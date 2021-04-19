@@ -10,11 +10,10 @@ namespace UAlbion.Core.Veldrid.Textures
         public TextureType Type => TextureType.Texture2D;
         public override int FormatSize => 1;
 
-        public unsafe Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
+        public unsafe Texture CreateDeviceTexture(GraphicsDevice gd, TextureUsage usage)
         {
             if (gd == null) throw new ArgumentNullException(nameof(gd));
-            if (rf == null) throw new ArgumentNullException(nameof(rf));
-            using Texture staging = rf.CreateTexture(new TextureDescription(
+            using Texture staging = gd.ResourceFactory.CreateTexture(new TextureDescription(
                 (uint)Width,
                 (uint)Height,
                 (uint)Depth,
@@ -34,7 +33,7 @@ namespace UAlbion.Core.Veldrid.Textures
                     0, 0, 0, (uint)Width, (uint)Height, 1, 0, 0);
             }
 
-            Texture texture = rf.CreateTexture(new TextureDescription(
+            Texture texture = gd.ResourceFactory.CreateTexture(new TextureDescription(
                 (uint)Width,
                 (uint)Height,
                 (uint)Depth,
@@ -45,7 +44,7 @@ namespace UAlbion.Core.Veldrid.Textures
                 Type));
 
             texture.Name = Name;
-            using (CommandList cl = rf.CreateCommandList()) // TODO: Update texture without a dedicated command list to improve perf.
+            using (CommandList cl = gd.ResourceFactory.CreateCommandList()) // TODO: Update texture without a dedicated command list to improve perf.
             {
                 cl.Begin();
                 cl.CopyTexture(staging, texture);

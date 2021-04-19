@@ -280,7 +280,7 @@ namespace UAlbion.Game.Assets
             var loaderRegistry = Resolve<IAssetLoaderRegistry>();
             var containerRegistry = Resolve<IContainerRegistry>();
             var disk = Resolve<IFileSystem>();
-            var target = _modsInReverseDependencyOrder.Last();
+            var target = _modsInReverseDependencyOrder.First();
 
             // Add any missing ids
             Raise(new LogEvent(LogEvent.Level.Info, "Populating destination asset info..."));

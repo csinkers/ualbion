@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api.Visual;
@@ -45,10 +46,11 @@ namespace UAlbion.Core.Veldrid.Textures
         public ISubImage GetSubImage(int subImageId) => _subImage;
         public void Invalidate() => IsDirty = true;
 
-        public Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
+        public Texture CreateDeviceTexture(GraphicsDevice gd, TextureUsage usage)
         {
+            if (gd == null) throw new ArgumentNullException(nameof(gd));
             IsDirty = false;
-            var texture = _texture.CreateDeviceTexture(gd, rf);
+            var texture = _texture.CreateDeviceTexture(gd, gd.ResourceFactory);
             texture.Name = "T_" + Name;
             return texture;
         }

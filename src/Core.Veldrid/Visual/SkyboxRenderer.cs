@@ -20,7 +20,7 @@ namespace UAlbion.Core.Veldrid.Visual
         readonly uint _pad1;   // 16
     }
 
-    public sealed class SkyboxRenderer : Component, IRenderer
+    public sealed class SkyboxRenderer : VeldridComponent, IRenderer
     {
         // Vertex Layout
         static readonly VertexLayoutDescription VertexLayout = VertexLayoutHelper.Vertex2DTextured;
@@ -41,10 +41,10 @@ namespace UAlbion.Core.Veldrid.Visual
 
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
         readonly List<Shader> _shaders = new List<Shader>();
-        Pipeline _pipeline;
 
 #pragma warning disable CA2213 // Disposable fields should be disposed
         // Context objects - disposed by the dispose collector.
+        Pipeline _pipeline;
         DeviceBuffer _vertexBuffer;
         DeviceBuffer _indexBuffer;
         DeviceBuffer _uniformBuffer;
@@ -54,11 +54,11 @@ namespace UAlbion.Core.Veldrid.Visual
         public Type[] RenderableTypes => new[] { typeof(SkyboxRenderable) };
         public RenderPasses RenderPasses => RenderPasses.Standard;
 
-        Pipeline BuildPipeline(GraphicsDevice gd, SceneContext sc)
+        Pipeline BuildPipeline(VeldridRendererContext context)
         {
             var shaderCache = Resolve<IVeldridShaderCache>();
 
-            var shaders = shaderCache.GetShaderPair(gd.ResourceFactory, "SkyBoxSV.vert", "SkyBoxSF.frag");
+            var shaders = shaderCache.GetShaderPair(context.GraphicsDevice.ResourceFactory, "SkyBoxSV.vert", "SkyBoxSF.frag");
             _shaders.AddRange(shaders);
             var shaderSet = new ShaderSetDescription(new[] { VertexLayout }, shaders);
             var depthStencilMode = DepthStencilStateDescription.Disabled;
@@ -76,34 +76,31 @@ namespace UAlbion.Core.Veldrid.Visual
                 PrimitiveTopology.TriangleList,
                 new ShaderSetDescription(new[] { VertexLayout },
                     shaderSet.Shaders,
-                    ShaderHelper.GetSpecializations(gd)),
-                new[] { _resourceLayout, sc.CommonResourceLayout },
-                gd.SwapchainFramebuffer.OutputDescription);
+                    ShaderHelper.GetSpecializations(context.GraphicsDevice)),
+                new[] { _resourceLayout, context.SceneContext.CommonResourceLayout },
+                context.GraphicsDevice.SwapchainFramebuffer.OutputDescription);
 
-            var pipeline = gd.ResourceFactory.CreateGraphicsPipeline(ref pipelineDescription);
+            var pipeline = context.GraphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref pipelineDescription);
             pipeline.Name = "P_Skybox";
             return pipeline;
         }
 
-        public void CreateDeviceObjects(IRendererContext context)
+        public override void CreateDeviceObjects(VeldridRendererContext context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            var c = (VeldridRendererContext)context;
 
-            ResourceFactory factory = c.GraphicsDevice.ResourceFactory;
-
-            _vertexBuffer = factory.CreateBuffer(new BufferDescription(Vertices.SizeInBytes(), BufferUsage.VertexBuffer));
-            _indexBuffer = factory.CreateBuffer(new BufferDescription(Indices.SizeInBytes(), BufferUsage.IndexBuffer));
-            _uniformBuffer = factory.CreateBuffer(new BufferDescription((uint)Unsafe.SizeOf<SkyboxUniformInfo>(), BufferUsage.UniformBuffer));
+            _vertexBuffer = context.GraphicsDevice.ResourceFactory.CreateBuffer(new BufferDescription(Vertices.SizeInBytes(), BufferUsage.VertexBuffer));
+            _indexBuffer = context.GraphicsDevice.ResourceFactory.CreateBuffer(new BufferDescription(Indices.SizeInBytes(), BufferUsage.IndexBuffer));
+            _uniformBuffer = context.GraphicsDevice.ResourceFactory.CreateBuffer(new BufferDescription((uint)Unsafe.SizeOf<SkyboxUniformInfo>(), BufferUsage.UniformBuffer));
             _vertexBuffer.Name = "SpriteVertexBuffer";
             _indexBuffer.Name = "SpriteIndexBuffer";
             _uniformBuffer.Name = "SpriteUniformBuffer";
-            c.CommandList.UpdateBuffer(_vertexBuffer, 0, Vertices);
-            c.CommandList.UpdateBuffer(_indexBuffer, 0, Indices);
+            context.CommandList.UpdateBuffer(_vertexBuffer, 0, Vertices);
+            context.CommandList.UpdateBuffer(_indexBuffer, 0, Indices);
 
-            _resourceLayout = factory.CreateResourceLayout(ResourceLayoutDescription);
-            _disposeCollector.Add(_vertexBuffer, _indexBuffer, _uniformBuffer, _resourceLayout);
-            _pipeline = BuildPipeline(c.GraphicsDevice, c.SceneContext);
+            _resourceLayout = context.GraphicsDevice.ResourceFactory.CreateResourceLayout(ResourceLayoutDescription);
+            _pipeline = BuildPipeline(context);
+            _disposeCollector.Add(_vertexBuffer, _indexBuffer, _uniformBuffer, _resourceLayout, _pipeline);
         }
 
         public void UpdatePerFrameResources(IRendererContext context, IEnumerable<IRenderable> renderables, IList<IRenderable> results)
@@ -112,22 +109,21 @@ namespace UAlbion.Core.Veldrid.Visual
             if (renderables == null) throw new ArgumentNullException(nameof(renderables));
             if (results == null) throw new ArgumentNullException(nameof(results));
             var c = (VeldridRendererContext)context;
-            var gd = c.GraphicsDevice;
             if(!(renderables.FirstOrDefault() is SkyboxRenderable skybox))
                 return;
 
-            ITextureManager textureManager = Resolve<ITextureManager>();
-            IDeviceObjectManager objectManager = Resolve<IDeviceObjectManager>();
+            var textureManager = Resolve<ITextureManager>();
+            var objectManager = Resolve<IDeviceObjectManager>();
 
-            textureManager?.PrepareTexture(skybox.Texture, context);
-            TextureView textureView = (TextureView)textureManager?.GetTexture(skybox.Texture);
+            textureManager.PrepareTexture(skybox.Texture, context);
+            TextureView textureView = (TextureView)textureManager.GetTexture(skybox.Texture);
 
             var resourceSet = objectManager.GetDeviceObject<ResourceSet>((skybox, textureView, null));
             if (resourceSet == null)
             {
-                resourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
+                resourceSet = c.GraphicsDevice.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
                     _resourceLayout,
-                    gd.PointSampler,
+                    c.GraphicsDevice.PointSampler,
                     textureView,
                     _uniformBuffer));
                 resourceSet.Name = $"RS_Sky:{skybox.Texture.Name}";
@@ -146,8 +142,8 @@ namespace UAlbion.Core.Veldrid.Visual
             var cl = c.CommandList;
             var sc = c.SceneContext;
 
-            ITextureManager textureManager = Resolve<ITextureManager>();
-            IDeviceObjectManager dom = Resolve<IDeviceObjectManager>();
+            var textureManager = Resolve<ITextureManager>();
+            var dom = Resolve<IDeviceObjectManager>();
             var config = Resolve<CoreConfig>().Visual.Skybox;
             if (!(Resolve<ICamera>() is PerspectiveCamera camera))
                 return;
@@ -168,7 +164,7 @@ namespace UAlbion.Core.Veldrid.Visual
             if (sc.PaletteView == null)
                 return;
 
-            TextureView textureView = (TextureView)textureManager?.GetTexture(skybox.Texture);
+            var textureView = (TextureView)textureManager.GetTexture(skybox.Texture);
             var resourceSet = dom.GetDeviceObject<ResourceSet>((skybox, textureView, null));
 
             cl.SetPipeline(_pipeline);
@@ -181,10 +177,9 @@ namespace UAlbion.Core.Veldrid.Visual
             cl.PopDebugGroup();
         }
 
-        public void DestroyDeviceObjects()
+        public override void DestroyDeviceObjects()
         {
             _disposeCollector.DisposeAll();
-            _pipeline?.Dispose();
 
             foreach (var shader in _shaders)
                 shader.Dispose();

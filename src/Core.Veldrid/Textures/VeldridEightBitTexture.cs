@@ -12,11 +12,10 @@ namespace UAlbion.Core.Veldrid.Textures
     {
         public TextureType Type => TextureType.Texture2D;
 
-        public unsafe Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
+        public unsafe Texture CreateDeviceTexture(GraphicsDevice gd, TextureUsage usage)
         {
             if (gd == null) throw new ArgumentNullException(nameof(gd));
-            if (rf == null) throw new ArgumentNullException(nameof(rf));
-            using Texture staging = rf.CreateTexture(new TextureDescription(
+            using Texture staging = gd.ResourceFactory.CreateTexture(new TextureDescription(
                 (uint)Width,
                 (uint)Height,
                 (uint)Depth,
@@ -49,7 +48,7 @@ namespace UAlbion.Core.Veldrid.Textures
                 }
             }
 
-            Texture texture = rf.CreateTexture(new TextureDescription(
+            Texture texture = gd.ResourceFactory.CreateTexture(new TextureDescription(
                 (uint)Width,
                 (uint)Height,
                 (uint)Depth,
@@ -61,7 +60,7 @@ namespace UAlbion.Core.Veldrid.Textures
 
             texture.Name = "T_" + Name;
 
-            using (CommandList cl = rf.CreateCommandList())
+            using (CommandList cl = gd.ResourceFactory.CreateCommandList())
             {
                 cl.Begin();
                 cl.CopyTexture(staging, texture);

@@ -10,7 +10,7 @@ namespace UAlbion.Core.Visual
         readonly bool _yAxisIncreasesDownTheScreen;
         Vector3 _position = new Vector3(0, 0, 0);
         Vector3 _lookDirection = new Vector3(0, 0, -1f);
-        Vector2 _windowSize = Vector2.One;
+        Vector2 _viewport = Vector2.One;
         Matrix4x4 _projectionMatrix;
         float _magnification = 1.0f; // TODO: Ensure this defaults to something sensible, and at some point lock it to a value that fits the gameplay and map design.
         float _yaw;
@@ -28,7 +28,19 @@ namespace UAlbion.Core.Visual
         public float FarDistance { get => _farDistance; private set { _farDistance = value; UpdatePerspectiveMatrix(); } } 
         public float Yaw { get => _yaw; private set { _yaw = value; UpdateViewMatrix(); } } // Radians
         public float Pitch { get => _pitch; private set { _pitch = Math.Clamp(value, (float)-Math.PI / 2, (float)Math.PI / 2); UpdateViewMatrix(); } } // Radians
-        public float AspectRatio => _windowSize.X / _windowSize.Y;
+        public float AspectRatio => _viewport.X / _viewport.Y;
+
+        public Vector2 Viewport
+        {
+            get => _viewport;
+            set
+            {
+                if (_viewport == value)
+                    return;
+                _viewport = value;
+                UpdatePerspectiveMatrix();
+            }
+        }
 
         public OrthographicCamera(bool yAxisIncreasesDownTheScreen = true)
         {
@@ -52,17 +64,6 @@ namespace UAlbion.Core.Visual
                 UpdatePerspectiveMatrix();
                 Raise(new CameraMagnificationEvent(_magnification));
             });
-
-            On<RenderEvent>(e =>
-            {
-                var window = Resolve<IWindowManager>();
-                var size = new Vector2(window.PixelWidth, window.PixelHeight);
-                if (_windowSize != size)
-                {
-                    _windowSize = size;
-                    UpdatePerspectiveMatrix();
-                }
-            });
         }
 
         protected override void Subscribed()
@@ -74,7 +75,7 @@ namespace UAlbion.Core.Visual
 
         bool TransformSelect(ScreenCoordinateSelectEvent e, Action<Selection> continuation)
         {
-            var normalisedScreenPosition = new Vector3(2 * e.Position.X / _windowSize.X - 1.0f, -2 * e.Position.Y / _windowSize.Y + 1.0f, 0.0f);
+            var normalisedScreenPosition = new Vector3(2 * e.Position.X / _viewport.X - 1.0f, -2 * e.Position.Y / _viewport.Y + 1.0f, 0.0f);
             var rayOrigin = UnprojectNormToWorld(normalisedScreenPosition + Vector3.UnitZ);
             var rayDirection = UnprojectNormToWorld(normalisedScreenPosition) - rayOrigin;
             RaiseAsync(new WorldCoordinateSelectEvent(rayOrigin, rayDirection), continuation);
@@ -84,8 +85,8 @@ namespace UAlbion.Core.Visual
         void UpdatePerspectiveMatrix()
         {
             _projectionMatrix = Matrix4x4.Identity;
-            _projectionMatrix.M11 = 2.0f * _magnification / _windowSize.X;
-            _projectionMatrix.M22 = 2.0f * _magnification / _windowSize.Y;
+            _projectionMatrix.M11 = 2.0f * _magnification / _viewport.X;
+            _projectionMatrix.M22 = 2.0f * _magnification / _viewport.Y;
             _projectionMatrix.M33 = 1 / FarDistance;
 
             var e = TryResolve<IEngine>();
@@ -98,22 +99,6 @@ namespace UAlbion.Core.Visual
             Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(Yaw, Pitch, 0f);
             _lookDirection = Vector3.Transform(-Vector3.UnitZ, lookRotation);
             ViewMatrix = Matrix4x4.CreateTranslation(-_position) * Matrix4x4.CreateFromQuaternion(lookRotation);
-        }
-
-        public CameraInfo GetCameraInfo()
-        {
-            var clock = TryResolve<IClock>();
-            var settings = TryResolve<IEngineSettings>();
-
-            return new CameraInfo
-            {
-                WorldSpacePosition = _position,
-                Resolution = _windowSize,
-                Time = clock?.ElapsedTime ?? 0,
-                Special1 = settings?.Special1 ?? 0,
-                Special2 = settings?.Special2 ?? 0,
-                EngineFlags = (uint?)settings?.Flags ?? 0
-            };
         }
 
         public Vector3 ProjectWorldToNorm(Vector3 worldPosition) => Vector3.Transform(worldPosition, ViewMatrix * ProjectionMatrix) - Vector3.UnitZ;

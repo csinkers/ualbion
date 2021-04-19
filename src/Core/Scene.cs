@@ -11,12 +11,12 @@ namespace UAlbion.Core
     public class Scene : Container, IScene
     {
         readonly IDictionary<(DrawLayer, int), List<IRenderable>> _processedRenderables = new Dictionary<(DrawLayer, int), List<IRenderable>>();
-        (float Red, float Green, float Blue) _clearColour;
+        (float Red, float Green, float Blue, float Alpha) _clearColour;
 
         protected Scene(string name) : base(name)
         {
             On<CollectScenesEvent>(e => e.Register(this));
-            On<SetClearColourEvent>(e => _clearColour = (e.Red, e.Green, e.Blue));
+            On<SetClearColourEvent>(e => _clearColour = (e.Red, e.Green, e.Blue, e.Alpha));
         }
 
         public override string ToString() => $"Scene:{Name}";
@@ -34,7 +34,6 @@ namespace UAlbion.Core
             using (PerfTracker.FrameEvent("6.2.2 Prepare per-frame resources"))
             using (context.Factory.CreateRenderDebugGroup(context, "Prepare per-frame resources"))
             {
-
                 _processedRenderables.Clear();
                 List<IRenderable> processed = new List<IRenderable>();
                 foreach (var renderableGroup in renderables)
@@ -61,7 +60,7 @@ namespace UAlbion.Core
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (renderers == null) throw new ArgumentNullException(nameof(renderers));
-            context.SetClearColor(_clearColour.Red, _clearColour.Green, _clearColour.Blue);
+            context.SetClearColor(_clearColour.Red, _clearColour.Green, _clearColour.Blue, _clearColour.Alpha);
 
             var orderedKeys = _processedRenderables.Keys.OrderBy(x => x).ToArray();
             CoreTrace.Log.Info("Scene", "Sorted processed renderables");

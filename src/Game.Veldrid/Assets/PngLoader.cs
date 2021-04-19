@@ -5,8 +5,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using SerdesNet;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
@@ -20,7 +20,7 @@ namespace UAlbion.Game.Veldrid.Assets
 {
     public class PngLoader : Component, IAssetLoader<IEightBitImage>
     {
-        static (byte[], string) Write(IImageEncoder encoder, uint[] palette, IEightBitImage existing, int frameNum)
+        static byte[] Write(IImageEncoder encoder, uint[] palette, IEightBitImage existing, int frameNum)
         {
             var frame = existing.GetSubImage(frameNum);
             var buffer = new ReadOnlyByteImageBuffer(
@@ -31,7 +31,7 @@ namespace UAlbion.Game.Veldrid.Assets
 
             Image<Rgba32> image = ImageUtil.BuildImageForFrame(buffer, palette);
             var bytes = FormatUtil.BytesFromStream(stream => encoder.Encode(image, stream));
-            return (bytes, null);
+            return bytes;
         }
 
         static IEightBitImage Read(AssetId id, uint[] palette, IList<Image<Rgba32>> images)

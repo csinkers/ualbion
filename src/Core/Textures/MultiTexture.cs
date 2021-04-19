@@ -79,15 +79,12 @@ namespace UAlbion.Core.Textures
         public int SizeInBytes => Width * Height * LayerSizes.Count * FormatSize;
         public void Invalidate() => IsDirty = true; 
 
-        public bool IsAnimated(int logicalId)
+        public int GetFrameCountForLogicalId(int logicalId)
         {
             if (IsMetadataDirty)
                 RebuildLayers();
 
-            if (logicalId >= LogicalSubImages.Count)
-                return false;
-
-            return LogicalSubImages[logicalId].Frames > 1;
+            return logicalId >= LogicalSubImages.Count ? 1 : LogicalSubImages[logicalId].Frames;
         }
 
         public int GetSubImageAtTime(int logicalId, int tick)

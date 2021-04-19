@@ -7,7 +7,7 @@ namespace UAlbion.Core.Visual
 {
     public class DungeonTilemap : IRenderable
     {
-        readonly DungeonTile[] _tiles;
+        DungeonTile[] _tiles;
         DungeonTileMapProperties _properties;
 
         public DungeonTilemap(IAssetId id, string name, int tileCount, DungeonTileMapProperties properties, ICoreFactory factory, IPalette dayPalette, IPalette nightPalette)
@@ -60,8 +60,12 @@ namespace UAlbion.Core.Visual
 
         public void Set(int index, byte floorSubImage, byte ceilingSubImage, byte wallSubImage, int frame)
         {
-            bool isAnimated = DayFloors.IsAnimated(floorSubImage) || DayFloors.IsAnimated(ceilingSubImage) || DayWalls.IsAnimated(wallSubImage);
-            if (isAnimated) AnimatedTiles.Add(index);
+            int totalFrameCount = 
+                DayFloors.GetFrameCountForLogicalId(floorSubImage) 
+                + DayFloors.GetFrameCountForLogicalId(ceilingSubImage) 
+                + DayWalls.GetFrameCountForLogicalId(wallSubImage);
+
+            if (totalFrameCount > 3) AnimatedTiles.Add(index);
             else AnimatedTiles.Remove(index);
 
             unsafe
@@ -77,6 +81,16 @@ namespace UAlbion.Core.Visual
                 }
             }
 
+            TilesDirty = true;
+        }
+
+        public void Resize(int tileCount)
+        {
+            var old = _tiles;
+            _tiles = new DungeonTile[tileCount];
+            if (old != null)
+                for (int i = 0; i < _tiles.Length && i < old.Length; i++)
+                    _tiles[i] = old[i];
             TilesDirty = true;
         }
     }

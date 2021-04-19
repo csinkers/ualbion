@@ -39,9 +39,9 @@ namespace UAlbion.Formats.Exporters.Tiled
                 PackedChunks.Pack(s, existing.Count, stampNumber =>
                 {
                     if (existing[stampNumber].Width == 0 || existing[stampNumber].Height == 0)
-                        return (Array.Empty<byte>(), null);
+                        return Array.Empty<byte>();
                     var stamp = new Stamp(stampNumber, existing[stampNumber], tileset);
-                    return (FormatUtil.BytesFromTextWriter(stamp.Serialize), null);
+                    return FormatUtil.BytesFromTextWriter(stamp.Serialize);
                 });
 
                 return existing;

@@ -41,7 +41,7 @@ namespace UAlbion.Formats.Containers
             {
                 using var bw = new BinaryWriter(ms, Encoding.UTF8, true);
                 using var s = new AlbionWriter(bw);
-                PackedChunks.Pack(s, subAssets.Keys.Max() + 1, i => 
+                PackedChunks.PackNamed(s, subAssets.Keys.Max() + 1, i => 
                     !subAssets.TryGetValue(i, out var pathAndName)
                         ? (Array.Empty<byte>(), null)
                         : (disk.ReadAllBytes(pathAndName.Item1), pathAndName.Item2));
@@ -91,8 +91,14 @@ namespace UAlbion.Formats.Containers
                         if (subAssetBytes.Length == 0)
                             continue;
 
-                        var filename = info.BuildFilename(pattern, i, name);
-                        disk.WriteAllBytes(Path.Combine(path, filename), subAssetBytes);
+                        var filename = name ?? info.BuildFilename(pattern, i, ConfigUtil.AssetName(info.AssetId));
+                        var fullPath = Path.Combine(path, filename);
+
+                        var dir = Path.GetDirectoryName(fullPath);
+                        if (!disk.DirectoryExists(dir))
+                            disk.CreateDirectory(dir);
+
+                        disk.WriteAllBytes(fullPath, subAssetBytes);
                     }
                 }
             }

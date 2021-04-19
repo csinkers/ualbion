@@ -6,6 +6,6 @@ namespace UAlbion.Core.Veldrid.Textures
     public interface IVeldridTexture : ITexture
     {
         TextureType Type { get; }
-        Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage);
+        Texture CreateDeviceTexture(GraphicsDevice gd, TextureUsage usage);
     }
 }

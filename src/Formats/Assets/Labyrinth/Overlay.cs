@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using SerdesNet;
 using UAlbion.Config;
 
@@ -7,6 +8,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
     public class Overlay
     {
         public SpriteId SpriteId { get; set; } // 0, ushort
+        [DefaultValue(1)]
         public byte AnimationFrames { get; set; } // 2
         public byte WriteZero { get; set; } // 3
         public ushort YOffset { get; set; } // 4

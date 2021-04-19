@@ -11,6 +11,7 @@ using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Text;
+using UAlbion.Game.Veldrid.Assets;
 using UAlbion.Game.Veldrid.Visual;
 
 #pragma warning disable CA2000 // Dispose objects before losing scopes
@@ -28,7 +29,7 @@ namespace UAlbion
             Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Formats.ScriptEvents.PartyMoveEvent)));
             Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Game.Events.StartEvent)));
             Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Game.Veldrid.Debugging.HideDebugWindowEvent)));
-            Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.IsoYawEvent)));
+            Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(IsoYawEvent)));
             PerfTracker.StartupEvent("Built event parsers");
 
             var commandLine = new CommandLineOptions(args);
@@ -69,7 +70,7 @@ namespace UAlbion
             switch (commandLine.Mode) // ConvertAssets handled above as it requires a specialised asset system setup
             {
                 case ExecutionMode.Game: Albion.RunGame(engine, exchange, services, baseDir, commandLine); break;
-                case ExecutionMode.BakeIsometric: IsoBake.Bake(exchange, services, baseDir, commandLine); break;
+                // case ExecutionMode.BakeIsometric: IsoBake.Bake(exchange, services, baseDir, commandLine); break;
 
                 case ExecutionMode.DumpData:
                     PerfTracker.BeginFrame(); // Don't need to show verbose startup logging while dumping
@@ -119,7 +120,7 @@ namespace UAlbion
         {
             PerfTracker.StartupEvent("Creating engine");
             var engine =
-                new VeldridEngine(commandLine.Backend, commandLine.UseRenderDoc, commandLine.StartupOnly) { WindowTitle = "UAlbion" }
+                new VeldridEngine(commandLine.Backend, commandLine.UseRenderDoc, commandLine.StartupOnly, true) { WindowTitle = "UAlbion" }
                     .AddRenderer(new SkyboxRenderer())
                     .AddRenderer(new SpriteRenderer())
                     .AddRenderer(new ExtrudedTileMapRenderer())

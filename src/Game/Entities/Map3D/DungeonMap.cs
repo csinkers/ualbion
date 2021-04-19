@@ -124,7 +124,7 @@ namespace UAlbion.Game.Entities.Map3D
                 }
             }
 
-            Raise(new SetClearColourEvent(_backgroundRed, _backgroundGreen, _backgroundBlue));
+            Raise(new SetClearColourEvent(_backgroundRed, _backgroundGreen, _backgroundBlue, 1.0f));
         }
 
         void Select(WorldCoordinateSelectEvent worldCoordinateSelectEvent)

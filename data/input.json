@@ -143,6 +143,12 @@
 
     "Control+A": "iso_lab 1",
     "Control+X": "iso_lab -1",
+    "Control+Z":  "iso_pal -1", 
+    "Control+C":  "iso_pal 1", 
+    "Number1": "iso_mode Floors",
+    "Number2": "iso_mode Ceilings",
+    "Number3": "iso_mode Walls",
+    "Number4": "iso_mode Contents",
 
     "Shift+W": "+cam_move 0 150",
     "Shift+A": "+cam_move -150 0",

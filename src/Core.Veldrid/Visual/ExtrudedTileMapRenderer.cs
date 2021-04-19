@@ -9,14 +9,11 @@ using Veldrid.Utilities;
 #pragma warning disable CA2213 // Analysis doesn't know about dispose collector
 namespace UAlbion.Core.Veldrid.Visual
 {
-    public sealed class ExtrudedTileMapRenderer : Component, IRenderer
+    public sealed class ExtrudedTileMapRenderer : VeldridComponent, IRenderer
     {
         static (object, object, object) ResourceSetKey(DungeonTilemap tilemap, TextureView texture) => (tilemap, texture, "ResourceSet");
         static (object, object, object) PropertyBufferKey(DungeonTilemap tilemap) => (tilemap, tilemap, "PropertyBuffer");
         static (object, object, object) InstanceBufferKey(DungeonTilemap tilemap) => (tilemap, tilemap, "InstanceBuffer");
-
-        // Vertex Layout
-        static readonly VertexLayoutDescription VertexLayout = VertexLayoutHelper.Vertex3DTextured;
 
         // Instance Layout
         static readonly VertexLayoutDescription InstanceLayout = new VertexLayoutDescription(
@@ -37,125 +34,67 @@ namespace UAlbion.Core.Veldrid.Visual
         const string VertexShaderName = "ExtrudedTileMapSV.vert";
         const string FragmentShaderName = "ExtrudedTileMapSF.frag";
 
-        static readonly Vertex3DTextured[] Vertices = 
-        { // Unit cube centred on the middle of the bottom face. Up axis = Y.
-            // Floor (facing inward)
-            new Vertex3DTextured(-0.5f, -0.5f,  0.5f, 0.0f, 1.0f), //  0 Bottom Front Left
-            new Vertex3DTextured( 0.5f, -0.5f,  0.5f, 1.0f, 1.0f), //  1 Bottom Front Right
-            new Vertex3DTextured(-0.5f, -0.5f, -0.5f, 0.0f, 0.0f), //  2 Bottom Back Left
-            new Vertex3DTextured( 0.5f, -0.5f, -0.5f, 1.0f, 0.0f), //  3 Bottom Back Right
-
-            // Ceiling (facing inward)
-            new Vertex3DTextured(-0.5f, 0.5f,  0.5f, 0.0f, 0.0f), //  4 Top Front Left
-            new Vertex3DTextured( 0.5f, 0.5f,  0.5f, 1.0f, 0.0f), //  5 Top Front Right
-            new Vertex3DTextured(-0.5f, 0.5f, -0.5f, 0.0f, 1.0f), //  6 Top Back Left
-            new Vertex3DTextured( 0.5f, 0.5f, -0.5f, 1.0f, 1.0f), //  7 Top Back Right
-
-            // Back (facing outward)
-            new Vertex3DTextured(-0.5f,  0.5f, -0.5f, 1.0f, 0.0f), //  8 Back Top Right
-            new Vertex3DTextured( 0.5f,  0.5f, -0.5f, 0.0f, 0.0f), //  9 Back Top Left
-            new Vertex3DTextured(-0.5f, -0.5f, -0.5f, 1.0f, 1.0f), // 10 Back Bottom Right
-            new Vertex3DTextured( 0.5f, -0.5f, -0.5f, 0.0f, 1.0f), // 11 Back Bottom Left
-
-            // Front (facing outward)
-            new Vertex3DTextured( 0.5f,  0.5f,  0.5f, 1.0f, 0.0f), // 12 Front Top Left
-            new Vertex3DTextured(-0.5f,  0.5f,  0.5f, 0.0f, 0.0f), // 13 Front Top Right
-            new Vertex3DTextured( 0.5f, -0.5f,  0.5f, 1.0f, 1.0f), // 14 Front Bottom Left
-            new Vertex3DTextured(-0.5f, -0.5f,  0.5f, 0.0f, 1.0f), // 15 Front Bottom Right
-
-            // Left (facing outward)
-            new Vertex3DTextured(-0.5f,  0.5f,  0.5f, 1.0f, 0.0f), // 16 Back Top Left
-            new Vertex3DTextured(-0.5f,  0.5f, -0.5f, 0.0f, 0.0f), // 17 Front Top Left
-            new Vertex3DTextured(-0.5f, -0.5f,  0.5f, 1.0f, 1.0f), // 18 Back Bottom Left
-            new Vertex3DTextured(-0.5f, -0.5f, -0.5f, 0.0f, 1.0f), // 19 Back Front Left
-
-            // Right (facing outward)
-            new Vertex3DTextured( 0.5f,  0.5f, -0.5f, 0.0f, 0.0f), // 20 Front Top Right
-            new Vertex3DTextured( 0.5f,  0.5f,  0.5f, 1.0f, 0.0f), // 21 Back Top Right
-            new Vertex3DTextured( 0.5f, -0.5f, -0.5f, 0.0f, 1.0f), // 22 Front Bottom Right
-            new Vertex3DTextured( 0.5f, -0.5f,  0.5f, 1.0f, 1.0f), // 23 Back Bottom Right
-        };
-
-        static readonly ushort[] Indices =
-        {
-             0,  1,  2,  2,  1,  3, // Floor
-             6,  5,  4,  7,  5,  6, // Ceiling
-             8,  9, 10, 10,  9, 11, // Back
-            12, 13, 14, 14, 13, 15, // Front
-            16, 17, 18, 18, 17, 19, // Left
-            20, 21, 22, 22, 21, 23, // Right
-        };
-
         public Type[] RenderableTypes => new[] { typeof(DungeonTilemap), typeof(TileMapWindow) };
         public RenderPasses RenderPasses => RenderPasses.Standard;
         readonly DisposeCollector _disposeCollector = new DisposeCollector();
-        DeviceBuffer _vb;
-        DeviceBuffer _ib;
+        DeviceBuffer _vertexBuffer;
+        DeviceBuffer _indexBuffer;
         Pipeline _normalPipeline;
         Pipeline _nonCullingPipeline;
         ResourceLayout _layout;
         Sampler _textureSampler;
 
-        public void CreateDeviceObjects(IRendererContext context)
+        public override void CreateDeviceObjects(VeldridRendererContext context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            var c = (VeldridRendererContext)context;
-            var cl = c.CommandList;
-            var gd = c.GraphicsDevice;
-            var sc = c.SceneContext;
 
-            ResourceFactory factory = gd.ResourceFactory;
-
-            _vb = factory.CreateBuffer(new BufferDescription(Vertices.SizeInBytes(), BufferUsage.VertexBuffer));
-            _ib = factory.CreateBuffer(new BufferDescription(Indices.SizeInBytes(), BufferUsage.IndexBuffer));
-            _vb.Name = "TileMapVertexBuffer";
-            _ib.Name = "TileMapIndexBuffer";
-            cl.UpdateBuffer(_vb, 0, Vertices);
-            cl.UpdateBuffer(_ib, 0, Indices);
+            _vertexBuffer = context.GraphicsDevice.ResourceFactory.CreateBuffer(new BufferDescription(Cube.Vertices.SizeInBytes(), BufferUsage.VertexBuffer));
+            _indexBuffer = context.GraphicsDevice.ResourceFactory.CreateBuffer(new BufferDescription(Cube.Indices.SizeInBytes(), BufferUsage.IndexBuffer));
+            _vertexBuffer.Name = "TileMapVertexBuffer";
+            _indexBuffer.Name = "TileMapIndexBuffer";
+            context.CommandList.UpdateBuffer(_vertexBuffer, 0, Cube.Vertices);
+            context.CommandList.UpdateBuffer(_indexBuffer, 0, Cube.Indices);
 
             var shaderCache = Resolve<IVeldridShaderCache>();
-            var shaders = shaderCache.GetShaderPair(gd.ResourceFactory, VertexShaderName, FragmentShaderName);
+            var shaders = shaderCache.GetShaderPair(context.GraphicsDevice.ResourceFactory, VertexShaderName, FragmentShaderName);
             foreach (var shader in shaders)
                 _disposeCollector.Add(shader);
 
-            var shaderSet = new ShaderSetDescription(new[] { VertexLayout, InstanceLayout }, shaders);
+            var shaderSet = new ShaderSetDescription(new[] { Cube.VertexLayout, InstanceLayout }, shaders);
 
-            _layout = factory.CreateResourceLayout(UniformLayout);
+            _layout = context.GraphicsDevice.ResourceFactory.CreateResourceLayout(UniformLayout);
             _layout.Name = "RL_Tilemap";
 
-            _textureSampler = gd.ResourceFactory.CreateSampler(new SamplerDescription(
+            _textureSampler = context.GraphicsDevice.ResourceFactory.CreateSampler(new SamplerDescription(
                 SamplerAddressMode.Clamp,
                 SamplerAddressMode.Clamp,
                 SamplerAddressMode.Clamp,
                 SamplerFilter.MinPoint_MagPoint_MipPoint,
                 null, 1, 0, 0, 0, SamplerBorderColor.TransparentBlack
             ));
-            _textureSampler.Name = "TS_Tilemap";
 
-            _normalPipeline = BuildPipeline("P_TileMapRenderer", FaceCullMode.Back, gd, sc, shaderSet);
-            _nonCullingPipeline = BuildPipeline("P_TileMapRendererNoCull", FaceCullMode.None, gd, sc, shaderSet);
-            _disposeCollector.Add(_vb, _ib, _layout, _textureSampler, _normalPipeline, _nonCullingPipeline);
+            _textureSampler.Name = "TS_Tilemap";
+            _normalPipeline = BuildPipeline("P_TileMapRenderer", FaceCullMode.Back, context, shaderSet);
+            _nonCullingPipeline = BuildPipeline("P_TileMapRendererNoCull", FaceCullMode.None, context, shaderSet);
+            _disposeCollector.Add(_vertexBuffer, _indexBuffer, _layout, _textureSampler, _normalPipeline, _nonCullingPipeline);
         }
 
-        Pipeline BuildPipeline(string name, FaceCullMode cullMode, GraphicsDevice gd, SceneContext sc, ShaderSetDescription shaderSet)
+        Pipeline BuildPipeline(string name, FaceCullMode cullMode, VeldridRendererContext c, ShaderSetDescription shaderSet)
         {
-            var depthStencilMode = gd.IsDepthRangeZeroToOne
-                    ? DepthStencilStateDescription.DepthOnlyLessEqual
-                    : DepthStencilStateDescription.DepthOnlyGreaterEqual;
-
             var rasterizerMode = new RasterizerStateDescription(cullMode, PolygonFillMode.Solid, FrontFace.CounterClockwise, true, false);
             var pipelineDescription = new GraphicsPipelineDescription(
                 BlendStateDescription.SingleAlphaBlend,
-                depthStencilMode,
+                DepthStencilStateDescription.DepthOnlyLessEqual,
                 rasterizerMode,
                 PrimitiveTopology.TriangleList,
-                new ShaderSetDescription(new[] { VertexLayout, InstanceLayout },
+                new ShaderSetDescription(new[] { Cube.VertexLayout, InstanceLayout },
                     shaderSet.Shaders,
-                    ShaderHelper.GetSpecializations(gd)),
-                new[] { _layout, sc.CommonResourceLayout },
-                gd.SwapchainFramebuffer.OutputDescription);
+                    ShaderHelper.GetSpecializations(c.GraphicsDevice)),
+                new[] { _layout, c.SceneContext.CommonResourceLayout },
+                ((FramebufferSource)c.Framebuffer)?.Framebuffer.OutputDescription
+                ?? c.GraphicsDevice.SwapchainFramebuffer.OutputDescription);
 
-            var pipeline = gd.ResourceFactory.CreateGraphicsPipeline(ref pipelineDescription);
+            var pipeline = c.GraphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref pipelineDescription);
             pipeline.Name = name;
             return pipeline;
         }
@@ -205,25 +144,25 @@ namespace UAlbion.Core.Veldrid.Visual
             cl.PushDebugGroup($"Tiles3D:{tilemap.Name}:{tilemap.RenderOrder}");
 
             var textureManager = Resolve<ITextureManager>();
-            TextureView floors = (TextureView)textureManager.GetTexture(tilemap.DayFloors); 
+            var floors = (TextureView)textureManager.GetTexture(tilemap.DayFloors); 
             var instanceBuffer = objectManager.GetDeviceObject<DeviceBuffer>(InstanceBufferKey(tilemap));
             var resourceSet = objectManager.GetDeviceObject<ResourceSet>(ResourceSetKey(tilemap, floors));
 
             cl.SetPipeline(tilemap.PipelineId == (int)DungeonTilemapPipeline.NoCulling ? _nonCullingPipeline : _normalPipeline);
             cl.SetGraphicsResourceSet(0, resourceSet);
             cl.SetGraphicsResourceSet(1, c.SceneContext.CommonResourceSet);
-            cl.SetVertexBuffer(0, _vb);
+            cl.SetVertexBuffer(0, _vertexBuffer);
             cl.SetVertexBuffer(1, instanceBuffer);
-            cl.SetIndexBuffer(_ib, IndexFormat.UInt16);
+            cl.SetIndexBuffer(_indexBuffer, Cube.IndexFormat);
 
-            cl.DrawIndexed((uint)Indices.Length, (uint)tilemap.Tiles.Length, 0, 0, 0);
+            cl.DrawIndexed((uint)Cube.Indices.Length, (uint)tilemap.Tiles.Length, 0, 0, 0);
             cl.PopDebugGroup();
         }
 
-        public void DestroyDeviceObjects() => _disposeCollector.DisposeAll();
+        public override void DestroyDeviceObjects() => _disposeCollector.DisposeAll();
         public void Dispose() => DestroyDeviceObjects();
 
-        static void UpdateInstanceBuffer(DungeonTilemap tilemap, IDeviceObjectManager objectManager, VeldridRendererContext c)
+        static unsafe void UpdateInstanceBuffer(DungeonTilemap tilemap, IDeviceObjectManager objectManager, VeldridRendererContext c)
         {
             var bufferSize = (uint)tilemap.Tiles.Length * DungeonTile.StructSize;
             var buffer = objectManager.GetDeviceObject<DeviceBuffer>(InstanceBufferKey(tilemap));
@@ -238,12 +177,9 @@ namespace UAlbion.Core.Veldrid.Visual
             if (!tilemap.TilesDirty) 
                 return;
 
-            unsafe
+            fixed (DungeonTile* tile = &tilemap.Tiles[0])
             {
-                fixed (DungeonTile* tile = &tilemap.Tiles[0])
-                {
-                    c.CommandList.UpdateBuffer(buffer, 0, (IntPtr)(&tile[0]), bufferSize);
-                }
+                c.CommandList.UpdateBuffer(buffer, 0, (IntPtr)(&tile[0]), bufferSize);
             }
 
             tilemap.TilesDirty = false;

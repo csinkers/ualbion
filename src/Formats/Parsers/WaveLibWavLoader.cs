@@ -16,7 +16,7 @@ namespace UAlbion.Formats.Parsers
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             return s.IsWriting() 
-                ? Write(existing, s) 
+                ? Write(existing, info, s) 
                 : Read(s);
         }
 
@@ -65,17 +65,19 @@ namespace UAlbion.Formats.Parsers
             return lib;
         }
 
-        static WaveLib Write(WaveLib existing, ISerializer s)
+        static WaveLib Write(WaveLib existing, AssetInfo info, ISerializer s)
         {
             if (existing == null) throw new ArgumentNullException(nameof(existing));
 
-            PackedChunks.Pack(s, WaveLib.MaxSamples, i =>
+            PackedChunks.PackNamed(s, WaveLib.MaxSamples, i =>
             {
                 var sample = existing.Samples[i];
                 if (!sample.Active)
                     return (Array.Empty<byte>(), null);
 
-                string name = Invariant($"i{sample.Instrument}t{sample.Type}");
+                string extension = Invariant($"i{sample.Instrument}t{sample.Type}");
+                var pattern = info.Get(AssetProperty.Pattern, "{0}_{1}_{2}.dat");
+                var name = info.BuildFilename(pattern, i, extension);
                 var bytes= FormatUtil.SerializeToBytes(s2 => WavLoader.Serdes(sample, null, null, s2));
                 return (bytes, name);
             });

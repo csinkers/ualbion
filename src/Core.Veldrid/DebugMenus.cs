@@ -77,18 +77,6 @@ namespace UAlbion.Core.Veldrid
                     ImGui.EndMenu();
                 }
 
-                if (ImGui.BeginMenu("Debug"))
-                {
-                    if (ImGui.MenuItem("Refresh Device Objects"))
-                        _engine.RefreshDeviceObjects(1);
-                    if (ImGui.MenuItem("Refresh Device Objects (10 times)"))
-                        _engine.RefreshDeviceObjects(10);
-                    if (ImGui.MenuItem("Refresh Device Objects (100 times)"))
-                        _engine.RefreshDeviceObjects(100);
-
-                    ImGui.EndMenu();
-                }
-
                 if (ImGui.BeginMenu("RenderDoc"))
                 {
                     if (VeldridEngine.RenderDoc == null)

@@ -46,7 +46,7 @@ namespace UAlbion.Game.Entities.Map2D
 
         protected override void Subscribed()
         {
-            Raise(new SetClearColourEvent(0,0,0));
+            Raise(new SetClearColourEvent(0,0,0, 1.0f));
             if (_logicalMap != null)
                 return;
 

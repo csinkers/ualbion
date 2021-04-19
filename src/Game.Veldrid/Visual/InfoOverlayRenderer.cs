@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UAlbion.Api;
-using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Visual;
 using UAlbion.Core.Visual;
@@ -12,7 +11,7 @@ using Veldrid.Utilities;
 
 namespace UAlbion.Game.Veldrid.Visual
 {
-    public sealed class InfoOverlayRenderer : Component, IRenderer
+    public sealed class InfoOverlayRenderer : VeldridComponent, IRenderer
     {
         static readonly VertexLayoutDescription VertexLayout = VertexLayoutHelper.Vertex2DTextured;
 
@@ -42,7 +41,7 @@ namespace UAlbion.Game.Veldrid.Visual
 
         public Type[] RenderableTypes => new[] { typeof(InfoOverlay) };
         public RenderPasses RenderPasses => RenderPasses.Standard;
-        Pipeline BuildPipeline(GraphicsDevice gd, SceneContext sc)
+        Pipeline BuildPipeline(VeldridRendererContext context)
         {
             var shaderCache = Resolve<IVeldridShaderCache>();
             var shaderName = "InfoOverlay"; 
@@ -52,14 +51,14 @@ namespace UAlbion.Game.Veldrid.Visual
             var fragmentShaderContent = shaderCache.GetGlsl(fragmentShaderName);
 
             var shaders = shaderCache.GetShaderPair(
-                gd.ResourceFactory,
+                context.GraphicsDevice.ResourceFactory,
                 vertexShaderName, fragmentShaderName,
                 vertexShaderContent, fragmentShaderContent);
 
             _shaders.AddRange(shaders);
 
             var depthStencilMode =
-                gd.IsDepthRangeZeroToOne
+                context.GraphicsDevice.IsDepthRangeZeroToOne
                     ? DepthStencilStateDescription.DepthOnlyLessEqual
                     : DepthStencilStateDescription.DepthOnlyGreaterEqual;
 
@@ -77,30 +76,27 @@ namespace UAlbion.Game.Veldrid.Visual
                 PrimitiveTopology.TriangleList,
                 new ShaderSetDescription(new[] { VertexLayout },
                     shaders,
-                    ShaderHelper.GetSpecializations(gd)),
-                new[] { _perSpriteResourceLayout, sc.CommonResourceLayout },
-                gd.SwapchainFramebuffer.OutputDescription);
+                    ShaderHelper.GetSpecializations(context.GraphicsDevice)),
+                new[] { _perSpriteResourceLayout, context.SceneContext.CommonResourceLayout },
+                context.GraphicsDevice.SwapchainFramebuffer.OutputDescription);
 
-            var pipeline = gd.ResourceFactory.CreateGraphicsPipeline(ref pipelineDescription);
+            var pipeline = context.GraphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref pipelineDescription);
             pipeline.Name = "P_InfoOverlay";
             return pipeline;
         }
 
-        public void CreateDeviceObjects(IRendererContext context)
+        public override void CreateDeviceObjects(VeldridRendererContext context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            var c = (VeldridRendererContext)context;
-            var cl = c.CommandList;
-            var factory = c.GraphicsDevice.ResourceFactory;
 
-            _perSpriteResourceLayout = factory.CreateResourceLayout(PerSpriteLayoutDescription);
-            _pipeline = BuildPipeline(c.GraphicsDevice, c.SceneContext);
-            _vertexBuffer = factory.CreateBuffer(new BufferDescription(Vertices.SizeInBytes(), BufferUsage.VertexBuffer));
-            _indexBuffer = factory.CreateBuffer(new BufferDescription(Indices.SizeInBytes(), BufferUsage.IndexBuffer));
+            _perSpriteResourceLayout = context.GraphicsDevice.ResourceFactory.CreateResourceLayout(PerSpriteLayoutDescription);
+            _pipeline = BuildPipeline(context);
+            _vertexBuffer = context.GraphicsDevice.ResourceFactory.CreateBuffer(new BufferDescription(Vertices.SizeInBytes(), BufferUsage.VertexBuffer));
+            _indexBuffer = context.GraphicsDevice.ResourceFactory.CreateBuffer(new BufferDescription(Indices.SizeInBytes(), BufferUsage.IndexBuffer));
             _vertexBuffer.Name = "InfoOverlayVertexBuffer";
             _indexBuffer.Name = "InfoOverlayIndexBuffer";
-            cl.UpdateBuffer(_vertexBuffer, 0, Vertices);
-            cl.UpdateBuffer(_indexBuffer, 0, Indices);
+            context.CommandList.UpdateBuffer(_vertexBuffer, 0, Vertices);
+            context.CommandList.UpdateBuffer(_indexBuffer, 0, Indices);
 
             _disposeCollector.Add(_vertexBuffer, _indexBuffer, _pipeline, _perSpriteResourceLayout);
         }
@@ -204,7 +200,7 @@ namespace UAlbion.Game.Veldrid.Visual
             cl.PopDebugGroup();
         }
 
-        public void DestroyDeviceObjects()
+        public override void DestroyDeviceObjects()
         {
             _disposeCollector.DisposeAll();
 

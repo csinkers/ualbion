@@ -9,7 +9,7 @@ using Veldrid.Utilities;
 
 namespace UAlbion.Core.Veldrid.Visual
 {
-    public sealed class SpriteRenderer : Component, IRenderer
+    public sealed class SpriteRenderer : VeldridComponent, IRenderer
     {
         // Vertex Layout
         static readonly VertexLayoutDescription VertexLayout = VertexLayoutHelper.Vertex2DTextured;
@@ -90,9 +90,7 @@ namespace UAlbion.Core.Veldrid.Visual
 
             var depthStencilMode =
                 key.PerformDepthTest
-                ? gd.IsDepthRangeZeroToOne
-                    ? DepthStencilStateDescription.DepthOnlyLessEqual
-                    : DepthStencilStateDescription.DepthOnlyGreaterEqual
+                ? DepthStencilStateDescription.DepthOnlyLessEqual
                 : DepthStencilStateDescription.Disabled;
 
             var rasterizerMode = new RasterizerStateDescription(
@@ -118,22 +116,18 @@ namespace UAlbion.Core.Veldrid.Visual
             return pipeline;
         }
 
-        public void CreateDeviceObjects(IRendererContext context)
+        public override void CreateDeviceObjects(VeldridRendererContext context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            var c = (VeldridRendererContext)context;
-            var cl = c.CommandList;
-            var gd = c.GraphicsDevice;
-            var factory = gd.ResourceFactory;
 
-            _vertexBuffer = factory.CreateBuffer(new BufferDescription(Vertices.SizeInBytes(), BufferUsage.VertexBuffer));
-            _indexBuffer = factory.CreateBuffer(new BufferDescription(Indices.SizeInBytes(), BufferUsage.IndexBuffer));
+            _vertexBuffer = context.GraphicsDevice.ResourceFactory.CreateBuffer(new BufferDescription(Vertices.SizeInBytes(), BufferUsage.VertexBuffer));
+            _indexBuffer = context.GraphicsDevice.ResourceFactory.CreateBuffer(new BufferDescription(Indices.SizeInBytes(), BufferUsage.IndexBuffer));
             _vertexBuffer.Name = "SpriteVertexBuffer";
             _indexBuffer.Name = "SpriteIndexBuffer";
-            cl.UpdateBuffer(_vertexBuffer, 0, Vertices);
-            cl.UpdateBuffer(_indexBuffer, 0, Indices);
+            context.CommandList.UpdateBuffer(_vertexBuffer, 0, Vertices);
+            context.CommandList.UpdateBuffer(_indexBuffer, 0, Indices);
 
-            _perSpriteResourceLayout = factory.CreateResourceLayout(PerSpriteLayoutDescription);
+            _perSpriteResourceLayout = context.GraphicsDevice.ResourceFactory.CreateResourceLayout(PerSpriteLayoutDescription);
             _disposeCollector.Add(_vertexBuffer, _indexBuffer, _perSpriteResourceLayout);
         }
 
@@ -271,7 +265,7 @@ namespace UAlbion.Core.Veldrid.Visual
             cl.PopDebugGroup();
         }
 
-        public void DestroyDeviceObjects()
+        public override void DestroyDeviceObjects()
         {
             _disposeCollector.DisposeAll();
 

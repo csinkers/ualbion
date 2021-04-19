@@ -38,7 +38,7 @@ namespace UAlbion
                 // Mode
                 if (arg == "--GAME") Mode = ExecutionMode.Game;
                 if (arg == "--DUMP" || arg == "-D") Mode = ExecutionMode.DumpData;
-                if (arg == "--ISO" || arg == "-ISO") Mode = ExecutionMode.BakeIsometric;
+                // if (arg == "--ISO" || arg == "-ISO") Mode = ExecutionMode.BakeIsometric;
                 if (arg == "--CONVERT" || arg == "--BUILD" || arg == "-B")
                 {
                     if (i +2 >= args.Length)

@@ -22,10 +22,11 @@ namespace UAlbion.Core
     {
         public static bool TraceAttachment { get; set; }
         static readonly Action<object> DummyContinuation = _ => { };
+        static readonly List<IComponent> EmptyChildren = new List<IComponent>();
         static int _nesting;
         static int _nextId;
-        readonly IDictionary<Type, Handler> _handlers = new Dictionary<Type, Handler>();
-        readonly List<IComponent> _children = new List<IComponent>();
+        List<IComponent> _children;
+        IDictionary<Type, Handler> _handlers;
         bool _isActive = true; // If false, then this component will not be attached to the exchange even if its parent is.
         protected Component() => ComponentId = Interlocked.Increment(ref _nextId);
 
@@ -56,7 +57,7 @@ namespace UAlbion.Core
         /// The primary purpose of children is ensuring that the children are also attached and
         /// detached when the parent component is.
         /// </summary>
-        protected IReadOnlyList<IComponent> Children => _children;
+        protected IReadOnlyList<IComponent> Children => _children ?? EmptyChildren;
 
         /// <summary>
         /// Resolve the currently active object that provides the given interface.
@@ -135,6 +136,7 @@ namespace UAlbion.Core
         /// <param name="callback">The function to call when the event is raised</param>
         protected void On<T>(Action<T> callback) where T : IEvent
         {
+            _handlers ??= new Dictionary<Type, Handler>();
             if (_handlers.ContainsKey(typeof(T)))
                 return;
 
@@ -152,6 +154,7 @@ namespace UAlbion.Core
         /// <param name="callback">The function to call when the event is raised</param>
         protected void OnAsync<T>(Func<T, Action, bool> callback) where T : IAsyncEvent
         {
+            _handlers ??= new Dictionary<Type, Handler>();
             if (_handlers.ContainsKey(typeof(T)))
                 return;
 
@@ -170,6 +173,7 @@ namespace UAlbion.Core
         /// <param name="callback">The function to call when the event is raised</param>
         protected void OnAsync<TEvent, TReturn>(Func<TEvent, Action<TReturn>, bool> callback) where TEvent : IAsyncEvent<TReturn>
         {
+            _handlers ??= new Dictionary<Type, Handler>();
             if (_handlers.ContainsKey(typeof(TEvent)))
                 return;
 
@@ -185,7 +189,7 @@ namespace UAlbion.Core
         /// <typeparam name="T">The event type which should no longer be handled by this component.</typeparam>
         protected void Off<T>()
         {
-            if (_handlers.Remove(typeof(T)) && IsSubscribed)
+            if (_handlers?.Remove(typeof(T)) == true && IsSubscribed)
                 Exchange.Unsubscribe<T>(this);
         }
 
@@ -236,8 +240,9 @@ namespace UAlbion.Core
             _nesting--;
 
             // exchange.Subscribe(null, this); // Ensure we always get added to the subscriber list, even if this component only uses subscription notifications.
-            foreach (var kvp in _handlers)
-                exchange.Subscribe(kvp.Value);
+            if (_handlers != null)
+                foreach (var kvp in _handlers)
+                    exchange.Subscribe(kvp.Value);
             IsSubscribed = true;
             Subscribed();
         }
@@ -297,6 +302,7 @@ namespace UAlbion.Core
             if (_isActive) // Children will be attached when this component is made active.
                 Exchange?.Attach(child);
 
+            _children ??= new List<IComponent>();
             _children.Add(child);
             if (child is Component component)
                 component.Parent = this;
@@ -321,6 +327,7 @@ namespace UAlbion.Core
         protected void RemoveChild(IComponent child)
         {
             if (child == null) throw new ArgumentNullException(nameof(child));
+            if (_children == null) return;
             int index = _children.IndexOf(child);
             if (index == -1) return;
             if (child is Component c)
@@ -343,7 +350,7 @@ namespace UAlbion.Core
             if (sender == this || !IsSubscribed || Exchange == null)
                 return;
 
-            if (_handlers.TryGetValue(@event.GetType(), out var handler))
+            if (_handlers != null && _handlers.TryGetValue(@event.GetType(), out var handler))
                 handler.Invoke(@event, DummyContinuation);
         }
     }

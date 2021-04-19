@@ -37,7 +37,10 @@ namespace UAlbion.Formats.Parsers
             }
         }
 
-        public static void Pack(ISerializer s, int count, Func<int, (byte[], string)> buildChunk)
+        public static void Pack(ISerializer s, int count, Func<int, byte[]> buildChunk) 
+            => PackNamed(s, count, i => (buildChunk(i), null));
+
+        public static void PackNamed(ISerializer s, int count, Func<int, (byte[], string)> buildChunk)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (buildChunk == null) throw new ArgumentNullException(nameof(buildChunk));

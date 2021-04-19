@@ -9,7 +9,7 @@ using Veldrid;
 
 namespace UAlbion.Core.Veldrid.Visual
 {
-    public sealed class DebugGuiRenderer : Component, IRenderer, IRenderable
+    public sealed class DebugGuiRenderer : VeldridComponent, IRenderer, IRenderable
     {
         ImGuiRenderer _imguiRenderer;
 
@@ -38,18 +38,22 @@ namespace UAlbion.Core.Veldrid.Visual
         public DrawLayer RenderOrder => DrawLayer.Debug;
         public int PipelineId => 1;
 
-        public void CreateDeviceObjects(IRendererContext context)
+        public override void CreateDeviceObjects(VeldridRendererContext context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            var c = (VeldridRendererContext)context;
             if (_imguiRenderer == null)
             {
                 var window = Resolve<IWindowManager>();
-                _imguiRenderer = new ImGuiRenderer(c.GraphicsDevice, c.GraphicsDevice.SwapchainFramebuffer.OutputDescription, window.PixelWidth, window.PixelHeight, ColorSpaceHandling.Linear);
+                _imguiRenderer = new ImGuiRenderer(
+                    context.GraphicsDevice,
+                    context.GraphicsDevice.SwapchainFramebuffer.OutputDescription,
+                    window.PixelWidth,
+                    window.PixelHeight,
+                    ColorSpaceHandling.Linear);
             }
             else
             {
-                _imguiRenderer.CreateDeviceResources(c.GraphicsDevice, c.GraphicsDevice.SwapchainFramebuffer.OutputDescription, ColorSpaceHandling.Linear);
+                _imguiRenderer.CreateDeviceResources(context.GraphicsDevice, context.GraphicsDevice.SwapchainFramebuffer.OutputDescription, ColorSpaceHandling.Linear);
             }
         }
 
@@ -59,11 +63,6 @@ namespace UAlbion.Core.Veldrid.Visual
             if (results == null) throw new ArgumentNullException(nameof(results));
             foreach (var r in renderables)
                 results.Add(r);
-        }
-
-        public void DestroyDeviceObjects()
-        {
-            _imguiRenderer?.Dispose();
         }
 
         public void Render(IRendererContext context, RenderPasses renderPass, IRenderable r)
@@ -76,10 +75,16 @@ namespace UAlbion.Core.Veldrid.Visual
             c.CommandList.SetFullScissorRects();
         }
 
+        public override void DestroyDeviceObjects()
+        {
+            _imguiRenderer?.Dispose();
+            _imguiRenderer = null;
+        }
+
         public void Dispose()
         {
-            DestroyDeviceObjects();
-            GC.SuppressFinalize(this);
+            _imguiRenderer?.Dispose();
+            _imguiRenderer = null;
         }
     }
 }

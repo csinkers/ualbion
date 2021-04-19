@@ -1,0 +1,9 @@
+{
+    "repo": "https://github.com/CSinkers/UAlbion",
+    "name":" UAlbion-Shaders",
+    "description": "Base-game shaders",
+    "author": "Cam Sinclair et al",
+    "version": "0.1.0",
+    "shader_path": "Shaders",
+    "dependencies": []
+}

@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using ImGuiNET;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Veldrid.Events;
+using UAlbion.Core.Veldrid.Visual;
 using UAlbion.Core.Visual;
 using Veldrid;
 using Veldrid.Sdl2;
@@ -33,10 +36,10 @@ namespace UAlbion.Core.Veldrid
         readonly int _defaultHeight = 480;
         readonly int _defaultX = 648;
         readonly int _defaultY = 431;
+        readonly bool _showWindow;
 
         SceneContext _sceneContext;
         CommandList _frameCommands;
-        VeldridRendererContext _renderContext;
         bool _windowResized;
         bool _done;
         bool _recreateWindow;
@@ -60,7 +63,7 @@ namespace UAlbion.Core.Veldrid
         public override bool IsDepthRangeZeroToOne => GraphicsDevice?.IsDepthRangeZeroToOne ?? false;
         public override bool IsClipSpaceYInverted => GraphicsDevice?.IsClipSpaceYInverted ?? false;
 
-        public VeldridEngine(GraphicsBackend backend, bool useRenderDoc, bool startupOnly, Rectangle? windowRect = null)
+        public VeldridEngine(GraphicsBackend backend, bool useRenderDoc, bool startupOnly, bool showWindow, Rectangle? windowRect = null)
         {
             On<LoadRenderDocEvent>(e =>
             {
@@ -73,10 +76,9 @@ namespace UAlbion.Core.Veldrid
             On<RunRenderDocEvent>(e => _renderDoc?.LaunchReplayUI());
             On<SetCursorPositionEvent>(e => _pendingCursorUpdate = new Vector2(e.X, e.Y));
             On<ToggleFullscreenEvent>(e => ToggleFullscreenState());
-            On<ToggleHardwareCursorEvent>(e => _window.CursorVisible = !_window.CursorVisible);
-            On<ToggleResizableEvent>(e => _window.Resizable = !_window.Resizable);
-            On<ToggleVisibleBorderEvent>(e => _window.BorderVisible = !_window.BorderVisible);
-            On<RefreshDeviceObjectsEvent>(e => RefreshDeviceObjects(e.Count ?? 1));
+            On<ToggleHardwareCursorEvent>(e => { if (_window == null) return; _window.CursorVisible = !_window.CursorVisible; });
+            On<ToggleResizableEvent>(e => { if (_window == null) return; _window.Resizable = !_window.Resizable; });
+            On<ToggleVisibleBorderEvent>(e => { if (_window == null) return; _window.BorderVisible = !_window.BorderVisible; });
             On<RecreateWindowEvent>(e => { _recreateWindow = true; _newBackend = GraphicsDevice.BackendType; });
             On<SetBackendEvent>(e => _newBackend = e.Value);
             On<TriggerRenderDocEvent>(e => _renderDoc?.TriggerCapture());
@@ -92,6 +94,7 @@ namespace UAlbion.Core.Veldrid
             _newBackend = backend;
             _useRenderDoc = useRenderDoc;
             _startupOnly = startupOnly;
+            _showWindow = showWindow;
 
             if (windowRect.HasValue)
             {
@@ -154,8 +157,10 @@ namespace UAlbion.Core.Veldrid
 
         public override void Run()
         {
-            ChangeBackend();
-            CreateAllObjects();
+            if (!_showWindow)
+                throw new InvalidOperationException("Cannot run as main game loop without a window");
+
+            VeldridRendererContext context = BuildContext(null);
             PerfTracker.StartupEvent("Set up backend");
             Sdl2Native.SDL_Init(SDLInitFlags.GameController);
 
@@ -175,9 +180,9 @@ namespace UAlbion.Core.Veldrid
             PerfTracker.StartupEvent("Startup done, rendering first frame");
             while (!_done)
             {
-                ChangeBackend();
                 //if (_frameCounter < 3) _renderDoc.TriggerCapture(); // Capture first few frames for transient rendering issues
-                CreateAllObjects();
+                if (!_objectsCreated)
+                    context = BuildContext(null);
 
                 PerfTracker.BeginFrame();
                 double deltaSeconds = frameCounter.StartFrame();
@@ -224,7 +229,7 @@ namespace UAlbion.Core.Veldrid
                     break;
 
                 using (PerfTracker.FrameEvent("6 Drawing"))
-                    Draw();
+                    Draw(context);
 
                 var flags = Resolve<IEngineSettings>().Flags;
                 if (GraphicsDevice.SyncToVerticalBlank != ((flags & EngineFlags.VSync) != 0))
@@ -251,45 +256,82 @@ namespace UAlbion.Core.Veldrid
             _window = null;
         }
 
+        public unsafe Image<Bgra32> RenderFrame(VeldridRendererContext context, bool captureWithRenderDoc)
+        {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            if (captureWithRenderDoc)
+                _renderDoc.TriggerCapture();
+
+            Draw(context);
+
+            var framebuffer = (FramebufferSource)context.Framebuffer ;
+            var color = framebuffer.Framebuffer.ColorTargets[0].Target;
+            var stagingDesc = new TextureDescription(color.Width, color.Height, 1, 1, 1, color.Format, TextureUsage.Staging, TextureType.Texture2D);
+            var staging = GraphicsDevice.ResourceFactory.CreateTexture(ref stagingDesc);
+
+            var cl = GraphicsDevice.ResourceFactory.CreateCommandList();
+            cl.Name = "CL:RetrieveFramebuffer";
+            cl.Begin();
+            cl.CopyTexture(color, staging);
+            cl.End();
+            GraphicsDevice.SubmitCommands(cl);
+            GraphicsDevice.WaitForIdle();
+            cl.Dispose();
+
+            var mapped = GraphicsDevice.Map(staging, MapMode.Read);
+            var result = new Image<Bgra32>((int)color.Width, (int)color.Height);
+            var sourceSpan = new Span<uint>(mapped.Data.ToPointer(), (int)mapped.SizeInBytes);
+            var stride = (int)mapped.RowPitch / sizeof(uint);
+
+            for (int j = 0; j < color.Height; j++)
+            {
+                var sourceRow = sourceSpan.Slice(stride * j, (int)color.Width);
+                var destRow = MemoryMarshal.Cast<Bgra32, uint>(result.GetPixelRowSpan(j));
+                sourceRow.CopyTo(destRow);
+            }
+
+            GraphicsDevice.Unmap(staging);
+            staging.Dispose();
+            return result;
+        }
+
         void Update(float deltaSeconds)
         {
             _frameTimeAverager.AddTime(deltaSeconds);
             Raise(new EngineUpdateEvent(deltaSeconds));
         }
 
-        internal void RefreshDeviceObjects(int numTimes)
-        {
-            Stopwatch sw = Stopwatch.StartNew();
-            for (int i = 0; i < numTimes; i++)
-            {
-                DestroyAllObjects();
-                CreateAllObjects();
-            }
-
-            sw.Stop();
-            Console.WriteLine($"Refreshing resources {numTimes} times took {sw.Elapsed.TotalSeconds} seconds.");
-        }
-
         void ToggleFullscreenState()
         {
+            if (_window == null)
+                return;
             bool isFullscreen = _window.WindowState == WindowState.BorderlessFullScreen;
             _window.WindowState = isFullscreen ? WindowState.Normal : WindowState.BorderlessFullScreen;
         }
 
-        void Draw()
+        void Draw(VeldridRendererContext context)
         {
-            ApiUtil.Assert(_window.Exists);
-            int width = _window.Width;
-            int height = _window.Height;
-
-            CoreTrace.Log.Info("Engine", "Start draw");
-            if (_windowResized)
+            var camera = Resolve<ICamera>();
+            context.Framebuffer?.CreateDeviceObjects(context);
+            if (_window != null)
             {
-                _windowResized = false;
+                CoreTrace.Log.Info("Engine", "Start draw");
+                int width = _window.Width;
+                int height = _window.Height;
 
-                GraphicsDevice.ResizeMainWindow((uint)width, (uint)height);
-                Raise(new WindowResizedEvent(width, height));
-                CoreTrace.Log.Info("Engine", "Resize finished");
+                if (_windowResized)
+                {
+                    GraphicsDevice.ResizeMainWindow((uint)width, (uint)height);
+                    Raise(new WindowResizedEvent(width, height));
+                    CoreTrace.Log.Info("Engine", "Resize finished");
+                    _windowResized = false;
+                }
+
+                camera.Viewport = new Vector2(width, height);
+            }
+            else if (context.Framebuffer != null)
+            {
+                camera.Viewport = new Vector2(context.Framebuffer.Width, context.Framebuffer.Height);
             }
 
             var scenes = new List<Scene>();
@@ -300,7 +342,7 @@ namespace UAlbion.Core.Veldrid
                 _frameCommands.Begin();
                 Raise(RenderEvent.Instance);
                 foreach (var scene in scenes)
-                    scene.UpdatePerFrameResources(_renderContext, _renderables);
+                    scene.UpdatePerFrameResources(context, _renderables);
                 _frameCommands.End();
                 GraphicsDevice.SubmitCommands(_frameCommands);
             }
@@ -309,13 +351,13 @@ namespace UAlbion.Core.Veldrid
             {
                 _frameCommands.Begin();
                 foreach (var scene in scenes)
-                    scene.RenderAllStages(_renderContext, _renderers);
+                    scene.RenderAllStages(context, _renderers);
                 _frameCommands.End();
             }
 
             using (PerfTracker.FrameEvent("6.3 Submit commandlist"))
             {
-                CoreTrace.Log.Info("Scene", "Submitting Commands");
+                CoreTrace.Log.Info("Scene", "Submitting commands");
                 GraphicsDevice.SubmitCommands(_frameCommands);
                 CoreTrace.Log.Info("Scene", "Submitted commands");
                 GraphicsDevice.WaitForIdle();
@@ -350,7 +392,7 @@ namespace UAlbion.Core.Veldrid
                     _renderDoc.APIValidation = true;
                 }
 
-                if (_window == null || _recreateWindow)
+                if (_showWindow && (_window == null || _recreateWindow))
                 {
                     _recreateWindow = false;
                     _window?.Close();
@@ -370,6 +412,7 @@ namespace UAlbion.Core.Veldrid
                     //Window.BorderVisible = false;
                     _window.CursorVisible = false;
                     _window.Resized += () => _windowResized = true;
+                    _windowResized = true;
                 }
 
                 GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(
@@ -388,7 +431,35 @@ namespace UAlbion.Core.Veldrid
                 if (singleThreadedProperty != null)
                     singleThreadedProperty.SetValueDirect(__makeref(gdOptions), true);
 
-                GraphicsDevice = VeldridStartup.CreateGraphicsDevice(_window, gdOptions, backend);
+                if (_showWindow)
+                {
+                    GraphicsDevice = VeldridStartup.CreateGraphicsDevice(_window, gdOptions, backend);
+                }
+                else
+                {
+                    /* This switch statement causes a compiler crash \o/
+                    GraphicsDevice = backend switch
+                    {
+                        GraphicsBackend.Direct3D11 => GraphicsDevice.CreateD3D11(gdOptions),
+                        GraphicsBackend.Metal => GraphicsDevice.CreateMetal(gdOptions),
+                        GraphicsBackend.Vulkan => GraphicsDevice.CreateVulkan(gdOptions),
+                        GraphicsBackend.OpenGL => throw new InvalidOperationException( "Headless rendering is not supported on the OpenGL backend"),
+                        GraphicsBackend.OpenGLES => throw new InvalidOperationException( "Headless rendering is not supported on the OpenGL ES backend"),
+                        _ => throw new InvalidOperationException($"Unhandled backend: {backend}")
+                    }; */
+
+                    switch (backend)
+                    {
+                        case GraphicsBackend.Direct3D11: GraphicsDevice = GraphicsDevice.CreateD3D11(gdOptions); break;
+                        case GraphicsBackend.Metal: GraphicsDevice = GraphicsDevice.CreateMetal(gdOptions); break;
+                        case GraphicsBackend.Vulkan: GraphicsDevice = GraphicsDevice.CreateVulkan(gdOptions); break;
+                        default: GraphicsDevice = null; break;
+                    }
+
+                    if (GraphicsDevice == null)
+                        throw new InvalidOperationException($"Unsupported backend for headless rendering: {backend}");
+                }
+
                 GraphicsDevice.WaitForIdle();
                 SetTitle();
 
@@ -398,19 +469,17 @@ namespace UAlbion.Core.Veldrid
 
         void SetTitle()
         {
-            if (DateTime.UtcNow - _lastTitleUpdateTime <= TimeSpan.FromSeconds(1)) 
-                return;
+            if (!_showWindow) return;
+            if (DateTime.UtcNow - _lastTitleUpdateTime <= TimeSpan.FromSeconds(1)) return;
 
             _window.Title = $"{WindowTitle} - {GraphicsDevice.BackendType} ({FrameTimeText})";
             _lastTitleUpdateTime = DateTime.UtcNow;
         }
 
-        void CreateAllObjects()
+        public VeldridRendererContext BuildContext(FramebufferSource framebuffer)
         {
-            if (_objectsCreated)
-                return;
-
-            using(PerfTracker.InfrequentEvent("Create objects"))
+            ChangeBackend();
+            using (PerfTracker.InfrequentEvent("Create objects"))
             {
                 _frameCommands = GraphicsDevice.ResourceFactory.CreateCommandList();
                 _frameCommands.Name = "Frame Commands List";
@@ -422,8 +491,9 @@ namespace UAlbion.Core.Veldrid
                 AttachChild(_sceneContext);
                 _sceneContext.CreateDeviceObjects(GraphicsDevice, initList);
 
-                var initContext = new VeldridRendererContext(GraphicsDevice, initList, _sceneContext, _coreFactory);
-                _renderContext = new VeldridRendererContext(GraphicsDevice, _frameCommands, _sceneContext, _coreFactory);
+                var initContext = new VeldridRendererContext(GraphicsDevice, initList, _sceneContext, _coreFactory, framebuffer);
+                var renderContext = new VeldridRendererContext(GraphicsDevice, _frameCommands, _sceneContext, _coreFactory, framebuffer);
+                framebuffer?.CreateDeviceObjects(initContext);
                 foreach (var r in _renderers.Values.Distinct())
                     r.CreateDeviceObjects(initContext);
 
@@ -431,8 +501,9 @@ namespace UAlbion.Core.Veldrid
                 GraphicsDevice.SubmitCommands(initList);
                 GraphicsDevice.WaitForIdle();
                 initList.Dispose();
-                GraphicsDevice.WaitForIdle();
                 _objectsCreated = true;
+
+                return renderContext;
             }
         }
 
@@ -454,7 +525,6 @@ namespace UAlbion.Core.Veldrid
                 }
 
                 _frameCommands = null;
-                _renderContext = null;
 
                 foreach (var r in _renderers.Values.Distinct())
                     r.DestroyDeviceObjects();

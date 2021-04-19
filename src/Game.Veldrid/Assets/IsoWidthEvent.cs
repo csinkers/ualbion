@@ -1,6 +1,6 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion
+namespace UAlbion.Game.Veldrid.Assets
 {
     [Event("iso_width")]
     public class IsoWidthEvent : Event

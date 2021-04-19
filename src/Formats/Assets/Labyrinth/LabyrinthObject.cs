@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using SerdesNet;
 using UAlbion.Config;
 
@@ -9,6 +10,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public LabyrinthObjectFlags Properties { get; set; } // 0
         public uint Collision { get; set; } // 1, len = 3 bytes
         public SpriteId SpriteId { get; set; } // 4, ushort
+        [DefaultValue(1)]
         public byte AnimationFrames { get; set; } // 6
         public byte Unk7 { get; set; } // 7
         public ushort Width { get; set; } // 8

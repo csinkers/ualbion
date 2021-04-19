@@ -54,8 +54,7 @@ namespace UAlbion.Core.Veldrid
             var factory = new DisposeCollectorResourceFactory(gd.ResourceFactory, _disposer);
             DeviceBuffer MakeBuffer(uint size, string name)
             {
-                var buffer = factory.CreateBuffer(
-                    new BufferDescription(size, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
+                var buffer = factory.CreateBuffer(new BufferDescription(size, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
                 buffer.Name = name;
                 return buffer;
             }
@@ -80,7 +79,7 @@ namespace UAlbion.Core.Veldrid
             UpdateResourceSet(gd);
         }
 
-        public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl)
+        public void UpdatePerFrameResources(GraphicsDevice gd, CommandList cl, IFramebufferSource framebuffer)
         {
             if (gd == null) throw new ArgumentNullException(nameof(gd));
             if (cl == null) throw new ArgumentNullException(nameof(cl));
@@ -97,7 +96,9 @@ namespace UAlbion.Core.Veldrid
                 WorldSpacePosition = camera.Position,
                 CameraPitch = camera.Pitch,
                 CameraYaw = camera.Yaw,
-                Resolution =  new Vector2(window.PixelWidth, window.PixelHeight),
+                Resolution =  framebuffer != null
+                    ? new Vector2(framebuffer.Width, framebuffer.Height)
+                    : new Vector2(window.PixelWidth, window.PixelHeight),
                 Time = clock?.ElapsedTime ?? 0,
                 Special1 = settings?.Special1 ?? 0,
                 Special2 = settings?.Special2 ?? 0,
@@ -137,7 +138,7 @@ namespace UAlbion.Core.Veldrid
             CoreTrace.Log.Info("Scene", "Disposed palette device texture");
             _paletteTexture = (VeldridPaletteTexture)newPalette;
             _lastPaletteVersion = newVersion;
-            PaletteTexture = _paletteTexture.CreateDeviceTexture(gd, gd.ResourceFactory, TextureUsage.Sampled);
+            PaletteTexture = _paletteTexture.CreateDeviceTexture(gd, TextureUsage.Sampled);
             PaletteView = gd.ResourceFactory.CreateTextureView(PaletteTexture);
             PaletteTexture.Name = "T_" + _paletteTexture.Name;
             PaletteView.Name = "TV_" + _paletteTexture.Name;

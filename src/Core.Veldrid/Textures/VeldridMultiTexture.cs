@@ -10,24 +10,25 @@ namespace UAlbion.Core.Veldrid.Textures
 {
     public class VeldridMultiTexture : MultiTexture, IVeldridTexture
     {
+        const int LayerLimit = 1024;
         public TextureType Type => TextureType.Texture2D;
         public override int FormatSize => Format.Size();
 
         // TODO: Cleanup
-        public Texture CreateDeviceTexture(GraphicsDevice gd, ResourceFactory rf, TextureUsage usage)
+        public Texture CreateDeviceTexture(GraphicsDevice gd, TextureUsage usage)
         {
             if (gd == null) throw new ArgumentNullException(nameof(gd));
-            if (rf == null) throw new ArgumentNullException(nameof(rf));
             using var _ = PerfTracker.FrameEvent("6.1.2.1 Rebuild MultiTextures");
             if (IsMetadataDirty)
                 RebuildLayers();
 
-            using var staging = rf.CreateTexture(new TextureDescription(
+            var layers = ArrayLayers > LayerLimit ? LayerLimit : ArrayLayers;
+            using var staging = gd.ResourceFactory.CreateTexture(new TextureDescription(
                 (uint)Width,
                 (uint)Height,
                 (uint)Depth,
                 (uint)MipLevels,
-                (uint)ArrayLayers,
+                (uint)layers,
                 Format.ToVeldrid(),
                 TextureUsage.Staging,
                 Type));
@@ -37,15 +38,14 @@ namespace UAlbion.Core.Veldrid.Textures
             Span<uint> toBuffer = stackalloc uint[Width * Height];
             foreach (var lsi in LogicalSubImages)
             {
-                //if (!rebuildAll && !lsi.IsPaletteAnimated) // TODO: Requires caching a single Texture and then modifying it
-                //    continue;
-
                 for (int i = 0; i < lsi.Frames; i++)
                 {
                     toBuffer.Fill(lsi.IsAlphaTested ? 0 : 0xff000000);
                     Rebuild(lsi, i, toBuffer, Palette.GetCompletePalette());
 
                     uint destinationLayer = (uint)LayerLookup[new LayerKey(lsi.Id, i)];
+                    if (destinationLayer >= LayerLimit)
+                        continue;
 
                     unsafe
                     {
@@ -66,19 +66,19 @@ namespace UAlbion.Core.Veldrid.Textures
                 {
                 } //*/
 
-            var texture = rf.CreateTexture(new TextureDescription(
+            var texture = gd.ResourceFactory.CreateTexture(new TextureDescription(
                 (uint)Width,
                 (uint)Height,
                 (uint)Depth,
                 (uint)MipLevels,
-                (uint)ArrayLayers,
+                (uint)layers,
                 Format.ToVeldrid(),
                 usage,
                 Type));
 
             texture.Name = "T_" + Name;
 
-            using (CommandList cl = rf.CreateCommandList())
+            using (CommandList cl = gd.ResourceFactory.CreateCommandList())
             {
                 cl.Begin();
                 cl.CopyTexture(staging, texture);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using SerdesNet;
 using UAlbion.Config;
@@ -24,6 +25,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public WallFlags Properties { get; set; } // 0
         public uint Collision { get; set; } // 1, len = 3 bytes
         public SpriteId SpriteId { get; set; } // 4, ushort
+        [DefaultValue(1)]
         public byte AnimationFrames { get; set; } // 6
         public byte AutoGfxType { get; set; } // 7
         public byte TransparentColour { get; set; } // 8 (PaletteId??)

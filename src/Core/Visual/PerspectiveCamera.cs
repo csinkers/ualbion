@@ -12,7 +12,7 @@ namespace UAlbion.Core.Visual
 
         Vector3 _position = new Vector3(0, 0, 0);
         Vector3 _lookDirection = new Vector3(0, -.3f, -1f);
-        Vector2 _windowSize = Vector2.One;
+        Vector2 _viewport = Vector2.One;
 
         float _yaw;
         float _pitch;
@@ -23,11 +23,22 @@ namespace UAlbion.Core.Visual
         public Matrix4x4 ViewMatrix => _viewMatrix;
         public Matrix4x4 ProjectionMatrix => _projectionMatrix;
         public Vector3 LookDirection => _lookDirection;
+        public Vector2 Viewport
+        {
+            get => _viewport;
+            set
+            {
+                if (_viewport == value) return;
+                _viewport = value;
+                UpdatePerspectiveMatrix();
+            }
+        }
+
         public float FieldOfView { get; private set; }
         public float NearDistance { get; private set; } = 10f;
         public float FarDistance { get; private set; } = 512.0f * 256.0f * 2.0f;
         public bool LegacyPitch { get; }
-        public float AspectRatio => _windowSize.X / _windowSize.Y;
+        public float AspectRatio => _viewport.X / _viewport.Y;
         public float Magnification { get; set; } // Ignored.
         public float Yaw { get => _yaw; set { _yaw = value; UpdateViewMatrix(); } } // Radians
 
@@ -58,8 +69,6 @@ namespace UAlbion.Core.Visual
             OnAsync<ScreenCoordinateSelectEvent, Selection>(TransformSelect);
             On<BackendChangedEvent>(_ => UpdateBackend());
             On<EngineFlagEvent>(_ => UpdateBackend());
-            // BUG: This event is not received when the screen is resized while a 2D scene is active.
-            On<WindowResizedEvent>(e => WindowResized(e.Width, e.Height));
             On<CameraPositionEvent>(e => Position = new Vector3(e.X, e.Y, e.Z));
             On<CameraDirectionEvent>(e =>
             {
@@ -91,7 +100,7 @@ namespace UAlbion.Core.Visual
 
         protected override void Subscribed()
         {
-            _windowSize = Resolve<IWindowManager>().Size;
+            Viewport = Resolve<IWindowManager>().Size;
             UpdateBackend();
             UpdateViewMatrix();
             base.Subscribed();
@@ -99,7 +108,7 @@ namespace UAlbion.Core.Visual
 
         bool TransformSelect(ScreenCoordinateSelectEvent e, Action<Selection> continuation)
         {
-            var normalisedScreenPosition = new Vector3(2 * e.Position.X / _windowSize.X - 1.0f, -2 * e.Position.Y / _windowSize.Y + 1.0f, 0.0f);
+            var normalisedScreenPosition = new Vector3(2 * e.Position.X / _viewport.X - 1.0f, -2 * e.Position.Y / _viewport.Y + 1.0f, 0.0f);
             var rayOrigin = UnprojectNormToWorld(normalisedScreenPosition + Vector3.UnitZ);
             var rayDirection = UnprojectNormToWorld(normalisedScreenPosition) - rayOrigin;
             RaiseAsync(new WorldCoordinateSelectEvent(rayOrigin, rayDirection), continuation);
@@ -119,14 +128,6 @@ namespace UAlbion.Core.Visual
                     : e.IsClipSpaceYInverted;
             }
 
-
-            UpdatePerspectiveMatrix();
-        }
-
-        void WindowResized(float width, float height)
-        {
-            _windowSize.X = width;
-            _windowSize.Y = height;
             UpdatePerspectiveMatrix();
         }
 

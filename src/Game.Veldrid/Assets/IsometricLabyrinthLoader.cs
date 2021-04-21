@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using SerdesNet;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -11,9 +13,9 @@ using UAlbion.Core.Veldrid.Visual;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets.Labyrinth;
+using UAlbion.Formats.Exporters.Tiled;
 using UAlbion.Formats.Parsers;
 using UAlbion.Game.Assets;
-using UAlbion.Game.Entities.Map3D;
 using UAlbion.Game.Events;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.State;
@@ -74,32 +76,47 @@ namespace UAlbion.Game.Veldrid.Assets
             _context = _engine.BuildContext(fbSource);
         }
 
-        byte[] SavePng(LabyrinthData labyrinth, AssetInfo info, IsometricMode mode)
+        IEnumerable<(string, byte[])> Save(LabyrinthData labyrinth, AssetInfo info, IsometricMode mode, string pngPath, string tsxPath)
         {
+            var width = info.Get(AssetProperty.TileWidth, DefaultWidth);
+            var height = info.Get(AssetProperty.TileHeight, DefaultHeight);
+            var baseHeight = info.Get(AssetProperty.BaseHeight, DefaultBaseHeight);
+            var tilesPerRow = info.Get(AssetProperty.TilesPerRow, DefaultTilesPerRow);
+
             if (_engine == null)
-            {
-                var width = info.Get(AssetProperty.TileWidth, DefaultWidth);
-                var height = info.Get(AssetProperty.TileHeight, DefaultHeight);
-                var baseHeight = info.Get(AssetProperty.BaseHeight, DefaultBaseHeight);
-                var tilesPerRow = info.Get(AssetProperty.TilesPerRow, DefaultTilesPerRow);
                 SetupEngine(width, height, baseHeight, tilesPerRow);
-            }
 
             var assets = Resolve<IAssetManager>();
-            _builder.Build(labyrinth, info, mode, assets);
+            var frames = _builder.Build(labyrinth, info, mode, assets);
 
-            var image = _engine.RenderFrame(_context, false);
+            Image<Bgra32> image = _engine.RenderFrame(_context, false);
 
             using var stream = new MemoryStream();
             image.SaveAsPng(stream);
             stream.Position = 0;
-            return stream.ToArray();
+            var pngBytes = stream.ToArray();
+            yield return (pngPath, pngBytes);
+
+            var properties = new TilemapProperties
+            {
+                TilesetId = labyrinth.Id.Id,
+                IsoMode = mode,
+                TileWidth = width,
+                TileHeight = height,
+                ImagePath = pngPath,
+                TilesetPath = tsxPath,
+                ImageWidth = image.Width,
+                ImageHeight = image.Height,
+            };
+
+            var tiledTileset = Tileset.FromLabyrinth(labyrinth, properties, frames);
+            var tsxBytes = FormatUtil.BytesFromTextWriter(tiledTileset.Serialize);
+            yield return (tsxPath, tsxBytes);
         }
 
-        byte[] SaveTilemap(LabyrinthData labyrinth, IsometricMode mode)
-        {
-            return Array.Empty<byte>(); // TODO
-        }
+        byte[] SaveJson(LabyrinthData labyrinth, AssetInfo info, AssetMapping mapping) =>
+            FormatUtil.SerializeToBytes(s =>
+                _jsonLoader.Serdes(labyrinth, info, mapping, s));
 
         public LabyrinthData Serdes(LabyrinthData existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
@@ -108,10 +125,10 @@ namespace UAlbion.Game.Veldrid.Assets
             {
                 if (existing == null) throw new ArgumentNullException(nameof(existing));
                 var json        = info.Get(AssetProperty.Pattern, "{0}_{2}.json");
-                var floor       = info.Get(AssetProperty.TiledFloorPattern, "Tiled/{0}_{2}_Floors.tsx");
-                var ceiling     = info.Get(AssetProperty.TiledCeilingPattern, "Tiled/{0}_{2}_Ceilings.tsx");
-                var wall        = info.Get(AssetProperty.TiledWallPattern, "Tiled/{0}_{2}_Walls.tsx");
-                var contents    = info.Get(AssetProperty.TiledContentsPattern, "Tiled/{0}_{2}_Contents.tsx");
+                var floorTsx    = info.Get(AssetProperty.TiledFloorPattern, "Tiled/{0}_{2}_Floors.tsx");
+                var ceilingTsx  = info.Get(AssetProperty.TiledCeilingPattern, "Tiled/{0}_{2}_Ceilings.tsx");
+                var wallTsx     = info.Get(AssetProperty.TiledWallPattern, "Tiled/{0}_{2}_Walls.tsx");
+                var contentsTsx = info.Get(AssetProperty.TiledContentsPattern, "Tiled/{0}_{2}_Contents.tsx");
                 var floorPng    = info.Get(AssetProperty.FloorPngPattern, "Tiled/Gfx/{0}_{2}_Floors.png");
                 var ceilingPng  = info.Get(AssetProperty.CeilingPngPattern, "Tiled/Gfx/{0}_{2}_Ceilings.png");
                 var wallPng     = info.Get(AssetProperty.WallPngPattern, "Tiled/Gfx/{0}_{2}_Walls.png");
@@ -119,35 +136,19 @@ namespace UAlbion.Game.Veldrid.Assets
 
                 string B(string pattern) => info.BuildFilename(pattern, 0);
 
-                var files =
-                    new[]
-                    {
-                        (B(json), SaveJson(existing, info, mapping)),
+                var files = new List<(string, byte[])> { (B(json), SaveJson(existing, info, mapping)) };
+                files.AddRange(Save(existing, info, IsometricMode.Floors, B(floorPng), B(floorTsx)));
+                files.AddRange(Save(existing, info, IsometricMode.Ceilings, B(ceilingPng), B(ceilingTsx)));
+                files.AddRange(Save(existing, info, IsometricMode.Walls, B(wallPng), B(wallTsx)));
+                files.AddRange(Save(existing, info, IsometricMode.Contents, B(contentsPng), B(contentsTsx)));
 
-                        (B(floor), SaveTilemap(existing, IsometricMode.Floors)),
-                        (B(ceiling), SaveTilemap(existing, IsometricMode.Ceilings)),
-                        (B(wall), SaveTilemap(existing, IsometricMode.Walls)),
-                        (B(contents), SaveTilemap(existing, IsometricMode.Contents)),
-
-                        (B(floorPng), SavePng(existing, info, IsometricMode.Floors)),
-                        (B(ceilingPng), SavePng(existing, info, IsometricMode.Ceilings)),
-                        (B(wallPng), SavePng(existing, info, IsometricMode.Walls)),
-                        (B(contentsPng), SavePng(existing, info, IsometricMode.Contents)),
-                    };
-
-                PackedChunks.PackNamed(s, files.Length, i => (files[i].Item2, files[i].Item1));
+                PackedChunks.PackNamed(s, files.Count, i => (files[i].Item2, files[i].Item1));
                 return existing;
             }
             else
             {
                 throw new NotImplementedException();
             }
-        }
-
-        byte[] SaveJson(LabyrinthData labyrinth, AssetInfo info, AssetMapping mapping)
-        {
-            return FormatUtil.SerializeToBytes(s =>
-                _jsonLoader.Serdes(labyrinth, info, mapping, s));
         }
 
         public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)

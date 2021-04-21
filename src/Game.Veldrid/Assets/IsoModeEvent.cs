@@ -1,5 +1,5 @@
 ﻿using UAlbion.Api;
-using UAlbion.Game.Entities.Map3D;
+using UAlbion.Formats.Assets.Labyrinth;
 
 namespace UAlbion.Game.Veldrid.Assets
 {

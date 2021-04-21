@@ -27,6 +27,7 @@ namespace UAlbion.Game.Entities.Map3D
         public List<int>[] FloorFrames { get; private set; }
         public List<int>[] CeilingFrames { get; private set; }
         public List<int>[] WallFrames { get; private set; }
+        public List<int>[] ContentsFrames { get; private set; }
 
         protected override void Subscribed()
         {
@@ -54,12 +55,14 @@ namespace UAlbion.Game.Entities.Map3D
             var engine = Resolve<IEngine>();
             var coreFactory = Resolve<ICoreFactory>();
 
+            RemoveAllChildren();
             if (_tilemap != null)
                 engine.UnregisterRenderable(_tilemap);
 
             bool floors = mode == IsometricMode.Floors || mode == IsometricMode.All;
             bool ceilings = mode == IsometricMode.Ceilings || mode == IsometricMode.All;
             bool walls = mode == IsometricMode.Walls || mode == IsometricMode.All;
+            bool contents = mode == IsometricMode.Contents || mode == IsometricMode.All;
 
             paletteId ??= info.Get(AssetProperty.PaletteId, 0);
             var palette = assets.LoadPalette(new PaletteId(AssetType.Palette, paletteId.Value));
@@ -113,6 +116,9 @@ namespace UAlbion.Game.Entities.Map3D
                 }
             }
 
+            if (contents)
+                totalTiles += labyrinthData.ObjectGroups.Count; // TODO: Object frames
+
             _wallCount = labyrinthData.Walls.Count;
             _floors = new byte[totalTiles];
             _ceilings = new byte[totalTiles];
@@ -125,6 +131,7 @@ namespace UAlbion.Game.Entities.Map3D
             if (floors)
             {
                 FloorFrames = new List<int>[labyrinthData.FloorAndCeilings.Count + 1];
+                FloorFrames[0] = new List<int> { 0 };
                 for (byte i = 1; i <= labyrinthData.FloorAndCeilings.Count; i++)
                 {
                     _floors[index] = i;
@@ -136,6 +143,7 @@ namespace UAlbion.Game.Entities.Map3D
             if (ceilings)
             {
                 CeilingFrames = new List<int>[labyrinthData.FloorAndCeilings.Count + 1];
+                CeilingFrames[0] = new List<int> { 0 };
                 for (byte i = 1; i <= labyrinthData.FloorAndCeilings.Count; i++)
                 {
                     _ceilings[index] = i;
@@ -147,10 +155,23 @@ namespace UAlbion.Game.Entities.Map3D
             if (walls)
             {
                 WallFrames = new List<int>[labyrinthData.Walls.Count + 1];
+                WallFrames[0] = new List<int> { 0 };
                 for (byte i = 1; i <= labyrinthData.Walls.Count; i++)
                 {
                     _contents[index] = (byte)(i + 100);
                     WallFrames[i] = new List<int> { index };
+                    index++;
+                }
+            }
+
+            if (contents)
+            {
+                ContentsFrames = new List<int>[labyrinthData.ObjectGroups.Count + 1];
+                ContentsFrames[0] = new List<int> { 0 };
+                for (byte i = 1; i <= labyrinthData.ObjectGroups.Count; i++)
+                {
+                    _contents[index] = i;
+                    ContentsFrames[i] = new List<int> { index };
                     index++;
                 }
             }

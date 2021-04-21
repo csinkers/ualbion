@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Game.Entities.Map3D
+﻿namespace UAlbion.Formats.Assets.Labyrinth
 {
     public enum IsometricMode
     {

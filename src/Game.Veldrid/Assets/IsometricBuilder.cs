@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -87,7 +88,7 @@ namespace UAlbion.Game.Veldrid.Assets
             });
         }
 
-        public void Build(LabyrinthData labyrinth, AssetInfo info, IsometricMode mode, IAssetManager assets)
+        public List<int>[] Build(LabyrinthData labyrinth, AssetInfo info, IsometricMode mode, IAssetManager assets)
         {
             if (labyrinth == null) throw new ArgumentNullException(nameof(labyrinth));
             _labId = labyrinth.Id;
@@ -98,6 +99,14 @@ namespace UAlbion.Game.Veldrid.Assets
             _framebufferSource.Width = (uint)(_width * _tilesPerRow);
             _framebufferSource.Height = (uint)(_height * rows);
             Update();
+            return mode switch
+            {
+                IsometricMode.Floors => _layout.FloorFrames,
+                IsometricMode.Ceilings => _layout.CeilingFrames,
+                IsometricMode.Walls => _layout.WallFrames,
+                IsometricMode.Contents => _layout.ContentsFrames,
+                _ => null
+            };
         }
 
         protected override void Subscribed()
@@ -119,19 +128,22 @@ namespace UAlbion.Game.Veldrid.Assets
             Update();
         }
 
+        public DungeonTileMapProperties Properties => _layout.Properties;
+        public LabyrinthId LabyrinthId => _labId;
+        public IsometricMode Mode => _mode;
+        public int TilesPerRow => _tilesPerRow;
+        public float DiamondHeight => _width * MathF.Sin(MathF.Abs(PitchRads));
+        public float SideLength => _width * MathF.Cos(YawRads);
+        public float YHeight => (_height - DiamondHeight) / MathF.Cos(MathF.Abs(PitchRads));
+        float YawRads => ApiUtil.DegToRad(_yaw);
+        float PitchRads => ApiUtil.DegToRad(-_pitch);
+
         void Update() => _layout.Properties = BuildProperties();
 
         DungeonTileMapProperties BuildProperties(bool log = false)
         {
             _yaw = Math.Clamp(_yaw, -45.0f, 45.0f);
             _pitch = Math.Clamp(_pitch, -85.0f, 85.0f);
-            float yawRads = ApiUtil.DegToRad(_yaw);
-            float pitchRads = ApiUtil.DegToRad(-_pitch);
-            float absPitchRads = MathF.Abs(pitchRads);
-
-            float sideLength = _width * MathF.Cos(yawRads);
-            float diamondHeight = _width * MathF.Sin(absPitchRads);
-            float height = (_height - diamondHeight) / MathF.Cos(absPitchRads);
 
             int rows = (_layout.TileCount + _tilesPerRow - 1) / _tilesPerRow;
             var viewport = new Vector2(_width * _tilesPerRow, _height * rows);
@@ -140,8 +152,8 @@ namespace UAlbion.Game.Veldrid.Assets
                 Raise(new LogEvent(LogEvent.Level.Info,
                     $"{_tilesPerRow}x{rows} " +
                     $"Y:{(int)_yaw} P:{(int)_pitch} " +
-                    $"{_width}x{_height} = {sideLength:N2}x{height:N2} " +
-                    $"DH:{diamondHeight:N2} R:{diamondHeight / _width:N2} " +
+                    $"{_width}x{_height} = {SideLength:N2}x{YHeight:N2} " +
+                    $"DH:{DiamondHeight:N2} R:{DiamondHeight / _width:N2} " +
                     $"Total Dims: {viewport}"));
             }
 
@@ -150,8 +162,8 @@ namespace UAlbion.Game.Veldrid.Assets
             var topLeft = camera.UnprojectNormToWorld(new Vector3(-1, 1, -0.5f));
 
             return new DungeonTileMapProperties(
-                new Vector3(sideLength, height, sideLength),
-                new Vector3(pitchRads, yawRads, 0),
+                new Vector3(SideLength, YHeight, SideLength),
+                new Vector3(PitchRads, YawRads, 0),
                 topLeft + new Vector3(_width, -_height, 0) / 2,
                 _width * Vector3.UnitX,
                 -_height * Vector3.UnitY,

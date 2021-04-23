@@ -97,7 +97,7 @@ namespace UAlbion.Game.Veldrid.Assets
             var pngBytes = stream.ToArray();
             yield return (pngPath, pngBytes);
 
-            var properties = new TilemapProperties
+            var properties = new Tilemap3DProperties
             {
                 TilesetId = labyrinth.Id.Id,
                 IsoMode = mode,

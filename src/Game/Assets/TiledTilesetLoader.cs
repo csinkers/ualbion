@@ -24,7 +24,7 @@ namespace UAlbion.Game.Assets
             var graphicsTemplate = info.Get(AssetProperty.GraphicsPattern, "{0}/{0}_{1}.png");
             var blankTilePath = info.Get(AssetProperty.BlankTilePath, "Blank.png");
 
-            var properties = new TilemapProperties
+            var properties = new Tilemap2DProperties
             {
                 GraphicsTemplate = graphicsTemplate,
                 BlankTilePath = blankTilePath,
@@ -36,7 +36,7 @@ namespace UAlbion.Game.Assets
             return s.IsWriting() ? Save(existing, properties, s) : Load(info, properties, s);
         }
 
-        static TilesetData Load(AssetInfo info, TilemapProperties properties, ISerializer serializer)
+        static TilesetData Load(AssetInfo info, Tilemap2DProperties properties, ISerializer serializer)
         {
             var xmlBytes = serializer.Bytes(null, null, (int)serializer.BytesRemaining);
             using var ms = new MemoryStream(xmlBytes);
@@ -44,7 +44,7 @@ namespace UAlbion.Game.Assets
             return tileset.ToAlbion(info.AssetId, properties);
         }
 
-        static TilesetData Save(TilesetData tileset, TilemapProperties properties, ISerializer s)
+        static TilesetData Save(TilesetData tileset, Tilemap2DProperties properties, ISerializer s)
         {
             if (tileset == null) throw new ArgumentNullException(nameof(tileset));
             var tiledTileset = Tileset.FromAlbion(tileset, properties);

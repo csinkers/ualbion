@@ -255,9 +255,9 @@
       "Container": "dir",
 
       "Pattern": "{0}_{2}.json",
-      "TileWidth": 48,
-      "TileHeight": 64,
-      "BaseHeight": 40, 
+      "TileWidth": 96,
+      "TileHeight": 128,
+      "BaseHeight": 80, 
       "TilesPerRow": 16, 
       "TiledFloorPattern": "Tiled/{0}_{2}_Floors.tsx", 
       "TiledCeilingPattern": "Tiled/{0}_{2}_Ceilings.tsx", 
@@ -304,6 +304,9 @@
       "SmallNpcs": "../Tilesets/SmallNPCs.tsx",
       "LargeNpcs": "../Tilesets/LargeNPCs.tsx",
 
+      "TileWidth": 96,
+      "TileHeight": 128,
+      "BaseHeight": 80, 
       "TiledFloorPattern": "../3dTilesets/Tiled/{0}_{2}_Floors.tsx", 
       "TiledCeilingPattern": "../3dTilesets/Tiled/{0}_{2}_Ceilings.tsx", 
       "TiledWallPattern": "../3dTilesets/Tiled/{0}_{2}_Walls.tsx", 

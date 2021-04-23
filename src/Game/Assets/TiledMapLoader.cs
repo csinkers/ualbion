@@ -26,7 +26,7 @@ namespace UAlbion.Game.Assets
                 byte[] bytes = existing switch
                 {
                     MapData2D map2d => Write2D(map2d, info),
-                    // MapData3D map3d => Write3D(map3d),
+                    MapData3D map3d => Write3D(map3d, info),
                     _ => null
                 };
 
@@ -71,17 +71,47 @@ namespace UAlbion.Game.Assets
             npcTilesetPath = Path.Combine(destPath, npcTilesetPath);
 
             var npcTileset = Tileset.Load(npcTilesetPath, disk);
-            var properties = new TilemapProperties { TileWidth = 16, TileHeight = 16 };
+            var properties = new Tilemap2DProperties { TileWidth = 16, TileHeight = 16 };
             var formatter = new EventFormatter(assets.LoadString, map.Id.ToMapText());
-            var tiledMap = Map.FromAlbionMap(map, tileset, properties, tilesetPath, npcTileset, formatter);
+            var tiledMap = MapExport.FromAlbionMap2D(map, tileset, properties, tilesetPath, npcTileset, formatter);
 
             return FormatUtil.BytesFromTextWriter(tiledMap.Serialize);
         }
-/*
-        byte[] Write3D(MapData3D map3d)
+
+        byte[] Write3D(MapData3D map, AssetInfo info)
         {
-            return null;
+            var sourceAssets = Resolve<IAssetManager>();
+            var destModApplier = Resolve<IModApplier>();
+
+            var floorPattern = info.Get(AssetProperty.TiledFloorPattern, "");
+            var ceilingPattern = info.Get(AssetProperty.TiledCeilingPattern, "");
+            var wallPattern = info.Get(AssetProperty.TiledWallPattern, "");
+            var contentsPattern = info.Get(AssetProperty.TiledContentsPattern, "");
+
+            if (string.IsNullOrEmpty(floorPattern) || string.IsNullOrEmpty(ceilingPattern) || string.IsNullOrEmpty(wallPattern) || string.IsNullOrEmpty(contentsPattern))
+                return Array.Empty<byte>();
+
+            var labInfo = destModApplier.GetAssetInfo(map.LabDataId, null);
+            if (labInfo == null)
+            {
+                Raise(new LogEvent(LogEvent.Level.Error, $"Could not load asset info for lab {map.LabDataId} in map {map.Id}"));
+                return Array.Empty<byte>();
+            }
+
+            string B(string pattern) => labInfo.BuildFilename(pattern, 0);
+            var properties = new Tilemap3DProperties
+            {
+                TileWidth = info.Get(AssetProperty.TileWidth, 0),
+                TileHeight = info.Get(AssetProperty.BaseHeight, 0),
+                FloorPath = B(floorPattern),
+                CeilingPath = B(ceilingPattern),
+                WallPath = B(wallPattern),
+                ContentsPath = B(contentsPattern),
+            };
+            var formatter = new EventFormatter(sourceAssets.LoadString, map.Id.ToMapText());
+            var tiledMap = MapExport.FromAlbionMap3D(map, properties, formatter);
+
+            return FormatUtil.BytesFromTextWriter(tiledMap.Serialize);
         }
-*/
     }
 }

@@ -192,7 +192,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             return properties;
         }
 
-        static Tile BuildTile(int id, int index, ushort? imageNumber, List<TileProperty> tileProperties, TilemapProperties properties)
+        static Tile BuildTile(int id, int index, ushort? imageNumber, List<TileProperty> tileProperties, Tilemap2DProperties properties)
         {
             var source = imageNumber switch
             {
@@ -218,7 +218,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             };
         }
 
-        public static Tileset FromAlbion(TilesetData tileset, TilemapProperties properties)
+        public static Tileset FromAlbion(TilesetData tileset, Tilemap2DProperties properties)
         {
             if (tileset == null) throw new ArgumentNullException(nameof(tileset));
             if (properties == null) throw new ArgumentNullException(nameof(properties));
@@ -278,7 +278,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             };
         }
 
-        public static Tileset FromLabyrinth(LabyrinthData labyrinth, TilemapProperties properties, List<int>[] allFrames)
+        public static Tileset FromLabyrinth(LabyrinthData labyrinth, Tilemap3DProperties properties, List<int>[] allFrames)
         {
             if (labyrinth == null) throw new ArgumentNullException(nameof(labyrinth));
             if (properties == null) throw new ArgumentNullException(nameof(properties));
@@ -308,9 +308,10 @@ namespace UAlbion.Formats.Exporters.Tiled
                 }
             }
 
-            var graphicsPath = properties.ImagePath; // TODO: null checks
-            var thisPath = properties.TilesetPath;
-            var relativeGraphicsPath = ConfigUtil.GetRelativePath(graphicsPath, Path.GetDirectoryName(thisPath), true);
+            var relativeGraphicsPath = ConfigUtil.GetRelativePath(
+                properties.ImagePath,
+                Path.GetDirectoryName(properties.TilesetPath),
+                true);
 
             return new Tileset
             {
@@ -368,7 +369,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             };
         }
 
-        static TileData InterpretTile(Tile tile, TilemapProperties properties)
+        static TileData InterpretTile(Tile tile, Tilemap2DProperties properties)
         {
             ushort SourceStringToImageNumber(string source)
             {
@@ -411,7 +412,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             return result;
         }
 
-        public TilesetData ToAlbion(TilesetId id, TilemapProperties properties)
+        public TilesetData ToAlbion(TilesetId id, Tilemap2DProperties properties)
         {
             if (properties == null) throw new ArgumentNullException(nameof(properties));
 

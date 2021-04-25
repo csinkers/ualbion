@@ -20,7 +20,7 @@ namespace UAlbion.Core.Veldrid.Textures
         public TextureManager()
         {
             On<EngineUpdateEvent>(OnUpdate);
-            On<TextureStatsEvent>(e => Raise(new LogEvent(LogEvent.Level.Info, Stats())));
+            On<TextureStatsEvent>(e => Info(Stats()));
         }
 
         public string Stats()

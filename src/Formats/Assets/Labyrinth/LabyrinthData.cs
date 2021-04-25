@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SerdesNet;
 using System.Linq;
 using System.Numerics;
+using Newtonsoft.Json;
 using UAlbion.Api;
 using UAlbion.Config;
 
@@ -46,6 +47,19 @@ namespace UAlbion.Formats.Assets.Labyrinth
             (byte)(FogGreen >> 8),
             (byte)(FogBlue >> 8),
             (byte)Math.Min(byte.MaxValue, FogDistance));
+
+        [JsonIgnore]
+        public float ObjectYScaling
+        {
+            get
+            {
+                var maxObjectHeightRaw = ObjectGroups.Max(x => x.SubObjects.Max(y => (int?)y?.Y));
+                float objectYScaling = TileSize.Y / WallHeight;
+                if (maxObjectHeightRaw > WallHeight * 1.5f)
+                    objectYScaling /= 2; // TODO: Figure out the proper way to handle this.
+                return objectYScaling;
+            }
+        }
 
         public static LabyrinthData Serdes(LabyrinthData d, AssetInfo info, AssetMapping mapping, ISerializer s)
         {

@@ -135,6 +135,18 @@ namespace UAlbion.Core
             {
                 eventText = e.ToString();
                 if (verbose) CoreTrace.Log.StartRaiseVerbose(eventId, _nesting, e.GetType().Name, eventText);
+                else if (e is LogEvent log)
+                {
+                    // ReSharper disable ExplicitCallerInfoArgument
+                    switch (log.Severity)
+                    {
+                        case LogLevel.Info: CoreTrace.Log.Info("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;;
+                        case LogLevel.Warning: CoreTrace.Log.Warning("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;;
+                        case LogLevel.Error: CoreTrace.Log.Error("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;;
+                        case LogLevel.Critical: CoreTrace.Log.Critical("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;;
+                    }
+                    // ReSharper restore ExplicitCallerInfoArgument
+                }
                 else CoreTrace.Log.StartRaise(eventId, _nesting, e.GetType().Name, eventText);
             }
 
@@ -185,7 +197,7 @@ namespace UAlbion.Core
                     if (subscribedTypes.Any(x => x.Type == handler.Type))
                     {
                         Raise(new LogEvent(
-                            LogEvent.Level.Error,
+                            LogLevel.Error,
                             $"Component of type \"{handler.Component.GetType()}\" tried to register " +
                             $"handler for event {handler.Type}, but it has already registered a handler for that event."),
                             this);

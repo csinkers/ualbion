@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
@@ -25,12 +24,20 @@ namespace UAlbion.Game.Input
         public InputManager()
         {
             On<InputModeEvent>(SetInputMode);
-            On<MouseModeEvent>(SetMouseMode);
+            On<MouseModeEvent>(e => SetMouseMode(e.Mode));
+            On<ToggleMouseLookEvent>(_ =>
+            {
+                switch (_mouseMode)
+                {
+                    case MouseMode.Normal: SetMouseMode(MouseMode.MouseLook); break;
+                    case MouseMode.MouseLook: SetMouseMode(MouseMode.Normal); break;
+                }
+            });
             On<PushMouseModeEvent>(e =>
             {
                 _mouseModeStack.Push(_mouseMode);
                 var setEvent = new MouseModeEvent(e.Mode);
-                SetMouseMode(setEvent);
+                SetMouseMode(setEvent.Mode);
                 Raise(setEvent);
             });
             On<PopMouseModeEvent>(e =>
@@ -39,7 +46,7 @@ namespace UAlbion.Game.Input
                     return;
 
                 var setEvent = new MouseModeEvent(_mouseModeStack.Pop());
-                SetMouseMode(setEvent);
+                SetMouseMode(setEvent.Mode);
                 Raise(setEvent);
             });
             On<PushInputModeEvent>(e =>
@@ -78,34 +85,32 @@ namespace UAlbion.Game.Input
             return this;
         }
 
-        void SetMouseMode(MouseModeEvent e)
+        void SetMouseMode(MouseMode? mode)
         {
-            if (e.Mode == null)
+            if (mode == null)
             {
-                Raise(new LogEvent(LogEvent.Level.Info,
-                    $"MouseMode: {MouseMode} (Stack: {string.Join(", ", _mouseModeStack)})"));
+                Info($"MouseMode: {MouseMode} (Stack: {string.Join(", ", _mouseModeStack)})");
                 return;
             }
 
-            _mouseModes.TryGetValue(e.Mode.Value, out var activeMode);
-            if (_mouseMode == e.Mode && activeMode?.IsActive == true)
+            _mouseModes.TryGetValue(mode.Value, out var activeMode);
+            if (_mouseMode == mode && activeMode?.IsActive == true)
                 return;
 
-            foreach (var mode in _mouseModes.Values)
-                mode.IsActive = false;
+            foreach (var otherMode in _mouseModes.Values)
+                otherMode.IsActive = false;
 
             if (activeMode != null)
                 activeMode.IsActive = true;
 
-            _mouseMode = e.Mode.Value;
+            _mouseMode = mode.Value;
         }
 
         void SetInputMode(InputModeEvent e)
         {
             if (e.Mode == null)
             {
-                Raise(new LogEvent(LogEvent.Level.Info,
-                    $"InputMode: {InputMode} (Stack: {string.Join(", ", _inputModeStack)})"));
+                Info($"InputMode: {InputMode} (Stack: {string.Join(", ", _inputModeStack)})");
                 return;
             }
 

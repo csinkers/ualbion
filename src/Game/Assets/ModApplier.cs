@@ -79,7 +79,7 @@ namespace UAlbion.Game.Assets
 
             if (modName.Any(c => c == '\\' || c == '/' || c == Path.DirectorySeparatorChar))
             {
-                Raise(new LogEvent(LogEvent.Level.Error, $"Mod {modName} is not a simple directory name"));
+                Error($"Mod {modName} is not a simple directory name");
                 return;
             }
 
@@ -88,14 +88,14 @@ namespace UAlbion.Game.Assets
             var assetConfigPath = Path.Combine(path, "assets.json");
             if (!disk.FileExists(assetConfigPath))
             {
-                Raise(new LogEvent(LogEvent.Level.Error, $"Mod {modName} does not contain an asset.config file"));
+                Error($"Mod {modName} does not contain an asset.config file");
                 return;
             }
 
             var modConfigPath = Path.Combine(path, "modinfo.json");
             if (!disk.FileExists(modConfigPath))
             {
-                Raise(new LogEvent(LogEvent.Level.Error, $"Mod {modName} does not contain an modinfo.config file"));
+                Error($"Mod {modName} does not contain an modinfo.config file");
                 return;
             }
 
@@ -110,7 +110,7 @@ namespace UAlbion.Game.Assets
                 LoadMod(dataDir, dependency, disk);
                 if (!_mods.TryGetValue(dependency, out var dependencyInfo))
                 {
-                    Raise(new LogEvent(LogEvent.Level.Error, $"Dependency {dependency} of mod {modName} could not be loaded, skipping load of {modName}"));
+                    Error($"Dependency {dependency} of mod {modName} could not be loaded, skipping load of {modName}");
                     return;
                 }
 
@@ -171,7 +171,7 @@ namespace UAlbion.Game.Assets
                 if (CoreUtil.IsCriticalException(e))
                     throw;
 
-                Raise(new LogEvent(LogEvent.Level.Error, $"Could not load asset {id}: {e}"));
+                Error($"Could not load asset {id}: {e}");
                 return null;
             }
         }
@@ -256,7 +256,7 @@ namespace UAlbion.Game.Assets
             var disk = Resolve<IFileSystem>();
             if (!disk.FileExists(path))
             {
-                Raise(new LogEvent(LogEvent.Level.Error, $"Could not find save game file \"{path}\""));
+                Error($"Could not find save game file \"{path}\"");
                 return null;
             }
 
@@ -283,7 +283,7 @@ namespace UAlbion.Game.Assets
             var target = _modsInReverseDependencyOrder.First();
 
             // Add any missing ids
-            Raise(new LogEvent(LogEvent.Level.Info, "Populating destination asset info..."));
+            Info("Populating destination asset info...");
             var extraPaths = new Dictionary<string, string> { ["MOD"] = target.AssetPath };
             target.AssetConfig.PopulateAssetIds(
                 AssetMapping.Global,
@@ -338,7 +338,7 @@ namespace UAlbion.Game.Assets
 
                     if (notify)
                     {
-                        Raise(new LogEvent(LogEvent.Level.Info, $"Saving {file.Filename}..."));
+                        Info($"Saving {file.Filename}...");
                         notify = false;
                     }
 

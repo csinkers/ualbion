@@ -19,6 +19,24 @@ namespace UAlbion.Formats.Assets.Maps
         public IList<AutomapInfo> Automap { get; } = new List<AutomapInfo>();
         public byte[] AutomapGraphics { get; private set; }
 
+        const int WallOffset = 100;
+
+        public byte[] BuildWallArray() => Contents.Select(x => (byte)(x >= WallOffset ? x - WallOffset : 0)).ToArray();
+        public byte[] BuildObjectArray() => Contents.Select(x => x < WallOffset ? x : (byte)0).ToArray();
+        public byte GetWall(int index)
+        {
+            if (index < 0 || index > Contents.Length) return 0;
+            var contents = Contents[index];
+            return (byte)(contents >= WallOffset ? contents - WallOffset : 0);
+        }
+
+        public byte GetObject(int index)
+        {
+            if (index < 0 || index > Contents.Length) return 0;
+            var contents = Contents[index];
+            return contents < WallOffset ? contents : (byte)0;
+        }
+
         public static MapData3D Serdes(AssetInfo info, MapData3D existing, AssetMapping mapping, ISerializer s)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));

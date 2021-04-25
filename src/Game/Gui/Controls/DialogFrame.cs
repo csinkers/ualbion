@@ -121,7 +121,7 @@ namespace UAlbion.Game.Gui.Controls
             DrawVerticalLine(4); // Top
             DrawVerticalLine(width - FrameOffsetX); // Bottom
 
-            var subImage = (SubImage)multi.GetSubImage(multi.GetSubImageAtTime(1, 0));
+            var subImage = (SubImage)multi.GetSubImage(multi.GetSubImageAtTime(1, 0, false));
             var normalisedSize = window.UiToNormRelative(subImage.Size);
 
             var key = new SpriteKey(multi, order, SpriteKeyFlags.NoTransform);

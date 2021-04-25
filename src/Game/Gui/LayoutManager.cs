@@ -150,7 +150,7 @@ namespace UAlbion.Game.Gui
             }
 
             Aux(root, 0);
-            Raise(new LogEvent(LogEvent.Level.Info, sb.ToString()));
+            Info(sb.ToString());
             Raise(new SetClipboardTextEvent(sb.ToString()));
         }
     }

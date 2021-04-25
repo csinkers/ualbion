@@ -225,7 +225,7 @@ namespace UAlbion.Core.Veldrid.Visual
                     }
                     catch (Exception e)
                     {
-                        Raise(new LogEvent(LogEvent.Level.Error, $"Error compiling shaders ({vertexName}, {fragmentName}): {e}"));
+                        Error($"Error compiling shaders ({vertexName}, {fragmentName}): {e}");
                     }
                 }
 

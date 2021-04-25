@@ -56,7 +56,7 @@ namespace UAlbion.Core.Veldrid.Visual
         public Type[] RenderableTypes => new [] { typeof(MultiSprite) };
         public RenderPasses RenderPasses => RenderPasses.Standard;
 
-        Pipeline BuildPipeline(GraphicsDevice gd, SceneContext sc, SpriteShaderKey key)
+        Pipeline BuildPipeline(VeldridRendererContext c, SpriteShaderKey key)
         {
             var shaderCache = Resolve<IVeldridShaderCache>();
             var shaderName = key.UseCylindricalShader ? "CylindricalSprite" : "Sprite"; 
@@ -82,7 +82,7 @@ namespace UAlbion.Core.Veldrid.Visual
             }
 
             var shaders = shaderCache.GetShaderPair(
-                gd.ResourceFactory,
+                c.GraphicsDevice.ResourceFactory,
                 vertexShaderName, fragmentShaderName,
                 vertexShaderContent, fragmentShaderContent);
 
@@ -107,11 +107,12 @@ namespace UAlbion.Core.Veldrid.Visual
                 PrimitiveTopology.TriangleList,
                 new ShaderSetDescription(new[] { VertexLayout, InstanceLayout },
                     shaders,
-                    ShaderHelper.GetSpecializations(gd)),
-                new[] { _perSpriteResourceLayout, sc.CommonResourceLayout },
-                gd.SwapchainFramebuffer.OutputDescription);
+                    ShaderHelper.GetSpecializations(c.GraphicsDevice)),
+                new[] { _perSpriteResourceLayout, c.SceneContext.CommonResourceLayout },
+                ((FramebufferSource)c.Framebuffer)?.Framebuffer.OutputDescription
+                ?? c.GraphicsDevice.SwapchainFramebuffer.OutputDescription);
 
-            var pipeline = gd.ResourceFactory.CreateGraphicsPipeline(ref pipelineDescription);
+            var pipeline = c.GraphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref pipelineDescription);
             pipeline.Name = $"P_Sprite_{key}";
             return pipeline;
         }
@@ -153,7 +154,7 @@ namespace UAlbion.Core.Veldrid.Visual
                 bool didSomething = false;
                 var shaderKey = new SpriteShaderKey(sprite, engineFlags);
                 if (!_pipelines.ContainsKey(shaderKey))
-                    _pipelines.Add(shaderKey, BuildPipeline(gd, c.SceneContext, shaderKey));
+                    _pipelines.Add(shaderKey, BuildPipeline(c, shaderKey));
 
                 uint bufferSize = (uint)sprite.Instances.Length * SpriteInstanceData.StructSize;
                 var buffer = objectManager.GetDeviceObject<DeviceBuffer>((sprite, sprite, "InstanceBuffer"));

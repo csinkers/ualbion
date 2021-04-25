@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using UAlbion.Api;
 
@@ -353,6 +354,17 @@ namespace UAlbion.Core
             if (_handlers != null && _handlers.TryGetValue(@event.GetType(), out var handler))
                 handler.Invoke(@event, DummyContinuation);
         }
+
+        public void Verbose(string msg, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
+            => Raise(new LogEvent(LogLevel.Verbose, msg, file, member, line));
+        public void Info(string msg, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
+            => Raise(new LogEvent(LogLevel.Info, msg, file, member, line));
+        public void Warn(string msg, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
+            => Raise(new LogEvent(LogLevel.Warning, msg, file, member, line));
+        public void Error(string msg, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
+            => Raise(new LogEvent(LogLevel.Error, msg, file, member, line));
+        public void Critical(string msg, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
+            => Raise(new LogEvent(LogLevel.Critical, msg, file, member, line));
     }
 }
 #pragma warning restore CA1030 // Use events where appropriate

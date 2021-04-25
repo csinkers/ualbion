@@ -6,7 +6,7 @@
     public interface IAsyncEvent : IEvent { }
     // ReSharper disable once UnusedTypeParameter
     public interface IAsyncEvent<T> : IAsyncEvent { }
-    public interface IHighlightEvent { }
+    public interface IHighlightEvent : IEvent { }
     public interface IVerboseEvent : IEvent { }
     public interface ICancellableEvent : IEvent { bool Propagating { get; set; } }
 #pragma warning restore 1040 // Avoid empty interfaces

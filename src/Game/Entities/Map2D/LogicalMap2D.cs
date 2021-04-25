@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using UAlbion.Core;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
@@ -10,82 +8,28 @@ using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Entities.Map2D
 {
-    public class LogicalMap2D
+    public class LogicalMap2D : LogicalMap
     {
         readonly MapData2D _mapData;
         readonly TilesetData _tileData;
         readonly IList<Block> _blockList;
-        readonly MapChangeCollection _tempChanges;
-        readonly MapChangeCollection _permChanges;
-
-        public MapId Id => _mapData.Id;
 
         public LogicalMap2D(
             IAssetManager assetManager,
             MapData2D mapData,
             MapChangeCollection tempChanges,
-            MapChangeCollection permChanges)
+            MapChangeCollection permChanges) : base(mapData, tempChanges, permChanges)
         {
             if (assetManager == null) throw new ArgumentNullException(nameof(assetManager));
             _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
-            _tempChanges = tempChanges ?? throw new ArgumentNullException(nameof(tempChanges));
-            _permChanges = permChanges ?? throw new ArgumentNullException(nameof(permChanges));
             _tileData = assetManager.LoadTileData(_mapData.TilesetId);
             _blockList = assetManager.LoadBlockList(_mapData.TilesetId.ToBlockList());
             UseSmallSprites = _tileData.UseSmallGraphics;
-
-            // Clear out temp changes for other maps
-            for(int i = 0; i < tempChanges.Count;)
-            {
-                if (_tempChanges[i].MapId != mapData.Id)
-                    _tempChanges.RemoveAt(i);
-                else i++;
-            }
-
-            // Replay any changes for this map
-            foreach (var change in permChanges.Where(x => x.MapId == mapData.Id))
-                ApplyChange(change.X, change.Y, change.ChangeType, change.Value);
-
-            foreach (var change in tempChanges)
-                ApplyChange(change.X, change.Y, change.ChangeType, change.Value);
         }
 
-        public void Modify(byte x, byte y, IconChangeType changeType, ushort value, bool isTemporary)
-        {
-            ApplyChange(x, y, changeType, value);
-            var collection = isTemporary ? _tempChanges : _permChanges;
-            collection.Update(Id, x, y, changeType, value);
-        }
-
-        void ApplyChange(byte x, byte y, IconChangeType changeType, ushort value)
-        {
-            switch (changeType)
-            {
-                case IconChangeType.Underlay: ChangeUnderlay(x, y, value); break;
-                case IconChangeType.Overlay: ChangeOverlay(x, y, value); break;
-                case IconChangeType.Wall: break; // N/A for 2D map
-                case IconChangeType.Floor: break; // N/A for 2D map
-                case IconChangeType.Ceiling: break; // N/A for 2D map
-                case IconChangeType.NpcMovement: break;
-                case IconChangeType.NpcSprite: break;
-                case IconChangeType.Chain: ChangeTileEventChain(x, y, value); break;
-                case IconChangeType.BlockHard: PlaceBlock(x, y, value, true); break;
-                case IconChangeType.BlockSoft: PlaceBlock(x, y, value, false); break;
-                case IconChangeType.Trigger: ChangeTileEventTrigger(x, y, value); break;
-                default: throw new ArgumentOutOfRangeException(nameof(changeType), changeType, $"Unexpected change type \"{changeType}\"");
-            }
-        }
-
-        public event EventHandler<DirtyTileEventArgs> Dirty;
-        public int Width => _mapData.Width;
-        public int Height => _mapData.Height;
         public bool UseSmallSprites { get; }
-        public PaletteId PaletteId => _mapData.PaletteId;
         public TilesetGraphicsId TilesetId => _mapData.TilesetId.ToTilesetGraphics();
-        public IEnumerable<MapNpc> Npcs => _mapData.Npcs;
         public Vector2 TileSize { get; set; } // TODO: Tidy up how this gets initialised
-
-        public int Index(int x, int y) => y * _mapData.Width + x;
 
         public TileData GetUnderlay(int x, int y) => GetUnderlay(Index(x, y));
         public TileData GetUnderlay(int index)
@@ -112,48 +56,39 @@ namespace UAlbion.Game.Entities.Map2D
             ?? GetOverlay(index)?.Collision 
             ?? Passability.Passable;
 
-        public MapEventZone GetZone(int x, int y) => GetZone(Index(x, y));
-        public MapEventZone GetZone(int index) => _mapData.ZoneLookup.TryGetValue(index, out var zone) ? zone : null;
-
-        public IEnumerable<MapEventZone> GetZonesOfType(TriggerTypes triggerType)
-        {
-            var matchingKeys = _mapData.ZoneTypeLookup.Keys.Where(x => (x & triggerType) == triggerType);
-            return matchingKeys.SelectMany(x => _mapData.ZoneTypeLookup[x]);
-        }
-
-        void ChangeUnderlay(byte x, byte y, ushort value)
+        protected override void ChangeUnderlay(byte x, byte y, ushort value)
         {
             var index = Index(x, y);
             if (index < 0 || index >= _mapData.Underlay.Length)
             {
-                CoreUtil.LogError($"Tried to update invalid underlay index {index} (max {_mapData.Underlay.Length}");
+                Error($"Tried to update invalid underlay index {index} (max {_mapData.Underlay.Length}");
             }
             else
             {
-                _mapData.Underlay[Index(x, y)] = value;
-                Dirty?.Invoke(this, new DirtyTileEventArgs(x, y, IconChangeType.Underlay));
+                _mapData.Underlay[index] = value;
+                OnDirty(x, y, IconChangeType.Underlay);
             }
         }
 
-        void ChangeOverlay(byte x, byte y, ushort value)
+        protected override void ChangeOverlay(byte x, byte y, ushort value)
         {
             var index = Index(x, y);
             if (index < 0 || index >= _mapData.Overlay.Length)
             {
-                CoreUtil.LogError($"Tried to update invalid overlay index {index} (max {_mapData.Overlay.Length}");
+                Error($"Tried to update invalid overlay index {index} (max {_mapData.Overlay.Length}");
             }
             else
             {
-                _mapData.Overlay[Index(x, y)] = value;
-                Dirty?.Invoke(this, new DirtyTileEventArgs(x, y, IconChangeType.Overlay));
+                _mapData.Overlay[index] = value;
+                OnDirty(x, y, IconChangeType.Overlay);
             }
         }
 
-        void PlaceBlock(byte x, byte y, ushort blockId, bool overwrite)
+        protected override void PlaceBlock(byte x, byte y, ushort blockId, bool overwrite)
         {
             if (blockId >= _blockList.Count)
             {
-                CoreUtil.LogError($"Tried to set out-of-range block {blockId} (max id {_blockList.Count-1})");
+                Error($"Tried to set out-of-range block {blockId} (max id {_blockList.Count-1})");
                 return;
             }
 
@@ -167,7 +102,7 @@ namespace UAlbion.Game.Entities.Map2D
 
                     if(targetIndex < 0 || targetIndex > _mapData.Underlay.Length)
                     {
-                        CoreUtil.LogError($"Tried to set out-of-range index {targetIndex}, @ ({x},{y}) + ({i},{j}) for block {blockId}");
+                        Error($"Tried to set out-of-range index {targetIndex}, @ ({x},{y}) + ({i},{j}) for block {blockId}");
                         return;
                     }
 
@@ -176,7 +111,7 @@ namespace UAlbion.Game.Entities.Map2D
                     if (newUnderlay > 1 && (overwrite || underlay <= 1))
                     {
                         _mapData.Underlay[targetIndex] = newUnderlay;
-                        Dirty?.Invoke(this, new DirtyTileEventArgs(x + i, y + j, IconChangeType.Underlay));
+                        OnDirty(x + i, y + j, IconChangeType.Underlay);
                     }
 
                     int overlay = _mapData.Overlay[targetIndex];
@@ -184,53 +119,10 @@ namespace UAlbion.Game.Entities.Map2D
                     if (overwrite || overlay > 1)
                     {
                         _mapData.Overlay[targetIndex] = newOverlay;
-                        Dirty?.Invoke(this, new DirtyTileEventArgs(x + i, y + j, IconChangeType.Overlay));
+                        OnDirty(x + i, y + j, IconChangeType.Overlay);
                     }
                 }
             }
         }
-
-        void ChangeTileEventChain(byte x, byte y, ushort value)
-        {
-            var index = Index(x, y);
-            _mapData.ZoneLookup.TryGetValue(index, out var zone);
-            if (zone == null)
-                return;
-
-            if (value >= _mapData.Chains.Count)
-            {
-                _mapData.ZoneLookup.Remove(index);
-                _mapData.Zones.Remove(zone);
-            }
-            else
-            {
-                zone.ChainSource = _mapData.Id;
-                zone.Chain = value;
-                var firstEventId = _mapData.Chains[value];
-                zone.Node = firstEventId >= _mapData.Events.Count ? null : _mapData.Events[firstEventId];
-            }
-        }
-
-        void ChangeTileEventTrigger(byte x, byte y, ushort value)
-        {
-            _mapData.ZoneLookup.TryGetValue(Index(x, y), out var zone);
-            if(zone != null)
-                zone.Trigger = (TriggerTypes)value;
-        }
-
-    }
-
-    public class DirtyTileEventArgs : EventArgs
-    {
-        public DirtyTileEventArgs(int x, int y, IconChangeType type)
-        {
-            X = x;
-            Y = y;
-            Type = type;
-        }
-
-        public int X { get; }
-        public int Y { get; }
-        public IconChangeType Type { get; }
     }
 }

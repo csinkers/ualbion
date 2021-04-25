@@ -77,10 +77,10 @@ namespace UAlbion.Core
             }
         }
 
-        public static void LogInfo(string msg) => Engine.GlobalExchange?.Raise(new LogEvent(LogEvent.Level.Info, msg), null);
-        public static void LogWarn(string msg) => Engine.GlobalExchange?.Raise(new LogEvent(LogEvent.Level.Warning, msg), null);
-        public static void LogError(string msg) => Engine.GlobalExchange?.Raise(new LogEvent(LogEvent.Level.Error, msg), null);
-        public static void LogCritical(string msg) => Engine.GlobalExchange?.Raise(new LogEvent(LogEvent.Level.Critical, msg), null);
+        public static void LogInfo(string msg) => Engine.GlobalExchange?.Raise(new LogEvent(LogLevel.Info, msg), null);
+        public static void LogWarn(string msg) => Engine.GlobalExchange?.Raise(new LogEvent(LogLevel.Warning, msg), null);
+        public static void LogError(string msg) => Engine.GlobalExchange?.Raise(new LogEvent(LogLevel.Error, msg), null);
+        public static void LogCritical(string msg) => Engine.GlobalExchange?.Raise(new LogEvent(LogLevel.Critical, msg), null);
         public static bool IsCriticalException(Exception e) => e switch
         {
             OutOfMemoryException _ => true,

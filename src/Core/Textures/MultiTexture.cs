@@ -87,7 +87,7 @@ namespace UAlbion.Core.Textures
             return logicalId >= LogicalSubImages.Count ? 1 : LogicalSubImages[logicalId].Frames;
         }
 
-        public int GetSubImageAtTime(int logicalId, int tick)
+        public int GetSubImageAtTime(int logicalId, int tick, bool backAndForth)
         {
             if (IsMetadataDirty)
                 RebuildLayers();
@@ -96,7 +96,17 @@ namespace UAlbion.Core.Textures
                 return 0;
 
             var logicalImage = LogicalSubImages[logicalId];
-            return LayerLookup.TryGetValue(new LayerKey(logicalId, tick % logicalImage.Frames), out var result) ? result : 0;
+            int frame;// = tick % logicalImage.Frames;
+
+            if (backAndForth && logicalImage.Frames > 2)
+            {
+                int maxFrame = logicalImage.Frames - 1;
+                frame = tick % (2 * maxFrame) - maxFrame;
+                frame = Math.Abs(frame);
+            }
+            else frame = tick % logicalImage.Frames;
+
+            return LayerLookup.TryGetValue(new LayerKey(logicalId, frame), out var result) ? result : 0;
         }
 
         public ISubImage GetSubImage(int subImage)

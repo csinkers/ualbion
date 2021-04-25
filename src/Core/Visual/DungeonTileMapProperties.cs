@@ -17,7 +17,7 @@ namespace UAlbion.Core.Visual
         public uint Width { get; }
         public uint AmbientLightLevel { get; }
         public uint FogColor { get; }
-        public uint Pad1 { get; }
+        public float ObjectYScaling { get; }
 
         public DungeonTileMapProperties(
             Vector3 scale,
@@ -27,7 +27,8 @@ namespace UAlbion.Core.Visual
             Vector3 verticalSpacing,
             uint width,
             uint ambientLightLevel,
-            uint fogColor)
+            uint fogColor,
+            float objectYScaling)
         {
             Scale = new Vector4(scale, 1);
             Rotation = new Vector4(rotation, 1);
@@ -37,7 +38,7 @@ namespace UAlbion.Core.Visual
             Width = width;
             AmbientLightLevel = ambientLightLevel;
             FogColor = fogColor;
-            Pad1 = 0;
+            ObjectYScaling = objectYScaling;
         }
     }
 #pragma warning restore CA1815 // Override equals and operator equals on value types

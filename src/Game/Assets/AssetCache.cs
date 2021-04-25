@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Game.Events;
@@ -40,7 +39,7 @@ namespace UAlbion.Game.Assets
                     foreach(var (type, count) in countByType)
                         sb.AppendLine($"    {type}: {count} items");
                 }
-                Raise(new LogEvent(LogEvent.Level.Info, sb.ToString()));
+                Info(sb.ToString());
             });
         }
 

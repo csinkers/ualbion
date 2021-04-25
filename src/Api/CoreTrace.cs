@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics.Tracing;
+using System.Runtime.CompilerServices;
+using T = System.Diagnostics.Tracing;
 
 namespace UAlbion.Api
 {
@@ -34,27 +36,34 @@ namespace UAlbion.Api
         [NonEvent]
         public static void SetCorrelationId(Guid correlationId) => SetCurrentThreadActivityId(correlationId, out _);
 
-        [System.Diagnostics.Tracing.Event(1, Level = EventLevel.Informational)]
-        public void Info(string category, string message) => WriteEvent(1, category ?? "", message ?? "");
+        [T.Event(1, Level = EventLevel.Informational)]
+        public void Info(string category, string message, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
+            => WriteEvent(1, category ?? "", message ?? "", file ?? "", member ?? "", line);
 
-        [System.Diagnostics.Tracing.Event(2, Level = EventLevel.Warning)]
-        public void Warning(string category, string message) => WriteEvent(2, category ?? "", message ?? "");
+        [T.Event(2, Level = EventLevel.Warning)]
+        public void Warning(string category, string message, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
+            => WriteEvent(2, category ?? "", message ?? "", file ?? "", member ?? "", line);
 
-        [System.Diagnostics.Tracing.Event(3, Level = EventLevel.Error)]
-        public void Error(string category, string message) => WriteEvent(3, category ?? "", message ?? "");
+        [T.Event(3, Level = EventLevel.Error)]
+        public void Error(string category, string message, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
+            => WriteEvent(3, category ?? "", message ?? "", file ?? "", member ?? "", line);
 
-        public void StartFrame(long frameCount, double deltaMicroseconds) => WriteEvent(4, frameCount, deltaMicroseconds);
-        public void CollectedRenderables(string renderer, int layerCount, int renderableCount) => WriteEvent(5, renderer ?? "", layerCount, renderableCount);
-        public void StartDebugGroup(string name) => WriteEvent(6, name ?? "");
-        public void StopDebugGroup(string name) => WriteEvent(7, name ?? "");
+        [T.Event(4, Level = EventLevel.Critical)]
+        public void Critical(string category, string message, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
+            => WriteEvent(4, category ?? "", message ?? "", file ?? "", member ?? "", line);
 
-        [System.Diagnostics.Tracing.Event(8, Level = EventLevel.Informational, Task = Tasks.Raise, Opcode = EventOpcode.Start)]
-        public void StartRaise(long eventId, int nesting, string type, string details) => WriteEvent(8, eventId, nesting, type ?? "", details ?? "");
+        public void StartFrame(long frameCount, double deltaMicroseconds) => WriteEvent(5, frameCount, deltaMicroseconds);
+        public void CollectedRenderables(string renderer, int layerCount, int renderableCount) => WriteEvent(6, renderer ?? "", layerCount, renderableCount);
+        public void StartDebugGroup(string name) => WriteEvent(7, name ?? "");
+        public void StopDebugGroup(string name) => WriteEvent(8, name ?? "");
 
-        [System.Diagnostics.Tracing.Event(9, Level = EventLevel.Informational, Task = Tasks.Raise, Opcode = EventOpcode.Stop)]
-        public void StopRaise(long eventId, int nesting, string type, string details, int subscriberCount) => WriteEvent(9, eventId, nesting, type, details, subscriberCount);
+        [T.Event(9, Level = EventLevel.Informational, Task = Tasks.Raise, Opcode = EventOpcode.Start)]
+        public void StartRaise(long eventId, int nesting, string type, string details) => WriteEvent(9, eventId, nesting, type ?? "", details ?? "");
 
-        [System.Diagnostics.Tracing.Event(10, Level = EventLevel.Verbose, Task = Tasks.Raise, Opcode = Opcodes.StartVerbose)]
+        [T.Event(10, Level = EventLevel.Informational, Task = Tasks.Raise, Opcode = EventOpcode.Stop)]
+        public void StopRaise(long eventId, int nesting, string type, string details, int subscriberCount) => WriteEvent(10, eventId, nesting, type, details, subscriberCount);
+
+        [T.Event(11, Level = EventLevel.Verbose, Task = Tasks.Raise, Opcode = Opcodes.StartVerbose)]
         public unsafe void StartRaiseVerbose(long eventId, int nesting, string type, string details)
         {
             type ??= "";
@@ -72,11 +81,11 @@ namespace UAlbion.Api
                 data[2].Size = (type.Length + 1) * 2;
                 data[3].DataPointer = (IntPtr)detailsPtr;
                 data[3].Size = (details.Length + 1) * 2;
-                WriteEventCore(10, 4, data);
+                WriteEventCore(11, 4, data);
             }
         } //=> WriteEvent(10, eventId, nesting, type ?? "", details ?? "", exchangeName ?? "");
 
-        [System.Diagnostics.Tracing.Event(11, Level = EventLevel.Verbose, Task = Tasks.Raise, Opcode = Opcodes.StopVerbose)]
+        [T.Event(12, Level = EventLevel.Verbose, Task = Tasks.Raise, Opcode = Opcodes.StopVerbose)]
         public unsafe void StopRaiseVerbose(long eventId, int nesting, string type, string details, int subscriberCount)
         {
             type ??= "";
@@ -96,9 +105,10 @@ namespace UAlbion.Api
                 data[3].Size = (details.Length + 1) * 2;
                 data[4].DataPointer = (IntPtr)subscriberCount;
                 data[4].Size = sizeof(int);
-                WriteEventCore(11, 5, data);
+                WriteEventCore(12, 5, data);
             }
         } // => WriteEvent(11, eventId, nesting, type ?? "", details ?? "", exchangeName ?? "", subscriberCount);
+
         public void CreatedDeviceTexture(string name, int width, int height, int layers) => WriteEvent(12, name ?? "", width, height, layers);
         public void StartupEvent(string name) => WriteEvent(13, name ?? "");
         public void AssertFailed(string message) => WriteEvent(14, message ?? "");

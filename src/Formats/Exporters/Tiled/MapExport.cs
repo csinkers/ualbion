@@ -331,8 +331,8 @@ namespace UAlbion.Formats.Exporters.Tiled
             var (gidOffset, tiles) = mode switch
             {
                 IsometricMode.Floors => (FloorGid, map.Floors),
-                IsometricMode.Walls => (WallGid, map.Contents.Select(x => (byte)(x >= 100 ? x - 100 : 0)).ToArray()),
-                IsometricMode.Contents => (ContentsGid, map.Contents.Select(x => x < 100 ? x : (byte)0).ToArray()),
+                IsometricMode.Walls => (WallGid, map.BuildWallArray()),
+                IsometricMode.Contents => (ContentsGid, map.BuildObjectArray()),
                 IsometricMode.Ceilings => (CeilingGid, map.Ceilings),
                 _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null)
             };

@@ -47,7 +47,9 @@ namespace UAlbion.Game.Veldrid.Assets
 
             _engine = new VeldridEngine(
                 GraphicsBackend.Vulkan, false, false, false)
-                .AddRenderer(new ExtrudedTileMapRenderer());
+                .AddRenderer(new ExtrudedTileMapRenderer())
+                .AddRenderer(new SpriteRenderer())
+                ;
 
             _engine.ChangeBackend();
 #pragma warning restore CA2000 // Dispose objects before losing scopes
@@ -72,6 +74,7 @@ namespace UAlbion.Game.Veldrid.Assets
             AttachChild(services);
             Raise(new SetSceneEvent(SceneId.IsometricBake));
             Raise(new SetClearColourEvent(0, 0, 0, 0));
+            Raise(new EngineFlagEvent(FlagOperation.Set, EngineFlags.ShowBoundingBoxes));
 
             _context = _engine.BuildContext(fbSource);
         }

@@ -94,7 +94,7 @@ void main()
 
 	if ((uEngineFlags & EF_SHOW_BOUNDING_BOXES) != 0)
 	{
-		color = mix(color, vec4(1.0f),
+		color = mix(color, (3*color + vec4(1.0f)) * 0.25f,
 				max(smoothstep(0.47, 0.5, abs(iTexCoords.x-0.5f)),
 					smoothstep(0.47, 0.5, abs(iTexCoords.y-0.5f))));
 	}

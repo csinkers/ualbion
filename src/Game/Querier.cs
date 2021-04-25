@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -41,22 +40,22 @@ namespace UAlbion.Game
 
             OnAsync(Do<QueryNpcActiveEvent>(q =>
             {
-                Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query NpcActive"));
+                Error("TODO: Query NpcActive");
                 return true;
             }));
             OnAsync(Do<QueryConsciousEvent> (q =>
             {
-                Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query Party member conscious"));
+                Error("TODO: Query Party member conscious");
                 return true;
             }));
             OnAsync(Do<QueryEventUsedEvent> (q =>
             {
-                Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query event already used"));
+                Error("TODO: Query event already used");
                 return false;
             }));
             OnAsync(Do<QueryDemoVersionEvent> (q =>
             {
-                Raise(new LogEvent(LogEvent.Level.Error, "TODO: Query is demo"));
+                Error("TODO: Query is demo");
                 return false;
             }));
 

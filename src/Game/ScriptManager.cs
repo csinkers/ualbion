@@ -25,7 +25,7 @@ namespace UAlbion.Game
             var events = assets.LoadScript(doScriptEvent.ScriptId);
             if (events == null)
             {
-                CoreUtil.LogError($"Could not load script {doScriptEvent.ScriptId}");
+                Error($"Could not load script {doScriptEvent.ScriptId}");
                 return false;
             }
 
@@ -45,7 +45,7 @@ namespace UAlbion.Game
             var assets = Resolve<IAssetManager>();
             var events = assets.LoadScript(dumpScriptEvent.ScriptId);
             foreach (var e in events)
-                Raise(new LogEvent(LogEvent.Level.Info, e.ToString()));
+                Info(e.ToString());
         }
     }
 

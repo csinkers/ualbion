@@ -1,5 +1,4 @@
-﻿using UAlbion.Api;
-using UAlbion.Api.Visual;
+﻿using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
@@ -51,7 +50,7 @@ namespace UAlbion.Game
             var palette = Resolve<IAssetManager>().LoadPalette(paletteId);
             if (palette == null)
             {
-                Raise(new LogEvent(LogEvent.Level.Error, $"Palette ID {paletteId} could not be loaded!"));
+                Error($"Palette ID {paletteId} could not be loaded!");
                 return;
             }
 

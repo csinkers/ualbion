@@ -146,7 +146,7 @@ namespace UAlbion.Game.Veldrid.Input
                 }
 
                 var actionEvent = Event.Parse(action);
-                Raise(actionEvent ?? new LogEvent(LogEvent.Level.Error, $"The action \"{action}\" could not be parsed."));
+                Raise(actionEvent ?? new LogEvent(LogLevel.Error, $"The action \"{action}\" could not be parsed."));
             }
 
             // Handle continuous bindings

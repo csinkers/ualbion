@@ -133,7 +133,7 @@ namespace UAlbion.Game.Gui.Text
             var npc = assets.LoadSheet(e.MemberId);
             if (npc == null)
             {
-                Raise(new LogEvent(LogEvent.Level.Error, $"Could not load NPC info for \"{e.MemberId}\""));
+                Error($"Could not load NPC info for \"{e.MemberId}\"");
                 continuation();
                 return true;
             }

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
+using UAlbion.Formats.ScriptEvents;
 
 namespace UAlbion.Game.Entities.Map3D
 {
@@ -46,7 +46,7 @@ namespace UAlbion.Game.Entities.Map3D
             Load(labyrinthData, info, mode, properties, paletteId, assets);
         }
 
-        public void Load(LabyrinthData labyrinthData, AssetInfo info, IsometricMode mode, DungeonTileMapProperties properties, int? paletteId, IAssetManager assets)
+        public void Load(LabyrinthData labyrinthData, AssetInfo info, IsometricMode mode, DungeonTileMapProperties properties, int? paletteNumber, IAssetManager assets)
         {
             if (labyrinthData == null) throw new ArgumentNullException(nameof(labyrinthData));
             if (info == null) throw new ArgumentNullException(nameof(info));
@@ -64,13 +64,15 @@ namespace UAlbion.Game.Entities.Map3D
             bool walls = mode == IsometricMode.Walls || mode == IsometricMode.All;
             bool contents = mode == IsometricMode.Contents || mode == IsometricMode.All;
 
-            paletteId ??= info.Get(AssetProperty.PaletteId, 0);
-            var palette = assets.LoadPalette(new PaletteId(AssetType.Palette, paletteId.Value));
+            paletteNumber ??= info.Get(AssetProperty.PaletteId, 0);
+            var paletteId = new PaletteId(AssetType.Palette, paletteNumber.Value);
+            var palette = assets.LoadPalette(paletteId);
             if (palette == null)
             {
-                Raise(new LogEvent(LogEvent.Level.Error, $"Could not load palette {paletteId}"));
+                Error($"Could not load palette {paletteNumber}");
                 palette = assets.LoadPalette(Base.Palette.Common);
             }
+            else Raise(new LoadPaletteEvent(paletteId));
 
             _tilemap = new DungeonTilemap(labyrinthData.Id, labyrinthData.Id.ToString(), 0, properties, coreFactory, palette, null)
             {
@@ -223,6 +225,9 @@ namespace UAlbion.Game.Entities.Map3D
             for (int i = 0; i < totalTiles; i++)
                 SetTile(i, i, frames[i]);
 
+            for (int i = 0; i < totalTiles; i++)
+                AddSprites(labyrinthData, i,  properties);
+
             engine.RegisterRenderable(_tilemap);
         }
 
@@ -241,7 +246,23 @@ namespace UAlbion.Game.Entities.Map3D
                 ? 0
                 : contents - 100);
 
-            _tilemap.Set(order, floorIndex, ceilingIndex, wallIndex, frameCount);
+            Tile3DFlags flags = 0;
+            _tilemap.Set(order, floorIndex, ceilingIndex, wallIndex, frameCount, flags);
+        }
+
+        void AddSprites(LabyrinthData labyrinthData, int index, in DungeonTileMapProperties properties)
+        {
+            int contents = _contents[index];
+            if (contents == 0 || contents >= labyrinthData.ObjectGroups.Count)
+                return;
+
+            var x = (int)(index % Properties.Width);
+            var y = (int)(index / Properties.Width);
+
+            var objectInfo = labyrinthData.ObjectGroups[contents - 1];
+            foreach (var subObject in objectInfo.SubObjects)
+                if (subObject != null && labyrinthData.Objects[subObject.ObjectInfoNumber] is { } definition)
+                    AttachChild(MapObject.Build(x, y, definition, subObject, properties));
         }
     }
 }

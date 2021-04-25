@@ -85,7 +85,7 @@ namespace UAlbion.Core.Visual
             {
                 if (e.Degrees == null)
                 {
-                    Raise(new LogEvent(LogEvent.Level.Info, $"FOV {ApiUtil.RadToDeg(FieldOfView)}"));
+                    Info($"FOV {ApiUtil.RadToDeg(FieldOfView)}");
                 }
                 else
                 {

@@ -103,9 +103,9 @@
     "Shift+S": "+camera_move  0  8",
     "Shift+D": "+camera_move  8  0",
 
+    "F": "toggle_mlook",
     "Q": "+cursor_mode examine",
     "E": "+cursor_mode manipulate",
-    // "F":" toggle between MouseLook and Normal mouse modes
     "R": "+cursor_mode talk",
     "Z": "+cursor_mode take"
   },

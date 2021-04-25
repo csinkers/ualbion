@@ -106,13 +106,13 @@ namespace UAlbion.Game.Entities.Map2D
         {
             var zones = _logicalMap.GetZonesOfType(type);
             if (!log)
-                Raise(new SetLogLevelEvent(LogEvent.Level.Warning));
+                Raise(new SetLogLevelEvent(LogLevel.Warning));
 
             foreach (var zone in zones)
                 Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), type, zone.X, zone.Y)));
 
             if (!log)
-                Raise(new SetLogLevelEvent(LogEvent.Level.Info));
+                Raise(new SetLogLevelEvent(LogLevel.Info));
         }
 
         void OnNpcEnteredTile(NpcEnteredTileEvent e)

@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.ScriptEvents;
@@ -41,7 +40,7 @@ namespace UAlbion.Game.Entities.Map2D
             On<NoClipEvent>(e =>
             {
                 _movement.Clipping = !_movement.Clipping;
-                Raise(new LogEvent(LogEvent.Level.Info, $"Clipping {(_movement.Clipping ? "on" : "off")}"));
+                Info($"Clipping {(_movement.Clipping ? "on" : "off")}");
             });
 
             _settings = settings;

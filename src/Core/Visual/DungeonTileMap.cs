@@ -5,6 +5,13 @@ using UAlbion.Core.Textures;
 
 namespace UAlbion.Core.Visual
 {
+    [Flags]
+    public enum Tile3DFlags
+    {
+        FloorBackAndForth = 1,
+        CeilingBackAndForth = 1 << 1,
+        WallBackAndForth = 1 << 2,
+    }
     public class DungeonTilemap : IRenderable
     {
         DungeonTile[] _tiles;
@@ -58,7 +65,7 @@ namespace UAlbion.Core.Visual
             NightWalls?.AddTexture(id, texture, x, y, transparentColour, isAlphaTested);
         }
 
-        public void Set(int index, byte floorSubImage, byte ceilingSubImage, byte wallSubImage, int frame)
+        public void Set(int index, byte floorSubImage, byte ceilingSubImage, byte wallSubImage, int frame, Tile3DFlags flags)
         {
             int totalFrameCount = 
                 DayFloors.GetFrameCountForLogicalId(floorSubImage) 
@@ -72,9 +79,9 @@ namespace UAlbion.Core.Visual
             {
                 fixed (DungeonTile* tile = &Tiles[index])
                 {
-                    tile->Floor = (byte)DayFloors.GetSubImageAtTime(floorSubImage, frame);
-                    tile->Ceiling = (byte)DayFloors.GetSubImageAtTime(ceilingSubImage, frame);
-                    tile->Wall = (byte)DayWalls.GetSubImageAtTime(wallSubImage, frame);
+                    tile->Floor = (byte)DayFloors.GetSubImageAtTime(floorSubImage, frame, (flags & Tile3DFlags.FloorBackAndForth) != 0);
+                    tile->Ceiling = (byte)DayFloors.GetSubImageAtTime(ceilingSubImage, frame, (flags & Tile3DFlags.CeilingBackAndForth) != 0);
+                    tile->Wall = (byte)DayWalls.GetSubImageAtTime(wallSubImage, frame, (flags & Tile3DFlags.WallBackAndForth) != 0);
                     tile->Flags = 0; // DungeonTileFlags.UsePalette;
                     var subImage = (SubImage)DayWalls.GetSubImage(tile->Wall);
                     tile->WallSize = subImage.TexSize;

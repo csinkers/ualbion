@@ -94,7 +94,7 @@ namespace UAlbion.Game.Assets
             var labInfo = destModApplier.GetAssetInfo(map.LabDataId, null);
             if (labInfo == null)
             {
-                Raise(new LogEvent(LogEvent.Level.Error, $"Could not load asset info for lab {map.LabDataId} in map {map.Id}"));
+                Error($"Could not load asset info for lab {map.LabDataId} in map {map.Id}");
                 return Array.Empty<byte>();
             }
 

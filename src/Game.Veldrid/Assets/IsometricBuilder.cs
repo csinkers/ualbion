@@ -10,7 +10,6 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Config;
-using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Entities.Map3D;
 using UAlbion.Game.Events;
 
@@ -59,25 +58,19 @@ namespace UAlbion.Game.Veldrid.Assets
                 if (_height < 1) _height = 1;
                 Update();
             });
-            On<LoadPaletteEvent>(e =>
-            {
-                _paletteId = e.PaletteId.Id;
-                if (_paletteId == 0) _paletteId = null;
-                RecreateLayout();
-            });
             On<IsoPaletteEvent>(e =>
             {
                 if (_paletteId == null) _paletteId = e.Delta;
                 else _paletteId += e.Delta;
 
                 if (_paletteId <= 0) _paletteId = null;
-                Raise(new LogEvent(LogEvent.Level.Info, $"PalId: {_paletteId}"));
+                Info($"PalId: {_paletteId}");
                 RecreateLayout();
             });
             On<IsoLabDeltaEvent>(e =>
             {
                 _labId = new LabyrinthId(AssetType.Labyrinth, _labId.Id + e.Delta);
-                Raise(new LogEvent(LogEvent.Level.Info, $"LabId: {_labId} ({_labId.Id})"));
+                Info($"LabId: {_labId} ({_labId.Id})");
                 RecreateLayout();
             });
             On<IsoLabEvent>(e => { _labId = e.Id; RecreateLayout(); });
@@ -99,6 +92,7 @@ namespace UAlbion.Game.Veldrid.Assets
             _framebufferSource.Width = (uint)(_width * _tilesPerRow);
             _framebufferSource.Height = (uint)(_height * rows);
             Update();
+
             return mode switch
             {
                 IsometricMode.Floors => _layout.FloorFrames,
@@ -149,12 +143,11 @@ namespace UAlbion.Game.Veldrid.Assets
             var viewport = new Vector2(_width * _tilesPerRow, _height * rows);
             if (log)
             {
-                Raise(new LogEvent(LogEvent.Level.Info,
-                    $"{_tilesPerRow}x{rows} " +
+                Info($"{_tilesPerRow}x{rows} " +
                     $"Y:{(int)_yaw} P:{(int)_pitch} " +
                     $"{_width}x{_height} = {SideLength:N2}x{YHeight:N2} " +
                     $"DH:{DiamondHeight:N2} R:{DiamondHeight / _width:N2} " +
-                    $"Total Dims: {viewport}"));
+                    $"Total Dims: {viewport}");
             }
 
             var camera = Resolve<ICamera>();
@@ -169,7 +162,8 @@ namespace UAlbion.Game.Veldrid.Assets
                 -_height * Vector3.UnitY,
                 (uint)_tilesPerRow,
                 0,
-                0);
+                0,
+                1.0f); // y-scale
         }
     }
 }

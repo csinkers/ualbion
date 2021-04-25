@@ -80,7 +80,7 @@ namespace UAlbion.Game.Veldrid.Audio
                 var sample = assets.LoadSample(id);
                 if (sample == null)
                 {
-                    Raise(new LogEvent(LogEvent.Level.Error, $"Could not load audio sample {id.Id}: {id}"));
+                    Error($"Could not load audio sample {id.Id}: {id}");
                     _sampleCache[id] = null;
                     return null;
                 }
@@ -103,7 +103,7 @@ namespace UAlbion.Game.Veldrid.Audio
                 var sample = assets.LoadWaveLib(songId.ToWaveLibrary())?[instrument];
                 if (sample == null)
                 {
-                    Raise(new LogEvent(LogEvent.Level.Error, $"Could not load audio sample {key}"));
+                    Error($"Could not load audio sample {key}");
                     _waveLibCache[key] = null;
                     return null;
                 }
@@ -202,7 +202,7 @@ namespace UAlbion.Game.Veldrid.Audio
 
         void StopAmbient()
         {
-            CoreUtil.LogInfo($"Stopping ambient playback ({_ambientPlayer?.SongId})");
+            Info($"Stopping ambient playback ({_ambientPlayer?.SongId})");
             _ambientPlayer?.Remove();
         }
 
@@ -211,7 +211,7 @@ namespace UAlbion.Game.Veldrid.Audio
             if (_music == null)
                 return;
 
-            CoreUtil.LogInfo($"Stopping music playback of {_musicGenerator.SongId}");
+            Info($"Stopping music playback of {_musicGenerator.SongId}");
             _music.Stop();
             _music.Dispose();
             _musicGenerator.Remove();

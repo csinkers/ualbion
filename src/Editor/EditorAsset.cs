@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UAlbion.Api;
 using UAlbion.Core;
 
 namespace UAlbion.Editor
@@ -83,9 +82,8 @@ namespace UAlbion.Editor
                     var currentValue = GetProperty(setProperty.PropertyName);
                     if (!Equals(currentValue, setProperty.CurrentValue))
                     {
-                        Raise(new LogEvent(LogEvent.Level.Error,
-                            $"Tried to change {_asset.GetType().Name}.{setProperty.PropertyName} " +
-                            $"from {setProperty.CurrentValue} to {setProperty.NewValue}, but it is currently set to {currentValue}"));
+                        Error($"Tried to change {_asset.GetType().Name}.{setProperty.PropertyName} " +
+                            $"from {setProperty.CurrentValue} to {setProperty.NewValue}, but it is currently set to {currentValue}");
                         return false;
                     }
 
@@ -107,7 +105,7 @@ namespace UAlbion.Editor
                     return true;
 
                 default:
-                    Raise(new LogEvent(LogEvent.Level.Error, $"Could not handle IEditorEvent of type {editorEvent.GetType()}"));
+                    Error($"Could not handle IEditorEvent of type {editorEvent.GetType()}");
                     return false;
             }
         }

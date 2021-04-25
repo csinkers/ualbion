@@ -13,7 +13,7 @@ namespace UAlbion.Core
     public class LogExchange : ILogExchange
     {
         readonly ConcurrentQueue<IEvent> _queuedEvents = new ConcurrentQueue<IEvent>();
-        LogEvent.Level _logLevel = LogEvent.Level.Info;
+        LogLevel _logLevel = LogLevel.Info;
         EventExchange _exchange;
 
         public bool IsActive { get; set; } // Dummy implementation, value not currently used.
@@ -85,9 +85,9 @@ namespace UAlbion.Core
                         Color =
                             e.Severity switch
                                 {
-                                LogEvent.Level.Critical => Console.ForegroundColor = ConsoleColor.Red,
-                                LogEvent.Level.Error => Console.ForegroundColor = ConsoleColor.Red,
-                                LogEvent.Level.Warning => Console.ForegroundColor = ConsoleColor.Yellow,
+                                LogLevel.Critical => Console.ForegroundColor = ConsoleColor.Red,
+                                LogLevel.Error => Console.ForegroundColor = ConsoleColor.Red,
+                                LogLevel.Warning => Console.ForegroundColor = ConsoleColor.Yellow,
                                 _ => Console.ForegroundColor = ConsoleColor.Gray,
                                 }
                     });
@@ -133,7 +133,7 @@ namespace UAlbion.Core
 
                 default:
                 {
-                    if (sender == this || (!highlight && _logLevel > LogEvent.Level.Info))
+                    if (sender == this || (!highlight && _logLevel > LogLevel.Info))
                         return;
 
                     Log?.Invoke(this, new LogEventArgs

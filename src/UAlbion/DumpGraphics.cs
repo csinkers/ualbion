@@ -52,8 +52,8 @@ namespace UAlbion
                     case AssetType.FullBodyPicture:     Export<Base.FullBodyPicture>  ("InventoryBackgrounds"); break;
                     case AssetType.TilesetGraphics:     Export<Base.TilesetGraphics>  ("Tiles");                break;
                     case AssetType.ItemGraphics:        Export<Base.ItemGraphics>     ("Item");                 break;
-                    case AssetType.LargeNpcGraphics:      Export<Base.LargeNpc>         ("NpcLarge");             break;
-                    case AssetType.LargePartyGraphics:    Export<Base.LargePartyMember> ("PartyLarge");           break;
+                    case AssetType.LargeNpcGraphics:    Export<Base.LargeNpc>         ("NpcLarge");             break;
+                    case AssetType.LargePartyGraphics:  Export<Base.LargePartyMember> ("PartyLarge");           break;
                     case AssetType.MonsterGraphics:     Export<Base.MonsterGraphics>  ("Monster");              break;
                     case AssetType.Picture:             Export<Base.Picture>          ("Picture");              break;
                     case AssetType.SmallNpcGraphics:    Export<Base.SmallNpc>         ("NpcSmall");             break;

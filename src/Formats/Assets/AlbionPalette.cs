@@ -97,6 +97,7 @@ namespace UAlbion.Formats.Assets
             }
         }
 
+        [JsonIgnore]
         public IEnumerable<(byte, int)> AnimatedEntries =>
             from r in Ranges
             let rangeLength = r.Item2 - r.Item1 + 1

@@ -91,13 +91,9 @@ namespace UAlbion.Core.Visual
             get => _frame;
             set
             {
-                if (_frame == value || FrameCount == 0) return;
-
-                while (FrameCount > 0 && value >= FrameCount)
-                    value -= FrameCount;
-
+                if (_frame == value || FrameCount <= 1) return;
+                value %= FrameCount;
                 if (_frame == value) return;
-
                 _frame = value;
                 Dirty = true;
             }
@@ -173,9 +169,18 @@ namespace UAlbion.Core.Visual
 
         bool Select(WorldCoordinateSelectEvent e, Action<Selection> continuation)
         {
+            if (_sprite == null)
+                return false;
+
             var hit = RayIntersect(e.Origin, e.Direction);
             if (!hit.HasValue)
                 return false;
+
+            if ((Resolve<IEngineSettings>().Flags & EngineFlags.HighlightSelection) != 0)
+            {
+                var instances = _sprite.Access();
+                instances[0].Flags |= SpriteFlags.Highlight;
+            }
 
             var selected = Selected;
             bool delegated = false;

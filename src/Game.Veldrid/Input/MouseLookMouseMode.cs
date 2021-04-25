@@ -40,6 +40,8 @@ namespace UAlbion.Game.Veldrid.Input
 
     public class MouseLookMouseMode : Component
     {
+        bool _firstEvent;
+
         public MouseLookMouseMode()
         {
             On<InputEvent>(OnInput);
@@ -52,11 +54,19 @@ namespace UAlbion.Game.Veldrid.Input
 
         protected override void Subscribed()
         {
+            var windowState = Resolve<IWindowManager>();
             Raise(new SetCursorEvent(Base.CoreSprite.CursorCrossUnselected));
+            _firstEvent = true;
         }
 
         void OnInput(InputEvent e)
         {
+            if (_firstEvent) // Ignore the first event to prevent the view jumping about due to the prior cursor position
+            {
+                _firstEvent = false;
+                return;
+            }
+
             var windowState = Resolve<IWindowManager>();
             var delta = e.Snapshot.MousePosition - new Vector2((int)(windowState.PixelWidth / 2), (int)(windowState.PixelHeight / 2));
             var hits = Resolve<ISelectionManager>()?.CastRayFromScreenSpace(e.Snapshot.MousePosition, true);

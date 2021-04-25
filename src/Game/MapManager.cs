@@ -1,5 +1,4 @@
-﻿using UAlbion.Api;
-using UAlbion.Core;
+﻿using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
@@ -66,7 +65,7 @@ namespace UAlbion.Game
                 Current = map;
                 AttachChild(map);
 
-                Raise(new LogEvent(LogEvent.Level.Info, $"Loaded map {pendingMapChange.Id}: {pendingMapChange}"));
+                Info($"Loaded map {pendingMapChange.Id}: {pendingMapChange}");
                 Enqueue(new MapInitEvent());
 
                 if (!map.MapData.SongId.IsNone)

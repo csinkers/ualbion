@@ -37,7 +37,7 @@ namespace UAlbion.Game
             int waiting = RaiseAsync(boolEvent, result =>
             {
 #if DEBUG
-                Raise(new LogEvent(LogEvent.Level.Info, $"if ({context.Node.Event}) => {result}"));
+                Info($"if ({context.Node.Event}) => {result}");
 #endif
                 context.Node = result ? branch.Next : branch.NextIfFalse;
 

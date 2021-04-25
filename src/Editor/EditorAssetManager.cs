@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Api;
 using UAlbion.Core;
 
 namespace UAlbion.Editor
@@ -62,7 +61,7 @@ namespace UAlbion.Editor
             if (asset != null)
                 return asset.Apply(e);
 
-            Raise(new LogEvent(LogEvent.Level.Error, $"No asset could be found with id {e.Id}"));
+            Error($"No asset could be found with id {e.Id}");
             return false;
         }
 

@@ -14,6 +14,7 @@ namespace UAlbion.Game.Entities.Map2D
         readonly BaseMapData _mapData;
         protected MapChangeCollection TempChanges { get; }
         protected MapChangeCollection PermChanges { get; }
+        bool _replayed;
 
         protected LogicalMap(BaseMapData mapData,
             MapChangeCollection tempChanges,
@@ -30,13 +31,21 @@ namespace UAlbion.Game.Entities.Map2D
                     TempChanges.RemoveAt(i);
                 else i++;
             }
+        }
+
+        protected override void Subscribed()
+        {
+            if (_replayed)
+                return;
 
             // Replay any changes for this map
-            foreach (var change in permChanges.Where(x => x.MapId == mapData.Id))
+            foreach (var change in PermChanges.Where(x => x.MapId == _mapData.Id))
                 ApplyChange(change.X, change.Y, change.ChangeType, change.Value);
 
-            foreach (var change in tempChanges)
+            foreach (var change in TempChanges)
                 ApplyChange(change.X, change.Y, change.ChangeType, change.Value);
+
+            _replayed = true;
         }
 
         public MapId Id => _mapData.Id;

@@ -31,9 +31,7 @@ namespace UAlbion.Game.Settings
         // Engine
         public float Special1 { get; set; }
         public float Special2 { get; set; }
-        public EngineFlags Flags { get; set; } = 
-            EngineFlags.VSync | 
-            EngineFlags.UseCylindricalBillboards;
+        public EngineFlags Flags { get; set; } = EngineFlags.VSync; 
 
         public static GeneralSettings Load(IGeneralConfig config, IFileSystem disk)
         {

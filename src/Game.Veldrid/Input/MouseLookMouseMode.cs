@@ -45,18 +45,34 @@ namespace UAlbion.Game.Veldrid.Input
         public MouseLookMouseMode()
         {
             On<InputEvent>(OnInput);
+            On<FocusGainedEvent>(_ => AcquireMouse());
+            On<FocusLostEvent>(_ => ReleaseMouse());
             On<PostUpdateEvent>(e =>
             {
-                var windowState = Resolve<IWindowManager>();
-                Raise(new SetCursorPositionEvent(windowState.PixelWidth / 2, windowState.PixelHeight / 2));
+                //var windowState = Resolve<IWindowManager>();
+                //Raise(new SetCursorPositionEvent(windowState.PixelWidth / 2, windowState.PixelHeight / 2));
             });
         }
 
         protected override void Subscribed()
         {
-            var windowState = Resolve<IWindowManager>();
             Raise(new SetCursorEvent(Base.CoreSprite.CursorCrossUnselected));
+            AcquireMouse();
             _firstEvent = true;
+        }
+
+        protected override void Unsubscribed() => ReleaseMouse();
+
+        void AcquireMouse()
+        {
+            Raise(new SetRelativeMouseModeEvent(true));
+            Raise(new ConfineMouseToWindowEvent(true));
+        }
+
+        void ReleaseMouse()
+        {
+            Raise(new ConfineMouseToWindowEvent(false));
+            Raise(new SetRelativeMouseModeEvent(false));
         }
 
         void OnInput(InputEvent e)
@@ -67,15 +83,15 @@ namespace UAlbion.Game.Veldrid.Input
                 return;
             }
 
-            var windowState = Resolve<IWindowManager>();
-            var delta = e.Snapshot.MousePosition - new Vector2((int)(windowState.PixelWidth / 2), (int)(windowState.PixelHeight / 2));
+            // var windowState = Resolve<IWindowManager>();
+            // var delta = e.Snapshot.MousePosition - new Vector2((int)(windowState.PixelWidth / 2), (int)(windowState.PixelHeight / 2));
             var hits = Resolve<ISelectionManager>()?.CastRayFromScreenSpace(e.Snapshot.MousePosition, true);
 
-            if (delta.LengthSquared() > float.Epsilon)
+            if (e.MouseDelta.LengthSquared() > float.Epsilon)
             {
                 var config = Resolve<GameConfig>();
                 var sensitivity = config.UI.MouseLookSensitivity / -1000;
-                Raise(new CameraRotateEvent(delta.X * sensitivity, delta.Y * sensitivity));
+                Raise(new CameraRotateEvent(e.MouseDelta.X * sensitivity, e.MouseDelta.Y * sensitivity));
             }
 
             // Clicks are targeted, releases are broadcast. e.g. if you click and drag a slider and move outside

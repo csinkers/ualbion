@@ -30,6 +30,7 @@ namespace UAlbion.Game.Veldrid.Input
         string _lastItemAmountText;
         bool _dirty = true;
         bool _showCursor = true;
+        bool _relative;
         int _frame;
 
         public CursorManager()
@@ -39,9 +40,15 @@ namespace UAlbion.Game.Veldrid.Input
             On<SetCursorEvent>(e => SetCursor(e.CursorId));
             On<ShowCursorEvent>(e => { _showCursor = e.Show; _dirty = true; });
             On<WindowResizedEvent>(e => SetCursor(_cursorId));
+            On<SetRelativeMouseModeEvent>(e => _relative = e.Enabled);
             On<InputEvent>(e =>
             {
-                Position = e.Snapshot.MousePosition;
+                if (_relative)
+                {
+                    var windowState = Resolve<IWindowManager>();
+                    Position = new Vector2((int)(windowState.PixelWidth / 2), (int)(windowState.PixelHeight / 2));
+                }
+                else Position = e.Snapshot.MousePosition;
                 _dirty = true;
             });
             On<SetCursorPositionEvent>(e =>

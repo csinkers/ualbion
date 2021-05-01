@@ -76,12 +76,20 @@ namespace UAlbion.Core.Veldrid
             On<RunRenderDocEvent>(e => _renderDoc?.LaunchReplayUI());
             On<SetCursorPositionEvent>(e => _pendingCursorUpdate = new Vector2(e.X, e.Y));
             On<ToggleFullscreenEvent>(e => ToggleFullscreenState());
-            On<ToggleHardwareCursorEvent>(e => { if (_window == null) return; _window.CursorVisible = !_window.CursorVisible; });
-            On<ToggleResizableEvent>(e => { if (_window == null) return; _window.Resizable = !_window.Resizable; });
-            On<ToggleVisibleBorderEvent>(e => { if (_window == null) return; _window.BorderVisible = !_window.BorderVisible; });
+            On<ToggleHardwareCursorEvent>(e => { if (_window != null) _window.CursorVisible = !_window.CursorVisible; });
+            On<ToggleResizableEvent>(e => { if (_window != null) _window.Resizable = !_window.Resizable; });
+            On<ToggleVisibleBorderEvent>(e => { if (_window != null) _window.BorderVisible = !_window.BorderVisible; });
             On<RecreateWindowEvent>(e => { _recreateWindow = true; _newBackend = GraphicsDevice.BackendType; });
             On<SetBackendEvent>(e => _newBackend = e.Value);
             On<TriggerRenderDocEvent>(e => _renderDoc?.TriggerCapture());
+            On<ConfineMouseToWindowEvent>(e => { if (_window != null) Sdl2Native.SDL_SetWindowGrab(_window.SdlWindowHandle, e.Enabled); });
+            On<SetRelativeMouseModeEvent>(e =>
+            {
+                if (_window == null) return;
+                Sdl2Native.SDL_SetRelativeMouseMode(e.Enabled);
+                if (!e.Enabled)
+                    Sdl2Native.SDL_WarpMouseInWindow(_window.SdlWindowHandle, _window.Width / 2, _window.Height / 2);
+            });
             On<SetVSyncEvent>(e =>
             {
                 if (_vsync == e.Value) return;
@@ -200,21 +208,24 @@ namespace UAlbion.Core.Veldrid
                     break;
 
                 SetTitle();
-                if (_pendingCursorUpdate.HasValue)
+                if (_window != null)
                 {
-                    using (PerfTracker.FrameEvent("3 Warping mouse"))
+                    if (_pendingCursorUpdate.HasValue && _window.Focused)
                     {
-                        Sdl2Native.SDL_WarpMouseInWindow(
-                            _window.SdlWindowHandle,
-                            (int) _pendingCursorUpdate.Value.X,
-                            (int) _pendingCursorUpdate.Value.Y);
+                        using (PerfTracker.FrameEvent("3 Warping mouse"))
+                        {
+                            Sdl2Native.SDL_WarpMouseInWindow(
+                                _window.SdlWindowHandle,
+                                (int) _pendingCursorUpdate.Value.X,
+                                (int) _pendingCursorUpdate.Value.Y);
 
-                        _pendingCursorUpdate = null;
+                            _pendingCursorUpdate = null;
+                        }
                     }
-                }
 
-                using (PerfTracker.FrameEvent("4 Raising input event"))
-                    Raise(new InputEvent(deltaSeconds, snapshot, _window.MouseDelta));
+                    using (PerfTracker.FrameEvent("4 Raising input event"))
+                        Raise(new InputEvent(deltaSeconds, snapshot, _window.MouseDelta));
+                }
 
                 using (PerfTracker.FrameEvent("5 Performing update"))
                     Update((float)deltaSeconds);
@@ -412,6 +423,8 @@ namespace UAlbion.Core.Veldrid
                     //Window.BorderVisible = false;
                     _window.CursorVisible = false;
                     _window.Resized += () => _windowResized = true;
+                    _window.FocusGained += () => Raise(new FocusGainedEvent());
+                    _window.FocusLost += () => Raise(new FocusLostEvent());
                     _windowResized = true;
                 }
 

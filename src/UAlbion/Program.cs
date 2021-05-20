@@ -14,6 +14,11 @@ using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid.Assets;
 using UAlbion.Game.Veldrid.Visual;
 
+// args for testing isometric map export: -b Base Unpacked -t "Labyrinth Map" -id "Labyrinth.Jirinaar Map.Jirinaar"
+// args for full asset export: -b Base Unpacked
+// args for re-pack of exported assets: -b Unpacked Repacked
+// args for combining mods for original: -b "Base SomeMod SomeOtherMod" Repacked
+
 #pragma warning disable CA2000 // Dispose objects before losing scopes
 namespace UAlbion
 {
@@ -70,7 +75,7 @@ namespace UAlbion
             switch (commandLine.Mode) // ConvertAssets handled above as it requires a specialised asset system setup
             {
                 case ExecutionMode.Game: Albion.RunGame(engine, exchange, services, baseDir, commandLine); break;
-                // case ExecutionMode.BakeIsometric: IsoBake.Bake(exchange, services, baseDir, commandLine); break;
+                case ExecutionMode.BakeIsometric: IsometricTest.Run(exchange, commandLine); break;
 
                 case ExecutionMode.DumpData:
                     PerfTracker.BeginFrame(); // Don't need to show verbose startup logging while dumping

@@ -38,7 +38,7 @@ namespace UAlbion
                 // Mode
                 if (arg == "--GAME") Mode = ExecutionMode.Game;
                 if (arg == "--DUMP" || arg == "-D") Mode = ExecutionMode.DumpData;
-                // if (arg == "--ISO" || arg == "-ISO") Mode = ExecutionMode.BakeIsometric;
+                if (arg == "--ISO" || arg == "-ISO") Mode = ExecutionMode.BakeIsometric;
                 if (arg == "--CONVERT" || arg == "--BUILD" || arg == "-B")
                 {
                     if (i +2 >= args.Length)
@@ -153,37 +153,31 @@ Command Line Options:
 (Note: To specify multiple values for any argument use double quotes and separate values with spaces)
 
 Execution Mode:
-    --game            : Runs the game (default)
-    --help -h /? help : Display this help
-    --dump -d         : Dump assets to the data/exported directory
-    --convert --build -b <FromMod> <ToMod> : Convert all assets from one mod's asset formats to another (e.g. Base->Unpacked, Unpacked->Repacked etc)
+    --game : Run the game normally (default)
+    --help : Display this usage information (aliases: -h /? help)
+    --dump : Dump assets to the data/exported directory (aliases: -d)
+    --iso : Debugging mode for investigating issues with the export of isometric tiles for 3D maps.
+    --convert <FromMod> <ToMod> : Convert all assets from one mod's asset formats to another (e.g. Base->Unpacked, Unpacked->Repacked etc) (aliases --build and -b)
 
 Rendering Backend:
-    --opengl    -gl    : Use OpenGL
-    --opengles  -gles  : Use OpenGLES
-    --vulkan    -vk    : Use Vulkan
-    --metal     -metal : Use Metal
-    --direct3d  -d3d   : Use Direct3D11
+    --direct3d : Use Direct3D11 (aliases: -d3d)
+    --opengl   : Use OpenGL     (aliases: -gl)
+    --opengles : Use OpenGLES   (aliases: -gles)
+    --metal    : Use Metal      (aliases: -metal)
+    --vulkan   : Use Vulkan     (aliases: -vk)
 
 Options:
-    --commands -c <Commands> : Raise the given events (semicolon separated list) on startup.
-    --menus          : Show debug menus
-    --no-audio       : Runs the game without audio
-    --startuponly -s : Exit immediately after the first frame (for profiling startup time etc)
-    --renderdoc -rd  : Load the RenderDoc plugin on startup
+    --commands <Commands> : Raise the given events (semicolon separated list) on startup (aliases: -c), e.g. -c ""new_game 110 60 30; add_party_member Rainer; simple_chest 1 HunterClanKey""
+    --menus       : Show debug menus
+    --no-audio    : Runs the game without audio
+    --startuponly : Exit immediately after the first frame (for profiling startup time etc) (aliases: -s)
+    --renderdoc   : Load the RenderDoc plugin on startup (aliases: -rd)
 
 Dump / Convert options:
-    --formats <Formats>       : Specifies the formats for the dumped data (defaults to JSON, valid formats: {formats})
-    --id --ids -id -ids <Ids> : Dump specific asset ids (space separated list)
-    --type -t <Types>         : Dump specific types of game data (space separated list, valid types: {dumpTypes})
-    --files -f <Regex>      : Convert only the assets required for files in the target mod that match the given regular expression
-
-Game Mode: (if running as game)
-    --main-menu (default)              : Show the main menu on startup
-    --new-game                         : Begin a new game immediately
-    --load -l <slotNumber> : Load the specified saved game
-    --load-map --map -map <mapId>      : Start a new game on the specified map
-    --inventory                        : Start a new game and load the inventory screen
+    --formats <Formats> : Specifies the formats for the dumped data (defaults to JSON, valid formats: {formats})
+    --ids <Ids>         : Dump only the specified asset ids (space separated list) (aliases: --id -id -ids)
+    --type <Types>      : Dump specific types of game data (space separated list, valid types: {dumpTypes}) (aliases: -t)
+    --files <Regex>     : Convert only the assets required for files in the target mod that match the given regular expression (aliases: -f)
 ");
         }
     }

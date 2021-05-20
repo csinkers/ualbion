@@ -115,8 +115,7 @@ namespace UAlbion.Game.Entities.Map3D
                 var objectData = _labyrinthData.ObjectGroups[npc.SpriteOrGroup.Id]; // TODO: Verify SpriteOrGroup is an ObjectGroup
                 // TODO: Build proper NPC objects with AI, sound effects etc
                 foreach (var subObject in objectData.SubObjects)
-                    if (subObject != null && _labyrinthData.Objects[subObject.ObjectInfoNumber] is { } definition)
-                        AttachChild(MapObject.Build(npc.Waypoints[0].X, npc.Waypoints[0].Y, definition, subObject, properties));
+                    AttachChild(MapObject.Build(npc.Waypoints[0].X, npc.Waypoints[0].Y, _labyrinthData, subObject, properties));
             }
 
             for (int y = 0; y < _logicalMap.Height; y++)
@@ -126,8 +125,7 @@ namespace UAlbion.Game.Entities.Map3D
                     var group = _logicalMap.GetObject(x, y);
                     if (group == null) continue;
                     foreach (var subObject in group.SubObjects)
-                        if (subObject != null && _labyrinthData.Objects[subObject.ObjectInfoNumber] is { } definition)
-                            AttachChild(MapObject.Build(x, y, definition, subObject, properties));
+                        AttachChild(MapObject.Build(x, y, _labyrinthData, subObject, properties));
                 }
             }
 

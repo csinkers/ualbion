@@ -25,10 +25,10 @@ namespace UAlbion.Game.Veldrid.Assets
 {
     public class IsometricLabyrinthLoader : Component, IAssetLoader<LabyrinthData>
     {
-        const int DefaultWidth = 48;
-        const int DefaultHeight = 64;
-        const int DefaultBaseHeight = 40;
-        const int DefaultTilesPerRow = 16;
+        public const int DefaultWidth = 48;
+        public const int DefaultHeight = 64;
+        public const int DefaultBaseHeight = 40;
+        public const int DefaultTilesPerRow = 16;
 
         readonly JsonLoader<LabyrinthData> _jsonLoader = new JsonLoader<LabyrinthData>();
         VeldridEngine _engine;
@@ -74,7 +74,7 @@ namespace UAlbion.Game.Veldrid.Assets
             AttachChild(services);
             Raise(new SetSceneEvent(SceneId.IsometricBake));
             Raise(new SetClearColourEvent(0, 0, 0, 0));
-            Raise(new EngineFlagEvent(FlagOperation.Set, EngineFlags.ShowBoundingBoxes));
+            // Raise(new EngineFlagEvent(FlagOperation.Set, EngineFlags.ShowBoundingBoxes));
 
             _context = _engine.BuildContext(fbSource);
         }

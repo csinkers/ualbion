@@ -261,8 +261,11 @@ namespace UAlbion.Game.Entities.Map3D
 
             var objectInfo = labyrinthData.ObjectGroups[contents - 1];
             foreach (var subObject in objectInfo.SubObjects)
-                if (subObject != null && labyrinthData.Objects[subObject.ObjectInfoNumber] is { } definition)
-                    AttachChild(MapObject.Build(x, y, definition, subObject, properties));
+            {
+                var mapObject = AttachChild(MapObject.Build(x, y, labyrinthData, subObject, properties));
+                if (mapObject != null)
+                    Info($"at ({x},{y}): ({subObject.X}, {subObject.Y}, {subObject.Z}) resolves to {mapObject.Position} ({mapObject.SpriteId})");
+            }
         }
     }
 }

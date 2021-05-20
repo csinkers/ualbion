@@ -355,15 +355,16 @@ namespace UAlbion.Core
                 handler.Invoke(@event, DummyContinuation);
         }
 
-        public void Verbose(string msg, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
+        // Logging helpers
+        protected void Verbose(string msg, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
             => Raise(new LogEvent(LogLevel.Verbose, msg, file, member, line));
-        public void Info(string msg, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
+        protected void Info(string msg, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
             => Raise(new LogEvent(LogLevel.Info, msg, file, member, line));
-        public void Warn(string msg, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
+        protected void Warn(string msg, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
             => Raise(new LogEvent(LogLevel.Warning, msg, file, member, line));
-        public void Error(string msg, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
+        protected void Error(string msg, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
             => Raise(new LogEvent(LogLevel.Error, msg, file, member, line));
-        public void Critical(string msg, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
+        protected void Critical(string msg, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
             => Raise(new LogEvent(LogLevel.Critical, msg, file, member, line));
     }
 }

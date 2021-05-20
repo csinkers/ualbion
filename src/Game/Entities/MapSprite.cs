@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Entities
 {
@@ -20,7 +21,7 @@ namespace UAlbion.Game.Entities
             }
         }
 
-        public MapSprite(IAssetId id, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
+        public MapSprite(SpriteId id, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
             : base(id, Vector3.Zero, layer, keyFlags, flags) { }
     }
 }

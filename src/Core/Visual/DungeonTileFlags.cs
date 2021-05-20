@@ -8,6 +8,7 @@ namespace UAlbion.Core.Visual
         TextureType1 = 1,
         TextureType2 = 1 << 1,
         UsePalette = 1 << 2,
+
         Highlight = 1 << 3,
         RedTint = 1 << 4,
         GreenTint = 1 << 5,

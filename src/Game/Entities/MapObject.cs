@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
@@ -45,51 +46,59 @@ namespace UAlbion.Game.Entities
             });
         }
 
+        public Vector3 Position { get => _sprite.Position; set => _sprite.Position = value; }
+        public SpriteId SpriteId => (SpriteId)_sprite.Id;
+
         public override string ToString() => $"MapObjSprite {_sprite.Id} @ {_sprite.TilePosition} {_sprite.Size.X}x{_sprite.Size.Y}";
 
-        public static MapObject Build(int tileX, int tileY, LabyrinthObject definition, SubObject subObject, in DungeonTileMapProperties properties)
+        static Vector4 GetRelativeObjectPosition(LabyrinthData labyrinth, SubObject subObject, float objectYScaling)
         {
-            if (definition == null) throw new ArgumentNullException(nameof(definition));
-            if (subObject == null) throw new ArgumentNullException(nameof(subObject));
+            var offset = new Vector4(
+                (float)subObject.X / 512 /*labyrinth.EffectiveWallWidth */,
+                (float)subObject.Y * objectYScaling / labyrinth.WallHeight,
+                (float)subObject.Z / 512 /*labyrinth.EffectiveWallWidth*/,
+                0);
 
-            if (definition.SpriteId.IsNone)
+            return offset - new Vector4(0.5f, 0, 0.5f, 0);
+        }
+
+        public static MapObject Build(int tileX, int tileY, LabyrinthData labyrinth, SubObject subObject, in DungeonTileMapProperties properties)
+        {
+            if (labyrinth == null) throw new ArgumentNullException(nameof(labyrinth));
+            if (subObject == null) return null;
+            if (subObject.ObjectInfoNumber >= labyrinth.Objects.Count)
+            {
+                ApiUtil.Assert($"Tried to build object {subObject.ObjectInfoNumber} in {labyrinth.Id}, but there are only {labyrinth.Objects.Count} objects");
                 return null;
+            }
+
+            if (!(labyrinth.Objects[subObject.ObjectInfoNumber] is { } definition)) return null;
+            if (definition.SpriteId.IsNone) return null;
 
             bool onFloor = (definition.Properties & LabyrinthObjectFlags.FloorObject) != 0;
             bool backAndForth = (definition.Properties & LabyrinthObjectFlags.Unk0) != 0;
 
-            // We should probably be offsetting the main tilemap by half a tile to centre the objects
-            // rather than fiddling with the object positions... will need to reevaluate when working on
-            // collision detection, path-finding etc.
-            var objectBias = new Vector3(-1.0f, 0, -1.0f) / 2;
-                /*
-                (MapId == MapId.Jirinaar3D || MapId == MapId.AltesFormergebäude || MapId == MapId.FormergebäudeNachKampfGegenArgim)
-                    ? new Vector3(-1.0f, 0, -1.0f) / 2
-                    : new Vector3(-1.0f, 0, -1.0f); // / 2;
-                */
+            var offset = GetRelativeObjectPosition(labyrinth, subObject, properties.ObjectYScaling);
 
-            var tilePosition = new Vector3(tileX, 0, tileY) + objectBias;
-            var offset = new Vector4(
-                subObject.X,
-                subObject.Y * properties.ObjectYScaling,
-                subObject.Z,
-                0);
+            // Cut down on z-fighting. TODO: Find a better solution, still happens sometimes.
+            var tweak = onFloor ? subObject.ObjectInfoNumber * (offset.Y < float.Epsilon ? 0.0001f : -0.0001f) : 0;
+            offset.Y += tweak;
 
-            var smidgeon = onFloor
-                ? new Vector4(0,subObject.ObjectInfoNumber * (offset.Y < float.Epsilon ? 0.1f : -0.1f), 0, 0)
-                : Vector4.Zero;
+            Vector4 position =
+                tileX * properties.HorizontalSpacing
+                + tileY * properties.VerticalSpacing
+                + offset * properties.Scale;
 
-            Vector4 position = 
-                tilePosition.X * properties.HorizontalSpacing 
-                + tilePosition.Z * properties.VerticalSpacing 
-                + offset 
-                + smidgeon;
+            var pos3 = new Vector3(position.X, position.Y, position.Z);
 
-            return new MapObject(
-                definition.SpriteId,
-                new Vector3(position.X, position.Y, position.Z),
-                new Vector2(definition.MapWidth, definition.MapHeight),
-                onFloor, backAndForth);
+            var size = 
+                    new Vector2(definition.MapWidth, definition.MapHeight)
+                    / new Vector2(labyrinth.EffectiveWallWidth, labyrinth.WallHeight)
+                ;
+
+            size *= new Vector2(properties.Scale.X, properties.Scale.Y);
+
+            return new MapObject(definition.SpriteId, pos3, size, onFloor, backAndForth);
         }
     }
 }

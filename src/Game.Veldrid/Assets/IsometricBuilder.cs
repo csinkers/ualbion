@@ -30,7 +30,7 @@ namespace UAlbion.Game.Veldrid.Assets
 
         public IsometricBuilder(FramebufferSource framebufferSource, int width, int height, int diamondHeight, int tilesPerRow)
         {
-            _framebufferSource = framebufferSource ?? throw new ArgumentNullException(nameof(framebufferSource));
+            _framebufferSource = framebufferSource;
             _labId = Base.Labyrinth.Test1;
             _layout = AttachChild(new IsometricLayout());
             _width = width;
@@ -69,7 +69,11 @@ namespace UAlbion.Game.Veldrid.Assets
             });
             On<IsoLabDeltaEvent>(e =>
             {
-                _labId = new LabyrinthId(AssetType.Labyrinth, _labId.Id + e.Delta);
+                var newId = _labId.Id + e.Delta;
+                if (newId < 0)
+                    return;
+
+                _labId = new LabyrinthId(AssetType.Labyrinth, newId);
                 Info($"LabId: {_labId} ({_labId.Id})");
                 RecreateLayout();
             });
@@ -89,8 +93,12 @@ namespace UAlbion.Game.Veldrid.Assets
             
             _layout.Load(labyrinth, info, _mode, BuildProperties(), _paletteId, assets);
             int rows = (_layout.TileCount + _tilesPerRow - 1) / _tilesPerRow;
-            _framebufferSource.Width = (uint)(_width * _tilesPerRow);
-            _framebufferSource.Height = (uint)(_height * rows);
+            if (_framebufferSource != null)
+            {
+                _framebufferSource.Width = (uint) (_width * _tilesPerRow);
+                _framebufferSource.Height = (uint) (_height * rows);
+            }
+
             Update();
 
             return mode switch
@@ -117,8 +125,12 @@ namespace UAlbion.Game.Veldrid.Assets
         {
             _layout.Load(_labId, _mode, BuildProperties(), _paletteId);
             int rows = (_layout.TileCount + _tilesPerRow - 1) / _tilesPerRow;
-            _framebufferSource.Width = (uint)(_width * _tilesPerRow);
-            _framebufferSource.Height = (uint)(_height * rows);
+            if (_framebufferSource != null)
+            {
+                _framebufferSource.Width = (uint) (_width * _tilesPerRow);
+                _framebufferSource.Height = (uint) (_height * rows);
+            }
+
             Update();
         }
 

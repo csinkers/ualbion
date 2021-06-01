@@ -145,7 +145,7 @@ namespace UAlbion.Game.Entities.Map2D
             _lastFrameCount = frameCount;
             if (_allDirty)
             {
-                _lease.Access(static (instances, s) =>
+                _lease.Access((instances, s) =>
                 {
                     var animatedTiles = new List<(int, int)>();
 
@@ -169,7 +169,7 @@ namespace UAlbion.Game.Entities.Map2D
             }
             else if (_dirty.Count > 0)
             {
-                _lease.Access(static(instances, s) =>
+                _lease.Access((instances, s) =>
                 {
                     foreach (var (x, y) in s._dirty)
                     {

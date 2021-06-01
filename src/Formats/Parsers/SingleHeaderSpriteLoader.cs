@@ -20,7 +20,7 @@ namespace UAlbion.Formats.Parsers
             if (s.IsWriting())
             {
                 if (existing == null) throw new ArgumentNullException(nameof(existing));
-                Write(existing, info, s);
+                Write(existing, s);
                 return existing;
             }
 
@@ -49,15 +49,14 @@ namespace UAlbion.Formats.Parsers
             return result;
         }
 
-        static void Write(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s)
+        static void Write(IReadOnlyTexture<byte> existing, ISerializer s)
         {
             var distinctSizes = existing.Regions.Select(x => (x.Width, x.Height)).Distinct();
             if (distinctSizes.Count() > 1)
             {
                 var parts = distinctSizes.Select(x => $"({x.Width}, {x.Height})");
                 var joined = string.Join(", ", parts);
-                throw new InvalidOperationException(
-                    $"Tried to a write an image with non-uniform frames to a single-header sprite (sizes: {joined})");
+                throw new InvalidOperationException($"Tried to a write an image with non-uniform frames to a single-header sprite (sizes: {joined})");
             }
 
             var width = (ushort)existing.Regions[0].Width;

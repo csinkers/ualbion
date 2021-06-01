@@ -158,14 +158,14 @@ namespace UAlbion.Core.Visual
                 _sprite = sm.Borrow(key, 1, this);
             }
 
-            _sprite.Access(static (instances, x) =>
+            _sprite.Access((instances, s) =>
             {
-                var subImage = x._sprite.Key.Texture.Regions[x.Frame];
+                var subImage = s._sprite.Key.Texture.Regions[s.Frame];
 
-                if (x._size == null)
-                    x.Size = subImage.Size;
+                if (s._size == null)
+                    s.Size = subImage.Size;
 
-                instances[0] = SpriteInstanceData.CopyFlags(x._position, x.Size, subImage, x._flags);
+                instances[0] = SpriteInstanceData.CopyFlags(s._position, s.Size, subImage, s._flags);
             }, this);
         }
 
@@ -180,7 +180,7 @@ namespace UAlbion.Core.Visual
 
             if ((Resolve<IEngineSettings>().Flags & EngineFlags.HighlightSelection) != 0)
             {
-                _sprite.Access<object>(static (instances, _) =>
+                _sprite.Access<object>((instances, _) =>
                     instances[0].Flags |= SpriteFlags.Highlight, null);
             }
 

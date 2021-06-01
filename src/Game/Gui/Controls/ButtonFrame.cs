@@ -101,7 +101,7 @@ namespace UAlbion.Game.Gui.Controls
                 var position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
                 var flags = SpriteFlags.None.SetOpacity(colors.Alpha);
 
-                static Region BuildSubImage(uint layer) => new(Vector2.Zero, Vector2.One, Vector2.One, (int) layer);
+                static Region BuildSubImage(uint layer) => new Region(Vector2.Zero, Vector2.One, Vector2.One, (int)layer);
 
                 int curInstance = 0;
                 if (topLeft.HasValue)

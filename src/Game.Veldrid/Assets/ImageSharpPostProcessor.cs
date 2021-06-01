@@ -13,7 +13,7 @@ namespace UAlbion.Game.Veldrid.Assets
         public object Process(object asset, AssetInfo info, ICoreFactory factory)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
-            return new ImageSharpTrueColorTexture(info.AssetId, info.AssetId.ToString(), (Image<Rgba32>) asset);
+            return ImageSharpUtil.FromImageSharp(info.AssetId, info.AssetId.ToString(), (Image<Rgba32>)asset);
         }
     }
 }

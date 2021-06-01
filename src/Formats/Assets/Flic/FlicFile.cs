@@ -70,6 +70,8 @@ namespace UAlbion.Formats.Assets.Flic
         public uint OFrame2 { get; } // Offset to frame 2 (FLC only)
         public byte[] Reserved3 { get; } // Set to zero (40 bytes)
         public IList<FlicChunk> Chunks { get; } = new List<FlicChunk>();
-        public FlicPlayer Play(byte[] pixelData) => new FlicPlayer(this, pixelData);
+
+        public delegate Span<byte> GetPixelDataFunc();
+        public FlicPlayer Play(GetPixelDataFunc getPixelData) => new FlicPlayer(this, getPixelData);
     }
 }

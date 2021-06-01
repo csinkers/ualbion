@@ -12,6 +12,7 @@ namespace UAlbion.Core.Visual
         CeilingBackAndForth = 1 << 1,
         WallBackAndForth = 1 << 2,
     }
+
     public class DungeonTilemap : IRenderable
     {
         DungeonTile[] _tiles;
@@ -26,12 +27,12 @@ namespace UAlbion.Core.Visual
             _tiles = new DungeonTile[tileCount];
 
             Name = name;
-            DayFloors = factory.CreateMultiTexture(id, "FloorTiles:" + name, dayPalette);
-            DayWalls = factory.CreateMultiTexture(id, "WallTiles:" + name, dayPalette);
+            DayFloors = new MultiTexture(id, "FloorTiles:" + name, dayPalette);
+            DayWalls = new MultiTexture(id, "WallTiles:" + name, dayPalette);
             if (nightPalette != null)
             {
-                NightFloors = factory.CreateMultiTexture(id, "FloorTiles:" + name, nightPalette);
-                NightWalls = factory.CreateMultiTexture(id, "WallTiles:" + name, nightPalette);
+                NightFloors = new MultiTexture(id, "FloorTiles:" + name, nightPalette);
+                NightWalls = new MultiTexture(id, "WallTiles:" + name, nightPalette);
             }
         }
 
@@ -83,7 +84,7 @@ namespace UAlbion.Core.Visual
                     tile->Ceiling = (byte)DayFloors.GetSubImageAtTime(ceilingSubImage, frame, (flags & Tile3DFlags.CeilingBackAndForth) != 0);
                     tile->Wall = (byte)DayWalls.GetSubImageAtTime(wallSubImage, frame, (flags & Tile3DFlags.WallBackAndForth) != 0);
                     tile->Flags = 0; // DungeonTileFlags.UsePalette;
-                    var subImage = (SubImage)DayWalls.GetSubImage(tile->Wall);
+                    var subImage = DayWalls.Regions[tile->Wall];
                     tile->WallSize = subImage.TexSize;
                 }
             }

@@ -6,7 +6,6 @@ using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
@@ -75,8 +74,7 @@ namespace UAlbion.Game.Entities.Map3D
             for (int i = 0; i < _labyrinthData.FloorAndCeilings.Count; i++)
             {
                 var floorInfo = _labyrinthData.FloorAndCeilings[i];
-                ITexture floor = assets.LoadTexture(floorInfo?.SpriteId ?? AssetId.None);
-                _tilemap.DefineFloor(i + 1, floor);
+                _tilemap.DefineFloor(i + 1, assets.LoadTexture(floorInfo?.SpriteId ?? AssetId.None));
             }
 
             for (int i = 0; i < _labyrinthData.Walls.Count; i++)

@@ -67,8 +67,7 @@ void main()
 #endif
 	// else if (color.x != 0) color = vec4(color.xx, 0.5f, 1.0f);
 
-	if (color.w == 0.0f)
-		discard;
+	float depth = (color.w == 0.0f) ?  1.0f : gl_FragCoord.z;
 
 	if ((iFlags & TF_HIGHLIGHT)  != 0) color = color * 1.2; // Highlight
 	if ((iFlags & TF_RED_TINT)   != 0) color = vec4(color.x * 1.5f + 0.3f, color.yzw);         // Red tint
@@ -84,8 +83,6 @@ void main()
 			color = vec4(wallLayer / 255.0f, wallLayer / 255.0f, wallLayer / 255.0f, 1.0f);
 	}
 
-	float depth = gl_FragCoord.z;
-
 	if ((iFlags & TF_TEXTURE_TYPE_MASK) == TF_TEXTURE_TYPE_FLOOR)
 		depth = 1.0f;
  
@@ -94,7 +91,7 @@ void main()
 
 	if ((uEngineFlags & EF_SHOW_BOUNDING_BOXES) != 0)
 	{
-		color = mix(color, (3*color + vec4(1.0f)) * 0.25f,
+		color = mix(color, vec4((2*color.xyz + vec3(1.0f)) * 0.333f, 1.0f),
 				max(smoothstep(0.47, 0.5, abs(iTexCoords.x-0.5f)),
 					smoothstep(0.47, 0.5, abs(iTexCoords.y-0.5f))));
 	}

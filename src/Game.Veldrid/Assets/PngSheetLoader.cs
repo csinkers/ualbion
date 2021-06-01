@@ -12,41 +12,40 @@ using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid.Textures;
+using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Veldrid.Assets
 {
-    public class PngSheetLoader : Component, IAssetLoader<IEightBitImage>
+    public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>>
     {
-        static byte[] Write(IImageEncoder encoder, uint[] palette, IEightBitImage existing)
+        static byte[] Write(IImageEncoder encoder, uint[] palette, IReadOnlyTexture<byte> existing)
         {
-            var image = ImageUtil.PackSpriteSheet(palette, existing.SubImageCount, existing.GetSubImageBuffer);
+            var image = ImageSharpUtil.PackSpriteSheet(palette, existing.Regions.Count, existing.GetRegionBuffer);
             return FormatUtil.BytesFromStream(stream => encoder.Encode(image, stream));
         }
 
-        static AlbionSprite Read(AssetId id, uint[] palette, Image<Rgba32> image, int subItemWidth, int subItemHeight)
+        static IReadOnlyTexture<byte> Read(AssetId id, uint[] palette, Image<Rgba32> image, int subItemWidth, int subItemHeight)
         {
             var pixels = new byte[image.Width * image.Height];
-            var frames = new List<AlbionSpriteFrame>();
+            var frames = new List<Region>();
             if (!image.TryGetSinglePixelSpan(out Span<Rgba32> rgbaSpan))
                 throw new InvalidOperationException("Could not retrieve single span from Image");
 
             var uintSpan = MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan);
-            var source = new ReadOnlyUIntImageBuffer(image.Width, image.Height, image.Width, uintSpan);
-            var dest = new ByteImageBuffer(image.Width, image.Height, image.Width, pixels);
+            var source = new ReadOnlyImageBuffer<uint>(image.Width, image.Height, image.Width, uintSpan);
+            var dest = new ImageBuffer<byte>(image.Width, image.Height, image.Width, pixels);
             BlitUtil.UnpackSpriteSheet(palette, subItemWidth, subItemHeight, source, dest,
-                (x,y,w,h) => frames.Add(new AlbionSpriteFrame(x, y, w, h, image.Width)));
-
-            bool uniform = frames.All(x => x.Width == frames[0].Width && x.Height == frames[0].Height);
+                (x,y,w,h) => frames.Add(new Region(x, y, w, h, image.Width, image.Height, 0)));
 
             while (IsFrameEmpty(frames.Last(), pixels, image.Width))
                 frames.RemoveAt(frames.Count - 1);
 
-            return new AlbionSprite(id, image.Width, image.Height, uniform, pixels, frames);
+            return new Texture<byte>(id, id.ToString(), image.Width, image.Height, 1, pixels, frames);
         }
 
-        static bool IsFrameEmpty(ISubImage frame, byte[] pixels, int stride)
+        static bool IsFrameEmpty(Region frame, byte[] pixels, int stride)
         {
             var span = pixels.AsSpan(frame.PixelOffset, frame.PixelLength);
             for (int j = 0; j < frame.Height; j++)
@@ -56,7 +55,7 @@ namespace UAlbion.Game.Veldrid.Assets
             return true;
         }
 
-        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
@@ -97,6 +96,6 @@ namespace UAlbion.Game.Veldrid.Assets
         }
 
         public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
-            => Serdes((IEightBitImage)existing, info, mapping, s);
+            => Serdes((IReadOnlyTexture<byte>)existing, info, mapping, s);
     }
 }

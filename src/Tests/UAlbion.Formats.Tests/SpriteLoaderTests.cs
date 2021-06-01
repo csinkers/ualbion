@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Formats.Parsers;
@@ -11,11 +10,11 @@ namespace UAlbion.Formats.Tests
 {
     public class SpriteLoaderTests
     {
-        static readonly HeaderBasedSpriteLoader HeaderLoader = new HeaderBasedSpriteLoader();
+        static readonly SingleHeaderSpriteLoader HeaderLoader = new SingleHeaderSpriteLoader();
         static readonly MultiHeaderSpriteLoader MultiHeaderLoader = new MultiHeaderSpriteLoader();
         static readonly AmorphousSpriteLoader AmorphousLoader = new AmorphousSpriteLoader();
 
-        static IEightBitImage Load(byte[] bytes, Func<IEightBitImage, ISerializer, IEightBitImage> serdes)
+        static IReadOnlyTexture<byte> Load(byte[] bytes, Func<IReadOnlyTexture<byte>, ISerializer, IReadOnlyTexture<byte>> serdes)
         {
             using var ms = new MemoryStream(bytes);
             using var br = new BinaryReader(ms);
@@ -23,7 +22,7 @@ namespace UAlbion.Formats.Tests
             return serdes(null, s);
         }
 
-        static byte[] Save(IEightBitImage sprite, Func<IEightBitImage, ISerializer, IEightBitImage> serdes)
+        static byte[] Save(IReadOnlyTexture<byte> sprite, Func<IReadOnlyTexture<byte>, ISerializer, IReadOnlyTexture<byte>> serdes)
         {
             using var ms = new MemoryStream();
             using var bw = new BinaryWriter(ms);
@@ -34,7 +33,7 @@ namespace UAlbion.Formats.Tests
         }
 
 
-        static void RoundTrip(byte[] bytes, Func<IEightBitImage, ISerializer, IEightBitImage> serdes, Action<IEightBitImage> assert)
+        static void RoundTrip(byte[] bytes, Func<IReadOnlyTexture<byte>, ISerializer, IReadOnlyTexture<byte>> serdes, Action<IReadOnlyTexture<byte>> assert)
         {
             var sprite = Load(bytes, serdes);
             assert(sprite);
@@ -62,11 +61,11 @@ namespace UAlbion.Formats.Tests
                 {
                     Assert.Equal(4, sprite.Width);
                     Assert.Equal(3, sprite.Height);
-                    Assert.Equal(1, sprite.SubImageCount);
-                    Assert.Equal(4, sprite.GetSubImage(0).Width);
-                    Assert.Equal(3, sprite.GetSubImage(0).Height);
-                    Assert.Equal(0, sprite.GetSubImage(0).X);
-                    Assert.Equal(0, sprite.GetSubImage(0).Y);
+                    Assert.Equal(1, sprite.Regions.Count);
+                    Assert.Equal(4, sprite.Regions[0].Width);
+                    Assert.Equal(3, sprite.Regions[0].Height);
+                    Assert.Equal(0, sprite.Regions[0].X);
+                    Assert.Equal(0, sprite.Regions[0].Y);
                 });
         }
 
@@ -92,11 +91,11 @@ namespace UAlbion.Formats.Tests
                 {
                     Assert.Equal(4, sprite.Width);
                     Assert.Equal(6, sprite.Height);
-                    Assert.Equal(2, sprite.SubImageCount);
-                    Assert.Equal(4, sprite.GetSubImage(0).Width);
-                    Assert.Equal(3, sprite.GetSubImage(0).Height);
-                    Assert.Equal(4, sprite.GetSubImage(1).Width);
-                    Assert.Equal(3, sprite.GetSubImage(1).Height);
+                    Assert.Equal(2, sprite.Regions.Count);
+                    Assert.Equal(4, sprite.Regions[0].Width);
+                    Assert.Equal(3, sprite.Regions[0].Height);
+                    Assert.Equal(4, sprite.Regions[1].Width);
+                    Assert.Equal(3, sprite.Regions[1].Height);
                     Assert.Equal(
                         FormatUtil.BytesToHexString(twoFrames.AsSpan(6).ToArray()),
                         FormatUtil.BytesToHexString(sprite.PixelData));
@@ -142,13 +141,13 @@ namespace UAlbion.Formats.Tests
                 {
                     Assert.Equal(5, sprite.Width);
                     Assert.Equal(6, sprite.Height);
-                    Assert.Equal(3, sprite.SubImageCount);
-                    Assert.Equal(4, sprite.GetSubImage(0).Width);
-                    Assert.Equal(2, sprite.GetSubImage(0).Height);
-                    Assert.Equal(2, sprite.GetSubImage(1).Width);
-                    Assert.Equal(3, sprite.GetSubImage(1).Height);
-                    Assert.Equal(5, sprite.GetSubImage(2).Width);
-                    Assert.Equal(1, sprite.GetSubImage(2).Height);
+                    Assert.Equal(3, sprite.Regions.Count);
+                    Assert.Equal(4, sprite.Regions[0].Width);
+                    Assert.Equal(2, sprite.Regions[0].Height);
+                    Assert.Equal(2, sprite.Regions[1].Width);
+                    Assert.Equal(3, sprite.Regions[1].Height);
+                    Assert.Equal(5, sprite.Regions[2].Width);
+                    Assert.Equal(1, sprite.Regions[2].Height);
                     Assert.Equal(
                         FormatUtil.BytesToHexString(expectedFinalPixels),
                         FormatUtil.BytesToHexString(sprite.PixelData));
@@ -179,32 +178,32 @@ namespace UAlbion.Formats.Tests
                 {
                     Assert.Equal(3, sprite.Width);
                     Assert.Equal(7, sprite.Height);
-                    Assert.Equal(5, sprite.SubImageCount);
+                    Assert.Equal(5, sprite.Regions.Count);
 
-                    Assert.Equal(3, sprite.GetSubImage(0).Width);
-                    Assert.Equal(2, sprite.GetSubImage(0).Height);
-                    Assert.Equal(0, sprite.GetSubImage(0).X);
-                    Assert.Equal(0, sprite.GetSubImage(0).Y);
+                    Assert.Equal(3, sprite.Regions[0].Width);
+                    Assert.Equal(2, sprite.Regions[0].Height);
+                    Assert.Equal(0, sprite.Regions[0].X);
+                    Assert.Equal(0, sprite.Regions[0].Y);
 
-                    Assert.Equal(3, sprite.GetSubImage(1).Width);
-                    Assert.Equal(2, sprite.GetSubImage(1).Height);
-                    Assert.Equal(0, sprite.GetSubImage(1).X);
-                    Assert.Equal(2, sprite.GetSubImage(1).Y);
+                    Assert.Equal(3, sprite.Regions[1].Width);
+                    Assert.Equal(2, sprite.Regions[1].Height);
+                    Assert.Equal(0, sprite.Regions[1].X);
+                    Assert.Equal(2, sprite.Regions[1].Y);
 
-                    Assert.Equal(2, sprite.GetSubImage(2).Width);
-                    Assert.Equal(1, sprite.GetSubImage(2).Height);
-                    Assert.Equal(0, sprite.GetSubImage(2).X);
-                    Assert.Equal(4, sprite.GetSubImage(2).Y);
+                    Assert.Equal(2, sprite.Regions[2].Width);
+                    Assert.Equal(1, sprite.Regions[2].Height);
+                    Assert.Equal(0, sprite.Regions[2].X);
+                    Assert.Equal(4, sprite.Regions[2].Y);
 
-                    Assert.Equal(2, sprite.GetSubImage(3).Width);
-                    Assert.Equal(1, sprite.GetSubImage(3).Height);
-                    Assert.Equal(0, sprite.GetSubImage(3).X);
-                    Assert.Equal(5, sprite.GetSubImage(3).Y);
+                    Assert.Equal(2, sprite.Regions[3].Width);
+                    Assert.Equal(1, sprite.Regions[3].Height);
+                    Assert.Equal(0, sprite.Regions[3].X);
+                    Assert.Equal(5, sprite.Regions[3].Y);
 
-                    Assert.Equal(2, sprite.GetSubImage(4).Width);
-                    Assert.Equal(1, sprite.GetSubImage(4).Height);
-                    Assert.Equal(0, sprite.GetSubImage(4).X);
-                    Assert.Equal(6, sprite.GetSubImage(4).Y);
+                    Assert.Equal(2, sprite.Regions[4].Width);
+                    Assert.Equal(1, sprite.Regions[4].Height);
+                    Assert.Equal(0, sprite.Regions[4].X);
+                    Assert.Equal(6, sprite.Regions[4].Y);
                 });
         }
     }

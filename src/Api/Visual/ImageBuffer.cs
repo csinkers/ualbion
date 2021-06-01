@@ -3,9 +3,9 @@
 namespace UAlbion.Api.Visual
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Won't be compared")]
-    public readonly ref struct ReadOnlyUIntImageBuffer
+    public readonly ref struct ImageBuffer<T> where T : unmanaged
     {
-        public ReadOnlyUIntImageBuffer(int width, int height, int stride, ReadOnlySpan<uint> buffer)
+        public ImageBuffer(int width, int height, int stride, Span<T> buffer)
         {
             Width = width;
             Height = height;
@@ -13,7 +13,7 @@ namespace UAlbion.Api.Visual
             Buffer = buffer;
         }
 
-        public ReadOnlyUIntImageBuffer(ReadOnlyUIntImageBuffer existing, ReadOnlySpan<uint> buffer)
+        public ImageBuffer(ImageBuffer<T> existing, Span<T> buffer)
         {
             Width = existing.Width;
             Height = existing.Height;
@@ -24,6 +24,7 @@ namespace UAlbion.Api.Visual
         public int Width { get; }
         public int Height { get; }
         public int Stride { get; }
-        public ReadOnlySpan<uint> Buffer { get; }
+        public Span<T> Buffer { get; }
+        public Span<T> GetRow(int row) => Buffer.Slice(Stride * row, Width);
     }
 }

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using UAlbion.Api.Visual;
 using UAlbion.Core;
-using UAlbion.Core.Textures;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Assets
@@ -24,7 +23,7 @@ namespace UAlbion.Game.Assets
         {
             var assets = Resolve<IAssetManager>();
             var textureId = (SpriteId)(id.IsBold ? Base.Font.BoldFont : Base.Font.RegularFont);
-            var texture = (EightBitTexture)assets.LoadTexture(textureId);
+            var texture = (Texture<byte>)assets.LoadTexture(textureId);
             if (texture == null)
                 throw new InvalidOperationException($"MetafontBuilder: Could not load font {textureId}");
 
@@ -40,12 +39,11 @@ namespace UAlbion.Game.Assets
                 bytes[i] = mapping[bytes[i]];
             }
 
-            return _factory.CreateEightBitTexture(
+            return new Texture<byte>(
                 textureId,
                 $"Font{id.Color}{(id.IsBold ? "Bold" : "")}",
-                texture.Width, texture.Height,
-                texture.MipLevels, texture.ArrayLayers,
-                bytes, texture.SubImages);
+                texture.Width, texture.Height, texture.ArrayLayers,
+                bytes, texture.Regions);
         }
     }
 }

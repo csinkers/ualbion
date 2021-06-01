@@ -8,13 +8,15 @@ namespace UAlbion.Formats.Assets.Flic
     public class FlicPlayer
     {
         readonly FlicFile _flic;
+        readonly FlicFile.GetPixelDataFunc _getPixelData;
         readonly FlicFrame[] _frames;
 
-        public FlicPlayer(FlicFile flic, byte[] pixelData)
+        public FlicPlayer(FlicFile flic, FlicFile.GetPixelDataFunc getPixelData)
         {
             if (flic == null) throw new ArgumentNullException(nameof(flic));
-            if (pixelData == null) throw new ArgumentNullException(nameof(pixelData));
+            _getPixelData = getPixelData ?? throw new ArgumentNullException(nameof(getPixelData));
 
+            var pixelData = _getPixelData();
             if (pixelData.Length != flic.Width * flic.Height)
             {
                 throw new ArgumentOutOfRangeException(
@@ -23,14 +25,12 @@ namespace UAlbion.Formats.Assets.Flic
                     $" but was given a buffer of size {pixelData.Length}");
             }
 
-            PixelData = pixelData;
             _flic = flic;
             _frames = flic.Chunks.OfType<FlicFrame>().ToArray();
             ApplyFrame(_frames[0]);
         }
 
         public uint[] Palette { get; } = new uint[0x100];
-        public byte[] PixelData { get; }
         public int Frame { get; private set; }
         public ushort Delay => _frames[Frame].Delay;
         public int FrameCount => _frames.Length;
@@ -40,6 +40,7 @@ namespace UAlbion.Formats.Assets.Flic
             ApiUtil.Assert(frame.Width == 0, "Frame width overrides are not currently handled");
             ApiUtil.Assert(frame.Height == 0, "Frame height overrides are not currently handled");
 
+            var pixelData = _getPixelData();
             foreach (var subChunk in frame.SubChunks)
             {
                 switch (subChunk)
@@ -48,13 +49,13 @@ namespace UAlbion.Formats.Assets.Flic
                         paletteChunk.GetEffectivePalette(Palette).CopyTo(Palette, 0);
                         break;
                     case CopyChunk copy:
-                        copy.PixelData.CopyTo(PixelData, 0);
+                        copy.PixelData.AsSpan().CopyTo(pixelData);
                         break;
                     case DeltaFlcChunk delta:
-                        delta.Apply(PixelData, _flic.Width);
+                        delta.Apply(pixelData, _flic.Width);
                         break;
                     case FullByteOrientedRleChunk rle:
-                        rle.PixelData.CopyTo(PixelData, 0);
+                        rle.PixelData.AsSpan().CopyTo(pixelData);
                         break;
                 }
             }
@@ -80,11 +81,12 @@ namespace UAlbion.Formats.Assets.Flic
             uint[] buffer32 = new uint[_flic.Width * _flic.Height];
             while (Frame < _flic.Frames)
             {
+                var pixelData = _getPixelData();
                 // Inefficient, could be optimised by rendering with an 8-bit shader or
                 // applying the deltas directly to the 32-bit buffer.
                 for (int y = 0; y < _flic.Height; y++)
                 for (int x = 0; x < _flic.Width; x++)
-                    buffer32[(_flic.Height - y - 1) * _flic.Width + x] = Palette[PixelData[y * _flic.Width + x]];
+                    buffer32[(_flic.Height - y - 1) * _flic.Width + x] = Palette[pixelData[y * _flic.Width + x]];
 
                 yield return (buffer32, Delay);
                 NextFrame();

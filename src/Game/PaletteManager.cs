@@ -11,7 +11,7 @@ namespace UAlbion.Game
     public class PaletteManager : ServiceComponent<IPaletteManager>, IPaletteManager
     {
         public IPalette Palette { get; private set; }
-        public PaletteTexture PaletteTexture { get; private set; }
+        public IReadOnlyTexture<uint> PaletteTexture { get; private set; }
         public int Version { get; private set; }
         public int Frame { get; private set; }
 
@@ -63,8 +63,7 @@ namespace UAlbion.Game
 
         void GeneratePalette(PaletteId id, string name, uint[] rawPalette)
         {
-            var factory = Resolve<ICoreFactory>();
-            PaletteTexture = factory.CreatePaletteTexture(id, name, rawPalette);
+            PaletteTexture = new PaletteTexture(id, name, rawPalette);
             Version++;
         }
     }

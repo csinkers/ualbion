@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid.Textures;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Game;
 
@@ -94,13 +96,13 @@ namespace UAlbion
             if (texture == null)
                 return filenames;
 
-            if (texture is TrueColorTexture trueColor)
+            if (texture is IReadOnlyTexture<uint> trueColor)
             {
                 var path = Path.Combine(directory, $"{assetId.Id}_{assetId}");
-                var image = trueColor.ToImage();
+                var image = ImageSharpUtil.ToImageSharp(trueColor.GetLayerBuffer(0));
                 Save(image, path, formats, filenames);
             }
-            else if (texture is VeldridEightBitTexture tilemap && (
+            else if (texture is IReadOnlyTexture<byte> tilemap && (
                 assetId.Type == AssetType.Font ||
                 assetId.Type == AssetType.TilesetGraphics ||
                 assetId.Type == AssetType.AutomapGraphics))
@@ -111,7 +113,7 @@ namespace UAlbion
                     return filenames;
                 }
 
-                var colors = tilemap.DistinctColors(null);
+                var colors = BlitUtil.DistinctColors(tilemap.PixelData);
                 int palettePeriod = palette.CalculatePeriod(colors);
 
                 for (int palFrame = 0; palFrame < palettePeriod; palFrame++)
@@ -119,13 +121,13 @@ namespace UAlbion
                     if (frameFilter != null && !frameFilter(0, palFrame))
                         continue;
                     var path = Path.Combine(directory, $"{assetId.Id}_{palFrame}_{assetId}");
-                    var image = tilemap.ToImage(palette.GetPaletteAtTime(palFrame));
+                    var image = ImageSharpUtil.ToImageSharp(tilemap.GetLayerBuffer(0), palette.GetPaletteAtTime(palFrame));
                     Save(image, path, formats, filenames);
                 }
             }
-            else if (texture is VeldridEightBitTexture ebt)
+            else if (texture is IReadOnlyTexture<byte> eightBit)
             {
-                for (int subId = 0; subId < ebt.SubImageCount; subId++)
+                for (int subId = 0; subId < eightBit.Regions.Count; subId++)
                 {
                     if (palette == null)
                     {
@@ -133,7 +135,7 @@ namespace UAlbion
                         break;
                     }
 
-                    var colors = ebt.DistinctColors(subId);
+                    var colors = BlitUtil.DistinctColors(eightBit.GetRegionBuffer(subId));
                     int palettePeriod = palette.CalculatePeriod(colors);
 
                     for (int palFrame = 0; palFrame < palettePeriod; palFrame++)
@@ -141,7 +143,7 @@ namespace UAlbion
                         if (frameFilter != null && !frameFilter(subId, palFrame))
                             continue;
                         var path = Path.Combine(directory, $"{assetId.Id}_{subId}_{palFrame}_{assetId}");
-                        var image = ebt.ToImage(subId, palette.GetPaletteAtTime(palFrame));
+                        var image = ImageSharpUtil.ToImageSharp(eightBit.GetRegionBuffer(subId), palette.GetPaletteAtTime(palFrame));
                         Save(image, path, formats, filenames);
                     }
                 }

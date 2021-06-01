@@ -23,10 +23,9 @@ namespace UAlbion.Game.Gui.Controls
 
         void Rebuild(int width, int height, DrawLayer order)
         {
-            var shadowSubImage = new SubImage(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
+            var shadowSubImage = new Region(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
             var window = Resolve<IWindowManager>();
             var sm = Resolve<ISpriteManager>();
-            var factory = Resolve<ICoreFactory>();
 
             { // Check if we need to rebuild
                 var normSize = window.UiToNormRelative(width, height);
@@ -38,14 +37,13 @@ namespace UAlbion.Game.Gui.Controls
             }
 
             var assets = Resolve<IAssetManager>();
-            var multi = factory.CreateMultiTexture(AssetId.None, $"Background {width}x{height}",
-                assets.LoadPalette(Base.Palette.Inventory));
+            var multi = new MultiTexture(AssetId.None, $"Background {width}x{height}", assets.LoadPalette(Base.Palette.Inventory));
 
             // Background
             var background = assets.LoadTexture(Base.CoreSprite.UiBackground);
             multi.AddTexture(1, background, 0, 0, 0, true, width, height);
 
-            var subImage = (SubImage)multi.GetSubImage(multi.GetSubImageAtTime(1, 0, false));
+            var subImage = multi.Regions[multi.GetSubImageAtTime(1, 0, false)];
             var normalisedSize = window.UiToNormRelative(subImage.Size);
 
             var key = new SpriteKey(multi, order, SpriteKeyFlags.NoTransform);

@@ -4,7 +4,6 @@ using System.Numerics;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
@@ -18,7 +17,7 @@ namespace UAlbion.Game.Entities.Map2D
     {
         static readonly SpriteInstanceData BlankInstance = SpriteInstanceData.TopMid(
             Vector3.Zero, Vector2.Zero,
-            new SubImage(Vector2.Zero, Vector2.Zero, Vector2.Zero, 0),
+            new Region(Vector2.Zero, Vector2.Zero, Vector2.Zero, 0),
             0);
 
         readonly LogicalMap2D _logicalMap;
@@ -77,7 +76,7 @@ namespace UAlbion.Game.Entities.Map2D
 
             int index = _logicalMap.Index(i, j);
             int subImageId = tile.GetSubImageForTile(tickCount);
-            var subImage = (SubImage)_tileset.GetSubImage(subImageId);
+            var subImage = _tileset.Regions[subImageId];
 
             var position = new Vector3(
                 new Vector2(i, j) * subImage.Size,

@@ -4,7 +4,6 @@ using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Core.Textures;
 
 namespace UAlbion.Game.Assets
 {
@@ -20,15 +19,15 @@ namespace UAlbion.Game.Assets
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (factory == null) throw new ArgumentNullException(nameof(factory));
 
-            var sprite = (IEightBitImage)asset;
-            var layout = SpriteSheetUtil.ArrangeSpriteSheet(sprite.SubImageCount, 1, sprite.GetSubImageBuffer);
+            var sprite = (IReadOnlyTexture<byte>)asset;
+            var layout = SpriteSheetUtil.ArrangeSpriteSheet(sprite.Regions.Count, 1, sprite.GetRegionBuffer);
             var totalHeight = ApiUtil.NextPowerOfTwo(layout.Height);
             byte[] pixelData = new byte[layout.Width * totalHeight];
-            var subImages = new SubImage[sprite.SubImageCount];
+            var subImages = new Region[sprite.Regions.Count];
 
-            for (int n = 0; n < sprite.SubImageCount; n++)
+            for (int n = 0; n < sprite.Regions.Count; n++)
             {
-                var frame = sprite.GetSubImageBuffer(n);
+                var frame = sprite.GetRegionBuffer(n);
                 var destWidth = frame.Width + 2 * MarginPixels;
                 var destHeight = frame.Height + 2 * MarginPixels;
                 var (x, y) = layout.Positions[n];
@@ -45,20 +44,16 @@ namespace UAlbion.Game.Assets
                     }
                 }
 
-                subImages[n] = new SubImage(
+                subImages[n] = new Region(
                     new Vector2(x + MarginPixels, y + MarginPixels),
                     new Vector2(frame.Width, frame.Height),
                     new Vector2(layout.Width, totalHeight),
                     0);
             }
 
-            return factory.CreateEightBitTexture(
-                info.AssetId,
-                sprite.Id.ToString(),
-                layout.Width,
-                totalHeight,
-                1,
-                1,
+            return new Texture<byte>(
+                info.AssetId, sprite.Id.ToString(),
+                layout.Width, totalHeight, 1,
                 pixelData,
                 subImages);
         }

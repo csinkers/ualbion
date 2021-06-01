@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
-using UAlbion.Core;
-using UAlbion.Core.Textures;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Gui
@@ -17,19 +15,20 @@ namespace UAlbion.Game.Gui
                 .Select((x, i) => (x, i))
                 .ToDictionary(x => x.x, x => (uint)x.i);
 
-        public ITexture BorderTexture { get; }
+        public IReadOnlyTexture<byte> BorderTexture { get; }
 
-        public CommonColors(ICoreFactory factory)
+        public CommonColors()
         {
-            if (factory == null) throw new ArgumentNullException(nameof(factory));
-            BorderTexture = factory.CreateEightBitTexture(
+            var texture = new Texture<byte>(
                 AssetId.None,
                 "CommonColors",
-                1, 1, 1, Palette.Count,
-                Palette.OrderBy(x => x.Value).Select(x => (byte)x.Key).ToArray(),
-                Palette.OrderBy(x => x.Value)
-                    .Select(x => new SubImage(Vector2.Zero, Vector2.One, Vector2.One, (int)x.Value))
-                    .ToArray());
+                1, 1, Palette.Count,
+                Palette.OrderBy(x => x.Value).Select(x => (byte)x.Key).ToArray());
+
+            foreach (var entry in Palette.OrderBy(x => x.Value))
+                texture.AddRegion(0, 0, 1, 1, (int)entry.Value);
+
+            BorderTexture = texture;
         }
     }
 }

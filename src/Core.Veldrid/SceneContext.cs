@@ -2,8 +2,8 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Core.Events;
-using UAlbion.Core.Textures;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
 using Veldrid;
@@ -15,7 +15,7 @@ namespace UAlbion.Core.Veldrid
     public sealed class SceneContext : Component, IDisposable
     {
         readonly DisposeCollector _disposer = new DisposeCollector();
-        VeldridPaletteTexture _paletteTexture;
+        IReadOnlyTexture<uint> _paletteTexture;
         int _lastPaletteVersion = -1;
 
         public DeviceBuffer IdentityMatrixBuffer { get; private set; }
@@ -126,7 +126,7 @@ namespace UAlbion.Core.Veldrid
         void SetCurrentPalette(GraphicsDevice gd)
         {
             var paletteManager = Resolve<IPaletteManager>();
-            PaletteTexture newPalette = paletteManager.PaletteTexture;
+            var newPalette = paletteManager.PaletteTexture;
             int newVersion = paletteManager.Version;
 
             if (newPalette == null) return;
@@ -136,9 +136,9 @@ namespace UAlbion.Core.Veldrid
             PaletteView?.Dispose();
             PaletteTexture?.Dispose();
             CoreTrace.Log.Info("Scene", "Disposed palette device texture");
-            _paletteTexture = (VeldridPaletteTexture)newPalette;
+            _paletteTexture = newPalette;
             _lastPaletteVersion = newVersion;
-            PaletteTexture = _paletteTexture.CreateDeviceTexture(gd, TextureUsage.Sampled);
+            PaletteTexture = VeldridTexture.CreateDeviceTexture(gd, TextureUsage.Sampled, _paletteTexture);
             PaletteView = gd.ResourceFactory.CreateTextureView(PaletteTexture);
             PaletteTexture.Name = "T_" + _paletteTexture.Name;
             PaletteView.Name = "TV_" + _paletteTexture.Name;

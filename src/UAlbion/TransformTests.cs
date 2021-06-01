@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Numerics;
-using UAlbion.Core.Textures;
+using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
 
 namespace UAlbion
@@ -38,7 +38,7 @@ namespace UAlbion
             SpriteInstanceData Make(Vector3 position, Vector2 size) =>
                 SpriteInstanceData.TopLeft(
                     position, size,
-                    new SubImage(Vector2.Zero, Vector2.One, Vector2.One, 0),
+                    new Region(Vector2.Zero, Vector2.One, Vector2.One, 0),
                     0);
 
 

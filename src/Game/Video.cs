@@ -3,7 +3,6 @@ using System.Numerics;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
@@ -34,7 +33,7 @@ namespace UAlbion.Game
                 else
                 {
                     _player.NextFrame();
-                    _texture.Invalidate();
+                    _texture.IsDirty = true;
                 }
             });
             _id = id;
@@ -61,19 +60,17 @@ namespace UAlbion.Game
             }
 
             var size = new Vector2(flic.Width, flic.Height);
-            var buffer = new byte[flic.Width * flic.Height];
-            _player = flic.Play(buffer);
 
-            _texture = Resolve<ICoreFactory>().CreateEightBitTexture(
+            var texture = new Texture<byte>(
                 _id,
                 $"V:{_id}",
-                flic.Width, flic.Height,
-                1, 1,
-                buffer,
-                new[] {new SubImage(Vector2.Zero, size, size, 0),});
+                flic.Width, flic.Height, 1,
+                new[] { new Region(Vector2.Zero, size, size, 0) });
 
+            _texture = texture;
+            _player = flic.Play(() => texture.GetMutableLayerBuffer(0).Buffer);
             _sprite = AttachChild(new Sprite(SpriteId.None,
-                new Vector3(-1, -1, 0), 
+                new Vector3(-1, -1, 0),
                 DrawLayer.Interface,
                 SpriteKeyFlags.NoTransform,
                 SpriteFlags.LeftAligned | SpriteFlags.FlipVertical,

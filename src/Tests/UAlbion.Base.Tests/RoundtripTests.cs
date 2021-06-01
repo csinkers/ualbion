@@ -63,7 +63,7 @@ namespace UAlbion.Base.Tests
                 postBytes,
                 new[] { (".pre.txt", preTxt), (".post.txt", postTxt), (".reload.txt", reloadTxt)});
 
-            if (asset is IEightBitImage) // TODO: Png round-trip?
+            if (asset is IReadOnlyTexture<byte>) // TODO: Png round-trip?
                 return asset;
 
             var json = Asset.SaveJson(asset);
@@ -385,7 +385,7 @@ namespace UAlbion.Base.Tests
         {
             var info = new AssetInfo { AssetId = AssetId.From(AutomapTiles.Set1) };
             info.Set(AssetProperty.SubSprites, "(8,8,576) (16,16)");
-            RoundTripXld<IEightBitImage>(nameof(AutomapGfxTest), "$(XLD)/AUTOGFX0.XLD", 0,
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(AutomapGfxTest), "$(XLD)/AUTOGFX0.XLD", 0,
                 (x, s) => Loaders.AmorphousSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -407,20 +407,20 @@ namespace UAlbion.Base.Tests
             var info = new AssetInfo();
             var factory = new MockFactory();
             info.Set(AssetProperty.SubSprites, "(1,1,3) (2,2)");
-            var sprite = RoundTrip<IEightBitImage>(
+            var sprite = RoundTrip<IReadOnlyTexture<byte>>(
                 nameof(AmorphousTest),
                 bytes,
                 (x, s) =>
                 {
                     var albionSprite = Loaders.AmorphousSpriteLoader.Serdes(x, info, AssetMapping.Global, s);
                     var pp = new AlbionSpritePostProcessor();
-                    return (IEightBitImage)pp.Process(albionSprite, info, factory);
+                    return (IReadOnlyTexture<byte>)pp.Process(albionSprite, info, factory);
                 });
 
             Assert.Equal(2, sprite.Width);
             Assert.Equal(7, sprite.Height);
-            Assert.Equal(5, sprite.SubImageCount);
-            Assert.Collection(sprite.PixelData,
+            Assert.Equal(5, sprite.Regions.Count);
+            Assert.Collection(sprite.PixelData.ToArray(),
                 x => Assert.Equal(0, x), x => Assert.Equal(0, x),
                 x => Assert.Equal(1, x), x => Assert.Equal(0, x),
                 x => Assert.Equal(2, x), x => Assert.Equal(0, x),
@@ -438,7 +438,7 @@ namespace UAlbion.Base.Tests
                 AssetId = AssetId.From(CombatBackground.Toronto),
                 Width = 360
             };
-            RoundTripXld<IEightBitImage>(nameof(CombatBgTest), "$(XLD)/COMBACK0.XLD", 0,
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(CombatBgTest), "$(XLD)/COMBACK0.XLD", 0,
                 (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -451,7 +451,7 @@ namespace UAlbion.Base.Tests
                 Width = 145,
                 Height = 165
             };
-            RoundTripXld<IEightBitImage>(nameof(DungeonObjectTest), "$(XLD)/3DOBJEC2.XLD", 81,
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(DungeonObjectTest), "$(XLD)/3DOBJEC2.XLD", 81,
                 (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -459,7 +459,7 @@ namespace UAlbion.Base.Tests
         public void FontTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Font.RegularFont), Width = 8, Height = 8 };
-            RoundTripXld<IEightBitImage>(nameof(FontTest), "$(XLD)/FONTS0.XLD", 0,
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(FontTest), "$(XLD)/FONTS0.XLD", 0,
                 (x, s) => Loaders.FontSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -472,7 +472,7 @@ namespace UAlbion.Base.Tests
                 Width = 16,
                 Height = 16
             };
-            RoundTripRaw<IEightBitImage>(nameof(ItemSpriteTest), "$(XLD)/ITEMGFX",
+            RoundTripRaw<IReadOnlyTexture<byte>>(nameof(ItemSpriteTest), "$(XLD)/ITEMGFX",
                 (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -480,7 +480,7 @@ namespace UAlbion.Base.Tests
         public void SlabTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(UiBackground.Slab), Width = 360 };
-            RoundTripRaw<IEightBitImage>(nameof(SlabTest), "$(XLD)/SLAB",
+            RoundTripRaw<IReadOnlyTexture<byte>>(nameof(SlabTest), "$(XLD)/SLAB",
                 (x, s) => Loaders.SlabLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -493,7 +493,7 @@ namespace UAlbion.Base.Tests
                 Width = 16,
                 Height = 16
             };
-            RoundTripXld<IEightBitImage>(nameof(TileGfxTest), "$(XLD)/ICONGFX0.XLD", 7,
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(TileGfxTest), "$(XLD)/ICONGFX0.XLD", 7,
                 (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -501,7 +501,7 @@ namespace UAlbion.Base.Tests
         public void CombatGfxTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(CombatGraphics.Unknown27) };
-            RoundTripXld<IEightBitImage>(nameof(CombatGfxTest), "$(XLD)/COMGFX0.XLD", 26,
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(CombatGfxTest), "$(XLD)/COMGFX0.XLD", 26,
                 (x, s) => Loaders.MultiHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -509,8 +509,8 @@ namespace UAlbion.Base.Tests
         public void DungeonBgTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(DungeonBackground.EarlyGameL) };
-            RoundTripXld<IEightBitImage>(nameof(DungeonBgTest), "$(XLD)/3DBCKGR0.XLD", 0,
-                (x, s) => Loaders.HeaderBasedSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(DungeonBgTest), "$(XLD)/3DBCKGR0.XLD", 0,
+                (x, s) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]
@@ -522,7 +522,7 @@ namespace UAlbion.Base.Tests
                 Width = 64,
                 Height = 64
             };
-            RoundTripXld<IEightBitImage>(nameof(FloorTest), "$(XLD)/3DFLOOR0.XLD", 2,
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(FloorTest), "$(XLD)/3DFLOOR0.XLD", 2,
                 (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -530,31 +530,31 @@ namespace UAlbion.Base.Tests
         public void FullBodyPictureTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(FullBodyPicture.Tom) };
-            RoundTripXld<IEightBitImage>(nameof(FullBodyPictureTest), "$(XLD)/FBODPIX0.XLD", 0,
-                (x, s) => Loaders.HeaderBasedSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(FullBodyPictureTest), "$(XLD)/FBODPIX0.XLD", 0,
+                (x, s) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]
         public void LargeNpcTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(LargeNpc.Christine) };
-            RoundTripXld<IEightBitImage>(nameof(LargeNpcTest), "$(XLD)/NPCGR0.XLD", 20,
-                (x, s) => Loaders.HeaderBasedSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(LargeNpcTest), "$(XLD)/NPCGR0.XLD", 20,
+                (x, s) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]
         public void LargePartyMemberTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(LargePartyMember.Tom) };
-            RoundTripXld<IEightBitImage>(nameof(LargePartyMemberTest), "$(XLD)/PARTGR0.XLD", 0,
-                (x, s) => Loaders.HeaderBasedSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(LargePartyMemberTest), "$(XLD)/PARTGR0.XLD", 0,
+                (x, s) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]
         public void MonsterGfxTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(MonsterGraphics.Krondir) };
-            RoundTripXld<IEightBitImage>(nameof(MonsterGfxTest), "$(XLD)/MONGFX0.XLD", 9,
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(MonsterGfxTest), "$(XLD)/MONGFX0.XLD", 9,
                 (x, s) => Loaders.MultiHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -568,7 +568,7 @@ namespace UAlbion.Base.Tests
                 File = new AssetFileInfo()
             };
             info.File.Set(AssetProperty.Transposed, true);
-            RoundTripXld<IEightBitImage>(nameof(OverlayTest), "$(XLD)/3DOVERL0.XLD", 17,
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(OverlayTest), "$(XLD)/3DOVERL0.XLD", 17,
                 (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -583,7 +583,7 @@ namespace UAlbion.Base.Tests
                 File = new AssetFileInfo()
             };
             info.File.Set(AssetProperty.Transposed, true);
-            RoundTripXld<IEightBitImage>(nameof(OverlayTest), "$(XLD)/3DOVERL2.XLD", 1,
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(OverlayTest), "$(XLD)/3DOVERL2.XLD", 1,
                 (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -606,7 +606,7 @@ namespace UAlbion.Base.Tests
                 AssetId = AssetId.From(Portrait.Tom),
                 Width = 34
             };
-            RoundTripXld<IEightBitImage>(nameof(PortraitTest), "$(XLD)/SMLPORT0.XLD", 0,
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(PortraitTest), "$(XLD)/SMLPORT0.XLD", 0,
                 (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -614,16 +614,16 @@ namespace UAlbion.Base.Tests
         public void SmallNpcTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(SmallNpc.Krondir) };
-            RoundTripXld<IEightBitImage>(nameof(SmallNpcTest), "$(XLD)/NPCKL0.XLD", 22,
-                (x, s) => Loaders.HeaderBasedSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(SmallNpcTest), "$(XLD)/NPCKL0.XLD", 22,
+                (x, s) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]
         public void SmallPartyMemberTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(SmallPartyMember.Tom) };
-            RoundTripXld<IEightBitImage>(nameof(SmallPartyMemberTest), "$(XLD)/PARTKL0.XLD", 0,
-                (x, s) => Loaders.HeaderBasedSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(SmallPartyMemberTest), "$(XLD)/PARTKL0.XLD", 0,
+                (x, s) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
         [Fact]
@@ -634,7 +634,7 @@ namespace UAlbion.Base.Tests
                 AssetId = AssetId.From(TacticalGraphics.Unknown1),
                 Width = 32
             };
-            RoundTripXld<IEightBitImage>(nameof(TacticalGfxTest), "$(XLD)/TACTICO0.XLD", 0,
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(TacticalGfxTest), "$(XLD)/TACTICO0.XLD", 0,
                 (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 
@@ -646,7 +646,7 @@ namespace UAlbion.Base.Tests
                 AssetId = AssetId.From(Wall.TorontoPanelling),
                 Width = 80
             };
-            RoundTripXld<IEightBitImage>(nameof(WallTest), "$(XLD)/3DWALLS0.XLD", 11,
+            RoundTripXld<IReadOnlyTexture<byte>>(nameof(WallTest), "$(XLD)/3DWALLS0.XLD", 11,
                 (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 // */

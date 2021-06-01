@@ -133,7 +133,7 @@ namespace UAlbion.Core
 
             if (CoreTrace.Log.IsEnabled())
             {
-                eventText = e.ToString();
+                eventText = verbose ? e.GetType().Name : e.ToString();
                 if (verbose) CoreTrace.Log.StartRaiseVerbose(eventId, _nesting, e.GetType().Name, eventText);
                 else if (e is LogEvent log)
                 {

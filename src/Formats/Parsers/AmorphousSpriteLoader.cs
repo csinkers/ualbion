@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text.RegularExpressions;
 using SerdesNet;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
-using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers
 {
-    public class AmorphousSpriteLoader : IAssetLoader<IEightBitImage>
+    public class AmorphousSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
     {
         static readonly Regex SizesRegex = new Regex(@"
             \(\s*
@@ -44,9 +42,9 @@ namespace UAlbion.Formats.Parsers
         }
 
         public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
-            => Serdes((IEightBitImage)existing, info, mapping, s);
+            => Serdes((IReadOnlyTexture<byte>)existing, info, mapping, s);
 
-        public IEightBitImage Serdes(IEightBitImage existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (info == null) throw new ArgumentNullException(nameof(info));
@@ -55,27 +53,25 @@ namespace UAlbion.Formats.Parsers
                 : Read(info, s);
         }
 
-        static IEightBitImage Write(IEightBitImage existing, ISerializer s)
+        static IReadOnlyTexture<byte> Write(IReadOnlyTexture<byte> existing, ISerializer s)
         {
             if (existing == null) throw new ArgumentNullException(nameof(existing));
 
             int bufferW = 0, bufferH = 0;
-            for (int i = 0; i < existing.SubImageCount; i++)
+            for (int i = 0; i < existing.Regions.Count; i++)
             {
-                var frame = existing.GetSubImage(i);
+                var frame = existing.Regions[i];
                 if (frame.Width > bufferW) bufferW = frame.Width;
                 if (frame.Height > bufferH) bufferH = frame.Height;
             }
 
             var buffer = new byte[bufferW * bufferH];
-            for(int i = 0; i < existing.SubImageCount; i++)
+            for(int i = 0; i < existing.Regions.Count; i++)
             {
-                var frame = existing.GetSubImage(i);
-                FormatUtil.Blit(
-                    existing.PixelData.AsSpan(frame.PixelOffset, frame.PixelLength),
-                    buffer.AsSpan(),
-                    frame.Width, frame.Height,
-                    existing.Width, frame.Width);
+                var frame = existing.GetRegionBuffer(i);
+                BlitUtil.BlitDirect(
+                    frame,
+                    new ImageBuffer<byte>(frame.Width, frame.Height, frame.Width, buffer));
 
                 s.Bytes("PixelData", buffer, frame.Width * frame.Height);
             }
@@ -83,54 +79,42 @@ namespace UAlbion.Formats.Parsers
             return existing;
         }
 
-        static IEightBitImage Read(AssetInfo info, ISerializer s)
+        static IReadOnlyTexture<byte> Read(AssetInfo info, ISerializer s)
         {
             var sizes = ParseSpriteSizes(info.Get<string>(AssetProperty.SubSprites, null));
 
             int totalWidth = 0;
-            int currentY = 0;
+            int totalHeight = 0;
             var allFrames = new List<byte[]>();
-            var frames = new List<(int, int, int)>(); // (y, w, h)
+            var frames = new List<(int y, int w, int h)>();
 
-            foreach(var (width, height) in sizes)
+            foreach (var (width, height) in sizes)
             {
                 if (s.BytesRemaining <= 0)
                     break;
 
                 byte[] frameBytes = s.Bytes("PixelData", null, width * height);
-                frames.Add((currentY, width, height));
+                frames.Add((totalHeight, width, height));
                 allFrames.Add(frameBytes);
 
-                currentY += height;
+                totalHeight += height;
                 if (width > totalWidth)
                     totalWidth = width;
             }
 
-            var totalHeight = currentY;
-            var pixelData = new byte[totalWidth * totalHeight];
+            var result = new Texture<byte>(info.AssetId, totalWidth, totalHeight);
 
             for (int n = 0; n < frames.Count; n++)
             {
                 var (y, w, h) = frames[n];
-                FormatUtil.Blit(
-                    allFrames[n],
-                    pixelData.AsSpan(y * totalWidth),
-                    w, h,
-                    w, totalWidth);
+                result.AddRegion(0, y, w, h);
+                BlitUtil.BlitDirect(
+                    new ReadOnlyImageBuffer<byte>(w, h, w, allFrames[n]),
+                    result.GetMutableRegionBuffer(n));
             }
 
             s.Check();
-            return new AlbionSprite(
-                info.AssetId,
-                totalWidth,
-                totalHeight,
-                false,
-                pixelData,
-                frames.Select(frame =>
-                {
-                    var (y,w,h) = frame;
-                    return new AlbionSpriteFrame(0, y, w, h, totalWidth);
-                }));
+            return result;
         }
     }
 }

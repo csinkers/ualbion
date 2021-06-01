@@ -14,7 +14,7 @@ namespace UAlbion.Base.Tests
         public static readonly EventSetLoader EventSetLoader = new EventSetLoader();
         public static readonly FixedSizeSpriteLoader FixedSizeSpriteLoader = new FixedSizeSpriteLoader();
         public static readonly FontSpriteLoader<FixedSizeSpriteLoader> FontSpriteLoader = new FontSpriteLoader<FixedSizeSpriteLoader>();
-        public static readonly HeaderBasedSpriteLoader HeaderBasedSpriteLoader = new HeaderBasedSpriteLoader();
+        public static readonly SingleHeaderSpriteLoader SingleHeaderSpriteLoader = new SingleHeaderSpriteLoader();
         public static readonly MultiHeaderSpriteLoader MultiHeaderSpriteLoader = new MultiHeaderSpriteLoader();
         // public static readonly InterlacedBitmapLoader InterlacedBitmapLoader = new InterlacedBitmapLoader();
         public static readonly ItemDataLoader ItemDataLoader = new ItemDataLoader();

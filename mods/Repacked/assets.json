@@ -73,7 +73,7 @@
     "fixedsize":   "UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats",
     "flic":        "UAlbion.Formats.Parsers.FlicLoader, UAlbion.Formats",
     "font":        "UAlbion.Game.Assets.FontSpriteLoader`1[[UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats]], UAlbion.Game",
-    "header":      "UAlbion.Formats.Parsers.HeaderBasedSpriteLoader, UAlbion.Formats",
+    "header":      "UAlbion.Formats.Parsers.SingleHeaderSpriteLoader, UAlbion.Formats",
     "multiheader": "UAlbion.Formats.Parsers.MultiHeaderSpriteLoader, UAlbion.Formats",
     "interlaced":  "UAlbion.Formats.Parsers.InterlacedBitmapLoader, UAlbion.Formats",
     "itemdata":    "UAlbion.Formats.Parsers.ItemDataLoader, UAlbion.Formats",

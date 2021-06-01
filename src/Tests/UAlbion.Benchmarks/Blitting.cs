@@ -14,35 +14,38 @@ namespace UAlbion.Benchmarks
         const int N = 1000;
         const int Dimensions = 256;
         static readonly IPalette _palette = new MockPalette();
-        static readonly MockTexture _black = new MockTexture(AssetId.None, 
+        static readonly ITexture _black = new Texture<byte>(AssetId.None, 
                 "Black",
                 Dimensions,
                 Dimensions,
+                1,
                 Enumerable.Repeat((byte)0, Dimensions * Dimensions).ToArray(),
-                new[] { new SubImage(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
+                new[] { new Region(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
 
-        static readonly MockTexture _white = new MockTexture(AssetId.None, 
+        static readonly ITexture _white = new Texture<byte>(AssetId.None, 
                 "Black",
                 Dimensions,
                 Dimensions,
+                1,
                 Enumerable.Repeat((byte)255, Dimensions * Dimensions).ToArray(),
-                new[] { new SubImage(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
+                new[] { new Region(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
 
-        readonly MockMultiTexture _opaqueUniform = new MockMultiTexture(AssetId.None, "OpaqueUniform", _palette);
-        readonly MockMultiTexture _opaqueRandom = new MockMultiTexture(AssetId.None, "OpaqueRandom", _palette);
-        readonly MockMultiTexture _transparentUniform = new MockMultiTexture(AssetId.None, "TransparentUniform", _palette);
-        readonly MockMultiTexture _transparentRandom = new MockMultiTexture(AssetId.None, "TransparentRandom", _palette);
+        readonly MultiTexture _opaqueUniform = new MultiTexture(AssetId.None, "OpaqueUniform", _palette);
+        readonly MultiTexture _opaqueRandom = new MultiTexture(AssetId.None, "OpaqueRandom", _palette);
+        readonly MultiTexture _transparentUniform = new MultiTexture(AssetId.None, "TransparentUniform", _palette);
+        readonly MultiTexture _transparentRandom = new MultiTexture(AssetId.None, "TransparentRandom", _palette);
         public Blitting()
         {
             var r = new Random();
             var randomBuffer = new byte[Dimensions * Dimensions];
             r.NextBytes(randomBuffer);
-            var random = new MockTexture(AssetId.None, 
+            var random = new Texture<byte>(AssetId.None, 
                 "Random",
                 Dimensions,
                 Dimensions,
+                1,
                 randomBuffer,
-                new[] { new SubImage(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
+                new[] { new Region(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
 
             _opaqueRandom.AddTexture(1, _black, 0, 0, null, false);
             _opaqueRandom.AddTexture(1, random, Dimensions / 4, Dimensions / 4, null, false, Dimensions / 2, Dimensions / 2);

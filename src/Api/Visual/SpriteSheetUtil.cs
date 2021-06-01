@@ -4,7 +4,7 @@ namespace UAlbion.Api.Visual
 {
     public static class SpriteSheetUtil
     {
-        public static SpriteSheetLayout ArrangeSpriteSheet(int frameCount, int margin, GetByteFrameDelegate getFrame)
+        public static SpriteSheetLayout ArrangeSpriteSheet<T>(int frameCount, int margin, GetFrameDelegate<T> getFrame)
         {
             long totalPixels = 0;
             int width = 0;

@@ -236,20 +236,6 @@ namespace UAlbion.Formats
                 _ => true
             };
 
-        public static void Blit(ReadOnlySpan<byte> from, Span<byte> to, int width, int height, int fromStride,
-            int toStride)
-        {
-            int srcIndex = 0;
-            int destIndex = 0;
-            for (int i = 0; i < height; i++)
-            {
-                var row = from.Slice(srcIndex, width);
-                row.CopyTo(to.Slice(destIndex));
-                srcIndex += fromStride;
-                destIndex += toStride;
-            }
-        }
-
         public static byte[] BytesFromTextWriter(Action<TextWriter> func)
         {
             if (func == null) throw new ArgumentNullException(nameof(func));

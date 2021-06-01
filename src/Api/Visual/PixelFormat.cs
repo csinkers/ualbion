@@ -1,7 +1,8 @@
 ﻿using System;
 
-namespace UAlbion.Core.Textures
+namespace UAlbion.Api.Visual
 {
+    /*
     public enum PixelFormat
     {
         /// <summary>
@@ -14,13 +15,6 @@ namespace UAlbion.Core.Textures
         /// </summary>
         [PixelFormatBytes(4)]
         Rgba32,
-    }
-
-    [AttributeUsage(AttributeTargets.Field)]
-    public class PixelFormatBytesAttribute : Attribute
-    {
-        public int Bytes { get; }
-        public PixelFormatBytesAttribute(int bytes) => Bytes = bytes;
     }
 
     public static class PixelFormatExtensions
@@ -39,4 +33,5 @@ namespace UAlbion.Core.Textures
             throw new InvalidOperationException($"Could not obtain size of pixel format {format} ({(int)format}), it either does not exist or is missing a PixelFormatBits attribute.");
         }
     }
+    */
 }

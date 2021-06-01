@@ -1,10 +1,10 @@
 ﻿using System;
-using UAlbion.Core.Textures;
+using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
 
 namespace UAlbion.Core.Veldrid.Visual
 {
-    struct SpriteShaderKey : IEquatable<SpriteShaderKey>
+    readonly struct SpriteShaderKey : IEquatable<SpriteShaderKey>
     {
         public bool UseArrayTexture { get; }
         public bool PerformDepthTest { get; }
@@ -14,7 +14,7 @@ namespace UAlbion.Core.Veldrid.Visual
         public SpriteShaderKey(MultiSprite sprite, EngineFlags engineFlags) : this(
             sprite.Key.Texture.ArrayLayers > 1,
             (sprite.Key.Flags & SpriteKeyFlags.NoDepthTest) == 0,
-            sprite.Key.Texture is EightBitTexture,
+            sprite.Key.Texture is IReadOnlyTexture<byte>,
             (engineFlags & EngineFlags.UseCylindricalBillboards) != 0 &&
             (sprite.Key.Flags & SpriteKeyFlags.UseCylindrical) != 0)
         { }

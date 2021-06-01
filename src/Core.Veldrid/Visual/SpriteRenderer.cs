@@ -245,6 +245,12 @@ namespace UAlbion.Core.Veldrid.Visual
             var resourceSet = dom.GetDeviceObject<ResourceSet>((sprite, textureView, "ResourceSet"));
             var instanceBuffer = dom.GetDeviceObject<DeviceBuffer>((sprite, sprite, "InstanceBuffer"));
 
+            if (resourceSet == null)
+            {
+                Warn($"Couldn't locate resource set for {sprite}");
+                return;
+            }
+
             cl.PushDebugGroup(sprite.Name);
             if (sprite.Key.ScissorRegion.HasValue)
             {

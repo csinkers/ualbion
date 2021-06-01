@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
@@ -89,7 +91,7 @@ namespace UAlbion.Game.Entities.Map3D
                 {
                     var floorInfo = labyrinthData.FloorAndCeilings[i];
                     var floor = floorInfo == null ? null : assets.LoadTexture(floorInfo.SpriteId);
-                    _tilemap.DefineFloor(i + 1, floor);
+                    _tilemap.DefineFloor(i + 1,  floor);
                     if (floors) totalTiles += _tilemap.DayFloors.GetFrameCountForLogicalId(i + 1);
                     if (ceilings) totalTiles += _tilemap.DayFloors.GetFrameCountForLogicalId(i + 1);
                 }
@@ -100,8 +102,8 @@ namespace UAlbion.Game.Entities.Map3D
                 for (int i = 0; i < labyrinthData.Walls.Count; i++)
                 {
                     var wallInfo = labyrinthData.Walls[i];
-                    var wall = wallInfo == null ? null : assets.LoadTexture(wallInfo.SpriteId);
                     bool isAlphaTested = wallInfo != null && (wallInfo.Properties & Wall.WallFlags.AlphaTested) != 0;
+                    var wall = wallInfo == null ? null : assets.LoadTexture(wallInfo.SpriteId);
                     _tilemap.DefineWall(i + 1, wall, 0, 0, wallInfo?.TransparentColour ?? 0, isAlphaTested);
 
                     foreach (var overlayInfo in wallInfo?.Overlays ?? Array.Empty<Overlay>())
@@ -110,7 +112,9 @@ namespace UAlbion.Game.Entities.Map3D
                             continue;
 
                         var overlay = assets.LoadTexture(overlayInfo.SpriteId);
-                        _tilemap.DefineWall(i + 1, overlay, overlayInfo.XOffset, overlayInfo.YOffset,
+                        _tilemap.DefineWall(i + 1,
+                            overlay,
+                            overlayInfo.XOffset, overlayInfo.YOffset,
                             wallInfo?.TransparentColour ?? 0, isAlphaTested);
                     }
 
@@ -119,7 +123,19 @@ namespace UAlbion.Game.Entities.Map3D
             }
 
             if (contents)
-                totalTiles += labyrinthData.ObjectGroups.Count; // TODO: Object frames
+            {
+                var transparent = new Texture<byte>(
+                        AssetId.None,
+                        "Transparent",
+                        1, 1, 1,
+                        new byte[] { 0 })
+                    .AddRegion(Vector2.Zero, Vector2.One, 0);
+
+                for (byte i = 1; i <= labyrinthData.ObjectGroups.Count; i++)
+                    _tilemap.DefineWall(i, transparent, 0, 0, 0, true);
+
+                totalTiles += labyrinthData.ObjectGroups.Count;
+            }
 
             _wallCount = labyrinthData.Walls.Count;
             _floors = new byte[totalTiles];
@@ -243,7 +259,7 @@ namespace UAlbion.Game.Entities.Map3D
             byte ceilingIndex = _ceilings[index];
             int contents = _contents[index];
             byte wallIndex = (byte)(contents < 100 || contents - 100 >= _wallCount
-                ? 0
+                ? contents
                 : contents - 100);
 
             Tile3DFlags flags = 0;

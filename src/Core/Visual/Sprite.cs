@@ -2,7 +2,6 @@
 using System.Numerics;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Events;
-using UAlbion.Core.Textures;
 
 namespace UAlbion.Core.Visual
 {
@@ -149,7 +148,7 @@ namespace UAlbion.Core.Visual
                     return;
                 }
 
-                FrameCount = texture.SubImageCount;
+                FrameCount = texture.Regions.Count;
 
                 var frame = _frame; // Ensure frame is in bounds.
                 Frame = 0;
@@ -160,10 +159,11 @@ namespace UAlbion.Core.Visual
             }
 
             var instances = _sprite.Access();
-            var subImage = (SubImage)_sprite.Key.Texture.GetSubImage(Frame);
+            var subImage = _sprite.Key.Texture.Regions[Frame];
 
             if (_size == null)
                 Size = subImage.Size;
+
             instances[0] = SpriteInstanceData.CopyFlags(_position, Size, subImage, _flags);
         }
 

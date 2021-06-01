@@ -2,7 +2,7 @@ using System;
 using System.Numerics;
 using System.Threading;
 using UAlbion.Api;
-using UAlbion.Core.Textures;
+using UAlbion.Api.Visual;
 
 namespace UAlbion.Core
 {
@@ -32,22 +32,22 @@ namespace UAlbion.Core
                     -1, -1, 0, 1
                 };
 
-        public static ITexture BuildTransposedTexture(ICoreFactory factory, EightBitTexture texture)
+        public static Texture<T> BuildTransposedTexture<T>(IReadOnlyTexture<T> texture) where T : unmanaged
         {
-            if (factory == null) throw new ArgumentNullException(nameof(factory));
             if (texture == null) throw new ArgumentNullException(nameof(texture));
-            var rotatedPixels = new byte[texture.Width * texture.Height];
+
+            var rotatedPixels = new T[texture.Width * texture.Height];
             ApiUtil.TransposeImage(texture.Width, texture.Height,
                texture.PixelData,
-               new Span<byte>(rotatedPixels));
+               new Span<T>(rotatedPixels));
 
-            return factory.CreateEightBitTexture(
+            return new Texture<T>(
                 texture.Id,
                 texture.Name + "Rotated",
                 texture.Height, texture.Width,
-                texture.MipLevels, texture.ArrayLayers,
+                texture.ArrayLayers,
                 rotatedPixels,
-                new[] { new SubImage(
+                new[] { new Region(
                     Vector2.Zero,
                     new Vector2(texture.Height, texture.Width),
                     new Vector2(texture.Height, texture.Width),

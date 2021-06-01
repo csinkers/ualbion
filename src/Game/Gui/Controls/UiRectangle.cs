@@ -72,7 +72,7 @@ namespace UAlbion.Game.Gui.Controls
             }
 
             var instances = _sprite.Access();
-            var subImage = new SubImage(
+            var subImage = new Region(
                 Vector2.Zero,
                 Vector2.One,
                 Vector2.One,

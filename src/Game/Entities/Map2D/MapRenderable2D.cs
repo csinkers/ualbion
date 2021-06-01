@@ -2,7 +2,6 @@
 using System.Numerics;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
-using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
@@ -23,7 +22,7 @@ namespace UAlbion.Game.Entities.Map2D
         {
             if (tileset == null) throw new ArgumentNullException(nameof(tileset));
             _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
-            var subImage = (SubImage)tileset.GetSubImage(0);
+            var subImage = tileset.Regions[0];
             TileSize = subImage.Size;
 
             _underlay = AttachChild(new TileLayer(
@@ -41,7 +40,7 @@ namespace UAlbion.Game.Entities.Map2D
 
             _info = AttachChild(new InfoOverlay(logicalMap));
 
-            var tileSize = ((SubImage)tileset.GetSubImage(0)).Size;
+            var tileSize = tileset.Regions[0].Size;
             _annotations = AttachChild(new MapAnnotationLayer(logicalMap, tileSize));
 
             On<ToggleUnderlayEvent>(e => _underlay.IsActive = !_underlay.IsActive);

@@ -189,7 +189,7 @@ namespace UAlbion.Core.Veldrid
             while (!_done)
             {
                 //if (_frameCounter < 3) _renderDoc.TriggerCapture(); // Capture first few frames for transient rendering issues
-                if (!_objectsCreated)
+                if (!_objectsCreated || _newBackend != null)
                     context = BuildContext(null);
 
                 PerfTracker.BeginFrame();

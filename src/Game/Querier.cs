@@ -69,15 +69,26 @@ namespace UAlbion.Game
             });
 
             OnAsync<PromptPlayerNumericEvent, bool>((q, continuation) =>
-           {
-               var context = Resolve<IEventManager>().Context;
-               if (context?.Source == null)
-                   return false;
+            {
+                var context = Resolve<IEventManager>().Context;
+                if (context?.Source == null)
+                    return false;
 
-               return RaiseAsync(
-                  new NumericPromptEvent((TextId)Base.SystemText.MsgBox_EnterNumber, 0, 9999),
-                  x => continuation(x == q.Argument)) > 0;
-           });
+                return RaiseAsync(
+                   new NumericPromptEvent((TextId)Base.SystemText.MsgBox_EnterNumber, 0, 9999),
+                   x => continuation(x == q.Argument)) > 0;
+            });
+
+            // TODO
+            OnAsync(Do<QueryUnk1Event>(_ => false));
+            OnAsync(Do<QueryUnk4Event>(_ => false));
+            OnAsync(Do<QueryUnkCEvent>(_ => false));
+            OnAsync(Do<QueryUnk12Event>(_ => false));
+            OnAsync(Do<QueryUnk19Event>(_ => false));
+            OnAsync(Do<QueryUnk1EEvent>(_ => false));
+            OnAsync(Do<QueryUnk21Event>(_ => false));
+            OnAsync(Do<QueryUnk29Event>(_ => false));
+            OnAsync(Do<QueryUnk2AEvent>(_ => false));
         }
 /*
         bool Query(QueryEvent query, Action<bool> continuation)

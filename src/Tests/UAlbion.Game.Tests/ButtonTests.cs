@@ -52,7 +52,7 @@ namespace UAlbion.Game.Tests
                 .Attach(new SpriteManager())
                 .Attach(new WindowManager { Window = new MockWindow(1920, 1080) })
                 .Attach(new TextManager())
-                .Register<ICommonColors>(new CommonColors(factory))
+                .Register<ICommonColors>(new CommonColors())
                 .Attach(this)
                 ;
         }

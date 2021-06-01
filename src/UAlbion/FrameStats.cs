@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
-using UAlbion.Core;
-using UAlbion.Core.Textures;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Game;
 
@@ -18,15 +18,18 @@ namespace UAlbion
             {
                 var id = AssetId.From(enumValue);
                 var info = assets.GetAssetInfo(id);
-                var texture = assets.LoadTexture(id) as EightBitTexture;
+                var texture = assets.LoadTexture(id) as IReadOnlyTexture<byte>;
                 if (texture == null)
                     continue;
 
                 var palleteId = new PaletteId(AssetType.Palette, info.Get(AssetProperty.PaletteId, 0));
                 var palette = assets.LoadPalette(palleteId);
 
-                var frames = texture.SubImageCount;
-                var uniqueColours = texture.PixelData.ToHashSet();
+                var frames = texture.Regions.Count;
+                var uniqueColours = new HashSet<byte>();
+                foreach (var colour in texture.PixelData)
+                    uniqueColours.Add(colour);
+
                 var lcm = BlitUtil.CalculatePalettePeriod(uniqueColours, palette);
                 dict[id] = (int)ApiUtil.Lcm(frames, lcm);
             }

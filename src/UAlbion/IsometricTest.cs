@@ -1,4 +1,5 @@
-﻿using UAlbion.Config;
+﻿using System;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
@@ -20,18 +21,19 @@ namespace UAlbion
 {
     class IsometricTest : Component // The engine construction code here should mostly parallel that in IsometricLabyrinthLoader.cs in Game.Veldrid
     {
-        readonly GraphicsBackend _backend;
+        readonly CommandLineOptions _cmdLine;
 
         public static void Run(EventExchange exchange, CommandLineOptions cmdLine)
         {
-            var test = new IsometricTest(cmdLine.Backend);
+            var test = new IsometricTest(cmdLine);
             exchange.Attach(test);
         }
 
-        IsometricTest(GraphicsBackend backend)
+        IsometricTest(CommandLineOptions cmdLine)
         {
-            _backend = backend;
+            _cmdLine = cmdLine ?? throw new ArgumentNullException(nameof(cmdLine));
         }
+
         protected override void Subscribed()
         {
 #pragma warning disable CA2000 // Dispose objects before losing scopes
@@ -41,7 +43,7 @@ namespace UAlbion
             foreach (var shaderPath in Resolve<IModApplier>().ShaderPaths)
                 shaderCache.AddShaderPath(shaderPath);
 
-            var engine = new VeldridEngine(_backend, false, false, true)
+            var engine = new VeldridEngine(_cmdLine.Backend, _cmdLine.UseRenderDoc, _cmdLine.StartupOnly, true)
                 .AddRenderer(new ExtrudedTileMapRenderer())
                 .AddRenderer(new SpriteRenderer())
                 ;

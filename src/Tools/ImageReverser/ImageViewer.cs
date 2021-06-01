@@ -4,6 +4,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
@@ -17,8 +18,8 @@ namespace UAlbion.Tools.ImageReverser
         readonly ReverserCore _core;
         readonly Timer _timer;
         readonly DateTime _startTime;
-        AlbionSprite _logicalSprite;
-        AlbionSprite _visualSprite;
+        IReadOnlyTexture<byte> _logicalSprite;
+        IReadOnlyTexture<byte> _visualSprite;
 
         public ImageViewer(ReverserCore core)
         {
@@ -50,10 +51,10 @@ namespace UAlbion.Tools.ImageReverser
             if (_logicalSprite == null) 
                 return;
 
-            trackFrameCount.Value = _logicalSprite.Frames.Count;
-            if (asset.File.Loader == FixedSizeSpriteLoader.TypeString && _logicalSprite.Frames[0].Height != asset.Height)
+            trackFrameCount.Value = _logicalSprite.Regions.Count;
+            if (asset.File.Loader == FixedSizeSpriteLoader.TypeString && _logicalSprite.Regions[0].Height != asset.Height)
             {
-                asset.Height = _logicalSprite.Frames[0].Height;
+                asset.Height = _logicalSprite.Regions[0].Height;
             }
         }
 
@@ -61,34 +62,34 @@ namespace UAlbion.Tools.ImageReverser
         {
             if (_logicalSprite != null)
             {
-                sb.AppendLine($"Logical Frame Count: {_logicalSprite.Frames.Count}");
+                sb.AppendLine($"Logical Frame Count: {_logicalSprite.Regions.Count}");
                 sb.AppendLine($"Logical Sprite Width: {_logicalSprite.Width}");
                 sb.AppendLine($"Logical Sprite Height: {_logicalSprite.Height}");
 
-                sb.AppendLine($"Logical Frame Width: {_logicalSprite.Frames[trackFrame.Value].Width}");
-                sb.AppendLine($"Logical Frame Height: {_logicalSprite.Frames[trackFrame.Value].Height}");
-                sb.AppendLine($"Logical Frame X: {_logicalSprite.Frames[trackFrame.Value].X}");
-                sb.AppendLine($"Logical Frame Y: {_logicalSprite.Frames[trackFrame.Value].Y}");
+                sb.AppendLine($"Logical Frame Width: {_logicalSprite.Regions[trackFrame.Value].Width}");
+                sb.AppendLine($"Logical Frame Height: {_logicalSprite.Regions[trackFrame.Value].Height}");
+                sb.AppendLine($"Logical Frame X: {_logicalSprite.Regions[trackFrame.Value].X}");
+                sb.AppendLine($"Logical Frame Y: {_logicalSprite.Regions[trackFrame.Value].Y}");
             }
 
             sb.AppendLine();
 
             if (_visualSprite != null)
             {
-                sb.AppendLine($"Visual Frame Count: {_visualSprite.Frames.Count}");
+                sb.AppendLine($"Visual Frame Count: {_visualSprite.Regions.Count}");
                 sb.AppendLine($"Visual Sprite Width: {_visualSprite.Width}");
                 sb.AppendLine($"Visual Sprite Height: {_visualSprite.Height}");
 
-                sb.AppendLine($"Visual Frame Width: {_visualSprite.Frames[trackFrame.Value].Width}");
-                sb.AppendLine($"Visual Frame Height: {_visualSprite.Frames[trackFrame.Value].Height}");
-                sb.AppendLine($"Visual Frame X: {_visualSprite.Frames[trackFrame.Value].X}");
-                sb.AppendLine($"Visual Frame Y: {_visualSprite.Frames[trackFrame.Value].Y}");
+                sb.AppendLine($"Visual Frame Width: {_visualSprite.Regions[trackFrame.Value].Width}");
+                sb.AppendLine($"Visual Frame Height: {_visualSprite.Regions[trackFrame.Value].Height}");
+                sb.AppendLine($"Visual Frame X: {_visualSprite.Regions[trackFrame.Value].X}");
+                sb.AppendLine($"Visual Frame Y: {_visualSprite.Regions[trackFrame.Value].Y}");
             }
         }
 
         void OnTimerTick(object sender, EventArgs e)
         {
-            if(_visualSprite?.Frames.Count > 1)
+            if(_visualSprite?.Regions.Count > 1)
             {
                 var frame = trackFrame.Value;
                 frame++;
@@ -97,7 +98,7 @@ namespace UAlbion.Tools.ImageReverser
                 if ((filename ?? "").Contains("MONGFX")) // Skip odd frames for monster graphics
                     frame++;
 
-                frame %= _visualSprite.Frames.Count;
+                frame %= _visualSprite.Regions.Count;
                 trackFrame.Value = frame;
             }
 
@@ -130,7 +131,7 @@ namespace UAlbion.Tools.ImageReverser
 
                 trackFrameCount.Maximum = _logicalSprite.Height;
                 numFrameCount.Maximum = trackFrameCount.Maximum;
-                trackFrame.Maximum = _logicalSprite.Frames.Count - 1;
+                trackFrame.Maximum = _logicalSprite.Regions.Count - 1;
                 numFrame.Maximum = trackFrame.Maximum;
 
                 if (trackWidth.Value == 1)
@@ -159,9 +160,9 @@ namespace UAlbion.Tools.ImageReverser
             canvas.Image = bmp;
         }
 
-        Bitmap GenerateBitmap(AlbionSprite sprite, int frameNumber, int width, int magnify, uint[] palette)
+        Bitmap GenerateBitmap(IReadOnlyTexture<byte> sprite, int frameNumber, int width, int magnify, uint[] palette)
         {
-            var frame = sprite.Frames[frameNumber];
+            var frame = sprite.Regions[frameNumber];
             var offset = frame.Y * sprite.Width;
             int height = Math.Min(frame.Height, (sprite.PixelData.Length - offset + (width - 1)) / width);
             if (height == 0)
@@ -368,12 +369,12 @@ namespace UAlbion.Tools.ImageReverser
             }
         }
 
-        AlbionSprite LoadSprite(string filename, AssetInfo conf)
+        IReadOnlyTexture<byte> LoadSprite(string filename, AssetInfo conf)
         {
             using var stream = File.OpenRead(Path.Combine(_core.BaseExportDirectory, filename));
             using var br = new BinaryReader(stream);
             using var ar = new AlbionReader(br, stream.Length);
-            return (AlbionSprite)GetLoader(conf).Serdes(null, conf, AssetMapping.Global, ar);
+            return (IReadOnlyTexture<byte>)GetLoader(conf).Serdes(null, conf, AssetMapping.Global, ar);
         }
 
         static IAssetLoader GetLoader(AssetInfo conf)

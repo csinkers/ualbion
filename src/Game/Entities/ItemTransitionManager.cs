@@ -66,7 +66,7 @@ namespace UAlbion.Game.Entities
                 case AssetType.Gold:
                     {
                         var texture = assets.LoadTexture(Base.CoreSprite.UiGold);
-                        var subImageDetails = (SubImage)texture.GetSubImage(0);
+                        var subImageDetails = texture.Regions[0];
 
                         AttachChild(new LinearItemTransition(
                             Base.CoreSprite.UiGold, 0,
@@ -81,7 +81,7 @@ namespace UAlbion.Game.Entities
                 case AssetType.Rations:
                     {
                         var texture = assets.LoadTexture(Base.CoreSprite.UiFood);
-                        var subImageDetails = (SubImage)texture.GetSubImage(0);
+                        var subImageDetails = texture.Regions[0];
 
                         AttachChild(new LinearItemTransition(
                             Base.CoreSprite.UiFood, 0,
@@ -96,7 +96,7 @@ namespace UAlbion.Game.Entities
                     {
                         var item = assets.LoadItem(itemId);
                         var texture = assets.LoadTexture(item.Icon);
-                        var subImageDetails = (SubImage)texture.GetSubImage(item.IconSubId);
+                        var subImageDetails = texture.Regions[item.IconSubId];
 
                         AttachChild(new LinearItemTransition(
                             item.Icon, item.IconSubId,
@@ -123,7 +123,7 @@ namespace UAlbion.Game.Entities
                 case AssetType.Gold:
                     {
                         var texture = assets.LoadTexture(Base.CoreSprite.UiGold);
-                        var subImageDetails = (SubImage)texture.GetSubImage(0);
+                        var subImageDetails = texture.Regions[0];
 
                         AttachChild(new GravityItemTransition(
                             Base.CoreSprite.UiGold, 0,
@@ -135,7 +135,7 @@ namespace UAlbion.Game.Entities
                 case AssetType.Rations:
                     {
                         var texture = assets.LoadTexture(Base.CoreSprite.UiFood);
-                        var subImageDetails = (SubImage)texture.GetSubImage(0);
+                        var subImageDetails = texture.Regions[0];
 
                         AttachChild(new GravityItemTransition(
                             Base.CoreSprite.UiFood, 0,
@@ -148,7 +148,7 @@ namespace UAlbion.Game.Entities
                     {
                         var item = assets.LoadItem(itemId);
                         var texture = assets.LoadTexture(item.Icon);
-                        var subImageDetails = (SubImage)texture.GetSubImage(item.IconSubId);
+                        var subImageDetails = texture.Regions[item.IconSubId];
 
                         AttachChild(new GravityItemTransition(
                             item.Icon, item.IconSubId,

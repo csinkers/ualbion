@@ -3,7 +3,6 @@ using System.Numerics;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Core.Textures;
 
 namespace UAlbion.Game.Assets
 {
@@ -15,27 +14,24 @@ namespace UAlbion.Game.Assets
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (factory == null) throw new ArgumentNullException(nameof(factory));
 
-            var sprite = (IEightBitImage)asset;
+            var sprite = (IReadOnlyTexture<byte>)asset;
 
             // For non-uniforms just use the on-disk packing
-            var subImages = new SubImage[sprite.SubImageCount];
+            var subImages = new Region[sprite.Regions.Count];
             for (int i = 0; i < subImages.Length; i++)
             {
-                var x = sprite.GetSubImage(i);
-                subImages[i] = new SubImage(
+                var x = sprite.Regions[i];
+                subImages[i] = new Region(
                     new Vector2(x.X, x.Y),
                     new Vector2(x.Width, x.Height),
                     new Vector2(sprite.Width, sprite.Height),
                     0);
             }
 
-            return factory.CreateEightBitTexture(
+            return new Texture<byte>(
                 info.AssetId,
                 sprite.Id.ToString(),
-                sprite.Width,
-                sprite.Height,
-                1,
-                1,
+                sprite.Width, sprite.Height, 1,
                 sprite.PixelData,
                 subImages);
         }

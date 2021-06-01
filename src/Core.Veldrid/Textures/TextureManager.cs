@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UAlbion.Api;
+using UAlbion.Api.Visual;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
@@ -13,7 +14,7 @@ namespace UAlbion.Core.Veldrid.Textures
     public class TextureManager : ServiceComponent<ITextureManager>, ITextureManager
     {
         readonly object _syncRoot = new object();
-        readonly IDictionary<ITexture, CacheEntry> _cache = new Dictionary<ITexture, CacheEntry>();
+        readonly IDictionary<ITexture, TextureCacheEntry> _cache = new Dictionary<ITexture, TextureCacheEntry>();
         float _lastCleanup;
         float _totalTime;
 
@@ -41,28 +42,6 @@ namespace UAlbion.Core.Veldrid.Textures
             }
 
             return sb.ToString();
-        }
-
-        class CacheEntry : IDisposable
-        {
-            public CacheEntry(Texture texture, TextureView textureView)
-            {
-                Texture = texture ?? throw new ArgumentNullException(nameof(texture));
-                TextureView = textureView ?? throw new ArgumentNullException(nameof(textureView));
-                LastAccessDateTime = DateTime.Now;
-            }
-
-            public Texture Texture { get; }
-
-            public TextureView TextureView { get; }
-
-            public DateTime LastAccessDateTime { get; set; }
-
-            public void Dispose()
-            {
-                Texture?.Dispose();
-                TextureView?.Dispose();
-            }
         }
 
         void OnUpdate(EngineUpdateEvent e)
@@ -105,7 +84,6 @@ namespace UAlbion.Core.Veldrid.Textures
         {
             if (texture == null) throw new ArgumentNullException(nameof(texture));
             if (context == null) throw new ArgumentNullException(nameof(context));
-            var veldridTexture = (IVeldridTexture)texture;
             var gd = ((VeldridRendererContext)context).GraphicsDevice;
 
             lock (_syncRoot)
@@ -114,17 +92,29 @@ namespace UAlbion.Core.Veldrid.Textures
                 {
                     if (!texture.IsDirty)
                         return;
+                    texture.IsDirty = false;
                     _cache[texture].Dispose();
                 }
             }
 
-            var deviceTexture = veldridTexture.CreateDeviceTexture(gd, TextureUsage.Sampled);
-            var textureView = gd.ResourceFactory.CreateTextureView(deviceTexture);
+#pragma warning disable CA2000 // Dispose objects before losing scope
+            Texture deviceTexture = null;
+            if (texture is IReadOnlyTexture<byte> eightBit)
+                deviceTexture = VeldridTexture.CreateDeviceTexture(gd, TextureUsage.Sampled | TextureUsage.GenerateMipmaps, eightBit);
+
+            if (texture is IReadOnlyTexture<uint> trueColor)
+                deviceTexture = VeldridTexture.CreateDeviceTexture(gd, TextureUsage.Sampled | TextureUsage.GenerateMipmaps, trueColor);
+
+            if (deviceTexture == null)
+                throw new NotSupportedException($"Image format {texture.GetType().GetGenericArguments()[0].Name} not currently supported");
+#pragma warning restore CA2000 // Dispose objects before losing scope
+
+            TextureView textureView = gd.ResourceFactory.CreateTextureView(deviceTexture);
             textureView.Name = "TV_" + texture.Name;
             CoreTrace.Log.CreatedDeviceTexture(textureView.Name, texture.Width, texture.Height, texture.ArrayLayers);
             lock (_syncRoot)
             {
-                _cache[texture] = new CacheEntry(deviceTexture, textureView);
+                _cache[texture] = new TextureCacheEntry(deviceTexture, textureView);
             }
         }
 

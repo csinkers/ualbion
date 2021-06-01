@@ -19,16 +19,11 @@ namespace UAlbion.Formats.Assets.Flic
             return (ushort)(s.Offset - start);
         }
 
-        public void Apply(byte[] buffer8, int width)
+        public void Apply(Span<byte> buffer8, int width)
         {
             if (buffer8 == null) throw new ArgumentNullException(nameof(buffer8));
             int y = 0;
             int x = 0;
-            void Write(byte b)
-            {
-                buffer8[y * width + x] = b;
-                x++;
-            }
 
             foreach (var line in _lines)
             {
@@ -40,16 +35,20 @@ namespace UAlbion.Formats.Assets.Flic
                     {
                         for (int i = 0; i < token.SignedCount; i++)
                         {
-                            Write((byte)(token.PixelData[i] & 0xff));
-                            Write((byte)((token.PixelData[i] & 0xff00) >> 8));
+                            buffer8[y * width + x] = (byte)(token.PixelData[i] & 0xff);
+                            x++;
+                            buffer8[y * width + x] = (byte)((token.PixelData[i] & 0xff00) >> 8);
+                            x++;
                         }
                     }
                     else // RLE
                     {
                         for (int i = 0; i < -token.SignedCount; i++)
                         {
-                            Write((byte)(token.PixelData[0] & 0xff));
-                            Write((byte)((token.PixelData[0] & 0xff00) >> 8));
+                            buffer8[y * width + x] = (byte)(token.PixelData[0] & 0xff);
+                            x++;
+                            buffer8[y * width + x] = (byte)((token.PixelData[0] & 0xff00) >> 8);
+                            x++;
                         }
                     }
                 }

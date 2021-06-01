@@ -92,11 +92,11 @@ namespace UAlbion.Base.Tests
         public void AutomapGfxTest()
         {
             var tileset = Test(assets => assets.LoadTexture(AutomapTiles.Set1));
-            Assert.Equal(632, tileset.SubImageCount);
-            Assert.Equal(8, tileset.GetSubImage(0).Width);
-            Assert.Equal(8, tileset.GetSubImage(0).Height);
-            Assert.Equal(16, tileset.GetSubImage(576).Width);
-            Assert.Equal(16, tileset.GetSubImage(576).Height);
+            Assert.Equal(632, tileset.Regions.Count);
+            Assert.Equal(8, tileset.Regions[0].Width);
+            Assert.Equal(8, tileset.Regions[0].Height);
+            Assert.Equal(16, tileset.Regions[576].Width);
+            Assert.Equal(16, tileset.Regions[576].Height);
         }
 
         [Fact]
@@ -134,7 +134,7 @@ namespace UAlbion.Base.Tests
         public void CombatBgTest()
         {
             var bg = Test(assets => assets.LoadTexture(CombatBackground.Toronto));
-            Assert.Equal(1, bg.SubImageCount);
+            Assert.Equal(1, bg.Regions.Count);
             Assert.Equal(360, bg.Width);
             Assert.Equal(192, bg.Height);
         }
@@ -157,7 +157,7 @@ namespace UAlbion.Base.Tests
         public void CoreSpriteTest()
         {
             var cursor = Test(assets => assets.LoadTexture(CoreSprite.Cursor));
-            Assert.Equal(1, cursor.SubImageCount);
+            Assert.Equal(1, cursor.Regions.Count);
             Assert.Equal(14, cursor.Width);
             Assert.Equal(14, cursor.Height);
         }
@@ -166,7 +166,7 @@ namespace UAlbion.Base.Tests
         public void DungeonObjectTest()
         {
             var krondir = Test(assets => assets.LoadTexture(DungeonObject.Krondir));
-            Assert.Equal(3, krondir.SubImageCount);
+            Assert.Equal(3, krondir.Regions.Count);
         }
 
         [Fact]
@@ -226,14 +226,14 @@ namespace UAlbion.Base.Tests
         public void FontTest()
         {
             var font = Test(assets => assets.LoadTexture(Font.RegularFont));
-            Assert.Equal(111, font.SubImageCount);
+            Assert.Equal(111, font.Regions.Count);
         }
 
         [Fact]
         public void ItemSpriteTest()
         {
             var items = Test(assets => assets.LoadTexture(ItemGraphics.ItemSprites));
-            Assert.Equal(468, items.SubImageCount);
+            Assert.Equal(468, items.Regions.Count);
         }
 
         [Fact]
@@ -506,7 +506,7 @@ namespace UAlbion.Base.Tests
         public void MetaFontTest()
         {
             var font = Test(assets => assets.LoadFont(FontColor.White, false));
-            Assert.Equal(111, font.SubImageCount);
+            Assert.Equal(111, font.Regions.Count);
         }
 
         [Fact]
@@ -725,7 +725,7 @@ namespace UAlbion.Base.Tests
             var slab = Test(assets => assets.LoadTexture(UiBackground.Slab));
             // Postprocessor creates the sub-images.
             // One is the full background, the other is just the status bar part.
-            Assert.Equal(2, slab.SubImageCount);
+            Assert.Equal(2, slab.Regions.Count);
         }
 
         [Fact]
@@ -756,7 +756,7 @@ namespace UAlbion.Base.Tests
         public void TileGfxTest()
         {
             var tiles = Test(assets => assets.LoadTexture(TilesetGraphics.Toronto));
-            Assert.Equal(2014, tiles.SubImageCount);
+            Assert.Equal(2014, tiles.Regions.Count);
         }
 
         [Fact]

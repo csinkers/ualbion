@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using UAlbion.Core.Textures;
+using UAlbion.Api.Visual;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Gui
@@ -7,6 +7,6 @@ namespace UAlbion.Game.Gui
     public interface ICommonColors
     {
         IDictionary<CommonColor, uint> Palette { get; }
-        ITexture BorderTexture { get; }
+        IReadOnlyTexture<byte> BorderTexture { get; }
     }
 }

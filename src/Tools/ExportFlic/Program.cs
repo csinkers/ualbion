@@ -27,13 +27,14 @@ namespace UAlbion.Tools.ExportFlic
                 using var br = new BinaryReader(stream);
                 using var s = new AlbionReader(br);
                 var flic = new FlicFile(s);
+                var buffer = new byte[flic.Width * flic.Height];
 
                 AviFile.Write(
                     Path.ChangeExtension(file, "avi"),
                     flic.Speed,
                     flic.Width,
                     flic.Height,
-                    flic.Play(new byte[flic.Width * flic.Height]).AllFrames32());
+                    flic.Play(() => buffer).AllFrames32());
                 // break;
             }
         }

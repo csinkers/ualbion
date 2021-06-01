@@ -3,7 +3,6 @@ using System.Numerics;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Textures;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
@@ -198,7 +197,7 @@ namespace UAlbion.Game.Veldrid.Input
                 _itemSprite = sm.Borrow(key, 1, this);
             }
 
-            var subImage = (SubImage)texture.GetSubImage(subItem);
+            var subImage = texture.Regions[subItem];
 
             // TODO: Quantity text
             var instances = _itemSprite.Access();

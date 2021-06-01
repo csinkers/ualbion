@@ -43,7 +43,6 @@ namespace UAlbion.Game.Gui.Controls
             static AssetId Id<T>(T enumValue) where T : unmanaged, Enum => AssetId.From(enumValue);
             var window = Resolve<IWindowManager>();
             var sm = Resolve<ISpriteManager>();
-            var factory = Resolve<ICoreFactory>();
 
             { // Check if we need to rebuild
                 var normSize = window.UiToNormRelative(width, height);
@@ -55,7 +54,7 @@ namespace UAlbion.Game.Gui.Controls
             }
 
             var assets = Resolve<IAssetManager>();
-            var multi = factory.CreateMultiTexture(AssetId.None, $"DialogFrame {width}x{height}", assets.LoadPalette(Id(Base.Palette.Inventory)));
+            var multi = new MultiTexture(AssetId.None, $"DialogFrame {width}x{height}", assets.LoadPalette(Id(Base.Palette.Inventory)));
 
             void DrawLine(int y)
             {
@@ -78,7 +77,7 @@ namespace UAlbion.Game.Gui.Controls
                 int n = 0;
                 var sprite = (Base.CoreSprite)(int)Base.CoreSprite.UiBackgroundLines1; // TODO: Better solution
                 var texture = assets.LoadTexture(Id(sprite));
-                texture = CoreUtil.BuildTransposedTexture(factory, (EightBitTexture)texture);
+                texture = CoreUtil.BuildTransposedTexture((IReadOnlyTexture<byte>)texture);
                 while (y < height - TileSize)
                 {
                     int? h = y + 2*TileSize > height ? height - TileSize - y : (int?)null;
@@ -121,7 +120,7 @@ namespace UAlbion.Game.Gui.Controls
             DrawVerticalLine(4); // Top
             DrawVerticalLine(width - FrameOffsetX); // Bottom
 
-            var subImage = (SubImage)multi.GetSubImage(multi.GetSubImageAtTime(1, 0, false));
+            var subImage = multi.Regions[multi.GetSubImageAtTime(1, 0, false)];
             var normalisedSize = window.UiToNormRelative(subImage.Size);
 
             var key = new SpriteKey(multi, order, SpriteKeyFlags.NoTransform);
@@ -131,7 +130,7 @@ namespace UAlbion.Game.Gui.Controls
             var flags = SpriteFlags.None.SetOpacity(0.5f);
             var instances = lease.Access();
 
-            var shadowSubImage = new SubImage(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
+            var shadowSubImage = new Region(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
 
             var bottomShadowPosition = new Vector3(window.UiToNormRelative(
                 ShadowX, subImage.Size.Y - ShadowY), 0);

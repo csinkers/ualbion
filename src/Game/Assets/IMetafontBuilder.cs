@@ -1,4 +1,4 @@
-﻿using UAlbion.Core.Textures;
+﻿using UAlbion.Api.Visual;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Assets

@@ -1,7 +1,5 @@
-﻿using UAlbion.Api;
-using UAlbion.Api.Visual;
+﻿using UAlbion.Api.Visual;
 using UAlbion.Core;
-using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 
 namespace UAlbion.TestCommon
@@ -11,7 +9,7 @@ namespace UAlbion.TestCommon
         int _frame;
 
         public IPalette Palette { get; set; }
-        public PaletteTexture PaletteTexture { get; set; }
+        public IReadOnlyTexture<uint> PaletteTexture { get; set; }
         public int Version { get; private set; }
 
         public int Frame

@@ -66,7 +66,7 @@ namespace UAlbion.Api.Tests
             };
 
             var result = new byte[9];
-            ApiUtil.TransposeImage(3, 3, image, result);
+            ApiUtil.TransposeImage<byte>(3, 3, image, result);
             Assert.Equal(rotated, result);
 
             image = new byte[] {
@@ -83,7 +83,7 @@ namespace UAlbion.Api.Tests
             };
 
             result = new byte[12];
-            ApiUtil.TransposeImage(4, 3, image, result);
+            ApiUtil.TransposeImage<byte>(4, 3, image, result);
             Assert.Equal(rotated, result);
         }
     }

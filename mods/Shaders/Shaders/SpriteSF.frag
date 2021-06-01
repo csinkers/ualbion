@@ -81,11 +81,10 @@ void main()
 	if ((iFlags & SF_BLUE_TINT)  != 0) color = vec4(color.xy * 0.7f,       color.z * 1.5f + 0.3f,                 color.w);
 #endif
 
-	if (color.w == 0.0f)
-		discard;
+	float depth = (color.w == 0.0f) ? 1.0f : gl_FragCoord.z;
 
 	if ((iFlags & SF_DROP_SHADOW) != 0)
-		color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+		color = vec4(0.0f, 0.0f, 0.0f, (color.w == 0.0f) ? 0.0f : 1.0f);
 
 	if ((iFlags & 0xff000000) != 0) // High order byte = opacity
 	{
@@ -93,7 +92,6 @@ void main()
 		color = vec4(color.xyz, color.w * opacity);
 	}
 	
-	float depth = (color.w == 0.0f) ? 0.0f : gl_FragCoord.z;
 
 #ifdef DEBUG
 	if ((uEngineFlags & EF_RENDER_DEPTH) != 0)

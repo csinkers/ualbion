@@ -69,10 +69,9 @@ namespace UAlbion
         static void RegisterComponents(EventExchange global, IContainer services, string baseDir, CommandLineOptions commandLine)
         {
             PerfTracker.StartupEvent("Creating main components");
-            var factory = global.Resolve<ICoreFactory>();
 
             global
-                .Register<ICommonColors>(new CommonColors(factory))
+                .Register<ICommonColors>(new CommonColors())
                 ;
 
             if (!commandLine.Mute)

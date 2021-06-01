@@ -37,8 +37,14 @@ namespace UAlbion.Game.Gui.Controls
             else if (_lastPosition == position && _lastSize == size)
                 return;
 
-            var instances = _sprite.Access();
-            instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, (int)commonColors.Palette[_color], 0);
+            bool lockWasTaken = false;
+            var instances = _sprite.Lock(ref lockWasTaken);
+            try
+            {
+                instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, (int)commonColors.Palette[_color], 0);
+            }
+            finally { _sprite.Unlock(lockWasTaken); }
+
             _lastPosition = position;
             _lastSize = size;
         }

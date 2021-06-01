@@ -110,10 +110,16 @@ namespace UAlbion.Game.Veldrid.Input
                 _hotspotSprite = sm.Borrow(key, 1, this);
             }
 
-            var instances = _hotspotSprite.Access();
             var position = new Vector3(window.PixelToNorm(Position), 0.0f);
             var size = window.UiToNormRelative(Vector2.One);
-            instances[0] = SpriteInstanceData.TopLeft(position, size, _hotspotSprite, (int)commonColors.Palette[CommonColor.Yellow3], 0);
+
+            bool lockWasTaken = false;
+            var instances = _hotspotSprite.Lock(ref lockWasTaken);
+            try
+            {
+                instances[0] = SpriteInstanceData.TopLeft(position, size, _hotspotSprite, (int)commonColors.Palette[CommonColor.Yellow3], 0);
+            }
+            finally { _hotspotSprite.Unlock(lockWasTaken); }
         }
 
         void RenderCursor(IAssetManager assets, ISpriteManager sm, IWindowManager window, Vector3 position)
@@ -138,9 +144,15 @@ namespace UAlbion.Game.Veldrid.Input
                 _cursorSprite = sm.Borrow(key, 1, this);
             }
 
-            var instances = _cursorSprite.Access();
             var size = window.UiToNormRelative(new Vector2(cursorTexture.Width, cursorTexture.Height));
-            instances[0] = SpriteInstanceData.TopMid(position, size, _cursorSprite, 0, 0);
+
+            bool lockWasTaken = false;
+            var instances = _cursorSprite.Lock(ref lockWasTaken);
+            try
+            {
+                instances[0] = SpriteInstanceData.TopMid(position, size, _cursorSprite, 0, 0);
+            }
+            finally { _cursorSprite.Unlock(lockWasTaken); }
         }
 
         void RenderItemInHandCursor(IAssetManager assets, ISpriteManager sm, IWindowManager window, Vector3 normPosition)
@@ -199,12 +211,17 @@ namespace UAlbion.Game.Veldrid.Input
 
             var subImage = texture.Regions[subItem];
 
-            // TODO: Quantity text
-            var instances = _itemSprite.Access();
-            instances[0] = SpriteInstanceData.TopMid(
-                normPosition + new Vector3(window.UiToNormRelative(6, 6), 0),
-                window.UiToNormRelative(subImage.Size),
-                subImage, 0);
+            bool lockWasTaken = false;
+            var instances = _itemSprite.Lock(ref lockWasTaken);
+            try
+            {
+                // TODO: Quantity text
+                instances[0] = SpriteInstanceData.TopMid(
+                    normPosition + new Vector3(window.UiToNormRelative(6, 6), 0),
+                    window.UiToNormRelative(subImage.Size),
+                    subImage, 0);
+            }
+            finally { _itemSprite.Unlock(lockWasTaken); }
 
             if (_itemAmountSprite != null)
                 _itemAmountSprite.Position = normPosition + new Vector3(window.UiToNormRelative(6, 18), 0);

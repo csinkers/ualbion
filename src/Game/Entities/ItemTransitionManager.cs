@@ -2,7 +2,6 @@
 using System.Numerics;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Core.Textures;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events.Transitions;

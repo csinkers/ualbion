@@ -28,11 +28,15 @@ namespace UAlbion.Game.Entities
                 if (Position == value)
                     return;
 
-                var delta = value - _position;
-                var instances = _sprite.Access();
-                for (int i = 0; i < instances.Length; i++)
-                    instances[i].OffsetBy(delta);
-
+                bool lockWasTaken = false;
+                var instances = _sprite.Lock(ref lockWasTaken);
+                try
+                {
+                    var delta = value - _position;
+                    for (int i = 0; i < instances.Length; i++)
+                        instances[i].OffsetBy(delta);
+                }
+                finally { _sprite.Unlock(lockWasTaken); }
                 _position = value;
             }
         }

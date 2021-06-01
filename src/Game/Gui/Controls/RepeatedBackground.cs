@@ -51,12 +51,19 @@ namespace UAlbion.Game.Gui.Controls
 
             var lease = sm.Borrow(key, 2, this);
             var flags = SpriteFlags.None.SetOpacity(0.5f);
-            var instances = lease.Access();
 
             var shadowPosition = new Vector3(window.UiToNormRelative(10, 10), 0);
             var shadowSize = window.UiToNormRelative(subImage.Size - new Vector2(10, 10));
-            instances[0] = SpriteInstanceData.TopLeft(shadowPosition, shadowSize, shadowSubImage, flags); // Drop shadow
-            instances[1] = SpriteInstanceData.TopLeft(Vector3.Zero, normalisedSize, subImage, 0); // DialogFrame
+
+            bool lockWasTaken = false;
+            var instances = lease.Lock(ref lockWasTaken);
+            try
+            {
+                instances[0] = SpriteInstanceData.TopLeft(shadowPosition, shadowSize, shadowSubImage, flags); // Drop shadow
+                instances[1] = SpriteInstanceData.TopLeft(Vector3.Zero, normalisedSize, subImage, 0); // DialogFrame
+            }
+            finally { lease.Unlock(lockWasTaken); }
+
             _sprite = new PositionedSpriteBatch(lease, normalisedSize);
         }
 

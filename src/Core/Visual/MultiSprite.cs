@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
 
@@ -122,11 +123,18 @@ namespace UAlbion.Core.Visual
             else ApiUtil.Assert(ActiveInstances == 0);
         }
 
-        internal Span<SpriteInstanceData> GetSpan(SpriteLease lease)
+        internal Span<SpriteInstanceData> Lock(SpriteLease lease, ref bool lockWasTaken)
         {
             PerfTracker.IncrementFrameCounter("Sprite Accesses");
+            Monitor.Enter(_syncRoot, ref lockWasTaken);
             InstancesDirty = true;
             return new Span<SpriteInstanceData>(_instances, lease.From, lease.Length);
+        }
+
+        internal void Unlock(SpriteLease _, bool lockWasTaken) // Might need the lease param later if we do more fine grained locking
+        {
+            if (lockWasTaken)
+                Monitor.Exit(_syncRoot);
         }
     }
 }

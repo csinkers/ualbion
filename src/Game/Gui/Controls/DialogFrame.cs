@@ -128,8 +128,6 @@ namespace UAlbion.Game.Gui.Controls
 
             var lease = sm.Borrow(key, 3, this);
             var flags = SpriteFlags.None.SetOpacity(0.5f);
-            var instances = lease.Access();
-
             var shadowSubImage = new Region(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
 
             var bottomShadowPosition = new Vector3(window.UiToNormRelative(
@@ -141,9 +139,16 @@ namespace UAlbion.Game.Gui.Controls
             var bottomShadowSize = window.UiToNormRelative(subImage.Size.X - ShadowX, ShadowY);
             var sideShadowSize = window.UiToNormRelative(ShadowX, subImage.Size.Y - ShadowY * 2);
 
-            instances[0] = SpriteInstanceData.TopLeft(bottomShadowPosition, bottomShadowSize, shadowSubImage, flags);
-            instances[1] = SpriteInstanceData.TopLeft(sideShadowPosition, sideShadowSize, shadowSubImage, flags);
-            instances[2] = SpriteInstanceData.TopLeft(Vector3.Zero, normalisedSize, subImage, 0);
+            bool lockWasTaken = false;
+            var instances = lease.Lock(ref lockWasTaken);
+            try
+            {
+                instances[0] = SpriteInstanceData.TopLeft(bottomShadowPosition, bottomShadowSize, shadowSubImage, flags);
+                instances[1] = SpriteInstanceData.TopLeft(sideShadowPosition, sideShadowSize, shadowSubImage, flags);
+                instances[2] = SpriteInstanceData.TopLeft(Vector3.Zero, normalisedSize, subImage, 0);
+            }
+            finally { lease.Unlock(lockWasTaken); }
+
             _sprite = new PositionedSpriteBatch(lease, normalisedSize);
         }
 

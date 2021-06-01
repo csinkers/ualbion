@@ -62,49 +62,54 @@ namespace UAlbion.Game.Gui.Text
             int displayableCharacterCount = text.Count(x => mapping.ContainsKey(x));
             int instanceCount = displayableCharacterCount * (isFat ? 4 : 2);
             var lease = sm.Borrow(key, instanceCount, caller);
-            var instances = lease.Access();
 
-            int n = 0;
-            foreach (var c in text)
+            bool lockWasTaken = false;
+            var instances = lease.Lock(ref lockWasTaken);
+            try
             {
-                if (!mapping.TryGetValue(c, out var index)) { offset += SpaceSize; continue; } // Spaces etc
-
-                var subImage = font.Regions[index];
-
-                // Adjust texture coordinates slightly to avoid bleeding
-                // var texOffset = subImage.TexOffset.Y + 0.1f / font.Height;
-
-                var normPosition = window.UiToNormRelative(offset, 0);
-                var baseInstance = SpriteInstanceData.TopLeft(
-                    new Vector3(normPosition, 0),
-                    window.UiToNormRelative(subImage.Size),
-                    subImage, 0);
-
-                instances[n] = baseInstance;
-                instances[n + 1] = baseInstance;
-                if (isFat)
+                int n = 0;
+                foreach (var c in text)
                 {
-                    instances[n + 2] = baseInstance;
-                    instances[n + 3] = baseInstance;
+                    if (!mapping.TryGetValue(c, out var index)) { offset += SpaceSize; continue; } // Spaces etc
 
-                    instances[n].OffsetBy(new Vector3(window.UiToNormRelative(2, 1), 0));
-                    instances[n].Flags |= SpriteFlags.DropShadow;
+                    var subImage = font.Regions[index];
 
-                    instances[n + 1].OffsetBy(new Vector3(window.UiToNormRelative(1, 1), 0));
-                    instances[n + 1].Flags |= SpriteFlags.DropShadow;
+                    // Adjust texture coordinates slightly to avoid bleeding
+                    // var texOffset = subImage.TexOffset.Y + 0.1f / font.Height;
 
-                    instances[n + 2].OffsetBy(new Vector3(window.UiToNormRelative(1, 0), 0));
-                    offset += 1;
+                    var normPosition = window.UiToNormRelative(offset, 0);
+                    var baseInstance = SpriteInstanceData.TopLeft(
+                        new Vector3(normPosition, 0),
+                        window.UiToNormRelative(subImage.Size),
+                        subImage, 0);
+
+                    instances[n] = baseInstance;
+                    instances[n + 1] = baseInstance;
+                    if (isFat)
+                    {
+                        instances[n + 2] = baseInstance;
+                        instances[n + 3] = baseInstance;
+
+                        instances[n].OffsetBy(new Vector3(window.UiToNormRelative(2, 1), 0));
+                        instances[n].Flags |= SpriteFlags.DropShadow;
+
+                        instances[n + 1].OffsetBy(new Vector3(window.UiToNormRelative(1, 1), 0));
+                        instances[n + 1].Flags |= SpriteFlags.DropShadow;
+
+                        instances[n + 2].OffsetBy(new Vector3(window.UiToNormRelative(1, 0), 0));
+                        offset += 1;
+                    }
+                    else
+                    {
+                        instances[n].Flags |= SpriteFlags.DropShadow;
+                        instances[n].OffsetBy(new Vector3(window.UiToNormRelative(1, 1), 0));
+                    }
+
+                    offset += (int)subImage.Size.X;
+                    n += isFat ? 4 : 2;
                 }
-                else
-                {
-                    instances[n].Flags |= SpriteFlags.DropShadow;
-                    instances[n].OffsetBy(new Vector3(window.UiToNormRelative(1, 1), 0));
-                }
-
-                offset += (int)subImage.Size.X;
-                n += isFat ? 4 : 2;
             }
+            finally { lease.Unlock(lockWasTaken); }
 
             var fontSize = font.Regions[0].Size;
             var size = new Vector2(offset + 1, fontSize.Y + 1); // +1 for the drop shadow

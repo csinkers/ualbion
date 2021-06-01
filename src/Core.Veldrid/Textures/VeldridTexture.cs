@@ -34,7 +34,7 @@ namespace UAlbion.Core.Veldrid.Textures
             if (texture == null) throw new ArgumentNullException(nameof(texture));
 
             var pixelFormat = GetFormat(typeof(T));
-            bool mip = ((usage & TextureUsage.GenerateMipmaps) != 0);
+            bool mip = (usage & TextureUsage.GenerateMipmaps) != 0;
             uint mipLevels = mip ? MipLevelCount(texture.Width, texture.Height) : 1;
             using Texture staging = gd.ResourceFactory.CreateTexture(new TextureDescription(
                 (uint)texture.Width, (uint)texture.Height, 1,

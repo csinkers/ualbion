@@ -85,8 +85,13 @@ namespace UAlbion.Game.Gui.Controls
             _lastSize = size;
             _dirty = false;
 
-            var instances = _sprite.Access();
-            instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, _subId, _flags);
+            bool lockWasTaken = false;
+            var instances = _sprite.Lock(ref lockWasTaken);
+            try
+            {
+                instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, _subId, _flags);
+            }
+            finally { _sprite.Unlock(lockWasTaken); }
 
             return order;
         }

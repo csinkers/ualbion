@@ -50,8 +50,13 @@ namespace UAlbion.Game.Gui.Controls
             var position = new Vector3(window.UiToNorm(_extents.X, _extents.Y), 0);
             var size = window.UiToNormRelative(_extents.Width, _extents.Height);
 
-            var instances = _sprite.Access();
-            instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, 0, 0);
+            bool lockWasTaken = false;
+            var instances = _sprite.Lock(ref lockWasTaken);
+            try
+            {
+                instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, 0, 0);
+            }
+            finally { _sprite.Unlock(lockWasTaken); }
         }
 
         public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)

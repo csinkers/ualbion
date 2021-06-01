@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace UAlbion.Core.Visual
 {
@@ -20,18 +21,81 @@ namespace UAlbion.Core.Visual
             Disposed = true;
         }
 
-        public Span<SpriteInstanceData> Access()
+        /* ==== Example of using Access: ==== *\
+        lease.Access(static (instances, context) => 
+        {
+            // Do stuff with instances. 
+            // This lambda should be static to prevent per-call allocation of a closure,
+            // access to members can be done by passing through 'this' as the context. If
+            // multiple values are needed then allocations can still be avoided by passing
+            // through a value tuple, e.g. (this, somethingElse)
+        }, this);
+        \* ================================== */
+
+        /* ==== Example of using Lock + Unlock: ==== *\
+        bool lockWasTaken = false;
+        var instances = lease.Lock(ref lockWasTaken);
+        try
+        {
+            // Do stuff with instances
+        }
+        finally { lease.Unlock(lockWasTaken); }
+        \* ========================================= */
+
+        /// <summary>
+        /// A delegate type for sprite instance data mutation functions. Accepts a span of the
+        /// lease's instances as well as an arbitrary context object.
+        /// </summary>
+        /// <typeparam name="T">The type of the context object</typeparam>
+        /// <param name="instances">A span pointing at the lease's instance data</param>
+        /// <param name="context">The context for the mutator function</param>
+        public delegate void LeaseAccessDelegate<in T>(Span<SpriteInstanceData> instances, T context);
+
+        /// <summary>
+        /// Invokes the mutator function with a span of the lease's instance
+        /// data to allow modification. An arbitrary context object can also be
+        /// passed in to avoid allocation of a closure.
+        /// </summary>
+        /// <typeparam name="T">The type of the context object</typeparam>
+        /// <param name="mutatorFunc">The function used to modify the instance data</param>
+        /// <param name="context">The context for the mutator function</param>
+        public void Access<T>(LeaseAccessDelegate<T> mutatorFunc, T context)
+        {
+            if (mutatorFunc == null) throw new ArgumentNullException(nameof(mutatorFunc));
+            bool lockWasTaken = false;
+            var instances = Lock(ref lockWasTaken);
+            try { mutatorFunc(instances, context); }
+            finally { Unlock(lockWasTaken); }
+        }
+
+        /// <summary>
+        /// Locks the sprite lease's underlying memory to ensure that it
+        /// won't be moved until Unlock is called. It is the caller's
+        /// responsibility to always call Unlock before the Span goes out
+        /// of scope (and pass through lockWasTaken as returned by Lock).
+        /// Care should be taken that this happens even if an exception is
+        /// thrown, e.g. by using a try...finally.
+        /// </summary>
+        /// <param name="lockWasTaken"></param>
+        /// <returns>A span containing the lease's instance data</returns>
+        public Span<SpriteInstanceData> Lock(ref bool lockWasTaken)
         {
             if (Disposed)
                 throw new InvalidOperationException("SpriteLease used after return");
-            return _sprite.GetSpan(this);
+            return _sprite.Lock(this, ref lockWasTaken);
         }
 
+        /// <summary>
+        /// Releases the lock on the lease's underlying memory.
+        /// </summary>
+        /// <param name="lockWasTaken">This should be the value returned as a ref parameter from Lock. It is important for re-entrant calls.</param>
+        public void Unlock(bool lockWasTaken) => _sprite.Unlock(this, lockWasTaken);
+
         // Should only be created by MultiSprite
-        internal SpriteLease(MultiSprite sprite, int @from, int to)
+        internal SpriteLease(MultiSprite sprite, int from, int to)
         {
             _sprite = sprite;
-            From = @from;
+            From = from;
             To = to;
         }
 
@@ -45,7 +109,7 @@ namespace UAlbion.Core.Visual
         }
 
         public override bool Equals(object obj) => obj is SpriteLease lease && Key == lease.Key && From == lease.From && To == lease.To;
-        public override int GetHashCode() => HashCode.Combine(Key, From, To);
+        public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
         public static bool operator ==(SpriteLease left, SpriteLease right) => left?.Equals(right) ?? right is null;
         public static bool operator !=(SpriteLease left, SpriteLease right) => !(left == right);
         public static bool operator <(SpriteLease left, SpriteLease right) => left is null ? !(right is null) : left.CompareTo(right) < 0;

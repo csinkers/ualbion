@@ -27,7 +27,12 @@ namespace UAlbion.Core.Visual
         // Derived properties for use by C# code
         public void OffsetBy(Vector3 offset) => Transform4 += offset;
 
-        public Vector3 Position => Transform4;
+        public Vector3 Position
+        {
+            get => Transform4;
+            set => Transform4 = value;
+        }
+
         public int DebugZ => (int)((1.0f - Transform4.Z) * 4095);
 
         public Matrix4x4 Transform => new Matrix4x4(

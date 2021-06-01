@@ -99,8 +99,8 @@ namespace UAlbion.Core.Veldrid.Textures
 
 #pragma warning disable CA2000 // Dispose objects before losing scope
             Texture deviceTexture = null;
-            if (texture is IReadOnlyTexture<byte> eightBit)
-                deviceTexture = VeldridTexture.CreateDeviceTexture(gd, TextureUsage.Sampled | TextureUsage.GenerateMipmaps, eightBit);
+            if (texture is IReadOnlyTexture<byte> eightBit) // Note: No Mip-mapping, blending/interpolation in palette-based images typically results in nonsense.
+                deviceTexture = VeldridTexture.CreateDeviceTexture(gd, TextureUsage.Sampled, eightBit); 
 
             if (texture is IReadOnlyTexture<uint> trueColor)
                 deviceTexture = VeldridTexture.CreateDeviceTexture(gd, TextureUsage.Sampled | TextureUsage.GenerateMipmaps, trueColor);

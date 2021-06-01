@@ -158,13 +158,15 @@ namespace UAlbion.Core.Visual
                 _sprite = sm.Borrow(key, 1, this);
             }
 
-            var instances = _sprite.Access();
-            var subImage = _sprite.Key.Texture.Regions[Frame];
+            _sprite.Access(static (instances, x) =>
+            {
+                var subImage = x._sprite.Key.Texture.Regions[x.Frame];
 
-            if (_size == null)
-                Size = subImage.Size;
+                if (x._size == null)
+                    x.Size = subImage.Size;
 
-            instances[0] = SpriteInstanceData.CopyFlags(_position, Size, subImage, _flags);
+                instances[0] = SpriteInstanceData.CopyFlags(x._position, x.Size, subImage, x._flags);
+            }, this);
         }
 
         bool Select(WorldCoordinateSelectEvent e, Action<Selection> continuation)
@@ -178,8 +180,8 @@ namespace UAlbion.Core.Visual
 
             if ((Resolve<IEngineSettings>().Flags & EngineFlags.HighlightSelection) != 0)
             {
-                var instances = _sprite.Access();
-                instances[0].Flags |= SpriteFlags.Highlight;
+                _sprite.Access<object>(static (instances, _) =>
+                    instances[0].Flags |= SpriteFlags.Highlight, null);
             }
 
             var selected = Selected;

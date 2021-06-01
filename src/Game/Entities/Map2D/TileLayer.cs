@@ -45,7 +45,7 @@ namespace UAlbion.Game.Entities.Map2D
             IconChangeType iconChangeType)
         {
             _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
-            _logicalMap.Dirty += (sender, args) =>
+            _logicalMap.Dirty += (_, args) =>
             {
                 if (args.Type == iconChangeType)
                     _dirty.Add((args.X, args.Y));
@@ -54,7 +54,7 @@ namespace UAlbion.Game.Entities.Map2D
             _tileFunc = tileFunc;
             _drawLayer = drawLayer;
 
-            On<RenderEvent>(e => Render());
+            On<RenderEvent>(_ => Render());
         }
 
         public WeakSpriteReference GetWeakSpriteReference(int x, int y)
@@ -142,46 +142,49 @@ namespace UAlbion.Game.Entities.Map2D
             if(!_allDirty && frameCount != _lastFrameCount)
                 _dirty.UnionWith(_animatedTiles);
 
+            _lastFrameCount = frameCount;
             if (_allDirty)
             {
-                var instances = _lease.Access();
-                var animatedTiles = new List<(int, int)>();
-
-                int index = 0;
-                for (int j = 0; j < _logicalMap.Height; j++)
+                _lease.Access(static (instances, s) =>
                 {
-                    for (int i = 0; i < _logicalMap.Width; i++)
+                    var animatedTiles = new List<(int, int)>();
+
+                    int index = 0;
+                    for (int j = 0; j < s._logicalMap.Height; j++)
                     {
-                        var tile = _tileFunc(index);
-                        instances[index] = BuildInstanceData(i, j, tile, frameCount);
-                        if(tile?.FrameCount > 1)
-                            animatedTiles.Add((i, j));
+                        for (int i = 0; i < s._logicalMap.Width; i++)
+                        {
+                            var tile = s._tileFunc(index);
+                            instances[index] = s.BuildInstanceData(i, j, tile, s._lastFrameCount);
+                            if (tile?.FrameCount > 1)
+                                animatedTiles.Add((i, j));
 
-                        index++;
+                            index++;
+                        }
                     }
-                }
-
-                _animatedTiles = animatedTiles.ToArray();
-                _dirty.Clear();
-                _allDirty = false;
+                    s._animatedTiles = animatedTiles.ToArray();
+                    s._dirty.Clear();
+                    s._allDirty = false;
+                }, this);
             }
             else if (_dirty.Count > 0)
             {
-                var instances = _lease.Access();
-                foreach (var (x,y) in _dirty)
+                _lease.Access(static(instances, s) =>
                 {
-                    int index = _logicalMap.Index(x, y);
-                    var tile = _tileFunc(index);
-                    instances[index] = BuildInstanceData(
-                        x,
-                        y,
-                        tile,
-                        frameCount);
-                }
-                _dirty.Clear();
-            }
+                    foreach (var (x, y) in s._dirty)
+                    {
+                        int index = s._logicalMap.Index(x, y);
+                        var tile = s._tileFunc(index);
+                        instances[index] = s.BuildInstanceData(
+                            x,
+                            y,
+                            tile,
+                            s._lastFrameCount);
+                    }
 
-            _lastFrameCount = frameCount;
+                    s._dirty.Clear();
+                }, this);
+            }
         }
     }
 }

@@ -8,5 +8,6 @@ namespace UAlbion.Core.Visual
         IReadOnlyTexture<uint> PaletteTexture { get; }
         int Version { get; }
         int Frame { get; }
+        float PaletteBlend { get; }
     }
 }

@@ -75,7 +75,9 @@ namespace UAlbion.Core.Veldrid
 
             CommonResourceLayout = factory.CreateResourceLayout(commonLayoutDescription);
             CommonResourceLayout.Name = "RL_Common";
-            SetCurrentPalette(gd);
+
+            var paletteManager = Resolve<IPaletteManager>();
+            SetCurrentPalette(gd, paletteManager);
             UpdateResourceSet(gd);
         }
 
@@ -87,9 +89,10 @@ namespace UAlbion.Core.Veldrid
             var camera = Resolve<ICamera>();
             var clock = TryResolve<IClock>();
             var settings = TryResolve<IEngineSettings>();
+            var paletteManager = Resolve<IPaletteManager>();
             var window = Resolve<IWindowManager>();
 
-            SetCurrentPalette(gd);
+            SetCurrentPalette(gd, paletteManager);
 
             var info = new CameraInfo
             {
@@ -103,6 +106,7 @@ namespace UAlbion.Core.Veldrid
                 Special1 = settings?.Special1 ?? 0,
                 Special2 = settings?.Special2 ?? 0,
                 EngineFlags = (uint?)settings?.Flags ?? 0,
+                PaletteBlend = paletteManager.PaletteBlend
             };
 
             cl.UpdateBuffer(ProjectionMatrixBuffer, 0, camera.ProjectionMatrix);
@@ -123,9 +127,8 @@ namespace UAlbion.Core.Veldrid
             CommonResourceSet.Name = "RS_Common";
         }
 
-        void SetCurrentPalette(GraphicsDevice gd)
+        void SetCurrentPalette(GraphicsDevice gd, IPaletteManager paletteManager)
         {
-            var paletteManager = Resolve<IPaletteManager>();
             var newPalette = paletteManager.PaletteTexture;
             int newVersion = paletteManager.Version;
 

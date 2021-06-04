@@ -21,7 +21,7 @@ namespace UAlbion.Game.Veldrid.Assets
                 .AddRegion(0, 0, bitmap.Width, bitmap.Height);
 
             var imageBuffer = new ReadOnlyImageBuffer<byte>(bitmap.Width, bitmap.Height, bitmap.Width, bitmap.ImageData);
-            BlitUtil.Blit8To32(imageBuffer, texture.GetMutableLayerBuffer(0), bitmap.Palette, 255, null);
+            BlitUtil.BlitTiled8To32(imageBuffer, texture.GetMutableLayerBuffer(0), bitmap.Palette, 255, null);
             return texture;
         }
     }

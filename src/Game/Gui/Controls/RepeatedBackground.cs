@@ -37,7 +37,7 @@ namespace UAlbion.Game.Gui.Controls
             }
 
             var assets = Resolve<IAssetManager>();
-            var multi = new MultiTexture(AssetId.None, $"Background {width}x{height}", assets.LoadPalette(Base.Palette.Inventory));
+            var multi = new CompositedTexture(AssetId.None, $"Background {width}x{height}", assets.LoadPalette(Base.Palette.Inventory));
 
             // Background
             var background = assets.LoadTexture(Base.CoreSprite.UiBackground);

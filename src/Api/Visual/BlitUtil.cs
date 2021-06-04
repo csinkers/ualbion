@@ -53,7 +53,7 @@ namespace UAlbion.Api.Visual
             }
         }
 
-        public static void Blit8To32(ReadOnlyImageBuffer<byte> from, ImageBuffer<uint> to, uint[] palette, byte componentAlpha, byte? transparentColor)
+        public static void BlitTiled8To32(ReadOnlyImageBuffer<byte> from, ImageBuffer<uint> to, uint[] palette, byte componentAlpha, byte? transparentColor)
         {
             if (palette == null) throw new ArgumentNullException(nameof(palette));
             int remainingWidth = to.Width;

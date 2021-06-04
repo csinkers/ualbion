@@ -37,7 +37,15 @@ namespace UAlbion.Game.Entities.Map3D
             On<SlowClockEvent>(OnSlowClock);
             On<RenderEvent>(_ => Update(false));
             On<SortMapTilesEvent>(e => _isSorting = e.IsSorting);
-            On<LoadPaletteEvent>(e => { });
+            On<PaletteChangedEvent>(_ =>
+            {
+                var paletteManager = Resolve<IPaletteManager>();
+                if (_tilemap != null)
+                {
+                    _tilemap.DayFloors.Palette = paletteManager.Palette;
+                    _tilemap.DayWalls.Palette = paletteManager.Palette;
+                }
+            });
 
             _mapId = mapId;
             _logicalMap = logicalMap;
@@ -60,14 +68,15 @@ namespace UAlbion.Game.Entities.Map3D
 
             var assets = Resolve<IAssetManager>();
             var dayPalette = assets.LoadPalette(_logicalMap.PaletteId);
-            IPalette nightPalette = null; // TODO
+            IPalette nightPalette = null;
+            if (NightPalettes.TryGetValue(_logicalMap.PaletteId, out var nightPaletteId))
+                nightPalette = assets.LoadPalette(nightPaletteId);
 
             _tilemap = new DungeonTilemap(
                 _mapId,
                 _mapId.ToString(),
                 _logicalMap.Width * _logicalMap.Height,
                 _properties,
-                Resolve<ICoreFactory>(),
                 dayPalette,
                 nightPalette);
 

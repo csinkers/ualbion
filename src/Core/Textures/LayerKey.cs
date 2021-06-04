@@ -2,7 +2,7 @@
 
 namespace UAlbion.Core.Textures
 {
-    readonly struct LayerKey : IEquatable<LayerKey>
+    public readonly struct LayerKey : IEquatable<LayerKey>
     {
         readonly int _id;
         readonly int _frame;

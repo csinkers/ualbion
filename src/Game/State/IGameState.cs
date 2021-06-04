@@ -11,6 +11,7 @@ namespace UAlbion.Game.State
         bool Loaded { get; }
         int TickCount { get; }
         DateTime Time { get; }
+        float PaletteBlend { get; }
         IParty Party { get; }
         MapId MapId { get; }
         ICharacterSheet GetSheet(CharacterId id);

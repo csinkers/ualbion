@@ -41,12 +41,24 @@ namespace UAlbion.Formats.Parsers
             height = (int)streamLength / (width * spriteCount);
 
             byte[] pixelData = s.Bytes(null, null, (int)streamLength);
+            int expectedPixelCount = width * height * spriteCount;
+            ApiUtil.Assert(expectedPixelCount == (int)streamLength,
+                $"Extra pixels found when loading fixed size sprite {info.AssetId} " +
+                $"({streamLength} bytes for a {width}x{height}x{spriteCount} image, expected {expectedPixelCount}");
 
             var frames = new Region[spriteCount];
             for (int n = 0; n < spriteCount; n++)
                 frames[n] = new Region(0, height * n, width, height, width, totalHeight, 0);
 
-            var sprite = new Texture<byte>(info.AssetId, info.AssetId.ToString(), width, height * spriteCount, 1, pixelData, frames);
+            var sprite = new Texture<byte>(
+                info.AssetId,
+                info.AssetId.ToString(),
+                width,
+                height * spriteCount,
+                1,
+                pixelData.AsSpan(0, expectedPixelCount), // May be less than the streamlength
+                frames);
+
             return info.Get(AssetProperty.Transposed, false) ? Transpose(sprite) : sprite;
         }
 

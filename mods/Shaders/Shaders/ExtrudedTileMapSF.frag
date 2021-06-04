@@ -35,7 +35,6 @@ vec4 getWall(vec3 coords)
 
 
 void main()
-
 {
 	float floorLayer   = float(iTextures & 0x000000ff);
 	float ceilingLayer = float((iTextures & 0x0000ff00) >> 8);

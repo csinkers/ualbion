@@ -16,7 +16,7 @@ namespace UAlbion.Core.Veldrid.Textures
 
             Span<uint> toBuffer = MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan);
             var to = new ImageBuffer<uint>(from.Width, from.Height, from.Width, toBuffer);
-            BlitUtil.Blit8To32(from, to, palette, 255, 0);
+            BlitUtil.BlitTiled8To32(from, to, palette, 255, 0);
 
             return image;
         }
@@ -47,7 +47,7 @@ namespace UAlbion.Core.Veldrid.Textures
                 var (toX, toY) = layout.Positions[i];
                 var target = pixels[(toX + toY * layout.Width)..];
                 var to = new ImageBuffer<uint>(frame.Width, frame.Height, layout.Width, target);
-                BlitUtil.Blit8To32(frame, to, palette, 255, 0);
+                BlitUtil.BlitTiled8To32(frame, to, palette, 255, 0);
             }
 
             return image;

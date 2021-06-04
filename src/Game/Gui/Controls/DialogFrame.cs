@@ -54,7 +54,7 @@ namespace UAlbion.Game.Gui.Controls
             }
 
             var assets = Resolve<IAssetManager>();
-            var multi = new MultiTexture(AssetId.None, $"DialogFrame {width}x{height}", assets.LoadPalette(Id(Base.Palette.Inventory)));
+            var multi = new CompositedTexture(AssetId.None, $"DialogFrame {width}x{height}", assets.LoadPalette(Id(Base.Palette.Inventory)));
 
             void DrawLine(int y)
             {

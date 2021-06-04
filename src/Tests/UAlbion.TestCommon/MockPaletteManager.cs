@@ -21,5 +21,7 @@ namespace UAlbion.TestCommon
                 Version++;
             }
         }
+
+        public float PaletteBlend => 0;
     }
 }

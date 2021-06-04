@@ -1,27 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
 
 namespace UAlbion.Core.Textures
 {
-    public class MultiTexture : IReadOnlyTexture<uint>
+    public class CompositedTexture : IReadOnlyTexture<uint>
     {
-        const int LayerLimit = 1024;
+        const int LayerLimit = 512;
 
         readonly IList<LogicalSubImage> _logicalSubImages = new List<LogicalSubImage>();
         readonly IDictionary<LayerKey, int> _layerLookup = new Dictionary<LayerKey, int>();
-        readonly IList<Vector2> _layerSizes = new List<Vector2>();
-        readonly IPalette _palette;
+        readonly List<Vector2> _layerSizes = new List<Vector2>();
+        IPalette _palette;
         bool _isMetadataDirty = true;
         Texture<uint> _texture;
+        int _width;
+        int _height;
 
-        public MultiTexture(IAssetId id, string name, IPalette palette)
+        public CompositedTexture(IAssetId id, string name, IPalette palette)
         {
             Id = id;
             Name = name;
-            _palette = palette ?? throw new ArgumentNullException(nameof(palette));
+            Palette = palette ?? throw new ArgumentNullException(nameof(palette));
 
             // Add empty texture for disabled walls/ceilings etc
             _logicalSubImages.Add(new LogicalSubImage(0) { W = 1, H = 1, Frames = 1 });
@@ -30,13 +33,25 @@ namespace UAlbion.Core.Textures
         Texture<uint> Texture { get { Rebuild(); return _texture; } }
         public IAssetId Id { get; }
         public string Name { get; }
-        public int Width { get; private set; }
-        public int Height { get; private set; }
+        public int Width { get { Rebuild(); return _width; } private set => _width = value; } 
+        public int Height { get { Rebuild(); return _height; } private set => _height = value; }
         public int ArrayLayers => Texture.ArrayLayers;
         public int SizeInBytes => Texture.SizeInBytes;
         public bool IsDirty { get => Texture.IsDirty; set => _texture.IsDirty = value; } 
         public IReadOnlyList<Region> Regions => Texture.Regions;
         public ReadOnlySpan<uint> PixelData => Texture.PixelData;
+
+        public IPalette Palette
+        {
+            get => _palette;
+            set
+            {
+                if (_palette == value) return;
+                _palette = value;
+                _isMetadataDirty = true;
+            }
+        }
+
         public ReadOnlyImageBuffer<uint> GetRegionBuffer(int i) => Texture.GetRegionBuffer(i);
         public ReadOnlyImageBuffer<uint> GetLayerBuffer(int i) => Texture.GetLayerBuffer(i);
 
@@ -102,77 +117,41 @@ namespace UAlbion.Core.Textures
             _isMetadataDirty = true;
         }
 
-        /* TODO: Add mip-mapping
-        static int GetDimension(int largestLevelDimension, int mipLevel)
+        public void RebuildAll() // Just for unit tests
         {
-            int ret = largestLevelDimension;
-            for (int i = 0; i < mipLevel; i++)
-                ret /= 2;
-
-            return Math.Max(1, ret);
+            _isMetadataDirty = true;
+            Rebuild();
         }
-        */
 
-        void Rebuild(LogicalSubImage lsi, int frameNumber, Span<uint> toBuffer, IList<uint[]> palette)
+        void Rebuild()
         {
-            if (lsi == null) throw new ArgumentNullException(nameof(lsi));
-            if (palette == null) throw new ArgumentNullException(nameof(palette));
+            using var _ = PerfTracker.FrameEvent("6.1.2.1 Rebuild MultiTextures");
+            if (!_isMetadataDirty)
+                return;
 
-            foreach (var component in lsi.Components)
+            RebuildLayout();
+
+            if (_texture == null || _texture.Width != Width || _texture.Height != Height || _texture.ArrayLayers != _layerSizes.Count)
+                _texture = new Texture<uint>(Id, Name, Width, Height, _layerSizes.Count);
+
+            foreach (var lsi in _logicalSubImages)
             {
-                if (component.Texture == null)
-                    continue;
-
-                int frame = frameNumber % component.Texture.Regions.Count;
-                if (component.Texture is IReadOnlyTexture<byte> eightBitTexture)
+                for (int i = 0; i < lsi.Frames; i++)
                 {
-                    int palFrame = frameNumber % palette.Count;
-
-                    var from = eightBitTexture.GetRegionBuffer(frame);
-                    int destWidth = component.W ?? from.Width;
-                    int destHeight = component.H ?? from.Height;
-
-                    if (component.X + destWidth > Width || component.Y + destHeight > Height)
+                    if (_layerLookup.TryGetValue(new LayerKey(lsi.Id, i), out var destinationLayer))
                     {
-                        CoreTrace.Log.Warning(
-                            "MultiTexture",
-                            $"Tried to write an oversize component to {Name}: {component.Texture.Name}:{frame} is ({destWidth}x{destHeight}) @ ({component.X}, {component.Y}) but multitexture is only ({Width}x{Height})");
-                        continue;
+                        Span<uint> toBuffer = _texture.GetMutableLayerBuffer(destinationLayer).Buffer;
+                        toBuffer.Fill(lsi.IsAlphaTested ? 0 : 0xff000000);
+                        RebuildLayer(lsi, i, toBuffer, Palette.GetCompletePalette());
                     }
-
-                    Span<uint> toSlice = toBuffer.Slice(
-                        component.Y * Width + component.X,
-                        destWidth + (destHeight - 1) * Width);
-
-                    var to = new ImageBuffer<uint>(destWidth, destHeight, Width, toSlice);
-                    BlitUtil.Blit8To32(from, to, palette[palFrame], component.Alpha, lsi.TransparentColor);
-                }
-
-                if (component.Texture is IReadOnlyTexture<uint> trueColorTexture)
-                {
-                    var from = trueColorTexture.GetRegionBuffer(frame);
-                    int destWidth = component.W ?? from.Width;
-                    int destHeight = component.H ?? from.Height;
-
-                    if (component.X + destWidth > Width || component.Y + destHeight > Height)
-                    {
-                        CoreTrace.Log.Warning(
-                            "MultiTexture",
-                            $"Tried to write an oversize component to {Name}: {component.Texture.Name}:{frame} is ({destWidth}x{destHeight}) @ ({component.X}, {component.Y}) but multitexture is only ({Width}x{Height})");
-                        continue;
-                    }
-
-                    Span<uint> toSlice = toBuffer.Slice(
-                        component.Y * Width + component.X,
-                        destWidth + (destHeight - 1) * Width);
-
-                    var to = new ImageBuffer<uint>(destWidth, destHeight, Width, toSlice);
-                    BlitUtil.BlitTiled32(from, to);
                 }
             }
+
+            for (int i = 0; i < _layerSizes.Count; i++)
+                _texture.AddRegion(Vector2.Zero, _layerSizes[i], i);
         }
 
-        void RebuildLayers()
+        void RebuildLayout()
         {
             _isMetadataDirty = false;
             _layerLookup.Clear();
@@ -205,7 +184,7 @@ namespace UAlbion.Core.Textures
                         foreach (var pixel in eightBit.PixelData)
                             colours.Add(pixel);
 
-                        long paletteFrames = BlitUtil.CalculatePalettePeriod(colours, _palette);
+                        long paletteFrames = BlitUtil.CalculatePalettePeriod(colours, Palette);
                         frames = ApiUtil.Lcm(frames, paletteFrames);
                     }
                 }
@@ -224,39 +203,72 @@ namespace UAlbion.Core.Textures
             }
 
             if (_layerSizes.Count > LayerLimit)
-                ApiUtil.Assert($"Too many textures added to multi-texture: {_layerSizes.Count}");
-        }
-
-        public void RebuildAll()
-        {
-            _isMetadataDirty = true;
-            Rebuild();
-        }
-
-        void Rebuild()
-        {
-            using var _ = PerfTracker.FrameEvent("6.1.2.1 Rebuild MultiTextures");
-            if (!_isMetadataDirty)
-                return;
-
-            RebuildLayers();
-
-            if (_texture == null || _texture.Width != Width || _texture.Height != Height || _texture.ArrayLayers != _layerSizes.Count)
-                _texture = new Texture<uint>(Id, Name, Width, Height, _layerSizes.Count);
-
-            foreach (var lsi in _logicalSubImages)
             {
-                for (int i = 0; i < lsi.Frames; i++)
+                ApiUtil.Assert($"Too many textures added to multi-texture: {_layerSizes.Count}");
+                _layerSizes.RemoveRange(LayerLimit, _layerSizes.Count-LayerLimit);
+                foreach (var key in _layerLookup.Keys.ToArray())
+                    if (_layerLookup[key] >= LayerLimit)
+                        _layerLookup.Remove(key);
+            }
+        }
+
+        void RebuildLayer(LogicalSubImage lsi, int frameNumber, Span<uint> toBuffer, IList<uint[]> palette)
+        {
+            if (lsi == null) throw new ArgumentNullException(nameof(lsi));
+            if (palette == null) throw new ArgumentNullException(nameof(palette));
+
+            foreach (var component in lsi.Components)
+            {
+                if (component.Texture == null)
+                    continue;
+
+                int frame = frameNumber % component.Texture.Regions.Count;
+                if (component.Texture is IReadOnlyTexture<byte> eightBitTexture)
                 {
-                    int destinationLayer = _layerLookup[new LayerKey(lsi.Id, i)];
-                    Span<uint> toBuffer = _texture.GetMutableLayerBuffer(destinationLayer).Buffer;
-                    toBuffer.Fill(lsi.IsAlphaTested ? 0 : 0xff000000);
-                    Rebuild(lsi, i, toBuffer, _palette.GetCompletePalette());
+                    int palFrame = frameNumber % palette.Count;
+
+                    var from = eightBitTexture.GetRegionBuffer(frame);
+                    int destWidth = component.W ?? from.Width;
+                    int destHeight = component.H ?? from.Height;
+
+                    if (component.X + destWidth > Width || component.Y + destHeight > Height)
+                    {
+                        CoreTrace.Log.Warning(
+                            "MultiTexture",
+                            $"Tried to write an oversize component to {Name}: {component.Texture.Name}:{frame} is ({destWidth}x{destHeight}) @ ({component.X}, {component.Y}) but multitexture is only ({Width}x{Height})");
+                        continue;
+                    }
+
+                    Span<uint> toSlice = toBuffer.Slice(
+                        component.Y * Width + component.X,
+                        destWidth + (destHeight - 1) * Width);
+
+                    var to = new ImageBuffer<uint>(destWidth, destHeight, Width, toSlice);
+                    BlitUtil.BlitTiled8To32(from, to, palette[palFrame], component.Alpha, lsi.TransparentColor);
+                }
+
+                if (component.Texture is IReadOnlyTexture<uint> trueColorTexture)
+                {
+                    var from = trueColorTexture.GetRegionBuffer(frame);
+                    int destWidth = component.W ?? from.Width;
+                    int destHeight = component.H ?? from.Height;
+
+                    if (component.X + destWidth > Width || component.Y + destHeight > Height)
+                    {
+                        CoreTrace.Log.Warning(
+                            "MultiTexture",
+                            $"Tried to write an oversize component to {Name}: {component.Texture.Name}:{frame} is ({destWidth}x{destHeight}) @ ({component.X}, {component.Y}) but multitexture is only ({Width}x{Height})");
+                        continue;
+                    }
+
+                    Span<uint> toSlice = toBuffer.Slice(
+                        component.Y * Width + component.X,
+                        destWidth + (destHeight - 1) * Width);
+
+                    var to = new ImageBuffer<uint>(destWidth, destHeight, Width, toSlice);
+                    BlitUtil.BlitTiled32(from, to);
                 }
             }
-
-            for (int i = 0; i < _layerSizes.Count; i++)
-                _texture.AddRegion(Vector2.Zero, _layerSizes[i], i);
         }
     }
 }

@@ -5,34 +5,25 @@ using UAlbion.Core.Textures;
 
 namespace UAlbion.Core.Visual
 {
-    [Flags]
-    public enum Tile3DFlags
-    {
-        FloorBackAndForth = 1,
-        CeilingBackAndForth = 1 << 1,
-        WallBackAndForth = 1 << 2,
-    }
-
     public class DungeonTilemap : IRenderable
     {
         DungeonTile[] _tiles;
         DungeonTileMapProperties _properties;
 
-        public DungeonTilemap(IAssetId id, string name, int tileCount, DungeonTileMapProperties properties, ICoreFactory factory, IPalette dayPalette, IPalette nightPalette)
+        public DungeonTilemap(IAssetId id, string name, int tileCount, DungeonTileMapProperties properties, IPalette dayPalette, IPalette nightPalette)
         {
-            if (factory == null) throw new ArgumentNullException(nameof(factory));
             if (dayPalette == null) throw new ArgumentNullException(nameof(dayPalette));
 
             Properties = properties;
             _tiles = new DungeonTile[tileCount];
 
             Name = name;
-            DayFloors = new MultiTexture(id, "FloorTiles:" + name, dayPalette);
-            DayWalls = new MultiTexture(id, "WallTiles:" + name, dayPalette);
+            DayFloors = new CompositedTexture(id, "FloorTiles:" + name, dayPalette);
+            DayWalls = new CompositedTexture(id, "WallTiles:" + name, dayPalette);
             if (nightPalette != null)
             {
-                NightFloors = new MultiTexture(id, "FloorTiles:" + name, nightPalette);
-                NightWalls = new MultiTexture(id, "WallTiles:" + name, nightPalette);
+                NightFloors = new CompositedTexture(id, "FloorTiles:" + name, nightPalette);
+                NightWalls = new CompositedTexture(id, "WallTiles:" + name, nightPalette);
             }
         }
 
@@ -47,10 +38,10 @@ namespace UAlbion.Core.Visual
         }
 
         public ISet<int> AnimatedTiles { get; } = new HashSet<int>();
-        public MultiTexture DayFloors { get; }
-        public MultiTexture DayWalls { get; }
-        public MultiTexture NightFloors { get; }
-        public MultiTexture NightWalls { get; }
+        public CompositedTexture DayFloors { get; }
+        public CompositedTexture DayWalls { get; }
+        public CompositedTexture NightFloors { get; }
+        public CompositedTexture NightWalls { get; }
         public bool TilesDirty { get; set; } = true;
         public bool PropertiesDirty { get; set; } = true;
 

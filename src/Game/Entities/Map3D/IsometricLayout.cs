@@ -55,7 +55,6 @@ namespace UAlbion.Game.Entities.Map3D
             if (assets == null) throw new ArgumentNullException(nameof(assets));
 
             var engine = Resolve<IEngine>();
-            var coreFactory = Resolve<ICoreFactory>();
 
             RemoveAllChildren();
             if (_tilemap != null)
@@ -76,7 +75,7 @@ namespace UAlbion.Game.Entities.Map3D
             }
             else Raise(new LoadPaletteEvent(paletteId));
 
-            _tilemap = new DungeonTilemap(labyrinthData.Id, labyrinthData.Id.ToString(), 0, properties, coreFactory, palette, null)
+            _tilemap = new DungeonTilemap(labyrinthData.Id, labyrinthData.Id.ToString(), 0, properties, palette, null)
             {
                 PipelineId = (int)DungeonTilemapPipeline.NoCulling
             };

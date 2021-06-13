@@ -414,7 +414,7 @@ namespace UAlbion.Base.Tests
                 {
                     var albionSprite = Loaders.AmorphousSpriteLoader.Serdes(x, info, AssetMapping.Global, s);
                     var pp = new AlbionSpritePostProcessor();
-                    return (IReadOnlyTexture<byte>)pp.Process(albionSprite, info, factory);
+                    return (IReadOnlyTexture<byte>)pp.Process(albionSprite, info);
                 });
 
             Assert.Equal(2, sprite.Width);

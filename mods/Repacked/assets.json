@@ -110,7 +110,7 @@
     "gfx": "UAlbion.Game.Assets.AlbionSpritePostProcessor, UAlbion.Game",
     "tile": "UAlbion.Game.Assets.TilePostProcessor, UAlbion.Game",
     "inv": "UAlbion.Game.Assets.InventoryPostProcessor, UAlbion.Game",
-    "ilbm": "UAlbion.Game.Veldrid.Assets.InterlacedBitmapPostProcessor, UAlbion.Game.Veldrid"
+    "ilbm": "UAlbion.Game.Assets.InterlacedBitmapPostProcessor, UAlbion.Game"
   },
 
   "Languages": { // Just used for the options screen

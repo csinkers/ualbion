@@ -233,7 +233,7 @@ namespace UAlbion.Game.Assets
                             var registry = Resolve<IAssetPostProcessorRegistry>();
                             var postProcessor = registry.GetPostProcessor(info.File.Post);
                             if (postProcessor != null)
-                                modAsset = postProcessor.Process(modAsset, info, Resolve<ICoreFactory>());
+                                modAsset = postProcessor.Process(modAsset, info);
                         }
 
                         asset = modAsset;

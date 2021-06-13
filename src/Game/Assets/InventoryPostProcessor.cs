@@ -26,7 +26,7 @@ namespace UAlbion.Game.Assets
                     slot.Item = assets.LoadItem(proxy.Id) ?? throw new InvalidOperationException($"Could not resolve item proxy for {slot.ItemId}");
         }
 
-        public object Process(object asset, AssetInfo info, ICoreFactory factory)
+        public object Process(object asset, AssetInfo info)
         {
             var assets = Resolve<IAssetManager>();
             switch (asset)

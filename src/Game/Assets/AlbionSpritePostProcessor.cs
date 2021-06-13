@@ -8,11 +8,10 @@ namespace UAlbion.Game.Assets
 {
     public class AlbionSpritePostProcessor : IAssetPostProcessor
     {
-        public object Process(object asset, AssetInfo info, ICoreFactory factory)
+        public object Process(object asset, AssetInfo info)
         {
             if (asset == null) throw new ArgumentNullException(nameof(asset));
             if (info == null) throw new ArgumentNullException(nameof(info));
-            if (factory == null) throw new ArgumentNullException(nameof(factory));
 
             var sprite = (IReadOnlyTexture<byte>)asset;
 

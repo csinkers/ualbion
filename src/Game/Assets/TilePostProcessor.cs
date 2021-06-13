@@ -13,11 +13,10 @@ namespace UAlbion.Game.Assets
     public class TilePostProcessor : IAssetPostProcessor
     {
         const int MarginPixels = 1;
-        public object Process(object asset, AssetInfo info, ICoreFactory factory)
+        public object Process(object asset, AssetInfo info)
         {
             if (asset == null) throw new ArgumentNullException(nameof(asset));
             if (info == null) throw new ArgumentNullException(nameof(info));
-            if (factory == null) throw new ArgumentNullException(nameof(factory));
 
             var sprite = (IReadOnlyTexture<byte>)asset;
             var layout = SpriteSheetUtil.ArrangeSpriteSheet(sprite.Regions.Count, 1, sprite.GetRegionBuffer);

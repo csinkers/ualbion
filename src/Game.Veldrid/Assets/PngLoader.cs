@@ -12,7 +12,6 @@ using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid.Textures;
-using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Parsers;

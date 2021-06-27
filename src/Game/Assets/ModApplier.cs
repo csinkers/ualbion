@@ -18,11 +18,11 @@ namespace UAlbion.Game.Assets
 {
     public class ModApplier : Component, IModApplier
     {
-        readonly Dictionary<string, ModInfo> _mods = new Dictionary<string, ModInfo>();
-        readonly List<ModInfo> _modsInReverseDependencyOrder = new List<ModInfo>();
-        readonly AssetCache _assetCache = new AssetCache();
-        readonly Dictionary<string, LanguageConfig> _languages = new Dictionary<string, LanguageConfig>();
-        readonly Dictionary<string, string> _extraPaths = new Dictionary<string, string>(); // Just used for $(MOD)
+        readonly Dictionary<string, ModInfo> _mods = new();
+        readonly List<ModInfo> _modsInReverseDependencyOrder = new();
+        readonly AssetCache _assetCache = new();
+        readonly Dictionary<string, LanguageConfig> _languages = new();
+        readonly Dictionary<string, string> _extraPaths = new(); // Just used for $(MOD)
 
         IAssetLocator _assetLocator;
 

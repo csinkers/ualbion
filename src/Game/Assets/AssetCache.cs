@@ -10,7 +10,7 @@ namespace UAlbion.Game.Assets
 {
     public class AssetCache : Component
     {
-        readonly object _syncRoot = new object();
+        readonly object _syncRoot = new();
         IDictionary<AssetId, object> _assetCache = new Dictionary<AssetId, object>();
         IDictionary<AssetId, object> _oldAssetCache = new Dictionary<AssetId, object>();
 

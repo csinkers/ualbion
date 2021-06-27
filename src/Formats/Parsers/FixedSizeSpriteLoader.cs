@@ -50,12 +50,11 @@ namespace UAlbion.Formats.Parsers
             for (int n = 0; n < spriteCount; n++)
                 frames[n] = new Region(0, height * n, width, height, width, totalHeight, 0);
 
-            var sprite = new Texture<byte>(
+            var sprite = new SimpleTexture<byte>(
                 info.AssetId,
                 info.AssetId.ToString(),
                 width,
                 height * spriteCount,
-                1,
                 pixelData.AsSpan(0, expectedPixelCount), // May be less than the streamlength
                 frames);
 
@@ -119,7 +118,7 @@ namespace UAlbion.Formats.Parsers
                     sprite.PixelData.Slice(oldFrame.PixelOffset, oldFrame.PixelLength),
                     pixelData.AsSpan(frames[i].PixelOffset, frames[i].PixelLength));
             }
-            return new Texture<byte>(sprite.Id, sprite.Name, height, width * spriteCount, 1, pixelData, frames);
+            return new SimpleTexture<byte>(sprite.Id, sprite.Name, height, width * spriteCount, pixelData, frames);
         }
     }
 }

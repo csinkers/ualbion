@@ -49,8 +49,7 @@ namespace UAlbion.Base.Tests
                 ActiveMods = { mod },
                 Language = Language.English
             };
-            var factory = new MockFactory();
-            var exchange = AssetSystem.Setup(_disk, factory, generalConfig, settings, coreConfig, gameConfig);
+            var exchange = AssetSystem.Setup(_disk, generalConfig, settings, coreConfig, gameConfig);
             return exchange.Resolve<IModApplier>();
         }
 
@@ -71,7 +70,6 @@ namespace UAlbion.Base.Tests
 
             ConvertAssets.Convert(
                 _disk,
-                new MockFactory(),
                 BaseAssetMod,
                 UnpackedAssetMod,
                 idStrings,
@@ -89,7 +87,6 @@ namespace UAlbion.Base.Tests
 
             ConvertAssets.Convert(
                 _disk,
-                new MockFactory(),
                 UnpackedAssetMod,
                 RepackedAssetMod,
                 idStrings,

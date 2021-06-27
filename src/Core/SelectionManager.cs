@@ -8,7 +8,7 @@ namespace UAlbion.Core
 {
     public class SelectionManager : ServiceComponent<ISelectionManager>, ISelectionManager
     {
-        HashSet<object> _lastSelection = new HashSet<object>();
+        HashSet<object> _lastSelection = new();
 
         public IList<Selection> CastRayFromScreenSpace(Vector2 pixelPosition, bool performFocusAlerts)
         {

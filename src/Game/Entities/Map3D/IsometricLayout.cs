@@ -13,31 +13,39 @@ namespace UAlbion.Game.Entities.Map3D
 {
     public class IsometricLayout : Component
     {
-        DungeonTilemap _tilemap;
+        IDungeonTilemap _tilemap;
         byte[] _contents;
         byte[] _floors;
         byte[] _ceilings;
         int _wallCount;
 
-        public DungeonTileMapProperties Properties
-        {
-            get => _tilemap.Properties;
-            set => _tilemap.Properties = value;
-        }
-
-        public int TileCount => _tilemap?.Tiles.Length ?? 0;
+        public int TileCount => _tilemap?.TileCount ?? 0;
         public List<int>[] FloorFrames { get; private set; }
         public List<int>[] CeilingFrames { get; private set; }
         public List<int>[] WallFrames { get; private set; }
         public List<int>[] ContentsFrames { get; private set; }
 
-        protected override void Subscribed()
+        public TilemapRequest Properties
         {
-            if (_tilemap != null)
-                Resolve<IEngine>()?.RegisterRenderable(_tilemap);
+            set
+            {
+                if (value == null)
+                    return;
+
+                _tilemap.Width = value.Width;
+                _tilemap.TileCount = value.TileCount;
+                _tilemap.Scale = value.Scale;
+                _tilemap.Rotation = value.Rotation;
+                _tilemap.Origin = value.Origin;
+                _tilemap.VerticalSpacing = value.VerticalSpacing;
+                _tilemap.HorizontalSpacing = value.HorizontalSpacing;
+                _tilemap.FogColor = value.FogColor;
+                _tilemap.AmbientLightLevel = value.AmbientLightLevel;
+                _tilemap.ObjectYScaling = value.ObjectYScaling;
+            }
         }
 
-        public void Load(LabyrinthId labyrinthId, IsometricMode mode, DungeonTileMapProperties properties, int? paletteId)
+        public void Load(LabyrinthId labyrinthId, IsometricMode mode, TilemapRequest request, int? paletteId)
         {
             var assets = Resolve<IAssetManager>();
             var labyrinthData = assets.LoadLabyrinthData(labyrinthId);
@@ -45,20 +53,17 @@ namespace UAlbion.Game.Entities.Map3D
             if (labyrinthData == null || info == null)
                 return;
 
-            Load(labyrinthData, info, mode, properties, paletteId, assets);
+            Load(labyrinthData, info, mode, request, paletteId, assets);
         }
 
-        public void Load(LabyrinthData labyrinthData, AssetInfo info, IsometricMode mode, DungeonTileMapProperties properties, int? paletteNumber, IAssetManager assets)
+        public void Load(LabyrinthData labyrinthData, AssetInfo info, IsometricMode mode, TilemapRequest request, int? paletteNumber, IAssetManager assets)
         {
             if (labyrinthData == null) throw new ArgumentNullException(nameof(labyrinthData));
             if (info == null) throw new ArgumentNullException(nameof(info));
+            if (request == null) throw new ArgumentNullException(nameof(request));
             if (assets == null) throw new ArgumentNullException(nameof(assets));
 
-            var engine = Resolve<IEngine>();
-
             RemoveAllChildren();
-            if (_tilemap != null)
-                engine.UnregisterRenderable(_tilemap);
 
             bool floors = mode == IsometricMode.Floors || mode == IsometricMode.All;
             bool ceilings = mode == IsometricMode.Ceilings || mode == IsometricMode.All;
@@ -75,10 +80,9 @@ namespace UAlbion.Game.Entities.Map3D
             }
             else Raise(new LoadPaletteEvent(paletteId));
 
-            _tilemap = new DungeonTilemap(labyrinthData.Id, labyrinthData.Id.ToString(), 0, properties, palette, null)
-            {
-                PipelineId = (int)DungeonTilemapPipeline.NoCulling
-            };
+            var etmManager = Resolve<IEtmManager>();
+            request.Pipeline = DungeonTilemapPipeline.NoCulling;
+            _tilemap = etmManager.CreateTilemap(request /*labyrinthData.Id, 0, request, palette, null, DungeonTilemapPipeline.NoCulling */);
 
             // Layout:
             // [Empty] [First frame of all floors] [First frame of all ceilings] [First frame of all walls] [Additional floor frames] [Additional ceiling frames] [Additional wall frames]
@@ -123,11 +127,7 @@ namespace UAlbion.Game.Entities.Map3D
 
             if (contents)
             {
-                var transparent = new Texture<byte>(
-                        AssetId.None,
-                        "Transparent",
-                        1, 1, 1,
-                        new byte[] { 0 })
+                var transparent = new SimpleTexture<byte>(AssetId.None, "Transparent", 1, 1, new byte[] { 0 })
                     .AddRegion(Vector2.Zero, Vector2.One, 0);
 
                 for (byte i = 1; i <= labyrinthData.ObjectGroups.Count; i++)
@@ -236,20 +236,12 @@ namespace UAlbion.Game.Entities.Map3D
                 }
             }
 
-            _tilemap.Resize(totalTiles);
+            _tilemap.TileCount = totalTiles;
             for (int i = 0; i < totalTiles; i++)
                 SetTile(i, i, frames[i]);
 
             for (int i = 0; i < totalTiles; i++)
-                AddSprites(labyrinthData, i,  properties);
-
-            engine.RegisterRenderable(_tilemap);
-        }
-
-        protected override void Unsubscribed()
-        {
-            if (_tilemap != null)
-                Resolve<IEngine>().UnregisterRenderable(_tilemap);
+                AddSprites(labyrinthData, i,  request);
         }
 
         void SetTile(int index, int order, int frameCount)
@@ -262,22 +254,22 @@ namespace UAlbion.Game.Entities.Map3D
                 : contents - 100);
 
             Tile3DFlags flags = 0;
-            _tilemap.Set(order, floorIndex, ceilingIndex, wallIndex, frameCount, flags);
+            _tilemap.SetTile(order, floorIndex, ceilingIndex, wallIndex, frameCount, flags);
         }
 
-        void AddSprites(LabyrinthData labyrinthData, int index, in DungeonTileMapProperties properties)
+        void AddSprites(LabyrinthData labyrinthData, int index, TilemapRequest request)
         {
             int contents = _contents[index];
             if (contents == 0 || contents >= labyrinthData.ObjectGroups.Count)
                 return;
 
-            var x = (int)(index % Properties.Width);
-            var y = (int)(index / Properties.Width);
+            var x = (int)(index % request.Width);
+            var y = (int)(index / request.Width);
 
             var objectInfo = labyrinthData.ObjectGroups[contents - 1];
             foreach (var subObject in objectInfo.SubObjects)
             {
-                var mapObject = AttachChild(MapObject.Build(x, y, labyrinthData, subObject, properties));
+                var mapObject = AttachChild(MapObject.Build(x, y, labyrinthData, subObject, request));
                 if (mapObject != null)
                     Info($"at ({x},{y}): ({subObject.X}, {subObject.Y}, {subObject.Z}) resolves to {mapObject.Position} ({mapObject.SpriteId})");
             }

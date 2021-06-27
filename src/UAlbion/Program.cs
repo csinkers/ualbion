@@ -6,13 +6,11 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
-using UAlbion.Core.Veldrid.Visual;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid.Assets;
-using UAlbion.Game.Veldrid.Visual;
 
 // args for testing isometric map export: -b Base Unpacked -t "Labyrinth Map" -id "Labyrinth.Jirinaar Map.Jirinaar"
 // args for full asset export: -b Base Unpacked
@@ -43,7 +41,6 @@ namespace UAlbion
 
             PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
             var disk = new FileSystem();
-            var factory = new VeldridCoreFactory();
 
             var baseDir = ConfigUtil.FindBasePath(disk);
             if (baseDir == null)
@@ -55,7 +52,6 @@ namespace UAlbion
             {
                 ConvertAssets.Convert(
                     disk,
-                    factory,
                     commandLine.ConvertFrom,
                     commandLine.ConvertTo,
                     commandLine.DumpIds,
@@ -64,9 +60,11 @@ namespace UAlbion
                 return;
             }
 
-            var setupAssetSystem = Task.Run(() => AssetSystem.SetupAsync(baseDir, disk, factory));
-            using var engine = commandLine.NeedsEngine ? BuildEngine(commandLine) : null;
+            var setupAssetSystem = Task.Run(() => AssetSystem.SetupAsync(baseDir, disk));
             var (exchange, services) = setupAssetSystem.Result;
+
+            if (commandLine.NeedsEngine)
+                BuildEngine(commandLine, exchange);
             services.Add(new StdioConsoleReader());
 
             var assets = exchange.Resolve<IAssetManager>();
@@ -74,7 +72,7 @@ namespace UAlbion
 
             switch (commandLine.Mode) // ConvertAssets handled above as it requires a specialised asset system setup
             {
-                case ExecutionMode.Game: Albion.RunGame(engine, exchange, services, baseDir, commandLine); break;
+                case ExecutionMode.Game: Albion.RunGame(exchange, services, baseDir, commandLine); break;
                 case ExecutionMode.BakeIsometric: IsometricTest.Run(exchange, commandLine); break;
 
                 case ExecutionMode.DumpData:
@@ -90,7 +88,11 @@ namespace UAlbion
                         DumpText.Dump(assets, baseDir, tf, commandLine.DumpAssetTypes, parsedIds);
 
                     if ((commandLine.DumpFormats & DumpFormats.Png) != 0)
-                        DumpGraphics.Dump(assets, baseDir, commandLine.DumpAssetTypes, commandLine.DumpFormats, parsedIds);
+                    {
+                        var dumper = new DumpGraphics();
+                        exchange.Attach(dumper);
+                        dumper.Dump(baseDir, commandLine.DumpAssetTypes, commandLine.DumpFormats, parsedIds);
+                    }
 
                     //if ((commandLine.DumpFormats & DumpFormats.Tiled) != 0)
                     //    DumpTiled.Dump(baseDir, assets, commandLine.DumpAssetTypes, parsedIds);
@@ -121,18 +123,17 @@ namespace UAlbion
             }
         }
 
-        static VeldridEngine BuildEngine(CommandLineOptions commandLine)
+        static void BuildEngine(CommandLineOptions commandLine, EventExchange exchange)
         {
             PerfTracker.StartupEvent("Creating engine");
-            var engine =
-                new VeldridEngine(commandLine.Backend, commandLine.UseRenderDoc, commandLine.StartupOnly, true) { WindowTitle = "UAlbion" }
-                    .AddRenderer(new SkyboxRenderer())
-                    .AddRenderer(new SpriteRenderer())
-                    .AddRenderer(new ExtrudedTileMapRenderer())
-                    .AddRenderer(new InfoOverlayRenderer())
-                    .AddRenderer(new DebugGuiRenderer());
-            engine.ChangeBackend();
-            return engine;
+            var fb = new MainFramebuffer();
+            var sceneRenderer = new SceneRenderer("MainRenderer", fb);
+            var engine = new Engine(commandLine.Backend, commandLine.UseRenderDoc, commandLine.StartupOnly, true, sceneRenderer);
+
+            exchange
+                .Attach(fb)
+                .Attach(sceneRenderer)
+                .Attach(engine);
         }
     }
 }

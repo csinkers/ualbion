@@ -51,7 +51,6 @@ namespace UAlbion.Game.Tests
                 .Attach(new WordLookup())
                 .Attach(new TextFormatter())
                 .Attach(new TextManager())
-                .Attach(new SpriteManager())
                 .Attach(new WindowManager { Window = new MockWindow(1920, 1080) })
                 .Attach(new MockSettings { Language = Base.Language.English })
                 .Attach(dm)

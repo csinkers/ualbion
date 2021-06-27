@@ -8,7 +8,7 @@ namespace UAlbion.Game.Text
 {
     public class WordLookup : ServiceComponent<IWordLookup>, IWordLookup
     {
-        readonly Dictionary<string, WordId> _lookup = new Dictionary<string, WordId>();
+        readonly Dictionary<string, WordId> _lookup = new();
 
         public WordLookup() => On<LanguageChangedEvent>(_ => _lookup.Clear());
         public WordId Parse(string s)

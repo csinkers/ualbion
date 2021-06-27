@@ -25,7 +25,7 @@ namespace UAlbion.Game.Gui.Controls
         {
             var shadowSubImage = new Region(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
             var window = Resolve<IWindowManager>();
-            var sm = Resolve<ISpriteManager>();
+            var factory = Resolve<ICoreFactory>();
 
             { // Check if we need to rebuild
                 var normSize = window.UiToNormRelative(width, height);
@@ -46,10 +46,10 @@ namespace UAlbion.Game.Gui.Controls
             var subImage = multi.Regions[multi.GetSubImageAtTime(1, 0, false)];
             var normalisedSize = window.UiToNormRelative(subImage.Size);
 
-            var key = new SpriteKey(multi, order, SpriteKeyFlags.NoTransform);
+            var key = new SpriteKey(multi, SpriteSampler.Point, order, SpriteKeyFlags.NoTransform);
             _sprite?.Dispose();
 
-            var lease = sm.Borrow(key, 2, this);
+            var lease = factory.CreateSprites(key, 2, this);
             var flags = SpriteFlags.None.SetOpacity(0.5f);
 
             var shadowPosition = new Vector3(window.UiToNormRelative(10, 10), 0);
@@ -59,8 +59,8 @@ namespace UAlbion.Game.Gui.Controls
             var instances = lease.Lock(ref lockWasTaken);
             try
             {
-                instances[0] = SpriteInstanceData.TopLeft(shadowPosition, shadowSize, shadowSubImage, flags); // Drop shadow
-                instances[1] = SpriteInstanceData.TopLeft(Vector3.Zero, normalisedSize, subImage, 0); // DialogFrame
+                instances[0] = new SpriteInstanceData(shadowPosition, shadowSize, shadowSubImage, SpriteFlags.TopLeft | flags); // Drop shadow
+                instances[1] = new SpriteInstanceData(Vector3.Zero, normalisedSize, subImage, SpriteFlags.TopLeft); // DialogFrame
             }
             finally { lease.Unlock(lockWasTaken); }
 

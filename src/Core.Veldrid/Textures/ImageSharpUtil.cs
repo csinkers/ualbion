@@ -58,7 +58,7 @@ namespace UAlbion.Core.Veldrid.Textures
             if (image == null) throw new ArgumentNullException(nameof(image));
             image.TryGetSinglePixelSpan(out var pixels);
             var asUint = MemoryMarshal.Cast<Rgba32, uint>(pixels);
-            return new Texture<uint>(id, name, image.Width, image.Height, 1, asUint)
+            return new SimpleTexture<uint>(id, name, image.Width, image.Height, asUint)
                 .AddRegion(0, 0, image.Width, image.Height, 0);
         }
     }

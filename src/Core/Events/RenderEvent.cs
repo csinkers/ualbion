@@ -4,6 +4,6 @@ namespace UAlbion.Core.Events
 {
     public class RenderEvent : EngineEvent, IVerboseEvent
     {
-        public static RenderEvent Instance { get; } = new RenderEvent();
+        public static RenderEvent Instance { get; } = new();
     }
 }

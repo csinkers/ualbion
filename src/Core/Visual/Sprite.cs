@@ -11,7 +11,7 @@ namespace UAlbion.Core.Visual
         readonly SpriteKeyFlags _keyFlags;
         readonly Func<IAssetId, ITexture> _loaderFunc;
 
-        SpriteLease _sprite;
+        ISpriteLease _sprite;
         Vector3 _position;
         Vector2? _size;
         int _frame;
@@ -19,10 +19,10 @@ namespace UAlbion.Core.Visual
         bool _dirty = true;
 
         public static Sprite CharacterSprite(IAssetId id) =>
-            new Sprite(id, Vector3.Zero, DrawLayer.Character, 0, SpriteFlags.BottomAligned);
+            new(id, Vector3.Zero, DrawLayer.Character, 0, SpriteFlags.BottomAligned);
 
         public static Sprite ScreenSpaceSprite(IAssetId id, Vector2 position, Vector2 size) =>
-            new Sprite(id, new Vector3(position, 0), DrawLayer.Interface,
+            new(id, new Vector3(position, 0), DrawLayer.Interface,
                 SpriteKeyFlags.NoTransform,
                 SpriteFlags.LeftAligned) { Size = size };
 
@@ -68,7 +68,7 @@ namespace UAlbion.Core.Visual
                     Raise(new PositionedComponentMovedEvent(this));
             }
         }
-        public Vector3 Dimensions => new Vector3(Size.X, Size.Y, Size.X);
+        public Vector3 Dimensions => new(Size.X, Size.Y, Size.X);
         public int DebugZ => DepthUtil.DepthToLayer(Position.Z);
 
         public Vector2 Size
@@ -136,8 +136,6 @@ namespace UAlbion.Core.Visual
                 return;
             Dirty = false;
 
-            var sm = Resolve<ISpriteManager>();
-
             if (_sprite == null)
             {
                 var texture = _loaderFunc(Id);
@@ -154,19 +152,12 @@ namespace UAlbion.Core.Visual
                 Frame = 0;
                 Frame = frame;
 
-                var key = new SpriteKey(texture, _layer, _keyFlags);
-                _sprite = sm.Borrow(key, 1, this);
+                var key = new SpriteKey(texture, SpriteSampler.Point, _layer, _keyFlags);
+                var factory = Resolve<ICoreFactory>();
+                _sprite = factory.CreateSprites(key, 1, this);
             }
 
-            _sprite.Access((instances, s) =>
-            {
-                var subImage = s._sprite.Key.Texture.Regions[s.Frame];
-
-                if (s._size == null)
-                    s.Size = subImage.Size;
-
-                instances[0] = SpriteInstanceData.CopyFlags(s._position, s.Size, subImage, s._flags);
-            }, this);
+            _sprite.Update(0, _position, Size, Frame, _flags);
         }
 
         bool Select(WorldCoordinateSelectEvent e, Action<Selection> continuation)
@@ -179,10 +170,7 @@ namespace UAlbion.Core.Visual
                 return false;
 
             if ((Resolve<IEngineSettings>().Flags & EngineFlags.HighlightSelection) != 0)
-            {
-                _sprite.Access<object>((instances, _) =>
-                    instances[0].Flags |= SpriteFlags.Highlight, null);
-            }
+                _sprite.UpdateFlags(0, SpriteFlags.Highlight);
 
             var selected = Selected;
             bool delegated = false;

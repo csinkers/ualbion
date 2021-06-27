@@ -25,8 +25,8 @@ namespace UAlbion.Core
         public int UiHeight => UiConstants.UiExtents.Height;
         public int PixelWidth => Window.Width;
         public int PixelHeight => Window.Height;
-        public Vector2 Size => new Vector2(Window.Width, Window.Height);
-        static Vector2 UiSize => new Vector2(UiConstants.UiExtents.Width, UiConstants.UiExtents.Height);
+        public Vector2 Size => new(Window.Width, Window.Height);
+        static Vector2 UiSize => new(UiConstants.UiExtents.Width, UiConstants.UiExtents.Height);
 
         void Recalculate()
         {

@@ -23,11 +23,11 @@ namespace UAlbion.Core
     {
         public static bool TraceAttachment { get; set; }
         static readonly Action<object> DummyContinuation = _ => { };
-        static readonly List<IComponent> EmptyChildren = new List<IComponent>();
+        static readonly List<IComponent> EmptyChildren = new();
         static int _nesting;
         static int _nextId;
         List<IComponent> _children;
-        IDictionary<Type, Handler> _handlers;
+        Dictionary<Type, Handler> _handlers;
         bool _isActive = true; // If false, then this component will not be attached to the exchange even if its parent is.
         protected Component() => ComponentId = Interlocked.Increment(ref _nextId);
 
@@ -318,6 +318,7 @@ namespace UAlbion.Core
         {
             for (int i = Children.Count - 1; i >= 0; i--)
                 Children[i].Remove(); // O(n²)… refactor if it ever becomes a problem.
+            _children = null;
         }
 
         /// <summary>
@@ -336,6 +337,8 @@ namespace UAlbion.Core
 
             child.Remove();
             _children.RemoveAt(index);
+            if (_children.Count == 0)
+                _children = null;
         }
 
         /// <summary>

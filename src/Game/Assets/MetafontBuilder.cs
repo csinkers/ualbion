@@ -17,13 +17,11 @@ namespace UAlbion.Game.Assets
             { FontColor.Gray, new byte[] { 0, 196, 197, 198, 199, 200 } }, // DataLiteral
         };
 
-        readonly ICoreFactory _factory;
-        public MetafontBuilder(ICoreFactory factory) => _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         public ITexture Build(MetaFontId id)
         {
             var assets = Resolve<IAssetManager>();
             var textureId = (SpriteId)(id.IsBold ? Base.Font.BoldFont : Base.Font.RegularFont);
-            var texture = (Texture<byte>)assets.LoadTexture(textureId);
+            var texture = (ArrayTexture<byte>)assets.LoadTexture(textureId);
             if (texture == null)
                 throw new InvalidOperationException($"MetafontBuilder: Could not load font {textureId}");
 
@@ -39,7 +37,7 @@ namespace UAlbion.Game.Assets
                 bytes[i] = mapping[bytes[i]];
             }
 
-            return new Texture<byte>(
+            return new ArrayTexture<byte>(
                 textureId,
                 $"Font{id.Color}{(id.IsBold ? "Bold" : "")}",
                 texture.Width, texture.Height, texture.ArrayLayers,

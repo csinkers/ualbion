@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core.Events;
+using UAlbion.Core.Visual;
 
 namespace UAlbion.Core
 {

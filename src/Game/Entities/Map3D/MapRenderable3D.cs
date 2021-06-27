@@ -21,15 +21,15 @@ namespace UAlbion.Game.Entities.Map3D
         readonly MapId _mapId;
         readonly LogicalMap3D _logicalMap;
         readonly LabyrinthData _labyrinthData;
-        readonly DungeonTileMapProperties _properties;
+        readonly TilemapRequest _properties;
         readonly IDictionary<int, IList<int>> _tilesByDistance = new Dictionary<int, IList<int>>();
         readonly ISet<int> _dirty = new HashSet<int>();
-        DungeonTilemap _tilemap;
+        IDungeonTilemap _tilemap;
         bool _isSorting;
         bool _fullUpdate = true;
         int _frameCount;
 
-        public MapRenderable3D(MapId mapId, LogicalMap3D logicalMap, LabyrinthData labyrinthData, in DungeonTileMapProperties properties)
+        public MapRenderable3D(MapId mapId, LogicalMap3D logicalMap, LabyrinthData labyrinthData, TilemapRequest properties)
         {
             if (logicalMap == null) throw new ArgumentNullException(nameof(logicalMap));
             if (labyrinthData == null) throw new ArgumentNullException(nameof(labyrinthData));
@@ -52,9 +52,9 @@ namespace UAlbion.Game.Entities.Map3D
             _labyrinthData = labyrinthData;
             _properties = properties;
 
-            _logicalMap.Dirty += (sender, args) =>
+            _logicalMap.Dirty += (_, args) =>
             {
-                if (args.Type == IconChangeType.Floor || args.Type == IconChangeType.Ceiling || args.Type == IconChangeType.Wall)
+                if (args.Type is IconChangeType.Floor or IconChangeType.Ceiling or IconChangeType.Wall)
                     _dirty.Add(_logicalMap.Index(args.X, args.Y));
             };
         }
@@ -67,18 +67,14 @@ namespace UAlbion.Game.Entities.Map3D
                 return;
 
             var assets = Resolve<IAssetManager>();
-            var dayPalette = assets.LoadPalette(_logicalMap.PaletteId);
-            IPalette nightPalette = null;
-            if (NightPalettes.TryGetValue(_logicalMap.PaletteId, out var nightPaletteId))
-                nightPalette = assets.LoadPalette(nightPaletteId);
+            _properties.TileCount = _logicalMap.Width * _logicalMap.Height;
+            _properties.DayPalette = assets.LoadPalette(_logicalMap.PaletteId);
 
-            _tilemap = new DungeonTilemap(
-                _mapId,
-                _mapId.ToString(),
-                _logicalMap.Width * _logicalMap.Height,
-                _properties,
-                dayPalette,
-                nightPalette);
+            if (NightPalettes.TryGetValue(_logicalMap.PaletteId, out var nightPaletteId))
+                _properties.NightPalette = assets.LoadPalette(nightPaletteId);
+
+            var etmManager = Resolve<IEtmManager>();
+            _tilemap = etmManager.CreateTilemap(_properties);
 
             for (int i = 0; i < _labyrinthData.FloorAndCeilings.Count; i++)
             {
@@ -109,13 +105,12 @@ namespace UAlbion.Game.Entities.Map3D
                 }
             }
 
-            Resolve<IEngine>()?.RegisterRenderable(_tilemap);
             _fullUpdate = true;
         }
 
         protected override void Unsubscribed()
         {
-            Resolve<IEngine>()?.UnregisterRenderable(_tilemap);
+            _tilemap.Dispose();
             _tilemap = null;
         }
 
@@ -134,7 +129,7 @@ namespace UAlbion.Game.Entities.Map3D
                 (ceilingFlag ? Tile3DFlags.CeilingBackAndForth : 0) |
                 (wallFlag ? Tile3DFlags.WallBackAndForth : 0);
 
-            _tilemap.Set(order, floorIndex, ceilingIndex, wallIndex, frameCount, flags);
+            _tilemap.SetTile(order, floorIndex, ceilingIndex, wallIndex, frameCount, flags);
         }
 
         void OnSlowClock(SlowClockEvent e)

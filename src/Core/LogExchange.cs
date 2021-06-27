@@ -12,7 +12,7 @@ namespace UAlbion.Core
 {
     public class LogExchange : ILogExchange
     {
-        readonly ConcurrentQueue<IEvent> _queuedEvents = new ConcurrentQueue<IEvent>();
+        readonly ConcurrentQueue<IEvent> _queuedEvents = new();
         LogLevel _logLevel = LogLevel.Info;
         EventExchange _exchange;
 

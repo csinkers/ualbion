@@ -5,19 +5,19 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Veldrid.Visual;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Entities.Map3D;
 using UAlbion.Game.Events;
+using VeldridGen.Interfaces;
 
 namespace UAlbion.Game.Veldrid.Assets
 {
     public class IsometricBuilder : Component
     {
-        readonly FramebufferSource _framebufferSource;
+        readonly IFramebufferHolder _framebuffer;
         readonly IsometricLayout _layout;
         LabyrinthId _labId;
         IsometricMode _mode = IsometricMode.Floors;
@@ -28,9 +28,9 @@ namespace UAlbion.Game.Veldrid.Assets
         int _tilesPerRow;
         int? _paletteId;
 
-        public IsometricBuilder(FramebufferSource framebufferSource, int width, int height, int diamondHeight, int tilesPerRow)
+        public IsometricBuilder(IFramebufferHolder framebuffer, int width, int height, int diamondHeight, int tilesPerRow)
         {
-            _framebufferSource = framebufferSource;
+            _framebuffer = framebuffer;
             _labId = Base.Labyrinth.Test1;
             _layout = AttachChild(new IsometricLayout());
             _width = width;
@@ -93,10 +93,10 @@ namespace UAlbion.Game.Veldrid.Assets
             
             _layout.Load(labyrinth, info, _mode, BuildProperties(), _paletteId, assets);
             int rows = (_layout.TileCount + _tilesPerRow - 1) / _tilesPerRow;
-            if (_framebufferSource != null)
+            if (_framebuffer != null)
             {
-                _framebufferSource.Width = (uint) (_width * _tilesPerRow);
-                _framebufferSource.Height = (uint) (_height * rows);
+                _framebuffer.Width = (uint) (_width * _tilesPerRow);
+                _framebuffer.Height = (uint) (_height * rows);
             }
 
             Update();
@@ -125,16 +125,15 @@ namespace UAlbion.Game.Veldrid.Assets
         {
             _layout.Load(_labId, _mode, BuildProperties(), _paletteId);
             int rows = (_layout.TileCount + _tilesPerRow - 1) / _tilesPerRow;
-            if (_framebufferSource != null)
+            if (_framebuffer != null)
             {
-                _framebufferSource.Width = (uint) (_width * _tilesPerRow);
-                _framebufferSource.Height = (uint) (_height * rows);
+                _framebuffer.Width = (uint) (_width * _tilesPerRow);
+                _framebuffer.Height = (uint) (_height * rows);
             }
 
             Update();
         }
 
-        public DungeonTileMapProperties Properties => _layout.Properties;
         public LabyrinthId LabyrinthId => _labId;
         public IsometricMode Mode => _mode;
         public int TilesPerRow => _tilesPerRow;
@@ -146,7 +145,7 @@ namespace UAlbion.Game.Veldrid.Assets
 
         void Update() => _layout.Properties = BuildProperties();
 
-        DungeonTileMapProperties BuildProperties(bool log = false)
+        TilemapRequest BuildProperties(bool log = false)
         {
             _yaw = Math.Clamp(_yaw, -45.0f, 45.0f);
             _pitch = Math.Clamp(_pitch, -85.0f, 85.0f);
@@ -166,16 +165,15 @@ namespace UAlbion.Game.Veldrid.Assets
             camera.Viewport = viewport;
             var topLeft = camera.UnprojectNormToWorld(new Vector3(-1, 1, -0.5f));
 
-            return new DungeonTileMapProperties(
-                new Vector3(SideLength, YHeight, SideLength),
-                new Vector3(PitchRads, YawRads, 0),
-                topLeft + new Vector3(_width, -_height, 0) / 2,
-                _width * Vector3.UnitX,
-                -_height * Vector3.UnitY,
-                (uint)_tilesPerRow,
-                0,
-                0,
-                1.0f); // y-scale
+            return new TilemapRequest
+            {
+                Scale = new Vector3(SideLength, YHeight, SideLength),
+                Rotation = new Vector3(PitchRads, YawRads, 0),
+                Origin = topLeft + new Vector3(_width, -_height, 0) / 2,
+                HorizontalSpacing = _width * Vector3.UnitX,
+                VerticalSpacing = -_height * Vector3.UnitY,
+                Width = (uint) _tilesPerRow,
+            };
         }
     }
 }

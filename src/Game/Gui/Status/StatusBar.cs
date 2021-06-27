@@ -15,8 +15,8 @@ namespace UAlbion.Game.Gui.Status
         const int MaxPortraits = SavedGame.MaxPartySize;
         readonly UiSpriteElement _sprite;
         readonly StatusBarPortrait[] _portraits;
-        readonly TextFilter _hoverSource = new TextFilter(x => x.Alignment = TextAlignment.Center);
-        readonly TextFilter _descriptionSource = new TextFilter(x => x.Alignment = TextAlignment.Center);
+        readonly TextFilter _hoverSource = new(x => x.Alignment = TextAlignment.Center);
+        readonly TextFilter _descriptionSource = new(x => x.Alignment = TextAlignment.Center);
         readonly FixedPosition _hoverTextContainer;
         readonly FixedPosition _descriptionTextContainer;
 
@@ -40,7 +40,7 @@ namespace UAlbion.Game.Gui.Status
             _descriptionTextContainer = AttachChild(new FixedPosition(new Rectangle(181, 208, 177, 30), descriptionText));
         }
 
-        public override Vector2 GetSize() => new Vector2(UiConstants.StatusBarExtents.Width, UiConstants.StatusBarExtents.Height);
+        public override Vector2 GetSize() => new(UiConstants.StatusBarExtents.Width, UiConstants.StatusBarExtents.Height);
 
         int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func, bool trimOverlap)
         {

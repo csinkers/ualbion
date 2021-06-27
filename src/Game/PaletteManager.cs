@@ -2,7 +2,6 @@
 using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.ScriptEvents;
@@ -64,8 +63,8 @@ namespace UAlbion.Game
             }
 
             Palette = palette;
-            _nightPalette = NightPalettes.TryGetValue(paletteId, out var nightPaletteId) 
-                ? assets.LoadPalette(nightPaletteId) 
+            _nightPalette = NightPalettes.TryGetValue(paletteId, out var nightPaletteId)
+                ? assets.LoadPalette(nightPaletteId)
                 : null;
 
             //while (Frame >= Palette.GetCompletePalette().Count)
@@ -93,7 +92,7 @@ namespace UAlbion.Game
                 }
             }
 
-            PaletteTexture = new PaletteTexture(id, name, blendedPalette);
+            PaletteTexture = new SimpleTexture<uint>(id, name, 256, 1, blendedPalette).AddRegion(0, 0, 256, 1);
             Version++;
             Raise(new PaletteChangedEvent());
         }

@@ -9,20 +9,33 @@ namespace UAlbion.Core.Visual
     {
         Matrix4x4 _viewMatrix;
         Matrix4x4 _projectionMatrix;
-
-        Vector3 _position = new Vector3(0, 0, 0);
-        Vector3 _lookDirection = new Vector3(0, -.3f, -1f);
+        Vector3 _position = new(0, 0, 0);
+        Vector3 _lookDirection = new(0, -.3f, -1f);
         Vector2 _viewport = Vector2.One;
 
+#pragma warning disable 649
         float _yaw;
         float _pitch;
         bool _useReverseDepth;
         bool _isClipSpaceYInverted;
         bool _depthZeroToOne;
+        bool _dirty = true;
+#pragma warning restore 649
 
-        public Matrix4x4 ViewMatrix => _viewMatrix;
-        public Matrix4x4 ProjectionMatrix => _projectionMatrix;
-        public Vector3 LookDirection => _lookDirection;
+        public int Version { get; private set; }
+        public Matrix4x4 ViewMatrix { get { Recalculate(); return _viewMatrix; } }
+        public Matrix4x4 ProjectionMatrix { get { Recalculate(); return _projectionMatrix; } }
+        void Recalculate()
+        {
+            if (!_dirty)
+                return;
+
+            _viewMatrix = CalculateView();
+            _projectionMatrix = CalculateProjection();
+            Version++;
+            _dirty = false;
+        }
+        public Vector3 LookDirection { get { Recalculate(); return _lookDirection; } }
         public Vector2 Viewport
         {
             get => _viewport;
@@ -30,7 +43,7 @@ namespace UAlbion.Core.Visual
             {
                 if (_viewport == value) return;
                 _viewport = value;
-                UpdatePerspectiveMatrix();
+                _dirty = true;
             }
         }
 
@@ -40,7 +53,7 @@ namespace UAlbion.Core.Visual
         public bool LegacyPitch { get; }
         public float AspectRatio => _viewport.X / _viewport.Y;
         public float Magnification { get; set; } // Ignored.
-        public float Yaw { get => _yaw; set { _yaw = value; UpdateViewMatrix(); } } // Radians
+        public float Yaw { get => _yaw; set { _yaw = value; _dirty = true; } } // Radians
 
         public float Pitch // Radians
         {
@@ -51,17 +64,14 @@ namespace UAlbion.Core.Visual
                     ? Math.Clamp(value, -0.48f, 0.48f)
                     : Math.Clamp(value, (float)-Math.PI / 2, (float)Math.PI / 2);
 
-                if (LegacyPitch)
-                    UpdatePerspectiveMatrix();
-                else
-                    UpdateViewMatrix();
+                _dirty = true;
             }
         }
 
         public Vector3 Position
         {
             get => _position;
-            set { _position = value; UpdateViewMatrix(); }
+            set { _position = value; _dirty = true; }
         }
 
         public PerspectiveCamera(bool legacyPitch = false)
@@ -78,7 +88,7 @@ namespace UAlbion.Core.Visual
             On<CameraPlanesEvent>(e =>
             {
                 NearDistance = e.Near; FarDistance = e.Far; 
-                UpdatePerspectiveMatrix();
+                _dirty = true;
             });
 
             On<SetFieldOfViewEvent>(e =>
@@ -90,7 +100,7 @@ namespace UAlbion.Core.Visual
                 else
                 {
                     FieldOfView = ApiUtil.DegToRad(e.Degrees.Value);
-                    UpdatePerspectiveMatrix();
+                    _dirty = true;
                 }
             });
 
@@ -101,8 +111,7 @@ namespace UAlbion.Core.Visual
         protected override void Subscribed()
         {
             Viewport = Resolve<IWindowManager>().Size;
-            UpdateBackend();
-            UpdateViewMatrix();
+            _dirty = true;
             base.Subscribed();
         }
 
@@ -128,12 +137,11 @@ namespace UAlbion.Core.Visual
                     : e.IsClipSpaceYInverted;
             }
 
-            UpdatePerspectiveMatrix();
+            _dirty = true;
         }
 
-        void UpdatePerspectiveMatrix()
-        {
-            _projectionMatrix = LegacyPitch
+        Matrix4x4 CalculateProjection() =>
+            LegacyPitch
                 ? MatrixUtil.CreateLegacyPerspective(
                     _isClipSpaceYInverted,
                     _useReverseDepth,
@@ -151,13 +159,12 @@ namespace UAlbion.Core.Visual
                     AspectRatio,
                     NearDistance,
                     FarDistance);
-        }
 
-        void UpdateViewMatrix()
+        Matrix4x4 CalculateView()
         {
             Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(Yaw, LegacyPitch ? 0f : Pitch, 0f);
             _lookDirection = Vector3.Transform(-Vector3.UnitZ, lookRotation);
-            _viewMatrix = Matrix4x4.CreateLookAt(_position, _position + _lookDirection, Vector3.UnitY);
+            return Matrix4x4.CreateLookAt(_position, _position + _lookDirection, Vector3.UnitY);
         }
 
         public Vector3 ProjectWorldToNorm(Vector3 worldPosition)

@@ -6,6 +6,5 @@ namespace UAlbion.Core.Visual
     {
         string Name { get; }
         DrawLayer RenderOrder { get; }
-        int PipelineId { get; }
     }
 }

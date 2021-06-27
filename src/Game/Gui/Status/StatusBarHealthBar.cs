@@ -15,7 +15,7 @@ namespace UAlbion.Game.Gui.Status
 
         public StatusBarHealthBar(int order, bool isHealth)
         {
-            On<PostUpdateEvent>(e => Update());
+            On<PostGameUpdateEvent>(e => Update());
 
             _order = order;
             _isHealth = isHealth;

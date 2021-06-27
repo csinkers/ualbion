@@ -16,7 +16,7 @@ namespace UAlbion.Game
         readonly bool _looping;
         Sprite _sprite;
         FlicPlayer _player;
-        ITexture _texture;
+        SimpleTexture<byte> _texture;
         PaletteId _previousPaletteId;
 
         event Action Complete;
@@ -33,7 +33,7 @@ namespace UAlbion.Game
                 else
                 {
                     _player.NextFrame();
-                    _texture.IsDirty = true;
+                    _texture.GetMutableLayerBuffer(0);
                 }
             });
             _id = id;
@@ -61,10 +61,10 @@ namespace UAlbion.Game
 
             var size = new Vector2(flic.Width, flic.Height);
 
-            var texture = new Texture<byte>(
+            var texture = new SimpleTexture<byte>(
                 _id,
                 $"V:{_id}",
-                flic.Width, flic.Height, 1,
+                flic.Width, flic.Height,
                 new[] { new Region(Vector2.Zero, size, size, 0) });
 
             _texture = texture;

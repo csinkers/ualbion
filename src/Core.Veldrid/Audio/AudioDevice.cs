@@ -31,7 +31,7 @@ namespace UAlbion.Core.Veldrid.Audio
             var _ = AL10.alGetError(); // Clear error code for subsequent callers
         }
 
-        public AudioListener Listener { get; } = new AudioListener();
+        public AudioListener Listener { get; } = new();
 
         public float DopplerFactor
         {

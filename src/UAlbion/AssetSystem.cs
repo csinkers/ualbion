@@ -14,7 +14,7 @@ namespace UAlbion
 {
     public static class AssetSystem
     {
-        public static async Task<(EventExchange, IContainer)> SetupAsync(string baseDir, IFileSystem disk, ICoreFactory factory)
+        public static async Task<(EventExchange, IContainer)> SetupAsync(string baseDir, IFileSystem disk)
         {
             var configAndSettingsTask = Task.Run(() =>
             {
@@ -24,10 +24,10 @@ namespace UAlbion
             });
             var coreConfigTask = Task.Run(() => LoadCoreConfig(baseDir, disk));
             var gameConfigTask = Task.Run(() => LoadGameConfig(baseDir, disk));
-            return await SetupCore(disk, factory, configAndSettingsTask, coreConfigTask, gameConfigTask).ConfigureAwait(false);
+            return await SetupCore(disk, configAndSettingsTask, coreConfigTask, gameConfigTask).ConfigureAwait(false);
         }
 
-        public static EventExchange Setup(IFileSystem disk, ICoreFactory factory,
+        public static EventExchange Setup(IFileSystem disk,
             GeneralConfig generalConfig,
             GeneralSettings settings,
             CoreConfig coreConfig,
@@ -36,19 +36,17 @@ namespace UAlbion
             var configAndSettingsTask = Task.FromResult((generalConfig, settings));
             var coreConfigTask = Task.FromResult(coreConfig);
             var gameConfigTask = Task.FromResult(gameConfig);
-            var task = SetupCore(disk, factory, configAndSettingsTask, coreConfigTask, gameConfigTask);
+            var task = SetupCore(disk, configAndSettingsTask, coreConfigTask, gameConfigTask);
             return task.Result.Item1;
         }
 
         static async Task<(EventExchange, IContainer)> SetupCore(
             IFileSystem disk,
-            ICoreFactory factory,
             Task<(GeneralConfig, GeneralSettings)> configAndSettingsTask,
             Task<CoreConfig> coreConfigTask,
             Task<GameConfig> gameConfigTask)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
-            if (factory == null) throw new ArgumentNullException(nameof(factory));
             if (configAndSettingsTask == null) throw new ArgumentNullException(nameof(configAndSettingsTask));
             if (coreConfigTask == null) throw new ArgumentNullException(nameof(coreConfigTask));
             if (gameConfigTask == null) throw new ArgumentNullException(nameof(gameConfigTask));
@@ -61,7 +59,7 @@ namespace UAlbion
                 new AssetLoaderRegistry(),
                 new ContainerRegistry(),
                 new PostProcessorRegistry(),
-                new MetafontBuilder(factory),
+                new MetafontBuilder(),
                 new StdioConsoleLogger(),
                 // new ClipboardManager(),
                 new ImGuiConsoleLogger(),
@@ -73,14 +71,11 @@ namespace UAlbion
 #pragma warning disable CA2000 // Dispose objects before losing scope
             var exchange = new EventExchange(new LogExchange())
                 .Register<IGeneralConfig>(generalConfig)
-                .Register(factory)
                 .Register(disk)
                 .Attach(services);
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
             PerfTracker.StartupEvent("Registered asset services");
-
-            Engine.GlobalExchange = exchange;
 
             modApplier.LoadMods(generalConfig, settings.ActiveMods);
             AssetMapping.Global.ConsistencyCheck();

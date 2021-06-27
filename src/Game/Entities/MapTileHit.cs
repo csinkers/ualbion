@@ -5,7 +5,7 @@ namespace UAlbion.Game.Entities
 {
     public class MapTileHit
     {
-        public MapTileHit(Vector2 tile, Vector3 intersectionPoint, WeakSpriteReference underlaySprite, WeakSpriteReference overlaySprite)
+        public MapTileHit(Vector2 tile, Vector3 intersectionPoint, IWeakSpriteReference underlaySprite, IWeakSpriteReference overlaySprite)
         {
             Tile = tile;
             IntersectionPoint = intersectionPoint;
@@ -16,7 +16,7 @@ namespace UAlbion.Game.Entities
         public override string ToString() => "MapTile";
         public Vector2 Tile { get; }
         public Vector3 IntersectionPoint { get; }
-        public WeakSpriteReference UnderlaySprite { get; }
-        public WeakSpriteReference OverlaySprite { get; }
+        public IWeakSpriteReference UnderlaySprite { get; }
+        public IWeakSpriteReference OverlaySprite { get; }
     }
 }

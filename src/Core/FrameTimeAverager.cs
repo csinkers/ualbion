@@ -3,7 +3,7 @@
     public class FrameTimeAverager
     {
         const double DecayRate = .3;
-        readonly double _timeLimit;
+        readonly double _averagingIntervalSeconds;
         double _accumulatedTime;
         int _frameCount;
 
@@ -11,7 +11,7 @@
         public double CurrentAverageFrameTimeMilliseconds => CurrentAverageFrameTimeSeconds * 1000.0;
         public double CurrentAverageFramesPerSecond => 1 / CurrentAverageFrameTimeSeconds;
 
-        public FrameTimeAverager(double maxTimeSeconds) { _timeLimit = maxTimeSeconds; }
+        public FrameTimeAverager(double averagingIntervalSeconds) { _averagingIntervalSeconds = averagingIntervalSeconds; }
 
         public void Reset()
         {
@@ -23,7 +23,7 @@
         {
             _accumulatedTime += seconds;
             _frameCount++;
-            if (_accumulatedTime >= _timeLimit)
+            if (_accumulatedTime >= _averagingIntervalSeconds)
                 Average();
         }
 

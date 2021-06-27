@@ -7,9 +7,9 @@ namespace UAlbion.Game.Entities
 {
     public sealed class PositionedSpriteBatch : IDisposable
     {
-        SpriteLease _sprite;
+        ISpriteLease _sprite;
         Vector3 _position;
-        public PositionedSpriteBatch(SpriteLease lease, Vector2 size)
+        public PositionedSpriteBatch(ISpriteLease lease, Vector2 size)
         {
             _sprite = lease ?? throw new ArgumentNullException(nameof(lease));
             Size = size;
@@ -28,15 +28,8 @@ namespace UAlbion.Game.Entities
                 if (Position == value)
                     return;
 
-                bool lockWasTaken = false;
-                var instances = _sprite.Lock(ref lockWasTaken);
-                try
-                {
-                    var delta = value - _position;
-                    for (int i = 0; i < instances.Length; i++)
-                        instances[i].OffsetBy(delta);
-                }
-                finally { _sprite.Unlock(lockWasTaken); }
+                var delta = value - _position;
+                _sprite.OffsetAll(delta);
                 _position = value;
             }
         }

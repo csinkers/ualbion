@@ -104,7 +104,7 @@ namespace UAlbion.Game.Gui.Controls
             return c;
         }
 
-        public static ButtonColorScheme Invisible(ButtonState state) => new ButtonColorScheme { Alpha = 0 };
+        public static ButtonColorScheme Invisible(ButtonState state) => new() { Alpha = 0 };
 
         public static ButtonColorScheme InventorySlot(ButtonState state)
         {
@@ -124,7 +124,7 @@ namespace UAlbion.Game.Gui.Controls
         }
 
         public static ButtonColorScheme InventoryOuterFrame(ButtonState _) =>
-            new ButtonColorScheme
+            new()
             {
                 Alpha = 0.5f,
                 Corners = CommonColor.Black2,

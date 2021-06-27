@@ -2,29 +2,53 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Events;
-using UAlbion.Core.Textures;
-using UAlbion.Core.Visual;
-using Veldrid;
 
 namespace UAlbion.Core.Veldrid.Textures
 {
-    public class TextureManager : ServiceComponent<ITextureManager>, ITextureManager
+    public class TextureSource : Component, ITextureSource
     {
-        readonly object _syncRoot = new object();
-        readonly IDictionary<ITexture, TextureCacheEntry> _cache = new Dictionary<ITexture, TextureCacheEntry>();
+        readonly object _syncRoot = new();
+        readonly Dictionary<ITexture, Texture2DHolder> _simple = new();
+        readonly Dictionary<ITexture, Texture2DArrayHolder> _array = new();
         float _lastCleanup;
         float _totalTime;
 
-        public TextureManager()
+        public TextureSource()
         {
             On<EngineUpdateEvent>(OnUpdate);
-            On<TextureStatsEvent>(e => Info(Stats()));
+            On<TextureStatsEvent>(_ => Info(Stats()));
         }
 
-        public string Stats()
+        public Texture2DHolder GetSimpleTexture(ITexture texture)
+        {
+            lock (_syncRoot)
+            {
+                if (!_simple.TryGetValue(texture, out var holder))
+                {
+                    holder = AttachChild(new Texture2DHolder(texture));
+                    _simple[texture] = holder;
+                }
+
+                return holder;
+            }
+        }
+
+        public Texture2DArrayHolder GetArrayTexture(ITexture texture)
+        {
+            lock (_syncRoot)
+            {
+                if (!_array.TryGetValue(texture, out var holder))
+                {
+                    holder = AttachChild(new Texture2DArrayHolder(texture));
+                    _array[texture] = holder;
+                }
+                return holder;
+            }
+        }
+
+        string Stats()
         {
             var sb = new StringBuilder();
             sb.AppendLine("Texture Statistics:");
@@ -33,12 +57,18 @@ namespace UAlbion.Core.Veldrid.Textures
             lock (_syncRoot)
             {
                 long totalSize = 0;
-                foreach (var entry in _cache.OrderBy(x => x.Key.SizeInBytes))
+                foreach (var entry in _simple.OrderBy(x => x.Key.SizeInBytes))
                 {
                     sb.AppendLine($"    {entry.Key.Name}: {entry.Key.SizeInBytes:N0} bytes LastAccess: {(now - entry.Value.LastAccessDateTime).TotalSeconds:F3} seconds ago");
                     totalSize += entry.Key.SizeInBytes;
                 }
-                sb.AppendLine($"    Total: {_cache.Count:N0} entries, {totalSize:N0} bytes");
+                foreach (var entry in _array.OrderBy(x => x.Key.SizeInBytes))
+                {
+                    sb.AppendLine($"    {entry.Key.Name}: {entry.Key.SizeInBytes:N0} bytes LastAccess: {(now - entry.Value.LastAccessDateTime).TotalSeconds:F3} seconds ago");
+                    totalSize += entry.Key.SizeInBytes;
+                }
+                sb.AppendLine($"    Total Simple: {_simple.Count:N0} entries, {totalSize:N0} bytes");
+                sb.AppendLine($"    Total Array: {_array.Count:N0} entries, {totalSize:N0} bytes");
             }
 
             return sb.ToString();
@@ -49,81 +79,35 @@ namespace UAlbion.Core.Veldrid.Textures
             _totalTime += e.DeltaSeconds;
             var config = Resolve<CoreConfig>().Visual.TextureManager;
 
-            if (_totalTime - _lastCleanup > config.CacheCheckIntervalSeconds)
+            if (_totalTime - _lastCleanup <= config.CacheCheckIntervalSeconds)
+                return;
+
+            lock (_syncRoot)
             {
-                lock (_syncRoot)
+                var now = DateTime.Now;
+                var keys = _simple.Keys.ToList();
+                foreach (var key in keys)
                 {
-                    var keys = _cache.Keys.ToList();
-                    foreach (var key in keys)
-                    {
-                        var entry = _cache[key];
-                        if ((DateTime.Now - entry.LastAccessDateTime).TotalSeconds > config.CacheLifetimeSeconds)
-                        {
-                            _cache.Remove(key);
-                            entry.Dispose();
-                        }
-                    }
+                    var entry = _simple[key];
+                    if ((now - entry.LastAccessDateTime).TotalSeconds <= config.CacheLifetimeSeconds)
+                        continue;
 
-                    _lastCleanup = _totalTime;
+                    _simple.Remove(key);
+                    entry.Dispose();
                 }
+
+                _lastCleanup = _totalTime;
             }
         }
 
-        public object GetTexture(ITexture texture)
-        {
-            // TODO: Return test texture when not found
-            lock (_syncRoot)
-            {
-                var entry = _cache[texture];
-                entry.LastAccessDateTime = DateTime.Now;
-                return entry.TextureView;
-            }
-        }
-
-        public void PrepareTexture(ITexture texture, IRendererContext context)
-        {
-            if (texture == null) throw new ArgumentNullException(nameof(texture));
-            if (context == null) throw new ArgumentNullException(nameof(context));
-            var gd = ((VeldridRendererContext)context).GraphicsDevice;
-
-            lock (_syncRoot)
-            {
-                if (_cache.ContainsKey(texture))
-                {
-                    if (!texture.IsDirty)
-                        return;
-                    texture.IsDirty = false;
-                    _cache[texture].Dispose();
-                }
-            }
-
-#pragma warning disable CA2000 // Dispose objects before losing scope
-            Texture deviceTexture = null;
-            if (texture is IReadOnlyTexture<byte> eightBit) // Note: No Mip-mapping, blending/interpolation in palette-based images typically results in nonsense.
-                deviceTexture = VeldridTexture.CreateDeviceTexture(gd, TextureUsage.Sampled, eightBit); 
-
-            if (texture is IReadOnlyTexture<uint> trueColor)
-                deviceTexture = VeldridTexture.CreateDeviceTexture(gd, TextureUsage.Sampled | TextureUsage.GenerateMipmaps, trueColor);
-
-            if (deviceTexture == null)
-                throw new NotSupportedException($"Image format {texture.GetType().GetGenericArguments()[0].Name} not currently supported");
-#pragma warning restore CA2000 // Dispose objects before losing scope
-
-            TextureView textureView = gd.ResourceFactory.CreateTextureView(deviceTexture);
-            textureView.Name = "TV_" + texture.Name;
-            CoreTrace.Log.CreatedDeviceTexture(textureView.Name, texture.Width, texture.Height, texture.ArrayLayers);
-            lock (_syncRoot)
-            {
-                _cache[texture] = new TextureCacheEntry(deviceTexture, textureView);
-            }
-        }
-
-        public void DestroyDeviceObjects()
+        protected override void Unsubscribed()
         {
             lock (_syncRoot)
             {
-                foreach (var entry in _cache.Values) entry.Dispose();
-                _cache.Clear();
+                foreach (var entry in _simple.Values) entry.Dispose();
+                foreach (var entry in _array.Values) entry.Dispose();
+                _simple.Clear();
+                _array.Clear();
             }
         }
     }

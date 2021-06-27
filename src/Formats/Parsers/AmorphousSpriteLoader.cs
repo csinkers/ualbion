@@ -102,7 +102,7 @@ namespace UAlbion.Formats.Parsers
                     totalWidth = width;
             }
 
-            var result = new Texture<byte>(info.AssetId, totalWidth, totalHeight);
+            var result = new SimpleTexture<byte>(info.AssetId, totalWidth, totalHeight);
 
             for (int n = 0; n < frames.Count; n++)
             {

@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core.Events;
+using UAlbion.Core.Visual;
 using Veldrid.Utilities;
 
 namespace UAlbion.Core.Veldrid
 {
     public class SceneGraph : Component, ISceneGraph
     {
-        readonly Octree<IPositioned> _octree = new Octree<IPositioned>(new BoundingBox(-Vector3.One, Vector3.One), 2);
+        readonly Octree<IPositioned> _octree = new(new BoundingBox(-Vector3.One, Vector3.One), 2);
+        List<IRenderable> _nonPositioned = new();
 
         public SceneGraph()
         {
@@ -46,7 +48,7 @@ namespace UAlbion.Core.Veldrid
                 return 1;
             });
 
-            foreach(var hit in veldridHits)
+            foreach (var hit in veldridHits)
                 hits.Add(new Selection(hit.Location, hit.Distance, hit.Item));
         }
 

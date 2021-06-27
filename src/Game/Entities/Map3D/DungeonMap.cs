@@ -26,15 +26,16 @@ namespace UAlbion.Game.Entities.Map3D
         float _backgroundRed;
         float _backgroundGreen;
         float _backgroundBlue;
+        ISkybox _skybox;
 
         public DungeonMap(MapId mapId, MapData3D mapData)
         {
             On<WorldCoordinateSelectEvent>(Select);
-            On<MapInitEvent>(e => FireEventChains(TriggerTypes.MapInit, true));
-            On<SlowClockEvent>(e => FireEventChains(TriggerTypes.EveryStep, false));
-            On<HourElapsedEvent>(e => FireEventChains(TriggerTypes.EveryHour, false));
-            On<DayElapsedEvent>(e => FireEventChains(TriggerTypes.EveryDay, false));
-            // On<UnloadMapEvent>(e => Unload());
+            On<MapInitEvent>(_ => FireEventChains(TriggerTypes.MapInit, true));
+            On<SlowClockEvent>(_ => FireEventChains(TriggerTypes.EveryStep, false));
+            On<HourElapsedEvent>(_ => FireEventChains(TriggerTypes.EveryHour, false));
+            On<DayElapsedEvent>(_ => FireEventChains(TriggerTypes.EveryDay, false));
+            // On<UnloadMapEvent>(_ => Unload());
 
             MapId = mapId;
             _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
@@ -55,6 +56,7 @@ namespace UAlbion.Game.Entities.Map3D
 
             var assets = Resolve<IAssetManager>();
             var state = Resolve<IGameState>();
+            var factory = Resolve<ICoreFactory>();
             _labyrinthData = assets.LoadLabyrinthData(_mapData.LabDataId);
 
             if (_labyrinthData == null)
@@ -62,16 +64,19 @@ namespace UAlbion.Game.Entities.Map3D
 
             _logicalMap = new LogicalMap3D(_mapData, _labyrinthData, state.TemporaryMapChanges, state.PermanentMapChanges);
 
-            var properties = new DungeonTileMapProperties(
-                _labyrinthData.TileSize,
-                Vector3.Zero,
-                _labyrinthData.TileSize.Y / 2 * Vector3.UnitY,
-                _labyrinthData.TileSize * Vector3.UnitX,
-                _labyrinthData.TileSize * Vector3.UnitZ,
-                (uint)_logicalMap.Width,
-                _labyrinthData.Lighting,
-                _labyrinthData.FogColor,
-                _labyrinthData.ObjectYScaling);
+            var properties = new TilemapRequest
+            {
+                Id = MapId,
+                Width = (uint)_logicalMap.Width,
+                Scale = _labyrinthData.TileSize,
+                Origin = _labyrinthData.TileSize.Y / 2 * Vector3.UnitY,
+                HorizontalSpacing = _labyrinthData.TileSize * Vector3.UnitX,
+                VerticalSpacing = _labyrinthData.TileSize * Vector3.UnitZ,
+                AmbientLightLevel = _labyrinthData.Lighting,
+                FogColor = _labyrinthData.FogColor,
+                ObjectYScaling = _labyrinthData.ObjectYScaling,
+                Pipeline = DungeonTilemapPipeline.Normal
+            };
 
             _selection = AttachChild(new Selection3D());
             AttachChild(new MapRenderable3D(MapId, _logicalMap, _labyrinthData, properties));
@@ -79,7 +84,7 @@ namespace UAlbion.Game.Entities.Map3D
             AttachChild(new Collider3D(_logicalMap));
 
             if (!_labyrinthData.BackgroundId.IsNone)
-                AttachChild(new Skybox(_labyrinthData.BackgroundId));
+                _skybox = factory.CreateSkybox(_labyrinthData.BackgroundId);
 
             var palette = assets.LoadPalette(_logicalMap.PaletteId);
             uint backgroundColour = palette.GetPaletteAtTime(0)[_labyrinthData.BackgroundColour];
@@ -130,6 +135,13 @@ namespace UAlbion.Game.Entities.Map3D
             }
 
             Raise(new SetClearColourEvent(_backgroundRed, _backgroundGreen, _backgroundBlue, 1.0f));
+        }
+
+        protected override void Unsubscribed()
+        {
+            _skybox?.Dispose();
+            _skybox = null;
+            base.Unsubscribed();
         }
 
         void Select(WorldCoordinateSelectEvent worldCoordinateSelectEvent)

@@ -22,7 +22,7 @@ namespace UAlbion.Game.Entities.Map2D
 
         public MapId MapId { get; }
         public MapType MapType => _logicalMap.UseSmallSprites ? MapType.TwoDOutdoors : MapType.TwoD;
-        public Vector2 LogicalSize => new Vector2(_logicalMap.Width, _logicalMap.Height);
+        public Vector2 LogicalSize => new(_logicalMap.Width, _logicalMap.Height);
         public Vector3 TileSize { get; private set; }
         public IMapData MapData => _mapData;
         public float BaseCameraHeight => 0.0f;
@@ -52,11 +52,12 @@ namespace UAlbion.Game.Entities.Map2D
 
             var assetManager = Resolve<IAssetManager>();
             var state = Resolve<IGameState>();
+            var gameFactory = Resolve<IGameFactory>();
             _logicalMap = new LogicalMap2D(assetManager, _mapData, state.TemporaryMapChanges, state.PermanentMapChanges);
             var tileset = assetManager.LoadTexture(_logicalMap.TilesetId);
             AttachChild(new ScriptManager());
             AttachChild(new Collider2D(_logicalMap, !_logicalMap.UseSmallSprites));
-            var renderable = AttachChild(new MapRenderable2D(_logicalMap, tileset));
+            var renderable = AttachChild(new MapRenderable2D(_logicalMap, tileset, gameFactory));
             var selector = AttachChild(new SelectionHandler2D(_logicalMap, renderable));
             selector.HighlightIndexChanged += (sender, x) => renderable.SetHighlightIndex(x);
             TileSize = new Vector3(renderable.TileSize, 1.0f);

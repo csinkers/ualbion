@@ -7,7 +7,7 @@ namespace UAlbion.Game.Assets
 {
     public class AssetLoaderRegistry : ServiceComponent<IAssetLoaderRegistry>, IAssetLoaderRegistry
     {
-        readonly object _syncRoot = new object();
+        readonly object _syncRoot = new();
         readonly IDictionary<string, IAssetLoader> _loaders = new Dictionary<string, IAssetLoader>();
 
         public IAssetLoader GetLoader(string loaderName)

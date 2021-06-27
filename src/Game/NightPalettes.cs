@@ -5,8 +5,8 @@ namespace UAlbion.Game
 {
     public static class NightPalettes
     {
-        static readonly object SyncRoot = new object();
-        static readonly Dictionary<PaletteId, PaletteId> _mapping = new Dictionary<PaletteId, PaletteId>();
+        static readonly object SyncRoot = new();
+        static readonly Dictionary<PaletteId, PaletteId> _mapping = new();
 
         public static bool TryGetValue(PaletteId dayPaletteId, out PaletteId nightPaletteId)
         {

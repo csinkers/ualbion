@@ -35,7 +35,7 @@ namespace UAlbion.Game
             On<EngineUpdateEvent>(OnEngineUpdate);
             On<StartTimerEvent>(StartTimer);
 
-            OnAsync<UpdateEvent>((e, c) =>
+            OnAsync<GameUpdateEvent>((e, c) =>
             {
                 if (IsRunning || _pendingContinuation != null)
                     return false;
@@ -109,7 +109,7 @@ namespace UAlbion.Game
                 _stoppedMs += 1000.0f * e.DeltaSeconds;
             }
 
-            Raise(new PostUpdateEvent());
+            Raise(new PostGameUpdateEvent());
         }
 
         void RaiseTick()

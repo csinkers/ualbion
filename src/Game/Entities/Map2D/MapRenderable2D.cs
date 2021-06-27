@@ -13,26 +13,27 @@ namespace UAlbion.Game.Entities.Map2D
     public class MapRenderable2D : Component
     {
         readonly LogicalMap2D _logicalMap;
-        readonly TileLayer _underlay;
-        readonly TileLayer _overlay;
+        readonly IMapLayer _underlay;
+        readonly IMapLayer _overlay;
         readonly InfoOverlay _info;
         readonly MapAnnotationLayer _annotations;
 
-        public MapRenderable2D(LogicalMap2D logicalMap, ITexture tileset)
+        public MapRenderable2D(LogicalMap2D logicalMap, ITexture tileset, IGameFactory factory)
         {
             if (tileset == null) throw new ArgumentNullException(nameof(tileset));
+            if (factory == null) throw new ArgumentNullException(nameof(factory));
             _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
             var subImage = tileset.Regions[0];
             TileSize = subImage.Size;
 
-            _underlay = AttachChild(new TileLayer(
+            _underlay = AttachChild(factory.CreateMapLayer(
                 logicalMap,
                 tileset,
                 logicalMap.GetUnderlay,
                 DrawLayer.Underlay,
                 IconChangeType.Underlay));
 
-            _overlay = AttachChild(new TileLayer(logicalMap,
+            _overlay = AttachChild(factory.CreateMapLayer(logicalMap,
                 tileset,
                 logicalMap.GetOverlay,
                 DrawLayer.Overlay,
@@ -50,8 +51,8 @@ namespace UAlbion.Game.Entities.Map2D
         public Vector2 TileSize { get; }
         public PaletteId Palette => _logicalMap.PaletteId;
         public Vector2 SizePixels => new Vector2(_logicalMap.Width, _logicalMap.Height) * TileSize;
-        public WeakSpriteReference GetWeakUnderlayReference(int x, int y) => _underlay.GetWeakSpriteReference(x, y);
-        public WeakSpriteReference GetWeakOverlayReference(int x, int y) => _overlay.GetWeakSpriteReference(x, y);
+        public IWeakSpriteReference GetWeakUnderlayReference(int x, int y) => _underlay.GetWeakSpriteReference(x, y);
+        public IWeakSpriteReference GetWeakOverlayReference(int x, int y) => _overlay.GetWeakSpriteReference(x, y);
 
         public void SetHighlightIndex(int? index)
         {

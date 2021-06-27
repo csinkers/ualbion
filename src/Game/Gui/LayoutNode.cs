@@ -6,7 +6,7 @@ namespace UAlbion.Game.Gui
 {
     public class LayoutNode
     {
-        readonly List<LayoutNode> _children = new List<LayoutNode>();
+        readonly List<LayoutNode> _children = new();
         public LayoutNode(LayoutNode parent, IUiElement element, Rectangle extents, int order)
         {
             Children = _children.AsReadOnly();

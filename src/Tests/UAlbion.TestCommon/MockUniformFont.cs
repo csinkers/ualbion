@@ -9,8 +9,8 @@ namespace UAlbion.TestCommon
 {
     public static class MockUniformFont
     {
-        public static ITexture Font(AssetId id) => new Texture<byte>(id,
-            "FakeFont", 6 * 256, 8, 1,
+        public static ITexture Font(AssetId id) => new SimpleTexture<byte>(id,
+            "FakeFont", 6 * 256, 8,
             new byte[6 * 8 * 256],
             Enumerable.Range(0, 256).Select(x =>
                 new Region(

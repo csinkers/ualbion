@@ -3,7 +3,7 @@
 namespace UAlbion.Core
 {
     [Flags]
-    public enum EngineFlags : int
+    public enum EngineFlags : uint
     {
         ShowBoundingBoxes        =   0x1,
         ShowCameraPosition       =   0x2,

@@ -8,15 +8,14 @@ using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid.Textures;
-using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Game;
 
 namespace UAlbion
 {
-    static class DumpGraphics
+    class DumpGraphics : Component
     {
-        public static void Dump(IAssetManager assets, string baseDir, ISet<AssetType> types, DumpFormats formats, AssetId[] dumpIds)
+        public void Dump(string baseDir, ISet<AssetType> types, DumpFormats formats, AssetId[] dumpIds)
         {
             void Export<TEnum>(string name) where TEnum : unmanaged, Enum
             {
@@ -26,6 +25,7 @@ namespace UAlbion
 
                 var ids = Enum.GetValues(typeof(TEnum)).OfType<TEnum>().ToArray();
                 Console.WriteLine($"Dumping {ids.Length} assets to {directory}...");
+                var assets = Resolve<IAssetManager>();
                 foreach (var id in ids)
                 {
                     var assetId = AssetId.From(id);
@@ -74,7 +74,7 @@ namespace UAlbion
             public DumpFormats Format { get; set; }
         }
 
-        public static IList<ExportedImageInfo> ExportImage(
+        public IList<ExportedImageInfo> ExportImage(
             AssetId assetId,
             IAssetManager assets,
             string directory,
@@ -109,7 +109,7 @@ namespace UAlbion
             {
                 if (palette == null)
                 {
-                    CoreUtil.LogError($"Could not load palette for {assetId}");
+                    Error($"Could not load palette for {assetId}");
                     return filenames;
                 }
 
@@ -131,7 +131,7 @@ namespace UAlbion
                 {
                     if (palette == null)
                     {
-                        CoreUtil.LogError($"Could not load palette for {assetId}");
+                        Error($"Could not load palette for {assetId}");
                         break;
                     }
 
@@ -158,7 +158,7 @@ namespace UAlbion
             return filenames;
         }
 
-        static void Save(Image<Rgba32> image, string pathWithoutExtension, DumpFormats formats, IList<ExportedImageInfo> filenames)
+        void Save(Image<Rgba32> image, string pathWithoutExtension, DumpFormats formats, IList<ExportedImageInfo> filenames)
         {
             if ((formats & DumpFormats.Png) != 0)
             {

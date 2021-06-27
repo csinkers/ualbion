@@ -61,12 +61,12 @@ namespace UAlbion.Game.Entities
             var heading = S(Base.SystemText.MapPopup_Person);
             var options = new List<ContextMenuOption>
             {
-                new ContextMenuOption(
+                new(
                     S(Base.SystemText.MapPopup_TalkTo),
                     new TriggerChainEvent(_npc.ChainSource, _npc.Chain, _npc.Node, new EventSource(_npc.Id, TextId.None, TriggerTypes.TalkTo)),
                     ContextMenuGroup.Actions),
 
-                new ContextMenuOption(
+                new(
                     S(Base.SystemText.MapPopup_MainMenu),
                     new PushSceneEvent(SceneId.MainMenu),
                     ContextMenuGroup.System

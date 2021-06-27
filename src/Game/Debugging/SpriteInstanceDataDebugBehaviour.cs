@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using UAlbion.Core;
 using UAlbion.Core.Visual;
 
 namespace UAlbion.Game.Debugging
 {
     public class SpriteInstanceDataDebugBehaviour : IDebugBehaviour
     {
-        public ReadOnlyCollection<Type> HandledTypes { get; } = new ReadOnlyCollection<Type>(new[] { typeof(SpriteInstanceData) });
-        public object Handle(DebugInspectorAction action, ReflectedObject reflected)
+        public ReadOnlyCollection<Type> HandledTypes { get; } = new(new[] { typeof(SpriteInstanceData) });
+        public object Handle(DebugInspectorAction action, ReflectedObject reflected, EventExchange exchange)
         {
-            if (reflected?.Parent == null) return null;
-
-            if (!(reflected.Parent.Target is SpriteInstanceData[] array))
+            if (reflected?.Parent?.Target is not SpriteInstanceData[] array)
                 return null;
 
             switch (action)

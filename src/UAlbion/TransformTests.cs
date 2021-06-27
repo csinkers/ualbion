@@ -7,6 +7,7 @@ namespace UAlbion
 {
     static class TransformTests
     {
+        /*
         public static void Run()
         {
             Vector3 Transform(SpriteInstanceData instance, Vector3 vector)
@@ -55,5 +56,6 @@ namespace UAlbion
 
             Console.ReadLine();
         }
+        */
     }
 }

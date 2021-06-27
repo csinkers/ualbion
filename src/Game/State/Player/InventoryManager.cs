@@ -21,7 +21,7 @@ namespace UAlbion.Game.State.Player
     public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryManager
     {
         readonly Func<InventoryId, Inventory> _getInventory;
-        readonly ItemSlot _hand = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.None));
+        readonly ItemSlot _hand = new(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.None));
         IEvent _returnItemInHandEvent;
 
         ItemSlot GetSlot(InventorySlotId id) => _getInventory(id.Id)?.GetSlot(id.Slot);

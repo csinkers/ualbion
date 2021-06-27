@@ -35,7 +35,7 @@ namespace UAlbion.Formats.Parsers
             ApiUtil.Assert(something == 0);
             byte frameCount = s.UInt8("Frames", 1);
 
-            var result = new Texture<byte>(info.AssetId, width, height * frameCount);
+            var result = new SimpleTexture<byte>(info.AssetId, width, height * frameCount);
             for (int i = 0; i < frameCount; i++)
             {
                 byte[] frameBytes = s.Bytes("Frame" + i, null, width * height);

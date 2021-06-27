@@ -7,7 +7,7 @@ namespace UAlbion.Game.State
 {
     public class SceneStack : Component
     {
-        readonly Stack<SceneId> _stack = new Stack<SceneId>();
+        readonly Stack<SceneId> _stack = new();
         public SceneStack()
         {
             On<PushSceneEvent>(e =>

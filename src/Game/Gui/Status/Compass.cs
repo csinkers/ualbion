@@ -17,7 +17,7 @@ namespace UAlbion.Game.Gui.Status
         const int MarkerRadius = 10;
         static readonly (int, int) Position  = (7, 5);
         static readonly (int, int) Size  = (29, 29);
-        static readonly Vector2 CenterRelative = new Vector2(15, 15);
+        static readonly Vector2 CenterRelative = new(15, 15);
         static readonly (int, int) MarkerSize = (6, 6);
 
         readonly UiSpriteElement _face;

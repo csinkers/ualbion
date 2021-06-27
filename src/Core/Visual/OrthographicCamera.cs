@@ -8,27 +8,39 @@ namespace UAlbion.Core.Visual
     public class OrthographicCamera : ServiceComponent<ICamera>, ICamera
     {
         readonly bool _yAxisIncreasesDownTheScreen;
-        Vector3 _position = new Vector3(0, 0, 0);
-        Vector3 _lookDirection = new Vector3(0, 0, -1f);
+        Vector3 _position = new(0, 0, 0);
+        Vector3 _lookDirection = new(0, 0, -1f);
         Vector2 _viewport = Vector2.One;
-        Matrix4x4 _projectionMatrix;
+        Matrix4x4 _viewMatrix;       
+        Matrix4x4 _projectionMatrix; 
         float _magnification = 1.0f; // TODO: Ensure this defaults to something sensible, and at some point lock it to a value that fits the gameplay and map design.
         float _yaw;
         float _pitch;
         float _farDistance = 1;
+        bool _dirty = true;
 
-        public Matrix4x4 ViewMatrix { get; private set; }
-        public Matrix4x4 ProjectionMatrix => _projectionMatrix;
-        public Vector3 Position { get => _position; set { _position = value; UpdateViewMatrix(); } }
-        public float Magnification { get => _magnification; private set { _magnification = value; UpdatePerspectiveMatrix(); } }
+        public int Version { get; private set; }
+        public Matrix4x4 ViewMatrix { get { Recalculate(); return _viewMatrix; } }
+        public Matrix4x4 ProjectionMatrix { get { Recalculate(); return _projectionMatrix; } }
+        void Recalculate()
+        {
+            if (!_dirty)
+                return;
+            _viewMatrix = CalculateView();
+            _projectionMatrix = CalculateProjection();
+            Version++;
+            _dirty = false;
+        }
+
+        public Vector3 Position { get => _position; set { _position = value; _dirty = true; } }
+        public float Magnification { get => _magnification; private set { _magnification = value; _dirty = true; } }
+        public float FarDistance { get => _farDistance; private set { _farDistance = value; _dirty = true; } } 
+        public float Yaw { get => _yaw; private set { _yaw = value; _dirty = true; } } // Radians
+        public float Pitch { get => _pitch; private set { _pitch = Math.Clamp(value, (float)-Math.PI / 2, (float)Math.PI / 2); _dirty = true; } } // Radians
+        public float AspectRatio => _viewport.X / _viewport.Y;
         public Vector3 LookDirection => _lookDirection;
         public float FieldOfView => 1f;
-
         public float NearDistance => 0;
-        public float FarDistance { get => _farDistance; private set { _farDistance = value; UpdatePerspectiveMatrix(); } } 
-        public float Yaw { get => _yaw; private set { _yaw = value; UpdateViewMatrix(); } } // Radians
-        public float Pitch { get => _pitch; private set { _pitch = Math.Clamp(value, (float)-Math.PI / 2, (float)Math.PI / 2); UpdateViewMatrix(); } } // Radians
-        public float AspectRatio => _viewport.X / _viewport.Y;
 
         public Vector2 Viewport
         {
@@ -38,7 +50,7 @@ namespace UAlbion.Core.Visual
                 if (_viewport == value)
                     return;
                 _viewport = value;
-                UpdatePerspectiveMatrix();
+                _dirty = true;
             }
         }
 
@@ -46,7 +58,7 @@ namespace UAlbion.Core.Visual
         {
             _yAxisIncreasesDownTheScreen = yAxisIncreasesDownTheScreen;
             OnAsync<ScreenCoordinateSelectEvent, Selection>(TransformSelect);
-            On<BackendChangedEvent>(_ => UpdatePerspectiveMatrix());
+            On<BackendChangedEvent>(_ => _dirty = true);
             On<CameraPositionEvent>(e => Position = new Vector3(e.X, e.Y, e.Z));
             On<CameraPlanesEvent>(e => FarDistance = e.Far);
             On<CameraDirectionEvent>(e => { Yaw = ApiUtil.DegToRad(e.Yaw); Pitch = ApiUtil.DegToRad(e.Pitch); });
@@ -61,7 +73,7 @@ namespace UAlbion.Core.Visual
 
                 if (_magnification < 0.5f)
                     _magnification = 0.5f;
-                UpdatePerspectiveMatrix();
+                _dirty = true;
                 Raise(new CameraMagnificationEvent(_magnification));
             });
         }
@@ -69,8 +81,7 @@ namespace UAlbion.Core.Visual
         protected override void Subscribed()
         {
             base.Subscribed();
-            UpdatePerspectiveMatrix();
-            UpdateViewMatrix();
+            _dirty = true;
         }
 
         bool TransformSelect(ScreenCoordinateSelectEvent e, Action<Selection> continuation)
@@ -82,23 +93,24 @@ namespace UAlbion.Core.Visual
             return true;
         }
 
-        void UpdatePerspectiveMatrix()
+        Matrix4x4 CalculateProjection()
         {
-            _projectionMatrix = Matrix4x4.Identity;
-            _projectionMatrix.M11 = 2.0f * _magnification / _viewport.X;
-            _projectionMatrix.M22 = 2.0f * _magnification / _viewport.Y;
-            _projectionMatrix.M33 = 1 / FarDistance;
+            var projectionMatrix = Matrix4x4.Identity;
+            projectionMatrix.M11 = 2.0f * _magnification / _viewport.X;
+            projectionMatrix.M22 = 2.0f * _magnification / _viewport.Y;
+            projectionMatrix.M33 = 1 / FarDistance;
 
             var e = TryResolve<IEngine>();
             if (e != null && _yAxisIncreasesDownTheScreen != e.IsClipSpaceYInverted)
                 _projectionMatrix.M22 = -_projectionMatrix.M22;
+            return projectionMatrix;
         }
 
-        void UpdateViewMatrix()
+        Matrix4x4 CalculateView()
         {
             Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(Yaw, Pitch, 0f);
             _lookDirection = Vector3.Transform(-Vector3.UnitZ, lookRotation);
-            ViewMatrix = Matrix4x4.CreateTranslation(-_position) * Matrix4x4.CreateFromQuaternion(lookRotation);
+            return Matrix4x4.CreateTranslation(-_position) * Matrix4x4.CreateFromQuaternion(lookRotation);
         }
 
         public Vector3 ProjectWorldToNorm(Vector3 worldPosition) => Vector3.Transform(worldPosition, ViewMatrix * ProjectionMatrix) - Vector3.UnitZ;

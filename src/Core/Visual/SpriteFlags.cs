@@ -13,6 +13,13 @@ namespace UAlbion.Core.Visual
         DebugMask      =    0xe00,
         OpacityMask  = 0xff000000, // MSB is opacity
 
+        TopMid = 0,
+        TopLeft = 0x1,
+        MidMid = 0x2,
+        MidLeft = 0x3,
+        BottomMid = 0x4,
+        BottomLeft = 0x5,
+
         LeftAligned    =      0x1, // Horizontal alignment (default is mid aligned)
         MidAligned     =      0x2, // Vertical alignment (default is top aligned)
         BottomAligned  =      0x4, // Vertical alignment

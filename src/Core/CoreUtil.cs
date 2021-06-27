@@ -32,7 +32,7 @@ namespace UAlbion.Core
                     -1, -1, 0, 1
                 };
 
-        public static Texture<T> BuildTransposedTexture<T>(IReadOnlyTexture<T> texture) where T : unmanaged
+        public static ArrayTexture<T> BuildTransposedTexture<T>(IReadOnlyTexture<T> texture) where T : unmanaged
         {
             if (texture == null) throw new ArgumentNullException(nameof(texture));
 
@@ -41,7 +41,7 @@ namespace UAlbion.Core
                texture.PixelData,
                new Span<T>(rotatedPixels));
 
-            return new Texture<T>(
+            return new ArrayTexture<T>(
                 texture.Id,
                 texture.Name + "Rotated",
                 texture.Height, texture.Width,
@@ -77,10 +77,6 @@ namespace UAlbion.Core
             }
         }
 
-        public static void LogInfo(string msg) => Engine.GlobalExchange?.Raise(new LogEvent(LogLevel.Info, msg), null);
-        public static void LogWarn(string msg) => Engine.GlobalExchange?.Raise(new LogEvent(LogLevel.Warning, msg), null);
-        public static void LogError(string msg) => Engine.GlobalExchange?.Raise(new LogEvent(LogLevel.Error, msg), null);
-        public static void LogCritical(string msg) => Engine.GlobalExchange?.Raise(new LogEvent(LogLevel.Critical, msg), null);
         public static bool IsCriticalException(Exception e) => e switch
         {
             OutOfMemoryException _ => true,

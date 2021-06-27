@@ -1,9 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <LangVersion>8</LangVersion>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EmitCompilerGeneratedFiles>True</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
     <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
     <IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">true</IsOSX>
     <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux> 
@@ -37,8 +39,9 @@
     <PackageReference Include="Veldrid" Version="4.8.0" />
     <PackageReference Include="Veldrid.ImageSharp" Version="4.8.0" />
     <PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
-    <PackageReference Include="Veldrid.RenderDoc" Version="1.0.0" />
-    <PackageReference Include="Veldrid.Sdl2" Version="4.8.0" />
+    <PackageReference Include="Veldrid.RenderDoc" Version="1.0.1" />
+    <PackageReference Include="Veldrid.SDL2" Version="4.8.0" />
+    <PackageReference Include="Veldrid.SPIRV" Version="1.0.14" />
     <PackageReference Include="Veldrid.StartupUtilities" Version="4.8.0" />
     <PackageReference Include="Veldrid.Utilities" Version="4.8.0" />
   </ItemGroup>
@@ -53,11 +56,27 @@
     <ProjectReference Include="..\..\deps\veldrid\src\Veldrid.StartupUtilities\Veldrid.StartupUtilities.csproj" />
     <ProjectReference Include="..\..\deps\veldrid\src\Veldrid.Utilities\Veldrid.Utilities.csproj" />
   </ItemGroup>
+
+  <ItemGroup Condition="!Exists('..\..\deps\VeldridGen\')">
+    <PackageReference Include="VeldridGen.Interfaces" />
+    <PackageReference Include="VeldridGen" />
+  </ItemGroup>
+  <ItemGroup Condition="Exists('..\..\deps\VeldridGen\')">
+    <ProjectReference Include="..\..\deps\VeldridGen\VeldridGen.Interfaces\VeldridGen.Interfaces.csproj" />
+    <ProjectReference Include="..\..\deps\VeldridGen\VeldridGen\VeldridGen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
   <ItemGroup Condition="!Exists('..\..\deps\veldrid-spirv\')">
     <PackageReference Include="Veldrid.SPIRV" Version="1.0.13" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\deps\veldrid-spirv\')">
     <ProjectReference Include="..\..\deps\veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj" />
   </ItemGroup>
+
+  <Target Name="RemoveGenerated" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <Compile Remove="$(CompilerGeneratedFilesOutputPath)/*/**/*.cs" />
+    </ItemGroup>
+  </Target>
 
 </Project>

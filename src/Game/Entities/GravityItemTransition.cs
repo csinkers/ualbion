@@ -11,8 +11,8 @@ namespace UAlbion.Game.Entities
 {
     public class GravityItemTransition : Component
     {
-        static readonly Random Random = new Random();
-        static readonly object SyncRoot = new object();
+        static readonly Random Random = new();
+        static readonly object SyncRoot = new();
 
         readonly Action _continuation;
         readonly Sprite _sprite;

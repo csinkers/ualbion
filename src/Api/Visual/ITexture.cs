@@ -11,8 +11,15 @@ namespace UAlbion.Api.Visual
         int Height { get; }
         int ArrayLayers { get; }
         int SizeInBytes { get; }
-        bool IsDirty { get; set; }
         IReadOnlyList<Region> Regions { get; }
+        TextureDirtyType DirtyType { get; }
+        int DirtyId { get; }
+        void Clean();
+    }
+
+    public interface IDepthTexture : ITexture
+    {
+        int Depth { get; }
     }
 
     public interface IReadOnlyTexture<T> : ITexture where T : unmanaged

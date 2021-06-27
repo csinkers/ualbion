@@ -9,7 +9,7 @@ namespace UAlbion.Game.Scenes
     public interface IInventoryScene : IScene { }
 
     [Scene(SceneId.Inventory)]
-    public class InventoryScene : Scene, IInventoryScene
+    public class InventoryScene : Container, IInventoryScene
     {
         bool _clockWasRunning;
 

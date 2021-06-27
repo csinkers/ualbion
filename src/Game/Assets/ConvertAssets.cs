@@ -13,7 +13,7 @@ namespace UAlbion.Game.Assets
 {
     public static class ConvertAssets
     {
-        static (ModApplier, EventExchange) BuildModApplier(string baseDir, string mod, IFileSystem disk, ICoreFactory factory)
+        static (ModApplier, EventExchange) BuildModApplier(string baseDir, string mod, IFileSystem disk)
         {
             var config = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir, disk);
             var applier = new ModApplier();
@@ -21,7 +21,6 @@ namespace UAlbion.Game.Assets
             exchange
                 .Register(disk)
                 .Register<IGeneralConfig>(config)
-                .Register(factory)
                 .Attach(new StdioConsoleLogger())
                 .Attach(new AssetLoaderRegistry())
                 .Attach(new ContainerRegistry())
@@ -35,7 +34,6 @@ namespace UAlbion.Game.Assets
         }
 
         public static void Convert(IFileSystem disk,
-            ICoreFactory factory,
             string fromMod,
             string toMod,
             string[] ids,
@@ -43,11 +41,10 @@ namespace UAlbion.Game.Assets
             Regex filePattern)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
-            if (factory == null) throw new ArgumentNullException(nameof(factory));
 
             var baseDir = ConfigUtil.FindBasePath(disk);
-            var (from, fromExchange) = BuildModApplier(baseDir, fromMod, disk, factory);
-            var (to, toExchange) = BuildModApplier(baseDir, toMod, disk, factory);
+            var (from, fromExchange) = BuildModApplier(baseDir, fromMod, disk);
+            var (to, toExchange) = BuildModApplier(baseDir, toMod, disk);
 
             using (fromExchange)
             using (toExchange)

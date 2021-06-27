@@ -65,7 +65,7 @@ namespace UAlbion.Formats.Parsers
                     totalWidth = width;
             }
 
-            var result = new Texture<byte>(info.AssetId, totalWidth, currentY);
+            var result = new SimpleTexture<byte>(info.AssetId, totalWidth, currentY);
             for (int i = 0; i < frameCount; i++)
             {
                 var (fy, fw, fh) = frames[i];

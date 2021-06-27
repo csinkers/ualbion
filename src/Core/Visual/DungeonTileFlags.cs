@@ -3,16 +3,19 @@
 namespace UAlbion.Core.Visual
 {
     [Flags]
-    public enum DungeonTileFlags
+    public enum DungeonTileFlags : uint
     {
-        TextureType1 = 1,
-        TextureType2 = 1 << 1,
-        UsePalette = 1 << 2,
+        TextureTypeFloor = 0x0,
+        TextureTypeCeiling = 0x1,
+        TextureTypeWall = 0x2,
+        TextureTypeMask = 0x3,
 
-        Highlight = 1 << 3,
-        RedTint = 1 << 4,
-        GreenTint = 1 << 5,
-        BlueTint = 1 << 6,
-        Transparent = 1 << 7,
+        UsePalette = 0x4,
+        Highlight = 0x8,
+        RedTint = 0x10,
+        GreenTint = 0x20,
+        BlueTint = 0x40,
+        Transparent = 0x80,
+        NoTexture = 0x100,
     }
 }

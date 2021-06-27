@@ -12,7 +12,7 @@ namespace UAlbion.Game.Gui.Controls
     {
         readonly SpriteId _id;
         readonly Rectangle _extents;
-        SpriteLease _sprite;
+        ISpriteLease _sprite;
 
         public UiFixedPositionElement(SpriteId id, Rectangle extents)
         {
@@ -23,7 +23,7 @@ namespace UAlbion.Game.Gui.Controls
         }
 
         public override string ToString() => $"{_id} @ {_extents}";
-        public override Vector2 GetSize() => new Vector2(_extents.Width, _extents.Height);
+        public override Vector2 GetSize() => new(_extents.Width, _extents.Height);
 
         protected override void Subscribed()
         {
@@ -31,8 +31,8 @@ namespace UAlbion.Game.Gui.Controls
             {
                 var assets = Resolve<IAssetManager>();
                 var texture = assets.LoadTexture(_id);
-                var key = new SpriteKey(texture, DrawLayer.Interface, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
-                _sprite = Resolve<ISpriteManager>().Borrow(key, 1, this);
+                var key = new SpriteKey(texture, SpriteSampler.Point, DrawLayer.Interface, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
+                _sprite = Resolve<ICoreFactory>().CreateSprites(key, 1, this);
             }
 
             Rebuild();
@@ -54,7 +54,7 @@ namespace UAlbion.Game.Gui.Controls
             var instances = _sprite.Lock(ref lockWasTaken);
             try
             {
-                instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, 0, 0);
+                instances[0] = new SpriteInstanceData(position, size, _sprite.Key.Texture.Regions[0], SpriteFlags.TopLeft);
             }
             finally { _sprite.Unlock(lockWasTaken); }
         }

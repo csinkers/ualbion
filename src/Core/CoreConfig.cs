@@ -9,17 +9,17 @@ namespace UAlbion.Core
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
     public class CoreConfig
     {
-        public VisualT Visual { get; } = new VisualT();
+        public VisualT Visual { get; } = new();
         public class VisualT
         {
-            public TextureManagerT TextureManager { get; } = new TextureManagerT();
+            public TextureManagerT TextureManager { get; } = new();
             public class TextureManagerT
             {
                 public float CacheLifetimeSeconds { get; private set; }
                 public float CacheCheckIntervalSeconds { get; private set; }
             }
 
-            public SkyboxT Skybox { get; } = new SkyboxT();
+            public SkyboxT Skybox { get; } = new();
             public class SkyboxT
             {
                 public float VisibleProportion { get; private set; }

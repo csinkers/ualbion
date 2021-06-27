@@ -3,6 +3,11 @@
     public enum DrawLayer : ushort
     {
         Background = 1, // Skybox in 3D
+        
+        OpaqueTerrain = 64, // Opaque 3D level geometry
+        Billboards = 65, // Sprites in 3D levels
+        TranslucentTerrain = 66, // Windows etc in 3D levels
+
         Overlay    = 0x100, // + (mapHeight - tilePosY - 1)
         Character  = 0x101, // + (mapHeight - tilePosY - 1)
         Underlay   = 0x102, // + (mapHeight - tilePosY - 1)

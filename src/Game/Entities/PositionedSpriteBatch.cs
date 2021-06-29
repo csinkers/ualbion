@@ -7,9 +7,9 @@ namespace UAlbion.Game.Entities
 {
     public sealed class PositionedSpriteBatch : IDisposable
     {
-        ISpriteLease _sprite;
+        SpriteLease _sprite;
         Vector3 _position;
-        public PositionedSpriteBatch(ISpriteLease lease, Vector2 size)
+        public PositionedSpriteBatch(SpriteLease lease, Vector2 size)
         {
             _sprite = lease ?? throw new ArgumentNullException(nameof(lease));
             Size = size;

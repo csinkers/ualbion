@@ -77,7 +77,7 @@ namespace UAlbion
                 .Add(new GameClock())
                 .Add(new IdleClock())
                 .Add(new SlowClock())
-                .Add(new SpriteManager(SpriteBatchComparer.Instance))
+                .Add(new SpriteManager())
                 .Add(new TextureSource())
                 .Add(new SpriteSamplerSource())
                 .Add(new VideoManager())

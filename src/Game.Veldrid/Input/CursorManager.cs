@@ -22,9 +22,9 @@ namespace UAlbion.Game.Veldrid.Input
 
         public Vector2 Position { get; private set; }
         Vector2 _hotspot;
-        ISpriteLease _cursorSprite;
-        ISpriteLease _itemSprite;
-        ISpriteLease _hotspotSprite;
+        SpriteLease _cursorSprite;
+        SpriteLease _itemSprite;
+        SpriteLease _hotspotSprite;
         PositionedSpriteBatch _itemAmountSprite;
         string _lastItemAmountText;
         bool _dirty = true;
@@ -34,11 +34,11 @@ namespace UAlbion.Game.Veldrid.Input
 
         public CursorManager()
         {
-            On<RenderEvent>(e => Render());
-            On<IdleClockEvent>(e => _frame++);
+            On<RenderEvent>(_ => Render());
+            On<IdleClockEvent>(_ => _frame++);
+            On<WindowResizedEvent>(_ => SetCursor(_cursorId));
             On<SetCursorEvent>(e => SetCursor(e.CursorId));
             On<ShowCursorEvent>(e => { _showCursor = e.Show; _dirty = true; });
-            On<WindowResizedEvent>(e => SetCursor(_cursorId));
             On<SetRelativeMouseModeEvent>(e => _relative = e.Enabled);
             On<InputEvent>(e =>
             {
@@ -82,19 +82,19 @@ namespace UAlbion.Game.Veldrid.Input
             _dirty = false;
 
             var assets = Resolve<IAssetManager>();
-            var factory = Resolve<ICoreFactory>();
+            var sm = Resolve<ISpriteManager>();
             var window = Resolve<IWindowManager>();
 
             if (window.Size.X < 1 || window.Size.Y < 1)
                 return;
 
             var position = new Vector3(window.PixelToNorm(Position - _hotspot), 1.0f);
-            RenderCursor(assets, factory, window, position);
-            RenderItemInHandCursor(assets, factory, window, position);
-            RenderHotspot(factory, window, showHotspot);
+            RenderCursor(assets, sm, window, position);
+            RenderItemInHandCursor(assets, sm, window, position);
+            RenderHotspot(sm, window, showHotspot);
         }
 
-        void RenderHotspot(ICoreFactory factory, IWindowManager window, bool showHotspot)
+        void RenderHotspot(ISpriteManager sm, IWindowManager window, bool showHotspot)
         {
             if(!showHotspot)
             {
@@ -107,7 +107,7 @@ namespace UAlbion.Game.Veldrid.Input
             if (_hotspotSprite == null)
             {
                 var key = new SpriteKey(commonColors.BorderTexture, SpriteSampler.Point, DrawLayer.MaxLayer, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
-                _hotspotSprite = factory.CreateSprites(key, 1, this);
+                _hotspotSprite = sm.Borrow(key, 1, this);
             }
 
             var position = new Vector3(window.PixelToNorm(Position), 0.0f);
@@ -123,7 +123,7 @@ namespace UAlbion.Game.Veldrid.Input
             finally { _hotspotSprite.Unlock(lockWasTaken); }
         }
 
-        void RenderCursor(IAssetManager assets, ICoreFactory factory, IWindowManager window, Vector3 position)
+        void RenderCursor(IAssetManager assets, ISpriteManager sm, IWindowManager window, Vector3 position)
         {
             if (!_showCursor)
             {
@@ -142,7 +142,7 @@ namespace UAlbion.Game.Veldrid.Input
             {
                 _cursorSprite?.Dispose();
                 var key = new SpriteKey(cursorTexture, SpriteSampler.Point, DrawLayer.Cursor, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
-                _cursorSprite = factory.CreateSprites(key, 1, this);
+                _cursorSprite = sm.Borrow(key, 1, this);
             }
 
             var size = window.UiToNormRelative(new Vector2(cursorTexture.Width, cursorTexture.Height));
@@ -156,7 +156,7 @@ namespace UAlbion.Game.Veldrid.Input
             finally { _cursorSprite.Unlock(lockWasTaken); }
         }
 
-        void RenderItemInHandCursor(IAssetManager assets, ICoreFactory factory, IWindowManager window, Vector3 normPosition)
+        void RenderItemInHandCursor(IAssetManager assets, ISpriteManager sm, IWindowManager window, Vector3 normPosition)
         {
             var held = Resolve<IInventoryManager>().ItemInHand;
             var itemAmountText = GetAmountText();
@@ -205,7 +205,7 @@ namespace UAlbion.Game.Veldrid.Input
                 _itemSprite?.Dispose();
 
                 var key = new SpriteKey(texture, SpriteSampler.Point, DrawLayer.Cursor, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
-                _itemSprite = factory.CreateSprites(key, 1, this);
+                _itemSprite = sm.Borrow(key, 1, this);
             }
 
             var subImage = texture.Regions[subItem];

@@ -48,7 +48,7 @@ namespace UAlbion.Game.Gui.Text
         {
             if (block == null) throw new ArgumentNullException(nameof(block));
             var assets = Resolve<IAssetManager>();
-            var factory = Resolve<ICoreFactory>();
+            var sm = Resolve<ISpriteManager>();
             var window = Resolve<IWindowManager>();
 
             var font = assets.LoadFont(block.Color, block.Style == TextStyle.Big);
@@ -61,7 +61,7 @@ namespace UAlbion.Game.Gui.Text
             var key = new SpriteKey(font, SpriteSampler.Point, order, flags, scissorRegion);
             int displayableCharacterCount = text.Count(x => mapping.ContainsKey(x));
             int instanceCount = displayableCharacterCount * (isFat ? 4 : 2);
-            var lease = factory.CreateSprites(key, instanceCount, caller);
+            var lease = sm.Borrow(key, instanceCount, caller);
 
             bool lockWasTaken = false;
             var instances = lease.Lock(ref lockWasTaken);

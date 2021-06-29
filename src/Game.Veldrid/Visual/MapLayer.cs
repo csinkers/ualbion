@@ -4,7 +4,6 @@ using System.Numerics;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
@@ -61,7 +60,7 @@ namespace UAlbion.Game.Veldrid.Visual
             On<RenderEvent>(_ => Render());
         }
 
-        public IWeakSpriteReference GetWeakSpriteReference(int x, int y) => _lease.MakeWeakReference(_logicalMap.Index(x, y));
+        public WeakSpriteReference GetWeakSpriteReference(int x, int y) => _lease.MakeWeakReference(_logicalMap.Index(x, y));
 
         protected override void Unsubscribed()
         {
@@ -119,11 +118,11 @@ namespace UAlbion.Game.Veldrid.Visual
                 _allDirty = true;
 #endif
 
-            var factory = Resolve<ICoreFactory>();
+            var sm = Resolve<ISpriteManager>();
             if (_lease == null)
             {
                 var key = new SpriteKey(_tileset, SpriteSampler.Point, _drawLayer, 0);
-                _lease = (SpriteLease)factory.CreateSprites(key, _logicalMap.Width * _logicalMap.Height, this);
+                _lease = sm.Borrow(key, _logicalMap.Width * _logicalMap.Height, this);
                 _allDirty = true;
             }
 

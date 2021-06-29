@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UAlbion.Core.Veldrid.Sprites
+namespace UAlbion.Core.Visual
 {
     public class SpriteBatchComparer : IComparer<SpriteBatch>
     {

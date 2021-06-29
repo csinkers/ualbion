@@ -84,7 +84,10 @@ namespace UAlbion.Game.Entities.Map3D
             AttachChild(new Collider3D(_logicalMap));
 
             if (!_labyrinthData.BackgroundId.IsNone)
-                _skybox = factory.CreateSkybox(_labyrinthData.BackgroundId);
+            {
+                var background = assets.LoadTexture(_labyrinthData.BackgroundId);
+                _skybox = factory.CreateSkybox(background);
+            }
 
             var palette = assets.LoadPalette(_logicalMap.PaletteId);
             uint backgroundColour = palette.GetPaletteAtTime(0)[_labyrinthData.BackgroundColour];

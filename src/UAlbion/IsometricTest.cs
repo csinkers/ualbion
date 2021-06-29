@@ -3,8 +3,8 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
-using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.Config;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
@@ -60,7 +60,7 @@ namespace UAlbion
                 .Add(framebuffer)
                 .Add(renderer)
                 .Add(engine)
-                .Add(new SpriteManager(SpriteBatchComparer.Instance))
+                .Add(new SpriteManager())
                 .Add(new TextureSource())
                 .Add(new SceneStack())
                 .Add(new SceneManager()

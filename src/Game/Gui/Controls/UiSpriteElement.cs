@@ -12,7 +12,7 @@ namespace UAlbion.Game.Gui.Controls
     {
         SpriteId _id;
         Vector2 _size;
-        ISpriteLease _sprite;
+        SpriteLease _sprite;
         Vector3 _lastPosition;
         Vector2 _lastSize;
         int _subId;
@@ -102,7 +102,7 @@ namespace UAlbion.Game.Gui.Controls
                 return;
 
             var assets = Resolve<IAssetManager>();
-            var factory = Resolve<ICoreFactory>();
+            var sm = Resolve<ISpriteManager>();
 
             _sprite?.Dispose();
             _sprite = null;
@@ -117,7 +117,7 @@ namespace UAlbion.Game.Gui.Controls
                 if (texture == null)
                     return;
                 var key = new SpriteKey(texture, SpriteSampler.Point, order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
-                _sprite = factory.CreateSprites(key, 1, this);
+                _sprite = sm.Borrow(key, 1, this);
                 _size = texture.Regions[0].Size;
             }
         }

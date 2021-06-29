@@ -1,9 +1,8 @@
 ﻿using System;
-using UAlbion.Core.Visual;
 
-namespace UAlbion.Core.Veldrid.Sprites
+namespace UAlbion.Core.Visual
 {
-    public class WeakSpriteReference : IWeakSpriteReference
+    public class WeakSpriteReference
     {
         readonly WeakReference<SpriteLease> _lease;
         readonly SpriteBatch _spriteBatch;

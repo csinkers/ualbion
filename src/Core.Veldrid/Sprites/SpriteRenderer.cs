@@ -36,7 +36,7 @@ namespace UAlbion.Core.Veldrid.Sprites
             });
         }
 
-        public void Render(CommandList cl, SpriteBatch batch, CommonSet commonSet, IFramebufferHolder framebuffer)
+        public void Render(CommandList cl, VeldridSpriteBatch batch, CommonSet commonSet, IFramebufferHolder framebuffer)
         {
             if (cl == null) throw new ArgumentNullException(nameof(cl));
             if (batch == null) throw new ArgumentNullException(nameof(batch));

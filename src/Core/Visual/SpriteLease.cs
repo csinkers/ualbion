@@ -2,11 +2,10 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using UAlbion.Api.Visual;
-using UAlbion.Core.Visual;
 
-namespace UAlbion.Core.Veldrid.Sprites
+namespace UAlbion.Core.Visual
 {
-    public sealed class SpriteLease : IComparable<SpriteLease>, ISpriteLease
+    public sealed class SpriteLease : IComparable<SpriteLease>
     {
         readonly SpriteBatch _spriteBatch;
         public SpriteKey Key => _spriteBatch.Key;
@@ -26,7 +25,7 @@ namespace UAlbion.Core.Veldrid.Sprites
             Unlock(taken);
         }
 
-        public IWeakSpriteReference MakeWeakReference(int index) => new WeakSpriteReference(_spriteBatch, this, index);
+        public WeakSpriteReference MakeWeakReference(int index) => new(_spriteBatch, this, index);
 
         public void Update(int index, Vector3 position, Vector2 size, int regionIndex, SpriteFlags flags)
             => Update(index, position, size, Key.Texture.Regions[regionIndex], flags);
@@ -76,6 +75,15 @@ namespace UAlbion.Core.Veldrid.Sprites
         \* ========================================= */
 
         /// <summary>
+        /// A delegate type for sprite instance data mutation functions. Accepts a span of the
+        /// lease's instances as well as an arbitrary context object.
+        /// </summary>
+        /// <typeparam name="T">The type of the context object</typeparam>
+        /// <param name="instances">A span pointing at the lease's instance data</param>
+        /// <param name="context">The context for the mutator function</param>
+        public delegate void LeaseAccessDelegate<in T>(Span<SpriteInstanceData> instances, T context);
+
+        /// <summary>
         /// Invokes the mutator function with a span of the lease's instance
         /// data to allow modification. An arbitrary context object can also be
         /// passed in to avoid allocation of a closure.
@@ -83,7 +91,7 @@ namespace UAlbion.Core.Veldrid.Sprites
         /// <typeparam name="T">The type of the context object</typeparam>
         /// <param name="mutatorFunc">The function used to modify the instance data</param>
         /// <param name="context">The context for the mutator function</param>
-        public void Access<T>(ISpriteLease.LeaseAccessDelegate<T> mutatorFunc, T context)
+        public void Access<T>(SpriteLease.LeaseAccessDelegate<T> mutatorFunc, T context)
         {
             if (mutatorFunc == null) throw new ArgumentNullException(nameof(mutatorFunc));
             bool lockWasTaken = false;

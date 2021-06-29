@@ -1,58 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Threading;
 using UAlbion.Api;
-using UAlbion.Core.Visual;
-using Veldrid;
 
-namespace UAlbion.Core.Veldrid.Sprites
+namespace UAlbion.Core.Visual
 {
-    public class SpriteBatch : Component
+    public abstract class SpriteBatch : Component
     {
-        const int MinSize = 4;
-        const double GrowthFactor = 1.5;
-        const double ShrinkFactor = 0.3;
+        protected const int MinSize = 4;
+        protected const double GrowthFactor = 1.5;
+        protected const double ShrinkFactor = 0.3;
 
         readonly object _syncRoot = new();
         readonly List<SpriteLease> _leases = new();
 
-        public SpriteBatch(SpriteKey key)
+        protected SpriteBatch(SpriteKey key)
         {
             Key = key;
-            Instances = AttachChild(new MultiBuffer<GpuSpriteInstanceData>(MinSize, BufferUsage.VertexBuffer, $"B_Inst:{Name}"));
-            Uniform = AttachChild(new SingleBuffer<SpriteUniform>(new SpriteUniform
-            {
-                Flags = Key.Flags,
-                TextureWidth = key.Texture.Width,
-                TextureHeight = key.Texture.Height
-            }, BufferUsage.UniformBuffer, $"B_SpriteUniform:{Name}"));
         }
 
-        public string Name => $"Sprite:{Key.Texture.Name}";
-        public override string ToString() => $"Multi:{Name} Flags:{Key.Flags} ({ActiveInstances}/{Instances.Count} instances)";
+        protected abstract ReadOnlySpan<SpriteInstanceData> ReadOnlySprites { get; }
+        protected abstract Span<SpriteInstanceData> MutableSprites { get; }
+        protected abstract void Resize(int instanceCount);
+
         public SpriteKey Key { get; }
+        public string Name => $"Sprite:{Key.Texture.Name}";
+        public override string ToString() => $"Multi:{Name} Flags:{Key.Flags} ({ActiveInstances}/{ReadOnlySprites.Length} instances)";
         public int ActiveInstances { get; private set; }
-        public MultiBuffer<GpuSpriteInstanceData> Instances { get; }
-        public SingleBuffer<SpriteUniform> Uniform { get; }
-        public SpriteArraySet SpriteResources { get; private set; }
-        protected override void Subscribed()
-        {
-            var samplerSource = Resolve<ISpriteSamplerSource>();
-            SpriteResources = AttachChild(new SpriteArraySet
-            {
-                Name = $"RS_Sprite:{Key.Texture.Name}",
-                Texture = Resolve<ITextureSource>().GetArrayTexture(Key.Texture),
-                Sampler = samplerSource.Get(Key.Sampler),
-                Uniform = Uniform
-            });
-        }
-
-        protected override void Unsubscribed()
-        {
-            RemoveChild(SpriteResources);
-        }
 
         internal SpriteLease Grow(int length, object caller)
         {
@@ -61,13 +36,13 @@ namespace UAlbion.Core.Veldrid.Sprites
                 PerfTracker.IncrementFrameCounter("Sprite Borrows");
                 int from = ActiveInstances;
                 ActiveInstances += length;
-                if (ActiveInstances >= Instances.Count)
+                if (ActiveInstances >= ReadOnlySprites.Length)
                 {
-                    int newSize = Instances.Count;
+                    int newSize = ReadOnlySprites.Length;
                     while (newSize <= ActiveInstances)
                         newSize = (int)(newSize * GrowthFactor);
 
-                    Instances.Resize(newSize);
+                    Resize(newSize);
                 }
 
                 var lease = new SpriteLease(this, from, ActiveInstances) { Owner = caller };
@@ -79,10 +54,11 @@ namespace UAlbion.Core.Veldrid.Sprites
 
         public void Shrink(SpriteLease leaseToRemove)
         {
+            if (leaseToRemove == null) throw new ArgumentNullException(nameof(leaseToRemove));
             // TODO: Use a more efficient algorithm, e.g. look for equal sized lease at end of list and swap, use linked list for lease list etc
             lock (_syncRoot)
             {
-                var buffer = Instances.Borrow();
+                var buffer = MutableSprites;
                 VerifyConsistency();
                 PerfTracker.IncrementFrameCounter("Sprite Returns");
                 bool shifting = false;
@@ -106,14 +82,14 @@ namespace UAlbion.Core.Veldrid.Sprites
                 }
                 VerifyConsistency();
 
-                if ((double)ActiveInstances / Instances.Count < ShrinkFactor)
+                if ((double)ActiveInstances / buffer.Length < ShrinkFactor)
                 {
-                    int newSize = Instances.Count;
+                    int newSize = buffer.Length;
                     while ((double)ActiveInstances / newSize > ShrinkFactor)
                         newSize = (int)(newSize * ShrinkFactor);
                     newSize = Math.Max(newSize, ActiveInstances);
                     newSize = Math.Max(newSize, MinSize);
-                    Instances.Resize(newSize);
+                    Resize(newSize);
                 }
             }
         }
@@ -139,8 +115,7 @@ namespace UAlbion.Core.Veldrid.Sprites
             if (lease == null) throw new ArgumentNullException(nameof(lease));
             PerfTracker.IncrementFrameCounter("Sprite Accesses");
             Monitor.Enter(_syncRoot, ref lockWasTaken);
-            var instances = Instances.Borrow();
-            return MemoryMarshal.Cast<GpuSpriteInstanceData, SpriteInstanceData>(instances.Slice(lease.From, lease.Length));
+            return MutableSprites.Slice(lease.From, lease.Length);
         }
 
         public void Unlock(SpriteLease _, bool lockWasTaken) // Might need the lease param later if we do more fine grained locking
@@ -150,4 +125,3 @@ namespace UAlbion.Core.Veldrid.Sprites
         }
     }
 }
-

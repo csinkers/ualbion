@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Core.Visual;
 
-namespace UAlbion.Core.Veldrid.Sprites
+namespace UAlbion.Core.Visual
 {
-    public interface ISpriteManager
-    {
-        IReadOnlyList<SpriteBatch> Ordered { get; }
-    }
-
     public class SpriteManager : ServiceComponent<ISpriteManager>, ISpriteManager
     {
         readonly object _syncRoot = new();
@@ -16,19 +10,18 @@ namespace UAlbion.Core.Veldrid.Sprites
         readonly List<SpriteBatch> _ordered = new();
         readonly IComparer<SpriteBatch> _comparer;
 
-        public SpriteManager(IComparer<SpriteBatch> comparer)
-        {
-            _comparer = comparer;
-        }
+        public SpriteManager(IComparer<SpriteBatch> comparer = null)
+            => _comparer = comparer ?? SpriteBatchComparer.Instance;
 
-        public ISpriteLease Borrow(SpriteKey key, int length, object caller)
+        public SpriteLease Borrow(SpriteKey key, int length, object caller)
         {
             if (length <= 0) throw new ArgumentOutOfRangeException(nameof(length));
+            var factory = Resolve<ICoreFactory>();
             lock (_syncRoot)
             {
                 if (!_sprites.TryGetValue(key, out var entry))
                 {
-                    entry = AttachChild(new SpriteBatch(key));
+                    entry = AttachChild(factory.CreateSpriteBatch(key));
                     _sprites[key] = entry;
                     _ordered.Add(entry);
                 }

@@ -6,6 +6,6 @@ namespace UAlbion.Game.Entities.Map2D
     public interface IMapLayer : IComponent
     {
         int? HighlightIndex { get; set; }
-        IWeakSpriteReference GetWeakSpriteReference(int x, int y);
+        WeakSpriteReference GetWeakSpriteReference(int x, int y);
     }
 }

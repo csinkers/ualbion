@@ -25,7 +25,7 @@ namespace UAlbion.Game.Gui.Controls
         {
             var shadowSubImage = new Region(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
             var window = Resolve<IWindowManager>();
-            var factory = Resolve<ICoreFactory>();
+            var sm = Resolve<ISpriteManager>();
 
             { // Check if we need to rebuild
                 var normSize = window.UiToNormRelative(width, height);
@@ -49,7 +49,7 @@ namespace UAlbion.Game.Gui.Controls
             var key = new SpriteKey(multi, SpriteSampler.Point, order, SpriteKeyFlags.NoTransform);
             _sprite?.Dispose();
 
-            var lease = factory.CreateSprites(key, 2, this);
+            var lease = sm.Borrow(key, 2, this);
             var flags = SpriteFlags.None.SetOpacity(0.5f);
 
             var shadowPosition = new Vector3(window.UiToNormRelative(10, 10), 0);

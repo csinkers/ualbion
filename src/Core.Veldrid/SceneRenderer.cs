@@ -78,7 +78,7 @@ namespace UAlbion.Core.Veldrid
                     _etmRenderer.Render(cl, (DungeonTilemap)tilemap, _commonSet, _framebuffer);
 
                 foreach (var batch in ((SpriteManager)Resolve<ISpriteManager>()).Ordered)
-                    _spriteRenderer.Render(cl, batch, _commonSet, _framebuffer);
+                    _spriteRenderer.Render(cl, (VeldridSpriteBatch)batch, _commonSet, _framebuffer);
 
                 _debugRenderer.Render(device, cl);
             }

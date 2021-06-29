@@ -24,12 +24,15 @@ namespace UAlbion.Game.Tests
             Exchange.Unregister(this);
         }
 
-        public ISkybox CreateSkybox(IAssetId assetId)
+        public ISkybox CreateSkybox(ITexture texture)
         {
             throw new NotImplementedException();
         }
 
-        public ISpriteLease CreateSprites(SpriteKey key, int length, object caller) => new MockSpriteLease(key, length);
+        public SpriteBatch CreateSpriteBatch(SpriteKey key)
+        {
+            return new MockSpriteBatch(key);
+        }
 
         public IMapLayer CreateMapLayer(LogicalMap2D logicalMap, ITexture tileset, Func<int, int, TileData> getTileFunc, DrawLayer layer,
             IconChangeType iconChangeType)

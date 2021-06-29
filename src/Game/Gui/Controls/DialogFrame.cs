@@ -125,8 +125,8 @@ namespace UAlbion.Game.Gui.Controls
             var key = new SpriteKey(multi, SpriteSampler.Point, order, SpriteKeyFlags.NoTransform);
             _sprite?.Dispose();
 
-            var factory = Resolve<ICoreFactory>();
-            var lease = factory.CreateSprites(key, 3, this);
+            var sm = Resolve<ISpriteManager>();
+            var lease = sm.Borrow(key, 3, this);
             var flags = SpriteFlags.None.SetOpacity(0.5f);
             var shadowSubImage = new Region(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
 

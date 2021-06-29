@@ -10,6 +10,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
+using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Exporters.Tiled;
@@ -57,7 +58,7 @@ namespace UAlbion.Game.Veldrid.Assets
                 .Add(framebuffer)
                 .Add(sceneRenderer)
                 .Add(_engine)
-                .Add(new SpriteManager(SpriteBatchComparer.Instance))
+                .Add(new SpriteManager())
                 .Add(new TextureSource())
                 .Add(new SceneStack())
                 .Add(new SceneManager()

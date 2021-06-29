@@ -1,9 +1,4 @@
-﻿using System;
-using System.Numerics;
-using UAlbion.Api.Visual;
-using UAlbion.Core.Visual;
-
-namespace UAlbion
+﻿namespace UAlbion
 {
     static class TransformTests
     {

@@ -12,7 +12,7 @@ namespace UAlbion.Game.Gui.Controls
     {
         readonly SpriteId _id;
         readonly Rectangle _extents;
-        ISpriteLease _sprite;
+        SpriteLease _sprite;
 
         public UiFixedPositionElement(SpriteId id, Rectangle extents)
         {
@@ -30,9 +30,10 @@ namespace UAlbion.Game.Gui.Controls
             if (_sprite == null)
             {
                 var assets = Resolve<IAssetManager>();
+                var sm = Resolve<ISpriteManager>();
                 var texture = assets.LoadTexture(_id);
                 var key = new SpriteKey(texture, SpriteSampler.Point, DrawLayer.Interface, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
-                _sprite = Resolve<ICoreFactory>().CreateSprites(key, 1, this);
+                _sprite = sm.Borrow(key, 1, this);
             }
 
             Rebuild();

@@ -4,7 +4,7 @@ namespace UAlbion.Core.Visual
 {
     public interface ICoreFactory
     {
-        ISkybox CreateSkybox(IAssetId assetId);
-        ISpriteLease CreateSprites(SpriteKey key, int length, object caller);
+        ISkybox CreateSkybox(ITexture texture);
+        SpriteBatch CreateSpriteBatch(SpriteKey key);
     }
 }

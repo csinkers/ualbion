@@ -21,7 +21,7 @@ namespace UAlbion.Game.Gui.Controls
     {
         public delegate ButtonColorScheme ThemeFunction(ButtonState state);
 
-        ISpriteLease _sprite;
+        SpriteLease _sprite;
         Rectangle _lastExtents;
         ButtonState _state = ButtonState.Normal;
         ThemeFunction _theme = ButtonTheme.Default;
@@ -89,9 +89,9 @@ namespace UAlbion.Game.Gui.Controls
                 if (instanceCount == 0)
                     return;
 
-                var factory = Resolve<ICoreFactory>();
+                var sm = Resolve<ISpriteManager>();
                 var key = new SpriteKey(commonColors.BorderTexture, SpriteSampler.Point, order, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
-                _sprite = factory.CreateSprites(key, instanceCount, this);
+                _sprite = sm.Borrow(key, instanceCount, this);
             }
 
             bool lockWasTaken = false;

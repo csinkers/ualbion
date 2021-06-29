@@ -11,7 +11,7 @@ namespace UAlbion.Core.Visual
         readonly SpriteKeyFlags _keyFlags;
         readonly Func<IAssetId, ITexture> _loaderFunc;
 
-        ISpriteLease _sprite;
+        SpriteLease _sprite;
         Vector3 _position;
         Vector2? _size;
         int _frame;
@@ -153,8 +153,8 @@ namespace UAlbion.Core.Visual
                 Frame = frame;
 
                 var key = new SpriteKey(texture, SpriteSampler.Point, _layer, _keyFlags);
-                var factory = Resolve<ICoreFactory>();
-                _sprite = factory.CreateSprites(key, 1, this);
+                var sm = Resolve<ISpriteManager>();
+                _sprite = sm.Borrow(key, 1, this);
             }
 
             _sprite.Update(0, _position, Size, Frame, _flags);

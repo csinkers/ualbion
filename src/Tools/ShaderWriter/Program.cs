@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
-using UAlbion.Core.SpriteRenderer;
+using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Sprites;
 
 namespace UAlbion.ShaderWriter
 {
@@ -25,6 +26,10 @@ namespace UAlbion.ShaderWriter
             bool success = true;
             success &= Emit(SpriteVertexShader.ShaderSource(), args[0]);
             success &= Emit(SpriteFragmentShader.ShaderSource(), args[0]);
+            success &= Emit(EtmVertexShader.ShaderSource(), args[0]);
+            success &= Emit(EtmFragmentShader.ShaderSource(), args[0]);
+            success &= Emit(SkyboxVertexShader.ShaderSource(), args[0]);
+            success &= Emit(SkyboxFragmentShader.ShaderSource(), args[0]);
             return success ? 0 : 1;
         }
 

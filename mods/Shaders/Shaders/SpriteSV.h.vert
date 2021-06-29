@@ -1,11 +1,4 @@
-﻿using Veldrid;
-namespace UAlbion.Core.Veldrid.Sprites
-{
-    public partial class SpriteVertexShader
-    {
-        public static (string, string) ShaderSource()
-        {
-            return ("SpriteSV.h.vert", @"// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // !!! This file was auto-generated using VeldridGen. It should not be edited by hand. !!!
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //!#version 450 // Comments with //! are just for the VS GLSL plugin
@@ -102,7 +95,3 @@ layout(location = 2) out flat uint oFlags;
 layout(location = 3) out vec2 oNormCoords;
 layout(location = 4) out vec3 oWorldPosition;
 
-");
-        }
-    }
-}

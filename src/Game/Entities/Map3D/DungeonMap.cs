@@ -79,7 +79,7 @@ namespace UAlbion.Game.Entities.Map3D
             };
 
             _selection = AttachChild(new Selection3D());
-            AttachChild(new MapRenderable3D(MapId, _logicalMap, _labyrinthData, properties));
+            AttachChild(new MapRenderable3D(_logicalMap, _labyrinthData, properties));
             AttachChild(new ScriptManager());
             AttachChild(new Collider3D(_logicalMap));
 

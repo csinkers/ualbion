@@ -29,7 +29,7 @@ namespace UAlbion.Core.Veldrid
 
         protected FramebufferHolder(uint width, uint height)
         {
-            On<DeviceCreatedEvent>(_ => Dirty());
+            On<DeviceCreatedEvent>(e => Update(e.Device));
             On<DestroyDeviceObjectsEvent>(_ => Dispose());
             _width = width;
             _height = height;
@@ -45,13 +45,14 @@ namespace UAlbion.Core.Veldrid
             Framebuffer = null;
         }
 
-        void Dirty() => On<PrepareFrameResourcesEvent>(e =>
+        void Dirty() => On<PrepareFrameResourcesEvent>(e => Update(e.Device));
+        void Update(GraphicsDevice device)
         {
             Dispose();
-            Framebuffer = CreateFramebuffer(e.Device);
+            Framebuffer = CreateFramebuffer(device);
             _width = Framebuffer.Width;
             _height = Framebuffer.Height;
             Off<PrepareFrameResourcesEvent>();
-        });
+        }
     }
 }

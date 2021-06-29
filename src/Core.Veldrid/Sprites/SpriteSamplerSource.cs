@@ -4,7 +4,7 @@ using Veldrid;
 
 namespace UAlbion.Core.Veldrid.Sprites
 {
-    public class SpriteSamplerSource : Component, ISpriteSamplerSource
+    public class SpriteSamplerSource : ServiceComponent<ISpriteSamplerSource>, ISpriteSamplerSource
     {
         readonly SamplerHolder LinearSampler;
         readonly SamplerHolder PointSampler;

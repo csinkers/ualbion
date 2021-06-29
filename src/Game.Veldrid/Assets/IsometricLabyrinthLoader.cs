@@ -40,13 +40,13 @@ namespace UAlbion.Game.Veldrid.Assets
             var config = Resolve<IGeneralConfig>();
             var shaderCache = new ShaderCache(config.ResolvePath("$(CACHE)/ShaderCache"));
             var framebuffer = new OffscreenFramebuffer(DefaultWidth * DefaultTilesPerRow, DefaultHeight);
-            var sceneRenderer = new SceneRenderer("MainPipeline", framebuffer);
+            var sceneRenderer = new SceneRenderer("MainPipeline", framebuffer, Renderers.ExtrudedTilemap | Renderers.Sprite);
 
             foreach (var shaderPath in Resolve<IModApplier>().ShaderPaths)
                 shaderCache.AddShaderPath(shaderPath);
 
             _engine = new Engine(
-                GraphicsBackend.Vulkan, false, false, true, sceneRenderer)
+                GraphicsBackend.Vulkan, false, false, false, sceneRenderer)
                 ;
 
 #pragma warning restore CA2000 // Dispose objects before losing scopes
@@ -58,7 +58,9 @@ namespace UAlbion.Game.Veldrid.Assets
                 .Add(framebuffer)
                 .Add(sceneRenderer)
                 .Add(_engine)
+                .Add(new EtmManager())
                 .Add(new SpriteManager())
+                .Add(new SpriteSamplerSource())
                 .Add(new TextureSource())
                 .Add(new SceneStack())
                 .Add(new SceneManager()

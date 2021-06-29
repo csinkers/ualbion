@@ -9,6 +9,6 @@ namespace UAlbion.Game.Entities
 {
     public interface IGameFactory : ICoreFactory
     {
-        IMapLayer CreateMapLayer(LogicalMap2D logicalMap, ITexture tileset, Func<int, int, TileData> getTileFunc, DrawLayer layer, IconChangeType iconChangeType);
+        IMapLayer CreateMapLayer(LogicalMap2D logicalMap, ITexture tileset, Func<int, TileData> getTileFunc, DrawLayer layer, IconChangeType iconChangeType);
     }
 }

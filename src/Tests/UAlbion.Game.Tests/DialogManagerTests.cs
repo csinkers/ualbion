@@ -48,10 +48,12 @@ namespace UAlbion.Game.Tests
             ex
                 .Attach(mma)
                 .Attach(new AssetManager())
+                .Attach(new SpriteManager())
+                .Attach(new MockGameFactory())
                 .Attach(new WordLookup())
                 .Attach(new TextFormatter())
                 .Attach(new TextManager())
-                .Attach(new WindowManager { Window = new MockWindow(1920, 1080) })
+                .Attach(new WindowManager { Resolution = (1920, 1080) })
                 .Attach(new MockSettings { Language = Base.Language.English })
                 .Attach(dm)
                 .Attach(lm)

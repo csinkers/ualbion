@@ -167,6 +167,7 @@ namespace UAlbion.Game.Veldrid.Assets
 
             return new TilemapRequest
             {
+                Id = LabyrinthId,
                 Scale = new Vector3(SideLength, YHeight, SideLength),
                 Rotation = new Vector3(PitchRads, YawRads, 0),
                 Origin = topLeft + new Vector3(_width, -_height, 0) / 2,

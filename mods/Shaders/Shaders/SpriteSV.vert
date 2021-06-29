@@ -2,11 +2,43 @@
 
 void main()
 {
-    mat4 transform = mat4(
-        vec4(iTransform1, 0),
-        vec4(iTransform2, 0),
-        vec4(iTransform3, 0),
-        vec4(iTransform4, 1));
+    mat4 transform;
+	vec3 offset = vec3(0);
+	switch (iFlags & SF_ALIGNMENT_MASK)
+	{
+		case SF_MID_MID:     offset = vec3(0, -0.5f, 0);
+		case SF_BOTTOM_MID:  offset = vec3(0, -1.0f, 0);
+		case SF_TOP_LEFT:    offset = vec3(0.5f, 0, 0);
+		case SF_MID_LEFT:    offset = vec3(0.5f, -0.5f, 0);
+		case SF_BOTTOM_LEFT: offset = vec3(0.5f, -1.0f, 0);
+	};
+
+	transform = mat4(
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        offset.x, offset.y, offset.z, 1);
+
+	if ((iFlags & SF_FLOOR) != 0)
+	{
+		transform *= mat4(
+			1, 0, 0, 0,
+			0, 0,-1, 0,
+			0, 1, 0, 0,
+			0, 0, 0, 1);
+	}
+
+	transform *= mat4(
+        iSize.x, 0, 0, 0,
+        0, iSize.y, 0, 0, 
+        0, 0, iSize.x, 0, 
+        0,   0,   0,  1);
+
+	transform *= mat4(
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        iInstancePos.x, iInstancePos.y, iInstancePos.z, 1);
 
     if ((iFlags & SF_BILLBOARD) != 0)
     {

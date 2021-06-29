@@ -14,13 +14,16 @@ namespace UAlbion.Core.Veldrid
         public DebugGuiRenderer(IFramebufferHolder framebuffer)
         {
             _framebuffer = framebuffer;
-            On<InputEvent>(e => _imguiRenderer.Update((float)e.DeltaSeconds, e.Snapshot));
-            On<WindowResizedEvent>(e => _imguiRenderer.WindowResized(e.Width, e.Height));
-            On<DeviceCreatedEvent>(e => CreateDeviceObjects(e.Device));
+            On<InputEvent>(e => _imguiRenderer?.Update((float)e.DeltaSeconds, e.Snapshot));
+            On<WindowResizedEvent>(e => _imguiRenderer?.WindowResized(e.Width, e.Height));
             On<DestroyDeviceObjectsEvent>(_ => Dispose());
         }
 
-        public void CreateDeviceObjects(GraphicsDevice graphicsDevice)
+        protected override void Subscribed() => Dirty();
+        protected override void Unsubscribed() => Dispose();
+        void Dirty() => On<PostEngineUpdateEvent>(e => CreateDeviceObjects(e.Device));
+
+        void CreateDeviceObjects(GraphicsDevice graphicsDevice)
         {
             if (graphicsDevice == null) throw new ArgumentNullException(nameof(graphicsDevice));
             if (_imguiRenderer == null)
@@ -37,6 +40,7 @@ namespace UAlbion.Core.Veldrid
             {
                 _imguiRenderer.CreateDeviceResources(graphicsDevice, graphicsDevice.SwapchainFramebuffer.OutputDescription, ColorSpaceHandling.Linear);
             }
+            Off<PostEngineUpdateEvent>();
         }
 
         public void Render(GraphicsDevice gd, CommandList cl)

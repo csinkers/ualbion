@@ -1,11 +1,4 @@
-﻿using Veldrid;
-namespace UAlbion.Core.Veldrid
-{
-    public partial class EtmFragmentShader
-    {
-        public static (string, string) ShaderSource()
-        {
-            return ("ExtrudedTileMapSF.h.frag", @"// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // !!! This file was auto-generated using VeldridGen. It should not be edited by hand. !!!
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //!#version 450 // Comments with //! are just for the VS GLSL plugin
@@ -34,11 +27,17 @@ namespace UAlbion.Core.Veldrid
 #define EF_USE_CYLINDRICAL_BILLBOARDS 0x40U
 #define EF_RENDER_DEPTH 0x80U
 
-layout(set = 0, binding = 1) uniform texture2DArray DayFloors; //!
-layout(set = 0, binding = 2) uniform texture2DArray DayWalls; //!
-layout(set = 0, binding = 3) uniform texture2DArray NightFloors; //!
-layout(set = 0, binding = 4) uniform texture2DArray NightWalls; //!
-layout(set = 0, binding = 5) uniform sampler TextureSampler; //!
+layout(set = 0, binding = 0) uniform Properties {
+    vec4 uScale;
+    vec4 uRotation;
+    vec4 uOrigin;
+    vec4 uHorizontalSpacing;
+    vec4 uVerticalSpacing;
+    uint uWidth;
+    uint uAmbient;
+    uint uFogColor;
+    float uYScale;
+};
 
 layout(set = 1, binding = 0) uniform _Shared {
     vec3 uWorldSpacePosition;
@@ -53,17 +52,24 @@ layout(set = 1, binding = 0) uniform _Shared {
     float uSpecial2;
     uint _globalInfo_pad5;
 };
-layout(set = 1, binding = 3) uniform texture2D uPalette; //!
+layout(set = 1, binding = 1) uniform _Projection {
+    mat4 uProjection;
+};
+layout(set = 1, binding = 2) uniform _View {
+    mat4 uView;
+};
+
+// UAlbion.Core.Veldrid.Sprites.Vertex3DTextured
+layout(location = 0) in vec3 iPosition;
+layout(location = 1) in vec2 iTexCoords;
+
+// UAlbion.Core.Veldrid.DungeonTile
+layout(location = 2) in uint iTextures;
+layout(location = 3) in vec2 iWallSize;
+layout(location = 4) in uint iFlags;
 
 // UAlbion.Core.Veldrid.EtmIntermediate
-layout(location = 0) in vec2 iTexCoords;
-layout(location = 1) in flat uint iTextures;
-layout(location = 2) in flat uint iFlags;
+layout(location = 0) out vec2 oTexCoords;
+layout(location = 1) out flat uint oTextures;
+layout(location = 2) out flat uint oFlags;
 
-// UAlbion.Core.Veldrid.Sprites.ColorOnly
-layout(location = 0) out vec4 oColor;
-
-");
-        }
-    }
-}

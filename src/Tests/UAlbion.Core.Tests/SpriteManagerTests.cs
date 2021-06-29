@@ -1,7 +1,4 @@
-﻿using UAlbion.Core.Visual;
-using Xunit;
-
-namespace UAlbion.Core.Tests
+﻿namespace UAlbion.Core.Tests
 {
     /*
     public class SpriteManagerTests

@@ -1,16 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Example\UAlbion.Core.SpriteRenderer\UAlbion.Core.SpriteRenderer.csproj" />
-  </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="dotnet &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Example\UAlbion.Core.SpriteRenderer\Shaders&quot;" />
+    <Exec Command="dotnet &quot;$(TargetPath)&quot; &quot;$(SolutionDir)mods\Shaders\Shaders&quot;" />
   </Target>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core.Veldrid\UAlbion.Core.Veldrid.csproj" />
+  </ItemGroup>
 
 </Project>

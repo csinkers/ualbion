@@ -57,7 +57,7 @@ namespace UAlbion.Core.Veldrid
                     _done = true;
             });
             On<QuitEvent>(_ => _done = true);
-            On<WindowResizedEvent>(e => _graphicsDevice.ResizeMainWindow((uint)e.Width, (uint)e.Height));
+            On<WindowResizedEvent>(e => _graphicsDevice?.ResizeMainWindow((uint)e.Width, (uint)e.Height));
 
             On<LoadRenderDocEvent>(e =>
             {
@@ -278,6 +278,10 @@ namespace UAlbion.Core.Veldrid
 
         public unsafe Image<Bgra32> RenderFrame(bool captureWithRenderDoc)
         {
+            if(_newBackend != null)
+                ChangeBackend(_newBackend.Value);
+            _newBackend = null;
+
             if (captureWithRenderDoc)
                 _renderDoc.TriggerCapture();
 

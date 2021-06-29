@@ -57,7 +57,7 @@ namespace UAlbion.Core.Veldrid.Sprites
 
     public partial struct GpuSpriteInstanceData : IVertexFormat
     {
-        [Vertex("Position")]  public Vector4 Position;
+        [Vertex("InstancePos")]  public Vector4 Position;
         [Vertex("Size")]      public Vector2 Size;
         [Vertex("TexOffset")] public Vector2 TexPosition; // Normalised texture coordinates
         [Vertex("TexSize")]   public Vector2 TexSize; // Normalised texture coordinates

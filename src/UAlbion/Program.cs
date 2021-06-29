@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -60,9 +59,7 @@ namespace UAlbion
                 return;
             }
 
-            var setupAssetSystem = Task.Run(() => AssetSystem.SetupAsync(baseDir, disk));
-            var (exchange, services) = setupAssetSystem.Result;
-
+            var (exchange, services) = AssetSystem.SetupAsync(baseDir, disk).Result;
             if (commandLine.NeedsEngine)
                 BuildEngine(commandLine, exchange);
             services.Add(new StdioConsoleReader());
@@ -126,14 +123,24 @@ namespace UAlbion
         static void BuildEngine(CommandLineOptions commandLine, EventExchange exchange)
         {
             PerfTracker.StartupEvent("Creating engine");
-            var fb = new MainFramebuffer();
-            var sceneRenderer = new SceneRenderer("MainRenderer", fb);
+            var framebuffer = new MainFramebuffer();
+            var sceneRenderer = new SceneRenderer("MainRenderer", framebuffer, Renderers.All);
             var engine = new Engine(commandLine.Backend, commandLine.UseRenderDoc, commandLine.StartupOnly, true, sceneRenderer);
+#pragma warning disable CA2000 // Dispose objects before losing scopes
+            var config = exchange.Resolve<IGeneralConfig>();
+            var shaderCache = new ShaderCache(config.ResolvePath("$(CACHE)/ShaderCache"));
+
+            foreach (var shaderPath in exchange.Resolve<IModApplier>().ShaderPaths)
+                shaderCache.AddShaderPath(shaderPath);
+#pragma warning restore CA2000 // Dispose objects before losing scopes
 
             exchange
-                .Attach(fb)
+                .Attach(shaderCache)
+                .Attach(framebuffer)
                 .Attach(sceneRenderer)
-                .Attach(engine);
+                .Attach(engine)
+                .Attach(new ResourceLayoutSource())
+                ;
         }
     }
 }

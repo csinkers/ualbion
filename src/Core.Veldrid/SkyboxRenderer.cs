@@ -16,22 +16,23 @@ namespace UAlbion.Core.Veldrid
 
     partial struct SkyboxIntermediate : IVertexFormat
     {
-        [Vertex("oTexPosition")] public Vector2 TextureCoordinates;
-        [Vertex("oNormCoords")] public Vector2 NormalisedSpriteCoordinates;
-        [Vertex("oWorldPosition")] public Vector3 WorldPosition;
+        [Vertex("TexPosition")] public Vector2 TextureCoordinates;
+        [Vertex("NormCoords")] public Vector2 NormalisedSpriteCoordinates;
+        [Vertex("WorldPosition")] public Vector3 WorldPosition;
     }
 
     [Name("SkyBoxSV.vert")]
     [Input(0, typeof(Vertex2DTextured))]
     [ResourceSet(0, typeof(SkyboxResourceSet))]
     [Output(0, typeof(SkyboxIntermediate))]
-    partial class SkyboxVertexShader : IVertexShader {}
+    public partial class SkyboxVertexShader : IVertexShader { }
 
     [Name("SkyBoxSF.frag")]
     [Input(0, typeof(SkyboxIntermediate))]
     [ResourceSet(0, typeof(SkyboxResourceSet))]
+    [ResourceSet(1, typeof(CommonSet))]
     [Output(0, typeof(ColorOnly))]
-    partial class SkyboxFragmentShader : IFragmentShader {}
+    public partial class SkyboxFragmentShader : IFragmentShader { }
 
     partial class SkyboxResourceSet : ResourceSetHolder
     {

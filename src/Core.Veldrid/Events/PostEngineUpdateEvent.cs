@@ -5,7 +5,6 @@ using Veldrid;
 
 namespace UAlbion.Core.Veldrid.Events
 {
-    [Event("e:post_update")]
     public class PostEngineUpdateEvent : EngineEvent, IVeldridInitEvent, IVerboseEvent
     {
         public PostEngineUpdateEvent(GraphicsDevice device, CommandList commandList)

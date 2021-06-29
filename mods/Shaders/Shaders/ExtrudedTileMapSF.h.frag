@@ -1,11 +1,4 @@
-﻿using Veldrid;
-namespace UAlbion.Core.Veldrid
-{
-    public partial class EtmFragmentShader
-    {
-        public static (string, string) ShaderSource()
-        {
-            return ("ExtrudedTileMapSF.h.frag", @"// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // !!! This file was auto-generated using VeldridGen. It should not be edited by hand. !!!
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //!#version 450 // Comments with //! are just for the VS GLSL plugin
@@ -63,7 +56,3 @@ layout(location = 2) in flat uint iFlags;
 // UAlbion.Core.Veldrid.Sprites.ColorOnly
 layout(location = 0) out vec4 oColor;
 
-");
-        }
-    }
-}

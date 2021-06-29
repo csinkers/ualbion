@@ -18,7 +18,7 @@ namespace UAlbion.Core.Veldrid
 #pragma warning disable 649
         [Vertex("TexCoords")] public Vector2 TextureCordinates;
         [Vertex("Textures", Flat = true)] public uint Textures;
-        [Vertex("Flags", Flat = true)] public DungeonTileFlags Flags;
+        [Vertex("Flags", EnumPrefix = "TF", Flat = true)] public DungeonTileFlags Flags;
 #pragma warning restore 649
     }
 
@@ -34,6 +34,7 @@ namespace UAlbion.Core.Veldrid
     [Input(0, typeof(EtmIntermediate))]
     [ResourceSet(0, typeof(EtmSet))]
     [ResourceSet(1, typeof(CommonSet))]
+    [Output(0, typeof(ColorOnly))]
     public partial class EtmFragmentShader : IFragmentShader { }
 
     public sealed class EtmRenderer : Component, IDisposable

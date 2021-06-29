@@ -6,7 +6,7 @@ using Veldrid;
 
 namespace UAlbion.Core.Veldrid
 {
-    public class ResourceLayoutSource : Component, IResourceLayoutSource
+    public class ResourceLayoutSource : ServiceComponent<IResourceLayoutSource>, IResourceLayoutSource
     {
         readonly object _syncRoot = new();
         readonly Dictionary<Type, ResourceLayout> _layouts = new();

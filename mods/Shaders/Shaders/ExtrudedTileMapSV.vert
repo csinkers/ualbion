@@ -1,37 +1,4 @@
-﻿//!#version 450 // Comments with //! are for tricking the Visual Studio GLSL plugin into doing the right thing
-//!#define gl_VertexIndex gl_VertexID
-
-// Resource Sets / Uniforms
-layout(binding = 0) uniform Properties 
-{
-	vec4 uScale;
-	vec4 uRotation;
-	vec4 uOrigin;
-	vec4 uHorizontalSpacing;
-	vec4 uVerticalSpacing;
-	uint uWidth;
-	uint uAmbient;
-	uint uFogColor; // RGBA, A = distance in tiles
-	uint uPad1;
-};
-
-#include "CommonResources.glsl"
-
-// TODO: Lighting info
-
-// Vertex Data
-layout(location = 0) in vec3 vPosition; // N.B. Tile origins are in the centre of the cube
-layout(location = 1) in vec2 vTexCoords;
-
-// Instance Data
-layout(location = 2) in uint iTextures; // Floor, Ceiling, Walls, Overlay - 1 byte each, 0 = transparent / off
-layout(location = 3) in uint iFlags;    // Bits 2 - 31 are instance flags, 0 & 1 denote texture type.
-layout(location = 4) in vec2 iWallSize; // U & W, normalised
-
-// Outputs
-layout(location = 0) out vec2 oTexCoords;     // Texture Coordinates
-layout(location = 1) out flat uint oTextures; // Textures
-layout(location = 2) out flat uint oFlags;    // Flags, bits 0-1 = tex type
+﻿#include "ExtrudedTileMapSV.h.vert"
 
 void main()
 {
@@ -40,8 +7,8 @@ void main()
 	else if (gl_VertexIndex < 8) textureType = TF_TEXTURE_TYPE_CEILING;
 
 	oTexCoords = (textureType == TF_TEXTURE_TYPE_WALL)
-		? vTexCoords * iWallSize
-		: vTexCoords;
+		? iTexCoords * iWallSize
+		: iTexCoords;
 
 	oTextures = iTextures;
 	oFlags = (iFlags & ~TF_TEXTURE_TYPE_MASK) | textureType;
@@ -76,8 +43,8 @@ void main()
 		uint j = index / uWidth;
 		uint i = index - j * uWidth;
 		
-		vec3 iPosition = uOrigin.xyz + i * uHorizontalSpacing.xyz + j * uVerticalSpacing.xyz;
-		vec3 worldSpace = mWorld * vPosition + iPosition;
+		vec3 instPos = uOrigin.xyz + i * uHorizontalSpacing.xyz + j * uVerticalSpacing.xyz;
+		vec3 worldSpace = mWorld * iPosition + instPos;
 		gl_Position = uProjection * uView * vec4(worldSpace, 1);
 	}
 }

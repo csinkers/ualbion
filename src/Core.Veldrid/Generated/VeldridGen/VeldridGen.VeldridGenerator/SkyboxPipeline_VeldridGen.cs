@@ -6,7 +6,7 @@ namespace UAlbion.Core.Veldrid
 
         public SkyboxPipeline() : base("SkyBoxSV.vert", "SkyBoxSF.frag",
             new[] { global::UAlbion.Core.Veldrid.Sprites.Vertex2DTextured.Layout},
-            new[] { typeof(global::UAlbion.Core.Veldrid.SkyboxResourceSet) })
+            new[] { typeof(global::UAlbion.Core.Veldrid.SkyboxResourceSet), typeof(global::UAlbion.Core.Veldrid.CommonSet) })
         { }
     }
 }

@@ -7,7 +7,7 @@ using UAlbion.Core.Events;
 
 namespace UAlbion.Core.Veldrid.Textures
 {
-    public class TextureSource : Component, ITextureSource
+    public class TextureSource : ServiceComponent<ITextureSource>, ITextureSource
     {
         readonly object _syncRoot = new();
         readonly Dictionary<ITexture, Texture2DHolder> _simple = new();

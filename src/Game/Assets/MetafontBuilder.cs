@@ -21,7 +21,7 @@ namespace UAlbion.Game.Assets
         {
             var assets = Resolve<IAssetManager>();
             var textureId = (SpriteId)(id.IsBold ? Base.Font.BoldFont : Base.Font.RegularFont);
-            var texture = (ArrayTexture<byte>)assets.LoadTexture(textureId);
+            var texture = (IReadOnlyTexture<byte>)assets.LoadTexture(textureId);
             if (texture == null)
                 throw new InvalidOperationException($"MetafontBuilder: Could not load font {textureId}");
 

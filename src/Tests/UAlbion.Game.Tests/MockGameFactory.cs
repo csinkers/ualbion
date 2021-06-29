@@ -34,7 +34,7 @@ namespace UAlbion.Game.Tests
             return new MockSpriteBatch(key);
         }
 
-        public IMapLayer CreateMapLayer(LogicalMap2D logicalMap, ITexture tileset, Func<int, int, TileData> getTileFunc, DrawLayer layer,
+        public IMapLayer CreateMapLayer(LogicalMap2D logicalMap, ITexture tileset, Func<int, TileData> getTileFunc, DrawLayer layer,
             IconChangeType iconChangeType)
         {
             throw new NotImplementedException();

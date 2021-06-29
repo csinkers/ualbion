@@ -42,7 +42,7 @@ namespace UAlbion
                 shaderCache.AddShaderPath(shaderPath);
 
             var framebuffer = new OffscreenFramebuffer(640, 480);
-            var renderer = new SceneRenderer("IsoRenderer", framebuffer);
+            var renderer = new SceneRenderer("IsoRenderer", framebuffer, Renderers.ExtrudedTilemap | Renderers.Sprite);
             var engine = new Engine(_cmdLine.Backend, _cmdLine.UseRenderDoc, _cmdLine.StartupOnly, true, renderer);
 
 #pragma warning restore CA2000 // Dispose objects before losing scopes

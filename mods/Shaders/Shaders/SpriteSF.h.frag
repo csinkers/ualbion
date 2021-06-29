@@ -1,11 +1,4 @@
-﻿using Veldrid;
-namespace UAlbion.Core.Veldrid.Sprites
-{
-    public partial class SpriteVertexShader
-    {
-        public static (string, string) ShaderSource()
-        {
-            return ("SpriteSV.h.vert", @"// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // !!! This file was auto-generated using VeldridGen. It should not be edited by hand. !!!
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //!#version 450 // Comments with //! are just for the VS GLSL plugin
@@ -67,12 +60,7 @@ layout(set = 0, binding = 0) uniform _Shared {
     float uSpecial2;
     uint _globalInfo_pad5;
 };
-layout(set = 0, binding = 1) uniform _Projection {
-    mat4 uProjection;
-};
-layout(set = 0, binding = 2) uniform _View {
-    mat4 uView;
-};
+layout(set = 0, binding = 3) uniform texture2D uPalette; //!
 
 layout(set = 1, binding = 0) uniform texture2DArray uSprite; //!
 layout(set = 1, binding = 1) uniform sampler uSpriteSampler; //!
@@ -83,26 +71,13 @@ layout(set = 1, binding = 2) uniform _Uniform {
     uint _pad1;
 };
 
-// UAlbion.Core.Veldrid.Sprites.Vertex2DTextured
-layout(location = 0) in vec2 iPosition;
-layout(location = 1) in vec2 iTexCoords;
-
-// UAlbion.Core.Veldrid.Sprites.GpuSpriteInstanceData
-layout(location = 2) in vec4 iInstancePos;
-layout(location = 3) in vec2 iSize;
-layout(location = 4) in vec2 iTexOffset;
-layout(location = 5) in vec2 iTexSize;
-layout(location = 6) in uint iTexLayer;
-layout(location = 7) in uint iFlags;
-
 // UAlbion.Core.Veldrid.Sprites.SpriteIntermediateData
-layout(location = 0) out vec2 oTexPosition;
-layout(location = 1) out flat float oLayer;
-layout(location = 2) out flat uint oFlags;
-layout(location = 3) out vec2 oNormCoords;
-layout(location = 4) out vec3 oWorldPosition;
+layout(location = 0) in vec2 iTexPosition;
+layout(location = 1) in flat float iLayer;
+layout(location = 2) in flat uint iFlags;
+layout(location = 3) in vec2 iNormCoords;
+layout(location = 4) in vec3 iWorldPosition;
 
-");
-        }
-    }
-}
+// UAlbion.Core.Veldrid.Sprites.ColorOnly
+layout(location = 0) out vec4 oColor;
+

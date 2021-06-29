@@ -32,7 +32,7 @@ void main()
         color = mix(color, vec4(1.0f), vec4(1.0f - min(factor.x, factor.y)));
     }
 
-    if ((uEngineFlags & EF_SHOW_CENTRE) != 0)
+    if ((uEngineFlags & EF_SHOW_CAMERA_POSITION) != 0)
     {
         float dist = length(vec3(screenCoords, 0) - vec3(0.5, 0.5, 0));
         if (dist < 0.01)

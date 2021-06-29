@@ -1,11 +1,4 @@
-﻿using Veldrid;
-namespace UAlbion.Core.Veldrid
-{
-    public partial class SkyboxVertexShader
-    {
-        public static (string, string) ShaderSource()
-        {
-            return ("SkyBoxSV.h.vert", @"// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // !!! This file was auto-generated using VeldridGen. It should not be edited by hand. !!!
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //!#version 450 // Comments with //! are just for the VS GLSL plugin
@@ -27,7 +20,3 @@ layout(location = 0) out vec2 oTexPosition;
 layout(location = 1) out vec2 oNormCoords;
 layout(location = 2) out vec3 oWorldPosition;
 
-");
-        }
-    }
-}

@@ -65,8 +65,8 @@ namespace UAlbion.Core.Veldrid
         public float ObjectYScaling { get; set; }
         public int TileCount { get => _tiles.Count; set => _tiles.Resize(value); }
 
-        public CompositedTexture DayWalls { get; }
-        public CompositedTexture DayFloors { get; }
+        public CompositedTexture DayWalls => _dayWalls;
+        public CompositedTexture DayFloors => _dayFloors;
         internal EtmSet ResourceSet { get; private set; }
         public DungeonTileMapProperties Properties
         {

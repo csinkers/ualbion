@@ -7,7 +7,6 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
@@ -18,7 +17,6 @@ namespace UAlbion.Game.Entities.Map3D
 {
     public class MapRenderable3D : Component
     {
-        readonly MapId _mapId;
         readonly LogicalMap3D _logicalMap;
         readonly LabyrinthData _labyrinthData;
         readonly TilemapRequest _properties;
@@ -29,7 +27,7 @@ namespace UAlbion.Game.Entities.Map3D
         bool _fullUpdate = true;
         int _frameCount;
 
-        public MapRenderable3D(MapId mapId, LogicalMap3D logicalMap, LabyrinthData labyrinthData, TilemapRequest properties)
+        public MapRenderable3D(LogicalMap3D logicalMap, LabyrinthData labyrinthData, TilemapRequest properties)
         {
             if (logicalMap == null) throw new ArgumentNullException(nameof(logicalMap));
             if (labyrinthData == null) throw new ArgumentNullException(nameof(labyrinthData));
@@ -47,7 +45,6 @@ namespace UAlbion.Game.Entities.Map3D
                 }
             });
 
-            _mapId = mapId;
             _logicalMap = logicalMap;
             _labyrinthData = labyrinthData;
             _properties = properties;

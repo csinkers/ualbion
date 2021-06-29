@@ -16,6 +16,7 @@ namespace UAlbion.Core.Veldrid
         readonly EtmRenderer _etmRenderer;
         readonly SkyboxRenderer _skyboxRenderer;
         readonly DebugGuiRenderer _debugRenderer;
+
         readonly SingleBuffer<GlobalInfo> _globalInfo;
         readonly SingleBuffer<ProjectionMatrix> _projection;
         readonly SingleBuffer<ViewMatrix> _view;
@@ -24,17 +25,23 @@ namespace UAlbion.Core.Veldrid
         Texture2DHolder _palette;
         (float Red, float Green, float Blue, float Alpha) _clearColour;
 
-        public SceneRenderer(string name, IFramebufferHolder framebuffer) : base(name)
+        public SceneRenderer(string name, IFramebufferHolder framebuffer, Renderers renderers) : base(name)
         {
             if (framebuffer == null) throw new ArgumentNullException(nameof(framebuffer));
             On<SetClearColourEvent>(e => _clearColour = (e.Red, e.Green, e.Blue, e.Alpha));
             On<PostEngineUpdateEvent>(_ => UpdatePerFrameResources());
 
-            // _spriteManager = AttachChild(new SpriteManager(SpriteBatchComparer.Instance));
-            _spriteRenderer = AttachChild(new SpriteRenderer(framebuffer));
-            _etmRenderer = AttachChild(new EtmRenderer(framebuffer));
-            _skyboxRenderer = AttachChild(new SkyboxRenderer(framebuffer));
-            _debugRenderer = AttachChild(new DebugGuiRenderer(framebuffer));
+            if ((renderers & Renderers.Sprite) != 0)
+                _spriteRenderer = AttachChild(new SpriteRenderer(framebuffer));
+
+            if ((renderers & Renderers.ExtrudedTilemap) != 0)
+                _etmRenderer = AttachChild(new EtmRenderer(framebuffer));
+
+            if ((renderers & Renderers.Skybox) != 0)
+                _skyboxRenderer = AttachChild(new SkyboxRenderer(framebuffer));
+
+            if ((renderers & Renderers.DebugGui) != 0)
+                _debugRenderer = AttachChild(new DebugGuiRenderer(framebuffer));
 
             _projection = AttachChild(new SingleBuffer<ProjectionMatrix>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "M_Projection"));
             _view = AttachChild(new SingleBuffer<ViewMatrix>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "M_View"));
@@ -70,17 +77,23 @@ namespace UAlbion.Core.Veldrid
                 cl.ClearColorTarget(0, new RgbaFloat(_clearColour.Red, _clearColour.Green, _clearColour.Blue, 1.0f));
                 cl.ClearDepthStencil(device.IsDepthRangeZeroToOne ? 1f : 0f);
 
-                var skybox = TryResolve<ISkybox>();
-                if (skybox != null)
-                    _skyboxRenderer.Render(cl, (Skybox)skybox, _commonSet, _framebuffer);
+                if (_skyboxRenderer != null)
+                {
+                    var skybox = TryResolve<ISkybox>();
+                    if (skybox != null)
+                        _skyboxRenderer.Render(cl, (Skybox) skybox, _commonSet, _framebuffer);
+                }
 
-                foreach (var tilemap in ((EtmManager)Resolve<IEtmManager>()).Ordered)
-                    _etmRenderer.Render(cl, (DungeonTilemap)tilemap, _commonSet, _framebuffer);
+                if(_etmRenderer != null)
+                    foreach (var tilemap in ((EtmManager)Resolve<IEtmManager>()).Ordered)
+                        _etmRenderer.Render(cl, (DungeonTilemap)tilemap, _commonSet, _framebuffer);
 
-                foreach (var batch in ((SpriteManager)Resolve<ISpriteManager>()).Ordered)
-                    _spriteRenderer.Render(cl, (VeldridSpriteBatch)batch, _commonSet, _framebuffer);
+                if (_spriteRenderer != null)
+                    foreach (var batch in ((SpriteManager)Resolve<ISpriteManager>()).Ordered)
+                        _spriteRenderer.Render(cl, (VeldridSpriteBatch)batch, _commonSet, _framebuffer);
 
-                _debugRenderer.Render(device, cl);
+                if (_debugRenderer != null)
+                    _debugRenderer.Render(device, cl);
             }
         }
 
@@ -120,10 +133,10 @@ namespace UAlbion.Core.Veldrid
         public void Dispose()
         {
             _commonSet?.Dispose();
-            _debugRenderer.Dispose();
-            _skyboxRenderer.Dispose();
-            _spriteRenderer.Dispose();
-            _etmRenderer.Dispose();
+            _debugRenderer?.Dispose();
+            _skyboxRenderer?.Dispose();
+            _spriteRenderer?.Dispose();
+            _etmRenderer?.Dispose();
             _globalInfo.Dispose();
             _projection.Dispose();
             _view.Dispose();

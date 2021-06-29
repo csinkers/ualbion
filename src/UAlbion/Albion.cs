@@ -1,7 +1,6 @@
 ﻿using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
-using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Sprites;
@@ -27,6 +26,7 @@ using UAlbion.Game.Veldrid.Audio;
 using UAlbion.Game.Veldrid.Debugging;
 using UAlbion.Editor;
 using UAlbion.Formats.Assets;
+using UAlbion.Game.Veldrid;
 using UAlbion.Game.Veldrid.Input;
 
 namespace UAlbion
@@ -35,16 +35,6 @@ namespace UAlbion
     {
         public static void RunGame(EventExchange global, IContainer services, string baseDir, CommandLineOptions commandLine)
         {
-#pragma warning disable CA2000 // Dispose objects before losing scopes
-            var config = global.Resolve<IGeneralConfig>();
-            var shaderCache = new ShaderCache(config.ResolvePath("$(CACHE)/ShaderCache"));
-
-            foreach (var shaderPath in global.Resolve<IModApplier>().ShaderPaths)
-                shaderCache.AddShaderPath(shaderPath);
-#pragma warning restore CA2000 // Dispose objects before losing scopes
-
-            services.Add(shaderCache);
-
             RegisterComponents(global, services, baseDir, commandLine);
 
             PerfTracker.StartupEvent("Running game");
@@ -73,10 +63,12 @@ namespace UAlbion
                 services.Add(new AudioManager(false));
 
             services
+                .Add(new VeldridGameFactory())
                 .Add(new GameState())
                 .Add(new GameClock())
                 .Add(new IdleClock())
                 .Add(new SlowClock())
+                .Add(new EtmManager())
                 .Add(new SpriteManager())
                 .Add(new TextureSource())
                 .Add(new SpriteSamplerSource())

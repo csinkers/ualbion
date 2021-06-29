@@ -14,11 +14,7 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game.Veldrid.Visual
 {
-    public class MapLayerManager : Component
-    {
-    }
-
-    public class MapLayer : Component
+    public class MapLayer : Component, IMapLayer
     {
         static readonly Region BlankRegion = new(Vector2.Zero, Vector2.Zero, Vector2.Zero, 0);
         static readonly SpriteInstanceData BlankInstance = new(Vector3.Zero, Vector2.Zero, BlankRegion, 0);

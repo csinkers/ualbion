@@ -11,6 +11,7 @@ namespace UAlbion.Core.Veldrid
 {
     class WindowHolder : Component, IDisposable
     {
+        readonly WindowManager _windowManager;
         Sdl2Window _window;
         DateTime _lastTitleUpdateTime;
         Vector2? _pendingCursorUpdate;
@@ -32,6 +33,7 @@ namespace UAlbion.Core.Veldrid
                 if (!e.Enabled)
                     Sdl2Native.SDL_WarpMouseInWindow(_window.SdlWindowHandle, _window.Width / 2, _window.Height / 2);
             });
+            _windowManager = AttachChild(new WindowManager());
         }
 
         public void CreateWindow(int x, int y, int width, int height)

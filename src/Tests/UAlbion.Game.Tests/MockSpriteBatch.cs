@@ -5,7 +5,7 @@ namespace UAlbion.Game.Tests
 {
     public class MockSpriteBatch : SpriteBatch
     {
-        SpriteInstanceData[] _instances;
+        SpriteInstanceData[] _instances = new SpriteInstanceData[MinSize];
         public MockSpriteBatch(SpriteKey key) : base(key) { } 
         protected override ReadOnlySpan<SpriteInstanceData> ReadOnlySprites => _instances;
         protected override Span<SpriteInstanceData> MutableSprites => _instances;

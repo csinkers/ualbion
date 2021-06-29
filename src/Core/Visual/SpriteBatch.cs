@@ -39,6 +39,7 @@ namespace UAlbion.Core.Visual
                 if (ActiveInstances >= ReadOnlySprites.Length)
                 {
                     int newSize = ReadOnlySprites.Length;
+                    if (newSize < MinSize) newSize = MinSize;
                     while (newSize <= ActiveInstances)
                         newSize = (int)(newSize * GrowthFactor);
 

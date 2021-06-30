@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\deps\veldrid\')">
-    <PackageReference Include="Veldrid" Version="4.8.0" />
+    <PackageReference Include="Veldrid" Version="4.9.0-gffcf1cdb33" />
     <PackageReference Include="Veldrid.ImageSharp" Version="4.8.0" />
     <PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
     <PackageReference Include="Veldrid.RenderDoc" Version="1.0.1" />
@@ -45,7 +45,6 @@
     <PackageReference Include="Veldrid.StartupUtilities" Version="4.8.0" />
     <PackageReference Include="Veldrid.Utilities" Version="4.8.0" />
   </ItemGroup>
-
   <ItemGroup Condition="Exists('..\..\deps\veldrid\')">
     <ProjectReference Include="..\..\deps\veldrid\src\Veldrid\Veldrid.csproj" />
     <ProjectReference Include="..\..\deps\veldrid\src\Veldrid.ImageSharp\Veldrid.ImageSharp.csproj" />
@@ -58,8 +57,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\deps\VeldridGen\')">
-    <PackageReference Include="VeldridGen.Interfaces" />
-    <PackageReference Include="VeldridGen" />
+    <PackageReference Include="VeldridGen.Interfaces" Version="0.1.2" />
+    <PackageReference Include="VeldridGen" Version="0.1.2" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\deps\VeldridGen\')">
     <ProjectReference Include="..\..\deps\VeldridGen\VeldridGen.Interfaces\VeldridGen.Interfaces.csproj" />

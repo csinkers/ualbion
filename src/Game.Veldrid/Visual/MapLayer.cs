@@ -56,7 +56,8 @@ namespace UAlbion.Game.Veldrid.Visual
             On<RenderEvent>(_ => Render());
         }
 
-        public WeakSpriteReference GetWeakSpriteReference(int x, int y) => _lease.MakeWeakReference(_logicalMap.Index(x, y));
+        public WeakSpriteReference GetWeakSpriteReference(int x, int y) 
+            => _lease?.MakeWeakReference(_logicalMap.Index(x, y));
 
         protected override void Unsubscribed()
         {

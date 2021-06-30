@@ -20,5 +20,17 @@ namespace UAlbion.Game.Veldrid
         {
             return new MapLayer(logicalMap, tileset, getTileFunc, layer, iconChangeType);
         }
+
+        protected override void Subscribed()
+        {
+            Exchange.Register<IGameFactory>(this);
+            base.Subscribed();
+        }
+
+        protected override void Unsubscribed()
+        {
+            base.Unsubscribed();
+            Exchange.Unregister(this);
+        }
     }
 }

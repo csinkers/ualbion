@@ -19,7 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\deps\VeldridGen\VeldridGen.Interfaces\VeldridGen.Interfaces.csproj" />
     <ProjectReference Include="..\Api\UAlbion.Api.csproj" />
   </ItemGroup>
 </Project>

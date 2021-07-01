@@ -3,6 +3,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid.Sprites
 {
+#pragma warning disable CA1815 // Override equals and operator equals on value types
     public readonly partial struct Vertex3DTextured : IVertexFormat
     {
         [Vertex("Position")] public Vector3 Position { get; }
@@ -25,4 +26,5 @@ namespace UAlbion.Core.Veldrid.Sprites
             TextureCoordinates = new Vector2(u, v);
         }
     }
+#pragma warning restore CA1815 // Override equals and operator equals on value types
 }

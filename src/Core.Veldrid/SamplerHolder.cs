@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using UAlbion.Core.Veldrid.Events;
 using Veldrid;
 using VeldridGen.Interfaces;
@@ -24,8 +25,8 @@ namespace UAlbion.Core.Veldrid
 
         public SamplerHolder()
         {
+            On<DeviceCreatedEvent>(_ => Dirty());
             On<DestroyDeviceObjectsEvent>(_ => Dispose());
-            Dirty();
         }
 
         protected override void Subscribed() => Dirty();
@@ -49,6 +50,7 @@ namespace UAlbion.Core.Veldrid
                 _lodBias,
                 _borderColor));
 
+            GC.ReRegisterForFinalize(this);
             if (!string.IsNullOrEmpty(_name))
                 Sampler.Name = _name;
 
@@ -129,10 +131,13 @@ namespace UAlbion.Core.Veldrid
             set { _borderColor = value; Dirty(); }
         }
 
-        public void Dispose()
+
+        protected virtual void Dispose(bool disposing)
         {
             Sampler?.Dispose();
             Sampler = null;
         }
+
+        public void Dispose() { Dispose(true); GC.SuppressFinalize(this); }
     }
 }

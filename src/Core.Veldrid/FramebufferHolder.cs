@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using UAlbion.Core.Veldrid.Events;
 using Veldrid;
 using VeldridGen.Interfaces;
@@ -25,7 +26,11 @@ namespace UAlbion.Core.Veldrid
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public void Dispose() => Dispose(true);
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         protected FramebufferHolder(uint width, uint height)
         {

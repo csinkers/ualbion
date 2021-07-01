@@ -13,16 +13,17 @@ namespace UAlbion.Game.Assets
 {
     public static class ConvertAssets
     {
-        static (ModApplier, EventExchange) BuildModApplier(string baseDir, string mod, IFileSystem disk)
+        static (ModApplier, EventExchange, AssetLoaderRegistry) BuildModApplier(string baseDir, string mod, IFileSystem disk)
         {
             var config = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir, disk);
             var applier = new ModApplier();
             var exchange = new EventExchange(new LogExchange());
+            var assetLoaderRegistry = new AssetLoaderRegistry();
             exchange
                 .Register(disk)
                 .Register<IGeneralConfig>(config)
                 .Attach(new StdioConsoleLogger())
-                .Attach(new AssetLoaderRegistry())
+                .Attach(assetLoaderRegistry)
                 .Attach(new ContainerRegistry())
                 .Attach(new PostProcessorRegistry())
                 .Attach(new AssetLocator())
@@ -30,7 +31,7 @@ namespace UAlbion.Game.Assets
                 .Attach(applier)
                 ;
             applier.LoadMods(config, new[] { mod });
-            return (applier, exchange);
+            return (applier, exchange, assetLoaderRegistry);
         }
 
         public static void Convert(IFileSystem disk,
@@ -43,11 +44,13 @@ namespace UAlbion.Game.Assets
             if (disk == null) throw new ArgumentNullException(nameof(disk));
 
             var baseDir = ConfigUtil.FindBasePath(disk);
-            var (from, fromExchange) = BuildModApplier(baseDir, fromMod, disk);
-            var (to, toExchange) = BuildModApplier(baseDir, toMod, disk);
+            var (from, fromExchange, fromLoaderRegistry) = BuildModApplier(baseDir, fromMod, disk);
+            var (to, toExchange, toLoaderRegistry) = BuildModApplier(baseDir, toMod, disk);
 
             using (fromExchange)
+            using (fromLoaderRegistry)
             using (toExchange)
+            using (toLoaderRegistry)
             {
                 // Give the "from" universe's asset manager "to" the to exchange so we can import the assets.
                 toExchange.Attach(new AssetManager(from)); 

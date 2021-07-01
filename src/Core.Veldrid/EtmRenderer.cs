@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Visual;
@@ -9,10 +10,11 @@ namespace UAlbion.Core.Veldrid
 {
     [VertexShader(typeof(EtmVertexShader))]
     [FragmentShader(typeof(EtmFragmentShader))]
-    public partial class EtmPipeline : PipelineHolder
+    partial class EtmPipeline : PipelineHolder
     {
     }
 
+    [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
     partial class EtmIntermediate : IVertexFormat
     {
 #pragma warning disable 649
@@ -28,16 +30,18 @@ namespace UAlbion.Core.Veldrid
     [ResourceSet(0, typeof(EtmSet))]
     [ResourceSet(1, typeof(CommonSet))]
     [Output(0, typeof(EtmIntermediate))]
-    public partial class EtmVertexShader : IVertexShader { }
+    [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
+    partial class EtmVertexShader : IVertexShader { }
 
     [Name( "ExtrudedTileMapSF.frag")]
     [Input(0, typeof(EtmIntermediate))]
     [ResourceSet(0, typeof(EtmSet))]
     [ResourceSet(1, typeof(CommonSet))]
     [Output(0, typeof(ColorOnly))]
-    public partial class EtmFragmentShader : IFragmentShader { }
+    [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
+    partial class EtmFragmentShader : IFragmentShader { }
 
-    public sealed class EtmRenderer : Component, IDisposable
+    sealed class EtmRenderer : Component, IDisposable
     {
         readonly MultiBuffer<Vertex3DTextured> _vertexBuffer;
         readonly MultiBuffer<ushort> _indexBuffer;
@@ -46,10 +50,14 @@ namespace UAlbion.Core.Veldrid
 
         public EtmRenderer(IFramebufferHolder framebuffer)
         {
-            _vertexBuffer = AttachChild(new MultiBuffer<Vertex3DTextured>(Cube.Vertices, BufferUsage.VertexBuffer) { Name = "TileMapVertexBuffer"});
-            _indexBuffer = AttachChild(new MultiBuffer<ushort>(Cube.Indices, BufferUsage.IndexBuffer) { Name = "TileMapIndexBuffer"});
-            _normalPipeline = AttachChild(BuildPipeline("P_TileMapRenderer", FaceCullMode.Back, framebuffer));
-            _nonCullingPipeline = AttachChild(BuildPipeline("P_TileMapRendererNoCull", FaceCullMode.None, framebuffer));
+            _vertexBuffer = new MultiBuffer<Vertex3DTextured>(Cube.Vertices, BufferUsage.VertexBuffer) { Name = "TileMapVertexBuffer"};
+            _indexBuffer = new MultiBuffer<ushort>(Cube.Indices, BufferUsage.IndexBuffer) { Name = "TileMapIndexBuffer"};
+            _normalPipeline = BuildPipeline("P_TileMapRenderer", FaceCullMode.Back, framebuffer);
+            _nonCullingPipeline = BuildPipeline("P_TileMapRendererNoCull", FaceCullMode.None, framebuffer);
+            AttachChild(_vertexBuffer);
+            AttachChild(_indexBuffer);
+            AttachChild(_normalPipeline);
+            AttachChild(_nonCullingPipeline);
         }
 
         static EtmPipeline BuildPipeline(string name, FaceCullMode cullMode, IFramebufferHolder framebuffer) => new()
@@ -73,7 +81,7 @@ namespace UAlbion.Core.Veldrid
             if (commonSet == null) throw new ArgumentNullException(nameof(commonSet));
             if (framebuffer == null) throw new ArgumentNullException(nameof(framebuffer));
 
-            cl.PushDebugGroup($"Tiles3D:{tilemap.Name}:{tilemap.RenderOrder}");
+            cl.PushDebugGroup($"Tiles3D:{tilemap.Name}");
 
             cl.SetPipeline(tilemap.RendererId == DungeonTilemapPipeline.NoCulling ? _nonCullingPipeline.Pipeline : _normalPipeline.Pipeline);
             cl.SetGraphicsResourceSet(0, tilemap.ResourceSet.ResourceSet);

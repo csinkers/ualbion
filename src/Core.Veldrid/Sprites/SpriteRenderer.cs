@@ -4,7 +4,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid.Sprites
 {
-    public class SpriteRenderer : Component, IDisposable
+    class SpriteRenderer : Component, IDisposable
     {
         readonly MultiBuffer<Vertex2DTextured> _vertexBuffer;
         readonly MultiBuffer<ushort> _indexBuffer;
@@ -19,9 +19,9 @@ namespace UAlbion.Core.Veldrid.Sprites
 
         public SpriteRenderer(IFramebufferHolder framebuffer)
         {
-            _vertexBuffer = AttachChild(new MultiBuffer<Vertex2DTextured>(Vertices, BufferUsage.VertexBuffer, "SpriteVertexBuffer"));
-            _indexBuffer = AttachChild(new MultiBuffer<ushort>(Indices, BufferUsage.IndexBuffer, "SpriteIndexBuffer"));
-            _pipeline = AttachChild(new SpritePipeline
+            _vertexBuffer = new MultiBuffer<Vertex2DTextured>(Vertices, BufferUsage.VertexBuffer, "SpriteVertexBuffer");
+            _indexBuffer = new MultiBuffer<ushort>(Indices, BufferUsage.IndexBuffer, "SpriteIndexBuffer");
+            _pipeline = new SpritePipeline
             {
                 Name = "P:Sprite",
                 AlphaBlend = BlendStateDescription.SingleAlphaBlend,
@@ -33,7 +33,10 @@ namespace UAlbion.Core.Veldrid.Sprites
                 UseDepthTest = true,
                 UseScissorTest = true,
                 Winding = FrontFace.Clockwise,
-            });
+            };
+            AttachChild(_vertexBuffer);
+            AttachChild(_indexBuffer);
+            AttachChild(_pipeline);
         }
 
         public void Render(CommandList cl, VeldridSpriteBatch batch, CommonSet commonSet, IFramebufferHolder framebuffer)
@@ -67,9 +70,9 @@ namespace UAlbion.Core.Veldrid.Sprites
 
         public void Dispose()
         {
-            _vertexBuffer?.Dispose();
-            _indexBuffer?.Dispose();
-            _pipeline?.Dispose();
+            _vertexBuffer.Dispose();
+            _indexBuffer.Dispose();
+            _pipeline.Dispose();
         }
     }
 }

@@ -143,7 +143,7 @@ namespace UAlbion.Game.Veldrid.Assets
         float YawRads => ApiUtil.DegToRad(_yaw);
         float PitchRads => ApiUtil.DegToRad(-_pitch);
 
-        void Update() => _layout.Properties = BuildProperties();
+        void Update() => _layout.Update(BuildProperties());
 
         TilemapRequest BuildProperties(bool log = false)
         {

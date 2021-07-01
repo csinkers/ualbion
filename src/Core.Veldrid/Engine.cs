@@ -41,7 +41,9 @@ namespace UAlbion.Core.Veldrid
             _useRenderDoc = useRenderDoc;
             _startupOnly = startupOnly;
             _sceneRenderer = sceneRenderer ?? throw new ArgumentNullException(nameof(sceneRenderer));
-            _windowHolder = showWindow ? AttachChild(new WindowHolder()) : null;
+            _windowHolder = showWindow ? new WindowHolder() : null;
+            if (_windowHolder != null)
+                AttachChild(_windowHolder);
 
             if (windowRect.HasValue)
             {
@@ -319,6 +321,8 @@ namespace UAlbion.Core.Veldrid
 
         public void Dispose()
         {
+            DestroyAllObjects();
+            _windowHolder.Dispose();
         }
     }
 }

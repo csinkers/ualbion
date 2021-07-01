@@ -16,6 +16,7 @@ namespace UAlbion.Core.Veldrid
             _framebuffer = framebuffer;
             On<InputEvent>(e => _imguiRenderer?.Update((float)e.DeltaSeconds, e.Snapshot));
             On<WindowResizedEvent>(e => _imguiRenderer?.WindowResized(e.Width, e.Height));
+            On<DeviceCreatedEvent>(_ => Dirty());
             On<DestroyDeviceObjectsEvent>(_ => Dispose());
         }
 

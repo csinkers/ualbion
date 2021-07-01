@@ -7,12 +7,13 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid
 {
-    public class Texture2DHolder : Component, ITextureHolder
+    public sealed class Texture2DHolder : Component, ITextureHolder
     {
         ITexture _texture;
         Texture _deviceTexture;
 
         public DateTime LastAccessDateTime { get; private set; }
+        public string Name => Texture.Name;
         public ITexture Texture
         {
             get => _texture;
@@ -44,6 +45,7 @@ namespace UAlbion.Core.Veldrid
         public Texture2DHolder(ITexture texture)
         {
             _texture = texture ?? throw new ArgumentNullException(nameof(texture));
+            On<DeviceCreatedEvent>(_ => Dirty());
             On<DestroyDeviceObjectsEvent>(_ => Dispose());
         }
 
@@ -61,7 +63,6 @@ namespace UAlbion.Core.Veldrid
                     IReadOnlyTexture<uint> trueColor => VeldridTexture.CreateSimpleTexture(e.Device, TextureUsage.Sampled | TextureUsage.GenerateMipmaps, trueColor),
                     _ => throw new NotSupportedException($"Image format {Texture.GetType().GetGenericArguments()[0].Name} not currently supported")
                 };
-
             Off<PrepareFrameResourcesEvent>();
         }
 

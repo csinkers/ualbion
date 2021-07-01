@@ -101,7 +101,7 @@ namespace UAlbion.Core.Veldrid
                     new RasterizerStateDescription(CullMode, FillMode, Winding, UseDepthTest, UseScissorTest),
                     Topology,
                     shaderSetDescription,
-                    _resourceLayouts.Select(x => layoutSource.Get(x, device)).ToArray(),
+                    _resourceLayouts.Select(x => layoutSource.GetLayout(x, device)).ToArray(),
                     OutputDescription 
                         ?? Framebuffer?.OutputDescription
                         ?? Framebuffer?.Framebuffer?.OutputDescription
@@ -109,11 +109,12 @@ namespace UAlbion.Core.Veldrid
 
                 _pipeline = device.ResourceFactory.CreateGraphicsPipeline(ref pipelineDescription);
                 _pipeline.Name = Name;
+                GC.ReRegisterForFinalize(this);
                 Off<PrepareFrameResourcesEvent>();
             }
         }
 
-        public void Dispose()
+        protected virtual void Dispose(bool disposing)
         {
             lock (_syncRoot)
             {
@@ -128,5 +129,7 @@ namespace UAlbion.Core.Veldrid
                 _pipeline = null;
             }
         }
+
+        public void Dispose() { Dispose(true); GC.SuppressFinalize(this); }
     }
 }

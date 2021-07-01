@@ -7,12 +7,13 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid
 {
-    public class Texture2DArrayHolder : Component, ITextureArrayHolder
+    public sealed class Texture2DArrayHolder : Component, ITextureArrayHolder
     {
         ITexture _texture;
         Texture _deviceTexture;
 
         public DateTime LastAccessDateTime { get; private set; }
+        public string Name => Texture.Name;
         public ITexture Texture
         {
             get => _texture;
@@ -40,6 +41,7 @@ namespace UAlbion.Core.Veldrid
         public Texture2DArrayHolder(ITexture texture)
         {
             _texture = texture ?? throw new ArgumentNullException(nameof(texture));
+            On<DeviceCreatedEvent>(_ => Dirty());
             On<DestroyDeviceObjectsEvent>(_ => Dispose());
         }
 

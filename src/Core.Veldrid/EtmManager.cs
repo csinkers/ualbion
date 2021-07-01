@@ -22,7 +22,9 @@ namespace UAlbion.Core.Veldrid
                 request.AmbientLightLevel, request.FogColor,
                 request.ObjectYScaling);
 
-            return AttachChild(new DungeonTilemap(this, request.Id, request.Id.ToString(), request.TileCount, properties, request.DayPalette, request.NightPalette));
+            var result = new DungeonTilemap(this, request.Id, request.Id.ToString(), request.TileCount, properties, request.DayPalette, request.NightPalette);
+            AttachChild(result);
+            return result;
         }
 
         public void DisposeTilemap(DungeonTilemap tilemap)

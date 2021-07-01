@@ -18,7 +18,7 @@ namespace UAlbion.Core.Veldrid
 
         protected override void Unsubscribed() => Dispose();
 
-        public ResourceLayout Get(Type type, GraphicsDevice device)
+        public ResourceLayout GetLayout(Type type, GraphicsDevice device)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
             if (device == null) throw new ArgumentNullException(nameof(device));

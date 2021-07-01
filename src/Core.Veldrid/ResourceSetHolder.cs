@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using UAlbion.Core.Veldrid.Events;
 using Veldrid;
 using VeldridGen.Interfaces;
@@ -41,16 +42,22 @@ namespace UAlbion.Core.Veldrid
                 Dispose();
 
             var layoutSource = Resolve<IResourceLayoutSource>();
-            var layout = layoutSource.Get(GetType(), e.Device);
+            var layout = layoutSource.GetLayout(GetType(), e.Device);
             _resourceSet = Build(e.Device, layout);
             _resourceSet.Name = Name;
             Off<PrepareFrameResourceSetsEvent>();
         }
 
-        public void Dispose()
+        protected virtual void Dispose(bool disposing)
         {
             _resourceSet?.Dispose();
             _resourceSet = null;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

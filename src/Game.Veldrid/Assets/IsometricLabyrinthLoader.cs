@@ -23,7 +23,7 @@ using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Assets
 {
-    public class IsometricLabyrinthLoader : Component, IAssetLoader<LabyrinthData>
+    public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<LabyrinthData>, IDisposable
     {
         public const int DefaultWidth = 48;
         public const int DefaultHeight = 64;
@@ -49,8 +49,6 @@ namespace UAlbion.Game.Veldrid.Assets
                 GraphicsBackend.Vulkan, false, false, false, sceneRenderer)
                 ;
 
-#pragma warning restore CA2000 // Dispose objects before losing scopes
-
             var services = new Container("IsometricLayoutServices");
             _builder = new IsometricBuilder(framebuffer, width, height, baseHeight, tilesPerRow);
             services
@@ -74,6 +72,7 @@ namespace UAlbion.Game.Veldrid.Assets
             Raise(new SetSceneEvent(SceneId.IsometricBake));
             Raise(new SetClearColourEvent(0, 0, 0, 0));
             // Raise(new EngineFlagEvent(FlagOperation.Set, EngineFlags.ShowBoundingBoxes));
+#pragma warning restore CA2000 // Dispose objects before losing scopes
         }
 
         IEnumerable<(string, byte[])> Save(LabyrinthData labyrinth, AssetInfo info, IsometricMode mode, string pngPath, string tsxPath)
@@ -153,5 +152,7 @@ namespace UAlbion.Game.Veldrid.Assets
 
         public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
             => Serdes((LabyrinthData)existing, info, mapping, s);
+
+        public void Dispose() => _engine?.Dispose();
     }
 }

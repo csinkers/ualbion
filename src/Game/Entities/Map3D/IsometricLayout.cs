@@ -25,24 +25,21 @@ namespace UAlbion.Game.Entities.Map3D
         public List<int>[] WallFrames { get; private set; }
         public List<int>[] ContentsFrames { get; private set; }
 
-        public TilemapRequest Properties
+        public void Update(TilemapRequest request)
         {
-            set
-            {
-                if (value == null)
+                if (request == null)
                     return;
 
-                _tilemap.Width = value.Width;
-                _tilemap.TileCount = value.TileCount;
-                _tilemap.Scale = value.Scale;
-                _tilemap.Rotation = value.Rotation;
-                _tilemap.Origin = value.Origin;
-                _tilemap.VerticalSpacing = value.VerticalSpacing;
-                _tilemap.HorizontalSpacing = value.HorizontalSpacing;
-                _tilemap.FogColor = value.FogColor;
-                _tilemap.AmbientLightLevel = value.AmbientLightLevel;
-                _tilemap.ObjectYScaling = value.ObjectYScaling;
-            }
+                _tilemap.Width = request.Width;
+                _tilemap.TileCount = request.TileCount;
+                _tilemap.Scale = request.Scale;
+                _tilemap.Rotation = request.Rotation;
+                _tilemap.Origin = request.Origin;
+                _tilemap.VerticalSpacing = request.VerticalSpacing;
+                _tilemap.HorizontalSpacing = request.HorizontalSpacing;
+                _tilemap.FogColor = request.FogColor;
+                _tilemap.AmbientLightLevel = request.AmbientLightLevel;
+                _tilemap.ObjectYScaling = request.ObjectYScaling;
         }
 
         public void Load(LabyrinthId labyrinthId, IsometricMode mode, TilemapRequest request, int? paletteId)

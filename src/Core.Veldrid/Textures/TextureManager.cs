@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Events;
+using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid.Textures
 {
@@ -21,13 +22,14 @@ namespace UAlbion.Core.Veldrid.Textures
             On<TextureStatsEvent>(_ => Info(Stats()));
         }
 
-        public Texture2DHolder GetSimpleTexture(ITexture texture)
+        public ITextureHolder GetSimpleTexture(ITexture texture)
         {
             lock (_syncRoot)
             {
                 if (!_simple.TryGetValue(texture, out var holder))
                 {
-                    holder = AttachChild(new Texture2DHolder(texture));
+                    holder = new Texture2DHolder(texture);
+                    AttachChild(holder);
                     _simple[texture] = holder;
                 }
 
@@ -35,13 +37,14 @@ namespace UAlbion.Core.Veldrid.Textures
             }
         }
 
-        public Texture2DArrayHolder GetArrayTexture(ITexture texture)
+        public ITextureArrayHolder GetArrayTexture(ITexture texture)
         {
             lock (_syncRoot)
             {
                 if (!_array.TryGetValue(texture, out var holder))
                 {
-                    holder = AttachChild(new Texture2DArrayHolder(texture));
+                    holder = new Texture2DArrayHolder(texture);
+                    AttachChild(holder);
                     _array[texture] = holder;
                 }
                 return holder;

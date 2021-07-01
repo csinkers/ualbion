@@ -9,13 +9,15 @@ namespace UAlbion.Core.Veldrid.Sprites
     {
         public VeldridSpriteBatch(SpriteKey key) : base(key)
         {
-            Instances = AttachChild(new MultiBuffer<GpuSpriteInstanceData>(MinSize, BufferUsage.VertexBuffer, $"B_Inst:{Name}"));
-            Uniform = AttachChild(new SingleBuffer<SpriteUniform>(new SpriteUniform
+            Instances = new MultiBuffer<GpuSpriteInstanceData>(MinSize, BufferUsage.VertexBuffer, $"B_Inst:{Name}");
+            Uniform = new SingleBuffer<SpriteUniform>(new SpriteUniform
             {
                 Flags = Key.Flags,
                 TextureWidth = key.Texture.Width,
                 TextureHeight = key.Texture.Height
-            }, BufferUsage.UniformBuffer, $"B_SpriteUniform:{Name}"));
+            }, BufferUsage.UniformBuffer, $"B_SpriteUniform:{Name}");
+            AttachChild(Instances);
+            AttachChild(Uniform);
         }
 
         internal MultiBuffer<GpuSpriteInstanceData> Instances { get; }
@@ -24,16 +26,20 @@ namespace UAlbion.Core.Veldrid.Sprites
         protected override void Subscribed()
         {
             var samplerSource = Resolve<ISpriteSamplerSource>();
-            SpriteResources = AttachChild(new SpriteArraySet
+            SpriteResources = new SpriteArraySet
             {
                 Name = $"RS_Sprite:{Key.Texture.Name}",
                 Texture = Resolve<ITextureSource>().GetArrayTexture(Key.Texture),
-                Sampler = samplerSource.Get(Key.Sampler),
+                Sampler = samplerSource.GetSampler(Key.Sampler),
                 Uniform = Uniform
-            });
+            };
+            AttachChild(SpriteResources);
         }
 
-        protected override void Unsubscribed() => RemoveChild(SpriteResources);
+        protected override void Unsubscribed()
+        {
+            CleanupSet();
+        }
 
         protected override ReadOnlySpan<SpriteInstanceData> ReadOnlySprites =>
             MemoryMarshal.Cast<GpuSpriteInstanceData, SpriteInstanceData>(Instances.Data);
@@ -43,6 +49,21 @@ namespace UAlbion.Core.Veldrid.Sprites
 
         protected override void Resize(int instanceCount) 
             => Instances.Resize(instanceCount);
+
+        void CleanupSet()
+        {
+            SpriteResources.Dispose();
+            RemoveChild(SpriteResources);
+            SpriteResources = null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            CleanupSet();
+            Instances.Dispose();
+            Uniform.Dispose();
+            base.Dispose(disposing);
+        }
     }
 }
 

@@ -1,40 +1,49 @@
 ﻿using System;
 using UAlbion.Core.Visual;
 using Veldrid;
+using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid.Sprites
 {
-    public class SpriteSamplerSource : ServiceComponent<ISpriteSamplerSource>, ISpriteSamplerSource
+    public sealed class SpriteSamplerSource : ServiceComponent<ISpriteSamplerSource>, ISpriteSamplerSource, IDisposable
     {
         readonly SamplerHolder LinearSampler;
         readonly SamplerHolder PointSampler;
         public SpriteSamplerSource()
         {
-            LinearSampler = AttachChild(new SamplerHolder
+            LinearSampler = new SamplerHolder
             {
                 AddressModeU = SamplerAddressMode.Clamp,
                 AddressModeV = SamplerAddressMode.Clamp,
                 AddressModeW = SamplerAddressMode.Clamp,
                 BorderColor = SamplerBorderColor.TransparentBlack,
                 Filter = SamplerFilter.MinLinear_MagLinear_MipLinear,
-            });
+            };
 
-            PointSampler = AttachChild(new SamplerHolder
+            PointSampler = new SamplerHolder
             {
                 AddressModeU = SamplerAddressMode.Clamp,
                 AddressModeV = SamplerAddressMode.Clamp,
                 AddressModeW = SamplerAddressMode.Clamp,
                 BorderColor = SamplerBorderColor.TransparentBlack,
                 Filter = SamplerFilter.MinPoint_MagPoint_MipPoint,
-            });
+            };
+            AttachChild(LinearSampler);
+            AttachChild(PointSampler);
         }
 
-        public SamplerHolder Get(SpriteSampler sampler) =>
+        public ISamplerHolder GetSampler(SpriteSampler sampler) =>
             sampler switch
             {
                 SpriteSampler.Linear => LinearSampler,
                 SpriteSampler.Point => PointSampler,
                 _ => throw new ArgumentOutOfRangeException(nameof(sampler), "Unexpected sprite sampler \"{sampler}\"")
             };
+
+        public void Dispose()
+        {
+            LinearSampler?.Dispose();
+            PointSampler?.Dispose();
+        }
     }
 }

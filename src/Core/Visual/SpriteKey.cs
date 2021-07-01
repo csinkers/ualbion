@@ -10,7 +10,11 @@ namespace UAlbion.Core.Visual
             Texture = texture ?? throw new ArgumentNullException(nameof(texture));
             Sampler = sampler;
             RenderOrder = renderOrder;
-            Flags = (flags & ~SpriteKeyFlags.UseArrayTexture) | (texture.ArrayLayers > 1 ? SpriteKeyFlags.UseArrayTexture : 0);
+            Flags = 
+                (flags & ~(SpriteKeyFlags.UseArrayTexture | SpriteKeyFlags.UsePalette)) | 
+                (texture.ArrayLayers > 1 ? SpriteKeyFlags.UseArrayTexture : 0) |
+                (texture is IReadOnlyTexture<byte> ? SpriteKeyFlags.UsePalette : 0);
+
             ScissorRegion = scissorRegion;
         }
 

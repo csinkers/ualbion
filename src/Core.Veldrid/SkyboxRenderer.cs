@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using UAlbion.Core.Veldrid.Sprites;
@@ -14,6 +15,7 @@ namespace UAlbion.Core.Veldrid
     {
     }
 
+    [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
     partial struct SkyboxIntermediate : IVertexFormat
     {
         [Vertex("TexPosition")] public Vector2 TextureCoordinates;
@@ -25,20 +27,22 @@ namespace UAlbion.Core.Veldrid
     [Input(0, typeof(Vertex2DTextured))]
     [ResourceSet(0, typeof(SkyboxResourceSet))]
     [Output(0, typeof(SkyboxIntermediate))]
-    public partial class SkyboxVertexShader : IVertexShader { }
+    [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
+    internal partial class SkyboxVertexShader : IVertexShader { }
 
     [Name("SkyBoxSF.frag")]
     [Input(0, typeof(SkyboxIntermediate))]
     [ResourceSet(0, typeof(SkyboxResourceSet))]
     [ResourceSet(1, typeof(CommonSet))]
     [Output(0, typeof(ColorOnly))]
-    public partial class SkyboxFragmentShader : IFragmentShader { }
+    [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
+    internal partial class SkyboxFragmentShader : IFragmentShader { }
 
     partial class SkyboxResourceSet : ResourceSetHolder
     {
-        [Resource("uSampler", ShaderStages.Fragment)] SamplerHolder _sampler;
-        [Resource("uTexture", ShaderStages.Fragment)] Texture2DHolder _texture;
-        [Resource("_Uniform", ShaderStages.Vertex)] SingleBuffer<SkyboxUniformInfo> _uniform;
+        [Resource("uSampler", ShaderStages.Fragment)] ISamplerHolder _sampler;
+        [Resource("uTexture", ShaderStages.Fragment)] ITextureHolder _texture;
+        [Resource("_Uniform", ShaderStages.Vertex)] IBufferHolder<SkyboxUniformInfo> _uniform;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -51,7 +55,7 @@ namespace UAlbion.Core.Veldrid
     }
 #pragma warning restore 649
 
-    public sealed class SkyboxRenderer : Component
+    internal sealed class SkyboxRenderer : Component, IDisposable
     {
         static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
         static readonly Vertex2DTextured[] Vertices =
@@ -80,9 +84,12 @@ namespace UAlbion.Core.Veldrid
 
         public SkyboxRenderer(IFramebufferHolder framebuffer)
         {
-            _vertexBuffer = AttachChild(new MultiBuffer<Vertex2DTextured>(Vertices, BufferUsage.VertexBuffer, "SpriteVertexBuffer"));
-            _indexBuffer = AttachChild(new MultiBuffer<ushort>(Indices, BufferUsage.IndexBuffer, "SpriteIndexBuffer"));
-            _pipeline = AttachChild(BuildPipeline(framebuffer));
+            _vertexBuffer = new MultiBuffer<Vertex2DTextured>(Vertices, BufferUsage.VertexBuffer, "SpriteVertexBuffer");
+            _indexBuffer = new MultiBuffer<ushort>(Indices, BufferUsage.IndexBuffer, "SpriteIndexBuffer");
+            _pipeline = BuildPipeline(framebuffer);
+            AttachChild(_vertexBuffer);
+            AttachChild(_indexBuffer);
+            AttachChild(_pipeline);
         }
 
         public void Render(CommandList cl, Skybox skybox, CommonSet commonSet, IFramebufferHolder framebuffer)
@@ -107,9 +114,9 @@ namespace UAlbion.Core.Veldrid
 
         public void Dispose()
         {
-            _pipeline?.Dispose();
             _vertexBuffer?.Dispose();
             _indexBuffer?.Dispose();
+            _pipeline?.Dispose();
         }
     }
 }

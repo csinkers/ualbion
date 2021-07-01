@@ -25,8 +25,10 @@ namespace UAlbion.Core.Veldrid
             if (dayPalette == null) throw new ArgumentNullException(nameof(dayPalette));
             _manager = manager ?? throw new ArgumentNullException(nameof(manager));
 
-            _tiles = AttachChild(new MultiBuffer<DungeonTile>(tileCount, BufferUsage.VertexBuffer) { Name = $"B_Inst{name}"});
-            _properties = AttachChild(new SingleBuffer<DungeonTileMapProperties>(properties, BufferUsage.UniformBuffer) { Name = $"B_TileProps:{name}" });
+            _tiles = new MultiBuffer<DungeonTile>(tileCount, BufferUsage.VertexBuffer) { Name = $"B_Inst{name}"};
+            _properties = new SingleBuffer<DungeonTileMapProperties>(properties, BufferUsage.UniformBuffer) { Name = $"B_TileProps:{name}" };
+            AttachChild(_tiles);
+            AttachChild(_properties);
 
             Name = name;
             _dayFloors = new CompositedTexture(id, "FloorTiles:" + name, dayPalette);
@@ -43,7 +45,7 @@ namespace UAlbion.Core.Veldrid
             base.Subscribed();
             var textureSource = Resolve<ITextureSource>();
             var samplerSource = Resolve<ISpriteSamplerSource>();
-            ResourceSet = AttachChild(new EtmSet
+            ResourceSet = new EtmSet
             {
                 Name = $"RS_TileMap:{Name}",
                 Properties = _properties,
@@ -51,16 +53,13 @@ namespace UAlbion.Core.Veldrid
                 DayWalls = textureSource.GetArrayTexture(_dayWalls),
                 NightFloors = textureSource.GetArrayTexture(_nightFloors ?? _dayFloors),
                 NightWalls = textureSource.GetArrayTexture(_nightWalls ?? _dayWalls),
-                TextureSampler = samplerSource.Get(SpriteSampler.Point)
-            });
+                TextureSampler = samplerSource.GetSampler(SpriteSampler.Point)
+            };
+            AttachChild(ResourceSet);
         }
-        protected override void Unsubscribed()
-        {
-            RemoveChild(ResourceSet);
-        }
+        protected override void Unsubscribed() => CleanupSet();
 
         public string Name { get; }
-        public DrawLayer RenderOrder => DrawLayer.Background;
         public ReadOnlySpan<DungeonTile> Tiles => _tiles.Data;
         public float ObjectYScaling { get; set; }
         public int TileCount { get => _tiles.Count; set => _tiles.Resize(value); }
@@ -114,7 +113,20 @@ namespace UAlbion.Core.Veldrid
                 };
         }
 
-        public void Dispose() => _manager.DisposeTilemap(this);
+        void CleanupSet()
+        {
+            ResourceSet.Dispose();
+            RemoveChild(ResourceSet);
+            ResourceSet = null;
+        }
+
+        public void Dispose()
+        {
+            CleanupSet();
+            _manager.DisposeTilemap(this);
+            _tiles.Dispose();
+            _properties.Dispose();
+        }
 
         public Vector3 Scale 
         { 

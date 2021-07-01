@@ -10,7 +10,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid
 {
-    public class SceneRenderer : Container, ISceneRenderer, IDisposable
+    public sealed class SceneRenderer : Container, ISceneRenderer, IDisposable
     {
         readonly SpriteRenderer _spriteRenderer;
         readonly EtmRenderer _etmRenderer;
@@ -21,42 +21,57 @@ namespace UAlbion.Core.Veldrid
         readonly SingleBuffer<ProjectionMatrix> _projection;
         readonly SingleBuffer<ViewMatrix> _view;
         readonly CommonSet _commonSet;
-        readonly IFramebufferHolder _framebuffer;
-        Texture2DHolder _palette;
+        ITextureHolder _palette;
         (float Red, float Green, float Blue, float Alpha) _clearColour;
 
         public SceneRenderer(string name, IFramebufferHolder framebuffer, Renderers renderers) : base(name)
         {
-            if (framebuffer == null) throw new ArgumentNullException(nameof(framebuffer));
+            Framebuffer = framebuffer ?? throw new ArgumentNullException(nameof(framebuffer));
+
             On<SetClearColourEvent>(e => _clearColour = (e.Red, e.Green, e.Blue, e.Alpha));
             On<PostEngineUpdateEvent>(_ => UpdatePerFrameResources());
 
             if ((renderers & Renderers.Sprite) != 0)
-                _spriteRenderer = AttachChild(new SpriteRenderer(framebuffer));
+            {
+                _spriteRenderer = new SpriteRenderer(framebuffer);
+                AttachChild(_spriteRenderer);
+            }
 
             if ((renderers & Renderers.ExtrudedTilemap) != 0)
-                _etmRenderer = AttachChild(new EtmRenderer(framebuffer));
+            {
+                _etmRenderer = new EtmRenderer(framebuffer);
+                AttachChild(_etmRenderer);
+            }
 
             if ((renderers & Renderers.Skybox) != 0)
-                _skyboxRenderer = AttachChild(new SkyboxRenderer(framebuffer));
+            {
+                _skyboxRenderer = new SkyboxRenderer(framebuffer);
+                AttachChild(_skyboxRenderer);
+            }
 
             if ((renderers & Renderers.DebugGui) != 0)
-                _debugRenderer = AttachChild(new DebugGuiRenderer(framebuffer));
+            {
+                _debugRenderer = new DebugGuiRenderer(framebuffer);
+                AttachChild(_debugRenderer);
+            }
 
-            _projection = AttachChild(new SingleBuffer<ProjectionMatrix>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "M_Projection"));
-            _view = AttachChild(new SingleBuffer<ViewMatrix>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "M_View"));
-            _globalInfo = AttachChild(new SingleBuffer<GlobalInfo>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "B_GlobalInfo"));
-            _framebuffer = framebuffer;
-            _commonSet = AttachChild(new CommonSet
+            _projection = new SingleBuffer<ProjectionMatrix>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "M_Projection");
+            _view = new SingleBuffer<ViewMatrix>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "M_View");
+            _globalInfo = new SingleBuffer<GlobalInfo>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "B_GlobalInfo");
+            _commonSet = new CommonSet
             {
                 Name = "RS_Common",
                 GlobalInfo = _globalInfo,
                 Projection = _projection,
                 View = _view,
-            });
+            };
+            AttachChild(_projection);
+            AttachChild(_view);
+            AttachChild(_globalInfo);
+            AttachChild(_commonSet);
         }
 
-        public IFramebufferHolder Framebuffer => _framebuffer;
+        public IFramebufferHolder Framebuffer { get; }
         public override string ToString() => $"Scene:{Name}";
         public void Render(GraphicsDevice device, CommandList cl)
         {
@@ -71,7 +86,7 @@ namespace UAlbion.Core.Veldrid
             // Main scene
             using (PerfTracker.FrameEvent("6.2.3 Main scene pass"))
             {
-                cl.SetFramebuffer(_framebuffer.Framebuffer);
+                cl.SetFramebuffer(Framebuffer.Framebuffer);
                 cl.SetFullViewports();
                 cl.SetFullScissorRects();
                 cl.ClearColorTarget(0, new RgbaFloat(_clearColour.Red, _clearColour.Green, _clearColour.Blue, 1.0f));
@@ -81,16 +96,16 @@ namespace UAlbion.Core.Veldrid
                 {
                     var skybox = TryResolve<ISkybox>();
                     if (skybox != null)
-                        _skyboxRenderer.Render(cl, (Skybox) skybox, _commonSet, _framebuffer);
+                        _skyboxRenderer.Render(cl, (Skybox) skybox, _commonSet, Framebuffer);
                 }
 
                 if(_etmRenderer != null)
                     foreach (var tilemap in ((EtmManager)Resolve<IEtmManager>()).Ordered)
-                        _etmRenderer.Render(cl, (DungeonTilemap)tilemap, _commonSet, _framebuffer);
+                        _etmRenderer.Render(cl, (DungeonTilemap)tilemap, _commonSet, Framebuffer);
 
                 if (_spriteRenderer != null)
                     foreach (var batch in ((SpriteManager)Resolve<ISpriteManager>()).Ordered)
-                        _spriteRenderer.Render(cl, (VeldridSpriteBatch)batch, _commonSet, _framebuffer);
+                        _spriteRenderer.Render(cl, (VeldridSpriteBatch)batch, _commonSet, Framebuffer);
 
                 if (_debugRenderer != null)
                     _debugRenderer.Render(device, cl);
@@ -105,7 +120,7 @@ namespace UAlbion.Core.Veldrid
             var paletteManager = Resolve<IPaletteManager>();
             var textureSource = Resolve<ITextureSource>();
 
-            camera.Viewport = new Vector2(_framebuffer.Width, _framebuffer.Height);
+            camera.Viewport = new Vector2(Framebuffer.Width, Framebuffer.Height);
             var palette = textureSource.GetSimpleTexture(paletteManager.PaletteTexture);
             if (_palette != palette)
             {
@@ -117,7 +132,7 @@ namespace UAlbion.Core.Veldrid
             {
                 WorldSpacePosition = camera.Position,
                 CameraDirection = camera.LookDirection,
-                Resolution =  new Vector2(_framebuffer.Width, _framebuffer.Height),
+                Resolution =  new Vector2(Framebuffer.Width, Framebuffer.Height),
                 Time = clock?.ElapsedTime ?? 0,
                 Special1 = settings?.Special1 ?? 0,
                 Special2 = settings?.Special2 ?? 0,

@@ -6,7 +6,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid
 {
-    public class SingleBuffer<T> : Component, IBufferHolder<T> where T : unmanaged // GPU buffer containing a single instance of T
+    public sealed class SingleBuffer<T> : Component, IBufferHolder<T> where T : unmanaged // GPU buffer containing a single instance of T
     {
         readonly BufferUsage _usage;
         string _name;
@@ -77,6 +77,7 @@ namespace UAlbion.Core.Veldrid
             {
                 DeviceBuffer = e.Device.ResourceFactory.CreateBuffer(new BufferDescription(size, _usage));
                 DeviceBuffer.Name = _name;
+                GC.ReRegisterForFinalize(this);
             }
 
             e.CommandList.UpdateBuffer(DeviceBuffer, 0, _instance);

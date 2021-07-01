@@ -5,6 +5,6 @@ namespace UAlbion.Core.Veldrid
 {
     public interface IResourceLayoutSource
     {
-        ResourceLayout Get(Type type, GraphicsDevice device);
+        ResourceLayout GetLayout(Type type, GraphicsDevice device);
     }
 }

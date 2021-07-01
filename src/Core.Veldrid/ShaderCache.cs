@@ -226,7 +226,7 @@ namespace UAlbion.Core.Veldrid
                         entry = BuildShaderPair(factory.BackendType, vertexName, fragmentName, vertexContent, fragmentContent);
                         _cache[cacheKey] = entry;
                     }
-                    catch (Exception e)
+                    catch (SpirvCompilationException e)
                     {
                         Error($"Error compiling shaders ({vertexName}, {fragmentName}): {e}");
                         compileException = e;

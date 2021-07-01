@@ -6,7 +6,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid
 {
-    public class MultiBuffer<T> : Component, IBufferHolder<T> where T : unmanaged // GPU buffer containing an array of Ts
+    public sealed class MultiBuffer<T> : Component, IBufferHolder<T> where T : unmanaged // GPU buffer containing an array of Ts
     {
         readonly object _syncRoot = new();
         readonly BufferUsage _usage;
@@ -43,8 +43,8 @@ namespace UAlbion.Core.Veldrid
             _usage = usage;
             _name = name;
 
+            On<DeviceCreatedEvent>(_ => Dirty());
             On<DestroyDeviceObjectsEvent>(_ => Dispose());
-            Dirty();
         }
 
         public MultiBuffer(ReadOnlySpan<T> data, BufferUsage usage, string name = null)
@@ -78,12 +78,6 @@ namespace UAlbion.Core.Veldrid
             Off<PrepareFrameResourcesEvent>();
         }
 
-        public void Dispose()
-        {
-            DeviceBuffer?.Dispose();
-            DeviceBuffer = null;
-        }
-
         public void Resize(int size)
         {
             if (size == _buffer.Length)
@@ -92,6 +86,12 @@ namespace UAlbion.Core.Veldrid
             _buffer = new T[size];
             Array.Copy(old, _buffer, Math.Min(old.Length, _buffer.Length));
             Dirty();
+        }
+
+        public void Dispose() 
+        {
+            DeviceBuffer?.Dispose();
+            DeviceBuffer = null;
         }
     }
 }

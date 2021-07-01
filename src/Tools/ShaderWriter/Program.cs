@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using UAlbion.Core.Veldrid;
-using UAlbion.Core.Veldrid.Sprites;
 
 namespace UAlbion.ShaderWriter
 {
@@ -24,18 +23,14 @@ namespace UAlbion.ShaderWriter
             }
 
             bool success = true;
-            success &= Emit(SpriteVertexShader.ShaderSource(), args[0]);
-            success &= Emit(SpriteFragmentShader.ShaderSource(), args[0]);
-            success &= Emit(EtmVertexShader.ShaderSource(), args[0]);
-            success &= Emit(EtmFragmentShader.ShaderSource(), args[0]);
-            success &= Emit(SkyboxVertexShader.ShaderSource(), args[0]);
-            success &= Emit(SkyboxFragmentShader.ShaderSource(), args[0]);
+            foreach (var (filename, glsl) in ShaderHeaders.All)
+                success &= Emit(filename, glsl, args[0]);
             return success ? 0 : 1;
         }
 
-        static bool Emit((string filename, string glsl) source, string directory)
+        static bool Emit(string filename, string glsl, string directory)
         {
-            var path = Path.Combine(directory, source.filename);
+            var path = Path.Combine(directory, filename);
             if (File.Exists(path))
             {
                 var currentText = File.ReadAllText(path);
@@ -46,7 +41,7 @@ namespace UAlbion.ShaderWriter
                 }
             }
 
-            File.WriteAllText(path, source.glsl);
+            File.WriteAllText(path, glsl);
             return true;
         }
     }

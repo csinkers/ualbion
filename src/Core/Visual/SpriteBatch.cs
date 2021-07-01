@@ -6,7 +6,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Core.Visual
 {
-    public abstract class SpriteBatch : Component
+    public abstract class SpriteBatch : Component, IDisposable
     {
         protected const int MinSize = 4;
         protected const double GrowthFactor = 1.5;
@@ -123,6 +123,13 @@ namespace UAlbion.Core.Visual
         {
             if (lockWasTaken)
                 Monitor.Exit(_syncRoot);
+        }
+
+        protected virtual void Dispose(bool disposing) { }
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

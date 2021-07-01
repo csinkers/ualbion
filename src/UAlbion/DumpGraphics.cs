@@ -158,7 +158,7 @@ namespace UAlbion
             return filenames;
         }
 
-        void Save(Image<Rgba32> image, string pathWithoutExtension, DumpFormats formats, IList<ExportedImageInfo> filenames)
+        static void Save(Image<Rgba32> image, string pathWithoutExtension, DumpFormats formats, IList<ExportedImageInfo> filenames)
         {
             if ((formats & DumpFormats.Png) != 0)
             {

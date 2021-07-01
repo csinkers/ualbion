@@ -1,10 +1,11 @@
 ﻿using UAlbion.Api.Visual;
+using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid
 {
     public interface ITextureSource
     {
-        Texture2DHolder GetSimpleTexture(ITexture texture);
-        Texture2DArrayHolder GetArrayTexture(ITexture texture);
+        ITextureHolder GetSimpleTexture(ITexture texture);
+        ITextureArrayHolder GetArrayTexture(ITexture texture);
     }
 }

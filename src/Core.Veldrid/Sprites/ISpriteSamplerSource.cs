@@ -1,9 +1,10 @@
 ﻿using UAlbion.Core.Visual;
+using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid.Sprites
 {
     public interface ISpriteSamplerSource
     {
-        SamplerHolder Get(SpriteSampler sampler);
+        ISamplerHolder GetSampler(SpriteSampler sampler);
     }
 }

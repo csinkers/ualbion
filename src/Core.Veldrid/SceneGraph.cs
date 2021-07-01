@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Core.Events;
-using UAlbion.Core.Visual;
 using Veldrid.Utilities;
 
 namespace UAlbion.Core.Veldrid
@@ -10,7 +9,6 @@ namespace UAlbion.Core.Veldrid
     public class SceneGraph : Component, ISceneGraph
     {
         readonly Octree<IPositioned> _octree = new(new BoundingBox(-Vector3.One, Vector3.One), 2);
-        List<IRenderable> _nonPositioned = new();
 
         public SceneGraph()
         {

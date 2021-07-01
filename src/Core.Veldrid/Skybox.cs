@@ -3,26 +3,30 @@ using UAlbion.Api.Visual;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using Veldrid;
+using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid
 {
-    public class Skybox : ServiceComponent<ISkybox>, ISkybox, IRenderable
+    internal class Skybox : ServiceComponent<ISkybox>, ISkybox, IRenderable
     {
         readonly SingleBuffer<SkyboxUniformInfo> _uniformBuffer;
 
-        public Skybox(Texture2DHolder texture, SamplerHolder sampler)
+        public Skybox(ITextureHolder texture, ISamplerHolder sampler)
         {
             if (texture == null) throw new ArgumentNullException(nameof(texture));
             if (sampler == null) throw new ArgumentNullException(nameof(sampler));
 
-            _uniformBuffer = AttachChild(new SingleBuffer<SkyboxUniformInfo>(new SkyboxUniformInfo(), BufferUsage.UniformBuffer, "SpriteUniformBuffer"));
-            ResourceSet = AttachChild(new SkyboxResourceSet
+            _uniformBuffer = new SingleBuffer<SkyboxUniformInfo>(new SkyboxUniformInfo(), BufferUsage.UniformBuffer, "SpriteUniformBuffer");
+            ResourceSet = new SkyboxResourceSet
             {
-                Name = $"RS_Sky:{texture.Texture.Name}",
+                Name = $"RS_Sky:{texture.Name}",
                 Texture = texture,
                 Sampler = sampler,
                 Uniform = _uniformBuffer
-            });
+            };
+
+            AttachChild(_uniformBuffer);
+            AttachChild(ResourceSet);
 
             On<EngineUpdateEvent>(_ =>
             {
@@ -40,7 +44,7 @@ namespace UAlbion.Core.Veldrid
 
         }
 
-        public string Name => ResourceSet.Texture.Texture.Name;
+        public string Name => ResourceSet.Texture.Name;
         public DrawLayer RenderOrder => DrawLayer.Background;
         internal SkyboxResourceSet ResourceSet { get; }
 

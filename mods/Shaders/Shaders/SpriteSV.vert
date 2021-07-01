@@ -18,27 +18,28 @@ void main()
         0, 1, 0, 0,
         0, 0, 1, 0,
         offset.x, offset.y, offset.z, 1);
+        // 0,0,0,1);
 
 	if ((iFlags & SF_FLOOR) != 0)
 	{
-		transform *= mat4(
+		transform = mat4(
 			1, 0, 0, 0,
 			0, 0,-1, 0,
 			0, 1, 0, 0,
-			0, 0, 0, 1);
+			0, 0, 0, 1) * transform;
 	}
 
-	transform *= mat4(
+	transform = mat4(
         iSize.x, 0, 0, 0,
         0, iSize.y, 0, 0, 
         0, 0, iSize.x, 0, 
-        0,   0,   0,  1);
+        0,   0,   0,  1) * transform;
 
-	transform *= mat4(
+	transform = mat4(
         1, 0, 0, 0,
         0, 1, 0, 0,
         0, 0, 1, 0,
-        iInstancePos.x, iInstancePos.y, iInstancePos.z, 1);
+        iInstancePos.x, iInstancePos.y, iInstancePos.z, 1) * transform;
 
     if ((iFlags & SF_BILLBOARD) != 0)
     {

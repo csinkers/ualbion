@@ -26,7 +26,13 @@ namespace UAlbion.Core.Visual
                 SpriteKeyFlags.NoTransform,
                 SpriteFlags.LeftAligned) { Size = size };
 
-        public Sprite(IAssetId id, Vector3 position, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags, Func<IAssetId, ITexture> loaderFunc = null)
+        public Sprite(
+            IAssetId id,
+            Vector3 position,
+            DrawLayer layer,
+            SpriteKeyFlags keyFlags,
+            SpriteFlags flags,
+            Func<IAssetId, ITexture> loaderFunc = null)
         {
             On<BackendChangedEvent>(_ => Dirty = true);
             On<RenderEvent>(e => UpdateSprite());

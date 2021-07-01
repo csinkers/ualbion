@@ -1,4 +1,5 @@
 ﻿using System;
+using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 
@@ -9,6 +10,7 @@ namespace UAlbion.Core.Veldrid.Sprites
         readonly MultiBuffer<Vertex2DTextured> _vertexBuffer;
         readonly MultiBuffer<ushort> _indexBuffer;
         readonly SpritePipeline _pipeline;
+        readonly SpritePipeline _noCullPipeline;
 
         static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
         static readonly Vertex2DTextured[] Vertices =
@@ -21,12 +23,22 @@ namespace UAlbion.Core.Veldrid.Sprites
         {
             _vertexBuffer = new MultiBuffer<Vertex2DTextured>(Vertices, BufferUsage.VertexBuffer, "SpriteVertexBuffer");
             _indexBuffer = new MultiBuffer<ushort>(Indices, BufferUsage.IndexBuffer, "SpriteIndexBuffer");
-            _pipeline = new SpritePipeline
+            _pipeline = BuildPipeline(DepthStencilStateDescription.DepthOnlyLessEqual, framebuffer);
+            _noCullPipeline = BuildPipeline(DepthStencilStateDescription.Disabled, framebuffer);
+            AttachChild(_vertexBuffer);
+            AttachChild(_indexBuffer);
+            AttachChild(_pipeline);
+            AttachChild(_noCullPipeline);
+        }
+
+        static SpritePipeline BuildPipeline(DepthStencilStateDescription depthMode, IFramebufferHolder framebuffer)
+        {
+            return new SpritePipeline
             {
                 Name = "P:Sprite",
                 AlphaBlend = BlendStateDescription.SingleAlphaBlend,
                 CullMode = FaceCullMode.None,
-                DepthStencilMode = DepthStencilStateDescription.DepthOnlyLessEqual,
+                DepthStencilMode = depthMode,
                 FillMode = PolygonFillMode.Solid,
                 Framebuffer = framebuffer,
                 Topology = PrimitiveTopology.TriangleList,
@@ -34,9 +46,6 @@ namespace UAlbion.Core.Veldrid.Sprites
                 UseScissorTest = true,
                 Winding = FrontFace.Clockwise,
             };
-            AttachChild(_vertexBuffer);
-            AttachChild(_indexBuffer);
-            AttachChild(_pipeline);
         }
 
         public void Render(CommandList cl, VeldridSpriteBatch batch, CommonSet commonSet, IFramebufferHolder framebuffer)
@@ -53,7 +62,11 @@ namespace UAlbion.Core.Veldrid.Sprites
                 cl.SetScissorRect(0, (uint)rect.X, (uint)rect.Y, (uint)rect.Width, (uint)rect.Height);
             }
 
-            cl.SetPipeline(_pipeline.Pipeline);
+            cl.SetPipeline(
+                (batch.Key.Flags & SpriteKeyFlags.NoDepthTest) != 0
+                ? _noCullPipeline.Pipeline 
+                : _pipeline.Pipeline);
+
             cl.SetGraphicsResourceSet(0, commonSet.ResourceSet);
             cl.SetGraphicsResourceSet(1, batch.SpriteResources.ResourceSet);
             cl.SetVertexBuffer(0, _vertexBuffer.DeviceBuffer);

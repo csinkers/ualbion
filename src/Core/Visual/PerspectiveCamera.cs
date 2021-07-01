@@ -54,7 +54,18 @@ namespace UAlbion.Core.Visual
         public bool LegacyPitch { get; }
         public float AspectRatio => _viewport.X / _viewport.Y;
         public float Magnification { get; set; } // Ignored.
-        public float Yaw { get => _yaw; set { _yaw = value; _dirty = true; } } // Radians
+
+        public float Yaw
+        {
+            get => _yaw;
+            set
+            {
+                if (value > 2 * MathF.PI) value -= 2 * MathF.PI;
+                if (value < 0) value += 2 * MathF.PI;
+                _yaw = value;
+                _dirty = true;
+            }
+        } // Radians
 
         public float Pitch // Radians
         {

@@ -19,14 +19,15 @@ void main()
 
     if ((iFlags & SF_BILLBOARD) != 0)
     {
-        float cx = cos(-uCameraLookDirection.x);
-        float sx = sin(-uCameraLookDirection.x);
+		float rot = -uCameraLookDirection.y;
+        float cx = cos(rot);
+        float sx = sin(rot);
 
-        pos = pos * mat4(
+        pos = mat4(
              cx, 0, sx, 0,
               0, 1,  0, 0,
             -sx, 0, cx, 0,
-              0, 0,  0, 1);
+              0, 0,  0, 1) * pos;
     }
 
 	pos += iInstancePos;

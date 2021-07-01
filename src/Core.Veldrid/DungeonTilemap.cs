@@ -115,6 +115,7 @@ namespace UAlbion.Core.Veldrid
 
         void CleanupSet()
         {
+            if (ResourceSet == null) return;
             ResourceSet.Dispose();
             RemoveChild(ResourceSet);
             ResourceSet = null;

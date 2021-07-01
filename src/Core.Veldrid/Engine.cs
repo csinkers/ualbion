@@ -59,7 +59,10 @@ namespace UAlbion.Core.Veldrid
                     _done = true;
             });
             On<QuitEvent>(_ => _done = true);
-            On<WindowResizedEvent>(e => _graphicsDevice?.ResizeMainWindow((uint)e.Width, (uint)e.Height));
+            On<WindowResizedEvent>(e =>
+            {
+                _graphicsDevice?.ResizeMainWindow((uint)e.Width, (uint)e.Height);
+            });
 
             On<LoadRenderDocEvent>(e =>
             {

@@ -35,6 +35,7 @@ namespace UAlbion.Core.Visual
             Version++;
             _dirty = false;
         }
+
         public Vector3 LookDirection { get { Recalculate(); return _lookDirection; } }
         public Vector2 Viewport
         {

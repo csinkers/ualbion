@@ -50,15 +50,12 @@
 layout(set = 0, binding = 0) uniform _Shared {
     vec3 uWorldSpacePosition;
     uint _globalInfo_pad1;
-    vec3 uCameraLookDirection;
-    uint _globalInfo_pad2;
+    vec2 uCameraLookDirection;
     vec2 uResolution;
     float uTime;
     uint uEngineFlags;
     float uPaletteBlend;
     float uSpecial1;
-    float uSpecial2;
-    uint _globalInfo_pad5;
 };
 layout(set = 0, binding = 3) uniform texture2D uPalette; //!
 

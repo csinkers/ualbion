@@ -131,11 +131,11 @@ namespace UAlbion.Core.Veldrid
             var info = new GlobalInfo
             {
                 WorldSpacePosition = camera.Position,
-                CameraDirection = camera.LookDirection,
+                CameraDirection = new Vector2(camera.Pitch, camera.Yaw),
                 Resolution =  new Vector2(Framebuffer.Width, Framebuffer.Height),
                 Time = clock?.ElapsedTime ?? 0,
                 Special1 = settings?.Special1 ?? 0,
-                Special2 = settings?.Special2 ?? 0,
+                // Special2 = settings?.Special2 ?? 0,
                 EngineFlags = settings?.Flags ?? 0,
                 PaletteBlend = paletteManager.PaletteBlend
             };

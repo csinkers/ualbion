@@ -21,17 +21,13 @@ namespace UAlbion.Core.Veldrid
         [Uniform("uWorldSpacePosition")] public Vector3 WorldSpacePosition;
         [Uniform("_globalInfo_pad1")] readonly uint _padding1;
 
-        [Uniform("uCameraLookDirection")] public Vector3 CameraDirection;
-        [Uniform("_globalInfo_pad2")] readonly uint _padding2;
-
+        [Uniform("uCameraLookDirection")] public Vector2 CameraDirection;
         [Uniform("uResolution")] public Vector2 Resolution;
+
         [Uniform("uTime")] public float Time;
         [Uniform("uEngineFlags", EnumPrefix = "EF")] public EngineFlags EngineFlags;
-
         [Uniform("uPaletteBlend")] public float PaletteBlend;
         [Uniform("uSpecial1")] public float Special1;
-        [Uniform("uSpecial2")] public float Special2;
-        [Uniform("_globalInfo_pad5")] readonly uint _padding5;
     }
 
     internal partial struct ProjectionMatrix : IUniformFormat

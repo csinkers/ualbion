@@ -53,7 +53,7 @@ namespace UAlbion.Core.Veldrid
 
             _window = VeldridStartup.CreateWindow(ref windowInfo);
             _window.CursorVisible = false;
-            _window.Resized += () => Raise(new WindowResizedEvent(width, height));
+            _window.Resized += () => Raise(new WindowResizedEvent(_window.Width, _window.Height));
             _window.Closed += () => Raise(new WindowClosedEvent());
             _window.FocusGained += () => Raise(new FocusGainedEvent());
             _window.FocusLost += () => Raise(new FocusLostEvent());

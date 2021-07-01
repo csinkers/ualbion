@@ -95,6 +95,7 @@ namespace UAlbion
                         .Add(new MonsterEye()))
 
                     .AddScene((IScene)new DungeonScene()
+                        .Add(new SceneGraph())
                         .Add(new StatusBar())
                         .Add(new ConversationManager())
                         .Add(new PaletteManager())

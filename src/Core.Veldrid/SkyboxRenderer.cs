@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using UAlbion.Core.Veldrid.Sprites;
+using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 
@@ -55,7 +56,7 @@ namespace UAlbion.Core.Veldrid
     }
 #pragma warning restore 649
 
-    internal sealed class SkyboxRenderer : Component, IDisposable
+    public sealed class SkyboxRenderer : Component, IRenderer, IDisposable
     {
         static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
         static readonly Vertex2DTextured[] Vertices =
@@ -92,12 +93,13 @@ namespace UAlbion.Core.Veldrid
             AttachChild(_pipeline);
         }
 
-        public void Render(CommandList cl, Skybox skybox, CommonSet commonSet, IFramebufferHolder framebuffer)
+        public void Render(IRenderable renderable, CommonSet commonSet, IFramebufferHolder framebuffer, CommandList cl, GraphicsDevice device)
         {
             if (cl == null) throw new ArgumentNullException(nameof(cl));
-            if (skybox == null) throw new ArgumentNullException(nameof(skybox));
             if (commonSet == null) throw new ArgumentNullException(nameof(commonSet));
             if (framebuffer == null) throw new ArgumentNullException(nameof(framebuffer));
+            if (renderable is not Skybox skybox)
+                throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
             cl.PushDebugGroup(skybox.Name);
 

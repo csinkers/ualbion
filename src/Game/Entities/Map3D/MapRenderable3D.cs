@@ -22,7 +22,7 @@ namespace UAlbion.Game.Entities.Map3D
         readonly TilemapRequest _properties;
         readonly IDictionary<int, IList<int>> _tilesByDistance = new Dictionary<int, IList<int>>();
         readonly ISet<int> _dirty = new HashSet<int>();
-        IDungeonTilemap _tilemap;
+        IExtrudedTilemap _tilemap;
         bool _isSorting;
         bool _fullUpdate = true;
         int _frameCount;
@@ -117,14 +117,36 @@ namespace UAlbion.Game.Entities.Map3D
             var (ceilingIndex, ceiling) = _logicalMap.GetCeiling(index);
             var (wallIndex, wall) = _logicalMap.GetWall(index);
 
-            bool floorFlag = ((floor?.Properties ?? 0) & FloorAndCeiling.FcFlags.BackAndForth) > 0;
-            bool ceilingFlag = ((ceiling?.Properties ?? 0) & FloorAndCeiling.FcFlags.BackAndForth) > 0;
-            bool wallFlag = ((wall?.Properties ?? 0) & Wall.WallFlags.BackAndForth) > 0;
+            EtmTileFlags flags = 0;
+            if (floor != null)
+            {
+                if ((floor.Properties & FloorAndCeiling.FcFlags.BackAndForth) != 0)
+                    flags |= EtmTileFlags.FloorBackAndForth;
 
-            Tile3DFlags flags =
-                (floorFlag ? Tile3DFlags.FloorBackAndForth : 0) |
-                (ceilingFlag ? Tile3DFlags.CeilingBackAndForth : 0) |
-                (wallFlag ? Tile3DFlags.WallBackAndForth : 0);
+                if ((floor.Properties & FloorAndCeiling.FcFlags.SelfIlluminating) != 0)
+                    flags |= EtmTileFlags.SelfIlluminating;
+            }
+
+            if (ceiling != null)
+            {
+                if ((ceiling.Properties & FloorAndCeiling.FcFlags.BackAndForth) != 0)
+                    flags |= EtmTileFlags.CeilingBackAndForth;
+
+                if ((ceiling.Properties & FloorAndCeiling.FcFlags.SelfIlluminating) != 0)
+                    flags |= EtmTileFlags.SelfIlluminating;
+            }
+
+            if (wall != null)
+            {
+                if ((wall.Properties & Wall.WallFlags.BackAndForth) != 0)
+                    flags |= EtmTileFlags.WallBackAndForth;
+
+                if ((wall.Properties & Wall.WallFlags.AlphaTested) != 0)
+                    flags |= EtmTileFlags.Translucent | (EtmTileFlags)((uint)wall.TransparentColour << 24);
+
+                if ((wall.Properties & Wall.WallFlags.SelfIlluminating) != 0)
+                    flags |= EtmTileFlags.SelfIlluminating;
+            }
 
             _tilemap.SetTile(order, floorIndex, ceilingIndex, wallIndex, frameCount, flags);
         }

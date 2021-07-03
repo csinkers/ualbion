@@ -1,12 +1,13 @@
 ﻿using System;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
+using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid
 {
-    public sealed class DebugGuiRenderer : Component, IDisposable
+    public sealed class DebugGuiRenderer : Component, IRenderer, IDisposable
     {
         readonly IFramebufferHolder _framebuffer;
         ImGuiRenderer _imguiRenderer;
@@ -44,18 +45,21 @@ namespace UAlbion.Core.Veldrid
             Off<PostEngineUpdateEvent>();
         }
 
-        public void Render(GraphicsDevice gd, CommandList cl)
-        {
-            if (gd == null) throw new ArgumentNullException(nameof(gd));
-            if (cl == null) throw new ArgumentNullException(nameof(cl));
-            _imguiRenderer.Render(gd, cl);
-            cl.SetFullScissorRects();
-        }
-
         public void Dispose()
         {
             _imguiRenderer?.Dispose();
             _imguiRenderer = null;
+        }
+
+        public void Render(IRenderable renderable, CommonSet commonSet, IFramebufferHolder framebuffer, CommandList cl, GraphicsDevice device)
+        {
+            if (cl == null) throw new ArgumentNullException(nameof(cl));
+            if (device == null) throw new ArgumentNullException(nameof(device));
+            if (renderable is not DebugGuiRenderable)
+                throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
+
+            _imguiRenderer.Render(device, cl);
+            cl.SetFullScissorRects();
         }
     }
 }

@@ -41,7 +41,7 @@ namespace UAlbion.Core.Veldrid
     [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
     partial class EtmFragmentShader : IFragmentShader { }
 
-    sealed class EtmRenderer : Component, IDisposable
+    public sealed class EtmRenderer : Component, IRenderer, IDisposable
     {
         readonly MultiBuffer<Vertex3DTextured> _vertexBuffer;
         readonly MultiBuffer<ushort> _indexBuffer;
@@ -74,16 +74,23 @@ namespace UAlbion.Core.Veldrid
                 Winding = FrontFace.CounterClockwise,
             };
 
-        public void Render(CommandList cl, DungeonTilemap tilemap, CommonSet commonSet, IFramebufferHolder framebuffer)
+        public void Render(IRenderable renderable, CommonSet commonSet, IFramebufferHolder framebuffer, CommandList cl,
+            GraphicsDevice device)
         {
             if (cl == null) throw new ArgumentNullException(nameof(cl));
-            if (tilemap == null) throw new ArgumentNullException(nameof(tilemap));
             if (commonSet == null) throw new ArgumentNullException(nameof(commonSet));
             if (framebuffer == null) throw new ArgumentNullException(nameof(framebuffer));
+            if (renderable is not EtmWindow window)
+                throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
+
+            var tilemap = window.Tilemap;
 
             cl.PushDebugGroup($"Tiles3D:{tilemap.Name}");
 
-            cl.SetPipeline(tilemap.RendererId == DungeonTilemapPipeline.NoCulling ? _nonCullingPipeline.Pipeline : _normalPipeline.Pipeline);
+            cl.SetPipeline(tilemap.RendererId == DungeonTilemapPipeline.NoCulling 
+                ? _nonCullingPipeline.Pipeline 
+                : _normalPipeline.Pipeline);
+
             cl.SetGraphicsResourceSet(0, tilemap.ResourceSet.ResourceSet);
             cl.SetGraphicsResourceSet(1, commonSet.ResourceSet);
             cl.SetVertexBuffer(0, _vertexBuffer.DeviceBuffer);

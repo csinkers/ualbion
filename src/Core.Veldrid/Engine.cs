@@ -224,8 +224,7 @@ namespace UAlbion.Core.Veldrid
             }
 
             var flags = Resolve<IEngineSettings>().Flags;
-            _windowHolder?.CreateWindow(_defaultX, _defaultY, _defaultWidth, _defaultHeight);
-            GraphicsDeviceOptions gdOptions = new GraphicsDeviceOptions(
+            var gdOptions = new GraphicsDeviceOptions(
                 _renderDoc != null,
                 PixelFormat.R32_Float,
                 (flags & EngineFlags.VSync) != 0,
@@ -246,6 +245,7 @@ namespace UAlbion.Core.Veldrid
 
             if (_windowHolder != null)
             {
+                _windowHolder.CreateWindow(_defaultX, _defaultY, _defaultWidth, _defaultHeight);
                 _graphicsDevice = VeldridStartup.CreateGraphicsDevice(_windowHolder.Window, gdOptions, backend);
             }
             else

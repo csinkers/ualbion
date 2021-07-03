@@ -13,7 +13,7 @@ namespace UAlbion.Game.Entities.Map3D
 {
     public class IsometricLayout : Component
     {
-        IDungeonTilemap _tilemap;
+        IExtrudedTilemap _tilemap;
         byte[] _contents;
         byte[] _floors;
         byte[] _ceilings;
@@ -251,7 +251,7 @@ namespace UAlbion.Game.Entities.Map3D
                 ? contents
                 : contents - 100);
 
-            Tile3DFlags flags = 0;
+            EtmTileFlags flags = 0;
             _tilemap.SetTile(order, floorIndex, ceilingIndex, wallIndex, frameCount, flags);
         }
 

@@ -14,8 +14,12 @@ namespace UAlbion.Game.Entities.Map3D
 
         bool OnSelect(WorldCoordinateSelectEvent e, Action<Selection> continuation)
         {
+            var scene = TryResolve<ISceneGraph>();
+            if (scene == null)
+                return false;
+
             var hits = new List<Selection>(); // TODO: Get rid of the extra allocation and copying
-            Resolve<ISceneGraph>().RayIntersect(e.Origin, e.Direction, hits);
+            scene.RayIntersect(e.Origin, e.Direction, hits);
             foreach (var hit in hits)
                 continuation(hit);
             return true;

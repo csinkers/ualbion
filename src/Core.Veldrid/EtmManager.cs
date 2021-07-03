@@ -6,11 +6,9 @@ using UAlbion.Core.Visual;
 
 namespace UAlbion.Core.Veldrid
 {
-    public class EtmManager : ServiceComponent<IEtmManager>, IEtmManager
+    public class EtmManager : ServiceComponent<IEtmManager>, IEtmManager, IRenderableSource
     {
-        public IEnumerable<IDungeonTilemap> Ordered => Children.OfType<IDungeonTilemap>();
-
-        public IDungeonTilemap CreateTilemap(TilemapRequest request)
+        public IExtrudedTilemap CreateTilemap(TilemapRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (request.Id == null) throw new ArgumentException("The tilemap request did not have an id set", nameof(request));
@@ -22,15 +20,27 @@ namespace UAlbion.Core.Veldrid
                 request.AmbientLightLevel, request.FogColor,
                 request.ObjectYScaling);
 
-            var result = new DungeonTilemap(this, request.Id, request.Id.ToString(), request.TileCount, properties, request.DayPalette, request.NightPalette);
+            var result = new ExtrudedTilemap(this, request.Id, request.Id.ToString(), request.TileCount, properties, request.DayPalette, request.NightPalette);
             AttachChild(result);
             return result;
         }
 
-        public void DisposeTilemap(DungeonTilemap tilemap)
+        public void DisposeTilemap(ExtrudedTilemap tilemap)
         {
             if (tilemap == null) throw new ArgumentNullException(nameof(tilemap));
             RemoveChild(tilemap);
+        }
+
+        public void Collect(List<IRenderable> renderables)
+        {
+            if (renderables == null) throw new ArgumentNullException(nameof(renderables));
+            foreach (var tilemap in Children.OfType<ExtrudedTilemap>())
+            {
+                if ((tilemap.OpaqueWindow?.ActiveCount ?? 0) > 0)
+                    renderables.Add(tilemap.OpaqueWindow);
+                if ((tilemap.AlphaWindow?.ActiveCount ?? 0) > 0)
+                    renderables.Add(tilemap.AlphaWindow);
+            }
         }
     }
 }

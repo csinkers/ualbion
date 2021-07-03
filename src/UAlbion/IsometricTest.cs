@@ -3,6 +3,7 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Config;
@@ -12,6 +13,7 @@ using UAlbion.Game.Events;
 using UAlbion.Game.Input;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.State;
+using UAlbion.Game.Veldrid;
 using UAlbion.Game.Veldrid.Assets;
 using UAlbion.Game.Veldrid.Input;
 
@@ -42,7 +44,11 @@ namespace UAlbion
                 shaderCache.AddShaderPath(shaderPath);
 
             var framebuffer = new OffscreenFramebuffer(640, 480);
-            var renderer = new SceneRenderer("IsoRenderer", framebuffer, Renderers.ExtrudedTilemap | Renderers.Sprite);
+            var renderer = new SceneRenderer("IsoRenderer", framebuffer)
+                    .AddRenderer(new EtmRenderer(framebuffer))
+                    .AddRenderer(new SpriteRenderer(framebuffer))
+                    .AddSource(new DefaultRenderableSource());
+
             var engine = new Engine(_cmdLine.Backend, _cmdLine.UseRenderDoc, _cmdLine.StartupOnly, true, renderer);
 
 #pragma warning restore CA2000 // Dispose objects before losing scopes

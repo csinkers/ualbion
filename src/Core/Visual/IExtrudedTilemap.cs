@@ -6,7 +6,7 @@ using UAlbion.Core.Textures;
 
 namespace UAlbion.Core.Visual
 {
-    public interface IDungeonTilemap : IDisposable
+    public interface IExtrudedTilemap : IDisposable
     {
         DungeonTilemapPipeline RendererId { get; set; }
         public Vector3 Scale { get; set; }
@@ -24,6 +24,6 @@ namespace UAlbion.Core.Visual
         ISet<int> AnimatedTiles { get; }
         void DefineFloor(int id, ITexture texture);
         void DefineWall(int id, ITexture texture, int x, int y, byte transparentColour, bool isAlphaTested);
-        void SetTile(int index, byte floorSubImage, byte ceilingSubImage, byte wallSubImage, int frame, Tile3DFlags flags);
+        void SetTile(int index, byte floorSubImage, byte ceilingSubImage, byte wallSubImage, int frame, EtmTileFlags flags);
     }
 }

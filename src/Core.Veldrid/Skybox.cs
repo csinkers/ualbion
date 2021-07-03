@@ -7,7 +7,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid
 {
-    internal class Skybox : ServiceComponent<ISkybox>, ISkybox, IRenderable
+    public sealed class Skybox : ServiceComponent<ISkybox>, ISkybox, IRenderable
     {
         readonly SingleBuffer<SkyboxUniformInfo> _uniformBuffer;
 

@@ -88,18 +88,29 @@ namespace UAlbion.Core.Veldrid.Textures
             lock (_syncRoot)
             {
                 var now = DateTime.Now;
-                var keys = _simple.Keys.ToList();
-                foreach (var key in keys)
-                {
-                    var entry = _simple[key];
-                    if ((now - entry.LastAccessDateTime).TotalSeconds <= config.CacheLifetimeSeconds)
-                        continue;
+                var cutoff = now - TimeSpan.FromSeconds(config.CacheLifetimeSeconds);
 
-                    _simple.Remove(key);
-                    entry.Dispose();
-                }
+                var keys = _simple.Keys.ToList();
+                Cleanup(cutoff, keys, _simple);
+
+                keys = _array.Keys.ToList();
+                Cleanup(cutoff, keys, _array);
 
                 _lastCleanup = _totalTime;
+            }
+        }
+
+        void Cleanup<T>(DateTime cutoff, List<ITexture> keys, IDictionary<ITexture, T> dictionary) where T : TextureHolder
+        {
+            foreach (var key in keys)
+            {
+                var entry = dictionary[key];
+                if (entry.LastAccessDateTime >= cutoff)
+                    continue;
+
+                dictionary.Remove(key);
+                entry.Dispose();
+                RemoveChild(entry);
             }
         }
 

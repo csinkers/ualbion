@@ -5,7 +5,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid.Sprites
 {
-    class SpriteRenderer : Component, IDisposable
+    public sealed class SpriteRenderer : Component, IRenderer, IDisposable
     {
         readonly MultiBuffer<Vertex2DTextured> _vertexBuffer;
         readonly MultiBuffer<ushort> _indexBuffer;
@@ -48,12 +48,14 @@ namespace UAlbion.Core.Veldrid.Sprites
             };
         }
 
-        public void Render(CommandList cl, VeldridSpriteBatch batch, CommonSet commonSet, IFramebufferHolder framebuffer)
+        public void Render(IRenderable renderable, CommonSet commonSet, IFramebufferHolder framebuffer, CommandList cl,
+            GraphicsDevice device)
         {
             if (cl == null) throw new ArgumentNullException(nameof(cl));
-            if (batch == null) throw new ArgumentNullException(nameof(batch));
             if (commonSet == null) throw new ArgumentNullException(nameof(commonSet));
             if (framebuffer == null) throw new ArgumentNullException(nameof(framebuffer));
+            if (renderable is not VeldridSpriteBatch batch)
+                throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
             cl.PushDebugGroup(batch.Name);
             if (batch.Key.ScissorRegion.HasValue)

@@ -10,7 +10,7 @@ using Veldrid;
 
 namespace UAlbion.Core.Veldrid
 {
-    public sealed class DungeonTilemap : Component, IDungeonTilemap
+    public sealed class ExtrudedTilemap : Component, IExtrudedTilemap
     {
         readonly EtmManager _manager;
         readonly MultiBuffer<DungeonTile> _tiles;
@@ -20,7 +20,7 @@ namespace UAlbion.Core.Veldrid
         readonly CompositedTexture _nightFloors;
         readonly CompositedTexture _nightWalls;
 
-        public DungeonTilemap(EtmManager manager, IAssetId id, string name, int tileCount, DungeonTileMapProperties properties, IPalette dayPalette, IPalette nightPalette)
+        public ExtrudedTilemap(EtmManager manager, IAssetId id, string name, int tileCount, DungeonTileMapProperties properties, IPalette dayPalette, IPalette nightPalette)
         {
             if (dayPalette == null) throw new ArgumentNullException(nameof(dayPalette));
             _manager = manager ?? throw new ArgumentNullException(nameof(manager));
@@ -38,6 +38,11 @@ namespace UAlbion.Core.Veldrid
                 _nightFloors = new CompositedTexture(id, "FloorTiles:" + name, nightPalette);
                 _nightWalls = new CompositedTexture(id, "WallTiles:" + name, nightPalette);
             }
+
+            OpaqueWindow = new EtmWindow($"{Name}_Opaque", this, tileCount, false);
+            AlphaWindow = new EtmWindow($"{Name}_Alpha", this, tileCount, true);
+            AttachChild(OpaqueWindow);
+            AttachChild(AlphaWindow);
         }
 
         protected override void Subscribed()
@@ -63,6 +68,8 @@ namespace UAlbion.Core.Veldrid
         public ReadOnlySpan<DungeonTile> Tiles => _tiles.Data;
         public float ObjectYScaling { get; set; }
         public int TileCount { get => _tiles.Count; set => _tiles.Resize(value); }
+        public EtmWindow OpaqueWindow { get; }
+        public EtmWindow AlphaWindow { get; }
 
         public CompositedTexture DayWalls => _dayWalls;
         public CompositedTexture DayFloors => _dayFloors;
@@ -89,7 +96,7 @@ namespace UAlbion.Core.Veldrid
             _nightWalls?.AddTexture(id, texture, x, y, transparentColour, isAlphaTested);
         }
 
-        public void SetTile(int index, byte floorSubImage, byte ceilingSubImage, byte wallSubImage, int frame, Tile3DFlags flags)
+        public void SetTile(int index, byte floorSubImage, byte ceilingSubImage, byte wallSubImage, int frame, EtmTileFlags flags)
         {
             int totalFrameCount = 
                 _dayFloors.GetFrameCountForLogicalId(floorSubImage) 
@@ -100,13 +107,13 @@ namespace UAlbion.Core.Veldrid
             else AnimatedTiles.Remove(index);
 
             var tiles = _tiles.Borrow();
-            var wall = (byte)_dayWalls.GetSubImageAtTime(wallSubImage, frame, (flags & Tile3DFlags.WallBackAndForth) != 0);
+            var wall = (byte)_dayWalls.GetSubImageAtTime(wallSubImage, frame, (flags & EtmTileFlags.WallBackAndForth) != 0);
             var subImage = _dayWalls.Regions[wall];
             tiles[index] =
                 new DungeonTile
                 {
-                    Floor = (byte)_dayFloors.GetSubImageAtTime(floorSubImage, frame, (flags & Tile3DFlags.FloorBackAndForth) != 0),
-                    Ceiling = (byte)_dayFloors.GetSubImageAtTime(ceilingSubImage, frame, (flags & Tile3DFlags.CeilingBackAndForth) != 0),
+                    Floor = (byte)_dayFloors.GetSubImageAtTime(floorSubImage, frame, (flags & EtmTileFlags.FloorBackAndForth) != 0),
+                    Ceiling = (byte)_dayFloors.GetSubImageAtTime(ceilingSubImage, frame, (flags & EtmTileFlags.CeilingBackAndForth) != 0),
                     Wall = wall,
                     Flags = 0, // DungeonTileFlags.UsePalette;
                     WallSize = subImage.TexSize

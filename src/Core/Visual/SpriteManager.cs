@@ -7,11 +7,7 @@ namespace UAlbion.Core.Visual
     {
         readonly object _syncRoot = new();
         readonly Dictionary<SpriteKey, SpriteBatch> _sprites = new();
-        readonly List<SpriteBatch> _ordered = new();
-        readonly IComparer<SpriteBatch> _comparer;
-
-        public SpriteManager(IComparer<SpriteBatch> comparer = null)
-            => _comparer = comparer ?? SpriteBatchComparer.Instance;
+        readonly List<SpriteBatch> _batches = new();
 
         public SpriteLease Borrow(SpriteKey key, int length, object caller)
         {
@@ -23,14 +19,14 @@ namespace UAlbion.Core.Visual
                 {
                     entry = AttachChild(factory.CreateSpriteBatch(key));
                     _sprites[key] = entry;
-                    _ordered.Add(entry);
+                    _batches.Add(entry);
                 }
 
                 return entry.Grow(length, caller);
             }
         }
 
-        public IReadOnlyList<SpriteBatch> Ordered { get { _ordered.Sort(_comparer); return _ordered; } }
+        public IReadOnlyList<SpriteBatch> Batches => _batches;
 
         public void Cleanup()
         {
@@ -44,7 +40,7 @@ namespace UAlbion.Core.Visual
                 foreach (var kvp in spritesToRemove)
                 {
                     _sprites.Remove(kvp.Key);
-                    _ordered.Remove(kvp.Value);
+                    _batches.Remove(kvp.Value);
                     RemoveChild(kvp.Value);
                 }
             }

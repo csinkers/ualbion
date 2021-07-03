@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using UAlbion.Api;
+using UAlbion.Api.Visual;
 
 namespace UAlbion.Core.Visual
 {
-    public abstract class SpriteBatch : Component, IDisposable
+    public abstract class SpriteBatch : Component, IRenderable, IDisposable
     {
         protected const int MinSize = 4;
         protected const double GrowthFactor = 1.5;
@@ -26,6 +27,7 @@ namespace UAlbion.Core.Visual
 
         public SpriteKey Key { get; }
         public string Name => $"Sprite:{Key.Texture.Name}";
+        public DrawLayer RenderOrder => Key.RenderOrder;
         public override string ToString() => $"Multi:{Name} Flags:{Key.Flags} ({ActiveInstances}/{ReadOnlySprites.Length} instances)";
         public int ActiveInstances { get; private set; }
 

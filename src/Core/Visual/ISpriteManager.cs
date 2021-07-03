@@ -4,7 +4,7 @@ namespace UAlbion.Core.Visual
 {
     public interface ISpriteManager
     {
-        IReadOnlyList<SpriteBatch> Ordered { get; }
+        IReadOnlyList<SpriteBatch> Batches { get; }
         SpriteLease Borrow(SpriteKey key, int count, object owner);
     }
 }

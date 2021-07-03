@@ -40,7 +40,10 @@ namespace UAlbion.Game.Veldrid.Assets
             var config = Resolve<IGeneralConfig>();
             var shaderCache = new ShaderCache(config.ResolvePath("$(CACHE)/ShaderCache"));
             var framebuffer = new OffscreenFramebuffer(DefaultWidth * DefaultTilesPerRow, DefaultHeight);
-            var sceneRenderer = new SceneRenderer("MainPipeline", framebuffer, Renderers.ExtrudedTilemap | Renderers.Sprite);
+            var sceneRenderer = new SceneRenderer("MainPipeline", framebuffer)
+                    .AddRenderer(new EtmRenderer(framebuffer))
+                    .AddRenderer(new SpriteRenderer(framebuffer))
+                    .AddSource(new DefaultRenderableSource());
 
             foreach (var shaderPath in Resolve<IModApplier>().ShaderPaths)
                 shaderCache.AddShaderPath(shaderPath);

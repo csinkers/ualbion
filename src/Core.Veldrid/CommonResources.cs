@@ -1,13 +1,13 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Runtime.InteropServices;
 using VeldridGen.Interfaces;
 using Veldrid;
 
 #pragma warning disable CA1051 // Do not declare visible instance fields
+#pragma warning disable CA1815 // Override equals and operator equals on value types
 namespace UAlbion.Core.Veldrid
 {
-    internal sealed partial class CommonSet : ResourceSetHolder
+    public sealed partial class CommonSet : ResourceSetHolder
     {
         [Resource("_Shared")]                          SingleBuffer<GlobalInfo>       _globalInfo; 
         [Resource("_Projection", ShaderStages.Vertex)] SingleBuffer<ProjectionMatrix> _projection; 
@@ -16,7 +16,7 @@ namespace UAlbion.Core.Veldrid
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal partial struct GlobalInfo : IUniformFormat
+    public partial struct GlobalInfo : IUniformFormat
     {
         [Uniform("uWorldSpacePosition")] public Vector3 WorldSpacePosition;
         [Uniform("_globalInfo_pad1")] readonly uint _padding1;
@@ -30,16 +30,17 @@ namespace UAlbion.Core.Veldrid
         [Uniform("uSpecial1")] public float Special1;
     }
 
-    internal partial struct ProjectionMatrix : IUniformFormat
+    public partial struct ProjectionMatrix : IUniformFormat
     {
         public ProjectionMatrix(Matrix4x4 matrix) => Matrix = matrix;
         [Uniform("uProjection")] public Matrix4x4 Matrix { get; }
     }
 
-    internal partial struct ViewMatrix : IUniformFormat
+    public partial struct ViewMatrix : IUniformFormat
     {
         public ViewMatrix(Matrix4x4 matrix) => Matrix = matrix;
         [Uniform("uView")] public Matrix4x4 Matrix { get; }
     }
 }
 #pragma warning restore CA1051 // Do not declare visible instance fields
+#pragma warning restore CA1815 // Override equals and operator equals on value types

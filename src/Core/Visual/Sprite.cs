@@ -163,7 +163,9 @@ namespace UAlbion.Core.Visual
                 _sprite = sm.Borrow(key, 1, this);
             }
 
-            _sprite.Update(0, _position, Size, Frame, _flags);
+            var subImage = _sprite.Key.Texture.Regions[Frame];
+            _size ??= subImage.Size;
+            _sprite.Update(0, _position, Size, subImage, _flags);
         }
 
         bool Select(WorldCoordinateSelectEvent e, Action<Selection> continuation)

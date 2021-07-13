@@ -117,6 +117,7 @@ namespace UAlbion.Api
             CoreTrace.Log.AssertFailed(message);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Don't care")]
         public static void Assert(bool condition)
         {
             if (!condition)

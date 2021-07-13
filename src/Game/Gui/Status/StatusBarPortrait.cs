@@ -76,7 +76,7 @@ namespace UAlbion.Game.Gui.Status
             var uiPosition = window.PixelToUi(cursorManager.Position);
             var options = new List<ContextMenuOption>
             {
-                new ContextMenuOption(
+                new(
                     S(Base.SystemText.PartyPopup_CharacterScreen),
                     new InventoryOpenEvent(member.Id),
                     ContextMenuGroup.Actions)

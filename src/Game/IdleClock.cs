@@ -9,7 +9,7 @@ namespace UAlbion.Game
     [Event("idle")] public class IdleClockEvent : GameEvent, IVerboseEvent { }
     public class IdleClock : Component
     {
-        readonly IdleClockEvent _event = new IdleClockEvent();
+        readonly IdleClockEvent _event = new();
         float _elapsedTimeThisGameFrame;
 
         public IdleClock()

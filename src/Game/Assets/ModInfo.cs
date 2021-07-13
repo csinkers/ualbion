@@ -41,7 +41,7 @@ namespace UAlbion.Game.Assets
         public string Name { get; }
         public AssetConfig AssetConfig { get; }
         public ModConfig ModConfig { get; }
-        public AssetMapping Mapping { get; } = new AssetMapping();
+        public AssetMapping Mapping { get; } = new();
         public string Path { get; }
         public string AssetPath { get; }
         public string ShaderPath { get; }

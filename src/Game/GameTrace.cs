@@ -7,7 +7,7 @@ namespace UAlbion.Game
     [EventSource(Name="UAlbion-GameTrace")]
     class GameTrace : EventSource
     {
-        public static GameTrace Log { get; } = new GameTrace();
+        public static GameTrace Log { get; } = new();
 
         [NonEvent]
         public void AssetLoaded(AssetId key, string language, string path)

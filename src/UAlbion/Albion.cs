@@ -1,11 +1,11 @@
 ﻿using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
-using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Etm;
+using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
-using UAlbion.Core.Veldrid.Visual;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Config;
 using UAlbion.Game;
@@ -27,30 +27,16 @@ using UAlbion.Game.Veldrid.Audio;
 using UAlbion.Game.Veldrid.Debugging;
 using UAlbion.Editor;
 using UAlbion.Formats.Assets;
+using UAlbion.Game.Veldrid;
 using UAlbion.Game.Veldrid.Input;
 
 namespace UAlbion
 {
     static class Albion
     {
-        public static void RunGame(IEngine engine, EventExchange global, IContainer services, string baseDir, CommandLineOptions commandLine)
+        public static void RunGame(EventExchange global, IContainer services, string baseDir, CommandLineOptions commandLine)
         {
-#pragma warning disable CA2000 // Dispose objects before losing scopes
-            var config = global.Resolve<IGeneralConfig>();
-            var shaderCache = new ShaderCache(config.ResolvePath("$(CACHE)/ShaderCache"));
-
-            foreach (var shaderPath in global.Resolve<IModApplier>().ShaderPaths)
-                shaderCache.AddShaderPath(shaderPath);
-#pragma warning restore CA2000 // Dispose objects before losing scopes
-
-            services
-                .Add(shaderCache)
-                .Add(engine);
-
             RegisterComponents(global, services, baseDir, commandLine);
-
-            if (commandLine.DebugMenus && engine is VeldridEngine ve)
-                services.Add(new DebugMenus(ve));
 
             PerfTracker.StartupEvent("Running game");
             global.Raise(new SetSceneEvent(SceneId.Empty), null);
@@ -62,7 +48,7 @@ namespace UAlbion
             }
             else global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
 
-            engine.Run();
+            global.Resolve<IEngine>().Run();
             // TODO: Ensure all sprite leases returned etc to weed out memory leaks
         }
 
@@ -78,13 +64,15 @@ namespace UAlbion
                 services.Add(new AudioManager(false));
 
             services
+                .Add(new VeldridGameFactory())
                 .Add(new GameState())
                 .Add(new GameClock())
                 .Add(new IdleClock())
                 .Add(new SlowClock())
-                .Add(new DeviceObjectManager())
+                .Add(new EtmManager())
                 .Add(new SpriteManager())
-                .Add(new TextureManager())
+                .Add(new TextureSource())
+                .Add(new SpriteSamplerSource())
                 .Add(new VideoManager())
                 .Add(new EventChainManager())
                 .Add(new Querier())
@@ -92,22 +80,23 @@ namespace UAlbion
                 .Add(new CollisionManager())
                 .Add(new SceneStack())
                 .Add(new SceneManager()
-                    .AddScene((Scene)new EmptyScene()
+                    .AddScene((IScene)new EmptyScene()
                         .Add(new StatusBar())
                         .Add(new PaletteManager()))
 
-                    .AddScene((Scene)new AutomapScene()
+                    .AddScene((IScene)new AutomapScene()
                         .Add(new StatusBar())
                         .Add(new PaletteManager()))
 
-                    .AddScene((Scene)new FlatScene()
+                    .AddScene((IScene)new FlatScene()
                         .Add(new StatusBar())
                         .Add(new ConversationManager())
                         .Add(new PaletteManager())
                         .Add(new ClockWidget())
                         .Add(new MonsterEye()))
 
-                    .AddScene((Scene)new DungeonScene()
+                    .AddScene((IScene)new DungeonScene()
+                        .Add(new SceneGraph())
                         .Add(new StatusBar())
                         .Add(new ConversationManager())
                         .Add(new PaletteManager())
@@ -115,7 +104,7 @@ namespace UAlbion
                         .Add(new Compass())
                         .Add(new MonsterEye()))
 
-                    .AddScene((Scene)new MenuScene()
+                    .AddScene((IScene)new MenuScene()
                         .Add(new StatusBar())
                         .Add(new PaletteManager())
                         .Add(new MainMenu())
@@ -126,13 +115,13 @@ namespace UAlbion
                             SpriteKeyFlags.NoTransform,
                             SpriteFlags.LeftAligned) { Size = new Vector2(2.0f, -2.0f) }))
 
-                    .AddScene((Scene)new InventoryScene()
+                    .AddScene((IScene)new InventoryScene()
                         .Add(new StatusBar())
                         .Add(new ConversationManager())
                         .Add(new PaletteManager())
                         .Add(new InventoryInspector()))
 
-                    .AddScene((Scene)new EditorScene()
+                    .AddScene((IScene)new EditorScene()
                         .Add(new RawAssetManager())
                         .Add(new PaletteManager())
                         .Add(new EditorAssetManager())

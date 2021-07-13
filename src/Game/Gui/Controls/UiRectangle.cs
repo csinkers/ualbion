@@ -63,7 +63,7 @@ namespace UAlbion.Game.Gui.Controls
             var sm = Resolve<ISpriteManager>();
             var commonColors = Resolve<ICommonColors>();
 
-            var key = new SpriteKey(commonColors.BorderTexture, order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
+            var key = new SpriteKey(commonColors.BorderTexture, SpriteSampler.Point, order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
             if (key != _sprite?.Key)
             {
                 _sprite?.Dispose();
@@ -80,11 +80,11 @@ namespace UAlbion.Game.Gui.Controls
             var instances = _sprite.Lock(ref lockWasTaken);
             try
             {
-                instances[0] = SpriteInstanceData.TopLeft(
+                instances[0] = new SpriteInstanceData(
                     position,
                     window.UiToNormRelative(DrawSize),
                     subImage,
-                    SpriteFlags.None);
+                    SpriteFlags.TopLeft);
             }
             finally { _sprite.Unlock(lockWasTaken); }
         }

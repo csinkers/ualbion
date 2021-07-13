@@ -1,7 +1,6 @@
 ﻿using System.Numerics;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.TestCommon;
 using Xunit;
 
 namespace UAlbion.Core.Tests
@@ -12,7 +11,7 @@ namespace UAlbion.Core.Tests
         public void TestPickingRay()
         {
             var ee = new EventExchange(new LogExchange());
-            var wm = new WindowManager {Window = new MockWindow(1024, 1024)};
+            var wm = new WindowManager { Resolution = (1024, 1024) };
             var camera = new PerspectiveCamera(true)
             {
                 Position = Vector3.Zero,

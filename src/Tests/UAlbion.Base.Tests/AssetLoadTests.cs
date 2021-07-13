@@ -58,8 +58,7 @@ namespace UAlbion.Base.Tests
         static T Test<T>(Func<IAssetManager, T> func)
         {
             var disk = new MockFileSystem(true);
-            var factory = new MockFactory();
-            var exchange = AssetSystem.Setup(disk, factory, GeneralConfig, Settings, CoreConfig, GameConfig);
+            var exchange = AssetSystem.Setup(disk, GeneralConfig, Settings, CoreConfig, GameConfig);
 
             var assets = exchange.Resolve<IAssetManager>();
             var result = func(assets);
@@ -716,7 +715,7 @@ namespace UAlbion.Base.Tests
             Assert.IsType<CommentEvent>(s[7]);
             Assert.IsType<CommentEvent>(s[8]);
             Assert.IsType<PartyMoveEvent>(s[9]);
-            Assert.IsType<UpdateEvent>(s[10]);
+            Assert.IsType<GameUpdateEvent>(s[10]);
         }
 
         [Fact]

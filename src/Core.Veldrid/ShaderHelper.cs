@@ -10,8 +10,8 @@ namespace UAlbion.Core.Veldrid
 {
     public static class ShaderHelper
     {
-        public static ShaderDescription Vertex(string shader) => new ShaderDescription(ShaderStages.Vertex, Encoding.UTF8.GetBytes(shader), "main");
-        public static ShaderDescription Fragment(string shader) => new ShaderDescription(ShaderStages.Fragment, Encoding.UTF8.GetBytes(shader), "main");
+        public static ShaderDescription Vertex(string shader) => new(ShaderStages.Vertex, Encoding.UTF8.GetBytes(shader), "main");
+        public static ShaderDescription Fragment(string shader) => new(ShaderStages.Fragment, Encoding.UTF8.GetBytes(shader), "main");
         public static (Shader vs, Shader fs) LoadSpirv(
             GraphicsDevice gd,
             ResourceFactory factory,

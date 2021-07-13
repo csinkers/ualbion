@@ -2,7 +2,6 @@
 using System.Numerics;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
-using UAlbion.Core;
 
 namespace UAlbion.Game.Assets
 {
@@ -27,10 +26,10 @@ namespace UAlbion.Game.Assets
                     0);
             }
 
-            return new Texture<byte>(
+            return new SimpleTexture<byte>(
                 info.AssetId,
                 sprite.Id.ToString(),
-                sprite.Width, sprite.Height, 1,
+                sprite.Width, sprite.Height,
                 sprite.PixelData,
                 subImages);
         }

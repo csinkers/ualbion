@@ -1,76 +1,69 @@
 ﻿using System;
 using System.Collections.Generic;
+using UAlbion.Core.Events;
 
 namespace UAlbion.Core.Visual
 {
     public class SpriteManager : ServiceComponent<ISpriteManager>, ISpriteManager
     {
-        readonly object _syncRoot = new object();
-        readonly IDictionary<SpriteKey, MultiSprite> _sprites = new Dictionary<SpriteKey, MultiSprite>();
+        readonly object _syncRoot = new();
+        readonly Dictionary<SpriteKey, SpriteBatch> _sprites = new();
+        readonly List<SpriteBatch> _batches = new();
+        float _lastCleanup;
+        float _totalTime;
+
+        public SpriteManager() => On<EngineUpdateEvent>(OnUpdate);
 
         public SpriteLease Borrow(SpriteKey key, int length, object caller)
         {
             if (length <= 0) throw new ArgumentOutOfRangeException(nameof(length));
+            var factory = Resolve<ICoreFactory>();
             lock (_syncRoot)
             {
                 if (!_sprites.TryGetValue(key, out var entry))
                 {
-                    entry = new MultiSprite(key);
-                    TryResolve<IEngine>()?.RegisterRenderable(entry);
+                    entry = AttachChild(factory.CreateSpriteBatch(key));
                     _sprites[key] = entry;
+                    _batches.Add(entry);
                 }
 
                 return entry.Grow(length, caller);
             }
         }
 
-        public void Cleanup()
+        void OnUpdate(EngineUpdateEvent e)
         {
+            _totalTime += e.DeltaSeconds;
+            var config = Resolve<CoreConfig>().Visual.SpriteManager;
+
+            if (_totalTime - _lastCleanup <= config.CacheCheckIntervalSeconds)
+                return;
+
             lock (_syncRoot)
             {
-                var spritesToRemove = new List<KeyValuePair<SpriteKey, MultiSprite>>();
+                var spritesToRemove = new List<KeyValuePair<SpriteKey, SpriteBatch>>();
                 foreach (var kvp in _sprites)
                     if (kvp.Value.ActiveInstances == 0)
                         spritesToRemove.Add(kvp);
 
                 foreach (var kvp in spritesToRemove)
                 {
-                    TryResolve<IEngine>()?.UnregisterRenderable(kvp.Value);
                     _sprites.Remove(kvp.Key);
+                    _batches.Remove(kvp.Value);
+                    RemoveChild(kvp.Value);
                 }
             }
+            _lastCleanup = _totalTime;
         }
 
-        public WeakSpriteReference MakeWeakReference(SpriteLease lease, int index)
+        public void Collect(List<IRenderable> renderables)
         {
+            if (renderables == null) throw new ArgumentNullException(nameof(renderables));
             lock (_syncRoot)
             {
-                if(lease == null)
-                    return new WeakSpriteReference(null, null, 0);
-                _sprites.TryGetValue(lease.Key, out var entry);
-                return new WeakSpriteReference(entry, lease, index);
+                foreach (var kvp in _batches)
+                    renderables.Add(kvp);
             }
-        }
-
-        protected override void Subscribed()
-        {
-            var engine = TryResolve<IEngine>();
-            if (engine != null)
-                lock (_syncRoot)
-                    foreach (var sprite in _sprites)
-                        engine.RegisterRenderable(sprite.Value);
-
-            base.Subscribed();
-        }
-        protected override void Unsubscribed()
-        {
-            var engine = TryResolve<IEngine>();
-            if (engine != null)
-                lock (_syncRoot)
-                    foreach (var sprite in _sprites)
-                        engine.UnregisterRenderable(sprite.Value);
-
-            base.Unsubscribed();
         }
     }
 }

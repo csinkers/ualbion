@@ -23,7 +23,7 @@ namespace UAlbion.Game.Events.Transitions
         [EventPart("to_x")] public int ToX { get; } // UI coordinates
         [EventPart("to_y")] public int ToY { get; }
         [EventPart("time_ms", true)] public float? TransitionTime { get; }
-        public Vector2 FromUiPosition => new Vector2(FromX, FromY);
-        public Vector2 ToUiPosition => new Vector2(ToX, ToY);
+        public Vector2 FromUiPosition => new(FromX, FromY);
+        public Vector2 ToUiPosition => new(ToX, ToY);
     }
 }

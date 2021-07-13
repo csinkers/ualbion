@@ -14,19 +14,17 @@ namespace UAlbion.Benchmarks
         const int N = 1000;
         const int Dimensions = 256;
         static readonly IPalette _palette = new MockPalette();
-        static readonly ITexture _black = new Texture<byte>(AssetId.None, 
+        static readonly ITexture _black = new SimpleTexture<byte>(AssetId.None, 
                 "Black",
                 Dimensions,
                 Dimensions,
-                1,
                 Enumerable.Repeat((byte)0, Dimensions * Dimensions).ToArray(),
                 new[] { new Region(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
 
-        static readonly ITexture _white = new Texture<byte>(AssetId.None, 
+        static readonly ITexture _white = new SimpleTexture<byte>(AssetId.None, 
                 "Black",
                 Dimensions,
                 Dimensions,
-                1,
                 Enumerable.Repeat((byte)255, Dimensions * Dimensions).ToArray(),
                 new[] { new Region(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
 
@@ -39,11 +37,10 @@ namespace UAlbion.Benchmarks
             var r = new Random();
             var randomBuffer = new byte[Dimensions * Dimensions];
             r.NextBytes(randomBuffer);
-            var random = new Texture<byte>(AssetId.None, 
+            var random = new SimpleTexture<byte>(AssetId.None, 
                 "Random",
                 Dimensions,
                 Dimensions,
-                1,
                 randomBuffer,
                 new[] { new Region(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
 

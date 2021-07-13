@@ -4,7 +4,7 @@ namespace UAlbion.Core
 {
     public class Container : Component, IContainer
     {
-        readonly object _syncRoot = new object();
+        readonly object _syncRoot = new();
         public string Name { get; }
         public Container(string name) { Name = name; }
         public Container(string name, params IComponent[] components)

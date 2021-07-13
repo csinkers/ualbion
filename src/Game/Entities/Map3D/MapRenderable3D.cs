@@ -7,7 +7,6 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
@@ -18,18 +17,17 @@ namespace UAlbion.Game.Entities.Map3D
 {
     public class MapRenderable3D : Component
     {
-        readonly MapId _mapId;
         readonly LogicalMap3D _logicalMap;
         readonly LabyrinthData _labyrinthData;
-        readonly DungeonTileMapProperties _properties;
+        readonly TilemapRequest _properties;
         readonly IDictionary<int, IList<int>> _tilesByDistance = new Dictionary<int, IList<int>>();
         readonly ISet<int> _dirty = new HashSet<int>();
-        DungeonTilemap _tilemap;
+        IExtrudedTilemap _tilemap;
         bool _isSorting;
         bool _fullUpdate = true;
         int _frameCount;
 
-        public MapRenderable3D(MapId mapId, LogicalMap3D logicalMap, LabyrinthData labyrinthData, in DungeonTileMapProperties properties)
+        public MapRenderable3D(LogicalMap3D logicalMap, LabyrinthData labyrinthData, TilemapRequest properties)
         {
             if (logicalMap == null) throw new ArgumentNullException(nameof(logicalMap));
             if (labyrinthData == null) throw new ArgumentNullException(nameof(labyrinthData));
@@ -47,14 +45,13 @@ namespace UAlbion.Game.Entities.Map3D
                 }
             });
 
-            _mapId = mapId;
             _logicalMap = logicalMap;
             _labyrinthData = labyrinthData;
             _properties = properties;
 
-            _logicalMap.Dirty += (sender, args) =>
+            _logicalMap.Dirty += (_, args) =>
             {
-                if (args.Type == IconChangeType.Floor || args.Type == IconChangeType.Ceiling || args.Type == IconChangeType.Wall)
+                if (args.Type is IconChangeType.Floor or IconChangeType.Ceiling or IconChangeType.Wall)
                     _dirty.Add(_logicalMap.Index(args.X, args.Y));
             };
         }
@@ -67,18 +64,14 @@ namespace UAlbion.Game.Entities.Map3D
                 return;
 
             var assets = Resolve<IAssetManager>();
-            var dayPalette = assets.LoadPalette(_logicalMap.PaletteId);
-            IPalette nightPalette = null;
-            if (NightPalettes.TryGetValue(_logicalMap.PaletteId, out var nightPaletteId))
-                nightPalette = assets.LoadPalette(nightPaletteId);
+            _properties.TileCount = _logicalMap.Width * _logicalMap.Height;
+            _properties.DayPalette = assets.LoadPalette(_logicalMap.PaletteId);
 
-            _tilemap = new DungeonTilemap(
-                _mapId,
-                _mapId.ToString(),
-                _logicalMap.Width * _logicalMap.Height,
-                _properties,
-                dayPalette,
-                nightPalette);
+            if (NightPalettes.TryGetValue(_logicalMap.PaletteId, out var nightPaletteId))
+                _properties.NightPalette = assets.LoadPalette(nightPaletteId);
+
+            var etmManager = Resolve<IEtmManager>();
+            _tilemap = etmManager.CreateTilemap(_properties);
 
             for (int i = 0; i < _labyrinthData.FloorAndCeilings.Count; i++)
             {
@@ -109,13 +102,12 @@ namespace UAlbion.Game.Entities.Map3D
                 }
             }
 
-            Resolve<IEngine>()?.RegisterRenderable(_tilemap);
             _fullUpdate = true;
         }
 
         protected override void Unsubscribed()
         {
-            Resolve<IEngine>()?.UnregisterRenderable(_tilemap);
+            _tilemap.Dispose();
             _tilemap = null;
         }
 
@@ -125,16 +117,38 @@ namespace UAlbion.Game.Entities.Map3D
             var (ceilingIndex, ceiling) = _logicalMap.GetCeiling(index);
             var (wallIndex, wall) = _logicalMap.GetWall(index);
 
-            bool floorFlag = ((floor?.Properties ?? 0) & FloorAndCeiling.FcFlags.BackAndForth) > 0;
-            bool ceilingFlag = ((ceiling?.Properties ?? 0) & FloorAndCeiling.FcFlags.BackAndForth) > 0;
-            bool wallFlag = ((wall?.Properties ?? 0) & Wall.WallFlags.BackAndForth) > 0;
+            EtmTileFlags flags = 0;
+            if (floor != null)
+            {
+                if ((floor.Properties & FloorAndCeiling.FcFlags.BackAndForth) != 0)
+                    flags |= EtmTileFlags.FloorBackAndForth;
 
-            Tile3DFlags flags =
-                (floorFlag ? Tile3DFlags.FloorBackAndForth : 0) |
-                (ceilingFlag ? Tile3DFlags.CeilingBackAndForth : 0) |
-                (wallFlag ? Tile3DFlags.WallBackAndForth : 0);
+                if ((floor.Properties & FloorAndCeiling.FcFlags.SelfIlluminating) != 0)
+                    flags |= EtmTileFlags.SelfIlluminating;
+            }
 
-            _tilemap.Set(order, floorIndex, ceilingIndex, wallIndex, frameCount, flags);
+            if (ceiling != null)
+            {
+                if ((ceiling.Properties & FloorAndCeiling.FcFlags.BackAndForth) != 0)
+                    flags |= EtmTileFlags.CeilingBackAndForth;
+
+                if ((ceiling.Properties & FloorAndCeiling.FcFlags.SelfIlluminating) != 0)
+                    flags |= EtmTileFlags.SelfIlluminating;
+            }
+
+            if (wall != null)
+            {
+                if ((wall.Properties & Wall.WallFlags.BackAndForth) != 0)
+                    flags |= EtmTileFlags.WallBackAndForth;
+
+                if ((wall.Properties & Wall.WallFlags.AlphaTested) != 0)
+                    flags |= EtmTileFlags.Translucent | (EtmTileFlags)((uint)wall.TransparentColour << 24);
+
+                if ((wall.Properties & Wall.WallFlags.SelfIlluminating) != 0)
+                    flags |= EtmTileFlags.SelfIlluminating;
+            }
+
+            _tilemap.SetTile(order, floorIndex, ceilingIndex, wallIndex, frameCount, flags);
         }
 
         void OnSlowClock(SlowClockEvent e)

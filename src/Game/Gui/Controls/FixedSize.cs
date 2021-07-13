@@ -41,7 +41,7 @@ namespace UAlbion.Game.Gui.Controls
             return base.DoLayout(fixedExtents, order, func);
         }
 
-        public override Vector2 GetSize() => new Vector2(_width, _height);
+        public override Vector2 GetSize() => new(_width, _height);
         public override string ToString() => $"FixedSize: <{_width}, {_height}> {Position} {Children[0]}";
     }
 }

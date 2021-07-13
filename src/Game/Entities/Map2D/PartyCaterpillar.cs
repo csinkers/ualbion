@@ -114,6 +114,6 @@ namespace UAlbion.Game.Entities.Map2D
                 ? (Vector3.Zero, 0) 
                 : _trail[_playerOffsets[followerIndex].Item1];
 
-        Vector3 To3D(Vector2 position) => new Vector3(position, _settings.GetDepth(position.Y));
+        Vector3 To3D(Vector2 position) => new(position, _settings.GetDepth(position.Y));
     }
 }

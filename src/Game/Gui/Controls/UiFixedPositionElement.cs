@@ -23,16 +23,17 @@ namespace UAlbion.Game.Gui.Controls
         }
 
         public override string ToString() => $"{_id} @ {_extents}";
-        public override Vector2 GetSize() => new Vector2(_extents.Width, _extents.Height);
+        public override Vector2 GetSize() => new(_extents.Width, _extents.Height);
 
         protected override void Subscribed()
         {
             if (_sprite == null)
             {
                 var assets = Resolve<IAssetManager>();
+                var sm = Resolve<ISpriteManager>();
                 var texture = assets.LoadTexture(_id);
-                var key = new SpriteKey(texture, DrawLayer.Interface, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
-                _sprite = Resolve<ISpriteManager>().Borrow(key, 1, this);
+                var key = new SpriteKey(texture, SpriteSampler.Point, DrawLayer.Interface, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
+                _sprite = sm.Borrow(key, 1, this);
             }
 
             Rebuild();
@@ -54,7 +55,7 @@ namespace UAlbion.Game.Gui.Controls
             var instances = _sprite.Lock(ref lockWasTaken);
             try
             {
-                instances[0] = SpriteInstanceData.TopLeft(position, size, _sprite, 0, 0);
+                instances[0] = new SpriteInstanceData(position, size, _sprite.Key.Texture.Regions[0], SpriteFlags.TopLeft);
             }
             finally { _sprite.Unlock(lockWasTaken); }
         }

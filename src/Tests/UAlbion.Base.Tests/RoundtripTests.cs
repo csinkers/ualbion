@@ -405,7 +405,6 @@ namespace UAlbion.Base.Tests
                 9, 10
             };
             var info = new AssetInfo();
-            var factory = new MockFactory();
             info.Set(AssetProperty.SubSprites, "(1,1,3) (2,2)");
             var sprite = RoundTrip<IReadOnlyTexture<byte>>(
                 nameof(AmorphousTest),

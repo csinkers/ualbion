@@ -12,7 +12,7 @@ namespace UAlbion.Core.Tests
         public int Seen { get; private set; }
         public int Handled { get; private set; }
         public T CallResolve<T>() => TryResolve<T>();
-        public new void Raise(IEvent e) => base.Raise(e);
+        public new void Raise<T>(T e) where T : IEvent => base.Raise(e);
         public new int RaiseAsync(IAsyncEvent e, Action continuation) => base.RaiseAsync(e, continuation);
         public new int RaiseAsync<T>(IAsyncEvent<T> e, Action<T> continuation) => base.RaiseAsync(e, continuation);
         public new void Enqueue(IEvent e) => base.Enqueue(e);

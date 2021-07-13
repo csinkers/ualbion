@@ -15,9 +15,9 @@ namespace UAlbion.Game
 {
     public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventManager, IDisposable
     {
-        readonly ThreadLocal<Stack<EventContext>> _threadContexts = new ThreadLocal<Stack<EventContext>>(() => new Stack<EventContext>());
-        readonly HashSet<EventContext> _activeContexts = new HashSet<EventContext>();
-        static readonly EventContext BaseContext = new EventContext(new EventSource(AssetId.None, TextId.None, 0));
+        readonly ThreadLocal<Stack<EventContext>> _threadContexts = new(() => new Stack<EventContext>());
+        readonly HashSet<EventContext> _activeContexts = new();
+        static readonly EventContext BaseContext = new(new EventSource(AssetId.None, TextId.None, 0));
 
         public EventChainManager()
         {

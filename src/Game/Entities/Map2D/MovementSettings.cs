@@ -9,14 +9,14 @@ namespace UAlbion.Game.Entities.Map2D
         readonly Func<float, float> _getDepth;
 
         public static MovementSettings Large() =>
-            new MovementSettings(DepthUtil.IndoorCharacterDepth, LargeSpriteAnimations.Frames) 
+            new(DepthUtil.IndoorCharacterDepth, LargeSpriteAnimations.Frames) 
             {
                 MinTrailDistance = 12,
                 MaxTrailDistance = 18
             };
 
         public static MovementSettings Small() =>
-            new MovementSettings(DepthUtil.OutdoorCharacterDepth, SmallSpriteAnimations.Frames) 
+            new(DepthUtil.OutdoorCharacterDepth, SmallSpriteAnimations.Frames) 
             {
                 MinTrailDistance = 6,
                 MaxTrailDistance = 12

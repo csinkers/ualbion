@@ -7,7 +7,7 @@ namespace UAlbion.Game.Scenes
 {
     public interface IMenuScene : IScene { }
     [Scene(SceneId.MainMenu)]
-    public class MenuScene : Scene, IMenuScene
+    public class MenuScene : Container, IMenuScene
     {
         bool _clockWasRunning;
 

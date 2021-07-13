@@ -14,11 +14,11 @@ namespace UAlbion.Game.Assets
 
             var bitmap = (InterlacedBitmap)asset;
             var texture =
-                new Texture<uint>(info.AssetId, bitmap.Width, bitmap.Height)
+                new SimpleTexture<uint>(info.AssetId, bitmap.Width, bitmap.Height)
                     .AddRegion(0, 0, bitmap.Width, bitmap.Height);
 
             var imageBuffer = new ReadOnlyImageBuffer<byte>(bitmap.Width, bitmap.Height, bitmap.Width, bitmap.ImageData);
-            BlitUtil.BlitTiled8To32(imageBuffer, texture.GetMutableLayerBuffer(0), bitmap.Palette, 255, null);
+            BlitUtil.BlitTiled8To32(imageBuffer, texture.GetMutableRegionBuffer(0), bitmap.Palette, 255, null);
             return texture;
         }
     }

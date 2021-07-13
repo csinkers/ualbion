@@ -19,10 +19,10 @@ namespace UAlbion.Core
     public sealed class EventExchange : IDisposable
     {
         static readonly Action<object> DummyContinuation = _ => { };
-        readonly object _syncRoot = new object();
+        readonly object _syncRoot = new();
         readonly ILogExchange _logExchange;
-        readonly Stack<List<Handler>> _dispatchLists = new Stack<List<Handler>>();
-        readonly Queue<(IEvent, object)> _queuedEvents = new Queue<(IEvent, object)>();
+        readonly Stack<List<Handler>> _dispatchLists = new();
+        readonly Queue<(IEvent, object)> _queuedEvents = new();
         readonly IDictionary<Type, object> _registrations = new Dictionary<Type, object>();
         readonly IDictionary<Type, IList<Handler>> _subscriptions = new Dictionary<Type, IList<Handler>>();
         readonly IDictionary<IComponent, IList<Handler>> _subscribers = new Dictionary<IComponent, IList<Handler>>();
@@ -140,10 +140,10 @@ namespace UAlbion.Core
                     // ReSharper disable ExplicitCallerInfoArgument
                     switch (log.Severity)
                     {
-                        case LogLevel.Info: CoreTrace.Log.Info("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;;
-                        case LogLevel.Warning: CoreTrace.Log.Warning("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;;
-                        case LogLevel.Error: CoreTrace.Log.Error("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;;
-                        case LogLevel.Critical: CoreTrace.Log.Critical("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;;
+                        case LogLevel.Info: CoreTrace.Log.Info("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;
+                        case LogLevel.Warning: CoreTrace.Log.Warning("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;
+                        case LogLevel.Error: CoreTrace.Log.Error("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;
+                        case LogLevel.Critical: CoreTrace.Log.Critical("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;
                     }
                     // ReSharper restore ExplicitCallerInfoArgument
                 }

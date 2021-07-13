@@ -13,7 +13,7 @@ namespace UAlbion.Game
 {
     public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
     {
-        readonly Random _random = new Random();
+        readonly Random _random = new();
 
         static Func<T, Action<bool>, bool> Do<T>(Func<T, bool> func) =>
             (e, continuation) =>

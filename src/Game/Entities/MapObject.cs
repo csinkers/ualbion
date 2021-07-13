@@ -19,7 +19,7 @@ namespace UAlbion.Game.Entities
             _sprite = AttachChild(new MapSprite(
                 id,
                 DrawLayer.Underlay,
-                SpriteKeyFlags.UseCylindrical,
+                0,
                 SpriteFlags.FlipVertical |
                 (onFloor
                     ? SpriteFlags.Floor | SpriteFlags.MidAligned
@@ -28,7 +28,7 @@ namespace UAlbion.Game.Entities
                 Size = size,
                 Position = initialPosition
             });
-            _sprite.Selected += (sender, args) => args.RegisterHit(this);
+            _sprite.Selected += (_, args) => args.RegisterHit(this);
 
             On<SlowClockEvent>(e =>
             {
@@ -62,9 +62,10 @@ namespace UAlbion.Game.Entities
             return offset - new Vector4(0.5f, 0, 0.5f, 0);
         }
 
-        public static MapObject Build(int tileX, int tileY, LabyrinthData labyrinth, SubObject subObject, in DungeonTileMapProperties properties)
+        public static MapObject Build(int tileX, int tileY, LabyrinthData labyrinth, SubObject subObject, TilemapRequest properties)
         {
             if (labyrinth == null) throw new ArgumentNullException(nameof(labyrinth));
+            if (properties == null) throw new ArgumentNullException(nameof(properties));
             if (subObject == null) return null;
             if (subObject.ObjectInfoNumber >= labyrinth.Objects.Count)
             {
@@ -84,12 +85,10 @@ namespace UAlbion.Game.Entities
             var tweak = onFloor ? subObject.ObjectInfoNumber * (offset.Y < float.Epsilon ? 0.0001f : -0.0001f) : 0;
             offset.Y += tweak;
 
-            Vector4 position =
+            Vector3 pos3 =
                 tileX * properties.HorizontalSpacing
                 + tileY * properties.VerticalSpacing
-                + offset * properties.Scale;
-
-            var pos3 = new Vector3(position.X, position.Y, position.Z);
+                + new Vector3(offset.X, offset.Y, offset.Z) * properties.Scale;
 
             var size = 
                     new Vector2(definition.MapWidth, definition.MapHeight)

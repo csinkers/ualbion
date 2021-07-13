@@ -41,7 +41,7 @@ namespace UAlbion.Game.Veldrid.Assets
             while (IsFrameEmpty(frames.Last(), pixels, image.Width))
                 frames.RemoveAt(frames.Count - 1);
 
-            return new Texture<byte>(id, id.ToString(), image.Width, image.Height, 1, pixels, frames);
+            return new SimpleTexture<byte>(id, id.ToString(), image.Width, image.Height, pixels, frames);
         }
 
         static bool IsFrameEmpty(Region frame, byte[] pixels, int stride)

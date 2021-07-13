@@ -15,8 +15,8 @@ namespace UAlbion.Game.State
         public const int MaxPartySize = 6;
 
         readonly IDictionary<CharacterId, CharacterSheet> _characterSheets;
-        readonly List<Player.PartyMember> _statusBarOrder = new List<Player.PartyMember>();
-        readonly List<Player.PartyMember> _walkOrder = new List<Player.PartyMember>();
+        readonly List<Player.PartyMember> _statusBarOrder = new();
+        readonly List<Player.PartyMember> _walkOrder = new();
         readonly IReadOnlyList<Player.PartyMember> _readOnlyStatusBarOrder;
         readonly IReadOnlyList<Player.PartyMember> _readOnlyWalkOrder;
 

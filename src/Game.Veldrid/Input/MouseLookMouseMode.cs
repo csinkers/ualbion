@@ -46,7 +46,7 @@ namespace UAlbion.Game.Veldrid.Input
             On<InputEvent>(OnInput);
             On<FocusGainedEvent>(_ => AcquireMouse());
             On<FocusLostEvent>(_ => ReleaseMouse());
-            On<PostUpdateEvent>(e =>
+            On<PostGameUpdateEvent>(e =>
             {
                 //var windowState = Resolve<IWindowManager>();
                 //Raise(new SetCursorPositionEvent(windowState.PixelWidth / 2, windowState.PixelHeight / 2));

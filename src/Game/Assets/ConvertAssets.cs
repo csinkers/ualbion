@@ -13,17 +13,17 @@ namespace UAlbion.Game.Assets
 {
     public static class ConvertAssets
     {
-        static (ModApplier, EventExchange) BuildModApplier(string baseDir, string mod, IFileSystem disk, ICoreFactory factory)
+        static (ModApplier, EventExchange, AssetLoaderRegistry) BuildModApplier(string baseDir, string mod, IFileSystem disk)
         {
             var config = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir, disk);
             var applier = new ModApplier();
             var exchange = new EventExchange(new LogExchange());
+            var assetLoaderRegistry = new AssetLoaderRegistry();
             exchange
                 .Register(disk)
                 .Register<IGeneralConfig>(config)
-                .Register(factory)
                 .Attach(new StdioConsoleLogger())
-                .Attach(new AssetLoaderRegistry())
+                .Attach(assetLoaderRegistry)
                 .Attach(new ContainerRegistry())
                 .Attach(new PostProcessorRegistry())
                 .Attach(new AssetLocator())
@@ -31,11 +31,10 @@ namespace UAlbion.Game.Assets
                 .Attach(applier)
                 ;
             applier.LoadMods(config, new[] { mod });
-            return (applier, exchange);
+            return (applier, exchange, assetLoaderRegistry);
         }
 
         public static void Convert(IFileSystem disk,
-            ICoreFactory factory,
             string fromMod,
             string toMod,
             string[] ids,
@@ -43,14 +42,15 @@ namespace UAlbion.Game.Assets
             Regex filePattern)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
-            if (factory == null) throw new ArgumentNullException(nameof(factory));
 
             var baseDir = ConfigUtil.FindBasePath(disk);
-            var (from, fromExchange) = BuildModApplier(baseDir, fromMod, disk, factory);
-            var (to, toExchange) = BuildModApplier(baseDir, toMod, disk, factory);
+            var (from, fromExchange, fromLoaderRegistry) = BuildModApplier(baseDir, fromMod, disk);
+            var (to, toExchange, toLoaderRegistry) = BuildModApplier(baseDir, toMod, disk);
 
             using (fromExchange)
+            using (fromLoaderRegistry)
             using (toExchange)
+            using (toLoaderRegistry)
             {
                 // Give the "from" universe's asset manager "to" the to exchange so we can import the assets.
                 toExchange.Attach(new AssetManager(from)); 

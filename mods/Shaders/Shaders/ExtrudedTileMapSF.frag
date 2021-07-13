@@ -1,23 +1,5 @@
-﻿//!#version 450 // Comments with //! are for tricking the Visual Studio GLSL plugin into doing the right thing
-//!#extension GL_KHR_vulkan_glsl: enable
-
-// Resource Sets / Uniforms 
-layout(binding = 1) uniform texture2DArray DayFloors;   //!
-layout(binding = 2) uniform texture2DArray DayWalls;    //!
-layout(binding = 3) uniform texture2DArray NightFloors; //!
-layout(binding = 4) uniform texture2DArray NightWalls;  //!
-layout(binding = 5) uniform sampler TextureSampler;     //!
-
-#include "CommonResources.glsl"
-
-// TODO: Lighting info
-
-// Vertex & Instance data piped through from vertex shader
-layout(location = 0) in vec2 iTexCoords;     // Texture Coordinates
-layout(location = 1) in flat uint iTextures; // Textures
-layout(location = 2) in flat uint iFlags;    // Flags
-
-layout(location = 0) out vec4 OutputColor;
+﻿#include "ExtrudedTileMapSF.h.frag"
+#define DEPTH_COLOR(depth) (vec4((int((depth) * 1024) % 10) / 10.0f, 20 * (max((depth), 0.95) - 0.95), 20 * min((depth), 0.05), 1.0f))
 
 vec4 getFloor(vec3 coords)
 {
@@ -32,7 +14,6 @@ vec4 getWall(vec3 coords)
 	vec4 night = texture(sampler2DArray(NightWalls, TextureSampler), coords); //! vec4 night;
 	return mix(day, night, uPaletteBlend);
 }
-
 
 void main()
 {
@@ -95,7 +76,7 @@ void main()
 					smoothstep(0.47, 0.5, abs(iTexCoords.y-0.5f))));
 	}
 
-	OutputColor = color;
+	oColor = color;
 
 	gl_FragDepth = ((uEngineFlags & EF_FLIP_DEPTH_RANGE) != 0) ? 1.0f - depth : depth;
 }

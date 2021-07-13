@@ -8,7 +8,7 @@ namespace UAlbion.Game.Scenes
 {
     public interface IFlatScene : IScene { }
     [Scene(SceneId.World2D)]
-    public class FlatScene : Scene, IFlatScene
+    public class FlatScene : Container, IFlatScene
     {
         public FlatScene() : base(nameof(SceneId.World2D))
         {

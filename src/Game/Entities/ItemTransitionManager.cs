@@ -2,6 +2,7 @@
 using System.Numerics;
 using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events.Transitions;
@@ -11,7 +12,7 @@ namespace UAlbion.Game.Entities
 {
     public class ItemTransitionManager : Component
     {
-        static readonly Vector2 FirstPortraitPosition = new Vector2(23, 204);
+        static readonly Vector2 FirstPortraitPosition = new(23, 204);
 
         public ItemTransitionManager()
         {

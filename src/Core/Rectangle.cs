@@ -34,8 +34,8 @@ namespace UAlbion.Core
         public int Top => Y;
         public int Bottom => Y + Height;
 
-        public Vector2 Position => new Vector2(X, Y);
-        public Vector2 Size => new Vector2(Width, Height);
+        public Vector2 Position => new(X, Y);
+        public Vector2 Size => new(Width, Height);
 
         public bool Contains(Point p) => Contains(p.X, p.Y);
         public bool Contains(int x, int y)

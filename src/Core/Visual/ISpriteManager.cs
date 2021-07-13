@@ -1,9 +1,7 @@
 ﻿namespace UAlbion.Core.Visual
 {
-    public interface ISpriteManager
+    public interface ISpriteManager : IRenderableSource
     {
-        SpriteLease Borrow(SpriteKey key, int length, object caller);
-        void Cleanup();
-        WeakSpriteReference MakeWeakReference(SpriteLease lease, int index);
+        SpriteLease Borrow(SpriteKey key, int count, object owner);
     }
 }

@@ -3,8 +3,9 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Etm;
+using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
-using UAlbion.Core.Veldrid.Visual;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Config;
 using UAlbion.Game;
@@ -13,9 +14,9 @@ using UAlbion.Game.Events;
 using UAlbion.Game.Input;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.State;
+using UAlbion.Game.Veldrid;
 using UAlbion.Game.Veldrid.Assets;
 using UAlbion.Game.Veldrid.Input;
-using Veldrid;
 
 namespace UAlbion
 {
@@ -43,12 +44,14 @@ namespace UAlbion
             foreach (var shaderPath in Resolve<IModApplier>().ShaderPaths)
                 shaderCache.AddShaderPath(shaderPath);
 
-            var engine = new VeldridEngine(_cmdLine.Backend, _cmdLine.UseRenderDoc, _cmdLine.StartupOnly, true)
-                .AddRenderer(new ExtrudedTileMapRenderer())
-                .AddRenderer(new SpriteRenderer())
-                ;
+            var framebuffer = new OffscreenFramebuffer(640, 480);
+            var renderer = new SceneRenderer("IsoRenderer", framebuffer)
+                    .AddRenderer(new EtmRenderer(framebuffer))
+                    .AddRenderer(new SpriteRenderer(framebuffer))
+                    .AddSource(new DefaultRenderableSource());
 
-            engine.ChangeBackend();
+            var engine = new Engine(_cmdLine.Backend, _cmdLine.UseRenderDoc, _cmdLine.StartupOnly, true, renderer);
+
 #pragma warning restore CA2000 // Dispose objects before losing scopes
 
             var builder = new IsometricBuilder(
@@ -61,14 +64,15 @@ namespace UAlbion
             var services = AttachChild(new Container("IsoServices"));
             services
                 .Add(shaderCache)
+                .Add(framebuffer)
+                .Add(renderer)
                 .Add(engine)
-                .Add(new DeviceObjectManager())
                 .Add(new SpriteManager())
-                .Add(new TextureManager())
+                .Add(new TextureSource())
                 .Add(new SceneStack())
                 .Add(new SceneManager()
                     .AddScene(new EmptyScene())
-                    .AddScene((Scene)new IsometricBakeScene()
+                    .AddScene((IScene)new IsometricBakeScene()
                         .Add(new PaletteManager())
                         .Add(builder)))
                 .Add(new InputManager().RegisterMouseMode(MouseMode.Normal, new NormalMouseMode()))

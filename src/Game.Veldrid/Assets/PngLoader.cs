@@ -58,7 +58,7 @@ namespace UAlbion.Game.Veldrid.Assets
                 currentY += image.Height;
             }
 
-            return new Texture<byte>(id, id.ToString(), totalWidth, totalHeight, 1, pixels, frames);
+            return new SimpleTexture<byte>(id, id.ToString(), totalWidth, totalHeight, pixels, frames);
         }
 
         public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s)

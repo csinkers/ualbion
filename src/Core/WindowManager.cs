@@ -6,67 +6,37 @@ namespace UAlbion.Core
 {
     public class WindowManager : ServiceComponent<IWindowManager>, IWindowManager
     {
-        public WindowManager()
-        {
-            On<WindowResizedEvent>(_ => Recalculate());
-        }
+        int _width;
+        int _height;
 
-        public IWindow Window
-        {
-            get => _window;
-            set
-            {
-                _window = value;
-                Recalculate();
-            }
-        }
-
-        public int UiWidth => UiConstants.UiExtents.Width;
-        public int UiHeight => UiConstants.UiExtents.Height;
-        public int PixelWidth => Window.Width;
-        public int PixelHeight => Window.Height;
-        public Vector2 Size => new Vector2(Window.Width, Window.Height);
-        static Vector2 UiSize => new Vector2(UiConstants.UiExtents.Width, UiConstants.UiExtents.Height);
-
-        void Recalculate()
-        {
-            float widthRatio = (float)Window.Width / UiWidth;
-            float heightRatio = (float)Window.Height / UiHeight;
-            int scale = (int)Math.Min(widthRatio, heightRatio);
-            GuiScale = scale == 0 ? 1 : scale;
-
-            _uiToNorm = new Vector2(
-                 2.0f * GuiScale / Window.Width,
-                -2.0f * GuiScale / Window.Height);
-
-            _normToUi = new Vector2(
-                 Window.Width / (2.0f * GuiScale),
-                -Window.Height / (2.0f * GuiScale));
-
-            _normToPixel = new Vector2(
-                 Window.Width / 2.0f,
-                -Window.Height / 2.0f);
-
-            _pixelToNorm = new Vector2(
-                 2.0f / Window.Width,
-                -2.0f / Window.Height);
-
-            _uiOffset = new Vector2(
-                UiSize.X * GuiScale / Window.Width,
-                1.0f - 2 * GuiScale * UiSize.Y / Window.Height);
-
-            // Snap to the nearest pixel
-            var uiPos = NormToUiRelative(_uiOffset);
-            _uiOffset = UiToNormRelative(new Vector2((int)uiPos.X, (int)uiPos.Y));
-        }
-
-        public int GuiScale { get; private set; }
         Vector2 _uiOffset;
         Vector2 _uiToNorm;
         Vector2 _normToUi;
         Vector2 _normToPixel;
         Vector2 _pixelToNorm;
-        IWindow _window;
+
+        public WindowManager()
+        {
+            On<WindowResizedEvent>(e => Resolution = (e.Width, e.Height));
+        }
+
+        public (int Width, int Height) Resolution
+        {
+            get => (_width, _height);
+            set
+            {
+                (_width, _height) = value;
+                Recalculate();
+            }
+        }
+
+        public int GuiScale { get; private set; }
+        public int UiWidth => UiConstants.UiExtents.Width;
+        public int UiHeight => UiConstants.UiExtents.Height;
+        public int PixelWidth => Resolution.Width;
+        public int PixelHeight => Resolution.Height;
+        public Vector2 Size => new(Resolution.Width, Resolution.Height);
+        static Vector2 UiSize => new(UiConstants.UiExtents.Width, UiConstants.UiExtents.Height);
 
         // UI Coordinates:
         // Top left corner in original game = (0,0)
@@ -93,6 +63,38 @@ namespace UAlbion.Core
                 (int)pos.Y,
                 (int)size.X,
                 (int)size.Y);
+        }
+
+        void Recalculate()
+        {
+            float widthRatio = (float)Resolution.Width / UiWidth;
+            float heightRatio = (float)Resolution.Height / UiHeight;
+            int scale = (int)Math.Min(widthRatio, heightRatio);
+            GuiScale = scale == 0 ? 1 : scale;
+
+            _uiToNorm = new Vector2(
+                 2.0f * GuiScale / Resolution.Width,
+                -2.0f * GuiScale / Resolution.Height);
+
+            _normToUi = new Vector2(
+                 Resolution.Width / (2.0f * GuiScale),
+                -Resolution.Height / (2.0f * GuiScale));
+
+            _normToPixel = new Vector2(
+                 Resolution.Width / 2.0f,
+                -Resolution.Height / 2.0f);
+
+            _pixelToNorm = new Vector2(
+                 2.0f / Resolution.Width,
+                -2.0f / Resolution.Height);
+
+            _uiOffset = new Vector2(
+                UiSize.X * GuiScale / Resolution.Width,
+                1.0f - 2 * GuiScale * UiSize.Y / Resolution.Height);
+
+            // Snap to the nearest pixel
+            var uiPos = NormToUiRelative(_uiOffset);
+            _uiOffset = UiToNormRelative(new Vector2((int)uiPos.X, (int)uiPos.Y));
         }
     }
 }

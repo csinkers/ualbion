@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UAlbion.Core;
 using UAlbion.Formats;
 
 namespace UAlbion.Game.Assets
 {
-    public class AssetLoaderRegistry : ServiceComponent<IAssetLoaderRegistry>, IAssetLoaderRegistry
+    public sealed class AssetLoaderRegistry : ServiceComponent<IAssetLoaderRegistry>, IAssetLoaderRegistry, IDisposable
     {
-        readonly object _syncRoot = new object();
+        readonly object _syncRoot = new();
         readonly IDictionary<string, IAssetLoader> _loaders = new Dictionary<string, IAssetLoader>();
 
         public IAssetLoader GetLoader(string loaderName)
@@ -36,6 +37,13 @@ namespace UAlbion.Game.Assets
 
             _loaders[loaderName] = loader;
             return loader;
+        }
+
+        public void Dispose()
+        {
+            foreach(var loader in _loaders.Values.OfType<IDisposable>())
+                loader.Dispose();
+            _loaders.Clear();
         }
     }
 }

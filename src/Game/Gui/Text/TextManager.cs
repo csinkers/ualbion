@@ -15,8 +15,8 @@ namespace UAlbion.Game.Gui.Text
     public class TextManager : ServiceComponent<ITextManager>, ITextManager
     {
         const int SpaceSize = 3;
-        readonly Dictionary<SpriteId, Dictionary<char, int>> _fontMappings = new Dictionary<SpriteId, Dictionary<char, int>>();
-        readonly object _syncRoot = new object();
+        readonly Dictionary<SpriteId, Dictionary<char, int>> _fontMappings = new();
+        readonly object _syncRoot = new();
 
         public Vector2 Measure(TextBlock block)
         {
@@ -58,7 +58,7 @@ namespace UAlbion.Game.Gui.Text
 
             int offset = 0;
             var flags = SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest;
-            var key = new SpriteKey(font, order, flags, scissorRegion);
+            var key = new SpriteKey(font, SpriteSampler.Point, order, flags, scissorRegion);
             int displayableCharacterCount = text.Count(x => mapping.ContainsKey(x));
             int instanceCount = displayableCharacterCount * (isFat ? 4 : 2);
             var lease = sm.Borrow(key, instanceCount, caller);
@@ -78,10 +78,10 @@ namespace UAlbion.Game.Gui.Text
                     // var texOffset = subImage.TexOffset.Y + 0.1f / font.Height;
 
                     var normPosition = window.UiToNormRelative(offset, 0);
-                    var baseInstance = SpriteInstanceData.TopLeft(
+                    var baseInstance = new SpriteInstanceData(
                         new Vector3(normPosition, 0),
                         window.UiToNormRelative(subImage.Size),
-                        subImage, 0);
+                        subImage, SpriteFlags.TopLeft);
 
                     instances[n] = baseInstance;
                     instances[n + 1] = baseInstance;

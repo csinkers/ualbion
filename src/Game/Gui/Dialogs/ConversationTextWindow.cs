@@ -8,7 +8,7 @@ namespace UAlbion.Game.Gui.Dialogs
 {
     public class ConversationTextWindow : ModalDialog
     {
-        readonly TextSourceWrapper _text = new TextSourceWrapper();
+        readonly TextSourceWrapper _text = new();
 
         public event Action Clicked;
 

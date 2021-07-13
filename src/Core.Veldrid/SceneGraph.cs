@@ -6,9 +6,9 @@ using Veldrid.Utilities;
 
 namespace UAlbion.Core.Veldrid
 {
-    public class SceneGraph : Component, ISceneGraph
+    public class SceneGraph : ServiceComponent<ISceneGraph>, ISceneGraph
     {
-        readonly Octree<IPositioned> _octree = new Octree<IPositioned>(new BoundingBox(-Vector3.One, Vector3.One), 2);
+        readonly Octree<IPositioned> _octree = new(new BoundingBox(-Vector3.One, Vector3.One), 2);
 
         public SceneGraph()
         {
@@ -46,7 +46,7 @@ namespace UAlbion.Core.Veldrid
                 return 1;
             });
 
-            foreach(var hit in veldridHits)
+            foreach (var hit in veldridHits)
                 hits.Add(new Selection(hit.Location, hit.Distance, hit.Item));
         }
 

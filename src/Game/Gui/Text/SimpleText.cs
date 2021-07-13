@@ -6,7 +6,7 @@ namespace UAlbion.Game.Gui.Text
 {
     public class SimpleText : UiElement, IText, ITextBuilder<SimpleText>
     {
-        readonly TextBlock _block = new TextBlock();
+        readonly TextBlock _block = new();
         public SimpleText(string literal) => _block.Text = literal;
         public int Version { get; private set; }
         public IEnumerable<TextBlock> GetBlocks() => new[] { _block };

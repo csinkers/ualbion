@@ -53,7 +53,7 @@ namespace UAlbion.Game.Assets
                     font.Width, font.Height, 0));
             }
 
-            return new Texture<byte>(font.Id, font.Id.ToString(), font.Width, font.Height, 1, font.PixelData, frames);
+            return new SimpleTexture<byte>(font.Id, font.Id.ToString(), font.Width, font.Height, font.PixelData, frames);
         }
 
         IReadOnlyTexture<byte> Write(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s)
@@ -64,7 +64,7 @@ namespace UAlbion.Game.Assets
             if (width == 0 || height == 0)
                 throw new ArgumentException("Explicit width and height must be defined when using FontSpriteLoader", nameof(info));
 
-            var repacked = new Texture<byte>(existing.Id, existing.Name, width, height * existing.Regions.Count);
+            var repacked = new SimpleTexture<byte>(existing.Id, existing.Name, width, height * existing.Regions.Count);
 
             for (int i = 0; i < existing.Regions.Count; i++)
             {

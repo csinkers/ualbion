@@ -8,8 +8,9 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Etm;
+using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
-using UAlbion.Core.Veldrid.Visual;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets.Labyrinth;
@@ -23,16 +24,15 @@ using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Assets
 {
-    public class IsometricLabyrinthLoader : Component, IAssetLoader<LabyrinthData>
+    public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<LabyrinthData>, IDisposable
     {
         public const int DefaultWidth = 48;
         public const int DefaultHeight = 64;
         public const int DefaultBaseHeight = 40;
         public const int DefaultTilesPerRow = 16;
 
-        readonly JsonLoader<LabyrinthData> _jsonLoader = new JsonLoader<LabyrinthData>();
-        VeldridEngine _engine;
-        VeldridRendererContext _context;
+        readonly JsonLoader<LabyrinthData> _jsonLoader = new();
+        Engine _engine;
         IsometricBuilder _builder;
 
         void SetupEngine(int width, int height, int baseHeight, int tilesPerRow)
@@ -40,33 +40,34 @@ namespace UAlbion.Game.Veldrid.Assets
 #pragma warning disable CA2000 // Dispose objects before losing scopes
             var config = Resolve<IGeneralConfig>();
             var shaderCache = new ShaderCache(config.ResolvePath("$(CACHE)/ShaderCache"));
-            var fbSource = new FramebufferSource(DefaultWidth * DefaultTilesPerRow, DefaultHeight);
+            var framebuffer = new OffscreenFramebuffer(DefaultWidth * DefaultTilesPerRow, DefaultHeight);
+            var sceneRenderer = new SceneRenderer("MainPipeline", framebuffer)
+                    .AddRenderer(new EtmRenderer(framebuffer))
+                    .AddRenderer(new SpriteRenderer(framebuffer))
+                    .AddSource(new DefaultRenderableSource());
 
             foreach (var shaderPath in Resolve<IModApplier>().ShaderPaths)
                 shaderCache.AddShaderPath(shaderPath);
 
-            _engine = new VeldridEngine(
-                GraphicsBackend.Vulkan, false, false, false)
-                .AddRenderer(new ExtrudedTileMapRenderer())
-                .AddRenderer(new SpriteRenderer())
+            _engine = new Engine(
+                GraphicsBackend.Vulkan, false, false, false, sceneRenderer)
                 ;
 
-            _engine.ChangeBackend();
-#pragma warning restore CA2000 // Dispose objects before losing scopes
-
             var services = new Container("IsometricLayoutServices");
-            _builder = new IsometricBuilder(fbSource, width, height, baseHeight, tilesPerRow);
+            _builder = new IsometricBuilder(framebuffer, width, height, baseHeight, tilesPerRow);
             services
                 .Add(shaderCache)
-                .Add(fbSource)
+                .Add(framebuffer)
+                .Add(sceneRenderer)
                 .Add(_engine)
-                .Add(new DeviceObjectManager())
+                .Add(new EtmManager())
                 .Add(new SpriteManager())
-                .Add(new TextureManager())
+                .Add(new SpriteSamplerSource())
+                .Add(new TextureSource())
                 .Add(new SceneStack())
                 .Add(new SceneManager()
                     .AddScene(new EmptyScene())
-                    .AddScene((Scene)new IsometricBakeScene()
+                    .AddScene((IScene)new IsometricBakeScene()
                         .Add(new PaletteManager())
                         .Add(_builder)))
                 ;
@@ -75,8 +76,7 @@ namespace UAlbion.Game.Veldrid.Assets
             Raise(new SetSceneEvent(SceneId.IsometricBake));
             Raise(new SetClearColourEvent(0, 0, 0, 0));
             // Raise(new EngineFlagEvent(FlagOperation.Set, EngineFlags.ShowBoundingBoxes));
-
-            _context = _engine.BuildContext(fbSource);
+#pragma warning restore CA2000 // Dispose objects before losing scopes
         }
 
         IEnumerable<(string, byte[])> Save(LabyrinthData labyrinth, AssetInfo info, IsometricMode mode, string pngPath, string tsxPath)
@@ -92,7 +92,7 @@ namespace UAlbion.Game.Veldrid.Assets
             var assets = Resolve<IAssetManager>();
             var frames = _builder.Build(labyrinth, info, mode, assets);
 
-            Image<Bgra32> image = _engine.RenderFrame(_context, false);
+            Image<Bgra32> image = _engine.RenderFrame(false);
 
             using var stream = new MemoryStream();
             image.SaveAsPng(stream);
@@ -156,5 +156,7 @@ namespace UAlbion.Game.Veldrid.Assets
 
         public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
             => Serdes((LabyrinthData)existing, info, mapping, s);
+
+        public void Dispose() => _engine?.Dispose();
     }
 }

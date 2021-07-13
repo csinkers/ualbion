@@ -53,8 +53,8 @@ namespace UAlbion.Formats.Exporters.Tiled
                     new MapTileset { FirstGid = 0, Source = tilesetPath, },
                     new MapTileset { FirstGid = npcTileset.GidOffset, Source = npcTileset.Filename }
                 },
-                Layers = new List<MapLayer> {
-                    new MapLayer
+                Layers = new List<TiledMapLayer> {
+                    new TiledMapLayer
                     {
                         Id = 1,
                         Name = "Underlay",
@@ -62,7 +62,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                         Height = map.Height,
                         Data = new LayerData { Encoding = "csv", Content = BuildCsvData(map, tileset, false, blankTileIndex) }
                     },
-                    new MapLayer
+                    new TiledMapLayer
                     {
                         Id = 2,
                         Name = "Overlay",
@@ -124,8 +124,8 @@ namespace UAlbion.Formats.Exporters.Tiled
                     new MapTileset { FirstGid = ContentsGid, Source = properties.ContentsPath },
                     new MapTileset { FirstGid = CeilingGid, Source = properties.CeilingPath, },
                 },
-                Layers = new List<MapLayer> {
-                    new MapLayer
+                Layers = new List<TiledMapLayer> {
+                    new TiledMapLayer
                     {
                         Id = 1,
                         Name = "Floors",
@@ -133,7 +133,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                         Height = map.Height,
                         Data = new LayerData { Encoding = "csv", Content = BuildCsvData(map, IsometricMode.Floors) }
                     },
-                    new MapLayer
+                    new TiledMapLayer
                     {
                         Id = 2,
                         Name = "Walls",
@@ -141,7 +141,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                         Height = map.Height,
                         Data = new LayerData { Encoding = "csv", Content = BuildCsvData(map, IsometricMode.Walls) }
                     },
-                    new MapLayer
+                    new TiledMapLayer
                     {
                         Id = 3,
                         Name = "Contents",
@@ -149,7 +149,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                         Height = map.Height,
                         Data = new LayerData { Encoding = "csv", Content = BuildCsvData(map, IsometricMode.Contents) }
                     },
-                    new MapLayer
+                    new TiledMapLayer
                     {
                         Id = 4,
                         Name = "Ceilings",

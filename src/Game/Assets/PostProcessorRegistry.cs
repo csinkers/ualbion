@@ -6,7 +6,7 @@ namespace UAlbion.Game.Assets
 {
     public class PostProcessorRegistry : ServiceComponent<IAssetPostProcessorRegistry>, IAssetPostProcessorRegistry
     {
-        readonly object _syncRoot = new object();
+        readonly object _syncRoot = new();
         readonly IDictionary<string, IAssetPostProcessor> _loaders = new Dictionary<string, IAssetPostProcessor>();
 
         public IAssetPostProcessor GetPostProcessor(string postProcessorName)

@@ -57,8 +57,7 @@ namespace UAlbion.Game.Entities.Map2D
 
         public string Name => "Map Info Overlay";
         public DrawLayer RenderOrder => DrawLayer.Info;
-        public int PipelineId => 0;
-        public ReadOnlySpan<byte> Tiles => new ReadOnlySpan<byte>(_tiles);
+        public ReadOnlySpan<byte> Tiles => new(_tiles);
         public bool BufferDirty { get; set; }
         public int Width => _logicalMap.Width;
         public int Height => _logicalMap.Height;
@@ -70,8 +69,6 @@ namespace UAlbion.Game.Entities.Map2D
         public float TakeOpacity { get; private set; }
         protected override void Subscribed()
         {
-            Resolve<IEngine>()?.RegisterRenderable(this);
-
             int index = 0;
             for (int j = 0; j < _logicalMap.Height; j++)
             {
@@ -86,8 +83,6 @@ namespace UAlbion.Game.Entities.Map2D
 
             BufferDirty = true;
         }
-
-        protected override void Unsubscribed() => Resolve<IEngine>()?.UnregisterRenderable(this);
 
         int Index(int i, int j) => j * Width + i;
 

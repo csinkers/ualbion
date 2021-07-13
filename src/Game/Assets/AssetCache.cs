@@ -10,28 +10,32 @@ namespace UAlbion.Game.Assets
 {
     public class AssetCache : Component
     {
-        readonly object _syncRoot = new object();
-        IDictionary<AssetId, object> _assetCache = new Dictionary<AssetId, object>();
-        IDictionary<AssetId, object> _oldAssetCache = new Dictionary<AssetId, object>();
+        readonly object _syncRoot = new();
+        readonly Dictionary<AssetId, WeakReference> _cache = new();
 
         public AssetCache()
         {
-            On<CycleCacheEvent>(e => CycleCacheEvent());
-            On<ReloadAssetsEvent>(e =>
+            On<CycleCacheEvent>(_ =>
             {
                 lock (_syncRoot)
                 {
-                    _assetCache.Clear();
-                    _oldAssetCache.Clear();
+                    foreach (var key in _cache.Keys.ToList())
+                    {
+                        var weakRef = _cache[key];
+                        if (weakRef.Target == null)
+                            _cache.Remove(key);
+                    }
                 }
+
             });
-            On<AssetStatsEvent>(e =>
+            On<ReloadAssetsEvent>(_ => { lock (_syncRoot) { _cache.Clear(); } });
+            On<AssetStatsEvent>(_ =>
             {
                 var sb = new StringBuilder();
                 sb.AppendLine("Asset Statistics:");
                 lock (_syncRoot)
                 {
-                    var countByType = _assetCache.Keys
+                    var countByType = _cache.Keys
                         .GroupBy(x => x.Type)
                         .Select(x => (x.Key, x.Count()))
                         .OrderBy(x => x.Key.ToString());
@@ -43,38 +47,19 @@ namespace UAlbion.Game.Assets
             });
         }
 
-        void CycleCacheEvent()
-        {
-            lock (_syncRoot)
-            {
-                _oldAssetCache = _assetCache;
-                _assetCache = new Dictionary<AssetId, object>();
-            }
-        }
-
         public object Get(AssetId key)
         {
             lock (_syncRoot)
             {
-                if (_assetCache.TryGetValue(key, out var cachedAsset))
-                    return cachedAsset;
-
-                // Check old cache
-                if (_oldAssetCache.TryGetValue(key, out var oldCachedAsset) && !(oldCachedAsset is Exception))
-                {
-                    _assetCache[key] = oldCachedAsset;
-                    return oldCachedAsset;
-                }
+                return _cache.TryGetValue(key, out var cachedAsset) ? cachedAsset.Target : null;
             }
-
-            return null;
         }
 
         public void Add(object asset, AssetId key)
         {
             lock (_syncRoot)
             {
-                _assetCache[key] = asset;
+                _cache[key] = new WeakReference(asset);
             }
         }
     }

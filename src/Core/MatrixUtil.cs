@@ -6,7 +6,7 @@ namespace UAlbion.Core
     public static class MatrixUtil
     {
         public static Vector4[] Print(this Matrix4x4 m) =>
-            new []
+            new[]
             {
                 new Vector4(m.M11, m.M12, m.M13, m.M14),
                 new Vector4(m.M21, m.M22, m.M23, m.M24),

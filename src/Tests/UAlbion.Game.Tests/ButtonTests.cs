@@ -38,7 +38,6 @@ namespace UAlbion.Game.Tests
                 ;
 
             var font = MockUniformFont.Font(AssetId.From(Base.Font.RegularFont));
-            var factory = new MockFactory();
             var modApplier = new MockModApplier()
                     .Add(new AssetId(AssetType.MetaFont, (ushort)new MetaFontId(false, FontColor.White)), font)
                     .AddInfo(AssetId.From(Base.Font.RegularFont), MockUniformFont.Info)
@@ -50,7 +49,8 @@ namespace UAlbion.Game.Tests
                 .Attach(modApplier)
                 .Attach(new AssetManager())
                 .Attach(new SpriteManager())
-                .Attach(new WindowManager { Window = new MockWindow(1920, 1080) })
+                .Attach(new WindowManager { Resolution = (1920, 1080) })
+                .Attach(new MockGameFactory())
                 .Attach(new TextManager())
                 .Register<ICommonColors>(new CommonColors())
                 .Attach(this)
@@ -318,7 +318,6 @@ namespace UAlbion.Game.Tests
             button.Receive(new UiLeftClickEvent(), null);
             Assert.Equal(3, downCount);
             Assert.Equal(3, clickCount);
-
         }
     }
 }

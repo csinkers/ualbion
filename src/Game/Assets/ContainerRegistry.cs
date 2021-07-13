@@ -9,7 +9,7 @@ namespace UAlbion.Game.Assets
 {
     public class ContainerRegistry : ServiceComponent<IContainerRegistry>, IContainerRegistry
     {
-        readonly object _syncRoot = new object();
+        readonly object _syncRoot = new();
         readonly IDictionary<Type, IAssetContainer> _containers = new Dictionary<Type, IAssetContainer>();
 
         public IAssetContainer GetContainer(string path, string container, IFileSystem disk)

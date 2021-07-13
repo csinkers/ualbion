@@ -2,10 +2,8 @@
 A remake of the 1995 RPG Albion 
 
 Prerequisites: 
-* .NET Core 3.1
+* .NET 5
 * Game data from an install of the original game (full version or demo)
-
-Issue tracker at [https://trello.com/b/Tcm2WbU1/ualbion](https://trello.com/b/Tcm2WbU1/ualbion)
 
 ## Screenshots
 <details>
@@ -30,13 +28,13 @@ Things that are at least somewhat implemented:
 - Sound effects and music
 - Loading/saving saved games
 - Video playback
-* Exporting assets
+- Exporting assets
+- Day/night cycle
 
 Currently unimplemented:
 - Lighting model for 3D levels
 - Event handling and collision detection in 3D environments
 - Automap for 3D environments
-- Day/night cycle
 - Combat system
 - Magic system
 - NPC movement
@@ -44,7 +42,7 @@ Currently unimplemented:
 Planned improvements / changes from the original gameplay:
 - Add hotkeys to streamline the interface, reduce the amount of right clicking required etc
 - Add some pathfinding logic to make mouse-based movement easier
-- Add a take-all button when looting chests / fallen foes
+- Add a take-all button when looting chests / fallen foes (done)
 - Graphical improvements in 3D environments
 - Fix bugs in original game (with option to toggle when there is a gameplay impact)
 - Modding support

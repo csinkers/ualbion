@@ -46,7 +46,7 @@ namespace UAlbion.Game.Gui.Controls
             var subImage = multi.Regions[multi.GetSubImageAtTime(1, 0, false)];
             var normalisedSize = window.UiToNormRelative(subImage.Size);
 
-            var key = new SpriteKey(multi, order, SpriteKeyFlags.NoTransform);
+            var key = new SpriteKey(multi, SpriteSampler.Point, order, SpriteKeyFlags.NoTransform);
             _sprite?.Dispose();
 
             var lease = sm.Borrow(key, 2, this);
@@ -59,8 +59,8 @@ namespace UAlbion.Game.Gui.Controls
             var instances = lease.Lock(ref lockWasTaken);
             try
             {
-                instances[0] = SpriteInstanceData.TopLeft(shadowPosition, shadowSize, shadowSubImage, flags); // Drop shadow
-                instances[1] = SpriteInstanceData.TopLeft(Vector3.Zero, normalisedSize, subImage, 0); // DialogFrame
+                instances[0] = new SpriteInstanceData(shadowPosition, shadowSize, shadowSubImage, SpriteFlags.TopLeft | flags); // Drop shadow
+                instances[1] = new SpriteInstanceData(Vector3.Zero, normalisedSize, subImage, SpriteFlags.TopLeft); // DialogFrame
             }
             finally { lease.Unlock(lockWasTaken); }
 

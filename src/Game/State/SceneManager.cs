@@ -10,7 +10,7 @@ namespace UAlbion.Game.State
 {
     public class SceneManager : ServiceComponent<ISceneManager>, ISceneManager
     {
-        readonly IDictionary<SceneId, Scene> _scenes = new Dictionary<SceneId, Scene>();
+        readonly IDictionary<SceneId, IScene> _scenes = new Dictionary<SceneId, IScene>();
 
         public SceneManager()
         {
@@ -21,7 +21,7 @@ namespace UAlbion.Game.State
         public IScene GetScene(SceneId sceneId) => _scenes.TryGetValue(sceneId, out var scene) ? scene : null;
         public IScene ActiveScene => _scenes[ActiveSceneId];
 
-        public SceneManager AddScene(Scene scene)
+        public SceneManager AddScene(IScene scene)
         {
             if (scene == null) throw new ArgumentNullException(nameof(scene));
             var attrib = (SceneAttribute)scene.GetType().GetCustomAttribute(typeof(SceneAttribute));

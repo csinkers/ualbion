@@ -4,7 +4,6 @@ using System.Linq;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
-using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Game;
 

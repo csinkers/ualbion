@@ -8,7 +8,7 @@ namespace UAlbion.Game.Scenes
 {
     public interface IEditorScene : IScene { }
     [Scene(SceneId.Editor)]
-    public class EditorScene : Scene, IEditorScene
+    public class EditorScene : Container, IEditorScene
     {
         public EditorScene() : base(nameof(SceneId.Editor))
         {

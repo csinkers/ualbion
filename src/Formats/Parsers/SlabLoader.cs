@@ -18,12 +18,11 @@ namespace UAlbion.Formats.Parsers
             {
                 if (existing == null) throw new ArgumentNullException(nameof(existing));
                 singleFrame =
-                    new Texture<byte>(
+                    new SimpleTexture<byte>(
                         existing.Id,
                         existing.Name,
                         existing.Width,
                         existing.Height,
-                        1,
                         existing.PixelData.ToArray())
                     .AddRegion(existing.Regions[0].X, existing.Regions[0].Y, existing.Regions[0].Width, existing.Regions[0].Height);
             }
@@ -32,12 +31,11 @@ namespace UAlbion.Formats.Parsers
             if (sprite == null)
                 return null;
 
-            return new Texture<byte>(
+            return new SimpleTexture<byte>(
                     sprite.Id,
                     sprite.Name,
                     sprite.Width,
                     sprite.Height,
-                    1,
                     sprite.PixelData.ToArray())
                 .AddRegion(0, 0, sprite.Width, sprite.Height)
                 .AddRegion(0, sprite.Height - StatusBarHeight, sprite.Width, StatusBarHeight);

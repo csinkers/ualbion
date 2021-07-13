@@ -42,7 +42,6 @@ namespace UAlbion.Game.Gui.Controls
         {
             static AssetId Id<T>(T enumValue) where T : unmanaged, Enum => AssetId.From(enumValue);
             var window = Resolve<IWindowManager>();
-            var sm = Resolve<ISpriteManager>();
 
             { // Check if we need to rebuild
                 var normSize = window.UiToNormRelative(width, height);
@@ -76,7 +75,7 @@ namespace UAlbion.Game.Gui.Controls
                 int y = TileSize;
                 int n = 0;
                 var sprite = (Base.CoreSprite)(int)Base.CoreSprite.UiBackgroundLines1; // TODO: Better solution
-                var texture = assets.LoadTexture(Id(sprite));
+                ITexture texture = assets.LoadTexture(Id(sprite));
                 texture = CoreUtil.BuildTransposedTexture((IReadOnlyTexture<byte>)texture);
                 while (y < height - TileSize)
                 {
@@ -123,9 +122,10 @@ namespace UAlbion.Game.Gui.Controls
             var subImage = multi.Regions[multi.GetSubImageAtTime(1, 0, false)];
             var normalisedSize = window.UiToNormRelative(subImage.Size);
 
-            var key = new SpriteKey(multi, order, SpriteKeyFlags.NoTransform);
+            var key = new SpriteKey(multi, SpriteSampler.Point, order, SpriteKeyFlags.NoTransform);
             _sprite?.Dispose();
 
+            var sm = Resolve<ISpriteManager>();
             var lease = sm.Borrow(key, 3, this);
             var flags = SpriteFlags.None.SetOpacity(0.5f);
             var shadowSubImage = new Region(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
@@ -143,9 +143,9 @@ namespace UAlbion.Game.Gui.Controls
             var instances = lease.Lock(ref lockWasTaken);
             try
             {
-                instances[0] = SpriteInstanceData.TopLeft(bottomShadowPosition, bottomShadowSize, shadowSubImage, flags);
-                instances[1] = SpriteInstanceData.TopLeft(sideShadowPosition, sideShadowSize, shadowSubImage, flags);
-                instances[2] = SpriteInstanceData.TopLeft(Vector3.Zero, normalisedSize, subImage, 0);
+                instances[0] = new SpriteInstanceData(bottomShadowPosition, bottomShadowSize, shadowSubImage, SpriteFlags.TopLeft | flags);
+                instances[1] = new SpriteInstanceData(sideShadowPosition, sideShadowSize, shadowSubImage, SpriteFlags.TopLeft | flags);
+                instances[2] = new SpriteInstanceData(Vector3.Zero, normalisedSize, subImage, SpriteFlags.TopLeft);
             }
             finally { lease.Unlock(lockWasTaken); }
 

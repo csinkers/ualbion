@@ -8,7 +8,7 @@ namespace UAlbion.Game.Scenes
 {
     public interface IAutoMapScene : IScene { }
     [Scene(SceneId.Automap)]
-    public class AutomapScene : Scene, IAutoMapScene
+    public class AutomapScene : Container, IAutoMapScene
     {
         public AutomapScene() : base(nameof(SceneId.Automap))
         {

@@ -7,7 +7,6 @@ using ImGuiNET;
 using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Game.Debugging;
@@ -27,8 +26,7 @@ namespace UAlbion.Game.Veldrid.Debugging
     public class DebugMapInspector : Component
     {
         // TODO: Initial size
-        readonly IDictionary<Type, Func<DebugInspectorAction, ReflectedObject, object>> _behaviours =
-            new Dictionary<Type, Func<DebugInspectorAction, ReflectedObject, object>>();
+        readonly Dictionary<Type, Func<DebugInspectorAction, ReflectedObject, EventExchange, object>> _behaviours = new();
 
         readonly IContainer _services;
         readonly IList<object> _fixedObjects = new List<object>();
@@ -39,8 +37,8 @@ namespace UAlbion.Game.Veldrid.Debugging
         public DebugMapInspector(IContainer services)
         {
             _services = services;
-            On<EngineUpdateEvent>(e => RenderDialog());
-            On<HideDebugWindowEvent>(e => _hits = null);
+            On<EngineUpdateEvent>(_ => RenderDialog());
+            On<HideDebugWindowEvent>(_ => _hits = null);
             On<ShowDebugInfoEvent>(e =>
             {
                 _hits = e.Selections;
@@ -150,11 +148,11 @@ namespace UAlbion.Game.Veldrid.Debugging
                     ImGui.TreePop();
                 }
 
-                if (ImGui.TreeNode("DeviceObjects"))
-                {
-                    ImGui.Text(Resolve<IDeviceObjectManager>()?.Stats());
-                    ImGui.TreePop();
-                }
+                // if (ImGui.TreeNode("DeviceObjects"))
+                // {
+                //     ImGui.Text(Resolve<IDeviceObjectManager>()?.Stats());
+                //     ImGui.TreePop();
+                // }
 
                 if (ImGui.TreeNode("Input"))
                 {
@@ -191,11 +189,11 @@ namespace UAlbion.Game.Veldrid.Debugging
                     ImGui.TreePop();
                 }
 
-                if (ImGui.TreeNode("Textures"))
-                {
-                    ImGui.Text(Resolve<ITextureManager>()?.Stats());
-                    ImGui.TreePop();
-                }
+                // if (ImGui.TreeNode("Textures"))
+                // {
+                //     ImGui.Text(Resolve<ITextureSource>()?.Stats());
+                //     ImGui.TreePop();
+                // }
 
                 ImGui.TreePop();
             }
@@ -303,7 +301,7 @@ namespace UAlbion.Game.Veldrid.Debugging
 
             if (!anyHovered && _lastHoveredItem?.Target != null &&
                 _behaviours.TryGetValue(_lastHoveredItem.Target.GetType(), out var callback))
-                callback(DebugInspectorAction.Blur, _lastHoveredItem);
+                callback(DebugInspectorAction.Blur, _lastHoveredItem, Exchange);
 
             /*
 
@@ -326,11 +324,11 @@ namespace UAlbion.Game.Veldrid.Debugging
             {
                 if (_lastHoveredItem?.Target != null &&
                     _behaviours.TryGetValue(_lastHoveredItem.Target.GetType(), out var blurredCallback))
-                    blurredCallback(DebugInspectorAction.Blur, _lastHoveredItem);
+                    blurredCallback(DebugInspectorAction.Blur, _lastHoveredItem, Exchange);
 
                 if (reflected.Target != null &&
                     _behaviours.TryGetValue(reflected.Target.GetType(), out var hoverCallback))
-                    hoverCallback(DebugInspectorAction.Hover, reflected);
+                    hoverCallback(DebugInspectorAction.Hover, reflected, Exchange);
 
                 _lastHoveredItem = reflected;
             }
@@ -350,7 +348,7 @@ namespace UAlbion.Game.Veldrid.Debugging
 
             if (type != null &&
                 _behaviours.TryGetValue(type, out var callback) &&
-                callback(DebugInspectorAction.Format, reflected) is string formatted)
+                callback(DebugInspectorAction.Format, reflected, Exchange) is string formatted)
             {
                 description += " " + formatted;
             }

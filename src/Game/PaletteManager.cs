@@ -1,8 +1,9 @@
-﻿using UAlbion.Api;
+﻿using System;
+using UAlbion.Api;
 using UAlbion.Api.Visual;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.ScriptEvents;
@@ -12,45 +13,43 @@ namespace UAlbion.Game
 {
     public class PaletteManager : ServiceComponent<IPaletteManager>, IPaletteManager
     {
+        readonly SimpleTexture<uint> _paletteTexture;
         IPalette _nightPalette;
         public IPalette Palette { get; private set; }
-        public IReadOnlyTexture<uint> PaletteTexture { get; private set; }
+        public IReadOnlyTexture<uint> PaletteTexture => _paletteTexture;
         public int Version { get; private set; }
         public int Frame { get; private set; }
         public float PaletteBlend => TryResolve<IGameState>()?.PaletteBlend ?? 0;
 
         public PaletteManager()
         {
+            _paletteTexture = new SimpleTexture<uint>(AssetId.None, "Palette", 256, 1).AddRegion(0, 0, 256, 1);
             On<SlowClockEvent>(e => OnTick(e.Delta));
             On<LoadPaletteEvent>(e => SetPalette(e.PaletteId));
             On<LoadRawPaletteEvent>(e =>
             {
                 Palette = null;
-                GeneratePalette(PaletteId.None, e.Name, e.Entries, null);
+                GeneratePalette(e.Entries, null);
             });
         }
 
         protected override void Subscribed()
         {
             base.Subscribed();
-            if (PaletteTexture == null)
-                SetPalette(Base.Palette.Toronto2D);
+            if (Palette == null)
+                SetPalette(Base.Palette.Common);
         }
 
         void OnTick(int frames)
         {
-            if (Palette == null || !Palette.IsAnimated)
+            if (Palette is not { IsAnimated: true })
                 return;
 
             Frame += frames;
             //while (Frame >= Palette.GetCompletePalette().Count)
             //    Frame -= Palette.GetCompletePalette().Count;
 
-            GeneratePalette(
-                PaletteId.FromUInt32(Palette.Id),
-                Palette.Name,
-                Palette.GetPaletteAtTime(Frame),
-                _nightPalette?.GetPaletteAtTime(Frame));
+            GeneratePalette(Palette.GetPaletteAtTime(Frame), _nightPalette?.GetPaletteAtTime(Frame));
         }
 
         void SetPalette(PaletteId paletteId)
@@ -64,17 +63,17 @@ namespace UAlbion.Game
             }
 
             Palette = palette;
-            _nightPalette = NightPalettes.TryGetValue(paletteId, out var nightPaletteId) 
-                ? assets.LoadPalette(nightPaletteId) 
+            _nightPalette = NightPalettes.TryGetValue(paletteId, out var nightPaletteId)
+                ? assets.LoadPalette(nightPaletteId)
                 : null;
 
             //while (Frame >= Palette.GetCompletePalette().Count)
             //    Frame -= Palette.GetCompletePalette().Count;
 
-            GeneratePalette(paletteId, Palette.Name, Palette.GetPaletteAtTime(Frame), _nightPalette?.GetPaletteAtTime(Frame));
+            GeneratePalette(Palette.GetPaletteAtTime(Frame), _nightPalette?.GetPaletteAtTime(Frame));
         }
 
-        void GeneratePalette(PaletteId id, string name, uint[] dayPalette, uint[] nightPalette)
+        void GeneratePalette(uint[] dayPalette, uint[] nightPalette)
         {
             var blendedPalette = dayPalette;
             var state = TryResolve<IGameState>();
@@ -93,7 +92,7 @@ namespace UAlbion.Game
                 }
             }
 
-            PaletteTexture = new PaletteTexture(id, name, blendedPalette);
+            blendedPalette.AsSpan().CopyTo(_paletteTexture.GetMutableRegionBuffer(0).Buffer);
             Version++;
             Raise(new PaletteChangedEvent());
         }

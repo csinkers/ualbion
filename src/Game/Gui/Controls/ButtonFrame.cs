@@ -68,11 +68,10 @@ namespace UAlbion.Game.Gui.Controls
             _lastExtents = extents;
 
             var window = Resolve<IWindowManager>();
-            var sm = Resolve<ISpriteManager>();
             var commonColors = Resolve<ICommonColors>();
             var colors = _theme(_state);
 
-            uint? C(CommonColor? color) => color.HasValue ? commonColors.Palette[color.Value] : (uint?)null;
+            uint? C(CommonColor? color) => color.HasValue ? commonColors.Palette[color.Value] : null;
             uint? topLeft = C(colors.TopLeft);
             uint? bottomRight = C(colors.BottomRight);
             uint? corners = C(colors.Corners);
@@ -90,7 +89,8 @@ namespace UAlbion.Game.Gui.Controls
                 if (instanceCount == 0)
                     return;
 
-                var key = new SpriteKey(commonColors.BorderTexture, order, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
+                var sm = Resolve<ISpriteManager>();
+                var key = new SpriteKey(commonColors.BorderTexture, SpriteSampler.Point, order, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
                 _sprite = sm.Borrow(key, instanceCount, this);
             }
 
@@ -101,63 +101,63 @@ namespace UAlbion.Game.Gui.Controls
                 var position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
                 var flags = SpriteFlags.None.SetOpacity(colors.Alpha);
 
-                static Region BuildSubImage(uint layer) => new Region(Vector2.Zero, Vector2.One, Vector2.One, (int)layer);
+                static Region BuildSubImage(uint layer) => new(Vector2.Zero, Vector2.One, Vector2.One, (int)layer);
 
                 int curInstance = 0;
                 if (topLeft.HasValue)
                 {
-                    instances[curInstance] = SpriteInstanceData.TopLeft( // Top
+                    instances[curInstance] = new SpriteInstanceData( // Top
                         position,
                         window.UiToNormRelative(extents.Width - 1, 1),
                         BuildSubImage(topLeft.Value),
-                        flags);
+                        SpriteFlags.TopLeft | flags);
 
-                    instances[curInstance + 1] = SpriteInstanceData.TopLeft( // Left
+                    instances[curInstance + 1] = new SpriteInstanceData( // Left
                         position + new Vector3(window.UiToNormRelative(0, 1), 0),
                         window.UiToNormRelative(1, extents.Height - 2),
                         BuildSubImage(topLeft.Value),
-                        flags);
+                        SpriteFlags.TopLeft | flags);
 
                     curInstance += 2;
                 }
 
                 if (bottomRight.HasValue)
                 {
-                    instances[curInstance] = SpriteInstanceData.TopLeft( // Bottom
+                    instances[curInstance] = new SpriteInstanceData( // Bottom
                         position + new Vector3(window.UiToNormRelative(1, extents.Height - 1), 0),
                         window.UiToNormRelative(extents.Width - 1, 1),
                         BuildSubImage(bottomRight.Value),
-                        flags);
-                    instances[curInstance + 1] = SpriteInstanceData.TopLeft( // Right
+                        SpriteFlags.TopLeft | flags);
+                    instances[curInstance + 1] = new SpriteInstanceData( // Right
                         position + new Vector3(window.UiToNormRelative(extents.Width - 1, 1), 0),
                         window.UiToNormRelative(1, extents.Height - 2),
                         BuildSubImage(bottomRight.Value),
-                        flags);
+                        SpriteFlags.TopLeft | flags);
                     curInstance += 2;
                 }
 
                 if (corners.HasValue)
                 {
-                    instances[curInstance] = SpriteInstanceData.TopLeft( // Bottom Left Corner
+                    instances[curInstance] = new SpriteInstanceData( // Bottom Left Corner
                         position + new Vector3(window.UiToNormRelative(0, extents.Height - 1), 0),
                         window.UiToNormRelative(Vector2.One),
                         BuildSubImage(corners.Value),
-                        flags);
-                    instances[curInstance + 1] = SpriteInstanceData.TopLeft( // Top Right Corner
+                        SpriteFlags.TopLeft | flags);
+                    instances[curInstance + 1] = new SpriteInstanceData( // Top Right Corner
                         position + new Vector3(window.UiToNormRelative(extents.Width - 1, 0), 0),
                         window.UiToNormRelative(Vector2.One),
                         BuildSubImage(corners.Value),
-                        flags);
+                        SpriteFlags.TopLeft | flags);
                     curInstance += 2;
                 }
 
                 if (background.HasValue)
                 {
-                    instances[curInstance] = SpriteInstanceData.TopLeft( // Background
+                    instances[curInstance] = new SpriteInstanceData( // Background
                         position + new Vector3(window.UiToNormRelative(1, 1), 0),
                         window.UiToNormRelative(extents.Width - 2, extents.Height - 2),
                         BuildSubImage(background.Value),
-                        flags.SetOpacity(colors.Alpha < 1.0f ? colors.Alpha / 2 : colors.Alpha));
+                        SpriteFlags.TopLeft | flags.SetOpacity(colors.Alpha < 1.0f ? colors.Alpha / 2 : colors.Alpha));
                 }
             }
             finally { _sprite.Unlock(lockWasTaken); }

@@ -7,7 +7,7 @@ namespace UAlbion.Game.Scenes
     public interface IIsometricBakeScene : IScene { }
 
     [Scene(SceneId.IsometricBake)]
-    public class IsometricBakeScene : Scene, IIsometricBakeScene
+    public class IsometricBakeScene : Container, IIsometricBakeScene
     {
         public IsometricBakeScene() : base(nameof(SceneId.IsometricBake))
         {

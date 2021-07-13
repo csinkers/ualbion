@@ -13,10 +13,10 @@ namespace UAlbion.Core.Textures
 
         readonly IList<LogicalSubImage> _logicalSubImages = new List<LogicalSubImage>();
         readonly IDictionary<LayerKey, int> _layerLookup = new Dictionary<LayerKey, int>();
-        readonly List<Vector2> _layerSizes = new List<Vector2>();
+        readonly List<Vector2> _layerSizes = new();
         IPalette _palette;
         bool _isMetadataDirty = true;
-        Texture<uint> _texture;
+        ArrayTexture<uint> _texture;
         int _width;
         int _height;
 
@@ -30,14 +30,17 @@ namespace UAlbion.Core.Textures
             _logicalSubImages.Add(new LogicalSubImage(0) { W = 1, H = 1, Frames = 1 });
         }
 
-        Texture<uint> Texture { get { Rebuild(); return _texture; } }
+        ArrayTexture<uint> Texture { get { Rebuild(); return _texture; } }
         public IAssetId Id { get; }
         public string Name { get; }
         public int Width { get { Rebuild(); return _width; } private set => _width = value; } 
         public int Height { get { Rebuild(); return _height; } private set => _height = value; }
         public int ArrayLayers => Texture.ArrayLayers;
         public int SizeInBytes => Texture.SizeInBytes;
-        public bool IsDirty { get => Texture.IsDirty; set => _texture.IsDirty = value; } 
+        public TextureDirtyType DirtyType => Texture.DirtyType;
+        public int DirtyId => Texture.DirtyId;
+        public void Clean() => Texture.Clean();
+
         public IReadOnlyList<Region> Regions => Texture.Regions;
         public ReadOnlySpan<uint> PixelData => Texture.PixelData;
 
@@ -132,7 +135,7 @@ namespace UAlbion.Core.Textures
             RebuildLayout();
 
             if (_texture == null || _texture.Width != Width || _texture.Height != Height || _texture.ArrayLayers != _layerSizes.Count)
-                _texture = new Texture<uint>(Id, Name, Width, Height, _layerSizes.Count);
+                _texture = new ArrayTexture<uint>(Id, Name, Width, Height, _layerSizes.Count);
 
             foreach (var lsi in _logicalSubImages)
             {

@@ -47,7 +47,7 @@ namespace UAlbion.Game.Tests
 
             var exchange = new EventExchange(new LogExchange());
             _im = new InventoryManager(x => inventories[x]);
-            var wm = new WindowManager { Window = new MockWindow(1920, 1080) };
+            var wm = new WindowManager { Resolution = (1920, 1080) };
             var cm = new MockCursorManager { Position = new Vector2(1, 1) };
 
             exchange

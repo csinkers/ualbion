@@ -1,20 +1,39 @@
 ﻿using System;
+using UAlbion.Api.Visual;
+using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Visual;
+using Veldrid;
 
 namespace UAlbion.Core.Veldrid
 {
-    public class VeldridCoreFactory : ICoreFactory
+    public class VeldridCoreFactory : ServiceComponent<ICoreFactory>, ICoreFactory, IDisposable
     {
-        // public MultiTexture CreateMultiTexture(IAssetId id, string name, IPalette palette) => new VeldridMultiTexture(id, name, palette);
-        public IDisposable CreateRenderDebugGroup(IRendererContext context, string name)
+        readonly SamplerHolder _skyboxSampler;
+
+        public VeldridCoreFactory()
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-            return new RenderDebugGroup(((VeldridRendererContext)context).CommandList, name);
+            _skyboxSampler = new SamplerHolder
+            {
+                Name = "SkyboxSampler",
+                AddressModeU = SamplerAddressMode.Wrap,
+                AddressModeV = SamplerAddressMode.Clamp,
+                AddressModeW = SamplerAddressMode.Clamp,
+                Filter = SamplerFilter.MinLinear_MagLinear_MipLinear,
+            };
+            AttachChild(_skyboxSampler);
         }
 
-        // public PaletteTexture CreatePaletteTexture(IAssetId id, string name, uint[] colours) => new VeldridPaletteTexture(id, name, colours);
+        public ISkybox CreateSkybox(ITexture texture)
+        {
+            var ts = Resolve<ITextureSource>();
+            var textureHolder = ts.GetSimpleTexture(texture);
+            return new Skybox(textureHolder, _skyboxSampler);
+        }
 
-        public ISceneGraph CreateSceneGraph()
-            => new SceneGraph();
+        public SpriteBatch CreateSpriteBatch(SpriteKey key) 
+            => new VeldridSpriteBatch(key);
+
+        protected virtual void Dispose(bool disposing) => _skyboxSampler?.Dispose();
+        public void Dispose() { Dispose(true); GC.SuppressFinalize(this); }
     }
 }

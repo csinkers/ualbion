@@ -1,23 +1,55 @@
 ﻿using System;
+using System.Numerics;
 using System.Runtime.CompilerServices;
+using UAlbion.Api.Visual;
 
 namespace UAlbion.Core.Visual
 {
-    public sealed class SpriteLease : IComparable<SpriteLease>, IDisposable
+    public sealed class SpriteLease : IComparable<SpriteLease>
     {
-        readonly MultiSprite _sprite;
-        public SpriteKey Key => _sprite.Key;
+        readonly SpriteBatch _spriteBatch;
+        public SpriteKey Key => _spriteBatch.Key;
         public int Length => To - From;
         internal int From { get; set; } // [from..to)
         internal int To { get; set; }
         public bool Disposed { get; private set; }
-        internal object Owner { get; set; }
-        public override string ToString() => $"LEASE [{From}-{To}) {_sprite} for {Owner}";
+        internal object Owner { get; set; } // For debugging
+        public override string ToString() => $"LEASE [{From}-{To}) {_spriteBatch} for {Owner}";
+
+        public void OffsetAll(Vector3 offset)
+        {
+            bool taken = false;
+            var span = Lock(ref taken);
+            for (int i = 0; i < span.Length; i++)
+                span[i].OffsetBy(offset);
+            Unlock(taken);
+        }
+
+        public WeakSpriteReference MakeWeakReference(int index) => new(_spriteBatch, this, index);
+
+        public void Update(int index, Vector3 position, Vector2 size, int regionIndex, SpriteFlags flags)
+            => Update(index, position, size, Key.Texture.Regions[regionIndex], flags);
+        public void Update(int index, Vector3 position, Vector2 size, Region region, SpriteFlags flags)
+        {
+            bool taken = false;
+            var span = Lock(ref taken);
+            span[index] = new SpriteInstanceData(position, size, region, flags);
+            Unlock(taken);
+        }
+
+        public void UpdateFlags(int index, SpriteFlags flags, SpriteFlags? mask = null)
+        {
+            SpriteFlags mask2 = mask ?? flags;
+            bool taken = false;
+            var span = Lock(ref taken);
+            span[index].Flags = (span[index].Flags & ~mask2) | (flags & mask2);
+            Unlock(taken);
+        }
 
         public void Dispose()
         {
             if (Disposed) return;
-            _sprite.Shrink(this);
+            _spriteBatch.Shrink(this);
             Disposed = true;
         }
 
@@ -59,7 +91,7 @@ namespace UAlbion.Core.Visual
         /// <typeparam name="T">The type of the context object</typeparam>
         /// <param name="mutatorFunc">The function used to modify the instance data</param>
         /// <param name="context">The context for the mutator function</param>
-        public void Access<T>(LeaseAccessDelegate<T> mutatorFunc, T context)
+        public void Access<T>(SpriteLease.LeaseAccessDelegate<T> mutatorFunc, T context)
         {
             if (mutatorFunc == null) throw new ArgumentNullException(nameof(mutatorFunc));
             bool lockWasTaken = false;
@@ -82,19 +114,19 @@ namespace UAlbion.Core.Visual
         {
             if (Disposed)
                 throw new InvalidOperationException("SpriteLease used after return");
-            return _sprite.Lock(this, ref lockWasTaken);
+            return _spriteBatch.Lock(this, ref lockWasTaken);
         }
 
         /// <summary>
         /// Releases the lock on the lease's underlying memory.
         /// </summary>
         /// <param name="lockWasTaken">This should be the value returned as a ref parameter from Lock. It is important for re-entrant calls.</param>
-        public void Unlock(bool lockWasTaken) => _sprite.Unlock(this, lockWasTaken);
+        public void Unlock(bool lockWasTaken) => _spriteBatch.Unlock(this, lockWasTaken);
 
-        // Should only be created by MultiSprite
-        internal SpriteLease(MultiSprite sprite, int from, int to)
+        // Should only be created by SpriteBatch
+        internal SpriteLease(SpriteBatch spriteBatch, int from, int to)
         {
-            _sprite = sprite;
+            _spriteBatch = spriteBatch ?? throw new ArgumentNullException(nameof(spriteBatch));
             From = from;
             To = to;
         }

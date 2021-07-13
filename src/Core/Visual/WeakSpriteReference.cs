@@ -5,12 +5,12 @@ namespace UAlbion.Core.Visual
     public class WeakSpriteReference
     {
         readonly WeakReference<SpriteLease> _lease;
-        readonly MultiSprite _multiSprite;
+        readonly SpriteBatch _spriteBatch;
         readonly int _offset;
 
-        public WeakSpriteReference(MultiSprite multiSprite, SpriteLease lease, int offset)
+        public WeakSpriteReference(SpriteBatch spriteBatch, SpriteLease lease, int offset)
         {
-            _multiSprite = multiSprite;
+            _spriteBatch = spriteBatch;
             _lease = new WeakReference<SpriteLease>(lease);
             _offset = offset;
         }
@@ -19,7 +19,7 @@ namespace UAlbion.Core.Visual
         {
             get
             {
-                if (_multiSprite == null ||
+                if (_spriteBatch == null ||
                     _lease == null ||
                     !_lease.TryGetTarget(out var lease) ||
                     lease.Disposed)
@@ -27,7 +27,10 @@ namespace UAlbion.Core.Visual
                     return null;
                 }
 
-                return _multiSprite.Instances[lease.From + _offset];
+                bool lockWasTaken = false;
+                var span = lease.Lock(ref lockWasTaken);
+                try { return span[_offset]; }
+                finally { lease.Unlock(lockWasTaken); }
             }
         }
     }

@@ -7,22 +7,19 @@ namespace UAlbion.Game.Entities.Map3D
 {
     public class Selection3D : Component
     {
-        ISceneGraph _sceneGraph;
         public Selection3D()
         {
             OnAsync<WorldCoordinateSelectEvent, Selection>(OnSelect);
         }
 
-        protected override void Subscribed()
-        {
-            _sceneGraph ??= Resolve<ICoreFactory>().CreateSceneGraph();
-            base.Subscribed();
-        }
-
         bool OnSelect(WorldCoordinateSelectEvent e, Action<Selection> continuation)
         {
+            var scene = TryResolve<ISceneGraph>();
+            if (scene == null)
+                return false;
+
             var hits = new List<Selection>(); // TODO: Get rid of the extra allocation and copying
-            _sceneGraph.RayIntersect(e.Origin, e.Direction, hits);
+            scene.RayIntersect(e.Origin, e.Direction, hits);
             foreach (var hit in hits)
                 continuation(hit);
             return true;
@@ -74,16 +71,6 @@ namespace UAlbion.Game.Entities.Map3D
                 _lastHighlightIndex = highlightIndex;
             }
             */
-        }
-
-        public void AddToScene(IPositioned child)
-        {
-            _sceneGraph.Add(child);
-        }
-
-        public void RemoveFromScene(IPositioned child)
-        {
-            _sceneGraph.Remove(child);
         }
     }
 }

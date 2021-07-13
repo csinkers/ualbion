@@ -19,7 +19,7 @@ namespace UAlbion.Game.Gui
 
         public CommonColors()
         {
-            var texture = new Texture<byte>(
+            var texture = new ArrayTexture<byte>(
                 AssetId.None,
                 "CommonColors",
                 1, 1, Palette.Count,

@@ -28,7 +28,55 @@ namespace UAlbion.Core.Veldrid.Textures
             throw new NotSupportedException();
         }
 
-        public static unsafe Texture CreateDeviceTexture<T>(GraphicsDevice gd, TextureUsage usage, IReadOnlyTexture<T> texture) where T : unmanaged
+        public static unsafe Texture CreateSimpleTexture<T>(GraphicsDevice gd, TextureUsage usage, IReadOnlyTexture<T> texture) where T : unmanaged
+        {
+            if (gd == null) throw new ArgumentNullException(nameof(gd));
+            if (texture == null) throw new ArgumentNullException(nameof(texture));
+
+            var pixelFormat = GetFormat(typeof(T));
+            bool mip = (usage & TextureUsage.GenerateMipmaps) != 0;
+            uint mipLevels = mip ? MipLevelCount(texture.Width, texture.Height) : 1;
+            using Texture staging = gd.ResourceFactory.CreateTexture(new TextureDescription(
+                (uint)texture.Width, (uint)texture.Height, 1,
+                mipLevels,
+                1,
+                pixelFormat,
+                TextureUsage.Staging,
+                TextureType.Texture2D));
+
+            staging.Name = "T_" + texture.Name + "_Staging";
+
+            var buffer = texture.PixelData;
+            fixed (T* texDataPtr = &buffer[0])
+            {
+                gd.UpdateTexture(
+                    staging, (IntPtr)texDataPtr, (uint)(buffer.Length * Unsafe.SizeOf<T>()),
+                    0, 0, 0,
+                    (uint)texture.Width, (uint)texture.Height, 1,
+                    0, 0);
+            }
+
+            Texture veldridTexture = gd.ResourceFactory.CreateTexture(new TextureDescription(
+                (uint)texture.Width, (uint)texture.Height, 1,
+                mipLevels,
+                1,
+                pixelFormat,
+                usage,
+                TextureType.Texture2D));
+
+            veldridTexture.Name = "T_" + texture.Name;
+
+            using CommandList cl = gd.ResourceFactory.CreateCommandList();
+            cl.Begin();
+            cl.CopyTexture(staging, veldridTexture);
+            if (mip) cl.GenerateMipmaps(veldridTexture);
+            cl.End();
+            gd.SubmitCommands(cl);
+
+            return veldridTexture;
+        }
+
+        public static unsafe Texture CreateArrayTexture<T>(GraphicsDevice gd, TextureUsage usage, IReadOnlyTexture<T> texture) where T : unmanaged
         {
             if (gd == null) throw new ArgumentNullException(nameof(gd));
             if (texture == null) throw new ArgumentNullException(nameof(texture));
@@ -78,8 +126,7 @@ namespace UAlbion.Core.Veldrid.Textures
 
             return veldridTexture;
         }
-
-        public static Texture CreateDeviceTexture(GraphicsDevice gd, TextureUsage usage, SixLabors.ImageSharp.Image<Rgba32> image, string name)
+        public static Texture CreateSimpleTexture(GraphicsDevice gd, TextureUsage usage, SixLabors.ImageSharp.Image<Rgba32> image, string name)
         {
             if (gd == null) throw new ArgumentNullException(nameof(gd));
             if (usage != TextureUsage.Sampled && usage != (TextureUsage.Sampled | TextureUsage.GenerateMipmaps))

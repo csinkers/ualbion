@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IsRoslynComponent>true</IsRoslynComponent>
+  </PropertyGroup>
+
+  <ItemGroup Condition="!Exists('..\..\deps\VeldridGen\')">
+    <PackageReference Include="VeldridGen" Version="0.1.5" GeneratePathProperty="true" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup Condition="Exists('..\..\deps\VeldridGen\')">
+    <ProjectReference Include="..\..\deps\VeldridGen\VeldridGen\VeldridGen.csproj" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="bin\Debug\netstandard2.0\$(AssemblyName).dll" />
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+  </PropertyGroup>
+
+  <Target Name="GetDependencyTargetPaths">
+    <ItemGroup Condition="!Exists('..\..\deps\VeldridGen\')">
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGVeldridGen)\lib\netstandard2.0\VeldridGen.dll" IncludeRuntimeDependency="false" />
+    </ItemGroup>
+    <ItemGroup Condition="Exists('..\..\deps\VeldridGen\')">
+      <TargetPathWithTargetPlatformMoniker Include="..\..\deps\VeldridGen\VeldridGen\bin\Debug\netstandard2.0\VeldridGen.dll" IncludeRuntimeDependency="false" />
+    </ItemGroup>
+  </Target>
+</Project>

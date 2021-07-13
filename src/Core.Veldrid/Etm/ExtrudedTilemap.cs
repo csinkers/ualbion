@@ -4,11 +4,10 @@ using System.Numerics;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Veldrid.Sprites;
-using UAlbion.Core.Veldrid.Visual;
 using UAlbion.Core.Visual;
 using Veldrid;
 
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Veldrid.Etm
 {
     public sealed class ExtrudedTilemap : Component, IExtrudedTilemap
     {

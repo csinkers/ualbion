@@ -23,7 +23,7 @@ namespace UAlbion.Core.Veldrid
 
         protected override void Subscribed() => Dirty();
         protected override void Unsubscribed() => Dispose();
-        void Dirty() => On<PostEngineUpdateEvent>(e => CreateDeviceObjects(e.Device));
+        void Dirty() => On<PrepareFrameResourcesEvent>(e => CreateDeviceObjects(e.Device));
 
         void CreateDeviceObjects(GraphicsDevice graphicsDevice)
         {
@@ -42,7 +42,7 @@ namespace UAlbion.Core.Veldrid
             {
                 _imguiRenderer.CreateDeviceResources(graphicsDevice, graphicsDevice.SwapchainFramebuffer.OutputDescription, ColorSpaceHandling.Linear);
             }
-            Off<PostEngineUpdateEvent>();
+            Off<PrepareFrameResourcesEvent>();
         }
 
         public void Dispose()

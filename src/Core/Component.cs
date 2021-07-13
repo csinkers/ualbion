@@ -81,7 +81,7 @@ namespace UAlbion.Core
         /// distribute it to all components that have registered a handler.
         /// </summary>
         /// <param name="event">The event to raise</param>
-        protected void Raise(IEvent @event) => Exchange?.Raise(@event, this);
+        protected void Raise<T>(T @event) where T : IEvent => Exchange?.Raise(@event, this);
 
         /// <summary>
         /// Raise an event via the currently subscribed event exchange (if subscribed), and

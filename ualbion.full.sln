@@ -201,6 +201,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VeldridGen.Tests", "deps\Ve
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.ShaderWriter", "src\Tools\ShaderWriter\UAlbion.ShaderWriter.csproj", "{844F634D-F7ED-44AA-A1F8-021144F429D1}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.CodeGen.Veldrid", "src\CodeGen.Veldrid\UAlbion.CodeGen.Veldrid.csproj", "{C9418659-7F4B-40DF-BA8C-48E61E823A76}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -715,6 +717,18 @@ Global
 		{844F634D-F7ED-44AA-A1F8-021144F429D1}.Release|x64.Build.0 = Release|Any CPU
 		{844F634D-F7ED-44AA-A1F8-021144F429D1}.Release|x86.ActiveCfg = Release|Any CPU
 		{844F634D-F7ED-44AA-A1F8-021144F429D1}.Release|x86.Build.0 = Release|Any CPU
+		{C9418659-7F4B-40DF-BA8C-48E61E823A76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9418659-7F4B-40DF-BA8C-48E61E823A76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9418659-7F4B-40DF-BA8C-48E61E823A76}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C9418659-7F4B-40DF-BA8C-48E61E823A76}.Debug|x64.Build.0 = Debug|Any CPU
+		{C9418659-7F4B-40DF-BA8C-48E61E823A76}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C9418659-7F4B-40DF-BA8C-48E61E823A76}.Debug|x86.Build.0 = Debug|Any CPU
+		{C9418659-7F4B-40DF-BA8C-48E61E823A76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9418659-7F4B-40DF-BA8C-48E61E823A76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9418659-7F4B-40DF-BA8C-48E61E823A76}.Release|x64.ActiveCfg = Release|Any CPU
+		{C9418659-7F4B-40DF-BA8C-48E61E823A76}.Release|x64.Build.0 = Release|Any CPU
+		{C9418659-7F4B-40DF-BA8C-48E61E823A76}.Release|x86.ActiveCfg = Release|Any CPU
+		{C9418659-7F4B-40DF-BA8C-48E61E823A76}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

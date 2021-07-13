@@ -5,6 +5,7 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Etm;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Visual;
 using UAlbion.Game;

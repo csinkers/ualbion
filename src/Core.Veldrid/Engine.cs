@@ -152,9 +152,7 @@ namespace UAlbion.Core.Veldrid
                 }
 
                 using (PerfTracker.FrameEvent("5 Performing update"))
-                {
-                    Raise(new EngineUpdateEvent((float) deltaSeconds));
-                }
+                    Raise(new EngineUpdateEvent((float)deltaSeconds));
 
                 using (PerfTracker.FrameEvent("5.1 Flushing queued events"))
                     Exchange.FlushQueuedEvents();
@@ -178,6 +176,9 @@ namespace UAlbion.Core.Veldrid
 
                 if (_startupOnly)
                     _done = true;
+
+                //Console.WriteLine($"Frame {frameCounter.FrameCount} complete, press Enter to continue");
+                //Console.ReadLine();
             }
         }
 
@@ -186,8 +187,7 @@ namespace UAlbion.Core.Veldrid
             using (PerfTracker.FrameEvent("6.1 Prepare scenes"))
             {
                 _frameCommands.Begin();
-                Raise(new PostEngineUpdateEvent(_graphicsDevice, _frameCommands));
-                Raise(RenderEvent.Instance); // TODO: Remove?
+                Raise(RenderEvent.Instance);
                 Raise(new PrepareFrameResourcesEvent(_graphicsDevice, _frameCommands));
                 Raise(new PrepareFrameResourceSetsEvent(_graphicsDevice, _frameCommands));
                 _frameCommands.End();

@@ -140,10 +140,10 @@ namespace UAlbion.Core
                     // ReSharper disable ExplicitCallerInfoArgument
                     switch (log.Severity)
                     {
-                        case LogLevel.Info: CoreTrace.Log.Info("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;;
-                        case LogLevel.Warning: CoreTrace.Log.Warning("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;;
-                        case LogLevel.Error: CoreTrace.Log.Error("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;;
-                        case LogLevel.Critical: CoreTrace.Log.Critical("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;;
+                        case LogLevel.Info: CoreTrace.Log.Info("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;
+                        case LogLevel.Warning: CoreTrace.Log.Warning("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;
+                        case LogLevel.Error: CoreTrace.Log.Error("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;
+                        case LogLevel.Critical: CoreTrace.Log.Critical("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;
                     }
                     // ReSharper restore ExplicitCallerInfoArgument
                 }

@@ -6,7 +6,7 @@ using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Veldrid.Etm
 {
     [VertexShader(typeof(EtmVertexShader))]
     [FragmentShader(typeof(EtmFragmentShader))]

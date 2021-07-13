@@ -1,12 +1,7 @@
 {
   "Visual": {
-    "TextureManager": {
-      "CacheLifetimeSeconds": 20.0,
-      "CacheCheckIntervalSeconds": 5.0
-    },
-
-    "Skybox": {
-      "VisibleProportion": 0.8
-    }
+    "TextureManager": { "CacheCheckIntervalSeconds": 5.0 },
+    "SpriteManager":  { "CacheCheckIntervalSeconds": 12.0 },
+    "Skybox": { "VisibleProportion": 0.8 }
   }
 }

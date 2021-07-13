@@ -45,7 +45,7 @@ layout(set = 1, binding = 0) uniform _Shared {
 };
 layout(set = 1, binding = 3) uniform texture2D uPalette; //!
 
-// UAlbion.Core.Veldrid.EtmIntermediate
+// UAlbion.Core.Veldrid.Etm.EtmIntermediate
 layout(location = 0) in vec2 iTexCoords;
 layout(location = 1) in flat uint iTextures;
 layout(location = 2) in flat uint iFlags;

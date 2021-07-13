@@ -15,8 +15,13 @@ namespace UAlbion.Core
             public TextureManagerT TextureManager { get; } = new();
             public class TextureManagerT
             {
-                public float CacheLifetimeSeconds { get; private set; }
-                public float CacheCheckIntervalSeconds { get; private set; }
+                public float CacheCheckIntervalSeconds { get; private set; } = 5.0f;
+            }
+
+            public SpriteManagerT SpriteManager { get; } = new();
+            public class SpriteManagerT
+            {
+                public float CacheCheckIntervalSeconds { get; private set; } = 12.0f;
             }
 
             public SkyboxT Skybox { get; } = new();

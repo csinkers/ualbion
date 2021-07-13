@@ -36,21 +36,20 @@ namespace UAlbion.Game
         protected override void Subscribed()
         {
             base.Subscribed();
-            if (PaletteTexture == null)
-                SetPalette(Base.Palette.Toronto2D);
+            if (Palette == null)
+                SetPalette(Base.Palette.Common);
         }
 
         void OnTick(int frames)
         {
-            if (Palette == null || !Palette.IsAnimated)
+            if (Palette is not { IsAnimated: true })
                 return;
 
             Frame += frames;
             //while (Frame >= Palette.GetCompletePalette().Count)
             //    Frame -= Palette.GetCompletePalette().Count;
 
-            GeneratePalette(Palette.GetPaletteAtTime(Frame),
-                _nightPalette?.GetPaletteAtTime(Frame));
+            GeneratePalette(Palette.GetPaletteAtTime(Frame), _nightPalette?.GetPaletteAtTime(Frame));
         }
 
         void SetPalette(PaletteId paletteId)

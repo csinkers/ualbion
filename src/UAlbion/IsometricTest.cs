@@ -3,6 +3,7 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Etm;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;

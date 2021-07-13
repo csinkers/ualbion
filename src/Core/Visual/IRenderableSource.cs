@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using UAlbion.Core.Visual;
 
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Visual
 {
     public interface IRenderableSource
     {

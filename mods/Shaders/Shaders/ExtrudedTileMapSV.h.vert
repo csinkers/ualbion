@@ -60,12 +60,12 @@ layout(set = 1, binding = 2) uniform _View {
 layout(location = 0) in vec3 iPosition;
 layout(location = 1) in vec2 iTexCoords;
 
-// UAlbion.Core.Veldrid.DungeonTile
+// UAlbion.Core.Veldrid.Etm.DungeonTile
 layout(location = 2) in uint iTextures;
 layout(location = 3) in vec2 iWallSize;
 layout(location = 4) in uint iFlags;
 
-// UAlbion.Core.Veldrid.EtmIntermediate
+// UAlbion.Core.Veldrid.Etm.EtmIntermediate
 layout(location = 0) out vec2 oTexCoords;
 layout(location = 1) out flat uint oTextures;
 layout(location = 2) out flat uint oFlags;

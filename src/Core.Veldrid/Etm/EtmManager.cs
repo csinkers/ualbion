@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UAlbion.Core.Veldrid.Visual;
 using UAlbion.Core.Visual;
 
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Veldrid.Etm
 {
     public class EtmManager : ServiceComponent<IEtmManager>, IEtmManager, IRenderableSource
     {

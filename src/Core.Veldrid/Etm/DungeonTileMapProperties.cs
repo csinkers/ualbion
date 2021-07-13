@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using VeldridGen.Interfaces;
 
-namespace UAlbion.Core.Veldrid.Visual
+namespace UAlbion.Core.Veldrid.Etm
 {
 #pragma warning disable CA1815 // Override equals and operator equals on value types
     [StructLayout(LayoutKind.Sequential)]

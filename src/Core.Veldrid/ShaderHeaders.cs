@@ -9,8 +9,8 @@ namespace UAlbion.Core.Veldrid
         {
             SpriteVertexShader.ShaderSource(),
             SpriteFragmentShader.ShaderSource(),
-            EtmVertexShader.ShaderSource(),
-            EtmFragmentShader.ShaderSource(),
+            Etm.EtmVertexShader.ShaderSource(),
+            Etm.EtmFragmentShader.ShaderSource(),
             SkyboxVertexShader.ShaderSource(),
             SkyboxFragmentShader.ShaderSource(),
         };

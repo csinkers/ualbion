@@ -30,7 +30,7 @@ namespace UAlbion.Core.Veldrid
             Framebuffer = framebuffer ?? throw new ArgumentNullException(nameof(framebuffer));
 
             On<SetClearColourEvent>(e => _clearColour = (e.Red, e.Green, e.Blue, e.Alpha));
-            On<PostEngineUpdateEvent>(_ => UpdatePerFrameResources());
+            On<RenderEvent>(_ => UpdatePerFrameResources());
 
             _projection = new SingleBuffer<ProjectionMatrix>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "M_Projection");
             _view = new SingleBuffer<ViewMatrix>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "M_View");
@@ -114,7 +114,7 @@ namespace UAlbion.Core.Veldrid
             }
         }
 
-        public void UpdatePerFrameResources()
+        void UpdatePerFrameResources()
         {
             var camera = Resolve<ICamera>();
             var clock = TryResolve<IClock>();
@@ -123,7 +123,7 @@ namespace UAlbion.Core.Veldrid
             var textureSource = Resolve<ITextureSource>();
 
             camera.Viewport = new Vector2(Framebuffer.Width, Framebuffer.Height);
-            var palette = textureSource.GetSimpleTexture(paletteManager.PaletteTexture);
+            var palette = textureSource.GetSimpleTexture(paletteManager.PaletteTexture, paletteManager.Version);
             if (_palette != palette)
             {
                 _palette = palette;

@@ -3,7 +3,6 @@
 
 void main()
 {
-    vec2 screenCoords = gl_FragCoord.xy / uResolution;
     vec2 uv = ((iFlags & SF_FLIP_VERTICAL) != 0)
         ? vec2(iTexPosition.x, 1 - iTexPosition.y)
         : iTexPosition;
@@ -34,6 +33,7 @@ void main()
 
     if ((uEngineFlags & EF_SHOW_CAMERA_POSITION) != 0)
     {
+		vec2 screenCoords = gl_FragCoord.xy / uResolution;
         float dist = length(vec3(screenCoords, 0) - vec3(0.5, 0.5, 0));
         if (dist < 0.01)
             color = mix(color, vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(0.4));
@@ -45,7 +45,8 @@ void main()
     if ((iFlags & SF_BLUE_TINT)  != 0) color = vec4(color.xy * 0.7f,       color.z * 1.5f + 0.3f,                 color.w);
 #endif
 
-    float depth = (color.w == 0.0f) ? 1.0f : gl_FragCoord.z;
+    float depth = /*(color.w == 0.0f) ? 1.0f : */ gl_FragCoord.z;
+    if (color.w == 0.0f) discard;
 
     if ((iFlags & SF_DROP_SHADOW) != 0)
         color = vec4(0.0f, 0.0f, 0.0f, 1.0f);

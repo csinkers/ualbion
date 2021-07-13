@@ -3,7 +3,7 @@ using System.Numerics;
 using UAlbion.Core.Visual;
 using VeldridGen.Interfaces;
 
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Veldrid.Etm
 {
     public partial struct DungeonTile : IVertexFormat, IEquatable<DungeonTile>
     {

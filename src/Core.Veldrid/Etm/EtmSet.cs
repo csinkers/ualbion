@@ -1,8 +1,7 @@
-﻿using UAlbion.Core.Veldrid.Visual;
-using Veldrid;
+﻿using Veldrid;
 using VeldridGen.Interfaces;
 
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Veldrid.Etm
 {
     partial class EtmSet : ResourceSetHolder
     {

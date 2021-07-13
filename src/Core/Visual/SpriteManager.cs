@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UAlbion.Core.Events;
 
 namespace UAlbion.Core.Visual
 {
@@ -8,6 +9,10 @@ namespace UAlbion.Core.Visual
         readonly object _syncRoot = new();
         readonly Dictionary<SpriteKey, SpriteBatch> _sprites = new();
         readonly List<SpriteBatch> _batches = new();
+        float _lastCleanup;
+        float _totalTime;
+
+        public SpriteManager() => On<EngineUpdateEvent>(OnUpdate);
 
         public SpriteLease Borrow(SpriteKey key, int length, object caller)
         {
@@ -26,10 +31,14 @@ namespace UAlbion.Core.Visual
             }
         }
 
-        public IReadOnlyList<SpriteBatch> Batches => _batches;
-
-        public void Cleanup()
+        void OnUpdate(EngineUpdateEvent e)
         {
+            _totalTime += e.DeltaSeconds;
+            var config = Resolve<CoreConfig>().Visual.SpriteManager;
+
+            if (_totalTime - _lastCleanup <= config.CacheCheckIntervalSeconds)
+                return;
+
             lock (_syncRoot)
             {
                 var spritesToRemove = new List<KeyValuePair<SpriteKey, SpriteBatch>>();
@@ -43,6 +52,17 @@ namespace UAlbion.Core.Visual
                     _batches.Remove(kvp.Value);
                     RemoveChild(kvp.Value);
                 }
+            }
+            _lastCleanup = _totalTime;
+        }
+
+        public void Collect(List<IRenderable> renderables)
+        {
+            if (renderables == null) throw new ArgumentNullException(nameof(renderables));
+            lock (_syncRoot)
+            {
+                foreach (var kvp in _batches)
+                    renderables.Add(kvp);
             }
         }
     }

@@ -30,11 +30,17 @@ namespace UAlbion.Core.Veldrid
             }
         }
 
-        protected override void Subscribed() => Dirty();
+        protected override void Subscribed() 
+        {
+            Resubscribe();
+            Dirty();
+        }
+
         protected override void Unsubscribed() => Dispose();
         protected void Dirty() => On<PrepareFrameResourceSetsEvent>(Update);
         protected void PropertyDirty(object sender, PropertyChangedEventArgs _) => Dirty();
         protected abstract ResourceSet Build(GraphicsDevice device, ResourceLayout layout);
+        protected abstract void Resubscribe();
 
         void Update(IVeldridInitEvent e)
         {
@@ -45,6 +51,7 @@ namespace UAlbion.Core.Veldrid
             var layout = layoutSource.GetLayout(GetType(), e.Device);
             _resourceSet = Build(e.Device, layout);
             _resourceSet.Name = Name;
+            Resubscribe();
             Off<PrepareFrameResourceSetsEvent>();
         }
 

@@ -19,8 +19,7 @@ namespace UAlbion.Game.Veldrid
             var etmSource = (IRenderableSource)Resolve<IEtmManager>();
             etmSource.Collect(list);
 
-            foreach (var batch in Resolve<ISpriteManager>().Batches)
-                list.Add(batch);
+            Resolve<ISpriteManager>().Collect(list);
 
             list.Add(DebugGuiRenderable.Instance);
         }

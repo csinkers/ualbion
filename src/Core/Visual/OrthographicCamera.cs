@@ -102,7 +102,7 @@ namespace UAlbion.Core.Visual
 
             var e = TryResolve<IEngine>();
             if (e != null && _yAxisIncreasesDownTheScreen != e.IsClipSpaceYInverted)
-                _projectionMatrix.M22 = -_projectionMatrix.M22;
+                projectionMatrix.M22 = -projectionMatrix.M22;
             return projectionMatrix;
         }
 

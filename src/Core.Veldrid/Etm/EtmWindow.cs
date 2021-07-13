@@ -4,7 +4,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using Veldrid;
 
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Veldrid.Etm
 {
     public class EtmWindow : Component, IRenderable
     {

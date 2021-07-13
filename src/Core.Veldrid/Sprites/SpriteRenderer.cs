@@ -33,7 +33,7 @@ namespace UAlbion.Core.Veldrid.Sprites
 
         static SpritePipeline BuildPipeline(DepthStencilStateDescription depthMode, IFramebufferHolder framebuffer)
         {
-            return new SpritePipeline
+            return new()
             {
                 Name = "P:Sprite",
                 AlphaBlend = BlendStateDescription.SingleAlphaBlend,
@@ -88,6 +88,7 @@ namespace UAlbion.Core.Veldrid.Sprites
             _vertexBuffer.Dispose();
             _indexBuffer.Dispose();
             _pipeline.Dispose();
+            _noCullPipeline.Dispose();
         }
     }
 }

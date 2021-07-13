@@ -38,6 +38,7 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>8</LangVersion>
   </PropertyGroup>
+
   <ItemGroup Condition="!Exists('..\..\..\deps\Newtonsoft.Json\')">
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -49,6 +50,32 @@
       <Name>Newtonsoft.Json</Name>
     </ProjectReference>
   </ItemGroup>
+
+  <ItemGroup Condition="!Exists('..\..\..\deps\SerdesNet\')">
+      <PackageReference Include="SerdesNet" Version="1.7.2" />
+  </ItemGroup>
+  <ItemGroup Condition="Exists('..\..\..\deps\SerdesNet\')">
+    <ProjectReference Include="..\..\..\deps\SerdesNet\src\SerdesNet.csproj">
+      <Project>{88B45D1E-E323-4B3C-B6AF-7EFFB7AEA496}</Project>
+      <Name>SerdesNet</Name>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Api\UAlbion.Api.csproj">
+      <Project>{20d41e69-c260-461f-a0b9-89920f133f60}</Project>
+      <Name>UAlbion.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Config\UAlbion.Config.csproj">
+      <Project>{9ad96f20-81ba-465f-925a-89544c64adf8}</Project>
+      <Name>UAlbion.Config</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Formats\UAlbion.Formats.csproj">
+      <Project>{78b55a1c-1200-4c6e-a9d3-9c04d65f0af9}</Project>
+      <Name>UAlbion.Formats</Name>
+    </ProjectReference>
+  </ItemGroup>
+
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -111,24 +138,6 @@
     </None>
     <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\deps\SerdesNet\src\SerdesNet.csproj">
-      <Project>{88B45D1E-E323-4B3C-B6AF-7EFFB7AEA496}</Project>
-      <Name>SerdesNet</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Api\UAlbion.Api.csproj">
-      <Project>{20d41e69-c260-461f-a0b9-89920f133f60}</Project>
-      <Name>UAlbion.Api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Config\UAlbion.Config.csproj">
-      <Project>{9ad96f20-81ba-465f-925a-89544c64adf8}</Project>
-      <Name>UAlbion.Config</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Formats\UAlbion.Formats.csproj">
-      <Project>{78b55a1c-1200-4c6e-a9d3-9c04d65f0af9}</Project>
-      <Name>UAlbion.Formats</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

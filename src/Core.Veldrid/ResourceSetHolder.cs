@@ -44,19 +44,25 @@ namespace UAlbion.Core.Veldrid
 
         void Update(IVeldridInitEvent e)
         {
+            bool resub = false;
             if (_resourceSet != null)
+            {
                 Dispose();
+                resub = true;
+            }
 
             var layoutSource = Resolve<IResourceLayoutSource>();
             var layout = layoutSource.GetLayout(GetType(), e.Device);
             _resourceSet = Build(e.Device, layout);
             _resourceSet.Name = Name;
-            Resubscribe();
+            if (resub)
+                Resubscribe();
             Off<PrepareFrameResourceSetsEvent>();
         }
 
         protected virtual void Dispose(bool disposing)
         {
+            Off<PrepareFrameResourceSetsEvent>();
             _resourceSet?.Dispose();
             _resourceSet = null;
         }

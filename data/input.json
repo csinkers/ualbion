@@ -71,7 +71,7 @@
   },
   "World3D": {
     "Escape": "push_scene MainMenu",
-    "Tab": "push_scene inventory",
+    "Tab": "inv:open Tom",
     "Control+A": "!loadnextmap",
     "Control+X": "!loadprevmap",
     "Control+Q": "engine_flag toggle UseCylindricalBillboards",

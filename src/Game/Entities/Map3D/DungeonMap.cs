@@ -52,7 +52,10 @@ namespace UAlbion.Game.Entities.Map3D
         protected override void Subscribed()
         {
             if (_labyrinthData != null)
+            {
+                Raise(new SetClearColourEvent(_backgroundRed, _backgroundGreen, _backgroundBlue, 1.0f));
                 return;
+            }
 
             var assets = Resolve<IAssetManager>();
             var state = Resolve<IGameState>();

@@ -2,6 +2,7 @@
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -77,7 +78,10 @@ namespace UAlbion.Game.Gui.Inventory
         void SetDisplayedPartyMember(PartyMemberId? member)
         {
             if (Resolve<ISceneManager>().ActiveSceneId != SceneId.Inventory)
+            {
                 Raise(new PushSceneEvent(SceneId.Inventory));
+                Raise(new SetClearColourEvent(0, 0, 0, 1));
+            }
 
             var party = Resolve<IParty>();
             member ??= party.Leader.Id;

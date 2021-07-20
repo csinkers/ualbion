@@ -7,12 +7,10 @@ using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Etm;
 using UAlbion.Core.Veldrid.Sprites;
-using UAlbion.Core.Visual;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Text;
-using UAlbion.Game.Veldrid;
 using UAlbion.Game.Veldrid.Assets;
 
 // args for testing isometric map export: -b Base Unpacked -t "Labyrinth Map" -id "Labyrinth.Jirinaar Map.Jirinaar"
@@ -129,13 +127,11 @@ namespace UAlbion
             PerfTracker.StartupEvent("Creating engine");
             var framebuffer = new MainFramebuffer();
             var sceneRenderer = new SceneRenderer("MainRenderer", framebuffer);
-            var defaultSource = new DefaultRenderableSource();
             sceneRenderer // TODO: Populate from json so mods can add new render methods
                 .AddRenderer(new SpriteRenderer(framebuffer), typeof(VeldridSpriteBatch))
                 .AddRenderer(new EtmRenderer(framebuffer), typeof(EtmWindow))
                 .AddRenderer(new SkyboxRenderer(framebuffer), typeof(Skybox))
                 .AddRenderer(new DebugGuiRenderer(framebuffer), typeof(DebugGuiRenderable))
-                .AddSource(defaultSource)
                 ;
 
             var engine = new Engine(commandLine.Backend, commandLine.UseRenderDoc, commandLine.StartupOnly, true, sceneRenderer);
@@ -150,7 +146,6 @@ namespace UAlbion
             exchange
                 .Attach(shaderCache)
                 .Attach(framebuffer)
-                .Attach(defaultSource)
                 .Attach(sceneRenderer)
                 .Attach(engine)
                 .Attach(new ResourceLayoutSource())

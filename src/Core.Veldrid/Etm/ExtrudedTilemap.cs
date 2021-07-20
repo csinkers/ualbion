@@ -18,6 +18,7 @@ namespace UAlbion.Core.Veldrid.Etm
         readonly CompositedTexture _dayWalls;
         readonly CompositedTexture _nightFloors;
         readonly CompositedTexture _nightWalls;
+        internal int Version { get; private set; }
 
         public ExtrudedTilemap(EtmManager manager, IAssetId id, string name, int tileCount, DungeonTileMapProperties properties, IPalette dayPalette, IPalette nightPalette)
         {
@@ -117,6 +118,7 @@ namespace UAlbion.Core.Veldrid.Etm
                     Flags = 0, // DungeonTileFlags.UsePalette;
                     WallSize = subImage.TexSize
                 };
+            Version++;
         }
 
         void CleanupSet()

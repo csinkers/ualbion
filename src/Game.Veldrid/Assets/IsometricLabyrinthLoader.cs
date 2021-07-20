@@ -8,18 +8,12 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
-using UAlbion.Core.Veldrid.Etm;
-using UAlbion.Core.Veldrid.Sprites;
-using UAlbion.Core.Veldrid.Textures;
-using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Exporters.Tiled;
 using UAlbion.Formats.Parsers;
-using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Scenes;
-using UAlbion.Game.State;
 using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Assets
@@ -35,44 +29,14 @@ namespace UAlbion.Game.Veldrid.Assets
         Engine _engine;
         IsometricBuilder _builder;
 
-        void SetupEngine(int width, int height, int baseHeight, int tilesPerRow)
+        void SetupEngine(int tileWidth, int tileHeight, int baseHeight, int tilesPerRow)
         {
-#pragma warning disable CA2000 // Dispose objects before losing scopes
-            var config = Resolve<IGeneralConfig>();
-            var shaderCache = new ShaderCache(config.ResolvePath("$(CACHE)/ShaderCache"));
-            var framebuffer = new OffscreenFramebuffer(DefaultWidth * DefaultTilesPerRow, DefaultHeight);
-            var sceneRenderer = new SceneRenderer("MainPipeline", framebuffer)
-                    .AddRenderer(new EtmRenderer(framebuffer))
-                    .AddRenderer(new SpriteRenderer(framebuffer))
-                    .AddSource(new DefaultRenderableSource());
-
-            foreach (var shaderPath in Resolve<IModApplier>().ShaderPaths)
-                shaderCache.AddShaderPath(shaderPath);
-
-            _engine = new Engine(
-                GraphicsBackend.Vulkan, false, false, false, sceneRenderer)
-                ;
-
-            var services = new Container("IsometricLayoutServices");
-            _builder = new IsometricBuilder(framebuffer, width, height, baseHeight, tilesPerRow);
-            services
-                .Add(shaderCache)
-                .Add(framebuffer)
-                .Add(sceneRenderer)
-                .Add(_engine)
-                .Add(new EtmManager())
-                .Add(new SpriteManager())
-                .Add(new SpriteSamplerSource())
-                .Add(new TextureSource())
-                .Add(new SceneStack())
-                .Add(new SceneManager()
-                    .AddScene(new EmptyScene())
-                    .AddScene((IScene)new IsometricBakeScene()
-                        .Add(new PaletteManager())
-                        .Add(_builder)))
-                ;
-
+            var (services, builder) = IsometricSetup.SetupEngine(Exchange,
+                tileWidth, tileHeight, baseHeight, tilesPerRow,
+                GraphicsBackend.Vulkan, false, null);
             AttachChild(services);
+            _engine = (Engine)Resolve<IEngine>();
+            _builder = builder;
             Raise(new SetSceneEvent(SceneId.IsometricBake));
             Raise(new SetClearColourEvent(0, 0, 0, 0));
             // Raise(new EngineFlagEvent(FlagOperation.Set, EngineFlags.ShowBoundingBoxes));
@@ -81,13 +45,13 @@ namespace UAlbion.Game.Veldrid.Assets
 
         IEnumerable<(string, byte[])> Save(LabyrinthData labyrinth, AssetInfo info, IsometricMode mode, string pngPath, string tsxPath)
         {
-            var width = info.Get(AssetProperty.TileWidth, DefaultWidth);
-            var height = info.Get(AssetProperty.TileHeight, DefaultHeight);
+            var tileWidth = info.Get(AssetProperty.TileWidth, DefaultWidth);
+            var tileHeight = info.Get(AssetProperty.TileHeight, DefaultHeight);
             var baseHeight = info.Get(AssetProperty.BaseHeight, DefaultBaseHeight);
             var tilesPerRow = info.Get(AssetProperty.TilesPerRow, DefaultTilesPerRow);
 
             if (_engine == null)
-                SetupEngine(width, height, baseHeight, tilesPerRow);
+                SetupEngine(tileWidth, tileHeight, baseHeight, tilesPerRow);
 
             var assets = Resolve<IAssetManager>();
             var frames = _builder.Build(labyrinth, info, mode, assets);
@@ -104,8 +68,8 @@ namespace UAlbion.Game.Veldrid.Assets
             {
                 TilesetId = labyrinth.Id.Id,
                 IsoMode = mode,
-                TileWidth = width,
-                TileHeight = height,
+                TileWidth = tileWidth,
+                TileHeight = tileHeight,
                 ImagePath = pngPath,
                 TilesetPath = tsxPath,
                 ImageWidth = image.Width,

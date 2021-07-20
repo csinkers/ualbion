@@ -57,7 +57,7 @@ layout(location = 0) in vec2 iTexCoords;
 layout(location = 1) in flat uint iTextures;
 layout(location = 2) in flat uint iFlags;
 
-// UAlbion.Core.Veldrid.Sprites.ColorOnly
+// UAlbion.Core.Veldrid.SimpleFramebuffer
 layout(location = 0) out vec4 oColor;
 
 ");

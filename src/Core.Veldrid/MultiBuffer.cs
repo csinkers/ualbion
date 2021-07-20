@@ -67,6 +67,9 @@ namespace UAlbion.Core.Veldrid
             if (DeviceBuffer != null && DeviceBuffer.SizeInBytes != size)
                 Dispose();
 
+            if (Count == 0)
+                return;
+
             if (DeviceBuffer == null)
             {
                 DeviceBuffer = e.Device.ResourceFactory.CreateBuffer(new BufferDescription(size, _usage));

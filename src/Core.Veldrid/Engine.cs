@@ -9,6 +9,7 @@ using Veldrid.StartupUtilities;
 using UAlbion.Api;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
+using UAlbion.Core.Visual;
 
 namespace UAlbion.Core.Veldrid
 {
@@ -64,16 +65,16 @@ namespace UAlbion.Core.Veldrid
                 _graphicsDevice?.ResizeMainWindow((uint)e.Width, (uint)e.Height);
             });
 
-            On<LoadRenderDocEvent>(e =>
+            On<LoadRenderDocEvent>(_ =>
             {
                 if (_renderDoc != null || !RenderDoc.Load(out _renderDoc)) return;
                 _newBackend = _graphicsDevice.BackendType;
             });
 
-            On<RunRenderDocEvent>(e => _renderDoc?.LaunchReplayUI());
-            On<TriggerRenderDocEvent>(e => _renderDoc?.TriggerCapture());
+            On<RunRenderDocEvent>(_ => _renderDoc?.LaunchReplayUI());
+            On<TriggerRenderDocEvent>(_ => _renderDoc?.TriggerCapture());
             On<SetBackendEvent>(e => _newBackend = e.Value);
-            On<GarbageCollectionEvent>(e => GC.Collect());
+            On<GarbageCollectionEvent>(_ => GC.Collect());
             // On<RecreateWindowEvent>(e => { _recreateWindow = true; _newBackend = _graphicsDevice.BackendType; });
             // Raise(new EngineFlagEvent(e.Value ? FlagOperation.Set : FlagOperation.Clear, EngineFlags.VSync));
         }
@@ -184,10 +185,11 @@ namespace UAlbion.Core.Veldrid
 
         void Draw()
         {
+            var camera = Resolve<ICamera>(); // TODO: More sophisticated approach, support multiple cameras etc
             using (PerfTracker.FrameEvent("6.1 Prepare scenes"))
             {
                 _frameCommands.Begin();
-                Raise(RenderEvent.Instance);
+                Raise(new RenderEvent(camera));
                 Raise(new PrepareFrameResourcesEvent(_graphicsDevice, _frameCommands));
                 Raise(new PrepareFrameResourceSetsEvent(_graphicsDevice, _frameCommands));
                 _frameCommands.End();
@@ -325,7 +327,7 @@ namespace UAlbion.Core.Veldrid
         public void Dispose()
         {
             DestroyAllObjects();
-            _windowHolder.Dispose();
+            _windowHolder?.Dispose();
         }
     }
 }

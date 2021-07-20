@@ -12,6 +12,7 @@ namespace UAlbion.Core.Veldrid
         uint _height;
         Framebuffer _framebuffer;
 
+        public string Name { get; }
         public uint Width { get => _width; set { if (_width == value) return;  _width = value; Dirty(); } } 
         public uint Height { get => _height; set { if (_height == value) return; _height = value; Dirty(); } }
 
@@ -32,12 +33,13 @@ namespace UAlbion.Core.Veldrid
             GC.SuppressFinalize(this);
         }
 
-        protected FramebufferHolder(uint width, uint height)
+        protected FramebufferHolder(uint width, uint height, string name)
         {
             On<DeviceCreatedEvent>(e => Update(e.Device));
             On<DestroyDeviceObjectsEvent>(_ => Dispose());
             _width = width;
             _height = height;
+            Name = name;
         }
 
         protected override void Subscribed() => Dirty();

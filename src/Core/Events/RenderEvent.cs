@@ -1,9 +1,12 @@
-﻿using UAlbion.Api;
+﻿using System;
+using UAlbion.Api;
+using UAlbion.Core.Visual;
 
 namespace UAlbion.Core.Events
 {
     public class RenderEvent : EngineEvent, IVerboseEvent
     {
-        public static RenderEvent Instance { get; } = new();
+        public RenderEvent(ICamera camera) => Camera = camera ?? throw new ArgumentNullException(nameof(camera));
+        public ICamera Camera { get; }
     }
 }

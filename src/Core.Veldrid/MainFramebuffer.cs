@@ -6,7 +6,7 @@ namespace UAlbion.Core.Veldrid
 {
     public class MainFramebuffer : FramebufferHolder
     {
-        public MainFramebuffer() : base(0, 0)
+        public MainFramebuffer() : base(0, 0, "FB_Main")
         {
             On<WindowResizedEvent>(e =>
             {

@@ -1,4 +1,6 @@
-﻿using Veldrid;
+﻿using System;
+using UAlbion.Core.Visual;
+using Veldrid;
 using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid
@@ -7,5 +9,7 @@ namespace UAlbion.Core.Veldrid
     {
         void Render(GraphicsDevice device, CommandList cl);
         IFramebufferHolder Framebuffer { get; }
+        SceneRenderer AddRenderer(IRenderer renderer, params Type[] types);
+        SceneRenderer AddSource(IRenderableSource source);
     }
 }

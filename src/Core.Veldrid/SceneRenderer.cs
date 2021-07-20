@@ -101,14 +101,14 @@ namespace UAlbion.Core.Veldrid
                 cl.ClearDepthStencil(device.IsDepthRangeZeroToOne ? 1f : 0f);
 
                 _renderList.Clear();
-                foreach(var source in _sources)
+                foreach (var source in _sources)
                     source.Collect(_renderList);
 
                 _renderList.Sort((x, y) => x.RenderOrder.CompareTo(y.RenderOrder));
 
                 foreach (var renderable in _renderList)
                 {
-                    if(_rendererLookup.TryGetValue(renderable.GetType(), out var renderer))
+                    if (_rendererLookup.TryGetValue(renderable.GetType(), out var renderer))
                         renderer.Render(renderable, _commonSet, Framebuffer, cl, device);
                 }
             }

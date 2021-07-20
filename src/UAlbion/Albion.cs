@@ -7,6 +7,8 @@ using UAlbion.Core.Veldrid.Etm;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
+using UAlbion.Editor;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
@@ -23,11 +25,9 @@ using UAlbion.Game.Input;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
+using UAlbion.Game.Veldrid;
 using UAlbion.Game.Veldrid.Audio;
 using UAlbion.Game.Veldrid.Debugging;
-using UAlbion.Editor;
-using UAlbion.Formats.Assets;
-using UAlbion.Game.Veldrid;
 using UAlbion.Game.Veldrid.Input;
 
 namespace UAlbion
@@ -63,14 +63,28 @@ namespace UAlbion
             if (!commandLine.Mute)
                 services.Add(new AudioManager(false));
 
+            var renderableSources = new IRenderableSource[]
+            {
+                new SkyboxManager(),
+                new EtmManager(),
+                new SpriteManager(),
+                DebugGuiRenderable.Instance
+            };
+
+            var renderer = global.Resolve<ISceneRenderer>();
+            foreach (var source in renderableSources)
+            {
+                if (source is IComponent component)
+                    services.Add(component);
+                renderer.AddSource(source);
+            }
+
             services
                 .Add(new VeldridGameFactory())
                 .Add(new GameState())
                 .Add(new GameClock())
                 .Add(new IdleClock())
                 .Add(new SlowClock())
-                .Add(new EtmManager())
-                .Add(new SpriteManager())
                 .Add(new TextureSource())
                 .Add(new SpriteSamplerSource())
                 .Add(new VideoManager())

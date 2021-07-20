@@ -27,19 +27,19 @@ namespace UAlbion.Game.Entities.Map3D
 
         public void Update(TilemapRequest request)
         {
-                if (request == null)
-                    return;
+            if (request == null)
+                return;
 
-                _tilemap.Width = request.Width;
-                _tilemap.TileCount = request.TileCount;
-                _tilemap.Scale = request.Scale;
-                _tilemap.Rotation = request.Rotation;
-                _tilemap.Origin = request.Origin;
-                _tilemap.VerticalSpacing = request.VerticalSpacing;
-                _tilemap.HorizontalSpacing = request.HorizontalSpacing;
-                _tilemap.FogColor = request.FogColor;
-                _tilemap.AmbientLightLevel = request.AmbientLightLevel;
-                _tilemap.ObjectYScaling = request.ObjectYScaling;
+            _tilemap.Width = request.Width;
+            _tilemap.TileCount = request.TileCount;
+            _tilemap.Scale = request.Scale;
+            _tilemap.Rotation = request.Rotation;
+            _tilemap.Origin = request.Origin;
+            _tilemap.VerticalSpacing = request.VerticalSpacing;
+            _tilemap.HorizontalSpacing = request.HorizontalSpacing;
+            _tilemap.FogColor = request.FogColor;
+            _tilemap.AmbientLightLevel = request.AmbientLightLevel;
+            _tilemap.ObjectYScaling = request.ObjectYScaling;
         }
 
         public void Load(LabyrinthId labyrinthId, IsometricMode mode, TilemapRequest request, int? paletteId)

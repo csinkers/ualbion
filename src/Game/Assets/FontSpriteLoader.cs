@@ -49,7 +49,7 @@ namespace UAlbion.Game.Assets
 
                 frames.Add(new Region(
                     frame.X, frame.Y,
-                    width + 2, frame.Height,
+                    Math.Min(width + 2, frame.Width), frame.Height,
                     font.Width, font.Height, 0));
             }
 

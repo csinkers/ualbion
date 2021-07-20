@@ -35,7 +35,7 @@ namespace UAlbion.Core.Veldrid.Sprites
         public ISamplerHolder GetSampler(SpriteSampler sampler) =>
             sampler switch
             {
-                SpriteSampler.Linear => LinearSampler,
+                SpriteSampler.TriLinear => LinearSampler,
                 SpriteSampler.Point => PointSampler,
                 _ => throw new ArgumentOutOfRangeException(nameof(sampler), "Unexpected sprite sampler \"{sampler}\"")
             };

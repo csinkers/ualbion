@@ -25,7 +25,7 @@ namespace UAlbion.Core.Veldrid.Sprites
     [Input(0, typeof(SpriteIntermediateData))]
     [ResourceSet(0, typeof(CommonSet))]
     [ResourceSet(1, typeof(SpriteArraySet))]
-    [Output(0, typeof(ColorOnly))]
+    [Output(0, typeof(SimpleFramebuffer))]
     [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
     internal partial class SpriteFragmentShader : IFragmentShader { }
 
@@ -52,11 +52,6 @@ namespace UAlbion.Core.Veldrid.Sprites
         [Vertex("Flags", Flat = true, EnumPrefix = "SF")] public SpriteFlags Flags;
         [Vertex("NormCoords")] public Vector2 NormalisedSpriteCoordinates;
         [Vertex("WorldPosition")] public Vector3 WorldPosition;
-    }
-
-    internal partial struct ColorOnly : IVertexFormat
-    {
-        [Vertex("Color")] public Vector4 OutputColor;
     }
 
     internal partial struct GpuSpriteInstanceData : IVertexFormat

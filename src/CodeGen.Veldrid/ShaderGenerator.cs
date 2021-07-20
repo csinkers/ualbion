@@ -134,6 +134,23 @@ namespace UAlbion.CodeGen.Veldrid
                 location = EmitVertexLayout(sb, context, layout.Item2, location, false);
         }
 
+        static string TypeForMember(VeldridMemberInfo component, GenerationContext context, bool isInput)
+        {
+            if (component.Vertex != null)
+                return VeldridGenUtil.GetGlslType(component.Type, context.Symbols);
+
+            if (component.ColorAttachment != null && !isInput)
+            {
+                try
+                {
+                    return VeldridGenUtil.GetGlslTypeForColorAttachment(component.ColorAttachment.Format);
+                }
+                catch (FormatException e) { context.Report(e.Message); }
+            }
+
+            return null;
+        }
+
         static int EmitVertexLayout(StringBuilder sb, GenerationContext context, INamedTypeSymbol layout, int location, bool isInput)
         {
             if (!context.Types.TryGetValue(layout, out var layoutInfo))
@@ -144,20 +161,24 @@ namespace UAlbion.CodeGen.Veldrid
 
             foreach (var component in layoutInfo.Members)
             {
-                if (component.Vertex == null)
+                var glslType = TypeForMember(component, context, isInput);
+                if(glslType == null)
                     continue;
-
-                var glslType = VeldridGenUtil.GetGlslType(component.Type, context.Symbols);
 
                 sb.Append("layout(location = ");
                 sb.Append(location);
                 sb.Append(isInput ? ") in " : ") out ");
-                if (component.Vertex.Flat)
+                if (component.Vertex?.Flat == true)
                     sb.Append("flat ");
                 sb.Append(glslType);
                 sb.Append(' ');
                 sb.Append(isInput ? 'i' : 'o');
-                sb.Append(component.Vertex.Name);
+
+                if (component.Vertex != null)
+                    sb.Append(component.Vertex.Name);
+                if (component.ColorAttachment != null)
+                    sb.Append(component.Symbol.Name);
+
                 sb.AppendLine(";");
                 location++;
             }

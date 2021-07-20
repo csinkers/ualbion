@@ -2,7 +2,7 @@
 {
     public enum SpriteSampler
     {
-        Linear,
+        TriLinear,
         Point
     }
 }

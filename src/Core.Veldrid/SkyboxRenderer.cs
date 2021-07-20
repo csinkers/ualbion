@@ -35,7 +35,7 @@ namespace UAlbion.Core.Veldrid
     [Input(0, typeof(SkyboxIntermediate))]
     [ResourceSet(0, typeof(SkyboxResourceSet))]
     [ResourceSet(1, typeof(CommonSet))]
-    [Output(0, typeof(ColorOnly))]
+    [Output(0, typeof(SimpleFramebuffer))]
     [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
     internal partial class SkyboxFragmentShader : IFragmentShader { }
 
@@ -122,4 +122,5 @@ namespace UAlbion.Core.Veldrid
         }
     }
 }
+
 

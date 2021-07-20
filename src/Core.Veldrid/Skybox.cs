@@ -7,14 +7,16 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid
 {
-    public sealed class Skybox : ServiceComponent<ISkybox>, ISkybox, IRenderable
+    public sealed class Skybox : Component, ISkybox
     {
+        readonly SkyboxManager _manager;
         readonly SingleBuffer<SkyboxUniformInfo> _uniformBuffer;
 
-        public Skybox(ITextureHolder texture, ISamplerHolder sampler)
+        internal Skybox(ITextureHolder texture, ISamplerHolder sampler, SkyboxManager manager)
         {
             if (texture == null) throw new ArgumentNullException(nameof(texture));
             if (sampler == null) throw new ArgumentNullException(nameof(sampler));
+            _manager = manager;
 
             _uniformBuffer = new SingleBuffer<SkyboxUniformInfo>(new SkyboxUniformInfo(), BufferUsage.UniformBuffer, "SpriteUniformBuffer");
             ResourceSet = new SkyboxResourceSet
@@ -52,6 +54,7 @@ namespace UAlbion.Core.Veldrid
         {
             _uniformBuffer?.Dispose();
             ResourceSet?.Dispose();
+            _manager.DisposeSkybox(this);
         }
     }
 }

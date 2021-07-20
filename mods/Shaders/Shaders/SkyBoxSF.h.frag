@@ -34,6 +34,6 @@ layout(location = 0) in vec2 iTexPosition;
 layout(location = 1) in vec2 iNormCoords;
 layout(location = 2) in vec3 iWorldPosition;
 
-// UAlbion.Core.Veldrid.Sprites.ColorOnly
+// UAlbion.Core.Veldrid.SimpleFramebuffer
 layout(location = 0) out vec4 oColor;
 

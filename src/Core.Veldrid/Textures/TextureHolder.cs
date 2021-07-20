@@ -7,7 +7,7 @@ namespace UAlbion.Core.Veldrid.Textures
     {
         Texture _deviceTexture;
 
-        public string Name { get; }
+        public string Name { get; set; }
         protected TextureHolder(string name) => Name = name;
 
         public Texture DeviceTexture

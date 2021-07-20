@@ -37,9 +37,9 @@ namespace UAlbion
 
                 // Mode
                 if (arg == "--GAME") Mode = ExecutionMode.Game;
-                if (arg == "--DUMP" || arg == "-D") Mode = ExecutionMode.DumpData;
-                if (arg == "--ISO" || arg == "-ISO") Mode = ExecutionMode.BakeIsometric;
-                if (arg == "--CONVERT" || arg == "--BUILD" || arg == "-B")
+                if (arg is "--DUMP" or "-D") Mode = ExecutionMode.DumpData;
+                if (arg is "--ISO" or "-ISO") Mode = ExecutionMode.BakeIsometric;
+                if (arg is "--CONVERT" or "--BUILD" or "-B")
                 {
                     if (i +2 >= args.Length)
                         throw new FormatException("\"--convert\" requires two parameters: the mod to convert from and the mod to convert to");
@@ -48,7 +48,7 @@ namespace UAlbion
                     Mode = ExecutionMode.ConvertAssets;
                 }
 
-                if (arg == "-H" || arg == "--HELP" || arg == "/?" || arg == "HELP")
+                if (arg is "-H" or "--HELP" or "/?" or "HELP")
                 {
                     DisplayUsage();
                     Mode = ExecutionMode.Exit;
@@ -56,18 +56,18 @@ namespace UAlbion
                 }
 
                 // Options
-                if (arg == "-GL" || arg == "--OPENGL") Backend = GraphicsBackend.OpenGL;
-                if (arg == "-GLES" || arg == "--OPENGLES") Backend = GraphicsBackend.OpenGLES;
-                if (arg == "-VK" || arg == "--VULKAN") Backend = GraphicsBackend.Vulkan;
-                if (arg == "-METAL" || arg == "--METAL") Backend = GraphicsBackend.Metal;
-                if (arg == "-D3D" || arg == "--DIRECT3D") Backend = GraphicsBackend.Direct3D11;
+                if (arg is "-GL" or "--OPENGL") Backend = GraphicsBackend.OpenGL;
+                if (arg is "-GLES" or "--OPENGLES") Backend = GraphicsBackend.OpenGLES;
+                if (arg is "-VK" or "--VULKAN") Backend = GraphicsBackend.Vulkan;
+                if (arg is "-METAL" or "--METAL") Backend = GraphicsBackend.Metal;
+                if (arg is "-D3D" or "--DIRECT3D") Backend = GraphicsBackend.Direct3D11;
 
                 if (arg == "--MENUS") DebugMenus = true;
-                if (arg == "--NO-AUDIO" || arg == "-MUTE" || arg == "--MUTE") Mute = true;
-                if (arg == "--STARTUPONlY" || arg == "-S") StartupOnly = true;
-                if (arg == "--RENDERDOC" || arg == "-RD") UseRenderDoc = true;
+                if (arg is "--NO-AUDIO" or "-MUTE" or "--MUTE") Mute = true;
+                if (arg is "--STARTUPONlY" or "-S") StartupOnly = true;
+                if (arg is "--RENDERDOC" or "-RD") UseRenderDoc = true;
 
-                if (arg == "--COMMANDS" || arg == "-C")
+                if (arg is "--COMMANDS" or "-C")
                 {
                     i++;
                     if (i == args.Length)
@@ -80,7 +80,7 @@ namespace UAlbion
                     Commands = args[i].Split(';').Select(x => x.Trim()).ToArray();
                 }
 
-                if (arg == "--TYPE" || arg == "-T")
+                if (arg is "--TYPE" or "-T")
                 {
                     i++;
                     if (i == args.Length)
@@ -95,7 +95,7 @@ namespace UAlbion
                         DumpAssetTypes.Add(Enum.Parse<AssetType>(type, true));
                 }
 
-                if (arg == "--ID" || arg == "-ID" || arg == "-IDS" || arg == "--IDS")
+                if (arg is "--ID" or "-ID" or "-IDS" or "--IDS")
                 {
                     i++;
                     if (i == args.Length)
@@ -107,7 +107,7 @@ namespace UAlbion
                     DumpIds = args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 }
 
-                if (arg == "--FILES" || arg == "-F")
+                if (arg is "--FILES" or "-F")
                 {
                     i++;
                     if (i == args.Length)
@@ -120,7 +120,7 @@ namespace UAlbion
                     ConvertFilePattern = new Regex(args[i]);
                 }
 
-                if (arg == "--FORMATS" || arg == "--FORMAT")
+                if (arg is "--FORMATS" or "--FORMAT")
                 {
                     i++;
                     if (i == args.Length)

@@ -1,33 +1,31 @@
 ﻿using System;
+using System.Numerics;
+using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
-using UAlbion.Core.Veldrid.Etm;
-using UAlbion.Core.Veldrid.Sprites;
-using UAlbion.Core.Veldrid.Textures;
-using UAlbion.Core.Visual;
 using UAlbion.Formats.Config;
-using UAlbion.Game;
-using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Input;
 using UAlbion.Game.Scenes;
-using UAlbion.Game.State;
 using UAlbion.Game.Veldrid;
 using UAlbion.Game.Veldrid.Assets;
 using UAlbion.Game.Veldrid.Input;
 
 namespace UAlbion
 {
-    class IsometricTest : Component // The engine construction code here should mostly parallel that in IsometricLabyrinthLoader.cs in Game.Veldrid
+    sealed class IsometricTest : Component, IDisposable // The engine construction code here should mostly parallel that in IsometricLabyrinthLoader.cs in Game.Veldrid
     {
         readonly CommandLineOptions _cmdLine;
+        MainFramebuffer _mainFramebuffer;
+        FullscreenQuadRenderer _quadRenderer;
 
         public static void Run(EventExchange exchange, CommandLineOptions cmdLine)
         {
-            var test = new IsometricTest(cmdLine);
+            using var test = new IsometricTest(cmdLine);
             exchange.Attach(test);
+            test.Detach();
         }
 
         IsometricTest(CommandLineOptions cmdLine)
@@ -37,54 +35,52 @@ namespace UAlbion
 
         protected override void Subscribed()
         {
-#pragma warning disable CA2000 // Dispose objects before losing scopes
-            var config = Resolve<IGeneralConfig>();
-            var shaderCache = new ShaderCache(config.ResolvePath("$(CACHE)/ShaderCache"));
-
-            foreach (var shaderPath in Resolve<IModApplier>().ShaderPaths)
-                shaderCache.AddShaderPath(shaderPath);
-
-            var framebuffer = new OffscreenFramebuffer(640, 480);
-            var renderer = new SceneRenderer("IsoRenderer", framebuffer)
-                    .AddRenderer(new EtmRenderer(framebuffer))
-                    .AddRenderer(new SpriteRenderer(framebuffer))
-                    .AddSource(new DefaultRenderableSource());
-
-            var engine = new Engine(_cmdLine.Backend, _cmdLine.UseRenderDoc, _cmdLine.StartupOnly, true, renderer);
-
-#pragma warning restore CA2000 // Dispose objects before losing scopes
-
-            var builder = new IsometricBuilder(
-                null,
+            var (services, builder) = IsometricSetup.SetupEngine(Exchange,
                 IsometricLabyrinthLoader.DefaultWidth,
                 IsometricLabyrinthLoader.DefaultHeight,
                 IsometricLabyrinthLoader.DefaultBaseHeight,
-                IsometricLabyrinthLoader.DefaultTilesPerRow);
+                IsometricLabyrinthLoader.DefaultTilesPerRow,
+                _cmdLine.Backend,
+                _cmdLine.UseRenderDoc,
+                new Rectangle(0, 0,
+                    IsometricLabyrinthLoader.DefaultWidth * IsometricLabyrinthLoader.DefaultTilesPerRow,
+                    IsometricLabyrinthLoader.DefaultHeight * 10));
 
-            var services = AttachChild(new Container("IsoServices"));
+            var config = Resolve<IGeneralConfig>();
             services
-                .Add(shaderCache)
-                .Add(framebuffer)
-                .Add(renderer)
-                .Add(engine)
-                .Add(new SpriteManager())
-                .Add(new TextureSource())
-                .Add(new SceneStack())
-                .Add(new SceneManager()
-                    .AddScene(new EmptyScene())
-                    .AddScene((IScene)new IsometricBakeScene()
-                        .Add(new PaletteManager())
-                        .Add(builder)))
                 .Add(new InputManager().RegisterMouseMode(MouseMode.Normal, new NormalMouseMode()))
                 .Add(new InputBinder(disk => InputConfig.Load(config.BasePath, disk)))
                 ;
+
+            _mainFramebuffer = new MainFramebuffer();
+            _quadRenderer = new FullscreenQuadRenderer();
+            var quad = new FullscreenQuad("Quad", DrawLayer.MaxLayer,
+                ((SimpleFramebuffer)builder.Framebuffer).Color,
+                _mainFramebuffer,
+                new Vector4(-1, -1, 2, 2));
+            var source = new AdhocRenderableSource(new[] { quad });
+
+            services.Add(_mainFramebuffer);
+            services.Add(_quadRenderer);
+            services.Add(quad);
+            Exchange.Attach(services);
+
+            var renderer = Resolve<ISceneRenderer>();
+            renderer.AddRenderer(_quadRenderer, typeof(FullscreenQuad));
+            renderer.AddSource(source);
 
             Raise(new InputModeEvent(InputMode.IsoBake));
             Raise(new SetSceneEvent(SceneId.IsometricBake));
             Raise(new SetClearColourEvent(0, 0, 0, 0));
             Raise(new EngineFlagEvent(FlagOperation.Set, EngineFlags.ShowBoundingBoxes));
 
-            engine.Run();
+            Resolve<IEngine>().Run();
+        }
+
+        public void Dispose()
+        {
+            _mainFramebuffer?.Dispose();
+            _quadRenderer?.Dispose();
         }
     }
 }

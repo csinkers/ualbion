@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Text;
 using VeldridGen;
+using SymbolDisplayFormat = Microsoft.CodeAnalysis.SymbolDisplayFormat;
 
 namespace UAlbion.CodeGen.Veldrid
 {
@@ -8,42 +9,74 @@ namespace UAlbion.CodeGen.Veldrid
     {
         public static void Generate(StringBuilder sb, VeldridTypeInfo type)
         {
-            // TODO: Decouple from UAlbion.Core etc, make more flexible
             var depth = type.Members.SingleOrDefault(x => x.DepthAttachment != null);
+            BuildConstructor(sb, type, depth);
+            BuildCreateFramebuffer(sb, type, depth);
+            BuildOutputDescription(sb, type, depth);
+            BuildDispose(sb, type, depth);
+        }
+
+        static void BuildConstructor(StringBuilder sb, VeldridTypeInfo type, VeldridMemberInfo depth)
+        {
+            var typeName = type.Symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+            sb.AppendLine(
+                $@"        public {typeName}(uint width, uint height, string name) : base(width, height, name)
+        {{");
+            if (depth != null)
+                sb.AppendLine($@"            {depth.Symbol.Name} = new global::UAlbion.Core.Veldrid.Textures.Texture2DHolder(name + "".{depth.Symbol.Name}"");");
+
+            foreach (var color in type.Members.Where(member => member.ColorAttachment != null))
+                sb.AppendLine($@"            {color.Symbol.Name} = new global::UAlbion.Core.Veldrid.Textures.Texture2DHolder(name + "".{color.Symbol.Name}"");");
+
+            sb.AppendLine(@"        }
+");
+        }
+
+        static void BuildCreateFramebuffer(StringBuilder sb, VeldridTypeInfo type, VeldridMemberInfo depth)
+        {
             sb.AppendLine(@"        protected override Framebuffer CreateFramebuffer(global::Veldrid.GraphicsDevice device)
         {
             if (device == null) throw new System.ArgumentNullException(nameof(device));");
 
             if (depth != null)
             {
-                sb.AppendLine($@"            {depth.Symbol.Name} = device.ResourceFactory.CreateTexture(new TextureDescription(
+                sb.AppendLine($@"            {depth.Symbol.Name}.DeviceTexture = device.ResourceFactory.CreateTexture(new TextureDescription(
                     Width, Height, 1, 1, 1,
                     global::{depth.DepthAttachment.Format}, TextureUsage.DepthStencil, TextureType.Texture2D));
+            {depth.Symbol.Name}.DeviceTexture.Name = {depth.Symbol.Name}.Name;
 ");
             }
 
             foreach (var color in type.Members.Where(member => member.ColorAttachment != null))
             {
-                sb.AppendLine($@"            {color.Symbol.Name} = device.ResourceFactory.CreateTexture(new TextureDescription(
+                sb.AppendLine($@"            {color.Symbol.Name}.DeviceTexture = device.ResourceFactory.CreateTexture(new TextureDescription(
                     Width, Height, 1, 1, 1,
-                    global::{color.ColorAttachment.Format}, TextureUsage.RenderTarget, TextureType.Texture2D));
+                    global::{color.ColorAttachment.Format}, TextureUsage.RenderTarget | TextureUsage.Sampled, TextureType.Texture2D));
+            {color.Symbol.Name}.DeviceTexture.Name = {color.Symbol.Name}.Name;
 ");
             }
 
             sb.Append("            var description = new FramebufferDescription(");
-            sb.Append(depth != null ? depth.Symbol.Name : "null");
+            sb.Append(depth != null ? depth.Symbol.Name + ".DeviceTexture" : "null");
 
             foreach (var member in type.Members.Where(member => member.ColorAttachment != null))
             {
                 sb.Append(", ");
                 sb.Append(member.Symbol.Name);
+                sb.Append(".DeviceTexture");
             }
 
-            sb.AppendLine($@");
-            return device.ResourceFactory.CreateFramebuffer(ref description);
-        }}
+            sb.AppendLine(@");
+            var framebuffer = device.ResourceFactory.CreateFramebuffer(ref description);
+            framebuffer.Name = Name;
+            return framebuffer;
+        }
+");
+        }
 
-        public override OutputDescription? OutputDescription
+        static void BuildOutputDescription(StringBuilder sb, VeldridTypeInfo type, VeldridMemberInfo depth)
+        {
+            sb.AppendLine($@"        public override OutputDescription? OutputDescription
         {{
             get
             {{
@@ -64,49 +97,82 @@ namespace UAlbion.CodeGen.Veldrid
                 return new OutputDescription(depthAttachment, colorAttachments);
             }
         }
+");
+        }
 
-        protected override void Dispose(bool disposing)
+        static void BuildDispose(StringBuilder sb, VeldridTypeInfo type, VeldridMemberInfo depth)
+        {
+            sb.AppendLine(@"        protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);");
             if (depth != null)
             {
-                sb.AppendLine($@"            {depth.Symbol.Name}?.Dispose();");
-                sb.AppendLine($@"            {depth.Symbol.Name} = null;");
+                sb.AppendLine($@"            {depth.Symbol.Name}.DeviceTexture?.Dispose();");
+                sb.AppendLine($@"            {depth.Symbol.Name}.DeviceTexture = null;");
             }
 
             foreach (var member in type.Members.Where(member => member.ColorAttachment != null))
             {
-                sb.AppendLine($@"            {member.Symbol.Name}?.Dispose();");
-                sb.AppendLine($@"            {member.Symbol.Name} = null;");
+                sb.AppendLine($@"            {member.Symbol.Name}.DeviceTexture?.Dispose();");
+                sb.AppendLine($@"            {member.Symbol.Name}.DeviceTexture = null;");
             }
 
             sb.AppendLine(@"        }");
         }
+
         /* e.g.
-        public partial class OffscreenFramebuffer
+    public partial class SimpleFramebuffer
+    {
+        public SimpleFramebuffer(uint width, uint height, string name) : base(width, height, name)
         {
-            protected override Framebuffer CreateFramebuffer(GraphicsDevice device)
-            {
-                _depth = device.ResourceFactory.CreateTexture(new TextureDescription(
+            Depth = new global::UAlbion.Core.Veldrid.Textures.Texture2DHolder(name + ".Depth");
+            Color = new global::UAlbion.Core.Veldrid.Textures.Texture2DHolder(name + ".Color");
+        }
+
+        protected override Framebuffer CreateFramebuffer(global::Veldrid.GraphicsDevice device)
+        {
+            if (device == null) throw new System.ArgumentNullException(nameof(device));
+            Depth.DeviceTexture = device.ResourceFactory.CreateTexture(new TextureDescription(
                     Width, Height, 1, 1, 1,
-                    PixelFormat.R32_Float, TextureUsage.DepthStencil, TextureType.Texture2D));
+                    global::Veldrid.PixelFormat.R32_Float, TextureUsage.DepthStencil, TextureType.Texture2D));
+            Depth.DeviceTexture.Name = Depth.Name;
 
-                _color = device.ResourceFactory.CreateTexture(new TextureDescription(
+            Color.DeviceTexture = device.ResourceFactory.CreateTexture(new TextureDescription(
                     Width, Height, 1, 1, 1,
-                    PixelFormat.B8_G8_R8_A8_UNorm, TextureUsage.RenderTarget, TextureType.Texture2D));
+                    global::Veldrid.PixelFormat.B8_G8_R8_A8_UNorm, TextureUsage.RenderTarget, TextureType.Texture2D));
+            Color.DeviceTexture.Name = Color.Name;
 
-                var description = new FramebufferDescription(_depth, _color);
-                return device.ResourceFactory.CreateFramebuffer(ref description);
-            }
+            var description = new FramebufferDescription(_depth, _color);
+            var framebuffer = device.ResourceFactory.CreateFramebuffer(ref description);
+            framebuffer.Name = Name;
+            return framebuffer;
+        }
 
-            protected override void Dispose(bool disposing)
+        public global::UAlbion.Core.Veldrid.Textures.Texture2DHolder Depth { get; }
+        public global::UAlbion.Core.Veldrid.Textures.Texture2DHolder Color { get; }
+
+        public override OutputDescription? OutputDescription
+        {
+            get
             {
-                base.Dispose(disposing);
-                _depth?.Dispose();
-                _color?.Dispose();
-                _depth = null;
-                _color = null;
+                OutputAttachmentDescription? depthAttachment = new(global::Veldrid.PixelFormat.R32_Float);
+                OutputAttachmentDescription[] colorAttachments =
+                {
+                    new(global::Veldrid.PixelFormat.B8_G8_R8_A8_UNorm)
+                };
+                return new OutputDescription(depthAttachment, colorAttachments);
             }
-        } */
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            _depth?.Dispose();
+            _depth = null;
+            _color?.Dispose();
+            _color = null;
+        }
+    }
+         */
     }
 }

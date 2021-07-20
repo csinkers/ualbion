@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="!Exists('..\..\deps\VeldridGen\')">
-    <PackageReference Include="VeldridGen" Version="0.1.5" GeneratePathProperty="true" PrivateAssets="all" />
+    <PackageReference Include="VeldridGen" Version="0.1.6" GeneratePathProperty="true" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\deps\VeldridGen\')">
     <ProjectReference Include="..\..\deps\VeldridGen\VeldridGen\VeldridGen.csproj" PrivateAssets="all" />

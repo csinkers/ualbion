@@ -1,43 +1,52 @@
 ﻿using System;
 using System.Globalization;
 using System.Reflection;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace UAlbion.Config
 {
-    public class ToStringJsonConverter : JsonConverter
+    public class ToStringJsonConverter<T> : JsonConverter<T>
     {
-        public override bool CanConvert(Type objectType) => true;
-        public override bool CanRead => true;
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        static readonly Lazy<MethodInfo> Parser = new(() => typeof(T).GetMethod("Parse", new[] { typeof(string) }));
+        static readonly Lazy<MethodInfo> Serialise = new(() => typeof(T).GetMethod("Serialise"));
+
+        public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (typeToConvert == null) throw new ArgumentNullException(nameof(typeToConvert));
+            if (typeToConvert != typeof(T)) throw new InvalidOperationException($"Invoked ToStringJsonConverter<{typeof(T).Name}>.Read with typeToConvert = {typeToConvert.Name}");
+
+            if (reader.TokenType == JsonTokenType.String)
+            {
+                var asString = reader.GetString();
+                var parser = Parser.Value;
+                if (parser != null && parser.IsStatic && parser.ReturnType == typeToConvert)
+                    return (T)parser.Invoke(null, new object[] { asString });
+
+                if (typeToConvert.IsEnum && asString != null)
+                    return (T)Enum.Parse(typeToConvert, asString);
+            }
+
+            if (reader.TokenType == JsonTokenType.Number)
+            {
+                long longValue = reader.GetInt64();
+                if (typeToConvert.IsEnum)
+                    return (T)Enum.Parse(typeToConvert, longValue.ToString(CultureInfo.InvariantCulture));
+            }
+
+            throw new JsonException($"The {typeToConvert.Name} type does not have a public " +
+                                    $"static Parse(string) method that returns a {typeToConvert.Name}.");
+        }
+
+        public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
         {
             if (writer == null) throw new ArgumentNullException(nameof(writer));
             if (value == null) throw new ArgumentNullException(nameof(value));
-            MethodInfo parse = value.GetType().GetMethod("Serialise");
-            if (parse != null && !parse.IsStatic && parse.ReturnType == typeof(string))
-                writer.WriteValue(parse.Invoke(value, Array.Empty<object>()));
+            var serialise = Serialise.Value;
+            if (serialise != null && !serialise.IsStatic && serialise.ReturnType == typeof(string))
+                writer.WriteStringValue((string)serialise.Invoke(value, Array.Empty<object>()));
             else
-                writer.WriteValue(value.ToString());
-        }
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            if (reader == null) throw new ArgumentNullException(nameof(reader));
-            if (objectType == null) throw new ArgumentNullException(nameof(objectType));
-
-            MethodInfo parse = objectType.GetMethod("Parse", new[] { typeof(string) });
-            if (parse != null && parse.IsStatic && parse.ReturnType == objectType)
-                return parse.Invoke(null, new object[] { (string)reader.Value });
-
-            if (objectType.IsEnum && reader.Value is string strValue)
-                return Enum.Parse(objectType, strValue);
-            if (objectType.IsEnum && reader.Value is int intValue)
-                return Enum.Parse(objectType, intValue.ToString(CultureInfo.InvariantCulture));
-            if (objectType.IsEnum && reader.Value is long longValue)
-                return Enum.Parse(objectType, longValue.ToString(CultureInfo.InvariantCulture));
-
-            throw new JsonException($"The {objectType.Name} type does not have a public " +
-                                    $"static Parse(string) method that returns a {objectType.Name}.");
+                writer.WriteStringValue(value.ToString());
         }
     }
 }

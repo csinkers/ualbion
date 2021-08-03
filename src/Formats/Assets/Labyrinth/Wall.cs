@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Config;
 
@@ -32,7 +33,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public byte Unk9 { get; set; } // 9
         public ushort Width { get; set; } // A
         public ushort Height { get; set; } // C
-        public IList<Overlay> Overlays { get; } = new List<Overlay>();
+        [JsonInclude] public IList<Overlay> Overlays { get; private set; } = new List<Overlay>();
 
         public override string ToString() =>
             $"Wall.{SpriteId}:{AnimationFrames} {Width}x{Height} ({Properties}) [ {string.Join(", ", Overlays.Select(x => x.ToString()))} ]";

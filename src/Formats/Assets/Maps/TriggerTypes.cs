@@ -1,11 +1,8 @@
 ﻿using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace UAlbion.Formats.Assets.Maps
 {
     [Flags]
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum TriggerTypes : ushort
     {
         Normal     = 1,       //    1

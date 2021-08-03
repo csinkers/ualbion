@@ -10,7 +10,7 @@ namespace UAlbion.Formats.Parsers
 {
     public class AmorphousSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
     {
-        static readonly Regex SizesRegex = new Regex(@"
+        static readonly Regex SizesRegex = new(@"
             \(\s*
                 (?'width'\d+),\s*
                 (?'height'\d+)\s*

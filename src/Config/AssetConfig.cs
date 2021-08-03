@@ -2,31 +2,31 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using UAlbion.Api;
 
 namespace UAlbion.Config
 {
     public class AssetConfig : IAssetConfig
     {
-        public IDictionary<string, AssetTypeInfo> IdTypes { get; } = new Dictionary<string, AssetTypeInfo>();
-        public IDictionary<string, string> StringMappings { get; } = new Dictionary<string, string>();
-        public IDictionary<string, string> Loaders { get; } = new Dictionary<string, string>();
-        public IDictionary<string, string> Containers { get; } = new Dictionary<string, string>();
-        public IDictionary<string, string> PostProcessors { get; } = new Dictionary<string, string>();
-        public IDictionary<string, LanguageConfig> Languages { get; } = new Dictionary<string, LanguageConfig>();
-        public IDictionary<string, AssetFileInfo> Files { get; } = new Dictionary<string, AssetFileInfo>();
+        [JsonInclude] public Dictionary<string, AssetTypeInfo> IdTypes { get; private set; } = new();
+        [JsonInclude] public Dictionary<string, string> StringMappings { get; private set; } = new();
+        [JsonInclude] public Dictionary<string, string> Loaders { get; private set; } = new();
+        [JsonInclude] public Dictionary<string, string> Containers { get; private set; } = new();
+        [JsonInclude] public Dictionary<string, string> PostProcessors { get; private set; } = new();
+        [JsonInclude] public Dictionary<string, LanguageConfig> Languages { get; private set; } = new();
+        [JsonInclude] public Dictionary<string, AssetFileInfo> Files { get; private set; } = new();
 
         Dictionary<AssetId, AssetInfo[]> _assetLookup;
 
-        public static AssetConfig Parse(string configText)
+        public static AssetConfig Parse(byte[] configText)
         {
-            var config = JsonConvert.DeserializeObject<AssetConfig>(configText);
+            var config = JsonUtil.Deserialize<AssetConfig>(configText);
             if (config == null)
                 return null;
 
-            config?.PostLoad();
-            return (AssetConfig)config;
+            config.PostLoad();
+            return config;
         }
 
         public static AssetConfig Load(string configPath, IFileSystem disk)
@@ -35,7 +35,7 @@ namespace UAlbion.Config
             if (!disk.FileExists(configPath))
                 throw new FileNotFoundException($"Could not open asset config from {configPath}");
 
-            var configText = disk.ReadAllText(configPath);
+            var configText = disk.ReadAllBytes(configPath);
             var config = Parse(configText);
             if(config == null)
                 throw new FileLoadException($"Could not load asset config from \"{configPath}\"");
@@ -45,7 +45,7 @@ namespace UAlbion.Config
         public void Save(string configPath, IFileSystem disk)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
-            var json = JsonConvert.SerializeObject(this, ConfigUtil.JsonSerializerSettings);
+            var json = JsonUtil.Serialize(this);
             disk.WriteAllText(configPath, json);
         }
 
@@ -64,7 +64,7 @@ namespace UAlbion.Config
 
             foreach (var kvp in Files)
             {
-                int index = kvp.Key.IndexOf('#');
+                int index = kvp.Key.IndexOf('#', StringComparison.InvariantCulture);
                 kvp.Value.Filename = index == -1 ? kvp.Key : kvp.Key.Substring(0, index);
                 if (index != -1)
                     kvp.Value.Sha256Hash = kvp.Key.Substring(index + 1);
@@ -85,14 +85,14 @@ namespace UAlbion.Config
         public void PopulateAssetIds(
             AssetMapping mapping,
             Func<AssetFileInfo, IList<(int, int)>> getSubItemCountForFile,
-            Func<string, string> readAllTextFunc)
+            Func<string, byte[]> readAllBytesFunc)
         {
             if (mapping == null) throw new ArgumentNullException(nameof(mapping));
 
             var temp = new Dictionary<AssetId, List<AssetInfo>>();
             foreach (var file in Files)
             {
-                file.Value.PopulateAssetIds(x => ResolveId(mapping, x), getSubItemCountForFile, readAllTextFunc);
+                file.Value.PopulateAssetIds(x => ResolveId(mapping, x), getSubItemCountForFile, readAllBytesFunc);
 
                 foreach (var asset in file.Value.Map.Values)
                 {
@@ -131,7 +131,7 @@ namespace UAlbion.Config
             if (s == "*")
                 return (0, int.MaxValue);
 
-            int index = s.IndexOf('-');
+            int index = s.IndexOf('-', StringComparison.InvariantCulture);
             if (index == -1)
             {
                 if(!int.TryParse(s, out var asInt))
@@ -153,7 +153,7 @@ namespace UAlbion.Config
 
         static (string, string) SplitId(string id, char separator)
         {
-            int index = id.IndexOf(separator);
+            int index = id.IndexOf(separator, StringComparison.InvariantCulture);
             if (index == -1)
                 return (id, null);
 

@@ -12,7 +12,7 @@ namespace UAlbion.TestCommon
     public class MockFileSystem : IFileSystem
     {
         static readonly char[] SeparatorChars = { '\\', '/' };
-        readonly DirNode _root = new DirNode(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "" : "/");
+        readonly DirNode _root = new(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "" : "/");
         readonly Func<string, bool> _maskingFunc;
 
         public MockFileSystem(Func<string, bool> maskingFunc) => _maskingFunc = maskingFunc ?? throw new ArgumentNullException(nameof(maskingFunc));

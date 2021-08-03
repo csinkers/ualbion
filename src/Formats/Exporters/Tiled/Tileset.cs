@@ -25,11 +25,11 @@ namespace UAlbion.Formats.Exporters.Tiled
         [XmlIgnore] public int GidOffset { get; set; }
         [XmlElement("grid", Order = 1)] public TiledGrid Grid { get; set; }
         [XmlElement("image", Order = 2)] public TilesetImage Image { get; set; }
-        [XmlArray("terraintypes", Order = 3)] [XmlArrayItem("terrain")] public List<TerrainType> TerrainTypes { get; } = new List<TerrainType>();
+        [XmlArray("terraintypes", Order = 3)] [XmlArrayItem("terrain")] public List<TerrainType> TerrainTypes { get; } = new();
         [XmlIgnore] public bool TerrainTypesSpecified => TerrainTypes != null && TerrainTypes.Count > 0;
         [XmlElement("tile", Order = 4)] public List<Tile> Tiles { get; set; }
         [XmlIgnore] public bool TilesSpecified => Tiles != null && Tiles.Count > 0;
-        [XmlArray("wangsets", Order = 5)] [XmlArrayItem("wangset")] public List<WangSet> WangSets { get; } = new List<WangSet>();
+        [XmlArray("wangsets", Order = 5)] [XmlArrayItem("wangset")] public List<WangSet> WangSets { get; } = new();
         [XmlIgnore] public bool WangSetsSpecified => WangSets != null && WangSets.Count > 0;
 
         [XmlAttribute("margin")] public int Margin { get; set; }
@@ -45,8 +45,8 @@ namespace UAlbion.Formats.Exporters.Tiled
         [XmlAttribute("tiledversion")] public string TiledVersion { get; set; }
         [XmlAttribute("backgroundcolor")] public string BackgroundColor { get; set; }
 
-        static TileFrame F(int id, int duration) => new TileFrame { Id = id, DurationMs = duration };
-        static WangTile W(int id, string wang) => new WangTile { TileId = id, WangId = wang };
+        static TileFrame F(int id, int duration) => new() { Id = id, DurationMs = duration };
+        static WangTile W(int id, string wang) => new() { TileId = id, WangId = wang };
 
         public static Tileset BuildExample()
         {
@@ -76,9 +76,9 @@ namespace UAlbion.Formats.Exporters.Tiled
             {
                 Corners = new List<WangCorner>
             {
-                new WangCorner { Name = "", Color = "#ff0000", Tile = -1, Probability = 1 },
-                new WangCorner { Name = "", Color = "#00ff00", Tile = -1, Probability = 1 },
-                new WangCorner { Name = "", Color = "#0000ff", Tile = -1, Probability = 1 },
+                new() { Name = "", Color = "#ff0000", Tile = -1, Probability = 1 },
+                new() { Name = "", Color = "#00ff00", Tile = -1, Probability = 1 },
+                new() { Name = "", Color = "#0000ff", Tile = -1, Probability = 1 },
             },
                 Tiles = new List<WangTile>
             {
@@ -133,7 +133,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             serializer.Serialize(tw, this, ns);
         }
 
-        static TileProperty Property(string name, string value, string type = null) => new TileProperty { Name = name, Type = type, Value = value };
+        static TileProperty Property(string name, string value, string type = null) => new() { Name = name, Type = type, Value = value };
 
         static List<TileProperty> BuildTileProperties(TileData x)
         {
@@ -245,7 +245,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                 if (sourceTile.FrameCount <= 1)
                     continue;
 
-                tile.Frames = new List<TileFrame> { new TileFrame(tile.Id, properties.FrameDurationMs) };
+                tile.Frames = new List<TileFrame> { new(tile.Id, properties.FrameDurationMs) };
                 for (int f = 1; f < sourceTile.FrameCount; f++)
                 {
                     tiles.Add(BuildTile(

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
 using UAlbion.Api;
-using UAlbion.Config;
 
 namespace UAlbion.Formats.Config
 {
@@ -24,8 +22,8 @@ namespace UAlbion.Formats.Config
             var configPath = Path.Combine(basePath, "data", "input.json");
             if (disk.FileExists(configPath))
             {
-                var configText = disk.ReadAllText(configPath);
-                inputConfig.Bindings = JsonConvert.DeserializeObject<IDictionary<InputMode, IDictionary<string, string>>>(configText);
+                var configText = disk.ReadAllBytes(configPath);
+                inputConfig.Bindings = JsonUtil.Deserialize<IDictionary<InputMode, IDictionary<string, string>>>(configText);
             }
 
             return inputConfig;
@@ -35,7 +33,7 @@ namespace UAlbion.Formats.Config
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
             var configPath = Path.Combine(_basePath, "data", "input.json");
-            var json = JsonConvert.SerializeObject(this, ConfigUtil.JsonSerializerSettings);
+            var json = JsonUtil.Serialize(this);
             disk.WriteAllText(configPath, json);
         }
     }

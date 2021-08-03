@@ -7,7 +7,7 @@ namespace UAlbion.Formats.Tests
 {
     public class EdgesToPolygonTests
     {
-        static Edge E(byte x1, byte y1, byte x2, byte y2) => new Edge(x1, y1, x2, y2);
+        static Edge E(byte x1, byte y1, byte x2, byte y2) => new(x1, y1, x2, y2);
         static IList<Geometry.Polygon> Convert(IEnumerable<Edge> edges) => 
             TriggerZoneBuilder.BuildPolygonsFromSortedEdges(
                 edges.OrderBy(x => x).ToList());

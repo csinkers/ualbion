@@ -2,21 +2,12 @@
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Newtonsoft.Json;
 using UAlbion.Api;
 
 namespace UAlbion.Config
 {
     public static class ConfigUtil
     {
-        public static JsonSerializerSettings JsonSerializerSettings { get; } = new JsonSerializerSettings
-        {
-            Formatting = Formatting.Indented,
-            NullValueHandling = NullValueHandling.Ignore,
-            DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
-            ContractResolver = new PrivatePropertyJsonContractResolver()
-        };
-
         public static string FindBasePath(IFileSystem disk)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
@@ -58,7 +49,7 @@ namespace UAlbion.Config
         public static string AssetName(AssetId id)
         {
             var full = id.ToString();
-            int index = full.IndexOf('.');
+            int index = full.IndexOf('.', StringComparison.InvariantCulture);
             return index == -1 ? full : full.Substring(index + 1);
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -10,14 +11,14 @@ namespace UAlbion.Formats.Assets.Maps
     public class MapData3D : BaseMapData
     {
         public override MapType MapType => MapType.ThreeD;
-        public Map3DFlags Flags { get; private set; }
-        public LabyrinthId LabDataId { get; private set; }
-        public SongId AmbientSongId { get; private set; }
-        public byte[] Contents { get; private set; }
-        public byte[] Floors { get; private set; }
-        public byte[] Ceilings { get; private set; }
-        public IList<AutomapInfo> Automap { get; } = new List<AutomapInfo>();
-        public byte[] AutomapGraphics { get; private set; }
+        [JsonInclude] public Map3DFlags Flags { get; private set; }
+        [JsonInclude] public LabyrinthId LabDataId { get; private set; }
+        [JsonInclude] public SongId AmbientSongId { get; private set; }
+        [JsonInclude] public byte[] Contents { get; private set; }
+        [JsonInclude] public byte[] Floors { get; private set; }
+        [JsonInclude] public byte[] Ceilings { get; private set; }
+        [JsonInclude] public IList<AutomapInfo> Automap { get; private set; } = new List<AutomapInfo>();
+        [JsonInclude] public byte[] AutomapGraphics { get; private set; }
 
         const int WallOffset = 100;
 

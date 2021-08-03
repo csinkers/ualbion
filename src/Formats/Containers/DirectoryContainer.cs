@@ -117,7 +117,7 @@ namespace UAlbion.Formats.Containers
             foreach (var filePath in disk.EnumerateDirectory(path))
             {
                 var file = Path.GetFileName(filePath);
-                int index = file.IndexOf('_');
+                int index = file.IndexOf('_', StringComparison.InvariantCulture);
                 var part = index == -1 ? file : file.Substring(0, index);
                 if (!int.TryParse(part, out var asInt))
                     continue;

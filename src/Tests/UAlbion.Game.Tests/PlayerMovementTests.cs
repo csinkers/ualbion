@@ -19,7 +19,7 @@ namespace UAlbion.Game.Tests
             0, 0, 0, 0, 0, // 4
         };
 
-        static Vector2 V(int x, int y) => new Vector2(x, y);
+        static Vector2 V(int x, int y) => new(x, y);
         static (int, int) XY(Vector2 v) => ((int)v.X, (int)v.Y);
 
         [Fact]

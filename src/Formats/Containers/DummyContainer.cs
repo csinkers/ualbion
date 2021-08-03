@@ -16,6 +16,6 @@ namespace UAlbion.Formats.Containers
         }
 
         public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk) { }
-        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk) => new List<(int, int)> { (0, 1) };
+        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk) => new() { (0, 1) };
     }
 }

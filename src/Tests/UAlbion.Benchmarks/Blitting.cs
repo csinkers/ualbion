@@ -28,10 +28,10 @@ namespace UAlbion.Benchmarks
                 Enumerable.Repeat((byte)255, Dimensions * Dimensions).ToArray(),
                 new[] { new Region(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
 
-        readonly CompositedTexture _opaqueUniform = new CompositedTexture(AssetId.None, "OpaqueUniform", _palette);
-        readonly CompositedTexture _opaqueRandom = new CompositedTexture(AssetId.None, "OpaqueRandom", _palette);
-        readonly CompositedTexture _transparentUniform = new CompositedTexture(AssetId.None, "TransparentUniform", _palette);
-        readonly CompositedTexture _transparentRandom = new CompositedTexture(AssetId.None, "TransparentRandom", _palette);
+        readonly CompositedTexture _opaqueUniform = new(AssetId.None, "OpaqueUniform", _palette);
+        readonly CompositedTexture _opaqueRandom = new(AssetId.None, "OpaqueRandom", _palette);
+        readonly CompositedTexture _transparentUniform = new(AssetId.None, "TransparentUniform", _palette);
+        readonly CompositedTexture _transparentRandom = new(AssetId.None, "TransparentRandom", _palette);
         public Blitting()
         {
             var r = new Random();

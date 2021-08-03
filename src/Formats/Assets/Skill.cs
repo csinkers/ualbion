@@ -1,9 +1,5 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
-namespace UAlbion.Formats.Assets
+﻿namespace UAlbion.Formats.Assets
 {
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum Skill : byte
     {
         Melee = 0,

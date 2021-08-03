@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using Xunit;
 
 namespace UAlbion.Config.Tests
@@ -135,8 +136,8 @@ namespace UAlbion.Config.Tests
     ""$(XLD)/PALETTE0.XLD"": {
       ""Loader"": ""pal"",
       ""Map"": {
-        ""0"": { ""Id"": ""pal.1"", ""AnimatedRanges"": [ ""0x99-0x9f"", ""0xb0-0xbf"" ] },
-        ""1"": { ""AnimatedRanges"": [ ""0x99-0x9f"", ""0xb0-0xb4"", ""0xb5-0xbf"" ] }
+        ""0"": { ""Id"": ""pal.1"", ""AnimatedRanges"": ""0x99-0x9f, 0xb0-0xbf"" },
+        ""1"": { ""AnimatedRanges"": ""0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf"" }
       }
     },
 
@@ -154,18 +155,21 @@ namespace UAlbion.Config.Tests
       ""Loader"": ""fixedsize"",
       ""Container"": ""binaryoffsets"",
       ""Map"": {
-        ""0"": { ""Id"": ""coresprite.0"", ""Offset"": 0x0FBE58, ""Width"": 14, ""Height"": 14, ""Hotspot"": { ""X"": -6,   ""Y"":  0 } },
-        ""1"": { ""Offset"": 0x0FBF1C, ""Width"": 16, ""Height"": 16, ""Hotspot"": { ""X"":  0,   ""Y"":  4 } },
-        ""27"": { ""Offset"": 0x0FDD10, ""Width"": 32, ""Height"": 64 }
+        ""0"": { ""Id"": ""coresprite.0"", ""Offset"": 1031768, ""Width"": 14, ""Height"": 14, ""Hotspot"": ""-6 0"" },
+        ""1"": { ""Offset"": 1031964, ""Width"": 16, ""Height"": 16, ""Hotspot"": ""0 4"" },
+        ""27"": { ""Offset"": 1039632, ""Width"": 32, ""Height"": 64 }
       }
     }
   }
 }
 ";
+
+        static byte[] TestConfig1Bytes { get; } = Encoding.UTF8.GetBytes(TestConfig1);
+
         [Fact]
         public void VerifyIdTypes()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             Assert.Collection(c.IdTypes.Values.OrderBy(x => x.Alias),
                 t =>
                 {
@@ -268,7 +272,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyLoaders()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             Assert.Collection(c.Loaders.OrderBy(x => x.Key),
                 l =>
                 {
@@ -345,7 +349,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyFiles()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             Assert.Collection(c.Files.Keys.OrderBy(x => x),
                 x => Assert.Equal("$(ALBION)/DRIVERS/ALBISND.OPL", x),
                 x => Assert.Equal("$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710", x),
@@ -371,7 +375,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifySpecial()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             var f = c.Files["$(ALBION)/DRIVERS/ALBISND.OPL"];
             Assert.Equal("UAlbion.Game.Assets.SoundBankLoader, UAlbion.Game", f.Loader);
             Assert.Null(f.Container);
@@ -386,7 +390,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyItemList()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             var f = c.Files["$(XLD)/ITEMLIST.DAT"];
             Assert.Equal("UAlbion.Formats.Parsers.ItemDataLoader, UAlbion.Formats", f.Loader);
             Assert.Equal("UAlbion.Formats.Containers.ItemListContainer, UAlbion.Formats", f.Container);
@@ -401,7 +405,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyBlockList()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             var f = c.Files["$(XLD)/BLKLIST0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.BlockListLoader, UAlbion.Formats", f.Loader);
             Assert.Null(f.Container);
@@ -415,7 +419,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyFloors()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             var f = c.Files["$(XLD)/3DFLOOR2.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Equal(64, f.Width);
@@ -430,7 +434,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyCombatBackgrounds()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             var f = c.Files["$(XLD)/COMBACK0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Equal(360, f.Width);
@@ -444,7 +448,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyTileGraphics()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             var f = c.Files["$(XLD)/ICONGFX0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Equal(16, f.Width);
@@ -459,7 +463,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyCombatGraphics()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             var f = c.Files["$(XLD)/COMGFX0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.MultiHeaderSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Collection(f.Map.OrderBy(x => x.Key), m =>
@@ -472,7 +476,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyAutomapGraphics()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             var f = c.Files["$(XLD)/AUTOGFX0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.AmorphousSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
@@ -492,7 +496,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void Verify3dObjects()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             var f = c.Files["$(XLD)/3DOBJEC0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
@@ -518,7 +522,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyOverlays()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             var f = c.Files["$(XLD)/3DOVERL0.XLD"];
             Assert.True(f.Get(AssetProperty.Transposed, false));
             Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
@@ -545,7 +549,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyFonts()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             var f = c.Files["$(XLD)/FONTS0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.FontSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Equal(8, f.Width);
@@ -571,7 +575,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyTilesets()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             var f = c.Files["$(XLD)/ICONDAT0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.TilesetLoader, UAlbion.Formats", f.Loader);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
@@ -596,7 +600,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyPalettes()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             var f = c.Files["$(XLD)/PALETTE0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.PaletteLoader, UAlbion.Formats", f.Loader);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
@@ -604,24 +608,19 @@ namespace UAlbion.Config.Tests
                 {
                     Assert.Equal(0, m.Key);
                     Assert.Equal("pal.1", m.Value.Id);
-                    Assert.Collection(m.Value.GetArray<string>(AssetProperty.AnimatedRanges),
-                        x => Assert.Equal("0x99-0x9f", x),
-                        x => Assert.Equal("0xb0-0xbf", x));
+                    Assert.Equal("0x99-0x9f, 0xb0-0xbf", m.Value.Get(AssetProperty.AnimatedRanges, ""));
                 },
                 m =>
                 {
                     Assert.Equal(1, m.Key);
-                    Assert.Collection(m.Value.GetArray<string>(AssetProperty.AnimatedRanges),
-                        x => Assert.Equal("0x99-0x9f", x),
-                        x => Assert.Equal("0xb0-0xb4", x),
-                        x => Assert.Equal("0xb5-0xbf", x));
+                    Assert.Equal("0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf", m.Value.Get(AssetProperty.AnimatedRanges, ""));
                 });
         }
 
         [Fact]
         public void VerifySpells()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             var f = c.Files["$(XLD)/SPELLDAT.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.SpellLoader, UAlbion.Formats", f.Loader);
             Assert.Equal("UAlbion.Formats.Containers.SpellListContainer, UAlbion.Formats", f.Container);
@@ -635,7 +634,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyWords()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             var f = c.Files["$(LANG)/WORDLIS0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.WordListLoader, UAlbion.Formats", f.Loader);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
@@ -650,7 +649,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyMain()
         {
-            var c = AssetConfig.Parse(TestConfig1);
+            var c = AssetConfig.Parse(TestConfig1Bytes);
             var f = c.Files["$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710"];
             Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Equal("UAlbion.Formats.Containers.BinaryOffsetContainer, UAlbion.Formats", f.Container);
@@ -659,30 +658,26 @@ namespace UAlbion.Config.Tests
                 {
                     Assert.Equal(0, m.Key);
                     Assert.Equal("coresprite.0", m.Value.Id);
-                    Assert.Equal(0x0FBE58, m.Value.Get(AssetProperty.Offset, 0));
+                    Assert.Equal(1031768, m.Value.Get(AssetProperty.Offset, 0));
                     Assert.Equal(14, m.Value.Width);
                     Assert.Equal(14, m.Value.Height);
-                    var hotspot = m.Value.GetRaw("Hotspot");
-                    Assert.Equal(-6, hotspot.Value<int>("X"));
-                    Assert.Equal(0, hotspot.Value<int>("Y"));
+                    Assert.Equal("-6 0", m.Value.Get<string>("Hotspot", null));
                 },
                 m =>
                 {
                     Assert.Equal(1, m.Key);
-                    Assert.Equal(0x0FBF1C, m.Value.Get(AssetProperty.Offset, 0));
+                    Assert.Equal(1031964, m.Value.Get(AssetProperty.Offset, 0));
                     Assert.Equal(16, m.Value.Width);
                     Assert.Equal(16, m.Value.Height);
-                    var hotspot = m.Value.GetRaw("Hotspot");
-                    Assert.Equal(0, hotspot.Value<int>("X"));
-                    Assert.Equal(4, hotspot.Value<int>("Y"));
+                    Assert.Equal("0 4", m.Value.Get<string>("Hotspot", null));
                 },
                 m =>
                 {
                     Assert.Equal(27, m.Key);
-                    Assert.Equal(0x0FDD10, m.Value.Get(AssetProperty.Offset, 0));
+                    Assert.Equal(1039632, m.Value.Get(AssetProperty.Offset, 0));
                     Assert.Equal(32, m.Value.Width);
                     Assert.Equal(64, m.Value.Height);
-                    Assert.Null(m.Value.GetRaw("Hotspot"));
+                    Assert.Null(m.Value.Get<string>("Hotspot", null));
                 });
         }
     }

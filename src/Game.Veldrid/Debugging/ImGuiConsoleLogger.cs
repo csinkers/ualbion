@@ -14,8 +14,8 @@ namespace UAlbion.Game.Veldrid.Debugging
     {
         // TODO: Initial size
         const int MaxHistory = 1000;
-        readonly object _syncRoot = new object();
-        readonly Queue<LogEventArgs> _history = new Queue<LogEventArgs>();
+        readonly object _syncRoot = new();
+        readonly Queue<LogEventArgs> _history = new();
         readonly byte[] _inputBuffer = new byte[512];
         bool _autoScroll = true;
         bool _scrollToBottom;

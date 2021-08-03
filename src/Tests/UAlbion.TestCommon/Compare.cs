@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Text;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Config;
 using UAlbion.Formats;
 using Xunit;
 
@@ -12,7 +11,6 @@ namespace UAlbion.TestCommon
 {
     public static class Asset
     {
-        static readonly JsonSerializer JsonSerializer = JsonSerializer.Create(ConfigUtil.JsonSerializerSettings);
         public static void Compare(
             string resultDir,
             string testName,
@@ -90,16 +88,10 @@ namespace UAlbion.TestCommon
         public static string SaveJson(object asset)
         {
             using var stream = new MemoryStream();
-            using var writer = new StreamWriter(stream);
-            JsonSerializer.Serialize(writer, asset);
-            writer.Flush();
+            stream.Write(Encoding.UTF8.GetBytes(JsonUtil.Serialize(asset)));
             return ReadToEnd(stream);
         }
 
-        public static T LoadJson<T>(string json)
-        {
-            using var jsonReader = new JsonTextReader(new StringReader(json));
-            return (T)JsonSerializer.Deserialize<T>(jsonReader);
-        }
+        public static T LoadJson<T>(string json) => JsonUtil.Deserialize<T>(Encoding.UTF8.GetBytes(json));
     }
 }

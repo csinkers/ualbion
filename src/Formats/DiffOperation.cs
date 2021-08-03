@@ -8,8 +8,8 @@ namespace UAlbion.Formats
         readonly int _offset;
 
         DiffOperation(int offset, int length) { _offset = offset; _length = length; }
-        public static DiffOperation Insert(byte value) => new DiffOperation(value, 0);
-        public static DiffOperation Copy(int offset, int length) => new DiffOperation(offset, length);
+        public static DiffOperation Insert(byte value) => new(value, 0);
+        public static DiffOperation Copy(int offset, int length) => new(offset, length);
 
         public bool IsCopy => _length > 0;
         public byte Value => _length == 0 ? (byte)_offset : throw new InvalidOperationException("Tried to access Value of a copy DiffOperation");

@@ -10,8 +10,8 @@ namespace UAlbion.Formats.Parsers
 {
     public class WaveLibWavLoader : IAssetLoader<WaveLib>
     {
-        static readonly WavLoader WavLoader = new WavLoader();
-        static readonly Regex NameRegex = new Regex(@"i(\d+)t(\d+)");
+        static readonly WavLoader WavLoader = new();
+        static readonly Regex NameRegex = new(@"i(\d+)t(\d+)");
         public WaveLib Serdes(WaveLib existing, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));

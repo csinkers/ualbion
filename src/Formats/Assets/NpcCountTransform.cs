@@ -6,7 +6,7 @@ namespace UAlbion.Formats.Assets
 {
     public class NpcCountTransform : IConverter<byte, int>
     {
-        public static readonly NpcCountTransform Instance = new NpcCountTransform();
+        public static readonly NpcCountTransform Instance = new();
         NpcCountTransform() { }
         public static int Serdes(string name, int existing, Func<string, byte, byte> serializer)
         {

@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace UAlbion.Config
 {
@@ -8,7 +8,7 @@ namespace UAlbion.Config
     /// If this enum is modified, then CodeGeneration must be re-run.
     /// Any AssetTypes in a family should have their own AssetId type, in additional to any more general id types they may be a part of.
     /// </summary>
-    [JsonConverter(typeof(ToStringJsonConverter))]
+    [JsonConverter(typeof(ToStringJsonConverter<AssetType>))]
     public enum AssetType : byte
     {
         [Unmapped] None = 0, // Must be 0 so default(AssetId) will equate to AssetId.None

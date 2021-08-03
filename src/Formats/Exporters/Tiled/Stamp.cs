@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using UAlbion.Api;
 using UAlbion.Formats.Assets;
 
@@ -10,8 +9,8 @@ namespace UAlbion.Formats.Exporters.Tiled
 {
     public class Stamp
     {
-        [JsonProperty("name")] public string Name { get; set; }
-        [JsonProperty("variations")] public List<Variation> Variations { get; private set; } = new List<Variation>();
+        [JsonPropertyName("name")] public string Name { get; set; }
+        [JsonInclude, JsonPropertyName("variations")] public List<Variation> Variations { get; private set; } = new();
 
         public Stamp() { }
         public Stamp(int blockId, Block block, Tileset tileset)
@@ -36,11 +35,11 @@ namespace UAlbion.Formats.Exporters.Tiled
                     NextObjectId = 1,
                     Tilesets = new List<VariationTileset> 
                     {
-                        new VariationTileset { FirstGid = 1, Source = tileset.Filename }
+                        new() { FirstGid = 1, Source = tileset.Filename }
                     },
                     Layers = new List<VariationLayer> 
                     {
-                        new VariationLayer
+                        new()
                         {
                             Id = 1,
                             Name = "Underlay",
@@ -48,7 +47,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                             Height = block.Height,
                             Data = ZipUtil.Deflate(underlay)
                         },
-                        new VariationLayer
+                        new()
                         {
                             Id = 2,
                             Name = "Overlay",
@@ -140,73 +139,67 @@ namespace UAlbion.Formats.Exporters.Tiled
         public static Stamp Load(string path, IFileSystem disk)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
-            return Parse(disk.ReadAllText(path));
+            return Parse(disk.ReadAllBytes(path));
         }
 
-        public static Stamp Parse(string json) => JsonConvert.DeserializeObject<Stamp>(json);
+        public static Stamp Parse(byte[] json) => JsonUtil.Deserialize<Stamp>(json);
 
         public void Save(string path, IFileSystem disk)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
-            using var stream = disk.OpenWriteTruncate(path);
-            using var sw = new StreamWriter(stream);
-            Serialize(sw);
+            disk.WriteAllText(path, Serialize());
         }
 
-        public void Serialize(TextWriter tw)
-        {
-            var serializer = new JsonSerializer();
-            serializer.Serialize(tw, this);
-        }
+        public string Serialize() => JsonUtil.Serialize(this);
     }
 
     public class Variation
     {
-        [JsonProperty("probability")] public int Probability { get; set; } = 1;
-        [JsonProperty("map")] public VariationMap Map { get; set; }
+        [JsonPropertyName("probability")] public int Probability { get; set; } = 1;
+        [JsonPropertyName("map")] public VariationMap Map { get; set; }
     }
 
     public class VariationMap
     {
-        [JsonProperty("width")] public int Width { get; set; }
-        [JsonProperty("height")] public int Height { get; set; }
-        [JsonProperty("tilewidth")] public int TileWidth { get; set; }
-        [JsonProperty("tileheight")] public int TileHeight { get; set; }
-        [JsonProperty("nextlayerid")] public int NextLayerId { get; set; }
-        [JsonProperty("nextobjectid")] public int NextObjectId { get; set; }
-        [JsonProperty("layers")] public List<VariationLayer> Layers { get; set; } = new List<VariationLayer>();
-        [JsonProperty("tilesets")] public List<VariationTileset> Tilesets { get; set; } = new List<VariationTileset>();
+        [JsonPropertyName("width")] public int Width { get; set; }
+        [JsonPropertyName("height")] public int Height { get; set; }
+        [JsonPropertyName("tilewidth")] public int TileWidth { get; set; }
+        [JsonPropertyName("tileheight")] public int TileHeight { get; set; }
+        [JsonPropertyName("nextlayerid")] public int NextLayerId { get; set; }
+        [JsonPropertyName("nextobjectid")] public int NextObjectId { get; set; }
+        [JsonPropertyName("layers")] public List<VariationLayer> Layers { get; set; } = new();
+        [JsonPropertyName("tilesets")] public List<VariationTileset> Tilesets { get; set; } = new();
 
-        [JsonProperty("type")] public string Type { get; set; } = "map";
-        [JsonProperty("compressionlevel")] public int Compressionlevel { get; set; } = -1;
-        [JsonProperty("orientation")] public string Orientation { get; set; } = "orthogonal";
-        [JsonProperty("renderorder")] public string Renderorder { get; set; } = "right-down";
-        [JsonProperty("tiledversion")] public string TiledVersion { get; set; } = "1.4.2";
-        [JsonProperty("version")] public float Version { get; set; } = 1.4f;
-        [JsonProperty("infinite")] public bool Infinite { get; set; } = false;
+        [JsonPropertyName("type")] public string Type { get; set; } = "map";
+        [JsonPropertyName("compressionlevel")] public int Compressionlevel { get; set; } = -1;
+        [JsonPropertyName("orientation")] public string Orientation { get; set; } = "orthogonal";
+        [JsonPropertyName("renderorder")] public string Renderorder { get; set; } = "right-down";
+        [JsonPropertyName("tiledversion")] public string TiledVersion { get; set; } = "1.4.2";
+        [JsonPropertyName("version")] public float Version { get; set; } = 1.4f;
+        [JsonPropertyName("infinite")] public bool Infinite { get; set; } = false;
     }
 
     public class VariationLayer
     {
-        [JsonProperty("id")] public int Id { get; set; }
-        [JsonProperty("name")] public string Name { get; set; }
-        [JsonProperty("width")] public int Width { get; set; }
-        [JsonProperty("height")] public int Height { get; set; }
-        [JsonProperty("data")] public byte[] Data { get; set; }
+        [JsonPropertyName("id")] public int Id { get; set; }
+        [JsonPropertyName("name")] public string Name { get; set; }
+        [JsonPropertyName("width")] public int Width { get; set; }
+        [JsonPropertyName("height")] public int Height { get; set; }
+        [JsonPropertyName("data")] public byte[] Data { get; set; }
 
-        [JsonProperty("x")] public int X { get; set; } = 0;
-        [JsonProperty("y")] public int Y { get; set; } = 0;
-        [JsonProperty("type")] public string Type { get; set; } = "tilelayer";
-        [JsonProperty("compression")] public string Compression { get; set; } = Tiled.CompressionFormat.Zlib;
-        [JsonProperty("encoding")] public string Encoding { get; set; } = "base64";
-        [JsonProperty("opacity")] public int Opacity { get; set; } = 1;
-        [JsonProperty("visible")] public bool Visible { get; set; } = true;
+        [JsonPropertyName("x")] public int X { get; set; } = 0;
+        [JsonPropertyName("y")] public int Y { get; set; } = 0;
+        [JsonPropertyName("type")] public string Type { get; set; } = "tilelayer";
+        [JsonPropertyName("compression")] public string Compression { get; set; } = Tiled.CompressionFormat.Zlib;
+        [JsonPropertyName("encoding")] public string Encoding { get; set; } = "base64";
+        [JsonPropertyName("opacity")] public int Opacity { get; set; } = 1;
+        [JsonPropertyName("visible")] public bool Visible { get; set; } = true;
     }
 
     public class VariationTileset
     {
-        [JsonProperty("firstgid")] public int FirstGid { get; set; }
-        [JsonProperty("source")] public string Source { get; set; }
+        [JsonPropertyName("firstgid")] public int FirstGid { get; set; }
+        [JsonPropertyName("source")] public string Source { get; set; }
     }
 }
 #pragma warning restore CA2227 // Collection properties should be read only

@@ -4,8 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -29,7 +27,7 @@ namespace UAlbion.Formats.Containers
             if (!dict.TryGetValue(info.AssetId, out var token))
                 return null;
 
-            var ms = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(token, ConfigUtil.JsonSerializerSettings)));
+            var ms = new MemoryStream(Encoding.UTF8.GetBytes(JsonUtil.Serialize(token)));
             var br = new BinaryReader(ms);
             return new GenericBinaryReader(
                 br,
@@ -48,15 +46,14 @@ namespace UAlbion.Formats.Containers
             if (!disk.DirectoryExists(dir))
                 disk.CreateDirectory(dir);
 
-            var dict = new Dictionary<string, JObject>();
+            var dict = new Dictionary<string, object>();
             foreach (var (info, bytes) in assets)
             {
-                var json = Encoding.UTF8.GetString(bytes);
-                var jObject = JObject.Parse(json);
+                var jObject = JsonUtil.Deserialize<object>(bytes);
                 dict[info.AssetId.ToString()] = jObject;
             }
 
-            var fullText = JsonConvert.SerializeObject(dict, ConfigUtil.JsonSerializerSettings);
+            var fullText = JsonUtil.Serialize(dict);
             disk.WriteAllText(path, fullText);
         }
 
@@ -69,10 +66,10 @@ namespace UAlbion.Formats.Containers
             return FormatUtil.SortedIntsToRanges(dict.Keys.Select(x => x.Id).OrderBy(x => x));
         }
 
-        static IDictionary<AssetId, JObject> Load(string path, IFileSystem disk)
+        static IDictionary<AssetId, object> Load(string path, IFileSystem disk)
         {
-            var text = disk.ReadAllText(path);
-            var dict = (IDictionary<string, JObject>)JsonConvert.DeserializeObject<IDictionary<string, JObject>>(text);
+            var text = disk.ReadAllBytes(path);
+            var dict = JsonUtil.Deserialize<IDictionary<string, object>>(text);
             if (dict == null)
                 throw new FileLoadException($"Could not deserialize \"{path}\"");
 

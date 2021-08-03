@@ -118,14 +118,14 @@ namespace UAlbion.CodeGenerator
 using System;
 using System.ComponentModel;
 using System.Globalization;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 
 namespace {destNamespace}
 {{
-    [JsonConverter(typeof(ToStringJsonConverter))]
+    [JsonConverter(typeof(ToStringJsonConverter<{name}>))]
     [TypeConverter(typeof({name}Converter))]
     public readonly struct {name} : IEquatable<{name}>, IEquatable<AssetId>, IComparable, IAssetId
     {{

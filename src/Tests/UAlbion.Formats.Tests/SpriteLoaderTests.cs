@@ -10,9 +10,9 @@ namespace UAlbion.Formats.Tests
 {
     public class SpriteLoaderTests
     {
-        static readonly SingleHeaderSpriteLoader HeaderLoader = new SingleHeaderSpriteLoader();
-        static readonly MultiHeaderSpriteLoader MultiHeaderLoader = new MultiHeaderSpriteLoader();
-        static readonly AmorphousSpriteLoader AmorphousLoader = new AmorphousSpriteLoader();
+        static readonly SingleHeaderSpriteLoader HeaderLoader = new();
+        static readonly MultiHeaderSpriteLoader MultiHeaderLoader = new();
+        static readonly AmorphousSpriteLoader AmorphousLoader = new();
 
         static IReadOnlyTexture<byte> Load(byte[] bytes, Func<IReadOnlyTexture<byte>, ISerializer, IReadOnlyTexture<byte>> serdes)
         {

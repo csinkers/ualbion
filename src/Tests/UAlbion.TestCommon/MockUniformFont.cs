@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using Newtonsoft.Json.Linq;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 
@@ -18,14 +17,11 @@ namespace UAlbion.TestCommon
                     new Vector2(6, 8),
                     new Vector2(6 * 256, 8),
                     0)));
-        public static AssetInfo Info { get; } = new AssetInfo
+
+        public static AssetInfo Info { get; } = new(new Dictionary<string, object> {
             {
-                Properties = new Dictionary<string, JToken> {
-                    {
-                        "Mapping",
-                        JToken.Parse(@"""abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\""?!/()#%*&+-=><☺♀♂éâàçêëèïîìôòûùáíóú""")
-                    }
-                }
-            };
+                "Mapping",
+                @"""abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\""?!/()#%*&+-=><☺♀♂éâàçêëèïîìôòûùáíóú"""
+            } });
     }
 }

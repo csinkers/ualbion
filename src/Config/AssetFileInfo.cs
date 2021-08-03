@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using UAlbion.Api;
 
-#pragma warning disable CA2227 // Collection properties should be read only
 namespace UAlbion.Config
 {
-    public class MappingDictionary : Dictionary<int, AssetInfo> { }
     public class AssetFileInfo
     {
         [JsonIgnore] public string Filename { get; set; } // Just mirrors the dictionary key
@@ -15,29 +14,49 @@ namespace UAlbion.Config
         public string Container { get; set; }
         public string Loader { get; set; }
         public string Post { get; set; }
-        public MappingDictionary Map { get; } = new MappingDictionary();
+        [JsonInclude] public int? Max { get; private set; }
+        [JsonInclude] public Dictionary<int, AssetInfo> Map { get; private set; } = new();
         public string MapFile { get; set; }
-        [JsonExtensionData] public IDictionary<string, JToken> Properties { get; set; }
 
-        [JsonIgnore] public int? Width // For sprites only
+        [JsonInclude]
+        [JsonExtensionData] 
+        public Dictionary<string, object> Properties { get; private set; }
+
+        public int? Width // For sprites only
         {
             get => Get(AssetProperty.Width, (int?)null);
             set => Set(AssetProperty.Width, value);
         }
 
-        [JsonIgnore]
         public int? Height // For sprites only
         {
             get => Get(AssetProperty.Height, (int?)null);
             set => Set(AssetProperty.Height, value);
         }
 
+        public override string ToString() => $"AssetFile: {Filename} ({Map.Count})";
+
         public T Get<T>(string property, T defaultValue)
         {
             if (Properties == null || !Properties.TryGetValue(property, out var token))
                 return defaultValue;
 
-            return (T)token.Value<T>();
+            if (token is JsonElement elem)
+            {
+                if (typeof(T) == typeof(string)) return (T)(object)elem.GetString();
+                if (typeof(T) == typeof(int)) return (T)(object)elem.GetInt32();
+                if (typeof(T) == typeof(long)) return (T)(object)elem.GetInt64();
+                if (typeof(T) == typeof(bool)) return (T)(object)elem.GetBoolean();
+            }
+            //if (token is double asDouble)
+            //{
+            //    if (typeof(T) == typeof(int))
+            //        return (T)(object)Convert.ToInt32(asDouble);
+
+            //    if (typeof(T) == typeof(int?))
+            //        return (T)(object)Convert.ToInt32(asDouble);
+            //}
+            return (T)token;
         }
 
         public void Set<T>(string property, T value)
@@ -53,12 +72,12 @@ namespace UAlbion.Config
             }
             else
             {
-                Properties ??= new Dictionary<string, JToken>();
-                Properties[property] = new JValue(value);
+                Properties ??= new Dictionary<string, object>();
+                Properties[property] = value;
             }
         }
 
-        void MergeMapping(MappingDictionary mapping)
+        void MergeMapping(Dictionary<int, AssetInfo> mapping)
         {
             foreach (var kvp in mapping)
             {
@@ -66,12 +85,9 @@ namespace UAlbion.Config
                 {
                     kvp.Value.File = this;
                     info.Id ??= kvp.Value.Id;
-                    if(kvp.Value.Properties != null)
-                    {
-                        info.Properties ??= new Dictionary<string, JToken>();
-                        foreach(var prop in kvp.Value.Properties)
-                            info.Properties[prop.Key] = prop.Value;
-                    }
+                    if (kvp.Value.Properties != null)
+                        foreach (var prop in kvp.Value.Properties)
+                            info.Set(prop.Key, prop.Value);
                 }
                 else
                 {
@@ -87,15 +103,15 @@ namespace UAlbion.Config
         public void PopulateAssetIds(
             Func<string, AssetId> resolveId,
             Func<AssetFileInfo, IList<(int, int)>> getSubItemCountForFile,
-            Func<string, string> readAllTextFunc)
+            Func<string, byte[]> readAllBytesFunc)
         {
             if (getSubItemCountForFile == null) throw new ArgumentNullException(nameof(getSubItemCountForFile));
-            if (readAllTextFunc == null) throw new ArgumentNullException(nameof(readAllTextFunc));
+            if (readAllBytesFunc == null) throw new ArgumentNullException(nameof(readAllBytesFunc));
 
             if (!string.IsNullOrEmpty(MapFile))
             {
-                var mappingJson = readAllTextFunc(MapFile);
-                var mapping = JsonConvert.DeserializeObject<MappingDictionary>(mappingJson);
+                var mappingJson = readAllBytesFunc(MapFile);
+                var mapping = JsonUtil.Deserialize<Dictionary<int, AssetInfo>>(mappingJson);
                 MergeMapping(mapping);
                 MapFile = null;
             }

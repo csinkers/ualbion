@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace UAlbion.Formats.Assets
 {
@@ -8,7 +9,14 @@ namespace UAlbion.Formats.Assets
         public ushort SpellPoints { get; set; }
         public ushort SpellPointsMax { get; set; }
         public SpellClasses SpellClasses { get; set; }
-        public IDictionary<SpellId, (bool, ushort)> SpellStrengths { get; private set; } = new Dictionary<SpellId, (bool, ushort)>();
+        [JsonIgnore] public IDictionary<SpellId, (bool, ushort)> SpellStrengths { get; private set; } = new Dictionary<SpellId, (bool, ushort)>();
+
+        [JsonInclude, JsonPropertyName("SpellStrengths")]
+        public IDictionary<string, (bool, ushort)> StringKeyedSpells // Ugh, messy hack to work around System.Text.Json having crappy dictionary key support.
+        {
+            get => SpellStrengths.ToDictionary(x => x.Key.ToString(), x => x.Value);
+            set => SpellStrengths = value.ToDictionary(x => SpellId.Parse(x.Key), x => x.Value);
+        }
 
         public MagicSkills DeepClone()
         {

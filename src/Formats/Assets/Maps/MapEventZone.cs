@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Maps
 {
-    [JsonConverter(typeof(ToStringJsonConverter))]
     public class MapEventZone 
     {
         public ZoneKey Key { get; }
@@ -58,7 +56,7 @@ namespace UAlbion.Formats.Assets.Maps
         }
 
         public override string ToString() => $"{(Global ? "GZ" : "Z")}({X}, {Y}) T({Trigger}) M({Unk1}) C({Chain}) E({Node?.Id})";
-        static readonly Regex ZoneRegex = new Regex(
+        static readonly Regex ZoneRegex = new(
             @"
 \s*(?<Type>Z|GZ)\((?<X>\d+),\s*(?<Y>\d+)\)\s*
 T\((?<Trigger>[^)]+)\)\s*

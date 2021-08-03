@@ -3,50 +3,49 @@
     public static class AssetProperty
     {
         // General
-        public const string Language = "Language";
-        public const string Mapping  = "Mapping";
-        public const string Max      = "Max";
-        public const string Offset   = "Offset";
-        public const string Pattern  = "Pattern";
+        public const string Language = "Language"; // string
+        public const string Mapping  = "Mapping"; // string
+        public const string Offset   = "Offset"; // int
+        public const string Pattern  = "Pattern"; // string
 
         // Textures
-        public const string Width      = "Width";
-        public const string Height     = "Height";
-        public const string PaletteId  = "PaletteId";
-        public const string SubSprites = "SubSprites";
-        public const string Transposed = "Transposed";
+        public const string Width      = "Width"; // int
+        public const string Height     = "Height"; // int
+        public const string PaletteId  = "PaletteId"; // int
+        public const string SubSprites = "SubSprites"; // string
+        public const string Transposed = "Transposed"; // bool
 
         // Palette
-        public const string IsCommon       = "IsCommon";
-        public const string AnimatedRanges = "AnimatedRanges";
+        public const string IsCommon       = "IsCommon"; // bool
+        public const string AnimatedRanges = "AnimatedRanges"; // string (e.g. "0x1-0xf, 0x12-0x1a")
 
         // Tileset gfx
-        public const string UseSmallGraphics = "UseSmallGraphics";
+        public const string UseSmallGraphics = "UseSmallGraphics"; // bool
 
         // 2D Tilesets
-        public const string BlankTilePath   = "BlankTilePath";
-        public const string GraphicsPattern = "GraphicsPattern";
+        public const string BlankTilePath   = "BlankTilePath"; // string
+        public const string GraphicsPattern = "GraphicsPattern"; // string
 
         // Maps
-        public const string LargeNpcs      = "LargeNpcs";
-        public const string SmallNpcs      = "SmallNpcs";
-        public const string TilesetPattern = "TilesetPattern";
+        public const string LargeNpcs      = "LargeNpcs"; // string
+        public const string SmallNpcs      = "SmallNpcs"; // string
+        public const string TilesetPattern = "TilesetPattern"; // string
 
         // NPC tileset
-        public const string IsSmall = "IsSmall";
+        public const string IsSmall = "IsSmall"; // bool
 
         // Isometric tileset/map properties
-        public const string BaseHeight           = "BaseHeight";
-        public const string CeilingPngPattern    = "CeilingPngPattern";
-        public const string ContentsPngPattern   = "ContentsPngPattern";
-        public const string FloorPngPattern      = "FloorPngPattern";
-        public const string TileHeight           = "TileHeight";
-        public const string TileWidth            = "TileWidth";
-        public const string TiledCeilingPattern  = "TiledCeilingPattern";
-        public const string TiledContentsPattern = "TiledContentsPattern";
-        public const string TiledFloorPattern    = "TiledFloorPattern";
-        public const string TiledWallPattern     = "TiledWallPattern";
-        public const string TilesPerRow          = "TilesPerRow";
-        public const string WallPngPattern       = "WallPngPattern";
+        public const string BaseHeight           = "BaseHeight"; // int
+        public const string CeilingPngPattern    = "CeilingPngPattern"; // string
+        public const string ContentsPngPattern   = "ContentsPngPattern"; // string
+        public const string FloorPngPattern      = "FloorPngPattern"; // string
+        public const string TileHeight           = "TileHeight"; // int
+        public const string TileWidth            = "TileWidth"; // int
+        public const string TiledCeilingPattern  = "TiledCeilingPattern"; // string
+        public const string TiledContentsPattern = "TiledContentsPattern"; // string
+        public const string TiledFloorPattern    = "TiledFloorPattern"; // string
+        public const string TiledWallPattern     = "TiledWallPattern"; // string
+        public const string TilesPerRow          = "TilesPerRow"; // int
+        public const string WallPngPattern       = "WallPngPattern"; // string
     }
 }

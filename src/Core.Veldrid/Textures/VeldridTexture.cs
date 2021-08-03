@@ -85,8 +85,7 @@ namespace UAlbion.Core.Veldrid.Textures
             bool mip = (usage & TextureUsage.GenerateMipmaps) != 0;
             uint mipLevels = mip ? MipLevelCount(texture.Width, texture.Height) : 1;
             using Texture staging = gd.ResourceFactory.CreateTexture(new TextureDescription(
-                (uint)texture.Width, (uint)texture.Height, 1,
-                mipLevels,
+                (uint)texture.Width, (uint)texture.Height, 1, mipLevels,
                 (uint)texture.ArrayLayers,
                 pixelFormat,
                 TextureUsage.Staging,
@@ -96,15 +95,24 @@ namespace UAlbion.Core.Veldrid.Textures
 
             for (int layer = 0; layer < texture.ArrayLayers; layer++)
             {
-                var buffer = texture.GetLayerBuffer(layer);
-                fixed (T* texDataPtr = &buffer.Buffer[0])
+                var mapped = gd.Map(staging, MapMode.Write, (uint)layer * mipLevels);
+                try
                 {
-                    gd.UpdateTexture(
-                        staging, (IntPtr)texDataPtr, (uint)(buffer.Buffer.Length * Unsafe.SizeOf<T>()),
-                        0, 0, 0,
-                        (uint)texture.Width, (uint)texture.Height, 1,
-                        0, (uint)layer);
+                    var span = new Span<T>(mapped.Data.ToPointer(), (int)mapped.SizeInBytes / sizeof(T));
+                    int pitch = (int)(mapped.RowPitch / sizeof(T));
+
+                    var source = texture.GetLayerBuffer(layer);
+                    var dest = new ImageBuffer<T>( texture.Width, texture.Height, pitch, span);
+
+                    BlitUtil.BlitDirect(source, dest);
+
+                    //gd.UpdateTexture(
+                    //    staging, (IntPtr) texDataPtr, (uint) (buffer.Buffer.Length * Unsafe.SizeOf<T>()),
+                    //    0, 0, 0,
+                    //    (uint) texture.Width, (uint) texture.Height, 1,
+                    //    0, (uint) layer);
                 }
+                finally { gd.Unmap(staging, (uint)layer * mipLevels); }
             }
 
             Texture veldridTexture = gd.ResourceFactory.CreateTexture(new TextureDescription(

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Text;
 using Xunit;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -43,7 +44,7 @@ namespace UAlbion.Game.Tests
                     .AddInfo(AssetId.From(Base.Font.RegularFont), MockUniformFont.Info)
                 ;
 
-            var config = GameConfig.LoadLiteral(@"{ ""UI"": { ""ButtonDoubleClickIntervalSeconds"": 0.35 } }");
+            var config = GameConfig.LoadLiteral(Encoding.UTF8.GetBytes(@"{ ""UI"": { ""ButtonDoubleClickIntervalSeconds"": 0.35 } }"));
             _exchange
                 .Register(config)
                 .Attach(modApplier)

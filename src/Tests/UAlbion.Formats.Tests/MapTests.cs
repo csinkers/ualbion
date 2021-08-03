@@ -14,7 +14,7 @@ namespace UAlbion.Formats.Tests
 
     public class MapTests
     {
-        static readonly AlbionPalette TestPalette = new AlbionPalette(
+        static readonly AlbionPalette TestPalette = new(
             1, "TestPal", new[]
                 {
                     0u, // 0 Transparent

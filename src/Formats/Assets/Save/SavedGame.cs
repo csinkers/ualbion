@@ -18,7 +18,7 @@ namespace UAlbion.Formats.Assets.Save
     {
         public const int MaxPartySize = 6;
         public const int MaxNpcCount = 96;
-        public static readonly DateTime Epoch = new DateTime(2200, 1, 1, 0, 0, 0);
+        public static readonly DateTime Epoch = new(2200, 1, 1, 0, 0, 0);
 
         public string Name { get; set; }
         public ushort Version { get; set; }
@@ -32,8 +32,8 @@ namespace UAlbion.Formats.Assets.Save
         public IDictionary<AssetId, Inventory> Inventories { get; } = new Dictionary<AssetId, Inventory>(); // TODO: Change to InventoryId?
         public IDictionary<AutomapId, byte[]> Automaps { get; } = new Dictionary<AutomapId, byte[]>();
 
-        readonly TickerDictionary _tickers  = new TickerDictionary();
-        readonly FlagDictionary _switches  = new FlagDictionary();
+        readonly TickerDictionary _tickers  = new();
+        readonly FlagDictionary _switches  = new();
         public IDictionary<TickerId, byte> Tickers => _tickers;
         public bool GetFlag(SwitchId flag) => _switches.GetFlag(flag);
         public void SetFlag(SwitchId flag, bool value) => _switches.SetFlag(flag, value);
@@ -42,14 +42,14 @@ namespace UAlbion.Formats.Assets.Save
         public uint Unk1 { get; set; }
         public byte[] Unk9 { get; set; }
         public byte[] Unknown15 { get; set; }
-        public MiscState Misc { get; private set; } = new MiscState();
+        public MiscState Misc { get; private set; } = new();
         public byte[] Unknown2C1 { get; set; }
         public byte[] Unknown5B9F { get; set; }
         public NpcState[] Npcs { get; } = new NpcState[MaxNpcCount];
         public byte[] Unknown5B71 { get; set; } 
         public Unknown35Byte[] Unk35Byte { get; set; } // Len = 16
-        public MapChangeCollection PermanentMapChanges { get; private set; } = new MapChangeCollection();
-        public MapChangeCollection TemporaryMapChanges { get; private set; } = new MapChangeCollection();
+        public MapChangeCollection PermanentMapChanges { get; private set; } = new();
+        public MapChangeCollection TemporaryMapChanges { get; private set; } = new();
         public IList<VisitedEvent> VisitedEvents { get; private set; } = new List<VisitedEvent>();
         public IList<PartyMemberId> ActiveMembers { get; private set; } = new PartyMemberId[MaxPartySize];
         public ISet<(AssetId, ushort)> DisabledChains { get; } = new HashSet<(AssetId, ushort)>();

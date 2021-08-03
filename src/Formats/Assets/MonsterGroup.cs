@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Config;
 
@@ -8,7 +9,7 @@ namespace UAlbion.Formats.Assets
     public class MonsterGroup
     {
         // 36 bytes = 2 bytes/slot, 6x3 combat grid.
-        public MonsterId[] Grid { get; private set; } = new MonsterId[6 * 3]; // setter required for JSON
+        [JsonInclude] public MonsterId[] Grid { get; private set; } = new MonsterId[6 * 3];
 
         public static MonsterGroup Serdes(int _, MonsterGroup m, AssetMapping mapping, ISerializer s)
         {

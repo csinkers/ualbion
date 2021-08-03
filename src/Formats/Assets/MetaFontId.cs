@@ -19,8 +19,8 @@ namespace UAlbion.Formats.Assets
 
         public static explicit operator ushort(MetaFontId id) => (ushort)((byte)id.Color << 8 | (id.IsBold ? 1 : 0));
         public static explicit operator MetaFontId(ushort id) => ToMetaFontId(id);
-        public static MetaFontId ToMetaFontId(int id) => new MetaFontId((id & 1) != 0, (FontColor)((id & 0xff00) >> 8));
-        public static MetaFontId ToMetaFontId(ushort id) => new MetaFontId((id & 1) != 0, (FontColor)((id & 0xff00) >> 8));
+        public static MetaFontId ToMetaFontId(int id) => new((id & 1) != 0, (FontColor)((id & 0xff00) >> 8));
+        public static MetaFontId ToMetaFontId(ushort id) => new((id & 1) != 0, (FontColor)((id & 0xff00) >> 8));
 
         public int ToInt32(IFormatProvider provider) => (int)this;
 

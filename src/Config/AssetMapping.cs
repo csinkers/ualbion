@@ -4,8 +4,8 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading;
-using Newtonsoft.Json;
 using UAlbion.Api;
 
 namespace UAlbion.Config
@@ -13,8 +13,8 @@ namespace UAlbion.Config
     public class AssetMapping
     {
         static readonly ThreadLocal<AssetMapping> ThreadLocalGlobal = 
-            new ThreadLocal<AssetMapping>(() => new AssetMapping());
-        static readonly AssetMapping TrueGlobal = new AssetMapping();
+            new(() => new AssetMapping());
+        static readonly AssetMapping TrueGlobal = new();
         static readonly AssetType[] AllAssetTypes =
             typeof(AssetType)
                 .GetEnumValues()
@@ -38,6 +38,7 @@ namespace UAlbion.Config
 
         readonly struct Range
         {
+            [JsonConstructor]
             public Range(int from, int to) { From = from; To = to; }
             public int From { get; }
             public int To { get; }
@@ -49,7 +50,7 @@ namespace UAlbion.Config
             [JsonIgnore] readonly string _enumTypeString;
             [JsonIgnore] public Type EnumType { get; set; }
             [JsonIgnore] public string EnumTypeString => _enumTypeString ?? EnumType.AssemblyQualifiedName;
-            [JsonConverter(typeof(ToStringJsonConverter))] public AssetType AssetType { get; set; }
+            public AssetType AssetType { get; set; }
             public int EnumMin { get; set; }
             public int EnumMax { get; set; }
             public int Offset { get; set; }
@@ -82,7 +83,7 @@ namespace UAlbion.Config
                 Ranges = values.Aggregate(new List<Range>(), (acc, x) =>
                     {
                         if (acc.Count == 0) acc.Add(new Range(x, x));
-                        else if (acc[acc.Count - 1].To == x - 1) acc[acc.Count - 1] = new Range(acc[acc.Count - 1].From, x);
+                        else if (acc[^1].To == x - 1) acc[^1] = new Range(acc[^1].From, x);
                         else acc.Add(new Range(x, x));
                         return acc;
                     })
@@ -103,20 +104,23 @@ namespace UAlbion.Config
                 .Select(_ => new List<EnumInfo>())
                 .ToArray(); // Keyed by AssetType, a byte enum
 
-        readonly Dictionary<Type, EnumInfo> _byEnumType = new Dictionary<Type, EnumInfo>();
-        readonly Dictionary<string, List<(EnumInfo, int)>> _byName = new Dictionary<string, List<(EnumInfo, int)>>();
-        readonly Dictionary<AssetId, (AssetId, ushort)> _stringLookup = new Dictionary<AssetId, (AssetId, ushort)>();
+        readonly Dictionary<Type, EnumInfo> _byEnumType = new();
+        readonly Dictionary<string, List<(EnumInfo, int)>> _byName = new();
+        readonly Dictionary<AssetId, (AssetId, ushort)> _stringLookup = new();
 
         public AssetMapping() { }
         AssetMapping(Dictionary<Type, EnumInfo> byEnumType)
         {
-            _byEnumType = byEnumType;
+            _byEnumType = byEnumType ?? throw new ArgumentNullException(nameof(byEnumType));
             foreach (var grouping in byEnumType.GroupBy(x => x.Value.AssetType))
             {
                 var typeMapping = _byAssetType[(byte)grouping.Key];
                 var ordered = grouping.OrderBy(x => x.Value.MappedMin);
                 typeMapping.AddRange(ordered.Select(kvp => kvp.Value));
             }
+
+            foreach (var info in byEnumType.Values)
+                RegisterNames(info);
         }
 
         public bool IsGlobal => Global == this;
@@ -292,7 +296,13 @@ namespace UAlbion.Config
 
             mapping.Add(info);
             _byEnumType[info.EnumType] = info;
+            RegisterNames(info);
 
+            return this;
+        }
+
+        void RegisterNames(EnumInfo info)
+        {
             foreach (var value in
                 Enum.GetValues(info.EnumType)
                 .Cast<object>()
@@ -306,8 +316,6 @@ namespace UAlbion.Config
                 }
                 entries.Add((info, value.Item2 + info.Offset));
             }
-
-            return this;
         }
 
         public AssetMapping RegisterStringRedirect(Type enumType, AssetId target, int min, int max, int offset)
@@ -389,15 +397,22 @@ namespace UAlbion.Config
                     yield return new AssetId(info.AssetType, i);
         }
 
-        public string Serialize(JsonSerializerSettings settings = null) => settings == null 
-            ? JsonConvert.SerializeObject(_byEnumType) 
-            : JsonConvert.SerializeObject(_byEnumType, settings);
-        public static AssetMapping Deserialize(string json)
+        public string Serialize() => JsonUtil.Serialize(
+            _byEnumType.ToDictionary(
+                x => x.Key.AssemblyQualifiedName,
+                x => x.Value));
+
+        public static AssetMapping Deserialize(byte[] json)
         {
-            var m = new AssetMapping(JsonConvert.DeserializeObject<Dictionary<Type, EnumInfo>>(json));
-            foreach (var kvp in m._byEnumType)
+            var stringKeyed = JsonUtil.Deserialize<Dictionary<string, EnumInfo>>(json);
+            var typeKeyed = stringKeyed.ToDictionary(
+                x => Type.GetType(x.Key),
+                x => x.Value);
+
+            foreach (var kvp in typeKeyed)
                 kvp.Value.EnumType = kvp.Key;
-            return m;
+
+            return new AssetMapping(typeKeyed);
         }
 
         public void MergeFrom(AssetMapping other)

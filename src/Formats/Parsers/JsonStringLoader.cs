@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Text;
-using Newtonsoft.Json;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 
@@ -13,8 +12,7 @@ namespace UAlbion.Formats.Parsers
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
-            var text = Encoding.UTF8.GetString(bytes);
-            return JsonConvert.DeserializeObject<IntStringDictionary>(text);
+            return JsonUtil.Deserialize<IntStringDictionary>(bytes);
         }
     }
 }

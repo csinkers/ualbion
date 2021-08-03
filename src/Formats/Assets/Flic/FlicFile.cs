@@ -72,6 +72,6 @@ namespace UAlbion.Formats.Assets.Flic
         public IList<FlicChunk> Chunks { get; } = new List<FlicChunk>();
 
         public delegate Span<byte> GetPixelDataFunc();
-        public FlicPlayer Play(GetPixelDataFunc getPixelData) => new FlicPlayer(this, getPixelData);
+        public FlicPlayer Play(GetPixelDataFunc getPixelData) => new(this, getPixelData);
     }
 }

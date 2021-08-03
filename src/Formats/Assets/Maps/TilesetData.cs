@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Config;
 
@@ -10,9 +11,9 @@ namespace UAlbion.Formats.Assets.Maps
         public const int TileCount = 4097;
         public TilesetData() { }
         public TilesetData(TilesetId id) => Id = id;
-        public TilesetId Id { get; private set; } // Setter required for JSON
+        [JsonInclude] public TilesetId Id { get; private set; } // Setter required for JSON
         public bool UseSmallGraphics { get; set; } // Careful if renaming: needs to match up to asset property in assets.json
-        public IList<TileData> Tiles { get; private set; } = new List<TileData>();
+        [JsonInclude] public IList<TileData> Tiles { get; private set; } = new List<TileData>();
 
         public static TilesetData Serdes(TilesetData td, ISerializer s, AssetInfo info)
         {

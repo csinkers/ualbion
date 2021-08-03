@@ -1,8 +1,8 @@
 {
-    "repo": "https://github.com/CSinkers/UAlbion",
-    "name":" UAlbion-Base",
-    "description": "Asset description information for the original Albion data files",
-    "author": "Cam Sinclair et al",
-    "version": "0.1.0",
-    "dependencies": [ "Shaders" ]
+    "Repo": "https://github.com/CSinkers/UAlbion",
+    "Name":" UAlbion-Base",
+    "Description": "Asset description information for the original Albion data files",
+    "Author": "Cam Sinclair et al",
+    "Version": "0.1.0",
+    "Dependencies": [ "Shaders" ]
 }

@@ -16,7 +16,7 @@ namespace UAlbion.Editor
         bool _showInspector;
         bool _showAssets;
 
-        readonly Dictionary<AssetType, AssetId[]> _allKeys = new Dictionary<AssetType, AssetId[]>();
+        readonly Dictionary<AssetType, AssetId[]> _allKeys = new();
 
         public EditorUi()
         {

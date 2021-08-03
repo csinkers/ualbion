@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Config;
 
@@ -128,7 +128,7 @@ namespace UAlbion.Formats.Assets
                 sb.Append($"E:{EnchantmentCount} MaxE:{MaxEnchantmentCount} ");
 
             if(Flags != 0)
-                sb.Append($"F:{Flags} ".Replace(", ", "|"));
+                sb.Append($"F:{Flags} ".Replace(", ", "|", StringComparison.InvariantCulture));
 
             if (Value != 0)
                 sb.Append($"${(decimal)Value / 10:F}");

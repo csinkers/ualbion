@@ -10,8 +10,8 @@ namespace UAlbion.Game.Tests
 {
     public class MockModApplier : ServiceComponent<IModApplier>, IModApplier
     {
-        readonly Dictionary<AssetId, object> _assets = new Dictionary<AssetId, object>();
-        readonly Dictionary<AssetId, AssetInfo> _infos = new Dictionary<AssetId, AssetInfo>();
+        readonly Dictionary<AssetId, object> _assets = new();
+        readonly Dictionary<AssetId, AssetInfo> _infos = new();
 
         public void LoadMods(IGeneralConfig config, IList<string> mods) { }
         public IModApplier AddAssetPostProcessor(IAssetPostProcessor postProcessor) => throw new NotImplementedException();

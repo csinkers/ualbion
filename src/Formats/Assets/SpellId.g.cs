@@ -5,14 +5,14 @@
 using System;
 using System.ComponentModel;
 using System.Globalization;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets
 {
-    [JsonConverter(typeof(ToStringJsonConverter))]
+    [JsonConverter(typeof(ToStringJsonConverter<SpellId>))]
     [TypeConverter(typeof(SpellIdConverter))]
     public readonly struct SpellId : IEquatable<SpellId>, IEquatable<AssetId>, IComparable, IAssetId
     {

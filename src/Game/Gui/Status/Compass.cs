@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Config;
-using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Events;

@@ -1,6 +1,6 @@
 {
-    "name": "UAlbion-Repacked",
-    "description": "Local location for repacking modified assets for testing with original game",
-    "version": "0.1.0",
-    "dependencies": [ "Shaders" ]
+    "Name": "UAlbion-Repacked",
+    "Description": "Local location for repacking modified assets for testing with original game",
+    "Version": "0.1.0",
+    "Dependencies": [ "Shaders" ]
 }

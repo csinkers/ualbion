@@ -41,7 +41,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                     if (existing[stampNumber].Width == 0 || existing[stampNumber].Height == 0)
                         return Array.Empty<byte>();
                     var stamp = new Stamp(stampNumber, existing[stampNumber], tileset);
-                    return FormatUtil.BytesFromTextWriter(stamp.Serialize);
+                    return Encoding.UTF8.GetBytes(stamp.Serialize());
                 });
 
                 return existing;
@@ -50,8 +50,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             var list = new BlockList();
             foreach (var (jsonBytes, _) in PackedChunks.Unpack(s))
             {
-                var json = Encoding.UTF8.GetString(jsonBytes);
-                var stamp = Stamp.Parse(json);
+                var stamp = Stamp.Parse(jsonBytes);
                 var block = stamp != null ? stamp.ToBlock() : new Block();
                 list.Add(block);
             }

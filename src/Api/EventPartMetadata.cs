@@ -6,7 +6,7 @@ namespace UAlbion.Api
 {
     public class EventPartMetadata
     {
-        static readonly EventPartParsers Parsers = new EventPartParsers();
+        static readonly EventPartParsers Parsers = new();
 
         public string Name { get; }
         public string HelpText { get; }
@@ -51,7 +51,7 @@ namespace UAlbion.Api
                     instance).Compile();
 
             return ApiUtil.IsFlagsEnum(property.PropertyType)
-                ? x => (getter(x)?.ToString() ?? "").Replace(", ", "|")
+                ? x => (getter(x)?.ToString() ?? "").Replace(", ", "|", StringComparison.InvariantCulture)
                 : getter;
         }
     }

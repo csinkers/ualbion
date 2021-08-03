@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -29,11 +30,11 @@ namespace UAlbion.Formats.Assets
         }
 
         // Grouped
-        public MagicSkills Magic { get; set; } = new MagicSkills();
+        public MagicSkills Magic { get; set; } = new();
         public Inventory Inventory { get; set; }
-        public CharacterAttributes Attributes { get; set; } = new CharacterAttributes();
-        public CharacterSkills Skills { get; set; } = new CharacterSkills();
-        public CombatAttributes Combat { get; set; } = new CombatAttributes();
+        public CharacterAttributes Attributes { get; set; } = new();
+        public CharacterSkills Skills { get; set; } = new();
+        public CombatAttributes Combat { get; set; } = new();
         IMagicSkills ICharacterSheet.Magic => Magic;
         IInventory ICharacterSheet.Inventory => Inventory;
         ICharacterAttributes ICharacterSheet.Attributes => Attributes;
@@ -48,7 +49,7 @@ namespace UAlbion.Formats.Assets
             _ => $"{Id} UNKNOWN TYPE {Type}" };
 
         // Names
-        public CharacterId Id { get; }
+        [JsonInclude] public CharacterId Id { get; private set; }
         public string EnglishName { get; set; }
         public string GermanName { get; set; }
         public string FrenchName { get; set; }

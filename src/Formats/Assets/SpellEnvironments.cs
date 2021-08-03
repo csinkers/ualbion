@@ -1,11 +1,8 @@
 ﻿using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace UAlbion.Formats.Assets
 {
     [Flags]
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum SpellEnvironments : byte
     {
         // The first 4 always appear together: reversing of

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using SerdesNet;
 using System.Linq;
 using System.Numerics;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using UAlbion.Api;
 using UAlbion.Config;
 
@@ -14,7 +14,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public const int MaxWalls = 155;
         public const int MaxObjectGroups = 100;
 
-        public LabyrinthId Id { get; private set; }
+        [JsonInclude] public LabyrinthId Id { get; private set; }
         public ushort WallHeight { get; set; }
         public ushort CameraHeight { get; set; } // EffectiveHeight = (CameraHeight << 16) + 165??
         public ushort Unk4 { get; set; }
@@ -37,11 +37,11 @@ namespace UAlbion.Formats.Assets.Labyrinth
         public ushort Unk20 { get; set; }
         public ushort Lighting { get; set; }
         public ushort Unk24 { get; set; }
-        public IList<ObjectGroup> ObjectGroups { get; } = new List<ObjectGroup>();
-        public IList<LabyrinthObject> Objects { get; } = new List<LabyrinthObject>();
-        public IList<FloorAndCeiling> FloorAndCeilings { get; } = new List<FloorAndCeiling>();
-        public IList<Wall> Walls { get; } = new List<Wall>();
-        public Vector3 TileSize => new Vector3(EffectiveWallWidth, WallHeight, EffectiveWallWidth);
+        [JsonInclude] public IList<ObjectGroup> ObjectGroups { get; private set; } = new List<ObjectGroup>();
+        [JsonInclude] public IList<LabyrinthObject> Objects { get; private set; } = new List<LabyrinthObject>();
+        [JsonInclude] public IList<FloorAndCeiling> FloorAndCeilings { get; private set; } = new List<FloorAndCeiling>();
+        [JsonInclude] public IList<Wall> Walls { get; private set; } = new List<Wall>();
+        public Vector3 TileSize => new(EffectiveWallWidth, WallHeight, EffectiveWallWidth);
         public uint FogColor => ApiUtil.PackColor(
             (byte)(FogRed >> 8),
             (byte)(FogGreen >> 8),

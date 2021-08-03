@@ -1,9 +1,5 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
-namespace UAlbion.Formats.Assets
+﻿namespace UAlbion.Formats.Assets
 {
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum AmmunitionType : byte
     {
         Intrinsic = 0, // used for throwing axes etc, as well as items that aren't ranged weapons

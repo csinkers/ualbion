@@ -1,10 +1,7 @@
 ﻿using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace UAlbion.Formats.Assets
 {
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum PlayerClass : byte
     {
         Pilot = 0,
@@ -20,7 +17,6 @@ namespace UAlbion.Formats.Assets
     }
 
     [Flags]
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum PlayerClasses : ushort
     {
         Pilot = 0x1,

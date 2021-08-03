@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using UAlbion.Api;
 
 namespace UAlbion.Config
@@ -13,9 +13,9 @@ namespace UAlbion.Config
         public string Description { get; set; }
         public string Author { get; set; }
         public Version Version { get; set; }
-        [JsonProperty("asset_path")] public string AssetPath { get; set; }
-        [JsonProperty("shader_path")] public string ShaderPath { get; set; }
-        public List<string> Dependencies { get; } = new List<string>();
+        public string AssetPath { get; set; }
+        public string ShaderPath { get; set; }
+        [JsonInclude] public List<string> Dependencies { get; private set; } = new();
 
         public static ModConfig Load(string configPath, IFileSystem disk)
         {
@@ -23,8 +23,8 @@ namespace UAlbion.Config
             if (!disk.FileExists(configPath))
                 throw new FileNotFoundException($"mod.config not found for mod {configPath}");
 
-            var configText = disk.ReadAllText(configPath);
-            return JsonConvert.DeserializeObject<ModConfig>(configText);
+            var configText = disk.ReadAllBytes(configPath);
+            return JsonUtil.Deserialize<ModConfig>(configText);
         }
     }
 }

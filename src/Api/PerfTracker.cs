@@ -85,7 +85,7 @@ namespace UAlbion.Api
         static readonly Stopwatch StartupStopwatch = Stopwatch.StartNew();
         static readonly IDictionary<string, Stats> FrameTimes = new Dictionary<string, Stats>();
         static readonly IDictionary<string, int> FrameCounters = new Dictionary<string, int>();
-        static readonly object SyncRoot = new object();
+        static readonly object SyncRoot = new();
         static int _frameCount;
 
         public static void BeginFrame()

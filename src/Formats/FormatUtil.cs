@@ -30,13 +30,13 @@ namespace UAlbion.Formats
         public static string BytesTo850String(byte[] bytes) =>
             AlbionEncoding
                 .GetString(bytes)
-                .Replace("×", "ß")
+                .Replace("×", "ß", StringComparison.InvariantCulture)
                 .TrimEnd((char)0);
 
         public static byte[] BytesFrom850String(string str)
         {
             if (str == null) throw new ArgumentNullException(nameof(str));
-            return AlbionEncoding.GetBytes(str.Replace("ß", "×"));
+            return AlbionEncoding.GetBytes(str.Replace("ß", "×", StringComparison.InvariantCulture));
         }
 
         public static string WordWrap(string s, int maxLine)

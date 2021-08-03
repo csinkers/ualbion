@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
@@ -24,7 +24,7 @@ namespace UAlbion.Formats.Assets
 
         public uint Id { get; private set; }
         public string Name { get; private set; }
-        public uint[] Entries { get; private set; } = new uint[EntryCount];
+        [JsonInclude] public uint[] Entries { get; private set; } = new uint[EntryCount];
         [JsonIgnore] public bool IsAnimated => Period > 1;
         [JsonIgnore] public int Period { get; private set; }
 
@@ -223,9 +223,9 @@ namespace UAlbion.Formats.Assets
         }
 
         static IEnumerable<(byte, byte)> ParseRanges(AssetInfo info) =>
-            info.GetArray<string>(AssetProperty.AnimatedRanges)?.Select(x =>
+            info.Get<string>(AssetProperty.AnimatedRanges, null)?.Split(',').Select(x =>
             {
-                var parts = x.Split('-');
+                var parts = x.Trim().Split('-');
                 if (parts.Length != 2)
                 {
                     throw new InvalidOperationException(

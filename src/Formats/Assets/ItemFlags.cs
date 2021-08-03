@@ -1,11 +1,8 @@
 ﻿using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace UAlbion.Formats.Assets
 {
     [Flags]
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum ItemFlags : ushort
     {
         Unk0      = 1, // Double battle-axe only

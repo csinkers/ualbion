@@ -31,10 +31,10 @@ namespace DumpSave
 
         static readonly Command[] Commands =
         {
-            new Command("dve", DumpVisitedEvents, "Dump Visited Events: Dump details of events and conversation paths that have been triggered."),
-            new Command("dtc", DumpTempMapChanges, "Dump Temp Changes: Dump details of temporary changes to the current map."),
-            new Command("dpc", DumpPermMapChanges, "Dump Perm Changes: Dump details of permanent changes to all maps."),
-            new Command("dn", DumpNpcs, "Dump NPC states: Dump details of NPCs on the current map.")
+            new("dve", DumpVisitedEvents, "Dump Visited Events: Dump details of events and conversation paths that have been triggered."),
+            new("dtc", DumpTempMapChanges, "Dump Temp Changes: Dump details of temporary changes to the current map."),
+            new("dpc", DumpPermMapChanges, "Dump Perm Changes: Dump details of permanent changes to all maps."),
+            new("dn", DumpNpcs, "Dump NPC states: Dump details of NPCs on the current map.")
         };
 
         static void DumpVisitedEvents(SavedGame save)

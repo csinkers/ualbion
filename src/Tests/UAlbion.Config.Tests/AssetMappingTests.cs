@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -27,11 +27,11 @@ namespace UAlbion.Config.Tests
         {
             var m = AssetMapping.Global.Clear();
             m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait);
-            Assert.Equal(new AssetId(AssetType.Portrait, 0), m.EnumToId(ZeroBasedByte.Zero));
+            Assert.Equal(new AssetId(AssetType.Portrait), m.EnumToId(ZeroBasedByte.Zero));
             Assert.Equal(new AssetId(AssetType.Portrait, 1), m.EnumToId(ZeroBasedByte.One));
             Assert.Equal(new AssetId(AssetType.Portrait, 2), m.EnumToId(ZeroBasedByte.Two));
 
-            Assert.Equal(new AssetId(AssetType.Portrait, 0), m.EnumToId(typeof(ZeroBasedByte), 0));
+            Assert.Equal(new AssetId(AssetType.Portrait), m.EnumToId(typeof(ZeroBasedByte), 0));
             Assert.Equal(new AssetId(AssetType.Portrait, 1), m.EnumToId(typeof(ZeroBasedByte), 1));
             Assert.Equal(new AssetId(AssetType.Portrait, 2), m.EnumToId(typeof(ZeroBasedByte), 2));
             Assert.Throws<ArgumentOutOfRangeException>(() => m.EnumToId(typeof(ZeroBasedByte), 3));
@@ -69,7 +69,7 @@ namespace UAlbion.Config.Tests
         {
             var m = new AssetMapping().RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait);
             // Used to throw, but now we forgive it to prevent issues when a mod overrides some assets using a dependency's ids.
-            m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait); 
+            m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait);
             m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Automap);
         }
 
@@ -133,17 +133,67 @@ namespace UAlbion.Config.Tests
                 x => Assert.Equal("ZeroBasedShort.Two", x.ToString())
             );
 
-            var json = m.Serialize(new JsonSerializerSettings { Formatting = Formatting.None });
-            const string expectedJson = "{" + 
-                                        @"""UAlbion.Config.Tests.AssetMappingTests+ZeroBasedByte, UAlbion.Config.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"":{""AssetType"":""Portrait"",""EnumMin"":0,""EnumMax"":2,""Offset"":0,""Ranges"":[{""From"":0,""To"":2}]}," + 
-                                        @"""UAlbion.Config.Tests.AssetMappingTests+OneBasedByte, UAlbion.Config.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"":{""AssetType"":""Portrait"",""EnumMin"":1,""EnumMax"":3,""Offset"":2,""Ranges"":[{""From"":3,""To"":5}]}," +
-                                        @"""UAlbion.Config.Tests.AssetMappingTests+GapByteZero, UAlbion.Config.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"":{""AssetType"":""Map"",""EnumMin"":0,""EnumMax"":255,""Offset"":0,""Ranges"":[{""From"":0,""To"":1},{""From"":255,""To"":255}]}," +
-                                        @"""UAlbion.Config.Tests.AssetMappingTests+ZeroBasedShort, UAlbion.Config.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"":{""AssetType"":""Map"",""EnumMin"":0,""EnumMax"":2,""Offset"":256,""Ranges"":[{""From"":256,""To"":258}]}"
-                                        + "}";
+            var json = m.Serialize();
+            const string expectedJson =
+                @"{
+  ""UAlbion.Config.Tests.AssetMappingTests+ZeroBasedByte, UAlbion.Config.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"": {
+    ""AssetType"": ""Portrait"",
+    ""EnumMin"": 0,
+    ""EnumMax"": 2,
+    ""Offset"": 0,
+    ""Ranges"": [
+      {
+        ""From"": 0,
+        ""To"": 2
+      }
+    ]
+  },
+  ""UAlbion.Config.Tests.AssetMappingTests+OneBasedByte, UAlbion.Config.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"": {
+    ""AssetType"": ""Portrait"",
+    ""EnumMin"": 1,
+    ""EnumMax"": 3,
+    ""Offset"": 2,
+    ""Ranges"": [
+      {
+        ""From"": 3,
+        ""To"": 5
+      }
+    ]
+  },
+  ""UAlbion.Config.Tests.AssetMappingTests+GapByteZero, UAlbion.Config.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"": {
+    ""AssetType"": ""Map"",
+    ""EnumMin"": 0,
+    ""EnumMax"": 255,
+    ""Offset"": 0,
+    ""Ranges"": [
+      {
+        ""From"": 0,
+        ""To"": 1
+      },
+      {
+        ""From"": 255,
+        ""To"": 255
+      }
+    ]
+  },
+  ""UAlbion.Config.Tests.AssetMappingTests+ZeroBasedShort, UAlbion.Config.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"": {
+    ""AssetType"": ""Map"",
+    ""EnumMin"": 0,
+    ""EnumMax"": 2,
+    ""Offset"": 256,
+    ""Ranges"": [
+      {
+        ""From"": 256,
+        ""To"": 258
+      }
+    ]
+  }
+}";
             Assert.Equal(expectedJson, json);
 
-            var roundTripped = AssetMapping.Deserialize(json);
-            Assert.Collection(roundTripped.EnumerateAssetsOfType(AssetType.Portrait),
+            var roundTripped = AssetMapping.Deserialize(Encoding.UTF8.GetBytes(json));
+            var portraitAssets = roundTripped.EnumerateAssetsOfType(AssetType.Portrait).ToList();
+            Assert.Collection(portraitAssets,
                 x => Assert.Equal("ZeroBasedByte.Zero", x.ToString()),
                 x => Assert.Equal("ZeroBasedByte.One", x.ToString()),
                 x => Assert.Equal("ZeroBasedByte.Two", x.ToString()),
@@ -152,7 +202,8 @@ namespace UAlbion.Config.Tests
                 x => Assert.Equal("OneBasedByte.Three", x.ToString())
             );
 
-            Assert.Collection(roundTripped.EnumerateAssetsOfType(AssetType.Map),
+            var mapAssets = roundTripped.EnumerateAssetsOfType(AssetType.Map);
+            Assert.Collection(mapAssets,
                 x => Assert.Equal("GapByteZero.Zero", x.ToString()),
                 x => Assert.Equal("GapByteZero.One", x.ToString()),
                 x => Assert.Equal("GapByteZero.Foo255", x.ToString()),
@@ -185,8 +236,8 @@ namespace UAlbion.Config.Tests
             m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait);
             m.RegisterAssetType(typeof(OneBasedByte), AssetType.Npc);
 
-            Assert.Equal(new AssetId(AssetType.Unknown, 0), m.Parse("somethinginvalid", null));
-            Assert.Equal(new AssetId(AssetType.Unknown, 0), m.Parse("Portrait.nonsense", null));
+            Assert.Equal(new AssetId(AssetType.Unknown), m.Parse("somethinginvalid", null));
+            Assert.Equal(new AssetId(AssetType.Unknown), m.Parse("Portrait.nonsense", null));
             Assert.Throws<FormatException>(() => m.Parse("0", null));
             Assert.Equal(AssetId.From(ZeroBasedByte.Zero), m.Parse("0", new[] { AssetType.Portrait }));
             Assert.Equal(AssetId.From(ZeroBasedByte.One), m.Parse("1", new[] { AssetType.Portrait }));
@@ -242,13 +293,13 @@ namespace UAlbion.Config.Tests
             Assert.Equal(AssetId.None, m.Parse("None", null)); // Succeeds due to special case
             Assert.Equal(AssetId.None, m.Parse("None.0", null));
 
-            Assert.Equal(new AssetId(AssetType.Unknown, 0), m.Parse("Gold", null));
-            Assert.Equal(new AssetId(AssetType.Unknown, 0), m.Parse("Rations", null));
+            Assert.Equal(new AssetId(AssetType.Unknown), m.Parse("Gold", null));
+            Assert.Equal(new AssetId(AssetType.Unknown), m.Parse("Rations", null));
             Assert.Equal(AssetId.Gold, m.Parse("Gold.0", null));
             Assert.Equal(AssetId.Rations, m.Parse("Rations.0", null));
 
-            Assert.Equal(new AssetId(AssetType.Unknown, 0), m.Parse("Unknown", null));
-            Assert.Equal(new AssetId(AssetType.Unknown, 0), m.Parse("Unknown.0", null));
+            Assert.Equal(new AssetId(AssetType.Unknown), m.Parse("Unknown", null));
+            Assert.Equal(new AssetId(AssetType.Unknown), m.Parse("Unknown.0", null));
         }
 
         [Fact]
@@ -269,7 +320,7 @@ namespace UAlbion.Config.Tests
             var m = AssetMapping.Global.Clear();
             Assert.Equal(new AssetId(AssetType.Unknown, 1), m.Parse("Unknown.1", null));
             Assert.Equal(new AssetId(AssetType.Unknown, 2), m.Parse("Unknown.2", null));
-            Assert.Equal(new AssetId(AssetType.Unknown, 0), m.Parse("Unknown.0", null));
+            Assert.Equal(new AssetId(AssetType.Unknown), m.Parse("Unknown.0", null));
         }
 
         [Fact]

@@ -1,11 +1,8 @@
 ﻿using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace UAlbion.Formats.Assets.Maps
 {
     [Flags]
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum NpcFlags : byte
     {
         Wander    = 1 << 0, // If not will always move towards the party

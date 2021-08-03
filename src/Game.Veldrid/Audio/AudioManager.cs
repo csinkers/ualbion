@@ -24,8 +24,8 @@ namespace UAlbion.Game.Veldrid.Audio
         readonly IDictionary<SampleId, AudioBuffer> _sampleCache = new Dictionary<SampleId, AudioBuffer>();
         readonly IDictionary<(SongId, int), AudioBuffer> _waveLibCache = new Dictionary<(SongId, int), AudioBuffer>();
         readonly IList<ActiveSound> _activeSounds = new List<ActiveSound>();
-        readonly ManualResetEvent _doneEvent = new ManualResetEvent(false);
-        readonly object _syncRoot = new object();
+        readonly ManualResetEvent _doneEvent = new(false);
+        readonly object _syncRoot = new();
 
         StreamingAudioSource _music;
         AlbionMusicGenerator _musicGenerator;

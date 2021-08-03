@@ -1,10 +1,7 @@
 ﻿using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace UAlbion.Formats.Assets
 {
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum ItemSlotId : byte // Enum values that are more convenient for in-memory use (item slot array accessing etc)
     {
         // Regular slots (only the first is named as they're generally accessed numerically)

@@ -23,7 +23,7 @@ namespace UAlbion.Formats.Parsers
 
         static AlbionSample Read(ISerializer s)
         {
-            return new AlbionSample
+            return new()
             {
                 SampleRate = SampleRate,
                 Channels= Channels,

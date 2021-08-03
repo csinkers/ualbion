@@ -8,9 +8,9 @@ namespace UAlbion.Editor
     {
         const int MaxUndo = 100;
         int _nextId;
-        readonly Dictionary<int, EditorAsset> _assetsById = new Dictionary<int, EditorAsset>();
-        readonly Dictionary<object, int> _idsByAsset = new Dictionary<object, int>();
-        readonly LinkedList<IEditorEvent> _undoStack = new LinkedList<IEditorEvent>();
+        readonly Dictionary<int, EditorAsset> _assetsById = new();
+        readonly Dictionary<object, int> _idsByAsset = new();
+        readonly LinkedList<IEditorEvent> _undoStack = new();
         // Cross references: IDictionary<AssetId, IList<(object, string)>> - requires loading total state.
 
         public EditorAssetManager()

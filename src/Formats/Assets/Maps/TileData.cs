@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api;
 

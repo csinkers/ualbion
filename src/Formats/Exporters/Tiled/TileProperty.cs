@@ -9,6 +9,6 @@ namespace UAlbion.Formats.Exporters.Tiled
         [XmlAttribute("value")] public string Value { get; set; }
 
         public static TileProperty Bool(string name, string value)
-            => new TileProperty { Type = "boolean", Name = name, Value = value };
+            => new() { Type = "boolean", Name = name, Value = value };
     }
 }

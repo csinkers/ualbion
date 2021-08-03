@@ -6,7 +6,7 @@ using Veldrid;
 
 namespace UAlbion.Core.Veldrid
 {
-    public sealed class SkyboxManager : Component, ISkyboxManager, IDisposable
+    public sealed class SkyboxManager : ServiceComponent<ISkyboxManager>, ISkyboxManager, IDisposable
     {
         readonly SamplerHolder _skyboxSampler;
 

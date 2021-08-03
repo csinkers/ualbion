@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -48,7 +47,7 @@ namespace UAlbion.Formats.Containers
             foreach(var (info, bytes) in assets)
                 dict[info.AssetId.ToString()] = Encoding.UTF8.GetString(bytes);
 
-            var fullText = JsonConvert.SerializeObject(dict, ConfigUtil.JsonSerializerSettings);
+            var fullText = JsonUtil.Serialize(dict);
             disk.WriteAllText(path, fullText);
         }
 
@@ -63,8 +62,8 @@ namespace UAlbion.Formats.Containers
 
         static IDictionary<AssetId, string> Load(string path, IFileSystem disk)
         {
-            var text = disk.ReadAllText(path);
-            var dict = (IDictionary<string, string>)JsonConvert.DeserializeObject<IDictionary<string, string>>(text);
+            var text = disk.ReadAllBytes(path);
+            var dict = JsonUtil.Deserialize<IDictionary<string, string>>(text);
             if (dict == null)
                 throw new FileLoadException($"Could not deserialize \"{path}\"");
 

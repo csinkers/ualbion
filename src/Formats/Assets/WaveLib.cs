@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using SerdesNet;
 
 namespace UAlbion.Formats.Assets
@@ -23,7 +24,7 @@ namespace UAlbion.Formats.Assets
             return w;
         }
 
-        public WaveLibSample[] Samples { get; private set; } = new WaveLibSample[MaxSamples];
+        [JsonInclude] public WaveLibSample[] Samples { get; private set; } = new WaveLibSample[MaxSamples];
         public void ClearInstrumentIndex() => _instrumentIndex = null; // Should be called if the instrument mapping is changed
 
         public ISample this[int instrument]

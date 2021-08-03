@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Globalization;
-using Newtonsoft.Json;
-using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets.Maps
 {
-    [JsonConverter(typeof(ToStringJsonConverter))]
     public struct NpcWaypoint : IEquatable<NpcWaypoint>
     {
         public NpcWaypoint(byte x, byte y)

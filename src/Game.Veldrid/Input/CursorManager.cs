@@ -5,6 +5,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Visual;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
@@ -64,10 +65,10 @@ namespace UAlbion.Game.Veldrid.Input
             var config = assets.GetAssetInfo(cursorId);
 
             _cursorId = cursorId;
-            var hotspot = config?.GetRaw("Hotspot");
+            var hotspot = CursorHotspot.Parse(config?.Get<string>("Hotspot", null));
             _hotspot = hotspot == null
                 ? Vector2.Zero
-                : window.GuiScale * new Vector2(hotspot.Value<int>("X"), hotspot.Value<int>("Y"));
+                : window.GuiScale * new Vector2(hotspot.X, hotspot.Y);
             _dirty = true;
         }
 

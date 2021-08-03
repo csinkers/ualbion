@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System;
 using System.Xml.Serialization;
 
 namespace UAlbion.Formats.Exporters.Tiled
@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Exporters.Tiled
         public ObjectProperty(string key, string value)
         {
             Name = key;
-            if (value.Contains('\n') || value.Contains('\r'))
+            if (value != null && (value.Contains('\n', StringComparison.Ordinal) || value.Contains('\r', StringComparison.Ordinal)))
                 MultiLine = value;
             else
                 Value = value;

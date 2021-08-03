@@ -44,7 +44,7 @@ namespace UAlbion.Base.Tests
             }
         }
 
-        static readonly XldContainer XldLoader = new XldContainer();
+        static readonly XldContainer XldLoader = new();
 
         byte[] BytesFromXld(IGeneralConfig conf, string path, AssetInfo info)
         {
@@ -194,7 +194,6 @@ namespace UAlbion.Base.Tests
                 (x, s) => MapData2D.Serdes(info, x, AssetMapping.Global, s));
         }
 
-
         [Fact]
         public void Map3DTest()
         {
@@ -231,7 +230,7 @@ namespace UAlbion.Base.Tests
         public void MonsterTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Monster.Krondir1) };
-            RoundTripXld<CharacterSheet>(nameof(MonsterTest), "$(XLD)/MONCHAR0.XLD", 3,
+            RoundTripXld<CharacterSheet>(nameof(MonsterTest), "$(XLD)/MONCHAR0.XLD", 9,
                 (x, s) => Loaders.CharacterSheetLoader.Serdes(x, info, AssetMapping.Global, s));
         }
 

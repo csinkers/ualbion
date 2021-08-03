@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using Newtonsoft.Json;
 using UAlbion.Api;
 
 namespace UAlbion.Core
@@ -37,9 +36,8 @@ namespace UAlbion.Core
             if (!disk.FileExists(configPath))
                 return new CoreConfig();
 
-            var configText = disk.ReadAllText(configPath);
-            return (CoreConfig)JsonConvert.DeserializeObject<CoreConfig>(configText,
-                new JsonSerializerSettings { ContractResolver = new PrivatePropertyJsonContractResolver() });
+            var configText = disk.ReadAllBytes(configPath);
+            return JsonUtil.Deserialize<CoreConfig>(configText);
         }
     }
 #pragma warning restore CA1034 // Nested types should not be visible

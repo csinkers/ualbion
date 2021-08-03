@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UAlbion.Api;
 
 namespace UAlbion.Formats.Assets
 {

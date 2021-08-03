@@ -30,7 +30,7 @@ namespace UAlbion.Game.Assets
         {
             Languages = new ReadOnlyDictionary<string, LanguageConfig>(_languages);
             AttachChild(_assetCache);
-            On<SetLanguageEvent>(e =>
+            On<SetLanguageEvent>(_ =>
             {
                 // TODO: Different languages could have different sub-id ranges in their
                 // container files, so we should really be invalidating / rebuilding the whole asset config too.
@@ -127,7 +127,7 @@ namespace UAlbion.Game.Assets
             assetConfig.PopulateAssetIds(
                 AssetMapping.Global,
                 x => _assetLocator.GetSubItemRangesForFile(x, extraPaths),
-                x => disk.ReadAllText(generalConfig.ResolvePath(x, extraPaths)));
+                x => disk.ReadAllBytes(generalConfig.ResolvePath(x, extraPaths)));
             _mods.Add(modName, modInfo);
             _modsInReverseDependencyOrder.Add(modInfo);
         }
@@ -308,12 +308,12 @@ namespace UAlbion.Game.Assets
                     if (container is XldContainer)
                         idsInRange = idsInRange.Where(x => x < 100);
 
-                    int maxSubId = file.Get(AssetProperty.Max, -1);
-                    if (maxSubId != -1)
-                        idsInRange = idsInRange.Where(x => x <= maxSubId);
+                    int? maxSubId = file.Max;
+                    if (maxSubId.HasValue)
+                        idsInRange = idsInRange.Where(x => x <= maxSubId.Value);
 
                     return FormatUtil.SortedIntsToRanges(idsInRange);
-                }, x => disk.ReadAllText(config.ResolvePath(x, extraPaths)));
+                }, x => disk.ReadAllBytes(config.ResolvePath(x, extraPaths)));
 
             Resolve<IGeneralConfig>().SetPath("MOD", target.AssetPath);
             foreach (var file in target.AssetConfig.Files.Values)

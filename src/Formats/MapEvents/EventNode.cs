@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using Newtonsoft.Json;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -12,7 +11,6 @@ using static System.FormattableString;
 namespace UAlbion.Formats.MapEvents
 {
     [DebuggerDisplay("{ToString()}")]
-    [JsonConverter(typeof(ToStringJsonConverter))]
     public class EventNode : IEventNode
     {
         bool DirectSequence => (Next?.Id ?? Id + 1) == Id + 1;

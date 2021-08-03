@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -46,7 +45,7 @@ namespace UAlbion.Game.Settings
                 throw new FileNotFoundException($"Could not find default settings file (expected at {path})");
 
             var settings = disk.FileExists(path) 
-                ? JsonConvert.DeserializeObject<GeneralSettings>(disk.ReadAllText(path)) 
+                ? JsonUtil.Deserialize<GeneralSettings>(disk.ReadAllBytes(path)) 
                 : new GeneralSettings();
 
             if (!settings.ActiveMods.Any())
@@ -59,18 +58,12 @@ namespace UAlbion.Game.Settings
             if (config == null) throw new ArgumentNullException(nameof(config));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
 
-            var serializerSettings = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented,
-                NullValueHandling = NullValueHandling.Ignore
-            };
-
             var path = config.ResolvePath(UserPath);
             var dir = Path.GetDirectoryName(path);
             if (!disk.DirectoryExists(dir))
                 disk.CreateDirectory(dir);
 
-            var json = JsonConvert.SerializeObject(this, serializerSettings);
+            var json = JsonUtil.Serialize(this);
             disk.WriteAllText(path, json);
         }
     }

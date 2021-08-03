@@ -10,7 +10,7 @@ namespace UAlbion.Formats.Assets.Save
         public const int OriginalSaveGameMax = 600;
         public static int PackedSize(int min, int max) => (max-min + 7) / 8;
 
-        readonly HashSet<SwitchId> _set = new HashSet<SwitchId>();
+        readonly HashSet<SwitchId> _set = new();
 
         public bool GetFlag(SwitchId flag) => _set.Contains(flag);
         public void SetFlag(SwitchId flag, bool value)

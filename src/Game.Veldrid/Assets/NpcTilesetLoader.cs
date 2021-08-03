@@ -15,7 +15,7 @@ namespace UAlbion.Game.Veldrid.Assets
 {
     public class NpcTilesetLoader : Component, IAssetLoader
     {
-        readonly PngLoader _pngLoader = new PngLoader();
+        readonly PngLoader _pngLoader = new();
 
         public NpcTilesetLoader() => AttachChild(_pngLoader);
         public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)

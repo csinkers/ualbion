@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Globalization;
-using Newtonsoft.Json;
 using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets
 {
-    [JsonConverter(typeof(ToStringJsonConverter))]
     public struct InventoryId : IEquatable<InventoryId>
     {
         public InventoryId(AssetId id)
@@ -73,7 +71,7 @@ namespace UAlbion.Formats.Assets
         public static int ToInt32(InventoryId id) => (int)id.Type << 16 | id.Id;
         public static explicit operator InventoryId(int id) => ToInventoryId(id);
         public static InventoryId ToInventoryId(int id)
-            => new InventoryId(
+            => new(
                 (InventoryType)((id & 0x7fff0000) >> 16),
                 (ushort)(id & 0xffff));
 
@@ -82,8 +80,8 @@ namespace UAlbion.Formats.Assets
         public static explicit operator InventoryId(ChestId id) => ToInventoryId(id);
         public static explicit operator InventoryId(MerchantId id) => ToInventoryId(id);
         public static explicit operator AssetId(InventoryId id) => ToAssetId(id);
-        public static InventoryId ToInventoryId(AssetId id) => new InventoryId(id);
-        public static AssetId ToAssetId(InventoryId id) => new AssetId(id.Type switch
+        public static InventoryId ToInventoryId(AssetId id) => new(id);
+        public static AssetId ToAssetId(InventoryId id) => new(id.Type switch
         {
             InventoryType.Chest => AssetType.Chest,
             InventoryType.Merchant => AssetType.Merchant,

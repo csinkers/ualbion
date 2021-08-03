@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Tests
 {
     public class EdgeMergingTests
     {
-        static Edge E(ushort x1, ushort y1, ushort x2, ushort y2) => new Edge(x1, y1, x2, y2);
+        static Edge E(ushort x1, ushort y1, ushort x2, ushort y2) => new(x1, y1, x2, y2);
 
         [Fact]
         public void TwoHorizontalTest()

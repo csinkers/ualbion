@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 using SerdesNet;
 
 namespace UAlbion.Formats.Assets.Labyrinth
@@ -8,7 +9,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
     {
         public const int MaxSubObjectCount = 8;
         public ushort AutoGraphicsId { get; set; }
-        public SubObject[] SubObjects { get; private set; } = new SubObject[MaxSubObjectCount]; // Need private setter for JSON deserialisation
+        [JsonInclude] public SubObject[] SubObjects { get; private set; } = new SubObject[MaxSubObjectCount];
 
         public override string ToString() =>
             $"Obj: AG{AutoGraphicsId} [ {string.Join("; ", SubObjects.Select(x => x.ToString()))} ]";

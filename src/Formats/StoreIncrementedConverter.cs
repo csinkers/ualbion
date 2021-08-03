@@ -11,7 +11,7 @@ namespace UAlbion.Formats
         IConverter<short, short>,
         IConverter<byte, byte>
     {
-        public static readonly StoreIncrementedConverter Instance = new StoreIncrementedConverter();
+        public static readonly StoreIncrementedConverter Instance = new();
         StoreIncrementedConverter() { }
         public static byte Serdes(string name, byte existing, Func<string, byte, byte, byte> serializer)
         {
@@ -78,7 +78,7 @@ namespace UAlbion.Formats
         IConverter<long, T>
         where T : struct, Enum
     {
-        public static readonly StoreIncrementedConverter<T> Instance = new StoreIncrementedConverter<T>();
+        public static readonly StoreIncrementedConverter<T> Instance = new();
         StoreIncrementedConverter() { }
         T IConverter<  byte, T>.FromNumeric(  byte x) => (T)(object)(  byte)(x - 1);
         T IConverter< sbyte, T>.FromNumeric( sbyte x) => (T)(object)( sbyte)(x - 1);

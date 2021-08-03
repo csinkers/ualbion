@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Formats.MapEvents;
@@ -10,21 +10,21 @@ namespace UAlbion.Formats.Assets.Maps
 {
     public abstract class BaseMapData : IMapData
     {
-        public MapId Id { get; protected set; }
+        [JsonInclude] public MapId Id { get; protected set; }
         public abstract MapType MapType { get; }
-        public byte Width { get; protected set; }
-        public byte Height { get; protected set; }
-        public SongId SongId { get; protected set; }
-        public PaletteId PaletteId { get; protected set; }
-        public SpriteId CombatBackgroundId { get; protected set; }
-        public byte OriginalNpcCount { get; protected set; }
-        public MapNpc[] Npcs { get; protected set; }
+        [JsonInclude] public byte Width { get; protected set; }
+        [JsonInclude] public byte Height { get; protected set; }
+        [JsonInclude] public SongId SongId { get; protected set; }
+        [JsonInclude] public PaletteId PaletteId { get; protected set; }
+        [JsonInclude] public SpriteId CombatBackgroundId { get; protected set; }
+        [JsonInclude] public byte OriginalNpcCount { get; protected set; }
+        [JsonInclude] public MapNpc[] Npcs { get; protected set; }
 
-        public IList<MapEventZone> Zones { get; private set; } = new List<MapEventZone>();
+        [JsonInclude] public IList<MapEventZone> Zones { get; private set; } = new List<MapEventZone>();
         [JsonIgnore] public IDictionary<int, MapEventZone> ZoneLookup { get; } = new Dictionary<int, MapEventZone>();
         [JsonIgnore] public IDictionary<TriggerTypes, MapEventZone[]> ZoneTypeLookup { get; } = new Dictionary<TriggerTypes, MapEventZone[]>();
         [JsonIgnore] public IList<EventNode> Events { get; private set; } = new List<EventNode>();
-        public IList<ushort> Chains { get; } = new List<ushort>();
+        [JsonInclude] public IList<ushort> Chains { get; private set; } = new List<ushort>();
         public string[] EventStrings // Used for JSON
         {
             get => Events?.Select(x => x.ToString()).ToArray();

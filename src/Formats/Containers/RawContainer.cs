@@ -46,6 +46,6 @@ namespace UAlbion.Formats.Containers
         }
 
         public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk) 
-            => new List<(int, int)> { (0, 1) };
+            => new() { (0, 1) };
     }
 }

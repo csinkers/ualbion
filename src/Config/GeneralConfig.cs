@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
 using UAlbion.Api;
 
 namespace UAlbion.Config
@@ -11,15 +11,16 @@ namespace UAlbion.Config
     public class GeneralConfig : IGeneralConfig
     {
         const string ConfigSubdir = "ualbion";
-        static readonly Regex Pattern = new Regex(@"(\$\([A-Z]+\))");
-        [JsonIgnore] public string BasePath { get; set; }
-        public IDictionary<string, string> Paths { get; } = new Dictionary<string, string>();
+        static readonly Regex Pattern = new(@"(\$\([A-Z]+\))");
+        [JsonIgnore] public string BasePath { get; private set; }
+        [JsonInclude] public IDictionary<string, string> Paths { get; private set; } = new Dictionary<string, string>();
 
         public static GeneralConfig Load(string configPath, string baseDir, IFileSystem disk)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
-            var config = disk.FileExists(configPath) 
-                ? JsonConvert.DeserializeObject<GeneralConfig>(disk.ReadAllText(configPath)) 
+
+            var config = disk.FileExists(configPath)
+                ? JsonUtil.Deserialize<GeneralConfig>(disk.ReadAllBytes(configPath))
                 : new GeneralConfig();
 
             config.BasePath = baseDir;
@@ -36,10 +37,10 @@ namespace UAlbion.Config
             if (string.IsNullOrEmpty(relative))
                 throw new ArgumentNullException(nameof(relative));
 
-            if (relative.Contains(".."))
+            if (relative.Contains("..", StringComparison.InvariantCulture))
                 throw new ArgumentOutOfRangeException($"Paths containing .. are not allowed ({relative})");
 
-            if (relative.Contains(":") && !relative.StartsWith(BasePath, StringComparison.InvariantCulture))
+            if (relative.Contains(":", StringComparison.InvariantCulture) && !relative.StartsWith(BasePath, StringComparison.InvariantCulture))
                 throw new ArgumentOutOfRangeException($"Paths containing : are not allowed ({relative})");
 
             var resolved = Pattern.Replace(relative, x =>

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -16,10 +16,10 @@ namespace UAlbion.Formats.Assets.Maps
             Base.Tileset.Desert
         };
         public override MapType MapType => OutdoorTilesets.Any(x => x == TilesetId) ? MapType.TwoDOutdoors : MapType.TwoD;
-        public FlatMapFlags Flags { get; private set; } // Wait/Rest, Light-Environment, NPC converge range
-        public byte Sound { get; private set; }
-        public TilesetId TilesetId { get; private set; }
-        public byte FrameRate { get; private set; }
+        [JsonInclude] public FlatMapFlags Flags { get; private set; } // Wait/Rest, Light-Environment, NPC converge range
+        [JsonInclude] public byte Sound { get; private set; }
+        [JsonInclude] public TilesetId TilesetId { get; private set; }
+        [JsonInclude] public byte FrameRate { get; private set; }
 
         [JsonIgnore] public int[] Underlay { get; private set; }
         [JsonIgnore] public int[] Overlay { get; private set; }

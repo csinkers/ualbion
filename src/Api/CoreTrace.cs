@@ -8,7 +8,7 @@ namespace UAlbion.Api
     [EventSource(Name = "UAlbion-CoreTrace")]
     public class CoreTrace : EventSource
     {
-        public static CoreTrace Log { get; } = new CoreTrace();
+        public static CoreTrace Log { get; } = new();
 
         // The Tasks and Opcodes classes need to be created exactly as shown or the reflection
         // code in EventSource won't pick them up.

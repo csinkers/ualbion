@@ -50,11 +50,11 @@ namespace UAlbion.Formats.Exporters.Tiled
                 BackgroundColor = "#000000",
                 Tilesets = new List<MapTileset>
                 {
-                    new MapTileset { FirstGid = 0, Source = tilesetPath, },
-                    new MapTileset { FirstGid = npcTileset.GidOffset, Source = npcTileset.Filename }
+                    new() { FirstGid = 0, Source = tilesetPath, },
+                    new() { FirstGid = npcTileset.GidOffset, Source = npcTileset.Filename }
                 },
                 Layers = new List<TiledMapLayer> {
-                    new TiledMapLayer
+                    new()
                     {
                         Id = 1,
                         Name = "Underlay",
@@ -62,7 +62,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                         Height = map.Height,
                         Data = new LayerData { Encoding = "csv", Content = BuildCsvData(map, tileset, false, blankTileIndex) }
                     },
-                    new TiledMapLayer
+                    new()
                     {
                         Id = 2,
                         Name = "Overlay",
@@ -119,13 +119,13 @@ namespace UAlbion.Formats.Exporters.Tiled
                 BackgroundColor = "#000000",
                 Tilesets = new List<MapTileset>
                 {
-                    new MapTileset { FirstGid = FloorGid, Source = properties.FloorPath, },
-                    new MapTileset { FirstGid = WallGid, Source = properties.WallPath, },
-                    new MapTileset { FirstGid = ContentsGid, Source = properties.ContentsPath },
-                    new MapTileset { FirstGid = CeilingGid, Source = properties.CeilingPath, },
+                    new() { FirstGid = FloorGid, Source = properties.FloorPath, },
+                    new() { FirstGid = WallGid, Source = properties.WallPath, },
+                    new() { FirstGid = ContentsGid, Source = properties.ContentsPath },
+                    new() { FirstGid = CeilingGid, Source = properties.CeilingPath, },
                 },
                 Layers = new List<TiledMapLayer> {
-                    new TiledMapLayer
+                    new()
                     {
                         Id = 1,
                         Name = "Floors",
@@ -133,7 +133,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                         Height = map.Height,
                         Data = new LayerData { Encoding = "csv", Content = BuildCsvData(map, IsometricMode.Floors) }
                     },
-                    new TiledMapLayer
+                    new()
                     {
                         Id = 2,
                         Name = "Walls",
@@ -141,7 +141,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                         Height = map.Height,
                         Data = new LayerData { Encoding = "csv", Content = BuildCsvData(map, IsometricMode.Walls) }
                     },
-                    new TiledMapLayer
+                    new()
                     {
                         Id = 3,
                         Name = "Contents",
@@ -149,7 +149,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                         Height = map.Height,
                         Data = new LayerData { Encoding = "csv", Content = BuildCsvData(map, IsometricMode.Contents) }
                     },
-                    new TiledMapLayer
+                    new()
                     {
                         Id = 4,
                         Name = "Ceilings",
@@ -220,9 +220,9 @@ namespace UAlbion.Formats.Exporters.Tiled
                     Polygon = new Polygon(r.Item2.Points, width, properties.TileHeight),
                     Properties = new List<ObjectProperty>
                     {
-                        new ObjectProperty("Script", eventFormatter.FormatChain(r.Item1.Node)),
-                        new ObjectProperty("Trigger", r.Item1.Trigger.ToString()),
-                        new ObjectProperty("Unk1", r.Item1.Unk1.ToString(CultureInfo.InvariantCulture)),
+                        new("Script", eventFormatter.FormatChain(r.Item1.Node)),
+                        new("Trigger", r.Item1.Trigger.ToString()),
+                        new("Unk1", r.Item1.Unk1.ToString(CultureInfo.InvariantCulture)),
                     }
                 };
 
@@ -230,7 +230,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             {
                 Id = objectGroupId,
                 Name = name,
-                Color = "#" + (name.GetHashCode() & 0x00ffffff).ToString("x", CultureInfo.InvariantCulture),
+                Color = "#" + (name.GetHashCode(StringComparison.InvariantCulture) & 0x00ffffff).ToString("x", CultureInfo.InvariantCulture),
                 Opacity = 0.5f,
                 Objects = zonePolygons.ToList(),
             };
@@ -277,11 +277,11 @@ namespace UAlbion.Formats.Exporters.Tiled
         {
             var objProps = new List<ObjectProperty>
             {
-                new ObjectProperty("Visual", npc.SpriteOrGroup.ToString()),
-                new ObjectProperty("Flags", npc.Flags.ToString()),
-                new ObjectProperty("Movement", ((int) npc.Movement).ToString(CultureInfo.InvariantCulture)),
-                new ObjectProperty("Unk8", npc.Unk8.ToString(CultureInfo.InvariantCulture)),
-                new ObjectProperty("Unk9", npc.Unk9.ToString(CultureInfo.InvariantCulture))
+                new("Visual", npc.SpriteOrGroup.ToString()),
+                new("Flags", npc.Flags.ToString()),
+                new("Movement", ((int) npc.Movement).ToString(CultureInfo.InvariantCulture)),
+                new("Unk8", npc.Unk8.ToString(CultureInfo.InvariantCulture)),
+                new("Unk9", npc.Unk9.ToString(CultureInfo.InvariantCulture))
             };
 
             if (!npc.Id.IsNone) objProps.Add(new ObjectProperty("Id", npc.Id.ToString()));

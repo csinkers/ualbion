@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Formats.MapEvents;
@@ -10,7 +10,7 @@ namespace UAlbion.Formats.Assets
     public class EventSet
     {
         public EventSetId Id { get; private set; }
-        public ushort[] Chains { get; private set; }
+        [JsonInclude] public ushort[] Chains { get; private set; }
         [JsonIgnore] public EventNode[] Events { get; private set; }
 
         public string[] EventStrings // Used for JSON

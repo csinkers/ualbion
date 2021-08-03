@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Parsers
 {
     public class SystemTextLoader : IAssetLoader<IntStringDictionary>
     {
-        static readonly Regex Regex = new Regex(@"\[(\d+):(.*)\]");
+        static readonly Regex Regex = new(@"\[(\d+):(.*)\]");
 
         public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
             => Serdes((IntStringDictionary) existing, info, mapping, s);

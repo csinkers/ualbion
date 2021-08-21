@@ -31,18 +31,11 @@ namespace UAlbion.Core
                 if (string.IsNullOrWhiteSpace(command))
                     continue;
 
-                try
-                {
-                    var @event = Event.Parse(command);
-                    if (@event != null)
-                        logExchange.EnqueueEvent(@event);
-                    else
-                        Console.WriteLine("Unknown event \"{0}\"", command);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"Error: {e}");
-                }
+                var @event = Event.Parse(command);
+                if (@event != null)
+                    logExchange.EnqueueEvent(@event);
+                else
+                    Console.WriteLine("Unknown event \"{0}\"", command);
             } while (!_done);
         }
     }

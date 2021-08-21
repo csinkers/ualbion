@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
@@ -54,7 +55,7 @@ namespace UAlbion.Formats.Tests
             var originalBytes = br.ReadBytes((int)stream.Length);
             var roundTripBytes = ms.ToArray();
 
-            /* Save round-tripped and annotated text output for debugging
+            //* Save round-tripped and annotated text output for debugging
 
             static string ReadToEnd(Stream stream)
             {
@@ -76,15 +77,9 @@ namespace UAlbion.Formats.Tests
             File.WriteAllText(file + ".reload.txt", ReadToEnd(reloadAnnotationStream));
             //*/
 
-            /* Save JSON for debugging
+            //* Save JSON for debugging
             {
-                var settings = new JsonSerializerSettings
-                {
-                    DefaultValueHandling = DefaultValueHandling.Ignore,
-                    NullValueHandling = NullValueHandling.Ignore,
-                    Formatting = Formatting.Indented
-                };
-                File.WriteAllText(file + ".json", JsonConvert.SerializeObject(save, settings));
+                File.WriteAllText(file + ".json", JsonUtil.Serialize(save));
             }
             //*/
 
@@ -92,6 +87,18 @@ namespace UAlbion.Formats.Tests
             ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
 
             var diffs = XDelta.Compare(originalBytes, roundTripBytes).ToArray();
+            if (diffs.Length != 1)
+            {
+                Console.WriteLine($"===== {file}.pre.txt =====");
+                Console.WriteLine(File.ReadAllText($"{file}.pre.txt"));
+                Console.WriteLine($"===== {file}.post.txt =====");
+                Console.WriteLine(File.ReadAllText($"{file}.post.txt"));
+                Console.WriteLine($"===== {file}.reload.txt =====");
+                Console.WriteLine(File.ReadAllText($"{file}.reload.txt"));
+                Console.WriteLine($"===== {file}.json =====");
+                Console.WriteLine(File.ReadAllText($"{file}.json"));
+            }
+
             Assert.Collection(diffs,
                 d =>
                 {

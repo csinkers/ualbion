@@ -6,6 +6,7 @@
 /data/settings.json
 /re/
 /deps/
+/_deps/
 
 .vs/
 .vscode/

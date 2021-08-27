@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Formats.MapEvents;
@@ -48,10 +49,13 @@ namespace UAlbion.Formats.Assets.Save
 
         uint _value;
 
+        [JsonInclude] public uint Value { get => _value; private set => _value = value; }
+
+        [JsonIgnore]
         public WordId WordId =>
             Type == ActionType.Word
                 ? WordId.FromUInt32(_value)
-                : throw new InvalidOperationException($"Tried to retrieve WordId of a non-word VisitedEvent");
+                : throw new InvalidOperationException("Tried to retrieve WordId of a non-word VisitedEvent");
         /*
         public WordId WordId => Word switch
         {
@@ -60,14 +64,15 @@ namespace UAlbion.Formats.Assets.Save
             _ => (WordId) (Word + 503)
         }; */
 
+        [JsonIgnore]
         public ItemId ItemId => 
-            Type == ActionType.AskAboutItem
-            || Type == ActionType.UseItem
-            || Type == ActionType.EquipItem
-            || Type == ActionType.UnequipItem
-            || Type == ActionType.PickupItem
+            Type is ActionType.AskAboutItem 
+                or ActionType.UseItem 
+                or ActionType.EquipItem 
+                or ActionType.UnequipItem 
+                or ActionType.PickupItem
                 ? ItemId.FromUInt32(_value)
-                : throw new InvalidOperationException($"Tried to retrieve WordId of a non-word VisitedEvent");
+                : throw new InvalidOperationException("Tried to retrieve ItemId of a non-item VisitedEvent");
 
         string ItemString =>
             Type switch

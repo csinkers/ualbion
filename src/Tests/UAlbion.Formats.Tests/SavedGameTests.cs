@@ -50,53 +50,56 @@ namespace UAlbion.Formats.Tests
             using var aw = new AnnotationFacadeSerializer(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
             SavedGame.Serdes(save, mapping, aw);
 
+            File.WriteAllText(file + ".json", JsonUtil.Serialize(save));
+
             // write out debugging files and compare round-tripped data
             br.BaseStream.Position = 0;
             var originalBytes = br.ReadBytes((int)stream.Length);
             var roundTripBytes = ms.ToArray();
 
-            //* Save round-tripped and annotated text output for debugging
-
-            static string ReadToEnd(Stream stream)
-            {
-                stream.Position = 0;
-                using var reader = new StreamReader(stream, null, true, -1, true);
-                return reader.ReadToEnd();
-            }
-
-            ms.Position = 0;
-            using var reloadBr = new BinaryReader(ms);
-            using var reloadAnnotationStream = new MemoryStream();
-            using var reloadAnnotationReader = new StreamWriter(reloadAnnotationStream);
-            using var reloadFacade = new AnnotationFacadeSerializer(new AlbionReader(reloadBr, stream.Length), reloadAnnotationReader, FormatUtil.BytesFrom850String);
-            SavedGame.Serdes(null, mapping, reloadFacade);
-
-            File.WriteAllBytes(file + ".bin", roundTripBytes);
-            File.WriteAllText(file + ".pre.txt", ReadToEnd(annotationReadStream));
-            File.WriteAllText(file + ".post.txt", ReadToEnd(annotationWriteStream));
-            File.WriteAllText(file + ".reload.txt", ReadToEnd(reloadAnnotationStream));
-            //*/
-
-            //* Save JSON for debugging
-            {
-                File.WriteAllText(file + ".json", JsonUtil.Serialize(save));
-            }
-            //*/
-
             ApiUtil.Assert(originalBytes.Length == roundTripBytes.Length, $"Save game size changed after round trip (delta {roundTripBytes.Length - originalBytes.Length})");
             ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
+
 
             var diffs = XDelta.Compare(originalBytes, roundTripBytes).ToArray();
             if (diffs.Length != 1)
             {
+                //* Save round-tripped and annotated text output for debugging
+
+                static string ReadToEnd(Stream stream)
+                {
+                    stream.Position = 0;
+                    using var reader = new StreamReader(stream, null, true, -1, true);
+                    return reader.ReadToEnd();
+                }
+
+                ms.Position = 0;
+                using var reloadBr = new BinaryReader(ms);
+                using var reloadAnnotationStream = new MemoryStream();
+                using var reloadAnnotationReader = new StreamWriter(reloadAnnotationStream);
+                using var reloadFacade = new AnnotationFacadeSerializer(new AlbionReader(reloadBr, stream.Length), reloadAnnotationReader, FormatUtil.BytesFrom850String);
+                SavedGame.Serdes(null, mapping, reloadFacade);
+
+                File.WriteAllBytes(file + ".bin", roundTripBytes);
+                File.WriteAllText(file + ".pre.txt", ReadToEnd(annotationReadStream));
+                File.WriteAllText(file + ".post.txt", ReadToEnd(annotationWriteStream));
+                File.WriteAllText(file + ".reload.txt", ReadToEnd(reloadAnnotationStream));
+
                 Console.WriteLine($"===== {file}.pre.txt =====");
                 Console.WriteLine(File.ReadAllText($"{file}.pre.txt"));
                 Console.WriteLine($"===== {file}.post.txt =====");
                 Console.WriteLine(File.ReadAllText($"{file}.post.txt"));
                 Console.WriteLine($"===== {file}.reload.txt =====");
                 Console.WriteLine(File.ReadAllText($"{file}.reload.txt"));
-                Console.WriteLine($"===== {file}.json =====");
-                Console.WriteLine(File.ReadAllText($"{file}.json"));
+                //*/
+
+                //* Save JSON for debugging
+                {
+                    File.WriteAllText(file + ".json", JsonUtil.Serialize(save));
+                    Console.WriteLine($"===== {file}.json =====");
+                    Console.WriteLine(File.ReadAllText($"{file}.json"));
+                }
+                //*/
             }
 
             Assert.Collection(diffs,

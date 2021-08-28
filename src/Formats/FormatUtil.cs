@@ -21,8 +21,7 @@ namespace UAlbion.Formats
             Justification = "Encoding.GetEncoding must happen after Encoding.RegisterProvider")]
         static FormatUtil()
         {
-            Encoding.RegisterProvider(CodePagesEncodingProvider
-                .Instance); // Required for code page 850 support in .NET Core
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
             PerfTracker.StartupEvent("Registered encodings");
             AlbionEncoding = Encoding.GetEncoding(850);
         }
@@ -30,13 +29,13 @@ namespace UAlbion.Formats
         public static string BytesTo850String(byte[] bytes) =>
             AlbionEncoding
                 .GetString(bytes)
-                .Replace("×", "ß", StringComparison.InvariantCulture)
+                .Replace('×', 'ß')
                 .TrimEnd((char)0);
 
         public static byte[] BytesFrom850String(string str)
         {
             if (str == null) throw new ArgumentNullException(nameof(str));
-            return AlbionEncoding.GetBytes(str.Replace("ß", "×", StringComparison.InvariantCulture));
+            return AlbionEncoding.GetBytes(str.Replace('ß', '×'));
         }
 
         public static string WordWrap(string s, int maxLine)

@@ -63,7 +63,7 @@ namespace UAlbion.Formats.Tests
             ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
 
             var diffs = XDelta.Compare(originalBytes, roundTripBytes).ToArray();
-            //if (diffs.Length != 1)
+            if (diffs.Length != 1)
             {
                 //* Save round-tripped and annotated text output for debugging
 

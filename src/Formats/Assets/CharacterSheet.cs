@@ -297,7 +297,29 @@ namespace UAlbion.Formats.Assets
             sheet.UnknownFC = s.UInt16(nameof(sheet.UnknownFC), sheet.UnknownFC);
             s.Check();
 
-            sheet.GermanName = s.FixedLengthString(nameof(sheet.GermanName), sheet.GermanName, MaxNameLength); // 112
+            if (id == Base.Npc.Kossea) // TODO: Remove this debugging code once bizarre test failure on github actions is resolved.
+            {
+                var nameBytes = new byte[MaxNameLength];
+                var existing = FormatUtil.BytesFrom850String(sheet.GermanName ?? "");
+                if (existing.Length > 0)
+                    Array.Copy(existing, nameBytes, existing.Length);
+
+                if (s.IsWriting())
+                    Console.WriteLine($"Writing Kossea: {FormatUtil.BytesToHexString(nameBytes)} = {sheet.GermanName}");
+
+                var from = s.Offset;
+                nameBytes = s.Bytes(nameof(sheet.GermanName), nameBytes, MaxNameLength);
+                var to = s.Offset - 1;
+
+                sheet.GermanName = FormatUtil.BytesTo850String(nameBytes);
+                if (s.IsReading())
+                    Console.WriteLine($"Reading Kossea: {FormatUtil.BytesToHexString(nameBytes)} = {sheet.GermanName}");
+
+                if (s is BreakpointFacadeSerializer bp)
+                    bp.BreakRange = (from, to);
+            }
+            else sheet.GermanName = s.FixedLengthString(nameof(sheet.GermanName), sheet.GermanName, MaxNameLength); // 112
+
             sheet.EnglishName = s.FixedLengthString(nameof(sheet.EnglishName), sheet.EnglishName, MaxNameLength);
             sheet.FrenchName = s.FixedLengthString(nameof(sheet.FrenchName), sheet.FrenchName, MaxNameLength);
 

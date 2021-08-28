@@ -40,7 +40,8 @@ namespace UAlbion.Formats.Tests
             using var annotationReadStream = new MemoryStream();
             using var annotationReader = new StreamWriter(annotationReadStream);
             using var ar = new AnnotationFacadeSerializer(new AlbionReader(br, stream.Length), annotationReader, FormatUtil.BytesFrom850String);
-            var save = SavedGame.Serdes(null, mapping, ar);
+            using var bpr = new BreakpointFacadeSerializer(ar);
+            var save = SavedGame.Serdes(null, mapping, bpr);
 
             // === Save ===
             using var ms = new MemoryStream();
@@ -48,7 +49,8 @@ namespace UAlbion.Formats.Tests
             using var annotationWriteStream = new MemoryStream();
             using var annotationWriter = new StreamWriter(annotationWriteStream);
             using var aw = new AnnotationFacadeSerializer(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
-            SavedGame.Serdes(save, mapping, aw);
+            using var bpw = new BreakpointFacadeSerializer(aw);
+            SavedGame.Serdes(save, mapping, bpw);
 
             File.WriteAllText(file + ".json", JsonUtil.Serialize(save));
 
@@ -60,9 +62,8 @@ namespace UAlbion.Formats.Tests
             ApiUtil.Assert(originalBytes.Length == roundTripBytes.Length, $"Save game size changed after round trip (delta {roundTripBytes.Length - originalBytes.Length})");
             ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
 
-
             var diffs = XDelta.Compare(originalBytes, roundTripBytes).ToArray();
-            if (diffs.Length != 1)
+            //if (diffs.Length != 1)
             {
                 //* Save round-tripped and annotated text output for debugging
 
@@ -78,7 +79,8 @@ namespace UAlbion.Formats.Tests
                 using var reloadAnnotationStream = new MemoryStream();
                 using var reloadAnnotationReader = new StreamWriter(reloadAnnotationStream);
                 using var reloadFacade = new AnnotationFacadeSerializer(new AlbionReader(reloadBr, stream.Length), reloadAnnotationReader, FormatUtil.BytesFrom850String);
-                SavedGame.Serdes(null, mapping, reloadFacade);
+                using var bpFacade = new BreakpointFacadeSerializer(reloadFacade);
+                SavedGame.Serdes(null, mapping, bpFacade);
 
                 File.WriteAllBytes(file + ".bin", roundTripBytes);
                 File.WriteAllText(file + ".pre.txt", ReadToEnd(annotationReadStream));

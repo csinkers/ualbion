@@ -126,15 +126,9 @@ namespace UAlbion.Formats.Containers
                 if (lengths[i] == 0)
                     continue;
 
-                long windowOffset = s.Offset;
                 using var window = new WindowingFacadeSerializer(s, null);
-                using var bp = new BreakpointFacadeSerializer(s);
-                func(i + firstId, lengths[i], context, bp);
+                func(i + firstId, lengths[i], context, window);
                 offset += lengths[i];
-
-                if (bp.BreakRange.HasValue && s is BreakpointFacadeSerializer parentBp)
-                    parentBp.BreakRange ??= (bp.BreakRange.Value.from + windowOffset, bp.BreakRange.Value.to + windowOffset);
-
                 ApiUtil.Assert(offset == s.Offset);
             }
         }
@@ -156,8 +150,7 @@ namespace UAlbion.Formats.Containers
             for (int i = 0; i < count; i++)
             {
                 using var window = new WindowingFacadeSerializer(s, null);
-                using var bp = new BreakpointFacadeSerializer(window);
-                func(i + firstId, 0, context, bp);
+                func(i + firstId, 0, context, window);
                 lengths[i] = (int)window.Offset;
             }
 

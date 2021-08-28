@@ -4,7 +4,8 @@ using SerdesNet;
 
 namespace UAlbion.Formats
 {
-    public sealed class BreakpointFacadeSerializer : ISerializer
+    // ReSharper disable once UnusedType.Global
+    public sealed class BreakpointFacadeSerializer : ISerializer // For debugging unintentional overwrites
     {
         readonly ISerializer _s;
         public (long from, long to)? BreakRange { get; set; }
@@ -51,6 +52,7 @@ namespace UAlbion.Formats
         public void Assert(bool condition, string message) => _s.Assert(condition, message);
         public bool IsComplete() => _s.IsComplete();
         public void Pad(int bytes) => CheckV(() => _s.Pad(bytes));
+#pragma warning disable CA1720 // Identifier contains type name
         public sbyte Int8(string name, sbyte value, sbyte defaultValue = 0) => CheckT(() => _s.Int8(name, value, defaultValue));
         public short Int16(string name, short value, short defaultValue = 0) => CheckT(() => _s.Int16(name, value, defaultValue));
         public int Int32(string name, int value, int defaultValue = 0) => CheckT(() => _s.Int32(name, value, defaultValue));
@@ -76,6 +78,7 @@ namespace UAlbion.Formats
         public T Object<T, TContext>(string name, T value, TContext context, Func<int, T, TContext, ISerializer, T> serdes) 
             => CheckT(() => _s.Object(name, value, context, serdes));
         public void Object(string name, Action<ISerializer> serdes) => CheckV(() => _s.Object(name, serdes));
+#pragma warning restore CA1720 // Identifier contains type name
         public IList<TTarget> List<TTarget>(
             string name,
             IList<TTarget> list,

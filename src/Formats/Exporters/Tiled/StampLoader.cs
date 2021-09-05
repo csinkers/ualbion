@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Text;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Parsers;
@@ -10,10 +11,11 @@ namespace UAlbion.Formats.Exporters.Tiled
 {
     public class StampLoader : IAssetLoader<BlockList>
     {
-        public BlockList Serdes(BlockList existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public BlockList Serdes(BlockList existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
 
             if (s.IsWriting())
             {
@@ -41,7 +43,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                     if (existing[stampNumber].Width == 0 || existing[stampNumber].Height == 0)
                         return Array.Empty<byte>();
                     var stamp = new Stamp(stampNumber, existing[stampNumber], tileset);
-                    return Encoding.UTF8.GetBytes(stamp.Serialize());
+                    return Encoding.UTF8.GetBytes(stamp.Serialize(jsonUtil));
                 });
 
                 return existing;
@@ -50,7 +52,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             var list = new BlockList();
             foreach (var (jsonBytes, _) in PackedChunks.Unpack(s))
             {
-                var stamp = Stamp.Parse(jsonBytes);
+                var stamp = Stamp.Parse(jsonBytes, jsonUtil);
                 var block = stamp != null ? stamp.ToBlock() : new Block();
                 list.Add(block);
             }
@@ -61,8 +63,8 @@ namespace UAlbion.Formats.Exporters.Tiled
             return list;
         }
 
-        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
-            => Serdes((BlockList) existing, info, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+            => Serdes((BlockList) existing, info, mapping, s, jsonUtil);
 
         /* .stamp file
 {

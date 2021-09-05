@@ -20,9 +20,10 @@ namespace UAlbion.Base.Tests
             AssetMapping.GlobalIsThreadLocal = true;
             var mapping = AssetMapping.Global;
             var disk = new MockFileSystem(true);
+            var jsonUtil = new FormatJsonUtil();
             var baseDir = ConfigUtil.FindBasePath(disk);
             var assetConfigPath = Path.Combine(baseDir, "mods", "Base", "assets.json");
-            var assetConfig = AssetConfig.Load(assetConfigPath, disk);
+            var assetConfig = AssetConfig.Load(assetConfigPath, disk, jsonUtil);
 
             foreach (var assetType in assetConfig.IdTypes.Values)
             {

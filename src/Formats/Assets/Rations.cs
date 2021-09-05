@@ -2,6 +2,8 @@
 {
     public class Rations : IContents
     {
+        Rations() { }
+        public static readonly Rations Instance = new();
         public bool Equals(IContents obj) => Equals((object)obj);
         public override bool Equals(object obj)
         {

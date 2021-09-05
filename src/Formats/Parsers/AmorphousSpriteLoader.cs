@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 
@@ -41,10 +42,10 @@ namespace UAlbion.Formats.Parsers
             }
         }
 
-        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
-            => Serdes((IReadOnlyTexture<byte>)existing, info, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+            => Serdes((IReadOnlyTexture<byte>)existing, info, mapping, s, jsonUtil);
 
-        public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (info == null) throw new ArgumentNullException(nameof(info));

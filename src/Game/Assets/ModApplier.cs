@@ -56,9 +56,8 @@ namespace UAlbion.Game.Assets
             _modsInReverseDependencyOrder.Clear();
             AssetMapping.Global.Clear();
 
-            var disk = Resolve<IFileSystem>();
             foreach (var mod in mods)
-                LoadMod(config.ResolvePath("$(MODS)"), mod, disk);
+                LoadMod(config.ResolvePath("$(MODS)"), mod);
 
             _modsInReverseDependencyOrder.Reverse();
 
@@ -69,7 +68,7 @@ namespace UAlbion.Game.Assets
                 .Select(mod => mod.ShaderPath)
                 .Where(x => x != null);
 
-        void LoadMod(string dataDir, string modName, IFileSystem disk)
+        void LoadMod(string dataDir, string modName)
         {
             if (string.IsNullOrEmpty(modName))
                 return;
@@ -82,6 +81,10 @@ namespace UAlbion.Game.Assets
                 Error($"Mod {modName} is not a simple directory name");
                 return;
             }
+
+            var disk = Resolve<IFileSystem>();
+            var generalConfig = Resolve<IGeneralConfig>();
+            var jsonUtil = Resolve<IJsonUtil>();
 
             string path = Path.Combine(dataDir, modName);
 
@@ -99,15 +102,14 @@ namespace UAlbion.Game.Assets
                 return;
             }
 
-            var generalConfig = Resolve<IGeneralConfig>();
-            var assetConfig = AssetConfig.Load(assetConfigPath, disk);
-            var modConfig = ModConfig.Load(modConfigPath, disk);
+            var assetConfig = AssetConfig.Load(assetConfigPath, disk, jsonUtil);
+            var modConfig = ModConfig.Load(modConfigPath, disk, jsonUtil);
             var modInfo = new ModInfo(modName, assetConfig, modConfig, path);
 
             // Load dependencies
             foreach (var dependency in modConfig.Dependencies)
             {
-                LoadMod(dataDir, dependency, disk);
+                LoadMod(dataDir, dependency);
                 if (!_mods.TryGetValue(dependency, out var dependencyInfo))
                 {
                     Error($"Dependency {dependency} of mod {modName} could not be loaded, skipping load of {modName}");
@@ -125,6 +127,7 @@ namespace UAlbion.Game.Assets
             modConfig.AssetPath ??= path;
             var extraPaths = new Dictionary<string, string> { ["MOD"] = modConfig.AssetPath };
             assetConfig.PopulateAssetIds(
+                jsonUtil,
                 AssetMapping.Global,
                 x => _assetLocator.GetSubItemRangesForFile(x, extraPaths),
                 x => disk.ReadAllBytes(generalConfig.ResolvePath(x, extraPaths)));
@@ -280,12 +283,14 @@ namespace UAlbion.Game.Assets
             var loaderRegistry = Resolve<IAssetLoaderRegistry>();
             var containerRegistry = Resolve<IContainerRegistry>();
             var disk = Resolve<IFileSystem>();
+            var jsonUtil = Resolve<IJsonUtil>();
             var target = _modsInReverseDependencyOrder.First();
 
             // Add any missing ids
             Info("Populating destination asset info...");
             var extraPaths = new Dictionary<string, string> { ["MOD"] = target.AssetPath };
             target.AssetConfig.PopulateAssetIds(
+                jsonUtil,
                 AssetMapping.Global,
                 file =>
                 {
@@ -349,14 +354,14 @@ namespace UAlbion.Game.Assets
                     using var ms = new MemoryStream();
                     using var bw = new BinaryWriter(ms);
                     using var s = new AlbionWriter(bw);
-                    loader.Serdes(asset, assetInfo, target.Mapping, s);
+                    loader.Serdes(asset, assetInfo, target.Mapping, s, jsonUtil);
 
                     ms.Position = 0;
                     assets.Add((assetInfo, ms.ToArray()));
                 }
 
                 if (assets.Count > 0)
-                    container.Write(path, assets, disk);
+                    container.Write(path, assets, disk, jsonUtil);
             }
         }
     }

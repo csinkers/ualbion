@@ -223,13 +223,13 @@ namespace UAlbion.Game.Gui.Status
                         item.Name,
                         member.Apparent.GetName(settings.Gameplay.Language));
                     break;
-                case Gold _:
+                case Gold:
                     // Give gold to %s
                     text = tf.Format(
                         Base.SystemText.PartyPortrait_GiveGoldToX,
                         member.Apparent.GetName(settings.Gameplay.Language));
                     break;
-                case Rations _:
+                case Rations:
                     // Give food to %s
                     text = tf.Format(
                         Base.SystemText.PartyPortrait_GiveFoodToX,

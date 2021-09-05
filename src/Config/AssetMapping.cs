@@ -397,14 +397,19 @@ namespace UAlbion.Config
                     yield return new AssetId(info.AssetType, i);
         }
 
-        public string Serialize() => JsonUtil.Serialize(
-            _byEnumType.ToDictionary(
-                x => x.Key.AssemblyQualifiedName,
-                x => x.Value));
-
-        public static AssetMapping Deserialize(byte[] json)
+        public string Serialize(IJsonUtil jsonUtil)
         {
-            var stringKeyed = JsonUtil.Deserialize<Dictionary<string, EnumInfo>>(json);
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+            return jsonUtil.Serialize(
+                _byEnumType.ToDictionary(
+                    x => x.Key.AssemblyQualifiedName,
+                    x => x.Value));
+        }
+
+        public static AssetMapping Deserialize(byte[] json, IJsonUtil jsonUtil)
+        {
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+            var stringKeyed = jsonUtil.Deserialize<Dictionary<string, EnumInfo>>(json);
             var typeKeyed = stringKeyed.ToDictionary(
                 x => Type.GetType(x.Key),
                 x => x.Value);

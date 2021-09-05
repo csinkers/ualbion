@@ -101,17 +101,19 @@ namespace UAlbion.Config
         }
 
         public void PopulateAssetIds(
+            IJsonUtil jsonUtil,
             Func<string, AssetId> resolveId,
             Func<AssetFileInfo, IList<(int, int)>> getSubItemCountForFile,
             Func<string, byte[]> readAllBytesFunc)
         {
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
             if (getSubItemCountForFile == null) throw new ArgumentNullException(nameof(getSubItemCountForFile));
             if (readAllBytesFunc == null) throw new ArgumentNullException(nameof(readAllBytesFunc));
 
             if (!string.IsNullOrEmpty(MapFile))
             {
                 var mappingJson = readAllBytesFunc(MapFile);
-                var mapping = JsonUtil.Deserialize<Dictionary<int, AssetInfo>>(mappingJson);
+                var mapping = jsonUtil.Deserialize<Dictionary<int, AssetInfo>>(mappingJson);
                 MergeMapping(mapping);
                 MapFile = null;
             }

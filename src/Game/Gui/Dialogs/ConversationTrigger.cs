@@ -16,7 +16,7 @@ namespace UAlbion.Game.Gui.Dialogs
             {
                 (Block blockA, Block blockB) => blockA.BlockId == blockB.BlockId && blockA.TextId == blockB.TextId,
                 (Word wordA, Word wordB) => wordA.WordId == wordB.WordId,
-                (Initial _, Initial _) => true,
+                (Initial, Initial) => true,
                 _ => false
             };
 
@@ -27,7 +27,7 @@ namespace UAlbion.Game.Gui.Dialogs
         public override int GetHashCode() =>
             this switch
             {
-                Initial _ => 0,
+                Initial => 0,
                 Block block => HashCode.Combine(1, block.TextId, block.BlockId),
                 Word word => HashCode.Combine(2, word.WordId),
                 _ => 0

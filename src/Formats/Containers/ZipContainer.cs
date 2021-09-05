@@ -10,17 +10,17 @@ namespace UAlbion.Formats.Containers
     /// </summary>
     public class ZipContainer : IAssetContainer
     {
-        public ISerializer Read(string file, AssetInfo info, IFileSystem disk)
+        public ISerializer Read(string file, AssetInfo info, IFileSystem disk, IJsonUtil jsonUtil)
         {
             throw new System.NotImplementedException();
         }
 
-        public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk)
+        public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk, IJsonUtil jsonUtil)
         {
             throw new System.NotImplementedException();
         }
 
-        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk)
+        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk, IJsonUtil jsonUtil)
         {
             throw new System.NotImplementedException();
         }

@@ -162,7 +162,7 @@ namespace UAlbion
                     .RegisterMouseMode(MouseMode.RightButtonHeld, new RightButtonHeldMouseMode())
                     .RegisterMouseMode(MouseMode.ContextMenu, new ContextMenuMouseMode()))
                 .Add(new SelectionManager())
-                .Add(new InputBinder(disk => InputConfig.Load(baseDir, disk)))
+                .Add(new InputBinder((disk, jsonUtil) => InputConfig.Load(baseDir, disk, jsonUtil)))
                 .Add(new ItemTransitionManager())
                 ;
         }

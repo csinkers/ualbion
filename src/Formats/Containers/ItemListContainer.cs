@@ -14,7 +14,7 @@ namespace UAlbion.Formats.Containers
     /// </summary>
     public class ItemListContainer : IAssetContainer
     {
-        public ISerializer Read(string file, AssetInfo info, IFileSystem disk)
+        public ISerializer Read(string file, AssetInfo info, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
@@ -24,7 +24,7 @@ namespace UAlbion.Formats.Containers
             return new AlbionReader(br, ItemData.SizeOnDisk);
         }
 
-        public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk)
+        public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
 
@@ -42,7 +42,7 @@ namespace UAlbion.Formats.Containers
             }
         }
 
-        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk)
+        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
             if (!disk.FileExists(path))

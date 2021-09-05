@@ -13,14 +13,15 @@ namespace UAlbion.Game.Assets
 {
     public static class ConvertAssets
     {
-        static (ModApplier, EventExchange, AssetLoaderRegistry) BuildModApplier(string baseDir, string mod, IFileSystem disk)
+        static (ModApplier, EventExchange, AssetLoaderRegistry) BuildModApplier(string baseDir, string mod, IFileSystem disk, IJsonUtil jsonUtil)
         {
-            var config = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir, disk);
+            var config = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir, disk, jsonUtil);
             var applier = new ModApplier();
             var exchange = new EventExchange(new LogExchange());
             var assetLoaderRegistry = new AssetLoaderRegistry();
             exchange
                 .Register(disk)
+                .Register(jsonUtil)
                 .Register<IGeneralConfig>(config)
                 .Attach(new StdioConsoleLogger())
                 .Attach(assetLoaderRegistry)
@@ -34,7 +35,9 @@ namespace UAlbion.Game.Assets
             return (applier, exchange, assetLoaderRegistry);
         }
 
-        public static void Convert(IFileSystem disk,
+        public static void Convert(
+            IFileSystem disk,
+            IJsonUtil jsonUtil,
             string fromMod,
             string toMod,
             string[] ids,
@@ -42,10 +45,11 @@ namespace UAlbion.Game.Assets
             Regex filePattern)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
 
             var baseDir = ConfigUtil.FindBasePath(disk);
-            var (from, fromExchange, fromLoaderRegistry) = BuildModApplier(baseDir, fromMod, disk);
-            var (to, toExchange, toLoaderRegistry) = BuildModApplier(baseDir, toMod, disk);
+            var (from, fromExchange, fromLoaderRegistry) = BuildModApplier(baseDir, fromMod, disk, jsonUtil);
+            var (to, toExchange, toLoaderRegistry) = BuildModApplier(baseDir, toMod, disk, jsonUtil);
 
             using (fromExchange)
             using (fromLoaderRegistry)

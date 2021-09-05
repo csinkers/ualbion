@@ -84,8 +84,8 @@ namespace UAlbion.Game.State
         IContents ContentsFromItemId(ItemId itemId) =>
             itemId.Type switch
             {
-                AssetType.Gold => new Gold(),
-                AssetType.Rations => new Rations(),
+                AssetType.Gold => Gold.Instance,
+                AssetType.Rations => Rations.Instance,
                 _ => Resolve<IAssetManager>().LoadItem(itemId),
             };
 

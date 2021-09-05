@@ -13,7 +13,7 @@ namespace UAlbion.Formats.Containers
     /// </summary>
     public class BinaryOffsetContainer : IAssetContainer
     {
-        public ISerializer Read(string file, AssetInfo info, IFileSystem disk)
+        public ISerializer Read(string file, AssetInfo info, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
@@ -25,10 +25,10 @@ namespace UAlbion.Formats.Containers
             return new AlbionReader(new BinaryReader(ms));
         }
 
-        public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk) 
+        public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk, IJsonUtil jsonUtil)
             => ApiUtil.Assert("Binary offset containers do not currently support saving");
 
-        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk) // All sub-items must be given explicitly for binary offset containers
+        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk, IJsonUtil jsonUtil) // All sub-items must be given explicitly for binary offset containers
             => FormatUtil.SortedIntsToRanges(info?.Map.Keys.OrderBy(x => x));
     }
 }

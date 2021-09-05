@@ -80,18 +80,22 @@ namespace UAlbion.Formats.Config
             [JsonInclude] public int CarryWeightPerStrength { get; private set; }
         }
 
-        public static GameConfig Load(string configPath, IFileSystem disk)
+        public static GameConfig Load(string configPath, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
             if (!disk.FileExists(configPath))
                 throw new FileNotFoundException($"Could not find game config file at expected path {configPath}");
 
             var configText = disk.ReadAllBytes(configPath);
-            return JsonUtil.Deserialize<GameConfig>(configText);
+            return jsonUtil.Deserialize<GameConfig>(configText);
         }
 
-        public static GameConfig LoadLiteral(byte[] json) =>
-            JsonUtil.Deserialize<GameConfig>(json);
+        public static GameConfig LoadLiteral(byte[] json, IJsonUtil jsonUtil)
+        {
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+            return jsonUtil.Deserialize<GameConfig>(json);
+        }
     }
 }
 #pragma warning restore CA1034 // Nested types should not be visible

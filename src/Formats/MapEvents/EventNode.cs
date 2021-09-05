@@ -62,7 +62,7 @@ namespace UAlbion.Formats.MapEvents
                     S.UInt16,
                     MaxToNullConverter.Instance);
 
-                if(falseEventId != null && branch.NextIfFalse == null)
+                if (falseEventId != null && branch.NextIfFalse == null)
                     branch.NextIfFalse = new DummyEventNode(falseEventId.Value);
             }
             else
@@ -98,7 +98,7 @@ namespace UAlbion.Formats.MapEvents
                     case '=':
                         if (step > 0) throw new FormatException($"Unexpected '{s[i]}' while parsing \"{s}\" as an event node");
                         i++;
-                        if(s[i] != '>') throw new FormatException($"Unexpected '{s[i]}' while parsing \"{s}\" as an event node (expected '>')");
+                        if (s[i] != '>') throw new FormatException($"Unexpected '{s[i]}' while parsing \"{s}\" as an event node (expected '>')");
                         step = 1; id = n; n = 0;
                         break;
                     case '!':

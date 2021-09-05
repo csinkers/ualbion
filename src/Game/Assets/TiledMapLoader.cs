@@ -13,10 +13,10 @@ namespace UAlbion.Game.Assets
 {
     public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
     {
-        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
-            => Serdes((BaseMapData) existing, info, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+            => Serdes((BaseMapData) existing, info, mapping, s, jsonUtil);
 
-        public BaseMapData Serdes(BaseMapData existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public BaseMapData Serdes(BaseMapData existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));

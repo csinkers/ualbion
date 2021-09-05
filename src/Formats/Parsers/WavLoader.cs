@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Parsers
 {
     public class WavLoader : IAssetLoader<ISample>
     {
-        public ISample Serdes(ISample w, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public ISample Serdes(ISample w, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (s.IsWriting() && w == null)
@@ -65,7 +65,7 @@ namespace UAlbion.Formats.Parsers
             w.Samples = s.Bytes(nameof(w.Samples), w.Samples, sampleCount);
         }
 
-        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
-            => Serdes((ISample) existing, info, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+            => Serdes((ISample) existing, info, mapping, s, jsonUtil);
     }
 }

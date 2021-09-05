@@ -33,7 +33,7 @@ namespace UAlbion.Formats.Assets
 
         ItemSlot TrySlot(ItemSlotId id) => Slots.Length > (int)id ? Slots[(int)id] : null;
 
-        [JsonIgnore] public InventoryId Id { get; private set; }
+        [JsonIgnore] public InventoryId Id { get; }
         [JsonInclude] public ItemSlot[] Slots { get; private set; }
         [JsonIgnore] public IEnumerable<ItemSlot> BackpackSlots { get { for (int i = 0; i < (int)ItemSlotId.NormalSlotCount; i++) yield return Slots[i]; } }
         [JsonIgnore] public ItemSlot Gold        => TrySlot(ItemSlotId.Gold);
@@ -89,8 +89,8 @@ namespace UAlbion.Formats.Assets
             {
                 if (s.IsReading())
                 {
-                    inv.Gold.Item = new Gold();
-                    inv.Rations.Item = new Rations();
+                    inv.Gold.Item = Assets.Gold.Instance;
+                    inv.Rations.Item = Assets.Rations.Instance;
                 }
 
                 inv.Gold.Amount = s.UInt16(nameof(inv.Gold), inv.Gold.Amount);

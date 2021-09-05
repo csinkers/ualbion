@@ -13,7 +13,7 @@ namespace UAlbion.Formats.Containers
     /// </summary>
     public class RawContainer : IAssetContainer
     {
-        public ISerializer Read(string file, AssetInfo info, IFileSystem disk)
+        public ISerializer Read(string file, AssetInfo info, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
@@ -23,7 +23,7 @@ namespace UAlbion.Formats.Containers
             return new AlbionReader(br);
         }
 
-        public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk)
+        public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (assets == null) throw new ArgumentNullException(nameof(assets));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
@@ -45,7 +45,7 @@ namespace UAlbion.Formats.Containers
             disk.WriteAllBytes(path, bytes);
         }
 
-        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk) 
+        public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk, IJsonUtil jsonUtil)
             => new() { (0, 1) };
     }
 }

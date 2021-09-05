@@ -33,6 +33,7 @@ namespace UAlbion.Formats.Tests
                 .RegisterAssetType(typeof(Base.Switch), AssetType.Switch)
                 .RegisterAssetType(typeof(Base.Ticker), AssetType.Ticker);
             var mapping = AssetMapping.Global;
+            var jsonUtil = new FormatJsonUtil();
 
             // === Load ===
             using var stream = File.Open(file, FileMode.Open, FileAccess.Read);
@@ -50,7 +51,7 @@ namespace UAlbion.Formats.Tests
             using var aw = new AnnotationFacadeSerializer(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
             SavedGame.Serdes(save, mapping, aw);
 
-            File.WriteAllText(file + ".json", JsonUtil.Serialize(save));
+            File.WriteAllText(file + ".json", jsonUtil.Serialize(save));
 
             // write out debugging files and compare round-tripped data
             br.BaseStream.Position = 0;
@@ -94,7 +95,7 @@ namespace UAlbion.Formats.Tests
 
                 //* Save JSON for debugging
                 {
-                    File.WriteAllText(file + ".json", JsonUtil.Serialize(save));
+                    File.WriteAllText(file + ".json", jsonUtil.Serialize(save));
                     Console.WriteLine($"===== {file}.json =====");
                     Console.WriteLine(File.ReadAllText($"{file}.json"));
                 }

@@ -32,10 +32,11 @@ namespace UAlbion.Game.Settings
         public float Special2 { get; set; }
         public EngineFlags Flags { get; set; } = EngineFlags.VSync; 
 
-        public static GeneralSettings Load(IGeneralConfig config, IFileSystem disk)
+        public static GeneralSettings Load(IGeneralConfig config, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
 
             var path = config.ResolvePath(UserPath);
             if (!disk.FileExists(path))
@@ -45,7 +46,7 @@ namespace UAlbion.Game.Settings
                 throw new FileNotFoundException($"Could not find default settings file (expected at {path})");
 
             var settings = disk.FileExists(path) 
-                ? JsonUtil.Deserialize<GeneralSettings>(disk.ReadAllBytes(path)) 
+                ? jsonUtil.Deserialize<GeneralSettings>(disk.ReadAllBytes(path)) 
                 : new GeneralSettings();
 
             if (!settings.ActiveMods.Any())
@@ -53,17 +54,18 @@ namespace UAlbion.Game.Settings
             return settings;
         }
 
-        public void Save(IGeneralConfig config, IFileSystem disk)
+        public void Save(IGeneralConfig config, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
 
             var path = config.ResolvePath(UserPath);
             var dir = Path.GetDirectoryName(path);
             if (!disk.DirectoryExists(dir))
                 disk.CreateDirectory(dir);
 
-            var json = JsonUtil.Serialize(this);
+            var json = jsonUtil.Serialize(this);
             disk.WriteAllText(path, json);
         }
     }

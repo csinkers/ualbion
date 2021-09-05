@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Formats.Parsers;
@@ -10,6 +11,7 @@ namespace UAlbion.Formats.Tests
 {
     public class SpriteLoaderTests
     {
+        static readonly IJsonUtil JsonUtil = new FormatJsonUtil();
         static readonly SingleHeaderSpriteLoader HeaderLoader = new();
         static readonly MultiHeaderSpriteLoader MultiHeaderLoader = new();
         static readonly AmorphousSpriteLoader AmorphousLoader = new();
@@ -56,7 +58,7 @@ namespace UAlbion.Formats.Tests
             };
 
             RoundTrip(oneFrame,
-                (x, s) => HeaderLoader.Serdes(x, new AssetInfo(), null, s),
+                (x, s) => HeaderLoader.Serdes(x, new AssetInfo(), null, s, JsonUtil),
                 sprite =>
                 {
                     Assert.Equal(4, sprite.Width);
@@ -86,7 +88,7 @@ namespace UAlbion.Formats.Tests
             };
 
             RoundTrip(twoFrames,
-                (x, s) => HeaderLoader.Serdes(x, new AssetInfo(), null, s),
+                (x, s) => HeaderLoader.Serdes(x, new AssetInfo(), null, s, JsonUtil),
                 sprite =>
                 {
                     Assert.Equal(4, sprite.Width);
@@ -136,7 +138,7 @@ namespace UAlbion.Formats.Tests
 
             var info = new AssetInfo();
             RoundTrip(nonUniform,
-                (x, s) => MultiHeaderLoader.Serdes(x, info, null, s),
+                (x, s) => MultiHeaderLoader.Serdes(x, info, null, s, JsonUtil),
                 sprite =>
                 {
                     Assert.Equal(5, sprite.Width);
@@ -173,7 +175,7 @@ namespace UAlbion.Formats.Tests
             var info = new AssetInfo();
             info.Set(AssetProperty.SubSprites, "(3,2,2) (2,1)");
             RoundTrip(oneFrame,
-                (x, s) => AmorphousLoader.Serdes(x, info, null, s),
+                (x, s) => AmorphousLoader.Serdes(x, info, null, s, JsonUtil),
                 sprite =>
                 {
                     Assert.Equal(3, sprite.Width);

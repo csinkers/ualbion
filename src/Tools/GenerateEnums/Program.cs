@@ -8,7 +8,8 @@ namespace UAlbion.CodeGenerator
         {
             // TODO: Add verify mode
             var disk = new FileSystem();
-            var assets = new Assets(disk);
+            var jsonUtil = new JsonUtil();
+            var assets = new Assets(disk, jsonUtil);
             GenerateAssetIds.Generate(assets);
         }
     }

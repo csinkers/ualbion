@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -11,7 +12,7 @@ namespace UAlbion.Game.Assets
 {
     public class ItemNameCollector : Component, IAssetLoader<MultiLanguageStringDictionary>
     {
-        public MultiLanguageStringDictionary Serdes(MultiLanguageStringDictionary existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public MultiLanguageStringDictionary Serdes(MultiLanguageStringDictionary existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
             if (mapping == null) throw new ArgumentNullException(nameof(mapping));
             if (s.IsWriting()) return existing;
@@ -51,7 +52,7 @@ namespace UAlbion.Game.Assets
             };
         }
 
-        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
-            => Serdes((MultiLanguageStringDictionary)existing, info, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+            => Serdes((MultiLanguageStringDictionary)existing, info, mapping, s, jsonUtil);
     }
 }

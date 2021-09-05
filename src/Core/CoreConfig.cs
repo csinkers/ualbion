@@ -30,14 +30,15 @@ namespace UAlbion.Core
             }
         }
 
-        public static CoreConfig Load(string configPath, IFileSystem disk)
+        public static CoreConfig Load(string configPath, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
             if (!disk.FileExists(configPath))
                 return new CoreConfig();
 
             var configText = disk.ReadAllBytes(configPath);
-            return JsonUtil.Deserialize<CoreConfig>(configText);
+            return jsonUtil.Deserialize<CoreConfig>(configText);
         }
     }
 #pragma warning restore CA1034 // Nested types should not be visible

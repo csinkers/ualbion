@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -20,19 +21,21 @@ namespace UAlbion.Game.Assets
                 AttachChild(component);
         }
 
-        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
-            => Serdes((IReadOnlyTexture<byte>)existing, info, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+            => Serdes((IReadOnlyTexture<byte>)existing, info, mapping, s, jsonUtil);
 
-        public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
-            return s.IsWriting() ? Write(existing, info, mapping, s) : Read(info, mapping, s);
+            return s.IsWriting() 
+                ? Write(existing, info, mapping, s, jsonUtil) 
+                : Read(info, mapping, s, jsonUtil);
         }
 
-        IReadOnlyTexture<byte> Read(AssetInfo info, AssetMapping mapping, ISerializer s)
+        IReadOnlyTexture<byte> Read(AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
-            var font = _loader.Serdes(null, info, mapping, s);
+            var font = _loader.Serdes(null, info, mapping, s, jsonUtil);
             if (font == null)
                 return null;
 
@@ -56,7 +59,7 @@ namespace UAlbion.Game.Assets
             return new SimpleTexture<byte>(font.Id, font.Id.ToString(), font.Width, font.Height, font.PixelData, frames);
         }
 
-        IReadOnlyTexture<byte> Write(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+        IReadOnlyTexture<byte> Write(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
             if (existing == null) throw new ArgumentNullException(nameof(existing));
             int width = info.Width;
@@ -73,7 +76,7 @@ namespace UAlbion.Game.Assets
                 BlitUtil.BlitDirect( oldFrame, repacked.GetMutableRegionBuffer(i));
             }
 
-            var font = _loader.Serdes(repacked, info, mapping, s);
+            var font = _loader.Serdes(repacked, info, mapping, s, jsonUtil);
             return font == null ? null : existing;
         }
     }

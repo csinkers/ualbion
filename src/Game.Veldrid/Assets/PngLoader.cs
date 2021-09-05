@@ -8,6 +8,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.PixelFormats;
+using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -61,7 +62,7 @@ namespace UAlbion.Game.Veldrid.Assets
             return new SimpleTexture<byte>(id, id.ToString(), totalWidth, totalHeight, pixels, frames);
         }
 
-        public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
@@ -99,7 +100,7 @@ namespace UAlbion.Game.Veldrid.Assets
             finally { foreach (var image in images) image.Dispose(); }
         }
 
-        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
-            => Serdes((IReadOnlyTexture<byte>)existing, info, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+            => Serdes((IReadOnlyTexture<byte>)existing, info, mapping, s, jsonUtil);
     }
 }

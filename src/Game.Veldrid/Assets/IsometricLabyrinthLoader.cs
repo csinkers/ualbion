@@ -4,6 +4,7 @@ using System.IO;
 using SerdesNet;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -81,11 +82,11 @@ namespace UAlbion.Game.Veldrid.Assets
             yield return (tsxPath, tsxBytes);
         }
 
-        byte[] SaveJson(LabyrinthData labyrinth, AssetInfo info, AssetMapping mapping) =>
+        byte[] SaveJson(LabyrinthData labyrinth, AssetInfo info, AssetMapping mapping, IJsonUtil jsonUtil) =>
             FormatUtil.SerializeToBytes(s =>
-                _jsonLoader.Serdes(labyrinth, info, mapping, s));
+                _jsonLoader.Serdes(labyrinth, info, mapping, s, jsonUtil));
 
-        public LabyrinthData Serdes(LabyrinthData existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public LabyrinthData Serdes(LabyrinthData existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (s.IsWriting())
@@ -103,7 +104,7 @@ namespace UAlbion.Game.Veldrid.Assets
 
                 string B(string pattern) => info.BuildFilename(pattern, 0);
 
-                var files = new List<(string, byte[])> { (B(json), SaveJson(existing, info, mapping)) };
+                var files = new List<(string, byte[])> { (B(json), SaveJson(existing, info, mapping, jsonUtil)) };
                 files.AddRange(Save(existing, info, IsometricMode.Floors, B(floorPng), B(floorTsx)));
                 files.AddRange(Save(existing, info, IsometricMode.Ceilings, B(ceilingPng), B(ceilingTsx)));
                 files.AddRange(Save(existing, info, IsometricMode.Walls, B(wallPng), B(wallTsx)));
@@ -118,8 +119,8 @@ namespace UAlbion.Game.Veldrid.Assets
             }
         }
 
-        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
-            => Serdes((LabyrinthData)existing, info, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+            => Serdes((LabyrinthData)existing, info, mapping, s, jsonUtil);
 
         public void Dispose() => _engine?.Dispose();
     }

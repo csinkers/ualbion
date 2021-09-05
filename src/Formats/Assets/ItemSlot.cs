@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Globalization;
 using System.Numerics;
+using System.Text;
 using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api;
@@ -31,11 +33,11 @@ namespace UAlbion.Formats.Assets
         IContents _item;
         public ItemSlot(InventorySlotId id) => Id = id;
         [JsonIgnore] public InventorySlotId Id { get; }
+        [JsonIgnore] public Vector2 LastUiPosition { get; set; }
+        public ushort Amount { get; set; }
+        public ItemSlotFlags Flags { get; set; }
         public byte Charges { get; set; }
         public byte Enchantment { get; set; }
-        public Vector2 LastUiPosition { get; set; }
-        public ItemSlotFlags Flags { get; set; }
-        public ushort Amount { get; set; }
 
         [JsonIgnore]
         public IContents Item
@@ -60,26 +62,135 @@ namespace UAlbion.Formats.Assets
         {
             get => Item switch
             {
-                Gold _ => AssetId.Gold,
-                Rations _ => AssetId.Rations,
+                Gold => AssetId.Gold,
+                Rations => AssetId.Rations,
                 ItemData item => item.Id,
                 ItemProxy item => item.Id,
                 _ => AssetId.None
             };
             set
             {
-                _item = value.Type switch
+                Item = value.Type switch
                 {
-                    AssetType.Gold => new Gold(),
-                    AssetType.Rations => new Rations(),
+                    AssetType.Gold => Gold.Instance,
+                    AssetType.Rations => Rations.Instance,
                     AssetType.Item => new ItemProxy(value),
                     _ => null
                 };
             }
         }
 
-        public ItemSlot DeepClone() => (ItemSlot)MemberwiseClone();
-        public override string ToString() => Amount == 0 ? "Empty" : $"{Amount}x{ItemId} {Flags}";
+        public ItemSlot DeepClone() => (ItemSlot) MemberwiseClone();
+
+        /* Test cases:
+        Empty
+        Item.Dagger
+        2x Item.Dagger
+        Item.Dagger F(Cursed, Broken)
+        Item.SerpentStaff C10 E1
+        Item.SerpentStaff F(Unk3) C10 E1
+        */
+        public override string ToString()
+        {
+            if (Amount == 0) return "Empty";
+            var sb = new StringBuilder();
+            if (Amount == Unlimited)
+            {
+                sb.Append("(Inf) ");
+            }
+            else if (Amount != 1)
+            {
+                sb.Append(Amount);
+                sb.Append("x ");
+            }
+
+            sb.Append(ItemId);
+            if (Flags != 0)
+            {
+                sb.Append(" F(");
+                sb.Append(Flags);
+                sb.Append(")");
+            }
+
+            if (Charges != 0)
+            {
+                sb.Append(" C");
+                sb.Append(Charges);
+            }
+
+            if (Charges != 0)
+            {
+                sb.Append(" E");
+                sb.Append(Enchantment);
+            }
+
+            return sb.ToString();
+        }
+
+        public static ItemSlot Parse(string s)
+        {
+            var slot = new ItemSlot(new InventorySlotId());
+            if (string.IsNullOrWhiteSpace(s) || "Empty".Equals(s, StringComparison.InvariantCultureIgnoreCase))
+                return slot;
+
+            int index = 0;
+            if (s.StartsWith("(Inf) ", true, CultureInfo.InvariantCulture))
+            {
+                slot.Amount = Unlimited;
+                index = "(Inf) ".Length;
+            }
+            else if (char.IsDigit(s[0]))
+            {
+                index = s.IndexOf("x ", StringComparison.Ordinal) + 2;
+                if (index == -1)
+                    throw new FormatException($"ItemSlot \"{s}\" began with a digit, but wasn't followed by \"x \"");
+
+                if (!ushort.TryParse(s[..(index - 2)], NumberStyles.None, CultureInfo.InvariantCulture, out var amount) || amount > MaxItemCount)
+                    throw new FormatException($"Amount in \"{s}\" was outside the allowed range [0..{MaxItemCount}]");
+                slot.Amount = amount;
+            }
+            else slot.Amount = 1;
+
+            int index2 = s.IndexOf(' ', index);
+            var itemId = index2 == -1 ? s[index..] : s[index..index2];
+            slot.ItemId = ItemId.Parse(itemId);
+            if (index2 == -1)
+                return slot;
+
+            char mode = ' ';
+            for (int i = index2; i < s.Length; i++)
+            {
+                switch (mode)
+                {
+                    case ' ': mode = s[i]; break;
+                    case 'F':
+                        mode = s[i];
+                        if (mode != '(') throw new FormatException($"Expected '(' after 'F' when parsing ItemSlot \"{s}\"");
+                        break;
+                    case '(':
+                        index = s.IndexOf(')', i);
+                        if (i == -1) throw new FormatException($"Expected ')' after the flag list when parsing ItemSlot \"{s}\"");
+                        slot.Flags = (ItemSlotFlags)Enum.Parse(typeof(ItemSlotFlags), s[i..index]);
+                        i = index;
+                        mode = ' ';
+                        break;
+                    case 'C':
+                    case 'E':
+                        index = s.IndexOf(' ', i);
+                        if (index == -1) index = s.Length;
+                        var valueString = s[i..index];
+                        var value = byte.Parse(valueString, CultureInfo.InvariantCulture);
+                        if (mode == 'C') slot.Charges = value;
+                        else slot.Enchantment = value;
+                        i = index;
+                        mode = ' ';
+                        break;
+                    default: throw new FormatException($"Unexpected '{mode}' in ItemSlot \"{s}\"");
+                }
+            }
+
+            return slot;
+        }
 
         public static ItemSlot Serdes(InventorySlotId id, ItemSlot slot, AssetMapping mapping, ISerializer s)  // 6 per slot
         {
@@ -106,8 +217,8 @@ namespace UAlbion.Formats.Assets
             {
                 case null: return 0;
 
-                case Gold _ when Item is Gold:
-                case Rations _ when Item is Rations:
+                case Gold when Item is Gold:
+                case Rations when Item is Rations:
                 {
                     ushort amountToTransfer = Math.Min(other.Amount, quantity ?? (ushort)short.MaxValue);
                     amountToTransfer = Math.Min((ushort)(short.MaxValue - Amount), amountToTransfer);
@@ -174,13 +285,16 @@ namespace UAlbion.Formats.Assets
             return itemsTransferred;
         }
 
-        public void Set(IContents item, ushort amount, ItemSlotFlags flags = 0, byte charges = 0, byte enchantment = 0) // Just for tests
+        public ItemSlot Set(ItemId item, ushort amount, ItemSlotFlags flags = 0, byte charges = 0, byte enchantment = 0) // Just for tests
+            => Set(new ItemProxy(item), amount, flags, charges, enchantment);
+        public ItemSlot Set(IContents item, ushort amount, ItemSlotFlags flags = 0, byte charges = 0, byte enchantment = 0) // Just for tests
         {
             Item = item;
             Amount = amount;
             Flags = flags;
             Charges = charges;
             Enchantment = enchantment;
+            return this;
         }
 
         public bool CanCoalesce(ItemSlot y)
@@ -190,7 +304,7 @@ namespace UAlbion.Formats.Assets
             if (ItemId != y.ItemId) return false; // Can't stack dissimilar items
             if (Item is Gold) return true;
             if (Item is Rations) return true;
-            if (!(Item is ItemData xi) || !(y.Item is ItemData _)) return false; // If not gold/rations, then both must be items
+            if (!(Item is ItemData xi) || !(y.Item is ItemData)) return false; // If not gold/rations, then both must be items
             if (Id.Slot.IsBodyPart() || y.Id.Slot.IsBodyPart()) return false; // Can't wield / wear stacks
             return xi.IsStackable;
         }

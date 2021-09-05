@@ -49,7 +49,7 @@ namespace UAlbion
             var config = Resolve<IGeneralConfig>();
             services
                 .Add(new InputManager().RegisterMouseMode(MouseMode.Normal, new NormalMouseMode()))
-                .Add(new InputBinder(disk => InputConfig.Load(config.BasePath, disk)))
+                .Add(new InputBinder((disk, jsonUtil) => InputConfig.Load(config.BasePath, disk, jsonUtil)))
                 ;
 
             _mainFramebuffer = new MainFramebuffer();

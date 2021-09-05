@@ -18,8 +18,9 @@ namespace UAlbion.Formats.Containers
         /// <param name="path">The path to the container file/directory</param>
         /// <param name="info">The config metadata for the asset</param>
         /// <param name="disk">The service to use for accessing the file system</param>
+        /// <param name="jsonUtil">The JSON serialization helper</param>
         /// <returns></returns>
-        ISerializer Read(string path, AssetInfo info, IFileSystem disk);
+        ISerializer Read(string path, AssetInfo info, IFileSystem disk, IJsonUtil jsonUtil);
 
         /// <summary>
         /// Write all assets inside a container
@@ -27,7 +28,8 @@ namespace UAlbion.Formats.Containers
         /// <param name="path">The path to the container file/directory</param>
         /// <param name="assets">A list of pairs containing asset metadata and the corresponding raw bytes of the asset</param>
         /// <param name="disk">The service to use for accessing the file system</param>
-        void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk);
+        /// <param name="jsonUtil">The JSON serialization helper</param>
+        void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk, IJsonUtil jsonUtil);
         
         /// <summary>
         /// Open the container and return the sub-item ranges that are present inside it.
@@ -35,7 +37,8 @@ namespace UAlbion.Formats.Containers
         /// <param name="path">The path to the container file/directory</param>
         /// <param name="info">The config metadata for the container</param>
         /// <param name="disk">The service to use for accessing the file system</param>
+        /// <param name="jsonUtil">The JSON serialization helper</param>
         /// <returns>A list of range pairs: (subItemId of start of range, count of ids in range)</returns>
-        List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk); 
+        List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk, IJsonUtil jsonUtil); 
     }
 }

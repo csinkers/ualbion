@@ -49,8 +49,8 @@ namespace UAlbion.Editor
                 var newItem = itemId.Type switch
                 {
                     AssetType.None => (IContents)null,
-                    AssetType.Gold => new Gold(),
-                    AssetType.Rations => new Rations(),
+                    AssetType.Gold => Gold.Instance,
+                    AssetType.Rations => Rations.Instance,
                     _ => Resolve<IRawAssetManager>().LoadItem(itemId)
                 };
                 Raise(new EditorSetPropertyEvent(assetId, nameof(_slot.Item), _slot.Item, newItem));

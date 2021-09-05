@@ -87,11 +87,11 @@ namespace UAlbion.Game
                     return new ReflectedObject(parent, index)
                     { Name = name, Target = o, Value = $"\"{s.Replace("\"", "\\\"", StringComparison.Ordinal)}\"" };
 
-                case bool _:   case byte _:
-                case ushort _: case short _:
-                case uint _:   case int _:
-                case ulong _:  case long _:
-                case float _:  case double _:
+                case bool:   case byte:
+                case ushort: case short:
+                case uint:   case int:
+                case ulong:  case long:
+                case float:  case double:
                     return new ReflectedObject(parent, index)
                     { Name = name, Target = o, Value = o.ToString() };
                 case Enum e:

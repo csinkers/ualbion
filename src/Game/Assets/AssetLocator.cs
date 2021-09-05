@@ -27,6 +27,7 @@ namespace UAlbion.Game.Assets
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (extraPaths == null) throw new ArgumentNullException(nameof(extraPaths));
             var generalConfig = Resolve<IGeneralConfig>();
+            var jsonUtil = Resolve<IJsonUtil>();
 
             using ISerializer s = Search(generalConfig, info, extraPaths);
             if (s == null)
@@ -39,7 +40,7 @@ namespace UAlbion.Game.Assets
             if (loader == null)
                 throw new InvalidOperationException($"Could not instantiate loader \"{info.File.Loader}\" required by asset {info.AssetId}");
 
-            return loader.Serdes(null, info, mapping, s);
+            return loader.Serdes(null, info, mapping, s, jsonUtil);
         }
 
         public List<(int,int)> GetSubItemRangesForFile(AssetFileInfo info, IDictionary<string, string> extraPaths)
@@ -48,20 +49,22 @@ namespace UAlbion.Game.Assets
 
             var generalConfig = Resolve<IGeneralConfig>();
             var disk = Resolve<IFileSystem>();
+            var jsonUtil = Resolve<IJsonUtil>();
             var resolved = generalConfig.ResolvePath(info.Filename, extraPaths);
             var container = _containerRegistry.GetContainer(resolved, info.Container, disk);
-            return container?.GetSubItemRanges(resolved, info, disk) ?? new List<(int, int)> { (0, 1) };
+            return container?.GetSubItemRanges(resolved, info, disk, jsonUtil) ?? new List<(int, int)> { (0, 1) };
         }
 
         ISerializer Search(IGeneralConfig generalConfig, AssetInfo info, IDictionary<string, string> extraPaths)
         {
             var path = generalConfig.ResolvePath(info.File.Filename, extraPaths);
             var disk = Resolve<IFileSystem>();
+            var jsonUtil = Resolve<IJsonUtil>();
             if (info.File.Sha256Hash != null && !info.File.Sha256Hash.Equals(GetHash(path, disk), StringComparison.OrdinalIgnoreCase))
                 return null;
 
             var container = _containerRegistry.GetContainer(path, info.File.Container, disk);
-            return container?.Read(path, info, disk);
+            return container?.Read(path, info, disk, jsonUtil);
         }
 
         string GetHash(string filename, IFileSystem disk)

@@ -5,6 +5,7 @@ using System.Threading;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
@@ -22,6 +23,7 @@ namespace UAlbion.Base.Tests
     {
         static int s_testNum;
 
+        static readonly IJsonUtil JsonUtil = new FormatJsonUtil();
         static readonly CoreConfig CoreConfig;
         static readonly GeneralConfig GeneralConfig;
         static readonly GameConfig GameConfig;
@@ -32,9 +34,9 @@ namespace UAlbion.Base.Tests
         {
             var disk = new MockFileSystem(true);
             var baseDir = ConfigUtil.FindBasePath(disk);
-            GeneralConfig = AssetSystem.LoadGeneralConfig(baseDir, disk);
+            GeneralConfig = AssetSystem.LoadGeneralConfig(baseDir, disk, JsonUtil);
             CoreConfig = new CoreConfig();
-            GameConfig = AssetSystem.LoadGameConfig(baseDir, disk);
+            GameConfig = AssetSystem.LoadGameConfig(baseDir, disk, JsonUtil);
             Settings = new GeneralSettings
             {
                 ActiveMods = { "Base" },
@@ -58,7 +60,7 @@ namespace UAlbion.Base.Tests
         static T Test<T>(Func<IAssetManager, T> func)
         {
             var disk = new MockFileSystem(true);
-            var exchange = AssetSystem.Setup(disk, GeneralConfig, Settings, CoreConfig, GameConfig);
+            var exchange = AssetSystem.Setup(disk, JsonUtil, GeneralConfig, Settings, CoreConfig, GameConfig);
 
             var assets = exchange.Resolve<IAssetManager>();
             var result = func(assets);
@@ -124,7 +126,7 @@ namespace UAlbion.Base.Tests
         {
             var chest = Test(assets => assets.LoadInventory(AssetId.From(Chest.Unknown121)));
             Assert.Equal(25, chest.Gold.Amount);
-            Assert.Equal(new Gold(), chest.Gold.Item);
+            Assert.Equal(Gold.Instance, chest.Gold.Item);
             Assert.Equal(1, chest.Slots[0].Amount);
             Assert.Equal(Item.IskaiDagger, chest.Slots[0].ItemId);
         }

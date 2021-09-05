@@ -179,8 +179,8 @@ namespace UAlbion.Formats.Assets
             ushort rations = s.UInt16("Rations", sheet.Inventory?.Rations.Amount ?? 0);
             if (sheet.Inventory != null)
             {
-                sheet.Inventory.Gold.Item = new Gold();
-                sheet.Inventory.Rations.Item = new Rations();
+                sheet.Inventory.Gold.Item = Gold.Instance;
+                sheet.Inventory.Rations.Item = Rations.Instance;
                 sheet.Inventory.Gold.Amount = gold;
                 sheet.Inventory.Rations.Amount = rations;
             }

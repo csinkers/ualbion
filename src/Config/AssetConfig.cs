@@ -19,9 +19,10 @@ namespace UAlbion.Config
 
         Dictionary<AssetId, AssetInfo[]> _assetLookup;
 
-        public static AssetConfig Parse(byte[] configText)
+        public static AssetConfig Parse(byte[] configText, IJsonUtil jsonUtil)
         {
-            var config = JsonUtil.Deserialize<AssetConfig>(configText);
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+            var config = jsonUtil.Deserialize<AssetConfig>(configText);
             if (config == null)
                 return null;
 
@@ -29,23 +30,25 @@ namespace UAlbion.Config
             return config;
         }
 
-        public static AssetConfig Load(string configPath, IFileSystem disk)
+        public static AssetConfig Load(string configPath, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
             if (!disk.FileExists(configPath))
                 throw new FileNotFoundException($"Could not open asset config from {configPath}");
 
             var configText = disk.ReadAllBytes(configPath);
-            var config = Parse(configText);
+            var config = Parse(configText, jsonUtil);
             if(config == null)
                 throw new FileLoadException($"Could not load asset config from \"{configPath}\"");
             return config;
         }
 
-        public void Save(string configPath, IFileSystem disk)
+        public void Save(string configPath, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
-            var json = JsonUtil.Serialize(this);
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+            var json = jsonUtil.Serialize(this);
             disk.WriteAllText(configPath, json);
         }
 
@@ -83,16 +86,18 @@ namespace UAlbion.Config
         }
 
         public void PopulateAssetIds(
+            IJsonUtil jsonUtil,
             AssetMapping mapping,
             Func<AssetFileInfo, IList<(int, int)>> getSubItemCountForFile,
             Func<string, byte[]> readAllBytesFunc)
         {
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
             if (mapping == null) throw new ArgumentNullException(nameof(mapping));
 
             var temp = new Dictionary<AssetId, List<AssetInfo>>();
             foreach (var file in Files)
             {
-                file.Value.PopulateAssetIds(x => ResolveId(mapping, x), getSubItemCountForFile, readAllBytesFunc);
+                file.Value.PopulateAssetIds(jsonUtil, x => ResolveId(mapping, x), getSubItemCountForFile, readAllBytesFunc);
 
                 foreach (var asset in file.Value.Map.Values)
                 {

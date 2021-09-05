@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using UAlbion.Api;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -9,6 +10,7 @@ namespace UAlbion.Config.Tests
 {
     public class AssetMappingTests : Component
     {
+        static readonly IJsonUtil JsonUtil = new JsonUtil();
         readonly ITestOutputHelper _output;
         enum ZeroBasedByte : byte { Zero = 0, One, Two }
         enum OneBasedByte : byte { One = 1, Two, Three }
@@ -133,7 +135,7 @@ namespace UAlbion.Config.Tests
                 x => Assert.Equal("ZeroBasedShort.Two", x.ToString())
             );
 
-            var json = m.Serialize();
+            var json = m.Serialize(JsonUtil);
             const string expectedJson =
                 @"{
   ""UAlbion.Config.Tests.AssetMappingTests+ZeroBasedByte, UAlbion.Config.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"": {
@@ -191,7 +193,7 @@ namespace UAlbion.Config.Tests
 }";
             Assert.Equal(expectedJson, json);
 
-            var roundTripped = AssetMapping.Deserialize(Encoding.UTF8.GetBytes(json));
+            var roundTripped = AssetMapping.Deserialize(Encoding.UTF8.GetBytes(json), JsonUtil);
             var portraitAssets = roundTripped.EnumerateAssetsOfType(AssetType.Portrait).ToList();
             Assert.Collection(portraitAssets,
                 x => Assert.Equal("ZeroBasedByte.Zero", x.ToString()),
@@ -264,7 +266,7 @@ namespace UAlbion.Config.Tests
             var m = AssetMapping.Global.Clear();
             m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait);
             m.RegisterAssetType(typeof(OneBasedByte), AssetType.Npc);
-            _output.WriteLine(m.Serialize());
+            _output.WriteLine(m.Serialize(JsonUtil));
             Assert.Equal(AssetId.From(ZeroBasedByte.Zero), m.Parse("Zero", null));
             Assert.Throws<FormatException>(() => m.Parse("One", null)); // Ambiguous
             Assert.Equal(AssetId.From(ZeroBasedByte.One), m.Parse("One", new[] {AssetType.Portrait}));
@@ -279,7 +281,7 @@ namespace UAlbion.Config.Tests
             var m = AssetMapping.Global.Clear();
             m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait);
             m.RegisterAssetType(typeof(OneBasedByte), AssetType.Npc);
-            _output.WriteLine(m.Serialize());
+            _output.WriteLine(m.Serialize(JsonUtil));
             Assert.Equal(AssetId.From(ZeroBasedByte.One), m.Parse("Portrait.One", null));
             Assert.Equal(AssetId.From(OneBasedByte.One), m.Parse("Npc.One", null));
         }
@@ -289,7 +291,7 @@ namespace UAlbion.Config.Tests
         {
             var m = AssetMapping.Global.Clear();
             m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait);
-            _output.WriteLine(m.Serialize());
+            _output.WriteLine(m.Serialize(JsonUtil));
             Assert.Equal(AssetId.None, m.Parse("None", null)); // Succeeds due to special case
             Assert.Equal(AssetId.None, m.Parse("None.0", null));
 
@@ -307,7 +309,7 @@ namespace UAlbion.Config.Tests
         {
             var m = AssetMapping.Global.Clear();
             m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait);
-            _output.WriteLine(m.Serialize());
+            _output.WriteLine(m.Serialize(JsonUtil));
             Assert.Equal("None", AssetId.None.ToString());
             Assert.Equal("Gold.0", AssetId.Gold.ToString());
             Assert.Equal("Rations.0", AssetId.Rations.ToString());

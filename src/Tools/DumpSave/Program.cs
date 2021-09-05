@@ -176,6 +176,7 @@ namespace DumpSave
         static void Main(string[] args)
         {
             var disk = new FileSystem();
+            var jsonUtil = new FormatJsonUtil();
             var baseDir = ConfigUtil.FindBasePath(disk);
             if (baseDir == null)
                 throw new InvalidOperationException("No base directory could be found.");
@@ -190,8 +191,8 @@ namespace DumpSave
             var filename = args[0];
             var stream = disk.OpenRead(filename);
             using var br = new BinaryReader(stream, Encoding.GetEncoding(850));
-            var generalConfig = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir, disk);
-            var settings = GeneralSettings.Load(generalConfig, disk);
+            var generalConfig = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir, disk, jsonUtil);
+            var settings = GeneralSettings.Load(generalConfig, disk, jsonUtil);
             var settingsManager = new SettingsManager(settings);
             var assets = new AssetManager();
             var loaderRegistry = new AssetLoaderRegistry();

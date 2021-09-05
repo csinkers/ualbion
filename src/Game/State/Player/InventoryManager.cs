@@ -69,18 +69,18 @@ namespace UAlbion.Game.State.Player
                 case (null, null): return InventoryAction.Nothing;
                 case (null, _): return InventoryAction.Pickup;
 
-                case (Gold _, Gold _):
-                case (Rations _, Rations _): return InventoryAction.Coalesce;
-                case (Gold _, null): return slotId.Slot == ItemSlotId.Gold ? InventoryAction.PutDown : InventoryAction.Nothing;
-                case (Rations _, null): return slotId.Slot == ItemSlotId.Rations ? InventoryAction.PutDown : InventoryAction.Nothing;
+                case (Gold, Gold):
+                case (Rations, Rations): return InventoryAction.Coalesce;
+                case (Gold, null): return slotId.Slot == ItemSlotId.Gold ? InventoryAction.PutDown : InventoryAction.Nothing;
+                case (Rations, null): return slotId.Slot == ItemSlotId.Rations ? InventoryAction.PutDown : InventoryAction.Nothing;
 
-                case (ItemData _, null): return InventoryAction.PutDown;
-                case (ItemData _, ItemData _) when slot.CanCoalesce(_hand):
+                case (ItemData, null): return InventoryAction.PutDown;
+                case (ItemData, ItemData) when slot.CanCoalesce(_hand):
                     return slot.Amount >= ItemSlot.MaxItemCount
                         ? InventoryAction.NoCoalesceFullStack
                         : InventoryAction.Coalesce;
 
-                case (ItemData _, ItemData _):
+                case (ItemData, ItemData):
                     return InventoryAction.Swap;
 
                 default:
@@ -137,10 +137,10 @@ namespace UAlbion.Game.State.Player
             switch (_hand?.Item)
             {
                 case null: return true;
-                case Gold _: return slotId == ItemSlotId.Gold;
-                case Rations _: return slotId == ItemSlotId.Rations;
-                case ItemData _ when slotId < ItemSlotId.NormalSlotCount: return true;
-                case ItemData _ when id.Type != InventoryType.Player: return false;
+                case Gold: return slotId == ItemSlotId.Gold;
+                case Rations: return slotId == ItemSlotId.Rations;
+                case ItemData when slotId < ItemSlotId.NormalSlotCount: return true;
+                case ItemData when id.Type != InventoryType.Player: return false;
                 case ItemData item:
                     {
                         var state = Resolve<IGameState>();
@@ -183,8 +183,8 @@ namespace UAlbion.Game.State.Player
             // TODO: Goddess' amulet etc
             switch (slot.Item)
             {
-                case Gold _:
-                case Rations _: return true;
+                case Gold:
+                case Rations: return true;
                 case ItemData item when
                     slot.Id.Slot < ItemSlotId.Slot0 &&
                     item.Flags.HasFlag(ItemSlotFlags.Cursed):
@@ -198,8 +198,8 @@ namespace UAlbion.Game.State.Player
             var inventory = _getInventory((InventoryId)e.MemberId);
             switch (_hand.Item)
             {
-                case Gold _: inventory.Gold.TransferFrom(_hand, null); break;
-                case Rations _: inventory.Rations.TransferFrom(_hand, null); break;
+                case Gold: inventory.Gold.TransferFrom(_hand, null); break;
+                case Rations: inventory.Rations.TransferFrom(_hand, null); break;
                 case ItemData item:
                     {
                         ItemSlot slot = null;
@@ -235,13 +235,13 @@ namespace UAlbion.Game.State.Player
 
             var text = (slot.Item, discard) switch
             {
-                (Gold _, true) => Base.SystemText.Gold_ThrowHowMuchGoldAway,
-                (Gold _, false) => Base.SystemText.Gold_TakeHowMuchGold,
-                (Rations _, true) => Base.SystemText.Gold_ThrowHowManyRationsAway,
-                (Rations _, false) => Base.SystemText.Gold_TakeHowManyRations,
-                (ItemData item, true) => Base.SystemText.InvMsg_ThrowHowManyItemsAway,
-                (ItemData item, false) => Base.SystemText.InvMsg_TakeHowManyItems,
-                { } x => throw new InvalidOperationException($"Unexpected item contents {x}")
+                (Gold, true) => Base.SystemText.Gold_ThrowHowMuchGoldAway,
+                (Gold, false) => Base.SystemText.Gold_TakeHowMuchGold,
+                (Rations, true) => Base.SystemText.Gold_ThrowHowManyRationsAway,
+                (Rations, false) => Base.SystemText.Gold_TakeHowManyRations,
+                (ItemData, true) => Base.SystemText.InvMsg_ThrowHowManyItemsAway,
+                (ItemData, false) => Base.SystemText.InvMsg_TakeHowManyItems,
+                var x => throw new InvalidOperationException($"Unexpected item contents {x}")
             };
 
             if (RaiseAsync(new ItemQuantityPromptEvent((TextId)text, slot.Item.Icon, slot.Item.IconSubId, slot.Amount, slotId == ItemSlotId.Gold), continuation) == 0)
@@ -423,9 +423,9 @@ namespace UAlbion.Game.State.Player
 
                 var prompt = slot.Item switch
                 {
-                    Gold _ => Base.SystemText.Gold_ReallyThrowTheGoldAway,
-                    Rations _ => Base.SystemText.Gold_ReallyThrowTheRationsAway,
-                    ItemData _ when itemsToDrop == 1 => Base.SystemText.InvMsg_ReallyThrowThisItemAway,
+                    Gold => Base.SystemText.Gold_ReallyThrowTheGoldAway,
+                    Rations => Base.SystemText.Gold_ReallyThrowTheRationsAway,
+                    ItemData when itemsToDrop == 1 => Base.SystemText.InvMsg_ReallyThrowThisItemAway,
                     _ => Base.SystemText.InvMsg_ReallyThrowTheseItemsAway,
                 };
 

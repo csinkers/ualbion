@@ -5,6 +5,7 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Assets;
@@ -38,13 +39,14 @@ namespace UAlbion.Game.Tests
                 .RegisterAssetType(typeof(Base.Font), AssetType.Font)
                 ;
 
+            var jsonUtil = new FormatJsonUtil();
             var font = MockUniformFont.Font(AssetId.From(Base.Font.RegularFont));
             var modApplier = new MockModApplier()
                     .Add(new AssetId(AssetType.MetaFont, (ushort)new MetaFontId(false, FontColor.White)), font)
                     .AddInfo(AssetId.From(Base.Font.RegularFont), MockUniformFont.Info)
                 ;
 
-            var config = GameConfig.LoadLiteral(Encoding.UTF8.GetBytes(@"{ ""UI"": { ""ButtonDoubleClickIntervalSeconds"": 0.35 } }"));
+            var config = GameConfig.LoadLiteral(Encoding.UTF8.GetBytes(@"{ ""UI"": { ""ButtonDoubleClickIntervalSeconds"": 0.35 } }"), jsonUtil);
             _exchange
                 .Register(config)
                 .Attach(modApplier)

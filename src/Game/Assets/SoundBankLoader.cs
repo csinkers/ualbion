@@ -20,7 +20,7 @@ namespace UAlbion.Game.Assets
             return ms.ToArray();
         }
 
-        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
             var oplFile = GlobalTimbreLibrary.Serdes(null, s);
             WoplFile wopl = new WoplFile(oplFile);

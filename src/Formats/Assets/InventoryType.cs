@@ -2,6 +2,7 @@
 {
     public enum InventoryType : byte
     {
+        Unknown,
         Player,
         Chest,
         Merchant,

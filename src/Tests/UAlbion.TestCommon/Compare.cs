@@ -85,13 +85,18 @@ namespace UAlbion.TestCommon
             return (bytes, annotation);
         }
 
-        public static string SaveJson(object asset)
+        public static string SaveJson(object asset, IJsonUtil jsonUtil)
         {
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
             using var stream = new MemoryStream();
-            stream.Write(Encoding.UTF8.GetBytes(JsonUtil.Serialize(asset)));
+            stream.Write(Encoding.UTF8.GetBytes(jsonUtil.Serialize(asset)));
             return ReadToEnd(stream);
         }
 
-        public static T LoadJson<T>(string json) => JsonUtil.Deserialize<T>(Encoding.UTF8.GetBytes(json));
+        public static T LoadJson<T>(string json, IJsonUtil jsonUtil)
+        {
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+            return jsonUtil.Deserialize<T>(Encoding.UTF8.GetBytes(json));
+        }
     }
 }

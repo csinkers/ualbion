@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -12,10 +13,10 @@ namespace UAlbion.Game.Assets
 {
     public class TiledTilesetLoader : Component, IAssetLoader<TilesetData>
     {
-        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
-            => Serdes((TilesetData)existing, info, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+            => Serdes((TilesetData)existing, info, mapping, s, jsonUtil);
 
-        public TilesetData Serdes(TilesetData existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public TilesetData Serdes(TilesetData existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));

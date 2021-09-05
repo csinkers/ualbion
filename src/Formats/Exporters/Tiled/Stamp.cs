@@ -136,21 +136,29 @@ namespace UAlbion.Formats.Exporters.Tiled
           }]
         }
          */
-        public static Stamp Load(string path, IFileSystem disk)
+        public static Stamp Load(string path, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
-            return Parse(disk.ReadAllBytes(path));
+            return Parse(disk.ReadAllBytes(path), jsonUtil);
         }
 
-        public static Stamp Parse(byte[] json) => JsonUtil.Deserialize<Stamp>(json);
+        public static Stamp Parse(byte[] json, IJsonUtil jsonUtil)
+        {
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+            return jsonUtil.Deserialize<Stamp>(json);
+        }
 
-        public void Save(string path, IFileSystem disk)
+        public void Save(string path, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
-            disk.WriteAllText(path, Serialize());
+            disk.WriteAllText(path, Serialize(jsonUtil));
         }
 
-        public string Serialize() => JsonUtil.Serialize(this);
+        public string Serialize(IJsonUtil jsonUtil)
+        {
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+            return jsonUtil.Serialize(this);
+        }
     }
 
     public class Variation

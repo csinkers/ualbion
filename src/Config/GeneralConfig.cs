@@ -15,12 +15,13 @@ namespace UAlbion.Config
         [JsonIgnore] public string BasePath { get; private set; }
         [JsonInclude] public IDictionary<string, string> Paths { get; private set; } = new Dictionary<string, string>();
 
-        public static GeneralConfig Load(string configPath, string baseDir, IFileSystem disk)
+        public static GeneralConfig Load(string configPath, string baseDir, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
 
             var config = disk.FileExists(configPath)
-                ? JsonUtil.Deserialize<GeneralConfig>(disk.ReadAllBytes(configPath))
+                ? jsonUtil.Deserialize<GeneralConfig>(disk.ReadAllBytes(configPath))
                 : new GeneralConfig();
 
             config.BasePath = baseDir;

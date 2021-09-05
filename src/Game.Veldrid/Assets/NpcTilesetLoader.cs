@@ -18,7 +18,7 @@ namespace UAlbion.Game.Veldrid.Assets
         readonly PngLoader _pngLoader = new();
 
         public NpcTilesetLoader() => AttachChild(_pngLoader);
-        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
@@ -54,7 +54,7 @@ namespace UAlbion.Game.Veldrid.Assets
                 var path = spriteInfo.BuildFilename(graphicsPattern,
                     9); // 9 = First frame facing west for both large and small
                 path = config.ResolvePath(path);
-                WriteNpcSprite(path, sprite, spriteInfo, disk, mapping);
+                WriteNpcSprite(path, sprite, spriteInfo, disk, mapping, jsonUtil);
 
                 tiles.Add(new TileProperties
                 {
@@ -71,13 +71,13 @@ namespace UAlbion.Game.Veldrid.Assets
             return existing;
         }
 
-        void WriteNpcSprite(string path, ITexture sprite, AssetInfo info, IFileSystem disk, AssetMapping mapping)
+        void WriteNpcSprite(string path, ITexture sprite, AssetInfo info, IFileSystem disk, AssetMapping mapping, IJsonUtil jsonUtil)
         {
             var dir = Path.GetDirectoryName(path);
             if (!disk.DirectoryExists(dir))
                 disk.CreateDirectory(dir);
 
-            using var s = FormatUtil.SerializeWithSerdes(s => _pngLoader.Serdes(sprite, info, mapping, s));
+            using var s = FormatUtil.SerializeWithSerdes(s => _pngLoader.Serdes(sprite, info, mapping, s, jsonUtil));
             int i = 0;
             foreach (var (chunk, _) in PackedChunks.Unpack(s))
             {

@@ -8,13 +8,13 @@ namespace UAlbion.Game.Assets
 {
     public class InventoryPostProcessor : Component, IAssetPostProcessor
     {
-        static void ResolveItemProxies(Inventory inventory, IAssetManager assets)
+        static void ResolveItemProxies(AssetId id, Inventory inventory, IAssetManager assets)
         {
             if (inventory == null)
                 return;
 
             // The first merchant has strange corrupt data, just zero it out
-            if (inventory.Id == new InventoryId((MerchantId)Base.Merchant.Unknown1))
+            if (id == AssetId.From(Base.Merchant.Unknown1))
             {
                 foreach (var slot in inventory.Slots)
                     slot.Clear();
@@ -28,16 +28,17 @@ namespace UAlbion.Game.Assets
 
         public object Process(object asset, AssetInfo info)
         {
+            if (info == null) throw new ArgumentNullException(nameof(info));
             var assets = Resolve<IAssetManager>();
             switch (asset)
             {
-                case CharacterSheet sheet: ResolveItemProxies(sheet.Inventory, assets); break;
-                case Inventory x: ResolveItemProxies(x, assets); break;
+                case CharacterSheet sheet: ResolveItemProxies(info.AssetId, sheet.Inventory, assets); break;
+                case Inventory x: ResolveItemProxies(info.AssetId, x, assets); break;
                 case SavedGame save:
                     foreach (var sheet in save.Sheets.Values)
-                        ResolveItemProxies(sheet.Inventory, assets);
+                        ResolveItemProxies(info.AssetId, sheet.Inventory, assets);
                     foreach (var inv in save.Inventories.Values)
-                        ResolveItemProxies(inv, assets);
+                        ResolveItemProxies(info.AssetId, inv, assets);
 
                     break;
                 default: throw new InvalidOperationException($"Unexpected asset type in inventory post processor: {asset}");

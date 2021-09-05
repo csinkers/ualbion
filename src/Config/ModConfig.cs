@@ -17,14 +17,15 @@ namespace UAlbion.Config
         public string ShaderPath { get; set; }
         [JsonInclude] public List<string> Dependencies { get; private set; } = new();
 
-        public static ModConfig Load(string configPath, IFileSystem disk)
+        public static ModConfig Load(string configPath, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
+            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
             if (!disk.FileExists(configPath))
                 throw new FileNotFoundException($"mod.config not found for mod {configPath}");
 
             var configText = disk.ReadAllBytes(configPath);
-            return JsonUtil.Deserialize<ModConfig>(configText);
+            return jsonUtil.Deserialize<ModConfig>(configText);
         }
     }
 }

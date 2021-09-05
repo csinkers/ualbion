@@ -17,15 +17,15 @@ namespace UAlbion.CodeGenerator
         public Dictionary<string, string[]> EnumsByAssetId { get; }
         public ILookup<AssetType, string> AssetIdsByType { get; }
 
-        public Assets(IFileSystem disk) // Everything in this class should be treated as read-only once the constructor finishes.
+        public Assets(IFileSystem disk, IJsonUtil jsonUtil) // Everything in this class should be treated as read-only once the constructor finishes.
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
             BaseDir = ConfigUtil.FindBasePath(disk);
             var assetIdConfigPath = Path.Combine(BaseDir, @"src/Formats/AssetIdTypes.json");
-            var config = GeneralConfig.Load(Path.Combine(BaseDir, "data/config.json"), BaseDir, disk);
+            var config = GeneralConfig.Load(Path.Combine(BaseDir, "data/config.json"), BaseDir, disk, jsonUtil);
 
-            AssetConfig = AssetConfig.Load(config.ResolvePath("$(MODS)/Base/assets.json"), disk);
-            AssetIdConfig = AssetIdConfig.Load(assetIdConfigPath, disk);
+            AssetConfig = AssetConfig.Load(config.ResolvePath("$(MODS)/Base/assets.json"), disk, jsonUtil);
+            AssetIdConfig = AssetIdConfig.Load(assetIdConfigPath, disk, jsonUtil);
 
             AssetIdsByType = FindAssetIdsByType(AssetIdConfig);
             ParentsByAssetId = FindAssetIdParents(AssetIdConfig, AssetIdsByType);

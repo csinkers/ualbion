@@ -7,6 +7,7 @@ using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Etm;
 using UAlbion.Core.Veldrid.Sprites;
+using UAlbion.Formats;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
@@ -42,6 +43,7 @@ namespace UAlbion
 
             PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
             var disk = new FileSystem();
+            var jsonUtil = new FormatJsonUtil();
 
             var baseDir = ConfigUtil.FindBasePath(disk);
             if (baseDir == null)
@@ -53,6 +55,7 @@ namespace UAlbion
             {
                 ConvertAssets.Convert(
                     disk,
+                    jsonUtil,
                     commandLine.ConvertFrom,
                     commandLine.ConvertTo,
                     commandLine.DumpIds,
@@ -61,7 +64,7 @@ namespace UAlbion
                 return;
             }
 
-            var (exchange, services) = AssetSystem.SetupAsync(baseDir, disk).Result;
+            var (exchange, services) = AssetSystem.SetupAsync(baseDir, disk, jsonUtil).Result;
             if (commandLine.NeedsEngine)
                 BuildEngine(commandLine, exchange);
             services.Add(new StdioConsoleReader());

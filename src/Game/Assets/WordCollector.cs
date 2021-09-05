@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -14,7 +15,7 @@ namespace UAlbion.Game.Assets
         static readonly AssetId Words2 = AssetId.From(Base.Special.Words2);
         static readonly AssetId Words3 = AssetId.From(Base.Special.Words3);
 
-        public ListStringCollection Serdes(ListStringCollection existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public ListStringCollection Serdes(ListStringCollection existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (mapping == null) throw new ArgumentNullException(nameof(mapping));
@@ -51,7 +52,7 @@ namespace UAlbion.Game.Assets
             return list;
         }
 
-        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
-            => Serdes((ListStringCollection) existing, info, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+            => Serdes((ListStringCollection) existing, info, mapping, s, jsonUtil);
     }
 }

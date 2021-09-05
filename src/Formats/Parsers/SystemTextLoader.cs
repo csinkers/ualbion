@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 
@@ -11,10 +12,10 @@ namespace UAlbion.Formats.Parsers
     {
         static readonly Regex Regex = new(@"\[(\d+):(.*)\]");
 
-        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s)
-            => Serdes((IntStringDictionary) existing, info, mapping, s);
+        public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+            => Serdes((IntStringDictionary) existing, info, mapping, s, jsonUtil);
 
-        public IntStringDictionary Serdes(IntStringDictionary existing, AssetInfo info, AssetMapping mapping, ISerializer s)
+        public IntStringDictionary Serdes(IntStringDictionary existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             if (s.IsWriting()) throw new NotImplementedException("Saving of system text not currently supported");

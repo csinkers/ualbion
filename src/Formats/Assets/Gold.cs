@@ -2,6 +2,8 @@
 {
     public class Gold : IContents
     {
+        Gold() { }
+        public static readonly Gold Instance = new();
         public bool Equals(IContents obj) => Equals((object)obj);
         public override bool Equals(object obj)
         {

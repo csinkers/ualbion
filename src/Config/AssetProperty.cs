@@ -47,5 +47,10 @@
         public const string TiledWallPattern     = "TiledWallPattern"; // string
         public const string TilesPerRow          = "TilesPerRow"; // int
         public const string WallPngPattern       = "WallPngPattern"; // string
+
+        // Spells
+        public const string Name = "Name"; // StringId to use in game
+        public const string MagicSchool = "School"; // SpellClass enum
+        public const string SpellNumber = "SpellNumber"; // offset into school, used for save-game serialization
     }
 }

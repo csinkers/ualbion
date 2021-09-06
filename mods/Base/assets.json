@@ -326,7 +326,7 @@
     },
 
     // Spells
-    "$(XLD)/SPELLDAT.DAT": { "Loader": "spell", "Container": "spells", "Map": { "0": { "Id": "spell.1" } } },
+    "$(XLD)/SPELLDAT.DAT": { "Loader": "spell", "Container": "spells", "MapFile": "$(MOD)/Meta/SPELLDAT.json" },
 
     // Initial game state data
     "$(XLD)/INITIAL/AUTOMAP1.XLD": { "Loader": "automap", "Map": { "0": { "Id": "automap.100" } } },

@@ -8,7 +8,7 @@ namespace UAlbion.Formats.MapEvents
     {
         EventNodeConverter() {}
         public static readonly EventNodeConverter Instance = new();
-        public override IEventNode? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override IEventNode Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TokenType != JsonTokenType.String)
                 throw new JsonException($"Tried to deserialize a token of type {reader.TokenType} as an IEventNode, expected String");

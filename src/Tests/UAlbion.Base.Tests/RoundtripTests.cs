@@ -35,7 +35,7 @@ namespace UAlbion.Base.Tests
             _resultDir = Path.Combine(_baseDir, "re", "RoundTripTests");
             var mapping = AssetMapping.Global;
             var assetConfigPath = Path.Combine(_baseDir, "mods", "Base", "assets.json");
-            var assetConfig = AssetConfig.Load(assetConfigPath, _disk, JsonUtil);
+            var assetConfig = AssetConfig.Load(assetConfigPath, mapping, _disk, JsonUtil);
 
             foreach (var assetType in assetConfig.IdTypes.Values)
             {

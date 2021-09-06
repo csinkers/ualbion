@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -34,7 +35,7 @@ namespace UAlbion.Game.Gui.Text
                 {
                     var size = font.Regions[index].Size;
                     offset += (int)size.X;
-                    if (block.Style == TextStyle.Fat || block.Style == TextStyle.FatAndHigh)
+                    if (block.Style is TextStyle.Fat or TextStyle.FatAndHigh)
                         offset++;
                 }
                 else offset += SpaceSize;
@@ -54,7 +55,7 @@ namespace UAlbion.Game.Gui.Text
             var font = assets.LoadFont(block.Color, block.Style == TextStyle.Big);
             var mapping = GetFontMapping(font.Id, assets);
             var text = block.Text ?? "";
-            var isFat = block.Style == TextStyle.Fat || block.Style == TextStyle.FatAndHigh;
+            var isFat = block.Style is TextStyle.Fat or TextStyle.FatAndHigh;
 
             int offset = 0;
             var flags = SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest;

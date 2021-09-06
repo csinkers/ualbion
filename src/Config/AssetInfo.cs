@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using UAlbion.Api;
 
 #pragma warning disable CA2227 // Collection properties should be read only
 namespace UAlbion.Config
@@ -49,12 +50,22 @@ namespace UAlbion.Config
                 if (typeof(T) == typeof(int)) return (T)(object)elem.GetInt32();
                 if (typeof(T) == typeof(long)) return (T)(object)elem.GetInt64();
                 if (typeof(T) == typeof(bool)) return (T)(object)elem.GetBoolean();
+
+                if (typeof(T).IsAssignableTo(typeof(IAssetId)))
+                {
+                    var id = elem.GetString();
+                    return CastHelper<AssetId, T>.Cast(File.ResolveId(id));
+                }
+
+                if (typeof(T).IsEnum)
+                    return (T)Enum.Parse(typeof(T), elem.GetString() ?? "");
             }
             //else if (token is double asDouble)
             //{
             //    if (typeof(T) == typeof(int)) return (T)(object)Convert.ToInt32(asDouble);
             //    if (typeof(T) == typeof(int?)) return (T)(object)Convert.ToInt32(asDouble);
             //}
+
             return (T)token;
         }
 

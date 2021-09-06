@@ -62,10 +62,10 @@ namespace UAlbion.Game.Entities.Map3D
 
             RemoveAllChildren();
 
-            bool floors = mode == IsometricMode.Floors || mode == IsometricMode.All;
-            bool ceilings = mode == IsometricMode.Ceilings || mode == IsometricMode.All;
-            bool walls = mode == IsometricMode.Walls || mode == IsometricMode.All;
-            bool contents = mode == IsometricMode.Contents || mode == IsometricMode.All;
+            bool floors = mode is IsometricMode.Floors or IsometricMode.All;
+            bool ceilings = mode is IsometricMode.Ceilings or IsometricMode.All;
+            bool walls = mode is IsometricMode.Walls or IsometricMode.All;
+            bool contents = mode is IsometricMode.Contents or IsometricMode.All;
 
             paletteNumber ??= info.Get(AssetProperty.PaletteId, 0);
             var paletteId = new PaletteId(AssetType.Palette, paletteNumber.Value);

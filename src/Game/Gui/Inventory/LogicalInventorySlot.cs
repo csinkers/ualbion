@@ -133,7 +133,7 @@ namespace UAlbion.Game.Gui.Inventory
                         Raise(new HoverTextEvent(new LiteralText(itemName)));
                         Raise(new SetCursorEvent(Base.CoreSprite.CursorSelected));
                     }
-                    else if(_id.Slot == ItemSlotId.Gold || _id.Slot == ItemSlotId.Rations)
+                    else if(_id.Slot is ItemSlotId.Gold or ItemSlotId.Rations)
                     {
                         bool isGold = _id.Slot == ItemSlotId.Gold;
                         int amount = isGold ? inventory.Gold.Amount : inventory.Rations.Amount;

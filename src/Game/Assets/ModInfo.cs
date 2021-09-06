@@ -5,11 +5,12 @@ namespace UAlbion.Game.Assets
 {
     public class ModInfo
     {
-        public ModInfo(string name, AssetConfig assetConfig, ModConfig modConfig, string path)
+        public ModInfo(string name, AssetConfig assetConfig, ModConfig modConfig, AssetMapping mapping, string path)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             AssetConfig = assetConfig ?? throw new ArgumentNullException(nameof(assetConfig));
             ModConfig = modConfig ?? throw new ArgumentNullException(nameof(modConfig));
+            Mapping = mapping ?? throw new ArgumentNullException(nameof(mapping));
             Path = path;
             AssetPath = path;
 
@@ -41,7 +42,7 @@ namespace UAlbion.Game.Assets
         public string Name { get; }
         public AssetConfig AssetConfig { get; }
         public ModConfig ModConfig { get; }
-        public AssetMapping Mapping { get; } = new();
+        public AssetMapping Mapping { get; }
         public string Path { get; }
         public string AssetPath { get; }
         public string ShaderPath { get; }

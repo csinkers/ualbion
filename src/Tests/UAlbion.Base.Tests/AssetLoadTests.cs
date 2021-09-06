@@ -745,6 +745,9 @@ namespace UAlbion.Base.Tests
             Assert.Equal(9, s.LevelRequirement);
             Assert.Equal(SpellEnvironments.Combat, s.Environments);
             Assert.Equal(SpellTargets.AllMonsters, s.Targets);
+            Assert.Equal(SpellClass.DjiKas, s.Class);
+            Assert.Equal(7, s.OffsetInClass);
+            Assert.Equal((TextId)SystemText.Spell0_7_FrostAvalanche, s.Name);
         }
 
         [Fact]

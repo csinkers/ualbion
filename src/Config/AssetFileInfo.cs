@@ -34,6 +34,8 @@ namespace UAlbion.Config
             set => Set(AssetProperty.Height, value);
         }
 
+        internal AssetConfig Config { get; set; }
+
         public override string ToString() => $"AssetFile: {Filename} ({Map.Count})";
 
         public T Get<T>(string property, T defaultValue)
@@ -56,6 +58,16 @@ namespace UAlbion.Config
             //    if (typeof(T) == typeof(int?))
             //        return (T)(object)Convert.ToInt32(asDouble);
             //}
+
+            if (typeof(T).IsAssignableFrom(typeof(AssetId)))
+            {
+                var id = (string)token;
+                return CastHelper<AssetId, T>.Cast(ResolveId(id));
+            }
+
+            if (typeof(T).IsEnum)
+                return (T)Enum.Parse(typeof(T), (string)token);
+
             return (T)token;
         }
 
@@ -102,7 +114,6 @@ namespace UAlbion.Config
 
         public void PopulateAssetIds(
             IJsonUtil jsonUtil,
-            Func<string, AssetId> resolveId,
             Func<AssetFileInfo, IList<(int, int)>> getSubItemCountForFile,
             Func<string, byte[]> readAllBytesFunc)
         {
@@ -127,7 +138,7 @@ namespace UAlbion.Config
             {
                 last ??= asset; // Let last start off as the first mapped info, in case the range doesn't overlap with the mapped ids.
                 if (asset.Id == null || !asset.AssetId.IsNone) continue;
-                asset.AssetId = resolveId(asset.Id);
+                asset.AssetId = ResolveId(asset.Id);
             }
 
             foreach(var range in ranges)
@@ -157,5 +168,7 @@ namespace UAlbion.Config
                 }
             }
         }
+
+        internal AssetId ResolveId(string id) => Config.ResolveId(id);
     }
 }

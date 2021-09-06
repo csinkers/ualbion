@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace UAlbion.Api.Visual
+namespace UAlbion.Api
 {
     public interface IAssetId
     {

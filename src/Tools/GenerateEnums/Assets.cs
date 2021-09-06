@@ -24,7 +24,7 @@ namespace UAlbion.CodeGenerator
             var assetIdConfigPath = Path.Combine(BaseDir, @"src/Formats/AssetIdTypes.json");
             var config = GeneralConfig.Load(Path.Combine(BaseDir, "data/config.json"), BaseDir, disk, jsonUtil);
 
-            AssetConfig = AssetConfig.Load(config.ResolvePath("$(MODS)/Base/assets.json"), disk, jsonUtil);
+            AssetConfig = AssetConfig.Load(config.ResolvePath("$(MODS)/Base/assets.json"), AssetMapping.Global, disk, jsonUtil);
             AssetIdConfig = AssetIdConfig.Load(assetIdConfigPath, disk, jsonUtil);
 
             AssetIdsByType = FindAssetIdsByType(AssetIdConfig);

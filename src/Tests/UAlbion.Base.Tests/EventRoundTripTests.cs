@@ -23,7 +23,7 @@ namespace UAlbion.Base.Tests
             var jsonUtil = new FormatJsonUtil();
             var baseDir = ConfigUtil.FindBasePath(disk);
             var assetConfigPath = Path.Combine(baseDir, "mods", "Base", "assets.json");
-            var assetConfig = AssetConfig.Load(assetConfigPath, disk, jsonUtil);
+            var assetConfig = AssetConfig.Load(assetConfigPath, mapping, disk, jsonUtil);
 
             foreach (var assetType in assetConfig.IdTypes.Values)
             {

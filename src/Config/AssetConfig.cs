@@ -18,19 +18,20 @@ namespace UAlbion.Config
         [JsonInclude] public Dictionary<string, AssetFileInfo> Files { get; private set; } = new();
 
         Dictionary<AssetId, AssetInfo[]> _assetLookup;
+        AssetMapping _mapping;
 
-        public static AssetConfig Parse(byte[] configText, IJsonUtil jsonUtil)
+        public static AssetConfig Parse(byte[] configText, AssetMapping mapping, IJsonUtil jsonUtil)
         {
             if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
             var config = jsonUtil.Deserialize<AssetConfig>(configText);
             if (config == null)
                 return null;
 
-            config.PostLoad();
+            config.PostLoad(mapping);
             return config;
         }
 
-        public static AssetConfig Load(string configPath, IFileSystem disk, IJsonUtil jsonUtil)
+        public static AssetConfig Load(string configPath,  AssetMapping mapping, IFileSystem disk, IJsonUtil jsonUtil)
         {
             if (disk == null) throw new ArgumentNullException(nameof(disk));
             if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
@@ -38,7 +39,7 @@ namespace UAlbion.Config
                 throw new FileNotFoundException($"Could not open asset config from {configPath}");
 
             var configText = disk.ReadAllBytes(configPath);
-            var config = Parse(configText, jsonUtil);
+            var config = Parse(configText, mapping, jsonUtil);
             if(config == null)
                 throw new FileLoadException($"Could not load asset config from \"{configPath}\"");
             return config;
@@ -57,8 +58,9 @@ namespace UAlbion.Config
                 ? info 
                 : Array.Empty<AssetInfo>();
 
-        void PostLoad()
+        void PostLoad(AssetMapping mapping)
         {
+            _mapping = mapping ?? throw new ArgumentNullException(nameof(mapping));
             foreach (var kvp in IdTypes)
                 kvp.Value.Alias = kvp.Key;
 
@@ -67,6 +69,7 @@ namespace UAlbion.Config
 
             foreach (var kvp in Files)
             {
+                kvp.Value.Config = this;
                 int index = kvp.Key.IndexOf('#', StringComparison.InvariantCulture);
                 kvp.Value.Filename = index == -1 ? kvp.Key : kvp.Key.Substring(0, index);
                 if (index != -1)
@@ -87,17 +90,15 @@ namespace UAlbion.Config
 
         public void PopulateAssetIds(
             IJsonUtil jsonUtil,
-            AssetMapping mapping,
             Func<AssetFileInfo, IList<(int, int)>> getSubItemCountForFile,
             Func<string, byte[]> readAllBytesFunc)
         {
             if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
-            if (mapping == null) throw new ArgumentNullException(nameof(mapping));
 
             var temp = new Dictionary<AssetId, List<AssetInfo>>();
             foreach (var file in Files)
             {
-                file.Value.PopulateAssetIds(jsonUtil, x => ResolveId(mapping, x), getSubItemCountForFile, readAllBytesFunc);
+                file.Value.PopulateAssetIds(jsonUtil, getSubItemCountForFile, readAllBytesFunc);
 
                 foreach (var asset in file.Value.Map.Values)
                 {
@@ -125,7 +126,7 @@ namespace UAlbion.Config
                 if (!int.TryParse(offsetStr, out var offset))
                     offset = 0;
 
-                var target = ResolveId(mapping, targetStr);
+                var target = ResolveId(targetStr);
                 var (min, max) = ParseRange(range);
                 mapping.RegisterStringRedirect(enumType, target, min, max, offset);
             }
@@ -179,13 +180,13 @@ namespace UAlbion.Config
             return enumType;
         }
 
-        AssetId ResolveId(AssetMapping mapping, string id)
+        internal AssetId ResolveId(string id)
         {
             var (type, val) = SplitId(id, '.');
             if (val == null)
                 throw new FormatException("Asset IDs should consist of an alias type and value, separated by a '.' character");
             var enumType = ResolveIdType(type);
-            return mapping.EnumToId(enumType, val);
+            return _mapping.EnumToId(enumType, val);
         }
     }
 }

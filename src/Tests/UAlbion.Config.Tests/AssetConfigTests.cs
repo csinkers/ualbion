@@ -167,11 +167,12 @@ namespace UAlbion.Config.Tests
 
         static byte[] TestConfig1Bytes { get; } = Encoding.UTF8.GetBytes(TestConfig1);
         static readonly IJsonUtil JsonUtil = new JsonUtil();
+        public AssetConfigTests() => AssetMapping.GlobalIsThreadLocal = true;
 
         [Fact]
         public void VerifyIdTypes()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             Assert.Collection(c.IdTypes.Values.OrderBy(x => x.Alias),
                 t =>
                 {
@@ -274,7 +275,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyLoaders()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             Assert.Collection(c.Loaders.OrderBy(x => x.Key),
                 l =>
                 {
@@ -351,7 +352,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyFiles()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             Assert.Collection(c.Files.Keys.OrderBy(x => x),
                 x => Assert.Equal("$(ALBION)/DRIVERS/ALBISND.OPL", x),
                 x => Assert.Equal("$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710", x),
@@ -377,7 +378,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifySpecial()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             var f = c.Files["$(ALBION)/DRIVERS/ALBISND.OPL"];
             Assert.Equal("UAlbion.Game.Assets.SoundBankLoader, UAlbion.Game", f.Loader);
             Assert.Null(f.Container);
@@ -392,7 +393,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyItemList()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             var f = c.Files["$(XLD)/ITEMLIST.DAT"];
             Assert.Equal("UAlbion.Formats.Parsers.ItemDataLoader, UAlbion.Formats", f.Loader);
             Assert.Equal("UAlbion.Formats.Containers.ItemListContainer, UAlbion.Formats", f.Container);
@@ -407,7 +408,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyBlockList()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             var f = c.Files["$(XLD)/BLKLIST0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.BlockListLoader, UAlbion.Formats", f.Loader);
             Assert.Null(f.Container);
@@ -421,7 +422,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyFloors()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             var f = c.Files["$(XLD)/3DFLOOR2.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Equal(64, f.Width);
@@ -436,7 +437,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyCombatBackgrounds()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             var f = c.Files["$(XLD)/COMBACK0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Equal(360, f.Width);
@@ -450,7 +451,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyTileGraphics()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             var f = c.Files["$(XLD)/ICONGFX0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Equal(16, f.Width);
@@ -465,7 +466,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyCombatGraphics()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             var f = c.Files["$(XLD)/COMGFX0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.MultiHeaderSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Collection(f.Map.OrderBy(x => x.Key), m =>
@@ -478,7 +479,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyAutomapGraphics()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             var f = c.Files["$(XLD)/AUTOGFX0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.AmorphousSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
@@ -498,7 +499,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void Verify3dObjects()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             var f = c.Files["$(XLD)/3DOBJEC0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
@@ -524,7 +525,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyOverlays()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             var f = c.Files["$(XLD)/3DOVERL0.XLD"];
             Assert.True(f.Get(AssetProperty.Transposed, false));
             Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
@@ -551,7 +552,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyFonts()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             var f = c.Files["$(XLD)/FONTS0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.FontSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Equal(8, f.Width);
@@ -577,7 +578,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyTilesets()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             var f = c.Files["$(XLD)/ICONDAT0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.TilesetLoader, UAlbion.Formats", f.Loader);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
@@ -602,7 +603,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyPalettes()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             var f = c.Files["$(XLD)/PALETTE0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.PaletteLoader, UAlbion.Formats", f.Loader);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
@@ -622,7 +623,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifySpells()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             var f = c.Files["$(XLD)/SPELLDAT.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.SpellLoader, UAlbion.Formats", f.Loader);
             Assert.Equal("UAlbion.Formats.Containers.SpellListContainer, UAlbion.Formats", f.Container);
@@ -651,7 +652,7 @@ namespace UAlbion.Config.Tests
         [Fact]
         public void VerifyMain()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes, JsonUtil);
+            var c = AssetConfig.Parse(TestConfig1Bytes, AssetMapping.Global, JsonUtil);
             var f = c.Files["$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710"];
             Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
             Assert.Equal("UAlbion.Formats.Containers.BinaryOffsetContainer, UAlbion.Formats", f.Container);

@@ -81,7 +81,7 @@ namespace UAlbion.Game.Entities.Map2D
 
         void RebuildPartyMembers()
         {
-            var existing = Children.Where(x => x is SmallPlayer || x is LargePlayer).ToList();
+            var existing = Children.Where(x => x is SmallPlayer or LargePlayer).ToList();
             foreach (var player in existing)
                 player.Remove();
 

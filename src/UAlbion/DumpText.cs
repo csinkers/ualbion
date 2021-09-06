@@ -309,8 +309,14 @@ namespace UAlbion
             if (c.Magic.SpellStrengths.Any())
             {
                 sw.WriteLine($"    Magic: (SP:{c.Magic.SpellPoints}/{c.Magic.SpellPointsMax}) Classes: {c.Magic.SpellClasses}");
-                foreach(var spell in c.Magic.SpellStrengths)
-                    sw.WriteLine($"        {spell.Key} {spell.Value.Item2} ({(spell.Value.Item1 ? "Learnt": "Unknown")})");
+                for (int i = 0; i < CharacterSheet.MaxSpellsPerSchool * CharacterSheet.SpellSchoolCount; i++)
+                {
+                    var spellId = new SpellId(AssetType.Spell, i + 1);
+                    bool known = c.Magic.KnownSpells.Contains(spellId);
+                    c.Magic.SpellStrengths.TryGetValue(spellId, out var strength);
+                    if (known || strength > 0)
+                        sw.WriteLine($"        {spellId} {strength} ({(known ? "Learnt": "Unknown")})");
+                }
             }
 
             sw.WriteLine($"    WordSetId:{c.WordSetId}");

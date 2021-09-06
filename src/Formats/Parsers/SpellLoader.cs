@@ -12,7 +12,7 @@ namespace UAlbion.Formats.Parsers
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
-            return SpellData.Serdes(info.AssetId, existing, s);
+            return SpellData.Serdes(existing, info, s);
         }
 
         public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Reflection;
 using SerdesNet;
-using UAlbion.Api.Visual;
+using UAlbion.Api;
 
 namespace UAlbion.Config
 {
@@ -16,7 +15,7 @@ namespace UAlbion.Config
         public AssetId(AssetType type, int id = 0) // Should only really be called by AssetMapping
         {
 #if DEBUG
-            if (id < 0 || id > 0xffffff)
+            if (id is < 0 or > 0xffffff)
                 throw new ArgumentOutOfRangeException($"Tried to construct a SpriteId with out of range id {id}");
 #endif
             _value = (uint)type << 24 | (uint)id;
@@ -65,13 +64,13 @@ namespace UAlbion.Config
         public static AssetId Rations { get; } = new(AssetType.Rations);
         public bool IsNone => _value == 0;
         AssetId(uint id) => _value = id;
-        public readonly AssetType Type => (AssetType)((_value & 0xff00_0000) >> 24);
-        public readonly int Id => (int)(_value & 0xffffff);
+        public AssetType Type => (AssetType)((_value & 0xff00_0000) >> 24);
+        public int Id => (int)(_value & 0xffffff);
         public override string ToString() => AssetMapping.Global.IdToName(this);
         public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
         public static AssetId Parse(string s) => AssetMapping.Global.Parse(s, null);
-        public readonly int ToInt32() => unchecked((int)_value);
-        public readonly uint ToUInt32() => _value;
+        public int ToInt32() => unchecked((int)_value);
+        public uint ToUInt32() => _value;
         public static AssetId FromInt32(int id) => new(unchecked((uint)id));
         public static AssetId FromUInt32(uint id) => new(id);
         public static bool operator ==(AssetId x, AssetId y) => x.Equals(y);

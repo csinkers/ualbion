@@ -76,7 +76,7 @@ namespace UAlbion.Game.Assets
             if (_mods.ContainsKey(modName))
                 return;
 
-            if (modName.Any(c => c == '\\' || c == '/' || c == Path.DirectorySeparatorChar))
+            if (modName.Any(c => c is '\\' or '/' || c == Path.DirectorySeparatorChar))
             {
                 Error($"Mod {modName} is not a simple directory name");
                 return;
@@ -102,9 +102,10 @@ namespace UAlbion.Game.Assets
                 return;
             }
 
-            var assetConfig = AssetConfig.Load(assetConfigPath, disk, jsonUtil);
+            var modMapping = new AssetMapping();
+            var assetConfig = AssetConfig.Load(assetConfigPath, modMapping, disk, jsonUtil);
             var modConfig = ModConfig.Load(modConfigPath, disk, jsonUtil);
-            var modInfo = new ModInfo(modName, assetConfig, modConfig, path);
+            var modInfo = new ModInfo(modName, assetConfig, modConfig, modMapping, path);
 
             // Load dependencies
             foreach (var dependency in modConfig.Dependencies)
@@ -128,7 +129,6 @@ namespace UAlbion.Game.Assets
             var extraPaths = new Dictionary<string, string> { ["MOD"] = modConfig.AssetPath };
             assetConfig.PopulateAssetIds(
                 jsonUtil,
-                AssetMapping.Global,
                 x => _assetLocator.GetSubItemRangesForFile(x, extraPaths),
                 x => disk.ReadAllBytes(generalConfig.ResolvePath(x, extraPaths)));
             _mods.Add(modName, modInfo);
@@ -248,7 +248,7 @@ namespace UAlbion.Game.Assets
             if (asset == null)
                 throw new AssetNotFoundException($"Could not load asset for {id}");
 
-            while (patches != null && patches.Count > 0)
+            while (patches is { Count: > 0 })
                 asset = patches.Pop().Apply(asset);
 
             return asset;
@@ -291,7 +291,6 @@ namespace UAlbion.Game.Assets
             var extraPaths = new Dictionary<string, string> { ["MOD"] = target.AssetPath };
             target.AssetConfig.PopulateAssetIds(
                 jsonUtil,
-                AssetMapping.Global,
                 file =>
                 {
                     // Don't need to resolve the filename as we're not actually using the container - we just want to find the type.

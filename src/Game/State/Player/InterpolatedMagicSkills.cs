@@ -21,6 +21,7 @@ namespace UAlbion.Game.State.Player
         public ushort SpellPoints => (ushort)ApiUtil.Lerp(_a().SpellPoints, _b().SpellPoints, _getLerp());
         public ushort SpellPointsMax => (ushort)ApiUtil.Lerp(_a().SpellPoints, _b().SpellPoints, _getLerp());
         public SpellClasses SpellClasses => _b().SpellClasses;
-        public IDictionary<SpellId, (bool, ushort)> SpellStrengths => _b().SpellStrengths;
+        public IList<SpellId> KnownSpells => _b().KnownSpells;
+        public IDictionary<SpellId, ushort> SpellStrengths => _b().SpellStrengths;
     }
 }

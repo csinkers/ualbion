@@ -55,8 +55,8 @@ namespace UAlbion.Game.Gui.Status
                 var language = Resolve<ISettings>()?.Gameplay.Language;
                 _face.Id = language switch
                     {
-                        { } x when x == Base.Language.German => Base.CoreSprite.CompassDe,
-                        { } x when x == Base.Language.French => Base.CoreSprite.CompassFr,
+                        { } and Base.Language.German => Base.CoreSprite.CompassDe,
+                        { } and Base.Language.French => Base.CoreSprite.CompassFr,
                         _ => Base.CoreSprite.CompassEn
                     };
 

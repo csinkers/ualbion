@@ -126,7 +126,7 @@ namespace UAlbion.Game.State.Player
                 case ItemSlotId.Tail:
                     return
                         item.TypeId == ItemType.CloseRangeWeapon
-                        && (item.SlotType == ItemSlotId.Tail || item.SlotType == ItemSlotId.RightHandOrTail);
+                        && item.SlotType is ItemSlotId.Tail or ItemSlotId.RightHandOrTail;
                 default:
                     return true;
             }
@@ -263,7 +263,7 @@ namespace UAlbion.Game.State.Player
                 redirected = true;
             }
 
-            if (slotId.Slot == ItemSlotId.None || slotId.Slot == ItemSlotId.CharacterBody)
+            if (slotId.Slot is ItemSlotId.None or ItemSlotId.CharacterBody)
                 return false;
 
             Inventory inventory = _getInventory(slotId.Id);
@@ -461,7 +461,7 @@ namespace UAlbion.Game.State.Player
         void CoalesceItems(ItemSlot slot)
         {
             ApiUtil.Assert(slot.CanCoalesce(_hand));
-            ApiUtil.Assert(slot.Amount < ItemSlot.MaxItemCount || slot.Item is Gold || slot.Item is Rations);
+            ApiUtil.Assert(slot.Amount < ItemSlot.MaxItemCount || slot.Item is Gold or Rations);
             slot.TransferFrom(_hand, null);
         }
 

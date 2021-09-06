@@ -7,7 +7,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Text.Json.Serialization;
 using SerdesNet;
-using UAlbion.Api.Visual;
+using UAlbion.Api;
 using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets

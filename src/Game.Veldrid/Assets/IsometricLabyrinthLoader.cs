@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using SerdesNet;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -89,34 +90,37 @@ namespace UAlbion.Game.Veldrid.Assets
         public LabyrinthData Serdes(LabyrinthData existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
-            if (s.IsWriting())
+
+            string B(string pattern) => info.BuildFilename(pattern, 0);
+            var json = info.Get(AssetProperty.Pattern, "{0}_{2}.json");
+
+            if (s.IsReading())
             {
-                if (existing == null) throw new ArgumentNullException(nameof(existing));
-                var json        = info.Get(AssetProperty.Pattern, "{0}_{2}.json");
-                var floorTsx    = info.Get(AssetProperty.TiledFloorPattern, "Tiled/{0}_{2}_Floors.tsx");
-                var ceilingTsx  = info.Get(AssetProperty.TiledCeilingPattern, "Tiled/{0}_{2}_Ceilings.tsx");
-                var wallTsx     = info.Get(AssetProperty.TiledWallPattern, "Tiled/{0}_{2}_Walls.tsx");
-                var contentsTsx = info.Get(AssetProperty.TiledContentsPattern, "Tiled/{0}_{2}_Contents.tsx");
-                var floorPng    = info.Get(AssetProperty.FloorPngPattern, "Tiled/Gfx/{0}_{2}_Floors.png");
-                var ceilingPng  = info.Get(AssetProperty.CeilingPngPattern, "Tiled/Gfx/{0}_{2}_Ceilings.png");
-                var wallPng     = info.Get(AssetProperty.WallPngPattern, "Tiled/Gfx/{0}_{2}_Walls.png");
-                var contentsPng = info.Get(AssetProperty.ContentsPngPattern, "Tiled/Gfx/{0}_{2}_Contents.png");
+                var chunks = PackedChunks.Unpack(s);
+                var (chunk, _) = chunks.Single();
 
-                string B(string pattern) => info.BuildFilename(pattern, 0);
-
-                var files = new List<(string, byte[])> { (B(json), SaveJson(existing, info, mapping, jsonUtil)) };
-                files.AddRange(Save(existing, info, IsometricMode.Floors, B(floorPng), B(floorTsx)));
-                files.AddRange(Save(existing, info, IsometricMode.Ceilings, B(ceilingPng), B(ceilingTsx)));
-                files.AddRange(Save(existing, info, IsometricMode.Walls, B(wallPng), B(wallTsx)));
-                files.AddRange(Save(existing, info, IsometricMode.Contents, B(contentsPng), B(contentsTsx)));
-
-                PackedChunks.PackNamed(s, files.Count, i => (files[i].Item2, files[i].Item1));
-                return existing;
+                return FormatUtil.DeserializeFromBytes(chunk, s2 =>
+                    _jsonLoader.Serdes(null, info, mapping, s2, jsonUtil));
             }
-            else
-            {
-                throw new NotImplementedException();
-            }
+
+            if (existing == null) throw new ArgumentNullException(nameof(existing));
+            var floorTsx = info.Get(AssetProperty.TiledFloorPattern, "Tiled/{0}_{2}_Floors.tsx");
+            var ceilingTsx = info.Get(AssetProperty.TiledCeilingPattern, "Tiled/{0}_{2}_Ceilings.tsx");
+            var wallTsx = info.Get(AssetProperty.TiledWallPattern, "Tiled/{0}_{2}_Walls.tsx");
+            var contentsTsx = info.Get(AssetProperty.TiledContentsPattern, "Tiled/{0}_{2}_Contents.tsx");
+            var floorPng = info.Get(AssetProperty.FloorPngPattern, "Tiled/Gfx/{0}_{2}_Floors.png");
+            var ceilingPng = info.Get(AssetProperty.CeilingPngPattern, "Tiled/Gfx/{0}_{2}_Ceilings.png");
+            var wallPng = info.Get(AssetProperty.WallPngPattern, "Tiled/Gfx/{0}_{2}_Walls.png");
+            var contentsPng = info.Get(AssetProperty.ContentsPngPattern, "Tiled/Gfx/{0}_{2}_Contents.png");
+
+            var files = new List<(string, byte[])> {(B(json), SaveJson(existing, info, mapping, jsonUtil))};
+            files.AddRange(Save(existing, info, IsometricMode.Floors, B(floorPng), B(floorTsx)));
+            files.AddRange(Save(existing, info, IsometricMode.Ceilings, B(ceilingPng), B(ceilingTsx)));
+            files.AddRange(Save(existing, info, IsometricMode.Walls, B(wallPng), B(wallTsx)));
+            files.AddRange(Save(existing, info, IsometricMode.Contents, B(contentsPng), B(contentsTsx)));
+
+            PackedChunks.PackNamed(s, files.Count, i => (files[i].Item2, files[i].Item1));
+            return existing;
         }
 
         public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)

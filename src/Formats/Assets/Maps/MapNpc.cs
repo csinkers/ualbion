@@ -10,7 +10,7 @@ namespace UAlbion.Formats.Assets.Maps
     {
         public const int SizeOnDisk = 10;
 
-        [JsonInclude] public int Index { get; private set; }
+        [JsonIgnore] public int Index { get; private set; }
         public AssetId Id { get; set; } // MonsterGroup, Npc etc
         // public SampleId? Sound { get; set; }
         public byte Sound { get; set; }

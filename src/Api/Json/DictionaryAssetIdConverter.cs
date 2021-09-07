@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using UAlbion.Api.Visual;
 
 namespace UAlbion.Api.Json
 {
 #pragma warning disable CA1812 // Internal class that is apparently never instantiated; this class is instantiated generically
     class DictionaryAssetIdConverter<TKey, TValue> : JsonConverter<Dictionary<TKey, TValue>> where TKey : struct, IAssetId
     {
+        static readonly Type _valueType = typeof(TValue);
+        static readonly IAssetId.ParserDelegate<TKey> _parser = IAssetId.GetParser<TKey>();
         readonly JsonConverter<TValue> _valueConverter;
-        readonly Type _valueType = typeof(TValue);
-        readonly IAssetId.ParserDelegate<TKey> _parser = IAssetId.GetParser<TKey>();
 
         public DictionaryAssetIdConverter(JsonSerializerOptions options)
         {

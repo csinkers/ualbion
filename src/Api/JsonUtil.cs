@@ -17,6 +17,7 @@ namespace UAlbion.Api
                 VersionConverter.Instance,
                 new DictionaryEnumConverterFactory(),
                 new DictionaryAssetIdConverterFactory(),
+                new AssetIdConverterFactory()
             }
         });
 

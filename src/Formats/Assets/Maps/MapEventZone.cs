@@ -51,7 +51,8 @@ namespace UAlbion.Formats.Assets.Maps
             if (Node is DummyEventNode dummy)
                 Node = getEvent(dummy.Id);
 
-            Chain = getChain(Node.Id);
+            if (Node != null)
+                Chain = getChain(Node.Id);
         }
 
         public override string ToString() => $"{(Global ? "GZ" : "Z")}({X}, {Y}) T({Trigger}) M({Unk1}) C({Chain}) E({Node?.Id})";

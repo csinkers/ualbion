@@ -268,7 +268,7 @@ namespace UAlbion.Formats.Exporters.Tiled
         {
             var referencedChains = new bool[map.Chains.Count];
             foreach (var zone in map.Zones)
-                if (zone.Chain != 0xffff)
+                if (zone.Chain < referencedChains.Length)
                     referencedChains[zone.Chain] = true;
 
             var dummies = new List<(ZoneKey, Geometry.Polygon)>();

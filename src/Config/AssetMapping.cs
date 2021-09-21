@@ -12,7 +12,7 @@ namespace UAlbion.Config
 {
     public class AssetMapping
     {
-        static readonly ThreadLocal<AssetMapping> ThreadLocalGlobal = 
+        static readonly ThreadLocal<AssetMapping> ThreadLocalGlobal =
             new(() => new AssetMapping());
         static readonly AssetMapping TrueGlobal = new();
         static readonly AssetType[] AllAssetTypes =
@@ -333,7 +333,7 @@ namespace UAlbion.Config
 
         public void ConsistencyCheck()
         {
-            (string, string ) Describe(AssetType assetType)
+            (string, string) Describe(AssetType assetType)
             {
                 var sbBasic = new StringBuilder();
                 var sbFull = new StringBuilder();
@@ -368,15 +368,15 @@ namespace UAlbion.Config
             if (issues.Count > 0)
             {
                 throw new InvalidOperationException(
-                    "AssetMapping constraints violated: " 
-                    + Environment.NewLine 
+                    "AssetMapping constraints violated: "
+                    + Environment.NewLine
                     + string.Join(Environment.NewLine, issues));
             }
         }
 
-        public (AssetId, ushort)? TextIdToStringId(AssetId id) 
-            => _stringLookup.ContainsKey(id) 
-                ? _stringLookup[id] 
+        public (AssetId, ushort)? TextIdToStringId(AssetId id)
+            => _stringLookup.ContainsKey(id)
+                ? _stringLookup[id]
                 : ((AssetId, ushort)?)null;
 
         public IEnumerable<AssetId> EnumerateAssetsOfType(AssetType type)

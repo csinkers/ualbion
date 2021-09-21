@@ -9,6 +9,7 @@ namespace UAlbion.Formats.Assets.Maps
     public class MapNpc
     {
         public const int SizeOnDisk = 10;
+        public const int WaypointCount = 0x480;
 
         [JsonIgnore] public int Index { get; private set; }
         public AssetId Id { get; set; } // MonsterGroup, Npc etc
@@ -78,7 +79,7 @@ namespace UAlbion.Formats.Assets.Maps
             }
             else
             {
-                Waypoints ??= new NpcWaypoint[0x480];
+                Waypoints ??= new NpcWaypoint[WaypointCount];
                 for (int i = 0; i < Waypoints.Length; i++)
                 {
                     byte x = s.UInt8("x", Waypoints[i].X);

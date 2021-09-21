@@ -34,15 +34,15 @@ namespace UAlbion.Game.Assets
                 return existing;
             }
 
-            return Read(info, s);
+            return Read(info, s, mapping);
         }
 
-        static BaseMapData Read(AssetInfo info, ISerializer s)
+        static BaseMapData Read(AssetInfo info, ISerializer s, AssetMapping mapping)
         {
             var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
             using var ms = new MemoryStream(bytes);
             var map = Map.Parse(ms);
-            return map.ToAlbion(info);
+            return map.ToAlbion(info, mapping);
         }
 
         byte[] Write2D(MapData2D map, AssetInfo info)

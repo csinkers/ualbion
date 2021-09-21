@@ -15,8 +15,11 @@ namespace UAlbion.Formats.Exporters.Tiled
         [XmlAttribute("y")] public double Y { get; set; }
         [XmlAttribute("width")] public double Width { get; set; }
         [XmlAttribute("height")] public double Height { get; set; }
-        [XmlArray("properties")] [XmlArrayItem("property")] public List<ObjectProperty> Properties { get; set; }
+        [XmlArray("properties")] [XmlArrayItem("property")] public List<TiledProperty> Properties { get; set; }
         [XmlElement("polygon")] public Polygon Polygon { get; set; }
+        [XmlElement("point")] public TiledPoint Point { get; set; }
+        [XmlIgnore] public bool WidthSpecified => Width != 0;
+        [XmlIgnore] public bool HeightSpecified => Height != 0;
     }
 }
 #pragma warning restore CA2227 // Collection properties should be read only

@@ -34,7 +34,7 @@ namespace UAlbion.Formats
 
         public string FormatChain(IEventNode firstEvent, string indent = null)
         {
-            if (firstEvent == null) 
+            if (firstEvent == null)
                 return null;
             var sb = new StringBuilder();
 
@@ -46,7 +46,7 @@ namespace UAlbion.Formats
                     if (e == null)
                         return;
 
-                    if (!uniqueEvents.Add(e)) 
+                    if (!uniqueEvents.Add(e))
                         break;
 
                     if (e is IBranchNode branch)

@@ -66,6 +66,7 @@ namespace UAlbion.Base.Tests
 
             var baseAsset = (T)_baseApplier.LoadAsset(id);
             var (baseBytes, baseNotes) = Asset.Save(baseAsset, serdes);
+            var baseJson = Asset.SaveJson(baseAsset, JsonUtil);
 
             var idStrings = allIds.Select(x => $"{x.Type}.{x.Id}").ToArray();
             var assetTypes = allIds.Select(x => x.Type).Distinct().ToHashSet();
@@ -82,11 +83,19 @@ namespace UAlbion.Base.Tests
             var unpackedAsset = (T)BuildApplier(UnpackedAssetMod).LoadAsset(id);
             Assert.NotNull(unpackedAsset);
             var (unpackedBytes, unpackedNotes) = Asset.Save(unpackedAsset, serdes);
+            var unpackedJson = Asset.SaveJson(unpackedAsset, JsonUtil);
+
             Asset.Compare(resultsDir,
                 id.Type.ToString(),
                 baseBytes,
                 unpackedBytes,
-                new[] { (".saveBase.txt", baseNotes), (".saveUnpacked.txt", unpackedNotes) });
+                new[]
+                {
+                    (".saveBase.txt", baseNotes),
+                    (".saveUnpacked.txt", unpackedNotes),
+                    (".Base.json", baseJson),
+                    (".Unpacked.json", unpackedJson)
+                });
 
             ConvertAssets.Convert(
                 _disk,
@@ -99,11 +108,19 @@ namespace UAlbion.Base.Tests
 
             var repackedAsset = (T)BuildApplier(RepackedAssetMod).LoadAsset(id);
             var (repackedBytes, repackedNotes) = Asset.Save(repackedAsset, serdes);
+            var repackedJson = Asset.SaveJson(repackedAsset, JsonUtil);
+
             Asset.Compare(resultsDir,
                 id.Type.ToString(),
                 baseBytes,
                 repackedBytes,
-                new[] { (".saveBase.txt", baseNotes), (".saveRepacked.txt", repackedNotes) });
+                new[]
+                {
+                    (".saveBase.txt", baseNotes),
+                    (".saveRepacked.txt", repackedNotes),
+                    (".Base.json", baseJson),
+                    (".Repacked.json", unpackedJson)
+                });
         }
 
         [Fact]

@@ -26,11 +26,11 @@ namespace UAlbion.Formats.Exporters.Tiled
         [XmlElement("grid", Order = 1)] public TiledGrid Grid { get; set; }
         [XmlElement("image", Order = 2)] public TilesetImage Image { get; set; }
         [XmlArray("terraintypes", Order = 3)] [XmlArrayItem("terrain")] public List<TerrainType> TerrainTypes { get; } = new();
-        [XmlIgnore] public bool TerrainTypesSpecified => TerrainTypes != null && TerrainTypes.Count > 0;
+        [XmlIgnore] public bool TerrainTypesSpecified => TerrainTypes is { Count: > 0 };
         [XmlElement("tile", Order = 4)] public List<Tile> Tiles { get; set; }
-        [XmlIgnore] public bool TilesSpecified => Tiles != null && Tiles.Count > 0;
+        [XmlIgnore] public bool TilesSpecified => Tiles is { Count: > 0 };
         [XmlArray("wangsets", Order = 5)] [XmlArrayItem("wangset")] public List<WangSet> WangSets { get; } = new();
-        [XmlIgnore] public bool WangSetsSpecified => WangSets != null && WangSets.Count > 0;
+        [XmlIgnore] public bool WangSetsSpecified => WangSets is { Count: > 0 };
 
         [XmlAttribute("margin")] public int Margin { get; set; }
         [XmlIgnore] public bool MarginSpecified => Margin != 0;
@@ -230,13 +230,13 @@ namespace UAlbion.Formats.Exporters.Tiled
                     BuildTile(
                         tileset.Id.Id,
                         x.Index,
-                        x.FrameCount > 0 ? x.ImageNumber : (ushort?)null,
+                        x.FrameCount > 0 ? x.ImageNumber : null,
                         BuildTileProperties(x),
                         properties))
                 .ToList();
 
             // Add tiles for the extra frames of animated tiles
-            int nextId = tileset.Tiles[tileset.Tiles.Count - 1].Index + 1;
+            int nextId = tileset.Tiles[^1].Index + 1;
             int maxTile = tiles.Count;
             for (int i = 0; i < maxTile; i++)
             {
@@ -400,7 +400,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                     case "FLAGS": result.Flags = (TileFlags)Enum.Parse(typeof(TileFlags), prop.Value); break;
                     case "LAYER": result.Layer = (TileLayer)Enum.Parse(typeof(TileLayer), prop.Value); break;
                     case "PASSABILITY":
-                        result.Collision = (Passability) int.Parse(prop.Value, CultureInfo.InvariantCulture);
+                        result.Collision = (Passability)int.Parse(prop.Value, CultureInfo.InvariantCulture);
                         //Enum.Parse(typeof(Passability), prop.Value); 
                         break;
                     case "TYPE": result.Type = (TileType)Enum.Parse(typeof(TileType), prop.Value); break;

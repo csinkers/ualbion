@@ -164,6 +164,7 @@ namespace UAlbion.Formats.Assets
             item.AmmoAnim = s.UInt8(nameof(item.AmmoAnim), item.AmmoAnim);
 
             // Original game spells have school then offset, so need to treat it as big endian so each school's spells are consecutive
+            // TODO: Fix this up so the item data's school/spell number system and SpellIds get mapped to each other correctly.
             item.Spell = SpellId.SerdesU16BE(nameof(item.Spell), item.Spell, mapping, s); 
 
             item.Charges = s.UInt8(nameof(item.Charges), item.Charges);

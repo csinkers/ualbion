@@ -44,7 +44,7 @@ namespace UAlbion.Formats.Assets
             if (s.IsReading())
             {
                 int i = 0;
-                while(s.BytesRemaining > 0)
+                while (s.BytesRemaining > 0)
                 {
                     var chunk = IFFChunk.Serdes(i, null, s);
                     switch (chunk.TypeId)
@@ -55,7 +55,7 @@ namespace UAlbion.Formats.Assets
 
                         case IFFChunkType.ColorRanges:
                             img.ColorRanges ??= new List<ColorRange>();
-                            img.ColorRanges.Add(ColorRange.Serdes(img.ColorRanges.Count, null, s)); 
+                            img.ColorRanges.Add(ColorRange.Serdes(img.ColorRanges.Count, null, s));
                             break;
 
                         case IFFChunkType.Thumbnail: img.SerdesThumbnail(s, chunk.Length); break;
@@ -132,7 +132,7 @@ namespace UAlbion.Formats.Assets
             ThumbnailWidth = s.UInt16BE(nameof(ThumbnailWidth), ThumbnailWidth);
             ThumbnailHeight = s.UInt16BE(nameof(ThumbnailHeight), ThumbnailHeight);
 
-            Thumbnail = Compression == 1 
+            Thumbnail = Compression == 1
                 ? s.IsReading() ? Unpack(s, length - 4) : Pack(Thumbnail, s)
                 : s.Bytes("Pixels", null, length - 4);
         }
@@ -162,7 +162,7 @@ namespace UAlbion.Formats.Assets
                     var rawBytes = s.Bytes("Raw", null, n + 1);
                     ms.Write(rawBytes, 0, rawBytes.Length);
                 }
-                else if (129 <= n && n <= 255)
+                else if (n is >= 129 and <= 255)
                 {
                     byte value = s.UInt8("Value", 0);
                     for (int i = 0; i < 257 - n; i++)

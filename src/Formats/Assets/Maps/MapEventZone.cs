@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using SerdesNet;
 using UAlbion.Config;
@@ -9,21 +10,20 @@ namespace UAlbion.Formats.Assets.Maps
 {
     public class MapEventZone 
     {
-        public ZoneKey Key { get; }
         public bool Global { get; set; }
         public byte Unk1 { get; set; }
         public byte X { get; set; }
         public byte Y { get; set; }
         public TriggerTypes Trigger { get; set; }
-        public AssetId ChainSource { get; set; }
+        [JsonIgnore] public AssetId ChainSource { get; set; }
         public ushort Chain { get; set; }
         public IEventNode Node { get; set; }
 
-        public MapEventZone() => Key = new ZoneKey(this);
         public static MapEventZone Serdes(MapEventZone existing, ISerializer s, byte y)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
 
+            s.Begin("Zone");
             bool global = y == 0xff;
             var zone = existing ?? new MapEventZone
             {
@@ -39,6 +39,7 @@ namespace UAlbion.Formats.Assets.Maps
             if (nodeId != null && zone.Node == null)
                 zone.Node = new DummyEventNode(nodeId.Value);
 
+            s.End();
             return zone;
         }
 
@@ -48,11 +49,9 @@ namespace UAlbion.Formats.Assets.Maps
             if (getChain == null) throw new ArgumentNullException(nameof(getChain));
             ChainSource = mapId;
             if (Node is DummyEventNode dummy)
-            {
                 Node = getEvent(dummy.Id);
-                Chain = getChain(dummy.Id);
-            }
-            else Chain = 0xffff;
+
+            Chain = getChain(Node.Id);
         }
 
         public override string ToString() => $"{(Global ? "GZ" : "Z")}({X}, {Y}) T({Trigger}) M({Unk1}) C({Chain}) E({Node?.Id})";
@@ -80,38 +79,5 @@ E\((?<Event>[^)]+)\)\s*", RegexOptions.IgnorePatternWhitespace);
                 Node = new DummyEventNode(ushort.Parse(m.Groups["Event"].Value, CultureInfo.InvariantCulture))
             };
         }
-    }
-
-    public readonly struct ZoneKey : IEquatable<ZoneKey>
-    {
-        readonly MapEventZone _zone;
-
-        public ZoneKey(MapEventZone zone)
-        {
-            _zone = zone ?? throw new ArgumentNullException(nameof(zone));
-        }
-
-        public bool Global => _zone.Global;
-        public byte Unk1 => _zone.Unk1;
-        public TriggerTypes Trigger => _zone.Trigger;
-        public ushort Chain => _zone.Chain;
-        public IEventNode Node => _zone.Node;
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = Global.GetHashCode();
-                hashCode = (hashCode * 397) ^ Unk1.GetHashCode();
-                hashCode = (hashCode * 397) ^ (int)Trigger;
-                hashCode = (hashCode * 397) ^ (Node != null ? Node.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ Chain.GetHashCode();
-                return hashCode;
-            }
-        }
-
-        public static bool operator ==(ZoneKey a, ZoneKey b) => a.Equals(b);
-        public static bool operator !=(ZoneKey a, ZoneKey b) => !a.Equals(b);
-        public override bool Equals(object obj) => obj is ZoneKey key && Equals(key);
-        public bool Equals(ZoneKey other) => Global == other.Global && Unk1 == other.Unk1 && Trigger == other.Trigger && Equals(Node, other.Node);
     }
 }

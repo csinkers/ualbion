@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace UAlbion.Api.Visual
 {
@@ -57,17 +58,19 @@ namespace UAlbion.Api.Visual
             return this;
         }
 
-        public IAssetId Id { get; }
+        [JsonIgnore] public IAssetId Id { get; }
         public string Name { get; }
         public int Width { get; }
         public int Height { get; }
-        public int ArrayLayers => 1;
-        public int SizeInBytes => PixelData.Length * Unsafe.SizeOf<T>();
+        [JsonIgnore] public int ArrayLayers => 1;
+        [JsonIgnore] public int SizeInBytes => PixelData.Length * Unsafe.SizeOf<T>();
         public IReadOnlyList<Region> Regions => _regions;
-        public TextureDirtyType DirtyType { get; private set; }
-        public int DirtyId { get; private set; }
+        [JsonIgnore] public TextureDirtyType DirtyType { get; private set; }
+        [JsonIgnore] public int DirtyId { get; private set; }
+        [JsonIgnore] public ReadOnlySpan<T> PixelData => _pixelData;
+        [JsonIgnore] public Span<T> MutablePixelData { get { DirtyType = TextureDirtyType.All; return _pixelData; } }
         public void Clean() => DirtyType = TextureDirtyType.None;
-        public override string ToString() => $"Image {Id} {Width}x{Height} ({Regions.Count} sub-images)";
+        public override string ToString() => $"STexture {Id} {Width}x{Height} ({Regions.Count} sub-images)";
 
         public ReadOnlySpan<T> GetRowSpan(int frameNumber, int row)
         {
@@ -81,7 +84,6 @@ namespace UAlbion.Api.Visual
             return _pixelData.AsSpan(index, frame.Width);
         }
 
-        public ReadOnlySpan<T> PixelData => _pixelData;
         public ReadOnlyImageBuffer<T> GetRegionBuffer(int i)
         {
             var frame = Regions[i];
@@ -95,7 +97,6 @@ namespace UAlbion.Api.Visual
             return new ReadOnlyImageBuffer<T>(Width, Height, Width, PixelData);
         }
 
-        public Span<T> MutablePixelData { get { DirtyType = TextureDirtyType.All; return _pixelData; } }
 
         public ImageBuffer<T> GetMutableRegionBuffer(int i)
         {

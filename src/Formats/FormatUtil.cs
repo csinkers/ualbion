@@ -151,7 +151,7 @@ namespace UAlbion.Formats
         static byte HexCharToByte(char c)
         {
             if (c >= 0 && c <= 9) return (byte)(c - '0');
-            if (c >= 'A' && c <= 'F') return (byte)(c - 'A');
+            if (c is >= 'A' and <= 'F') return (byte)(c - 'A');
             throw new FormatException($"Invalid character '{c}' in hex string");
         }
 

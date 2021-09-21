@@ -12,9 +12,10 @@ namespace UAlbion.Api
         static ParserDelegate<T> GetParser<T>() where T : IAssetId
         {
             var type = typeof(T);
+
             var parser = type.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public);
 
-            if(parser == null)
+            if (parser == null)
                 throw new InvalidOperationException($"Asset type \"{type}\" was expected to contain a static Parse method, but none could be found.");
 
             var parameters = parser.GetParameters();

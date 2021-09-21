@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Exporters.Tiled;
 
 namespace UAlbion.Formats.Exporters
 {
@@ -14,7 +15,7 @@ namespace UAlbion.Formats.Exporters
             var zones = new List<(ZoneKey, Geometry.Polygon)>();
             foreach (var zone in map.Zones)
             {
-                zones.Add((zone.Key, new Geometry.Polygon { Points = new[]
+                zones.Add((new ZoneKey(zone), new Geometry.Polygon { Points = new[]
                     {
                         (zone.X, zone.Y),
                         (zone.X+1, zone.Y),
@@ -156,6 +157,7 @@ namespace UAlbion.Formats.Exporters
 
             return edges;
         }
+
         static void AddAdjacency(EdgeLookup adjacency, ushort x, ushort y, int index)
         {
             if (!adjacency.TryGetValue((x, y), out var indices))
@@ -237,7 +239,8 @@ namespace UAlbion.Formats.Exporters
             Queue<int> pending = new Queue<int>();
             pending.Enqueue(index);
             var region = new List<(int, int)>();
-            regions.Add((zone.Key, region));
+            var key = new ZoneKey(zone);
+            regions.Add((key, region));
 
             while (pending.Count > 0)
             {
@@ -251,7 +254,7 @@ namespace UAlbion.Formats.Exporters
                 for (int k = 0; k < targetZones.Count;)
                 {
                     var other = targetZones[k];
-                    if (other.Key != zone.Key)
+                    if (new ZoneKey(other) != key)
                     {
                         k++;
                         continue;
@@ -265,6 +268,68 @@ namespace UAlbion.Formats.Exporters
                     targetZones.RemoveAt(k);
                 }
             }
+        }
+
+        static (int x0, int y0, int x1, int y1) GetExtents(IEnumerable<((int x, int y) from, (int x, int y) to)> shape) // Assume edges are already sorted
+        {
+            (int x, int y) min = (int.MaxValue, int.MaxValue);
+            (int x, int y) max = (int.MinValue, int.MinValue);
+            foreach (var (from, to) in shape)
+            {
+                if (from.x < min.x) min.x = from.x;
+                if (from.y < min.y) min.y = from.y;
+
+                if (to.x > max.x) max.x = to.x;
+                if (to.y > max.y) max.y = to.y;
+            }
+            return (min.x, min.y, max.x, max.y);
+        }
+
+        static ((int x, int y) from, (int x, int y) to)[] SortEdges(IEnumerable<((int x, int y) from, (int x, int y) to)> shape)
+        {
+            return shape.Select(edge =>
+            {
+                if (edge.to.x < edge.from.x) return (edge.to, edge.from);
+                if (edge.to.x == edge.from.x && edge.to.y < edge.from.y) return (edge.to, edge.from);
+                return (edge.from, edge.to);
+            }).OrderBy(x => x).ToArray();
+        }
+
+        static float Lerp(float t, float a, float b) => a + (b - a) * t;
+
+        static bool TestEdge(int i, int j, ((int x, int y) from, (int x, int y) to) edge)
+        {
+            if (edge.from.x == edge.to.x) return false;
+            if (edge.from.x > i) return false;
+            if (edge.to.x <= i) return false;
+            if (edge.to.y == edge.from.y) return edge.to.y <= j;
+
+            float t = (float)(i - edge.from.x) / (edge.to.x - edge.from.x);
+            float yIntercept = Lerp(t, edge.from.y, edge.to.y);
+            return yIntercept <= j;
+        }
+
+        static bool TestPoint(int i, int j, IEnumerable<((int x, int y) from, (int x, int y) to)> shape)
+        {
+            int intersectionsAbove = 0;
+
+            foreach (var edge in shape)
+                if (TestEdge(i, j, edge))
+                    intersectionsAbove++;
+
+            return (intersectionsAbove & 1) == 1;
+        }
+
+        public static IList<(int x, int y)> GetPointsInsideShape(IEnumerable<((int x, int y) from, (int x, int y) to)> shape)
+        {
+            var results = new List<(int x, int y)>();
+            shape = SortEdges(shape);
+            var rect = GetExtents(shape);
+            for (int j = rect.y0; j < rect.y1; j++)
+                for (int i = rect.x0; i < rect.x1; i++)
+                    if (TestPoint(i, j, shape))
+                        results.Add((i, j));
+            return results;
         }
     }
 }

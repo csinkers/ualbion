@@ -141,12 +141,14 @@ namespace UAlbion
             var formats = string.Join(" ", 
                 Enum.GetValues(typeof(DumpFormats))
                     .Cast<DumpFormats>()
-                    .Select(x => x.ToString()));
+                    .Select(x => x.ToString())
+                    .OrderBy(x => x));
 
             var dumpTypes = string.Join(" ",
                 Enum.GetValues(typeof(AssetType))
                     .Cast<AssetType>()
-                    .Select(x => x.ToString()));
+                    .Select(x => x.ToString())
+                    .OrderBy(x => x));
 
             Console.WriteLine($@"UAlbion
 Command Line Options:

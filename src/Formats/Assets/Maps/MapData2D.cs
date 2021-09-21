@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Maps
 {
@@ -16,10 +18,10 @@ namespace UAlbion.Formats.Assets.Maps
             Base.Tileset.Desert
         };
         public override MapType MapType => OutdoorTilesets.Any(x => x == TilesetId) ? MapType.TwoDOutdoors : MapType.TwoD;
-        [JsonInclude] public FlatMapFlags Flags { get; private set; } // Wait/Rest, Light-Environment, NPC converge range
-        [JsonInclude] public byte Sound { get; private set; }
-        [JsonInclude] public TilesetId TilesetId { get; private set; }
-        [JsonInclude] public byte FrameRate { get; private set; }
+        [JsonInclude] public FlatMapFlags Flags { get; set; } // Wait/Rest, Light-Environment, NPC converge range
+        [JsonInclude] public byte Sound { get; set; }
+        [JsonInclude] public TilesetId TilesetId { get; set; }
+        [JsonInclude] public byte FrameRate { get; set; }
 
         [JsonIgnore] public int[] Underlay { get; private set; }
         [JsonIgnore] public int[] Overlay { get; private set; }
@@ -31,11 +33,22 @@ namespace UAlbion.Formats.Assets.Maps
         }
 
         public MapData2D() { } // For JSON
-        public MapData2D(MapId id, byte width, byte height)
+        public MapData2D(MapId id, byte width, byte height, IList<EventNode> events, IList<ushort> chains, IEnumerable<MapNpc> npcs, IList<MapEventZone> zones)
         {
+            if (events == null) throw new ArgumentNullException(nameof(events));
+            if (chains == null) throw new ArgumentNullException(nameof(chains));
+            if (npcs == null) throw new ArgumentNullException(nameof(npcs));
+            if (zones == null) throw new ArgumentNullException(nameof(zones));
+
             Id = id;
             Width = width;
             Height = height;
+            Npcs = npcs.ToArray();
+
+            foreach (var e in events) Events.Add(e);
+            foreach (var c in chains) Chains.Add(c);
+            foreach (var z in zones) Zones.Add(z);
+            Unswizzle();
         }
 
         public static MapData2D Serdes(AssetInfo info, MapData2D existing, AssetMapping mapping, ISerializer s)

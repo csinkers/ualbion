@@ -24,6 +24,7 @@ namespace UAlbion.Formats.Exporters.Tiled
         [XmlAttribute("nextlayerid")] public int NextLayerId { get; set; }
         [XmlAttribute("nextobjectid")] public int NextObjectId { get; set; }
         [XmlAttribute("backgroundcolor")] public string BackgroundColor { get; set; }
+        [XmlArray("properties")] [XmlArrayItem("property")] public List<TiledProperty> Properties { get; set; }
         [XmlElement("tileset")] public List<MapTileset> Tilesets { get; set; }
         [XmlElement("layer")] public List<TiledMapLayer> Layers { get; set; }
         [XmlElement("objectgroup")] public List<ObjectGroup> ObjectGroups { get; set; }

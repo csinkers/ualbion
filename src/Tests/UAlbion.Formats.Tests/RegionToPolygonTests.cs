@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
@@ -11,29 +12,29 @@ namespace UAlbion.Formats.Tests
 {
     public class RegionToPolygonTests
     {
-        static IList<Geometry.Polygon> Convert(List<(byte, byte)> region)
+        static IList<Geometry.Polygon> Convert(List<(byte x, byte y)> region)
         {
             byte w = (byte)(region.Max(x => x.Item1) + 1);
             byte h = (byte)(region.Max(x => x.Item2) + 1);
 
-            var map = new MapData2D(MapId.None, w, h);
-            var events = new List<IEventNode> { new EventNode(0, new DoScriptEvent(new ScriptId(AssetType.Script))) };
-            foreach (var (x, y) in region)
-            {
-                map.Zones.Add(new MapEventZone
+            var events = new List<EventNode> { new(0, new DoScriptEvent(new ScriptId(AssetType.Script))) };
+            var map = new MapData2D(MapId.None, w, h,
+                events,
+                new ushort[] { 0 },
+                Array.Empty<MapNpc>(),
+                region.Select(p => new MapEventZone
                 {
-                    X = x,
-                    Y = y,
+                    X = p.x,
+                    Y = p.y,
                     Chain = 0,
                     Node = events[0],
                     Trigger = TriggerTypes.Default
-                });
-            }
+                }).ToArray()
+            );
 
             var zones = TriggerZoneBuilder.BuildZones(map);
             return zones.Select(x => x.Item2).ToList();
         }
-
 
         [Fact]
         public void SingleTileTest()
@@ -113,7 +114,7 @@ namespace UAlbion.Formats.Tests
                         x => Assert.Equal((0, 3), x));
                 });
         }
-/*
+
         [Fact]
         public void DoughnutTest()
         {
@@ -174,15 +175,14 @@ namespace UAlbion.Formats.Tests
                 },
                 poly =>
                 {
-                    Assert.Equal(0, poly.OffsetX);
-                    Assert.Equal(0, poly.OffsetY);
+                    Assert.Equal(2, poly.OffsetX);
+                    Assert.Equal(1, poly.OffsetY);
                     Assert.Collection(poly.Points,
+                        x => Assert.Equal((0, 0), x),
+                        x => Assert.Equal((2, 0), x),
                         x => Assert.Equal((2, 1), x),
-                        x => Assert.Equal((4, 1), x),
-                        x => Assert.Equal((4, 2), x),
-                        x => Assert.Equal((2, 2), x));
+                        x => Assert.Equal((0, 1), x));
                 });
         }
-*/
     }
 }

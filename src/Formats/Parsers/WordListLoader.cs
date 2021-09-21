@@ -29,12 +29,12 @@ namespace UAlbion.Formats.Parsers
             }
             else
             {
-                if(existing == null)
+                if (existing == null)
                     throw new ArgumentNullException(nameof(existing));
 
                 foreach (var x in existing)
                 {
-                    if (x != null && x.Length > WordLength)
+                    if (x is { Length: > WordLength })
                         throw new ArgumentOutOfRangeException(nameof(existing), $"Tried to write a word ({x}) of length {x.Length} to a word list, but the maximum length is {WordLength}");
 
                     s.FixedLengthString(null, x, WordLength);

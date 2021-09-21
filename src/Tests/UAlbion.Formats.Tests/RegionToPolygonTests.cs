@@ -132,23 +132,23 @@ namespace UAlbion.Formats.Tests
                     Assert.Equal(0, poly.OffsetY);
                     Assert.Collection(poly.Points,
                         x => Assert.Equal((0, 0), x),
-                        x => Assert.Equal((3, 0), x),
-                        x => Assert.Equal((3, 3), x),
-                        x => Assert.Equal((0, 3), x),
-                        x => Assert.Equal((0, 2), x),
-                        x => Assert.Equal((2, 2), x),
+                        x => Assert.Equal((2, 0), x),
                         x => Assert.Equal((2, 1), x),
-                        x => Assert.Equal((0, 1), x));
+                        x => Assert.Equal((1, 1), x),
+                        x => Assert.Equal((1, 2), x),
+                        x => Assert.Equal((2, 2), x),
+                        x => Assert.Equal((2, 3), x),
+                        x => Assert.Equal((0, 3), x));
                 },
                 poly =>
                 {
-                    Assert.Equal(0, poly.OffsetX);
+                    Assert.Equal(2, poly.OffsetX);
                     Assert.Equal(0, poly.OffsetY);
                     Assert.Collection(poly.Points,
-                        x => Assert.Equal((0, 1), x),
-                        x => Assert.Equal((1, 1), x),
-                        x => Assert.Equal((1, 2), x),
-                        x => Assert.Equal((0, 2), x));
+                        x => Assert.Equal((0, 0), x),
+                        x => Assert.Equal((1, 0), x),
+                        x => Assert.Equal((1, 3), x),
+                        x => Assert.Equal((0, 3), x));
                 }
             );
         }

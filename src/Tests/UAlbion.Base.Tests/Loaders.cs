@@ -9,7 +9,6 @@ namespace UAlbion.Base.Tests
         public static readonly AmorphousSpriteLoader AmorphousSpriteLoader = new();
         public static readonly AutomapLoader AutomapLoader = new();
         public static readonly BlockListLoader BlockListLoader = new();
-        public static readonly CharacterSheetLoader CharacterSheetLoader = new();
         public static readonly ChestLoader ChestLoader = new();
         public static readonly EventSetLoader EventSetLoader = new();
         public static readonly FixedSizeSpriteLoader FixedSizeSpriteLoader = new();
@@ -17,7 +16,6 @@ namespace UAlbion.Base.Tests
         public static readonly SingleHeaderSpriteLoader SingleHeaderSpriteLoader = new();
         public static readonly MultiHeaderSpriteLoader MultiHeaderSpriteLoader = new();
         // public static readonly InterlacedBitmapLoader InterlacedBitmapLoader = new InterlacedBitmapLoader();
-        public static readonly ItemDataLoader ItemDataLoader = new();
         public static readonly ItemNameLoader ItemNameLoader = new();
         public static readonly LabyrinthDataLoader LabyrinthDataLoader = new();
         public static readonly MerchantLoader MerchantLoader = new();

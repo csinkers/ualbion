@@ -40,7 +40,9 @@ namespace UAlbion.Config
         {
             [JsonConstructor]
             public Range(int from, int to) { From = from; To = to; }
+            [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
             public int From { get; }
+            [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
             public int To { get; }
             public override string ToString() => $"{From}:{To}";
         }
@@ -51,8 +53,11 @@ namespace UAlbion.Config
             [JsonIgnore] public Type EnumType { get; set; }
             [JsonIgnore] public string EnumTypeString => _enumTypeString ?? EnumType.AssemblyQualifiedName;
             public AssetType AssetType { get; set; }
+            [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
             public int EnumMin { get; set; }
+            [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
             public int EnumMax { get; set; }
+            [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
             public int Offset { get; set; }
             [JsonIgnore] public int MappedMin => EnumMin + Offset;
             [JsonIgnore] public int MappedMax => EnumMax + Offset;

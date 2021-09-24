@@ -36,7 +36,7 @@ namespace UAlbion.Formats.Assets
         public byte SkillTax2 { get; set; } // 18 Skill Tax 2 value. Ranged Values
         public byte Activate { get; set; } // 19 Activate enables compass (0), monster eye (1) or clock (3) (if type=0×13) / Torch intensity (if type=0×16)
         public byte AmmoAnim { get; set; } // 20 Ammo combat animation (long-range weapons only)
-        public SpellId Spell { get; set; } // 21 Spell Id (2 bytes)
+        public SpellId Spell { get; set; } // 21 Spell (1 byte for class, 1 byte for number in class)
         public byte Charges { get; set; } // 23 Charges left in item / Torch lifetime (if type=0×16)
         public byte EnchantmentCount { get; set; } // 24 Number of times item was enchanted/recharged
         public byte MaxEnchantmentCount { get; set; } // 25 Maximum possible enchantments
@@ -136,10 +136,12 @@ namespace UAlbion.Formats.Assets
             return sb.ToString();
         }
 
-        public static ItemData Serdes(AssetInfo info, ItemData item, AssetMapping mapping, ISerializer s)
+        public static ItemData Serdes(AssetInfo info, ItemData item, ISerializer s, ISpellManager spellManager)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
+            if (spellManager == null) throw new ArgumentNullException(nameof(spellManager));
+
             item ??= new ItemData(info.AssetId);
             item.Unknown = s.UInt8(nameof(item.Unknown), item.Unknown);
             item.TypeId = s.EnumU8(nameof(item.TypeId), item.TypeId);
@@ -163,9 +165,12 @@ namespace UAlbion.Formats.Assets
             item.Activate = s.UInt8(nameof(item.Activate), item.Activate);
             item.AmmoAnim = s.UInt8(nameof(item.AmmoAnim), item.AmmoAnim);
 
-            // Original game spells have school then offset, so need to treat it as big endian so each school's spells are consecutive
-            // TODO: Fix this up so the item data's school/spell number system and SpellIds get mapped to each other correctly.
-            item.Spell = SpellId.SerdesU16BE(nameof(item.Spell), item.Spell, mapping, s); 
+            var spell = item.Spell.IsNone ? null : spellManager.GetSpellOrDefault(item.Spell);
+            SpellClass spellClass = s.EnumU8("SpellClass", spell?.Class ?? 0);
+            byte spellNumber = s.UInt8("SpellNumber", (byte)((spell?.OffsetInClass + 1) ?? 0));
+            item.Spell = spellNumber == 0 
+                ? SpellId.None 
+                : spellManager.GetSpellId(spellClass, (byte)(spellNumber - 1));
 
             item.Charges = s.UInt8(nameof(item.Charges), item.Charges);
             item.EnchantmentCount = s.UInt8(nameof(item.EnchantmentCount), item.EnchantmentCount);

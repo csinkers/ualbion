@@ -133,9 +133,11 @@ namespace UAlbion.Formats.Assets
         public byte[] UnkMonster { get; set; } // 472 bytes more than an NPC
         // ReSharper restore InconsistentNaming
 
-        public static CharacterSheet Serdes(CharacterId id, CharacterSheet sheet, AssetMapping mapping, ISerializer s)
+        public static CharacterSheet Serdes(CharacterId id, CharacterSheet sheet, AssetMapping mapping, ISerializer s, ISpellManager spellManager)
         {
+            if (mapping == null) throw new ArgumentNullException(nameof(mapping));
             if (s == null) throw new ArgumentNullException(nameof(s));
+            if (spellManager == null) throw new ArgumentNullException(nameof(spellManager));
             var initialOffset = s.Offset;
 
             sheet ??= new CharacterSheet(id);
@@ -273,19 +275,23 @@ namespace UAlbion.Formats.Assets
             byte[] knownSpellBytes = null;
             byte[] spellStrengthBytes = null;
 
-            uint GetSchoolId(SpellId spellId) => (uint)(spellId.Id - 1) / MaxSpellsPerSchool;
-            int GetOffset(SpellId spellId) => (spellId.Id - 1) % MaxSpellsPerSchool;
-            SpellId GetSpellId(int schoolId, int offset) => new(AssetType.Spell, 1 + schoolId * MaxSpellsPerSchool + offset);
-
             if (s.IsWriting())
             {
                 var knownSpells = new uint[SpellSchoolCount];
                 foreach (var spellId in sheet.Magic.KnownSpells)
-                    knownSpells[GetSchoolId(spellId)] |= 1U << GetOffset(spellId);
+                {
+                    var spell = spellManager.GetSpellOrDefault(spellId);
+                    if (spell == null) continue;
+                    knownSpells[(int)spell.Class] |= 1U << spell.OffsetInClass;
+                }
 
                 var spellStrengths = new ushort[MaxSpellsPerSchool * SpellSchoolCount];
                 foreach (var kvp in sheet.Magic.SpellStrengths)
-                    spellStrengths[GetSchoolId(kvp.Key) * MaxSpellsPerSchool + GetOffset(kvp.Key)] = kvp.Value;
+                {
+                    var spell = spellManager.GetSpellOrDefault(kvp.Key);
+                    if (spell == null) continue;
+                    spellStrengths[(int)spell.Class * MaxSpellsPerSchool + spell.OffsetInClass] = kvp.Value;
+                }
 
                 knownSpellBytes = knownSpells.Select(BitConverter.GetBytes).SelectMany(x => x).ToArray();
                 spellStrengthBytes = spellStrengths.Select(BitConverter.GetBytes).SelectMany(x => x).ToArray();
@@ -311,14 +317,14 @@ namespace UAlbion.Formats.Assets
                 for (int school = 0; school < SpellSchoolCount; school++)
                 {
                     byte knownSpells = 0;
-                    for (int offset = 0; offset < MaxSpellsPerSchool; offset++)
+                    for (byte offset = 0; offset < MaxSpellsPerSchool; offset++)
                     {
                         if (offset % 8 == 0)
                             knownSpells = knownSpellBytes[school * 4 + offset / 8];
                         int i = school * MaxSpellsPerSchool + offset;
                         bool isKnown = (knownSpells & (1 << (offset % 8))) != 0;
                         ushort spellStrength = BitConverter.ToUInt16(spellStrengthBytes, i * sizeof(ushort));
-                        var spellId = GetSpellId(school, offset);
+                        var spellId = spellManager.GetSpellId((SpellClass)school, offset);
 
                         if (isKnown)
                             sheet.Magic.KnownSpells.Add(spellId);

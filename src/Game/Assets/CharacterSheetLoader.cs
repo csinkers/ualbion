@@ -2,16 +2,18 @@
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 
-namespace UAlbion.Formats.Parsers
+namespace UAlbion.Game.Assets
 {
-    public class CharacterSheetLoader : IAssetLoader<CharacterSheet>
+    public class CharacterSheetLoader : Component, IAssetLoader<CharacterSheet>
     {
         public CharacterSheet Serdes(CharacterSheet existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
-            return CharacterSheet.Serdes(info.AssetId, existing, mapping, s);
+            return CharacterSheet.Serdes(info.AssetId, existing, mapping, s, Resolve<ISpellManager>());
         }
 
         public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)

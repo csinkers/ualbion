@@ -165,6 +165,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Meta", "Meta", "{A4FBE98A-3
 		mods\Base\Meta\MONGFX0.json = mods\Base\Meta\MONGFX0.json
 		mods\Base\Meta\NPCGR0.json = mods\Base\Meta\NPCGR0.json
 		mods\Base\Meta\NPCGR1.json = mods\Base\Meta\NPCGR1.json
+		mods\Base\Meta\SPELLDAT.json = mods\Base\Meta\SPELLDAT.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{45789AD1-F501-469F-B410-D71AE73EE3EC}"

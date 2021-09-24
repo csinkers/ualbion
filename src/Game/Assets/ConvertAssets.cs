@@ -7,6 +7,7 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats.Assets;
+using UAlbion.Game.Magic;
 using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Assets
@@ -28,6 +29,7 @@ namespace UAlbion.Game.Assets
                 .Attach(new ContainerRegistry())
                 .Attach(new PostProcessorRegistry())
                 .Attach(new AssetLocator())
+                .Attach(new SpellManager())
                 .Attach(new SettingsManager(new GeneralSettings())) // Used for event comments
                 .Attach(applier)
                 ;

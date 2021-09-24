@@ -119,8 +119,22 @@ namespace UAlbion.Base.Tests
         public void ItemTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Item.Knife) };
+            var spell = new SpellData(Spell.ThornSnare, SpellClass.DjiKas, 0)
+            {
+                Cost = 1,
+                Environments = SpellEnvironments.Combat,
+                LevelRequirement = 2,
+                Targets = SpellTargets.OneMonster,
+            };
+
+            var spellManager = new MockSpellManager().Add(spell);
+            ItemDataLoader itemDataLoader = new();
+            new EventExchange()
+                .Attach(spellManager)
+                .Attach(itemDataLoader);
+
             RoundTripItem<ItemData>(nameof(ItemTest), "$(XLD)/ITEMLIST.DAT", 10,
-                (x, s) => Loaders.ItemDataLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+                (x, s) => itemDataLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
         }
 
         [Fact]
@@ -228,20 +242,49 @@ namespace UAlbion.Base.Tests
                 (x, s) => Loaders.MonsterGroupLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
         }
 
+        static SpellData BuildMockSpell(SpellId id, SpellClass school, byte number) => new(id, school, number)
+            {
+                Cost = 1,
+                Environments = SpellEnvironments.Combat,
+                LevelRequirement = 2,
+                Targets = SpellTargets.OneMonster,
+            };
+
+        static CharacterSheetLoader BuildCharacterLoader()
+        {
+            var spellManager = new MockSpellManager()
+                .Add(BuildMockSpell(Spell.ThornSnare, SpellClass.DjiKas, 0))
+                .Add(BuildMockSpell(Spell.Fireball, SpellClass.OquloKamulos, 0))
+                .Add(BuildMockSpell(Spell.LightningStrike, SpellClass.OquloKamulos, 1))
+                .Add(BuildMockSpell(Spell.FireRain, SpellClass.OquloKamulos, 2))
+                .Add(BuildMockSpell(Spell.RemoveTrapKK, SpellClass.OquloKamulos, 14))
+                .Add(BuildMockSpell(Spell.Unused106, SpellClass.OquloKamulos, 15))
+                ;
+
+            CharacterSheetLoader characterSheetLoader = new();
+            new EventExchange()
+                .Attach(spellManager)
+                .Attach(characterSheetLoader);
+
+            return characterSheetLoader;
+        }
+
         [Fact]
         public void MonsterTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Monster.Krondir1) };
+            var loader = BuildCharacterLoader();
             RoundTripXld<CharacterSheet>(nameof(MonsterTest), "$(XLD)/MONCHAR0.XLD", 9,
-                (x, s) => Loaders.CharacterSheetLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+                (x, s) => loader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
         }
 
         [Fact]
         public void NpcTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Npc.Christine) };
+            var loader = BuildCharacterLoader();
             RoundTripXld<CharacterSheet>(nameof(NpcTest), "$(XLD)/INITIAL/NPCCHAR1.XLD", 83,
-                (x, s) => Loaders.CharacterSheetLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+                (x, s) => loader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
         }
 
         [Fact]
@@ -256,8 +299,9 @@ namespace UAlbion.Base.Tests
         public void PartyMemberTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(PartyMember.Tom) };
+            var loader = BuildCharacterLoader();
             RoundTripXld<CharacterSheet>(nameof(PartyMemberTest), "$(XLD)/INITIAL/PRTCHAR0.XLD", 0,
-                (x, s) => Loaders.CharacterSheetLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+                (x, s) => loader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
         }
 
         [Fact]

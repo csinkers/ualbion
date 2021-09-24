@@ -37,12 +37,14 @@ namespace UAlbion.Formats.Exporters.Tiled
             Type = TiledPropertyType.Bool;
         }
 
+#pragma warning disable CA1720 // Identifier contains type name
         public static TiledProperty Object(string key, int objectId) => new()
         {
             Name = key,
             Type = TiledPropertyType.Object,
             Value = objectId.ToString(CultureInfo.InvariantCulture)
         };
+#pragma warning restore CA1720 // Identifier contains type name
 
         [XmlAttribute("name")] public string Name { get; set; }
         [XmlAttribute("value")] public string Value { get; set; }

@@ -9,6 +9,7 @@ using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Assets;
+using UAlbion.Game.Magic;
 using UAlbion.Game.Settings;
 
 namespace DumpSave
@@ -143,11 +144,11 @@ namespace DumpSave
             }
         }
 
-        static bool VerifyRoundTrip(Stream fileStream, SavedGame save, AssetMapping mapping)
+        static bool VerifyRoundTrip(Stream fileStream, SavedGame save, AssetMapping mapping, ISpellManager spellManager)
         {
             using var ms = new MemoryStream((int)fileStream.Length);
             using var bw = new BinaryWriter(ms, Encoding.GetEncoding(850));
-            SavedGame.Serdes(save, mapping, new AlbionWriter(bw));
+            SavedGame.Serdes(save, mapping, new AlbionWriter(bw), spellManager);
 
             if (ms.Position != fileStream.Length)
             {
@@ -199,6 +200,7 @@ namespace DumpSave
             var containerLoaderRegistry = new ContainerRegistry();
             var postProcessorRegistry = new PostProcessorRegistry();
             var modApplier = new ModApplier();
+            var spellManager = new SpellManager();
 
             var exchange = new EventExchange(new LogExchange());
             exchange
@@ -209,12 +211,13 @@ namespace DumpSave
                 .Attach(postProcessorRegistry)
                 .Attach(modApplier)
                 .Attach(assets)
+                .Attach(spellManager)
                 ;
 
             modApplier.LoadMods(generalConfig, settings.ActiveMods);
-            var save = SavedGame.Serdes(null, AssetMapping.Global, new AlbionReader(br, stream.Length));
+            var save = SavedGame.Serdes(null, AssetMapping.Global, new AlbionReader(br, stream.Length), spellManager);
 
-            if (!VerifyRoundTrip(stream, save, AssetMapping.Global))
+            if (!VerifyRoundTrip(stream, save, AssetMapping.Global, spellManager))
                 return;
 
             foreach (var command in commands)

@@ -4,6 +4,7 @@ using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.TestCommon;
 using Xunit;
@@ -34,6 +35,16 @@ namespace UAlbion.Formats.Tests
                 .RegisterAssetType(typeof(Base.Ticker), AssetType.Ticker);
             var mapping = AssetMapping.Global;
             var jsonUtil = new FormatJsonUtil();
+            var spellManager = new MockSpellManager();
+            foreach (var school in Enum.GetValues<SpellClass>())
+            {
+                for (byte i = 0; i < 30; i++)
+                {
+                    var id = new SpellId(AssetType.Spell, (int)school * 30 + i);
+                    var spell = new SpellData(id, school, i);
+                    spellManager.Add(spell);
+                }
+            }
 
             // === Load ===
             using var stream = File.Open(file, FileMode.Open, FileAccess.Read);
@@ -41,7 +52,7 @@ namespace UAlbion.Formats.Tests
             using var annotationReadStream = new MemoryStream();
             using var annotationReader = new StreamWriter(annotationReadStream);
             using var ar = new AnnotationFacadeSerializer(new AlbionReader(br, stream.Length), annotationReader, FormatUtil.BytesFrom850String);
-            var save = SavedGame.Serdes(null, mapping, ar);
+            var save = SavedGame.Serdes(null, mapping, ar, spellManager);
 
             // === Save ===
             using var ms = new MemoryStream();
@@ -49,7 +60,7 @@ namespace UAlbion.Formats.Tests
             using var annotationWriteStream = new MemoryStream();
             using var annotationWriter = new StreamWriter(annotationWriteStream);
             using var aw = new AnnotationFacadeSerializer(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
-            SavedGame.Serdes(save, mapping, aw);
+            SavedGame.Serdes(save, mapping, aw, spellManager);
 
             File.WriteAllText(file + ".json", jsonUtil.Serialize(save));
 
@@ -78,7 +89,7 @@ namespace UAlbion.Formats.Tests
                 using var reloadAnnotationStream = new MemoryStream();
                 using var reloadAnnotationReader = new StreamWriter(reloadAnnotationStream);
                 using var reloadFacade = new AnnotationFacadeSerializer(new AlbionReader(reloadBr, stream.Length), reloadAnnotationReader, FormatUtil.BytesFrom850String);
-                SavedGame.Serdes(null, mapping, reloadFacade);
+                SavedGame.Serdes(null, mapping, reloadFacade, spellManager);
 
                 File.WriteAllBytes(file + ".bin", roundTripBytes);
                 File.WriteAllText(file + ".pre.txt", ReadToEnd(annotationReadStream));

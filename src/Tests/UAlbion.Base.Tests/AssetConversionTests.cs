@@ -127,7 +127,21 @@ namespace UAlbion.Base.Tests
         public void ItemTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Item.Knife) };
-            Test<ItemData>(info.AssetId, null, (x, s) => Loaders.ItemDataLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            var spell = new SpellData(Spell.ThornSnare, SpellClass.DjiKas, 0)
+            {
+                Cost = 1,
+                Environments = SpellEnvironments.Combat,
+                LevelRequirement = 2,
+                Targets = SpellTargets.OneMonster,
+            };
+
+            var spellManager = new MockSpellManager().Add(spell);
+            ItemDataLoader itemDataLoader = new();
+            new EventExchange()
+                .Attach(spellManager)
+                .Attach(itemDataLoader);
+
+            Test<ItemData>(info.AssetId, null, (x, s) => itemDataLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
         }
 
         [Fact]
@@ -250,21 +264,42 @@ namespace UAlbion.Base.Tests
             Test<Formats.Assets.MonsterGroup>(info.AssetId, null, (x, s) => Loaders.MonsterGroupLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
         }
 
+        static CharacterSheetLoader BuildCharacterLoader()
+        {
+            var spell = new SpellData(Spell.ThornSnare, SpellClass.DjiKas, 0)
+            {
+                Cost = 1,
+                Environments = SpellEnvironments.Combat,
+                LevelRequirement = 2,
+                Targets = SpellTargets.OneMonster,
+            };
+
+            var spellManager = new MockSpellManager().Add(spell);
+            CharacterSheetLoader characterSheetLoader = new();
+            new EventExchange()
+                .Attach(spellManager)
+                .Attach(characterSheetLoader);
+
+            return characterSheetLoader;
+        }
+
         [Fact]
         public void MonsterTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Monster.Krondir1) };
+            var loader = BuildCharacterLoader();
             Test<CharacterSheet>(
                 info.AssetId,
                 AssetId.EnumerateAll(AssetType.Item).ToArray(),
-                (x, s) => Loaders.CharacterSheetLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+                (x, s) => loader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
         }
 
         [Fact]
         public void NpcTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Npc.Christine) };
-            Test<CharacterSheet>(info.AssetId, null, (x, s) => Loaders.CharacterSheetLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            var loader = BuildCharacterLoader();
+            Test<CharacterSheet>(info.AssetId, null, (x, s) => loader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
         }
 
         [Fact]
@@ -278,10 +313,11 @@ namespace UAlbion.Base.Tests
         public void PartyMemberTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(PartyMember.Tom) };
+            var loader = BuildCharacterLoader();
             Test<CharacterSheet>(
                 info.AssetId,
                 AssetId.EnumerateAll(AssetType.Item).ToArray(),
-                (x, s) => Loaders.CharacterSheetLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+                (x, s) => loader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
         }
 
         [Fact]

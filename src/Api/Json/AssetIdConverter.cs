@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace UAlbion.Api.Json
 {
+#pragma warning disable CA1812 // Internal class that is apparently never instantiated; this class is instantiated generically
     class AssetIdConverter<T> : JsonConverter<T> where T : struct, IAssetId
     {
         static readonly IAssetId.ParserDelegate<T> Parser = IAssetId.GetParser<T>();
@@ -17,4 +18,5 @@ namespace UAlbion.Api.Json
         public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options) 
             => writer.WriteStringValue(value.ToString());
     }
+#pragma warning restore CA1812 // Internal class that is apparently never instantiated; this class is instantiated generically
 }

@@ -60,7 +60,7 @@ namespace UAlbion.Game.Assets
                 LoadMod(config.ResolvePath("$(MODS)"), mod);
 
             _modsInReverseDependencyOrder.Reverse();
-
+            Raise(ModsLoadedEvent.Instance);
         }
 
         public IEnumerable<string> ShaderPaths =>
@@ -266,7 +266,8 @@ namespace UAlbion.Game.Assets
             using var stream = disk.OpenRead(path);
             using var br = new BinaryReader(stream);
             using var s = new AlbionReader(br, stream.Length);
-            return SavedGame.Serdes(null, AssetMapping.Global, s);
+            var spellManager = Resolve<ISpellManager>();
+            return SavedGame.Serdes(null, AssetMapping.Global, s, spellManager);
         }
 
         public void SaveAssets(

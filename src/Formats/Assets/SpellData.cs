@@ -9,12 +9,19 @@ namespace UAlbion.Formats.Assets
     {
         public const int SizeOnDisk = 5;
 
-        public SpellData() { }
-        SpellData(SpellId id) => Id = id;
+        public SpellData() { } // For JSON
+        SpellData(SpellId id) => Id = id; // For Serdes
+        public SpellData(SpellId id, SpellClass school, byte number) // For tests
+        {
+            Id = id;
+            Class = school;
+            OffsetInClass = number;
+        }
+
         [JsonIgnore] public SpellId Id { get; } // Setters needed for JSON
-        public StringId Name { get; private set; }
-        public SpellClass Class { get; private set; }
-        public int OffsetInClass { get; private set; }
+        public StringId Name { get; set; }
+        public SpellClass Class { get; set; }
+        public byte OffsetInClass { get; set; }
         public SpellEnvironments Environments { get; set; }
         public byte Cost { get; set; }
         public byte LevelRequirement { get; set; }
@@ -34,7 +41,7 @@ namespace UAlbion.Formats.Assets
             d.Unused = s.UInt8(nameof(Unused), d.Unused);
             d.Name = info.Get(AssetProperty.Name, (TextId)AssetId.None);
             d.Class = info.Get(AssetProperty.MagicSchool, SpellClass.DjiKas);
-            d.OffsetInClass = info.Get(AssetProperty.SpellNumber, 0);
+            d.OffsetInClass = (byte)info.Get(AssetProperty.SpellNumber, 0);
             return d;
         }
     }

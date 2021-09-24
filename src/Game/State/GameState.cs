@@ -65,11 +65,11 @@ namespace UAlbion.Game.State
                 _game.Tickers.TryGetValue(e.TickerId, out var curValue);
                 _game.Tickers[e.TickerId] = (byte)e.Operation.Apply(curValue, e.Amount, 0, 255);
             });
-            On<ChangeTimeEvent>(e => { });
+            On<ChangeTimeEvent>(_ => { });
             On<ActivateItemEvent>(ActivateItem);
             On<DisableEventChainEvent>(e =>
             {
-                _game.DisabledChains.Add((e.ChainSource, (ushort) e.ChainNumber));
+                _game.DisabledChains.Add((e.ChainSource, e.ChainNumber));
             });
 
             AttachChild(new InventoryManager(GetWriteableInventory));
@@ -138,7 +138,7 @@ namespace UAlbion.Game.State
         {
             var generalConfig = Resolve<IGeneralConfig>();
             // TODO: This path currently exists in two places: here and Game\Gui\Menus\PickSaveSlot.cs
-            return generalConfig.ResolvePath($"$(SAVE)/SAVE.{id:D3}", null);
+            return generalConfig.ResolvePath($"$(SAVE)/SAVE.{id:D3}");
         }
 
         void LoadGame(ushort id)
@@ -156,6 +156,7 @@ namespace UAlbion.Game.State
                 return;
 
             var disk = Resolve<IFileSystem>();
+            var spellManager = Resolve<ISpellManager>();
             _game.Name = name;
 
             for (int i = 0; i < SavedGame.MaxPartySize; i++)
@@ -168,7 +169,7 @@ namespace UAlbion.Game.State
             using var bw = new BinaryWriter(stream);
             var mapping = new AssetMapping(); // TODO
             using var aw = new AlbionWriter(bw);
-            SavedGame.Serdes(_game, mapping, aw);
+            SavedGame.Serdes(_game, mapping, aw, spellManager);
         }
 
         void InitialiseGame()

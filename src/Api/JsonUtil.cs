@@ -11,10 +11,12 @@ namespace UAlbion.Api
         {
             ReadCommentHandling = JsonCommentHandling.Skip,
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
             WriteIndented = true,
             Converters =
             {
                 VersionConverter.Instance,
+                new JsonStringEnumConverter(),
                 new DictionaryEnumConverterFactory(),
                 new DictionaryAssetIdConverterFactory(),
                 new AssetIdConverterFactory()

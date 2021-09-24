@@ -6,6 +6,7 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Assets;
+using UAlbion.Game.Magic;
 using UAlbion.Game.Settings;
 using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid.Debugging;
@@ -70,7 +71,8 @@ namespace UAlbion
                 new WordLookup(),
                 new AssetLocator(),
                 modApplier,
-                new AssetManager());
+                new AssetManager(),
+                new SpellManager());
 
 #pragma warning disable CA2000 // Dispose objects before losing scope
             var exchange = new EventExchange(new LogExchange())

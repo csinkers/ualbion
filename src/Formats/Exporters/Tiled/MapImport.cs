@@ -260,14 +260,6 @@ namespace UAlbion.Formats.Exporters.Tiled
             return zones.Where(x => x != null);
         }
 
-        static List<EventNode> ParseScript(string script)
-        {
-            if (string.IsNullOrWhiteSpace(script))
-                return null;
-            var lines = FormatUtil.SplitLines(script);
-            return lines.Select(EventNode.Parse).ToList();
-        }
-
         static NpcInfo ParseNpc(MapObject obj, Map map)
         {
             var position = ((int)obj.X / map.TileWidth, (int)obj.Y / map.TileHeight);
@@ -282,7 +274,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             if (string.IsNullOrEmpty(visual) && string.IsNullOrEmpty(group)) // TODO: Differentiate between 2D/3D maps
                 throw new FormatException($"NPC \"{obj.Name}\" (id {obj.Id}) requires either a Visual or Group property to determine its appearance");
 
-            var events = ParseScript(Prop("Script"));
+            var events = EventNode.ParseScript(Prop("Script"));
             UnswizzleEvents(events);
 
             return new NpcInfo
@@ -333,7 +325,7 @@ namespace UAlbion.Formats.Exporters.Tiled
 
             var polygon = obj.Polygon.Points.Select(p => (((int)obj.X + p.x) / map.TileWidth, ((int)obj.Y + p.y) / map.TileHeight));
             var shape = PolygonToShape(polygon);
-            var events = ParseScript(Prop("Script"));
+            var events = EventNode.ParseScript(Prop("Script"));
             UnswizzleEvents(events);
             var trigger = RequiredProp("Trigger");
             var unk1 = Prop("Unk1");

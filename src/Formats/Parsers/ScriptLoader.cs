@@ -35,7 +35,7 @@ namespace UAlbion.Formats.Parsers
                     if (string.IsNullOrEmpty(line))
                         e = new CommentEvent(null);
                     else if (line.StartsWith(";", StringComparison.Ordinal))
-                        e = new CommentEvent(line.Substring(1));
+                        e = new CommentEvent(line[1..]);
                     else
                         e = Event.Parse(line);
 

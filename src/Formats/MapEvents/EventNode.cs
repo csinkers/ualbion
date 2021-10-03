@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -34,7 +35,7 @@ namespace UAlbion.Formats.MapEvents
         public virtual void Unswizzle(IList<EventNode> nodes)
         {
             if (nodes == null) throw new ArgumentNullException(nameof(nodes));
-            if (!(Next is DummyEventNode dummy)) 
+            if (Next is not DummyEventNode dummy) 
                 return;
 
             if (dummy.Id >= nodes.Count)
@@ -121,11 +122,11 @@ namespace UAlbion.Formats.MapEvents
 
             done:
             if (id < 0) throw new FormatException($"Error parsing node id of event node \"{s}\"");
-            var e = Api.Event.Parse(s.Substring(i));
+            var e = Api.Event.Parse(s[i..]);
 
             if (step == 5) // Branch node
             {
-                if (!(e is IBranchingEvent be))
+                if (e is not IBranchingEvent be)
                     throw new FormatException($"Error parsing branch node \"{s}\": event \"{e}\" is not an IBranchingEvent");
 
                 return new BranchNode((ushort)id, be)
@@ -136,9 +137,9 @@ namespace UAlbion.Formats.MapEvents
             }
 
             return new EventNode((ushort)id, e)
-            {
-                Next = next == -1 ? null : new DummyEventNode((ushort)next)
-            };
+                {
+                    Next = next == -1 ? null : new DummyEventNode((ushort)next)
+                };
 
             //  "{(DirectSequence ? " " : "#")}{id}=>{next?.ToString(CultureInfo.InvariantCulture) ?? "!"}: {Event}");
             // 00001
@@ -155,6 +156,14 @@ namespace UAlbion.Formats.MapEvents
             // #1?2:!: foo
             //  1?!:3: foo
             // #1?!:3: foo
+        }
+
+        public static List<EventNode> ParseScript(string script)
+        {
+            if (string.IsNullOrWhiteSpace(script))
+                return null;
+            var lines = FormatUtil.SplitLines(script);
+            return lines.Select(Parse).ToList();
         }
     }
 }

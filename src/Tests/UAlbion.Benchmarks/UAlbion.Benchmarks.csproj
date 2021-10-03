@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\UAlbion.Formats.Tests\UAlbion.Formats.Tests.csproj" />
     <ProjectReference Include="..\UAlbion.TestCommon\UAlbion.TestCommon.csproj" />
   </ItemGroup>
 

@@ -5,14 +5,11 @@ namespace UAlbion.Formats.Scripting
 {
     public class BreakNode : ICfgNode
     {
-        public BreakNode(ICfgNode body) => Body = body;
-        public ICfgNode Body { get; }
-        public void ToPseudocode(StringBuilder sb, string indent, bool numeric = false)
+        public override string ToString() => ((ICfgNode)this).ToPseudocode();
+        public void ToPseudocode(StringBuilder sb, bool isStatement, bool numeric)
         {
             if (sb == null) throw new ArgumentNullException(nameof(sb));
-            Body?.ToPseudocode(sb, indent, numeric);
-            sb.Append(indent);
-            sb.AppendLine("break;");
+            sb.Append("break; ");
         }
     }
 }

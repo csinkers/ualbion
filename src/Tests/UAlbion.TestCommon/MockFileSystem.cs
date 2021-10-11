@@ -15,6 +15,12 @@ namespace UAlbion.TestCommon
         readonly DirNode _root = new(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "" : "/");
         readonly Func<string, bool> _maskingFunc;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="maskingFunc">A function that takes a path, and returns true if
+        /// the on-disk version should be used as a fallback for reading, and false if
+        /// the on-disk version (if any) should be ignored.</param>
         public MockFileSystem(Func<string, bool> maskingFunc) => _maskingFunc = maskingFunc ?? throw new ArgumentNullException(nameof(maskingFunc));
         public MockFileSystem(bool fallBackToFileSystem) 
             => _maskingFunc = fallBackToFileSystem

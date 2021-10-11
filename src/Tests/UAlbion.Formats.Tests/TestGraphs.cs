@@ -95,9 +95,124 @@ namespace UAlbion.Formats.Tests
                 f  f
                 v  |
                 7<-/ */
-        public static readonly ControlFlowGraph Graph2 = new(0, BuildNodes(8), new[] { 
+        public static readonly ControlFlowGraph Graph2 = new(0, BuildNodes(8), new[] {
                 (0, 1, true), (1, 2, true), (2, 3, true), (3, 6, true), (6, 5, true), (5, 2, true),
                 (6, 7, false), (4, 6, true), (4, 7, false), (1, 4, false) });
+
+        /* 0
+           v
+           1----------\
+           t          f
+           v          v
+      /-/->2-f--\     8 <-\--\
+      | |  t    |     |   |  |
+      | |  v    |     v  10  |
+      | \t-3    |     9-t-/  |
+      |    f    |     f      |
+      |    v    |     v      |
+      |    4--\ | /t--11     |
+      |    f  t | |   f      |
+      |    v  | | 12  13     |
+      \----5  | | |   v      |
+              v | |   14 -t--/
+              6</ |   f
+              |   v   |
+              |   15<-/
+              v   |
+              7 <-/ */
+        public static readonly ControlFlowGraph LoopBranch = new(0, BuildNodes(16), new[] {
+            (0, 1, true), (1, 2, true), (1, 8, false), (2, 3, true), (2, 6, false), (3, 2, true),
+            (3, 4, false), (4, 5, false), (4, 6, true), (5, 2, true), (6, 7, true), (8, 9, true),
+            (9, 10, true), (10, 8, true), (9, 11, false), (11, 13, false), (11, 12, true),
+            (12, 15, true), (13, 14, true), (14, 8, true), (14, 15, false), (15, 7, true) });
+        public static string LoopBranchCode => @"0;
+if (1) {
+    while(2) {
+        if (3) {
+            continue;
+        }
+        if (4) {
+            break;
+        }
+        5;
+    }
+    6;
+}
+else {
+    do {
+        8;
+        if (9) {
+            10;
+            continue;
+        }
+        if (11) {
+            12;
+            break;
+        }
+        13;
+    } while(14);
+    9;
+}
+7";
+
+
+        /* 0
+           v
+           1 <------------\
+           v              t
+           2 -f-> 8 > 9 > 10
+           t              f
+           v              |
+           3              |
+           v              |
+       /-f-4-t-\          |
+       v       v          |
+       5-->7<--6          |
+           |              |
+           11 <-----------/*/
+        public static readonly ControlFlowGraph BreakBranch = new(0, BuildNodes(12), new[] {
+            (0, 1, true), (1, 2, true), (2, 3, true), (2, 8, false), (3, 4, true), (4, 5, false), (4, 6, true),
+            (5, 7, true), (6, 7, true), (7, 11, true), (8, 9, true), (9, 10, true), (10, 1, true), (10, 11, false) });
+        public static string BreakBranchCode => @"0;
+do {
+    1; 
+    if (2) {
+        3;
+        if (4) {
+            6;
+        } else {
+            5;
+        }
+        7;
+        break;
+    }
+    8;
+    9;
+} while (10);
+11;";
+
+        /* 0
+           v
+           1 <----\
+           v      t
+           2 -f-> 5
+           t      f
+           v      |
+           3      |
+           v      |
+           4 <---/*/
+        public static readonly ControlFlowGraph BreakBranch2 = new(0, BuildNodes(6), new[] {
+            (0, 1, true), (1, 2, true), (2, 3, true), (2, 5, false), (3, 4, true), (5, 1, true), (5, 4, false)
+        });
+        public static string BreakBranch2Code => @"0;
+do {
+    1; 
+    if (2) {
+        3;
+        break;
+    }
+} while (5);
+4;";
 
         /*########################\#/#########################\  if (A)
         #  No More Gotos figure 3  #                          #  {
@@ -224,6 +339,102 @@ namespace UAlbion.Formats.Tests
                 (17,  5, false), // (n9,!c3),
             });
 
+        public static readonly ControlFlowGraph NoMoreGotos3Region1 =
+            new(0, new[] {
+                D("A"),  // 0
+                D("c1"), // 1
+                D("c2"), // 2
+                D("c3"), // 3
+                D("n1"), // 4
+                D("n2"), // 5
+                D("n3"), // 6
+                D("n9"), // 7
+            }, new[] {
+                (0, 1, true),
+                (1, 2, false),
+                (1, 4, true),
+                (4, 1, true),
+                (2, 5, true),
+                (2, 6, false),
+                (3, 1, true),
+                (3, 7, false),
+                (5, 7, true),
+                (6, 3, true)
+            });
+
+        public static string NoMoreGotos3Region1Code => 
+@"A;
+do {
+    while (c1) {
+        n1;
+    }
+    if (c2) {
+        n2;
+        break;
+    }
+    n3;
+} while (c3);";
+
+        public static readonly ControlFlowGraph NoMoreGotos3Region2 =
+            new(0, new[]
+            {
+                D("A"),  // 0
+                D("b1"), // 1
+                D("b2"), // 2
+                D("n4"), // 3
+                D("n5"), // 4
+                D("n6"), // 5
+                D("n7"), // 6
+            }, new[] {
+                (0, 1, true),
+                (1, 2, true),
+                (1, 3, false),
+                (2, 4, false),
+                (2, 5, true),
+                (3, 4, true),
+                (4, 6, true),
+                (5, 6, true)
+            });
+
+        public static string NoMoreGotos3Region2Code => 
+@"A;
+if (!b1) {
+    n4;
+}
+if (b1 && b2) {
+    n6;
+}
+else {
+    n5;
+}
+n7;";
+
+        public static readonly ControlFlowGraph NoMoreGotos3Region3 =
+            new(0, new[]
+            {
+                D("start"), // 0
+                D("d1"), // 1
+                D("d2"), // 2
+                D("d3"), // 3
+                D("n8"), // 4
+                D("n9"), // 5
+            }, new[] {
+                (0, 1, true),
+                (1, 2, false),
+                (1, 3, true),
+                (2, 4, true),
+                (2, 5, false),
+                (3, 4, true),
+                (3, 5, false),
+                (4, 1, true),
+            });
+        public static string NoMoreGotos3Region3Code => 
+@"start;
+while ((d1 && d3) || (!d1 && d2)) {
+    n8;
+}
+n9;";
+
         /* ZeroK if example
               0
              / \
@@ -340,5 +551,25 @@ namespace UAlbion.Formats.Tests
 |         4<-----/
 |         v
 \-------->5 */
+        public static readonly ControlFlowGraph ZeroKSese = new(0, BuildNodes(15), new[] {
+            (0, 1, true),
+            (1, 2, false),
+            (1, 3, true),
+            (2, 6, true),
+            (3, 4, true),
+            (4, 5, true),
+            (6, 5, true),
+            (6, 7, false),
+            (7, 8, true),
+            (8, 9, false),
+            (8, 10, true),
+            (9, 4, true),
+            (10, 11, true),
+            (11, 9, true),
+            (11, 12, false),
+            (12, 13, true),
+            (13, 14, false),
+            (13, 9, true)
+        });
     }
 }

@@ -3,17 +3,20 @@ using System.Text;
 
 namespace UAlbion.Formats.Scripting
 {
-    public class DummyNode : ICfgNode // Used for unit tests
+    public class DummyNode : ICondition // Used for unit tests
     {
         public DummyNode(string text) => Text = text;
         public string Text { get; }
         public override string ToString() => "D:" + Text;
 
-        public void ToPseudocode(StringBuilder sb, string indent, bool numeric)
+        public void ToPseudocode(StringBuilder sb, bool isStatement, bool numeric)
         {
             if (sb == null) throw new ArgumentNullException(nameof(sb));
-            sb.Append(indent);
-            sb.AppendLine(Text);
+            sb.Append(Text);
+            if (isStatement)
+                sb.Append("; ");
         }
+
+        public int Precedence => int.MaxValue;
     }
 }

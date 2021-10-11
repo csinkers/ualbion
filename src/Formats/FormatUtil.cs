@@ -293,6 +293,78 @@ namespace UAlbion.Formats
             using var s = new AlbionReader(br);
             return serdes(s);
         }
+
+        public static string PrettyPrintScript(string s)
+        {
+            if (s == null)
+                return null;
+
+            var sb = new StringBuilder();
+            int indent = 0;
+            void Indent() { for (int i = 0; i < indent; i++) sb.Append("    "); }
+
+            bool newLine = true;
+            foreach (var c in s)
+            {
+                switch (c)
+                {
+                    case ' ':
+                        if (!newLine)
+                            sb.Append(' ');
+                        break;
+                    case ';':
+                        sb.AppendLine(/*";"*/);
+                        newLine = true;
+                        break;
+                    case '{':
+                        sb.Append(c);
+                        indent++;
+                        sb.AppendLine();
+                        newLine = true;
+                        break;
+                    case '}':
+                        if (!newLine)
+                            sb.AppendLine();
+                        indent--;
+                        Indent();
+                        sb.AppendLine("}");
+                        newLine = true;
+                        break;
+                    default:
+                        if (newLine)
+                            Indent();
+                        sb.Append(c);
+                        newLine = false;
+                        break;
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        public static string StripWhitespaceForScript(string s)
+        {
+            var sb = new StringBuilder();
+            bool lastWasSpace = false;
+            foreach (var c in s)
+            {
+                switch (c)
+                {
+                    case ' ': case '\t': case '\n': case '\r': lastWasSpace = true; break;
+                    default:
+                        if (lastWasSpace)
+                            sb.Append(' ');
+                        sb.Append(c);
+                        lastWasSpace = false;
+                        break;
+                }
+            }
+
+            if (lastWasSpace)
+                sb.Append(' ');
+
+            return sb.ToString().Trim();
+        }
     }
 }
 

@@ -42,7 +42,6 @@ namespace UAlbion.Formats.Tests
         {
             var graph = TestGraphs.Graph1;
             var order = graph.GetDfsOrder();
-            Assert.NotNull(order);
             Assert.Collection(order,
                 x => Assert.Equal(0, x),
                 x => Assert.Equal(1, x),

@@ -1,22 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using UAlbion.Formats.MapEvents;
 
+#pragma warning disable 8321 // Stop warnings about Vis() debug functions
 namespace UAlbion.Formats.Scripting
 {
     public static class Decompiler
     {
-        public static ICfgNode Decompile(List<IEventNode> nodes)
+        public delegate ControlFlowGraph RecordFunc(string description, ControlFlowGraph graph);
+        public static ICfgNode Decompile(List<IEventNode> nodes, List<(string, ControlFlowGraph)> steps = null)
         {
             if (nodes == null) throw new ArgumentNullException(nameof(nodes));
             if (nodes.Count == 0)
                 throw new ArgumentException("Must supply at least one event node", nameof(nodes));
 
-            var rawGraph = MakeBlocks(nodes);
-            var basicBlockGraph = DetectBasicBlocks(rawGraph);
-            return SimplifyGraph(basicBlockGraph).Head;
+            RecordFunc record;
+            if (steps != null)
+            {
+                var steps2 = steps;
+                record = (description, graph) =>
+                {
+                    if (steps2.Count == 0 || steps[^1].Item2 != graph)
+                        steps2.Add((description, graph));
+                    return graph;
+                };
+            }
+            else record = (_, x) => x;
+
+            var rawGraph = record("Make blocks", MakeBlocks(nodes));
+            var basicBlockGraph = record("Detect blocks", DetectBasicBlocks(rawGraph));
+            return SimplifyGraph(basicBlockGraph, record).Head;
         }
 
         public static ControlFlowGraph DetectBasicBlocks(ControlFlowGraph graph)
@@ -33,14 +49,14 @@ namespace UAlbion.Formats.Scripting
             nodes.Add(new EmptyNode());
             foreach (var e in events)
             {
-                nodes.Add(new Block(new[] { e.Event }));
+                nodes.Add(new Block(e.Event));
                 if (mapping.ContainsKey(e.Id))
                     throw new InvalidOperationException($"Multiple events have the same id ({e.Id})!");
                 mapping[e.Id] = i++;
             }
             nodes.Add(new EmptyNode());
 
-            var edges = new List<(int, int, bool)>();
+            var edges = new List<(int, int, bool)> { (0, 1, true) };
             foreach (var e in events)
             {
                 var start = mapping[e.Id];
@@ -57,22 +73,22 @@ namespace UAlbion.Formats.Scripting
             return new ControlFlowGraph(0, nodes, edges);
         }
 
-        public static ControlFlowGraph SimplifyGraph(ControlFlowGraph graph)
+        public static ControlFlowGraph SimplifyGraph(ControlFlowGraph graph, RecordFunc record)
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
+            Func<string> vis = () => graph.Visualize();
             ControlFlowGraph previous = null;
             while (graph != previous)
             {
                 previous = graph;
-                graph = ReduceSimpleWhile(graph);
-                graph = ReduceSequences(graph);
-                graph = ReduceIfThen(graph);
-                graph = ReduceIfThenElse(graph);
-                graph = ReduceLoopParts(graph);
-                graph = ReduceSimpleLoops(graph);
-                if (previous == graph)
-                    graph = ReduceSeseRegions(graph);
-                graph = graph.Defragment();
+                graph = record("Reduce simple while", ReduceSimpleWhile(graph)); if (graph != previous) continue;
+                graph = record("Reduce sequence", ReduceSequences(graph));       if (graph != previous) continue;
+                graph = record("Reduce if-then", ReduceIfThen(graph));           if (graph != previous) continue;
+                graph = record("Reduce if-then-else", ReduceIfThenElse(graph));  if (graph != previous) continue;
+                graph = record("Reduce loop parts", ReduceLoopParts(graph));     if (graph != previous) continue;
+                graph = record("Reduce simple loop", ReduceSimpleLoops(graph));  if (graph != previous) continue;
+                graph = record("Reduce SESE region", ReduceSeseRegions(graph));  if (graph != previous) continue;
+                graph = record("Defragment", graph.Defragment());
             }
             return graph;
         }
@@ -103,7 +119,7 @@ namespace UAlbion.Formats.Scripting
                 if (!cond)
                     sb.Append('!');
 
-                region.Contents.Nodes[path[i]].ToPseudocode(sb, "");
+                region.Contents.Nodes[path[i]].ToPseudocode(sb, false, false);
             }
             return sb.ToString();
         }
@@ -119,8 +135,14 @@ namespace UAlbion.Formats.Scripting
 
             foreach (var index in simpleLoopIndices)
             {
+                #if DEBUG
+                Func<string> vis = () => graph.ToVis().AddPointer("index", index).ToString();
+                #endif
+                if (graph.Nodes[index] is not ICondition condition)
+                    throw new ControlFlowGraphException($"While-loop header {index} was not a condition", graph);
+
                 var updated = graph
-                    .ReplaceNode(index, new WhileLoop(graph.Nodes[index], null))
+                    .ReplaceNode(index, new WhileLoop(condition, null))
                     .RemoveEdge(index, index);
 
                 return updated;
@@ -139,6 +161,10 @@ namespace UAlbion.Formats.Scripting
                     continue;
 
                 int child = children[0];
+                #if DEBUG
+                Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("child", child).ToString();
+                #endif
+
                 var childsParents = graph.Parents(child);
                 var grandChildren = graph.Children(child);
 
@@ -178,6 +204,9 @@ namespace UAlbion.Formats.Scripting
 
                 int after = -1;
                 var then = -1;
+                #if DEBUG
+                Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("after", after).AddPointer("then", then).ToString();
+                #endif
 
                 var parents0 = graph.Parents(children[0]);
                 var parents1 = graph.Parents(children[1]);
@@ -203,7 +232,10 @@ namespace UAlbion.Formats.Scripting
                 if (after == -1 || then == -1 || after == head) 
                     continue;
 
-                var newNode = new IfThen(graph.Nodes[head], graph.Nodes[then]);
+                if (graph.Nodes[head] is not ICondition condition)
+                    throw new ControlFlowGraphException($"If-then header {head} was not a condition", graph);
+
+                var newNode = new IfThen(condition, graph.Nodes[then]);
                 return graph.RemoveNode(then).ReplaceNode(head, newNode);
             }
 
@@ -222,6 +254,12 @@ namespace UAlbion.Formats.Scripting
 
                 var left = children[0];
                 var right = children[1];
+                int after = -1;
+
+                #if DEBUG
+                Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("after", after).AddPointer("left", left).AddPointer("right", right).ToString();
+                #endif
+
                 var leftParents = graph.Parents(left);
                 var rightParents = graph.Parents(right);
                 var leftChildren = graph.Children(left);
@@ -242,13 +280,16 @@ namespace UAlbion.Formats.Scripting
                 bool leftLabel = graph.GetEdgeLabel(head, left);
                 var thenIndex = leftLabel ? left : right;
                 var elseIndex = leftLabel ? right : left;
-                var after = isRegularIfThenElse ? leftChildren[0] : -1;
+                after = isRegularIfThenElse ? leftChildren[0] : -1;
 
                 if (after == head)
                     continue;
 
+                if (graph.Nodes[head] is not ICondition condition)
+                    throw new ControlFlowGraphException($"If-then-else header {head} was not a condition", graph);
+
                 var newNode = new IfThenElse(
-                    graph.Nodes[head],
+                    condition,
                     graph.Nodes[thenIndex],
                     graph.Nodes[elseIndex]);
 
@@ -278,6 +319,9 @@ namespace UAlbion.Formats.Scripting
 
                     foreach (var part in loop.Body)
                     {
+#if DEBUG
+                        Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("part", part.Index).ToString();
+#endif
                         if (part.Index != index)
                             continue;
 
@@ -296,34 +340,92 @@ namespace UAlbion.Formats.Scripting
 
         static ControlFlowGraph ReduceContinue(LoopPart part, ControlFlowGraph graph, int index, CfgLoop loop)
         {
+#if DEBUG
+            Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("part", part.Index).ToString();
+#endif
             if (part.OutsideEntry || part.Tail || part.Header || !part.Continue || part.Break) 
                 return graph;
 
             var children = graph.Children(index);
-            if (children.Length != 2)
-                return graph;
+            var continueNode = new ContinueNode();
+            if (children.Length == 1)
+            {
+                var seq = new Sequence(graph.Nodes[index], continueNode);
+                return graph
+                    .ReplaceNode(index, seq)
+                    .RemoveEdge(index, loop.Header.Index);
+            }
 
-            var newNode = new ContinueNode(graph.Nodes[index]);
-            return graph
-                .ReplaceNode(index, newNode)
-                .RemoveEdge(index, loop.Header.Index);
+            if (children.Length == 2)
+                return ReplaceLoopBranch(graph, index, loop.Header.Index, continueNode);
+
+            throw new ControlFlowGraphException($"Continue at {index} has unexpected child count ({children.Length})", graph);
         }
 
         static ControlFlowGraph ReduceBreak(LoopPart part, ControlFlowGraph graph, int index, CfgLoop loop)
         {
+#if DEBUG
+            Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("part", part.Index).ToString();
+#endif
             if (part.OutsideEntry || part.Tail || part.Header || part.Continue || !part.Break) 
                 return graph;
 
             var children = graph.Children(index);
-            if (children.Length != 2)
-                return graph;
 
-            bool isFirst = loop.Body.Any(x => x.Index == children[0]);
-            var newNode = new BreakNode(graph.Nodes[index]);
+            var breakNode = new BreakNode();
+            if (children.Length == 1)
+            {
+                var seq = new Sequence(graph.Nodes[index], breakNode);
+                return graph
+                    .ReplaceNode(index, seq)
+                    .RemoveEdge(index, loop.Header.Index);
+            }
 
+            if (children.Length == 2)
+            {
+                bool isfirstChildInLoop = loop.Body.Any(x => x.Index == children[0]);
+                var target = isfirstChildInLoop ? children[1] : children[0];
+
+                if (target != loop.MainExit)
+                {
+                    var targetChildren = graph.Children(target);
+                    if (targetChildren.Length != 1 || targetChildren[0] != loop.MainExit)
+                        return graph;
+
+                    bool label = graph.GetEdgeLabel(index, target);
+
+                    if (graph.Nodes[index] is not ICondition condition)
+                        throw new ControlFlowGraphException($"Branching continue {index} was not a condition", graph);
+
+                    if (!label)
+                        condition = new Negation(condition);
+
+                    var newBlock = new Sequence(graph.Nodes[target], new BreakNode());
+                    var ifNode = new IfThen(condition, newBlock);
+                    return graph
+                        .RemoveNode(target)
+                        .ReplaceNode(index, ifNode);
+                }
+
+                return ReplaceLoopBranch(graph, index, target, breakNode);
+            }
+
+            throw new ControlFlowGraphException($"Break at {index} has unexpected child count ({children.Length})", graph);
+        }
+
+        static ControlFlowGraph ReplaceLoopBranch(ControlFlowGraph graph, int index, int target, ICfgNode newNode)
+        {
+            bool label = graph.GetEdgeLabel(index, target);
+            if (graph.Nodes[index] is not ICondition condition)
+                throw new ControlFlowGraphException($"Branching continue {index} was not a condition", graph);
+
+            if (!label)
+                condition = new Negation(condition);
+
+            var ifNode = new IfThen(condition, newNode);
             return graph
-                .ReplaceNode(index, newNode)
-                .RemoveEdge(index, isFirst ? children[1] : children[0]);
+                .ReplaceNode(index, ifNode)
+                .RemoveEdge(index, target);
         }
 
         public static ControlFlowGraph ReduceSimpleLoops(ControlFlowGraph graph)
@@ -334,6 +436,10 @@ namespace UAlbion.Formats.Scripting
             {
                 foreach (CfgLoop loop in loops)
                 {
+                #if DEBUG
+                Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("loop", loop.Header.Index).ToString();
+                #endif
+
                     if (loop.Header.Index != head
                      || loop.IsMultiExit
                      || loop.Body.Count != 1
@@ -363,19 +469,22 @@ namespace UAlbion.Formats.Scripting
 
         static ControlFlowGraph ReduceWhileLoop(ControlFlowGraph graph, int head, int tail)
         {
+#if DEBUG
+            Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("tail", tail).ToString();
+#endif
             var updated = graph;
             var children = graph.Children(tail);
             if (children.Length != 1)
             {
-                var breakNode = new BreakNode(graph.Nodes[tail]);
-                foreach (int child in children)
-                    if (child != head)
-                        updated = updated.RemoveEdge(tail, child);
-
-                return updated.ReplaceNode(tail, breakNode);
+                bool isfirstChildInLoop = head == children[0];
+                var target = isfirstChildInLoop ? children[1] : children[0];
+                return ReplaceLoopBranch(graph, tail, target, new BreakNode());
             }
 
-            var newNode = new WhileLoop(graph.Nodes[head], graph.Nodes[tail]);
+            if (graph.Nodes[head] is not ICondition condition)
+                throw new ControlFlowGraphException($"While-loop header {head} was not a condition", graph);
+
+            var newNode = new WhileLoop(condition, graph.Nodes[tail]);
             return updated
                 .RemoveNode(tail)
                 .ReplaceNode(head, newNode);
@@ -383,6 +492,9 @@ namespace UAlbion.Formats.Scripting
 
         static ControlFlowGraph ReduceDoLoop(ControlFlowGraph graph, int head, int tail)
         {
+#if DEBUG
+            Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("tail", tail).ToString();
+#endif
             var updated = graph;
             var children = graph.Children(tail);
             if (children.Length != 2)
@@ -392,7 +504,10 @@ namespace UAlbion.Formats.Scripting
                 if (child != head)
                     updated = updated.AddEdge(head, child, true);
 
-            var newNode = new DoLoop(graph.Nodes[head], graph.Nodes[tail]);
+            if (graph.Nodes[tail] is not ICondition condition)
+                throw new ControlFlowGraphException($"Do-loop tail {tail} was not a condition", graph);
+
+            var newNode = new DoLoop(condition, graph.Nodes[head]);
             return updated
                 .RemoveNode(tail)
                 .ReplaceNode(head, newNode);
@@ -404,21 +519,58 @@ namespace UAlbion.Formats.Scripting
             var regions = graph.GetAllSeseRegions();
             foreach (var region in regions)
             {
+                #if DEBUG
+                Func<string> vis = () =>
+                {
+                     var d = graph.ToVis(); 
+                     foreach(var n in d.Nodes)
+                        if (region.Contains(int.Parse(n.Id, CultureInfo.InvariantCulture)))
+                            n.Color = "#4040b0";
+                     return d.ToString();
+                };
+                #endif
                 bool containsOther = regions.Any(x => x != region && !x.Except(region).Any());
                 if (containsOther)
                     continue;
 
-                var gr = graph.GetCutOut(region);
-                if (gr.IsCyclic()) continue;
+                var cut = graph.Cut(region);
 
-                var newNode = new SeseRegion(gr);
-                var updated = graph.ReplaceNode(region[0], newNode);
+                if (cut.Cut.IsCyclic())
+                    continue;
 
-                int last = region[^1];
-                if (graph.Children(last).Length > 0)
-                    updated = updated.AddEdge(region[0], graph.Children(last)[0], true);
+                var cutEntries = cut.RemainderToCutEdges.Select(x => x.end).Distinct().ToList();
+                var cutExits = cut.CutToRemainderEdges.Select(x => x.start).Distinct().ToList();
 
-                region.RemoveAt(0);
+                if (cutEntries.Count > 1)
+                {
+                    var regionNodes = string.Join(", ", region.OrderBy(x => x).Select(x => x.ToString(CultureInfo.InvariantCulture)));
+                    var entryNodes = string.Join(", ", cutEntries.OrderBy(x => x).Select(x => x.ToString(CultureInfo.InvariantCulture)));
+                    throw new ControlFlowGraphException($"SESE cut ({regionNodes}) had multiple entry nodes: {entryNodes}", graph);
+                }
+
+                if (cutExits.Count > 1)
+                {
+                    var regionNodes = string.Join(", ", region.OrderBy(x => x).Select(x => x.ToString(CultureInfo.InvariantCulture)));
+                    var exitNodes = string.Join(", ", cutExits.OrderBy(x => x).Select(x => x.ToString(CultureInfo.InvariantCulture)));
+                    throw new ControlFlowGraphException($"SESE cut ({regionNodes}) had multiple exit nodes: {exitNodes}", graph);
+                }
+
+                if (cutEntries[0] != cut.Cut.HeadIndex)
+                {
+                    var regionNodes = string.Join(", ", region.OrderBy(x => x).Select(x => x.ToString(CultureInfo.InvariantCulture)));
+                    throw new ControlFlowGraphException( $"SESE cut ({regionNodes}) had unique entry node {cut.Cut.HeadIndex} " +
+                                                         $"but all incoming edges point at {cutEntries[0]}", graph);
+                }
+
+                var newNode = new SeseRegion(cut.Cut);
+                var updated = cut.Remainder.AddNode(newNode, out var newNodeIndex);
+
+                foreach (var (start, _, label) in cut.RemainderToCutEdges)
+                    updated = updated.AddEdge(start, newNodeIndex, label);
+
+                foreach (var (_, end, label) in cut.CutToRemainderEdges)
+                    updated = updated.AddEdge(newNodeIndex, end, label);
+
                 return updated.RemoveNodes(region);
             }
 
@@ -426,3 +578,4 @@ namespace UAlbion.Formats.Scripting
         }
     }
 }
+#pragma warning restore 8321

@@ -4,18 +4,20 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.Scripting
 {
-    public class Block : ICfgNode
+    public class Block : ICondition
     {
-        public Block(IEvent[] events) => Events = events ?? throw new ArgumentNullException(nameof(events));
-        IEvent[] Events { get; }
-        public void ToPseudocode(StringBuilder sb, string indent, bool numeric)
+        public Block(IEvent e) => Event = e ?? throw new ArgumentNullException(nameof(e));
+        IEvent Event { get; }
+
+        public override string ToString() => ((ICfgNode)this).ToPseudocode();
+        public void ToPseudocode(StringBuilder sb, bool isStatement, bool numeric)
         {
             if (sb == null) throw new ArgumentNullException(nameof(sb));
-            foreach (var e in Events)
-            {
-                sb.Append(indent);
-                sb.AppendLine(numeric ? e.ToStringNumeric() : e.ToString());
-            }
+            sb.Append(numeric ? Event.ToStringNumeric() : Event.ToString());
+            if (isStatement)
+                sb.Append("; ");
         }
+
+        public int Precedence => 1;
     }
 }

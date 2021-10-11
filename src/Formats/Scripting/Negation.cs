@@ -8,12 +8,13 @@ namespace UAlbion.Formats.Scripting
         public int Precedence => 1;
         public Negation(ICondition condition) => Condition = condition ?? throw new ArgumentNullException(nameof(condition));
         public ICondition Condition { get; }
-        public void ToPseudocode(StringBuilder sb, string indent, bool numeric = false)
+        public override string ToString() => ((ICfgNode)this).ToPseudocode();
+        public void ToPseudocode(StringBuilder sb, bool isStatement, bool numeric)
         {
             if (sb == null) throw new ArgumentNullException(nameof(sb));
             sb.Append('!');
             if (Condition.Precedence < Precedence) sb.Append('(');
-            Condition.ToPseudocode(sb, indent, numeric);
+            Condition.ToPseudocode(sb, false, numeric);
             if (Condition.Precedence < Precedence) sb.Append(')');
         }
     }

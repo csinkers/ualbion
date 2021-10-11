@@ -19,10 +19,12 @@ namespace UAlbion.Formats.Scripting
 
         public Sequence(params ICfgNode[] nodes) => Nodes = (nodes ?? throw new ArgumentNullException(nameof(nodes))).ToImmutableArray();
         public ImmutableArray<ICfgNode> Nodes { get; }
-        public void ToPseudocode(StringBuilder sb, string indent, bool numeric = false)
+        public override string ToString() => ((ICfgNode)this).ToPseudocode();
+        public void ToPseudocode(StringBuilder sb, bool isStatement, bool numeric)
         {
+            if (sb == null) throw new ArgumentNullException(nameof(sb));
             foreach (var node in Nodes)
-                node.ToPseudocode(sb, indent, numeric);
+                node.ToPseudocode(sb, true, numeric);
         }
     }
 }

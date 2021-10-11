@@ -16,7 +16,8 @@ namespace UAlbion.Formats.Scripting
         public ControlFlowGraph Contents { get; }
         public ImmutableArray<int> DecisionNodes { get; }
         public ImmutableArray<int> CodeNodes { get; }
-        public void ToPseudocode(StringBuilder sb, string indent, bool numeric = false)
-            => Contents.Head.ToPseudocode(sb, indent, numeric);
+        public override string ToString() => ((ICfgNode)this).ToPseudocode();
+        public void ToPseudocode(StringBuilder sb, bool isStatement, bool numeric)
+            => Contents.Head.ToPseudocode(sb, isStatement, numeric);
     }
 }

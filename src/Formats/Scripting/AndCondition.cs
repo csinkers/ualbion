@@ -14,15 +14,16 @@ namespace UAlbion.Formats.Scripting
 
         public ICondition Left { get; }
         public ICondition Right { get; }
-        public void ToPseudocode(StringBuilder sb, string indent, bool numeric = false)
+        public override string ToString() => ((ICfgNode)this).ToPseudocode();
+        public void ToPseudocode(StringBuilder sb, bool isStatement, bool numeric)
         {
             if (sb == null) throw new ArgumentNullException(nameof(sb));
             if (Left.Precedence < Precedence) sb.Append('(');
-            Left.ToPseudocode(sb, indent, numeric);
+            Left.ToPseudocode(sb, false, numeric);
             if (Left.Precedence < Precedence) sb.Append(')');
             sb.Append(" && ");
             if (Right.Precedence < Precedence) sb.Append('(');
-            Right.ToPseudocode(sb, indent, numeric);
+            Right.ToPseudocode(sb, false, numeric);
             if (Right.Precedence < Precedence) sb.Append(')');
         }
     }

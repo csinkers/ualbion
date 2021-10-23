@@ -148,7 +148,7 @@ namespace UAlbion.Formats.Assets.Save
             ApiUtil.Assert(visitedEventsSize == visitedEventsCount * VisitedEvent.SizeOnDisk + 2);
             save.VisitedEvents = s.List(nameof(VisitedEvents), save.VisitedEvents, mapping, visitedEventsCount, VisitedEvent.Serdes);
 
-            var partyIds = save.Sheets.Keys.Where(x => x.Type == AssetType.PartyMember).Select(x => x.Id).ToList();
+            var partyIds = save.Sheets.Keys.Where(x => x.Type == AssetType.Party).Select(x => x.Id).ToList();
             partyIds.Add(199); // Force extra XLD length fields to be written for empty objects to preserve compat with original game.
             partyIds.Add(299);
 
@@ -200,7 +200,7 @@ namespace UAlbion.Formats.Assets.Save
             if (i > 0xff)
                 return;
 
-            var id = CharacterId.FromDisk(AssetType.PartyMember, i, context.mapping);
+            var id = CharacterId.FromDisk(AssetType.Party, i, context.mapping);
             CharacterSheet existing = null;
             if (size > 0 || context.save.Sheets.TryGetValue(id, out existing))
                 context.save.Sheets[id] = CharacterSheet.Serdes(id, existing, context.mapping, serializer, context.spellManager);

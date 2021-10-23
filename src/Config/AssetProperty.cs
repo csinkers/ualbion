@@ -30,6 +30,7 @@
         public const string LargeNpcs      = "LargeNpcs"; // string
         public const string SmallNpcs      = "SmallNpcs"; // string
         public const string TilesetPattern = "TilesetPattern"; // string
+        public const string ScriptPattern  = "ScriptPattern"; // string
 
         // NPC tileset
         public const string IsSmall = "IsSmall"; // bool

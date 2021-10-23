@@ -3,7 +3,6 @@
 #pragma warning disable CA1707 // Identifiers should not contain underscores
 namespace UAlbion.Base
 {
-    //[JsonConverter(typeof(StringEnumConverter))]
     public enum SystemText : ushort
     {
         PartyPortrait_XLifeMana = 0,

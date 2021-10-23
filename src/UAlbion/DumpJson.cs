@@ -96,10 +96,10 @@ namespace UAlbion
                 Flush();
             }
 
-            if (types.Contains(AssetType.PartyMember))
+            if (types.Contains(AssetType.Party))
             {
                 tw = Writer("party_members.json");
-                s.Serialize(tw, DumpUtil.AllAssets(AssetType.PartyMember, dumpIds, x => assets.LoadSheet(x)));
+                s.Serialize(tw, DumpUtil.AllAssets(AssetType.Party, dumpIds, x => assets.LoadSheet(x)));
                 Flush();
 
             }

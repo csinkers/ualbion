@@ -26,7 +26,7 @@ namespace UAlbion.Formats.MapEvents
             zeroed += s.UInt8(null, 0);
             e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
             e.Amount = s.UInt16(nameof(Amount), e.Amount);
-            s.Assert(zeroed == 0, "ChangeEvent: Expected bytes 4, 5 to be 0");
+            s.Assert(zeroed == 0, "ChangeUnk0Event: Expected bytes 4, 5 to be 0");
             return e;
         }
 

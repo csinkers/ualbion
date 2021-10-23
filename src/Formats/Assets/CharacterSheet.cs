@@ -25,7 +25,7 @@ namespace UAlbion.Formats.Assets
         public CharacterSheet(CharacterId id)
         {
             Id = id;
-            if (id.Type == AssetType.PartyMember || id.Type == AssetType.Monster)
+            if (id.Type == AssetType.Party || id.Type == AssetType.Monster)
                 Inventory = new Inventory(new InventoryId(id));
         }
 

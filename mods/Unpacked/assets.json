@@ -299,6 +299,7 @@
       "Loader": "tiledMap",
       "Container": "dir",
       "Pattern": "{0}_{2}.tmx",
+      "ScriptPattern": "{0}_{2}.script",
 
       "TilesetPattern": "../Tilesets/{0}_{2}.tsx",
       "SmallNpcs": "../Tilesets/SmallNPCs.tsx",

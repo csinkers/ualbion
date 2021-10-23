@@ -19,7 +19,7 @@ namespace UAlbion.Formats.Assets
         readonly uint _value;
         public CharacterId(AssetType type, int id = 0)
         {
-            if (!(type == AssetType.None || type >= AssetType.Monster && type <= AssetType.PartyMember))
+            if (!(type == AssetType.None || type >= AssetType.Monster && type <= AssetType.Party))
                 throw new ArgumentOutOfRangeException($"Tried to construct a CharacterId with a type of {type}");
 #if DEBUG
             if (id < 0 || id > 0xffffff)
@@ -31,7 +31,7 @@ namespace UAlbion.Formats.Assets
         CharacterId(uint id) 
         {
             _value = id;
-            if (!(Type == AssetType.None || Type >= AssetType.Monster && Type <= AssetType.PartyMember))
+            if (!(Type == AssetType.None || Type >= AssetType.Monster && Type <= AssetType.Party))
                 throw new ArgumentOutOfRangeException($"Tried to construct a CharacterId with a type of {Type}");
         }
 
@@ -48,7 +48,7 @@ namespace UAlbion.Formats.Assets
         {
             if (mapping == null) throw new ArgumentNullException(nameof(mapping));
             
-            if (!(type == AssetType.None || type >= AssetType.Monster && type <= AssetType.PartyMember))
+            if (!(type == AssetType.None || type >= AssetType.Monster && type <= AssetType.Party))
                 throw new ArgumentOutOfRangeException($"Tried to construct a CharacterId with a type of {type}");
 
             var (enumType, enumValue) = mapping.IdToEnum(new CharacterId(type, disk));
@@ -95,7 +95,7 @@ namespace UAlbion.Formats.Assets
 
         public override string ToString() => AssetMapping.Global.IdToName(this);
         public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
-        public static AssetType[] ValidTypes = { AssetType.Monster, AssetType.Npc, AssetType.PartyMember };
+        public static AssetType[] ValidTypes = { AssetType.Monster, AssetType.Npc, AssetType.Party };
         public static CharacterId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 
         public static implicit operator AssetId(CharacterId id) => AssetId.FromUInt32(id._value);

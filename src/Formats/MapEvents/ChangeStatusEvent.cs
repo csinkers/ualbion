@@ -29,7 +29,7 @@ namespace UAlbion.Formats.MapEvents
             e.PartyMemberId = PartyMemberId.SerdesU8(nameof(PartyMemberId), e.PartyMemberId, mapping, s);
             e.Status = s.EnumU16(nameof(Status), e.Status);
             e.Amount = s.UInt16(nameof(Amount), e.Amount);
-            s.Assert(zeroed == 0, "ChangeEvent: Expected byte 4 to be 0");
+            s.Assert(zeroed == 0, "ChangeStatusEvent: Expected byte 4 to be 0");
             return e;
         }
         public override ChangeProperty ChangeProperty => ChangeProperty.Status;

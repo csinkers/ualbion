@@ -20,7 +20,7 @@ namespace UAlbion.Config
         CoreGraphics,
         Floor,
         Font,
-        [IsomorphicTo(PartyMember)] FullBodyPicture,
+        [IsomorphicTo(Party)] FullBodyPicture,
         ItemGraphics,
         LargeNpcGraphics,
         LargePartyGraphics,
@@ -54,7 +54,7 @@ namespace UAlbion.Config
 
         Monster,
         Npc,
-        PartyMember,
+        Party,
 
         [Unmapped] MetaFont,
         MonsterGroup,

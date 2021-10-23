@@ -2,7 +2,6 @@
 // ReSharper disable UnusedMember.Global
 namespace UAlbion.Base
 {
-    //[JsonConverter(typeof(StringEnumConverter))]
     public enum Picture : byte
     {
         SmallWizard = 1,

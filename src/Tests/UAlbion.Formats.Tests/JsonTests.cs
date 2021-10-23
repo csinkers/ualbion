@@ -16,7 +16,7 @@ namespace UAlbion.Formats.Tests
             AssetMapping.GlobalIsThreadLocal = true;
             AssetMapping.Global.Clear()
                 .RegisterAssetType(typeof(Base.Npc), AssetType.Npc)
-                .RegisterAssetType(typeof(Base.PartyMember), AssetType.PartyMember)
+                .RegisterAssetType(typeof(Base.PartyMember), AssetType.Party)
                 ;
 
             var sheets = new Dictionary<CharacterId, CharacterSheet>
@@ -46,7 +46,7 @@ namespace UAlbion.Formats.Tests
         {
             AssetMapping.GlobalIsThreadLocal = true;
             AssetMapping.Global.Clear()
-                .RegisterAssetType(typeof(Base.PartyMember), AssetType.PartyMember)
+                .RegisterAssetType(typeof(Base.PartyMember), AssetType.Party)
                 .RegisterAssetType(typeof(Base.Item), AssetType.Item)
                 ;
             var id = new InventorySlotId((CharacterId) Base.PartyMember.Tom, ItemSlotId.Head);

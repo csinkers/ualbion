@@ -23,18 +23,36 @@ namespace UAlbion.Game.Assets
 
             if (s.IsWriting())
             {
-                byte[] bytes = existing switch
-                {
-                    MapData2D map2d => Write2D(map2d, info),
-                    MapData3D map3d => Write3D(map3d, info),
-                    _ => null
-                };
-
-                if (bytes != null) s.Bytes(null, bytes, bytes.Length);
+                Write(existing, info, s);
                 return existing;
             }
 
             return Read(info, s, mapping);
+        }
+
+        void Write(BaseMapData existing, AssetInfo info, ISerializer s)
+        {
+            (byte[] bytes, string script) = existing switch
+            {
+                MapData2D map2d => Write2D(map2d, info),
+                MapData3D map3d => Write3D(map3d, info),
+                _ => (null, null)
+            };
+
+            if (bytes != null)
+                s.Bytes(null, bytes, bytes.Length);
+
+            var disk = Resolve<IFileSystem>();
+            var scriptPattern = info.Get(AssetProperty.ScriptPattern, "");
+            if (script == null || string.IsNullOrEmpty(scriptPattern))
+                return;
+
+            // TODO: Find a less hacky way of doing this
+            var scriptPath = info.BuildFilename(scriptPattern, 0);
+            var assetDir = GetAssetDir(info);
+            if (!disk.DirectoryExists(assetDir))
+                disk.CreateDirectory(assetDir);
+            disk.WriteAllText(Path.Combine(assetDir, scriptPath), script);
         }
 
         static BaseMapData Read(AssetInfo info, ISerializer s, AssetMapping mapping)
@@ -45,14 +63,14 @@ namespace UAlbion.Game.Assets
             return map.ToAlbion(info, mapping);
         }
 
-        byte[] Write2D(MapData2D map, AssetInfo info)
+        (byte[], string) Write2D(MapData2D map, AssetInfo info)
         {
             var assets = Resolve<IAssetManager>();
             var disk = Resolve<IFileSystem>();
 
             TilesetData tileset = assets.LoadTileData(map.TilesetId);
             if (tileset == null)
-                return null;
+                return (null, null);
 
             var tilesetPattern = info.Get(AssetProperty.TilesetPattern, "../Tilesets/{0}_{2}.tsx");
             var tilesetPath = string.Format(CultureInfo.InvariantCulture,
@@ -65,20 +83,17 @@ namespace UAlbion.Game.Assets
                 ? info.Get(AssetProperty.SmallNpcs, "../Tilesets/SmallNPCs.tsx")
                 : info.Get(AssetProperty.LargeNpcs, "../Tilesets/LargeNPCs.tsx");
 
-            // Resolve to absolute path
-            var config = Resolve<IGeneralConfig>();
-            var destPath = config.ResolvePath(info.File.Filename);
-            npcTilesetPath = Path.Combine(destPath, npcTilesetPath);
-
-            var npcTileset = Tileset.Load(npcTilesetPath, disk);
+            var assetDir = GetAssetDir(info);
+            var npcTileset = Tileset.Load(Path.Combine(assetDir, npcTilesetPath), disk);
             var properties = new Tilemap2DProperties { TileWidth = 16, TileHeight = 16 };
             var formatter = new EventFormatter(assets.LoadString, map.Id.ToMapText());
-            var tiledMap = MapExport.FromAlbionMap2D(map, tileset, properties, tilesetPath, npcTileset, formatter);
+            var (tiledMap, script) = MapExport.FromAlbionMap2D(map, tileset, properties, tilesetPath, npcTileset, formatter);
 
-            return FormatUtil.BytesFromTextWriter(tiledMap.Serialize);
+            var mapBytes = FormatUtil.BytesFromTextWriter(tiledMap.Serialize);
+            return (mapBytes, script);
         }
 
-        byte[] Write3D(MapData3D map, AssetInfo info)
+        (byte[], string) Write3D(MapData3D map, AssetInfo info)
         {
             var sourceAssets = Resolve<IAssetManager>();
             var destModApplier = Resolve<IModApplier>();
@@ -89,13 +104,13 @@ namespace UAlbion.Game.Assets
             var contentsPattern = info.Get(AssetProperty.TiledContentsPattern, "");
 
             if (string.IsNullOrEmpty(floorPattern) || string.IsNullOrEmpty(ceilingPattern) || string.IsNullOrEmpty(wallPattern) || string.IsNullOrEmpty(contentsPattern))
-                return Array.Empty<byte>();
+                return (Array.Empty<byte>(), null);
 
             var labInfo = destModApplier.GetAssetInfo(map.LabDataId, null);
             if (labInfo == null)
             {
                 Error($"Could not load asset info for lab {map.LabDataId} in map {map.Id}");
-                return Array.Empty<byte>();
+                return (Array.Empty<byte>(), null);
             }
 
             string B(string pattern) => labInfo.BuildFilename(pattern, 0);
@@ -109,9 +124,17 @@ namespace UAlbion.Game.Assets
                 ContentsPath = B(contentsPattern),
             };
             var formatter = new EventFormatter(sourceAssets.LoadString, map.Id.ToMapText());
-            var tiledMap = MapExport.FromAlbionMap3D(map, properties, formatter);
+            var (tiledMap, script) = MapExport.FromAlbionMap3D(map, properties, formatter);
 
-            return FormatUtil.BytesFromTextWriter(tiledMap.Serialize);
+            var mapBytes = FormatUtil.BytesFromTextWriter(tiledMap.Serialize);
+            return (mapBytes, script);
+        }
+
+        string GetAssetDir(AssetInfo info)
+        {
+            var config = Resolve<IGeneralConfig>();
+            var destPath = config.ResolvePath(info.File.Filename);
+            return destPath;
         }
     }
 }

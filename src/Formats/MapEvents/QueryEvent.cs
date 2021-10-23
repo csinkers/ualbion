@@ -1,5 +1,6 @@
 ﻿using System;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
@@ -51,7 +52,7 @@ namespace UAlbion
                     case AssetType.Monster: MonsterCharacterSheets(assets, tf, baseDir, dumpIds); break;
                     case AssetType.MonsterGroup: MonsterGroups(assets, baseDir, dumpIds); break;
                     case AssetType.Npc: NpcCharacterSheets(assets, tf, baseDir, dumpIds); break;
-                    case AssetType.PartyMember: PartyCharacterSheets(assets, tf, baseDir, dumpIds); break;
+                    case AssetType.Party: PartyCharacterSheets(assets, tf, baseDir, dumpIds); break;
                     case AssetType.Script: Scripts(assets, baseDir, dumpIds); break;
                     case AssetType.Spell: Spells(assets, baseDir, dumpIds); break;
                 }
@@ -250,7 +251,7 @@ namespace UAlbion
                     {
                         sw.WriteLine($"        EventChain: {npc.Chain}");
                         var formatter = new EventFormatter(assets.LoadString, id.ToMapText());
-                        sw.WriteLine(formatter.FormatChain(npc.Node, "          "));
+                        sw.WriteLine(formatter.FormatChain(npc.Node, 2));
                     }
                 }
                 sw.WriteLine();

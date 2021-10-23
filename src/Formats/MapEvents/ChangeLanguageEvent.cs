@@ -29,7 +29,7 @@ namespace UAlbion.Formats.MapEvents
             e.Language = s.EnumU8(nameof(Language), e.Language);
             s.UInt8(null, 0);
             zeroed += s.UInt16(null, 0);
-            s.Assert(zeroed == 0, "ChangeEvent: Expected byte 4 to be 0");
+            s.Assert(zeroed == 0, "ChangeLanguageEvent: Expected byte 4 to be 0");
             return e;
         }
         public override ChangeProperty ChangeProperty => ChangeProperty.Language;

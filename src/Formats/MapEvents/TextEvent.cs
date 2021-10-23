@@ -45,7 +45,7 @@ namespace UAlbion.Formats.MapEvents
         AssetType CharacterType => Location switch
         {
             // TODO: Handle the other cases
-            TextLocation.PortraitLeft => AssetType.PartyMember,
+            TextLocation.PortraitLeft => AssetType.Party,
             _ => AssetType.Npc
         };
 

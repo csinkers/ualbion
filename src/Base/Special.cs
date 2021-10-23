@@ -2,7 +2,6 @@
 // ReSharper disable UnusedMember.Global
 namespace UAlbion.Base
 {
-    //[JsonConverter(typeof(StringEnumConverter))]
     public enum Special : ushort
     {
         SoundBank = 0,

@@ -19,7 +19,7 @@ namespace UAlbion.Formats.Assets
         readonly uint _value;
         public PartyMemberId(AssetType type, int id = 0)
         {
-            if (!(type == AssetType.None || type == AssetType.PartyMember))
+            if (!(type == AssetType.None || type == AssetType.Party))
                 throw new ArgumentOutOfRangeException($"Tried to construct a PartyMemberId with a type of {type}");
 #if DEBUG
             if (id < 0 || id > 0xffffff)
@@ -31,7 +31,7 @@ namespace UAlbion.Formats.Assets
         PartyMemberId(uint id) 
         {
             _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.PartyMember))
+            if (!(Type == AssetType.None || Type == AssetType.Party))
                 throw new ArgumentOutOfRangeException($"Tried to construct a PartyMemberId with a type of {Type}");
         }
 
@@ -49,7 +49,7 @@ namespace UAlbion.Formats.Assets
             if (mapping == null) throw new ArgumentNullException(nameof(mapping));
             
 
-            var (enumType, enumValue) = mapping.IdToEnum(new PartyMemberId(AssetType.PartyMember, disk));
+            var (enumType, enumValue) = mapping.IdToEnum(new PartyMemberId(AssetType.Party, disk));
             return (PartyMemberId)AssetMapping.Global.EnumToId(enumType, enumValue);
         }
 
@@ -93,7 +93,7 @@ namespace UAlbion.Formats.Assets
 
         public override string ToString() => AssetMapping.Global.IdToName(this);
         public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
-        public static AssetType[] ValidTypes = { AssetType.PartyMember };
+        public static AssetType[] ValidTypes = { AssetType.Party };
         public static PartyMemberId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 
         public static implicit operator AssetId(PartyMemberId id) => AssetId.FromUInt32(id._value);

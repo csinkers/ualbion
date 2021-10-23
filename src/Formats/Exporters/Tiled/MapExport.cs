@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using UAlbion.Api;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
@@ -17,9 +18,8 @@ namespace UAlbion.Formats.Exporters.Tiled
         const int WallGid = TilesetSpacing;
         const int ContentsGid = 2 * TilesetSpacing;
         const int CeilingGid = 3 * TilesetSpacing;
-        static Geometry.Polygon Square => new() { Points = new List<(int, int)> { (0, 0), (1, 0), (1, 1), (0, 1) } };
 
-        public static Map FromAlbionMap2D(
+        public static (Map, string) FromAlbionMap2D(
             MapData2D map,
             TilesetData tileset,
             Tilemap2DProperties properties,
@@ -36,6 +36,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             int nextObjectId = 1;
             int nextLayerId = 3; // 1 & 2 are always underlay & overlay.
             npcTileset.GidOffset = tileset.Tiles.Count;
+            var (script, functionsByEventId) = BuildScript(map, eventFormatter);
 
             var result = new Map
             {
@@ -75,14 +76,14 @@ namespace UAlbion.Formats.Exporters.Tiled
                     }
                 },
                 ObjectGroups = new[] {
-                    BuildTriggers(map, properties, eventFormatter, false, ref nextLayerId, ref nextObjectId),
-                    BuildNpcs(map, properties, eventFormatter, npcTileset, ref nextLayerId, ref nextObjectId),
+                    BuildTriggers(map, properties, false, functionsByEventId, ref nextLayerId, ref nextObjectId),
+                    BuildNpcs(map, properties, npcTileset, functionsByEventId, ref nextLayerId, ref nextObjectId),
                 }.SelectMany(x => x).ToList()
             };
 
             result.NextObjectId = nextObjectId;
             result.NextLayerId = nextLayerId;
-            return result;
+            return (result, script);
         }
 
         static List<TiledProperty> BuildMapProperties(MapData2D map)
@@ -102,7 +103,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             return props;
         }
 
-        public static Map FromAlbionMap3D(MapData3D map, Tilemap3DProperties properties, EventFormatter eventFormatter)
+        public static (Map, string) FromAlbionMap3D(MapData3D map, Tilemap3DProperties properties, EventFormatter eventFormatter)
         {
             if (map == null) throw new ArgumentNullException(nameof(map));
             if (properties == null) throw new ArgumentNullException(nameof(properties));
@@ -126,8 +127,9 @@ namespace UAlbion.Formats.Exporters.Tiled
 
             int nextObjectId = 1;
             int nextObjectGroupId = 3; // 1 & 2 are always underlay & overlay.
+            var (script, functionsByEventId) = BuildScript(map, eventFormatter);
 
-            return new Map
+            return (new Map
             {
                 TiledVersion = "1.4.2",
                 Version = "1.4",
@@ -184,17 +186,124 @@ namespace UAlbion.Formats.Exporters.Tiled
                     }
                 },
                 ObjectGroups = new[] {
-                    BuildTriggers(map, properties, eventFormatter, true, ref nextObjectGroupId, ref nextObjectId),
-                    // BuildNpcs(map, properties, eventFormatter, npcTileset, ref nextObjectGroupId, ref nextObjectId)
+                    BuildTriggers(map, properties, true, functionsByEventId, ref nextObjectGroupId, ref nextObjectId),
+                    // BuildNpcs(map, properties, npcTileset, functionsByEventId, ref nextObjectGroupId, ref nextObjectId)
                 }.SelectMany(x => x).ToList()
-            };
+            }, script);
+        }
+
+        static (string script, Dictionary<ushort, string> functionsByEventId) BuildScript(IMapData map, EventFormatter eventFormatter)
+        {
+            var sb = new StringBuilder();
+            var mapping = new Dictionary<ushort, string>();
+
+            for (int chainId = 0; chainId < map.Chains.Count; chainId++)
+            {
+                var i = map.Chains[chainId];
+                if (i == 0xffff) continue;
+
+                var name = $"C{chainId}";
+                mapping[i] = name;
+
+                var labels = new List<IEventNode>();
+
+                if (chainId > 0)
+                    sb.AppendLine();
+
+                sb.AppendLine($"function {name} {{");
+                eventFormatter.FormatChainDecompiled(sb, map.Events[i], labels, 1);
+                sb.AppendLine("}");
+            }
+
+            foreach (var key in GetDummyChains(map))
+            {
+                sb.AppendLine();
+                var name = $"C{key.Chain}_{key.DummyNumber}";
+                mapping[key.Node.Id] = name;
+
+                var labels = new List<IEventNode>();
+
+                sb.AppendLine($"function {name} {{");
+                eventFormatter.FormatChainDecompiled(sb, key.Node, labels, 1);
+                sb.AppendLine("}");
+            }
+
+            return (sb.ToString(), mapping);
+        }
+
+        static ushort[] GetEventToChainMapping(IMapData map)
+        {
+            var eventToChainMapping = new ushort[map.Events.Count];
+            Array.Fill<ushort>(eventToChainMapping, 0xffff);
+
+            var queue = new Queue<EventNode>();
+            for (ushort i = 0; i < map.Chains.Count; i++)
+            {
+                if (map.Chains[i] == 0xffff) continue;
+                queue.Enqueue(map.Events[map.Chains[i]]);
+                while (queue.TryDequeue(out var e))
+                {
+                    if (eventToChainMapping[e.Id] != 0xffff) continue; // Already visited?
+                    eventToChainMapping[e.Id] = i;
+
+                    if (e.Next != null)
+                        queue.Enqueue((EventNode)e.Next);
+
+                    if (e is BranchNode { NextIfFalse: { } } branch)
+                        queue.Enqueue((EventNode)branch.NextIfFalse);
+                }
+            }
+
+            return eventToChainMapping;
+        }
+
+        static List<ZoneKey> GetDummyChains(IMapData map)
+        {
+            ushort chainId = 0;
+            ushort dummyId = 1;
+            var visited = new HashSet<EventNode>();
+            var eventToChainMapping = GetEventToChainMapping(map);
+            var dummies = new List<ZoneKey>();
+            for (ushort i = 0; i < eventToChainMapping.Length; i++)
+            {
+                if (eventToChainMapping[i] != 0xffff)
+                {
+                    chainId = eventToChainMapping[i];
+                    dummyId = 1;
+                    continue;
+                }
+
+                var e = map.Events[i];
+                if (visited.Contains(e))
+                    continue;
+
+                dummies.Add(new ZoneKey(chainId, dummyId, map.Events[i]));
+                dummyId++;
+
+                var queue = new Queue<EventNode>();
+                queue.Enqueue(e);
+                while (queue.TryDequeue(out e))
+                {
+                    if (visited.Contains(e)) continue;
+                    if (eventToChainMapping[e.Id] != 0xffff) continue; // Belongs to a real chain. TODO: Assert always false?
+                    visited.Add(e);
+
+                    if (e.Next != null)
+                        queue.Enqueue((EventNode)e.Next);
+
+                    if (e is BranchNode { NextIfFalse: { } } branch)
+                        queue.Enqueue((EventNode)branch.NextIfFalse);
+                }
+            }
+
+            return dummies;
         }
 
         static IEnumerable<ObjectGroup> BuildTriggers(
             BaseMapData map,
             TilemapProperties properties,
-            EventFormatter eventFormatter,
             bool isometric,
+            Dictionary<ushort, string> functionsByEventId,
             ref int nextObjectGroupId,
             ref int nextObjectId)
         {
@@ -217,26 +326,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                     "T:Global",
                     globals,
                     properties,
-                    eventFormatter,
-                    isometric,
-                    ref nextObjectId));
-            }
-
-            var dummies = BuildDummyTriggers(map);
-            if (dummies.Any())
-            {
-                foreach (var dummy in dummies)
-                {
-                    var (x, y) = DiagonalLayout.GetPositionForIndex(globalIndex++);
-                    (dummy.Item2.OffsetX, dummy.Item2.OffsetY) = (-x - 1, -y - 1);
-                }
-
-                objectGroups.Add(BuildTriggerObjectGroup(
-                    nextObjectGroupId++,
-                    "T:Dummy",
-                    dummies,
-                    properties,
-                    eventFormatter,
+                    functionsByEventId,
                     isometric,
                     ref nextObjectId));
             }
@@ -253,7 +343,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                     $"T:{polygonsForTriggerType.Key}",
                     polygonsForTriggerType,
                     properties,
-                    eventFormatter,
+                    functionsByEventId,
                     isometric,
                     ref nextObjectId));
 
@@ -264,86 +354,12 @@ namespace UAlbion.Formats.Exporters.Tiled
             return objectGroups;
         }
 
-        static List<(ZoneKey, Geometry.Polygon)> BuildDummyTriggers(IMapData map)
+        static List<TiledProperty> BuildTriggerProperties(ZoneKey zone, Dictionary<ushort, string> functionsByEventId)
         {
-            var referencedChains = new bool[map.Chains.Count];
-            foreach (var zone in map.Zones)
-                if (zone.Chain < referencedChains.Length)
-                    referencedChains[zone.Chain] = true;
+            var properties = new List<TiledProperty> { new("Trigger", zone.Trigger.ToString()) };
 
-            var dummies = new List<(ZoneKey, Geometry.Polygon)>();
-            for (ushort i = 0; i < referencedChains.Length; i++)
-            {
-                if (referencedChains[i]) continue; // Referenced chain, ignore
-                if (map.Chains[i] == 0xffff) continue; // Inactive chain, ignore
-                dummies.Add((new ZoneKey(i, 0, map.Events[map.Chains[i]]), Square));
-            }
-
-            var chainMapping = new ushort[map.Events.Count];
-            Array.Fill<ushort>(chainMapping, 0xffff);
-
-            var queue = new Queue<EventNode>();
-            for (ushort i = 0; i < map.Chains.Count; i++)
-            {
-                if (map.Chains[i] == 0xffff) continue;
-                queue.Enqueue(map.Events[map.Chains[i]]);
-                while (queue.TryDequeue(out var e))
-                {
-                    if (chainMapping[e.Id] != 0xffff) continue; // Already visited?
-                    chainMapping[e.Id] = i;
-
-                    if (e.Next != null)
-                        queue.Enqueue((EventNode)e.Next);
-
-                    if (e is BranchNode { NextIfFalse: { } } branch)
-                        queue.Enqueue((EventNode)branch.NextIfFalse);
-                }
-            }
-
-            ushort chainId = 0;
-            ushort dummyId = 1;
-            var visited = new HashSet<EventNode>();
-            for (ushort i = 0; i < chainMapping.Length; i++)
-            {
-                if (chainMapping[i] != 0xffff)
-                {
-                    chainId = chainMapping[i];
-                    dummyId = 1;
-                    continue;
-                }
-
-                var e = map.Events[i];
-                if (visited.Contains(e))
-                    continue;
-
-                dummies.Add((new ZoneKey(chainId, dummyId, map.Events[i]), Square));
-                dummyId++;
-
-                queue.Enqueue(e);
-                while (queue.TryDequeue(out e))
-                {
-                    if (visited.Contains(e)) continue;
-                    if (chainMapping[e.Id] != 0xffff) continue; // Belongs to a real chain. TODO: Assert always false?
-                    visited.Add(e);
-
-                    if (e.Next != null)
-                        queue.Enqueue((EventNode)e.Next);
-
-                    if (e is BranchNode { NextIfFalse: { } } branch)
-                        queue.Enqueue((EventNode)branch.NextIfFalse);
-                }
-            }
-
-            return dummies;
-        }
-
-        static List<TiledProperty> BuildTriggerProperties(ZoneKey zone, EventFormatter eventFormatter)
-        {
-            var properties = new List<TiledProperty>
-            {
-                new("Script", eventFormatter.FormatChain(zone.Node)),
-                new("Trigger", zone.Trigger.ToString())
-            };
+            if (zone.Node != null)
+                properties.Add(new TiledProperty("Script", functionsByEventId[zone.Node.Id]));
 
             if (zone.Unk1 != 0)
                 properties.Add(new TiledProperty("Unk1", zone.Unk1.ToString(CultureInfo.InvariantCulture)));
@@ -359,7 +375,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             string name,
             IEnumerable<(ZoneKey, Geometry.Polygon)> polygons,
             TilemapProperties properties,
-            EventFormatter eventFormatter,
+            Dictionary<ushort, string> functionsByEventId,
             bool isometric,
             ref int nextObjectId)
         {
@@ -375,7 +391,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                     X = r.Item2.OffsetX * width,
                     Y = r.Item2.OffsetY * properties.TileHeight,
                     Polygon = new Polygon(r.Item2.Points, width, properties.TileHeight),
-                    Properties = BuildTriggerProperties(r.Item1, eventFormatter)
+                    Properties = BuildTriggerProperties(r.Item1, functionsByEventId)
                 };
 
             var objectGroup = new ObjectGroup
@@ -394,8 +410,8 @@ namespace UAlbion.Formats.Exporters.Tiled
         static IEnumerable<ObjectGroup> BuildNpcs(
             BaseMapData map,
             TilemapProperties properties,
-            EventFormatter eventFormatter,
             Tileset npcTileset,
+            Dictionary<ushort, string> functionsByEventId,
             ref int nextObjectGroupId,
             ref int nextObjectId)
         {
@@ -427,7 +443,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                 Objects = map.Npcs.Select(x =>
                         BuildNpcObject(
                             properties,
-                            eventFormatter,
+                            functionsByEventId,
                             npcTileset,
                             npcPathIndices,
                             x,
@@ -440,7 +456,7 @@ namespace UAlbion.Formats.Exporters.Tiled
         }
 
         static MapObject BuildNpcObject(TilemapProperties properties,
-            EventFormatter eventFormatter,
+            Dictionary<ushort, string> functionsByEventId,
             Tileset npcTileset,
             Dictionary<int, int> npcPathIndices,
             MapNpc npc,
@@ -456,7 +472,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             };
 
             if (!npc.Id.IsNone) objProps.Add(new TiledProperty("Id", npc.Id.ToString()));
-            if (npc.Node != null) objProps.Add(new TiledProperty("Script", eventFormatter.FormatChain(npc.Node)));
+            if (npc.Node != null) objProps.Add(new TiledProperty("Script", functionsByEventId[npc.Node.Id]));
             if (npc.Sound > 0) objProps.Add(new TiledProperty("Sound", npc.Sound.ToString(CultureInfo.InvariantCulture)));
             if (npcPathIndices.TryGetValue(npc.Index, out var pathObjectId)) objProps.Add(TiledProperty.Object("Path", pathObjectId));
 

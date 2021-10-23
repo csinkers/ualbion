@@ -27,7 +27,7 @@ namespace UAlbion.Formats.MapEvents
             e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
             e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
             e.Amount = s.UInt16(nameof(Amount), e.Amount);
-            s.Assert(zeroed == 0, "ChangeEvent: Expected byte 4 to be 0");
+            s.Assert(zeroed == 0, "ChangeUnkBEEvent: Expected byte 4 to be 0");
             return e;
         }
         public override ChangeProperty ChangeProperty => ChangeProperty.UnkB;

@@ -20,6 +20,7 @@ namespace UAlbion.Formats.Containers
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
             var subAssets = new Dictionary<int, (string, string)>(); // path and name
+            // Pattern vars: 0=Index 1=SubItem 2=Name 3=Palette
             var pattern = info.Get(AssetProperty.Pattern, "{0}_{1}_{2}.dat");
 
             foreach (var filePath in disk.EnumerateDirectory(path, $"{info.Index}_*.*"))

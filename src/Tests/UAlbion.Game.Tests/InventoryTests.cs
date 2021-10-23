@@ -24,7 +24,7 @@ namespace UAlbion.Game.Tests
         {
             AssetMapping.GlobalIsThreadLocal = true;
             AssetMapping.Global.Clear()
-                .RegisterAssetType(typeof(Base.PartyMember), AssetType.PartyMember)
+                .RegisterAssetType(typeof(Base.PartyMember), AssetType.Party)
                 .RegisterAssetType(typeof(Base.CoreSprite), AssetType.CoreGraphics)
                 .RegisterAssetType(typeof(Base.Item), AssetType.Item)
                 ;

@@ -8,7 +8,6 @@ namespace UAlbion.Benchmarks
         static void Main()
         {
             BenchmarkRunner.Run<Blitting>();
-            BenchmarkRunner.Run<ControlFlow>();
             Console.ReadLine();
         }
     }

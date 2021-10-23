@@ -358,10 +358,10 @@ execute 1 1");
         [Fact]
         public void Inv()
         {
-            Test(@"inv:chest Chest.Unknown1 MapText.Jirinaar Item.Pistol 1 2 3
-inv:chest Chest.Unknown1 MapText.Jirinaar None 0 255 255
-inv:door Door.HerrasDoor MapText.Jirinaar Item.Pistol 1 2 3
-inv:door Door.HerrasDoor MapText.Jirinaar None 0 255 255");
+            Test(@"open_chest Chest.Unknown1 MapText.Jirinaar Item.Pistol 1 2 3
+open_chest Chest.Unknown1 MapText.Jirinaar None 0 255 255
+open_door Door.HerrasDoor MapText.Jirinaar Item.Pistol 1 2 3
+open_door Door.HerrasDoor MapText.Jirinaar None 0 255 255");
         }
 
         [Fact]

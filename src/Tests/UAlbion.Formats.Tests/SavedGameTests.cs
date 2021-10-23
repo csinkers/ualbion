@@ -26,7 +26,7 @@ namespace UAlbion.Formats.Tests
                 .RegisterAssetType(typeof(Base.Map), AssetType.Map)
                 .RegisterAssetType(typeof(Base.Merchant), AssetType.Merchant)
                 .RegisterAssetType(typeof(Base.Npc), AssetType.Npc)
-                .RegisterAssetType(typeof(Base.PartyMember), AssetType.PartyMember)
+                .RegisterAssetType(typeof(Base.PartyMember), AssetType.Party)
                 .RegisterAssetType(typeof(Base.Portrait), AssetType.Portrait)
                 .RegisterAssetType(typeof(Base.SmallNpc), AssetType.SmallNpcGraphics)
                 .RegisterAssetType(typeof(Base.SmallPartyMember), AssetType.SmallPartyGraphics)

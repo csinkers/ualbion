@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.MapEvents;
 

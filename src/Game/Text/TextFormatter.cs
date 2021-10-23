@@ -30,7 +30,7 @@ namespace UAlbion.Game.Text
 
                 var asset = e.AssetId.Type switch
                 {
-                    AssetType.PartyMember => (object)state.GetSheet(e.AssetId), // TODO: Load game state assets via AssetManager?
+                    AssetType.Party => (object)state.GetSheet(e.AssetId), // TODO: Load game state assets via AssetManager?
                     AssetType.Npc => state.GetSheet(e.AssetId),
                     AssetType.Monster => assets.LoadSheet(e.AssetId),
                     AssetType.Item => assets.LoadItem(e.AssetId),

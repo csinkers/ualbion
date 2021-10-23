@@ -2,7 +2,6 @@
 // ReSharper disable UnusedMember.Global
 namespace UAlbion.Base
 {
-    //[JsonConverter(typeof(StringEnumConverter))]
     public enum Chest : ushort
     {
         Unknown1 = 1,
@@ -74,16 +73,16 @@ namespace UAlbion.Base
         Unknown164 = 164,
         Unknown165 = 165,
         Unknown166 = 166,
-        Unknown167 = 167,
-        Unknown168 = 168,
-        Unknown169 = 169,
-        Unknown170 = 170,
-        Unknown171 = 171,
-        Unknown172 = 172,
-        Unknown173 = 173,
-        Unknown174 = 174,
-        Unknown175 = 175,
-        Unknown176 = 176,
+        NakSeedBush1 = 167,
+        NakSeedBush2 = 168,
+        NakSeedBush3 = 169,
+        NakSeedBush4 = 170,
+        NakSeedBush5 = 171,
+        NakSeedBush6 = 172,
+        NakSeedBush7 = 173,
+        NakSeedBush8 = 174,
+        NakSeedBush9 = 175,
+        NakSeedBush10 = 176,
         Unknown177 = 177,
         Unknown178 = 178,
         Unknown179 = 179,

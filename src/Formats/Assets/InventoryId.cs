@@ -12,7 +12,7 @@ namespace UAlbion.Formats.Assets
             {
                 AssetType.Chest => InventoryType.Chest,
                 AssetType.Merchant => InventoryType.Merchant,
-                AssetType.PartyMember => InventoryType.Player,
+                AssetType.Party => InventoryType.Player,
                 AssetType.Monster => InventoryType.Monster,
                 _ => throw new ArgumentOutOfRangeException($"Tried to convert an asset of type {id.Type} (value {id.Id}) to an inventory id")
             };
@@ -31,7 +31,7 @@ namespace UAlbion.Formats.Assets
         public AssetId ToAssetId() =>
             Type switch
             {
-                InventoryType.Player => new AssetId(AssetType.PartyMember, Id),
+                InventoryType.Player => new AssetId(AssetType.Party, Id),
                 InventoryType.Chest => new AssetId(AssetType.Chest, Id),
                 InventoryType.Merchant => new AssetId(AssetType.Merchant, Id),
                 InventoryType.Monster => new AssetId(AssetType.Monster, Id),
@@ -74,7 +74,7 @@ namespace UAlbion.Formats.Assets
         {
             InventoryType.Chest => AssetType.Chest,
             InventoryType.Merchant => AssetType.Merchant,
-            InventoryType.Player => AssetType.PartyMember,
+            InventoryType.Player => AssetType.Party,
             InventoryType.Monster => AssetType.Monster,
             _ => throw new ArgumentOutOfRangeException($"Cannot convert inventory id of type {id.Type} to an AssetId")
         }, id.Id);

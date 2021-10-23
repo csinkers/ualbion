@@ -119,7 +119,7 @@ namespace UAlbion.Game.State
                 ActiveMembers = { [0] = Base.PartyMember.Tom }
             };
 
-            foreach (var id in AssetMapping.Global.EnumerateAssetsOfType(AssetType.PartyMember))
+            foreach (var id in AssetMapping.Global.EnumerateAssetsOfType(AssetType.Party))
                 _game.Sheets.Add(id, assets.LoadSheet(id));
 
             foreach (var id in AssetMapping.Global.EnumerateAssetsOfType(AssetType.Npc))

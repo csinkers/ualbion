@@ -6,7 +6,7 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
-    [Event("inv:chest", "Opens the inventory screen for the given chest")]
+    [Event("open_chest", "Opens the inventory screen for the given chest")]
     public class ChestEvent : MapEvent, ILockedInventoryEvent
     {
         ChestEvent(TextId textSource) => TextSource = textSource;

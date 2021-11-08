@@ -146,18 +146,20 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void Action()
         {
+            var unknown0 = new AssetId(AssetType.Unknown);
+            var unknown1 = new AssetId(AssetType.Unknown, 1);
             Test(("action AskAboutItem 1 Item.Pistol 1", new ActionEvent(ActionType.AskAboutItem,   1, (ItemId)Item.Pistol, 1)),
-                ("action DialogueLine 1 Unknown.1 1",   new ActionEvent(ActionType.DialogueLine,   1, new AssetId(AssetType.Unknown, 1), 1)),
+                ("action DialogueLine 1 Unknown.1 1",   new ActionEvent(ActionType.DialogueLine,   1, unknown1, 1)),
                 ("action EquipItem 1 Item.Pistol 1",    new ActionEvent(ActionType.EquipItem,      1, (ItemId)Item.Pistol, 1)),
-                ("action FinishDialogue 1 Unknown.0 1", new ActionEvent(ActionType.FinishDialogue, 1, new AssetId(AssetType.Unknown), 1)),
+                ("action FinishDialogue 1 Unknown.0 1", new ActionEvent(ActionType.FinishDialogue, 1, unknown0, 1)),
                 ("action PickupItem 1 Item.Pistol 1",   new ActionEvent(ActionType.PickupItem,     1, (ItemId)Item.Pistol, 1)),
-                ("action StartDialogue 1 Unknown.0 1",  new ActionEvent(ActionType.StartDialogue,  1, new AssetId(AssetType.Unknown), 1)),
-                ("action StartDialogue 1 Unknown.1 1",  new ActionEvent(ActionType.StartDialogue,  1, new AssetId(AssetType.Unknown, 1), 1)),
+                ("action StartDialogue 1 Unknown.0 1",  new ActionEvent(ActionType.StartDialogue,  1, unknown0, 1)),
+                ("action StartDialogue 1 Unknown.1 1",  new ActionEvent(ActionType.StartDialogue,  1, unknown1, 1)),
                 ("action UnequipItem 1 Item.Pistol 1",  new ActionEvent(ActionType.UnequipItem,    1, (ItemId)Item.Pistol, 1)),
-                ("action Unk14 1 Unknown.0 1",          new ActionEvent(ActionType.Unk14,          1, new AssetId(AssetType.Unknown), 1)),
-                ("action Unk23 1 Unknown.1 1",          new ActionEvent(ActionType.Unk23,          1, new AssetId(AssetType.Unknown, 1), 1)),
+                ("action UnkE 1 Unknown.0 1",           new ActionEvent(ActionType.UnkE,          1, unknown0, 1)),
+                ("action Unk17 1 Unknown.1 1",          new ActionEvent(ActionType.Unk17,          1, unknown1, 1)),
                 ("action UseItem 1 Item.Pistol 1",      new ActionEvent(ActionType.UseItem,        1, (ItemId)Item.Pistol, 1)),
-                ("action Word 1 None 1",              new ActionEvent(ActionType.Word,           1, AssetId.None, 1)),
+                ("action Word 1 None 1",               new ActionEvent(ActionType.Word,           1, AssetId.None, 1)),
                 ("action Word 1 Word.Argim 1",          new ActionEvent(ActionType.Word,           1, (WordId)Word.Argim, 1)));
         }
 

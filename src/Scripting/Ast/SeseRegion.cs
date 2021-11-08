@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
-using System.Text;
 
-namespace UAlbion.Scripting
+namespace UAlbion.Scripting.Ast
 {
     public class SeseRegion : ICfgNode
     {
@@ -16,8 +15,7 @@ namespace UAlbion.Scripting
         public ControlFlowGraph Contents { get; }
         public ImmutableArray<int> DecisionNodes { get; }
         public ImmutableArray<int> CodeNodes { get; }
-        public override string ToString() => ((ICfgNode)this).ToPseudocode();
-        public void ToPseudocode(StringBuilder sb, bool isStatement, bool numeric)
-            => Contents.Head.ToPseudocode(sb, isStatement, numeric);
+        public override string ToString() => "SESE";
+        public void Accept(IAstVisitor visitor) => visitor.Visit(this);
     }
 }

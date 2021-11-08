@@ -6,7 +6,7 @@
         AskAboutItem   = 0x1,
         Unk2           = 0x2, // Pay money? See ES156 (Garris, Gratogel sailor)
         Unk4           = 0x4,
-        Unk5           = 0x5,
+        AskToLeave     = 0x5,
         StartDialogue  = 0x6,
         FinishDialogue = 0x7,
         DialogueLine   = 0x8,

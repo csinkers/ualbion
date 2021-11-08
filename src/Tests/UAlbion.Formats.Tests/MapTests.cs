@@ -109,7 +109,7 @@ namespace UAlbion.Formats.Tests
             AssetMapping.GlobalIsThreadLocal = true;
             var m = AssetMapping.Global;
             m.Clear();
-            m.RegisterAssetType(typeof(TestTiles), AssetType.TilesetData);
+            m.RegisterAssetType(typeof(TestTiles), AssetType.Tileset);
             var tileset = new TilesetData(AssetId.From(TestTiles.Basic))
             {
                 UseSmallGraphics = false

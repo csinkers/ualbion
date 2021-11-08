@@ -19,7 +19,7 @@ namespace UAlbion.Formats.Assets
         readonly uint _value;
         public TilesetId(AssetType type, int id = 0)
         {
-            if (!(type == AssetType.None || type == AssetType.TilesetData))
+            if (!(type == AssetType.None || type == AssetType.Tileset))
                 throw new ArgumentOutOfRangeException($"Tried to construct a TilesetId with a type of {type}");
 #if DEBUG
             if (id < 0 || id > 0xffffff)
@@ -31,7 +31,7 @@ namespace UAlbion.Formats.Assets
         TilesetId(uint id) 
         {
             _value = id;
-            if (!(Type == AssetType.None || Type == AssetType.TilesetData))
+            if (!(Type == AssetType.None || Type == AssetType.Tileset))
                 throw new ArgumentOutOfRangeException($"Tried to construct a TilesetId with a type of {Type}");
         }
 
@@ -49,7 +49,7 @@ namespace UAlbion.Formats.Assets
             if (mapping == null) throw new ArgumentNullException(nameof(mapping));
             
 
-            var (enumType, enumValue) = mapping.IdToEnum(new TilesetId(AssetType.TilesetData, disk));
+            var (enumType, enumValue) = mapping.IdToEnum(new TilesetId(AssetType.Tileset, disk));
             return (TilesetId)AssetMapping.Global.EnumToId(enumType, enumValue);
         }
 
@@ -93,7 +93,7 @@ namespace UAlbion.Formats.Assets
 
         public override string ToString() => AssetMapping.Global.IdToName(this);
         public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
-        public static AssetType[] ValidTypes = { AssetType.TilesetData };
+        public static AssetType[] ValidTypes = { AssetType.Tileset };
         public static TilesetId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 
         public static implicit operator AssetId(TilesetId id) => AssetId.FromUInt32(id._value);

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using UAlbion.Api;
+using UAlbion.Scripting.Ast;
 
 #pragma warning disable 8321 // Stop warnings about Vis() debug functions
 namespace UAlbion.Scripting
@@ -46,15 +46,15 @@ namespace UAlbion.Scripting
             var nodes = new List<ICfgNode>();
             var mapping = new Dictionary<ushort, int>();
             int i = 1;
-            nodes.Add(new EmptyNode());
+            nodes.Add(Emit.Empty());
             foreach (var e in events)
             {
-                nodes.Add(new Block(e.Event));
+                nodes.Add(Emit.Event(e.Event));
                 if (mapping.ContainsKey(e.Id))
                     throw new InvalidOperationException($"Multiple events have the same id ({e.Id})!");
                 mapping[e.Id] = i++;
             }
-            nodes.Add(new EmptyNode());
+            nodes.Add(Emit.Empty());
 
             var edges = new List<(int, int, bool)> { (0, 1, true) };
             foreach (var e in events)
@@ -99,37 +99,6 @@ namespace UAlbion.Scripting
             return graph;
         }
 
-        public static string ConditionPathToExpression(List<int> path, SeseRegion region)
-        {
-            // TODO: Convert to ICondition construction + handle SESE w/ reaching paths
-            if (path == null) throw new ArgumentNullException(nameof(path));
-            if (region == null) throw new ArgumentNullException(nameof(region));
-            var sb = new StringBuilder();
-            for (int i = 0; i < path.Count - 1; i++)
-            {
-                if (!region.DecisionNodes.Contains(path[i]) || !region.CodeNodes.Contains(path[i + 1])) 
-                    continue;
-
-                bool cond = false;
-                foreach (var e in region.Contents.Edges)
-                {
-                    if (e.start == path[i] &&
-                        e.end == path[i + 1])
-                    {
-                        cond = region.Contents.GetEdgeLabel(e.start, e.end);
-                        break;
-                    }
-                }
-
-                if (sb.Length != 0) sb.Append(" && ");
-                if (!cond)
-                    sb.Append('!');
-
-                region.Contents.Nodes[path[i]].ToPseudocode(sb, false, false);
-            }
-            return sb.ToString();
-        }
-
         public static ControlFlowGraph ReduceSimpleWhile(ControlFlowGraph graph)
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
@@ -144,11 +113,9 @@ namespace UAlbion.Scripting
                 #if DEBUG
                 Func<string> vis = () => graph.ToVis().AddPointer("index", index).ToString();
                 #endif
-                if (graph.Nodes[index] is not ICondition condition)
-                    throw new ControlFlowGraphException($"While-loop header {index} was not a condition", graph);
 
                 var updated = graph
-                    .ReplaceNode(index, new WhileLoop(condition, null))
+                    .ReplaceNode(index, Emit.While(graph.Nodes[index], null))
                     .RemoveEdge(index, index);
 
                 return updated;
@@ -182,8 +149,8 @@ namespace UAlbion.Scripting
 
                 var newNode = 
                     graph.Nodes[index] is Sequence existing
-                    ? new Sequence(existing.Nodes, graph.Nodes[child])
-                    : new Sequence(graph.Nodes[index], graph.Nodes[child]);
+                    ? Emit.Seq(existing.Statements.Append(graph.Nodes[child]).ToArray())
+                    : Emit.Seq(graph.Nodes[index], graph.Nodes[child]);
 
                 var updated = graph
                     .RemoveNode(child)
@@ -238,10 +205,7 @@ namespace UAlbion.Scripting
                 if (after == -1 || then == -1 || after == head) 
                     continue;
 
-                if (graph.Nodes[head] is not ICondition condition)
-                    throw new ControlFlowGraphException($"If-then header {head} was not a condition", graph);
-
-                var newNode = new IfThen(condition, graph.Nodes[then]);
+                var newNode = Emit.If(graph.Nodes[head], graph.Nodes[then]);
                 return graph.RemoveNode(then).ReplaceNode(head, newNode);
             }
 
@@ -291,11 +255,8 @@ namespace UAlbion.Scripting
                 if (after == head)
                     continue;
 
-                if (graph.Nodes[head] is not ICondition condition)
-                    throw new ControlFlowGraphException($"If-then-else header {head} was not a condition", graph);
-
-                var newNode = new IfThenElse(
-                    condition,
+                var newNode = Emit.IfElse(
+                    graph.Nodes[head],
                     graph.Nodes[thenIndex],
                     graph.Nodes[elseIndex]);
 
@@ -353,10 +314,10 @@ namespace UAlbion.Scripting
                 return graph;
 
             var children = graph.Children(index);
-            var continueNode = new ContinueNode();
+            var continueNode = Emit.Continue();
             if (children.Length == 1)
             {
-                var seq = new Sequence(graph.Nodes[index], continueNode);
+                var seq = Emit.Seq(graph.Nodes[index], continueNode);
                 return graph
                     .ReplaceNode(index, seq)
                     .RemoveEdge(index, loop.Header.Index);
@@ -378,7 +339,7 @@ namespace UAlbion.Scripting
 
             var children = graph.Children(index);
 
-            var breakNode = new BreakNode();
+            var breakNode = Emit.Break();
             if (children.Length != 2)
                 throw new ControlFlowGraphException($"Break at {index} has unexpected child count ({children.Length})", graph);
 
@@ -393,14 +354,12 @@ namespace UAlbion.Scripting
 
                 bool label = graph.GetEdgeLabel(index, target);
 
-                if (graph.Nodes[index] is not ICondition condition)
-                    throw new ControlFlowGraphException($"Branching continue {index} was not a condition", graph);
-
+                var condition = graph.Nodes[index];
                 if (!label)
-                    condition = new Negation(condition);
+                    condition = Emit.Negation(condition);
 
-                var newBlock = new Sequence(graph.Nodes[target], new BreakNode());
-                var ifNode = new IfThen(condition, newBlock);
+                var newBlock = Emit.Seq(graph.Nodes[target], Emit.Break());
+                var ifNode = Emit.If(condition, newBlock);
                 return graph
                     .RemoveNode(target)
                     .ReplaceNode(index, ifNode);
@@ -412,13 +371,12 @@ namespace UAlbion.Scripting
         static ControlFlowGraph ReplaceLoopBranch(ControlFlowGraph graph, int index, int target, ICfgNode newNode)
         {
             bool label = graph.GetEdgeLabel(index, target);
-            if (graph.Nodes[index] is not ICondition condition)
-                throw new ControlFlowGraphException($"Branching continue {index} was not a condition", graph);
+            var condition = graph.Nodes[index];
 
             if (!label)
-                condition = new Negation(condition);
+                condition = Emit.Negation(condition);
 
-            var ifNode = new IfThen(condition, newNode);
+            var ifNode = Emit.If(condition, newNode);
             return graph
                 .ReplaceNode(index, ifNode)
                 .RemoveEdge(index, target);
@@ -474,13 +432,10 @@ namespace UAlbion.Scripting
             {
                 bool isfirstChildInLoop = head == children[0];
                 var target = isfirstChildInLoop ? children[1] : children[0];
-                return ReplaceLoopBranch(graph, tail, target, new BreakNode());
+                return ReplaceLoopBranch(graph, tail, target, Emit.Break());
             }
 
-            if (graph.Nodes[head] is not ICondition condition)
-                throw new ControlFlowGraphException($"While-loop header {head} was not a condition", graph);
-
-            var newNode = new WhileLoop(condition, graph.Nodes[tail]);
+            var newNode = Emit.While(graph.Nodes[head], graph.Nodes[tail]);
             return updated
                 .RemoveNode(tail)
                 .ReplaceNode(head, newNode);
@@ -500,10 +455,7 @@ namespace UAlbion.Scripting
                 if (child != head)
                     updated = updated.AddEdge(head, child, true);
 
-            if (graph.Nodes[tail] is not ICondition condition)
-                throw new ControlFlowGraphException($"Do-loop tail {tail} was not a condition", graph);
-
-            var newNode = new DoLoop(condition, graph.Nodes[head]);
+            var newNode = Emit.Do(graph.Nodes[tail], graph.Nodes[head]);
             return updated
                 .RemoveNode(tail)
                 .ReplaceNode(head, newNode);
@@ -534,7 +486,7 @@ namespace UAlbion.Scripting
                 if (cut.Cut.IsCyclic())
                     continue;
 
-                var newNode = new SeseRegion(cut.Cut);
+                var newNode = Emit.Sese(cut.Cut);
                 var updated = cut.Remainder.AddNode(newNode, out var newNodeIndex);
 
                 foreach (var (start, _, label) in cut.RemainderToCutEdges)

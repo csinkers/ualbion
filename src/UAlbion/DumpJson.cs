@@ -48,9 +48,9 @@ namespace UAlbion
 
             var s = JsonSerializer.Create(settings);
             TextWriter tw;
-            if (types.Contains(AssetType.TilesetData))
+            if (types.Contains(AssetType.Tileset))
             {
-                foreach (var id in DumpUtil.All(AssetType.TilesetData, dumpIds))
+                foreach (var id in DumpUtil.All(AssetType.Tileset, dumpIds))
                 {
                     TilesetData asset = assets.LoadTileData(id);
                     if (asset == null) continue;

@@ -4,8 +4,11 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="!Exists('..\..\deps\superpower')">
     <PackageReference Include="Superpower" Version="3.0.0" />
+  </ItemGroup>
+  <ItemGroup Condition="Exists('..\..\deps\superpower')">
+    <ProjectReference Include="..\..\deps\superpower\src\Superpower\Superpower.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -27,7 +27,7 @@ namespace UAlbion.Scripting
 
                 data.Nodes.Add(new DebugVisualizerNodeData(i.ToString(CultureInfo.InvariantCulture))
                 {
-                    Label = node.ToPseudocode()
+                    Label = node.ToString()
                     // Color = ...
                 });
             }

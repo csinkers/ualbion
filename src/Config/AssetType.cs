@@ -32,7 +32,7 @@ namespace UAlbion.Config
         SmallPartyGraphics,
         Portrait,
         TacticalIcon,
-        [IsomorphicTo(TilesetData)] TilesetGraphics,
+        [IsomorphicTo(Tileset)] TilesetGraphics,
         Wall,
         WallOverlay,
 
@@ -66,8 +66,8 @@ namespace UAlbion.Config
         Spell,
         Switch,
         Ticker,
-        TilesetData,
-        [IsomorphicTo(TilesetData)] BlockList,
+        Tileset,
+        [IsomorphicTo(Tileset)] BlockList,
         [Localised] Video,
 
         [Localised] [IsomorphicTo(EventSet)] EventText,

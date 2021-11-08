@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using UAlbion.Scripting.Ast;
 
 #pragma warning disable 8321 // Stop warnings about Vis() debug functions
 namespace UAlbion.Scripting

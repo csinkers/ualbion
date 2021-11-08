@@ -15,7 +15,7 @@ namespace UAlbion.Config.Tests
     ""block"": {
       ""AssetType"": ""BlockList"",
       ""EnumType"": ""UAlbion.Base.BlockList, UAlbion.Base"",
-      ""CopiedFrom"": ""UAlbion.Base.TilesetData, UAlbion.Base""
+      ""CopiedFrom"": ""UAlbion.Base.Tileset, UAlbion.Base""
     },
     ""combg"":      { ""AssetType"": ""CombatBackground"", ""EnumType"": ""UAlbion.Base.CombatBackground, UAlbion.Base"" },
     ""comgfx"":     { ""AssetType"": ""CombatGraphics"",   ""EnumType"": ""UAlbion.Base.CombatGraphics, UAlbion.Base"" },
@@ -27,11 +27,11 @@ namespace UAlbion.Config.Tests
     ""pal"":        { ""AssetType"": ""Palette"",          ""EnumType"": ""UAlbion.Base.Palette, UAlbion.Base"" },
     ""special"":    { ""AssetType"": ""Special"",          ""EnumType"": ""UAlbion.Base.Special, UAlbion.Base"" },
     ""spell"":      { ""AssetType"": ""Spell"",            ""EnumType"": ""UAlbion.Base.Spell, UAlbion.Base"" },
-    ""tiledata"":   { ""AssetType"": ""TilesetData"",      ""EnumType"": ""UAlbion.Base.TilesetData, UAlbion.Base"" },
+    ""tiledata"":   { ""AssetType"": ""Tileset"",          ""EnumType"": ""UAlbion.Base.Tileset, UAlbion.Base"" },
     ""tilegfx"": {
       ""AssetType"": ""TilesetGraphics"",
       ""EnumType"": ""UAlbion.Base.TilesetGraphics, UAlbion.Base"",
-      ""CopiedFrom"": ""UAlbion.Base.TilesetData, UAlbion.Base""
+      ""CopiedFrom"": ""UAlbion.Base.Tileset, UAlbion.Base""
     },
      ""word"": { ""AssetType"": ""Word"", ""EnumType"": ""UAlbion.Base.Word, UAlbion.Base"" }
   },
@@ -255,8 +255,8 @@ namespace UAlbion.Config.Tests
                 t =>
                 {
                     Assert.Equal("tiledata", t.Alias);
-                    Assert.Equal(AssetType.TilesetData, t.AssetType);
-                    Assert.Equal("UAlbion.Base.TilesetData, UAlbion.Base", t.EnumType);
+                    Assert.Equal(AssetType.Tileset, t.AssetType);
+                    Assert.Equal("UAlbion.Base.Tileset, UAlbion.Base", t.EnumType);
                 },
                 t =>
                 {

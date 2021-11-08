@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Scripting\UAlbion.Scripting.csproj" />
-    <ProjectReference Include="..\UAlbion.TestCommon\UAlbion.TestCommon.csproj" />
   </ItemGroup>
 
 </Project>

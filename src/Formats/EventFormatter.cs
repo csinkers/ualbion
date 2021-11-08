@@ -44,9 +44,8 @@ namespace UAlbion.Formats
             try
             {
                 var tree = Decompiler.Decompile(sorted, steps);
-                var inner = new StringBuilder();
-                tree.ToPseudocode(inner, true, false);
-                ScriptUtil.PrettyPrintScript(sb, inner.ToString(), indent);
+                var visitor = new EmitPseudocodeVisitor(sb) { IndentLevel = indent };
+                tree.Accept(visitor);
             }
             catch (ControlFlowGraphException)
             {

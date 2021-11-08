@@ -212,6 +212,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Scripting", "src\Sc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Scripting.Tests", "src\Tests\UAlbion.Scripting.Tests\UAlbion.Scripting.Tests.csproj", "{BFBED7AA-8DC1-4307-A8B2-23339EEF8930}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Superpower", "deps\superpower\src\Superpower\Superpower.csproj", "{749431A9-1911-4361-AE08-AD91C99F43C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -762,6 +764,18 @@ Global
 		{BFBED7AA-8DC1-4307-A8B2-23339EEF8930}.Release|x64.Build.0 = Release|Any CPU
 		{BFBED7AA-8DC1-4307-A8B2-23339EEF8930}.Release|x86.ActiveCfg = Release|Any CPU
 		{BFBED7AA-8DC1-4307-A8B2-23339EEF8930}.Release|x86.Build.0 = Release|Any CPU
+		{749431A9-1911-4361-AE08-AD91C99F43C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{749431A9-1911-4361-AE08-AD91C99F43C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{749431A9-1911-4361-AE08-AD91C99F43C5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{749431A9-1911-4361-AE08-AD91C99F43C5}.Debug|x64.Build.0 = Debug|Any CPU
+		{749431A9-1911-4361-AE08-AD91C99F43C5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{749431A9-1911-4361-AE08-AD91C99F43C5}.Debug|x86.Build.0 = Debug|Any CPU
+		{749431A9-1911-4361-AE08-AD91C99F43C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{749431A9-1911-4361-AE08-AD91C99F43C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{749431A9-1911-4361-AE08-AD91C99F43C5}.Release|x64.ActiveCfg = Release|Any CPU
+		{749431A9-1911-4361-AE08-AD91C99F43C5}.Release|x64.Build.0 = Release|Any CPU
+		{749431A9-1911-4361-AE08-AD91C99F43C5}.Release|x86.ActiveCfg = Release|Any CPU
+		{749431A9-1911-4361-AE08-AD91C99F43C5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -809,6 +823,7 @@ Global
 		{13BB3E3F-C4B2-4F76-ACE8-0D910A6CCA69} = {EC61DB68-353D-4825-B221-FADABA7ADFF3}
 		{844F634D-F7ED-44AA-A1F8-021144F429D1} = {149A8BC2-91D1-4249-9E1D-7B0054347832}
 		{BFBED7AA-8DC1-4307-A8B2-23339EEF8930} = {EC61DB68-353D-4825-B221-FADABA7ADFF3}
+		{749431A9-1911-4361-AE08-AD91C99F43C5} = {B2D034E4-684C-48C8-85C4-A74AFEDF9BEA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2759A62D-227A-4D68-B6B5-966B9141AA74}

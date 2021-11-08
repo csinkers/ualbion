@@ -1,19 +1,20 @@
 ﻿using System.Linq;
+using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting.Tests
 {
     public static class TestGraphs
     {
-        static DummyNode D(int num) => new(num.ToString());
-        static DummyNode D(string name) => new(name);
-        static DummyNode[] BuildNodes(int count) => Enumerable.Range(0, count).Select(D).ToArray();
+        static Statement D(int num) => Emit.Statement(Emit.Const(num));
+        static Statement D(string name) => Emit.Statement(Emit.Name(name));
+        static Statement[] BuildNodes(int count) => Enumerable.Range(0, count).Select(D).ToArray();
 
-        /* Sequence: 0 -> 1 -> 2  = 0;1;2 */
+        /* Sequence: 0 -> 1 -> 2  = 0,1,2 */
         public static readonly ControlFlowGraph Sequence = new(0, BuildNodes(3),
             new[] { (0, 1, true), (1, 2, true) });
 
         /* IfThen:
-           0--\   if(0) { 1 }; 2
+           0--\   if(0) { 1 }, 2
            t  |
            v  |
            1  f
@@ -23,7 +24,7 @@ namespace UAlbion.Scripting.Tests
             new[] { (0, 1, true), (1, 2, true), (0, 2, false) });
 
         /* IfThenElse:
-        0--\  if(0) { 1 } else { 2 }; 3
+        0--\  if(0) { 1 } else { 2 }, 3
         t  f
         v  v
         1  2
@@ -35,7 +36,7 @@ namespace UAlbion.Scripting.Tests
         /* Simple while loop:
             0
             v
-         /--1<-\   0; while(1) { }; 2
+         /--1<-\   0, while(1) { }, 2
          f  t  |
          |  \--/
          |
@@ -46,7 +47,7 @@ namespace UAlbion.Scripting.Tests
         /* WhileLoop:
             0
             v
-         /--1<-\   0; while(1) { 2 }; 3
+         /--1<-\   0, while(1) { 2 }, 3
          f  t  |
          |  v  |
          |  2--/
@@ -58,7 +59,7 @@ namespace UAlbion.Scripting.Tests
         /* DoWhileLoop:
             0
             v
-            1<-\   0; do { 1; } while(2); 3
+            1<-\   0, do { 1 } while(2), 3
             v  |
             2-t/
             f
@@ -69,10 +70,10 @@ namespace UAlbion.Scripting.Tests
 
         /* Graph1
            0
-           |<----\   0;
-           v     |   do { 1 } while (2 && 3);
+           |<----\   0
+           v     |   do { 1 } while (2 && 3)
            1-->2 |   while (4) { }
-              /t |   5;
+              /t |   5
            v-f v t
         /->4<f-3-/
         \t/f
@@ -124,33 +125,33 @@ namespace UAlbion.Scripting.Tests
             (3, 4, false), (4, 5, false), (4, 6, true), (5, 2, true), (6, 7, true), (8, 9, true),
             (9, 10, true), (10, 8, true), (9, 11, false), (11, 13, false), (11, 12, true),
             (12, 15, true), (13, 14, true), (14, 8, true), (14, 15, false), (15, 7, true) });
-        public static string LoopBranchCode => @"0;
+        public static string LoopBranchCode => @"0
 if (1) {
     while(2) {
         if (3) {
-            continue;
+            continue
         }
         if (4) {
-            break;
+            break
         }
-        5;
+        5
     }
-    6;
+    6
 }
 else {
     do {
-        8;
+        8
         if (9) {
-            10;
-            continue;
+            10
+            continue
         }
         if (11) {
-            12;
-            break;
+            12
+            break
         }
-        13;
-    } while(14);
-    9;
+        13
+    } while(14)
+    9
 }
 7";
 
@@ -172,23 +173,23 @@ else {
         public static readonly ControlFlowGraph BreakBranch = new(0, BuildNodes(12), new[] {
             (0, 1, true), (1, 2, true), (2, 3, true), (2, 8, false), (3, 4, true), (4, 5, false), (4, 6, true),
             (5, 7, true), (6, 7, true), (7, 11, true), (8, 9, true), (9, 10, true), (10, 1, true), (10, 11, false) });
-        public static string BreakBranchCode => @"0;
+        public static string BreakBranchCode => @"0
 do {
-    1; 
+    1 
     if (2) {
-        3;
+        3
         if (4) {
-            6;
+            6
         } else {
-            5;
+            5
         }
-        7;
-        break;
+        7
+        break
     }
-    8;
-    9;
-} while (10);
-11;";
+    8
+    9
+} while (10)
+11";
 
         /* 0
            v
@@ -203,15 +204,15 @@ do {
         public static readonly ControlFlowGraph BreakBranch2 = new(0, BuildNodes(6), new[] {
             (0, 1, true), (1, 2, true), (2, 3, true), (2, 5, false), (3, 4, true), (5, 1, true), (5, 4, false)
         });
-        public static string BreakBranch2Code => @"0;
+        public static string BreakBranch2Code => @"0
 do {
-    1; 
+    1 
     if (2) {
-        3;
-        break;
+        3
+        break
     }
-} while (5);
-4;";
+} while (5)
+4";
 
         /*########################\#/#########################\  if (A)
         #  No More Gotos figure 3  #                          #  {
@@ -362,17 +363,17 @@ do {
             });
 
         public static string NoMoreGotos3Region1Code => 
-@"A;
+@"A
 do {
     while (c1) {
-        n1;
+        n1
     }
     if (c2) {
-        n2;
-        break;
+        n2
+        break
     }
-    n3;
-} while (c3);";
+    n3
+} while (c3)";
 
         public static readonly ControlFlowGraph NoMoreGotos3Region2 =
             new(0, new[]
@@ -396,17 +397,17 @@ do {
             });
 
         public static string NoMoreGotos3Region2Code => 
-@"A;
+@"A
 if (!b1) {
-    n4;
+    n4
 }
 if (b1 && b2) {
-    n6;
+    n6
 }
 else {
-    n5;
+    n5
 }
-n7;";
+n7";
 
         public static readonly ControlFlowGraph NoMoreGotos3Region3 =
             new(0, new[]
@@ -428,11 +429,11 @@ n7;";
                 (4, 1, true),
             });
         public static string NoMoreGotos3Region3Code => 
-@"start;
+@"start
 while ((d1 && d3) || (!d1 && d2)) {
-    n8;
+    n8
 }
-n9;";
+n9";
 
         /* ZeroK if example
               0

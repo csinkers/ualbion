@@ -4,5 +4,6 @@
     {
         public override string ToString() => $"Label({Name})";
         public void Accept(IAstVisitor visitor) => visitor.Visit(this);
+        public int Priority => int.MaxValue;
     }
 }

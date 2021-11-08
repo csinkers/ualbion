@@ -1,7 +1,7 @@
 ﻿using UAlbion.Api;
 using UAlbion.Formats.Assets;
 
-namespace UAlbion.Formats.MapEvents
+namespace UAlbion.Formats.ScriptEvents
 {
     [Event("party_member_text")] // USED IN SCRIPT
     public class PartyMemberTextEvent : Event, IAsyncEvent

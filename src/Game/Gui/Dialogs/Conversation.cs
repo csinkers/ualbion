@@ -140,12 +140,12 @@ namespace UAlbion.Game.Gui.Dialogs
             TriggerLineAction(blockId, textId);
         }
 
-        public bool? OnText(TextEvent textEvent, Action continuation)
+        public bool? OnText(MapTextEvent mapTextEvent, Action continuation)
         {
-            if (textEvent == null) throw new ArgumentNullException(nameof(textEvent));
+            if (mapTextEvent == null) throw new ArgumentNullException(nameof(mapTextEvent));
             if (continuation == null) throw new ArgumentNullException(nameof(continuation));
             var tf = Resolve<ITextFormatter>();
-            switch(textEvent.Location)
+            switch(mapTextEvent.Location)
             {
                 case TextLocation.Conversation:
                 case TextLocation.NoPortrait:
@@ -156,7 +156,7 @@ namespace UAlbion.Game.Gui.Dialogs
                         continuation();
                     }
 
-                    var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
+                    var text = tf.Ink(FontColor.Yellow).Format(mapTextEvent.ToId());
                     DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
                     _textWindow.Text = text;
                     _textWindow.Clicked += OnConversationClicked;
@@ -165,14 +165,14 @@ namespace UAlbion.Game.Gui.Dialogs
 
                 case TextLocation.ConversationOptions:
                 {
-                    var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
+                    var text = tf.Ink(FontColor.Yellow).Format(mapTextEvent.ToId());
                     DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
                     _textWindow.Text = text;
 
                     var options = new List<(IText, int?, Action)>();
                     var blocks = text.GetBlocks().Select(x => x.BlockId).Distinct();
                     foreach (var blockId in blocks.Where(x => x > 0))
-                        options.Add((text, blockId, () => BlockClicked(blockId, textEvent.SubId)));
+                        options.Add((text, blockId, () => BlockClicked(blockId, mapTextEvent.SubId)));
 
                     var standardOptions = GetStandardOptions(tf);
                     _optionsWindow.SetOptions(options, standardOptions);
@@ -183,7 +183,7 @@ namespace UAlbion.Game.Gui.Dialogs
 
                 case TextLocation.ConversationQuery:
                 {
-                    var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
+                    var text = tf.Ink(FontColor.Yellow).Format(mapTextEvent.ToId());
 
                     DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
 
@@ -194,7 +194,7 @@ namespace UAlbion.Game.Gui.Dialogs
                         var options = new List<(IText, int?, Action)>();
                         var blocks = text.GetBlocks().Select(x => x.BlockId).Distinct();
                         foreach (var blockId in blocks.Where(x => x > 0))
-                            options.Add((text, blockId, () => BlockClicked(blockId, textEvent.SubId)));
+                            options.Add((text, blockId, () => BlockClicked(blockId, mapTextEvent.SubId)));
                         _optionsWindow.SetOptions(options, null);
                         _optionsWindow.IsActive = true;
 

@@ -101,7 +101,7 @@ namespace UAlbion.Game.Gui.Inventory
             // TODO: Determine the actual probabilities the game uses.
             var baseChance = (100.0f - _lockEvent.PickDifficulty) / 100.0f;
             var adjusted = baseChance * skill;
-            RaiseAsync(new QueryRandomChanceEvent(QueryOperation.GreaterThan, 0, (ushort)adjusted), continuation);
+            RaiseAsync(new QueryRandomChanceEvent((ushort)adjusted, QueryOperation.GreaterThan, 0), continuation);
         }
 
         void PickLock()

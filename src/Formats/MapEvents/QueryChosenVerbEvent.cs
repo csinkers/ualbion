@@ -9,15 +9,15 @@ namespace UAlbion.Formats.MapEvents
     public class QueryChosenVerbEvent : QueryEvent
     {
         public override QueryType QueryType => QueryType.ChosenVerb;
-        [EventPart("op")] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
-        [EventPart("imm")] public byte Immediate { get; private set; } // immediate value?
         [EventPart("arg")] public TriggerType TriggerType { get; set; }
+        [EventPart("op", true, QueryOperation.IsTrue)] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
+        [EventPart("imm", true, (byte)0)] public byte Immediate { get; private set; } // immediate value?
         QueryChosenVerbEvent() { }
-        public QueryChosenVerbEvent(QueryOperation operation, byte immediate, TriggerType triggerType)
+        public QueryChosenVerbEvent(TriggerType triggerType, QueryOperation operation, byte immediate)
         {
+            TriggerType = triggerType;
             Operation = operation;
             Immediate = immediate;
-            TriggerType = triggerType;
         }
         public static QueryChosenVerbEvent Serdes(QueryChosenVerbEvent e, ISerializer s)
         {
@@ -28,7 +28,7 @@ namespace UAlbion.Formats.MapEvents
             int zeroes = s.UInt8(null, 0);
             zeroes += s.UInt8(null, 0);
             e.TriggerType = s.EnumU16(nameof(TriggerType), e.TriggerType);
-            // field 8 is the next event id when the condition is and is deserialised as part of the BranchEventNode that this event should belong to.
+            // field 8 is the next event id when the condition is false and is deserialised as part of the BranchEventNode that this event should belong to.
 
             s.Assert(zeroes == 0, "QueryChosenVerbEvent: Expected fields 3,4 to be 0");
             return e;

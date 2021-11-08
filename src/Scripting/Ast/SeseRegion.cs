@@ -17,5 +17,6 @@ namespace UAlbion.Scripting.Ast
         public ImmutableArray<int> CodeNodes { get; }
         public override string ToString() => "SESE";
         public void Accept(IAstVisitor visitor) => visitor.Visit(this);
+        public int Priority => int.MaxValue;
     }
 }

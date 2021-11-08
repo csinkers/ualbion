@@ -48,7 +48,15 @@ namespace UAlbion.Scripting
         public void Visit(ContinueStatement continueStatement) { Indent(); _sb.Append("continue"); }
         public void Visit(EmptyNode empty) { }
         public void Visit(Name name) => _sb.Append(name.Value);
-        public void Visit(Negation negation) { _sb.Append('!'); negation.Expression.Accept(this); }
+
+        public void Visit(Negation negation)
+        {
+            _sb.Append('!');
+            bool parens = negation.Expression.Priority > negation.Priority;
+            if (parens) _sb.Append('(');
+            negation.Expression.Accept(this);
+            if (parens) _sb.Append(')');
+        }
         public void Visit(Numeric numeric) => _sb.Append(numeric.Value);
 
         public void Visit(IfThen ifThen)
@@ -155,28 +163,21 @@ namespace UAlbion.Scripting
             _sb.Append(":");
         }
 
-        public void Visit(Indexed index)
-        {
-            index.Parent.Accept(this);
-            _sb.Append('[');
-            index.Index.Accept(this);
-            _sb.Append(']');
-        }
-
-        public void Visit(Member member)
-        {
-            member.Parent.Accept(this);
-            _sb.Append('.');
-            member.Child.Accept(this);
-        }
-
         public void Visit(BinaryOp binaryOp)
         {
+            bool parens = binaryOp.Left.Priority > binaryOp.Priority;
+            if (parens) _sb.Append('(');
             binaryOp.Left.Accept(this);
-            _sb.Append(' ');
+            if (parens) _sb.Append(')');
+
+            if(binaryOp.Operation != ScriptOp.Member) _sb.Append(' ');
             _sb.Append(binaryOp.Operation.ToPseudocode());
-            _sb.Append(' ');
+            if (binaryOp.Operation != ScriptOp.Member) _sb.Append(' ');
+
+            parens = binaryOp.Right.Priority > binaryOp.Priority;
+            if (parens) _sb.Append('(');
             binaryOp.Right.Accept(this);
+            if (parens) _sb.Append(')');
         }
     }
 }

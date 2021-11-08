@@ -34,10 +34,10 @@ namespace UAlbion.Formats.MapEvents
 
         [EventPart("id")] public DoorId DoorId { get; private set; }
         [EventPart("text_src")] public TextId TextSource { get; }
-        [EventPart("key_id")] public ItemId Key { get; private set; }
-        [EventPart("difficulty", true, "0")] public byte PickDifficulty { get; private set; }
-        [EventPart("open_text", true, "255")] public byte OpenedText { get; private set; }
-        [EventPart("unlock_text", true, "255")] public byte UnlockedText { get; private set; }
+        [EventPart("key_id", true, "None")] public ItemId Key { get; private set; }
+        [EventPart("difficulty", true, (byte)0)] public byte PickDifficulty { get; private set; }
+        [EventPart("open_text", true, (byte)255)] public byte OpenedText { get; private set; }
+        [EventPart("unlock_text", true, (byte)255)] public byte UnlockedText { get; private set; }
         public override MapEventType EventType => MapEventType.Door;
     }
 }

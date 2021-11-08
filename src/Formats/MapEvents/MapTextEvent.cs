@@ -7,10 +7,10 @@ using UAlbion.Formats.Assets;
 namespace UAlbion.Formats.MapEvents
 {
     [Event("map_text")]
-    public class TextEvent : MapEvent, ITextEvent, IAsyncEvent
+    public class MapTextEvent : MapEvent, ITextEvent, IAsyncEvent
     {
-        TextEvent(TextId textSourceId) => TextSource = textSourceId;
-        public TextEvent(TextId textSourceId, byte subId, TextLocation? location, CharacterId characterId)
+        MapTextEvent(TextId textSourceId) => TextSource = textSourceId;
+        public MapTextEvent(TextId textSourceId, byte subId, TextLocation? location, CharacterId characterId)
         {
             TextSource = textSourceId;
             SubId = subId;
@@ -18,9 +18,9 @@ namespace UAlbion.Formats.MapEvents
             CharacterId = characterId;
         }
 
-        public static TextEvent Serdes(TextEvent e, AssetMapping mapping, ISerializer s, TextId textSourceId)
+        public static MapTextEvent Serdes(MapTextEvent e, AssetMapping mapping, ISerializer s, TextId textSourceId)
         {
-            e ??= new TextEvent(textSourceId);
+            e ??= new MapTextEvent(textSourceId);
             if (e.TextSource != textSourceId)
                 throw new InvalidOperationException($"Called Serdes on a TextEvent with source id {e.TextSource} but passed in source id {textSourceId}");
 
@@ -40,7 +40,7 @@ namespace UAlbion.Formats.MapEvents
         [EventPart("text")] public TextId TextSource { get; private set; }
         [EventPart("sub_id")] public byte SubId { get; private set; }
         [EventPart("location")] public TextLocation? Location { get; private set; }
-        [EventPart("char")] public CharacterId CharacterId { get; private set; }
+        [EventPart("char", true, "None")] public CharacterId CharacterId { get; private set; }
 
         AssetType CharacterType => Location switch
         {

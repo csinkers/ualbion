@@ -32,7 +32,7 @@ namespace UAlbion.Formats.MapEvents
 
         [EventPart("op")] public NumericOperation Operation { get; private set; }
         [EventPart("amount")] public ushort Amount { get; private set; }
-        [EventPart("unk3", true, "0")] public byte Unk3 { get; private set; }
+        [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
         public override ModifyType SubType => ModifyType.PartyRations;
     }
 }

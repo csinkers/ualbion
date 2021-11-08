@@ -4,5 +4,6 @@
     {
         public override string ToString() => $"Negation({Expression})";
         public void Accept(IAstVisitor visitor) => visitor.Visit(this);
+        public int Priority => 2;
     }
 }

@@ -25,6 +25,8 @@ namespace UAlbion.Scripting.Ast
         }
 
         public void Accept(IAstVisitor visitor) => visitor.Visit(this);
+        public int Priority => int.MaxValue;
+
         public bool Equals(Statement other)
         {
             if (ReferenceEquals(null, other)) return false;

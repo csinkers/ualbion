@@ -329,7 +329,7 @@ namespace UAlbion
                 sw.WriteLine("    Chain Offsets: " + string.Join(", ", eventSet.Chains.Select((x, i) => $"{i}:{x}")));
                 foreach (var e in eventSet.Events)
                 {
-                    if (e.Event is TextEvent textEvent)
+                    if (e.Event is MapTextEvent textEvent)
                     {
                         var textSource = tf.Format(textEvent.ToId());
                         var text = string.Join(", ", textSource.GetBlocks().Select(x => x.Text));

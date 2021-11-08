@@ -8,13 +8,13 @@ namespace UAlbion.Game.Debugging
 {
     public class FormatTextEventBehaviour : IDebugBehaviour
     {
-        public ReadOnlyCollection<Type> HandledTypes { get; } = new(new[] { typeof(TextEvent) });
+        public ReadOnlyCollection<Type> HandledTypes { get; } = new(new[] { typeof(MapTextEvent) });
         public object Handle(DebugInspectorAction action, ReflectedObject reflected, EventExchange exchange)
         {
             if (exchange == null || reflected == null || action != DebugInspectorAction.Format)
                 return null;
 
-            if (reflected.Target is not TextEvent text)
+            if (reflected.Target is not MapTextEvent text)
                 return null;
 
             IText textSource = exchange.Resolve<ITextFormatter>()?.Format(text.ToId());

@@ -33,7 +33,7 @@ namespace UAlbion.Formats.MapEvents
 
         [EventPart("op")] public SwitchOperation Operation { get; private set; } // 0,1,2
         [EventPart("switch")] public SwitchId SwitchId { get; private set; } // [0..599]
-        [EventPart("unk3", true, "0")] public byte Unk3 { get; private set; } // 0,1,21
+        [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; } // 0,1,21
         public override ModifyType SubType => ModifyType.Switch;
     }
 }

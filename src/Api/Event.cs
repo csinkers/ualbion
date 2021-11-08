@@ -54,19 +54,15 @@ namespace UAlbion.Api
             }
         }
 
-        public override string ToString()
-        {
-            if (Serializers.TryGetValue(GetType(), out var metadata))
-                return metadata.Serialize(this, false);
-            return GetType().Name;
-        }
+        public override string ToString() =>
+            Serializers.TryGetValue(GetType(), out var metadata)
+                ? metadata.Serialize(this, false)
+                : GetType().Name;
 
-        public string ToStringNumeric()
-        {
-            if (Serializers.TryGetValue(GetType(), out var metadata))
-                return metadata.Serialize(this, true);
-            return GetType().Name;
-        }
+        public string ToStringNumeric() =>
+            Serializers.TryGetValue(GetType(), out var metadata)
+                ? metadata.Serialize(this, true)
+                : GetType().Name;
 
         public static IEnumerable<EventMetadata> GetEventMetadata() =>
             Events.Values.OrderBy(x => x.Name);
@@ -154,7 +150,12 @@ namespace UAlbion.Api
                     if (i < parts.Length)
                         newParts[i] = parts[i];
                     else
-                        newParts[i] = metadata.Parts[i - 1].Default;
+                    {
+                        var sb = new StringBuilder();
+                        var part = metadata.Parts[i - 1];
+                        EventMetadata.SerializePart(sb, part, part.Default, false);
+                        newParts[i] = sb.ToString();
+                    }
                 }
                 parts = newParts;
             }
@@ -162,6 +163,11 @@ namespace UAlbion.Api
             try
             {
                 return metadata.Parser(parts);
+            }
+            catch (ArgumentException ex)
+            {
+                ApiUtil.Assert($"Failed to parse \"{s}\" as a {metadata.Name} ({metadata.Type}): {ex.Message}");
+                return null;
             }
             catch (FormatException ex)
             {

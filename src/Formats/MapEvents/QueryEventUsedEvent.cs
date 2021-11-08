@@ -4,7 +4,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    [Event("query_event_used")]
+    [Event("event_used")]
     public class QueryEventUsedEvent : QueryEvent
     {
         public override QueryType QueryType => QueryType.EventUsed;
@@ -27,7 +27,7 @@ namespace UAlbion.Formats.MapEvents
             int zeroes = s.UInt8(null, 0);
             zeroes += s.UInt8(null, 0);
             e.Argument = s.UInt16(nameof(Argument), e.Argument);
-            // field 8 is the next event id when the condition is and is deserialised as part of the BranchEventNode that this event should belong to.
+            // field 8 is the next event id when the condition is false and is deserialised as part of the BranchEventNode that this event should belong to.
 
             s.Assert(zeroes == 0, "QueryEventUsedEvent: Expected fields 3,4 to be 0");
             return e;

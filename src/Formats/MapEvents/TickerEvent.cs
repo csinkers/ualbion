@@ -37,7 +37,7 @@ namespace UAlbion.Formats.MapEvents
         [EventPart("")] public TickerId TickerId { get; private set; }
         [EventPart("")] public NumericOperation Operation { get; private set; }
         [EventPart("")] public byte Amount { get; private set; }
-        [EventPart("", true, "0")] public byte Unk4 { get; private set; } // 0, 1
+        [EventPart("", true, (byte)0)] public byte Unk4 { get; private set; } // 0, 1
         public override ModifyType SubType => ModifyType.Ticker;
     }
 }

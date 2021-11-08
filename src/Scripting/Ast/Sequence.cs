@@ -15,5 +15,6 @@ namespace UAlbion.Scripting.Ast
             if (ReferenceEquals(Statements, other.Statements)) return true;
             return Statements != null && other.Statements != null && Statements.SequenceEqual(other.Statements);
         }
+        public int Priority => int.MaxValue;
     }
 }

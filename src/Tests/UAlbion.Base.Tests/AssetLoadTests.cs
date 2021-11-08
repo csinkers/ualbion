@@ -198,7 +198,7 @@ namespace UAlbion.Base.Tests
                 {
                     Assert.Equal(2, x.Id);
                     Assert.Null(x.Next);
-                    var e = (TextEvent)x.Event;
+                    var e = (MapTextEvent)x.Event;
                     Assert.Equal(EventText.Frill, e.TextSource);
                     Assert.Equal(7, e.SubId);
                     Assert.Equal(TextLocation.NoPortrait, e.Location);

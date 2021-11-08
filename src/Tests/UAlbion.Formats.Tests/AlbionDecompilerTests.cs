@@ -89,19 +89,19 @@ namespace UAlbion.Formats.Tests
         public void DecompileTest()
         {
             const string script = 
-@"!0?1:2: query_verb IsTrue 0 Examine
+@"!0?1:2: query_verb Examine
  1=>!: map_text MapText.Jirinaar 37 NoPortrait None ; ""The door to the house of the Hunter Clan. It is secured with a lock.""
 !2?3:!: open_door Door.HunterClan MapText.Jirinaar Item.HunterClanKey 100 32 33
-!3?4:!: query_previous_action_result IsTrue 0 0
+!3?4:!: result
  4=>5: modify_unk2 0 0 0 0 101 0
  5=>!: teleport Map.HunterClan 69 67 Unchanged 255 0";
 
             string expected = 
-@"if (query_verb IsTrue 0 Examine) {
-    map_text MapText.Jirinaar 37 NoPortrait None
+@"if (query_verb Examine) {
+    map_text MapText.Jirinaar 37 NoPortrait
 } else {
     if (open_door Door.HunterClan MapText.Jirinaar Item.HunterClanKey 100 32 33) {
-        if (query_previous_action_result IsTrue 0 0) {
+        if (result) {
             modify_unk2 0 0 0 0 101 0
             teleport Map.HunterClan 69 67 Unchanged 255 0
         }

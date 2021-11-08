@@ -1,8 +1,10 @@
 ﻿using System;
 using SerdesNet;
+using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
+    [Event("ask_surrender")]
     public class AskSurrenderEvent : MapEvent
     {
         public static AskSurrenderEvent Serdes(AskSurrenderEvent e, ISerializer s)

@@ -10,9 +10,7 @@
         void Visit(EmptyNode empty);
         void Visit(IfThen ifThen);
         void Visit(IfThenElse ifElse);
-        void Visit(Indexed index);
         void Visit(Label label);
-        void Visit(Member member);
         void Visit(Name name);
         void Visit(Negation negation);
         void Visit(Numeric numeric);

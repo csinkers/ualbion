@@ -71,7 +71,7 @@ namespace UAlbion.Game.Gui.Inventory
             if (e is ILockedInventoryEvent locked && locked.OpenedText != 255)
             {
                 var state = Resolve<IGameState>();
-                Raise(new TextEvent(state.MapId.ToMapText(), locked.OpenedText, TextLocation.NoPortrait, NpcId.None));
+                Raise(new MapTextEvent(state.MapId.ToMapText(), locked.OpenedText, TextLocation.NoPortrait, NpcId.None));
             }
         }
 

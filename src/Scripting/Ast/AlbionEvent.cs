@@ -6,5 +6,6 @@ namespace UAlbion.Scripting.Ast
     {
         public override string ToString() => Event.ToString();
         public void Accept(IAstVisitor visitor) => visitor.Visit(this);
+        public int Priority => int.MaxValue;
     }
 }

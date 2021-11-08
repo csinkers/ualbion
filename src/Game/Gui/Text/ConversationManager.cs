@@ -3,6 +3,7 @@ using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Dialogs;
 using UAlbion.Game.State;
@@ -17,7 +18,7 @@ namespace UAlbion.Game.Gui.Text
         public ConversationManager()
         {
             OnAsync<ContextTextEvent>(OnTextEvent);
-            OnAsync<TextEvent>(OnBaseTextEvent);
+            OnAsync<MapTextEvent>(OnBaseTextEvent);
             OnAsync<NpcTextEvent>(OnNpcTextEvent);
             OnAsync<PartyMemberTextEvent>(OnPartyMemberTextEvent);
             OnAsync<StartDialogueEvent>(StartDialogue);
@@ -31,37 +32,36 @@ namespace UAlbion.Game.Gui.Text
 
         bool OnNpcTextEvent(NpcTextEvent e, Action continuation)
         {
-            var textEvent = new TextEvent(ContextTextSource, e.TextId, TextLocation.PortraitLeft, e.NpcId);
+            var textEvent = new MapTextEvent(ContextTextSource, e.TextId, TextLocation.PortraitLeft, e.NpcId);
             return OnBaseTextEvent(textEvent, continuation);
         }
 
         bool OnPartyMemberTextEvent(PartyMemberTextEvent e, Action continuation)
         {
-            var party = Resolve<IParty>();
-            var textEvent = new TextEvent(ContextTextSource, e.TextId, TextLocation.PortraitLeft, e.MemberId);
+            var textEvent = new MapTextEvent(ContextTextSource, e.TextId, TextLocation.PortraitLeft, e.MemberId);
             return OnBaseTextEvent(textEvent, continuation);
         }
 
         bool OnTextEvent(ContextTextEvent e, Action continuation)
         {
-            var textEvent = new TextEvent(ContextTextSource, e.TextId, e.Location, e.NpcId ?? NpcId.None);
+            var textEvent = new MapTextEvent(ContextTextSource, e.TextId, e.Location, e.NpcId ?? NpcId.None);
             return OnBaseTextEvent(textEvent, continuation);
         }
 
-        bool OnBaseTextEvent(TextEvent textEvent, Action continuation)
+        bool OnBaseTextEvent(MapTextEvent mapTextEvent, Action continuation)
         {
-            var conversationResult = _conversation?.OnText(textEvent, continuation);
+            var conversationResult = _conversation?.OnText(mapTextEvent, continuation);
             if (conversationResult.HasValue)
                 return conversationResult.Value;
 
             var tf = Resolve<ITextFormatter>();
-            switch(textEvent.Location)
+            switch(mapTextEvent.Location)
             {
                 case null:
                 case TextLocation.NoPortrait:
                 {
-                    var dialog = AttachChild(new TextDialog(tf.Format(textEvent.ToId())));
-                    dialog.Closed += (sender, _) => continuation();
+                    var dialog = AttachChild(new TextDialog(tf.Format(mapTextEvent.ToId())));
+                    dialog.Closed += (_, _) => continuation();
                     return true;
                 }
 
@@ -69,17 +69,17 @@ namespace UAlbion.Game.Gui.Text
                 case TextLocation.PortraitLeft2:
                 case TextLocation.PortraitLeft3:
                 {
-                    var portraitId = GetPortrait(textEvent.CharacterId);
-                    if (textEvent.Location == TextLocation.PortraitLeft2) // TODO: ??? work out how this is meant to work.
+                    var portraitId = GetPortrait(mapTextEvent.CharacterId);
+                    if (mapTextEvent.Location == TextLocation.PortraitLeft2) // TODO: ??? work out how this is meant to work.
                         portraitId = Base.Portrait.Rainer;
-                    var text = tf.Ink(FontColor.Yellow).Format(textEvent.ToId());
+                    var text = tf.Ink(FontColor.Yellow).Format(mapTextEvent.ToId());
                     var dialog = AttachChild(new TextDialog(text, portraitId));
-                    dialog.Closed += (sender, _) => continuation();
+                    dialog.Closed += (_, _) => continuation();
                     return true;
                 }
 
                 case TextLocation.QuickInfo:
-                    Raise(new DescriptionTextEvent(tf.Format(textEvent.ToId())));
+                    Raise(new DescriptionTextEvent(tf.Format(mapTextEvent.ToId())));
                     continuation();
                     return true;
 
@@ -90,7 +90,7 @@ namespace UAlbion.Game.Gui.Text
                     break; // Handled by Conversation
 
                 default:
-                    Raise(new DescriptionTextEvent(tf.Format(textEvent.ToId()))); // TODO:
+                    Raise(new DescriptionTextEvent(tf.Format(mapTextEvent.ToId()))); // TODO:
                     continuation();
                     return true;
             }
@@ -104,7 +104,7 @@ namespace UAlbion.Game.Gui.Text
                 return Base.Portrait.GibtEsNicht;
 
             var sheet = Resolve<IGameState>().GetSheet(id);
-            if (sheet != null && !sheet.PortraitId.IsNone)
+            if (sheet is { PortraitId: { IsNone: false } })
                 return sheet.PortraitId;
             var leader = Resolve<IParty>().Leader.Effective;
             return leader.PortraitId;
@@ -122,7 +122,7 @@ namespace UAlbion.Game.Gui.Text
             }
 
             _conversation = AttachChild(new Conversation(party?.Leader.Id ?? Base.PartyMember.Tom, npc));
-            _conversation.Complete += (sender, args) => { _conversation = null; continuation(); };
+            _conversation.Complete += (_, _) => { _conversation = null; continuation(); };
             _conversation.StartDialogue();
             return true;
         }
@@ -139,7 +139,7 @@ namespace UAlbion.Game.Gui.Text
             }
 
             _conversation = AttachChild(new Conversation(Base.PartyMember.Tom, npc));
-            _conversation.Complete += (sender, args) => { _conversation = null; continuation(); };
+            _conversation.Complete += (_, _) => { _conversation = null; continuation(); };
             _conversation.StartDialogue();
             return true;
         }

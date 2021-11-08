@@ -21,6 +21,9 @@ namespace UAlbion.Api
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
             var eventAttribute = (EventAttribute)type.GetCustomAttribute(typeof(EventAttribute), false);
+            if (eventAttribute == null)
+                throw new InvalidOperationException($"Event type {type} is missing an Event attribute");
+
             var properties = type.GetProperties();
             Type = type;
             Name = eventAttribute.Name;
@@ -41,24 +44,55 @@ namespace UAlbion.Api
                 if (parameters.Length == 1 && parameters[0].ParameterType == typeof(string[]))
                 {
                     Parser = (Func<string[], Event>)Expression.Lambda(
-                    Expression.Convert(
-                        Expression.Call(parser, partsParameter), typeof(Event)),
-                    partsParameter).Compile();
+                        Expression.Convert(
+                            Expression.Call(parser, partsParameter), typeof(Event)),
+                        partsParameter).Compile();
                 }
             }
 
-            Parser ??= BuildParser(partsParameter);
+            try { Parser ??= BuildParser(partsParameter); }
+            catch (ArgumentException e)
+            {
+                throw new ArgumentException(e.Message + " when constructing parser for " + type.Name, e);
+            }
         }
 
         public string Serialize(object instance, bool useNumericIds)
         {
             var sb = new StringBuilder();
             sb.Append(Name);
-            foreach (var part in Parts)
+
+            int skipCount = 0;
+            for (int i = Parts.Count - 1; i >= 0; i--)
             {
+                var part = Parts[i];
+                if (!part.IsOptional || part.Default == null)
+                    break;
+
+                var value = part.Getter(instance);
+                if (Equals(value, part.Default))
+                    skipCount++;
+                else break;
+            }
+
+            for (var index = 0; index < Parts.Count - skipCount; index++)
+            {
+                var part = Parts[index];
                 sb.Append(' ');
                 var value = part.Getter(instance);
-                if (part.PropertyType == typeof(string) && value is string s)
+                SerializePart(sb, part, value, useNumericIds);
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+        public static void SerializePart(StringBuilder sb, EventPartMetadata part, object value, bool useNumericIds)
+        {
+            if (sb == null) throw new ArgumentNullException(nameof(sb));
+            if (part == null) throw new ArgumentNullException(nameof(part));
+            switch (value)
+            {
+                case string s when part.PropertyType == typeof(string):
                 {
                     sb.Append('"');
                     foreach (var c in s)
@@ -71,25 +105,25 @@ namespace UAlbion.Api
                             default: sb.Append(c); break;
                         }
                     }
-                    sb.Append('"');
-                }
-                else if (value is IAssetId id)
-                {
-                    sb.Append(useNumericIds ? id.ToStringNumeric() : id.ToString());
-                }
-                else if (value is Enum enumValue)
-                {
-                    if (useNumericIds)
-                    {
-                        object numeric = Convert.ChangeType(enumValue, enumValue.GetTypeCode(), CultureInfo.InvariantCulture);
-                        sb.Append(numeric);
-                    }
-                    else sb.Append(enumValue);
-                }
-                else sb.Append(value);
-            }
 
-            return sb.ToString().TrimEnd();
+                    sb.Append('"');
+                    break;
+                }
+
+                case IAssetId id:
+                    sb.Append(useNumericIds ? id.ToStringNumeric() : id.ToString());
+                    break;
+
+                case Enum enumValue when useNumericIds:
+                {
+                    object numeric = Convert.ChangeType(enumValue, enumValue.GetTypeCode(), CultureInfo.InvariantCulture);
+                    sb.Append(numeric);
+                    break;
+                }
+
+                case Enum enumValue: sb.Append(enumValue); break;
+                default: sb.Append(value); break;
+            }
         }
 
         Func<string[], Event> BuildParser(ParameterExpression partsParameter)

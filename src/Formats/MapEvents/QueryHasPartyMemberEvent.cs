@@ -6,7 +6,7 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents
 {
-    [Event("query_has_party_member")]
+    [Event("party_has")]
     public class QueryHasPartyMemberEvent : QueryEvent
     {
         public override QueryType QueryType => QueryType.HasPartyMember;
@@ -29,7 +29,7 @@ namespace UAlbion.Formats.MapEvents
             int zeroes = s.UInt8(null, 0);
             zeroes += s.UInt8(null, 0);
             e.PartyMemberId = PartyMemberId.SerdesU16(nameof(PartyMemberId), e.PartyMemberId, mapping, s);
-            // field 8 is the next event id when the condition is and is deserialised as part of the BranchEventNode that this event should belong to.
+            // field 8 is the next event id when the condition is false and is deserialised as part of the BranchEventNode that this event should belong to.
 
             s.Assert(zeroes == 0, "QueryHasPartyMemberEvent: Expected fields 3,4 to be 0");
             return e;

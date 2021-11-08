@@ -24,57 +24,43 @@ namespace UAlbion.Scripting
                     Token.EqualTo(ScriptToken.RParen))
                 .Or(Identifier);
 
-        public static readonly TokenListParser<ScriptToken, ICfgNode> Member =
-            Parse.Chain(Token.EqualTo(ScriptToken.Dot), Factor, MakeMember);
-
-        static ICfgNode MakeMember(Token<ScriptToken> _, ICfgNode parent, ICfgNode child) => new Member(parent, child);
-
-        // (from owner in Identifier
-            // from _ in Token.EqualTo(ScriptToken.Dot)
-            // from child in Parse.Ref(() => Expression)
-            // select (ICfgNode)Emit.Member(owner, child)).Named("Member");
-
-        public static readonly TokenListParser<ScriptToken, ICfgNode> Indexer = 
-            (from owner in Factor
-            from lb in Token.EqualTo(ScriptToken.LBracket)
-            from child in Factor
-            from rb in Token.EqualTo(ScriptToken.RBracket)
-            select (ICfgNode)Emit.Index(owner, child)).Named("Indexer");
 
         public static readonly TokenListParser<ScriptToken, ICfgNode> Negation =
             (from op in Token.EqualTo(ScriptToken.Not)
             from val in Factor
             select (ICfgNode)Emit.Negation(val)).Named("Negation");
 
-        public static readonly TokenListParser<ScriptToken, Operation> Eq  = Token.EqualTo(ScriptToken.Equal).Value(Operation.Equal);
-        public static readonly TokenListParser<ScriptToken, Operation> Neq = Token.EqualTo(ScriptToken.NotEqual).Value(Operation.NotEqual);
-        public static readonly TokenListParser<ScriptToken, Operation> Gt  = Token.EqualTo(ScriptToken.Greater).Value(Operation.Greater);
-        public static readonly TokenListParser<ScriptToken, Operation> Gte = Token.EqualTo(ScriptToken.GreaterEqual).Value(Operation.GreaterEqual);
-        public static readonly TokenListParser<ScriptToken, Operation> Lte = Token.EqualTo(ScriptToken.LesserEqual).Value(Operation.LesserEqual);
-        public static readonly TokenListParser<ScriptToken, Operation> Lt  = Token.EqualTo(ScriptToken.Lesser).Value(Operation.Lesser);
-        public static readonly TokenListParser<ScriptToken, Operation> Assign = Token.EqualTo(ScriptToken.Assign).Value(Operation.Assign);
-        public static readonly TokenListParser<ScriptToken, Operation> Add = Token.EqualTo(ScriptToken.Add).Value(Operation.Add);
-        public static readonly TokenListParser<ScriptToken, Operation> Sub = Token.EqualTo(ScriptToken.Sub).Value(Operation.Subtract);
-        public static readonly TokenListParser<ScriptToken, Operation> And = Token.EqualTo(ScriptToken.And).Value(Operation.And);
-        public static readonly TokenListParser<ScriptToken, Operation> Or = Token.EqualTo(ScriptToken.Or).Value(Operation.Or);
+        public static readonly TokenListParser<ScriptToken, ScriptOp> Member = Token.EqualTo(ScriptToken.Dot).Value(ScriptOp.Member);
+        public static readonly TokenListParser<ScriptToken, ScriptOp> Eq  = Token.EqualTo(ScriptToken.Equal).Value(ScriptOp.Equal);
+        public static readonly TokenListParser<ScriptToken, ScriptOp> Neq = Token.EqualTo(ScriptToken.NotEqual).Value(ScriptOp.NotEqual);
+        public static readonly TokenListParser<ScriptToken, ScriptOp> Gt  = Token.EqualTo(ScriptToken.Greater).Value(ScriptOp.Greater);
+        public static readonly TokenListParser<ScriptToken, ScriptOp> Gte = Token.EqualTo(ScriptToken.GreaterEqual).Value(ScriptOp.GreaterEqual);
+        public static readonly TokenListParser<ScriptToken, ScriptOp> Lte = Token.EqualTo(ScriptToken.LesserEqual).Value(ScriptOp.LesserEqual);
+        public static readonly TokenListParser<ScriptToken, ScriptOp> Lt  = Token.EqualTo(ScriptToken.Lesser).Value(ScriptOp.Lesser);
+        public static readonly TokenListParser<ScriptToken, ScriptOp> Assign = Token.EqualTo(ScriptToken.Assign).Value(ScriptOp.Assign);
+        public static readonly TokenListParser<ScriptToken, ScriptOp> Add = Token.EqualTo(ScriptToken.Add).Value(ScriptOp.Add);
+        public static readonly TokenListParser<ScriptToken, ScriptOp> Sub = Token.EqualTo(ScriptToken.Sub).Value(ScriptOp.Subtract);
+        public static readonly TokenListParser<ScriptToken, ScriptOp> And = Token.EqualTo(ScriptToken.And).Value(ScriptOp.And);
+        public static readonly TokenListParser<ScriptToken, ScriptOp> Or = Token.EqualTo(ScriptToken.Or).Value(ScriptOp.Or);
 
         /*
-        1 () [] . (postfix inc/dec) LtR
-        2 ! (prefix inc/dec)        RtL
-        3 < <= > >=                       LtR
-        4 == !=                           LtR
-        5 &&                              LtR
-        6 ||                              LtR
-        7 = += -=                         RtL
-        8 ,                               LtR */
+        1 LtR () [] . (postfix inc/dec)
+        2 RtL ! (prefix inc/dec)       
+        3 LtR < <= > >=                
+        4 LtR == !=                    
+        5 LtR &&                       
+        6 LtR ||                       
+        7 RtL = += -=                  
+        8 LtR , 
+        */
 
-        public static readonly TokenListParser<ScriptToken, ICfgNode> Op1 = Indexer.Try().Or(Member);
+        public static readonly TokenListParser<ScriptToken, ICfgNode> Op1 = Parse.Chain(Member, Factor, Emit.Op);
         public static readonly TokenListParser<ScriptToken, ICfgNode> Op2 = Negation.Or(Op1);
         public static readonly TokenListParser<ScriptToken, ICfgNode> Op3 = Parse.Chain(Lte.Or(Lt).Or(Gte).Or(Gt), Op2, Emit.Op);
         public static readonly TokenListParser<ScriptToken, ICfgNode> Op4 = Parse.Chain(Eq.Or(Neq), Op3, Emit.Op);
         public static readonly TokenListParser<ScriptToken, ICfgNode> Op5 = Parse.Chain(And, Op4, Emit.Op);
         public static readonly TokenListParser<ScriptToken, ICfgNode> Op6 = Parse.Chain(Or, Op5, Emit.Op);
-        public static readonly TokenListParser<ScriptToken, ICfgNode> Op7 = Parse.Chain(Assign.Or(Add).Or(Sub), Op6, Emit.Op);
+        public static readonly TokenListParser<ScriptToken, ICfgNode> Op7 = Parse.ChainRight(Assign.Or(Add).Or(Sub), Op6, Emit.Op);
 
         public static readonly TokenListParser<ScriptToken, ICfgNode> Expression = Op7.Named("Expression");
 
@@ -155,7 +141,7 @@ namespace UAlbion.Scripting
             .Or(Block)
             .Named("Statement");
 
-        public static readonly TokenListParser<ScriptToken, ICfgNode> TopLevel = Sequence;
+        public static readonly TokenListParser<ScriptToken, ICfgNode> TopLevel = Sequence.AtEnd();
 
         public static bool TryParse(string source, out ICfgNode abstractSyntaxTree, out string error, out Position errorPosition)
         {

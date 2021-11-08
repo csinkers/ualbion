@@ -25,7 +25,7 @@ namespace UAlbion.Formats
         {
             if (e == null) throw new ArgumentNullException(nameof(e));
             var nodeText = e.ToString(idOffset);
-            if (e.Event is TextEvent textEvent)
+            if (e.Event is MapTextEvent textEvent)
             {
                 var text = _stringLoadFunc(new StringId(_textSourceId, textEvent.SubId));
                 return $"{nodeText} // \"{text}\"";

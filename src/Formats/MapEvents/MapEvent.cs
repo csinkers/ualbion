@@ -43,7 +43,7 @@ namespace UAlbion.Formats.MapEvents
                 MapEventType.Sound => SoundEvent.Serdes((SoundEvent)e, mapping, s),
                 MapEventType.Spinner => SpinnerEvent.Serdes((SpinnerEvent)e, s),
                 MapEventType.StartDialogue => StartDialogueEvent.Serdes((StartDialogueEvent)e, mapping, s),
-                MapEventType.Text => TextEvent.Serdes((TextEvent)e, mapping, s, textSourceId),
+                MapEventType.Text => MapTextEvent.Serdes((MapTextEvent)e, mapping, s, textSourceId),
                 MapEventType.Trap => TrapEvent.Serdes((TrapEvent)e, s),
                 MapEventType.Wipe => WipeEvent.Serdes((WipeEvent)e, s),
                 _ => DummyMapEvent.Serdes((DummyMapEvent)e, s, type)

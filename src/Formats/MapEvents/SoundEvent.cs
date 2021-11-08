@@ -38,18 +38,18 @@ namespace UAlbion.Formats.MapEvents
             e.FrequencyOverride = s.UInt16(nameof(FrequencyOverride), e.FrequencyOverride);
             int zeroed = s.UInt16(null, 0);
             s.Assert(e.Unk3 <= 100, "SoundEvent: Expected unk3 to be <= 100");
-            s.Assert(e.Volume <= 150, "SoundEvent: Expected volumn to be <= 150");
+            s.Assert(e.Volume <= 150, "SoundEvent: Expected volume to be <= 150");
             s.Assert(e.RestartProbability <= 102, "SoundEvent: Expected restart probability to be <= 102");
             s.Assert(zeroed == 0, "SoundEvent: Expected field 8 to be 0");
             return e;
         }
 
         [EventPart("sound")] public SampleId SoundId { get; private set; } // [0..78], 153
-        [EventPart("vol", true, "100")] public byte Volume { get; private set; } // [0..150]
-        [EventPart("restart_prob", true, "0")] public byte RestartProbability { get; private set; } // [0..100]
-        [EventPart("unk3", true, "0")] public byte Unk3 { get; private set; } // [0..100] (multiples of 5)
-        [EventPart("freq", true, "0")] public ushort FrequencyOverride { get; private set; } // 0,8, [5..22]*1000
-        [EventPart("mode", true, "GlobalOneShot")] public SoundMode Mode { get; private set; }
+        [EventPart("vol", true, (byte)100)] public byte Volume { get; private set; } // [0..150]
+        [EventPart("restart_prob", true, (byte)0)] public byte RestartProbability { get; private set; } // [0..100]
+        [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; } // [0..100] (multiples of 5)
+        [EventPart("freq", true, (ushort)0)] public ushort FrequencyOverride { get; private set; } // 0,8, [5..22]*1000
+        [EventPart("mode", true, SoundMode.GlobalOneShot)] public SoundMode Mode { get; private set; }
         public override MapEventType EventType => MapEventType.Sound;
     }
 }

@@ -33,8 +33,8 @@ namespace UAlbion.Formats.MapEvents
         }
 
         [EventPart("member_id")] public PartyMemberId PartyMemberId { get; private set; }
-        [EventPart("unk2", true, "0")] public byte Unk2 { get; private set; }
-        [EventPart("unk6", true, "0")] public ushort Unk6 { get; private set; }
+        [EventPart("unk2", true, (byte)0)] public byte Unk2 { get; private set; }
+        [EventPart("unk6", true, (ushort)0)] public ushort Unk6 { get; private set; }
         public override MapEventType EventType => MapEventType.RemovePartyMember;
     }
 }

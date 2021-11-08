@@ -7,6 +7,6 @@ namespace UAlbion.Formats.ScriptEvents
     {
         public NpcTurnEvent(int npcId, Direction direction) { NpcId = npcId; Direction = direction; }
         [EventPart("npcId ")] public int NpcId { get; }
-        [EventPart("direction", true, "Unchanged")] public Direction Direction { get; }
+        [EventPart("direction", true, Direction.Unchanged)] public Direction Direction { get; }
     }
 }

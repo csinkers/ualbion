@@ -4,5 +4,6 @@
     {
         public override string ToString() => "ø";
         public void Accept(IAstVisitor visitor) => visitor.Visit(this);
+        public int Priority => int.MaxValue;
     }
 }

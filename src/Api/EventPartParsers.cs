@@ -70,7 +70,6 @@ namespace UAlbion.Api
             return parser;
         }
 
-
         // Methods called via reflection
 #pragma warning disable IDE0051 // Remove unused private members
         static T ParseEnum<T>(string s) => (T)Enum.Parse(typeof(T), s, true);

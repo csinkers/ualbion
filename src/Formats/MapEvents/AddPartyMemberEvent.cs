@@ -35,8 +35,8 @@ namespace UAlbion.Formats.MapEvents
         AddPartyMemberEvent() { }
 
         [EventPart("member_id")] public PartyMemberId PartyMemberId { get; private set; }
-        [EventPart("unk2", true, "0")] public byte Unk2 { get; private set; }
-        [EventPart("unk3", true, "0")] public byte Unk3 { get; private set; }
+        [EventPart("unk2", true, (byte)0)] public byte Unk2 { get; private set; }
+        [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
         public override ModifyType SubType => ModifyType.AddPartyMember;
     }
 }

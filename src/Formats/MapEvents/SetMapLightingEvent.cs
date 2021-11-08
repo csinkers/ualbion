@@ -31,8 +31,8 @@ namespace UAlbion.Formats.MapEvents
         }
 
         [EventPart("level")] public LightingLevel LightLevel { get; private set; }
-        [EventPart("unk2", true, "3")] public byte Unk2 { get; private set; }
-        [EventPart("unk3", true, "0")] public byte Unk3 { get; private set; }
+        [EventPart("unk2", true, (byte)3)] public byte Unk2 { get; private set; }
+        [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
         public override ModifyType SubType => ModifyType.MapLighting;
     }
 }

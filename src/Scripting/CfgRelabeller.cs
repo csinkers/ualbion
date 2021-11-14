@@ -24,7 +24,7 @@ namespace UAlbion.Scripting
             public override ICfgNode Build(Label label) => Emit.Label(_mapping[label.Name]);
         }
 
-        public static ControlFlowGraph Relabel(ControlFlowGraph graph)
+        public static ControlFlowGraph Relabel(ControlFlowGraph graph, string dummyLabelPrefix)
         {
             var collector = new LabelCollectionAstVisitor();
             foreach (var index in graph.GetDfsOrder())
@@ -33,7 +33,9 @@ namespace UAlbion.Scripting
             int i = 1;
             var mapping = new Dictionary<string, string>();
             foreach (var label in collector.Labels)
-                mapping[label] = $"L{i++}";
+                mapping[label] = label.StartsWith(dummyLabelPrefix) 
+                    ? $"L{i++}" 
+                    : label;
 
             var applier = new RelabellingAstVisitor(mapping);
             var result = graph;

@@ -10,7 +10,7 @@ using Xunit;
 
 namespace UAlbion.Scripting.Tests
 {
-    static class TestUtil
+    public static class TestUtil
     {
         public static string FindBasePath()
         {
@@ -31,24 +31,27 @@ namespace UAlbion.Scripting.Tests
             Assert.Equal(expected, visitor.Code);
         }
 
-        public static void Verify(ControlFlowGraph graph, List<(string, ControlFlowGraph)> steps, string expected, [CallerMemberName] string method = null)
+        public static void Verify(
+            ControlFlowGraph graph,
+            List<(string, ControlFlowGraph)> steps,
+            string expected,
+            string resultsDir,
+            [CallerMemberName] string method = null)
         {
             var visitor = new EmitPseudocodeVisitor { PrettyPrint = false };
             foreach (var node in graph.GetDfsOrder())
                 graph.Nodes[node].Accept(visitor);
             var pseudo = visitor.Code;
-            DumpSteps(steps, method);
+            DumpSteps(steps, resultsDir, method);
 
             Assert.Equal(expected, pseudo);
         }
 
-        public static void DumpSteps(List<(string, ControlFlowGraph)> steps, string method)
+        public static void DumpSteps(List<(string, ControlFlowGraph)> steps, string resultsDir, string method)
         {
             if (steps == null)
                 return;
 
-            var baseDir = FindBasePath();
-            var resultsDir = Path.Combine(baseDir, "re", "DecompilerTests");
             if (!Directory.Exists(resultsDir))
                 Directory.CreateDirectory(resultsDir);
 

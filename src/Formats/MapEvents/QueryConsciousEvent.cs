@@ -11,8 +11,8 @@ namespace UAlbion.Formats.MapEvents
     {
         public override QueryType QueryType => QueryType.Conscious;
         [EventPart("party_member")] public PartyMemberId PartyMemberId { get; private set; } // => AssetType == AssetType.PartyMember
-        [EventPart("op")] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
-        [EventPart("imm")] public byte Immediate { get; private set; } // immediate value?
+        [EventPart("op", true, QueryOperation.IsTrue)] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
+        [EventPart("imm", true, (byte)0)] public byte Immediate { get; private set; } // immediate value?
         QueryConsciousEvent() { }
         public QueryConsciousEvent(PartyMemberId partyMemberId, QueryOperation operation, byte immediate)
         {

@@ -8,12 +8,15 @@ namespace UAlbion.Scripting.Tests
     public class ParseTests
     {
         static Statement S(ICfgNode head, params ICfgNode[] p) => Emit.Statement(head, p);
-        [Fact] public void NameTest() => TestRoundTrip("foo", Emit.Name("foo"), ScriptParser.Name); 
+        [Fact] public void NameTest() => TestRoundTrip("foo", Emit.Name("foo"), ScriptParser.Name);
         [Fact] public void NumberTest() => TestRoundTrip("100", Emit.Const(100), ScriptParser.Number);
         [Fact] public void IdentifierNameTest() => TestRoundTrip("foo", Emit.Name("foo"), ScriptParser.Identifier);
         [Fact] public void IdentifierConstTest() => TestRoundTrip("100", Emit.Const(100), ScriptParser.Identifier);
         [Fact] public void IdentifierZeroTest() => TestRoundTrip("0", Emit.Const(0), ScriptParser.Identifier);
-        [Fact] public void StatementTest() => TestRoundTrip("a b c", Emit.Statement(Emit.Name("a"), Emit.Name("b"), Emit.Name("c")), ScriptParser.EventStatement);
+        [Fact] public void StatementTest() =>
+            TestRoundTrip("a b c",
+                S(Emit.Name("a"), Emit.Name("b"), Emit.Name("c")),
+                ScriptParser.Expression);
         [Fact] public void LabelTest() => TestRoundTrip("foo:", Emit.Label("foo"), ScriptParser.Label);
 
         [Fact] public void MemberTest() => TestRoundTrip("a.b", Emit.Member(Emit.Name("a"), Emit.Name("b")), ScriptParser.Expression);
@@ -31,7 +34,7 @@ namespace UAlbion.Scripting.Tests
                 Emit.Neq(Emit.Name("b"), Emit.Const(2))),
             ScriptParser.Expression);
 
-        [Fact] public void TestOr() => TestRoundTrip("a == 1 || b != 2", 
+        [Fact] public void TestOr() => TestRoundTrip("a == 1 || b != 2",
             Emit.Or(
                 Emit.Eq(Emit.Name("a"), Emit.Const(1)),
                 Emit.Neq(Emit.Name("b"), Emit.Const(2))),
@@ -41,7 +44,7 @@ namespace UAlbion.Scripting.Tests
         [Fact] public void TestAdd() => TestRoundTrip("x += 3", Emit.Add(Emit.Name("x"), Emit.Const(3)), ScriptParser.Expression);
         [Fact] public void TestSub() => TestRoundTrip("x -= 3", Emit.Sub(Emit.Name("x"), Emit.Const(3)), ScriptParser.Expression);
 
-        [Fact] public void ExpressionNameTest() => TestRoundTrip("foo", Emit.Name("foo"), ScriptParser.Expression); 
+        [Fact] public void ExpressionNameTest() => TestRoundTrip("foo", Emit.Name("foo"), ScriptParser.Expression);
         [Fact] public void ExpressionNumberTest() => TestRoundTrip("100", Emit.Const(100), ScriptParser.Expression);
         [Fact] public void ExpressionIdentifierNameTest() => TestRoundTrip("foo", Emit.Name("foo"), ScriptParser.Expression);
         [Fact] public void ExpressionIdentifierConstTest() => TestRoundTrip("100", Emit.Const(100), ScriptParser.Expression);
@@ -59,8 +62,8 @@ namespace UAlbion.Scripting.Tests
         [Fact] public void StatementStatementTest()       => TestRoundTrip("a b c", S(Emit.Name("a"), Emit.Name("b"), Emit.Name("c")), ScriptParser.Statement);
         [Fact] public void StatementLabelTest()           => TestRoundTrip("foo:",  Emit.Label("foo"), ScriptParser.Statement);
 
-        [Fact] public void NegationNameTest() => TestRoundTrip("!foo", Emit.Negation(Emit.Name("foo")), ScriptParser.Negation); 
-        [Fact] public void NegationNumberTest() => TestRoundTrip("!100", Emit.Negation(Emit.Const(100)), ScriptParser.Negation); 
+        [Fact] public void NegationNameTest() => TestRoundTrip("!foo", Emit.Negation(Emit.Name("foo")), ScriptParser.Negation);
+        [Fact] public void NegationNumberTest() => TestRoundTrip("!100", Emit.Negation(Emit.Const(100)), ScriptParser.Negation);
         [Fact] public void NegationCompoundTest() =>
             TestRoundTrip("!(ticker.100 == 23)",
                 Emit.Negation(
@@ -158,7 +161,7 @@ namespace UAlbion.Scripting.Tests
 
         [Fact] public void SequenceTest() =>
             TestRoundTrip("a, b, c",
-                Emit.Seq(Emit.Statement(Emit.Name("a")), Emit.Statement(Emit.Name("b")), Emit.Statement(Emit.Name("c"))),
+                Emit.Seq(S(Emit.Name("a")), S(Emit.Name("b")), S(Emit.Name("c"))),
                 ScriptParser.Sequence);
 
         [Fact] public void IfTest() =>
@@ -197,6 +200,105 @@ namespace UAlbion.Scripting.Tests
                         S(Emit.Name("c")))),
                 ScriptParser.TopLevel);
 
+        [Fact] public void IfEventTest() =>
+            TestRoundTrip("if (a 1 2) { b foo }",
+                Emit.If(
+                    S(Emit.Name("a"), Emit.Const(1), Emit.Const(2)),
+                    S(Emit.Name("b"), Emit.Name("foo"))
+                ),
+                ScriptParser.TopLevel);
+
+        [Fact] public void BlockPrettyTest() =>
+            TestParse(@"{
+    a
+    b
+    c
+}",
+                Emit.Seq(S(Emit.Name("a")), S(Emit.Name("b")), S(Emit.Name("c"))),
+                ScriptParser.Block);
+
+        [Fact] public void SequencePrettyTest() =>
+            TestRoundTrip(@"a
+b
+c",
+                Emit.Seq(S(Emit.Name("a")), S(Emit.Name("b")), S(Emit.Name("c"))),
+                ScriptParser.Sequence, true);
+
+        [Fact] public void SequenceEmptyLinePrettyTest() =>
+            TestParse(@"a
+b
+
+
+
+c",
+                Emit.Seq(S(Emit.Name("a")), S(Emit.Name("b")), S(Emit.Name("c"))),
+                ScriptParser.Sequence);
+
+        [Fact] public void IfPrettyTest() =>
+            TestRoundTrip(@"if (a) {
+    b
+}",
+                Emit.If(Emit.Name("a"), S(Emit.Name("b"))),
+                ScriptParser.If, true);
+
+        [Fact] public void IfElsePrettyTest() =>
+            TestRoundTrip(@"if (a) {
+    b
+} else {
+    c
+}",
+                Emit.IfElse(Emit.Name("a"), S(Emit.Name("b")), S(Emit.Name("c"))),
+                ScriptParser.IfElse, true);
+
+        [Fact] public void WhilePrettyTest() =>
+            TestRoundTrip(@"while (a) {
+    b
+}",
+                Emit.While(Emit.Name("a"), S(Emit.Name("b"))),
+                ScriptParser.While, true);
+
+        [Fact] public void DoPrettyTest() =>
+            TestRoundTrip(@"do {
+    b
+} while (a)",
+                Emit.Do(Emit.Name("a"), S(Emit.Name("b"))),
+                ScriptParser.Do, true);
+
+        [Fact] public void BreakPrettyTest() =>
+            TestRoundTrip(@"while (a) {
+    if (b) {
+        break
+    }
+    c
+}",
+                Emit.While(Emit.Name("a"),
+                    Emit.Seq(
+                        Emit.If(Emit.Name("b"), Emit.Break()),
+                        S(Emit.Name("c")))),
+                ScriptParser.TopLevel, true);
+
+        [Fact] public void ContinuePrettyTest() =>
+            TestRoundTrip(@"while (a) {
+    if (b) {
+        continue
+    }
+    c
+}",
+                Emit.While(Emit.Name("a"),
+                    Emit.Seq(
+                        Emit.If(Emit.Name("b"), Emit.Continue()),
+                        S(Emit.Name("c")))),
+                ScriptParser.TopLevel, true);
+
+        [Fact] public void IfEventPrettyTest() =>
+            TestRoundTrip(@"if (a 1 2) {
+    b foo
+}",
+                Emit.If(
+                    S(Emit.Name("a"), Emit.Const(1), Emit.Const(2)),
+                    S(Emit.Name("b"), Emit.Name("foo"))
+                ),
+                ScriptParser.TopLevel, true);
 
         static T TestParse<T>(string source, ICfgNode expected, TokenListParser<ScriptToken, T> parser) where T : ICfgNode
         {
@@ -205,7 +307,8 @@ namespace UAlbion.Scripting.Tests
                 throw new InvalidOperationException(
                     $"Tokenization failure: {tokens.ErrorMessage} at {tokens.ErrorPosition}");
 
-            var parsed = parser.TryParse(tokens.Value);
+            var filtered = ScriptParser.FilterTokens(tokens.Value);
+            var parsed = parser.TryParse(filtered);
             if (!parsed.HasValue)
                 throw new InvalidOperationException($"Parse failure: {parsed}");
 
@@ -213,10 +316,14 @@ namespace UAlbion.Scripting.Tests
             return parsed.Value;
         }
 
-        static void TestRoundTrip<T>(string source, ICfgNode expected, TokenListParser<ScriptToken, T> parser) where T : ICfgNode
+        static void TestRoundTrip<T>(
+            string source,
+            ICfgNode expected,
+            TokenListParser<ScriptToken, T> parser,
+            bool pretty = false) where T : ICfgNode
         {
             var parsed = TestParse(source, expected, parser);
-            var visitor = new EmitPseudocodeVisitor { PrettyPrint = false };
+            var visitor = new EmitPseudocodeVisitor { PrettyPrint = pretty };
             parsed.Accept(visitor);
             Assert.Equal(source, visitor.Code);
         }

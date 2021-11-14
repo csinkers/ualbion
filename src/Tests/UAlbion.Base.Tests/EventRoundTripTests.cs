@@ -415,7 +415,7 @@ place_action SleepInRoom 1 1 1 1 1 1");
             Test(@"prompt_player MapText.TestMapIskai 1
 prompt_player EventText.FestivalTime 1 IsTrue 1
 prompt_player_numeric MapText.Jirinaar Equals 0 1
-is_conscious PartyMember.Tom IsTrue 0
+is_conscious PartyMember.Tom
 is_conscious PartyMember.Tom IsTrue 1
 is_demo_version 1 IsTrue 0
 event_used

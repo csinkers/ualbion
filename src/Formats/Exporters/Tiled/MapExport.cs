@@ -197,6 +197,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             var sb = new StringBuilder();
             var mapping = new Dictionary<ushort, string>();
 
+            /*
             for (int chainId = 0; chainId < map.Chains.Count; chainId++)
             {
                 var i = map.Chains[chainId];
@@ -227,6 +228,17 @@ namespace UAlbion.Formats.Exporters.Tiled
                 eventFormatter.FormatChainDecompiled(sb, key.Node, labels, 1);
                 sb.AppendLine("}");
             }
+            */
+            var npcRefs = map.Npcs.Where(x => x.Node != null).Select(x => x.Node.Id).ToHashSet();
+            var zoneRefs = map.Zones.Where(x => x.Node != null).Select(x => x.Node.Id).ToHashSet();
+            var refs = npcRefs.Union(zoneRefs).Except(map.Chains);
+
+            eventFormatter.FormatEventSetDecompiled(
+                sb,
+                map.Events,
+                map.Chains,
+                refs,
+                0);
 
             return (sb.ToString(), mapping);
         }
@@ -236,7 +248,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             var eventToChainMapping = new ushort[map.Events.Count];
             Array.Fill<ushort>(eventToChainMapping, 0xffff);
 
-            var queue = new Queue<EventNode>();
+            var queue = new Queue<IEventNode>();
             for (ushort i = 0; i < map.Chains.Count; i++)
             {
                 if (map.Chains[i] == 0xffff) continue;
@@ -261,7 +273,7 @@ namespace UAlbion.Formats.Exporters.Tiled
         {
             ushort chainId = 0;
             ushort dummyId = 1;
-            var visited = new HashSet<EventNode>();
+            var visited = new HashSet<IEventNode>();
             var eventToChainMapping = GetEventToChainMapping(map);
             var dummies = new List<ZoneKey>();
             for (ushort i = 0; i < eventToChainMapping.Length; i++)

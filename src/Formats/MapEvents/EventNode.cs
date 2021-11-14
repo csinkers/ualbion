@@ -165,7 +165,10 @@ namespace UAlbion.Formats.MapEvents
             if (string.IsNullOrWhiteSpace(script))
                 return null;
             var lines = FormatUtil.SplitLines(script);
-            return lines.Select(Parse).ToList();
+            var events = lines.Select(Parse).ToList();
+            foreach (var e in events)
+                e.Unswizzle(events);
+            return events;
         }
     }
 }

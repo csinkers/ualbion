@@ -153,8 +153,15 @@ namespace UAlbion.Scripting
             _edgesByStart = starts.ToImmutable();
             _edgesByEnd = ends.ToImmutable();
             _falseEdges = falseEdges.ToImmutable();
-            _deletedNodes = ImmutableStack<int>.Empty;
             HeadIndex = headIndex == -1 ? GetEntryNode() : headIndex;
+
+            var deleted = new List<int>();
+            for (var index = 0; index < Nodes.Count; index++)
+                if (Nodes[index] == null)
+                    deleted.Add(index);
+
+            _deletedNodes = ImmutableStack.CreateRange(deleted);
+            _deletedNodeCount = deleted.Count;
 
             if (error != null)
                 throw new ControlFlowGraphException(error, this);
@@ -352,6 +359,38 @@ namespace UAlbion.Scripting
                 throw new ControlFlowGraphException($"Tried to remove edge ({start}, {end}), but it does not exist");
 
             return new ControlFlowGraph(HeadIndex, Nodes, byStart, byEnd, falseEdges, _deletedNodes, _deletedNodeCount);
+        }
+
+        public ControlFlowGraph InsertBefore(int position, ICfgNode node)
+        {
+            var result = AddNode(node, out var newIndex);
+            var edges = new List<(int, int, bool)>();
+            foreach (var parent in Parents(position))
+            {
+                edges.Add((parent, newIndex, result.GetEdgeLabel(parent, position)));
+                result = result.RemoveEdge(parent, position);
+            }
+
+            result = result.AddEdge(newIndex, position, true);
+            foreach (var edge in edges)
+                result = result.AddEdge(edge.Item1, edge.Item2, edge.Item3);
+            return result;
+        }
+
+        public ControlFlowGraph InsertAfter(int position, ICfgNode node)
+        {
+            var result = AddNode(node, out var newIndex);
+            var edges = new List<(int, int, bool)>();
+            foreach (var child in Children(position))
+            {
+                edges.Add((newIndex, child, result.GetEdgeLabel(position, child)));
+                result = result.RemoveEdge(position, child);
+            }
+
+            result = result.AddEdge(position, newIndex, true);
+            foreach (var edge in edges)
+                result = result.AddEdge(edge.Item1, edge.Item2, edge.Item3);
+            return result;
         }
 
         public bool IsCyclic()

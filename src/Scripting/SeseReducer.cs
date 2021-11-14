@@ -5,7 +5,7 @@ namespace UAlbion.Scripting
 {
     public static class SeseReducer
     {
-        public static ControlFlowGraph Reduce(ControlFlowGraph cut)
+        public static ControlFlowGraph Reduce(ControlFlowGraph cut, string dummyLabelPrefix)
         {
             var minDepth = FindShortestPaths(cut);
             var maxDepth = FindLongestPaths(cut);
@@ -33,7 +33,7 @@ namespace UAlbion.Scripting
             var shortCircuitEdgeLabel = cut.GetEdgeLabel(shortCircuitEdgeStart, maxDeltaNode);
             var result = cut.RemoveEdge(shortCircuitEdgeStart, maxDeltaNode);
 
-            var labelName = $"L_{Guid.NewGuid():N}";
+            var labelName = $"{dummyLabelPrefix}{Guid.NewGuid():N}";
             var gotoNode = Emit.Goto(labelName);
             var label = Emit.Label(labelName);
 

@@ -101,7 +101,12 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
             var steps = new List<(string, ControlFlowGraph)>();
             try
             {
-                var result = Decompiler.Decompile(events.Cast<IEventNode>().ToList(), steps);
+                var result = Decompiler.Decompile(
+                    events,
+                    new ushort[] { 0 },
+                    null,
+                    steps).Single();
+
                 Verify(result, steps, expected, method);
             }
             catch (ControlFlowGraphException e)
@@ -147,7 +152,8 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
  5=>!: teleport Map.HunterClan 69 67 Unchanged 255 0";
 
             string expected = 
-@"if (query_verb Examine) {
+@"Chain0:
+if (query_verb Examine) {
     map_text MapText.Jirinaar 37
 } else {
     if (open_door Door.HunterClan MapText.Jirinaar Item.HunterClanKey 100 32 33) {
@@ -254,7 +260,7 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
 !82?!:86: get_switch Switch.Switch597
  83=>84: change_health PartyMember.Sira AddAmount 2 2
  84=>85: change_health PartyMember.Mellthas AddAmount 2 2
-!85?86:!: is_conscious PartyMember.Mellthas IsTrue 0
+!85?86:!: is_conscious PartyMember.Mellthas
  86=>87: do_script Script.60
  87=>!: switch Set Switch.Switch597
  88=>89: action Unk2D 255
@@ -263,7 +269,7 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
  91=>92: execute 1 65535
  92=>93: map_text EventText.Sira2 21 PortraitLeft PartyMember.Sira
 !93?!:94: get_switch Switch.SiraAndTomDiscussedSeedSignificance
-!94?95:!: is_conscious PartyMember.Tom IsTrue 0
+!94?95:!: is_conscious PartyMember.Tom
  95=>96: map_text EventText.Sira2 22 PortraitLeft PartyMember.Tom
  96=>97: map_text EventText.Sira2 23 PortraitLeft PartyMember.Sira
  97=>98: map_text EventText.Sira2 24 PortraitLeft PartyMember.Tom
@@ -275,7 +281,7 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
  103=>104: execute 1 65535
  104=>105: map_text EventText.Sira2 21 PortraitLeft PartyMember.Sira
 !105?!:106: get_switch Switch.SiraAndTomDiscussedSeedSignificance
-!106?107:!: is_conscious PartyMember.Tom IsTrue 0
+!106?107:!: is_conscious PartyMember.Tom
  107=>108: map_text EventText.Sira2 22 PortraitLeft PartyMember.Tom
  108=>109: map_text EventText.Sira2 23 PortraitLeft PartyMember.Sira
  109=>110: map_text EventText.Sira2 24 PortraitLeft PartyMember.Tom
@@ -306,7 +312,8 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
             var set = FormatUtil.DeserializeFromBytes(bytes, s => EventSet.Serdes(Base.EventSet.Sira2, null, AssetMapping.Global, s));
             var script = string.Join(Environment.NewLine, set.EventStrings.Take(29));
 
-            const string expected = @"action StartDialogue
+            const string expected = @"Chain0:
+action StartDialogue
 if (party_has PartyMember.Sira) {
     if (get_switch Switch.Switch597) {
         if (get_switch Switch.Switch77) {

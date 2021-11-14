@@ -10,8 +10,14 @@ namespace UAlbion.Scripting
 {
     public static class Decompiler
     {
+        const string DummyLabelPrefix = "L_";
+
         public delegate ControlFlowGraph RecordFunc(string description, ControlFlowGraph graph);
-        public static ICfgNode Decompile(List<IEventNode> nodes, List<(string, ControlFlowGraph)> steps = null)
+        public static List<ICfgNode> Decompile<T>(
+            IList<T> nodes,
+            IEnumerable<ushort> chains,
+            IEnumerable<ushort> additionalEntryPoints,
+            List<(string, ControlFlowGraph)> steps = null) where T : IEventNode
         {
             if (nodes == null) throw new ArgumentNullException(nameof(nodes));
             if (nodes.Count == 0)
@@ -30,52 +36,101 @@ namespace UAlbion.Scripting
             }
             else record = (_, x) => x;
 
-            var rawGraph = record("Make blocks", MakeBlocks(nodes));
-            var basicBlockGraph = record("Detect blocks", DetectBasicBlocks(rawGraph));
-            return SimplifyGraph(basicBlockGraph, record).Head;
-        }
-
-        public static ControlFlowGraph DetectBasicBlocks(ControlFlowGraph graph)
-        {
-            return graph;
-        }
-
-        public static ControlFlowGraph MakeBlocks(List<IEventNode> events)
-        {
-            if (events == null) throw new ArgumentNullException(nameof(events));
-            var nodes = new List<ICfgNode>();
-            var mapping = new Dictionary<ushort, int>();
-            int i = 1;
-            nodes.Add(Emit.Empty());
-            foreach (var e in events)
+            var graphs = BuildEventRegions(nodes, chains, additionalEntryPoints);
+            var results = new List<ICfgNode>();
+            for (var index = 0; index < graphs.Count; index++)
             {
-                nodes.Add(Emit.Event(e.Event));
-                if (mapping.ContainsKey(e.Id))
-                    throw new InvalidOperationException($"Multiple events have the same id ({e.Id})!");
-                mapping[e.Id] = i++;
-            }
-            nodes.Add(Emit.Empty());
-
-            var edges = new List<(int, int, bool)> { (0, 1, true) };
-            foreach (var e in events)
-            {
-                var start = mapping[e.Id];
-                var trueEnd = e.Next == null ? i : mapping[e.Next.Id];
-                edges.Add((start, trueEnd, true));
-
-                if (e is not IBranchNode branch) 
-                    continue;
-
-                var falseEnd = branch.NextIfFalse == null ? i : mapping[branch.NextIfFalse.Id];
-                // A branching event with only one child means that
-                // both true and false results should transition to that child.
-                if (trueEnd == falseEnd) 
-                    continue;
-
-                edges.Add((start, falseEnd, false));
+                var graph = record($"Make region {index}", graphs[index]);
+                results.Add(SimplifyGraph(graph, record).Head);
             }
 
-            return new ControlFlowGraph(0, nodes, edges);
+            return results;
+        }
+
+        public static List<ControlFlowGraph> BuildEventRegions<T>(
+            IList<T> events,
+            IEnumerable<ushort> chains,
+            IEnumerable<ushort> additionalEntryPoints) where T : IEventNode
+        {
+            int entry = events.Count;
+            int exit = events.Count + 1;
+            var results = new List<ControlFlowGraph>();
+            var mapping = new Dictionary<int, int>();
+            var queue = new Queue<IEventNode>();
+
+            for (int i = 0; i < events.Count; i++)
+                if (events[i].Id != i)
+                    throw new ArgumentException($"Event {i} in the event list had id {events[i].Id}!");
+
+            void Visit(int head, string label)
+            {
+                if (head == 0xffff) // Terminal value for unused chains etc
+                    return;
+
+                if (head > events.Count)
+                    throw new ArgumentException($"Entry node {head} was given, but there are only {events.Count} nodes");
+
+                if (mapping.TryGetValue(head, out var graphIndex))
+                {
+                    results[graphIndex] = results[graphIndex].InsertBefore(head, Emit.Label(label));
+                    return;
+                }
+
+                queue.Enqueue(events[head]);
+
+                var edges = new List<(int, int, bool)>();
+                var nodes = new ICfgNode[events.Count + 2];
+                nodes[entry] = Emit.Empty();
+                nodes[exit] = Emit.Empty();
+
+                while (queue.TryDequeue(out var node))
+                {
+                    int i = node.Id;
+                    if (mapping.ContainsKey(i))
+                        continue;
+
+                    mapping[i] = results.Count;
+                    nodes[i] = Emit.Event(node.Event);
+
+                    if (node.Next != null)
+                    {
+                        queue.Enqueue(node.Next);
+                        edges.Add((i, node.Next.Id, true));
+                    }
+                    else edges.Add((i, exit, true));
+
+                    if (node is IBranchNode branch && branch.NextIfFalse != branch.Next)
+                    {
+                        if (branch.NextIfFalse != null)
+                        {
+                            queue.Enqueue(branch.NextIfFalse);
+                            edges.Add((i, branch.NextIfFalse.Id, false));
+                        }
+                        else edges.Add((i, exit, false));
+                    }
+                }
+                edges.Add((entry, head, true));
+
+                var graph = new ControlFlowGraph(entry, nodes, edges);
+                graph = graph.InsertBefore(head, Emit.Label(label));
+                results.Add(graph);
+            }
+
+            if (chains != null)
+            {
+                int index = 0;
+                foreach (var chain in chains)
+                    Visit(chain, $"Chain{index++}");
+            }
+
+            if (additionalEntryPoints != null)
+                foreach (var head in additionalEntryPoints)
+                    Visit(head, $"Event{head}");
+
+            for (var i = 0; i < results.Count; i++)
+                results[i] = results[i].Defragment();
+
+            return results;
         }
 
         public static ControlFlowGraph SimplifyGraph(ControlFlowGraph graph, RecordFunc record)
@@ -97,7 +152,7 @@ namespace UAlbion.Scripting
                 graph = record("Reduce sequence", ReduceSequences(graph, true));
             }
 
-            return CfgRelabeller.Relabel(graph);
+            return CfgRelabeller.Relabel(graph, DummyLabelPrefix);
         }
 
         public static ControlFlowGraph ReduceSimpleWhile(ControlFlowGraph graph)
@@ -135,14 +190,14 @@ namespace UAlbion.Scripting
                     continue;
 
                 int child = children[0];
-                #if DEBUG
+#if DEBUG
                 Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("child", child).ToString();
-                #endif
+#endif
 
                 var childsParents = graph.Parents(child);
                 var grandChildren = graph.Children(child);
 
-                if (childsParents.Length != 1 || grandChildren.Length >= 2) 
+                if (childsParents.Length != 1 || grandChildren.Length > 1)
                     continue; // Is a jump target from somewhere else as well - can't combine
 
                 if (grandChildren.Length == 1 && (grandChildren[0] == index || grandChildren[0] == child))
@@ -498,7 +553,7 @@ namespace UAlbion.Scripting
                 if (cut.Cut.IsCyclic())
                     continue; // Must be some sort of weird loop that couldn't be reduced earlier, currently irreducible.
 
-                var restructured = SeseReducer.Reduce(cut.Cut);
+                var restructured = SeseReducer.Reduce(cut.Cut, DummyLabelPrefix);
                 int restructuredHead = restructured.HeadIndex;
                 int restructuredTail = cut.Cut.GetExitNode();
 

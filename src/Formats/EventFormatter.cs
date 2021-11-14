@@ -34,22 +34,32 @@ namespace UAlbion.Formats
             return nodeText;
         }
 
-        public void FormatChainDecompiled(StringBuilder sb, IEventNode firstEvent, IList<IEventNode> additionalEntryPoints, int indent)
+        public void FormatEventSetDecompiled<T>(
+            StringBuilder sb,
+            IList<T> events,
+            IEnumerable<ushort> chains,
+            IEnumerable<ushort> additionalEntryPoints,
+            int indent) where T : IEventNode
         {
-            var events = ExploreGraph(firstEvent);
-            events.Remove(firstEvent);
-            var sorted = new List<IEventNode> { firstEvent };
-            sorted.AddRange(events);
             List<(string, ControlFlowGraph)> steps = new();
             try
             {
-                var tree = Decompiler.Decompile(sorted, steps);
+                var trees = Decompiler.Decompile(events, chains, additionalEntryPoints, steps);
+
+                bool first = true;
                 var visitor = new EmitPseudocodeVisitor(sb) { IndentLevel = indent };
-                tree.Accept(visitor);
+                foreach (var tree in trees)
+                {
+                    if (!first)
+                        sb.AppendLine();
+
+                    tree.Accept(visitor);
+                    first = false;
+                }
             }
             catch (ControlFlowGraphException)
             {
-                FormatChain(sb, firstEvent, indent); // Fallback to raw view
+                FormatEventSet(sb, events, indent); // Fallback to raw view
             }
         }
 
@@ -92,9 +102,20 @@ namespace UAlbion.Formats
             var sorted = uniqueEvents.OrderBy(x => x.Id).ToList();
             foreach (var e in sorted)
             {
-                for (int i = 0; i < indent; i++)
-                    sb.Append("    ");
+                sb.Append(new string(' ', 4 * indent));
                 sb.AppendLine(Format(e, sorted[0].Id));
+            }
+        }
+
+        public void FormatEventSet<T>(StringBuilder sb, IList<T> events, int indent = 0) where T : IEventNode
+        {
+            if (sb == null) throw new ArgumentNullException(nameof(sb));
+            if (events == null) return;
+
+            foreach (var e in events)
+            {
+                sb.Append(new string(' ', 4 * indent));
+                sb.AppendLine(Format(e, events[0].Id));
             }
         }
     }

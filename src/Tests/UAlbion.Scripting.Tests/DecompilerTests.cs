@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.CompilerServices;
 using Xunit;
 
@@ -7,6 +8,7 @@ namespace UAlbion.Scripting.Tests
 {
     public class DecompilerTests
     {
+        static readonly string ResultsDir = Path.Combine(TestUtil.FindBasePath(), "re", "DecompilerTests");
         static void TestSimplify(ControlFlowGraph graph, string expected, [CallerMemberName] string method = null)
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
@@ -26,12 +28,12 @@ namespace UAlbion.Scripting.Tests
             catch (ControlFlowGraphException e)
             {
                 steps.Add((e.Message, e.Graph));
-                TestUtil.DumpSteps(steps, method);
+                TestUtil.DumpSteps(steps, ResultsDir, method);
                 throw;
             }
             catch
             {
-                TestUtil.DumpSteps(steps, method);
+                TestUtil.DumpSteps(steps, ResultsDir, method);
                 throw;
             }
         }
@@ -46,7 +48,7 @@ namespace UAlbion.Scripting.Tests
                         true),
                     true);
 
-            TestUtil.Verify(result, null, "0, 1, 2");
+            TestUtil.Verify(result, null, "0, 1, 2", ResultsDir);
         }
 
         [Fact]
@@ -54,7 +56,7 @@ namespace UAlbion.Scripting.Tests
         {
             var result = Decompiler.ReduceIfThen(TestGraphs.IfThen);
             result = Decompiler.ReduceSequences(result, true);
-            TestUtil.Verify(result, null, "if (0) { 1 }, 2");
+            TestUtil.Verify(result, null, "if (0) { 1 }, 2", ResultsDir);
         }
 
         [Fact]
@@ -62,7 +64,7 @@ namespace UAlbion.Scripting.Tests
         {
             var result = Decompiler.ReduceIfThenElse(TestGraphs.IfThenElse);
             result = Decompiler.ReduceSequences(result, true);
-            TestUtil.Verify(result, null, "if (0) { 1 } else { 2 }, 3");
+            TestUtil.Verify(result, null, "if (0) { 1 } else { 2 }, 3", ResultsDir);
         }
 
         [Fact]
@@ -71,7 +73,7 @@ namespace UAlbion.Scripting.Tests
             var result = Decompiler.ReduceSimpleWhile(TestGraphs.SimpleWhileLoop);
             result = Decompiler.ReduceSequences(result, true);
             result = Decompiler.ReduceSequences(result, true);
-            TestUtil.Verify(result, null, "0, while (1) { }, 2");
+            TestUtil.Verify(result, null, "0, while (1) { }, 2", ResultsDir);
         }
 
         [Fact]
@@ -80,7 +82,7 @@ namespace UAlbion.Scripting.Tests
             var result = Decompiler.ReduceSimpleLoops(TestGraphs.WhileLoop);
             result = Decompiler.ReduceSequences(result, true);
             result = Decompiler.ReduceSequences(result, true);
-            TestUtil.Verify(result, null, "0, while (1) { 2 }, 3");
+            TestUtil.Verify(result, null, "0, while (1) { 2 }, 3", ResultsDir);
         }
 
         [Fact]
@@ -89,7 +91,7 @@ namespace UAlbion.Scripting.Tests
             var result = Decompiler.ReduceSimpleLoops(TestGraphs.DoWhileLoop);
             result = Decompiler.ReduceSequences(result, true);
             result = Decompiler.ReduceSequences(result, true);
-            TestUtil.Verify(result, null, "0, do { 1 } while (2), 3");
+            TestUtil.Verify(result, null, "0, do { 1 } while (2), 3", ResultsDir);
         }
 /*
         [Fact]

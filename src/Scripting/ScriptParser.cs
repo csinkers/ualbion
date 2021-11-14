@@ -1,4 +1,5 @@
-﻿using Superpower;
+﻿using System.Collections.Generic;
+using Superpower;
 using Superpower.Model;
 using Superpower.Parsers;
 using UAlbion.Scripting.Ast;
@@ -62,7 +63,15 @@ namespace UAlbion.Scripting
         public static readonly TokenListParser<ScriptToken, ICfgNode> Op6 = Parse.Chain(Or, Op5, Emit.Op);
         public static readonly TokenListParser<ScriptToken, ICfgNode> Op7 = Parse.ChainRight(Assign.Or(Add).Or(Sub), Op6, Emit.Op);
 
-        public static readonly TokenListParser<ScriptToken, ICfgNode> Expression = Op7.Named("Expression");
+        public static readonly TokenListParser<ScriptToken, ICfgNode> Expression =
+            (from first in Op7
+             from rest in Op7.Many()
+             select rest.Length == 0 ? first : Emit.Statement(first, rest)).Named("Expression");
+
+        public static readonly TokenListParser<ScriptToken, ICfgNode> EventStatement =
+            (from first in Op7
+             from rest in Op7.Many()
+             select (ICfgNode)Emit.Statement(first, rest)).Named("EventStatement");
 
         public static readonly TokenListParser<ScriptToken, ICfgNode> Label =
             (from name in Token.EqualTo(ScriptToken.Identifier)
@@ -72,6 +81,7 @@ namespace UAlbion.Scripting
         public static readonly TokenListParser<ScriptToken, ICfgNode> If =
             (from keyword in Token.EqualToValue(ScriptToken.Identifier, "if")
             from lp in Token.EqualTo(ScriptToken.LParen)
+            from _ in Token.EqualTo(ScriptToken.NewLine).Many()
             from condition in Expression
             from rp in Token.EqualTo(ScriptToken.RParen)
             from body in Parse.Ref(() => Statement)
@@ -80,6 +90,7 @@ namespace UAlbion.Scripting
         public static readonly TokenListParser<ScriptToken, ICfgNode> IfElse =
             (from keyword in Token.EqualToValue(ScriptToken.Identifier, "if")
             from lp in Token.EqualTo(ScriptToken.LParen)
+            from _ in Token.EqualTo(ScriptToken.NewLine).Many()
             from condition in Expression
             from rp in Token.EqualTo(ScriptToken.RParen)
             from body in Parse.Ref(() => Statement)
@@ -90,6 +101,7 @@ namespace UAlbion.Scripting
         public static readonly TokenListParser<ScriptToken, ICfgNode> While =
             (from keyword in Token.EqualToValue(ScriptToken.Identifier, "while")
             from lp in Token.EqualTo(ScriptToken.LParen)
+            from _ in Token.EqualTo(ScriptToken.NewLine).Many()
             from condition in Expression
             from rp in Token.EqualTo(ScriptToken.RParen)
             from body in Parse.Ref(() => Statement)
@@ -100,14 +112,10 @@ namespace UAlbion.Scripting
             from body in Parse.Ref(() => Statement)
             from keyword2 in Token.EqualToValue(ScriptToken.Identifier, "while")
             from lp in Token.EqualTo(ScriptToken.LParen)
+            from _ in Token.EqualTo(ScriptToken.NewLine).Many()
             from condition in Expression
             from rp in Token.EqualTo(ScriptToken.RParen)
             select (ICfgNode)Emit.Do(condition, body)).Named("Do");
-
-        public static readonly TokenListParser<ScriptToken, ICfgNode> EventStatement =
-            (from first in Expression
-             from rest in Expression.Many()
-            select (ICfgNode)new Statement(first, rest)).Named("Event");
 
         public static readonly TokenListParser<ScriptToken, ICfgNode> Break =
             Token.EqualToValue(ScriptToken.Identifier, "break").Value((ICfgNode)Emit.Break());
@@ -126,12 +134,21 @@ namespace UAlbion.Scripting
 
         static ICfgNode MakeSeq(ICfgNode[] statements) => statements.Length == 1 ? statements[0] : Emit.Seq(statements);
 
+        public static readonly TokenListParser<ScriptToken, Token<ScriptToken>> Comma = Token.EqualTo(ScriptToken.Comma);
+        public static readonly TokenListParser<ScriptToken, Token<ScriptToken>> NewLine = Token.EqualTo(ScriptToken.NewLine);
+
+        public static readonly TokenListParser<ScriptToken, ScriptToken> EmptyLines1 =
+            NewLine.IgnoreThen(
+            NewLine.Many()).Value(ScriptToken.NewLine);
+
         public static readonly TokenListParser<ScriptToken, ICfgNode> Sequence =
-            (from statements in SingleStatement.ManyDelimitedBy(Token.EqualTo(ScriptToken.Comma).Or(Token.EqualTo(ScriptToken.NewLine)))
+            (
+             from statements in SingleStatement.ManyDelimitedBy(Comma.Or(NewLine))
              select MakeSeq(statements)).Named("Sequence");
 
         public static readonly TokenListParser<ScriptToken, ICfgNode> Block =
             (from lb in Token.EqualTo(ScriptToken.LBrace)
+             from _ in NewLine.Many()
             from body in Sequence
             from rb in Token.EqualTo(ScriptToken.RBrace)
             select body).Named("Block");
@@ -142,6 +159,34 @@ namespace UAlbion.Scripting
             .Named("Statement");
 
         public static readonly TokenListParser<ScriptToken, ICfgNode> TopLevel = Sequence.AtEnd();
+
+        public static TokenList<ScriptToken> FilterTokens(TokenList<ScriptToken> tokens)
+        {
+            var filtered = new List<Token<ScriptToken>>();
+            Token<ScriptToken> last = Token<ScriptToken>.Empty;
+            foreach (var token in tokens)
+            {
+                if (last.HasValue)
+                {
+                    var skip = (last.Kind, token.Kind) switch
+                    {
+                        (ScriptToken.NewLine, ScriptToken.NewLine) => true,
+                        (ScriptToken.NewLine, ScriptToken.RBrace) => true,
+                        _ => false
+                    };
+
+                    if (!skip)
+                        filtered.Add(last);
+                }
+
+                last = token;
+            }
+
+            if (last.HasValue)
+                filtered.Add(last);
+
+            return new TokenList<ScriptToken>(filtered.ToArray());
+        }
 
         public static bool TryParse(string source, out ICfgNode abstractSyntaxTree, out string error, out Position errorPosition)
         {
@@ -154,7 +199,9 @@ namespace UAlbion.Scripting
                 return false;
             }
 
-            var parsed = TopLevel.TryParse(tokens.Value);
+            var filtered = FilterTokens(tokens.Value);
+            var parsed = TopLevel.TryParse(filtered);
+
             if (!parsed.HasValue)
             {
                 abstractSyntaxTree = null;

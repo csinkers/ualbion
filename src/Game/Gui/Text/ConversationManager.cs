@@ -44,7 +44,7 @@ namespace UAlbion.Game.Gui.Text
 
         bool OnTextEvent(ContextTextEvent e, Action continuation)
         {
-            var textEvent = new MapTextEvent(ContextTextSource, e.TextId, e.Location, e.NpcId ?? NpcId.None);
+            var textEvent = new MapTextEvent(ContextTextSource, e.TextId, e.Location, e.NpcId);
             return OnBaseTextEvent(textEvent, continuation);
         }
 
@@ -57,7 +57,6 @@ namespace UAlbion.Game.Gui.Text
             var tf = Resolve<ITextFormatter>();
             switch(mapTextEvent.Location)
             {
-                case null:
                 case TextLocation.NoPortrait:
                 {
                     var dialog = AttachChild(new TextDialog(tf.Format(mapTextEvent.ToId())));

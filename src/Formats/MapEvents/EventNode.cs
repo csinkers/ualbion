@@ -123,6 +123,8 @@ namespace UAlbion.Formats.MapEvents
             done:
             if (id < 0) throw new FormatException($"Error parsing node id of event node \"{s}\"");
             var e = Api.Event.Parse(s[i..]);
+            if (e == null)
+                throw new FormatException($"Could not parse \"{s[i..]}\" as an event");
 
             if (step == 5) // Branch node
             {

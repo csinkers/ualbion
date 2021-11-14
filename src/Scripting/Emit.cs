@@ -12,12 +12,12 @@ namespace UAlbion.Scripting
         public static EmptyNode Empty() => new();
         public static IfThen If(ICfgNode condition, ICfgNode body) => new(condition, body);
         public static IfThenElse IfElse(ICfgNode condition, ICfgNode body, ICfgNode elseBody) => new(condition, body, elseBody);
+        public static Goto Goto(string label) => new(label);
         public static Label Label(string name) => new(name);
         public static Name Name(string name) => new(name);
         public static Negation Negation(ICfgNode expression) => new(expression);
         public static Numeric Const(int num) => new(num);
         public static Sequence Seq(params ICfgNode[] statements) => new(statements);
-        public static SeseRegion Sese(ControlFlowGraph cfg) => new(cfg);
         public static Statement Statement(ICfgNode head, params ICfgNode[] parameters) => new(head, parameters);
         public static WhileLoop While(ICfgNode condition, ICfgNode body) => new(condition, body);
 
@@ -34,6 +34,5 @@ namespace UAlbion.Scripting
         public static BinaryOp Neq(ICfgNode parent, ICfgNode child) => new(ScriptOp.NotEqual, parent, child);
         public static BinaryOp Or(ICfgNode parent, ICfgNode child) => new(ScriptOp.Or, parent, child);
         public static BinaryOp Sub(ICfgNode parent, ICfgNode child) => new(ScriptOp.Subtract, parent, child);
-
     }
 }

@@ -94,13 +94,11 @@ namespace UAlbion.Scripting
             _sb.Append("}");
         }
 
-        public void Visit(SeseRegion sese)
+        public void Visit(Goto jump)
         {
-            _sb.Append("SESE(");
-            _inCondition = true;
-            _sb.Append(sese.Contents);
-            _inCondition = false;
-            _sb.Append(")");
+            Indent();
+            _sb.Append("goto ");
+            _sb.Append(jump.Label);
         }
 
         public void Visit(Statement statement)

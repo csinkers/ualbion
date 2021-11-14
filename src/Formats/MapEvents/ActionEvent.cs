@@ -9,6 +9,10 @@ namespace UAlbion.Formats.MapEvents
     public class ActionEvent : MapEvent
     {
         ActionEvent() { }
+        [EventPart("type")] public ActionType ActionType { get; private set; }
+        [EventPart("block", true, (byte)0)] public byte Block { get; private set; } // Item Class, 255 for 'any'
+        [EventPart("arg", true, "None")] public AssetId Argument { get; private set; }
+        [EventPart("unk2", true, (byte)1)] public byte Unk2 { get; private set; } // Always 1, unless ActionType == 14 (in which cas it is 2)
 
         public ActionEvent(ActionType actionType, byte block, AssetId arg, byte unk2)
         {
@@ -50,11 +54,6 @@ namespace UAlbion.Formats.MapEvents
             ApiUtil.Assert(e.Unk8 == 0);
             return e;
         }
-
-        [EventPart("type")] public ActionType ActionType { get; private set; }
-        [EventPart("block")] public byte Block { get; private set; } // Item Class, 255 for 'any'
-        [EventPart("arg")] public AssetId Argument { get; private set; }
-        [EventPart("unk2")] public byte Unk2 { get; private set; } // Always 1, unless ActionType == 14 (in which cas it is 2)
 
         byte Unk4 { get; set; }
         byte Unk5 { get; set; }

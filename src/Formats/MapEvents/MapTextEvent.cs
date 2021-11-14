@@ -10,7 +10,7 @@ namespace UAlbion.Formats.MapEvents
     public class MapTextEvent : MapEvent, ITextEvent, IAsyncEvent
     {
         MapTextEvent(TextId textSourceId) => TextSource = textSourceId;
-        public MapTextEvent(TextId textSourceId, byte subId, TextLocation? location, CharacterId characterId)
+        public MapTextEvent(TextId textSourceId, byte subId, TextLocation location, CharacterId characterId)
         {
             TextSource = textSourceId;
             SubId = subId;
@@ -26,7 +26,7 @@ namespace UAlbion.Formats.MapEvents
 
             if (s == null) throw new ArgumentNullException(nameof(s));
             e.TextSource = textSourceId;
-            e.Location = s.EnumU8(nameof(Location), e.Location ?? TextLocation.NoPortrait);
+            e.Location = s.EnumU8(nameof(Location), e.Location);
             int zeroed = s.UInt8(null, 0);
             zeroed += s.UInt8(null, 0);
             e.CharacterId = CharacterId.SerdesU8(nameof(CharacterId), e.CharacterId, e.CharacterType, mapping, s);
@@ -39,7 +39,7 @@ namespace UAlbion.Formats.MapEvents
 
         [EventPart("text")] public TextId TextSource { get; private set; }
         [EventPart("sub_id")] public byte SubId { get; private set; }
-        [EventPart("location")] public TextLocation? Location { get; private set; }
+        [EventPart("location", true, TextLocation.NoPortrait)] public TextLocation Location { get; private set; }
         [EventPart("char", true, "None")] public CharacterId CharacterId { get; private set; }
 
         AssetType CharacterType => Location switch

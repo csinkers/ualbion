@@ -39,9 +39,13 @@ namespace UAlbion.Scripting.Tests
         [Fact]
         public void ReduceSequenceTest()
         {
-            var result = 
+            var result =
                 Decompiler.ReduceSequences(
-                    Decompiler.ReduceSequences(TestGraphs.Sequence));
+                    Decompiler.ReduceSequences(
+                        TestGraphs.Sequence,
+                        true),
+                    true);
+
             TestUtil.Verify(result, null, "0, 1, 2");
         }
 
@@ -49,7 +53,7 @@ namespace UAlbion.Scripting.Tests
         public void ReduceIfThenTest()
         {
             var result = Decompiler.ReduceIfThen(TestGraphs.IfThen);
-            result = Decompiler.ReduceSequences(result);
+            result = Decompiler.ReduceSequences(result, true);
             TestUtil.Verify(result, null, "if (0) { 1 }, 2");
         }
 
@@ -57,7 +61,7 @@ namespace UAlbion.Scripting.Tests
         public void ReduceIfThenElseTest()
         {
             var result = Decompiler.ReduceIfThenElse(TestGraphs.IfThenElse);
-            result = Decompiler.ReduceSequences(result);
+            result = Decompiler.ReduceSequences(result, true);
             TestUtil.Verify(result, null, "if (0) { 1 } else { 2 }, 3");
         }
 
@@ -65,8 +69,8 @@ namespace UAlbion.Scripting.Tests
         public void ReduceSimpleWhileTest()
         {
             var result = Decompiler.ReduceSimpleWhile(TestGraphs.SimpleWhileLoop);
-            result = Decompiler.ReduceSequences(result);
-            result = Decompiler.ReduceSequences(result);
+            result = Decompiler.ReduceSequences(result, true);
+            result = Decompiler.ReduceSequences(result, true);
             TestUtil.Verify(result, null, "0, while (1) { }, 2");
         }
 
@@ -74,8 +78,8 @@ namespace UAlbion.Scripting.Tests
         public void ReduceWhileTest()
         {
             var result = Decompiler.ReduceSimpleLoops(TestGraphs.WhileLoop);
-            result = Decompiler.ReduceSequences(result);
-            result = Decompiler.ReduceSequences(result);
+            result = Decompiler.ReduceSequences(result, true);
+            result = Decompiler.ReduceSequences(result, true);
             TestUtil.Verify(result, null, "0, while (1) { 2 }, 3");
         }
 
@@ -83,8 +87,8 @@ namespace UAlbion.Scripting.Tests
         public void ReduceDoWhileTest()
         {
             var result = Decompiler.ReduceSimpleLoops(TestGraphs.DoWhileLoop);
-            result = Decompiler.ReduceSequences(result);
-            result = Decompiler.ReduceSequences(result);
+            result = Decompiler.ReduceSequences(result, true);
+            result = Decompiler.ReduceSequences(result, true);
             TestUtil.Verify(result, null, "0, do { 1 } while (2), 3");
         }
 /*

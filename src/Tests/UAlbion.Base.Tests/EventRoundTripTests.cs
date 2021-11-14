@@ -148,19 +148,19 @@ namespace UAlbion.Base.Tests
         {
             var unknown0 = new AssetId(AssetType.Unknown);
             var unknown1 = new AssetId(AssetType.Unknown, 1);
-            Test(("action AskAboutItem 1 Item.Pistol 1", new ActionEvent(ActionType.AskAboutItem,   1, (ItemId)Item.Pistol, 1)),
-                ("action DialogueLine 1 Unknown.1 1",   new ActionEvent(ActionType.DialogueLine,   1, unknown1, 1)),
-                ("action EquipItem 1 Item.Pistol 1",    new ActionEvent(ActionType.EquipItem,      1, (ItemId)Item.Pistol, 1)),
-                ("action FinishDialogue 1 Unknown.0 1", new ActionEvent(ActionType.FinishDialogue, 1, unknown0, 1)),
-                ("action PickupItem 1 Item.Pistol 1",   new ActionEvent(ActionType.PickupItem,     1, (ItemId)Item.Pistol, 1)),
-                ("action StartDialogue 1 Unknown.0 1",  new ActionEvent(ActionType.StartDialogue,  1, unknown0, 1)),
-                ("action StartDialogue 1 Unknown.1 1",  new ActionEvent(ActionType.StartDialogue,  1, unknown1, 1)),
-                ("action UnequipItem 1 Item.Pistol 1",  new ActionEvent(ActionType.UnequipItem,    1, (ItemId)Item.Pistol, 1)),
-                ("action UnkE 1 Unknown.0 1",           new ActionEvent(ActionType.UnkE,          1, unknown0, 1)),
-                ("action Unk17 1 Unknown.1 1",          new ActionEvent(ActionType.Unk17,          1, unknown1, 1)),
-                ("action UseItem 1 Item.Pistol 1",      new ActionEvent(ActionType.UseItem,        1, (ItemId)Item.Pistol, 1)),
-                ("action Word 1 None 1",               new ActionEvent(ActionType.Word,           1, AssetId.None, 1)),
-                ("action Word 1 Word.Argim 1",          new ActionEvent(ActionType.Word,           1, (WordId)Word.Argim, 1)));
+            Test(("action AskAboutItem 1 Item.Pistol", new ActionEvent(ActionType.AskAboutItem,   1, (ItemId)Item.Pistol, 1)),
+                ("action DialogueLine 1 Unknown.1",   new ActionEvent(ActionType.DialogueLine,   1, unknown1, 1)),
+                ("action EquipItem 1 Item.Pistol",    new ActionEvent(ActionType.EquipItem,      1, (ItemId)Item.Pistol, 1)),
+                ("action FinishDialogue 1 Unknown.0", new ActionEvent(ActionType.FinishDialogue, 1, unknown0, 1)),
+                ("action PickupItem 1 Item.Pistol",   new ActionEvent(ActionType.PickupItem,     1, (ItemId)Item.Pistol, 1)),
+                ("action StartDialogue 1 Unknown.0",  new ActionEvent(ActionType.StartDialogue,  1, unknown0, 1)),
+                ("action StartDialogue 1 Unknown.1",  new ActionEvent(ActionType.StartDialogue,  1, unknown1, 1)),
+                ("action UnequipItem 1 Item.Pistol",  new ActionEvent(ActionType.UnequipItem,    1, (ItemId)Item.Pistol, 1)),
+                ("action UnkE 1 Unknown.0",           new ActionEvent(ActionType.UnkE,          1, unknown0, 1)),
+                ("action Unk17 1 Unknown.1",          new ActionEvent(ActionType.Unk17,          1, unknown1, 1)),
+                ("action UseItem 1 Item.Pistol",      new ActionEvent(ActionType.UseItem,        1, (ItemId)Item.Pistol, 1)),
+                ("action Word 1",                     new ActionEvent(ActionType.Word,           1, AssetId.None, 1)),
+                ("action Word 1 Word.Argim",          new ActionEvent(ActionType.Word,           1, (WordId)Word.Argim, 1)));
         }
 
         [Fact]
@@ -418,7 +418,7 @@ prompt_player_numeric MapText.Jirinaar Equals 0 1
 is_conscious PartyMember.Tom IsTrue 0
 is_conscious PartyMember.Tom IsTrue 1
 is_demo_version 1 IsTrue 0
-event_used IsTrue 0 0
+event_used
 total_gold GreaterThan 0 0
 total_gold GreaterThanOrEqual 0 1
 total_gold GreaterThanOrEqual 1 0
@@ -426,22 +426,22 @@ total_gold LessThanOrEqual 0 1
 has_item Equals 1 Item.Pistol
 has_item GreaterThan 0 Item.Pistol
 has_item GreaterThanOrEqual 1 Item.Pistol
-party_has IsTrue 0 PartyMember.Tom
-is_leader Equals 0 PartyMember.Tom
-is_leader IsTrue 0 PartyMember.Tom
+party_has PartyMember.Tom
+is_leader PartyMember.Tom Equals
+is_leader PartyMember.Tom
 current_map Equals 0 Map.1
-is_npc_active Equals 0 0
-is_npc_active Equals 1 1
-is_npc_active IsTrue 0 0
-is_npc_active IsTrue 0 1
-is_npc_active IsTrue 1 0
+is_npc_active 0
+is_npc_active 0 Equals
+is_npc_active 0 IsTrue 1
+is_npc_active 1
+is_npc_active 1 Equals 1
 result
 random_chance 1 IsTrue 1
 random_chance 1 LessThanOrEqual 0
 random_chance 1 LessThanOrEqual 1
 random_chance 1 NotEqual 1
 random_chance 1 OpUnk6 0
-is_debug_mode IsTrue 0 0
+is_debug_mode
 get_switch Switch.ExpelledFromSouthWind
 get_ticker Ticker.Ticker100 Equals 1
 get_ticker Ticker.Ticker100 GreaterThan 1
@@ -466,8 +466,8 @@ query_unk1e LessThanOrEqual 0 1
 query_unk1e OpUnk6 0 1
 query_unkc Equals 0 0
 query_unkc Equals 0 1
-used_item Item.Pistol Equals 0
-used_item Item.Pistol IsTrue 0
+used_item Item.Pistol Equals
+used_item Item.Pistol
 query_verb MapInit");
         }
 
@@ -574,13 +574,13 @@ teleport None 1 1 North 1 1");
 map_text EventText.Frill 1 Conversation
 map_text EventText.Frill 1 ConversationOptions
 map_text EventText.Frill 1 ConversationQuery
-map_text EventText.Frill 1 NoPortrait
+map_text EventText.Frill 1
 map_text EventText.Frill 1 NoPortrait Npc.Christine
 map_text EventText.Frill 1 PortraitLeft Npc.Christine
 map_text EventText.Frill 1 PortraitLeft2
 map_text EventText.Frill 1 StandardOptions
 map_text MapText.Jirinaar 1 1
-map_text MapText.Jirinaar 1 NoPortrait
+map_text MapText.Jirinaar 1
 map_text MapText.Jirinaar 1 PortraitLeft
 map_text MapText.Jirinaar 1 PortraitLeft Npc.Christine
 map_text MapText.Jirinaar 1 PortraitLeft2

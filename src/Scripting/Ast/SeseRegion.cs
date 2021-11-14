@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Collections.Immutable;
 
 namespace UAlbion.Scripting.Ast
@@ -20,3 +21,4 @@ namespace UAlbion.Scripting.Ast
         public int Priority => int.MaxValue;
     }
 }
+#endif

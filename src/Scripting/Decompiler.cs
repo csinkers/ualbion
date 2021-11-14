@@ -87,16 +87,17 @@ namespace UAlbion.Scripting
             {
                 previous = graph;
                 graph = record("Defragment", graph.Defragment());
-                graph = record("Reduce simple while", ReduceSimpleWhile(graph)); if (graph != previous) continue;
-                graph = record("Reduce sequence", ReduceSequences(graph));       if (graph != previous) continue;
-                graph = record("Reduce if-then", ReduceIfThen(graph));           if (graph != previous) continue;
-                graph = record("Reduce if-then-else", ReduceIfThenElse(graph));  if (graph != previous) continue;
-                graph = record("Reduce loop parts", ReduceLoopParts(graph));     if (graph != previous) continue;
-                graph = record("Reduce simple loop", ReduceSimpleLoops(graph));  if (graph != previous) continue;
-                graph = record("Reduce SESE region", ReduceSeseRegions(graph));  if (graph != previous) continue;
-                graph = record("Add gotos", AddGotos(graph));                    if (graph != previous) continue;
+                graph = record("Reduce simple while", ReduceSimpleWhile(graph));  if (graph != previous) continue;
+                graph = record("Reduce sequence", ReduceSequences(graph, false)); if (graph != previous) continue;
+                graph = record("Reduce if-then", ReduceIfThen(graph));            if (graph != previous) continue;
+                graph = record("Reduce if-then-else", ReduceIfThenElse(graph));   if (graph != previous) continue;
+                graph = record("Reduce loop parts", ReduceLoopParts(graph));      if (graph != previous) continue;
+                graph = record("Reduce simple loop", ReduceSimpleLoops(graph));   if (graph != previous) continue;
+                graph = record("Reduce SESE region", ReduceSeseRegions(graph));   if (graph != previous) continue;
+                graph = record("Reduce sequence", ReduceSequences(graph, true));
             }
-            return graph;
+
+            return CfgRelabeller.Relabel(graph);
         }
 
         public static ControlFlowGraph ReduceSimpleWhile(ControlFlowGraph graph)
@@ -124,7 +125,7 @@ namespace UAlbion.Scripting
             return graph;
         }
 
-        public static ControlFlowGraph ReduceSequences(ControlFlowGraph graph)
+        public static ControlFlowGraph ReduceSequences(ControlFlowGraph graph, bool reduceEmptyNodes)
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
             foreach (var index in graph.GetDfsPostOrder())
@@ -147,10 +148,16 @@ namespace UAlbion.Scripting
                 if (grandChildren.Length == 1 && (grandChildren[0] == index || grandChildren[0] == child))
                     continue; // Loops around, not a sequence
 
+                var node = graph.Nodes[index];
+                var childNode = graph.Nodes[child];
+
+                if (reduceEmptyNodes && (node is EmptyNode || childNode is EmptyNode))
+                    continue; // Don't collapse the entry/exit nodes until the end
+
                 var newNode = 
-                    graph.Nodes[index] is Sequence existing
+                    node is Sequence existing
                     ? Emit.Seq(existing.Statements.Append(graph.Nodes[child]).ToArray())
-                    : Emit.Seq(graph.Nodes[index], graph.Nodes[child]);
+                    : Emit.Seq(node, childNode);
 
                 var updated = graph
                     .RemoveNode(child)
@@ -465,8 +472,13 @@ namespace UAlbion.Scripting
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
             var regions = graph.GetAllSeseRegions();
-            foreach (var (region, regionHead) in regions)
+
+            // Do smallest regions first, as they may be nested in a larger one
+            foreach (var (region, regionHead) in regions.OrderBy(x => x.nodes.Count))
             {
+                if (regionHead == graph.HeadIndex)
+                    continue; // Don't try and reduce the 'sequence' of start node -> actual entry point nodes when there's only one entry
+
                 #if DEBUG
                 Func<string> vis = () =>
                 {
@@ -484,31 +496,21 @@ namespace UAlbion.Scripting
                 var cut = graph.Cut(region, regionHead);
 
                 if (cut.Cut.IsCyclic())
-                    continue;
+                    continue; // Must be some sort of weird loop that couldn't be reduced earlier, currently irreducible.
 
-                var newNode = Emit.Sese(cut.Cut);
-                var updated = cut.Remainder.AddNode(newNode, out var newNodeIndex);
+                var restructured = SeseReducer.Reduce(cut.Cut);
+                int restructuredHead = restructured.HeadIndex;
+                int restructuredTail = cut.Cut.GetExitNode();
+
+                var (updated, mapping) = cut.Remainder.Merge(restructured);
 
                 foreach (var (start, _, label) in cut.RemainderToCutEdges)
-                    updated = updated.AddEdge(start, newNodeIndex, label);
+                    updated = updated.AddEdge(start, mapping[restructuredHead], label);
 
                 foreach (var (_, end, label) in cut.CutToRemainderEdges)
-                    updated = updated.AddEdge(newNodeIndex, end, label);
+                    updated = updated.AddEdge(mapping[restructuredTail], end, label);
 
                 return updated;
-            }
-
-            return graph;
-        }
-
-        static ControlFlowGraph AddGotos(ControlFlowGraph graph)
-        {
-            if (graph.ActiveNodeCount == 1) // Is it already completely structured? i.e. an abstract syntax tree
-                return graph;
-
-            // Can't structure the rest nicely so add gotos
-            foreach (var index in graph.GetDfsPostOrder())
-            {
             }
 
             return graph;

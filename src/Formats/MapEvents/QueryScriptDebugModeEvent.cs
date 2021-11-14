@@ -8,15 +8,15 @@ namespace UAlbion.Formats.MapEvents
     public class QueryScriptDebugModeEvent : QueryEvent
     {
         public override QueryType QueryType => QueryType.ScriptDebugMode;
-        [EventPart("op")] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
-        [EventPart("imm")] public byte Immediate { get; private set; } // immediate value?
-        [EventPart("arg")] public ushort Argument { get; set; }
+        [EventPart("arg", true, (ushort)0)] public ushort Argument { get; set; }
+        [EventPart("op", true, QueryOperation.IsTrue)] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
+        [EventPart("imm", true, (byte)0)] public byte Immediate { get; private set; } // immediate value?
         QueryScriptDebugModeEvent() { }
-        public QueryScriptDebugModeEvent(QueryOperation operation, byte immediate, ushort argument)
+        public QueryScriptDebugModeEvent(ushort argument, QueryOperation operation, byte immediate)
         {
+            Argument = argument;
             Operation = operation;
             Immediate = immediate;
-            Argument = argument;
         }
         public static QueryScriptDebugModeEvent Serdes(QueryScriptDebugModeEvent e, ISerializer s)
         {

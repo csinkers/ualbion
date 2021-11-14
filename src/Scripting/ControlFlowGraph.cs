@@ -10,7 +10,17 @@ using UAlbion.Scripting.Ast;
 #pragma warning disable 8321 // Stop warnings about Vis() debug functions
 namespace UAlbion.Scripting
 {
-    public class ControlFlowGraph
+    public interface IGraph<out TNode, out TLabel>
+    {
+        int NodeCount { get; }
+        TNode GetNode(int i);
+        TLabel GetEdgeLabel(int start, int end);
+        IEnumerable<(int start, int end)> Edges { get; }
+        IEnumerable<int> Children(int i);
+        IEnumerable<int> Parents(int i);
+    }
+
+    public class ControlFlowGraph : IGraph<ICfgNode, bool>
     {
         const double DefragThreshold = 0.5; // If the majority are deleted then defrag
         static readonly ImmutableDictionary<int, ImmutableArray<int>> EmptyEdges = ImmutableDictionary<int, ImmutableArray<int>>.Empty;
@@ -30,6 +40,7 @@ namespace UAlbion.Scripting
 
         public int HeadIndex { get; }
         public ImmutableList<ICfgNode> Nodes { get; }
+        public ICfgNode GetNode(int i) => Nodes[i];
 
         public ICfgNode Head => Nodes.Count == 0 ? null : Nodes[HeadIndex];
 
@@ -39,6 +50,7 @@ namespace UAlbion.Scripting
             select (kvp.Key, end);
 
         public int ActiveNodeCount => Nodes.Count - _deletedNodeCount;
+        public int NodeCount => Nodes.Count;
 
         public ControlFlowGraph()
         {
@@ -160,6 +172,9 @@ namespace UAlbion.Scripting
 
         public ImmutableArray<int> Children(int i) => _edgesByStart.TryGetValue(i, out var nodes) ? nodes : ImmutableArray<int>.Empty;
         public ImmutableArray<int> Parents(int i) => _edgesByEnd.TryGetValue(i, out var nodes) ? nodes : ImmutableArray<int>.Empty;
+        IEnumerable<int> IGraph<ICfgNode, bool>.Children(int i) => Children(i);
+        IEnumerable<int> IGraph<ICfgNode, bool>.Parents(int i) => Parents(i);
+
         public bool GetEdgeLabel(int start, int end) => !_falseEdges.Contains((start, end));
         public ControlFlowGraph Reverse() =>
             _cachedReverse ??= 
@@ -189,6 +204,11 @@ namespace UAlbion.Scripting
 
         public ControlFlowGraph AddEdge(int start, int end, bool label)
         {
+            if (start < 0) throw new ArgumentOutOfRangeException(nameof(start), $"Tried to add edge with invalid start index {start}");
+            if (end < 0) throw new ArgumentOutOfRangeException(nameof(end), $"Tried to add edge with invalid end index {end}");
+            if (start >= Nodes.Count) throw new ArgumentOutOfRangeException(nameof(start), $"Tried to add edge with start index {start}, but there are only {Nodes.Count} nodes");
+            if (end >= Nodes.Count) throw new ArgumentOutOfRangeException(nameof(end), $"Tried to add edge with end index {end}, but there are only {Nodes.Count} nodes");
+
             var edgesByStart = _edgesByStart.TryGetValue(start, out var byStart) 
                 ? _edgesByStart.SetItem(start, byStart.Add(end)) 
                 : _edgesByStart.Add(start, ImmutableArray<int>.Empty.Add(end));
@@ -373,7 +393,7 @@ namespace UAlbion.Scripting
             return false;
         }
 
-        int GetEntryNode()
+        public int GetEntryNode()
         {
             // Should be the only node with indegree 0
             int result = -1;
@@ -384,13 +404,13 @@ namespace UAlbion.Scripting
                 if (result != -1)
                     throw new ControlFlowGraphException("Multiple entry nodes were found in control flow graph!", this);
                 result = i;
-                return result;
+                // return result;
             }
 
             return result;
         }
 
-        int GetExitNode()
+        public int GetExitNode()
         {
             // Should be the only node with outdegree 0
             int result = -1;
@@ -401,7 +421,7 @@ namespace UAlbion.Scripting
                 if (result != -1)
                     throw new ControlFlowGraphException("Multiple exit nodes were found in control flow graph!", this);
                 result = i;
-                return result;
+                // return result;
             }
 
             return result;
@@ -564,7 +584,11 @@ namespace UAlbion.Scripting
                 sb.Append("    Node"); sb.Append(i);
                 sb.Append(" [shape=box, fontname = \"Consolas\", fontsize=8, fillcolor=azure2, style=filled, label=\"Node "); sb.Append(i);
                 sb.Append("\\l");
-                sb.Append(Nodes[i].ToString()?.Trim().Replace(Environment.NewLine, "\\l", StringComparison.InvariantCulture));
+
+                var visitor = new EmitPseudocodeVisitor();
+                Nodes[i].Accept(visitor);
+                sb.Append(visitor.Code.Replace(Environment.NewLine, "\\l", StringComparison.InvariantCulture));
+
                 sb.AppendLine("\\l\"];");
             }
 
@@ -907,11 +931,12 @@ namespace UAlbion.Scripting
                         return d.AddPointer("i", i).ToString();
                     };
 #endif
-                    if (visited[i]) 
-                        continue;
+                    if (visited[i])
+                        continue; // Don't visit nodes twice
 
-                    if (Edges.Any(e => e.end == i && !visited[e.start])) 
-                        continue;
+
+                    if (Parents(i).Any(x => !visited[x])) 
+                        continue; // If we haven't visited all of the parents we can't evaluate this node yet.
 
                     visited[i] = true;
                     result.Add(i);
@@ -974,6 +999,28 @@ namespace UAlbion.Scripting
             var cut = new ControlFlowGraph(0, cutNodes, cutEdges);
             var remainder = new ControlFlowGraph(remainderHead, remainderNodes, remainderEdges);
             return new CfgCutResult(cut, remainder, cutToRemainderEdges, remainderToCutEdges);
+        }
+
+        public (ControlFlowGraph result, int[] mapping) Merge(ControlFlowGraph restructured)
+        {
+            var result = this;
+            var mapping = new int[restructured.Nodes.Count];
+            Array.Fill(mapping, -1);
+
+            for (int i = 0; i < restructured.Nodes.Count; i++)
+            {
+                var node = restructured.Nodes[i];
+                if (node == null)
+                    continue;
+
+                result = result.AddNode(node, out var newIndex);
+                mapping[i] = newIndex;
+            }
+
+            foreach (var (start, end) in restructured.Edges)
+                result = result.AddEdge(mapping[start], mapping[end], restructured.GetEdgeLabel(start, end));
+
+            return (result, mapping);
         }
 
         public void GetReachingPath(int target, int current, List<int> path, List<List<int>> stack)

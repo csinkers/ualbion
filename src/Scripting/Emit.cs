@@ -1,22 +1,23 @@
-﻿using UAlbion.Api;
+﻿using System;
+using UAlbion.Api;
 using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting
 {
     public static class Emit
     {
-        public static SingleEvent Event(IEvent e) => new(e);
+        public static SingleEvent Event(IEvent e) => new(e ?? throw new ArgumentNullException(nameof(e)));
         public static BreakStatement Break() => new();
         public static ContinueStatement Continue() => new();
-        public static ControlFlowNode Cfg(ControlFlowGraph graph) => new(graph);
+        public static ControlFlowNode Cfg(ControlFlowGraph graph) => new(graph ?? throw new ArgumentNullException(nameof(graph)));
         public static DoLoop Do(ICfgNode condition, ICfgNode body) => new(condition, body);
         public static EmptyNode Empty() => new();
         public static IfThen If(ICfgNode condition, ICfgNode body) => new(condition, body);
         public static IfThenElse IfElse(ICfgNode condition, ICfgNode body, ICfgNode elseBody) => new(condition, body, elseBody);
-        public static Goto Goto(string label) => new(label);
-        public static Label Label(string name) => new(name);
-        public static Name Name(string name) => new(name);
-        public static Negation Negation(ICfgNode expression) => new(expression);
+        public static Goto Goto(string label) => new(label ?? throw new ArgumentNullException(nameof(label)));
+        public static Label Label(string name) => new(name ?? throw new ArgumentNullException(nameof(name)));
+        public static Name Name(string name) => new(name ?? throw new ArgumentNullException(nameof(name)));
+        public static Negation Negation(ICfgNode expression) => new(expression ?? throw new ArgumentNullException(nameof(expression)));
         public static Numeric Const(int num) => new(num);
         public static Sequence Seq(params ICfgNode[] statements) => new(statements);
         public static Statement Statement(ICfgNode head, params ICfgNode[] parameters) => new(head, parameters);

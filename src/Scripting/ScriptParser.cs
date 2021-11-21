@@ -122,6 +122,11 @@ namespace UAlbion.Scripting
         public static readonly TokenListParser<ScriptToken, ICfgNode> Continue =
             Token.EqualToValue(ScriptToken.Identifier, "continue").Value((ICfgNode)Emit.Continue());
 
+        public static readonly TokenListParser<ScriptToken, ICfgNode> Goto =
+            from keyword in Token.EqualToValue(ScriptToken.Identifier, "goto")
+            from label in Token.EqualTo(ScriptToken.Identifier)
+            select (ICfgNode)Emit.Goto(label.ToStringValue());
+
         public static readonly TokenListParser<ScriptToken, ICfgNode> SingleStatement =
             Label.Try()
             .Or(IfElse).Try()
@@ -130,6 +135,7 @@ namespace UAlbion.Scripting
             .Or(Do)
             .Or(Break)
             .Or(Continue)
+            .Or(Goto)
             .Or(EventStatement);
 
         static ICfgNode MakeSeq(ICfgNode[] statements) => statements.Length == 1 ? statements[0] : Emit.Seq(statements);

@@ -69,7 +69,7 @@ namespace UAlbion.Scripting
         }
 
 
-        bool IsEventFree(ushort index) => _indexToNode.ContainsKey(index);
+        bool IsEventFree(ushort index) => !_indexToNode.ContainsKey(index);
         bool IsNodeHandled(int graphIndex, int nodeIndex) => _nodeToIndex.ContainsKey((graphIndex, nodeIndex));
 
         void Set(ushort index, int graphIndex, int nodeIndex)
@@ -80,7 +80,11 @@ namespace UAlbion.Scripting
             if (IsNodeHandled(graphIndex, nodeIndex))
                 return;
 
-            var node = (SingleEvent)_graphs[graphIndex].Nodes[nodeIndex];
+            var node = _graphs[graphIndex].Nodes[nodeIndex];
+            if (node is EmptyNode)
+                return;
+
+            var eventNode = (SingleEvent)node;
             _indexToNode[index] = (graphIndex, nodeIndex);
             _nodeToIndex[(graphIndex, nodeIndex)] = index;
 
@@ -88,9 +92,9 @@ namespace UAlbion.Scripting
                 Events.Add(null);
 
             Events[index] = 
-                node.Event is IBranchingEvent branch
+                eventNode.Event is IBranchingEvent branch
                 ? new BranchNode(index, branch)
-                : new EventNode(index, node.Event);
+                : new EventNode(index, eventNode.Event);
         }
 
         void AddEntryPoint(ushort eventId, int graphIndex, int nodeIndex)
@@ -149,7 +153,8 @@ namespace UAlbion.Scripting
                 for (var index = 0; index < graph.Nodes.Count; index++)
                 {
                     var node = graph.Nodes[index];
-                    if (node is null or SingleEvent or Label) continue;
+                    if (node is null or SingleEvent or Label or EmptyNode)
+                        continue;
 
                     throw new ControlFlowGraphException(
                         $"Tried to lay out a graph containing a non-event node ({index}): {node} ({node.GetType().Name})",

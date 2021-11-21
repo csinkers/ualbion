@@ -23,7 +23,6 @@ namespace UAlbion.Base.Tests
 {
     public class FullDecompilationTests : IDisposable
     {
-        const bool DumpSteps = true;
         static readonly string ResultsDir = Path.Combine(TestUtil.FindBasePath(), "re", "FullDecomp");
         static int s_testNum;
 
@@ -89,23 +88,27 @@ namespace UAlbion.Base.Tests
             IEnumerable<ushort> entryPoints,
             [CallerMemberName] string testName = null) where T : IEventNode
         {
+            var resultsDir = Path.Combine(ResultsDir, testName ?? "Unknown");
             var graphs = Decompiler.BuildEventRegions(events, chains, entryPoints);
             var scripts = new string[graphs.Count];
             var errors = new string[graphs.Count];
+            var allSteps = new List<List<(string, ControlFlowGraph)>>();
             int successCount = 0;
 
             for (var index = 0; index < graphs.Count; index++)
             {
                 errors[index] = "";
+                var steps = new List<(string, ControlFlowGraph)>();
+                allSteps.Add(steps);
+                var graph = graphs[index];
                 try
                 {
-                    var graph = graphs[index];
-                    var decompiled = Decompile(graph, testName + index, DumpSteps);
+                    var decompiled = Decompile(graph, steps);
                     var visitor = new FormatScriptVisitor();
                     decompiled.Accept(visitor);
                     scripts[index] = visitor.Code;
 
-                    var roundTripLayout = ScriptCompiler.Compile(scripts[index]);
+                    var roundTripLayout = ScriptCompiler.Compile(scripts[index], steps);
                     var expectedLayout = EventLayout.Build(new[] { graph });
 
                     if (!TestUtil.CompareLayout(roundTripLayout, expectedLayout, out var error))
@@ -113,40 +116,41 @@ namespace UAlbion.Base.Tests
                     else
                         successCount++;
                 }
-                catch (Exception e)
+                catch (ControlFlowGraphException ex)
                 {
-                    errors[index] += $"[{index}: {e.Message}] ";
+                    steps.Add((ex.Message, ex.Graph));
+                    errors[index] += $"[{index}: {ex.Message}] ";
+                }
+                catch (Exception ex)
+                {
+                    errors[index] += $"[{index}: {ex.Message}] ";
                 }
             }
 
             if (successCount < graphs.Count)
             {
                 var combined = string.Join(Environment.NewLine, errors.Where(x => x.Length > 0));
+                for (int i = 0; i < allSteps.Count; i++)
+                {
+                    var steps = allSteps[i];
+                    if (!string.IsNullOrEmpty(errors[i]))
+                        TestUtil.DumpSteps(steps, resultsDir, $"Region{i}");
+                }
+
                 throw new InvalidOperationException($"[{successCount}/{graphs.Count}] Errors:{Environment.NewLine}{combined}");
             }
         }
 
-        static ICfgNode Decompile(ControlFlowGraph graph, string testName, bool dumpSteps)
+        static ICfgNode Decompile(ControlFlowGraph graph, List<(string, ControlFlowGraph)> steps)
         {
-            var steps = new List<(string, ControlFlowGraph)>();
-
-            ControlFlowGraph Record(string d, ControlFlowGraph g)
+            ControlFlowGraph Record(string description, ControlFlowGraph g)
             {
-                steps.Add((d, g));
+                if (steps.Count == 0 || steps[^1].Item2 != g)
+                    steps.Add((description, g));
                 return g;
             }
 
-            try
-            {
-                return Decompiler.SimplifyGraph(graph, Record);
-            }
-            catch(ControlFlowGraphException ex)
-            {
-                steps.Add((ex.Message, ex.Graph));
-                if (dumpSteps)
-                    TestUtil.DumpSteps(steps, ResultsDir, testName);
-                throw;
-            }
+            return Decompiler.SimplifyGraph(graph, Record);
         }
 
         static T Load<T>(Func<IAssetManager, T> func)

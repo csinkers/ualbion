@@ -7,7 +7,7 @@ using static System.FormattableString;
 namespace UAlbion.Api
 {
     [DebuggerDisplay("{ToString()}")]
-    public class EventNode : IEventNode
+    public class EventNode : IEventNode, IEquatable<EventNode>
     {
         bool DirectSequence => (Next?.Id ?? Id + 1) == Id + 1;
         public override string ToString() => ToString(0);
@@ -119,6 +119,25 @@ namespace UAlbion.Api
             //  1?!:3: foo
             // #1?!:3: foo
         }
+
+        public bool Equals(EventNode other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Id == other.Id && 
+                   Equals(Event.ToStringNumeric(), other.Event.ToStringNumeric()) && 
+                   Equals(Next?.Id, other.Next?.Id);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((EventNode)obj);
+        }
+
+        public override int GetHashCode() => HashCode.Combine(Id, Event.ToStringNumeric(), Next?.Id);
     }
 
     [DebuggerDisplay("{ToString()}")]

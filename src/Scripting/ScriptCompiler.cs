@@ -45,8 +45,8 @@ namespace UAlbion.Scripting
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
             ControlFlowGraph previous = null;
+            graph = record("Begin compilation", graph);
             graph = record("Lower loops", LowerLoops(graph));
-            // TODO: Convert statements to events
 
             while (graph != previous)
             {
@@ -59,8 +59,58 @@ namespace UAlbion.Scripting
 
             graph = record("Resolve goto", ResolveGotos(graph));
             // TODO: Split graphs
-            // TODO: Remove empty nodes
+            try
+            {
+                graph = record("Parse events", ParseEvents(graph));
+            }
+            catch {}
+
+            graph = record("Remove empty nodes", RemoveEmptyNodes(graph));
             graph = record("Defragment", graph.Defragment());
+            return graph;
+        }
+
+        static ControlFlowGraph RemoveEmptyNodes(ControlFlowGraph graph)
+        {
+            foreach (var index in graph.GetDfsOrder())
+            {
+                var node = graph.Nodes[index];
+                if (node is not EmptyNode)
+                    continue;
+
+                var children = graph.Children(index);
+                if (children.Length != 1)
+                    continue;
+
+                var child = children[0];
+
+                var parents = graph.Parents(index);
+                if (parents.Length == 0) // Don't remove head node
+                    continue;
+
+                foreach (var parent in parents)
+                    graph = graph.AddEdge(parent, child, graph.GetEdgeLabel(parent, index));
+                graph = graph.RemoveNode(index);
+            }
+
+            return graph;
+        }
+
+        static ControlFlowGraph ParseEvents(ControlFlowGraph graph)
+        {
+            foreach (var index in graph.GetDfsOrder())
+            {
+                var node = graph.Nodes[index];
+                var visitor = new EventParsingVisitor();
+                try
+                {
+                    node.Accept(visitor);
+                    if (visitor.Result != null)
+                        graph = graph.ReplaceNode(index, visitor.Result);
+                }
+                catch (Exception ex) { throw new ControlFlowGraphException(ex.Message, graph); }
+            }
+
             return graph;
         }
 
@@ -72,7 +122,7 @@ namespace UAlbion.Scripting
                 if (node is not ControlFlowNode cfgNode)
                     continue;
 
-                return graph.ReplaceNode(index, cfgNode);
+                return graph.ReplaceNode(index, cfgNode.Graph);
             }
 
             return graph;
@@ -150,18 +200,26 @@ namespace UAlbion.Scripting
                 if (node is not IfThen ifThen)
                     continue;
 
+                bool negated = false;
+                var condition = ifThen.Condition;
+                if (ifThen.Condition is Negation negation)
+                {
+                    negated = true;
+                    condition = negation.Expression;
+                }
+
                 var cfg = new ControlFlowGraph(
                     new[]
                     {
-                        ifThen.Condition, // 0
+                        condition, // 0
                         ifThen.Body, // 1
                         Emit.Empty() // 2
                     },
                     new []
                     {
-                        (0,1,true),
-                        (0,2,false),
-                        (1,2,true),
+                        (0, 1, !negated),
+                        (0, 2, negated),
+                        (1, 2, true),
                     });
                 return graph.ReplaceNode(index, cfg);
             }

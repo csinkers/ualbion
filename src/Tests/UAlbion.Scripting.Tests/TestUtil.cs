@@ -73,25 +73,39 @@ namespace UAlbion.Scripting.Tests
 
         public static bool CompareLayout(EventLayout actual, EventLayout expected, out string message)
         {
-            if (!expected.Events.SequenceEqual(actual.Events))
+            if (!Compare(expected.Events, actual.Events))
             {
                 message = "Event mismatch";
                 return false;
             }
 
-            if (!expected.Chains.SequenceEqual(actual.Chains))
+            if (!Compare(expected.Chains, actual.Chains))
             {
                 message = "Chain mismatch";
                 return false;
             }
 
-            if (!expected.ExtraEntryPoints.SequenceEqual(actual.ExtraEntryPoints))
+            if (!Compare(expected.ExtraEntryPoints, actual.ExtraEntryPoints))
             {
                 message = "Entry point mismatch";
                 return false;
             }
 
             message = null;
+            return true;
+        }
+
+        static bool Compare<T>(IList<T> left, IList<T> right)
+        {
+            if (left.Count != right.Count)
+                return false;
+
+            for (int i = 0; i < left.Count; i++)
+            {
+                if (!Equals(left[i], right[i]))
+                    return false;
+            }
+
             return true;
         }
 
@@ -156,6 +170,7 @@ namespace UAlbion.Scripting.Tests
             for (int i = 0; i < steps.Count; i++)
             {
                 var (description, graph) = steps[i];
+                description = SanitizeForPath(description);
                 var path = Path.Combine(resultsDir, $"{method}_{i}_{description}.gv");
                 var sb = new StringBuilder();
                 graph.ExportToDot(sb);
@@ -165,6 +180,21 @@ namespace UAlbion.Scripting.Tests
             }
 
             Task.WaitAll(tasks.ToArray());
+        }
+
+        static string SanitizeForPath(string description)
+        {
+            var sb = new StringBuilder();
+            foreach (var c in description)
+            {
+                if (c is ' ' or '_' or '-')
+                    sb.Append(c);
+                else if (char.IsLetterOrDigit(c))
+                    sb.Append(c);
+                else if (c is '(' or ')' or '[' or ']')
+                    sb.Append(c);
+            }
+            return sb.ToString();
         }
 
         static async Task FormatGraph(string path)

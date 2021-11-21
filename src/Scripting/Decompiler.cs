@@ -133,6 +133,7 @@ namespace UAlbion.Scripting
         public static ICfgNode SimplifyGraph(ControlFlowGraph graph, RecordFunc record)
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
+            record("Begin decompilation", graph);
             Func<string> vis = () => graph.Visualize();
             ControlFlowGraph previous = null;
             while (graph != previous)
@@ -271,7 +272,10 @@ namespace UAlbion.Scripting
                 if (after == -1 || then == -1 || after == head) 
                     continue;
 
-                var newNode = Emit.If(graph.Nodes[head], graph.Nodes[then]);
+                var label = graph.GetEdgeLabel(head, then);
+                var condition = label ? graph.Nodes[head] : Emit.Negation(graph.Nodes[head]);
+
+                var newNode = Emit.If(condition, graph.Nodes[then]);
                 return graph.RemoveNode(then).ReplaceNode(head, newNode);
             }
 

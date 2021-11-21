@@ -18,6 +18,7 @@ namespace UAlbion.Scripting.Tests
                 S(Emit.Name("a"), Emit.Name("b"), Emit.Name("c")),
                 ScriptParser.Expression);
         [Fact] public void LabelTest() => TestRoundTrip("foo:", Emit.Label("foo"), ScriptParser.Label);
+        [Fact] public void GotoTest() => TestRoundTrip("goto foo", Emit.Goto("foo"), ScriptParser.Goto);
 
         [Fact] public void MemberTest() => TestRoundTrip("a.b", Emit.Member(Emit.Name("a"), Emit.Name("b")), ScriptParser.Expression);
         [Fact] public void MemberNumTest() => TestRoundTrip("a.100", Emit.Member(Emit.Name("a"), Emit.Const(100)), ScriptParser.Expression);
@@ -61,6 +62,7 @@ namespace UAlbion.Scripting.Tests
         [Fact] public void StatementMemberNumTest()       => TestRoundTrip("a.100", S(Emit.Member(Emit.Name("a"), Emit.Const(100))), ScriptParser.Statement);
         [Fact] public void StatementStatementTest()       => TestRoundTrip("a b c", S(Emit.Name("a"), Emit.Name("b"), Emit.Name("c")), ScriptParser.Statement);
         [Fact] public void StatementLabelTest()           => TestRoundTrip("foo:",  Emit.Label("foo"), ScriptParser.Statement);
+        [Fact] public void StatementGotoTest()            => TestRoundTrip("goto foo", Emit.Goto("foo"), ScriptParser.Statement);
 
         [Fact] public void NegationNameTest() => TestRoundTrip("!foo", Emit.Negation(Emit.Name("foo")), ScriptParser.Negation);
         [Fact] public void NegationNumberTest() => TestRoundTrip("!100", Emit.Negation(Emit.Const(100)), ScriptParser.Negation);

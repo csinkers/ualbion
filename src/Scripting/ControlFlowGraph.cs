@@ -1065,15 +1065,15 @@ namespace UAlbion.Scripting
             return new CfgCutResult(cut, remainder, cutToRemainderEdges, remainderToCutEdges);
         }
 
-        public (ControlFlowGraph result, int[] mapping) Merge(ControlFlowGraph restructured)
+        public (ControlFlowGraph result, int[] mapping) Merge(ControlFlowGraph other)
         {
             var result = this;
-            var mapping = new int[restructured.Nodes.Count];
+            var mapping = new int[other.Nodes.Count];
             Array.Fill(mapping, -1);
 
-            for (int i = 0; i < restructured.Nodes.Count; i++)
+            for (int i = 0; i < other.Nodes.Count; i++)
             {
-                var node = restructured.Nodes[i];
+                var node = other.Nodes[i];
                 if (node == null)
                     continue;
 
@@ -1081,8 +1081,8 @@ namespace UAlbion.Scripting
                 mapping[i] = newIndex;
             }
 
-            foreach (var (start, end) in restructured.Edges)
-                result = result.AddEdge(mapping[start], mapping[end], restructured.GetEdgeLabel(start, end));
+            foreach (var (start, end) in other.Edges)
+                result = result.AddEdge(mapping[start], mapping[end], other.GetEdgeLabel(start, end));
 
             return (result, mapping);
         }

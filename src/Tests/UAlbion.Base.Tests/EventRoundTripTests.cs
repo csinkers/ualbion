@@ -182,11 +182,11 @@ namespace UAlbion.Base.Tests
         [Fact]
         public void ChangeIcon()
         {
-            Test(("change_icon 1 1 0 BlockHard 0 1", new ChangeIconEvent(1, 1, 0, IconChangeType.BlockHard, 0, 1)),
-                ("change_icon 1 1 0 BlockHard 1 0", new ChangeIconEvent(1, 1, 0, IconChangeType.BlockHard, 1, 0)),
-                ("change_icon 1 1 Rel BlockHard 1 3", new ChangeIconEvent(1, 1, EventScopes.Rel, IconChangeType.BlockHard, 1, 3)),
-                ("change_icon 1 1 Rel|Temp BlockHard 1 2", new ChangeIconEvent(1, 1, EventScopes.Rel | EventScopes.Temp, IconChangeType.BlockHard, 1,  2)),
-                ("change_icon 1 1 Temp BlockHard 1 0", new ChangeIconEvent(1, 1, EventScopes.Temp, IconChangeType.BlockHard, 1, 0)));
+            Test(("change_icon 1 1 AbsPerm BlockHard 0 1", new ChangeIconEvent(1, 1, EventScopes.AbsPerm, IconChangeType.BlockHard, 0, 1)),
+                ("change_icon 1 1 AbsPerm BlockHard 1 0", new ChangeIconEvent(1, 1, EventScopes.AbsPerm, IconChangeType.BlockHard, 1, 0)),
+                ("change_icon 1 1 RelPerm BlockHard 1 3", new ChangeIconEvent(1, 1, EventScopes.RelPerm, IconChangeType.BlockHard, 1, 3)),
+                ("change_icon 1 1 RelTemp BlockHard 1 2", new ChangeIconEvent(1, 1, EventScopes.RelTemp, IconChangeType.BlockHard, 1,  2)),
+                ("change_icon 1 1 AbsTemp BlockHard 1 0", new ChangeIconEvent(1, 1, EventScopes.AbsTemp, IconChangeType.BlockHard, 1, 0)));
         }
 
         [Fact]

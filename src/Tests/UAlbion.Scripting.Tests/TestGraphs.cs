@@ -43,6 +43,8 @@ namespace UAlbion.Scripting.Tests
          \->2 */
         public static readonly ControlFlowGraph SimpleWhileLoop = new(0, BuildNodes(3),
             new[] { (0, 1, true), (1, 1, true), (1, 2, false) });
+        public static readonly ControlFlowGraph NegativeSimpleWhileLoop = new(0, BuildNodes(3),
+            new[] { (0, 1, true), (1, 1, false), (1, 2, true) });
 
         /* WhileLoop:
             0
@@ -55,6 +57,8 @@ namespace UAlbion.Scripting.Tests
          \->3 */
         public static readonly ControlFlowGraph WhileLoop = new(0, BuildNodes(4),
             new[] { (0, 1, true), (1, 2, true), (2, 1, true), (1, 3, false) });
+        public static readonly ControlFlowGraph NegativeWhileLoop = new(0, BuildNodes(4),
+            new[] { (0, 1, true), (1, 2, false), (2, 1, true), (1, 3, true) });
 
         /* DoWhileLoop:
             0
@@ -67,6 +71,8 @@ namespace UAlbion.Scripting.Tests
             3 */
         public static readonly ControlFlowGraph DoWhileLoop = new(0, BuildNodes(4),
             new[] { (0, 1, true), (1, 2, true), (2, 1, true), (2, 3, false) });
+        public static readonly ControlFlowGraph NegativeDoWhileLoop = new(0, BuildNodes(4),
+            new[] { (0, 1, true), (1, 2, true), (2, 1, false), (2, 3, true) });
 
         /* Graph1
            0
@@ -595,6 +601,52 @@ do {
             (1, 3, false),
             (3, 1, true),
             (3, 4, false)
+        });
+
+        /* 0
+           v
+           1
+          / \
+         t   f
+        /     \
+       2       3
+     /  \     / \
+    t    f   f   t
+   /      \ /     \
+  4        5       6
+   \       |      /
+    \      v     /
+     ----> 7 <--- */
+        public static string DiamondSeseCode =
+@"0
+if (1) {
+    if (2) {
+        4
+    } else {
+        goto L1
+    }
+} else {
+    if (3) {
+        6
+    } else {
+        L1:
+        5
+    }
+}
+7";
+
+        public static readonly ControlFlowGraph DiamondSese = new(0, BuildNodes(8), new[]
+        {
+            (0, 1, true),
+            (1, 2, true),
+            (1, 3, false),
+            (2, 4, true),
+            (2, 5, false),
+            (3, 5, false),
+            (3, 6, true),
+            (4, 7, true),
+            (5, 7, true),
+            (6, 7, true),
         });
     }
 }

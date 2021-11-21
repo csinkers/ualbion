@@ -39,7 +39,7 @@ namespace UAlbion.Scripting
             return SplitGraph(graph);
         }
 
-        static List<ControlFlowGraph> SplitGraph(ControlFlowGraph graph) => new() { graph }; // TODO
+        static List<ControlFlowGraph> SplitGraph(ControlFlowGraph graph) => new() { graph.Defragment() }; // TODO
 
         public static ControlFlowGraph ExpandGraph(ControlFlowGraph graph, RecordFunc record)
         {
@@ -135,9 +135,9 @@ namespace UAlbion.Scripting
                 var node = graph.Nodes[index];
                 var visitor = new LoopLoweringVisitor();
                 node.Accept(visitor);
-                var result = (ControlFlowNode)visitor.Result;
-                if (result != null)
-                    graph = graph.ReplaceNode(index, result);
+                 
+                if (visitor.Result != null)
+                    graph = graph.ReplaceNode(index, visitor.Result);
             }
             return graph;
         }

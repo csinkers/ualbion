@@ -33,11 +33,13 @@ namespace UAlbion.Scripting
 
         // Logical operators
         [Token(Example = "!")] Not,
-        [Token(Example = "&")] And,
-        [Token(Example = "|")] Or,
+        [Token(Example = "&&")] And,
+        [Token(Example = "||")] Or,
 
         // Arithmetic operators
         [Token(Example = "+=")] Add,
         [Token(Example = "-=")] Sub,
+
+        [Token(Example = "|")] BitwiseOr,
     }
 }

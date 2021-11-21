@@ -138,7 +138,13 @@ namespace UAlbion.Scripting
             .Or(Goto)
             .Or(EventStatement);
 
-        static ICfgNode MakeSeq(ICfgNode[] statements) => statements.Length == 1 ? statements[0] : Emit.Seq(statements);
+        static ICfgNode MakeSeq(ICfgNode[] statements) =>
+            statements.Length switch
+            {
+                0 => Emit.Empty(),
+                1 => statements[0],
+                _ => Emit.Seq(statements)
+            };
 
         public static readonly TokenListParser<ScriptToken, Token<ScriptToken>> Comma = Token.EqualTo(ScriptToken.Comma);
         public static readonly TokenListParser<ScriptToken, Token<ScriptToken>> NewLine = Token.EqualTo(ScriptToken.NewLine);

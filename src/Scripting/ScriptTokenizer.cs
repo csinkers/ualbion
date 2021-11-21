@@ -8,11 +8,18 @@ namespace UAlbion.Scripting
 {
     public static class ScriptTokenizer
     {
+        static TextParser<Unit> NumberToken { get; } =
+            from sign in Character.EqualTo('-').OptionalOrDefault()
+            from first in Character.Digit
+            from rest in Character.Digit.IgnoreMany()
+            select Unit.Value;
+
         static Tokenizer<ScriptToken> TokenParser { get; } = new TokenizerBuilder<ScriptToken>()
             .Match(Span.EqualTo(Environment.NewLine), ScriptToken.NewLine)
             .Ignore(Span.WhiteSpace)
             .Match(Span.EqualTo("&&"), ScriptToken.And)
             .Match(Span.EqualTo("||"), ScriptToken.Or)
+            .Match(Span.EqualTo("|"), ScriptToken.BitwiseOr)
             .Match(Span.EqualTo("+="), ScriptToken.Add)
             .Match(Span.EqualTo("-="), ScriptToken.Sub)
             .Match(Span.EqualTo("=="), ScriptToken.Equal)
@@ -33,7 +40,7 @@ namespace UAlbion.Scripting
             .Match(Character.EqualTo(':'), ScriptToken.Colon)
             .Match(Character.EqualTo(','), ScriptToken.Comma)
             .Match(Comment.ToEndOfLine(Span.EqualTo(';')), ScriptToken.Comment)
-            .Match(Numerics.Natural, ScriptToken.Number)
+            .Match(NumberToken, ScriptToken.Number)
             .Match(Identifier.CStyle, ScriptToken.Identifier)
             .Build();
 

@@ -159,9 +159,13 @@ namespace UAlbion.Game.Entities.Map2D
                 return;
             }
 
-            byte x = (byte)(e.X + context.Source.X);
-            byte y = (byte)(e.Y + context.Source.Y);
-            _logicalMap.Modify(x, y, e.ChangeType, e.Value, (e.Scopes & EventScopes.Temp) != 0);
+            bool relative = e.Scopes is EventScopes.RelPerm or EventScopes.RelTemp;
+            bool temp = e.Scopes is EventScopes.AbsTemp or EventScopes.RelTemp;
+
+            byte x = relative ? (byte)(e.X + context.Source.X) : (byte)e.X;
+            byte y = relative ? (byte)(e.Y + context.Source.Y) : (byte)e.Y;
+
+            _logicalMap.Modify(x, y, e.ChangeType, e.Value, temp);
         }
     }
 }

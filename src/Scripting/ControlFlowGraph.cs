@@ -491,6 +491,15 @@ namespace UAlbion.Scripting
             return result;
         }
 
+        public IEnumerable<int> GetExitNodes()
+        {
+            for (int i = 0; i < Nodes.Count; i++)
+            {
+                if (Nodes[i] == null || !Children(i).IsEmpty) continue;
+                yield return i;
+            }
+        }
+
         public ImmutableArray<(int, int)> GetBackEdges()
         {
             if (_cachedBackEdges == null)
@@ -860,7 +869,8 @@ namespace UAlbion.Scripting
             {
                 if (nodes.Contains(child)) 
                     continue;
-                header = new LoopPart(header.Index, true, Break: true);
+                bool edgeLabel = GetEdgeLabel(nodes[0], child);
+                header = new LoopPart(header.Index, true, Break: true, Negated: edgeLabel);
                 exits.Add(child);
             }
 
@@ -869,6 +879,7 @@ namespace UAlbion.Scripting
                 bool isContinue = false;
                 bool isBreak = false;
                 bool isTail = true;
+                bool negated = false;
 
                 foreach (int child in Children(nodes[i]))
                 {
@@ -882,13 +893,14 @@ namespace UAlbion.Scripting
                         isTail = false;
                     else
                     {
+                        negated = !GetEdgeLabel(nodes[i], child);
                         isBreak = true;
                         exits.Add(child);
                     }
                 }
 
                 bool hasOutsideEntry = Enumerable.Any(Parents(nodes[i]), x => !nodes.Contains(x));
-                body.Add(new LoopPart(nodes[i], false, isTail, isBreak, isContinue, hasOutsideEntry));
+                body.Add(new LoopPart(nodes[i], false, isTail, isBreak, isContinue, hasOutsideEntry, negated));
             }
 
             bool isMultiExit = exits.Count > 1;

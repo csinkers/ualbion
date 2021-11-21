@@ -15,7 +15,7 @@ namespace UAlbion.Scripting.Tests
 {
     public static class TestUtil
     {
-        static readonly SemaphoreSlim _processSemaphore = new(Environment.ProcessorCount, Environment.ProcessorCount);
+        static readonly SemaphoreSlim ProcessSemaphore = new(Environment.ProcessorCount, Environment.ProcessorCount);
         public static string FindBasePath()
         {
             var exeLocation = Assembly.GetExecutingAssembly().Location;
@@ -42,23 +42,22 @@ namespace UAlbion.Scripting.Tests
             string resultsDir,
             [CallerMemberName] string method = null)
         {
-            if (!CompareCfgVsScript(graph, expected, out var error))
+            if (!CompareCfgVsScript(graph, expected, false, out var error) && !CompareCfgVsScript(graph, expected, true, out error))
             {
                 DumpSteps(steps, resultsDir, method);
-                var nl = Environment.NewLine;
                 throw new InvalidOperationException(error);
             }
         }
 
-        public static bool CompareCfgVsScript(ControlFlowGraph graph, string expected, out string message)
+        public static bool CompareCfgVsScript(ControlFlowGraph graph, string expected, bool pretty, out string message)
         {
             var nodes = graph.GetDfsOrder().Select(x => graph.Nodes[x]);
-            return CompareNodesVsScript(nodes, expected, out message);
+            return CompareNodesVsScript(nodes, expected, pretty, out message);
         }
 
-        public static bool CompareNodesVsScript(IEnumerable<ICfgNode> nodes, string expected, out string message)
+        public static bool CompareNodesVsScript(IEnumerable<ICfgNode> nodes, string expected, bool pretty, out string message)
         {
-            var visitor = new FormatScriptVisitor { PrettyPrint = false };
+            var visitor = new FormatScriptVisitor { PrettyPrint = pretty };
             foreach (var node in nodes)
                 node.Accept(visitor);
 
@@ -68,26 +67,27 @@ namespace UAlbion.Scripting.Tests
             var nl = Environment.NewLine;
             if (pseudo != expected)
                 message = $"Test Failed{nl}Expected:{nl}{expected}{nl}Actual:{nl}{pseudo}";
+
             return pseudo == expected;
         }
 
         public static bool CompareLayout(EventLayout actual, EventLayout expected, out string message)
         {
-            if (!Compare(expected.Events, actual.Events))
+            if (!Compare(expected.Events, actual.Events, out var error))
             {
-                message = "Event mismatch";
+                message = "Event mismatch: " + error;
                 return false;
             }
 
-            if (!Compare(expected.Chains, actual.Chains))
+            if (!Compare(expected.Chains, actual.Chains, out error))
             {
-                message = "Chain mismatch";
+                message = "Chain mismatch: " + error;
                 return false;
             }
 
-            if (!Compare(expected.ExtraEntryPoints, actual.ExtraEntryPoints))
+            if (!Compare(expected.ExtraEntryPoints, actual.ExtraEntryPoints, out error))
             {
-                message = "Entry point mismatch";
+                message = "Entry point mismatch " + error;
                 return false;
             }
 
@@ -95,18 +95,23 @@ namespace UAlbion.Scripting.Tests
             return true;
         }
 
-        static bool Compare<T>(IList<T> left, IList<T> right)
+        static bool Compare<T>(IList<T> left, IList<T> right, out string error)
         {
             if (left.Count != right.Count)
+            {
+                error = $"Expected {left.Count}, but there were {right.Count}";
                 return false;
+            }
 
+            var sb = new StringBuilder();
             for (int i = 0; i < left.Count; i++)
             {
                 if (!Equals(left[i], right[i]))
-                    return false;
+                    sb.AppendLine($"    {i}: expected \"{left[i]}\", received \"{right[i]}\"");
             }
 
-            return true;
+            error = sb.ToString();
+            return sb.Length == 0;
         }
 
         public static bool CompareCfg(ControlFlowGraph cfg, ControlFlowGraph expectedCfg, out string message)
@@ -199,7 +204,7 @@ namespace UAlbion.Scripting.Tests
 
         static async Task FormatGraph(string path)
         {
-            await _processSemaphore.WaitAsync();
+            await ProcessSemaphore.WaitAsync();
             try
             {
                 var graphVizDot = @"C:\Program Files\Graphviz\bin\dot.exe";
@@ -214,7 +219,7 @@ namespace UAlbion.Scripting.Tests
 
                 await process.WaitForExitAsync();
             }
-            finally { _processSemaphore.Release(); }
+            finally { ProcessSemaphore.Release(); }
         }
     }
 }

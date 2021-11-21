@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UAlbion.Api;
 using UAlbion.Scripting.Ast;
 
@@ -126,17 +125,21 @@ namespace UAlbion.Scripting
                         continue;
                     }
 
-                    var children = graph.Children(nodeIndex);
-                    if (children.Length != 1)
-                        throw new ControlFlowGraphException($"Label {node} ({nodeIndex}) does not have a single child",
-                            graph);
+                    int target = nodeIndex;
+                    while (graph.Nodes[target] is Label)
+                    {
+                        var children = graph.Children(target);
+                        if (children.Length != 1)
+                            throw new ControlFlowGraphException($"Label {graph.Nodes[target]} ({target}) does not have a single child", graph);
 
-                    var child = children[0];
-                    labels.Add((node.Name, graphIndex, child));
+                        target = children[0];
+                    }
+
+                    labels.Add((node.Name, graphIndex, target));
 
                     var parents = graph.Parents(nodeIndex);
                     foreach (var parent in parents)
-                        graph = graph.AddEdge(parent, child, graph.GetEdgeLabel(parent, nodeIndex));
+                        graph = graph.AddEdge(parent, graph.Children(nodeIndex)[0], graph.GetEdgeLabel(parent, nodeIndex));
                     graph = graph.RemoveNode(nodeIndex);
                 }
 

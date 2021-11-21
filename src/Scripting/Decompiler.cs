@@ -136,8 +136,13 @@ namespace UAlbion.Scripting
             record("Begin decompilation", graph);
             Func<string> vis = () => graph.Visualize();
             ControlFlowGraph previous = null;
+            int iterations = 0;
             while (graph != previous)
             {
+                iterations++;
+                if (iterations > 1000)
+                    throw new ControlFlowGraphException("Iteration overflow, assuming graph cannot be structured", graph);
+
                 previous = graph;
                 // graph = record("Defragment", graph.Defragment());
                 graph = record("Reduce simple while", ReduceSimpleWhile(graph));  if (graph != previous) continue;
@@ -167,7 +172,7 @@ namespace UAlbion.Scripting
             var simpleLoopIndices =
                 from index in graph.GetDfsPostOrder()
                 let children = graph.Children(index)
-                where children.Length == 2 && children.Contains(index)
+                where children.Length is 1 or 2 && children.Contains(index)
                 select index;
 
             foreach (var index in simpleLoopIndices)
@@ -176,9 +181,24 @@ namespace UAlbion.Scripting
                 Func<string> vis = () => graph.ToVis().AddPointer("index", index).ToString();
                 #endif
 
+                var condition = graph.Nodes[index];
+                if (!graph.GetEdgeLabel(index, index))
+                    condition = Emit.Negation(condition);
+
                 var updated = graph
-                    .ReplaceNode(index, Emit.While(graph.Nodes[index], null))
+                    .ReplaceNode(index, Emit.While(condition, null))
                     .RemoveEdge(index, index);
+
+                if (updated.Children(index).Length == 0) // For horrible infinite-loop cases add a dummy link to the exit node to prevent errors while calculating dominator trees.
+                {
+                    foreach (var exitIndex in updated.GetExitNodes())
+                    {
+                        if (updated.Nodes[exitIndex] is not EmptyNode)
+                            continue;
+                        updated = updated.AddEdge(index, exitIndex, true);
+                        break;
+                    }
+                }
 
                 return updated;
             }
@@ -421,10 +441,8 @@ namespace UAlbion.Scripting
                 if (targetChildren.Length != 1 || targetChildren[0] != loop.MainExit)
                     return graph;
 
-                bool label = graph.GetEdgeLabel(index, target);
-
                 var condition = graph.Nodes[index];
-                if (!label)
+                if (!graph.GetEdgeLabel(index, target))
                     condition = Emit.Negation(condition);
 
                 var newBlock = Emit.Seq(graph.Nodes[target], Emit.Break());
@@ -474,7 +492,7 @@ namespace UAlbion.Scripting
                     int tail = loop.Body[0].Index;
                     if (loop.Header.Break)
                     {
-                        var updated = ReduceWhileLoop(graph, head, tail);
+                        var updated = ReduceWhileLoop(graph, head, tail, loop.Header.Negated);
                         if (updated != graph)
                             return updated;
                     }
@@ -484,13 +502,12 @@ namespace UAlbion.Scripting
                         if (updated != graph)
                             return updated;
                     }
-
                 }
             }
             return graph;
         }
 
-        static ControlFlowGraph ReduceWhileLoop(ControlFlowGraph graph, int head, int tail)
+        static ControlFlowGraph ReduceWhileLoop(ControlFlowGraph graph, int head, int tail, bool negated)
         {
 #if DEBUG
             Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("tail", tail).ToString();
@@ -504,7 +521,11 @@ namespace UAlbion.Scripting
                 return ReplaceLoopBranch(graph, tail, target, Emit.Break());
             }
 
-            var newNode = Emit.While(graph.Nodes[head], graph.Nodes[tail]);
+            var condition = graph.Nodes[head];
+            if (negated)
+                condition = Emit.Negation(condition);
+
+            var newNode = Emit.While(condition, graph.Nodes[tail]);
             return updated
                 .RemoveNode(tail)
                 .ReplaceNode(head, newNode);
@@ -524,7 +545,11 @@ namespace UAlbion.Scripting
                 if (child != head)
                     updated = updated.AddEdge(head, child, true);
 
-            var newNode = Emit.Do(graph.Nodes[tail], graph.Nodes[head]);
+            var condition = graph.Nodes[tail];
+            if (!graph.GetEdgeLabel(tail, head))
+                condition = Emit.Negation(condition);
+
+            var newNode = Emit.Do(condition, graph.Nodes[head]);
             return updated
                 .RemoveNode(tail)
                 .ReplaceNode(head, newNode);
@@ -560,7 +585,7 @@ namespace UAlbion.Scripting
                 if (cut.Cut.IsCyclic())
                     continue; // Must be some sort of weird loop that couldn't be reduced earlier, currently irreducible.
 
-                var restructured = SeseReducer.Reduce(cut.Cut, ScriptConstants.DummyLabelPrefix);
+                var restructured = SeseReducer.Reduce(cut.Cut);
                 int restructuredHead = restructured.HeadIndex;
                 int restructuredTail = cut.Cut.GetExitNode();
 

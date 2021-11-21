@@ -25,7 +25,7 @@ namespace UAlbion.Scripting.Tests
                         return x;
                     });
 
-                if (!TestUtil.CompareNodesVsScript(new[] { result }, expected, out var error))
+                if (!TestUtil.CompareNodesVsScript(new[] { result }, expected, false, out var error) && !TestUtil.CompareNodesVsScript(new[] { result }, expected, true, out error))
                 {
                     TestUtil.DumpSteps(steps, resultsDir, method);
                     throw new InvalidOperationException(error);
@@ -83,6 +83,15 @@ namespace UAlbion.Scripting.Tests
         }
 
         [Fact]
+        public void ReduceNegativeSimpleWhileTest()
+        {
+            var result = Decompiler.ReduceSimpleWhile(TestGraphs.NegativeSimpleWhileLoop);
+            result = Decompiler.ReduceSequences(result, true);
+            result = Decompiler.ReduceSequences(result, true);
+            TestUtil.VerifyCfgVsScript(result, null, "0, while (!(1)) { }, 2", ResultsDir);
+        }
+
+        [Fact]
         public void ReduceWhileTest()
         {
             var result = Decompiler.ReduceSimpleLoops(TestGraphs.WhileLoop);
@@ -92,12 +101,30 @@ namespace UAlbion.Scripting.Tests
         }
 
         [Fact]
+        public void ReduceNegativeWhileTest()
+        {
+            var result = Decompiler.ReduceSimpleLoops(TestGraphs.NegativeWhileLoop);
+            result = Decompiler.ReduceSequences(result, true);
+            result = Decompiler.ReduceSequences(result, true);
+            TestUtil.VerifyCfgVsScript(result, null, "0, while (!(1)) { 2 }, 3", ResultsDir);
+        }
+
+        [Fact]
         public void ReduceDoWhileTest()
         {
             var result = Decompiler.ReduceSimpleLoops(TestGraphs.DoWhileLoop);
             result = Decompiler.ReduceSequences(result, true);
             result = Decompiler.ReduceSequences(result, true);
             TestUtil.VerifyCfgVsScript(result, null, "0, do { 1 } while (2), 3", ResultsDir);
+        }
+
+        [Fact]
+        public void ReduceNegativeDoWhileTest()
+        {
+            var result = Decompiler.ReduceSimpleLoops(TestGraphs.NegativeDoWhileLoop);
+            result = Decompiler.ReduceSequences(result, true);
+            result = Decompiler.ReduceSequences(result, true);
+            TestUtil.VerifyCfgVsScript(result, null, "0, do { 1 } while (!(2)), 3", ResultsDir);
         }
 /*
         [Fact]
@@ -112,7 +139,8 @@ namespace UAlbion.Scripting.Tests
         [Fact] public void IfThenElseTest() => TestSimplify(TestGraphs.IfThenElse, "if (0) { 1 } else { 2 }, 3"); 
         [Fact] public void SimpleWhileTest() => TestSimplify(TestGraphs.SimpleWhileLoop, "0, while (1) { }, 2"); 
         [Fact] public void WhileTest() => TestSimplify(TestGraphs.WhileLoop, "0, while (1) { 2 }, 3"); 
-        [Fact] public void DoWhileTest() => TestSimplify(TestGraphs.DoWhileLoop, "0, do { 1 } while (2), 3"); 
+        [Fact] public void DoWhileTest() => TestSimplify(TestGraphs.DoWhileLoop, "0, do { 1 } while (2), 3");
+        [Fact] public void DiamondSeseTest() => TestSimplify(TestGraphs.DiamondSese, TestGraphs.DiamondSeseCode);
         /*
         [Fact] public void ZeroKSeseTest() => TestSimplify(TestGraphs.ZeroKSese, "0; do { 2; } while (1); 3; "); 
         [Fact] public void NoMoreGotos3Test() => TestSimplify(TestGraphs.NoMoreGotos3, "something"); 

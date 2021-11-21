@@ -16,27 +16,33 @@ namespace UAlbion.Scripting
             _tailStack.Push(tailLabel);
 
             doLoop.Body?.Accept(this);
-            var body = Result;
+            var body = Result ?? doLoop.Body;
             doLoop.Condition.Accept(this);
-            var condition = Result;
+            var condition = Result ?? doLoop.Condition;
 
             _tailStack.Pop();
             _headStack.Pop();
+
+            var negated = false;
+            if (condition is Negation negation)
+            {
+                condition = negation.Expression;
+                negated = true;
+            }
 
             return Emit.Cfg(new ControlFlowGraph(new[]
                 {
                     Emit.Empty(), // 0
                     Emit.Label(headLabel), // 1
-                    body ?? doLoop.Body, // 2
-                    condition ?? doLoop.Condition, // 3
+                    body, // 2
+                    condition, // 3
                     Emit.Label(tailLabel), // 4
                     Emit.Empty() // 5
                 },
                 new[]
                 {
                     (0,1,true), (1,2,true), (2,3,true),
-                    (3,1,true),
-                    (3,4,false),
+                    (3,1,!negated), (3,4,negated),
                     (4,5,true),
                 }));
         }
@@ -49,26 +55,33 @@ namespace UAlbion.Scripting
             _tailStack.Push(tailLabel);
 
             whileLoop.Condition.Accept(this);
-            var condition = Result;
+            var condition = Result ?? whileLoop.Condition;
             whileLoop.Body?.Accept(this);
-            var body = Result;
+            var body = Result ?? whileLoop.Body;
 
             _tailStack.Pop();
             _headStack.Pop();
+
+            var negated = false;
+            if (condition is Negation negation)
+            {
+                condition = negation.Expression;
+                negated = true;
+            }
 
             return Emit.Cfg(new ControlFlowGraph(new[]
                 {
                     Emit.Empty(), // 0
                     Emit.Label(headLabel), // 1
-                    condition ?? whileLoop.Condition, // 2
-                    body ?? whileLoop.Body, // 3
+                    condition, // 2
+                    body, // 3
                     Emit.Label(tailLabel), // 4
                     Emit.Empty() // 5
                 },
                 new[]
                 {
                     (0,1,true), (1,2,true), 
-                    (2,3,true), (2,4,false),
+                    (2,3,!negated), (2,4,negated),
                     (3,1,true),
                     (4,5,true)
                 }));

@@ -389,7 +389,7 @@ namespace UAlbion.Base.Tests
             Assert.IsType<ChangeIconEvent>(en.Event);
             var e = (ChangeIconEvent)en.Event;
             Assert.Equal(IconChangeType.BlockSoft, e.ChangeType);
-            Assert.Equal(EventScopes.Rel, e.Scopes);
+            Assert.Equal(EventScopes.RelPerm, e.Scopes);
             Assert.Equal(-1, e.X);
             Assert.Equal(-3, e.Y);
             Assert.Equal(302, e.Value);

@@ -5,7 +5,7 @@ namespace UAlbion.Scripting
 {
     public static class SeseReducer
     {
-        public static ControlFlowGraph Reduce(ControlFlowGraph cut, string dummyLabelPrefix)
+        public static ControlFlowGraph Reduce(ControlFlowGraph cut)
         {
             var minDepth = FindShortestPaths(cut);
             var maxDepth = FindLongestPaths(cut);
@@ -26,12 +26,32 @@ namespace UAlbion.Scripting
                 }
             }
 
-            if (maxDeltaNode == -1)
-                return cut;
+            if (maxDeltaNode != -1)
+            {
+                var shortCircuitEdgeStart = cut.Parents(maxDeltaNode).OrderBy(parent => maxDepth[parent]).First();
+                return SeverEdge(cut, shortCircuitEdgeStart, maxDeltaNode, exitNode);
+            }
 
-            var shortCircuitEdgeStart = cut.Parents(maxDeltaNode).OrderBy(parent => maxDepth[parent]).First();
-            var shortCircuitEdgeLabel = cut.GetEdgeLabel(shortCircuitEdgeStart, maxDeltaNode);
-            var result = cut.RemoveEdge(shortCircuitEdgeStart, maxDeltaNode);
+            // If there's no depth discrepancies, then just sever one of the links to the first node with two parents
+            foreach (var i in cut.GetDfsPostOrder())
+            {
+                if (i == exitNode)
+                    continue;
+
+                var parents = cut.Parents(i);
+                if (parents.Length <= 1)
+                    continue;
+
+                return SeverEdge(cut, parents[0], i, exitNode);
+            }
+
+            throw new ControlFlowGraphException("Cannot reduce SESE region", cut);
+        }
+
+        static ControlFlowGraph SeverEdge(ControlFlowGraph cut, int start, int end, int exitNode)
+        {
+            var shortCircuitEdgeLabel = cut.GetEdgeLabel(start, end);
+            var result = cut.RemoveEdge(start, end);
 
             var labelName = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
             var gotoNode = Emit.Goto(labelName);
@@ -39,17 +59,17 @@ namespace UAlbion.Scripting
 
             result = result.AddNode(gotoNode, out var gotoIndex);
             result = result.AddNode(label, out var labelIndex);
-            result = result.AddEdge(shortCircuitEdgeStart, gotoIndex, shortCircuitEdgeLabel);
+            result = result.AddEdge(start, gotoIndex, shortCircuitEdgeLabel);
             result = result.AddEdge(gotoIndex, exitNode, true); // Dummy edge to ensure exit node stays unique
 
-            var parents = result.Parents(maxDeltaNode);
+            var parents = result.Parents(end);
             foreach (var parent in parents)
             {
-                var edgeLabel = cut.GetEdgeLabel(parent, maxDeltaNode);
-                result = result.RemoveEdge(parent, maxDeltaNode).AddEdge(parent, labelIndex, edgeLabel);
+                var edgeLabel = cut.GetEdgeLabel(parent, end);
+                result = result.RemoveEdge(parent, end).AddEdge(parent, labelIndex, edgeLabel);
             }
 
-            result = result.AddEdge(labelIndex, maxDeltaNode, true);
+            result = result.AddEdge(labelIndex, end, true);
 
             return result;
         }

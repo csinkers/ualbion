@@ -624,7 +624,7 @@ namespace UAlbion.Scripting
                 sb.Append(" [shape=box, fontname = \"Consolas\", fontsize=8, fillcolor=azure2, style=filled, label=\"Node "); sb.Append(i);
                 sb.Append("\\l");
 
-                var visitor = new EmitPseudocodeVisitor();
+                var visitor = new FormatScriptVisitor();
                 Nodes[i].Accept(visitor);
                 sb.Append(visitor.Code.Replace(Environment.NewLine, "\\l", StringComparison.InvariantCulture));
 

@@ -323,7 +323,7 @@ c",
             bool pretty = false) where T : ICfgNode
         {
             var parsed = TestParse(source, expected, parser);
-            var visitor = new EmitPseudocodeVisitor { PrettyPrint = pretty };
+            var visitor = new FormatScriptVisitor { PrettyPrint = pretty };
             parsed.Accept(visitor);
             Assert.Equal(source, visitor.Code);
         }

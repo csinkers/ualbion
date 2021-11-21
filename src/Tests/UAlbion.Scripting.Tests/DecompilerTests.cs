@@ -23,7 +23,8 @@ namespace UAlbion.Scripting.Tests
                         return x;
                     });
 
-                TestUtil.Verify(result, steps, expected, method);
+                var resultsDir = !string.IsNullOrEmpty(method) ? Path.Combine(ResultsDir, method) : ResultsDir;
+                TestUtil.Verify(result, steps, expected, resultsDir);
             }
             catch (ControlFlowGraphException e)
             {

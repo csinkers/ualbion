@@ -22,6 +22,7 @@ namespace UAlbion.Base.Tests
 {
     public class FullDecompilationTests : IDisposable
     {
+        const bool DumpSteps = false;
         static readonly string ResultsDir = Path.Combine(TestUtil.FindBasePath(), "re", "FullDecomp");
         static int s_testNum;
 
@@ -62,7 +63,7 @@ namespace UAlbion.Base.Tests
         [Fact] public void Set1() => TestEventSet(new EventSetId(AssetType.EventSet, 1));
         [Fact] public void Map110() => TestMap(new MapId(AssetType.Map, 110));
 
-        void TestMap(MapId id)
+        static void TestMap(MapId id)
         {
             var map = Load(x => x.LoadMap(id));
             var npcRefs = map.Npcs.Where(x => x.Node != null).Select(x => x.Node.Id).ToHashSet();
@@ -75,37 +76,59 @@ namespace UAlbion.Base.Tests
                 refs);
         }
 
-        void TestEventSet(EventSetId id)
+        static void TestEventSet(EventSetId id)
         {
             var set = Load(x => x.LoadEventSet(id));
             TestInner(set.Events, set.Chains, Array.Empty<ushort>());
         }
 
-        void TestInner<T>(
+        static void TestInner<T>(
             IList<T> events,
             IEnumerable<ushort> chains,
             IEnumerable<ushort> entryPoints,
             [CallerMemberName] string testName = null) where T : IEventNode
         {
             var graphs = Decompiler.BuildEventRegions(events, chains, entryPoints);
-            foreach (var graph in graphs)
+            var scripts = new string[graphs.Count];
+            var errors = new string[graphs.Count];
+            int successCount = 0;
+
+            for (var index = 0; index < graphs.Count; index++)
             {
-                var decompiled = Decompile(graph, testName);
-                var visitor = new EmitPseudocodeVisitor();
-                decompiled.Head.Accept(visitor);
-                var script = visitor.Code;
+                errors[index] = "";
+                try
+                {
+                    var graph = graphs[index];
+                    var decompiled = Decompile(graph, testName, DumpSteps);
+                    var visitor = new FormatScriptVisitor();
+                    decompiled.Head.Accept(visitor);
+                    scripts[index] = visitor.Code;
 
-                var (roundTripEvents, roundTripChains) = ScriptCompiler.Compile(script);
-                var (expectedEvents, expectedChains) = ScriptCompiler.LayoutGraph(graph);
-                if (!expectedEvents.SequenceEqual(roundTripEvents))
-                    throw new InvalidOperationException();
+                    var roundTripLayout = ScriptCompiler.Compile(scripts[index]);
+                    var expectedLayout = EventLayout.Build(new[] { graph });
 
-                if (!expectedChains.SequenceEqual(roundTripChains))
-                    throw new InvalidOperationException();
+                    if (!expectedLayout.Events.SequenceEqual(roundTripLayout.Events))
+                        errors[index] += $"[{index}: Events did not match] ";
+                    else if (!expectedLayout.Chains.SequenceEqual(roundTripLayout.Chains))
+                        errors[index] += $"[{index}: Chains did not match] ";
+                    else if (!expectedLayout.ExtraEntryPoints.SequenceEqual(roundTripLayout.ExtraEntryPoints))
+                        errors[index] += $"[{index}: Extra entry points did not match] ";
+                    else successCount++;
+                }
+                catch (Exception e)
+                {
+                    errors[index] += $"[{index}: {e.Message}] ";
+                }
+            }
+
+            if (successCount < graphs.Count)
+            {
+                var combined = string.Join(Environment.NewLine, errors.Where(x => x.Length > 0));
+                throw new InvalidOperationException($"[{successCount}/{graphs.Count}] Errors:{Environment.NewLine}{combined}");
             }
         }
 
-        static ControlFlowGraph Decompile(ControlFlowGraph graph, string testName)
+        static ControlFlowGraph Decompile(ControlFlowGraph graph, string testName, bool dumpSteps)
         {
             var steps = new List<(string, ControlFlowGraph)>();
 
@@ -122,7 +145,8 @@ namespace UAlbion.Base.Tests
             catch(ControlFlowGraphException ex)
             {
                 steps.Add((ex.Message, ex.Graph));
-                TestUtil.DumpSteps(steps, ResultsDir, testName);
+                if (dumpSteps)
+                    TestUtil.DumpSteps(steps, ResultsDir, testName);
                 throw;
             }
         }

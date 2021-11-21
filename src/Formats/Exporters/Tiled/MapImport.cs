@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
@@ -99,7 +100,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             scriptable.EventBytes = FormatUtil.SerializeToBytes(s =>
             {
                 for (ushort i = 0; i < scriptable.Events.Count; i++)
-                    scriptable.Events[i] = EventNode.Serdes(i, scriptable.Events[i], s, mapId, mapId.ToMapText(), mapping);
+                    scriptable.Events[i] = MapEvent.SerdesNode(i, scriptable.Events[i], s, mapId, mapId.ToMapText(), mapping);
             });
         }
 
@@ -274,7 +275,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             if (string.IsNullOrEmpty(visual) && string.IsNullOrEmpty(group)) // TODO: Differentiate between 2D/3D maps
                 throw new FormatException($"NPC \"{obj.Name}\" (id {obj.Id}) requires either a Visual or Group property to determine its appearance");
 
-            var events = EventNode.ParseScript(Prop("Script"));
+            var events = MapEvent.ParseRawEvents(Prop("Script"));
             UnswizzleEvents(events);
 
             return new NpcInfo
@@ -325,7 +326,7 @@ namespace UAlbion.Formats.Exporters.Tiled
 
             var polygon = obj.Polygon.Points.Select(p => (((int)obj.X + p.x) / map.TileWidth, ((int)obj.Y + p.y) / map.TileHeight));
             var shape = PolygonToShape(polygon);
-            var events = EventNode.ParseScript(Prop("Script"));
+            var events = MapEvent.ParseRawEvents(Prop("Script"));
             UnswizzleEvents(events);
             var trigger = RequiredProp("Trigger");
             var unk1 = Prop("Unk1");

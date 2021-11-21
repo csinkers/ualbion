@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using UAlbion.Api;
 using UAlbion.Formats.Assets.Maps;
-using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets
 {

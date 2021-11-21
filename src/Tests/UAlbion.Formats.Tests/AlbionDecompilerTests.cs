@@ -58,7 +58,7 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
 
         static void Verify(ICfgNode tree, List<(string, ControlFlowGraph)> steps, string expected, [CallerMemberName] string method = null)
         {
-            var visitor = new EmitPseudocodeVisitor();
+            var visitor = new FormatScriptVisitor();
             tree.Accept(visitor);
             // DumpSteps(steps, method);
 
@@ -97,7 +97,7 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
 
         static void TestDecompile(string script, string expected, [CallerMemberName] string method = null)
         {
-            var events = EventNode.ParseScript(script);
+            var events = MapEvent.ParseRawEvents(script);
             var steps = new List<(string, ControlFlowGraph)>();
             try
             {

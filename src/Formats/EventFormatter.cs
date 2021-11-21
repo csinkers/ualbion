@@ -47,7 +47,7 @@ namespace UAlbion.Formats
                 var trees = Decompiler.Decompile(events, chains, additionalEntryPoints, steps);
 
                 bool first = true;
-                var visitor = new EmitPseudocodeVisitor(sb) { IndentLevel = indent };
+                var visitor = new FormatScriptVisitor(sb) { IndentLevel = indent };
                 foreach (var tree in trees)
                 {
                     if (!first)

@@ -2,14 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using SerdesNet;
-using UAlbion.Api;
-using UAlbion.Config;
-using UAlbion.Formats.Assets;
 using static System.FormattableString;
 
-namespace UAlbion.Formats.MapEvents
+namespace UAlbion.Api
 {
     [DebuggerDisplay("{ToString()}")]
     public class EventNode : IEventNode
@@ -44,41 +39,6 @@ namespace UAlbion.Formats.MapEvents
                 Next = null;
             }
             else Next = nodes[dummy.Id];
-        }
-
-        public static EventNode Serdes(ushort id, EventNode node, ISerializer s, AssetId chainSource, TextId textAssetId, AssetMapping mapping)
-        {
-            if (s == null) throw new ArgumentNullException(nameof(s));
-            var initialPosition = s.Offset;
-            var mapEvent = node?.Event as MapEvent;
-            var @event = MapEvent.Serdes(mapEvent, s, chainSource, textAssetId, mapping);
-
-            if (@event is IBranchingEvent be)
-            {
-                node ??= new BranchNode(id, be);
-                var branch = (BranchNode)node;
-                ushort? falseEventId = s.Transform<ushort, ushort?>(
-                    nameof(branch.NextIfFalse),
-                    branch.NextIfFalse?.Id,
-                    S.UInt16,
-                    MaxToNullConverter.Instance);
-
-                if (falseEventId != null && branch.NextIfFalse == null)
-                    branch.NextIfFalse = new DummyEventNode(falseEventId.Value);
-            }
-            else
-                node ??= new EventNode(id, @event);
-
-            ushort? nextEventId = s.Transform<ushort, ushort?>(nameof(node.Next), node.Next?.Id, S.UInt16, MaxToNullConverter.Instance);
-            if (nextEventId != null && node.Next == null)
-                node.Next = new DummyEventNode(nextEventId.Value);
-
-            long expectedPosition = initialPosition + 12;
-            long actualPosition = s.Offset;
-            ApiUtil.Assert(expectedPosition == actualPosition,
-                $"Expected to have read {expectedPosition - initialPosition} bytes, but {actualPosition - initialPosition} have been read.");
-
-            return node;
         }
 
         public static EventNode Parse(string s)
@@ -139,9 +99,9 @@ namespace UAlbion.Formats.MapEvents
             }
 
             return new EventNode((ushort)id, e)
-                {
-                    Next = next == -1 ? null : new DummyEventNode((ushort)next)
-                };
+            {
+                Next = next == -1 ? null : new DummyEventNode((ushort)next)
+            };
 
             //  "{(DirectSequence ? " " : "#")}{id}=>{next?.ToString(CultureInfo.InvariantCulture) ?? "!"}: {Event}");
             // 00001
@@ -159,17 +119,46 @@ namespace UAlbion.Formats.MapEvents
             //  1?!:3: foo
             // #1?!:3: foo
         }
+    }
 
-        public static List<EventNode> ParseScript(string script)
+    [DebuggerDisplay("{ToString()}")]
+    public class BranchNode : EventNode, IBranchNode
+    {
+        public BranchNode(ushort id, IBranchingEvent @event) : base(id, @event) { }
+        public override string ToString() => ToString(0);
+
+        public override string ToString(int idOffset)
         {
-            if (string.IsNullOrWhiteSpace(script))
-                return null;
-            var lines = FormatUtil.SplitLines(script);
-            var events = lines.Select(Parse).ToList();
-            foreach (var e in events)
-                e.Unswizzle(events);
-            return events;
+            var id = Id - idOffset;
+            var ifTrue = (Next?.Id - idOffset)?.ToString(CultureInfo.InvariantCulture) ?? "!";
+            var ifFalse = (NextIfFalse?.Id - idOffset)?.ToString(CultureInfo.InvariantCulture) ?? "!";
+            return Invariant($"!{id}?{ifTrue}:{ifFalse}: {Event}");
+        }
+
+        public IEventNode NextIfFalse { get; set; }
+        public override void Unswizzle(IList<EventNode> nodes)
+        {
+            if (nodes == null) throw new ArgumentNullException(nameof(nodes));
+            if (NextIfFalse is DummyEventNode dummy)
+            {
+                if (dummy.Id >= nodes.Count)
+                {
+                    ApiUtil.Assert($"Invalid event id: {Id} links to {dummy.Id} when false, but the set only contains {nodes.Count} events");
+                    NextIfFalse = null;
+                }
+                else NextIfFalse = nodes[dummy.Id];
+
+            }
+            base.Unswizzle(nodes);
         }
     }
+    public class DummyEventNode : IEventNode // These should only exist temporarily during deserialisation
+    {
+        public DummyEventNode(ushort id) => Id = id;
+        public ushort Id { get; }
+        public IEvent Event => throw new InvalidOperationException("All DummyEventNodes should be removed during the unswizzling process.");
+        public IEventNode Next => throw new InvalidOperationException("All DummyEventNodes should be removed during the unswizzling process.");
+        public override string ToString() => ToString(0);
+        public string ToString(int idOffset) => $"DummyNode {Id - idOffset}";
+    }
 }
-

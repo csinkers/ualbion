@@ -71,7 +71,7 @@ namespace UAlbion.Base.Tests
             using var ms = new MemoryStream();
             using var bw = new BinaryWriter(ms);
             using var s = new AlbionWriter(bw);
-            MapEvent.Serdes(e, s, EventSetId.None, TextId.None, AssetMapping.Global);
+            MapEvent.SerdesEvent(e, s, EventSetId.None, TextId.None, AssetMapping.Global);
             bw.Flush();
             ms.Position = 0;
             return ms.ToArray();
@@ -82,7 +82,7 @@ namespace UAlbion.Base.Tests
             using var ms = new MemoryStream(bytes);
             using var br = new BinaryReader(ms);
             using var s = new AlbionReader(br);
-            return MapEvent.Serdes(null, s, EventSetId.None, TextId.None, AssetMapping.Global);
+            return MapEvent.SerdesEvent(null, s, EventSetId.None, TextId.None, AssetMapping.Global);
         }
 
         static string Test(string scriptFormat, string expectedToStringResult, IMapEvent e)

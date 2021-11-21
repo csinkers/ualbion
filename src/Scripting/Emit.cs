@@ -5,7 +5,7 @@ namespace UAlbion.Scripting
 {
     public static class Emit
     {
-        public static AlbionEvent Event(IEvent e) => new(e);
+        public static SingleEvent Event(IEvent e) => new(e);
         public static BreakStatement Break() => new();
         public static ContinueStatement Continue() => new();
         public static DoLoop Do(ICfgNode condition, ICfgNode body) => new(condition, body);

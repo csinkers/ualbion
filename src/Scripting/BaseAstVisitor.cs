@@ -4,7 +4,7 @@ namespace UAlbion.Scripting
 {
     public abstract class BaseAstVisitor : IAstVisitor
     {
-        public virtual void Visit(AlbionEvent e) { }
+        public virtual void Visit(SingleEvent e) { }
         public virtual void Visit(BreakStatement breakStatement) { }
         public virtual void Visit(ContinueStatement continueStatement) { }
         public virtual void Visit(EmptyNode empty) { }

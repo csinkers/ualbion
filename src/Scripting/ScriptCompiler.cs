@@ -1,27 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Api;
 using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting
 {
     public static class ScriptCompiler
     {
-        public static (List<IEventNode> events, List<int> chains) Compile(string source)
+        public static EventLayout Compile(string source)
         {
             if (!ScriptParser.TryParse(source, out var ast, out var error, out _))
                 throw new InvalidOperationException(error);
 
-            var compiled = ExpandAstToGraph(ast);
-            return LayoutGraph(compiled);
+            var compiled = ExpandAstToGraphs(ast);
+            return EventLayout.Build(compiled);
         }
 
-        public static ControlFlowGraph ExpandAstToGraph(ICfgNode ast)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static (List<IEventNode> events, List<int> chains) LayoutGraph(ControlFlowGraph compiled)
+        public static List<ControlFlowGraph> ExpandAstToGraphs(ICfgNode ast)
         {
             throw new NotImplementedException();
         }

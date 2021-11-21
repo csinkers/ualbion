@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.MapEvents;
 
@@ -71,7 +72,7 @@ namespace UAlbion.Formats.Assets.Maps
                     Events[i].Id = i;
 
             s.List(nameof(Events), Events, eventCount, (i, x, serializer)
-                => EventNode.Serdes((ushort)i, x, serializer, Id, Id.ToMapText(), mapping));
+                => MapEvent.SerdesNode((ushort)i, x, serializer, Id, Id.ToMapText(), mapping));
 
             foreach (var node in Events)
                 node.Unswizzle(Events);

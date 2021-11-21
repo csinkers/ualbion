@@ -8,7 +8,7 @@ namespace UAlbion.Scripting
     {
         public ICfgNode Result { get; private set; }
 
-        public void Visit(AlbionEvent e) => Result = Build(e);
+        public void Visit(SingleEvent e) => Result = Build(e);
         public void Visit(BinaryOp binaryOp) => Result = Build(binaryOp);
         public void Visit(BreakStatement breakStatement) => Result = Build(breakStatement);
         public void Visit(ContinueStatement continueStatement) => Result = Build(continueStatement);
@@ -25,7 +25,7 @@ namespace UAlbion.Scripting
         public void Visit(Statement statement) => Result = Build(statement);
         public void Visit(WhileLoop whileLoop) => Result = Build(whileLoop);
 
-        public virtual ICfgNode Build(AlbionEvent e) => null;
+        public virtual ICfgNode Build(SingleEvent e) => null;
         public virtual ICfgNode Build(BreakStatement breakStatement) => null;
         public virtual ICfgNode Build(ContinueStatement continueStatement) => null;
         public virtual ICfgNode Build(EmptyNode empty) => null;

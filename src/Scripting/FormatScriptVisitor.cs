@@ -4,14 +4,14 @@ using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting
 {
-    public class EmitPseudocodeVisitor : IAstVisitor
+    public class FormatScriptVisitor : IAstVisitor
     {
         readonly StringBuilder _sb = new();
         readonly long _initialPos;
         bool _inCondition;
 
-        public EmitPseudocodeVisitor() { }
-        public EmitPseudocodeVisitor(StringBuilder sb)
+        public FormatScriptVisitor() { }
+        public FormatScriptVisitor(StringBuilder sb)
         {
             _sb = sb ?? throw new ArgumentNullException(nameof(sb));
             _initialPos = _sb.Length;
@@ -43,7 +43,7 @@ namespace UAlbion.Scripting
         void Push() => IndentLevel += TabSize;
         void Pop() => IndentLevel -= TabSize;
 
-        public void Visit(AlbionEvent e) { Indent(); _sb.Append(UseNumericIds ? e.Event.ToStringNumeric() : e.Event.ToString()); } 
+        public void Visit(SingleEvent e) { Indent(); _sb.Append(UseNumericIds ? e.Event.ToStringNumeric() : e.Event.ToString()); } 
         public void Visit(BreakStatement breakStatement) { Indent(); _sb.Append("break"); }
         public void Visit(ContinueStatement continueStatement) { Indent(); _sb.Append("continue"); }
         public void Visit(EmptyNode empty) { }

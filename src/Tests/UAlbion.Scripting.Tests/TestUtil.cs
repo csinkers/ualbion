@@ -5,6 +5,8 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using UAlbion.Scripting.Ast;
 using Xunit;
 
@@ -12,6 +14,7 @@ namespace UAlbion.Scripting.Tests
 {
     public static class TestUtil
     {
+        static readonly SemaphoreSlim _processSemaphore = new(Environment.ProcessorCount, Environment.ProcessorCount);
         public static string FindBasePath()
         {
             var exeLocation = Assembly.GetExecutingAssembly().Location;
@@ -26,7 +29,7 @@ namespace UAlbion.Scripting.Tests
 
         public static void VerifyPseudocode(string expected, ICfgNode ast, [CallerMemberName] string method = null)
         {
-            var visitor = new EmitPseudocodeVisitor { PrettyPrint = false };
+            var visitor = new FormatScriptVisitor { PrettyPrint = false };
             ast.Accept(visitor);
             Assert.Equal(expected, visitor.Code);
         }
@@ -38,7 +41,7 @@ namespace UAlbion.Scripting.Tests
             string resultsDir,
             [CallerMemberName] string method = null)
         {
-            var visitor = new EmitPseudocodeVisitor { PrettyPrint = false };
+            var visitor = new FormatScriptVisitor { PrettyPrint = false };
             foreach (var node in graph.GetDfsOrder())
                 graph.Nodes[node].Accept(visitor);
             var pseudo = visitor.Code;
@@ -55,6 +58,7 @@ namespace UAlbion.Scripting.Tests
             if (!Directory.Exists(resultsDir))
                 Directory.CreateDirectory(resultsDir);
 
+            var tasks = new List<Task>();
             for (int i = 0; i < steps.Count; i++)
             {
                 var (description, graph) = steps[i];
@@ -63,15 +67,30 @@ namespace UAlbion.Scripting.Tests
                 graph.ExportToDot(sb);
                 File.WriteAllText(path, sb.ToString());
 
+                tasks.Add(Task.Run(() => FormatGraph(path)));
+            }
+
+            Task.WaitAll(tasks.ToArray());
+        }
+
+        static async Task FormatGraph(string path)
+        {
+            await _processSemaphore.WaitAsync();
+            try
+            {
                 var graphVizDot = @"C:\Program Files\Graphviz\bin\dot.exe";
                 if (!File.Exists(graphVizDot))
-                    continue;
+                    return;
 
                 var pngPath = Path.ChangeExtension(path, "png");
                 var args = $"\"{path}\" -T png -o \"{pngPath}\"";
                 using var process = Process.Start(graphVizDot, args);
-                process?.WaitForExit();
+                if (process == null)
+                    return;
+
+                await process.WaitForExitAsync();
             }
+            finally { _processSemaphore.Release(); }
         }
     }
 }

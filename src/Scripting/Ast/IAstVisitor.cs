@@ -2,7 +2,6 @@
 {
     public interface IAstVisitor
     {
-        void Visit(AlbionEvent e);
         void Visit(BinaryOp binaryOp);
         void Visit(BreakStatement breakStatement);
         void Visit(ContinueStatement continueStatement);
@@ -16,6 +15,7 @@
         void Visit(Negation negation);
         void Visit(Numeric numeric);
         void Visit(Sequence sequence);
+        void Visit(SingleEvent e);
         void Visit(Statement statement);
         void Visit(WhileLoop whileLoop);
     }

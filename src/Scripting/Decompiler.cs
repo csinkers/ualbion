@@ -141,7 +141,7 @@ namespace UAlbion.Scripting
             while (graph != previous)
             {
                 previous = graph;
-                graph = record("Defragment", graph.Defragment());
+                // graph = record("Defragment", graph.Defragment());
                 graph = record("Reduce simple while", ReduceSimpleWhile(graph));  if (graph != previous) continue;
                 graph = record("Reduce sequence", ReduceSequences(graph, false)); if (graph != previous) continue;
                 graph = record("Reduce if-then", ReduceIfThen(graph));            if (graph != previous) continue;
@@ -151,6 +151,7 @@ namespace UAlbion.Scripting
                 graph = record("Reduce SESE region", ReduceSeseRegions(graph));   if (graph != previous) continue;
                 graph = record("Reduce sequence", ReduceSequences(graph, true));
             }
+            graph = record("Defragment", graph.Defragment());
 
             return CfgRelabeller.Relabel(graph, DummyLabelPrefix);
         }

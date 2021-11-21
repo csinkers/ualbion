@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -9,7 +11,43 @@ namespace UAlbion.Formats.MapEvents
     public abstract class MapEvent : Event, IMapEvent
     {
         public abstract MapEventType EventType { get; }
-        public static IMapEvent Serdes(IMapEvent e, ISerializer s, AssetId chainSource, TextId textSourceId, AssetMapping mapping)
+
+        public static EventNode SerdesNode(ushort id, EventNode node, ISerializer s, AssetId chainSource, TextId textAssetId, AssetMapping mapping)
+        {
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            var initialPosition = s.Offset;
+            var mapEvent = node?.Event as MapEvent;
+            var @event = SerdesEvent(mapEvent, s, chainSource, textAssetId, mapping);
+
+            if (@event is IBranchingEvent be)
+            {
+                node ??= new BranchNode(id, be);
+                var branch = (BranchNode)node;
+                ushort? falseEventId = s.Transform<ushort, ushort?>(
+                    nameof(branch.NextIfFalse),
+                    branch.NextIfFalse?.Id,
+                    S.UInt16,
+                    MaxToNullConverter.Instance);
+
+                if (falseEventId != null && branch.NextIfFalse == null)
+                    branch.NextIfFalse = new DummyEventNode(falseEventId.Value);
+            }
+            else
+                node ??= new EventNode(id, @event);
+
+            ushort? nextEventId = s.Transform<ushort, ushort?>(nameof(node.Next), node.Next?.Id, S.UInt16, MaxToNullConverter.Instance);
+            if (nextEventId != null && node.Next == null)
+                node.Next = new DummyEventNode(nextEventId.Value);
+
+            long expectedPosition = initialPosition + 12;
+            long actualPosition = s.Offset;
+            ApiUtil.Assert(expectedPosition == actualPosition,
+                $"Expected to have read {expectedPosition - initialPosition} bytes, but {actualPosition - initialPosition} have been read.");
+
+            return node;
+        }
+
+        public static IMapEvent SerdesEvent(IMapEvent e, ISerializer s, AssetId chainSource, TextId textSourceId, AssetMapping mapping)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             var initialPosition = s.Offset;
@@ -54,6 +92,17 @@ namespace UAlbion.Formats.MapEvents
             else
                 s.Assert(s.Offset - initialPosition == 10, "Non-query map events should always be 10 bytes");
             return e;
+        }
+
+        public static List<EventNode> ParseRawEvents(string script)
+        {
+            if (string.IsNullOrWhiteSpace(script))
+                return null;
+            var lines = FormatUtil.SplitLines(script);
+            var events = lines.Select(EventNode.Parse).ToList();
+            foreach (var e in events)
+                e.Unswizzle(events);
+            return events;
         }
 
 /* ==  Binary Serialisable Event types: ==

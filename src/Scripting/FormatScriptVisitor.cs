@@ -46,6 +46,7 @@ namespace UAlbion.Scripting
         public void Visit(SingleEvent e) { Indent(); _sb.Append(UseNumericIds ? e.Event.ToStringNumeric() : e.Event.ToString()); } 
         public void Visit(BreakStatement breakStatement) { Indent(); _sb.Append("break"); }
         public void Visit(ContinueStatement continueStatement) { Indent(); _sb.Append("continue"); }
+        public void Visit(ControlFlowNode cfgNode) { Indent(); _sb.Append("!!!ARBITRARY CONTROL FLOW!!!"); }
         public void Visit(EmptyNode empty) { }
         public void Visit(Name name) => _sb.Append(name.Value);
 

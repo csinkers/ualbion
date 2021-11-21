@@ -5,6 +5,7 @@
         void Visit(BinaryOp binaryOp);
         void Visit(BreakStatement breakStatement);
         void Visit(ContinueStatement continueStatement);
+        void Visit(ControlFlowNode cfgNode);
         void Visit(DoLoop doLoop);
         void Visit(EmptyNode empty);
         void Visit(IfThen ifThen);

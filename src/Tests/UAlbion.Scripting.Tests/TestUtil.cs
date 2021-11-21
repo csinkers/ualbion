@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -27,30 +28,123 @@ namespace UAlbion.Scripting.Tests
             return baseDir;
         }
 
-        public static void VerifyPseudocode(string expected, ICfgNode ast, [CallerMemberName] string method = null)
+        public static void VerifyAstVsScript(string expected, ICfgNode ast)
         {
             var visitor = new FormatScriptVisitor { PrettyPrint = false };
             ast.Accept(visitor);
             Assert.Equal(expected, visitor.Code);
         }
 
-        public static void Verify(
+        public static void VerifyCfgVsScript(
             ControlFlowGraph graph,
             List<(string, ControlFlowGraph)> steps,
             string expected,
             string resultsDir,
             [CallerMemberName] string method = null)
         {
-            var visitor = new FormatScriptVisitor { PrettyPrint = false };
-            foreach (var node in graph.GetDfsOrder())
-                graph.Nodes[node].Accept(visitor);
-            var pseudo = visitor.Code;
-            DumpSteps(steps, resultsDir, method);
-
-            Assert.Equal(expected, pseudo);
+            if (!CompareCfgVsScript(graph, expected, out var error))
+            {
+                DumpSteps(steps, resultsDir, method);
+                var nl = Environment.NewLine;
+                throw new InvalidOperationException(error);
+            }
         }
 
-        public static void DumpSteps(List<(string, ControlFlowGraph)> steps, string resultsDir, string method)
+        public static bool CompareCfgVsScript(ControlFlowGraph graph, string expected, out string message)
+        {
+            var nodes = graph.GetDfsOrder().Select(x => graph.Nodes[x]);
+            return CompareNodesVsScript(nodes, expected, out message);
+        }
+
+        public static bool CompareNodesVsScript(IEnumerable<ICfgNode> nodes, string expected, out string message)
+        {
+            var visitor = new FormatScriptVisitor { PrettyPrint = false };
+            foreach (var node in nodes)
+                node.Accept(visitor);
+
+            var pseudo = visitor.Code;
+
+            message = null;
+            var nl = Environment.NewLine;
+            if (pseudo != expected)
+                message = $"Test Failed{nl}Expected:{nl}{expected}{nl}Actual:{nl}{pseudo}";
+            return pseudo == expected;
+        }
+
+        public static bool CompareLayout(EventLayout actual, EventLayout expected, out string message)
+        {
+            if (!expected.Events.SequenceEqual(actual.Events))
+            {
+                message = "Event mismatch";
+                return false;
+            }
+
+            if (!expected.Chains.SequenceEqual(actual.Chains))
+            {
+                message = "Chain mismatch";
+                return false;
+            }
+
+            if (!expected.ExtraEntryPoints.SequenceEqual(actual.ExtraEntryPoints))
+            {
+                message = "Entry point mismatch";
+                return false;
+            }
+
+            message = null;
+            return true;
+        }
+
+        public static bool CompareCfg(ControlFlowGraph cfg, ControlFlowGraph expectedCfg, out string message)
+        {
+            var actual = Arrange(cfg);
+            var expected = Arrange(expectedCfg);
+
+            if (!expected.nodes.SequenceEqual(actual.nodes))
+            {
+                message = "Node mismatch";
+                return false;
+            }
+
+            if (!expected.edges.SequenceEqual(actual.edges))
+            {
+                message = "Edge mismatch";
+                return false;
+            }
+
+            message = null;
+            return true;
+        }
+
+        public static (List<ICfgNode> nodes, List<(int, int, bool)> edges) Arrange(ControlFlowGraph graph)
+        {
+            var nodes = new List<ICfgNode>();
+            var mapping = new int[graph.Nodes.Count];
+            Array.Fill(mapping, -1);
+
+            foreach(var entry in graph.GetDfsOrder())
+            {
+                var stack = new Stack<int>();
+                stack.Push(entry);
+                while (stack.TryPop(out var nodeIndex))
+                {
+                    if (mapping[nodeIndex] != -1)
+                        continue;
+
+                    mapping[nodeIndex] = nodes.Count;
+                    nodes.Add(graph.Nodes[nodeIndex]);
+
+                    var (trueChild, falseChild) = graph.FindBinaryChildren(nodeIndex);
+                    if (trueChild.HasValue) stack.Push(trueChild.Value);
+                    if (falseChild.HasValue) stack.Push(falseChild.Value);
+                }
+            }
+
+            var edges = graph.LabelledEdges.Select(x => ( mapping[x.start], mapping[x.end], x.label )).ToList();
+            return (nodes, edges);
+        }
+
+        public static void DumpSteps(List<(string, ControlFlowGraph)> steps, string resultsDir, [CallerMemberName] string method = null)
         {
             if (steps == null)
                 return;

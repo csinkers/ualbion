@@ -20,8 +20,8 @@ namespace UAlbion.Scripting
         {
             readonly IDictionary<string, string> _mapping;
             public RelabellingAstVisitor(IDictionary<string, string> mapping) => _mapping = mapping ?? throw new ArgumentNullException(nameof(mapping));
-            public override ICfgNode Build(Goto jump) => Emit.Goto(_mapping[jump.Label]);
-            public override ICfgNode Build(Label label) => Emit.Label(_mapping[label.Name]);
+            protected override ICfgNode Build(Goto jump) => Emit.Goto(_mapping[jump.Label]);
+            protected override ICfgNode Build(Label label) => Emit.Label(_mapping[label.Name]);
         }
 
         public static ControlFlowGraph Relabel(ControlFlowGraph graph, string dummyLabelPrefix)

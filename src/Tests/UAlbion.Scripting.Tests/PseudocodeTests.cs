@@ -7,27 +7,27 @@ namespace UAlbion.Scripting.Tests
     {
         static Statement S(ICfgNode head, params ICfgNode[] p) => Emit.Statement(head, p);
         [Fact] public void FormatSequenceTest() 
-            => TestUtil.VerifyPseudocode(
+            => TestUtil.VerifyAstVsScript(
                 "0, 1, 2",
                 Emit.Seq(S(Emit.Const(0)), S(Emit.Const(1)), S(Emit.Const(2))));
 
-        [Fact] public void FormatIfThenTest() => TestUtil.VerifyPseudocode(
+        [Fact] public void FormatIfThenTest() => TestUtil.VerifyAstVsScript(
             "if (0) { 1 }, 2",
             Emit.Seq(Emit.If(Emit.Const(0), S(Emit.Const(1))), S(Emit.Const(2))));
 
-        [Fact] public void FormatIfThenElseTest() => TestUtil.VerifyPseudocode(
+        [Fact] public void FormatIfThenElseTest() => TestUtil.VerifyAstVsScript(
             "if (0) { 1 } else { 2 }, 3",
             Emit.Seq(Emit.IfElse(Emit.Const(0), S(Emit.Const(1)), S(Emit.Const(2))), S(Emit.Const(3))));
 
-        [Fact] public void FormatSimpleWhileTest() => TestUtil.VerifyPseudocode(
+        [Fact] public void FormatSimpleWhileTest() => TestUtil.VerifyAstVsScript(
             "0, while (1) { }, 2",
             Emit.Seq(S(Emit.Const(0)), Emit.While(Emit.Const(1), null), S(Emit.Const(2))));
 
-        [Fact] public void FormatWhileTest() => TestUtil.VerifyPseudocode(
+        [Fact] public void FormatWhileTest() => TestUtil.VerifyAstVsScript(
             "0, while (1) { 2 }, 3",
             Emit.Seq(S(Emit.Const(0)), Emit.While(Emit.Const(1), S(Emit.Const(2))), S(Emit.Const(3))));
 
-        [Fact] public void FormatDoWhileTest() => TestUtil.VerifyPseudocode(
+        [Fact] public void FormatDoWhileTest() => TestUtil.VerifyAstVsScript(
             "0, do { 1 } while (2), 3",
             Emit.Seq(S(Emit.Const(0)), Emit.Do(Emit.Const(2), S(Emit.Const(1))), S(Emit.Const(3))));
 

@@ -33,7 +33,7 @@ namespace UAlbion.Scripting
             var shortCircuitEdgeLabel = cut.GetEdgeLabel(shortCircuitEdgeStart, maxDeltaNode);
             var result = cut.RemoveEdge(shortCircuitEdgeStart, maxDeltaNode);
 
-            var labelName = $"{dummyLabelPrefix}{Guid.NewGuid():N}";
+            var labelName = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
             var gotoNode = Emit.Goto(labelName);
             var label = Emit.Label(labelName);
 

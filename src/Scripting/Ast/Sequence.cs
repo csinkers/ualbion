@@ -1,10 +1,19 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace UAlbion.Scripting.Ast
 {
-    public sealed record Sequence(ICfgNode[] Statements) : ICfgNode
+    public sealed record Sequence : ICfgNode
     {
-        public Sequence(ICfgNode statement) : this(new[] { statement }) { }
+        public ICfgNode[] Statements { get; init; }
+        public Sequence(ICfgNode[] statements)
+        {
+            Statements = statements ?? throw new ArgumentNullException(nameof(statements));
+            if(statements.Length < 2)
+                throw new ArgumentException("Tried to create sequence with less than 2 statements");
+        }
+        public void Deconstruct(out ICfgNode[] statements) => statements = Statements;
+
         public override string ToString() => $"Seq({string.Join(", ", Statements.Select(x => x.ToString()))})";
         public void Accept(IAstVisitor visitor) => visitor.Visit(this);
         public override int GetHashCode() => Statements != null ? Statements.GetHashCode() : 0;

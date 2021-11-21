@@ -158,36 +158,6 @@ namespace UAlbion.Scripting
             }
         }
 
-        static (int? trueChild, int? falseChild) FindChildren(ControlFlowGraph graph, int nodeIndex)
-        {
-            var children = graph.Children(nodeIndex);
-
-            if (children.Length > 2)
-                throw new ControlFlowGraphException($"Node {nodeIndex} has {children.Length} children! Max allowed is 2 for branch events, 1 for regular events.", graph);
-
-            int? trueChild = null;
-            int? falseChild = null;
-
-            foreach (var child in children)
-            {
-                var edgeLabel = graph.GetEdgeLabel(nodeIndex, child);
-                if (edgeLabel)
-                {
-                    if (trueChild != null)
-                        throw new ControlFlowGraphException($"Node {nodeIndex} has 2 true children!", graph);
-                    trueChild = child;
-                }
-                else
-                {
-                    if (falseChild != null)
-                        throw new ControlFlowGraphException($"Node {nodeIndex} has 2 false children!", graph);
-                    falseChild = child;
-                }
-            }
-
-            return (trueChild, falseChild);
-        }
-
         void LinkNodes()
         {
             for (ushort ei = 0; ei < Events.Count; ei++)
@@ -196,7 +166,7 @@ namespace UAlbion.Scripting
                 var (gi, ni) = _indexToNode[ei];
                 var graph = _graphs[gi];
                 var exitNode = graph.GetExitNode();
-                var (trueChild, falseChild) = FindChildren(graph, ni);
+                var (trueChild, falseChild) = graph.FindBinaryChildren(ni);
 
                 if (trueChild == null)
                     throw new ControlFlowGraphException($"Node {ni} had no true child", graph);
@@ -230,13 +200,9 @@ namespace UAlbion.Scripting
                 initialEventIndex ??= eventIndex;
                 Set(eventIndex, graphIndex, nodeIndex);
                 var graph = _graphs[graphIndex];
-                var children = 
-                    graph
-                        .Children(nodeIndex)
-                        .OrderBy(x => graph.GetEdgeLabel(nodeIndex, x) ? 1 : 0);
-
-                foreach(var child in children)
-                    stack.Push(child);
+                var (trueChild, falseChild) = graph.FindBinaryChildren(nodeIndex);
+                if (trueChild.HasValue) stack.Push(trueChild.Value);
+                if (falseChild.HasValue) stack.Push(falseChild.Value);
             }
 
             return initialEventIndex ?? 0xffff;

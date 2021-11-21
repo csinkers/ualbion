@@ -12,6 +12,7 @@ namespace UAlbion.Scripting
         public void Visit(BinaryOp binaryOp) => Result = Build(binaryOp);
         public void Visit(BreakStatement breakStatement) => Result = Build(breakStatement);
         public void Visit(ContinueStatement continueStatement) => Result = Build(continueStatement);
+        public void Visit(ControlFlowNode cfgNode) => Result = Build(cfgNode);
         public void Visit(DoLoop doLoop) => Result = Build(doLoop);
         public void Visit(EmptyNode empty) => Result = Build(empty);
         public void Visit(Goto jump) => Result = Build(jump);
@@ -25,22 +26,23 @@ namespace UAlbion.Scripting
         public void Visit(Statement statement) => Result = Build(statement);
         public void Visit(WhileLoop whileLoop) => Result = Build(whileLoop);
 
-        public virtual ICfgNode Build(SingleEvent e) => null;
-        public virtual ICfgNode Build(BreakStatement breakStatement) => null;
-        public virtual ICfgNode Build(ContinueStatement continueStatement) => null;
-        public virtual ICfgNode Build(EmptyNode empty) => null;
-        public virtual ICfgNode Build(Goto jump) => null;
-        public virtual ICfgNode Build(Label label) => null;
-        public virtual ICfgNode Build(Name name) => null;
-        public virtual ICfgNode Build(Numeric numeric) => null;
+        protected virtual ICfgNode Build(SingleEvent e) => null;
+        protected virtual ICfgNode Build(BreakStatement breakStatement) => null;
+        protected virtual ICfgNode Build(ContinueStatement continueStatement) => null;
+        protected virtual ICfgNode Build(ControlFlowNode cfgNode) => null;
+        protected virtual ICfgNode Build(EmptyNode empty) => null;
+        protected virtual ICfgNode Build(Goto jump) => null;
+        protected virtual ICfgNode Build(Label label) => null;
+        protected virtual ICfgNode Build(Name name) => null;
+        protected virtual ICfgNode Build(Numeric numeric) => null;
 
-        public virtual ICfgNode Build(Negation negation)
+        protected virtual ICfgNode Build(Negation negation)
         {
             negation.Expression.Accept(this);
             return Result == null ? null : Emit.Negation(Result);
         }
 
-        public virtual ICfgNode Build(IfThen ifThen)
+        protected virtual ICfgNode Build(IfThen ifThen)
         {
             ifThen.Condition.Accept(this);
             var condition = Result;
@@ -53,7 +55,7 @@ namespace UAlbion.Scripting
             return Emit.If(condition ?? ifThen.Condition, body ?? ifThen.Body);
         }
 
-        public virtual ICfgNode Build(IfThenElse ifElse)
+        protected virtual ICfgNode Build(IfThenElse ifElse)
         {
             ifElse.Condition.Accept(this);
             var condition = Result;
@@ -73,7 +75,7 @@ namespace UAlbion.Scripting
                 falseBody ?? ifElse.FalseBody);
         }
 
-        public virtual ICfgNode Build(Statement statement)
+        protected virtual ICfgNode Build(Statement statement)
         {
             statement.Head.Accept(this);
             var head = Result;
@@ -93,7 +95,7 @@ namespace UAlbion.Scripting
             return Emit.Statement(head, parts);
         }
 
-        public virtual ICfgNode Build(WhileLoop whileLoop)
+        protected virtual ICfgNode Build(WhileLoop whileLoop)
         {
             whileLoop.Condition.Accept(this);
             var condition = Result;
@@ -108,7 +110,7 @@ namespace UAlbion.Scripting
                 body ?? whileLoop.Body);
         }
 
-        public virtual ICfgNode Build(Sequence sequence)
+        protected virtual ICfgNode Build(Sequence sequence)
         {
             var result = new List<ICfgNode>();
             bool trivial = true;
@@ -132,7 +134,7 @@ namespace UAlbion.Scripting
             return Emit.Seq(result.ToArray());
         }
 
-        public virtual ICfgNode Build(DoLoop doLoop)
+        protected virtual ICfgNode Build(DoLoop doLoop)
         {
             doLoop.Body?.Accept(this);
             var body = Result;
@@ -147,7 +149,7 @@ namespace UAlbion.Scripting
                 body ?? doLoop.Body);
         }
 
-        public virtual ICfgNode Build(BinaryOp binaryOp)
+        protected virtual ICfgNode Build(BinaryOp binaryOp)
         {
             binaryOp.Left.Accept(this);
             var left = Result;

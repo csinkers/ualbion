@@ -10,6 +10,7 @@ using UAlbion.Scripting.Ast;
 #pragma warning disable 8321 // Stop warnings about Vis() debug functions
 namespace UAlbion.Scripting
 {
+    public delegate ControlFlowGraph RecordFunc(string description, ControlFlowGraph graph);
     public interface IGraph<out TNode, out TLabel>
     {
         int NodeCount { get; }
@@ -48,6 +49,11 @@ namespace UAlbion.Scripting
             from kvp in _edgesByStart
             from end in kvp.Value
             select (kvp.Key, end);
+
+        public IEnumerable<(int start, int end, bool label)> LabelledEdges =>
+            from kvp in _edgesByStart
+            from end in kvp.Value
+            select (kvp.Key, end, GetEdgeLabel(kvp.Key, end));
 
         public int ActiveNodeCount => Nodes.Count - _deletedNodeCount;
         public int NodeCount => Nodes.Count;
@@ -241,6 +247,25 @@ namespace UAlbion.Scripting
                 Nodes.SetItem(index, newNode),
                 _edgesByStart, _edgesByEnd, _falseEdges, 
                 _deletedNodes, _deletedNodeCount);
+
+        public ControlFlowGraph ReplaceNode(int index, ControlFlowGraph replacement)
+        {
+            var parents = Parents(index);
+            var children = Children(index);
+
+            var (graph, mapping) = Merge(replacement);
+
+            int start = mapping[replacement.GetEntryNode()];
+            int end = mapping[replacement.GetExitNode()];
+
+            foreach (var parent in parents)
+                graph = graph.AddEdge(parent, start, GetEdgeLabel(parent, index));
+
+            foreach (var child in children)
+                graph = graph.AddEdge(end, child, GetEdgeLabel(index, child));
+
+            return graph.RemoveNode(index);
+        }
 
         public ControlFlowGraph RemoveNode(int index) => RemoveNodes(new[] { index });
         public ControlFlowGraph RemoveNodes(IEnumerable<int> indices)
@@ -1096,6 +1121,35 @@ namespace UAlbion.Scripting
             => _edgesByStart
                 .Where(x => x.Value.Length <= 1)
                 .Select(x => x.Key);
+
+        public (int? trueChild, int? falseChild) FindBinaryChildren(int index)
+        {
+            var children = Children(index);
+            if (children.Length > 2)
+                throw new ControlFlowGraphException($"Node {index} has {children.Length} children! Max allowed is 2 for branch events, 1 for regular events.", this);
+
+            int? trueChild = null;
+            int? falseChild = null;
+
+            foreach (var child in children)
+            {
+                var edgeLabel = GetEdgeLabel(index, child);
+                if (edgeLabel)
+                {
+                    if (trueChild != null)
+                        throw new ControlFlowGraphException($"Node {index} has 2 true children!", this);
+                    trueChild = child;
+                }
+                else
+                {
+                    if (falseChild != null)
+                        throw new ControlFlowGraphException($"Node {index} has 2 false children!", this);
+                    falseChild = child;
+                }
+            }
+
+            return (trueChild, falseChild);
+        }
 
         // Used by https://github.com/hediet/vscode-debug-visualizer
         // ReSharper disable once UnusedMember.Global

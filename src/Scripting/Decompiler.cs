@@ -10,9 +10,6 @@ namespace UAlbion.Scripting
 {
     public static class Decompiler
     {
-        const string DummyLabelPrefix = "L_";
-
-        public delegate ControlFlowGraph RecordFunc(string description, ControlFlowGraph graph);
         public static List<ICfgNode> Decompile<T>(
             IList<T> nodes,
             IEnumerable<ushort> chains,
@@ -41,7 +38,7 @@ namespace UAlbion.Scripting
             for (var index = 0; index < graphs.Count; index++)
             {
                 var graph = record($"Make region {index}", graphs[index]);
-                results.Add(SimplifyGraph(graph, record).Head);
+                results.Add(SimplifyGraph(graph, record));
             }
 
             return results;
@@ -133,7 +130,7 @@ namespace UAlbion.Scripting
             return results;
         }
 
-        public static ControlFlowGraph SimplifyGraph(ControlFlowGraph graph, RecordFunc record)
+        public static ICfgNode SimplifyGraph(ControlFlowGraph graph, RecordFunc record)
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
             Func<string> vis = () => graph.Visualize();
@@ -151,9 +148,16 @@ namespace UAlbion.Scripting
                 graph = record("Reduce SESE region", ReduceSeseRegions(graph));   if (graph != previous) continue;
                 graph = record("Reduce sequence", ReduceSequences(graph, true));
             }
-            graph = record("Defragment", graph.Defragment());
 
-            return CfgRelabeller.Relabel(graph, DummyLabelPrefix);
+            if (graph.ActiveNodeCount != 1)
+                throw new ControlFlowGraphException("Could not reduce graph to an AST", graph);
+
+            graph = record("Defragment", graph.Defragment());
+            var relabelled = CfgRelabeller.Relabel(graph, ScriptConstants.DummyLabelPrefix);
+
+            var visitor = new EmptyNodeRemovalVisitor();
+            relabelled.Head.Accept(visitor);
+            return visitor.Result ?? relabelled.Head;
         }
 
         public static ControlFlowGraph ReduceSimpleWhile(ControlFlowGraph graph)
@@ -231,8 +235,7 @@ namespace UAlbion.Scripting
         public static ControlFlowGraph ReduceIfThen(ControlFlowGraph graph)
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
-            var order = graph.GetDfsPostOrder();
-            foreach (var head in order)
+            foreach (var head in graph.GetDfsPostOrder())
             {
                 var children = graph.Children(head);
                 if (children.Length != 2) 
@@ -278,8 +281,7 @@ namespace UAlbion.Scripting
         public static ControlFlowGraph ReduceIfThenElse(ControlFlowGraph graph)
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
-            var order = graph.GetDfsPostOrder();
-            foreach (var head in order)
+            foreach (var head in graph.GetDfsPostOrder())
             {
                 var children = graph.Children(head);
                 if (children.Length != 2) 
@@ -554,7 +556,7 @@ namespace UAlbion.Scripting
                 if (cut.Cut.IsCyclic())
                     continue; // Must be some sort of weird loop that couldn't be reduced earlier, currently irreducible.
 
-                var restructured = SeseReducer.Reduce(cut.Cut, DummyLabelPrefix);
+                var restructured = SeseReducer.Reduce(cut.Cut, ScriptConstants.DummyLabelPrefix);
                 int restructuredHead = restructured.HeadIndex;
                 int restructuredTail = cut.Cut.GetExitNode();
 

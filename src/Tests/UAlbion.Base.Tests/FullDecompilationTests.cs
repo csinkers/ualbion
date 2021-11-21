@@ -14,6 +14,7 @@ using UAlbion.Formats.MapEvents;
 using UAlbion.Game;
 using UAlbion.Game.Settings;
 using UAlbion.Scripting;
+using UAlbion.Scripting.Ast;
 using UAlbion.Scripting.Tests;
 using UAlbion.TestCommon;
 using Xunit;
@@ -22,7 +23,7 @@ namespace UAlbion.Base.Tests
 {
     public class FullDecompilationTests : IDisposable
     {
-        const bool DumpSteps = false;
+        const bool DumpSteps = true;
         static readonly string ResultsDir = Path.Combine(TestUtil.FindBasePath(), "re", "FullDecomp");
         static int s_testNum;
 
@@ -99,21 +100,18 @@ namespace UAlbion.Base.Tests
                 try
                 {
                     var graph = graphs[index];
-                    var decompiled = Decompile(graph, testName, DumpSteps);
+                    var decompiled = Decompile(graph, testName + index, DumpSteps);
                     var visitor = new FormatScriptVisitor();
-                    decompiled.Head.Accept(visitor);
+                    decompiled.Accept(visitor);
                     scripts[index] = visitor.Code;
 
                     var roundTripLayout = ScriptCompiler.Compile(scripts[index]);
                     var expectedLayout = EventLayout.Build(new[] { graph });
 
-                    if (!expectedLayout.Events.SequenceEqual(roundTripLayout.Events))
-                        errors[index] += $"[{index}: Events did not match] ";
-                    else if (!expectedLayout.Chains.SequenceEqual(roundTripLayout.Chains))
-                        errors[index] += $"[{index}: Chains did not match] ";
-                    else if (!expectedLayout.ExtraEntryPoints.SequenceEqual(roundTripLayout.ExtraEntryPoints))
-                        errors[index] += $"[{index}: Extra entry points did not match] ";
-                    else successCount++;
+                    if (!TestUtil.CompareLayout(roundTripLayout, expectedLayout, out var error))
+                        errors[index] += $"[{index}: {error}] ";
+                    else
+                        successCount++;
                 }
                 catch (Exception e)
                 {
@@ -128,7 +126,7 @@ namespace UAlbion.Base.Tests
             }
         }
 
-        static ControlFlowGraph Decompile(ControlFlowGraph graph, string testName, bool dumpSteps)
+        static ICfgNode Decompile(ControlFlowGraph graph, string testName, bool dumpSteps)
         {
             var steps = new List<(string, ControlFlowGraph)>();
 

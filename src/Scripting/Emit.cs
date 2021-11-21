@@ -8,6 +8,7 @@ namespace UAlbion.Scripting
         public static SingleEvent Event(IEvent e) => new(e);
         public static BreakStatement Break() => new();
         public static ContinueStatement Continue() => new();
+        public static ControlFlowNode Cfg(ControlFlowGraph graph) => new(graph);
         public static DoLoop Do(ICfgNode condition, ICfgNode body) => new(condition, body);
         public static EmptyNode Empty() => new();
         public static IfThen If(ICfgNode condition, ICfgNode body) => new(condition, body);

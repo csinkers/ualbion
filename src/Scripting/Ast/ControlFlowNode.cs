@@ -1,8 +1,8 @@
 ﻿namespace UAlbion.Scripting.Ast
 {
-    public record EmptyNode : ICfgNode // Used for empty entry / exit nodes
+    public record ControlFlowNode(ControlFlowGraph Graph) : ICfgNode
     {
-        public override string ToString() => "ø";
+        public override string ToString() => "SubGraph";
         public void Accept(IAstVisitor visitor) => visitor.Visit(this);
         public int Priority => int.MaxValue;
     }

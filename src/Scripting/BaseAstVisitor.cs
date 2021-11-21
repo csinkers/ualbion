@@ -7,6 +7,7 @@ namespace UAlbion.Scripting
         public virtual void Visit(SingleEvent e) { }
         public virtual void Visit(BreakStatement breakStatement) { }
         public virtual void Visit(ContinueStatement continueStatement) { }
+        public virtual void Visit(ControlFlowNode cfgNode) { }
         public virtual void Visit(EmptyNode empty) { }
         public virtual void Visit(Goto jump) { }
         public virtual void Visit(Label label) { } 

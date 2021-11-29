@@ -3,7 +3,7 @@ using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting
 {
-    public class EmptyNodeRemovalVisitor : BaseBuilderAstVisitor
+    public class EmptyNodeRemovalVisitor : BaseAstBuilderVisitor
     {
         protected override ICfgNode Build(Sequence sequence)
         {
@@ -32,9 +32,14 @@ namespace UAlbion.Scripting
             if (trivial)
                 return null;
 
-            return result.Count == 1 
-                ? result[0] 
-                : Emit.Seq(result.ToArray());
+            return result.Count switch
+            {
+                // If it was a sequence of all empty nodes, emit a single empty node
+                // so the next iteration will take care of it
+                0 => Emit.Empty(), 
+                1 => result[0],
+                _ =>  Emit.Seq(result.ToArray())
+            };
         }
     }
 }

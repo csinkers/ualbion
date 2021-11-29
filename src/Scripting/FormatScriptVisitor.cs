@@ -20,6 +20,7 @@ namespace UAlbion.Scripting
         public string Code => _sb.ToString();
         public bool UseNumericIds { get; init; }
         public bool PrettyPrint { get; init; } = true;
+        public bool WrapStatements { get; init; } = true;
         public int IndentLevel { get; set; }
         public int TabSize { get; init; } = 4;
 
@@ -47,7 +48,7 @@ namespace UAlbion.Scripting
         public void Visit(BreakStatement breakStatement) { Indent(); _sb.Append("break"); }
         public void Visit(ContinueStatement continueStatement) { Indent(); _sb.Append("continue"); }
         public void Visit(ControlFlowNode cfgNode) { Indent(); _sb.Append("!!!ARBITRARY CONTROL FLOW!!!"); }
-        public void Visit(EmptyNode empty) { }
+        public void Visit(EmptyNode empty) { _sb.Append('ø'); }
         public void Visit(Name name) => _sb.Append(name.Value);
 
         public void Visit(Negation negation)
@@ -105,27 +106,18 @@ namespace UAlbion.Scripting
         public void Visit(Statement statement)
         {
             Indent();
+            if (WrapStatements)
+                _sb.Append("S(");
+
             statement.Head.Accept(this);
             foreach (var part in statement.Parameters)
             {
                 _sb.Append(' ');
                 part.Accept(this);
             }
-        }
 
-        public void Visit(WhileLoop whileLoop)
-        {
-            Indent();
-            _sb.Append("while (");
-            _inCondition = true;
-            whileLoop.Condition.Accept(this);
-            _inCondition = false;
-            _sb.Append(") {");
-            Push();
-            whileLoop.Body?.Accept(this);
-            Pop();
-            Indent();
-            _sb.Append("}");
+            if (WrapStatements)
+                _sb.Append(")");
         }
 
         public void Visit(Sequence sequence)
@@ -153,6 +145,32 @@ namespace UAlbion.Scripting
             doLoop.Condition.Accept(this);
             _inCondition = false;
             _sb.Append(")");
+        }
+
+        public void Visit(EndlessLoop loop)
+        {
+            Indent();
+            _sb.Append("loop {");
+            Push();
+            loop.Body?.Accept(this);
+            Pop();
+            Indent();
+            _sb.Append("}");
+        }
+
+        public void Visit(WhileLoop whileLoop)
+        {
+            Indent();
+            _sb.Append("while (");
+            _inCondition = true;
+            whileLoop.Condition.Accept(this);
+            _inCondition = false;
+            _sb.Append(") {");
+            Push();
+            whileLoop.Body?.Accept(this);
+            Pop();
+            Indent();
+            _sb.Append("}");
         }
 
         public void Visit(Label label)

@@ -30,7 +30,7 @@ namespace UAlbion.Scripting.Tests
 
         public static void VerifyAstVsScript(string expected, ICfgNode ast)
         {
-            var visitor = new FormatScriptVisitor { PrettyPrint = false };
+            var visitor = new FormatScriptVisitor { PrettyPrint = false, WrapStatements = false };
             ast.Accept(visitor);
             Assert.Equal(expected, visitor.Code);
         }
@@ -42,33 +42,42 @@ namespace UAlbion.Scripting.Tests
             string resultsDir,
             [CallerMemberName] string method = null)
         {
-            if (!CompareCfgVsScript(graph, expected, false, out var error) && !CompareCfgVsScript(graph, expected, true, out error))
+            if (CompareCfgVsScript(graph, expected, out var error))
             {
                 DumpSteps(steps, resultsDir, method);
                 throw new InvalidOperationException(error);
             }
         }
 
-        public static bool CompareCfgVsScript(ControlFlowGraph graph, string expected, bool pretty, out string message)
+        public static bool CompareCfgVsScript(ControlFlowGraph graph, string expected, out string message)
         {
             var nodes = graph.GetDfsOrder().Select(x => graph.Nodes[x]);
-            return CompareNodesVsScript(nodes, expected, pretty, out message);
+            return CompareNodesVsScript(nodes, expected, out message);
         }
 
-        public static bool CompareNodesVsScript(IEnumerable<ICfgNode> nodes, string expected, bool pretty, out string message)
+        static string FormatScript(IEnumerable<ICfgNode> nodes, bool pretty)
         {
-            var visitor = new FormatScriptVisitor { PrettyPrint = pretty };
+            var visitor = new FormatScriptVisitor { PrettyPrint = pretty, WrapStatements = false };
             foreach (var node in nodes)
                 node.Accept(visitor);
 
-            var pseudo = visitor.Code;
+            return visitor.Code;
+        }
+
+        public static bool CompareNodesVsScript(IEnumerable<ICfgNode> nodes, string expected, out string message)
+        {
+            var compact = FormatScript(nodes, false);
+            var pretty = FormatScript(nodes, true);
 
             message = null;
             var nl = Environment.NewLine;
-            if (pseudo != expected)
-                message = $"Test Failed{nl}Expected:{nl}{expected}{nl}Actual:{nl}{pseudo}";
+            if (compact != expected && pretty != expected)
+            {
+                message = $"Test Failed{nl}Expected:{nl}{expected}{nl}Actual (compact):{nl}{compact}{nl}Actual (pretty printed):{nl}{pretty}{nl}";
+                return false;
+            }
 
-            return pseudo == expected;
+            return true;
         }
 
         public static bool CompareLayout(EventLayout actual, EventLayout expected, out string message)

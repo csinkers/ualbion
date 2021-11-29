@@ -8,6 +8,7 @@
         void Visit(ControlFlowNode cfgNode);
         void Visit(DoLoop doLoop);
         void Visit(EmptyNode empty);
+        void Visit(EndlessLoop loop);
         void Visit(IfThen ifThen);
         void Visit(IfThenElse ifElse);
         void Visit(Goto jump);

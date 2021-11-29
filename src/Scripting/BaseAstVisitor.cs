@@ -34,12 +34,6 @@ namespace UAlbion.Scripting
             foreach (var part in statement.Parameters) part.Accept(this);
         }
 
-        public virtual void Visit(WhileLoop whileLoop)
-        {
-            whileLoop.Condition.Accept(this);
-            whileLoop.Body?.Accept(this);
-        }
-
         public virtual void Visit(Sequence sequence)
         {
             foreach (var node in sequence.Statements)
@@ -50,6 +44,17 @@ namespace UAlbion.Scripting
         {
             doLoop.Body?.Accept(this);
             doLoop.Condition.Accept(this);
+        }
+
+        public virtual void Visit(EndlessLoop loop)
+        {
+            loop.Body?.Accept(this);
+        }
+
+        public virtual void Visit(WhileLoop whileLoop)
+        {
+            whileLoop.Condition.Accept(this);
+            whileLoop.Body?.Accept(this);
         }
 
         public virtual void Visit(BinaryOp binaryOp)

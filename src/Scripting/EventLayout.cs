@@ -171,6 +171,9 @@ namespace UAlbion.Scripting
             for (ushort ei = 0; ei < Events.Count; ei++)
             {
                 var e = Events[ei];
+                if (e == null)
+                    continue;
+
                 var (gi, ni) = _indexToNode[ei];
                 var graph = _graphs[gi];
                 var exitNode = graph.GetExitNode();

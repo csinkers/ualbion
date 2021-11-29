@@ -325,7 +325,7 @@ c",
             bool pretty = false) where T : ICfgNode
         {
             var parsed = TestParse(source, expected, parser);
-            var visitor = new FormatScriptVisitor { PrettyPrint = pretty };
+            var visitor = new FormatScriptVisitor { PrettyPrint = pretty, WrapStatements = false };
             parsed.Accept(visitor);
             Assert.Equal(source, visitor.Code);
         }

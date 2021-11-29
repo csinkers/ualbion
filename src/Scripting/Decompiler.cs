@@ -108,7 +108,7 @@ namespace UAlbion.Scripting
                 }
                 edges.Add((entry, head, true));
 
-                var graph = new ControlFlowGraph(entry, nodes, edges);
+                var graph = new ControlFlowGraph(entry, exit, nodes, edges);
                 graph = graph.InsertBefore(head, Emit.Label(label));
                 results.Add(graph);
             }
@@ -145,25 +145,22 @@ namespace UAlbion.Scripting
 
                 previous = graph;
                 // graph = record("Defragment", graph.Defragment());
-                graph = record("Reduce simple while", ReduceSimpleWhile(graph));  if (graph != previous) continue;
-                graph = record("Reduce sequence", ReduceSequences(graph, false)); if (graph != previous) continue;
-                graph = record("Reduce if-then", ReduceIfThen(graph));            if (graph != previous) continue;
-                graph = record("Reduce if-then-else", ReduceIfThenElse(graph));   if (graph != previous) continue;
-                graph = record("Reduce loop parts", ReduceLoopParts(graph));      if (graph != previous) continue;
-                graph = record("Reduce simple loop", ReduceSimpleLoops(graph));   if (graph != previous) continue;
-                graph = record("Reduce SESE region", ReduceSeseRegions(graph));   if (graph != previous) continue;
-                graph = record("Reduce sequence", ReduceSequences(graph, true));
+                graph = record("Reduce simple while", ReduceSimpleWhile(graph)); if (graph != previous) continue;
+                graph = record("Reduce sequence",     ReduceSequences(graph));   if (graph != previous) continue;
+                graph = record("Reduce if-then",      ReduceIfThen(graph));      if (graph != previous) continue;
+                graph = record("Reduce if-then-else", ReduceIfThenElse(graph));  if (graph != previous) continue;
+                graph = record("Reduce loop parts",   ReduceLoopParts(graph));   if (graph != previous) continue;
+                graph = record("Reduce simple loop",  ReduceSimpleLoops(graph)); if (graph != previous) continue;
+                graph = record("Reduce SESE region",  ReduceSeseRegions(graph));
             }
 
+            graph = record("Defragment", graph.Defragment());
             if (graph.ActiveNodeCount != 1)
                 throw new ControlFlowGraphException("Could not reduce graph to an AST", graph);
 
-            graph = record("Defragment", graph.Defragment());
-            var relabelled = CfgRelabeller.Relabel(graph, ScriptConstants.DummyLabelPrefix);
-
-            var visitor = new EmptyNodeRemovalVisitor();
-            relabelled.Head.Accept(visitor);
-            return visitor.Result ?? relabelled.Head;
+            graph = record("Relabel", CfgRelabeller.Relabel(graph, ScriptConstants.DummyLabelPrefix));
+            graph = record("Remove empty nodes", graph.AcceptBuilder(new EmptyNodeRemovalVisitor()));
+            return graph.Entry;
         }
 
         public static ControlFlowGraph ReduceSimpleWhile(ControlFlowGraph graph)
@@ -181,6 +178,9 @@ namespace UAlbion.Scripting
                 Func<string> vis = () => graph.ToVis().AddPointer("index", index).ToString();
                 #endif
 
+                if (graph.Children(index).Length == 1)
+                    return ReduceEmptyInfiniteWhileLoop(graph, index);
+
                 var condition = graph.Nodes[index];
                 if (!graph.GetEdgeLabel(index, index))
                     condition = Emit.Negation(condition);
@@ -189,24 +189,13 @@ namespace UAlbion.Scripting
                     .ReplaceNode(index, Emit.While(condition, null))
                     .RemoveEdge(index, index);
 
-                if (updated.Children(index).Length == 0) // For horrible infinite-loop cases add a dummy link to the exit node to prevent errors while calculating dominator trees.
-                {
-                    foreach (var exitIndex in updated.GetExitNodes())
-                    {
-                        if (updated.Nodes[exitIndex] is not EmptyNode)
-                            continue;
-                        updated = updated.AddEdge(index, exitIndex, true);
-                        break;
-                    }
-                }
-
                 return updated;
             }
 
             return graph;
         }
 
-        public static ControlFlowGraph ReduceSequences(ControlFlowGraph graph, bool reduceEmptyNodes)
+        public static ControlFlowGraph ReduceSequences(ControlFlowGraph graph)
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
             foreach (var index in graph.GetDfsPostOrder())
@@ -232,17 +221,9 @@ namespace UAlbion.Scripting
                 var node = graph.Nodes[index];
                 var childNode = graph.Nodes[child];
 
-                if (reduceEmptyNodes && (node is EmptyNode || childNode is EmptyNode))
-                    continue; // Don't collapse the entry/exit nodes until the end
-
-                var newNode = 
-                    node is Sequence existing
-                    ? Emit.Seq(existing.Statements.Append(graph.Nodes[child]).ToArray())
-                    : Emit.Seq(node, childNode);
-
                 var updated = graph
                     .RemoveNode(child)
-                    .ReplaceNode(index, newNode);
+                    .ReplaceNode(index, Emit.Seq(node, childNode));
 
                 foreach (var grandChild in grandChildren)
                     updated = updated.AddEdge(index, grandChild, graph.GetEdgeLabel(child, grandChild));
@@ -496,6 +477,12 @@ namespace UAlbion.Scripting
                         if (updated != graph)
                             return updated;
                     }
+                    else if (loop.Body.All(x => !x.Break)) // Infinite while loop
+                    {
+                        var updated = ReduceInfiniteWhileLoop(graph, head, tail);
+                        if (updated != graph)
+                            return updated;
+                    }
                     else
                     {
                         var updated = ReduceDoLoop(graph, head, tail);
@@ -505,6 +492,46 @@ namespace UAlbion.Scripting
                 }
             }
             return graph;
+        }
+
+        static ControlFlowGraph ReduceEmptyInfiniteWhileLoop(ControlFlowGraph graph, int index)
+        {
+            var exitNode = GetFirstEmptyExitNode(graph);
+            var label = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
+            var subgraph = new ControlFlowGraph(new[]
+                {
+                    Emit.Empty(), // 0
+                    Emit.Label(label), // 1
+                    graph.Nodes[index], // 2
+                    Emit.Goto(label), // 3
+                    Emit.Empty(), // 4
+                },
+                new[] { (0,1,true), (1,2,true), (2,3,true), (3,4,true), });
+
+            return graph
+                .AddEdge(index, exitNode, true)
+                .ReplaceNode(index, subgraph);
+        }
+
+        static ControlFlowGraph ReduceInfiniteWhileLoop(ControlFlowGraph graph, int head, int tail)
+        {
+            var exitNode = GetFirstEmptyExitNode(graph);
+            var label = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
+            var subgraph = new ControlFlowGraph(new[]
+                {
+                    Emit.Empty(), // 0
+                    Emit.Label(label), // 1
+                    graph.Nodes[head], // 2
+                    graph.Nodes[tail], // 3
+                    Emit.Goto(label), // 4
+                    Emit.Empty(), // 5
+                },
+                new[] { (0,1,true), (1,2,true), (2,3,true), (3,4,true), (4,5,true), });
+
+            return graph
+                .RemoveNode(tail)
+                .AddEdge(head, exitNode, true)
+                .ReplaceNode(head, subgraph);
         }
 
         static ControlFlowGraph ReduceWhileLoop(ControlFlowGraph graph, int head, int tail, bool negated)
@@ -555,15 +582,15 @@ namespace UAlbion.Scripting
                 .ReplaceNode(head, newNode);
         }
 
-        public static ControlFlowGraph ReduceSeseRegions(ControlFlowGraph graph)
+        public static ControlFlowGraph ReduceSeseRegions(ControlFlowGraph graph/*, RecordFunc recordFunc = null*/)
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
             var regions = graph.GetAllSeseRegions();
 
             // Do smallest regions first, as they may be nested in a larger one
-            foreach (var (region, regionHead) in regions.OrderBy(x => x.nodes.Count))
+            foreach (var (region, regionEntry, regionExit) in regions.OrderBy(x => x.nodes.Count))
             {
-                if (regionHead == graph.HeadIndex)
+                if (regionEntry == graph.EntryIndex)
                     continue; // Don't try and reduce the 'sequence' of start node -> actual entry point nodes when there's only one entry
 
                 #if DEBUG
@@ -580,27 +607,52 @@ namespace UAlbion.Scripting
                 if (containsOther)
                     continue;
 
-                var cut = graph.Cut(region, regionHead);
+                var cut = graph.Cut(region, regionEntry, regionExit);
 
                 if (cut.Cut.IsCyclic())
                     continue; // Must be some sort of weird loop that couldn't be reduced earlier, currently irreducible.
 
                 var restructured = SeseReducer.Reduce(cut.Cut);
-                int restructuredHead = restructured.HeadIndex;
-                int restructuredTail = cut.Cut.GetExitNode();
-
                 var (updated, mapping) = cut.Remainder.Merge(restructured);
+                /* if (recordFunc != null)
+                {
+                    recordFunc("SESE Remainder Region", cut.Remainder);
+                    recordFunc("SESE Cut Region", cut.Cut);
+                    recordFunc("SESE Restructured Cut Region", restructured);
+                    recordFunc("SESE Disjoint Result", updated);
+                } */
 
-                foreach (var (start, _, label) in cut.RemainderToCutEdges)
-                    updated = updated.AddEdge(start, mapping[restructuredHead], label);
+                if (cut.RemainderToCutEdges.Count > 0)
+                {
+                    foreach (var (start, _, label) in cut.RemainderToCutEdges)
+                        updated = updated.AddEdge(start, mapping[restructured.EntryIndex], label);
+                }
+                else updated = updated.SetEntry(mapping[restructured.EntryIndex]);
 
-                foreach (var (_, end, label) in cut.CutToRemainderEdges)
-                    updated = updated.AddEdge(mapping[restructuredTail], end, label);
+                if (cut.CutToRemainderEdges.Count > 0)
+                {
+                    foreach (var (_, end, label) in cut.CutToRemainderEdges)
+                        updated = updated.AddEdge(mapping[restructured.ExitIndex], end, label);
+                }
+                else updated = updated.SetExit(mapping[restructured.ExitIndex]);
 
                 return updated;
             }
 
             return graph;
+        }
+
+        static int GetFirstEmptyExitNode(ControlFlowGraph graph)
+        {
+            int exitNode = -1;
+            foreach (var candidate in graph.GetExitNodes())
+                if (graph.Nodes[candidate] is EmptyNode)
+                    exitNode = candidate;
+
+            if (exitNode == -1)
+                throw new ControlFlowGraphException("Could not structure infinite loop", graph);
+
+            return exitNode;
         }
     }
 }

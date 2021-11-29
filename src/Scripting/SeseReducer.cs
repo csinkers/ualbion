@@ -78,7 +78,7 @@ namespace UAlbion.Scripting
         {
             var result = new int[graph.Nodes.Count];
             Array.Fill(result, int.MaxValue);
-            result[graph.HeadIndex] = 0;
+            result[graph.EntryIndex] = 0;
 
             foreach (var i in graph.GetTopogicalOrder())
                 foreach (var child in graph.Children(i))
@@ -92,7 +92,7 @@ namespace UAlbion.Scripting
         {
             var result = new int[graph.Nodes.Count];
             Array.Fill(result, int.MinValue);
-            result[graph.HeadIndex] = 0;
+            result[graph.EntryIndex] = 0;
 
             foreach (var i in graph.GetTopogicalOrder())
                 foreach (var child in graph.Children(i))

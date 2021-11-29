@@ -11,6 +11,10 @@ namespace UAlbion.Scripting.Ast
             Statements = statements ?? throw new ArgumentNullException(nameof(statements));
             if(statements.Length < 2)
                 throw new ArgumentException("Tried to create sequence with less than 2 statements");
+            #if DEBUG
+            if (statements.OfType<Sequence>().Any())
+                throw new ArgumentException("Tried to create nested sequence");
+            #endif
         }
         public void Deconstruct(out ICfgNode[] statements) => statements = Statements;
 

@@ -117,6 +117,11 @@ namespace UAlbion.Scripting
             from rp in Token.EqualTo(ScriptToken.RParen)
             select (ICfgNode)Emit.Do(condition, body)).Named("Do");
 
+        public static readonly TokenListParser<ScriptToken, ICfgNode> Loop =
+            (from keyword in Token.EqualToValue(ScriptToken.Identifier, "loop")
+            from body in Parse.Ref(() => Statement)
+            select (ICfgNode)Emit.Loop(body)).Named("EndlessLoop");
+
         public static readonly TokenListParser<ScriptToken, ICfgNode> Break =
             Token.EqualToValue(ScriptToken.Identifier, "break").Value((ICfgNode)Emit.Break());
         public static readonly TokenListParser<ScriptToken, ICfgNode> Continue =
@@ -133,6 +138,7 @@ namespace UAlbion.Scripting
             .Or(If)
             .Or(While)
             .Or(Do)
+            .Or(Loop)
             .Or(Break)
             .Or(Continue)
             .Or(Goto)
@@ -149,13 +155,8 @@ namespace UAlbion.Scripting
         public static readonly TokenListParser<ScriptToken, Token<ScriptToken>> Comma = Token.EqualTo(ScriptToken.Comma);
         public static readonly TokenListParser<ScriptToken, Token<ScriptToken>> NewLine = Token.EqualTo(ScriptToken.NewLine);
 
-        public static readonly TokenListParser<ScriptToken, ScriptToken> EmptyLines1 =
-            NewLine.IgnoreThen(
-            NewLine.Many()).Value(ScriptToken.NewLine);
-
         public static readonly TokenListParser<ScriptToken, ICfgNode> Sequence =
-            (
-             from statements in SingleStatement.ManyDelimitedBy(Comma.Or(NewLine))
+            (from statements in SingleStatement.ManyDelimitedBy(Comma.Or(NewLine))
              select MakeSeq(statements)).Named("Sequence");
 
         public static readonly TokenListParser<ScriptToken, ICfgNode> Block =

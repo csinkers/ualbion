@@ -39,11 +39,11 @@ namespace UAlbion.Scripting
         ImmutableArray<(int start, int end)> _cachedBackEdges;
         ImmutableArray<CfgLoop> _cachedLoops;
 
-        public int HeadIndex { get; }
+        public int EntryIndex { get; }
+        public int ExitIndex { get; }
         public ImmutableList<ICfgNode> Nodes { get; }
         public ICfgNode GetNode(int i) => Nodes[i];
-
-        public ICfgNode Head => Nodes.Count == 0 ? null : Nodes[HeadIndex];
+        public ICfgNode Entry => EntryIndex == -1 ? null : Nodes[EntryIndex];
 
         public IEnumerable<(int start, int end)> Edges =>
             from kvp in _edgesByStart
@@ -60,14 +60,16 @@ namespace UAlbion.Scripting
 
         public ControlFlowGraph()
         {
-            HeadIndex = 0;
+            EntryIndex = -1;
+            ExitIndex = -1;
             Nodes = ImmutableList<ICfgNode>.Empty;
             _edgesByStart = EmptyEdges;
             _edgesByEnd = EmptyEdges;
         }
 
         ControlFlowGraph(
-            int headIndex,
+            int entryIndex,
+            int exitIndex,
             ImmutableList<ICfgNode> nodes,
             ImmutableDictionary<int, ImmutableArray<int>> edgesByStart,
             ImmutableDictionary<int, ImmutableArray<int>> edgesByEnd,
@@ -81,7 +83,8 @@ namespace UAlbion.Scripting
             _falseEdges = falseEdges;
             _deletedNodes = deletedNodes;
             _deletedNodeCount = deletedNodeCount;
-            HeadIndex = headIndex;
+            EntryIndex = entryIndex;
+            ExitIndex = exitIndex;
 
 #if DEBUG
             if (Nodes == null) throw new ArgumentNullException(nameof(nodes)); 
@@ -91,23 +94,23 @@ namespace UAlbion.Scripting
             if (_deletedNodes == null) throw new ArgumentNullException(nameof(deletedNodes));
 
             string message = null;
-            if (headIndex < 0)
-                message = $"Invalid head index given ({headIndex})";
-            if (headIndex > nodes.Count)
-                message = $"Head index {headIndex} given, but there are only {nodes.Count} nodes";
-            if (nodes[headIndex] == null)
-                message = $"Head index {headIndex} given, but it has been deleted";
-            //if (_edgesByEnd.TryGetValue(headIndex, out _))
-            //    message = $"Head index {headIndex} given, but it does not have 0 indegree";
-            //if (GetEntryNode() != headIndex)
-            //    message = $"Head index {headIndex} given, but it is not the unique entry node";
+            if (entryIndex < 0) message = $"Invalid entry index given ({entryIndex})";
+            if (entryIndex > nodes.Count) message = $"Entry index {entryIndex} given, but there are only {nodes.Count} nodes";
+            if (nodes[entryIndex] == null) message = $"Entry index {entryIndex} given, but it has been deleted";
+            // if (_edgesByEnd.TryGetValue(entryIndex, out _)) message = $"Entry index {entryIndex} given, but it does not have 0 indegree";
+            // if (GetEntryNode() != entryIndex) message = $"Entry index {entryIndex} given, but it is not the unique entry node";
+
+            if (exitIndex < 0) message = $"Invalid exit index given ({exitIndex})";
+            if (exitIndex > nodes.Count) message = $"Exit index {exitIndex} given, but there are only {nodes.Count} nodes";
+            if (nodes[exitIndex] == null) message = $"Exit index {exitIndex} given, but it has been deleted";
             if (message != null)
                 throw new ControlFlowGraphException(message, this);
 #endif
         }
 
         ControlFlowGraph(
-            int headIndex,
+            int entryIndex,
+            int exitIndex,
             ImmutableList<ICfgNode> nodes,
             ImmutableDictionary<int, ImmutableArray<int>> edgesByStart,
             ImmutableDictionary<int, ImmutableArray<int>> edgesByEnd,
@@ -115,13 +118,15 @@ namespace UAlbion.Scripting
             ImmutableStack<int> deletedNodes,
             int deletedNodeCount,
             ControlFlowGraph reversed)
-            : this(headIndex, nodes, edgesByStart, edgesByEnd, falseEdges, deletedNodes, deletedNodeCount)
+            : this(entryIndex, exitIndex, nodes, edgesByStart, edgesByEnd, falseEdges, deletedNodes, deletedNodeCount)
         {
             _cachedReverse = reversed;
         }
 
-        public ControlFlowGraph(IEnumerable<ICfgNode> nodes, IEnumerable<(int start, int end, bool label)> edges) : this(-1, nodes, edges) {}
-        public ControlFlowGraph(int headIndex, IEnumerable<ICfgNode> nodes, IEnumerable<(int start, int end, bool label)> edges)
+        public ControlFlowGraph SetEntry(int i) => new(i, ExitIndex, Nodes, _edgesByStart, _edgesByEnd, _falseEdges, _deletedNodes, _deletedNodeCount);
+        public ControlFlowGraph SetExit(int i) => new(EntryIndex, i, Nodes, _edgesByStart, _edgesByEnd, _falseEdges, _deletedNodes, _deletedNodeCount);
+        public ControlFlowGraph(IEnumerable<ICfgNode> nodes, IEnumerable<(int start, int end, bool label)> edges) : this(-1, -1, nodes, edges) {}
+        public ControlFlowGraph(int entryIndex, int exitIndex, IEnumerable<ICfgNode> nodes, IEnumerable<(int start, int end, bool label)> edges)
         {
             if (nodes == null) throw new ArgumentNullException(nameof(nodes));
             if (edges == null) throw new ArgumentNullException(nameof(edges));
@@ -159,7 +164,8 @@ namespace UAlbion.Scripting
             _edgesByStart = starts.ToImmutable();
             _edgesByEnd = ends.ToImmutable();
             _falseEdges = falseEdges.ToImmutable();
-            HeadIndex = headIndex == -1 ? GetEntryNode() : headIndex;
+            EntryIndex = entryIndex == -1 ? GetEntryNode() : entryIndex;
+            ExitIndex = exitIndex == -1 ? GetExitNode() : exitIndex;
 
             var deleted = new List<int>();
             for (var index = 0; index < Nodes.Count; index++)
@@ -172,11 +178,11 @@ namespace UAlbion.Scripting
             if (error != null)
                 throw new ControlFlowGraphException(error, this);
 
-            if (_edgesByEnd.TryGetValue(headIndex, out _))
-                error = $"Head index {headIndex} given, but it does not have 0 indegree";
+            if (_edgesByEnd.TryGetValue(entryIndex, out _))
+                error = $"Entry index {entryIndex} given, but it does not have 0 indegree";
 #if DEBUG
             //if (GetEntryNode() != headIndex)
-            //    error = $"Head index {headIndex} given, but it is not the unique entry node";
+            //    error = $"Entry index {headIndex} given, but it is not the unique entry node";
 #endif
 
             if (error != null)
@@ -192,7 +198,8 @@ namespace UAlbion.Scripting
         public ControlFlowGraph Reverse() =>
             _cachedReverse ??= 
                 new ControlFlowGraph(
-                GetExitNode(),
+                ExitIndex,
+                EntryIndex,
                 Nodes,
                 _edgesByEnd,
                 _edgesByStart,
@@ -206,13 +213,13 @@ namespace UAlbion.Scripting
             if (_deletedNodes.IsEmpty)
             {
                 index = Nodes.Count;
-                return new ControlFlowGraph(HeadIndex, Nodes.Add(node), _edgesByStart, _edgesByEnd, _falseEdges, _deletedNodes, 0);
+                return new ControlFlowGraph(EntryIndex, ExitIndex, Nodes.Add(node), _edgesByStart, _edgesByEnd, _falseEdges, _deletedNodes, 0);
             }
 
             var deletedNodes = _deletedNodes.Pop(out index);
             Debug.Assert(Nodes[index] == null);
             var nodes = Nodes.SetItem(index, node);
-            return new ControlFlowGraph(HeadIndex, nodes, _edgesByStart, _edgesByEnd, _falseEdges, deletedNodes, _deletedNodeCount - 1);
+            return new ControlFlowGraph(EntryIndex, ExitIndex, nodes, _edgesByStart, _edgesByEnd, _falseEdges, deletedNodes, _deletedNodeCount - 1);
         }
 
         public ControlFlowGraph AddEdge(int start, int end, bool label)
@@ -233,7 +240,8 @@ namespace UAlbion.Scripting
             var falseEdges = label ? _falseEdges : _falseEdges.Add((start, end));
 
             return new ControlFlowGraph(
-                HeadIndex,
+                EntryIndex,
+                ExitIndex,
                 Nodes,
                 edgesByStart,
                 edgesByEnd,
@@ -243,7 +251,7 @@ namespace UAlbion.Scripting
         }
 
         public ControlFlowGraph ReplaceNode(int index, ICfgNode newNode) =>
-            new(HeadIndex,
+            new(EntryIndex, ExitIndex,
                 Nodes.SetItem(index, newNode),
                 _edgesByStart, _edgesByEnd, _falseEdges, 
                 _deletedNodes, _deletedNodeCount);
@@ -267,30 +275,44 @@ namespace UAlbion.Scripting
             return graph.RemoveNode(index);
         }
 
-        public ControlFlowGraph RemoveNode(int index) => RemoveNodes(new[] { index });
-        public ControlFlowGraph RemoveNodes(IEnumerable<int> indices)
+        public ControlFlowGraph RemoveNode(int i) 
         {
-            if (indices == null) throw new ArgumentNullException(nameof(indices));
+            if (Nodes[i] == null)
+                throw new ControlFlowGraphException($"Tried to remove a non-existent node ({i})", this);
+
             var nodes = Nodes.ToBuilder();
             var byStart = _edgesByStart.ToBuilder();
             var byEnd = _edgesByEnd.ToBuilder();
             var falseEdges = _falseEdges.ToBuilder();
             var deletedNodes = _deletedNodes;
             int deletedCount = _deletedNodeCount;
+            int newEntry = EntryIndex;
+            int newExit = ExitIndex;
 
-            foreach (var i in indices.OrderByDescending(x => x))
+            if (EntryIndex == i)
             {
-                if (HeadIndex == i) throw new InvalidOperationException($"Tried to remove the head node ({i})");
-                if (nodes[i] == null) throw new InvalidOperationException($"Tried to remove a non-existent node ({i})");
-
-                nodes[i] = null;
-                deletedNodes = deletedNodes.Push(i);
-                deletedCount++;
-                BuilderRemoveEdges(i, byStart, byEnd, falseEdges);
+                if (Parents(i).Length > 0) throw new ControlFlowGraphException($"Tried to remove entry node {i}, but it has parents", this);
+                var children = Children(i);
+                if (children.Length != 1) throw new ControlFlowGraphException($"Tried to remove entry node {i}, but it does not have a single child", this);
+                newEntry = children[0];
             }
 
+            if (ExitIndex == i)
+            {
+                if (Children(i).Length > 0) throw new ControlFlowGraphException($"Tried to remove exit node {i}, but it has children", this);
+                var parents = Parents(i);
+                if (parents.Length != 1) throw new ControlFlowGraphException($"Tried to remove exit node {i}, but it does not have a single parent", this);
+                newExit = parents[0];
+            }
+
+            nodes[i] = null;
+            deletedNodes = deletedNodes.Push(i);
+            deletedCount++;
+            BuilderRemoveEdges(i, byStart, byEnd, falseEdges);
+
             return new ControlFlowGraph(
-                HeadIndex,
+                newEntry,
+                newExit,
                 nodes.ToImmutable(),
                 byStart.ToImmutable(),
                 byEnd.ToImmutable(),
@@ -359,7 +381,7 @@ namespace UAlbion.Scripting
                 from end in start.Value
                 select (mapping[start.Key], mapping[end], GetEdgeLabel(start.Key, end));
 
-            return new ControlFlowGraph(mapping[HeadIndex], Nodes.Where(x => x != null), edges);
+            return new ControlFlowGraph(mapping[EntryIndex], mapping[ExitIndex], Nodes.Where(x => x != null), edges);
         }
 
         public ControlFlowGraph RemoveEdge(int start, int end)
@@ -383,7 +405,7 @@ namespace UAlbion.Scripting
             if (byStart == _edgesByStart)
                 throw new ControlFlowGraphException($"Tried to remove edge ({start}, {end}), but it does not exist");
 
-            return new ControlFlowGraph(HeadIndex, Nodes, byStart, byEnd, falseEdges, _deletedNodes, _deletedNodeCount);
+            return new ControlFlowGraph(EntryIndex, ExitIndex, Nodes, byStart, byEnd, falseEdges, _deletedNodes, _deletedNodeCount);
         }
 
         public ControlFlowGraph InsertBefore(int position, ICfgNode node)
@@ -555,7 +577,7 @@ namespace UAlbion.Scripting
             var visited = new bool[Nodes.Count];
             var stack = new List<int>();
 
-            DepthFirstSearch(HeadIndex, visited, stack, results, backEdges, postOrder);
+            DepthFirstSearch(EntryIndex, visited, stack, results, backEdges, postOrder);
 #if DEBUG
             for (int i = 0; i < Nodes.Count; i++)
             {
@@ -576,8 +598,8 @@ namespace UAlbion.Scripting
             if (_cachedDominatorTree != null)
                 return _cachedDominatorTree;
 
-            if (Parents(HeadIndex).Any())
-                throw new ControlFlowGraphException("Tried to obtain dominator tree of graph, but the head was not parentless.", this);
+            if (Parents(EntryIndex).Any())
+                throw new ControlFlowGraphException("Tried to obtain dominator tree of graph, but the entry was not parentless.", this);
 
             var dominators = new List<int>[Nodes.Count];
             for (int i = 0; i < Nodes.Count; i++)
@@ -586,7 +608,7 @@ namespace UAlbion.Scripting
                     continue;
 
                 dominators[i] = new List<int>(Nodes.Count);
-                if (i == HeadIndex)
+                if (i == EntryIndex)
                     dominators[i].Add(i);
                 else
                     for (int j = 0; j < Nodes.Count; j++)
@@ -601,7 +623,7 @@ namespace UAlbion.Scripting
                 changed = false;
                 foreach(var index in postOrder)
                 {
-                    if (index == HeadIndex)
+                    if (index == EntryIndex)
                         continue;
 
                     List<int> currentDominators;
@@ -633,7 +655,7 @@ namespace UAlbion.Scripting
 
                 // The dominator lists could be out of order, need to make sure.
                 list.Sort((x, y) => x == y ? 0 : dominators[y].Contains(x) ? -1 : 1);
-                if (list[0] != HeadIndex)
+                if (list[0] != EntryIndex)
                     throw new ControlFlowGraphException("Disjoint graph detected while computing dominator tree", this);
 
                 tree = tree.AddPath(list);
@@ -656,6 +678,8 @@ namespace UAlbion.Scripting
                 if (Nodes[i] == null) continue;
                 sb.Append("    Node"); sb.Append(i);
                 sb.Append(" [shape=box, fontname = \"Consolas\", fontsize=8, fillcolor=azure2, style=filled, label=\"Node "); sb.Append(i);
+                if (i == EntryIndex) sb.Append(" <ENTRY>");
+                if (i == ExitIndex) sb.Append(" <EXIT>");
                 sb.Append("\\l");
 
                 var visitor = new FormatScriptVisitor();
@@ -702,7 +726,7 @@ namespace UAlbion.Scripting
                 .OrderBy(x => x.Item1)
                 .ThenBy(x => x.Item2);
 
-            return new ControlFlowGraph(mapping[HeadIndex], nodes, edges);
+            return new ControlFlowGraph(mapping[EntryIndex], mapping[ExitIndex], nodes, edges);
         }
 
         public List<List<int>> GetAllStronglyConnectedComponents()
@@ -949,11 +973,11 @@ namespace UAlbion.Scripting
             return result;
         }
 
-        public List<(HashSet<int> nodes, int head)> GetAllSeseRegions()
+        public List<(HashSet<int> nodes, int entry, int exit)> GetAllSeseRegions()
         {
             var domTree = GetDominatorTree();
             var postDomTree = GetPostDominatorTree();
-            List<(HashSet<int>, int)> regions = new();
+            List<(HashSet<int>, int, int)> regions = new();
 
             void GetRegionParts(int current, HashSet<int> region, int end)
             {
@@ -978,7 +1002,7 @@ namespace UAlbion.Scripting
                     HashSet<int> region = new();
                     GetRegionParts(i, region, j);
                     region.Add(j);
-                    regions.Add((region, i));
+                    regions.Add((region, i, j));
                 }
             }
             return regions;
@@ -1024,7 +1048,7 @@ namespace UAlbion.Scripting
             return result;
         }
 
-        public CfgCutResult Cut(HashSet<int> selectedNodes, int newHead)
+        public CfgCutResult Cut(HashSet<int> selectedNodes, int entry, int exit)
         {
             if (selectedNodes == null) throw new ArgumentNullException(nameof(selectedNodes));
             List<ICfgNode> remainderNodes = new();
@@ -1038,7 +1062,6 @@ namespace UAlbion.Scripting
             List<(int, int, bool)> cutToRemainderEdges = new();
             List<(int, int, bool)> remainderToCutEdges = new();
 
-            cutNodes.Add(new EmptyNode());
             for (int i = 0; i < Nodes.Count; i++)
             {
                 if (Nodes[i] == null)
@@ -1056,7 +1079,6 @@ namespace UAlbion.Scripting
                 }
             }
 
-            cutEdges.Add((0, cutMapping[newHead], true));
             foreach (var edge in Edges)
             {
                 bool startCut = selectedNodes.Contains(edge.start);
@@ -1071,9 +1093,10 @@ namespace UAlbion.Scripting
                     remainderToCutEdges.Add((remainderMapping[edge.start], cutMapping[edge.end], GetEdgeLabel(edge.start, edge.end)));
             }
 
-            int remainderHead = !selectedNodes.Contains(HeadIndex) ? remainderMapping[HeadIndex] : -1;
-            var cut = new ControlFlowGraph(0, cutNodes, cutEdges);
-            var remainder = new ControlFlowGraph(remainderHead, remainderNodes, remainderEdges);
+            int remainderEntry = !selectedNodes.Contains(EntryIndex) ? remainderMapping[EntryIndex] : -1;
+            int remainderExit = !selectedNodes.Contains(ExitIndex) ? remainderMapping[ExitIndex] : -1;
+            var cut = new ControlFlowGraph(cutMapping[entry], cutMapping[exit], cutNodes, cutEdges);
+            var remainder = new ControlFlowGraph(remainderEntry, remainderExit, remainderNodes, remainderEdges);
             return new CfgCutResult(cut, remainder, cutToRemainderEdges, remainderToCutEdges);
         }
 
@@ -1161,6 +1184,25 @@ namespace UAlbion.Scripting
             }
 
             return (trueChild, falseChild);
+        }
+
+        public void Accept(IAstVisitor visitor)
+        {
+            foreach (var index in GetDfsOrder())
+                Nodes[index].Accept(visitor);
+        }
+
+        public ControlFlowGraph AcceptBuilder(IAstBuilderVisitor visitor)
+        {
+            var result = this;
+            foreach (var index in GetDfsOrder())
+            {
+                result.Nodes[index].Accept(visitor);
+                if (visitor.Result != null)
+                    result = result.ReplaceNode(index, visitor.Result);
+            }
+
+            return result;
         }
 
         // Used by https://github.com/hediet/vscode-debug-visualizer

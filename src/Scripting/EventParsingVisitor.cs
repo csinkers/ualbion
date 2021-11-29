@@ -1,15 +1,23 @@
 ﻿using System;
+using System.Text;
 using UAlbion.Api;
 using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting
 {
-    public class EventParsingVisitor : BaseBuilderAstVisitor
+    public class EventParsingVisitor : BaseAstBuilderVisitor
     {
-        protected override ICfgNode Build(Statement s)
+        protected override ICfgNode Build(Statement statement)
         {
-            var formatter = new FormatScriptVisitor();
-            s.Accept(formatter);
+            var sb = new StringBuilder();
+            var formatter = new FormatScriptVisitor(sb);
+            statement.Head.Accept(formatter);
+            foreach (var part in statement.Parameters)
+            {
+                sb.Append(' ');
+                part.Accept(formatter);
+            }
+
             var e = Event.Parse(formatter.Code);
             if (e == null)
                 throw new InvalidOperationException($"Could not parse \"{formatter.Code}\" as an event");

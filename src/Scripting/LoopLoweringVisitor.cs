@@ -4,7 +4,7 @@ using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting
 {
-    public class LoopLoweringVisitor : BaseBuilderAstVisitor
+    public class LoopLoweringVisitor : BaseAstBuilderVisitor
     {
         readonly Stack<string> _headStack = new();
         readonly Stack<string> _tailStack = new();

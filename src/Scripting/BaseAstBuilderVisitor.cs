@@ -4,7 +4,7 @@ using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting
 {
-    public abstract class BaseBuilderAstVisitor : IAstVisitor
+    public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
     {
         public ICfgNode Result { get; private set; }
 
@@ -15,6 +15,7 @@ namespace UAlbion.Scripting
         public void Visit(ControlFlowNode cfgNode) => Result = Build(cfgNode);
         public void Visit(DoLoop doLoop) => Result = Build(doLoop);
         public void Visit(EmptyNode empty) => Result = Build(empty);
+        public void Visit(EndlessLoop loop) => Result = Build(loop);
         public void Visit(Goto jump) => Result = Build(jump);
         public void Visit(IfThen ifThen) => Result = Build(ifThen);
         public void Visit(IfThenElse ifElse) => Result = Build(ifElse);
@@ -95,21 +96,6 @@ namespace UAlbion.Scripting
             return Emit.Statement(head, parts);
         }
 
-        protected virtual ICfgNode Build(WhileLoop whileLoop)
-        {
-            whileLoop.Condition.Accept(this);
-            var condition = Result;
-            whileLoop.Body?.Accept(this);
-            var body = Result;
-
-            if (condition == null && body == null)
-                return null;
-
-            return Emit.While(
-                condition ?? whileLoop.Condition,
-                body ?? whileLoop.Body);
-        }
-
         protected virtual ICfgNode Build(Sequence sequence)
         {
             var result = new List<ICfgNode>();
@@ -147,6 +133,32 @@ namespace UAlbion.Scripting
             return Emit.Do(
                 condition ?? doLoop.Condition,
                 body ?? doLoop.Body);
+        }
+
+        protected virtual ICfgNode Build(EndlessLoop loop)
+        {
+            loop.Body?.Accept(this);
+            var body = Result;
+
+            if (body == null)
+                return null;
+
+            return Emit.Loop(body);
+        }
+
+        protected virtual ICfgNode Build(WhileLoop whileLoop)
+        {
+            whileLoop.Condition.Accept(this);
+            var condition = Result;
+            whileLoop.Body?.Accept(this);
+            var body = Result;
+
+            if (condition == null && body == null)
+                return null;
+
+            return Emit.While(
+                condition ?? whileLoop.Condition,
+                body ?? whileLoop.Body);
         }
 
         protected virtual ICfgNode Build(BinaryOp binaryOp)

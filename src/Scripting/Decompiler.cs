@@ -44,6 +44,40 @@ namespace UAlbion.Scripting
             return results;
         }
 
+        public static ICfgNode SimplifyGraph(ControlFlowGraph graph, RecordFunc record)
+        {
+            if (graph == null) throw new ArgumentNullException(nameof(graph));
+            record("Begin decompilation", graph);
+            Func<string> vis = () => graph.Visualize();
+            ControlFlowGraph previous = null;
+            int iterations = 0;
+            while (graph != previous)
+            {
+                iterations++;
+                if (iterations > 1000)
+                    throw new ControlFlowGraphException("Iteration overflow, assuming graph cannot be structured", graph);
+
+                previous = graph;
+                // graph = record("Defragment", graph.Defragment());
+                graph = record("Reduce simple while", ReduceSimpleWhile(graph));   if (graph != previous) continue;
+                graph = record("Reduce sequence",     ReduceSequences(graph));     if (graph != previous) continue;
+                graph = record("Reduce if-then",      ReduceIfThen(graph));        if (graph != previous) continue;
+                graph = record("Reduce if-then-else", ReduceIfThenElse(graph));    if (graph != previous) continue;
+                // graph = record("Reduce loop parts",   ReduceLoops(graph, record)); if (graph != previous) continue;
+                graph = record("Reduce loop parts",   ReduceLoopParts(graph));   if (graph != previous) continue;
+                graph = record("Reduce simple loop",  ReduceSimpleLoops(graph)); if (graph != previous) continue;
+                graph = record("Reduce SESE region",  ReduceSeseRegions(graph));
+            }
+
+            graph = record("Defragment", graph.Defragment());
+            if (graph.ActiveNodeCount != 1)
+                throw new ControlFlowGraphException("Could not reduce graph to an AST", graph);
+
+            graph = record("Relabel", CfgRelabeller.Relabel(graph, ScriptConstants.DummyLabelPrefix));
+            graph = record("Remove empty nodes", graph.AcceptBuilder(new EmptyNodeRemovalVisitor()));
+            return graph.Entry;
+        }
+
         public static List<ControlFlowGraph> BuildEventRegions<T>(
             IList<T> events,
             IEnumerable<ushort> chains,
@@ -128,39 +162,6 @@ namespace UAlbion.Scripting
                 results[i] = results[i].Defragment();
 
             return results;
-        }
-
-        public static ICfgNode SimplifyGraph(ControlFlowGraph graph, RecordFunc record)
-        {
-            if (graph == null) throw new ArgumentNullException(nameof(graph));
-            record("Begin decompilation", graph);
-            Func<string> vis = () => graph.Visualize();
-            ControlFlowGraph previous = null;
-            int iterations = 0;
-            while (graph != previous)
-            {
-                iterations++;
-                if (iterations > 1000)
-                    throw new ControlFlowGraphException("Iteration overflow, assuming graph cannot be structured", graph);
-
-                previous = graph;
-                // graph = record("Defragment", graph.Defragment());
-                graph = record("Reduce simple while", ReduceSimpleWhile(graph)); if (graph != previous) continue;
-                graph = record("Reduce sequence",     ReduceSequences(graph));   if (graph != previous) continue;
-                graph = record("Reduce if-then",      ReduceIfThen(graph));      if (graph != previous) continue;
-                graph = record("Reduce if-then-else", ReduceIfThenElse(graph));  if (graph != previous) continue;
-                graph = record("Reduce loop parts",   ReduceLoopParts(graph));   if (graph != previous) continue;
-                graph = record("Reduce simple loop",  ReduceSimpleLoops(graph)); if (graph != previous) continue;
-                graph = record("Reduce SESE region",  ReduceSeseRegions(graph));
-            }
-
-            graph = record("Defragment", graph.Defragment());
-            if (graph.ActiveNodeCount != 1)
-                throw new ControlFlowGraphException("Could not reduce graph to an AST", graph);
-
-            graph = record("Relabel", CfgRelabeller.Relabel(graph, ScriptConstants.DummyLabelPrefix));
-            graph = record("Remove empty nodes", graph.AcceptBuilder(new EmptyNodeRemovalVisitor()));
-            return graph.Entry;
         }
 
         public static ControlFlowGraph ReduceSimpleWhile(ControlFlowGraph graph)
@@ -305,14 +306,14 @@ namespace UAlbion.Scripting
                 var leftChildren = graph.Children(left);
                 var rightChildren = graph.Children(right);
 
+                if (leftParents.Length != 1 || rightParents.Length != 1) // Branches of an if can't be jump destinations from elsewhere
+                    continue;
+
                 bool isRegularIfThenElse =
-                    leftParents.Length == 1 && rightParents.Length == 1 &&
                     leftChildren.Length == 1 && rightChildren.Length == 1 &&
                     leftChildren[0] == rightChildren[0];
 
-                bool isTerminalIfThenElse = // TODO: Remove?
-                    leftParents.Length == 1 && rightParents.Length == 1 &&
-                    leftChildren.Length == 0 && rightChildren.Length == 0;
+                bool isTerminalIfThenElse = leftChildren.Length == 0 && rightChildren.Length == 0;
 
                 if (!isRegularIfThenElse && !isTerminalIfThenElse)
                     continue;
@@ -338,6 +339,47 @@ namespace UAlbion.Scripting
                     .RemoveNode(thenIndex)
                     .RemoveNode(elseIndex)
                     .ReplaceNode(head, newNode);
+            }
+
+            return graph;
+        }
+
+        static bool DominatesAll(DominatorTree tree, int dominator, IEnumerable<int> indices)
+        {
+            foreach (var index in indices)
+                if (!tree.Dominates(dominator, index))
+                    return false;
+            return true;
+        }
+
+        static ControlFlowGraph ReduceLoops(ControlFlowGraph graph, RecordFunc record)
+        {
+            var loops = graph.GetLoops();
+            foreach (var loop in loops.OrderBy(x => x.Body.Count))
+            {
+                // Find pre-dominator
+                var dom = graph.GetDominatorTree();
+                if (!DominatesAll(dom, loop.Header.Index, loop.Body.Select(x => x.Index)))
+                    continue;
+
+                // Find post-dominator
+                var postdom = graph.GetPostDominatorTree();
+                var loopExit = postdom.ImmediateDominator(loop.Header.Index);
+                if (!loopExit.HasValue || !DominatesAll(postdom, loopExit.Value, loop.Body.Select(x => x.Index)))
+                    continue;
+
+                // Isolate edges to post-dominator via an empty node (if necessary)
+                HashSet<int> region = new();
+                graph.GetRegionParts(region, loop.Header.Index, loopExit.Value);
+                region.Add(loopExit.Value);
+
+                // Cut out loop and hand off to loop simplifier.
+                var cut = graph.Cut(region, loop.Header.Index, loopExit.Value);
+                var simplified = LoopSimplifier.SimplifyLoop(cut.Cut, record);
+                if (simplified == null || simplified == cut.Cut)
+                    continue;
+
+                return cut.Merge(simplified);
             }
 
             return graph;
@@ -612,31 +654,7 @@ namespace UAlbion.Scripting
                 if (cut.Cut.IsCyclic())
                     continue; // Must be some sort of weird loop that couldn't be reduced earlier, currently irreducible.
 
-                var restructured = SeseReducer.Reduce(cut.Cut);
-                var (updated, mapping) = cut.Remainder.Merge(restructured);
-                /* if (recordFunc != null)
-                {
-                    recordFunc("SESE Remainder Region", cut.Remainder);
-                    recordFunc("SESE Cut Region", cut.Cut);
-                    recordFunc("SESE Restructured Cut Region", restructured);
-                    recordFunc("SESE Disjoint Result", updated);
-                } */
-
-                if (cut.RemainderToCutEdges.Count > 0)
-                {
-                    foreach (var (start, _, label) in cut.RemainderToCutEdges)
-                        updated = updated.AddEdge(start, mapping[restructured.EntryIndex], label);
-                }
-                else updated = updated.SetEntry(mapping[restructured.EntryIndex]);
-
-                if (cut.CutToRemainderEdges.Count > 0)
-                {
-                    foreach (var (_, end, label) in cut.CutToRemainderEdges)
-                        updated = updated.AddEdge(mapping[restructured.ExitIndex], end, label);
-                }
-                else updated = updated.SetExit(mapping[restructured.ExitIndex]);
-
-                return updated;
+                return cut.Merge(SeseReducer.Reduce(cut.Cut));
             }
 
             return graph;
@@ -653,6 +671,29 @@ namespace UAlbion.Scripting
                 throw new ControlFlowGraphException("Could not structure infinite loop", graph);
 
             return exitNode;
+        }
+
+        public static ControlFlowGraph BreakEdge(ControlFlowGraph graph, int start, int end, ICfgNode sourceNode, string destLabel)
+        {
+            if (graph == null) throw new ArgumentNullException(nameof(graph));
+            if (sourceNode == null) throw new ArgumentNullException(nameof(sourceNode));
+            var label = graph.GetEdgeLabel(start, end);
+            graph = graph
+                .RemoveEdge(start, end)
+                .AddNode(sourceNode, out var sourceNodeIndex)
+                .AddEdge(start, sourceNodeIndex, label)
+                .AddEdge(sourceNodeIndex, graph.ExitIndex, true);
+                ;
+
+            if (destLabel != null)
+            {
+                graph = graph.ReplaceNode(end,
+                    new ControlFlowGraph(0, 1,
+                        new[] { Emit.Label(destLabel), graph.Nodes[end] },
+                        new[] { (0, 1, true) }));
+            }
+
+            return graph;
         }
     }
 }

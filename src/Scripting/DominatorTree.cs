@@ -40,5 +40,16 @@ namespace UAlbion.Scripting
         }
 
         public IEnumerable<int> Values => Root?.Values ?? Enumerable.Empty<int>();
+
+        public int? ImmediateDominator(int index)
+        {
+            if (Root.Value == index)
+                return null; // Supplied index dominates all other nodes
+
+            var path = Root.FindPath(index, NodeEquality);
+            return path.Count > 1
+                ? path[1]
+                : null;
+        }
     }
 }

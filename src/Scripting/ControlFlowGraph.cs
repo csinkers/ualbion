@@ -973,20 +973,20 @@ namespace UAlbion.Scripting
             return result;
         }
 
+        public void GetRegionParts(HashSet<int> region, int entry, int exit)
+        {
+            if (region.Contains(entry)) return;
+
+            region.Add(entry);
+            foreach (var child in Children(entry).Where(child => child != exit))
+                GetRegionParts(region, child, exit);
+        }
+
         public List<(HashSet<int> nodes, int entry, int exit)> GetAllSeseRegions()
         {
             var domTree = GetDominatorTree();
             var postDomTree = GetPostDominatorTree();
             List<(HashSet<int>, int, int)> regions = new();
-
-            void GetRegionParts(int current, HashSet<int> region, int end)
-            {
-                if (region.Contains(current)) return;
-
-                region.Add(current);
-                foreach (var child in Children(current).Where(child => child != end))
-                    GetRegionParts(child, region, end);
-            }
 
             foreach(var i in GetDfsPostOrder())
             {
@@ -1000,7 +1000,7 @@ namespace UAlbion.Scripting
                     if (Parents(i).Length > 1) continue;
 
                     HashSet<int> region = new();
-                    GetRegionParts(i, region, j);
+                    GetRegionParts(region, i, j);
                     region.Add(j);
                     regions.Add((region, i, j));
                 }
@@ -1059,8 +1059,8 @@ namespace UAlbion.Scripting
             List<(int, int, bool)> cutEdges = new();
             var cutMapping = new int[Nodes.Count];
 
-            List<(int, int, bool)> cutToRemainderEdges = new();
-            List<(int, int, bool)> remainderToCutEdges = new();
+            List<(int, bool)> cutToRemainderEdges = new();
+            List<(int, bool)> remainderToCutEdges = new();
 
             for (int i = 0; i < Nodes.Count; i++)
             {
@@ -1081,23 +1081,28 @@ namespace UAlbion.Scripting
 
             foreach (var edge in Edges)
             {
-                bool startCut = selectedNodes.Contains(edge.start);
-                bool endCut = selectedNodes.Contains(edge.end);
-                if (startCut && endCut)
-                    cutEdges.Add((cutMapping[edge.start], cutMapping[edge.end], GetEdgeLabel(edge.start, edge.end)));
-                else if (!startCut && !endCut)
-                    remainderEdges.Add((remainderMapping[edge.start], remainderMapping[edge.end], GetEdgeLabel(edge.start, edge.end)));
-                else if (startCut && !endCut)
-                    cutToRemainderEdges.Add((cutMapping[edge.start], remainderMapping[edge.end], GetEdgeLabel(edge.start, edge.end)));
-                else if (!startCut && endCut)
-                    remainderToCutEdges.Add((remainderMapping[edge.start], cutMapping[edge.end], GetEdgeLabel(edge.start, edge.end)));
+                bool isStartInCut = selectedNodes.Contains(edge.start);
+                bool isEndInCut = selectedNodes.Contains(edge.end);
+                bool edgeLabel = GetEdgeLabel(edge.start, edge.end);
+                switch (isStartInCut, isEndInCut)
+                {
+                    case (true,  true):  cutEdges.Add((cutMapping[edge.start], cutMapping[edge.end], edgeLabel)); break;
+                    case (false, true):  remainderToCutEdges.Add((remainderMapping[edge.start], edgeLabel)); break;
+                    case (true,  false): cutToRemainderEdges.Add((remainderMapping[edge.end], edgeLabel)); break;
+                    case (false, false): remainderEdges.Add((remainderMapping[edge.start], remainderMapping[edge.end], edgeLabel)); break;
+                }
             }
 
             int remainderEntry = !selectedNodes.Contains(EntryIndex) ? remainderMapping[EntryIndex] : -1;
             int remainderExit = !selectedNodes.Contains(ExitIndex) ? remainderMapping[ExitIndex] : -1;
-            var cut = new ControlFlowGraph(cutMapping[entry], cutMapping[exit], cutNodes, cutEdges);
+
+            int cutEntryIndex = cutNodes.Count;
+            cutNodes.Add(new EmptyNode());
+            cutEdges.Add((cutEntryIndex, cutMapping[entry], true));
+
+            var cut = new ControlFlowGraph(cutEntryIndex, cutMapping[exit], cutNodes, cutEdges);
             var remainder = new ControlFlowGraph(remainderEntry, remainderExit, remainderNodes, remainderEdges);
-            return new CfgCutResult(cut, remainder, cutToRemainderEdges, remainderToCutEdges);
+            return new CfgCutResult(cut, remainder, remainderToCutEdges, cutToRemainderEdges);
         }
 
         public (ControlFlowGraph result, int[] mapping) Merge(ControlFlowGraph other)

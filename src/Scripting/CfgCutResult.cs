@@ -8,8 +8,8 @@ namespace UAlbion.Scripting
         public CfgCutResult(
             ControlFlowGraph cut,
             ControlFlowGraph remainder,
-            List<(int start, int end, bool label)> cutToRemainderEdges,
-            List<(int start, int end, bool label)> remainderToCutEdges)
+            List<(int remainderIndex, bool label)> remainderToCutEdges,
+            List<(int remainderIndex, bool label)> cutToRemainderEdges)
         {
             Cut = cut ?? throw new ArgumentNullException(nameof(cut));
             Remainder = remainder ?? throw new ArgumentNullException(nameof(remainder));
@@ -18,7 +18,28 @@ namespace UAlbion.Scripting
         }
         public ControlFlowGraph Cut { get; }
         public ControlFlowGraph Remainder { get; }
-        public List<(int start, int end, bool label)> CutToRemainderEdges { get; }
-        public List<(int start, int end, bool label)> RemainderToCutEdges { get; }
+        public List<(int remainderIndex, bool label)> RemainderToCutEdges { get; }
+        public List<(int remainderIndex, bool label)> CutToRemainderEdges { get; }
+
+        public ControlFlowGraph Merge(ControlFlowGraph restructured)
+        {
+            var (updated, mapping) = Remainder.Merge(restructured);
+
+            if (RemainderToCutEdges.Count > 0)
+            {
+                foreach (var (start, label) in RemainderToCutEdges)
+                    updated = updated.AddEdge(start, mapping[restructured.EntryIndex], label);
+            }
+            else updated = updated.SetEntry(mapping[restructured.EntryIndex]);
+
+            if (CutToRemainderEdges.Count > 0)
+            {
+                foreach (var (end, label) in CutToRemainderEdges)
+                    updated = updated.AddEdge(mapping[restructured.ExitIndex], end, label);
+            }
+            else updated = updated.SetExit(mapping[restructured.ExitIndex]);
+
+            return updated;
+        }
     }
 }

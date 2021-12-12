@@ -76,6 +76,24 @@ namespace UAlbion.Scripting
             return null;
         }
 
+        public List<T> FindPath(T value, Func<T, T, bool> equalityFunc)
+        {
+            foreach (GenericTreeNode<T> child in Children)
+            {
+                if (equalityFunc(child.Value, value))
+                    return new List<T> { child.Value };
+
+                var result = child.FindPath(value, equalityFunc);
+                if (result != null)
+                {
+                    result.Add(child.Value);
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
         public string ToStringRecursive()
         {
             StringBuilder sb = new StringBuilder();

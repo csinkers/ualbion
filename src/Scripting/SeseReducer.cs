@@ -50,28 +50,9 @@ namespace UAlbion.Scripting
 
         static ControlFlowGraph SeverEdge(ControlFlowGraph cut, int start, int end, int exitNode)
         {
-            var shortCircuitEdgeLabel = cut.GetEdgeLabel(start, end);
-            var result = cut.RemoveEdge(start, end);
-
             var labelName = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
             var gotoNode = Emit.Goto(labelName);
-            var label = Emit.Label(labelName);
-
-            result = result.AddNode(gotoNode, out var gotoIndex);
-            result = result.AddNode(label, out var labelIndex);
-            result = result.AddEdge(start, gotoIndex, shortCircuitEdgeLabel);
-            result = result.AddEdge(gotoIndex, exitNode, true); // Dummy edge to ensure exit node stays unique
-
-            var parents = result.Parents(end);
-            foreach (var parent in parents)
-            {
-                var edgeLabel = cut.GetEdgeLabel(parent, end);
-                result = result.RemoveEdge(parent, end).AddEdge(parent, labelIndex, edgeLabel);
-            }
-
-            result = result.AddEdge(labelIndex, end, true);
-
-            return result;
+            return Decompiler.BreakEdge(cut, start, end, gotoNode, labelName);
         }
 
         public static int[] FindShortestPaths(ControlFlowGraph graph)

@@ -146,7 +146,7 @@ namespace UAlbion.Scripting.Tests
               |   15<-/
               v   |
               7 <-/ */
-        public static ControlFlowGraph LoopBranch => new(0, 15, BuildNodes(16), new[] {
+        public static ControlFlowGraph LoopBranch => new(0, 7, BuildNodes(16), new[] {
             (0, 1, true), (1, 2, true), (1, 8, false), (2, 3, true), (2, 6, false), (3, 2, true),
             (3, 4, false), (4, 5, false), (4, 6, true), (5, 2, true), (6, 7, true), (8, 9, true),
             (9, 10, true), (10, 8, true), (9, 11, false), (11, 13, false), (11, 12, true),
@@ -223,7 +223,7 @@ else {
            3      |
            v      |
            4 <---/*/
-        public static ControlFlowGraph BreakBranch2 => new(0, 5, BuildNodes(6), new[] {
+        public static ControlFlowGraph BreakBranch2 => new(0, 4, BuildNodes(6), new[] {
             (0, 1, true), (1, 2, true), (2, 3, true), (2, 5, false), (3, 4, true), (5, 1, true), (5, 4, false)
         });
         public static string BreakBranch2Code => @"do {

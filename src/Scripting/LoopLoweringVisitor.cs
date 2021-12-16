@@ -41,9 +41,9 @@ namespace UAlbion.Scripting
                 },
                 new[]
                 {
-                    (0,1,true), (1,2,true), (2,3,true),
-                    (3,1,!negated), (3,4,negated),
-                    (4,5,true),
+                    (0,1,CfgEdge.True), (1,2,CfgEdge.True), (2,3,CfgEdge.True),
+                    (3,1,negated ? CfgEdge.False : CfgEdge.True), (3,4,negated ? CfgEdge.True : CfgEdge.False),
+                    (4,5,CfgEdge.True),
                 }));
         }
 
@@ -80,10 +80,10 @@ namespace UAlbion.Scripting
                 },
                 new[]
                 {
-                    (0,1,true), (1,2,true), 
-                    (2,3,!negated), (2,4,negated),
-                    (3,1,true),
-                    (4,5,true)
+                    (0,1,CfgEdge.True), (1,2,CfgEdge.True),
+                    (2,3,negated ? CfgEdge.False : CfgEdge.True), (2,4,negated ? CfgEdge.True : CfgEdge.False),
+                    (3,1,CfgEdge.True),
+                    (4,5,CfgEdge.True)
                 }));
         }
 

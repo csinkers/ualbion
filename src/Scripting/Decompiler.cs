@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Scripting.Ast;
@@ -48,25 +47,17 @@ namespace UAlbion.Scripting
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
             record("Begin decompilation", graph);
-            Func<string> vis = () => graph.Visualize();
+            // Func<string> vis = () => graph.Visualize(); // For VS Code debug visualisation
             ControlFlowGraph previous = null;
             int iterations = 0;
             while (graph != previous)
             {
+                previous = graph;
                 iterations++;
                 if (iterations > 1000)
                     throw new ControlFlowGraphException("Iteration overflow, assuming graph cannot be structured", graph);
 
-                previous = graph;
-                // graph = record("Defragment", graph.Defragment());
-                graph = record("Reduce simple while", ReduceSimpleWhile(graph));   if (graph != previous) continue;
-                graph = record("Reduce sequence",     ReduceSequences(graph));     if (graph != previous) continue;
-                graph = record("Reduce if-then",      ReduceIfThen(graph));        if (graph != previous) continue;
-                graph = record("Reduce if-then-else", ReduceIfThenElse(graph));    if (graph != previous) continue;
-                // graph = record("Reduce loop parts",   ReduceLoops(graph, record)); if (graph != previous) continue;
-                graph = record("Reduce loop parts",   ReduceLoopParts(graph));   if (graph != previous) continue;
-                graph = record("Reduce simple loop",  ReduceSimpleLoops(graph)); if (graph != previous) continue;
-                graph = record("Reduce SESE region",  ReduceSeseRegions(graph));
+                graph = SimplifyOnce(graph, record);
             }
 
             graph = record("Defragment", graph.Defragment());
@@ -76,6 +67,74 @@ namespace UAlbion.Scripting
             graph = record("Relabel", CfgRelabeller.Relabel(graph, ScriptConstants.DummyLabelPrefix));
             graph = record("Remove empty nodes", graph.AcceptBuilder(new EmptyNodeRemovalVisitor()));
             return graph.Entry;
+        }
+
+        public static ControlFlowGraph SimplifyOnce(ControlFlowGraph previous, RecordFunc record)
+        {
+            var graph = previous;
+            // graph = record("Defragment", graph.Defragment());
+
+            graph = record("Connect disjoint node to exit", ConnectDisjointNodeToExit(graph));
+            if (graph != previous)
+                return graph;
+
+            graph = record("Reduce simple while", ReduceSimpleWhile(graph));
+            if (graph != previous)
+                return graph;
+
+            graph = record("Reduce sequence", ReduceSequences(graph));
+            if (graph != previous)
+                return graph;
+
+            graph = record("Reduce if-then", ReduceIfThen(graph));
+            if (graph != previous)
+                return graph;
+
+            graph = record("Reduce if-then-else", ReduceIfThenElse(graph));
+            if (graph != previous)
+                return graph;
+
+            graph = record("Reduce SESE region", ReduceSeseRegions(graph));
+            if (graph != previous)
+                return graph;
+
+            // graph = record("Reduce loops", ReduceLoops(graph, record));
+            // if (graph != previous)
+            //     return graph;
+
+            graph = record("Reduce loop parts", ReduceLoopParts(graph));
+            if (graph != previous)
+                return graph;
+
+            // graph = record("Reduce simple loop", ReduceSimpleLoops(graph));
+            // if (graph != previous)
+            //     return graph;
+
+            return graph;
+        }
+
+        static ControlFlowGraph ConnectDisjointNodeToExit(ControlFlowGraph graph)
+        {
+            var reachability = graph.Reverse().GetReachability(graph.ExitIndex, out var reachableCount);
+            if (reachableCount == graph.ActiveNodeCount)
+                return graph;
+
+            var acyclic = graph.RemoveBackEdges();
+            var distances = acyclic.GetLongestPaths();
+            int longestDistance = 0;
+            int winner = -1;
+
+            for (int i = 0; i < graph.NodeCount; i++)
+            {
+                if (graph.Nodes[i] == null || reachability[i]) // Only consider nodes that can't reach the exit
+                    continue;
+
+                if (distances[i] <= longestDistance) continue;
+                longestDistance = distances[i];
+                winner = i;
+            }
+
+            return graph.AddEdge(winner, graph.ExitIndex, CfgEdge.DisjointGraphFixup);
         }
 
         public static List<ControlFlowGraph> BuildEventRegions<T>(
@@ -109,7 +168,7 @@ namespace UAlbion.Scripting
 
                 queue.Enqueue(events[head]);
 
-                var edges = new List<(int, int, bool)>();
+                var edges = new List<(int, int, CfgEdge)>();
                 var nodes = new ICfgNode[events.Count + 2];
                 nodes[entry] = Emit.Empty();
                 nodes[exit] = Emit.Empty();
@@ -126,21 +185,21 @@ namespace UAlbion.Scripting
                     if (node.Next != null)
                     {
                         queue.Enqueue(node.Next);
-                        edges.Add((i, node.Next.Id, true));
+                        edges.Add((i, node.Next.Id, CfgEdge.True));
                     }
-                    else edges.Add((i, exit, true));
+                    else edges.Add((i, exit, CfgEdge.True));
 
-                    if (node is IBranchNode branch && branch.NextIfFalse != branch.Next)
+                    if (node is IBranchNode branch && !ReferenceEquals(branch.NextIfFalse, branch.Next))
                     {
                         if (branch.NextIfFalse != null)
                         {
                             queue.Enqueue(branch.NextIfFalse);
-                            edges.Add((i, branch.NextIfFalse.Id, false));
+                            edges.Add((i, branch.NextIfFalse.Id, CfgEdge.False));
                         }
-                        else edges.Add((i, exit, false));
+                        else edges.Add((i, exit, CfgEdge.False));
                     }
                 }
-                edges.Add((entry, head, true));
+                edges.Add((entry, head, CfgEdge.True));
 
                 var graph = new ControlFlowGraph(entry, exit, nodes, edges);
                 graph = graph.InsertBefore(head, Emit.Label(label));
@@ -175,15 +234,12 @@ namespace UAlbion.Scripting
 
             foreach (var index in simpleLoopIndices)
             {
-                #if DEBUG
-                Func<string> vis = () => graph.ToVis().AddPointer("index", index).ToString();
-                #endif
-
+                // Func<string> vis = () => graph.ToVis().AddPointer("index", index).ToString(); // For VS Code debug visualisation
                 if (graph.Children(index).Length == 1)
                     return ReduceEmptyInfiniteWhileLoop(graph, index);
 
                 var condition = graph.Nodes[index];
-                if (!graph.GetEdgeLabel(index, index))
+                if (graph.GetEdgeLabel(index, index) == CfgEdge.False)
                     condition = Emit.Negation(condition);
 
                 var updated = graph
@@ -206,9 +262,7 @@ namespace UAlbion.Scripting
                     continue;
 
                 int child = children[0];
-#if DEBUG
-                Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("child", child).ToString();
-#endif
+                // Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("child", child).ToString(); // For VS Code debug visualisation
 
                 var childsParents = graph.Parents(child);
                 var grandChildren = graph.Children(child);
@@ -246,9 +300,7 @@ namespace UAlbion.Scripting
 
                 int after = -1;
                 var then = -1;
-                #if DEBUG
-                Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("after", after).AddPointer("then", then).ToString();
-                #endif
+                // Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("after", after).AddPointer("then", then).ToString(); // For VS Code debug visualisation
 
                 var parents0 = graph.Parents(children[0]);
                 var parents1 = graph.Parents(children[1]);
@@ -275,7 +327,7 @@ namespace UAlbion.Scripting
                     continue;
 
                 var label = graph.GetEdgeLabel(head, then);
-                var condition = label ? graph.Nodes[head] : Emit.Negation(graph.Nodes[head]);
+                var condition = label == CfgEdge.False ? Emit.Negation(graph.Nodes[head]) : graph.Nodes[head];
 
                 var newNode = Emit.If(condition, graph.Nodes[then]);
                 return graph.RemoveNode(then).ReplaceNode(head, newNode);
@@ -295,11 +347,7 @@ namespace UAlbion.Scripting
 
                 var left = children[0];
                 var right = children[1];
-                int after = -1;
-
-                #if DEBUG
-                Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("after", after).AddPointer("left", left).AddPointer("right", right).ToString();
-                #endif
+                // Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("after", after).AddPointer("left", left).AddPointer("right", right).ToString(); // For VS Code debug visualisation
 
                 var leftParents = graph.Parents(left);
                 var rightParents = graph.Parents(right);
@@ -318,10 +366,10 @@ namespace UAlbion.Scripting
                 if (!isRegularIfThenElse && !isTerminalIfThenElse)
                     continue;
 
-                bool leftLabel = graph.GetEdgeLabel(head, left);
-                var thenIndex = leftLabel ? left : right;
-                var elseIndex = leftLabel ? right : left;
-                after = isRegularIfThenElse ? leftChildren[0] : -1;
+                var leftLabel = graph.GetEdgeLabel(head, left);
+                var thenIndex = leftLabel == CfgEdge.False ? right : left;
+                var elseIndex = leftLabel == CfgEdge.False ? left : right;
+                var after = isRegularIfThenElse ? leftChildren[0] : -1;
 
                 if (after == head)
                     continue;
@@ -333,7 +381,7 @@ namespace UAlbion.Scripting
 
                 var updated = graph;
                 if (isRegularIfThenElse)
-                    updated = updated.AddEdge(head, after, true);
+                    updated = updated.AddEdge(head, after, CfgEdge.True);
 
                 return updated
                     .RemoveNode(thenIndex)
@@ -368,6 +416,7 @@ namespace UAlbion.Scripting
                 if (!loopExit.HasValue || !DominatesAll(postdom, loopExit.Value, loop.Body.Select(x => x.Index)))
                     continue;
 
+/*
                 // Isolate edges to post-dominator via an empty node (if necessary)
                 HashSet<int> region = new();
                 graph.GetRegionParts(region, loop.Header.Index, loopExit.Value);
@@ -380,6 +429,7 @@ namespace UAlbion.Scripting
                     continue;
 
                 return cut.Merge(simplified);
+*/
             }
 
             return graph;
@@ -394,13 +444,14 @@ namespace UAlbion.Scripting
                 foreach (var loop in loops)
                 {
                     if (loop.IsMultiExit)
+                    {
+                        // Grow loop then reduce
                         continue;
+                    }
 
                     foreach (var part in loop.Body)
                     {
-#if DEBUG
-                        Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("part", part.Index).ToString();
-#endif
+                        // Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("part", part.Index).ToString(); // For VS Code debug visualisation
                         if (part.Index != index)
                             continue;
 
@@ -412,6 +463,34 @@ namespace UAlbion.Scripting
                         if (updated != graph)
                             return updated;
                     }
+
+                    if (loop.Header.Index != index
+                     || loop.IsMultiExit
+                     || loop.Body.Count != 1
+                     || loop.Body[0].OutsideEntry)
+                    {
+                        continue;
+                    }
+
+                    int tail = loop.Body[0].Index;
+                    if (loop.Header.Break)
+                    {
+                        var updated = ReduceWhileLoop(graph, index, tail, loop.Header.Negated);
+                        if (updated != graph)
+                            return updated;
+                    }
+                    else if (loop.Body.All(x => !x.Break)) // Infinite while loop
+                    {
+                        var updated = ReduceInfiniteWhileLoop(graph, index, tail);
+                        if (updated != graph)
+                            return updated;
+                    }
+                    else
+                    {
+                        var updated = ReduceDoLoop(graph, index, tail);
+                        if (updated != graph)
+                            return updated;
+                    }
                 }
             }
             return graph;
@@ -419,9 +498,7 @@ namespace UAlbion.Scripting
 
         static ControlFlowGraph ReduceContinue(LoopPart part, ControlFlowGraph graph, int index, CfgLoop loop)
         {
-#if DEBUG
-            Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("part", part.Index).ToString();
-#endif
+            // Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("part", part.Index).ToString(); // For VS Code debug visualisation
             if (part.OutsideEntry || part.Tail || part.Header || !part.Continue || part.Break) 
                 return graph;
 
@@ -443,9 +520,7 @@ namespace UAlbion.Scripting
 
         static ControlFlowGraph ReduceBreak(LoopPart part, ControlFlowGraph graph, int index, CfgLoop loop)
         {
-#if DEBUG
-            Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("part", part.Index).ToString();
-#endif
+            // Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("part", part.Index).ToString(); // For VS Code debug visualisation
             if (part.OutsideEntry || part.Tail || part.Header || part.Continue || !part.Break) 
                 return graph;
 
@@ -465,7 +540,7 @@ namespace UAlbion.Scripting
                     return graph;
 
                 var condition = graph.Nodes[index];
-                if (!graph.GetEdgeLabel(index, target))
+                if (graph.GetEdgeLabel(index, target) == CfgEdge.False)
                     condition = Emit.Negation(condition);
 
                 var newBlock = Emit.Seq(graph.Nodes[target], Emit.Break());
@@ -480,60 +555,16 @@ namespace UAlbion.Scripting
 
         static ControlFlowGraph ReplaceLoopBranch(ControlFlowGraph graph, int index, int target, ICfgNode newNode)
         {
-            bool label = graph.GetEdgeLabel(index, target);
+            var label = graph.GetEdgeLabel(index, target);
             var condition = graph.Nodes[index];
 
-            if (!label)
+            if (label == CfgEdge.False)
                 condition = Emit.Negation(condition);
 
             var ifNode = Emit.If(condition, newNode);
             return graph
                 .ReplaceNode(index, ifNode)
                 .RemoveEdge(index, target);
-        }
-
-        public static ControlFlowGraph ReduceSimpleLoops(ControlFlowGraph graph)
-        {
-            if (graph == null) throw new ArgumentNullException(nameof(graph));
-            var loops = graph.GetLoops();
-            foreach (var head in graph.GetDfsPostOrder())
-            {
-                foreach (CfgLoop loop in loops)
-                {
-                #if DEBUG
-                Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("loop", loop.Header.Index).ToString();
-                #endif
-
-                    if (loop.Header.Index != head
-                     || loop.IsMultiExit
-                     || loop.Body.Count != 1
-                     || loop.Body[0].OutsideEntry)
-                    {
-                        continue;
-                    }
-
-                    int tail = loop.Body[0].Index;
-                    if (loop.Header.Break)
-                    {
-                        var updated = ReduceWhileLoop(graph, head, tail, loop.Header.Negated);
-                        if (updated != graph)
-                            return updated;
-                    }
-                    else if (loop.Body.All(x => !x.Break)) // Infinite while loop
-                    {
-                        var updated = ReduceInfiniteWhileLoop(graph, head, tail);
-                        if (updated != graph)
-                            return updated;
-                    }
-                    else
-                    {
-                        var updated = ReduceDoLoop(graph, head, tail);
-                        if (updated != graph)
-                            return updated;
-                    }
-                }
-            }
-            return graph;
         }
 
         static ControlFlowGraph ReduceEmptyInfiniteWhileLoop(ControlFlowGraph graph, int index)
@@ -548,10 +579,10 @@ namespace UAlbion.Scripting
                     Emit.Goto(label), // 3
                     Emit.Empty(), // 4
                 },
-                new[] { (0,1,true), (1,2,true), (2,3,true), (3,4,true), });
+                new[] { (0,1,CfgEdge.True), (1,2,CfgEdge.True), (2,3,CfgEdge.True), (3,4,CfgEdge.True), });
 
             return graph
-                .AddEdge(index, exitNode, true)
+                .AddEdge(index, exitNode, CfgEdge.True)
                 .ReplaceNode(index, subgraph);
         }
 
@@ -568,19 +599,17 @@ namespace UAlbion.Scripting
                     Emit.Goto(label), // 4
                     Emit.Empty(), // 5
                 },
-                new[] { (0,1,true), (1,2,true), (2,3,true), (3,4,true), (4,5,true), });
+                new[] { (0,1,CfgEdge.True), (1,2,CfgEdge.True), (2,3,CfgEdge.True), (3,4,CfgEdge.True), (4,5,CfgEdge.True), });
 
             return graph
                 .RemoveNode(tail)
-                .AddEdge(head, exitNode, true)
+                .AddEdge(head, exitNode, CfgEdge.True)
                 .ReplaceNode(head, subgraph);
         }
 
         static ControlFlowGraph ReduceWhileLoop(ControlFlowGraph graph, int head, int tail, bool negated)
         {
-#if DEBUG
-            Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("tail", tail).ToString();
-#endif
+            // Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("tail", tail).ToString(); // For VS Code debug visualisation
             var updated = graph;
             var children = graph.Children(tail);
             if (children.Length != 1)
@@ -602,9 +631,7 @@ namespace UAlbion.Scripting
 
         static ControlFlowGraph ReduceDoLoop(ControlFlowGraph graph, int head, int tail)
         {
-#if DEBUG
-            Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("tail", tail).ToString();
-#endif
+            // Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("tail", tail).ToString(); // For VS Code debug visualisation
             var updated = graph;
             var children = graph.Children(tail);
             if (children.Length != 2)
@@ -612,10 +639,10 @@ namespace UAlbion.Scripting
 
             foreach (int child in children)
                 if (child != head)
-                    updated = updated.AddEdge(head, child, true);
+                    updated = updated.AddEdge(head, child, CfgEdge.True);
 
             var condition = graph.Nodes[tail];
-            if (!graph.GetEdgeLabel(tail, head))
+            if (graph.GetEdgeLabel(tail, head) == CfgEdge.False)
                 condition = Emit.Negation(condition);
 
             var newNode = Emit.Do(condition, graph.Nodes[head]);
@@ -635,24 +662,22 @@ namespace UAlbion.Scripting
                 if (regionEntry == graph.EntryIndex)
                     continue; // Don't try and reduce the 'sequence' of start node -> actual entry point nodes when there's only one entry
 
-                #if DEBUG
-                Func<string> vis = () =>
+                /* Func<string> vis = () => // For VS Code debug visualisation
                 {
                      var d = graph.ToVis(); 
                      foreach(var n in d.Nodes)
                         if (region.Contains(int.Parse(n.Id, CultureInfo.InvariantCulture)))
                             n.Color = "#4040b0";
                      return d.ToString();
-                };
-                #endif
+                }; */
                 bool containsOther = regions.Any(x => x.nodes != region && !x.nodes.Except(region).Any());
                 if (containsOther)
                     continue;
 
                 var cut = graph.Cut(region, regionEntry, regionExit);
 
-                if (cut.Cut.IsCyclic())
-                    continue; // Must be some sort of weird loop that couldn't be reduced earlier, currently irreducible.
+                if (cut.Cut.IsCyclic()) // Loop reduction comes later
+                    continue;
 
                 return cut.Merge(SeseReducer.Reduce(cut.Cut));
             }
@@ -682,15 +707,14 @@ namespace UAlbion.Scripting
                 .RemoveEdge(start, end)
                 .AddNode(sourceNode, out var sourceNodeIndex)
                 .AddEdge(start, sourceNodeIndex, label)
-                .AddEdge(sourceNodeIndex, graph.ExitIndex, true);
-                ;
+                .AddEdge(sourceNodeIndex, graph.ExitIndex, CfgEdge.True);
 
             if (destLabel != null)
             {
                 graph = graph.ReplaceNode(end,
                     new ControlFlowGraph(0, 1,
                         new[] { Emit.Label(destLabel), graph.Nodes[end] },
-                        new[] { (0, 1, true) }));
+                        new[] { (0, 1, CfgEdge.True) }));
             }
 
             return graph;

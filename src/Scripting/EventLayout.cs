@@ -177,7 +177,7 @@ namespace UAlbion.Scripting
                 var (gi, ni) = _indexToNode[ei];
                 var graph = _graphs[gi];
                 var exitNode = graph.GetExitNode();
-                var (trueChild, falseChild) = graph.FindBinaryChildren(ni);
+                var (trueChild, falseChild) = graph.GetBinaryChildren(ni);
 
                 if (trueChild == null)
                     throw new ControlFlowGraphException($"Node {ni} had no true child", graph);
@@ -211,7 +211,7 @@ namespace UAlbion.Scripting
                 initialEventIndex ??= eventIndex;
                 Set(eventIndex, graphIndex, nodeIndex);
                 var graph = _graphs[graphIndex];
-                var (trueChild, falseChild) = graph.FindBinaryChildren(nodeIndex);
+                var (trueChild, falseChild) = graph.GetBinaryChildren(nodeIndex);
                 if (trueChild.HasValue) stack.Push(trueChild.Value);
                 if (falseChild.HasValue) stack.Push(falseChild.Value);
             }

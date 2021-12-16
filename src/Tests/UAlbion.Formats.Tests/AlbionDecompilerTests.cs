@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
@@ -60,7 +59,7 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
         {
             var visitor = new FormatScriptVisitor();
             tree.Accept(visitor);
-            // DumpSteps(steps, method);
+            DumpSteps(steps, method);
 
             Assert.Equal(expected, visitor.Code);
         }
@@ -80,9 +79,7 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
             {
                 var (description, graph) = steps[i];
                 var path = Path.Combine(resultsDir, $"{method}_{i}_{description}.gv");
-                var sb = new StringBuilder();
-                graph.ExportToDot(sb);
-                File.WriteAllText(path, sb.ToString());
+                File.WriteAllText(path, graph.ExportToDot());
 
                 var graphVizDot = @"C:\Program Files\Graphviz\bin\dot.exe";
                 if (!File.Exists(graphVizDot))

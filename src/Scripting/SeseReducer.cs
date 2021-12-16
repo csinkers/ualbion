@@ -7,8 +7,8 @@ namespace UAlbion.Scripting
     {
         public static ControlFlowGraph Reduce(ControlFlowGraph cut)
         {
-            var minDepth = FindShortestPaths(cut);
-            var maxDepth = FindLongestPaths(cut);
+            var minDepth = cut.GetShortestPaths();
+            var maxDepth = cut.GetLongestPaths();
             var exitNode = cut.GetExitNode();
 
             int maxDelta = 0;
@@ -53,34 +53,6 @@ namespace UAlbion.Scripting
             var labelName = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
             var gotoNode = Emit.Goto(labelName);
             return Decompiler.BreakEdge(cut, start, end, gotoNode, labelName);
-        }
-
-        public static int[] FindShortestPaths(ControlFlowGraph graph)
-        {
-            var result = new int[graph.Nodes.Count];
-            Array.Fill(result, int.MaxValue);
-            result[graph.EntryIndex] = 0;
-
-            foreach (var i in graph.GetTopogicalOrder())
-                foreach (var child in graph.Children(i))
-                    if (result[child] > result[i] + 1)
-                        result[child] = result[i] + 1;
-
-            return result;
-        }
-
-        public static int[] FindLongestPaths(ControlFlowGraph graph)
-        {
-            var result = new int[graph.Nodes.Count];
-            Array.Fill(result, int.MinValue);
-            result[graph.EntryIndex] = 0;
-
-            foreach (var i in graph.GetTopogicalOrder())
-                foreach (var child in graph.Children(i))
-                    if (result[child] < result[i] + 1)
-                        result[child] = result[i] + 1;
-
-            return result;
         }
     }
 }

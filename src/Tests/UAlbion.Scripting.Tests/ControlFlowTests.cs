@@ -59,6 +59,14 @@ namespace UAlbion.Scripting.Tests
         }
 
         [Fact]
+        public void TopologicalOrderTest()
+        {
+            var graph = TestGraphs.ZeroKSese;
+            var order = graph.GetTopogicalOrder();
+            Verify(order, 0, 1, 2, 3, 6, 7, 8, 10, 11, 12, 13, 5, 9, 4, 14);
+        }
+
+        [Fact]
         public void ReverseTest()
         {
             var reversed = TestGraphs.NoMoreGotos3.Reverse().Canonicalize();
@@ -84,7 +92,7 @@ namespace UAlbion.Scripting.Tests
         {
             var components =
                 TestGraphs.NoMoreGotos3
-                .GetAllStronglyConnectedComponents()
+                .GetStronglyConnectedComponents()
                 .Where(x => x.Count > 1)
                 .OrderBy(x => x.Sum())
                 .ToList();
@@ -104,7 +112,7 @@ namespace UAlbion.Scripting.Tests
         {
             var components =
                 TestGraphs.NoMoreGotos3
-                .GetAllStronglyConnectedComponents()
+                .GetStronglyConnectedComponents()
                 .Where(x => x.Count > 1)
                 .OrderBy(x => x.Sum())
                 .ToList();

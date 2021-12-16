@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using UAlbion.Scripting.Ast;
@@ -21,13 +20,20 @@ namespace UAlbion.Scripting
         IEnumerable<int> Parents(int i);
     }
 
-    public class ControlFlowGraph : IGraph<ICfgNode, bool>
+    public enum CfgEdge
+    {
+        True,
+        False,
+        DisjointGraphFixup
+    }
+
+    public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
     {
         const double DefragThreshold = 0.5; // If the majority are deleted then defrag
         static readonly ImmutableDictionary<int, ImmutableArray<int>> EmptyEdges = ImmutableDictionary<int, ImmutableArray<int>>.Empty;
         readonly ImmutableDictionary<int, ImmutableArray<int>> _edgesByStart;
         readonly ImmutableDictionary<int, ImmutableArray<int>> _edgesByEnd;
-        readonly ImmutableHashSet<(int start, int end)> _falseEdges;
+        readonly ImmutableDictionary<(int start, int end), CfgEdge> _labels; // N.B. Only includes non-true labels
         readonly ImmutableStack<int> _deletedNodes;
         readonly int _deletedNodeCount;
 
@@ -50,7 +56,7 @@ namespace UAlbion.Scripting
             from end in kvp.Value
             select (kvp.Key, end);
 
-        public IEnumerable<(int start, int end, bool label)> LabelledEdges =>
+        public IEnumerable<(int start, int end, CfgEdge label)> LabelledEdges =>
             from kvp in _edgesByStart
             from end in kvp.Value
             select (kvp.Key, end, GetEdgeLabel(kvp.Key, end));
@@ -73,24 +79,24 @@ namespace UAlbion.Scripting
             ImmutableList<ICfgNode> nodes,
             ImmutableDictionary<int, ImmutableArray<int>> edgesByStart,
             ImmutableDictionary<int, ImmutableArray<int>> edgesByEnd,
-            ImmutableHashSet<(int, int)> falseEdges,
+            ImmutableDictionary<(int, int), CfgEdge> labels,
             ImmutableStack<int> deletedNodes,
             int deletedNodeCount)
         {
             Nodes = nodes;
             _edgesByStart = edgesByStart;
             _edgesByEnd = edgesByEnd;
-            _falseEdges = falseEdges;
+            _labels = labels;
             _deletedNodes = deletedNodes;
             _deletedNodeCount = deletedNodeCount;
             EntryIndex = entryIndex;
             ExitIndex = exitIndex;
 
 #if DEBUG
-            if (Nodes == null) throw new ArgumentNullException(nameof(nodes)); 
-            if (_edgesByStart == null) throw new ArgumentNullException(nameof(edgesByStart)); 
-            if (_edgesByEnd == null) throw new ArgumentNullException(nameof(edgesByEnd)); 
-            if (_falseEdges == null) throw new ArgumentNullException(nameof(falseEdges)); 
+            if (Nodes == null) throw new ArgumentNullException(nameof(nodes));
+            if (_edgesByStart == null) throw new ArgumentNullException(nameof(edgesByStart));
+            if (_edgesByEnd == null) throw new ArgumentNullException(nameof(edgesByEnd));
+            if (_labels == null) throw new ArgumentNullException(nameof(labels));
             if (_deletedNodes == null) throw new ArgumentNullException(nameof(deletedNodes));
 
             string message = null;
@@ -114,19 +120,19 @@ namespace UAlbion.Scripting
             ImmutableList<ICfgNode> nodes,
             ImmutableDictionary<int, ImmutableArray<int>> edgesByStart,
             ImmutableDictionary<int, ImmutableArray<int>> edgesByEnd,
-            ImmutableHashSet<(int, int)> falseEdges,
+            ImmutableDictionary<(int, int), CfgEdge> labels,
             ImmutableStack<int> deletedNodes,
             int deletedNodeCount,
             ControlFlowGraph reversed)
-            : this(entryIndex, exitIndex, nodes, edgesByStart, edgesByEnd, falseEdges, deletedNodes, deletedNodeCount)
+            : this(entryIndex, exitIndex, nodes, edgesByStart, edgesByEnd, labels, deletedNodes, deletedNodeCount)
         {
             _cachedReverse = reversed;
         }
 
-        public ControlFlowGraph SetEntry(int i) => new(i, ExitIndex, Nodes, _edgesByStart, _edgesByEnd, _falseEdges, _deletedNodes, _deletedNodeCount);
-        public ControlFlowGraph SetExit(int i) => new(EntryIndex, i, Nodes, _edgesByStart, _edgesByEnd, _falseEdges, _deletedNodes, _deletedNodeCount);
-        public ControlFlowGraph(IEnumerable<ICfgNode> nodes, IEnumerable<(int start, int end, bool label)> edges) : this(-1, -1, nodes, edges) {}
-        public ControlFlowGraph(int entryIndex, int exitIndex, IEnumerable<ICfgNode> nodes, IEnumerable<(int start, int end, bool label)> edges)
+        public ControlFlowGraph SetEntry(int i) => new(i, ExitIndex, Nodes, _edgesByStart, _edgesByEnd, _labels, _deletedNodes, _deletedNodeCount);
+        public ControlFlowGraph SetExit(int i) => new(EntryIndex, i, Nodes, _edgesByStart, _edgesByEnd, _labels, _deletedNodes, _deletedNodeCount);
+        public ControlFlowGraph(IEnumerable<ICfgNode> nodes, IEnumerable<(int start, int end, CfgEdge label)> edges) : this(-1, -1, nodes, edges) { }
+        public ControlFlowGraph(int entryIndex, int exitIndex, IEnumerable<ICfgNode> nodes, IEnumerable<(int start, int end, CfgEdge label)> edges)
         {
             if (nodes == null) throw new ArgumentNullException(nameof(nodes));
             if (edges == null) throw new ArgumentNullException(nameof(edges));
@@ -134,7 +140,7 @@ namespace UAlbion.Scripting
             Nodes = ImmutableList<ICfgNode>.Empty.AddRange(nodes);
             var starts = EmptyEdges.ToBuilder();
             var ends = EmptyEdges.ToBuilder();
-            var falseEdges = ImmutableHashSet<(int, int)>.Empty.ToBuilder();
+            var labels = ImmutableDictionary<(int, int), CfgEdge>.Empty.ToBuilder();
             string error = null;
 
             foreach (var edge in edges)
@@ -157,13 +163,13 @@ namespace UAlbion.Scripting
 
                 starts[edge.start] = endsForStart.Add(edge.end);
                 ends[edge.end] = startsForEnd.Add(edge.start);
-                if (!edge.label)
-                    falseEdges.Add((edge.start, edge.end));
+                if (edge.label != CfgEdge.True)
+                    labels.Add((edge.start, edge.end), edge.label);
             }
 
             _edgesByStart = starts.ToImmutable();
             _edgesByEnd = ends.ToImmutable();
-            _falseEdges = falseEdges.ToImmutable();
+            _labels = labels.ToImmutable();
             EntryIndex = entryIndex == -1 ? GetEntryNode() : entryIndex;
             ExitIndex = exitIndex == -1 ? GetExitNode() : exitIndex;
 
@@ -191,19 +197,22 @@ namespace UAlbion.Scripting
 
         public ImmutableArray<int> Children(int i) => _edgesByStart.TryGetValue(i, out var nodes) ? nodes : ImmutableArray<int>.Empty;
         public ImmutableArray<int> Parents(int i) => _edgesByEnd.TryGetValue(i, out var nodes) ? nodes : ImmutableArray<int>.Empty;
-        IEnumerable<int> IGraph<ICfgNode, bool>.Children(int i) => Children(i);
-        IEnumerable<int> IGraph<ICfgNode, bool>.Parents(int i) => Parents(i);
+        int InDegree(int node) => Parents(node).Length;
+        int OutDegree(int node) => Children(node).Length;
 
-        public bool GetEdgeLabel(int start, int end) => !_falseEdges.Contains((start, end));
+        IEnumerable<int> IGraph<ICfgNode, CfgEdge>.Children(int i) => Children(i);
+        IEnumerable<int> IGraph<ICfgNode, CfgEdge>.Parents(int i) => Parents(i);
+
+        public CfgEdge GetEdgeLabel(int start, int end) => _labels.TryGetValue((start, end), out var label) ? label : CfgEdge.True;
         public ControlFlowGraph Reverse() =>
-            _cachedReverse ??= 
+            _cachedReverse ??=
                 new ControlFlowGraph(
                 ExitIndex,
                 EntryIndex,
                 Nodes,
                 _edgesByEnd,
                 _edgesByStart,
-                _falseEdges.Select(x => (x.end, x.start)).ToImmutableHashSet(),
+                _labels.ToImmutableDictionary(x => (x.Key.end, x.Key.start), x => x.Value),
                 _deletedNodes,
                 _deletedNodeCount,
                 this);
@@ -213,31 +222,31 @@ namespace UAlbion.Scripting
             if (_deletedNodes.IsEmpty)
             {
                 index = Nodes.Count;
-                return new ControlFlowGraph(EntryIndex, ExitIndex, Nodes.Add(node), _edgesByStart, _edgesByEnd, _falseEdges, _deletedNodes, 0);
+                return new ControlFlowGraph(EntryIndex, ExitIndex, Nodes.Add(node), _edgesByStart, _edgesByEnd, _labels, _deletedNodes, 0);
             }
 
             var deletedNodes = _deletedNodes.Pop(out index);
             Debug.Assert(Nodes[index] == null);
             var nodes = Nodes.SetItem(index, node);
-            return new ControlFlowGraph(EntryIndex, ExitIndex, nodes, _edgesByStart, _edgesByEnd, _falseEdges, deletedNodes, _deletedNodeCount - 1);
+            return new ControlFlowGraph(EntryIndex, ExitIndex, nodes, _edgesByStart, _edgesByEnd, _labels, deletedNodes, _deletedNodeCount - 1);
         }
 
-        public ControlFlowGraph AddEdge(int start, int end, bool label)
+        public ControlFlowGraph AddEdge(int start, int end, CfgEdge label)
         {
             if (start < 0) throw new ArgumentOutOfRangeException(nameof(start), $"Tried to add edge with invalid start index {start}");
             if (end < 0) throw new ArgumentOutOfRangeException(nameof(end), $"Tried to add edge with invalid end index {end}");
             if (start >= Nodes.Count) throw new ArgumentOutOfRangeException(nameof(start), $"Tried to add edge with start index {start}, but there are only {Nodes.Count} nodes");
             if (end >= Nodes.Count) throw new ArgumentOutOfRangeException(nameof(end), $"Tried to add edge with end index {end}, but there are only {Nodes.Count} nodes");
 
-            var edgesByStart = _edgesByStart.TryGetValue(start, out var byStart) 
-                ? _edgesByStart.SetItem(start, byStart.Add(end)) 
+            var edgesByStart = _edgesByStart.TryGetValue(start, out var byStart)
+                ? _edgesByStart.SetItem(start, byStart.Add(end))
                 : _edgesByStart.Add(start, ImmutableArray<int>.Empty.Add(end));
 
-            var edgesByEnd = _edgesByEnd.TryGetValue(end, out var byEnd) 
-                ? _edgesByEnd.SetItem(end, byEnd.Add(start)) 
+            var edgesByEnd = _edgesByEnd.TryGetValue(end, out var byEnd)
+                ? _edgesByEnd.SetItem(end, byEnd.Add(start))
                 : _edgesByEnd.Add(end, ImmutableArray<int>.Empty.Add(start));
 
-            var falseEdges = label ? _falseEdges : _falseEdges.Add((start, end));
+            var labels = label == CfgEdge.True ? _labels : _labels.Add((start, end), label);
 
             return new ControlFlowGraph(
                 EntryIndex,
@@ -245,7 +254,7 @@ namespace UAlbion.Scripting
                 Nodes,
                 edgesByStart,
                 edgesByEnd,
-                falseEdges,
+                labels,
                 _deletedNodes,
                 _deletedNodeCount);
         }
@@ -253,7 +262,7 @@ namespace UAlbion.Scripting
         public ControlFlowGraph ReplaceNode(int index, ICfgNode newNode) =>
             new(EntryIndex, ExitIndex,
                 Nodes.SetItem(index, newNode),
-                _edgesByStart, _edgesByEnd, _falseEdges, 
+                _edgesByStart, _edgesByEnd, _labels,
                 _deletedNodes, _deletedNodeCount);
 
         public ControlFlowGraph ReplaceNode(int index, ControlFlowGraph replacement)
@@ -275,7 +284,7 @@ namespace UAlbion.Scripting
             return graph.RemoveNode(index);
         }
 
-        public ControlFlowGraph RemoveNode(int i) 
+        public ControlFlowGraph RemoveNode(int i)
         {
             if (Nodes[i] == null)
                 throw new ControlFlowGraphException($"Tried to remove a non-existent node ({i})", this);
@@ -283,7 +292,7 @@ namespace UAlbion.Scripting
             var nodes = Nodes.ToBuilder();
             var byStart = _edgesByStart.ToBuilder();
             var byEnd = _edgesByEnd.ToBuilder();
-            var falseEdges = _falseEdges.ToBuilder();
+            var labels = _labels.ToBuilder();
             var deletedNodes = _deletedNodes;
             int deletedCount = _deletedNodeCount;
             int newEntry = EntryIndex;
@@ -308,7 +317,7 @@ namespace UAlbion.Scripting
             nodes[i] = null;
             deletedNodes = deletedNodes.Push(i);
             deletedCount++;
-            BuilderRemoveEdges(i, byStart, byEnd, falseEdges);
+            BuilderRemoveEdges(i, byStart, byEnd, labels);
 
             return new ControlFlowGraph(
                 newEntry,
@@ -316,32 +325,32 @@ namespace UAlbion.Scripting
                 nodes.ToImmutable(),
                 byStart.ToImmutable(),
                 byEnd.ToImmutable(),
-                falseEdges.ToImmutable(),
+                labels.ToImmutable(),
                 deletedNodes,
                 deletedCount);
         }
 
-        static void BuilderAddEdge(int start, int end, bool label,
+        static void BuilderAddEdge(int start, int end, CfgEdge label,
             ImmutableDictionary<int, ImmutableArray<int>>.Builder byStart,
             ImmutableDictionary<int, ImmutableArray<int>>.Builder byEnd,
-            ImmutableHashSet<(int start, int end)>.Builder falseEdges)
+            ImmutableDictionary<(int, int), CfgEdge>.Builder labels)
         {
             byStart[start] = byStart.TryGetValue(start, out var starts)
                 ? starts.Add(end)
                 : ImmutableArray<int>.Empty.Add(end);
 
-            byEnd[end] = byEnd.TryGetValue(end, out var ends) 
-                ? ends.Add(start) 
+            byEnd[end] = byEnd.TryGetValue(end, out var ends)
+                ? ends.Add(start)
                 : ImmutableArray<int>.Empty.Add(start);
 
-            if (!label)
-                falseEdges.Add((start, end));
+            if (label != CfgEdge.True)
+                labels.Add((start, end), label);
         }
 
-        static void BuilderRemoveEdges(int i, 
+        static void BuilderRemoveEdges(int i,
             ImmutableDictionary<int, ImmutableArray<int>>.Builder byStart,
             ImmutableDictionary<int, ImmutableArray<int>>.Builder byEnd,
-            ImmutableHashSet<(int start, int end)>.Builder falseEdges)
+            ImmutableDictionary<(int, int), CfgEdge>.Builder labels)
         {
             void RemoveHelper(int start, int end)
             {
@@ -353,7 +362,7 @@ namespace UAlbion.Scripting
                 if (newStarts.IsEmpty) byEnd.Remove(end);
                 else byEnd[end] = newStarts;
 
-                falseEdges.Remove((start, end));
+                labels.Remove((start, end));
             }
 
             if (byStart.TryGetValue(i, out var ends))
@@ -365,9 +374,9 @@ namespace UAlbion.Scripting
                     RemoveHelper(start, i);
         }
 
-        public ControlFlowGraph Defragment()
+        public ControlFlowGraph Defragment(bool force = false)
         {
-            if ((double)_deletedNodeCount / Nodes.Count < DefragThreshold)
+            if (!force && (double)_deletedNodeCount / Nodes.Count < DefragThreshold)
                 return this;
 
             int[] mapping = new int[Nodes.Count];
@@ -388,7 +397,7 @@ namespace UAlbion.Scripting
         {
             var byStart = _edgesByStart;
             var byEnd = _edgesByEnd;
-            var falseEdges = _falseEdges.Remove((start, end));
+            var labels = _labels.Remove((start, end));
 
             if (_edgesByStart.TryGetValue(start, out var ends))
             {
@@ -405,20 +414,20 @@ namespace UAlbion.Scripting
             if (byStart == _edgesByStart)
                 throw new ControlFlowGraphException($"Tried to remove edge ({start}, {end}), but it does not exist");
 
-            return new ControlFlowGraph(EntryIndex, ExitIndex, Nodes, byStart, byEnd, falseEdges, _deletedNodes, _deletedNodeCount);
+            return new ControlFlowGraph(EntryIndex, ExitIndex, Nodes, byStart, byEnd, labels, _deletedNodes, _deletedNodeCount);
         }
 
         public ControlFlowGraph InsertBefore(int position, ICfgNode node)
         {
             var result = AddNode(node, out var newIndex);
-            var edges = new List<(int, int, bool)>();
+            var edges = new List<(int, int, CfgEdge)>();
             foreach (var parent in Parents(position))
             {
                 edges.Add((parent, newIndex, result.GetEdgeLabel(parent, position)));
                 result = result.RemoveEdge(parent, position);
             }
 
-            result = result.AddEdge(newIndex, position, true);
+            result = result.AddEdge(newIndex, position, CfgEdge.True);
             foreach (var edge in edges)
                 result = result.AddEdge(edge.Item1, edge.Item2, edge.Item3);
             return result;
@@ -427,14 +436,14 @@ namespace UAlbion.Scripting
         public ControlFlowGraph InsertAfter(int position, ICfgNode node)
         {
             var result = AddNode(node, out var newIndex);
-            var edges = new List<(int, int, bool)>();
+            var edges = new List<(int, int, CfgEdge)>();
             foreach (var child in Children(position))
             {
                 edges.Add((newIndex, child, result.GetEdgeLabel(position, child)));
                 result = result.RemoveEdge(position, child);
             }
 
-            result = result.AddEdge(position, newIndex, true);
+            result = result.AddEdge(position, newIndex, CfgEdge.True);
             foreach (var edge in edges)
                 result = result.AddEdge(edge.Item1, edge.Item2, edge.Item3);
             return result;
@@ -539,19 +548,19 @@ namespace UAlbion.Scripting
         {
             visited[index] = true;
             stack.Add(index);
-            if (!postOrder)
+            if (!postOrder && results != null)
                 results.Add(index);
 
             foreach (int i in Children(index))
             {
                 if (!visited[i])
                     DepthFirstSearch(i, visited, stack, results, backEdges, postOrder);
-                else if (stack.Contains(i))
+                else if (stack.Contains(i) && backEdges != null)
                     backEdges.Add((index, i));
             }
 
-            stack.Remove(index);
-            if (postOrder)
+            stack.RemoveAt(stack.Count - 1);
+            if (postOrder && results != null)
                 results.Add(index);
         }
 
@@ -621,7 +630,7 @@ namespace UAlbion.Scripting
             while (changed)
             {
                 changed = false;
-                foreach(var index in postOrder)
+                foreach (var index in postOrder)
                 {
                     if (index == EntryIndex)
                         continue;
@@ -665,26 +674,51 @@ namespace UAlbion.Scripting
             return tree;
         }
 
+        public ControlFlowGraph RemoveBackEdges()
+        {
+            var backEdges = GetBackEdges();
+            var graph = this;
+            foreach (var (start, end) in backEdges)
+                graph = graph.RemoveEdge(start, end);
+            return graph;
+        }
+
         static bool ListEquals(List<int> x, List<int> y) => x.Count == y.Count && !x.Except(y).Any();
 
-        public void ExportToDot(StringBuilder sb)
+        public string ExportToDot(bool showContent = true, int dpi = 180)
+        {
+            var sb = new StringBuilder();
+            ExportToDot(sb, showContent, dpi);
+            return sb.ToString();
+        }
+
+        public void ExportToDot(StringBuilder sb, bool showContent = true, int dpi = 180)
         {
             if (sb == null) throw new ArgumentNullException(nameof(sb));
             sb.AppendLine("digraph G {");
-            sb.AppendLine("    graph [ dpi = 300 ];");
+            sb.AppendLine($"    graph [ dpi = {dpi} ];");
 
             for (int i = 0; i < Nodes.Count; i++)
             {
                 if (Nodes[i] == null) continue;
-                sb.Append("    Node"); sb.Append(i);
-                sb.Append(" [shape=box, fontname = \"Consolas\", fontsize=8, fillcolor=azure2, style=filled, label=\"Node "); sb.Append(i);
-                if (i == EntryIndex) sb.Append(" <ENTRY>");
-                if (i == ExitIndex) sb.Append(" <EXIT>");
-                sb.Append("\\l");
+                sb.Append("    "); sb.Append(i);
+                sb.Append(" [");
+                if (showContent)
+                    sb.Append("shape=box, ");
 
-                var visitor = new FormatScriptVisitor();
-                Nodes[i].Accept(visitor);
-                sb.Append(visitor.Code.Replace(Environment.NewLine, "\\l", StringComparison.InvariantCulture));
+                sb.Append("fontname = \"Consolas\", fontsize=8, fillcolor=azure2, style=filled, label=\"");
+                sb.Append(i);
+                if (i == EntryIndex) sb.Append(" <IN>");
+                if (i == ExitIndex) sb.Append(" <OUT>");
+
+                if (showContent)
+                {
+                    sb.Append("\\l");
+
+                    var visitor = new FormatScriptVisitor();
+                    Nodes[i].Accept(visitor);
+                    sb.Append(visitor.Code.Replace(Environment.NewLine, "\\l", StringComparison.InvariantCulture));
+                }
 
                 sb.AppendLine("\\l\"];");
             }
@@ -694,12 +728,19 @@ namespace UAlbion.Scripting
                 var start = kvp.Key;
                 foreach (var end in kvp.Value)
                 {
-                    sb.Append("    Node"); sb.Append(start);
-                    sb.Append(" -> Node"); sb.Append(end);
-                    if (!GetEdgeLabel(start, end))
-                        sb.Append(" [label=\"f\"];");
-                    else
-                        sb.AppendLine(" [];");
+                    sb.Append("    "); sb.Append(start);
+                    sb.Append(" -> "); sb.Append(end);
+                    switch (GetEdgeLabel(start, end))
+                    {
+                        case CfgEdge.True:
+                            if (OutDegree(start) > 1)
+                                sb.Append(" [color=green4];");
+                            else sb.Append(" [];");
+                            break;
+                        case CfgEdge.False: sb.Append(" [color=red3];"); break;
+                        case CfgEdge.DisjointGraphFixup: sb.Append(" [color=purple]"); break;
+                        default: sb.Append(" [];"); break;
+                    }
                 }
             }
             sb.AppendLine("}");
@@ -729,7 +770,57 @@ namespace UAlbion.Scripting
             return new ControlFlowGraph(mapping[EntryIndex], mapping[ExitIndex], nodes, edges);
         }
 
-        public List<List<int>> GetAllStronglyConnectedComponents()
+        public int[] GetComponentMapping()
+        {
+            int componentIndex = 0;
+            var mapping = new int[NodeCount];
+            var stack = new Stack<int>();
+            Array.Fill(mapping, -1);
+
+            for (int i = 0; i < NodeCount; i++)
+            {
+                if (Nodes[i] == null || mapping[i] != -1)
+                    continue;
+
+                stack.Push(i);
+                while (stack.TryPop(out var current))
+                {
+                    if (mapping[current] != -1)
+                        continue;
+
+                    mapping[current] = componentIndex;
+                    foreach (int child in Children(current))
+                        stack.Push(child);
+                }
+
+                componentIndex++;
+            }
+
+            return mapping;
+        }
+
+        public bool[] GetReachability(int start, out int reachableCount)
+        {
+            reachableCount = 0;
+            var visited = new bool[NodeCount];
+            var stack = new Stack<int>();
+
+            stack.Push(start);
+            while (stack.TryPop(out var current))
+            {
+                if (visited[current])
+                    continue;
+
+                visited[current] = true;
+                reachableCount++;
+                foreach (int child in Children(current))
+                    stack.Push(child);
+            }
+
+            return visited;
+        }
+
+        public List<List<int>> GetStronglyConnectedComponents()
         {
             List<List<int>> result = new();
             List<int> finished = new();
@@ -799,7 +890,7 @@ namespace UAlbion.Scripting
 
                 foreach (int n in Children(index))
                 {
-                    if (visited[n] || !component.Contains(n)) 
+                    if (visited[n] || !component.Contains(n))
                         continue;
 
                     if (n == startIndex)
@@ -840,18 +931,16 @@ namespace UAlbion.Scripting
             var cycles = GetAllSimpleCyclePaths(component);
             foreach (int header in headers)
             {
-                #if DEBUG
-                Func<string> vis = () =>
+                /*Func<string> vis = () => // For VS Code debug visualisation
                 {
                     var d = ToVis();
                     foreach (var n in d.Nodes)
                         if (component.Contains(int.Parse(n.Id, CultureInfo.InvariantCulture)))
                             n.Color = "#4040b0";
                     return d.AddPointer("header", header).ToString();
-                };
-                #endif
+                };*/
 
-                if (!component.Contains(header)) 
+                if (!component.Contains(header))
                     continue;
 
                 var simplePaths = new List<List<int>>();
@@ -891,10 +980,10 @@ namespace UAlbion.Scripting
             // Determine if header can break out of the loop
             foreach (int child in Children(nodes[0]))
             {
-                if (nodes.Contains(child)) 
+                if (nodes.Contains(child))
                     continue;
-                bool edgeLabel = GetEdgeLabel(nodes[0], child);
-                header = new LoopPart(header.Index, true, Break: true, Negated: edgeLabel);
+                CfgEdge edgeLabel = GetEdgeLabel(nodes[0], child);
+                header = new LoopPart(header.Index, true, Break: true, Negated: edgeLabel == CfgEdge.True);
                 exits.Add(child);
             }
 
@@ -907,9 +996,7 @@ namespace UAlbion.Scripting
 
                 foreach (int child in Children(nodes[i]))
                 {
-#if DEBUG
-                    Func<string> vis = () => ToVis().AddPointer("i", nodes[i]).AddPointer("child", child).ToString();
-#endif
+                    // Func<string> vis = () => ToVis().AddPointer("i", nodes[i]).AddPointer("child", child).ToString(); // For VS Code debug visualisation
 
                     if (child == header.Index) // Jump to header = possible continue
                         isContinue = true;
@@ -917,7 +1004,7 @@ namespace UAlbion.Scripting
                         isTail = false;
                     else
                     {
-                        negated = !GetEdgeLabel(nodes[i], child);
+                        negated = GetEdgeLabel(nodes[i], child) == CfgEdge.False;
                         isBreak = true;
                         exits.Add(child);
                     }
@@ -957,19 +1044,19 @@ namespace UAlbion.Scripting
             if (_cachedLoops != null)
                 return _cachedLoops;
 
-            var components = GetAllStronglyConnectedComponents();
-            _cachedLoops = 
+            var components = GetStronglyConnectedComponents();
+            _cachedLoops =
                 (from component in components.Where(x => x.Count > 1)
-                from loop in GetAllSimpleLoops(component)
-                select GetLoopInformation(loop)).ToImmutableArray();
+                 from loop in GetAllSimpleLoops(component)
+                 select GetLoopInformation(loop)).ToImmutableArray();
 
             return _cachedLoops;
         }
 
-        public List<List<int>> GetAllReachingPaths(int index)
+        public List<List<int>> GetAllReachingPaths(int from, int to)
         {
             var result = new List<List<int>>();
-            GetReachingPath(index, 0, new List<int>(), result);
+            GetReachingPath(from, to, new List<int>(), result);
             return result;
         }
 
@@ -988,7 +1075,7 @@ namespace UAlbion.Scripting
             var postDomTree = GetPostDominatorTree();
             List<(HashSet<int>, int, int)> regions = new();
 
-            foreach(var i in GetDfsPostOrder())
+            foreach (var i in GetDfsPostOrder())
             {
                 for (int j = 0; j < Nodes.Count; j++)
                 {
@@ -1019,8 +1106,7 @@ namespace UAlbion.Scripting
                 found = false;
                 for (int i = 0; i < Nodes.Count; i++)
                 {
-#if DEBUG
-                    Func<string> vis = () =>
+                    /*Func<string> vis = () => // For VS Code debug visualisation
                     {
                         var d = ToVis();
                         foreach (var n in d.Nodes)
@@ -1029,13 +1115,13 @@ namespace UAlbion.Scripting
                         for (int ri = 0; ri < result.Count; ri++)
                             d.AddPointer($"r{ri}", result[ri]);
                         return d.AddPointer("i", i).ToString();
-                    };
-#endif
+                    }; */
+
                     if (visited[i])
                         continue; // Don't visit nodes twice
 
 
-                    if (Parents(i).Any(x => !visited[x])) 
+                    if (Parents(i).Any(x => !visited[x]))
                         continue; // If we haven't visited all of the parents we can't evaluate this node yet.
 
                     visited[i] = true;
@@ -1045,6 +1131,9 @@ namespace UAlbion.Scripting
                 }
             }
 
+            if (result.Count != ActiveNodeCount) // Cycle detected
+                result.Clear();
+
             return result;
         }
 
@@ -1052,15 +1141,15 @@ namespace UAlbion.Scripting
         {
             if (selectedNodes == null) throw new ArgumentNullException(nameof(selectedNodes));
             List<ICfgNode> remainderNodes = new();
-            List<(int, int, bool)> remainderEdges = new();
+            List<(int, int, CfgEdge)> remainderEdges = new();
             var remainderMapping = new int[Nodes.Count];
 
             List<ICfgNode> cutNodes = new();
-            List<(int, int, bool)> cutEdges = new();
+            List<(int, int, CfgEdge)> cutEdges = new();
             var cutMapping = new int[Nodes.Count];
 
-            List<(int, bool)> cutToRemainderEdges = new();
-            List<(int, bool)> remainderToCutEdges = new();
+            List<(int, CfgEdge)> cutToRemainderEdges = new();
+            List<(int, CfgEdge)> remainderToCutEdges = new();
 
             for (int i = 0; i < Nodes.Count; i++)
             {
@@ -1083,12 +1172,12 @@ namespace UAlbion.Scripting
             {
                 bool isStartInCut = selectedNodes.Contains(edge.start);
                 bool isEndInCut = selectedNodes.Contains(edge.end);
-                bool edgeLabel = GetEdgeLabel(edge.start, edge.end);
+                CfgEdge edgeLabel = GetEdgeLabel(edge.start, edge.end);
                 switch (isStartInCut, isEndInCut)
                 {
-                    case (true,  true):  cutEdges.Add((cutMapping[edge.start], cutMapping[edge.end], edgeLabel)); break;
-                    case (false, true):  remainderToCutEdges.Add((remainderMapping[edge.start], edgeLabel)); break;
-                    case (true,  false): cutToRemainderEdges.Add((remainderMapping[edge.end], edgeLabel)); break;
+                    case (true, true): cutEdges.Add((cutMapping[edge.start], cutMapping[edge.end], edgeLabel)); break;
+                    case (false, true): remainderToCutEdges.Add((remainderMapping[edge.start], edgeLabel)); break;
+                    case (true, false): cutToRemainderEdges.Add((remainderMapping[edge.end], edgeLabel)); break;
                     case (false, false): remainderEdges.Add((remainderMapping[edge.start], remainderMapping[edge.end], edgeLabel)); break;
                 }
             }
@@ -1098,7 +1187,7 @@ namespace UAlbion.Scripting
 
             int cutEntryIndex = cutNodes.Count;
             cutNodes.Add(new EmptyNode());
-            cutEdges.Add((cutEntryIndex, cutMapping[entry], true));
+            cutEdges.Add((cutEntryIndex, cutMapping[entry], CfgEdge.True));
 
             var cut = new ControlFlowGraph(cutEntryIndex, cutMapping[exit], cutNodes, cutEdges);
             var remainder = new ControlFlowGraph(remainderEntry, remainderExit, remainderNodes, remainderEdges);
@@ -1127,13 +1216,13 @@ namespace UAlbion.Scripting
             return (result, mapping);
         }
 
-        public void GetReachingPath(int target, int current, List<int> path, List<List<int>> stack)
+        public void GetReachingPath(int start, int target, List<int> path, List<List<int>> stack)
         {
             if (path == null) throw new ArgumentNullException(nameof(path));
             if (stack == null) throw new ArgumentNullException(nameof(stack));
 
-            path.Add(current);
-            var children = Children(current);
+            path.Add(start);
+            var children = Children(start);
             foreach (int child in children)
             {
                 var npath = path.ToList();
@@ -1148,7 +1237,7 @@ namespace UAlbion.Scripting
                 if (path.Contains(child))
                     continue;
 
-                GetReachingPath(target, child, npath, stack);
+                GetReachingPath(child, target, npath, stack);
             }
         }
 
@@ -1157,12 +1246,12 @@ namespace UAlbion.Scripting
                .Where(x => x.Value.Length > 1)
                .Select(x => x.Key);
 
-        public IEnumerable<int> GetNonBranchNodes() 
+        public IEnumerable<int> GetNonBranchNodes()
             => _edgesByStart
                 .Where(x => x.Value.Length <= 1)
                 .Select(x => x.Key);
 
-        public (int? trueChild, int? falseChild) FindBinaryChildren(int index)
+        public (int? trueChild, int? falseChild) GetBinaryChildren(int index)
         {
             var children = Children(index);
             if (children.Length > 2)
@@ -1173,22 +1262,51 @@ namespace UAlbion.Scripting
 
             foreach (var child in children)
             {
-                var edgeLabel = GetEdgeLabel(index, child);
-                if (edgeLabel)
+                switch ( GetEdgeLabel(index, child))
                 {
-                    if (trueChild != null)
-                        throw new ControlFlowGraphException($"Node {index} has 2 true children!", this);
-                    trueChild = child;
-                }
-                else
-                {
-                    if (falseChild != null)
-                        throw new ControlFlowGraphException($"Node {index} has 2 false children!", this);
-                    falseChild = child;
+                    case CfgEdge.True:
+                        if (trueChild != null)
+                            throw new ControlFlowGraphException($"Node {index} has 2 true children!", this);
+                        trueChild = child;
+                        break;
+
+                    case CfgEdge.False:
+                        if (falseChild != null)
+                            throw new ControlFlowGraphException($"Node {index} has 2 false children!", this);
+                        falseChild = child;
+                        break;
                 }
             }
 
             return (trueChild, falseChild);
+        }
+
+        public int[] GetShortestPaths()
+        {
+            var result = new int[Nodes.Count];
+            Array.Fill(result, int.MaxValue);
+            result[EntryIndex] = 0;
+
+            foreach (var i in GetTopogicalOrder())
+                foreach (var child in Children(i))
+                    if (result[child] > result[i] + 1)
+                        result[child] = result[i] + 1;
+
+            return result;
+        }
+
+        public int[] GetLongestPaths()
+        {
+            var result = new int[Nodes.Count];
+            Array.Fill(result, int.MinValue);
+            result[EntryIndex] = 0;
+
+            foreach (var i in GetTopogicalOrder())
+                foreach (var child in Children(i))
+                    if (result[child] < result[i] + 1)
+                        result[child] = result[i] + 1;
+
+            return result;
         }
 
         public void Accept(IAstVisitor visitor)
@@ -1214,6 +1332,83 @@ namespace UAlbion.Scripting
         // ReSharper disable once UnusedMember.Global
         public string Visualize() => ToVis().ToString();
         public DebugVisualizerGraphData ToVis() => DebugVisualizerGraphData.FromCfg(this);
+        public static IEnumerable<ICfgNode> BuildTestNodes(int count)
+        {
+            if (count < 2)
+                throw new InvalidOperationException("All control flow graphs require an entry and exit node");
+
+            yield return Emit.Empty();
+            for (int i = 1; i < count - 1; i++)
+                yield return Emit.Statement(Emit.Const(i));
+            yield return Emit.Empty();
+        }
+
+        public static ControlFlowGraph FromString(string s)
+        {
+            // Syntax: [NodeCount, Entry, Exit, Edges]
+            // Edges: 0+1 0-2 2+3 etc, + for true, - for false
+            // [5,0,4,0+1 1+2 2+3 3+4]
+            s = s.Trim('[', ']');
+            var parts = s.Split(',');
+            if (parts.Length != 4)
+                throw new FormatException("Expected 4 parts in graph description");
+            var entry = int.Parse(parts[0].Trim());
+            var exit = int.Parse(parts[1].Trim());
+            var nodeCount = int.Parse(parts[2].Trim());
+            bool[] active = new bool[nodeCount];
+            var edges = new List<(int, int, CfgEdge)>();
+            foreach (var edgePart in parts[3].Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries))
+            {
+                int plusIndex = edgePart.IndexOf('+');
+                int minusIndex = edgePart.IndexOf('-');
+                if (plusIndex <= 0 && minusIndex <= 0)
+                    throw new FormatException($"Bad edge \"{edgePart}\", expected two numbers separated by a + or -");
+
+                var index = Math.Max(plusIndex, minusIndex);
+                CfgEdge label = plusIndex > 0 ? CfgEdge.True : CfgEdge.False;
+                int start = int.Parse(edgePart[..index]);
+                int end = int.Parse(edgePart[(index + 1)..]);
+                active[start] = true;
+                active[end] = true;
+                edges.Add((start, end, label));
+            }
+
+            var nodes = BuildTestNodes(nodeCount).ToArray();
+            for (int i = 0; i < nodeCount; i++)
+                if (!active[i] && i != entry && i != exit)
+                    nodes[i] = null;
+
+            return new ControlFlowGraph(entry, exit, nodes, edges);
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.Append('[');
+            sb.Append(EntryIndex);
+            sb.Append(',');
+            sb.Append(ExitIndex);
+            sb.Append(',');
+            sb.Append(NodeCount);
+            sb.Append(',');
+
+            bool first = true;
+            foreach (var (start, end, label) in LabelledEdges)
+            {
+                if (label == CfgEdge.DisjointGraphFixup) // Disjoint fixups are implied
+                    continue;
+
+                if (!first)
+                    sb.Append(' ');
+                sb.Append(start);
+                sb.Append(label == CfgEdge.True ? '+' : '-');
+                sb.Append(end);
+                first = false;
+            }
+
+            sb.Append(']');
+            return sb.ToString();
+        }
     }
 }
 #pragma warning restore 8321

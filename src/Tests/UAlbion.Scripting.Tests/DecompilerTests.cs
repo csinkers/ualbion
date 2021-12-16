@@ -89,7 +89,7 @@ namespace UAlbion.Scripting.Tests
         [Fact]
         public void ReduceWhileTest()
         {
-            var result = Decompiler.ReduceSimpleLoops(TestGraphs.WhileLoop);
+            var result = Decompiler.ReduceLoopParts(TestGraphs.WhileLoop);
             result = Decompiler.ReduceSequences(result);
             result = Decompiler.ReduceSequences(result);
             TestUtil.VerifyCfgVsScript(result, null, "while (1) { 2 }", ResultsDir);
@@ -98,7 +98,7 @@ namespace UAlbion.Scripting.Tests
         [Fact]
         public void ReduceNegativeWhileTest()
         {
-            var result = Decompiler.ReduceSimpleLoops(TestGraphs.NegativeWhileLoop);
+            var result = Decompiler.ReduceLoopParts(TestGraphs.NegativeWhileLoop);
             result = Decompiler.ReduceSequences(result);
             result = Decompiler.ReduceSequences(result);
             TestUtil.VerifyCfgVsScript(result, null, "while (!(1)) { 2 }", ResultsDir);
@@ -107,7 +107,7 @@ namespace UAlbion.Scripting.Tests
         [Fact]
         public void ReduceDoWhileTest()
         {
-            var result = Decompiler.ReduceSimpleLoops(TestGraphs.DoWhileLoop);
+            var result = Decompiler.ReduceLoopParts(TestGraphs.DoWhileLoop);
             result = Decompiler.ReduceSequences(result);
             result = Decompiler.ReduceSequences(result);
             TestUtil.VerifyCfgVsScript(result, null, "do { 1 } while (2)", ResultsDir);
@@ -116,7 +116,7 @@ namespace UAlbion.Scripting.Tests
         [Fact]
         public void ReduceNegativeDoWhileTest()
         {
-            var result = Decompiler.ReduceSimpleLoops(TestGraphs.NegativeDoWhileLoop);
+            var result = Decompiler.ReduceLoopParts(TestGraphs.NegativeDoWhileLoop);
             result = Decompiler.ReduceSequences(result);
             result = Decompiler.ReduceSequences(result);
             TestUtil.VerifyCfgVsScript(result, null, "do { 1 } while (!(2))", ResultsDir);
@@ -136,7 +136,7 @@ namespace UAlbion.Scripting.Tests
         [Fact]
         public void ReduceInfiniteLoopTest()
         {
-            var result = Decompiler.ReduceSimpleLoops(TestGraphs.InfiniteLoop);
+            var result = Decompiler.ReduceLoopParts(TestGraphs.InfiniteLoop);
             result = Decompiler.ReduceSequences(result);
             result = Decompiler.ReduceSequences(result);
             result = Decompiler.ReduceSequences(result);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace UAlbion.Scripting
 {
@@ -48,8 +49,33 @@ namespace UAlbion.Scripting
 
             var path = Root.FindPath(index, NodeEquality);
             return path.Count > 1
-                ? path[1]
-                : null;
+                ? path[^1]
+                : path[0];
+        }
+
+        public string ExportToDot(int dpi = 150)
+        {
+            var sb = new StringBuilder();
+            ExportToDot(sb, dpi);
+            return sb.ToString();
+        }
+
+        public void ExportToDot(StringBuilder sb, int dpi = 150)
+        {
+            if (sb == null) throw new ArgumentNullException(nameof(sb));
+            sb.AppendLine("digraph G {");
+            sb.AppendLine($"    graph [ dpi = {dpi} ];");
+            var stack = new Stack<GenericTreeNode<int>>();
+            stack.Push(Root);
+            while (stack.TryPop(out var node))
+            {
+                foreach (var child in node.Children)
+                {
+                    sb.AppendLine($"    {node.Value} -> {child.Value};");
+                    stack.Push(child);
+                }
+            }
+            sb.AppendLine("}");
         }
     }
 }

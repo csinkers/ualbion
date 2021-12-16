@@ -8,8 +8,8 @@ namespace UAlbion.Scripting
         public CfgCutResult(
             ControlFlowGraph cut,
             ControlFlowGraph remainder,
-            List<(int remainderIndex, bool label)> remainderToCutEdges,
-            List<(int remainderIndex, bool label)> cutToRemainderEdges)
+            List<(int remainderIndex, CfgEdge label)> remainderToCutEdges,
+            List<(int remainderIndex, CfgEdge label)> cutToRemainderEdges)
         {
             Cut = cut ?? throw new ArgumentNullException(nameof(cut));
             Remainder = remainder ?? throw new ArgumentNullException(nameof(remainder));
@@ -18,8 +18,8 @@ namespace UAlbion.Scripting
         }
         public ControlFlowGraph Cut { get; }
         public ControlFlowGraph Remainder { get; }
-        public List<(int remainderIndex, bool label)> RemainderToCutEdges { get; }
-        public List<(int remainderIndex, bool label)> CutToRemainderEdges { get; }
+        public List<(int remainderIndex, CfgEdge label)> RemainderToCutEdges { get; }
+        public List<(int remainderIndex, CfgEdge label)> CutToRemainderEdges { get; }
 
         public ControlFlowGraph Merge(ControlFlowGraph restructured)
         {

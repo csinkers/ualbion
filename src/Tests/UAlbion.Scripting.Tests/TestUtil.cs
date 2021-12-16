@@ -144,7 +144,7 @@ namespace UAlbion.Scripting.Tests
             return true;
         }
 
-        public static (List<ICfgNode> nodes, List<(int, int, bool)> edges) Arrange(ControlFlowGraph graph)
+        public static (List<ICfgNode> nodes, List<(int, int, CfgEdge)> edges) Arrange(ControlFlowGraph graph)
         {
             var nodes = new List<ICfgNode>();
             var mapping = new int[graph.Nodes.Count];
@@ -162,7 +162,7 @@ namespace UAlbion.Scripting.Tests
                     mapping[nodeIndex] = nodes.Count;
                     nodes.Add(graph.Nodes[nodeIndex]);
 
-                    var (trueChild, falseChild) = graph.FindBinaryChildren(nodeIndex);
+                    var (trueChild, falseChild) = graph.GetBinaryChildren(nodeIndex);
                     if (trueChild.HasValue) stack.Push(trueChild.Value);
                     if (falseChild.HasValue) stack.Push(falseChild.Value);
                 }
@@ -186,9 +186,7 @@ namespace UAlbion.Scripting.Tests
                 var (description, graph) = steps[i];
                 description = SanitizeForPath(description);
                 var path = Path.Combine(resultsDir, $"{method}_{i}_{description}.gv");
-                var sb = new StringBuilder();
-                graph.ExportToDot(sb);
-                File.WriteAllText(path, sb.ToString());
+                File.WriteAllText(path, graph.ExportToDot());
 
                 tasks.Add(Task.Run(() => FormatGraph(path)));
             }

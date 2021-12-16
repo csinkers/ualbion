@@ -1,26 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using UAlbion.Scripting.Ast;
+﻿using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting.Tests
 {
     public static class TestGraphs
     {
         static Statement D(string name) => Emit.Statement(Emit.Name(name));
-        static IEnumerable<ICfgNode> BuildNodes(int count)
-        {
-            if (count < 2)
-                throw new InvalidOperationException("All control flow graphs require an entry and exit node");
-
-            yield return Emit.Empty();
-            for (int i = 1; i < count - 1; i++)
-                yield return Emit.Statement(Emit.Const(i));
-            yield return Emit.Empty();
-        }
-
         /* Sequence: 1 -> 2 -> 3  = 1,2,3 */
-        public static ControlFlowGraph Sequence => new(0, 4, BuildNodes(5),
-            new[] { (0, 1, true), (1, 2, true), (2, 3, true), (3, 4, true) });
+        public static ControlFlowGraph Sequence => ControlFlowGraph.FromString("[0, 4, 5, 0+1 1+2 2+3 3+4]");
 
         /* IfThen:
            0
@@ -31,8 +17,7 @@ namespace UAlbion.Scripting.Tests
            2  f
            v  |
            3<-/ */
-        public static ControlFlowGraph IfThen => new(0, 3, BuildNodes(4),
-            new[] { (0,1,true), (1, 2, true), (2, 3, true), (1, 3, false) });
+        public static ControlFlowGraph IfThen => ControlFlowGraph.FromString("[0, 3, 4, 0+1 1+2 2+3 1-3]");
 
         /* IfThenElse:
         0
@@ -43,8 +28,7 @@ namespace UAlbion.Scripting.Tests
         2  3
         v  |
         4<-/ */
-        public static ControlFlowGraph IfThenElse => new(0, 4, BuildNodes(5),
-            new[] { (0, 1, true), (1, 2, true), (2, 4, true), (1, 3, false), (3, 4, true) });
+        public static ControlFlowGraph IfThenElse => ControlFlowGraph.FromString("[0, 4, 5, 0+1 1+2 2+4 1-3 3+4]");
 
         /* Simple while loop:
             0
@@ -54,11 +38,8 @@ namespace UAlbion.Scripting.Tests
          |  \--/
          |
          \->2 */
-        public static ControlFlowGraph SimpleWhileLoop => new(0, 2, BuildNodes(3),
-            new[] { (0, 1, true), (1, 1, true), (1, 2, false) });
-        public static ControlFlowGraph NegativeSimpleWhileLoop => new(0, 2, BuildNodes(3),
-            new[] { (0, 1, true), (1, 1, false), (1, 2, true) });
-
+        public static ControlFlowGraph SimpleWhileLoop =>         ControlFlowGraph.FromString("[0,2,3,0+1 1+1 1-2]");
+        public static ControlFlowGraph NegativeSimpleWhileLoop => ControlFlowGraph.FromString("[0,2,3,0+1 1-1 1+2]");
         /* WhileLoop:
             0
             v
@@ -68,10 +49,8 @@ namespace UAlbion.Scripting.Tests
          |  2--/
          |
          \->3 */
-        public static ControlFlowGraph WhileLoop => new(0, 3, BuildNodes(4),
-            new[] { (0, 1, true), (1, 2, true), (2, 1, true), (1, 3, false) });
-        public static ControlFlowGraph NegativeWhileLoop => new(0, 3, BuildNodes(4),
-            new[] { (0, 1, true), (1, 2, false), (2, 1, true), (1, 3, true) });
+        public static ControlFlowGraph WhileLoop => ControlFlowGraph.FromString("[0,3,4,0+1 1+2 2+1 1-3]");
+        public static ControlFlowGraph NegativeWhileLoop => ControlFlowGraph.FromString("[0,3,4,0+1 1-2 2+1 1+3]");
 
         /* DoWhileLoop:
             0
@@ -82,17 +61,15 @@ namespace UAlbion.Scripting.Tests
             f
             v
             3 */
-        public static ControlFlowGraph DoWhileLoop => new(0, 3, BuildNodes(4),
-            new[] { (0, 1, true), (1, 2, true), (2, 1, true), (2, 3, false) });
-        public static ControlFlowGraph NegativeDoWhileLoop => new(0, 3, BuildNodes(4),
-            new[] { (0, 1, true), (1, 2, true), (2, 1, false), (2, 3, true) });
+        public static ControlFlowGraph DoWhileLoop => ControlFlowGraph.FromString("[0,3,4,0+1 1+2 2+1 2-3]");
+        public static ControlFlowGraph NegativeDoWhileLoop => ControlFlowGraph.FromString("[0,3,4,0+1 1+2 2-1 2+3]");
 
         /* 0 > 1 <-\
                \---/  */
-        public static ControlFlowGraph InfiniteEmptyLoop => new(0, 2, BuildNodes(3), new[] { (0, 1, true), (1, 1, true) });
+        public static ControlFlowGraph InfiniteEmptyLoop => ControlFlowGraph.FromString("[0,2,3,0+1 1+1]");
 
         /* 0 > 1 <-> 2 */
-        public static ControlFlowGraph InfiniteLoop => new(0, 3, BuildNodes(4), new[] { (0, 1, true), (1, 2, true), (2, 1, true) });
+        public static ControlFlowGraph InfiniteLoop => ControlFlowGraph.FromString("[0,3,4,0+1 1+2 2+1]");
 
         /* Graph1
            0
@@ -105,9 +82,7 @@ namespace UAlbion.Scripting.Tests
         \t/f
            v
            5 */
-        public static ControlFlowGraph Graph1 => new(0, 5, BuildNodes(6),
-            new[] { (0, 1, true), (1, 2, true), (2, 3, true), (2, 4, false), (4, 4, true), (3, 1, true), (4, 5, false) });
-
+        public static ControlFlowGraph Graph1 => ControlFlowGraph.FromString("[0,5,6,0+1 1+2 2+3 2-4 4+4 3+1 4-5]");
         /* Graph2
           0
           v
@@ -121,10 +96,7 @@ namespace UAlbion.Scripting.Tests
                 f  f
                 v  |
                 7<-/ */
-        public static ControlFlowGraph Graph2 => new(0, 7, BuildNodes(8), new[] {
-                (0, 1, true), (1, 2, true), (2, 3, true), (3, 6, true), (6, 5, true), (5, 2, true),
-                (6, 7, false), (4, 6, true), (4, 7, false), (1, 4, false) });
-
+        public static ControlFlowGraph Graph2 => ControlFlowGraph.FromString("[0,7,8,0+1 1+2 2+3 3+6 6+5 5+2 6-7 4+6 4-7 1-4]");
         /* 0
            v
            1----------\
@@ -146,11 +118,7 @@ namespace UAlbion.Scripting.Tests
               |   15<-/
               v   |
               7 <-/ */
-        public static ControlFlowGraph LoopBranch => new(0, 7, BuildNodes(16), new[] {
-            (0, 1, true), (1, 2, true), (1, 8, false), (2, 3, true), (2, 6, false), (3, 2, true),
-            (3, 4, false), (4, 5, false), (4, 6, true), (5, 2, true), (6, 7, true), (8, 9, true),
-            (9, 10, true), (10, 8, true), (9, 11, false), (11, 13, false), (11, 12, true),
-            (12, 15, true), (13, 14, true), (14, 8, true), (14, 15, false), (15, 7, true) });
+        public static ControlFlowGraph LoopBranch => ControlFlowGraph.FromString("[0,7,16,0+1 1+2 1-8 2+3 2-6 3+2 3-4 4-5 4+6 5+2 6+7 8+9 9+10 10+8 9-11 11-13 11+12 12+15 13+14 14+8 14-15 15+7]");
         public static string LoopBranchCode => @"if (1) {
     while(2) {
         if (3) {
@@ -194,9 +162,7 @@ else {
        5-->7<--6          |
            |              |
            11 <-----------/*/
-        public static ControlFlowGraph BreakBranch => new(0, 11, BuildNodes(12), new[] {
-            (0, 1, true), (1, 2, true), (2, 3, true), (2, 8, false), (3, 4, true), (4, 5, false), (4, 6, true),
-            (5, 7, true), (6, 7, true), (7, 11, true), (8, 9, true), (9, 10, true), (10, 1, true), (10, 11, false) });
+        public static ControlFlowGraph BreakBranch => ControlFlowGraph.FromString("[0,11,12,0+1 1+2 2+3 2-8 3+4 4-5 4+6 5+7 6+7 7+11 8+9 9+10 10+1 10-11]");
         public static string BreakBranchCode => @"do {
     1
     if (2) {
@@ -223,9 +189,7 @@ else {
            3      |
            v      |
            4 <---/*/
-        public static ControlFlowGraph BreakBranch2 => new(0, 4, BuildNodes(6), new[] {
-            (0, 1, true), (1, 2, true), (2, 3, true), (2, 5, false), (3, 4, true), (5, 1, true), (5, 4, false)
-        });
+        public static ControlFlowGraph BreakBranch2 => ControlFlowGraph.FromString("[0,4,6,0+1 1+2 2+3 2-5 3+4 5+1 5-4]");
         public static string BreakBranch2Code => @"do {
     1
     if (2) {
@@ -282,32 +246,32 @@ else {
                 D("n8"), // 16
                 D("n9"), // 17
             }, new[] {
-                ( 0, 1, false), // ( A,!b1),
-                ( 0, 3, true),  // ( A,c1),
-                ( 1, 2, true),  // (b1,b2),
-                ( 1,12, false), // (b1,!n4),
-                (12,13, true),  // (n4,n5),
-                ( 2,13, false), // (b2,!n5),
-                ( 2,14, true),  // (b2,n6),
-                (14,15, true),  // (n6,n7),
-                (13,15, true),  // (n5,n7),
-                (15, 6, true),  // (n7,d1),
-                ( 6, 8, true),  // (d1,d3),
-                ( 6, 7, false), // (d1,!d2),
-                ( 8,16, true),  // (d3,n8),
-                ( 7,16, true),  // (d2,n8),
-                (16, 6, true),  // (n8,d1),
-                ( 8,17, false), // (d3,!n9),
-                ( 7,17, false), // (d2,!n9),
-                ( 3, 9, true),  // (c1,n1),
-                ( 9, 3, true),  // (n1,c1),
-                ( 3, 4, false), // (c1,!c2),
-                ( 4,11, false), // (c2,!n3),
-                ( 4,10, true),  // (c2,n2),
-                (10,17, true),  // (n2,n9),
-                (11, 5, true),  // (n3,c3),
-                ( 5, 3, true),  // (c3,c1),
-                ( 5,17, false), // (c3,!n9),
+                ( 0, 1, CfgEdge.False), // ( A,!b1),
+                ( 0, 3, CfgEdge.True),  // ( A,c1),
+                ( 1, 2, CfgEdge.True),  // (b1,b2),
+                ( 1,12, CfgEdge.False), // (b1,!n4),
+                (12,13, CfgEdge.True),  // (n4,n5),
+                ( 2,13, CfgEdge.False), // (b2,!n5),
+                ( 2,14, CfgEdge.True),  // (b2,n6),
+                (14,15, CfgEdge.True),  // (n6,n7),
+                (13,15, CfgEdge.True),  // (n5,n7),
+                (15, 6, CfgEdge.True),  // (n7,d1),
+                ( 6, 8, CfgEdge.True),  // (d1,d3),
+                ( 6, 7, CfgEdge.False), // (d1,!d2),
+                ( 8,16, CfgEdge.True),  // (d3,n8),
+                ( 7,16, CfgEdge.True),  // (d2,n8),
+                (16, 6, CfgEdge.True),  // (n8,d1),
+                ( 8,17, CfgEdge.False), // (d3,!n9),
+                ( 7,17, CfgEdge.False), // (d2,!n9),
+                ( 3, 9, CfgEdge.True),  // (c1,n1),
+                ( 9, 3, CfgEdge.True),  // (n1,c1),
+                ( 3, 4, CfgEdge.False), // (c1,!c2),
+                ( 4,11, CfgEdge.False), // (c2,!n3),
+                ( 4,10, CfgEdge.True),  // (c2,n2),
+                (10,17, CfgEdge.True),  // (n2,n9),
+                (11, 5, CfgEdge.True),  // (n3,c3),
+                ( 5, 3, CfgEdge.True),  // (c3,c1),
+                ( 5,17, CfgEdge.False), // (c3,!n9),
             });
 
         public static ControlFlowGraph NoMoreGotos3Reversed =>
@@ -331,32 +295,32 @@ else {
                 D("n8"), // 16
                 D("n9"), // 17
             }, new[] {
-                ( 1,  0, false), // (b1, !A),
-                ( 3,  0, true),  // (c1,  A),
-                ( 2,  1, true),  // (b2, b1),
-                (12,  1, false), // (n4,!b1),
-                (13, 12, true),  // (n5, n4),
-                (13,  2, false), // (n5,!b2),
-                (14,  2, true),  // (n6, b2),
-                (15, 14, true),  // (n7, n6),
-                (15, 13, true),  // (n7, n5),
-                ( 6, 15, true),  // (d1, n7),
-                ( 8,  6, true),  // (d3, d1),
-                ( 7,  6, false), // (d2,!d1),
-                (16,  8, true),  // (n8, d3),
-                (16,  7, true),  // (n8, d2),
-                ( 6, 16, true),  // (d1, n8),
-                (17,  8, false), // (n9,!d3),
-                (17,  7, false), // (n9,!d2),
-                ( 9,  3, true),  // (n1, c1),
-                ( 3,  9, true),  // (c1, n1),
-                ( 4,  3, false), // (c2,!c1),
-                (11,  4, false), // (n3,!c2),
-                (10,  4, true),  // (n2, c2),
-                (17, 10, true),  // (n9, n2),
-                ( 5, 11, true),  // (c3, n3),
-                ( 3,  5, true),  // (c1, c3),
-                (17,  5, false), // (n9,!c3),
+                ( 1,  0, CfgEdge.False), // (b1, !A),
+                ( 3,  0, CfgEdge.True),  // (c1,  A),
+                ( 2,  1, CfgEdge.True),  // (b2, b1),
+                (12,  1, CfgEdge.False), // (n4,!b1),
+                (13, 12, CfgEdge.True),  // (n5, n4),
+                (13,  2, CfgEdge.False), // (n5,!b2),
+                (14,  2, CfgEdge.True),  // (n6, b2),
+                (15, 14, CfgEdge.True),  // (n7, n6),
+                (15, 13, CfgEdge.True),  // (n7, n5),
+                ( 6, 15, CfgEdge.True),  // (d1, n7),
+                ( 8,  6, CfgEdge.True),  // (d3, d1),
+                ( 7,  6, CfgEdge.False), // (d2,!d1),
+                (16,  8, CfgEdge.True),  // (n8, d3),
+                (16,  7, CfgEdge.True),  // (n8, d2),
+                ( 6, 16, CfgEdge.True),  // (d1, n8),
+                (17,  8, CfgEdge.False), // (n9,!d3),
+                (17,  7, CfgEdge.False), // (n9,!d2),
+                ( 9,  3, CfgEdge.True),  // (n1, c1),
+                ( 3,  9, CfgEdge.True),  // (c1, n1),
+                ( 4,  3, CfgEdge.False), // (c2,!c1),
+                (11,  4, CfgEdge.False), // (n3,!c2),
+                (10,  4, CfgEdge.True),  // (n2, c2),
+                (17, 10, CfgEdge.True),  // (n9, n2),
+                ( 5, 11, CfgEdge.True),  // (c3, n3),
+                ( 3,  5, CfgEdge.True),  // (c1, c3),
+                (17,  5, CfgEdge.False), // (n9,!c3),
             });
 
         public static ControlFlowGraph NoMoreGotos3Region1 =>
@@ -370,16 +334,16 @@ else {
                 D("n3"), // 6
                 D("n9"), // 7
             }, new[] {
-                (0, 1, true),
-                (1, 2, false),
-                (1, 4, true),
-                (4, 1, true),
-                (2, 5, true),
-                (2, 6, false),
-                (3, 1, true),
-                (3, 7, false),
-                (5, 7, true),
-                (6, 3, true)
+                (0, 1, CfgEdge.True),
+                (1, 2, CfgEdge.False),
+                (1, 4, CfgEdge.True),
+                (4, 1, CfgEdge.True),
+                (2, 5, CfgEdge.True),
+                (2, 6, CfgEdge.False),
+                (3, 1, CfgEdge.True),
+                (3, 7, CfgEdge.False),
+                (5, 7, CfgEdge.True),
+                (6, 3, CfgEdge.True)
             });
 
         public static string NoMoreGotos3Region1Code =>
@@ -406,14 +370,14 @@ do {
                 D("n6"), // 5
                 D("n7"), // 6
             }, new[] {
-                (0, 1, true),
-                (1, 2, true),
-                (1, 3, false),
-                (2, 4, false),
-                (2, 5, true),
-                (3, 4, true),
-                (4, 6, true),
-                (5, 6, true)
+                (0, 1, CfgEdge.True),
+                (1, 2, CfgEdge.True),
+                (1, 3, CfgEdge.False),
+                (2, 4, CfgEdge.False),
+                (2, 5, CfgEdge.True),
+                (3, 4, CfgEdge.True),
+                (4, 6, CfgEdge.True),
+                (5, 6, CfgEdge.True)
             });
 
         public const string NoMoreGotos3Region2Code = @"A, if (b1) { if (b2) { n6 } else { goto L1 } } else { n4, L1:, n5 }, n7";
@@ -428,14 +392,14 @@ do {
                 D("n8"), // 4
                 D("n9"), // 5
             }, new[] {
-                (0, 1, true),
-                (1, 2, false),
-                (1, 3, true),
-                (2, 4, true),
-                (2, 5, false),
-                (3, 4, true),
-                (3, 5, false),
-                (4, 1, true),
+                (0, 1, CfgEdge.True),
+                (1, 2, CfgEdge.False),
+                (1, 3, CfgEdge.True),
+                (2, 4, CfgEdge.True),
+                (2, 5, CfgEdge.False),
+                (3, 4, CfgEdge.True),
+                (3, 5, CfgEdge.False),
+                (4, 1, CfgEdge.True),
             });
         public static string NoMoreGotos3Region3Code =>
 @"start
@@ -553,33 +517,14 @@ n9";
 |  | |   /  \    |
 |  | |  t    f   |
 |  | |  v    v   |
-|  \-\->9    14  |
+|  \-\->9    5   |
 |        \  /    |
 |         Y      |
 |         v      |
 |         4<-----/
 |         v
-\-------->5 */
-        public static ControlFlowGraph ZeroKSese => new(0, 14, BuildNodes(15), new[] {
-            (0, 1, true),
-            (1, 2, false),
-            (1, 3, true),
-            (2, 6, true),
-            (3, 4, true),
-            (4, 5, true),
-            (6, 5, true),
-            (6, 7, false),
-            (7, 8, true),
-            (8, 9, false),
-            (8, 10, true),
-            (9, 4, true),
-            (10, 11, true),
-            (11, 9, true),
-            (11, 12, false),
-            (12, 13, true),
-            (13, 14, false),
-            (13, 9, true)
-        });
+\-------->14 */
+        public static ControlFlowGraph ZeroKSese => ControlFlowGraph.FromString("[0,14,15,0+1 1-2 1+3 2+6 3+4 4+14 6+14 6-7 7+8 8-9 8+10 9+4 10+11 11+9 11-12 12+13 13-5 13+9 5+4]");
 
         /* 0 ______
            v/      \
@@ -595,14 +540,7 @@ n9";
         2
     }
 } while (3)";
-        public static ControlFlowGraph ContinueBranch => new(0, 4, BuildNodes(5), new[] {
-            (0, 1, true),
-            (1, 2, true),
-            (2, 1, true),
-            (1, 3, false),
-            (3, 1, true),
-            (3, 4, false)
-        });
+        public static ControlFlowGraph ContinueBranch => ControlFlowGraph.FromString("[0,4,5,0+1 1+2 2+1 1-3 3+1 3-4]");
 
         /* 0
            v
@@ -633,11 +571,7 @@ n9";
         5
     }
 }";
-        public static ControlFlowGraph DiamondSese => new(0, 7, BuildNodes(8), new[]
-        {
-            (0, 1, true), (1, 2, true), (1, 3, false), (2, 4, true), (2, 5, false),
-            (3, 5, false), (3, 6, true), (4, 7, true), (5, 7, true), (6, 7, true),
-        });
+        public static ControlFlowGraph DiamondSese => ControlFlowGraph.FromString("[0,7,8,0+1 1+2 1-3 2+4 2-5 3-5 3+6 4+7 5+7 6+7]");
 
         /*
         1
@@ -652,11 +586,7 @@ n9";
         |    |
         7 <--/ */
         public const string SeseExample1Code = "1, if (2) { if (3) { goto L1 } else { if (4) { 5 } else { L1:, 6 } } } else { goto L1 }, 7";
-        public static ControlFlowGraph SeseExample1 => new(0, 8, BuildNodes(9), new[]
-        {
-            (0,1,true), (1,2,true), (2,3,true), (3,4,false), (4,5,true), (5,7,true),
-            (2,6,false), (3,6,true), (4,6,false), (6,7,true), (7,8,true)
-        });
+        public static ControlFlowGraph SeseExample1 => ControlFlowGraph.FromString("[0,8,9,0+1 1+2 2+3 3-4 4+5 5+7 2-6 3+6 4-6 6+7 7+8]");
 
         /*  0
             v
@@ -676,13 +606,7 @@ n9";
             |                 |
             \------>13 <------/ */
         public const string MultiBreakCode = "";
-        public static ControlFlowGraph MultiBreak => new(0, 13, BuildNodes(14), new[]
-        {
-            (0,1,true), (1,2,true), (1,3,false), (3,4,true), (4,5,true), 
-            (5,6,true), (7,8,true), (9,10,true), (11,12,true),
-            (5,7,false), (7,9,false), (9,11,false), (11,5,false),
-            (2,13, true), (3,13,false), (6,13, false), (8,13, false), (10,13, false), (12,13, false),
-        });
+        public static ControlFlowGraph MultiBreak => ControlFlowGraph.FromString("[0,13,14,0+1 1+2 1-3 3+4 4+5 5+6 7+8 9+10 11+12 5-7 7-9 9-11 11-5 2+13 3-13 6-13 8-13 10-13 12-13]");
 
         /* 0
            v
@@ -696,10 +620,6 @@ n9";
     |      |
     \----> 7 */
         public const string MidBreakLoopCode = "";
-        public static ControlFlowGraph MidBreakLoop => new(0, 7, BuildNodes(8), new[]
-        {
-            (0,1,true), (1,2,false), (2,7,true), (1,3,true), (3,4,true),
-            (4,6,true), (6,7,true), (4,5,false), (5,3,true)
-        });
+        public static ControlFlowGraph MidBreakLoop => ControlFlowGraph.FromString("[0,7,8,0+1 1-2 2+7 1+3 3+4 4+6 6+7 4-5 5+3]");
     }
 }

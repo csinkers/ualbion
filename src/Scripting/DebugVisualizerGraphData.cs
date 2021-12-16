@@ -39,7 +39,13 @@ namespace UAlbion.Scripting
                         start.ToString(CultureInfo.InvariantCulture),
                         end.ToString(CultureInfo.InvariantCulture))
                 {
-                    Label = label ? null : "f"
+                    Label = label switch
+                    {
+                        CfgEdge.True => null,
+                        CfgEdge.False => "f",
+                        CfgEdge.DisjointGraphFixup => "d",
+                        _ => "?"
+                    }
                 });
             }
 

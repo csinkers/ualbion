@@ -516,7 +516,7 @@ namespace UAlbion.Base.Tests
                 catch (ControlFlowGraphException ex)
                 {
                     steps.Add((ex.Message, ex.Graph));
-                    errors[index] += $"[{index}: {ex.Message}] ";
+                    errors[index] += $"[{index}: {ex.Message}] {ex.Graph.Defragment()} ";
                 }
                 catch (Exception ex)
                 {

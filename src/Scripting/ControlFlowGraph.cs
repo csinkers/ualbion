@@ -380,17 +380,27 @@ namespace UAlbion.Scripting
                 return this;
 
             int[] mapping = new int[Nodes.Count];
-            int index = 0;
+            Array.Fill(mapping, -1);
+            mapping[EntryIndex] = 0;
+
+            int index = 1;
+            for (int i = 0; i < Nodes.Count; i++)
+                if (Nodes[i] != null && i != EntryIndex && i != ExitIndex)
+                    mapping[i] = index++;
+
+            mapping[ExitIndex] = index++;
+
+            var nodes = new ICfgNode[index];
             for (int i = 0; i < Nodes.Count; i++)
                 if (Nodes[i] != null)
-                    mapping[i] = index++;
+                    nodes[mapping[i]] = Nodes[i];
 
             var edges =
                 from start in _edgesByStart
                 from end in start.Value
                 select (mapping[start.Key], mapping[end], GetEdgeLabel(start.Key, end));
 
-            return new ControlFlowGraph(mapping[EntryIndex], mapping[ExitIndex], Nodes.Where(x => x != null), edges);
+            return new ControlFlowGraph(mapping[EntryIndex], mapping[ExitIndex], nodes, edges);
         }
 
         public ControlFlowGraph RemoveEdge(int start, int end)
@@ -529,6 +539,19 @@ namespace UAlbion.Scripting
                 if (Nodes[i] == null || !Children(i).IsEmpty) continue;
                 yield return i;
             }
+        }
+
+        public int GetFirstEmptyExitNode()
+        {
+            int exitNode = -1;
+            foreach (var candidate in GetExitNodes())
+                if (Nodes[candidate] is EmptyNode)
+                    exitNode = candidate;
+
+            if (exitNode == -1)
+                throw new ControlFlowGraphException("Could not find an empty exit node", this);
+
+            return exitNode;
         }
 
         public ImmutableArray<(int, int)> GetBackEdges()
@@ -695,6 +718,8 @@ namespace UAlbion.Scripting
         public void ExportToDot(StringBuilder sb, bool showContent = true, int dpi = 180)
         {
             if (sb == null) throw new ArgumentNullException(nameof(sb));
+            sb.Append("# ");
+            sb.AppendLine(ToString());
             sb.AppendLine("digraph G {");
             sb.AppendLine($"    graph [ dpi = {dpi} ];");
 
@@ -733,13 +758,11 @@ namespace UAlbion.Scripting
                     switch (GetEdgeLabel(start, end))
                     {
                         case CfgEdge.True:
-                            if (OutDegree(start) > 1)
-                                sb.Append(" [color=green4];");
-                            else sb.Append(" [];");
+                            sb.AppendLine(OutDegree(start) > 1 ? " [color=green4];" : " [];");
                             break;
-                        case CfgEdge.False: sb.Append(" [color=red3];"); break;
-                        case CfgEdge.DisjointGraphFixup: sb.Append(" [color=purple]"); break;
-                        default: sb.Append(" [];"); break;
+                        case CfgEdge.False: sb.AppendLine(" [color=red3];"); break;
+                        case CfgEdge.DisjointGraphFixup: sb.AppendLine(" [color=purple]"); break;
+                        default: sb.AppendLine(" [];"); break;
                     }
                 }
             }
@@ -799,9 +822,9 @@ namespace UAlbion.Scripting
             return mapping;
         }
 
-        public bool[] GetReachability(int start, out int reachableCount)
+        public (bool[] reachability, int reachableCount) GetReachability(int start)
         {
-            reachableCount = 0;
+            int reachableCount = 0;
             var visited = new bool[NodeCount];
             var stack = new Stack<int>();
 
@@ -817,7 +840,7 @@ namespace UAlbion.Scripting
                     stack.Push(child);
             }
 
-            return visited;
+            return (visited, reachableCount);
         }
 
         public List<List<int>> GetStronglyConnectedComponents()

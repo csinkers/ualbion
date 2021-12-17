@@ -6,14 +6,15 @@ namespace UAlbion.Scripting
     {
         public LoopPart Header { get; }
         public ImmutableList<LoopPart> Body { get; }
-        public bool IsMultiExit { get; }
+        public ImmutableList<int> Exits { get; }
+        public bool IsMultiExit => Exits.Count > 1;
         public int? MainExit { get; }
 
-        public CfgLoop(LoopPart header, ImmutableList<LoopPart> body, bool isMultiExit, int? mainExit)
+        public CfgLoop(LoopPart header, ImmutableList<LoopPart> body, ImmutableList<int> exits, int? mainExit)
         {
             Header = header;
             Body = body;
-            IsMultiExit = isMultiExit;
+            Exits = exits;
             MainExit = mainExit;
         }
     }

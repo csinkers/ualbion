@@ -4,6 +4,7 @@
     {
         True,
         False,
-        DisjointGraphFixup
+        DisjointGraphFixup,
+        LoopSuccessor
     }
 }

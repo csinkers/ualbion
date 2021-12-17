@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Scripting.Ast;
 
@@ -53,17 +54,17 @@ namespace UAlbion.Scripting.Rules
                         if (updated != graph)
                             return (updated, "Reduce while loop");
                     }
-                    else if (loop.Body.All(x => !x.Break)) // Infinite while loop
-                    {
-                        var updated = ReduceInfiniteWhileLoop(graph, index, tail);
-                        if (updated != graph)
-                            return (updated, "Reduce infinite while loop");
-                    }
-                    else
+                    else if (loop.Body[0].Break)
                     {
                         var updated = ReduceDoLoop(graph, index, tail);
                         if (updated != graph)
                             return (updated, "Reduce do loop");
+                    }
+                    else
+                    {
+                        var updated = ReduceGenericLoop(graph, index, tail);
+                        if (updated != graph)
+                            return (updated, "Reduce generic loop");
                     }
                 }
             }
@@ -88,9 +89,11 @@ namespace UAlbion.Scripting.Rules
                 case 1:
                 {
                     var seq = Emit.Seq(graph.Nodes[part.Index], Emit.Continue());
+                    var tailIndex = loop.Body.First(x => x.Tail).Index;
                     return graph
                         .ReplaceNode(part.Index, seq)
-                        .RemoveEdge(part.Index, loop.Header.Index);
+                        .RemoveEdge(part.Index, loop.Header.Index)
+                        .AddEdge(part.Index, tailIndex, CfgEdge.True);
                 }
 
                 case 2:
@@ -127,6 +130,16 @@ namespace UAlbion.Scripting.Rules
             bool isfirstChildInLoop = loop.Body.Any(x => x.Index == children[0]) || children[0] == loop.Header.Index;
             var exitTarget = isfirstChildInLoop ? children[1] : children[0];
 
+            // Add LoopSuccessor edge if this is the last link to the MainExit.
+            var remainingLoopChildren = loop.Body
+                .Where(x => x.Index != part.Index)
+                .Aggregate(
+                    (IEnumerable<int>)graph.Children(loop.Header.Index),
+                    (current, x) => current.Union(graph.Children(x.Index)));
+
+            if (loop.MainExit.HasValue && !remainingLoopChildren.Contains(loop.MainExit.Value))
+                graph = graph.AddEdge(loop.Header.Index, loop.MainExit.Value, CfgEdge.LoopSuccessor);
+
             if (exitTarget != loop.MainExit)
             {
                 var targetChildren = graph.Children(exitTarget);
@@ -160,25 +173,12 @@ namespace UAlbion.Scripting.Rules
                 .RemoveEdge(index, target);
         }
 
-        static ControlFlowGraph ReduceInfiniteWhileLoop(ControlFlowGraph graph, int head, int tail)
+        static ControlFlowGraph ReduceGenericLoop(ControlFlowGraph graph, int head, int tail)
         {
-            var exitNode = graph.GetFirstEmptyExitNode();
-            var label = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
-            var subgraph = new ControlFlowGraph(new[]
-                {
-                    Emit.Empty(), // 0
-                    Emit.Label(label), // 1
-                    graph.Nodes[head], // 2
-                    graph.Nodes[tail], // 3
-                    Emit.Goto(label), // 4
-                    Emit.Empty(), // 5
-                },
-                new[] { (0, 1, CfgEdge.True), (1, 2, CfgEdge.True), (2, 3, CfgEdge.True), (3, 4, CfgEdge.True), (4, 5, CfgEdge.True), });
-
+            var loopNode = Emit.Loop(Emit.Seq(graph.Nodes[head], graph.Nodes[tail]));
             return graph
                 .RemoveNode(tail)
-                .AddEdge(head, exitNode, CfgEdge.True)
-                .ReplaceNode(head, subgraph);
+                .ReplaceNode(head, loopNode);
         }
 
         static ControlFlowGraph ReduceWhileLoop(ControlFlowGraph graph, int head, int tail, bool negated)

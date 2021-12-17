@@ -4,18 +4,19 @@
   <Reference Relative="..\..\build\UAlbion.Scripting\bin\Debug\net5.0\UAlbion.Scripting.dll">C:\Depot\bb\ualbion\build\UAlbion.Scripting\bin\Debug\net5.0\UAlbion.Scripting.dll</Reference>
   <Namespace>UAlbion.Scripting</Namespace>
   <Namespace>UAlbion.Scripting.Ast</Namespace>
+  <Namespace>System.Runtime.CompilerServices</Namespace>
 </Query>
 
 void Main()
 {
-	DumpSteps(TestGraphs.LoopEdgeCaseMap305Reduced, 1);
+	DumpSteps(TestGraphs.MultiBreakMap201, 20);
 }
 
 static void DumpSteps(string graph, int count) => DumpSteps(ControlFlowGraph.FromString(graph), count);
-static void DumpSteps(ControlFlowGraph graph, int count)
+static void DumpSteps(ControlFlowGraph graph, int count, [CallerArgumentExpression("graph")] string graphExpression = null)
 {
-	var steps = new List<(string, ControlFlowGraph)>();
-	steps.Add(("Initial", graph));
+	var steps = new List<(string, IGraph)>();
+	steps.Add(($"Initialise {graphExpression}", graph));
 	int i = 1;
 	try
 	{
@@ -32,14 +33,15 @@ static void DumpSteps(ControlFlowGraph graph, int count)
 			};
 
 			graph = Decompiler.SimplifyOnce(graph, recordFunc);
-			steps.Add((description, graph));
-			if (graph.ActiveNodeCount == 1)
+			if (description == "Nothing")
 				break;
+
+			steps.Add((description, graph));
 		}
 	}
 	catch (ControlFlowGraphException e) { steps.Add((e.Message, e.Graph)); }
 
-	steps.Select(x => DumpGraph(x.Item2, x.Item1)).Dump();
+	steps.Select(x => DumpGraph((ControlFlowGraph)x.Item2, x.Item1)).Dump();
 }
 static T NullOnError<T>(Func<T> func)
 {
@@ -56,7 +58,8 @@ static object DumpGraph(ControlFlowGraph graph, string description) => new
 	{
 		Description = description,
 		Graph = new GraphDumper(() => graph.ExportToDot(true, 120)),
-		AsString = graph?.Defragment(true)?.ToString()
+		AsString = graph?.Defragment(true)?.ToString(),
+		Code = graph == null ? null : GetCode(graph)
 	},
 	Info = new
 	{
@@ -86,6 +89,13 @@ static object DumpGraph(ControlFlowGraph graph, string description) => new
 		}).Where(x => x.Entry != graph.EntryIndex || x.Exit != graph.ExitIndex)),
 	}
 };
+
+static string GetCode(ControlFlowGraph graph)
+{
+	var visitor = new FormatScriptVisitor { WrapStatements = false, PrettyPrint = true };
+	graph.Accept(visitor);
+	return visitor.Code;
+}
 
 class GraphDumper
 {

@@ -18,6 +18,9 @@ namespace UAlbion.Scripting
             ReduceIfThenElse.Decompile,
             ReduceSeseRegions.Decompile,
             ReduceLoops.Decompile,
+            x => (x.Defragment(), "Defragment"),
+            x => (CfgRelabeller.Relabel(x, ScriptConstants.DummyLabelPrefix), "Relabel"),
+            x => (x.AcceptBuilder(new EmptyNodeRemovalVisitor()), "Remove empty nodes")
         };
 
         public static List<ICfgNode> Decompile<T>(
@@ -73,12 +76,9 @@ namespace UAlbion.Scripting
                 graph = SimplifyOnce(graph, record, rules);
             }
 
-            graph = record("Defragment", graph.Defragment());
-            if (graph.ActiveNodeCount != 1)
-                throw new ControlFlowGraphException("Could not reduce graph to an AST", graph);
+            if (graph.ActiveNodeCount > 1)
+                throw new ControlFlowGraphException("Could not structure graph", graph);
 
-            graph = record("Relabel", CfgRelabeller.Relabel(graph, ScriptConstants.DummyLabelPrefix));
-            graph = record("Remove empty nodes", graph.AcceptBuilder(new EmptyNodeRemovalVisitor()));
             return graph.Entry;
         }
 
@@ -171,8 +171,8 @@ namespace UAlbion.Scripting
             if (chains != null)
             {
                 int index = 0;
-                foreach (var chain in chains)
-                    Visit(chain, $"Chain{index++}");
+                foreach (var chainHead in chains)
+                    Visit(chainHead, $"Chain{index++}");
             }
 
             if (additionalEntryPoints != null)

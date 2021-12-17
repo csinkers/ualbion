@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UAlbion.Api;
 using UAlbion.Scripting.Ast;
 using UAlbion.Scripting.Rules;
@@ -25,7 +24,7 @@ namespace UAlbion.Scripting
             IList<T> nodes,
             IEnumerable<ushort> chains,
             IEnumerable<ushort> additionalEntryPoints,
-            List<(string, ControlFlowGraph)> steps = null,
+            List<(string, IGraph)> steps = null,
             IList<ControlFlowRuleDelegate> rules = null) where T : IEventNode
         {
             rules ??= DefaultRules;
@@ -184,49 +183,6 @@ namespace UAlbion.Scripting
                 results[i] = results[i].Defragment();
 
             return results;
-        }
-
-        static bool DominatesAll(DominatorTree tree, int dominator, IEnumerable<int> indices)
-        {
-            foreach (var index in indices)
-                if (!tree.Dominates(dominator, index))
-                    return false;
-            return true;
-        }
-
-        static ControlFlowGraph _ReduceLoops(ControlFlowGraph graph, RecordFunc record)
-        {
-            var loops = graph.GetLoops();
-            foreach (var loop in loops.OrderBy(x => x.Body.Count))
-            {
-                // Find pre-dominator
-                var dom = graph.GetDominatorTree();
-                if (!DominatesAll(dom, loop.Header.Index, loop.Body.Select(x => x.Index)))
-                    continue;
-
-                // Find post-dominator
-                var postdom = graph.GetPostDominatorTree();
-                var loopExit = postdom.ImmediateDominator(loop.Header.Index);
-                if (!loopExit.HasValue || !DominatesAll(postdom, loopExit.Value, loop.Body.Select(x => x.Index)))
-                    continue;
-
-/*
-                // Isolate edges to post-dominator via an empty node (if necessary)
-                HashSet<int> region = new();
-                graph.GetRegionParts(region, loop.Header.Index, loopExit.Value);
-                region.Add(loopExit.Value);
-
-                // Cut out loop and hand off to loop simplifier.
-                var cut = graph.Cut(region, loop.Header.Index, loopExit.Value);
-                var simplified = LoopSimplifier.SimplifyLoop(cut.Cut, record);
-                if (simplified == null || simplified == cut.Cut)
-                    continue;
-
-                return cut.Merge(simplified);
-*/
-            }
-
-            return graph;
         }
     }
 }

@@ -617,9 +617,7 @@ do {
         public const string MidBreakLoopCode = "TODO";
         public static ControlFlowGraph MidBreakLoop => ControlFlowGraph.FromString("[0,7,8,0+1 1-2 2+7 1+3 3+4 4+6 6+7 4-5 5+3]");
 
-
         public const string MultiBreakMap166Code = "TODO";
-
         public static ControlFlowGraph MultiBreakMap166 => ControlFlowGraph.FromString(
             "[0,25,26,0+1 1+2 1-3 2+25 3+4 3-25 4+5 5+6 5-7 6+25 7+8 7-9 8+25 9+10 9-11 " +
             "10+25 11+12 11-13 12+25 13+14 13-15 14+25 15+16 15-17 16+25 17+18 17-19 " +
@@ -650,5 +648,16 @@ do {
 
         public const string LoopEdgeCaseMap313Code = "do { 1, if (2) { break } } while (3)";
         public static ControlFlowGraph LoopEdgeCaseMap313 => ControlFlowGraph.FromString("[0,4,5,0+1 1+2 2+4 2-3 3+1]");
+
+        /* 0
+           |
+        /->1-f-\
+        |  |   |
+        f  2   |
+        |  |   |
+        \--3-t\|
+               4 */
+        public const string LoopBreaksBothEndsCode = "while (1) { 2, if (3) { break } }";
+        public static ControlFlowGraph LoopBreaksBothEnds = ControlFlowGraph.FromString("[0,4,5,0+1 1+2 2+3 3-1 1-4 3+4]");
     }
 }

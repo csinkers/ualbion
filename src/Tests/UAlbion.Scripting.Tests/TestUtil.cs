@@ -37,7 +37,7 @@ namespace UAlbion.Scripting.Tests
 
         public static void VerifyCfgVsScript(
             ControlFlowGraph graph,
-            List<(string, ControlFlowGraph)> steps,
+            List<(string, IGraph)> steps,
             string expected,
             string resultsDir,
             [CallerMemberName] string method = null)
@@ -172,7 +172,7 @@ namespace UAlbion.Scripting.Tests
             return (nodes, edges);
         }
 
-        public static void DumpSteps(List<(string, ControlFlowGraph)> steps, string resultsDir, [CallerMemberName] string method = null)
+        public static void DumpSteps(List<(string, IGraph)> steps, string resultsDir, [CallerMemberName] string method = null)
         {
             if (steps == null)
                 return;

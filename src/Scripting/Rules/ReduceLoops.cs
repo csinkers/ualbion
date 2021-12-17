@@ -20,19 +20,22 @@ namespace UAlbion.Scripting.Rules
                         continue;
                     }
 
-                    foreach (var part in loop.Body)
+                    if (loop.Header.Index != index) // Handle non-header exits and back edges
                     {
-                        // Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("part", part.Index).ToString(); // For VS Code debug visualisation
-                        if (part.Index != index)
-                            continue;
+                        foreach (var part in loop.Body)
+                        {
+                            // Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("part", part.Index).ToString(); // For VS Code debug visualisation
+                            if (part.Index != index)
+                                continue;
 
-                        var updated = ReduceContinue(part, graph, index, loop);
-                        if (updated != graph)
-                            return (updated, "Reduce continue");
+                            var updated = ReduceContinue(graph, loop, part);
+                            if (updated != graph)
+                                return (updated, "Reduce continue");
 
-                        updated = ReduceBreak(part, graph, index, loop);
-                        if (updated != graph)
-                            return (updated, "Reduce break");
+                            updated = ReduceBreak(graph, loop, part);
+                            if (updated != graph)
+                                return (updated, "Reduce break");
+                        }
                     }
 
                     if (loop.Header.Index != index
@@ -67,61 +70,80 @@ namespace UAlbion.Scripting.Rules
             return (graph, null);
         }
 
-        static ControlFlowGraph ReduceContinue(LoopPart part, ControlFlowGraph graph, int index, CfgLoop loop)
+        static ControlFlowGraph ReduceContinue(ControlFlowGraph graph, CfgLoop loop, LoopPart part)
         {
             // Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("part", part.Index).ToString(); // For VS Code debug visualisation
+
+            // Outside entry = non-structured code, so give up
+            // Tail = the tail of a loop always continues by default, don't need a statement - the top-level loop reduction will handle it.
+            // Header = continuing header should be handled by simple loop rule
+            // !Continue = if it's not a jump back to the header, it's not a continue
+            // Break = shouldn't be both a continue and a break
             if (part.OutsideEntry || part.Tail || part.Header || !part.Continue || part.Break)
                 return graph;
 
-            var children = graph.Children(index);
-            var continueNode = Emit.Continue();
-            if (children.Length == 1)
+            var children = graph.Children(part.Index);
+            switch (children.Length)
             {
-                var seq = Emit.Seq(graph.Nodes[index], continueNode);
-                return graph
-                    .ReplaceNode(index, seq)
-                    .RemoveEdge(index, loop.Header.Index);
+                case 1:
+                {
+                    var seq = Emit.Seq(graph.Nodes[part.Index], Emit.Continue());
+                    return graph
+                        .ReplaceNode(part.Index, seq)
+                        .RemoveEdge(part.Index, loop.Header.Index);
+                }
+
+                case 2:
+                    return ReplaceLoopBranch(graph, part.Index, loop.Header.Index, Emit.Continue());
+
+                default:
+                    throw new ControlFlowGraphException($"Continue at {part.Index} has unexpected child count ({children.Length})", graph);
             }
-
-            if (children.Length == 2)
-                return ReplaceLoopBranch(graph, index, loop.Header.Index, continueNode);
-
-            throw new ControlFlowGraphException($"Continue at {index} has unexpected child count ({children.Length})", graph);
         }
 
-        static ControlFlowGraph ReduceBreak(LoopPart part, ControlFlowGraph graph, int index, CfgLoop loop)
+        static ControlFlowGraph ReduceBreak(ControlFlowGraph graph, CfgLoop loop, LoopPart part)
         {
-            // Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("part", part.Index).ToString(); // For VS Code debug visualisation
-            if (part.OutsideEntry || part.Tail || part.Header || part.Continue || !part.Break)
+            // Func<string> vis = () => graph.ToVis().AddPointer("part", part.Index).ToString(); // For VS Code debug visualisation
+
+            // Break = needs to exit the loop to be a break
+            if (!part.Break)
                 return graph;
 
-            var children = graph.Children(index);
+            // Outside entry = non-structured code, so give up
+            if (part.OutsideEntry)
+                return graph;
 
-            var breakNode = Emit.Break();
+            if (part.Header) // Header-breaks will be structured into a while loop
+                return graph;
+
+            if (part.Tail && !loop.Header.Break) // Tail-breaks will be structured into a do loop as long as the header isn't also a break (while loop is preferred)
+                return graph;
+
+            var children = graph.Children(part.Index);
+             
             if (children.Length != 2)
-                throw new ControlFlowGraphException($"Break at {index} has unexpected child count ({children.Length})", graph);
+                throw new ControlFlowGraphException($"Break at {part.Index} has unexpected child count ({children.Length})", graph);
 
-            bool isfirstChildInLoop = loop.Body.Any(x => x.Index == children[0]);
-            var target = isfirstChildInLoop ? children[1] : children[0];
+            bool isfirstChildInLoop = loop.Body.Any(x => x.Index == children[0]) || children[0] == loop.Header.Index;
+            var exitTarget = isfirstChildInLoop ? children[1] : children[0];
 
-            if (target != loop.MainExit)
+            if (exitTarget != loop.MainExit)
             {
-                var targetChildren = graph.Children(target);
+                var targetChildren = graph.Children(exitTarget);
                 if (targetChildren.Length != 1 || targetChildren[0] != loop.MainExit)
                     return graph;
 
-                var condition = graph.Nodes[index];
-                if (graph.GetEdgeLabel(index, target) == CfgEdge.False)
+                var condition = graph.Nodes[part.Index];
+                if (graph.GetEdgeLabel(part.Index, exitTarget) == CfgEdge.False)
                     condition = Emit.Negation(condition);
 
-                var newBlock = Emit.Seq(graph.Nodes[target], Emit.Break());
-                var ifNode = Emit.If(condition, newBlock);
+                var ifNode = Emit.If(condition, Emit.Seq(graph.Nodes[exitTarget], Emit.Break()));
                 return graph
-                    .RemoveNode(target)
-                    .ReplaceNode(index, ifNode);
+                    .RemoveNode(exitTarget)
+                    .ReplaceNode(part.Index, ifNode);
             }
 
-            return ReplaceLoopBranch(graph, index, target, breakNode);
+            return ReplaceLoopBranch(graph, part.Index, exitTarget, Emit.Break());
         }
 
         static ControlFlowGraph ReplaceLoopBranch(ControlFlowGraph graph, int index, int target, ICfgNode newNode)

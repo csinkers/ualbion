@@ -10,7 +10,7 @@
                 return (graph, null);
 
             var acyclic = graph.RemoveBackEdges();
-            var distances = acyclic.GetLongestPaths();
+            var distances = acyclic.GetLongestPaths(acyclic.EntryIndex);
             int longestDistance = 0;
             int winner = -1;
 

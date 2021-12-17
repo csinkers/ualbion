@@ -7,7 +7,7 @@ namespace UAlbion.Scripting
 {
     public static class ScriptCompiler
     {
-        public static EventLayout Compile(string source, List<(string, ControlFlowGraph)> steps = null)
+        public static EventLayout Compile(string source, List<(string, IGraph)> steps = null)
         {
             RecordFunc record;
             if (steps != null)

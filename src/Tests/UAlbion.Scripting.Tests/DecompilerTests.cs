@@ -13,7 +13,7 @@ namespace UAlbion.Scripting.Tests
         static void TestSimplify(ControlFlowGraph graph, string expected, [CallerMemberName] string method = null)
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
-            var steps = new List<(string, ControlFlowGraph)> { ("Initial", graph) };
+            var steps = new List<(string, IGraph)> { ("Initial", graph) };
             var resultsDir = !string.IsNullOrEmpty(method) ? Path.Combine(ResultsDir, method) : ResultsDir;
 
             try
@@ -197,6 +197,7 @@ namespace UAlbion.Scripting.Tests
 
         [Fact] public void BreakBranchTest() => TestSimplify(TestGraphs.BreakBranch, TestGraphs.BreakBranchCode);
         [Fact] public void BreakBranch2Test() => TestSimplify(TestGraphs.BreakBranch2, TestGraphs.BreakBranch2Code);
+        [Fact] public void LoopBreaksBothEnds() => TestSimplify(TestGraphs.LoopBreaksBothEnds, TestGraphs.LoopBreaksBothEndsCode);
 
         /*
         [Fact] public void MultiBreakTest() => TestSimplify(TestGraphs.MultiBreak, TestGraphs.MultiBreakCode);

@@ -55,7 +55,7 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
 0000 7100 0400 0000 0026 0000 0000 ffff
 ";
 
-        static void Verify(ICfgNode tree, List<(string, ControlFlowGraph)> steps, string expected, [CallerMemberName] string method = null)
+        static void Verify(ICfgNode tree, List<(string, IGraph)> steps, string expected, [CallerMemberName] string method = null)
         {
             var visitor = new FormatScriptVisitor();
             tree.Accept(visitor);
@@ -64,7 +64,7 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
             Assert.Equal(expected, visitor.Code);
         }
 
-        static void DumpSteps(List<(string, ControlFlowGraph)> steps, string method)
+        static void DumpSteps(List<(string, IGraph)> steps, string method)
         {
             if (steps == null)
                 return;
@@ -95,7 +95,7 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
         static void TestDecompile(string script, string expected, [CallerMemberName] string method = null)
         {
             var events = MapEvent.ParseRawEvents(script);
-            var steps = new List<(string, ControlFlowGraph)>();
+            var steps = new List<(string, IGraph)>();
             try
             {
                 var result = Decompiler.Decompile(

@@ -41,7 +41,7 @@ namespace UAlbion.Formats
             IEnumerable<ushort> additionalEntryPoints,
             int indent) where T : IEventNode
         {
-            List<(string, ControlFlowGraph)> steps = new();
+            List<(string, IGraph)> steps = new();
             try
             {
                 var trees = Decompiler.Decompile(events, chains, additionalEntryPoints, steps);

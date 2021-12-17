@@ -7,8 +7,8 @@ namespace UAlbion.Scripting
     {
         public static ControlFlowGraph Reduce(ControlFlowGraph cut)
         {
-            var minDepth = cut.GetShortestPaths();
-            var maxDepth = cut.GetLongestPaths();
+            var minDepth = cut.GetShortestPaths(cut.EntryIndex);
+            var maxDepth = cut.GetLongestPaths(cut.EntryIndex);
             var exitNode = cut.GetExitNode();
 
             int maxDelta = 0;

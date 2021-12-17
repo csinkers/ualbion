@@ -489,13 +489,13 @@ namespace UAlbion.Base.Tests
             var graphs = Decompiler.BuildEventRegions(events, chains, entryPoints);
             var scripts = new string[graphs.Count];
             var errors = new string[graphs.Count];
-            var allSteps = new List<List<(string, ControlFlowGraph)>>();
+            var allSteps = new List<List<(string, IGraph)>>();
             int successCount = 0;
 
             for (var index = 0; index < graphs.Count; index++)
             {
                 errors[index] = "";
-                var steps = new List<(string, ControlFlowGraph)>();
+                var steps = new List<(string, IGraph)>();
                 allSteps.Add(steps);
                 var graph = graphs[index];
                 try
@@ -540,7 +540,7 @@ namespace UAlbion.Base.Tests
             }
         }
 
-        static ICfgNode Decompile(ControlFlowGraph graph, List<(string, ControlFlowGraph)> steps)
+        static ICfgNode Decompile(ControlFlowGraph graph, List<(string, IGraph)> steps)
         {
             ControlFlowGraph Record(string description, ControlFlowGraph g)
             {

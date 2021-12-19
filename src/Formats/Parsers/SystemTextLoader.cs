@@ -22,7 +22,7 @@ namespace UAlbion.Formats.Parsers
             var results = new IntStringDictionary();
             var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
             var data = FormatUtil.BytesTo850String(bytes);
-            foreach (var line in FormatUtil.SplitLines(data))
+            foreach (var line in ApiUtil.SplitLines(data))
             {
                 var m = Regex.Match(line);
                 if (!m.Success)

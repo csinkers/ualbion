@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -92,17 +90,6 @@ namespace UAlbion.Formats.MapEvents
             else
                 s.Assert(s.Offset - initialPosition == 10, "Non-query map events should always be 10 bytes");
             return e;
-        }
-
-        public static List<EventNode> ParseRawEvents(string script)
-        {
-            if (string.IsNullOrWhiteSpace(script))
-                return null;
-            var lines = FormatUtil.SplitLines(script);
-            var events = lines.Select(EventNode.Parse).ToList();
-            foreach (var e in events)
-                e.Unswizzle(events);
-            return events;
         }
 
 /* ==  Binary Serialisable Event types: ==

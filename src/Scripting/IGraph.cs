@@ -20,9 +20,10 @@ namespace UAlbion.Scripting
         IGraph Reverse();
     }
 
-    public interface IGraph<out TNode, out TLabel> : IGraph
+    public interface IGraph<out TNode, TLabel> : IGraph
     {
         TNode GetNode(int i);
         TLabel GetEdgeLabel(int start, int end);
+        IEnumerable<(int start, int end, TLabel label)> LabelledEdges { get; }
     }
 }

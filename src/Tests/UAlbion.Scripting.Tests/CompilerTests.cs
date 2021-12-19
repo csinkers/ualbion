@@ -38,5 +38,6 @@ namespace UAlbion.Scripting.Tests
             TestUtil.VerifyNodesVsScript(result, expected);
         }
         */
+        // TODO: Test sequence, if, if-else, do, while, loop, break, continue, goto and labels.
     }
 }

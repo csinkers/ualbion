@@ -4,7 +4,7 @@ using UAlbion.Core.Veldrid;
 
 namespace UAlbion.ShaderWriter
 {
-    class Program
+    static class Program
     {
         const string AutoGenMessage = "This file was auto-generated using VeldridGen. It should not be edited by hand.";
         static int Main(string[] args)

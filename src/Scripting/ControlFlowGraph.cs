@@ -134,7 +134,6 @@ namespace UAlbion.Scripting
             var starts = EmptyEdges.ToBuilder();
             var ends = EmptyEdges.ToBuilder();
             var labels = ImmutableDictionary<(int, int), CfgEdge>.Empty.ToBuilder();
-            string error = null;
 
             foreach (var edge in edges)
             {
@@ -147,10 +146,7 @@ namespace UAlbion.Scripting
                     startsForEnd = ImmutableArray<int>.Empty;
 
                 if (endsForStart.Contains(edge.end))
-                {
-                    error = $"Tried to add the edge ({edge.start}, {edge.end}) twice";
-                    break;
-                }
+                    throw new ControlFlowGraphException($"Tried to add the edge ({edge.start}, {edge.end}) twice", this);
 
                 starts[edge.start] = endsForStart.Add(edge.end);
                 ends[edge.end] = startsForEnd.Add(edge.start);
@@ -172,18 +168,13 @@ namespace UAlbion.Scripting
             _deletedNodes = ImmutableStack.CreateRange(deleted);
             _deletedNodeCount = deleted.Count;
 
-            if (error != null)
-                throw new ControlFlowGraphException(error, this);
-
             if (_edgesByEnd.TryGetValue(entryIndex, out _))
-                error = $"Entry index {entryIndex} given, but it does not have 0 indegree";
+                throw new ControlFlowGraphException($"Entry index {entryIndex} given, but it does not have 0 indegree", this);
+
 #if DEBUG
             //if (GetEntryNode() != headIndex)
-            //    error = $"Entry index {headIndex} given, but it is not the unique entry node";
+            //    throw new ControlFlowGraphException($"Entry index {headIndex} given, but it is not the unique entry node", this);
 #endif
-
-            if (error != null)
-                throw new ControlFlowGraphException(error, this);
         }
 
         IGraph IGraph.Reverse() => Reverse();
@@ -358,7 +349,7 @@ namespace UAlbion.Scripting
         IGraph IGraph.Defragment() => Defragment(true);
         public ControlFlowGraph Defragment(bool force = false)
         {
-            if (_deletedNodeCount == 0) return this;
+            if (_deletedNodeCount == 0 && EntryIndex == 0 && ExitIndex == NodeCount) return this;
             if (!force && (double)_deletedNodeCount / Nodes.Count < DefragThreshold) return this;
 
             int[] mapping = new int[Nodes.Count];
@@ -455,11 +446,14 @@ namespace UAlbion.Scripting
             return exitNode;
         }
 
+        static (ImmutableArray<int>, ImmutableArray<(int start, int end)>) ToImmutable((List<int> order, List<(int, int)> backEdges) result) 
+            => (result.order.ToImmutableArray(), result.backEdges.ToImmutableArray());
+
         IEnumerable<(int, int)> IGraph.GetBackEdges() => GetBackEdges();
         public ImmutableArray<(int start, int end)> GetBackEdges()
         {
             if (!_cachedOrder.HasValue)
-                (_cachedOrder, _cachedBackEdges) = GetDfsOrderAndBackEdges(true); // Use post-order, more likely we'll need the cached order later
+                (_cachedOrder, _cachedBackEdges) = ToImmutable(GetDfsOrderAndBackEdges(true, false)); // Use post-order, more likely we'll need the cached order later
             return _cachedBackEdges.Value;
         }
 
@@ -467,20 +461,22 @@ namespace UAlbion.Scripting
         public ImmutableArray<int> GetDfsOrder()
         {
             if (!_cachedOrder.HasValue)
-                (_cachedOrder, _cachedBackEdges) = GetDfsOrderAndBackEdges(false);
+                (_cachedOrder, _cachedBackEdges) = ToImmutable(GetDfsOrderAndBackEdges(false, false));
             return _cachedOrder.Value;
         }
+
+        public List<int> GetDfsOrderComplete() => GetDfsOrderAndBackEdges(false, true).Item1;
 
         IList<int> IGraph.GetDfsPostOrder() => GetDfsPostOrder();
         public ImmutableArray<int> GetDfsPostOrder()
         {
             if (!_cachedPostOrder.HasValue)
-                (_cachedPostOrder, _cachedBackEdges) = GetDfsOrderAndBackEdges(true);
+                (_cachedPostOrder, _cachedBackEdges) = ToImmutable(GetDfsOrderAndBackEdges(true, false));
 
             return _cachedPostOrder.Value;
         }
 
-        (ImmutableArray<int>, ImmutableArray<(int, int)>) GetDfsOrderAndBackEdges(bool postOrder)
+        (List<int>, List<(int, int)>) GetDfsOrderAndBackEdges(bool postOrder, bool allNodes)
         {
             var results = new List<int>();
             var backEdges = new List<(int, int)>();
@@ -488,15 +484,17 @@ namespace UAlbion.Scripting
             var stack = new List<int>();
 
             this.DepthFirstSearch(EntryIndex, visited, stack, results, backEdges, postOrder);
-            /* for (int i = 0; i < Nodes.Count; i++)
+            if (allNodes)
             {
-                if (Nodes[i] == null || visited[i]) continue;
-                stack.Clear();
-                this.DepthFirstSearch(i, visited, stack, results, backEdges, postOrder);
-                // throw new ControlFlowGraphException("Disconnected graph found during depth-first sort!", this);
-            } //*/
+                for (int i = 0; i < Nodes.Count; i++)
+                {
+                    if (Nodes[i] == null || visited[i])
+                        continue;
+                    this.DepthFirstSearch(i, visited, stack, results, backEdges, postOrder);
+                }
+            }
 
-            return (results.ToImmutableArray(), backEdges.ToImmutableArray());
+            return (results, backEdges);
         }
 
         public ControlFlowGraph RemoveBackEdges()
@@ -730,9 +728,6 @@ namespace UAlbion.Scripting
         public (int? trueChild, int? falseChild) GetBinaryChildren(int index)
         {
             var children = Children(index);
-            if (children.Length > 2)
-                throw new ControlFlowGraphException($"Node {index} has {children.Length} children! Max allowed is 2 for branch events, 1 for regular events.", this);
-
             int? trueChild = null;
             int? falseChild = null;
 
@@ -824,6 +819,7 @@ namespace UAlbion.Scripting
                             CfgEdge.False => "red3",
                             CfgEdge.DisjointGraphFixup => "purple",
                             CfgEdge.LoopSuccessor => "gold3",
+                            CfgEdge.EntryPoint => "blue",
                             _ => null
                         };
 
@@ -854,7 +850,7 @@ namespace UAlbion.Scripting
             {
                 var (index, label) = FindSymbol(edgePart);
                 if (index == -1)
-                    throw new FormatException($"Bad edge \"{edgePart}\", expected two numbers separated by a label symbol (+, -, d or l)");
+                    throw new FormatException($"Bad edge \"{edgePart}\", expected two numbers separated by a label symbol (+, -, d, l or e)");
 
                 int start = int.Parse(edgePart[..index]);
                 int end = int.Parse(edgePart[(index + 1)..]);
@@ -881,6 +877,7 @@ namespace UAlbion.Scripting
                     case '-': return (i, CfgEdge.False);
                     case 'd': return (i, CfgEdge.DisjointGraphFixup);
                     case 'l': return (i, CfgEdge.LoopSuccessor);
+                    case 'e': return (i, CfgEdge.EntryPoint);
                 }
             }
 
@@ -917,6 +914,7 @@ namespace UAlbion.Scripting
                     CfgEdge.False => '-',
                     CfgEdge.DisjointGraphFixup => 'd',
                     CfgEdge.LoopSuccessor => 'l',
+                    CfgEdge.EntryPoint => 'n',
                     _ => throw new ArgumentOutOfRangeException()
                 };
 

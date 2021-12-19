@@ -40,7 +40,7 @@ namespace UAlbion.Base.Tests
         {
             var results = new List<(string, string)>();
 
-            var lines = FormatUtil.SplitLines(data);
+            var lines = ApiUtil.SplitLines(data);
             foreach (var line in lines)
             {
                 try

@@ -192,14 +192,15 @@ namespace UAlbion.Scripting.Tests
         4
     }
 }"); 
+        [Fact] public void NoMoreGotos3Region1Test() => TestSimplify(TestGraphs.NoMoreGotos3Region1, TestGraphs.NoMoreGotos3Region1Code); 
         [Fact] public void NoMoreGotos3Region2Test() => TestSimplify(TestGraphs.NoMoreGotos3Region2, TestGraphs.NoMoreGotos3Region2Code); 
-        // [Fact] public void NoMoreGotos3Region3Test() => TestSimplify(TestGraphs.NoMoreGotos3Region3, TestGraphs.NoMoreGotos3Region3Code); 
+        [Fact] public void NoMoreGotos3Region3Test() => TestSimplify(TestGraphs.NoMoreGotos3Region3, TestGraphs.NoMoreGotos3Region3Code); 
+        [Fact] public void NoMoreGotos3Test() => TestSimplify(TestGraphs.NoMoreGotos3, TestGraphs.NoMoreGotos3Code); 
 
         [Fact] public void BreakBranchTest() => TestSimplify(TestGraphs.BreakBranch, TestGraphs.BreakBranchCode);
         [Fact] public void BreakBranch2Test() => TestSimplify(TestGraphs.BreakBranch2, TestGraphs.BreakBranch2Code);
         [Fact] public void LoopBreaksBothEnds() => TestSimplify(TestGraphs.LoopBreaksBothEnds, TestGraphs.LoopBreaksBothEndsCode);
         [Fact] public void MidBreakLoopTest() => TestSimplify(TestGraphs.MidBreakLoop, TestGraphs.MidBreakLoopCode);
-        [Fact] public void NoMoreGotos3Region1Test() => TestSimplify(TestGraphs.NoMoreGotos3Region1, TestGraphs.NoMoreGotos3Region1Code); 
         [Fact] public void LoopBranchTest() => TestSimplify(TestGraphs.LoopBranch, TestGraphs.LoopBranchCode);
         [Fact] public void LoopBranchReducedTest() => TestSimplify(TestGraphs.LoopBranchReduced, TestGraphs.LoopBranchReducedCode);
         [Fact] public void LoopEdgeCase_Map174() => TestSimplify(TestGraphs.LoopEdgeCaseMap174, TestGraphs.LoopEdgeCaseMap174Code);
@@ -209,7 +210,6 @@ namespace UAlbion.Scripting.Tests
 
         /*
         [Fact] public void MultiBreakTest() => TestSimplify(TestGraphs.MultiBreak, TestGraphs.MultiBreakCode);
-        [Fact] public void NoMoreGotos3Test() => TestSimplify(TestGraphs.NoMoreGotos3, "something"); 
         [Fact] public void NestedLoopTest() => TestSimplify(TestGraphs.ContinueBranch, TestGraphs.ContinueBranchCode);
         [Fact] public void MultiBreak_Map166() => TestSimplify(TestGraphs.MultiBreakMap166, TestGraphs.MultiBreakMap166Code);
         [Fact] public void MultiBreak_Map200() => TestSimplify(TestGraphs.MultiBreakMap200, TestGraphs.MultiBreakMap200Code);

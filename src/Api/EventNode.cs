@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using static System.FormattableString;
 
 namespace UAlbion.Api
@@ -39,6 +40,17 @@ namespace UAlbion.Api
                 Next = null;
             }
             else Next = nodes[dummy.Id];
+        }
+
+        public static List<EventNode> ParseRawEvents(string script)
+        {
+            if (string.IsNullOrWhiteSpace(script))
+                return null;
+            var lines = ApiUtil.SplitLines(script);
+            var events = lines.Select(Parse).ToList();
+            foreach (var e in events)
+                e.Unswizzle(events);
+            return events;
         }
 
         public static EventNode Parse(string s)

@@ -17,54 +17,49 @@ namespace UAlbion.Scripting.Rules
                 {
                     if (loop.IsMultiExit)
                     {
-                        // Grow loop then reduce
+                        // TODO: Grow loop then reduce
                         continue;
                     }
 
-                    if (loop.Header.Index != index) // Handle non-header exits and back edges
+                    if (loop.Header.Index != index) // Handle non-header exits and back edges (post-order iteration means these will be handled before the header)
                     {
-                        foreach (var part in loop.Body)
+                        var part = loop.Body.FirstOrDefault(x => x.Index == index);
+                        if (part == null) 
+                            continue;
+
+                        // Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("part", part.Index).ToString(); // For VS Code debug visualisation
+                        var updated = ReduceContinue(graph, loop, part);
+                        if (updated != graph)
+                            return (updated, "Reduce continue");
+
+                        updated = ReduceBreak(graph, loop, part);
+                        if (updated != graph)
+                            return (updated, "Reduce break");
+                    }
+                    else // Handle header
+                    {
+                        if (loop.Body.Count != 1 || loop.Body[0].OutsideEntry) // TODO: Add a separate reducer to turn outside entries into gotos + labels
+                            continue;
+
+                        int tail = loop.Body[0].Index;
+                        if (loop.Header.Break)
                         {
-                            // Func<string> vis = () => graph.ToVis().AddPointer("index", index).AddPointer("part", part.Index).ToString(); // For VS Code debug visualisation
-                            if (part.Index != index)
-                                continue;
-
-                            var updated = ReduceContinue(graph, loop, part);
+                            var updated = ReduceWhileLoop(graph, index, tail, loop.Header.Negated);
                             if (updated != graph)
-                                return (updated, "Reduce continue");
-
-                            updated = ReduceBreak(graph, loop, part);
-                            if (updated != graph)
-                                return (updated, "Reduce break");
+                                return (updated, "Reduce while loop");
                         }
-                    }
-
-                    if (loop.Header.Index != index
-                        || loop.IsMultiExit
-                        || loop.Body.Count != 1
-                        || loop.Body[0].OutsideEntry)
-                    {
-                        continue;
-                    }
-
-                    int tail = loop.Body[0].Index;
-                    if (loop.Header.Break)
-                    {
-                        var updated = ReduceWhileLoop(graph, index, tail, loop.Header.Negated);
-                        if (updated != graph)
-                            return (updated, "Reduce while loop");
-                    }
-                    else if (loop.Body[0].Break)
-                    {
-                        var updated = ReduceDoLoop(graph, index, tail);
-                        if (updated != graph)
-                            return (updated, "Reduce do loop");
-                    }
-                    else
-                    {
-                        var updated = ReduceGenericLoop(graph, index, tail);
-                        if (updated != graph)
-                            return (updated, "Reduce generic loop");
+                        else if (loop.Body[0].Break)
+                        {
+                            var updated = ReduceDoLoop(graph, index, tail);
+                            if (updated != graph)
+                                return (updated, "Reduce do loop");
+                        }
+                        else
+                        {
+                            var updated = ReduceGenericLoop(graph, index, tail);
+                            if (updated != graph)
+                                return (updated, "Reduce generic loop");
+                        }
                     }
                 }
             }

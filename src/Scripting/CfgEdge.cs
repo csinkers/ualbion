@@ -5,6 +5,7 @@
         True,
         False,
         DisjointGraphFixup,
-        LoopSuccessor
+        LoopSuccessor,
+        EntryPoint
     }
 }

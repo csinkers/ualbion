@@ -8,7 +8,6 @@ using System.Runtime.CompilerServices;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.MapEvents;
 using UAlbion.Scripting;
 using UAlbion.Scripting.Ast;
 using UAlbion.TestCommon;
@@ -94,7 +93,7 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
 
         static void TestDecompile(string script, string expected, [CallerMemberName] string method = null)
         {
-            var events = MapEvent.ParseRawEvents(script);
+            var events = EventNode.ParseRawEvents(script);
             var steps = new List<(string, IGraph)>();
             try
             {
@@ -287,8 +286,8 @@ if (query_verb Examine) {
  112=>113: action Word 0 Word.Stri
  113=>!: map_text EventText.Sira2 38";
 
-            var lines = FormatUtil.SplitLines(script);
-            var expectedLines = FormatUtil.SplitLines(expectedScript);
+            var lines = ApiUtil.SplitLines(script);
+            var expectedLines = ApiUtil.SplitLines(expectedScript);
             
             Assert.Equal(lines.Length, expectedLines.Length);
 

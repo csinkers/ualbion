@@ -26,7 +26,8 @@ namespace UAlbion.Scripting
             return node.FindChild(b, NodeEquality, true) != null;
         }
 
-        public DominatorTree AddPath(IList<int> path)
+        public DominatorTree AddPath(params int[] path) => AddPathList(path);
+        public DominatorTree AddPathList(IList<int> path)
         {
             if (path == null) throw new ArgumentNullException(nameof(path));
             if (path.Count == 0)
@@ -50,7 +51,7 @@ namespace UAlbion.Scripting
             var path = Root.FindPath(index, NodeEquality);
             return path.Count > 1
                 ? path[^1]
-                : path[0];
+                : Root.Value;
         }
 
         public string ExportToDot(int dpi = 150)

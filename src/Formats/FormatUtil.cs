@@ -216,12 +216,6 @@ namespace UAlbion.Formats
                 : new StringId(id, 0);
         }
 
-        static readonly char[] NewLineChars = { '\n', '\r' };
-
-        public static string[] SplitLines(string s)
-            => s?.Split(NewLineChars, StringSplitOptions.RemoveEmptyEntries)
-               ?? Array.Empty<string>();
-
         public static bool Compare(QueryOperation operation, int value, int immediate) =>
             operation switch
             {

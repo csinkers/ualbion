@@ -87,6 +87,36 @@ namespace UAlbion.Scripting
                 }));
         }
 
+        protected override ICfgNode Build(EndlessLoop loop)
+        {
+            var headLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
+            var tailLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
+            _headStack.Push(headLabel);
+            _tailStack.Push(tailLabel);
+
+            loop.Body?.Accept(this);
+            var body = Result ?? loop.Body;
+
+            _tailStack.Pop();
+            _headStack.Pop();
+
+            return Emit.Cfg(new ControlFlowGraph(new[]
+                {
+                    Emit.Empty(), // 0
+                    Emit.Label(headLabel), // 1
+                    body, // 2
+                    Emit.Label(tailLabel), // 3
+                    Emit.Empty() // 4
+                },
+                new[]
+                {
+                    (0,1,CfgEdge.True),
+                    (1,2,CfgEdge.True), (1,3,CfgEdge.LoopSuccessor),
+                    (2,1,CfgEdge.True),
+                    (3,4,CfgEdge.True)
+                }));
+        }
+
         protected override ICfgNode Build(BreakStatement breakStatement)
         {
             if (_headStack.Count == 0)

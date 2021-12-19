@@ -287,6 +287,46 @@ namespace UAlbion.Scripting
                 ( 5, 3, CfgEdge.True),  // (c3,c1),
                 ( 5,17, CfgEdge.False), // (c3,!n9),
             });
+        public const string NoMoreGotos3Code = @"if (A) {
+    do {
+        if (c1) {
+            n1
+            continue
+        } else {
+            if (c2) {
+                n2
+                break
+            }
+            n3
+        }
+    } while (c3)
+} else {
+    if (b1) {
+        if (b2) {
+            n6
+        } else {
+            goto L1
+        }
+    } else {
+        n4
+        L1:
+        n5
+    }
+    n7
+    loop {
+        if (d1) {
+            if (!(d3)) {
+                break
+            }
+        } else {
+            if (!(d2)) {
+                break
+            }
+        }
+        n8
+    }
+}
+n9";
 
         public static ControlFlowGraph NoMoreGotos3Reversed =>
             new(17, 0, new[] {
@@ -418,7 +458,7 @@ n9";
                 (3, 5, CfgEdge.False),
                 (4, 1, CfgEdge.True),
             });
-        public static string NoMoreGotos3Region3Code => @"start, do { if (d1) { if (!(d3)) { break } } else { if (!(d2)) { break } } } while (n8), n9";
+        public static string NoMoreGotos3Region3Code => @"start, loop { if (d1) { if (!(d3)) { break } } else { if (!(d2)) { break } }, n8 }, n9";
 
         /* ZeroK if example
               0
@@ -665,7 +705,6 @@ n9";
 
         public const string LoopEdgeCaseMap313Code = "loop { 1, if (2) { break }, 3 }";
         public static ControlFlowGraph LoopEdgeCaseMap313 => ControlFlowGraph.FromString("[0,4,5,0+1 1+2 2+4 2-3 3+1]");
-
         /* 0
            |
         /->1-f-\

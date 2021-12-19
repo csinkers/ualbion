@@ -57,6 +57,7 @@ namespace UAlbion.Scripting
                 graph = record("Expand if-then",      ExpandIfThen(graph));
             }
 
+            graph = record("Remove loop successor edges", RemoveLoopSuccessors(graph));
             graph = record("Resolve goto", ResolveGotos(graph));
             // TODO: Split graphs
             try
@@ -227,11 +228,24 @@ namespace UAlbion.Scripting
             return graph;
         }
 
+        public static ControlFlowGraph RemoveLoopSuccessors(ControlFlowGraph graph)
+        {
+            var edgesToRemove = graph.LabelledEdges.Where(x => x.label == CfgEdge.LoopSuccessor);
+            foreach (var (start, end, _) in edgesToRemove)
+                graph = graph.RemoveEdge(start, end);
+            return graph;
+        }
+
         public static ControlFlowGraph ResolveGotos(ControlFlowGraph graph)
         {
             // Build label name -> target dict
             var mapping = new Dictionary<string, int>();
-            foreach (var index in graph.GetDfsOrder())
+
+            // Need to use DfsComplete as the removal of loop successor edges can make
+            // parts of the graph unreachable from the entry node. These areas should
+            // get reconnected when we convert the gotos to edges.
+            var order = graph.GetDfsOrderComplete(); 
+            foreach (var index in order)
             {
                 var node = graph.Nodes[index];
                 if (node is not Label label)
@@ -241,7 +255,7 @@ namespace UAlbion.Scripting
             }
 
             // Add edges and remove gotos
-            foreach (var index in graph.GetDfsOrder())
+            foreach (var index in order)
             {
                 var node = graph.Nodes[index];
                 if (node is not Goto statement)
@@ -258,7 +272,7 @@ namespace UAlbion.Scripting
             }
 
             // Remove labels
-            foreach (var index in graph.GetDfsOrder())
+            foreach (var index in graph.GetDfsOrder()) // Can use regular DfsOrder as the missing edges should have been added
             {
                 var node = graph.Nodes[index];
                 if (node is not Label label)

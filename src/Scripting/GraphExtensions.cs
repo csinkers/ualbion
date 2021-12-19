@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace UAlbion.Scripting
@@ -78,6 +79,15 @@ namespace UAlbion.Scripting
             stack.RemoveAt(stack.Count - 1);
             if (postOrder && results != null)
                 results.Add(index);
+        }
+
+        public static List<int> GetDfsOrder(this IGraph graph, int start, bool postOrder)
+        {
+            var results = new List<int>();
+            var visited = new bool[graph.NodeCount];
+            var stack = new List<int>();
+            graph.DepthFirstSearch(start, visited, stack, results, null, postOrder);
+            return results;
         }
 
         public static List<int> GetTopogicalOrder(this IGraph graph)
@@ -245,13 +255,13 @@ namespace UAlbion.Scripting
                 if (list[0] != entry)
                     throw new ControlFlowGraphException("Disjoint graph detected while computing dominator tree", graph);
 
-                tree = tree.AddPath(list);
+                tree = tree.AddPathList(list);
             }
 
             return tree;
         }
 
-        public static int[] GetComponentMapping(this IGraph graph)
+        public static (int[], int componentCount) GetComponentMapping(this IGraph graph)
         {
             int componentIndex = 0;
             var mapping = new int[graph.NodeCount];
@@ -272,14 +282,15 @@ namespace UAlbion.Scripting
                     mapping[current] = componentIndex;
                     foreach (int child in graph.Children(current))
                         stack.Push(child);
+                    foreach (int child in graph.Parents(current))
+                        stack.Push(child);
                 }
 
                 componentIndex++;
             }
 
-            return mapping;
+            return (mapping, componentIndex);
         }
-
 
         public static (bool[] reachability, int reachableCount) GetReachability(this IGraph graph, int start)
         {

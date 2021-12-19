@@ -275,7 +275,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             if (string.IsNullOrEmpty(visual) && string.IsNullOrEmpty(group)) // TODO: Differentiate between 2D/3D maps
                 throw new FormatException($"NPC \"{obj.Name}\" (id {obj.Id}) requires either a Visual or Group property to determine its appearance");
 
-            var events = MapEvent.ParseRawEvents(Prop("Script"));
+            var events = EventNode.ParseRawEvents(Prop("Script"));
             UnswizzleEvents(events);
 
             return new NpcInfo
@@ -326,7 +326,7 @@ namespace UAlbion.Formats.Exporters.Tiled
 
             var polygon = obj.Polygon.Points.Select(p => (((int)obj.X + p.x) / map.TileWidth, ((int)obj.Y + p.y) / map.TileHeight));
             var shape = PolygonToShape(polygon);
-            var events = MapEvent.ParseRawEvents(Prop("Script"));
+            var events = EventNode.ParseRawEvents(Prop("Script"));
             UnswizzleEvents(events);
             var trigger = RequiredProp("Trigger");
             var unk1 = Prop("Unk1");

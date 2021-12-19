@@ -21,16 +21,16 @@ namespace UAlbion.Scripting.Tests
         public void AddPathTest()
         {
             var tree = DominatorTree.Empty;
-            tree = tree.AddPath(new[] { 0, 3, 5, 6 });
+            tree = tree.AddPath(0, 3, 5, 6);
             Verify(tree.Values, 0, 3, 5, 6);
 
-            tree = tree.AddPath(new[] { 0, 3, 4, 1 });
+            tree = tree.AddPath(0, 3, 4, 1);
             Verify(tree.Values, 0, 3, 5, 6, 4, 1);
 
-            tree = tree.AddPath(new[] { 0, 2, 7 });
+            tree = tree.AddPath(0, 2, 7);
             Verify(tree.Values, 0, 3, 5, 6, 4, 1, 2, 7);
 
-            tree = tree.AddPath(new[] { 0, 3, 5, 6, 8 });
+            tree = tree.AddPath(0, 3, 5, 6, 8);
             Verify(tree.Values, 0, 3, 5, 6, 8, 4, 1, 2, 7);
         }
 
@@ -84,16 +84,16 @@ namespace UAlbion.Scripting.Tests
             */
 
             var tree = DominatorTree.Empty;
-            tree = tree.AddPath(new[] { 0, 1, 12 });
-            tree = tree.AddPath(new[] { 0, 1, 13 });
-            tree = tree.AddPath(new[] { 0, 1, 2, 14 });
-            tree = tree.AddPath(new[] { 0, 1, 15, 6, 7 });
-            tree = tree.AddPath(new[] { 0, 1, 15, 6, 8 });
-            tree = tree.AddPath(new[] { 0, 1, 15, 6, 16 });
-            tree = tree.AddPath(new[] { 0, 3, 4, 10 });
-            tree = tree.AddPath(new[] { 0, 3, 4, 11, 5 });
-            tree = tree.AddPath(new[] { 0, 3, 9 });
-            tree = tree.AddPath(new[] { 0, 17 });
+            tree = tree.AddPath(0, 1, 12);
+            tree = tree.AddPath(0, 1, 13);
+            tree = tree.AddPath(0, 1, 2, 14);
+            tree = tree.AddPath(0, 1, 15, 6, 7);
+            tree = tree.AddPath(0, 1, 15, 6, 8);
+            tree = tree.AddPath(0, 1, 15, 6, 16);
+            tree = tree.AddPath(0, 3, 4, 10);
+            tree = tree.AddPath(0, 3, 4, 11, 5);
+            tree = tree.AddPath(0, 3, 9);
+            tree = tree.AddPath(0, 17);
 
             var graph = TestGraphs.NoMoreGotos3;
             var calculated = graph.GetDominatorTree();
@@ -126,23 +126,37 @@ namespace UAlbion.Scripting.Tests
             |+--A     =  0
             */
             var tree = DominatorTree.Empty;
-            tree = tree.AddPath(new[] { 17, 7 });
-            tree = tree.AddPath(new[] { 17, 8 });
-            tree = tree.AddPath(new[] { 17, 6, 16 });
-            tree = tree.AddPath(new[] { 17, 6, 15, 13, 12 });
-            tree = tree.AddPath(new[] { 17, 6, 15, 14 });
-            tree = tree.AddPath(new[] { 17, 6, 15, 2 });
-            tree = tree.AddPath(new[] { 17, 6, 15, 1 });
-            tree = tree.AddPath(new[] { 17, 5, 11 });
-            tree = tree.AddPath(new[] { 17, 10 });
-            tree = tree.AddPath(new[] { 17, 4, 3, 9 });
-            tree = tree.AddPath(new[] { 17, 0 });
+            tree = tree.AddPath(17, 7);
+            tree = tree.AddPath(17, 8);
+            tree = tree.AddPath(17, 6, 16);
+            tree = tree.AddPath(17, 6, 15, 13, 12);
+            tree = tree.AddPath(17, 6, 15, 14);
+            tree = tree.AddPath(17, 6, 15, 2);
+            tree = tree.AddPath(17, 6, 15, 1);
+            tree = tree.AddPath(17, 5, 11);
+            tree = tree.AddPath(17, 10);
+            tree = tree.AddPath(17, 4, 3, 9);
+            tree = tree.AddPath(17, 0);
 
             var graph = TestGraphs.NoMoreGotos3;
             var calculated = graph.GetPostDominatorTree();
             for (int i = 0; i < 18; i++)
                 for (int j = 0; j < 18; j++)
                     Assert.Equal(tree.Dominates(i, j), calculated.Dominates(i, j));
+        }
+
+        [Fact]
+        public void ImmediateDominatorTest()
+        {
+            var tree = DominatorTree.Empty;
+            tree = tree.AddPath(13, 5, 4).AddPath(13, 1, 0).AddPath(13, 2);
+
+            Assert.Equal(13, tree.ImmediateDominator(5));
+            Assert.Equal(5, tree.ImmediateDominator(4));
+            Assert.Equal(13, tree.ImmediateDominator(1));
+            Assert.Equal(1, tree.ImmediateDominator(0));
+            Assert.Equal(13, tree.ImmediateDominator(2));
+            Assert.Equal((int?)null, tree.ImmediateDominator(13));
         }
     }
 }

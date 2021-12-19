@@ -83,8 +83,8 @@ namespace UAlbion.Game.Veldrid.Visual
             var zone = _logicalMap.GetZone(index);
             int eventNum = zone?.Node?.Id ?? -1;
 
-            instance.Flags = instance.Flags
 #if DEBUG
+            instance.Flags = instance.Flags
                              | ((_lastDebugFlags & DebugFlags.HighlightTile) != 0 && HighlightIndex == index ? SpriteFlags.Highlight : 0)
                              | ((_lastDebugFlags & DebugFlags.HighlightEventChainZones) != 0 && _highlightEvent == eventNum ? SpriteFlags.GreenTint : 0)
                              | ((_lastDebugFlags & DebugFlags.HighlightCollision) != 0 && tile.Collision != Passability.Passable ? SpriteFlags.RedTint : 0)

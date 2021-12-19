@@ -119,7 +119,7 @@ namespace UAlbion.Game.Veldrid.Input
             try
             {
                 var region = _hotspotSprite.Key.Texture.Regions[(int) commonColors.Palette[CommonColor.Yellow3]];
-                instances[0] = new SpriteInstanceData(position, size, region, SpriteFlags.TopMid);
+                instances[0] = new SpriteInstanceData(position, size, region, SpriteFlags.MidMid);
             }
             finally { _hotspotSprite.Unlock(lockWasTaken); }
         }
@@ -152,7 +152,7 @@ namespace UAlbion.Game.Veldrid.Input
             var instances = _cursorSprite.Lock(ref lockWasTaken);
             try
             {
-                instances[0] = new SpriteInstanceData(position, size, _cursorSprite.Key.Texture.Regions[0], SpriteFlags.TopMid);
+                instances[0] = new SpriteInstanceData(position, size, _cursorSprite.Key.Texture.Regions[0], SpriteFlags.MidMid);
             }
             finally { _cursorSprite.Unlock(lockWasTaken); }
         }
@@ -219,12 +219,12 @@ namespace UAlbion.Game.Veldrid.Input
                 instances[0] = new SpriteInstanceData(
                     normPosition + new Vector3(window.UiToNormRelative(6, 6), 0),
                     window.UiToNormRelative(subImage.Size),
-                    subImage, SpriteFlags.TopMid);
+                    subImage, SpriteFlags.MidMid);
             }
             finally { _itemSprite.Unlock(lockWasTaken); }
 
             if (_itemAmountSprite != null)
-                _itemAmountSprite.Position = normPosition + new Vector3(window.UiToNormRelative(6, 18), 0);
+                _itemAmountSprite.Position = normPosition + new Vector3(window.UiToNormRelative(6, 10), 0);
         }
 
         string GetAmountText()

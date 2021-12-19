@@ -29,6 +29,7 @@ namespace UAlbion.Game
             }
             catch (TargetException e) { return e; }
             catch (TargetParameterCountException e) { return e; }
+            catch (NotSupportedException e) { return e; }
             catch (MethodAccessException e) { return e; }
             catch (TargetInvocationException e) { return e; }
         }

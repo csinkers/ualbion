@@ -19,10 +19,10 @@ namespace UAlbion.Scripting
             ReduceIfThenElse.Decompile,
             ReduceSeseRegions.Decompile,
             ReduceLoops.Decompile,
-            LoopConverter.Apply,
             x => (x.Defragment(), "Defragment"),
             SimplifyLabels.Apply,
-            RemoveEmptyNodes.Apply
+            RemoveEmptyNodes.Apply,
+            LoopConverter.Apply,
         };
 
         public static List<ICfgNode> Decompile<T>(

@@ -288,7 +288,7 @@ namespace UAlbion.Scripting
                 ( 5,17, CfgEdge.False), // (c3,!n9),
             });
         public const string NoMoreGotos3Code = @"if (A) {
-    loop {
+    do {
         if (c1) {
             n1
             continue
@@ -299,10 +299,7 @@ namespace UAlbion.Scripting
             }
             n3
         }
-        if (!(c3)) {
-            break
-        }
-    }
+    } while (c3)
 } else {
     if (b1) {
         if (b2) {

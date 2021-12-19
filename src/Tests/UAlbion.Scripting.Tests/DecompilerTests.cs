@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+using UAlbion.Scripting.Ast;
+using UAlbion.Scripting.Rules;
 using Xunit;
 
 namespace UAlbion.Scripting.Tests
@@ -98,7 +100,52 @@ namespace UAlbion.Scripting.Tests
         [Fact] public void MultiBreak_Map200() => TestSimplify(TestGraphs.MultiBreakMap200, TestGraphs.MultiBreakMap200Code);
         [Fact] public void MultiBreak_Map201() => TestSimplify(TestGraphs.MultiBreakMap201, TestGraphs.MultiBreakMap201Code);
 
-        /*
+        void LoopConversionTest(string expected, ICfgNode ast)
+        {
+            var nodes = new[] { ast };
+            var cfg = new ControlFlowGraph(nodes, Array.Empty<(int, int, CfgEdge)>());
+            var (result, _) = LoopConverter.Apply(cfg);
+            if (!TestUtil.CompareCfgVsScript(result, expected, out var message))
+                throw new InvalidOperationException(message);
+        }
+
+        [Fact]
+        public void ConvertWhileTest() =>
+            LoopConversionTest("while (!(1)) { }, 2",
+                Emit.Seq(
+                    Emit.Loop(
+                        Emit.If(
+                            Emit.Statement(Emit.Const(1)),
+                            Emit.Break())),
+                    Emit.Statement(Emit.Const(2))));
+
+        [Fact]
+        public void ConvertDoTest() =>
+            LoopConversionTest("do { 1 } while (!(2)), 3",
+                Emit.Seq(
+                    Emit.Loop(
+                        Emit.Seq(
+                            Emit.Statement(Emit.Const(1)),
+                            Emit.If(
+                                Emit.Statement(Emit.Const(2)),
+                                Emit.Break()))
+                        ),
+                    Emit.Statement(Emit.Const(3))));
+
+        [Fact]
+        public void ConvertWhileWithTerminalBreakTest() =>
+            LoopConversionTest("while (!(1)) { if (2) { break } }, 3",
+                Emit.Seq(
+                    Emit.Loop(
+                        Emit.Seq(
+                            Emit.If(
+                                Emit.Statement(Emit.Const(1)),
+                                Emit.Break()),
+                            Emit.If(
+                                Emit.Statement(Emit.Const(2)),
+                                Emit.Break()))),
+                    Emit.Statement(Emit.Const(3))));
+
         [Fact] public void SimpleWhileTest() => TestSimplify(TestGraphs.SimpleWhileLoop, "while (1) { }"); 
         [Fact] public void WhileTest() => TestSimplify(TestGraphs.WhileLoop, "while (1) { 2 }"); 
         [Fact] public void DoWhileTest() => TestSimplify(TestGraphs.DoWhileLoop, "do { 1 } while (2)");
@@ -107,6 +154,5 @@ namespace UAlbion.Scripting.Tests
         [Fact] public void LoopBreaksBothEnds() => TestSimplify(TestGraphs.LoopBreaksBothEnds, TestGraphs.LoopBreaksBothEndsCode);
         [Fact] public void LoopBranchTest() => TestSimplify(TestGraphs.LoopBranch, TestGraphs.LoopBranchCode);
         [Fact] public void LoopBranchReducedTest() => TestSimplify(TestGraphs.LoopBranchReduced, TestGraphs.LoopBranchReducedCode);
-        //*/
     }
 }

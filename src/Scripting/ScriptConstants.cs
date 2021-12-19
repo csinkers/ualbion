@@ -9,6 +9,8 @@ namespace UAlbion.Scripting
         public const string DummyLabelPrefix = "L_";
 
         public static string BuildDummyLabel(Guid guid) => $"{DummyLabelPrefix}{Guid.NewGuid():N}";
+        public static string BuildChainLabel(int chainNumber) => $"Chain{chainNumber}";
+        public static string BuildAdditionalEntryLabel(ushort eventId) => $"Event{eventId}";
 
         public static bool IsDummyLabel(string name) =>
             name.StartsWith(DummyLabelPrefix) && 

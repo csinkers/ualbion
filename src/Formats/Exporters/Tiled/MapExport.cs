@@ -4,10 +4,11 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
-using UAlbion.Formats.MapEvents;
+using UAlbion.Scripting;
 
 namespace UAlbion.Formats.Exporters.Tiled
 {
@@ -231,14 +232,23 @@ namespace UAlbion.Formats.Exporters.Tiled
             */
             var npcRefs = map.Npcs.Where(x => x.Node != null).Select(x => x.Node.Id).ToHashSet();
             var zoneRefs = map.Zones.Where(x => x.Node != null).Select(x => x.Node.Id).ToHashSet();
-            var refs = npcRefs.Union(zoneRefs).Except(map.Chains);
+            var refs = npcRefs.Union(zoneRefs).Except(map.Chains).ToList();
 
-            eventFormatter.FormatEventSetDecompiled(
-                sb,
-                map.Events,
-                map.Chains,
-                refs,
-                0);
+            if (map.Events.Count > 0)
+            {
+                eventFormatter.FormatEventSetDecompiled(
+                    sb,
+                    map.Events,
+                    map.Chains,
+                    refs,
+                    0);
+
+                foreach(var entryEventId in refs)
+                    mapping[entryEventId] = ScriptConstants.BuildAdditionalEntryLabel(entryEventId);
+
+                for (int chainId = 0; chainId < map.Chains.Count; chainId++)
+                    mapping[map.Chains[chainId]] = ScriptConstants.BuildChainLabel(chainId);
+            }
 
             return (sb.ToString(), mapping);
         }
@@ -435,6 +445,9 @@ namespace UAlbion.Formats.Exporters.Tiled
             foreach (var npc in map.Npcs)
             {
                 if ((npc.Movement & NpcMovementTypes.RandomMask) != 0)
+                    continue;
+
+                if (npc.SpriteOrGroup == AssetId.None)
                     continue;
 
                 int firstWaypointObjectId = nextId;

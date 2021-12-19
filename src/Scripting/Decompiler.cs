@@ -116,18 +116,21 @@ namespace UAlbion.Scripting
             int chainId = 0;
             foreach (var chainEntry in chains)
             {
-                if (chainEntry == 0xffff) // Terminal value for unused chains etc
-                    continue;
+                try
+                {
+                    if (chainEntry == 0xffff) // Terminal value for unused chains etc
+                        continue;
 
-                var subGraph = BuildSubGraph(chainEntry, $"Chain{chainId}", graph, events);
-                results.Add(subGraph);
-                chainId++;
+                    var subGraph = BuildSubGraph(chainEntry, ScriptConstants.BuildChainLabel(chainId), graph, events);
+                    results.Add(subGraph);
+                }
+                finally { chainId++; }
             }
 
             // Create a graph per extra entry
             foreach (var additionalEntryPoint in additionalEntryPoints)
             {
-                var subGraph = BuildSubGraph(additionalEntryPoint, $"Event{additionalEntryPoint}", graph, events);
+                var subGraph = BuildSubGraph(additionalEntryPoint, ScriptConstants.BuildAdditionalEntryLabel(additionalEntryPoint), graph, events);
                 results.Add(subGraph);
             }
 

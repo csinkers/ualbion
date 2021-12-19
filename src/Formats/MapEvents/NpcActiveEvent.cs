@@ -31,10 +31,10 @@ namespace UAlbion.Formats.MapEvents
             return e;
         }
 
-        [EventPart("")] public byte NpcIndex { get; private set; }
-        [EventPart("")] public byte IsActive { get; private set; }
-        [EventPart("")] public byte Unk5 { get; private set; }
-        [EventPart("")] public ushort Unk6 { get; private set; }
+        [EventPart("index")] public byte NpcIndex { get; private set; }
+        [EventPart("active", true, (byte)1)] public byte IsActive { get; private set; }
+        [EventPart("unk5", true, (byte)0)] public byte Unk5 { get; private set; }
+        [EventPart("unk6", true, (ushort)0)] public ushort Unk6 { get; private set; }
         public override ModifyType SubType => ModifyType.NpcActive;
     }
 }

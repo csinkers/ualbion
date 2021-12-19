@@ -45,15 +45,41 @@ namespace UAlbion.Formats
             try
             {
                 var trees = Decompiler.Decompile(events, chains, additionalEntryPoints, steps);
+                var counter = new CountEventsVisitor();
 
                 bool first = true;
-                var visitor = new FormatScriptVisitor(sb) { IndentLevel = indent };
+                bool lastWasTrivial = false;
                 foreach (var tree in trees)
                 {
                     if (!first)
                         sb.AppendLine();
 
-                    tree.Accept(visitor);
+                    tree.Accept(counter);
+                    var eventCount = counter.Count;
+                    counter.Reset();
+
+                    if (eventCount > 1)
+                    {
+                        if (lastWasTrivial)
+                            sb.AppendLine();
+                        sb.AppendLine("{");
+
+                        var visitor = new FormatScriptVisitor(sb) { PrettyPrint = true, IndentLevel = indent };
+                        visitor.IndentLevel += visitor.TabSize;
+                        tree.Accept(visitor);
+
+                        sb.AppendLine();
+                        sb.AppendLine("}");
+                        lastWasTrivial = false;
+                    }
+                    else
+                    {
+                        sb.Append("{ ");
+                        var visitor = new FormatScriptVisitor(sb) { PrettyPrint = false };
+                        tree.Accept(visitor);
+                        sb.Append(" }");
+                        lastWasTrivial = true;
+                    }
                     first = false;
                 }
             }

@@ -198,57 +198,20 @@ namespace UAlbion.Formats.Exporters.Tiled
             var sb = new StringBuilder();
             var mapping = new Dictionary<ushort, string>();
 
-            /*
-            for (int chainId = 0; chainId < map.Chains.Count; chainId++)
-            {
-                var i = map.Chains[chainId];
-                if (i == 0xffff) continue;
+            if (map.Events.Count <= 0)
+                return ("", mapping);
 
-                var name = $"C{chainId}";
-                mapping[i] = name;
-
-                var labels = new List<IEventNode>();
-
-                if (chainId > 0)
-                    sb.AppendLine();
-
-                sb.AppendLine($"function {name} {{");
-                eventFormatter.FormatChainDecompiled(sb, map.Events[i], labels, 1);
-                sb.AppendLine("}");
-            }
-
-            foreach (var key in GetDummyChains(map))
-            {
-                sb.AppendLine();
-                var name = $"C{key.Chain}_{key.DummyNumber}";
-                mapping[key.Node.Id] = name;
-
-                var labels = new List<IEventNode>();
-
-                sb.AppendLine($"function {name} {{");
-                eventFormatter.FormatChainDecompiled(sb, key.Node, labels, 1);
-                sb.AppendLine("}");
-            }
-            */
             var npcRefs = map.Npcs.Where(x => x.Node != null).Select(x => x.Node.Id).ToHashSet();
             var zoneRefs = map.Zones.Where(x => x.Node != null).Select(x => x.Node.Id).ToHashSet();
             var refs = npcRefs.Union(zoneRefs).Except(map.Chains).ToList();
 
-            if (map.Events.Count > 0)
-            {
-                eventFormatter.FormatEventSetDecompiled(
-                    sb,
-                    map.Events,
-                    map.Chains,
-                    refs,
-                    0);
+            eventFormatter.FormatEventSetDecompiled(sb, map.Events, map.Chains, refs, 0);
 
-                foreach(var entryEventId in refs)
-                    mapping[entryEventId] = ScriptConstants.BuildAdditionalEntryLabel(entryEventId);
+            foreach (var entryEventId in refs)
+                mapping[entryEventId] = ScriptConstants.BuildAdditionalEntryLabel(entryEventId);
 
-                for (int chainId = 0; chainId < map.Chains.Count; chainId++)
-                    mapping[map.Chains[chainId]] = ScriptConstants.BuildChainLabel(chainId);
-            }
+            for (int chainId = 0; chainId < map.Chains.Count; chainId++)
+                mapping[map.Chains[chainId]] = ScriptConstants.BuildChainLabel(chainId);
 
             return (sb.ToString(), mapping);
         }

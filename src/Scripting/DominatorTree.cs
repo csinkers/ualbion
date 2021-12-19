@@ -50,7 +50,7 @@ namespace UAlbion.Scripting
 
             var path = Root.FindPath(index, NodeEquality);
             return path.Count > 1
-                ? path[^1]
+                ? path[1]
                 : Root.Value;
         }
 

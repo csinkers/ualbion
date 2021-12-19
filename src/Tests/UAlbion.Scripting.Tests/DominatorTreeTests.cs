@@ -158,5 +158,30 @@ namespace UAlbion.Scripting.Tests
             Assert.Equal(13, tree.ImmediateDominator(2));
             Assert.Equal((int?)null, tree.ImmediateDominator(13));
         }
+
+        [Fact]
+        public void ImmediateDominatorTest2()
+        {
+            var tree = DominatorTree.Empty
+                .AddPath(11, 9, 8, 12, 7, 6, 3, 2, 13, 4)
+                .AddPath(11, 9, 8, 12, 10)
+                .AddPath(11, 9, 8, 12, 7, 1, 0)
+                .AddPath(11, 9, 8, 12, 7, 5);
+
+            Assert.Equal(1, tree.ImmediateDominator(0));
+            Assert.Equal(7, tree.ImmediateDominator(1));
+            Assert.Equal(3, tree.ImmediateDominator(2));
+            Assert.Equal(6, tree.ImmediateDominator(3));
+            Assert.Equal(13, tree.ImmediateDominator(4));
+            Assert.Equal(7, tree.ImmediateDominator(5));
+            Assert.Equal(7, tree.ImmediateDominator(6));
+            Assert.Equal(12, tree.ImmediateDominator(7));
+            Assert.Equal(9, tree.ImmediateDominator(8));
+            Assert.Equal(11, tree.ImmediateDominator(9));
+            Assert.Equal(12, tree.ImmediateDominator(10));
+            Assert.Equal(8, tree.ImmediateDominator(12));
+            Assert.Equal(2, tree.ImmediateDominator(13));
+            Assert.Equal((int?)null, tree.ImmediateDominator(11));
+        }
     }
 }

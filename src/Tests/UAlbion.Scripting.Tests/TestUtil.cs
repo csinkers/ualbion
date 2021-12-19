@@ -42,7 +42,7 @@ namespace UAlbion.Scripting.Tests
             string resultsDir,
             [CallerMemberName] string method = null)
         {
-            if (CompareCfgVsScript(graph, expected, out var error))
+            if (!CompareCfgVsScript(graph, expected, out var error))
             {
                 DumpSteps(steps, resultsDir, method);
                 throw new InvalidOperationException(error);
@@ -51,6 +51,12 @@ namespace UAlbion.Scripting.Tests
 
         public static bool CompareCfgVsScript(ControlFlowGraph graph, string expected, out string message)
         {
+            if (graph.ActiveNodeCount > 1)
+            {
+                message = "Result is not fully reduced";
+                return false;
+            }
+
             var nodes = graph.GetDfsOrder().Select(x => graph.Nodes[x]);
             return CompareNodesVsScript(nodes, expected, out message);
         }

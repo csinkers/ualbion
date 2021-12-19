@@ -19,26 +19,11 @@ namespace UAlbion.Scripting
             ReduceIfThenElse.Decompile,
             ReduceSeseRegions.Decompile,
             ReduceLoops.Decompile,
-            // x => (AddLoopSuccessor(x), "Add loop successor"),
+            LoopConverter.Apply,
             x => (x.Defragment(), "Defragment"),
-            x => (CfgRelabeller.Relabel(x, ScriptConstants.DummyLabelPrefix), "Relabel"),
-            x => (x.AcceptBuilder(new EmptyNodeRemovalVisitor()), "Remove empty nodes")
+            SimplifyLabels.Apply,
+            RemoveEmptyNodes.Apply
         };
-
-        static ControlFlowGraph AddLoopSuccessor(ControlFlowGraph graph)
-        {
-            var postDom = graph.GetPostDominatorTree();
-            foreach(var loop in graph.GetLoops())
-            {
-                var successor = postDom.ImmediateDominator(loop.Header.Index);
-                if (!successor.HasValue)
-                    continue;
-
-                return graph.AddEdge(loop.Header.Index, successor.Value, CfgEdge.LoopSuccessor);
-            }
-
-            return graph;
-        }
 
         public static List<ICfgNode> Decompile<T>(
             IList<T> nodes,
@@ -184,6 +169,23 @@ namespace UAlbion.Scripting
             return result.Select(x => (x.Key.start, x.Key.end, x.Value));
         }
 
+        public static ControlFlowGraph BuildDisconnectedGraphFromEvents<T>(IList<T> events) where T : IEventNode
+        {
+            var nodes = events.Select(x => (ICfgNode)Emit.Event(x.Event)).ToList();
+
+            // Add empty nodes for the unique entry/exit points
+            var entry = nodes.Count;
+            nodes.Add(Emit.Empty());
+            var exit = nodes.Count;
+            nodes.Add(Emit.Empty());
+
+            var trueEdges = events.Where(x => x.Next != null).Select(x => ((int)x.Id, (int)x.Next.Id, CfgEdge.True));
+            var falseEdges = events.OfType<IBranchNode>().Where(x => x.NextIfFalse != null).Select(x => ((int)x.Id, (int)x.NextIfFalse.Id, CfgEdge.False));
+            var edges = trueEdges.Concat(falseEdges);
+            edges = FilterOutDuplicateEdges(edges);
+            return new ControlFlowGraph(entry, exit, nodes, edges);
+        }
+
         /* // Split into regions preserving shared tails - requires fancier handling during later decompilation steps
         public static IList<ControlFlowGraph> BuildEventRegions<T>(
             IList<T> events,
@@ -269,23 +271,6 @@ namespace UAlbion.Scripting
 
             return results;
         } //*/
-
-        public static ControlFlowGraph BuildDisconnectedGraphFromEvents<T>(IList<T> events) where T : IEventNode
-        {
-            var nodes = events.Select(x => (ICfgNode)Emit.Event(x.Event)).ToList();
-
-            // Add empty nodes for the unique entry/exit points
-            var entry = nodes.Count;
-            nodes.Add(Emit.Empty());
-            var exit = nodes.Count;
-            nodes.Add(Emit.Empty());
-
-            var trueEdges = events.Where(x => x.Next != null).Select(x => ((int)x.Id, (int)x.Next.Id, CfgEdge.True));
-            var falseEdges = events.OfType<IBranchNode>().Where(x => x.NextIfFalse != null).Select(x => ((int)x.Id, (int)x.NextIfFalse.Id, CfgEdge.False));
-            var edges = trueEdges.Concat(falseEdges);
-            edges = FilterOutDuplicateEdges(edges);
-            return new ControlFlowGraph(entry, exit, nodes, edges);
-        }
 
         /* // First attempt, doesn't handle shared suffixes
         public static List<ControlFlowGraph> BuildEventRegions<T>(

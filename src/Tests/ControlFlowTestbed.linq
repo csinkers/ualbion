@@ -11,6 +11,7 @@
   <Namespace>UAlbion.Scripting</Namespace>
   <Namespace>UAlbion.Scripting.Ast</Namespace>
   <Namespace>UAlbion.Config</Namespace>
+  <Namespace>UAlbion.Scripting.Rules</Namespace>
 </Query>
 
 void Main()
@@ -36,7 +37,7 @@ void Main()
 3=>4: test 3
 4=>5: test 4
 5=>!: test 5", "0 3"); // Overlapping chains */
-	DumpSteps(TestGraphs.MultiBreak, 20);
+	DumpSteps(TestGraphs.InfiniteLoopMap149, 20);
 	/*const string Foo = @"";
 	var events = EventNode.ParseRawEvents(Foo);
 	//BuildGraphDumper(Decompiler.BuildDisconnectedGraphFromEvents(events), "foo").Dump();
@@ -126,7 +127,7 @@ static object BuildGraphDumper(ControlFlowGraph graph, string description) => ne
 	{
 		Dominator = NullOnError(() => BuildTreeDumper(graph.GetDominatorTree())),
 		PostDominator = NullOnError(() => BuildTreeDumper(graph.GetPostDominatorTree())),
-		Loops = NullOnError(() => graph.GetLoops()),
+		Loops = NullOnError(() => ReduceLoops.GetLoops(graph)),
 		BackEdges = NullOnError(() => graph.GetBackEdges())
 	},
 	Extra = new

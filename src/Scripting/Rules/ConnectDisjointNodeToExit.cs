@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Scripting.Rules
+﻿using System.Linq;
+
+namespace UAlbion.Scripting.Rules
 {
     public class ConnectDisjointNodeToExit 
     {
@@ -26,6 +28,9 @@
 
             if (winner == -1)
                 return (graph, null);
+
+            foreach (var backEdge in graph.GetBackEdges().Where(x => x.start == winner))
+                return (graph.AddEdge(backEdge.end, graph.ExitIndex, CfgEdge.LoopSuccessor), Description);
 
             return (graph.AddEdge(winner, graph.ExitIndex, CfgEdge.DisjointGraphFixup), Description);
         }

@@ -66,10 +66,10 @@ namespace UAlbion.Scripting
 
         /* 0 > 1 <-\
                \---/  */
-        public static ControlFlowGraph InfiniteEmptyLoop => ControlFlowGraph.FromString("[0,2,3,0+1 1+1]");
+        public static ControlFlowGraph InfiniteLoop1 => ControlFlowGraph.FromString("[0,2,3,0+1 1+1]");
 
         /* 0 > 1 <-> 2 */
-        public static ControlFlowGraph InfiniteLoop => ControlFlowGraph.FromString("[0,3,4,0+1 1+2 2+1]");
+        public static ControlFlowGraph InfiniteLoop2 => ControlFlowGraph.FromString("[0,3,4,0+1 1+2 2+1]");
 
         /* Graph1
            0
@@ -288,7 +288,7 @@ namespace UAlbion.Scripting
                 ( 5,17, CfgEdge.False), // (c3,!n9),
             });
         public const string NoMoreGotos3Code = @"if (A) {
-    do {
+    loop {
         if (c1) {
             n1
             continue
@@ -299,7 +299,10 @@ namespace UAlbion.Scripting
             }
             n3
         }
-    } while (c3)
+        if (!(c3)) {
+            break
+        }
+    }
 } else {
     if (b1) {
         if (b2) {
@@ -402,18 +405,20 @@ n9";
 
         public static string NoMoreGotos3Region1Code =>
             @"A
-do {
+loop {
     if (c1) {
         n1
-        continue
     } else {
         if (c2) {
             n2
             break
         }
         n3
+        if (!(c3)) {
+            break
+        }
     }
-} while (c3)
+}
 n9";
 
         public static ControlFlowGraph NoMoreGotos3Region2 =>
@@ -586,13 +591,16 @@ n9";
                f
                v
                4 */
-        public const string ContinueBranchCode =
-            @"do {
-    while (1) {
+        public const string NestedLoopCode = @"loop {
+    if (1) {
         2
+    } else {
+        if (!(3)) {
+            break
+        }
     }
-} while (3)";
-        public static ControlFlowGraph ContinueBranch => ControlFlowGraph.FromString("[0,4,5,0+1 1+2 2+1 1-3 3+1 3-4]");
+}";
+        public static ControlFlowGraph NestedLoop => ControlFlowGraph.FromString("[0,4,5,0+1 1+2 2+1 1-3 3+1 3-4]");
 
         /* 0
            v
@@ -657,8 +665,49 @@ n9";
             |  \-f-11 -t->12-\|
             |                 |
             \------>13 <------/ */
-        public const string MultiBreakCode = "TODO";
-        public static ControlFlowGraph MultiBreak => ControlFlowGraph.FromString("[0,13,14,0+1 1+2 1-3 3+4 4+5 5+6 7+8 9+10 11+12 5-7 7-9 9-11 11-5 2+13 3-13 6-13 8-13 10-13 12-13]");
+        public const string MultiBreakCode = @"if (1) {
+    2
+} else {
+    if (3) {
+        4
+        loop {
+            if (5) {
+                6
+                break
+            }
+            if (7) {
+                8
+                break
+            }
+            if (9) {
+                10
+                break
+            }
+            if (11) {
+                12
+                break
+            }
+        }
+    }
+    13
+}";
+        public static ControlFlowGraph MultiBreak => ControlFlowGraph.FromString("[0,14,15,0+1 1+2 1-3 3+4 4+5 5+6 7+8 9+10 11+12 5-7 7-9 9-11 11-5 2+14 3-13 6+13 8+13 10+13 12+13 13+14]");
+/* 0
+   |
+/--1---\
+t  ^   l
+|  f   |
+3  v   |
+|  2   |
+|      |
+\->4 <-/
+   v
+   5
+ */
+        public const string MultiBreak2Code = "loop { if (1) { 3, break }, 2 }, 4";
+        public static ControlFlowGraph MultiBreak2 => ControlFlowGraph.FromString("[0,5,6,0+1 1+3 3+4 1l4 1-2 2-1 4+5]");
+
+
 
         /* 0
            v
@@ -674,22 +723,163 @@ n9";
         public const string MidBreakLoopCode = "if (1) { loop { 3, if (4) { break }, 5 }, 6 } else { 2 }";
         public static ControlFlowGraph MidBreakLoop => ControlFlowGraph.FromString("[0,7,8,0+1 1-2 2+7 1+3 3+4 4+6 6+7 4-5 5+3]");
 
-        public const string MultiBreakMap166Code = "TODO";
+        public const string MultiBreakMap166Code = @"if (1) {
+    2
+} else {
+    if (3) {
+        4
+        loop {
+            if (5) {
+                6
+                break
+            }
+            if (7) {
+                8
+                break
+            }
+            if (9) {
+                10
+                break
+            }
+            if (11) {
+                12
+                break
+            }
+            if (13) {
+                14
+                break
+            }
+            if (15) {
+                16
+                break
+            }
+            if (17) {
+                18
+                break
+            }
+            if (19) {
+                20
+                break
+            }
+            if (21) {
+                22
+                break
+            }
+            if (23) {
+                24
+                break
+            }
+        }
+    }
+}";
         public static ControlFlowGraph MultiBreakMap166 => ControlFlowGraph.FromString(
             "[0,25,26,0+1 1+2 1-3 2+25 3+4 3-25 4+5 5+6 5-7 6+25 7+8 7-9 8+25 9+10 9-11 " +
             "10+25 11+12 11-13 12+25 13+14 13-15 14+25 15+16 15-17 16+25 17+18 17-19 " +
             "18+25 19+20 19-21 20+25 21+22 21-23 22+25 23+24 23-5 24+25]");
 
-        public const string MultiBreakMap200Code = "TODO";
+        public const string MultiBreakMap200Code = @"if (1) {
+    2
+} else {
+    if (3) {
+        if (4) {
+            26
+        } else {
+            5
+            loop {
+                if (6) {
+                    7
+                    break
+                }
+                if (8) {
+                    9
+                    break
+                }
+                if (10) {
+                    11
+                    break
+                }
+                if (12) {
+                    13
+                    break
+                }
+                if (14) {
+                    15
+                    break
+                }
+                if (16) {
+                    17
+                    break
+                }
+                if (18) {
+                    19
+                    break
+                }
+                if (20) {
+                    21
+                    break
+                }
+                if (22) {
+                    23
+                    break
+                }
+                if (24) {
+                    25
+                    break
+                }
+            }
+        }
+    }
+}";
 
         public static ControlFlowGraph MultiBreakMap200 => ControlFlowGraph.FromString(
             "[0,27,28,0+1 1+2 1-3 2+27 3+4 3-27 4+26 4-5 5+6 6+7 6-8 7+27 8+9 8-10 9+27 " +
             "10+11 10-12 11+27 12+13 12-14 13+27 14+15 14-16 15+27 16+17 16-18 17+27 " +
             "18+19 18-20 19+27 20+21 20-22 21+27 22+23 22-24 23+27 24+25 24-6 25+27 26+27]");
 
-        public const string MultiBreakMap201Code = "TODO"; // 202 identical to 201
+        public const string MultiBreakMap201Code = @"if (1) {
+    2
+    if (!(3)) {
+        4
+        loop {
+            if (5) {
+                6
+                break
+            }
+            if (7) {
+                8
+                break
+            }
+            if (9) {
+                10
+                break
+            }
+            if (11) {
+                12
+                break
+            }
+        }
+    }
+}"; // 202 identical to 201
         public static ControlFlowGraph MultiBreakMap201 => ControlFlowGraph.FromString("[0,13,14,0+1 1+2 1-13 2+3 3+13 3-4 4+5 5+6 5-7 6+13 7+8 7-9 8+13 9+10 9-11 10+13 11+12 11-5 12+13]");
-
+        public static ControlFlowGraph InfiniteLoopMap149 => ControlFlowGraph.FromString("[0,9,10,0+1 1+2 1-3 2+9 3+4 4+8 4-5 5+6 5-8 6+7 7+7 8-9]");
+        public const string InfiniteLoopMap149Code = @"if (1) {
+    2
+} else {
+    3
+    if (4) {
+        goto L1
+    } else {
+        if (5) {
+            6
+            loop {
+                7
+            }
+        } else {
+            L1:
+            8
+        }
+    }
+}";
 
         public const string LoopEdgeCaseMap174Code = "if (1) { loop { 2, if (3) { break }, 4 }, 6 } else { 5 }";
         public static ControlFlowGraph LoopEdgeCaseMap174 => ControlFlowGraph.FromString("[0,7,8,0+1 1+2 1-5 2+3 3+6 3-4 4+2 5+7 6+7]");

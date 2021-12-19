@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace UAlbion.Scripting
@@ -112,9 +111,8 @@ namespace UAlbion.Scripting
                         return d.AddPointer("i", i).ToString();
                     }; */
 
-                    if (visited[i])
-                        continue; // Don't visit nodes twice
-
+                    if (!graph.IsNodeActive(i) || visited[i])
+                        continue;
 
                     if (graph.Parents(i).Any(x => !visited[x]))
                         continue; // If we haven't visited all of the parents we can't evaluate this node yet.

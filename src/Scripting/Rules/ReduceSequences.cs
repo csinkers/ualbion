@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Linq;
 
 namespace UAlbion.Scripting.Rules
 {
     public static class ReduceSequences
     {
-        const string Description = "Reduce sequence";
         public static (ControlFlowGraph, string) Decompile(ControlFlowGraph graph)
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
@@ -12,6 +12,10 @@ namespace UAlbion.Scripting.Rules
             {
                 var children = graph.Children(index);
                 if (children.Length != 1 || children[0] == index)
+                    continue;
+
+                // If the node is the target of a back-edge then leave it alone: it's probably an empty loop-header node
+                if (graph.GetBackEdges().Any(x => x.end == index))
                     continue;
 
                 int child = children[0];
@@ -36,7 +40,7 @@ namespace UAlbion.Scripting.Rules
                 foreach (var grandChild in grandChildren)
                     updated = updated.AddEdge(index, grandChild, graph.GetEdgeLabel(child, grandChild));
 
-                return (updated, Description);
+                return (updated, $"Reduce sequence (node {index}, child {child})");
             }
 
             return (graph, null);

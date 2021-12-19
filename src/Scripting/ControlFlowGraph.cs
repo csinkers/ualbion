@@ -26,7 +26,6 @@ namespace UAlbion.Scripting
         DominatorTree _cachedDominatorTree;
         ImmutableArray<int>? _cachedOrder;
         ImmutableArray<int>? _cachedPostOrder;
-        ImmutableArray<CfgLoop>? _cachedLoops;
         ImmutableArray<(int start, int end)>? _cachedBackEdges;
 
         public int EntryIndex { get; }
@@ -350,7 +349,7 @@ namespace UAlbion.Scripting
         public ControlFlowGraph Defragment(bool force = false)
         {
             if (_deletedNodeCount == 0 && EntryIndex == 0 && ExitIndex == NodeCount) return this;
-            if (!force && (double)_deletedNodeCount / Nodes.Count < DefragThreshold) return this;
+            if (!force && (double)_deletedNodeCount / Nodes.Count <= DefragThreshold) return this;
 
             int[] mapping = new int[Nodes.Count];
             Array.Fill(mapping, -1);
@@ -401,9 +400,10 @@ namespace UAlbion.Scripting
             return new ControlFlowGraph(EntryIndex, ExitIndex, Nodes, byStart, byEnd, labels, _deletedNodes, _deletedNodeCount);
         }
 
-        public ControlFlowGraph InsertBefore(int position, ICfgNode node)
+        public ControlFlowGraph InsertBefore(int position, ICfgNode node) => InsertBefore(position, node, out _);
+        public ControlFlowGraph InsertBefore(int position, ICfgNode node, out int newIndex)
         {
-            var result = AddNode(node, out var newIndex);
+            var result = AddNode(node, out newIndex);
             var edges = new List<(int, int, CfgEdge)>();
             foreach (var parent in Parents(position))
             {
@@ -528,122 +528,6 @@ namespace UAlbion.Scripting
                 .ThenBy(x => x.Item2);
 
             return new ControlFlowGraph(mapping[EntryIndex], mapping[ExitIndex], nodes, edges);
-        }
-
-        public CfgLoop GetLoopInformation(List<int> nodes)
-        {
-            if (nodes == null) throw new ArgumentNullException(nameof(nodes));
-            if (nodes.Count == 0) throw new ArgumentException("Empty loop provided to GetLoopInformation", nameof(nodes));
-
-            var body = new List<LoopPart>();
-            var header = new LoopPart(nodes[0], true);
-            var exits = new HashSet<int>();
-
-            // Determine if header can break out of the loop
-            foreach (int child in Children(nodes[0]))
-            {
-                if (nodes.Contains(child))
-                    continue;
-
-                CfgEdge edgeLabel = GetEdgeLabel(nodes[0], child);
-                if (edgeLabel == CfgEdge.LoopSuccessor) // Loop successor pseudo-edges don't count for break-detection
-                    continue;
-
-                header = new LoopPart(header.Index, true, Break: true, Negated: edgeLabel == CfgEdge.True);
-                exits.Add(child);
-            }
-
-            for (int i = 1; i < nodes.Count; i++)
-            {
-                var node = nodes[i];
-                bool isContinue = false;
-                bool isBreak = false;
-                bool isTail = true;
-                bool negated = false;
-
-                foreach (int child in Children(node))
-                {
-                    // Func<string> vis = () => ToVis().AddPointer("i", node).AddPointer("child", child).ToString(); // For VS Code debug visualisation
-
-                    if (child == header.Index) // Jump to header = possible continue
-                        isContinue = true;
-                    else if (nodes.Contains(child))
-                        isTail = false;
-                    else
-                    {
-                        negated = GetEdgeLabel(node, child) == CfgEdge.False;
-                        isBreak = true;
-                        exits.Add(child);
-                    }
-                }
-
-                bool hasOutsideEntry = Enumerable.Any(Parents(node), x => !nodes.Contains(x));
-                body.Add(new LoopPart(node, false, isTail, isBreak, isContinue, hasOutsideEntry, negated));
-            }
-
-            bool isMultiExit = exits.Count > 1;
-            int? mainExit;
-            if (isMultiExit)
-            {
-                // If the main loop exit post-dominates all the others then we should be able to structure them
-                int? headerExit = Children(header.Index).Intersect(exits).Select(x => (int?)x).SingleOrDefault();
-                var tailExits = body
-                    .Where(x => x.Tail)
-                    .SelectMany(x => Children(x.Index))
-                    .Intersect(exits)
-                    .ToList();
-
-                mainExit = headerExit ?? (tailExits.Count == 1 ? tailExits[0] : null);
-                if (mainExit.HasValue)
-                {
-                    var postDom = GetPostDominatorTree();
-                    if (exits.All(x => x == mainExit.Value || postDom.Dominates(mainExit.Value, x)))
-                    {
-                        exits.Clear();
-                        exits.Add(mainExit.Value);
-                    }
-                }
-            }
-            else mainExit = exits.SingleOrDefault();
-
-            if (body.Count(x => x.Tail) > 1) // Only allow one tail, pick one of the nodes with the longest path from the header.
-            {
-                var longestPaths = new Dictionary<int, int>();
-                for (int i = 0; i < body.Count; i++)
-                {
-                    var part = body[i];
-                    if (!part.Tail)
-                        continue;
-                    var paths = this.GetAllReachingPaths(header.Index, part.Index);
-                    longestPaths[i] = paths.Select(x => x.Count).Max();
-                }
-
-                var longestDistance = longestPaths.Values.Max();
-                var winner = longestPaths.First(x => x.Value == longestDistance).Key;
-                foreach(var kvp in longestPaths)
-                {
-                    if (kvp.Key == winner) continue;
-                    var part = body[kvp.Key];
-                    body[kvp.Key] = new LoopPart(part.Index, part.Header, false, part.Break, part.Continue, part.OutsideEntry, part.Negated);
-                }
-            }
-
-            return new CfgLoop(header, body.ToImmutableList(), exits.ToImmutableList(), mainExit);
-        }
-
-        public ImmutableArray<CfgLoop> GetLoops()
-        {
-            if (_cachedLoops.HasValue)
-                return _cachedLoops.Value;
-
-            var components = this.GetStronglyConnectedComponents();
-            var loops =
-                from component in components.Where(x => x.Count > 1)
-                from loop in this.GetAllSimpleLoops(component)
-                select GetLoopInformation(loop);
-
-            _cachedLoops = loops.ToImmutableArray();
-            return _cachedLoops.Value;
         }
 
         public CfgCutResult Cut(HashSet<int> selectedNodes, int entry, int exit)

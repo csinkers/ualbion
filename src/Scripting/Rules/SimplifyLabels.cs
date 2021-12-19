@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using UAlbion.Scripting.Ast;
 
-namespace UAlbion.Scripting
+namespace UAlbion.Scripting.Rules
 {
-    public static class CfgRelabeller
+    public static class SimplifyLabels
     {
+        public static (ControlFlowGraph result, string description) Apply(ControlFlowGraph graph) 
+            => (Relabel(graph, ScriptConstants.DummyLabelPrefix), "Relabel");
+
         class LabelCollectionAstVisitor : BaseAstVisitor
         {
             public Dictionary<string, ICfgNode> Labels { get; } = new();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using UAlbion.Scripting.Ast;
 
@@ -10,17 +11,42 @@ namespace UAlbion.Scripting.Rules
         public static (ControlFlowGraph, string) Decompile(ControlFlowGraph graph)
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
-            var loops = graph.GetLoops();
+            var loops = GetLoops(graph);
+
+            // Add an empty node for the header so the header will never be a continue / break. Then we can structure 
+            // all loops as infinite loops (the most general case) and use a separate step to identify while / do loops.
             foreach (var index in graph.GetDfsPostOrder())
             {
                 foreach (var loop in loops)
                 {
-                    if (loop.IsMultiExit)
-                    {
-                        // TODO: Grow loop then reduce
+                    if (loop.Header.Index != index)
                         continue;
+
+                    var headerNode = graph.Nodes[loop.Header.Index];
+                    if (headerNode is EmptyNode)
+                        continue;
+
+                    int? successor = null;
+                    foreach (var child in graph.Children(loop.Header.Index).Where(x => graph.GetEdgeLabel(loop.Header.Index, x) == CfgEdge.LoopSuccessor))
+                        successor = child;
+
+                    graph = graph.InsertBefore(loop.Header.Index, Emit.Empty(), out var newHeaderIndex);
+
+                    if (successor.HasValue)
+                    {
+                        graph = graph
+                            .RemoveEdge(loop.Header.Index, successor.Value)
+                            .AddEdge(newHeaderIndex, successor.Value, CfgEdge.LoopSuccessor);
                     }
 
+                    return (graph, "Add empty node for loop header");
+                }
+            }
+
+            foreach (var index in graph.GetDfsPostOrder())
+            {
+                foreach (var loop in loops)
+                {
                     if (loop.Header.Index != index) // Handle non-header exits and back edges (post-order iteration means these will be handled before the header)
                     {
                         var part = loop.Body.FirstOrDefault(x => x.Index == index);
@@ -42,24 +68,10 @@ namespace UAlbion.Scripting.Rules
                             continue;
 
                         int tail = loop.Body[0].Index;
-                        if (loop.Header.Break)
-                        {
-                            var updated = ReduceWhileLoop(graph, index, tail, loop.Header.Negated);
-                            if (updated != graph)
-                                return (updated, "Reduce while loop");
-                        }
-                        else if (loop.Body[0].Break)
-                        {
-                            var updated = ReduceDoLoop(graph, index, tail);
-                            if (updated != graph)
-                                return (updated, "Reduce do loop");
-                        }
-                        else
-                        {
-                            var updated = ReduceGenericLoop(graph, index, tail);
-                            if (updated != graph)
-                                return (updated, "Reduce generic loop");
-                        }
+                        var loopNode = Emit.Loop(Emit.Seq(graph.Nodes[index], graph.Nodes[tail]));
+                        return (graph
+                            .RemoveNode(tail)
+                            .ReplaceNode(index, loopNode), "Reduce generic loop");
                     }
                 }
             }
@@ -109,12 +121,6 @@ namespace UAlbion.Scripting.Rules
 
             // Outside entry = non-structured code, so give up
             if (part.OutsideEntry)
-                return graph;
-
-            if (part.Header) // Header-breaks will be structured into a while loop
-                return graph;
-
-            if (part.Tail && !loop.Header.Break) // Tail-breaks will be structured into a do loop as long as the header isn't also a break (while loop is preferred)
                 return graph;
 
             var children = graph.Children(part.Index);
@@ -168,56 +174,96 @@ namespace UAlbion.Scripting.Rules
                 .RemoveEdge(index, target);
         }
 
-        static ControlFlowGraph ReduceGenericLoop(ControlFlowGraph graph, int head, int tail)
+        public static IList<CfgLoop> GetLoops(ControlFlowGraph graph)
         {
-            var loopNode = Emit.Loop(Emit.Seq(graph.Nodes[head], graph.Nodes[tail]));
-            return graph
-                .RemoveNode(tail)
-                .ReplaceNode(head, loopNode);
+            var components = graph.GetStronglyConnectedComponents();
+            var loops =
+                from component in components.Where(x => x.Count > 1)
+                from loop in graph.GetAllSimpleLoops(component)
+                select GetLoopInformation(graph, loop);
+
+            return loops.ToList();
         }
 
-        static ControlFlowGraph ReduceWhileLoop(ControlFlowGraph graph, int head, int tail, bool negated)
+        public static CfgLoop GetLoopInformation(ControlFlowGraph graph, List<int> nodes)
         {
-            // Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("tail", tail).ToString(); // For VS Code debug visualisation
-            var updated = graph;
-            var children = graph.Children(tail);
-            if (children.Length != 1)
+            if (nodes == null) throw new ArgumentNullException(nameof(nodes));
+            if (nodes.Count == 0) throw new ArgumentException("Empty loop provided to GetLoopInformation", nameof(nodes));
+
+            var body = new List<LoopPart>();
+            var header = new LoopPart(nodes[0], true);
+            var exits = new HashSet<int>();
+
+            // Determine if header can break out of the loop
+            foreach (int child in graph.Children(nodes[0]))
             {
-                bool isfirstChildInLoop = head == children[0];
-                var target = isfirstChildInLoop ? children[1] : children[0];
-                return ReplaceLoopBranch(graph, tail, target, Emit.Break());
+                if (nodes.Contains(child))
+                    continue;
+
+                CfgEdge edgeLabel = graph.GetEdgeLabel(nodes[0], child);
+                if (edgeLabel == CfgEdge.LoopSuccessor) // Loop successor pseudo-edges don't count for break-detection
+                    continue;
+
+                header = new LoopPart(header.Index, true, Break: true, Negated: edgeLabel == CfgEdge.True);
+                exits.Add(child);
             }
 
-            var condition = graph.Nodes[head];
-            if (negated)
-                condition = Emit.Negation(condition);
+            for (int i = 1; i < nodes.Count; i++)
+            {
+                var node = nodes[i];
+                bool isContinue = false;
+                bool isBreak = false;
+                bool isTail = true;
+                bool negated = false;
 
-            var newNode = Emit.While(condition, graph.Nodes[tail]);
-            return updated
-                .RemoveNode(tail)
-                .ReplaceNode(head, newNode);
-        }
+                foreach (int child in graph.Children(node))
+                {
+                    // Func<string> vis = () => ToVis().AddPointer("i", node).AddPointer("child", child).ToString(); // For VS Code debug visualisation
 
-        static ControlFlowGraph ReduceDoLoop(ControlFlowGraph graph, int head, int tail)
-        {
-            // Func<string> vis = () => graph.ToVis().AddPointer("head", head).AddPointer("tail", tail).ToString(); // For VS Code debug visualisation
-            var updated = graph;
-            var children = graph.Children(tail);
-            if (children.Length != 2)
-                return updated;
+                    if (child == header.Index) // Jump to header = possible continue
+                        isContinue = true;
+                    else if (nodes.Contains(child))
+                        isTail = false;
+                    else
+                    {
+                        negated = graph.GetEdgeLabel(node, child) == CfgEdge.False;
+                        isBreak = true;
+                        exits.Add(child);
+                    }
+                }
 
-            foreach (int child in children)
-                if (child != head)
-                    updated = updated.AddEdge(head, child, CfgEdge.True);
+                bool hasOutsideEntry = Enumerable.Any(graph.Parents(node), x => !nodes.Contains(x));
+                body.Add(new LoopPart(node, false, isTail, isBreak, isContinue, hasOutsideEntry, negated));
+            }
 
-            var condition = graph.Nodes[tail];
-            if (graph.GetEdgeLabel(tail, head) == CfgEdge.False)
-                condition = Emit.Negation(condition);
+            var postDom = graph.GetPostDominatorTree();
+            int? mainExit = postDom.ImmediateDominator(header.Index);
+            while (mainExit.HasValue && body.Any(x => !postDom.Dominates(mainExit.Value, x.Index)))
+                mainExit = postDom.ImmediateDominator(mainExit.Value);
 
-            var newNode = Emit.Do(condition, graph.Nodes[head]);
-            return updated
-                .RemoveNode(tail)
-                .ReplaceNode(head, newNode);
+            if (body.Count(x => x.Tail) > 1) // Only allow one tail, pick one of the nodes with the longest path from the header.
+            {
+                var longestPaths = new Dictionary<int, int>();
+                for (int i = 0; i < body.Count; i++)
+                {
+                    var part = body[i];
+                    if (!part.Tail)
+                        continue;
+                    var paths = graph.GetAllReachingPaths(header.Index, part.Index);
+                    longestPaths[i] = paths.Select(x => x.Count).Max();
+                }
+
+                var longestDistance = longestPaths.Values.Max();
+                var winner = longestPaths.First(x => x.Value == longestDistance).Key;
+                foreach(var kvp in longestPaths)
+                {
+                    if (kvp.Key == winner) continue;
+                    var part = body[kvp.Key];
+                    body[kvp.Key] = new LoopPart(part.Index, part.Header, false, part.Break, part.Continue, part.OutsideEntry, part.Negated);
+                }
+            }
+
+            return new CfgLoop(header, body.ToImmutableList(), exits.ToImmutableList(), mainExit);
         }
     }
 }

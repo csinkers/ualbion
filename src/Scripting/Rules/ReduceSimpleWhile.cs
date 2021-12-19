@@ -5,51 +5,37 @@ namespace UAlbion.Scripting.Rules
 {
     public static class ReduceSimpleWhile 
     {
-        const string Description = "Reduce simple while";
         public static (ControlFlowGraph, string) Decompile(ControlFlowGraph graph)
         {
             if (graph == null) throw new ArgumentNullException(nameof(graph));
             var simpleLoopIndices =
                 from index in graph.GetDfsPostOrder()
                 let children = graph.Children(index)
-                where children.Length is 1 or 2 && children.Contains(index)
+                where children.Length == 2 && children.Contains(index)
                 select index;
 
             foreach (var index in simpleLoopIndices)
             {
                 // Func<string> vis = () => graph.ToVis().AddPointer("index", index).ToString(); // For VS Code debug visualisation
-                if (graph.Children(index).Length == 1)
-                    return ReduceEmptyInfiniteWhileLoop(graph, index);
 
-                var condition = graph.Nodes[index];
-                if (graph.GetEdgeLabel(index, index) == CfgEdge.False)
-                    condition = Emit.Negation(condition);
+                // Add an empty header node, which will put it into the form expected by the general-case loop reducer
+                int? successor = null;
+                foreach (var child in graph.Children(index).Where(x => graph.GetEdgeLabel(index, x) == CfgEdge.LoopSuccessor))
+                    successor = child;
 
-                var updated = graph
-                    .ReplaceNode(index, Emit.While(condition, null))
-                    .RemoveEdge(index, index);
+                graph = graph.InsertBefore(index, Emit.Empty(), out var newHeaderIndex);
 
-                return (updated, Description);
+                if (successor.HasValue)
+                {
+                    graph = graph
+                        .RemoveEdge(index, successor.Value)
+                        .AddEdge(newHeaderIndex, successor.Value, CfgEdge.LoopSuccessor);
+                }
+
+                return (graph, "Add empty header for single-node loop");
             }
 
             return (graph, null);
-        }
-
-        static (ControlFlowGraph, string) ReduceEmptyInfiniteWhileLoop(ControlFlowGraph graph, int index)
-        {
-            var exitNode = graph.GetFirstEmptyExitNode();
-            var label = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
-            var subgraph = new ControlFlowGraph(new[]
-                {
-                    Emit.Empty(), // 0
-                    Emit.Label(label), // 1
-                    graph.Nodes[index], // 2
-                    Emit.Goto(label), // 3
-                    Emit.Empty(), // 4
-                },
-                new[] { (0,1,CfgEdge.True), (1,2,CfgEdge.True), (2,3,CfgEdge.True), (3,4,CfgEdge.True), });
-
-            return (graph.AddEdge(index, exitNode, CfgEdge.True).ReplaceNode(index, subgraph), "Reduce empty infinite while");
         }
     }
 }

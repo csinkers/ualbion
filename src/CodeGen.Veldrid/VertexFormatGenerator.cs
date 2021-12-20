@@ -12,13 +12,13 @@ namespace UAlbion.CodeGen.Veldrid
             if (members.Count == 0)
                 return;
 
-            sb.AppendLine(@"        public static VertexLayoutDescription Layout { get; } = new(");
+            sb.AppendLine(@"        public static VertexLayoutDescription GetLayout(bool input) => new(");
             bool first = true;
             foreach (var member in members)
             {
                 if (!first)
                     sb.AppendLine(",");
-                sb.Append($@"            new VertexElementDescription(""{member.Vertex.Name}"", VertexElementSemantic.TextureCoordinate, {member.Vertex.Format})");
+                sb.Append($@"            new VertexElementDescription((input ? ""i"" : ""o"") + ""{member.Vertex.Name}"", VertexElementSemantic.TextureCoordinate, {member.Vertex.Format})");
                 first = false;
             }
             sb.AppendLine(");");

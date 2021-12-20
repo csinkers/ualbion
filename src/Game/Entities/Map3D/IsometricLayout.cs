@@ -92,7 +92,12 @@ namespace UAlbion.Game.Entities.Map3D
                 {
                     var floorInfo = labyrinthData.FloorAndCeilings[i];
                     var floor = floorInfo == null ? null : assets.LoadTexture(floorInfo.SpriteId);
-                    _tilemap.DefineFloor(i + 1,  floor);
+                    _tilemap.DefineFloor(i + 1, floor);
+                }
+
+                // Count the frames in a separate loop to avoid rebuilding the composited texture over and over
+                for (int i = 0; i < labyrinthData.FloorAndCeilings.Count; i++)
+                {
                     if (floors) totalTiles += _tilemap.DayFloors.GetFrameCountForLogicalId(i + 1);
                     if (ceilings) totalTiles += _tilemap.DayFloors.GetFrameCountForLogicalId(i + 1);
                 }
@@ -118,9 +123,11 @@ namespace UAlbion.Game.Entities.Map3D
                             overlayInfo.XOffset, overlayInfo.YOffset,
                             wallInfo?.TransparentColour ?? 0, isAlphaTested);
                     }
-
-                    totalTiles += _tilemap.DayWalls.GetFrameCountForLogicalId(i + 1);
                 }
+
+                // Count the frames in a separate loop to avoid rebuilding the composited texture over and over
+                for (int i = 0; i < labyrinthData.Walls.Count; i++)
+                    totalTiles += _tilemap.DayWalls.GetFrameCountForLogicalId(i + 1);
             }
 
             if (contents)

@@ -14,8 +14,8 @@ namespace UAlbion.Api.Visual
 
         public ArrayTexture(IAssetId id, int width, int height, int layers = 1, IEnumerable<Region> regions = null)
         {
-            Id = id ?? throw new ArgumentNullException(nameof(id));
-            Name = id.ToString();
+            Id = id;
+            Name = id?.ToString();
             Width = width;
             Height = height;
             ArrayLayers = layers;

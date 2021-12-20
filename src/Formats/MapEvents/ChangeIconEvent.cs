@@ -4,7 +4,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents
 {
-    [Event("change_icon")]
+    [Event("change_icon", "Modify a map tile's visual or trigger data", "ci")]
     public class ChangeIconEvent : MapEvent
     {
         public static ChangeIconEvent Serdes(ChangeIconEvent e, ISerializer s)

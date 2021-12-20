@@ -3,8 +3,8 @@ namespace UAlbion.Core.Veldrid.Sprites
 {
     public partial struct Vertex2DTextured
     {
-        public static VertexLayoutDescription Layout { get; } = new(
-            new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
-            new VertexElementDescription("TexCoords", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2));
+        public static VertexLayoutDescription GetLayout(bool input) => new(
+            new VertexElementDescription((input ? "i" : "o") + "Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
+            new VertexElementDescription((input ? "i" : "o") + "TexCoords", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2));
     }
 }

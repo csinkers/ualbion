@@ -7,7 +7,7 @@ namespace UAlbion.Core.Veldrid.Etm
         {
             get
             {
-                var layout = global::UAlbion.Core.Veldrid.Etm.DungeonTile.Layout;
+                var layout = global::UAlbion.Core.Veldrid.Etm.DungeonTile.GetLayout(true);
                 layout.InstanceStepRate = 1;
                 return layout;
             }
@@ -15,7 +15,7 @@ namespace UAlbion.Core.Veldrid.Etm
 
 
         public EtmPipeline() : base("ExtrudedTileMapSV.vert", "ExtrudedTileMapSF.frag",
-            new[] { global::UAlbion.Core.Veldrid.Sprites.Vertex3DTextured.Layout, DungeonTileLayout},
+            new[] { global::UAlbion.Core.Veldrid.Sprites.Vertex3DTextured.GetLayout(true), DungeonTileLayout},
             new[] { typeof(global::UAlbion.Core.Veldrid.Etm.EtmSet), typeof(global::UAlbion.Core.Veldrid.CommonSet) })
         { }
     }

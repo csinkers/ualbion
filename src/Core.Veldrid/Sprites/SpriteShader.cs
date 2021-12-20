@@ -16,7 +16,7 @@ namespace UAlbion.Core.Veldrid.Sprites
     [Input(0, typeof(Vertex2DTextured))]
     [Input(1, typeof(GpuSpriteInstanceData), InstanceStep = 1)]
     [ResourceSet(0, typeof(CommonSet))]
-    [ResourceSet(1, typeof(SpriteArraySet))]
+    [ResourceSet(1, typeof(SpriteSet))]
     [Output(0, typeof(SpriteIntermediateData))]
     [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
     internal partial class SpriteVertexShader : IVertexShader { }
@@ -24,14 +24,15 @@ namespace UAlbion.Core.Veldrid.Sprites
     [Name("SpriteSF.frag")]
     [Input(0, typeof(SpriteIntermediateData))]
     [ResourceSet(0, typeof(CommonSet))]
-    [ResourceSet(1, typeof(SpriteArraySet))]
+    [ResourceSet(1, typeof(SpriteSet))]
     [Output(0, typeof(SimpleFramebuffer))]
     [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
     internal partial class SpriteFragmentShader : IFragmentShader { }
 
-    internal sealed partial class SpriteArraySet : ResourceSetHolder
+    internal sealed partial class SpriteSet : ResourceSetHolder
     {
-        [Resource("uSprite")] ITextureArrayHolder _texture;
+        [Resource("uSprite")] ITextureHolder _texture; // Only one of texture & textureArray will be used at a time
+        [Resource("uSpriteArray")] ITextureArrayHolder _textureArray;
         [Resource("uSpriteSampler")] ISamplerHolder _sampler;
         [Resource("_Uniform")] IBufferHolder<SpriteUniform> _uniform;
     }

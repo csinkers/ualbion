@@ -1,4 +1,5 @@
 #include "SpriteSF.h.frag"
+
 #define DEPTH_COLOR(depth) (vec4((int((depth) * 1024) % 10) / 10.0f, 20 * (max((depth), 0.95) - 0.95), 20 * min((depth), 0.05), 1.0f))
 
 void main()
@@ -7,7 +8,10 @@ void main()
         ? vec2(iTexPosition.x, 1 - iTexPosition.y)
         : iTexPosition;
 
-    vec4 color = texture(sampler2DArray(uSprite, uSpriteSampler), vec3(uv, iLayer)); //! vec4 color;
+    vec4 color = 
+		((uFlags & SKF_USE_ARRAY_TEXTURE) != 0)
+		? texture(sampler2DArray(uSpriteArray, uSpriteSampler), vec3(uv, iLayer)) //! ? vec4(1.0f)
+		: texture(sampler2D(uSprite, uSpriteSampler), uv); //! : vec4(1.0f);
 
     if ((uFlags & SKF_USE_PALETTE) != 0)
     {

@@ -5,7 +5,7 @@ namespace UAlbion.Core.Veldrid
     {
 
         public FullscreenQuadPipeline() : base("FullscreenQuadSV.vert", "FullscreenQuadSF.frag",
-            new[] { global::UAlbion.Core.Veldrid.Sprites.Vertex2DTextured.Layout},
+            new[] { global::UAlbion.Core.Veldrid.Sprites.Vertex2DTextured.GetLayout(true)},
             new[] { typeof(global::UAlbion.Core.Veldrid.FullscreenQuadResourceSet) })
         { }
     }

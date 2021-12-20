@@ -3,7 +3,7 @@ namespace UAlbion.Core.Veldrid
 {
     internal partial struct FullscreenQuadIntermediate
     {
-        public static VertexLayoutDescription Layout { get; } = new(
-            new VertexElementDescription("NormCoords", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2));
+        public static VertexLayoutDescription GetLayout(bool input) => new(
+            new VertexElementDescription((input ? "i" : "o") + "NormCoords", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2));
     }
 }

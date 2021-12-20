@@ -15,14 +15,14 @@ namespace UAlbion.CodeGen.Veldrid
             // TODO: Ensure vertex shader outputs are compatible with fragment shader inputs
             var vshader = context.Types[type.Pipeline.VertexShader];
             var fshader = context.Types[type.Pipeline.FragmentShader];
-            foreach (var input in vshader.Shader.Inputs.Where(x => x.Item3 != 0))
+            foreach (var input in vshader.Shader.Inputs.Where(x => x.instanceStep != 0))
             {
-                sb.AppendLine($@"        static VertexLayoutDescription {LayoutHelperName(input.Item2)}
+                sb.AppendLine($@"        static VertexLayoutDescription {LayoutHelperName(input.type)}
         {{
             get
             {{
-                var layout = {input.Item2.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}.Layout;
-                layout.InstanceStepRate = {input.Item3};
+                var layout = {input.type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}.GetLayout(true);
+                layout.InstanceStepRate = {input.instanceStep};
                 return layout;
             }}
         }}
@@ -35,14 +35,14 @@ namespace UAlbion.CodeGen.Veldrid
 
             // e.g. Vertex2DTextured.Layout, SpriteInstanceDataLayout 
             bool first = true;
-            foreach (var input in vshader.Shader.Inputs.OrderBy(x => x.Item1))
+            foreach (var input in vshader.Shader.Inputs.OrderBy(x => x.slot))
             {
                 if (!first)
                     sb.Append(", ");
 
-                sb.Append(input.Item3 == 0
-                    ? $"{input.Item2.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}.Layout"
-                    : LayoutHelperName(input.Item2));
+                sb.Append(input.instanceStep == 0
+                    ? $"{input.type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}.GetLayout(true)"
+                    : LayoutHelperName(input.type));
                 first = false;
             }
 
@@ -56,7 +56,7 @@ namespace UAlbion.CodeGen.Veldrid
                 if (!first)
                     sb.Append(", ");
 
-                sb.Append($"typeof({set.Item2.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)})");
+                sb.Append($"typeof({set.type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)})");
                 first = false;
             }
             sb.AppendLine(" })");

@@ -213,6 +213,11 @@ namespace UAlbion.Core.Textures
                     if (_layerLookup[key] >= LayerLimit)
                         _layerLookup.Remove(key);
             }
+
+            // Make sure that there's always multiple layers to stop OpenGL complaining about
+            // being given a regular texture when it was expecting an array texture.
+            if (_layerSizes.Count < 2)
+                _layerSizes.Add(new Vector2(1, 1));
         }
 
         void RebuildLayer(LogicalSubImage lsi, int frameNumber, Span<uint> toBuffer, IList<uint[]> palette)

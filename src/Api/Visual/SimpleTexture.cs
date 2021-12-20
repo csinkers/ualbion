@@ -14,8 +14,8 @@ namespace UAlbion.Api.Visual
 
         public SimpleTexture(IAssetId id, int width, int height, IEnumerable<Region> regions = null)
         {
-            Id = id ?? throw new ArgumentNullException(nameof(id));
-            Name = id.ToString();
+            Id = id;
+            Name = id?.ToString();
             Width = width;
             Height = height;
             _pixelData = new T[Width * Height];

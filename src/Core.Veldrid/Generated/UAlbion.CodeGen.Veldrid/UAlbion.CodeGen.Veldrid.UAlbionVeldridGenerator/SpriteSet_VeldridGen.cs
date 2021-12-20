@@ -1,14 +1,15 @@
 ﻿using Veldrid;
 namespace UAlbion.Core.Veldrid.Sprites
 {
-    internal partial class SpriteArraySet
+    internal partial class SpriteSet
     {
         public static readonly ResourceLayoutDescription Layout = new(
             new ResourceLayoutElementDescription("uSprite", global::Veldrid.ResourceKind.TextureReadOnly, (ShaderStages)17),
+            new ResourceLayoutElementDescription("uSpriteArray", global::Veldrid.ResourceKind.TextureReadOnly, (ShaderStages)17),
             new ResourceLayoutElementDescription("uSpriteSampler", global::Veldrid.ResourceKind.Sampler, (ShaderStages)17),
             new ResourceLayoutElementDescription("_Uniform", global::Veldrid.ResourceKind.UniformBuffer, (ShaderStages)17));
 
-        public global::VeldridGen.Interfaces.ITextureArrayHolder Texture
+        public global::VeldridGen.Interfaces.ITextureHolder Texture
         {
             get => _texture;
             set
@@ -22,6 +23,24 @@ namespace UAlbion.Core.Veldrid.Sprites
 
                 if (_texture != null)
                     _texture.PropertyChanged += PropertyDirty;
+                Dirty();
+            }
+        }
+
+        public global::VeldridGen.Interfaces.ITextureArrayHolder TextureArray
+        {
+            get => _textureArray;
+            set
+            {
+                if (_textureArray == value) return;
+
+                if (_textureArray != null)
+                    _textureArray.PropertyChanged -= PropertyDirty;
+
+                _textureArray = value;
+
+                if (_textureArray != null)
+                    _textureArray.PropertyChanged += PropertyDirty;
                 Dirty();
             }
         }
@@ -61,6 +80,7 @@ namespace UAlbion.Core.Veldrid.Sprites
             device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
                 layout,
                 _texture.DeviceTexture,
+                _textureArray.DeviceTexture,
                 _sampler.Sampler,
                 _uniform.DeviceBuffer));
 
@@ -68,6 +88,8 @@ namespace UAlbion.Core.Veldrid.Sprites
         {
             if (_texture != null)
                 _texture.PropertyChanged += PropertyDirty;
+            if (_textureArray != null)
+                _textureArray.PropertyChanged += PropertyDirty;
             if (_sampler != null)
                 _sampler.PropertyChanged += PropertyDirty;
         }
@@ -77,6 +99,8 @@ namespace UAlbion.Core.Veldrid.Sprites
             base.Dispose(disposing);
             if (_texture != null)
                 _texture.PropertyChanged -= PropertyDirty;
+            if (_textureArray != null)
+                _textureArray.PropertyChanged -= PropertyDirty;
             if (_sampler != null)
                 _sampler.PropertyChanged -= PropertyDirty;
         }

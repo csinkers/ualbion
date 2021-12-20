@@ -3,9 +3,9 @@ namespace UAlbion.Core.Veldrid
 {
     internal partial struct SkyboxIntermediate
     {
-        public static VertexLayoutDescription Layout { get; } = new(
-            new VertexElementDescription("TexPosition", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
-            new VertexElementDescription("NormCoords", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
-            new VertexElementDescription("WorldPosition", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3));
+        public static VertexLayoutDescription GetLayout(bool input) => new(
+            new VertexElementDescription((input ? "i" : "o") + "TexPosition", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
+            new VertexElementDescription((input ? "i" : "o") + "NormCoords", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
+            new VertexElementDescription((input ? "i" : "o") + "WorldPosition", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3));
     }
 }

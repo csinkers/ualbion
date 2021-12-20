@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
 using Veldrid;
 
@@ -22,14 +23,18 @@ namespace UAlbion.Core.Veldrid.Sprites
 
         internal MultiBuffer<GpuSpriteInstanceData> Instances { get; }
         internal SingleBuffer<SpriteUniform> Uniform { get; }
-        internal SpriteArraySet SpriteResources { get; private set; }
+        internal SpriteSet SpriteResources { get; private set; }
         protected override void Subscribed()
         {
             var samplerSource = Resolve<ISpriteSamplerSource>();
-            SpriteResources = new SpriteArraySet
+            bool isArray = (Key.Flags & SpriteKeyFlags.UseArrayTexture) != 0;
+            var source = Resolve<ITextureSource>();
+
+            SpriteResources = new SpriteSet
             {
                 Name = $"RS_Sprite:{Key.Texture.Name}",
-                Texture = Resolve<ITextureSource>().GetArrayTexture(Key.Texture),
+                Texture = isArray ? source.GetDummySimpleTexture() : source.GetSimpleTexture(Key.Texture),
+                TextureArray = isArray ? source.GetArrayTexture(Key.Texture) : source.GetDummyArrayTexture(),
                 Sampler = samplerSource.GetSampler(Key.Sampler),
                 Uniform = Uniform
             };

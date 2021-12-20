@@ -64,9 +64,10 @@ layout(set = 0, binding = 2) uniform _View {
     mat4 uView;
 };
 
-layout(set = 1, binding = 0) uniform texture2DArray uSprite; //!
-layout(set = 1, binding = 1) uniform sampler uSpriteSampler; //!
-layout(set = 1, binding = 2) uniform _Uniform {
+layout(set = 1, binding = 0) uniform texture2D uSprite; //!
+layout(set = 1, binding = 1) uniform texture2DArray uSpriteArray; //!
+layout(set = 1, binding = 2) uniform sampler uSpriteSampler; //!
+layout(set = 1, binding = 3) uniform _Uniform {
     uint uFlags;
     float uTexSizeW;
     float uTexSizeH;

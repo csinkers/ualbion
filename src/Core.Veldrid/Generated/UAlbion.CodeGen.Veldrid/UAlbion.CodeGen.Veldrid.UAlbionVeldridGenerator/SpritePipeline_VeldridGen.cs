@@ -7,7 +7,7 @@ namespace UAlbion.Core.Veldrid.Sprites
         {
             get
             {
-                var layout = global::UAlbion.Core.Veldrid.Sprites.GpuSpriteInstanceData.Layout;
+                var layout = global::UAlbion.Core.Veldrid.Sprites.GpuSpriteInstanceData.GetLayout(true);
                 layout.InstanceStepRate = 1;
                 return layout;
             }
@@ -15,8 +15,8 @@ namespace UAlbion.Core.Veldrid.Sprites
 
 
         public SpritePipeline() : base("SpriteSV.vert", "SpriteSF.frag",
-            new[] { global::UAlbion.Core.Veldrid.Sprites.Vertex2DTextured.Layout, GpuSpriteInstanceDataLayout},
-            new[] { typeof(global::UAlbion.Core.Veldrid.CommonSet), typeof(global::UAlbion.Core.Veldrid.Sprites.SpriteArraySet) })
+            new[] { global::UAlbion.Core.Veldrid.Sprites.Vertex2DTextured.GetLayout(true), GpuSpriteInstanceDataLayout},
+            new[] { typeof(global::UAlbion.Core.Veldrid.CommonSet), typeof(global::UAlbion.Core.Veldrid.Sprites.SpriteSet) })
         { }
     }
 }

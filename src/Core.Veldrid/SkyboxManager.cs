@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UAlbion.Api.Visual;
+using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
 using Veldrid;
 

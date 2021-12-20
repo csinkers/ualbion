@@ -212,8 +212,8 @@ namespace UAlbion.Scripting
                 Set(eventIndex, graphIndex, nodeIndex);
                 var graph = _graphs[graphIndex];
                 var (trueChild, falseChild) = graph.GetBinaryChildren(nodeIndex);
-                if (trueChild.HasValue) stack.Push(trueChild.Value);
                 if (falseChild.HasValue) stack.Push(falseChild.Value);
+                if (trueChild.HasValue) stack.Push(trueChild.Value);
             }
 
             return initialEventIndex ?? 0xffff;

@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
-using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Maps
 {
@@ -101,6 +100,23 @@ namespace UAlbion.Formats.Assets.Maps
                 Chain = getChain(dummy.Id);
             }
             else Chain = 0xffff;
+        }
+
+        public static int WaypointIndexToTime(int index)
+        {
+            var hours = index / 48;
+            var minutes = index % 48;
+            return hours * 100 + minutes;
+        }
+
+        public static int TimeToWaypointIndex(int time)
+        {
+            var hours = time / 100;
+            var minutes = time % 100;
+            if (hours < 0) throw new FormatException($"Time {time} had a negative hours component");
+            if (hours > 23) throw new FormatException($"Time {time} had an hours component greater than the maximum (23)");
+            if (minutes > 47) throw new FormatException($"Time {time} had a minutes component greater than the maximum (47)");
+            return hours * 48 + minutes;
         }
 
         public override string ToString() => $"Npc{Id.Id} {Id} O:{SpriteOrGroup} F:{Flags:x} M{Movement} Amount:{Unk8} Unk9:{Unk9} S{Sound} E{Node?.Id}";

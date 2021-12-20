@@ -59,6 +59,8 @@ namespace UAlbion.Formats.Exporters.Tiled
 
             var triggers = new List<TriggerInfo>();
             var npcs = new List<MapNpc>();
+            var getWaypoints = NpcPathBuilder.BuildWaypointLookup(map);
+
             foreach (var objectGroup in map.ObjectGroups)
             {
                 foreach (var obj in objectGroup.Objects)
@@ -67,7 +69,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                         triggers.Add(ParseTrigger(obj, map, ResolveEntryPoint));
 
                     if ("NPC".Equals(obj.Type, StringComparison.OrdinalIgnoreCase))
-                        npcs.Add(ParseNpc(obj, map, ResolveEntryPoint));
+                        npcs.Add(ParseNpc(obj, map, ResolveEntryPoint, getWaypoints));
                 }
             }
 
@@ -146,32 +148,35 @@ namespace UAlbion.Formats.Exporters.Tiled
             return zones.Where(x => x != null);
         }
 
-        static MapNpc ParseNpc(MapObject obj, Map map, Func<string, ushort> resolveEntryPoint)
+        static MapNpc ParseNpc(MapObject obj, Map map, Func<string, ushort> resolveEntryPoint, Func<int, NpcWaypoint[]> getWaypoints)
         {
             var position = ((int)obj.X / map.TileWidth, (int)obj.Y / map.TileHeight);
             NpcWaypoint[] waypoints = { new((byte)position.Item1, (byte)position.Item2) };
 
-            string Prop(string name) => obj.Properties.FirstOrDefault(x => name.Equals(x.Name, StringComparison.OrdinalIgnoreCase))?.Value;
             // string RequiredProp(string name) => Prop(name) ?? throw new FormatException($"Required property \"{name}\" was not present on NPC \"{obj.Name}\" (id {obj.Id})");
 
-            var id = Prop("Id");
-            var visual = Prop("Visual");
-            var group = Prop("Group");
+            var id = obj.PropString("Id");
+            var visual = obj.PropString("Visual");
+            var group = obj.PropString("Group");
             if (string.IsNullOrEmpty(visual) && string.IsNullOrEmpty(group)) // TODO: Differentiate between 2D/3D maps
                 throw new FormatException($"NPC \"{obj.Name}\" (id {obj.Id}) requires either a Visual or Group property to determine its appearance");
 
-            var entryPointName = Prop("Script");
+            var entryPointName = obj.PropString("Script");
             var entryPoint = resolveEntryPoint(entryPointName);
+
+            var pathStart = obj.PropInt("Path");
+            if (pathStart.HasValue)
+                waypoints = getWaypoints(pathStart.Value);
 
             return new MapNpc
             {
                 Id = string.IsNullOrEmpty(id) ? AssetId.None : AssetId.Parse(id),
                 Node = entryPoint == EventNode.UnusedEventId ? null : new DummyEventNode(entryPoint),
                 Waypoints = waypoints,
-                Flags = (NpcFlags)Enum.Parse(typeof(NpcFlags), Prop("Flags")),
-                Movement = (NpcMovementTypes)Enum.Parse(typeof(NpcMovementTypes), Prop("Movement")),
-                Unk8 = byte.Parse(Prop("Unk8") ?? "0", CultureInfo.InvariantCulture),
-                Unk9 = byte.Parse(Prop("Unk9") ?? "0", CultureInfo.InvariantCulture),
+                Flags = (NpcFlags)Enum.Parse(typeof(NpcFlags), obj.PropString("Flags")),
+                Movement = (NpcMovementTypes)Enum.Parse(typeof(NpcMovementTypes), obj.PropString("Movement")),
+                Unk8 = (byte)(obj.PropInt("Unk8") ?? 0),
+                Unk9 = (byte)(obj.PropInt("Unk9") ?? 0),
                 SpriteOrGroup = AssetId.Parse(visual) // TODO: Handle groups for 3D maps
             };
         }

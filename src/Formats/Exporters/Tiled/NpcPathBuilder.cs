@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using UAlbion.Api;
 using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Formats.Exporters.Tiled
 {
     public static class NpcPathBuilder
     {
+        public const string NextNodePropertyName = "Next";
+        public const string TimePropertyName = "Time";
         public static IEnumerable<(int x, int y)> FollowRuns(IEnumerable<(int time, int x, int y)> runs)
         {
             yield break; // TODO
@@ -65,12 +68,9 @@ namespace UAlbion.Formats.Exporters.Tiled
 
             foreach (var (index, posX, posY) in combined)
             {
-                var hours = index / 48;
-                var minutes = index % 48;
-                int time = hours * 100 + minutes;
                 int id = nextId++;
                 if (results.Count > 0)
-                    results[^1].Properties.Add(TiledProperty.Object("Next", id));
+                    results[^1].Properties.Add(TiledProperty.Object(NextNodePropertyName, id));
 
                 results.Add(new MapObject
                 {
@@ -78,12 +78,18 @@ namespace UAlbion.Formats.Exporters.Tiled
                     Type = "Path",
                     X = posX * properties.TileWidth,
                     Y = posY * properties.TileHeight,
-                    Properties = new List<TiledProperty> { new("Time", time) },
+                    Properties = new List<TiledProperty> { new(TimePropertyName, MapNpc.WaypointIndexToTime(index)) },
                     Point = TiledPoint.Instance
                 });
             }
 
             return results;
+        }
+
+        public static Func<int, NpcWaypoint[]> BuildWaypointLookup(Map map)
+        {
+            var lookup = new WaypointLookup(map);
+            return lookup.GetWaypoints;
         }
     }
 }

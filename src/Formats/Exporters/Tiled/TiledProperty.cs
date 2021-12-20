@@ -51,5 +51,6 @@ namespace UAlbion.Formats.Exporters.Tiled
         [XmlAttribute("type")] public TiledPropertyType Type { get; set; }
         [XmlIgnore] public bool TypeSpecified => Type != TiledPropertyType.String;
         [XmlText] public string MultiLine { get; set; }
+        public override string ToString() => $"{Name} = {Value} ({Type})";
     }
 }

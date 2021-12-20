@@ -17,6 +17,7 @@ namespace UAlbion.Formats.Exporters.Tiled
         [XmlAttribute("opacity")] public float Opacity { get; set; } = 1.0f;
         [XmlIgnore] public bool OpacitySpecified => Math.Abs(Opacity - 1.0f) > float.Epsilon;
         [XmlElement("object")] public List<MapObject> Objects { get; set; }
+        public override string ToString() => $"{Id}: {Name} ({Objects.Count} objects) {Color} {(Hidden ? " (hidden)" : "")}";
     }
 }
 #pragma warning restore CA2227 // Collection properties should be read only

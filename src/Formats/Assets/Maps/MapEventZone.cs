@@ -17,7 +17,7 @@ namespace UAlbion.Formats.Assets.Maps
         public TriggerTypes Trigger { get; set; }
         [JsonIgnore] public AssetId ChainSource { get; set; }
         public ushort Chain { get; set; }
-        public IEventNode Node { get; set; }
+        [JsonIgnore] public IEventNode Node { get; set; }
 
         public static MapEventZone Serdes(MapEventZone existing, ISerializer s, byte y)
         {

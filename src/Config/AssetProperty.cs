@@ -53,5 +53,6 @@
         public const string Name = "Name"; // StringId to use in game
         public const string MagicSchool = "School"; // SpellClass enum
         public const string SpellNumber = "SpellNumber"; // offset into school, used for save-game serialization
+        public const string MinimumCount = "MinimumCount"; // Just used to get closer to 1:1 round-tripping of XLDs
     }
 }

@@ -18,7 +18,7 @@ namespace UAlbion.Game.Assets
         {
             var config = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir, disk, jsonUtil);
             var applier = new ModApplier();
-            var exchange = new EventExchange(new LogExchange()) { Name = $"Exchange for {mod}"};
+            var exchange = new EventExchange(new LogExchange()) { Name = $"EventExchange for {mod}"};
             var assetLoaderRegistry = new AssetLoaderRegistry();
             exchange
                 .Register(disk)

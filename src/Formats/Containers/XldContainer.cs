@@ -36,17 +36,25 @@ namespace UAlbion.Formats.Containers
             if (!disk.DirectoryExists(dir))
                 disk.CreateDirectory(dir);
 
-            int count = assets.Max(x => x.Item1.Index) + 1;
-            var ordered = new (AssetInfo, byte[])[count];
-            var lengths = new int[count];
-            foreach (var (info, bytes) in assets)
-            {
-                ordered[info.Index] = (info, bytes);
-                lengths[info.Index] = bytes.Length;
-            }
+            var byIndex = disk.FileExists(path) 
+                ? LoadAll(disk, path) 
+                : new Dictionary<int, byte[]>();
 
-            count = lengths.Select((x, i) => (x, i)).Last(x => x.x > 0).i + 1;
-            lengths = lengths.Take(count).ToArray();
+            foreach (var (info, bytes) in assets)
+                byIndex[info.Index] = bytes;
+
+            int minCount = assets[0].Item1.File.Get<int>(AssetProperty.MinimumCount, 0);
+            int count = byIndex
+                .OrderBy(x => x.Key)
+                .Last(x => x.Value.Length > 0)
+                .Key + 1;
+
+            if (minCount > 0 && count < minCount)
+                count = minCount;
+
+            var lengths = new int[count];
+            for (int i = 0; i < count; i++)
+                lengths[i] = byIndex.TryGetValue(i, out var buffer) ? buffer.Length : 0;
 
             using var fs = disk.OpenWriteTruncate(path);
             using var bw = new BinaryWriter(fs);
@@ -54,7 +62,8 @@ namespace UAlbion.Formats.Containers
             HeaderSerdes(lengths, s);
 
             for (int i = 0; i < count; i++)
-                s.Bytes(null, ordered[i].Item2, lengths[i]);
+                if (byIndex.TryGetValue(i, out var buffer))
+                    s.Bytes(null, buffer, buffer.Length);
         }
 
         public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk, IJsonUtil jsonUtil)
@@ -78,6 +87,16 @@ namespace UAlbion.Formats.Containers
             offset += lengths.Where((x, i) => i < subItem).Sum();
             s.Seek(offset);
             return s.Bytes(null, null, lengths[subItem]);
+        }
+
+        static Dictionary<int, byte[]> LoadAll(IFileSystem disk, string path)
+        {
+            using var s = new AlbionReader(new BinaryReader(disk.OpenRead(path)));
+            var lengths = HeaderSerdes(null, s);
+            var results = new Dictionary<int, byte[]>();
+            for (var index = 0; index < lengths.Length; index++)
+                results[index] = s.Bytes(null, null, lengths[index]);
+            return results;
         }
 
         static int[] HeaderSerdes(int[] lengths, ISerializer s)

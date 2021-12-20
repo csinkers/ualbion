@@ -31,6 +31,7 @@ namespace UAlbion.Core
         long _nextEventId;
         public int Nesting => _nesting;
         public string Name { get; init; }
+        public override string ToString() => Name ?? "EventExchange";
 
 #if DEBUG
         // ReSharper disable once CollectionNeverQueried.Local

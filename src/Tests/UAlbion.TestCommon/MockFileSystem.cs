@@ -132,11 +132,11 @@ namespace UAlbion.TestCommon
         public bool FileExists(string path)
         {
             path = Path.GetFullPath(path);
-            if (!(GetDir(Path.GetDirectoryName(path)) is DirNode dir))
+            if (GetDir(Path.GetDirectoryName(path)) is not DirNode dir)
                 return false;
 
             var filename = Path.GetFileName(path);
-            var result = dir.ContainsKey(filename);
+            var result = dir.TryGetValue(filename, out var node) && node is not DirNode;
             return !result && _maskingFunc(path) ? File.Exists(path) : result;
         }
 

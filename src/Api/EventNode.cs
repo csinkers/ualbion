@@ -10,6 +10,7 @@ namespace UAlbion.Api
     [DebuggerDisplay("{ToString()}")]
     public class EventNode : IEventNode, IEquatable<EventNode>
     {
+        public const ushort UnusedEventId = 0xffff;
         bool DirectSequence => (Next?.Id ?? Id + 1) == Id + 1;
         public override string ToString() => ToString(0);
         public virtual string ToString(int idOffset)

@@ -206,6 +206,7 @@ namespace UAlbion.Game.Assets
             Stack<IPatch> patches = null; // Create the stack lazily, as most assets won't have any patches.
             foreach (var mod in _modsInReverseDependencyOrder)
             {
+                Resolve<IGeneralConfig>().SetPath("MOD", mod.AssetPath);
                 foreach (var info in mod.AssetConfig.GetAssetInfo(id))
                 {
                     var assetLang = info.Get<string>(AssetProperty.Language, null);
@@ -216,8 +217,6 @@ namespace UAlbion.Game.Assets
                             continue;
                     }
 
-                    extraPaths ??= new Dictionary<string, string>();
-                    extraPaths["MOD"] = mod.AssetPath;
                     var modAsset = _assetLocator.LoadAsset(id, mod.Mapping, info, extraPaths);
 
                     if (modAsset is IPatch patch)

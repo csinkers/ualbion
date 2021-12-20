@@ -21,13 +21,17 @@ namespace UAlbion.Game.Assets
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
 
-            if (s.IsWriting())
-            {
-                Write(existing, info, s);
-                return existing;
-            }
+            if (!s.IsWriting())
+                return Read(info, s, mapping);
 
-            return Read(info, s, mapping);
+            Write(existing, info, s);
+            return existing;
+        }
+
+        static string GetScriptFilename(AssetInfo info)
+        {
+            var scriptPattern = info.Get(AssetProperty.ScriptPattern, "");
+            return string.IsNullOrEmpty(scriptPattern) ? null : info.BuildFilename(scriptPattern, 0);
         }
 
         void Write(BaseMapData existing, AssetInfo info, ISerializer s)
@@ -42,25 +46,33 @@ namespace UAlbion.Game.Assets
             if (bytes != null)
                 s.Bytes(null, bytes, bytes.Length);
 
-            var disk = Resolve<IFileSystem>();
-            var scriptPattern = info.Get(AssetProperty.ScriptPattern, "");
-            if (script == null || string.IsNullOrEmpty(scriptPattern))
+            if (script == null)
                 return;
 
-            // TODO: Find a less hacky way of doing this
-            var scriptPath = info.BuildFilename(scriptPattern, 0);
+            var scriptPath = GetScriptFilename(info);
+            if (string.IsNullOrEmpty(scriptPath))
+                return;
+
+            var disk = Resolve<IFileSystem>();
             var assetDir = GetAssetDir(info);
             if (!disk.DirectoryExists(assetDir))
                 disk.CreateDirectory(assetDir);
             disk.WriteAllText(Path.Combine(assetDir, scriptPath), script);
         }
 
-        static BaseMapData Read(AssetInfo info, ISerializer s, AssetMapping mapping)
+        BaseMapData Read(AssetInfo info, ISerializer s, AssetMapping mapping)
         {
+            var disk = Resolve<IFileSystem>();
+            var assetDir = GetAssetDir(info);
+            var scriptPath = Path.Combine(assetDir, GetScriptFilename(info));
+            string script = null;
+            if (!string.IsNullOrEmpty(scriptPath) && File.Exists(scriptPath))
+                script = disk.ReadAllText(scriptPath);
+
             var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
             using var ms = new MemoryStream(bytes);
             var map = Map.Parse(ms);
-            return map.ToAlbion(info, mapping);
+            return map.ToAlbion(info, mapping, script);
         }
 
         (byte[], string) Write2D(MapData2D map, AssetInfo info)

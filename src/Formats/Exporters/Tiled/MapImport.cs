@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
-using UAlbion.Formats.MapEvents;
+using UAlbion.Scripting;
 
 namespace UAlbion.Formats.Exporters.Tiled
 {
@@ -25,7 +24,7 @@ namespace UAlbion.Formats.Exporters.Tiled
         static int? PropInt(Map map, string key) => int.TryParse(PropString(map, key), out var i) ? i : null;
         static AssetId PropId(Map map, string key) => AssetId.Parse(PropString(map, key));
 
-        public static BaseMapData ToAlbion(this Map map, AssetInfo info, AssetMapping mapping)
+        public static BaseMapData ToAlbion(this Map map, AssetInfo info, AssetMapping mapping, string script)
         {
             if (map == null) throw new ArgumentNullException(nameof(map));
             if (info == null) throw new ArgumentNullException(nameof(info));
@@ -49,17 +48,26 @@ namespace UAlbion.Formats.Exporters.Tiled
             if (underlay.Length != map.Width * map.Height) throw new FormatException($"Map underlay had {underlay.Length}, but {map.Width * map.Height} were expected ({map.Width} x {map.Height})");
             if (overlay.Length != map.Width * map.Height) throw new FormatException($"Map overlay had {overlay.Length}, but {map.Width * map.Height} were expected ({map.Width} x {map.Height})");
 
+            var steps = new List<(string, IGraph)>();
+            var eventLayout = ScriptCompiler.Compile(script, steps);
+
+            ushort ResolveEntryPoint(string name)
+            {
+                var (isChain, id) = ScriptConstants.ParseEntryPoint(name);
+                return isChain ? eventLayout.Chains[id] : id;
+            }
+
             var triggers = new List<TriggerInfo>();
-            var npcs = new List<NpcInfo>();
+            var npcs = new List<MapNpc>();
             foreach (var objectGroup in map.ObjectGroups)
             {
                 foreach (var obj in objectGroup.Objects)
                 {
                     if ("Trigger".Equals(obj.Type, StringComparison.OrdinalIgnoreCase))
-                        triggers.Add(ParseTrigger(obj, map));
+                        triggers.Add(ParseTrigger(obj, map, ResolveEntryPoint));
 
                     if ("NPC".Equals(obj.Type, StringComparison.OrdinalIgnoreCase))
-                        npcs.Add(ParseNpc(obj, map));
+                        npcs.Add(ParseNpc(obj, map, ResolveEntryPoint));
                 }
             }
 
@@ -70,15 +78,10 @@ namespace UAlbion.Formats.Exporters.Tiled
                     BuildNpcs(map, properties, eventFormatter, npcTileset, ref nextObjectGroupId, ref nextObjectId)
                 }.SelectMany(x => x).ToList() */
 
-            var (events, chains) = BuildChains(info.AssetId, triggers, npcs, mapping);
             var zones = BuildGlobalZones(info.AssetId, triggers);
             zones.AddRange(BuildZones(info.AssetId, map, triggers));
 
-            return new MapData2D(info.AssetId, (byte)map.Width, (byte)map.Height,
-                events,
-                chains,
-                npcs.Select(x => BuildNpc(x)),
-                zones)
+            return new MapData2D(info.AssetId, (byte)map.Width, (byte)map.Height, eventLayout.Events, eventLayout.Chains, npcs, zones)
             {
                 RawLayout = FormatUtil.ToPacked(underlay, overlay, 1),
                 Flags = Enum.Parse<FlatMapFlags>(PropString(map, "Flags")),
@@ -90,122 +93,6 @@ namespace UAlbion.Formats.Exporters.Tiled
                 SongId = PropId(map, "Song"),
                 TilesetId = PropId(map, "Tileset"),
             };
-        }
-
-        static void BuildEventHash(MapId mapId, IScriptable scriptable, AssetMapping mapping)
-        {
-            if (scriptable.Events == null)
-                return;
-
-            scriptable.EventBytes = FormatUtil.SerializeToBytes(s =>
-            {
-                for (ushort i = 0; i < scriptable.Events.Count; i++)
-                    scriptable.Events[i] = MapEvent.SerdesNode(i, scriptable.Events[i], s, mapId, mapId.ToMapText(), mapping);
-            });
-        }
-
-        static (IList<EventNode> events, IList<ushort> chains) BuildChains(MapId mapId, List<TriggerInfo> triggers, List<NpcInfo> npcs, AssetMapping mapping)
-        {
-            var scriptables = triggers.Cast<IScriptable>().Concat(npcs);
-            foreach (var scriptable in scriptables)
-                BuildEventHash(mapId, scriptable, mapping);
-
-            var scripts = scriptables.GroupBy(x => x.Key, ScriptableKeyComparer.Instance);
-            var scriptsByHint = new Dictionary<ChainHint, List<IGrouping<ScriptableKey, IScriptable>>>();
-            foreach (var g in scripts)
-            {
-                foreach (var scriptable in g)
-                {
-                    scriptable.EventBytes = g.Key.EventBytes;
-                    var first = g.First();
-                    if (scriptable != first && first.Events != null)
-                        scriptable.Events = first.Events.ToList();
-                }
-
-                if (!scriptsByHint.TryGetValue(g.Key.ChainHint, out var group))
-                {
-                    group = new List<IGrouping<ScriptableKey, IScriptable>>();
-                    scriptsByHint[g.Key.ChainHint] = group;
-                }
-
-                group.Add(g);
-            }
-
-            var events = new List<EventNode>();
-            var chains = new List<ushort>();
-
-            ushort eventId = 0;
-            foreach (var kvp in scriptsByHint.OrderBy(x => x.Key))
-            {
-                var hint = kvp.Key;
-                var groupsWithHint = kvp.Value;
-                if (hint.IsNone) 
-                    continue;
-
-                if (hint.IsChain)
-                {
-                    while (chains.Count <= hint.ChainId)
-                        chains.Add(ushort.MaxValue);
-                    chains[hint.ChainId] = eventId;
-
-                    if (groupsWithHint.Count > 1)
-                    {
-                        // Map Map.TorontoStart contains multiple scriptable entities with differing event chains but the same chain hint (12):
-                        // Version 1: 1, 4, 5
-                        // Version 2: 3
-                        var sb = new StringBuilder();
-                        sb.AppendLine($"Map {mapId} contains multiple scriptable entities with differing event chains but the same chain hint ({hint}):");
-                        int version = 1;
-                        foreach (var grouping in groupsWithHint)
-                        {
-                            sb.Append("Version "); sb.Append(version++); sb.Append(": ");
-                            foreach (var scriptable in grouping)
-                            {
-                                sb.Append(scriptable.ObjectId);
-                                sb.Append(' ');
-                            }
-                            sb.AppendLine();
-                        }
-
-                        throw new FormatException(sb.ToString());
-                    }
-                }
-
-                var groupEvents = groupsWithHint[0].First().Events;
-                foreach (var e in groupEvents)
-                {
-                    events.Add(e);
-                    e.Id = eventId;
-                    eventId++;
-                }
-            }
-
-            if (scriptsByHint.TryGetValue(ChainHint.None, out var groupsWithoutHint))
-            {
-                var group = groupsWithoutHint[^1];
-                groupsWithoutHint.RemoveAt(groupsWithoutHint.Count - 1);
-                if (groupsWithoutHint.Count == 0)
-                    scriptsByHint.Remove(ChainHint.None);
-
-                var groupEvents = group.First().Events;
-                if (groupEvents != null)
-                {
-                    foreach (var e in groupEvents)
-                    {
-                        events.Add(e);
-                        e.Id = eventId;
-                        eventId++;
-                    }
-                }
-            }
-
-            return (events, chains);
-        }
-
-        static MapNpc BuildNpc(NpcInfo npc)
-        {
-            // npc.Npc.Chain = 0; // TODO
-            return npc.Npc;
         }
 
         static List<MapEventZone> BuildGlobalZones(MapId mapId, List<TriggerInfo> triggers)
@@ -223,9 +110,8 @@ namespace UAlbion.Formats.Exporters.Tiled
                     Global = true,
                     X = 255,
                     Y = 0,
-                    Chain = global.ChainHint.ChainId,
                     ChainSource = mapId,
-                    Node = global.Events[0],
+                    Node = global.EventIndex == EventNode.UnusedEventId ? null : new DummyEventNode(global.EventIndex),
                     Trigger = global.TriggerType,
                     Unk1 = global.Unk1
                 });
@@ -248,9 +134,8 @@ namespace UAlbion.Formats.Exporters.Tiled
                     {
                         X = (byte)x,
                         Y = (byte)y,
-                        Chain = trigger.ChainHint.ChainId,
                         ChainSource = mapId,
-                        Node = trigger.Events[0],
+                        Node = trigger.EventIndex == EventNode.UnusedEventId ? null : new DummyEventNode(trigger.EventIndex),
                         Trigger = trigger.TriggerType,
                         Unk1 = trigger.Unk1,
                         Global = trigger.Global
@@ -261,7 +146,7 @@ namespace UAlbion.Formats.Exporters.Tiled
             return zones.Where(x => x != null);
         }
 
-        static NpcInfo ParseNpc(MapObject obj, Map map)
+        static MapNpc ParseNpc(MapObject obj, Map map, Func<string, ushort> resolveEntryPoint)
         {
             var position = ((int)obj.X / map.TileWidth, (int)obj.Y / map.TileHeight);
             NpcWaypoint[] waypoints = { new((byte)position.Item1, (byte)position.Item2) };
@@ -275,46 +160,23 @@ namespace UAlbion.Formats.Exporters.Tiled
             if (string.IsNullOrEmpty(visual) && string.IsNullOrEmpty(group)) // TODO: Differentiate between 2D/3D maps
                 throw new FormatException($"NPC \"{obj.Name}\" (id {obj.Id}) requires either a Visual or Group property to determine its appearance");
 
-            var events = EventNode.ParseRawEvents(Prop("Script"));
-            UnswizzleEvents(events);
+            var entryPointName = Prop("Script");
+            var entryPoint = resolveEntryPoint(entryPointName);
 
-            return new NpcInfo
+            return new MapNpc
             {
-                ObjectId = obj.Id,
-                ChainHint = ChainHint.None,
-                Events = events,
-                Npc = new MapNpc
-                {
-                    Id = string.IsNullOrEmpty(id) ? AssetId.None : AssetId.Parse(id),
-                    Waypoints = waypoints,
-                    Flags = (NpcFlags)Enum.Parse(typeof(NpcFlags), Prop("Flags")),
-                    Movement = (NpcMovementTypes)Enum.Parse(typeof(NpcMovementTypes), Prop("Movement")),
-                    Unk8 = byte.Parse(Prop("Unk8") ?? "0", CultureInfo.InvariantCulture),
-                    Unk9 = byte.Parse(Prop("Unk9") ?? "0", CultureInfo.InvariantCulture),
-                    SpriteOrGroup = AssetId.Parse(visual) // TODO: Handle groups for 3D maps
-                }
+                Id = string.IsNullOrEmpty(id) ? AssetId.None : AssetId.Parse(id),
+                Node = entryPoint == EventNode.UnusedEventId ? null : new DummyEventNode(entryPoint),
+                Waypoints = waypoints,
+                Flags = (NpcFlags)Enum.Parse(typeof(NpcFlags), Prop("Flags")),
+                Movement = (NpcMovementTypes)Enum.Parse(typeof(NpcMovementTypes), Prop("Movement")),
+                Unk8 = byte.Parse(Prop("Unk8") ?? "0", CultureInfo.InvariantCulture),
+                Unk9 = byte.Parse(Prop("Unk9") ?? "0", CultureInfo.InvariantCulture),
+                SpriteOrGroup = AssetId.Parse(visual) // TODO: Handle groups for 3D maps
             };
         }
 
-        static ChainHint ParseChainHint(string name)
-        {
-            if (string.IsNullOrEmpty(name)) return ChainHint.None;
-            if (name[0] != 'C') return ChainHint.None;
-            int index = name.IndexOf(' ', StringComparison.InvariantCulture);
-            var segment = index == -1 ? name.Substring(1) : name.Substring(1, index - 1);
-
-            index = segment.IndexOf('.', StringComparison.Ordinal);
-            if (!ushort.TryParse(index == -1 ? segment : segment[..index], out var chainId))
-                return ChainHint.None;
-
-            ushort dummy = 0;
-            if (index != -1 && !ushort.TryParse(segment[(index + 1)..], out dummy)) 
-                return ChainHint.None;
-
-            return new ChainHint(chainId, dummy);
-        }
-
-        static TriggerInfo ParseTrigger(MapObject obj, Map map)
+        static TriggerInfo ParseTrigger(MapObject obj, Map map, Func<string, ushort> resolveEntryPoint)
         {
             string Prop(string name)
             {
@@ -326,8 +188,8 @@ namespace UAlbion.Formats.Exporters.Tiled
 
             var polygon = obj.Polygon.Points.Select(p => (((int)obj.X + p.x) / map.TileWidth, ((int)obj.Y + p.y) / map.TileHeight));
             var shape = PolygonToShape(polygon);
-            var events = EventNode.ParseRawEvents(Prop("Script"));
-            UnswizzleEvents(events);
+            var entryPointName = Prop("Script");
+            var entryPoint = resolveEntryPoint(entryPointName);
             var trigger = RequiredProp("Trigger");
             var unk1 = Prop("Unk1");
             var global = Prop("Global") is { } s && "true".Equals(s, StringComparison.OrdinalIgnoreCase);
@@ -336,27 +198,11 @@ namespace UAlbion.Formats.Exporters.Tiled
             {
                 Global = global,
                 ObjectId = obj.Id,
-                ChainHint = ParseChainHint(obj.Name),
                 TriggerType = (TriggerTypes)Enum.Parse(typeof(TriggerTypes), trigger),
                 Unk1 = string.IsNullOrEmpty(unk1) ? (byte)0 : byte.Parse(unk1, CultureInfo.InvariantCulture),
-                Events = events,
+                EventIndex = entryPoint,
                 Points = TriggerZoneBuilder.GetPointsInsideShape(shape)
             };
-        }
-
-        static void UnswizzleEvents(List<EventNode> events)
-        {
-            if (events == null)
-                return;
-
-            foreach (var e in events)
-            {
-                if (e.Next is DummyEventNode dummy)
-                    e.Next = events[dummy.Id];
-
-                if (e is BranchNode { NextIfFalse: DummyEventNode dummy2 } branch)
-                    branch.NextIfFalse = events[dummy2.Id];
-            }
         }
 
         static IEnumerable<((int x, int y) from, (int x, int y) to)> PolygonToShape(IEnumerable<(int x, int y)> polygon)

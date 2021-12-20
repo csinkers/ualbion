@@ -7,6 +7,7 @@ using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Scripting;
+using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Formats
 {
@@ -25,7 +26,7 @@ namespace UAlbion.Formats
         {
             if (e == null) throw new ArgumentNullException(nameof(e));
             var nodeText = e.ToString(idOffset);
-            if (e.Event is MapTextEvent textEvent)
+            if (e.Event is MapTextEvent textEvent && _stringLoadFunc != null)
             {
                 var text = _stringLoadFunc(new StringId(_textSourceId, textEvent.SubId));
                 return $"{nodeText} // \"{text}\"";
@@ -45,47 +46,52 @@ namespace UAlbion.Formats
             try
             {
                 var trees = Decompiler.Decompile(events, chains, additionalEntryPoints, steps);
-                var counter = new CountEventsVisitor();
-
-                bool first = true;
-                bool lastWasTrivial = false;
-                foreach (var tree in trees)
-                {
-                    if (!first)
-                        sb.AppendLine();
-
-                    tree.Accept(counter);
-                    var eventCount = counter.Count;
-                    counter.Reset();
-
-                    if (eventCount > 1)
-                    {
-                        if (lastWasTrivial)
-                            sb.AppendLine();
-                        sb.AppendLine("{");
-
-                        var visitor = new FormatScriptVisitor(sb) { PrettyPrint = true, IndentLevel = indent };
-                        visitor.IndentLevel += visitor.TabSize;
-                        tree.Accept(visitor);
-
-                        sb.AppendLine();
-                        sb.AppendLine("}");
-                        lastWasTrivial = false;
-                    }
-                    else
-                    {
-                        sb.Append("{ ");
-                        var visitor = new FormatScriptVisitor(sb) { PrettyPrint = false };
-                        tree.Accept(visitor);
-                        sb.Append(" }");
-                        lastWasTrivial = true;
-                    }
-                    first = false;
-                }
+                FormatGraphsAsBlocks(sb, trees, indent);
             }
             catch (ControlFlowGraphException)
             {
                 FormatEventSet(sb, events, indent); // Fallback to raw view
+            }
+        }
+
+        public static void FormatGraphsAsBlocks(StringBuilder sb, IEnumerable<ICfgNode> trees, int indent)
+        {
+            var counter = new CountEventsVisitor();
+
+            bool first = true;
+            bool lastWasTrivial = false;
+            foreach (var tree in trees)
+            {
+                if (!first)
+                    sb.AppendLine();
+
+                tree.Accept(counter);
+                var eventCount = counter.Count;
+                counter.Reset();
+
+                if (eventCount > 1)
+                {
+                    if (lastWasTrivial)
+                        sb.AppendLine();
+                    sb.AppendLine("{");
+
+                    var visitor = new FormatScriptVisitor(sb) { PrettyPrint = true, IndentLevel = indent };
+                    visitor.IndentLevel += visitor.TabSize;
+                    tree.Accept(visitor);
+
+                    sb.AppendLine();
+                    sb.AppendLine("}");
+                    lastWasTrivial = false;
+                }
+                else
+                {
+                    sb.Append("{ ");
+                    var visitor = new FormatScriptVisitor(sb) { PrettyPrint = false };
+                    tree.Accept(visitor);
+                    sb.Append(" }");
+                    lastWasTrivial = true;
+                }
+                first = false;
             }
         }
 

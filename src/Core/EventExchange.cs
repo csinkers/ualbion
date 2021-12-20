@@ -30,6 +30,7 @@ namespace UAlbion.Core
         int _nesting = -1;
         long _nextEventId;
         public int Nesting => _nesting;
+        public string Name { get; init; }
 
 #if DEBUG
         // ReSharper disable once CollectionNeverQueried.Local

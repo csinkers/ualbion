@@ -184,7 +184,7 @@ namespace UAlbion.Base.Tests
         {
             Test(("change_icon 1 1 AbsPerm BlockHard 0 1", new ChangeIconEvent(1, 1, EventScopes.AbsPerm, IconChangeType.BlockHard, 0, 1)),
                 ("change_icon 1 1 AbsPerm BlockHard 1 0", new ChangeIconEvent(1, 1, EventScopes.AbsPerm, IconChangeType.BlockHard, 1, 0)),
-                ("change_icon 1 1 RelPerm BlockHard 1 3", new ChangeIconEvent(1, 1, EventScopes.RelPerm, IconChangeType.BlockHard, 1, 3)),
+                ("change_icon 1 1 RelPerm BlockHard 1", new ChangeIconEvent(1, 1, EventScopes.RelPerm, IconChangeType.BlockHard, 1, 3)),
                 ("change_icon 1 1 RelTemp BlockHard 1 2", new ChangeIconEvent(1, 1, EventScopes.RelTemp, IconChangeType.BlockHard, 1,  2)),
                 ("change_icon 1 1 AbsTemp BlockHard 1 0", new ChangeIconEvent(1, 1, EventScopes.AbsTemp, IconChangeType.BlockHard, 1, 0)));
         }
@@ -487,8 +487,8 @@ remove_party_member PartyMember.Tom 1 1");
         [Fact]
         public void NpcActive()
         {
-            Test(@"npc_active 1 0 0 0
-npc_active 1 1 0 0
+            Test(@"npc_active 1 0
+npc_active 1
 npc_active 1 1 0 1");
         }
 

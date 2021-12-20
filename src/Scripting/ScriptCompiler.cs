@@ -22,24 +22,21 @@ namespace UAlbion.Scripting
             }
             else record = (_, x) => x;
 
-            if (!ScriptParser.TryParse(source, out var ast, out var error, out _))
+            if (!ScriptParser.TryParse(source, out var trees, out var error, out _))
                 throw new InvalidOperationException(error);
 
-            var compiled = ExpandAstToGraphs(ast, record);
+            var compiled = trees.Select(ast => ExpandAstToGraph(ast, record)).ToList();
             return EventLayout.Build(compiled);
         }
 
-        public static List<ControlFlowGraph> ExpandAstToGraphs(ICfgNode ast, RecordFunc record)
+        public static ControlFlowGraph ExpandAstToGraph(ICfgNode ast, RecordFunc record)
         {
             if (ast == null) throw new ArgumentNullException(nameof(ast));
             var start = Emit.Empty();
             var end = Emit.Empty();
             var graph = new ControlFlowGraph(new[] { start, ast, end }, new[] { (0, 1, CfgEdge.True), (1, 2, CfgEdge.True) });
-            graph = ExpandGraph(graph, record);
-            return SplitGraph(graph);
+            return ExpandGraph(graph, record);
         }
-
-        static List<ControlFlowGraph> SplitGraph(ControlFlowGraph graph) => new() { graph.Defragment() }; // TODO
 
         public static ControlFlowGraph ExpandGraph(ControlFlowGraph graph, RecordFunc record)
         {

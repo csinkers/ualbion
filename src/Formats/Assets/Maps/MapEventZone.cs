@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
-using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Maps
 {

@@ -172,6 +172,11 @@ namespace UAlbion.Scripting
             .Named("Statement");
 
         public static readonly TokenListParser<ScriptToken, ICfgNode> TopLevel = Sequence.AtEnd();
+        public static readonly TokenListParser<ScriptToken, ICfgNode[]> Blocks = 
+            (from ws in NewLine.Many()
+            from block in Block
+            from ws2 in NewLine.Many()
+            select block).Many();
 
         public static TokenList<ScriptToken> FilterTokens(TokenList<ScriptToken> tokens)
         {
@@ -201,29 +206,29 @@ namespace UAlbion.Scripting
             return new TokenList<ScriptToken>(filtered.ToArray());
         }
 
-        public static bool TryParse(string source, out ICfgNode abstractSyntaxTree, out string error, out Position errorPosition)
+        public static bool TryParse(string source, out ICfgNode[] abstractSyntaxTrees, out string error, out Position errorPosition)
         {
             var tokens = ScriptTokenizer.Tokenize(source);
             if (!tokens.HasValue)
             {
-                abstractSyntaxTree = null;
+                abstractSyntaxTrees = null;
                 error = "Tokenisation error, " + tokens;
                 errorPosition = tokens.ErrorPosition;
                 return false;
             }
 
             var filtered = FilterTokens(tokens.Value);
-            var parsed = TopLevel.TryParse(filtered);
+            var parsed = Blocks.TryParse(filtered);
 
             if (!parsed.HasValue)
             {
-                abstractSyntaxTree = null;
+                abstractSyntaxTrees = null;
                 error = parsed.ToString();
                 errorPosition = parsed.ErrorPosition;
                 return false;
             }
 
-            abstractSyntaxTree = parsed.Value;
+            abstractSyntaxTrees = parsed.Value;
             error = null;
             errorPosition = Position.Empty;
             return true;

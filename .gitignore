@@ -24,6 +24,7 @@ packages/
 *.user
 *.DotSettings
 *.code-workspace
+*.gfxr
 launchSettings.json
 imgui.ini
 global.json

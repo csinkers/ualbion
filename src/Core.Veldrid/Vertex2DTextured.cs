@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using VeldridGen.Interfaces;
 
-namespace UAlbion.Core.Veldrid.Sprites
+namespace UAlbion.Core.Veldrid
 {
 #pragma warning disable CA1815 // Override equals and operator equals on value types
     public readonly partial struct Vertex2DTextured : IVertexFormat

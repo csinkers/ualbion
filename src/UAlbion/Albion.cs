@@ -4,6 +4,7 @@ using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Etm;
+using UAlbion.Core.Veldrid.Skybox;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
@@ -34,9 +35,9 @@ namespace UAlbion
 {
     static class Albion
     {
-        public static void RunGame(EventExchange global, IContainer services, string baseDir, CommandLineOptions commandLine)
+        public static void RunGame(EventExchange global, IContainer services, IRenderPass mainPass, string baseDir, CommandLineOptions commandLine)
         {
-            RegisterComponents(global, services, baseDir, commandLine);
+            RegisterComponents(global, services, mainPass, baseDir, commandLine);
 
             PerfTracker.StartupEvent("Running game");
             global.Raise(new SetSceneEvent(SceneId.Empty), null);
@@ -52,7 +53,7 @@ namespace UAlbion
             // TODO: Ensure all sprite leases returned etc to weed out memory leaks
         }
 
-        static void RegisterComponents(EventExchange global, IContainer services, string baseDir, CommandLineOptions commandLine)
+        static void RegisterComponents(EventExchange global, IContainer services, IRenderPass mainPass, string baseDir, CommandLineOptions commandLine)
         {
             PerfTracker.StartupEvent("Creating main components");
 
@@ -71,12 +72,11 @@ namespace UAlbion
                 DebugGuiRenderable.Instance
             };
 
-            var renderer = global.Resolve<ISceneRenderer>();
             foreach (var source in renderableSources)
             {
                 if (source is IComponent component)
                     services.Add(component);
-                renderer.AddSource(source);
+                mainPass.AddSource(source);
             }
 
             services

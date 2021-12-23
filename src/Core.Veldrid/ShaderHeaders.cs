@@ -13,8 +13,8 @@ namespace UAlbion.Core.Veldrid
             Etm.EtmFragmentShader.ShaderSource(),
             FullscreenQuadVertexShader.ShaderSource(),
             FullscreenQuadFragmentShader.ShaderSource(),
-            SkyboxVertexShader.ShaderSource(),
-            SkyboxFragmentShader.ShaderSource(),
+            Skybox.SkyboxVertexShader.ShaderSource(),
+            Skybox.SkyboxFragmentShader.ShaderSource(),
         };
     }
 }

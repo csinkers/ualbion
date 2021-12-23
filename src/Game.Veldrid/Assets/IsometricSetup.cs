@@ -23,23 +23,22 @@ namespace UAlbion.Game.Veldrid.Assets
             GraphicsBackend backend, bool useRenderDoc, Rectangle? windowRect)
         {
             if (exchange == null) throw new ArgumentNullException(nameof(exchange));
-            var framebuffer = new SimpleFramebuffer((uint)(tileWidth * tilesPerRow), (uint)tileHeight, "FB_Offscreen");
-            var builder = new IsometricBuilder(framebuffer, tileWidth, tileHeight, baseHeight, tilesPerRow);
+            var offscreenFB = new SimpleFramebuffer((uint)(tileWidth * tilesPerRow), (uint)tileHeight, "FB_Offscreen");
+            var builder = new IsometricBuilder(offscreenFB, tileWidth, tileHeight, baseHeight, tilesPerRow);
 
 #pragma warning disable CA2000 // Dispose objects before losing scopes
             var config = exchange.Resolve<IGeneralConfig>();
             var shaderCache = new ShaderCache(config.ResolvePath("$(CACHE)/ShaderCache"));
-            var sceneRenderer = new SceneRenderer("MainPipeline", framebuffer)
-                .AddRenderer(new SpriteRenderer(framebuffer), typeof(VeldridSpriteBatch))
-                .AddRenderer(new EtmRenderer(framebuffer), typeof(EtmWindow))
+            var mainPass = new RenderPass("Iso Render Pass", offscreenFB)
+                .AddRenderer(new SpriteRenderer(offscreenFB), typeof(VeldridSpriteBatch))
+                .AddRenderer(new EtmRenderer(offscreenFB), typeof(EtmWindow))
                 ;
 
             foreach (var shaderPath in exchange.Resolve<IModApplier>().ShaderPaths)
                 shaderCache.AddShaderPath(shaderPath);
 
-            var engine = new Engine(
-                    backend, useRenderDoc, false, windowRect != null, sceneRenderer, windowRect)
-                ;
+            var engine = new Engine(backend, useRenderDoc, false, windowRect != null, windowRect);
+            engine.AddRenderPass(mainPass);
 
             var renderableSources = new IRenderableSource[]
             {
@@ -50,8 +49,8 @@ namespace UAlbion.Game.Veldrid.Assets
             var services = new Container("IsometricLayoutServices");
             services
                 .Add(shaderCache)
-                .Add(framebuffer)
-                .Add(sceneRenderer)
+                .Add(offscreenFB)
+                .Add(mainPass)
                 .Add(engine)
                 .Add(new SpriteSamplerSource())
                 .Add(new TextureSource())
@@ -69,7 +68,7 @@ namespace UAlbion.Game.Veldrid.Assets
             {
                 if (source is IComponent component)
                     services.Add(component);
-                sceneRenderer.AddSource(source);
+                mainPass.AddSource(source);
             }
 
             return (services, builder);

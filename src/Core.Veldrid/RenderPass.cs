@@ -4,7 +4,6 @@ using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Core.Events;
-using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
 using Veldrid;
@@ -12,7 +11,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid
 {
-    public sealed class SceneRenderer : ServiceComponent<ISceneRenderer>, ISceneRenderer, IDisposable
+    public sealed class RenderPass : Component, IRenderPass, IDisposable
     {
         readonly Dictionary<Type, IRenderer> _rendererLookup = new();
         readonly List<IRenderer> _renderers = new();
@@ -25,7 +24,7 @@ namespace UAlbion.Core.Veldrid
         ITextureHolder _palette;
         (float Red, float Green, float Blue, float Alpha) _clearColour;
 
-        public SceneRenderer(string name, IFramebufferHolder framebuffer)
+        public RenderPass(string name, IFramebufferHolder framebuffer)
         {
             Name = name;
             Framebuffer = framebuffer ?? throw new ArgumentNullException(nameof(framebuffer));
@@ -49,9 +48,12 @@ namespace UAlbion.Core.Veldrid
             AttachChild(_commonSet);
         }
 
-        public SceneRenderer AddRenderer(IRenderer renderer, params Type[] types)
+        public RenderPass AddRenderer(IRenderer renderer, params Type[] types)
         {
             if (renderer == null) throw new ArgumentNullException(nameof(renderer));
+            if (types == null) throw new ArgumentNullException(nameof(types));
+            if (types.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(types));
+
             if (!_renderers.Contains(renderer))
             {
                 _renderers.Add(renderer);
@@ -72,7 +74,7 @@ namespace UAlbion.Core.Veldrid
             return this;
         }
 
-        public SceneRenderer AddSource(IRenderableSource source)
+        public RenderPass AddSource(IRenderableSource source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             _sources.Add(source);

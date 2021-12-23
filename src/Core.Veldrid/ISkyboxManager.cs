@@ -5,6 +5,6 @@ namespace UAlbion.Core.Veldrid
 {
     public interface ISkyboxManager : IRenderableSource
     {
-        Skybox CreateSkybox(ITexture texture);
+        Skybox.SkyboxRenderable CreateSkybox(ITexture texture);
     }
 }

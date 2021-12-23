@@ -1,61 +1,10 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Numerics;
-using System.Runtime.InteropServices;
-using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Veldrid.Skybox
 {
-#pragma warning disable 649
-    [VertexShader(typeof(SkyboxVertexShader))]
-    [FragmentShader(typeof(SkyboxFragmentShader))]
-    partial class SkyboxPipeline : PipelineHolder
-    {
-    }
-
-    [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-    partial struct SkyboxIntermediate : IVertexFormat
-    {
-        [Vertex("TexPosition")] public Vector2 TextureCoordinates;
-        [Vertex("NormCoords")] public Vector2 NormalisedSpriteCoordinates;
-        [Vertex("WorldPosition")] public Vector3 WorldPosition;
-    }
-
-    [Name("SkyBoxSV.vert")]
-    [Input(0, typeof(Vertex2DTextured))]
-    [ResourceSet(0, typeof(SkyboxResourceSet))]
-    [Output(0, typeof(SkyboxIntermediate))]
-    [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-    internal partial class SkyboxVertexShader : IVertexShader { }
-
-    [Name("SkyBoxSF.frag")]
-    [Input(0, typeof(SkyboxIntermediate))]
-    [ResourceSet(0, typeof(SkyboxResourceSet))]
-    [ResourceSet(1, typeof(CommonSet))]
-    [Output(0, typeof(SimpleFramebuffer))]
-    [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-    internal partial class SkyboxFragmentShader : IFragmentShader { }
-
-    partial class SkyboxResourceSet : ResourceSetHolder
-    {
-        [Resource("uSampler", ShaderStages.Fragment)] ISamplerHolder _sampler;
-        [Resource("uTexture", ShaderStages.Fragment)] ITextureHolder _texture;
-        [Resource("_Uniform", ShaderStages.Vertex)] IBufferHolder<SkyboxUniformInfo> _uniform;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    struct SkyboxUniformInfo // Length must be multiple of 16
-    {
-        [Uniform("uYaw")] public float uYaw; // 4
-        [Uniform("uPitch")] public float uPitch;  // 8
-        [Uniform("uVisibleProportion")] public float uVisibleProportion;  // 12
-        [Uniform("_pad1")] readonly uint _pad1;   // 16
-    }
-#pragma warning restore 649
-
     public sealed class SkyboxRenderer : Component, IRenderer, IDisposable
     {
         static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
@@ -98,7 +47,7 @@ namespace UAlbion.Core.Veldrid
             if (cl == null) throw new ArgumentNullException(nameof(cl));
             if (commonSet == null) throw new ArgumentNullException(nameof(commonSet));
             if (framebuffer == null) throw new ArgumentNullException(nameof(framebuffer));
-            if (renderable is not Skybox skybox)
+            if (renderable is not SkyboxRenderable skybox)
                 throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
             cl.PushDebugGroup(skybox.Name);

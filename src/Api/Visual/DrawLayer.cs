@@ -17,7 +17,8 @@
         InterfaceOverlay = 0x800,
 
         Debug = 0xff0, // ImGui
-        Cursor = 0xffe, // Mouse cursor
+        Cursor = 0xffd, // Mouse cursor
+        Compositing = 0xffe, // Composing offscreen framebuffers etc
         MaxLayer = 0xfff // Mouse cursor hotspot
     }
 }

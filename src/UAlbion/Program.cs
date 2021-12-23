@@ -6,6 +6,7 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Etm;
+using UAlbion.Core.Veldrid.Skybox;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Formats;
 using UAlbion.Game;
@@ -65,8 +66,10 @@ namespace UAlbion
             }
 
             var (exchange, services) = AssetSystem.SetupAsync(baseDir, disk, jsonUtil).Result;
+            IRenderPass mainPass = null;
             if (commandLine.NeedsEngine)
-                BuildEngine(commandLine, exchange);
+                mainPass = BuildEngine(commandLine, exchange);
+
             services.Add(new StdioConsoleReader());
 
             var assets = exchange.Resolve<IAssetManager>();
@@ -74,7 +77,7 @@ namespace UAlbion
 
             switch (commandLine.Mode) // ConvertAssets handled above as it requires a specialised asset system setup
             {
-                case ExecutionMode.Game: Albion.RunGame(exchange, services, baseDir, commandLine); break;
+                case ExecutionMode.Game: Albion.RunGame(exchange, services, mainPass, baseDir, commandLine); break;
                 case ExecutionMode.BakeIsometric: IsometricTest.Run(exchange, commandLine); break;
 
                 case ExecutionMode.DumpData:
@@ -125,19 +128,21 @@ namespace UAlbion
             }
         }
 
-        static void BuildEngine(CommandLineOptions commandLine, EventExchange exchange)
+        static IRenderPass BuildEngine(CommandLineOptions commandLine, EventExchange exchange)
         {
             PerfTracker.StartupEvent("Creating engine");
             var framebuffer = new MainFramebuffer();
-            var sceneRenderer = new SceneRenderer("MainRenderer", framebuffer);
-            sceneRenderer // TODO: Populate from json so mods can add new render methods
+            var renderPass = new RenderPass("Main Pass", framebuffer);
+            renderPass // TODO: Populate from json so mods can add new render methods
                 .AddRenderer(new SpriteRenderer(framebuffer), typeof(VeldridSpriteBatch))
                 .AddRenderer(new EtmRenderer(framebuffer), typeof(EtmWindow))
-                .AddRenderer(new SkyboxRenderer(framebuffer), typeof(Skybox))
+                .AddRenderer(new SkyboxRenderer(framebuffer), typeof(SkyboxRenderable))
                 .AddRenderer(new DebugGuiRenderer(framebuffer), typeof(DebugGuiRenderable))
                 ;
 
-            var engine = new Engine(commandLine.Backend, commandLine.UseRenderDoc, commandLine.StartupOnly, true, sceneRenderer);
+            var engine = new Engine(commandLine.Backend, commandLine.UseRenderDoc, commandLine.StartupOnly, true);
+            engine.AddRenderPass(renderPass);
+
 #pragma warning disable CA2000 // Dispose objects before losing scopes
             var config = exchange.Resolve<IGeneralConfig>();
             var shaderCache = new ShaderCache(config.ResolvePath("$(CACHE)/ShaderCache"));
@@ -149,10 +154,12 @@ namespace UAlbion
             exchange
                 .Attach(shaderCache)
                 .Attach(framebuffer)
-                .Attach(sceneRenderer)
+                .Attach(renderPass)
                 .Attach(engine)
                 .Attach(new ResourceLayoutSource())
                 ;
+
+            return renderPass;
         }
     }
 }

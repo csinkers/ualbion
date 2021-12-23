@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using ImGuiNET;
 using SixLabors.ImageSharp;
@@ -18,14 +19,15 @@ namespace UAlbion.Core.Veldrid
         static RenderDoc _renderDoc;
 
         readonly FrameTimeAverager _frameTimeAverager = new(0.5);
+        readonly FenceHolder _fence;
         readonly WindowHolder _windowHolder;
+        readonly List<IRenderPass> _renderPasses = new();
         readonly bool _useRenderDoc;
         readonly bool _startupOnly;
         readonly int _defaultWidth = 720;
         readonly int _defaultHeight = 480;
         readonly int _defaultX = 648;
         readonly int _defaultY = 431;
-        readonly ISceneRenderer _sceneRenderer;
 
         GraphicsDevice _graphicsDevice;
         CommandList _frameCommands;
@@ -36,13 +38,15 @@ namespace UAlbion.Core.Veldrid
         public bool IsClipSpaceYInverted => _graphicsDevice?.IsClipSpaceYInverted ?? false;
         public string FrameTimeText => $"{_graphicsDevice.BackendType} {_frameTimeAverager.CurrentAverageFramesPerSecond:N2} fps ({_frameTimeAverager.CurrentAverageFrameTimeMilliseconds:N3} ms)";
 
-        public Engine(GraphicsBackend backend, bool useRenderDoc, bool startupOnly, bool showWindow, ISceneRenderer sceneRenderer, Rectangle? windowRect = null)
+        public Engine(GraphicsBackend backend, bool useRenderDoc, bool startupOnly, bool showWindow, Rectangle? windowRect = null)
         {
             _newBackend = backend;
             _useRenderDoc = useRenderDoc;
             _startupOnly = startupOnly;
-            _sceneRenderer = sceneRenderer ?? throw new ArgumentNullException(nameof(sceneRenderer));
             _windowHolder = showWindow ? new WindowHolder() : null;
+            _fence = new FenceHolder("RenderStage fence");
+            AttachChild(_fence);
+
             if (_windowHolder != null)
                 AttachChild(_windowHolder);
 
@@ -77,6 +81,12 @@ namespace UAlbion.Core.Veldrid
             On<GarbageCollectionEvent>(_ => GC.Collect());
             // On<RecreateWindowEvent>(e => { _recreateWindow = true; _newBackend = _graphicsDevice.BackendType; });
             // Raise(new EngineFlagEvent(e.Value ? FlagOperation.Set : FlagOperation.Clear, EngineFlags.VSync));
+        }
+
+        public Engine AddRenderPass(IRenderPass pass)
+        {
+            _renderPasses.Add(pass);
+            return this;
         }
 
         protected override void Subscribed()
@@ -186,6 +196,8 @@ namespace UAlbion.Core.Veldrid
         void Draw()
         {
             var camera = Resolve<ICamera>(); // TODO: More sophisticated approach, support multiple cameras etc
+            _fence.Fence.Reset();
+
             using (PerfTracker.FrameEvent("6.1 Prepare scenes"))
             {
                 _frameCommands.Begin();
@@ -193,22 +205,27 @@ namespace UAlbion.Core.Veldrid
                 Raise(new PrepareFrameResourcesEvent(_graphicsDevice, _frameCommands));
                 Raise(new PrepareFrameResourceSetsEvent(_graphicsDevice, _frameCommands));
                 _frameCommands.End();
-                _graphicsDevice.SubmitCommands(_frameCommands);
+                _graphicsDevice.SubmitCommands(_frameCommands, _fence.Fence);
             }
 
-            using (PerfTracker.FrameEvent("6.2 Render scenes"))
+            _graphicsDevice.WaitForFence(_fence.Fence);
+            foreach (var phase in _renderPasses)
             {
-                _frameCommands.Begin();
-                _sceneRenderer.Render(_graphicsDevice, _frameCommands);
-                _frameCommands.End();
-            }
+                _fence.Fence.Reset();
+                using (PerfTracker.FrameEvent("6.2 Render scenes"))
+                {
+                    _frameCommands.Begin();
+                    phase.Render(_graphicsDevice, _frameCommands);
+                    _frameCommands.End();
+                }
 
-            using (PerfTracker.FrameEvent("6.3 Submit commandlist"))
-            {
-                CoreTrace.Log.Info("Scene", "Submitting commands");
-                _graphicsDevice.SubmitCommands(_frameCommands);
-                CoreTrace.Log.Info("Scene", "Submitted commands");
-                _graphicsDevice.WaitForIdle();
+                using (PerfTracker.FrameEvent("6.3 Submit commandlist"))
+                {
+                    CoreTrace.Log.Info("Scene", "Submitting commands");
+                    _graphicsDevice.SubmitCommands(_frameCommands, _fence.Fence);
+                    CoreTrace.Log.Info("Scene", "Submitted commands");
+                    _graphicsDevice.WaitForFence(_fence.Fence);
+                }
             }
         }
 
@@ -283,7 +300,7 @@ namespace UAlbion.Core.Veldrid
             }
         }
 
-        public unsafe Image<Bgra32> RenderFrame(bool captureWithRenderDoc)
+        public unsafe Image<Bgra32> RenderFrame(bool captureWithRenderDoc, int phase)
         {
             if(_newBackend != null)
                 ChangeBackend(_newBackend.Value);
@@ -294,7 +311,7 @@ namespace UAlbion.Core.Veldrid
 
             Draw();
 
-            var color = _sceneRenderer.Framebuffer.Framebuffer.ColorTargets[0].Target;
+            var color = _renderPasses[phase].Framebuffer.Framebuffer.ColorTargets[0].Target;
             var stagingDesc = new TextureDescription(color.Width, color.Height, 1, 1, 1, color.Format, TextureUsage.Staging, TextureType.Texture2D);
             var staging = _graphicsDevice.ResourceFactory.CreateTexture(ref stagingDesc);
 
@@ -328,6 +345,7 @@ namespace UAlbion.Core.Veldrid
         {
             DestroyAllObjects();
             _windowHolder?.Dispose();
+            _fence.Dispose();
         }
     }
 }

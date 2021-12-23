@@ -8,7 +8,7 @@ layout(set = 0, binding = 2) uniform _Uniform {
     vec4 uRect;
 };
 
-// UAlbion.Core.Veldrid.Sprites.Vertex2DTextured
+// UAlbion.Core.Veldrid.Vertex2DTextured
 layout(location = 0) in vec2 iPosition;
 layout(location = 1) in vec2 iTexCoords;
 

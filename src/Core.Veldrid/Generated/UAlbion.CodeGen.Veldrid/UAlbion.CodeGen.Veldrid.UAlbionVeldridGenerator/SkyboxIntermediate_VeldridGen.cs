@@ -1,5 +1,5 @@
 ﻿using Veldrid;
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Veldrid.Skybox
 {
     internal partial struct SkyboxIntermediate
     {

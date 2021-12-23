@@ -1,5 +1,5 @@
 ﻿using Veldrid;
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Veldrid.Skybox
 {
     internal partial class SkyboxResourceSet
     {
@@ -45,7 +45,7 @@ namespace UAlbion.Core.Veldrid
             }
         }
 
-        public global::VeldridGen.Interfaces.IBufferHolder<global::UAlbion.Core.Veldrid.SkyboxUniformInfo> Uniform
+        public global::VeldridGen.Interfaces.IBufferHolder<global::UAlbion.Core.Veldrid.Skybox.SkyboxUniformInfo> Uniform
         {
             get => _uniform;
             set

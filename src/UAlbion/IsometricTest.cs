@@ -21,16 +21,13 @@ namespace UAlbion
         MainFramebuffer _mainFramebuffer;
         FullscreenQuadRenderer _quadRenderer;
 
+        IsometricTest(CommandLineOptions cmdLine) => _cmdLine = cmdLine ?? throw new ArgumentNullException(nameof(cmdLine));
+
         public static void Run(EventExchange exchange, CommandLineOptions cmdLine)
         {
             using var test = new IsometricTest(cmdLine);
             exchange.Attach(test);
             test.Detach();
-        }
-
-        IsometricTest(CommandLineOptions cmdLine)
-        {
-            _cmdLine = cmdLine ?? throw new ArgumentNullException(nameof(cmdLine));
         }
 
         protected override void Subscribed()
@@ -46,28 +43,29 @@ namespace UAlbion
                     IsometricLabyrinthLoader.DefaultWidth * IsometricLabyrinthLoader.DefaultTilesPerRow,
                     IsometricLabyrinthLoader.DefaultHeight * 10));
 
+            Exchange.Attach(services);
             var config = Resolve<IGeneralConfig>();
             services
                 .Add(new InputManager().RegisterMouseMode(MouseMode.Normal, new NormalMouseMode()))
                 .Add(new InputBinder((disk, jsonUtil) => InputConfig.Load(config.BasePath, disk, jsonUtil)))
                 ;
 
+            var engine = (Engine)Resolve<IEngine>();
             _mainFramebuffer = new MainFramebuffer();
             _quadRenderer = new FullscreenQuadRenderer();
-            var quad = new FullscreenQuad("Quad", DrawLayer.MaxLayer,
+            var quad = new FullscreenQuad("Quad", DrawLayer.Compositing,
                 ((SimpleFramebuffer)builder.Framebuffer).Color,
-                _mainFramebuffer,
-                new Vector4(-1, -1, 2, 2));
+                new Vector4(0, 0, 1, 1));
             var source = new AdhocRenderableSource(new[] { quad });
+            var copyPass = new RenderPass("Copy Pass", _mainFramebuffer);
+            copyPass.AddSource(source);
+            copyPass.AddRenderer(_quadRenderer, typeof(FullscreenQuad));
+            engine.AddRenderPass(copyPass);
 
             services.Add(_mainFramebuffer);
             services.Add(_quadRenderer);
             services.Add(quad);
-            Exchange.Attach(services);
-
-            var renderer = Resolve<ISceneRenderer>();
-            renderer.AddRenderer(_quadRenderer, typeof(FullscreenQuad));
-            renderer.AddSource(source);
+            services.Add(copyPass);
 
             Raise(new InputModeEvent(InputMode.IsoBake));
             Raise(new SetSceneEvent(SceneId.IsometricBake));

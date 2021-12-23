@@ -1,5 +1,5 @@
 ﻿using Veldrid;
-namespace UAlbion.Core.Veldrid.Sprites
+namespace UAlbion.Core.Veldrid
 {
     public partial struct Vertex2DTextured
     {

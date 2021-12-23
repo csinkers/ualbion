@@ -1,46 +1,10 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Numerics;
-using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid.Etm
 {
-    [VertexShader(typeof(EtmVertexShader))]
-    [FragmentShader(typeof(EtmFragmentShader))]
-    partial class EtmPipeline : PipelineHolder
-    {
-    }
-
-    [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-    partial class EtmIntermediate : IVertexFormat
-    {
-#pragma warning disable 649
-        [Vertex("TexCoords")] public Vector2 TextureCordinates;
-        [Vertex("Textures", Flat = true)] public uint Textures;
-        [Vertex("Flags", EnumPrefix = "TF", Flat = true)] public DungeonTileFlags Flags;
-#pragma warning restore 649
-    }
-
-    [Name("ExtrudedTileMapSV.vert")]
-    [Input(0, typeof(Vertex3DTextured))]
-    [Input(1, typeof(DungeonTile), InstanceStep = 1)]
-    [ResourceSet(0, typeof(EtmSet))]
-    [ResourceSet(1, typeof(CommonSet))]
-    [Output(0, typeof(EtmIntermediate))]
-    [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-    partial class EtmVertexShader : IVertexShader { }
-
-    [Name( "ExtrudedTileMapSF.frag")]
-    [Input(0, typeof(EtmIntermediate))]
-    [ResourceSet(0, typeof(EtmSet))]
-    [ResourceSet(1, typeof(CommonSet))]
-    [Output(0, typeof(SimpleFramebuffer))]
-    [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-    partial class EtmFragmentShader : IFragmentShader { }
-
     public sealed class EtmRenderer : Component, IRenderer, IDisposable
     {
         readonly MultiBuffer<Vertex3DTextured> _vertexBuffer;

@@ -1,5 +1,5 @@
 ﻿using Veldrid;
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Veldrid.Skybox
 {
     internal partial class SkyboxFragmentShader
     {
@@ -36,7 +36,7 @@ layout(set = 1, binding = 0) uniform _Shared {
 };
 layout(set = 1, binding = 3) uniform texture2D uPalette; //!
 
-// UAlbion.Core.Veldrid.SkyboxIntermediate
+// UAlbion.Core.Veldrid.Skybox.SkyboxIntermediate
 layout(location = 0) in vec2 iTexPosition;
 layout(location = 1) in vec2 iNormCoords;
 layout(location = 2) in vec3 iWorldPosition;

@@ -5,14 +5,14 @@ using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Veldrid.Skybox
 {
-    public sealed class Skybox : Component, ISkybox
+    public sealed class SkyboxRenderable : Component, ISkybox
     {
         readonly SkyboxManager _manager;
         readonly SingleBuffer<SkyboxUniformInfo> _uniformBuffer;
 
-        internal Skybox(ITextureHolder texture, ISamplerHolder sampler, SkyboxManager manager)
+        internal SkyboxRenderable(ITextureHolder texture, ISamplerHolder sampler, SkyboxManager manager)
         {
             if (texture == null) throw new ArgumentNullException(nameof(texture));
             if (sampler == null) throw new ArgumentNullException(nameof(sampler));

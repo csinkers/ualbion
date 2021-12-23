@@ -58,7 +58,7 @@ namespace UAlbion.Game.Veldrid.Assets
             var assets = Resolve<IAssetManager>();
             var frames = _builder.Build(labyrinth, info, mode, assets);
 
-            Image<Bgra32> image = _engine.RenderFrame(false);
+            Image<Bgra32> image = _engine.RenderFrame(false, 0);
 
             using var stream = new MemoryStream();
             image.SaveAsPng(stream);

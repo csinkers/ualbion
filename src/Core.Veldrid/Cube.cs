@@ -1,6 +1,4 @@
-﻿using UAlbion.Core.Veldrid.Sprites;
-
-namespace UAlbion.Core.Veldrid
+﻿namespace UAlbion.Core.Veldrid
 {
     public static class Cube
     {

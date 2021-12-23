@@ -15,7 +15,7 @@ namespace UAlbion.Core.Veldrid.Etm
 
 
         public EtmPipeline() : base("ExtrudedTileMapSV.vert", "ExtrudedTileMapSF.frag",
-            new[] { global::UAlbion.Core.Veldrid.Sprites.Vertex3DTextured.GetLayout(true), DungeonTileLayout},
+            new[] { global::UAlbion.Core.Veldrid.Vertex3DTextured.GetLayout(true), DungeonTileLayout},
             new[] { typeof(global::UAlbion.Core.Veldrid.Etm.EtmSet), typeof(global::UAlbion.Core.Veldrid.CommonSet) })
         { }
     }

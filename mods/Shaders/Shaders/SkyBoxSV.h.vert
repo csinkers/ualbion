@@ -11,11 +11,11 @@ layout(set = 0, binding = 2) uniform _Uniform {
     uint _pad1;
 };
 
-// UAlbion.Core.Veldrid.Sprites.Vertex2DTextured
+// UAlbion.Core.Veldrid.Vertex2DTextured
 layout(location = 0) in vec2 iPosition;
 layout(location = 1) in vec2 iTexCoords;
 
-// UAlbion.Core.Veldrid.SkyboxIntermediate
+// UAlbion.Core.Veldrid.Skybox.SkyboxIntermediate
 layout(location = 0) out vec2 oTexPosition;
 layout(location = 1) out vec2 oNormCoords;
 layout(location = 2) out vec3 oWorldPosition;

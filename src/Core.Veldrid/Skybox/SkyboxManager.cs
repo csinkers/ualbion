@@ -5,7 +5,7 @@ using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
 using Veldrid;
 
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Veldrid.Skybox
 {
     public sealed class SkyboxManager : ServiceComponent<ISkyboxManager>, ISkyboxManager, IDisposable
     {
@@ -28,18 +28,18 @@ namespace UAlbion.Core.Veldrid
         {
             if (renderables == null) throw new ArgumentNullException(nameof(renderables));
             foreach (var child in Children)
-                if (child is Skybox skybox)
+                if (child is SkyboxRenderable skybox)
                     renderables.Add(skybox);
         }
 
-        public Skybox CreateSkybox(ITexture texture)
+        public SkyboxRenderable CreateSkybox(ITexture texture)
         {
             var ts = Resolve<ITextureSource>();
             var textureHolder = ts.GetSimpleTexture(texture);
-            return new Skybox(textureHolder, _skyboxSampler, this);
+            return new SkyboxRenderable(textureHolder, _skyboxSampler, this);
         }
 
-        internal void DisposeSkybox(Skybox skybox)
+        internal void DisposeSkybox(SkyboxRenderable skybox)
         {
             if (skybox == null) throw new ArgumentNullException(nameof(skybox));
             RemoveChild(skybox);
@@ -48,7 +48,7 @@ namespace UAlbion.Core.Veldrid
         public void Dispose()
         {
             foreach (var child in Children)
-                if (child is Skybox skybox)
+                if (child is SkyboxRenderable skybox)
                     skybox.Dispose();
 
             _skyboxSampler?.Dispose();

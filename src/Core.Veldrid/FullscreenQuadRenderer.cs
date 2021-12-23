@@ -18,7 +18,6 @@ namespace UAlbion.Core.Veldrid
         public string Name { get; }
         public DrawLayer RenderOrder { get; }
         public ITextureHolder Source { get; }
-        public IFramebufferHolder Destination { get; }
         public Vector4 NormalisedDestRectangle
         {
             get => _uniform.Data.uRect;
@@ -29,13 +28,11 @@ namespace UAlbion.Core.Veldrid
         public FullscreenQuad(string name,
             DrawLayer renderOrder,
             ITextureHolder source,
-            IFramebufferHolder destination,
             Vector4 normalisedDestWindowXYWH)
         {
             Name = name;
             RenderOrder = renderOrder;
             Source = source ?? throw new ArgumentNullException(nameof(source));
-            Destination = destination ?? throw new ArgumentNullException(nameof(destination));
             _uniform = new SingleBuffer<FullscreenQuadUniformInfo>(new FullscreenQuadUniformInfo
             {
                 uRect = normalisedDestWindowXYWH
@@ -167,6 +164,7 @@ namespace UAlbion.Core.Veldrid
             if (!_pipelines.TryGetValue(framebuffer.OutputDescription.Value, out var pipeline))
             {
                 pipeline = BuildPipeline(framebuffer.OutputDescription.Value);
+                AttachChild(pipeline);
                 _pipelines[framebuffer.OutputDescription.Value] = pipeline;
             }
 
@@ -181,7 +179,7 @@ namespace UAlbion.Core.Veldrid
             cl.SetIndexBuffer(_indexBuffer.DeviceBuffer, IndexFormat.UInt16);
             cl.SetFramebuffer(framebuffer.Framebuffer);
 
-            cl.Draw((uint)Indices.Length);
+            cl.DrawIndexed((uint)Indices.Length);
             cl.PopDebugGroup();
         }
 

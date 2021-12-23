@@ -63,7 +63,7 @@ layout(set = 1, binding = 2) uniform _View {
     mat4 uView;
 };
 
-// UAlbion.Core.Veldrid.Sprites.Vertex3DTextured
+// UAlbion.Core.Veldrid.Vertex3DTextured
 layout(location = 0) in vec3 iPosition;
 layout(location = 1) in vec2 iTexCoords;
 

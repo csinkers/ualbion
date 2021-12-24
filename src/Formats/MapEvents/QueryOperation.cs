@@ -4,7 +4,7 @@
     {
         IsTrue = 0,             // NZ >0
         LessThanOrEqual = 1,    // LE <=
-        NotEqual = 2,           // NE !=
+        LessThan = 2,           // LT <
         Equals = 3,             // EQ ==
         GreaterThanOrEqual = 4, // GE >=
         GreaterThan = 5,        // GT >

@@ -14,7 +14,7 @@
         NpcActive = 0xE,
         Gold = 0xF,
         RandomChance = 0x11,
-        Unk12 = 0x12,
+        Hour = 0x12,
         ChosenVerb = 0x14,
         Conscious = 0x15,
         Leader = 0x1A,

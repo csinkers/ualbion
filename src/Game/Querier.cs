@@ -24,18 +24,19 @@ namespace UAlbion.Game
 
         public Querier()
         {
-            OnAsync(Do<QuerySwitchEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().GetSwitch(q.SwitchId) ? 1 : 0, q.Immediate)));
-            OnAsync(Do<QueryTickerEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().GetTicker(q.TickerId), q.Immediate)));
-            OnAsync(Do<QueryMapEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().MapId.Id, q.MapId.Id)));
+            OnAsync(Do<QueryChosenVerbEvent>(q => Resolve<IEventManager>().Context.Source.Trigger.HasFlag((TriggerTypes)(1 << (int)q.TriggerType))));
             OnAsync(Do<QueryGoldEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Party.TotalGold, q.Argument)));
             OnAsync(Do<QueryHasItemEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Party.GetItemCount(q.ItemId), q.Immediate)));
             OnAsync(Do<QueryHasPartyMemberEvent>(q => Resolve<IGameState>().Party.StatusBarOrder.Any(x => x.Id == q.PartyMemberId)));
+            OnAsync(Do<QueryHourEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Time.Hour, q.Argument)));
             OnAsync(Do<QueryLeaderEvent>(q => Resolve<IGameState>().Party.Leader.Id == q.PartyMemberId));
-            OnAsync(Do<QueryRandomChanceEvent>(q => _random.Next(100) < q.Argument));
-            OnAsync(Do<QueryTriggerTypeEvent>(q => Resolve<IEventManager>().Context.Source.Trigger == (TriggerTypes)q.Argument));
-            OnAsync(Do<QueryChosenVerbEvent>(q => Resolve<IEventManager>().Context.Source.Trigger.HasFlag((TriggerTypes)(1 << (int)q.TriggerType))));
-            OnAsync(Do<QueryUsedItemEvent>(q => Resolve<IEventManager>().Context.Source.AssetId == (AssetId)q.ItemId));
+            OnAsync(Do<QueryMapEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().MapId.Id, q.MapId.Id)));
             OnAsync(Do<QueryPreviousActionResultEvent> (q => Resolve<IEventManager>().LastEventResult));
+            OnAsync(Do<QueryRandomChanceEvent>(q => _random.Next(100) < q.Argument));
+            OnAsync(Do<QuerySwitchEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().GetSwitch(q.SwitchId) ? 1 : 0, q.Immediate)));
+            OnAsync(Do<QueryTickerEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().GetTicker(q.TickerId), q.Immediate)));
+            OnAsync(Do<QueryTriggerTypeEvent>(q => Resolve<IEventManager>().Context.Source.Trigger == (TriggerTypes)q.Argument));
+            OnAsync(Do<QueryUsedItemEvent>(q => Resolve<IEventManager>().Context.Source.AssetId == (AssetId)q.ItemId));
             OnAsync(Do<QueryScriptDebugModeEvent>(q => false));
 
             OnAsync(Do<QueryNpcActiveEvent>(q =>
@@ -83,7 +84,6 @@ namespace UAlbion.Game
             OnAsync(Do<QueryUnk1Event>(_ => false));
             OnAsync(Do<QueryUnk4Event>(_ => false));
             OnAsync(Do<QueryUnkCEvent>(_ => false));
-            OnAsync(Do<QueryUnk12Event>(_ => false));
             OnAsync(Do<QueryUnk19Event>(_ => false));
             OnAsync(Do<QueryUnk1EEvent>(_ => false));
             OnAsync(Do<QueryUnk21Event>(_ => false));

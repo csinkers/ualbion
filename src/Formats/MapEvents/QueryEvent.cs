@@ -30,7 +30,7 @@ namespace UAlbion.Formats.MapEvents
                 QueryType.NpcActive => QueryNpcActiveEvent.Serdes((QueryNpcActiveEvent)e, s),
                 QueryType.Gold => QueryGoldEvent.Serdes((QueryGoldEvent)e, s),
                 QueryType.RandomChance => QueryRandomChanceEvent.Serdes((QueryRandomChanceEvent)e, s),
-                QueryType.Unk12 => QueryUnk12Event.Serdes((QueryUnk12Event)e, s),
+                QueryType.Hour => QueryHourEvent.Serdes((QueryHourEvent)e, s),
                 QueryType.ChosenVerb => QueryChosenVerbEvent.Serdes((QueryChosenVerbEvent)e, s),
                 QueryType.Conscious => QueryConsciousEvent.Serdes((QueryConsciousEvent)e, mapping, s),
                 QueryType.Leader => QueryLeaderEvent.Serdes((QueryLeaderEvent)e, mapping, s),

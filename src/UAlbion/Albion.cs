@@ -55,6 +55,7 @@ namespace UAlbion
 
         static void RegisterComponents(EventExchange global, IContainer services, IRenderPass mainPass, string baseDir, CommandLineOptions commandLine)
         {
+#pragma warning disable CA2000 // Dispose objects before losing scope
             PerfTracker.StartupEvent("Creating main components");
 
             global
@@ -150,7 +151,7 @@ namespace UAlbion
                 .Add(new DebugMapInspector(services)
                     .AddBehaviour(new SpriteInstanceDataDebugBehaviour())
                     .AddBehaviour(new FormatTextEventBehaviour()))
-                    // .AddBehaviour(new QueryEventDebugBehaviour()))
+                // .AddBehaviour(new QueryEventDebugBehaviour()))
                 .Add(new ContextMenu())
                 .Add(new CursorManager())
                 .Add(new InputManager()
@@ -165,6 +166,7 @@ namespace UAlbion
                 .Add(new InputBinder((disk, jsonUtil) => InputConfig.Load(baseDir, disk, jsonUtil)))
                 .Add(new ItemTransitionManager())
                 ;
+#pragma warning restore CA2000 // Dispose objects before losing scope
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29009.5
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{B2D034E4-684C-48C8-85C4-A74AFEDF9BEA}"
 EndProject
@@ -205,8 +205,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.ShaderWriter", "src\Tools\ShaderWriter\UAlbion.ShaderWriter.csproj", "{844F634D-F7ED-44AA-A1F8-021144F429D1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.CodeGen.Veldrid", "src\CodeGen.Veldrid\UAlbion.CodeGen.Veldrid.csproj", "{C9418659-7F4B-40DF-BA8C-48E61E823A76}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReinerRainer", "mods\ReinerRainer\src\ReinerRainer.csproj", "{84A23175-3D90-4C39-B325-9E679F463605}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Scripting", "src\Scripting\UAlbion.Scripting.csproj", "{C16097FB-F65D-43CA-9373-6C07A32CEE97}"
 EndProject
@@ -728,18 +726,6 @@ Global
 		{C9418659-7F4B-40DF-BA8C-48E61E823A76}.Release|x64.Build.0 = Release|Any CPU
 		{C9418659-7F4B-40DF-BA8C-48E61E823A76}.Release|x86.ActiveCfg = Release|Any CPU
 		{C9418659-7F4B-40DF-BA8C-48E61E823A76}.Release|x86.Build.0 = Release|Any CPU
-		{84A23175-3D90-4C39-B325-9E679F463605}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{84A23175-3D90-4C39-B325-9E679F463605}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{84A23175-3D90-4C39-B325-9E679F463605}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{84A23175-3D90-4C39-B325-9E679F463605}.Debug|x64.Build.0 = Debug|Any CPU
-		{84A23175-3D90-4C39-B325-9E679F463605}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{84A23175-3D90-4C39-B325-9E679F463605}.Debug|x86.Build.0 = Debug|Any CPU
-		{84A23175-3D90-4C39-B325-9E679F463605}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{84A23175-3D90-4C39-B325-9E679F463605}.Release|Any CPU.Build.0 = Release|Any CPU
-		{84A23175-3D90-4C39-B325-9E679F463605}.Release|x64.ActiveCfg = Release|Any CPU
-		{84A23175-3D90-4C39-B325-9E679F463605}.Release|x64.Build.0 = Release|Any CPU
-		{84A23175-3D90-4C39-B325-9E679F463605}.Release|x86.ActiveCfg = Release|Any CPU
-		{84A23175-3D90-4C39-B325-9E679F463605}.Release|x86.Build.0 = Release|Any CPU
 		{C16097FB-F65D-43CA-9373-6C07A32CEE97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C16097FB-F65D-43CA-9373-6C07A32CEE97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C16097FB-F65D-43CA-9373-6C07A32CEE97}.Debug|x64.ActiveCfg = Debug|Any CPU

@@ -123,7 +123,6 @@ namespace UAlbion.Core.Veldrid
         };
 
         readonly Dictionary<OutputDescription, FullscreenQuadPipeline> _pipelines = new();
-
         readonly MultiBuffer<Vertex2DTextured> _vertexBuffer;
         readonly MultiBuffer<ushort> _indexBuffer;
 
@@ -155,7 +154,7 @@ namespace UAlbion.Core.Veldrid
             if (cl == null) throw new ArgumentNullException(nameof(cl));
             if (commonSet == null) throw new ArgumentNullException(nameof(commonSet));
             if (framebuffer == null) throw new ArgumentNullException(nameof(framebuffer));
-            if (renderable is not FullscreenQuad FullscreenQuad)
+            if (renderable is not FullscreenQuad fullscreenQuad)
                 throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
             if (framebuffer.OutputDescription == null)
@@ -171,10 +170,10 @@ namespace UAlbion.Core.Veldrid
             if (pipeline.Pipeline == null)
                 return; // Can't render it this frame as it needs to be initialised in the pre-draw steps
 
-            cl.PushDebugGroup(FullscreenQuad.Name);
+            cl.PushDebugGroup(fullscreenQuad.Name);
 
             cl.SetPipeline(pipeline.Pipeline);
-            cl.SetGraphicsResourceSet(0, FullscreenQuad.ResourceSet.ResourceSet);
+            cl.SetGraphicsResourceSet(0, fullscreenQuad.ResourceSet.ResourceSet);
             cl.SetVertexBuffer(0, _vertexBuffer.DeviceBuffer);
             cl.SetIndexBuffer(_indexBuffer.DeviceBuffer, IndexFormat.UInt16);
             cl.SetFramebuffer(framebuffer.Framebuffer);

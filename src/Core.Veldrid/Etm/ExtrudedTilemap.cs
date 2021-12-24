@@ -83,7 +83,7 @@ namespace UAlbion.Core.Veldrid.Etm
         }
 
         public ISet<int> AnimatedTiles { get; } = new HashSet<int>();
-        public DungeonTilemapPipeline RendererId { get; set; }
+        public DungeonTilemapPipeline RendererId { get; set; } = DungeonTilemapPipeline.Normal;
         public DeviceBuffer TileBuffer => _tiles.DeviceBuffer;
 
         public void DefineFloor(int id, ITexture texture)

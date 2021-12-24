@@ -100,7 +100,7 @@ namespace UAlbion.Core.Veldrid
                 cl.SetFramebuffer(Framebuffer.Framebuffer);
                 cl.SetFullViewports();
                 cl.SetFullScissorRects();
-                cl.ClearColorTarget(0, new RgbaFloat(_clearColour.Red, _clearColour.Green, _clearColour.Blue, 1.0f));
+                cl.ClearColorTarget(0, new RgbaFloat(_clearColour.Red, _clearColour.Green, _clearColour.Blue, _clearColour.Alpha));
                 cl.ClearDepthStencil(device.IsDepthRangeZeroToOne ? 1f : 0f);
 
                 _renderList.Clear();

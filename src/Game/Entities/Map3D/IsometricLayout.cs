@@ -80,6 +80,8 @@ namespace UAlbion.Game.Entities.Map3D
             var etmManager = Resolve<IEtmManager>();
             request.Pipeline = DungeonTilemapPipeline.NoCulling;
             request.DayPalette = palette;
+
+            _tilemap?.Dispose();
             _tilemap = etmManager.CreateTilemap(request /*labyrinthData.Id, 0, request, palette, null, DungeonTilemapPipeline.NoCulling */);
 
             // Layout:

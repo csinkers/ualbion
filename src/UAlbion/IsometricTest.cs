@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
@@ -32,6 +33,7 @@ namespace UAlbion
 
         protected override void Subscribed()
         {
+#pragma warning disable CA2000 // Dispose objects before losing scope
             var (services, builder) = IsometricSetup.SetupEngine(Exchange,
                 IsometricLabyrinthLoader.DefaultWidth,
                 IsometricLabyrinthLoader.DefaultHeight,
@@ -56,10 +58,28 @@ namespace UAlbion
             var quad = new FullscreenQuad("Quad", DrawLayer.Compositing,
                 ((SimpleFramebuffer)builder.Framebuffer).Color,
                 new Vector4(0, 0, 1, 1));
+
+            var firstPass = (RenderPass)engine.RenderPasses.First();
+
+            void UpdateDestRectangle()
+            {
+                if (_mainFramebuffer.Width == 0 || _mainFramebuffer.Height == 0) return;
+
+                var w = (float)firstPass.Framebuffer.Width;
+                var h = (float)firstPass.Framebuffer.Height;
+                var normW = w / _mainFramebuffer.Width;
+                var normH = h / _mainFramebuffer.Height;
+                quad.NormalisedDestRectangle = new Vector4(0, 0, normW, normH);
+            }
+
+            firstPass.Framebuffer.PropertyChanged += (_, _) => UpdateDestRectangle();
+            _mainFramebuffer.PropertyChanged += (_, _) => UpdateDestRectangle();
+
             var source = new AdhocRenderableSource(new[] { quad });
             var copyPass = new RenderPass("Copy Pass", _mainFramebuffer);
             copyPass.AddSource(source);
             copyPass.AddRenderer(_quadRenderer, typeof(FullscreenQuad));
+
             engine.AddRenderPass(copyPass);
 
             services.Add(_mainFramebuffer);
@@ -73,6 +93,7 @@ namespace UAlbion
             Raise(new EngineFlagEvent(FlagOperation.Set, EngineFlags.ShowBoundingBoxes));
 
             Resolve<IEngine>().Run();
+#pragma warning restore CA2000 // Dispose objects before losing scope
         }
 
         public void Dispose()

@@ -19,7 +19,18 @@ namespace UAlbion.Core.Veldrid.Etm
                 request.AmbientLightLevel, request.FogColor,
                 request.ObjectYScaling);
 
-            var result = new ExtrudedTilemap(this, request.Id, request.Id.ToString(), request.TileCount, properties, request.DayPalette, request.NightPalette);
+            var result = new ExtrudedTilemap(
+                this,
+                request.Id,
+                request.Id.ToString(),
+                request.TileCount,
+                properties,
+                request.DayPalette,
+                request.NightPalette)
+            {
+                RendererId = request.Pipeline
+            };
+
             AttachChild(result);
             return result;
         }

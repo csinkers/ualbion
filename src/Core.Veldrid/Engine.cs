@@ -83,6 +83,7 @@ namespace UAlbion.Core.Veldrid
             // Raise(new EngineFlagEvent(e.Value ? FlagOperation.Set : FlagOperation.Clear, EngineFlags.VSync));
         }
 
+        public IList<IRenderPass> RenderPasses => _renderPasses.AsReadOnly();
         public Engine AddRenderPass(IRenderPass pass)
         {
             _renderPasses.Add(pass);

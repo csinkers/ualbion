@@ -9,25 +9,50 @@ namespace UAlbion.Core.Veldrid
 {
     public abstract class FramebufferHolder : Component, IFramebufferHolder
     {
-        class Holder : ITextureHolder
+        class TextureHolder : ITextureHolder
         {
             readonly Func<Texture> _getter;
-            public Holder(Func<Texture> getter) => _getter = getter ?? throw new ArgumentNullException(nameof(getter));
-            public event PropertyChangedEventHandler PropertyChanged;
+            public TextureHolder(Func<Texture> getter) => _getter = getter ?? throw new ArgumentNullException(nameof(getter));
+            public event PropertyChangedEventHandler PropertyChanged { add { } remove { } }
             public Texture DeviceTexture => _getter();
             public string Name => _getter()?.Name;
         }
 
         readonly object _syncRoot = new();
-        readonly List<Holder> _colorHolders = new();
+        readonly List<TextureHolder> _colorHolders = new();
         Framebuffer _framebuffer;
-        Holder _depthHolder;
+        TextureHolder _depthHolder;
         uint _width;
         uint _height;
 
         public string Name { get; }
-        public uint Width { get => _width; set { if (_width == value) return;  _width = value; Dirty(); } } 
-        public uint Height { get => _height; set { if (_height == value) return; _height = value; Dirty(); } }
+
+        public uint Width
+        {
+            get => _width;
+            set
+            {
+                if (_width == value)
+                    return;
+
+                _width = value;
+                Dirty();
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Width)));
+            }
+        }
+
+        public uint Height
+        {
+            get => _height;
+            set
+            {
+                if (_height == value)
+                    return;
+                _height = value;
+                Dirty();
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Height)));
+            }
+        }
 
         public Framebuffer Framebuffer
         {
@@ -65,7 +90,7 @@ namespace UAlbion.Core.Veldrid
             get
             {
                 lock (_syncRoot)
-                    return _depthHolder ??= new Holder(() => Framebuffer.DepthTarget?.Target);
+                    return _depthHolder ??= new TextureHolder(() => Framebuffer.DepthTarget?.Target);
             }
         }
 
@@ -74,7 +99,7 @@ namespace UAlbion.Core.Veldrid
             lock (_syncRoot)
             {
                 while(_colorHolders.Count <= index)
-                    _colorHolders.Add(new Holder(() => Framebuffer.ColorTargets[index].Target));
+                    _colorHolders.Add(new TextureHolder(() => Framebuffer.ColorTargets[index].Target));
                 return _colorHolders[index];
             }
         }

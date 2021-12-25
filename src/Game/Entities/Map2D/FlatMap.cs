@@ -125,7 +125,7 @@ namespace UAlbion.Game.Entities.Map2D
                 if (zone == null || !zone.Trigger.HasFlag(TriggerTypes.Npc))
                     return;
 
-                if (!(zone.Node.Event is OffsetEvent offset))
+                if (zone.Node.Event is not OffsetEvent offset)
                     break;
                 e = new NpcEnteredTileEvent(e.Id, e.X + offset.X, e.Y + offset.Y);
             }
@@ -142,7 +142,7 @@ namespace UAlbion.Game.Entities.Map2D
                 if (zone?.Node == null || !zone.Trigger.HasFlag(TriggerTypes.Normal))
                     return;
 
-                if (!(zone.Node.Event is OffsetEvent offset))
+                if (zone.Node.Event is not OffsetEvent offset)
                     break;
                 e = new PlayerEnteredTileEvent(e.X + offset.X, e.Y + offset.Y);
             }

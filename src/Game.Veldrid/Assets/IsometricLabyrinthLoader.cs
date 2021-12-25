@@ -27,6 +27,10 @@ namespace UAlbion.Game.Veldrid.Assets
         public const int DefaultBaseHeight = 40;
         public const int DefaultTilesPerRow = 16;
 
+        // TODO: Calculate these properly
+        const int HackyContentsOffsetX = -143;
+        const int HackyContentsOffsetY = 235;
+
         readonly JsonLoader<LabyrinthData> _jsonLoader = new();
         Engine _engine;
         IsometricBuilder _builder;
@@ -66,16 +70,19 @@ namespace UAlbion.Game.Veldrid.Assets
             var pngBytes = stream.ToArray();
             yield return (pngPath, pngBytes);
 
+            int expansionFactor = mode == IsometricMode.Contents ? IsometricBuilder.ContentsExpansionFactor : 1;
             var properties = new Tilemap3DProperties
             {
                 TilesetId = labyrinth.Id.Id,
                 IsoMode = mode,
-                TileWidth = tileWidth,
-                TileHeight = tileHeight,
+                TileWidth = expansionFactor * tileWidth,
+                TileHeight = expansionFactor * tileHeight,
                 ImagePath = pngPath,
                 TilesetPath = tsxPath,
                 ImageWidth = image.Width,
                 ImageHeight = image.Height,
+                OffsetX = mode == IsometricMode.Contents ? HackyContentsOffsetX : 0,
+                OffsetY = mode == IsometricMode.Contents ? HackyContentsOffsetY : 0
             };
 
             var tiledTileset = Tileset.FromLabyrinth(labyrinth, properties, frames);

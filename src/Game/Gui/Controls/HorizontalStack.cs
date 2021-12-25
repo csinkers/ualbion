@@ -45,7 +45,7 @@ namespace UAlbion.Game.Gui.Controls
             foreach(var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
             {
                 int width = (int)child.GetSize().X;
-                if (!(child is IFixedSizeUiElement))
+                if (child is not IFixedSizeUiElement)
                     nonFixedCount++;
                 minWidth += width;
             }
@@ -56,7 +56,7 @@ namespace UAlbion.Game.Gui.Controls
             {
                 int width = (int)child.GetSize().X;
                 var rect = new Rectangle(offset, extents.Y, width, extents.Height);
-                if (!(child is IFixedSizeUiElement))
+                if (child is not IFixedSizeUiElement)
                     rect = new Rectangle(rect.X, rect.Y, rect.Width + spareWidth / nonFixedCount, rect.Height);
 
                 maxOrder = Math.Max(maxOrder, func(child, rect, order));

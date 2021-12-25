@@ -37,7 +37,7 @@ namespace UAlbion.Game.Gui.Inventory
                 {
                     var gold = Inventory?.Gold.Amount ?? 0;
                     return new[] { new TextBlock($"{gold / 10}.{gold % 10}") }; // i18n: May need to vary based on the current game language
-                }, x => _version);
+                }, _ => _version);
             }
             else if (id.Slot == ItemSlotId.Rations)
             {
@@ -45,7 +45,7 @@ namespace UAlbion.Game.Gui.Inventory
                 {
                     var food = Inventory?.Rations.Amount ?? 0;
                     return new[] { new TextBlock(food.ToString(CultureInfo.InvariantCulture)) }; // i18n: Will need to be changed if we support a language that doesn't use Hindu-Arabic numerals.
-                }, x => _version);
+                }, _ => _version);
             }
             else
             {
@@ -55,7 +55,7 @@ namespace UAlbion.Game.Gui.Inventory
                     return slotInfo == null || slotInfo.Amount < 2
                         ? Array.Empty<TextBlock>()
                         : new[] { new TextBlock(slotInfo.Amount.ToString(CultureInfo.InvariantCulture)) { Alignment = TextAlignment.Right } }; // i18n: Will need to be changed if we support a language that doesn't use Hindu-Arabic numerals.
-                }, x => _version);
+                }, _ => _version);
             }
 
             _visual = AttachChild(new VisualInventorySlot(_id, amountSource, () => Slot))
@@ -104,7 +104,6 @@ namespace UAlbion.Game.Gui.Inventory
         void Hover()
         {
             var assets = Resolve<IAssetManager>();
-            var settings = Resolve<ISettings>();
             var inventoryManager = Resolve<IInventoryManager>();
             var inventory = Resolve<IGameState>().GetInventory(_id.Id);
             var tf = Resolve<ITextFormatter>();
@@ -183,7 +182,7 @@ namespace UAlbion.Game.Gui.Inventory
             var inventory = Resolve<IGameState>().GetInventory(_id.Id);
             var tf = Resolve<ITextFormatter>();
             var slotInfo = inventory.GetSlot(_id.Slot);
-            if (!(slotInfo?.Item is ItemData item))
+            if (slotInfo?.Item is not ItemData item)
                 return;
 
             var itemPosition = window.UiToNorm(slotInfo.LastUiPosition);
@@ -212,7 +211,7 @@ namespace UAlbion.Game.Gui.Inventory
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.InvPopup_Sell, isPlotItem),
                     isPlotItem 
-                        ? (IEvent)new HoverTextEvent(
+                        ? new HoverTextEvent(
                             tf.Format(
                                 Base.SystemText.InvMsg_ThisIsAVitalItem))
                         : new InventorySellEvent(_id.Id, _id.Slot),
@@ -225,7 +224,7 @@ namespace UAlbion.Game.Gui.Inventory
                     new ContextMenuOption(
                         S(Base.SystemText.InvPopup_Drop, isPlotItem),
                         isPlotItem
-                            ? (IEvent)new HoverTextEvent(
+                            ? new HoverTextEvent(
                                 tf.Format(
                                     Base.SystemText.InvMsg_ThisIsAVitalItem))
                             : new InventoryDiscardEvent(itemPosition.X, itemPosition.Y, _id.Id, _id.Slot),

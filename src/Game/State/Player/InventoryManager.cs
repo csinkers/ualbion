@@ -121,7 +121,7 @@ namespace UAlbion.Game.State.Player
             {
                 case ItemSlotId.LeftHand:
                     {
-                        return !(sheet.Inventory.RightHand.Item is ItemData rightHandItem) || rightHandItem.Hands <= 1;
+                        return sheet.Inventory.RightHand.Item is not ItemData { Hands: > 1 };
                     }
                 case ItemSlotId.Tail:
                     return
@@ -157,7 +157,7 @@ namespace UAlbion.Game.State.Player
         {
             if (_hand.Item is Gold) return ItemSlotId.Gold;
             if (_hand.Item is Rations) return ItemSlotId.Rations;
-            if (!(_hand.Item is ItemData item)) return id.Slot; // Shouldn't be possible
+            if (_hand.Item is not ItemData item) return id.Slot; // Shouldn't be possible
 
             if (id.Id.Type != InventoryType.Player || !id.Slot.IsBodyPart())
                 return ItemSlotId.None;

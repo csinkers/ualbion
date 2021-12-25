@@ -20,22 +20,23 @@ namespace UAlbion.Game.Entities
 
         public CameraMotion2D(OrthographicCamera camera)
         {
-            if (camera == null) throw new ArgumentNullException(nameof(camera));
+            _camera = camera ?? throw new ArgumentNullException(nameof(camera));
+
             On<EngineUpdateEvent>(Update);
-            On<BeginFrameEvent>(e => _velocity = Vector3.Zero);
-            On<CameraLockEvent>(e => _locked = true);
-            On<CameraUnlockEvent>(e => _locked = false);
+            On<BeginFrameEvent>(_ => _velocity = Vector3.Zero);
+            On<CameraLockEvent>(_ => _locked = true);
+            On<CameraUnlockEvent>(_ => _locked = false);
             On<CameraJumpEvent>(e =>
             {
                 var map = TryResolve<IMapManager>()?.Current;
                 if (map == null)
                 {
-                    _position = new Vector3(e.X, e.Y, _camera.Position.Z);
+                    _position = new Vector3(e.X, e.Y, e.Z ?? _camera.Position.Z);
                     _camera.Position = _position;
                 }
                 else
                 {
-                    _position = new Vector3(e.X * map.TileSize.X + 0.1f, e.Y * map.TileSize.Y + 0.1f, map.BaseCameraHeight);
+                    _position = new Vector3(e.X * map.TileSize.X + 0.1f, e.Y * map.TileSize.Y + 0.1f, e.Z ?? map.BaseCameraHeight);
                     _camera.Position = _position;
                 }
             });
@@ -45,8 +46,6 @@ namespace UAlbion.Game.Entities
                 if (map == null) _velocity += new Vector3(e.X, e.Y, e.Z ?? 0);
                 else _velocity += new Vector3(e.X * map.TileSize.X, e.Y * map.TileSize.Y, e.Z ?? 0);
             });
-
-            _camera = camera;
         }
 
         void Update(EngineUpdateEvent e)
@@ -57,6 +56,8 @@ namespace UAlbion.Game.Entities
 
             if (_locked)
             {
+                if (_velocity.X == 0 && _velocity.Y == 0 && _velocity.Z == 0)
+                    return;
                 _position += _velocity * e.DeltaSeconds;
             }
             else

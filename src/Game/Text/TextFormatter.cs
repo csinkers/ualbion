@@ -73,7 +73,7 @@ namespace UAlbion.Game.Text
 
                     case Token.Class:
                     {
-                        if (!(active is ICharacterSheet character))
+                        if (active is not ICharacterSheet character)
                         {
                             yield return (Token.Text, "{CLAS}");
                             break; // throw new FormatException($"Expected the active item to be a character, was actually {active ?? "null"}");
@@ -100,7 +100,7 @@ namespace UAlbion.Game.Text
                     case Token.Him:
                     case Token.His:
                     {
-                        if (!(active is ICharacterSheet character))
+                        if (active is not ICharacterSheet character)
                         {
                             yield return (Token.Text, $"{{{token}}}");
                             break; // throw new FormatException($"Expected the active item to be a character, was actually {active ?? "null"}");
@@ -140,7 +140,7 @@ namespace UAlbion.Game.Text
 
                     case Token.Price:
                     {
-                        if (!(active is ItemData item))
+                        if (active is not ItemData item)
                         {
                             yield return (Token.Text, "{PRIC}");
                             break; // throw new FormatException($"Expected the active item to be an item, was actually {active ?? "null"}");
@@ -152,7 +152,7 @@ namespace UAlbion.Game.Text
 
                     case Token.Race:
                     {
-                        if (!(active is ICharacterSheet character))
+                        if (active is not ICharacterSheet character)
                         {
                             yield return (Token.Text, "{RACE}");
                             break; // throw new FormatException($"Expected the active item to be a character, was actually {active ?? "null"}");
@@ -176,7 +176,7 @@ namespace UAlbion.Game.Text
 
                     case Token.Sex:
                     {
-                        if (!(active is ICharacterSheet character))
+                        if (active is not ICharacterSheet character)
                         {
                             yield return (Token.Text, "{SEX}");
                             break; // throw new FormatException($"Expected the active item to be a character, was actually {active ?? "null"}");

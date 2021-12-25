@@ -12,7 +12,7 @@ namespace UAlbion.Formats.Assets.Labyrinth
     public class LabyrinthData
     {
         public const int MaxWalls = 155;
-        public const int MaxObjectGroups = 100;
+        public const int WallOffset = 100; // Any content value below this refers to an object group, any equal or above refers to a wall.
 
         [JsonInclude] public LabyrinthId Id { get; private set; }
         public ushort WallHeight { get; set; }
@@ -66,6 +66,10 @@ namespace UAlbion.Formats.Assets.Labyrinth
             if (info == null) throw new ArgumentNullException(nameof(info));
             if (s == null) throw new ArgumentNullException(nameof(s));
             d ??= new LabyrinthData { Id = info.AssetId };
+
+            if (d.ObjectGroups.Count > WallOffset) throw new InvalidOperationException($"A labyrinth specification can only contain a maximum of {WallOffset} object groups, but {d.Id} contains {d.ObjectGroups.Count}");
+            if (d.Walls.Count > MaxWalls) throw new InvalidOperationException($"A labyrinth specification can only contain a maximum of {WallOffset} walls, but {d.Id} contains {d.Walls.Count}");
+
             PerfTracker.StartupEvent("Start loading labyrinth data");
             // s.ByteArray("UnknownBlock6C", () => sheet.UnknownBlock6C, x => sheet.UnknownBlock6C = x, 14);
 

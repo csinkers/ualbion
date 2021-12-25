@@ -23,6 +23,8 @@ namespace UAlbion.Formats.Exporters.Tiled
         public int ImageWidth { get; set; } // For tilesets
         public int ImageHeight { get; set; } // For tilesets
         public IsometricMode IsoMode { get; set; } = IsometricMode.All; // For tilesets
+        public int OffsetX { get; set; }
+        public int OffsetY { get; set; }
 
         public string FloorPath { get; set; } // For maps
         public string CeilingPath { get; set; } // For maps

@@ -9,6 +9,7 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Entities.Map3D;
 using UAlbion.Game.Events;
 using VeldridGen.Interfaces;
@@ -17,6 +18,7 @@ namespace UAlbion.Game.Veldrid.Assets
 {
     public class IsometricBuilder : Component
     {
+        public const int ContentsExpansionFactor = 4; // TODO: Work out the required size properly based on the largest sprites in the lab
         readonly IsometricLayout _layout;
         LabyrinthId _labId;
         IsometricMode _mode = IsometricMode.Floors;
@@ -36,6 +38,7 @@ namespace UAlbion.Game.Veldrid.Assets
         float YawRads => ApiUtil.DegToRad(_yaw);
         float PitchRads => ApiUtil.DegToRad(-_pitch);
         public IFramebufferHolder Framebuffer { get; }
+        int ExpansionFactor => _mode == IsometricMode.Contents ? ContentsExpansionFactor : 1;
 
         public IsometricBuilder(IFramebufferHolder framebuffer, int width, int height, int diamondHeight, int tilesPerRow)
         {
@@ -47,32 +50,36 @@ namespace UAlbion.Game.Veldrid.Assets
             _pitch = ApiUtil.RadToDeg(MathF.Asin((float)diamondHeight / _width));
             _tilesPerRow = tilesPerRow;
 
+            On<IsoLabEvent>(e => { _labId = e.Id; RecreateLayout(); });
+            On<IsoModeEvent>(e => { _mode = e.Mode; RecreateLayout(); });
             On<IsoYawEvent>(e => { _yaw += e.Delta; Update(); });
             On<IsoPitchEvent>(e => { _pitch += e.Delta; Update(); });
             On<IsoRowWidthEvent>(e =>
             {
                 _tilesPerRow += e.Delta;
-                if (_tilesPerRow < 1) _tilesPerRow = 1;
+                if (_tilesPerRow < 1)
+                    _tilesPerRow = 1;
                 Update();
             });
             On<IsoWidthEvent>(e =>
             {
                 _width += e.Delta;
-                if (_width < 1) _width = 1;
+                if (_width < 1)
+                    _width = 1;
                 Update();
             });
             On<IsoHeightEvent>(e =>
             {
                 _height += e.Delta;
-                if (_height < 1) _height = 1;
+                if (_height < 1)
+                    _height = 1;
                 Update();
             });
             On<IsoPaletteEvent>(e =>
             {
-                if (_paletteId == null) _paletteId = e.Delta;
-                else _paletteId += e.Delta;
-
-                if (_paletteId <= 0) _paletteId = null;
+                _paletteId = (_paletteId ?? 0) + e.Delta;
+                if (_paletteId <= 0)
+                    _paletteId = null;
                 Info($"PalId: {_paletteId}");
                 RecreateLayout();
             });
@@ -86,12 +93,17 @@ namespace UAlbion.Game.Veldrid.Assets
                 Info($"LabId: {_labId} ({_labId.Id})");
                 RecreateLayout();
             });
-            On<IsoLabEvent>(e => { _labId = e.Id; RecreateLayout(); });
-            On<IsoModeEvent>(e =>
-            {
-                _mode = e.Mode;
-                RecreateLayout();
-            });
+        }
+
+        void ResizeFramebuffer()
+        {
+            int rows = (_layout.TileCount + _tilesPerRow - 1) / _tilesPerRow;
+            if (Framebuffer == null) 
+                return;
+
+            var mag = TryResolve<ICamera>()?.Magnification ?? 1.0f;
+            Framebuffer.Width = (uint)(ExpansionFactor * _width * _tilesPerRow * mag);
+            Framebuffer.Height = (uint)(ExpansionFactor * _height * rows * mag);
         }
 
         public List<int>[] Build(LabyrinthData labyrinth, AssetInfo info, IsometricMode mode, IAssetManager assets)
@@ -99,15 +111,9 @@ namespace UAlbion.Game.Veldrid.Assets
             if (labyrinth == null) throw new ArgumentNullException(nameof(labyrinth));
             _labId = labyrinth.Id;
             _mode = mode;
-            
-            _layout.Load(labyrinth, info, _mode, BuildProperties(), _paletteId, assets);
-            int rows = (_layout.TileCount + _tilesPerRow - 1) / _tilesPerRow;
-            if (Framebuffer != null)
-            {
-                Framebuffer.Width = (uint) (_width * _tilesPerRow);
-                Framebuffer.Height = (uint) (_height * rows);
-            }
 
+            _layout.Load(labyrinth, info, _mode, BuildProperties(), _paletteId, assets);
+            ResizeFramebuffer();
             Update();
 
             return mode switch
@@ -126,6 +132,7 @@ namespace UAlbion.Game.Veldrid.Assets
             Raise(new EngineFlagEvent(FlagOperation.Set, EngineFlags.FlipDepthRange));
             Raise(new CameraMagnificationEvent(1.0f));
             Raise(new CameraPlanesEvent(0, 5000));
+            Raise(new CameraJumpEvent(0, 0, -256));
             // Raise(new EngineFlagEvent(FlagOperation.Set, EngineFlags.ShowBoundingBoxes));
             RecreateLayout();
         }
@@ -133,13 +140,7 @@ namespace UAlbion.Game.Veldrid.Assets
         void RecreateLayout()
         {
             _layout.Load(_labId, _mode, BuildProperties(), _paletteId);
-            int rows = (_layout.TileCount + _tilesPerRow - 1) / _tilesPerRow;
-            if (Framebuffer != null)
-            {
-                Framebuffer.Width = (uint) (_width * _tilesPerRow);
-                Framebuffer.Height = (uint) (_height * rows);
-            }
-
+            ResizeFramebuffer();
             Update();
         }
 
@@ -151,7 +152,7 @@ namespace UAlbion.Game.Veldrid.Assets
             _pitch = Math.Clamp(_pitch, -85.0f, 85.0f);
 
             int rows = (_layout.TileCount + _tilesPerRow - 1) / _tilesPerRow;
-            var viewport = new Vector2(_width * _tilesPerRow, _height * rows);
+            var viewport = new Vector2(ExpansionFactor * _width * _tilesPerRow, ExpansionFactor * _height * rows);
             if (log)
             {
                 Info($"{_tilesPerRow}x{rows} " +
@@ -171,10 +172,10 @@ namespace UAlbion.Game.Veldrid.Assets
                 TileCount = _layout.TileCount,
                 Scale = new Vector3(SideLength, YHeight, SideLength),
                 Rotation = new Vector3(PitchRads, YawRads, 0),
-                Origin = topLeft + new Vector3(_width, -_height, 0) / 2,
-                HorizontalSpacing = _width * Vector3.UnitX,
-                VerticalSpacing = -_height * Vector3.UnitY,
-                Width = (uint) _tilesPerRow
+                Origin = topLeft + new Vector3(_width, -_height, 0) * ExpansionFactor / 2,
+                HorizontalSpacing = _width * ExpansionFactor * Vector3.UnitX,
+                VerticalSpacing = -_height * ExpansionFactor * Vector3.UnitY,
+                Width = (uint)_tilesPerRow
             };
         }
     }

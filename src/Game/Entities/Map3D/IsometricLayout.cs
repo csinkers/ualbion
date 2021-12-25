@@ -13,6 +13,7 @@ namespace UAlbion.Game.Entities.Map3D
 {
     public class IsometricLayout : Component
     {
+        readonly Dictionary<MapObject, Vector3> _relativeSpritePositions = new();
         IExtrudedTilemap _tilemap;
         byte[] _contents;
         byte[] _floors;
@@ -40,6 +41,9 @@ namespace UAlbion.Game.Entities.Map3D
             _tilemap.FogColor = request.FogColor;
             _tilemap.AmbientLightLevel = request.AmbientLightLevel;
             _tilemap.ObjectYScaling = request.ObjectYScaling;
+
+            foreach (var kvp in _relativeSpritePositions)
+                kvp.Key.Position = kvp.Value + request.Origin;
         }
 
         public void Load(LabyrinthId labyrinthId, IsometricMode mode, TilemapRequest request, int? paletteId)
@@ -61,6 +65,7 @@ namespace UAlbion.Game.Entities.Map3D
             if (assets == null) throw new ArgumentNullException(nameof(assets));
 
             RemoveAllChildren();
+            _relativeSpritePositions.Clear();
 
             bool floors = mode is IsometricMode.Floors or IsometricMode.All;
             bool ceilings = mode is IsometricMode.Ceilings or IsometricMode.All;
@@ -260,8 +265,7 @@ namespace UAlbion.Game.Entities.Map3D
                 ? contents
                 : contents - 100);
 
-            EtmTileFlags flags = 0;
-            _tilemap.SetTile(order, floorIndex, ceilingIndex, wallIndex, frameCount, flags);
+            _tilemap.SetTile(order, floorIndex, ceilingIndex, wallIndex, frameCount, EtmTileFlags.Translucent);
         }
 
         void AddSprites(LabyrinthData labyrinthData, int index, TilemapRequest request)
@@ -276,9 +280,12 @@ namespace UAlbion.Game.Entities.Map3D
             var objectInfo = labyrinthData.ObjectGroups[contents - 1];
             foreach (var subObject in objectInfo.SubObjects)
             {
-                var mapObject = AttachChild(MapObject.Build(x, y, labyrinthData, subObject, request));
+                var mapObject = AttachChild(MapObject.Build(x, y, labyrinthData, subObject, request, SpriteKeyFlags.NoDepthTest));
                 if (mapObject != null)
-                    Info($"at ({x},{y}): ({subObject.X}, {subObject.Y}, {subObject.Z}) resolves to {mapObject.Position} ({mapObject.SpriteId})");
+                {
+                    _relativeSpritePositions[mapObject] = mapObject.Position;
+                    mapObject.Position = _relativeSpritePositions[mapObject] + request.Origin;
+                }
             }
         }
     }

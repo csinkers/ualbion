@@ -23,13 +23,14 @@ namespace UAlbion.Formats.Exporters.Tiled
     {
         [XmlIgnore] public string Filename { get; set; }
         [XmlIgnore] public int GidOffset { get; set; }
-        [XmlElement("grid", Order = 1)] public TiledGrid Grid { get; set; }
-        [XmlElement("image", Order = 2)] public TilesetImage Image { get; set; }
-        [XmlArray("terraintypes", Order = 3)] [XmlArrayItem("terrain")] public List<TerrainType> TerrainTypes { get; } = new();
+        [XmlElement("tileoffset", Order = 1)] public TileOffset Offset { get; set; }
+        [XmlElement("grid", Order = 2)] public TiledGrid Grid { get; set; }
+        [XmlElement("image", Order = 3)] public TilesetImage Image { get; set; }
+        [XmlArray("terraintypes", Order = 4)] [XmlArrayItem("terrain")] public List<TerrainType> TerrainTypes { get; } = new();
         [XmlIgnore] public bool TerrainTypesSpecified => TerrainTypes is { Count: > 0 };
-        [XmlElement("tile", Order = 4)] public List<Tile> Tiles { get; set; }
+        [XmlElement("tile", Order = 5)] public List<Tile> Tiles { get; set; }
         [XmlIgnore] public bool TilesSpecified => Tiles is { Count: > 0 };
-        [XmlArray("wangsets", Order = 5)] [XmlArrayItem("wangset")] public List<WangSet> WangSets { get; } = new();
+        [XmlArray("wangsets", Order = 6)] [XmlArrayItem("wangset")] public List<WangSet> WangSets { get; } = new();
         [XmlIgnore] public bool WangSetsSpecified => WangSets is { Count: > 0 };
 
         [XmlAttribute("margin")] public int Margin { get; set; }
@@ -315,7 +316,7 @@ namespace UAlbion.Formats.Exporters.Tiled
 
             return new Tileset
             {
-                Name = labyrinth.Id.ToString(),
+                Name = $"{labyrinth.Id}.{properties.IsoMode}",
                 Version = "1.4",
                 TiledVersion = "1.4.2",
                 TileCount = tiles.Count,
@@ -323,6 +324,11 @@ namespace UAlbion.Formats.Exporters.Tiled
                 TileHeight = properties.TileHeight,
                 BackgroundColor = "#000000",
                 Tiles = tiles,
+                Offset =
+                    properties.OffsetX == 0 && properties.OffsetY == 0 
+                    ? null 
+                    : new TileOffset { X = properties.OffsetX, Y = properties.OffsetY },
+
                 Grid = new TiledGrid
                 {
                     Orientation = "isometric",

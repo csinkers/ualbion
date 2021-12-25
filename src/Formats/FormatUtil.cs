@@ -127,7 +127,7 @@ namespace UAlbion.Formats
 
         public static int ParseHex(string s) =>
             s != null && s.StartsWith("0x", StringComparison.InvariantCulture)
-                ? int.Parse(s.Substring(2), NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture)
+                ? int.Parse(s[2..], NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture)
                 : s == null
                     ? 0
                     : int.Parse(s, CultureInfo.InvariantCulture);
@@ -219,13 +219,13 @@ namespace UAlbion.Formats
         public static bool Compare(QueryOperation operation, int value, int immediate) =>
             operation switch
             {
-                QueryOperation.IsTrue => value != 0,
-                QueryOperation.LessThan => value < immediate,
-                QueryOperation.LessThanOrEqual => value <= immediate,
-                QueryOperation.Equals => value == immediate,
+                QueryOperation.IsTrue             => value != 0,
+                QueryOperation.LessThan           => value < immediate,
+                QueryOperation.LessThanOrEqual    => value <= immediate,
+                QueryOperation.Equals             => value == immediate,
                 QueryOperation.GreaterThanOrEqual => value >= immediate,
-                QueryOperation.GreaterThan => value > immediate,
-                QueryOperation.OpUnk6 => value == immediate,
+                QueryOperation.GreaterThan        => value > immediate,
+                QueryOperation.OpUnk6             => value == immediate,
                 _ => true
             };
 

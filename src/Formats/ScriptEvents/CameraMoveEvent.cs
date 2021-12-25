@@ -8,6 +8,6 @@ namespace UAlbion.Formats.ScriptEvents
         public CameraMoveEvent(int x, int y, int? z) { X = x; Y = y; Z = z; }
         [EventPart("x ")] public int X { get; }
         [EventPart("y")] public int Y { get; }
-        [EventPart("z', true")] public int? Z { get; }
+        [EventPart("z", true)] public int? Z { get; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
@@ -14,7 +15,8 @@ namespace UAlbion.Game.Entities
 
         public CameraMotion3D(PerspectiveCamera camera)
         {
-            On<BeginFrameEvent>(e => _velocity = Vector3.Zero);
+            _camera = camera ?? throw new ArgumentNullException(nameof(camera));
+            On<BeginFrameEvent>(_ => _velocity = Vector3.Zero);
             On<CameraJumpEvent>(e =>
             {
                 var map = Resolve<IMapManager>().Current;
@@ -39,8 +41,6 @@ namespace UAlbion.Game.Entities
                 Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(_camera.Yaw, 0f, 0f);
                 _camera.Position += Vector3.Transform(_velocity, lookRotation) * e.DeltaSeconds;
             });
-
-            _camera = camera;
         }
     }
 }

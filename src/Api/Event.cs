@@ -160,25 +160,17 @@ namespace UAlbion.Api
                 parts = newParts;
             }
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 return metadata.Parser(parts);
             }
-            catch (ArgumentException ex)
+            catch (Exception ex)
             {
                 ApiUtil.Assert($"Failed to parse \"{s}\" as a {metadata.Name} ({metadata.Type}): {ex.Message}");
                 return null;
             }
-            catch (FormatException ex)
-            {
-                ApiUtil.Assert($"Failed to parse \"{s}\" as a {metadata.Name} ({metadata.Type}): {ex.Message}");
-                return null;
-            }
-            catch (NullReferenceException ex)
-            {
-                ApiUtil.Assert($"Failed to parse \"{s}\" as a {metadata.Name} ({metadata.Type}): {ex.Message}");
-                return null;
-            }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
     }
 }

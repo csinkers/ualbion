@@ -14,12 +14,12 @@ namespace UAlbion.Game.Entities
         readonly MapSprite _sprite;
         int _frame;
 
-        public MapObject(SpriteId id, Vector3 initialPosition, Vector2 size, bool onFloor, bool backAndForth)
+        public MapObject(SpriteId id, Vector3 initialPosition, Vector2 size, bool onFloor, bool backAndForth, SpriteKeyFlags keyFlags = 0)
         {
             _sprite = AttachChild(new MapSprite(
                 id,
                 DrawLayer.Underlay,
-                0,
+                keyFlags,
                 SpriteFlags.FlipVertical |
                 (onFloor
                     ? SpriteFlags.Floor | SpriteFlags.MidAligned
@@ -48,6 +48,7 @@ namespace UAlbion.Game.Entities
 
         public Vector3 Position { get => _sprite.Position; set => _sprite.Position = value; }
         public SpriteId SpriteId => (SpriteId)_sprite.Id;
+        public void SetFlags(SpriteFlags flag, SpriteFlags mask) => _sprite.Flags = (_sprite.Flags & ~mask) | flag;
 
         public override string ToString() => $"MapObjSprite {_sprite.Id} @ {_sprite.TilePosition} {_sprite.Size.X}x{_sprite.Size.Y}";
 
@@ -62,7 +63,7 @@ namespace UAlbion.Game.Entities
             return offset - new Vector4(0.5f, 0, 0.5f, 0);
         }
 
-        public static MapObject Build(int tileX, int tileY, LabyrinthData labyrinth, SubObject subObject, TilemapRequest properties)
+        public static MapObject Build(int tileX, int tileY, LabyrinthData labyrinth, SubObject subObject, TilemapRequest properties, SpriteKeyFlags keyFlags = 0)
         {
             if (labyrinth == null) throw new ArgumentNullException(nameof(labyrinth));
             if (properties == null) throw new ArgumentNullException(nameof(properties));
@@ -73,7 +74,7 @@ namespace UAlbion.Game.Entities
                 return null;
             }
 
-            if (!(labyrinth.Objects[subObject.ObjectInfoNumber] is { } definition)) return null;
+            if (labyrinth.Objects[subObject.ObjectInfoNumber] is not { } definition) return null;
             if (definition.SpriteId.IsNone) return null;
 
             bool onFloor = (definition.Properties & LabyrinthObjectFlags.FloorObject) != 0;
@@ -97,7 +98,7 @@ namespace UAlbion.Game.Entities
 
             size *= new Vector2(properties.Scale.X, properties.Scale.Y);
 
-            return new MapObject(definition.SpriteId, pos3, size, onFloor, backAndForth);
+            return new MapObject(definition.SpriteId, pos3, size, onFloor, backAndForth, keyFlags);
         }
     }
 }

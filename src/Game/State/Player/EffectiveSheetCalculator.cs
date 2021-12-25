@@ -50,7 +50,7 @@ namespace UAlbion.Game.State.Player
             sheet.TotalWeight = 0;
             foreach (var itemSlot in sheet.Inventory.EnumerateAll())
             {
-                if (!(itemSlot.Item is ItemData item))
+                if (itemSlot.Item is not ItemData item)
                     continue;
                 sheet.TotalWeight += itemSlot.Amount * item.Weight;
             }
@@ -67,7 +67,7 @@ namespace UAlbion.Game.State.Player
 
             foreach (var itemSlot in sheet.Inventory.EnumerateBodyParts())
             {
-                if (!(itemSlot.Item is ItemData item))
+                if (itemSlot.Item is not ItemData item)
                     continue;
 
                 sheet.Combat.Damage += item.Damage;

@@ -45,13 +45,13 @@ namespace UAlbion.Formats.Assets.Maps
             if (eventNumber != null && npc.Node == null)
                 npc.Node = new DummyEventNode(eventNumber.Value);
 
-            switch (mapType)
+            npc.SpriteOrGroup = mapType switch
             {
-                case MapType.ThreeD: npc.SpriteOrGroup = AssetId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.ObjectGroup, mapping, s); break;
-                case MapType.TwoD: npc.SpriteOrGroup = SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.LargeNpcGraphics, mapping, s); break;
-                case MapType.TwoDOutdoors: npc.SpriteOrGroup = SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.SmallNpcGraphics, mapping, s); break;
-                default: throw new ArgumentOutOfRangeException(nameof(mapType), mapType, null);
-            }
+                MapType.ThreeD => AssetId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.ObjectGroup, mapping, s),
+                MapType.TwoD => SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.LargeNpcGraphics, mapping, s),
+                MapType.TwoDOutdoors => SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.SmallNpcGraphics, mapping, s),
+                _ => throw new ArgumentOutOfRangeException(nameof(mapType), mapType, null)
+            };
 
             npc.Flags = s.EnumU8(nameof(Flags), npc.Flags);
             npc.Movement = s.EnumU8(nameof(Movement), npc.Movement);

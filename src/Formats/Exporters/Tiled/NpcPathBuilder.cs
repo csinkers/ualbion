@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Api;
 using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Formats.Exporters.Tiled
@@ -58,11 +57,11 @@ namespace UAlbion.Formats.Exporters.Tiled
 
         public static List<MapObject> Build(
             MapNpc npc,
-            TilemapProperties properties,
+            int tileWidth,
+            int tileHeight,
             ref int nextId)
         {
             if (npc == null) throw new ArgumentNullException(nameof(npc));
-            if (properties == null) throw new ArgumentNullException(nameof(properties));
             var results = new List<MapObject>();
             var combined = CombineRuns(npc.Waypoints, x => (x.X, x.Y));
 
@@ -76,8 +75,8 @@ namespace UAlbion.Formats.Exporters.Tiled
                 {
                     Id = id,
                     Type = "Path",
-                    X = posX * properties.TileWidth,
-                    Y = posY * properties.TileHeight,
+                    X = posX * tileWidth,
+                    Y = posY * tileHeight,
                     Properties = new List<TiledProperty> { new(TimePropertyName, MapNpc.WaypointIndexToTime(index)) },
                     Point = TiledPoint.Instance
                 });

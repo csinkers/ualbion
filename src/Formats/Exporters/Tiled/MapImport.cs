@@ -24,7 +24,7 @@ namespace UAlbion.Formats.Exporters.Tiled
         static int? PropInt(Map map, string key) => int.TryParse(PropString(map, key), out var i) ? i : null;
         static AssetId PropId(Map map, string key) => AssetId.Parse(PropString(map, key));
 
-        public static BaseMapData ToAlbion(this Map map, AssetInfo info, AssetMapping mapping, string script)
+        public static BaseMapData ToAlbion(this Map map, AssetInfo info, string script)
         {
             if (map == null) throw new ArgumentNullException(nameof(map));
             if (info == null) throw new ArgumentNullException(nameof(info));

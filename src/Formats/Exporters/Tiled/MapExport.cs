@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
@@ -19,6 +18,7 @@ namespace UAlbion.Formats.Exporters.Tiled
         const int WallGid = TilesetSpacing;
         const int ContentsGid = 2 * TilesetSpacing;
         const int CeilingGid = 3 * TilesetSpacing;
+        delegate (int? tileId, int w, int h) GetTileFunc(AssetId id);
 
         public static (Map, string) FromAlbionMap2D(
             MapData2D map,
@@ -36,8 +36,18 @@ namespace UAlbion.Formats.Exporters.Tiled
             ushort blankTileIndex = 0;
             int nextObjectId = 1;
             int nextLayerId = 3; // 1 & 2 are always underlay & overlay.
-            npcTileset.GidOffset = tileset.Tiles.Count;
+            int npcGidOffset = tileset.Tiles.Count;
             var (script, functionsByEventId) = BuildScript(map, eventFormatter);
+
+            (int? tileId, int w, int h) GetNpcTileInfo(AssetId id)
+            {
+                var assetName = id.ToString();
+                var tile = npcTileset.Tiles.FirstOrDefault(x => x.Properties.Any(p => p.Name == "Visual" && p.Value == assetName));
+                return (
+                     tile?.Id + npcGidOffset ?? 0,
+                     tile?.Image.Width ?? properties.TileWidth,
+                     tile?.Image.Height ?? properties.TileHeight);
+            }
 
             var result = new Map
             {
@@ -56,7 +66,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                 Tilesets = new List<MapTileset>
                 {
                     new() { FirstGid = 0, Source = tilesetPath, },
-                    new() { FirstGid = npcTileset.GidOffset, Source = npcTileset.Filename }
+                    new() { FirstGid = npcGidOffset, Source = npcTileset.Filename }
                 },
                 Layers = new List<TiledMapLayer> {
                     new()
@@ -77,8 +87,8 @@ namespace UAlbion.Formats.Exporters.Tiled
                     }
                 },
                 ObjectGroups = new[] {
-                    BuildTriggers(map, properties, false, functionsByEventId, ref nextLayerId, ref nextObjectId),
-                    BuildNpcs(map, properties, npcTileset, functionsByEventId, ref nextLayerId, ref nextObjectId),
+                    BuildTriggers(map, properties.TileWidth, properties.TileHeight, functionsByEventId, ref nextLayerId, ref nextObjectId),
+                    BuildNpcs(map, properties.TileWidth, properties.TileHeight, GetNpcTileInfo, functionsByEventId, ref nextLayerId, ref nextObjectId),
                 }.SelectMany(x => x).ToList()
             };
 
@@ -114,8 +124,8 @@ namespace UAlbion.Formats.Exporters.Tiled
             if (string.IsNullOrEmpty(properties.CeilingPath)) throw new ArgumentException("No ceiling path given", nameof(properties));
             if (string.IsNullOrEmpty(properties.WallPath)) throw new ArgumentException("No wall path given", nameof(properties));
             if (string.IsNullOrEmpty(properties.ContentsPath)) throw new ArgumentException("No contents path given", nameof(properties));
-            if (properties.TileWidth <= 0 || properties.TileWidth > 255) throw new ArgumentException("Width must be in the range [1..255]", nameof(properties));
-            if (properties.TileHeight <= 0 || properties.TileHeight > 255) throw new ArgumentException("Height must be in the range [1..255]", nameof(properties));
+            if (properties.TileWidth is <= 0 or > 255) throw new ArgumentException("Width must be in the range [1..255]", nameof(properties));
+            if (properties.TileHeight is <= 0 or > 255) throw new ArgumentException("Height must be in the range [1..255]", nameof(properties));
 
             /* Layers:
             1: Floors
@@ -129,6 +139,12 @@ namespace UAlbion.Formats.Exporters.Tiled
             int nextObjectId = 1;
             int nextObjectGroupId = 3; // 1 & 2 are always underlay & overlay.
             var (script, functionsByEventId) = BuildScript(map, eventFormatter);
+
+            (int? tileId, int w, int h) GetNpcTileInfo(AssetId id)
+            {
+                var tile = id.Id == 0 ? null : (int?)id.Id;
+                return (tile + ContentsGid, properties.TileHeight, properties.TileHeight);
+            }
 
             return (new Map
             {
@@ -187,8 +203,8 @@ namespace UAlbion.Formats.Exporters.Tiled
                     }
                 },
                 ObjectGroups = new[] {
-                    BuildTriggers(map, properties, true, functionsByEventId, ref nextObjectGroupId, ref nextObjectId),
-                    // BuildNpcs(map, properties, npcTileset, functionsByEventId, ref nextObjectGroupId, ref nextObjectId)
+                    BuildTriggers(map, properties.TileHeight, properties.TileHeight, functionsByEventId, ref nextObjectGroupId, ref nextObjectId),
+                    BuildNpcs(map, properties.TileHeight, properties.TileHeight, GetNpcTileInfo, functionsByEventId, ref nextObjectGroupId, ref nextObjectId)
                 }.SelectMany(x => x).ToList()
             }, script);
         }
@@ -216,78 +232,10 @@ namespace UAlbion.Formats.Exporters.Tiled
             return (sb.ToString(), mapping);
         }
 
-        static ushort[] GetEventToChainMapping(IMapData map)
-        {
-            var eventToChainMapping = new ushort[map.Events.Count];
-            Array.Fill<ushort>(eventToChainMapping, 0xffff);
-
-            var queue = new Queue<IEventNode>();
-            for (ushort i = 0; i < map.Chains.Count; i++)
-            {
-                if (map.Chains[i] == 0xffff) continue;
-                queue.Enqueue(map.Events[map.Chains[i]]);
-                while (queue.TryDequeue(out var e))
-                {
-                    if (eventToChainMapping[e.Id] != 0xffff) continue; // Already visited?
-                    eventToChainMapping[e.Id] = i;
-
-                    if (e.Next != null)
-                        queue.Enqueue((EventNode)e.Next);
-
-                    if (e is BranchNode { NextIfFalse: { } } branch)
-                        queue.Enqueue((EventNode)branch.NextIfFalse);
-                }
-            }
-
-            return eventToChainMapping;
-        }
-
-        static List<ZoneKey> GetDummyChains(IMapData map)
-        {
-            ushort chainId = 0;
-            ushort dummyId = 1;
-            var visited = new HashSet<IEventNode>();
-            var eventToChainMapping = GetEventToChainMapping(map);
-            var dummies = new List<ZoneKey>();
-            for (ushort i = 0; i < eventToChainMapping.Length; i++)
-            {
-                if (eventToChainMapping[i] != 0xffff)
-                {
-                    chainId = eventToChainMapping[i];
-                    dummyId = 1;
-                    continue;
-                }
-
-                var e = map.Events[i];
-                if (visited.Contains(e))
-                    continue;
-
-                dummies.Add(new ZoneKey(chainId, dummyId, map.Events[i]));
-                dummyId++;
-
-                var queue = new Queue<EventNode>();
-                queue.Enqueue(e);
-                while (queue.TryDequeue(out e))
-                {
-                    if (visited.Contains(e)) continue;
-                    if (eventToChainMapping[e.Id] != 0xffff) continue; // Belongs to a real chain. TODO: Assert always false?
-                    visited.Add(e);
-
-                    if (e.Next != null)
-                        queue.Enqueue((EventNode)e.Next);
-
-                    if (e is BranchNode { NextIfFalse: { } } branch)
-                        queue.Enqueue((EventNode)branch.NextIfFalse);
-                }
-            }
-
-            return dummies;
-        }
-
         static IEnumerable<ObjectGroup> BuildTriggers(
             BaseMapData map,
-            TilemapProperties properties,
-            bool isometric,
+            int tileWidth,
+            int tileHeight,
             Dictionary<ushort, string> functionsByEventId,
             ref int nextObjectGroupId,
             ref int nextObjectId)
@@ -310,9 +258,9 @@ namespace UAlbion.Formats.Exporters.Tiled
                     nextObjectGroupId++,
                     "T:Global",
                     globals,
-                    properties,
+                    tileWidth,
+                    tileHeight,
                     functionsByEventId,
-                    isometric,
                     ref nextObjectId));
             }
 
@@ -327,9 +275,9 @@ namespace UAlbion.Formats.Exporters.Tiled
                     nextObjectGroupId++,
                     $"T:{polygonsForTriggerType.Key}",
                     polygonsForTriggerType,
-                    properties,
+                    tileWidth,
+                    tileHeight,
                     functionsByEventId,
-                    isometric,
                     ref nextObjectId));
 
                 if (polygonsForTriggerType.Key == TriggerTypes.Examine)
@@ -359,13 +307,12 @@ namespace UAlbion.Formats.Exporters.Tiled
             int objectGroupId,
             string name,
             IEnumerable<(ZoneKey, Geometry.Polygon)> polygons,
-            TilemapProperties properties,
+            int tileWidth,
+            int tileHeight,
             Dictionary<ushort, string> functionsByEventId,
-            bool isometric,
             ref int nextObjectId)
         {
             int nextId = nextObjectId;
-            var width = isometric ? properties.TileHeight : properties.TileWidth;
             var zonePolygons =
                 from r in polygons
                 select new MapObject
@@ -373,9 +320,9 @@ namespace UAlbion.Formats.Exporters.Tiled
                     Id = nextId++,
                     Name = $"C{r.Item1.Chain}{(r.Item1.DummyNumber == 0 ? "" : $".{r.Item1.DummyNumber}")} {r.Item1.Trigger}",
                     Type = "Trigger",
-                    X = r.Item2.OffsetX * width,
-                    Y = r.Item2.OffsetY * properties.TileHeight,
-                    Polygon = new Polygon(r.Item2.Points, width, properties.TileHeight),
+                    X = r.Item2.OffsetX * tileWidth,
+                    Y = r.Item2.OffsetY * tileHeight,
+                    Polygon = new Polygon(r.Item2.Points, tileWidth, tileHeight),
                     Properties = BuildTriggerProperties(r.Item1, functionsByEventId)
                 };
 
@@ -394,8 +341,9 @@ namespace UAlbion.Formats.Exporters.Tiled
 
         static IEnumerable<ObjectGroup> BuildNpcs(
             BaseMapData map,
-            TilemapProperties properties,
-            Tileset npcTileset,
+            int tileWidth,
+            int tileHeight,
+            GetTileFunc getTileFunc,
             Dictionary<ushort, string> functionsByEventId,
             ref int nextObjectGroupId,
             ref int nextObjectId)
@@ -410,7 +358,10 @@ namespace UAlbion.Formats.Exporters.Tiled
                 if ((npc.Movement & NpcMovementTypes.RandomMask) != 0)
                     continue;
 
-                if (npc.SpriteOrGroup == AssetId.None)
+                if (npc.SpriteOrGroup == AssetId.None) // Unused 2D slots
+                    continue;
+
+                if (npc.SpriteOrGroup == new AssetId(AssetType.ObjectGroup, 1) && npc.Id.IsNone) // unused 3D slots
                     continue;
 
                 int firstWaypointObjectId = nextId;
@@ -419,7 +370,7 @@ namespace UAlbion.Formats.Exporters.Tiled
                 {
                     Id = nextObjectGroupId++,
                     Name = $"NPC{npc.Index} Path",
-                    Objects = NpcPathBuilder.Build(npc, properties, ref nextId),
+                    Objects = NpcPathBuilder.Build(npc, tileWidth, tileHeight, ref nextId),
                     Hidden = true,
                 });
             }
@@ -430,9 +381,10 @@ namespace UAlbion.Formats.Exporters.Tiled
                 Name = "NPCs",
                 Objects = map.Npcs.Select(x =>
                         BuildNpcObject(
-                            properties,
+                            tileWidth,
+                            tileHeight,
                             functionsByEventId,
-                            npcTileset,
+                            getTileFunc,
                             npcPathIndices,
                             x,
                             ref nextId))
@@ -443,9 +395,11 @@ namespace UAlbion.Formats.Exporters.Tiled
             return new[] { group }.Concat(waypointGroups);
         }
 
-        static MapObject BuildNpcObject(TilemapProperties properties,
+        static MapObject BuildNpcObject(
+            int tileWidth,
+            int tileHeight,
             Dictionary<ushort, string> functionsByEventId,
-            Tileset npcTileset,
+            GetTileFunc getTileFunc,
             Dictionary<int, int> npcPathIndices,
             MapNpc npc,
             ref int nextId)
@@ -464,19 +418,17 @@ namespace UAlbion.Formats.Exporters.Tiled
             if (npc.Sound > 0) objProps.Add(new TiledProperty("Sound", npc.Sound.ToString(CultureInfo.InvariantCulture)));
             if (npcPathIndices.TryGetValue(npc.Index, out var pathObjectId)) objProps.Add(TiledProperty.Object("Path", pathObjectId));
 
-            var assetName = npc.SpriteOrGroup.ToString();
-            var tile = npcTileset.Tiles.FirstOrDefault(x => x.Properties.Any(p => p.Name == "Visual" && p.Value == assetName));
-
+            var (tileId, tileW, tileH) = getTileFunc(npc.SpriteOrGroup);
             return new MapObject
             {
                 Id = nextId++,
-                Gid = tile == null ? 0 : (tile.Id + npcTileset.GidOffset),
+                Gid = tileId ?? 0,
                 Name = $"NPC{npc.Index} {npc.Id}",
                 Type = "NPC",
-                X = npc.Waypoints[0].X * properties.TileWidth,
-                Y = npc.Waypoints[0].Y * properties.TileHeight,
-                Width = tile?.Image.Width ?? properties.TileWidth,
-                Height = tile?.Image.Height ?? properties.TileHeight,
+                X = npc.Waypoints[0].X * tileWidth,
+                Y = npc.Waypoints[0].Y * tileHeight,
+                Width = tileW,
+                Height = tileH,
                 Properties = objProps
             };
         }

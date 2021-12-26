@@ -486,6 +486,7 @@ namespace UAlbion.Base.Tests
             IEnumerable<ushort> entryPoints,
             [CallerMemberName] string testName = null) where T : IEventNode
         {
+            var formatter = new EventFormatter(null, AssetId.None);
             var resultsDir = Path.Combine(ResultsDir, testName ?? "Unknown");
             var graphs = Decompiler.BuildEventRegions(events, chains, entryPoints);
             var scripts = new string[graphs.Count];
@@ -503,7 +504,7 @@ namespace UAlbion.Base.Tests
                 {
                     var decompiled = Decompile(graph, steps);
                     var sb = new StringBuilder();
-                    EventFormatter.FormatGraphsAsBlocks(sb, new []  { decompiled }, 0);
+                    formatter.FormatGraphsAsBlocks(sb, new []  { decompiled }, 0);
                     scripts[index] = sb.ToString();
 
                     var roundTripLayout = ScriptCompiler.Compile(scripts[index], steps);

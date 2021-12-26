@@ -23,6 +23,7 @@ namespace UAlbion.Scripting
         public bool WrapStatements { get; init; } = true;
         public int IndentLevel { get; set; }
         public int TabSize { get; init; } = 4;
+        public IEventFormatter Formatter { get; init; }
 
         void Indent()
         {
@@ -44,7 +45,20 @@ namespace UAlbion.Scripting
         void Push() => IndentLevel += TabSize;
         void Pop() => IndentLevel -= TabSize;
 
-        public void Visit(SingleEvent e) { Indent(); _sb.Append(UseNumericIds ? e.Event.ToStringNumeric() : e.Event.ToString()); } 
+        public void Visit(SingleEvent e)
+        {
+            Indent();
+            if (!_inCondition && PrettyPrint && Formatter != null)
+            {
+                _sb.Append(Formatter.Format(e.Event, UseNumericIds));
+                return;
+            }
+
+            _sb.Append(UseNumericIds 
+                ? e.Event.ToStringNumeric() 
+                : e.Event.ToString());
+        }
+
         public void Visit(BreakStatement breakStatement) { Indent(); _sb.Append("break"); }
         public void Visit(ContinueStatement continueStatement) { Indent(); _sb.Append("continue"); }
         public void Visit(ControlFlowNode cfgNode) { Indent(); _sb.Append("!!!ARBITRARY CONTROL FLOW!!!"); }

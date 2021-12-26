@@ -64,6 +64,7 @@
     "font":             "UAlbion.Game.Assets.FontSpriteLoader`1[[UAlbion.Game.Veldrid.Assets.PngSheetLoader, UAlbion.Game.Veldrid]], UAlbion.Game",
     "itemNameCollector": "UAlbion.Game.Assets.ItemNameCollector, UAlbion.Game",
     "wordCollector":    "UAlbion.Game.Assets.WordCollector, UAlbion.Game",
+    "eventSetScript":   "UAlbion.Game.Assets.EventSetScriptLoader, UAlbion.Game",
     "jsonEventSet":     "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.EventSet, UAlbion.Formats]], UAlbion.Formats",
     "jsonInv":          "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.Inventory, UAlbion.Formats]], UAlbion.Formats",
     "jsonItems":        "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.ItemData, UAlbion.Formats]], UAlbion.Formats",
@@ -121,7 +122,7 @@
     "$(MOD)/Assets/TacticalIcons":      { "Loader": "png", "Container": "dir", "Pattern": "{0}_{1}_p{3}_{2}.png", "Map": { "1": { "Id": "tacgfx.1"   } } },
 
     "$(MOD)/Assets/Chests":        { "Loader": "jsonInv",          "Container": "dir", "Pattern": "{0}_{2}.json", "Map": { "1": { "Id": "chest.1"    } } },
-    "$(MOD)/Assets/Events":        { "Loader": "jsonEventSet",     "Container": "dir", "Pattern": "{0}_{2}.json", "Map": { "1": { "Id": "eset.1"     } } },
+    "$(MOD)/Assets/Events":        { "Loader": "eventSetScript",   "Container": "dir", "Pattern": "{0}_{2}.ua",   "Map": { "1": { "Id": "eset.1"     } } },
     "$(MOD)/Assets/Merchants":     { "Loader": "jsonInv",          "Container": "dir", "Pattern": "{0}_{2}.json", "Map": { "1": { "Id": "merchant.1" } } },
     "$(MOD)/Assets/MonsterGroups": { "Loader": "jsonMonsterGroup", "Container": "dir", "Pattern": "{0}_{2}.json", "Map": { "1": { "Id": "mongrp.1"   } } },
     "$(MOD)/Assets/Monsters":      { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{0}_{2}.json", "Map": { "1": { "Id": "monster.1"  } } },
@@ -299,7 +300,7 @@
       "Loader": "tiledMap",
       "Container": "dir",
       "Pattern": "{0}_{2}.tmx",
-      "ScriptPattern": "{0}_{2}.script",
+      "ScriptPattern": "{0}_{2}.ua",
 
       "TilesetPattern": "../Tilesets/{0}_{2}.tsx",
       "SmallNpcs": "../Tilesets/SmallNPCs.tsx",

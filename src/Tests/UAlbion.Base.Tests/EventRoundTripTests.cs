@@ -439,7 +439,7 @@ result
 random_chance 1 IsTrue 1
 random_chance 1 LessThanOrEqual 0
 random_chance 1 LessThanOrEqual 1
-random_chance 1 NotEqual 1
+random_chance 1 LessThan 1
 random_chance 1 OpUnk6 0
 is_debug_mode
 get_switch Switch.ExpelledFromSouthWind
@@ -447,8 +447,8 @@ get_ticker Ticker.Ticker100 Equals 1
 get_ticker Ticker.Ticker100 GreaterThan 1
 get_ticker Ticker.Ticker100 GreaterThanOrEqual 1
 get_ticker Ticker.Ticker100 LessThanOrEqual 1
-get_ticker Ticker.Ticker100 NotEqual 1
-query_unk1 Equals 1 1
+get_ticker Ticker.Ticker100 LessThan 1
+query_hour Equals 1 1
 query_unk1 Equals 1 1
 query_unk1 GreaterThan 1 1
 query_unk1 GreaterThan 1 1
@@ -458,7 +458,7 @@ query_unk1 IsTrue 0 0
 query_unk1 IsTrue 1 0
 query_unk1 LessThanOrEqual 1 1
 query_unk1 LessThanOrEqual 1 1
-query_unk1 NotEqual 1 1
+query_unk1 LessThan 1 1
 query_unk1 OpUnk6 1 1
 query_unk1e GreaterThan 0 1
 query_unk1e GreaterThanOrEqual 0 1

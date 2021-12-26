@@ -11,7 +11,7 @@ using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Formats
 {
-    public class EventFormatter
+    public class EventFormatter : IEventFormatter
     {
         readonly Func<StringId, string> _stringLoadFunc;
         readonly AssetId _textSourceId;
@@ -28,11 +28,24 @@ namespace UAlbion.Formats
             var nodeText = e.ToString(idOffset);
             if (e.Event is MapTextEvent textEvent && _stringLoadFunc != null)
             {
-                var text = _stringLoadFunc(new StringId(_textSourceId, textEvent.SubId));
-                return $"{nodeText} // \"{text}\"";
+                var text = _stringLoadFunc(new StringId(_textSourceId, textEvent.SubId)).Replace("\"", "\\\"");
+                return $"{nodeText} ; \"{text}\"";
             }
 
             return nodeText;
+        }
+
+        public string Format(IEvent e, bool useNumeric)
+        {
+            if (e == null) throw new ArgumentNullException(nameof(e));
+            var eventText = useNumeric ? e.ToStringNumeric() : e.ToString();
+            if (e is MapTextEvent textEvent && _stringLoadFunc != null)
+            {
+                var text = _stringLoadFunc(new StringId(_textSourceId, textEvent.SubId)).Replace("\"", "\\\"");
+                return $"{eventText} ; \"{text}\"";
+            }
+
+            return eventText;
         }
 
         public void FormatEventSetDecompiled<T>(
@@ -42,6 +55,9 @@ namespace UAlbion.Formats
             IEnumerable<ushort> additionalEntryPoints,
             int indent) where T : IEventNode
         {
+            if (events.Count == 0)
+                return;
+
             List<(string, IGraph)> steps = new();
             try
             {
@@ -54,7 +70,7 @@ namespace UAlbion.Formats
             }
         }
 
-        public static void FormatGraphsAsBlocks(StringBuilder sb, IEnumerable<ICfgNode> trees, int indent)
+        public void FormatGraphsAsBlocks(StringBuilder sb, IEnumerable<ICfgNode> trees, int indent)
         {
             var counter = new CountEventsVisitor();
 
@@ -75,7 +91,7 @@ namespace UAlbion.Formats
                         sb.AppendLine();
                     sb.AppendLine("{");
 
-                    var visitor = new FormatScriptVisitor(sb) { PrettyPrint = true, IndentLevel = indent };
+                    var visitor = new FormatScriptVisitor(sb) { PrettyPrint = true, IndentLevel = indent, Formatter = this };
                     visitor.IndentLevel += visitor.TabSize;
                     tree.Accept(visitor);
 

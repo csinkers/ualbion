@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using SerdesNet;
@@ -13,6 +14,17 @@ namespace UAlbion.Formats.Assets
         public EventSetId Id { get; private set; }
         [JsonInclude] public ushort[] Chains { get; private set; }
         [JsonIgnore] public EventNode[] Events { get; private set; }
+
+        public EventSet() { }
+
+        public EventSet(EventSetId id, IEnumerable<EventNode> nodes, IEnumerable<ushort> chains)
+        {
+            if (nodes == null) throw new ArgumentNullException(nameof(nodes));
+            if (chains == null) throw new ArgumentNullException(nameof(chains));
+            Id = id;
+            Events = nodes.ToArray();
+            Chains = chains.ToArray();
+        }
 
         public string[] EventStrings // Used for JSON
         {

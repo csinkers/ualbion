@@ -118,9 +118,12 @@ namespace UAlbion.Game.Gui.Text
             Rebuild(_lastExtents);
 
             Vector2 size = Vector2.Zero;
-            foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
+            foreach (var child in Children)
             {
-                var childSize = child.GetSize();
+                if (child is not IUiElement { IsActive: true } childElement)
+                    continue;
+
+                var childSize = childElement.GetSize();
                 if (childSize.X > size.X)
                     size.X = childSize.X;
 

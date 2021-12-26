@@ -19,6 +19,7 @@ namespace UAlbion.Core.Visual
         protected SpriteBatch(SpriteKey key)
         {
             Key = key;
+            Name = $"Sprite:{Key.Texture.Name}";
         }
 
         protected abstract ReadOnlySpan<SpriteInstanceData> ReadOnlySprites { get; }
@@ -26,7 +27,7 @@ namespace UAlbion.Core.Visual
         protected abstract void Resize(int instanceCount);
 
         public SpriteKey Key { get; }
-        public string Name => $"Sprite:{Key.Texture.Name}";
+        public string Name { get; }
         public DrawLayer RenderOrder => Key.RenderOrder;
         public override string ToString() => $"Multi:{Name} Flags:{Key.Flags} ({ActiveInstances}/{ReadOnlySprites.Length} instances)";
         public int ActiveInstances { get; private set; }

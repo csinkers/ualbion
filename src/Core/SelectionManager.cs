@@ -1,40 +1,48 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
-using UAlbion.Api;
 using UAlbion.Core.Events;
 
 namespace UAlbion.Core
 {
     public class SelectionManager : ServiceComponent<ISelectionManager>, ISelectionManager
     {
-        HashSet<object> _lastSelection = new();
+        readonly BlurEvent _blurEvent = new();
+        readonly HoverEvent _hoverEvent = new();
+        readonly DoubleBuffered<HashSet<object>> _selection = new(() => new HashSet<object>());
 
-        public IList<Selection> CastRayFromScreenSpace(Vector2 pixelPosition, bool performFocusAlerts)
+        IComponent HoverSelector(Selection o)
         {
-            IList<Selection> hits = new List<Selection>();
-            RaiseAsync(new ScreenCoordinateSelectEvent(pixelPosition), x => hits.Add(x));
-            var orderedHits = hits.OrderBy(x => x.Distance).ToList();
+            if (_selection.Back.Contains(o.Target))
+                return null;
 
-            if (!performFocusAlerts)
-                return orderedHits;
-
-            var newSelection = orderedHits.Select(x => x.Target).ToHashSet();
-            var focused = newSelection.Except(_lastSelection);
-            var blurred = _lastSelection.Except(newSelection);
-            Distribute(new BlurEvent(), blurred);
-            Distribute(new HoverEvent(), focused);
-            _lastSelection = newSelection;
-            return orderedHits;
+            return o.Target as IComponent;
         }
 
-        void Distribute(ICancellableEvent e, IEnumerable<object> targets)
+        IComponent BlurSelector(object o)
         {
-            foreach (var component in targets.OfType<IComponent>())
-            {
-                if (!e.Propagating) break;
-                component.Receive(e, this);
-            }
+            if (_selection.Front.Contains(o))
+                return null;
+
+            return o as IComponent;
+        }
+
+        public void CastRayFromScreenSpace(List<Selection> hits, Vector2 pixelPosition, bool debug, bool performFocusAlerts)
+        {
+            if (hits == null) throw new ArgumentNullException(nameof(hits));
+            RaiseAsync(new ScreenCoordinateSelectEvent(pixelPosition, debug), hits.Add);
+            hits.Sort(static (x, y) => x.Distance.CompareTo(y.Distance));
+
+            if (!performFocusAlerts)
+                return;
+
+            _selection.Swap();
+            _selection.Front.Clear();
+            foreach (var hit in hits)
+                _selection.Front.Add(hit.Target);
+
+            Distribute(_hoverEvent, hits, HoverSelector);
+            Distribute(_blurEvent, _selection.Back, BlurSelector);
         }
     }
 }

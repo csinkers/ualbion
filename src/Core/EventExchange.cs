@@ -18,14 +18,13 @@ namespace UAlbion.Core
     /// </summary>
     public sealed class EventExchange : IDisposable
     {
-        static readonly Action<object> DummyContinuation = _ => { };
         readonly object _syncRoot = new();
         readonly ILogExchange _logExchange;
-        readonly Stack<List<Handler>> _dispatchLists = new();
-        readonly Queue<(IEvent, object)> _queuedEvents = new();
+        readonly PooledThreadSafe<List<Handler>> _dispatchLists = new(() => new List<Handler>(), x => x.Clear());
+        readonly DoubleBuffered<List<(IEvent, object)>> _queuedEvents = new(() => new List<(IEvent, object)>());
         readonly IDictionary<Type, object> _registrations = new Dictionary<Type, object>();
-        readonly IDictionary<Type, IList<Handler>> _subscriptions = new Dictionary<Type, IList<Handler>>();
-        readonly IDictionary<IComponent, IList<Handler>> _subscribers = new Dictionary<IComponent, IList<Handler>>();
+        readonly IDictionary<Type, List<Handler>> _subscriptions = new Dictionary<Type, List<Handler>>();
+        readonly IDictionary<IComponent, List<Handler>> _subscribers = new Dictionary<IComponent, List<Handler>>();
 
         int _nesting = -1;
         long _nextEventId;
@@ -35,9 +34,9 @@ namespace UAlbion.Core
 
 #if DEBUG
         // ReSharper disable once CollectionNeverQueried.Local
-        readonly IList<IEvent> _frameEvents = new List<IEvent>();
-        IList<IComponent> _sortedSubscribersCached;
-        public IList<IComponent> SortedSubscribers // Just for debugging
+        readonly List<IEvent> _frameEvents = new();
+        List<IComponent> _sortedSubscribersCached = new();
+        public List<IComponent> SortedSubscribers // Just for debugging
         {
             get
             {
@@ -60,7 +59,7 @@ namespace UAlbion.Core
 
         public void Dispose()
         {
-            lock(_syncRoot)
+            lock (_syncRoot)
                 foreach (var disposableSystem in _registrations.Values.OfType<IDisposable>())
                     disposableSystem.Dispose();
         }
@@ -74,19 +73,14 @@ namespace UAlbion.Core
             return this;
         }
 
-        public void Enqueue(IEvent e, object sender) { lock (_syncRoot) _queuedEvents.Enqueue((e, sender)); }
+        public void Enqueue(IEvent e, object sender) { lock (_syncRoot) _queuedEvents.Front.Add((e, sender)); }
 
         public void FlushQueuedEvents()
         {
-            IList<(IEvent, object)> events;
-            lock (_syncRoot)
-            {
-                events = _queuedEvents.ToList();
-                _queuedEvents.Clear();
-            }
-
-            foreach(var (e, sender) in events)
+            _queuedEvents.Swap();
+            foreach (var (e, sender) in _queuedEvents.Back)
                 Raise(e, sender);
+            _queuedEvents.Back.Clear();
         }
 
         void Collect(List<Handler> subscribers, Type eventType) // Must be called from inside lock(_syncRoot)!
@@ -101,93 +95,107 @@ namespace UAlbion.Core
                 subscribers.Add(subscriber);
         }
 
-        public void Raise(IEvent e, object sender) => RaiseInternal(e, sender, DummyContinuation);
-        public int RaiseAsync(IAsyncEvent e, object sender, Action continuation) => RaiseInternal(e, sender, _ => continuation?.Invoke());
-        public int RaiseAsync<T>(IAsyncEvent e, object sender, Action<T> continuation) 
-            => RaiseInternal(e, sender, 
-                continuation == null 
-                ? DummyContinuation 
-                : x =>
-                {
-                    if (x is T t)
-                        continuation(t);
-                    else
-                        ApiUtil.Assert($"Tried to complete a continuation of type Action<{typeof(T).Name}> with null or a value of a different type.");
-                });
+        public void Raise<T>(T e, object sender) where T : IEvent => RaiseInternal(e, sender, DummyContinuation.Instance);
+        public int RaiseAsync(IAsyncEvent e, object sender, Action continuation) => RaiseInternal(e, sender, continuation);
+        public int RaiseAsync<T>(IAsyncEvent e, object sender, Action<T> continuation) => RaiseInternal(e, sender, continuation ?? DummyContinuation<T>.Instance);
 
-        int RaiseInternal(IEvent e, object sender, Action<object> continuation) // This method is performance critical, memory allocations should be avoided etc.
+        int RaiseInternal(IEvent e, object sender, object continuation) // This method is performance critical, memory allocations should be avoided etc.
         {
             if (e == null) throw new ArgumentNullException(nameof(e));
             bool verbose = e is IVerboseEvent;
+            long eventId = Interlocked.Increment(ref _nextEventId);
+            string eventText = LogRaise(e, verbose, eventId, sender);
+
+            List<Handler> handlers = _dispatchLists.Borrow();
+            lock (_syncRoot)
+            {
+#if DEBUG
+                if (e is BeginFrameEvent) _frameEvents.Clear();
+                else _frameEvents.Add(e);
+#endif
+                Collect(handlers, e.GetType());
+            }
+
+            int inProgressHandlers = 0;
+            foreach (var handler in handlers)
+                if (sender != handler.Component)
+                    if (handler.Invoke(e, continuation))
+                        inProgressHandlers++;
+
+            _dispatchLists.Return(handlers);
+            LogRaiseEnd(e, verbose, eventId, eventText, handlers.Count);
+            return inProgressHandlers;
+        }
+
+        string LogRaise(IEvent e, bool verbose, long eventId, object sender)
+        {
             if (!verbose)
             { // Nesting level helps identify which events were caused by other events when reading the console window
                 Interlocked.Increment(ref _nesting);
                 _logExchange?.Receive(e, sender);
             }
 
-#if DEBUG // Keep track of which events have been fired this frame for debugging
-            if (e is BeginFrameEvent) _frameEvents.Clear();
-            else _frameEvents.Add(e);
-#endif
-
-            long eventId = Interlocked.Increment(ref _nextEventId);
             string eventText = null;
-
             if (CoreTrace.Log.IsEnabled())
             {
-                eventText = verbose ? e.GetType().Name : e.ToString();
-                if (verbose) CoreTrace.Log.StartRaiseVerbose(eventId, _nesting, e.GetType().Name, eventText);
+                if (verbose)
+                {
+                    eventText =  e.GetType().Name;
+                    CoreTrace.Log.StartRaiseVerbose(eventId, _nesting, e.GetType().Name, eventText);
+                }
                 else if (e is LogEvent log)
                 {
                     // ReSharper disable ExplicitCallerInfoArgument
+                    eventText = log.Message;
                     switch (log.Severity)
                     {
-                        case LogLevel.Info: CoreTrace.Log.Info("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;
-                        case LogLevel.Warning: CoreTrace.Log.Warning("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;
-                        case LogLevel.Error: CoreTrace.Log.Error("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;
+                        case LogLevel.Info:     CoreTrace.Log.Info("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;
+                        case LogLevel.Warning:  CoreTrace.Log.Warning("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;
+                        case LogLevel.Error:    CoreTrace.Log.Error("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;
                         case LogLevel.Critical: CoreTrace.Log.Critical("Log", log.Message, log.File, log.Member, log.Line ?? 0); break;
                     }
                     // ReSharper restore ExplicitCallerInfoArgument
                 }
-                else CoreTrace.Log.StartRaise(eventId, _nesting, e.GetType().Name, eventText);
+                else
+                {
+                    eventText = e.ToString();
+                    CoreTrace.Log.StartRaise(eventId, _nesting, e.GetType().Name, eventText);
+                }
             }
 
-            List<Handler> handlers;
-            lock (_syncRoot)
-            {
-                if (!_dispatchLists.TryPop(out handlers)) // reuse the event handler lists to avoid GC churn
-                    handlers = new List<Handler>();
-#if DEBUG
-                if (e is BeginFrameEvent) _frameEvents.Clear();
-#endif
-                Collect(handlers, e.GetType());
-            }
+            return eventText;
+        }
 
-            int inProgressHandlers = 0;
-
-            foreach (var handler in handlers)
-                if (sender != handler.Component)
-                    if (handler.Invoke(e, continuation))
-                        inProgressHandlers++;
-
+        void LogRaiseEnd(IEvent e, bool verbose, long eventId, string eventText, int handlerCount)
+        {
             if (eventText != null)
             {
-                if (verbose) CoreTrace.Log.StopRaiseVerbose(eventId, _nesting, e.GetType().Name, eventText, handlers.Count);
-                else CoreTrace.Log.StopRaise(eventId, _nesting, e.GetType().Name, eventText, handlers.Count);
+                if (verbose) CoreTrace.Log.StopRaiseVerbose(eventId, _nesting, e.GetType().Name, eventText, handlerCount);
+                else CoreTrace.Log.StopRaise(eventId, _nesting, e.GetType().Name, eventText, handlerCount);
             }
-
-            handlers.Clear();
-            lock (_syncRoot)
-                _dispatchLists.Push(handlers);
 
             if (!verbose)
                 Interlocked.Decrement(ref _nesting);
-
-            return inProgressHandlers;
         }
 
         public void Subscribe<T>(IComponent component) where T : IEvent 
             => Subscribe(new Handler<T>(e => component.Receive(e, null), component));
+
+        bool CheckForDoubleRegistration(Handler handler, List<Handler> subscribedTypes)
+        {
+            foreach (var x in subscribedTypes)
+            {
+                if (x.Type != handler.Type)
+                    continue;
+
+                Raise(new LogEvent(LogLevel.Error,
+                    $"Component of type \"{handler.Component.GetType()}\" tried to register " +
+                    $"handler for event {handler.Type}, but it has already registered a handler for that event."), this);
+                return true;
+            }
+
+            return false;
+        }
 
         public void Subscribe(Handler handler)
         {
@@ -196,15 +204,8 @@ namespace UAlbion.Core
             {
                 if (_subscribers.TryGetValue(handler.Component, out var subscribedTypes))
                 {
-                    if (subscribedTypes.Any(x => x.Type == handler.Type))
-                    {
-                        Raise(new LogEvent(
-                            LogLevel.Error,
-                            $"Component of type \"{handler.Component.GetType()}\" tried to register " +
-                            $"handler for event {handler.Type}, but it has already registered a handler for that event."),
-                            this);
+                    if (CheckForDoubleRegistration(handler, subscribedTypes))
                         return;
-                    }
                 }
                 else
                 {
@@ -229,7 +230,7 @@ namespace UAlbion.Core
                 if (!_subscribers.TryGetValue(subscriber, out var handlersForSubscriber))
                     return;
 
-                foreach (var handler in handlersForSubscriber.ToList())
+                foreach (var handler in handlersForSubscriber)
                     _subscriptions[handler.Type].Remove(handler);
 
                 _subscribers.Remove(subscriber);
@@ -243,7 +244,16 @@ namespace UAlbion.Core
                 if (!_subscribers.TryGetValue(subscriber, out var handlersForSubscriber))
                     return;
 
-                var handler = handlersForSubscriber.FirstOrDefault(x => x.Type == typeof(T));
+                Handler handler = null;
+                foreach (var x in handlersForSubscriber)
+                {
+                    if (x.Type == typeof(T))
+                    {
+                        handler = x;
+                        break;
+                    }
+                }
+
                 if (handler == null)
                     return;
 
@@ -307,7 +317,7 @@ namespace UAlbion.Core
             {
                 var subscribers = new List<Handler>();
                 Collect(subscribers, eventType);
-                return subscribers.Select(x => x.Component).ToList();
+                return subscribers.Select(x => x.Component).ToList(); // Fine to allocate here - not called every frame.
             }
         }
     }

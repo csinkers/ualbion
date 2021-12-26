@@ -46,7 +46,17 @@ namespace UAlbion.Game.State
         }
 
         [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "<Pending>")]
-        public IPlayer this[PartyMemberId id] => _statusBarOrder.FirstOrDefault(x => x.Id == id);
+        public IPlayer this[PartyMemberId id]
+        {
+            get
+            {
+                foreach (var x in _statusBarOrder) // Don't use LINQ, we want to avoid allocations
+                    if (x.Id == id) 
+                        return x;
+                return null;
+            }
+        }
+
         public IPlayer Leader => _walkOrder[0];
         public IReadOnlyList<IPlayer> StatusBarOrder => _readOnlyStatusBarOrder;
         public IReadOnlyList<IPlayer> WalkOrder => _readOnlyWalkOrder;

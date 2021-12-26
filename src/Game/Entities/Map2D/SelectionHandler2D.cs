@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
@@ -21,12 +22,14 @@ namespace UAlbion.Game.Entities.Map2D
         static readonly Vector3 Normal = Vector3.UnitZ;
         readonly LogicalMap2D _map;
         readonly MapRenderable2D _renderable;
+        readonly MapTileHit _mapTileHit = new();
+        Func<object, string> _formatChain;
         int _lastHighlightIndex;
 
         public SelectionHandler2D(LogicalMap2D map, MapRenderable2D renderable)
         {
             OnAsync<WorldCoordinateSelectEvent, Selection>(OnSelect);
-            On<ShowMapMenuEvent>(e => ShowMapMenu());
+            On<ShowMapMenuEvent>(_ => ShowMapMenu());
             On<UiRightClickEvent>(e =>
             {
                 e.Propagating = false;
@@ -38,6 +41,12 @@ namespace UAlbion.Game.Entities.Map2D
         }
 
         public event EventHandler<int> HighlightIndexChanged;
+        protected override void Subscribed()
+        {
+            var assets = Resolve<IAssetManager>();
+            var eventFormatter = new EventFormatter(assets.LoadString, _map.Id.ToMapText());
+            _formatChain = x => eventFormatter.FormatChain((IEventNode)x);
+        }
 
         bool OnSelect(WorldCoordinateSelectEvent e, Action<Selection> continuation)
         {
@@ -53,32 +62,31 @@ namespace UAlbion.Game.Entities.Map2D
             int x = (int)(intersectionPoint.X / _renderable.TileSize.X);
             int y = (int)(intersectionPoint.Y / _renderable.TileSize.Y);
 
-            int highlightIndex = y * _map.Width + x;
-            var underlayTile = _map.GetUnderlay(x, y);
-            var overlayTile = _map.GetOverlay(x, y);
+            _mapTileHit.Tile = new Vector2(x, y);
+            _mapTileHit.IntersectionPoint = intersectionPoint;
+            _mapTileHit.UnderlaySprite = e.Debug ? _renderable.GetWeakUnderlayReference(x, y) : null;
+            _mapTileHit.OverlaySprite = e.Debug ? _renderable.GetWeakOverlayReference(x, y) : null;
+            continuation(new Selection(e.Origin, e.Direction, t, _mapTileHit));
 
-            continuation(new Selection(e.Origin, e.Direction, t, new MapTileHit(
-                new Vector2(x, y),
-                intersectionPoint,
-                _renderable.GetWeakUnderlayReference(x, y),
-                _renderable.GetWeakOverlayReference(x, y))));
-
-            if (underlayTile != null) continuation(new Selection(e.Origin, e.Direction, t, underlayTile));
-            if (overlayTile != null) continuation(new Selection(e.Origin, e.Direction, t, overlayTile));
-            continuation(new Selection(e.Origin, e.Direction, t, this));
-
-            var zone = _map.GetZone(x, y);
-            if (zone != null)
-                continuation(new Selection(e.Origin, e.Direction, t, zone));
-
-            var chain = zone?.Chain;
-            if (chain != null)
+            if (e.Debug)
             {
-                var assets = Resolve<IAssetManager>();
-                var ef = new EventFormatter(assets.LoadString, _map.Id.ToMapText());
-                continuation(new Selection(e.Origin, e.Direction, t, ef.FormatChain(zone.Node)));
+                var underlayTile = _map.GetUnderlay(x, y);
+                var overlayTile = _map.GetOverlay(x, y);
+
+                if (underlayTile != null) continuation(new Selection(e.Origin, e.Direction, t, underlayTile));
+                if (overlayTile != null) continuation(new Selection(e.Origin, e.Direction, t, overlayTile));
+                continuation(new Selection(e.Origin, e.Direction, t, this));
+
+                var zone = _map.GetZone(x, y);
+                if (zone != null)
+                    continuation(new Selection(e.Origin, e.Direction, t, zone));
+
+                var chain = zone?.Chain;
+                if (chain != null)
+                    continuation(new Selection(e.Origin, e.Direction, t, zone.Node, _formatChain));
             }
 
+            int highlightIndex = y * _map.Width + x;
             if (_lastHighlightIndex != highlightIndex)
             {
                 HighlightIndexChanged?.Invoke(this, highlightIndex);

@@ -8,6 +8,7 @@ namespace UAlbion.Core.Veldrid
 {
     public sealed class SingleBuffer<T> : Component, IBufferHolder<T> where T : unmanaged // GPU buffer containing a single instance of T
     {
+        readonly Action<IVeldridInitEvent> _updateAction; // Cached action to avoid allocating new closures every time a buffer is dirtied
         readonly BufferUsage _usage;
         string _name;
         T _instance;
@@ -49,6 +50,7 @@ namespace UAlbion.Core.Veldrid
             _instance = data;
             _usage = usage;
             _name = name;
+            _updateAction = Update;
 
             On<DeviceCreatedEvent>(_ => Dirty());
             On<DestroyDeviceObjectsEvent>(_ => Dispose());
@@ -58,6 +60,7 @@ namespace UAlbion.Core.Veldrid
         {
             _usage = usage;
             _name = name;
+            _updateAction = Update;
 
             On<DeviceCreatedEvent>(_ => Dirty());
             On<DestroyDeviceObjectsEvent>(_ => Dispose());
@@ -65,7 +68,7 @@ namespace UAlbion.Core.Veldrid
 
         protected override void Subscribed() => Dirty();
         protected override void Unsubscribed() => Dispose();
-        void Dirty() => On<PrepareFrameResourcesEvent>(Update);
+        void Dirty() => On<PrepareFrameResourcesEvent>(_updateAction);
 
         void Update(IVeldridInitEvent e)
         {

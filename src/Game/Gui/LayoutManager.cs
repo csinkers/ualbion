@@ -34,7 +34,9 @@ namespace UAlbion.Game.Gui
             int uiHeight = UiConstants.ActiveAreaExtents.Height;
             var dialogs = new List<IDialog>();
             Raise(new CollectDialogsEvent(dialogs.Add));
-            foreach (var dialog in dialogs.OrderBy(x => x.Depth))
+            dialogs.Sort((x,y) => x.Depth.CompareTo(y.Depth));
+
+            foreach (var dialog in dialogs)
             {
                 var size = dialog.GetSize();
 

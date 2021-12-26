@@ -140,8 +140,7 @@ namespace UAlbion.Game.Entities.Map2D
                 Raise(new LogEvent(LogEvent.Level.Info, ""));
             }
 #endif
-            bool Probe(Vector2 x) => !detector.IsOccupied(position + x);
-            if (Probe(direction))
+            if (!detector.IsOccupied(position + direction))
                 return direction;
 
             if ((int)direction.X != 0 && (int)direction.Y != 0) // First try and reduce diagonal movement to an axis-aligned movement
@@ -153,23 +152,24 @@ namespace UAlbion.Game.Entities.Map2D
                 return CheckForCollisions(detector, position, new Vector2(0, direction.Y));
             }
 
+            static bool Probe(ICollisionManager detector, Vector2 position, int x, int y) => !detector.IsOccupied(position + new Vector2(x, y));
             return ((int)direction.X, (int)direction.Y) switch // First probe
             {
                 // West
-                (-1, 0)  when Probe(new Vector2(-1.0f,  1.0f)) && Probe(new Vector2(0.0f, 1.0f)) => new Vector2(0.0f,  1.0f),  // South
-                (-1, 0)  when Probe(new Vector2(-1.0f, -1.0f)) && Probe(new Vector2(0.0f, -1.0f)) => new Vector2(0.0f, -1.0f), // North
+                (-1, 0)  when Probe(detector, position, -1,  1) && Probe(detector, position, 0,  1) => new Vector2(0.0f,  1.0f), // South
+                (-1, 0)  when Probe(detector, position, -1, -1) && Probe(detector, position, 0, -1) => new Vector2(0.0f, -1.0f), // North
 
                 // East
-                ( 1, 0)  when Probe(new Vector2( 1.0f, -1.0f)) && Probe(new Vector2(0.0f, -1.0f)) => new Vector2(0.0f, -1.0f), // North
-                ( 1, 0)  when Probe(new Vector2( 1.0f,  1.0f)) && Probe(new Vector2(0.0f,  1.0f)) => new Vector2(0.0f,  1.0f), // South
+                ( 1, 0)  when Probe(detector, position,  1, -1) && Probe(detector, position, 0, -1) => new Vector2(0.0f, -1.0f), // North
+                ( 1, 0)  when Probe(detector, position,  1,  1) && Probe(detector, position, 0,  1) => new Vector2(0.0f,  1.0f), // South
 
                 // North
-                ( 0, -1) when Probe(new Vector2(-1.0f, -1.0f)) && Probe(new Vector2(-1.0f, 0.0f)) => new Vector2(-1.0f, 0.0f), // West
-                ( 0, -1) when Probe(new Vector2( 1.0f, -1.0f)) && Probe(new Vector2( 1.0f, 0.0f)) => new Vector2( 1.0f, 0.0f), // East
+                ( 0, -1) when Probe(detector, position, -1, -1) && Probe(detector, position, -1, 0) => new Vector2(-1.0f, 0.0f), // West
+                ( 0, -1) when Probe(detector, position,  1, -1) && Probe(detector, position,  1, 0) => new Vector2( 1.0f, 0.0f), // East
 
                 // South
-                ( 0, 1)  when Probe(new Vector2( 1.0f,  1.0f)) && Probe(new Vector2( 1.0f, 0.0f)) => new Vector2( 1.0f, 0.0f), // East
-                ( 0, 1)  when Probe(new Vector2(-1.0f,  1.0f)) && Probe(new Vector2(-1.0f, 0.0f)) => new Vector2(-1.0f, 0.0f), // West
+                ( 0, 1)  when Probe(detector, position,  1,  1) && Probe(detector, position,  1, 0) => new Vector2( 1.0f, 0.0f), // East
+                ( 0, 1)  when Probe(detector, position, -1,  1) && Probe(detector, position, -1, 0) => new Vector2(-1.0f, 0.0f), // West
 
                 _ => Vector2.Zero
             };

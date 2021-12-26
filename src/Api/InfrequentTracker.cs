@@ -4,6 +4,7 @@ using System.Threading;
 
 namespace UAlbion.Api
 {
+#pragma warning disable CA1815 // Override equals and operator equals on value types
     public readonly struct InfrequentTracker : IDisposable
     {
         readonly Stopwatch _stopwatch;
@@ -32,4 +33,5 @@ namespace UAlbion.Api
             CoreTrace.Log.StartupEvent(_name);
         }
     }
+#pragma warning restore CA1815 // Override equals and operator equals on value types
 }

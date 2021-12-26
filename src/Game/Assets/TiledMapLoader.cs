@@ -22,7 +22,7 @@ namespace UAlbion.Game.Assets
             if (s == null) throw new ArgumentNullException(nameof(s));
 
             if (!s.IsWriting())
-                return Read(info, s, mapping);
+                return Read(info, s);
 
             Write(existing, info, s);
             return existing;
@@ -60,7 +60,7 @@ namespace UAlbion.Game.Assets
             disk.WriteAllText(Path.Combine(assetDir, scriptPath), script);
         }
 
-        BaseMapData Read(AssetInfo info, ISerializer s, AssetMapping mapping)
+        BaseMapData Read(AssetInfo info, ISerializer s)
         {
             var disk = Resolve<IFileSystem>();
             var assetDir = GetAssetDir(info);

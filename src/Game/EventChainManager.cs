@@ -15,19 +15,32 @@ namespace UAlbion.Game
 {
     public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventManager, IDisposable
     {
+        static readonly EventContext BaseContext = new(new EventSource(AssetId.None, TextId.None, 0));
+
         readonly ThreadLocal<Stack<EventContext>> _threadContexts = new(() => new Stack<EventContext>());
         readonly HashSet<EventContext> _activeContexts = new();
-        static readonly EventContext BaseContext = new(new EventSource(AssetId.None, TextId.None, 0));
+        readonly StartClockEvent _startClockEvent = new();
+        readonly StopClockEvent _stopClockEvent = new();
+        readonly ResumeChainsEvent _resumeChainsEvent = new();
 
         public EventChainManager()
         {
             // Need to enqueue without a sender if we want to handle it ourselves.
-            On<BeginFrameEvent>(_ => Exchange?.Enqueue(new ResumeChainsEvent(), null)); 
+            On<BeginFrameEvent>(_ => Exchange?.Enqueue(_resumeChainsEvent, null)); 
             On<ResumeChainsEvent>(ResumeChains);
             OnAsync<TriggerChainEvent>(Trigger);
         }
 
-        public EventContext Context => _threadContexts.Value.FirstOrDefault() ?? BaseContext;
+        public EventContext Context
+        {
+            get
+            {
+                foreach (var context in _threadContexts.Value)
+                    return context;
+                return BaseContext;
+            }
+        }
+
         public bool LastEventResult { get; set; }
         public IEnumerable<EventContext> DebugActiveContexts => _activeContexts;
 
@@ -94,7 +107,7 @@ namespace UAlbion.Game
         void HandleChainCompletion(EventContext context)
         {
             if (context.ClockWasRunning)
-                Raise(new StartClockEvent());
+                Raise(_startClockEvent);
 
             context.Status = EventContextStatus.Completing;
             context.CompletionCallback?.Invoke();
@@ -157,7 +170,7 @@ namespace UAlbion.Game
             };
 
             if (context.ClockWasRunning)
-                Raise(new StopClockEvent());
+                Raise(_stopClockEvent);
 
             _activeContexts.Add(context);
             Resume(context);

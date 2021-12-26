@@ -6,6 +6,6 @@ namespace UAlbion.Core
 {
     public interface ISelectionManager
     {
-        IList<Selection> CastRayFromScreenSpace(Vector2 pixelPosition, bool performFocusAlerts = false);
+        void CastRayFromScreenSpace(List<Selection> hits, Vector2 pixelPosition, bool debug, bool performFocusAlerts);
     }
 }

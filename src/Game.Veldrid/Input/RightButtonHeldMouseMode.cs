@@ -6,7 +6,6 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using Veldrid;
@@ -15,6 +14,7 @@ namespace UAlbion.Game.Veldrid.Input
 {
     public class RightButtonHeldMouseMode : Component
     {
+        readonly List<Selection> _hits = new();
         readonly MapSprite _cursor;
         Vector2 _lastTilePosition;
         bool _wasClockRunning;
@@ -22,7 +22,7 @@ namespace UAlbion.Game.Veldrid.Input
         public RightButtonHeldMouseMode()
         {
             On<InputEvent>(OnInput);
-            _cursor = AttachChild(new MapSprite((SpriteId)Base.CoreSprite.Select, DrawLayer.MaxLayer, 0, SpriteFlags.LeftAligned));
+            _cursor = AttachChild(new MapSprite(Base.CoreSprite.Select, DrawLayer.MaxLayer, 0, SpriteFlags.LeftAligned));
         }
 
         protected override void Subscribed()
@@ -44,37 +44,38 @@ namespace UAlbion.Game.Veldrid.Input
 
         void OnInput(InputEvent e)
         {
-            var hits = Resolve<ISelectionManager>()?.CastRayFromScreenSpace(e.Snapshot.MousePosition);
-            if (hits == null) return;
+            _hits.Clear();
+            Resolve<ISelectionManager>().CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, false);
+            if (_hits.Count == 0) return;
+
             if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && !x.Down))
-                ShowContextMenu(hits);
+                ShowContextMenu(_hits);
             else
-                UpdateCursorPosition(hits);
+                UpdateCursorPosition(_hits);
         }
 
-        void UpdateCursorPosition(IList<Selection> orderedHits)
+        void UpdateCursorPosition(IEnumerable<Selection> orderedHits)
         {
-            var tile = orderedHits.Select(x => x.Target).OfType<MapTileHit>().FirstOrDefault();
-            if (tile == null || tile.Tile == _lastTilePosition)
-                return;
-
-            var map = Resolve<IMapManager>()?.Current;
-            var offset = map == null ? Vector3.Zero : new Vector3(-1.0f, -1.0f, 0.0f) / map.TileSize;
-            _lastTilePosition = tile.Tile;
-            _cursor.TilePosition = new Vector3(tile.Tile, 0) + offset;
-        }
-
-        void ShowContextMenu(IList<Selection> orderedHits)
-        {
-            Raise(new PopMouseModeEvent());
-
-            var clickEvent = new ShowMapMenuEvent();
             foreach (var hit in orderedHits)
             {
-                if (!clickEvent.Propagating) break;
-                var component = hit.Target as IComponent;
-                component?.Receive(clickEvent, this);
+                if (hit.Target is not MapTileHit tile)
+                    continue;
+
+                if (tile.Tile == _lastTilePosition)
+                    return;
+
+                var map = Resolve<IMapManager>()?.Current;
+                var offset = map == null ? Vector3.Zero : new Vector3(-1.0f, -1.0f, 0.0f) / map.TileSize;
+                _lastTilePosition = tile.Tile;
+                _cursor.TilePosition = new Vector3(tile.Tile, 0) + offset;
+                return;
             }
+        }
+
+        void ShowContextMenu(IEnumerable<Selection> orderedHits)
+        {
+            Raise(new PopMouseModeEvent());
+            Distribute(new ShowMapMenuEvent(), orderedHits, x => x.Target as IComponent);
         }
     }
 }

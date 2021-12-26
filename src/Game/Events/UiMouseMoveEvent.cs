@@ -11,7 +11,7 @@ namespace UAlbion.Game.Events
             Y = y;
         }
 
-        [EventPart("x")] public int X { get; }
-        [EventPart("y")] public int Y { get; }
+        [EventPart("x")] public int X { get; set; }
+        [EventPart("y")] public int Y { get; set; }
     }
 }

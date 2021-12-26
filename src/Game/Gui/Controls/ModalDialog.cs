@@ -18,11 +18,14 @@ namespace UAlbion.Game.Gui.Controls
             if (Children == null) 
                 return size;
 
-            foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
+            foreach (var child in Children)
             {
-                if (child == _blocker) // Don't include the blocker in the size calculation
+                if (child is not IUiElement { IsActive: true } childElement)
                     continue;
-                var childSize = child.GetSize();
+
+                if (childElement == _blocker) // Don't include the blocker in the size calculation
+                    continue;
+                var childSize = childElement.GetSize();
                 if (childSize.X > size.X)
                     size.X = childSize.X;
                 if (childSize.Y > size.Y)
@@ -37,11 +40,14 @@ namespace UAlbion.Game.Gui.Controls
             int maxOrder = order;
             if (extents.Contains((int) uiPosition.X, (int) uiPosition.Y))
             {
-                foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
+                foreach (var child in Children)
                 {
-                    if (child == _blocker)
+                    if (child is not IUiElement { IsActive: true } childElement)
                         continue;
-                    maxOrder = Math.Max(maxOrder, child.Select(uiPosition, extents, order + 1, registerHitFunc));
+
+                    if (childElement == _blocker)
+                        continue;
+                    maxOrder = Math.Max(maxOrder, childElement.Select(uiPosition, extents, order + 1, registerHitFunc));
                 }
 
                 registerHitFunc(order, this);

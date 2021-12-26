@@ -9,6 +9,7 @@ namespace UAlbion.Core.Veldrid
     public sealed class MultiBuffer<T> : Component, IBufferHolder<T> where T : unmanaged // GPU buffer containing an array of Ts
     {
         readonly object _syncRoot = new();
+        readonly Action<IVeldridInitEvent> _updateAction; // Cached action to avoid allocating new closures every time a buffer is dirtied
         readonly BufferUsage _usage;
         string _name;
         T[] _buffer;
@@ -42,6 +43,7 @@ namespace UAlbion.Core.Veldrid
             _buffer = new T[size];
             _usage = usage;
             _name = name;
+            _updateAction = Update;
 
             On<DeviceCreatedEvent>(_ => Dirty());
             On<DestroyDeviceObjectsEvent>(_ => Dispose());
@@ -52,6 +54,7 @@ namespace UAlbion.Core.Veldrid
             _buffer = data.ToArray();
             _usage = usage;
             _name = name;
+            _updateAction = Update;
 
             On<DeviceCreatedEvent>(_ => Dirty());
             On<DestroyDeviceObjectsEvent>(_ => Dispose());
@@ -59,7 +62,7 @@ namespace UAlbion.Core.Veldrid
 
         protected override void Subscribed() => Dirty();
         protected override void Unsubscribed() => Dispose();
-        void Dirty() => On<PrepareFrameResourcesEvent>(Update);
+        void Dirty() => On<PrepareFrameResourcesEvent>(_updateAction);
 
         void Update(IVeldridInitEvent e)
         {

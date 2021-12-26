@@ -20,29 +20,6 @@ namespace UAlbion.Game.Entities.Map2D
 
         public PartyCaterpillar(Vector2 initialPosition, Direction initialDirection, MovementSettings settings)
         {
-            On<FastClockEvent>(e => Update());
-            On<PartyMoveEvent>(e => _direction += new Vector2(e.X, e.Y));
-            On<PartyJumpEvent>(e =>
-            {
-                var position = new Vector2(e.X, e.Y);
-                for (int i = 0; i < _trail.Length; i++)
-                    _trail[i] = (To3D(position), 0);
-
-                _movement.Position = position;
-            });
-            On<PartyTurnEvent>(e =>
-            {
-                var (position3d, _) = _trail[_trailOffset];
-                var position = new Vector2(position3d.X, position3d.Y);
-                _movement.FacingDirection = e.Direction;
-                MoveLeader(position);
-            });
-            On<NoClipEvent>(e =>
-            {
-                _movement.Clipping = !_movement.Clipping;
-                Info($"Clipping {(_movement.Clipping ? "on" : "off")}");
-            });
-
             _settings = settings;
             _movement = new Movement2D(settings);
             _movement.EnteredTile += (sender, coords) => Raise(new PlayerEnteredTileEvent(coords.Item1, coords.Item2));
@@ -66,6 +43,29 @@ namespace UAlbion.Game.Entities.Map2D
                 var position = initialPosition + offset * i;
                 _trail[_trailOffset - i] = (To3D(position), _movement.SpriteFrame);
             }
+
+            On<FastClockEvent>(_ => Update());
+            On<PartyMoveEvent>(e => _direction += new Vector2(e.X, e.Y));
+            On<PartyJumpEvent>(e =>
+            {
+                var position = new Vector2(e.X, e.Y);
+                for (int i = 0; i < _trail.Length; i++)
+                    _trail[i] = (To3D(position), 0);
+
+                _movement.Position = position;
+            });
+            On<PartyTurnEvent>(e =>
+            {
+                var (position3d, _) = _trail[_trailOffset];
+                var position = new Vector2(position3d.X, position3d.Y);
+                _movement.FacingDirection = e.Direction;
+                MoveLeader(position);
+            });
+            On<NoClipEvent>(_ =>
+            {
+                _movement.Clipping = !_movement.Clipping;
+                Info($"Clipping {(_movement.Clipping ? "on" : "off")}");
+            });
         }
 
         int OffsetAge(int offset) => offset > _trailOffset ? _trailOffset - (offset - _trail.Length) : _trailOffset - offset;

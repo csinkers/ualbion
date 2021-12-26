@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
@@ -39,6 +38,16 @@ namespace UAlbion.Game.Veldrid.Input
 
     public class MouseLookMouseMode : Component
     {
+        readonly CameraRotateEvent _cameraRotateEvent = new(0,0);
+        readonly ConfineMouseToWindowEvent _confineMouseToWindowEvent = new(true);
+        readonly SetCursorEvent _setCursorEvent = new(Base.CoreSprite.CursorCrossUnselected);
+        readonly SetRelativeMouseModeEvent _setRelativeMouseModeEvent = new(true);
+        readonly UiLeftClickEvent _uiLeftClickEvent = new();
+        readonly UiLeftReleaseEvent _uiLeftReleaseEvent = new();
+        readonly UiRightClickEvent _uiRightClickEvent = new();
+        readonly UiScrollEvent _uiScrollEvent = new(0);
+        readonly List<Selection> _hits = new();
+
         bool _firstEvent;
 
         public MouseLookMouseMode()
@@ -46,7 +55,7 @@ namespace UAlbion.Game.Veldrid.Input
             On<InputEvent>(OnInput);
             On<FocusGainedEvent>(_ => AcquireMouse());
             On<FocusLostEvent>(_ => ReleaseMouse());
-            On<PostGameUpdateEvent>(e =>
+            On<PostGameUpdateEvent>(_ =>
             {
                 //var windowState = Resolve<IWindowManager>();
                 //Raise(new SetCursorPositionEvent(windowState.PixelWidth / 2, windowState.PixelHeight / 2));
@@ -55,7 +64,7 @@ namespace UAlbion.Game.Veldrid.Input
 
         protected override void Subscribed()
         {
-            Raise(new SetCursorEvent(Base.CoreSprite.CursorCrossUnselected));
+            Raise(_setCursorEvent);
             AcquireMouse();
             _firstEvent = true;
         }
@@ -64,14 +73,18 @@ namespace UAlbion.Game.Veldrid.Input
 
         void AcquireMouse()
         {
-            Raise(new SetRelativeMouseModeEvent(true));
-            Raise(new ConfineMouseToWindowEvent(true));
+            _setRelativeMouseModeEvent.Enabled = true;
+            _confineMouseToWindowEvent.Enabled = true;
+            Raise(_setRelativeMouseModeEvent);
+            Raise(_confineMouseToWindowEvent);
         }
 
         void ReleaseMouse()
         {
-            Raise(new ConfineMouseToWindowEvent(false));
-            Raise(new SetRelativeMouseModeEvent(false));
+            _setRelativeMouseModeEvent.Enabled = false;
+            _confineMouseToWindowEvent.Enabled = false;
+            Raise(_setRelativeMouseModeEvent);
+            Raise(_confineMouseToWindowEvent);
         }
 
         void OnInput(InputEvent e)
@@ -84,43 +97,39 @@ namespace UAlbion.Game.Veldrid.Input
 
             // var windowState = Resolve<IWindowManager>();
             // var delta = e.Snapshot.MousePosition - new Vector2((int)(windowState.PixelWidth / 2), (int)(windowState.PixelHeight / 2));
-            var hits = Resolve<ISelectionManager>()?.CastRayFromScreenSpace(e.Snapshot.MousePosition, true);
+            _hits.Clear();
+            Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, true);
 
             if (e.MouseDelta.LengthSquared() > float.Epsilon)
             {
                 var config = Resolve<GameConfig>();
                 var sensitivity = config.UI.MouseLookSensitivity / -1000;
-                Raise(new CameraRotateEvent(e.MouseDelta.X * sensitivity, e.MouseDelta.Y * sensitivity));
+                _cameraRotateEvent.Yaw = e.MouseDelta.X * sensitivity;
+                _cameraRotateEvent.Pitch = e.MouseDelta.Y * sensitivity;
+                Raise(_cameraRotateEvent);
             }
 
             // Clicks are targeted, releases are broadcast. e.g. if you click and drag a slider and move outside
             // its hover area, then it should switch to "ClickedBlurred". If you then release the button while
             // still outside its hover area and releases were broadcast, it would never receive the release and
             // it wouldn't be able to transition back to Normal
-            if (hits != null)
+            if (_hits.Count > 0)
             {
                 if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && x.Down))
-                    Distribute(new UiRightClickEvent(), hits);
+                    Distribute(_uiRightClickEvent, _hits, x => x.Target as IComponent);
 
                 if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && x.Down))
-                    Distribute(new UiLeftClickEvent(), hits);
+                    Distribute(_uiLeftClickEvent, _hits, x => x.Target as IComponent);
 
                 if ((int)e.Snapshot.WheelDelta != 0)
-                    Distribute(new UiScrollEvent((int)e.Snapshot.WheelDelta), hits);
+                {
+                    _uiScrollEvent.Delta = (int)e.Snapshot.WheelDelta;
+                    Distribute(_uiScrollEvent, _hits, x => x.Target as IComponent);
+                }
             }
 
             if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && !x.Down))
-                Raise(new UiLeftReleaseEvent());
-        }
-
-        void Distribute(ICancellableEvent e, IList<Selection> hits)
-        {
-            foreach (var hit in hits)
-            {
-                if (!e.Propagating) break;
-                var component = hit.Target as IComponent;
-                component?.Receive(e, this);
-            }
+                Raise(_uiLeftReleaseEvent);
         }
     }
 }

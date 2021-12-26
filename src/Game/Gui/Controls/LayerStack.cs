@@ -22,16 +22,19 @@ namespace UAlbion.Game.Gui.Controls
 
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
-            foreach(var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
+            foreach(var child in Children)
             {
-                var childSize = child.GetSize();
+                if (child is not IUiElement { IsActive: true } childElement)
+                    continue;
+
+                var childSize = childElement.GetSize();
                 var childExtents = new Rectangle(
                     extents.X,
                     extents.Y,
                     (int)childSize.X,
                     (int)childSize.Y);
 
-                order = Math.Max(order, func(child, childExtents, order + 1));
+                order = Math.Max(order, func(childElement, childExtents, order + 1));
             }
             return order;
         }

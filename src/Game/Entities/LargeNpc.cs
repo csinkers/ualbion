@@ -24,16 +24,18 @@ namespace UAlbion.Game.Entities
 
         public LargeNpc(MapNpc npc)
         {
+            _npc = npc ?? throw new ArgumentNullException(nameof(npc));
+            _sprite = AttachChild(new MapSprite(_npc.SpriteOrGroup, DrawLayer.Underlay - 1, 0, SpriteFlags.BottomAligned)
+            {
+                SelectionCallback = registerHit => { registerHit(this); return true; }
+            });
+
             On<ShowMapMenuEvent>(OnRightClick);
             On<SlowClockEvent>(e =>
             {
                 _frameCount += e.Delta;
                 _sprite.Frame = _frameCount;
             });
-
-            _npc = npc ?? throw new ArgumentNullException(nameof(npc));
-            _sprite = AttachChild(new MapSprite(_npc.SpriteOrGroup, DrawLayer.Underlay - 1, 0, SpriteFlags.BottomAligned));
-            _sprite.Selected += (sender, e) => { e.RegisterHit(this); e.Handled = true; };
         }
 
         protected override void Subscribed()

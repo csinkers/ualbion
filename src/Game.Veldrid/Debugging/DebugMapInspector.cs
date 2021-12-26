@@ -286,7 +286,8 @@ namespace UAlbion.Game.Veldrid.Debugging
             {
                 if (ImGui.TreeNode($"{hitId} {hit.Target}"))
                 {
-                    var reflected = Reflector.Reflect(null, hit.Target, null);
+                    var target = hit.Formatter == null ? hit.Target : hit.Formatter(hit.Target);
+                    var reflected = Reflector.Reflect(null, target, null);
                     if (reflected.SubObjects != null)
                         foreach (var child in reflected.SubObjects)
                             anyHovered |= RenderNode(child, false);

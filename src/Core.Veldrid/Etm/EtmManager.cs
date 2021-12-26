@@ -44,8 +44,10 @@ namespace UAlbion.Core.Veldrid.Etm
         public void Collect(List<IRenderable> renderables)
         {
             if (renderables == null) throw new ArgumentNullException(nameof(renderables));
-            foreach (var tilemap in Children.OfType<ExtrudedTilemap>())
+            foreach (var child in Children)
             {
+                if (child is not ExtrudedTilemap tilemap)
+                    continue;
                 if ((tilemap.OpaqueWindow?.ActiveCount ?? 0) > 0)
                     renderables.Add(tilemap.OpaqueWindow);
                 if ((tilemap.AlphaWindow?.ActiveCount ?? 0) > 0)

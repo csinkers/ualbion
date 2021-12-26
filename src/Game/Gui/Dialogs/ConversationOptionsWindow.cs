@@ -18,10 +18,13 @@ namespace UAlbion.Game.Gui.Dialogs
             On<RespondEvent>(e =>
             {
                 int i = 1;
-                foreach(var option in _optionElements.OfType<ConversationOption>())
+                foreach(var option in _optionElements)
                 {
+                    if (option is not ConversationOption conversationOption)
+                        continue;
+
                     if (e.Option == i)
-                        option.Trigger();
+                        conversationOption.Trigger();
                     i++;
                 }
             });

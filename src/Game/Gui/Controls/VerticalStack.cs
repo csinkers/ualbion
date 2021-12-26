@@ -26,9 +26,12 @@ namespace UAlbion.Game.Gui.Controls
         public override Vector2 GetSize()
         {
             Vector2 size = Vector2.Zero;
-            foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
+            foreach (var child in Children)
             {
-                var childSize = child.GetSize();
+                if (child is not IUiElement { IsActive: true } childElement)
+                    continue;
+
+                var childSize = childElement.GetSize();
                 if (childSize.X > size.X)
                     size.X = childSize.X;
 
@@ -42,18 +45,21 @@ namespace UAlbion.Game.Gui.Controls
         {
             int offset = extents.Y;
             int maxOrder = order;
-            foreach(var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
+            foreach(var child in Children)
             {
-                var childSize = child.GetSize();
+                if (child is not IUiElement { IsActive: true } childElement)
+                    continue;
+
+                var childSize = childElement.GetSize();
                 int height = (int)childSize.Y;
                 var childExtents = Greedy
                     ? new Rectangle(extents.X, offset, extents.Width, height)
                     : new Rectangle(extents.X + (int)(extents.Width - childSize.X) / 2, offset, (int)childSize.X, height);
 
-                maxOrder = Math.Max(maxOrder, func(child, childExtents, order + 1));
+                maxOrder = Math.Max(maxOrder, func(childElement, childExtents, order + 1));
                 // Rendering may have altered the size of any text elements, so retrieve it
                 // again to ensure correct rendering on the first frame.
-                height = (int)child.GetSize().Y;
+                height = (int)childElement.GetSize().Y;
                 offset += height;
             }
             return maxOrder;

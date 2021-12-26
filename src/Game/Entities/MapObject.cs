@@ -26,9 +26,9 @@ namespace UAlbion.Game.Entities
                     : SpriteFlags.Billboard))
             {
                 Size = size,
-                Position = initialPosition
+                Position = initialPosition,
+                SelectionCallback = registerHit => { registerHit(this); return false; }
             });
-            _sprite.Selected += (_, args) => args.RegisterHit(this);
 
             On<SlowClockEvent>(e =>
             {

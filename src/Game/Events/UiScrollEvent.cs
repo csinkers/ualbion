@@ -6,6 +6,6 @@ namespace UAlbion.Game.Events
     public class UiScrollEvent : CancellableEvent, IVerboseEvent
     {
         public UiScrollEvent(int delta) => Delta = delta;
-        [EventPart("delta")] public int Delta { get; }
+        [EventPart("delta")] public int Delta { get; set; }
     }
 }

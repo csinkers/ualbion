@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Numerics;
 using UAlbion.Core;
 
@@ -15,17 +14,20 @@ namespace UAlbion.Game.Gui
     {
         protected Vector2 GetMaxChildSize()
         {
+            if (Children == null) 
+                return Vector2.Zero;
+
             Vector2 size = Vector2.Zero;
-            if (Children != null)
+            foreach (var child in Children)
             {
-                foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
-                {
-                    var childSize = child.GetSize();
-                    if (childSize.X > size.X)
-                        size.X = childSize.X;
-                    if (childSize.Y > size.Y)
-                        size.Y = childSize.Y;
-                }
+                if (child is not IUiElement { IsActive: true } childElement)
+                    continue;
+
+                var childSize = childElement.GetSize();
+                if (childSize.X > size.X)
+                    size.X = childSize.X;
+                if (childSize.Y > size.Y)
+                    size.Y = childSize.Y;
             }
             return size;
         }
@@ -33,8 +35,14 @@ namespace UAlbion.Game.Gui
         protected virtual int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
             int maxOrder = order;
-            foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
-                maxOrder = Math.Max(maxOrder, func(child, extents, order + 1));
+            foreach (var child in Children)
+            {
+                if (child is not IUiElement { IsActive: true } childElement)
+                    continue;
+
+                maxOrder = Math.Max(maxOrder, func(childElement, extents, order + 1));
+            }
+
             return maxOrder;
         }
 

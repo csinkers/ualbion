@@ -65,8 +65,11 @@ namespace UAlbion.Game.Gui.Text
 
             int maxOrder = order;
             int offset = 0;
-            foreach (var chunk in Children.OfType<IUiElement>().Where(x => x.IsActive))
+            foreach (var child in Children)
             {
+                if (child is not IUiElement { IsActive: true } chunk)
+                    continue;
+
                 var size = chunk.GetSize();
                 maxOrder = Math.Max(maxOrder, func(chunk,
                     new Rectangle(

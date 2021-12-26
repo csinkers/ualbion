@@ -132,7 +132,7 @@ namespace UAlbion.Core.Visual
             var normalisedScreenPosition = new Vector3(2 * e.Position.X / _viewport.X - 1.0f, -2 * e.Position.Y / _viewport.Y + 1.0f, 0.0f);
             var rayOrigin = UnprojectNormToWorld(normalisedScreenPosition + Vector3.UnitZ);
             var rayDirection = UnprojectNormToWorld(normalisedScreenPosition) - rayOrigin;
-            RaiseAsync(new WorldCoordinateSelectEvent(rayOrigin, rayDirection), continuation);
+            RaiseAsync(new WorldCoordinateSelectEvent(rayOrigin, rayDirection, e.Debug), continuation);
             return true;
         }
 

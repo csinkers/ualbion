@@ -216,7 +216,9 @@ namespace UAlbion.Config
                     : sizeof(T) == 4 ? Unsafe.As<T, int>(ref id)
                     : throw new InvalidOperationException($"Type {typeof(T)} is of non-enum type, or has an unsupported underlying type");
 
-                ApiUtil.Assert(enumValue >= info.EnumMin && enumValue <= info.EnumMax, $"Enum value {id} of type {typeof(T)} with a value of {enumValue} falls outside the mapped range");
+                if (enumValue < info.EnumMin || enumValue > info.EnumMax)
+                    ApiUtil.Assert($"Enum value {id} of type {typeof(T)} with a value of {enumValue} falls outside the mapped range");
+
                 return new AssetId(info.AssetType, enumValue + info.Offset);
             }
         }

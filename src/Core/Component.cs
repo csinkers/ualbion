@@ -57,8 +57,9 @@ namespace UAlbion.Core
         /// The list of this component's child components.
         /// The primary purpose of children is ensuring that the children are also attached and
         /// detached when the parent component is.
+        /// This collection should only be modified by the AttachChild, RemoveChild and RemoveAllChildren methods.
         /// </summary>
-        protected IReadOnlyList<IComponent> Children => _children ?? EmptyChildren;
+        protected List<IComponent> Children => _children ?? EmptyChildren;
 
         /// <summary>
         /// Resolve the currently active object that provides the given interface.
@@ -112,6 +113,28 @@ namespace UAlbion.Core
         /// </summary>
         /// <param name="event"></param>
         protected void Enqueue(IEvent @event) => Exchange?.Enqueue(@event, this);
+
+        /// <summary>
+        /// Distribute a cancellable event to each target in turn until the event is cancelled.
+        /// </summary>
+        /// <typeparam name="T">The target type</typeparam>
+        /// <param name="event">The event to distribute</param>
+        /// <param name="targets">The targets to distribute the event to</param>
+        /// <param name="projection">A function that maps from the target type to its associated component which will receive the event</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        protected void Distribute<T>(ICancellableEvent @event, IEnumerable<T> targets, Func<T, IComponent> projection)
+        {
+            if (@event == null) throw new ArgumentNullException(nameof(@event));
+            if (targets == null) throw new ArgumentNullException(nameof(targets));
+
+            @event.Propagating = true;
+            foreach (var target in targets)
+            {
+                if (!@event.Propagating) break;
+                var component = projection(target);
+                component?.Receive(@event, this);
+            }
+        }
 
         protected virtual void Subscribing() { }
 

@@ -107,7 +107,12 @@ namespace UAlbion.Core.Veldrid
                 foreach (var source in _sources)
                     source.Collect(_renderList);
 
-                _renderList.Sort((x, y) => x.RenderOrder.CompareTo(y.RenderOrder));
+                _renderList.Sort((x, y) =>
+                {
+                    var x2 = (ushort)x.RenderOrder;
+                    var y2 = (ushort)y.RenderOrder;
+                    return x2 < y2 ? -1 : x2 > y2 ? 1 : 0;
+                });
 
                 foreach (var renderable in _renderList)
                 {

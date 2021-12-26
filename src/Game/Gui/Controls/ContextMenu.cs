@@ -33,9 +33,12 @@ namespace UAlbion.Game.Gui.Controls
         protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
         {
             int maxOrder = order;
-            foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
+            foreach (var child in Children)
             {
-                var size = child.GetSize();
+                if (child is not IUiElement { IsActive: true } childElement)
+                    continue;
+
+                var size = childElement.GetSize();
                 int x = (int)_uiPosition.X;
                 int y = (int)_uiPosition.Y;
 
@@ -51,7 +54,7 @@ namespace UAlbion.Game.Gui.Controls
                     (int)size.X,
                     (int)size.Y);
 
-                maxOrder = Math.Max(maxOrder, func(child, childExtents, order + 1));
+                maxOrder = Math.Max(maxOrder, func(childElement, childExtents, order + 1));
             }
             return maxOrder;
         }

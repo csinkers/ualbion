@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
@@ -12,59 +11,57 @@ namespace UAlbion.Game.Veldrid.Input
 {
     public class NormalMouseMode : Component
     {
-        Vector2 _lastPosition;
-        public NormalMouseMode()
-        {
-            On<InputEvent>(OnInput);
-        }
+        readonly List<Selection> _hits = new();
+        readonly UiMouseMoveEvent _moveEvent = new(0, 0);
+        readonly UiScrollEvent _scrollEvent = new(0);
+        readonly UiLeftClickEvent _leftClickEvent = new();
+        readonly UiRightClickEvent _rightClickEvent = new();
+        readonly UiLeftReleaseEvent _leftReleaseEvent = new();
+        readonly UiRightReleaseEvent _rightReleaseEvent = new();
 
-        protected override void Subscribed()
-        {
-            Raise(new SetCursorEvent(Base.CoreSprite.Cursor));
-        }
+        Vector2 _lastPosition;
+
+        public NormalMouseMode() => On<InputEvent>(OnInput);
+        protected override void Subscribed() => Raise(new SetCursorEvent(Base.CoreSprite.Cursor));
 
         void OnInput(InputEvent e)
         {
-            var hits = Resolve<ISelectionManager>()?.CastRayFromScreenSpace(e.Snapshot.MousePosition, true);
+            _hits.Clear();
+            Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, true);
 
             // Clicks are targeted, releases are broadcast. e.g. if you click and drag a slider and move outside
             // its hover area, then it should switch to "ClickedBlurred". If you then release the button while
             // still outside its hover area and releases were broadcast, it would never receive the release and
             // it wouldn't be able to transition back to Normal
-            if (hits != null)
+            if (_hits.Count > 0)
             {
                 if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && x.Down))
-                    Distribute(new UiRightClickEvent(), hits);
+                    Distribute(_rightClickEvent, _hits, x => x.Target as IComponent);
 
                 if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && x.Down))
-                    Distribute(new UiLeftClickEvent(), hits);
+                    Distribute(_leftClickEvent, _hits, x => x.Target as IComponent);
 
                 if ((int)e.Snapshot.WheelDelta != 0)
-                    Distribute(new UiScrollEvent((int)e.Snapshot.WheelDelta), hits);
+                {
+                    _scrollEvent.Delta = (int)e.Snapshot.WheelDelta;
+                    Distribute(_scrollEvent, _hits, x => x.Target as IComponent);
+                }
             }
 
             if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && !x.Down))
-                Raise(new UiLeftReleaseEvent());
+                Raise(_leftReleaseEvent);
 
             if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && !x.Down))
-                Raise(new UiRightReleaseEvent());
+                Raise(_rightReleaseEvent);
 
-            if(_lastPosition != e.Snapshot.MousePosition)
+            if (_lastPosition != e.Snapshot.MousePosition)
             {
                 _lastPosition = e.Snapshot.MousePosition;
                 var window = Resolve<IWindowManager>();
                 var uiPosition = window.NormToUi(window.PixelToNorm(e.Snapshot.MousePosition));
-                Raise(new UiMouseMoveEvent((int)uiPosition.X, (int)uiPosition.Y));
-            }
-        }
-
-        void Distribute(ICancellableEvent e, IList<Selection> hits)
-        {
-            foreach (var hit in hits)
-            {
-                if (!e.Propagating) break;
-                var component = hit.Target as IComponent;
-                component?.Receive(e, this);
+                _moveEvent.X = (int)uiPosition.X;
+                _moveEvent.Y = (int)uiPosition.Y;
+                Raise(_moveEvent);
             }
         }
     }

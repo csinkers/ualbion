@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -30,19 +29,16 @@ namespace UAlbion.Formats.Assets.Save
 
         public void Update(MapId mapId, byte x, byte y, IconChangeType type, ushort value)
         {
-            var change = this.FirstOrDefault(c =>
-                c.MapId == mapId &&
-                c.X == x &&
-                c.Y == y &&
-                c.ChangeType == type);
-
-            if (change == null)
+            foreach (var c in this)
             {
-                change = new MapChange { MapId = mapId, X = x, Y = y, ChangeType = type };
-                Add(change);
+                if (c.MapId != mapId || c.X != x || c.Y != y || c.ChangeType != type) 
+                    continue;
+
+                c.Value = value;
+                return;
             }
 
-            change.Value = value;
+            Add(new MapChange { MapId = mapId, X = x, Y = y, ChangeType = type });
         }
     }
 }

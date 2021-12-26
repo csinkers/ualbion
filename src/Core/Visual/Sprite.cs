@@ -11,6 +11,7 @@ namespace UAlbion.Core.Visual
         readonly DrawLayer _layer;
         readonly SpriteKeyFlags _keyFlags;
         readonly Func<IAssetId, ITexture> _loaderFunc;
+        readonly Action<RenderEvent> _dirtyAction;
 
         SpriteLease _sprite;
         Vector3 _position;
@@ -36,19 +37,20 @@ namespace UAlbion.Core.Visual
             Func<IAssetId, ITexture> loaderFunc = null)
         {
             On<BackendChangedEvent>(_ => Dirty = true);
-            On<RenderEvent>(e => UpdateSprite());
+            On<RenderEvent>(_ => UpdateSprite());
             OnAsync<WorldCoordinateSelectEvent, Selection>(Select);
-            On<HoverEvent>(e =>
+            On<HoverEvent>(_ =>
             {
                 if ((Resolve<IEngineSettings>()?.Flags & EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
                     Flags |= SpriteFlags.Highlight;
             });
-            On<BlurEvent>(e =>
+            On<BlurEvent>(_ =>
             {
                 if ((Resolve<IEngineSettings>()?.Flags & EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
                     Flags &= ~SpriteFlags.Highlight;
             });
 
+            _dirtyAction = _ => UpdateSprite();
             Position = position;
             _layer = layer;
             _keyFlags = keyFlags;
@@ -58,8 +60,7 @@ namespace UAlbion.Core.Visual
         }
 
         public IAssetId Id { get; }
-
-        public event EventHandler<SpriteSelectedEventArgs> Selected;
+        public Func<Action<object>, bool> SelectionCallback { get; init; } // Returns true if handled
         static Vector3 Normal => Vector3.UnitZ; // TODO
 
         public Vector3 Position
@@ -115,7 +116,7 @@ namespace UAlbion.Core.Visual
                 if (value == _dirty)
                     return;
 
-                if (value) On<RenderEvent>(e => UpdateSprite());
+                if (value) On<RenderEvent>(_dirtyAction);
                 else Off<RenderEvent>();
 
                 _dirty = value;
@@ -181,21 +182,12 @@ namespace UAlbion.Core.Visual
             if ((Resolve<IEngineSettings>().Flags & EngineFlags.HighlightSelection) != 0)
                 _sprite.UpdateFlags(0, SpriteFlags.Highlight);
 
-            var selected = Selected;
             bool delegated = false;
-            if (selected != null)
-            {
-                var args = new SpriteSelectedEventArgs(x =>
-                    continuation(new Selection(e.Origin, e.Direction, hit.Value.Item1, x)));
-                selected.Invoke(this, args);
-                delegated = args.Handled;
-            }
+            if (SelectionCallback != null)
+                delegated = SelectionCallback(x => continuation(new Selection(e.Origin, e.Direction, hit.Value.Item1, x)));
 
             if (!delegated)
-            {
                 continuation(new Selection(hit.Value.Item2, hit.Value.Item1, this));
-                return true;
-            }
 
             return true;
         }

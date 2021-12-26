@@ -53,9 +53,12 @@ namespace UAlbion.Game.Gui.Controls
         public override Vector2 GetSize()
         {
             Vector2 size = Vector2.Zero;
-            foreach (var child in Children.OfType<IUiElement>().Where(x => x.IsActive))
+            foreach (var child in Children)
             {
-                var childSize = child.GetSize();
+                if (child is not IUiElement { IsActive: true } childElement)
+                    continue;
+
+                var childSize = childElement.GetSize();
                 size.X += childSize.X;
 
                 if (childSize.Y > size.Y)

@@ -5,7 +5,8 @@ using UAlbion.Core.Events;
 namespace UAlbion.Core.Tests
 {
     public class BasicEvent : Event { }
-    public class BasicAsyncEvent : Event, IAsyncEvent<bool> { }
+    public class BasicAsyncEvent : Event, IAsyncEvent { }
+    public class BoolAsyncEvent : Event, IAsyncEvent<bool> { }
 
     public class BasicComponent : Component
     {

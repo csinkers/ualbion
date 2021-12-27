@@ -34,13 +34,13 @@ namespace UAlbion.Core
     {
         Func<TEvent, Action, bool> Callback { get; }
         public AsyncHandler(Func<TEvent, Action, bool> callback, IComponent component) : base(typeof(TEvent), component) => Callback = callback;
-        public override bool Invoke(IEvent e, object continuation) => Callback((TEvent)e, (Action)continuation);
+        public override bool Invoke(IEvent e, object continuation) => Callback((TEvent)e, (Action)continuation ?? DummyContinuation.Instance);
     }
 
     public class AsyncHandler<TEvent, TReturn> : Handler
     {
         Func<TEvent, Action<TReturn>, bool> Callback { get; }
         public AsyncHandler(Func<TEvent, Action<TReturn>, bool> callback, IComponent component) : base(typeof(TEvent), component) => Callback = callback;
-        public override bool Invoke(IEvent e, object continuation) => Callback((TEvent)e, (Action<TReturn>)continuation);
+        public override bool Invoke(IEvent e, object continuation) => Callback((TEvent)e, (Action<TReturn>)continuation ?? DummyContinuation<TReturn>.Instance);
     }
 }

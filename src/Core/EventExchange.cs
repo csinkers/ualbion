@@ -95,9 +95,9 @@ namespace UAlbion.Core
                 subscribers.Add(subscriber);
         }
 
-        public void Raise<T>(T e, object sender) where T : IEvent => RaiseInternal(e, sender, DummyContinuation.Instance);
+        public void Raise<T>(T e, object sender) where T : IEvent => RaiseInternal(e, sender, null);
         public int RaiseAsync(IAsyncEvent e, object sender, Action continuation) => RaiseInternal(e, sender, continuation);
-        public int RaiseAsync<T>(IAsyncEvent e, object sender, Action<T> continuation) => RaiseInternal(e, sender, continuation ?? DummyContinuation<T>.Instance);
+        public int RaiseAsync<T>(IAsyncEvent<T> e, object sender, Action<T> continuation) => RaiseInternal(e, sender, continuation);
 
         int RaiseInternal(IEvent e, object sender, object continuation) // This method is performance critical, memory allocations should be avoided etc.
         {

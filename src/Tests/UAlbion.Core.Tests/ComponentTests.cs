@@ -93,14 +93,16 @@ namespace UAlbion.Core.Tests
         [Fact]
         public void RaiseAsyncTest()
         {
-            var pending2 = new Queue<Action>();
-            var pending3 = new Queue<Action<bool>>();
             var c1 = new BasicComponent();
             var c2 = new BasicComponent();
             var c3 = new BasicComponent();
+            var pending2 = new Queue<Action>();
+            var pending3 = new Queue<Action<bool>>();
+
+            c1.AddHandler<BoolAsyncEvent>(_ => { });
             c1.AddHandler<BasicAsyncEvent>(_ => { });
             c2.AddAsyncHandler<BasicAsyncEvent>((_, c) => { pending2.Enqueue(c); return true; });
-            c3.AddAsyncHandler<BasicAsyncEvent, bool>((_, c) => { pending3.Enqueue(c); return true; });
+            c3.AddAsyncHandler<BoolAsyncEvent, bool>((_, c) => { pending3.Enqueue(c); return true; });
 
             void Check(int seen1, int seen2, int seen3, int handled1, int handled2, int handled3)
             {
@@ -112,32 +114,29 @@ namespace UAlbion.Core.Tests
                 Assert.Equal(handled3, c3.Handled);
             }
 
-            var e = new BasicAsyncEvent();
+            var boolEvent = new BoolAsyncEvent();
+            var nullEvent = new BasicAsyncEvent();
             var ee = new EventExchange(new BasicLogExchange());
 
             ee.Attach(c1);
             ee.Attach(c2);
             ee.Attach(c3);
-            Assert.Equal(0, c1.Seen + c2.Seen + c3.Seen);
-            Assert.Equal(0, c1.Handled + c2.Handled + c3.Handled);
+            Check(0, 0, 0, 0, 0, 0);
 
-            ee.Raise(e, this);
-            Check(1, 1, 1, 1, 0, 0);
-            Assert.Collection(pending2, _ => { });
+            ee.Raise(boolEvent, this);
+
+            Check(1, 0, 1, 1, 0, 0);
+            Assert.Empty(pending2);
             Assert.Collection(pending3, _ => { });
 
-            pending2.Dequeue()();
-            Check(1, 1, 1, 1, 1, 0);
-
             pending3.Dequeue()(true);
-            Check(1, 1, 1, 1, 1, 1);
+            Check(1, 0, 1, 1, 0, 1);
 
-            var recipients = ee.EnumerateRecipients(typeof(BasicAsyncEvent)).ToList();
-            Assert.Collection(recipients,
-                x => Assert.Equal(x, c1),
-                x => Assert.Equal(x, c2),
-                x => Assert.Equal(x, c3)
-            );
+            var recipients = ee.EnumerateRecipients(typeof(BoolAsyncEvent)).ToList();
+            Assert.Collection(recipients, x => Assert.Equal(x, c1), x => Assert.Equal(x, c3) );
+
+            recipients = ee.EnumerateRecipients(typeof(BasicAsyncEvent)).ToList();
+            Assert.Collection(recipients, x => Assert.Equal(x, c1), x => Assert.Equal(x, c2) );
 
             int total = 0;
             int totalTrue = 0;
@@ -148,34 +147,29 @@ namespace UAlbion.Core.Tests
                 if (x) totalTrue++;
             }
 
-            void PlainContinuation()
-            {
-                total++;
-            }
+            void PlainContinuation() => total++;
 
-            Assert.Equal(2, ee.RaiseAsync<bool>(e, this, BoolContinuation)); // 2 async handlers, 1 sync
-            Check(2, 2, 2, 2, 1, 1);
-            pending2.Dequeue()(); // This attempted completion will not register as null cannot be coerced to bool.
-            Check(2, 2, 2, 2, 2, 1);
-            Assert.Equal(0, total);
+            Assert.Equal(1, ee.RaiseAsync(boolEvent, this, BoolContinuation)); // 1 async handler, 1 sync
+            Check(2, 0, 2, 2, 0, 1);
+
             pending3.Dequeue()(true);
-            Check(2, 2, 2, 2, 2, 2);
+            Check(2, 0, 2, 2, 0, 2);
             Assert.Equal(1, total);
             Assert.Equal(1, totalTrue);
 
-            Assert.Equal(1, c3.RaiseAsync(e, PlainContinuation)); // 2 async handlers, 1 sync but c3 is raising so shouldn't receive it.
-            Check(3, 3, 2, 3, 2, 2);
+            Assert.Equal(1, ee.RaiseAsync(boolEvent, this, BoolContinuation)); // 1 async handler, 1 sync
+            Check(3, 0, 3, 3, 0, 2);
+            pending3.Dequeue()(false);
+            Assert.Equal(2, total);
+            Assert.Equal(1, totalTrue);
+            Check(3, 0, 3, 3, 0, 3);
+
+            Assert.Equal(1, c1.RaiseAsync(nullEvent, PlainContinuation)); // 1 async handlers, 1 sync but c1 is raising so shouldn't receive it.
+            Check(3, 1, 3, 3, 0, 3);
             Assert.Empty(pending3);
             pending2.Dequeue()();
-            Check(3, 3, 2, 3, 3, 2);
-            Assert.Equal(2, total);
-
-            Assert.Equal(2, c1.RaiseAsync(e, BoolContinuation)); // 2 async handlers, 1 sync but c1 raises.
-            Check(3, 4, 3, 3, 3, 2);
-            pending2.Dequeue()(); // This attempted completion will not register as null cannot be coerced to bool.
-            Check(3, 4, 3, 3, 4, 2); 
-            pending3.Dequeue()(true);
-            Check(3, 4, 3, 3, 4, 3);
+            Check(3, 1, 3, 3, 1, 3);
+            Assert.Equal(3, total);
         }
 
         [Fact]

@@ -52,10 +52,10 @@ namespace UAlbion.Core
                             switch (queuedEvent)
                             {
                                 case IAsyncEvent<bool> boolEvent:
-                                    _exchange.RaiseAsync<bool>(boolEvent, this, x => { Console.WriteLine($"{boolEvent}: {x}"); });
+                                    _exchange.RaiseAsync(boolEvent, this, x => { Console.WriteLine($"{boolEvent}: {x}"); });
                                     break;
                                 case IAsyncEvent<int> intEvent:
-                                    _exchange.RaiseAsync<int>(intEvent, this, x => { Console.WriteLine($"{intEvent}: {x}"); });
+                                    _exchange.RaiseAsync(intEvent, this, x => { Console.WriteLine($"{intEvent}: {x}"); });
                                     break;
                                 default:
                                     _exchange.Raise(queuedEvent, this);

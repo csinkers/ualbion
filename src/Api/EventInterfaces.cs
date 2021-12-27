@@ -7,7 +7,7 @@ namespace UAlbion.Api
     public interface IEvent { string ToStringNumeric(); }
     public interface IAsyncEvent : IEvent { }
 // ReSharper disable once UnusedTypeParameter
-    public interface IAsyncEvent<T> : IAsyncEvent { }
+    public interface IAsyncEvent<T> : IEvent { }
     public interface IHighlightEvent : IEvent { }
     public interface IVerboseEvent : IEvent { }
     public interface ICancellableEvent : IEvent { bool Propagating { get; set; } }

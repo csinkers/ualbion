@@ -438,7 +438,7 @@ namespace UAlbion.Base.Tests
             Assert.Equal(map.Width * map.Height, map.Contents.Length);
             Assert.Equal(117, map.Contents[212]);
 
-            Assert.Equal(0, map.Automap.Count);
+            Assert.Empty(map.Automap);
 
             Assert.Equal(452, map.Events.Count);
             var en = map.Events[0];

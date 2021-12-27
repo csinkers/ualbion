@@ -26,7 +26,7 @@ namespace UAlbion.Scripting
                 return (true, ushort.Parse(name[ChainPrefix.Length..]));
 
             if (name.StartsWith(FixedEventPrefix))
-                return (true, ushort.Parse(name[FixedEventPrefix.Length..]));
+                return (false, ushort.Parse(name[FixedEventPrefix.Length..]));
 
             return (false, EventNode.UnusedEventId);
         }

@@ -7,7 +7,7 @@ namespace UAlbion.Formats.MapEvents
     [Event("query_unk1e")]
     public class QueryUnk1EEvent : QueryEvent
     {
-        public override QueryType QueryType => QueryType.Unk1;
+        public override QueryType QueryType => QueryType.Unk1E;
         [EventPart("op")] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
         [EventPart("imm")] public byte Immediate { get; private set; } // immediate value?
         [EventPart("arg")] public ushort Argument { get; set; }

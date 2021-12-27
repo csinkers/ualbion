@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using UAlbion.Api;
@@ -67,9 +66,9 @@ namespace UAlbion.Core
         public EventExchange Attach(IComponent component)
         {
             if (component == null) throw new ArgumentNullException(nameof(component));
-            Stopwatch sw = Stopwatch.StartNew();
+            // Stopwatch sw = Stopwatch.StartNew();
             component.Attach(this);
-            PerfTracker.StartupEvent($"Attached {component.GetType().Name} in {sw.ElapsedMilliseconds}ms");
+            // PerfTracker.StartupEvent($"Attached {component.GetType().Name} in {sw.ElapsedMilliseconds}ms");
             return this;
         }
 

@@ -70,7 +70,7 @@ namespace UAlbion.Core.Veldrid.Textures
                     IReadOnlyTexture<byte> eightBit => VeldridTexture.CreateSimpleTexture(device, TextureUsage.Sampled, eightBit),
                     IReadOnlyTexture<uint> trueColor => VeldridTexture.CreateSimpleTexture(
                         device,
-                        TextureUsage.Sampled | ((trueColor.Height == 1) ? 0 : TextureUsage.GenerateMipmaps),
+                        TextureUsage.Sampled, // | ((trueColor.Height == 1) ? 0 : TextureUsage.GenerateMipmaps),
                         trueColor),
                     _ => throw new NotSupportedException($"Image format {texture.GetType().GetGenericArguments()[0].Name} not currently supported")
                 };

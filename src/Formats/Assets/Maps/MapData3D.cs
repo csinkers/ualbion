@@ -12,19 +12,19 @@ namespace UAlbion.Formats.Assets.Maps
     public class MapData3D : BaseMapData
     {
         public override MapType MapType => MapType.ThreeD;
-        [JsonInclude] public Map3DFlags Flags { get; private set; }
-        [JsonInclude] public LabyrinthId LabDataId { get; private set; }
-        [JsonInclude] public SongId AmbientSongId { get; private set; }
+        [JsonInclude] public Map3DFlags Flags { get; set; }
+        [JsonInclude] public LabyrinthId LabDataId { get; set; }
+        [JsonInclude] public SongId AmbientSongId { get; set; }
 
         /// <summary>
         /// These either refer to object-groups, or walls. If the value is below 100, it is an object-group index.
         /// If the value is above 100, then the value is a wall index + 100.
         /// </summary>
-        [JsonInclude] public byte[] Contents { get; private set; }
-        [JsonInclude] public byte[] Floors { get; private set; }
-        [JsonInclude] public byte[] Ceilings { get; private set; }
-        [JsonInclude] public IList<AutomapInfo> Automap { get; private set; } = new List<AutomapInfo>();
-        [JsonInclude] public byte[] AutomapGraphics { get; private set; }
+        [JsonInclude] public byte[] Contents { get; set; }
+        [JsonInclude] public byte[] Floors { get; set; }
+        [JsonInclude] public byte[] Ceilings { get; set; }
+        [JsonInclude] public byte[] AutomapGraphics { get; set; }
+        [JsonInclude] public List<AutomapInfo> Automap { get; set; } = new();
 
         public byte[] BuildWallArray() => Contents.Select(x => (byte)(x >= LabyrinthData.WallOffset ? x - LabyrinthData.WallOffset : 0)).ToArray();
         public byte[] BuildObjectArray() => Contents.Select(x => x < LabyrinthData.WallOffset ? x : (byte)0).ToArray();
@@ -41,6 +41,13 @@ namespace UAlbion.Formats.Assets.Maps
             var contents = Contents[index];
             return contents < LabyrinthData.WallOffset ? contents : (byte)0;
         }
+
+        public MapData3D() { } // For JSON
+        public MapData3D(MapId id,
+            byte width, byte height,
+            IList<EventNode> events, IList<ushort> chains,
+            IEnumerable<MapNpc> npcs,
+            IList<MapEventZone> zones) : base(id, width, height, events, chains, npcs, zones) { }
 
         public static MapData3D Serdes(AssetInfo info, MapData3D existing, AssetMapping mapping, ISerializer s)
         {

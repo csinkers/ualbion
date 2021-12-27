@@ -6,12 +6,12 @@ namespace UAlbion.Formats.Assets.Maps
     {
         Normal = 0, // Most floors, low and centre EW walls
         Layer1 = 2, // Mid EW walls, Overlay1
-        Layer2 = 4, // Overlay2
+        Layer2 = 4, // 
         Layer3 = 6, // NS walls + Overlay3
         Unk8 = 8,
         Unk10 = 10,
-        Unk12 = 12,
-        Unk14 = 14,
+        Unk12 = 12, // Only used for overlay
+        Unk14 = 14, // Only used for overlay
 
         Unused1 = 1,
         Unused3 = 3,

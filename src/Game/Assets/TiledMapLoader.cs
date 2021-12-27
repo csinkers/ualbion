@@ -72,7 +72,7 @@ namespace UAlbion.Game.Assets
             var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
             using var ms = new MemoryStream(bytes);
             var map = Map.Parse(ms);
-            return map.ToAlbion(info, script);
+            return map.ToAlbion(info, script, null);
         }
 
         (byte[], string) Write2D(MapData2D map, AssetInfo info)

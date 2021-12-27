@@ -61,6 +61,12 @@ namespace UAlbion.Formats.Assets.Labyrinth
             }
         }
 
+        public int FrameCountForObjectGroup(int i) =>
+            (int)ApiUtil.Lcm(
+                ObjectGroups[i].SubObjects
+                    .Where(x => x is { ObjectInfoNumber: >= 0 } && x.ObjectInfoNumber < Objects.Count)
+                    .Select(x => (long)Objects[x.ObjectInfoNumber].AnimationFrames));
+
         public static LabyrinthData Serdes(LabyrinthData d, AssetInfo info, AssetMapping mapping, ISerializer s)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));

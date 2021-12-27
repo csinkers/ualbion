@@ -40,6 +40,29 @@ namespace UAlbion.Formats.Assets.Maps
         [JsonIgnore] public IList<object>[] EventReferences { get; private set; }
 #endif
 
+        protected BaseMapData() { }
+        protected BaseMapData(MapId id,
+            byte width, byte height,
+            IList<EventNode> events, IList<ushort> chains,
+            IEnumerable<MapNpc> npcs,
+            IList<MapEventZone> zones)
+        {
+            if (events == null) throw new ArgumentNullException(nameof(events));
+            if (chains == null) throw new ArgumentNullException(nameof(chains));
+            if (npcs == null) throw new ArgumentNullException(nameof(npcs));
+            if (zones == null) throw new ArgumentNullException(nameof(zones));
+
+            Id = id;
+            Width = width;
+            Height = height;
+            Npcs = npcs.ToArray();
+
+            foreach (var e in events) Events.Add(e);
+            foreach (var c in chains) Chains.Add(c);
+            foreach (var z in zones) Zones.Add(z);
+            Unswizzle();
+        }
+
         protected void SerdesZones(ISerializer s)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
@@ -83,6 +106,9 @@ namespace UAlbion.Formats.Assets.Maps
         protected void SerdesChains(ISerializer s, int chainCount)
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
+            while (Chains.Count < chainCount)
+                Chains.Add(EventNode.UnusedEventId);
+
             s.List(nameof(Chains), Chains, chainCount, (_, x, s2) => s2.UInt16(null, x));
             s.Check();
         }
@@ -170,9 +196,16 @@ namespace UAlbion.Formats.Assets.Maps
             if (s.BytesRemaining == 0)
                 return null;
 
+            var mapType = existing switch
+            {
+                MapData2D => MapType.TwoD, // TwoDOutdoors is never written to disk
+                MapData3D => MapType.ThreeD,
+                _ => MapType.Unknown
+            };
+
             var startPosition = s.Offset;
             s.UInt16("DummyRead", 0); // Initial flags + npc count, will be re-read by the 2D/3D specific map loader
-            MapType mapType = s.EnumU8(nameof(mapType), existing?.MapType ?? MapType.Unknown);
+            mapType = s.EnumU8(nameof(mapType), mapType);
             s.Seek(startPosition);
 
             return mapType switch

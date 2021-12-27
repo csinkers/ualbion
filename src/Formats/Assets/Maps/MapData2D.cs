@@ -5,7 +5,6 @@ using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
-using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Maps
 {
@@ -33,23 +32,11 @@ namespace UAlbion.Formats.Assets.Maps
         }
 
         public MapData2D() { } // For JSON
-        public MapData2D(MapId id, byte width, byte height, IList<EventNode> events, IList<ushort> chains, IEnumerable<MapNpc> npcs, IList<MapEventZone> zones)
-        {
-            if (events == null) throw new ArgumentNullException(nameof(events));
-            if (chains == null) throw new ArgumentNullException(nameof(chains));
-            if (npcs == null) throw new ArgumentNullException(nameof(npcs));
-            if (zones == null) throw new ArgumentNullException(nameof(zones));
-
-            Id = id;
-            Width = width;
-            Height = height;
-            Npcs = npcs.ToArray();
-
-            foreach (var e in events) Events.Add(e);
-            foreach (var c in chains) Chains.Add(c);
-            foreach (var z in zones) Zones.Add(z);
-            Unswizzle();
-        }
+        public MapData2D(MapId id,
+            byte width, byte height,
+            IList<EventNode> events, IList<ushort> chains,
+            IEnumerable<MapNpc> npcs,
+            IList<MapEventZone> zones) : base(id, width, height, events, chains, npcs, zones) { }
 
         public static MapData2D Serdes(AssetInfo info, MapData2D existing, AssetMapping mapping, ISerializer s)
         {
@@ -62,7 +49,7 @@ namespace UAlbion.Formats.Assets.Maps
             map.Flags = s.EnumU8(nameof(Flags), map.Flags); // 0
             map.OriginalNpcCount = s.UInt8(nameof(OriginalNpcCount), map.OriginalNpcCount); // 1
             int npcCount = NpcCountTransform.Instance.FromNumeric(map.OriginalNpcCount);
-            var _ = s.UInt8("MapType", (byte)map.MapType); // 2 (always Map2D to start with, may shift to outdoors once we assign the tileset)
+            _ = s.UInt8("MapType", (byte)MapType.TwoD); // 2 (always Map2D to start with, may shift to outdoors once we assign the tileset)
 
             map.SongId = SongId.SerdesU8(nameof(SongId), map.SongId, mapping, s); // 3
             map.Width = s.UInt8(nameof(Width), map.Width); // 4

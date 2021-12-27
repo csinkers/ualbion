@@ -67,9 +67,9 @@ namespace UAlbion.Game.Entities.Map3D
             RemoveAllChildren();
             _relativeSpritePositions.Clear();
 
-            bool floors = mode is IsometricMode.Floors or IsometricMode.All;
+            bool floors   = mode is IsometricMode.Floors or IsometricMode.All;
             bool ceilings = mode is IsometricMode.Ceilings or IsometricMode.All;
-            bool walls = mode is IsometricMode.Walls or IsometricMode.All;
+            bool walls    = mode is IsometricMode.Walls or IsometricMode.All;
             bool contents = mode is IsometricMode.Contents or IsometricMode.All;
 
             paletteNumber ??= info.Get(AssetProperty.PaletteId, 0);
@@ -143,9 +143,10 @@ namespace UAlbion.Game.Entities.Map3D
                     .AddRegion(Vector2.Zero, Vector2.One, 0);
 
                 for (byte i = 1; i <= labyrinthData.ObjectGroups.Count; i++)
+                {
                     _tilemap.DefineWall(i, transparent, 0, 0, 0, true);
-
-                totalTiles += labyrinthData.ObjectGroups.Count;
+                    totalTiles += labyrinthData.FrameCountForObjectGroup(i - 1);
+                }
             }
 
             _wallCount = labyrinthData.Walls.Count;
@@ -243,6 +244,20 @@ namespace UAlbion.Game.Entities.Map3D
                     {
                         _contents[index] = (byte)(i + 100);
                         WallFrames[i].Add(index);
+                        frames[index++] = j;
+                    }
+                }
+            }
+
+            if (contents)
+            {
+                for (byte i = 1; i <= labyrinthData.ObjectGroups.Count; i++)
+                {
+                    int frameCount = labyrinthData.FrameCountForObjectGroup(i - 1);
+                    for (int j = 1; j < frameCount; j++)
+                    {
+                        _contents[index] = i;
+                        ContentsFrames[i].Add(index);
                         frames[index++] = j;
                     }
                 }

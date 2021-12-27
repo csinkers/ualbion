@@ -13,7 +13,7 @@ namespace UAlbion.Formats.Assets.Maps
         public TilesetData(TilesetId id) => Id = id;
         [JsonInclude] public TilesetId Id { get; private set; } // Setter required for JSON
         public bool UseSmallGraphics { get; set; } // Careful if renaming: needs to match up to asset property in assets.json
-        [JsonInclude] public IList<TileData> Tiles { get; private set; } = new List<TileData>();
+        [JsonInclude] public List<TileData> Tiles { get; private set; } = new();
 
         public static TilesetData Serdes(TilesetData td, ISerializer s, AssetInfo info)
         {

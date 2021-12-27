@@ -3,7 +3,7 @@ using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Formats.Exporters.Tiled
 {
-    class TriggerInfo
+    public class TriggerInfo
     {
         public int ObjectId { get; init; }
         public TriggerTypes TriggerType { get; init; }

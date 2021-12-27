@@ -2,8 +2,10 @@
 using System.IO;
 using System.Threading.Tasks;
 using UAlbion.Api;
+using UAlbion.Base;
 using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Magic;
@@ -123,6 +125,22 @@ namespace UAlbion
             var result = GameConfig.Load(Path.Combine(baseDir, "data", "game.json"), disk, jsonUtil);
             PerfTracker.StartupEvent("Loaded game config");
             return result;
+        }
+
+        public static EventExchange SetupSimple(string baseDir)
+        {
+            var jsonUtil = new FormatJsonUtil();
+            var disk = new FileSystem();
+            var coreConfig = new CoreConfig();
+            var generalConfig = LoadGeneralConfig(baseDir, disk, jsonUtil);
+            var gameConfig = LoadGameConfig(baseDir, disk, jsonUtil);
+            var settings = new GeneralSettings
+            {
+                ActiveMods = { "Base" },
+                Language = Language.English
+            };
+
+            return Setup(disk, jsonUtil, generalConfig, settings, coreConfig, gameConfig);
         }
     }
 }

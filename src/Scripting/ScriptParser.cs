@@ -190,6 +190,7 @@ namespace UAlbion.Scripting
                     {
                         (ScriptToken.NewLine, ScriptToken.NewLine) => true,
                         (ScriptToken.NewLine, ScriptToken.RBrace) => true,
+                        (ScriptToken.Comment, _) => true,
                         _ => false
                     };
 

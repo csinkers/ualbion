@@ -57,7 +57,8 @@ namespace UAlbion.Base.Tests
 
         void Test<T>(AssetId id,
             AssetId[] prerequisites,
-            Func<T, ISerializer, T> serdes) where T : class
+            Func<T, ISerializer, T> serdes,
+            Func<T, T> canonicalize = null) where T : class
         {
             prerequisites ??= Array.Empty<AssetId>();
             var allIds = prerequisites.Append(id);
@@ -65,6 +66,9 @@ namespace UAlbion.Base.Tests
             var resultsDir = Path.Combine(_baseDir, "re", "ConversionTests");
 
             var baseAsset = (T)_baseApplier.LoadAsset(id);
+            if (canonicalize != null)
+                baseAsset = canonicalize(baseAsset);
+
             var (baseBytes, baseNotes) = Asset.Save(baseAsset, serdes);
             var baseJson = Asset.SaveJson(baseAsset, JsonUtil);
 
@@ -189,7 +193,11 @@ namespace UAlbion.Base.Tests
         public void EventSetTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(EventSet.Frill) };
-            Test<Formats.Assets.EventSet>(info.AssetId, null, (x, s) => Loaders.EventSetLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            Test<Formats.Assets.EventSet>(
+                info.AssetId,
+                null,
+                (x, s) => Loaders.EventSetLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil),
+                LayoutTestUtil.CanonicalizeEventSet);
         }
 
         [Fact]
@@ -219,15 +227,22 @@ namespace UAlbion.Base.Tests
                     .Concat(large)
                     .ToArray();
 
-            Test<MapData2D>(info.AssetId, prereqs, (x, s) => MapData2D.Serdes(info, x, AssetMapping.Global, s));
+            Test<MapData2D>(
+                info.AssetId,
+                prereqs,
+                (x, s) => MapData2D.Serdes(info, x, AssetMapping.Global, s),
+                LayoutTestUtil.CanonicalizeMap);
         }
-
 
         [Fact]
         public void Map3DTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(Map.OldFormerBuilding) };
-            Test<MapData3D>(info.AssetId, null, (x, s) => MapData3D.Serdes(info, x, AssetMapping.Global, s));
+            Test<MapData3D>(
+                info.AssetId,
+                null,
+                (x, s) => MapData3D.Serdes(info, x, AssetMapping.Global, s),
+                LayoutTestUtil.CanonicalizeMap);
         }
 
         [Fact]

@@ -24,10 +24,10 @@ namespace UAlbion.Formats.Assets.Maps
         public MapId ChainSource { get; set; }
         public ushort Chain { get; set; }
         [JsonIgnore] public IEventNode Node { get; set; }
-        public ushort EventIndex
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)] public ushort EventIndex
         {
             get => Node?.Id ?? 0xffff;
-            set => Node = new DummyEventNode(value);
+            set => Node = value == 0xffff ? null : new DummyEventNode(value);
         }
 
         public static MapNpc Serdes(int index, MapNpc existing, MapType mapType, AssetMapping mapping, ISerializer s)
@@ -89,10 +89,12 @@ namespace UAlbion.Formats.Assets.Maps
             }
         }
 
-        public void Unswizzle(MapId mapId, Func<ushort, IEventNode> getEvent, Func<ushort, ushort> getChain)
+        public void Unswizzle(MapId mapId, int npcNumber, Func<ushort, IEventNode> getEvent, Func<ushort, ushort> getChain)
         {
             if (getEvent == null) throw new ArgumentNullException(nameof(getEvent));
             if (getChain == null) throw new ArgumentNullException(nameof(getChain));
+
+            Index = npcNumber;
             ChainSource = mapId;
             if (Node is DummyEventNode dummy)
             {

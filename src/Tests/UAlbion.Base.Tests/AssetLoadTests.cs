@@ -174,7 +174,7 @@ namespace UAlbion.Base.Tests
         public void EventSetTest()
         {
             var set = Test(assets => assets.LoadEventSet(EventSet.Frill));
-            Assert.Equal(10, set.Chains.Length);
+            Assert.Equal(10, set.Chains.Count);
             Assert.Collection(set.Events.Take(7),
                 x =>
                 {

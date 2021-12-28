@@ -14,10 +14,10 @@ namespace UAlbion.Formats.Assets
         PaletteId PaletteId { get;  }
 
         MapNpc[] Npcs { get; }
-        IList<EventNode> Events { get; }
-        IList<ushort> Chains { get; }
-        IList<MapEventZone> Zones { get; }
-        IDictionary<int, MapEventZone> ZoneLookup { get; }
-        IDictionary<TriggerTypes, MapEventZone[]> ZoneTypeLookup { get; }
+        List<EventNode> Events { get; }
+        List<ushort> Chains { get; }
+        List<MapEventZone> Zones { get; }
+        Dictionary<int, MapEventZone> ZoneLookup { get; }
+        Dictionary<TriggerTypes, MapEventZone[]> ZoneTypeLookup { get; }
     }
 }

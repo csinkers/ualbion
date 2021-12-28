@@ -16,8 +16,13 @@ namespace UAlbion.Formats.Assets.Maps
         public byte Y { get; set; }
         public TriggerTypes Trigger { get; set; }
         [JsonIgnore] public AssetId ChainSource { get; set; }
-        public ushort Chain { get; set; }
+        [JsonIgnore] public ushort Chain { get; set; }
         [JsonIgnore] public IEventNode Node { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)] public ushort EventIndex
+        {
+            get => Node?.Id ?? 0xffff;
+            set => Node = value == 0xffff ? null : new DummyEventNode(value);
+        }
 
         public static MapEventZone Serdes(MapEventZone existing, ISerializer s, byte y)
         {
@@ -49,7 +54,7 @@ namespace UAlbion.Formats.Assets.Maps
             if (getChain == null) throw new ArgumentNullException(nameof(getChain));
             ChainSource = mapId;
             if (Node is DummyEventNode dummy)
-                Node = getEvent(dummy.Id);
+                Node = dummy.Id == EventNode.UnusedEventId ? null : getEvent(dummy.Id);
 
             if (Node != null)
                 Chain = getChain(Node.Id);

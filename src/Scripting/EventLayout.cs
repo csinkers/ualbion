@@ -11,9 +11,13 @@ namespace UAlbion.Scripting
         readonly Dictionary<ushort, (int, int)> _indexToNode = new();
         readonly Dictionary<(int, int), ushort> _nodeToIndex = new();
 
-        EventLayout(IList<ControlFlowGraph> graphs)
+        EventLayout(IList<ControlFlowGraph> graphs) => _graphs = graphs ?? throw new ArgumentNullException(nameof(graphs));
+
+        public EventLayout(List<EventNode> events, List<ushort> chains, List<ushort> extraEntryPoints)
         {
-            _graphs = graphs ?? throw new ArgumentNullException(nameof(graphs));
+            Events = events ?? throw new ArgumentNullException(nameof(events));
+            Chains = chains ?? throw new ArgumentNullException(nameof(chains));
+            ExtraEntryPoints = extraEntryPoints ?? new List<ushort>();
         }
 
         public List<EventNode> Events { get; } = new();
@@ -66,7 +70,6 @@ namespace UAlbion.Scripting
             layout.ExtraEntryPoints.Sort();
             return layout;
         }
-
 
         bool IsEventFree(ushort index) => !_indexToNode.ContainsKey(index);
         bool IsNodeHandled(int graphIndex, int nodeIndex) => _nodeToIndex.ContainsKey((graphIndex, nodeIndex));

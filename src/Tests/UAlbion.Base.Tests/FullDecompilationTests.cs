@@ -474,7 +474,7 @@ namespace UAlbion.Base.Tests
             }
             catch (NotNullException e) { throw new XunitException($"{e.Message} when loading {id}"); }
 
-            if (set.Events.Length == 0)
+            if (set.Events.Count == 0)
                 return;
 
             TestInner(set.Events, set.Chains, Array.Empty<ushort>(), testName);

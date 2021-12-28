@@ -9,7 +9,7 @@ using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Maps
 {
-    public abstract class BaseMapData : IMapData
+    public abstract class BaseMapData : IMapData, IJsonPostDeserialise
     {
         [JsonInclude] public MapId Id { get; protected set; }
         public abstract MapType MapType { get; }
@@ -21,17 +21,17 @@ namespace UAlbion.Formats.Assets.Maps
         [JsonInclude] public byte OriginalNpcCount { get; set; }
         [JsonInclude] public MapNpc[] Npcs { get; protected set; }
 
-        [JsonInclude] public IList<MapEventZone> Zones { get; private set; } = new List<MapEventZone>();
-        [JsonIgnore] public IDictionary<int, MapEventZone> ZoneLookup { get; } = new Dictionary<int, MapEventZone>();
-        [JsonIgnore] public IDictionary<TriggerTypes, MapEventZone[]> ZoneTypeLookup { get; } = new Dictionary<TriggerTypes, MapEventZone[]>();
-        [JsonIgnore] public IList<EventNode> Events { get; private set; } = new List<EventNode>();
-        [JsonInclude] public IList<ushort> Chains { get; private set; } = new List<ushort>();
+        [JsonInclude] public List<MapEventZone> Zones { get; private set; } = new();
+        [JsonIgnore] public Dictionary<int, MapEventZone> ZoneLookup { get; } = new();
+        [JsonIgnore] public Dictionary<TriggerTypes, MapEventZone[]> ZoneTypeLookup { get; } = new();
+        [JsonIgnore] public List<EventNode> Events { get; private set; } = new();
+        [JsonInclude] public List<ushort> Chains { get; private set; } = new();
         public string[] EventStrings // Used for JSON
         {
             get => Events?.Select(x => x.ToString()).ToArray();
             set
             {
-                Events = value?.Select(EventNode.Parse).ToArray() ?? Array.Empty<EventNode>();
+                Events = value?.Select(EventNode.Parse).ToList() ?? new List<EventNode>();
                 foreach (var e in Events)
                     e.Unswizzle(Events);
             }
@@ -130,8 +130,9 @@ namespace UAlbion.Formats.Assets.Maps
             // Use map events if the event number is set, otherwise use the event set from the NPC's character sheet.
             // Note: Event set loading requires IAssetManager, so can't be done directly by UAlbion.Formats code.
             // Instead, the MapManager will call AttachEventSets with a callback to load the event sets.
+            int npcNumber = 0;
             foreach (var npc in Npcs)
-                npc.Unswizzle(Id, x => Events[x], x => chainMapping[x]);
+                npc.Unswizzle(Id, npcNumber++, x => Events[x], x => chainMapping[x]);
 
             foreach (var zone in Zones)
                 zone.Unswizzle(Id, x => Events[x], x => chainMapping[x]);
@@ -215,6 +216,25 @@ namespace UAlbion.Formats.Assets.Maps
                 MapType.ThreeD => MapData3D.Serdes(info, (MapData3D)existing, mapping, s),
                 _ => throw new NotImplementedException($"Unrecognised map type {mapType} found.")
             };
+        }
+
+        public void OnDeserialized() => Unswizzle();
+        public void RemapChains(List<EventNode> events, List<ushort> chains)
+        {
+            foreach (var npc in Npcs)
+                if (npc.Chain != EventNode.UnusedEventId)
+                    npc.EventIndex = chains[npc.Chain];
+
+            foreach (var zone in Zones)
+                if (zone.Chain != EventNode.UnusedEventId)
+                    zone.EventIndex = chains[zone.Chain];
+
+            Events.Clear();
+            Events.AddRange(events);
+            Chains.Clear();
+            Chains.AddRange(chains);
+
+            Unswizzle();
         }
     }
 }

@@ -323,7 +323,7 @@ namespace UAlbion
             sw.WriteLine($"    WordSetId:{c.WordSetId}");
 
             var eventSet = assets.LoadEventSet(c.EventSetId);
-            sw.WriteLine($"    Event Set {c.EventSetId}: {(eventSet == null ? "Not Found" : $"{eventSet.Chains.Length} chains")}");
+            sw.WriteLine($"    Event Set {c.EventSetId}: {(eventSet == null ? "Not Found" : $"{eventSet.Chains.Count} chains")}");
             if (eventSet != null)
             {
                 sw.WriteLine("    Chain Offsets: " + string.Join(", ", eventSet.Chains.Select((x, i) => $"{i}:{x}")));

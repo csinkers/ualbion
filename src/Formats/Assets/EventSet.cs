@@ -11,9 +11,9 @@ namespace UAlbion.Formats.Assets
 {
     public class EventSet
     {
-        public EventSetId Id { get; private set; }
-        [JsonInclude] public ushort[] Chains { get; private set; }
-        [JsonIgnore] public EventNode[] Events { get; private set; }
+        public EventSetId Id { get; private init; }
+        [JsonInclude] public List<ushort> Chains { get; private set; }
+        [JsonIgnore] public List<EventNode> Events { get; private set; }
 
         public EventSet() { }
 
@@ -22,8 +22,8 @@ namespace UAlbion.Formats.Assets
             if (nodes == null) throw new ArgumentNullException(nameof(nodes));
             if (chains == null) throw new ArgumentNullException(nameof(chains));
             Id = id;
-            Events = nodes.ToArray();
-            Chains = chains.ToArray();
+            Events = nodes.ToList();
+            Chains = chains.ToList();
         }
 
         public string[] EventStrings // Used for JSON
@@ -31,7 +31,7 @@ namespace UAlbion.Formats.Assets
             get => Events?.Select(x => x.ToString()).ToArray();
             set
             {
-                Events = value?.Select(EventNode.Parse).ToArray() ?? Array.Empty<EventNode>();
+                Events = value?.Select(EventNode.Parse).ToList() ?? new List<EventNode>();
                 foreach (var e in Events)
                     e.Unswizzle(Events);
             }
@@ -41,19 +41,19 @@ namespace UAlbion.Formats.Assets
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
             set ??= new EventSet { Id = id };
-            var chains = set.Chains;
-            ushort chainCount = s.UInt16("ChainCount", (ushort)(chains?.Length ?? 0));
-            ushort eventCount = s.UInt16("TotalEventCount", (ushort)(set.Events?.Length ?? 0));
+            ushort chainCount = s.UInt16("ChainCount", (ushort)(set.Chains?.Count ?? 0));
+            ushort eventCount = s.UInt16("TotalEventCount", (ushort)(set.Events?.Count ?? 0));
 
-            chains ??= new ushort[chainCount];
-            set.Events ??= new EventNode[eventCount];
+            set.Chains ??= new List<ushort>(chainCount);
+            set.Events ??= new List<EventNode>(eventCount);
+
+            while(set.Chains.Count < chainCount) set.Chains.Add(EventNode.UnusedEventId);
+            while(set.Events.Count < eventCount) set.Events.Add(null);
 
             for (int i = 0; i < chainCount; i++)
-                chains[i] = s.UInt16(null, chains[i]);
+                set.Chains[i] = s.UInt16(null, set.Chains[i]);
 
-            set.Chains = chains;
-
-            for (ushort i = 0; i < set.Events.Length; i++)
+            for (ushort i = 0; i < set.Events.Count; i++)
                 set.Events[i] = MapEvent.SerdesNode(i, set.Events[i], s, id, id.ToEventText(), mapping);
 
             foreach (var e in set.Events)

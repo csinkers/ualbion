@@ -1,10 +1,9 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
-namespace UAlbion.Base
+namespace UAlbion.Base;
+
+public enum Font : byte
 {
-    public enum Font : byte
-    {
-        RegularFont = 1,
-        BoldFont = 2,
-    }
+    RegularFont = 1,
+    BoldFont = 2,
 }

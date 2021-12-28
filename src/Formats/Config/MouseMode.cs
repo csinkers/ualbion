@@ -1,11 +1,10 @@
-﻿namespace UAlbion.Formats.Config
+﻿namespace UAlbion.Formats.Config;
+
+public enum MouseMode
 {
-    public enum MouseMode
-    {
-        Normal,
-        MouseLook,
-        DebugPick,
-        RightButtonHeld,
-        ContextMenu
-    }
+    Normal,
+    MouseLook,
+    DebugPick,
+    RightButtonHeld,
+    ContextMenu
 }

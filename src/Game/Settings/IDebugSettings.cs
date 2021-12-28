@@ -1,7 +1,6 @@
-﻿namespace UAlbion.Game.Settings
+﻿namespace UAlbion.Game.Settings;
+
+public interface IDebugSettings
 {
-    public interface IDebugSettings
-    {
-        DebugFlags DebugFlags { get; }
-    }
+    DebugFlags DebugFlags { get; }
 }

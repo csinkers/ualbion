@@ -1,13 +1,12 @@
 ﻿using UAlbion.Api.Visual;
 
-namespace UAlbion.Core.Visual
+namespace UAlbion.Core.Visual;
+
+public interface IPaletteManager
 {
-    public interface IPaletteManager
-    {
-        IPalette Palette { get; }
-        IReadOnlyTexture<uint> PaletteTexture { get; }
-        int Version { get; }
-        int Frame { get; }
-        float PaletteBlend { get; }
-    }
+    IPalette Palette { get; }
+    IReadOnlyTexture<uint> PaletteTexture { get; }
+    int Version { get; }
+    int Frame { get; }
+    float PaletteBlend { get; }
 }

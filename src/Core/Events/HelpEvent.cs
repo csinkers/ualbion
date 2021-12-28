@@ -1,16 +1,15 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Core.Events
-{
-    [Event("help", "Display help on the available console commands.", "?", "usage")]
-    public class HelpEvent : Event
-    {
-        public HelpEvent(string commandName)
-        {
-            CommandName = commandName;
-        }
+namespace UAlbion.Core.Events;
 
-        [EventPart("command", true)]
-        public string CommandName { get; }
+[Event("help", "Display help on the available console commands.", "?", "usage")]
+public class HelpEvent : Event
+{
+    public HelpEvent(string commandName)
+    {
+        CommandName = commandName;
     }
+
+    [EventPart("command", true)]
+    public string CommandName { get; }
 }

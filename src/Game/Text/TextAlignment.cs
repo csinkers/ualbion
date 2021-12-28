@@ -1,10 +1,9 @@
-﻿namespace UAlbion.Game.Text
+﻿namespace UAlbion.Game.Text;
+
+public enum TextAlignment
 {
-    public enum TextAlignment
-    {
-        Left,
-        Center,
-        Justified,
-        Right
-    }
+    Left,
+    Center,
+    Justified,
+    Right
 }

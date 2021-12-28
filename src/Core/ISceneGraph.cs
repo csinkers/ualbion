@@ -3,13 +3,12 @@ using System.Numerics;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 
-namespace UAlbion.Core
+namespace UAlbion.Core;
+
+public interface ISceneGraph
 {
-    public interface ISceneGraph
-    {
-        void Add(IPositioned entity);
-        void Remove(IPositioned entity);
-        void RayIntersect(Vector3 origin, Vector3 direction, List<Selection> hits);
-        void FrustumIntersect(Matrix4x4 frustum, List<IPositioned> hits);
-    }
+    void Add(IPositioned entity);
+    void Remove(IPositioned entity);
+    void RayIntersect(Vector3 origin, Vector3 direction, List<Selection> hits);
+    void FrustumIntersect(Matrix4x4 frustum, List<IPositioned> hits);
 }

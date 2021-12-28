@@ -1,9 +1,8 @@
-﻿namespace UAlbion.Formats.MapEvents
+﻿namespace UAlbion.Formats.MapEvents;
+
+public enum LightingLevel : ushort
 {
-    public enum LightingLevel : ushort
-    {
-        Normal = 0,
-        NeedTorch = 1,
-        FadeFromBlack = 2
-    }
+    Normal = 0,
+    NeedTorch = 1,
+    FadeFromBlack = 2
 }

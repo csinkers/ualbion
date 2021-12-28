@@ -1,10 +1,9 @@
-﻿namespace UAlbion.Api.Visual
+﻿namespace UAlbion.Api.Visual;
+
+public enum TextureDirtyType
 {
-    public enum TextureDirtyType
-    {
-        None,
-        All,
-        Region,
-        Layer
-    }
+    None,
+    All,
+    Region,
+    Layer
 }

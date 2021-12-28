@@ -7,29 +7,28 @@ using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 using Veldrid;
 
-namespace UAlbion.Game.Veldrid.Input
+namespace UAlbion.Game.Veldrid.Input;
+
+public class ExclusiveMouseMode : Component
 {
-    public class ExclusiveMouseMode : Component
+    readonly List<Selection> _hits = new();
+    public ExclusiveMouseMode() => On<InputEvent>(OnInput);
+
+    void OnInput(InputEvent e)
     {
-        readonly List<Selection> _hits = new();
-        public ExclusiveMouseMode() => On<InputEvent>(OnInput);
+        _hits.Clear();
+        Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, true);
 
-        void OnInput(InputEvent e)
+        if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && !x.Down))
         {
-            _hits.Clear();
-            Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, true);
+            Raise(new UiLeftReleaseEvent());
+            Raise(new MouseModeEvent(MouseMode.Normal));
+        }
 
-            if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && !x.Down))
-            {
-                Raise(new UiLeftReleaseEvent());
-                Raise(new MouseModeEvent(MouseMode.Normal));
-            }
-
-            if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && !x.Down))
-            {
-                Raise(new UiRightReleaseEvent());
-                Raise(new MouseModeEvent(MouseMode.Normal));
-            }
+        if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && !x.Down))
+        {
+            Raise(new UiRightReleaseEvent());
+            Raise(new MouseModeEvent(MouseMode.Normal));
         }
     }
 }

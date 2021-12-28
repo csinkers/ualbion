@@ -1,9 +1,8 @@
-﻿namespace UAlbion.Formats.MapEvents
+﻿namespace UAlbion.Formats.MapEvents;
+
+public enum SimpleChestItemType : byte
 {
-    public enum SimpleChestItemType : byte
-    {
-        Item = 0,
-        Gold = 1,
-        Rations = 2
-    }
+    Item = 0,
+    Gold = 1,
+    Rations = 2
 }

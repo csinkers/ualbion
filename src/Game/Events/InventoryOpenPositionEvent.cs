@@ -1,11 +1,10 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Game.Events
+namespace UAlbion.Game.Events;
+
+[Event("inv:open_pos", "Opens the inventory screen for the character in the given status bar position")]
+public class InventoryOpenPositionEvent : GameEvent
 {
-    [Event("inv:open_pos", "Opens the inventory screen for the character in the given status bar position")]
-    public class InventoryOpenPositionEvent : GameEvent
-    {
-        public InventoryOpenPositionEvent(int position) => Position = position;
-        [EventPart("position")] public int Position { get; }
-    }
+    public InventoryOpenPositionEvent(int position) => Position = position;
+    [EventPart("position")] public int Position { get; }
 }

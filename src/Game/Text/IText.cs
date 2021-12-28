@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace UAlbion.Game.Text
+namespace UAlbion.Game.Text;
+
+public interface IText
 {
-    public interface IText
-    {
-        int Version { get; }
-        IEnumerable<TextBlock> GetBlocks();
-    }
+    int Version { get; }
+    IEnumerable<TextBlock> GetBlocks();
 }

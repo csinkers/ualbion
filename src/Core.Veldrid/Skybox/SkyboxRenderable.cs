@@ -5,56 +5,55 @@ using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 
-namespace UAlbion.Core.Veldrid.Skybox
+namespace UAlbion.Core.Veldrid.Skybox;
+
+public sealed class SkyboxRenderable : Component, ISkybox
 {
-    public sealed class SkyboxRenderable : Component, ISkybox
+    readonly SkyboxManager _manager;
+    readonly SingleBuffer<SkyboxUniformInfo> _uniformBuffer;
+
+    internal SkyboxRenderable(ITextureHolder texture, ISamplerHolder sampler, SkyboxManager manager)
     {
-        readonly SkyboxManager _manager;
-        readonly SingleBuffer<SkyboxUniformInfo> _uniformBuffer;
+        if (texture == null) throw new ArgumentNullException(nameof(texture));
+        if (sampler == null) throw new ArgumentNullException(nameof(sampler));
+        _manager = manager;
 
-        internal SkyboxRenderable(ITextureHolder texture, ISamplerHolder sampler, SkyboxManager manager)
+        _uniformBuffer = new SingleBuffer<SkyboxUniformInfo>(new SkyboxUniformInfo(), BufferUsage.UniformBuffer, "SpriteUniformBuffer");
+        ResourceSet = new SkyboxResourceSet
         {
-            if (texture == null) throw new ArgumentNullException(nameof(texture));
-            if (sampler == null) throw new ArgumentNullException(nameof(sampler));
-            _manager = manager;
+            Name = $"RS_Sky:{texture.Name}",
+            Texture = texture,
+            Sampler = sampler,
+            Uniform = _uniformBuffer
+        };
 
-            _uniformBuffer = new SingleBuffer<SkyboxUniformInfo>(new SkyboxUniformInfo(), BufferUsage.UniformBuffer, "SpriteUniformBuffer");
-            ResourceSet = new SkyboxResourceSet
+        AttachChild(_uniformBuffer);
+        AttachChild(ResourceSet);
+
+        On<EngineUpdateEvent>(_ =>
+        {
+            var config = Resolve<CoreConfig>().Visual.Skybox;
+            if (Resolve<ICamera>() is not PerspectiveCamera camera)
+                return;
+
+            _uniformBuffer.Data = new SkyboxUniformInfo
             {
-                Name = $"RS_Sky:{texture.Name}",
-                Texture = texture,
-                Sampler = sampler,
-                Uniform = _uniformBuffer
+                uYaw = camera.Yaw,
+                uPitch = camera.Pitch,
+                uVisibleProportion = config.VisibleProportion
             };
+        });
 
-            AttachChild(_uniformBuffer);
-            AttachChild(ResourceSet);
+    }
 
-            On<EngineUpdateEvent>(_ =>
-            {
-                var config = Resolve<CoreConfig>().Visual.Skybox;
-                if (Resolve<ICamera>() is not PerspectiveCamera camera)
-                    return;
+    public string Name => ResourceSet.Texture.Name;
+    public DrawLayer RenderOrder => DrawLayer.Background;
+    internal SkyboxResourceSet ResourceSet { get; }
 
-                _uniformBuffer.Data = new SkyboxUniformInfo
-                {
-                    uYaw = camera.Yaw,
-                    uPitch = camera.Pitch,
-                    uVisibleProportion = config.VisibleProportion
-                };
-            });
-
-        }
-
-        public string Name => ResourceSet.Texture.Name;
-        public DrawLayer RenderOrder => DrawLayer.Background;
-        internal SkyboxResourceSet ResourceSet { get; }
-
-        public void Dispose()
-        {
-            _uniformBuffer?.Dispose();
-            ResourceSet?.Dispose();
-            _manager.DisposeSkybox(this);
-        }
+    public void Dispose()
+    {
+        _uniformBuffer?.Dispose();
+        ResourceSet?.Dispose();
+        _manager.DisposeSkybox(this);
     }
 }

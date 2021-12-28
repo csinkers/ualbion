@@ -1,9 +1,8 @@
-﻿namespace UAlbion.Config
+﻿namespace UAlbion.Config;
+
+public class Position2D
 {
-    public class Position2D
-    {
-        public float X { get; set; }
-        public float Y { get; set; }
-        public override string ToString() => $"<{X}, {Y}>";
-    }
+    public float X { get; set; }
+    public float Y { get; set; }
+    public override string ToString() => $"<{X}, {Y}>";
 }

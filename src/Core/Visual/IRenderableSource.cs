@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace UAlbion.Core.Visual
+namespace UAlbion.Core.Visual;
+
+public interface IRenderableSource
 {
-    public interface IRenderableSource
-    {
-        void Collect(List<IRenderable> renderables);
-    }
+    void Collect(List<IRenderable> renderables);
 }

@@ -1,10 +1,9 @@
-﻿namespace UAlbion.Core
+﻿namespace UAlbion.Core;
+
+public interface IEngine : IComponent
 {
-    public interface IEngine : IComponent
-    {
-        void Run();
-        string FrameTimeText { get; }
-        bool IsDepthRangeZeroToOne { get; }
-        bool IsClipSpaceYInverted { get; }
-    }
+    void Run();
+    string FrameTimeText { get; }
+    bool IsDepthRangeZeroToOne { get; }
+    bool IsClipSpaceYInverted { get; }
 }

@@ -1,11 +1,10 @@
 ﻿using System;
 using UAlbion.Api;
 
-namespace UAlbion.Game.Events
+namespace UAlbion.Game.Events;
+
+public class SetTimeEvent : GameEvent, IVerboseEvent
 {
-    public class SetTimeEvent : GameEvent, IVerboseEvent
-    {
-        public SetTimeEvent(DateTime time) => Time = time;
-        public DateTime Time { get; }
-    }
+    public SetTimeEvent(DateTime time) => Time = time;
+    public DateTime Time { get; }
 }

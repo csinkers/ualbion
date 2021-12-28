@@ -1,8 +1,7 @@
-﻿namespace UAlbion.Core
+﻿namespace UAlbion.Core;
+
+public interface IContainer
 {
-    public interface IContainer
-    {
-        IContainer Add(IComponent child);
-        void Remove(IComponent child);
-    }
+    IContainer Add(IComponent child);
+    void Remove(IComponent child);
 }

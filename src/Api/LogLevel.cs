@@ -1,11 +1,10 @@
-﻿namespace UAlbion.Api
+﻿namespace UAlbion.Api;
+
+public enum LogLevel
 {
-    public enum LogLevel
-    {
-        Verbose,
-        Info,
-        Warning,
-        Error,
-        Critical
-    }
+    Verbose,
+    Info,
+    Warning,
+    Error,
+    Critical
 }

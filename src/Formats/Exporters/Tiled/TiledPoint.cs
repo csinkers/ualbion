@@ -1,8 +1,7 @@
-﻿namespace UAlbion.Formats.Exporters.Tiled
+﻿namespace UAlbion.Formats.Exporters.Tiled;
+
+public sealed class TiledPoint
 {
-    public sealed class TiledPoint
-    {
-        TiledPoint() { }
-        public static TiledPoint Instance => new();
-    }
+    TiledPoint() { }
+    public static TiledPoint Instance => new();
 }

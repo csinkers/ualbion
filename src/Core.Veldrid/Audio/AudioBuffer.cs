@@ -1,42 +1,41 @@
 ﻿using System;
 using OpenAL;
 
-namespace UAlbion.Core.Veldrid.Audio
+namespace UAlbion.Core.Veldrid.Audio;
+
+public abstract class AudioBuffer : AudioObject, IDisposable
 {
-    public abstract class AudioBuffer : AudioObject, IDisposable
+    public int SamplingRate { get; }
+    public DateTime LastUpdatedDateTime { get; protected set; }
+    public int LastUpdatedMs => (int)(DateTime.Now - LastUpdatedDateTime).TotalMilliseconds;
+    public int LastSize { get; protected set; }
+
+    internal readonly uint Buffer;
+    bool _disposed;
+
+    protected AudioBuffer(int samplingRate)
     {
-        public int SamplingRate { get; }
-        public DateTime LastUpdatedDateTime { get; protected set; }
-        public int LastUpdatedMs => (int)(DateTime.Now - LastUpdatedDateTime).TotalMilliseconds;
-        public int LastSize { get; protected set; }
+        SamplingRate = samplingRate;
+        AL10.alGenBuffers(1, out Buffer);
+        Check();
+        LastUpdatedDateTime = DateTime.Now;
+    }
 
-        internal readonly uint Buffer;
-        bool _disposed;
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
-        protected AudioBuffer(int samplingRate)
-        {
-            SamplingRate = samplingRate;
-            AL10.alGenBuffers(1, out Buffer);
-            Check();
-            LastUpdatedDateTime = DateTime.Now;
-        }
+    ~AudioBuffer() => Dispose(false);
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+            return;
 
-        ~AudioBuffer() => Dispose(false);
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-                return;
-
-            AL10.alDeleteBuffers(1, new[] { Buffer });
-            Check();
-            _disposed = true;
-        }
+        AL10.alDeleteBuffers(1, new[] { Buffer });
+        Check();
+        _disposed = true;
     }
 }

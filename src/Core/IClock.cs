@@ -1,8 +1,7 @@
-﻿namespace UAlbion.Core
+﻿namespace UAlbion.Core;
+
+public interface IClock
 {
-    public interface IClock
-    {
-        float ElapsedTime { get; }
-        bool IsRunning { get; }
-    }
+    float ElapsedTime { get; }
+    bool IsRunning { get; }
 }

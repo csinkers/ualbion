@@ -3,13 +3,12 @@ using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Veldrid;
+
+public interface IRenderPass
 {
-    public interface IRenderPass
-    {
-        void Render(GraphicsDevice device, CommandList cl);
-        IFramebufferHolder Framebuffer { get; }
-        RenderPass AddRenderer(IRenderer renderer, params Type[] types);
-        RenderPass AddSource(IRenderableSource source);
-    }
+    void Render(GraphicsDevice device, CommandList cl);
+    IFramebufferHolder Framebuffer { get; }
+    RenderPass AddRenderer(IRenderer renderer, params Type[] types);
+    RenderPass AddSource(IRenderableSource source);
 }

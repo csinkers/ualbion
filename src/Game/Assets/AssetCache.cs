@@ -6,61 +6,60 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Game.Events;
 
-namespace UAlbion.Game.Assets
+namespace UAlbion.Game.Assets;
+
+public class AssetCache : Component
 {
-    public class AssetCache : Component
+    readonly object _syncRoot = new();
+    readonly Dictionary<AssetId, WeakReference> _cache = new();
+
+    public AssetCache()
     {
-        readonly object _syncRoot = new();
-        readonly Dictionary<AssetId, WeakReference> _cache = new();
-
-        public AssetCache()
-        {
-            On<CycleCacheEvent>(_ =>
-            {
-                lock (_syncRoot)
-                {
-                    foreach (var key in _cache.Keys.ToList())
-                    {
-                        var weakRef = _cache[key];
-                        if (weakRef.Target == null)
-                            _cache.Remove(key);
-                    }
-                }
-
-            });
-            On<ReloadAssetsEvent>(_ => { lock (_syncRoot) { _cache.Clear(); } });
-            On<AssetStatsEvent>(_ =>
-            {
-                var sb = new StringBuilder();
-                sb.AppendLine("Asset Statistics:");
-                lock (_syncRoot)
-                {
-                    var countByType = _cache.Keys
-                        .GroupBy(x => x.Type)
-                        .Select(x => (x.Key, x.Count()))
-                        .OrderBy(x => x.Key.ToString());
-
-                    foreach(var (type, count) in countByType)
-                        sb.AppendLine($"    {type}: {count} items");
-                }
-                Info(sb.ToString());
-            });
-        }
-
-        public object Get(AssetId key)
+        On<CycleCacheEvent>(_ =>
         {
             lock (_syncRoot)
             {
-                return _cache.TryGetValue(key, out var cachedAsset) ? cachedAsset.Target : null;
+                foreach (var key in _cache.Keys.ToList())
+                {
+                    var weakRef = _cache[key];
+                    if (weakRef.Target == null)
+                        _cache.Remove(key);
+                }
             }
-        }
 
-        public void Add(object asset, AssetId key)
+        });
+        On<ReloadAssetsEvent>(_ => { lock (_syncRoot) { _cache.Clear(); } });
+        On<AssetStatsEvent>(_ =>
         {
+            var sb = new StringBuilder();
+            sb.AppendLine("Asset Statistics:");
             lock (_syncRoot)
             {
-                _cache[key] = new WeakReference(asset);
+                var countByType = _cache.Keys
+                    .GroupBy(x => x.Type)
+                    .Select(x => (x.Key, x.Count()))
+                    .OrderBy(x => x.Key.ToString());
+
+                foreach(var (type, count) in countByType)
+                    sb.AppendLine($"    {type}: {count} items");
             }
+            Info(sb.ToString());
+        });
+    }
+
+    public object Get(AssetId key)
+    {
+        lock (_syncRoot)
+        {
+            return _cache.TryGetValue(key, out var cachedAsset) ? cachedAsset.Target : null;
+        }
+    }
+
+    public void Add(object asset, AssetId key)
+    {
+        lock (_syncRoot)
+        {
+            _cache[key] = new WeakReference(asset);
         }
     }
 }

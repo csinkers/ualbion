@@ -1,11 +1,10 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
-namespace UAlbion.Base
+namespace UAlbion.Base;
+
+public enum DungeonBackground : ushort
 {
-    public enum DungeonBackground : ushort
-    {
-        EarlyGameS = 1,
-        EarlyGameL = 2,
-        LateGame = 3,
-    }
+    EarlyGameS = 1,
+    EarlyGameL = 2,
+    LateGame = 3,
 }

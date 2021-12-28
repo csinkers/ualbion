@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace UAlbion.TestCommon
+namespace UAlbion.TestCommon;
+
+public class MockDisposable : IDisposable
 {
-    public class MockDisposable : IDisposable
-    {
-        public void Dispose() { }
-    }
+    public void Dispose() { }
 }

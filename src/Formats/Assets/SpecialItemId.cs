@@ -1,9 +1,8 @@
-﻿namespace UAlbion.Formats.Assets
+﻿namespace UAlbion.Formats.Assets;
+
+public enum SpecialItemId : byte
 {
-    public enum SpecialItemId : byte
-    {
-        Compass = 0,
-        MonsterEye = 1,
-        Clock = 3
-    }
+    Compass = 0,
+    MonsterEye = 1,
+    Clock = 3
 }

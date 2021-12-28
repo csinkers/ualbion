@@ -1,90 +1,90 @@
 using System;
 using System.Numerics;
 
-namespace UAlbion.Core
+namespace UAlbion.Core;
+
+public static class MatrixUtil
 {
-    public static class MatrixUtil
+    public static Vector4[] Print(this Matrix4x4 m) =>
+        new[]
+        {
+            new Vector4(m.M11, m.M12, m.M13, m.M14),
+            new Vector4(m.M21, m.M22, m.M23, m.M24),
+            new Vector4(m.M31, m.M32, m.M33, m.M34),
+            new Vector4(m.M41, m.M42, m.M43, m.M44),
+        };
+
+    public static Matrix4x4 CreatePerspective(
+        bool isClipSpaceYInverted,
+        bool useReverseDepth,
+        bool depthZeroToOne,
+        float fov,
+        float aspectRatio,
+        float near, float far)
     {
-        public static Vector4[] Print(this Matrix4x4 m) =>
-            new[]
-            {
-                new Vector4(m.M11, m.M12, m.M13, m.M14),
-                new Vector4(m.M21, m.M22, m.M23, m.M24),
-                new Vector4(m.M31, m.M32, m.M33, m.M34),
-                new Vector4(m.M41, m.M42, m.M43, m.M44),
-            };
+        var persp = useReverseDepth
+            ? CreatePerspective(depthZeroToOne, fov, aspectRatio, far, near)
+            : CreatePerspective(depthZeroToOne, fov, aspectRatio, near, far);
 
-        public static Matrix4x4 CreatePerspective(
-            bool isClipSpaceYInverted,
-            bool useReverseDepth,
-            bool depthZeroToOne,
-            float fov,
-            float aspectRatio,
-            float near, float far)
+        if (isClipSpaceYInverted)
         {
-            var persp = useReverseDepth
-                ? CreatePerspective(depthZeroToOne, fov, aspectRatio, far, near)
-                : CreatePerspective(depthZeroToOne, fov, aspectRatio, near, far);
-
-            if (isClipSpaceYInverted)
-            {
-                persp *= new Matrix4x4(
-                    1, 0, 0, 0,
-                    0, -1, 0, 0,
-                    0, 0, 1, 0,
-                    0, 0, 0, 1);
-            }
-
-            return persp;
-        }
-
-        public static Matrix4x4 CreateLegacyPerspective(
-            bool isClipSpaceYInverted,
-            bool useReverseDepth,
-            bool depthZeroToOne,
-            float fov,
-            float aspectRatio,
-            float near, float far,
-            float pitch)
-        {
-            var persp = CreatePerspective(isClipSpaceYInverted, useReverseDepth, depthZeroToOne, fov, aspectRatio, near, far);
-
             persp *= new Matrix4x4(
                 1, 0, 0, 0,
-                0, 1, 0, 0,
+                0, -1, 0, 0,
                 0, 0, 1, 0,
-                0, -MathF.Tan(pitch) / MathF.Tan(fov * 0.5f), 0, 1);
-
-            return persp;
+                0, 0, 0, 1);
         }
 
-        static Matrix4x4 CreatePerspective(bool depthZeroToOne, float fov, float aspectRatio, float near, float far)
+        return persp;
+    }
+
+    public static Matrix4x4 CreateLegacyPerspective(
+        bool isClipSpaceYInverted,
+        bool useReverseDepth,
+        bool depthZeroToOne,
+        float fov,
+        float aspectRatio,
+        float near, float far,
+        float pitch)
+    {
+        var persp = CreatePerspective(isClipSpaceYInverted, useReverseDepth, depthZeroToOne, fov, aspectRatio, near, far);
+
+        persp *= new Matrix4x4(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, -MathF.Tan(pitch) / MathF.Tan(fov * 0.5f), 0, 1);
+
+        return persp;
+    }
+
+    static Matrix4x4 CreatePerspective(bool depthZeroToOne, float fov, float aspectRatio, float near, float far)
+    {
+        if (fov <= 0.0f || fov >= MathF.PI) throw new ArgumentOutOfRangeException(nameof(fov));
+        if (near <= 0.0f) throw new ArgumentOutOfRangeException(nameof(near));
+        if (far <= 0.0f) throw new ArgumentOutOfRangeException(nameof(far));
+
+        float yScale = 1.0f / MathF.Tan(fov * 0.5f);
+        float xScale = yScale / aspectRatio;
+        var negFarRange = float.IsPositiveInfinity(far) ? -1.0f : far / (near - far);
+
+        if (depthZeroToOne)
         {
-            if (fov <= 0.0f || fov >= MathF.PI) throw new ArgumentOutOfRangeException(nameof(fov));
-            if (near <= 0.0f) throw new ArgumentOutOfRangeException(nameof(near));
-            if (far <= 0.0f) throw new ArgumentOutOfRangeException(nameof(far));
-
-            float yScale = 1.0f / MathF.Tan(fov * 0.5f);
-            float xScale = yScale / aspectRatio;
-            var negFarRange = float.IsPositiveInfinity(far) ? -1.0f : far / (near - far);
-
-            if (depthZeroToOne)
-            {
-                return new Matrix4x4(
-                    xScale, 0, 0, 0,
-                    0, yScale, 0, 0,
-                    0, 0, negFarRange, -1.0f,
-                    0, 0, near * negFarRange, 0);
-            }
-            else
-            {
-                // TODO
-                return new Matrix4x4(
-                    xScale, 0, 0, 0,
-                    0, yScale, 0, 0,
-                    0, 0, negFarRange, -1.0f,
-                    0, 0, near * negFarRange, 0);
-            }
+            return new Matrix4x4(
+                xScale, 0, 0, 0,
+                0, yScale, 0, 0,
+                0, 0, negFarRange, -1.0f,
+                0, 0, near * negFarRange, 0);
+        }
+        else
+        {
+            // TODO
+            return new Matrix4x4(
+                xScale, 0, 0, 0,
+                0, yScale, 0, 0,
+                0, 0, negFarRange, -1.0f,
+                0, 0, near * negFarRange, 0);
+        }
 
 /*
     z' = z * m22 + 1 * m23
@@ -102,6 +102,5 @@ namespace UAlbion.Core
 
     For [-1..1]
 */
-        }
     }
 }

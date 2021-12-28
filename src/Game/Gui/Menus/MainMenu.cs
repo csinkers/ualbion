@@ -5,119 +5,118 @@ using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.State;
 
-namespace UAlbion.Game.Gui.Menus
+namespace UAlbion.Game.Gui.Menus;
+
+public class MainMenu : Dialog
 {
-    public class MainMenu : Dialog
+    public MainMenu() : base(DialogPositioning.Center)
     {
-        public MainMenu() : base(DialogPositioning.Center)
+        On<CloseWindowEvent>(e => Raise(new PopSceneEvent()));
+    }
+
+    protected override void Subscribed()
+    {
+        RemoveAllChildren();
+
+        var state = Resolve<IGameState>();
+        var elements = new List<IUiElement>
         {
-            On<CloseWindowEvent>(e => Raise(new PopSceneEvent()));
-        }
+            new Spacing(0, 2),
+            new HorizontalStack(new Spacing(5, 0), new BoldHeader((TextId)Base.SystemText.MainMenu_MainMenu), new Spacing(5, 0)),
+            new Divider(CommonColor.Yellow3),
+            new Spacing(0, 2),
+        };
 
-        protected override void Subscribed()
+        if (state.Loaded)
         {
-            RemoveAllChildren();
-
-            var state = Resolve<IGameState>();
-            var elements = new List<IUiElement>
-            {
-                new Spacing(0, 2),
-                new HorizontalStack(new Spacing(5, 0), new BoldHeader((TextId)Base.SystemText.MainMenu_MainMenu), new Spacing(5, 0)),
-                new Divider(CommonColor.Yellow3),
-                new Spacing(0, 2),
-            };
-
-            if (state.Loaded)
-            {
-                elements.AddRange(new IUiElement[]
-                {
-                    new Button(Base.SystemText.MainMenu_ContinueGame).OnClick(Continue),
-                    new Spacing(0, 4),
-                });
-            }
-
             elements.AddRange(new IUiElement[]
             {
-                new Button(Base.SystemText.MainMenu_NewGame).OnClick(NewGame),
-                new Button(Base.SystemText.MainMenu_LoadGame).OnClick(LoadGame),
+                new Button(Base.SystemText.MainMenu_ContinueGame).OnClick(Continue),
+                new Spacing(0, 4),
             });
-
-            if (state.Loaded)
-                elements.Add(new Button(Base.SystemText.MainMenu_SaveGame).OnClick(SaveGame));
-
-            elements.AddRange(new IUiElement[]
-            {
-                new Spacing(0,4),
-                new Button(Base.SystemText.MainMenu_Options).OnClick(Options),
-                new Button(Base.SystemText.MainMenu_ViewIntro),
-                new Button(Base.SystemText.MainMenu_Credits),
-                new Spacing(0,3),
-                new Button(Base.SystemText.MainMenu_QuitGame).OnClick(QuitGame),
-                new Spacing(0,2),
-            });
-
-            var stack = new VerticalStack(elements);
-            AttachChild(new DialogFrame(stack));
         }
 
-        void Continue()
+        elements.AddRange(new IUiElement[]
         {
-            Raise(new PopSceneEvent());
-        }
+            new Button(Base.SystemText.MainMenu_NewGame).OnClick(NewGame),
+            new Button(Base.SystemText.MainMenu_LoadGame).OnClick(LoadGame),
+        });
 
-        void NewGame()
-        {
-            var e = new YesNoPromptEvent((TextId)Base.SystemText.MainMenu_DoYouReallyWantToStartANewGame);
-            var exchange = Exchange;
-            RaiseAsync(e, response =>
-            {
-                Attach(exchange);
-                if (response)
-                    Raise(new NewGameEvent(Base.Map.TorontoBegin, 30, 75)); // TODO: Move this to config?
-            });
-            Detach();
-        }
+        if (state.Loaded)
+            elements.Add(new Button(Base.SystemText.MainMenu_SaveGame).OnClick(SaveGame));
 
-        void LoadGame()
+        elements.AddRange(new IUiElement[]
         {
-            var menu = new PickSaveSlotMenu(false, (TextId)Base.SystemText.MainMenu_WhichSavedGameDoYouWantToLoad, 1);
-            var exchange = Exchange;
-            menu.Closed += (args, id) =>
-            {
-                Attach(exchange);
-                if (id.HasValue)
-                    Raise(new LoadGameEvent(id.Value));
-            };
-            Exchange.Attach(menu);
-            Detach();
-        }
+            new Spacing(0,4),
+            new Button(Base.SystemText.MainMenu_Options).OnClick(Options),
+            new Button(Base.SystemText.MainMenu_ViewIntro),
+            new Button(Base.SystemText.MainMenu_Credits),
+            new Spacing(0,3),
+            new Button(Base.SystemText.MainMenu_QuitGame).OnClick(QuitGame),
+            new Spacing(0,2),
+        });
 
-        void SaveGame()
-        {
-            var menu = new PickSaveSlotMenu(true, (TextId)Base.SystemText.MainMenu_SaveOnWhichPosition, 1);
-            var exchange = Exchange;
-            menu.Closed += (args, _) =>
-            {
-                Attach(exchange);
-                // TODO: Prompt user for new save name
-                // Raise(new SaveGameEvent(filename, name));
-            };
-            Exchange.Attach(menu);
-            Detach();
-        }
+        var stack = new VerticalStack(elements);
+        AttachChild(new DialogFrame(stack));
+    }
 
-        void Options()
-        {
-            var optionsMenu = new OptionsMenu();
-            var exchange = Exchange;
-            optionsMenu.Closed += (args, _) => Attach(exchange);
-            Exchange.Attach(optionsMenu);
-            Detach();
-        }
+    void Continue()
+    {
+        Raise(new PopSceneEvent());
+    }
 
-        void QuitGame()
+    void NewGame()
+    {
+        var e = new YesNoPromptEvent((TextId)Base.SystemText.MainMenu_DoYouReallyWantToStartANewGame);
+        var exchange = Exchange;
+        RaiseAsync(e, response =>
         {
-            Raise(new QuitEvent());
-        }
+            Attach(exchange);
+            if (response)
+                Raise(new NewGameEvent(Base.Map.TorontoBegin, 30, 75)); // TODO: Move this to config?
+        });
+        Detach();
+    }
+
+    void LoadGame()
+    {
+        var menu = new PickSaveSlotMenu(false, (TextId)Base.SystemText.MainMenu_WhichSavedGameDoYouWantToLoad, 1);
+        var exchange = Exchange;
+        menu.Closed += (args, id) =>
+        {
+            Attach(exchange);
+            if (id.HasValue)
+                Raise(new LoadGameEvent(id.Value));
+        };
+        Exchange.Attach(menu);
+        Detach();
+    }
+
+    void SaveGame()
+    {
+        var menu = new PickSaveSlotMenu(true, (TextId)Base.SystemText.MainMenu_SaveOnWhichPosition, 1);
+        var exchange = Exchange;
+        menu.Closed += (args, _) =>
+        {
+            Attach(exchange);
+            // TODO: Prompt user for new save name
+            // Raise(new SaveGameEvent(filename, name));
+        };
+        Exchange.Attach(menu);
+        Detach();
+    }
+
+    void Options()
+    {
+        var optionsMenu = new OptionsMenu();
+        var exchange = Exchange;
+        optionsMenu.Closed += (args, _) => Attach(exchange);
+        Exchange.Attach(optionsMenu);
+        Detach();
+    }
+
+    void QuitGame()
+    {
+        Raise(new QuitEvent());
     }
 }

@@ -1,10 +1,9 @@
 ﻿using UAlbion.Formats.MapEvents;
 
-namespace UAlbion.Game
+namespace UAlbion.Game;
+
+public interface IEventManager
 {
-    public interface IEventManager
-    {
-        EventContext Context { get; }
-        bool LastEventResult { get; set; }
-    }
+    EventContext Context { get; }
+    bool LastEventResult { get; set; }
 }

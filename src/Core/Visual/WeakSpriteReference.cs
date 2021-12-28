@@ -1,37 +1,36 @@
 ﻿using System;
 
-namespace UAlbion.Core.Visual
+namespace UAlbion.Core.Visual;
+
+public class WeakSpriteReference
 {
-    public class WeakSpriteReference
+    readonly WeakReference<SpriteLease> _lease;
+    readonly SpriteBatch _spriteBatch;
+    readonly int _offset;
+
+    public WeakSpriteReference(SpriteBatch spriteBatch, SpriteLease lease, int offset)
     {
-        readonly WeakReference<SpriteLease> _lease;
-        readonly SpriteBatch _spriteBatch;
-        readonly int _offset;
+        _spriteBatch = spriteBatch;
+        _lease = new WeakReference<SpriteLease>(lease);
+        _offset = offset;
+    }
 
-        public WeakSpriteReference(SpriteBatch spriteBatch, SpriteLease lease, int offset)
+    public SpriteInstanceData? Data
+    {
+        get
         {
-            _spriteBatch = spriteBatch;
-            _lease = new WeakReference<SpriteLease>(lease);
-            _offset = offset;
-        }
-
-        public SpriteInstanceData? Data
-        {
-            get
+            if (_spriteBatch == null ||
+                _lease == null ||
+                !_lease.TryGetTarget(out var lease) ||
+                lease.Disposed)
             {
-                if (_spriteBatch == null ||
-                    _lease == null ||
-                    !_lease.TryGetTarget(out var lease) ||
-                    lease.Disposed)
-                {
-                    return null;
-                }
-
-                bool lockWasTaken = false;
-                var span = lease.Lock(ref lockWasTaken);
-                try { return span[_offset]; }
-                finally { lease.Unlock(lockWasTaken); }
+                return null;
             }
+
+            bool lockWasTaken = false;
+            var span = lease.Lock(ref lockWasTaken);
+            try { return span[_offset]; }
+            finally { lease.Unlock(lockWasTaken); }
         }
     }
 }

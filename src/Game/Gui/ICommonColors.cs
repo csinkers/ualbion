@@ -2,11 +2,10 @@
 using UAlbion.Api.Visual;
 using UAlbion.Formats.Assets;
 
-namespace UAlbion.Game.Gui
+namespace UAlbion.Game.Gui;
+
+public interface ICommonColors
 {
-    public interface ICommonColors
-    {
-        IDictionary<CommonColor, uint> Palette { get; }
-        IReadOnlyTexture<byte> BorderTexture { get; }
-    }
+    IDictionary<CommonColor, uint> Palette { get; }
+    IReadOnlyTexture<byte> BorderTexture { get; }
 }

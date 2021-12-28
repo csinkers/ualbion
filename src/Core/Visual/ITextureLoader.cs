@@ -1,10 +1,9 @@
 ﻿using UAlbion.Api;
 using UAlbion.Api.Visual;
 
-namespace UAlbion.Core.Visual
+namespace UAlbion.Core.Visual;
+
+public interface ITextureLoader
 {
-    public interface ITextureLoader
-    {
-        ITexture LoadTexture(IAssetId id);
-    }
+    ITexture LoadTexture(IAssetId id);
 }

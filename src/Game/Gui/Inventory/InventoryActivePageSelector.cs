@@ -3,49 +3,48 @@ using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Formats.Assets;
 
-namespace UAlbion.Game.Gui.Inventory
+namespace UAlbion.Game.Gui.Inventory;
+
+public class InventoryActivePageSelector : UiElement
 {
-    public class InventoryActivePageSelector : UiElement
+    readonly PartyMemberId _activeCharacter;
+    readonly Func<InventoryPage> _getPage;
+    InventoryPage _lastPage = (InventoryPage)(object)-1;
+
+    public InventoryActivePageSelector(PartyMemberId activeCharacter, Func<InventoryPage> getPage)
     {
-        readonly PartyMemberId _activeCharacter;
-        readonly Func<InventoryPage> _getPage;
-        InventoryPage _lastPage = (InventoryPage)(object)-1;
+        _activeCharacter = activeCharacter;
+        _getPage = getPage;
+    }
 
-        public InventoryActivePageSelector(PartyMemberId activeCharacter, Func<InventoryPage> getPage)
+    void ChangePage()
+    {
+        var pageId = _getPage();
+        if (pageId == _lastPage)
+            return;
+
+        _lastPage = pageId;
+        RemoveAllChildren();
+
+        IUiElement page = pageId switch
         {
-            _activeCharacter = activeCharacter;
-            _getPage = getPage;
-        }
+            InventoryPage.Summary => new InventorySummaryPage(_activeCharacter),
+            InventoryPage.Stats => new InventoryStatsPage(_activeCharacter),
+            InventoryPage.Misc => new InventoryMiscPage(),
+            { } x => throw new NotImplementedException($"Unhandled inventory page \"{x}\"")
+        };
 
-        void ChangePage()
-        {
-            var pageId = _getPage();
-            if (pageId == _lastPage)
-                return;
+        AttachChild(page);
+    }
+    public override int Render(Rectangle extents, int order)
+    {
+        ChangePage();
+        return base.Render(extents, order);
+    }
 
-            _lastPage = pageId;
-            RemoveAllChildren();
-
-            IUiElement page = pageId switch
-            {
-                InventoryPage.Summary => new InventorySummaryPage(_activeCharacter),
-                InventoryPage.Stats => new InventoryStatsPage(_activeCharacter),
-                InventoryPage.Misc => new InventoryMiscPage(),
-                { } x => throw new NotImplementedException($"Unhandled inventory page \"{x}\"")
-            };
-
-            AttachChild(page);
-        }
-        public override int Render(Rectangle extents, int order)
-        {
-            ChangePage();
-            return base.Render(extents, order);
-        }
-
-        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
-        {
-            ChangePage();
-            return base.Select(uiPosition, extents, order, registerHitFunc);
-        }
+    public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+    {
+        ChangePage();
+        return base.Select(uiPosition, extents, order, registerHitFunc);
     }
 }

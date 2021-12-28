@@ -1,6 +1,5 @@
-﻿namespace UAlbion.Core.Events
+﻿namespace UAlbion.Core.Events;
+
+public class PersistToDiskEvent : EngineEvent
 {
-    public class PersistToDiskEvent : EngineEvent
-    {
-    }
 }

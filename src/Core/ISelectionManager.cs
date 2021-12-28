@@ -2,10 +2,9 @@
 using System.Numerics;
 using UAlbion.Core.Events;
 
-namespace UAlbion.Core
+namespace UAlbion.Core;
+
+public interface ISelectionManager
 {
-    public interface ISelectionManager
-    {
-        void CastRayFromScreenSpace(List<Selection> hits, Vector2 pixelPosition, bool debug, bool performFocusAlerts);
-    }
+    void CastRayFromScreenSpace(List<Selection> hits, Vector2 pixelPosition, bool debug, bool performFocusAlerts);
 }

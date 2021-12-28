@@ -1,12 +1,11 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Editor
+namespace UAlbion.Editor;
+
+public class EditorRemoveInstanceEvent : Event, IEditorEvent
 {
-    public class EditorRemoveInstanceEvent : Event, IEditorEvent
-    {
-        public int Id { get; }
-        public string CollectionName { get; }
-        public int Index { get; }
-        public EditorAsset Asset { get; }
-    }
+    public int Id { get; }
+    public string CollectionName { get; }
+    public int Index { get; }
+    public EditorAsset Asset { get; }
 }

@@ -1,8 +1,7 @@
-﻿namespace UAlbion.Game.Gui.Controls
+﻿namespace UAlbion.Game.Gui.Controls;
+
+public enum DialogFrameBackgroundStyle
 {
-    public enum DialogFrameBackgroundStyle
-    {
-        MainMenuPattern,
-        DarkTint
-    }
+    MainMenuPattern,
+    DarkTint
 }

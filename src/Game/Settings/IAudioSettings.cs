@@ -1,8 +1,7 @@
-﻿namespace UAlbion.Game.Settings
+﻿namespace UAlbion.Game.Settings;
+
+public interface IAudioSettings
 {
-    public interface IAudioSettings
-    {
-        int MusicVolume { get; }
-        int FxVolume { get; }
-    }
+    int MusicVolume { get; }
+    int FxVolume { get; }
 }

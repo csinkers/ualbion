@@ -1,12 +1,11 @@
 ﻿using System.Xml.Serialization;
 
-namespace UAlbion.Formats.Exporters.Tiled
+namespace UAlbion.Formats.Exporters.Tiled;
+
+public class TileFrame
 {
-    public class TileFrame
-    {
-        [XmlAttribute("tileid")] public int Id { get; set; }
-        [XmlAttribute("duration")] public int DurationMs { get; set; }
-        public TileFrame() { }
-        public TileFrame(int id, int durationMs) { Id = id; DurationMs = durationMs; }
-    }
+    [XmlAttribute("tileid")] public int Id { get; set; }
+    [XmlAttribute("duration")] public int DurationMs { get; set; }
+    public TileFrame() { }
+    public TileFrame(int id, int durationMs) { Id = id; DurationMs = durationMs; }
 }

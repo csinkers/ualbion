@@ -1,11 +1,10 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Editor
+namespace UAlbion.Editor;
+
+public class EditorAddInstanceEvent : Event, IEditorEvent
 {
-    public class EditorAddInstanceEvent : Event, IEditorEvent
-    {
-        public int Id { get; }
-        public string CollectionName { get; }
-        public int Index { get; }
-    }
+    public int Id { get; }
+    public string CollectionName { get; }
+    public int Index { get; }
 }

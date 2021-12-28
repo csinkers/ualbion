@@ -5,40 +5,39 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.MapEvents;
 
-namespace UAlbion.Formats.Assets.Save
+namespace UAlbion.Formats.Assets.Save;
+
+public class MapChangeCollection : List<MapChange>
 {
-    public class MapChangeCollection : List<MapChange>
+    public static MapChangeCollection Serdes(int _, MapChangeCollection c, AssetMapping mapping, ISerializer s)
     {
-        public static MapChangeCollection Serdes(int _, MapChangeCollection c, AssetMapping mapping, ISerializer s)
+        if (s == null) throw new ArgumentNullException(nameof(s));
+        c ??= new MapChangeCollection();
+        uint size = s.UInt32("Size", (uint)(c.Count * MapChange.SizeOnDisk + 2));
+        ushort count = s.UInt16(nameof(Count), (ushort)c.Count);
+        ApiUtil.Assert(count * MapChange.SizeOnDisk == size - 2);
+        for (int i = 0; i < count; i++)
         {
-            if (s == null) throw new ArgumentNullException(nameof(s));
-            c ??= new MapChangeCollection();
-            uint size = s.UInt32("Size", (uint)(c.Count * MapChange.SizeOnDisk + 2));
-            ushort count = s.UInt16(nameof(Count), (ushort)c.Count);
-            ApiUtil.Assert(count * MapChange.SizeOnDisk == size - 2);
-            for (int i = 0; i < count; i++)
-            {
-                if(i < c.Count)
-                    c[i] = MapChange.Serdes(i, c[i], mapping, s);
-                else
-                    c.Add(MapChange.Serdes(i, null, mapping, s));
-            }
-
-            return c;
+            if(i < c.Count)
+                c[i] = MapChange.Serdes(i, c[i], mapping, s);
+            else
+                c.Add(MapChange.Serdes(i, null, mapping, s));
         }
 
-        public void Update(MapId mapId, byte x, byte y, IconChangeType type, ushort value)
+        return c;
+    }
+
+    public void Update(MapId mapId, byte x, byte y, IconChangeType type, ushort value)
+    {
+        foreach (var c in this)
         {
-            foreach (var c in this)
-            {
-                if (c.MapId != mapId || c.X != x || c.Y != y || c.ChangeType != type) 
-                    continue;
+            if (c.MapId != mapId || c.X != x || c.Y != y || c.ChangeType != type) 
+                continue;
 
-                c.Value = value;
-                return;
-            }
-
-            Add(new MapChange { MapId = mapId, X = x, Y = y, ChangeType = type });
+            c.Value = value;
+            return;
         }
+
+        Add(new MapChange { MapId = mapId, X = x, Y = y, ChangeType = type });
     }
 }

@@ -2,12 +2,11 @@
 using UAlbion.Api;
 using UAlbion.Game.Gui.Controls;
 
-namespace UAlbion.Game.Events
-{
-    public class CollectDialogsEvent : GameEvent, IVerboseEvent
-    {
-        public Action<IDialog> AddDialog { get; }
+namespace UAlbion.Game.Events;
 
-        public CollectDialogsEvent(Action<IDialog> addDialog) { AddDialog = addDialog; }
-    }
+public class CollectDialogsEvent : GameEvent, IVerboseEvent
+{
+    public Action<IDialog> AddDialog { get; }
+
+    public CollectDialogsEvent(Action<IDialog> addDialog) { AddDialog = addDialog; }
 }

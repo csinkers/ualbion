@@ -1,6 +1,5 @@
-﻿namespace UAlbion.Game.Tests
+﻿namespace UAlbion.Game.Tests;
+
+class Map3DTests
 {
-    class Map3DTests
-    {
-    }
 }

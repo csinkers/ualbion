@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace UAlbion.Game.Veldrid.Audio
+namespace UAlbion.Game.Veldrid.Audio;
+
+public interface IAudioManager
 {
-    public interface IAudioManager
-    {
-        IList<string> ActiveSounds { get; }
-    }
+    IList<string> ActiveSounds { get; }
 }

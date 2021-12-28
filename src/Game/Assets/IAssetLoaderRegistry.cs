@@ -1,9 +1,8 @@
 ﻿using UAlbion.Formats;
 
-namespace UAlbion.Game.Assets
+namespace UAlbion.Game.Assets;
+
+public interface IAssetLoaderRegistry
 {
-    public interface IAssetLoaderRegistry
-    {
-        IAssetLoader GetLoader(string loaderName);
-    }
+    IAssetLoader GetLoader(string loaderName);
 }

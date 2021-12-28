@@ -1,9 +1,8 @@
-﻿namespace UAlbion.Game.Gui.Inventory
+﻿namespace UAlbion.Game.Gui.Inventory;
+
+public enum InventoryPage
 {
-    public enum InventoryPage
-    {
-        Summary,
-        Stats,
-        Misc,
-    }
+    Summary,
+    Stats,
+    Misc,
 }

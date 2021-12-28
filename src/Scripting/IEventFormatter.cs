@@ -1,9 +1,8 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Scripting
+namespace UAlbion.Scripting;
+
+public interface IEventFormatter
 {
-    public interface IEventFormatter
-    {
-        string Format(IEvent e, bool useNumeric);
-    }
+    string Format(IEvent e, bool useNumeric);
 }

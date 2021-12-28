@@ -1,10 +1,9 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Core.Events
+namespace UAlbion.Core.Events;
+
+public class PositionedComponentMovedEvent : Event, IVerboseEvent
 {
-    public class PositionedComponentMovedEvent : Event, IVerboseEvent
-    {
-        public PositionedComponentMovedEvent(IPositioned positioned) => Positioned = positioned;
-        public IPositioned Positioned { get; }
-    }
+    public PositionedComponentMovedEvent(IPositioned positioned) => Positioned = positioned;
+    public IPositioned Positioned { get; }
 }

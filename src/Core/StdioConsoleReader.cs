@@ -3,40 +3,39 @@ using System.Threading.Tasks;
 using UAlbion.Api;
 using UAlbion.Core.Events;
 
-namespace UAlbion.Core
+namespace UAlbion.Core;
+
+public class StdioConsoleReader : Component
 {
-    public class StdioConsoleReader : Component
+    bool _done;
+
+    public StdioConsoleReader() => On<QuitEvent>(_ => IsActive = false);
+
+    protected override void Subscribed()
     {
-        bool _done;
+        _done = false;
+        Task.Run(ConsoleReaderThread);
+    }
 
-        public StdioConsoleReader() => On<QuitEvent>(_ => IsActive = false);
+    protected override void Unsubscribed()
+    {
+        _done = true;
+    }
 
-        protected override void Subscribed()
+    void ConsoleReaderThread()
+    {
+        var logExchange = Resolve<ILogExchange>();
+        do
         {
-            _done = false;
-            Task.Run(ConsoleReaderThread);
-        }
+            var command = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(command))
+                continue;
 
-        protected override void Unsubscribed()
-        {
-            _done = true;
-        }
-
-        void ConsoleReaderThread()
-        {
-            var logExchange = Resolve<ILogExchange>();
-            do
-            {
-                var command = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(command))
-                    continue;
-
-                var @event = Event.Parse(command);
-                if (@event != null)
-                    logExchange.EnqueueEvent(@event);
-                else
-                    Console.WriteLine("Unknown event \"{0}\"", command);
-            } while (!_done);
-        }
+            var @event = Event.Parse(command);
+            if (@event != null)
+                logExchange.EnqueueEvent(@event);
+            else
+                Console.WriteLine("Unknown event \"{0}\"", command);
+        } while (!_done);
     }
 }

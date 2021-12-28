@@ -4,20 +4,19 @@ using UAlbion.Formats.Config;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 
-namespace UAlbion.Game.Scenes
+namespace UAlbion.Game.Scenes;
+
+public interface IEditorScene : IScene { }
+[Scene(SceneId.Editor)]
+public class EditorScene : Container, IEditorScene
 {
-    public interface IEditorScene : IScene { }
-    [Scene(SceneId.Editor)]
-    public class EditorScene : Container, IEditorScene
+    public EditorScene() : base(nameof(SceneId.Editor))
     {
-        public EditorScene() : base(nameof(SceneId.Editor))
-        {
-            var camera = AttachChild(new OrthographicCamera());
-            AttachChild(new CameraMotion2D(camera));
-        }
-
-
-        protected override void Subscribed() => Raise(new PushInputModeEvent(InputMode.Editor));
-        protected override void Unsubscribed() => Raise(new PopInputModeEvent());
+        var camera = AttachChild(new OrthographicCamera());
+        AttachChild(new CameraMotion2D(camera));
     }
+
+
+    protected override void Subscribed() => Raise(new PushInputModeEvent(InputMode.Editor));
+    protected override void Unsubscribed() => Raise(new PopInputModeEvent());
 }

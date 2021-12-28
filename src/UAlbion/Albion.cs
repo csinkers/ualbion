@@ -31,142 +31,141 @@ using UAlbion.Game.Veldrid.Audio;
 using UAlbion.Game.Veldrid.Debugging;
 using UAlbion.Game.Veldrid.Input;
 
-namespace UAlbion
+namespace UAlbion;
+
+static class Albion
 {
-    static class Albion
+    public static void RunGame(EventExchange global, IContainer services, IRenderPass mainPass, string baseDir, CommandLineOptions commandLine)
     {
-        public static void RunGame(EventExchange global, IContainer services, IRenderPass mainPass, string baseDir, CommandLineOptions commandLine)
+        RegisterComponents(global, services, mainPass, baseDir, commandLine);
+
+        PerfTracker.StartupEvent("Running game");
+        global.Raise(new SetSceneEvent(SceneId.Empty), null);
+
+        if (commandLine.Commands != null)
         {
-            RegisterComponents(global, services, mainPass, baseDir, commandLine);
-
-            PerfTracker.StartupEvent("Running game");
-            global.Raise(new SetSceneEvent(SceneId.Empty), null);
-
-            if (commandLine.Commands != null)
-            {
-                foreach (var command in commandLine.Commands)
-                    global.Raise(Event.Parse(command), null);
-            }
-            else global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
-
-            global.Resolve<IEngine>().Run();
-            // TODO: Ensure all sprite leases returned etc to weed out memory leaks
+            foreach (var command in commandLine.Commands)
+                global.Raise(Event.Parse(command), null);
         }
+        else global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
 
-        static void RegisterComponents(EventExchange global, IContainer services, IRenderPass mainPass, string baseDir, CommandLineOptions commandLine)
-        {
+        global.Resolve<IEngine>().Run();
+        // TODO: Ensure all sprite leases returned etc to weed out memory leaks
+    }
+
+    static void RegisterComponents(EventExchange global, IContainer services, IRenderPass mainPass, string baseDir, CommandLineOptions commandLine)
+    {
 #pragma warning disable CA2000 // Dispose objects before losing scope
-            PerfTracker.StartupEvent("Creating main components");
+        PerfTracker.StartupEvent("Creating main components");
 
-            global
-                .Register<ICommonColors>(new CommonColors())
-                ;
+        global
+            .Register<ICommonColors>(new CommonColors())
+            ;
 
-            if (!commandLine.Mute)
-                services.Add(new AudioManager(false));
+        if (!commandLine.Mute)
+            services.Add(new AudioManager(false));
 
-            var renderableSources = new IRenderableSource[]
-            {
-                new SkyboxManager(),
-                new EtmManager(),
-                new SpriteManager(),
-                DebugGuiRenderable.Instance
-            };
+        var renderableSources = new IRenderableSource[]
+        {
+            new SkyboxManager(),
+            new EtmManager(),
+            new SpriteManager(),
+            DebugGuiRenderable.Instance
+        };
 
-            foreach (var source in renderableSources)
-            {
-                if (source is IComponent component)
-                    services.Add(component);
-                mainPass.AddSource(source);
-            }
-
-            services
-                .Add(new VeldridGameFactory())
-                .Add(new GameState())
-                .Add(new GameClock())
-                .Add(new IdleClock())
-                .Add(new SlowClock())
-                .Add(new TextureSource())
-                .Add(new SpriteSamplerSource())
-                .Add(new VideoManager())
-                .Add(new EventChainManager())
-                .Add(new Querier())
-                .Add(new MapManager())
-                .Add(new CollisionManager())
-                .Add(new SceneStack())
-                .Add(new SceneManager()
-                    .AddScene((IScene)new EmptyScene()
-                        .Add(new StatusBar())
-                        .Add(new PaletteManager()))
-
-                    .AddScene((IScene)new AutomapScene()
-                        .Add(new StatusBar())
-                        .Add(new PaletteManager()))
-
-                    .AddScene((IScene)new FlatScene()
-                        .Add(new StatusBar())
-                        .Add(new ConversationManager())
-                        .Add(new PaletteManager())
-                        .Add(new ClockWidget())
-                        .Add(new MonsterEye()))
-
-                    .AddScene((IScene)new DungeonScene()
-                        .Add(new SceneGraph())
-                        .Add(new StatusBar())
-                        .Add(new ConversationManager())
-                        .Add(new PaletteManager())
-                        .Add(new ClockWidget())
-                        .Add(new Compass())
-                        .Add(new MonsterEye()))
-
-                    .AddScene((IScene)new MenuScene()
-                        .Add(new StatusBar())
-                        .Add(new PaletteManager())
-                        .Add(new MainMenu())
-                        .Add(new Sprite(
-                            (SpriteId)Base.Picture.MenuBackground8,
-                            new Vector3(-1.0f, 1.0f, 0),
-                            DrawLayer.Interface,
-                            SpriteKeyFlags.NoTransform,
-                            SpriteFlags.LeftAligned) { Size = new Vector2(2.0f, -2.0f) }))
-
-                    .AddScene((IScene)new InventoryScene()
-                        .Add(new StatusBar())
-                        .Add(new ConversationManager())
-                        .Add(new PaletteManager())
-                        .Add(new InventoryInspector()))
-
-                    .AddScene((IScene)new EditorScene()
-                        .Add(new RawAssetManager())
-                        .Add(new PaletteManager())
-                        .Add(new EditorAssetManager())
-                        .Add(new EditorUi()))
-                )
-
-                .Add(new TextFormatter())
-                .Add(new TextManager())
-                .Add(new LayoutManager())
-                .Add(new DialogManager())
-                .Add(new InventoryScreenManager())
-                .Add(new DebugMapInspector(services)
-                    .AddBehaviour(new SpriteInstanceDataDebugBehaviour())
-                    .AddBehaviour(new FormatTextEventBehaviour()))
-                // .AddBehaviour(new QueryEventDebugBehaviour()))
-                .Add(new ContextMenu())
-                .Add(new CursorManager())
-                .Add(new InputManager()
-                    .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
-                    .RegisterInputMode(InputMode.World2D, new World2DInputMode())
-                    .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
-                    .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
-                    .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
-                    .RegisterMouseMode(MouseMode.RightButtonHeld, new RightButtonHeldMouseMode())
-                    .RegisterMouseMode(MouseMode.ContextMenu, new ContextMenuMouseMode()))
-                .Add(new SelectionManager())
-                .Add(new InputBinder((disk, jsonUtil) => InputConfig.Load(baseDir, disk, jsonUtil)))
-                .Add(new ItemTransitionManager())
-                ;
-#pragma warning restore CA2000 // Dispose objects before losing scope
+        foreach (var source in renderableSources)
+        {
+            if (source is IComponent component)
+                services.Add(component);
+            mainPass.AddSource(source);
         }
+
+        services
+            .Add(new VeldridGameFactory())
+            .Add(new GameState())
+            .Add(new GameClock())
+            .Add(new IdleClock())
+            .Add(new SlowClock())
+            .Add(new TextureSource())
+            .Add(new SpriteSamplerSource())
+            .Add(new VideoManager())
+            .Add(new EventChainManager())
+            .Add(new Querier())
+            .Add(new MapManager())
+            .Add(new CollisionManager())
+            .Add(new SceneStack())
+            .Add(new SceneManager()
+                .AddScene((IScene)new EmptyScene()
+                    .Add(new StatusBar())
+                    .Add(new PaletteManager()))
+
+                .AddScene((IScene)new AutomapScene()
+                    .Add(new StatusBar())
+                    .Add(new PaletteManager()))
+
+                .AddScene((IScene)new FlatScene()
+                    .Add(new StatusBar())
+                    .Add(new ConversationManager())
+                    .Add(new PaletteManager())
+                    .Add(new ClockWidget())
+                    .Add(new MonsterEye()))
+
+                .AddScene((IScene)new DungeonScene()
+                    .Add(new SceneGraph())
+                    .Add(new StatusBar())
+                    .Add(new ConversationManager())
+                    .Add(new PaletteManager())
+                    .Add(new ClockWidget())
+                    .Add(new Compass())
+                    .Add(new MonsterEye()))
+
+                .AddScene((IScene)new MenuScene()
+                    .Add(new StatusBar())
+                    .Add(new PaletteManager())
+                    .Add(new MainMenu())
+                    .Add(new Sprite(
+                        (SpriteId)Base.Picture.MenuBackground8,
+                        new Vector3(-1.0f, 1.0f, 0),
+                        DrawLayer.Interface,
+                        SpriteKeyFlags.NoTransform,
+                        SpriteFlags.LeftAligned) { Size = new Vector2(2.0f, -2.0f) }))
+
+                .AddScene((IScene)new InventoryScene()
+                    .Add(new StatusBar())
+                    .Add(new ConversationManager())
+                    .Add(new PaletteManager())
+                    .Add(new InventoryInspector()))
+
+                .AddScene((IScene)new EditorScene()
+                    .Add(new RawAssetManager())
+                    .Add(new PaletteManager())
+                    .Add(new EditorAssetManager())
+                    .Add(new EditorUi()))
+            )
+
+            .Add(new TextFormatter())
+            .Add(new TextManager())
+            .Add(new LayoutManager())
+            .Add(new DialogManager())
+            .Add(new InventoryScreenManager())
+            .Add(new DebugMapInspector(services)
+                .AddBehaviour(new SpriteInstanceDataDebugBehaviour())
+                .AddBehaviour(new FormatTextEventBehaviour()))
+            // .AddBehaviour(new QueryEventDebugBehaviour()))
+            .Add(new ContextMenu())
+            .Add(new CursorManager())
+            .Add(new InputManager()
+                .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
+                .RegisterInputMode(InputMode.World2D, new World2DInputMode())
+                .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
+                .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
+                .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())
+                .RegisterMouseMode(MouseMode.RightButtonHeld, new RightButtonHeldMouseMode())
+                .RegisterMouseMode(MouseMode.ContextMenu, new ContextMenuMouseMode()))
+            .Add(new SelectionManager())
+            .Add(new InputBinder((disk, jsonUtil) => InputConfig.Load(baseDir, disk, jsonUtil)))
+            .Add(new ItemTransitionManager())
+            ;
+#pragma warning restore CA2000 // Dispose objects before losing scope
     }
 }

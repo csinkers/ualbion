@@ -1,7 +1,6 @@
-﻿namespace UAlbion.Api
+﻿namespace UAlbion.Api;
+
+public abstract class CancellableEvent : Event, ICancellableEvent
 {
-    public abstract class CancellableEvent : Event, ICancellableEvent
-    {
-        public bool Propagating { get; set; } = true;
-    }
+    public bool Propagating { get; set; } = true;
 }

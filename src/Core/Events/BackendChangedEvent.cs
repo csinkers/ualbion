@@ -1,4 +1,3 @@
-﻿namespace UAlbion.Core.Events
-{
-    public class BackendChangedEvent : EngineEvent { }
-}
+﻿namespace UAlbion.Core.Events;
+
+public class BackendChangedEvent : EngineEvent { }

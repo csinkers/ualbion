@@ -1,11 +1,10 @@
-﻿namespace UAlbion.Game.Text
+﻿namespace UAlbion.Game.Text;
+
+public enum TextStyle
 {
-    public enum TextStyle
-    {
-        Normal,
-        Big, // Use other font(?)
-        Fat, // Double thickness
-        High, // Double height
-        FatAndHigh
-    }
+    Normal,
+    Big, // Use other font(?)
+    Fat, // Double thickness
+    High, // Double height
+    FatAndHigh
 }

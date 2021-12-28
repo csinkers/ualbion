@@ -1,11 +1,10 @@
-﻿namespace UAlbion.Formats.MapEvents
+﻿namespace UAlbion.Formats.MapEvents;
+
+public enum EventContextStatus
 {
-    public enum EventContextStatus
-    {
-        Running,
-        Waiting,
-        Ready, // Wait complete, ready to transition back to Running
-        Completing, // Set while the completion callback is in progress
-        Complete
-    }
+    Running,
+    Waiting,
+    Ready, // Wait complete, ready to transition back to Running
+    Completing, // Set while the completion callback is in progress
+    Complete
 }

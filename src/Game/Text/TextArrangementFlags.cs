@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace UAlbion.Game.Text
+namespace UAlbion.Game.Text;
+
+[Flags]
+public enum TextArrangementFlags
 {
-    [Flags]
-    public enum TextArrangementFlags
-    {
-        NoWrap = 1,
-        ForceNewLine = 2,
-    }
+    NoWrap = 1,
+    ForceNewLine = 2,
 }

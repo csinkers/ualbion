@@ -9,103 +9,102 @@ using UAlbion.Formats;
 using UAlbion.Formats.Containers;
 using Xunit;
 
-namespace UAlbion.TestCommon
+namespace UAlbion.TestCommon;
+
+public static class Asset
 {
-    public static class Asset
+    static readonly XldContainer XldLoader = new();
+    public static void Compare(
+        string resultDir,
+        string testName,
+        byte[] originalBytes,
+        byte[] roundTripBytes,
+        (string, string)[] notes) // (extension, text)
     {
-        static readonly XldContainer XldLoader = new();
-        public static void Compare(
-            string resultDir,
-            string testName,
-            byte[] originalBytes,
-            byte[] roundTripBytes,
-            (string, string)[] notes) // (extension, text)
+        ApiUtil.Assert(originalBytes.Length == roundTripBytes.Length, $"Asset size changed after round trip (delta {roundTripBytes.Length - originalBytes.Length})");
+        ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
+
+        var diffs = XDelta.Compare(originalBytes, roundTripBytes).ToArray();
+
+        if (originalBytes.Length != roundTripBytes.Length || diffs.Length > 1)
         {
-            ApiUtil.Assert(originalBytes.Length == roundTripBytes.Length, $"Asset size changed after round trip (delta {roundTripBytes.Length - originalBytes.Length})");
-            ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
+            if (!Directory.Exists(resultDir))
+                Directory.CreateDirectory(resultDir);
 
-            var diffs = XDelta.Compare(originalBytes, roundTripBytes).ToArray();
+            var path = Path.Combine(resultDir, testName);
+            foreach (var (extension, text) in notes)
+                if (!string.IsNullOrEmpty(text))
+                    File.WriteAllText(path + extension, text);
+        }
 
-            if (originalBytes.Length != roundTripBytes.Length || diffs.Length > 1)
+        Assert.Collection(diffs,
+            d =>
             {
-                if (!Directory.Exists(resultDir))
-                    Directory.CreateDirectory(resultDir);
+                Assert.True(d.IsCopy);
+                Assert.Equal(0, d.Offset);
+                Assert.Equal(originalBytes.Length, d.Length);
+            });
+    }
 
-                var path = Path.Combine(resultDir, testName);
-                foreach (var (extension, text) in notes)
-                    if (!string.IsNullOrEmpty(text))
-                        File.WriteAllText(path + extension, text);
-            }
+    static string ReadToEnd(Stream stream)
+    {
+        stream.Position = 0;
+        using var reader = new StreamReader(stream, null, true, -1, true);
+        return reader.ReadToEnd();
+    }
 
-            Assert.Collection(diffs,
-                d =>
-                {
-                    Assert.True(d.IsCopy);
-                    Assert.Equal(0, d.Offset);
-                    Assert.Equal(originalBytes.Length, d.Length);
-                });
-        }
+    public static (T, string) Load<T>(byte[] bytes, Func<T, ISerializer, T> serdes) where T : class
+    {
+        using var stream = new MemoryStream(bytes);
+        using var br = new BinaryReader(stream);
+        using var ar = new AlbionReader(br, stream.Length);
 
-        static string ReadToEnd(Stream stream)
-        {
-            stream.Position = 0;
-            using var reader = new StreamReader(stream, null, true, -1, true);
-            return reader.ReadToEnd();
-        }
+        using var annotationStream = new MemoryStream();
+        using var annotationWriter = new StreamWriter(annotationStream);
+        using var afs = new AnnotationFacadeSerializer(ar, annotationWriter, FormatUtil.BytesFrom850String);
 
-        public static (T, string) Load<T>(byte[] bytes, Func<T, ISerializer, T> serdes) where T : class
-        {
-            using var stream = new MemoryStream(bytes);
-            using var br = new BinaryReader(stream);
-            using var ar = new AlbionReader(br, stream.Length);
+        var result = serdes(null, afs);
+        annotationWriter.Flush();
+        var annotation = ReadToEnd(annotationStream);
 
-            using var annotationStream = new MemoryStream();
-            using var annotationWriter = new StreamWriter(annotationStream);
-            using var afs = new AnnotationFacadeSerializer(ar, annotationWriter, FormatUtil.BytesFrom850String);
+        if (afs.BytesRemaining > 0)
+            throw new InvalidOperationException($"{afs.BytesRemaining} bytes left over after reading");
 
-            var result = serdes(null, afs);
-            annotationWriter.Flush();
-            var annotation = ReadToEnd(annotationStream);
+        return (result, annotation);
+    }
 
-            if (afs.BytesRemaining > 0)
-                throw new InvalidOperationException($"{afs.BytesRemaining} bytes left over after reading");
+    public static (byte[], string) Save<T>(T asset, Func<T, ISerializer, T> serdes) where T : class
+    {
+        using var ms = new MemoryStream();
+        using var bw = new BinaryWriter(ms);
+        using var annotationStream = new MemoryStream();
+        using var annotationWriter = new StreamWriter(annotationStream);
+        using var aw = new AnnotationFacadeSerializer(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
+        serdes(asset, aw);
+        ms.Position = 0;
+        var bytes = ms.ToArray();
+        annotationWriter.Flush();
+        var annotation = ReadToEnd(annotationStream);
+        return (bytes, annotation);
+    }
 
-            return (result, annotation);
-        }
+    public static string SaveJson(object asset, IJsonUtil jsonUtil)
+    {
+        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        using var stream = new MemoryStream();
+        stream.Write(Encoding.UTF8.GetBytes(jsonUtil.Serialize(asset)));
+        return ReadToEnd(stream);
+    }
 
-        public static (byte[], string) Save<T>(T asset, Func<T, ISerializer, T> serdes) where T : class
-        {
-            using var ms = new MemoryStream();
-            using var bw = new BinaryWriter(ms);
-            using var annotationStream = new MemoryStream();
-            using var annotationWriter = new StreamWriter(annotationStream);
-            using var aw = new AnnotationFacadeSerializer(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
-            serdes(asset, aw);
-            ms.Position = 0;
-            var bytes = ms.ToArray();
-            annotationWriter.Flush();
-            var annotation = ReadToEnd(annotationStream);
-            return (bytes, annotation);
-        }
+    public static T LoadJson<T>(string json, IJsonUtil jsonUtil)
+    {
+        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        return jsonUtil.Deserialize<T>(Encoding.UTF8.GetBytes(json));
+    }
 
-        public static string SaveJson(object asset, IJsonUtil jsonUtil)
-        {
-            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
-            using var stream = new MemoryStream();
-            stream.Write(Encoding.UTF8.GetBytes(jsonUtil.Serialize(asset)));
-            return ReadToEnd(stream);
-        }
-
-        public static T LoadJson<T>(string json, IJsonUtil jsonUtil)
-        {
-            if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
-            return jsonUtil.Deserialize<T>(Encoding.UTF8.GetBytes(json));
-        }
-
-        public static byte[] BytesFromXld(IGeneralConfig conf, string path, AssetInfo info, IFileSystem disk, IJsonUtil jsonUtil)
-        {
-            using var s = XldLoader.Read(conf.ResolvePath(path), info, disk, jsonUtil);
-            return s.Bytes(null, null, (int)s.BytesRemaining);
-        }
+    public static byte[] BytesFromXld(IGeneralConfig conf, string path, AssetInfo info, IFileSystem disk, IJsonUtil jsonUtil)
+    {
+        using var s = XldLoader.Read(conf.ResolvePath(path), info, disk, jsonUtil);
+        return s.Bytes(null, null, (int)s.BytesRemaining);
     }
 }

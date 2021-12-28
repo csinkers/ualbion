@@ -1,11 +1,10 @@
-﻿namespace UAlbion.Scripting
+﻿namespace UAlbion.Scripting;
+
+public enum CfgEdge
 {
-    public enum CfgEdge
-    {
-        True,
-        False,
-        DisjointGraphFixup,
-        LoopSuccessor,
-        EntryPoint
-    }
+    True,
+    False,
+    DisjointGraphFixup,
+    LoopSuccessor,
+    EntryPoint
 }

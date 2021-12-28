@@ -1,10 +1,9 @@
 ﻿using UAlbion.Api.Visual;
 
-namespace UAlbion.Core.Visual
+namespace UAlbion.Core.Visual;
+
+public interface ICoreFactory
 {
-    public interface ICoreFactory
-    {
-        ISkybox CreateSkybox(ITexture texture);
-        SpriteBatch CreateSpriteBatch(SpriteKey key);
-    }
+    ISkybox CreateSkybox(ITexture texture);
+    SpriteBatch CreateSpriteBatch(SpriteKey key);
 }

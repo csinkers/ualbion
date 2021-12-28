@@ -3,39 +3,38 @@ using UAlbion.Core;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 
-namespace UAlbion.Game
+namespace UAlbion.Game;
+
+public class SlowClock : Component
 {
-    public class SlowClock : Component
+    int _ticks;
+
+    public SlowClock() => On<FastClockEvent>(OnUpdate);
+
+    void OnUpdate(FastClockEvent updateEvent)
     {
-        int _ticks;
-
-        public SlowClock() => On<FastClockEvent>(OnUpdate);
-
-        void OnUpdate(FastClockEvent updateEvent)
+        var config = Resolve<GameConfig>();
+        _ticks += updateEvent.Frames;
+        int delta = 0;
+        while(_ticks >= config.Time.FastTicksPerSlowTick)
         {
-            var config = Resolve<GameConfig>();
-            _ticks += updateEvent.Frames;
-            int delta = 0;
-            while(_ticks >= config.Time.FastTicksPerSlowTick)
-            {
-                _ticks -= config.Time.FastTicksPerSlowTick;
-                delta++;
-            }
-
-            if (delta <= 0)
-                return;
-
-            Raise(new SlowClockEvent(delta));
+            _ticks -= config.Time.FastTicksPerSlowTick;
+            delta++;
         }
+
+        if (delta <= 0)
+            return;
+
+        Raise(new SlowClockEvent(delta));
     }
+}
 
-    [Event("slow_clock")]
-    public class SlowClockEvent : GameEvent, IVerboseEvent
+[Event("slow_clock")]
+public class SlowClockEvent : GameEvent, IVerboseEvent
+{
+    [EventPart("delta")] public int Delta { get; }
+    public SlowClockEvent(int delta)
     {
-        [EventPart("delta")] public int Delta { get; }
-        public SlowClockEvent(int delta)
-        {
-            Delta = delta;
-        }
+        Delta = delta;
     }
 }

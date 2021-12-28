@@ -1,9 +1,8 @@
 ﻿using UAlbion.Scripting.Ast;
 
-namespace UAlbion.Scripting
+namespace UAlbion.Scripting;
+
+public interface IAstBuilderVisitor : IAstVisitor
 {
-    public interface IAstBuilderVisitor : IAstVisitor
-    {
-        ICfgNode Result { get; }
-    }
+    ICfgNode Result { get; }
 }

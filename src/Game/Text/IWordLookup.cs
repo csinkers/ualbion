@@ -1,9 +1,8 @@
 ﻿using UAlbion.Formats.Assets;
 
-namespace UAlbion.Game.Text
+namespace UAlbion.Game.Text;
+
+public interface IWordLookup
 {
-    public interface IWordLookup
-    {
-        WordId Parse(string s);
-    }
+    WordId Parse(string s);
 }

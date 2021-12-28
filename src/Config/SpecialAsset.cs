@@ -1,3 +1,1 @@
-﻿namespace UAlbion.Config
-{
-}
+﻿namespace UAlbion.Config;

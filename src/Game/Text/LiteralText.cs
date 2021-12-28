@@ -1,21 +1,20 @@
 ﻿using System.Collections.Generic;
 
-namespace UAlbion.Game.Text
+namespace UAlbion.Game.Text;
+
+public class LiteralText : IText
 {
-    public class LiteralText : IText
+    readonly TextBlock[] _blocks;
+    public LiteralText(string text)
     {
-        readonly TextBlock[] _blocks;
-        public LiteralText(string text)
-        {
-            _blocks = new[] { new TextBlock(text) };
-        }
-
-        public LiteralText(TextBlock text)
-        {
-            _blocks = new[] { text };
-        }
-
-        public int Version => 1;
-        public IEnumerable<TextBlock> GetBlocks() => _blocks;
+        _blocks = new[] { new TextBlock(text) };
     }
+
+    public LiteralText(TextBlock text)
+    {
+        _blocks = new[] { text };
+    }
+
+    public int Version => 1;
+    public IEnumerable<TextBlock> GetBlocks() => _blocks;
 }

@@ -4,24 +4,23 @@ using System.Numerics;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 
-namespace UAlbion.TestCommon
-{
-    public static class MockUniformFont
-    {
-        public static ITexture Font(AssetId id) => new SimpleTexture<byte>(id,
-            "FakeFont", 6 * 256, 8,
-            new byte[6 * 8 * 256],
-            Enumerable.Range(0, 256).Select(x =>
-                new Region(
-                    new Vector2(x * 6, 0),
-                    new Vector2(6, 8),
-                    new Vector2(6 * 256, 8),
-                    0)));
+namespace UAlbion.TestCommon;
 
-        public static AssetInfo Info { get; } = new(new Dictionary<string, object> {
-            {
-                "Mapping",
-                @"""abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\""?!/()#%*&+-=><☺♀♂éâàçêëèïîìôòûùáíóú"""
-            } });
-    }
+public static class MockUniformFont
+{
+    public static ITexture Font(AssetId id) => new SimpleTexture<byte>(id,
+        "FakeFont", 6 * 256, 8,
+        new byte[6 * 8 * 256],
+        Enumerable.Range(0, 256).Select(x =>
+            new Region(
+                new Vector2(x * 6, 0),
+                new Vector2(6, 8),
+                new Vector2(6 * 256, 8),
+                0)));
+
+    public static AssetInfo Info { get; } = new(new Dictionary<string, object> {
+    {
+        "Mapping",
+        @"""abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\""?!/()#%*&+-=><☺♀♂éâàçêëèïîìôòûùáíóú"""
+    } });
 }

@@ -1,12 +1,11 @@
-﻿namespace UAlbion.Game.State.Player
+﻿namespace UAlbion.Game.State.Player;
+
+public enum InventoryAction
 {
-    public enum InventoryAction
-    {
-        Nothing,
-        Pickup,
-        PutDown,
-        Swap,
-        Coalesce,
-        NoCoalesceFullStack,
-    }
+    Nothing,
+    Pickup,
+    PutDown,
+    Swap,
+    Coalesce,
+    NoCoalesceFullStack,
 }

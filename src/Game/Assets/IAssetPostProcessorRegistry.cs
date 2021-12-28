@@ -1,7 +1,6 @@
-﻿namespace UAlbion.Game.Assets
+﻿namespace UAlbion.Game.Assets;
+
+public interface IAssetPostProcessorRegistry
 {
-    public interface IAssetPostProcessorRegistry
-    {
-        IAssetPostProcessor GetPostProcessor(string postProcessorName);
-    }
+    IAssetPostProcessor GetPostProcessor(string postProcessorName);
 }

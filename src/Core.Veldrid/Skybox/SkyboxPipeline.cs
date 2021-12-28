@@ -1,10 +1,9 @@
 ﻿using VeldridGen.Interfaces;
 
-namespace UAlbion.Core.Veldrid.Skybox
+namespace UAlbion.Core.Veldrid.Skybox;
+
+[VertexShader(typeof(SkyboxVertexShader))]
+[FragmentShader(typeof(SkyboxFragmentShader))]
+partial class SkyboxPipeline : PipelineHolder
 {
-    [VertexShader(typeof(SkyboxVertexShader))]
-    [FragmentShader(typeof(SkyboxFragmentShader))]
-    partial class SkyboxPipeline : PipelineHolder
-    {
-    }
 }

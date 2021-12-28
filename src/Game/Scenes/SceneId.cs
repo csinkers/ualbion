@@ -1,15 +1,14 @@
-﻿namespace UAlbion.Game.Scenes
+﻿namespace UAlbion.Game.Scenes;
+
+public enum SceneId
 {
-    public enum SceneId
-    {
-        Empty, // Empty scene for debugging
-        MainMenu,
-        World2D,
-        World3D,
-        Automap,
-        Inventory,
-        Combat,
-        Editor,
-        IsometricBake
-    }
+    Empty, // Empty scene for debugging
+    MainMenu,
+    World2D,
+    World3D,
+    Automap,
+    Inventory,
+    Combat,
+    Editor,
+    IsometricBake
 }

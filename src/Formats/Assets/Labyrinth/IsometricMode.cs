@@ -1,11 +1,10 @@
-﻿namespace UAlbion.Formats.Assets.Labyrinth
+﻿namespace UAlbion.Formats.Assets.Labyrinth;
+
+public enum IsometricMode
 {
-    public enum IsometricMode
-    {
-        All,
-        Floors,
-        Ceilings,
-        Walls,
-        Contents
-    }
+    All,
+    Floors,
+    Ceilings,
+    Walls,
+    Contents
 }

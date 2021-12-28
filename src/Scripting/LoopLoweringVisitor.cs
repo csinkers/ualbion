@@ -2,133 +2,132 @@
 using System.Collections.Generic;
 using UAlbion.Scripting.Ast;
 
-namespace UAlbion.Scripting
+namespace UAlbion.Scripting;
+
+public class LoopLoweringVisitor : BaseAstBuilderVisitor
 {
-    public class LoopLoweringVisitor : BaseAstBuilderVisitor
+    readonly Stack<string> _headStack = new();
+    readonly Stack<string> _tailStack = new();
+    protected override ICfgNode Build(DoLoop doLoop)
     {
-        readonly Stack<string> _headStack = new();
-        readonly Stack<string> _tailStack = new();
-        protected override ICfgNode Build(DoLoop doLoop)
+        var headLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
+        var tailLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
+        _headStack.Push(headLabel);
+        _tailStack.Push(tailLabel);
+
+        doLoop.Body?.Accept(this);
+        var body = Result ?? doLoop.Body;
+        doLoop.Condition.Accept(this);
+        var condition = Result ?? doLoop.Condition;
+
+        _tailStack.Pop();
+        _headStack.Pop();
+
+        var negated = false;
+        if (condition is Negation negation)
         {
-            var headLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
-            var tailLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
-            _headStack.Push(headLabel);
-            _tailStack.Push(tailLabel);
+            condition = negation.Expression;
+            negated = true;
+        }
 
-            doLoop.Body?.Accept(this);
-            var body = Result ?? doLoop.Body;
-            doLoop.Condition.Accept(this);
-            var condition = Result ?? doLoop.Condition;
-
-            _tailStack.Pop();
-            _headStack.Pop();
-
-            var negated = false;
-            if (condition is Negation negation)
+        return Emit.Cfg(new ControlFlowGraph(new[]
             {
-                condition = negation.Expression;
-                negated = true;
-            }
-
-            return Emit.Cfg(new ControlFlowGraph(new[]
-                {
-                    Emit.Empty(), // 0
-                    Emit.Label(headLabel), // 1
-                    body, // 2
-                    condition, // 3
-                    Emit.Label(tailLabel), // 4
-                    Emit.Empty() // 5
-                },
-                new[]
-                {
-                    (0,1,CfgEdge.True), (1,2,CfgEdge.True), (2,3,CfgEdge.True),
-                    (3,1,negated ? CfgEdge.False : CfgEdge.True), (3,4,negated ? CfgEdge.True : CfgEdge.False),
-                    (4,5,CfgEdge.True),
-                }));
-        }
-
-        protected override ICfgNode Build(WhileLoop whileLoop)
-        {
-            var headLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
-            var tailLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
-            _headStack.Push(headLabel);
-            _tailStack.Push(tailLabel);
-
-            whileLoop.Condition.Accept(this);
-            var condition = Result ?? whileLoop.Condition;
-            whileLoop.Body?.Accept(this);
-            var body = Result ?? whileLoop.Body;
-
-            _tailStack.Pop();
-            _headStack.Pop();
-
-            var negated = false;
-            if (condition is Negation negation)
+                Emit.Empty(), // 0
+                Emit.Label(headLabel), // 1
+                body, // 2
+                condition, // 3
+                Emit.Label(tailLabel), // 4
+                Emit.Empty() // 5
+            },
+            new[]
             {
-                condition = negation.Expression;
-                negated = true;
-            }
+                (0,1,CfgEdge.True), (1,2,CfgEdge.True), (2,3,CfgEdge.True),
+                (3,1,negated ? CfgEdge.False : CfgEdge.True), (3,4,negated ? CfgEdge.True : CfgEdge.False),
+                (4,5,CfgEdge.True),
+            }));
+    }
 
-            return Emit.Cfg(new ControlFlowGraph(new[]
-                {
-                    Emit.Empty(), // 0
-                    Emit.Label(headLabel), // 1
-                    condition, // 2
-                    body, // 3
-                    Emit.Label(tailLabel), // 4
-                    Emit.Empty() // 5
-                },
-                new[]
-                {
-                    (0,1,CfgEdge.True), (1,2,CfgEdge.True),
-                    (2,3,negated ? CfgEdge.False : CfgEdge.True), (2,4,negated ? CfgEdge.True : CfgEdge.False),
-                    (3,1,CfgEdge.True),
-                    (4,5,CfgEdge.True)
-                }));
-        }
+    protected override ICfgNode Build(WhileLoop whileLoop)
+    {
+        var headLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
+        var tailLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
+        _headStack.Push(headLabel);
+        _tailStack.Push(tailLabel);
 
-        protected override ICfgNode Build(EndlessLoop loop)
+        whileLoop.Condition.Accept(this);
+        var condition = Result ?? whileLoop.Condition;
+        whileLoop.Body?.Accept(this);
+        var body = Result ?? whileLoop.Body;
+
+        _tailStack.Pop();
+        _headStack.Pop();
+
+        var negated = false;
+        if (condition is Negation negation)
         {
-            var headLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
-            var tailLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
-            _headStack.Push(headLabel);
-            _tailStack.Push(tailLabel);
-
-            loop.Body?.Accept(this);
-            var body = Result ?? loop.Body;
-
-            _tailStack.Pop();
-            _headStack.Pop();
-
-            return Emit.Cfg(new ControlFlowGraph(new[]
-                {
-                    Emit.Empty(), // 0
-                    Emit.Label(headLabel), // 1
-                    body, // 2
-                    Emit.Label(tailLabel), // 3
-                    Emit.Empty() // 4
-                },
-                new[]
-                {
-                    (0,1,CfgEdge.True),
-                    (1,2,CfgEdge.True), (1,3,CfgEdge.LoopSuccessor),
-                    (2,1,CfgEdge.True),
-                    (3,4,CfgEdge.True)
-                }));
+            condition = negation.Expression;
+            negated = true;
         }
 
-        protected override ICfgNode Build(BreakStatement breakStatement)
-        {
-            if (_headStack.Count == 0)
-                throw new InvalidOperationException("Break statement detected outside of a loop");
-            return Emit.Goto(_tailStack.Peek());
-        }
+        return Emit.Cfg(new ControlFlowGraph(new[]
+            {
+                Emit.Empty(), // 0
+                Emit.Label(headLabel), // 1
+                condition, // 2
+                body, // 3
+                Emit.Label(tailLabel), // 4
+                Emit.Empty() // 5
+            },
+            new[]
+            {
+                (0,1,CfgEdge.True), (1,2,CfgEdge.True),
+                (2,3,negated ? CfgEdge.False : CfgEdge.True), (2,4,negated ? CfgEdge.True : CfgEdge.False),
+                (3,1,CfgEdge.True),
+                (4,5,CfgEdge.True)
+            }));
+    }
 
-        protected override ICfgNode Build(ContinueStatement continueStatement)
-        {
-            if (_headStack.Count == 0)
-                throw new InvalidOperationException("Continue statement detected outside of a loop");
-            return Emit.Goto(_headStack.Peek());
-        }
+    protected override ICfgNode Build(EndlessLoop loop)
+    {
+        var headLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
+        var tailLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
+        _headStack.Push(headLabel);
+        _tailStack.Push(tailLabel);
+
+        loop.Body?.Accept(this);
+        var body = Result ?? loop.Body;
+
+        _tailStack.Pop();
+        _headStack.Pop();
+
+        return Emit.Cfg(new ControlFlowGraph(new[]
+            {
+                Emit.Empty(), // 0
+                Emit.Label(headLabel), // 1
+                body, // 2
+                Emit.Label(tailLabel), // 3
+                Emit.Empty() // 4
+            },
+            new[]
+            {
+                (0,1,CfgEdge.True),
+                (1,2,CfgEdge.True), (1,3,CfgEdge.LoopSuccessor),
+                (2,1,CfgEdge.True),
+                (3,4,CfgEdge.True)
+            }));
+    }
+
+    protected override ICfgNode Build(BreakStatement breakStatement)
+    {
+        if (_headStack.Count == 0)
+            throw new InvalidOperationException("Break statement detected outside of a loop");
+        return Emit.Goto(_tailStack.Peek());
+    }
+
+    protected override ICfgNode Build(ContinueStatement continueStatement)
+    {
+        if (_headStack.Count == 0)
+            throw new InvalidOperationException("Continue statement detected outside of a loop");
+        return Emit.Goto(_headStack.Peek());
     }
 }

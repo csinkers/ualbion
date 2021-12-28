@@ -5,152 +5,152 @@ using System.Text.RegularExpressions;
 using UAlbion.Config;
 using Veldrid;
 
-namespace UAlbion
+namespace UAlbion;
+
+class CommandLineOptions
 {
-    class CommandLineOptions
+    public ExecutionMode Mode { get; }
+    public GraphicsBackend Backend { get; }
+    public bool DebugMenus { get; }
+    public bool Mute { get; }
+    public bool NeedsEngine => Mode == ExecutionMode.Game;
+    public bool StartupOnly { get; }
+    public bool UseRenderDoc { get; }
+    public string[] ConvertFrom { get; }
+    public string ConvertTo { get; }
+    public Regex ConvertFilePattern { get; }
+
+    public string[] Commands { get; }
+    public string[] DumpIds { get; }
+    public DumpFormats DumpFormats { get; } = DumpFormats.Json;
+    public ISet<AssetType> DumpAssetTypes { get; }
+
+    public CommandLineOptions(string[] args)
     {
-        public ExecutionMode Mode { get; }
-        public GraphicsBackend Backend { get; }
-        public bool DebugMenus { get; }
-        public bool Mute { get; }
-        public bool NeedsEngine => Mode == ExecutionMode.Game;
-        public bool StartupOnly { get; }
-        public bool UseRenderDoc { get; }
-        public string[] ConvertFrom { get; }
-        public string ConvertTo { get; }
-        public Regex ConvertFilePattern { get; }
+        // Defaults
+        Mode = ExecutionMode.Game;
+        Backend = GraphicsBackend.Vulkan;
 
-        public string[] Commands { get; }
-        public string[] DumpIds { get; }
-        public DumpFormats DumpFormats { get; } = DumpFormats.Json;
-        public ISet<AssetType> DumpAssetTypes { get; }
-
-        public CommandLineOptions(string[] args)
+        for (int i = 0; i < args.Length; i++)
         {
-            // Defaults
-            Mode = ExecutionMode.Game;
-            Backend = GraphicsBackend.Vulkan;
+            var arg = args[i].ToUpperInvariant();
 
-            for (int i = 0; i < args.Length; i++)
+            // Mode
+            if (arg == "--GAME") Mode = ExecutionMode.Game;
+            if (arg is "--DUMP" or "-D") Mode = ExecutionMode.DumpData;
+            if (arg is "--ISO" or "-ISO") Mode = ExecutionMode.BakeIsometric;
+            if (arg is "--CONVERT" or "--BUILD" or "-B")
             {
-                var arg = args[i].ToUpperInvariant();
+                if (i +2 >= args.Length)
+                    throw new FormatException("\"--convert\" requires two parameters: the mod to convert from and the mod to convert to");
+                ConvertFrom = args[++i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                ConvertTo = args[++i];
+                Mode = ExecutionMode.ConvertAssets;
+            }
 
-                // Mode
-                if (arg == "--GAME") Mode = ExecutionMode.Game;
-                if (arg is "--DUMP" or "-D") Mode = ExecutionMode.DumpData;
-                if (arg is "--ISO" or "-ISO") Mode = ExecutionMode.BakeIsometric;
-                if (arg is "--CONVERT" or "--BUILD" or "-B")
-                {
-                    if (i +2 >= args.Length)
-                        throw new FormatException("\"--convert\" requires two parameters: the mod to convert from and the mod to convert to");
-                    ConvertFrom = args[++i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                    ConvertTo = args[++i];
-                    Mode = ExecutionMode.ConvertAssets;
-                }
+            if (arg is "-H" or "--HELP" or "/?" or "HELP")
+            {
+                DisplayUsage();
+                Mode = ExecutionMode.Exit;
+                return;
+            }
 
-                if (arg is "-H" or "--HELP" or "/?" or "HELP")
+            // Options
+            if (arg is "-GL" or "--OPENGL") Backend = GraphicsBackend.OpenGL;
+            if (arg is "-GLES" or "--OPENGLES") Backend = GraphicsBackend.OpenGLES;
+            if (arg is "-VK" or "--VULKAN") Backend = GraphicsBackend.Vulkan;
+            if (arg is "-METAL" or "--METAL") Backend = GraphicsBackend.Metal;
+            if (arg is "-D3D" or "--DIRECT3D") Backend = GraphicsBackend.Direct3D11;
+
+            if (arg == "--MENUS") DebugMenus = true;
+            if (arg is "--NO-AUDIO" or "-MUTE" or "--MUTE") Mute = true;
+            if (arg is "--STARTUPONlY" or "-S") StartupOnly = true;
+            if (arg is "--RENDERDOC" or "-RD") UseRenderDoc = true;
+
+            if (arg is "--COMMANDS" or "-C")
+            {
+                i++;
+                if (i == args.Length)
                 {
-                    DisplayUsage();
+                    Console.WriteLine("\"-c\" requires an argument specifying the commands to run");
                     Mode = ExecutionMode.Exit;
                     return;
                 }
 
-                // Options
-                if (arg is "-GL" or "--OPENGL") Backend = GraphicsBackend.OpenGL;
-                if (arg is "-GLES" or "--OPENGLES") Backend = GraphicsBackend.OpenGLES;
-                if (arg is "-VK" or "--VULKAN") Backend = GraphicsBackend.Vulkan;
-                if (arg is "-METAL" or "--METAL") Backend = GraphicsBackend.Metal;
-                if (arg is "-D3D" or "--DIRECT3D") Backend = GraphicsBackend.Direct3D11;
+                Commands = args[i].Split(';').Select(x => x.Trim()).ToArray();
+            }
 
-                if (arg == "--MENUS") DebugMenus = true;
-                if (arg is "--NO-AUDIO" or "-MUTE" or "--MUTE") Mute = true;
-                if (arg is "--STARTUPONlY" or "-S") StartupOnly = true;
-                if (arg is "--RENDERDOC" or "-RD") UseRenderDoc = true;
-
-                if (arg is "--COMMANDS" or "-C")
+            if (arg is "--TYPE" or "-T")
+            {
+                i++;
+                if (i == args.Length)
                 {
-                    i++;
-                    if (i == args.Length)
-                    {
-                        Console.WriteLine("\"-c\" requires an argument specifying the commands to run");
-                        Mode = ExecutionMode.Exit;
-                        return;
-                    }
-
-                    Commands = args[i].Split(';').Select(x => x.Trim()).ToArray();
+                    Console.WriteLine("\"-type\" requires an argument specifying the asset types to process");
+                    Mode = ExecutionMode.Exit;
+                    return;
                 }
 
-                if (arg is "--TYPE" or "-T")
-                {
-                    i++;
-                    if (i == args.Length)
-                    {
-                        Console.WriteLine("\"-type\" requires an argument specifying the asset types to process");
-                        Mode = ExecutionMode.Exit;
-                        return;
-                    }
+                DumpAssetTypes = new HashSet<AssetType>();
+                foreach (var type in args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                    DumpAssetTypes.Add(Enum.Parse<AssetType>(type, true));
+            }
 
-                    DumpAssetTypes = new HashSet<AssetType>();
-                    foreach (var type in args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries))
-                        DumpAssetTypes.Add(Enum.Parse<AssetType>(type, true));
+            if (arg is "--ID" or "-ID" or "-IDS" or "--IDS")
+            {
+                i++;
+                if (i == args.Length)
+                {
+                    Console.WriteLine("\"-id\" requires an argument specifying the ids to process");
+                    Mode = ExecutionMode.Exit;
+                    return;
+                }
+                DumpIds = args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            if (arg is "--FILES" or "-F")
+            {
+                i++;
+                if (i == args.Length)
+                {
+                    Console.WriteLine("\"--files\" requires an argument specifying the regex to match against");
+                    Mode = ExecutionMode.Exit;
+                    return;
                 }
 
-                if (arg is "--ID" or "-ID" or "-IDS" or "--IDS")
-                {
-                    i++;
-                    if (i == args.Length)
-                    {
-                        Console.WriteLine("\"-id\" requires an argument specifying the ids to process");
-                        Mode = ExecutionMode.Exit;
-                        return;
-                    }
-                    DumpIds = args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                }
+                ConvertFilePattern = new Regex(args[i]);
+            }
 
-                if (arg is "--FILES" or "-F")
+            if (arg is "--FORMATS" or "--FORMAT")
+            {
+                i++;
+                if (i == args.Length)
                 {
-                    i++;
-                    if (i == args.Length)
-                    {
-                        Console.WriteLine("\"--files\" requires an argument specifying the regex to match against");
-                        Mode = ExecutionMode.Exit;
-                        return;
-                    }
-
-                    ConvertFilePattern = new Regex(args[i]);
+                    Console.WriteLine("\"--formats\" requires an argument specifying the formats to process");
+                    Mode = ExecutionMode.Exit;
+                    return;
                 }
-
-                if (arg is "--FORMATS" or "--FORMAT")
-                {
-                    i++;
-                    if (i == args.Length)
-                    {
-                        Console.WriteLine("\"--formats\" requires an argument specifying the formats to process");
-                        Mode = ExecutionMode.Exit;
-                        return;
-                    }
-                    DumpFormats = 0;
-                    foreach (var type in args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries))
-                        DumpFormats |= Enum.Parse<DumpFormats>(type, true);
-                }
+                DumpFormats = 0;
+                foreach (var type in args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                    DumpFormats |= Enum.Parse<DumpFormats>(type, true);
             }
         }
+    }
 
-        static void DisplayUsage()
-        {
-            var formats = string.Join(" ", 
-                Enum.GetValues(typeof(DumpFormats))
-                    .Cast<DumpFormats>()
-                    .Select(x => x.ToString())
-                    .OrderBy(x => x));
+    static void DisplayUsage()
+    {
+        var formats = string.Join(" ", 
+            Enum.GetValues(typeof(DumpFormats))
+                .Cast<DumpFormats>()
+                .Select(x => x.ToString())
+                .OrderBy(x => x));
 
-            var dumpTypes = string.Join(" ",
-                Enum.GetValues(typeof(AssetType))
-                    .Cast<AssetType>()
-                    .Select(x => x.ToString())
-                    .OrderBy(x => x));
+        var dumpTypes = string.Join(" ",
+            Enum.GetValues(typeof(AssetType))
+                .Cast<AssetType>()
+                .Select(x => x.ToString())
+                .OrderBy(x => x));
 
-            Console.WriteLine($@"UAlbion
+        Console.WriteLine($@"UAlbion
 Command Line Options:
 (Note: To specify multiple values for any argument use double quotes and separate values with spaces)
 
@@ -181,6 +181,5 @@ Dump / Convert options:
     --type <Types>      : Dump specific types of game data (space separated list, valid types: {dumpTypes}) (aliases: -t)
     --files <Regex>     : Convert only the assets required for files in the target mod that match the given regular expression (aliases: -f)
 ");
-        }
     }
 }

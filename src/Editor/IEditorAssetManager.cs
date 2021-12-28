@@ -1,7 +1,6 @@
-﻿namespace UAlbion.Editor
+﻿namespace UAlbion.Editor;
+
+public interface IEditorAssetManager
 {
-    public interface IEditorAssetManager
-    {
-        int GetIdForAsset(object asset);
-    }
+    int GetIdForAsset(object asset);
 }

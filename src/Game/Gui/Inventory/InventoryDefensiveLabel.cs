@@ -7,56 +7,55 @@ using UAlbion.Game.Gui.Text;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
 
-namespace UAlbion.Game.Gui.Inventory
+namespace UAlbion.Game.Gui.Inventory;
+
+public class InventoryDefensiveLabel : UiElement
 {
-    public class InventoryDefensiveLabel : UiElement
+    readonly PartyMemberId _activeCharacter;
+    int _version;
+
+    public InventoryDefensiveLabel(PartyMemberId activeCharacter)
     {
-        readonly PartyMemberId _activeCharacter;
-        int _version;
+        On<InventoryChangedEvent>(e => _version++);
+        On<BlurEvent>(e => Raise(new HoverTextEvent(null)));
+        On<HoverEvent>(Hover);
 
-        public InventoryDefensiveLabel(PartyMemberId activeCharacter)
-        {
-            On<InventoryChangedEvent>(e => _version++);
-            On<BlurEvent>(e => Raise(new HoverTextEvent(null)));
-            On<HoverEvent>(Hover);
+        _activeCharacter = activeCharacter;
 
-            _activeCharacter = activeCharacter;
-
-            var source = new DynamicText(() =>
-            {
-                var player = Resolve<IParty>()[_activeCharacter];
-                var protection = player?.Apparent.DisplayProtection ?? 0;
-                return new[] { new TextBlock($"{protection}") };
-            }, x => _version);
-
-            AttachChild(
-                new ButtonFrame(
-                    new FixedSize(27, 8,
-                        new HorizontalStack(
-                            new FixedSize(6, 8,
-                                new UiSpriteElement(Base.CoreSprite.UiDefensiveValue)),
-                            new Spacing(1, 0),
-                            new UiText(new LiteralText(":")),
-                            new UiText(source)
-                        )
-                    ))
-                {
-                    State = ButtonState.Pressed,
-                    Padding = 0
-                }
-            );
-        }
-
-        void Hover(HoverEvent e)
+        var source = new DynamicText(() =>
         {
             var player = Resolve<IParty>()[_activeCharacter];
-            var tf = Resolve<ITextFormatter>();
-
-            // Protection : %d
             var protection = player?.Apparent.DisplayProtection ?? 0;
-            var text = tf.Format(Base.SystemText.Inv_ProtectionN, protection);
-            Raise(new HoverTextEvent(text));
-            e.Propagating = false;
-        }
+            return new[] { new TextBlock($"{protection}") };
+        }, x => _version);
+
+        AttachChild(
+            new ButtonFrame(
+                new FixedSize(27, 8,
+                    new HorizontalStack(
+                        new FixedSize(6, 8,
+                            new UiSpriteElement(Base.CoreSprite.UiDefensiveValue)),
+                        new Spacing(1, 0),
+                        new UiText(new LiteralText(":")),
+                        new UiText(source)
+                    )
+                ))
+            {
+                State = ButtonState.Pressed,
+                Padding = 0
+            }
+        );
+    }
+
+    void Hover(HoverEvent e)
+    {
+        var player = Resolve<IParty>()[_activeCharacter];
+        var tf = Resolve<ITextFormatter>();
+
+        // Protection : %d
+        var protection = player?.Apparent.DisplayProtection ?? 0;
+        var text = tf.Format(Base.SystemText.Inv_ProtectionN, protection);
+        Raise(new HoverTextEvent(text));
+        e.Propagating = false;
     }
 }

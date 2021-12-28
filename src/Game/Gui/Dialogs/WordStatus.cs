@@ -1,9 +1,8 @@
-﻿namespace UAlbion.Game.Gui.Dialogs
+﻿namespace UAlbion.Game.Gui.Dialogs;
+
+public enum WordStatus
 {
-    public enum WordStatus
-    {
-        Unknown,
-        Mentioned,
-        Discussed,
-    }
+    Unknown,
+    Mentioned,
+    Discussed,
 }

@@ -1,6 +1,5 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Core.Events
-{
-    [Event("hover")] public class HoverEvent : CancellableEvent {}
-}
+namespace UAlbion.Core.Events;
+
+[Event("hover")] public class HoverEvent : CancellableEvent {}

@@ -1,7 +1,6 @@
-namespace UAlbion.Base
+namespace UAlbion.Base;
+
+public enum UiBackground : byte
 {
-    public enum UiBackground : byte
-    {
-        Slab = 1,
-    }
+    Slab = 1,
 }

@@ -1,10 +1,9 @@
 ﻿using System.Xml.Serialization;
 
-namespace UAlbion.Formats.Exporters.Tiled
+namespace UAlbion.Formats.Exporters.Tiled;
+
+public class WangTile
 {
-    public class WangTile
-    {
-        [XmlAttribute("tileid")] public int TileId { get; set; }
-        [XmlAttribute("wangid")] public string WangId { get; set; }
-    }
+    [XmlAttribute("tileid")] public int TileId { get; set; }
+    [XmlAttribute("wangid")] public string WangId { get; set; }
 }

@@ -1,10 +1,9 @@
 ﻿using UAlbion.Api.Visual;
 
-namespace UAlbion.Core.Visual
+namespace UAlbion.Core.Visual;
+
+public interface IRenderable
 {
-    public interface IRenderable
-    {
-        string Name { get; }
-        DrawLayer RenderOrder { get; }
-    }
+    string Name { get; }
+    DrawLayer RenderOrder { get; }
 }

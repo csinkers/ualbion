@@ -3,49 +3,48 @@ using ADLMidi.NET;
 using UAlbion.Core;
 using UAlbion.Formats.Assets;
 
-namespace UAlbion.Game
+namespace UAlbion.Game;
+
+public class AlbionMusicGenerator : Component, IAudioGenerator
 {
-    public class AlbionMusicGenerator : Component, IAudioGenerator
+    MidiPlayer _player;
+
+    public SongId SongId { get; }
+    public AlbionMusicGenerator(SongId songId) => SongId = songId;
+
+    protected override void Subscribed()
     {
-        MidiPlayer _player;
+        if (_player != null)
+            return;
 
-        public SongId SongId { get; }
-        public AlbionMusicGenerator(SongId songId) => SongId = songId;
+        try { _player = AdlMidi.Init(); }
+        catch (DllNotFoundException e) { Error($"DLL not found: {e.Message}"); }
 
-        protected override void Subscribed()
+        if (_player == null)
+            return;
+
+        var assets = Resolve<IAssetManager>();
+        var xmiBytes = assets.LoadSong(SongId);
+        if ((xmiBytes?.Length ?? 0) == 0)
+            return;
+
+        var banks = assets.LoadSoundBanks();
+        if(banks == null)
         {
-            if (_player != null)
-                return;
-
-            try { _player = AdlMidi.Init(); }
-            catch (DllNotFoundException e) { Error($"DLL not found: {e.Message}"); }
-
-            if (_player == null)
-                return;
-
-            var assets = Resolve<IAssetManager>();
-            var xmiBytes = assets.LoadSong(SongId);
-            if ((xmiBytes?.Length ?? 0) == 0)
-                return;
-
-            var banks = assets.LoadSoundBanks();
-            if(banks == null)
-            {
-                Error("AlbionMusicGenerator: Could not load sound banks");
-                return;
-            }
-
-            _player.OpenBankData(banks);
-            _player.OpenData(xmiBytes);
-            _player.SetLoopEnabled(true);
+            Error("AlbionMusicGenerator: Could not load sound banks");
+            return;
         }
 
-        protected override void Unsubscribed()
-        {
-            _player?.Close();
-            _player = null;
-        }
-
-        public int FillBuffer(Span<short> buffer) => _player?.Play(buffer) ?? 0;
+        _player.OpenBankData(banks);
+        _player.OpenData(xmiBytes);
+        _player.SetLoopEnabled(true);
     }
+
+    protected override void Unsubscribed()
+    {
+        _player?.Close();
+        _player = null;
+    }
+
+    public int FillBuffer(Span<short> buffer) => _player?.Play(buffer) ?? 0;
 }

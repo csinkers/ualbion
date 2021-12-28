@@ -1,7 +1,6 @@
-﻿namespace UAlbion.Core.Visual
+﻿namespace UAlbion.Core.Visual;
+
+public interface IEtmManager
 {
-    public interface IEtmManager
-    {
-        IExtrudedTilemap CreateTilemap(TilemapRequest request);
-    }
+    IExtrudedTilemap CreateTilemap(TilemapRequest request);
 }

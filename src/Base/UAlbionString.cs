@@ -1,8 +1,7 @@
-﻿namespace UAlbion.Base
+﻿namespace UAlbion.Base;
+
+public enum UAlbionString
 {
-    public enum UAlbionString
-    {
-        LanguageLabel = 0,
-        TakeAll = 1,
-    }
+    LanguageLabel = 0,
+    TakeAll = 1,
 }

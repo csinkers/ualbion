@@ -1,11 +1,10 @@
 ﻿using System.Numerics;
 using UAlbion.Formats.Assets.Maps;
 
-namespace UAlbion.Game
+namespace UAlbion.Game;
+
+public interface IMovementCollider
 {
-    public interface IMovementCollider
-    {
-        bool IsOccupied(Vector2 tilePosition);
-        Passability GetPassability(Vector2 tilePosition);
-    }
+    bool IsOccupied(Vector2 tilePosition);
+    Passability GetPassability(Vector2 tilePosition);
 }

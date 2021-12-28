@@ -1,10 +1,9 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Game.Events
+namespace UAlbion.Game.Events;
+
+public class ModsLoadedEvent : Event
 {
-    public class ModsLoadedEvent : Event
-    {
-        ModsLoadedEvent() {}
-        public static ModsLoadedEvent Instance { get; } = new();
-    }
+    ModsLoadedEvent() {}
+    public static ModsLoadedEvent Instance { get; } = new();
 }

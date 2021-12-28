@@ -1,12 +1,11 @@
-﻿namespace UAlbion.Game.Input
+﻿namespace UAlbion.Game.Input;
+
+public enum CursorMode
 {
-    public enum CursorMode
-    {
-        Normal,
-        Examine,
-        Manipulate,
-        Talk,
-        Take,
-        PathFinding
-    }
+    Normal,
+    Examine,
+    Manipulate,
+    Talk,
+    Take,
+    PathFinding
 }

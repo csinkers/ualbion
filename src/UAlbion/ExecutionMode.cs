@@ -1,11 +1,10 @@
-﻿namespace UAlbion
+﻿namespace UAlbion;
+
+public enum ExecutionMode
 {
-    public enum ExecutionMode
-    {
-        Game,
-        DumpData,
-        ConvertAssets,
-        BakeIsometric,
-        Exit,
-    }
+    Game,
+    DumpData,
+    ConvertAssets,
+    BakeIsometric,
+    Exit,
 }

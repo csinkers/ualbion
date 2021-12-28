@@ -1,22 +1,21 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Core.Events
+namespace UAlbion.Core.Events;
+
+[Event("e:mag", "Changes the current magnification level.")]
+public class MagnifyEvent : EngineEvent
 {
-    [Event("e:mag", "Changes the current magnification level.")]
-    public class MagnifyEvent : EngineEvent
-    {
-        public MagnifyEvent(int delta) => Delta = delta;
+    public MagnifyEvent(int delta) => Delta = delta;
 
-        [EventPart("delta", "The change in magnification level")]
-        public int Delta { get; }
-    }
+    [EventPart("delta", "The change in magnification level")]
+    public int Delta { get; }
+}
 
-    [Event("cam_mag", "Sets the current magnification level")]
-    public class CameraMagnificationEvent : EngineEvent
-    {
-        public CameraMagnificationEvent(float magnification) => Magnification = magnification;
+[Event("cam_mag", "Sets the current magnification level")]
+public class CameraMagnificationEvent : EngineEvent
+{
+    public CameraMagnificationEvent(float magnification) => Magnification = magnification;
 
-        [EventPart("magnification", "The magnification level")]
-        public float Magnification { get; }
-    }
+    [EventPart("magnification", "The magnification level")]
+    public float Magnification { get; }
 }

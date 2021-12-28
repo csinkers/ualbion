@@ -1,9 +1,8 @@
-﻿namespace UAlbion.Game.Debugging
+﻿namespace UAlbion.Game.Debugging;
+
+public enum DebugInspectorAction
 {
-    public enum DebugInspectorAction
-    {
-        Format,
-        Hover,
-        Blur,
-    }
+    Format,
+    Hover,
+    Blur,
 }

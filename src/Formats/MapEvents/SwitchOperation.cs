@@ -1,9 +1,8 @@
-﻿namespace UAlbion.Formats.MapEvents
+﻿namespace UAlbion.Formats.MapEvents;
+
+public enum SwitchOperation : byte
 {
-    public enum SwitchOperation : byte
-    {
-        Reset,
-        Set,
-        Toggle
-    }
+    Reset,
+    Set,
+    Toggle
 }

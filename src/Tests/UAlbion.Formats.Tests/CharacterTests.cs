@@ -1,6 +1,5 @@
-﻿namespace UAlbion.Formats.Tests
+﻿namespace UAlbion.Formats.Tests;
+
+class CharacterTests
 {
-    class CharacterTests
-    {
-    }
 }

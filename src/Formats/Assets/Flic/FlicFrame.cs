@@ -3,40 +3,39 @@ using System.Collections.Generic;
 using SerdesNet;
 using UAlbion.Api;
 
-namespace UAlbion.Formats.Assets.Flic
+namespace UAlbion.Formats.Assets.Flic;
+
+public class FlicFrame : FlicChunk
 {
-    public class FlicFrame : FlicChunk
+    readonly int _videoWidth;
+    readonly int _videoHeight;
+
+    public FlicFrame(int width, int height)
     {
-        readonly int _videoWidth;
-        readonly int _videoHeight;
+        _videoWidth = width;
+        _videoHeight = height;
+    }
 
-        public FlicFrame(int width, int height)
-        {
-            _videoWidth = width;
-            _videoHeight = height;
-        }
+    public override FlicChunkType Type => FlicChunkType.Frame;
+    public IList<FlicChunk> SubChunks { get; } = new List<FlicChunk>();
+    public ushort Delay { get; private set; }
+    public ushort Width { get; private set; } // Overrides, usually 0.
+    public ushort Height { get; private set; }
 
-        public override FlicChunkType Type => FlicChunkType.Frame;
-        public IList<FlicChunk> SubChunks { get; } = new List<FlicChunk>();
-        public ushort Delay { get; private set; }
-        public ushort Width { get; private set; } // Overrides, usually 0.
-        public ushort Height { get; private set; }
+    protected override uint LoadChunk(uint length, ISerializer s)
+    {
+        if (s == null) throw new ArgumentNullException(nameof(s));
+        var initialOffset = s.Offset;
+        ushort subChunkCount = s.UInt16(null, 0);
+        Delay = s.UInt16(null, 0);
+        s.UInt16(null, 0);
+        Width = s.UInt16(null, 0);
+        Height = s.UInt16(null, 0);
 
-        protected override uint LoadChunk(uint length, ISerializer s)
-        {
-            if (s == null) throw new ArgumentNullException(nameof(s));
-            var initialOffset = s.Offset;
-            ushort subChunkCount = s.UInt16(null, 0);
-            Delay = s.UInt16(null, 0);
-            s.UInt16(null, 0);
-            Width = s.UInt16(null, 0);
-            Height = s.UInt16(null, 0);
+        for (int i = 0; i < subChunkCount; i++)
+            SubChunks.Add(Load(s, _videoWidth, _videoHeight));
 
-            for (int i = 0; i < subChunkCount; i++)
-                SubChunks.Add(Load(s, _videoWidth, _videoHeight));
-
-            ApiUtil.Assert(s.Offset == initialOffset + length);
-            return length;
-        }
+        ApiUtil.Assert(s.Offset == initialOffset + length);
+        return length;
     }
 }

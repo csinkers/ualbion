@@ -1,9 +1,8 @@
-﻿namespace UAlbion.Core
+﻿namespace UAlbion.Core;
+
+public enum ValueOperation
 {
-    public enum ValueOperation
-    {
-        Set,
-        Add,
-        Mult
-    }
+    Set,
+    Add,
+    Mult
 }

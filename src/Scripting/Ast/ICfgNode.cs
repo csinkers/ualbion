@@ -1,8 +1,7 @@
-﻿namespace UAlbion.Scripting.Ast
+﻿namespace UAlbion.Scripting.Ast;
+
+public interface ICfgNode
 {
-    public interface ICfgNode
-    {
-        void Accept(IAstVisitor visitor);
-        int Priority { get; }
-    }
+    void Accept(IAstVisitor visitor);
+    int Priority { get; }
 }

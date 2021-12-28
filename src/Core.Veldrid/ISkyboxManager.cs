@@ -1,10 +1,9 @@
 ﻿using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
 
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Veldrid;
+
+public interface ISkyboxManager : IRenderableSource
 {
-    public interface ISkyboxManager : IRenderableSource
-    {
-        Skybox.SkyboxRenderable CreateSkybox(ITexture texture);
-    }
+    Skybox.SkyboxRenderable CreateSkybox(ITexture texture);
 }

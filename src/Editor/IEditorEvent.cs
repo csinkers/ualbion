@@ -1,9 +1,8 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Editor
+namespace UAlbion.Editor;
+
+public interface IEditorEvent : IEvent
 {
-    public interface IEditorEvent : IEvent
-    {
-        int Id { get; }
-    }
+    int Id { get; }
 }

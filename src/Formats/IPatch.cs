@@ -1,7 +1,6 @@
-﻿namespace UAlbion.Formats
+﻿namespace UAlbion.Formats;
+
+public interface IPatch
 {
-    public interface IPatch
-    {
-        object Apply(object asset);
-    }
+    object Apply(object asset);
 }

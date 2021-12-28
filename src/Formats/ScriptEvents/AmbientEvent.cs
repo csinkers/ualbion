@@ -1,12 +1,11 @@
 ﻿using UAlbion.Api;
 using UAlbion.Formats.Assets;
 
-namespace UAlbion.Formats.ScriptEvents
+namespace UAlbion.Formats.ScriptEvents;
+
+[Event("ambient")] // USED IN SCRIPT
+public class AmbientEvent : Event
 {
-    [Event("ambient")] // USED IN SCRIPT
-    public class AmbientEvent : Event
-    {
-        public AmbientEvent(SongId songId) { SongId = songId; }
-        [EventPart("songId")] public SongId SongId { get; }
-    }
+    public AmbientEvent(SongId songId) { SongId = songId; }
+    [EventPart("songId")] public SongId SongId { get; }
 }

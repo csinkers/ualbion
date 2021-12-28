@@ -1,9 +1,8 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
-namespace UAlbion.Base
+namespace UAlbion.Base;
+
+public enum ItemGraphics : byte
 {
-    public enum ItemGraphics : byte
-    {
-        ItemSprites = 1,
-    }
+    ItemSprites = 1,
 }

@@ -4,12 +4,11 @@ using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Game.Text;
 
-namespace UAlbion.Game.Entities
+namespace UAlbion.Game.Entities;
+
+public interface ITextManager
 {
-    public interface ITextManager
-    {
-        Vector2 Measure(TextBlock block);
-        PositionedSpriteBatch BuildRenderable(TextBlock block, DrawLayer layer, Rectangle? scissorRegion, object caller);
-        IEnumerable<TextBlock> SplitBlocksToSingleWords(IEnumerable<TextBlock> blocks);
-    }
+    Vector2 Measure(TextBlock block);
+    PositionedSpriteBatch BuildRenderable(TextBlock block, DrawLayer layer, Rectangle? scissorRegion, object caller);
+    IEnumerable<TextBlock> SplitBlocksToSingleWords(IEnumerable<TextBlock> blocks);
 }

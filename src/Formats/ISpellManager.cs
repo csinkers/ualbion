@@ -1,10 +1,9 @@
 ﻿using UAlbion.Formats.Assets;
 
-namespace UAlbion.Formats
+namespace UAlbion.Formats;
+
+public interface ISpellManager
 {
-    public interface ISpellManager
-    {
-        SpellId GetSpellId(SpellClass school, byte number);
-        SpellData GetSpellOrDefault(SpellId id); // null if doesn't exist
-    }
+    SpellId GetSpellId(SpellClass school, byte number);
+    SpellData GetSpellOrDefault(SpellId id); // null if doesn't exist
 }

@@ -1,9 +1,8 @@
-﻿namespace UAlbion.Formats.MapEvents
+﻿namespace UAlbion.Formats.MapEvents;
+
+public enum SoundMode : byte
 {
-    public enum SoundMode : byte
-    {
-        Silent = 0, // ??
-        GlobalOneShot = 1,
-        LocalLoop = 4
-    }
+    Silent = 0, // ??
+    GlobalOneShot = 1,
+    LocalLoop = 4
 }

@@ -1,9 +1,8 @@
 ﻿using UAlbion.Config;
 
-namespace UAlbion.Game.Assets
+namespace UAlbion.Game.Assets;
+
+public interface IAssetPostProcessor
 {
-    public interface IAssetPostProcessor
-    {
-        object Process(object asset, AssetInfo info);
-    }
+    object Process(object asset, AssetInfo info);
 }

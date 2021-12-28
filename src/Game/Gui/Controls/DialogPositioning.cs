@@ -1,16 +1,15 @@
-﻿namespace UAlbion.Game.Gui.Controls
+﻿namespace UAlbion.Game.Gui.Controls;
+
+public enum DialogPositioning
 {
-    public enum DialogPositioning
-    {
-        Center,
-        Bottom,
-        Top,
-        Left,
-        Right,
-        BottomLeft,
-        TopLeft,
-        TopRight,
-        BottomRight,
-        StatusBar,
-    }
+    Center,
+    Bottom,
+    Top,
+    Left,
+    Right,
+    BottomLeft,
+    TopLeft,
+    TopRight,
+    BottomRight,
+    StatusBar,
 }

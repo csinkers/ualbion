@@ -1,10 +1,9 @@
 ﻿using System.Numerics;
 using UAlbion.Core;
 
-namespace UAlbion.Game.State
+namespace UAlbion.Game.State;
+
+public interface IMovement : IComponent
 {
-    public interface IMovement : IComponent
-    {
-        (Vector3, int) GetPositionHistory(int followerIndex);
-    }
+    (Vector3, int) GetPositionHistory(int followerIndex);
 }

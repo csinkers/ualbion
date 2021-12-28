@@ -1,9 +1,8 @@
-﻿namespace UAlbion.Core
+﻿namespace UAlbion.Core;
+
+public enum FlagOperation
 {
-    public enum FlagOperation
-    {
-        Set,
-        Clear,
-        Toggle
-    }
+    Set,
+    Clear,
+    Toggle
 }

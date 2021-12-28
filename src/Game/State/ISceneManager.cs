@@ -1,12 +1,11 @@
 ﻿using UAlbion.Core;
 using UAlbion.Game.Scenes;
 
-namespace UAlbion.Game.State
+namespace UAlbion.Game.State;
+
+public interface ISceneManager
 {
-    public interface ISceneManager
-    {
-        IScene ActiveScene { get; }
-        SceneId ActiveSceneId { get; }
-        IScene GetScene(SceneId sceneId);
-    }
+    IScene ActiveScene { get; }
+    SceneId ActiveSceneId { get; }
+    IScene GetScene(SceneId sceneId);
 }

@@ -1,12 +1,11 @@
-﻿namespace UAlbion.Game.Text
+﻿namespace UAlbion.Game.Text;
+
+public enum ContextType
 {
-    public enum ContextType
-    {
-        Leader,
-        Subject,
-        Inventory,
-        Combatant,
-        Victim,
-        Weapon
-    }
+    Leader,
+    Subject,
+    Inventory,
+    Combatant,
+    Victim,
+    Weapon
 }

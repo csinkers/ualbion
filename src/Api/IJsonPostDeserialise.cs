@@ -1,7 +1,6 @@
-﻿namespace UAlbion.Api
+﻿namespace UAlbion.Api;
+
+public interface IJsonPostDeserialise
 {
-    public interface IJsonPostDeserialise
-    {
-        void OnDeserialized();
-    }
+    void OnDeserialized();
 }

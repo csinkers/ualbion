@@ -1,14 +1,13 @@
 ﻿using UAlbion.Core;
 using UAlbion.Game.Settings;
 
-namespace UAlbion.Game
+namespace UAlbion.Game;
+
+public interface ISettings
 {
-    public interface ISettings
-    {
-        IDebugSettings Debug { get; }
-        IAudioSettings Audio { get; }
-        IGameplaySettings Gameplay { get; }
-        IEngineSettings Engine { get; }
-        void Save();
-    }
+    IDebugSettings Debug { get; }
+    IAudioSettings Audio { get; }
+    IGameplaySettings Gameplay { get; }
+    IEngineSettings Engine { get; }
+    void Save();
 }

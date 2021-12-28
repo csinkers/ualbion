@@ -1,7 +1,6 @@
-﻿namespace UAlbion.Config
+﻿namespace UAlbion.Config;
+
+public interface IAssetConfig
 {
-    public interface IAssetConfig
-    {
-        AssetInfo[] GetAssetInfo(AssetId id);
-    }
+    AssetInfo[] GetAssetInfo(AssetId id);
 }

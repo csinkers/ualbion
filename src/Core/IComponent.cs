@@ -1,12 +1,11 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Core
+namespace UAlbion.Core;
+
+public interface IComponent
 {
-    public interface IComponent
-    {
-        void Attach(EventExchange exchange);
-        void Remove();
-        void Receive(IEvent e, object sender);
-        bool IsActive { get; set; }
-    }
+    void Attach(EventExchange exchange);
+    void Remove();
+    void Receive(IEvent e, object sender);
+    bool IsActive { get; set; }
 }

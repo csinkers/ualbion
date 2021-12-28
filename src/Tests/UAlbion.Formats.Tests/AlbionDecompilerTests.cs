@@ -13,11 +13,11 @@ using UAlbion.Scripting.Ast;
 using UAlbion.TestCommon;
 using Xunit;
 
-namespace UAlbion.Formats.Tests
+namespace UAlbion.Formats.Tests;
+
+public class AlbionDecompilerTests
 {
-    public class AlbionDecompilerTests
-    {
-        const string Sira2EventSetHex = @"
+    const string Sira2EventSetHex = @"
 0f00 7200 0000 1d00 2100 2500 2700 2b00 2d00 2f00 3100 3300 3a00 5000 5800 6400 7000 0e06 0100 0000 0000 
 0000 0100 0c05 0000 0000 0400 0b00 0200 0c00 0000 0000 5502 0300 0600 040d 0000 0007 0000 0000 0400 040b 
 0000 0001 0000 0000 0500 0404 0000 0001 0000 0000 ffff 0c00 0000 0000 4d00 0800 0700 040d 0000 000b 0000 
@@ -54,101 +54,101 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
 0000 7100 0400 0000 0026 0000 0000 ffff
 ";
 
-        static void Verify(ICfgNode tree, List<(string, IGraph)> steps, string expected, [CallerMemberName] string method = null)
+    static void Verify(ICfgNode tree, List<(string, IGraph)> steps, string expected, [CallerMemberName] string method = null)
+    {
+        var visitor = new FormatScriptVisitor();
+        tree.Accept(visitor);
+        DumpSteps(steps, method);
+
+        Assert.Equal(expected, visitor.Code);
+    }
+
+    static void DumpSteps(List<(string, IGraph)> steps, string method)
+    {
+        if (steps == null)
+            return;
+
+        var disk = new MockFileSystem(true);
+        var baseDir = ConfigUtil.FindBasePath(disk);
+        var resultsDir = Path.Combine(baseDir, "re", "DecompilerTests");
+        if (!Directory.Exists(resultsDir))
+            Directory.CreateDirectory(resultsDir);
+
+        for (int i = 0; i < steps.Count; i++)
         {
-            var visitor = new FormatScriptVisitor();
-            tree.Accept(visitor);
+            var (description, graph) = steps[i];
+            var path = Path.Combine(resultsDir, $"{method}_{i}_{description}.gv");
+            File.WriteAllText(path, graph.ExportToDot());
+
+            var graphVizDot = @"C:\Program Files\Graphviz\bin\dot.exe";
+            if (!File.Exists(graphVizDot))
+                continue;
+
+            var pngPath = Path.ChangeExtension(path, "png");
+            var args = $"\"{path}\" -T png -o \"{pngPath}\"";
+            using var process = Process.Start(graphVizDot, args);
+            process?.WaitForExit();
+        }
+    }
+
+    static void TestDecompile(string script, string expected, [CallerMemberName] string method = null)
+    {
+        var events = EventNode.ParseRawEvents(script);
+        var steps = new List<(string, IGraph)>();
+        try
+        {
+            var result = Decompiler.Decompile(
+                events,
+                new ushort[] { 0 },
+                null,
+                steps).Single();
+
+            Verify(result, steps, expected, method);
+        }
+        catch (ControlFlowGraphException e)
+        {
+            steps.Add((e.Message, e.Graph));
             DumpSteps(steps, method);
-
-            Assert.Equal(expected, visitor.Code);
+            throw;
         }
-
-        static void DumpSteps(List<(string, IGraph)> steps, string method)
+        catch
         {
-            if (steps == null)
-                return;
-
-            var disk = new MockFileSystem(true);
-            var baseDir = ConfigUtil.FindBasePath(disk);
-            var resultsDir = Path.Combine(baseDir, "re", "DecompilerTests");
-            if (!Directory.Exists(resultsDir))
-                Directory.CreateDirectory(resultsDir);
-
-            for (int i = 0; i < steps.Count; i++)
-            {
-                var (description, graph) = steps[i];
-                var path = Path.Combine(resultsDir, $"{method}_{i}_{description}.gv");
-                File.WriteAllText(path, graph.ExportToDot());
-
-                var graphVizDot = @"C:\Program Files\Graphviz\bin\dot.exe";
-                if (!File.Exists(graphVizDot))
-                    continue;
-
-                var pngPath = Path.ChangeExtension(path, "png");
-                var args = $"\"{path}\" -T png -o \"{pngPath}\"";
-                using var process = Process.Start(graphVizDot, args);
-                process?.WaitForExit();
-            }
+            DumpSteps(steps, method);
+            throw;
         }
+    }
 
-        static void TestDecompile(string script, string expected, [CallerMemberName] string method = null)
-        {
-            var events = EventNode.ParseRawEvents(script);
-            var steps = new List<(string, IGraph)>();
-            try
-            {
-                var result = Decompiler.Decompile(
-                    events,
-                    new ushort[] { 0 },
-                    null,
-                    steps).Single();
+    static void Setup()
+    {
+        AssetMapping.GlobalIsThreadLocal = true;
+        AssetMapping.Global.RegisterAssetType(typeof(Base.Door), AssetType.Door);
+        AssetMapping.Global.RegisterAssetType(typeof(Base.EventSet), AssetType.EventSet);
+        AssetMapping.Global.RegisterAssetType(typeof(Base.EventText), AssetType.EventText);
+        AssetMapping.Global.RegisterAssetType(typeof(Base.Item), AssetType.Item);
+        AssetMapping.Global.RegisterAssetType(typeof(Base.Map), AssetType.Map);
+        AssetMapping.Global.RegisterAssetType(typeof(Base.MapText), AssetType.MapText);
+        AssetMapping.Global.RegisterAssetType(typeof(Base.PartyMember), AssetType.Party);
+        AssetMapping.Global.RegisterAssetType(typeof(Base.Switch), AssetType.Switch);
+        AssetMapping.Global.RegisterAssetType(typeof(Base.Ticker), AssetType.Ticker);
+        AssetMapping.Global.RegisterAssetType(typeof(Base.Word), AssetType.Word);
+        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(ScriptEvents.PartyMoveEvent)));
+    }
 
-                Verify(result, steps, expected, method);
-            }
-            catch (ControlFlowGraphException e)
-            {
-                steps.Add((e.Message, e.Graph));
-                DumpSteps(steps, method);
-                throw;
-            }
-            catch
-            {
-                DumpSteps(steps, method);
-                throw;
-            }
-        }
+    [Fact]
+    public void DecompileTest()
+    {
+        Setup();
 
-        static void Setup()
-        {
-            AssetMapping.GlobalIsThreadLocal = true;
-            AssetMapping.Global.RegisterAssetType(typeof(Base.Door), AssetType.Door);
-            AssetMapping.Global.RegisterAssetType(typeof(Base.EventSet), AssetType.EventSet);
-            AssetMapping.Global.RegisterAssetType(typeof(Base.EventText), AssetType.EventText);
-            AssetMapping.Global.RegisterAssetType(typeof(Base.Item), AssetType.Item);
-            AssetMapping.Global.RegisterAssetType(typeof(Base.Map), AssetType.Map);
-            AssetMapping.Global.RegisterAssetType(typeof(Base.MapText), AssetType.MapText);
-            AssetMapping.Global.RegisterAssetType(typeof(Base.PartyMember), AssetType.Party);
-            AssetMapping.Global.RegisterAssetType(typeof(Base.Switch), AssetType.Switch);
-            AssetMapping.Global.RegisterAssetType(typeof(Base.Ticker), AssetType.Ticker);
-            AssetMapping.Global.RegisterAssetType(typeof(Base.Word), AssetType.Word);
-            Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(ScriptEvents.PartyMoveEvent)));
-        }
-
-        [Fact]
-        public void DecompileTest()
-        {
-            Setup();
-
-            const string script = 
-@"!0?1:2: query_verb Examine
+        const string script = 
+            @"!0?1:2: query_verb Examine
  1=>!: map_text MapText.Jirinaar 37 NoPortrait None ; ""The door to the house of the Hunter Clan. It is secured with a lock.""
 !2?3:!: open_door Door.HunterClan MapText.Jirinaar Item.HunterClanKey 100 32 33
 !3?4:!: result
  4=>5: modify_unk2 0 0 0 0 101 0
  5=>!: teleport Map.HunterClan 69 67 Unchanged 255 0";
 
-            string expected = 
-@"Chain0:
+        string expected = 
+            @"Chain0:
 if (query_verb Examine) {
     map_text MapText.Jirinaar 37
 } else {
@@ -159,19 +159,19 @@ if (query_verb Examine) {
         }
     }
 }";
-            TestDecompile(script, expected);
-        }
+        TestDecompile(script, expected);
+    }
 
-        [Fact]
-        public void SiraParseTest()
-        { // From event set 984 (Sira2)
-            Setup();
-            var bytes = FormatUtil.HexStringToBytes(Sira2EventSetHex.Replace(" ", "").Replace(Environment.NewLine, ""));
-            var set = FormatUtil.DeserializeFromBytes(bytes,
-                s => EventSet.Serdes(Base.EventSet.Sira2, null, AssetMapping.Global, s));
-            var script = string.Join(Environment.NewLine, set.EventStrings);
+    [Fact]
+    public void SiraParseTest()
+    { // From event set 984 (Sira2)
+        Setup();
+        var bytes = FormatUtil.HexStringToBytes(Sira2EventSetHex.Replace(" ", "").Replace(Environment.NewLine, ""));
+        var set = FormatUtil.DeserializeFromBytes(bytes,
+            s => EventSet.Serdes(Base.EventSet.Sira2, null, AssetMapping.Global, s));
+        var script = string.Join(Environment.NewLine, set.EventStrings);
 
-            const string expectedScript = @" 0=>1: action StartDialogue
+        const string expectedScript = @" 0=>1: action StartDialogue
 !1?2:11: party_has PartyMember.Sira
 !2?6:3: get_switch Switch.Switch597
  3=>4: map_text EventText.Sira2 7 StandardOptions
@@ -286,29 +286,29 @@ if (query_verb Examine) {
  112=>113: action Word 0 Word.Stri
  113=>!: map_text EventText.Sira2 38";
 
-            var lines = ApiUtil.SplitLines(script);
-            var expectedLines = ApiUtil.SplitLines(expectedScript);
+        var lines = ApiUtil.SplitLines(script);
+        var expectedLines = ApiUtil.SplitLines(expectedScript);
             
-            Assert.Equal(lines.Length, expectedLines.Length);
+        Assert.Equal(lines.Length, expectedLines.Length);
 
-            var discrep = new List<string>();
-            for (int i = 0; i < lines.Length; i++)
-                if (lines[i] != expectedLines[i])
-                    discrep.Add($"{i}: Expected \"{expectedLines[i]}\", but was \"{lines[i]}\"");
+        var discrep = new List<string>();
+        for (int i = 0; i < lines.Length; i++)
+            if (lines[i] != expectedLines[i])
+                discrep.Add($"{i}: Expected \"{expectedLines[i]}\", but was \"{lines[i]}\"");
 
-            if (discrep.Any())
-                throw new InvalidOperationException( string.Join(Environment.NewLine, discrep));
-        }
+        if (discrep.Any())
+            throw new InvalidOperationException( string.Join(Environment.NewLine, discrep));
+    }
 
-        [Fact]
-        public void SiraDecompileTest()
-        {
-            Setup();
-            var bytes = FormatUtil.HexStringToBytes(Sira2EventSetHex.Replace(" ", "").Replace(Environment.NewLine, ""));
-            var set = FormatUtil.DeserializeFromBytes(bytes, s => EventSet.Serdes(Base.EventSet.Sira2, null, AssetMapping.Global, s));
-            var script = string.Join(Environment.NewLine, set.EventStrings.Take(29));
+    [Fact]
+    public void SiraDecompileTest()
+    {
+        Setup();
+        var bytes = FormatUtil.HexStringToBytes(Sira2EventSetHex.Replace(" ", "").Replace(Environment.NewLine, ""));
+        var set = FormatUtil.DeserializeFromBytes(bytes, s => EventSet.Serdes(Base.EventSet.Sira2, null, AssetMapping.Global, s));
+        var script = string.Join(Environment.NewLine, set.EventStrings.Take(29));
 
-            const string expected = @"Chain0:
+        const string expected = @"Chain0:
 action StartDialogue
 if (party_has PartyMember.Sira) {
     if (get_switch Switch.Switch597) {
@@ -354,7 +354,6 @@ if (party_has PartyMember.Sira) {
         end_dialogue
     }
 }";
-            TestDecompile(script, expected);
-        }
+        TestDecompile(script, expected);
     }
 }

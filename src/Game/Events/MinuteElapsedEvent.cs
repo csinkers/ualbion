@@ -1,10 +1,9 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Game.Events
+namespace UAlbion.Game.Events;
+
+[Event("minute_elapsed")]
+public class MinuteElapsedEvent : GameEvent, IVerboseEvent
 {
-    [Event("minute_elapsed")]
-    public class MinuteElapsedEvent : GameEvent, IVerboseEvent
-    {
-        public static MinuteElapsedEvent Instance { get; } = new();
-    }
+    public static MinuteElapsedEvent Instance { get; } = new();
 }

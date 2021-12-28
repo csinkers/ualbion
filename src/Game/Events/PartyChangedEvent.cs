@@ -1,9 +1,8 @@
 ﻿using UAlbion.Api;
 
-namespace UAlbion.Game.Events
+namespace UAlbion.Game.Events;
+
+[Event("party_changed", "Emitted when party members have been added or removed")]
+public class PartyChangedEvent : GameEvent
 {
-    [Event("party_changed", "Emitted when party members have been added or removed")]
-    public class PartyChangedEvent : GameEvent
-    {
-    }
 }

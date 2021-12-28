@@ -1,4 +1,3 @@
-﻿namespace UAlbion.Core
-{
-    public interface IScene : IContainer, IComponent { }
-}
+﻿namespace UAlbion.Core;
+
+public interface IScene : IContainer, IComponent { }

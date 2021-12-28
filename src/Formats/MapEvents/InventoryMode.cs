@@ -1,11 +1,10 @@
-﻿namespace UAlbion.Formats.MapEvents
+﻿namespace UAlbion.Formats.MapEvents;
+
+public enum InventoryMode
 {
-    public enum InventoryMode
-    {
-        Character,
-        Merchant,
-        Chest,
-        LockedDoor,
-        LockedChest
-    }
+    Character,
+    Merchant,
+    Chest,
+    LockedDoor,
+    LockedChest
 }

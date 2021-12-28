@@ -6,29 +6,28 @@ using UAlbion.Core.Veldrid.Events;
 using UAlbion.Game.Events;
 using Veldrid;
 
-namespace UAlbion.Game.Veldrid.Input
+namespace UAlbion.Game.Veldrid.Input;
+
+public class ContextMenuMouseMode : Component
 {
-    public class ContextMenuMouseMode : Component
+    readonly List<Selection> _hits = new();
+    readonly UiLeftClickEvent _leftClickEvent = new();
+    readonly UiLeftReleaseEvent _leftReleaseEvent = new();
+
+    public ContextMenuMouseMode() => On<InputEvent>(OnInput);
+    protected override void Subscribed() => Raise(new SetCursorEvent(Base.CoreSprite.Cursor));
+
+    void OnInput(InputEvent e)
     {
-        readonly List<Selection> _hits = new();
-        readonly UiLeftClickEvent _leftClickEvent = new();
-        readonly UiLeftReleaseEvent _leftReleaseEvent = new();
+        _hits.Clear();
+        Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, true);
+        if (_hits.Count > 0 && e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && x.Down))
+            Distribute(_leftClickEvent, _hits, x => x.Target as IComponent);
 
-        public ContextMenuMouseMode() => On<InputEvent>(OnInput);
-        protected override void Subscribed() => Raise(new SetCursorEvent(Base.CoreSprite.Cursor));
+        if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && !x.Down))
+            Raise(_leftReleaseEvent);
 
-        void OnInput(InputEvent e)
-        {
-            _hits.Clear();
-            Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, true);
-            if (_hits.Count > 0 && e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && x.Down))
-                Distribute(_leftClickEvent, _hits, x => x.Target as IComponent);
-
-            if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && !x.Down))
-                Raise(_leftReleaseEvent);
-
-            if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && x.Down))
-                Raise(new CloseWindowEvent());
-        }
+        if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && x.Down))
+            Raise(new CloseWindowEvent());
     }
 }

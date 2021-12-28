@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace UAlbion.Api
+namespace UAlbion.Api;
+
+public interface IJsonUtil
 {
-    public interface IJsonUtil
-    {
-        T Deserialize<T>(ReadOnlySpan<byte> bytes);
-        T Deserialize<T>(string json);
-        string Serialize<T>(T input);
-    }
+    T Deserialize<T>(ReadOnlySpan<byte> bytes);
+    T Deserialize<T>(string json);
+    string Serialize<T>(T input);
 }

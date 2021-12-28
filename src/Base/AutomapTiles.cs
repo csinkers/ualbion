@@ -1,10 +1,9 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
-namespace UAlbion.Base
+namespace UAlbion.Base;
+
+public enum AutomapTiles : byte
 {
-    public enum AutomapTiles : byte
-    {
-        Set1 = 1,
-        Set2 = 2,
-    }
+    Set1 = 1,
+    Set2 = 2,
 }

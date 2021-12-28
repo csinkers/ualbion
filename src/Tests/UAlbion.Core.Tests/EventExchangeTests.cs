@@ -1,6 +1,5 @@
-namespace UAlbion.Core.Tests
+namespace UAlbion.Core.Tests;
+
+public class EventExchangeTests
 {
-    public class EventExchangeTests
-    {
-    }
 }

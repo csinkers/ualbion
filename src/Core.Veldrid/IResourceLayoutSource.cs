@@ -1,10 +1,9 @@
 ﻿using System;
 using Veldrid;
 
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Veldrid;
+
+public interface IResourceLayoutSource
 {
-    public interface IResourceLayoutSource
-    {
-        ResourceLayout GetLayout(Type type, GraphicsDevice device);
-    }
+    ResourceLayout GetLayout(Type type, GraphicsDevice device);
 }

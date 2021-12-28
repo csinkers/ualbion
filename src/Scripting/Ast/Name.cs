@@ -1,9 +1,8 @@
-﻿namespace UAlbion.Scripting.Ast
+﻿namespace UAlbion.Scripting.Ast;
+
+public record Name(string Value) : ICfgNode
 {
-    public record Name(string Value) : ICfgNode
-    {
-        public override string ToString() => $"{Value}";
-        public void Accept(IAstVisitor visitor) => visitor.Visit(this);
-        public int Priority => 0;
-    }
+    public override string ToString() => $"{Value}";
+    public void Accept(IAstVisitor visitor) => visitor.Visit(this);
+    public int Priority => 0;
 }

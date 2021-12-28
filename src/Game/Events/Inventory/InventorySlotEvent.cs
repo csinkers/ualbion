@@ -1,17 +1,16 @@
 ﻿using UAlbion.Api;
 using UAlbion.Formats.Assets;
 
-namespace UAlbion.Game.Events.Inventory
-{
-    public abstract class InventorySlotEvent : GameEvent, IInventoryEvent, IAsyncEvent
-    {
-        protected InventorySlotEvent(InventoryId id, ItemSlotId slotId)
-        {
-            Id = id;
-            SlotId = slotId;
-        }
+namespace UAlbion.Game.Events.Inventory;
 
-        [EventPart("id", "The id of the inventory to discard from")] public InventoryId Id { get; }
-        [EventPart("slot_id", "The slot in the inventory to discard from")] public ItemSlotId SlotId { get; }
+public abstract class InventorySlotEvent : GameEvent, IInventoryEvent, IAsyncEvent
+{
+    protected InventorySlotEvent(InventoryId id, ItemSlotId slotId)
+    {
+        Id = id;
+        SlotId = slotId;
     }
+
+    [EventPart("id", "The id of the inventory to discard from")] public InventoryId Id { get; }
+    [EventPart("slot_id", "The slot in the inventory to discard from")] public ItemSlotId SlotId { get; }
 }

@@ -8,111 +8,110 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 
-namespace UAlbion.Game.Gui.Controls
+namespace UAlbion.Game.Gui.Controls;
+
+public class ContextMenu : Dialog
 {
-    public class ContextMenu : Dialog
+    ContextMenuEvent _event;
+    Vector2 _uiPosition;
+
+    public ContextMenu() : base(DialogPositioning.TopLeft, int.MaxValue)
     {
-        ContextMenuEvent _event;
-        Vector2 _uiPosition;
+        On<ContextMenuEvent>(Display);
+        On<CloseWindowEvent>(e => Display(null));
+    }
 
-        public ContextMenu() : base(DialogPositioning.TopLeft, int.MaxValue)
+    public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+    {
+        if (registerHitFunc == null) throw new ArgumentNullException(nameof(registerHitFunc));
+        // Just the default condition without the extents check, as the use of a fixed position stack means the extents passed in are ignored.
+        var maxOrder = DoLayout(extents, order, (x,y,z) => x.Select(uiPosition, y, z, registerHitFunc));
+        registerHitFunc(order, this);
+        return maxOrder;
+    }
+
+    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    {
+        int maxOrder = order;
+        foreach (var child in Children)
         {
-            On<ContextMenuEvent>(Display);
-            On<CloseWindowEvent>(e => Display(null));
+            if (child is not IUiElement { IsActive: true } childElement)
+                continue;
+
+            var size = childElement.GetSize();
+            int x = (int)_uiPosition.X;
+            int y = (int)_uiPosition.Y;
+
+            if (x + size.X > UiConstants.UiExtents.Right - 10)
+                x -= (int)size.X;
+
+            if (y + size.Y > UiConstants.UiExtents.Bottom - 10)
+                y -= (int)size.Y;
+
+            var childExtents = new Rectangle(
+                x,
+                y,
+                (int)size.X,
+                (int)size.Y);
+
+            maxOrder = Math.Max(maxOrder, func(childElement, childExtents, order + 1));
+        }
+        return maxOrder;
+    }
+
+    void OnButton(ContextMenuOption option, bool keepOpen)
+    {
+        if (!keepOpen)
+            Close();
+
+        if (option.Event is IAsyncEvent asyncEvent)
+            RaiseAsync(asyncEvent, null);
+        else if (option.Event != null)
+            Raise(option.Event);
+    }
+
+    void Close()
+    {
+        RemoveAllChildren();
+        _event = null;
+        Raise(new PopInputModeEvent());
+    }
+
+    void Display(ContextMenuEvent contextMenuEvent)
+    {
+        if (_event != null)
+            Close();
+
+        if (contextMenuEvent == null)
+            return;
+
+        _event = contextMenuEvent;
+        _uiPosition = contextMenuEvent.UiPosition;
+
+        var optionElements = new List<IUiElement>();
+        ContextMenuGroup? lastGroup = null;
+        foreach (var option in _event.Options)
+        {
+            lastGroup ??= option.Group;
+            if(lastGroup != option.Group)
+                optionElements.Add(new Spacing(0, 2));
+            lastGroup = option.Group;
+
+            var option1 = option;
+            optionElements.Add(new Button(option.Text).OnClick(() => OnButton(option1, option1.Disabled)));
         }
 
-        public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+        var elements = new List<IUiElement>
         {
-            if (registerHitFunc == null) throw new ArgumentNullException(nameof(registerHitFunc));
-            // Just the default condition without the extents check, as the use of a fixed position stack means the extents passed in are ignored.
-            var maxOrder = DoLayout(extents, order, (x,y,z) => x.Select(uiPosition, y, z, registerHitFunc));
-            registerHitFunc(order, this);
-            return maxOrder;
-        }
+            new Spacing(0, 2),
+            new HorizontalStack(new Spacing(5, 0), new BoldHeader(_event.Heading), new Spacing(5, 0)),
+            new Divider(CommonColor.Yellow3),
+            new Padding(new VerticalStack(optionElements), 0, 2)
+        };
 
-        protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
-        {
-            int maxOrder = order;
-            foreach (var child in Children)
-            {
-                if (child is not IUiElement { IsActive: true } childElement)
-                    continue;
-
-                var size = childElement.GetSize();
-                int x = (int)_uiPosition.X;
-                int y = (int)_uiPosition.Y;
-
-                if (x + size.X > UiConstants.UiExtents.Right - 10)
-                    x -= (int)size.X;
-
-                if (y + size.Y > UiConstants.UiExtents.Bottom - 10)
-                    y -= (int)size.Y;
-
-                var childExtents = new Rectangle(
-                    x,
-                    y,
-                    (int)size.X,
-                    (int)size.Y);
-
-                maxOrder = Math.Max(maxOrder, func(childElement, childExtents, order + 1));
-            }
-            return maxOrder;
-        }
-
-        void OnButton(ContextMenuOption option, bool keepOpen)
-        {
-            if (!keepOpen)
-                Close();
-
-            if (option.Event is IAsyncEvent asyncEvent)
-                RaiseAsync(asyncEvent, null);
-            else if (option.Event != null)
-                Raise(option.Event);
-        }
-
-        void Close()
-        {
-            RemoveAllChildren();
-            _event = null;
-            Raise(new PopInputModeEvent());
-        }
-
-        void Display(ContextMenuEvent contextMenuEvent)
-        {
-            if (_event != null)
-                Close();
-
-            if (contextMenuEvent == null)
-                return;
-
-            _event = contextMenuEvent;
-            _uiPosition = contextMenuEvent.UiPosition;
-
-            var optionElements = new List<IUiElement>();
-            ContextMenuGroup? lastGroup = null;
-            foreach (var option in _event.Options)
-            {
-                lastGroup ??= option.Group;
-                if(lastGroup != option.Group)
-                    optionElements.Add(new Spacing(0, 2));
-                lastGroup = option.Group;
-
-                var option1 = option;
-                optionElements.Add(new Button(option.Text).OnClick(() => OnButton(option1, option1.Disabled)));
-            }
-
-            var elements = new List<IUiElement>
-            {
-                new Spacing(0, 2),
-                new HorizontalStack(new Spacing(5, 0), new BoldHeader(_event.Heading), new Spacing(5, 0)),
-                new Divider(CommonColor.Yellow3),
-                new Padding(new VerticalStack(optionElements), 0, 2)
-            };
-
-            var frame = new DialogFrame(new VerticalStack(elements));
-            AttachChild(frame);
-            Raise(new PushInputModeEvent(InputMode.ContextMenu));
-        }
+        var frame = new DialogFrame(new VerticalStack(elements));
+        AttachChild(frame);
+        Raise(new PushInputModeEvent(InputMode.ContextMenu));
     }
 }
 

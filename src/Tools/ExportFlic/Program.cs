@@ -6,47 +6,46 @@ using UAlbion.Config;
 using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats;
 
-namespace UAlbion.Tools.ExportFlic
+namespace UAlbion.Tools.ExportFlic;
+
+class Program
 {
-    class Program
+    const string RelativePath = @"data\Exported\ENGLISH\FLICS0.XLD";
+    static void Main()
     {
-        const string RelativePath = @"data\Exported\ENGLISH\FLICS0.XLD";
-        static void Main()
+        var disk = new FileSystem();
+        var baseDir = ConfigUtil.FindBasePath(disk);
+        if (baseDir == null)
+            throw new InvalidOperationException("No base directory could be found.");
+
+        var dir = Path.Combine(baseDir, RelativePath);
+
+        var files = Directory.EnumerateFiles(dir, "*.bin");
+        foreach (var file in files)
         {
-            var disk = new FileSystem();
-            var baseDir = ConfigUtil.FindBasePath(disk);
-            if (baseDir == null)
-                throw new InvalidOperationException("No base directory could be found.");
+            using var stream = File.OpenRead(file);
+            using var br = new BinaryReader(stream);
+            using var s = new AlbionReader(br);
+            var flic = new FlicFile(s);
+            var buffer = new byte[flic.Width * flic.Height];
 
-            var dir = Path.Combine(baseDir, RelativePath);
-
-            var files = Directory.EnumerateFiles(dir, "*.bin");
-            foreach (var file in files)
-            {
-                using var stream = File.OpenRead(file);
-                using var br = new BinaryReader(stream);
-                using var s = new AlbionReader(br);
-                var flic = new FlicFile(s);
-                var buffer = new byte[flic.Width * flic.Height];
-
-                AviFile.Write(
-                    Path.ChangeExtension(file, "avi"),
-                    flic.Speed,
-                    flic.Width,
-                    flic.Height,
-                    flic.Play(() => buffer).AllFrames32());
-                // break;
-            }
+            AviFile.Write(
+                Path.ChangeExtension(file, "avi"),
+                flic.Speed,
+                flic.Width,
+                flic.Height,
+                flic.Play(() => buffer).AllFrames32());
+            // break;
         }
+    }
 
-        static IEnumerable<byte[]> FrameGenerator(int width, int height)
+    static IEnumerable<byte[]> FrameGenerator(int width, int height)
+    {
+        byte[] frame = new byte[width * height * 3];
+        for (byte i = 0; i < 255; i++)
         {
-            byte[] frame = new byte[width * height * 3];
-            for (byte i = 0; i < 255; i++)
-            {
-                Array.Fill(frame, i);
-                yield return frame;
-            }
+            Array.Fill(frame, i);
+            yield return frame;
         }
     }
 }

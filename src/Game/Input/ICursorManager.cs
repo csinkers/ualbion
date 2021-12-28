@@ -1,12 +1,11 @@
 ﻿using System.Numerics;
 
-namespace UAlbion.Game.Input
+namespace UAlbion.Game.Input;
+
+public interface ICursorManager
 {
-    public interface ICursorManager
-    {
-        /// <summary>
-        /// The cursor position in pixel coordinates
-        /// </summary>
-        Vector2 Position { get; }
-    }
+    /// <summary>
+    /// The cursor position in pixel coordinates
+    /// </summary>
+    Vector2 Position { get; }
 }

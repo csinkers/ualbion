@@ -1,8 +1,7 @@
-﻿namespace UAlbion.Core.Visual
+﻿namespace UAlbion.Core.Visual;
+
+public enum DungeonTilemapPipeline
 {
-    public enum DungeonTilemapPipeline
-    {
-        Normal = 1,
-        NoCulling = 2
-    }
+    Normal = 1,
+    NoCulling = 2
 }

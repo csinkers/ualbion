@@ -1,10 +1,9 @@
 ﻿using UAlbion.Api.Visual;
 using UAlbion.Formats.Assets;
 
-namespace UAlbion.Game.Assets
+namespace UAlbion.Game.Assets;
+
+public interface IMetafontBuilder
 {
-    public interface IMetafontBuilder
-    {
-        ITexture Build(MetaFontId id);
-    }
+    ITexture Build(MetaFontId id);
 }

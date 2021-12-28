@@ -33,11 +33,11 @@
     "CharacterId": [
       "Monster",
       "Npc",
-      "PartyMember"
+      "Party"
     ],
     "MonsterId": [ "Monster" ],
     "NpcId": [ "Npc" ],
-    "PartyMemberId": [ "PartyMember" ],
+    "PartyMemberId": [ "Party" ],
 
     "ItemId": [
       "Item",
@@ -62,7 +62,7 @@
     "SpellId": [ "Spell" ],
     "SwitchId": [ "Switch" ],
     "TickerId": [ "Ticker" ],
-    "TilesetId": [ "TilesetData" ],
+    "TilesetId": [ "Tileset" ],
     "VideoId": [ "Video" ],
     "WaveLibraryId": [ "WaveLibrary" ],
 
@@ -87,7 +87,7 @@
       "        public readonly BlockListId ToBlockList() => new BlockListId(AssetType.BlockList, Id);",
       "        public readonly TilesetGraphicsId ToTilesetGraphics() => new TilesetGraphicsId(AssetType.TilesetGraphics, Id);"
     ],
-    "BlockListId": [ "        public readonly TilesetId ToTileset() => new TilesetId(AssetType.TilesetData, Id);" ],
+    "BlockListId": [ "        public readonly TilesetId ToTileset() => new TilesetId(AssetType.Tileset, Id);" ],
     "PartyMemberId": [
       "        public readonly SpriteId ToSmallPartyGraphics() => new SpriteId(AssetType.SmallPartyGraphics, Id);",
       "        public readonly SpriteId ToLargePartyGraphics() => new SpriteId(AssetType.LargePartyGraphics, Id);",

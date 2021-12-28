@@ -1,10 +1,9 @@
 ﻿using System.Xml.Serialization;
 
-namespace UAlbion.Formats.Exporters.Tiled
+namespace UAlbion.Formats.Exporters.Tiled;
+
+public class LayerData
 {
-    public class LayerData
-    {
-        [XmlAttribute("encoding")] public string Encoding { get; set; }
-        [XmlText] public string Content { get; set; }
-    }
+    [XmlAttribute("encoding")] public string Encoding { get; set; }
+    [XmlText] public string Content { get; set; }
 }

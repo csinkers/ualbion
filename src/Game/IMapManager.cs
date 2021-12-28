@@ -1,9 +1,8 @@
 ﻿using UAlbion.Game.Entities;
 
-namespace UAlbion.Game
+namespace UAlbion.Game;
+
+public interface IMapManager
 {
-    public interface IMapManager
-    {
-        IMap Current { get; }
-    }
+    IMap Current { get; }
 }

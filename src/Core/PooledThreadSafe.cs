@@ -1,39 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UAlbion.Core
+namespace UAlbion.Core;
+
+public class PooledThreadSafe<T> where T : class
 {
-    public class PooledThreadSafe<T> where T : class
+    readonly object _syncRoot = new();
+    readonly Func<T> _constructor;
+    readonly Action<T> _cleanFunc;
+    readonly Stack<T> _free = new();
+
+    public PooledThreadSafe(Func<T> constructor, Action<T> cleanFunc)
     {
-        readonly object _syncRoot = new();
-        readonly Func<T> _constructor;
-        readonly Action<T> _cleanFunc;
-        readonly Stack<T> _free = new();
+        _constructor = constructor ?? throw new ArgumentNullException(nameof(constructor));
+        _cleanFunc = cleanFunc;
+    }
 
-        public PooledThreadSafe(Func<T> constructor, Action<T> cleanFunc)
+    public T Borrow()
+    {
+        lock (_syncRoot)
         {
-            _constructor = constructor ?? throw new ArgumentNullException(nameof(constructor));
-            _cleanFunc = cleanFunc;
+            if (_free.TryPop(out var result))
+                return result;
+
+            return _constructor();
         }
+    }
 
-        public T Borrow()
+    public void Return(T instance)
+    {
+        _cleanFunc?.Invoke(instance);
+        lock (_syncRoot)
         {
-            lock (_syncRoot)
-            {
-                if (_free.TryPop(out var result))
-                    return result;
-
-                return _constructor();
-            }
-        }
-
-        public void Return(T instance)
-        {
-            _cleanFunc?.Invoke(instance);
-            lock (_syncRoot)
-            {
-                _free.Push(instance);
-            }
+            _free.Push(instance);
         }
     }
 }

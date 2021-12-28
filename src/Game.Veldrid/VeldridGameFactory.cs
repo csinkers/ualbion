@@ -7,30 +7,29 @@ using UAlbion.Game.Entities;
 using UAlbion.Game.Entities.Map2D;
 using UAlbion.Game.Veldrid.Visual;
 
-namespace UAlbion.Game.Veldrid
+namespace UAlbion.Game.Veldrid;
+
+public class VeldridGameFactory : VeldridCoreFactory, IGameFactory
 {
-    public class VeldridGameFactory : VeldridCoreFactory, IGameFactory
+    public IMapLayer CreateMapLayer(
+        LogicalMap2D logicalMap,
+        ITexture tileset,
+        Func<int, TileData> getTileFunc,
+        DrawLayer layer,
+        IconChangeType iconChangeType)
     {
-        public IMapLayer CreateMapLayer(
-            LogicalMap2D logicalMap,
-            ITexture tileset,
-            Func<int, TileData> getTileFunc,
-            DrawLayer layer,
-            IconChangeType iconChangeType)
-        {
-            return new MapLayer(logicalMap, tileset, getTileFunc, layer, iconChangeType);
-        }
+        return new MapLayer(logicalMap, tileset, getTileFunc, layer, iconChangeType);
+    }
 
-        protected override void Subscribed()
-        {
-            Exchange.Register<IGameFactory>(this);
-            base.Subscribed();
-        }
+    protected override void Subscribed()
+    {
+        Exchange.Register<IGameFactory>(this);
+        base.Subscribed();
+    }
 
-        protected override void Unsubscribed()
-        {
-            base.Unsubscribed();
-            Exchange.Unregister(this);
-        }
+    protected override void Unsubscribed()
+    {
+        base.Unsubscribed();
+        Exchange.Unregister(this);
     }
 }

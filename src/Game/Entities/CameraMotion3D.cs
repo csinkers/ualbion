@@ -6,41 +6,40 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 
-namespace UAlbion.Game.Entities
+namespace UAlbion.Game.Entities;
+
+public class CameraMotion3D : Component
 {
-    public class CameraMotion3D : Component
+    readonly PerspectiveCamera _camera;
+    Vector3 _velocity;
+
+    public CameraMotion3D(PerspectiveCamera camera)
     {
-        readonly PerspectiveCamera _camera;
-        Vector3 _velocity;
-
-        public CameraMotion3D(PerspectiveCamera camera)
+        _camera = camera ?? throw new ArgumentNullException(nameof(camera));
+        On<BeginFrameEvent>(_ => _velocity = Vector3.Zero);
+        On<CameraJumpEvent>(e =>
         {
-            _camera = camera ?? throw new ArgumentNullException(nameof(camera));
-            On<BeginFrameEvent>(_ => _velocity = Vector3.Zero);
-            On<CameraJumpEvent>(e =>
-            {
-                var map = Resolve<IMapManager>().Current;
-                if (map == null) return;
-                _camera.Position = new Vector3(e.X * map.TileSize.X, map.BaseCameraHeight, e.Y * map.TileSize.Y);
-            });
-            On<CameraMoveEvent>(e =>
-            {
-                var map = Resolve<IMapManager>().Current;
-                if (map == null) return;
-                _velocity += new Vector3(e.X, 0, e.Y) * map.TileSize;
-            });
-            On<CameraRotateEvent>(e => {
-                _camera.Yaw += e.Yaw;
-                _camera.Pitch += e.Pitch;
-            });
-            On<EngineUpdateEvent>(e =>
-            {
-                if (_velocity == Vector3.Zero)
-                    return;
+            var map = Resolve<IMapManager>().Current;
+            if (map == null) return;
+            _camera.Position = new Vector3(e.X * map.TileSize.X, map.BaseCameraHeight, e.Y * map.TileSize.Y);
+        });
+        On<CameraMoveEvent>(e =>
+        {
+            var map = Resolve<IMapManager>().Current;
+            if (map == null) return;
+            _velocity += new Vector3(e.X, 0, e.Y) * map.TileSize;
+        });
+        On<CameraRotateEvent>(e => {
+            _camera.Yaw += e.Yaw;
+            _camera.Pitch += e.Pitch;
+        });
+        On<EngineUpdateEvent>(e =>
+        {
+            if (_velocity == Vector3.Zero)
+                return;
 
-                Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(_camera.Yaw, 0f, 0f);
-                _camera.Position += Vector3.Transform(_velocity, lookRotation) * e.DeltaSeconds;
-            });
-        }
+            Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(_camera.Yaw, 0f, 0f);
+            _camera.Position += Vector3.Transform(_velocity, lookRotation) * e.DeltaSeconds;
+        });
     }
 }

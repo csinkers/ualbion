@@ -2,11 +2,10 @@
 using Veldrid;
 using VeldridGen.Interfaces;
 
-namespace UAlbion.Core.Veldrid
+namespace UAlbion.Core.Veldrid;
+
+public interface IRenderer : IComponent
 {
-    public interface IRenderer : IComponent
-    {
-        void Render(IRenderable renderable, CommonSet commonSet, IFramebufferHolder framebuffer, CommandList cl,
-            GraphicsDevice device);
-    }
+    void Render(IRenderable renderable, CommonSet commonSet, IFramebufferHolder framebuffer, CommandList cl,
+        GraphicsDevice device);
 }

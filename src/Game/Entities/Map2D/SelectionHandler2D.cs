@@ -15,148 +15,147 @@ using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.Text;
 
-namespace UAlbion.Game.Entities.Map2D
+namespace UAlbion.Game.Entities.Map2D;
+
+public sealed class SelectionHandler2D : Component
 {
-    public sealed class SelectionHandler2D : Component
+    static readonly Vector3 Normal = Vector3.UnitZ;
+    readonly LogicalMap2D _map;
+    readonly MapRenderable2D _renderable;
+    readonly MapTileHit _mapTileHit = new();
+    Func<object, string> _formatChain;
+    int _lastHighlightIndex;
+
+    public SelectionHandler2D(LogicalMap2D map, MapRenderable2D renderable)
     {
-        static readonly Vector3 Normal = Vector3.UnitZ;
-        readonly LogicalMap2D _map;
-        readonly MapRenderable2D _renderable;
-        readonly MapTileHit _mapTileHit = new();
-        Func<object, string> _formatChain;
-        int _lastHighlightIndex;
-
-        public SelectionHandler2D(LogicalMap2D map, MapRenderable2D renderable)
+        OnAsync<WorldCoordinateSelectEvent, Selection>(OnSelect);
+        On<ShowMapMenuEvent>(_ => ShowMapMenu());
+        On<UiRightClickEvent>(e =>
         {
-            OnAsync<WorldCoordinateSelectEvent, Selection>(OnSelect);
-            On<ShowMapMenuEvent>(_ => ShowMapMenu());
-            On<UiRightClickEvent>(e =>
-            {
-                e.Propagating = false;
-                Raise(new PushMouseModeEvent(MouseMode.RightButtonHeld));
-            });
+            e.Propagating = false;
+            Raise(new PushMouseModeEvent(MouseMode.RightButtonHeld));
+        });
 
-            _map = map ?? throw new ArgumentNullException(nameof(map));
-            _renderable = renderable;
-        }
+        _map = map ?? throw new ArgumentNullException(nameof(map));
+        _renderable = renderable;
+    }
 
-        public event EventHandler<int> HighlightIndexChanged;
-        protected override void Subscribed()
+    public event EventHandler<int> HighlightIndexChanged;
+    protected override void Subscribed()
+    {
+        var assets = Resolve<IAssetManager>();
+        var eventFormatter = new EventFormatter(assets.LoadString, _map.Id.ToMapText());
+        _formatChain = x => eventFormatter.FormatChain((IEventNode)x);
+    }
+
+    bool OnSelect(WorldCoordinateSelectEvent e, Action<Selection> continuation)
+    {
+        float denominator = Vector3.Dot(Normal, e.Direction);
+        if (Math.Abs(denominator) < 0.00001f)
+            return false;
+
+        float t = Vector3.Dot(-e.Origin, Normal) / denominator;
+        if (t < 0)
+            return false;
+
+        Vector3 intersectionPoint = e.Origin + t * e.Direction;
+        int x = (int)(intersectionPoint.X / _renderable.TileSize.X);
+        int y = (int)(intersectionPoint.Y / _renderable.TileSize.Y);
+
+        _mapTileHit.Tile = new Vector2(x, y);
+        _mapTileHit.IntersectionPoint = intersectionPoint;
+        _mapTileHit.UnderlaySprite = e.Debug ? _renderable.GetWeakUnderlayReference(x, y) : null;
+        _mapTileHit.OverlaySprite = e.Debug ? _renderable.GetWeakOverlayReference(x, y) : null;
+        continuation(new Selection(e.Origin, e.Direction, t, _mapTileHit));
+
+        if (e.Debug)
         {
-            var assets = Resolve<IAssetManager>();
-            var eventFormatter = new EventFormatter(assets.LoadString, _map.Id.ToMapText());
-            _formatChain = x => eventFormatter.FormatChain((IEventNode)x);
-        }
+            var underlayTile = _map.GetUnderlay(x, y);
+            var overlayTile = _map.GetOverlay(x, y);
 
-        bool OnSelect(WorldCoordinateSelectEvent e, Action<Selection> continuation)
-        {
-            float denominator = Vector3.Dot(Normal, e.Direction);
-            if (Math.Abs(denominator) < 0.00001f)
-                return false;
-
-            float t = Vector3.Dot(-e.Origin, Normal) / denominator;
-            if (t < 0)
-                return false;
-
-            Vector3 intersectionPoint = e.Origin + t * e.Direction;
-            int x = (int)(intersectionPoint.X / _renderable.TileSize.X);
-            int y = (int)(intersectionPoint.Y / _renderable.TileSize.Y);
-
-            _mapTileHit.Tile = new Vector2(x, y);
-            _mapTileHit.IntersectionPoint = intersectionPoint;
-            _mapTileHit.UnderlaySprite = e.Debug ? _renderable.GetWeakUnderlayReference(x, y) : null;
-            _mapTileHit.OverlaySprite = e.Debug ? _renderable.GetWeakOverlayReference(x, y) : null;
-            continuation(new Selection(e.Origin, e.Direction, t, _mapTileHit));
-
-            if (e.Debug)
-            {
-                var underlayTile = _map.GetUnderlay(x, y);
-                var overlayTile = _map.GetOverlay(x, y);
-
-                if (underlayTile != null) continuation(new Selection(e.Origin, e.Direction, t, underlayTile));
-                if (overlayTile != null) continuation(new Selection(e.Origin, e.Direction, t, overlayTile));
-                continuation(new Selection(e.Origin, e.Direction, t, this));
-
-                var zone = _map.GetZone(x, y);
-                if (zone != null)
-                    continuation(new Selection(e.Origin, e.Direction, t, zone));
-
-                var chain = zone?.Chain;
-                if (chain != null)
-                    continuation(new Selection(e.Origin, e.Direction, t, zone.Node, _formatChain));
-            }
-
-            int highlightIndex = y * _map.Width + x;
-            if (_lastHighlightIndex != highlightIndex)
-            {
-                HighlightIndexChanged?.Invoke(this, highlightIndex);
-                _lastHighlightIndex = highlightIndex;
-            }
-
-            return true;
-        }
-
-        void ShowMapMenu()
-        {
-            int x = _lastHighlightIndex % _map.Width;
-            int y = _lastHighlightIndex / _map.Width;
-            var window = Resolve<IWindowManager>();
-            var camera = Resolve<ICamera>();
-            var tf = Resolve<ITextFormatter>();
-
-            IText S(TextId textId) => tf.Center().Format(textId);
-            var worldPosition = new Vector2(x, y) * _map.TileSize;
-            var normPosition = camera.ProjectWorldToNorm(new Vector3(worldPosition, 0.0f));
-            var uiPosition = window.NormToUi(normPosition.X, normPosition.Y);
-            var heading = S(Base.SystemText.MapPopup_Environment);
-            var options = new List<ContextMenuOption>();
+            if (underlayTile != null) continuation(new Selection(e.Origin, e.Direction, t, underlayTile));
+            if (overlayTile != null) continuation(new Selection(e.Origin, e.Direction, t, overlayTile));
+            continuation(new Selection(e.Origin, e.Direction, t, this));
 
             var zone = _map.GetZone(x, y);
-            if (zone?.Chain != null && zone.Node != null)
+            if (zone != null)
+                continuation(new Selection(e.Origin, e.Direction, t, zone));
+
+            var chain = zone?.Chain;
+            if (chain != null)
+                continuation(new Selection(e.Origin, e.Direction, t, zone.Node, _formatChain));
+        }
+
+        int highlightIndex = y * _map.Width + x;
+        if (_lastHighlightIndex != highlightIndex)
+        {
+            HighlightIndexChanged?.Invoke(this, highlightIndex);
+            _lastHighlightIndex = highlightIndex;
+        }
+
+        return true;
+    }
+
+    void ShowMapMenu()
+    {
+        int x = _lastHighlightIndex % _map.Width;
+        int y = _lastHighlightIndex / _map.Width;
+        var window = Resolve<IWindowManager>();
+        var camera = Resolve<ICamera>();
+        var tf = Resolve<ITextFormatter>();
+
+        IText S(TextId textId) => tf.Center().Format(textId);
+        var worldPosition = new Vector2(x, y) * _map.TileSize;
+        var normPosition = camera.ProjectWorldToNorm(new Vector3(worldPosition, 0.0f));
+        var uiPosition = window.NormToUi(normPosition.X, normPosition.Y);
+        var heading = S(Base.SystemText.MapPopup_Environment);
+        var options = new List<ContextMenuOption>();
+
+        var zone = _map.GetZone(x, y);
+        if (zone?.Chain != null && zone.Node != null)
+        {
+            if (zone.Trigger.HasFlag(TriggerTypes.Examine))
             {
-                if (zone.Trigger.HasFlag(TriggerTypes.Examine))
-                {
-                    options.Add(new ContextMenuOption(
-                        S(Base.SystemText.MapPopup_Examine),
-                        new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.Examine, x, y)),
-                        ContextMenuGroup.Actions));
-                }
-
-                if (zone.Trigger.HasFlag(TriggerTypes.Manipulate))
-                {
-                    options.Add(new ContextMenuOption(
-                        S(Base.SystemText.MapPopup_Manipulate),
-                        new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.Manipulate, x, y)),
-                        ContextMenuGroup.Actions));
-                }
-
-                if (zone.Trigger.HasFlag(TriggerTypes.Take))
-                {
-                    options.Add(new ContextMenuOption(
-                        S(Base.SystemText.MapPopup_Take),
-                        new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.Take, x, y)),
-                        ContextMenuGroup.Actions));
-                }
-
-                if (zone.Trigger.HasFlag(TriggerTypes.TalkTo))
-                {
-                    options.Add(new ContextMenuOption(
-                        S(Base.SystemText.MapPopup_TalkTo),
-                        new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.TalkTo, x, y)),
-                        ContextMenuGroup.Actions));
-                }
+                options.Add(new ContextMenuOption(
+                    S(Base.SystemText.MapPopup_Examine),
+                    new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.Examine, x, y)),
+                    ContextMenuGroup.Actions));
             }
 
-            // Check if map allows Rest
+            if (zone.Trigger.HasFlag(TriggerTypes.Manipulate))
+            {
+                options.Add(new ContextMenuOption(
+                    S(Base.SystemText.MapPopup_Manipulate),
+                    new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.Manipulate, x, y)),
+                    ContextMenuGroup.Actions));
+            }
 
-            options.Add(new ContextMenuOption(
-                    S(Base.SystemText.MapPopup_MainMenu),
-                    new PushSceneEvent(SceneId.MainMenu),
-                    ContextMenuGroup.System
-                ));
+            if (zone.Trigger.HasFlag(TriggerTypes.Take))
+            {
+                options.Add(new ContextMenuOption(
+                    S(Base.SystemText.MapPopup_Take),
+                    new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.Take, x, y)),
+                    ContextMenuGroup.Actions));
+            }
 
-            Raise(new ContextMenuEvent(uiPosition, heading, options));
+            if (zone.Trigger.HasFlag(TriggerTypes.TalkTo))
+            {
+                options.Add(new ContextMenuOption(
+                    S(Base.SystemText.MapPopup_TalkTo),
+                    new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_map.Id, _map.Id.ToMapText(), TriggerTypes.TalkTo, x, y)),
+                    ContextMenuGroup.Actions));
+            }
         }
+
+        // Check if map allows Rest
+
+        options.Add(new ContextMenuOption(
+            S(Base.SystemText.MapPopup_MainMenu),
+            new PushSceneEvent(SceneId.MainMenu),
+            ContextMenuGroup.System
+        ));
+
+        Raise(new ContextMenuEvent(uiPosition, heading, options));
     }
 }
 

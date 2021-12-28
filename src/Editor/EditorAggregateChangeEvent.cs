@@ -2,17 +2,16 @@
 using System.Linq;
 using UAlbion.Api;
 
-namespace UAlbion.Editor
-{
-    public class EditorAggregateChangeEvent : Event, IEditorEvent
-    {
-        public EditorAggregateChangeEvent(int id, IList<IEditorEvent> events)
-        {
-            Id = id;
-            Events = events.ToArray();
-        }
+namespace UAlbion.Editor;
 
-        public int Id { get; }
-        public IReadOnlyList<IEditorEvent> Events { get; }
+public class EditorAggregateChangeEvent : Event, IEditorEvent
+{
+    public EditorAggregateChangeEvent(int id, IList<IEditorEvent> events)
+    {
+        Id = id;
+        Events = events.ToArray();
     }
+
+    public int Id { get; }
+    public IReadOnlyList<IEditorEvent> Events { get; }
 }

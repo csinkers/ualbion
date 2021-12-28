@@ -1,12 +1,11 @@
-﻿namespace UAlbion.Game.Gui.Controls
+﻿namespace UAlbion.Game.Gui.Controls;
+
+public enum ButtonState
 {
-    public enum ButtonState
-    {
-        Normal,
-        Hover,
-        Clicked,
-        Pressed,
-        HoverPressed,
-        ClickedBlurred
-    }
+    Normal,
+    Hover,
+    Clicked,
+    Pressed,
+    HoverPressed,
+    ClickedBlurred
 }

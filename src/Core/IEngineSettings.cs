@@ -1,9 +1,8 @@
-﻿namespace UAlbion.Core
+﻿namespace UAlbion.Core;
+
+public interface IEngineSettings
 {
-    public interface IEngineSettings
-    {
-        float Special1 { get; }
-        float Special2 { get; }
-        EngineFlags Flags { get; }
-    }
+    float Special1 { get; }
+    float Special2 { get; }
+    EngineFlags Flags { get; }
 }

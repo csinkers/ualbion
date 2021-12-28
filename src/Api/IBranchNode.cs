@@ -1,3 +1,1 @@
-﻿namespace UAlbion.Api
-{
-}
+﻿namespace UAlbion.Api;

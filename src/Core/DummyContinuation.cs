@@ -1,14 +1,13 @@
 ﻿using System;
 
-namespace UAlbion.Core
-{
-    static class DummyContinuation
-    {
-        public static Action Instance { get; } = () => { };
-    }
+namespace UAlbion.Core;
 
-    static class DummyContinuation<T>
-    {
-        public static Action<T> Instance { get; } = _ => { };
-    }
+static class DummyContinuation
+{
+    public static Action Instance { get; } = () => { };
+}
+
+static class DummyContinuation<T>
+{
+    public static Action<T> Instance { get; } = _ => { };
 }

@@ -1,23 +1,22 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Formats.Assets;
 
-namespace UAlbion.Game.Text
-{
-    public interface ITextFormatter
-    {
-        IText Format(TextId textId, params object[] arguments);
-        IText Format(StringId stringId, params object[] arguments);
-        IText Format(string templateText, params object[] arguments);
-        IText Format(TextId textId, IList<(Token, object)> implicitTokens, params object[] arguments);
-        IText Format(StringId stringId, IList<(Token, object)> implicitTokens, params object[] arguments);
-        IText Format(string templateText, IList<(Token, object)> implicitTokens, params object[] arguments);
+namespace UAlbion.Game.Text;
 
-        ITextFormatter NoWrap();
-        ITextFormatter Left();
-        ITextFormatter Center();
-        ITextFormatter Right();
-        ITextFormatter Justify();
-        ITextFormatter Fat();
-        ITextFormatter Ink(FontColor color);
-    }
+public interface ITextFormatter
+{
+    IText Format(TextId textId, params object[] arguments);
+    IText Format(StringId stringId, params object[] arguments);
+    IText Format(string templateText, params object[] arguments);
+    IText Format(TextId textId, IList<(Token, object)> implicitTokens, params object[] arguments);
+    IText Format(StringId stringId, IList<(Token, object)> implicitTokens, params object[] arguments);
+    IText Format(string templateText, IList<(Token, object)> implicitTokens, params object[] arguments);
+
+    ITextFormatter NoWrap();
+    ITextFormatter Left();
+    ITextFormatter Center();
+    ITextFormatter Right();
+    ITextFormatter Justify();
+    ITextFormatter Fat();
+    ITextFormatter Ink(FontColor color);
 }

@@ -1,11 +1,10 @@
-﻿namespace UAlbion.Formats.Assets.Save
+﻿namespace UAlbion.Formats.Assets.Save;
+
+public enum XldCategory : ushort
 {
-    public enum XldCategory : ushort
-    {
-        PartyCharacter = 17,
-        Automap = 27,
-        Chest = 33,
-        Merchant = 34,
-        NpcCharacter = 35,
-    }
+    PartyCharacter = 17,
+    Automap = 27,
+    Chest = 33,
+    Merchant = 34,
+    NpcCharacter = 35,
 }

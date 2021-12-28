@@ -1,9 +1,8 @@
 ﻿using UAlbion.Formats.Assets;
 
-namespace UAlbion.Game.Events.Inventory
+namespace UAlbion.Game.Events.Inventory;
+
+public interface IInventoryEvent
 {
-    public interface IInventoryEvent
-    {
-        InventoryId Id { get; }
-    }
+    InventoryId Id { get; }
 }

@@ -1,9 +1,8 @@
-﻿namespace UAlbion.Formats.Assets
+﻿namespace UAlbion.Formats.Assets;
+
+public enum CharacterType : byte
 {
-    public enum CharacterType : byte
-    {
-        Party = 0,
-        Npc = 1,
-        Monster = 2
-    }
+    Party = 0,
+    Npc = 1,
+    Monster = 2
 }

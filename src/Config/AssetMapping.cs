@@ -12,8 +12,7 @@ namespace UAlbion.Config
 {
     public class AssetMapping
     {
-        static readonly ThreadLocal<AssetMapping> ThreadLocalGlobal =
-            new(() => new AssetMapping());
+        static readonly ThreadLocal<AssetMapping> ThreadLocalGlobal = new(() => new AssetMapping());
         static readonly AssetMapping TrueGlobal = new();
         static readonly AssetType[] AllAssetTypes =
             typeof(AssetType)

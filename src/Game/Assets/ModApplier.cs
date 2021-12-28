@@ -47,17 +47,18 @@ namespace UAlbion.Game.Assets
             Exchange.Register<IModApplier>(this);
         }
 
-        public void LoadMods(IGeneralConfig config, IList<string> mods)
+        public void LoadMods(AssetMapping mapping, IGeneralConfig config, IList<string> mods)
         {
+            if (mapping == null) throw new ArgumentNullException(nameof(mapping));
             if (config == null) throw new ArgumentNullException(nameof(config));
             if (mods == null) throw new ArgumentNullException(nameof(mods));
 
             _mods.Clear();
             _modsInReverseDependencyOrder.Clear();
-            AssetMapping.Global.Clear();
+            mapping.Clear();
 
             foreach (var mod in mods)
-                LoadMod(config.ResolvePath("$(MODS)"), mod);
+                LoadMod(config.ResolvePath("$(MODS)"), mod, mapping);
 
             _modsInReverseDependencyOrder.Reverse();
             Raise(ModsLoadedEvent.Instance);
@@ -68,7 +69,7 @@ namespace UAlbion.Game.Assets
                 .Select(mod => mod.ShaderPath)
                 .Where(x => x != null);
 
-        void LoadMod(string dataDir, string modName)
+        void LoadMod(string dataDir, string modName, AssetMapping mapping)
         {
             if (string.IsNullOrEmpty(modName))
                 return;
@@ -110,7 +111,7 @@ namespace UAlbion.Game.Assets
             // Load dependencies
             foreach (var dependency in modConfig.Dependencies)
             {
-                LoadMod(dataDir, dependency);
+                LoadMod(dataDir, dependency, mapping);
                 if (!_mods.TryGetValue(dependency, out var dependencyInfo))
                 {
                     Error($"Dependency {dependency} of mod {modName} could not be loaded, skipping load of {modName}");
@@ -124,7 +125,7 @@ namespace UAlbion.Game.Assets
                 _languages[kvp.Key] = kvp.Value;
 
             MergeTypesToMapping(modInfo.Mapping, assetConfig, assetConfigPath);
-            AssetMapping.Global.MergeFrom(modInfo.Mapping);
+            mapping.MergeFrom(modInfo.Mapping);
             modConfig.AssetPath ??= path;
             var extraPaths = new Dictionary<string, string> { ["MOD"] = modConfig.AssetPath };
             assetConfig.PopulateAssetIds(

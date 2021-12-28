@@ -13,7 +13,7 @@ namespace UAlbion.Game.Tests
         readonly Dictionary<AssetId, object> _assets = new();
         readonly Dictionary<AssetId, AssetInfo> _infos = new();
 
-        public void LoadMods(IGeneralConfig config, IList<string> mods) { }
+        public void LoadMods(AssetMapping mapping, IGeneralConfig config, IList<string> mods) { }
         public IModApplier AddAssetPostProcessor(IAssetPostProcessor postProcessor) => throw new NotImplementedException();
         public AssetInfo GetAssetInfo(AssetId id, string language) => _infos[id];
         public object LoadAsset(AssetId id) => _assets[id];

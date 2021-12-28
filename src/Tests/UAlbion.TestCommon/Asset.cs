@@ -4,13 +4,16 @@ using System.Linq;
 using System.Text;
 using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Formats;
+using UAlbion.Formats.Containers;
 using Xunit;
 
 namespace UAlbion.TestCommon
 {
     public static class Asset
     {
+        static readonly XldContainer XldLoader = new();
         public static void Compare(
             string resultDir,
             string testName,
@@ -97,6 +100,12 @@ namespace UAlbion.TestCommon
         {
             if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
             return jsonUtil.Deserialize<T>(Encoding.UTF8.GetBytes(json));
+        }
+
+        public static byte[] BytesFromXld(IGeneralConfig conf, string path, AssetInfo info, IFileSystem disk, IJsonUtil jsonUtil)
+        {
+            using var s = XldLoader.Read(conf.ResolvePath(path), info, disk, jsonUtil);
+            return s.Bytes(null, null, (int)s.BytesRemaining);
         }
     }
 }

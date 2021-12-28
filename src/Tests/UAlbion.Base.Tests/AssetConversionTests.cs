@@ -11,7 +11,6 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Assets;
-using UAlbion.Game.Settings;
 using UAlbion.TestCommon;
 using Xunit;
 
@@ -38,20 +37,13 @@ namespace UAlbion.Base.Tests
                 !x.Contains(Path.Combine("mods", RepackedAssetMod, "Albion")));
 
             _baseDir = ConfigUtil.FindBasePath(_disk);
-            _baseApplier = BuildApplier(BaseAssetMod);
+            _baseApplier = BuildApplier(BaseAssetMod, AssetMapping.Global);
         }
 
-        IModApplier BuildApplier(string mod)
+        IModApplier BuildApplier(string mod, AssetMapping mapping)
         {
-            var generalConfig = AssetSystem.LoadGeneralConfig(_baseDir, _disk, JsonUtil);
-            var coreConfig = new CoreConfig();
-            var gameConfig = AssetSystem.LoadGameConfig(_baseDir, _disk, JsonUtil);
-            var settings = new GeneralSettings
-            {
-                ActiveMods = { mod },
-                Language = Language.English
-            };
-            var exchange = AssetSystem.Setup(_disk, JsonUtil, generalConfig, settings, coreConfig, gameConfig);
+            var baseDir = ConfigUtil.FindBasePath(_disk);
+            var exchange = AssetSystem.SetupSimple(baseDir, mapping, mod);
             return exchange.Resolve<IModApplier>();
         }
 
@@ -75,16 +67,18 @@ namespace UAlbion.Base.Tests
             var idStrings = allIds.Select(x => $"{x.Type}.{x.Id}").ToArray();
             var assetTypes = allIds.Select(x => x.Type).Distinct().ToHashSet();
 
-            ConvertAssets.Convert(
+            var mapping = AssetMapping.Global;
+            using (var unpacker = new AssetConverter(
+                mapping,
                 _disk,
                 JsonUtil,
                 BaseAssetMod,
-                UnpackedAssetMod,
-                idStrings,
-                assetTypes, 
-                null);
+                UnpackedAssetMod))
+            {
+                unpacker.Convert(idStrings, assetTypes, null);
+            }
 
-            var unpackedAsset = (T)BuildApplier(UnpackedAssetMod).LoadAsset(id);
+            var unpackedAsset = (T)BuildApplier(UnpackedAssetMod, AssetMapping.Global).LoadAsset(id);
             Assert.NotNull(unpackedAsset);
             var (unpackedBytes, unpackedNotes) = Asset.Save(unpackedAsset, serdes);
             var unpackedJson = Asset.SaveJson(unpackedAsset, JsonUtil);
@@ -101,16 +95,17 @@ namespace UAlbion.Base.Tests
                     (".Unpacked.json", unpackedJson)
                 });
 
-            ConvertAssets.Convert(
+            using (var repacker = new AssetConverter(
+                mapping,
                 _disk,
                 JsonUtil,
                 UnpackedAssetMod,
-                RepackedAssetMod,
-                idStrings,
-                assetTypes, 
-                null);
+                RepackedAssetMod))
+            {
+                repacker.Convert(idStrings, assetTypes, null);
+            }
 
-            var repackedAsset = (T)BuildApplier(RepackedAssetMod).LoadAsset(id);
+            var repackedAsset = (T)BuildApplier(RepackedAssetMod, AssetMapping.Global).LoadAsset(id);
             var (repackedBytes, repackedNotes) = Asset.Save(repackedAsset, serdes);
             var repackedJson = Asset.SaveJson(repackedAsset, JsonUtil);
 

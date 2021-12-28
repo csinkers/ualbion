@@ -5,15 +5,12 @@ using System.Threading;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game;
-using UAlbion.Game.Settings;
 using UAlbion.TestCommon;
 using Xunit;
 
@@ -21,27 +18,17 @@ namespace UAlbion.Base.Tests
 {
     public class AssetLoadTests : IDisposable
     {
-        static int s_testNum;
+        static readonly EventExchange Exchange;
+        static readonly AssetMapping Mapping = new();
+        static int _nextTestNumber;
 
-        static readonly IJsonUtil JsonUtil = new FormatJsonUtil();
-        static readonly CoreConfig CoreConfig;
-        static readonly GeneralConfig GeneralConfig;
-        static readonly GameConfig GameConfig;
-        static readonly GeneralSettings Settings;
         readonly int _testNum;
 
         static AssetLoadTests()
         {
             var disk = new MockFileSystem(true);
             var baseDir = ConfigUtil.FindBasePath(disk);
-            GeneralConfig = AssetSystem.LoadGeneralConfig(baseDir, disk, JsonUtil);
-            CoreConfig = new CoreConfig();
-            GameConfig = AssetSystem.LoadGameConfig(baseDir, disk, JsonUtil);
-            Settings = new GeneralSettings
-            {
-                ActiveMods = { "Base" },
-                Language = Language.English
-            };
+            Exchange = AssetSystem.SetupSimple(baseDir, Mapping);
         }
 
         public AssetLoadTests()
@@ -49,7 +36,8 @@ namespace UAlbion.Base.Tests
             Event.AddEventsFromAssembly(typeof(ActionEvent).Assembly);
             AssetMapping.GlobalIsThreadLocal = true;
             AssetMapping.Global.Clear();
-            _testNum = Interlocked.Increment(ref s_testNum);
+            AssetMapping.Global.MergeFrom(Mapping);
+            _testNum = Interlocked.Increment(ref _nextTestNumber);
             PerfTracker.StartupEvent($"Start asset test {_testNum}");
         }
         public void Dispose()
@@ -59,10 +47,7 @@ namespace UAlbion.Base.Tests
 
         static T Test<T>(Func<IAssetManager, T> func)
         {
-            var disk = new MockFileSystem(true);
-            var exchange = AssetSystem.Setup(disk, JsonUtil, GeneralConfig, Settings, CoreConfig, GameConfig);
-
-            var assets = exchange.Resolve<IAssetManager>();
+            var assets = Exchange.Resolve<IAssetManager>();
             var result = func(assets);
             Assert.NotNull(result);
 

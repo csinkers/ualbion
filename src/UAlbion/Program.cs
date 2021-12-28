@@ -54,18 +54,22 @@ namespace UAlbion
 
             if (commandLine.Mode == ExecutionMode.ConvertAssets)
             {
-                ConvertAssets.Convert(
+                using var converter = new AssetConverter(
+                    AssetMapping.Global,
                     disk,
                     jsonUtil,
                     commandLine.ConvertFrom,
-                    commandLine.ConvertTo,
+                    commandLine.ConvertTo);
+
+                converter.Convert(
                     commandLine.DumpIds,
                     commandLine.DumpAssetTypes,
                     commandLine.ConvertFilePattern);
+
                 return;
             }
 
-            var (exchange, services) = AssetSystem.SetupAsync(baseDir, disk, jsonUtil).Result;
+            var (exchange, services) = AssetSystem.SetupAsync(baseDir, AssetMapping.Global, disk, jsonUtil).Result;
             IRenderPass mainPass = null;
             if (commandLine.NeedsEngine)
                 mainPass = BuildEngine(commandLine, exchange);

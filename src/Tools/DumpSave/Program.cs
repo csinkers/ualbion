@@ -214,7 +214,7 @@ namespace DumpSave
                 .Attach(spellManager)
                 ;
 
-            modApplier.LoadMods(generalConfig, settings.ActiveMods);
+            modApplier.LoadMods(AssetMapping.Global, generalConfig, settings.ActiveMods);
             var save = SavedGame.Serdes(null, AssetMapping.Global, new AlbionReader(br, stream.Length), spellManager);
 
             if (!VerifyRoundTrip(stream, save, AssetMapping.Global, spellManager))

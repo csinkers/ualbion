@@ -1,63 +1,54 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.MapEvents;
 using UAlbion.Game;
-using UAlbion.Game.Settings;
 using UAlbion.Scripting;
-using UAlbion.Scripting.Ast;
-using UAlbion.Scripting.Tests;
 using UAlbion.TestCommon;
 using Xunit;
-using Xunit.Sdk;
 
 namespace UAlbion.Base.Tests
 {
-    public class FullDecompilationTests : IDisposable
+    public class CanonicalEventTests
     {
-        static readonly string ResultsDir = Path.Combine(TestUtil.FindBasePath(), "re", "FullDecomp");
-        static readonly IJsonUtil JsonUtil = new FormatJsonUtil();
-        static readonly AssetMapping Mapping = new();
         static readonly EventExchange Exchange;
-        static int _nextTestNum;
-
-        readonly int _testNum;
-
-        static FullDecompilationTests()
+        static readonly AssetMapping Mapping = new();
+        static CanonicalEventTests()
         {
             var disk = new MockFileSystem(true);
             var baseDir = ConfigUtil.FindBasePath(disk);
-            var generalConfig = AssetSystem.LoadGeneralConfig(baseDir, disk, JsonUtil);
-            var gameConfig = AssetSystem.LoadGameConfig(baseDir, disk, JsonUtil);
-            var coreConfig = new CoreConfig();
-            var settings = new GeneralSettings
-            {
-                ActiveMods = { "Base" },
-                Language = Language.English
-            };
-
-            Exchange = AssetSystem.Setup(Mapping, disk, JsonUtil, generalConfig, settings, coreConfig, gameConfig);
+            Exchange = AssetSystem.SetupSimple(baseDir, Mapping);
         }
 
-        public FullDecompilationTests()
+        public CanonicalEventTests()
         {
-            Event.AddEventsFromAssembly(typeof(ActionEvent).Assembly);
             AssetMapping.GlobalIsThreadLocal = true;
-            AssetMapping.Global.Clear();
             AssetMapping.Global.MergeFrom(Mapping);
-            _testNum = Interlocked.Increment(ref _nextTestNum);
-            PerfTracker.StartupEvent($"Start decompilation test {_testNum}");
         }
-        public void Dispose() => PerfTracker.StartupEvent($"Finish decompilation test {_testNum}");
+
+        void TestEventSet(EventSetId eventSetId)
+        {
+            var assets = Exchange.Resolve<IAssetManager>();
+            var eventSet = assets.LoadEventSet(eventSetId);
+            Test(eventSetId, eventSet, LayoutTestUtil.ExtractSetLayout);
+        }
+
+        void TestMap(MapId mapId)
+        {
+            var assets = Exchange.Resolve<IAssetManager>();
+            var map = assets.LoadMap(mapId);
+            Test(mapId, map, LayoutTestUtil.ExtractMapLayout);
+        }
+
+        static void Test<T>(AssetId id, T asset, LayoutTestUtil.LayoutExtractor<T> extractor)
+        {
+            var (e, c, x) = extractor(asset);
+            var expectedLayout = new EventLayout(e, c, x);
+            var result = LayoutTestUtil.BuildLayout(asset, extractor);
+
+            if (!LayoutTestUtil.CompareLayoutBytes(result, expectedLayout, id, out var message))
+                throw new InvalidOperationException($"Difference detected: {message}");
+        }
 
         [Fact] public void EventSet1() => TestEventSet(new EventSetId(AssetType.EventSet, 1));
         [Fact] public void EventSet100() => TestEventSet(new EventSetId(AssetType.EventSet, 100));
@@ -451,113 +442,5 @@ namespace UAlbion.Base.Tests
         [Fact] public void Map390() => TestMap(new MapId(AssetType.Map, 390));
         [Fact] public void Map398() => TestMap(new MapId(AssetType.Map, 398));
         [Fact] public void Map399() => TestMap(new MapId(AssetType.Map, 399));
-
-        static void TestMap(MapId id, [CallerMemberName] string testName = null)
-        {
-            var map = Load(x => x.LoadMap(id));
-            var npcRefs = map.Npcs.Where(x => x.Node != null).Select(x => x.Node.Id).ToHashSet();
-            var zoneRefs = map.Zones.Where(x => x.Node != null).Select(x => x.Node.Id).ToHashSet();
-            var refs = npcRefs.Union(zoneRefs).Except(map.Chains);
-
-            TestInner(map.Events, map.Chains, refs, testName);
-        }
-
-        static void TestEventSet(EventSetId id, [CallerMemberName] string testName = null)
-        {
-            Formats.Assets.EventSet set;
-            try
-            {
-                set = Load(x => x.LoadEventSet(id));
-            }
-            catch (NotNullException e) { throw new XunitException($"{e.Message} when loading {id}"); }
-
-            if (set.Events.Count == 0)
-                return;
-
-            TestInner(set.Events, set.Chains, Array.Empty<ushort>(), testName);
-        }
-
-        static void TestInner<T>(
-            IList<T> events,
-            IEnumerable<ushort> chains,
-            IEnumerable<ushort> entryPoints,
-            [CallerMemberName] string testName = null) where T : IEventNode
-        {
-            var formatter = new EventFormatter(null, AssetId.None);
-            var resultsDir = Path.Combine(ResultsDir, testName ?? "Unknown");
-            var graphs = Decompiler.BuildEventRegions(events, chains, entryPoints);
-            var scripts = new string[graphs.Count];
-            var errors = new string[graphs.Count];
-            var allSteps = new List<List<(string, IGraph)>>();
-            int successCount = 0;
-
-            for (var index = 0; index < graphs.Count; index++)
-            {
-                errors[index] = "";
-                var steps = new List<(string, IGraph)>();
-                allSteps.Add(steps);
-                var graph = graphs[index];
-                try
-                {
-                    var decompiled = Decompile(graph, steps);
-                    var sb = new StringBuilder();
-                    formatter.FormatGraphsAsBlocks(sb, new []  { decompiled }, 0);
-                    scripts[index] = sb.ToString();
-
-                    var roundTripLayout = ScriptCompiler.Compile(scripts[index], steps);
-                    var expectedLayout = EventLayout.Build(new[] { graph });
-
-                    if (!TestUtil.CompareLayout(roundTripLayout, expectedLayout, out var error))
-                        errors[index] += $"[{index}: {error}] ";
-                    else
-                        successCount++;
-                }
-                catch (ControlFlowGraphException ex)
-                {
-                    steps.Add((ex.Message, ex.Graph));
-                    errors[index] += $"[{index}: {ex.Message}] {ex.Graph.Defragment()} ";
-                }
-                catch (Exception ex)
-                {
-                    errors[index] += $"[{index}: {ex.Message}] ";
-                }
-            }
-
-            if (successCount < graphs.Count)
-            {
-                var combined = string.Join(Environment.NewLine, errors.Where(x => x.Length > 0));
-                //*
-                for (int i = 0; i < allSteps.Count; i++)
-                {
-                    var steps = allSteps[i];
-                    if (!string.IsNullOrEmpty(errors[i]))
-                        TestUtil.DumpSteps(steps, resultsDir, $"Region{i}");
-                }
-                //*/
-
-                throw new InvalidOperationException($"[{successCount}/{graphs.Count}] Errors:{Environment.NewLine}{combined}");
-            }
-        }
-
-        static ICfgNode Decompile(ControlFlowGraph graph, List<(string, IGraph)> steps)
-        {
-            ControlFlowGraph Record(string description, ControlFlowGraph g)
-            {
-                if (steps.Count == 0 || steps[^1].Item2 != g)
-                    steps.Add((description, g));
-                return g;
-            }
-
-            return Decompiler.SimplifyGraph(graph, Record);
-        }
-
-        static T Load<T>(Func<IAssetManager, T> func)
-        {
-            var assets = Exchange.Resolve<IAssetManager>();
-            var result = func(assets);
-            Assert.NotNull(result);
-
-            return result;
-        }
     }
 }

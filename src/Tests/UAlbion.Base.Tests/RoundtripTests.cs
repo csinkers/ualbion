@@ -19,39 +19,46 @@ namespace UAlbion.Base.Tests
 {
     public class RoundtripTests
     {
-        static readonly XldContainer XldLoader = new();
         static readonly IJsonUtil JsonUtil = new FormatJsonUtil();
+        static readonly GeneralConfig GeneralConfig;
+        static readonly AssetMapping Mapping;
+        static readonly IFileSystem Disk;
+        static readonly string ResultDir;
 
-        readonly IFileSystem _disk;
-        readonly string _baseDir;
-        readonly string _resultDir;
+        static RoundtripTests()
+        {
+            string baseDir;
+            (Disk, baseDir, GeneralConfig, Mapping) = SetupAssets(JsonUtil);
+            ResultDir = Path.Combine(baseDir, "re", "RoundTripTests");
+        }
 
         public RoundtripTests()
         {
-            Event.AddEventsFromAssembly(typeof(ActionEvent).Assembly);
             AssetMapping.GlobalIsThreadLocal = true;
-            _disk = new MockFileSystem(true);
-            _baseDir = ConfigUtil.FindBasePath(_disk);
-            _resultDir = Path.Combine(_baseDir, "re", "RoundTripTests");
-            var mapping = AssetMapping.Global;
-            var assetConfigPath = Path.Combine(_baseDir, "mods", "Base", "assets.json");
-            var assetConfig = AssetConfig.Load(assetConfigPath, mapping, _disk, JsonUtil);
+            AssetMapping.Global.MergeFrom(Mapping);
+        }
+
+        static (MockFileSystem disk, string baseDir, GeneralConfig generalConfig, AssetMapping mapping) SetupAssets(IJsonUtil jsonUtil)
+        {
+            Event.AddEventsFromAssembly(typeof(ActionEvent).Assembly);
+            var mapping = new AssetMapping();
+            var disk = new MockFileSystem(true);
+            var baseDir = ConfigUtil.FindBasePath(disk);
+            var assetConfigPath = Path.Combine(baseDir, "mods", "Base", "assets.json");
+            var assetConfig = AssetConfig.Load(assetConfigPath, mapping, disk, jsonUtil);
+            var generalConfig = AssetSystem.LoadGeneralConfig(baseDir, disk, jsonUtil);
 
             foreach (var assetType in assetConfig.IdTypes.Values)
             {
                 var enumType = Type.GetType(assetType.EnumType);
                 if (enumType == null)
                     throw new InvalidOperationException(
-                            $"Could not load enum type \"{assetType.EnumType}\" defined in \"{assetConfigPath}\"");
+                        $"Could not load enum type \"{assetType.EnumType}\" defined in \"{assetConfigPath}\"");
 
                 mapping.RegisterAssetType(assetType.EnumType, assetType.AssetType);
             }
-        }
 
-        byte[] BytesFromXld(IGeneralConfig conf, string path, AssetInfo info)
-        {
-            using var s = XldLoader.Read(conf.ResolvePath(path), info, _disk, JsonUtil);
-            return s.Bytes(null, null, (int)s.BytesRemaining);
+            return (disk, baseDir, generalConfig, mapping);
         }
 
         T RoundTrip<T>(string testName, byte[] bytes, Func<T, ISerializer, T> serdes) where T : class
@@ -59,7 +66,7 @@ namespace UAlbion.Base.Tests
             var (asset, preTxt) = Asset.Load(bytes, serdes);
             var (postBytes, postTxt) = Asset.Save(asset, serdes);
             var (_, reloadTxt) = Asset.Load(postBytes, serdes);
-            Asset.Compare(_resultDir,
+            Asset.Compare(ResultDir,
                 testName,
                 bytes,
                 postBytes,
@@ -71,7 +78,7 @@ namespace UAlbion.Base.Tests
             var json = Asset.SaveJson(asset, JsonUtil);
             var fromJson = Asset.LoadJson<T>(json, JsonUtil);
             var (fromJsonBytes, fromJsonTxt) = Asset.Save(fromJson, serdes);
-            Asset.Compare(_resultDir,
+            Asset.Compare(ResultDir,
                 testName + ".json",
                 bytes,
                 fromJsonBytes,
@@ -82,35 +89,31 @@ namespace UAlbion.Base.Tests
 
         void RoundTripXld<T>(string testName, string file, int subId, Func<T, ISerializer, T> serdes) where T : class
         {
-            var conf = AssetSystem.LoadGeneralConfig(_baseDir, _disk, JsonUtil);
             var info = new AssetInfo { Index = subId };
-            var bytes = BytesFromXld(conf, file, info);
+            var bytes = Asset.BytesFromXld(GeneralConfig, file, info, Disk, JsonUtil);
             RoundTrip(testName, bytes, serdes);
         }
 
         void RoundTripRaw<T>(string testName, string file, Func<T, ISerializer, T> serdes) where T : class
         {
-            var conf = AssetSystem.LoadGeneralConfig(_baseDir, _disk, JsonUtil);
-            var bytes = File.ReadAllBytes(conf.ResolvePath(file));
+            var bytes = File.ReadAllBytes(GeneralConfig.ResolvePath(file));
             RoundTrip(testName, bytes, serdes);
         }
 
         void RoundTripItem<T>(string testName, string file, int subId, Func<T, ISerializer, T> serdes) where T : class
         {
-            var conf = AssetSystem.LoadGeneralConfig(_baseDir, _disk, JsonUtil);
             var info = new AssetInfo { Index = subId };
             var loader = new ItemListContainer();
-            using var s = loader.Read(conf.ResolvePath(file), info, _disk, JsonUtil);
+            using var s = loader.Read(GeneralConfig.ResolvePath(file), info, Disk, JsonUtil);
             var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
             RoundTrip(testName, bytes, serdes);
         }
 
         void RoundTripSpell<T>(string testName, string file, int subId, Func<T, ISerializer, T> serdes) where T : class
         {
-            var conf = AssetSystem.LoadGeneralConfig(_baseDir, _disk, JsonUtil);
             var info = new AssetInfo { Index = subId };
             var loader = new SpellListContainer();
-            using var s = loader.Read(conf.ResolvePath(file), info, _disk, JsonUtil);
+            using var s = loader.Read(GeneralConfig.ResolvePath(file), info, Disk, JsonUtil);
             var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
             RoundTrip(testName, bytes, serdes);
         }
@@ -359,8 +362,7 @@ namespace UAlbion.Base.Tests
                 .Attach(modApplier)
                 .Attach(new AssetManager());
 
-            var conf = AssetSystem.LoadGeneralConfig(_baseDir, _disk, JsonUtil);
-            var bytes = BytesFromXld(conf, "$(XLD)/ICONDAT0.XLD", info);
+            var bytes = Asset.BytesFromXld(GeneralConfig, "$(XLD)/ICONDAT0.XLD", info, Disk, JsonUtil);
 
             TilesetData Serdes(TilesetData x, ISerializer s) => Loaders.TilesetLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil);
             var (asset, preTxt) = Asset.Load<TilesetData>(bytes, Serdes);
@@ -373,7 +375,7 @@ namespace UAlbion.Base.Tests
                 (x, s) => loader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
 
             var (roundTripped, roundTripTxt) = Asset.Save(fromTiled, Serdes);
-            Asset.Compare(_resultDir,
+            Asset.Compare(ResultDir,
                 nameof(TiledTilesetTest),
                 bytes,
                 roundTripped,
@@ -384,8 +386,7 @@ namespace UAlbion.Base.Tests
         public void TiledStampTest()
         {
             var info = new AssetInfo { AssetId = AssetId.From(BlockList.Toronto), Index = 7 };
-            var conf = AssetSystem.LoadGeneralConfig(_baseDir, _disk, JsonUtil);
-            var bytes = BytesFromXld(conf, "$(XLD)/BLKLIST0.XLD", info);
+            var bytes = Asset.BytesFromXld(GeneralConfig, "$(XLD)/BLKLIST0.XLD", info, Disk, JsonUtil);
 
             Formats.Assets.BlockList Serdes(Formats.Assets.BlockList x, ISerializer s) => Loaders.BlockListLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil);
             var (asset, preTxt) = Asset.Load<Formats.Assets.BlockList>(bytes, Serdes);
@@ -397,7 +398,7 @@ namespace UAlbion.Base.Tests
                 (x, s) => loader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
 
             var (roundTripped, roundTripTxt) = Asset.Save(fromTiled, Serdes);
-            Asset.Compare(_resultDir,
+            Asset.Compare(ResultDir,
                 nameof(TiledStampTest),
                 bytes,
                 roundTripped,

@@ -17,7 +17,7 @@ namespace UAlbion
 {
     public static class AssetSystem
     {
-        public static async Task<(EventExchange, IContainer)> SetupAsync(string baseDir, IFileSystem disk, IJsonUtil jsonUtil)
+        public static async Task<(EventExchange, IContainer)> SetupAsync(string baseDir, AssetMapping mapping, IFileSystem disk, IJsonUtil jsonUtil)
         {
             var configAndSettingsTask = Task.Run(() =>
             {
@@ -27,10 +27,11 @@ namespace UAlbion
             });
             var coreConfigTask = Task.Run(() => LoadCoreConfig(baseDir, disk, jsonUtil));
             var gameConfigTask = Task.Run(() => LoadGameConfig(baseDir, disk, jsonUtil));
-            return await SetupCore(disk, jsonUtil, configAndSettingsTask, coreConfigTask, gameConfigTask).ConfigureAwait(false);
+            return await SetupCore(mapping, disk, jsonUtil, configAndSettingsTask, coreConfigTask, gameConfigTask).ConfigureAwait(false);
         }
 
         public static EventExchange Setup(
+            AssetMapping mapping,
             IFileSystem disk,
             IJsonUtil jsonUtil,
             GeneralConfig generalConfig,
@@ -41,11 +42,12 @@ namespace UAlbion
             var configAndSettingsTask = Task.FromResult((generalConfig, settings));
             var coreConfigTask = Task.FromResult(coreConfig);
             var gameConfigTask = Task.FromResult(gameConfig);
-            var task = SetupCore(disk, jsonUtil, configAndSettingsTask, coreConfigTask, gameConfigTask);
+            var task = SetupCore(mapping, disk, jsonUtil, configAndSettingsTask, coreConfigTask, gameConfigTask);
             return task.Result.Item1;
         }
 
         static async Task<(EventExchange, IContainer)> SetupCore(
+            AssetMapping mapping,
             IFileSystem disk,
             IJsonUtil jsonUtil,
             Task<(GeneralConfig, GeneralSettings)> configAndSettingsTask,
@@ -86,8 +88,8 @@ namespace UAlbion
 
             PerfTracker.StartupEvent("Registered asset services");
 
-            modApplier.LoadMods(generalConfig, settings.ActiveMods);
-            AssetMapping.Global.ConsistencyCheck();
+            modApplier.LoadMods(mapping, generalConfig, settings.ActiveMods);
+            mapping.ConsistencyCheck();
             PerfTracker.StartupEvent("Loaded mods");
 
             var coreConfig = await coreConfigTask.ConfigureAwait(false);
@@ -127,7 +129,7 @@ namespace UAlbion
             return result;
         }
 
-        public static EventExchange SetupSimple(string baseDir)
+        public static EventExchange SetupSimple(string baseDir, AssetMapping mapping, params string[] mods)
         {
             var jsonUtil = new FormatJsonUtil();
             var disk = new FileSystem();
@@ -136,11 +138,11 @@ namespace UAlbion
             var gameConfig = LoadGameConfig(baseDir, disk, jsonUtil);
             var settings = new GeneralSettings
             {
-                ActiveMods = { "Base" },
+                ActiveMods = mods.Length == 0 ? new[] { "Base" } : mods,
                 Language = Language.English
             };
 
-            return Setup(disk, jsonUtil, generalConfig, settings, coreConfig, gameConfig);
+            return Setup(mapping, disk, jsonUtil, generalConfig, settings, coreConfig, gameConfig);
         }
     }
 }

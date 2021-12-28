@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Numerics;
 using System.Text;
 using UAlbion.Api;
@@ -10,6 +9,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
+using static System.FormattableString;
 
 namespace UAlbion.Game.Gui;
 
@@ -144,9 +144,9 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
         void Aux(LayoutNode node, int level)
         {
             var size = node.Element?.GetSize() ?? Vector2.Zero;
-            sb.Append($"{node.Order,4} ({node.Extents.X,3}, {node.Extents.Y,3}, {node.Extents.Width,3}, {node.Extents.Height,3}) <{size.X,3}, {size.Y,3}> ");
+            sb.Append(Invariant($"{node.Order,4} ({node.Extents.X,3}, {node.Extents.Y,3}, {node.Extents.Width,3}, {node.Extents.Height,3}) <{size.X,3}, {size.Y,3}> "));
             sb.Append("".PadLeft(level * 2));
-            sb.AppendLine($"{node.Element}");
+            sb.AppendLine(Invariant($"{node.Element}"));
             foreach (var child in node.Children)
                 Aux(child, level + 1);
         }

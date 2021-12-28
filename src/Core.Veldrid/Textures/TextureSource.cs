@@ -4,6 +4,7 @@ using UAlbion.Api.Visual;
 using UAlbion.Core.Events;
 using Veldrid;
 using VeldridGen.Interfaces;
+using static System.FormattableString;
 
 namespace UAlbion.Core.Veldrid.Textures;
 
@@ -33,7 +34,7 @@ public class TextureSource : ServiceComponent<ITextureSource>, ITextureSource
     {
         var sb = new StringBuilder();
         sb.AppendLine("Texture Statistics:");
-        sb.AppendLine($"    Total Time: {_totalTime} Last Cleanup: {_lastCleanup}");
+        sb.AppendLine(Invariant($"    Total Time: {_totalTime} Last Cleanup: {_lastCleanup}"));
 
         sb.AppendLine("Simple textures:");
         _simple.DumpStats(sb);

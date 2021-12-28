@@ -5,6 +5,7 @@ using System.Text;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Game.Events;
+using static System.FormattableString;
 
 namespace UAlbion.Game.Assets;
 
@@ -41,7 +42,7 @@ public class AssetCache : Component
                     .OrderBy(x => x.Key.ToString());
 
                 foreach(var (type, count) in countByType)
-                    sb.AppendLine($"    {type}: {count} items");
+                    sb.AppendLine(Invariant($"    {type}: {count} items"));
             }
             Info(sb.ToString());
         });

@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading;
 using UAlbion.Api;
+using static System.FormattableString;
 
 namespace UAlbion.Config;
 
@@ -347,7 +348,7 @@ public class AssetMapping
             {
                 var basic = $"O:{info.Offset} {string.Join(" ", info.Ranges.Select(x => x.ToString()))}";
                 sbBasic.AppendLine(basic);
-                sbFull.AppendLine($"      {basic} ({info.EnumTypeString})");
+                sbFull.AppendLine(Invariant($"      {basic} ({info.EnumTypeString})"));
             }
 
             return (sbBasic.ToString(), sbFull.ToString());

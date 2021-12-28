@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using static System.FormattableString;
 
 namespace UAlbion.Api;
 
@@ -112,14 +113,14 @@ public static class PerfTracker
         {
             foreach (var kvp in FrameTimes.OrderBy(x => x.Key))
             {
-                sb.Append($"Avg/frame: {(float)kvp.Value.Total / (MillisecondsToTicks * _frameCount):F3}");
-                sb.Append($" Min: {(float)kvp.Value.Min / MillisecondsToTicks:F3}");
-                sb.Append($" Max: {(float)kvp.Value.Max / MillisecondsToTicks:F3}");
-                sb.Append($" F:{kvp.Value.Fast / MillisecondsToTicks:F3}");
-                sb.Append($" Avg/call: {(float)kvp.Value.Total / (MillisecondsToTicks * kvp.Value.Count):F3}");
-                sb.Append($" Calls/Frame: {(float)kvp.Value.Count / _frameCount:F3}");
-                sb.Append($" Total: {kvp.Value.Total / MillisecondsToTicks}");
-                sb.Append($" Count: {kvp.Value.Count}");
+                sb.Append(Invariant($"Avg/frame: {(float)kvp.Value.Total / (MillisecondsToTicks * _frameCount):F3}"));
+                sb.Append(Invariant($" Min: {(float)kvp.Value.Min / MillisecondsToTicks:F3}"));
+                sb.Append(Invariant($" Max: {(float)kvp.Value.Max / MillisecondsToTicks:F3}"));
+                sb.Append(Invariant($" F:{kvp.Value.Fast / MillisecondsToTicks:F3}"));
+                sb.Append(Invariant($" Avg/call: {(float)kvp.Value.Total / (MillisecondsToTicks * kvp.Value.Count):F3}"));
+                sb.Append(Invariant($" Calls/Frame: {(float)kvp.Value.Count / _frameCount:F3}"));
+                sb.Append(Invariant($" Total: {kvp.Value.Total / MillisecondsToTicks}"));
+                sb.Append(Invariant($" Count: {kvp.Value.Count}"));
                 descriptions.Add(kvp.Key);
                 results.Add(sb.ToString());
                 sb.Clear();

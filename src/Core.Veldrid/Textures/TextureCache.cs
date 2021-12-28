@@ -5,6 +5,7 @@ using System.Text;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Veldrid.Events;
 using Veldrid;
+using static System.FormattableString;
 
 namespace UAlbion.Core.Veldrid.Textures;
 
@@ -67,11 +68,11 @@ class TextureCache<T> : Component, IDisposable where T : TextureHolder
                 var status = holder == null
                     ? "(unused)"
                     : "(active)";
-                sb.AppendLine($"    {status} {entry.Key.Name}: {entry.Key.SizeInBytes:N0} bytes");
+                sb.AppendLine(Invariant($"    {status} {entry.Key.Name}: {entry.Key.SizeInBytes:N0} bytes"));
                 totalSize += entry.Key.SizeInBytes;
                 // TODO: Actual estimation of VRAM usage
             }
-            sb.AppendLine($"    Total Simple: {_cache.Count:N0} entries, {totalSize:N0} bytes");
+            sb.AppendLine(Invariant($"    Total Simple: {_cache.Count:N0} entries, {totalSize:N0} bytes"));
         }
     }
 

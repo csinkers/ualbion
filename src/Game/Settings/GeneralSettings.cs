@@ -8,6 +8,7 @@ using UAlbion.Core;
 
 namespace UAlbion.Game.Settings;
 
+#pragma warning disable CA2227 // Collection properties should be read only
 public class GeneralSettings : IDebugSettings, IAudioSettings, IGameplaySettings, IEngineSettings
 {
     const string UserPath = "$(CONFIG)/settings.json";
@@ -69,3 +70,4 @@ public class GeneralSettings : IDebugSettings, IAudioSettings, IGameplaySettings
         disk.WriteAllText(path, json);
     }
 }
+#pragma warning restore CA2227 // Collection properties should be read only

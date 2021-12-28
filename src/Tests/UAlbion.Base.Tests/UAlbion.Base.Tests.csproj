@@ -2,10 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-
+    <LangVersion>10</LangVersion>
     <IsPackable>false</IsPackable>
-
-    <AssemblyName>UAlbion.Base.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

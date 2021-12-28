@@ -117,8 +117,8 @@ public readonly struct MapId : IEquatable<MapId>, IEquatable<AssetId>, IComparab
     public override bool Equals(object obj) => obj is IAssetId other && other.ToUInt32() == _value;
     public int CompareTo(object obj) => (obj is IAssetId other) ? _value.CompareTo(other.ToUInt32()) : -1;
     public override int GetHashCode() => unchecked((int)_value);
-        public readonly TextId ToMapText() => new TextId(AssetType.MapText, Id);
-    }
+    public readonly TextId ToMapText() => new TextId(AssetType.MapText, Id);
+}
 
 public class MapIdConverter : TypeConverter
 {
@@ -128,6 +128,6 @@ public class MapIdConverter : TypeConverter
     public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value) 
         => value is string s ? MapId.Parse(s) : base.ConvertFrom(context, culture, value);
 
-    public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType) =>
-        destinationType == typeof(string) ? value.ToString() : base.ConvertTo(context, culture, value, destinationType);
+    public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        => destinationType == typeof(string) ? value.ToString() : base.ConvertTo(context, culture, value, destinationType);
 }

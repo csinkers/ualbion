@@ -80,19 +80,19 @@
     ]
   },
   "Extras": {
-    "EventSetId": [ "        public readonly TextId ToEventText() => new TextId(AssetType.EventText, Id);" ],
-    "MapId": [ "        public readonly TextId ToMapText() => new TextId(AssetType.MapText, Id);" ],
-    "ItemId": [ "        public readonly TextId ToName() => new TextId(AssetType.ItemName, Id);" ],
+    "EventSetId": [ "    public readonly TextId ToEventText() => new TextId(AssetType.EventText, Id);" ],
+    "MapId": [ "    public readonly TextId ToMapText() => new TextId(AssetType.MapText, Id);" ],
+    "ItemId": [ "    public readonly TextId ToName() => new TextId(AssetType.ItemName, Id);" ],
     "TilesetId": [
-      "        public readonly BlockListId ToBlockList() => new BlockListId(AssetType.BlockList, Id);",
-      "        public readonly TilesetGraphicsId ToTilesetGraphics() => new TilesetGraphicsId(AssetType.TilesetGraphics, Id);"
+      "    public readonly BlockListId ToBlockList() => new BlockListId(AssetType.BlockList, Id);",
+      "    public readonly TilesetGraphicsId ToTilesetGraphics() => new TilesetGraphicsId(AssetType.TilesetGraphics, Id);"
     ],
-    "BlockListId": [ "        public readonly TilesetId ToTileset() => new TilesetId(AssetType.Tileset, Id);" ],
+    "BlockListId": [ "    public readonly TilesetId ToTileset() => new TilesetId(AssetType.Tileset, Id);" ],
     "PartyMemberId": [
-      "        public readonly SpriteId ToSmallPartyGraphics() => new SpriteId(AssetType.SmallPartyGraphics, Id);",
-      "        public readonly SpriteId ToLargePartyGraphics() => new SpriteId(AssetType.LargePartyGraphics, Id);",
-      "        public readonly SpriteId ToFullBodyPicture() => new SpriteId(AssetType.FullBodyPicture, Id);"
+      "    public readonly SpriteId ToSmallPartyGraphics() => new SpriteId(AssetType.SmallPartyGraphics, Id);",
+      "    public readonly SpriteId ToLargePartyGraphics() => new SpriteId(AssetType.LargePartyGraphics, Id);",
+      "    public readonly SpriteId ToFullBodyPicture() => new SpriteId(AssetType.FullBodyPicture, Id);"
     ],
-    "SongId": [ "        public readonly WaveLibraryId ToWaveLibrary() => new WaveLibraryId(AssetType.WaveLibrary, Id);" ]
+    "SongId": [ "    public readonly WaveLibraryId ToWaveLibrary() => new WaveLibraryId(AssetType.WaveLibrary, Id);" ]
   }
 }

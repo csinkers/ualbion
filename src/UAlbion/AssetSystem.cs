@@ -54,6 +54,7 @@ namespace UAlbion
             Task<CoreConfig> coreConfigTask,
             Task<GameConfig> gameConfigTask)
         {
+            if (mapping == null) throw new ArgumentNullException(nameof(mapping));
             if (disk == null) throw new ArgumentNullException(nameof(disk));
             if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
             if (configAndSettingsTask == null) throw new ArgumentNullException(nameof(configAndSettingsTask));

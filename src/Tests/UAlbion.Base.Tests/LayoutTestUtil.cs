@@ -48,8 +48,21 @@ namespace UAlbion.Base.Tests
             return (map.Events, map.Chains, entryPoints.ToList());
         }
 
+        static void TrimTrailingEmptyChains(IList<ushort> chains)
+        {
+            for (int i = chains.Count - 1; i >= 0; i--)
+            {
+                if (chains[i] != EventNode.UnusedEventId)
+                    break;
+                chains.RemoveAt(i);
+            }
+        }
+
         public static bool CompareLayoutBytes(EventLayout actual, EventLayout expected, AssetId assetId, out string message)
         {
+            TrimTrailingEmptyChains(actual.Chains);
+            TrimTrailingEmptyChains(expected.Chains);
+
             AssetId textSource = assetId.Type switch
             {
                 AssetType.EventSet => ((EventSetId)assetId).ToEventText(),
@@ -98,7 +111,7 @@ namespace UAlbion.Base.Tests
                 stack.Push(entryPoint);
                 while (stack.TryPop(out var index))
                 {
-                    if (visited[index])
+                    if (index == EventNode.UnusedEventId || visited[index])
                         continue;
 
                     visited[index] = true;

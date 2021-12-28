@@ -72,7 +72,7 @@ namespace UAlbion.Base.Tests
                 mapping,
                 _disk,
                 JsonUtil,
-                BaseAssetMod,
+                new[] { BaseAssetMod },
                 UnpackedAssetMod))
             {
                 unpacker.Convert(idStrings, assetTypes, null);
@@ -99,7 +99,7 @@ namespace UAlbion.Base.Tests
                 mapping,
                 _disk,
                 JsonUtil,
-                UnpackedAssetMod,
+                new[] { UnpackedAssetMod },
                 RepackedAssetMod))
             {
                 repacker.Convert(idStrings, assetTypes, null);

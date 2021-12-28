@@ -16,7 +16,7 @@ namespace UAlbion
         public bool NeedsEngine => Mode == ExecutionMode.Game;
         public bool StartupOnly { get; }
         public bool UseRenderDoc { get; }
-        public string ConvertFrom { get; }
+        public string[] ConvertFrom { get; }
         public string ConvertTo { get; }
         public Regex ConvertFilePattern { get; }
 
@@ -43,7 +43,7 @@ namespace UAlbion
                 {
                     if (i +2 >= args.Length)
                         throw new FormatException("\"--convert\" requires two parameters: the mod to convert from and the mod to convert to");
-                    ConvertFrom = args[++i];
+                    ConvertFrom = args[++i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
                     ConvertTo = args[++i];
                     Mode = ExecutionMode.ConvertAssets;
                 }

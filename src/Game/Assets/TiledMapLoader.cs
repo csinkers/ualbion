@@ -72,7 +72,7 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
         var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
         using var ms = new MemoryStream(bytes);
         var map = Map.Parse(ms);
-        return map.ToAlbion(info, script, null);
+        return map.ToAlbion(info, script);
     }
 
     (byte[], string) Write2D(MapData2D map, AssetInfo info)

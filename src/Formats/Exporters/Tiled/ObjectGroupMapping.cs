@@ -46,7 +46,9 @@ public static class ObjectGroupMapping
             return isChain ? eventLayout.Chains[id] : id;
         }
 
-        var getWaypoints = NpcPathBuilder.BuildWaypointLookup(map);
+        var mapObjects = map.ObjectGroups.SelectMany(x => x.Objects);
+        var pathParser = NpcPathBuilder.BuildParser(mapObjects, tileWidth, tileHeight);
+
         foreach (var objectGroup in map.ObjectGroups)
         {
             foreach (var obj in objectGroup.Objects)
@@ -55,7 +57,7 @@ public static class ObjectGroupMapping
                     triggers.Add(TriggerMapping.ParseTrigger(obj, tileWidth, tileHeight, ResolveEntryPoint));
 
                 if (ObjectTypeName.Npc.Equals(obj.Type, StringComparison.OrdinalIgnoreCase))
-                    npcs.Add(NpcMapping.ParseNpc(obj, tileWidth, tileHeight, ResolveEntryPoint, getWaypoints));
+                    npcs.Add(NpcMapping.ParseNpc(obj, tileWidth, tileHeight, ResolveEntryPoint, pathParser));
             }
         }
 

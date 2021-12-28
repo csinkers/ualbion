@@ -28,7 +28,7 @@ public class AssetLoadTests : IDisposable
     {
         var disk = new MockFileSystem(true);
         var baseDir = ConfigUtil.FindBasePath(disk);
-        Exchange = AssetSystem.SetupSimple(baseDir, Mapping);
+        Exchange = AssetSystem.SetupSimple(baseDir, disk, Mapping);
     }
 
     public AssetLoadTests()

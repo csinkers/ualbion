@@ -130,10 +130,9 @@ public static class AssetSystem
         return result;
     }
 
-    public static EventExchange SetupSimple(string baseDir, AssetMapping mapping, params string[] mods)
+    public static EventExchange SetupSimple(string baseDir, IFileSystem disk, AssetMapping mapping, params string[] mods)
     {
         var jsonUtil = new FormatJsonUtil();
-        var disk = new FileSystem();
         var coreConfig = new CoreConfig();
         var generalConfig = LoadGeneralConfig(baseDir, disk, jsonUtil);
         var gameConfig = LoadGameConfig(baseDir, disk, jsonUtil);

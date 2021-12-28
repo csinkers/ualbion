@@ -22,7 +22,9 @@ public class MapObject
     [XmlElement("point")] public TiledPoint Point { get; set; }
     [XmlIgnore] public bool WidthSpecified => Width != 0;
     [XmlIgnore] public bool HeightSpecified => Height != 0;
-    public override string ToString() => $"{Id}: {Name} ({Type}) @ ({X}, {Y})";
+
+    [XmlIgnore] string PropsDisplayString => string.Join(" ", Properties?.Select(x => $"{x.Name}={x.Value}") ?? Array.Empty<string>());
+    public override string ToString() => $"{Id}: {Name} ({Type}) @ ({X}, {Y}) {PropsDisplayString}";
 
     public string PropString(string key)
     {

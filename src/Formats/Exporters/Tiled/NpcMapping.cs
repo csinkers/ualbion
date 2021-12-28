@@ -55,7 +55,7 @@ public static class NpcMapping
             {
                 Id = nextObjectGroupId++,
                 Name = $"NPC{npc.Index} Path",
-                Objects = NpcPathBuilder.Build(npc, tileWidth, tileHeight, ref nextId),
+                Objects = NpcPathBuilder.Build(npc.Waypoints, tileWidth, tileHeight, ref nextId),
                 Hidden = true,
             });
         }
@@ -118,7 +118,7 @@ public static class NpcMapping
         };
     }
 
-    public static MapNpc ParseNpc(MapObject obj, int tileWidth, int tileHeight, Func<string, ushort> resolveEntryPoint, Func<int, NpcWaypoint[]> getWaypoints)
+    public static MapNpc ParseNpc(MapObject obj, int tileWidth, int tileHeight, Func<string, ushort> resolveEntryPoint, NpcPathParser pathParser)
     {
         var position = ((int)obj.X / tileWidth, (int)obj.Y / tileHeight);
         NpcWaypoint[] waypoints = { new((byte)position.Item1, (byte)position.Item2) };
@@ -128,14 +128,15 @@ public static class NpcMapping
         var id = obj.PropString(NpcPropName.Id);
         var visual = obj.PropString(NpcPropName.Visual);
         if (string.IsNullOrEmpty(visual))
-            throw new FormatException($"NPC \"{obj.Name}\" (id {obj.Id}) requires a Visual property to determine its appearance");
+            throw new FormatException(
+                $"NPC \"{obj.Name}\" (id {obj.Id}) requires a Visual property to determine its appearance");
 
         var entryPointName = obj.PropString(NpcPropName.Script);
         var entryPoint = resolveEntryPoint(entryPointName);
 
         var pathStart = obj.PropInt(NpcPropName.Path);
         if (pathStart.HasValue)
-            waypoints = getWaypoints(pathStart.Value);
+            waypoints = pathParser.GetWaypoints(pathStart.Value, MapNpc.WaypointCount);
 
         return new MapNpc
         {

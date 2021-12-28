@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Formats.Exporters.Tiled;
@@ -8,62 +9,62 @@ public static class NpcPathBuilder
 {
     public const string NextNodePropertyName = "Next";
     public const string TimePropertyName = "Time";
-    public static IEnumerable<(int x, int y)> FollowRuns(IEnumerable<(int time, int x, int y)> runs)
+    public static IEnumerable<(int index, int x, int y)> CombineRuns(NpcWaypoint[] points)
     {
-        yield break; // TODO
-    }
-
-    public static IEnumerable<(int time, int x, int y)> CombineRuns<T>(T[] points, Func<T, (int x, int y)> getter)
-    {
-        var waypoints = IdentifyWaypoints(points, getter);
+        var waypoints = IdentifyWaypoints(points).ToList();
         int last = -1;
-        foreach (var i in waypoints)
+        foreach (var (i, mustEmit) in waypoints)
         {
-            var (x, y) = getter(points[i]);
-            if (last != -1)
+            var a = points[i];
+            if (!mustEmit && last != -1)
             {
-                var (lastX, lastY) = getter(points[last]);
-                if (lastX == x && lastY == y)
+                var b = points[last];
+                if (a == b)
                     continue;
             }
 
-            yield return (i, x, y);
+            yield return (i, a.X, a.Y);
             last = i;
         }
     }
 
-    public static IEnumerable<int> IdentifyWaypoints<T>(T[] points, Func<T, (int x, int y)> getter)
+    public static IEnumerable<(int index, bool mustEmit)> IdentifyWaypoints(NpcWaypoint[] points)
     {
-        if (getter == null) throw new ArgumentNullException(nameof(getter));
         if (points == null || points.Length == 0) yield break;
-        yield return 0;
+        yield return (0, true);
 
         for (int i = 1; i < points.Length - 1; i++)
         {
-            var lastPoint = getter(points[i - 1]);
-            var point     = getter(points[i]);
-            var nextPoint = getter(points[i + 1]);
+            var a = points[i - 1];
+            var b = points[i];
+            var c = points[i + 1];
 
-            var dl = (point.x - lastPoint.x, point.y - lastPoint.y);
-            var dn = (nextPoint.x - point.x, nextPoint.y - point.y);
+            var ab = (b.X - a.X, b.Y - a.Y);
+            var bc = (c.X - b.X, c.Y - b.Y);
 
-            if (dl != dn)
-                yield return i;
+            bool discontinuous =
+                Math.Abs(ab.Item1) > 1 ||
+                Math.Abs(ab.Item2) > 1 ||
+                Math.Abs(bc.Item1) > 1 ||
+                Math.Abs(bc.Item2) > 1;
+
+            if (ab != bc || discontinuous)
+                yield return (i, discontinuous);
         }
 
         if (points.Length > 1)
-            yield return points.Length - 1;
+            yield return (points.Length - 1, true);
     }
 
     public static List<MapObject> Build(
-        MapNpc npc,
+        NpcWaypoint[] waypoints,
         int tileWidth,
         int tileHeight,
         ref int nextId)
     {
-        if (npc == null) throw new ArgumentNullException(nameof(npc));
+        if (waypoints == null) throw new ArgumentNullException(nameof(waypoints));
         var results = new List<MapObject>();
-        var combined = CombineRuns(npc.Waypoints, x => (x.X, x.Y));
+        var combined = CombineRuns(waypoints);
 
         foreach (var (index, posX, posY) in combined)
         {
@@ -85,9 +86,5 @@ public static class NpcPathBuilder
         return results;
     }
 
-    public static Func<int, NpcWaypoint[]> BuildWaypointLookup(Map map)
-    {
-        var lookup = new WaypointLookup(map);
-        return lookup.GetWaypoints;
-    }
+    public static NpcPathParser BuildParser(IEnumerable<MapObject> objects, int tileWidth, int tileHeight) => new(objects, tileWidth, tileHeight);
 }

@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Exporters.Tiled;
 
 public static class MapImport
 {
-    public static BaseMapData ToAlbion(this Map map, AssetInfo info, string script, TilesetData tileset)
+    public static BaseMapData ToAlbion(this Map map, AssetInfo info, string script)
     {
         if (map == null) throw new ArgumentNullException(nameof(map));
         if (info == null) throw new ArgumentNullException(nameof(info));

@@ -116,7 +116,8 @@ public class MapNpc
         var hours = time / 100;
         var minutes = time % 100;
         if (hours < 0) throw new FormatException($"Time {time} had a negative hours component");
-        if (hours > 23) throw new FormatException($"Time {time} had an hours component greater than the maximum (23)");
+        // Allow 2400 as it's used for the fake final position when parsing
+        if (hours == 24 && minutes > 0 || hours > 24) throw new FormatException($"Time {time} had an hours component greater than the maximum (23)");
         if (minutes > 47) throw new FormatException($"Time {time} had a minutes component greater than the maximum (47)");
         return hours * 48 + minutes;
     }

@@ -43,7 +43,7 @@ public class AssetConversionTests
     IModApplier BuildApplier(string mod, AssetMapping mapping)
     {
         var baseDir = ConfigUtil.FindBasePath(_disk);
-        var exchange = AssetSystem.SetupSimple(baseDir, mapping, mod);
+        var exchange = AssetSystem.SetupSimple(baseDir, _disk, mapping, mod);
         return exchange.Resolve<IModApplier>();
     }
 
@@ -84,7 +84,7 @@ public class AssetConversionTests
         var unpackedJson = Asset.SaveJson(unpackedAsset, JsonUtil);
 
         Asset.Compare(resultsDir,
-            id.Type.ToString(),
+            id.ToString(),
             baseBytes,
             unpackedBytes,
             new[]

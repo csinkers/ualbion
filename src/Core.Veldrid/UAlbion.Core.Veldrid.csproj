@@ -40,14 +40,13 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\deps\veldrid\')">
-    <PackageReference Include="Veldrid" Version="4.9.0-gffcf1cdb33" />
-    <PackageReference Include="Veldrid.ImageSharp" Version="4.8.0" />
-    <PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
-    <PackageReference Include="Veldrid.RenderDoc" Version="1.0.1" />
-    <PackageReference Include="Veldrid.SDL2" Version="4.8.0" />
-    <PackageReference Include="Veldrid.SPIRV" Version="1.0.14" />
-    <PackageReference Include="Veldrid.StartupUtilities" Version="4.8.0" />
-    <PackageReference Include="Veldrid.Utilities" Version="4.8.0" />
+    <PackageReference Include="Veldrid" Version="4.9.0-gf94814eecc" />
+    <PackageReference Include="Veldrid.ImageSharp" Version="4.9.0-gac88c7210e" />
+    <PackageReference Include="Veldrid.ImGui" Version="5.72.0-gac88c7210e" />
+    <PackageReference Include="Veldrid.RenderDoc" Version="1.0.1-gac88c7210e" />
+    <PackageReference Include="Veldrid.SDL2" Version="4.9.0-gac88c7210e" />
+    <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0-gac88c7210e" />
+    <PackageReference Include="Veldrid.Utilities" Version="4.9.0-gf94814eecc" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\deps\veldrid\')">
     <ProjectReference Include="..\..\deps\veldrid\src\Veldrid\Veldrid.csproj" />
@@ -61,14 +60,14 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\deps\veldrid-spirv\')">
-    <PackageReference Include="Veldrid.SPIRV" Version="1.0.13" />
+    <PackageReference Include="Veldrid.SPIRV" Version="1.0.14" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\deps\veldrid-spirv\')">
     <ProjectReference Include="..\..\deps\veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\deps\VeldridGen\')">
-    <PackageReference Include="VeldridGen.Interfaces" Version="0.1.5" />
+    <PackageReference Include="VeldridGen.Interfaces" Version="0.1.6" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\deps\VeldridGen\')">
     <ProjectReference Include="..\..\deps\VeldridGen\VeldridGen.Interfaces\VeldridGen.Interfaces.csproj" />

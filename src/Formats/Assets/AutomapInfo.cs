@@ -5,11 +5,12 @@ namespace UAlbion.Formats.Assets;
 
 public class AutomapInfo
 {
-    public byte X { get; private set; }
-    public byte Y { get; private set; }
-    public byte Unk2 { get; private set; }
-    public byte Unk3 { get; private set; }
-    public string Name { get; private set; } // name length = 15
+    public const int MaxNameLength = 15;
+    public byte X { get; set; }
+    public byte Y { get; set; }
+    public byte Unk2 { get; set; }
+    public byte Unk3 { get; set; }
+    public string Name { get; set; } // name length = 15
 
     public static AutomapInfo Serdes(int _, AutomapInfo existing, ISerializer s)
     {

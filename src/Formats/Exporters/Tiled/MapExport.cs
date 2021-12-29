@@ -30,7 +30,7 @@ public static class MapExport
         (int? tileId, int w, int h) GetNpcTileInfo(AssetId id)
         {
             var assetName = id.ToString();
-            var tile = npcTileset.Tiles.FirstOrDefault(x => x.Properties.Any(p => p.Name == NpcMapping.NpcPropName.Visual && p.Value == assetName));
+            var tile = npcTileset.Tiles.FirstOrDefault(x => x.Properties.Any(p => p.Name == NpcMapping.Prop.Visual && p.Value == assetName));
             return (
                 tile?.Id + npcGidOffset ?? 0,
                 tile?.Image.Width ?? properties.TileWidth,
@@ -110,7 +110,6 @@ public static class MapExport
                 new() { FirstGid = LayerMapping3D.WallGid, Source = properties.WallPath, },
                 new() { FirstGid = LayerMapping3D.ContentsGid, Source = properties.ContentsPath },
                 new() { FirstGid = LayerMapping3D.CeilingGid, Source = properties.CeilingPath, },
-                // TODO: Automap tiles + markers
             },
             Layers = LayerMapping3D.BuildLayers(map, ref nextLayerId),
             ObjectGroups = ObjectGroupMapping.BuildObjectGroups(map, properties.TileHeight, properties.TileHeight, GetNpcTileInfo, functionsByEventId, ref nextLayerId, ref nextObjectId)

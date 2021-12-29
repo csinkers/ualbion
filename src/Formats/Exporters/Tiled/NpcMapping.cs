@@ -11,7 +11,7 @@ namespace UAlbion.Formats.Exporters.Tiled;
 public static class NpcMapping
 {
     public delegate (int? tileId, int w, int h) GetTileFunc(AssetId id);
-    public static class NpcPropName
+    public static class Prop
     {
         public const string Id = "Id";
         public const string Visual = "Visual";
@@ -91,17 +91,17 @@ public static class NpcMapping
     {
         var objProps = new List<TiledProperty>
         {
-            new(NpcPropName.Visual, npc.SpriteOrGroup.ToString()),
-            new(NpcPropName.Flags, npc.Flags.ToString()),
-            new(NpcPropName.Movement, ((int) npc.Movement).ToString(CultureInfo.InvariantCulture)),
-            new(NpcPropName.Unk8, npc.Unk8.ToString(CultureInfo.InvariantCulture)),
-            new(NpcPropName.Unk9, npc.Unk9.ToString(CultureInfo.InvariantCulture))
+            new(Prop.Visual, npc.SpriteOrGroup.ToString()),
+            new(Prop.Flags, npc.Flags.ToString()),
+            new(Prop.Movement, ((int) npc.Movement).ToString(CultureInfo.InvariantCulture)),
+            new(Prop.Unk8, npc.Unk8.ToString(CultureInfo.InvariantCulture)),
+            new(Prop.Unk9, npc.Unk9.ToString(CultureInfo.InvariantCulture))
         };
 
-        if (!npc.Id.IsNone) objProps.Add(new TiledProperty(NpcPropName.Id, npc.Id.ToString()));
-        if (npc.Node != null) objProps.Add(new TiledProperty(NpcPropName.Script, functionsByEventId[npc.Node.Id]));
-        if (npc.Sound > 0) objProps.Add(new TiledProperty(NpcPropName.Sound, npc.Sound.ToString(CultureInfo.InvariantCulture)));
-        if (npcPathIndices.TryGetValue(npc.Index, out var pathObjectId)) objProps.Add(TiledProperty.Object(NpcPropName.Path, pathObjectId));
+        if (!npc.Id.IsNone) objProps.Add(new TiledProperty(Prop.Id, npc.Id.ToString()));
+        if (npc.Node != null) objProps.Add(new TiledProperty(Prop.Script, functionsByEventId[npc.Node.Id]));
+        if (npc.Sound > 0) objProps.Add(new TiledProperty(Prop.Sound, npc.Sound.ToString(CultureInfo.InvariantCulture)));
+        if (npcPathIndices.TryGetValue(npc.Index, out var pathObjectId)) objProps.Add(TiledProperty.Object(Prop.Path, pathObjectId));
 
         var (tileId, tileW, tileH) = getTileFunc(npc.SpriteOrGroup);
         return new MapObject
@@ -109,7 +109,7 @@ public static class NpcMapping
             Id = nextId++,
             Gid = tileId ?? 0,
             Name = $"NPC{npc.Index} {npc.Id}",
-            Type = ObjectGroupMapping.ObjectTypeName.Npc,
+            Type = ObjectGroupMapping.TypeName.Npc,
             X = npc.Waypoints[0].X * tileWidth,
             Y = npc.Waypoints[0].Y * tileHeight,
             Width = tileW,
@@ -123,18 +123,16 @@ public static class NpcMapping
         var position = ((int)obj.X / tileWidth, (int)obj.Y / tileHeight);
         NpcWaypoint[] waypoints = { new((byte)position.Item1, (byte)position.Item2) };
 
-        // string RequiredProp(string name) => Prop(name) ?? throw new FormatException($"Required property \"{name}\" was not present on NPC \"{obj.Name}\" (id {obj.Id})");
-
-        var id = obj.PropString(NpcPropName.Id);
-        var visual = obj.PropString(NpcPropName.Visual);
+        var id = obj.PropString(Prop.Id);
+        var visual = obj.PropString(Prop.Visual);
         if (string.IsNullOrEmpty(visual))
             throw new FormatException(
                 $"NPC \"{obj.Name}\" (id {obj.Id}) requires a Visual property to determine its appearance");
 
-        var entryPointName = obj.PropString(NpcPropName.Script);
+        var entryPointName = obj.PropString(Prop.Script);
         var entryPoint = resolveEntryPoint(entryPointName);
 
-        var pathStart = obj.PropInt(NpcPropName.Path);
+        var pathStart = obj.PropInt(Prop.Path);
         if (pathStart.HasValue)
             waypoints = pathParser.GetWaypoints(pathStart.Value, MapNpc.WaypointCount);
 
@@ -143,11 +141,11 @@ public static class NpcMapping
             Id = string.IsNullOrEmpty(id) ? AssetId.None : AssetId.Parse(id),
             Node = entryPoint == EventNode.UnusedEventId ? null : new DummyEventNode(entryPoint),
             Waypoints = waypoints,
-            Flags = (NpcFlags)Enum.Parse(typeof(NpcFlags), obj.PropString(NpcPropName.Flags)),
-            Movement = (NpcMovementTypes)Enum.Parse(typeof(NpcMovementTypes), obj.PropString(NpcPropName.Movement)),
-            Unk8 = (byte)(obj.PropInt(NpcPropName.Unk8) ?? 0),
-            Unk9 = (byte)(obj.PropInt(NpcPropName.Unk9) ?? 0),
-            Sound = (byte)(obj.PropInt(NpcPropName.Sound) ?? 0),
+            Flags = (NpcFlags)Enum.Parse(typeof(NpcFlags), obj.PropString(Prop.Flags)),
+            Movement = (NpcMovementTypes)Enum.Parse(typeof(NpcMovementTypes), obj.PropString(Prop.Movement)),
+            Unk8 = (byte)(obj.PropInt(Prop.Unk8) ?? 0),
+            Unk9 = (byte)(obj.PropInt(Prop.Unk9) ?? 0),
+            Sound = (byte)(obj.PropInt(Prop.Sound) ?? 0),
             SpriteOrGroup = AssetId.Parse(visual) // TODO: Handle groups for 3D maps
         };
     }

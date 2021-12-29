@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Config;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Scripting;
 
@@ -9,10 +10,11 @@ namespace UAlbion.Formats.Exporters.Tiled;
 
 public static class ObjectGroupMapping
 {
-    public static class ObjectTypeName
+    public static class TypeName
     {
-        public const string Trigger = "Trigger";
+        public const string Marker = "Marker";
         public const string Npc = "NPC";
+        public const string Trigger = "Trigger";
     }
 
     public static List<ObjectGroup> BuildObjectGroups(
@@ -23,12 +25,18 @@ public static class ObjectGroupMapping
         Dictionary<ushort, string> functionsByEventId,
         ref int nextObjectGroupId,
         ref int nextObjectId)
-        =>
-            new[]
-            {
-                TriggerMapping.BuildTriggers(map, tileWidth, tileHeight, functionsByEventId, ref nextObjectGroupId, ref nextObjectId),
-                NpcMapping.BuildNpcs(map, tileWidth, tileHeight, getTileFunc, functionsByEventId, ref nextObjectGroupId, ref nextObjectId),
-            }.SelectMany(x => x).ToList();
+    {
+        var results = new[]
+        {
+            TriggerMapping.BuildTriggers(map, tileWidth, tileHeight, functionsByEventId, ref nextObjectGroupId, ref nextObjectId),
+            NpcMapping.BuildNpcs(map, tileWidth, tileHeight, getTileFunc, functionsByEventId, ref nextObjectGroupId, ref nextObjectId),
+        }.SelectMany(x => x);
+
+        if (map is MapData3D map3d)
+            results = results.Concat(AutomapMapping.BuildMarkers(map3d, tileWidth, tileHeight, ref nextObjectGroupId, ref nextObjectId));
+
+        return results.ToList();
+    }
 
 
     public static void LoadObjectGroups(AssetInfo info,
@@ -38,7 +46,9 @@ public static class ObjectGroupMapping
         EventLayout eventLayout,
         List<TriggerInfo> triggers,
         List<MapNpc> npcs,
-        List<MapEventZone> zones)
+        List<MapEventZone> zones,
+        List<AutomapInfo> markers,
+        List<byte> markerTiles)
     {
         ushort ResolveEntryPoint(string name)
         {
@@ -53,11 +63,18 @@ public static class ObjectGroupMapping
         {
             foreach (var obj in objectGroup.Objects)
             {
-                if (ObjectTypeName.Trigger.Equals(obj.Type, StringComparison.OrdinalIgnoreCase))
+                if (TypeName.Trigger.Equals(obj.Type, StringComparison.OrdinalIgnoreCase))
                     triggers.Add(TriggerMapping.ParseTrigger(obj, tileWidth, tileHeight, ResolveEntryPoint));
 
-                if (ObjectTypeName.Npc.Equals(obj.Type, StringComparison.OrdinalIgnoreCase))
+                if (TypeName.Npc.Equals(obj.Type, StringComparison.OrdinalIgnoreCase))
                     npcs.Add(NpcMapping.ParseNpc(obj, tileWidth, tileHeight, ResolveEntryPoint, pathParser));
+
+                if (TypeName.Marker.Equals(obj.Type, StringComparison.OrdinalIgnoreCase))
+                {
+                    var (marker, tile) = AutomapMapping.ParseMarker(obj, tileWidth, tileHeight);
+                    markers.Add(marker);
+                    markerTiles.Add(tile);
+                }
             }
         }
 

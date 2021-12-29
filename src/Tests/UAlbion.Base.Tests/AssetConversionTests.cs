@@ -210,7 +210,27 @@ public class AssetConversionTests
     }
 
     [Fact]
-    public void Map2DTest()
+    public void Map2DTest_200() // An outdoor level
+    {
+        var info = new AssetInfo { AssetId = AssetId.From(Map.Nakiridaani) };
+
+        var small = AssetMapping.Global.EnumerateAssetsOfType(AssetType.SmallNpcGraphics);
+        var large = AssetMapping.Global.EnumerateAssetsOfType(AssetType.LargeNpcGraphics);
+        var prereqs =
+            new[] { AssetId.From(Special.DummyObject) }
+                .Concat(small)
+                .Concat(large)
+                .ToArray();
+
+        Test<MapData2D>(
+            info.AssetId,
+            prereqs,
+            (x, s) => MapData2D.Serdes(info, x, AssetMapping.Global, s),
+            LayoutTestUtil.CanonicalizeMap);
+    }
+
+    [Fact]
+    public void Map2DTest_300() // Starting level
     {
         var info = new AssetInfo { AssetId = AssetId.From(Map.TorontoBegin) };
 
@@ -230,7 +250,7 @@ public class AssetConversionTests
     }
 
     [Fact]
-    public void Map3DTest_110()
+    public void Map3DTest_110() // A town level with automap markers
     {
         var prereqs = new[] { AssetId.From(Labyrinth.Jirinaar) };
         var info = new AssetInfo { AssetId = AssetId.From(Map.Jirinaar) };
@@ -242,7 +262,7 @@ public class AssetConversionTests
     }
 
     [Fact]
-    public void Map3DTest_122()
+    public void Map3DTest_122() // A dungeon level
     {
         var prereqs = new[] { AssetId.From(Labyrinth.Argim) };
         var info = new AssetInfo { AssetId = AssetId.From(Map.OldFormerBuilding) };

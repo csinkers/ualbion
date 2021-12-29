@@ -11,7 +11,7 @@ namespace UAlbion.Formats.Exporters.Tiled;
 
 public static class TriggerMapping
 {
-    public static class TriggerPropName
+    static class Prop
     {
         public const string Trigger = "Trigger";
         public const string Script = "Script";
@@ -76,16 +76,16 @@ public static class TriggerMapping
 
     static List<TiledProperty> BuildTriggerProperties(ZoneKey zone, Dictionary<ushort, string> functionsByEventId)
     {
-        var properties = new List<TiledProperty> { new(TriggerPropName.Trigger, zone.Trigger.ToString()) };
+        var properties = new List<TiledProperty> { new(Prop.Trigger, zone.Trigger.ToString()) };
 
         if (zone.Node != null)
-            properties.Add(new TiledProperty(TriggerPropName.Script, functionsByEventId[zone.Node.Id]));
+            properties.Add(new TiledProperty(Prop.Script, functionsByEventId[zone.Node.Id]));
 
         if (zone.Unk1 != 0)
-            properties.Add(new TiledProperty(TriggerPropName.Unk1, zone.Unk1.ToString(CultureInfo.InvariantCulture)));
+            properties.Add(new TiledProperty(Prop.Unk1, zone.Unk1.ToString(CultureInfo.InvariantCulture)));
 
         if (zone.Global)
-            properties.Add(new TiledProperty(TriggerPropName.Global, "true"));
+            properties.Add(new TiledProperty(Prop.Global, "true"));
 
         return properties;
     }
@@ -106,7 +106,7 @@ public static class TriggerMapping
             {
                 Id = nextId++,
                 Name = $"C{r.Item1.Chain}{(r.Item1.DummyNumber == 0 ? "" : $".{r.Item1.DummyNumber}")} {r.Item1.Trigger}",
-                Type = ObjectGroupMapping.ObjectTypeName.Trigger,
+                Type = ObjectGroupMapping.TypeName.Trigger,
                 X = r.Item2.OffsetX * tileWidth,
                 Y = r.Item2.OffsetY * tileHeight,
                 Polygon = new Polygon(r.Item2.Points, tileWidth, tileHeight),
@@ -185,21 +185,13 @@ public static class TriggerMapping
 
     public static TriggerInfo ParseTrigger(MapObject obj, int tileWidth, int tileHeight, Func<string, ushort> resolveEntryPoint)
     {
-        string Prop(string name)
-        {
-            var prop = obj.Properties.FirstOrDefault(x => name.Equals(x.Name, StringComparison.OrdinalIgnoreCase));
-            return prop?.Value ?? prop?.MultiLine;
-        }
-
-        string RequiredProp(string name) => Prop(name) ?? throw new FormatException($"Required property \"{name}\" was not present on NPC \"{obj.Name}\" (id {obj.Id})");
-
         var polygon = obj.Polygon.Points.Select(p => (((int)obj.X + p.x) / tileWidth, ((int)obj.Y + p.y) / tileHeight));
         var shape = PolygonToShape(polygon);
-        var entryPointName = Prop(TriggerPropName.Script);
+        var entryPointName = obj.PropString(Prop.Script);
         var entryPoint = resolveEntryPoint(entryPointName);
-        var trigger = RequiredProp(TriggerPropName.Trigger);
-        var unk1 = Prop(TriggerPropName.Unk1);
-        var global = Prop(TriggerPropName.Global) is { } s && "true".Equals(s, StringComparison.OrdinalIgnoreCase);
+        var trigger = obj.PropString(Prop.Trigger) ?? throw new FormatException($"Required property \"{Prop.Trigger}\" was not present on trigger \"{obj.Name}\" (id {obj.Id}) @ ({obj.X}, {obj.Y})");
+        var unk1 = obj.PropString(Prop.Unk1);
+        var global = obj.PropString(Prop.Global) is { } s && "true".Equals(s, StringComparison.OrdinalIgnoreCase);
         var points = TriggerZoneBuilder.GetPointsInsideShape(shape);
 
         if (points.Count == 0)

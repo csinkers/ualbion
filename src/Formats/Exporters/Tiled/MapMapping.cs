@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Exporters.Tiled;
 
 public static class MapMapping
 {
-    public static class MapPropName
+    static class Prop
     {
         public const string Ambient = "Ambient";
         public const string CombatBackground = "CombatBackground";
@@ -24,49 +24,49 @@ public static class MapMapping
 
     public static void ReadMapProperties(BaseMapData albionMap, Map tiledMap)
     {
-        albionMap.OriginalNpcCount = (byte)(PropInt(tiledMap, MapPropName.OriginalNpcCount) ?? 96);
-        albionMap.CombatBackgroundId = PropId(tiledMap, MapPropName.CombatBackground);
-        albionMap.PaletteId = PropId(tiledMap, MapPropName.Palette, true);
-        albionMap.SongId = PropId(tiledMap, MapPropName.Song);
+        albionMap.OriginalNpcCount = (byte)(PropInt(tiledMap, Prop.OriginalNpcCount) ?? 96);
+        albionMap.CombatBackgroundId = PropId(tiledMap, Prop.CombatBackground);
+        albionMap.PaletteId = PropId(tiledMap, Prop.Palette, true);
+        albionMap.SongId = PropId(tiledMap, Prop.Song);
 
         if (albionMap is MapData2D map2d)
         {
-            map2d.Flags = Enum.Parse<FlatMapFlags>(PropString(tiledMap, MapPropName.Flags, true));
-            map2d.FrameRate = (byte)(PropInt(tiledMap, MapPropName.FrameRate) ?? 0);
-            map2d.Sound = (byte)(PropInt(tiledMap, MapPropName.Sound) ?? 0);
-            map2d.TilesetId = PropId(tiledMap, MapPropName.Tileset, true);
+            map2d.Flags = Enum.Parse<FlatMapFlags>(PropString(tiledMap, Prop.Flags, true));
+            map2d.FrameRate = (byte)(PropInt(tiledMap, Prop.FrameRate) ?? 0);
+            map2d.Sound = (byte)(PropInt(tiledMap, Prop.Sound) ?? 0);
+            map2d.TilesetId = PropId(tiledMap, Prop.Tileset, true);
         }
 
         if (albionMap is MapData3D map3d)
         {
-            map3d.AmbientSongId = PropId(tiledMap, MapPropName.Ambient);
-            map3d.Flags = Enum.Parse<Map3DFlags>(PropString(tiledMap, MapPropName.Flags, true));
-            map3d.LabDataId = PropId(tiledMap, MapPropName.Labyrinth, true);
+            map3d.AmbientSongId = PropId(tiledMap, Prop.Ambient);
+            map3d.Flags = Enum.Parse<Map3DFlags>(PropString(tiledMap, Prop.Flags, true));
+            map3d.LabDataId = PropId(tiledMap, Prop.Labyrinth, true);
         }
     }
 
     public static List<TiledProperty> BuildMapProperties(BaseMapData map)
     {
         var props = new List<TiledProperty>();
-        props.Add(new(MapPropName.OriginalNpcCount, map.OriginalNpcCount));
-        props.Add(new(MapPropName.Palette, map.PaletteId.ToString()));
+        props.Add(new(Prop.OriginalNpcCount, map.OriginalNpcCount));
+        props.Add(new(Prop.Palette, map.PaletteId.ToString()));
 
-        if (map.SongId != SongId.None) props.Add(new(MapPropName.Song, map.SongId.ToString()));
-        if (map.CombatBackgroundId != SpriteId.None) props.Add(new(MapPropName.CombatBackground, map.CombatBackgroundId.ToString()));
+        if (map.SongId != SongId.None) props.Add(new(Prop.Song, map.SongId.ToString()));
+        if (map.CombatBackgroundId != SpriteId.None) props.Add(new(Prop.CombatBackground, map.CombatBackgroundId.ToString()));
 
         if (map is MapData2D map2d)
         {
-            props.Add(new(MapPropName.Flags, map2d.Flags.ToString()));
-            props.Add(new(MapPropName.Tileset, map2d.TilesetId.ToString()));
-            if (map2d.FrameRate > 0) props.Add(new(MapPropName.FrameRate, map2d.FrameRate));
-            if (map2d.Sound > 0) props.Add(new(MapPropName.Sound, map2d.Sound));
+            props.Add(new(Prop.Flags, map2d.Flags.ToString()));
+            props.Add(new(Prop.Tileset, map2d.TilesetId.ToString()));
+            if (map2d.FrameRate > 0) props.Add(new(Prop.FrameRate, map2d.FrameRate));
+            if (map2d.Sound > 0) props.Add(new(Prop.Sound, map2d.Sound));
         }
 
         if (map is MapData3D map3d)
         {
-            props.Add(new(MapPropName.Ambient, map3d.AmbientSongId.ToString()));
-            props.Add(new(MapPropName.Flags, map3d.Flags.ToString()));
-            props.Add(new(MapPropName.Labyrinth, map3d.LabDataId.ToString()));
+            props.Add(new(Prop.Ambient, map3d.AmbientSongId.ToString()));
+            props.Add(new(Prop.Flags, map3d.Flags.ToString()));
+            props.Add(new(Prop.Labyrinth, map3d.LabDataId.ToString()));
         }
 
         return props;

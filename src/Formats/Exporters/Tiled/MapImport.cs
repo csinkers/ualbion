@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UAlbion.Config;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Scripting;
 
@@ -23,17 +24,28 @@ public static class MapImport
         List<TriggerInfo> triggers = new();
         List<MapNpc> npcs = new();
         List<MapEventZone> zones = new();
+        List<AutomapInfo> markers = new();
+        List<byte> markerTiles = new();
         ObjectGroupMapping.LoadObjectGroups(
             info, map,
             is3d ? map.TileHeight : map.TileWidth,
             map.TileHeight,
-            eventLayout, triggers, npcs, zones);
+            eventLayout, triggers, npcs, zones,
+            markers, markerTiles);
 
         BaseMapData albionMap;
         if (is3d)
         {
-            albionMap = new MapData3D(info.AssetId, (byte)map.Width, (byte)map.Height, eventLayout.Events, eventLayout.Chains, npcs, zones);
-            LayerMapping3D.ReadLayers((MapData3D)albionMap, map.Layers);
+            var map3d = new MapData3D(info.AssetId, (byte)map.Width, (byte)map.Height, eventLayout.Events, eventLayout.Chains, npcs, zones);
+            LayerMapping3D.ReadLayers(map3d, map.Layers);
+
+            for (int i = 0; i < markerTiles.Count; i++)
+                map3d.AutomapGraphics[i] = markerTiles[i];
+
+            map3d.Automap.Clear();
+            map3d.Automap.AddRange(markers);
+
+            albionMap = map3d;
         }
         else
         {

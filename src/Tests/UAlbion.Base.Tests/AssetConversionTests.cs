@@ -118,7 +118,7 @@ public class AssetConversionTests
                 (".saveBase.txt", baseNotes),
                 (".saveRepacked.txt", repackedNotes),
                 (".Base.json", baseJson),
-                (".Repacked.json", unpackedJson)
+                (".Repacked.json", repackedJson)
             });
     }
 
@@ -230,12 +230,25 @@ public class AssetConversionTests
     }
 
     [Fact]
-    public void Map3DTest()
+    public void Map3DTest_110()
     {
+        var prereqs = new[] { AssetId.From(Labyrinth.Jirinaar) };
+        var info = new AssetInfo { AssetId = AssetId.From(Map.Jirinaar) };
+        Test<MapData3D>(
+            info.AssetId,
+            prereqs,
+            (x, s) => MapData3D.Serdes(info, x, AssetMapping.Global, s),
+            LayoutTestUtil.CanonicalizeMap);
+    }
+
+    [Fact]
+    public void Map3DTest_122()
+    {
+        var prereqs = new[] { AssetId.From(Labyrinth.Argim) };
         var info = new AssetInfo { AssetId = AssetId.From(Map.OldFormerBuilding) };
         Test<MapData3D>(
             info.AssetId,
-            null,
+            prereqs,
             (x, s) => MapData3D.Serdes(info, x, AssetMapping.Global, s),
             LayoutTestUtil.CanonicalizeMap);
     }

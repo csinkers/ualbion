@@ -189,10 +189,21 @@ public class ModApplier : Component, IModApplier
         if (asset != null)
             return asset;
 
-        asset = LoadAsset(id, null);
+        try
+        {
+            asset = LoadAssetInternal(id, _extraPaths);
+            _assetCache.Add(asset ?? new AssetNotFoundException($"Could not load asset for {id}"), id);
+            return asset;
+        }
+        catch (Exception e)
+        {
+            if (CoreUtil.IsCriticalException(e))
+                throw;
 
-        _assetCache.Add(asset, id);
-        return asset is Exception ? null : asset;
+            Error($"Could not load asset {id}: {e}");
+            _assetCache.Add(e, id);
+            return null;
+        }
     }
 
     object LoadAssetInternal(AssetId id, Dictionary<string, string> extraPaths, string language = null)
@@ -246,7 +257,7 @@ public class ModApplier : Component, IModApplier
         }
 
         if (asset == null)
-            throw new AssetNotFoundException($"Could not load asset for {id}");
+            return null;
 
         while (patches is { Count: > 0 })
             asset = patches.Pop().Apply(asset);

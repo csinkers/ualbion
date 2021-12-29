@@ -18,27 +18,22 @@ public static class MapImport
         if (map.Height > 255) throw new FormatException($"Map heights above 255 are not currently supported (was {map.Height})");
 
         bool is3d = map.Orientation == "isometric";
-        var steps = new List<(string, IGraph)>();
-        var eventLayout = ScriptCompiler.Compile(script, steps);
+        var eventLayout = ScriptCompiler.Compile(script);
 
         List<TriggerInfo> triggers = new();
         List<MapNpc> npcs = new();
         List<MapEventZone> zones = new();
         ObjectGroupMapping.LoadObjectGroups(
-            info,
-            map,
+            info, map,
             is3d ? map.TileHeight : map.TileWidth,
             map.TileHeight,
-            eventLayout,
-            triggers,
-            npcs,
-            zones);
+            eventLayout, triggers, npcs, zones);
 
         BaseMapData albionMap;
         if (is3d)
         {
             albionMap = new MapData3D(info.AssetId, (byte)map.Width, (byte)map.Height, eventLayout.Events, eventLayout.Chains, npcs, zones);
-            LayerMapping3D.ReadLayers((MapData3D)albionMap, map);
+            LayerMapping3D.ReadLayers((MapData3D)albionMap, map.Layers);
         }
         else
         {

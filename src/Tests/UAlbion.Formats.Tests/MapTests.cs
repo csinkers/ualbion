@@ -1,8 +1,11 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Exporters.Tiled;
 using Xunit;
 
 namespace UAlbion.Formats.Tests;
@@ -130,5 +133,26 @@ public class MapTests
         tileset.Tiles.Add(T("12:0:0:8"));
         tileset.Tiles.Add(T("13:0:0:8"));
         tileset.Tiles.Add(T("14:0:0:8"));
+    }
+
+    [Fact]
+    public void RoundTrip3DLayers()
+    {
+        int nextLayerId = 0;
+        var map = new MapData3D(MapId.None, 16, 16, new List<EventNode>(), new List<ushort>(), new List<MapNpc>(), new List<MapEventZone>());
+        for (int i = 0; i < 256; i++)
+        {
+            map.Floors[i] = (byte)i;
+            map.Ceilings[i] = (byte)i;
+            map.Contents[i] = (byte)i;
+        }
+
+        var layers = LayerMapping3D.BuildLayers(map, ref nextLayerId);
+        var reloaded = new MapData3D(MapId.None, 16, 16, new List<EventNode>(), new List<ushort>(), new List<MapNpc>(), new List<MapEventZone>());
+        LayerMapping3D.ReadLayers(reloaded, layers);
+
+        Assert.True(map.Floors.SequenceEqual(reloaded.Floors));
+        Assert.True(map.Ceilings.SequenceEqual(reloaded.Ceilings));
+        Assert.True(map.Contents.SequenceEqual(reloaded.Contents));
     }
 }

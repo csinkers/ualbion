@@ -30,8 +30,7 @@ public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
         {
             var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
             var script = Encoding.UTF8.GetString(bytes);
-            var steps = new List<(string, IGraph)>();
-            var eventLayout = ScriptCompiler.Compile(script, steps);
+            var eventLayout = ScriptCompiler.Compile(script);
             return new EventSet(info.AssetId, eventLayout.Events, eventLayout.Chains);
         }
 

@@ -147,6 +147,7 @@ public static class NpcMapping
             Movement = (NpcMovementTypes)Enum.Parse(typeof(NpcMovementTypes), obj.PropString(NpcPropName.Movement)),
             Unk8 = (byte)(obj.PropInt(NpcPropName.Unk8) ?? 0),
             Unk9 = (byte)(obj.PropInt(NpcPropName.Unk9) ?? 0),
+            Sound = (byte)(obj.PropInt(NpcPropName.Sound) ?? 0),
             SpriteOrGroup = AssetId.Parse(visual) // TODO: Handle groups for 3D maps
         };
     }

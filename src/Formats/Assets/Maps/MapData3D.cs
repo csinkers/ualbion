@@ -11,6 +11,7 @@ namespace UAlbion.Formats.Assets.Maps;
 
 public class MapData3D : BaseMapData
 {
+    const int AutomapGraphicsSize = 64;
     public override MapType MapType => MapType.ThreeD;
     [JsonInclude] public Map3DFlags Flags { get; set; }
     [JsonInclude] public LabyrinthId LabDataId { get; set; }
@@ -26,7 +27,7 @@ public class MapData3D : BaseMapData
     [JsonInclude] public byte[] AutomapGraphics { get; set; }
     [JsonInclude] public List<AutomapInfo> Automap { get; set; } = new();
 
-    public byte[] BuildWallArray() => Contents.Select(x => (byte)(x >= LabyrinthData.WallOffset ? x - LabyrinthData.WallOffset : 0)).ToArray();
+    public byte[] BuildWallArray() => Contents.Select(x => (byte)(x >= LabyrinthData.WallOffset ? x - LabyrinthData.WallOffset + 1 : 0)).ToArray();
     public byte[] BuildObjectArray() => Contents.Select(x => x < LabyrinthData.WallOffset ? x : (byte)0).ToArray();
     public byte GetWall(int index)
     {
@@ -43,11 +44,18 @@ public class MapData3D : BaseMapData
     }
 
     public MapData3D() { } // For JSON
+
     public MapData3D(MapId id,
         byte width, byte height,
         IList<EventNode> events, IList<ushort> chains,
         IEnumerable<MapNpc> npcs,
-        IList<MapEventZone> zones) : base(id, width, height, events, chains, npcs, zones) { }
+        IList<MapEventZone> zones) : base(id, width, height, events, chains, npcs, zones)
+    {
+        Floors = new byte[width * height];
+        Ceilings = new byte[width * height];
+        Contents = new byte[width * height];
+        AutomapGraphics = new byte[AutomapGraphicsSize];
+    }
 
     public static MapData3D Serdes(AssetInfo info, MapData3D existing, AssetMapping mapping, ISerializer s)
     {
@@ -115,7 +123,7 @@ public class MapData3D : BaseMapData
             s.Check();
         }
 
-        AutomapGraphics = s.Bytes(nameof(AutomapGraphics), AutomapGraphics, 0x40);
+        AutomapGraphics = s.Bytes(nameof(AutomapGraphics), AutomapGraphics, AutomapGraphicsSize);
         s.Check();
     }
 }

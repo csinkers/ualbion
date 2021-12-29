@@ -68,21 +68,21 @@ public static class LayerMapping3D
         };
     }
 
-    public static void ReadLayers(MapData3D albionMap, Map map)
+    public static void ReadLayers(MapData3D albionMap, List<TiledMapLayer> layers)
     {
-        albionMap.Floors = new byte[map.Width * map.Height];
-        albionMap.Ceilings = new byte[map.Width * map.Height];
-        albionMap.Contents = new byte[map.Width * map.Height];
-
-        foreach (var layer in map.Layers)
+        foreach (var layer in layers)
         {
             var values = ParseCsv(layer.Data.Content).ToArray();
-            if (values.Length != map.Width * map.Height)
-                throw new FormatException($"Map layer {layer.Id} had {values.Length}, but {map.Width * map.Height} were expected ({map.Width} x {map.Height})");
+            if (values.Length != albionMap.Width * albionMap.Height)
+                throw new FormatException($"Map layer {layer.Id} had {values.Length}, but {albionMap.Width * albionMap.Height} were expected ({albionMap.Width} x {albionMap.Height})");
 
             for (int i = 0; i < values.Length; i++)
             {
-                var (type, value) = InterpretTile(values[i]);
+                var globalValue = values[i];
+                if (globalValue == 0)
+                    continue;
+
+                var (type, value) = InterpretTile(globalValue);
                 var array = type switch
                 {
                     IsometricMode.Floors => albionMap.Floors,
@@ -101,8 +101,8 @@ public static class LayerMapping3D
         {
             >= CeilingGid and < CeilingGid + TilesetSpacing => (IsometricMode.Ceilings, (byte)(tile - CeilingGid)),
             >= ContentsGid => (IsometricMode.Contents, (byte)(tile - ContentsGid)),
-            >= WallGid => (IsometricMode.Contents, (byte)(tile - WallGid)),
-            >= FloorGid => (IsometricMode.Contents, (byte)(LabyrinthData.WallOffset + tile - FloorGid)),
+            >= WallGid => (IsometricMode.Contents, (byte)(LabyrinthData.WallOffset + tile - 1 - WallGid)),
+            >= FloorGid => (IsometricMode.Floors, (byte)(tile - FloorGid)),
             _ => throw new ArgumentOutOfRangeException($"Tile {tile} did not fall into any of the expected ranges")
         };
 
@@ -123,7 +123,11 @@ public static class LayerMapping3D
             for (int i = 0; i < map.Width; i++)
             {
                 int index = j * map.Width + i;
-                sb.Append(gidOffset + tiles[index]);
+                int tile = tiles[index];
+                if (tile == 0)
+                    sb.Append(0);
+                else
+                    sb.Append(gidOffset + tiles[index]);
                 sb.Append(',');
             }
 

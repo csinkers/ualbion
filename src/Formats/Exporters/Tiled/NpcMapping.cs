@@ -55,7 +55,7 @@ public static class NpcMapping
             {
                 Id = nextObjectGroupId++,
                 Name = $"NPC{npc.Index} Path",
-                Objects = NpcPathBuilder.Build(npc.Waypoints, tileWidth, tileHeight, ref nextId),
+                Objects = NpcPathBuilder.Build(npc.Index, npc.Waypoints, tileWidth, tileHeight, ref nextId),
                 Hidden = true,
             });
         }

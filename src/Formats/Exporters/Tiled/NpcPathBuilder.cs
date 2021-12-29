@@ -57,6 +57,7 @@ public static class NpcPathBuilder
     }
 
     public static List<MapObject> Build(
+        int npcNumber,
         NpcWaypoint[] waypoints,
         int tileWidth,
         int tileHeight,
@@ -72,13 +73,15 @@ public static class NpcPathBuilder
             if (results.Count > 0)
                 results[^1].Properties.Add(TiledProperty.Object(NextNodePropertyName, id));
 
+            var time = MapNpc.WaypointIndexToTime(index);
             results.Add(new MapObject
             {
                 Id = id,
                 Type = "Path",
+                Name = $"N{npcNumber} T{time}",
                 X = posX * tileWidth,
                 Y = posY * tileHeight,
-                Properties = new List<TiledProperty> { new(TimePropertyName, MapNpc.WaypointIndexToTime(index)) },
+                Properties = new List<TiledProperty> { new(TimePropertyName, time) },
                 Point = TiledPoint.Instance
             });
         }

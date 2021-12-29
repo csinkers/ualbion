@@ -442,7 +442,7 @@ public class AssetLoadTests : IDisposable
 
         Assert.Equal(96, map.Npcs.Length);
         var n = map.Npcs[2];
-        Assert.Equal(AssetId.From(MonsterGroup.Unknown1), n.Id);
+        Assert.Equal(AssetId.From(MonsterGroup.Empty), n.Id);
         Assert.Equal(new AssetId(AssetType.ObjectGroup, 68), n.SpriteOrGroup);
         Assert.Equal(NpcFlags.Wander
                      | NpcFlags.IsMonster

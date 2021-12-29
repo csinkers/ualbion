@@ -4,7 +4,7 @@ namespace UAlbion.Base;
 
 public enum MonsterGroup : byte
 {
-    Unknown1 = 1,
+    Empty = 1,
     DebugMix = 2,
     OneKrondir1 = 3,
     TwoKrondir1 = 4,

@@ -425,7 +425,7 @@ public class NpcPathBuilderTests
         const int tileHeight = 16;
 
         int nextId = 0;
-        var mapObjects = NpcPathBuilder.Build(path, tileWidth, tileHeight, ref nextId);
+        var mapObjects = NpcPathBuilder.Build(0, path, tileWidth, tileHeight, ref nextId);
         var parser = NpcPathBuilder.BuildParser(mapObjects, tileWidth, tileHeight);
         var reconstructed = parser.GetWaypoints(0, path.Length);
         Assert.Equal(path.Length, reconstructed.Length);

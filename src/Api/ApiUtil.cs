@@ -147,9 +147,9 @@ public static class ApiUtil
         | (uint)(b << 16)
         | (uint)(a << 24);
 
-    static readonly char[] NewLineChars = { '\n', '\r' };
+    static readonly string[] NewLineChars = { "\r\n", "\r", "\n" };
 
-    public static string[] SplitLines(string s)
-        => s?.Split(NewLineChars, StringSplitOptions.RemoveEmptyEntries)
+    public static string[] SplitLines(string s, StringSplitOptions options = StringSplitOptions.RemoveEmptyEntries)
+        => s?.Split(NewLineChars, options)
            ?? Array.Empty<string>();
 }

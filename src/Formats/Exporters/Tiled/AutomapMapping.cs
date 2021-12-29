@@ -19,6 +19,9 @@ public static class AutomapMapping
 
     public static IEnumerable<ObjectGroup> BuildMarkers(MapData3D map, int tileWidth, int tileHeight, ref int nextObjectGroupId, ref int nextObjectId)
     {
+        if (map.Automap == null || map.Automap.Count == 0 || map.AutomapGraphics == null)
+            return Enumerable.Empty<ObjectGroup>();
+
         int nextId = nextObjectId;
         int npcGroupId = nextObjectGroupId++;
 

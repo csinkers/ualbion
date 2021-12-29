@@ -32,7 +32,7 @@ public static class TriggerMapping
         var regions = TriggerZoneBuilder.BuildZones(map);
 
         int globalIndex = 0;
-        var globals = regions.Where(x => x.Item1.Chain != 0xffff && x.Item1.Global).ToList();
+        var globals = regions.Where(x => x.Item1.Global).ToList();
         if (globals.Any())
         {
             foreach (var global in globals)
@@ -52,7 +52,7 @@ public static class TriggerMapping
         }
 
         var groupedByTriggerType = regions
-            .Where(x => x.Item1.Chain != 0xffff && !x.Item1.Global)
+            .Where(x => !x.Item1.Global)
             .GroupBy(x => x.Item1.Trigger)
             .OrderBy(x => x.Key);
 
@@ -186,13 +186,12 @@ public static class TriggerMapping
     public static TriggerInfo ParseTrigger(MapObject obj, int tileWidth, int tileHeight, Func<string, ushort> resolveEntryPoint)
     {
         var polygon = obj.Polygon.Points.Select(p => (((int)obj.X + p.x) / tileWidth, ((int)obj.Y + p.y) / tileHeight));
-        var shape = PolygonToShape(polygon);
         var entryPointName = obj.PropString(Prop.Script);
         var entryPoint = resolveEntryPoint(entryPointName);
         var trigger = obj.PropString(Prop.Trigger) ?? throw new FormatException($"Required property \"{Prop.Trigger}\" was not present on trigger \"{obj.Name}\" (id {obj.Id}) @ ({obj.X}, {obj.Y})");
         var unk1 = obj.PropString(Prop.Unk1);
         var global = obj.PropString(Prop.Global) is { } s && "true".Equals(s, StringComparison.OrdinalIgnoreCase);
-        var points = TriggerZoneBuilder.GetPointsInsideShape(shape);
+        var points = TriggerZoneBuilder.GetPointsInsidePolygon(polygon);
 
         if (points.Count == 0)
             throw new FormatException($"Trigger {trigger} at ({obj.X}, {obj.Y}) resolved to an empty point set!");
@@ -206,25 +205,5 @@ public static class TriggerMapping
             EventIndex = entryPoint,
             Points = points
         };
-    }
-
-    static IEnumerable<((int x, int y) from, (int x, int y) to)> PolygonToShape(IEnumerable<(int x, int y)> polygon)
-    {
-        bool first = true;
-        (int x, int y) firstPoint = (0, 0);
-        (int x, int y) lastPoint = (0, 0);
-
-        foreach (var point in polygon)
-        {
-            if (first)
-                firstPoint = point;
-            else
-                yield return (lastPoint, point);
-
-            lastPoint = point;
-            first = false;
-        }
-
-        yield return (lastPoint, firstPoint);
     }
 }

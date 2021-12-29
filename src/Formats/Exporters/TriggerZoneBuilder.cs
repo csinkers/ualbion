@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UAlbion.Api;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Exporters.Tiled;
@@ -9,30 +10,13 @@ namespace UAlbion.Formats.Exporters;
 
 public static class TriggerZoneBuilder
 {
-    public static IList<(ZoneKey, Geometry.Polygon)> BuildZonesSimple(BaseMapData map)
-    {
-        if (map == null) throw new ArgumentNullException(nameof(map));
-        var zones = new List<(ZoneKey, Geometry.Polygon)>();
-        foreach (var zone in map.Zones)
-        {
-            zones.Add((new ZoneKey(zone), new Geometry.Polygon { Points = new[]
-                {
-                    (zone.X, zone.Y),
-                    (zone.X+1, zone.Y),
-                    (zone.X+1, zone.Y+1),
-                    (zone.X, zone.Y+1),
-                }
-            }));
-        }
-        return zones;
-    }
-
     public static IList<(ZoneKey, Geometry.Polygon)> BuildZones(BaseMapData map)
     {
         if (map == null) throw new ArgumentNullException(nameof(map));
 
         // Render zones to a grid
         var zoneMap = new List<MapEventZone>[map.Width * map.Height];
+
         foreach (var zone in map.Zones)
         {
             int index = zone.Y * map.Width + zone.X;
@@ -101,7 +85,41 @@ public static class TriggerZoneBuilder
         }
     }
 
-    static void RemoveVoids(List<(ZoneKey key, IList<(int x, int y)> points)> regions)
+    public static string PrintRegion(IList<(int x, int y)> region)
+    {
+        var extents = GetExtents(region);
+        var width = 1 + extents.x1 - extents.x0;
+        var height = 1 + extents.y1 - extents.y0;
+        var grid = new int[width * height];
+
+        foreach (var (x, y) in region)
+        {
+            int index = (y - extents.y0) * width + (x - extents.x0);
+            grid[index] = 1;
+        }
+
+        return PrintGrid(grid, width);
+    }
+
+    static string PrintGrid(int[] grid, int width)
+    {
+        var sb = new StringBuilder();
+        for (int i = 0, column = 0; i < grid.Length; i++, column++)
+        {
+            if (column == width)
+            {
+                sb.AppendLine();
+                column = 0;
+            }
+
+            if (grid[i] == 0) sb.Append(' ');
+            else sb.Append(grid[i]);
+        }
+
+        return sb.ToString();
+    }
+
+    public static void RemoveVoids(List<(ZoneKey key, IList<(int x, int y)> points)> regions)
     {
         for (int regionIndex = 0; regionIndex < regions.Count; regionIndex++)
         {
@@ -129,19 +147,21 @@ public static class TriggerZoneBuilder
                 if (grid[gridIndex] != 0)
                     continue;
 
-                int cutoff = gridIndex % width + extents.x0;
+                int cutoff = gridIndex / width + extents.y0;
+                if (cutoff == 0)
+                    continue;
 
-                // Void detected! Split across the x-coord
-                var leftRegion = new List<(int x, int y)>();
-                var rightRegion = new List<(int x, int y)>();
+                // Void detected! Split across the y-coord
+                var topRegion = new List<(int x, int y)>();
+                var bottomRegion = new List<(int x, int y)>();
                 foreach (var (x, y) in region.points)
                 {
-                    if (x <= cutoff) leftRegion.Add((x,y));
-                    else rightRegion.Add((x,y));
+                    if (y <= cutoff) topRegion.Add((x,y));
+                    else bottomRegion.Add((x,y));
                 }
 
-                regions[regionIndex] = (region.key, leftRegion); // Left region is guaranteed to contain no voids
-                regions.Add((region.key, rightRegion));
+                regions[regionIndex] = (region.key, topRegion);
+                regions.Add((region.key, bottomRegion));
                 break;
             }
         }
@@ -311,43 +331,6 @@ public static class TriggerZoneBuilder
         return cur;
     }
 
-    /*
-    static void FillZone(List<(ZoneKey, IList<(int, int)>)> regions, List<MapEventZone>[] zoneMap, int width, MapEventZone zone, int index)
-    {
-        Queue<int> pending = new Queue<int>();
-        pending.Enqueue(index);
-        var region = new List<(int, int)>();
-        var key = new ZoneKey(zone);
-        regions.Add((key, region));
-
-        while (pending.Count > 0)
-        {
-            var n = pending.Dequeue();
-            var targetZones = zoneMap[n];
-            if (targetZones == null)
-                continue;
-
-            byte i = (byte)(n % width);
-            byte j = (byte)(n / width);
-            for (int k = 0; k < targetZones.Count;)
-            {
-                var other = targetZones[k];
-                if (new ZoneKey(other) != key)
-                {
-                    k++;
-                    continue;
-                }
-
-                if (i > 0)                      pending.Enqueue(n - 1); // Check left
-                if (i < width - 1)              pending.Enqueue(n + 1); // Check right
-                if (n - width >= 0)             pending.Enqueue(n - width); // Check above
-                if (n + width < zoneMap.Length) pending.Enqueue(n + width); // Check below
-                region.Add((i, j));
-                targetZones.RemoveAt(k);
-            }
-        }
-    }
-    */
     static void FillZone(List<(ZoneKey, IList<(int, int)>)> regions, List<MapEventZone>[] zoneMap, int width, MapEventZone zone, int index)
     {
         var key = new ZoneKey(zone);
@@ -465,7 +448,33 @@ public static class TriggerZoneBuilder
         return (intersectionsAbove & 1) == 1;
     }
 
-    public static IList<(int x, int y)> GetPointsInsideShape(IEnumerable<((int x, int y) from, (int x, int y) to)> shape)
+    public static IList<(int x, int y)> GetPointsInsidePolygon(IEnumerable<(int, int)> polygon)
+    {
+        var shape = PolygonToShape(polygon);
+        return GetPointsInsideShape(shape);
+    }
+
+    static IEnumerable<((int x, int y) from, (int x, int y) to)> PolygonToShape(IEnumerable<(int x, int y)> polygon)
+    {
+        bool first = true;
+        (int x, int y) firstPoint = (0, 0);
+        (int x, int y) lastPoint = (0, 0);
+
+        foreach (var point in polygon)
+        {
+            if (first)
+                firstPoint = point;
+            else
+                yield return (lastPoint, point);
+
+            lastPoint = point;
+            first = false;
+        }
+
+        yield return (lastPoint, firstPoint);
+    }
+
+    static IList<(int x, int y)> GetPointsInsideShape(IEnumerable<((int x, int y) from, (int x, int y) to)> shape)
     {
         var results = new List<(int x, int y)>();
         shape = SortEdges(shape);

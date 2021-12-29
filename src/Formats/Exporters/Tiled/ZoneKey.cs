@@ -1,7 +1,6 @@
 ﻿using System;
 using UAlbion.Api;
 using UAlbion.Formats.Assets.Maps;
-using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Exporters.Tiled;
 
@@ -26,6 +25,16 @@ public readonly struct ZoneKey : IEquatable<ZoneKey>
         Chain = chain;
         DummyNumber = dummyNumber;
         Node = node;
+    }
+
+    public ZoneKey(bool global, TriggerTypes type, ushort chain) // For tests
+    {
+        Global = global;
+        Trigger = type;
+        Chain = chain;
+        Unk1 = 0;
+        DummyNumber = 0;
+        Node = null;
     }
 
     public bool Global { get; }

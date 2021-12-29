@@ -56,8 +56,7 @@ public class MapEventZone
         if (Node is DummyEventNode dummy)
             Node = dummy.Id == EventNode.UnusedEventId ? null : getEvent(dummy.Id);
 
-        if (Node != null)
-            Chain = getChain(Node.Id);
+        Chain = Node != null ? getChain(Node.Id) : EventNode.UnusedEventId;
     }
 
     public override string ToString() => $"{(Global ? "GZ" : "Z")}({X}, {Y}) T({Trigger}) M({Unk1}) C({Chain}) E({Node?.Id})";

@@ -68,15 +68,15 @@ public sealed class SelectionHandler2D : Component
         _mapTileHit.OverlaySprite = e.Debug ? _renderable.GetWeakOverlayReference(x, y) : null;
         continuation(new Selection(e.Origin, e.Direction, t, _mapTileHit));
 
+        var underlayTile = _map.GetUnderlay(x, y);
+        var overlayTile = _map.GetOverlay(x, y);
+
+        if (underlayTile != null) continuation(new Selection(e.Origin, e.Direction, t, underlayTile));
+        if (overlayTile != null) continuation(new Selection(e.Origin, e.Direction, t, overlayTile));
+        continuation(new Selection(e.Origin, e.Direction, t, this));
+
         if (e.Debug)
         {
-            var underlayTile = _map.GetUnderlay(x, y);
-            var overlayTile = _map.GetOverlay(x, y);
-
-            if (underlayTile != null) continuation(new Selection(e.Origin, e.Direction, t, underlayTile));
-            if (overlayTile != null) continuation(new Selection(e.Origin, e.Direction, t, overlayTile));
-            continuation(new Selection(e.Origin, e.Direction, t, this));
-
             var zone = _map.GetZone(x, y);
             if (zone != null)
                 continuation(new Selection(e.Origin, e.Direction, t, zone));

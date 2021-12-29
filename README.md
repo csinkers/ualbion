@@ -2,7 +2,7 @@
 A remake of the 1995 RPG Albion 
 
 Prerequisites: 
-* .NET 5
+* .NET 6
 * Game data from an install of the original game (full version or demo)
 
 ## Screenshots
@@ -97,5 +97,5 @@ Thanks also to the authors of and contributers to the dependencies of this proje
 - [OpenAL](https://www.openal.org/) audio abstraction API from Loki Entertainment / Creative Technology
 - [OpenAL-CS](https://github.com/flibitijibibo/OpenAL-CS) C# wrapper for OpenAL (using the NuGet package of the [OpenRA](https://github.com/OpenRA/OpenAL-CS) fork)
 - [AdlMidi](https://github.com/Wohlstand/libADLMIDI) OPL-3 synthesiser library by Vitaly Novichkov, Joel Yliluoma et al
-- [Json.NET](https://github.com/JamesNK/Newtonsoft.Json) JSON serialisation library by James Newton-King
+- [Superpower](https://github.com/datalust/superpower) C# parsing library by Nicholas Blumhardt et al
 

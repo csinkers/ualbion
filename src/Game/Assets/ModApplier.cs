@@ -193,7 +193,7 @@ public class ModApplier : Component, IModApplier
         {
             asset = LoadAssetInternal(id, _extraPaths);
             _assetCache.Add(asset ?? new AssetNotFoundException($"Could not load asset for {id}"), id);
-            return asset;
+            return asset is Exception ? null : asset;
         }
         catch (Exception e)
         {

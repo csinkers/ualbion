@@ -7,6 +7,7 @@ public static class AssetProperty
     public const string Mapping  = "Mapping"; // string
     public const string Offset   = "Offset"; // int
     public const string Pattern  = "Pattern"; // string
+    public const string MinimumCount = "MinimumCount"; // Just used to get closer to 1:1 round-tripping of XLDs
 
     // Textures
     public const string Width      = "Width"; // int
@@ -53,5 +54,4 @@ public static class AssetProperty
     public const string Name = "Name"; // StringId to use in game
     public const string MagicSchool = "School"; // SpellClass enum
     public const string SpellNumber = "SpellNumber"; // offset into school, used for save-game serialization
-    public const string MinimumCount = "MinimumCount"; // Just used to get closer to 1:1 round-tripping of XLDs
 }

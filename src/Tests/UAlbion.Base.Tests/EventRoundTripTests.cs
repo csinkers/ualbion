@@ -536,13 +536,13 @@ simple_chest 1 Rations.0");
     [Fact]
     public void Sound()
     {
-        Test(@"sound None 0
+        Test(@"sound None 0 0 0 0
 sound None 1 1 1 11000
 sound Sample.AmbientThrum 0 0 0 0 Silent
-sound Sample.IllTemperedLlama 0 1
-sound Sample.IllTemperedLlama 0 1 1
+sound Sample.IllTemperedLlama 0 1 0 0
+sound Sample.IllTemperedLlama 0 1 1 0
 sound Sample.IllTemperedLlama 0 1 1 11000
-sound Sample.IllTemperedLlama 1 1 1
+sound Sample.IllTemperedLlama 1 1 1 0
 sound Sample.IllTemperedLlama 1 1 0 11000
 sound Sample.IllTemperedLlama 1 1 1 11000");
     }
@@ -647,11 +647,11 @@ show_pic Picture.CelticIskaiStandoff
 show_pic Picture.TorontoWithVines 0 0
 show_picture Picture.HarbourTown 0 0
 song Song.TechCombatMusic
-sound Sample.DistantCollapse 80
+sound Sample.DistantCollapse 80 0 0 0
 sound Sample.DistantCollapse 80 0 0 7000
-sound Sample.DistantCollapse 80 150
+sound Sample.DistantCollapse 80 150 0 0
 sound Sample.XylophoneTones 90 100 0 22000
-sound Sample.Healing 80
+sound Sample.Healing 80 0 0 0
 sound_fx_off
 start_anim 10 0 0 1
 start_anim 3 25 24 2

@@ -6,8 +6,18 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.MapEvents;
 
-[Event("sound", "Play a sound sample", "sound_effect")] // USED IN SCRIPT (both names)
-public class SoundEvent : MapEvent
+public interface ISoundEvent
+{
+    SampleId SoundId { get; } // [0..78], 153
+    byte Volume { get; } // [0..150]
+    byte RestartProbability { get; } // [0..100]
+    byte Unk3 { get; } // [0..100] (multiples of 5)
+    ushort FrequencyOverride { get; } // 0,8, [5..22]*1000
+    SoundMode Mode { get; }
+}
+
+[Event("sound", "Play a sound sample")] // USED IN SCRIPT
+public class SoundEvent : MapEvent, ISoundEvent
 {
     SoundEvent() { }
     public SoundEvent(
@@ -45,10 +55,46 @@ public class SoundEvent : MapEvent
     }
 
     [EventPart("sound")] public SampleId SoundId { get; private set; } // [0..78], 153
-    [EventPart("vol", true, (byte)100)] public byte Volume { get; private set; } // [0..150]
-    [EventPart("restart_prob", true, (byte)0)] public byte RestartProbability { get; private set; } // [0..100]
-    [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; } // [0..100] (multiples of 5)
-    [EventPart("freq", true, (ushort)0)] public ushort FrequencyOverride { get; private set; } // 0,8, [5..22]*1000
+    [EventPart("vol")] public byte Volume { get; private set; } // [0..150]
+    [EventPart("restart_prob")] public byte RestartProbability { get; private set; } // [0..100]
+    [EventPart("unk3")] public byte Unk3 { get; private set; } // [0..100] (multiples of 5)
+    [EventPart("freq")] public ushort FrequencyOverride { get; private set; } // 0,8, [5..22]*1000
     [EventPart("mode", true, SoundMode.GlobalOneShot)] public SoundMode Mode { get; private set; }
+
+    // Disabled default values for now to ensure the script text round-trips close enough
+    // [EventPart("vol", true, (byte)100)] public byte Volume { get; private set; } // [0..150]
+    // [EventPart("restart_prob", true, (byte)0)] public byte RestartProbability { get; private set; } // [0..100]
+    // [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; } // [0..100] (multiples of 5)
+    // [EventPart("freq", true, (ushort)0)] public ushort FrequencyOverride { get; private set; } // 0,8, [5..22]*1000
+    // [EventPart("mode", true, SoundMode.GlobalOneShot)] public SoundMode Mode { get; private set; }
+
     public override MapEventType EventType => MapEventType.Sound;
+}
+
+[Event("sound_effect", "Play a sound sample")] // USED IN SCRIPT
+public class SoundEffectEvent : Event, ISoundEvent
+{
+    SoundEffectEvent() { }
+    public SoundEffectEvent(
+        SampleId soundId,
+        byte volume,
+        byte restartProbability,
+        byte unk3,
+        ushort frequencyOverride,
+        SoundMode mode)
+    {
+        SoundId = soundId;
+        Volume = volume;
+        RestartProbability = restartProbability;
+        Unk3 = unk3;
+        FrequencyOverride = frequencyOverride;
+        Mode = mode;
+    }
+
+    [EventPart("sound")] public SampleId SoundId { get; } // [0..78], 153
+    [EventPart("vol")] public byte Volume { get; } // [0..150]
+    [EventPart("restart_prob")] public byte RestartProbability { get; } // [0..100]
+    [EventPart("unk3")] public byte Unk3 { get; } // [0..100] (multiples of 5)
+    [EventPart("freq")] public ushort FrequencyOverride { get; } // 0,8, [5..22]*1000
+    [EventPart("mode", true, SoundMode.GlobalOneShot)] public SoundMode Mode { get; }
 }

@@ -34,11 +34,12 @@ public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManage
     public AudioManager(bool standalone)
     {
         On<SoundEvent>(Play);
+        On<SoundEffectEvent>(Play);
         On<WaveLibEvent>(PlayWaveLib);
         On<SongEvent>(e => PlayMusic(e.SongId));
         On<AmbientEvent>(e => PlayAmbient(e.SongId));
-        On<MuteEvent>(e => StopAll());
-        On<QuitEvent>(e => _doneEvent.Set());
+        On<MuteEvent>(_ => StopAll());
+        On<QuitEvent>(_ => _doneEvent.Set());
 
         _standalone = standalone;
     }
@@ -133,7 +134,7 @@ public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManage
             _activeSounds.Add(active);
     }
 
-    void Play(SoundEvent e)
+    void Play(ISoundEvent e)
     {
         if (e.Mode == SoundMode.Silent)
             return;

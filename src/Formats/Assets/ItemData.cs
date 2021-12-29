@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Assets;
 
 public sealed class ItemData : IItem
 {
-    public const int SizeOnDisk = 40;
+    public const int SizeOnDisk = 0x28;
     public ItemData(ItemId id) => Id = id;
     [JsonIgnore] public StringId Name => Id.ToName();
     [JsonIgnore] public ItemId Id { get; }
@@ -143,48 +143,48 @@ public sealed class ItemData : IItem
         if (spellManager == null) throw new ArgumentNullException(nameof(spellManager));
 
         item ??= new ItemData(info.AssetId);
-        item.Unknown = s.UInt8(nameof(item.Unknown), item.Unknown);
-        item.TypeId = s.EnumU8(nameof(item.TypeId), item.TypeId);
-        item.SlotType = ((PersistedItemSlotId)s.UInt8(nameof(item.SlotType), (byte)item.SlotType.ToPersisted())).ToMemory();
-        item.BreakRate = s.UInt8(nameof(item.BreakRate), item.BreakRate);
-        item.AllowedGender = s.EnumU8(nameof(item.AllowedGender), item.AllowedGender);
-        item.Hands = s.UInt8(nameof(item.Hands), item.Hands);
-        item.LpMaxBonus = s.UInt8(nameof(item.LpMaxBonus), item.LpMaxBonus);
-        item.SpMaxBonus = s.UInt8(nameof(item.SpMaxBonus), item.SpMaxBonus);
-        item.AttributeType = s.EnumU8(nameof(item.AttributeType), item.AttributeType);
-        item.AttributeBonus = s.UInt8(nameof(item.AttributeBonus), item.AttributeBonus);
-        item.SkillType = s.EnumU8(nameof(item.SkillType), item.SkillType);
-        item.SkillBonus = s.UInt8(nameof(item.SkillBonus), item.SkillBonus);
-        item.Protection = s.UInt8(nameof(item.Protection), item.Protection);
-        item.Damage = s.UInt8(nameof(item.Damage), item.Damage);
-        item.AmmoType = s.EnumU8(nameof(item.AmmoType), item.AmmoType);
-        item.SkillTax1Type = s.EnumU8(nameof(item.SkillTax1Type), item.SkillTax1Type);
-        item.SkillTax2Type = s.EnumU8(nameof(item.SkillTax2Type), item.SkillTax2Type);
-        item.SkillTax1 = s.UInt8(nameof(item.SkillTax1), item.SkillTax1);
-        item.SkillTax2 = s.UInt8(nameof(item.SkillTax2), item.SkillTax2);
-        item.Activate = s.UInt8(nameof(item.Activate), item.Activate);
-        item.AmmoAnim = s.UInt8(nameof(item.AmmoAnim), item.AmmoAnim);
+        item.Unknown  = s.UInt8(nameof(item.Unknown), item.Unknown); // 0
+        item.TypeId   = s.EnumU8(nameof(item.TypeId), item.TypeId);   // 1
+        item.SlotType = ((PersistedItemSlotId)s.UInt8(nameof(item.SlotType), (byte)item.SlotType.ToPersisted())).ToMemory(); // 2
+        item.BreakRate      = s.UInt8(nameof(item.BreakRate), item.BreakRate);           // 3
+        item.AllowedGender  = s.EnumU8(nameof(item.AllowedGender), item.AllowedGender);  // 4
+        item.Hands          = s.UInt8(nameof(item.Hands), item.Hands);                   // 5
+        item.LpMaxBonus     = s.UInt8(nameof(item.LpMaxBonus), item.LpMaxBonus);         // 6
+        item.SpMaxBonus     = s.UInt8(nameof(item.SpMaxBonus), item.SpMaxBonus);         // 7
+        item.AttributeType  = s.EnumU8(nameof(item.AttributeType), item.AttributeType);  // 8
+        item.AttributeBonus = s.UInt8(nameof(item.AttributeBonus), item.AttributeBonus); // 9
+        item.SkillType      = s.EnumU8(nameof(item.SkillType), item.SkillType);          // A
+        item.SkillBonus     = s.UInt8(nameof(item.SkillBonus), item.SkillBonus);         // B
+        item.Protection     = s.UInt8(nameof(item.Protection), item.Protection);         // C
+        item.Damage         = s.UInt8(nameof(item.Damage), item.Damage);                 // D
+        item.AmmoType       = s.EnumU8(nameof(item.AmmoType), item.AmmoType);            // E
+        item.SkillTax1Type  = s.EnumU8(nameof(item.SkillTax1Type), item.SkillTax1Type);  // F
+        item.SkillTax2Type  = s.EnumU8(nameof(item.SkillTax2Type), item.SkillTax2Type);  // 10
+        item.SkillTax1      = s.UInt8(nameof(item.SkillTax1), item.SkillTax1);           // 11
+        item.SkillTax2      = s.UInt8(nameof(item.SkillTax2), item.SkillTax2);           // 12
+        item.Activate       = s.UInt8(nameof(item.Activate), item.Activate);             // 13
+        item.AmmoAnim       = s.UInt8(nameof(item.AmmoAnim), item.AmmoAnim);             // 14
 
         var spell = item.Spell.IsNone ? null : spellManager.GetSpellOrDefault(item.Spell);
-        SpellClass spellClass = s.EnumU8("SpellClass", spell?.Class ?? 0);
-        byte spellNumber = s.UInt8("SpellNumber", (byte)((spell?.OffsetInClass + 1) ?? 0));
+        SpellClass spellClass = s.EnumU8("SpellClass", spell?.Class ?? 0);                  // 15
+        byte spellNumber = s.UInt8("SpellNumber", (byte)((spell?.OffsetInClass + 1) ?? 0)); // 16
         item.Spell = spellNumber == 0 
             ? SpellId.None 
             : spellManager.GetSpellId(spellClass, (byte)(spellNumber - 1));
 
-        item.Charges = s.UInt8(nameof(item.Charges), item.Charges);
-        item.EnchantmentCount = s.UInt8(nameof(item.EnchantmentCount), item.EnchantmentCount);
-        item.MaxEnchantmentCount = s.UInt8(nameof(item.MaxEnchantmentCount), item.MaxEnchantmentCount);
-        item.MaxCharges = s.UInt8(nameof(item.MaxCharges), item.MaxCharges);
-        item.Flags = s.EnumU16(nameof(item.Flags), item.Flags);
-        item.IconAnim = s.UInt8(nameof(item.IconAnim), item.IconAnim);
-        item.Weight = s.UInt16(nameof(item.Weight), item.Weight);
-        item.Value = s.UInt16(nameof(item.Value), item.Value);
-        item.Icon = SpriteId.From(Base.ItemGraphics.ItemSprites); // TODO: Allow mods to add extra sprite sheets via specifying their ID in the AssetInfo.
-        item.IconSubId = s.UInt16(nameof(item.IconSubId), (ushort)item.IconSubId);
-        item.Class = s.EnumU16(nameof(item.Class), item.Class);
-        item.Race = s.UInt16(nameof(item.Race), item.Race);
-        return item;
+        item.Charges             = s.UInt8(nameof(item.Charges), item.Charges);                         // 17
+        item.EnchantmentCount    = s.UInt8(nameof(item.EnchantmentCount), item.EnchantmentCount);       // 18
+        item.MaxEnchantmentCount = s.UInt8(nameof(item.MaxEnchantmentCount), item.MaxEnchantmentCount); // 19
+        item.MaxCharges          = s.UInt8(nameof(item.MaxCharges), item.MaxCharges);                   // 1A
+        item.Flags               = s.EnumU16(nameof(item.Flags), item.Flags);                           // 1B
+        item.IconAnim            = s.UInt8(nameof(item.IconAnim), item.IconAnim);                       // 1D
+        item.Weight              = s.UInt16(nameof(item.Weight), item.Weight);                          // 1E
+        item.Value               = s.UInt16(nameof(item.Value), item.Value);                            // 20
+        item.Icon                = SpriteId.From(Base.ItemGraphics.ItemSprites); // TODO: Allow mods to add extra sprite sheets via specifying their ID in the AssetInfo.
+        item.IconSubId           = s.UInt16(nameof(item.IconSubId), (ushort)item.IconSubId);            // 22
+        item.Class               = s.EnumU16(nameof(item.Class), item.Class);                           // 24
+        item.Race                = s.UInt16(nameof(item.Race), item.Race);                              // 26
+        return item; // Total size 0x28
     }
 
     bool Equals(ItemData other) => Id == other.Id;

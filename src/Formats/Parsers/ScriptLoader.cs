@@ -16,7 +16,7 @@ public class ScriptLoader : IAssetLoader<Script>
     {
         var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
         var text = FormatUtil.BytesTo850String(bytes);
-        return text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None).Select(x => x.Trim());
+        return ApiUtil.SplitLines(text, StringSplitOptions.None).Select(x => x.Trim());
     }
 
     public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
@@ -55,7 +55,7 @@ public class ScriptLoader : IAssetLoader<Script>
             foreach (var e in script)
                 sb.AppendLine(e.ToStringNumeric());
 
-            var text = sb.ToString();
+            var text = sb.ToString().TrimEnd() + Environment.NewLine;
             s.FixedLengthString(null, text, text.Length);
         }
 

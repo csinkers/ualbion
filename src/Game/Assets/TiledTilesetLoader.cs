@@ -42,13 +42,13 @@ public class TiledTilesetLoader : Component, IAssetLoader<TilesetData>
         var xmlBytes = serializer.Bytes(null, null, (int)serializer.BytesRemaining);
         using var ms = new MemoryStream(xmlBytes);
         var tileset = Tileset.Parse(ms);
-        return tileset.ToAlbion(info.AssetId, properties);
+        return TilesetMapping.ToAlbion(tileset, info.AssetId, properties);
     }
 
     static TilesetData Save(TilesetData tileset, Tilemap2DProperties properties, ISerializer s)
     {
         if (tileset == null) throw new ArgumentNullException(nameof(tileset));
-        var tiledTileset = Tileset.FromAlbion(tileset, properties);
+        var tiledTileset = TilesetMapping.FromAlbion(tileset, properties);
         var bytes = FormatUtil.BytesFromTextWriter(tiledTileset.Serialize);
         s.Bytes(null, bytes, bytes.Length);
         return tileset;

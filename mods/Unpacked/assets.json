@@ -84,6 +84,7 @@
     "tiledStamp":       "UAlbion.Formats.Exporters.Tiled.StampLoader, UAlbion.Formats",
     "tiledTileGfx":     "UAlbion.Formats.Exporters.Tiled.TileGraphicsLoader, UAlbion.Formats",
     "tiledTileset":     "UAlbion.Game.Assets.TiledTilesetLoader, UAlbion.Game",
+    "jsonTileset":      "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.Maps.TilesetData, UAlbion.Formats]], UAlbion.Formats",
     "tiledNpcTileset":  "UAlbion.Game.Veldrid.Assets.NpcTilesetLoader, UAlbion.Game.Veldrid",
     "utf8":             "UAlbion.Formats.Parsers.Utf8Loader, UAlbion.Formats",
     "wav":              "UAlbion.Formats.Parsers.WavLoader, UAlbion.Formats",
@@ -274,9 +275,9 @@
     },
 
     "$(MOD)/Assets/Tilesets": {
-      "Loader": "tiledTileset",
+      "Loader": "tiledTileset", // "jsonTileset"
       "Container": "dir",
-      "Pattern": "{0}_{2}.tsx",
+      "Pattern": "{0}_{2}.tsx", // "{0}_{2}.json",
       "GraphicsPattern": "{0}/{0}_{1}.png",
       "BlankTilePath": "../../Blank.png",
       "Map": { "1": { "Id": "tiledata.1" } }

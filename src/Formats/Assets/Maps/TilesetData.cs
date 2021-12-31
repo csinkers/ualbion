@@ -32,7 +32,6 @@ public class TilesetData
                 Layer = TileLayer.Normal,
                 Type = TileType.Normal,
                 Collision = Passability.Passable,
-                Flags = 0,
                 ImageNumber = 0xffff,
                 FrameCount = 1,
                 Unk7 = 0

@@ -13,7 +13,7 @@ public interface IMapData
     SpriteId CombatBackgroundId { get;  }
     PaletteId PaletteId { get;  }
 
-    MapNpc[] Npcs { get; }
+    List<MapNpc> Npcs { get; }
     List<EventNode> Events { get; }
     List<ushort> Chains { get; }
     List<MapEventZone> Zones { get; }

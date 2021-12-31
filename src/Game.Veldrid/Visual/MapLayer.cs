@@ -67,7 +67,7 @@ public class MapLayer : Component, IMapLayer
 
     SpriteInstanceData BuildInstanceData(int i, int j, TileData tile, int tickCount)
     {
-        if (tile == null || (tile.Flags & TileFlags.Debug) != 0)
+        if (tile == null || tile.NoDraw)
             return BlankInstance;
 
         int index = _logicalMap.Index(i, j);

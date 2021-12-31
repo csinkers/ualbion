@@ -147,6 +147,27 @@ public static class ApiUtil
         | (uint)(b << 16)
         | (uint)(a << 24);
 
+    public static uint PackColorHsv(byte h, byte s, byte v)
+    {
+        var hue = 2 * (float)360 * h / byte.MaxValue;
+        var saturation = s / 255.0f;
+
+        double f = hue / 60 - Math.Floor(hue / 60);
+        byte p = (byte)(v * (1 - saturation));
+        byte q = (byte)(v * (1 - f * saturation));
+        byte t = (byte)(v * (1 - (1 - f) * saturation));
+
+        return ((int)Math.Floor(hue / 60) % 6) switch
+        {
+            0 => PackColor(v, t, p, 255),
+            1 => PackColor(q, v, p, 255),
+            2 => PackColor(p, v, t, 255),
+            3 => PackColor(p, q, v, 255),
+            4 => PackColor(t, p, v, 255),
+            _ => PackColor(v, p, q, 255)
+        };
+    }
+
     static readonly string[] NewLineChars = { "\r\n", "\r", "\n" };
 
     public static string[] SplitLines(string s, StringSplitOptions options = StringSplitOptions.RemoveEmptyEntries)

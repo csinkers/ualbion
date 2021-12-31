@@ -299,4 +299,34 @@ public static class BlitUtil
 
         return ApiUtil.Lcm(periods);
     }
+
+    public static IReadOnlyTexture<T> CombineFramesVertically<T>(IAssetId id, IList<IReadOnlyTexture<T>> frames) where T : unmanaged
+    {
+        if (frames == null) throw new ArgumentNullException(nameof(frames));
+        int[] yOffsets = new int[frames.Count];
+        int currentY = 0;
+        int totalWidth = 0;
+
+        for (int i = 0; i < frames.Count; i++)
+        {
+            yOffsets[i] = currentY;
+            currentY += frames[i].Height;
+            if (frames[i].Width > totalWidth)
+                totalWidth = frames[i].Width;
+        }
+
+        if (totalWidth == 0 || currentY == 0)
+            throw new InvalidOperationException($"Tried to combine frames, but the width or height was 0");
+
+        var result = new SimpleTexture<T>(id, totalWidth, currentY);
+        for (int i = 0; i < frames.Count; i++)
+        {
+            var fy = yOffsets[i];
+            var frame = frames[i];
+            result.AddRegion(0, fy, frame.Width, frame.Height);
+            BlitDirect(frame.GetLayerBuffer(0), result.GetMutableRegionBuffer(i));
+        }
+
+        return result;
+    }
 }

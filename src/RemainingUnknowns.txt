@@ -1,0 +1,365 @@
+C:\Depot\bb\ualbion\src\Formats\Assets\AutomapInfo.cs:11                    : public byte Unk2 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\AutomapInfo.cs:12                    : public byte Unk3 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:81                 : public byte Unknown6 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:82                 : public byte Unknown7 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:83                 : public byte Unknown11 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:84                 : public byte Unknown12 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:85                 : public byte Unknown13 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:86                 : public byte Unknown14 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:87                 : public byte Unknown15 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:88                 : public byte Unknown16 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:89                 : public ushort Unknown1C { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:90                 : public ushort Unknown20 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:91                 : public ushort Unknown22 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:93                 : public ushort Unknown24 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:94                 : public ushort Unknown26 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:95                 : public ushort Unknown28 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:96                 : public ushort Unknown2E { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:97                 : public ushort Unknown30 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:98                 : public ushort Unknown36 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:99                 : public ushort Unknown38 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:100                : public ushort Unknown3E { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:101                : public ushort Unknown40 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:102                : public ushort Unknown46 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:103                : public ushort Unknown48 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:104                : public ushort Unknown4E { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:105                : public ushort Unknown50 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:106                : public ushort Unknown56 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:107                : public ushort Unknown58 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:108                : public ushort Unknown5E { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:109                : public ushort Unknown60 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:110                : public ushort Unknown66 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:111                : public ushort Unknown68 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:112                : public byte Unknown6C { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:113                : public ushort Unknown7E { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:114                : public ushort Unknown80 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:115                : public ushort Unknown86 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:116                : public ushort Unknown88 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:117                : public ushort Unknown8E { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:118                : public ushort Unknown90 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:121                : public ushort UnknownCE { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:122                : public ushort UnknownD6 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:123                : public ushort UnknownDA { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:124                : public ushort UnknownDC { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:125                : public uint UnknownDE { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:126                : public ushort UnknownE2 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:127                : public ushort UnknownE4 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:128                : public uint UnknownE6 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:129                : public uint UnknownEA { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:131                : public ushort UnknownFA { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:132                : public ushort UnknownFC { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\CharacterSheet.cs:133                : public byte[] UnkMonster { get; set; } // 472 bytes more than an NPC
+C:\Depot\bb\ualbion\src\Formats\Assets\ItemData.cs:16                       : public byte Unknown { get; set; } //  0 Always 0
+C:\Depot\bb\ualbion\src\Formats\Assets\ItemFlags.cs:8                       : Unk0      = 1, // Double battle-axe only
+C:\Depot\bb\ualbion\src\Formats\Assets\ItemFlags.cs:11                      : Unk3      = 1 << 3,
+C:\Depot\bb\ualbion\src\Formats\Assets\ItemFlags.cs:12                      : Unk4      = 1 << 4, // Spell scrolls, potions, HUD items, throwing daggers/stones and lockpicks
+C:\Depot\bb\ualbion\src\Formats\Assets\ItemFlags.cs:13                      : Unk5      = 1 << 5,
+C:\Depot\bb\ualbion\src\Formats\Assets\ItemFlags.cs:14                      : Unk6      = 1 << 6,
+C:\Depot\bb\ualbion\src\Formats\Assets\ItemFlags.cs:15                      : Unk7      = 1 << 7,
+C:\Depot\bb\ualbion\src\Formats\Assets\ItemFlags.cs:16                      : Unk8      = 1 << 8, // Dji-Cantos stone only
+C:\Depot\bb\ualbion\src\Formats\Assets\ItemFlags.cs:17                      : Unk9      = 1 << 9,
+C:\Depot\bb\ualbion\src\Formats\Assets\ItemFlags.cs:19                      : Unk11     = 1 << 11,
+C:\Depot\bb\ualbion\src\Formats\Assets\ItemFlags.cs:20                      : Unk12     = 1 << 12,
+C:\Depot\bb\ualbion\src\Formats\Assets\ItemSlotFlags.cs:11                  : Unk3 = 0x8,
+C:\Depot\bb\ualbion\src\Formats\Assets\ItemSlotFlags.cs:12                  : Unk4 = 0x10,
+C:\Depot\bb\ualbion\src\Formats\Assets\ItemSlotFlags.cs:13                  : Unk5 = 0x20,
+C:\Depot\bb\ualbion\src\Formats\Assets\ItemSlotFlags.cs:14                  : Unk6 = 0x40,
+C:\Depot\bb\ualbion\src\Formats\Assets\ItemSlotFlags.cs:15                  : Unk7 = 0x80,
+C:\Depot\bb\ualbion\src\Formats\Assets\Map3DFlags.cs:8                      : Unk0 = 1,
+C:\Depot\bb\ualbion\src\Formats\Assets\Map3DFlags.cs:9                      : Unk1 = 1 << 1,
+C:\Depot\bb\ualbion\src\Formats\Assets\Map3DFlags.cs:10                     : Unk2 = 1 << 2,
+C:\Depot\bb\ualbion\src\Formats\Assets\Map3DFlags.cs:11                     : Unk3 = 1 << 3,
+C:\Depot\bb\ualbion\src\Formats\Assets\Map3DFlags.cs:12                     : Unk4 = 1 << 4,
+C:\Depot\bb\ualbion\src\Formats\Assets\Map3DFlags.cs:13                     : Unk5 = 1 << 5,
+C:\Depot\bb\ualbion\src\Formats\Assets\Map3DFlags.cs:14                     : Unk6 = 1 << 6,
+C:\Depot\bb\ualbion\src\Formats\Assets\Map3DFlags.cs:15                     : Unk7 = 1 << 7,
+C:\Depot\bb\ualbion\src\Formats\Assets\MentalConditions.cs:9                : Unk0 = 1,
+C:\Depot\bb\ualbion\src\Formats\Assets\MentalConditions.cs:10               : Unk1 = 1 << 1,
+C:\Depot\bb\ualbion\src\Formats\Assets\MentalConditions.cs:11               : Unk2 = 1 << 2,
+C:\Depot\bb\ualbion\src\Formats\Assets\MentalConditions.cs:12               : Unk3 = 1 << 3,
+C:\Depot\bb\ualbion\src\Formats\Assets\MentalConditions.cs:13               : Unk4 = 1 << 4,
+C:\Depot\bb\ualbion\src\Formats\Assets\MentalConditions.cs:14               : Unk5 = 1 << 5,
+C:\Depot\bb\ualbion\src\Formats\Assets\MentalConditions.cs:15               : Unk6 = 1 << 6,
+C:\Depot\bb\ualbion\src\Formats\Assets\MentalConditions.cs:16               : Unk7 = 1 << 7,
+C:\Depot\bb\ualbion\src\Formats\Assets\PhysicalConditions.cs:9              : Unk0 = 1,
+C:\Depot\bb\ualbion\src\Formats\Assets\PhysicalConditions.cs:10             : Unk1 = 1 << 1,
+C:\Depot\bb\ualbion\src\Formats\Assets\PhysicalConditions.cs:11             : Unk2 = 1 << 2,
+C:\Depot\bb\ualbion\src\Formats\Assets\PhysicalConditions.cs:12             : Unk3 = 1 << 3,
+C:\Depot\bb\ualbion\src\Formats\Assets\PhysicalConditions.cs:13             : Unk4 = 1 << 4,
+C:\Depot\bb\ualbion\src\Formats\Assets\PhysicalConditions.cs:14             : Unk5 = 1 << 5,
+C:\Depot\bb\ualbion\src\Formats\Assets\PhysicalConditions.cs:15             : Unk6 = 1 << 6,
+C:\Depot\bb\ualbion\src\Formats\Assets\PhysicalConditions.cs:16             : Unk7 = 1 << 7,
+C:\Depot\bb\ualbion\src\Formats\Assets\SpellClass.cs:11                     : Unk4         = 4, // Unused
+C:\Depot\bb\ualbion\src\Formats\Assets\SpellClass.cs:13                     : Unk6         = 6, // Unused
+C:\Depot\bb\ualbion\src\Formats\Assets\SpellClass.cs:24                     : Unk4         = 16,
+C:\Depot\bb\ualbion\src\Formats\Assets\SpellEnvironments.cs:15              : Unk4   = 1 << 4,
+C:\Depot\bb\ualbion\src\Formats\Assets\SpellEnvironments.cs:17              : Unk6   = 1 << 6,
+C:\Depot\bb\ualbion\src\Formats\Assets\SpellEnvironments.cs:18              : Unk7   = 1 << 7,
+C:\Depot\bb\ualbion\src\Formats\Assets\SpellTargets.cs:9                    : Unk1          = 1 << 1,
+C:\Depot\bb\ualbion\src\Formats\Assets\SpellTargets.cs:14                   : Unk6          = 1 << 6,
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\FloorAndCeiling.cs:16      : Unknown3 = 1 << 3,
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\FloorAndCeiling.cs:17      : Unknown4 = 1 << 4,
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\FloorAndCeiling.cs:24      : public byte Unk1 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\FloorAndCeiling.cs:25      : public byte Unk2 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\FloorAndCeiling.cs:26      : public byte Unk3 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\FloorAndCeiling.cs:29      : public byte Unk5 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\FloorAndCeiling.cs:31      : public ushort Unk8 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\LabyrinthData.cs:20        : public ushort Unk4 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\LabyrinthData.cs:27        : public byte Unk12 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\LabyrinthData.cs:28        : public byte Unk13 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\LabyrinthData.cs:30        : public byte Unk15 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\LabyrinthData.cs:37        : public ushort Unk20 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\LabyrinthData.cs:39        : public ushort Unk24 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\LabyrinthObject.cs:15      : public byte Unk7 { get; set; } // 7
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\LabyrinthObjectFlags.cs:8  : Unk0 = 1,
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\LabyrinthObjectFlags.cs:9  : Unk1 = 1 << 1,
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\LabyrinthObjectFlags.cs:11 : Unk3 = 1 << 3,
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\LabyrinthObjectFlags.cs:12 : Unk4 = 1 << 4,
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\LabyrinthObjectFlags.cs:13 : Unk5 = 1 << 5,
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\LabyrinthObjectFlags.cs:14 : Unk6 = 1 << 6,
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\LabyrinthObjectFlags.cs:15 : Unk7 = 1 << 7,
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\Wall.cs:19                 : Unk3 = 1 << 3,
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\Wall.cs:20                 : Unk4 = 1 << 4,
+C:\Depot\bb\ualbion\src\Formats\Assets\Labyrinth\Wall.cs:33                 : public byte Unk9 { get; set; } // 9
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\FlatMapFlags.cs:8               : Unk0 = 1,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\FlatMapFlags.cs:9               : Unk1 = 1 << 1,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\FlatMapFlags.cs:10              : Unk2 = 1 << 2,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\FlatMapFlags.cs:11              : Unk3 = 1 << 3,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\FlatMapFlags.cs:12              : Unk4 = 1 << 4,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\FlatMapFlags.cs:13              : Unk5 = 1 << 5,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\FlatMapFlags.cs:14              : Unk6 = 1 << 6,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\FlatMapFlags.cs:15              : Unk7 = 1 << 7,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\MapEventZone.cs:14              : public byte Unk1 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\MapNpc.cs:21                    : public byte Unk8 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\MapNpc.cs:22                    : public byte Unk9 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\NpcFlags.cs:10                  : Unk2      = 1 << 2,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\NpcFlags.cs:11                  : Unk3      = 1 << 3, // Has contact event?
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\NpcFlags.cs:12                  : Unk4      = 1 << 4,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\NpcFlags.cs:13                  : Unk5      = 1 << 5,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\NpcFlags.cs:14                  : Unk6      = 1 << 6,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\NpcFlags.cs:15                  : Unk7      = 1 << 7,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\NpcMovementTypes.cs:12          : Unk4 = 4,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\TileData.cs:18                  : public byte Unk7 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\TileFlags.cs:16                 : Unk12 = 1 << 2,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\TileFlags.cs:16                 : Unk18 = 1 << 2,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\TriggerType.cs:18               : Unk13 = 13,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\TriggerType.cs:19               : Unk14 = 14,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\TriggerType.cs:20               : Unk15 = 15,
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\TriggerTypes.cs:21              : Unk13      = 1 << 13, // 2000
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\TriggerTypes.cs:22              : Unk14      = 1 << 14, // 4000
+C:\Depot\bb\ualbion\src\Formats\Assets\Maps\TriggerTypes.cs:23              : Unk15      = 1 << 15, // 8000
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MapChange.cs:23                 : public Enum2 Unk3 { get; set; } // Ranges over [0..3], 3 very popular, 0 moderately, 1 and 2 ~1% each.
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:9                  : public int Unk0 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:11                 : public long Unk8 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:12                 : public long Unk10 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:13                 : public long Unk18 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:14                 : public long Unk20 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:15                 : public long Unk28 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:16                 : public long Unk30 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:17                 : public long Unk38 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:18                 : public long Unk40 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:19                 : public long Unk48 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:20                 : public long Unk50 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:21                 : public long Unk58 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:22                 : public long Unk60 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:23                 : public long Unk68 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:24                 : public long Unk70 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:25                 : public long Unk78 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:26                 : public long Unk80 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:27                 : public long Unk88 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:28                 : public long Unk90 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:29                 : public long Unk98 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:30                 : public long UnkA0 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:31                 : public long UnkA8 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:32                 : public long UnkB0 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:33                 : public long UnkB8 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:34                 : public long UnkC0 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\MiscState.cs:35                 : public long UnkC8 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:108                 : public ushort Unk4 { get; set; } // 4
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:109                 : public ushort Unk6 { get; set; } // 6. Always 0?
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:110                 : public byte Unk8 { get; set; } // 8. Always 0?
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:111                 : public long Unk9 { get; set; } // 9. Always -1?
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:112                 : public ushort Unk11 { get; set; } // 11
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:113                 : public ushort Unk13 { get; set; } // 13 Always 0xffff?
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:114                 : public ushort Unk15 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:115                 : public ushort Unk17 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:116                 : public ushort Unk19 { get; set; } // IsActive?
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:117                 : public ushort Unk1B { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:118                 : public ushort Unk1D { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:119                 : public byte Unk1F { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:120                 : public byte Unk20 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:121                 : public ushort Unk21 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:122                 : public ushort Unk23 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:123                 : public ushort Unk25 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:124                 : public ushort Unk27 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:125                 : public byte Unk29 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:130                 : public byte Unk32 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:131                 : public byte Unk33 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:132                 : public ushort Unk34 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:133                 : public ushort Unk36 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:134                 : public ushort Unk38 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:135                 : public ushort Unk3A { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:136                 : public ushort Unk3C { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:137                 : public ushort Unk3E { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:138                 : public ushort Unk40 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:139                 : public ushort Unk42 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:144                 : public ushort Unk4C { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:145                 : public ushort Unk4E { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:146                 : public byte Unk50 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:147                 : public byte Unk51 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:148                 : public byte Unk52 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:149                 : public byte Unk53 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:150                 : public ushort Unk54 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:151                 : public ushort Unk56 { get; set; } // Probably flags
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:152                 : public ushort Unk58 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:153                 : public ushort Unk5A { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:154                 : public ushort Unk5C { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:155                 : public ushort Unk5E { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:156                 : public byte Unk60 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:157                 : public byte Unk61 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:158                 : public ushort Unk62 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:159                 : public byte Unk64 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:160                 : public byte Unk65 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:161                 : public ushort Unk66 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:162                 : public ushort Unk68 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:163                 : public ushort Unk6A { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:164                 : public ushort Unk6C { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:165                 : public ushort Unk6E { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:166                 : public ushort Unk70 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:167                 : public ushort Unk72 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:168                 : public ushort Unk74 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:169                 : public ushort Unk76 { get; set; } // Always 0xffff?
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:170                 : public ushort Unk78 { get; set; } // Always 0xffff?
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:171                 : public ushort Unk7A { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:172                 : public ushort Unk7C { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\NpcState.cs:173                 : public ushort Unk7E { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\SavedGame.cs:13                 : public class Unknown35Byte
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\SavedGame.cs:41                 : public ushort Unk0 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\SavedGame.cs:42                 : public uint Unk1 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\SavedGame.cs:43                 : public byte[] Unk9 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\SavedGame.cs:44                 : public byte[] Unknown15 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\SavedGame.cs:46                 : public byte[] Unknown2C1 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\SavedGame.cs:47                 : public byte[] Unknown5B9F { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\SavedGame.cs:49                 : public byte[] Unknown5B71 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\SavedGame.cs:50                 : public Unknown35Byte[] Unk35Byte { get; set; } // Len = 16
+C:\Depot\bb\ualbion\src\Formats\Assets\Save\VisitedEvent.cs:13              : public byte Unk0 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ActionEvent.cs:15                 : [EventPart("unk2", true, (byte)1)] public byte Unk2 { get; private set; } // Always 1, unless ActionType == 14 (in which cas it is 2)
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ActionEvent.cs:58                 : byte Unk4 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ActionEvent.cs:59                 : byte Unk5 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ActionEvent.cs:60                 : ushort Unk8 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ActionType.cs:7                   : Unk2           = 0x2, // Pay money? See ES156 (Garris, Gratogel sailor)
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ActionType.cs:8                   : Unk4           = 0x4,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ActionType.cs:13                  : Unk9           = 0x9,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ActionType.cs:14                  : UnkE           = 0xE,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ActionType.cs:15                  : Unk17          = 0x17,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ActionType.cs:16                  : Unk2D          = 0x2D,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ActionType.cs:21                  : Unk39          = 0x39,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ActionType.cs:22                  : Unk3D          = 0x3D
+C:\Depot\bb\ualbion\src\Formats\MapEvents\AddPartyMemberEvent.cs:38         : [EventPart("unk2", true, (byte)0)] public byte Unk2 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\AddPartyMemberEvent.cs:39         : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\AskSurrenderEvent.cs:24           : public byte Unk1 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\AskSurrenderEvent.cs:25           : public byte Unk2 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\AskSurrenderEvent.cs:26           : public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\AskSurrenderEvent.cs:27           : public byte Unk4 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\AskSurrenderEvent.cs:28           : public byte Unk5 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\AskSurrenderEvent.cs:29           : public ushort Unk6 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\AskSurrenderEvent.cs:30           : public ushort Unk8 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeExperienceEvent.cs:38       : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeFoodEvent.cs:39             : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeGoldEvent.cs:38             : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeHealthEvent.cs:38           : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeIconEvent.cs:45             : [EventPart("unk5", true, (byte)3)] public byte Unk5 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeIconEvent.cs:46             : ushort Unk8 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeItemEvent.cs:41             : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeLanguageEvent.cs:39         : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeManaEvent.cs:38             : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangePartyGoldEvent.cs:34        : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangePartyRationsEvent.cs:35     : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeProperty.cs:5               : Unk0 = 0,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeProperty.cs:11              : UnkB = 0xb,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeProperty.cs:12              : UnkC = 0xc,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeStatusEvent.cs:40           : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeUnk0Event.cs:36             : [EventPart("unk6")] public ushort Unk6 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeUnk0Event.cs:37             : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeUnkBEvent.cs:34             : [EventPart("unk5")] public byte Unk5 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeUnkBEvent.cs:37             : [EventPart("unk6")] public ushort Unk6 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeUnkBEvent.cs:38             : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeUnkCEvent.cs:34             : [EventPart("unk5")] public byte Unk5 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeUnkCEvent.cs:37             : [EventPart("unk6")] public ushort Unk6 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ChangeUnkCEvent.cs:38             : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\CreateTransportEvent.cs:22        : public byte Unk1 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\CreateTransportEvent.cs:23        : public byte Unk2 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\CreateTransportEvent.cs:24        : public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\CreateTransportEvent.cs:25        : public byte Unk4 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\CreateTransportEvent.cs:26        : public byte Unk5 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\CreateTransportEvent.cs:27        : public ushort Unk6 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\CreateTransportEvent.cs:28        : public ushort Unk8 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\DisableEventChainEvent.cs:39      : [EventPart("unk2")] public byte Unk2 { get; private set; } // Temp / permanent?
+C:\Depot\bb\ualbion\src\Formats\MapEvents\DisableEventChainEvent.cs:40      : [EventPart("unk6")] public ushort Unk6 { get; private set; } // varies
+C:\Depot\bb\ualbion\src\Formats\MapEvents\DoScriptEvent.cs:36               : byte Unk1 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\DoScriptEvent.cs:37               : byte Unk2 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\DoScriptEvent.cs:38               : byte Unk3 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\DoScriptEvent.cs:39               : byte Unk4 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\DoScriptEvent.cs:40               : byte Unk5 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\DoScriptEvent.cs:41               : ushort Unk8 { get; set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\DummyMapEvent.cs:47               : [EventPart("unk1")] public byte Unk1 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\DummyMapEvent.cs:48               : [EventPart("unk2")] public byte Unk2 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\DummyMapEvent.cs:49               : [EventPart("unk3")] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\DummyMapEvent.cs:50               : [EventPart("unk4")] public byte Unk4 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\DummyMapEvent.cs:51               : [EventPart("unk5")] public byte Unk5 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\DummyMapEvent.cs:52               : [EventPart("unk6")] public ushort Unk6 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\DummyMapEvent.cs:53               : [EventPart("unk8")] public ushort Unk8 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\EncounterEvent.cs:32              : [EventPart("unk6")] public ushort Unk6 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\EncounterEvent.cs:33              : [EventPart("unk8")] public ushort Unk8 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ExecuteEvent.cs:32                : [EventPart("unk1")]public byte Unk1 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ExecuteEvent.cs:33                : [EventPart("unk8")]public ushort Unk8 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\MapEventType.cs:34                : UnkFf = 0xFF // 3D only?
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ModifyUnk2Event.cs:34             : [EventPart("unk2")] public byte Unk2 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ModifyUnk2Event.cs:35             : [EventPart("unk3")] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ModifyUnk2Event.cs:36             : [EventPart("unk4")] public byte Unk4 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ModifyUnk2Event.cs:37             : [EventPart("unk5")] public byte Unk5 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ModifyUnk2Event.cs:38             : [EventPart("unk6")] public ushort Unk6 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\ModifyUnk2Event.cs:39             : [EventPart("unk8")] public ushort Unk8 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\NpcActiveEvent.cs:36              : [EventPart("unk5", true, (byte)0)] public byte Unk5 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\NpcActiveEvent.cs:37              : [EventPart("unk6", true, (ushort)0)] public ushort Unk6 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\NumericOperation.cs:9             : Unk2 = 2,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\OffsetEvent.cs:36                 : [EventPart("unk3")] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\PlaceActionEvent.cs:36            : [EventPart("unk2")] public byte Unk2 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\PlaceActionEvent.cs:37            : [EventPart("unk3")] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\PlaceActionEvent.cs:38            : [EventPart("unk4")] public byte Unk4 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\PlaceActionEvent.cs:39            : [EventPart("unk5")] public byte Unk5 { get; private set; } // Spell class for learn magic
+C:\Depot\bb\ualbion\src\Formats\MapEvents\PlaceActionEvent.cs:40            : [EventPart("unk6")] public ushort Unk6 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\PlaceActionEvent.cs:41            : [EventPart("unk8")] public ushort Unk8 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\PlayAnimationEvent.cs:40          : [EventPart("unk4")] public byte Unk4 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\PlayAnimationEvent.cs:41          : [EventPart("unk5")] public byte Unk5 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\QueryType.cs:6                    : Unk1 = 0x1,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\QueryType.cs:7                    : Unk4 = 0x4,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\QueryType.cs:13                   : UnkC = 0xC,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\QueryType.cs:23                   : Unk1E = 0x1E,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\QueryType.cs:25                   : Unk19 = 0x19,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\QueryType.cs:27                   : Unk21 = 0x21,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\QueryType.cs:30                   : Unk29 = 0x29,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\QueryType.cs:31                   : Unk2A = 0x2A,
+C:\Depot\bb\ualbion\src\Formats\MapEvents\RemovePartyMemberEvent.cs:36      : [EventPart("unk2", true, (byte)0)] public byte Unk2 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\RemovePartyMemberEvent.cs:37      : [EventPart("unk6", true, (ushort)0)] public ushort Unk6 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\SetMapLightingEvent.cs:34         : [EventPart("unk2", true, (byte)3)] public byte Unk2 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\SetMapLightingEvent.cs:35         : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\SetPartyLeaderEvent.cs:35         : [EventPart("unk2", true, (byte)3)] public byte Unk2 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\SetPartyLeaderEvent.cs:36         : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\SoundEvent.cs:60                  : [EventPart("unk3")] public byte Unk3 { get; private set; } // [0..100] (multiples of 5)
+C:\Depot\bb\ualbion\src\Formats\MapEvents\SpinnerEvent.cs:28                : [EventPart("unk1")] public byte Unk1 { get; private set; }
+C:\Depot\bb\ualbion\src\Formats\MapEvents\SwitchEvent.cs:36                 : [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; } // 0,1,21
+C:\Depot\bb\ualbion\src\Formats\MapEvents\TeleportEvent.cs:49               : [EventPart("unk4")] public byte Unk4 { get; private set; } // 255 on 2D maps, (1,6) on 3D maps
+C:\Depot\bb\ualbion\src\Formats\MapEvents\TeleportEvent.cs:50               : [EventPart("unk5")] public byte Unk5 { get; private set; } // 2,3,4,5,6,8,9
+C:\Depot\bb\ualbion\src\Formats\MapEvents\TickerEvent.cs:40                 : [EventPart("", true, (byte)0)] public byte Unk4 { get; private set; } // 0, 1
+C:\Depot\bb\ualbion\src\Formats\MapEvents\TrapEvent.cs:36                   : [EventPart("unk1")] public byte Unk1 { get; private set; } // Observed values- 1,6,7,11,255
+C:\Depot\bb\ualbion\src\Formats\MapEvents\TrapEvent.cs:37                   : [EventPart("unk2")] public byte Unk2 { get; private set; } // 2,3 (2 only seen once)
+C:\Depot\bb\ualbion\src\Formats\MapEvents\TrapEvent.cs:38                   : [EventPart("unk3")] public byte Unk3 { get; private set; } // 0,1,2
+C:\Depot\bb\ualbion\src\Formats\MapEvents\TrapEvent.cs:39                   : [EventPart("unk5")] public byte Unk5 { get; private set; } // [0..12]
+C:\Depot\bb\ualbion\src\Formats\MapEvents\TrapEvent.cs:40                   : [EventPart("unk6")] public ushort Unk6 { get; private set; } // [0..10000], mostly 6, 0 or multiples of 5. Damage?
+C:\Depot\bb\ualbion\src\Formats\ScriptEvents\PlayEvent.cs:9                 : [EventPart("unknown")] public int Unknown { get; }
+C:\Depot\bb\ualbion\src\Formats\ScriptEvents\StartAnimEvent.cs:9            : [EventPart("unk1 ")] public int Unk1 { get; }
+C:\Depot\bb\ualbion\src\Formats\ScriptEvents\StartAnimEvent.cs:10           : [EventPart("unk2 ")] public int Unk2 { get; }
+C:\Depot\bb\ualbion\src\Formats\ScriptEvents\StartAnimEvent.cs:11           : [EventPart("unk3 ")] public int Unk3 { get; }
+C:\Depot\bb\ualbion\src\Formats\ScriptEvents\StartAnimEvent.cs:12           : [EventPart("unk4 ")] public int Unk4 { get; }
+C:\Depot\bb\ualbion\src\Formats\ScriptEvents\StartAnimEvent.cs:13           : [EventPart("unk5", true)] public int? Unk5 { get; }

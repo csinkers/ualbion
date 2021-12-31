@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats.Assets.Save;
@@ -25,6 +26,10 @@ public class MockModApplier : ServiceComponent<IModApplier>, IModApplier
             new Dictionary<string, LanguageConfig>());
 
     public IEnumerable<string> ShaderPaths => Array.Empty<string>();
+    public void SaveAssets(IModApplier.AssetLoaderDelegate loaderFunc, Action flushCacheFunc, ISet<AssetId> ids, ISet<AssetType> assetTypes, Regex filePattern)
+    {
+        throw new NotImplementedException();
+    }
 
     public MockModApplier Add(AssetId id, object asset)
     {

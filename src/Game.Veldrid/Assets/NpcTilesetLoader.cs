@@ -64,7 +64,7 @@ public class NpcTilesetLoader : Component, IAssetLoader
             }); // TODO: Add object templates 
         }
 
-        var tilemap = Tileset.FromSprites(small ? "SmallNPCs" : "LargeNPCs", "NPC", tiles);
+        var tilemap = TilesetMapping.FromSprites(small ? "SmallNPCs" : "LargeNPCs", "NPC", tiles);
         var bytes = FormatUtil.BytesFromTextWriter(tilemap.Serialize);
         s.Bytes(null, bytes, bytes.Length);
 

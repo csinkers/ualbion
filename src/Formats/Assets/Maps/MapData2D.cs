@@ -32,11 +32,19 @@ public class MapData2D : BaseMapData
     }
 
     public MapData2D() { } // For JSON
+
     public MapData2D(MapId id,
+        PaletteId paletteId,
+        TilesetId tilesetId,
         byte width, byte height,
         IList<EventNode> events, IList<ushort> chains,
         IEnumerable<MapNpc> npcs,
-        IList<MapEventZone> zones) : base(id, width, height, events, chains, npcs, zones) { }
+        IList<MapEventZone> zones) : base(id, paletteId, width, height, events, chains, npcs, zones)
+    {
+        TilesetId = tilesetId;
+        Underlay = new int[width * height];
+        Overlay = new int[width * height];
+    }
 
     public static MapData2D Serdes(AssetInfo info, MapData2D existing, AssetMapping mapping, ISerializer s)
     {
@@ -58,11 +66,16 @@ public class MapData2D : BaseMapData
         map.CombatBackgroundId = SpriteId.SerdesU8(nameof(CombatBackgroundId), map.CombatBackgroundId, AssetType.CombatBackground, mapping, s); // 7
         map.PaletteId = PaletteId.SerdesU8(nameof(PaletteId), map.PaletteId, mapping, s);
         map.FrameRate = s.UInt8(nameof(FrameRate), map.FrameRate); //9
+
+        map.Npcs ??= new List<MapNpc>();
+        while (map.Npcs.Count < npcCount)
+            map.Npcs.Add(MapNpc.CreateInactive(map.Npcs.Count));
+
         map.Npcs = s.List(
             nameof(Npcs),
             map.Npcs,
             npcCount,
-            (n, x, s2) => MapNpc.Serdes(n, x, map.MapType, mapping, s2)).ToArray();
+            (n, x, s2) => MapNpc.Serdes(n, x, map.MapType, mapping, s2)).ToList();
 
         if (s.IsReading())
             map.RawLayout = s.Bytes("Layout", null, 3 * map.Width * map.Height);

@@ -11,6 +11,8 @@ public class MapNpc
     public const int SizeOnDisk = 10;
     public const int WaypointCount = 0x480;
 
+    public static MapNpc CreateInactive(int index) => new() { Index = index, };
+
     [JsonIgnore] public int Index { get; private set; }
     public AssetId Id { get; set; } // MonsterGroup, Npc etc
     // public SampleId? Sound { get; set; }

@@ -7,25 +7,26 @@ namespace UAlbion.Formats.Exporters.Tiled;
 
 public static class MapperUtil
 {
-    public static string PropString(Map map, string key, bool required = false)
+    public static string PropString(ITiledPropertySource source, string key, bool required = false)
     {
-        if (map.Properties == null || map.Properties.Count == 0)
+        if (source.Properties == null || source.Properties.Count == 0)
         {
             if (required)
-                throw new FormatException($"Map property \"{key}\" was not found");
+                throw new FormatException($"Property \"{key}\" was not found");
             return null;
         }
 
-        var prop = map.Properties.FirstOrDefault(x => key.Equals(x.Name, StringComparison.OrdinalIgnoreCase));
+        var prop = source.Properties.FirstOrDefault(x => key.Equals(x.Name, StringComparison.OrdinalIgnoreCase));
         return prop?.Value;
     }
 
-    public static int? PropInt(Map map, string key) => int.TryParse(PropString(map, key), out var i) ? i : null;
-    public static AssetId PropId(Map map, string key, bool required = false)
+    public static bool? PropBool(ITiledPropertySource source, string key) => bool.TryParse(PropString(source, key), out var i) ? i : null;
+    public static int? PropInt(ITiledPropertySource source, string key) => int.TryParse(PropString(source, key), out var i) ? i : null;
+    public static AssetId PropId(ITiledPropertySource source, string key, bool required = false)
     {
-        var id = AssetId.Parse(PropString(map, key));
+        var id = AssetId.Parse(PropString(source, key));
         if (required && id.IsNone)
-            throw new FormatException($"Map property \"{key}\" was invalid or not found");
+            throw new FormatException($"Property \"{key}\" was invalid or not found");
         return id;
     }
 

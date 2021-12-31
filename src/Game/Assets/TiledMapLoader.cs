@@ -45,13 +45,21 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
 
         if (bytes != null)
             s.Bytes(null, bytes, bytes.Length);
+        else
+            Warn($"No bytes were generated when saving map {info.Id}");
 
         if (script == null)
+        {
+            Warn($"No script for map {info.Id}, aborting script output");
             return;
+        }
 
         var scriptPath = GetScriptFilename(info);
         if (string.IsNullOrEmpty(scriptPath))
+        {
+            Warn($"No script path was set for map {info.Id}, aborting script output");
             return;
+        }
 
         var disk = Resolve<IFileSystem>();
         var assetDir = GetAssetDir(info);
@@ -82,7 +90,10 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
 
         TilesetData tileset = assets.LoadTileData(map.TilesetId);
         if (tileset == null)
+        {
+            Error($"Tileset {map.TilesetId} not found when writing map {map.Id}, aborting");
             return (null, null);
+        }
 
         var tilesetPattern = info.Get(AssetProperty.TilesetPattern, "../Tilesets/{0}_{2}.tsx");
         var tilesetPath = string.Format(CultureInfo.InvariantCulture,

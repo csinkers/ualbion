@@ -4,6 +4,9 @@ namespace UAlbion.Formats.Assets;
 
 public enum ItemSlotId : byte // Enum values that are more convenient for in-memory use (item slot array accessing etc)
 {
+    NormalSlotCount = 24,
+    ChestSlotCount = 26,
+
     // Regular slots (only the first is named as they're generally accessed numerically)
     Slot0 = 0,
 
@@ -23,8 +26,6 @@ public enum ItemSlotId : byte // Enum values that are more convenient for in-mem
     RightHandOrTail,
     FullSlotCount,
 
-    NormalSlotCount = 24,
-    ChestSlotCount = 26,
     // Dummy slot id used for the character's full body picture as a
     // background on the middle inventory pane.  It can't hold anything,
     // but it can be a target for dropping items, in which case they'll

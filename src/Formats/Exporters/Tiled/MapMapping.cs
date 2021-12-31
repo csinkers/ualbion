@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Exporters.Tiled;
 
 public static class MapMapping
 {
-    static class Prop
+    public static class Prop
     {
         public const string Ambient = "Ambient";
         public const string CombatBackground = "CombatBackground";
@@ -26,7 +26,6 @@ public static class MapMapping
     {
         albionMap.OriginalNpcCount = (byte)(PropInt(tiledMap, Prop.OriginalNpcCount) ?? 96);
         albionMap.CombatBackgroundId = PropId(tiledMap, Prop.CombatBackground);
-        albionMap.PaletteId = PropId(tiledMap, Prop.Palette, true);
         albionMap.SongId = PropId(tiledMap, Prop.Song);
 
         if (albionMap is MapData2D map2d)
@@ -34,14 +33,12 @@ public static class MapMapping
             map2d.Flags = Enum.Parse<FlatMapFlags>(PropString(tiledMap, Prop.Flags, true));
             map2d.FrameRate = (byte)(PropInt(tiledMap, Prop.FrameRate) ?? 0);
             map2d.Sound = (byte)(PropInt(tiledMap, Prop.Sound) ?? 0);
-            map2d.TilesetId = PropId(tiledMap, Prop.Tileset, true);
         }
 
         if (albionMap is MapData3D map3d)
         {
             map3d.AmbientSongId = PropId(tiledMap, Prop.Ambient);
             map3d.Flags = Enum.Parse<Map3DFlags>(PropString(tiledMap, Prop.Flags, true));
-            map3d.LabDataId = PropId(tiledMap, Prop.Labyrinth, true);
         }
     }
 

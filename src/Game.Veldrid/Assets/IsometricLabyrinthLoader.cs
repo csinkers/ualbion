@@ -85,7 +85,7 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
             OffsetY = mode == IsometricMode.Contents ? HackyContentsOffsetY : 0
         };
 
-        var tiledTileset = Tileset.FromLabyrinth(labyrinth, properties, frames);
+        var tiledTileset = TilesetMapping.FromLabyrinth(labyrinth, properties, frames);
         var tsxBytes = FormatUtil.BytesFromTextWriter(tiledTileset.Serialize);
         yield return (tsxPath, tsxBytes);
     }

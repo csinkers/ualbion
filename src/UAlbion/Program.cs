@@ -27,6 +27,9 @@ static class Program
 {
     static void Main(string[] args)
     {
+#if DEBUG
+        PerfTracker.IsTracing = true;
+#endif
         PerfTracker.StartupEvent("Entered main");
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Api.Event)));
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Core.Events.HelpEvent)));

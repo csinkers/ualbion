@@ -381,7 +381,7 @@ public class AssetLoadTests : IDisposable
 
         Assert.Equal(250, map.Chains.Count);
 
-        Assert.Equal(96, map.Npcs.Length);
+        Assert.Equal(96, map.Npcs.Count);
         var n = map.Npcs[2];
         Assert.Equal(AssetId.From(Npc.Christine), n.Id);
         Assert.Equal(AssetId.From(LargeNpc.Christine), n.SpriteOrGroup);
@@ -440,7 +440,7 @@ public class AssetLoadTests : IDisposable
 
         Assert.Equal(64, map.Chains.Count);
 
-        Assert.Equal(96, map.Npcs.Length);
+        Assert.Equal(96, map.Npcs.Count);
         var n = map.Npcs[2];
         Assert.Equal(AssetId.From(MonsterGroup.Empty), n.Id);
         Assert.Equal(new AssetId(AssetType.ObjectGroup, 68), n.SpriteOrGroup);
@@ -760,7 +760,6 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(TileLayer.Normal, t.Layer);
         Assert.Equal(TileType.Normal, t.Type);
         Assert.Equal(Passability.Passable, t.Collision);
-        Assert.Equal(TileFlags.None, t.Flags);
         Assert.Equal(0xffff, t.ImageNumber);
         Assert.Equal(1, t.FrameCount);
         Assert.Equal(0, t.Unk7);
@@ -768,8 +767,8 @@ public class AssetLoadTests : IDisposable
         t = ts.Tiles[452];
         Assert.Equal(TileLayer.Layer1, t.Layer);
         Assert.Equal(TileType.Underlay2, t.Type);
-        Assert.Equal(Passability.Blocked, t.Collision);
-        Assert.Equal(TileFlags.Dir4 | TileFlags.Dir5, t.Flags);
+        Assert.Equal(Passability.Solid, t.Collision);
+        Assert.Equal(SitMode.Sleep2, t.SitMode);
         Assert.Equal(451, t.ImageNumber);
         Assert.Equal(1, t.FrameCount);
         Assert.Equal(7, t.Unk7);

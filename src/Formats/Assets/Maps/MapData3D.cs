@@ -46,11 +46,14 @@ public class MapData3D : BaseMapData
     public MapData3D() { } // For JSON
 
     public MapData3D(MapId id,
+        PaletteId paletteId,
+        LabyrinthId labyrinthId,
         byte width, byte height,
         IList<EventNode> events, IList<ushort> chains,
         IEnumerable<MapNpc> npcs,
-        IList<MapEventZone> zones) : base(id, width, height, events, chains, npcs, zones)
+        IList<MapEventZone> zones) : base(id, paletteId, width, height, events, chains, npcs, zones)
     {
+        LabDataId = labyrinthId;
         Floors = new byte[width * height];
         Ceilings = new byte[width * height];
         Contents = new byte[width * height];
@@ -75,11 +78,16 @@ public class MapData3D : BaseMapData
         map.CombatBackgroundId = SpriteId.SerdesU8(nameof(CombatBackgroundId), map.CombatBackgroundId, AssetType.CombatBackground, mapping, s); // 7 TODO: Verify this is combat background
         map.PaletteId = PaletteId.SerdesU8(nameof(PaletteId), map.PaletteId, mapping, s);
         map.AmbientSongId = SongId.SerdesU8(nameof(AmbientSongId), map.AmbientSongId, mapping, s);
+
+        map.Npcs ??= new List<MapNpc>();
+        while (map.Npcs.Count < npcCount)
+            map.Npcs.Add(MapNpc.CreateInactive(map.Npcs.Count));
+
         map.Npcs = s.List(
             nameof(Npcs),
             map.Npcs,
             npcCount,
-            (n, x, s2) => MapNpc.Serdes(n, x, map.MapType, mapping, s2)).ToArray();
+            (n, x, s2) => MapNpc.Serdes(n, x, map.MapType, mapping, s2)).ToList();
 
         map.Contents ??= new byte[map.Width * map.Height];
         map.Floors   ??= new byte[map.Width * map.Height];

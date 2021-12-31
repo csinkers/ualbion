@@ -282,7 +282,7 @@ public class ModApplier : Component, IModApplier
     }
 
     public void SaveAssets(
-        Func<AssetId, string, (object, AssetInfo)> loaderFunc,
+        IModApplier.AssetLoaderDelegate loaderFunc,
         Action flushCacheFunc,
         ISet<AssetId> ids,
         ISet<AssetType> assetTypes,

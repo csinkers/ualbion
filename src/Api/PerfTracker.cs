@@ -42,10 +42,15 @@ public static class PerfTracker
     static readonly object SyncRoot = new();
     static int _frameCount;
 
+    public static bool IsTracing { get; set; }
+
     public static void BeginFrame()
     {
         if (_frameCount == 1)
+        {
             StartupEvent("First frame finished"); // Last startup event to be emitted
+            IsTracing = false;
+        }
 
         _frameCount++;
 
@@ -84,11 +89,11 @@ public static class PerfTracker
 
     public static void StartupEvent(string name)
     {
-        if (_frameCount > 1) return;
-        //#if DEBUG
+        if (!IsTracing)
+            return;
+
         var tid = Thread.CurrentThread.ManagedThreadId;
         Console.WriteLine($"[{tid}] at {StartupStopwatch.ElapsedMilliseconds}: {name}");
-        //#endif
         CoreTrace.Log.StartupEvent(name);
     }
 

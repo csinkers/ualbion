@@ -19,7 +19,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
     [JsonInclude] public PaletteId PaletteId { get; set; }
     [JsonInclude] public SpriteId CombatBackgroundId { get; set; }
     [JsonInclude] public byte OriginalNpcCount { get; set; }
-    [JsonInclude] public MapNpc[] Npcs { get; protected set; }
+    [JsonInclude] public List<MapNpc> Npcs { get; protected set; }
 
     [JsonInclude] public List<MapEventZone> Zones { get; private set; } = new();
     [JsonIgnore] public Dictionary<int, MapEventZone> ZoneLookup { get; } = new();
@@ -42,6 +42,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 
     protected BaseMapData() { }
     protected BaseMapData(MapId id,
+        PaletteId paletteId,
         byte width, byte height,
         IList<EventNode> events, IList<ushort> chains,
         IEnumerable<MapNpc> npcs,
@@ -53,9 +54,10 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
         if (zones == null) throw new ArgumentNullException(nameof(zones));
 
         Id = id;
+        PaletteId = paletteId;
         Width = width;
         Height = height;
-        Npcs = npcs.ToArray();
+        Npcs = npcs.ToList();
 
         foreach (var e in events) Events.Add(e);
         foreach (var c in chains) Chains.Add(c);

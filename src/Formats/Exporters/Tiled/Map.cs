@@ -10,7 +10,7 @@ using UAlbion.Config;
 namespace UAlbion.Formats.Exporters.Tiled;
 
 [XmlRoot("map")]
-public class Map
+public class Map : ITiledPropertySource
 {
     [XmlAttribute("version")] public string Version { get; set; }
     [XmlAttribute("tiledversion")] public string TiledVersion { get; set; }

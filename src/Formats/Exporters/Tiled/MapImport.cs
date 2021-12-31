@@ -33,10 +33,13 @@ public static class MapImport
             eventLayout, triggers, npcs, zones,
             markers, markerTiles);
 
+        var paletteId = MapperUtil.PropId(map, MapMapping.Prop.Palette, true);
+
         BaseMapData albionMap;
         if (is3d)
         {
-            var map3d = new MapData3D(info.AssetId, (byte)map.Width, (byte)map.Height, eventLayout.Events, eventLayout.Chains, npcs, zones);
+            var labId = MapperUtil.PropId(map, MapMapping.Prop.Labyrinth, true);
+            var map3d = new MapData3D(info.AssetId, paletteId, labId, (byte)map.Width, (byte)map.Height, eventLayout.Events, eventLayout.Chains, npcs, zones);
             LayerMapping3D.ReadLayers(map3d, map.Layers);
 
             for (int i = 0; i < markerTiles.Count; i++)
@@ -49,7 +52,8 @@ public static class MapImport
         }
         else
         {
-            albionMap = new MapData2D(info.AssetId, (byte)map.Width, (byte)map.Height, eventLayout.Events, eventLayout.Chains, npcs, zones)
+            var tilesetId = MapperUtil.PropId(map, MapMapping.Prop.Tileset, true);
+            albionMap = new MapData2D(info.AssetId, paletteId, tilesetId, (byte)map.Width, (byte)map.Height, eventLayout.Events, eventLayout.Chains, npcs, zones)
             {
                 RawLayout = LayerMapping2D.ReadLayout(map)
             };

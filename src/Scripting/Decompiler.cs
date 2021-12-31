@@ -55,7 +55,7 @@ public static class Decompiler
         for (var index = 0; index < graphs.Count; index++)
         {
             var graph = record($"Make region {index}", graphs[index]);
-            results.Add(SimplifyGraph(graph, record));
+            results.Add(SimplifyGraph(graph, record, rules));
         }
 
         return results;

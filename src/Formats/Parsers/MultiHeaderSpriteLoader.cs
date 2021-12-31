@@ -39,11 +39,7 @@ public class MultiHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
         byte frameCount = s.UInt8("Frames", 1);
 
         // TODO: When writing, assert that uniform and the frame sizes match up
-        var frames = new (int, int, int)[frameCount];
-        var frameBuffers = new List<byte[]>(frameCount);
-        int currentY = 0;
-
-        int totalWidth = 0;
+        var frames = new List<IReadOnlyTexture<byte>>();
         for (int i = 0; i < frameCount; i++)
         {
             if (i > 0)
@@ -57,26 +53,12 @@ public class MultiHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
             }
 
             byte[] frameBytes = s.Bytes("Frame" + i, null, width * height);
-            frames[i] = (currentY, width, height);
-            frameBuffers.Add(frameBytes);
-
-            currentY += height;
-            if (width > totalWidth)
-                totalWidth = width;
-        }
-
-        var result = new SimpleTexture<byte>(info.AssetId, totalWidth, currentY);
-        for (int i = 0; i < frameCount; i++)
-        {
-            var (fy, fw, fh) = frames[i];
-            result.AddRegion(0, fy, fw, fh);
-            BlitUtil.BlitDirect(
-                new ReadOnlyImageBuffer<byte>(fw, fh, fw, frameBuffers[i]),
-                result.GetMutableRegionBuffer(i));
+            frames.Add(new SimpleTexture<byte>(null, null, width, height, frameBytes));
         }
 
         s.Check();
-        return result;
+
+        return BlitUtil.CombineFramesVertically<byte>(info.AssetId, frames);
     }
 
     static void Write(IReadOnlyTexture<byte> existing, ISerializer s)

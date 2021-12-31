@@ -64,6 +64,8 @@ public class DirectoryContainer : IAssetContainer
         if (disk.FileExists(path))
             throw new InvalidOperationException($"Cannot save directory container at \"{path}\", as there is already a file with that name.");
 
+        // Console.WriteLine($"Writing {string.Join(", ", assets.Select(x => $"{x.Item1.AssetId}:{x.Item2?.Length}"))} to {path}");
+
         if (!disk.DirectoryExists(path))
             disk.CreateDirectory(path);
 

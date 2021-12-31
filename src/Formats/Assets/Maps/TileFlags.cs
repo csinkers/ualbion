@@ -3,54 +3,46 @@
 namespace UAlbion.Formats.Assets.Maps;
 
 [Flags]
-public enum TileFlags : ushort
+public enum TileFlags : uint
 {
     None = 0,
-    Unused0 = 1, // Not used?
-    Unused1 = 1 << 1, // Not used?
-    // Set on stairs on 117
-    // Set on chairs on 129, 130, 131, 139, 141, 142 (+stairs), 213, 230, 231
-    // Rock corners, 134, 143 (+stairs)
-    // Cliff edges 200-207, 210
-    // Lamps 243
-    Unk2 = 1 << 2,
-    Unused3 = 1 << 3, // Not used?
-    Unused4 = 1 << 4, // Not used?
-    // Bed 280, 111, 112
-    // Sword on wall 108, 127, 131
-    // Trees 207
-    // Rando floor tiles 231, 236, 237
-    // Comms room shelf 300
-    // Computer terminals 301, 302, 305
-    Debug = 1 << 5,
+    LayerMask = Layer1 | Layer2,
+    TypeMask = Type1 | Type2 | Type4 | Type8,
+    CollMask = CollTop | CollRight | CollBottom | CollLeft | Solid,
+    SitMask = Sit1 | Sit2 | Sit4 | Sit8,
+    MiscMask = Unk12 | Unk18 | NoDraw | DebugDot,
+    UnusedMask = ~(LayerMask | TypeMask | CollMask | SitMask | MiscMask),
 
-    // Direction bits:
-    // BGR
-    // 000 = no sit
-    // 001 = S facing E half of double-wide & top of column?? (300)
-    // 010 = S facing W half of double-wide + regular S facing
-    // 011 = Terminals & high-backed chair SE section (300)
-    // 100 =
-    // 101 = W facing
-    // 110 = E facing + beds
-    // 111 = S facing E part of triple bench (300)
-
-    // Double-wide south-facing seats 230
-    // E half of sign 278
-    Dir1 = 1 << 6,
-    // Seated facing south?
-    Dir2 = 1 << 7,
-    // Seated facing north? (Beds have bits 7 & 8 set)
-    // Also set on shoals on continent 201, 205, 206
-    // West facing = bits 6 & 8
-    Dir3 = 1 << 8,
-    Dir4 = 1 << 9, // Sitting related (primarily south & west facing + beds)
-    Dir5 = 1 << 10, // Bed related + seen on bridges & shallows for continent tilesets
-    Unused11 = 1 << 11, // Unused?
-    Unused12 = 1 << 12, // Unused
-    Unused13 = 1 << 13, // Unused
-    Unused14 = 1 << 14, // Unused
-    Unused15 = 1 << 15,
-
-    UnusedMask = Unused0 | Unused1 | Unused3 | Unused4 | Unused11 | Unused12 | Unused13 | Unused14 | Unused15
+    Type1      = 1,       // 0x00000001
+    Type2      = 1 << 1,  // 0x00000002  Overlay: Small orange debug marker in top left
+    Type4      = 1 << 2,  // 0x00000004  
+    Type8      = 1 << 3,  // 0x00000008  
+    Unused4    = 1 << 4,  // 0x00000010  
+    Layer1     = 1 << 5,  // 0x00000020  
+    Layer2     = 1 << 6,  // 0x00000040  
+    CollTop    = 1 << 7,  // 0x00000080  Overlay: Orange line marker on top side
+    CollRight  = 1 << 8,  // 0x00000100  Overlay: Orange line marker on right side
+    CollBottom = 1 << 9,  // 0x00000200  Overlay: Orange line marker on bottom side
+    CollLeft   = 1 << 10, // 0x00000400  Overlay: Orange line marker on left side
+    Solid      = 1 << 11, // 0x00000800  Underlay: White solid debug marker. Overlay: Orange solid debug marker.
+    Unk12      = 1 << 12, // 0x00001000  
+    Unused13   = 1 << 13, // 0x00002000  
+    Unused14   = 1 << 14, // 0x00004000  
+    Unused15   = 1 << 15, // 0x00008000  
+    Unused16   = 1 << 16, // 0x00010000  
+    Unused17   = 1 << 17, // 0x00020000  
+    Unk18      = 1 << 18, // 0x00040000  
+    Unused19   = 1 << 19, // 0x00080000  
+    Unused20   = 1 << 20, // 0x00100000  
+    NoDraw     = 1 << 21, // 0x00200000  
+    DebugDot   = 1 << 22, // 0x00400000  Orange dot in lower right, both layers.
+    Sit1       = 1 << 23, // 0x00800000  
+    Sit2       = 1 << 24, // 0x01000000  
+    Sit4       = 1 << 25, // 0x02000000  
+    Sit8       = 1 << 26, // 0x04000000  
+    Unused27   = 1 << 27, // 0x08000000  
+    Unused28   = 1 << 28, // 0x10000000  
+    Unused29   = 1 << 29, // 0x20000000  
+    Unused30   = 1 << 30, // 0x40000000  
+    Unused31   = 0x8000000, // 80000000
 }

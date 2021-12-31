@@ -27,9 +27,9 @@ public class PlayerMovementTests
     {
         var collision = new MockCollisionManager((x, y) =>
         {
-            if (x < 0 || y < 0 || x > MapWidth) return Passability.Blocked;
+            if (x < 0 || y < 0 || x > MapWidth) return Passability.Solid;
             var index = x + y * MapWidth;
-            if (index >= Map.Length) return Passability.Blocked;
+            if (index >= Map.Length) return Passability.Solid;
             return (Passability)Map[index];
         });
 

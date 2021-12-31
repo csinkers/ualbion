@@ -198,7 +198,7 @@ static class DumpText
             sw.Write($"Song:{map.SongId} ({map.SongId.Id}) ");
             sw.WriteLine($"CombatBackground:{map.CombatBackgroundId} ({map.CombatBackgroundId.Id})");
 
-            for(int j = 0; j < map.Npcs.Length; j++)
+            for(int j = 0; j < map.Npcs.Count; j++)
             {
                 var npc = map.Npcs[j];
                 if (npc == null)

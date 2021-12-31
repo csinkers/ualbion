@@ -85,25 +85,9 @@ public class MapTests
         // Multi frame: #+F:T:L:C:Flags:Unk7
 
         var parts = s.Split(':');
-        var t = new TileData();
-        if (parts.Length > 0)
-        {
-            int index = parts[0].IndexOf('+');
-            t.ImageNumber = index == -1 
-                ? ushort.Parse(parts[0])
-                : ushort.Parse(parts[0].Substring(0, index));
 
-            if (index != -1)
-                t.FrameCount = byte.Parse(parts[0].Substring(index));
-        }
-
-        if (parts.Length > 1) t.Type = (TileType)byte.Parse(parts[1]);
-        if (parts.Length > 2) t.Layer = (TileLayer)byte.Parse(parts[2]);
-        if (parts.Length > 3) t.Collision = (Passability)byte.Parse(parts[3]);
-        if (parts.Length > 4) t.Flags = (TileFlags)ushort.Parse(parts[4], NumberStyles.HexNumber);
-        if (parts.Length > 5) t.Unk7 = byte.Parse(parts[5]);
-
-        return t;
+        var raw = (TileFlags)int.Parse(parts[0], NumberStyles.HexNumber);
+        return TileData.FromRaw(raw);
     }
 
     [Fact]
@@ -139,7 +123,7 @@ public class MapTests
     public void RoundTrip3DLayers()
     {
         int nextLayerId = 0;
-        var map = new MapData3D(MapId.None, 16, 16, new List<EventNode>(), new List<ushort>(), new List<MapNpc>(), new List<MapEventZone>());
+        var map = new MapData3D(MapId.None, PaletteId.None, LabyrinthId.None, 16, 16, new List<EventNode>(), new List<ushort>(), new List<MapNpc>(), new List<MapEventZone>());
         for (int i = 0; i < 256; i++)
         {
             map.Floors[i] = (byte)i;
@@ -148,7 +132,7 @@ public class MapTests
         }
 
         var layers = LayerMapping3D.BuildLayers(map, ref nextLayerId);
-        var reloaded = new MapData3D(MapId.None, 16, 16, new List<EventNode>(), new List<ushort>(), new List<MapNpc>(), new List<MapEventZone>());
+        var reloaded = new MapData3D(MapId.None, PaletteId.None, LabyrinthId.None, 16, 16, new List<EventNode>(), new List<ushort>(), new List<MapNpc>(), new List<MapEventZone>());
         LayerMapping3D.ReadLayers(reloaded, layers);
 
         Assert.True(map.Floors.SequenceEqual(reloaded.Floors));

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
-using UAlbion.Scripting;
 
 namespace UAlbion.Formats.Exporters.Tiled;
 
@@ -19,7 +18,8 @@ public static class MapImport
         if (map.Height > 255) throw new FormatException($"Map heights above 255 are not currently supported (was {map.Height})");
 
         bool is3d = map.Orientation == "isometric";
-        var eventLayout = ScriptCompiler.Compile(script);
+        var mapId = (MapId)info.AssetId;
+        var eventLayout = AlbionCompiler.Compile(script, mapId.ToMapText());
 
         List<TriggerInfo> triggers = new();
         List<MapNpc> npcs = new();

@@ -8,20 +8,69 @@ namespace UAlbion.Formats.Assets.Maps;
 
 public class MapNpc
 {
+    public static Func<MapNpc, bool> EmitWaypointsFunc = x =>
+    {
+        //if ((x.Flags & NpcFlags.Unk16) != 0)
+            return (x.MovementB & NpcMoveB.RandomMask) == 0;
+
+        //if (x.MovementA == NpcMoveA.FollowWaypoints)
+        //    return true;
+        //return false;
+    };
+
     public const int SizeOnDisk = 10;
     public const int WaypointCount = 0x480;
 
-    public static MapNpc CreateInactive(int index) => new() { Index = index, };
-
-    [JsonIgnore] public int Index { get; private set; }
+    NpcFlags _raw;
     public AssetId Id { get; set; } // MonsterGroup, Npc etc
     // public SampleId? Sound { get; set; }
     public byte Sound { get; set; }
     public AssetId SpriteOrGroup { get; set; } // LargeNpcGfx, SmallNpcGfx etc but could also be an ObjectGroup for 3D
-    public NpcFlags Flags { get; set; } // 1=Dialogue, 2=AutoAttack, 11=ReturnMsg
-    public NpcMovementTypes Movement { get; set; }
-    public byte Unk8 { get; set; }
-    public byte Unk9 { get; set; }
+
+    public NpcType Type
+    {
+        get => (NpcType)(
+            ((_raw & NpcFlags.Type1) != 0 ? 1 : 0) |
+            ((_raw & NpcFlags.Type2) != 0 ? 2 : 0));
+        set => _raw =
+            _raw & ~NpcFlags.TypeMask
+            | (((int)value &  1) != 0 ? NpcFlags.Type1 : 0)
+            | (((int)value &  2) != 0 ? NpcFlags.Type2 : 0);
+    } // 1=Dialogue, 2=AutoAttack, 11=ReturnMsg
+
+    public NpcFlags Flags
+    {
+        get => _raw & NpcFlags.MiscMask;
+        set => _raw = _raw & ~NpcFlags.MiscMask | (value & NpcFlags.MiscMask);
+    }
+
+    public NpcMoveA MovementA
+    {
+        get => (NpcMoveA)(
+            ((_raw & NpcFlags.MoveA1) != 0 ? 1 : 0) |
+            ((_raw & NpcFlags.MoveA2) != 0 ? 2 : 0));
+        set => _raw =
+            _raw & ~NpcFlags.MoveAMask
+            | (((int)value & 1) != 0 ? NpcFlags.MoveA1 : 0)
+            | (((int)value & 2) != 0 ? NpcFlags.MoveA2 : 0);
+
+    }
+
+    public NpcMoveB MovementB
+    {
+        get => (NpcMoveB)(
+            ((_raw & NpcFlags.MoveB1) != 0 ? 1 : 0) |
+            ((_raw & NpcFlags.MoveB2) != 0 ? 2 : 0) |
+            ((_raw & NpcFlags.MoveB4) != 0 ? 4 : 0) |
+            ((_raw & NpcFlags.MoveB8) != 0 ? 8 : 0));
+        set => _raw =
+            _raw & ~NpcFlags.MoveBMask
+            | (((int)value & 1) != 0 ? NpcFlags.MoveB1 : 0)
+            | (((int)value & 2) != 0 ? NpcFlags.MoveB2 : 0)
+            | (((int)value & 4) != 0 ? NpcFlags.MoveB4 : 0)
+            | (((int)value & 8) != 0 ? NpcFlags.MoveB8 : 0);
+    }
+
     public NpcWaypoint[] Waypoints { get; set; }
     public MapId ChainSource { get; set; }
     public ushort Chain { get; set; }
@@ -32,21 +81,22 @@ public class MapNpc
         set => Node = value == 0xffff ? null : new DummyEventNode(value);
     }
 
-    public static MapNpc Serdes(int index, MapNpc existing, MapType mapType, AssetMapping mapping, ISerializer s)
+    public static MapNpc Serdes(int _, MapNpc existing, MapType mapType, AssetMapping mapping, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         s.Begin("Npc");
-        var npc = existing ?? new MapNpc { Index = index };
+        var offset = s.Offset;
+        var npc = existing ?? new MapNpc();
 
         byte id = (byte)npc.Id.ToDisk(mapping);
         id = s.UInt8(nameof(Id), id);
-        // npc.Sound = (SampleId?)Tweak.Serdes(nameof(Sound), (byte?)npc.Sound, s.UInt8);
-        npc.Sound = s.UInt8(nameof(Sound), npc.Sound);
+        npc.Sound = s.UInt8(nameof(Sound), npc.Sound); // SampleId?
 
         ushort? eventNumber = MaxToNullConverter.Serdes(nameof(npc.Node), npc.Node?.Id, s.UInt16);
         if (eventNumber != null && npc.Node == null)
             npc.Node = new DummyEventNode(eventNumber.Value);
 
+        // TODO: Use Large/SmallPartyGfx when type is Party
         npc.SpriteOrGroup = mapType switch
         {
             MapType.ThreeD => AssetId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.ObjectGroup, mapping, s),
@@ -55,22 +105,30 @@ public class MapNpc
             _ => throw new ArgumentOutOfRangeException(nameof(mapType), mapType, null)
         };
 
-        npc.Flags = s.EnumU8(nameof(Flags), npc.Flags);
-        npc.Movement = s.EnumU8(nameof(Movement), npc.Movement);
-        npc.Unk8 = s.UInt8(nameof(Unk8), npc.Unk8);
-        npc.Unk9 = s.UInt8(nameof(Unk9), npc.Unk9);
-
-        var assetType = (npc.Flags & NpcFlags.IsMonster) != 0 ? AssetType.MonsterGroup : AssetType.Npc;
+        npc._raw = s.EnumU32(nameof(Flags), npc._raw);
+        var assetType = AssetTypeForNpcType(npc.Type);
         npc.Id = AssetId.FromDisk(assetType, id, mapping);
 
         s.End();
+        var actualSize = s.Offset - offset;
+        if (actualSize != 10)
+            throw new FormatException("NPC was not 10 bytes!");
         return npc;
     }
+
+    public static AssetType AssetTypeForNpcType(NpcType type) =>
+        type switch
+        {
+            NpcType.Party => AssetType.EventSet, // TODO: Add the 980 offset
+            NpcType.Monster1 => AssetType.MonsterGroup,
+            NpcType.Monster2 => AssetType.MonsterGroup,
+            _ => AssetType.EventSet
+        };
 
     public void LoadWaypoints(ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if ((Movement & NpcMovementTypes.RandomMask) != 0)
+        if (!EmitWaypointsFunc(this))
         {
             var wp = Waypoints?[0];
             byte x = wp?.X ?? 0;
@@ -91,12 +149,11 @@ public class MapNpc
         }
     }
 
-    public void Unswizzle(MapId mapId, int npcNumber, Func<ushort, IEventNode> getEvent, Func<ushort, ushort> getChain)
+    public void Unswizzle(MapId mapId, Func<ushort, IEventNode> getEvent, Func<ushort, ushort> getChain)
     {
         if (getEvent == null) throw new ArgumentNullException(nameof(getEvent));
         if (getChain == null) throw new ArgumentNullException(nameof(getChain));
 
-        Index = npcNumber;
         ChainSource = mapId;
         if (Node is DummyEventNode dummy)
         {
@@ -124,5 +181,5 @@ public class MapNpc
         return hours * 48 + minutes;
     }
 
-    public override string ToString() => $"Npc{Id.Id} {Id} O:{SpriteOrGroup} F:{Flags:x} M{Movement} Amount:{Unk8} Unk9:{Unk9} S{Sound} E{Node?.Id}";
+    public override string ToString() => $"Npc{Id.Id} {Id} O:{SpriteOrGroup} F:{Flags:x} M{MovementB} S{Sound} E{Node?.Id}";
 }

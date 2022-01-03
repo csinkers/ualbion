@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -27,6 +28,7 @@ public class MockFileSystem : IFileSystem
         => _maskingFunc = fallBackToFileSystem ? _ => true : _ => false;
 
     interface INode { string Path { get; } }
+    public string CurrentDirectory { get; set; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
     class DirNode : Dictionary<string, INode>, INode
     {

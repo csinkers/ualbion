@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -13,7 +12,6 @@ using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Text;
-using UAlbion.Game.Veldrid.Assets;
 
 // args for testing isometric map export: -b Base Unpacked -t "Labyrinth Map" -id "Labyrinth.Jirinaar Map.Jirinaar"
 // args for full asset export: -b Base Unpacked
@@ -31,14 +29,7 @@ static class Program
         PerfTracker.IsTracing = true;
 #endif
         PerfTracker.StartupEvent("Entered main");
-        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Api.Event)));
-        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Core.Events.HelpEvent)));
-        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Core.Veldrid.Events.InputEvent)));
-        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Editor.EditorSetPropertyEvent)));
-        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Formats.ScriptEvents.PartyMoveEvent)));
-        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Game.Events.StartEvent)));
-        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Game.Veldrid.Debugging.HideDebugWindowEvent)));
-        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(IsoYawEvent)));
+        AssetSystem.LoadEvents();
         PerfTracker.StartupEvent("Built event parsers");
 
         var commandLine = new CommandLineOptions(args);

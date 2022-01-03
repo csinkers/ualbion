@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UAlbion.Api;
 using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting;
 
 public static class ScriptCompiler
 {
-    public static EventLayout Compile(string source, List<(string, IGraph)> steps = null)
+    public static EventLayout Compile(string source, Func<IEvent, IEvent> eventTransformer, List<(string, IGraph)> steps = null)
     {
         RecordFunc record;
         if (steps != null)
@@ -25,20 +26,20 @@ public static class ScriptCompiler
         if (!ScriptParser.TryParse(source, out var trees, out var error, out _))
             throw new InvalidOperationException(error);
 
-        var compiled = trees.Select(ast => ExpandAstToGraph(ast, record)).ToList();
+        var compiled = trees.Select(ast => ExpandAstToGraph(ast, eventTransformer, record)).ToList();
         return EventLayout.Build(compiled);
     }
 
-    public static ControlFlowGraph ExpandAstToGraph(ICfgNode ast, RecordFunc record)
+    public static ControlFlowGraph ExpandAstToGraph(ICfgNode ast, Func<IEvent, IEvent> eventTransformer, RecordFunc record)
     {
         if (ast == null) throw new ArgumentNullException(nameof(ast));
         var start = Emit.Empty();
         var end = Emit.Empty();
         var graph = new ControlFlowGraph(new[] { start, ast, end }, new[] { (0, 1, CfgEdge.True), (1, 2, CfgEdge.True) });
-        return ExpandGraph(graph, record);
+        return ExpandGraph(graph, eventTransformer, record);
     }
 
-    public static ControlFlowGraph ExpandGraph(ControlFlowGraph graph, RecordFunc record)
+    public static ControlFlowGraph ExpandGraph(ControlFlowGraph graph, Func<IEvent, IEvent> eventTransformer, RecordFunc record)
     {
         if (graph == null) throw new ArgumentNullException(nameof(graph));
         ControlFlowGraph previous = null;
@@ -56,16 +57,17 @@ public static class ScriptCompiler
 
         graph = record("Remove loop successor edges", RemoveLoopSuccessors(graph));
         graph = record("Resolve goto", ResolveGotos(graph));
-        // TODO: Split graphs
-        try
-        {
-            graph = record("Parse events", ParseEvents(graph));
-        }
-        catch {}
-
+        graph = record("Parse events", ParseEvents(graph));
+        graph = record("Transform events", TransformEvents(graph, eventTransformer));
         graph = record("Remove empty nodes", RemoveEmptyNodes(graph));
         graph = record("Defragment", graph.Defragment());
         return graph;
+    }
+
+    static ControlFlowGraph TransformEvents(ControlFlowGraph graph, Func<IEvent, IEvent> eventTransformer)
+    {
+        var visitor = new EventTransformVisitor(eventTransformer);
+        return visitor.Apply(graph);
     }
 
     static ControlFlowGraph RemoveEmptyNodes(ControlFlowGraph graph)

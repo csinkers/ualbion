@@ -55,7 +55,7 @@ public sealed class AssetConverter : IDisposable
         (_to, _toExchange, _toLoaderRegistry) = BuildModApplier(baseDir, new[] { toMod }, disk, jsonUtil, mapping);
     }
 
-    public void Convert(string[] ids, ISet<AssetType> assetTypes, Regex filePattern)
+    public void Convert(string[] ids, ISet<AssetType> assetTypes, Regex filePattern, Func<object, object> filter = null)
     {
         // Give the "from" universe's asset manager "to" the to exchange so we can import the assets.
         _toExchange.Attach(new AssetManager(_from));
@@ -85,6 +85,9 @@ public sealed class AssetConverter : IDisposable
 
             if (stringId.HasValue && asset is IStringCollection collection)
                 asset = collection.GetString(stringId.Value, language);
+
+            if (filter != null)
+                asset = filter(asset);
 
             return (asset, info);
         }

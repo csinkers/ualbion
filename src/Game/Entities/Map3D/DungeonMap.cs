@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -155,12 +154,7 @@ public class DungeonMap : Component, IMap
         // TODO
     }
 
-    IEnumerable<MapEventZone> GetZonesOfType(TriggerTypes triggerType)
-    {
-        var matchingKeys = _mapData.ZoneTypeLookup.Keys.Where(x => (x & triggerType) == triggerType);
-        return matchingKeys.SelectMany(x => _mapData.ZoneTypeLookup[x]);
-    }
-
+    IEnumerable<MapEventZone> GetZonesOfType(TriggerTypes triggerType) => _mapData.GetZonesOfType(triggerType);
     void FireEventChains(TriggerTypes type, bool log)
     {
         var zones = GetZonesOfType(type);

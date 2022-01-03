@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using UAlbion.Api;
 using UAlbion.Base;
@@ -11,12 +12,25 @@ using UAlbion.Game.Assets;
 using UAlbion.Game.Magic;
 using UAlbion.Game.Settings;
 using UAlbion.Game.Text;
+using UAlbion.Game.Veldrid.Assets;
 using UAlbion.Game.Veldrid.Debugging;
 
 namespace UAlbion;
 
 public static class AssetSystem
 {
+    public static void LoadEvents()
+    {
+        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Api.Event)));
+        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Core.Events.HelpEvent)));
+        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Core.Veldrid.Events.InputEvent)));
+        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Editor.EditorSetPropertyEvent)));
+        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Formats.ScriptEvents.PartyMoveEvent)));
+        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Game.Events.StartEvent)));
+        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Game.Veldrid.Debugging.HideDebugWindowEvent)));
+        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(IsoYawEvent)));
+    }
+
     public static async Task<(EventExchange, IContainer)> SetupAsync(string baseDir, AssetMapping mapping, IFileSystem disk, IJsonUtil jsonUtil)
     {
         var configAndSettingsTask = Task.Run(() =>
@@ -130,8 +144,9 @@ public static class AssetSystem
         return result;
     }
 
-    public static EventExchange SetupSimple(string baseDir, IFileSystem disk, AssetMapping mapping, params string[] mods)
+    public static EventExchange SetupSimple(IFileSystem disk, AssetMapping mapping, params string[] mods)
     {
+        var baseDir = ConfigUtil.FindBasePath(disk);
         var jsonUtil = new FormatJsonUtil();
         var coreConfig = new CoreConfig();
         var generalConfig = LoadGeneralConfig(baseDir, disk, jsonUtil);

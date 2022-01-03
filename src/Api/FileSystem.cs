@@ -19,4 +19,9 @@ public class FileSystem : IFileSystem
     public IEnumerable<string> ReadAllLines(string path) => File.ReadAllLines(path);
     public byte[] ReadAllBytes(string path)              => File.ReadAllBytes(path);
     public void WriteAllBytes(string path, byte[] bytes) => File.WriteAllBytes(path, bytes);
+    public string CurrentDirectory
+    {
+        get => Directory.GetCurrentDirectory();
+        set => Directory.SetCurrentDirectory(value);
+    }
 }

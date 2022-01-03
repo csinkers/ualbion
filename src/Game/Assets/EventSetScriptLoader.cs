@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using SerdesNet;
 using UAlbion.Api;
@@ -7,7 +6,6 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
-using UAlbion.Scripting;
 
 namespace UAlbion.Game.Assets;
 
@@ -28,9 +26,10 @@ public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
         }
         else
         {
+            var eventSetId = (EventSetId)info.AssetId;
             var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
             var script = Encoding.UTF8.GetString(bytes);
-            var eventLayout = ScriptCompiler.Compile(script);
+            var eventLayout = AlbionCompiler.Compile(script, eventSetId.ToEventText());
             return new EventSet(info.AssetId, eventLayout.Events, eventLayout.Chains);
         }
 

@@ -11,6 +11,9 @@ namespace UAlbion.Formats.Assets.Maps;
 
 public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 {
+    readonly Dictionary<TriggerTypes, List<int>> _zoneTypeLookup = new();
+    int[] _zoneLookup;
+
     [JsonInclude] public MapId Id { get; protected set; }
     public abstract MapType MapType { get; }
     [JsonInclude] public byte Width { get; protected set; }
@@ -22,8 +25,6 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
     [JsonInclude] public List<MapNpc> Npcs { get; protected set; }
 
     [JsonInclude] public List<MapEventZone> Zones { get; private set; } = new();
-    [JsonIgnore] public Dictionary<int, MapEventZone> ZoneLookup { get; } = new();
-    [JsonIgnore] public Dictionary<TriggerTypes, MapEventZone[]> ZoneTypeLookup { get; } = new();
     [JsonIgnore] public List<EventNode> Events { get; private set; } = new();
     [JsonInclude] public List<ushort> Chains { get; private set; } = new();
     public string[] EventStrings // Used for JSON
@@ -117,6 +118,10 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 
     protected void Unswizzle() // Resolve event indices to pointers
     {
+        _zoneLookup = new int[Width * Height];
+        _zoneTypeLookup.Clear();
+        Array.Fill(_zoneLookup, -1);
+
         var chainMapping = new ushort[Events.Count];
         var sortedChains = Chains
             .Select((eventId, chainId) => (eventId, chainId))
@@ -132,22 +137,20 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
         // Use map events if the event number is set, otherwise use the event set from the NPC's character sheet.
         // Note: Event set loading requires IAssetManager, so can't be done directly by UAlbion.Formats code.
         // Instead, the MapManager will call AttachEventSets with a callback to load the event sets.
-        int npcNumber = 0;
         foreach (var npc in Npcs)
-            npc.Unswizzle(Id, npcNumber++, x => Events[x], x => chainMapping[x]);
+            npc.Unswizzle(Id, x => Events[x], x => chainMapping[x]);
 
         foreach (var zone in Zones)
             zone.Unswizzle(Id, x => Events[x], x => chainMapping[x]);
 
-        foreach (var position in Zones.Where(x => !x.Global).GroupBy(x => x.Y * Width + x.X))
+        foreach (var position in Zones.Where(x => !x.Global).Select((x,i) => (zoneIndex: i, tileIndex: Index(x.X, x.Y))).GroupBy(x => x.tileIndex))
         {
-            var zone = position.SingleOrDefault();
-            if (zone != null)
-                ZoneLookup[position.Key] = zone;
+            var zone = position.Single();
+            _zoneLookup[zone.tileIndex] = zone.zoneIndex;
         }
 
-        foreach (var triggerType in Zones.GroupBy(x => x.Trigger))
-            ZoneTypeLookup[triggerType.Key] = triggerType.ToArray();
+        foreach (var triggerType in Zones.Select((x,i) => (zoneIndex: i, type: x.Trigger)).GroupBy(x => x.type))
+            _zoneTypeLookup[triggerType.Key] = triggerType.Select(x => x.zoneIndex).ToList();
 
 #if DEBUG
         EventReferences = new IList<object>[Events.Count];
@@ -181,10 +184,11 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
     protected void SerdesNpcWaypoints(ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        foreach (var npc in Npcs)
+        for (var index = 0; index < Npcs.Count; index++)
         {
+            var npc = Npcs[index];
             if (npc == null) continue;
-            s.Begin("NpcWaypoints" + npc.Index);
+            s.Begin("NpcWaypoints" + index);
             if (npc.Id.Type != AssetType.None)
                 npc.LoadWaypoints(s);
             else
@@ -237,5 +241,101 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
         Chains.AddRange(chains);
 
         Unswizzle();
+    }
+
+    public int Index(int x, int y) => y * Width + x;
+    public MapEventZone GetZone(int x, int y) => GetZone(Index(x, y));
+    public MapEventZone GetZone(int tileIndex)
+    {
+        int zoneIndex = _zoneLookup[tileIndex];
+        return zoneIndex == -1 ? null : Zones[zoneIndex];
+    }
+
+    public IEnumerable<MapEventZone> GetZonesOfType(TriggerTypes triggerType)
+    {
+        var matchingKeys = _zoneTypeLookup.Keys.Where(x => (x & triggerType) == triggerType);
+        return matchingKeys.SelectMany(x => _zoneTypeLookup[x]).Select(x => Zones[x]);
+    }
+
+    public void AddZone(byte x, byte y, TriggerTypes trigger, ushort chain) => AddZoneInner(false, x, y, trigger, chain);
+    public void AddGlobalZone(TriggerTypes trigger, ushort chain) => AddZoneInner(true, 0, 0xff, trigger, chain);
+    public void RemoveZone(byte x, byte y) => RemoveZone(_zoneLookup[Index(x, y)]);
+    void RemoveZone(int zoneIndex)
+    {
+        if (zoneIndex == -1)
+            return;
+
+        var zone = Zones[zoneIndex];
+        if (zone == null)
+            return;
+
+        if (!zone.Global)
+        {
+            var tileIndex = Index(zone.X, zone.Y);
+            _zoneLookup[tileIndex] = -1;
+        }
+
+        if (_zoneTypeLookup.TryGetValue(zone.Trigger, out var ofType))
+            ofType.Remove(zoneIndex);
+
+        Zones.RemoveAt(zoneIndex);
+    }
+
+    void AddZoneInner(bool global, byte x, byte y, TriggerTypes trigger, ushort chain)
+    {
+        var eventIndex = Chains[chain];
+        var zone = new MapEventZone
+        {
+            X = x,
+            Y = y,
+            Global = global,
+            Trigger = trigger,
+            Unk1 = 0,
+            Chain = chain,
+            ChainSource = Id,
+            EventIndex = eventIndex,
+            Node = Events[eventIndex],
+        };
+
+        int index = Index(x, y);
+        int existingZoneIndex = _zoneLookup[index];
+        if (existingZoneIndex != -1)
+            RemoveZone(existingZoneIndex);
+
+        if (!_zoneTypeLookup.TryGetValue(trigger, out var ofType))
+        {
+            ofType = new List<int>();
+            _zoneTypeLookup[trigger] = ofType;
+        }
+
+        _zoneLookup[index] = Zones.Count;
+        ofType.Add(Zones.Count);
+        Zones.Add(zone);
+    }
+
+    public void SetZoneChain(byte x, byte y, ushort value)
+    {
+        var zoneIndex = _zoneLookup[Index(x, y)];
+        if (zoneIndex == -1)
+            return;
+
+        if (value >= Chains.Count)
+        {
+            RemoveZone(zoneIndex);
+            return;
+        }
+
+        var zone = Zones[zoneIndex];
+        zone.Chain = value;
+        zone.ChainSource = Id;
+        var firstEventId = Chains[value];
+        zone.Node = firstEventId >= Events.Count ? null : Events[firstEventId];
+    }
+
+    public void SetZoneTrigger(byte x, byte y, TriggerTypes value)
+    {
+        var zoneIndex = _zoneLookup[Index(x, y)];
+        if (zoneIndex != -1)
+            Zones[zoneIndex].Trigger = value;
     }
 }

@@ -16,8 +16,7 @@ public class CanonicalEventTests
     static CanonicalEventTests()
     {
         var disk = new MockFileSystem(true);
-        var baseDir = ConfigUtil.FindBasePath(disk);
-        Exchange = AssetSystem.SetupSimple(baseDir, disk, Mapping);
+        Exchange = AssetSystem.SetupSimple(disk, Mapping);
     }
 
     public CanonicalEventTests()

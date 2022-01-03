@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Scripting;
 
 namespace UAlbion.Formats.Assets.Maps;
 
@@ -21,7 +22,6 @@ public class MapData2D : BaseMapData
     [JsonInclude] public byte Sound { get; set; }
     [JsonInclude] public TilesetId TilesetId { get; set; }
     [JsonInclude] public byte FrameRate { get; set; }
-
     [JsonIgnore] public int[] Underlay { get; private set; }
     [JsonIgnore] public int[] Overlay { get; private set; }
 
@@ -32,6 +32,8 @@ public class MapData2D : BaseMapData
     }
 
     public MapData2D() { } // For JSON
+    public MapData2D(MapId id, PaletteId paletteId, TilesetId tilesetId, byte width, byte height, EventLayout layout, IEnumerable<MapNpc> npcs, IList<MapEventZone> zones)
+        : this(id, paletteId, tilesetId, width, height, layout.Events, layout.Chains, npcs, zones) { }
 
     public MapData2D(MapId id,
         PaletteId paletteId,
@@ -69,7 +71,7 @@ public class MapData2D : BaseMapData
 
         map.Npcs ??= new List<MapNpc>();
         while (map.Npcs.Count < npcCount)
-            map.Npcs.Add(MapNpc.CreateInactive(map.Npcs.Count));
+            map.Npcs.Add(new MapNpc());
 
         map.Npcs = s.List(
             nameof(Npcs),

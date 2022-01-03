@@ -16,11 +16,11 @@ public static class NpcMapping
         public const string Id = "Id";
         public const string Visual = "Visual";
         public const string Flags = "Flags";
-        public const string Movement = "Movement";
-        public const string Unk8 = "Unk8";
-        public const string Unk9 = "Unk9";
+        public const string MovementA = "MovementA";
+        public const string MovementB = "MovementB";
         public const string Script = "Script";
         public const string Sound = "Sound";
+        public const string Type = "Type";
         public const string Path = "Path";
     }
 
@@ -38,9 +38,10 @@ public static class NpcMapping
 
         var waypointGroups = new List<ObjectGroup>();
         var npcPathIndices = new Dictionary<int, int>();
-        foreach (var npc in map.Npcs)
+        for (var index = 0; index < map.Npcs.Count; index++)
         {
-            if ((npc.Movement & NpcMovementTypes.RandomMask) != 0)
+            var npc = map.Npcs[index];
+            if ((npc.MovementB & NpcMoveB.RandomMask) != 0)
                 continue;
 
             if (npc.SpriteOrGroup == AssetId.None) // Unused 2D slots
@@ -50,12 +51,12 @@ public static class NpcMapping
                 continue;
 
             int firstWaypointObjectId = nextId;
-            npcPathIndices[npc.Index] = firstWaypointObjectId;
+            npcPathIndices[index] = firstWaypointObjectId;
             waypointGroups.Add(new ObjectGroup
             {
                 Id = nextObjectGroupId++,
-                Name = $"NPC{npc.Index} Path",
-                Objects = NpcPathBuilder.Build(npc.Index, npc.Waypoints, tileWidth, tileHeight, ref nextId),
+                Name = $"NPC{index} Path",
+                Objects = NpcPathBuilder.Build(index, npc.Waypoints, tileWidth, tileHeight, ref nextId),
                 Hidden = true,
             });
         }
@@ -64,13 +65,14 @@ public static class NpcMapping
         {
             Id = npcGroupId,
             Name = "NPCs",
-            Objects = map.Npcs.Select(x =>
+            Objects = map.Npcs.Select((x, i) =>
                     BuildNpcObject(
                         tileWidth,
                         tileHeight,
                         functionsByEventId,
                         getTileFunc,
                         npcPathIndices,
+                        i,
                         x,
                         ref nextId))
                 .ToList(),
@@ -86,6 +88,7 @@ public static class NpcMapping
         Dictionary<ushort, string> functionsByEventId,
         GetTileFunc getTileFunc,
         Dictionary<int, int> npcPathIndices,
+        int npcIndex,
         MapNpc npc,
         ref int nextId)
     {
@@ -93,22 +96,22 @@ public static class NpcMapping
         {
             new(Prop.Visual, npc.SpriteOrGroup.ToString()),
             new(Prop.Flags, npc.Flags.ToString()),
-            new(Prop.Movement, ((int) npc.Movement).ToString(CultureInfo.InvariantCulture)),
-            new(Prop.Unk8, npc.Unk8.ToString(CultureInfo.InvariantCulture)),
-            new(Prop.Unk9, npc.Unk9.ToString(CultureInfo.InvariantCulture))
+            new(Prop.MovementA, npc.MovementA.ToString()),
+            new(Prop.MovementB, npc.MovementB.ToString()),
+            new(Prop.Type, npc.Type.ToString()),
         };
 
         if (!npc.Id.IsNone) objProps.Add(new TiledProperty(Prop.Id, npc.Id.ToString()));
         if (npc.Node != null) objProps.Add(new TiledProperty(Prop.Script, functionsByEventId[npc.Node.Id]));
         if (npc.Sound > 0) objProps.Add(new TiledProperty(Prop.Sound, npc.Sound.ToString(CultureInfo.InvariantCulture)));
-        if (npcPathIndices.TryGetValue(npc.Index, out var pathObjectId)) objProps.Add(TiledProperty.Object(Prop.Path, pathObjectId));
+        if (npcPathIndices.TryGetValue(npcIndex, out var pathObjectId)) objProps.Add(TiledProperty.Object(Prop.Path, pathObjectId));
 
         var (tileId, tileW, tileH) = getTileFunc(npc.SpriteOrGroup);
         return new MapObject
         {
             Id = nextId++,
             Gid = tileId ?? 0,
-            Name = $"NPC{npc.Index} {npc.Id}",
+            Name = $"NPC{npcIndex} {npc.Id}",
             Type = ObjectGroupMapping.TypeName.Npc,
             X = npc.Waypoints[0].X * tileWidth,
             Y = npc.Waypoints[0].Y * tileHeight,
@@ -141,10 +144,10 @@ public static class NpcMapping
             Id = string.IsNullOrEmpty(id) ? AssetId.None : AssetId.Parse(id),
             Node = entryPoint == EventNode.UnusedEventId ? null : new DummyEventNode(entryPoint),
             Waypoints = waypoints,
+            Type = (NpcType)Enum.Parse(typeof(NpcType), obj.PropString(Prop.Type)),
             Flags = (NpcFlags)Enum.Parse(typeof(NpcFlags), obj.PropString(Prop.Flags)),
-            Movement = (NpcMovementTypes)Enum.Parse(typeof(NpcMovementTypes), obj.PropString(Prop.Movement)),
-            Unk8 = (byte)(obj.PropInt(Prop.Unk8) ?? 0),
-            Unk9 = (byte)(obj.PropInt(Prop.Unk9) ?? 0),
+            MovementA = (NpcMoveA)Enum.Parse(typeof(NpcMoveA), obj.PropString(Prop.MovementA)),
+            MovementB = (NpcMoveB)Enum.Parse(typeof(NpcMoveB), obj.PropString(Prop.MovementB)),
             Sound = (byte)(obj.PropInt(Prop.Sound) ?? 0),
             SpriteOrGroup = AssetId.Parse(visual) // TODO: Handle groups for 3D maps
         };

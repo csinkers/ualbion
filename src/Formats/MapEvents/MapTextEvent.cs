@@ -10,12 +10,12 @@ namespace UAlbion.Formats.MapEvents;
 public class MapTextEvent : MapEvent, ITextEvent, IAsyncEvent
 {
     MapTextEvent(TextId textSourceId) => TextSource = textSourceId;
-    public MapTextEvent(TextId textSourceId, byte subId, TextLocation location, CharacterId characterId)
+    public MapTextEvent(TextId textSourceId, ushort subId, TextLocation location, CharacterId speaker)
     {
         TextSource = textSourceId;
         SubId = subId;
         Location = location;
-        CharacterId = characterId;
+        Speaker = speaker;
     }
 
     public static MapTextEvent Serdes(MapTextEvent e, AssetMapping mapping, ISerializer s, TextId textSourceId)
@@ -26,29 +26,36 @@ public class MapTextEvent : MapEvent, ITextEvent, IAsyncEvent
 
         if (s == null) throw new ArgumentNullException(nameof(s));
         e.TextSource = textSourceId;
-        e.Location = s.EnumU8(nameof(Location), e.Location);
-        int zeroed = s.UInt8(null, 0);
+        e.Location = s.EnumU8(nameof(Location), e.Location); // 1
+        int zeroed = s.UInt16(null, 0); // 2, 3
+
+        e.Speaker = CharacterId.SerdesU8( // 4
+            nameof(Speaker),
+            e.Speaker,
+            AssetTypeForTextLocation(e.Location),
+            mapping,
+            s);
+
+        e.SubId = s.UInt16(nameof(SubId), e.SubId);
         zeroed += s.UInt8(null, 0);
-        e.CharacterId = CharacterId.SerdesU8(nameof(CharacterId), e.CharacterId, e.CharacterType, mapping, s);
-        e.SubId = s.UInt8(nameof(SubId), e.SubId);
-        zeroed += s.UInt16(null, 0);
         zeroed += s.UInt16(null, 0);
         s.Assert(zeroed == 0, "TextEvent: Expected fields 2,3,6,8 to be 0");
         return e;
     }
 
     [EventPart("text")] public TextId TextSource { get; private set; }
-    [EventPart("sub_id")] public byte SubId { get; private set; }
+    [EventPart("sub_id")] public ushort SubId { get; private set; }
     [EventPart("location", true, TextLocation.NoPortrait)] public TextLocation Location { get; private set; }
-    [EventPart("char", true, "None")] public CharacterId CharacterId { get; private set; }
-
-    AssetType CharacterType => Location switch
-    {
-        // TODO: Handle the other cases
-        TextLocation.PortraitLeft => AssetType.Party,
-        _ => AssetType.Npc
-    };
+    [EventPart("speaker", true, "None")] public CharacterId Speaker { get; private set; }
 
     public override MapEventType EventType => MapEventType.Text;
     public StringId ToId() => new(TextSource, SubId);
+
+    public static AssetType AssetTypeForTextLocation(TextLocation location) =>
+        location switch
+        {
+            // TODO: Handle the other cases
+            TextLocation.PortraitLeft => AssetType.Party,
+            _ => AssetType.Npc
+        };
 }

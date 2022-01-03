@@ -15,6 +15,9 @@ public abstract class MapEvent : Event, IMapEvent
         if (s == null) throw new ArgumentNullException(nameof(s));
         var initialPosition = s.Offset;
         var mapEvent = node?.Event as MapEvent;
+        if (node?.Event != null && mapEvent == null)
+            throw new ArgumentOutOfRangeException($"Tried to serialise a non-map event \"{node.Event}\" to bytes");
+
         var @event = SerdesEvent(mapEvent, s, chainSource, textAssetId, mapping);
 
         if (@event is IBranchingEvent be)

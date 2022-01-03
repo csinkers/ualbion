@@ -218,9 +218,9 @@
     "$(MOD)/Albion/CD/XLDLIBS/WAVELIB0.XLD": { "Loader": "wavlib", "Map": { "0": { "Id": "wavlib.1" } } },
 
     // Videos
-    "$(MOD)/Albion/CD/XLDLIBS/GERMAN/FLICS0.XLD":  { "Language": "GERMAN",  "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/ENGLISH/FLICS0.XLD": { "Language": "ENGLISH", "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/FRENCH/FLICS0.XLD":  { "Language": "FRENCH",  "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
+    // "$(MOD)/Albion/CD/XLDLIBS/GERMAN/FLICS0.XLD":  { "Language": "GERMAN",  "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
+    // "$(MOD)/Albion/CD/XLDLIBS/ENGLISH/FLICS0.XLD": { "Language": "ENGLISH", "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
+    // "$(MOD)/Albion/CD/XLDLIBS/FRENCH/FLICS0.XLD":  { "Language": "FRENCH",  "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
 
     // Text
     "$(MOD)/Albion/CD/XLDLIBS/GERMAN/EVNTTXT0.XLD": { "Language": "GERMAN", "Loader": "stringtable", "Max": 98,  "Map": { "0": { "Id": "etext.1" } } },
@@ -272,27 +272,27 @@
       "Map": { "0": { "Id": "special.UAlbionStrings" } }
     },
 
-    "$(MOD)/Albion/CD/XLDLIBS/GERMAN/SYSTEXTS":     {
-      "Language": "GERMAN",
-      "Loader": "stext",
-      "Container": "raw",
-      "Max": 0,
-      "Map": { "0": { "Id": "special.SystemStrings" } }
-    },
-    "$(MOD)/Albion/CD/XLDLIBS/ENGLISH/SYSTEXTS":     {
-      "Language": "ENGLISH",
-      "Loader": "stext",
-      "Container": "raw",
-      "Max": 0,
-      "Map": { "0": { "Id": "special.SystemStrings" } }
-    },
-    "$(MOD)/Albion/CD/XLDLIBS/FRENCH/SYSTEXTS":     {
-      "Language": "FRENCH",
-      "Loader": "stext",
-      "Container": "raw",
-      "Max": 0,
-      "Map": { "0": { "Id": "special.SystemStrings" } }
-    },
+    // "$(MOD)/Albion/CD/XLDLIBS/GERMAN/SYSTEXTS":     {
+    //   "Language": "GERMAN",
+    //   "Loader": "stext",
+    //   "Container": "raw",
+    //   "Max": 0,
+    //   "Map": { "0": { "Id": "special.SystemStrings" } }
+    // },
+    // "$(MOD)/Albion/CD/XLDLIBS/ENGLISH/SYSTEXTS":     {
+    //   "Language": "ENGLISH",
+    //   "Loader": "stext",
+    //   "Container": "raw",
+    //   "Max": 0,
+    //   "Map": { "0": { "Id": "special.SystemStrings" } }
+    // },
+    // "$(MOD)/Albion/CD/XLDLIBS/FRENCH/SYSTEXTS":     {
+    //   "Language": "FRENCH",
+    //   "Loader": "stext",
+    //   "Container": "raw",
+    //   "Max": 0,
+    //   "Map": { "0": { "Id": "special.SystemStrings" } }
+    // },
 
     "$(MOD)/Albion/CD/XLDLIBS/GERMAN/WORDLIS0.XLD": {
       "Language": "GERMAN",
@@ -368,7 +368,7 @@
     "$(MOD)/Albion/CD/XLDLIBS/NPCKL0.XLD":   { "Post": "gfx",  "Loader": "header", "PaletteId": 1, "Map": { "0": { "Id": "snpc.1" }, "27": { "PaletteId": 4 } } },
     "$(MOD)/Albion/CD/XLDLIBS/PARTGR0.XLD":  { "Post": "gfx",  "Loader": "header", "PaletteId": 20, "Map": { "0": { "Id": "lparty.1" } } },
     "$(MOD)/Albion/CD/XLDLIBS/PARTKL0.XLD":  { "Post": "gfx",  "Loader": "header", "PaletteId": 1, "Map": { "0": { "Id": "sparty.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/PICTURE0.XLD": { "Post": "ilbm", "Loader": "interlaced", "Map": { "0": { "Id": "pic.1" } } },
+    // "$(MOD)/Albion/CD/XLDLIBS/PICTURE0.XLD": { "Post": "ilbm", "Loader": "interlaced", "Map": { "0": { "Id": "pic.1" } } },
     "$(MOD)/Albion/CD/XLDLIBS/SMLPORT0.XLD": { "Post": "gfx",  "Loader": "fixedsize", "Width": 34, "Max": 98, "Map": { "0": { "Id": "portrait.1" } } },
     "$(MOD)/Albion/CD/XLDLIBS/SMLPORT1.XLD": { "Post": "gfx",  "Loader": "fixedsize", "Width": 34, "MinimumCount": 100, "Map": { "0": { "Id": "portrait.100" } } },
     "$(MOD)/Albion/CD/XLDLIBS/TACTICO0.XLD": { "Post": "gfx",  "Loader": "fixedsize", "Width": 32, "Map": { "0": { "Id": "tacgfx.1" } } },

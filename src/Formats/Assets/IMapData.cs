@@ -17,6 +17,4 @@ public interface IMapData
     List<EventNode> Events { get; }
     List<ushort> Chains { get; }
     List<MapEventZone> Zones { get; }
-    Dictionary<int, MapEventZone> ZoneLookup { get; }
-    Dictionary<TriggerTypes, MapEventZone[]> ZoneTypeLookup { get; }
 }

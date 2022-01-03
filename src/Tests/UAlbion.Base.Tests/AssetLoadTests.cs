@@ -27,8 +27,7 @@ public class AssetLoadTests : IDisposable
     static AssetLoadTests()
     {
         var disk = new MockFileSystem(true);
-        var baseDir = ConfigUtil.FindBasePath(disk);
-        Exchange = AssetSystem.SetupSimple(baseDir, disk, Mapping);
+        Exchange = AssetSystem.SetupSimple(disk, Mapping);
     }
 
     public AssetLoadTests()
@@ -187,7 +186,7 @@ public class AssetLoadTests : IDisposable
                 Assert.Equal(EventText.Frill, e.TextSource);
                 Assert.Equal(7, e.SubId);
                 Assert.Equal(TextLocation.NoPortrait, e.Location);
-                Assert.Equal(CharacterId.None, e.CharacterId);
+                Assert.Equal(CharacterId.None, e.Speaker);
             }, // 2=>!: text EventText.Frill:7 NoPortrait None (0 0 0 0)
             x => { Assert.Equal(3, x.Id); Assert.Equal(4, x.Next.Id); }, // 3=>4: text EventText.Frill:1 NoPortrait None (0 0 0 0)
             x => { Assert.Equal(4, x.Id); Assert.Equal(5, x.Next.Id); }, // 4=>5: text EventText.Frill:2 PortraitLeft Npc.Branagh (0 0 0 0)
@@ -383,13 +382,13 @@ public class AssetLoadTests : IDisposable
 
         Assert.Equal(96, map.Npcs.Count);
         var n = map.Npcs[2];
-        Assert.Equal(AssetId.From(Npc.Christine), n.Id);
+        Assert.Equal(AssetId.From(EventSet.Christine), n.Id);
         Assert.Equal(AssetId.From(LargeNpc.Christine), n.SpriteOrGroup);
-        Assert.Equal(NpcFlags.Wander | NpcFlags.Unk3, n.Flags);
+        Assert.Equal(NpcType.Npc, n.Type);
+        Assert.Equal(NpcMoveA.Stationary, n.MovementA);
+        Assert.Equal(NpcFlags.Unk16, n.Flags);
         Assert.Equal(0xffff, n.Chain);
-        Assert.Equal(NpcMovementTypes.None, n.Movement);
-        Assert.Equal(1, n.Unk8);
-        Assert.Equal(0, n.Unk9);
+        Assert.Equal(NpcMoveB.None, n.MovementB);
         Assert.Equal(1152, n.Waypoints.Length);
 
         Assert.Equal(3768, map.Zones.Count);
@@ -444,14 +443,10 @@ public class AssetLoadTests : IDisposable
         var n = map.Npcs[2];
         Assert.Equal(AssetId.From(MonsterGroup.Empty), n.Id);
         Assert.Equal(new AssetId(AssetType.ObjectGroup, 68), n.SpriteOrGroup);
-        Assert.Equal(NpcFlags.Wander
-                     | NpcFlags.IsMonster
-                     | NpcFlags.Unk4
-                     | NpcFlags.Unk5, n.Flags);
+        Assert.Equal(NpcType.Monster2, n.Type);
+        Assert.Equal(NpcFlags.SimpleMsg | NpcFlags.Unk5 | NpcFlags.Unk16 | NpcFlags.Unk17, n.Flags);
         Assert.Equal(23, n.Chain);
-        Assert.Equal(NpcMovementTypes.Random1, n.Movement);
-        Assert.Equal(3, n.Unk8);
-        Assert.Equal(0, n.Unk9);
+        Assert.Equal(NpcMoveB.Random1, n.MovementB);
         Assert.Collection(n.Waypoints,
             x =>
             {
@@ -698,7 +693,7 @@ public class AssetLoadTests : IDisposable
         Assert.IsType<ShowMapEvent>(s[3]);
         Assert.IsType<CommentEvent>(s[4]);
         Assert.IsType<CommentEvent>(s[5]);
-        Assert.IsType<ContextTextEvent>(s[6]);
+        Assert.IsType<ScriptTextEvent>(s[6]);
         Assert.IsType<CommentEvent>(s[7]);
         Assert.IsType<CommentEvent>(s[8]);
         Assert.IsType<PartyMoveEvent>(s[9]);

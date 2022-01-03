@@ -459,7 +459,7 @@ public class FullDecompilationTests : IDisposable
         var zoneRefs = map.Zones.Where(x => x.Node != null).Select(x => x.Node.Id).ToHashSet();
         var refs = npcRefs.Union(zoneRefs).Except(map.Chains);
 
-        TestInner(map.Events, map.Chains, refs, testName);
+        TestInner(map.Events, id.ToMapText(), map.Chains, refs, testName);
     }
 
     static void TestEventSet(EventSetId id, [CallerMemberName] string testName = null)
@@ -474,11 +474,12 @@ public class FullDecompilationTests : IDisposable
         if (set.Events.Count == 0)
             return;
 
-        TestInner(set.Events, set.Chains, Array.Empty<ushort>(), testName);
+        TestInner(set.Events, id.ToEventText(), set.Chains, Array.Empty<ushort>(), testName);
     }
 
     static void TestInner<T>(
         IList<T> events,
+        AssetId contextId,
         IEnumerable<ushort> chains,
         IEnumerable<ushort> entryPoints,
         [CallerMemberName] string testName = null) where T : IEventNode
@@ -504,7 +505,7 @@ public class FullDecompilationTests : IDisposable
                 formatter.FormatGraphsAsBlocks(sb, new []  { decompiled }, 0);
                 scripts[index] = sb.ToString();
 
-                var roundTripLayout = ScriptCompiler.Compile(scripts[index], steps);
+                var roundTripLayout = AlbionCompiler.Compile(scripts[index], contextId, steps);
                 var expectedLayout = EventLayout.Build(new[] { graph });
 
                 if (!TestUtil.CompareLayout(roundTripLayout, expectedLayout, out var error))

@@ -17,7 +17,7 @@ public class ConversationManager : Component
 
     public ConversationManager()
     {
-        OnAsync<ContextTextEvent>(OnTextEvent);
+        OnAsync<ScriptTextEvent>(OnTextEvent);
         OnAsync<MapTextEvent>(OnBaseTextEvent);
         OnAsync<NpcTextEvent>(OnNpcTextEvent);
         OnAsync<PartyMemberTextEvent>(OnPartyMemberTextEvent);
@@ -32,7 +32,7 @@ public class ConversationManager : Component
 
     bool OnNpcTextEvent(NpcTextEvent e, Action continuation)
     {
-        var textEvent = new MapTextEvent(ContextTextSource, e.TextId, TextLocation.PortraitLeft, e.NpcId);
+        var textEvent = new MapTextEvent(ContextTextSource, e.TextId, TextLocation.PortraitLeft2, e.NpcId);
         return OnBaseTextEvent(textEvent, continuation);
     }
 
@@ -42,9 +42,9 @@ public class ConversationManager : Component
         return OnBaseTextEvent(textEvent, continuation);
     }
 
-    bool OnTextEvent(ContextTextEvent e, Action continuation)
+    bool OnTextEvent(ScriptTextEvent e, Action continuation)
     {
-        var textEvent = new MapTextEvent(ContextTextSource, e.TextId, e.Location, e.NpcId);
+        var textEvent = new MapTextEvent(ContextTextSource, e.TextId, e.Location, e.Speaker);
         return OnBaseTextEvent(textEvent, continuation);
     }
 
@@ -68,7 +68,7 @@ public class ConversationManager : Component
             case TextLocation.PortraitLeft2:
             case TextLocation.PortraitLeft3:
             {
-                var portraitId = GetPortrait(mapTextEvent.CharacterId);
+                var portraitId = GetPortrait(mapTextEvent.Speaker);
                 if (mapTextEvent.Location == TextLocation.PortraitLeft2) // TODO: ??? work out how this is meant to work.
                     portraitId = Base.Portrait.Rainer;
                 var text = tf.Ink(FontColor.Yellow).Format(mapTextEvent.ToId());

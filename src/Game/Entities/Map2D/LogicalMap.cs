@@ -56,8 +56,7 @@ public abstract class LogicalMap : Component
     public PaletteId PaletteId => _mapData.PaletteId;
     public IEnumerable<MapNpc> Npcs => _mapData.Npcs;
     public MapEventZone GetZone(int x, int y) => GetZone(Index(x, y));
-    public MapEventZone GetZone(int index) => _mapData.ZoneLookup.TryGetValue(index, out var zone) ? zone : null;
-
+    public MapEventZone GetZone(int index) => _mapData.GetZone(index);
 
     public void Modify(byte x, byte y, IconChangeType changeType, ushort value, bool isTemporary)
     {
@@ -66,11 +65,7 @@ public abstract class LogicalMap : Component
         collection.Update(Id, x, y, changeType, value);
     }
 
-    public IEnumerable<MapEventZone> GetZonesOfType(TriggerTypes triggerType)
-    {
-        var matchingKeys = _mapData.ZoneTypeLookup.Keys.Where(x => (x & triggerType) == triggerType);
-        return matchingKeys.SelectMany(x => _mapData.ZoneTypeLookup[x]);
-    }
+    public IEnumerable<MapEventZone> GetZonesOfType(TriggerTypes triggerType) => _mapData.GetZonesOfType(triggerType);
 
     void ApplyChange(byte x, byte y, IconChangeType changeType, ushort value)
     {
@@ -83,10 +78,10 @@ public abstract class LogicalMap : Component
             case IconChangeType.Ceiling: break; // N/A for 2D map
             case IconChangeType.NpcMovement: break;
             case IconChangeType.NpcSprite: break;
-            case IconChangeType.Chain: ChangeTileEventChain(x, y, value); break;
+            case IconChangeType.Chain: _mapData.SetZoneChain(x, y, value); break;
             case IconChangeType.BlockHard: PlaceBlock(x, y, value, true); break;
             case IconChangeType.BlockSoft: PlaceBlock(x, y, value, false); break;
-            case IconChangeType.Trigger: ChangeTileEventTrigger(x, y, value); break;
+            case IconChangeType.Trigger: _mapData.SetZoneTrigger(x, y, (TriggerTypes)value); break;
             default: throw new ArgumentOutOfRangeException(nameof(changeType), changeType, $"Unexpected change type \"{changeType}\"");
         }
     }
@@ -100,34 +95,6 @@ public abstract class LogicalMap : Component
 
     protected virtual void ChangeNpcMovement(byte x, byte y, ushort value) { } // TODO
     protected virtual void ChangeNpcSprite(byte x, byte y, ushort value) { } // TODO
-
-    void ChangeTileEventChain(byte x, byte y, ushort value)
-    {
-        var index = Index(x, y);
-        _mapData.ZoneLookup.TryGetValue(index, out var zone);
-        if (zone == null)
-            return;
-
-        if (value >= _mapData.Chains.Count)
-        {
-            _mapData.ZoneLookup.Remove(index);
-            _mapData.Zones.Remove(zone);
-        }
-        else
-        {
-            zone.ChainSource = _mapData.Id;
-            zone.Chain = value;
-            var firstEventId = _mapData.Chains[value];
-            zone.Node = firstEventId >= _mapData.Events.Count ? null : _mapData.Events[firstEventId];
-        }
-    }
-
-    void ChangeTileEventTrigger(byte x, byte y, ushort value)
-    {
-        _mapData.ZoneLookup.TryGetValue(Index(x, y), out var zone);
-        if(zone != null)
-            zone.Trigger = (TriggerTypes)value;
-    }
 
     protected void OnDirty(int x, int y, IconChangeType type) => Dirty?.Invoke(this, new DirtyTileEventArgs(x, y, type));
 }

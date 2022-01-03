@@ -44,5 +44,5 @@ public enum TileFlags : uint
     Unused28   = 1 << 28, // 0x10000000  
     Unused29   = 1 << 29, // 0x20000000  
     Unused30   = 1 << 30, // 0x40000000  
-    Unused31   = 0x8000000, // 80000000
+    Unused31   = 1U << 31, // 80000000
 }

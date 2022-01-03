@@ -209,10 +209,8 @@ static class DumpText
 
                 sw.Write($"    Npc{j:D3}: {idText} ({npc.Id.Id:D3}) ");
                 sw.Write($"X:{wp.X:D3} Y:{wp.Y:D3} ");
-                sw.Write($"U8:{npc.Unk8} ");
-                sw.Write($"U9:{npc.Unk9} ");
                 sw.Write($"F{(int)npc.Flags:X2}:({npc.Flags}) ");
-                sw.Write($"M:{npc.Movement} ");
+                sw.Write($"M:{npc.MovementB} ");
                 sw.Write($"S:{npc.Sound} ({(int?)npc.Sound}) ");
                 switch (map.MapType)
                 {

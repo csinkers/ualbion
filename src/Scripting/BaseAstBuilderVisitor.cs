@@ -8,6 +8,19 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
 {
     public ICfgNode Result { get; private set; }
 
+    public ControlFlowGraph Apply(ControlFlowGraph graph)
+    {
+        foreach (var index in graph.GetDfsOrder())
+        {
+            var node = graph.Nodes[index];
+            node.Accept(this);
+            if (Result != null)
+                graph = graph.ReplaceNode(index, Result);
+        }
+
+        return graph;
+    }
+
     public void Visit(SingleEvent e) => Result = Build(e);
     public void Visit(BinaryOp binaryOp) => Result = Build(binaryOp);
     public void Visit(BreakStatement breakStatement) => Result = Build(breakStatement);

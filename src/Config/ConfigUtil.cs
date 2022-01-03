@@ -12,14 +12,19 @@ public static class ConfigUtil
     {
         if (disk == null) throw new ArgumentNullException(nameof(disk));
 
+        static string Probe(string start, IFileSystem disk)
+        {
+            var curDir = new DirectoryInfo(start ?? throw new InvalidOperationException());
+
+            while (curDir != null && !disk.FileExists(Path.Combine(curDir.FullName, "data", "config.json")))
+                curDir = curDir.Parent;
+
+            return curDir?.FullName;
+        }
+
         var exeLocation = Assembly.GetExecutingAssembly().Location;
-        var curDir = new DirectoryInfo(Path.GetDirectoryName(exeLocation) ?? throw new InvalidOperationException());
-
-        while (curDir != null && !disk.FileExists(Path.Combine(curDir.FullName, "data", "config.json")))
-            curDir = curDir.Parent;
-
-        var baseDir = curDir?.FullName;
-        return baseDir;
+        var result = Probe(Path.GetDirectoryName(exeLocation), disk) ?? Probe(disk.CurrentDirectory, disk);
+        return result;
     }
 
     static readonly char[] OneSlash = { '/' };

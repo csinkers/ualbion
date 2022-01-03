@@ -3,7 +3,7 @@
 namespace UAlbion.Formats.Assets.Maps;
 
 [Flags]
-public enum NpcMovementTypes : byte
+public enum NpcMoveB : byte
 {
     None = 0,
     RandomMask = 3,

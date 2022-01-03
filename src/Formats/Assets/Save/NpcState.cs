@@ -95,7 +95,8 @@ public class NpcState
         npc.Unk7C = s.UInt16(nameof(Unk7C), npc.Unk7C);
         npc.Unk7E = s.UInt16(nameof(Unk7E), npc.Unk7E);
 
-        var assetType = (npc.Flags & NpcFlags.IsMonster) != 0 ? AssetType.MonsterGroup : AssetType.Npc;
+        // TODO
+        var assetType = MapNpc.AssetTypeForNpcType(npc.Type);
         npc.Id = AssetId.FromDisk(assetType, id, c.mapping);
 
         ApiUtil.Assert(s.Offset == startOffset + 0x80);
@@ -103,7 +104,7 @@ public class NpcState
         return npc;
     }
 
-    public NpcId Id { get; set; } // 0
+    public AssetId Id { get; set; } // 0
     public AssetId SpriteOrGroup { get; set; } // 2
     public ushort Unk4 { get; set; } // 4
     public ushort Unk6 { get; set; } // 6. Always 0?
@@ -173,8 +174,10 @@ public class NpcState
     public ushort Unk7E { get; set; }
 
 
+    public NpcType Type { get; } = 0; // TODO
     public NpcFlags Flags { get; } = 0; // TODO: Find which Unk this is
-    public NpcMovementTypes Movement { get; } = 0; // TODO: Find which Unk this is
+    public NpcMoveA MovementA { get; } = 0; // TODO: Find which Unk this is
+    public NpcMoveB MovementB { get; } = 0; // TODO: Find which Unk this is
 
     public override string ToString() =>
         $@"{Id} O:{SpriteOrGroup}

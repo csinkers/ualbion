@@ -81,7 +81,7 @@ public class MapData3D : BaseMapData
 
         map.Npcs ??= new List<MapNpc>();
         while (map.Npcs.Count < npcCount)
-            map.Npcs.Add(MapNpc.CreateInactive(map.Npcs.Count));
+            map.Npcs.Add(new MapNpc());
 
         map.Npcs = s.List(
             nameof(Npcs),

@@ -182,11 +182,11 @@ public class EventRoundTripTests
     [Fact]
     public void ChangeIcon()
     {
-        Test(("change_icon 1 1 AbsPerm BlockHard 0 1", new ChangeIconEvent(1, 1, EventScopes.AbsPerm, IconChangeType.BlockHard, 0, 1)),
-            ("change_icon 1 1 AbsPerm BlockHard 1 0", new ChangeIconEvent(1, 1, EventScopes.AbsPerm, IconChangeType.BlockHard, 1, 0)),
-            ("change_icon 1 1 RelPerm BlockHard 1", new ChangeIconEvent(1, 1, EventScopes.RelPerm, IconChangeType.BlockHard, 1, 3)),
-            ("change_icon 1 1 RelTemp BlockHard 1 2", new ChangeIconEvent(1, 1, EventScopes.RelTemp, IconChangeType.BlockHard, 1,  2)),
-            ("change_icon 1 1 AbsTemp BlockHard 1 0", new ChangeIconEvent(1, 1, EventScopes.AbsTemp, IconChangeType.BlockHard, 1, 0)));
+        Test(("change_icon 1 1 AbsPerm BlockHard 0 Underlay", new ChangeIconEvent(1, 1, EventScope.AbsPerm, IconChangeType.BlockHard, 0, ChangeIconLayers.Underlay)),
+            ("change_icon 1 1 AbsPerm BlockHard 1 0", new ChangeIconEvent(1, 1, EventScope.AbsPerm, IconChangeType.BlockHard, 1, 0)),
+            ("change_icon 1 1 RelPerm BlockHard 1", new ChangeIconEvent(1, 1, EventScope.RelPerm, IconChangeType.BlockHard, 1, ChangeIconLayers.Underlay | ChangeIconLayers.Overlay)),
+            ("change_icon 1 1 RelTemp BlockHard 1 Overlay", new ChangeIconEvent(1, 1, EventScope.RelTemp, IconChangeType.BlockHard, 1,  ChangeIconLayers.Overlay)),
+            ("change_icon 1 1 AbsTemp BlockHard 1 0", new ChangeIconEvent(1, 1, EventScope.AbsTemp, IconChangeType.BlockHard, 1, 0)));
     }
 
     [Fact]

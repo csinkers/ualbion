@@ -58,7 +58,7 @@ public abstract class MapEvent : Event, IMapEvent
         {
             MapEventType.Action => ActionEvent.Serdes((ActionEvent)e, mapping, s),
             MapEventType.AskSurrender => AskSurrenderEvent.Serdes((AskSurrenderEvent)e, s),
-            MapEventType.ChangeIcon => ChangeIconEvent.Serdes((ChangeIconEvent)e, s),
+            MapEventType.ChangeIcon => ChangeIconEvent.Serdes((ChangeIconEvent)e, mapping, s),
             MapEventType.ChangeUsedItem => ChangeUsedItemEvent.Serdes((ChangeUsedItemEvent)e, mapping, s),
             MapEventType.Chest => ChestEvent.Serdes((ChestEvent)e, mapping, s, textSourceId),
             MapEventType.CloneAutomap => CloneAutomapEvent.Serdes((CloneAutomapEvent)e, mapping, s),

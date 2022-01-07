@@ -159,8 +159,8 @@ public class FlatMap : Component, IMap
             return;
         }
 
-        bool relative = e.Scopes is EventScopes.RelPerm or EventScopes.RelTemp;
-        bool temp = e.Scopes is EventScopes.AbsTemp or EventScopes.RelTemp;
+        bool relative = e.Scope is EventScope.RelPerm or EventScope.RelTemp;
+        bool temp = e.Scope is EventScope.AbsTemp or EventScope.RelTemp;
 
         byte x = relative ? (byte)(e.X + context.Source.X) : (byte)e.X;
         byte y = relative ? (byte)(e.Y + context.Source.Y) : (byte)e.Y;

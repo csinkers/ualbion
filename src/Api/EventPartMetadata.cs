@@ -65,8 +65,6 @@ public class EventPartMetadata
                     typeof(object)),
                 instance).Compile();
 
-        return ApiUtil.IsFlagsEnum(property.PropertyType)
-            ? x => (getter(x)?.ToString() ?? "").Replace(", ", "|", StringComparison.InvariantCulture)
-            : getter;
+        return getter;
     }
 }

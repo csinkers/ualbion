@@ -1,6 +1,6 @@
 ﻿namespace UAlbion.Formats.MapEvents;
 
-public enum EventScopes : byte
+public enum EventScope : byte
 {
     AbsPerm = 0, // Absolute positioning, permanent lifetime
     RelPerm = 1, // Relative positioning (vs. absolute), permanent lifetime

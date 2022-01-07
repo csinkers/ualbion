@@ -121,7 +121,9 @@ public class EventMetadata
                 break;
             }
 
-            case Enum enumValue: sb.Append(enumValue); break;
+            case Enum enumValue:
+                sb.Append(enumValue.ToString().Replace(", ", "|", StringComparison.InvariantCulture)); 
+                break;
             default: sb.Append(value); break;
         }
     }

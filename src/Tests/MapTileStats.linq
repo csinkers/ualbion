@@ -1,28 +1,30 @@
 <Query Kind="Program">
-  <Reference Relative="..\..\build\UAlbion\bin\Debug\net5.0\UAlbion.Api.dll">C:\Depot\bb\ualbion\build\UAlbion\bin\Debug\net5.0\UAlbion.Api.dll</Reference>
-  <Reference Relative="..\..\build\UAlbion\bin\Debug\net5.0\UAlbion.Base.dll">C:\Depot\bb\ualbion\build\UAlbion\bin\Debug\net5.0\UAlbion.Base.dll</Reference>
-  <Reference Relative="..\..\build\UAlbion\bin\Debug\net5.0\UAlbion.Config.dll">C:\Depot\bb\ualbion\build\UAlbion\bin\Debug\net5.0\UAlbion.Config.dll</Reference>
-  <Reference Relative="..\..\build\UAlbion\bin\Debug\net5.0\UAlbion.Core.dll">C:\Depot\bb\ualbion\build\UAlbion\bin\Debug\net5.0\UAlbion.Core.dll</Reference>
-  <Reference Relative="..\..\build\UAlbion\bin\Debug\net5.0\UAlbion.dll">C:\Depot\bb\ualbion\build\UAlbion\bin\Debug\net5.0\UAlbion.dll</Reference>
-  <Reference Relative="..\..\build\UAlbion\bin\Debug\net5.0\UAlbion.Formats.dll">C:\Depot\bb\ualbion\build\UAlbion\bin\Debug\net5.0\UAlbion.Formats.dll</Reference>
-  <Reference Relative="..\..\build\UAlbion\bin\Debug\net5.0\UAlbion.Game.dll">C:\Depot\bb\ualbion\build\UAlbion\bin\Debug\net5.0\UAlbion.Game.dll</Reference>
+  <Reference Relative="..\..\build\UAlbion\bin\Debug\net6.0\UAlbion.Api.dll">C:\Depot\bb\ualbion\build\UAlbion\bin\Debug\net6.0\UAlbion.Api.dll</Reference>
+  <Reference Relative="..\..\build\UAlbion\bin\Debug\net6.0\UAlbion.Base.dll">C:\Depot\bb\ualbion\build\UAlbion\bin\Debug\net6.0\UAlbion.Base.dll</Reference>
+  <Reference Relative="..\..\build\UAlbion\bin\Debug\net6.0\UAlbion.Config.dll">C:\Depot\bb\ualbion\build\UAlbion\bin\Debug\net6.0\UAlbion.Config.dll</Reference>
+  <Reference Relative="..\..\build\UAlbion\bin\Debug\net6.0\UAlbion.Core.dll">C:\Depot\bb\ualbion\build\UAlbion\bin\Debug\net6.0\UAlbion.Core.dll</Reference>
+  <Reference Relative="..\..\build\UAlbion\bin\Debug\net6.0\UAlbion.dll">C:\Depot\bb\ualbion\build\UAlbion\bin\Debug\net6.0\UAlbion.dll</Reference>
+  <Reference Relative="..\..\build\UAlbion\bin\Debug\net6.0\UAlbion.Formats.dll">C:\Depot\bb\ualbion\build\UAlbion\bin\Debug\net6.0\UAlbion.Formats.dll</Reference>
+  <Reference Relative="..\..\build\UAlbion\bin\Debug\net6.0\UAlbion.Game.dll">C:\Depot\bb\ualbion\build\UAlbion\bin\Debug\net6.0\UAlbion.Game.dll</Reference>
   <Namespace>UAlbion</Namespace>
   <Namespace>UAlbion.Api</Namespace>
+  <Namespace>UAlbion.Base</Namespace>
   <Namespace>UAlbion.Config</Namespace>
   <Namespace>UAlbion.Core</Namespace>
   <Namespace>UAlbion.Formats</Namespace>
-  <Namespace>UAlbion.Formats.Config</Namespace>
-  <Namespace>UAlbion.Game.Settings</Namespace>
-  <Namespace>UAlbion.Base</Namespace>
-  <Namespace>UAlbion.Game</Namespace>
   <Namespace>UAlbion.Formats.Assets.Maps</Namespace>
+  <Namespace>UAlbion.Formats.Config</Namespace>
+  <Namespace>UAlbion.Game</Namespace>
+  <Namespace>UAlbion.Game.Settings</Namespace>
 </Query>
 
 const string baseDir = @"C:\Depot\bb\ualbion";
 
 void Main()
 {
-	var exchange = AssetSystem.SetupSimple(baseDir);
+	var disk = new FileSystem();
+	disk.CurrentDirectory = baseDir;
+	var exchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "Base");
 	var assets = exchange.Resolve<IAssetManager>();
 	var layerMap = new Dictionary<TileLayer, int>();
 	var typeMap = new Dictionary<TileType, int>();
@@ -35,12 +37,11 @@ void Main()
 	{
 		for (int i = 0; i < layer.Length; i++)
 		{
-
 			var tile = tileset.Tiles[layer[i]];
 			Set(isOverlay, layerMap, tile.Layer);
 			Set(isOverlay, typeMap, tile.Type);
-			foreach (var flag in SeparateFlags(tile.Flags))
-				Set(isOverlay, flagMap, flag);
+			// foreach (var flag in SeparateFlags(tile.Flags))
+			// 	Set(isOverlay, flagMap, flag);
 			Set(isOverlay, unk7Map, tile.Unk7);
 			Set(isOverlay, collisionMap, tile.Collision);
 			Set(isOverlay, depthMap, tile.Depth);

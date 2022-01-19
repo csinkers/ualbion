@@ -357,7 +357,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
             return;
 
         zone.Chain = value;
-        zone.Node = Events[Chains[value]];
+        zone.Node = value >= Chains.Count ? null : Events[Chains[value]];
     }
 
     public void SetZoneTrigger(byte x, byte y, TriggerTypes value)

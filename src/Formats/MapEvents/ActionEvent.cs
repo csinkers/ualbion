@@ -29,12 +29,11 @@ public class ActionEvent : MapEvent
         e ??= new ActionEvent();
         var assetType = actionType switch
         {
-            var x when
-                x == ActionType.AskAboutItem ||
-                x == ActionType.UseItem ||
-                x == ActionType.EquipItem ||
-                x == ActionType.UnequipItem ||
-                x == ActionType.PickupItem => AssetType.Item,
+            ActionType.AskAboutItem 
+                or ActionType.UseItem 
+                or ActionType.EquipItem 
+                or ActionType.UnequipItem 
+                or ActionType.PickupItem => AssetType.Item,
             ActionType.Word => AssetType.Word,
             ActionType.DialogueLine => AssetType.Unknown,
             _ => AssetType.Unknown

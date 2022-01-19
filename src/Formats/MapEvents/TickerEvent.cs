@@ -29,7 +29,7 @@ public class TickerEvent : ModifyEvent
         int zeroed = s.UInt8(null, 0);
         e.TickerId = TickerId.SerdesU16(nameof(TickerId), e.TickerId, mapping, s);
         zeroed += s.UInt16(null, 0);
-        ApiUtil.Assert(e.Unk4 == 0 || e.Unk4 == 1);
+        ApiUtil.Assert(e.Unk4 is 0 or 1);
         s.Assert(zeroed == 0, "TickerEvent: Expected fields 5, 8 to be 0");
         return e;
     }

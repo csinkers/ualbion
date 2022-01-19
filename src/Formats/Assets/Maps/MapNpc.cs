@@ -6,18 +6,8 @@ using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets.Maps;
 
-public class MapNpc
+public class MapNpc // 0xA = 10 bytes
 {
-    public static Func<MapNpc, bool> EmitWaypointsFunc = x =>
-    {
-        //if ((x.Flags & NpcFlags.Unk16) != 0)
-            return (x.MovementB & NpcMoveB.RandomMask) == 0;
-
-        //if (x.MovementA == NpcMoveA.FollowWaypoints)
-        //    return true;
-        //return false;
-    };
-
     public const int SizeOnDisk = 10;
     public const int WaypointCount = 0x480;
 
@@ -81,6 +71,11 @@ public class MapNpc
         set => Node = value == 0xffff ? null : new DummyEventNode(value);
     }
 
+    public bool HasWaypoints(MapFlags mapFlags) =>
+        (mapFlags & MapFlags.NpcMovementMode) != 0
+            ? MovementB is NpcMoveB.Waypoints or NpcMoveB.Waypoints2
+            : MovementA == NpcMoveA.FollowWaypoints;
+
     public static MapNpc Serdes(int _, MapNpc existing, MapType mapType, AssetMapping mapping, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
@@ -125,19 +120,10 @@ public class MapNpc
             _ => AssetType.EventSet
         };
 
-    public void LoadWaypoints(ISerializer s)
+    public void LoadWaypoints(ISerializer s, bool useWaypoints)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (!EmitWaypointsFunc(this))
-        {
-            var wp = Waypoints?[0];
-            byte x = wp?.X ?? 0;
-            byte y = wp?.Y ?? 0;
-            x = s.UInt8("X", x);
-            y = s.UInt8("Y", y);
-            Waypoints = new[] { new NpcWaypoint(x, y) };
-        }
-        else
+        if (useWaypoints)
         {
             Waypoints ??= new NpcWaypoint[WaypointCount];
             for (int i = 0; i < Waypoints.Length; i++)
@@ -146,6 +132,15 @@ public class MapNpc
                 byte y = s.UInt8("y", Waypoints[i].Y);
                 Waypoints[i] = new NpcWaypoint(x, y);
             }
+        }
+        else
+        {
+            var wp = Waypoints?[0];
+            byte x = wp?.X ?? 0;
+            byte y = wp?.Y ?? 0;
+            x = s.UInt8("X", x);
+            y = s.UInt8("Y", y);
+            Waypoints = new[] { new NpcWaypoint(x, y) };
         }
     }
 

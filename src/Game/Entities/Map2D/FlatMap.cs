@@ -135,8 +135,8 @@ public class FlatMap : Component, IMap
 
     void OnPlayerEnteredTile(PlayerEnteredTileEvent e)
     {
-        MapEventZone zone;
-        while (true)
+        MapEventZone zone = null;
+        for (int i = 0; i < 255; i++) // Offset chains should have no need to ever be longer than the map width/height.
         {
             zone = _logicalMap.GetZone(e.X, e.Y);
             if (zone?.Node == null || !zone.Trigger.HasFlag(TriggerTypes.Normal))
@@ -145,6 +145,12 @@ public class FlatMap : Component, IMap
             if (zone.Node.Event is not OffsetEvent offset)
                 break;
             e = new PlayerEnteredTileEvent(e.X + offset.X, e.Y + offset.Y);
+        }
+
+        if (zone == null)
+        {
+            Error($"Encountered infinite offset event loop including ({e.X}, {e.Y})");
+            return;
         }
 
         Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Normal, e.X, e.Y)));

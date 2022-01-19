@@ -176,7 +176,7 @@ public class AssetLoadTests : IDisposable
                 Assert.Equal(3, bn.NextIfFalse.Id);
                 var e = (QueryEventUsedEvent)x.Event;
                 Assert.Equal(QueryType.EventUsed, e.QueryType);
-                Assert.Equal(QueryOperation.IsTrue, e.Operation);
+                Assert.Equal(QueryOperation.AlwaysFalse, e.Operation);
             }, // !1?2:3: query EventAlreadyUsed 0 (IsTrue 0)
             x =>
             {
@@ -358,7 +358,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(Song.Toronto, map.SongId);
         Assert.Equal(Tileset.Toronto, map.TilesetId);
         Assert.Equal(Palette.Toronto2D, map.PaletteId);
-        Assert.Equal(FlatMapFlags.Unk2 | FlatMapFlags.Unk3 | FlatMapFlags.Unk4, map.Flags);
+        Assert.Equal(MapFlags.Unk4 | MapFlags.Unk8 | MapFlags.Unk10 | MapFlags.NpcMovementMode | MapFlags.ExtraNpcs, map.Flags);
         Assert.Equal(map.Width * map.Height, map.Underlay.Length);
         Assert.Equal(871, map.Underlay[0]);
         Assert.Equal(349, map.Underlay[75]);
@@ -388,11 +388,11 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(NpcMoveA.Stationary, n.MovementA);
         Assert.Equal(NpcFlags.Unk16, n.Flags);
         Assert.Equal(0xffff, n.Chain);
-        Assert.Equal(NpcMoveB.None, n.MovementB);
+        Assert.Equal(NpcMoveB.Waypoints, n.MovementB);
         Assert.Equal(1152, n.Waypoints.Length);
 
-        Assert.Equal(3768, map.Zones.Count);
-        var z = map.Zones[0];
+        var initZones = map.GetZonesOfType(TriggerTypes.MapInit);
+        var z = initZones.First();
         Assert.Equal(24, z.Chain);
         Assert.True(z.Global);
         Assert.Equal(TriggerTypes.MapInit, z.Trigger);
@@ -414,7 +414,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(Labyrinth.Argim, map.LabDataId);
         Assert.Equal(64, map.AutomapGraphics.Length);
         Assert.Equal(Song.DungeonAmbient, map.AmbientSongId);
-        Assert.Equal(Map3DFlags.Unk0 | Map3DFlags.Unk2, map.Flags);
+        Assert.Equal(MapFlags.Unk1 | MapFlags.Unk4 | MapFlags.NpcMovementMode | MapFlags.ExtraNpcs, map.Flags);
         Assert.Equal(map.Width * map.Height, map.Ceilings.Length);
         Assert.Equal(2, map.Ceilings[101]);
         Assert.Equal(map.Width * map.Height, map.Floors.Length);
@@ -454,8 +454,7 @@ public class AssetLoadTests : IDisposable
                 Assert.Equal(12, x.Y);
             });
 
-        Assert.Equal(355, map.Zones.Count);
-        var z = map.Zones[6];
+        var z = map.GetZone(72, 3);
         Assert.Equal(15, z.Chain);
         Assert.False(z.Global);
         Assert.Equal(TriggerTypes.Normal | TriggerTypes.Examine | TriggerTypes.UseItem, z.Trigger);
@@ -504,24 +503,24 @@ public class AssetLoadTests : IDisposable
     public void MonsterTest()
     {
         var m = Test(assets => assets.LoadSheet(Monster.Krondir1));
-        Assert.Equal(990, m.Magic.SpellPointsMax);
+        Assert.Equal(990, m.Magic.SpellPoints.Max);
         Assert.Empty(m.Magic.SpellStrengths);
-        Assert.Equal(36, m.Attributes.Strength);
-        Assert.Equal(50, m.Attributes.Intelligence);
-        Assert.Equal(15, m.Attributes.Dexterity);
-        Assert.Equal(15, m.Attributes.Speed);
-        Assert.Equal(99, m.Attributes.StrengthMax);
-        Assert.Equal(99, m.Attributes.IntelligenceMax);
-        Assert.Equal(99, m.Attributes.DexterityMax);
-        Assert.Equal(99, m.Attributes.SpeedMax);
-        Assert.Equal(99, m.Attributes.MagicResistanceMax);
-        Assert.Equal(99, m.Attributes.MagicTalentMax);
-        Assert.Equal(65, m.Skills.CloseCombat);
-        Assert.Equal(99, m.Skills.CloseCombatMax);
-        Assert.Equal(99, m.Skills.RangedCombatMax);
-        Assert.Equal(99, m.Skills.CriticalChanceMax);
-        Assert.Equal(32, m.Combat.LifePoints);
-        Assert.Equal(990, m.Combat.LifePointsMax);
+        Assert.Equal(36, m.Attributes.Strength.Current);
+        Assert.Equal(50, m.Attributes.Intelligence.Current);
+        Assert.Equal(15, m.Attributes.Dexterity.Current);
+        Assert.Equal(15, m.Attributes.Speed.Current);
+        Assert.Equal(99, m.Attributes.Strength.Max);
+        Assert.Equal(99, m.Attributes.Intelligence.Max);
+        Assert.Equal(99, m.Attributes.Dexterity.Max);
+        Assert.Equal(99, m.Attributes.Speed.Max);
+        Assert.Equal(99, m.Attributes.MagicResistance.Max);
+        Assert.Equal(99, m.Attributes.MagicTalent.Max);
+        Assert.Equal(65, m.Skills.CloseCombat.Current);
+        Assert.Equal(99, m.Skills.CloseCombat.Max);
+        Assert.Equal(99, m.Skills.RangedCombat.Max);
+        Assert.Equal(99, m.Skills.CriticalChance.Max);
+        Assert.Equal(32, m.Combat.LifePoints.Current);
+        Assert.Equal(990, m.Combat.LifePoints.Max);
         Assert.Equal(1, m.Combat.ActionPoints);
         Assert.Equal(Monster.Krondir1, m.Id);
         Assert.Equal("", m.EnglishName);
@@ -532,17 +531,17 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(PlayerClass.Monster, m.PlayerClass);
         Assert.Equal(PlayerLanguages.None, m.Languages);
         Assert.Equal(10, m.Level);
-        Assert.Equal(10, m.Unknown11);
-        Assert.Equal(1, m.Unknown12);
-        Assert.Equal(1, m.Unknown13);
-        Assert.Equal(1, m.Unknown14);
-        Assert.Equal(75, m.Unknown15);
-        Assert.Equal(180, m.Unknown20);
+        Assert.Equal(MonsterGraphics.Krondir, m.MonsterGfxId);
+        Assert.Equal(1, m.UnkownC);
+        Assert.Equal(1, m.UnkownD);
+        Assert.Equal(1, m.UnknownE);
+        Assert.Equal(75, m.Morale);
+        Assert.Equal(180, m.ExperienceReward);
         Assert.Equal(21, m.UnknownDA);
-        Assert.Equal(8, m.UnknownE2);
-        Assert.Equal(99, m.UnknownE4);
-        Assert.Equal(99u, m.UnknownE6);
-        Assert.Equal(480, m.UnknownFA);
+        Assert.Equal(8, m.LevelsPerActionPoint);
+        Assert.Equal(99, m.LifePointsPerLevel);
+        Assert.Equal(99u, m.SpellPointsPerLevel);
+        Assert.Equal(480, m.Weight);
     }
 
     [Fact]
@@ -567,37 +566,37 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(PlayerClass.Pilot, n.PlayerClass);
         Assert.Equal(PlayerLanguages.Terran, n.Languages);
 
-        Assert.Equal(0, n.Magic.SpellPointsMax);
+        Assert.Equal(0, n.Magic.SpellPoints.Max);
         Assert.Empty(n.Magic.SpellStrengths);
-        Assert.Equal(0, n.Attributes.Strength);
-        Assert.Equal(0, n.Attributes.Intelligence);
-        Assert.Equal(0, n.Attributes.Dexterity);
-        Assert.Equal(0, n.Attributes.Speed);
-        Assert.Equal(0, n.Attributes.StrengthMax);
-        Assert.Equal(0, n.Attributes.IntelligenceMax);
-        Assert.Equal(0, n.Attributes.DexterityMax);
-        Assert.Equal(0, n.Attributes.SpeedMax);
-        Assert.Equal(0, n.Attributes.MagicResistanceMax);
-        Assert.Equal(0, n.Attributes.MagicTalentMax);
-        Assert.Equal(0, n.Skills.CloseCombat);
-        Assert.Equal(0, n.Skills.CloseCombatMax);
-        Assert.Equal(0, n.Skills.RangedCombatMax);
-        Assert.Equal(0, n.Skills.CriticalChanceMax);
-        Assert.Equal(0, n.Combat.LifePoints);
-        Assert.Equal(0, n.Combat.LifePointsMax);
+        Assert.Equal(0, n.Attributes.Strength.Current);
+        Assert.Equal(0, n.Attributes.Intelligence.Current);
+        Assert.Equal(0, n.Attributes.Dexterity.Current);
+        Assert.Equal(0, n.Attributes.Speed.Current);
+        Assert.Equal(0, n.Attributes.Strength.Max);
+        Assert.Equal(0, n.Attributes.Intelligence.Max);
+        Assert.Equal(0, n.Attributes.Dexterity.Max);
+        Assert.Equal(0, n.Attributes.Speed.Max);
+        Assert.Equal(0, n.Attributes.MagicResistance.Max);
+        Assert.Equal(0, n.Attributes.MagicTalent.Max);
+        Assert.Equal(0, n.Skills.CloseCombat.Current);
+        Assert.Equal(0, n.Skills.CloseCombat.Max);
+        Assert.Equal(0, n.Skills.RangedCombat.Max);
+        Assert.Equal(0, n.Skills.CriticalChance.Max);
+        Assert.Equal(0, n.Combat.LifePoints.Current);
+        Assert.Equal(0, n.Combat.LifePoints.Max);
         Assert.Equal(0, n.Combat.ActionPoints);
         Assert.Equal(0, n.Level);
-        Assert.Equal(0, n.Unknown11);
-        Assert.Equal(0, n.Unknown12);
-        Assert.Equal(0, n.Unknown13);
-        Assert.Equal(0, n.Unknown14);
-        Assert.Equal(0, n.Unknown15);
-        Assert.Equal(0, n.Unknown20);
+        Assert.Equal(SpriteId.None, n.MonsterGfxId);
+        Assert.Equal(0, n.UnkownC);
+        Assert.Equal(0, n.UnkownD);
+        Assert.Equal(0, n.UnknownE);
+        Assert.Equal(0, n.Morale);
+        Assert.Equal(0, n.ExperienceReward);
         Assert.Equal(0, n.UnknownDA);
-        Assert.Equal(0, n.UnknownE2);
-        Assert.Equal(0, n.UnknownE4);
-        Assert.Equal(0u, n.UnknownE6);
-        Assert.Equal(0, n.UnknownFA);
+        Assert.Equal(0, n.LevelsPerActionPoint);
+        Assert.Equal(0, n.LifePointsPerLevel);
+        Assert.Equal(0u, n.SpellPointsPerLevel);
+        Assert.Equal(0, n.Weight);
     }
 
     [Fact]
@@ -614,7 +613,7 @@ public class AssetLoadTests : IDisposable
     public void PartyMemberTest()
     {
         var t = Test(assets => assets.LoadSheet(PartyMember.Tom));
-        Assert.Equal(0, t.Magic.SpellPointsMax);
+        Assert.Equal(0, t.Magic.SpellPoints.Max);
         Assert.Empty(t.Magic.SpellStrengths);
 
         var s = t.Inventory.Slots;
@@ -625,51 +624,51 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(Item.Shoes, t.Inventory.Feet.ItemId);
         Assert.Equal(1, t.Inventory.Feet.Amount);
 
-        Assert.Equal(42, t.Attributes.Strength);
-        Assert.Equal(50, t.Attributes.Intelligence);
-        Assert.Equal(40, t.Attributes.Dexterity);
-        Assert.Equal(20, t.Attributes.Speed);
-        Assert.Equal(32, t.Attributes.Stamina);
-        Assert.Equal(10, t.Attributes.Luck);
-        Assert.Equal(70, t.Attributes.StrengthMax);
-        Assert.Equal(90, t.Attributes.IntelligenceMax);
-        Assert.Equal(90, t.Attributes.DexterityMax);
-        Assert.Equal(50, t.Attributes.SpeedMax);
-        Assert.Equal(65, t.Attributes.StaminaMax);
-        Assert.Equal(25, t.Attributes.LuckMax);
-        Assert.Equal(20, t.Attributes.MagicResistanceMax);
-        Assert.Equal(35, t.Skills.CloseCombat);
-        Assert.Equal(25, t.Skills.RangedCombat);
-        Assert.Equal(15, t.Skills.LockPicking);
-        Assert.Equal(80, t.Skills.CloseCombatMax);
-        Assert.Equal(70, t.Skills.RangedCombatMax);
-        Assert.Equal(8, t.Skills.CriticalChanceMax);
-        Assert.Equal(80, t.Skills.LockPickingMax);
+        Assert.Equal(42, t.Attributes.Strength.Current);
+        Assert.Equal(50, t.Attributes.Intelligence.Current);
+        Assert.Equal(40, t.Attributes.Dexterity.Current);
+        Assert.Equal(20, t.Attributes.Speed.Current);
+        Assert.Equal(32, t.Attributes.Stamina.Current);
+        Assert.Equal(10, t.Attributes.Luck.Current);
+        Assert.Equal(70, t.Attributes.Strength.Max);
+        Assert.Equal(90, t.Attributes.Intelligence.Max);
+        Assert.Equal(90, t.Attributes.Dexterity.Max);
+        Assert.Equal(50, t.Attributes.Speed.Max);
+        Assert.Equal(65, t.Attributes.Stamina.Max);
+        Assert.Equal(25, t.Attributes.Luck.Max);
+        Assert.Equal(20, t.Attributes.MagicResistance.Max);
+        Assert.Equal(35, t.Skills.CloseCombat.Current);
+        Assert.Equal(25, t.Skills.RangedCombat.Current);
+        Assert.Equal(15, t.Skills.LockPicking.Current);
+        Assert.Equal(80, t.Skills.CloseCombat.Max);
+        Assert.Equal(70, t.Skills.RangedCombat.Max);
+        Assert.Equal(8, t.Skills.CriticalChance.Max);
+        Assert.Equal(80, t.Skills.LockPicking.Max);
         Assert.Equal(150, t.Combat.ExperiencePoints);
         Assert.Equal(9, t.Combat.TrainingPoints);
-        Assert.Equal(12, t.Combat.LifePoints);
-        Assert.Equal(12, t.Combat.LifePointsMax);
+        Assert.Equal(12, t.Combat.LifePoints.Current);
+        Assert.Equal(12, t.Combat.LifePoints.Max);
         Assert.Equal(1, t.Combat.ActionPoints);
-        Assert.Equal(25, t.Combat.Damage);
+        Assert.Equal(25, t.Combat.UnknownD8);
         Assert.Equal(PartyMember.Tom, t.Id);
         Assert.Equal("", t.EnglishName);
         Assert.Equal("Tom", t.GermanName);
         Assert.Equal("", t.FrenchName);
-        Assert.Equal(28, t.Age);
+        Assert.Equal(28, t.Age.Current);
         Assert.Equal(3, t.Level);
         Assert.Equal(PlayerLanguages.Terran, t.Languages);
         Assert.Equal(LargePartyMember.Tom, t.SpriteId);
         Assert.Equal(Portrait.Tom, t.PortraitId);
         Assert.Equal(EventSet.Tom, t.EventSetId);
         Assert.Equal(1, t.Unknown6);
-        Assert.Equal(1, t.Unknown11);
-        Assert.Equal(2, t.Unknown14);
-        Assert.Equal(80, t.Unknown6C);
-        Assert.Equal(12, t.UnknownDC);
-        Assert.Equal(10, t.UnknownE2);
-        Assert.Equal(4, t.UnknownE4);
-        Assert.Equal(3u, t.UnknownEA);
-        Assert.Equal(2690, t.UnknownFA);
+        Assert.Equal(1, t.MonsterGfxId.Id);
+        Assert.Equal(0, t.UnkownC);
+        Assert.Equal(2, t.UnknownE);
+        Assert.Equal(0, t.UnknownDE);
+        Assert.Equal(10, t.LevelsPerActionPoint);
+        Assert.Equal(4, t.LifePointsPerLevel);
+        Assert.Equal(3, t.TrainingPointsPerLevel);
+        Assert.Equal(2690, t.Weight);
     }
 
     [Fact]

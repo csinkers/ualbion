@@ -91,7 +91,7 @@ public class InventorySummaryPage : UiElement // Summary
             yield return block;
         }
 
-        if (member.Apparent.Magic.SpellPointsMax > 0)
+        if (member.Apparent.Magic.SpellPoints.Max > 0)
         {
             foreach (var block in tf.Format(Base.SystemText.Inv1_SpellPoints).GetBlocks())
             {
@@ -123,17 +123,13 @@ public class InventorySummaryPage : UiElement // Summary
         if (member == null)
             yield break;
 
-        yield return new TextBlock($"{member.Apparent.Combat.LifePoints}/{member.Apparent.Combat.LifePointsMax}") { ArrangementFlags = TextArrangementFlags.NoWrap };
+        var lp = member.Apparent.Combat.LifePoints;
+        var sp = member.Apparent.Magic.SpellPoints;
+        var flags = TextArrangementFlags.ForceNewLine | TextArrangementFlags.NoWrap;
 
-        yield return new TextBlock(
-            member.Apparent.Magic.SpellPointsMax > 0
-                ? $"{member.Apparent.Magic.SpellPoints}/{member.Apparent.Magic.SpellPointsMax}"
-                : "")
-        {
-            ArrangementFlags = TextArrangementFlags.ForceNewLine | TextArrangementFlags.NoWrap
-        };
-
-        yield return new TextBlock($"{member.Apparent.Combat.ExperiencePoints}") { ArrangementFlags = TextArrangementFlags.ForceNewLine | TextArrangementFlags.NoWrap };
-        yield return new TextBlock($"{member.Apparent.Combat.TrainingPoints}") { ArrangementFlags = TextArrangementFlags.ForceNewLine | TextArrangementFlags.NoWrap };
+        yield return new TextBlock($"{lp.Current}/{lp.Max}") { ArrangementFlags = TextArrangementFlags.NoWrap };
+        yield return new TextBlock(sp.Max > 0 ? $"{sp.Current}/{sp.Max}" : "") { ArrangementFlags = flags };
+        yield return new TextBlock($"{member.Apparent.Combat.ExperiencePoints}") { ArrangementFlags = flags };
+        yield return new TextBlock($"{member.Apparent.Combat.TrainingPoints}") { ArrangementFlags = flags };
     }
 }

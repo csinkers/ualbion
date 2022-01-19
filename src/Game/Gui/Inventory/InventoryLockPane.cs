@@ -92,7 +92,7 @@ public class InventoryLockPane : UiElement
     void CanPick(IPlayer player, Action<bool> continuation)
     {
         var skill = player.Effective.Skills.LockPicking;
-        if (skill == 0)
+        if (skill.Current == 0)
         {
             continuation(false);
             return;
@@ -100,7 +100,7 @@ public class InventoryLockPane : UiElement
 
         // TODO: Determine the actual probabilities the game uses.
         var baseChance = (100.0f - _lockEvent.PickDifficulty) / 100.0f;
-        var adjusted = baseChance * skill;
+        var adjusted = baseChance * skill.Current;
         RaiseAsync(new QueryRandomChanceEvent((ushort)adjusted, QueryOperation.GreaterThan, 0), continuation);
     }
 

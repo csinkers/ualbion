@@ -14,6 +14,7 @@ public class QueryRandomChanceEvent : QueryEvent
     QueryRandomChanceEvent() { }
     public QueryRandomChanceEvent(ushort argument, QueryOperation operation, byte immediate)
     {
+        // argument compared against random number in range [0..100]
         Operation = operation;
         Immediate = immediate;
         Argument = argument;

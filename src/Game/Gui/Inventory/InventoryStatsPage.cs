@@ -70,21 +70,21 @@ public class InventoryStatsPage : UiElement // Stats
                 new Spacing(2,0),
                 new VerticalStack(
                     new Spacing(105, 0),
-                    Progress(Base.SystemText.Attrib_Strength, x => x.Attributes.Strength, x => x.Attributes.StrengthMax),
+                    Progress(Base.SystemText.Attrib_Strength, x => x.Attributes.Strength.Current, x => x.Attributes.Strength.Max),
                     new Spacing(0,3),
-                    Progress(Base.SystemText.Attrib_Intelligence, x => x.Attributes.Intelligence, x => x.Attributes.IntelligenceMax),
+                    Progress(Base.SystemText.Attrib_Intelligence, x => x.Attributes.Intelligence.Current, x => x.Attributes.Intelligence.Max),
                     new Spacing(0,3),
-                    Progress(Base.SystemText.Attrib_Dexterity, x => x.Attributes.Dexterity, x => x.Attributes.DexterityMax),
+                    Progress(Base.SystemText.Attrib_Dexterity, x => x.Attributes.Dexterity.Current, x => x.Attributes.Dexterity.Max),
                     new Spacing(0,3),
-                    Progress(Base.SystemText.Attrib_Speed, x => x.Attributes.Speed, x => x.Attributes.SpeedMax),
+                    Progress(Base.SystemText.Attrib_Speed, x => x.Attributes.Speed.Current, x => x.Attributes.Speed.Max),
                     new Spacing(0,3),
-                    Progress(Base.SystemText.Attrib_Stamina, x => x.Attributes.Stamina, x => x.Attributes.StaminaMax),
+                    Progress(Base.SystemText.Attrib_Stamina, x => x.Attributes.Stamina.Current, x => x.Attributes.Stamina.Max),
                     new Spacing(0,3),
-                    Progress(Base.SystemText.Attrib_Luck, x => x.Attributes.Luck, x => x.Attributes.LuckMax),
+                    Progress(Base.SystemText.Attrib_Luck, x => x.Attributes.Luck.Current, x => x.Attributes.Luck.Max),
                     new Spacing(0,3),
-                    Progress(Base.SystemText.Attrib_MagicResistance, x => x.Attributes.MagicResistance, x => x.Attributes.MagicResistanceMax),
+                    Progress(Base.SystemText.Attrib_MagicResistance, x => x.Attributes.MagicResistance.Current, x => x.Attributes.MagicResistance.Max),
                     new Spacing(0,3),
-                    Progress(Base.SystemText.Attrib_MagicTalent, x => x.Attributes.MagicTalent, x => x.Attributes.MagicTalentMax)
+                    Progress(Base.SystemText.Attrib_MagicTalent, x => x.Attributes.MagicTalent.Current, x => x.Attributes.MagicTalent.Max)
                 )
             ),
             new Header(Base.SystemText.Inv2_Skills),
@@ -101,13 +101,13 @@ public class InventoryStatsPage : UiElement // Stats
                 new Spacing(2,0),
                 new VerticalStack(
                     new Spacing(105, 0),
-                    Progress(Base.SystemText.Skill_CloseRangeCombat, x => x.Skills.CloseCombat, x => x.Skills.CloseCombatMax),
+                    Progress(Base.SystemText.Skill_CloseRangeCombat, x => x.Skills.CloseCombat.Current, x => x.Skills.CloseCombat.Max),
                     new Spacing(0,3),
-                    Progress(Base.SystemText.Skill_LongRangeCombat, x => x.Skills.RangedCombat, x => x.Skills.RangedCombatMax),
+                    Progress(Base.SystemText.Skill_LongRangeCombat, x => x.Skills.RangedCombat.Current, x => x.Skills.RangedCombat.Max),
                     new Spacing(0,3),
-                    Progress(Base.SystemText.Skill_CriticalHit, x => x.Skills.CriticalChance, x => x.Skills.CriticalChanceMax),
+                    Progress(Base.SystemText.Skill_CriticalHit, x => x.Skills.CriticalChance.Current, x => x.Skills.CriticalChance.Max),
                     new Spacing(0,3),
-                    Progress(Base.SystemText.Skill_Lockpicking, x => x.Skills.LockPicking, x => x.Skills.LockPickingMax)
+                    Progress(Base.SystemText.Skill_Lockpicking, x => x.Skills.LockPicking.Current, x => x.Skills.LockPicking.Max)
                 )
             )
         );

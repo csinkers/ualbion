@@ -15,15 +15,14 @@ public class InterpolatedCombat : ICombatAttributes
         _a = a;
         _b = b;
         _getLerp = getLerp;
+        LifePoints = new InterpolatedAttribute(() => a().LifePoints, () => b().LifePoints, getLerp);
     }
 
     public int ExperiencePoints => (int)ApiUtil.Lerp(_a().ExperiencePoints, _b().ExperiencePoints, _getLerp());
     public ushort TrainingPoints => (ushort)ApiUtil.Lerp(_a().TrainingPoints, _b().TrainingPoints, _getLerp());
-    public ushort LifePoints => (ushort)ApiUtil.Lerp(_a().LifePoints, _b().LifePoints, _getLerp());
-    public ushort LifePointsMax => (ushort)ApiUtil.Lerp(_a().LifePointsMax, _b().LifePointsMax, _getLerp());
+    public ICharacterAttribute LifePoints { get; }
     public byte ActionPoints => (byte)ApiUtil.Lerp(_a().ActionPoints, _b().ActionPoints, _getLerp());
-    public ushort Protection => (ushort)ApiUtil.Lerp(_a().Protection, _b().Protection, _getLerp());
-    public ushort Damage => (ushort)ApiUtil.Lerp(_a().Damage, _b().Damage, _getLerp());
-    public PhysicalConditions PhysicalConditions => _b().PhysicalConditions;
-    public MentalConditions MentalConditions => _b().MentalConditions;
+    public ushort UnknownD6 => (ushort)ApiUtil.Lerp(_a().UnknownD6, _b().UnknownD6, _getLerp());
+    public ushort UnknownD8 => (ushort)ApiUtil.Lerp(_a().UnknownD8, _b().UnknownD8, _getLerp());
+    public Conditions Conditions => _b().Conditions;
 }

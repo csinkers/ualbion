@@ -129,7 +129,7 @@ public static class MapExport
             return ("", mapping);
 
         var npcRefs = map.Npcs.Where(x => x.Node != null).Select(x => x.Node.Id).ToHashSet();
-        var zoneRefs = map.Zones.Where(x => x.Node != null).Select(x => x.Node.Id).ToHashSet();
+        var zoneRefs = map.UniqueZoneNodeIds;
         var refs = npcRefs.Union(zoneRefs).Except(map.Chains).ToList();
 
         eventFormatter.FormatEventSetDecompiled(sb, map.Events, map.Chains, refs, 0);

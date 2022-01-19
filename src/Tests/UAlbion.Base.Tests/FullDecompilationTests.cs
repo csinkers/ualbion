@@ -456,7 +456,7 @@ public class FullDecompilationTests : IDisposable
     {
         var map = Load(x => x.LoadMap(id));
         var npcRefs = map.Npcs.Where(x => x.Node != null).Select(x => x.Node.Id).ToHashSet();
-        var zoneRefs = map.Zones.Where(x => x.Node != null).Select(x => x.Node.Id).ToHashSet();
+        var zoneRefs = map.UniqueZoneNodeIds;
         var refs = npcRefs.Union(zoneRefs).Except(map.Chains);
 
         TestInner(map.Events, id.ToMapText(), map.Chains, refs, testName);

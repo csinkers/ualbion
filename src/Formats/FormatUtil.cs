@@ -219,13 +219,12 @@ public static class FormatUtil
     public static bool Compare(QueryOperation operation, int value, int immediate) =>
         operation switch
         {
-            QueryOperation.IsTrue             => value != 0,
+            QueryOperation.AlwaysFalse        => false,
             QueryOperation.LessThan           => value < immediate,
             QueryOperation.LessThanOrEqual    => value <= immediate,
             QueryOperation.Equals             => value == immediate,
             QueryOperation.GreaterThanOrEqual => value >= immediate,
             QueryOperation.GreaterThan        => value > immediate,
-            QueryOperation.OpUnk6             => value == immediate,
             _ => true
         };
 

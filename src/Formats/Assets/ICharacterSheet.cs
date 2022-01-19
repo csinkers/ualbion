@@ -9,7 +9,7 @@ public interface ICharacterSheet
     Gender Gender { get; }
     PlayerRace Race { get; }
     PlayerClass PlayerClass { get; }
-    ushort Age { get; }
+    ICharacterAttribute Age { get; }
     byte Level { get; }
 
     SpriteId SpriteId { get; }

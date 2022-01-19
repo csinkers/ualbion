@@ -7,15 +7,6 @@ using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets;
 
-public class EffectiveCharacterSheet : CharacterSheet, IEffectiveCharacterSheet
-{
-    public EffectiveCharacterSheet(CharacterId id) : base(id) { }
-    public int TotalWeight { get; set; }
-    public int MaxWeight { get; set; }
-    public int DisplayDamage { get; set; }
-    public int DisplayProtection { get; set; }
-}
-
 public class CharacterSheet : ICharacterSheet
 {
     public const int SpellSchoolCount = 7;
@@ -25,7 +16,7 @@ public class CharacterSheet : ICharacterSheet
     public CharacterSheet(CharacterId id)
     {
         Id = id;
-        if (id.Type == AssetType.Party || id.Type == AssetType.Monster)
+        if (id.Type is AssetType.Party or AssetType.Monster)
             Inventory = new Inventory(new InventoryId(id));
     }
 
@@ -35,17 +26,20 @@ public class CharacterSheet : ICharacterSheet
     [JsonInclude] public CharacterAttributes Attributes { get; init; } = new();
     [JsonInclude] public CharacterSkills Skills { get; init; } = new();
     [JsonInclude] public CombatAttributes Combat { get; init; } = new();
+    [JsonInclude] public MonsterData Monster { get; set; }
+
     IMagicSkills ICharacterSheet.Magic => Magic;
     IInventory ICharacterSheet.Inventory => Inventory;
     ICharacterAttributes ICharacterSheet.Attributes => Attributes;
     ICharacterSkills ICharacterSheet.Skills => Skills;
     ICombatAttributes ICharacterSheet.Combat => Combat;
+    ICharacterAttribute ICharacterSheet.Age => Age;
 
     public override string ToString() =>
         Type switch {
             CharacterType.Party => $"{Id} {Race} {PlayerClass} {Age} EN:{EnglishName} DE:{GermanName} {Magic.SpellStrengths.Count} spells",
             CharacterType.Npc => $"{Id} {PortraitId} S:{SpriteId} E{EventSetId} W{WordSetId}",
-            CharacterType.Monster => $"{Id} {PlayerClass} {Gender} AP{Combat.ActionPoints} Lvl{Level} LP{Combat.LifePoints}/{Combat.LifePointsMax} {Magic.SpellStrengths.Count} spells",
+            CharacterType.Monster => $"{Id} {PlayerClass} {Gender} AP{Combat.ActionPoints} Lvl{Level} LP{Combat.LifePoints} {Magic.SpellStrengths.Count} spells",
             _ => $"{Id} UNKNOWN TYPE {Type}" };
 
     // Names
@@ -59,7 +53,7 @@ public class CharacterSheet : ICharacterSheet
     public Gender Gender { get; set; }
     public PlayerRace Race { get; set; }
     public PlayerClass PlayerClass { get; set; }
-    public ushort Age { get; set; }
+    public CharacterAttribute Age { get; set; }
     public byte Level { get; set; }
 
     // Display and behaviour
@@ -77,60 +71,35 @@ public class CharacterSheet : ICharacterSheet
         throw new InvalidOperationException($"Unexpected language {language}");
     }
 
+    public SpriteId MonsterGfxId { get; set; }
+    public byte Morale { get; set; }
+    public byte SpellTypeImmunities { get; set; }
+    public ushort ExperienceReward { get; set; }
+    public ushort PartyDepartX { get; set; }
+    public ushort PartyDepartY { get; set; }
+    public MapId PartyDepartMapId { get; set; }
+    public ushort LevelsPerActionPoint { get; set; }
+    public ushort LifePointsPerLevel { get; set; }
+    public ushort SpellPointsPerLevel { get; set; }
+    public ushort TrainingPointsPerLevel { get; set; }
+    public int Weight { get; set; }
+
     // Pending further reversing
+    // ReSharper disable InconsistentNaming
     public byte Unknown6 { get; set; }
     public byte Unknown7 { get; set; }
-    public byte Unknown11 { get; set; }
-    public byte Unknown12 { get; set; }
-    public byte Unknown13 { get; set; }
-    public byte Unknown14 { get; set; }
-    public byte Unknown15 { get; set; }
-    public byte Unknown16 { get; set; }
+    public byte UnkownC { get; set; }
+    public byte UnkownD { get; set; }
+    public byte UnknownE { get; set; }
     public ushort Unknown1C { get; set; }
-    public ushort Unknown20 { get; set; }
     public ushort Unknown22 { get; set; }
-
-    public ushort Unknown24 { get; set; }
-    public ushort Unknown26 { get; set; }
-    public ushort Unknown28 { get; set; }
-    public ushort Unknown2E { get; set; }
-    public ushort Unknown30 { get; set; }
-    public ushort Unknown36 { get; set; }
-    public ushort Unknown38 { get; set; }
-    public ushort Unknown3E { get; set; }
-    public ushort Unknown40 { get; set; }
-    public ushort Unknown46 { get; set; }
-    public ushort Unknown48 { get; set; }
-    public ushort Unknown4E { get; set; }
-    public ushort Unknown50 { get; set; }
-    public ushort Unknown56 { get; set; }
-    public ushort Unknown58 { get; set; }
-    public ushort Unknown5E { get; set; }
-    public ushort Unknown60 { get; set; }
-    public ushort Unknown66 { get; set; }
-    public ushort Unknown68 { get; set; }
-    public byte Unknown6C { get; set; }
-    public ushort Unknown7E { get; set; }
-    public ushort Unknown80 { get; set; }
-    public ushort Unknown86 { get; set; }
-    public ushort Unknown88 { get; set; }
-    public ushort Unknown8E { get; set; }
-    public ushort Unknown90 { get; set; }
     public byte[] UnusedBlock { get; set; } // Only non-zero for the NPC "Konny"
-    // ReSharper disable InconsistentNaming
-    public ushort UnknownCE { get; set; }
-    public ushort UnknownD6 { get; set; }
     public ushort UnknownDA { get; set; }
     public ushort UnknownDC { get; set; }
-    public uint UnknownDE { get; set; }
-    public ushort UnknownE2 { get; set; }
-    public ushort UnknownE4 { get; set; }
-    public uint UnknownE6 { get; set; }
-    public uint UnknownEA { get; set; }
-
-    public ushort UnknownFA { get; set; }
-    public ushort UnknownFC { get; set; }
-    public byte[] UnkMonster { get; set; } // 472 bytes more than an NPC
+    public ushort UnknownDE { get; set; }
+    public ushort UnknownE0 { get; set; }
+    public ushort UnknownE8 { get; set; }
+    public ushort UnknownEC { get; set; }
     // ReSharper restore InconsistentNaming
 
     public static CharacterSheet Serdes(CharacterId id, CharacterSheet sheet, AssetMapping mapping, ISerializer s, ISpellManager spellManager)
@@ -146,18 +115,18 @@ public class CharacterSheet : ICharacterSheet
 
         s.Check();
         s.Begin(id.ToString());
-        sheet.Type = s.EnumU8(nameof(sheet.Type), sheet.Type);
-        sheet.Gender = s.EnumU8(nameof(sheet.Gender), sheet.Gender);
-        sheet.Race = s.EnumU8(nameof(sheet.Race), sheet.Race);
-        sheet.PlayerClass = s.EnumU8(nameof(sheet.PlayerClass), sheet.PlayerClass);
-        sheet.Magic.SpellClasses = s.EnumU8(nameof(sheet.Magic.SpellClasses), sheet.Magic.SpellClasses);
-        sheet.Level = s.UInt8(nameof(sheet.Level), sheet.Level);
-        sheet.Unknown6 = s.UInt8(nameof(sheet.Unknown6), sheet.Unknown6);
-        sheet.Unknown7 = s.UInt8(nameof(sheet.Unknown7), sheet.Unknown7);
-        sheet.Languages = s.EnumU8(nameof(sheet.Languages), sheet.Languages);
+        sheet.Type = s.EnumU8(nameof(sheet.Type), sheet.Type); // 0
+        sheet.Gender = s.EnumU8(nameof(sheet.Gender), sheet.Gender); // 1
+        sheet.Race = s.EnumU8(nameof(sheet.Race), sheet.Race); // 2
+        sheet.PlayerClass = s.EnumU8(nameof(sheet.PlayerClass), sheet.PlayerClass); // 3
+        sheet.Magic.SpellClasses = s.EnumU8(nameof(sheet.Magic.SpellClasses), sheet.Magic.SpellClasses); // 4
+        sheet.Level = s.UInt8(nameof(sheet.Level), sheet.Level); // 5
+        sheet.Unknown6 = s.UInt8(nameof(sheet.Unknown6), sheet.Unknown6); //  6 takes values [0..2] except Rainer, with 255. All other party members except Siobhan are 1. Monsters are mix of 1 and 2.
+        sheet.Unknown7 = s.UInt8(nameof(sheet.Unknown7), sheet.Unknown7); //  7 (always 0)
+        sheet.Languages = s.EnumU8(nameof(sheet.Languages), sheet.Languages); //8
         s.Check();
 
-        sheet.SpriteId = sheet.Type switch
+        sheet.SpriteId = sheet.Type switch // 9
         {
             CharacterType.Party   => SpriteId.SerdesU8(nameof(SpriteId), sheet.SpriteId, AssetType.LargePartyGraphics, mapping, s),
             CharacterType.Npc     => SpriteId.SerdesU8(nameof(SpriteId), sheet.SpriteId, AssetType.LargeNpcGraphics, mapping, s),
@@ -165,20 +134,27 @@ public class CharacterSheet : ICharacterSheet
             _ => throw new InvalidOperationException($"Unhandled character type {sheet.Type}")
         };
 
-        sheet.PortraitId = SpriteId.SerdesU8(nameof(sheet.PortraitId), sheet.PortraitId, AssetType.Portrait, mapping, s); 
-        sheet.Unknown11 = s.UInt8(nameof(sheet.Unknown11 ), sheet.Unknown11);
-        sheet.Unknown12 = s.UInt8(nameof(sheet.Unknown12), sheet.Unknown12);
-        sheet.Unknown13 = s.UInt8(nameof(sheet.Unknown13), sheet.Unknown13);
-        sheet.Unknown14 = s.UInt8(nameof(sheet.Unknown14), sheet.Unknown14);
-        sheet.Unknown15 = s.UInt8(nameof(sheet.Unknown15), sheet.Unknown15);
-        sheet.Unknown16 = s.UInt8(nameof(sheet.Unknown16), sheet.Unknown16);
-        sheet.Combat.ActionPoints = s.UInt8(nameof(sheet.Combat.ActionPoints), sheet.Combat.ActionPoints);
-        sheet.EventSetId = EventSetId.SerdesU16(nameof(sheet.EventSetId), sheet.EventSetId, mapping, s);
-        sheet.WordSetId = EventSetId.SerdesU16(nameof(sheet.WordSetId), sheet.WordSetId, mapping, s);
-        sheet.Combat.TrainingPoints = s.UInt16(nameof(sheet.Combat.TrainingPoints), sheet.Combat.TrainingPoints);
+        sheet.PortraitId = SpriteId.SerdesU8(nameof(sheet.PortraitId), sheet.PortraitId, AssetType.Portrait, mapping, s); // A
 
-        ushort gold = s.UInt16("Gold", sheet.Inventory?.Gold.Amount ?? 0);
-        ushort rations = s.UInt16("Rations", sheet.Inventory?.Rations.Amount ?? 0);
+        // Only monster graphics if monster, means something else for party members (matches PartyMemberId). Never set for NPCs.
+        sheet.MonsterGfxId = SpriteId.SerdesU8(nameof(sheet.MonsterGfxId), sheet.MonsterGfxId, AssetType.MonsterGraphics, mapping, s); // B
+
+        sheet.UnkownC = s.UInt8(nameof(sheet.UnkownC), sheet.UnkownC); // C takes values [0..9], only non-zero for monsters & Drirr. Distribution of non-zero values: 42, 3, 4, 1, 1, 1, 4, 3,  1
+        sheet.UnkownD = s.UInt8(nameof(sheet.UnkownD), sheet.UnkownD); // D takes values [0..4], only non-zero for monsters & Drirr. Distribution of non-zero values: 46, 3, 4, 3
+
+        // E takes values 1,2,10,20,130,138,186. Only non-zero for monsters & party members. All party members use 2. Distr: 23, 15, 3, 3, 1, 2, 12. Flags?
+        // Basic mobs=1. AiBody1,Argim=2. all demons=20. human/iskai mobs=10. Ai,Ai2,AiBody22=130. Beastmaster,Nodd,Kontos=138. Kamulos=186.
+        sheet.UnknownE = s.UInt8(nameof(sheet.UnknownE), sheet.UnknownE);
+
+        sheet.Morale = s.UInt8(nameof(sheet.Morale), sheet.Morale); // F [0..100]
+        sheet.SpellTypeImmunities = s.UInt8(nameof(sheet.SpellTypeImmunities), sheet.SpellTypeImmunities); // 10 spell type immunities? Always 0
+        sheet.Combat.ActionPoints = s.UInt8(nameof(sheet.Combat.ActionPoints), sheet.Combat.ActionPoints); // 11
+        sheet.EventSetId = EventSetId.SerdesU16(nameof(sheet.EventSetId), sheet.EventSetId, mapping, s); // 12
+        sheet.WordSetId = EventSetId.SerdesU16(nameof(sheet.WordSetId), sheet.WordSetId, mapping, s); // 14
+        sheet.Combat.TrainingPoints = s.UInt16(nameof(sheet.Combat.TrainingPoints), sheet.Combat.TrainingPoints); // 16
+
+        ushort gold = s.UInt16("Gold", sheet.Inventory?.Gold.Amount ?? 0); // 18
+        ushort rations = s.UInt16("Rations", sheet.Inventory?.Rations.Amount ?? 0); // 1A
         if (sheet.Inventory != null)
         {
             sheet.Inventory.Gold.Item = Gold.Instance;
@@ -187,90 +163,53 @@ public class CharacterSheet : ICharacterSheet
             sheet.Inventory.Rations.Amount = rations;
         }
 
-        sheet.Unknown1C = s.UInt16(nameof(sheet.Unknown1C), sheet.Unknown1C);
+        sheet.Unknown1C = s.UInt16(nameof(sheet.Unknown1C), sheet.Unknown1C); // 1C Party member leaving related bits?
+        sheet.Combat.Conditions = s.EnumU16(nameof(sheet.Combat.Conditions), sheet.Combat.Conditions); // 1E
+        sheet.ExperienceReward = s.UInt16(nameof(sheet.ExperienceReward), sheet.ExperienceReward); // 20
+        sheet.Unknown22 = s.UInt16(nameof(sheet.Unknown22), sheet.Unknown22); // 22
+        sheet.PartyDepartX = s.UInt16(nameof(sheet.PartyDepartX), sheet.PartyDepartX); // 24
+        sheet.PartyDepartY = s.UInt16(nameof(sheet.PartyDepartY), sheet.PartyDepartY); // 26
+        sheet.PartyDepartMapId = MapId.SerdesU16(nameof(sheet.PartyDepartMapId), sheet.PartyDepartMapId, mapping, s); // 28
+
+        sheet.Attributes.Strength        = CharacterAttribute.Serdes(nameof(sheet.Attributes.Strength),        sheet.Attributes.Strength,        s); // 2A
+        sheet.Attributes.Intelligence    = CharacterAttribute.Serdes(nameof(sheet.Attributes.Intelligence),    sheet.Attributes.Intelligence,    s); // 32
+        sheet.Attributes.Dexterity       = CharacterAttribute.Serdes(nameof(sheet.Attributes.Dexterity),       sheet.Attributes.Dexterity,       s); // 3A
+        sheet.Attributes.Speed           = CharacterAttribute.Serdes(nameof(sheet.Attributes.Speed),           sheet.Attributes.Speed,           s); // 42
+        sheet.Attributes.Stamina         = CharacterAttribute.Serdes(nameof(sheet.Attributes.Stamina),         sheet.Attributes.Stamina,         s); // 4A
+        sheet.Attributes.Luck            = CharacterAttribute.Serdes(nameof(sheet.Attributes.Luck),            sheet.Attributes.Luck,            s); // 52
+        sheet.Attributes.MagicResistance = CharacterAttribute.Serdes(nameof(sheet.Attributes.MagicResistance), sheet.Attributes.MagicResistance, s); // 5A
+        sheet.Attributes.MagicTalent     = CharacterAttribute.Serdes(nameof(sheet.Attributes.MagicTalent),     sheet.Attributes.MagicTalent,     s); // 62
         s.Check();
 
-        sheet.Combat.PhysicalConditions = s.EnumU8(nameof(sheet.Combat.PhysicalConditions), sheet.Combat.PhysicalConditions);
-        sheet.Combat.MentalConditions = s.EnumU8(nameof(sheet.Combat.MentalConditions), sheet.Combat.MentalConditions);
-        s.Check();
+        sheet.Age = CharacterAttribute.Serdes(nameof(sheet.Age), sheet.Age, s); // 6A
+        s.RepeatU8("UnknownBlock72", 0, 8); // Unused attrib, for a total of 10 physical attribs?
 
-        sheet.Unknown20 = s.UInt16(nameof(sheet.Unknown20), sheet.Unknown20);
-        sheet.Unknown22 = s.UInt16(nameof(sheet.Unknown22), sheet.Unknown22);
-        sheet.Unknown24 = s.UInt16(nameof(sheet.Unknown24), sheet.Unknown24);
-        sheet.Unknown26 = s.UInt16(nameof(sheet.Unknown26), sheet.Unknown26);
-        sheet.Unknown28 = s.UInt16(nameof(sheet.Unknown28), sheet.Unknown28);
-        sheet.Attributes.Strength = s.UInt16(nameof(sheet.Attributes.Strength), sheet.Attributes.Strength);
-        sheet.Attributes.StrengthMax = s.UInt16(nameof(sheet.Attributes.StrengthMax), sheet.Attributes.StrengthMax);
-        sheet.Unknown2E = s.UInt16(nameof(sheet.Unknown2E), sheet.Unknown2E);
-        sheet.Unknown30 = s.UInt16(nameof(sheet.Unknown30), sheet.Unknown30);
-        sheet.Attributes.Intelligence = s.UInt16(nameof(sheet.Attributes.Intelligence), sheet.Attributes.Intelligence);
-        sheet.Attributes.IntelligenceMax = s.UInt16(nameof(sheet.Attributes.IntelligenceMax), sheet.Attributes.IntelligenceMax);
-        sheet.Unknown36 = s.UInt16(nameof(sheet.Unknown36), sheet.Unknown36);
-        sheet.Unknown38 = s.UInt16(nameof(sheet.Unknown38), sheet.Unknown38);
-        sheet.Attributes.Dexterity = s.UInt16(nameof(sheet.Attributes.Dexterity), sheet.Attributes.Dexterity);
-        sheet.Attributes.DexterityMax = s.UInt16(nameof(sheet.Attributes.DexterityMax), sheet.Attributes.DexterityMax);
-        sheet.Unknown3E = s.UInt16(nameof(sheet.Unknown3E), sheet.Unknown3E);
-        sheet.Unknown40 = s.UInt16(nameof(sheet.Unknown40), sheet.Unknown40);
-        sheet.Attributes.Speed = s.UInt16(nameof(sheet.Attributes.Speed), sheet.Attributes.Speed);
-        sheet.Attributes.SpeedMax = s.UInt16(nameof(sheet.Attributes.SpeedMax), sheet.Attributes.SpeedMax);
-        sheet.Unknown46 = s.UInt16(nameof(sheet.Unknown46), sheet.Unknown46);
-        sheet.Unknown48 = s.UInt16(nameof(sheet.Unknown48), sheet.Unknown48);
-        sheet.Attributes.Stamina = s.UInt16(nameof(sheet.Attributes.Stamina), sheet.Attributes.Stamina);
-        sheet.Attributes.StaminaMax = s.UInt16(nameof(sheet.Attributes.StaminaMax), sheet.Attributes.StaminaMax);
-        sheet.Unknown4E = s.UInt16(nameof(sheet.Unknown4E), sheet.Unknown4E);
-        sheet.Unknown50 = s.UInt16(nameof(sheet.Unknown50), sheet.Unknown50);
-        sheet.Attributes.Luck = s.UInt16(nameof(sheet.Attributes.Luck), sheet.Attributes.Luck);
-        sheet.Attributes.LuckMax = s.UInt16(nameof(sheet.Attributes.LuckMax), sheet.Attributes.LuckMax);
-        sheet.Unknown56 = s.UInt16(nameof(sheet.Unknown56), sheet.Unknown56);
-        sheet.Unknown58 = s.UInt16(nameof(sheet.Unknown58), sheet.Unknown58);
-        sheet.Attributes.MagicResistance = s.UInt16(nameof(sheet.Attributes.MagicResistance), sheet.Attributes.MagicResistance);
-        sheet.Attributes.MagicResistanceMax = s.UInt16(nameof(sheet.Attributes.MagicResistanceMax), sheet.Attributes.MagicResistanceMax);
-        sheet.Unknown5E = s.UInt16(nameof(sheet.Unknown5E), sheet.Unknown5E);
-        sheet.Unknown60 = s.UInt16(nameof(sheet.Unknown60), sheet.Unknown60);
-        sheet.Attributes.MagicTalent = s.UInt16(nameof(sheet.Attributes.MagicTalent), sheet.Attributes.MagicTalent);
-        sheet.Attributes.MagicTalentMax = s.UInt16(nameof(sheet.Attributes.MagicTalentMax), sheet.Attributes.MagicTalentMax);
-        sheet.Unknown66 = s.UInt16(nameof(sheet.Unknown66), sheet.Unknown66);
-        sheet.Unknown68 = s.UInt16(nameof(sheet.Unknown68), sheet.Unknown68);
-        s.Check();
+        sheet.Skills.CloseCombat    = CharacterAttribute.Serdes(nameof(sheet.Skills.CloseCombat),    sheet.Skills.CloseCombat,    s); // 7A
+        sheet.Skills.RangedCombat   = CharacterAttribute.Serdes(nameof(sheet.Skills.RangedCombat),   sheet.Skills.RangedCombat,   s); // 82
+        sheet.Skills.CriticalChance = CharacterAttribute.Serdes(nameof(sheet.Skills.CriticalChance), sheet.Skills.CriticalChance, s); // 8A
+        sheet.Skills.LockPicking    = CharacterAttribute.Serdes(nameof(sheet.Skills.LockPicking),    sheet.Skills.LockPicking,    s); // 92
+        sheet.UnusedBlock = s.Bytes(nameof(sheet.UnusedBlock), sheet.UnusedBlock, 48); // 6 unused skills, for a total of 10 skill attribs?
 
-        sheet.Age = s.UInt16(nameof(sheet.Age), sheet.Age);
-        sheet.Unknown6C = s.UInt8(nameof(sheet.Unknown6C), sheet.Unknown6C);
-        s.RepeatU8("UnknownBlock6D", 0, 13);
-        sheet.Skills.CloseCombat = s.UInt16(nameof(sheet.Skills.CloseCombat), sheet.Skills.CloseCombat);
-        sheet.Skills.CloseCombatMax = s.UInt16(nameof(sheet.Skills.CloseCombatMax), sheet.Skills.CloseCombatMax);
-        sheet.Unknown7E = s.UInt16(nameof(sheet.Unknown7E), sheet.Unknown7E);
-        sheet.Unknown80 = s.UInt16(nameof(sheet.Unknown80), sheet.Unknown80);
-        sheet.Skills.RangedCombat = s.UInt16(nameof(sheet.Skills.RangedCombat), sheet.Skills.RangedCombat);
-        sheet.Skills.RangedCombatMax = s.UInt16(nameof(sheet.Skills.RangedCombatMax), sheet.Skills.RangedCombatMax);
-        sheet.Unknown86 = s.UInt16(nameof(sheet.Unknown86), sheet.Unknown86);
-        sheet.Unknown88 = s.UInt16(nameof(sheet.Unknown88), sheet.Unknown88);
-        sheet.Skills.CriticalChance = s.UInt16(nameof(sheet.Skills.CriticalChance), sheet.Skills.CriticalChance);
-        sheet.Skills.CriticalChanceMax = s.UInt16(nameof(sheet.Skills.CriticalChanceMax), sheet.Skills.CriticalChanceMax);
-        sheet.Unknown8E = s.UInt16(nameof(sheet.Unknown8E), sheet.Unknown8E);
-        sheet.Unknown90 = s.UInt16(nameof(sheet.Unknown90), sheet.Unknown90);
-        sheet.Skills.LockPicking = s.UInt16(nameof(sheet.Skills.LockPicking), sheet.Skills.LockPicking);
-        sheet.Skills.LockPickingMax = s.UInt16(nameof(sheet.Skills.LockPickingMax), sheet.Skills.LockPickingMax);
-        sheet.UnusedBlock = s.Bytes(nameof(sheet.UnusedBlock), sheet.UnusedBlock, 52);
-        sheet.Combat.LifePoints = s.UInt16(nameof(sheet.Combat.LifePoints), sheet.Combat.LifePoints);
-        sheet.Combat.LifePointsMax = s.UInt16(nameof(sheet.Combat.LifePointsMax), sheet.Combat.LifePointsMax);
-        sheet.UnknownCE = s.UInt16(nameof(sheet.UnknownCE), sheet.UnknownCE);
-        sheet.Magic.SpellPoints = s.UInt16(nameof(sheet.Magic.SpellPoints), sheet.Magic.SpellPoints);
-        sheet.Magic.SpellPointsMax = s.UInt16(nameof(sheet.Magic.SpellPointsMax), sheet.Magic.SpellPointsMax);
-        sheet.Combat.Protection = s.UInt16(nameof(sheet.Combat.Protection), sheet.Combat.Protection);
-        sheet.UnknownD6 = s.UInt16(nameof(sheet.UnknownD6), sheet.UnknownD6);
-        sheet.Combat.Damage = s.UInt16(nameof(sheet.Combat.Damage), sheet.Combat.Damage);
+        sheet.Combat.LifePoints = CharacterAttribute.Serdes(nameof(sheet.Combat.LifePoints), sheet.Combat.LifePoints, s, false); // CA
+        sheet.Magic.SpellPoints = CharacterAttribute.Serdes(nameof(sheet.Magic.SpellPoints), sheet.Magic.SpellPoints, s, false); // D0
 
-        sheet.UnknownDA = s.UInt16(nameof(sheet.UnknownDA), sheet.UnknownDA);
-        sheet.UnknownDC = s.UInt16(nameof(sheet.UnknownDC), sheet.UnknownDC);
-        sheet.UnknownDE = s.UInt32(nameof(sheet.UnknownDE), sheet.UnknownDE);
-        sheet.UnknownE2 = s.UInt16(nameof(sheet.UnknownE2), sheet.UnknownE2);
-        sheet.UnknownE4 = s.UInt16(nameof(sheet.UnknownE4), sheet.UnknownE4);
-        sheet.UnknownE6 = s.UInt32(nameof(sheet.UnknownE6), sheet.UnknownE6);
-        sheet.UnknownEA = s.UInt32(nameof(sheet.UnknownEA), sheet.UnknownEA);
+        // Expect variable protection, base protection, variable attack, base attack
+        sheet.Combat.UnknownD6 = s.UInt16(nameof(sheet.Combat.UnknownD6), sheet.Combat.UnknownD6); // D6
+        sheet.Combat.UnknownD8 = s.UInt16(nameof(sheet.Combat.UnknownD8), sheet.Combat.UnknownD8); // D8
+        sheet.UnknownDA = s.UInt16(nameof(sheet.UnknownDA), sheet.UnknownDA); // DA
+        sheet.UnknownDC = s.UInt16(nameof(sheet.UnknownDC), sheet.UnknownDC); // DC
+        sheet.UnknownDE = s.UInt16(nameof(sheet.UnknownDE), sheet.UnknownDE); // DE always 0 in initial data
+        sheet.UnknownE0 = s.UInt16(nameof(sheet.UnknownE0), sheet.UnknownE0); // E0 always 0 in initial data
+        sheet.LevelsPerActionPoint = s.UInt16(nameof(sheet.LevelsPerActionPoint), sheet.LevelsPerActionPoint); // E2
+        sheet.LifePointsPerLevel = s.UInt16(nameof(sheet.LifePointsPerLevel), sheet.LifePointsPerLevel); // E4
+        sheet.SpellPointsPerLevel = s.UInt16(nameof(sheet.SpellPointsPerLevel), sheet.SpellPointsPerLevel); // E6
+        sheet.UnknownE8 = s.UInt16(nameof(sheet.UnknownE8), sheet.UnknownE8); // E8 Spell learning points? Only set for some Iskai monsters
+        sheet.TrainingPointsPerLevel = s.UInt16(nameof(sheet.TrainingPointsPerLevel), sheet.TrainingPointsPerLevel); // EA
+        sheet.UnknownEC = s.UInt16(nameof(sheet.UnknownEC), sheet.UnknownEC); // EC
 
-        sheet.Combat.ExperiencePoints = s.Int32(nameof(sheet.Combat.ExperiencePoints), sheet.Combat.ExperiencePoints);
+        sheet.Combat.ExperiencePoints = s.Int32(nameof(sheet.Combat.ExperiencePoints), sheet.Combat.ExperiencePoints); // EE
         // e.g. 98406 = 0x18066 => 6680 0100 in file
-        s.Check();
+        s.Check(); // F2
 
         byte[] knownSpellBytes = null;
         byte[] spellStrengthBytes = null;
@@ -297,17 +236,13 @@ public class CharacterSheet : ICharacterSheet
             spellStrengthBytes = spellStrengths.Select(BitConverter.GetBytes).SelectMany(x => x).ToArray();
         }
 
-        knownSpellBytes = s.Bytes("KnownSpells", knownSpellBytes, SpellSchoolCount * sizeof(uint));
+        knownSpellBytes = s.Bytes("KnownSpells", knownSpellBytes, SpellSchoolCount * sizeof(uint)); // F2
         s.Check();
 
-        sheet.UnknownFA = s.UInt16(nameof(sheet.UnknownFA), sheet.UnknownFA);
-        sheet.UnknownFC = s.UInt16(nameof(sheet.UnknownFC), sheet.UnknownFC);
-        s.Check();
-
+        sheet.Weight = s.Int32(nameof(sheet.Weight), sheet.Weight); // FA
         sheet.GermanName = s.FixedLengthString(nameof(sheet.GermanName), sheet.GermanName, MaxNameLength); // 112
         sheet.EnglishName = s.FixedLengthString(nameof(sheet.EnglishName), sheet.EnglishName, MaxNameLength);
         sheet.FrenchName = s.FixedLengthString(nameof(sheet.FrenchName), sheet.FrenchName, MaxNameLength);
-
         s.Check();
 
         spellStrengthBytes = s.Bytes("SpellStrength", spellStrengthBytes, MaxSpellsPerSchool * SpellSchoolCount * sizeof(ushort));
@@ -347,14 +282,13 @@ public class CharacterSheet : ICharacterSheet
                     s.Comment($"{spellId}: {strength}{(known ? " (Learnt)" : "")}");
             }
         }
+        ApiUtil.Assert(s.Offset - initialOffset == 742, "Expected common sheet data to be 742 bytes");
 
         if (sheet.Type == CharacterType.Npc)
         {
-            ApiUtil.Assert(s.Offset - initialOffset == 742, "Expected non-player character sheet to be 742 bytes");
             s.End();
             return sheet;
         }
-
 
         if (sheet.Type == CharacterType.Party)
         {
@@ -366,7 +300,8 @@ public class CharacterSheet : ICharacterSheet
 
         // Must be a monster
         Inventory.SerdesMonster(id.Id, sheet.Inventory, mapping, s);
-        sheet.UnkMonster = s.Bytes(nameof(UnkMonster), sheet.UnkMonster, 328);
+        sheet.Monster = MonsterData.Serdes(sheet.Monster, s);
+        // sheet.UnkMonster = s.Bytes(nameof(UnkMonster), sheet.UnkMonster, 328);
         ApiUtil.Assert(s.Offset - initialOffset == 1214, "Expected monster character sheet to be 1214 bytes");
         s.End();
         return sheet;

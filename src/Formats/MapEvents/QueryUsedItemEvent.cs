@@ -11,7 +11,7 @@ public class QueryUsedItemEvent : QueryEvent
 {
     public override QueryType QueryType => QueryType.UsedItem;
     [EventPart("item")] public ItemId ItemId { get; private set; } // => AssetType == AssetType.Item
-    [EventPart("op", true, QueryOperation.IsTrue)] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
+    [EventPart("op", true, QueryOperation.AlwaysFalse)] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
     [EventPart("imm", true, (byte)0)] public byte Immediate { get; private set; } // immediate value?
     QueryUsedItemEvent() { }
     public QueryUsedItemEvent(ItemId itemId, QueryOperation operation, byte immediate)

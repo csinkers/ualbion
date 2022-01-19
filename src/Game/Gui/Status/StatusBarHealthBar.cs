@@ -15,7 +15,7 @@ public class StatusBarHealthBar : UiElement
 
     public StatusBarHealthBar(int order, bool isHealth)
     {
-        On<PostGameUpdateEvent>(e => Update());
+        On<PostGameUpdateEvent>(_ => Update());
 
         _order = order;
         _isHealth = isHealth;
@@ -27,7 +27,7 @@ public class StatusBarHealthBar : UiElement
         _frame = AttachChild(new ButtonFrame(_bar)
         {
             Theme = isHealth 
-                ? (ButtonFrame.ThemeFunction)HealthIndicatorTheme
+                ? HealthIndicatorTheme
                 : ManaIndicatorTheme,
             Padding = 0
         });
@@ -45,8 +45,8 @@ public class StatusBarHealthBar : UiElement
         var playerId = party.StatusBarOrder[_order].Id;
         var highlighted = playerId == party.Leader.Id;
         var sheet = party[playerId];
-        var value = _isHealth ? sheet.Apparent.Combat.LifePoints : sheet.Apparent.Magic.SpellPoints;
-        var valueMax = _isHealth ? sheet.Apparent.Combat.LifePointsMax : sheet.Apparent.Magic.SpellPointsMax;
+        var value = _isHealth ? sheet.Apparent.Combat.LifePoints.Current : sheet.Apparent.Magic.SpellPoints.Current;
+        var valueMax = _isHealth ? sheet.Apparent.Combat.LifePoints.Max : sheet.Apparent.Magic.SpellPoints.Max;
         if (valueMax == 0) valueMax = 1;
         _bar.DrawSize = new Vector2(_bar.MeasureSize.X * value / valueMax, _bar.MeasureSize.Y);
         _frame.State = highlighted ? ButtonState.Hover : ButtonState.Normal;

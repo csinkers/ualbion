@@ -61,16 +61,32 @@ public class RoundtripTests
         return (disk, baseDir, generalConfig, mapping);
     }
 
-    T RoundTrip<T>(string testName, byte[] bytes, Func<T, ISerializer, T> serdes) where T : class
+    static T RoundTrip<T>(string testName, byte[] bytes, Func<T, ISerializer, T> serdes) where T : class
     {
-        var (asset, preTxt) = Asset.Load(bytes, serdes);
-        var (postBytes, postTxt) = Asset.Save(asset, serdes);
-        var (_, reloadTxt) = Asset.Load(postBytes, serdes);
+        TResult Wrap<TResult>(Func<TResult> func, string extension) 
+        {
+            try { return func(); }
+            catch (AssetSerializationException ase)
+            {
+                if (!Directory.Exists(ResultDir))
+                    Directory.CreateDirectory(ResultDir);
+
+                var path = Path.Combine(ResultDir, testName);
+                if (!string.IsNullOrEmpty(ase.Annotation))
+                    File.WriteAllText(path + extension, ase.Annotation);
+                throw;
+            }
+        }
+
+        var (asset, preTxt)      = Wrap(() => Asset.Load(bytes, serdes), ".pre.ex.txt");
+        var (postBytes, postTxt) = Wrap(() => Asset.Save(asset, serdes), ".post.ex.txt");
+        var (_, reloadTxt)       = Wrap(() => Asset.Load(postBytes, serdes), ".reload.ex.txt");
+
         Asset.Compare(ResultDir,
             testName,
             bytes,
             postBytes,
-            new[] { (".pre.txt", preTxt), (".post.txt", postTxt), (".reload.txt", reloadTxt)});
+            new[] { (".pre.txt", preTxt), (".post.txt", postTxt), (".reload.txt", reloadTxt) });
 
         if (asset is IReadOnlyTexture<byte>) // TODO: Png round-trip?
             return asset;
@@ -82,7 +98,7 @@ public class RoundtripTests
             testName + ".json",
             bytes,
             fromJsonBytes,
-            new[] { (".pre.txt", preTxt), (".post.txt", json), (".reload.txt", fromJsonTxt)});
+            new[] { (".pre.txt", preTxt), (".post.txt", json), (".reload.txt", fromJsonTxt) });
 
         return asset;
     }

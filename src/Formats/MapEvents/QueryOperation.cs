@@ -2,11 +2,11 @@
 
 public enum QueryOperation : byte
 {
-    IsTrue = 0,             // NZ >0
+    AlwaysFalse = 0,        // Always false
     LessThanOrEqual = 1,    // LE <=
     LessThan = 2,           // LT <
     Equals = 3,             // EQ ==
     GreaterThanOrEqual = 4, // GE >=
     GreaterThan = 5,        // GT >
-    OpUnk6 = 6              // U6 ??
+    AlwaysFalse2 = 6,
 }

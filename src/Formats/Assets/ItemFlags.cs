@@ -18,4 +18,5 @@ public enum ItemFlags : ushort
     Cursed    = 1 << 10,
     Unk11     = 1 << 11,
     Unk12     = 1 << 12,
+    // Possible unks: Unimportant, CanEquipInBattle, DestroyAfterUse, Indestructible, Cloneable
 }

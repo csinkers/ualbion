@@ -2,30 +2,22 @@
 
 public interface ICharacterSkills
 {
-    ushort CloseCombat { get; }
-    ushort RangedCombat { get; }
-    ushort CriticalChance { get; }
-    ushort LockPicking { get; }
-
-    ushort CloseCombatMax { get; }
-    ushort RangedCombatMax { get; }
-    ushort CriticalChanceMax { get; }
-    ushort LockPickingMax { get; }
+    ICharacterAttribute CloseCombat { get; }
+    ICharacterAttribute RangedCombat { get; }
+    ICharacterAttribute CriticalChance { get; }
+    ICharacterAttribute LockPicking { get; }
 }
 
 public class CharacterSkills : ICharacterSkills
 {
-    public override string ToString() =>
-        $"M{CloseCombat}/{CloseCombatMax} R{RangedCombat}/{RangedCombatMax} C{CriticalChance}/{CriticalChanceMax} L{LockPicking}/{LockPickingMax}";
-    public ushort CloseCombat { get; set; }
-    public ushort RangedCombat { get; set; }
-    public ushort CriticalChance { get; set; }
-    public ushort LockPicking { get; set; }
-
-    public ushort CloseCombatMax { get; set; }
-    public ushort RangedCombatMax { get; set; }
-    public ushort CriticalChanceMax { get; set; }
-    public ushort LockPickingMax { get; set; }
-
+    public override string ToString() => $"M{CloseCombat} R{RangedCombat} C{CriticalChance} L{LockPicking}";
+    ICharacterAttribute ICharacterSkills.CloseCombat => CloseCombat;
+    ICharacterAttribute ICharacterSkills.RangedCombat => RangedCombat;
+    ICharacterAttribute ICharacterSkills.CriticalChance => CriticalChance;
+    ICharacterAttribute ICharacterSkills.LockPicking => LockPicking;
+    public CharacterAttribute CloseCombat { get; set; }
+    public CharacterAttribute RangedCombat { get; set; }
+    public CharacterAttribute CriticalChance { get; set; }
+    public CharacterAttribute LockPicking { get; set; }
     public CharacterSkills DeepClone() => (CharacterSkills)MemberwiseClone();
 }

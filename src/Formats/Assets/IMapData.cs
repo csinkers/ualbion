@@ -6,6 +6,7 @@ namespace UAlbion.Formats.Assets;
 
 public interface IMapData
 {
+    MapFlags Flags { get; }
     MapType MapType { get; }
     SongId SongId { get; }
     byte Width { get;  }
@@ -16,5 +17,5 @@ public interface IMapData
     List<MapNpc> Npcs { get; }
     List<EventNode> Events { get; }
     List<ushort> Chains { get; }
-    List<MapEventZone> Zones { get; }
+    HashSet<ushort> UniqueZoneNodeIds { get; }
 }

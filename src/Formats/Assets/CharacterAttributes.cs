@@ -1,49 +1,68 @@
-﻿namespace UAlbion.Formats.Assets;
+﻿using SerdesNet;
+
+namespace UAlbion.Formats.Assets;
+
+public interface ICharacterAttribute
+{
+    ushort Current { get; }
+    ushort Max { get; }
+    ushort Boost { get; }
+    ushort Backup { get; }
+}
 
 public interface ICharacterAttributes
 {
-    ushort Strength { get; }
-    ushort Intelligence { get; }
-    ushort Dexterity { get; }
-    ushort Speed { get; }
-    ushort Stamina { get; }
-    ushort Luck { get; }
-    ushort MagicResistance { get; }
-    ushort MagicTalent { get; }
+    ICharacterAttribute Strength { get; }
+    ICharacterAttribute Intelligence { get; }
+    ICharacterAttribute Dexterity { get; }
+    ICharacterAttribute Speed { get; }
+    ICharacterAttribute Stamina { get; }
+    ICharacterAttribute Luck { get; }
+    ICharacterAttribute MagicResistance { get; }
+    ICharacterAttribute MagicTalent { get; }
+}
 
-    ushort StrengthMax { get; }
-    ushort IntelligenceMax { get; }
-    ushort DexterityMax { get; }
-    ushort SpeedMax { get; }
-    ushort StaminaMax { get; }
-    ushort LuckMax { get; }
-    ushort MagicResistanceMax { get; }
-    ushort MagicTalentMax { get; }
+public class CharacterAttribute : ICharacterAttribute
+{
+    public ushort Current { get; set; }
+    public ushort Max { get; set; }
+    public ushort Boost { get; set; }
+    public ushort Backup { get; set; }
+    public override string ToString() => $"[{Current}/{Max}]{(Boost > 0 ? $"+{Boost}" : "")}{(Backup > 0 ? $" (was {Backup})" : "")}";
+
+    public static CharacterAttribute Serdes(string name, CharacterAttribute attr, ISerializer s, bool hasBackup = true)
+    {
+        s.Begin(name);
+        attr ??= new CharacterAttribute();
+        attr.Current = s.UInt16(nameof(Current), attr.Current);
+        attr.Max = s.UInt16(nameof(Max), attr.Max);
+        attr.Boost = s.UInt16(nameof(Boost), attr.Boost);
+        if (hasBackup)
+            attr.Backup = s.UInt16(nameof(Backup), attr.Backup);
+        s.End();
+        return attr;
+    }
 }
 
 public class CharacterAttributes : ICharacterAttributes
 {
-    public override string ToString() =>
-        $"S{Strength}/{StrengthMax} I{Intelligence}/{IntelligenceMax} D{Dexterity}/{DexterityMax} " +
-        $"Sp{Speed}/{SpeedMax} St{Stamina}/{StaminaMax} L{Luck}/{LuckMax} " +
-        $"MR{MagicResistance}/{MagicResistanceMax} MT{MagicTalent}/{MagicTalentMax}";
+    public override string ToString() => $"S{Strength} I{Intelligence} D{Dexterity} Sp{Speed} St{Stamina} L{Luck} MR{MagicResistance} MT{MagicTalent}";
+    ICharacterAttribute ICharacterAttributes.Strength => Strength;
+    ICharacterAttribute ICharacterAttributes.Intelligence => Intelligence;
+    ICharacterAttribute ICharacterAttributes.Dexterity => Dexterity;
+    ICharacterAttribute ICharacterAttributes.Speed => Speed;
+    ICharacterAttribute ICharacterAttributes.Stamina => Stamina;
+    ICharacterAttribute ICharacterAttributes.Luck => Luck;
+    ICharacterAttribute ICharacterAttributes.MagicResistance => MagicResistance;
+    ICharacterAttribute ICharacterAttributes.MagicTalent => MagicTalent;
+    public CharacterAttribute Strength { get; set; }
+    public CharacterAttribute Intelligence { get; set; }
+    public CharacterAttribute Dexterity { get; set; }
+    public CharacterAttribute Speed { get; set; }
+    public CharacterAttribute Stamina { get; set; }
+    public CharacterAttribute Luck { get; set; }
+    public CharacterAttribute MagicResistance { get; set; }
+    public CharacterAttribute MagicTalent { get; set; }
 
-    public ushort Strength { get; set; }
-    public ushort Intelligence { get; set; }
-    public ushort Dexterity { get; set; }
-    public ushort Speed { get; set; }
-    public ushort Stamina { get; set; }
-    public ushort Luck { get; set; }
-    public ushort MagicResistance { get; set; }
-    public ushort MagicTalent { get; set; }
-
-    public ushort StrengthMax { get; set; }
-    public ushort IntelligenceMax { get; set; }
-    public ushort DexterityMax { get; set; }
-    public ushort SpeedMax { get; set; }
-    public ushort StaminaMax { get; set; }
-    public ushort LuckMax { get; set; }
-    public ushort MagicResistanceMax { get; set; }
-    public ushort MagicTalentMax { get; set; }
     public CharacterAttributes DeepClone() => (CharacterAttributes)MemberwiseClone();
 }

@@ -101,20 +101,20 @@ public static class ItemSlotIdExtensions
         return id switch
         {
             { } x when
-                x == ItemSlotId.Neck ||
-                x == ItemSlotId.Head ||
-                x == ItemSlotId.Tail ||
-                x == ItemSlotId.RightHand ||
-                x == ItemSlotId.Chest ||
-                x == ItemSlotId.LeftHand ||
-                x == ItemSlotId.RightFinger ||
-                x == ItemSlotId.Feet ||
-                x == ItemSlotId.LeftFinger ||
-                x == ItemSlotId.RightHandOrTail ||
-                x == ItemSlotId.CharacterBody => true,
+                x is ItemSlotId.Neck 
+                    or ItemSlotId.Head 
+                    or ItemSlotId.Tail 
+                    or ItemSlotId.RightHand 
+                    or ItemSlotId.Chest 
+                    or ItemSlotId.LeftHand 
+                    or ItemSlotId.RightFinger 
+                    or ItemSlotId.Feet 
+                    or ItemSlotId.LeftFinger 
+                    or ItemSlotId.RightHandOrTail 
+                    or ItemSlotId.CharacterBody => true,
             _ => false
         };
     }
 
-    public static bool IsSpecial(this ItemSlotId id) => id == ItemSlotId.Gold || id == ItemSlotId.Rations;
+    public static bool IsSpecial(this ItemSlotId id) => id is ItemSlotId.Gold or ItemSlotId.Rations;
 }

@@ -28,7 +28,7 @@ public class DisableEventChainEvent : ModifyEvent
         zeroes += s.UInt8(null, 0);
         e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
         zeroes += s.UInt16(null, 0);
-        s.Assert(e.Unk2 == 0 || e.Unk2 == 1 || e.Unk2 == 2, "DisableEventChain: field 2 expected to be in [0..2]"); // Usually 1
+        s.Assert(e.Unk2 is 0 or 1 or 2, "DisableEventChain: field 2 expected to be in [0..2]"); // Usually 1
         s.Assert(zeroes == 0, "DisableEventChain: fields 4,5,8 are expected to be 0");
 
         return e;

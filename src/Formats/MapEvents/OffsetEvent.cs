@@ -26,7 +26,7 @@ public class OffsetEvent : MapEvent
         zeroes += s.UInt8(null, 0);
         zeroes += s.UInt16(null, 0);
         zeroes += s.UInt16(null, 0);
-        s.Assert(e.Unk3 == 1 || e.Unk3 == 3, "OffsetEvent: Expected field 3 to be 1 or 3");
+        s.Assert(e.Unk3 is 1 or 3, "OffsetEvent: Expected field 3 to be 1 or 3");
         s.Assert(zeroes == 0, "OffsetEvent: Expected fields 4-8 to be 0");
         return e;
     }

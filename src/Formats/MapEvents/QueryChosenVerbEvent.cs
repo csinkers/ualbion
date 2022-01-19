@@ -10,7 +10,7 @@ public class QueryChosenVerbEvent : QueryEvent
 {
     public override QueryType QueryType => QueryType.ChosenVerb;
     [EventPart("arg")] public TriggerType TriggerType { get; set; }
-    [EventPart("op", true, QueryOperation.IsTrue)] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
+    [EventPart("op", true, QueryOperation.AlwaysFalse)] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
     [EventPart("imm", true, (byte)0)] public byte Immediate { get; private set; } // immediate value?
     QueryChosenVerbEvent() { }
     public QueryChosenVerbEvent(TriggerType triggerType, QueryOperation operation, byte immediate)

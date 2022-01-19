@@ -41,7 +41,7 @@ public static class NpcMapping
         for (var index = 0; index < map.Npcs.Count; index++)
         {
             var npc = map.Npcs[index];
-            if ((npc.MovementB & NpcMoveB.RandomMask) != 0)
+            if (!npc.HasWaypoints(map.Flags))
                 continue;
 
             if (npc.SpriteOrGroup == AssetId.None) // Unused 2D slots

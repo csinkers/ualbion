@@ -18,6 +18,19 @@ public enum NpcMoveA
     ChaseParty = 3,
 }
 
+public enum NpcMoveB : byte
+{
+    Waypoints = 0,
+    Random1 = 1,
+    Random2 = 2,
+    Random3 = 3,
+    Waypoints2 = 4,
+    Unk5 = 5,
+    Unk6 = 6,
+    Unk7 = 7,
+    Stationary = 8,
+}
+
 [Flags]
 public enum NpcFlags : uint
 {
@@ -30,14 +43,14 @@ public enum NpcFlags : uint
     // Flags
     Type1         = 1 <<  0, // 0x00000001 2 bit value
     Type2         = 1 <<  1, // 0x00000002 0 = PartyGfx; 1,2,3 = NpcGfx (2D levels)
-    MoveA1        = 1 <<  2, // 0x00000004 Wander randomly, don't emit waypoints
-    MoveA2        = 1 <<  3, // 0x00000008 Stay put, don't emit waypoints (4+8 = follow party)
+    MoveA1        = 1 <<  2, // 0x00000004 2 bit movement type, used if MapFlags.NpcMovementMode is not set
+    MoveA2        = 1 <<  3, // 0x00000008 
     SimpleMsg     = 1 <<  4, // 0x00000010 When talked to, shows a simple msg (i.e. interprets Id as a MapText sub-id). When not set, Id = EventSetId.
     Unk5          = 1 <<  5, // 0x00000020 277 times
     Unk6          = 1 <<  6, // 0x00000040 84 times
     Unused7       = 1 <<  7, // 0x00000080 ??
 
-    // Movement
+    // Movement (used if MapFlags.NpcMovementMode is set)
     MoveB1         = 1 <<  8, // 0x00000100 ??
     MoveB2         = 1 <<  9, // 0x00000200 ??
     MoveB4         = 1 << 10, // 0x00000400 ??

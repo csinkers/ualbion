@@ -4,14 +4,13 @@ public class CombatAttributes : ICombatAttributes
 {
     public int ExperiencePoints { get; set; }
     public ushort TrainingPoints { get; set; }
-    public ushort LifePoints { get; set; }
-    public ushort LifePointsMax { get; set; }
+    ICharacterAttribute ICombatAttributes.LifePoints => LifePoints;
+    public CharacterAttribute LifePoints { get; set; }
     public byte ActionPoints { get; set; }
-    public ushort Protection { get; set; }
-    public ushort Damage { get; set; }
-    public PhysicalConditions PhysicalConditions { get; set; }
-    public MentalConditions MentalConditions { get; set; }
+    public ushort UnknownD6 { get; set; }
+    public ushort UnknownD8 { get; set; }
+    public Conditions Conditions { get; set; }
 
     public CombatAttributes DeepClone() => (CombatAttributes) MemberwiseClone();
-    public override string ToString() => $"XP:{ExperiencePoints} TP:{TrainingPoints} LP:{LifePoints}/{LifePointsMax} AP:{ActionPoints} D:{Damage} P:{Protection} PCond:{PhysicalConditions} MCond:{MentalConditions}";
+    public override string ToString() => $"XP:{ExperiencePoints} TP:{TrainingPoints} LP:{LifePoints} AP:{ActionPoints} D:{UnknownD8} P:{UnknownD6} Cond:{Conditions}";
 }

@@ -28,23 +28,28 @@ public static class TriggerMapping
         ref int nextObjectId)
     {
         var objectGroups = new List<ObjectGroup>();
-
         var regions = TriggerZoneBuilder.BuildZones(map);
 
-        int globalIndex = 0;
-        var globals = regions.Where(x => x.Item1.Global).ToList();
-        if (globals.Any())
+        if (map.GlobalZones.Count > 0)
         {
-            foreach (var global in globals)
+            var globalRegions = new List<(ZoneKey, Geometry.Polygon)>();
+            for (var index = 0; index < map.GlobalZones.Count; index++)
             {
-                var (x, y) = DiagonalLayout.GetPositionForIndex(globalIndex++);
-                (global.Item2.OffsetX, global.Item2.OffsetY) = (-x - 1, -y - 1);
+                var global = map.GlobalZones[index];
+                var (x, y) = DiagonalLayout.GetPositionForIndex(index);
+                var polygon = new Geometry.Polygon
+                {
+                    OffsetX = -x - 1,
+                    OffsetY = -y - 1,
+                    Points = new List<(int, int)> { (0, 0), (1, 0), (1, 1), (0, 1) }
+                };
+                globalRegions.Add((new ZoneKey(global), polygon));
             }
 
             objectGroups.Add(BuildTriggerObjectGroup(
                 nextObjectGroupId++,
                 "T:Global",
-                globals,
+                globalRegions,
                 tileWidth,
                 tileHeight,
                 functionsByEventId,

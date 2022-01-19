@@ -15,6 +15,7 @@ public class InterpolatedCharacterSheet : IEffectiveCharacterSheet
         _a = a;
         _b = b;
         _getLerp = getLerp;
+        Age = new InterpolatedAttribute(() => _a().Age, () => _b().Age, _getLerp);
         Magic = new InterpolatedMagicSkills(() => _a().Magic, () => _b().Magic, _getLerp);
         Inventory = new InterpolatedInventory(() => _a().Inventory,() =>  _b().Inventory, _getLerp);
         Attributes = new InterpolatedAttributes(() => _a().Attributes, () => _b().Attributes, _getLerp);
@@ -28,7 +29,7 @@ public class InterpolatedCharacterSheet : IEffectiveCharacterSheet
     public Gender Gender => _b().Gender;
     public PlayerRace Race => _b().Race;
     public PlayerClass PlayerClass => _b().PlayerClass;
-    public ushort Age => _b().Age;
+    public ICharacterAttribute Age { get; }
     public byte Level => _b().Level;
     public SpriteId SpriteId => _b().SpriteId;
     public SpriteId PortraitId => _b().PortraitId;

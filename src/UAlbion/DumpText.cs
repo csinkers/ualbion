@@ -307,7 +307,7 @@ static class DumpText
         sw.WriteLine($"    {c.Combat}");
         if (c.Magic.SpellStrengths.Any())
         {
-            sw.WriteLine($"    Magic: (SP:{c.Magic.SpellPoints}/{c.Magic.SpellPointsMax}) Classes: {c.Magic.SpellClasses}");
+            sw.WriteLine($"    Magic: SP{c.Magic.SpellPoints} Classes: {c.Magic.SpellClasses}");
             for (int i = 0; i < CharacterSheet.MaxSpellsPerSchool * CharacterSheet.SpellSchoolCount; i++)
             {
                 var spellId = new SpellId(AssetType.Spell, i + 1);
@@ -340,58 +340,32 @@ static class DumpText
 
         if (c.Unknown6 != 0) sw.WriteLine($"    Unknown06:{c.Unknown6}");
         if (c.Unknown7 != 0) sw.WriteLine($"    Unknown07:{c.Unknown7}");
-        if (c.Unknown11 != 0) sw.WriteLine($"    Unknown11:{c.Unknown11}");
-        if (c.Unknown12 != 0) sw.WriteLine($"    Unknown12:{c.Unknown12}");
-        if (c.Unknown13 != 0) sw.WriteLine($"    Unknown13:{c.Unknown13}");
-        if (c.Unknown14 != 0) sw.WriteLine($"    Unknown14:{c.Unknown14}");
-        if (c.Unknown15 != 0) sw.WriteLine($"    Unknown15:{c.Unknown15}");
-        if (c.Unknown16 != 0) sw.WriteLine($"    Unknown16:{c.Unknown16}");
+        if (!c.MonsterGfxId.IsNone) sw.WriteLine($"    CombatGfx:{c.MonsterGfxId}");
+        if (c.UnkownC != 0) sw.WriteLine($"    Unknown12:{c.UnkownC}");
+        if (c.UnkownD != 0) sw.WriteLine($"    Unknown13:{c.UnkownD}");
+        if (c.UnknownE != 0) sw.WriteLine($"    Unknown14:{c.UnknownE}");
+        if (c.Morale != 0) sw.WriteLine($"    Unknown15:{c.Morale}");
+        if (c.SpellTypeImmunities != 0) sw.WriteLine($"    Unknown16:{c.SpellTypeImmunities}");
         if (c.Unknown1C != 0) sw.WriteLine($"    Unknown1C:{c.Unknown1C}");
-        if (c.Unknown20 != 0) sw.WriteLine($"    Unknown20:{c.Unknown20}");
+        if (c.ExperienceReward != 0) sw.WriteLine($"    Unknown20:{c.ExperienceReward}");
         if (c.Unknown22 != 0) sw.WriteLine($"    Unknown22:{c.Unknown22}");
-        if (c.Unknown24 != 0) sw.WriteLine($"    Unknown24:{c.Unknown24}");
-        if (c.Unknown26 != 0) sw.WriteLine($"    Unknown26:{c.Unknown26}");
-        if (c.Unknown28 != 0) sw.WriteLine($"    Unknown28:{c.Unknown28}");
-        if (c.Unknown2E != 0) sw.WriteLine($"    Unknown2E:{c.Unknown2E}");
-        if (c.Unknown30 != 0) sw.WriteLine($"    Unknown30:{c.Unknown30}");
-        if (c.Unknown36 != 0) sw.WriteLine($"    Unknown36:{c.Unknown36}");
-        if (c.Unknown38 != 0) sw.WriteLine($"    Unknown38:{c.Unknown38}");
-        if (c.Unknown3E != 0) sw.WriteLine($"    Unknown3E:{c.Unknown3E}");
-        if (c.Unknown40 != 0) sw.WriteLine($"    Unknown40:{c.Unknown40}");
-        if (c.Unknown46 != 0) sw.WriteLine($"    Unknown46:{c.Unknown46}");
-        if (c.Unknown48 != 0) sw.WriteLine($"    Unknown48:{c.Unknown48}");
-        if (c.Unknown4E != 0) sw.WriteLine($"    Unknown4E:{c.Unknown4E}");
-        if (c.Unknown50 != 0) sw.WriteLine($"    Unknown50:{c.Unknown50}");
-        if (c.Unknown56 != 0) sw.WriteLine($"    Unknown56:{c.Unknown56}");
-        if (c.Unknown58 != 0) sw.WriteLine($"    Unknown58:{c.Unknown58}");
-        if (c.Unknown5E != 0) sw.WriteLine($"    Unknown5E:{c.Unknown5E}");
-        if (c.Unknown60 != 0) sw.WriteLine($"    Unknown60:{c.Unknown60}");
-        if (c.Unknown66 != 0) sw.WriteLine($"    Unknown66:{c.Unknown66}");
-        if (c.Unknown68 != 0) sw.WriteLine($"    Unknown68:{c.Unknown68}");
-        if (c.Unknown6C != 0) sw.WriteLine($"    Unknown6C:{c.Unknown6C}");
-        if (c.Unknown7E != 0) sw.WriteLine($"    Unknown7E:{c.Unknown7E}");
-        if (c.Unknown80 != 0) sw.WriteLine($"    Unknown80:{c.Unknown80}");
-        if (c.Unknown86 != 0) sw.WriteLine($"    Unknown86:{c.Unknown86}");
-        if (c.Unknown88 != 0) sw.WriteLine($"    Unknown88:{c.Unknown88}");
-        if (c.Unknown8E != 0) sw.WriteLine($"    Unknown8E:{c.Unknown8E}");
-        if (c.Unknown90 != 0) sw.WriteLine($"    Unknown90:{c.Unknown90}");
+        if (c.PartyDepartX != 0) sw.WriteLine($"    DepartX:{c.PartyDepartX}");
+        if (c.PartyDepartY != 0) sw.WriteLine($"    DepartY:{c.PartyDepartY}");
+        if (!c.PartyDepartMapId.IsNone) sw.WriteLine($"    DepartMap:{c.PartyDepartMapId}");
         if (c.UnusedBlock.Any(x => x != 0))
         {
             for (int i = 0; i < c.UnusedBlock.Length; i++)
                 sw.WriteLine($" UnusedBlock.{i}:{c.UnusedBlock[i]}");
         }
 
-        if (c.UnknownCE != 0) sw.WriteLine($"    UnknownCE:{c.UnknownCE}");
-        if (c.UnknownD6 != 0) sw.WriteLine($"    UnknownD6:{c.UnknownD6}");
         if (c.UnknownDA != 0) sw.WriteLine($"    UnknownDA:{c.UnknownDA}");
-        if (c.UnknownDC != 0) sw.WriteLine($"    UnknownDC:{c.UnknownDC}");
-        if (c.UnknownDE != 0) sw.WriteLine($"    UnknownDE:{c.UnknownDE}");
-        if (c.UnknownE2 != 0) sw.WriteLine($"    UnknownE2:{c.UnknownE2}");
-        if (c.UnknownE4 != 0) sw.WriteLine($"    UnknownE4:{c.UnknownE4}");
-        if (c.UnknownE6 != 0) sw.WriteLine($"    UnknownE6:{c.UnknownE6}");
-        if (c.UnknownEA != 0) sw.WriteLine($"    UnknownEA:{c.UnknownEA}");
-        if (c.UnknownFA != 0) sw.WriteLine($"    UnknownFA:{c.UnknownFA}");
-        if (c.UnknownFC != 0) sw.WriteLine($"    UnknownFC:{c.UnknownFC}");
+        if (c.UnknownDE != 0) sw.WriteLine($"    UnknownDC:{c.UnknownDE}");
+        if (c.UnknownE0 != 0) sw.WriteLine($"    UnknownDE:{c.UnknownE0}");
+        if (c.LevelsPerActionPoint != 0) sw.WriteLine($"    UnknownE2:{c.LevelsPerActionPoint}");
+        if (c.LifePointsPerLevel != 0) sw.WriteLine($"    UnknownE4:{c.LifePointsPerLevel}");
+        if (c.SpellPointsPerLevel != 0) sw.WriteLine($"    UnknownE6:{c.SpellPointsPerLevel}");
+        if (c.TrainingPointsPerLevel != 0) sw.WriteLine($"    UnknownEA:{c.TrainingPointsPerLevel}");
+        if (c.Weight != 0) sw.WriteLine($"    Weight:{c.Weight}");
     }
 
     static void Chests(IAssetManager assets, string baseDir, AssetId[] dumpIds)

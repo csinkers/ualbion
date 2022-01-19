@@ -4,24 +4,24 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents;
 
-[Event("query_unk2A")]
-public class QueryUnk2AEvent : QueryEvent
+[Event("is_chain_active")]
+public class QueryChainActiveEvent : QueryEvent
 {
-    public override QueryType QueryType => QueryType.Unk2A;
+    public override QueryType QueryType => QueryType.ChainActive;
     [EventPart("op")] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
     [EventPart("imm")] public byte Immediate { get; private set; } // immediate value?
     [EventPart("arg")] public ushort Argument { get; set; }
-    QueryUnk2AEvent() { }
-    public QueryUnk2AEvent(QueryOperation operation, byte immediate, ushort argument)
+    QueryChainActiveEvent() { }
+    public QueryChainActiveEvent(QueryOperation operation, byte immediate, ushort argument)
     {
         Operation = operation;
         Immediate = immediate;
         Argument = argument;
     }
-    public static QueryUnk2AEvent Serdes(QueryUnk2AEvent e, ISerializer s)
+    public static QueryChainActiveEvent Serdes(QueryChainActiveEvent e, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        e ??= new QueryUnk2AEvent();
+        e ??= new QueryChainActiveEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         e.Immediate = s.UInt8(nameof(Immediate), e.Immediate);
         int zeroes = s.UInt8(null, 0);
@@ -29,7 +29,7 @@ public class QueryUnk2AEvent : QueryEvent
         e.Argument = s.UInt16(nameof(Argument), e.Argument);
         // field 8 is the next event id when the condition is false and is deserialised as part of the BranchEventNode that this event should belong to.
 
-        s.Assert(zeroes == 0, "QueryUnk2AEvent: Expected fields 3,4 to be 0");
+        s.Assert(zeroes == 0, "QueryChainActiveEvent: Expected fields 3,4 to be 0");
         return e;
     }
 }

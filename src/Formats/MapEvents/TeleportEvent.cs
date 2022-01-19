@@ -31,13 +31,7 @@ public class TeleportEvent : MapEvent
         e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
         e.MapId = MapId.SerdesU16(nameof(MapId), e.MapId, mapping, s);
         int zeroed = s.UInt16(null, 0);
-        s.Assert(e.Unk4 == 0
-                 || e.Unk4 == 1
-                 || e.Unk4 == 2
-                 || e.Unk4 == 3
-                 || e.Unk4 == 6
-                 || e.Unk4 == 106
-                 || e.Unk4 == 255, "TeleportEvent: Expected field 4 to be in { 0,1,2,3,6,106,255 }"); // Always 255 in maps
+        s.Assert(e.Unk4 is 0 or 1 or 2 or 3 or 6 or 106 or 255, "TeleportEvent: Expected field 4 to be in { 0,1,2,3,6,106,255 }"); // Always 255 in maps
         s.Assert(zeroed == 0, "TeleportEvent: Expected field 8 to be 0");
         return e;
     }

@@ -19,8 +19,8 @@ public abstract class QueryEvent : MapEvent, IBranchingEvent
         return queryType switch
         {
             QueryType.Switch => QuerySwitchEvent.Serdes((QuerySwitchEvent)e, mapping, s),
-            QueryType.Unk1 => QueryUnk1Event.Serdes((QueryUnk1Event)e, s),
-            QueryType.Unk4 => QueryUnk4Event.Serdes((QueryUnk4Event)e, s),
+            QueryType.ChainActive => QueryChainActiveEvent.Serdes((QueryChainActiveEvent)e, s),
+            QueryType.NpcActiveOnMap => QueryNpcActiveOnMapEvent.Serdes((QueryNpcActiveOnMapEvent)e, mapping, s),
             QueryType.HasPartyMember => QueryHasPartyMemberEvent.Serdes((QueryHasPartyMemberEvent)e, mapping, s),
             QueryType.HasItem => QueryHasItemEvent.Serdes((QueryHasItemEvent)e, mapping, s),
             QueryType.UsedItem => QueryUsedItemEvent.Serdes((QueryUsedItemEvent)e, mapping, s),
@@ -29,6 +29,7 @@ public abstract class QueryEvent : MapEvent, IBranchingEvent
             QueryType.UnkC => QueryUnkCEvent.Serdes((QueryUnkCEvent)e, s),
             QueryType.NpcActive => QueryNpcActiveEvent.Serdes((QueryNpcActiveEvent)e, s),
             QueryType.Gold => QueryGoldEvent.Serdes((QueryGoldEvent)e, s),
+            // QueryType.Rations => TODO
             QueryType.RandomChance => QueryRandomChanceEvent.Serdes((QueryRandomChanceEvent)e, s),
             QueryType.Hour => QueryHourEvent.Serdes((QueryHourEvent)e, s),
             QueryType.ChosenVerb => QueryChosenVerbEvent.Serdes((QueryChosenVerbEvent)e, s),
@@ -43,8 +44,8 @@ public abstract class QueryEvent : MapEvent, IBranchingEvent
             QueryType.Unk21 => QueryUnk21Event.Serdes((QueryUnk21Event)e, s),
             QueryType.EventUsed => QueryEventUsedEvent.Serdes((QueryEventUsedEvent)e, s),
             QueryType.DemoVersion => QueryDemoVersionEvent.Serdes((QueryDemoVersionEvent)e, s),
-            QueryType.Unk29 => QueryUnk29Event.Serdes((QueryUnk29Event)e, s),
-            QueryType.Unk2A => QueryUnk2AEvent.Serdes((QueryUnk2AEvent)e, s),
+            QueryType.NpcXCoord => QueryNpcXEvent.Serdes((QueryNpcXEvent)e, s),
+            QueryType.NpcYCoord => QueryNpcYEvent.Serdes((QueryNpcYEvent)e, s),
             QueryType.PromptPlayerNumeric => PromptPlayerNumericEvent.Serdes((PromptPlayerNumericEvent)e, textSourceId, s),
             _ => throw new FormatException($"Unexpected query type \"queryType\"")
         };

@@ -15,32 +15,25 @@ public static class TriggerZoneBuilder
         if (map == null) throw new ArgumentNullException(nameof(map));
 
         // Render zones to a grid
-        var zoneMap = new List<MapEventZone>[map.Width * map.Height];
+        var zoneMap = new MapEventZone[map.Width * map.Height];
+        Array.Copy(map.Zones, zoneMap, zoneMap.Length);
 
-        foreach (var zone in map.Zones)
-        {
-            int index = zone.Y * map.Width + zone.X;
-            zoneMap[index] ??= new List<MapEventZone>();
-            zoneMap[index].Add(zone);
-        }
-
-        var regions = new List<(ZoneKey, IList<(int, int)>)>();
+        var regions = new List<(ZoneKey key, IList<(int, int)> region)>();
         for (int index = 0; index < zoneMap.Length; index++)
         {
             var current = zoneMap[index];
             if (current == null)
                 continue;
 
-            while (current.Count > 0)
-                FillZone(regions, zoneMap, map.Width, current[0], index);
+            FillZone(regions, zoneMap, map.Width, current, index);
         }
 
         RemoveVoids(regions);
 
-        var edgeSets = regions.Select(x => (x.Item1, FindRegionEdges(x.Item2))).ToList();
+        var edgeSets = regions.Select(x => (x.key, FindRegionEdges(x.region))).ToList();
 
         // zoneMap should be empty now
-        ApiUtil.Assert(zoneMap.All(x => x?.Any() != true));
+        ApiUtil.Assert(zoneMap.All(x => x == null));
 
         // Stitch edges together
         for (int i = 0; i < edgeSets.Count; i++)
@@ -331,7 +324,7 @@ public static class TriggerZoneBuilder
         return cur;
     }
 
-    static void FillZone(List<(ZoneKey, IList<(int, int)>)> regions, List<MapEventZone>[] zoneMap, int width, MapEventZone zone, int index)
+    static void FillZone(List<(ZoneKey, IList<(int, int)>)> regions, MapEventZone[] zoneMap, int width, MapEventZone zone, int index)
     {
         var key = new ZoneKey(zone);
         var region = new List<(int, int)>();
@@ -339,28 +332,19 @@ public static class TriggerZoneBuilder
 
         Fill(width, index, zoneMap.Length, n =>
         {
-            var targetZones = zoneMap[n];
-            if (targetZones == null || targetZones.Count == 0)
+            var other = zoneMap[n];
+            if (other == null)
                 return false;
 
-            bool hit = false;
-            for (int k = 0; k < targetZones.Count;)
-            {
-                var other = targetZones[k];
-                if (new ZoneKey(other) != key)
-                {
-                    k++;
-                    continue;
-                }
+            if (new ZoneKey(other) != key)
+                return false;
 
-                hit = true;
-                byte i = (byte)(n % width);
-                byte j = (byte)(n / width);
-                region.Add((i, j));
-                targetZones.RemoveAt(k);
-            }
+            byte i = (byte)(n % width);
+            byte j = (byte)(n / width);
+            region.Add((i, j));
+            zoneMap[n] = null;
 
-            return hit;
+            return true;
         });
     }
 

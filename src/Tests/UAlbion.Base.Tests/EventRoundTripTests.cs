@@ -407,17 +407,17 @@ place_action SleepInRoom 1 1 1 1 1 1");
         Test((@"play_anim Video.MagicDemonstration 1 2 3 4", new PlayAnimationEvent(Video.MagicDemonstration, 1, 2, 3, 4)));
     }
 
-    [Fact] public void FestivalQuery() => Test(@"prompt_player EventText.FestivalTime 1 IsTrue 1");
+    [Fact] public void FestivalQuery() => Test(@"prompt_player EventText.FestivalTime 1 AlwaysFalse 1");
 
     [Fact]
     public void Query()
     {
         Test(@"prompt_player MapText.TestMapIskai 1
-prompt_player EventText.FestivalTime 1 IsTrue 1
+prompt_player EventText.FestivalTime 1 AlwaysFalse 1
 prompt_player_numeric MapText.Jirinaar Equals 0 1
 is_conscious PartyMember.Tom
-is_conscious PartyMember.Tom IsTrue 1
-is_demo_version 1 IsTrue 0
+is_conscious PartyMember.Tom AlwaysFalse 1
+is_demo_version 1 AlwaysFalse 0
 event_used
 total_gold GreaterThan 0 0
 total_gold GreaterThanOrEqual 0 1
@@ -426,21 +426,21 @@ total_gold LessThanOrEqual 0 1
 has_item Equals 1 Item.Pistol
 has_item GreaterThan 0 Item.Pistol
 has_item GreaterThanOrEqual 1 Item.Pistol
-party_has PartyMember.Tom
+in_party PartyMember.Tom
 is_leader PartyMember.Tom Equals
 is_leader PartyMember.Tom
 current_map Equals 0 Map.1
 is_npc_active 0
 is_npc_active 0 Equals
-is_npc_active 0 IsTrue 1
+is_npc_active 0 AlwaysFalse 1
 is_npc_active 1
 is_npc_active 1 Equals 1
 result
-random_chance 1 IsTrue 1
+random_chance 1 AlwaysFalse 1
 random_chance 1 LessThanOrEqual 0
 random_chance 1 LessThanOrEqual 1
 random_chance 1 LessThan 1
-random_chance 1 OpUnk6 0
+random_chance 1 AlwaysFalse2 0
 is_debug_mode
 get_switch Switch.ExpelledFromSouthWind
 get_ticker Ticker.Ticker100 Equals 1
@@ -449,21 +449,21 @@ get_ticker Ticker.Ticker100 GreaterThanOrEqual 1
 get_ticker Ticker.Ticker100 LessThanOrEqual 1
 get_ticker Ticker.Ticker100 LessThan 1
 query_hour Equals 1 1
-query_unk1 Equals 1 1
-query_unk1 GreaterThan 1 1
-query_unk1 GreaterThan 1 1
-query_unk1 GreaterThanOrEqual 1 1
-query_unk1 GreaterThanOrEqual 1 1
-query_unk1 IsTrue 0 0
-query_unk1 IsTrue 1 0
-query_unk1 LessThanOrEqual 1 1
-query_unk1 LessThanOrEqual 1 1
-query_unk1 LessThan 1 1
-query_unk1 OpUnk6 1 1
+is_chain_active Equals 1 1
+is_chain_active GreaterThan 1 1
+is_chain_active GreaterThan 1 1
+is_chain_active GreaterThanOrEqual 1 1
+is_chain_active GreaterThanOrEqual 1 1
+is_chain_active AlwaysFalse 0 0
+is_chain_active AlwaysFalse 1 0
+is_chain_active LessThanOrEqual 1 1
+is_chain_active LessThanOrEqual 1 1
+is_chain_active LessThan 1 1
+is_chain_active AlwaysFalse2 1 1
 query_unk1e GreaterThan 0 1
 query_unk1e GreaterThanOrEqual 0 1
 query_unk1e LessThanOrEqual 0 1
-query_unk1e OpUnk6 0 1
+query_unk1e AlwaysFalse2 0 1
 query_unkc Equals 0 0
 query_unkc Equals 0 1
 used_item Item.Pistol Equals

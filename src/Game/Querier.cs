@@ -81,14 +81,14 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
         });
 
         // TODO
-        OnAsync(Do<QueryUnk1Event>(_ => false));
-        OnAsync(Do<QueryUnk4Event>(_ => false));
+        OnAsync(Do<QueryChainActiveEvent>(_ => false));
+        OnAsync(Do<QueryNpcActiveOnMapEvent>(_ => false));
         OnAsync(Do<QueryUnkCEvent>(_ => false));
         OnAsync(Do<QueryUnk19Event>(_ => false));
         OnAsync(Do<QueryUnk1EEvent>(_ => false));
         OnAsync(Do<QueryUnk21Event>(_ => false));
-        OnAsync(Do<QueryUnk29Event>(_ => false));
-        OnAsync(Do<QueryUnk2AEvent>(_ => false));
+        OnAsync(Do<QueryNpcXEvent>(_ => false));
+        OnAsync(Do<QueryNpcYEvent>(_ => false));
     }
 /*
         bool Query(QueryEvent query, Action<bool> continuation)

@@ -3,7 +3,7 @@ using SerdesNet;
 
 namespace UAlbion.Formats.Assets;
 
-public class AutomapInfo
+public class AutomapInfo // Total size 0x13 = 19 bytes
 {
     public const int MaxNameLength = 15;
     public byte X { get; set; }

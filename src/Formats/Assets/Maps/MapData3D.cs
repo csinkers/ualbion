@@ -13,7 +13,6 @@ public class MapData3D : BaseMapData
 {
     const int AutomapGraphicsSize = 64;
     public override MapType MapType => MapType.ThreeD;
-    [JsonInclude] public Map3DFlags Flags { get; set; }
     [JsonInclude] public LabyrinthId LabDataId { get; set; }
     [JsonInclude] public SongId AmbientSongId { get; set; }
 
@@ -66,9 +65,7 @@ public class MapData3D : BaseMapData
         if (s == null) throw new ArgumentNullException(nameof(s));
 
         var map = existing ?? new MapData3D { Id = info.AssetId };
-        map.Flags = s.EnumU8(nameof(Flags), map.Flags); // 0
-        map.OriginalNpcCount = s.UInt8(nameof(OriginalNpcCount), map.OriginalNpcCount); // 1
-        int npcCount = NpcCountTransform.Instance.FromNumeric(map.OriginalNpcCount);
+        map.Flags = s.EnumU16(nameof(Flags), map.Flags); // 0
         var _ = s.UInt8("MapType", (byte)map.MapType); // 2
 
         map.SongId = SongId.SerdesU8(nameof(SongId), map.SongId, mapping, s); // 3
@@ -80,6 +77,7 @@ public class MapData3D : BaseMapData
         map.AmbientSongId = SongId.SerdesU8(nameof(AmbientSongId), map.AmbientSongId, mapping, s);
 
         map.Npcs ??= new List<MapNpc>();
+        int npcCount = (map.Flags & MapFlags.ExtraNpcs) != 0 ? 96 : 32;
         while (map.Npcs.Count < npcCount)
             map.Npcs.Add(new MapNpc());
 
@@ -101,11 +99,11 @@ public class MapData3D : BaseMapData
         }
         s.Check();
 
-        map.SerdesZones(s);
+        var zoneCount = map.SerdesZones(s);
 
         if (s.IsReading() && s.IsComplete() || s.IsWriting() && map.AutomapGraphics == null)
         {
-            ApiUtil.Assert(map.Zones.Count == 0);
+            ApiUtil.Assert(zoneCount == 0, "Trivial test map was expected to have 0 zones");
             foreach (var npc in map.Npcs)
                 npc.Waypoints = new NpcWaypoint[1];
             return map;

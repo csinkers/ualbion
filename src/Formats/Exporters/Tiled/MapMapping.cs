@@ -15,7 +15,6 @@ public static class MapMapping
         public const string Flags = "Flags";
         public const string FrameRate = "FrameRate";
         public const string Labyrinth = "Labyrinth";
-        public const string OriginalNpcCount = "OriginalNpcCount";
         public const string Palette = "Palette";
         public const string Song = "Song";
         public const string Sound = "Sound";
@@ -24,13 +23,12 @@ public static class MapMapping
 
     public static void ReadMapProperties(BaseMapData albionMap, Map tiledMap)
     {
-        albionMap.OriginalNpcCount = (byte)(PropInt(tiledMap, Prop.OriginalNpcCount) ?? 96);
         albionMap.CombatBackgroundId = PropId(tiledMap, Prop.CombatBackground);
         albionMap.SongId = PropId(tiledMap, Prop.Song);
 
         if (albionMap is MapData2D map2d)
         {
-            map2d.Flags = Enum.Parse<FlatMapFlags>(PropString(tiledMap, Prop.Flags, true));
+            map2d.Flags = Enum.Parse<MapFlags>(PropString(tiledMap, Prop.Flags, true));
             map2d.FrameRate = (byte)(PropInt(tiledMap, Prop.FrameRate) ?? 0);
             map2d.Sound = (byte)(PropInt(tiledMap, Prop.Sound) ?? 0);
         }
@@ -38,14 +36,13 @@ public static class MapMapping
         if (albionMap is MapData3D map3d)
         {
             map3d.AmbientSongId = PropId(tiledMap, Prop.Ambient);
-            map3d.Flags = Enum.Parse<Map3DFlags>(PropString(tiledMap, Prop.Flags, true));
+            map3d.Flags = Enum.Parse<MapFlags>(PropString(tiledMap, Prop.Flags, true));
         }
     }
 
     public static List<TiledProperty> BuildMapProperties(BaseMapData map)
     {
         var props = new List<TiledProperty>();
-        props.Add(new(Prop.OriginalNpcCount, map.OriginalNpcCount));
         props.Add(new(Prop.Palette, map.PaletteId.ToString()));
 
         if (map.SongId != SongId.None) props.Add(new(Prop.Song, map.SongId.ToString()));

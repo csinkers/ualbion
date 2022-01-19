@@ -39,9 +39,8 @@ public static class LayoutTestUtil
 
     public static (List<EventNode> events, List<ushort> chains, List<ushort> extra) ExtractMapLayout(IMapData map)
     {
-        var entryPoints = map.Npcs.Select(x => x.EventIndex)
-            .Concat(map.Zones.Select(x => x.EventIndex))
-            .ToHashSet();
+        var entryPoints = map.Npcs.Select(x => x.EventIndex).ToHashSet();
+        entryPoints.UnionWith(map.UniqueZoneNodeIds);
         entryPoints.ExceptWith(map.Chains);
         entryPoints.Remove(0xffff);
 

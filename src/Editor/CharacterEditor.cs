@@ -47,7 +47,7 @@ public class CharacterEditor : AssetEditor
             EnumRadioButtons(nameof(_sheet.Gender), _sheet.Gender);
             EnumRadioButtons(nameof(_sheet.Race), _sheet.Race); // TODO: Dropdown
             EnumRadioButtons(nameof(_sheet.PlayerClass), _sheet.PlayerClass); // TODO: Dropdown
-            UInt16Slider(nameof(_sheet.Age), _sheet.Age, 0, ushort.MaxValue);
+            UInt16Slider(nameof(_sheet.Age), _sheet.Age.Current, 0, _sheet.Age.Max);
             UInt8Slider(nameof(_sheet.Level), _sheet.Level, 0, byte.MaxValue);
 
             EnumCheckboxes(nameof(_sheet.Languages), _sheet.Languages);

@@ -6,8 +6,8 @@ namespace UAlbion.Formats.Assets;
 
 public class MagicSkills : IMagicSkills
 {
-    public ushort SpellPoints { get; set; }
-    public ushort SpellPointsMax { get; set; }
+    ICharacterAttribute IMagicSkills.SpellPoints => SpellPoints;
+    public CharacterAttribute SpellPoints { get; set; }
     public SpellClasses SpellClasses { get; set; }
     [JsonInclude] public IList<SpellId> KnownSpells { get; private set; } = new List<SpellId>();
     [JsonInclude] public IDictionary<SpellId, ushort> SpellStrengths { get; private set; } = new Dictionary<SpellId, ushort>();
@@ -32,8 +32,7 @@ public class MagicSkills : IMagicSkills
 
 public interface IMagicSkills
 {
-    ushort SpellPoints { get; }
-    ushort SpellPointsMax { get; }
+    ICharacterAttribute SpellPoints { get; }
     SpellClasses SpellClasses { get; }
     IList<SpellId> KnownSpells { get; }
     IDictionary<SpellId, ushort> SpellStrengths { get; }

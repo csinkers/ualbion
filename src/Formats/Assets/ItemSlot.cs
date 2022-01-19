@@ -302,8 +302,7 @@ public class ItemSlot : IReadOnlyItemSlot
         if (y == null) throw new ArgumentNullException(nameof(y));
         if (Item == null || y.Item == null) return true; // Anything can coalesce with nothing
         if (ItemId != y.ItemId) return false; // Can't stack dissimilar items
-        if (Item is Gold) return true;
-        if (Item is Rations) return true;
+        if (Item is Gold or Rations) return true;
         if (!(Item is ItemData xi) || !(y.Item is ItemData)) return false; // If not gold/rations, then both must be items
         if (Id.Slot.IsBodyPart() || y.Id.Slot.IsBodyPart()) return false; // Can't wield / wear stacks
         return xi.IsStackable;

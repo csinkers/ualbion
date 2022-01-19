@@ -45,7 +45,7 @@ public class WaveLibSample : ISample
         // Check for new patterns
         ApiUtil.Assert(new[] { 119, 120, 121, 122, 123, 124, 125, 126, 127, -1 }.Contains(w.Instrument));
         ApiUtil.Assert(new[] { 56, 58, 60, 62, 63, 64, 66, 69, 76, 80 }.Contains(w.Type));
-        ApiUtil.Assert(w.SampleRate == 11025 || w.SampleRate == -1);
+        ApiUtil.Assert(w.SampleRate is 11025 or -1);
 
         return w;
     }

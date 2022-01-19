@@ -30,11 +30,16 @@ public class StatusBarPortrait : UiElement
 
     public StatusBarPortrait(int order)
     {
-        On<PartyChangedEvent>(e => LoadSprite());
+        _order = order;
+        _portrait = AttachChild(new UiSpriteElement(Base.Portrait.Tom));
+        _health = AttachChild(new StatusBarHealthBar(order, true));
+        _mana = AttachChild(new StatusBarHealthBar(order, false));
+
+        On<PartyChangedEvent>(_ => LoadSprite());
         On<UiLeftClickEvent>(OnClick);
         On<UiRightClickEvent>(OnRightClick);
         On<HoverEvent>(Hover);
-        On<BlurEvent>(e =>
+        On<BlurEvent>(_ =>
         {
             _portrait.Flags = 0;
             Raise(new HoverTextEvent(null));
@@ -45,10 +50,6 @@ public class StatusBarPortrait : UiElement
                 OnTimer();
         });
 
-        _order = order;
-        _portrait = AttachChild(new UiSpriteElement(Base.Portrait.Tom));
-        _health = AttachChild(new StatusBarHealthBar(order, true));
-        _mana = AttachChild(new StatusBarHealthBar(order, false));
     }
 
     void OnRightClick(UiRightClickEvent e)
@@ -141,7 +142,7 @@ public class StatusBarPortrait : UiElement
                 4),
             order));
 
-        if (member.Apparent.Magic.SpellPointsMax > 0)
+        if (member.Apparent.Magic.SpellPoints.Max > 0)
         {
             maxOrder = Math.Max(maxOrder, func(_mana, new Rectangle(
                     extents.X + 5,
@@ -209,7 +210,6 @@ public class StatusBarPortrait : UiElement
             return;
 
         var settings = Resolve<ISettings>();
-        var assets = Resolve<IAssetManager>();
         var inventoryManager = Resolve<IInventoryManager>();
         var tf = Resolve<ITextFormatter>();
 

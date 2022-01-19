@@ -18,7 +18,6 @@ public class MapData2D : BaseMapData
         Base.Tileset.Desert
     };
     public override MapType MapType => OutdoorTilesets.Any(x => x == TilesetId) ? MapType.TwoDOutdoors : MapType.TwoD;
-    [JsonInclude] public FlatMapFlags Flags { get; set; } // Wait/Rest, Light-Environment, NPC converge range
     [JsonInclude] public byte Sound { get; set; }
     [JsonInclude] public TilesetId TilesetId { get; set; }
     [JsonInclude] public byte FrameRate { get; set; }
@@ -56,9 +55,7 @@ public class MapData2D : BaseMapData
 
         var startOffset = s.Offset;
         var map = existing ?? new MapData2D { Id = info.AssetId };
-        map.Flags = s.EnumU8(nameof(Flags), map.Flags); // 0
-        map.OriginalNpcCount = s.UInt8(nameof(OriginalNpcCount), map.OriginalNpcCount); // 1
-        int npcCount = NpcCountTransform.Instance.FromNumeric(map.OriginalNpcCount);
+        map.Flags = s.EnumU16(nameof(Flags), map.Flags); // 0
         _ = s.UInt8("MapType", (byte)MapType.TwoD); // 2 (always Map2D to start with, may shift to outdoors once we assign the tileset)
 
         map.SongId = SongId.SerdesU8(nameof(SongId), map.SongId, mapping, s); // 3
@@ -67,9 +64,13 @@ public class MapData2D : BaseMapData
         map.TilesetId = TilesetId.SerdesU8(nameof(TilesetId), map.TilesetId, mapping, s); //6
         map.CombatBackgroundId = SpriteId.SerdesU8(nameof(CombatBackgroundId), map.CombatBackgroundId, AssetType.CombatBackground, mapping, s); // 7
         map.PaletteId = PaletteId.SerdesU8(nameof(PaletteId), map.PaletteId, mapping, s);
-        map.FrameRate = s.UInt8(nameof(FrameRate), map.FrameRate); //9
+        map.FrameRate = s.UInt8(nameof(FrameRate), map.FrameRate); // 9
+        ApiUtil.Assert(s.Offset == startOffset + 10);
+        s.Check();
 
         map.Npcs ??= new List<MapNpc>();
+
+        int npcCount = (map.Flags & MapFlags.ExtraNpcs) != 0 ? 96 : 32;
         while (map.Npcs.Count < npcCount)
             map.Npcs.Add(new MapNpc());
 
@@ -78,6 +79,9 @@ public class MapData2D : BaseMapData
             map.Npcs,
             npcCount,
             (n, x, s2) => MapNpc.Serdes(n, x, map.MapType, mapping, s2)).ToList();
+
+        ApiUtil.Assert(s.Offset == startOffset + 10 + npcCount * MapNpc.SizeOnDisk);
+        s.Check();
 
         if (s.IsReading())
             map.RawLayout = s.Bytes("Layout", null, 3 * map.Width * map.Height);

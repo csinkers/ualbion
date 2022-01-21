@@ -25,7 +25,17 @@ public sealed class SpriteLease : IComparable<SpriteLease>
         Unlock(taken);
     }
 
-    public WeakSpriteReference MakeWeakReference(int index) => new(_spriteBatch, this, index);
+    public SpriteInstanceData? GetInstance(int index)
+    {
+        if (index < 0 || index >= Length)
+            return null;
+
+        bool taken = false;
+        var span = Lock(ref taken);
+        var result = span[index];
+        Unlock(taken);
+        return result;
+    }
 
     public void Update(int index, Vector3 position, Vector2 size, int regionIndex, SpriteFlags flags)
         => Update(index, position, size, Key.Texture.Regions[regionIndex], flags);
@@ -91,7 +101,7 @@ public sealed class SpriteLease : IComparable<SpriteLease>
     /// <typeparam name="T">The type of the context object</typeparam>
     /// <param name="mutatorFunc">The function used to modify the instance data</param>
     /// <param name="context">The context for the mutator function</param>
-    public void Access<T>(SpriteLease.LeaseAccessDelegate<T> mutatorFunc, T context)
+    public void Access<T>(LeaseAccessDelegate<T> mutatorFunc, T context)
     {
         if (mutatorFunc == null) throw new ArgumentNullException(nameof(mutatorFunc));
         bool lockWasTaken = false;

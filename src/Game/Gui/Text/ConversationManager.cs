@@ -58,24 +58,22 @@ public class ConversationManager : Component
         switch(mapTextEvent.Location)
         {
             case TextLocation.NoPortrait:
-            {
-                var dialog = AttachChild(new TextDialog(tf.Format(mapTextEvent.ToId())));
-                dialog.Closed += (_, _) => continuation();
-                return true;
-            }
+                {
+                    var dialog = AttachChild(new TextDialog(tf.Format(mapTextEvent.ToId())));
+                    dialog.Closed += (_, _) => continuation();
+                    return true;
+                }
 
             case TextLocation.PortraitLeft:
             case TextLocation.PortraitLeft2:
             case TextLocation.PortraitLeft3:
-            {
-                var portraitId = GetPortrait(mapTextEvent.Speaker);
-                if (mapTextEvent.Location == TextLocation.PortraitLeft2) // TODO: ??? work out how this is meant to work.
-                    portraitId = Base.Portrait.Rainer;
-                var text = tf.Ink(FontColor.Yellow).Format(mapTextEvent.ToId());
-                var dialog = AttachChild(new TextDialog(text, portraitId));
-                dialog.Closed += (_, _) => continuation();
-                return true;
-            }
+                {
+                    var portraitId = GetPortrait(mapTextEvent.Speaker);
+                    var text = tf.Ink(FontColor.Yellow).Format(mapTextEvent.ToId());
+                    var dialog = AttachChild(new TextDialog(text, portraitId));
+                    dialog.Closed += (_, _) => continuation();
+                    return true;
+                }
 
             case TextLocation.QuickInfo:
                 Raise(new DescriptionTextEvent(tf.Format(mapTextEvent.ToId())));

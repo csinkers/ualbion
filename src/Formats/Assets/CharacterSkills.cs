@@ -19,5 +19,11 @@ public class CharacterSkills : ICharacterSkills
     public CharacterAttribute RangedCombat { get; set; }
     public CharacterAttribute CriticalChance { get; set; }
     public CharacterAttribute LockPicking { get; set; }
-    public CharacterSkills DeepClone() => (CharacterSkills)MemberwiseClone();
+    public CharacterSkills DeepClone() => new()
+    {
+        CloseCombat = CloseCombat.DeepClone(),
+        RangedCombat = RangedCombat.DeepClone(),
+        CriticalChance = CriticalChance.DeepClone(),
+        LockPicking = LockPicking.DeepClone()
+    };
 }

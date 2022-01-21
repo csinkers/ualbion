@@ -89,7 +89,7 @@ public class SavedGame
         save.PartyX = s.UInt16(nameof(PartyX), save.PartyX);   // 10
         save.PartyY = s.UInt16(nameof(PartyY), save.PartyY);   // 12
         save.PartyDirection = s.EnumU8(nameof(PartyDirection), save.PartyDirection); // 14
-        save.Unknown15 = s.Bytes(nameof(Unknown15), save.Unknown15, 0x185); // 15
+        save.Unknown15 = s.Bytes(nameof(Unknown15), save.Unknown15, 0x185); // 15 TODO: Active spell info?
 
         save.ActiveMembers = s.List(
             nameof(ActiveMembers),
@@ -108,6 +108,7 @@ public class SavedGame
                 save._switches.GetPacked(0, FlagDictionary.OriginalSaveGameMax, mapping),
                 FlagDictionary.PackedSize(0, FlagDictionary.OriginalSaveGameMax)), mapping); // 276
 
+        // TODO: Chain, Door, Chest, Npc, KnownWord flag dictionaries. Known 3D automap info markers? Battle positions?
         save.Unknown2C1 = s.Bytes(nameof(Unknown2C1), save.Unknown2C1, 0x5833); // 0x2C1
         s.Object(nameof(Tickers), save._tickers, TickerDictionary.Serdes); // 5AF4
 

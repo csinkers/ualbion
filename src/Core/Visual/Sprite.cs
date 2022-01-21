@@ -95,11 +95,9 @@ public class Sprite : Component, IPositioned
 
     public int Frame
     {
-        get => _frame;
+        get => _frame % FrameCount;
         set
         {
-            if (_frame == value || FrameCount <= 1) return;
-            value %= FrameCount;
             if (_frame == value) return;
             _frame = value;
             Dirty = true;

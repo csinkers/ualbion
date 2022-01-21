@@ -51,7 +51,7 @@ public abstract class Component : IComponent
     /// <summary>
     /// The parent of this component, if it is a child.
     /// </summary>
-    IComponent Parent { get; set; }
+    public IComponent Parent { get; private set; }
 
     /// <summary>
     /// The list of this component's child components.

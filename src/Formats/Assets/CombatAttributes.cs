@@ -11,6 +11,16 @@ public class CombatAttributes : ICombatAttributes
     public ushort UnknownD8 { get; set; }
     public Conditions Conditions { get; set; }
 
-    public CombatAttributes DeepClone() => (CombatAttributes) MemberwiseClone();
+    public CombatAttributes DeepClone() => new()
+    {
+        ExperiencePoints = ExperiencePoints,
+        TrainingPoints = TrainingPoints,
+        LifePoints = LifePoints.DeepClone(),
+        ActionPoints = ActionPoints,
+        UnknownD6 = UnknownD6,
+        UnknownD8 = UnknownD8,
+        Conditions = Conditions
+    };
+
     public override string ToString() => $"XP:{ExperiencePoints} TP:{TrainingPoints} LP:{LifePoints} AP:{ActionPoints} D:{UnknownD8} P:{UnknownD6} Cond:{Conditions}";
 }

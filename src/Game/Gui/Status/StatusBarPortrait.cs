@@ -240,8 +240,8 @@ public class StatusBarPortrait : UiElement
                 text = tf.Format(
                     Base.SystemText.PartyPortrait_XLifeMana,
                     member.Apparent.GetName(settings.Gameplay.Language),
-                    member.Apparent.Combat.LifePoints,
-                    member.Apparent.Magic.SpellPoints);
+                    member.Apparent.Combat.LifePoints.Current,
+                    member.Apparent.Magic.SpellPoints.Current);
                 break;
         }
 

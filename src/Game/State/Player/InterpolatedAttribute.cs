@@ -21,4 +21,5 @@ public class InterpolatedAttribute : ICharacterAttribute
     public ushort Max => (ushort)ApiUtil.Lerp(_a().Max, _b().Max, _getLerp());
     public ushort Boost => (ushort)ApiUtil.Lerp(_a().Boost, _b().Boost, _getLerp());
     public ushort Backup => (ushort)ApiUtil.Lerp(_a().Backup, _b().Backup, _getLerp());
+    public override string ToString() => $"[{Current}/{Max}]{(Boost > 0 ? $"+{Boost}" : "")}{(Backup > 0 ? $" (was {Backup})" : "")}";
 }

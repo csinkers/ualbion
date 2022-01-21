@@ -173,7 +173,7 @@ if (query_verb Examine) {
         var script = string.Join(Environment.NewLine, set.EventStrings);
 
         const string expectedScript = @" 0=>1: action StartDialogue
-!1?2:11: party_has PartyMember.Sira
+!1?2:11: in_party PartyMember.Sira
 !2?6:3: get_switch Switch.Switch597
  3=>4: map_text EventText.Sira2 7 StandardOptions
  4=>5: map_text EventText.Sira2 1 ConversationOptions
@@ -232,7 +232,7 @@ if (query_verb Examine) {
  57=>!: end_dialogue
 !58?!:!: get_switch Switch.Switch0
  59=>60: action StartDialogue
-!60?61:71: party_has PartyMember.Drirr
+!60?61:71: in_party PartyMember.Drirr
 !61?65:62: get_switch Switch.Switch599
  62=>63: map_text EventText.Sira2 12 StandardOptions
  63=>64: map_text EventText.Sira2 1 ConversationOptions
@@ -253,7 +253,7 @@ if (query_verb Examine) {
  78=>79: add_party_member PartyMember.Drirr 3
  79=>!: end_dialogue
  80=>81: action Unk3D
-!81?82:!: party_has PartyMember.Mellthas
+!81?82:!: in_party PartyMember.Mellthas
 !82?!:86: get_switch Switch.Switch597
  83=>84: change_health PartyMember.Sira AddAmount 2 2
  84=>85: change_health PartyMember.Mellthas AddAmount 2 2
@@ -311,7 +311,7 @@ if (query_verb Examine) {
 
         const string expected = @"Chain0:
 action StartDialogue
-if (party_has PartyMember.Sira) {
+if (in_party PartyMember.Sira) {
     if (get_switch Switch.Switch597) {
         if (get_switch Switch.Switch77) {
             map_text EventText.Sira2 11 StandardOptions

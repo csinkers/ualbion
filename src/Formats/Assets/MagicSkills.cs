@@ -24,8 +24,13 @@ public class MagicSkills : IMagicSkills
 
     public MagicSkills DeepClone()
     {
-        var clone = (MagicSkills)MemberwiseClone();
-        clone.SpellStrengths = clone.SpellStrengths.ToDictionary(x => x.Key, x => x.Value);
+        var clone = new MagicSkills()
+        {
+            SpellPoints = SpellPoints.DeepClone(),
+            SpellClasses = SpellClasses,
+            KnownSpells = KnownSpells.ToList(),
+            SpellStrengths = SpellStrengths.ToDictionary(x => x.Key, x => x.Value)
+        };
         return clone;
     }
 }

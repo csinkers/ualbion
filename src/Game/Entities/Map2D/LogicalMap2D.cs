@@ -38,7 +38,7 @@ public class LogicalMap2D : LogicalMap
             return null;
 
         int tileIndex = _mapData.Underlay[index];
-        return tileIndex > 1 ? _tileData.Tiles[tileIndex] : null;
+        return tileIndex >= 1 ? _tileData.Tiles[tileIndex] : null;
     }
 
     public TileData GetOverlay(int x, int y) => GetOverlay(Index(x, y));

@@ -51,8 +51,8 @@ public class MapRenderable2D : Component
     public Vector2 TileSize { get; }
     public PaletteId Palette => _logicalMap.PaletteId;
     public Vector2 SizePixels => new Vector2(_logicalMap.Width, _logicalMap.Height) * TileSize;
-    public WeakSpriteReference GetWeakUnderlayReference(int x, int y) => _underlay.GetWeakSpriteReference(x, y);
-    public WeakSpriteReference GetWeakOverlayReference(int x, int y) => _overlay.GetWeakSpriteReference(x, y);
+    public SpriteInstanceData? GetUnderlaySpriteData(int x, int y) => _underlay.GetSpriteData(x, y);
+    public SpriteInstanceData? GetOverlaySpriteData(int x, int y) => _overlay.GetSpriteData(x, y);
 
     public void SetHighlightIndex(int? index)
     {

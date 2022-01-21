@@ -23,6 +23,7 @@ public sealed class SelectionHandler2D : Component
     readonly LogicalMap2D _map;
     readonly MapRenderable2D _renderable;
     readonly MapTileHit _mapTileHit = new();
+    readonly DebugMapTileHit _debugMapTileHit = new();
     Func<object, string> _formatChain;
     int _lastHighlightIndex;
 
@@ -63,16 +64,18 @@ public sealed class SelectionHandler2D : Component
         int y = (int)(intersectionPoint.Y / _renderable.TileSize.Y);
 
         _mapTileHit.Tile = new Vector2(x, y);
-        _mapTileHit.IntersectionPoint = intersectionPoint;
-        _mapTileHit.UnderlaySprite = e.Debug ? _renderable.GetWeakUnderlayReference(x, y) : null;
-        _mapTileHit.OverlaySprite = e.Debug ? _renderable.GetWeakOverlayReference(x, y) : null;
         continuation(new Selection(e.Origin, e.Direction, t, _mapTileHit));
 
-        var underlayTile = _map.GetUnderlay(x, y);
-        var overlayTile = _map.GetOverlay(x, y);
-
-        if (underlayTile != null) continuation(new Selection(e.Origin, e.Direction, t, underlayTile));
-        if (overlayTile != null) continuation(new Selection(e.Origin, e.Direction, t, overlayTile));
+        if (e.Debug)
+        {
+            _debugMapTileHit.Tile = new Vector2(x, y);
+            _debugMapTileHit.IntersectionPoint = intersectionPoint;
+            _debugMapTileHit.UnderlaySprite = _renderable.GetUnderlaySpriteData(x, y);
+            _debugMapTileHit.OverlaySprite = _renderable.GetOverlaySpriteData(x, y);
+            _debugMapTileHit.UnderlayTile = _map.GetUnderlay(x, y);
+            _debugMapTileHit.OverlayTile = _map.GetUnderlay(x, y);
+            continuation(new Selection(e.Origin, e.Direction, t, _debugMapTileHit));
+        }
         continuation(new Selection(e.Origin, e.Direction, t, this));
 
         if (e.Debug)

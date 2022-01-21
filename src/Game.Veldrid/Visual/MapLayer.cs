@@ -56,8 +56,8 @@ public class MapLayer : Component, IMapLayer
         On<RenderEvent>(_ => Render());
     }
 
-    public WeakSpriteReference GetWeakSpriteReference(int x, int y) 
-        => _lease?.MakeWeakReference(_logicalMap.Index(x, y));
+    public SpriteInstanceData? GetSpriteData(int x, int y) 
+        => _lease?.GetInstance(_logicalMap.Index(x, y));
 
     protected override void Unsubscribed()
     {

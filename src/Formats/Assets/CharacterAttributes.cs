@@ -28,6 +28,7 @@ public class CharacterAttribute : ICharacterAttribute
     public ushort Max { get; set; }
     public ushort Boost { get; set; }
     public ushort Backup { get; set; }
+    public CharacterAttribute DeepClone() => (CharacterAttribute)MemberwiseClone();
     public override string ToString() => $"[{Current}/{Max}]{(Boost > 0 ? $"+{Boost}" : "")}{(Backup > 0 ? $" (was {Backup})" : "")}";
 
     public static CharacterAttribute Serdes(string name, CharacterAttribute attr, ISerializer s, bool hasBackup = true)
@@ -64,5 +65,15 @@ public class CharacterAttributes : ICharacterAttributes
     public CharacterAttribute MagicResistance { get; set; }
     public CharacterAttribute MagicTalent { get; set; }
 
-    public CharacterAttributes DeepClone() => (CharacterAttributes)MemberwiseClone();
+    public CharacterAttributes DeepClone() => new()
+    {
+        Strength = Strength.DeepClone(),
+        Intelligence = Intelligence.DeepClone(),
+        Dexterity = Dexterity.DeepClone(),
+        Speed = Speed.DeepClone(),
+        Stamina = Stamina.DeepClone(),
+        Luck = Luck.DeepClone(),
+        MagicResistance = MagicResistance.DeepClone(),
+        MagicTalent = MagicTalent.DeepClone(),
+    };
 }

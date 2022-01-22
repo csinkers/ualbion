@@ -22,13 +22,13 @@ public enum NpcMoveB : byte
 {
     Waypoints = 0,
     Random1 = 1,
-    Random2 = 2,
-    Random3 = 3,
+    Stationary = 2,
+    ChaseParty = 3,
     Waypoints2 = 4,
-    Unk5 = 5,
-    Unk6 = 6,
-    Unk7 = 7,
-    Stationary = 8,
+    Unk5 = 5, // Stationary
+    Unk6 = 6, // Stationary
+    Unk7 = 7, // Stationary
+    Unk8 = 8,
 }
 
 [Flags]

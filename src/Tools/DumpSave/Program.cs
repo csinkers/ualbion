@@ -68,13 +68,13 @@ static class Program
                 continue;
             Console.WriteLine($"{e.Id} O:{e.SpriteOrGroup} ({e.X1}, {e.Y1}) ({e.X2}, {e.Y2}) ({e.X3}, {e.Y3}) ({e.X4}, {e.Y4})");
             ColorPrint(0x4, e.Unk4);
-            ColorPrint(0x6, e.Unk6);
-            ColorPrint(0x8, e.Unk8);
+            Console.WriteLine($"Sound: {e.Sound}");
+            ColorPrint(0x8, e.Unk7);
             ColorPrint(0x9, e.Unk9);
             Console.WriteLine();
             ColorPrint(0x11, e.Unk11);
-            ColorPrint(0x13, e.Unk13);
-            ColorPrint(0x15, e.Unk15);
+            ColorPrint(0x13, e.EventIndex);
+            ColorPrint(0x15, e.MovementType);
             ColorPrint(0x17, e.Unk17);
             Console.WriteLine();
             ColorPrint(0x19, e.Unk19);
@@ -132,7 +132,7 @@ static class Program
             ColorPrint(0x70, e.Unk70);
             ColorPrint(0x72, e.Unk72);
             Console.WriteLine();
-            ColorPrint(0x74, e.Unk74);
+            Console.WriteLine($"Dir: {e.Direction}");
             ColorPrint(0x76, e.Unk76);
             ColorPrint(0x78, e.Unk78);
             ColorPrint(0x7A, e.Unk7A);

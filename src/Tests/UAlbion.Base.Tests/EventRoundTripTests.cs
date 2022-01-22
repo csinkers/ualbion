@@ -288,9 +288,9 @@ public class EventRoundTripTests
     [Fact]
     public void ChangeLanguage()
     {
-        Test(("change_language None SetToMaximum Iskai 1", new ChangeLanguageEvent(PartyMemberId.None, NumericOperation.SetToMaximum, PlayerLanguages.Iskai, 1)),
-            ("change_language PartyMember.Rainer SetToMaximum Iskai 2", new ChangeLanguageEvent(PartyMember.Rainer, NumericOperation.SetToMaximum, PlayerLanguages.Iskai, 2)),
-            ("change_language PartyMember.Tom SetToMaximum Iskai 2", new ChangeLanguageEvent(PartyMember.Tom, NumericOperation.SetToMaximum, PlayerLanguages.Iskai, 2)));
+        Test(("change_language None SetToMaximum Iskai 1", new ChangeLanguageEvent(PartyMemberId.None, NumericOperation.SetToMaximum, PlayerLanguage.Iskai, 1)),
+            ("change_language PartyMember.Rainer SetToMaximum Iskai 2", new ChangeLanguageEvent(PartyMember.Rainer, NumericOperation.SetToMaximum, PlayerLanguage.Iskai, 2)),
+            ("change_language PartyMember.Tom SetToMaximum Iskai 2", new ChangeLanguageEvent(PartyMember.Tom, NumericOperation.SetToMaximum, PlayerLanguage.Iskai, 2)));
     }
 
     [Fact]

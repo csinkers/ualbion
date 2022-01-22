@@ -10,10 +10,6 @@ using UAlbion.Formats.Containers;
 
 namespace UAlbion.Formats.Assets.Save;
 
-public class Unknown35Byte
-{
-}
-
 public class SavedGame
 {
     public const int MaxPartySize = 6;
@@ -47,7 +43,6 @@ public class SavedGame
     public byte[] Unknown5B9F { get; set; }
     public NpcState[] Npcs { get; } = new NpcState[MaxNpcCount];
     public byte[] Unknown5B71 { get; set; } 
-    public Unknown35Byte[] Unk35Byte { get; set; } // Len = 16
     public MapChangeCollection PermanentMapChanges { get; private set; } = new();
     public MapChangeCollection TemporaryMapChanges { get; private set; } = new();
     public IList<VisitedEvent> VisitedEvents { get; private set; } = new List<VisitedEvent>();

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -103,7 +102,7 @@ public static class NpcMapping
 
         if (!npc.Id.IsNone) objProps.Add(new TiledProperty(Prop.Id, npc.Id.ToString()));
         if (npc.Node != null) objProps.Add(new TiledProperty(Prop.Script, functionsByEventId[npc.Node.Id]));
-        if (npc.Sound > 0) objProps.Add(new TiledProperty(Prop.Sound, npc.Sound.ToString(CultureInfo.InvariantCulture)));
+        if (!npc.Sound.IsNone) objProps.Add(new TiledProperty(Prop.Sound, npc.Sound.ToString()));
         if (npcPathIndices.TryGetValue(npcIndex, out var pathObjectId)) objProps.Add(TiledProperty.Object(Prop.Path, pathObjectId));
 
         var (tileId, tileW, tileH) = getTileFunc(npc.SpriteOrGroup);
@@ -148,7 +147,7 @@ public static class NpcMapping
             Flags = (NpcFlags)Enum.Parse(typeof(NpcFlags), obj.PropString(Prop.Flags)),
             MovementA = (NpcMoveA)Enum.Parse(typeof(NpcMoveA), obj.PropString(Prop.MovementA)),
             MovementB = (NpcMoveB)Enum.Parse(typeof(NpcMoveB), obj.PropString(Prop.MovementB)),
-            Sound = (byte)(obj.PropInt(Prop.Sound) ?? 0),
+            Sound = AssetId.Parse(obj.PropString(Prop.Sound)),
             SpriteOrGroup = AssetId.Parse(visual) // TODO: Handle groups for 3D maps
         };
     }

@@ -211,7 +211,7 @@ static class DumpText
                 sw.Write($"X:{wp.X:D3} Y:{wp.Y:D3} ");
                 sw.Write($"F{(int)npc.Flags:X2}:({npc.Flags}) ");
                 sw.Write($"M:{npc.MovementB} ");
-                sw.Write($"S:{npc.Sound} ({(int?)npc.Sound}) ");
+                sw.Write($"S:{npc.Sound} ({npc.Sound}) ");
                 switch (map.MapType)
                 {
                     case MapType.TwoD: sw.Write($"GR:{npc.SpriteOrGroup} "); break;

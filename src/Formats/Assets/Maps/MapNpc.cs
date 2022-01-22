@@ -13,8 +13,7 @@ public class MapNpc // 0xA = 10 bytes
 
     NpcFlags _raw;
     public AssetId Id { get; set; } // MonsterGroup, Npc etc
-    // public SampleId? Sound { get; set; }
-    public byte Sound { get; set; }
+    public AssetId Sound { get; set; }
     public AssetId SpriteOrGroup { get; set; } // LargeNpcGfx, SmallNpcGfx etc but could also be an ObjectGroup for 3D
 
     public NpcType Type
@@ -85,7 +84,7 @@ public class MapNpc // 0xA = 10 bytes
 
         byte id = (byte)npc.Id.ToDisk(mapping);
         id = s.UInt8(nameof(Id), id);
-        npc.Sound = s.UInt8(nameof(Sound), npc.Sound); // SampleId?
+        npc.Sound = SampleId.SerdesU8(nameof(Sound), npc.Sound, mapping, s);
 
         ushort? eventNumber = MaxToNullConverter.Serdes(nameof(npc.Node), npc.Node?.Id, s.UInt16);
         if (eventNumber != null && npc.Node == null)

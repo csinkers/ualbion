@@ -358,7 +358,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(Song.Toronto, map.SongId);
         Assert.Equal(Tileset.Toronto, map.TilesetId);
         Assert.Equal(Palette.Toronto2D, map.PaletteId);
-        Assert.Equal(MapFlags.Unk4 | MapFlags.Unk8 | MapFlags.Unk10 | MapFlags.NpcMovementMode | MapFlags.ExtraNpcs, map.Flags);
+        Assert.Equal(MapFlags.CanRest1 | MapFlags.CanRest2 | MapFlags.Unk10 | MapFlags.NpcMovementMode | MapFlags.ExtraNpcs, map.Flags);
         Assert.Equal(map.Width * map.Height, map.Underlay.Length);
         Assert.Equal(871, map.Underlay[0]);
         Assert.Equal(349, map.Underlay[75]);
@@ -414,7 +414,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(Labyrinth.Argim, map.LabDataId);
         Assert.Equal(64, map.AutomapGraphics.Length);
         Assert.Equal(Song.DungeonAmbient, map.AmbientSongId);
-        Assert.Equal(MapFlags.Unk1 | MapFlags.Unk4 | MapFlags.NpcMovementMode | MapFlags.ExtraNpcs, map.Flags);
+        Assert.Equal(MapFlags.Unlit | MapFlags.CanRest1 | MapFlags.NpcMovementMode | MapFlags.ExtraNpcs, map.Flags);
         Assert.Equal(map.Width * map.Height, map.Ceilings.Length);
         Assert.Equal(2, map.Ceilings[101]);
         Assert.Equal(map.Width * map.Height, map.Floors.Length);

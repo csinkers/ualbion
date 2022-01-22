@@ -16,6 +16,7 @@
   <Namespace>UAlbion.Formats.Config</Namespace>
   <Namespace>UAlbion.Game</Namespace>
   <Namespace>UAlbion.Game.Settings</Namespace>
+  <Namespace>UAlbion.Formats.Assets</Namespace>
 </Query>
 
 const string baseDir = @"C:\Depot\bb\ualbion";
@@ -48,6 +49,7 @@ void Main()
 		}
 	}
 	
+	var ruffians = new List<MapId>();
 	foreach (var mapId in Enum.GetValues(typeof(UAlbion.Base.Map)).OfType<UAlbion.Base.Map>())
 	{
 		var map = assets.LoadMap(mapId);

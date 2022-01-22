@@ -16,9 +16,8 @@ public class NpcState
         var startOffset = s.Offset;
 
         s.Begin("Npc" + i);
-        byte id = (byte)npc.Id.ToDisk(c.mapping);
-        id = s.UInt8(nameof(Id), id); // 0
-        s.Pad(1);
+        ushort id = (byte)npc.Id.ToDisk(c.mapping);
+        id = s.UInt16(nameof(Id), id); // 0
 
         switch (c.mapType)
         {
@@ -28,13 +27,13 @@ public class NpcState
             default: throw new ArgumentOutOfRangeException(nameof(c), c.mapType, null);
         }
 
-        npc.Unk4 = s.UInt16(nameof(Unk4), npc.Unk4);
-        npc.Unk6 = s.UInt16(nameof(Unk6), npc.Unk6);
-        npc.Unk8 = s.UInt8(nameof(Unk8), npc.Unk8);
+        npc.Unk4 = s.UInt8(nameof(Unk4), npc.Unk4);
+        npc.Sound = SampleId.SerdesU16(nameof(Sound), npc.Sound, c.mapping, s);
+        npc.Unk7 = s.UInt16(nameof(Unk7), npc.Unk7);
         npc.Unk9 = s.Int64(nameof(Unk9), npc.Unk9);
         npc.Unk11 = s.UInt16(nameof(Unk11), npc.Unk11);
-        npc.Unk13 = s.UInt16(nameof(Unk13), npc.Unk13);
-        npc.Unk15 = s.UInt16(nameof(Unk15), npc.Unk15);
+        npc.EventIndex = s.UInt16(nameof(EventIndex), npc.EventIndex);
+        npc.MovementType = s.UInt16(nameof(MovementType), npc.MovementType);
         npc.Unk17 = s.UInt16(nameof(Unk17), npc.Unk17);
         npc.Unk19 = s.UInt16(nameof(Unk19), npc.Unk19);
         npc.Unk1B = s.UInt16(nameof(Unk1B), npc.Unk1B);
@@ -46,10 +45,10 @@ public class NpcState
         npc.Unk25 = s.UInt16(nameof(Unk25), npc.Unk25);
         npc.Unk27 = s.UInt16(nameof(Unk27), npc.Unk27);
         npc.Unk29 = s.UInt8(nameof(Unk29), npc.Unk29);
-        npc.X1 = s.UInt16(nameof(X1), npc.X1);
-        npc.Y1 = s.UInt16(nameof(Y1), npc.Y1);
-        npc.X2 = s.UInt16(nameof(X2), npc.X2);
-        npc.Y2 = s.UInt16(nameof(Y2), npc.Y2);
+        npc.X1 = s.UInt16(nameof(X1), npc.X1); // 2A Current POS?
+        npc.Y1 = s.UInt16(nameof(Y1), npc.Y1); // 2C
+        npc.X2 = s.UInt16(nameof(X2), npc.X2); // 2E
+        npc.Y2 = s.UInt16(nameof(Y2), npc.Y2); // 30
         npc.Unk32 = s.UInt8(nameof(Unk32), npc.Unk32);
         npc.Unk33 = s.UInt8(nameof(Unk33), npc.Unk33);
         npc.Unk34 = s.UInt16(nameof(Unk34), npc.Unk34);
@@ -60,9 +59,9 @@ public class NpcState
         npc.Unk3E = s.UInt16(nameof(Unk3E), npc.Unk3E);
         npc.Unk40 = s.UInt16(nameof(Unk40), npc.Unk40);
         npc.Unk42 = s.UInt16(nameof(Unk42), npc.Unk42);
-        npc.X3 = s.UInt16(nameof(X3), npc.X3);
+        npc.X3 = s.UInt16(nameof(X3), npc.X3); // Old?
         npc.Y3 = s.UInt16(nameof(Y3), npc.Y3);
-        npc.X4 = s.UInt16(nameof(X4), npc.X4);
+        npc.X4 = s.UInt16(nameof(X4), npc.X4); // Target?
         npc.Y4 = s.UInt16(nameof(Y4), npc.Y4);
         npc.Unk4C = s.UInt16(nameof(Unk4C), npc.Unk4C);
         npc.Unk4E = s.UInt16(nameof(Unk4E), npc.Unk4E);
@@ -88,7 +87,8 @@ public class NpcState
         npc.Unk6E = s.UInt16(nameof(Unk6E), npc.Unk6E);
         npc.Unk70 = s.UInt16(nameof(Unk70), npc.Unk70);
         npc.Unk72 = s.UInt16(nameof(Unk72), npc.Unk72);
-        npc.Unk74 = s.UInt16(nameof(Unk74), npc.Unk74);
+        npc.Direction = s.EnumU8(nameof(Direction), npc.Direction);
+        s.Pad(1);
         npc.Unk76 = s.UInt16(nameof(Unk76), npc.Unk76);
         npc.Unk78 = s.UInt16(nameof(Unk78), npc.Unk78);
         npc.Unk7A = s.UInt16(nameof(Unk7A), npc.Unk7A);
@@ -106,13 +106,13 @@ public class NpcState
 
     public AssetId Id { get; set; } // 0
     public AssetId SpriteOrGroup { get; set; } // 2
-    public ushort Unk4 { get; set; } // 4
-    public ushort Unk6 { get; set; } // 6. Always 0?
-    public byte Unk8 { get; set; } // 8. Always 0?
+    public byte Unk4 { get; set; } // 4
+    public SampleId Sound { get; set; } // 5
+    public ushort Unk7 { get; set; } // 8. Always 0?
     public long Unk9 { get; set; } // 9. Always -1?
     public ushort Unk11 { get; set; } // 11
-    public ushort Unk13 { get; set; } // 13 Always 0xffff?
-    public ushort Unk15 { get; set; }
+    public ushort EventIndex { get; set; } // 13 Always 0xffff?
+    public ushort MovementType { get; set; }
     public ushort Unk17 { get; set; }
     public ushort Unk19 { get; set; } // IsActive?
     public ushort Unk1B { get; set; }
@@ -166,7 +166,7 @@ public class NpcState
     public ushort Unk6E { get; set; }
     public ushort Unk70 { get; set; }
     public ushort Unk72 { get; set; }
-    public ushort Unk74 { get; set; }
+    public Direction Direction { get; set; }
     public ushort Unk76 { get; set; } // Always 0xffff?
     public ushort Unk78 { get; set; } // Always 0xffff?
     public ushort Unk7A { get; set; }
@@ -181,12 +181,12 @@ public class NpcState
 
     public override string ToString() =>
         $@"{Id} O:{SpriteOrGroup}
-    4:{Unk4} 6:{Unk6} 8:{Unk8} 9:{Unk9} 11:{Unk11} 13:{Unk13} 15:{Unk15} 17:{Unk17} 19:{Unk19} 
+    4:{Unk4} 6:{Sound} 8:{Unk7} 9:{Unk9} 11:{Unk11} 13:{EventIndex} 15:{MovementType} 17:{Unk17} 19:{Unk19} 
     1B:{Unk1B} 1D:{Unk1D} 1F:{Unk1F} 20:{Unk20} 21:{Unk21} 23:{Unk23} 25:{Unk25} 27:{Unk27} 
     29:{Unk29} {X1} {Y1} {X2} {Y2} 32:{Unk32} 33:{Unk33} 34:{Unk34} 36:{Unk36} 38:{Unk38} 
     3A:{Unk3A} 3C:{Unk3C} 3E:{Unk3E} 40:{Unk40} 42:{Unk42} {X3} {Y3} {X4} {Y4} 4C:{Unk4C} 
     4E:{Unk4E} 50:{Unk50} 51:{Unk51} 52:{Unk52} 53:{Unk53} 54:{Unk54} 56:{Unk56} 58:{Unk58} 
     5A:{Unk5A} 5C:{Unk5C} 5E:{Unk5E} 60:{Unk60} 61:{Unk61} 62:{Unk62} 64:{Unk64} 65:{Unk65} 
-    66:{Unk66} 68:{Unk68} 6A:{Unk6A} 6C:{Unk6C} 6E:{Unk6E} 70:{Unk70} 72:{Unk72} 74:{Unk74} 
+    66:{Unk66} 68:{Unk68} 6A:{Unk6A} 6C:{Unk6C} 6E:{Unk6E} 70:{Unk70} 72:{Unk72} 74:{Direction} 
     76:{Unk76} 78:{Unk78} 7A:{Unk7A} 7C:{Unk7C} 7E:{Unk7E}";
 }

@@ -10,3 +10,10 @@ public enum PlayerLanguages : byte
     Iskai = 2,
     Celtic = 4
 }
+
+public enum PlayerLanguage : byte
+{
+    Terran = 0,
+    Iskai = 1,
+    Celtic = 2
+}

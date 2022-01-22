@@ -10,7 +10,7 @@ namespace UAlbion.Formats.MapEvents;
 public class ChangeLanguageEvent : DataChangeEvent
 {
     ChangeLanguageEvent() { }
-    public ChangeLanguageEvent(PartyMemberId partyMemberId, NumericOperation operation, PlayerLanguages language, byte unk3)
+    public ChangeLanguageEvent(PartyMemberId partyMemberId, NumericOperation operation, PlayerLanguage language, byte unk3)
     {
         PartyMemberId = partyMemberId;
         Operation = operation;
@@ -35,6 +35,6 @@ public class ChangeLanguageEvent : DataChangeEvent
     public override ChangeProperty ChangeProperty => ChangeProperty.Language;
     [EventPart("party_member")] public PartyMemberId PartyMemberId { get; private set; }
     [EventPart("op")] public NumericOperation Operation { get; private set; }
-    [EventPart("language")] public PlayerLanguages Language { get; private set; }
+    [EventPart("language")] public PlayerLanguage Language { get; private set; }
     [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
 }

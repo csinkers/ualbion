@@ -485,11 +485,11 @@ remove_party_member PartyMember.Tom 1 1");
     }
 
     [Fact]
-    public void NpcActive()
+    public void DisableNpc()
     {
-        Test(@"npc_disabled 1 0
-npc_disabled 1
-npc_disabled 1 1 0 1");
+        Test(@"disable_npc 1 0
+disable_npc 1
+disable_npc 1 1 0 1");
     }
 
     [Fact]

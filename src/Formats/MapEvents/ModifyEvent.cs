@@ -16,7 +16,7 @@ public abstract class ModifyEvent : MapEvent
             ModifyType.Switch => SwitchEvent.Serdes((SwitchEvent)genericEvent, mapping, s), // 0
             ModifyType.DisableEventChain => DisableEventChainEvent.Serdes((DisableEventChainEvent)genericEvent, eventSource, s), // 1
             ModifyType.Unk2 => ModifyUnk2Event.Serdes((ModifyUnk2Event)genericEvent, s), // 2
-            ModifyType.NpcActive => NpcDisabledEvent.Serdes((NpcDisabledEvent)genericEvent, s), // 4
+            ModifyType.NpcActive => DisableNpcEvent.Serdes((DisableNpcEvent)genericEvent, s), // 4
             ModifyType.AddPartyMember => AddPartyMemberEvent.Serdes((AddPartyMemberEvent)genericEvent, mapping, s), // 5
             ModifyType.InventoryItem => AddRemoveInventoryItemEvent.Serdes((AddRemoveInventoryItemEvent)genericEvent, mapping, s), // 6
             ModifyType.MapLighting => SetMapLightingEvent.Serdes((SetMapLightingEvent)genericEvent, s), // B

@@ -196,8 +196,8 @@ if (query_verb Examine) {
  21=>22: add_party_member PartyMember.Mellthas 3
 !22?24:23: result
 #23=>27: map_text EventText.Sira2 18
- 24=>25: npc_disabled 8 1 0 281
- 25=>26: npc_disabled 9 1 0 281
+ 24=>25: disable_npc 8 1 0 281
+ 25=>26: disable_npc 9 1 0 281
  26=>!: end_dialogue
  27=>28: remove_party_member PartyMember.Sira 1 26888
  28=>!: remove_party_member PartyMember.Mellthas 1 26889
@@ -338,8 +338,8 @@ if (in_party PartyMember.Sira) {
         if (result) {
             add_party_member PartyMember.Mellthas 3
             if (result) {
-                npc_disabled 8 1 0 281
-                npc_disabled 9 1 0 281
+                disable_npc 8 1 0 281
+                disable_npc 9 1 0 281
                 end_dialogue
             } else {
                 L1:

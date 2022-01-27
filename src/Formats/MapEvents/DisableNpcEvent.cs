@@ -4,12 +4,12 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents;
 
-[Event("npc_disabled")]
-public class NpcDisabledEvent : ModifyEvent
+[Event("disable_npc")]
+public class DisableNpcEvent : ModifyEvent
 {
-    NpcDisabledEvent() { }
+    DisableNpcEvent() { }
 
-    public NpcDisabledEvent(byte npcIndex, byte isDisabled, byte unk5, ushort unk6)
+    public DisableNpcEvent(byte npcIndex, byte isDisabled, byte unk5, ushort unk6)
     {
         NpcIndex = npcIndex;
         IsDisabled = isDisabled;
@@ -17,17 +17,17 @@ public class NpcDisabledEvent : ModifyEvent
         Unk6 = unk6;
     }
 
-    public static NpcDisabledEvent Serdes(NpcDisabledEvent e, ISerializer s)
+    public static DisableNpcEvent Serdes(DisableNpcEvent e, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        e ??= new NpcDisabledEvent();
+        e ??= new DisableNpcEvent();
         e.IsDisabled = s.UInt8(nameof(IsDisabled), e.IsDisabled);
         e.NpcIndex = s.UInt8(nameof(NpcIndex), e.NpcIndex);
         int zeroed = s.UInt8(null, 0);
         e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
         e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
         zeroed += s.UInt16(null, 0);
-        s.Assert(zeroed == 0, "NpcDisabledEvent:Expected fields 4,8 to be 0");
+        s.Assert(zeroed == 0, "DisableNpcEvent:Expected fields 4,8 to be 0");
         return e;
     }
 

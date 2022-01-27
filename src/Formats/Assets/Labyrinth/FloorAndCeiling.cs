@@ -5,7 +5,7 @@ using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets.Labyrinth;
 
-public class FloorAndCeiling
+public class FloorAndCeiling // Length = 0xA (10) bytes
 {
     [Flags]
     public enum FcFlags : byte

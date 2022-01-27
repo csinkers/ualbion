@@ -175,7 +175,7 @@ public class BranchNode : EventNode, IBranchNode
         {
             if (dummy.Id >= nodes.Count)
             {
-                ApiUtil.Assert($"Invalid event id: {Id} links to {dummy.Id} when false, but the set only contains {nodes.Count} events");
+                // ApiUtil.Assert($"Invalid event id: {Id} links to {dummy.Id} when false, but the set only contains {nodes.Count} events");
                 NextIfFalse = null;
             }
             else NextIfFalse = nodes[dummy.Id];

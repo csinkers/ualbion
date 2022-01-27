@@ -14,6 +14,7 @@ public interface IModApplier : IComponent
     object LoadAsset(AssetId id);
     object LoadAsset(AssetId id, string language);
     object LoadAssetCached(AssetId assetId);
+    string LoadAssetAnnotated(AssetId id, string language);
     SavedGame LoadSavedGame(string path);
     IReadOnlyDictionary<string, LanguageConfig> Languages { get; }
     IEnumerable<string> ShaderPaths { get; }

@@ -20,6 +20,8 @@ public class MockModApplier : ServiceComponent<IModApplier>, IModApplier
     public object LoadAsset(AssetId id) => _assets[id];
     public object LoadAsset(AssetId id, string language) => _assets[id];
     public object LoadAssetCached(AssetId id) => _assets[id];
+    public string LoadAssetAnnotated(AssetId id, string language) => throw new NotImplementedException();
+
     public SavedGame LoadSavedGame(string path) => throw new NotImplementedException();
     public IReadOnlyDictionary<string, LanguageConfig> Languages { get; } 
         = new ReadOnlyDictionary<string, LanguageConfig>(

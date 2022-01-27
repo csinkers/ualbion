@@ -14,13 +14,13 @@ public class ObjectGroup
     public override string ToString() =>
         $"Obj: AG{AutoGraphicsId} [ {string.Join("; ", SubObjects.Select(x => x.ToString()))} ]";
 
-    public static ObjectGroup Serdes(int _, ObjectGroup og, ISerializer s)
+    public static ObjectGroup Serdes(int _, ObjectGroup og, ISerializer s) // total size 0x42 = 66
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         og ??= new ObjectGroup();
         og.AutoGraphicsId = s.UInt16(nameof(og.AutoGraphicsId), og.AutoGraphicsId);
 
-        for (int n = 0; n < MaxSubObjectCount; n++)
+        for (int n = 0; n < MaxSubObjectCount; n++) // 8 bytes per object, 8 objects = 64
         {
             og.SubObjects[n] ??= new SubObject { ObjectInfoNumber = 0xffff };
             var so = og.SubObjects[n];

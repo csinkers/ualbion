@@ -49,6 +49,6 @@ public class ChangeIconEvent : MapEvent
     // For NpcMovement: 0=NoChange 4=NoChange
     [EventPart("value")] public ushort Value { get; private set; }
     [EventPart("layers", true, (ChangeIconLayers)3)] public ChangeIconLayers Layers { get; private set; } // Only applies to the block change types
-    [EventPart("mapId", true, "None")] MapId MapId { get; set; }
+    [EventPart("mapId", true, "None")] MapId MapId { get; set; } // None = current map
     public override MapEventType EventType => MapEventType.ChangeIcon;
 }

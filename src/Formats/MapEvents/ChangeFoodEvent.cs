@@ -24,11 +24,10 @@ public class ChangeFoodEvent : DataChangeEvent
         e ??= new ChangeFoodEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-        int zeroed = s.UInt8(null, 0);
+        int zeroed = s.UInt8(null, 0); s.Assert(zeroed == 0, "ChangeFoodEvent: Expected byte 4 to be 0");
         e.PartyMemberId = PartyMemberId.SerdesU8(nameof(PartyMemberId), e.PartyMemberId, mapping, s);
-        zeroed += s.UInt16(null, 0);
+        zeroed = s.UInt16(null, 0); s.Assert(zeroed == 0, "ChangeFoodEvent: Expected word 6 to be 0"); // TODO: Can be 1
         e.Amount = s.UInt16(nameof(Amount), e.Amount);
-        s.Assert(zeroed == 0, "ChangeFoodEvent: Expected bytes 4, 6 & 7 to be 0");
         return e;
     }
 

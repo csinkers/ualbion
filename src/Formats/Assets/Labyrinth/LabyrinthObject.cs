@@ -5,7 +5,7 @@ using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets.Labyrinth;
 
-public class LabyrinthObject
+public class LabyrinthObject // Length 0x10 (16) bytes
 {
     public LabyrinthObjectFlags Properties { get; set; } // 0
     public uint Collision { get; set; } // 1, len = 3 bytes

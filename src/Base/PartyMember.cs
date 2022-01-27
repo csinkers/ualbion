@@ -14,6 +14,6 @@ public enum PartyMember : byte
     Unknown8 = 8,
     Khunag = 9,
     Siobhan = 10,
-    // Invalid11 = 11,
-    // Invalid12 = 12,
+    Invalid11 = 11,
+    Invalid12 = 12,
 }

@@ -85,16 +85,35 @@ static class Program
                 var parsedIds = commandLine.DumpIds?.Select(AssetId.Parse).ToArray();
 
                 if ((commandLine.DumpFormats & DumpFormats.Json) != 0)
-                    DumpJson.Dump(baseDir, assets, commandLine.DumpAssetTypes, parsedIds);
+                {
+                    var dumper = new DumpJson();
+                    exchange.Attach(dumper);
+                    dumper.Dump(baseDir, commandLine.DumpAssetTypes, parsedIds);
+                    dumper.Remove();
+                }
 
                 if ((commandLine.DumpFormats & DumpFormats.Text) != 0)
-                    DumpText.Dump(assets, baseDir, tf, commandLine.DumpAssetTypes, parsedIds);
+                {
+                    var dumper = new DumpText();
+                    exchange.Attach(dumper);
+                    dumper.Dump(baseDir, commandLine.DumpAssetTypes, parsedIds);
+                    dumper.Remove();
+                }
 
                 if ((commandLine.DumpFormats & DumpFormats.Png) != 0)
                 {
-                    var dumper = new DumpGraphics();
+                    var dumper = new DumpGraphics(commandLine.DumpFormats);
                     exchange.Attach(dumper);
-                    dumper.Dump(baseDir, commandLine.DumpAssetTypes, commandLine.DumpFormats, parsedIds);
+                    dumper.Dump(baseDir, commandLine.DumpAssetTypes, parsedIds);
+                    dumper.Remove();
+                }
+
+                if ((commandLine.DumpFormats & DumpFormats.Annotated) != 0)
+                {
+                    var dumper = new DumpAnnotated();
+                    exchange.Attach(dumper);
+                    dumper.Dump(baseDir, commandLine.DumpAssetTypes, parsedIds);
+                    dumper.Remove();
                 }
 
                 //if ((commandLine.DumpFormats & DumpFormats.Tiled) != 0)

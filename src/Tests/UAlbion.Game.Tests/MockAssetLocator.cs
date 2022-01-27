@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Game.Assets;
@@ -11,7 +12,6 @@ public class MockAssetLocator : ServiceComponent<IAssetLocator>, IAssetLocator
     public IAssetLocator AddAssetLocator(IAssetLocator locator, bool useAsDefault) => this;
     public IAssetLocator AddAssetPostProcessor(IAssetPostProcessor postProcessor) => this;
     public MockAssetLocator Add(AssetId key, object asset) { _assets[key] = asset; return this; }
-    public object LoadAsset(AssetId id, AssetMapping mapping, AssetInfo info, IDictionary<string, string> extraPaths) => _assets[id];
-    public List<(int, int)> GetSubItemRangesForFile(AssetFileInfo info, IDictionary<string, string> extraPaths)
-        => new() { (0, 100) };
+    public object LoadAsset(AssetInfo info, AssetMapping mapping, IDictionary<string, string> extraPaths, TextWriter annotationWriter) => _assets[info.AssetId];
+    public List<(int, int)> GetSubItemRangesForFile(AssetFileInfo info, IDictionary<string, string> extraPaths) => new() { (0, 100) };
 }

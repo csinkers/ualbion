@@ -169,10 +169,10 @@ public class AssetMapping
             return (info.EnumType, id.Id - info.Offset);
         }
 
-#if DEBUG
-        if (!UnmappedTypes.Contains(id.Type))
-            ApiUtil.Assert($"AssetId ({id.Type}, {id.Id}) is outside the mapped range.");
-#endif
+// #if DEBUG
+//         if (!UnmappedTypes.Contains(id.Type))
+//             ApiUtil.Assert($"AssetId ({id.Type}, {id.Id}) is outside the mapped range.");
+// #endif
         return (null, id.ToInt32());
     }
 

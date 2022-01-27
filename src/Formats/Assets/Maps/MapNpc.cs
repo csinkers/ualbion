@@ -22,44 +22,34 @@ public class MapNpc // 0xA = 10 bytes
             ((_raw & NpcFlags.Type1) != 0 ? 1 : 0) |
             ((_raw & NpcFlags.Type2) != 0 ? 2 : 0));
         set => _raw =
-            _raw & ~NpcFlags.TypeMask
+            _raw & ~NpcFlags.TypeMaskV2
             | (((int)value &  1) != 0 ? NpcFlags.Type1 : 0)
-            | (((int)value &  2) != 0 ? NpcFlags.Type2 : 0);
-    } // 1=Dialogue, 2=AutoAttack, 11=ReturnMsg
+            | (((int)value &  2) != 0 ? NpcFlags.Type2 : 0)
+            | (((int)value &  4) != 0 ? NpcFlags.Type4 : 0);
+    }
 
     public NpcFlags Flags
     {
-        get => _raw & NpcFlags.MiscMask;
-        set => _raw = _raw & ~NpcFlags.MiscMask | (value & NpcFlags.MiscMask);
+        get => _raw & NpcFlags.MiscMaskV2;
+        set => _raw = _raw & ~NpcFlags.MiscMaskV2 | (value & NpcFlags.MiscMaskV2);
     }
 
-    public NpcMoveA MovementA
+    public NpcMovement Movement
     {
-        get => (NpcMoveA)(
-            ((_raw & NpcFlags.MoveA1) != 0 ? 1 : 0) |
-            ((_raw & NpcFlags.MoveA2) != 0 ? 2 : 0));
-        set => _raw =
-            _raw & ~NpcFlags.MoveAMask
-            | (((int)value & 1) != 0 ? NpcFlags.MoveA1 : 0)
-            | (((int)value & 2) != 0 ? NpcFlags.MoveA2 : 0);
-
-    }
-
-    public NpcMoveB MovementB
-    {
-        get => (NpcMoveB)(
+        get => (NpcMovement)(
             ((_raw & NpcFlags.MoveB1) != 0 ? 1 : 0) |
             ((_raw & NpcFlags.MoveB2) != 0 ? 2 : 0) |
             ((_raw & NpcFlags.MoveB4) != 0 ? 4 : 0) |
             ((_raw & NpcFlags.MoveB8) != 0 ? 8 : 0));
         set => _raw =
-            _raw & ~NpcFlags.MoveBMask
+            _raw & ~NpcFlags.MoveMaskV2
             | (((int)value & 1) != 0 ? NpcFlags.MoveB1 : 0)
             | (((int)value & 2) != 0 ? NpcFlags.MoveB2 : 0)
             | (((int)value & 4) != 0 ? NpcFlags.MoveB4 : 0)
             | (((int)value & 8) != 0 ? NpcFlags.MoveB8 : 0);
     }
 
+    public TriggerTypes Triggers { get; set; }
     public NpcWaypoint[] Waypoints { get; set; }
     public MapId ChainSource { get; set; }
     public ushort Chain { get; set; }
@@ -70,10 +60,7 @@ public class MapNpc // 0xA = 10 bytes
         set => Node = value == 0xffff ? null : new DummyEventNode(value);
     }
 
-    public bool HasWaypoints(MapFlags mapFlags) =>
-        (mapFlags & MapFlags.NpcMovementMode) != 0
-            ? MovementB is NpcMoveB.Waypoints or NpcMoveB.Waypoints2
-            : MovementA == NpcMoveA.FollowWaypoints;
+    public bool HasWaypoints(MapFlags mapFlags) => Movement is NpcMovement.Waypoints or NpcMovement.Waypoints2;
 
     public static MapNpc Serdes(int _, MapNpc existing, MapType mapType, AssetMapping mapping, ISerializer s)
     {
@@ -99,7 +86,8 @@ public class MapNpc // 0xA = 10 bytes
             _ => throw new ArgumentOutOfRangeException(nameof(mapType), mapType, null)
         };
 
-        npc._raw = s.EnumU32(nameof(Flags), npc._raw);
+        npc._raw = s.EnumU16(nameof(Flags), npc._raw);
+        npc.Triggers = s.EnumU16(nameof(Triggers), npc.Triggers);
         var assetType = AssetTypeForNpcType(npc.Type);
         npc.Id = AssetId.FromDisk(assetType, id, mapping);
 
@@ -114,8 +102,8 @@ public class MapNpc // 0xA = 10 bytes
         type switch
         {
             NpcType.Party => AssetType.EventSet, // TODO: Add the 980 offset
-            NpcType.Monster1 => AssetType.MonsterGroup,
-            NpcType.Monster2 => AssetType.MonsterGroup,
+            NpcType.Monster => AssetType.MonsterGroup,
+            NpcType.Prop => AssetType.MonsterGroup,
             _ => AssetType.EventSet
         };
 
@@ -175,5 +163,5 @@ public class MapNpc // 0xA = 10 bytes
         return hours * 48 + minutes;
     }
 
-    public override string ToString() => $"Npc{Id.Id} {Id} O:{SpriteOrGroup} F:{Flags:x} M{MovementB} S{Sound} E{Node?.Id}";
+    public override string ToString() => $"Npc{Id.Id} {Id} O:{SpriteOrGroup} F:{Flags:x} M{Movement} S{Sound} E{Node?.Id}";
 }

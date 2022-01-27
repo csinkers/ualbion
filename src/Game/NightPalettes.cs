@@ -3,7 +3,7 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game;
 
-public static class NightPalettes
+public static class NightPalettes // TODO: Load from config / asset instead
 {
     static readonly object SyncRoot = new();
     static readonly Dictionary<PaletteId, PaletteId> _mapping = new();

@@ -5,7 +5,7 @@ using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets.Labyrinth;
 
-public class Overlay
+public class Overlay // 0xC bytes = 12
 {
     public SpriteId SpriteId { get; set; } // 0, ushort
     [DefaultValue(1)]

@@ -173,11 +173,9 @@ public class NpcState
     public ushort Unk7C { get; set; }
     public ushort Unk7E { get; set; }
 
-
-    public NpcType Type { get; } = 0; // TODO
-    public NpcFlags Flags { get; } = 0; // TODO: Find which Unk this is
-    public NpcMoveA MovementA { get; } = 0; // TODO: Find which Unk this is
-    public NpcMoveB MovementB { get; } = 0; // TODO: Find which Unk this is
+    public NpcType Type { get; set; } = 0;
+    public NpcFlags Flags { get; set; } = 0;
+    public NpcMovement Movement { get; set; } = 0;
 
     public override string ToString() =>
         $@"{Id} O:{SpriteOrGroup}

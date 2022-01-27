@@ -180,6 +180,18 @@ public class ModApplier : Component, IModApplier
         }
     }
 
+    public string LoadAssetAnnotated(AssetId id, string language)
+    {
+        using var ms = new MemoryStream();
+        using var annotationWriter = new StreamWriter(ms);
+        LoadAssetInternal(id, _extraPaths, language, annotationWriter);
+        annotationWriter.Flush();
+
+        ms.Position = 0;
+        using var reader = new StreamReader(ms, null, true, -1, true);
+        return reader.ReadToEnd();
+    }
+
     public object LoadAssetCached(AssetId id)
     {
         object asset = _assetCache.Get(id);
@@ -206,7 +218,7 @@ public class ModApplier : Component, IModApplier
         }
     }
 
-    object LoadAssetInternal(AssetId id, Dictionary<string, string> extraPaths, string language = null)
+    object LoadAssetInternal(AssetId id, Dictionary<string, string> extraPaths, string language = null, TextWriter annotationWriter = null)
     {
         if (id.IsNone)
             return null;
@@ -229,7 +241,7 @@ public class ModApplier : Component, IModApplier
                         continue;
                 }
 
-                var modAsset = _assetLocator.LoadAsset(id, mod.Mapping, info, extraPaths);
+                var modAsset = _assetLocator.LoadAsset(info, mod.Mapping, extraPaths, annotationWriter);
 
                 if (modAsset is IPatch patch)
                 {

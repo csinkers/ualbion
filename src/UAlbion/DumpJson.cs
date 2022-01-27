@@ -5,6 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Core;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
@@ -12,9 +13,9 @@ using UAlbion.Game;
 
 namespace UAlbion;
 
-static class DumpJson
+class DumpJson : Component, IAssetDumper
 {
-    public static void Dump(string baseDir, IAssetManager assets, ISet<AssetType> types, AssetId[] dumpIds)
+    public void Dump(string baseDir, ISet<AssetType> types, AssetId[] dumpIds)
     {
         var disposeList = new List<IDisposable>();
 
@@ -46,6 +47,7 @@ static class DumpJson
             DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
         };
 
+        var assets = Resolve<IAssetManager>();
         var s = JsonSerializer.Create(settings);
         TextWriter tw;
         if (types.Contains(AssetType.Tileset))

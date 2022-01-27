@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
@@ -15,7 +16,7 @@ using UAlbion.Game.Text;
 
 namespace UAlbion;
 
-static class DumpText
+class DumpText : Component, IAssetDumper
 {
     const string ChestPath            = "ChestInfo.txt";
     const string EventSetPath         = "EventSets.txt";
@@ -37,8 +38,10 @@ static class DumpText
             .Select(AssetId.From)
             .Where(x => dumpIds == null || dumpIds.Contains(x));
 
-    public static void Dump(IAssetManager assets, string baseDir, ITextFormatter tf, ISet<AssetType> types, AssetId[] dumpIds)
+    public void Dump(string baseDir, ISet<AssetType> types, AssetId[] dumpIds)
     {
+        var assets = Resolve<IAssetManager>();
+        var tf = Resolve<ITextFormatter>();
         foreach (var type in types)
         {
             switch (type)
@@ -168,7 +171,7 @@ static class DumpText
         for (int i = 100; i < 400; i++)
         {
             MapId id = MapId.From((Base.Map)i);
-            if (dumpIds != null && !dumpIds.Contains((AssetId)id))
+            if (dumpIds != null && !dumpIds.Contains(id))
                 continue;
 
             IMapData map = assets.LoadMap(id);
@@ -210,7 +213,7 @@ static class DumpText
                 sw.Write($"    Npc{j:D3}: {idText} ({npc.Id.Id:D3}) ");
                 sw.Write($"X:{wp.X:D3} Y:{wp.Y:D3} ");
                 sw.Write($"F{(int)npc.Flags:X2}:({npc.Flags}) ");
-                sw.Write($"M:{npc.MovementB} ");
+                sw.Write($"M:{npc.Movement} ");
                 sw.Write($"S:{npc.Sound} ({npc.Sound}) ");
                 switch (map.MapType)
                 {

@@ -69,7 +69,7 @@ public enum Map : ushort
     Kenget8 = 162,
     TestMapKenget = 163,
     OldFormerBuildingPostFight = 164,
-    Unnamed2 = 165,
+    FlightToAlbion = 165,
     LandingOnAlbion = 166,
     JirinaarCombatTrainer = 167,
     JirinaarCave = 168,

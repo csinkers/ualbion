@@ -272,6 +272,7 @@ public class CharacterSheet : ICharacterSheet
 
         if ((s.Flags & SerializerFlags.Comments) != 0 && sheet.Magic.SpellStrengths.Count > 0)
         {
+            s.NewLine();
             s.Comment("Spells:");
             for (int i = 0; i < MaxSpellsPerSchool * SpellSchoolCount; i++)
             {
@@ -279,7 +280,10 @@ public class CharacterSheet : ICharacterSheet
                 bool known = sheet.Magic.KnownSpells.Contains(spellId);
                 sheet.Magic.SpellStrengths.TryGetValue(spellId, out var strength);
                 if (known || strength > 0)
+                {
+                    s.NewLine();
                     s.Comment($"{spellId}: {strength}{(known ? " (Learnt)" : "")}");
+                }
             }
         }
         ApiUtil.Assert(s.Offset - initialOffset == 742, "Expected common sheet data to be 742 bytes");

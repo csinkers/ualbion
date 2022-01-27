@@ -5,11 +5,11 @@ using SerdesNet;
 namespace UAlbion.Formats;
 
 // ReSharper disable once UnusedType.Global
-public sealed class BreakpointFacadeSerializer : ISerializer // For debugging unintentional overwrites
+public sealed class BreakpointProxySerializer : ISerializer // For debugging unintentional overwrites
 {
     readonly ISerializer _s;
     public (long from, long to)? BreakRange { get; set; }
-    public BreakpointFacadeSerializer(ISerializer s) => _s = s ?? throw new ArgumentNullException(nameof(s));
+    public BreakpointProxySerializer(ISerializer s) => _s = s ?? throw new ArgumentNullException(nameof(s));
     public void Dispose() {}
     public SerializerFlags Flags => _s.Flags;
     public long Offset => _s.Offset;

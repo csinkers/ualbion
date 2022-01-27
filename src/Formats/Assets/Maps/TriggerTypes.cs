@@ -22,3 +22,31 @@ public enum TriggerTypes : ushort
     Unk14      = 1 << 14, // 4000
     Unk15      = 1 << 15, // 8000
 }
+
+/*
+    // ???
+    Unk16        = 1 << 0, // 0x0001 Almost always set
+    Unk17        = 1 << 1, // 0x0002 264 times
+    Unk18        = 1 << 2, // 0x0004 18 times
+    Unk19        = 1 << 3, // 0x0008 136 times
+    Unk20        = 1 << 4, // 0x0010 Only used once
+    Unk21        = 1 << 5, // 0x0020 Only used once
+    Unk22        = 1 << 6, // 0x0040 Only used once - setting across the board results in instant Rainer when starting a game
+    Unk23        = 1 << 7, // 0x0080 Only used once
+
+    // ???
+    Unk24        = 1 << 8, // 0x0100 Only used once
+    Unk25        = 1 << 9, // 0x0200 Only used once
+    Unk26        = 1 << 10, // 0x0400 Only used once
+    Unk27        = 1 << 11, // 0x0800 Used 14 times. Has contact event?
+    Unk28        = 1 << 12, // 0x1000 Only used once
+    Unk29        = 1 << 13, // 0x2000 Only used once
+    Unused30     = 1 << 14, // 0x4000
+    Unused31     = 1U << 15, //  8000
+
+    /*
+     Instant Rainer:
+        002...
+        00A
+        FFA
+     */

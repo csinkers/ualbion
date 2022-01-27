@@ -61,7 +61,7 @@ public static class Asset
 
         using var annotationStream = new MemoryStream();
         using var annotationWriter = new StreamWriter(annotationStream);
-        using var afs = new AnnotationFacadeSerializer(ar, annotationWriter, FormatUtil.BytesFrom850String);
+        using var afs = new AnnotationProxySerializer(ar, annotationWriter, FormatUtil.BytesFrom850String);
 
         T result;
         Exception exception = null;
@@ -93,7 +93,7 @@ public static class Asset
         using var bw = new BinaryWriter(ms);
         using var annotationStream = new MemoryStream();
         using var annotationWriter = new StreamWriter(annotationStream);
-        using var aw = new AnnotationFacadeSerializer(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
+        using var aw = new AnnotationProxySerializer(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
 
         Exception exception = null;
         try { serdes(asset, aw); }

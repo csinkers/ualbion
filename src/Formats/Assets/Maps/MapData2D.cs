@@ -20,7 +20,7 @@ public class MapData2D : BaseMapData
     public override MapType MapType => OutdoorTilesets.Any(x => x == TilesetId) ? MapType.TwoDOutdoors : MapType.TwoD;
     [JsonInclude] public byte Sound { get; set; }
     [JsonInclude] public TilesetId TilesetId { get; set; }
-    [JsonInclude] public byte FrameRate { get; set; }
+    [JsonInclude] public byte FrameRate { get; set; } // If set to 0, used default value (5)
     [JsonIgnore] public int[] Underlay { get; private set; }
     [JsonIgnore] public int[] Overlay { get; private set; }
 

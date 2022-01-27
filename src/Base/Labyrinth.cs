@@ -52,4 +52,5 @@ public enum Labyrinth : byte
     DeviceMaker = 208,
     Unknown209 = 209,
     MountainPass = 210,
+    Unknown211 = 211,
 }

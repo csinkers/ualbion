@@ -106,10 +106,12 @@ public class LabyrinthData
         s.List(nameof(d.ObjectGroups), d.ObjectGroups, objectGroupCount, ObjectGroup.Serdes);
         s.Check();
 
+        // MaxFloors = 50
         var floorAndCeilingCount = s.UInt16("FloorAndCeilingCount", (ushort)d.FloorAndCeilings.Count); // 28 + objectGroupCount * 42
         s.List(nameof(d.FloorAndCeilings), d.FloorAndCeilings, mapping, floorAndCeilingCount, FloorAndCeiling.Serdes);
         s.Check();
 
+        // MaxObjects = 100
         ushort objectCount = s.UInt16("ObjectCount", (ushort)d.Objects.Count); // 2A + objectGroupCount * 42 + floorAndCeilingCount * A
         s.List(nameof(d.Objects), d.Objects, mapping, objectCount, LabyrinthObject.Serdes);
         s.Check();

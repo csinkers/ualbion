@@ -263,15 +263,15 @@ public class EventRoundTripTests
     [Fact]
     public void ChangeHealth()
     {
-        Test(("change_health None AddAmount 2 1", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.AddAmount, 2, 1)),
-            ("change_health None AddPercentage 25 7", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.AddPercentage, 25, 7)),
-            ("change_health None SetToMaximum 0", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.SetToMaximum, 0, 0)),
-            ("change_health None SubtractAmount 17 1", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.SubtractAmount, 17, 1)),
-            ("change_health None SubtractPercentage 15 1", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.SubtractPercentage, 15, 1)),
-            ("change_health PartyMember.Harriet AddAmount 1 2", new ChangeHealthEvent(PartyMember.Harriet, NumericOperation.AddAmount, 1, 2)),
-            ("change_health PartyMember.Unknown8 SetToMaximum 0 2", new ChangeHealthEvent(PartyMember.Unknown8, NumericOperation.SetToMaximum, 0, 2)),
-            ("change_health PartyMember.Siobhan SetToMaximum 0 2", new ChangeHealthEvent(PartyMember.Siobhan, NumericOperation.SetToMaximum, 0, 2)),
-            ("change_health PartyMember.Drirr SetToMaximum 0 2", new ChangeHealthEvent(PartyMember.Drirr, NumericOperation.SetToMaximum, 0, 2)));
+        Test(("change_health None AddAmount 2 1", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.AddAmount, 2, 1, 0)),
+            ("change_health None AddPercentage 25 7", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.AddPercentage, 25, 7, 0)),
+            ("change_health None SetToMaximum 0", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.SetToMaximum, 0, 0, 0)),
+            ("change_health None SubtractAmount 17 1", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.SubtractAmount, 17, 1, 0)),
+            ("change_health None SubtractPercentage 15 1", new ChangeHealthEvent(PartyMemberId.None, NumericOperation.SubtractPercentage, 15, 1, 0)),
+            ("change_health PartyMember.Harriet AddAmount 1 2", new ChangeHealthEvent(PartyMember.Harriet, NumericOperation.AddAmount, 1, 2, 0)),
+            ("change_health PartyMember.Unknown8 SetToMaximum 0 2", new ChangeHealthEvent(PartyMember.Unknown8, NumericOperation.SetToMaximum, 0, 2, 0)),
+            ("change_health PartyMember.Siobhan SetToMaximum 0 2", new ChangeHealthEvent(PartyMember.Siobhan, NumericOperation.SetToMaximum, 0, 2, 0)),
+            ("change_health PartyMember.Drirr SetToMaximum 0 2", new ChangeHealthEvent(PartyMember.Drirr, NumericOperation.SetToMaximum, 0, 2, 0)));
     }
 
     [Fact]
@@ -404,7 +404,7 @@ place_action SleepInRoom 1 1 1 1 1 1");
     [Fact]
     public void PlayAnim()
     {
-        Test((@"play_anim Video.MagicDemonstration 1 2 3 4", new PlayAnimationEvent(Video.MagicDemonstration, 1, 2, 3, 4)));
+        Test((@"play_anim Video.MagicDemonstration 1 2 3 4", new PlayAnimationEvent(Video.MagicDemonstration, 1, 2, 3, 4, 0, 0)));
     }
 
     [Fact] public void FestivalQuery() => Test(@"prompt_player EventText.FestivalTime 1 AlwaysFalse 1");
@@ -487,9 +487,9 @@ remove_party_member PartyMember.Tom 1 1");
     [Fact]
     public void NpcActive()
     {
-        Test(@"npc_active 1 0
-npc_active 1
-npc_active 1 1 0 1");
+        Test(@"npc_disabled 1 0
+npc_disabled 1
+npc_disabled 1 1 0 1");
     }
 
     [Fact]

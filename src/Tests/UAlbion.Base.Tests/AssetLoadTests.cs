@@ -358,7 +358,9 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(Song.Toronto, map.SongId);
         Assert.Equal(Tileset.Toronto, map.TilesetId);
         Assert.Equal(Palette.Toronto2D, map.PaletteId);
-        Assert.Equal(MapFlags.CanRest1 | MapFlags.CanRest2 | MapFlags.Unk10 | MapFlags.NpcMovementMode | MapFlags.ExtraNpcs, map.Flags);
+        Assert.Equal(MapFlags.RestMode1 | MapFlags.RestMode2 | MapFlags.TorontoAutomap | MapFlags.V2NpcData | MapFlags.ExtraNpcs, map.Flags);
+        Assert.Equal(MapSubMode.Unk0, map.SubMode);
+        Assert.Equal(RestMode.NoResting, map.RestMode);
         Assert.Equal(map.Width * map.Height, map.Underlay.Length);
         Assert.Equal(871, map.Underlay[0]);
         Assert.Equal(349, map.Underlay[75]);
@@ -385,10 +387,9 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(AssetId.From(EventSet.Christine), n.Id);
         Assert.Equal(AssetId.From(LargeNpc.Christine), n.SpriteOrGroup);
         Assert.Equal(NpcType.Npc, n.Type);
-        Assert.Equal(NpcMoveA.Stationary, n.MovementA);
-        Assert.Equal(NpcFlags.Unk16, n.Flags);
+        Assert.Equal(TriggerTypes.Normal, n.Triggers);
         Assert.Equal(0xffff, n.Chain);
-        Assert.Equal(NpcMoveB.Waypoints, n.MovementB);
+        Assert.Equal(NpcMovement.Waypoints, n.Movement);
         Assert.Equal(1152, n.Waypoints.Length);
 
         var initZones = map.GetZonesOfType(TriggerTypes.MapInit);
@@ -414,7 +415,9 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(Labyrinth.Argim, map.LabDataId);
         Assert.Equal(64, map.AutomapGraphics.Length);
         Assert.Equal(Song.DungeonAmbient, map.AmbientSongId);
-        Assert.Equal(MapFlags.Unlit | MapFlags.CanRest1 | MapFlags.NpcMovementMode | MapFlags.ExtraNpcs, map.Flags);
+        Assert.Equal(MapFlags.SubMode1 | MapFlags.RestMode1 | MapFlags.V2NpcData | MapFlags.ExtraNpcs, map.Flags);
+        Assert.Equal(MapSubMode.Unk1, map.SubMode);
+        Assert.Equal(RestMode.RestEightHours, map.RestMode);
         Assert.Equal(map.Width * map.Height, map.Ceilings.Length);
         Assert.Equal(2, map.Ceilings[101]);
         Assert.Equal(map.Width * map.Height, map.Floors.Length);
@@ -443,10 +446,11 @@ public class AssetLoadTests : IDisposable
         var n = map.Npcs[2];
         Assert.Equal(AssetId.From(MonsterGroup.Empty), n.Id);
         Assert.Equal(new AssetId(AssetType.ObjectGroup, 68), n.SpriteOrGroup);
-        Assert.Equal(NpcType.Monster2, n.Type);
-        Assert.Equal(NpcFlags.SimpleMsg | NpcFlags.Unk5 | NpcFlags.Unk16 | NpcFlags.Unk17, n.Flags);
+        Assert.Equal(NpcType.Prop, n.Type);
+        Assert.Equal(NpcFlags.SimpleMsg | NpcFlags.Unk5, n.Flags);
+        Assert.Equal(TriggerTypes.Normal | TriggerTypes.Examine, n.Triggers);
         Assert.Equal(23, n.Chain);
-        Assert.Equal(NpcMoveB.Random1, n.MovementB);
+        Assert.Equal(NpcMovement.RandomWander, n.Movement);
         Assert.Collection(n.Waypoints,
             x =>
             {

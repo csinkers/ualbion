@@ -145,7 +145,7 @@ public class XldContainer : IAssetContainer
             if (lengths[i] == 0)
                 continue;
 
-            using var window = new WindowingFacadeSerializer(s, null);
+            using var window = new WindowingProxySerializer(s, null);
             func(i + firstId, lengths[i], context, window);
             offset += lengths[i];
             ApiUtil.Assert(offset == s.Offset);
@@ -168,7 +168,7 @@ public class XldContainer : IAssetContainer
 
         for (int i = 0; i < count; i++)
         {
-            using var window = new WindowingFacadeSerializer(s, null);
+            using var window = new WindowingProxySerializer(s, null);
             func(i + firstId, 0, context, window);
             lengths[i] = (int)window.Offset;
         }

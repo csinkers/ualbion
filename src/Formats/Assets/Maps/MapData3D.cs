@@ -87,6 +87,7 @@ public class MapData3D : BaseMapData
             npcCount,
             (n, x, s2) => MapNpc.Serdes(n, x, map.MapType, mapping, s2)).ToList();
 
+        s.Begin("TileData");
         map.Contents ??= new byte[map.Width * map.Height];
         map.Floors   ??= new byte[map.Width * map.Height];
         map.Ceilings ??= new byte[map.Width * map.Height];
@@ -98,6 +99,7 @@ public class MapData3D : BaseMapData
             map.Ceilings[i] = s.UInt8(null, map.Ceilings[i]);
         }
         s.Check();
+        s.End();
 
         var zoneCount = map.SerdesZones(s);
 

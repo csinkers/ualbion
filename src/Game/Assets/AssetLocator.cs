@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography;
 using SerdesNet;
 using UAlbion.Api;
@@ -22,14 +23,14 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
         base.Subscribed();
     }
 
-    public object LoadAsset(AssetId id, AssetMapping mapping, AssetInfo info, IDictionary<string, string> extraPaths)
+    public object LoadAsset(AssetInfo info, AssetMapping mapping, IDictionary<string, string> extraPaths, TextWriter annotationWriter = null)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (extraPaths == null) throw new ArgumentNullException(nameof(extraPaths));
         var generalConfig = Resolve<IGeneralConfig>();
         var jsonUtil = Resolve<IJsonUtil>();
 
-        using ISerializer s = Search(generalConfig, info, extraPaths);
+        using ISerializer s = Search(generalConfig, info, extraPaths, annotationWriter);
         if (s == null)
             return null;
 
@@ -55,7 +56,7 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
         return container?.GetSubItemRanges(resolved, info, disk, jsonUtil) ?? new List<(int, int)> { (0, 1) };
     }
 
-    ISerializer Search(IGeneralConfig generalConfig, AssetInfo info, IDictionary<string, string> extraPaths)
+    ISerializer Search(IGeneralConfig generalConfig, AssetInfo info, IDictionary<string, string> extraPaths, TextWriter annotationWriter = null)
     {
         var path = generalConfig.ResolvePath(info.File.Filename, extraPaths);
         var disk = Resolve<IFileSystem>();
@@ -64,7 +65,10 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
             return null;
 
         var container = _containerRegistry.GetContainer(path, info.File.Container, disk);
-        return container?.Read(path, info, disk, jsonUtil);
+        var s = container?.Read(path, info, disk, jsonUtil);
+        if (annotationWriter != null)
+            s = new AnnotationProxySerializer(s, annotationWriter, FormatUtil.BytesFrom850String);
+        return s;
     }
 
     string GetHash(string filename, IFileSystem disk)

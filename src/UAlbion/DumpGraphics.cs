@@ -13,9 +13,13 @@ using UAlbion.Game;
 
 namespace UAlbion;
 
-class DumpGraphics : Component
+class DumpGraphics : Component, IAssetDumper
 {
-    public void Dump(string baseDir, ISet<AssetType> types, DumpFormats formats, AssetId[] dumpIds)
+    readonly DumpFormats _formats;
+
+    public DumpGraphics(DumpFormats formats) => _formats = formats;
+
+    public void Dump(string baseDir, ISet<AssetType> types, AssetId[] dumpIds)
     {
         void Export<TEnum>(string name) where TEnum : unmanaged, Enum
         {
@@ -32,7 +36,7 @@ class DumpGraphics : Component
                 if (dumpIds != null && !dumpIds.Contains(assetId))
                     continue;
 
-                ExportImage(assetId, assets, directory, formats, (frame, palFrame) => palFrame < 10); // Limit to 10, some of the tile sets can get a bit silly.
+                ExportImage(assetId, assets, directory, _formats, (frame, palFrame) => palFrame < 10); // Limit to 10, some of the tile sets can get a bit silly.
             }
         }
 

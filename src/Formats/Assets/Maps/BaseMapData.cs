@@ -13,7 +13,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 {
     readonly Dictionary<TriggerTypes, HashSet<MapEventZone>> _zoneTypeLookup = new();
 
-[JsonInclude] public MapId Id { get; protected set; }
+    [JsonInclude] public MapId Id { get; protected set; }
     public abstract MapType MapType { get; }
     [JsonInclude] public MapFlags Flags { get; set; } // Wait/Rest, Light-Environment, NPC converge range
     [JsonInclude] public byte Width { get; protected set; }
@@ -39,6 +39,29 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
     [JsonIgnore] public HashSet<ushort> UniqueZoneNodeIds => GlobalZones.Concat(Zones).Where(x => x?.Node != null).Select(x => x.Node.Id).ToHashSet();
     [JsonIgnore] internal List<MapEventZone> GlobalZones { get; private set; } = new();
     [JsonIgnore] internal MapEventZone[] Zones { get; private set; } // This should only ever be modified using the Add/RemoveZone methods
+
+    [JsonIgnore] public MapSubMode SubMode
+    {
+        get => (MapSubMode)(
+            ((Flags & MapFlags.SubMode1) != 0 ? 1 : 0) |
+            ((Flags & MapFlags.SubMode2) != 0 ? 2 : 0));
+        set => Flags =
+            Flags & ~MapFlags.SubModeMask
+            | (((int)value &  1) != 0 ? MapFlags.SubMode1 : 0)
+            | (((int)value &  2) != 0 ? MapFlags.SubMode2 : 0);
+    }
+
+    [JsonIgnore] public RestMode RestMode
+    {
+        get => (RestMode)(
+            ((Flags & MapFlags.RestMode1) != 0 ? 1 : 0) |
+            ((Flags & MapFlags.RestMode2) != 0 ? 2 : 0));
+        set => Flags =
+            Flags & ~MapFlags.RestModeMask
+            | (((int)value &  1) != 0 ? MapFlags.RestMode1 : 0)
+            | (((int)value &  2) != 0 ? MapFlags.RestMode2 : 0);
+    }
+
 
 #if DEBUG
     [JsonIgnore] public IList<object>[] EventReferences { get; private set; }
@@ -115,7 +138,13 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
                 Events[i].Id = i;
 
         s.List(nameof(Events), Events, eventCount, (i, x, serializer)
-            => MapEvent.SerdesNode((ushort)i, x, serializer, Id, Id.ToMapText(), mapping));
+            =>
+        {
+            var node = MapEvent.SerdesNode((ushort)i, x, serializer, Id, Id.ToMapText(), mapping);
+            if (serializer.IsCommenting())
+                serializer.Comment(node.ToString());
+            return node;
+        });
 
         foreach (var node in Events)
             node.Unswizzle(Events);

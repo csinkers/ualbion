@@ -15,8 +15,8 @@ public static class NpcMapping
         public const string Id = "Id";
         public const string Visual = "Visual";
         public const string Flags = "Flags";
-        public const string MovementA = "MovementA";
-        public const string MovementB = "MovementB";
+        public const string Triggers = "Triggers";
+        public const string Movement = "Movement";
         public const string Script = "Script";
         public const string Sound = "Sound";
         public const string Type = "Type";
@@ -95,8 +95,8 @@ public static class NpcMapping
         {
             new(Prop.Visual, npc.SpriteOrGroup.ToString()),
             new(Prop.Flags, npc.Flags.ToString()),
-            new(Prop.MovementA, npc.MovementA.ToString()),
-            new(Prop.MovementB, npc.MovementB.ToString()),
+            new(Prop.Triggers, npc.Triggers.ToString()),
+            new(Prop.Movement, npc.Movement.ToString()),
             new(Prop.Type, npc.Type.ToString()),
         };
 
@@ -145,8 +145,8 @@ public static class NpcMapping
             Waypoints = waypoints,
             Type = (NpcType)Enum.Parse(typeof(NpcType), obj.PropString(Prop.Type)),
             Flags = (NpcFlags)Enum.Parse(typeof(NpcFlags), obj.PropString(Prop.Flags)),
-            MovementA = (NpcMoveA)Enum.Parse(typeof(NpcMoveA), obj.PropString(Prop.MovementA)),
-            MovementB = (NpcMoveB)Enum.Parse(typeof(NpcMoveB), obj.PropString(Prop.MovementB)),
+            Triggers = (TriggerTypes)Enum.Parse(typeof(TriggerTypes), obj.PropString(Prop.Triggers)),
+            Movement = (NpcMovement)Enum.Parse(typeof(NpcMovement), obj.PropString(Prop.Movement)),
             Sound = AssetId.Parse(obj.PropString(Prop.Sound)),
             SpriteOrGroup = AssetId.Parse(visual) // TODO: Handle groups for 3D maps
         };

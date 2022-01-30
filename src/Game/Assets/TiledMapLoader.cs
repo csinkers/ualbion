@@ -74,7 +74,7 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
         var assetDir = GetAssetDir(info);
         var scriptPath = Path.Combine(assetDir, GetScriptFilename(info));
         string script = null;
-        if (!string.IsNullOrEmpty(scriptPath) && File.Exists(scriptPath))
+        if (!string.IsNullOrEmpty(scriptPath) && disk.FileExists(scriptPath))
             script = disk.ReadAllText(scriptPath);
 
         var bytes = s.Bytes(null, null, (int)s.BytesRemaining);

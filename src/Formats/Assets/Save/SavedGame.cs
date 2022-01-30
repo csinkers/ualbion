@@ -13,7 +13,16 @@ namespace UAlbion.Formats.Assets.Save;
 public class SavedGame
 {
     public const int MaxPartySize = 6;
-    public const int MaxNpcCount = 96;
+    const int MapCount = 512; // TODO
+    const int SwitchCount = 1024;
+    const int ChestCount = 999;
+    const int DoorCount = 999;
+    const int NpcCountPerMap = 96; // total 49152
+    const int ChainCountPerMap = 250; // total 128000
+    const int Unk5Count = 1500; // Words?
+    const int Unk6Count = 1500; // Words?
+    const int AutomapMarkerCount = 256;
+    const int Unk8Count = 1500; // ?
     public static readonly DateTime Epoch = new(2200, 1, 1, 0, 0, 0);
 
     public string Name { get; set; }
@@ -28,20 +37,30 @@ public class SavedGame
     public IDictionary<AssetId, Inventory> Inventories { get; } = new Dictionary<AssetId, Inventory>(); // TODO: Change to InventoryId?
     public IDictionary<AutomapId, byte[]> Automaps { get; } = new Dictionary<AutomapId, byte[]>();
 
-    readonly TickerDictionary _tickers  = new();
-    readonly FlagDictionary _switches  = new();
+    readonly FlagSet _switches  = new(0, SwitchCount);
+    readonly FlagSet _unlockedChests  = new(0, ChestCount);
+    readonly FlagSet _unlockedDoors  = new(0, DoorCount);
+    readonly FlagSet _removedNpcs  = new(0, MapCount * NpcCountPerMap);
+    readonly FlagSet _disabledChains  = new(0, MapCount * ChainCountPerMap);
+    readonly FlagSet _unk5Flags = new(0, Unk5Count);
+    readonly FlagSet _unk6Flags = new(0, Unk6Count);
+    readonly FlagSet _automapMarkersFound = new(0, AutomapMarkerCount);
+    readonly FlagSet _unk8Flags = new(0, Unk8Count);
+    readonly TickerSet _tickers = new();
+
     public IDictionary<TickerId, byte> Tickers => _tickers;
-    public bool GetFlag(SwitchId flag) => _switches.GetFlag(flag);
-    public void SetFlag(SwitchId flag, bool value) => _switches.SetFlag(flag, value);
+    public bool GetFlag(SwitchId flag) => _switches.GetFlag(flag.Id);
+    public void SetFlag(SwitchId flag, bool value) => _switches.SetFlag(flag.Id, value);
+    public bool IsNpcDisabled(MapId mapId, int npcNumber) => _removedNpcs.GetFlag(mapId.Id * NpcCountPerMap + npcNumber);
 
     public ushort Unk0 { get; set; }
     public uint Unk1 { get; set; }
     public byte[] Unk9 { get; set; }
     public byte[] Unknown15 { get; set; }
     public MiscState Misc { get; private set; } = new();
-    public byte[] Unknown2C1 { get; set; }
+    public byte[] Unknown2F6 { get; set; }
     public byte[] Unknown5B9F { get; set; }
-    public NpcState[] Npcs { get; } = new NpcState[MaxNpcCount];
+    public NpcState[] Npcs { get; } = new NpcState[NpcCountPerMap];
     public byte[] Unknown5B71 { get; set; } 
     public MapChangeCollection PermanentMapChanges { get; private set; } = new();
     public MapChangeCollection TemporaryMapChanges { get; private set; } = new();
@@ -98,18 +117,24 @@ public class SavedGame
             });
 
         save.Misc = s.Object(nameof(Misc), save.Misc, MiscState.Serdes); // 1A6
-        save._switches.SetPacked(0,
-            s.Bytes("Switches",
-                save._switches.GetPacked(0, FlagDictionary.OriginalSaveGameMax, mapping),
-                FlagDictionary.PackedSize(0, FlagDictionary.OriginalSaveGameMax)), mapping); // 276
+        save._switches.Serdes("Switches", s); // 276
+
+        // save._unlockedChests.Serdes("UnlockedChests", s);
+        // save._unlockedDoors.Serdes("UnlockedDoors", s);
+        // save._removedNpcs.Serdes("RemovedNpcs", s);
+        // save._disabledChains.Serdes("DisabledChains", s);
+        // save._unk5Flags.Serdes("Unk5Flags", s);
+        // save._unk6Flags.Serdes("Unk6Flags", s);
+        // save._automapMarkersFound.Serdes("AutomapMarkers", s);
+        // save._unk8Flags.Serdes("Unk8Flags", s);
 
         // TODO: Chain, Door, Chest, Npc, KnownWord flag dictionaries. Known 3D automap info markers? Battle positions?
-        save.Unknown2C1 = s.Bytes(nameof(Unknown2C1), save.Unknown2C1, 0x5833); // 0x2C1
-        s.Object(nameof(Tickers), save._tickers, TickerDictionary.Serdes); // 5AF4
+        save.Unknown2F6 = s.Bytes(nameof(Unknown2F6), save.Unknown2F6, 0x57FE); // 0x2F6
+        s.Object(nameof(Tickers), save._tickers, TickerSet.Serdes); // 5AF4
 
         save.Unknown5B9F = s.Bytes(nameof(Unknown5B9F), save.Unknown5B9F, 0x2C);
         var mapType = MapType.TwoD;
-        s.List(nameof(save.Npcs), save.Npcs, (mapType, mapping), MaxNpcCount, NpcState.Serdes);
+        s.List(nameof(save.Npcs), save.Npcs, (mapType, mapping), NpcCountPerMap, NpcState.Serdes);
 
         save.Unknown5B71 = s.Bytes(
             nameof(Unknown5B71),

@@ -6,15 +6,15 @@ using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets.Save;
 
-public class TickerDictionary : Dictionary<TickerId, byte>
+public class TickerSet : Dictionary<TickerId, byte>
 {
     const int Min = 100;
     const int Max = 255;
 
-    public static TickerDictionary Serdes(int _, TickerDictionary d, ISerializer s)
+    public static TickerSet Serdes(int _, TickerSet d, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        d ??= new TickerDictionary();
+        d ??= new TickerSet();
         if (s.IsReading())
             d.Clear();
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UAlbion;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -176,11 +177,7 @@ static class Program
 
     static void Main(string[] args)
     {
-        var disk = new FileSystem();
-        var jsonUtil = new FormatJsonUtil();
-        var baseDir = ConfigUtil.FindBasePath(disk);
-        if (baseDir == null)
-            throw new InvalidOperationException("No base directory could be found.");
+        var wut = FormatUtil.AlbionEncoding;
 
         var commands = ParseCommands(args.Skip(1)).ToList();
         if (!commands.Any())
@@ -189,32 +186,14 @@ static class Program
             return;
         }
 
+        var disk = new FileSystem();
         var filename = args[0];
         var stream = disk.OpenRead(filename);
         using var br = new BinaryReader(stream, Encoding.GetEncoding(850));
-        var generalConfig = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir, disk, jsonUtil);
-        var settings = GeneralSettings.Load(generalConfig, disk, jsonUtil);
-        var settingsManager = new SettingsManager(settings);
-        var assets = new AssetManager();
-        var loaderRegistry = new AssetLoaderRegistry();
-        var containerLoaderRegistry = new ContainerRegistry();
-        var postProcessorRegistry = new PostProcessorRegistry();
-        var modApplier = new ModApplier();
-        var spellManager = new SpellManager();
 
-        var exchange = new EventExchange(new LogExchange());
-        exchange
-            .Attach(settingsManager)
-            .Register<IGeneralConfig>(generalConfig)
-            .Attach(loaderRegistry)
-            .Attach(containerLoaderRegistry)
-            .Attach(postProcessorRegistry)
-            .Attach(modApplier)
-            .Attach(assets)
-            .Attach(spellManager)
-            ;
+        var exchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "Base");
 
-        modApplier.LoadMods(AssetMapping.Global, generalConfig, settings.ActiveMods);
+        var spellManager = exchange.Resolve<ISpellManager>();
         var save = SavedGame.Serdes(null, AssetMapping.Global, new AlbionReader(br, stream.Length), spellManager);
 
         if (!VerifyRoundTrip(stream, save, AssetMapping.Global, spellManager))

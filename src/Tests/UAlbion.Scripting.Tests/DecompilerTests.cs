@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using UAlbion.Scripting.Ast;
@@ -19,11 +20,18 @@ public class DecompilerTests
 
         try
         {
+            var sw = Stopwatch.StartNew();
             var result = Decompiler.SimplifyGraph(graph,
                 (description, x) =>
                 {
                     if (steps.Count == 0 || steps[^1].Item2 != x)
-                        steps.Add((description, x));
+                    {
+                        var ms = sw.ElapsedMilliseconds;
+                        steps.Add(ms == 0
+                            ? (description, graph)
+                            : ($"{description} ({sw.ElapsedMilliseconds} ms)", graph));
+                        sw.Restart();
+                    }
                     return x;
                 });
 

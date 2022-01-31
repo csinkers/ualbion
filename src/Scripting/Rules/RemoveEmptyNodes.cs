@@ -12,19 +12,32 @@ public static class RemoveEmptyNodes
     {
         protected override ICfgNode Build(Sequence sequence)
         {
-            var result = new List<ICfgNode>();
-            bool trivial = true;
-            foreach (var node in sequence.Statements)
+            List<ICfgNode> result = null;
+            for (var index = 0; index < sequence.Statements.Length; index++)
             {
+                var node = sequence.Statements[index];
                 if (node is EmptyNode)
                 {
-                    trivial = false;
+                    if (result == null)
+                    {
+                        result = new List<ICfgNode>();
+                        for (int i = 0; i < index; i++)
+                            result.Add(sequence.Statements[i]);
+                    }
+
                     continue;
                 }
 
                 node.Accept(this);
-                if (Result != null)
-                    trivial = false;
+                if (result == null)
+                {
+                    if (Result == null)
+                        continue;
+
+                    result = new List<ICfgNode>();
+                    for (int i = 0; i < index; i++)
+                        result.Add(sequence.Statements[i]);
+                }
 
                 if (Result is Sequence seq)
                 {
@@ -34,10 +47,7 @@ public static class RemoveEmptyNodes
                 else result.Add(Result ?? node);
             }
 
-            if (trivial)
-                return null;
-
-            return result.Count switch
+            return result == null ? null : result.Count switch
             {
                 // If it was a sequence of all empty nodes, emit a single empty node
                 // so the next iteration will take care of it

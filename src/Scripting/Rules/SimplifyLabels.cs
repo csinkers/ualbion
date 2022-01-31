@@ -38,7 +38,8 @@ public static class SimplifyLabels
     class RelabellingAstVisitor : BaseAstBuilderVisitor
     {
         readonly IDictionary<string, (string target, bool removed)> _mapping;
-        public RelabellingAstVisitor(IDictionary<string, (string target, bool removed)> mapping) => _mapping = mapping ?? throw new ArgumentNullException(nameof(mapping));
+        public RelabellingAstVisitor(IDictionary<string, (string target, bool removed)> mapping)
+            => _mapping = mapping ?? throw new ArgumentNullException(nameof(mapping));
         protected override ICfgNode Build(Goto jump) => 
             _mapping.ContainsKey(jump.Label) 
                 ? Emit.Goto(_mapping[jump.Label].target) 

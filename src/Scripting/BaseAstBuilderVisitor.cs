@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting;
@@ -75,14 +74,12 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
         var condition = Result;
         ifElse.TrueBody?.Accept(this);
         var trueBody = Result;
-
         ifElse.FalseBody?.Accept(this);
         var falseBody = Result;
 
         if (condition == null && trueBody == null && falseBody == null)
             return null;
 
-        ifElse.FalseBody?.Accept(this);
         return Emit.IfElse(
             condition ?? ifElse.Condition,
             trueBody ?? ifElse.TrueBody,
@@ -93,31 +90,48 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
     {
         statement.Head.Accept(this);
         var head = Result;
-        var parts = new ICfgNode[statement.Parameters.Length];
+        ICfgNode[] parts = null;
         for (var index = 0; index < statement.Parameters.Length; index++)
         {
             statement.Parameters[index].Accept(this);
-            parts[index] = Result;
+            if (parts == null)
+            {
+                if (Result == null)
+                    continue;
+
+                parts = new ICfgNode[statement.Parameters.Length];
+                for (int i = 0; i < index; i++)
+                    parts[i] = statement.Parameters[i];
+            }
+
+            parts[index] = Result ?? statement.Parameters[index];
         }
 
-        if (head == null && parts.All(x => x == null))
+        if (head == null && parts== null)
             return null;
 
-        for (var index = 0; index < statement.Parameters.Length; index++)
-            parts[index] ??= statement.Parameters[index];
+        head ??= statement.Head;
+        parts ??= statement.Parameters;
 
         return Emit.Statement(head, parts);
     }
 
     protected virtual ICfgNode Build(Sequence sequence)
     {
-        var result = new List<ICfgNode>();
-        bool trivial = true;
-        foreach (var node in sequence.Statements)
+        List<ICfgNode> result = null;
+        for (var index = 0; index < sequence.Statements.Length; index++)
         {
+            var node = sequence.Statements[index];
             node.Accept(this);
-            if (Result != null)
-                trivial = false;
+            if (result == null)
+            {
+                if (Result == null)
+                    continue;
+
+                result = new List<ICfgNode>();
+                for (int i = 0; i < index; i++)
+                    result.Add(sequence.Statements[i]);
+            }
 
             if (Result is Sequence seq)
             {
@@ -127,10 +141,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
             else result.Add(Result ?? node);
         }
 
-        if (trivial)
-            return null;
-
-        return Emit.Seq(result.ToArray());
+        return result == null ? null : Emit.Seq(result.ToArray());
     }
 
     protected virtual ICfgNode Build(DoLoop doLoop)

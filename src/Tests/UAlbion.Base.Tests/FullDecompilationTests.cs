@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -34,6 +35,8 @@ public class FullDecompilationTests : IDisposable
 
     static FullDecompilationTests()
     {
+        Event.AddEventsFromAssembly(typeof(ActionEvent).Assembly);
+        AssetMapping.GlobalIsThreadLocal = true;
         var disk = new MockFileSystem(true);
         var baseDir = ConfigUtil.FindBasePath(disk);
         var generalConfig = AssetSystem.LoadGeneralConfig(baseDir, disk, JsonUtil);
@@ -50,10 +53,9 @@ public class FullDecompilationTests : IDisposable
 
     public FullDecompilationTests()
     {
-        Event.AddEventsFromAssembly(typeof(ActionEvent).Assembly);
-        AssetMapping.GlobalIsThreadLocal = true;
-        AssetMapping.Global.Clear();
-        AssetMapping.Global.MergeFrom(Mapping);
+        if (AssetMapping.Global.IsEmpty)
+            AssetMapping.Global.MergeFrom(Mapping);
+
         _testNum = Interlocked.Increment(ref _nextTestNum);
         PerfTracker.StartupEvent($"Start decompilation test {_testNum}");
     }
@@ -524,14 +526,15 @@ public class FullDecompilationTests : IDisposable
             }
         }
 
-        if (successCount < graphs.Count)
+        int? dumpRegion = null;
+        if (successCount < graphs.Count || dumpRegion.HasValue)
         {
             var combined = string.Join(Environment.NewLine, errors.Where(x => x.Length > 0));
             //*
             for (int i = 0; i < allSteps.Count; i++)
             {
                 var steps = allSteps[i];
-                if (!string.IsNullOrEmpty(errors[i]))
+                if (!string.IsNullOrEmpty(errors[i]) || dumpRegion == i)
                     TestUtil.DumpSteps(steps, resultsDir, $"Region{i}");
             }
             //*/
@@ -542,10 +545,12 @@ public class FullDecompilationTests : IDisposable
 
     static ICfgNode Decompile(ControlFlowGraph graph, List<(string, IGraph)> steps)
     {
+        var sw = Stopwatch.StartNew();
         ControlFlowGraph Record(string description, ControlFlowGraph g)
         {
             if (steps.Count == 0 || steps[^1].Item2 != g)
-                steps.Add((description, g));
+                steps.Add(($"{description} ({sw.ElapsedMilliseconds} ms)", g));
+            sw.Restart();
             return g;
         }
 

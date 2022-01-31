@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Scripting.Ast;
@@ -38,13 +39,21 @@ public static class Decompiler
             throw new ArgumentException("Must supply at least one event node", nameof(nodes));
 
         RecordFunc record;
+        var sw = Stopwatch.StartNew();
         if (steps != null)
         {
             var steps2 = steps;
             record = (description, graph) =>
             {
                 if (steps2.Count == 0 || steps[^1].Item2 != graph)
-                    steps2.Add((description, graph));
+                {
+                    var ms = sw.ElapsedMilliseconds;
+                    steps2.Add(ms == 0
+                        ? (description, graph)
+                        : ($"{description} ({sw.ElapsedMilliseconds} ms)", graph));
+                    sw.Restart();
+                }
+
                 return graph;
             };
         }

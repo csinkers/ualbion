@@ -129,6 +129,7 @@ public class AssetMapping
     }
 
     public bool IsGlobal => Global == this;
+    public bool IsEmpty => _byEnumType.Count == 0;
 
     /// <summary>
     /// Convert a run-time AssetId to its unambiguous enum representation.

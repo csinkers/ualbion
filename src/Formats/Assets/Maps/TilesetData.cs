@@ -22,52 +22,6 @@ public class TilesetData
         if (info == null) throw new ArgumentNullException(nameof(info));
 
         int tileCount = td?.Tiles.Count ?? (int)(s.BytesRemaining / 8) + dummyTileCount;
-        const string expected = @"Chain0:
-action StartDialogue
-if (in_party PartyMember.Sira) {
-    if (get_switch Switch.Switch597) {
-        if (get_switch Switch.Switch77) {
-            map_text EventText.Sira2 11 StandardOptions
-        } else {
-            map_text EventText.Sira2 7 StandardOptions
-        }
-        map_text EventText.Sira2 8 ConversationOptions
-        map_text EventText.Sira2 8 Conversation
-    } else {
-        map_text EventText.Sira2 7 StandardOptions
-        map_text EventText.Sira2 1 ConversationOptions
-        map_text EventText.Sira2 1 Conversation
-    }
-} else {
-    if (get_switch Switch.Switch76) {
-        map_text EventText.Sira2 16
-    } else {
-        map_text EventText.Sira2 15
-    }
-    switch Set Switch.Switch76
-    if (prompt_player EventText.Sira2 17) {
-        map_text EventText.Sira2 19
-        add_party_member PartyMember.Sira 3
-        if (result) {
-            add_party_member PartyMember.Mellthas 3
-            if (result) {
-                npc_disabled 8 1 0 281
-                npc_disabled 9 1 0 281
-                end_dialogue
-            } else {
-                L1:
-                map_text EventText.Sira2 18
-                remove_party_member PartyMember.Sira 1 26888
-                remove_party_member PartyMember.Mellthas 1 26889
-            }
-        } else {
-            goto L1
-        }
-    } else {
-        map_text EventText.Sira2 20
-        end_dialogue
-    }
-}";
         td ??= new TilesetData(info.AssetId);
         td.UseSmallGraphics = info.Get(AssetProperty.UseSmallGraphics, td.UseSmallGraphics);
 

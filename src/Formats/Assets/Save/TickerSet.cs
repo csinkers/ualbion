@@ -8,7 +8,6 @@ namespace UAlbion.Formats.Assets.Save;
 
 public class TickerSet : Dictionary<TickerId, byte>
 {
-    const int Min = 100;
     const int Max = 255;
 
     public static TickerSet Serdes(int _, TickerSet d, ISerializer s)
@@ -19,7 +18,7 @@ public class TickerSet : Dictionary<TickerId, byte>
             d.Clear();
 
         // TODO: Proper extensible modding support
-        for (int i = Min; i <= Max; i++)
+        for (int i = 0; i <= Max; i++)
         {
             var assetId = new TickerId(AssetType.Ticker, i);
             d[assetId] = d.TryGetValue(assetId, out var existing)

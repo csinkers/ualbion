@@ -447,7 +447,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(AssetId.From(MonsterGroup.Empty), n.Id);
         Assert.Equal(new AssetId(AssetType.ObjectGroup, 68), n.SpriteOrGroup);
         Assert.Equal(NpcType.Prop, n.Type);
-        Assert.Equal(NpcFlags.SimpleMsg | NpcFlags.Unk5, n.Flags);
+        Assert.Equal(MapNpcFlags.SimpleMsg | MapNpcFlags.Unk5, n.Flags);
         Assert.Equal(TriggerTypes.Normal | TriggerTypes.Examine, n.Triggers);
         Assert.Equal(23, n.Chain);
         Assert.Equal(NpcMovement.RandomWander, n.Movement);

@@ -1,6 +1,6 @@
 ﻿namespace UAlbion.Formats.Assets.Maps;
 
-public enum NpcType
+public enum NpcType : byte
 {
     Party = 0,    // PartyGfx, fires Id as party member event set (i.e. set id Id+980)
     Npc = 1,      // NpcGfx,   fires Id as EventSet

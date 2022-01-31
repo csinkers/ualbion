@@ -34,6 +34,7 @@ public enum Spell : ushort
     Unused28 = 28,
     Unused29 = 29,
     Unused30 = 30,
+
     Regeneration = 31,
     MapView = 32,
     Lifebringer = 33,
@@ -64,6 +65,7 @@ public enum Spell : ushort
     Unused58 = 58,
     Unused59 = 59,
     Unused60 = 60,
+
     Berserk = 61,
     BanishDemon = 62,
     BanishDemons = 63,
@@ -94,6 +96,7 @@ public enum Spell : ushort
     Unused88 = 88,
     Unused89 = 89,
     Unused90 = 90,
+
     Fireball = 91,
     LightningStrike = 92,
     FireRain = 93,
@@ -124,6 +127,7 @@ public enum Spell : ushort
     Unused118 = 118,
     Unused119 = 119,
     Unused120 = 120,
+
     Unused121 = 121,
     Unused122 = 122,
     Unused123 = 123,
@@ -154,6 +158,7 @@ public enum Spell : ushort
     Unused148 = 148,
     Unused149 = 149,
     Unused150 = 150,
+
     ZombiePanic = 151,
     ZombiePoisonBreeze = 152,
     ZombieIrritation = 153,
@@ -184,6 +189,7 @@ public enum Spell : ushort
     Unused178 = 178,
     Unused179 = 179,
     Unused180 = 180,
+
     Unused181 = 181,
     Unused182 = 182,
     Unused183 = 183,

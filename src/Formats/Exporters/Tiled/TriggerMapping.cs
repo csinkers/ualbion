@@ -178,6 +178,7 @@ public static class TriggerMapping
                     Y = (byte)y,
                     ChainSource = mapId,
                     Node = trigger.EventIndex == EventNode.UnusedEventId ? null : new DummyEventNode(trigger.EventIndex),
+                    Chain = trigger.EventIndex == EventNode.UnusedEventId ? EventNode.UnusedEventId : (ushort)0,
                     Trigger = trigger.TriggerType,
                     Unk1 = trigger.Unk1,
                     Global = trigger.Global

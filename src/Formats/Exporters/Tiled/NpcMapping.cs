@@ -144,7 +144,7 @@ public static class NpcMapping
             Node = entryPoint == EventNode.UnusedEventId ? null : new DummyEventNode(entryPoint),
             Waypoints = waypoints,
             Type = (NpcType)Enum.Parse(typeof(NpcType), obj.PropString(Prop.Type)),
-            Flags = (NpcFlags)Enum.Parse(typeof(NpcFlags), obj.PropString(Prop.Flags)),
+            Flags = (MapNpcFlags)Enum.Parse(typeof(MapNpcFlags), obj.PropString(Prop.Flags)),
             Triggers = (TriggerTypes)Enum.Parse(typeof(TriggerTypes), obj.PropString(Prop.Triggers)),
             Movement = (NpcMovement)Enum.Parse(typeof(NpcMovement), obj.PropString(Prop.Movement)),
             Sound = AssetId.Parse(obj.PropString(Prop.Sound)),

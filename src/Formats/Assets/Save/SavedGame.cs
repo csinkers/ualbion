@@ -14,15 +14,16 @@ public class SavedGame
 {
     public const int MaxPartySize = 6;
     const int MapCount = 512; // TODO
-    const int SwitchCount = 1024;
-    const int ChestCount = 999;
-    const int DoorCount = 999;
-    const int NpcCountPerMap = 96; // total 49152
-    const int ChainCountPerMap = 250; // total 128000
-    const int Unk5Count = 1500; // Words?
-    const int Unk6Count = 1500; // Words?
-    const int AutomapMarkerCount = 256;
-    const int Unk8Count = 1500; // ?
+    const int SwitchCount = 1024; // 0x80 bytes
+    const int ChestCount = 999; // 7D bytes
+    const int DoorCount = 999; // 7D bytes
+    const int NpcCountPerMap = 96; // total 49152 = 0x1800 bytes
+    const int ChainCountPerMap = 250; // total 128000 = 0x3e80 bytes
+    const int AutomapMarkerCount = 256; // = 0x20 bytes
+    const int Unk5Count = 1500; // Words? = 0xBC bytes
+    const int Unk6Count = 1500; // Words? = 0xBC bytes
+    const int Unk8Count = 1500; // ? = 0xBC bytes
+
     public static readonly DateTime Epoch = new(2200, 1, 1, 0, 0, 0);
 
     public string Name { get; set; }
@@ -51,15 +52,22 @@ public class SavedGame
     public IDictionary<TickerId, byte> Tickers => _tickers;
     public bool GetFlag(SwitchId flag) => _switches.GetFlag(flag.Id);
     public void SetFlag(SwitchId flag, bool value) => _switches.SetFlag(flag.Id, value);
-    public bool IsNpcDisabled(MapId mapId, int npcNumber) => _removedNpcs.GetFlag(mapId.Id * NpcCountPerMap + npcNumber);
+    public bool IsNpcDisabled(MapId mapId, int npcNumber) =>
+        npcNumber is < 0 or >= NpcCountPerMap
+        || mapId.Id is < 0 or >= MapCount
+        || _removedNpcs.GetFlag(mapId.Id * NpcCountPerMap + npcNumber);
+    public bool IsChainDisabled(MapId mapId, int chainNumber) =>
+        chainNumber is < 0 or >= ChainCountPerMap
+        || mapId.Id is < 0 or >= MapCount
+        || _disabledChains.GetFlag(mapId.Id * ChainCountPerMap + chainNumber);
 
     public ushort Unk0 { get; set; }
     public uint Unk1 { get; set; }
     public byte[] Unk9 { get; set; }
-    public byte[] Unknown15 { get; set; }
+    public ushort[] ActiveSpells { get; set; }
+    public byte[] UnkB5 { get; set; }
     public MiscState Misc { get; private set; } = new();
-    public byte[] Unknown2F6 { get; set; }
-    public byte[] Unknown5B9F { get; set; }
+    public byte[] Unknown5B90 { get; set; }
     public NpcState[] Npcs { get; } = new NpcState[NpcCountPerMap];
     public byte[] Unknown5B71 { get; set; } 
     public MapChangeCollection PermanentMapChanges { get; private set; } = new();
@@ -103,7 +111,15 @@ public class SavedGame
         save.PartyX = s.UInt16(nameof(PartyX), save.PartyX);   // 10
         save.PartyY = s.UInt16(nameof(PartyY), save.PartyY);   // 12
         save.PartyDirection = s.EnumU8(nameof(PartyDirection), save.PartyDirection); // 14
-        save.Unknown15 = s.Bytes(nameof(Unknown15), save.Unknown15, 0x185); // 15 TODO: Active spell info?
+
+        save.ActiveSpells = (ushort[])s.List( // [0] = Light spell % remaining?, [1] = Max Light%?
+            nameof(ActiveSpells),
+            save.ActiveSpells,
+            0x50,
+            (_, x,s2) => s2.UInt16(null, x),
+            n => new ushort[n]); // 15
+
+        save.UnkB5 = s.Bytes(nameof(UnkB5), save.UnkB5, 0xE5);
 
         save.ActiveMembers = s.List(
             nameof(ActiveMembers),
@@ -119,20 +135,20 @@ public class SavedGame
         save.Misc = s.Object(nameof(Misc), save.Misc, MiscState.Serdes); // 1A6
         save._switches.Serdes("Switches", s); // 276
 
-        // save._unlockedChests.Serdes("UnlockedChests", s);
-        // save._unlockedDoors.Serdes("UnlockedDoors", s);
-        // save._removedNpcs.Serdes("RemovedNpcs", s);
-        // save._disabledChains.Serdes("DisabledChains", s);
         // save._unk5Flags.Serdes("Unk5Flags", s);
         // save._unk6Flags.Serdes("Unk6Flags", s);
-        // save._automapMarkersFound.Serdes("AutomapMarkers", s);
         // save._unk8Flags.Serdes("Unk8Flags", s);
 
         // TODO: Chain, Door, Chest, Npc, KnownWord flag dictionaries. Known 3D automap info markers? Battle positions?
-        save.Unknown2F6 = s.Bytes(nameof(Unknown2F6), save.Unknown2F6, 0x57FE); // 0x2F6
-        s.Object(nameof(Tickers), save._tickers, TickerSet.Serdes); // 5AF4
+        save._disabledChains.Serdes("DisabledChains", s);
+        save._removedNpcs.Serdes("RemovedNpcs", s); // 2f6 + 3e80 = 4176
+        save._automapMarkersFound.Serdes("AutomapMarkers", s); // 5976
+        save._unlockedChests.Serdes("UnlockedChests", s); // 5996
+        save._unlockedDoors.Serdes("UnlockedDoors", s); // 5A13
+        s.Object(nameof(Tickers), save._tickers, TickerSet.Serdes); // 5a90
 
-        save.Unknown5B9F = s.Bytes(nameof(Unknown5B9F), save.Unknown5B9F, 0x2C);
+        ApiUtil.Assert(s.Offset - versionOffset == 0x5b90);
+        save.Unknown5B90 = s.Bytes(nameof(Unknown5B90), save.Unknown5B90, 0x2C);
         var mapType = MapType.TwoD;
         s.List(nameof(save.Npcs), save.Npcs, (mapType, mapping), NpcCountPerMap, NpcState.Serdes);
 

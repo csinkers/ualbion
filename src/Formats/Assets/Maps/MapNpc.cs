@@ -10,8 +10,9 @@ public class MapNpc // 0xA = 10 bytes
 {
     public const int SizeOnDisk = 10;
     public const int WaypointCount = 0x480;
+    public static MapNpc Default => new() { Waypoints = new[] { new NpcWaypoint(0, 0) } };
 
-    NpcFlags _raw;
+    MapNpcFlags _raw;
     public AssetId Id { get; set; } // MonsterGroup, Npc etc
     public AssetId Sound { get; set; }
     public AssetId SpriteOrGroup { get; set; } // LargeNpcGfx, SmallNpcGfx etc but could also be an ObjectGroup for 3D
@@ -19,34 +20,34 @@ public class MapNpc // 0xA = 10 bytes
     public NpcType Type
     {
         get => (NpcType)(
-            ((_raw & NpcFlags.Type1) != 0 ? 1 : 0) |
-            ((_raw & NpcFlags.Type2) != 0 ? 2 : 0));
+            ((_raw & MapNpcFlags.Type1) != 0 ? 1 : 0) |
+            ((_raw & MapNpcFlags.Type2) != 0 ? 2 : 0));
         set => _raw =
-            _raw & ~NpcFlags.TypeMaskV2
-            | (((int)value &  1) != 0 ? NpcFlags.Type1 : 0)
-            | (((int)value &  2) != 0 ? NpcFlags.Type2 : 0)
-            | (((int)value &  4) != 0 ? NpcFlags.Type4 : 0);
+            _raw & ~MapNpcFlags.TypeMaskV2
+            | (((int)value &  1) != 0 ? MapNpcFlags.Type1 : 0)
+            | (((int)value &  2) != 0 ? MapNpcFlags.Type2 : 0)
+            | (((int)value &  4) != 0 ? MapNpcFlags.Type4 : 0);
     }
 
-    public NpcFlags Flags
+    public MapNpcFlags Flags
     {
-        get => _raw & NpcFlags.MiscMaskV2;
-        set => _raw = _raw & ~NpcFlags.MiscMaskV2 | (value & NpcFlags.MiscMaskV2);
+        get => _raw & MapNpcFlags.MiscMaskV2;
+        set => _raw = _raw & ~MapNpcFlags.MiscMaskV2 | (value & MapNpcFlags.MiscMaskV2);
     }
 
     public NpcMovement Movement
     {
         get => (NpcMovement)(
-            ((_raw & NpcFlags.MoveB1) != 0 ? 1 : 0) |
-            ((_raw & NpcFlags.MoveB2) != 0 ? 2 : 0) |
-            ((_raw & NpcFlags.MoveB4) != 0 ? 4 : 0) |
-            ((_raw & NpcFlags.MoveB8) != 0 ? 8 : 0));
+            ((_raw & MapNpcFlags.MoveB1) != 0 ? 1 : 0) |
+            ((_raw & MapNpcFlags.MoveB2) != 0 ? 2 : 0) |
+            ((_raw & MapNpcFlags.MoveB4) != 0 ? 4 : 0) |
+            ((_raw & MapNpcFlags.MoveB8) != 0 ? 8 : 0));
         set => _raw =
-            _raw & ~NpcFlags.MoveMaskV2
-            | (((int)value & 1) != 0 ? NpcFlags.MoveB1 : 0)
-            | (((int)value & 2) != 0 ? NpcFlags.MoveB2 : 0)
-            | (((int)value & 4) != 0 ? NpcFlags.MoveB4 : 0)
-            | (((int)value & 8) != 0 ? NpcFlags.MoveB8 : 0);
+            _raw & ~MapNpcFlags.MoveMaskV2
+            | (((int)value & 1) != 0 ? MapNpcFlags.MoveB1 : 0)
+            | (((int)value & 2) != 0 ? MapNpcFlags.MoveB2 : 0)
+            | (((int)value & 4) != 0 ? MapNpcFlags.MoveB4 : 0)
+            | (((int)value & 8) != 0 ? MapNpcFlags.MoveB8 : 0);
     }
 
     public TriggerTypes Triggers { get; set; }

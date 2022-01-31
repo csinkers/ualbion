@@ -63,7 +63,7 @@ public enum Script : ushort
     Unknown57 = 57,
     Unknown58 = 58,
     Unknown59 = 59,
-    Unknown60 = 60,
+    ShortcutMapTestScript = 60,
     Unknown61 = 61,
     EndOfDemo = 62,
     Unknown200 = 200,

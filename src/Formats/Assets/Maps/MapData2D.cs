@@ -47,6 +47,13 @@ public class MapData2D : BaseMapData
         Overlay = new int[width * height];
     }
 
+    public MapData2D(MapId id, PaletteId paletteId, TilesetId tilesetId, byte width, byte height) : base(id, paletteId, width, height)
+    {
+        TilesetId = tilesetId;
+        Underlay = new int[width * height];
+        Overlay = new int[width * height];
+    }
+
     public static MapData2D Serdes(AssetInfo info, MapData2D existing, AssetMapping mapping, ISerializer s)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));

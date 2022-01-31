@@ -52,7 +52,7 @@ public static class AutomapMapping
             {
                 new(Prop.Visual, tile.ToString()),
                 new(Prop.Unk2, marker.Unk2.ToString(CultureInfo.InvariantCulture)),
-                new(Prop.Unk3, marker.Unk3.ToString(CultureInfo.InvariantCulture))
+                new(Prop.Unk3, marker.MarkerId.ToString(CultureInfo.InvariantCulture))
             }
         };
 
@@ -74,7 +74,7 @@ public static class AutomapMapping
             X = (byte)(obj.X / tileWidth),
             Y = (byte)(obj.Y / tileHeight),
             Unk2 = (byte)unk2,
-            Unk3 = (byte)unk3,
+            MarkerId = (byte)unk3,
         }, (byte)visual);
     }
 }

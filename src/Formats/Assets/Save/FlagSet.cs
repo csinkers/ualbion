@@ -9,9 +9,9 @@ public class FlagSet
 {
     readonly BitArray _set;
 
-    public static int PackedSize(int unpackedSize) => (unpackedSize + 7) / 8;
     public int Offset { get; }
     public int Count { get; }
+    public int PackedSize => (Count + 7) / 8;
 
     public FlagSet(int offset, int count)
     {
@@ -35,7 +35,7 @@ public class FlagSet
     public byte[] GetPacked()
     {
         // TODO: Check if .CopyTo will work
-        var packed = new byte[PackedSize(Count)];
+        var packed = new byte[PackedSize];
         for (int i = 0; i < Count; i++)
             packed[i / 8] |= (byte)((_set[i] ? 1 : 0) << (i % 8));
 
@@ -45,8 +45,8 @@ public class FlagSet
     public void SetPacked(byte[] packed)
     {
         if (packed == null) throw new ArgumentNullException(nameof(packed));
-        if (packed.Length != PackedSize(Count))
-            throw new ArgumentException($"Expected {PackedSize(Count)} bytes, but given {packed.Length}");
+        if (packed.Length != PackedSize)
+            throw new ArgumentException($"Expected {PackedSize} bytes, but given {packed.Length}");
 
         for (int i = 0; i < Count; i++)
         {
@@ -58,8 +58,8 @@ public class FlagSet
     public void Serdes(string name, ISerializer s)
     {
         if (s.IsReading())
-            SetPacked(s.Bytes(name, null, PackedSize(Count)));
+            SetPacked(s.Bytes(name, null, PackedSize));
         else
-            s.Bytes(name, GetPacked(), PackedSize(Count));
+            s.Bytes(name, GetPacked(), PackedSize);
     }
 }

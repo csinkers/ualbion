@@ -8,7 +8,10 @@ public class MiscState
     // Len: 0xD0
     public int Unk0 { get; set; }
     public ActiveItems ActiveItems { get; set; }
-    public long Unk8 { get; set; }
+    public ushort HoursSinceResting { get; set; }
+    public ushort UnkA { get; set; }
+    public ushort UnkC { get; set; }
+    public ushort UnkE { get; set; }
     public long Unk10 { get; set; }
     public long Unk18 { get; set; }
     public long Unk20 { get; set; }
@@ -40,7 +43,10 @@ public class MiscState
         m ??= new MiscState();
         m.Unk0 = s.Int32(nameof(Unk0), m.Unk0); // 0
         m.ActiveItems = s.EnumU32(nameof(ActiveItems), m.ActiveItems); // 4
-        m.Unk8 = s.Int64(nameof(Unk8), m.Unk8);
+        m.HoursSinceResting = s.UInt16(nameof(HoursSinceResting), m.HoursSinceResting);
+        m.UnkA = s.UInt16(nameof(UnkA), m.UnkA);
+        m.UnkC = s.UInt16(nameof(UnkC), m.UnkC);
+        m.UnkE = s.UInt16(nameof(UnkE), m.UnkE);
         m.Unk10 = s.Int64(nameof(Unk10), m.Unk10);
         m.Unk18 = s.Int64(nameof(Unk18), m.Unk18);
         m.Unk20 = s.Int64(nameof(Unk20), m.Unk20);

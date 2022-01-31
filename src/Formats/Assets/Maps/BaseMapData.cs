@@ -94,6 +94,16 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
         Unswizzle();
     }
 
+    protected BaseMapData(MapId id, PaletteId paletteId, byte width, byte height)
+    {
+        Id = id;
+        PaletteId = paletteId;
+        Width = width;
+        Height = height;
+        Npcs = new List<MapNpc>();
+        Zones = new MapEventZone[width * height];
+    }
+
     protected int SerdesZones(ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
@@ -162,7 +172,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
         s.Check();
     }
 
-    protected void Unswizzle() // Resolve event indices to pointers
+    public void Unswizzle() // Resolve event indices to pointers
     {
         var chainMapping = new ushort[Events.Count];
         var sortedChains = Chains
@@ -183,7 +193,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
             npc.Unswizzle(Id, x => Events[x], x => chainMapping[x]);
 
         foreach (var zone in GlobalZones.Concat(Zones))
-            zone?.Unswizzle(Id, x => Events[x], x => chainMapping[x]);
+            zone?.Unswizzle(Id, x => Events[x], x => chainMapping[x], x => Events[Chains[x]]);
 
         foreach (var triggerType in GlobalZones.Concat(Zones).Where(x => x != null).GroupBy(x => x.Trigger))
             _zoneTypeLookup[triggerType.Key] = triggerType.ToHashSet();
@@ -332,7 +342,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 
     MapEventZone BuildZone(bool global, byte x, byte y, TriggerTypes trigger, ushort chain)
     {
-        var eventIndex = Chains[chain];
+        var eventIndex = chain >= Chains.Count ? EventNode.UnusedEventId : Chains[chain];
         return new MapEventZone
         {
             X = x, Y = y, Global = global,
@@ -340,7 +350,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
             Unk1 = 0,
             Chain = chain,
             ChainSource = Id,
-            Node = Events[eventIndex],
+            Node = eventIndex == EventNode.UnusedEventId ? null : Events[eventIndex],
         };
     }
 

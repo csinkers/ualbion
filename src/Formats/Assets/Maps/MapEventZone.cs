@@ -33,7 +33,8 @@ public class MapEventZone
         var zone = existing ?? new MapEventZone
         {
             Global = global,
-            Y = global ? (byte)0 : y
+            Y = global ? (byte)0 : y,
+            Chain = EventNode.UnusedEventId
         };
 
         zone.X = s.Transform<byte, byte>(nameof(X), zone.X, S.UInt8, StoreIncrementedConverter.Instance);
@@ -44,11 +45,14 @@ public class MapEventZone
         if (nodeId != null && zone.Node == null)
             zone.Node = new DummyEventNode(nodeId.Value);
 
+        if (nodeId == null)
+            zone.Chain = EventNode.UnusedEventId;
+
         s.End();
         return zone;
     }
 
-    public void Unswizzle(MapId mapId, Func<ushort, IEventNode> getEvent, Func<ushort, ushort> getChain)
+    public void Unswizzle(MapId mapId, Func<ushort, IEventNode> getEvent, Func<ushort, ushort> getChain, Func<ushort, IEventNode> getEventForChain)
     {
         if (getEvent == null) throw new ArgumentNullException(nameof(getEvent));
         if (getChain == null) throw new ArgumentNullException(nameof(getChain));
@@ -56,7 +60,10 @@ public class MapEventZone
         if (Node is DummyEventNode dummy)
             Node = dummy.Id == EventNode.UnusedEventId ? null : getEvent(dummy.Id);
 
-        Chain = Node != null ? getChain(Node.Id) : EventNode.UnusedEventId;
+        if (Node == null && Chain != EventNode.UnusedEventId)
+            Node = getEventForChain(Chain);
+        else
+            Chain = Node != null ? getChain(Node.Id) : EventNode.UnusedEventId;
     }
 
     public override string ToString() => $"{(Global ? "GZ" : "Z")}({X}, {Y}) T({Trigger}) M({Unk1}) C({Chain}) E({Node?.Id})";

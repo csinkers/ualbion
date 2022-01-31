@@ -149,6 +149,7 @@
     "$(MOD)/Albion/CD/XLDLIBS/LABDATA0.XLD": { "Loader": "lab", "Map": { "0": { "Id": "lab.1" } } },
     "$(MOD)/Albion/CD/XLDLIBS/LABDATA1.XLD": { "Loader": "lab", "MinimumCount": 100, "Map": { "0": { "Id": "lab.100" } } },
     "$(MOD)/Albion/CD/XLDLIBS/LABDATA2.XLD": { "Loader": "lab", "MinimumCount": 100, "Map": { "0": { "Id": "lab.200" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/MAPDATA0.XLD": { "Loader": "map", "Max": 98, "Map": { "0": { "Id": "map.1" } } },
     "$(MOD)/Albion/CD/XLDLIBS/MAPDATA1.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.100" } } },
     "$(MOD)/Albion/CD/XLDLIBS/MAPDATA2.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.200" } } },
     "$(MOD)/Albion/CD/XLDLIBS/MAPDATA3.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.300" } } },

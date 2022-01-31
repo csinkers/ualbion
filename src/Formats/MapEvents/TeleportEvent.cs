@@ -39,8 +39,8 @@ public class TeleportEvent : MapEvent
     [EventPart("map")] public MapId MapId { get; private set; } // 0 = stay on current map
     [EventPart("x")] public byte X { get; private set; }
     [EventPart("y")] public byte Y { get; private set; }
-    [EventPart("dir")] public Direction Direction { get; private set; }
-    [EventPart("unk4")] public byte Unk4 { get; private set; } // 255 on 2D maps, (1,6) on 3D maps
-    [EventPart("unk5")] public byte Unk5 { get; private set; } // 2,3,4,5,6,8,9
+    [EventPart("dir", true, Direction.Unchanged)] public Direction Direction { get; private set; }
+    [EventPart("unk4", true, (byte)255)] public byte Unk4 { get; private set; } // 255 on 2D maps, (1,6) on 3D maps
+    [EventPart("unk5", true, (byte)2)] public byte Unk5 { get; private set; } // 2,3,4,5,6,8,9
     public override MapEventType EventType => MapEventType.MapExit;
 }

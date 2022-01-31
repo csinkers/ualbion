@@ -59,6 +59,15 @@ public class MapData3D : BaseMapData
         AutomapGraphics = new byte[AutomapGraphicsSize];
     }
 
+    public MapData3D(MapId id, PaletteId paletteId, LabyrinthId labyrinthId, byte width, byte height) : base(id, paletteId, width, height)
+    {
+        LabDataId = labyrinthId;
+        Floors = new byte[width * height];
+        Ceilings = new byte[width * height];
+        Contents = new byte[width * height];
+        AutomapGraphics = new byte[AutomapGraphicsSize];
+    }
+
     public static MapData3D Serdes(AssetInfo info, MapData3D existing, AssetMapping mapping, ISerializer s)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));

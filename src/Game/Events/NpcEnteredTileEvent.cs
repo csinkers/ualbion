@@ -1,19 +1,19 @@
 ﻿using UAlbion.Api;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Events;
 
 [Event("npc_entered_tile")]
-public class NpcEnteredTileEvent : GameEvent, IVerboseEvent
+public class NpcEnteredTileEvent : GameEvent, INpcEvent, IVerboseEvent
 {
-    public NpcEnteredTileEvent(NpcId id, int x, int y)
+    public NpcEnteredTileEvent(byte npcNum, int x, int y)
     {
-        Id = id;
+        NpcNum = npcNum;
         X = x;
         Y = y;
     }
 
-    [EventPart("id")] public NpcId Id { get; }
+    [EventPart("npcNum")] public byte NpcNum { get; }
     [EventPart("x")] public int X { get; }
     [EventPart("y")] public int Y { get; }
 }

@@ -1,10 +1,11 @@
 ﻿using UAlbion.Api;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.ScriptEvents;
 
 [Event("npc_lock")] // USED IN SCRIPT
-public class NpcLockEvent : Event
+public class NpcLockEvent : Event, INpcEvent
 {
-    public NpcLockEvent(int npcId) { NpcId = npcId; }
-    [EventPart("npcId")] public int NpcId { get; }
+    public NpcLockEvent(byte npcNum) { NpcNum = npcNum; }
+    [EventPart("npcNum")] public byte NpcNum { get; }
 }

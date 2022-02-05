@@ -201,6 +201,9 @@ namespace UAlbion.Core
             if (handler == null) throw new ArgumentNullException(nameof(handler));
             lock (_syncRoot)
             {
+                if (!handler.ShouldSubscribe)
+                    return;
+
                 if (_subscribers.TryGetValue(handler.Component, out var subscribedTypes))
                 {
                     if (CheckForDoubleRegistration(handler, subscribedTypes))

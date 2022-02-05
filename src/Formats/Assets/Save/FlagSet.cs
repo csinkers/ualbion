@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Text;
 using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets.Save;
 
@@ -10,14 +12,15 @@ public class FlagSet
     readonly BitArray _set;
 
     public int Offset { get; }
-    public int Count { get; }
+    public int BitsPerMap { get; }
+    public int Count => _set.Count;
     public int PackedSize => (Count + 7) / 8;
 
-    public FlagSet(int offset, int count)
+    public FlagSet(int offset, int count, int bitsPerMap = 0)
     {
         Offset = offset;
-        Count = count;
-        _set = new BitArray(Count);
+        BitsPerMap = bitsPerMap;
+        _set = new BitArray(count);
     }
 
     public bool GetFlag(int i) => i >= Offset && i < Count + Offset && _set[i - Offset];
@@ -61,5 +64,44 @@ public class FlagSet
             SetPacked(s.Bytes(name, null, PackedSize));
         else
             s.Bytes(name, GetPacked(), PackedSize);
+
+        if (s.IsCommenting())
+            Describe(s);
+    }
+
+    void Describe(ISerializer s)
+    {
+        var sb = new StringBuilder();
+        int lastMap = -1;
+        int printCount = 0;
+        for (int i = 0; i < Count; i++)
+        {
+            if (BitsPerMap > 0)
+            {
+                var map = i / BitsPerMap;
+                var offset = i % BitsPerMap;
+                if (map != lastMap)
+                {
+                    sb.AppendLine();
+                    sb.Append($"{new MapId(AssetType.Map, map)} ({map}): ");
+                    lastMap = map;
+                }
+
+                sb.Append(offset);
+                sb.Append(' ');
+            }
+            else
+            {
+                sb.Append(i);
+                sb.Append(' ');
+                printCount++;
+                if (printCount > 16)
+                {
+                    sb.AppendLine();
+                    printCount = 0;
+                }
+            }
+        }
+        s.Comment(sb.ToString());
     }
 }

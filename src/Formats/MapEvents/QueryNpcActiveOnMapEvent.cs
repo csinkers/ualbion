@@ -11,13 +11,13 @@ public class QueryNpcActiveOnMapEvent : QueryEvent
 {
     public override QueryType QueryType => QueryType.NpcActiveOnMap;
     [EventPart("op")] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
-    [EventPart("npc")] public byte NpcNumber { get; private set; } // immediate value?
+    [EventPart("npc")] public byte NpcNum { get; private set; } // immediate value?
     [EventPart("map")] public MapId MapId { get; set; }
     QueryNpcActiveOnMapEvent() { }
-    public QueryNpcActiveOnMapEvent(QueryOperation operation, byte npcNumber, MapId mapId)
+    public QueryNpcActiveOnMapEvent(QueryOperation operation, byte npcNum, MapId mapId)
     {
         Operation = operation;
-        NpcNumber = npcNumber;
+        NpcNum = npcNum;
         MapId = mapId;
     }
     public static QueryNpcActiveOnMapEvent Serdes(QueryNpcActiveOnMapEvent e, AssetMapping mapping, ISerializer s)
@@ -25,7 +25,7 @@ public class QueryNpcActiveOnMapEvent : QueryEvent
         if (s == null) throw new ArgumentNullException(nameof(s));
         e ??= new QueryNpcActiveOnMapEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
-        e.NpcNumber = s.UInt8(nameof(NpcNumber), e.NpcNumber);
+        e.NpcNum = s.UInt8(nameof(NpcNum), e.NpcNum);
         int zeroes = s.UInt8(null, 0);
         zeroes += s.UInt8(null, 0);
         e.MapId = MapId.SerdesU16(nameof(MapId), e.MapId, mapping, s);

@@ -1,12 +1,11 @@
-﻿using System.Numerics;
-using UAlbion.Formats.Assets.Maps;
+﻿using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Game;
 
 public interface ICollisionManager
 {
-    bool IsOccupied(Vector2 tilePosition);
-    Passability GetPassability(Vector2 tilePosition);
+    bool IsOccupied(int x, int y);
+    Passability GetPassability(int x, int y);
     void Register(IMovementCollider collider);
     void Unregister(IMovementCollider collider);
 }

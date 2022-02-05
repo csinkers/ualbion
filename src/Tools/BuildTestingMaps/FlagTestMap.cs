@@ -108,7 +108,7 @@ public static class FlagTestMap
             });
 
             while(map.Npcs.Count < 96)
-                map.Npcs.Add(MapNpc.Default);
+                map.Npcs.Add(MapNpc.Unused);
 
             Add("N0", s => @$"
     text {s("Setting NPC 0 inactive")}

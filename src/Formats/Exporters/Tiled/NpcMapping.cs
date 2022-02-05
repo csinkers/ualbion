@@ -102,7 +102,7 @@ public static class NpcMapping
 
         if (!npc.Id.IsNone) objProps.Add(new TiledProperty(Prop.Id, npc.Id.ToString()));
         if (npc.Node != null) objProps.Add(new TiledProperty(Prop.Script, functionsByEventId[npc.Node.Id]));
-        if (!npc.Sound.IsNone) objProps.Add(new TiledProperty(Prop.Sound, npc.Sound.ToString()));
+        if (npc.Sound != 0) objProps.Add(new TiledProperty(Prop.Sound, npc.Sound.ToString()));
         if (npcPathIndices.TryGetValue(npcIndex, out var pathObjectId)) objProps.Add(TiledProperty.Object(Prop.Path, pathObjectId));
 
         var (tileId, tileW, tileH) = getTileFunc(npc.SpriteOrGroup);
@@ -147,7 +147,7 @@ public static class NpcMapping
             Flags = (MapNpcFlags)Enum.Parse(typeof(MapNpcFlags), obj.PropString(Prop.Flags)),
             Triggers = (TriggerTypes)Enum.Parse(typeof(TriggerTypes), obj.PropString(Prop.Triggers)),
             Movement = (NpcMovement)Enum.Parse(typeof(NpcMovement), obj.PropString(Prop.Movement)),
-            Sound = AssetId.Parse(obj.PropString(Prop.Sound)),
+            Sound = (byte)(obj.PropInt(Prop.Sound) ?? 0),
             SpriteOrGroup = AssetId.Parse(visual) // TODO: Handle groups for 3D maps
         };
     }

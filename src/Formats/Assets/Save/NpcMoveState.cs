@@ -10,7 +10,8 @@ public class NpcMoveState
     public ushort Angle1 { get; set; }
     public ushort X2 { get; set; }
     public ushort Y2 { get; set; }
-    public ushort Direction { get; set; }
+    public Direction Direction { get; set; }
+    byte UnusedD { get; set; } // Unused upper 8 bytes of direction
     public ushort UnkE { get; set; }
     public ushort Unk10 { get; set; }
     public ushort Unk12 { get; set; } // Backup of NpcState.Unk5?
@@ -27,7 +28,8 @@ public class NpcMoveState
         ms.Angle1 = s.UInt16(nameof(Angle1), ms.Angle1); // 6
         ms.X2 = s.UInt16(nameof(X2), ms.X2); // 8
         ms.Y2 = s.UInt16(nameof(Y2), ms.Y2); // A
-        ms.Direction = s.UInt16(nameof(Direction), ms.Direction); // C
+        ms.Direction = s.EnumU8(nameof(Direction), ms.Direction); // C
+        ms.UnusedD = s.UInt8(nameof(UnusedD), ms.UnusedD); // D
         ms.UnkE = s.UInt16(nameof(UnkE), ms.UnkE); // E
         ms.Unk10 = s.UInt16(nameof(Unk10), ms.Unk10); // 10
         ms.Unk12 = s.UInt16(nameof(Unk12), ms.Unk12);

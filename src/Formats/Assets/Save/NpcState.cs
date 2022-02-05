@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -6,7 +7,7 @@ using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Formats.Assets.Save;
 
-public class NpcState
+public class NpcState : IMovementState
 {
     // Total size = 128 bytes
     public static NpcState Serdes(int i, NpcState npc, (MapType mapType, AssetMapping mapping) c, ISerializer s)
@@ -28,7 +29,7 @@ public class NpcState
         }
 
         npc.Type = s.EnumU8(nameof(Type), npc.Type);
-        npc.Unk5 = s.UInt16(nameof(Unk5), npc.Unk5);
+        npc.NoClip = s.UInt16(nameof(NoClip), (ushort)(npc.NoClip ? 1 : 0)) != 0;
         npc.Sound = s.UInt16(nameof(Sound), npc.Sound);
         npc.ActiveSfx0 = s.UInt16(nameof(ActiveSfx0), npc.ActiveSfx0);
         npc.ActiveSfx1 = s.UInt16(nameof(ActiveSfx1), npc.ActiveSfx1);
@@ -36,7 +37,8 @@ public class NpcState
         npc.ActiveSfx3 = s.UInt16(nameof(ActiveSfx3), npc.ActiveSfx3);
         npc.Triggers = s.EnumU16(nameof(Triggers), npc.Triggers);
         npc.EventIndex = s.UInt16(nameof(EventIndex), npc.EventIndex);
-        npc.MovementType = s.UInt16(nameof(MovementType), npc.MovementType);
+        npc.MovementType = s.EnumU8(nameof(MovementType), npc.MovementType);
+        s.Pad(1);
         npc.WasActive = s.UInt16(nameof(WasActive), npc.WasActive);
         npc.Flags = s.EnumU8(nameof(Flags), npc.Flags);
         npc.Unk1A = s.UInt8(nameof(Unk1A), npc.Unk1A);
@@ -47,12 +49,12 @@ public class NpcState
         npc.Angle = s.UInt16(nameof(Angle), npc.Angle);
         npc.WaypointIndex = s.UInt16(nameof(WaypointIndex), npc.WaypointIndex);
         npc.Unk29 = s.UInt8(nameof(Unk29), npc.Unk29); // State machine var? [0..5]
-        npc.X1 = s.UInt16(nameof(X1), npc.X1); // 2A Current POS?
-        npc.Y1 = s.UInt16(nameof(Y1), npc.Y1); // 2C
+        npc.X = s.UInt16(nameof(X), npc.X); // 2A Current tile position
+        npc.Y = s.UInt16(nameof(Y), npc.Y); // 2C
         npc.X2 = s.UInt16(nameof(X2), npc.X2); // 2E
         npc.Y2 = s.UInt16(nameof(Y2), npc.Y2); // 30
-        npc.PixelX = s.UInt32(nameof(PixelX), npc.PixelX); // 32
-        npc.PixelY = s.UInt32(nameof(PixelY), npc.PixelY); // 36
+        npc.PixelX = s.Int32(nameof(PixelX), (int)npc.PixelX); // 32
+        npc.PixelY = s.Int32(nameof(PixelY), (int)npc.PixelY); // 36
         npc.PixelDeltaX = s.Int32(nameof(PixelDeltaX), npc.PixelDeltaX); // 3A
         npc.PixelDeltaY = s.Int32(nameof(PixelDeltaY), npc.PixelDeltaY); // 3E
         npc.Unk42 = s.UInt16(nameof(Unk42), npc.Unk42); // 42
@@ -76,7 +78,7 @@ public class NpcState
         npc.Unk64 = s.UInt8(nameof(Unk64), npc.Unk64);
         npc.Unk65 = s.UInt8(nameof(Unk65), npc.Unk65);
         npc.Unk66 = s.UInt16(nameof(Unk66), npc.Unk66);
-        npc.NpcMoveState = NpcMoveState.Serdes(npc.NpcMoveState, s);
+        NpcMoveState.Serdes(npc.NpcMoveState, s);
 
         // TODO
         var assetType = MapNpc.AssetTypeForNpcType(npc.Type);
@@ -87,12 +89,11 @@ public class NpcState
         return npc;
     }
 
-    public byte Unk1A { get; set; }
-
+    [JsonIgnore] public IEventSet EventSet { get; set; }
     public AssetId Id { get; set; } // 0
     public AssetId SpriteOrGroup { get; set; } // 2
     public NpcType Type { get; set; } // 4
-    public ushort Unk5 { get; set; } // 5
+    public bool NoClip { get; set; } // 5
     public ushort Sound { get; set; } // 8. Always 0?
     public ushort ActiveSfx0 { get; set; } // 9
     public ushort ActiveSfx1 { get; set; } // B
@@ -100,9 +101,10 @@ public class NpcState
     public ushort ActiveSfx3 { get; set; } // F
     public TriggerTypes Triggers { get; set; } // 11
     public ushort EventIndex { get; set; } // 13 Always 0xffff?
-    public ushort MovementType { get; set; }
+    public NpcMovement MovementType { get; set; }
     public ushort WasActive { get; set; }
     public NpcFlags Flags { get; set; }
+    public byte Unk1A { get; set; }
     public ushort Unk1B { get; set; }
     public ushort Unk1D { get; set; }
     public uint WaypointDataOffset { get; set; }
@@ -110,12 +112,13 @@ public class NpcState
     public ushort Angle { get; set; }
     public ushort WaypointIndex { get; set; }
     public byte Unk29 { get; set; }
-    public ushort X1 { get; set; }
-    public ushort Y1 { get; set; }
+    public ushort X { get; set; }
+    public ushort Y { get; set; }
     public ushort X2 { get; set; }
     public ushort Y2 { get; set; }
-    public uint PixelX { get; set; }
-    public uint PixelY { get; set; }
+
+    public float PixelX { get; set; }
+    public float PixelY { get; set; }
     public int PixelDeltaX { get; set; }
     public int PixelDeltaY { get; set; }
     public ushort Unk42 { get; set; }
@@ -139,5 +142,14 @@ public class NpcState
     public byte Unk64 { get; set; }
     public byte Unk65 { get; set; }
     public ushort Unk66 { get; set; }
-    public NpcMoveState NpcMoveState { get; set; }
+    public NpcMoveState NpcMoveState { get; } = new();
+
+    public int StartTick { get; set; }
+    public int MovementTick { get; set; }
+    public bool HasTarget { get; set; }
+    public Direction FacingDirection
+    {
+        get => NpcMoveState.Direction;
+        set => NpcMoveState.Direction = value;
+    }
 }

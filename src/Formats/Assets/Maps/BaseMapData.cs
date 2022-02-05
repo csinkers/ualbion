@@ -9,11 +9,14 @@ using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Maps;
 
-public abstract class BaseMapData : IMapData, IJsonPostDeserialise
+public abstract class BaseMapData : IMapData, IJsonPostDeserialise, IEventSet
 {
     readonly Dictionary<TriggerTypes, HashSet<MapEventZone>> _zoneTypeLookup = new();
+    ushort[] _chainMapping;
 
+    AssetId IEventSet.Id => Id;
     [JsonInclude] public MapId Id { get; protected set; }
+    [JsonIgnore] public TextId TextId => Id.ToMapText();
     public abstract MapType MapType { get; }
     [JsonInclude] public MapFlags Flags { get; set; } // Wait/Rest, Light-Environment, NPC converge range
     [JsonInclude] public byte Width { get; protected set; }
@@ -66,6 +69,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 #if DEBUG
     [JsonIgnore] public IList<object>[] EventReferences { get; private set; }
 #endif
+    public ushort GetChainForEvent(ushort index) => index >= Events.Count ? EventNode.UnusedEventId : _chainMapping[index];
 
     protected BaseMapData() { }
     protected BaseMapData(MapId id,
@@ -174,26 +178,27 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 
     public void Unswizzle() // Resolve event indices to pointers
     {
-        var chainMapping = new ushort[Events.Count];
+        // TODO: Unify the chain mapping code with the copy in EventSet
         var sortedChains = Chains
             .Select((eventId, chainId) => (eventId, chainId))
             .OrderBy(x => x)
             .ToArray();
 
+        _chainMapping = new ushort[Events.Count];
         for (int i = 0, j = 0; i < Events.Count; i++)
         {
             while (sortedChains.Length > j + 1 && sortedChains[j].eventId < i) j++;
-            chainMapping[i] = (ushort)sortedChains[j].chainId;
+            _chainMapping[i] = (ushort)sortedChains[j].chainId;
         }
 
         // Use map events if the event number is set, otherwise use the event set from the NPC's character sheet.
         // Note: Event set loading requires IAssetManager, so can't be done directly by UAlbion.Formats code.
         // Instead, the MapManager will call AttachEventSets with a callback to load the event sets.
         foreach (var npc in Npcs)
-            npc.Unswizzle(Id, x => Events[x], x => chainMapping[x]);
+            npc.Unswizzle(Id, x => Events[x], GetChainForEvent);
 
         foreach (var zone in GlobalZones.Concat(Zones))
-            zone?.Unswizzle(Id, x => Events[x], x => chainMapping[x], x => Events[Chains[x]]);
+            zone?.Unswizzle(Id, x => Events[x], GetChainForEvent, x => Events[Chains[x]]);
 
         foreach (var triggerType in GlobalZones.Concat(Zones).Where(x => x != null).GroupBy(x => x.Trigger))
             _zoneTypeLookup[triggerType.Key] = triggerType.ToHashSet();

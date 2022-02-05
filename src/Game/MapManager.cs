@@ -1,5 +1,4 @@
 ﻿using UAlbion.Core;
-using UAlbion.Core.Events;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
@@ -14,14 +13,11 @@ namespace UAlbion.Game;
 
 public class MapManager : ServiceComponent<IMapManager>, IMapManager
 {
-    MapId? _pendingMapChange;
-
     public IMap Current { get; private set; }
 
     public MapManager()
     {
         On<ShowMapEvent>(e => { foreach (var child in Children) child.IsActive = e.Show ?? true; });
-        On<BeginFrameEvent>(e => LoadMap());
         On<TeleportEvent>(Teleport);
         On<LoadMapEvent>(e =>
         {
@@ -31,22 +27,15 @@ public class MapManager : ServiceComponent<IMapManager>, IMapManager
                 return;
             }
 
-            _pendingMapChange = e.MapId;
-            LoadMap();
+            LoadMap(e.MapId);
             Raise(new CameraJumpEvent(0, 0));
         });
     }
 
-    void LoadMap()
+    void LoadMap(MapId mapId)
     {
-        if (_pendingMapChange == null)
-            return;
-
-        var pendingMapChange = _pendingMapChange.Value;
-        _pendingMapChange = null;
-
         Raise(new UnloadMapEvent());
-        if (pendingMapChange == MapId.None) // 0 = Build a blank scene for testing / debugging
+        if (mapId == MapId.None) // 0 = Build a blank scene for testing / debugging
         {
             Raise(new SetSceneEvent(SceneId.World2D));
             return;
@@ -54,30 +43,28 @@ public class MapManager : ServiceComponent<IMapManager>, IMapManager
 
         // Remove old map
         RemoveAllChildren();
-        Current = null;
 
         Raise(new MuteEvent());
-        var map = BuildMap(pendingMapChange);
-        if (map != null)
-        {
-            // Set the scene first to ensure scene-local components from other scenes are disabled.
-            Raise(new SetSceneEvent(map is Entities.Map3D.DungeonMap ? SceneId.World3D : SceneId.World2D));
-            Current = map;
-            AttachChild(map);
+        var map = BuildMap(mapId);
+        Current = map;
 
-            Info($"Loaded map {pendingMapChange.Id}: {pendingMapChange}");
-            Enqueue(new MapInitEvent());
+        if (map == null) 
+            return;
 
-            if (!map.MapData.SongId.IsNone)
-                Enqueue(new SongEvent(map.MapData.SongId));
-        }
-        // Raise(new CycleCacheEvent());
+        // Set the scene first to ensure scene-local components from other scenes are disabled.
+        Raise(new SetSceneEvent(map is Entities.Map3D.DungeonMap ? SceneId.World3D : SceneId.World2D));
+        AttachChild(map);
+
+        Info($"Loaded map {mapId.Id}: {mapId}");
+        Enqueue(new MapInitEvent());
+
+        if (!map.MapData.SongId.IsNone)
+            Enqueue(new SongEvent(map.MapData.SongId));
     }
 
     IMap BuildMap(MapId mapId)
     {
         var assets = Resolve<IAssetManager>();
-        var game = Resolve<IGameState>();
         var mapData = assets.LoadMap(mapId);
         if (mapData == null)
             return null;

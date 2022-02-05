@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 
@@ -14,6 +13,7 @@ public interface IGameState
     float PaletteBlend { get; }
     IParty Party { get; }
     MapId MapId { get; }
+    MapId MapIdForNpcs { get; set; } // Set by NpcManagers
     ICharacterSheet GetSheet(CharacterId id);
     IInventory GetInventory(InventoryId id);
     short GetTicker(TickerId id);
@@ -22,5 +22,6 @@ public interface IGameState
     MapChangeCollection PermanentMapChanges { get; }
     ActiveItems ActiveItems { get; }
     IList<NpcState> Npcs { get; }
-    bool IsChainDisabled(AssetId chainSource, ushort chain);
+    bool IsChainDisabled(MapId mapId, ushort chain);
+    bool IsNpcDisabled(MapId mapId, byte npcNum);
 }

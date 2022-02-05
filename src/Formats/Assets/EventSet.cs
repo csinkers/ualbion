@@ -9,9 +9,12 @@ using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets;
 
-public class EventSet
+public class EventSet : IEventSet
 {
-    public EventSetId Id { get; private init; }
+    ushort[] _chainMapping;
+    AssetId IEventSet.Id => Id;
+    [JsonIgnore] public TextId TextId => Id.ToEventText();
+    [JsonInclude] public EventSetId Id { get; private init; }
     [JsonInclude] public List<ushort> Chains { get; private set; }
     [JsonIgnore] public List<EventNode> Events { get; private set; }
 
@@ -26,6 +29,7 @@ public class EventSet
         Chains = chains.ToList();
     }
 
+    public ushort GetChainForEvent(ushort index) => index >= Events.Count ? EventNode.UnusedEventId : _chainMapping[index];
     public string[] EventStrings // Used for JSON
     {
         get => Events?.Select(x => x.ToString()).ToArray();
@@ -59,6 +63,18 @@ public class EventSet
         foreach (var e in set.Events)
             e.Unswizzle(set.Events);
 
+        // TODO: Unify this with the code in BaseMapData
+        var sortedChains = set.Chains
+            .Select((eventId, chainId) => (eventId, chainId))
+            .OrderBy(x => x)
+            .ToArray();
+
+        set._chainMapping = new ushort[set.Events.Count];
+        for (int i = 0, j = 0; i < set.Events.Count; i++)
+        {
+            while (sortedChains.Length > j + 1 && sortedChains[j].eventId < i) j++;
+            set._chainMapping[i] = (ushort)sortedChains[j].chainId;
+        }
         return set;
     }
 }

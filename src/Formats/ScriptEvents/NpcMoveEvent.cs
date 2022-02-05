@@ -1,12 +1,13 @@
 ﻿using UAlbion.Api;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.ScriptEvents;
 
 [Event("npc_move")] // USED IN SCRIPT
-public class NpcMoveEvent : Event
+public class NpcMoveEvent : Event, INpcEvent
 {
-    public NpcMoveEvent(int npcId, int x, int y) { NpcId = npcId; X = x; Y = y; }
-    [EventPart("npcId ")] public int NpcId { get; }
+    public NpcMoveEvent(byte npcNum, int x, int y) { NpcNum = npcNum; X = x; Y = y; }
+    [EventPart("npcNum ")] public byte NpcNum { get; }
     [EventPart("x ")] public int X { get; }
     [EventPart("y")] public int Y { get; }
 }

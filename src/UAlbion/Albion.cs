@@ -86,6 +86,7 @@ static class Albion
             .Add(new GameClock())
             .Add(new IdleClock())
             .Add(new SlowClock())
+            .Add(new RandomNumberGenerator())
             .Add(new TextureSource())
             .Add(new SpriteSamplerSource())
             .Add(new VideoManager())

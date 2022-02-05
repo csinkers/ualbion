@@ -152,19 +152,13 @@ public abstract class Component : IComponent
     /// </summary>
     protected virtual void Unsubscribed() { }
 
-    /// <summary>
-    /// Add an event handler callback to be called when the relevant event
-    /// type is raised by other components.
-    /// </summary>
-    /// <typeparam name="T">The event type to handle</typeparam>
-    /// <param name="callback">The function to call when the event is raised</param>
-    protected void On<T>(Action<T> callback) where T : IEvent
+    void OnCore<T, TCallback>(TCallback callback, Func<TCallback, Component, Handler> handlerConstructor)
     {
         _handlers ??= new Dictionary<Type, Handler>();
         if (_handlers.ContainsKey(typeof(T)))
             return;
 
-        var handler = new Handler<T>(callback, this);
+        var handler = handlerConstructor(callback, this);
         _handlers.Add(typeof(T), handler);
         if (IsSubscribed)
             Exchange.Subscribe(handler);
@@ -176,17 +170,17 @@ public abstract class Component : IComponent
     /// </summary>
     /// <typeparam name="T">The event type to handle</typeparam>
     /// <param name="callback">The function to call when the event is raised</param>
-    protected void OnAsync<T>(Func<T, Action, bool> callback) where T : IAsyncEvent
-    {
-        _handlers ??= new Dictionary<Type, Handler>();
-        if (_handlers.ContainsKey(typeof(T)))
-            return;
+    protected void On<T>(Action<T> callback) where T : IEvent => 
+        OnCore<T, Action<T>>(callback, (c, x) => new Handler<T>(c, x));
 
-        var handler = new AsyncHandler<T>(callback, this);
-        _handlers.Add(typeof(T), handler);
-        if (IsSubscribed)
-            Exchange.Subscribe(handler);
-    }
+    /// <summary>
+    /// Add an event handler callback to be called when the relevant event
+    /// type is raised by other components.
+    /// </summary>
+    /// <typeparam name="T">The event type to handle</typeparam>
+    /// <param name="callback">The function to call when the event is raised</param>
+    protected void OnAsync<T>(Func<T, Action, bool> callback) where T : IAsyncEvent =>
+        OnCore<T, Func<T, Action, bool>>(callback, (c,x)=> new AsyncHandler<T>(c, x));
 
     /// <summary>
     /// Add an event handler callback to be called when the relevant event
@@ -195,17 +189,19 @@ public abstract class Component : IComponent
     /// <typeparam name="TEvent">The event type to handle</typeparam>
     /// <typeparam name="TReturn">The type of value returned from async handlers for the event</typeparam>
     /// <param name="callback">The function to call when the event is raised</param>
-    protected void OnAsync<TEvent, TReturn>(Func<TEvent, Action<TReturn>, bool> callback) where TEvent : IAsyncEvent<TReturn>
-    {
-        _handlers ??= new Dictionary<Type, Handler>();
-        if (_handlers.ContainsKey(typeof(TEvent)))
-            return;
+    protected void OnAsync<TEvent, TReturn>(Func<TEvent, Action<TReturn>, bool> callback) where TEvent : IAsyncEvent<TReturn> =>
+        OnCore<TEvent, Func<TEvent, Action<TReturn>, bool>>(callback, 
+            (c,x) => new AsyncHandler<TEvent, TReturn>(c, x));
 
-        var handler = new AsyncHandler<TEvent, TReturn>(callback, this);
-        _handlers.Add(typeof(TEvent), handler);
-        if (IsSubscribed)
-            Exchange.Subscribe(handler);
-    }
+    /// <summary>
+    /// Add an event handler callback to be called only when the relevant event
+    /// type is passed directly to the Receive method (i.e. events raised through the
+    /// exchange will not cause the handler to be called)
+    /// </summary>
+    /// <typeparam name="T">The event type to handle</typeparam>
+    /// <param name="callback">The function to call when the event is raised</param>
+    protected void OnDirectCall<T>(Action<T> callback) where T : IEvent => 
+        OnCore<T, Action<T>>(callback, (c, x) => new ReceiveOnlyHandler<T>(c, x));
 
     /// <summary>
     /// Cease handling the relevant event type.

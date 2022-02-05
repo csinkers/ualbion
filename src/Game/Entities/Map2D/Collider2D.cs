@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Formats.Assets.Maps;
 
@@ -18,25 +17,24 @@ public class Collider2D : Component, IMovementCollider
 
     protected override void Subscribed() => Resolve<ICollisionManager>()?.Register(this);
     protected override void Unsubscribed() => Resolve<ICollisionManager>()?.Unregister(this);
-    public bool IsOccupied(Vector2 tilePosition) => 
-        IsOccupiedCore(tilePosition) || 
-        (_isLargeMap && IsOccupiedCore(tilePosition + new Vector2(-1.0f, 0.0f)));
+    public bool IsOccupied(int tx, int ty) => 
+        IsOccupiedCore(tx, ty) || 
+        _isLargeMap && IsOccupiedCore(tx-1, ty);
 
-    bool IsOccupiedCore(Vector2 tilePosition)
+    bool IsOccupiedCore(int tx, int ty)
     {
-        if ((int)tilePosition.X < 0) return true;
-        if ((int)tilePosition.Y < 0) return true;
-        if ((int)tilePosition.X >= _logicalMap.Width) return true;
-        if ((int)tilePosition.Y >= _logicalMap.Height) return true;
+        if (tx < 0) return true;
+        if (ty < 0) return true;
+        if (tx >= _logicalMap.Width) return true;
+        if (ty >= _logicalMap.Height) return true;
 
-        var underlayTile = _logicalMap.GetUnderlay((int)tilePosition.X, (int)tilePosition.Y);
-        var overlayTile = _logicalMap.GetOverlay((int)tilePosition.X, (int)tilePosition.Y);
+        var underlayTile = _logicalMap.GetUnderlay(tx, ty);
+        var overlayTile = _logicalMap.GetOverlay(tx, ty);
 
         bool underlayBlocked = underlayTile != null && underlayTile.Collision != Passability.Passable;
         bool overlayBlocked = overlayTile != null && overlayTile.Collision != Passability.Passable;
         return underlayBlocked || overlayBlocked;
     }
 
-    public Passability GetPassability(Vector2 tilePosition) =>
-        _logicalMap.GetPassability(_logicalMap.Index((int)tilePosition.X, (int)tilePosition.Y));
+    public Passability GetPassability(int tx, int ty) => _logicalMap.GetPassability(_logicalMap.Index(tx, ty));
 }

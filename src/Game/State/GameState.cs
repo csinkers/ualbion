@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -31,9 +32,15 @@ public class GameState : ServiceComponent<IGameState>, IGameState
     public MapChangeCollection PermanentMapChanges => _game.PermanentMapChanges;
     public ActiveItems ActiveItems => _game.Misc.ActiveItems;
     public IList<NpcState> Npcs => _game.Npcs;
-    public bool IsChainDisabled(AssetId chainSource, ushort chain) => _game.DisabledChains.Contains((chainSource, chain));
+    public bool IsChainDisabled(MapId mapId, ushort chain) => _game.IsChainDisabled(mapId, chain);
+    public bool IsNpcDisabled(MapId mapId, byte npcNum) => _game.IsNpcDisabled(mapId, npcNum);
 
     public MapId MapId => _game.MapId;
+    public MapId MapIdForNpcs
+    {
+        get => _game.MapIdForNpcs;
+        set => _game.MapIdForNpcs = value;
+    }
 
     public GameState()
     {
@@ -41,10 +48,8 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         On<LoadGameEvent>(e => LoadGame(e.Id));
         On<SaveGameEvent>(e => SaveGame(e.Id, e.Name));
         On<FastClockEvent>(e => TickCount += e.Frames);
-        On<SetTimeEvent>(e =>
-        {
-            _game.ElapsedTime = e.Time - SavedGame.Epoch;
-        });
+        On<GetTimeEvent>(e => Info(Time.ToString("O", CultureInfo.InvariantCulture)));
+        On<SetTimeEvent>(e => _game.ElapsedTime = e.Time - SavedGame.Epoch);
         On<LoadMapEvent>(e =>
         {
             if (_game != null)
@@ -69,7 +74,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         On<ActivateItemEvent>(ActivateItem);
         On<DisableEventChainEvent>(e =>
         {
-            _game.DisabledChains.Add((e.ChainSource, e.ChainNumber));
+            // TODO
         });
 
         AttachChild(new InventoryManager(GetWriteableInventory));

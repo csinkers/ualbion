@@ -49,7 +49,7 @@ public class MultiFont
     }
 
     public ReadOnlyImageBuffer<byte> GetRegion(int size, char c) => _texture.GetRegionBuffer(GetOffset(size, c));
-    public SingleFont GetFont(int size) => new SingleFont(this, size);
+    public SingleFont GetFont(int size) => new(this, size);
 
     int GetOffset(int size, char c) =>
         _lookup.TryGetValue((size, c), out var offset)

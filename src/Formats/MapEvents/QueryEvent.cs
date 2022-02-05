@@ -19,7 +19,7 @@ public abstract class QueryEvent : MapEvent, IBranchingEvent
         return queryType switch
         {
             QueryType.Switch => QuerySwitchEvent.Serdes((QuerySwitchEvent)e, mapping, s),
-            QueryType.ChainActive => QueryChainActiveEvent.Serdes((QueryChainActiveEvent)e, s),
+            QueryType.ChainActive => QueryChainActiveEvent.Serdes((QueryChainActiveEvent)e, mapping, s),
             QueryType.NpcActiveOnMap => QueryNpcActiveOnMapEvent.Serdes((QueryNpcActiveOnMapEvent)e, mapping, s),
             QueryType.HasPartyMember => QueryHasPartyMemberEvent.Serdes((QueryHasPartyMemberEvent)e, mapping, s),
             QueryType.HasItem => QueryHasItemEvent.Serdes((QueryHasItemEvent)e, mapping, s),
@@ -27,7 +27,7 @@ public abstract class QueryEvent : MapEvent, IBranchingEvent
             QueryType.PreviousActionResult => QueryPreviousActionResultEvent.Serdes((QueryPreviousActionResultEvent)e, s),
             QueryType.ScriptDebugMode => QueryScriptDebugModeEvent.Serdes((QueryScriptDebugModeEvent)e, s),
             QueryType.UnkC => QueryUnkCEvent.Serdes((QueryUnkCEvent)e, s),
-            QueryType.NpcActive => QueryNpcActiveEvent.Serdes((QueryNpcActiveEvent)e, s),
+            QueryType.NpcActive => QueryNpcActiveEvent.Serdes((QueryNpcActiveEvent)e, mapping, s),
             QueryType.Gold => QueryGoldEvent.Serdes((QueryGoldEvent)e, s),
             // QueryType.Rations => TODO
             QueryType.RandomChance => QueryRandomChanceEvent.Serdes((QueryRandomChanceEvent)e, s),

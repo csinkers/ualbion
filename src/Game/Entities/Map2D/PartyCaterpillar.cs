@@ -10,7 +10,7 @@ namespace UAlbion.Game.Entities.Map2D;
 public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
 {
     readonly MovementSettings _settings;
-    readonly Movement2D _movement;
+    readonly PlayerMovementState _state;
 
     readonly (Vector3, int)[] _trail; // Positions (tile coordinates) and frame numbers.
     readonly (int, bool)[] _playerOffsets = new (int, bool)[Party.MaxPartySize]; // int = trail offset, bool = isMoving
@@ -21,27 +21,30 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
     public PartyCaterpillar(Vector2 initialPosition, Direction initialDirection, MovementSettings settings)
     {
         _settings = settings;
-        _movement = new Movement2D(settings);
-        _movement.EnteredTile += (sender, coords) => Raise(new PlayerEnteredTileEvent(coords.Item1, coords.Item2));
+        _state = new PlayerMovementState(settings)
+        {
+            X = (ushort)initialPosition.X,
+            Y = (ushort)initialPosition.Y,
+        };
 
         _trail = new (Vector3, int)[TrailLength];
         _trailOffset = _trail.Length - 1;
         for (int i = 0; i < _playerOffsets.Length; i++)
             _playerOffsets[i] = (_trailOffset - i * _settings.MinTrailDistance, false);
 
-        var offset = (initialDirection switch
+        var offset = initialDirection switch
         {
             Direction.West  => new Vector2(1.0f, 0.0f),
-            Direction.East => new Vector2(-1.0f, 0.0f),
-            Direction.North    => new Vector2(0.0f, -1.0f),
-            Direction.South  => new Vector2(0.0f, 1.0f),
+            Direction.East  => new Vector2(-1.0f, 0.0f),
+            Direction.North => new Vector2(0.0f, -1.0f),
+            Direction.South => new Vector2(0.0f, 1.0f),
             _ => Vector2.Zero
-        }) / _settings.TicksPerTile;
+        } / _settings.TicksPerTile;
 
         for (int i = 0; i < _trail.Length; i++)
         {
             var position = initialPosition + offset * i;
-            _trail[_trailOffset - i] = (To3D(position), _movement.SpriteFrame);
+            _trail[_trailOffset - i] = (To3D(position), _state.SpriteFrame);
         }
 
         On<FastClockEvent>(_ => Update());
@@ -52,19 +55,20 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
             for (int i = 0; i < _trail.Length; i++)
                 _trail[i] = (To3D(position), 0);
 
-            _movement.Position = position;
+            _state.X = (ushort)e.X;
+            _state.Y = (ushort)e.Y;
         });
         On<PartyTurnEvent>(e =>
         {
             var (position3d, _) = _trail[_trailOffset];
             var position = new Vector2(position3d.X, position3d.Y);
-            _movement.FacingDirection = e.Direction;
+            _state.FacingDirection = e.Direction;
             MoveLeader(position);
         });
         On<NoClipEvent>(_ =>
         {
-            _movement.Clipping = !_movement.Clipping;
-            Info($"Clipping {(_movement.Clipping ? "on" : "off")}");
+            _state.NoClip = !_state.NoClip;
+            Info($"Clipping {(_state.NoClip ? "on" : "off")}");
         });
     }
 
@@ -73,8 +77,18 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
     void Update()
     {
         var detector = Resolve<ICollisionManager>();
-        if (_movement.Update(detector, _direction))
-            MoveLeader(_movement.Position);
+        if (Movement2D.Update(
+                _state,
+                _settings,
+                detector,
+                (int)_direction.X,
+                (int)_direction.Y,
+                (x, y) => Raise(new PlayerEnteredTileEvent(x, y))))
+        {
+            MoveLeader(new Vector2(
+                _state.PixelX / _state.Settings.TileWidth,
+                _state.PixelY / _state.Settings.TileHeight));
+        }
 
         _direction = Vector2.Zero;
         MoveFollowers();
@@ -86,7 +100,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
         if (_trailOffset >= _trail.Length)
             _trailOffset = 0;
 
-        _trail[_trailOffset] = (To3D(position), _movement.SpriteFrame);
+        _trail[_trailOffset] = (To3D(position), _state.SpriteFrame);
         _playerOffsets[0] = (_trailOffset, true);
     }
 

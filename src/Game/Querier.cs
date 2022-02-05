@@ -13,8 +13,6 @@ namespace UAlbion.Game;
 
 public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
 {
-    readonly Random _random = new();
-
     static Func<T, Action<bool>, bool> Do<T>(Func<T, bool> func) =>
         (e, continuation) =>
         {
@@ -32,28 +30,29 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
         OnAsync(Do<QueryLeaderEvent>(q => Resolve<IGameState>().Party.Leader.Id == q.PartyMemberId));
         OnAsync(Do<QueryMapEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().MapId.Id, q.MapId.Id)));
         OnAsync(Do<QueryPreviousActionResultEvent> (q => Resolve<IEventManager>().LastEventResult));
-        OnAsync(Do<QueryRandomChanceEvent>(q => _random.Next(100) < q.Argument));
+        OnAsync(Do<QueryRandomChanceEvent>(q => Resolve<IRandom>().Generate(100) < q.Argument));
         OnAsync(Do<QuerySwitchEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().GetSwitch(q.SwitchId) ? 1 : 0, q.Immediate)));
         OnAsync(Do<QueryTickerEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().GetTicker(q.TickerId), q.Immediate)));
         OnAsync(Do<QueryTriggerTypeEvent>(q => Resolve<IEventManager>().Context.Source.Trigger == (TriggerTypes)q.Argument));
         OnAsync(Do<QueryUsedItemEvent>(q => Resolve<IEventManager>().Context.Source.AssetId == (AssetId)q.ItemId));
+        OnAsync(Do<QueryNpcActiveEvent>(q => Resolve<IGameState>().IsNpcDisabled(MapId.None, q.Immediate)));
         OnAsync(Do<QueryScriptDebugModeEvent>(q => false));
 
-        OnAsync(Do<QueryNpcActiveEvent>(q =>
-        {
-            Error("TODO: Query NpcActive");
-            return true;
-        }));
         OnAsync(Do<QueryConsciousEvent> (q =>
         {
-            Error("TODO: Query Party member conscious");
-            return true;
+            var state = Resolve<IGameState>();
+            var member = state.GetSheet(q.PartyMemberId);
+            if (member == null)
+                return false;
+            return (member.Combat.Conditions & Conditions.UnconsciousMask) == 0;
         }));
+
         OnAsync(Do<QueryEventUsedEvent> (q =>
         {
             Error("TODO: Query event already used");
             return false;
         }));
+
         OnAsync(Do<QueryDemoVersionEvent> (q =>
         {
             Error("TODO: Query is demo");
@@ -80,15 +79,16 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
                 x => continuation(x == q.Argument)) > 0;
         });
 
+        OnAsync(Do<QueryChainActiveEvent>(q => !Resolve<IGameState>().IsChainDisabled(q.MapId, q.ChainNum)));
+        OnAsync(Do<QueryNpcActiveOnMapEvent>(q => !Resolve<IGameState>().IsNpcDisabled(q.MapId, q.NpcNum)));
+        OnAsync(Do<QueryNpcXEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Npcs[q.Immediate].X, q.Argument)));
+        OnAsync(Do<QueryNpcYEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Npcs[q.Immediate].Y, q.Argument)));
+
         // TODO
-        OnAsync(Do<QueryChainActiveEvent>(_ => false));
-        OnAsync(Do<QueryNpcActiveOnMapEvent>(_ => false));
         OnAsync(Do<QueryUnkCEvent>(_ => false));
         OnAsync(Do<QueryUnk19Event>(_ => false));
         OnAsync(Do<QueryUnk1EEvent>(_ => false));
         OnAsync(Do<QueryUnk21Event>(_ => false));
-        OnAsync(Do<QueryNpcXEvent>(_ => false));
-        OnAsync(Do<QueryNpcYEvent>(_ => false));
     }
 /*
         bool Query(QueryEvent query, Action<bool> continuation)

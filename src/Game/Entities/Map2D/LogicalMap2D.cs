@@ -65,7 +65,7 @@ public class LogicalMap2D : LogicalMap
         }
         else
         {
-            _mapData.Underlay[index] = value;
+            _mapData.Underlay[index] = value - 1;
             OnDirty(x, y, IconChangeType.Underlay);
         }
     }
@@ -79,7 +79,7 @@ public class LogicalMap2D : LogicalMap
         }
         else
         {
-            _mapData.Overlay[index] = value;
+            _mapData.Overlay[index] = value - 1;
             OnDirty(x, y, IconChangeType.Overlay);
         }
     }

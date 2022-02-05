@@ -38,7 +38,7 @@ public class MonsterEye : Dialog
             if (npc == null)
                 continue;
 
-            var dist = (new Vector2(pos.X, pos.Y) - new Vector2(npc.X1, npc.X2)).LengthSquared();
+            var dist = (new Vector2(pos.X, pos.Y) - new Vector2(npc.X, npc.Y)).LengthSquared();
             if (dist < ProximityThresholdTilesSquared)
             {
                 proximity = true;

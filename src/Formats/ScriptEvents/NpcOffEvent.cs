@@ -1,10 +1,11 @@
 ﻿using UAlbion.Api;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.ScriptEvents;
 
 [Event("npc_off")] // USED IN SCRIPT
-public class NpcOffEvent : Event
+public class NpcOffEvent : Event, INpcEvent
 {
-    public NpcOffEvent(int npcId) { NpcId = npcId; }
-    [EventPart("npcId")] public int NpcId { get; }
+    public NpcOffEvent(byte npcNum) { NpcNum = npcNum; }
+    [EventPart("npcNum")] public byte NpcNum { get; }
 }

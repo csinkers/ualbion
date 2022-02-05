@@ -30,6 +30,7 @@ public class SavedGame
     public ushort Version { get; set; }
     public TimeSpan ElapsedTime { get; set; }
     public MapId MapId { get; set; }
+    public MapId MapIdForNpcs { get; set; }
     public ushort PartyX { get; set; }
     public ushort PartyY { get; set; }
     public Direction PartyDirection { get; set; }
@@ -41,25 +42,35 @@ public class SavedGame
     readonly FlagSet _switches  = new(0, SwitchCount);
     readonly FlagSet _unlockedChests  = new(0, ChestCount);
     readonly FlagSet _unlockedDoors  = new(0, DoorCount);
-    readonly FlagSet _removedNpcs  = new(0, MapCount * NpcCountPerMap);
-    readonly FlagSet _disabledChains  = new(0, MapCount * ChainCountPerMap);
-    readonly FlagSet _unk5Flags = new(0, Unk5Count);
-    readonly FlagSet _unk6Flags = new(0, Unk6Count);
+    readonly FlagSet _removedNpcs  = new(0, MapCount * NpcCountPerMap, NpcCountPerMap);
+    readonly FlagSet _disabledChains  = new(0, MapCount * ChainCountPerMap, ChainCountPerMap);
     readonly FlagSet _automapMarkersFound = new(0, AutomapMarkerCount);
-    readonly FlagSet _unk8Flags = new(0, Unk8Count);
     readonly TickerSet _tickers = new();
 
     public IDictionary<TickerId, byte> Tickers => _tickers;
     public bool GetFlag(SwitchId flag) => _switches.GetFlag(flag.Id);
     public void SetFlag(SwitchId flag, bool value) => _switches.SetFlag(flag.Id, value);
-    public bool IsNpcDisabled(MapId mapId, int npcNumber) =>
-        npcNumber is < 0 or >= NpcCountPerMap
-        || mapId.Id is < 0 or >= MapCount
-        || _removedNpcs.GetFlag(mapId.Id * NpcCountPerMap + npcNumber);
-    public bool IsChainDisabled(MapId mapId, int chainNumber) =>
-        chainNumber is < 0 or >= ChainCountPerMap
-        || mapId.Id is < 0 or >= MapCount
-        || _disabledChains.GetFlag(mapId.Id * ChainCountPerMap + chainNumber);
+    public bool IsNpcDisabled(MapId mapId, int npcNumber)
+    {
+        if (mapId.IsNone)
+            mapId = MapId;
+
+        // TODO: Check for possible off-by-one
+        return npcNumber is < 0 or >= NpcCountPerMap
+               || mapId.Id is < 0 or >= MapCount
+               || _removedNpcs.GetFlag(mapId.Id * NpcCountPerMap + npcNumber);
+    }
+
+    public bool IsChainDisabled(MapId mapId, int chainNumber)
+    {
+        if (mapId.IsNone)
+            mapId = MapId;
+
+        // TODO: Check for possible off-by-one
+        return chainNumber is < 0 or >= ChainCountPerMap
+               || mapId.Id is < 0 or >= MapCount
+               || _disabledChains.GetFlag(mapId.Id * ChainCountPerMap + chainNumber);
+    }
 
     public ushort Unk0 { get; set; }
     public uint Unk1 { get; set; }
@@ -74,7 +85,6 @@ public class SavedGame
     public MapChangeCollection TemporaryMapChanges { get; private set; } = new();
     public IList<VisitedEvent> VisitedEvents { get; private set; } = new List<VisitedEvent>();
     public IList<PartyMemberId> ActiveMembers { get; private set; } = new PartyMemberId[MaxPartySize];
-    public ISet<(AssetId, ushort)> DisabledChains { get; } = new HashSet<(AssetId, ushort)>();
 
     public static string GetName(BinaryReader br)
     {
@@ -108,6 +118,7 @@ public class SavedGame
         ushort minutes = s.UInt16("Minutes", (ushort)save.ElapsedTime.Minutes); // C
         save.ElapsedTime = new TimeSpan(days, hours, minutes, save.ElapsedTime.Seconds, save.ElapsedTime.Milliseconds);
         save.MapId = MapId.SerdesU16(nameof(MapId), save.MapId, mapping, s);      // E
+        save.MapIdForNpcs = save.MapId;
         save.PartyX = s.UInt16(nameof(PartyX), save.PartyX);   // 10
         save.PartyY = s.UInt16(nameof(PartyY), save.PartyY);   // 12
         save.PartyDirection = s.EnumU8(nameof(PartyDirection), save.PartyDirection); // 14

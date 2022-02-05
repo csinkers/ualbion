@@ -11,6 +11,7 @@ public interface IPlayer
     IEffectiveCharacterSheet Effective { get; }
     IEffectiveCharacterSheet Apparent { get; }
     // InventoryAction GetInventoryAction(ItemSlotId slotId);
-    Func<Vector3> GetPosition { get; set; } // TODO: Find a better solution
+    Vector3 GetPosition();
+    void SetPositionFunc(Func<Vector3> func); // TODO: Refactor
     Vector2 StatusBarUiPosition { get; }
 }

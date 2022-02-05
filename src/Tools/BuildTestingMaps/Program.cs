@@ -18,7 +18,6 @@ public static class Program
         var baseExchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "Base");
         var testExchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "UATestDev");
         var repackedExchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "Repacked");
-        InitialiseAssets();
 
         var assets = new Dictionary<AssetId, object>
         {

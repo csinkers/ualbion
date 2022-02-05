@@ -33,12 +33,12 @@ public class FlatMap : Component, IMap
         On<PlayerEnteredTileEvent>(OnPlayerEnteredTile);
         On<NpcEnteredTileEvent>(OnNpcEnteredTile);
         On<ChangeIconEvent>(ChangeIcon);
-        On<MapInitEvent>(e => FireEventChains(TriggerTypes.MapInit, true));
-        On<SlowClockEvent>(e => FireEventChains(TriggerTypes.EveryStep, false));
-        On<HourElapsedEvent>(e => FireEventChains(TriggerTypes.EveryHour, true));
-        On<DayElapsedEvent>(e => FireEventChains(TriggerTypes.EveryDay, true));
-        On<PartyChangedEvent>(e => RebuildPartyMembers());
-        // On<UnloadMapEvent>(e => Unload());
+        On<MapInitEvent>(_ => FireEventChains(TriggerTypes.MapInit, true));
+        On<SlowClockEvent>(_ => FireEventChains(TriggerTypes.EveryStep, false));
+        On<HourElapsedEvent>(_ => FireEventChains(TriggerTypes.EveryHour, true));
+        On<DayElapsedEvent>(_ => FireEventChains(TriggerTypes.EveryDay, true));
+        On<PartyChangedEvent>(_ => RebuildPartyMembers());
+        // On<UnloadMapEvent>(_ => Unload());
 
         MapId = mapId;
         _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
@@ -59,23 +59,14 @@ public class FlatMap : Component, IMap
         AttachChild(new Collider2D(_logicalMap, !_logicalMap.UseSmallSprites));
         var renderable = AttachChild(new MapRenderable2D(_logicalMap, tileset, gameFactory));
         var selector = AttachChild(new SelectionHandler2D(_logicalMap, renderable));
-        selector.HighlightIndexChanged += (sender, x) => renderable.SetHighlightIndex(x);
+        selector.HighlightIndexChanged += (_, x) => renderable.SetHighlightIndex(x);
         TileSize = new Vector3(renderable.TileSize, 1.0f);
         _logicalMap.TileSize = renderable.TileSize;
 
-        var movementSettings = _logicalMap.UseSmallSprites ? MovementSettings.Small() : MovementSettings.Large();
+        var movementSettings = _logicalMap.UseSmallSprites ? MovementSettings.Small : MovementSettings.Large;
         _partyMovement = AttachChild(new PartyCaterpillar(Vector2.Zero, Direction.East, movementSettings));
 
-        foreach (var npc in _logicalMap.Npcs)
-        {
-            if (npc.SpriteOrGroup.IsNone)
-                continue;
-
-            AttachChild(_logicalMap.UseSmallSprites
-                ? new SmallNpc(npc) as IComponent
-                : new LargeNpc(npc));
-        }
-
+        AttachChild(new NpcManager2D(_logicalMap));
         RebuildPartyMembers();
     }
 
@@ -92,7 +83,7 @@ public class FlatMap : Component, IMap
             foreach(var player in state.Party.StatusBarOrder)
             {
                 var iCopy = i; // Make a copy to ensure each closure captures its own number.
-                player.GetPosition = () => _partyMovement.GetPositionHistory(iCopy).Item1;
+                player.SetPositionFunc(() => _partyMovement.GetPositionHistory(iCopy).Item1);
                 (Vector3, int) PositionFunc() => _partyMovement.GetPositionHistory(iCopy);
 
                 AttachChild(_logicalMap.UseSmallSprites
@@ -127,7 +118,8 @@ public class FlatMap : Component, IMap
 
             if (zone.Node.Event is not OffsetEvent offset)
                 break;
-            e = new NpcEnteredTileEvent(e.Id, e.X + offset.X, e.Y + offset.Y);
+
+            e = new NpcEnteredTileEvent(e.NpcNum, e.X + offset.X, e.Y + offset.Y);
         }
 
         Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Npc, e.X, e.Y)));

@@ -15,6 +15,7 @@ public class PartyMember : Component, IPlayer
     IEffectiveCharacterSheet _lastEffective;
     DateTime _lastChangeTime;
     float _lerp;
+    Func<Vector3> _positionFunc;
 
     public PartyMember(PartyMemberId id, CharacterSheet sheet)
     {
@@ -50,7 +51,8 @@ public class PartyMember : Component, IPlayer
     public int CombatPosition { get; set; }
     public IEffectiveCharacterSheet Effective { get; private set; }
     public IEffectiveCharacterSheet Apparent { get; }
-    public Func<Vector3> GetPosition { get; set; }
+    public Vector3 GetPosition() => _positionFunc();
+    public void SetPositionFunc(Func<Vector3> func) => _positionFunc = func; // TODO: Refactor
     public Vector2 StatusBarUiPosition { get; private set; }
     public override string ToString() => $"PartyMember {Id}";
 

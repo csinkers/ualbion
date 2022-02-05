@@ -54,7 +54,7 @@ public abstract class LogicalMap : Component
     public int Width => _mapData.Width;
     public int Height => _mapData.Height;
     public PaletteId PaletteId => _mapData.PaletteId;
-    public IEnumerable<MapNpc> Npcs => _mapData.Npcs;
+    public List<MapNpc> Npcs => _mapData.Npcs;
     public MapEventZone GetZone(int x, int y) => GetZone(Index(x, y));
     public MapEventZone GetZone(int index) => _mapData.GetZone(index);
 

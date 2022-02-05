@@ -7,21 +7,21 @@ public enum Conditions : ushort
 {
     UnconsciousMask = Unconscious | Poisoned | Asleep,
 
-    None        = 0,
-    Unconscious = 1,       //   1 Unconscious
-    Poisoned    = 1 <<  1, //   2 Poisoned
-    Ill         = 1 <<  2, //   4 Ill
-    Exhausted   = 1 <<  3, //   8 Exhausted
-    Paralysed   = 1 <<  4, //  10 Paralysed
-    Fleeing     = 1 <<  5, //  20 Fleeing
-    Intoxicated = 1 <<  6, //  40 Intoxicated
-    Blind       = 1 <<  7, //  80 Blind
-    Panicking   = 1 <<  8, // 100 Panicking
-    Asleep      = 1 <<  9, // 200 Asleep
-    Insane      = 1 << 10, // 400 Insane
-    Irritated   = 1 << 11, // 800 Irritated
-    Unk12       = 1 << 12,
-    Unk13       = 1 << 13,
-    Unk14       = 1 << 14,
-    Unk15       = 1 << 15,
+    None        =    0x0,
+    Unconscious =    0x1, // Unconscious
+    Poisoned    =    0x2, // Poisoned
+    Ill         =    0x4, // Ill
+    Exhausted   =    0x8, // Exhausted
+    Paralysed   =   0x10, // Paralysed
+    Fleeing     =   0x20, // Fleeing
+    Intoxicated =   0x40, // Intoxicated
+    Blind       =   0x80, // Blind
+    Panicking   =  0x100, // Panicking
+    Asleep      =  0x200, // Asleep
+    Insane      =  0x400, // Insane
+    Irritated   =  0x800, // Irritated
+    Unk12       = 0x1000,
+    Unk13       = 0x2000,
+    Unk14       = 0x4000,
+    Unk15       = 0x8000,
 }

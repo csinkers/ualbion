@@ -10,12 +10,13 @@ public class MapNpc // 0xA = 10 bytes
 {
     public const int SizeOnDisk = 10;
     public const int WaypointCount = 0x480;
-    public static MapNpc Default => new() { Waypoints = new[] { new NpcWaypoint(0, 0) } };
+    public static MapNpc Unused => new() { Waypoints = new[] { new NpcWaypoint(0, 0) } };
 
     MapNpcFlags _raw;
     public AssetId Id { get; set; } // MonsterGroup, Npc etc
-    public AssetId Sound { get; set; }
+    public byte Sound { get; set; }
     public AssetId SpriteOrGroup { get; set; } // LargeNpcGfx, SmallNpcGfx etc but could also be an ObjectGroup for 3D
+    public bool IsUnused => Id == AssetId.None && SpriteOrGroup == AssetId.None;
 
     public NpcType Type
     {
@@ -52,7 +53,6 @@ public class MapNpc // 0xA = 10 bytes
 
     public TriggerTypes Triggers { get; set; }
     public NpcWaypoint[] Waypoints { get; set; }
-    public MapId ChainSource { get; set; }
     public ushort Chain { get; set; }
     [JsonIgnore] public IEventNode Node { get; set; }
     [JsonIgnore(Condition = JsonIgnoreCondition.Never)] public ushort EventIndex
@@ -72,7 +72,7 @@ public class MapNpc // 0xA = 10 bytes
 
         byte id = (byte)npc.Id.ToDisk(mapping);
         id = s.UInt8(nameof(Id), id);
-        npc.Sound = SampleId.SerdesU8(nameof(Sound), npc.Sound, mapping, s);
+        npc.Sound = s.UInt8(nameof(Sound), npc.Sound);
 
         ushort? eventNumber = MaxToNullConverter.Serdes(nameof(npc.Node), npc.Node?.Id, s.UInt16);
         if (eventNumber != null && npc.Node == null)
@@ -137,7 +137,6 @@ public class MapNpc // 0xA = 10 bytes
         if (getEvent == null) throw new ArgumentNullException(nameof(getEvent));
         if (getChain == null) throw new ArgumentNullException(nameof(getChain));
 
-        ChainSource = mapId;
         if (Node is DummyEventNode dummy)
         {
             Node = getEvent(dummy.Id);

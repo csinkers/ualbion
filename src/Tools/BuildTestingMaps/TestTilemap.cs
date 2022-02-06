@@ -1,7 +1,9 @@
 ﻿using UAlbion.Api.Visual;
+using UAlbion.Config;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
+using static BuildTestingMaps.Constants;
 
 namespace BuildTestingMaps;
 
@@ -17,7 +19,7 @@ public class TestTilemap
     public int SitOffset { get; }
     public int TextOffset { get; }
     public TilesetData Tileset { get; }
-    public IReadOnlyTexture<byte> TilesetGfx { get; }
+    public Dictionary<AssetId, object> Assets { get; }= new();
 
     public int IndexForChar(char c)
     {
@@ -27,13 +29,13 @@ public class TestTilemap
 
     static IReadOnlyTexture<byte> MakeTileGfx(bool overlay, byte num, ITextureBuilderFont font)
     {
-        var t = Constants.T.FillRect(overlay ? Constants.CBlue2 : Constants.CGrey6, 0, 0, Constants.TileWidth, overlay ? Constants.TileHeight / 2 : Constants.TileHeight);
+        var t = T16.FillRect(overlay ? CBlue2 : CGrey6, 0, 0, TileWidth, overlay ? TileHeight / 2 : TileHeight);
 
         if (!overlay)
-            t = t.Border(Constants.CGreen4);
+            t = t.Border(CGreen4);
 
         return
-            t.Text($"{num:X2}", Constants.CWhite, 2, overlay ? 2 : 9, font)
+            t.Text($"{num:X2}", CWhite, 2, overlay ? 2 : 9, font)
                 .Texture;
     }
 
@@ -41,9 +43,9 @@ public class TestTilemap
     {
         var tiles = new List<IReadOnlyTexture<byte>>
         {
-            Constants.T.FillAll(Constants.CBlack1).Texture,
-            Constants.T.FillAll(Constants.CBlack1).Texture,
-            Constants.T.FillAll(Constants.CGrey12).Texture,
+            T16.FillAll(CBlack1).Texture,
+            T16.FillAll(CBlack1).Texture,
+            T16.FillAll(CGrey12).Texture,
         };
 
         Tileset = new TilesetData(UAlbion.Base.Tileset.Toronto) { UseSmallGraphics = false };
@@ -80,10 +82,10 @@ public class TestTilemap
         for (int i = 0; i < 16; i++)
         {
             int gfxIndex = tiles.Count;
-            tiles.Add(Constants.T.FillAll(Constants.CGrey4)
-                .Border(Constants.CWhite)
-                .Text("S", Constants.CGreen5, 2, 2, font)
-                .Text(i.ToString(), Constants.CGreen5, 2, 9, font)
+            tiles.Add(T16.FillAll(CGrey4)
+                .Border(CWhite)
+                .Text("S", CGreen5, 2, 2, font)
+                .Text(i.ToString(), CGreen5, 2, 9, font)
                 .Texture);
 
             Tileset.Tiles.Add(new(Tileset.Tiles.Count, (ushort)gfxIndex, 0, 0) { SitMode = (SitMode)i });
@@ -93,14 +95,16 @@ public class TestTilemap
         for (char c = ' '; c <= '~'; c++)
         {
             int gfxIndex = tiles.Count;
-            tiles.Add(Constants.T.FillAll(Constants.CBlueGrey7)
-                .Border(Constants.COrange3)
-                .Text(c == '`' ? "'" : c.ToString(), Constants.CGreen5, 2, 2, bigFont)
+            tiles.Add(T16.FillAll(CBlueGrey7)
+                .Border(COrange3)
+                .Text(c == '`' ? "'" : c.ToString(), CGreen5, 2, 2, bigFont)
                 .Texture);
 
             Tileset.Tiles.Add(new(Tileset.Tiles.Count, (ushort)gfxIndex, 0, 0));
         }
 
-        TilesetGfx = BlitUtil.CombineFramesVertically((SpriteId)UAlbion.Base.TilesetGraphics.Toronto, tiles);
+        var gfxId = (SpriteId)UAlbion.Base.TilesetGraphics.Toronto;
+        Assets[gfxId] = BlitUtil.CombineFramesVertically(gfxId, tiles);
+        Assets[Tileset.Id] = Tileset;
     }
 }

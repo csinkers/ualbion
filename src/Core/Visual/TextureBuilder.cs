@@ -13,7 +13,12 @@ namespace UAlbion.Core.Visual
     {
         readonly SimpleTexture<T> _texture;
         public IReadOnlyTexture<T> Texture => _texture;
-        internal TextureBuilder(int width, int height) => _texture = new SimpleTexture<T>(null, width, height);
+        internal TextureBuilder(int width, int height)
+        {
+            _texture = new SimpleTexture<T>(null, width, height);
+            _texture.AddRegion(0, 0, width, height);
+        }
+
         public int Width => _texture.Width;
         public int Height => _texture.Height;
 

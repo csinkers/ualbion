@@ -63,16 +63,8 @@ public class AssetManager : Component, IAssetManager
         => (ITexture)_modApplier.LoadAssetCached(new AssetId(
             AssetType.MetaFont, (ushort)new MetaFontId(isBold, color)));
 
-    TilesetData IAssetManager.LoadTileData(TilesetId id)
-    {
-        return LoadTileData(id);
-    }
-
-    LabyrinthData IAssetManager.LoadLabyrinthData(LabyrinthId id)
-    {
-        return LoadLabyrinthData(id);
-    }
-
+    TilesetData IAssetManager.LoadTileData(TilesetId id) => LoadTileData(id);
+    LabyrinthData IAssetManager.LoadLabyrinthData(LabyrinthId id) => LoadLabyrinthData(id);
     public TilesetData LoadTileData(TilesetId id) => (TilesetData)_modApplier.LoadAssetCached(id);
     public LabyrinthData LoadLabyrinthData(LabyrinthId id) => (LabyrinthData)_modApplier.LoadAssetCached(id);
 

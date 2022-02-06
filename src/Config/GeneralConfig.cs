@@ -31,6 +31,7 @@ public class GeneralConfig : IGeneralConfig
         return config;
     }
 
+    public string GetPath(string pathName) => Paths.TryGetValue(pathName, out var result) ? result : null;
     public void SetPath(string pathName, string path) => Paths[pathName] = path;
 
     public string ResolvePath(string relative, IDictionary<string, string> extraPaths = null)
@@ -46,7 +47,7 @@ public class GeneralConfig : IGeneralConfig
 
         var resolved = Pattern.Replace(relative, x =>
         {
-            var name = x.Groups[0].Value.Substring(2).TrimEnd(')').ToUpperInvariant();
+            var name = x.Groups[0].Value[2..].TrimEnd(')').ToUpperInvariant();
             if (extraPaths != null && extraPaths.TryGetValue(name, out var value))
                 return value;
 

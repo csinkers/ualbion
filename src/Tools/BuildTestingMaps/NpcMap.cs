@@ -53,7 +53,7 @@ public static class NpcMap
 
                 MajMin(cellW, cellH, (i, j) =>
                 {
-                    if (i == 0 || j == 0 || i == (cellW-1) || j == (cellH-1))
+                    if (i == 0 || j == 0 || i == (cellW - 1) || j == (cellH - 1))
                         map.Underlay[Pos(x0 + i, y0 + j)] = Tileset1.SolidOffset; // Draw cell walls
                 });
 

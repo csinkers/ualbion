@@ -2,7 +2,6 @@
 using UAlbion.Api;
 using UAlbion.Base;
 using UAlbion.Config;
-using UAlbion.Formats.Assets;
 using UAlbion.Game.Assets;
 using static BuildTestingMaps.Constants;
 
@@ -18,14 +17,18 @@ public static class Program
         var baseExchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "Base");
         var testExchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "UATestDev");
         var repackedExchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "Repacked");
+        baseExchange.Name = "BaseExchange";
+        testExchange.Name = "TestExchange";
+        repackedExchange.Name = "RepackedExchange";
 
         var assets = new Dictionary<AssetId, object>
         {
             [AssetId.FromUInt32(PaletteCommon.Id)] = PaletteCommon,
             [Palette1Id] = Palette1,
-            [Tileset1.Tileset.Id] = Tileset1.Tileset,
-            [(SpriteId)Tileset1.TilesetGfx.Id] = Tileset1.TilesetGfx,
         };
+
+        foreach (var kvp in Tileset1.Assets) assets[kvp.Key] = kvp.Value;
+        foreach (var kvp in Lab1.Assets) assets[kvp.Key] = kvp.Value;
 
         void Merge(Dictionary<AssetId, object> newAssets)
         {
@@ -33,9 +36,10 @@ public static class Program
                 assets[kvp.Key] = kvp.Value;
         }
 
-        Merge(JumpMap.Build((Map)300, (Map)100, 5, 5));
+        Merge(JumpMap.Build((Map)300, (Map)101, 5, 5));
         Merge(NpcMap.Build((Map)301));
         Merge(FlagTestMap.Build((Map)100));
+        Merge(Test3DMap.Build((Map)101));
 
         (object? asset, AssetInfo? info) LoaderFunc(AssetId id, string lang)
             => assets.TryGetValue(id, out var asset)
@@ -47,6 +51,27 @@ public static class Program
         // Create item data
         // Create player graphics
         //Tileset1.TilesetGfx.ToBitmap().Dump();
+
+        /*NPC Test maps:
+        npc_on / npc_off
+        npc_lock / npc_unlock
+        npc_jump
+        npc_move
+        npc_turn
+        npc_text
+        is_npc_active_on_map
+        is_npc_active
+        is_npc_x
+        is_npc_y
+        disable_npc
+        change_icon npcnum 0 AbsTemp NpcMovement 0..3
+        change_icon npcnum 0 AbsTemp NpcSprite id
+
+        types: party, npc, monster, prop
+        movement: wp, static, random, chase
+
+        mem monitoring, movement details
+         */
 
         testExchange.Resolve<IModApplier>().SaveAssets(LoaderFunc, () => { }, assets.Keys.ToHashSet(), null, null);
         repackedExchange.Resolve<IModApplier>().SaveAssets(LoaderFunc, () => { }, assets.Keys.ToHashSet(), null, null);

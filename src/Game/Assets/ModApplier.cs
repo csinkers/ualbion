@@ -228,9 +228,11 @@ public class ModApplier : Component, IModApplier
 
         object asset = null;
         Stack<IPatch> patches = null; // Create the stack lazily, as most assets won't have any patches.
+        var generalConfig = Resolve<IGeneralConfig>();
+        var oldModPath = generalConfig.GetPath("MOD");
         foreach (var mod in _modsInReverseDependencyOrder)
         {
-            Resolve<IGeneralConfig>().SetPath("MOD", mod.AssetPath);
+            generalConfig.SetPath("MOD", mod.AssetPath);
             foreach (var info in mod.AssetConfig.GetAssetInfo(id))
             {
                 var assetLang = info.Get<string>(AssetProperty.Language, null);
@@ -267,6 +269,9 @@ public class ModApplier : Component, IModApplier
                 }
             }
         }
+
+        if (!string.IsNullOrEmpty(oldModPath))
+            generalConfig.SetPath("MOD", oldModPath);
 
         if (asset == null)
             return null;

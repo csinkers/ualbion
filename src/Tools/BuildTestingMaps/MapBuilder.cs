@@ -16,7 +16,9 @@ public class MapBuilder
         Id = id;
         Width = width;
         Height = height;
-        _map = new MapData2D(id, palette, tileset, width, height) { Flags = MapFlags.V2NpcData };
+        _map = new MapData2D(id, palette, tileset, width, height) { Flags = MapFlags.V2NpcData | MapFlags.ExtraNpcs };
+        while (_map.Npcs.Count < 96)
+            _map.Npcs.Add(MapNpc.Unused);
     }
 
     MapBuilder(MapId id, PaletteId palette, LabyrinthId labyrinth, byte width, byte height)
@@ -24,11 +26,14 @@ public class MapBuilder
         Id = id;
         Width = width;
         Height = height;
-        _map = new MapData3D(id, palette, labyrinth, width, height) { Flags = MapFlags.V2NpcData };
+        _map = new MapData3D(id, palette, labyrinth, width, height) { Flags = MapFlags.V2NpcData | MapFlags.ExtraNpcs };
+        while (_map.Npcs.Count < 96)
+            _map.Npcs.Add(MapNpc.Unused);
     }
 
-    int S(string text) => _mapStrings.FindOrAdd(text);
+    public int AddMapText(string text) => _mapStrings.FindOrAdd(text);
     public static MapBuilder Create2D(MapId id, PaletteId palette, TilesetId tileset, byte width, byte height) => new(id, palette, tileset, width, height);
+    public static MapBuilder Create3D(MapId id, PaletteId palette, LabyrinthId lab, byte width, byte height) => new(id, palette, lab, width, height);
 
     public MapId Id { get; }
     public int Width { get; }
@@ -36,7 +41,7 @@ public class MapBuilder
 
     public MapBuilder SetChain(int i, Func<Func<string, int>, string> func)
     {
-        _scripts[i] = func(S);
+        _scripts[i] = func(AddMapText);
         return this;
     }
 

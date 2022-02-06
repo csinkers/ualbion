@@ -26,8 +26,7 @@ public class Wall // Length = 0x12 + overlayCount * 0xC
     public WallFlags Properties { get; set; } // 0
     public uint Collision { get; set; } // 1, len = 3 bytes
     public SpriteId SpriteId { get; set; } // 4, ushort
-    [DefaultValue(1)]
-    public byte AnimationFrames { get; set; } // 6
+    [DefaultValue(1)] public byte AnimationFrames { get; set; } = 1; // 6
     public byte AutoGfxType { get; set; } // 7
     public byte TransparentColour { get; set; } // 8 (PaletteId??)
     public byte Unk9 { get; set; } // 9

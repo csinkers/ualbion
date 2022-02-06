@@ -114,7 +114,8 @@ public static class Constants
         4282862411, 4283126615, 4283915103, 4284441447, 4285230963, 4286020475, 4287335303, 4284699483
     };
 
-    public static TextureBuilder<byte> T => TextureBuilder.Create<byte>(TileWidth, TileHeight);
+    public static TextureBuilder<byte> T16 => TextureBuilder.Create<byte>(TileWidth, TileHeight);
+    public static TextureBuilder<byte> T64 => TextureBuilder.Create<byte>(64, 64);
     public static MultiFont? Font { get; }
     public static SingleFont Font6 { get; }
     public static SingleFont Font10 { get; }
@@ -122,6 +123,7 @@ public static class Constants
     public static PaletteId Palette1Id { get; }
     public static AlbionPalette Palette1 { get; }
     public static TestTilemap Tileset1 { get; }
+    public static TestLab Lab1 { get; }
 
     static Constants()
     {
@@ -136,6 +138,7 @@ public static class Constants
         PaletteCommon = new AlbionPalette(((PaletteId)UAlbion.Base.Palette.Common).ToUInt32(), null, commonRaw);
         Palette1 = new AlbionPalette(Palette1Id.ToUInt32(), Palette1Id.ToString(), torontoRaw);
         Tileset1 = new TestTilemap(Font6, Font10);
+        Lab1 = new TestLab(Font6, Font10);
     }
 
     public static void MajMin(int min, int maj, Action<int, int> func)

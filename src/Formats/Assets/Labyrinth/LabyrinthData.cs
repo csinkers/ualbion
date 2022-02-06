@@ -11,6 +11,9 @@ namespace UAlbion.Formats.Assets.Labyrinth;
 
 public class LabyrinthData
 {
+    public LabyrinthData() { } // For JSON
+    public LabyrinthData(LabyrinthId id) => Id = id;
+
     public const int MaxWalls = 155;
     public const int WallOffset = 100; // Any content value below this refers to an object group, any equal or above refers to a wall.
 
@@ -41,7 +44,7 @@ public class LabyrinthData
     [JsonInclude] public IList<LabyrinthObject> Objects { get; private set; } = new List<LabyrinthObject>();
     [JsonInclude] public IList<FloorAndCeiling> FloorAndCeilings { get; private set; } = new List<FloorAndCeiling>();
     [JsonInclude] public IList<Wall> Walls { get; private set; } = new List<Wall>();
-    public Vector3 TileSize => new(EffectiveWallWidth, WallHeight, EffectiveWallWidth);
+    [JsonIgnore] public Vector3 TileSize => new(EffectiveWallWidth, WallHeight, EffectiveWallWidth);
     public uint FogColor => ApiUtil.PackColor(
         (byte)(FogRed >> 8),
         (byte)(FogGreen >> 8),
@@ -108,11 +111,13 @@ public class LabyrinthData
 
         // MaxFloors = 50
         var floorAndCeilingCount = s.UInt16("FloorAndCeilingCount", (ushort)d.FloorAndCeilings.Count); // 28 + objectGroupCount * 42
+        ApiUtil.Assert(floorAndCeilingCount <= 50, "A labyrinth cannot have more than 50 floors/ceilings");
         s.List(nameof(d.FloorAndCeilings), d.FloorAndCeilings, mapping, floorAndCeilingCount, FloorAndCeiling.Serdes);
         s.Check();
 
         // MaxObjects = 100
         ushort objectCount = s.UInt16("ObjectCount", (ushort)d.Objects.Count); // 2A + objectGroupCount * 42 + floorAndCeilingCount * A
+        ApiUtil.Assert(objectCount <= 100, "A labyrinth cannot have more than 100 object types");
         s.List(nameof(d.Objects), d.Objects, mapping, objectCount, LabyrinthObject.Serdes);
         s.Check();
 
@@ -124,6 +129,7 @@ public class LabyrinthData
         }
 
         ushort wallCount = s.UInt16("WallCount", (ushort)d.Walls.Count);
+        ApiUtil.Assert(objectCount <= MaxWalls, "A labyrinth cannot have more than 150 wall types");
         s.List(nameof(d.Walls), d.Walls, mapping, wallCount, Wall.Serdes);
         s.Check();
         PerfTracker.StartupEvent("Finish loading labyrinth data");

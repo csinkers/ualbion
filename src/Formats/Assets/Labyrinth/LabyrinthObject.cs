@@ -10,8 +10,7 @@ public class LabyrinthObject // Length 0x10 (16) bytes
     public LabyrinthObjectFlags Properties { get; set; } // 0
     public uint Collision { get; set; } // 1, len = 3 bytes
     public SpriteId SpriteId { get; set; } // 4, ushort
-    [DefaultValue(1)]
-    public byte AnimationFrames { get; set; } // 6
+    [DefaultValue(1)] public byte AnimationFrames { get; set; } = 1; // 6
     public byte Unk7 { get; set; } // 7
     public ushort Width { get; set; } // 8
     public ushort Height { get; set; } // A

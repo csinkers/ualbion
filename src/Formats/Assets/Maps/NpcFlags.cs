@@ -6,7 +6,7 @@ namespace UAlbion.Formats.Assets.Maps;
 public enum NpcFlags : byte
 {
     None = 0,
-    Unk1 = 0x1,
+    Locked = 0x1,
     Unk2 = 0x2,
     Unk4 = 0x4, // Motion related?
     Unk8 = 0x8,

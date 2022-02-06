@@ -118,9 +118,9 @@ public class IsometricBuilder : Component
 
         return mode switch
         {
-            IsometricMode.Floors => _layout.FloorFrames,
+            IsometricMode.Floors   => _layout.FloorFrames,
             IsometricMode.Ceilings => _layout.CeilingFrames,
-            IsometricMode.Walls => _layout.WallFrames,
+            IsometricMode.Walls    => _layout.WallFrames,
             IsometricMode.Contents => _layout.ContentsFrames,
             _ => null
         };
@@ -134,7 +134,7 @@ public class IsometricBuilder : Component
         Raise(new CameraPlanesEvent(0, 5000));
         Raise(new CameraJumpEvent(0, 0, -256));
         // Raise(new EngineFlagEvent(FlagOperation.Set, EngineFlags.ShowBoundingBoxes));
-        RecreateLayout();
+        // RecreateLayout();
     }
 
     void RecreateLayout()

@@ -30,6 +30,7 @@ Things that are at least somewhat implemented:
 - Video playback
 - Exporting assets
 - Day/night cycle
+- NPC movement
 
 Currently unimplemented:
 - Lighting model for 3D levels
@@ -37,7 +38,6 @@ Currently unimplemented:
 - Automap for 3D environments
 - Combat system
 - Magic system
-- NPC movement
 
 Planned improvements / changes from the original gameplay:
 - Add hotkeys to streamline the interface, reduce the amount of right clicking required etc
@@ -46,7 +46,7 @@ Planned improvements / changes from the original gameplay:
 - Graphical improvements in 3D environments
 - Fix bugs in original game (with option to toggle when there is a gameplay impact)
 - Modding support
-* A built-in editor for modifying and adding assets
+- A built-in editor for modifying and adding assets
 
 ## Getting started
 
@@ -54,14 +54,14 @@ Planned improvements / changes from the original gameplay:
 
 You need to have the original Albion game files. These days, Albion can be bought cheaply on [GOG](https://www.gog.com/game/albion).
 
-If you have the GOG version of the game, extract the required game files as following:
+If you have the GOG version of the game, extract the required game files as follows:
 
 #### Linux:
 1. Ensure `wine` and `dosbox` are installed
 1. Download the [Albion installer for Windows from GOG](https://www.gog.com/game/albion)
 1. Run the installer using wine (`wine setup_albion_1.38_\(28043\).exe`). Note that the installer may show some errors, but if the game can be launched in the end, it's okay.
 1. Run `dosbox`
-1. Run the following commands in dosbox to extract the data files: (Replace `~/ualbion` with wherever you cloned the ualbion repository. Replace `~/.wine/drive_c/GOG Games/Albion/` with wherever you installed your GOG version of Albion. Note the double quotes (`"`), they are necessary if your path contains spaces.)
+1. Run the following commands in dosbox to extract the data files. Replace `~/ualbion` with wherever you cloned the ualbion repository. Replace `~/.wine/drive_c/GOG Games/Albion/` with wherever you installed your GOG version of Albion. Note the double quotes (`"`), they are necessary if your path contains spaces.
     1. `mount C "~/ualbion"`
     1. `mount D "~/.wine/drive_c/GOG Games/Albion/"`
     1. `C:\src\Tools\GOG_EXTR.BAT`
@@ -71,12 +71,12 @@ If you have the GOG version of the game, extract the required game files as foll
 1. Run installer
 1. Open the Albion install directory in file explorer (e.g. `C:\GOG Games\Albion`)
 1. Go into the `DOSBOX` directory and run `DOSBOX.exe`
-1. Run the following commands in dosbox to extract the data files: (Replace `C:\Git\ualbion` with wherever you cloned the ualbion repository. Replace `C:\GOG Games\Albion` with wherever you installed your GOG version of Albion. Note the double quotes (`"`), they are necessary if your path contains spaces.)
+1. Run the following commands in dosbox to extract the data files. Replace `C:\Git\ualbion` with wherever you cloned the ualbion repository. Replace `C:\GOG Games\Albion` with wherever you installed your GOG version of Albion. Note the double quotes (`"`), they are necessary if your path contains spaces.
     1. `mount C "C:\Git\ualbion"`
     1. `mount D "C:\GOG Games\Albion"`
     1. `C:\src\Tools\GOG_EXTR.BAT`
 
-If you did not do the above steps and want to select your game files manually, configure `data/config.json` to set the paths for the files from the original game (currently only version v1.38 where `MAIN.EXE` is 1,109,655 bytes and has a SHA256 hash of `476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710` is supported). If you're running the GOG version, you'll want to mount the `game.gog` file (it's just a raw binary dump of the CD contents) using CDemu and then copy the ALBION directory into your UAlbion folder.
+If you're not using the GOG version or want to select your game files manually, you can either copy the files into an "ALBION" subdirectory manually or configure `data/config.json` to set the paths for the files. The files can also be manually extracted from the GOG version by mounting the `game.gog` file using CDemu (it's just a raw binary dump of the CD contents) and then copy the ALBION directory into your UAlbion folder.
 
 ### Compile and run
 
@@ -85,6 +85,8 @@ To compile and run the project, open `ualbion.sln` in the C# IDE of your choice 
 - To run with Vulkan: `run -vk`
 - To run with OpenGL: `run -gl`
 - To run with Direct3D: `run -d3d`
+- To extract all game resources into modern formats under the mods/Unpacked dir: `run -b Base Unpacked`
+- To repack the (possibly modified) assets in mods/Unpacked back into the original binary formats: `run -b Unpacked Repacked` (outputs to mods/Repacked)
 
 ## Attributions
 Many thanks to Florian Ziesche and the other contributers to the [freealbion wiki](https://github.com/freealbion/freealbion/wiki) for their efforts in discovering and documenting the Albion file formats.

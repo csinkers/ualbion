@@ -261,7 +261,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(61, lab.Objects.Count);
         var o = lab.Objects[0];
         Assert.Equal(DungeonObject.LightCover, o.SpriteId);
-        Assert.Equal(1, o.AnimationFrames);
+        Assert.Equal(1, o.FrameCount);
         Assert.Equal(0u, o.Collision);
         Assert.Equal(32, o.Width);
         Assert.Equal(32, o.Height);
@@ -271,7 +271,7 @@ public class AssetLoadTests : IDisposable
 
         o = lab.Objects[1];
         Assert.Equal(DungeonObject.Pylon, o.SpriteId);
-        Assert.Equal(1, o.AnimationFrames);
+        Assert.Equal(1, o.FrameCount);
         Assert.Equal(8u, o.Collision);
         Assert.Equal(16, o.Width);
         Assert.Equal(96, o.Height);
@@ -281,7 +281,7 @@ public class AssetLoadTests : IDisposable
 
         Assert.Equal(36, lab.FloorAndCeilings.Count);
         var f = lab.FloorAndCeilings[31];
-        Assert.Equal(1, f.AnimationCount);
+        Assert.Equal(1, f.FrameCount);
         Assert.Equal((FloorAndCeiling.FcFlags)0, f.Properties);
         Assert.Equal(Floor.Moss, f.SpriteId);
         Assert.Equal(0, f.Unk1);
@@ -292,7 +292,7 @@ public class AssetLoadTests : IDisposable
 
         Assert.Equal(31, lab.Walls.Count);
         var w = lab.Walls[23];
-        Assert.Equal(1, w.AnimationFrames);
+        Assert.Equal(1, w.FrameCount);
         Assert.Equal(11, w.AutoGfxType);
         Assert.Equal(8u, w.Collision);
         Assert.Equal(112, w.Width);

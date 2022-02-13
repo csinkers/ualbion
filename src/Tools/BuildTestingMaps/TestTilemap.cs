@@ -29,7 +29,7 @@ public class TestTilemap
 
     static IReadOnlyTexture<byte> MakeTileGfx(bool overlay, byte num, ITextureBuilderFont font)
     {
-        var t = T16.FillRect(overlay ? CBlue2 : CGrey6, 0, 0, TileWidth, overlay ? TileHeight / 2 : TileHeight);
+        var t = T16(null).FillRect(overlay ? CBlue2 : CGrey6, 0, 0, TileWidth, overlay ? TileHeight / 2 : TileHeight);
 
         if (!overlay)
             t = t.Border(CGreen4);
@@ -43,9 +43,9 @@ public class TestTilemap
     {
         var tiles = new List<IReadOnlyTexture<byte>>
         {
-            T16.FillAll(CBlack1).Texture,
-            T16.FillAll(CBlack1).Texture,
-            T16.FillAll(CGrey12).Texture,
+            T16(null).FillAll(CBlack1).Texture,
+            T16(null).FillAll(CBlack1).Texture,
+            T16(null).FillAll(CGrey12).Texture,
         };
 
         Tileset = new TilesetData(UAlbion.Base.Tileset.Toronto) { UseSmallGraphics = false };
@@ -82,7 +82,7 @@ public class TestTilemap
         for (int i = 0; i < 16; i++)
         {
             int gfxIndex = tiles.Count;
-            tiles.Add(T16.FillAll(CGrey4)
+            tiles.Add(T16(null).FillAll(CGrey4)
                 .Border(CWhite)
                 .Text("S", CGreen5, 2, 2, font)
                 .Text(i.ToString(), CGreen5, 2, 9, font)
@@ -95,7 +95,7 @@ public class TestTilemap
         for (char c = ' '; c <= '~'; c++)
         {
             int gfxIndex = tiles.Count;
-            tiles.Add(T16.FillAll(CBlueGrey7)
+            tiles.Add(T16(null).FillAll(CBlueGrey7)
                 .Border(COrange3)
                 .Text(c == '`' ? "'" : c.ToString(), CGreen5, 2, 2, bigFont)
                 .Texture);

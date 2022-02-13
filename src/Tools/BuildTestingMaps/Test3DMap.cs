@@ -28,10 +28,10 @@ class Test3DMap
             {
                 var y = i / map.Width;
                 var x = i % map.Width;
-                map.Contents[i] =
-                     x == 0 || y == 0 || x == map.Width - 1 || y == map.Height - 1
-                         ? Lab1.SolidWallOffset
-                         : (byte)0;
+                //map.Contents[i] =
+                //     x == 0 || y == 0 || x == map.Width - 1 || y == map.Height - 1
+                //         ? Lab1.SolidWallOffset
+                //         : (byte)0;
             }
 
             ushort n = 0;
@@ -56,7 +56,7 @@ class Test3DMap
                 assets[scriptId] = script;
                 return "do_script " + scriptId.Id;
             }
-
+/*
             // var waypoints = BuildPatrolPath(18, 6);
             map.Npcs[0] = new MapNpc
             {
@@ -66,6 +66,7 @@ class Test3DMap
                 Waypoints = new NpcWaypoint[] { new(16, 16) },
                 SpriteOrGroup = new AssetId(AssetType.ObjectGroup, Lab1.TwoMonstersObjGroupOffset)
             };
+*/
         });
 
         var (finalMap, mapText) = builder.Build();

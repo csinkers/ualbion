@@ -33,7 +33,7 @@ public class AssetInfo
     public AssetInfo(Dictionary<string, object> properties)
     {
         if (properties == null) throw new ArgumentNullException(nameof(properties));
-        foreach(var property in properties)
+        foreach (var property in properties)
             Set(property.Key, property.Value);
     }
 

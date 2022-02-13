@@ -12,10 +12,10 @@ public class TestLab
 {
     public int BlankFloorOffset { get; }
     public int TextFloorOffset { get; }
-    public int MonsterObjOffset { get; }
-    public byte SolidWallOffset { get; }
-    public int OneMonsterObjGroupOffset { get; }
-    public int TwoMonstersObjGroupOffset { get; }
+    // public int MonsterObjOffset { get; }
+    // public byte SolidWallOffset { get; }
+    // public int OneMonsterObjGroupOffset { get; }
+    // public int TwoMonstersObjGroupOffset { get; }
     public LabyrinthData Lab { get; }
     public Dictionary<AssetId, object> Assets { get; } = new();
 
@@ -50,9 +50,10 @@ public class TestLab
         };
 
         BlankFloorOffset = Lab.FloorAndCeilings.Count + 1; // Skip 'blank' pseudo entry
-        Assets[(SpriteId)Floor.Brick] = T64.FillAll(CGrey12).Border(CBlue2).Texture;
-        Lab.FloorAndCeilings.Add(new() { AnimationCount = 0, Properties = 0, SpriteId = Floor.Brick, });
-
+        var brick = T64((SpriteId)Floor.Brick).FillAll(CGrey12).Border(CBlue2).Texture;
+        Assets[(SpriteId)brick.Id] = brick;
+        Lab.FloorAndCeilings.Add(new() { SpriteId = Floor.Brick, });
+/*
         MonsterObjOffset = Lab.Objects.Count;
         Assets[(SpriteId)DungeonObject.EvilKangaroo] = TextureBuilder.Create<byte>(48, 72).Border(CFlesh4).Text("!!", CBlueGrey5, 12, 40, bigFont).Texture;
         Lab.Objects.Add(new LabyrinthObject
@@ -77,25 +78,26 @@ public class TestLab
             [1] = new SubObject(0, 100, 20, 0)
         } };
         Lab.ObjectGroups.Add(twoSkrinn);
-
+*//*
         SolidWallOffset = (byte)(Lab.Walls.Count + LabyrinthData.WallOffset);
-        Assets[(SpriteId)UAlbion.Base.Wall.JiriTileAndStone] = T64.FillAll(CGreen2).Texture;
+        var wall1 = T64((SpriteId)UAlbion.Base.Wall.JiriTileAndStone).FillAll(CGreen2).Texture;
+        Assets[(SpriteId)wall1.Id] = wall1;
         Lab.Walls.Add(new Wall
         {
-            Width = 64,
-            Height = 64,
+            Width = (ushort)wall1.Width,
+            Height = (ushort)wall1.Height,
             SpriteId = UAlbion.Base.Wall.JiriTileAndStone,
             Collision = 8,
-            Properties = 0,
+            Properties = Wall.WallFlags.WriteOverlay, // Actually type?
         });
-
+*/
         TextFloorOffset = Lab.FloorAndCeilings.Count + 1;
         int gfxIndex = 2;
         foreach (var c in ValidCharacters)
         {
             var spriteId = new SpriteId(AssetType.Floor, gfxIndex);
-            Assets[spriteId] = T64.FillAll(CBlueGrey7).Border(COrange3).Text(c.ToString(), CGreen5, 2, 2, bigFont).Texture;
-            Lab.FloorAndCeilings.Add(new() { AnimationCount = 0, Properties = 0, SpriteId = spriteId, });
+            Assets[spriteId] = T64(spriteId).FillAll(CBlueGrey7).Border(COrange3).Text(c.ToString(), CGreen5, 2, 2, bigFont).Texture;
+            Lab.FloorAndCeilings.Add(new FloorAndCeiling { Properties = 0, SpriteId = spriteId, });
             gfxIndex++;
         }
 

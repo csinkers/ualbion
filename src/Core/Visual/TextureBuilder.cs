@@ -1,4 +1,5 @@
 ﻿using System;
+using UAlbion.Api;
 using UAlbion.Api.Visual;
 
 namespace UAlbion.Core.Visual
@@ -6,16 +7,16 @@ namespace UAlbion.Core.Visual
     public static class TextureBuilder
     {
         public static readonly bool[] Dashed = { true, true, true, true, true, false, false, false };
-        public static TextureBuilder<T> Create<T>(int width, int height) where T : unmanaged => new(width, height);
+        public static TextureBuilder<T> Create<T>(IAssetId id, int width, int height) where T : unmanaged => new(id, width, height);
     }
 
     public class TextureBuilder<T> where T : unmanaged
     {
         readonly SimpleTexture<T> _texture;
         public IReadOnlyTexture<T> Texture => _texture;
-        internal TextureBuilder(int width, int height)
+        internal TextureBuilder(IAssetId id, int width, int height)
         {
-            _texture = new SimpleTexture<T>(null, width, height);
+            _texture = new SimpleTexture<T>(id, width, height);
             _texture.AddRegion(0, 0, width, height);
         }
 

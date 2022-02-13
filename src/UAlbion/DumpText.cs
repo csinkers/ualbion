@@ -137,13 +137,13 @@ class DumpText : Component, IAssetDumper
             for (int j = 0; j < l.FloorAndCeilings.Count; j++)
             {
                 var fc = l.FloorAndCeilings[j];
-                sw.WriteLine($"    F/C {j}: {fc.SpriteId} {fc.AnimationCount}");
+                sw.WriteLine($"    F/C {j}: {fc.SpriteId} {fc.FrameCount}");
             }
 
             for (int j = 0; j < l.Walls.Count; j++)
             {
                 var w = l.Walls[j];
-                sw.WriteLine($"    W {j}: {w.SpriteId} {w.AnimationFrames} P{w.TransparentColour}");
+                sw.WriteLine($"    W {j}: {w.SpriteId} {w.FrameCount} P{w.TransparentColour}");
             }
 
             for (int j = 0; j < l.ObjectGroups.Count; j++)
@@ -160,7 +160,7 @@ class DumpText : Component, IAssetDumper
             {
                 var o = l.Objects[j];
                 sw.WriteLine(
-                    $"    Extra {j}: {o.SpriteId} {o.AnimationFrames} {o.Width}x{o.Height} M:{o.MapWidth}x{o.MapHeight}");
+                    $"    Extra {j}: {o.SpriteId} {o.FrameCount} {o.Width}x{o.Height} M:{o.MapWidth}x{o.MapHeight}");
             }
         }
     }

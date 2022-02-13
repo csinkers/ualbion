@@ -10,7 +10,7 @@ public class LabyrinthObject // Length 0x10 (16) bytes
     public LabyrinthObjectFlags Properties { get; set; } // 0
     public uint Collision { get; set; } // 1, len = 3 bytes
     public SpriteId SpriteId { get; set; } // 4, ushort
-    [DefaultValue(1)] public byte AnimationFrames { get; set; } = 1; // 6
+    public byte FrameCount { get; set; } = 1; // 6
     public byte Unk7 { get; set; } // 7
     public ushort Width { get; set; } // 8
     public ushort Height { get; set; } // A
@@ -18,7 +18,7 @@ public class LabyrinthObject // Length 0x10 (16) bytes
     public ushort MapHeight { get; set; } // E
 
     public override string ToString() =>
-        $"EO.{SpriteId}:{AnimationFrames} {Width}x{Height} [{MapWidth}x{MapHeight}] {Properties}";
+        $"EO.{SpriteId}:{FrameCount} {Width}x{Height} [{MapWidth}x{MapHeight}] {Properties}";
 
     public static LabyrinthObject Serdes(int _, LabyrinthObject o, AssetMapping mapping, ISerializer s)
     {
@@ -32,7 +32,7 @@ public class LabyrinthObject // Length 0x10 (16) bytes
         o.Collision = (o.Collision & 0x00ffff) | (uint)s.UInt8(nameof(o.Collision), (byte)((o.Collision >> 16) & 0xff)) << 16;
 
         o.SpriteId = SpriteId.SerdesU16(nameof(SpriteId), o.SpriteId, AssetType.Object3D, mapping, s);
-        o.AnimationFrames = s.UInt8(nameof(o.AnimationFrames), o.AnimationFrames);
+        o.FrameCount = s.UInt8(nameof(o.FrameCount), o.FrameCount);
         o.Unk7 = s.UInt8(nameof(o.Unk7), o.Unk7);
         o.Width = s.UInt16(nameof(o.Width), o.Width);
         o.Height = s.UInt16(nameof(o.Height), o.Height);

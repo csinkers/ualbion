@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>ua</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Formats\UAlbion.Formats.csproj" />
+    <ProjectReference Include="..\..\Game.Veldrid\UAlbion.Game.Veldrid.csproj" />
+    <ProjectReference Include="..\..\Game\UAlbion.Game.csproj" />
+  </ItemGroup>
+
+</Project>

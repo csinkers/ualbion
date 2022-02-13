@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text.Json.Serialization;
 using SerdesNet;
@@ -26,7 +25,7 @@ public class Wall // Length = 0x12 + overlayCount * 0xC
     public WallFlags Properties { get; set; } // 0
     public uint Collision { get; set; } // 1, len = 3 bytes
     public SpriteId SpriteId { get; set; } // 4, ushort
-    [DefaultValue(1)] public byte AnimationFrames { get; set; } = 1; // 6
+    public byte FrameCount { get; set; } = 1; // 6
     public byte AutoGfxType { get; set; } // 7
     public byte TransparentColour { get; set; } // 8 (PaletteId??)
     public byte Unk9 { get; set; } // 9
@@ -35,7 +34,7 @@ public class Wall // Length = 0x12 + overlayCount * 0xC
     [JsonInclude] public IList<Overlay> Overlays { get; private set; } = new List<Overlay>();
 
     public override string ToString() =>
-        $"Wall.{SpriteId}:{AnimationFrames} {Width}x{Height} ({Properties}) [ {string.Join(", ", Overlays.Select(x => x.ToString()))} ]";
+        $"Wall.{SpriteId}:{FrameCount} {Width}x{Height} ({Properties}) [ {string.Join(", ", Overlays.Select(x => x.ToString()))} ]";
 
     public static Wall Serdes(int _, Wall w, AssetMapping mapping, ISerializer s)
     {
@@ -49,7 +48,7 @@ public class Wall // Length = 0x12 + overlayCount * 0xC
         w.Collision = (w.Collision & 0x00ffff) | (uint)s.UInt8(nameof(w.Collision), (byte)((w.Collision >> 16) & 0xff)) << 16;
 
         w.SpriteId = SpriteId.SerdesU16(nameof(w.SpriteId), w.SpriteId, AssetType.Wall, mapping, s); // 4
-        w.AnimationFrames = s.UInt8(nameof(w.AnimationFrames), w.AnimationFrames); // 6
+        w.FrameCount = s.UInt8(nameof(w.FrameCount), w.FrameCount); // 6
         w.AutoGfxType = s.UInt8(nameof(w.AutoGfxType), w.AutoGfxType); // 7
         w.TransparentColour = s.UInt8(nameof(w.TransparentColour), w.TransparentColour); // 8
         w.Unk9 = s.UInt8(nameof(w.Unk9), w.Unk9); // 9

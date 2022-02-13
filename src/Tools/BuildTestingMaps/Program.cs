@@ -36,7 +36,8 @@ public static class Program
                 assets[kvp.Key] = kvp.Value;
         }
 
-        Merge(JumpMap.Build((Map)300, (Map)101, 5, 5));
+        Merge(JumpMap.Build((Map)300, (Map)100, 5, 5));
+        //Merge(JumpMap.Build((Map)300, (Map)101, 5, 5));
         Merge(NpcMap.Build((Map)301));
         Merge(FlagTestMap.Build((Map)100));
         Merge(Test3DMap.Build((Map)101));

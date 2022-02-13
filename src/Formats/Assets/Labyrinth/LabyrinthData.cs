@@ -68,7 +68,7 @@ public class LabyrinthData
         (int)ApiUtil.Lcm(
             ObjectGroups[i].SubObjects
                 .Where(x => x is { ObjectInfoNumber: >= 0 } && x.ObjectInfoNumber < Objects.Count)
-                .Select(x => (long)Objects[x.ObjectInfoNumber].AnimationFrames));
+                .Select(x => (long)Objects[x.ObjectInfoNumber].FrameCount));
 
     public static LabyrinthData Serdes(LabyrinthData d, AssetInfo info, AssetMapping mapping, ISerializer s)
     {

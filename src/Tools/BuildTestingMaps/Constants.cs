@@ -1,4 +1,5 @@
-﻿using UAlbion.Core.Visual;
+﻿using UAlbion.Api;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game.Veldrid.Assets;
@@ -114,8 +115,8 @@ public static class Constants
         4282862411, 4283126615, 4283915103, 4284441447, 4285230963, 4286020475, 4287335303, 4284699483
     };
 
-    public static TextureBuilder<byte> T16 => TextureBuilder.Create<byte>(TileWidth, TileHeight);
-    public static TextureBuilder<byte> T64 => TextureBuilder.Create<byte>(64, 64);
+    public static TextureBuilder<byte> T16(IAssetId? id) => TextureBuilder.Create<byte>(id, TileWidth, TileHeight);
+    public static TextureBuilder<byte> T64(IAssetId? id) => TextureBuilder.Create<byte>(id, 64, 64);
     public static MultiFont? Font { get; }
     public static SingleFont Font6 { get; }
     public static SingleFont Font10 { get; }

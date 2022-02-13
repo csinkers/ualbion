@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using SerdesNet;
 using UAlbion.Config;
 
@@ -24,12 +23,11 @@ public class FloorAndCeiling // Length = 0xA (10) bytes
     public byte Unk1 { get; set; }
     public byte Unk2 { get; set; }
     public byte Unk3 { get; set; }
-    [DefaultValue(1)]
-    public byte AnimationCount { get; set; }
+    public byte FrameCount { get; set; } = 1;
     public byte Unk5 { get; set; }
     public SpriteId SpriteId { get; set; } // ushort
     public ushort Unk8 { get; set; }
-    public override string ToString() => $"FC.{SpriteId}:{AnimationCount} {Properties}";
+    public override string ToString() => $"FC.{SpriteId}:{FrameCount} {Properties}";
 
     public static FloorAndCeiling Serdes(int _, FloorAndCeiling existing, AssetMapping mapping, ISerializer s)
     {
@@ -39,7 +37,7 @@ public class FloorAndCeiling // Length = 0xA (10) bytes
         fc.Unk1 = s.UInt8(nameof(fc.Unk1), fc.Unk1);
         fc.Unk2 = s.UInt8(nameof(fc.Unk2), fc.Unk2);
         fc.Unk3 = s.UInt8(nameof(fc.Unk3), fc.Unk3);
-        fc.AnimationCount = s.UInt8(nameof(fc.AnimationCount), fc.AnimationCount);
+        fc.FrameCount = s.UInt8(nameof(fc.FrameCount), fc.FrameCount);
         fc.Unk5 = s.UInt8(nameof(fc.Unk5), fc.Unk5);
         fc.SpriteId = SpriteId.SerdesU16(nameof(SpriteId), fc.SpriteId, AssetType.Floor, mapping, s);
         fc.Unk8 = s.UInt16(nameof(fc.Unk8), fc.Unk8);

@@ -814,7 +814,7 @@ public class AssetLoadTests : IDisposable
     [Fact] public void PortraitTest() { Test(assets => assets.LoadTexture(Portrait.Tom)); }
     [Fact] public void SmallNpcTest() { Test(assets => assets.LoadTexture(SmallNpc.Krondir)); }
     [Fact] public void SmallPartyMemberTest() { Test(assets => assets.LoadTexture(SmallPartyMember.Tom)); }
-    [Fact] public void TacticalGfxTest() { Test(assets => assets.LoadTexture(TacticalGraphics.Unknown1)); }
+    [Fact] public void TacticalGfxTest() { Test(assets => assets.LoadTexture(TacticalGraphics.Tom)); }
     [Fact] public void WallTest() { Test(assets => assets.LoadTexture(Wall.TorontoPanelling)); }
 
     [Fact]

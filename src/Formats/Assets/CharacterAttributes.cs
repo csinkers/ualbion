@@ -65,15 +65,17 @@ public class CharacterAttributes : ICharacterAttributes
     public CharacterAttribute MagicResistance { get; set; }
     public CharacterAttribute MagicTalent { get; set; }
 
-    public CharacterAttributes DeepClone() => new()
+    public CharacterAttributes DeepClone() => new CharacterAttributes().CopyFrom(this);
+    public CharacterAttributes CopyFrom(CharacterAttributes other)
     {
-        Strength = Strength.DeepClone(),
-        Intelligence = Intelligence.DeepClone(),
-        Dexterity = Dexterity.DeepClone(),
-        Speed = Speed.DeepClone(),
-        Stamina = Stamina.DeepClone(),
-        Luck = Luck.DeepClone(),
-        MagicResistance = MagicResistance.DeepClone(),
-        MagicTalent = MagicTalent.DeepClone(),
-    };
+        Strength = other.Strength.DeepClone();
+        Intelligence = other.Intelligence.DeepClone();
+        Dexterity = other.Dexterity.DeepClone();
+        Speed = other.Speed.DeepClone();
+        Stamina = other.Stamina.DeepClone();
+        Luck = other.Luck.DeepClone();
+        MagicResistance = other.MagicResistance.DeepClone();
+        MagicTalent = other.MagicTalent.DeepClone();
+        return this;
+    }
 }

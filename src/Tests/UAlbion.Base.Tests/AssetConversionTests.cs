@@ -626,7 +626,7 @@ public class AssetConversionTests
     {
         var info = new AssetInfo
         {
-            AssetId = AssetId.From(TacticalGraphics.Unknown1),
+            AssetId = AssetId.From(TacticalGraphics.Tom),
             Width = 32
         };
         Test<IReadOnlyTexture<byte>>(info.AssetId,

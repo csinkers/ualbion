@@ -22,16 +22,14 @@ public class MagicSkills : IMagicSkills
     #pragma warning restore CA2227 // Collection properties should be read only
     */
 
-    public MagicSkills DeepClone()
+    public MagicSkills DeepClone() => new MagicSkills().CopyFrom(this);
+    public MagicSkills CopyFrom(MagicSkills other)
     {
-        var clone = new MagicSkills()
-        {
-            SpellPoints = SpellPoints.DeepClone(),
-            SpellClasses = SpellClasses,
-            KnownSpells = KnownSpells.ToList(),
-            SpellStrengths = SpellStrengths.ToDictionary(x => x.Key, x => x.Value)
-        };
-        return clone;
+        SpellPoints = other.SpellPoints.DeepClone();
+        SpellClasses = other.SpellClasses;
+        KnownSpells = other.KnownSpells.ToList();
+        SpellStrengths = other.SpellStrengths.ToDictionary(x => x.Key, x => x.Value);
+        return this;
     }
 }
 

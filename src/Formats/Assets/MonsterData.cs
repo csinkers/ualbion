@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System.Linq;
+using SerdesNet;
 
 namespace UAlbion.Formats.Assets;
 
@@ -21,5 +22,12 @@ public class MonsterData
         m ??= new MonsterData();
         m.Unk0 = s.Bytes(nameof(Unk0), m.Unk0, 328);
         return m;
+    }
+
+    public MonsterData DeepCopy() => new MonsterData().CopyFrom(this);
+    public MonsterData CopyFrom(MonsterData other)
+    {
+        Unk0 = other.Unk0.ToArray();
+        return this;
     }
 }

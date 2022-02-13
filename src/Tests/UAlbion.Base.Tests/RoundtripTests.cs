@@ -692,7 +692,7 @@ public class RoundtripTests
     {
         var info = new AssetInfo
         {
-            AssetId = AssetId.From(TacticalGraphics.Unknown1),
+            AssetId = AssetId.From(TacticalGraphics.Tom),
             Width = 32
         };
         RoundTripXld<IReadOnlyTexture<byte>>(nameof(TacticalGfxTest), "$(XLD)/TACTICO0.XLD", 0,

@@ -98,7 +98,7 @@ public readonly struct TilesetId : IEquatable<TilesetId>, IEquatable<AssetId>, I
 
     public static implicit operator AssetId(TilesetId id) => AssetId.FromUInt32(id._value);
     public static implicit operator TilesetId(AssetId id) => new TilesetId(id.ToUInt32());
-        public static implicit operator TilesetId(UAlbion.Base.Tileset id) => TilesetId.From(id);
+    public static implicit operator TilesetId(UAlbion.Base.Tileset id) => TilesetId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

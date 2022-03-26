@@ -98,9 +98,9 @@ public readonly struct PortraitId : IEquatable<PortraitId>, IEquatable<AssetId>,
 
     public static implicit operator AssetId(PortraitId id) => AssetId.FromUInt32(id._value);
     public static implicit operator PortraitId(AssetId id) => new PortraitId(id.ToUInt32());
-        public static implicit operator SpriteId(PortraitId id) => SpriteId.FromUInt32(id._value);
-        public static explicit operator PortraitId(SpriteId id) => new PortraitId(id.ToUInt32());
-        public static implicit operator PortraitId(UAlbion.Base.Portrait id) => PortraitId.From(id);
+    public static implicit operator SpriteId(PortraitId id) => SpriteId.FromUInt32(id._value);
+    public static explicit operator PortraitId(SpriteId id) => new PortraitId(id.ToUInt32());
+    public static implicit operator PortraitId(UAlbion.Base.Portrait id) => PortraitId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

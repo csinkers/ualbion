@@ -98,7 +98,7 @@ public readonly struct AutomapId : IEquatable<AutomapId>, IEquatable<AssetId>, I
 
     public static implicit operator AssetId(AutomapId id) => AssetId.FromUInt32(id._value);
     public static implicit operator AutomapId(AssetId id) => new AutomapId(id.ToUInt32());
-        public static implicit operator AutomapId(UAlbion.Base.Automap id) => AutomapId.From(id);
+    public static implicit operator AutomapId(UAlbion.Base.Automap id) => AutomapId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

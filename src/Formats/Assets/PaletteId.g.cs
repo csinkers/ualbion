@@ -98,7 +98,7 @@ public readonly struct PaletteId : IEquatable<PaletteId>, IEquatable<AssetId>, I
 
     public static implicit operator AssetId(PaletteId id) => AssetId.FromUInt32(id._value);
     public static implicit operator PaletteId(AssetId id) => new PaletteId(id.ToUInt32());
-        public static implicit operator PaletteId(UAlbion.Base.Palette id) => PaletteId.From(id);
+    public static implicit operator PaletteId(UAlbion.Base.Palette id) => PaletteId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

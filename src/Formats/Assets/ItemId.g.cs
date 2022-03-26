@@ -100,7 +100,7 @@ public readonly struct ItemId : IEquatable<ItemId>, IEquatable<AssetId>, ICompar
 
     public static implicit operator AssetId(ItemId id) => AssetId.FromUInt32(id._value);
     public static implicit operator ItemId(AssetId id) => new ItemId(id.ToUInt32());
-        public static implicit operator ItemId(UAlbion.Base.Item id) => ItemId.From(id);
+    public static implicit operator ItemId(UAlbion.Base.Item id) => ItemId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

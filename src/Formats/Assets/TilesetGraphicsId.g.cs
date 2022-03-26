@@ -98,9 +98,9 @@ public readonly struct TilesetGraphicsId : IEquatable<TilesetGraphicsId>, IEquat
 
     public static implicit operator AssetId(TilesetGraphicsId id) => AssetId.FromUInt32(id._value);
     public static implicit operator TilesetGraphicsId(AssetId id) => new TilesetGraphicsId(id.ToUInt32());
-        public static implicit operator SpriteId(TilesetGraphicsId id) => SpriteId.FromUInt32(id._value);
-        public static explicit operator TilesetGraphicsId(SpriteId id) => new TilesetGraphicsId(id.ToUInt32());
-        public static implicit operator TilesetGraphicsId(UAlbion.Base.TilesetGraphics id) => TilesetGraphicsId.From(id);
+    public static implicit operator SpriteId(TilesetGraphicsId id) => SpriteId.FromUInt32(id._value);
+    public static explicit operator TilesetGraphicsId(SpriteId id) => new TilesetGraphicsId(id.ToUInt32());
+    public static implicit operator TilesetGraphicsId(UAlbion.Base.TilesetGraphics id) => TilesetGraphicsId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

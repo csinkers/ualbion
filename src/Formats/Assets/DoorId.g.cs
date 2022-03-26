@@ -98,7 +98,7 @@ public readonly struct DoorId : IEquatable<DoorId>, IEquatable<AssetId>, ICompar
 
     public static implicit operator AssetId(DoorId id) => AssetId.FromUInt32(id._value);
     public static implicit operator DoorId(AssetId id) => new DoorId(id.ToUInt32());
-        public static implicit operator DoorId(UAlbion.Base.Door id) => DoorId.From(id);
+    public static implicit operator DoorId(UAlbion.Base.Door id) => DoorId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

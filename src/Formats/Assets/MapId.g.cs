@@ -98,7 +98,7 @@ public readonly struct MapId : IEquatable<MapId>, IEquatable<AssetId>, IComparab
 
     public static implicit operator AssetId(MapId id) => AssetId.FromUInt32(id._value);
     public static implicit operator MapId(AssetId id) => new MapId(id.ToUInt32());
-        public static implicit operator MapId(UAlbion.Base.Map id) => MapId.From(id);
+    public static implicit operator MapId(UAlbion.Base.Map id) => MapId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

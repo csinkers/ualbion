@@ -98,9 +98,9 @@ public readonly struct NpcId : IEquatable<NpcId>, IEquatable<AssetId>, IComparab
 
     public static implicit operator AssetId(NpcId id) => AssetId.FromUInt32(id._value);
     public static implicit operator NpcId(AssetId id) => new NpcId(id.ToUInt32());
-        public static implicit operator CharacterId(NpcId id) => CharacterId.FromUInt32(id._value);
-        public static explicit operator NpcId(CharacterId id) => new NpcId(id.ToUInt32());
-        public static implicit operator NpcId(UAlbion.Base.Npc id) => NpcId.From(id);
+    public static implicit operator CharacterId(NpcId id) => CharacterId.FromUInt32(id._value);
+    public static explicit operator NpcId(CharacterId id) => new NpcId(id.ToUInt32());
+    public static implicit operator NpcId(UAlbion.Base.Npc id) => NpcId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

@@ -100,8 +100,8 @@ public readonly struct TargetId : IEquatable<TargetId>, IEquatable<AssetId>, ICo
 
     public static implicit operator AssetId(TargetId id) => AssetId.FromUInt32(id._value);
     public static implicit operator TargetId(AssetId id) => new TargetId(id.ToUInt32());
-        public static implicit operator TargetId(UAlbion.Base.PartyMember id) => TargetId.From(id);
-        public static implicit operator TargetId(UAlbion.Base.Target id) => TargetId.From(id);
+    public static implicit operator TargetId(UAlbion.Base.PartyMember id) => TargetId.From(id);
+    public static implicit operator TargetId(UAlbion.Base.Target id) => TargetId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

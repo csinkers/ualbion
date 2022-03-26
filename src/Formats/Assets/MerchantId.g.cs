@@ -98,7 +98,7 @@ public readonly struct MerchantId : IEquatable<MerchantId>, IEquatable<AssetId>,
 
     public static implicit operator AssetId(MerchantId id) => AssetId.FromUInt32(id._value);
     public static implicit operator MerchantId(AssetId id) => new MerchantId(id.ToUInt32());
-        public static implicit operator MerchantId(UAlbion.Base.Merchant id) => MerchantId.From(id);
+    public static implicit operator MerchantId(UAlbion.Base.Merchant id) => MerchantId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

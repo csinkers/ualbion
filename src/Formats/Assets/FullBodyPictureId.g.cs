@@ -98,9 +98,9 @@ public readonly struct FullBodyPictureId : IEquatable<FullBodyPictureId>, IEquat
 
     public static implicit operator AssetId(FullBodyPictureId id) => AssetId.FromUInt32(id._value);
     public static implicit operator FullBodyPictureId(AssetId id) => new FullBodyPictureId(id.ToUInt32());
-        public static implicit operator SpriteId(FullBodyPictureId id) => SpriteId.FromUInt32(id._value);
-        public static explicit operator FullBodyPictureId(SpriteId id) => new FullBodyPictureId(id.ToUInt32());
-        public static implicit operator FullBodyPictureId(UAlbion.Base.FullBodyPicture id) => FullBodyPictureId.From(id);
+    public static implicit operator SpriteId(FullBodyPictureId id) => SpriteId.FromUInt32(id._value);
+    public static explicit operator FullBodyPictureId(SpriteId id) => new FullBodyPictureId(id.ToUInt32());
+    public static implicit operator FullBodyPictureId(UAlbion.Base.FullBodyPicture id) => FullBodyPictureId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

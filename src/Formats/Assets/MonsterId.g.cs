@@ -98,9 +98,9 @@ public readonly struct MonsterId : IEquatable<MonsterId>, IEquatable<AssetId>, I
 
     public static implicit operator AssetId(MonsterId id) => AssetId.FromUInt32(id._value);
     public static implicit operator MonsterId(AssetId id) => new MonsterId(id.ToUInt32());
-        public static implicit operator CharacterId(MonsterId id) => CharacterId.FromUInt32(id._value);
-        public static explicit operator MonsterId(CharacterId id) => new MonsterId(id.ToUInt32());
-        public static implicit operator MonsterId(UAlbion.Base.Monster id) => MonsterId.From(id);
+    public static implicit operator CharacterId(MonsterId id) => CharacterId.FromUInt32(id._value);
+    public static explicit operator MonsterId(CharacterId id) => new MonsterId(id.ToUInt32());
+    public static implicit operator MonsterId(UAlbion.Base.Monster id) => MonsterId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

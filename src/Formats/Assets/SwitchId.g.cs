@@ -98,7 +98,7 @@ public readonly struct SwitchId : IEquatable<SwitchId>, IEquatable<AssetId>, ICo
 
     public static implicit operator AssetId(SwitchId id) => AssetId.FromUInt32(id._value);
     public static implicit operator SwitchId(AssetId id) => new SwitchId(id.ToUInt32());
-        public static implicit operator SwitchId(UAlbion.Base.Switch id) => SwitchId.From(id);
+    public static implicit operator SwitchId(UAlbion.Base.Switch id) => SwitchId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

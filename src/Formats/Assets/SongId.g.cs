@@ -98,7 +98,7 @@ public readonly struct SongId : IEquatable<SongId>, IEquatable<AssetId>, ICompar
 
     public static implicit operator AssetId(SongId id) => AssetId.FromUInt32(id._value);
     public static implicit operator SongId(AssetId id) => new SongId(id.ToUInt32());
-        public static implicit operator SongId(UAlbion.Base.Song id) => SongId.From(id);
+    public static implicit operator SongId(UAlbion.Base.Song id) => SongId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

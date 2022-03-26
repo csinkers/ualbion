@@ -98,7 +98,7 @@ public readonly struct VideoId : IEquatable<VideoId>, IEquatable<AssetId>, IComp
 
     public static implicit operator AssetId(VideoId id) => AssetId.FromUInt32(id._value);
     public static implicit operator VideoId(AssetId id) => new VideoId(id.ToUInt32());
-        public static implicit operator VideoId(UAlbion.Base.Video id) => VideoId.From(id);
+    public static implicit operator VideoId(UAlbion.Base.Video id) => VideoId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

@@ -98,9 +98,9 @@ public readonly struct EventTextId : IEquatable<EventTextId>, IEquatable<AssetId
 
     public static implicit operator AssetId(EventTextId id) => AssetId.FromUInt32(id._value);
     public static implicit operator EventTextId(AssetId id) => new EventTextId(id.ToUInt32());
-        public static implicit operator TextId(EventTextId id) => TextId.FromUInt32(id._value);
-        public static explicit operator EventTextId(TextId id) => new EventTextId(id.ToUInt32());
-        public static implicit operator EventTextId(UAlbion.Base.EventText id) => EventTextId.From(id);
+    public static implicit operator TextId(EventTextId id) => TextId.FromUInt32(id._value);
+    public static explicit operator EventTextId(TextId id) => new EventTextId(id.ToUInt32());
+    public static implicit operator EventTextId(UAlbion.Base.EventText id) => EventTextId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

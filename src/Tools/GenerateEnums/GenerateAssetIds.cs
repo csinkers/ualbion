@@ -71,8 +71,8 @@ static class GenerateAssetIds
         var sb = new StringBuilder();
         foreach (var parent in assets.ParentsByAssetId[name])
         {
-            sb.AppendLine($"        public static implicit operator {parent}({name} id) => {parent}.FromUInt32(id._value);");
-            sb.AppendLine($"        public static explicit operator {name}({parent} id) => new {name}(id.ToUInt32());");
+            sb.AppendLine($"    public static implicit operator {parent}({name} id) => {parent}.FromUInt32(id._value);");
+            sb.AppendLine($"    public static explicit operator {name}({parent} id) => new {name}(id.ToUInt32());");
         }
         return sb.ToString();
     }
@@ -84,7 +84,7 @@ static class GenerateAssetIds
         {
             int index = fullEnumName.IndexOf(',');
             string enumName = index == -1 ? fullEnumName : fullEnumName.Substring(0, index);
-            sb.AppendLine($"        public static implicit operator {name}({enumName} id) => {name}.From(id);");
+            sb.AppendLine($"    public static implicit operator {name}({enumName} id) => {name}.From(id);");
         }
 
         return sb.ToString();

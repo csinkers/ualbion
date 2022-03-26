@@ -98,7 +98,7 @@ public readonly struct WaveLibraryId : IEquatable<WaveLibraryId>, IEquatable<Ass
 
     public static implicit operator AssetId(WaveLibraryId id) => AssetId.FromUInt32(id._value);
     public static implicit operator WaveLibraryId(AssetId id) => new WaveLibraryId(id.ToUInt32());
-        public static implicit operator WaveLibraryId(UAlbion.Base.WaveLibrary id) => WaveLibraryId.From(id);
+    public static implicit operator WaveLibraryId(UAlbion.Base.WaveLibrary id) => WaveLibraryId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

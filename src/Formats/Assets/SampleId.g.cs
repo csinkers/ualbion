@@ -98,7 +98,7 @@ public readonly struct SampleId : IEquatable<SampleId>, IEquatable<AssetId>, ICo
 
     public static implicit operator AssetId(SampleId id) => AssetId.FromUInt32(id._value);
     public static implicit operator SampleId(AssetId id) => new SampleId(id.ToUInt32());
-        public static implicit operator SampleId(UAlbion.Base.Sample id) => SampleId.From(id);
+    public static implicit operator SampleId(UAlbion.Base.Sample id) => SampleId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

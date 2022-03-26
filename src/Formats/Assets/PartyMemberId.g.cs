@@ -98,11 +98,11 @@ public readonly struct PartyMemberId : IEquatable<PartyMemberId>, IEquatable<Ass
 
     public static implicit operator AssetId(PartyMemberId id) => AssetId.FromUInt32(id._value);
     public static implicit operator PartyMemberId(AssetId id) => new PartyMemberId(id.ToUInt32());
-        public static implicit operator CharacterId(PartyMemberId id) => CharacterId.FromUInt32(id._value);
-        public static explicit operator PartyMemberId(CharacterId id) => new PartyMemberId(id.ToUInt32());
-        public static implicit operator TargetId(PartyMemberId id) => TargetId.FromUInt32(id._value);
-        public static explicit operator PartyMemberId(TargetId id) => new PartyMemberId(id.ToUInt32());
-        public static implicit operator PartyMemberId(UAlbion.Base.PartyMember id) => PartyMemberId.From(id);
+    public static implicit operator CharacterId(PartyMemberId id) => CharacterId.FromUInt32(id._value);
+    public static explicit operator PartyMemberId(CharacterId id) => new PartyMemberId(id.ToUInt32());
+    public static implicit operator TargetId(PartyMemberId id) => TargetId.FromUInt32(id._value);
+    public static explicit operator PartyMemberId(TargetId id) => new PartyMemberId(id.ToUInt32());
+    public static implicit operator PartyMemberId(UAlbion.Base.PartyMember id) => PartyMemberId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

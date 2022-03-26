@@ -98,9 +98,9 @@ public readonly struct WordId : IEquatable<WordId>, IEquatable<AssetId>, ICompar
 
     public static implicit operator AssetId(WordId id) => AssetId.FromUInt32(id._value);
     public static implicit operator WordId(AssetId id) => new WordId(id.ToUInt32());
-        public static implicit operator TextId(WordId id) => TextId.FromUInt32(id._value);
-        public static explicit operator WordId(TextId id) => new WordId(id.ToUInt32());
-        public static implicit operator WordId(UAlbion.Base.Word id) => WordId.From(id);
+    public static implicit operator TextId(WordId id) => TextId.FromUInt32(id._value);
+    public static explicit operator WordId(TextId id) => new WordId(id.ToUInt32());
+    public static implicit operator WordId(UAlbion.Base.Word id) => WordId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

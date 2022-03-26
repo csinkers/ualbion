@@ -98,9 +98,9 @@ public readonly struct MapTextId : IEquatable<MapTextId>, IEquatable<AssetId>, I
 
     public static implicit operator AssetId(MapTextId id) => AssetId.FromUInt32(id._value);
     public static implicit operator MapTextId(AssetId id) => new MapTextId(id.ToUInt32());
-        public static implicit operator TextId(MapTextId id) => TextId.FromUInt32(id._value);
-        public static explicit operator MapTextId(TextId id) => new MapTextId(id.ToUInt32());
-        public static implicit operator MapTextId(UAlbion.Base.MapText id) => MapTextId.From(id);
+    public static implicit operator TextId(MapTextId id) => TextId.FromUInt32(id._value);
+    public static explicit operator MapTextId(TextId id) => new MapTextId(id.ToUInt32());
+    public static implicit operator MapTextId(UAlbion.Base.MapText id) => MapTextId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

@@ -98,7 +98,7 @@ public readonly struct ChestId : IEquatable<ChestId>, IEquatable<AssetId>, IComp
 
     public static implicit operator AssetId(ChestId id) => AssetId.FromUInt32(id._value);
     public static implicit operator ChestId(AssetId id) => new ChestId(id.ToUInt32());
-        public static implicit operator ChestId(UAlbion.Base.Chest id) => ChestId.From(id);
+    public static implicit operator ChestId(UAlbion.Base.Chest id) => ChestId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

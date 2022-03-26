@@ -98,7 +98,7 @@ public readonly struct ScriptId : IEquatable<ScriptId>, IEquatable<AssetId>, ICo
 
     public static implicit operator AssetId(ScriptId id) => AssetId.FromUInt32(id._value);
     public static implicit operator ScriptId(AssetId id) => new ScriptId(id.ToUInt32());
-        public static implicit operator ScriptId(UAlbion.Base.Script id) => ScriptId.From(id);
+    public static implicit operator ScriptId(UAlbion.Base.Script id) => ScriptId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

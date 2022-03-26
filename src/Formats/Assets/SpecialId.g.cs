@@ -98,9 +98,9 @@ public readonly struct SpecialId : IEquatable<SpecialId>, IEquatable<AssetId>, I
 
     public static implicit operator AssetId(SpecialId id) => AssetId.FromUInt32(id._value);
     public static implicit operator SpecialId(AssetId id) => new SpecialId(id.ToUInt32());
-        public static implicit operator TextId(SpecialId id) => TextId.FromUInt32(id._value);
-        public static explicit operator SpecialId(TextId id) => new SpecialId(id.ToUInt32());
-        public static implicit operator SpecialId(UAlbion.Base.Special id) => SpecialId.From(id);
+    public static implicit operator TextId(SpecialId id) => TextId.FromUInt32(id._value);
+    public static explicit operator SpecialId(TextId id) => new SpecialId(id.ToUInt32());
+    public static implicit operator SpecialId(UAlbion.Base.Special id) => SpecialId.From(id);
 
     public readonly int ToInt32() => unchecked((int)_value);
     public readonly uint ToUInt32() => _value;

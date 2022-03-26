@@ -38,6 +38,11 @@
     "MonsterId": [ "Monster" ],
     "NpcId": [ "Npc" ],
     "PartyMemberId": [ "Party" ],
+    "TargetId": [
+      "Target",
+      "Party",
+      "LocalNpc"
+    ],
 
     "ItemId": [
       "Item",

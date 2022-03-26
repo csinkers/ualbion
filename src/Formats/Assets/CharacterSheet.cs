@@ -304,7 +304,7 @@ public class CharacterSheet : ICharacterSheet
 
         // Must be a monster
         Inventory.SerdesMonster(id.Id, sheet.Inventory, mapping, s);
-        sheet.Monster = MonsterData.Serdes(sheet.Monster, s);
+        sheet.Monster = MonsterData.Serdes(sheet.Monster, mapping, s);
         // sheet.UnkMonster = s.Bytes(nameof(UnkMonster), sheet.UnkMonster, 328);
         ApiUtil.Assert(s.Offset - initialOffset == 1214, "Expected monster character sheet to be 1214 bytes");
         s.End();

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using SerdesNet;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets;
 
@@ -15,19 +16,26 @@ public class MonsterData
     // public ushort Height { get; set; }
     // public ushort DisplayWidth { get; set; }
     // public ushort DisplayHeight { get; set; }
-    public byte[] Unk0 { get; set; }
 
-    public static MonsterData Serdes(MonsterData m, ISerializer s)
+    public SpriteId MonsterGraphics { get; set; }
+    public byte Unk1 { get; set; }
+    public byte[] Unk2 { get; set; }
+
+    public static MonsterData Serdes(MonsterData m, AssetMapping mapping, ISerializer s)
     {
         m ??= new MonsterData();
-        m.Unk0 = s.Bytes(nameof(Unk0), m.Unk0, 328);
+        m.MonsterGraphics = SpriteId.SerdesU8(nameof(MonsterGraphics), m.MonsterGraphics, AssetType.MonsterGraphics, mapping, s);
+        m.Unk1 = s.UInt8(nameof(Unk1), m.Unk1);
+        m.Unk2 = s.Bytes(nameof(Unk2), m.Unk2, 326);
         return m;
     }
 
     public MonsterData DeepCopy() => new MonsterData().CopyFrom(this);
     public MonsterData CopyFrom(MonsterData other)
     {
-        Unk0 = other.Unk0.ToArray();
+        MonsterGraphics = other.MonsterGraphics;
+        Unk1 = other.Unk1;
+        Unk2 = other.Unk2.ToArray();
         return this;
     }
 }

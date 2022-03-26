@@ -7,36 +7,40 @@ using UAlbion.Formats.Assets;
 namespace UAlbion.Formats.MapEvents;
 
 [Event("change_item")]
-public class ChangeItemEvent : DataChangeEvent
+public class ChangeItemEvent : MapEvent, IDataChangeEvent
 {
+    public override MapEventType EventType => MapEventType.DataChange;
+    public ChangeProperty ChangeProperty => ChangeProperty.Item;
+    [EventPart("target")] public TargetId Target { get; private set; }
+    [EventPart("item")] public ItemId ItemId { get; private set; }
+    [EventPart("op")] public NumericOperation Operation { get; private set; }
+    [EventPart("amount", true, (ushort)0)] public ushort Amount { get; private set; }
+    [EventPart("random", true, false)] public bool IsRandom { get; private set; }
+
     ChangeItemEvent() { }
-    public ChangeItemEvent(PartyMemberId partyMemberId, NumericOperation operation, ushort amount, ItemId itemId, byte unk3)
+    public ChangeItemEvent(TargetId target, ItemId itemId, NumericOperation operation, ushort amount, bool isRandom = false)
     {
-        PartyMemberId = partyMemberId;
+        // change_item Target.PartyLeader Torch Add 5
+        Target = target;
+        ItemId = itemId;
         Operation = operation;
         Amount = amount;
-        ItemId = itemId;
-        Unk3 = unk3;
+        IsRandom = isRandom;
     }
 
     public static ChangeItemEvent Serdes(ChangeItemEvent e, AssetMapping mapping, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         e ??= new ChangeItemEvent();
-        e.Operation = s.EnumU8(nameof(Operation), e.Operation);
-        e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-        int zeroed = s.UInt8(null, 0);
-        e.PartyMemberId = PartyMemberId.SerdesU8(nameof(PartyMemberId), e.PartyMemberId, mapping, s);
-        e.ItemId = ItemId.SerdesU16(nameof(ItemId), e.ItemId, AssetType.Item, mapping, s);
-        e.Amount = s.UInt16(nameof(Amount), e.Amount);
-        s.Assert(zeroed == 0, "ChangeItemEvent: Expected byte 4 to be 0");
+
+        var (targetType, targetId) = DataChangeEvent.UnpackTargetId(e.Target);
+        e.Operation = s.EnumU8(nameof(Operation), e.Operation);                               // 2
+        targetType  = s.EnumU8(nameof(Target), targetType);                                   // 3
+        e.IsRandom  = s.UInt8(nameof(IsRandom), (byte)(e.IsRandom ? 1 : 0)) != 0;             // 4
+        targetId    = s.UInt8("TargetId", targetId);                                          // 5
+        e.ItemId    = ItemId.SerdesU16(nameof(ItemId), e.ItemId, AssetType.Item, mapping, s); // 6
+        e.Amount    = s.UInt16(nameof(Amount), e.Amount);                                     // 8
+        e.Target    = DataChangeEvent.PackTargetId(targetType, targetId);
         return e;
     }
-
-    public override ChangeProperty ChangeProperty => ChangeProperty.Item;
-    [EventPart("party_member")] public PartyMemberId PartyMemberId { get; private set; }
-    [EventPart("op")] public NumericOperation Operation { get; private set; }
-    [EventPart("amount")] public ushort Amount { get; private set; }
-    [EventPart("item")] public ItemId ItemId { get; private set; }
-    [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
 }

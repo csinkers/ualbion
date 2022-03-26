@@ -411,7 +411,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(50, map.Height);
         Assert.Equal(SpriteId.None, map.CombatBackgroundId);
         Assert.Equal(Song.Ethereal, map.SongId);
-        Assert.Equal(Palette.GlowyPlantDungeon, map.PaletteId);
+        Assert.Equal(Palette.Argim, map.PaletteId);
         Assert.Equal(Labyrinth.Argim, map.LabDataId);
         Assert.Equal(64, map.AutomapGraphics.Length);
         Assert.Equal(Song.DungeonAmbient, map.AmbientSongId);

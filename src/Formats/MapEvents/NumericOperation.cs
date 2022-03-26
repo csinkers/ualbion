@@ -6,7 +6,7 @@ public enum NumericOperation : byte
 {
     SetToMinimum = 0,
     SetToMaximum = 1,
-    Unk2 = 2,
+    Toggle = 2,
     SetAmount = 3,
     AddAmount = 4,
     SubtractAmount = 5,
@@ -21,7 +21,7 @@ public static class NumericOperationExtensions
         {
             NumericOperation.SetToMinimum => min,
             NumericOperation.SetToMaximum => max,
-            NumericOperation.Unk2 => existing,
+            NumericOperation.Toggle => existing,
             NumericOperation.SetAmount => immediate,
             NumericOperation.AddAmount => existing + immediate,
             NumericOperation.SubtractAmount => existing - immediate,

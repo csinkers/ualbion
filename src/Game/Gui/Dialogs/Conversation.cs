@@ -242,9 +242,9 @@ public class Conversation : Component
         yield return Build(Base.SystemText.Dialog_ItsBeenNiceTalkingToYou, 3);
     }
 
-    void OnDataChange(DataChangeEvent e)
+    void OnDataChange(IDataChangeEvent e)
     {
-        if (e is ChangeItemEvent cie && cie.Operation == NumericOperation.AddAmount)
+        if (e is ChangeItemEvent { Operation: NumericOperation.AddAmount } cie)
         {
             var transitionEvent = new LinearItemTransitionEvent(cie.ItemId,
                 (int)ConversationPositionRight.X,

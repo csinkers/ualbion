@@ -44,7 +44,7 @@ public class TestTilemap
         var tiles = new List<IReadOnlyTexture<byte>>
         {
             T16(null).FillAll(CBlack1).Texture,
-            T16(null).FillAll(CBlack1).Texture,
+            T16(null).FillAll(CBlack1).Border(CWhite).Texture,
             T16(null).FillAll(CGrey12).Texture,
         };
 

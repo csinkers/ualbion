@@ -110,7 +110,7 @@
     "Z": "+cursor_mode take"
   },
   "Inventory": {
-    "Control+A": "inv_take_all",
+    "Control+A": "take_all",
     "E": "inv:equip",
     "Escape": "inv:close",
     "Tab": "inv:close"

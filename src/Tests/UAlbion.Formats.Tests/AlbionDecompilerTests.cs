@@ -255,13 +255,13 @@ if (query_verb Examine) {
  80=>81: action Unk3D
 !81?82:!: in_party PartyMember.Mellthas
 !82?!:86: get_switch Switch.Switch597
- 83=>84: change_health PartyMember.Sira AddAmount 2 2
- 84=>85: change_health PartyMember.Mellthas AddAmount 2 2
+ 83=>84: change PartyMember.Sira Health AddAmount 2
+ 84=>85: change PartyMember.Mellthas Health AddAmount 2
 !85?86:!: is_conscious PartyMember.Mellthas
  86=>87: do_script Script.60
  87=>!: switch Set Switch.Switch597
  88=>89: action Unk2D 255
- 89=>90: change_item PartyMember.Sira SubtractAmount 1 Item.TriifalaiSeed 2
+ 89=>90: change_item PartyMember.Sira Item.TriifalaiSeed SubtractAmount 1
 !90?!:91: result
  91=>92: execute 1 65535
  92=>93: map_text EventText.Sira2 21 PortraitLeft PartyMember.Sira
@@ -273,7 +273,7 @@ if (query_verb Examine) {
  98=>99: map_text EventText.Sira2 25 PortraitLeft PartyMember.Sira
  99=>!: switch Set Switch.SiraAndTomDiscussedSeedSignificance
  100=>101: action Unk17 255
- 101=>102: change_item PartyMember.Sira SubtractAmount 1 Item.TriifalaiSeed 2
+ 101=>102: change_item PartyMember.Sira Item.TriifalaiSeed SubtractAmount 1
 !102?!:103: result
  103=>104: execute 1 65535
  104=>105: map_text EventText.Sira2 21 PortraitLeft PartyMember.Sira

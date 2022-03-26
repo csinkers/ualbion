@@ -27,7 +27,7 @@ public class SavedGame
     public static readonly DateTime Epoch = new(2200, 1, 1, 0, 0, 0);
 
     public string Name { get; set; }
-    public ushort Version { get; set; }
+    public uint Version { get; set; }
     public TimeSpan ElapsedTime { get; set; }
     public MapId MapId { get; set; }
     public MapId MapIdForNpcs { get; set; }
@@ -73,8 +73,8 @@ public class SavedGame
     }
 
     public ushort Unk0 { get; set; }
-    public uint Unk1 { get; set; }
-    public byte[] Unk9 { get; set; }
+    public uint MagicNumber { get; set; }
+    public uint Unk9 { get; set; }
     public ushort[] ActiveSpells { get; set; }
     public byte[] UnkB5 { get; set; }
     public MiscState Misc { get; private set; } = new();
@@ -107,28 +107,32 @@ public class SavedGame
         save.Unk0 = s.UInt16(nameof(Unk0), save.Unk0);
         save.Name = s.FixedLengthString(nameof(Name), save.Name, nameLength);
 
-        save.Unk1 = s.UInt32(nameof(Unk1), save.Unk1);
-        var versionOffset = s.Offset;
-        save.Version = s.UInt16(nameof(Version), save.Version); // 0
+        save.MagicNumber = s.UInt32(nameof(MagicNumber), save.MagicNumber);
+        ApiUtil.Assert(save.MagicNumber == 0x25051971, "Magic number was expected to be 0x25051971"); // Must be someone's birthday
+        save.Version = s.UInt32(nameof(Version), save.Version);
         ApiUtil.Assert(save.Version == 138); // TODO: Throw error for other versions?
-        save.Unk9 = s.Bytes(nameof(Unk9), save.Unk9, 6); // 2
 
-        ushort days = s.UInt16("Days", (ushort)save.ElapsedTime.TotalDays);  // 8
-        ushort hours = s.UInt16("Hours", (ushort)save.ElapsedTime.Hours);    // A
-        ushort minutes = s.UInt16("Minutes", (ushort)save.ElapsedTime.Minutes); // C
+        // ------------------------------
+        // ---- START OF GAME HEADER ----
+        // ------------------------------
+        var headerOffset = s.Offset;
+        save.Unk9 = s.UInt32(nameof(Unk9), save.Unk9, 4); // 0
+        ushort days = s.UInt16("Days", (ushort)save.ElapsedTime.TotalDays);  // 4
+        ushort hours = s.UInt16("Hours", (ushort)save.ElapsedTime.Hours);    // 6
+        ushort minutes = s.UInt16("Minutes", (ushort)save.ElapsedTime.Minutes); // 8
         save.ElapsedTime = new TimeSpan(days, hours, minutes, save.ElapsedTime.Seconds, save.ElapsedTime.Milliseconds);
-        save.MapId = MapId.SerdesU16(nameof(MapId), save.MapId, mapping, s);      // E
+        save.MapId = MapId.SerdesU16(nameof(MapId), save.MapId, mapping, s);      // A
         save.MapIdForNpcs = save.MapId;
-        save.PartyX = s.UInt16(nameof(PartyX), save.PartyX);   // 10
-        save.PartyY = s.UInt16(nameof(PartyY), save.PartyY);   // 12
-        save.PartyDirection = s.EnumU8(nameof(PartyDirection), save.PartyDirection); // 14
+        save.PartyX = s.UInt16(nameof(PartyX), save.PartyX);   // C
+        save.PartyY = s.UInt16(nameof(PartyY), save.PartyY);   // E
+        save.PartyDirection = s.EnumU8(nameof(PartyDirection), save.PartyDirection); // 10
 
         save.ActiveSpells = (ushort[])s.List( // [0] = Light spell % remaining?, [1] = Max Light%?
             nameof(ActiveSpells),
             save.ActiveSpells,
             0x50,
             (_, x,s2) => s2.UInt16(null, x),
-            n => new ushort[n]); // 15
+            n => new ushort[n]); // 11
 
         save.UnkB5 = s.Bytes(nameof(UnkB5), save.UnkB5, 0xE5);
 
@@ -143,8 +147,8 @@ public class SavedGame
                 return value;
             });
 
-        save.Misc = s.Object(nameof(Misc), save.Misc, MiscState.Serdes); // 1A6
-        save._switches.Serdes("Switches", s); // 276
+        save.Misc = s.Object(nameof(Misc), save.Misc, MiscState.Serdes); // 1A2
+        save._switches.Serdes("Switches", s); // 272
 
         // save._unk5Flags.Serdes("Unk5Flags", s);
         // save._unk6Flags.Serdes("Unk6Flags", s);
@@ -153,20 +157,21 @@ public class SavedGame
         // TODO: Chain, Door, Chest, Npc, KnownWord flag dictionaries. Known 3D automap info markers? Battle positions?
         save._disabledChains.Serdes("DisabledChains", s);
         save._removedNpcs.Serdes("RemovedNpcs", s); // 2f6 + 3e80 = 4176
-        save._automapMarkersFound.Serdes("AutomapMarkers", s); // 5976
-        save._unlockedChests.Serdes("UnlockedChests", s); // 5996
-        save._unlockedDoors.Serdes("UnlockedDoors", s); // 5A13
-        s.Object(nameof(Tickers), save._tickers, TickerSet.Serdes); // 5a90
+        save._automapMarkersFound.Serdes("AutomapMarkers", s); // 5972
+        save._unlockedChests.Serdes("UnlockedChests", s); // 5992
+        save._unlockedDoors.Serdes("UnlockedDoors", s); // 5A0E
+        s.Object(nameof(Tickers), save._tickers, TickerSet.Serdes); // 5A8C
 
-        ApiUtil.Assert(s.Offset - versionOffset == 0x5b90);
+        // ----------------------------
+        // ---- END OF GAME HEADER ----
+        // ----------------------------
+
+        ApiUtil.Assert(s.Offset - headerOffset == 0x5b8e);
         save.Unknown5B90 = s.Bytes(nameof(Unknown5B90), save.Unknown5B90, 0x2C);
         var mapType = MapType.TwoD;
         s.List(nameof(save.Npcs), save.Npcs, (mapType, mapping), NpcCountPerMap, NpcState.Serdes);
 
-        save.Unknown5B71 = s.Bytes(
-            nameof(Unknown5B71),
-            save.Unknown5B71,
-            0x8c0); // (int)(0x947C + versionOffset - s.Offset)); // 5B9F
+        save.Unknown5B71 = s.Bytes( nameof(Unknown5B71), save.Unknown5B71, 0x8c0);
 
         uint permChangesSize = s.UInt32("PermanentMapChanges_Size", (uint)(save.PermanentMapChanges.Count * MapChange.SizeOnDisk + 2));
         ushort permChangesCount = s.UInt16("PermanentMapChanges_Count", (ushort)save.PermanentMapChanges.Count);

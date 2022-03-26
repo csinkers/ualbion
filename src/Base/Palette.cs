@@ -2,7 +2,7 @@
 // ReSharper disable UnusedMember.Global
 namespace UAlbion.Base;
 
-public enum Palette : byte
+public enum Palette : byte // TODO: Add night/day lookup to metadata in assets.json
 {
     Common = 0,
     FirstIslandDay = 1,
@@ -10,7 +10,7 @@ public enum Palette : byte
     JirinaarDay = 3,
     DesertDay = 4,
     StoneyDay = 5,
-    IskaiIndoorLight = 6,
+    IskaiIndoorLight = 6, // Dark=20
     Toronto3D = 7,
     Light2D2 = 8,
     CeltDungeon2D = 9,
@@ -19,12 +19,12 @@ public enum Palette : byte
     Unknown12 = 12,
     Unknown13 = 13,
     Unknown14 = 14,
-    GlowyPlantDungeon = 15,
+    Argim = 15,
     Stoney2D = 16,
     Unknown17 = 17,
     Unknown18 = 18,
     Inventory = 19,
-    IskaiIndoorDark = 20,
+    IskaiIndoorDark = 20, // Light=6
     Unknown21 = 21,
     Unknown22 = 22,
     PlainsCombat = 23,
@@ -43,7 +43,7 @@ public enum Palette : byte
     PlantDungeonCombat = 36,
     CaveCombat = 37,
     TorontoCombat = 38,
-    LivingWallsCombat = 39,
+    ArgimCombat = 39,
     ForestCombat = 40,
     TownNightCombat = 41,
     TownCombat = 42,

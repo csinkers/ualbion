@@ -156,7 +156,7 @@ public class EventRoundTripTests
             ("action StartDialogue 1 Unknown.0",  new ActionEvent(ActionType.StartDialogue,  1, unknown0, 1)),
             ("action StartDialogue 1 Unknown.1",  new ActionEvent(ActionType.StartDialogue,  1, unknown1, 1)),
             ("action UnequipItem 1 Item.Pistol",  new ActionEvent(ActionType.UnequipItem,    1, (ItemId)Item.Pistol, 1)),
-            ("action UnkE 1 Unknown.0",           new ActionEvent(ActionType.UnkE,          1, unknown0, 1)),
+            ("action UnkE 1 Unknown.0",           new ActionEvent(ActionType.UnkE,           1, unknown0, 1)),
             ("action Unk17 1 Unknown.1",          new ActionEvent(ActionType.Unk17,          1, unknown1, 1)),
             ("action UseItem 1 Item.Pistol",      new ActionEvent(ActionType.UseItem,        1, (ItemId)Item.Pistol, 1)),
             ("action Word 1",                     new ActionEvent(ActionType.Word,           1, AssetId.None, 1)),
@@ -231,7 +231,7 @@ public class EventRoundTripTests
             "clone_automap Map.OldFormerBuilding Map.OldFormerBuildingPostFight",
             new CloneAutomapEvent(Map.OldFormerBuilding, Map.OldFormerBuildingPostFight));
     }
-
+/*
     [Fact]
     public void ChangeUnk0()
     {
@@ -273,26 +273,26 @@ public class EventRoundTripTests
             ("change_health PartyMember.Siobhan SetToMaximum 0 2", new ChangeHealthEvent(PartyMember.Siobhan, NumericOperation.SetToMaximum, 0, 2, 0)),
             ("change_health PartyMember.Drirr SetToMaximum 0 2", new ChangeHealthEvent(PartyMember.Drirr, NumericOperation.SetToMaximum, 0, 2, 0)));
     }
-
+*/
     [Fact]
     public void ChangeItem()
     {
-        Test(("change_item None AddAmount 1 Item.BlueHealingPotion", new ChangeItemEvent(PartyMemberId.None, NumericOperation.AddAmount, 1, Item.BlueHealingPotion, 0)),
-            ("change_item None SetToMinimum 0 Item.Canister", new ChangeItemEvent(PartyMemberId.None, NumericOperation.SetToMinimum, 0, Item.Canister, 0)),
-            ("change_item None SetToMinimum 1 Item.StrengthAmulet", new ChangeItemEvent(PartyMemberId.None, NumericOperation.SetToMinimum, 1, Item.StrengthAmulet, 0)),
-            ("change_item None SubtractAmount 1 Item.BlueStaff", new ChangeItemEvent(PartyMemberId.None, NumericOperation.SubtractAmount, 1, Item.BlueStaff, 0)),
-            ("change_item PartyMember.Sira SubtractAmount 1 Item.TriifalaiSeed 2", new ChangeItemEvent(PartyMember.Sira, NumericOperation.SubtractAmount, 1, Item.TriifalaiSeed, 2)),
-            ("change_item PartyMember.Tom AddAmount 1 Item.TheSeed 2", new ChangeItemEvent(PartyMember.Tom, NumericOperation.AddAmount, 1, Item.TheSeed, 2)));
+        Test(("change_item Target.Leader Item.BlueHealingPotion AddAmount 1",               new ChangeItemEvent(Target.Leader,    Item.BlueHealingPotion, NumericOperation.AddAmount,      1)),
+            ("change_item Target.Leader Item.Canister SetToMinimum",                      new ChangeItemEvent(Target.Leader,    Item.Canister,          NumericOperation.SetToMinimum,   0)),
+            ("change_item Target.Leader Item.StrengthAmulet SetToMinimum 1",                new ChangeItemEvent(Target.Leader,    Item.StrengthAmulet,    NumericOperation.SetToMinimum,   1)),
+            ("change_item Target.Leader Item.BlueStaff SubtractAmount 1",                   new ChangeItemEvent(Target.Leader,    Item.BlueStaff,         NumericOperation.SubtractAmount, 1)),
+            ("change_item PartyMember.Sira Item.TriifalaiSeed SubtractAmount 1", new ChangeItemEvent(PartyMember.Sira, Item.TriifalaiSeed,     NumericOperation.SubtractAmount, 1)),
+            ("change_item PartyMember.Tom Item.TheSeed AddAmount 1",             new ChangeItemEvent(PartyMember.Tom,  Item.TheSeed,           NumericOperation.AddAmount,      1)));
     }
 
     [Fact]
     public void ChangeLanguage()
     {
-        Test(("change_language None SetToMaximum Iskai 1", new ChangeLanguageEvent(PartyMemberId.None, NumericOperation.SetToMaximum, PlayerLanguage.Iskai, 1)),
-            ("change_language PartyMember.Rainer SetToMaximum Iskai 2", new ChangeLanguageEvent(PartyMember.Rainer, NumericOperation.SetToMaximum, PlayerLanguage.Iskai, 2)),
-            ("change_language PartyMember.Tom SetToMaximum Iskai 2", new ChangeLanguageEvent(PartyMember.Tom, NumericOperation.SetToMaximum, PlayerLanguage.Iskai, 2)));
+        Test(("change_language Target.Everyone Iskai SetToMaximum",   new ChangeLanguageEvent(Target.Everyone,    PlayerLanguage.Iskai, NumericOperation.SetToMaximum)),
+            ("change_language PartyMember.Rainer Iskai SetToMaximum", new ChangeLanguageEvent(PartyMember.Rainer, PlayerLanguage.Iskai, NumericOperation.SetToMaximum)),
+            ("change_language PartyMember.Tom Iskai SetToMaximum",    new ChangeLanguageEvent(PartyMember.Tom,    PlayerLanguage.Iskai, NumericOperation.SetToMaximum)));
     }
-
+/*
     [Fact]
     public void ChangeMana()
     {
@@ -301,18 +301,18 @@ public class EventRoundTripTests
             ("change_mana None SetToMaximum 0", new ChangeManaEvent(PartyMemberId.None, NumericOperation.SetToMaximum, 0, 0)),
             ("change_mana None SetToMaximum 0 1", new ChangeManaEvent(PartyMemberId.None, NumericOperation.SetToMaximum, 0, 1)));
     }
-
+*/
     [Fact]
     public void ChangeStatus()
     {
-        Test(("change_status None SetToMaximum 0 Intoxicated", new ChangeStatusEvent(PartyMemberId.None, NumericOperation.SetToMaximum, 0, PlayerCondition.Intoxicated, 0)),
-            ("change_status None SetToMaximum 0 Irritated", new ChangeStatusEvent(PartyMemberId.None, NumericOperation.SetToMaximum, 0, PlayerCondition.Irritated, 0)),
-            ("change_status None SetToMaximum 3 Unconscious 1", new ChangeStatusEvent(PartyMemberId.None, NumericOperation.SetToMaximum, 3, PlayerCondition.Unconscious, 1)),
-            ("change_status None SetToMinimum 0 Poisoned 7", new ChangeStatusEvent(PartyMemberId.None, NumericOperation.SetToMinimum, 0, PlayerCondition.Poisoned, 7)),
-            ("change_status None SetToMinimum 10 Unconscious", new ChangeStatusEvent(PartyMemberId.None, NumericOperation.SetToMinimum, 10, PlayerCondition.Unconscious, 0)),
-            ("change_status None SetToMinimum 3 Unconscious 1", new ChangeStatusEvent(PartyMemberId.None, NumericOperation.SetToMinimum, 3, PlayerCondition.Unconscious, 1)));
+        Test(("change_status Target.Leader Intoxicated SetToMaximum",    new ChangeStatusEvent(Target.Leader,   PlayerCondition.Intoxicated, NumericOperation.SetToMaximum)),
+            ("change_status Target.Leader Irritated SetToMaximum",       new ChangeStatusEvent(Target.Leader,   PlayerCondition.Irritated,   NumericOperation.SetToMaximum)),
+            ("change_status Target.Everyone Unconscious SetToMaximum 3", new ChangeStatusEvent(Target.Everyone, PlayerCondition.Unconscious, NumericOperation.SetToMaximum,  3)),
+            ("change_status Target.Unk7 Poisoned SetToMinimum",        new ChangeStatusEvent(Target.Unk7,     PlayerCondition.Poisoned,    NumericOperation.SetToMinimum)),
+            ("change_status Target.Leader Unconscious SetToMinimum 10",  new ChangeStatusEvent(Target.Leader,   PlayerCondition.Unconscious, NumericOperation.SetToMinimum, 10)),
+            ("change_status Target.Everyone Unconscious SetToMinimum 3", new ChangeStatusEvent(Target.Everyone, PlayerCondition.Unconscious, NumericOperation.SetToMinimum,  3)));
     }
-
+/*
     [Fact]
     public void ChangeUnkB()
     {
@@ -320,7 +320,7 @@ public class EventRoundTripTests
             ("change_unkb 220 SetAmount 220 228 5", new ChangeUnkBEvent(220, NumericOperation.SetAmount, 220, 228, 5)),
             ("change_unkb 237 SetAmount 255 0 5", new ChangeUnkBEvent(237, NumericOperation.SetAmount, 255, 0, 5)));
     }
-
+*/
     [Fact]
     public void DisableEventChain()
     {

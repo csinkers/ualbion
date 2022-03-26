@@ -12,9 +12,9 @@ public class SpellManager : ServiceComponent<ISpellManager>, ISpellManager
 {
     readonly Dictionary<(SpellClass, byte), SpellId> _lookup = new();
     readonly Dictionary<SpellId, SpellData> _spells = new();
+    bool _loaded;
 
-    public SpellManager() => On<ModsLoadedEvent>(_ => Reload());
-
+    public SpellManager() => On<ModsLoadedEvent>(_ => _loaded = false);
     void Reload()
     {
         _lookup.Clear();
@@ -30,11 +30,19 @@ public class SpellManager : ServiceComponent<ISpellManager>, ISpellManager
             _lookup[(spell.Class, spell.OffsetInClass)] = id;
             _spells[id] = spell;
         }
+
+        _loaded = true;
     }
 
-    public SpellId GetSpellId(SpellClass school, byte number) 
-        => _lookup.TryGetValue((school, number), out var id) ? id : SpellId.None;
+    public SpellId GetSpellId(SpellClass school, byte number)
+    {
+        if (!_loaded) Reload();
+        return _lookup.TryGetValue((school, number), out var id) ? id : SpellId.None;
+    }
 
     public SpellData GetSpellOrDefault(SpellId id)
-        => _spells.TryGetValue(id, out var spell) ? spell : null;
+    {
+        if (!_loaded) Reload();
+        return _spells.TryGetValue(id, out var spell) ? spell : null;
+    }
 }

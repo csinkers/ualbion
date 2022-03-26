@@ -43,6 +43,7 @@
     "stext":    { "AssetType": "Text",               "EnumType": "UAlbion.Base.SystemText, UAlbion.Base" },
     "switch":   { "AssetType": "Switch",             "EnumType": "UAlbion.Base.Switch, UAlbion.Base" },
     "tacgfx":   { "AssetType": "TacticalIcon",       "EnumType": "UAlbion.Base.TacticalGraphics, UAlbion.Base" },
+    "target":   { "AssetType": "Target",             "EnumType": "UAlbion.Base.Target, UAlbion.Base" },
     "ticker":   { "AssetType": "Ticker",             "EnumType": "UAlbion.Base.Ticker, UAlbion.Base" },
     "tiledata": { "AssetType": "Tileset",            "EnumType": "UAlbion.Base.Tileset, UAlbion.Base" },
     "tilegfx":  { "AssetType": "TilesetGraphics",    "EnumType": "UAlbion.Base.TilesetGraphics, UAlbion.Base" },

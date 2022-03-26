@@ -7,34 +7,41 @@ using UAlbion.Formats.Assets;
 namespace UAlbion.Formats.MapEvents;
 
 [Event("change_language")]
-public class ChangeLanguageEvent : DataChangeEvent
+public class ChangeLanguageEvent : MapEvent, IDataChangeEvent
 {
+    public override MapEventType EventType => MapEventType.DataChange;
+    public ChangeProperty ChangeProperty => ChangeProperty.Language;
+    [EventPart("target")] public TargetId Target { get; private set; }
+    [EventPart("language")] public PlayerLanguage Language { get; private set; }
+    [EventPart("op")] public NumericOperation Operation { get; private set; }
+    [EventPart("amount", true, (ushort)0)] public ushort Amount { get; private set; }
+    [EventPart("random", true, false)] public bool IsRandom { get; private set; }
+
     ChangeLanguageEvent() { }
-    public ChangeLanguageEvent(PartyMemberId partyMemberId, NumericOperation operation, PlayerLanguage language, byte unk3)
+    public ChangeLanguageEvent(TargetId target, PlayerLanguage language, NumericOperation operation, ushort amount = 0, bool isRandom = false)
     {
-        PartyMemberId = partyMemberId;
-        Operation = operation;
+        Target = target;
         Language = language;
-        Unk3 = unk3;
+        Operation = operation;
+        Amount = amount;
+        IsRandom = isRandom;
     }
 
     public static ChangeLanguageEvent Serdes(ChangeLanguageEvent e, AssetMapping mapping, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         e ??= new ChangeLanguageEvent();
-        e.Operation = s.EnumU8(nameof(Operation), e.Operation);
-        e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
+        var (targetType, targetId) = DataChangeEvent.UnpackTargetId(e.Target);
+        e.Operation = s.EnumU8(nameof(Operation), e.Operation);                   // 2
+        targetType  = s.EnumU8(nameof(Target), targetType);                       // 3
+        e.IsRandom  = s.UInt8(nameof(IsRandom), (byte)(e.IsRandom ? 1 : 0)) != 0; // 4
+        targetId    = s.UInt8("TargetId", targetId);                              // 5
+        e.Language  = s.EnumU8(nameof(Language), e.Language);                     // 6
+        e.Target = DataChangeEvent.PackTargetId(targetType, targetId);
+
         int zeroed = s.UInt8(null, 0);
-        e.PartyMemberId = PartyMemberId.SerdesU8(nameof(PartyMemberId), e.PartyMemberId, mapping, s);
-        e.Language = s.EnumU8(nameof(Language), e.Language);
-        s.UInt8(null, 0);
         zeroed += s.UInt16(null, 0);
-        s.Assert(zeroed == 0, "ChangeLanguageEvent: Expected byte 4 to be 0");
+        s.Assert(zeroed == 0, "ChangeLanguageEvent: Expected bytes 7 through 10 to be zero in ChangeLanguageEvent");
         return e;
     }
-    public override ChangeProperty ChangeProperty => ChangeProperty.Language;
-    [EventPart("party_member")] public PartyMemberId PartyMemberId { get; private set; }
-    [EventPart("op")] public NumericOperation Operation { get; private set; }
-    [EventPart("language")] public PlayerLanguage Language { get; private set; }
-    [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
 }

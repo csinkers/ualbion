@@ -16,7 +16,7 @@ public enum TacticalGraphics : byte
     Siobhan = 10,
     Drunk2 = 11,
     Drunk3 = 12,
-    Fear = 13,
+    Fear = 13, // Monster tac icons are hardcoded to be 12 above their MonsterGraphics id
     Unused14 = 14,
     Unused15 = 15,
     Brogg1 = 16,

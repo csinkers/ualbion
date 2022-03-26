@@ -35,6 +35,11 @@ public class InventoryScreenManager : Component
         });
         On<InventoryCloseEvent>(_ => InventoryClosed());
         On<LockOpenedEvent>(_ => LockOpened());
+        On<TakeAllEvent>(_ =>
+        {
+            if (_modeEvent is ChestEvent chest)
+                Raise(new InventoryTakeAllEvent(chest.ChestId));
+        });
     }
 
     bool TalkToMerchant(MerchantEvent e, Action continuation)

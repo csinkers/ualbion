@@ -211,15 +211,15 @@ if (query_verb Examine) {
  36=>!: map_text EventText.Sira2 3
  37=>38: action DialogueLine 11 Unknown.8
  38=>!: map_text EventText.Sira2 9
- 39=>40: action Word 0 Word.Former
+ 39=>40: action Word 0 Word.DjiFadh
 !40?41:42: event_used
  41=>!: map_text EventText.Sira2 5
  42=>!: map_text EventText.Sira2 4
- 43=>44: action Word 0 Word.Magician
+ 43=>44: action Word 0 Word.DjiKas
  44=>!: map_text EventText.Sira2 6
- 45=>46: action Word 0 Word.Guild1
+ 45=>46: action Word 0 Word.Magic1
  46=>!: map_text EventText.Sira2 6
- 47=>48: action Word 0 Word.GuildHouse
+ 47=>48: action Word 0 Word.Triifalai
  48=>!: map_text EventText.Sira2 10
  49=>50: action AskAboutItem 255 Item.TriifalaiSeed
  50=>!: map_text EventText.Sira2 10
@@ -284,7 +284,7 @@ if (query_verb Examine) {
  109=>110: map_text EventText.Sira2 24 PortraitLeft PartyMember.Tom
  110=>111: map_text EventText.Sira2 25 PortraitLeft PartyMember.Sira
  111=>!: switch Set Switch.SiraAndTomDiscussedSeedSignificance
- 112=>113: action Word 0 Word.Stri
+ 112=>113: action Word 0 Word.Akiir
  113=>!: map_text EventText.Sira2 38";
 
         var lines = ApiUtil.SplitLines(script);

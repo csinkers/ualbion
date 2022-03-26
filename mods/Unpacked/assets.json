@@ -186,26 +186,56 @@
       "Map": { "100": { "Id": "mtext.100" } }
     },
 
-    "dummy2": { "Language": "GERMAN",  "Loader": "wordCollector", "Container": "dummy", "Max": 2, "Map": { "0": { "Id": "special.Words1" }, "1": { "Id": "special.Words2" }, "2": { "Id": "special.Words3" } } },
-    "dummy3": { "Language": "ENGLISH", "Loader": "wordCollector", "Container": "dummy", "Max": 2, "Map": { "0": { "Id": "special.Words1" }, "1": { "Id": "special.Words2" }, "2": { "Id": "special.Words3" } } },
-    "dummy4": { "Language": "FRENCH",  "Loader": "wordCollector", "Container": "dummy", "Max": 2, "Map": { "0": { "Id": "special.Words1" }, "1": { "Id": "special.Words2" }, "2": { "Id": "special.Words3" } } },
+    "dummy2": {
+      "Language": "GERMAN",
+      "Loader": "wordCollector",
+      "Container": "dummy",
+      "Max": 2,
+      "Map": {
+        "0": { "Id": "special.Words1" },
+        "1": { "Id": "special.Words2" },
+        "2": { "Id": "special.Words3" }
+      }
+    },
+    "dummy3": {
+      "Language": "ENGLISH",
+      "Loader": "wordCollector",
+      "Container": "dummy",
+      "Max": 2,
+      "Map": {
+        "0": { "Id": "special.Words1" },
+        "1": { "Id": "special.Words2" },
+        "2": { "Id": "special.Words3" }
+      }
+    },
+    "dummy4": {
+      "Language": "FRENCH",
+      "Loader": "wordCollector",
+      "Container": "dummy",
+      "Max": 2,
+      "Map": {
+        "0": { "Id": "special.Words1" },
+        "1": { "Id": "special.Words2" },
+        "2": { "Id": "special.Words3" }
+      }
+    },
     "$(MOD)/Assets/WordsDE.json": {
       "Language": "GERMAN",
       "Loader": "utf8",
       "Container": "jsonStrings",
-      "Map": { "1": { "Id": "word.1"    } }
+      "Map": { "0": { "Id": "word.0"    } }
     },
     "$(MOD)/Assets/WordsEN.json": {
       "Language": "ENGLISH",
       "Loader": "utf8",
       "Container": "jsonStrings",
-      "Map": { "1": { "Id": "word.1"    } }
+      "Map": { "0": { "Id": "word.0"    } }
     },
     "$(MOD)/Assets/WordsFR.json": {
       "Language": "FRENCH",
       "Loader": "utf8",
       "Container": "jsonStrings",
-      "Map": { "1": { "Id": "word.1"    } }
+      "Map": { "0": { "Id": "word.0"    } }
     },
 
     "$(MOD)/Assets/Automap/1": { "Loader": "png", "Container": "dir", "Pattern": "{0}_{1:000}_p{3}_{2}.png", "Max": 1, "Map": { "1": { "Id": "autotile.1" } } },

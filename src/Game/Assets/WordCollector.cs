@@ -23,9 +23,9 @@ public class WordCollector : Component, IAssetLoader<ListStringCollection>
 
         var predicate = info.AssetId switch
         {
-            { } x when x == Words1 => (Func<int, bool>)(x => x <= 500),
-            { } x when x == Words2 => (Func<int, bool>)(x => x > 500 && x <= 1000),
-            { } x when x == Words3 => (Func<int, bool>)(x => x > 1000),
+            { } x when x == Words1 => (Func<int, bool>)(y => y < 500),
+            { } x when x == Words2 => y => y is >= 500 and < 1000,
+            { } x when x == Words3 => y => y >= 1000,
             _ => throw new ArgumentOutOfRangeException(nameof(info))
         };
 
@@ -48,7 +48,7 @@ public class WordCollector : Component, IAssetLoader<ListStringCollection>
             list.Add(null);
 
         foreach (var kvp in dict)
-            list[kvp.Key - 1] = kvp.Value;
+            list[kvp.Key] = kvp.Value;
         return list;
     }
 

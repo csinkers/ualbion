@@ -59,9 +59,9 @@
     "itemname.*":     "special.ItemNames",
     "stext.*":        "special.SystemStrings",
     "utext.*":        "special.UAlbionStrings",
-    "word.1-500":     "special.Words1:0",
-    "word.501-1000":  "special.Words2:500",
-    "word.1001-1500": "special.Words3:1000"
+    "word.0-499":     "special.Words1:0",
+    "word.500-999":   "special.Words2:500",
+    "word.1000-1499": "special.Words3:1000"
   },
 
   "Loaders": {

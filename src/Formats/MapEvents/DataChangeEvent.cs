@@ -38,9 +38,14 @@ public sealed class DataChangeEvent : MapEvent, IDataChangeEvent
         var property = s.EnumU8(nameof(MapEvents.ChangeProperty), existing?.ChangeProperty ?? ChangeProperty.Attribute); // 1
         switch (property)
         {
-            case ChangeProperty.Item:     return ChangeItemEvent.Serdes((ChangeItemEvent)existing, mapping, s);
-            case ChangeProperty.Status:   return ChangeStatusEvent.Serdes((ChangeStatusEvent)existing, mapping, s);
-            case ChangeProperty.Language: return ChangeLanguageEvent.Serdes((ChangeLanguageEvent)existing, mapping, s);
+            case ChangeProperty.Item:        return ChangeItemEvent     .Serdes(     (ChangeItemEvent)existing, mapping, s);
+            case ChangeProperty.Status:      return ChangeStatusEvent   .Serdes(   (ChangeStatusEvent)existing, mapping, s);
+            case ChangeProperty.Language:    return ChangeLanguageEvent .Serdes( (ChangeLanguageEvent)existing, mapping, s);
+            case ChangeProperty.Attribute:   return ChangeAttributeEvent.Serdes((ChangeAttributeEvent)existing, mapping, s);
+            case ChangeProperty.Skill:       return ChangeSkillEvent    .Serdes(    (ChangeSkillEvent)existing, mapping, s);
+            case ChangeProperty.EventSetId:  return ChangeEventSetEvent .Serdes( (ChangeEventSetEvent)existing, mapping, s);
+            case ChangeProperty.WordSetId:   return ChangeWordSetEvent  .Serdes(  (ChangeWordSetEvent)existing, mapping, s);
+            case ChangeProperty.KnownSpells: return ChangeSpellsEvent   .Serdes(   (ChangeSpellsEvent)existing, mapping, s);
         }
 
         var e = (DataChangeEvent)(existing ?? new DataChangeEvent());

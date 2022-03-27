@@ -308,7 +308,7 @@ public class EventRoundTripTests
         Test(("change_status Target.Leader Intoxicated SetToMaximum",    new ChangeStatusEvent(Target.Leader,   PlayerCondition.Intoxicated, NumericOperation.SetToMaximum)),
             ("change_status Target.Leader Irritated SetToMaximum",       new ChangeStatusEvent(Target.Leader,   PlayerCondition.Irritated,   NumericOperation.SetToMaximum)),
             ("change_status Target.Everyone Unconscious SetToMaximum 3", new ChangeStatusEvent(Target.Everyone, PlayerCondition.Unconscious, NumericOperation.SetToMaximum,  3)),
-            ("change_status Target.Unk7 Poisoned SetToMinimum",        new ChangeStatusEvent(Target.Unk7,     PlayerCondition.Poisoned,    NumericOperation.SetToMinimum)),
+            ("change_status Target.LastMessageTarget Poisoned SetToMinimum", new ChangeStatusEvent(Target.LastMessageTarget, PlayerCondition.Poisoned, NumericOperation.SetToMinimum)),
             ("change_status Target.Leader Unconscious SetToMinimum 10",  new ChangeStatusEvent(Target.Leader,   PlayerCondition.Unconscious, NumericOperation.SetToMinimum, 10)),
             ("change_status Target.Everyone Unconscious SetToMinimum 3", new ChangeStatusEvent(Target.Everyone, PlayerCondition.Unconscious, NumericOperation.SetToMinimum,  3)));
     }

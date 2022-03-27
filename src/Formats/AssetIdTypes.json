@@ -41,7 +41,7 @@
     "TargetId": [
       "Target",
       "Party",
-      "LocalNpc"
+      "Npc"
     ],
 
     "ItemId": [

@@ -286,7 +286,7 @@ public class CharacterSheet : ICharacterSheet
                 }
             }
         }
-        ApiUtil.Assert(s.Offset - initialOffset == 742, "Expected common sheet data to be 742 bytes");
+        ApiUtil.Assert(s.Offset - initialOffset == 742, "Expected common sheet data to be 742 bytes"); // 742=2E6
 
         if (sheet.Type == CharacterType.Npc)
         {
@@ -297,7 +297,7 @@ public class CharacterSheet : ICharacterSheet
         if (sheet.Type == CharacterType.Party)
         {
             Inventory.SerdesCharacter(id.Id, sheet.Inventory, mapping, s);
-            ApiUtil.Assert(s.Offset - initialOffset == 940, "Expected player character sheet to be 940 bytes");
+            ApiUtil.Assert(s.Offset - initialOffset == 940, "Expected player character sheet to be 940 bytes"); // 940=3AC
             s.End();
             return sheet;
         }
@@ -306,7 +306,7 @@ public class CharacterSheet : ICharacterSheet
         Inventory.SerdesMonster(id.Id, sheet.Inventory, mapping, s);
         sheet.Monster = MonsterData.Serdes(sheet.Monster, mapping, s);
         // sheet.UnkMonster = s.Bytes(nameof(UnkMonster), sheet.UnkMonster, 328);
-        ApiUtil.Assert(s.Offset - initialOffset == 1214, "Expected monster character sheet to be 1214 bytes");
+        ApiUtil.Assert(s.Offset - initialOffset == 1214, "Expected monster character sheet to be 1214 bytes"); // 1214=4BE
         s.End();
         return sheet;
     }

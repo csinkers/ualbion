@@ -19,7 +19,7 @@ public readonly struct TargetId : IEquatable<TargetId>, IEquatable<AssetId>, ICo
     readonly uint _value;
     public TargetId(AssetType type, int id = 0)
     {
-        if (!(type == AssetType.None || type == AssetType.Party || type >= AssetType.LocalNpc && type <= AssetType.Target))
+        if (!(type == AssetType.None || type >= AssetType.Npc && type <= AssetType.Party || type == AssetType.Target))
             throw new ArgumentOutOfRangeException($"Tried to construct a TargetId with a type of {type}");
 #if DEBUG
         if (id < 0 || id > 0xffffff)
@@ -31,7 +31,7 @@ public readonly struct TargetId : IEquatable<TargetId>, IEquatable<AssetId>, ICo
     TargetId(uint id) 
     {
         _value = id;
-        if (!(Type == AssetType.None || Type == AssetType.Party || Type >= AssetType.LocalNpc && Type <= AssetType.Target))
+        if (!(Type == AssetType.None || Type >= AssetType.Npc && Type <= AssetType.Party || Type == AssetType.Target))
             throw new ArgumentOutOfRangeException($"Tried to construct a TargetId with a type of {Type}");
     }
 
@@ -48,7 +48,7 @@ public readonly struct TargetId : IEquatable<TargetId>, IEquatable<AssetId>, ICo
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
         
-        if (!(type == AssetType.None || type == AssetType.Party || type >= AssetType.LocalNpc && type <= AssetType.Target))
+        if (!(type == AssetType.None || type >= AssetType.Npc && type <= AssetType.Party || type == AssetType.Target))
             throw new ArgumentOutOfRangeException($"Tried to construct a TargetId with a type of {type}");
 
         var (enumType, enumValue) = mapping.IdToEnum(new TargetId(type, disk));
@@ -95,11 +95,12 @@ public readonly struct TargetId : IEquatable<TargetId>, IEquatable<AssetId>, ICo
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
     public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
-    public static AssetType[] ValidTypes = { AssetType.Target, AssetType.Party, AssetType.LocalNpc };
+    public static AssetType[] ValidTypes = { AssetType.Target, AssetType.Party, AssetType.Npc };
     public static TargetId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 
     public static implicit operator AssetId(TargetId id) => AssetId.FromUInt32(id._value);
     public static implicit operator TargetId(AssetId id) => new TargetId(id.ToUInt32());
+    public static implicit operator TargetId(UAlbion.Base.Npc id) => TargetId.From(id);
     public static implicit operator TargetId(UAlbion.Base.PartyMember id) => TargetId.From(id);
     public static implicit operator TargetId(UAlbion.Base.Target id) => TargetId.From(id);
 

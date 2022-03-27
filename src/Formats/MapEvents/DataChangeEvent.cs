@@ -35,7 +35,7 @@ public sealed class DataChangeEvent : MapEvent, IDataChangeEvent
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (s.IsWriting() && existing == null) throw new ArgumentNullException(nameof(existing));
 
-        var property = s.EnumU8(nameof(MapEvents.ChangeProperty), existing?.ChangeProperty ?? ChangeProperty.Unk0); // 1
+        var property = s.EnumU8(nameof(MapEvents.ChangeProperty), existing?.ChangeProperty ?? ChangeProperty.Attribute); // 1
         switch (property)
         {
             case ChangeProperty.Item:     return ChangeItemEvent.Serdes((ChangeItemEvent)existing, mapping, s);
@@ -63,34 +63,31 @@ public sealed class DataChangeEvent : MapEvent, IDataChangeEvent
         switch (target.Type)
         {
             case AssetType.Target:
-                if (target == Base.Target.Leader) return (DataChangeTarget.PartyLeader, 0);
-                if (target == Base.Target.Everyone) return (DataChangeTarget.AllMembers, 0);
-                if (target == Base.Target.Inventory) return (DataChangeTarget.InventoryPic, 0);
-                // if (target == Base.Target.CombatActor) return (DataChangeTarget.Unk3, 0);
-                // if (target == Base.Target.CombatTarget) return (DataChangeTarget.Unk4, 0);
-                // if (target == Base.Target.ConversationLeft) return (DataChangeTarget.Unk7, 0);
-                // if (target == Base.Target.ConversationRight) return (DataChangeTarget.AllMembers, 0);
-                return (DataChangeTarget.PartyLeader, 0);
+                if (target == Base.Target.Leader) return (DataChangeTarget.Leader, 0);
+                if (target == Base.Target.Everyone) return (DataChangeTarget.Everyone, 0);
+                if (target == Base.Target.Inventory) return (DataChangeTarget.Inventory, 0);
+                if (target == Base.Target.Attacker) return (DataChangeTarget.Attacker, 0);
+                if (target == Base.Target.Target) return (DataChangeTarget.Target, 0);
+                if (target == Base.Target.LastMessageTarget) return (DataChangeTarget.LastMessageTarget, 0);
+                return (DataChangeTarget.Leader, 0);
 
-            case AssetType.LocalNpc: return (DataChangeTarget.Npc, (byte)target.Id);
+            case AssetType.Npc: return (DataChangeTarget.Npc, (byte)target.Id);
             case AssetType.Party: return (DataChangeTarget.SpecificMember, (byte)target.Id);
-            default: return (DataChangeTarget.PartyLeader, 0);
+            default: return (DataChangeTarget.Leader, 0);
         }
     }
 
-    public static TargetId PackTargetId(DataChangeTarget targetType, byte targetId)
-    {
-        switch (targetType)
+    public static TargetId PackTargetId(DataChangeTarget targetType, byte targetId) =>
+        targetType switch
         {
-            case DataChangeTarget.PartyLeader: return Base.Target.Leader;
-            case DataChangeTarget.AllMembers: return Base.Target.Everyone;
-            case DataChangeTarget.SpecificMember: return new PartyMemberId(AssetType.Party, targetId);
-            case DataChangeTarget.Npc: return new TargetId(AssetType.LocalNpc, targetId);
-            // case DataChangeTarget.Unk3: break;
-            // case DataChangeTarget.Unk4: break;
-            // case DataChangeTarget.InventoryPic: break;
-            // case DataChangeTarget.Unk7: break;
-            default: return TargetId.None;
-        }
-    }
+            DataChangeTarget.Leader => Base.Target.Leader,
+            DataChangeTarget.Everyone => Base.Target.Everyone,
+            DataChangeTarget.SpecificMember => new PartyMemberId(AssetType.Party, targetId),
+            DataChangeTarget.Npc => new TargetId(AssetType.Npc, targetId),
+            DataChangeTarget.Attacker => Base.Target.Attacker,
+            DataChangeTarget.Target => Base.Target.Target,
+            DataChangeTarget.Inventory => Base.Target.Inventory,
+            DataChangeTarget.LastMessageTarget => Base.Target.LastMessageTarget,
+            _ => TargetId.None
+        };
 }

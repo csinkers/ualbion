@@ -1,7 +1,9 @@
-﻿using UAlbion.Formats;
+﻿using UAlbion.Config;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game.Entities.Map2D;
+using UAlbion.TestCommon;
 using Xunit;
 
 namespace UAlbion.Game.Tests;
@@ -29,7 +31,11 @@ public class PlayerMovementTests
             return (Passability)Map[index];
         });
 
-        var m = new PlayerMovementState(MovementSettings.Large)
+        var disk = new MockFileSystem(true);
+        var json = new FormatJsonUtil();
+        var configProvider = new ConfigProvider(ConfigUtil.FindBasePath(disk), disk, json);
+        var moveSettings = new MovementSettings(true, configProvider);
+        var m = new PlayerMovementState(moveSettings)
         {
             X = 2,
             Y = 3,

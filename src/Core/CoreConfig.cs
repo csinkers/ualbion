@@ -4,6 +4,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Core;
 #pragma warning disable CA1034 // Nested types should not be visible
+
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
 public class CoreConfig
 {

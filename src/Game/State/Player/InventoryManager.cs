@@ -271,7 +271,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         if (slot == null)
             return false;
 
-        var config = Resolve<GameConfig>();
+        var config = Resolve<IGameConfigProvider>().Game;
         var cursorManager = Resolve<ICursorManager>();
         var window = Resolve<IWindowManager>();
         var cursorUiPosition = window.PixelToUi(cursorManager.Position);
@@ -439,7 +439,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
 
                 if (!slot.ItemId.IsNone)
                 {
-                    var config = Resolve<GameConfig>();
+                    var config = Resolve<IGameConfigProvider>().Game;
                     for (int i = 0; i < itemsToDrop && i < config.UI.Transitions.MaxDiscardTransitions; i++)
                         Raise(new GravityItemTransitionEvent(slot.ItemId, e.NormX, e.NormY));
                 }

@@ -101,7 +101,7 @@ public class MapLayer : Component, IMapLayer
 
     void Render()
     {
-        var config = Resolve<GameConfig>();
+        var config = Resolve<IGameConfigProvider>().Game;
         var frameCount =  (Resolve<IGameState>()?.TickCount ?? 0) / config.Time.FastTicksPerMapTileFrame;
 #if DEBUG
         var debug = Resolve<IDebugSettings>()?.DebugFlags ?? 0;

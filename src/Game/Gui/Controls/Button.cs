@@ -84,8 +84,8 @@ public class Button : UiElement
             }
             else // For the first click, just start the double-click timer.
             {
-                var config = Resolve<GameConfig>();
-                Raise(new StartTimerEvent(TimerName, config.UI.ButtonDoubleClickIntervalSeconds, this));
+                var uiConfig = Resolve<IGameConfigProvider>().Game.UI;
+                Raise(new StartTimerEvent(TimerName, uiConfig.ButtonDoubleClickIntervalSeconds, this));
                 ClickTimerPending = true;
             }
         });

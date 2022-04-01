@@ -8,6 +8,7 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Entities.Map2D;
@@ -26,6 +27,7 @@ public class Npc2D : Component
     readonly MapSprite _sprite;
     readonly byte _npcNumber;
     readonly bool _isLarge;
+    IMovementSettings _moveSettings;
     // int _frameCount;
     int _targetX;
     int _targetY;
@@ -60,7 +62,6 @@ public class Npc2D : Component
         OnDirectCall<NpcUnlockEvent>(_ => Lock(false));
     }
 
-    IMovementSettings MoveSettings => _isLarge ? MovementSettings.Large : MovementSettings.Small;
     void Update()
     {
         switch (_state.MovementType)
@@ -83,7 +84,7 @@ public class Npc2D : Component
         var detector = Resolve<ICollisionManager>();
         if (Movement2D.Update(
                 _state,
-                MoveSettings,
+                _moveSettings,
                 detector,
                 _targetX - _state.X,
                 _targetY - _state.Y,
@@ -91,9 +92,9 @@ public class Npc2D : Component
         {
             _sprite.TilePosition =
                 new Vector3(
-                    _state.PixelX / MoveSettings.TileWidth,
-                    _state.PixelY / MoveSettings.TileHeight,
-                    MoveSettings.GetDepth(_state.Y));
+                    _state.PixelX / _moveSettings.TileWidth,
+                    _state.PixelY / _moveSettings.TileHeight,
+                    _moveSettings.GetDepth(_state.Y));
             // _sprite.Frame = 
         }
     }
@@ -119,6 +120,7 @@ public class Npc2D : Component
 
     protected override void Subscribed()
     {
+        _moveSettings ??= new MovementSettings(_isLarge, Resolve<IGameConfigProvider>());
         _sprite.TilePosition = new Vector3(
             _state.X,
             _state.Y,

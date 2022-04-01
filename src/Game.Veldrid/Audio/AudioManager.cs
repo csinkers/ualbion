@@ -242,7 +242,7 @@ public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManage
     void AudioThread()
     {
         using var device = new AudioDevice { DistanceModel = DistanceModel.InverseDistance };
-        var config = Resolve<GameConfig>();
+        var config = Resolve<IGameConfigProvider>().Game;
 
         while (!_doneEvent.WaitOne((int)(config.Audio.AudioPollIntervalSeconds * 1000)))
         {

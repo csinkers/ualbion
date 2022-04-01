@@ -56,7 +56,7 @@ public class ItemTransitionManager : Component
         Action continuation)
     {
         var assets = Resolve<IAssetManager>();
-        var config = Resolve<GameConfig>().UI.Transitions;
+        var transitionConfig = Resolve<IGameConfigProvider>().Game.UI.Transitions;
         var window = Resolve<IWindowManager>();
         var destPosition = window.UiToNorm(toUiPosition); // Tom's portrait, hardcoded for now.
 
@@ -72,7 +72,7 @@ public class ItemTransitionManager : Component
                     Base.CoreSprite.UiGold, 0,
                     fromNormPosition,
                     destPosition,
-                    transitionTimeSeconds ?? config.DefaultTransitionTimeSeconds,
+                    transitionTimeSeconds ?? transitionConfig.DefaultTransitionTimeSeconds,
                     window.UiToNormRelative(subImageDetails.Size),
                     continuation));
                 break;
@@ -87,7 +87,7 @@ public class ItemTransitionManager : Component
                     Base.CoreSprite.UiFood, 0,
                     fromNormPosition,
                     destPosition,
-                    transitionTimeSeconds ?? config.DefaultTransitionTimeSeconds,
+                    transitionTimeSeconds ?? transitionConfig.DefaultTransitionTimeSeconds,
                     window.UiToNormRelative(subImageDetails.Size),
                     continuation));
                 break;
@@ -102,7 +102,7 @@ public class ItemTransitionManager : Component
                     item.Icon, item.IconSubId,
                     fromNormPosition,
                     destPosition,
-                    transitionTimeSeconds ?? config.DefaultTransitionTimeSeconds,
+                    transitionTimeSeconds ?? transitionConfig.DefaultTransitionTimeSeconds,
                     window.UiToNormRelative(subImageDetails.Size),
                     continuation));
                 break;

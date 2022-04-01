@@ -16,7 +16,7 @@ public class InventoryMidPane : UiElement
 
     protected override void Subscribed()
     {
-        var config = Resolve<GameConfig>();
+        var config = Resolve<IGameConfigProvider>().Game;
         var allPositions = config.Inventory.Positions.ToDictionary(
             x => PartyMemberId.Parse(x.Key),
             x => x.Value);

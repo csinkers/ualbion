@@ -8,6 +8,7 @@ using UAlbion.Core.Events;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
@@ -63,7 +64,7 @@ public class FlatMap : Component, IMap
         TileSize = new Vector3(renderable.TileSize, 1.0f);
         _logicalMap.TileSize = renderable.TileSize;
 
-        var movementSettings = _logicalMap.UseSmallSprites ? MovementSettings.Small : MovementSettings.Large;
+        var movementSettings = new MovementSettings(!_logicalMap.UseSmallSprites, Resolve<IGameConfigProvider>());
         _partyMovement = AttachChild(new PartyCaterpillar(Vector2.Zero, Direction.East, movementSettings));
 
         AttachChild(new NpcManager2D(_logicalMap));

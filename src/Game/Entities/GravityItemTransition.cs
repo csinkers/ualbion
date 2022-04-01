@@ -37,12 +37,12 @@ public class GravityItemTransition : Component
 
     protected override void Subscribed()
     {
-        var config = Resolve<GameConfig>().UI.Transitions;
+        var transitionConfig = Resolve<IGameConfigProvider>().Game.UI.Transitions;
         lock (SyncRoot)
         {
             _velocity = new Vector2(
-                (float)(Random.NextDouble() - 0.5) * config.DiscardItemMaxInitialX,
-                (float)Random.NextDouble() * config.DiscardItemMaxInitialY);
+                (float)(Random.NextDouble() - 0.5) * transitionConfig.DiscardItemMaxInitialX,
+                (float)Random.NextDouble() * transitionConfig.DiscardItemMaxInitialY);
         }
 
         base.Subscribed();
@@ -57,8 +57,8 @@ public class GravityItemTransition : Component
             return;
         }
 
-        var config = Resolve<GameConfig>().UI.Transitions;
-        _velocity += new Vector2(0, -config.DiscardItemGravity) * deltaSeconds;
+        var transitionConfig = Resolve<IGameConfigProvider>().Game.UI.Transitions;
+        _velocity += new Vector2(0, -transitionConfig.DiscardItemGravity) * deltaSeconds;
         _sprite.Position += new Vector3(_velocity, 0) * deltaSeconds;
     }
 }

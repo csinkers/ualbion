@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Numerics;
 using UAlbion.Api.Visual;
-using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
@@ -46,10 +45,9 @@ sealed class IsometricTest : Component, IDisposable // The engine construction c
                 IsometricLabyrinthLoader.DefaultHeight * 10));
 
         Exchange.Attach(services);
-        var config = Resolve<IGeneralConfig>();
         services
             .Add(new InputManager().RegisterMouseMode(MouseMode.Normal, new NormalMouseMode()))
-            .Add(new InputBinder((disk, jsonUtil) => InputConfig.Load(config.BasePath, disk, jsonUtil)))
+            .Add(new InputBinder())
             ;
 
         var engine = (Engine)Resolve<IEngine>();

@@ -176,7 +176,7 @@ public class StatusBarPortrait : UiElement
         }
         else // For the first click, just start the double-click timer.
         {
-            var config = Resolve<GameConfig>();
+            var config = Resolve<IGameConfigProvider>().Game;
             Raise(new StartTimerEvent(TimerName, config.UI.ButtonDoubleClickIntervalSeconds, this));
             _isClickTimerPending = true;
         }

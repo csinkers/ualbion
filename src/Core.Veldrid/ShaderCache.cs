@@ -65,7 +65,7 @@ public sealed class ShaderCache : Component, IShaderCache, IDisposable
         var watcher = new FileSystemWatcher(path);
         //_watcher.Filters.Add("*.frag");
         //_watcher.Filters.Add("*.vert");
-        watcher.Changed += (sender, e) => ShadersUpdated?.Invoke(sender, new EventArgs());
+        watcher.Changed += (sender, e) => ShadersUpdated?.Invoke(sender, EventArgs.Empty);
         watcher.EnableRaisingEvents = true;
         _watchers.Add(watcher);
         return this;

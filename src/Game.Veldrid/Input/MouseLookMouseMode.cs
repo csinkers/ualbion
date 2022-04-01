@@ -101,7 +101,7 @@ public class MouseLookMouseMode : Component
 
         if (e.MouseDelta.LengthSquared() > float.Epsilon)
         {
-            var config = Resolve<GameConfig>();
+            var config = Resolve<IGameConfigProvider>().Game;
             var sensitivity = config.UI.MouseLookSensitivity / -1000;
             _cameraRotateEvent.Yaw = e.MouseDelta.X * sensitivity;
             _cameraRotateEvent.Pitch = e.MouseDelta.Y * sensitivity;

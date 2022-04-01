@@ -16,30 +16,47 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
 {
     class BindingSet : Dictionary<InputMode, IDictionary<KeyBinding, string>> { }
 
-    readonly Func<IFileSystem, IJsonUtil, InputConfig> _configLoader;
     readonly BindingSet _bindings = new();
     readonly HashSet<Key> _pressedKeys = new();
+    IInputConfigProvider _configProvider;
     MapId _mapId = Base.Map.TestMapIskai;
 
     public bool IsAltPressed => _pressedKeys.Contains(Key.AltLeft) || _pressedKeys.Contains(Key.AltRight);
     public bool IsCtrlPressed  => _pressedKeys.Contains(Key.ControlLeft) || _pressedKeys.Contains(Key.ControlRight);
     public bool IsShiftPressed  => _pressedKeys.Contains(Key.ShiftLeft) || _pressedKeys.Contains(Key.ShiftRight);
 
-    public InputBinder(Func<IFileSystem, IJsonUtil, InputConfig> configLoader)
+    public InputBinder()
     {
-        _configLoader = configLoader ?? throw new ArgumentNullException(nameof(configLoader));
         On<InputEvent>(OnInput);
         On<RebindInputEvent>(_ => Rebind());
         On<LoadMapEvent>(e => _mapId = e.MapId);
     }
 
-    protected override void Subscribed() => Rebind();
+    protected override void Subscribed()
+    {
+        if (_configProvider == null)
+        {
+            _configProvider = Resolve<IInputConfigProvider>();
+            _configProvider.InputChanged += OnConfigChanged;
+        }
+
+        Rebind();
+    }
+
+    protected override void Unsubscribed()
+    {
+        if (_configProvider != null)
+        {
+            _configProvider.InputChanged -= OnConfigChanged;
+            _configProvider = null;
+        }
+    }
+
+    void OnConfigChanged(object sender, EventArgs args) => Rebind();
 
     void Rebind()
     {
-        var disk = Resolve<IFileSystem>();
-        var jsonUtil = Resolve<IJsonUtil>();
-        var config = _configLoader(disk, jsonUtil);
+        var config = _configProvider.Input;
         _bindings.Clear();
 
         foreach (var rawMode in config.Bindings)

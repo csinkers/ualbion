@@ -20,14 +20,14 @@ public class GameClock : ServiceComponent<IClock>, IClock
 
     public GameClock()
     {
-        On<StartClockEvent>(e =>
+        On<StartClockEvent>(_ =>
         {
             GameTrace.Log.ClockStart(_stoppedFrames, _stoppedMs);
             _stoppedFrames = 0;
             _stoppedMs = 0;
             IsRunning = true;
         });
-        On<StopClockEvent>(e =>
+        On<StopClockEvent>(_ =>
         {
             GameTrace.Log.ClockStop();
             IsRunning = false;
@@ -69,12 +69,12 @@ public class GameClock : ServiceComponent<IClock>, IClock
 
         if (IsRunning)
         {
-            var config = Resolve<GameConfig>().Time;
+            var timeConfig = Resolve<IGameConfigProvider>().Game.Time;
             var state = Resolve<IGameState>();
             if (state != null)
             {
                 var lastGameTime = state.Time;
-                var newGameTime = lastGameTime.AddSeconds(e.DeltaSeconds * config.GameSecondsPerSecond);
+                var newGameTime = lastGameTime.AddSeconds(e.DeltaSeconds * timeConfig.GameSecondsPerSecond);
                 ((IComponent) state).Receive(new SetTimeEvent(newGameTime), this);
 
                 if (newGameTime.Minute != lastGameTime.Minute)
@@ -88,7 +88,7 @@ public class GameClock : ServiceComponent<IClock>, IClock
             }
 
             _elapsedTimeThisGameFrame += e.DeltaSeconds;
-            var tickDurationSeconds = 1.0f / config.FastTicksPerSecond;
+            var tickDurationSeconds = 1.0f / timeConfig.FastTicksPerSecond;
 
             // If the game was paused for a while don't try and catch up
             if (_elapsedTimeThisGameFrame > 4 * tickDurationSeconds)
@@ -99,7 +99,7 @@ public class GameClock : ServiceComponent<IClock>, IClock
                 _elapsedTimeThisGameFrame -= tickDurationSeconds;
                 RaiseTick();
 
-                if ((state?.TickCount ?? 0) % config.FastTicksPerAssetCacheCycle == config.FastTicksPerAssetCacheCycle - 1)
+                if ((state?.TickCount ?? 0) % timeConfig.FastTicksPerAssetCacheCycle == timeConfig.FastTicksPerAssetCacheCycle - 1)
                     Raise(new CycleCacheEvent());
             }
         }

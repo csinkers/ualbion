@@ -8,6 +8,7 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Config;
+using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Magic;
 using UAlbion.Game.Settings;
@@ -39,9 +40,9 @@ public static class AssetSystem
             var settings = LoadSettings(config, disk, jsonUtil);
             return (config, settings);
         });
-        var coreConfigTask = Task.Run(() => LoadCoreConfig(baseDir, disk, jsonUtil));
-        var gameConfigTask = Task.Run(() => LoadGameConfig(baseDir, disk, jsonUtil));
-        return await SetupCore(mapping, disk, jsonUtil, configAndSettingsTask, coreConfigTask, gameConfigTask).ConfigureAwait(false);
+
+        var configTask = Task.Run(() => LoadConfig(baseDir, disk, jsonUtil));
+        return await SetupCore(mapping, disk, jsonUtil, configAndSettingsTask, configTask).ConfigureAwait(false);
     }
 
     public static EventExchange Setup(
@@ -50,13 +51,11 @@ public static class AssetSystem
         IJsonUtil jsonUtil,
         GeneralConfig generalConfig,
         GeneralSettings settings,
-        CoreConfig coreConfig,
-        GameConfig gameConfig)
+        IConfigProvider configProvider)
     {
         var configAndSettingsTask = Task.FromResult((generalConfig, settings));
-        var coreConfigTask = Task.FromResult(coreConfig);
-        var gameConfigTask = Task.FromResult(gameConfig);
-        var task = SetupCore(mapping, disk, jsonUtil, configAndSettingsTask, coreConfigTask, gameConfigTask);
+        var configTask = Task.FromResult(configProvider);
+        var task = SetupCore(mapping, disk, jsonUtil, configAndSettingsTask, configTask);
         return task.Result.Item1;
     }
 
@@ -65,15 +64,13 @@ public static class AssetSystem
         IFileSystem disk,
         IJsonUtil jsonUtil,
         Task<(GeneralConfig, GeneralSettings)> configAndSettingsTask,
-        Task<CoreConfig> coreConfigTask,
-        Task<GameConfig> gameConfigTask)
+        Task<IConfigProvider> configTask)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
         if (disk == null) throw new ArgumentNullException(nameof(disk));
         if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
         if (configAndSettingsTask == null) throw new ArgumentNullException(nameof(configAndSettingsTask));
-        if (coreConfigTask == null) throw new ArgumentNullException(nameof(coreConfigTask));
-        if (gameConfigTask == null) throw new ArgumentNullException(nameof(gameConfigTask));
+        if (configTask == null) throw new ArgumentNullException(nameof(configTask));
 
         IModApplier modApplier = new ModApplier();
 
@@ -107,12 +104,14 @@ public static class AssetSystem
         mapping.ConsistencyCheck();
         PerfTracker.StartupEvent("Loaded mods");
 
-        var coreConfig = await coreConfigTask.ConfigureAwait(false);
-        var gameConfig = await gameConfigTask.ConfigureAwait(false);
+        var configProvider = await configTask.ConfigureAwait(false);
         exchange // Need to load game config after mods so asset ids can be parsed.
-            .Register(coreConfig)
-            .Register(gameConfig);
-        PerfTracker.StartupEvent("Loaded core and game config");
+            .Register(configProvider)
+            .Register<IGameConfigProvider>(configProvider)
+            .Register<ICoreConfigProvider>(configProvider)
+            .Register<IInputConfigProvider>(configProvider);
+
+        PerfTracker.StartupEvent("Loaded configs");
         return (exchange, services);
     }
 
@@ -130,16 +129,9 @@ public static class AssetSystem
         return result;
     }
 
-    static CoreConfig LoadCoreConfig(string baseDir, IFileSystem disk, IJsonUtil jsonUtil)
+    public static IConfigProvider LoadConfig(string baseDir, IFileSystem disk, IJsonUtil jsonUtil)
     {
-        var result = CoreConfig.Load(Path.Combine(baseDir, "data", "core.json"), disk, jsonUtil);
-        PerfTracker.StartupEvent("Loaded core config");
-        return result;
-    }
-
-    public static GameConfig LoadGameConfig(string baseDir, IFileSystem disk, IJsonUtil jsonUtil)
-    {
-        var result = GameConfig.Load(Path.Combine(baseDir, "data", "game.json"), disk, jsonUtil);
+        var result = new ConfigProvider(baseDir, disk, jsonUtil);
         PerfTracker.StartupEvent("Loaded game config");
         return result;
     }
@@ -148,15 +140,14 @@ public static class AssetSystem
     {
         var baseDir = ConfigUtil.FindBasePath(disk);
         var jsonUtil = new FormatJsonUtil();
-        var coreConfig = new CoreConfig();
         var generalConfig = LoadGeneralConfig(baseDir, disk, jsonUtil);
-        var gameConfig = LoadGameConfig(baseDir, disk, jsonUtil);
+        var configProvider = LoadConfig(baseDir, disk, jsonUtil);
         var settings = new GeneralSettings
         {
             ActiveMods = mods.Length == 0 ? new[] { "Base" } : mods,
             Language = Language.English
         };
 
-        return Setup(mapping, disk, jsonUtil, generalConfig, settings, coreConfig, gameConfig);
+        return Setup(mapping, disk, jsonUtil, generalConfig, settings, configProvider);
     }
 }

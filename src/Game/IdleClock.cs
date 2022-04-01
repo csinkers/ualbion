@@ -20,7 +20,7 @@ public class IdleClock : Component
     void OnEngineUpdate(EngineUpdateEvent e)
     {
         _elapsedTimeThisGameFrame += e.DeltaSeconds;
-        var config = Resolve<GameConfig>();
+        var config = Resolve<IGameConfigProvider>().Game;
         var tickDurationSeconds = 1.0f / config.Time.IdleTicksPerSecond;
 
         // If the game was paused for a while don't try and catch up

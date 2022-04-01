@@ -47,8 +47,9 @@ public class ButtonTests : Component
             ;
 
         var config = GameConfig.LoadLiteral(Encoding.UTF8.GetBytes(@"{ ""UI"": { ""ButtonDoubleClickIntervalSeconds"": 0.35 } }"), jsonUtil);
+        var configProvider = new MockGameConfigProvider(config);
         _exchange
-            .Register(config)
+            .Register<IGameConfigProvider>(configProvider)
             .Attach(modApplier)
             .Attach(new AssetManager())
             .Attach(new SpriteManager())

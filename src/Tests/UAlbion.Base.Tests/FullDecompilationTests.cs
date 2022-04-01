@@ -40,15 +40,14 @@ public class FullDecompilationTests : IDisposable
         var disk = new MockFileSystem(true);
         var baseDir = ConfigUtil.FindBasePath(disk);
         var generalConfig = AssetSystem.LoadGeneralConfig(baseDir, disk, JsonUtil);
-        var gameConfig = AssetSystem.LoadGameConfig(baseDir, disk, JsonUtil);
-        var coreConfig = new CoreConfig();
+        var configProvider = AssetSystem.LoadConfig(baseDir, disk, JsonUtil);
         var settings = new GeneralSettings
         {
             ActiveMods = { "Base" },
             Language = Language.English
         };
 
-        Exchange = AssetSystem.Setup(Mapping, disk, JsonUtil, generalConfig, settings, coreConfig, gameConfig);
+        Exchange = AssetSystem.Setup(Mapping, disk, JsonUtil, generalConfig, settings, configProvider);
     }
 
     public FullDecompilationTests()

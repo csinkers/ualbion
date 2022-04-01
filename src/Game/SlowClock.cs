@@ -13,7 +13,7 @@ public class SlowClock : Component
 
     void OnUpdate(FastClockEvent updateEvent)
     {
-        var config = Resolve<GameConfig>();
+        var config = Resolve<IGameConfigProvider>().Game;
         _ticks += updateEvent.Frames;
         int delta = 0;
         while(_ticks >= config.Time.FastTicksPerSlowTick)

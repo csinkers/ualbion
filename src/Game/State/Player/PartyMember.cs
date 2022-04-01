@@ -35,7 +35,7 @@ public class PartyMember : Component, IPlayer
         if (_lerp >= 1.0f)
             return;
 
-        var config = Resolve<GameConfig>();
+        var config = Resolve<IGameConfigProvider>().Game;
         var elapsed = (DateTime.Now - _lastChangeTime).TotalSeconds;
         var oldLerp = _lerp;
 
@@ -65,7 +65,7 @@ public class PartyMember : Component, IPlayer
     void UpdateInventory()
     {
         _lastEffective = Effective;
-        Effective = EffectiveSheetCalculator.GetEffectiveSheet(_base, Resolve<GameConfig>());
+        Effective = EffectiveSheetCalculator.GetEffectiveSheet(_base, Resolve<IGameConfigProvider>().Game);
         _lastEffective ??= Effective;
         _lastChangeTime = DateTime.Now;
         _lerp = 0.0f;

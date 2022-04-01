@@ -47,9 +47,9 @@ public class TextureSource : ServiceComponent<ITextureSource>, ITextureSource
     void OnUpdate(EngineUpdateEvent e)
     {
         _totalTime += e.DeltaSeconds;
-        var config = Resolve<CoreConfig>().Visual.TextureManager;
+        var texConfig = Resolve<ICoreConfigProvider>().Core.Visual.TextureManager;
 
-        if (_totalTime - _lastCleanup <= config.CacheCheckIntervalSeconds)
+        if (_totalTime - _lastCleanup <= texConfig.CacheCheckIntervalSeconds)
             return;
 
         _simple.Cleanup();

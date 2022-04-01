@@ -34,7 +34,7 @@ public class SpriteManager : ServiceComponent<ISpriteManager>, ISpriteManager
     void OnUpdate(EngineUpdateEvent e)
     {
         _totalTime += e.DeltaSeconds;
-        var config = Resolve<CoreConfig>().Visual.SpriteManager;
+        var config = Resolve<ICoreConfigProvider>().Core.Visual.SpriteManager;
 
         if (_totalTime - _lastCleanup <= config.CacheCheckIntervalSeconds)
             return;

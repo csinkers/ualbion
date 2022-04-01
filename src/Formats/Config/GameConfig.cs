@@ -43,6 +43,17 @@ public class GameConfig
         [JsonInclude] public int FastTicksPerMapTileFrame { get; private set; }
     }
 
+    [JsonInclude] public MovementT Movement { get; private set; } = new();
+    public class MovementT
+    {
+        [JsonInclude] public int TicksPerTile { get; private set; } // Number of game ticks it takes to move across a map tile
+        [JsonInclude] public int TicksPerFrame { get; private set; } // Number of game ticks it takes to advance to the next animation frame
+        [JsonInclude] public int MinTrailDistanceSmall { get; private set; }
+        [JsonInclude] public int MaxTrailDistanceSmall { get; private set; } // Max number of positions between each character in the party. Looks best if coprime to TicksPerPile and TicksPerFrame.
+        [JsonInclude] public int MinTrailDistanceLarge { get; private set; }
+        [JsonInclude] public int MaxTrailDistanceLarge { get; private set; } // Max number of positions between each character in the party. Looks best if coprime to TicksPerPile and TicksPerFrame.
+    }
+
     [JsonInclude] public UIT UI { get; private set; } = new();
     public class UIT
     {

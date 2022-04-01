@@ -1,5 +1,4 @@
 ﻿using System;
-using UAlbion.Api;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
@@ -7,35 +6,10 @@ using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
+using UAlbion.Game.Events;
 using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities.Map2D;
-
-public enum FlagArray
-{
-    Switch,
-    NpcInactive,
-    ChainDisabled,
-    DoorOpen,
-    ChestOpen,
-    WordKnown,
-    WordAsked,
-}
-
-public class SetFlagArrayEvent : Event, IVerboseEvent
-{
-    public FlagArray Type { get; }
-    public MapId MapId { get; }
-    public int Number { get; }
-    public FlagOperation Operation { get; }
-    public SetFlagArrayEvent(FlagArray type, MapId mapId, int number, FlagOperation operation)
-    {
-        Type = type;
-        MapId = mapId;
-        Number = number;
-        Operation = operation;
-    }
-}
 
 class NpcManager2D : Component
 {
@@ -87,7 +61,7 @@ class NpcManager2D : Component
             bool isDisabled = game.IsNpcDisabled(_logicalMap.Id, (byte)index);
 
             if (initialise)
-                InitialiseState(npc, state, !isDisabled);
+                InitialiseState(npc, state, !isDisabled, _logicalMap.Events);
 
             if (npc.IsUnused)
                 continue;
@@ -98,7 +72,7 @@ class NpcManager2D : Component
         game.MapIdForNpcs = _logicalMap.Id;
     }
 
-    static void InitialiseState(MapNpc npc, NpcState state, bool active)
+    void InitialiseState(MapNpc npc, NpcState state, bool active, IEventSet mapEvents)
     {
         state.Id = npc.Id;
         state.SpriteOrGroup = npc.SpriteOrGroup;
@@ -110,6 +84,7 @@ class NpcManager2D : Component
         state.ActiveSfx2 = 0xffff;
         state.ActiveSfx3 = 0xffff;
         state.Triggers = npc.Triggers;
+        state.EventSet = mapEvents;
         state.EventIndex = npc.EventIndex;
         state.MovementType = npc.Movement;
         state.WasActive = (ushort)(active ? 1 : 0);

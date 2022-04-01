@@ -15,6 +15,15 @@
     "FastTicksPerMapTileFrame": 10
   },
 
+  "Movement": {
+	"TicksPerTile":  12, // Number of game ticks it takes to move across a map tile
+	"TicksPerFrame":  9, // Number of game ticks it takes to advance to the next animation frame
+	"MinTrailDistanceSmall":  6,
+	"MaxTrailDistanceSmall":  12,
+	"MinTrailDistanceLarge":  12,
+	"MaxTrailDistanceLarge":  18
+  },
+
   "UI": {
     "Transitions": {
       "DiscardItemGravity": 9.8,

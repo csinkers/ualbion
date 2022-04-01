@@ -32,7 +32,7 @@ public sealed class SkyboxRenderable : Component, ISkybox
 
         On<EngineUpdateEvent>(_ =>
         {
-            var config = Resolve<CoreConfig>().Visual.Skybox;
+            var skyConfig = Resolve<ICoreConfigProvider>().Core.Visual.Skybox;
             if (Resolve<ICamera>() is not PerspectiveCamera camera)
                 return;
 
@@ -40,7 +40,7 @@ public sealed class SkyboxRenderable : Component, ISkybox
             {
                 uYaw = camera.Yaw,
                 uPitch = camera.Pitch,
-                uVisibleProportion = config.VisibleProportion
+                uVisibleProportion = skyConfig.VisibleProportion
             };
         });
 

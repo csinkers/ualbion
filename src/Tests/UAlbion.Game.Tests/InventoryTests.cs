@@ -7,7 +7,6 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.State.Player;
-using UAlbion.TestCommon;
 
 namespace UAlbion.Game.Tests;
 
@@ -49,9 +48,11 @@ public class InventoryTests : Component
         _im = new InventoryManager(x => inventories[x]);
         var wm = new WindowManager { Resolution = (1920, 1080) };
         var cm = new MockCursorManager { Position = new Vector2(1, 1) };
+        var gc = new GameConfig();
+        var mgcp = new MockGameConfigProvider(gc);
 
         exchange
-            .Register(new GameConfig())
+            .Register<IGameConfigProvider>(mgcp)
             .Register<IInventoryManager>(_im)
             .Attach(wm)
             .Attach(cm)

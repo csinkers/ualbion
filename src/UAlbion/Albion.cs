@@ -164,7 +164,7 @@ static class Albion
                 .RegisterMouseMode(MouseMode.RightButtonHeld, new RightButtonHeldMouseMode())
                 .RegisterMouseMode(MouseMode.ContextMenu, new ContextMenuMouseMode()))
             .Add(new SelectionManager())
-            .Add(new InputBinder((disk, jsonUtil) => InputConfig.Load(baseDir, disk, jsonUtil)))
+            .Add(new InputBinder())
             .Add(new ItemTransitionManager())
             ;
 #pragma warning restore CA2000 // Dispose objects before losing scope

@@ -47,8 +47,6 @@ public readonly struct ScriptId : IEquatable<ScriptId>, IEquatable<AssetId>, ICo
     public static ScriptId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new ScriptId(AssetType.Script, disk));
         return (ScriptId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

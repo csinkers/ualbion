@@ -145,7 +145,7 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
  1=>!: map_text MapText.Jirinaar 37 NoPortrait None ; ""The door to the house of the Hunter Clan. It is secured with a lock.""
 !2?3:!: open_door Door.HunterClan MapText.Jirinaar Item.HunterClanKey 100 32 33
 !3?4:!: result
- 4=>5: modify_unk2 0 0 0 0 101 0
+ 4=>5: door_open Set Door.HunterClan
  5=>!: teleport Map.HunterClan 69 67 Unchanged 255 0";
 
         string expected = 
@@ -155,7 +155,7 @@ if (query_verb Examine) {
 } else {
     if (open_door Door.HunterClan MapText.Jirinaar Item.HunterClanKey 100 32 33) {
         if (result) {
-            modify_unk2 0 0 0 0 101 0
+            door_open Set Door.HunterClan
             teleport Map.HunterClan 69 67 Unchanged 255 0
         }
     }
@@ -191,13 +191,13 @@ if (query_verb Examine) {
  16=>17: map_text EventText.Sira2 20
  17=>!: end_dialogue
  18=>19: map_text EventText.Sira2 19
- 19=>20: add_party_member PartyMember.Sira 3
+ 19=>20: add_party_member PartyMember.Sira
 !20?21:23: result
- 21=>22: add_party_member PartyMember.Mellthas 3
+ 21=>22: add_party_member PartyMember.Mellthas
 !22?24:23: result
 #23=>27: map_text EventText.Sira2 18
- 24=>25: disable_npc 8 1 0 281
- 25=>26: disable_npc 9 1 0 281
+ 24=>25: modify_npc_off Set 8 Map.Edjirr
+ 25=>26: modify_npc_off Set 9 Map.Edjirr
  26=>!: end_dialogue
  27=>28: remove_party_member PartyMember.Sira 1 26888
  28=>!: remove_party_member PartyMember.Mellthas 1 26889
@@ -250,7 +250,7 @@ if (query_verb Examine) {
  75=>76: map_text EventText.Sira2 28
  76=>!: end_dialogue
  77=>78: map_text EventText.Sira2 27
- 78=>79: add_party_member PartyMember.Drirr 3
+ 78=>79: add_party_member PartyMember.Drirr
  79=>!: end_dialogue
  80=>81: action Unk3D
 !81?82:!: in_party PartyMember.Mellthas
@@ -334,12 +334,12 @@ if (in_party PartyMember.Sira) {
     switch Set Switch.Switch76
     if (prompt_player EventText.Sira2 17) {
         map_text EventText.Sira2 19
-        add_party_member PartyMember.Sira 3
+        add_party_member PartyMember.Sira
         if (result) {
-            add_party_member PartyMember.Mellthas 3
+            add_party_member PartyMember.Mellthas
             if (result) {
-                disable_npc 8 1 0 281
-                disable_npc 9 1 0 281
+                modify_npc_off Set 8 Map.Edjirr
+                modify_npc_off Set 9 Map.Edjirr
                 end_dialogue
             } else {
                 L1:

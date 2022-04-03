@@ -47,8 +47,6 @@ public readonly struct LabyrinthId : IEquatable<LabyrinthId>, IEquatable<AssetId
     public static LabyrinthId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new LabyrinthId(AssetType.Labyrinth, disk));
         return (LabyrinthId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

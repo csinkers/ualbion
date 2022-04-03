@@ -21,9 +21,9 @@ class NpcManager2D : Component
         _logicalMap = logicalMap2D ?? throw new ArgumentNullException(nameof(logicalMap2D));
         _npcs = new Npc2D[_logicalMap.Npcs.Count];
 
-        On<DisableNpcEvent>(e => SetNpcActive(e.NpcNum, e.IsDisabled != 0));
-        On<NpcOffEvent>(e => SetNpcActive(e.NpcNum, false));
-        On<NpcOnEvent>(e => SetNpcActive(e.NpcNum, true));
+        On<ModifyNpcOffEvent>(e => SetNpcActive(e.NpcNum, e.Operation));
+        On<NpcOffEvent>(e => SetNpcActive(e.NpcNum, SwitchOperation.Set));
+        On<NpcOnEvent>(e => SetNpcActive(e.NpcNum, SwitchOperation.Clear));
 
         On<NpcJumpEvent>(DispatchNpcEvent);
         On<NpcLockEvent>(DispatchNpcEvent);
@@ -32,15 +32,13 @@ class NpcManager2D : Component
         On<NpcUnlockEvent>(DispatchNpcEvent);
     }
 
-    void SetNpcActive(byte npcNum, bool value)
+    void SetNpcActive(byte npcNum, SwitchOperation operation)
     {
         Raise(new SetFlagArrayEvent(
             FlagArray.NpcInactive,
             _logicalMap.Id,
             npcNum,
-            value ? FlagOperation.Set : FlagOperation.Clear));
-
-        _npcs[npcNum].IsActive = value;
+            operation));
     }
 
     protected override void Subscribed()

@@ -71,7 +71,7 @@ public class EventRoundTripTests
         using var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms);
         using var s = new AlbionWriter(bw);
-        MapEvent.SerdesEvent(e, s, EventSetId.None, TextId.None, AssetMapping.Global);
+        MapEvent.SerdesEvent(e, s, TextId.None, AssetMapping.Global);
         bw.Flush();
         ms.Position = 0;
         return ms.ToArray();
@@ -82,7 +82,7 @@ public class EventRoundTripTests
         using var ms = new MemoryStream(bytes);
         using var br = new BinaryReader(ms);
         using var s = new AlbionReader(br);
-        return MapEvent.SerdesEvent(null, s, EventSetId.None, TextId.None, AssetMapping.Global);
+        return MapEvent.SerdesEvent(null, s, TextId.None, AssetMapping.Global);
     }
 
     static string Test(string scriptFormat, string expectedToStringResult, IMapEvent e)
@@ -138,9 +138,9 @@ public class EventRoundTripTests
     }
 
     [Fact]
-    public void DummyModify()
+    public void DoorOpen()
     {
-        Test(("modify_unk2 1 2 3 4 5 6", new ModifyUnk2Event(1, 2, 3, 4, 5, 6)));
+        Test(("door_open Set Door.Beastmaster", new DoorOpenEvent(SwitchOperation.Set, Base.Door.Beastmaster)));
     }
 
     [Fact]
@@ -166,17 +166,16 @@ public class EventRoundTripTests
     [Fact]
     public void AddPartyMember()
     {
-        Test(("add_party_member PartyMember.Tom 1", new AddPartyMemberEvent(PartyMember.Tom, 1, 0)),
-            ("add_party_member PartyMember.Tom 1 1", new AddPartyMemberEvent(PartyMember.Tom, 1, 1)));
+        Test(("add_party_member PartyMember.Tom", new AddPartyMemberEvent(PartyMember.Tom)));
     }
 
     [Fact]
-    public void AddRemoveInvItem()
+    public void ModifyItemCount()
     {
-        Test(("add_remove_inv AddAmount 1 Item.Pistol", new AddRemoveInventoryItemEvent(NumericOperation.AddAmount, 1, Item.Pistol)),
-            ("add_remove_inv SetToMinimum 0 Item.Pistol", new AddRemoveInventoryItemEvent(NumericOperation.SetToMinimum, 0, Item.Pistol)),
-            ("add_remove_inv SetToMinimum 1 Item.Pistol", new AddRemoveInventoryItemEvent(NumericOperation.SetToMinimum, 1, Item.Pistol)),
-            ("add_remove_inv SubtractAmount 1 Item.Pistol", new AddRemoveInventoryItemEvent(NumericOperation.SubtractAmount, 1, Item.Pistol)));
+        Test(("modify_item_count AddAmount 1 Item.Pistol", new ModifyItemCountEvent(NumericOperation.AddAmount, 1, Item.Pistol)),
+            ("modify_item_count SetToMinimum 0 Item.Pistol", new ModifyItemCountEvent(NumericOperation.SetToMinimum, 0, Item.Pistol)),
+            ("modify_item_count SetToMinimum 1 Item.Pistol", new ModifyItemCountEvent(NumericOperation.SetToMinimum, 1, Item.Pistol)),
+            ("modify_item_count SubtractAmount 1 Item.Pistol", new ModifyItemCountEvent(NumericOperation.SubtractAmount, 1, Item.Pistol)));
     }
 
     [Fact]
@@ -190,32 +189,27 @@ public class EventRoundTripTests
     }
 
     [Fact]
-    public void ChangePartyGold()
+    public void ModifyGold()
     {
-        Test(("change_party_gold AddAmount 1", new ChangePartyGoldEvent(NumericOperation.AddAmount, 1, 0)),
-            ("change_party_gold AddAmount 1 1", new ChangePartyGoldEvent(NumericOperation.AddAmount, 1, 1)),
-            ("change_party_gold SetToMinimum 0", new ChangePartyGoldEvent(NumericOperation.SetToMinimum, 0, 0)),
-            ("change_party_gold SubtractAmount 0 1", new ChangePartyGoldEvent(NumericOperation.SubtractAmount, 0, 1)),
-            ("change_party_gold SubtractAmount 1", new ChangePartyGoldEvent(NumericOperation.SubtractAmount, 1, 0)),
-            ("change_party_gold SubtractAmount 1 1", new ChangePartyGoldEvent(NumericOperation.SubtractAmount, 1, 1)));
+        Test(("modify_gold AddAmount 1", new ModifyGoldEvent(NumericOperation.AddAmount, 1)),
+            ("modify_gold SetToMinimum 0", new ModifyGoldEvent(NumericOperation.SetToMinimum, 0)),
+            ("modify_gold SubtractAmount 0", new ModifyGoldEvent(NumericOperation.SubtractAmount, 0)),
+            ("modify_gold SubtractAmount 1", new ModifyGoldEvent(NumericOperation.SubtractAmount, 1)));
     }
 
     [Fact]
-    public void ChangePartyRations()
+    public void ModifyRations()
     {
-        Test(("change_party_rations AddAmount 1", new ChangePartyRationsEvent(NumericOperation.AddAmount, 1, 0)),
-            ("change_party_rations AddAmount 1 1", new ChangePartyRationsEvent(NumericOperation.AddAmount, 1, 1)),
-            ("change_party_rations SetToMinimum 0", new ChangePartyRationsEvent(NumericOperation.SetToMinimum, 0, 0)),
-            ("change_party_rations SubtractAmount 0 1", new ChangePartyRationsEvent(NumericOperation.SubtractAmount, 0, 1)),
-            ("change_party_rations SubtractAmount 1", new ChangePartyRationsEvent(NumericOperation.SubtractAmount, 1, 0)),
-            ("change_party_rations SubtractAmount 1 1", new ChangePartyRationsEvent(NumericOperation.SubtractAmount, 1, 1)));
+        Test(("modify_rations AddAmount 1", new ModifyRationsEvent(NumericOperation.AddAmount, 1)),
+            ("modify_rations SetToMinimum 0", new ModifyRationsEvent(NumericOperation.SetToMinimum, 0)),
+            ("modify_rations SubtractAmount 1", new ModifyRationsEvent(NumericOperation.SubtractAmount, 1)));
     }
 
     [Fact]
-    public void ChangeTime()
+    public void ModifyHours()
     {
-        Test(("change_time AddAmount 1", new ChangeTimeEvent(NumericOperation.AddAmount, 1)),
-            ("change_time SetAmount 1", new ChangeTimeEvent(NumericOperation.SetAmount, 1)));
+        Test(("modify_hours AddAmount 1", new ModifyHoursEvent(NumericOperation.AddAmount, 1)),
+            ("modify_hours SetAmount 1", new ModifyHoursEvent(NumericOperation.SetAmount, 1)));
     }
 
     [Fact]
@@ -322,14 +316,11 @@ public class EventRoundTripTests
     }
 */
     [Fact]
-    public void DisableEventChain()
+    public void ChainOff()
     {
-        Test(@"disable_event_chain None 0 1 0
-disable_event_chain None 0 1 1
-disable_event_chain None 1 0 0
-disable_event_chain None 1 0 1
-disable_event_chain None 1 1 0
-disable_event_chain None 1 1 1");
+        Test(@"chain_off Clear 1
+chain_off Set 1
+chain_off Set 1 Map.Jirinaar");
     }
 
     [Fact]
@@ -429,7 +420,7 @@ has_item GreaterThanOrEqual 1 Item.Pistol
 in_party PartyMember.Tom
 is_leader PartyMember.Tom Equals
 is_leader PartyMember.Tom
-current_map Equals 0 Map.1
+current_map Equals 0 Map.Unk1
 is_npc_active 0
 is_npc_active 0 Equals
 is_npc_active 0 AlwaysFalse 1
@@ -479,17 +470,17 @@ remove_party_member PartyMember.Tom 1 1");
     }
 
     [Fact]
-    public void SetMapLighting()
+    public void MapLighting()
     {
-        Test(@"set_map_lighting NeedTorch 1 2");
+        Test(@"map_lighting SetAmount NeedTorch");
     }
 
     [Fact]
     public void DisableNpc()
     {
-        Test(@"disable_npc 1 0
-disable_npc 1
-disable_npc 1 1 0 1");
+        Test(@"modify_npc_off Set 0
+modify_npc_off Set 0
+modify_npc_off Set 1 Map.Jirinaar");
     }
 
     [Fact]
@@ -502,8 +493,8 @@ set_party_leader PartyMember.Tom 1 1");
     [Fact]
     public void SetTemporarySwitch()
     {
-        Test(@"switch Reset Switch.ExpelledFromSouthWind
-switch Reset Switch.ExpelledFromSouthWind 1
+        Test(@"switch Clear Switch.ExpelledFromSouthWind
+switch Clear Switch.ExpelledFromSouthWind 1
 switch Set Switch.ExpelledFromSouthWind
 switch Set Switch.ExpelledFromSouthWind 1
 switch Toggle Switch.ExpelledFromSouthWind");

@@ -47,7 +47,6 @@ public readonly struct CharacterId : IEquatable<CharacterId>, IEquatable<AssetId
     public static CharacterId FromDisk(AssetType type, int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
         if (!(type == AssetType.None || type >= AssetType.Monster && type <= AssetType.Party))
             throw new ArgumentOutOfRangeException($"Tried to construct a CharacterId with a type of {type}");
 

@@ -47,8 +47,6 @@ public readonly struct TickerId : IEquatable<TickerId>, IEquatable<AssetId>, ICo
     public static TickerId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new TickerId(AssetType.Ticker, disk));
         return (TickerId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

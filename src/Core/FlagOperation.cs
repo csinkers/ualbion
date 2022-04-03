@@ -2,7 +2,7 @@
 
 public enum FlagOperation
 {
-    Set,
     Clear,
+    Set,
     Toggle
 }

@@ -23,9 +23,9 @@ public class PartyInventory : Component
     {
         _getInventory = getInventory;
         On<InventoryTakeAllEvent>(TakeAll);
-        On<ChangePartyGoldEvent>(e => ChangePartyItemAmount(AssetId.Gold, e.Operation, e.Amount));
-        On<ChangePartyRationsEvent>(e => ChangePartyItemAmount(AssetId.Rations, e.Operation, e.Amount));
-        On<AddRemoveInventoryItemEvent>(e => GiveToParty(e.ItemId, e.Amount));
+        On<ModifyGoldEvent>(e => ChangePartyItemAmount(AssetId.Gold, e.Operation, e.Amount));
+        On<ModifyRationsEvent>(e => ChangePartyItemAmount(AssetId.Rations, e.Operation, e.Amount));
+        On<ModifyItemCountEvent>(e => GiveToParty(e.ItemId, e.Amount));
         On<SimpleChestEvent>(e =>
         {
             var itemId = e.ChestType switch

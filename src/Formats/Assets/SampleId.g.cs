@@ -47,8 +47,6 @@ public readonly struct SampleId : IEquatable<SampleId>, IEquatable<AssetId>, ICo
     public static SampleId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new SampleId(AssetType.Sample, disk));
         return (SampleId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

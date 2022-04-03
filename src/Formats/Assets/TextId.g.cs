@@ -47,7 +47,6 @@ public readonly struct TextId : IEquatable<TextId>, IEquatable<AssetId>, ICompar
     public static TextId FromDisk(AssetType type, int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
         if (!(type == AssetType.None || type >= AssetType.EventText && type <= AssetType.Word || type == AssetType.Special))
             throw new ArgumentOutOfRangeException($"Tried to construct a TextId with a type of {type}");
 

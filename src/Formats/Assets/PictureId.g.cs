@@ -47,8 +47,6 @@ public readonly struct PictureId : IEquatable<PictureId>, IEquatable<AssetId>, I
     public static PictureId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new PictureId(AssetType.Picture, disk));
         return (PictureId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

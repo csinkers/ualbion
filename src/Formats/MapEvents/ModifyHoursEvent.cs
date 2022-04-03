@@ -4,13 +4,13 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.MapEvents;
 
-[Event("change_time")]
-public class ChangeTimeEvent : ModifyEvent
+[Event("modify_hours")]
+public class ModifyHoursEvent : ModifyEvent
 {
-    public static ChangeTimeEvent Serdes(ChangeTimeEvent e, ISerializer s)
+    public static ModifyHoursEvent Serdes(ModifyHoursEvent e, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        e ??= new ChangeTimeEvent();
+        e ??= new ModifyHoursEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         int zeroes = s.UInt8(null, 0);
         zeroes += s.UInt8(null, 0);
@@ -21,9 +21,8 @@ public class ChangeTimeEvent : ModifyEvent
         return e;
     }
 
-    ChangeTimeEvent(){}
-
-    public ChangeTimeEvent(NumericOperation operation, ushort amount)
+    ModifyHoursEvent(){}
+    public ModifyHoursEvent(NumericOperation operation, ushort amount)
     {
         Operation = operation;
         Amount = amount;
@@ -31,5 +30,5 @@ public class ChangeTimeEvent : ModifyEvent
 
     [EventPart("op")] public NumericOperation Operation { get; private set; }
     [EventPart("amount")] public ushort Amount { get; private set; }
-    public override ModifyType SubType => ModifyType.Time;
+    public override ModifyType SubType => ModifyType.TimeHours;
 }

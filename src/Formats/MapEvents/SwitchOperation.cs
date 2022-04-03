@@ -2,7 +2,7 @@
 
 public enum SwitchOperation : byte
 {
-    Reset,
+    Clear,
     Set,
     Toggle
 }

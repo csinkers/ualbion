@@ -47,8 +47,6 @@ public readonly struct DoorId : IEquatable<DoorId>, IEquatable<AssetId>, ICompar
     public static DoorId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new DoorId(AssetType.Door, disk));
         return (DoorId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

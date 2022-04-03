@@ -47,8 +47,6 @@ public readonly struct FullBodyPictureId : IEquatable<FullBodyPictureId>, IEquat
     public static FullBodyPictureId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new FullBodyPictureId(AssetType.FullBodyPicture, disk));
         return (FullBodyPictureId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

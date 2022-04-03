@@ -1,6 +1,6 @@
 ﻿using UAlbion.Api;
-using UAlbion.Core;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Events;
 
@@ -9,8 +9,8 @@ public class SetFlagArrayEvent : Event, IVerboseEvent
     public FlagArray Type { get; }
     public MapId MapId { get; }
     public int Number { get; }
-    public FlagOperation Operation { get; }
-    public SetFlagArrayEvent(FlagArray type, MapId mapId, int number, FlagOperation operation)
+    public SwitchOperation Operation { get; }
+    public SetFlagArrayEvent(FlagArray type, MapId mapId, int number, SwitchOperation operation)
     {
         Type = type;
         MapId = mapId;

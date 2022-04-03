@@ -47,8 +47,6 @@ public readonly struct ChestId : IEquatable<ChestId>, IEquatable<AssetId>, IComp
     public static ChestId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new ChestId(AssetType.Chest, disk));
         return (ChestId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

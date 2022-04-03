@@ -47,8 +47,6 @@ public readonly struct BlockListId : IEquatable<BlockListId>, IEquatable<AssetId
     public static BlockListId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new BlockListId(AssetType.BlockList, disk));
         return (BlockListId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

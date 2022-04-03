@@ -40,8 +40,8 @@ public sealed class DataChangeEvent : MapEvent, IDataChangeEvent
         {
             case ChangeProperty.Item:        return ChangeItemEvent     .Serdes(     (ChangeItemEvent)existing, mapping, s);
             case ChangeProperty.Status:      return ChangeStatusEvent   .Serdes(   (ChangeStatusEvent)existing, mapping, s);
-            case ChangeProperty.Language:    return ChangeLanguageEvent .Serdes( (ChangeLanguageEvent)existing, mapping, s);
-            case ChangeProperty.Attribute:   return ChangeAttributeEvent.Serdes((ChangeAttributeEvent)existing, mapping, s);
+            case ChangeProperty.Language:    return ChangeLanguageEvent .Serdes( (ChangeLanguageEvent)existing, s);
+            case ChangeProperty.Attribute:   return ChangeAttributeEvent.Serdes((ChangeAttributeEvent)existing, s);
             case ChangeProperty.Skill:       return ChangeSkillEvent    .Serdes(    (ChangeSkillEvent)existing, mapping, s);
             case ChangeProperty.EventSetId:  return ChangeEventSetEvent .Serdes( (ChangeEventSetEvent)existing, mapping, s);
             case ChangeProperty.WordSetId:   return ChangeWordSetEvent  .Serdes(  (ChangeWordSetEvent)existing, mapping, s);

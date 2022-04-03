@@ -47,8 +47,6 @@ public readonly struct NpcId : IEquatable<NpcId>, IEquatable<AssetId>, IComparab
     public static NpcId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new NpcId(AssetType.Npc, disk));
         return (NpcId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

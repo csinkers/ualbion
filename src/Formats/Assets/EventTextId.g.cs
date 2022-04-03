@@ -47,8 +47,6 @@ public readonly struct EventTextId : IEquatable<EventTextId>, IEquatable<AssetId
     public static EventTextId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new EventTextId(AssetType.EventText, disk));
         return (EventTextId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

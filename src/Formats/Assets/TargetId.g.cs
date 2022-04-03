@@ -47,7 +47,6 @@ public readonly struct TargetId : IEquatable<TargetId>, IEquatable<AssetId>, ICo
     public static TargetId FromDisk(AssetType type, int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
         if (!(type == AssetType.None || type >= AssetType.Npc && type <= AssetType.Party || type == AssetType.Target))
             throw new ArgumentOutOfRangeException($"Tried to construct a TargetId with a type of {type}");
 

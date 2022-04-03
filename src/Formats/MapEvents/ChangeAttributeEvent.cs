@@ -28,7 +28,7 @@ public class ChangeAttributeEvent : MapEvent, IDataChangeEvent
         IsRandom = isRandom;
     }
 
-    public static ChangeAttributeEvent Serdes(ChangeAttributeEvent e, AssetMapping mapping, ISerializer s)
+    public static ChangeAttributeEvent Serdes(ChangeAttributeEvent e, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         e ??= new ChangeAttributeEvent();

@@ -47,7 +47,6 @@ public readonly struct SpriteId : IEquatable<SpriteId>, IEquatable<AssetId>, ICo
     public static SpriteId FromDisk(AssetType type, int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
         if (!(type >= AssetType.None && type <= AssetType.WallOverlay))
             throw new ArgumentOutOfRangeException($"Tried to construct a SpriteId with a type of {type}");
 

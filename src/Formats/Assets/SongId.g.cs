@@ -47,8 +47,6 @@ public readonly struct SongId : IEquatable<SongId>, IEquatable<AssetId>, ICompar
     public static SongId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new SongId(AssetType.Song, disk));
         return (SongId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

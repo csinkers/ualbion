@@ -47,8 +47,6 @@ public readonly struct AutomapId : IEquatable<AutomapId>, IEquatable<AssetId>, I
     public static AutomapId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new AutomapId(AssetType.Automap, disk));
         return (AutomapId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

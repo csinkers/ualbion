@@ -47,8 +47,6 @@ public readonly struct PartyMemberId : IEquatable<PartyMemberId>, IEquatable<Ass
     public static PartyMemberId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new PartyMemberId(AssetType.Party, disk));
         return (PartyMemberId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

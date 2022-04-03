@@ -47,8 +47,6 @@ public readonly struct WordId : IEquatable<WordId>, IEquatable<AssetId>, ICompar
     public static WordId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new WordId(AssetType.Word, disk));
         return (WordId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

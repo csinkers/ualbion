@@ -47,8 +47,6 @@ public readonly struct TilesetGraphicsId : IEquatable<TilesetGraphicsId>, IEquat
     public static TilesetGraphicsId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new TilesetGraphicsId(AssetType.TilesetGraphics, disk));
         return (TilesetGraphicsId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

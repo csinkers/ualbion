@@ -47,8 +47,6 @@ public readonly struct SpecialId : IEquatable<SpecialId>, IEquatable<AssetId>, I
     public static SpecialId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new SpecialId(AssetType.Special, disk));
         return (SpecialId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

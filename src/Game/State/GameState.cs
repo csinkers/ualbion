@@ -59,7 +59,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         {
             _game.SetFlag(e.SwitchId, e.Operation switch
             {
-                SwitchOperation.Reset => false,
+                SwitchOperation.Clear => false,
                 SwitchOperation.Set => true,
                 SwitchOperation.Toggle => !_game.GetFlag(e.SwitchId),
                 _ => false
@@ -70,9 +70,9 @@ public class GameState : ServiceComponent<IGameState>, IGameState
             _game.Tickers.TryGetValue(e.TickerId, out var curValue);
             _game.Tickers[e.TickerId] = (byte)e.Operation.Apply(curValue, e.Amount, 0, 255);
         });
-        On<ChangeTimeEvent>(_ => { });
+        On<ModifyHoursEvent>(_ => { });
         On<ActivateItemEvent>(ActivateItem);
-        On<DisableEventChainEvent>(e =>
+        On<EventChainOffEvent>(e =>
         {
             // TODO
         });

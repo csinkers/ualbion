@@ -47,7 +47,6 @@ public readonly struct ItemId : IEquatable<ItemId>, IEquatable<AssetId>, ICompar
     public static ItemId FromDisk(AssetType type, int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
         if (!(type == AssetType.None || type >= AssetType.Gold && type <= AssetType.Item))
             throw new ArgumentOutOfRangeException($"Tried to construct a ItemId with a type of {type}");
 

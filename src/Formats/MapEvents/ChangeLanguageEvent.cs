@@ -27,7 +27,7 @@ public class ChangeLanguageEvent : MapEvent, IDataChangeEvent
         IsRandom = isRandom;
     }
 
-    public static ChangeLanguageEvent Serdes(ChangeLanguageEvent e, AssetMapping mapping, ISerializer s)
+    public static ChangeLanguageEvent Serdes(ChangeLanguageEvent e, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         e ??= new ChangeLanguageEvent();

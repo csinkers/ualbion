@@ -159,11 +159,10 @@ public readonly struct {name} : IEquatable<{name}>, IEquatable<AssetId>, ICompar
 
     public static {name} FromDisk({(single ? "" : "AssetType type, ")}int disk, AssetMapping mapping)
     {{
-        if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        {(single ? "" : $@"
+        if (mapping == null) throw new ArgumentNullException(nameof(mapping));{(single ? "" : $@"
         if (!({condition}))
-            throw new ArgumentOutOfRangeException($""Tried to construct a {name} with a type of {{type}}"");")}
-
+            throw new ArgumentOutOfRangeException($""Tried to construct a {name} with a type of {{type}}"");
+")}
         var (enumType, enumValue) = mapping.IdToEnum(new {name}({(single ? firstType : "type")}, disk));
         return ({name})AssetMapping.Global.EnumToId(enumType, enumValue);
     }}

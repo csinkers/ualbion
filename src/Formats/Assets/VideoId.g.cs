@@ -47,8 +47,6 @@ public readonly struct VideoId : IEquatable<VideoId>, IEquatable<AssetId>, IComp
     public static VideoId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new VideoId(AssetType.Video, disk));
         return (VideoId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

@@ -47,8 +47,6 @@ public readonly struct MonsterGroupId : IEquatable<MonsterGroupId>, IEquatable<A
     public static MonsterGroupId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new MonsterGroupId(AssetType.MonsterGroup, disk));
         return (MonsterGroupId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

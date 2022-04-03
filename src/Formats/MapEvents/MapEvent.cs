@@ -18,7 +18,7 @@ public abstract class MapEvent : Event, IMapEvent
         if (node?.Event != null && mapEvent == null)
             throw new ArgumentOutOfRangeException($"Tried to serialise a non-map event \"{node.Event}\" to bytes");
 
-        var @event = SerdesEvent(mapEvent, s, chainSource, textAssetId, mapping);
+        var @event = SerdesEvent(mapEvent, s, textAssetId, mapping);
 
         if (@event is IBranchingEvent be)
         {
@@ -48,7 +48,7 @@ public abstract class MapEvent : Event, IMapEvent
         return node;
     }
 
-    public static IMapEvent SerdesEvent(IMapEvent e, ISerializer s, AssetId chainSource, TextId textSourceId, AssetMapping mapping)
+    public static IMapEvent SerdesEvent(IMapEvent e, ISerializer s, TextId textSourceId, AssetMapping mapping)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         var initialPosition = s.Offset;
@@ -69,7 +69,7 @@ public abstract class MapEvent : Event, IMapEvent
             MapEventType.EndDialogue => EndDialogueEvent.Serdes((EndDialogueEvent)e, s),
             MapEventType.Execute => ExecuteEvent.Serdes((ExecuteEvent)e, s),
             MapEventType.MapExit => TeleportEvent.Serdes((TeleportEvent)e, mapping, s),
-            MapEventType.Modify => ModifyEvent.BaseSerdes((ModifyEvent)e, mapping, chainSource, s),
+            MapEventType.Modify => ModifyEvent.BaseSerdes((ModifyEvent)e, mapping, s),
             MapEventType.Offset => OffsetEvent.Serdes((OffsetEvent)e, s),
             MapEventType.Pause => PauseEvent.Serdes((PauseEvent)e, s),
             MapEventType.PlaceAction => PlaceActionEvent.Serdes((PlaceActionEvent)e, s),

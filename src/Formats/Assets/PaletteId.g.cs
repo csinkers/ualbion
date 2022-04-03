@@ -47,8 +47,6 @@ public readonly struct PaletteId : IEquatable<PaletteId>, IEquatable<AssetId>, I
     public static PaletteId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new PaletteId(AssetType.Palette, disk));
         return (PaletteId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

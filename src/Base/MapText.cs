@@ -4,6 +4,8 @@ namespace UAlbion.Base;
 
 public enum MapText : ushort
 {
+    Unk1 = 1, // Referenced in a ModifyNpcOffEvent in map 163
+    Unk40 = 40, // Referenced in some EventChainOffEvents in maps 147, 151, 154
     TestMapIskai = 100,
     TestMapToronto = 101,
     TestMapToronto2 = 102,

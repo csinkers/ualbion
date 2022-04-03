@@ -47,8 +47,6 @@ public readonly struct WaveLibraryId : IEquatable<WaveLibraryId>, IEquatable<Ass
     public static WaveLibraryId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new WaveLibraryId(AssetType.WaveLibrary, disk));
         return (WaveLibraryId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

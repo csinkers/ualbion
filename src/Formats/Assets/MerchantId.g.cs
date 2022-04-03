@@ -47,8 +47,6 @@ public readonly struct MerchantId : IEquatable<MerchantId>, IEquatable<AssetId>,
     public static MerchantId FromDisk(int disk, AssetMapping mapping)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        
-
         var (enumType, enumValue) = mapping.IdToEnum(new MerchantId(AssetType.Merchant, disk));
         return (MerchantId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }

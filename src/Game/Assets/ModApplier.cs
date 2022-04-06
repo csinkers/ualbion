@@ -58,7 +58,7 @@ public class ModApplier : Component, IModApplier
         mapping.Clear();
 
         foreach (var mod in mods.Reverse())
-            LoadMod(config.ResolvePath("$(MODS)"), mod, mapping);
+            LoadMod(config.ResolvePath("$(MODS)"), mod.Trim(), mapping);
 
         _modsInReverseDependencyOrder.Reverse();
         Raise(ModsLoadedEvent.Instance);
@@ -92,14 +92,14 @@ public class ModApplier : Component, IModApplier
         var assetConfigPath = Path.Combine(path, "assets.json");
         if (!disk.FileExists(assetConfigPath))
         {
-            Error($"Mod {modName} does not contain an asset.config file");
+            Error($"Mod {modName} does not contain an assets.json file");
             return;
         }
 
         var modConfigPath = Path.Combine(path, "modinfo.json");
         if (!disk.FileExists(modConfigPath))
         {
-            Error($"Mod {modName} does not contain an modinfo.config file");
+            Error($"Mod {modName} does not contain a modinfo.json file");
             return;
         }
 

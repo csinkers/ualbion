@@ -153,7 +153,7 @@ public static class AssetSystem
             disk,
             jsonUtil,
             LoadGeneralConfig(baseDir, disk, jsonUtil),
-            new GeneralSettings(),
+            new GeneralSettings { ActiveMods = new[] { "Base" } },
             LoadConfig(baseDir, disk, jsonUtil),
             mods.Length == 0 ? null : mods.ToList());
     }

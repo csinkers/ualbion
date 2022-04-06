@@ -9,6 +9,7 @@ public interface IGameState
 {
     bool Loaded { get; }
     int TickCount { get; }
+    int MTicksToday => (int)(48.0 * Time.TimeOfDay.TotalHours);
     DateTime Time { get; }
     float PaletteBlend { get; }
     IParty Party { get; }

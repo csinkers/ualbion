@@ -81,11 +81,9 @@ public class Npc2D : Component
                 break;
         }
 
-        var detector = Resolve<ICollisionManager>();
-        if (Movement2D.Update(
-                _state,
+        if (Movement2D.Update(_state,
                 _moveSettings,
-                detector,
+                Resolve<ICollisionManager>(),
                 _targetX - _state.X,
                 _targetY - _state.Y,
                 (x, y) => Raise(new NpcEnteredTileEvent(_npcNumber, x, y))))
@@ -95,7 +93,8 @@ public class Npc2D : Component
                     _state.PixelX / _moveSettings.TileWidth,
                     _state.PixelY / _moveSettings.TileHeight,
                     _moveSettings.GetDepth(_state.Y));
-            // _sprite.Frame = 
+
+            _sprite.Frame = _moveSettings.GetSpriteFrame(_state, false);
         }
     }
 
@@ -118,9 +117,10 @@ public class Npc2D : Component
     {
     }
 
+    GameConfig.MovementT GetMoveConfig() => Resolve<IGameConfigProvider>().Game.NpcMovement;
     protected override void Subscribed()
     {
-        _moveSettings ??= new MovementSettings(_isLarge, Resolve<IGameConfigProvider>());
+        _moveSettings ??= new MovementSettings(_isLarge, GetMoveConfig);
         _sprite.TilePosition = new Vector3(
             _state.X,
             _state.Y,
@@ -184,23 +184,27 @@ public class Npc2D : Component
             new EventSource(_state.Id, TextId.None, TriggerTypes.TalkTo));
     }
 
-    void MovementStationary()
+    void SetTarget(int x, int y)
     {
-        _targetX = _state.X;
-        _targetY = _state.Y;
+        if (_targetX == x && _targetY == y)
+            return;
+
+        GameTrace.Log.SetNpcMoveTarget(_npcNumber, x, y);
+        _targetX = x;
+        _targetY = y;
     }
+
+    void MovementStationary() => SetTarget(_state.X, _state.Y);
 
     void MovementFollowWaypoints()
     {
         var game = Resolve<IGameState>();
-        var dayFraction = game.Time.TimeOfDay.TotalHours / 24.0;
-        var waypointIndex = (int)(_mapData.Waypoints.Length * dayFraction);
+        var waypointIndex = game.MTicksToday;
         if (waypointIndex >= _mapData.Waypoints.Length)
             waypointIndex = 0;
 
         var waypoint = _mapData.Waypoints[waypointIndex];
-        _targetX = waypoint.X;
-        _targetY = waypoint.Y;
+        SetTarget(waypoint.X, waypoint.Y);
 
         // if too far, teleport
         int dx = _targetX - _state.X;
@@ -208,6 +212,7 @@ public class Npc2D : Component
         int d2 = dx * dx + dy * dy;
         if (d2 > 4)
         {
+            GameTrace.Log.TeleportNpc(_npcNumber, _targetX, _targetY);
             _state.X = (ushort)_targetX;
             _state.Y = (ushort)_targetY;
         }
@@ -217,18 +222,19 @@ public class Npc2D : Component
     {
         var party = Resolve<IParty>();
         var pos = party.Leader.GetPosition();
-        _targetX = (int)pos.X;
-        _targetY = (int)pos.Y;
+        SetTarget((int)pos.X, (int)pos.Y);
     }
 
     void MovementRandom()
     {
-        (_targetX, _targetY) = Resolve<IRandom>().Generate(4) switch
+        var (x,y) = Resolve<IRandom>().Generate(4) switch
         {
             0 => (-1, 0),
             1 => (0, 1),
             2 => (1, 0),
             _ => (0, -1),
         };
+
+        SetTarget(x,y);
     }
 }

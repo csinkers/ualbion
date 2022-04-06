@@ -23,18 +23,21 @@ public class DirectoryContainer : IAssetContainer
         // Pattern vars: 0=Index 1=SubItem 2=Name 3=Palette
         var pattern = info.Get(AssetProperty.Pattern, "{0}_{1}_{2}.dat");
 
-        foreach (var filePath in disk.EnumerateDirectory(path, $"{info.Index}_*.*"))
+        if (disk.DirectoryExists(path))
         {
-            var filename = Path.GetFileName(filePath);
-            var (index, subAsset, paletteId, name) = AssetInfo.ParseFilename(pattern, filename);
+            foreach (var filePath in disk.EnumerateDirectory(path, $"{info.Index}_*.*"))
+            {
+                var filename = Path.GetFileName(filePath);
+                var (index, subAsset, paletteId, name) = AssetInfo.ParseFilename(pattern, filename);
 
-            if (paletteId.HasValue)
-                info.Set(AssetProperty.PaletteId, paletteId);
+                if (paletteId.HasValue)
+                    info.Set(AssetProperty.PaletteId, paletteId);
 
-            if (index != info.Index)
-                continue;
+                if (index != info.Index)
+                    continue;
 
-            subAssets[subAsset] = (filePath, name);
+                subAssets[subAsset] = (filePath, name);
+            }
         }
 
         var ms = new MemoryStream();

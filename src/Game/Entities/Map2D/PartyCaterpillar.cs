@@ -44,7 +44,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
         for (int i = 0; i < _trail.Length; i++)
         {
             var position = initialPosition + offset * i;
-            _trail[_trailOffset - i] = (To3D(position), _state.SpriteFrame);
+            _trail[_trailOffset - i] = (To3D(position), settings.GetSpriteFrame(_state, false));
         }
 
         On<FastClockEvent>(_ => Update());
@@ -77,8 +77,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
     void Update()
     {
         var detector = Resolve<ICollisionManager>();
-        if (Movement2D.Update(
-                _state,
+        if (Movement2D.Update(_state,
                 _settings,
                 detector,
                 (int)_direction.X,
@@ -100,7 +99,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
         if (_trailOffset >= _trail.Length)
             _trailOffset = 0;
 
-        _trail[_trailOffset] = (To3D(position), _state.SpriteFrame);
+        _trail[_trailOffset] = (To3D(position), _settings.GetSpriteFrame(_state, false));
         _playerOffsets[0] = (_trailOffset, true);
     }
 

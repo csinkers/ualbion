@@ -57,7 +57,7 @@ public class ModApplier : Component, IModApplier
         _modsInReverseDependencyOrder.Clear();
         mapping.Clear();
 
-        foreach (var mod in mods)
+        foreach (var mod in mods.Reverse())
             LoadMod(config.ResolvePath("$(MODS)"), mod, mapping);
 
         _modsInReverseDependencyOrder.Reverse();

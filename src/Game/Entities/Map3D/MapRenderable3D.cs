@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
@@ -8,10 +7,11 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets.Labyrinth;
+using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Entities.Map2D;
-using UAlbion.Game.Events;
+using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities.Map3D;
 
@@ -20,10 +20,10 @@ public class MapRenderable3D : Component
     readonly LogicalMap3D _logicalMap;
     readonly LabyrinthData _labyrinthData;
     readonly TilemapRequest _properties;
-    readonly IDictionary<int, IList<int>> _tilesByDistance = new Dictionary<int, IList<int>>();
+    // readonly IDictionary<int, IList<int>> _tilesByDistance = new Dictionary<int, IList<int>>();
     readonly ISet<int> _dirty = new HashSet<int>();
     IExtrudedTilemap _tilemap;
-    bool _isSorting;
+    // bool _isSorting;
     bool _fullUpdate = true;
     int _frameCount;
 
@@ -32,9 +32,8 @@ public class MapRenderable3D : Component
         if (logicalMap == null) throw new ArgumentNullException(nameof(logicalMap));
         if (labyrinthData == null) throw new ArgumentNullException(nameof(labyrinthData));
 
-        On<SlowClockEvent>(OnSlowClock);
-        On<RenderEvent>(_ => Update(false));
-        On<SortMapTilesEvent>(e => _isSorting = e.IsSorting);
+        On<RenderEvent>(_ => Update());
+        // On<SortMapTilesEvent>(e => _isSorting = e.IsSorting);
         On<PaletteChangedEvent>(_ =>
         {
             var paletteManager = Resolve<IPaletteManager>();
@@ -151,19 +150,16 @@ public class MapRenderable3D : Component
         _tilemap.SetTile(order, floorIndex, ceilingIndex, wallIndex, frameCount, flags);
     }
 
-    void OnSlowClock(SlowClockEvent e)
+    void Update()
     {
-        _frameCount += e.Delta;
-        if (_isSorting)
-            SortingUpdate();
-        else
-            Update(true);
-    }
+        var config = Resolve<IGameConfigProvider>().Game;
+        var frameCount =  (Resolve<IGameState>()?.TickCount ?? 0) / config.Time.FastTicksPerMapTileFrame;
 
-    void Update(bool frameChanged)
-    {
-        if (frameChanged)
+        if (_frameCount != frameCount)
+        {
             _dirty.UnionWith(_tilemap.AnimatedTiles);
+            _frameCount = frameCount;
+        }
 
         if (_fullUpdate)
         {
@@ -186,7 +182,7 @@ public class MapRenderable3D : Component
         }
         _dirty.Clear();
     }
-
+/*
     void SortingUpdate()
     {
         using var _ = PerfTracker.FrameEvent("5.1 Update tilemap (sorting)");
@@ -235,4 +231,5 @@ public class MapRenderable3D : Component
             }
         }
     }
+*/
 }

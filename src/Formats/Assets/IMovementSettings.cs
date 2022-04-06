@@ -12,4 +12,5 @@ public interface IMovementSettings
     int TileWidth { get; }
     int TileHeight { get; }
     float GetDepth(float y);
+    int GetSpriteFrame(IMovementState state, bool isSeated);
 }

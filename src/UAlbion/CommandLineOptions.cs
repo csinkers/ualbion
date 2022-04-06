@@ -22,6 +22,7 @@ class CommandLineOptions
 
     public string[] Commands { get; }
     public string[] DumpIds { get; }
+    public List<string> Mods { get; }
     public DumpFormats DumpFormats { get; } = DumpFormats.Json;
     public ISet<AssetType> DumpAssetTypes { get; }
 
@@ -133,6 +134,21 @@ class CommandLineOptions
                 foreach (var type in args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries))
                     DumpFormats |= Enum.Parse<DumpFormats>(type, true);
             }
+
+            if (arg is "--MODS" or "--MOD" or "-M")
+            {
+                i++;
+                if (i == args.Length)
+                {
+                    Console.WriteLine("\"-mods\" requires an argument specifying the mods to load");
+                    Mode = ExecutionMode.Exit;
+                    return;
+                }
+
+                Mods = new List<string>();
+                foreach (var mod in args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                    Mods.Add(mod);
+            }
         }
     }
 
@@ -174,6 +190,7 @@ Options:
     --no-audio    : Runs the game without audio
     --startuponly : Exit immediately after the first frame (for profiling startup time etc) (aliases: -s)
     --renderdoc   : Load the RenderDoc plugin on startup (aliases: -rd)
+    --mods        : Override the default mod list (aliases: -m --mod)
 
 Dump / Convert options:
     --formats <Formats> : Specifies the formats for the dumped data (defaults to JSON, valid formats: {formats})

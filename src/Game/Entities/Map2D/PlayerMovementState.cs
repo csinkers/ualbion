@@ -19,22 +19,4 @@ public class PlayerMovementState : IMovementState
     public int MovementTick { get; set; }
     public Direction FacingDirection { get; set; }
     public bool HasTarget { get; set; }
-
-    public int SpriteFrame
-    {
-        get
-        {
-            var anim = FacingDirection switch
-            {
-                Direction.West => SpriteAnimation.WalkW,
-                Direction.East => SpriteAnimation.WalkE,
-                Direction.North => SpriteAnimation.WalkN,
-                Direction.South => SpriteAnimation.WalkS,
-                _ => SpriteAnimation.Sleeping
-            };
-
-            var frames = Settings.Frames[anim];
-            return frames[(MovementTick / Settings.TicksPerFrame) % frames.Length];
-        }
-    }
 }

@@ -122,10 +122,8 @@ public static class FlagTestMap
 
             Add(1, n+1, "N0", s => @$"
     text {s("Setting NPC 0 inactive")}
-    disable_npc 0
-    disable_npc 95
-    disable_npc 0 1 0 1
-    disable_npc 95 1 0 512
+    modify_npc_off Set 0
+    modify_npc_off Set 95
 ");
 
             var waypoints = BuildPatrolPath(18, 6);
@@ -139,9 +137,7 @@ public static class FlagTestMap
             };
 
             Add(1, n+1, "EC0", s => $@"
-    disable_event_chain {mapId.ToMapText()} 0 1 1
-    disable_event_chain {mapId.ToMapText()} 0 1 {mapId.Id}
-    disable_event_chain {mapId.ToMapText()} 249 1 512
+    chain_off Set 0
 ");
 
             Add( 9, 5, "<", _ => Script(s => $@"

@@ -45,6 +45,7 @@ public class FlatMap : Component, IMap
         _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
     }
 
+    GameConfig.MovementT GetMoveConfig() => Resolve<IGameConfigProvider>().Game.PartyMovement;
     protected override void Subscribed()
     {
         Raise(new SetClearColourEvent(0,0,0, 1.0f));
@@ -64,7 +65,7 @@ public class FlatMap : Component, IMap
         TileSize = new Vector3(renderable.TileSize, 1.0f);
         _logicalMap.TileSize = renderable.TileSize;
 
-        var movementSettings = new MovementSettings(!_logicalMap.UseSmallSprites, Resolve<IGameConfigProvider>());
+        var movementSettings = new MovementSettings(!_logicalMap.UseSmallSprites, GetMoveConfig);
         _partyMovement = AttachChild(new PartyCaterpillar(Vector2.Zero, Direction.East, movementSettings));
 
         AttachChild(new NpcManager2D(_logicalMap));

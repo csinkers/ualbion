@@ -63,7 +63,13 @@ static class Program
             return;
         }
 
-        var (exchange, services) = AssetSystem.SetupAsync(baseDir, AssetMapping.Global, disk, jsonUtil).Result;
+        var (exchange, services) = AssetSystem.SetupAsync(
+            baseDir,
+            AssetMapping.Global,
+            disk,
+            jsonUtil,
+            commandLine.Mods).Result;
+
         IRenderPass mainPass = null;
         if (commandLine.NeedsEngine)
             mainPass = BuildEngine(commandLine, exchange);

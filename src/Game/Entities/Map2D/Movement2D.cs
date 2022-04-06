@@ -17,6 +17,8 @@ public static class Movement2D
     {
         if (state == null) throw new ArgumentNullException(nameof(state));
         if (settings == null) throw new ArgumentNullException(nameof(settings));
+        // GameTrace.Log.MoveStart(id, state.X, state.Y, state.PixelX, state.PixelY);
+
         bool moved = false;
         if (!state.HasTarget && (dx != 0 || dy != 0))
             (dx, dy) = CheckForCollisions(state.NoClip ? null : detector, state.X, state.Y, dx, dy);
@@ -32,7 +34,7 @@ public static class Movement2D
             else if (dy < 0) desiredDirection = Direction.North;
 
             // Only start moving if we're already facing the right way
-            state.HasTarget = desiredDirection == state.FacingDirection; 
+            state.HasTarget = desiredDirection == state.FacingDirection;
             state.MoveToX = (ushort)(state.X + dx);
             state.MoveToY = (ushort)(state.Y + dy);
             state.StartTick = state.MovementTick;
@@ -51,9 +53,8 @@ public static class Movement2D
             else
                 enteredTile?.Invoke(state.MoveToX, state.MoveToY);
 
-            GameTrace.Log.Move(
-                oldDirection, desiredDirection, state.FacingDirection,
-                state.X, state.Y, state.MoveToX, state.MoveToY, 0);
+            // GameTrace.Log.MoveDir(oldDirection, desiredDirection, state.FacingDirection);
+            // GameTrace.Log.MovePos(state.X, state.Y, state.MoveToX, state.MoveToY, 0);
         }
 
         if (state.HasTarget)
@@ -64,9 +65,8 @@ public static class Movement2D
             state.PixelY = settings.TileHeight * ApiUtil.Lerp(state.Y, state.MoveToY, t);
             moved = true;
 
-            GameTrace.Log.Move(
-                state.FacingDirection, state.FacingDirection, state.FacingDirection,
-                state.X, state.Y, state.MoveToX, state.MoveToY, state.MovementTick - state.StartTick);
+            // GameTrace.Log.MoveDir(state.FacingDirection, state.FacingDirection, state.FacingDirection);
+            // GameTrace.Log.MovePos(state.X, state.Y, state.MoveToX, state.MoveToY, state.MovementTick - state.StartTick);
 
             if (state.MovementTick - state.StartTick >= settings.TicksPerTile)
             {
@@ -81,6 +81,7 @@ public static class Movement2D
             state.PixelY = settings.TileHeight * state.Y;
         }
 
+        // GameTrace.Log.MoveStop(id, moved);
         return moved;
     }
 

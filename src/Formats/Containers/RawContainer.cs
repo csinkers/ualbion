@@ -18,6 +18,10 @@ public class RawContainer : IAssetContainer
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (disk == null) throw new ArgumentNullException(nameof(disk));
         ApiUtil.Assert(info.Index == 0, "SubItem should always be 0 when accessing a non-container file");
+
+        if (!disk.FileExists(file))
+            return null;
+
         var stream = disk.OpenRead(file);
         var br = new BinaryReader(stream);
         return new AlbionReader(br);

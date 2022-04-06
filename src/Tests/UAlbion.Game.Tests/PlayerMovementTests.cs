@@ -34,7 +34,7 @@ public class PlayerMovementTests
         var disk = new MockFileSystem(true);
         var json = new FormatJsonUtil();
         var configProvider = new ConfigProvider(ConfigUtil.FindBasePath(disk), disk, json);
-        var moveSettings = new MovementSettings(true, configProvider);
+        var moveSettings = new MovementSettings(true, () => configProvider.Game.PartyMovement);
         var m = new PlayerMovementState(moveSettings)
         {
             X = 2,

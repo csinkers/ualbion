@@ -22,6 +22,9 @@ public class JsonStringContainer : IAssetContainer
         if (disk == null) throw new ArgumentNullException(nameof(disk));
         if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
 
+        if (!disk.FileExists(path))
+            return null;
+
         var dict = Load(path, disk, jsonUtil);
         if (!dict.TryGetValue(info.AssetId, out var value))
             return null;

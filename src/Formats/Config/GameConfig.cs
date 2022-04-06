@@ -43,7 +43,8 @@ public class GameConfig
         [JsonInclude] public int FastTicksPerMapTileFrame { get; private set; }
     }
 
-    [JsonInclude] public MovementT Movement { get; private set; } = new();
+    [JsonInclude] public MovementT PartyMovement { get; private set; } = new();
+    [JsonInclude] public MovementT NpcMovement { get; private set; } = new();
     public class MovementT
     {
         [JsonInclude] public int TicksPerTile { get; private set; } // Number of game ticks it takes to move across a map tile

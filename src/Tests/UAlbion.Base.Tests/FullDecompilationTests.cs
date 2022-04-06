@@ -47,7 +47,7 @@ public class FullDecompilationTests : IDisposable
             Language = Language.English
         };
 
-        Exchange = AssetSystem.Setup(Mapping, disk, JsonUtil, generalConfig, settings, configProvider);
+        Exchange = AssetSystem.Setup(Mapping, disk, JsonUtil, generalConfig, settings, configProvider, null);
     }
 
     public FullDecompilationTests()

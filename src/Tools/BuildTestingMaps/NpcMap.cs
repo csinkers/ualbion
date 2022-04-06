@@ -20,7 +20,7 @@ public static class NpcMap
             int i = index;
             builder.SetChain(i, s => @$"
 	text {s($"Test string {i} ({i:X})")}
-	change_language Tom SetToMaximum Celtic
+	change_language Tom Celtic SetToMaximum
 	");
         }
 

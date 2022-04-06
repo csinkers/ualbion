@@ -17,17 +17,19 @@ class GameTrace : EventSource
 
     [Event(1)]
     void AssetLoaded(AssetType type, int id, string name, string language, string path)
-    {
-        WriteEvent(1, type, id, name, language, path);
-    }
+        => WriteEvent(1, type, id, name, language, path);
 
-    public void Move(Direction oldDir, Direction desiredDir, Direction facingDir, float fromX, float fromY, float toX, float toY, int frame)
-    {
-        WriteEvent(2, oldDir, desiredDir, facingDir, fromX, fromY, toX, toY, frame);
-    }
-
-    public void ClockStart(int stoppedFrames, float stoppedMs) => WriteEvent(3, stoppedFrames, stoppedMs);
-    public void ClockStop() => WriteEvent(4);
-    public void ClockUpdating(int cycles) => WriteEvent(5, cycles);
-    public void ClockUpdateComplete() => WriteEvent(6);
+    public void ClockStart(int stoppedFrames, float stoppedMs) => WriteEvent(2, stoppedFrames, stoppedMs);
+    public void ClockStop() => WriteEvent(2);
+    public void ClockUpdating(int cycles) => WriteEvent(2, cycles);
+    public void ClockUpdateComplete() => WriteEvent(3);
+    public void SetNpcMoveTarget(int npc, int x, int y) => WriteEvent(4, npc, x, y);
+    public void TeleportNpc(int npc, int x, int y) => WriteEvent(5, npc, x, y);
+    // public void MoveStart(int id, ushort x, ushort y, float pixelX, float pixelY) 
+    //     => WriteEvent(6, id, x, y, pixelX, pixelY);
+    // public void MoveDir(Direction oldDir, Direction desiredDir, Direction facingDir)
+    //     => WriteEvent(7, oldDir, desiredDir, facingDir);
+    // public void MovePos(int frame, float fromX, float fromY, float toX, float toY)
+    //     => WriteEvent(8, frame, fromX, fromY, toX, toY);
+    // public void MoveStop(int id, bool moved) => WriteEvent(9, id, moved);
 }

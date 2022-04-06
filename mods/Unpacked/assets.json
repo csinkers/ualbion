@@ -247,7 +247,10 @@
       "Pattern": "{0}_{2}.png",
       "Width": 8,
       "Height": 8,
-      "Map": { "1": { "Id": "font.1" } }
+      "Map": { "1": {
+        "Id": "font.1",
+        "Mapping": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\"?!/()#%*&+-=><☺♂♀éâàçêëèïîìôòûùáíóú"
+      } }
     },
     "$(MOD)/Assets/Items.png": {
       "Loader": "pngsheet",

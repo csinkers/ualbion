@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using UAlbion.Api;
-using UAlbion.Base;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -32,7 +33,12 @@ public static class AssetSystem
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(IsoYawEvent)));
     }
 
-    public static async Task<(EventExchange, IContainer)> SetupAsync(string baseDir, AssetMapping mapping, IFileSystem disk, IJsonUtil jsonUtil)
+    public static async Task<(EventExchange, IContainer)> SetupAsync(
+        string baseDir,
+        AssetMapping mapping,
+        IFileSystem disk,
+        IJsonUtil jsonUtil,
+        List<string> mods)
     {
         var configAndSettingsTask = Task.Run(() =>
         {
@@ -42,7 +48,7 @@ public static class AssetSystem
         });
 
         var configTask = Task.Run(() => LoadConfig(baseDir, disk, jsonUtil));
-        return await SetupCore(mapping, disk, jsonUtil, configAndSettingsTask, configTask).ConfigureAwait(false);
+        return await SetupCore(mapping, disk, jsonUtil, configAndSettingsTask, configTask, mods).ConfigureAwait(false);
     }
 
     public static EventExchange Setup(
@@ -51,11 +57,12 @@ public static class AssetSystem
         IJsonUtil jsonUtil,
         GeneralConfig generalConfig,
         GeneralSettings settings,
-        IConfigProvider configProvider)
+        IConfigProvider configProvider,
+        List<string> mods)
     {
         var configAndSettingsTask = Task.FromResult((generalConfig, settings));
         var configTask = Task.FromResult(configProvider);
-        var task = SetupCore(mapping, disk, jsonUtil, configAndSettingsTask, configTask);
+        var task = SetupCore(mapping, disk, jsonUtil, configAndSettingsTask, configTask, mods);
         return task.Result.Item1;
     }
 
@@ -64,7 +71,8 @@ public static class AssetSystem
         IFileSystem disk,
         IJsonUtil jsonUtil,
         Task<(GeneralConfig, GeneralSettings)> configAndSettingsTask,
-        Task<IConfigProvider> configTask)
+        Task<IConfigProvider> configTask,
+        List<string> mods)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
         if (disk == null) throw new ArgumentNullException(nameof(disk));
@@ -100,7 +108,7 @@ public static class AssetSystem
 
         PerfTracker.StartupEvent("Registered asset services");
 
-        modApplier.LoadMods(mapping, generalConfig, settings.ActiveMods);
+        modApplier.LoadMods(mapping, generalConfig, mods ?? settings.ActiveMods);
         mapping.ConsistencyCheck();
         PerfTracker.StartupEvent("Loaded mods");
 
@@ -140,14 +148,13 @@ public static class AssetSystem
     {
         var baseDir = ConfigUtil.FindBasePath(disk);
         var jsonUtil = new FormatJsonUtil();
-        var generalConfig = LoadGeneralConfig(baseDir, disk, jsonUtil);
-        var configProvider = LoadConfig(baseDir, disk, jsonUtil);
-        var settings = new GeneralSettings
-        {
-            ActiveMods = mods.Length == 0 ? new[] { "Base" } : mods,
-            Language = Language.English
-        };
-
-        return Setup(mapping, disk, jsonUtil, generalConfig, settings, configProvider);
+        return Setup(
+            mapping,
+            disk,
+            jsonUtil,
+            LoadGeneralConfig(baseDir, disk, jsonUtil),
+            new GeneralSettings(),
+            LoadConfig(baseDir, disk, jsonUtil),
+            mods.Length == 0 ? null : mods.ToList());
     }
 }

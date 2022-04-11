@@ -35,9 +35,9 @@ namespace UAlbion;
 
 static class Albion
 {
-    public static void RunGame(EventExchange global, IContainer services, IRenderPass mainPass, string baseDir, CommandLineOptions commandLine)
+    public static void RunGame(EventExchange global, IContainer services, IRenderPass mainPass, CommandLineOptions commandLine)
     {
-        RegisterComponents(global, services, mainPass, baseDir, commandLine);
+        RegisterComponents(global, services, mainPass, commandLine);
 
         PerfTracker.StartupEvent("Running game");
         global.Raise(new SetSceneEvent(SceneId.Empty), null);
@@ -53,7 +53,7 @@ static class Albion
         // TODO: Ensure all sprite leases returned etc to weed out memory leaks
     }
 
-    static void RegisterComponents(EventExchange global, IContainer services, IRenderPass mainPass, string baseDir, CommandLineOptions commandLine)
+    static void RegisterComponents(EventExchange global, IContainer services, IRenderPass mainPass, CommandLineOptions commandLine)
     {
 #pragma warning disable CA2000 // Dispose objects before losing scope
         PerfTracker.StartupEvent("Creating main components");

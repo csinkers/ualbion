@@ -81,7 +81,7 @@ static class Program
 
         switch (commandLine.Mode) // ConvertAssets handled above as it requires a specialised asset system setup
         {
-            case ExecutionMode.Game: Albion.RunGame(exchange, services, mainPass, baseDir, commandLine); break;
+            case ExecutionMode.Game: Albion.RunGame(exchange, services, mainPass, commandLine); break;
             case ExecutionMode.BakeIsometric: IsometricTest.Run(exchange, commandLine); break;
 
             case ExecutionMode.DumpData:

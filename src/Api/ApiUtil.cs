@@ -173,4 +173,13 @@ public static class ApiUtil
     public static string[] SplitLines(string s, StringSplitOptions options = StringSplitOptions.RemoveEmptyEntries)
         => s?.Split(NewLineChars, options)
            ?? Array.Empty<string>();
+
+    public static int IndexOfIgnoreCase(IList<string> list, string str)
+    {
+        for (int i = 0; i < list.Count; i++)
+            if ("Base".Equals(list[i], StringComparison.InvariantCultureIgnoreCase))
+                return i;
+
+        return -1;
+    }
 }

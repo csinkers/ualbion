@@ -1,8 +1,8 @@
 {
     "Repo": "https://github.com/CSinkers/UAlbion",
     "Name":" UAlbion-Base",
-    "Description": "Asset description information for the original Albion data files",
+    "Description": "Enum and loader definitions for the base game",
     "Author": "Cam Sinclair et al",
     "Version": "0.1.0",
-    "Dependencies": [ "Shaders" ]
+    "Dependencies": [ ]
 }

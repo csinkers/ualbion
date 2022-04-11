@@ -22,8 +22,11 @@ public class EventRoundTripTests
         var disk = new MockFileSystem(true);
         var jsonUtil = new FormatJsonUtil();
         var baseDir = ConfigUtil.FindBasePath(disk);
-        var assetConfigPath = Path.Combine(baseDir, "mods", "Base", "assets.json");
-        var assetConfig = AssetConfig.Load(assetConfigPath, mapping, disk, jsonUtil);
+        var baseAssetConfigPath = Path.Combine(baseDir, "mods", "Base", "assets.json");
+        var assetConfigPath = Path.Combine(baseDir, "mods", "Albion", "assets.json");
+
+        var baseAssetConfig = AssetConfig.Load(baseAssetConfigPath, null, mapping, disk, jsonUtil);
+        var assetConfig = AssetConfig.Load(assetConfigPath, baseAssetConfig, mapping, disk, jsonUtil);
 
         foreach (var assetType in assetConfig.IdTypes.Values)
         {

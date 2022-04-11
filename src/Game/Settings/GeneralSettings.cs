@@ -31,7 +31,7 @@ public class GeneralSettings : IDebugSettings, IAudioSettings, IGameplaySettings
     // Engine
     public float Special1 { get; set; }
     public float Special2 { get; set; }
-    public EngineFlags Flags { get; set; } = EngineFlags.VSync; 
+    public EngineFlags Flags { get; set; } = EngineFlags.VSync;
 
     public static GeneralSettings Load(IGeneralConfig config, IFileSystem disk, IJsonUtil jsonUtil)
     {
@@ -46,12 +46,20 @@ public class GeneralSettings : IDebugSettings, IAudioSettings, IGameplaySettings
         if (!disk.FileExists(path))
             throw new FileNotFoundException($"Could not find default settings file (expected at {path})");
 
-        var settings = disk.FileExists(path) 
-            ? jsonUtil.Deserialize<GeneralSettings>(disk.ReadAllBytes(path)) 
+        var settings = disk.FileExists(path)
+            ? jsonUtil.Deserialize<GeneralSettings>(disk.ReadAllBytes(path))
             : new GeneralSettings();
 
+        int baseIndex = ApiUtil.IndexOfIgnoreCase(settings.ActiveMods, "Base");
+        if (baseIndex != -1)
+        {
+            settings.ActiveMods.RemoveAt(baseIndex);
+            settings.ActiveMods.Add("Albion");
+        }
+
         if (!settings.ActiveMods.Any())
-            settings.ActiveMods.Add("Base");
+            settings.ActiveMods.Add("Albion");
+
         return settings;
     }
 

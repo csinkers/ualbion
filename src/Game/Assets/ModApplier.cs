@@ -104,9 +104,7 @@ public class ModApplier : Component, IModApplier
         }
 
         var modMapping = new AssetMapping();
-        var assetConfig = AssetConfig.Load(assetConfigPath, modMapping, disk, jsonUtil);
         var modConfig = ModConfig.Load(modConfigPath, disk, jsonUtil);
-        var modInfo = new ModInfo(modName, assetConfig, modConfig, modMapping, path);
 
         // Load dependencies
         foreach (var dependency in modConfig.Dependencies)
@@ -118,14 +116,18 @@ public class ModApplier : Component, IModApplier
                 return;
             }
 
-            modInfo.Mapping.MergeFrom(dependencyInfo.Mapping);
+            modMapping.MergeFrom(dependencyInfo.Mapping);
         }
+
+        var parentConfig = modConfig.InheritTypesFrom != null && _mods.TryGetValue(modConfig.InheritTypesFrom, out var parent) ? parent.AssetConfig : null;
+        var assetConfig = AssetConfig.Load(assetConfigPath, parentConfig, modMapping, disk, jsonUtil);
+        var modInfo = new ModInfo(modName, assetConfig, modConfig, modMapping, path);
 
         foreach (var kvp in assetConfig.Languages)
             _languages[kvp.Key] = kvp.Value;
 
-        MergeTypesToMapping(modInfo.Mapping, assetConfig, assetConfigPath);
-        mapping.MergeFrom(modInfo.Mapping);
+        MergeTypesToMapping(modMapping, assetConfig, assetConfigPath);
+        mapping.MergeFrom(modMapping);
         modConfig.AssetPath ??= path;
         var extraPaths = new Dictionary<string, string> { ["MOD"] = modConfig.AssetPath };
         assetConfig.PopulateAssetIds(

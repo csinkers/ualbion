@@ -18,7 +18,7 @@ namespace UAlbion.Base.Tests;
 
 public class AssetConversionTests
 {
-    const string BaseAssetMod = "Base";
+    const string BaseAssetMod = "Albion";
     const string UnpackedAssetMod = "Unpacked";
     const string RepackedAssetMod = "Repacked";
 

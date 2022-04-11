@@ -43,7 +43,7 @@ public class FullDecompilationTests : IDisposable
         var configProvider = AssetSystem.LoadConfig(baseDir, disk, JsonUtil);
         var settings = new GeneralSettings
         {
-            ActiveMods = { "Base" },
+            ActiveMods = { "Albion" },
             Language = Language.English
         };
 

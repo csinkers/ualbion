@@ -20,18 +20,30 @@ public class AssetConfig : IAssetConfig
     Dictionary<AssetId, AssetInfo[]> _assetLookup;
     AssetMapping _mapping;
 
-    public static AssetConfig Parse(byte[] configText, AssetMapping mapping, IJsonUtil jsonUtil)
+    public static AssetConfig Parse(
+        byte[] configText,
+        AssetConfig? parent,
+        AssetMapping mapping,
+        IJsonUtil jsonUtil)
     {
         if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
         var config = jsonUtil.Deserialize<AssetConfig>(configText);
         if (config == null)
             return null;
 
+        if (parent != null)
+            config.ImportFromParent(parent);
+
         config.PostLoad(mapping);
         return config;
     }
 
-    public static AssetConfig Load(string configPath,  AssetMapping mapping, IFileSystem disk, IJsonUtil jsonUtil)
+    public static AssetConfig Load(
+        string configPath,
+        AssetConfig? parent,
+        AssetMapping mapping,
+        IFileSystem disk,
+        IJsonUtil jsonUtil)
     {
         if (disk == null) throw new ArgumentNullException(nameof(disk));
         if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
@@ -39,7 +51,7 @@ public class AssetConfig : IAssetConfig
             throw new FileNotFoundException($"Could not open asset config from {configPath}");
 
         var configText = disk.ReadAllBytes(configPath);
-        var config = Parse(configText, mapping, jsonUtil);
+        var config = Parse(configText, parent, mapping, jsonUtil);
         if(config == null)
             throw new FileLoadException($"Could not load asset config from \"{configPath}\"");
         return config;
@@ -163,8 +175,8 @@ public class AssetConfig : IAssetConfig
         if (index == -1)
             return (id, null);
 
-        var type = id.Substring(0, index);
-        var val = id.Substring(index + 1);
+        var type = id[..index];
+        var val = id[(index + 1)..];
         return (type, val);
     }
 
@@ -187,5 +199,46 @@ public class AssetConfig : IAssetConfig
             throw new FormatException("Asset IDs should consist of an alias type and value, separated by a '.' character");
         var enumType = ResolveIdType(type);
         return _mapping.EnumToId(enumType, val);
+    }
+
+    void ImportFromParent(AssetConfig parent)
+    {
+        if (parent == null) throw new ArgumentNullException(nameof(parent));
+
+        foreach (var kvp in parent.IdTypes)
+        {
+            if (IdTypes.ContainsKey(kvp.Key)) continue; 
+            IdTypes[kvp.Key] = kvp.Value;
+        }
+
+        foreach (var kvp in parent.StringMappings)
+        {
+            if (StringMappings.ContainsKey(kvp.Key)) continue;
+            StringMappings[kvp.Key] = kvp.Value;
+        }
+
+        foreach (var kvp in parent.Loaders)
+        {
+            if (Loaders.ContainsKey(kvp.Key)) continue;
+            Loaders[kvp.Key] = kvp.Value;
+        }
+
+        foreach (var kvp in parent.Containers)
+        {
+            if (Containers.ContainsKey(kvp.Key)) continue;
+            Containers[kvp.Key] = kvp.Value;
+        }
+
+        foreach (var kvp in parent.PostProcessors)
+        {
+            if (PostProcessors.ContainsKey(kvp.Key)) continue;
+            PostProcessors[kvp.Key] = kvp.Value;
+        }
+
+        foreach (var kvp in parent.Languages)
+        {
+            if (Languages.ContainsKey(kvp.Key)) continue;
+            Languages[kvp.Key] = kvp.Value;
+        }
     }
 }

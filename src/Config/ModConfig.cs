@@ -15,6 +15,7 @@ public class ModConfig
     public Version Version { get; set; }
     public string AssetPath { get; set; }
     public string ShaderPath { get; set; }
+    public string InheritTypesFrom { get; set; }
     [JsonInclude] public List<string> Dependencies { get; private set; } = new();
 
     public static ModConfig Load(string configPath, IFileSystem disk, IJsonUtil jsonUtil)

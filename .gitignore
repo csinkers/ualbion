@@ -31,6 +31,7 @@ global.json
 r.bat
 
 mods/*
+!mods/Albion/
 !mods/Base/
 !mods/Shaders/
 !mods/Test/

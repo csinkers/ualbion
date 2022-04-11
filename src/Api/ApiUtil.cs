@@ -176,8 +176,11 @@ public static class ApiUtil
 
     public static int IndexOfIgnoreCase(IList<string> list, string str)
     {
+        if (list == null) throw new ArgumentNullException(nameof(list));
+        if (string.IsNullOrEmpty(str)) throw new ArgumentNullException(nameof(str));
+
         for (int i = 0; i < list.Count; i++)
-            if ("Base".Equals(list[i], StringComparison.InvariantCultureIgnoreCase))
+            if (str.Equals(list[i], StringComparison.InvariantCultureIgnoreCase))
                 return i;
 
         return -1;

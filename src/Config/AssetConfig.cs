@@ -22,7 +22,7 @@ public class AssetConfig : IAssetConfig
 
     public static AssetConfig Parse(
         byte[] configText,
-        AssetConfig? parent,
+        AssetConfig parent,
         AssetMapping mapping,
         IJsonUtil jsonUtil)
     {
@@ -40,7 +40,7 @@ public class AssetConfig : IAssetConfig
 
     public static AssetConfig Load(
         string configPath,
-        AssetConfig? parent,
+        AssetConfig parent,
         AssetMapping mapping,
         IFileSystem disk,
         IJsonUtil jsonUtil)

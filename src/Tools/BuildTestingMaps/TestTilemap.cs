@@ -1,5 +1,6 @@
 ﻿using UAlbion.Api.Visual;
 using UAlbion.Config;
+using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
@@ -18,6 +19,8 @@ public class TestTilemap
     // public int FlagTileOffset { get; }
     public int SitOffset { get; }
     public int TextOffset { get; }
+    public int AnimLoopOffset { get; }
+    public int AnimCycleOffset { get; }
     public TilesetData Tileset { get; }
     public Dictionary<AssetId, object> Assets { get; }= new();
 
@@ -49,11 +52,11 @@ public class TestTilemap
         };
 
         Tileset = new TilesetData(UAlbion.Base.Tileset.Toronto) { UseSmallGraphics = false };
-        Tileset.Tiles.Add(new(Tileset.Tiles.Count, 1, TileType.Normal, TileLayer.Normal));
+        Tileset.Tiles.Add(new(Tileset.Tiles.Count, 1, TileType.Unk0, TileLayer.Normal));
         BlankOffset = Tileset.Tiles.Count;
-        Tileset.Tiles.Add(new(Tileset.Tiles.Count, 1, TileType.Normal, TileLayer.Normal));
+        Tileset.Tiles.Add(new(Tileset.Tiles.Count, 1, TileType.Unk0, TileLayer.Normal));
         SolidOffset = Tileset.Tiles.Count;
-        Tileset.Tiles.Add(new(Tileset.Tiles.Count, 2, TileType.Normal, TileLayer.Normal)
+        Tileset.Tiles.Add(new(Tileset.Tiles.Count, 2, TileType.Unk0, TileLayer.Normal)
             { Collision = Passability.Solid });
 
         UnderlayOffset = Tileset.Tiles.Count;
@@ -101,6 +104,49 @@ public class TestTilemap
                 .Texture);
 
             Tileset.Tiles.Add(new(Tileset.Tiles.Count, (ushort)gfxIndex, 0, 0));
+        }
+
+        AnimLoopOffset = Tileset.Tiles.Count;
+        const int loopFrameCount = 8;
+        for (int i = 0; i < 16; i++)
+        {
+            int gfxIndex = tiles.Count;
+            for (int j = 0; j < loopFrameCount; j++)
+            {
+                float t = (float)j / (loopFrameCount - 1);
+                tiles.Add(T16(null).FillAll(CBlack2)
+                    .FillRect(CGrey8, 0, 0, 15, (int)(15 * t))
+                    .Border(CWhite)
+                    .Text(i.ToString("X") + j, CWhite, 2, 2, font)
+                    .Texture);
+            }
+
+            Tileset.Tiles.Add(new(Tileset.Tiles.Count, (ushort)gfxIndex, (TileType)i, 0)
+            {
+                FrameCount = loopFrameCount,
+            });
+        }
+
+        AnimCycleOffset = Tileset.Tiles.Count;
+        const int cycleFrameCount = 8;
+        for (int i = 0; i < 16; i++)
+        {
+            int gfxIndex = tiles.Count;
+            for (int j = 0; j < cycleFrameCount; j++)
+            {
+                float t = (float)j / (cycleFrameCount - 1);
+                tiles.Add(T16(null).FillAll(CBlack2)
+                    .FillRect(CGrey8, 0, 0, 15, (int)(15 * t))
+                    .Border(CWhite)
+                    .Text(i.ToString("X") + j, CWhite, 2, 2, font)
+                    .Texture);
+            }
+
+            Tileset.Tiles.Add(new(Tileset.Tiles.Count, (ushort)gfxIndex, (TileType)i, 0)
+            {
+                FrameCount = cycleFrameCount,
+                BackAndForth = true
+            });
         }
 
         var gfxId = (SpriteId)UAlbion.Base.TilesetGraphics.Toronto;

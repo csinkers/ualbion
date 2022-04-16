@@ -18,6 +18,7 @@ public static class TileMapping
         public const string DebugDot = "DebugDot";
         public const string Flags = "Flags";
         public const string Layer = "Layer";
+        public const string BackAndForth = "BackAndForth";
         public const string NoDraw = "NoDraw";
         public const string SitMode = "SitMode";
         public const string Type = "Type";
@@ -75,10 +76,12 @@ public static class TileMapping
         result.Collision = (Passability)Enum.Parse(typeof(Passability), PropString(tile, Prop.Collision) ?? "0");
         result.SitMode   =     (SitMode)Enum.Parse(typeof(SitMode),     PropString(tile, Prop.SitMode)   ?? "0");
         result.Unk7      = (byte)(PropInt(tile, Prop.Unk7) ?? 0);
-        result.Unk12     = PropBool(tile, Prop.Unk12) ?? false;
-        result.Unk18     = PropBool(tile, Prop.Unk18) ?? false;
-        result.NoDraw    = PropBool(tile, Prop.NoDraw) ?? false;
-        result.DebugDot  = PropBool(tile, Prop.DebugDot) ?? false;
+
+        result.BackAndForth = PropBool(tile, Prop.BackAndForth) ?? false;
+        result.Unk12        = PropBool(tile, Prop.Unk12) ?? false;
+        result.Unk18        = PropBool(tile, Prop.Unk18) ?? false;
+        result.NoDraw       = PropBool(tile, Prop.NoDraw) ?? false;
+        result.DebugDot     = PropBool(tile, Prop.DebugDot) ?? false;
         return result;
     }
 
@@ -90,6 +93,7 @@ public static class TileMapping
             new(Prop.Type, x.Type.ToString())
         };
 
+        if (x.BackAndForth) properties.Add(new(Prop.BackAndForth, true));
         if (x.Collision != 0) properties.Add(new(Prop.Collision, ((int)x.Collision)));
         if (x.SitMode != 0) properties.Add(new(Prop.SitMode, x.SitMode.ToString()));
         if (x.Unk7 != 0) properties.Add(new(Prop.Unk7, x.Unk7));

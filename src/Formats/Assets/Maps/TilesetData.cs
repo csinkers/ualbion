@@ -30,7 +30,7 @@ public class TilesetData
             td.Tiles.Add(new TileData
             {
                 Layer = TileLayer.Normal,
-                Type = TileType.Normal,
+                Type = TileType.Unk0,
                 Collision = Passability.Passable,
                 ImageNumber = 0xffff,
                 FrameCount = 1,

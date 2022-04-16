@@ -69,6 +69,12 @@ public class TileData
             | (((int)value & 8) != 0 ? TileFlags.Sit8 : 0);
     }
 
+    public bool BackAndForth
+    {
+        get => (_raw & TileFlags.BackAndForth) != 0;
+        set => _raw = (_raw & ~TileFlags.BackAndForth) | (value ? TileFlags.BackAndForth : 0);
+    }
+
     public bool Unk12
     {
         get => (_raw & TileFlags.Unk12) != 0;
@@ -94,7 +100,7 @@ public class TileData
     }
 
     public ushort ImageNumber { get; set; }
-    [DefaultValue(1)] public byte FrameCount { get; set; }
+    [DefaultValue(1)] public byte FrameCount { get; set; } // Maximum = 8
     public byte Unk7 { get; set; }
     TileFlags _raw;
 
@@ -136,7 +142,7 @@ public class TileData
     }
 
     public override string ToString() => $"Tile {_raw:X} ->{ImageNumber}:{FrameCount} Unk7: {Unk7}";
-    [JsonIgnore] public int Depth => Type.ToDepthOffset() + Layer.ToDepthOffset();
+    [JsonIgnore] public int Depth => Layer.ToDepthOffset();
 
     public static TileData Serdes(int _, TileData t, ISerializer s)
     {
@@ -159,7 +165,7 @@ public class TileData
         FrameCount == 0 &&
         ImageNumber == 0 &&
         Layer == TileLayer.Normal &&
-        Type == TileType.Normal &&
+        Type == TileType.Unk0 &&
         Unk7 == 0;
 
 }

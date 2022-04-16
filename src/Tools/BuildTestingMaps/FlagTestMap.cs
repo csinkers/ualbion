@@ -238,6 +238,15 @@ if (get_ticker 101 Equals 0) {{
             Add(14, 4, "^", _ => Script(_ => "npc_turn 0 0"));
             Add(15, 5, ">", _ => Script(_ => "npc_turn 0 1"));
             Add(14, 6, "v", _ => Script(_ => "npc_turn 0 2"));
+
+            MajMin(4, 4, (i, j) =>
+            {
+                int x0 = 4 + i;
+                int y0 = 2 + j;
+                int num = i + j * 4;
+                map.Underlay[Pos(x0, y0)] = Tileset1.AnimLoopOffset + num;
+                map.Underlay[Pos(x0, y0 + 5)] = Tileset1.AnimCycleOffset + num;
+            });
         });
 
         var (finalMap, mapText) = builder.Build();

@@ -1,6 +1,4 @@
 {
-  "Import": "Base",
-
   "StringMappings": {
     "itemname.*":     "special.ItemNames",
     "stext.*":        "special.SystemStrings",

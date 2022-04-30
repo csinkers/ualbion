@@ -6,12 +6,12 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.Assets.Maps;
 
-public class TileData
+public class TileData // 8 bytes per tile
 {
-    public static TileData FromRaw(TileFlags raw) => new TileData { _raw = raw };
+    public static TileData FromRaw(TileFlags raw) => new() { _raw = raw };
     [JsonIgnore] public ushort Index { get; set; }
 
-    public TileLayer Layer
+    public TileLayer Layer // Establishes the tile's depth relative to NPCs / party members etc
     {
         get => (TileLayer)(
             ((_raw & TileFlags.Layer1) != 0 ? 1 : 0) |
@@ -27,14 +27,12 @@ public class TileData
         get => (TileType)(
                 ((_raw & TileFlags.Type1) != 0 ? 1 : 0) |
                 ((_raw & TileFlags.Type2) != 0 ? 2 : 0) |
-                ((_raw & TileFlags.Type4) != 0 ? 4 : 0) |
-                ((_raw & TileFlags.Type8) != 0 ? 8 : 0));
+                ((_raw & TileFlags.Type4) != 0 ? 4 : 0));
         set => _raw =
             _raw & ~TileFlags.TypeMask
             | (((int)value & 1) != 0 ? TileFlags.Type1 : 0)
             | (((int)value & 2) != 0 ? TileFlags.Type2 : 0)
-            | (((int)value & 4) != 0 ? TileFlags.Type4 : 0)
-            | (((int)value & 8) != 0 ? TileFlags.Type8 : 0);
+            | (((int)value & 4) != 0 ? TileFlags.Type4 : 0);
     }
 
     public Passability Collision
@@ -69,10 +67,16 @@ public class TileData
             | (((int)value & 8) != 0 ? TileFlags.Sit8 : 0);
     }
 
-    public bool BackAndForth
+    public bool Bouncy // Show frames in order 0123210 instead of 01230123
     {
-        get => (_raw & TileFlags.BackAndForth) != 0;
-        set => _raw = (_raw & ~TileFlags.BackAndForth) | (value ? TileFlags.BackAndForth : 0);
+        get => (_raw & TileFlags.Bouncy) != 0;
+        set => _raw = (_raw & ~TileFlags.Bouncy) | (value ? TileFlags.Bouncy : 0);
+    }
+
+    public bool UseUnderlayFlags // Defines this tile as 'cosmetic only' when used in the overlay
+    {
+        get => (_raw & TileFlags.UseUnderlayFlags) != 0;
+        set => _raw = (_raw & ~TileFlags.UseUnderlayFlags) | (value ? TileFlags.UseUnderlayFlags : 0);
     }
 
     public bool Unk12
@@ -87,7 +91,7 @@ public class TileData
         set => _raw = (_raw & ~TileFlags.Unk18) | (value ? TileFlags.Unk18 : 0);
     }
 
-    public bool NoDraw
+    public bool NoDraw // Tile is invisible / won't draw at all
     {
         get => (_raw & TileFlags.NoDraw) != 0;
         set => _raw = (_raw & ~TileFlags.NoDraw) | (value ? TileFlags.NoDraw : 0);
@@ -130,19 +134,10 @@ public class TileData
         Unk7 = 0;
     }
 
-    public int GetSubImageForTile(int tickCount)
-    {
-        int frames = FrameCount;
-        if (tickCount > 0 && FrameCount > 1)
-            frames = frames > 6 ? frames : (int)(frames + 0.01);
-        if (frames == 0)
-            frames = 1;
-
-        return ImageNumber + tickCount % frames;
-    }
-
-    public override string ToString() => $"Tile {_raw:X} ->{ImageNumber}:{FrameCount} Unk7: {Unk7}";
-    [JsonIgnore] public int Depth => Layer.ToDepthOffset();
+    public override string ToString() => 
+        $"Tile L:{(int)Layer} T:{(int)Type} C:{(int)Collision} S:{(int)SitMode} ->{ImageNumber}:{FrameCount} " +
+        $"U7:{Unk7} {(Bouncy ? "Bounce " : "")}{(UseUnderlayFlags ? "Fallback " : "")}{(DebugDot ? "Debug " : "")}" +
+        $"{(NoDraw ? "NoDraw ":"")}{(Unk12 ? "Unk12 ":"")}{(Unk18 ? "Unk18 ":"")}";
 
     public static TileData Serdes(int _, TileData t, ISerializer s)
     {

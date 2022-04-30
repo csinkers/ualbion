@@ -7,9 +7,9 @@ public enum DrawLayer : ushort
     Billboards = 65, // Sprites in 3D levels
     TranslucentTerrain = 66, // Windows etc in 3D levels
 
-    Overlay    = 0x100, // + (mapHeight - tilePosY - 1) (for 2D levels)
-    Character  = 0x101, // + (mapHeight - tilePosY - 1) (for 2D levels)
-    Underlay   = 0x102, // + (mapHeight - tilePosY - 1) (for 2D levels)
+    Underlay   = 0x100, // for 2D levels
+    Overlay    = 0x101, // for 2D levels
+    Character  = 0x102, // for 2D levels
     Info       = 0x300, // Verb highlights on map etc   (for 2D levels)
     // Effects,
     Diagnostic  = 0x600, // Missing textures etc

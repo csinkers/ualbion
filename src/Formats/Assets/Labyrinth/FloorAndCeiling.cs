@@ -9,7 +9,7 @@ public class FloorAndCeiling // Length = 0xA (10) bytes
     [Flags]
     public enum FcFlags : byte
     {
-        BackAndForth = 1,
+        Bouncy = 1,
         SelfIlluminating = 1 << 1,
         NonWalkable = 1 << 2,
         Unknown3 = 1 << 3,

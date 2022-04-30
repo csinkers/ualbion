@@ -119,7 +119,7 @@ public class MapRenderable3D : Component
         EtmTileFlags flags = 0;
         if (floor != null)
         {
-            if ((floor.Properties & FloorAndCeiling.FcFlags.BackAndForth) != 0)
+            if ((floor.Properties & FloorAndCeiling.FcFlags.Bouncy) != 0)
                 flags |= EtmTileFlags.FloorBackAndForth;
 
             if ((floor.Properties & FloorAndCeiling.FcFlags.SelfIlluminating) != 0)
@@ -128,7 +128,7 @@ public class MapRenderable3D : Component
 
         if (ceiling != null)
         {
-            if ((ceiling.Properties & FloorAndCeiling.FcFlags.BackAndForth) != 0)
+            if ((ceiling.Properties & FloorAndCeiling.FcFlags.Bouncy) != 0)
                 flags |= EtmTileFlags.CeilingBackAndForth;
 
             if ((ceiling.Properties & FloorAndCeiling.FcFlags.SelfIlluminating) != 0)
@@ -137,7 +137,7 @@ public class MapRenderable3D : Component
 
         if (wall != null)
         {
-            if ((wall.Properties & Wall.WallFlags.BackAndForth) != 0)
+            if ((wall.Properties & Wall.WallFlags.Bouncy) != 0)
                 flags |= EtmTileFlags.WallBackAndForth;
 
             if ((wall.Properties & Wall.WallFlags.AlphaTested) != 0)

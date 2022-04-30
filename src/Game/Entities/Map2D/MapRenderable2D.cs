@@ -4,7 +4,6 @@ using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 
@@ -26,19 +25,8 @@ public class MapRenderable2D : Component
         var subImage = tileset.Regions[0];
         TileSize = subImage.Size;
 
-        _underlay = AttachChild(factory.CreateMapLayer(
-            logicalMap,
-            tileset,
-            logicalMap.GetUnderlay,
-            DrawLayer.Underlay,
-            IconChangeType.Underlay));
-
-        _overlay = AttachChild(factory.CreateMapLayer(logicalMap,
-            tileset,
-            logicalMap.GetOverlay,
-            DrawLayer.Overlay,
-            IconChangeType.Overlay));
-
+        _underlay = AttachChild(factory.CreateMapLayer(logicalMap, tileset, false));
+        _overlay = AttachChild(factory.CreateMapLayer(logicalMap, tileset, true)); 
         _info = AttachChild(new InfoOverlay(logicalMap));
 
         var tileSize = tileset.Regions[0].Size;

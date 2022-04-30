@@ -12,13 +12,15 @@ namespace UAlbion.Game.Entities;
 public class MapObject : Component
 {
     readonly MapSprite _sprite;
+    readonly bool _isBouncy;
     int _frame;
 
-    public MapObject(SpriteId id, Vector3 initialPosition, Vector2 size, bool onFloor, bool backAndForth, SpriteKeyFlags keyFlags = 0)
+    public MapObject(SpriteId id, Vector3 initialPosition, Vector2 size, bool onFloor, bool bouncy, SpriteKeyFlags keyFlags = 0)
     {
+        _isBouncy = bouncy;
         _sprite = AttachChild(new MapSprite(
             id,
-            DrawLayer.Underlay,
+            DrawLayer.Billboards,
             keyFlags,
             SpriteFlags.FlipVertical |
             (onFloor
@@ -30,20 +32,16 @@ public class MapObject : Component
             SelectionCallback = registerHit => { registerHit(this); return false; }
         });
 
-        On<SlowClockEvent>(e =>
-        {
-            if (_sprite.FrameCount == 1)
-                Exchange.Unsubscribe<SlowClockEvent>(this);
+        On<SlowClockEvent>(AdvanceFrame);
+    }
 
-            _frame += e.Delta;
-            if (backAndForth && _sprite.FrameCount > 2)
-            {
-                int maxFrame = _sprite.FrameCount - 1;
-                int frame = _frame % (2 * maxFrame) - maxFrame;
-                _sprite.Frame = Math.Abs(frame);
-            }
-            else _sprite.Frame = _frame;
-        });
+    void AdvanceFrame(SlowClockEvent e)
+    {
+        if (_sprite.FrameCount <= 1) // Can't check this until after subscription
+            Off<SlowClockEvent>();
+
+        _frame += e.Delta;
+            _sprite.Frame = AnimUtil.GetFrame(_frame, _sprite.FrameCount, _isBouncy);
     }
 
     public Vector3 Position { get => _sprite.Position; set => _sprite.Position = value; }

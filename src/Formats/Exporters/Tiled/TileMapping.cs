@@ -18,7 +18,7 @@ public static class TileMapping
         public const string DebugDot = "DebugDot";
         public const string Flags = "Flags";
         public const string Layer = "Layer";
-        public const string BackAndForth = "BackAndForth";
+        public const string Bouncy = "Bouncy";
         public const string NoDraw = "NoDraw";
         public const string SitMode = "SitMode";
         public const string Type = "Type";
@@ -31,6 +31,7 @@ public static class TileMapping
         public const string Unk9 = "Unk9";
         public const string Unk12 = "Unk12";
         public const string Unk18 = "Unk18";
+        public const string UseUnderlayFlags =  "UseUnderlayFlags";
     }
 
     public static Tile BuildTile(int id, int index, ushort? imageNumber, List<TiledProperty> tileProperties, Tilemap2DProperties properties)
@@ -77,11 +78,12 @@ public static class TileMapping
         result.SitMode   =     (SitMode)Enum.Parse(typeof(SitMode),     PropString(tile, Prop.SitMode)   ?? "0");
         result.Unk7      = (byte)(PropInt(tile, Prop.Unk7) ?? 0);
 
-        result.BackAndForth = PropBool(tile, Prop.BackAndForth) ?? false;
-        result.Unk12        = PropBool(tile, Prop.Unk12) ?? false;
-        result.Unk18        = PropBool(tile, Prop.Unk18) ?? false;
-        result.NoDraw       = PropBool(tile, Prop.NoDraw) ?? false;
-        result.DebugDot     = PropBool(tile, Prop.DebugDot) ?? false;
+        result.Bouncy   = PropBool(tile, Prop.Bouncy) ?? false;
+        result.UseUnderlayFlags = PropBool(tile, Prop.UseUnderlayFlags) ?? false;
+        result.Unk12    = PropBool(tile, Prop.Unk12) ?? false;
+        result.Unk18    = PropBool(tile, Prop.Unk18) ?? false;
+        result.NoDraw   = PropBool(tile, Prop.NoDraw) ?? false;
+        result.DebugDot = PropBool(tile, Prop.DebugDot) ?? false;
         return result;
     }
 
@@ -93,7 +95,8 @@ public static class TileMapping
             new(Prop.Type, x.Type.ToString())
         };
 
-        if (x.BackAndForth) properties.Add(new(Prop.BackAndForth, true));
+        if (x.Bouncy) properties.Add(new(Prop.Bouncy, true));
+        if (x.UseUnderlayFlags) properties.Add(new(Prop.UseUnderlayFlags, true));
         if (x.Collision != 0) properties.Add(new(Prop.Collision, ((int)x.Collision)));
         if (x.SitMode != 0) properties.Add(new(Prop.SitMode, x.SitMode.ToString()));
         if (x.Unk7 != 0) properties.Add(new(Prop.Unk7, x.Unk7));

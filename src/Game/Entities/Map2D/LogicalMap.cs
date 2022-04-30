@@ -97,13 +97,19 @@ public abstract class LogicalMap : Component
     protected virtual void ChangeNpcMovement(byte x, byte y, ushort value) { } // TODO
     protected virtual void ChangeNpcSprite(byte x, byte y, ushort value) { } // TODO
 
-    protected void OnDirty(int x, int y, IconChangeType type) => Dirty?.Invoke(this, new DirtyTileEventArgs(x, y, type));
+    readonly DirtyTileEventArgs _args = new();
+    protected void OnDirty(int x, int y, IconChangeType type)
+    {
+        _args.X = x;
+        _args.Y = y;
+        _args.Type = type;
+        Dirty?.Invoke(this, _args);
+    }
 }
 
 public class DirtyTileEventArgs : EventArgs
 {
-    public DirtyTileEventArgs(int x, int y, IconChangeType type) { X = x; Y = y; Type = type; }
-    public int X { get; }
-    public int Y { get; }
-    public IconChangeType Type { get; }
+    public int X { get; set; }
+    public int Y { get; set; }
+    public IconChangeType Type { get; set; }
 }

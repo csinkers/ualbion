@@ -12,7 +12,7 @@ public class Wall // Length = 0x12 + overlayCount * 0xC
     [Flags]
     public enum WallFlags : byte
     {
-        BackAndForth = 1,
+        Bouncy = 1,
         SelfIlluminating = 2,
         WriteOverlay = 4,
         Unk3 = 8,

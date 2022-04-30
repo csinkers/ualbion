@@ -2,8 +2,6 @@
 using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets.Maps;
-using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Entities.Map2D;
 
@@ -34,8 +32,7 @@ public class MockGameFactory : Component, IGameFactory
         return new MockSpriteBatch(key);
     }
 
-    public IMapLayer CreateMapLayer(LogicalMap2D logicalMap, ITexture tileset, Func<int, TileData> getTileFunc, DrawLayer layer,
-        IconChangeType iconChangeType)
+    public IMapLayer CreateMapLayer(LogicalMap2D logicalMap, ITexture tileset, bool isOverlay)
     {
         throw new NotImplementedException();
     }

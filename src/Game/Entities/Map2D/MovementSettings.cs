@@ -11,13 +11,11 @@ public class MovementSettings : IMovementSettings
 {
     readonly bool _isLarge;
     readonly Func<GameConfig.MovementT> _getConfig;
-    readonly Func<float, float> _getDepth;
 
     public MovementSettings(bool isLarge, Func<GameConfig.MovementT> getConfig)
     {
         _isLarge = isLarge;
         _getConfig = getConfig ?? throw new ArgumentNullException(nameof(getConfig));
-        _getDepth = isLarge ? DepthUtil.IndoorCharacterDepth : DepthUtil.OutdoorCharacterDepth;
         Frames = isLarge ? LargeSpriteAnimations.Frames : SmallSpriteAnimations.Frames;
     }
 
@@ -29,7 +27,7 @@ public class MovementSettings : IMovementSettings
     public int MaxTrailDistance => _isLarge ? Movement.MaxTrailDistanceLarge : Movement.MaxTrailDistanceSmall;
     public int TileWidth => 16;
     public int TileHeight => 16;
-    public float GetDepth(float y) => _getDepth(y);
+    public float GetDepth(float y) => DepthUtil.LayerToDepth(0, y);
     public int GetSpriteFrame(IMovementState state, bool isSeated)
     {
         if (state == null) throw new ArgumentNullException(nameof(state));

@@ -21,6 +21,8 @@ public class TestTilemap
     public int TextOffset { get; }
     public int AnimLoopOffset { get; }
     public int AnimCycleOffset { get; }
+    public int AnimLoopOverlayOffset { get; }
+    public int AnimCycleOverlayOffset { get; }
     public TilesetData Tileset { get; }
     public Dictionary<AssetId, object> Assets { get; }= new();
 
@@ -106,48 +108,48 @@ public class TestTilemap
             Tileset.Tiles.Add(new(Tileset.Tiles.Count, (ushort)gfxIndex, 0, 0));
         }
 
-        AnimLoopOffset = Tileset.Tiles.Count;
         const int loopFrameCount = 8;
-        for (int i = 0; i < 16; i++)
+        void BuildCycle(int num, int frameCount, Action<TileData, int> func)
         {
-            int gfxIndex = tiles.Count;
-            for (int j = 0; j < loopFrameCount; j++)
+            for (int i = 0; i < num; i++)
             {
-                float t = (float)j / (loopFrameCount - 1);
-                tiles.Add(T16(null).FillAll(CBlack2)
-                    .FillRect(CGrey8, 0, 0, 15, (int)(15 * t))
-                    .Border(CWhite)
-                    .Text(i.ToString("X") + j, CWhite, 2, 2, font)
-                    .Texture);
-            }
+                int gfxIndex = tiles.Count;
+                for (int j = 0; j < frameCount; j++)
+                {
+                    float t = (float)j / (frameCount - 1);
+                    tiles.Add(T16(null).FillAll(CBlack2)
+                        .FillRect(CGrey8, 0, 0, 15, (int)(15 * t))
+                        .Border(CWhite)
+                        .Text(i.ToString("X") + j, CWhite, 2, 2, font)
+                        .Texture);
+                }
 
-            Tileset.Tiles.Add(new(Tileset.Tiles.Count, (ushort)gfxIndex, (TileType)i, 0)
-            {
-                FrameCount = loopFrameCount,
-            });
+                var tile = new TileData(Tileset.Tiles.Count, (ushort)gfxIndex, 0, 0) { FrameCount = loopFrameCount, };
+                func(tile, i);
+                Tileset.Tiles.Add(tile);
+            }
         }
+
+        AnimLoopOffset = Tileset.Tiles.Count;
+        BuildCycle(8, loopFrameCount, (x,i) => x.Type = (TileType)i);
 
         AnimCycleOffset = Tileset.Tiles.Count;
-        const int cycleFrameCount = 8;
-        for (int i = 0; i < 16; i++)
-        {
-            int gfxIndex = tiles.Count;
-            for (int j = 0; j < cycleFrameCount; j++)
-            {
-                float t = (float)j / (cycleFrameCount - 1);
-                tiles.Add(T16(null).FillAll(CBlack2)
-                    .FillRect(CGrey8, 0, 0, 15, (int)(15 * t))
-                    .Border(CWhite)
-                    .Text(i.ToString("X") + j, CWhite, 2, 2, font)
-                    .Texture);
-            }
+        BuildCycle(8, loopFrameCount, (x,i) => { x.Type = (TileType)i; x.Bouncy = true; });
 
-            Tileset.Tiles.Add(new(Tileset.Tiles.Count, (ushort)gfxIndex, (TileType)i, 0)
-            {
-                FrameCount = cycleFrameCount,
-                BackAndForth = true
-            });
-        }
+        AnimLoopOverlayOffset = Tileset.Tiles.Count;
+        BuildCycle(8, loopFrameCount, (x,i) =>
+        {
+            x.Type = (TileType)i;
+            x.UseUnderlayFlags = true;
+        });
+
+        AnimCycleOverlayOffset = Tileset.Tiles.Count;
+        BuildCycle(8, loopFrameCount, (x, i) =>
+        {
+            x.Type = (TileType)i;
+            x.Bouncy = true;
+            x.UseUnderlayFlags = true;
+        });
 
         var gfxId = (SpriteId)UAlbion.Base.TilesetGraphics.Toronto;
         Assets[gfxId] = BlitUtil.CombineFramesVertically(gfxId, tiles);

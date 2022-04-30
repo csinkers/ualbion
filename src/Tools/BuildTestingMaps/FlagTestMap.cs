@@ -56,7 +56,7 @@ public static class FlagTestMap
                 assets[scriptId] = script;
                 return "do_script " + scriptId.Id;
             }
-
+/*
             Add(1, n+1, "S0", s => @$"
     text {s("Setting switch 0")}
     switch 1 0
@@ -238,14 +238,16 @@ if (get_ticker 101 Equals 0) {{
             Add(14, 4, "^", _ => Script(_ => "npc_turn 0 0"));
             Add(15, 5, ">", _ => Script(_ => "npc_turn 0 1"));
             Add(14, 6, "v", _ => Script(_ => "npc_turn 0 2"));
-
-            MajMin(4, 4, (i, j) =>
+*/
+            MajMin(8, 1, (i, j) =>
             {
-                int x0 = 4 + i;
+                int x0 = 2 + i;
                 int y0 = 2 + j;
-                int num = i + j * 4;
-                map.Underlay[Pos(x0, y0)] = Tileset1.AnimLoopOffset + num;
-                map.Underlay[Pos(x0, y0 + 5)] = Tileset1.AnimCycleOffset + num;
+                int num = i; // + j * 4;
+                map.Overlay[Pos(x0, y0)]     = Tileset1.AnimLoopOffset  + num;
+                map.Overlay[Pos(x0, y0 + 1)] = Tileset1.AnimLoopOverlayOffset  + num;
+                map.Overlay[Pos(x0, y0 + 4)] = Tileset1.AnimCycleOffset + num;
+                map.Overlay[Pos(x0, y0 + 5)] = Tileset1.AnimCycleOverlayOffset + num;
             });
         });
 

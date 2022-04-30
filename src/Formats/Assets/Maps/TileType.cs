@@ -10,12 +10,4 @@ public enum TileType : byte
     Unk5,
     Unk6,
     Unk7,
-    Unk8,
-    Unk9,
-    UnkA,
-    UnkB,
-    UnkC,
-    UnkD,
-    UnkE,
-    UnkF,
 }

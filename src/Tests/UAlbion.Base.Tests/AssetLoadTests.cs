@@ -764,7 +764,7 @@ public class AssetLoadTests : IDisposable
 
         t = ts.Tiles[452];
         Assert.Equal(TileLayer.Layer1, t.Layer);
-        Assert.Equal(TileType.Unk1, t.Type);
+        Assert.Equal(TileType.Unk0, t.Type);
         Assert.Equal(Passability.Solid, t.Collision);
         Assert.Equal(SitMode.Sleep2, t.SitMode);
         Assert.Equal(451, t.ImageNumber);

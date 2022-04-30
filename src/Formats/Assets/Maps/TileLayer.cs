@@ -1,6 +1,4 @@
-﻿using UAlbion.Api.Visual;
-
-namespace UAlbion.Formats.Assets.Maps;
+﻿namespace UAlbion.Formats.Assets.Maps;
 
 public enum TileLayer
 {
@@ -12,17 +10,5 @@ public enum TileLayer
 
 public static class TileLayerExtensions
 {
-    public static int ToDepthOffset(this TileLayer layer)
-    {
-        int adjustment;
-        switch ((int)layer & 0x7)
-        {
-            case (int)TileLayer.Normal: adjustment = DepthUtil.NormalAdjustment; break;
-            case (int)TileLayer.Layer1: adjustment = DepthUtil.Layer1Adjustment; break;
-            case (int)TileLayer.Layer2: adjustment = DepthUtil.Layer2Adjustment; break;
-            case (int)TileLayer.Layer3: adjustment = DepthUtil.Layer3Adjustment; break;
-            default: adjustment = 0; break;
-        }
-        return adjustment;
-    }
+    public static int ToDepthOffset(this TileLayer layer) => (int)layer;
 }

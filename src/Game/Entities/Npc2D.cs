@@ -42,7 +42,7 @@ public class Npc2D : Component
         _isLarge = isLarge;
         _sprite = AttachChild(new MapSprite(
             _state.SpriteOrGroup,
-            DrawLayer.Underlay - 1,
+            DrawLayer.Character,
             0,
             SpriteFlags.BottomAligned)
         {
@@ -124,9 +124,7 @@ public class Npc2D : Component
         _sprite.TilePosition = new Vector3(
             _state.X,
             _state.Y,
-            _isLarge
-                ? DepthUtil.IndoorCharacterDepth(_state.X)
-                : DepthUtil.OutdoorCharacterDepth(_state.Y)
+            DepthUtil.LayerToDepth(0, _state.Y)
         );
     }
 

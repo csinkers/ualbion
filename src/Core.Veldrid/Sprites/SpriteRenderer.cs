@@ -23,8 +23,21 @@ public sealed class SpriteRenderer : Component, IRenderer, IDisposable
     {
         _vertexBuffer = new MultiBuffer<Vertex2DTextured>(Vertices, BufferUsage.VertexBuffer, "SpriteVertexBuffer");
         _indexBuffer = new MultiBuffer<ushort>(Indices, BufferUsage.IndexBuffer, "SpriteIndexBuffer");
-        _pipeline = BuildPipeline(DepthStencilStateDescription.DepthOnlyLessEqual, framebuffer);
-        _noCullPipeline = BuildPipeline(DepthStencilStateDescription.Disabled, framebuffer);
+        _pipeline = BuildPipeline(
+            new DepthStencilStateDescription
+            {
+                DepthTestEnabled = true,
+                DepthWriteEnabled = true,
+                DepthComparison = ComparisonKind.LessEqual
+            }, framebuffer);
+
+        _noCullPipeline = BuildPipeline(
+            new DepthStencilStateDescription
+            {
+                DepthTestEnabled = true,
+                DepthWriteEnabled = true,
+                DepthComparison = ComparisonKind.Always
+            }, framebuffer);
         AttachChild(_vertexBuffer);
         AttachChild(_indexBuffer);
         AttachChild(_pipeline);

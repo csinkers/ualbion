@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;

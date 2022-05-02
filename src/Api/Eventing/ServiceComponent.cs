@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Core;
+﻿namespace UAlbion.Api.Eventing;
 
 public abstract class ServiceComponent<T> : Component
 {

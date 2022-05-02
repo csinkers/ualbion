@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Scripting;

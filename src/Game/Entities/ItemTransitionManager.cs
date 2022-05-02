@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Visual;

@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 
 namespace UAlbion.Core;

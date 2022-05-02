@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Formats.Containers;
 

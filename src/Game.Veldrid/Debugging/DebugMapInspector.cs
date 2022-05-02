@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using ImGuiNET;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;

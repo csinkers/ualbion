@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Api;
+﻿namespace UAlbion.Api.Eventing;
 
 [Event("log", "Writes to the game log.")]
 public class LogEvent : Event

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UAlbion.Core;
+namespace UAlbion.Api;
 
 public class PooledThreadSafe<T> where T : class
 {

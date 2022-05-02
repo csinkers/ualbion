@@ -8,6 +8,7 @@ using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Visual;

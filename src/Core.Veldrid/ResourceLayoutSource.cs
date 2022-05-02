@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid.Events;
 using Veldrid;
 

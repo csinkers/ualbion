@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Core;
+﻿using UAlbion.Api.Eventing;
+
+namespace UAlbion.Core;
 
 public interface IEngine : IComponent
 {

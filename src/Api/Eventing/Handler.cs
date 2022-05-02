@@ -1,7 +1,6 @@
 ﻿using System;
-using UAlbion.Api;
 
-namespace UAlbion.Core;
+namespace UAlbion.Api.Eventing;
 
 public abstract class Handler
 {

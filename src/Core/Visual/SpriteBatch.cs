@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 
 namespace UAlbion.Core.Visual;

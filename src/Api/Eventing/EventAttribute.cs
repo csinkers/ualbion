@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UAlbion.Api;
+namespace UAlbion.Api.Eventing;
 
 [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
 public sealed class EventAttribute : Attribute

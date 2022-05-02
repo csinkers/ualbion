@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Text;
 using ImGuiNET;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Settings;

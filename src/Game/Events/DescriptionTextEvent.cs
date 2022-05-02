@@ -1,4 +1,5 @@
 ﻿using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Events;

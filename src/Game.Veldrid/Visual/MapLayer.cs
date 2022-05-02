@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Visual;

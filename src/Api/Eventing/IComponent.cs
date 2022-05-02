@@ -1,6 +1,4 @@
-﻿using UAlbion.Api;
-
-namespace UAlbion.Core;
+﻿namespace UAlbion.Api.Eventing;
 
 public interface IComponent
 {

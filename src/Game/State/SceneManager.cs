@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Game.Events;
 using UAlbion.Game.Scenes;

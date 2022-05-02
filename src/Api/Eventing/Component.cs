@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using UAlbion.Api;
 
 #pragma warning disable CA1030 // Use events where appropriate
-namespace UAlbion.Core;
+namespace UAlbion.Api.Eventing;
 
 /// <summary>
 /// Component is effectively the base class of all game objects.

@@ -5,6 +5,7 @@ using System.Linq;
 using SerdesNet;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;

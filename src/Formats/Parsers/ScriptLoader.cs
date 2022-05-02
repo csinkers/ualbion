@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;

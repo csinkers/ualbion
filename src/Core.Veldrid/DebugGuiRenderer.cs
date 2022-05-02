@@ -1,4 +1,5 @@
 ﻿using System;
+using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Visual;

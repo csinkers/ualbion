@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-namespace UAlbion.Api;
+namespace UAlbion.Api.Eventing;
 
 public class EventMetadata
 {

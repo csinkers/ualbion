@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Text;
+using UAlbion.Api.Eventing;
 using Xunit;
 using UAlbion.Config;
 using UAlbion.Core;

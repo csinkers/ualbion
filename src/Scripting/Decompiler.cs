@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Scripting.Ast;
 using UAlbion.Scripting.Rules;
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;

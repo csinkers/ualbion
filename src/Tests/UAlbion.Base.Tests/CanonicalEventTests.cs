@@ -1,4 +1,5 @@
 ﻿using System;
+using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;

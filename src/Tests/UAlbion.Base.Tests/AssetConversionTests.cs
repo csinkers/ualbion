@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;

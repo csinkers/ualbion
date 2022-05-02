@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid.Events;
 using Veldrid;
 using Veldrid.SPIRV;

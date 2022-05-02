@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;

@@ -6,6 +6,7 @@ using System.Text;
 using SerdesNet;
 using UAlbion;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;

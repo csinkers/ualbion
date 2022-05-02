@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Events;
 using Veldrid;

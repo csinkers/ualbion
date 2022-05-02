@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Game.Events;
 using UAlbion.Game.Scenes;

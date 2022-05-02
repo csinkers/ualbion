@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using UAlbion.Api.Eventing;
 using Xunit;
 
 namespace UAlbion.Api.Tests;

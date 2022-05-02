@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting;

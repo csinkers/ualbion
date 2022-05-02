@@ -1,4 +1,5 @@
-﻿using UAlbion.Core.Visual;
+﻿using UAlbion.Api.Eventing;
+using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UAlbion.Core;
+namespace UAlbion.Api;
 
 public class DoubleBuffered<T>
 {

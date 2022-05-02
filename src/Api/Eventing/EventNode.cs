@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 using static System.FormattableString;
 
-namespace UAlbion.Api;
+namespace UAlbion.Api.Eventing;
 
 [DebuggerDisplay("{ToString()}")]
 public class EventNode : IEventNode, IEquatable<EventNode>
@@ -95,7 +95,7 @@ public class EventNode : IEventNode, IEquatable<EventNode>
 
         done:
         if (id < 0) throw new FormatException($"Error parsing node id of event node \"{s}\"");
-        var e = Api.Event.Parse(s[i..]);
+        var e = Eventing.Event.Parse(s[i..]);
         if (e == null)
             throw new FormatException($"Could not parse \"{s[i..]}\" as an event");
 

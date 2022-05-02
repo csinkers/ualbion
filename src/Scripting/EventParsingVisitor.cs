@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting;

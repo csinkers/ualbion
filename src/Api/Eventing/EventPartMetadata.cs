@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace UAlbion.Api;
+namespace UAlbion.Api.Eventing;
 
 public class EventPartMetadata
 {

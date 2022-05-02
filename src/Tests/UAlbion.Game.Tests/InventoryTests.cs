@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
+using UAlbion.Api.Eventing;
 using Xunit;
 using UAlbion.Config;
 using UAlbion.Core;

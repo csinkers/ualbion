@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;

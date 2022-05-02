@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using SerdesNet;
+using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;

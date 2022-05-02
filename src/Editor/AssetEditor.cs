@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using ImGuiNET;
+using UAlbion.Api.Eventing;
 using UAlbion.Core;
 
 namespace UAlbion.Editor;

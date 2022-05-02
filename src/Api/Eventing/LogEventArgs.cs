@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UAlbion.Core.Events;
+namespace UAlbion.Api.Eventing;
 
 public class LogEventArgs : EventArgs
 {

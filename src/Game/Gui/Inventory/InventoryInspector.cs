@@ -1,4 +1,5 @@
-﻿using UAlbion.Core;
+﻿using UAlbion.Api.Eventing;
+using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Game.Events.Inventory;
 

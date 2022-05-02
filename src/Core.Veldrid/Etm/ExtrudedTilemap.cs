@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;

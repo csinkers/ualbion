@@ -1,4 +1,5 @@
 ﻿using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Formats.Assets.Labyrinth;
 
 namespace UAlbion.Game.Veldrid.Assets;

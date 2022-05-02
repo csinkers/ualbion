@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Api;
+﻿namespace UAlbion.Api.Eventing;
 
 [Event("set_log_level")]
 public class SetLogLevelEvent : Event, IVerboseEvent

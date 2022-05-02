@@ -4,6 +4,7 @@ using System.ComponentModel;
 using UAlbion.Core.Veldrid.Events;
 using Veldrid;
 using VeldridGen.Interfaces;
+using Component = UAlbion.Api.Eventing.Component;
 
 namespace UAlbion.Core.Veldrid;
 

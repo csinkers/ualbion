@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 
 namespace UAlbion.Core;

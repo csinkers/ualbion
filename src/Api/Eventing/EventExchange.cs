@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using UAlbion.Api;
 #if DEBUG
-using UAlbion.Core.Events;
 #endif
 
 #pragma warning disable CA1030 // Use events where appropriate
-namespace UAlbion.Core
+namespace UAlbion.Api.Eventing
 {
     /// <summary>
     /// An event exchange responsible for efficiently distributing events to all

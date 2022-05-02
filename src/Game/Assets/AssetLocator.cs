@@ -4,6 +4,7 @@ using System.IO;
 using System.Security.Cryptography;
 using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;

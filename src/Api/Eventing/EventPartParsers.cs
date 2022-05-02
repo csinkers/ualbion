@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace UAlbion.Api;
+namespace UAlbion.Api.Eventing;
 
 public class EventPartParsers
 {

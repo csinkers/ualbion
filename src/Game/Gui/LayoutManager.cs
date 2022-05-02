@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Numerics;
 using System.Text;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;

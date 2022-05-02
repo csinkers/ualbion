@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using Xunit;

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace UAlbion.Api;
+namespace UAlbion.Api.Eventing;
 
 [SuppressMessage("Naming", "CA1716:Identifiers should not match keywords", Justification = "Don't care about VB")]
 public abstract class Event : IEvent // Contains no fields, only helper methods for reflection-based parsing and serialization.

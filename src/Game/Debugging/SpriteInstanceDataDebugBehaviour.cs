@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
 

@@ -2,7 +2,7 @@
 using UAlbion.Api;
 using UAlbion.Base;
 using UAlbion.Config;
-using UAlbion.Game.Assets;
+using UAlbion.Formats;
 using static BuildTestingMaps.Constants;
 
 namespace BuildTestingMaps;

@@ -3,7 +3,6 @@ using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
-using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Magic;

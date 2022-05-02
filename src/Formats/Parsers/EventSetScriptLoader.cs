@@ -3,10 +3,9 @@ using System.Text;
 using SerdesNet;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 
-namespace UAlbion.Game.Assets;
+namespace UAlbion.Formats.Parsers;
 
 public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
 {
@@ -36,7 +35,7 @@ public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
         return existing;
     }
 
-    string Decompile(EventSetId id, EventSet set, IAssetManager assets)
+    static string Decompile(EventSetId id, EventSet set, IAssetManager assets)
     {
         var sb = new StringBuilder();
         var eventFormatter = new EventFormatter(assets.LoadString, id.ToEventText());

@@ -7,7 +7,7 @@ using UAlbion.Core.Veldrid.Etm;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Game.Assets;
+using UAlbion.Formats;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.State;
 using Veldrid;

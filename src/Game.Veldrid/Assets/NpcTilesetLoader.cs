@@ -9,7 +9,6 @@ using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Exporters.Tiled;
 using UAlbion.Formats.Parsers;
-using UAlbion.Game.Assets;
 
 namespace UAlbion.Game.Veldrid.Assets;
 

@@ -1,5 +1,4 @@
 ﻿using UAlbion.Formats.Parsers;
-using UAlbion.Game.Assets;
 
 namespace UAlbion.Base.Tests;
 

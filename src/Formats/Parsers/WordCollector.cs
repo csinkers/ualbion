@@ -3,10 +3,9 @@ using System.Linq;
 using SerdesNet;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 
-namespace UAlbion.Game.Assets;
+namespace UAlbion.Formats.Parsers;
 
 public class WordCollector : Component, IAssetLoader<ListStringCollection>
 {

@@ -3,7 +3,7 @@ using System.IO;
 using UAlbion.Api.Eventing;
 using UAlbion.Base;
 using UAlbion.Config;
-using UAlbion.Game.Assets;
+using UAlbion.Formats;
 
 namespace UAlbion;
 

@@ -9,6 +9,7 @@ using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Formats.Parsers;
 using UAlbion.Game.Assets;
 using UAlbion.TestCommon;
 using Xunit;
@@ -21,7 +22,7 @@ public class AssetConversionTests
     const string UnpackedAssetMod = "Unpacked";
     const string RepackedAssetMod = "Repacked";
 
-    static readonly DummyAssetManager DummyAssets = new DummyAssetManager();
+    static readonly DummyAssetManager DummyAssets = new();
     static readonly IJsonUtil JsonUtil = new FormatJsonUtil();
     readonly string _baseDir;
     readonly IFileSystem _disk;

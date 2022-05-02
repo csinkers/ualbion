@@ -5,7 +5,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Save;
 
-namespace UAlbion.Game.Assets;
+namespace UAlbion.Formats;
 
 public interface IModApplier : IComponent
 {

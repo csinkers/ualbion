@@ -4,9 +4,8 @@ using SerdesNet;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
-using UAlbion.Formats;
 
-namespace UAlbion.Game.Assets;
+namespace UAlbion.Formats.Parsers;
 
 public class FontSpriteLoader<T> : Component, IAssetLoader<IReadOnlyTexture<byte>>
     where T : IAssetLoader<IReadOnlyTexture<byte>>, new()

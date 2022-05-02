@@ -62,15 +62,15 @@
     "chest":             "UAlbion.Formats.Parsers.ChestLoader, UAlbion.Formats",
     "dummy":             "UAlbion.Formats.Parsers.DummyLoader, UAlbion.Formats",
     "eset":              "UAlbion.Formats.Parsers.EventSetLoader, UAlbion.Formats",
-    "eventSetScript":    "UAlbion.Game.Assets.EventSetScriptLoader, UAlbion.Game",
+    "eventSetScript":    "UAlbion.Formats.Parsers.EventSetScriptLoader, UAlbion.Formats",
     "fixedsize":         "UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats",
     "flic":              "UAlbion.Formats.Parsers.FlicLoader, UAlbion.Formats",
-    "font":              "UAlbion.Game.Assets.FontSpriteLoader`1[[UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats]], UAlbion.Game",
-    "pngfont":           "UAlbion.Game.Assets.FontSpriteLoader`1[[UAlbion.Game.Veldrid.Assets.PngSheetLoader, UAlbion.Game.Veldrid]], UAlbion.Game",
+    "font":              "UAlbion.Formats.Parsers.FontSpriteLoader`1[[UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats]], UAlbion.Formats",
+    "pngfont":           "UAlbion.Formats.Parsers.FontSpriteLoader`1[[UAlbion.Game.Veldrid.Assets.PngSheetLoader, UAlbion.Game.Veldrid]], UAlbion.Formats",
     "header":            "UAlbion.Formats.Parsers.SingleHeaderSpriteLoader, UAlbion.Formats",
     "interlaced":        "UAlbion.Formats.Parsers.InterlacedBitmapLoader, UAlbion.Formats",
-    "itemNameCollector": "UAlbion.Game.Assets.ItemNameCollector, UAlbion.Game",
-    "itemdata":          "UAlbion.Game.Assets.ItemDataLoader, UAlbion.Game",
+    "itemNameCollector": "UAlbion.Formats.Parsers.ItemNameCollector, UAlbion.Formats",
+    "itemdata":          "UAlbion.Formats.Parsers.ItemDataLoader, UAlbion.Formats",
     "itemname":          "UAlbion.Formats.Parsers.ItemNameLoader, UAlbion.Formats",
     "json":              "UAlbion.Formats.Parsers.JsonStringLoader, UAlbion.Formats",
     "jsonEventSet":      "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.EventSet, UAlbion.Formats]], UAlbion.Formats",
@@ -89,35 +89,41 @@
     "mongrp":            "UAlbion.Formats.Parsers.MonsterGroupLoader, UAlbion.Formats",
     "multiheader":       "UAlbion.Formats.Parsers.MultiHeaderSpriteLoader, UAlbion.Formats",
     "pal":               "UAlbion.Formats.Parsers.PaletteLoader, UAlbion.Formats",
-    "png8":              "UAlbion.Game.Veldrid.Assets.Png8Loader, UAlbion.Game.Veldrid",
-    "png32":             "UAlbion.Game.Veldrid.Assets.Png32Loader, UAlbion.Game.Veldrid",
-    "pngtile8":          "UAlbion.Game.Veldrid.Assets.PngTileLoader8Bit, UAlbion.Game.Veldrid",
-    "pngtile32":         "UAlbion.Game.Veldrid.Assets.PngTileLoader32Bit, UAlbion.Game.Veldrid",
-    "pngsheet":          "UAlbion.Game.Veldrid.Assets.PngSheetLoader, UAlbion.Game.Veldrid",
     "raw":               "UAlbion.Formats.Parsers.RawLoader, UAlbion.Formats",
     "sample":            "UAlbion.Formats.Parsers.SampleLoader, UAlbion.Formats",
     "script":            "UAlbion.Formats.Parsers.ScriptLoader, UAlbion.Formats",
-    "sheet":             "UAlbion.Game.Assets.CharacterSheetLoader, UAlbion.Game",
+    "sheet":             "UAlbion.Formats.Parsers.CharacterSheetLoader, UAlbion.Formats",
     "slab":              "UAlbion.Formats.Parsers.SlabLoader, UAlbion.Formats",
     "song":              "UAlbion.Formats.Parsers.SongLoader, UAlbion.Formats",
-    "soundbank":         "UAlbion.Game.Assets.SoundBankLoader, UAlbion.Game",
     "spell":             "UAlbion.Formats.Parsers.SpellLoader, UAlbion.Formats",
     "stext":             "UAlbion.Formats.Parsers.SystemTextLoader, UAlbion.Formats",
     "stringtable":       "UAlbion.Formats.Parsers.AlbionStringTableLoader, UAlbion.Formats",
-    "tiledLabyrinth":    "UAlbion.Game.Veldrid.Assets.IsometricLabyrinthLoader, UAlbion.Game.Veldrid",
-    "tiledMap":          "UAlbion.Game.Assets.TiledMapLoader, UAlbion.Game",
-    "tiledNpcTileset":   "UAlbion.Game.Veldrid.Assets.NpcTilesetLoader, UAlbion.Game.Veldrid",
+    "tiledMap":          "UAlbion.Formats.Exporters.Tiled.TiledMapLoader, UAlbion.Formats",
     "tiledStamp":        "UAlbion.Formats.Exporters.Tiled.StampLoader, UAlbion.Formats",
     "tiledTileGfx":      "UAlbion.Formats.Exporters.Tiled.TileGraphicsLoader, UAlbion.Formats",
-    "tiledTileset":      "UAlbion.Game.Assets.TiledTilesetLoader, UAlbion.Game",
+    "tiledTileset":      "UAlbion.Formats.Exporters.Tiled.TiledTilesetLoader, UAlbion.Formats",
     "tileset":           "UAlbion.Formats.Parsers.TilesetLoader, UAlbion.Formats",
     "tilegfx":           "UAlbion.Formats.Parsers.TilesetGraphicsLoader, UAlbion.Formats",
     "utf8":              "UAlbion.Formats.Parsers.Utf8Loader, UAlbion.Formats",
     "wav":               "UAlbion.Formats.Parsers.WavLoader, UAlbion.Formats",
     "wavlib":            "UAlbion.Formats.Parsers.WaveLibLoader, UAlbion.Formats",
     "wavlib2":           "UAlbion.Formats.Parsers.WaveLibWavLoader, UAlbion.Formats",
-    "wordCollector":     "UAlbion.Game.Assets.WordCollector, UAlbion.Game",
-    "wordlist":          "UAlbion.Formats.Parsers.WordListLoader, UAlbion.Formats"
+    "wordCollector":     "UAlbion.Formats.Parsers.WordCollector, UAlbion.Formats",
+    "wordlist":          "UAlbion.Formats.Parsers.WordListLoader, UAlbion.Formats",
+
+    // These are in Game.Veldrid due to a dependency on ImageSharp
+    "png8":              "UAlbion.Game.Veldrid.Assets.Png8Loader, UAlbion.Game.Veldrid",
+    "png32":             "UAlbion.Game.Veldrid.Assets.Png32Loader, UAlbion.Game.Veldrid",
+    "pngtile8":          "UAlbion.Game.Veldrid.Assets.PngTileLoader8Bit, UAlbion.Game.Veldrid",
+    "pngtile32":         "UAlbion.Game.Veldrid.Assets.PngTileLoader32Bit, UAlbion.Game.Veldrid",
+    "pngsheet":          "UAlbion.Game.Veldrid.Assets.PngSheetLoader, UAlbion.Game.Veldrid",
+
+    // This is in Game due to a dependency on AdlMidi.NET
+    "soundbank":         "UAlbion.Game.Assets.SoundBankLoader, UAlbion.Game",
+
+    // These are in Game.Veldrid as they require the 3D engine to render isometric tiles to offscreen buffers
+    "tiledLabyrinth":    "UAlbion.Game.Veldrid.Assets.IsometricLabyrinthLoader, UAlbion.Game.Veldrid",
+    "tiledNpcTileset":   "UAlbion.Game.Veldrid.Assets.NpcTilesetLoader, UAlbion.Game.Veldrid"
   },
 
   "Containers": {
@@ -133,7 +139,7 @@
 
   "PostProcessors": {
     "atlas": "UAlbion.Formats.Parsers.AtlasPostProcessor, UAlbion.Formats",
-    "inv":  "UAlbion.Game.Assets.InventoryPostProcessor, UAlbion.Game"
+    "inv":   "UAlbion.Formats.Parsers.InventoryPostProcessor, UAlbion.Formats"
   },
 
   "Languages": {

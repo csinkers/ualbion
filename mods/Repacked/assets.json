@@ -237,34 +237,33 @@
     "$(MOD)/Albion/CD/XLDLIBS/INITIAL/PRTCHAR2.XLD": { "Post": "inv", "Loader": "sheet", "Map": { "0": { "Id": "party.200" } } },
 
     // Graphics
-    "$(MOD)/Albion/CD/XLDLIBS/3DFLOOR0.XLD": { "Post": "gfx",  "Loader": "fixedsize", "Width": 64, "Height": 64, "Max": 98, "MapFile": "$(MOD)/Meta/3DFLOOR0.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DFLOOR1.XLD": { "Post": "gfx",  "Loader": "fixedsize", "MinimumCount": 100, "Width": 64, "Height": 64, "MapFile": "$(MOD)/Meta/3DFLOOR1.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DFLOOR2.XLD": { "Post": "gfx",  "Loader": "fixedsize", "MinimumCount": 100, "Width": 64, "Height": 64, "MapFile": "$(MOD)/Meta/3DFLOOR2.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DOBJEC0.XLD": { "Post": "gfx",  "Loader": "fixedsize", "Max": 98, "MapFile": "$(MOD)/Meta/3DOBJEC0.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DOBJEC1.XLD": { "Post": "gfx",  "Loader": "fixedsize", "MapFile": "$(MOD)/Meta/3DOBJEC1.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DOBJEC2.XLD": { "Post": "gfx",  "Loader": "fixedsize", "MapFile": "$(MOD)/Meta/3DOBJEC2.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DOBJEC3.XLD": { "Post": "gfx",  "Loader": "fixedsize", "MinimumCount": 100, "MapFile": "$(MOD)/Meta/3DOBJEC3.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DOVERL0.XLD": { "Post": "gfx",  "Transposed": true, "Loader": "fixedsize", "Max": 98, "MapFile": "$(MOD)/Meta/3DOVERL0.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DOVERL1.XLD": { "Post": "gfx",  "Transposed": true, "Loader": "fixedsize", "MapFile": "$(MOD)/Meta/3DOVERL1.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DOVERL2.XLD": { "Post": "gfx",  "Transposed": true, "Loader": "fixedsize", "MinimumCount": 100, "MapFile": "$(MOD)/Meta/3DOVERL2.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DWALLS0.XLD": { "Post": "gfx",  "Transposed": true, "Loader": "fixedsize", "Max": 98, "MapFile": "$(MOD)/Meta/3DWALLS0.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DWALLS1.XLD": { "Post": "gfx",  "Transposed": true, "Loader": "fixedsize", "MinimumCount": 100, "MapFile": "$(MOD)/Meta/3DWALLS1.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/COMBACK0.XLD": { "Post": "gfx",  "Loader": "fixedsize", "Width": 360, "MapFile": "$(MOD)/Meta/COMBACK0.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/COMGFX0.XLD":  { "Post": "gfx",  "Loader": "multiheader", "PaletteId": 23, "Map": { "0": { "Id": "comgfx.1"} } },
-    "$(MOD)/Albion/CD/XLDLIBS/FBODPIX0.XLD": { "Post": "gfx",  "Loader": "header", "PaletteId": 19, "Map": { "0": { "Id": "fullbody.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/MONGFX0.XLD":  { "Post": "gfx",  "Loader": "multiheader", "PaletteId": 24, "MapFile": "$(MOD)/Meta/MONGFX0.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/NPCGR0.XLD":   { "Post": "gfx",  "Loader": "header", "Max": 98, "MapFile": "$(MOD)/Meta/NPCGR0.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/NPCGR1.XLD":   { "Post": "gfx",  "Loader": "header", "MinimumCount": 100, "MapFile": "$(MOD)/Meta/NPCGR1.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/NPCKL0.XLD":   { "Post": "gfx",  "Loader": "header", "PaletteId": 1, "Map": { "0": { "Id": "snpc.1" }, "27": { "PaletteId": 4 } } },
-    "$(MOD)/Albion/CD/XLDLIBS/PARTGR0.XLD":  { "Post": "gfx",  "Loader": "header", "PaletteId": 20, "Map": { "0": { "Id": "lparty.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/PARTKL0.XLD":  { "Post": "gfx",  "Loader": "header", "PaletteId": 1, "Map": { "0": { "Id": "sparty.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/3DFLOOR0.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "Max": 98, "MapFile": "$(MOD)/Meta/3DFLOOR0.json" },
+    "$(MOD)/Albion/CD/XLDLIBS/3DFLOOR1.XLD": { "Loader": "fixedsize", "MinimumCount": 100, "Width": 64, "Height": 64, "MapFile": "$(MOD)/Meta/3DFLOOR1.json" },
+    "$(MOD)/Albion/CD/XLDLIBS/3DFLOOR2.XLD": { "Loader": "fixedsize", "MinimumCount": 100, "Width": 64, "Height": 64, "MapFile": "$(MOD)/Meta/3DFLOOR2.json" },
+    "$(MOD)/Albion/CD/XLDLIBS/3DOBJEC0.XLD": { "Loader": "fixedsize", "Max": 98, "MapFile": "$(MOD)/Meta/3DOBJEC0.json" },
+    "$(MOD)/Albion/CD/XLDLIBS/3DOBJEC1.XLD": { "Loader": "fixedsize", "MapFile": "$(MOD)/Meta/3DOBJEC1.json" },
+    "$(MOD)/Albion/CD/XLDLIBS/3DOBJEC2.XLD": { "Loader": "fixedsize", "MapFile": "$(MOD)/Meta/3DOBJEC2.json" },
+    "$(MOD)/Albion/CD/XLDLIBS/3DOBJEC3.XLD": { "Loader": "fixedsize", "MinimumCount": 100, "MapFile": "$(MOD)/Meta/3DOBJEC3.json" },
+    "$(MOD)/Albion/CD/XLDLIBS/3DOVERL0.XLD": { "Transposed": true, "Loader": "fixedsize", "Max": 98, "MapFile": "$(MOD)/Meta/3DOVERL0.json" },
+    "$(MOD)/Albion/CD/XLDLIBS/3DOVERL1.XLD": { "Transposed": true, "Loader": "fixedsize", "MapFile": "$(MOD)/Meta/3DOVERL1.json" },
+    "$(MOD)/Albion/CD/XLDLIBS/3DOVERL2.XLD": { "Transposed": true, "Loader": "fixedsize", "MinimumCount": 100, "MapFile": "$(MOD)/Meta/3DOVERL2.json" },
+    "$(MOD)/Albion/CD/XLDLIBS/3DWALLS0.XLD": { "Transposed": true, "Loader": "fixedsize", "Max": 98, "MapFile": "$(MOD)/Meta/3DWALLS0.json" },
+    "$(MOD)/Albion/CD/XLDLIBS/3DWALLS1.XLD": { "Transposed": true, "Loader": "fixedsize", "MinimumCount": 100, "MapFile": "$(MOD)/Meta/3DWALLS1.json" },
+    "$(MOD)/Albion/CD/XLDLIBS/COMBACK0.XLD": { "Loader": "fixedsize", "Width": 360, "MapFile": "$(MOD)/Meta/COMBACK0.json" },
+    "$(MOD)/Albion/CD/XLDLIBS/COMGFX0.XLD":  { "Loader": "multiheader", "PaletteId": 23, "Map": { "0": { "Id": "comgfx.1"} } },
+    "$(MOD)/Albion/CD/XLDLIBS/FBODPIX0.XLD": { "Loader": "header", "PaletteId": 19, "Map": { "0": { "Id": "fullbody.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/MONGFX0.XLD":  { "Loader": "multiheader", "PaletteId": 24, "MapFile": "$(MOD)/Meta/MONGFX0.json" },
+    "$(MOD)/Albion/CD/XLDLIBS/NPCGR0.XLD":   { "Loader": "header", "Max": 98, "MapFile": "$(MOD)/Meta/NPCGR0.json" },
+    "$(MOD)/Albion/CD/XLDLIBS/NPCGR1.XLD":   { "Loader": "header", "MinimumCount": 100, "MapFile": "$(MOD)/Meta/NPCGR1.json" },
+    "$(MOD)/Albion/CD/XLDLIBS/NPCKL0.XLD":   { "Loader": "header", "PaletteId": 1, "Map": { "0": { "Id": "snpc.1" }, "27": { "PaletteId": 4 } } },
+    "$(MOD)/Albion/CD/XLDLIBS/PARTGR0.XLD":  { "Loader": "header", "PaletteId": 20, "Map": { "0": { "Id": "lparty.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/PARTKL0.XLD":  { "Loader": "header", "PaletteId": 1, "Map": { "0": { "Id": "sparty.1" } } },
     // "$(MOD)/Albion/CD/XLDLIBS/PICTURE0.XLD": { "Post": "ilbm", "Loader": "interlaced", "Map": { "0": { "Id": "pic.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/SMLPORT0.XLD": { "Post": "gfx",  "Loader": "fixedsize", "Width": 34, "Max": 98, "Map": { "0": { "Id": "portrait.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/SMLPORT1.XLD": { "Post": "gfx",  "Loader": "fixedsize", "Width": 34, "MinimumCount": 100, "Map": { "0": { "Id": "portrait.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/TACTICO0.XLD": { "Post": "gfx",  "Loader": "fixedsize", "Width": 32, "Map": { "0": { "Id": "tacgfx.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/SMLPORT0.XLD": { "Loader": "fixedsize", "Width": 34, "Max": 98, "Map": { "0": { "Id": "portrait.1" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/SMLPORT1.XLD": { "Loader": "fixedsize", "Width": 34, "MinimumCount": 100, "Map": { "0": { "Id": "portrait.100" } } },
+    "$(MOD)/Albion/CD/XLDLIBS/TACTICO0.XLD": { "Loader": "fixedsize", "Width": 32, "Map": { "0": { "Id": "tacgfx.1" } } },
 
     "$(MOD)/Albion/CD/XLDLIBS/3DBCKGR0.XLD": {
-      "Post": "gfx",
       "Loader": "header",
       "Map": {
         "0": { "Id": "3dbg.1", "PaletteId": 3 },
@@ -300,7 +299,6 @@
       }
     },
     "$(MOD)/Albion/CD/XLDLIBS/ITEMGFX":      {
-      "Post": "gfx",
       "Loader": "fixedsize",
       "Container": "raw",
       "Width": 16,
@@ -309,7 +307,6 @@
       "Map": { "0": { "Id": "itemgfx.1" } }
     },
     "$(MOD)/Albion/CD/XLDLIBS/SLAB": {
-      "Post": "gfx",
       "Loader": "slab",
       "Container": "raw",
       "Width": 360,
@@ -317,13 +314,11 @@
       "Map": { "0": { "Id": "uibg.1" } }
     },
     "$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710": { // EN+DE
-      "Post": "gfx",
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
       "MapFile": "$(MOD)/Meta/MainExeEN_DE.json"
     },
     "$(ALBION)/MAIN.EXE#487da3348c367363f3efcbb22ae45c186f1fbecada73f0bf0ce2ca8377a8de14": { // FR
-      "Post": "gfx",
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
       "MapFile": "$(MOD)/Meta/MainExeFR.json"

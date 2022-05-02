@@ -20,14 +20,16 @@ public sealed class RenderPass : Component, IRenderPass, IDisposable
     readonly SingleBuffer<GlobalInfo> _globalInfo;
     readonly SingleBuffer<ProjectionMatrix> _projection;
     readonly SingleBuffer<ViewMatrix> _view;
+    readonly SamplerHolder _paletteSampler;
     readonly CommonSet _commonSet;
-    ITextureHolder _palette;
+    ITextureHolder _dayPalette;
+    ITextureHolder _nightPalette;
     (float Red, float Green, float Blue, float Alpha) _clearColour;
 
     public RenderPass(string name, IFramebufferHolder framebuffer)
     {
-        Name = name;
         Framebuffer = framebuffer ?? throw new ArgumentNullException(nameof(framebuffer));
+        Name = name;
 
         On<SetClearColourEvent>(e => _clearColour = (e.Red, e.Green, e.Blue, e.Alpha));
         On<RenderEvent>(_ => UpdatePerFrameResources());
@@ -35,16 +37,27 @@ public sealed class RenderPass : Component, IRenderPass, IDisposable
         _projection = new SingleBuffer<ProjectionMatrix>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "M_Projection");
         _view = new SingleBuffer<ViewMatrix>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "M_View");
         _globalInfo = new SingleBuffer<GlobalInfo>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "B_GlobalInfo");
+        _paletteSampler = new SamplerHolder
+            {
+                AddressModeU = SamplerAddressMode.Clamp,
+                AddressModeV = SamplerAddressMode.Clamp,
+                AddressModeW = SamplerAddressMode.Clamp,
+                BorderColor = SamplerBorderColor.TransparentBlack,
+                Filter = SamplerFilter.MinPoint_MagPoint_MipPoint,
+            };
+
         _commonSet = new CommonSet
         {
             Name = "RS_Common",
             GlobalInfo = _globalInfo,
             Projection = _projection,
             View = _view,
+            Sampler = _paletteSampler,
         };
         AttachChild(_projection);
         AttachChild(_view);
         AttachChild(_globalInfo);
+        AttachChild(_paletteSampler);
         AttachChild(_commonSet);
     }
 
@@ -131,11 +144,20 @@ public sealed class RenderPass : Component, IRenderPass, IDisposable
         var textureSource = Resolve<ITextureSource>();
 
         camera.Viewport = new Vector2(Framebuffer.Width, Framebuffer.Height);
-        var palette = textureSource.GetSimpleTexture(paletteManager.PaletteTexture, paletteManager.Version);
-        if (_palette != palette)
+        var dayPalette = textureSource.GetSimpleTexture(paletteManager.Day.Texture, paletteManager.Version);
+        var nightTexture = paletteManager.Night?.Texture ?? paletteManager.Day.Texture;
+        var nightPalette = textureSource.GetSimpleTexture(nightTexture, paletteManager.Version);
+
+        if (_dayPalette != dayPalette)
         {
-            _palette = palette;
-            _commonSet.Palette = _palette;
+            _dayPalette = dayPalette;
+            _commonSet.DayPalette = dayPalette;
+        }
+
+        if (_nightPalette != nightPalette)
+        {
+            _nightPalette = nightPalette;
+            _commonSet.NightPalette = nightPalette;
         }
 
         var info = new GlobalInfo
@@ -144,10 +166,9 @@ public sealed class RenderPass : Component, IRenderPass, IDisposable
             CameraDirection = new Vector2(camera.Pitch, camera.Yaw),
             Resolution =  new Vector2(Framebuffer.Width, Framebuffer.Height),
             Time = clock?.ElapsedTime ?? 0,
-            Special1 = settings?.Special1 ?? 0,
-            // Special2 = settings?.Special2 ?? 0,
             EngineFlags = settings?.Flags ?? 0,
-            PaletteBlend = paletteManager.PaletteBlend
+            PaletteBlend = paletteManager.Blend,
+            PaletteFrame = paletteManager.Frame
         };
 
         _projection.Data = new ProjectionMatrix(camera.ProjectionMatrix);
@@ -158,6 +179,7 @@ public sealed class RenderPass : Component, IRenderPass, IDisposable
     public void Dispose()
     {
         _commonSet?.Dispose();
+        _paletteSampler.Dispose();
         _globalInfo.Dispose();
         _projection.Dispose();
         _view.Dispose();

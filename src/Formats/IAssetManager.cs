@@ -2,19 +2,19 @@
 using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
-using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
 
-namespace UAlbion.Game;
+namespace UAlbion.Formats;
 
 public interface IAssetManager : ITextureLoader
 {
     AssetInfo GetAssetInfo(AssetId id, string language = null);
     ITexture LoadTexture(SpriteId id);
+    ITileGraphics LoadTileGraphics(TilesetGraphicsId id);
     ITexture LoadFont(FontColor color, bool isBold);
     TilesetData LoadTileData(TilesetId id);
     LabyrinthData LoadLabyrinthData(LabyrinthId id);

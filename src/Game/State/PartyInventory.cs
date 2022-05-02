@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Events.Transitions;
 using UAlbion.Game.State.Player;
-using Component = UAlbion.Core.Component;
 
 namespace UAlbion.Game.State;
 
@@ -33,7 +32,7 @@ public class PartyInventory : Component
                 SimpleChestItemType.Item => (AssetId)e.ItemId,
                 SimpleChestItemType.Gold => AssetId.Gold,
                 SimpleChestItemType.Rations => AssetId.Rations,
-                _ => throw new InvalidEnumArgumentException(nameof(e.ChestType), (int)e.ChestType, typeof(SimpleChestItemType))
+                _ => throw new System.ComponentModel.InvalidEnumArgumentException(nameof(e.ChestType), (int)e.ChestType, typeof(SimpleChestItemType))
             };
 
             var recipient = ChangePartyItemAmount(itemId, NumericOperation.AddAmount, e.Amount);

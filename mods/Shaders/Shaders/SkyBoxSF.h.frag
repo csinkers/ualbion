@@ -25,9 +25,11 @@ layout(set = 1, binding = 0) uniform _Shared {
     float uTime;
     uint uEngineFlags;
     float uPaletteBlend;
-    float uSpecial1;
+    int uPaletteFrame;
 };
-layout(set = 1, binding = 3) uniform texture2D uPalette; //!
+layout(set = 1, binding = 3) uniform texture2D uDayPalette; //!
+layout(set = 1, binding = 4) uniform texture2D uNightPalette; //!
+layout(set = 1, binding = 5) uniform sampler uPaletteSampler; //!
 
 // UAlbion.Core.Veldrid.Skybox.SkyboxIntermediate
 layout(location = 0) in vec2 iTexPosition;

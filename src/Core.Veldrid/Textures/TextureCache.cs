@@ -16,14 +16,17 @@ class TextureCache<T> : Component, IDisposable where T : TextureHolder
     readonly Func<ITexture, T> _holderFactory;
     readonly Func<GraphicsDevice, ITexture, Texture> _textureFactory;
     readonly HashSet<ITexture> _dirtySet = new();
+    readonly T _defaultHolder;
     bool _allDirty = true;
 
     enum CacheAction { ForceCleanup, Cleanup, Update }
 
-    public TextureCache(Func<ITexture, T> factory, Func<GraphicsDevice, ITexture, Texture> textureFactory)
+    public TextureCache(Func<ITexture, T> factory, Func<GraphicsDevice, ITexture, Texture> textureFactory, ITexture defaultTexture)
     {
+        if (defaultTexture == null) throw new ArgumentNullException(nameof(defaultTexture));
         _holderFactory = factory ?? throw new ArgumentNullException(nameof(factory));
         _textureFactory = textureFactory ?? throw new ArgumentNullException(nameof(textureFactory));
+        _defaultHolder = factory(defaultTexture);
         On<DeviceCreatedEvent>(_ => Dirty());
         On<DestroyDeviceObjectsEvent>(_ => Dispose());
     }
@@ -33,6 +36,9 @@ class TextureCache<T> : Component, IDisposable where T : TextureHolder
 
     public T GetTextureHolder(ITexture texture, int version) // Should never be called during rendering (i.e. between PrepareFrameResourcesEvent and swapping the video buffers)
     {
+        if (texture == null)
+            return _defaultHolder;
+
         lock (_syncRoot)
         {
             if (_cache.TryGetValue(texture, out var entry)

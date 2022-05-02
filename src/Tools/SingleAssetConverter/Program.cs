@@ -3,7 +3,6 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Containers;
-using UAlbion.Game;
 using UAlbion.Game.Assets;
 
 namespace UAlbion.SingleAssetConverter;
@@ -127,7 +126,8 @@ static class Program
         }
 
         var exchange = new EventExchange();
-        exchange.Register<IAssetManager>(new DummyAssetManager());
+        var assets = new DummyAssetManager();
+        exchange.Register<IAssetManager>(assets);
 
         if (options.Loader is IComponent loaderComponent)
             exchange.Attach(loaderComponent);
@@ -148,8 +148,9 @@ static class Program
             return;
         }
 
-        var asset = options.Loader.Serdes(null, options.Info, AssetMapping.Global, inputSerializer, jsonUtil);
-        File.WriteAllBytes(options.OutputPath, FormatUtil.SerializeToBytes(s => options.Saver.Serdes(asset, options.Info, AssetMapping.Global, s, jsonUtil)));
+        var context = new LoaderContext(assets, jsonUtil, AssetMapping.Global);
+        var asset = options.Loader.Serdes(null, options.Info, inputSerializer, context);
+        File.WriteAllBytes(options.OutputPath, FormatUtil.SerializeToBytes(s => options.Saver.Serdes(asset, options.Info, s, context)));
     }
 
     static IAssetLoader? Resolve(string alias) => !Loaders.TryGetValue(alias, out var loaderName) ? null : Registry.GetLoader(loaderName);

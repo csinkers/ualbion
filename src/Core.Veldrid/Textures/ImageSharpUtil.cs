@@ -9,7 +9,7 @@ namespace UAlbion.Core.Veldrid.Textures;
 
 public static class ImageSharpUtil
 {
-    public static Image<Rgba32> ToImageSharp(ReadOnlyImageBuffer<byte> from, uint[] palette)
+    public static Image<Rgba32> ToImageSharp(ReadOnlyImageBuffer<byte> from, ReadOnlySpan<uint> palette)
     {
         Image<Rgba32> image = new Image<Rgba32>(from.Width, from.Height);
         if (!image.TryGetSinglePixelSpan(out var rgbaSpan))

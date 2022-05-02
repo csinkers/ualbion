@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -21,21 +20,21 @@ public class FontSpriteLoader<T> : Component, IAssetLoader<IReadOnlyTexture<byte
             AttachChild(component);
     }
 
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes((IReadOnlyTexture<byte>)existing, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes((IReadOnlyTexture<byte>)existing, info, s, context);
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
         return s.IsWriting() 
-            ? Write(existing, info, mapping, s, jsonUtil) 
-            : Read(info, mapping, s, jsonUtil);
+            ? Write(existing, info, s, context) 
+            : Read(info, s, context);
     }
 
-    IReadOnlyTexture<byte> Read(AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    IReadOnlyTexture<byte> Read(AssetInfo info, ISerializer s, LoaderContext context)
     {
-        var font = _loader.Serdes(null, info, mapping, s, jsonUtil);
+        var font = _loader.Serdes(null, info, s, context);
         if (font == null)
             return null;
 
@@ -59,7 +58,7 @@ public class FontSpriteLoader<T> : Component, IAssetLoader<IReadOnlyTexture<byte
         return new SimpleTexture<byte>(font.Id, font.Id.ToString(), font.Width, font.Height, font.PixelData, frames);
     }
 
-    IReadOnlyTexture<byte> Write(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    IReadOnlyTexture<byte> Write(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (existing == null) throw new ArgumentNullException(nameof(existing));
         int width = info.Width;
@@ -76,7 +75,7 @@ public class FontSpriteLoader<T> : Component, IAssetLoader<IReadOnlyTexture<byte
             BlitUtil.BlitDirect( oldFrame, repacked.GetMutableRegionBuffer(i));
         }
 
-        var font = _loader.Serdes(repacked, info, mapping, s, jsonUtil);
+        var font = _loader.Serdes(repacked, info, s, context);
         return font == null ? null : existing;
     }
 }

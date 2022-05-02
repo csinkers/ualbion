@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Assets;

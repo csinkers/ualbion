@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 

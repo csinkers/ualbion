@@ -6,6 +6,7 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
@@ -34,16 +35,6 @@ public class MapRenderable3D : Component
 
         On<RenderEvent>(_ => Update());
         // On<SortMapTilesEvent>(e => _isSorting = e.IsSorting);
-        On<PaletteChangedEvent>(_ =>
-        {
-            var paletteManager = Resolve<IPaletteManager>();
-            if (_tilemap != null)
-            {
-                _tilemap.DayFloors.Palette = paletteManager.Palette;
-                _tilemap.DayWalls.Palette = paletteManager.Palette;
-            }
-        });
-
         _logicalMap = logicalMap;
         _labyrinthData = labyrinthData;
         _properties = properties;

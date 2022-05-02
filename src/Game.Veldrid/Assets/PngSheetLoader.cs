@@ -8,7 +8,6 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
-using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -55,7 +54,7 @@ public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>>
         return true;
     }
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
@@ -95,6 +94,6 @@ public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>>
         }
     }
 
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes((IReadOnlyTexture<byte>)existing, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes((IReadOnlyTexture<byte>)existing, info, s, context);
 }

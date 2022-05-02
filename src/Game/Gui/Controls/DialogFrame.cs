@@ -6,6 +6,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
+using UAlbion.Formats;
 using UAlbion.Game.Entities;
 
 namespace UAlbion.Game.Gui.Controls;

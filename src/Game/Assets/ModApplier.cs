@@ -231,10 +231,15 @@ public class ModApplier : Component, IModApplier
         object asset = null;
         Stack<IPatch> patches = null; // Create the stack lazily, as most assets won't have any patches.
         var generalConfig = Resolve<IGeneralConfig>();
+        var assets = Resolve<IAssetManager>();
+        var jsonUtil = Resolve<IJsonUtil>();
+
         var oldModPath = generalConfig.GetPath("MOD");
         foreach (var mod in _modsInReverseDependencyOrder)
         {
+            var loaderContext = new LoaderContext(assets, jsonUtil, mod.Mapping);
             generalConfig.SetPath("MOD", mod.AssetPath);
+
             foreach (var info in mod.AssetConfig.GetAssetInfo(id))
             {
                 var assetLang = info.Get<string>(AssetProperty.Language, null);
@@ -245,7 +250,7 @@ public class ModApplier : Component, IModApplier
                         continue;
                 }
 
-                var modAsset = _assetLocator.LoadAsset(info, mod.Mapping, extraPaths, annotationWriter);
+                var modAsset = _assetLocator.LoadAsset(info, loaderContext, extraPaths, annotationWriter);
 
                 if (modAsset is IPatch patch)
                 {
@@ -311,11 +316,13 @@ public class ModApplier : Component, IModApplier
         if (flushCacheFunc == null) throw new ArgumentNullException(nameof(flushCacheFunc));
 
         var config = Resolve<IGeneralConfig>();
+        var assetManager = Resolve<IAssetManager>();
         var loaderRegistry = Resolve<IAssetLoaderRegistry>();
         var containerRegistry = Resolve<IContainerRegistry>();
         var disk = Resolve<IFileSystem>();
         var jsonUtil = Resolve<IJsonUtil>();
         var target = _modsInReverseDependencyOrder.First();
+        var loaderContext = new LoaderContext(assetManager, jsonUtil, target.Mapping);
 
         // Add any missing ids
         Info("Populating destination asset info...");
@@ -384,7 +391,7 @@ public class ModApplier : Component, IModApplier
                 using var ms = new MemoryStream();
                 using var bw = new BinaryWriter(ms);
                 using var s = new AlbionWriter(bw);
-                loader.Serdes(asset, assetInfo, target.Mapping, s, jsonUtil);
+                loader.Serdes(asset, assetInfo, s, loaderContext);
 
                 ms.Position = 0;
                 assets.Add((assetInfo, ms.ToArray()));

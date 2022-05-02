@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Config;
+using UAlbion.Formats;
 
 namespace UAlbion.Game.Assets;
 

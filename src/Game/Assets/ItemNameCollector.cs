@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -12,14 +11,14 @@ namespace UAlbion.Game.Assets;
 
 public class ItemNameCollector : Component, IAssetLoader<MultiLanguageStringDictionary>
 {
-    public MultiLanguageStringDictionary Serdes(MultiLanguageStringDictionary existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    public MultiLanguageStringDictionary Serdes(MultiLanguageStringDictionary existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
-        if (mapping == null) throw new ArgumentNullException(nameof(mapping));
+        if (context == null) throw new ArgumentNullException(nameof(context));
         if (s.IsWriting()) return existing;
 
         var assets = Resolve<IAssetManager>();
         var ids = 
-            mapping.EnumerateAssetsOfType(AssetType.ItemName)
+            context.Mapping.EnumerateAssetsOfType(AssetType.ItemName)
                 // make sure TextId->StringId resolution won't happen
                 // and get stuck in infinite recursion
                 .Select(x => new StringId(x, 0))
@@ -52,6 +51,6 @@ public class ItemNameCollector : Component, IAssetLoader<MultiLanguageStringDict
         };
     }
 
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes((MultiLanguageStringDictionary)existing, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes((MultiLanguageStringDictionary)existing, info, s, context);
 }

@@ -6,7 +6,7 @@ using UAlbion.Formats;
 
 namespace UAlbion.Game.Assets;
 
-public sealed class AssetLoaderRegistry : ServiceComponent<IAssetLoaderRegistry>, IAssetLoaderRegistry, IDisposable
+public class AssetLoaderRegistry : ServiceComponent<IAssetLoaderRegistry>, IAssetLoaderRegistry, IDisposable
 {
     readonly object _syncRoot = new();
     readonly IDictionary<string, IAssetLoader> _loaders = new Dictionary<string, IAssetLoader>();

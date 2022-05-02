@@ -54,7 +54,7 @@ layout(set = 1, binding = 0) uniform _Shared {
     float uTime;
     uint uEngineFlags;
     float uPaletteBlend;
-    float uSpecial1;
+    int uPaletteFrame;
 };
 layout(set = 1, binding = 1) uniform _Projection {
     mat4 uProjection;

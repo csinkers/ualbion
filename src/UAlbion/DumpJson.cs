@@ -6,10 +6,10 @@ using Newtonsoft.Json;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
-using UAlbion.Game;
 
 namespace UAlbion;
 

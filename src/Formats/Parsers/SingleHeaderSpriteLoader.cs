@@ -9,10 +9,10 @@ namespace UAlbion.Formats.Parsers;
 
 public class SingleHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 {
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes((IReadOnlyTexture<byte>)existing, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes((IReadOnlyTexture<byte>)existing, info, s, context);
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (info == null) throw new ArgumentNullException(nameof(info));

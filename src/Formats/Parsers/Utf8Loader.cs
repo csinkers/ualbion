@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Text;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Config;
 
 namespace UAlbion.Formats.Parsers;
 
 public class Utf8Loader : IAssetLoader<string>
 {
-    public string Serdes(string existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    public string Serdes(string existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if(s.IsWriting())
@@ -25,6 +24,6 @@ public class Utf8Loader : IAssetLoader<string>
         }
     }
 
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes((string) existing, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes((string) existing, info, s, context);
 }

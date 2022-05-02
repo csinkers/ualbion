@@ -20,7 +20,7 @@ public class MapLayer : Component, IMapLayer
     static readonly SpriteInstanceData BlankInstance = new(Vector3.Zero, Vector2.Zero, BlankRegion, 0);
 
     readonly LogicalMap2D _logicalMap;
-    readonly ITexture _tileset;
+    readonly ITileGraphics _tileset;
     readonly bool _isOverlay;
     readonly DrawLayer _drawLayer;
     readonly ISet<(int, int)> _dirty = new HashSet<(int, int)>();
@@ -38,7 +38,7 @@ public class MapLayer : Component, IMapLayer
 
     public MapLayer(
         LogicalMap2D logicalMap,
-        ITexture tileset,
+        ITileGraphics tileset,
         bool isOverlay)
     {
         _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
@@ -95,8 +95,9 @@ public class MapLayer : Component, IMapLayer
         if (tile == null || tile.NoDraw)
             return BlankInstance;
 
-        int subImageId = tile.ImageNumber + AnimUtil.GetFrame(tickCount, tile.FrameCount, tile.Bouncy);
-        var subImage = _tileset.Regions[subImageId];
+        var pm = Resolve<IPaletteManager>();
+        int frame = AnimUtil.GetFrame(tickCount, tile.FrameCount, tile.Bouncy);
+        var subImage = _tileset.GetRegion(tile.ImageNumber, frame, pm.Frame);
         var fallback = GetFallbackTile(index);
         var layer = tile.Layer;
 
@@ -147,7 +148,11 @@ public class MapLayer : Component, IMapLayer
         var sm = Resolve<ISpriteManager>();
         if (_lease == null)
         {
-            var key = new SpriteKey(_tileset, SpriteSampler.Point, _drawLayer, SpriteKeyFlags.NoDepthTest);
+            var flags = SpriteKeyFlags.NoDepthTest;
+            if (!_isOverlay)
+                flags |= SpriteKeyFlags.ZeroOpaque;
+
+            var key = new SpriteKey(_tileset.Texture, SpriteSampler.Point, _drawLayer, flags);
             _lease = sm.Borrow(key, _logicalMap.Width * _logicalMap.Height, this);
             _allDirty = true;
         }
@@ -170,7 +175,7 @@ public class MapLayer : Component, IMapLayer
         _lastFrameCount = frameCount;
         if (_allDirty)
         {
-            _lease.Access((instances, s) =>
+            _lease.Access(static (instances, s) =>
             {
                 int index = 0;
                 for (int j = 0; j < s._logicalMap.Height; j++)
@@ -188,7 +193,7 @@ public class MapLayer : Component, IMapLayer
         }
         else if (_dirty.Count > 0)
         {
-            _lease.Access((instances, s) =>
+            _lease.Access(static (instances, s) =>
             {
                 foreach (var (x, y) in s._dirty)
                 {

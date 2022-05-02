@@ -5,12 +5,12 @@ using System.Threading;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
-using UAlbion.Game;
 using UAlbion.TestCommon;
 using Xunit;
 
@@ -742,8 +742,8 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void TileGfxTest()
     {
-        var tiles = Test(assets => assets.LoadTexture(TilesetGraphics.Toronto));
-        Assert.Equal(2014, tiles.Regions.Count);
+        var tiles = Test(assets => assets.LoadTileGraphics(TilesetGraphics.Toronto));
+        Assert.Equal(2014, tiles.Texture.Regions.Count);
     }
 
     [Fact]

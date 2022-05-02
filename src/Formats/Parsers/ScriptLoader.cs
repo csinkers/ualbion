@@ -19,10 +19,10 @@ public class ScriptLoader : IAssetLoader<Script>
         return ApiUtil.SplitLines(text, StringSplitOptions.None).Select(x => x.Trim());
     }
 
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes((Script)existing, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes((Script)existing, info, s, context);
 
-    public Script Serdes(Script script, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    public Script Serdes(Script script, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

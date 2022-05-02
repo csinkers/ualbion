@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UAlbion.Core.Visual;
 
 namespace UAlbion.Core.Veldrid.Etm;

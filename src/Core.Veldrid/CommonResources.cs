@@ -12,7 +12,9 @@ public sealed partial class CommonSet : ResourceSetHolder
     [Resource("_Shared")]                          SingleBuffer<GlobalInfo>       _globalInfo; 
     [Resource("_Projection", ShaderStages.Vertex)] SingleBuffer<ProjectionMatrix> _projection; 
     [Resource("_View",       ShaderStages.Vertex)] SingleBuffer<ViewMatrix>       _view; 
-    [Resource("uPalette",    ShaderStages.Fragment)] ITextureHolder               _palette;
+    [Resource("uDayPalette", ShaderStages.Fragment)]     ITextureHolder           _dayPalette;
+    [Resource("uNightPalette", ShaderStages.Fragment)]   ITextureHolder           _nightPalette;
+    [Resource("uPaletteSampler", ShaderStages.Fragment)] ISamplerHolder           _sampler;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -27,7 +29,7 @@ public partial struct GlobalInfo : IUniformFormat
     [Uniform("uTime")] public float Time;
     [Uniform("uEngineFlags", EnumPrefix = "EF")] public EngineFlags EngineFlags;
     [Uniform("uPaletteBlend")] public float PaletteBlend;
-    [Uniform("uSpecial1")] public float Special1;
+    [Uniform("uPaletteFrame")] public int PaletteFrame;
 }
 
 public partial struct ProjectionMatrix : IUniformFormat

@@ -145,7 +145,7 @@ public class CompositedTexture : IReadOnlyTexture<uint>
                 {
                     Span<uint> toBuffer = _texture.GetMutableLayerBuffer(destinationLayer).Buffer;
                     toBuffer.Fill(lsi.IsAlphaTested ? 0 : 0xff000000);
-                    RebuildLayer(lsi, i, toBuffer, Palette.GetCompletePalette());
+                    RebuildLayer(lsi, i, toBuffer, Palette.Texture);
                 }
             }
         }
@@ -220,7 +220,7 @@ public class CompositedTexture : IReadOnlyTexture<uint>
             _layerSizes.Add(new Vector2(1, 1));
     }
 
-    void RebuildLayer(LogicalSubImage lsi, int frameNumber, Span<uint> toBuffer, IList<uint[]> palette)
+    void RebuildLayer(LogicalSubImage lsi, int frameNumber, Span<uint> toBuffer, IReadOnlyTexture<uint> palette)
     {
         if (lsi == null) throw new ArgumentNullException(nameof(lsi));
         if (palette == null) throw new ArgumentNullException(nameof(palette));
@@ -233,7 +233,7 @@ public class CompositedTexture : IReadOnlyTexture<uint>
             int frame = frameNumber % component.Texture.Regions.Count;
             if (component.Texture is IReadOnlyTexture<byte> eightBitTexture)
             {
-                int palFrame = frameNumber % palette.Count;
+                int palFrame = frameNumber % palette.Height;
 
                 var from = eightBitTexture.GetRegionBuffer(frame);
                 int destWidth = component.W ?? from.Width;
@@ -252,7 +252,7 @@ public class CompositedTexture : IReadOnlyTexture<uint>
                     destWidth + (destHeight - 1) * Width);
 
                 var to = new ImageBuffer<uint>(destWidth, destHeight, Width, toSlice);
-                BlitUtil.BlitTiled8To32(from, to, palette[palFrame], component.Alpha, lsi.TransparentColor);
+                BlitUtil.BlitTiled8To32(from, to, palette.GetRegionBuffer(palFrame).Buffer, component.Alpha, lsi.TransparentColor);
             }
 
             if (component.Texture is IReadOnlyTexture<uint> trueColorTexture)

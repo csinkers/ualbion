@@ -11,10 +11,10 @@ public class WordListLoader : IAssetLoader<ListStringCollection>
 {
     const int WordLength = 21;
 
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes((ListStringCollection)existing, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes((ListStringCollection)existing, info, s, context);
 
-    public ListStringCollection Serdes(ListStringCollection existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    public ListStringCollection Serdes(ListStringCollection existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (info == null) throw new ArgumentNullException(nameof(info));

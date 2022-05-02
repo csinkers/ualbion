@@ -7,7 +7,9 @@ namespace UAlbion.Core.Veldrid
             new ResourceLayoutElementDescription("_Shared", global::Veldrid.ResourceKind.UniformBuffer, (ShaderStages)17),
             new ResourceLayoutElementDescription("_Projection", global::Veldrid.ResourceKind.UniformBuffer, (ShaderStages)1),
             new ResourceLayoutElementDescription("_View", global::Veldrid.ResourceKind.UniformBuffer, (ShaderStages)1),
-            new ResourceLayoutElementDescription("uPalette", global::Veldrid.ResourceKind.TextureReadOnly, (ShaderStages)16));
+            new ResourceLayoutElementDescription("uDayPalette", global::Veldrid.ResourceKind.TextureReadOnly, (ShaderStages)16),
+            new ResourceLayoutElementDescription("uNightPalette", global::Veldrid.ResourceKind.TextureReadOnly, (ShaderStages)16),
+            new ResourceLayoutElementDescription("uPaletteSampler", global::Veldrid.ResourceKind.Sampler, (ShaderStages)16));
 
         public global::UAlbion.Core.Veldrid.SingleBuffer<global::UAlbion.Core.Veldrid.GlobalInfo> GlobalInfo
         {
@@ -45,20 +47,57 @@ namespace UAlbion.Core.Veldrid
             }
         }
 
-        public global::VeldridGen.Interfaces.ITextureHolder Palette
+        public global::VeldridGen.Interfaces.ITextureHolder DayPalette
         {
-            get => _palette;
+            get => _dayPalette;
             set
             {
-                if (_palette == value) return;
+                if (_dayPalette == value) return;
 
-                if (_palette != null)
-                    _palette.PropertyChanged -= PropertyDirty;
+                if (_dayPalette != null)
+                    _dayPalette.PropertyChanged -= PropertyDirty;
 
-                _palette = value;
+                _dayPalette = value;
 
-                if (_palette != null)
-                    _palette.PropertyChanged += PropertyDirty;
+                if (_dayPalette != null)
+                    _dayPalette.PropertyChanged += PropertyDirty;
+                Dirty();
+            }
+        }
+
+        public global::VeldridGen.Interfaces.ITextureHolder NightPalette
+        {
+            get => _nightPalette;
+            set
+            {
+                if (_nightPalette == value) return;
+
+                if (_nightPalette != null)
+                    _nightPalette.PropertyChanged -= PropertyDirty;
+
+                _nightPalette = value;
+
+                if (_nightPalette != null)
+                    _nightPalette.PropertyChanged += PropertyDirty;
+                Dirty();
+            }
+        }
+
+        public global::VeldridGen.Interfaces.ISamplerHolder Sampler
+        {
+            get => _sampler;
+            set
+            {
+                if (_sampler == value) 
+                    return;
+
+                if (_sampler != null)
+                    _sampler.PropertyChanged -= PropertyDirty;
+
+                _sampler = value;
+
+                if (_sampler != null)
+                    _sampler.PropertyChanged += PropertyDirty;
                 Dirty();
             }
         }
@@ -69,19 +108,29 @@ namespace UAlbion.Core.Veldrid
                 _globalInfo.DeviceBuffer,
                 _projection.DeviceBuffer,
                 _view.DeviceBuffer,
-                _palette.DeviceTexture));
+                _dayPalette.DeviceTexture,
+                _nightPalette.DeviceTexture,
+                _sampler.Sampler));
 
         protected override void Resubscribe()
         {
-            if (_palette != null)
-                _palette.PropertyChanged += PropertyDirty;
+            if (_dayPalette != null)
+                _dayPalette.PropertyChanged += PropertyDirty;
+            if (_nightPalette != null)
+                _nightPalette.PropertyChanged += PropertyDirty;
+            if (_sampler != null)
+                _sampler.PropertyChanged += PropertyDirty;
         }
 
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            if (_palette != null)
-                _palette.PropertyChanged -= PropertyDirty;
+            if (_dayPalette != null)
+                _dayPalette.PropertyChanged -= PropertyDirty;
+            if (_nightPalette != null)
+                _nightPalette.PropertyChanged -= PropertyDirty;
+            if (_sampler != null)
+                _sampler.PropertyChanged -= PropertyDirty;
         }
     }
 }

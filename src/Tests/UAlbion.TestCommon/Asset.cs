@@ -14,6 +14,7 @@ namespace UAlbion.TestCommon;
 public static class Asset
 {
     static readonly XldContainer XldLoader = new();
+    public delegate T SerdesFunc<T>(T x, ISerializer s, LoaderContext context) where T : class;
     public static void Compare(
         string resultDir,
         string testName,
@@ -53,7 +54,7 @@ public static class Asset
         return reader.ReadToEnd();
     }
 
-    public static (T, string) Load<T>(byte[] bytes, Func<T, ISerializer, T> serdes) where T : class
+    public static (T, string) Load<T>(byte[] bytes, SerdesFunc<T> serdes, LoaderContext context) where T : class
     {
         using var stream = new MemoryStream(bytes);
         using var br = new BinaryReader(stream);
@@ -67,7 +68,7 @@ public static class Asset
         Exception exception = null;
         try
         {
-            result = serdes(null, afs);
+            result = serdes(null, afs, context);
         }
         catch (Exception ex)
         {
@@ -87,7 +88,7 @@ public static class Asset
         return (result, annotation);
     }
 
-    public static (byte[], string) Save<T>(T asset, Func<T, ISerializer, T> serdes) where T : class
+    public static (byte[], string) Save<T>(T asset, SerdesFunc<T> serdes, LoaderContext context) where T : class
     {
         using var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms);
@@ -96,7 +97,7 @@ public static class Asset
         using var aw = new AnnotationProxySerializer(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
 
         Exception exception = null;
-        try { serdes(asset, aw); }
+        try { serdes(asset, aw, context); }
         catch (Exception ex) { exception = ex; }
 
         ms.Position = 0;

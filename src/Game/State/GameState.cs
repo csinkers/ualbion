@@ -22,7 +22,6 @@ public class GameState : ServiceComponent<IGameState>, IGameState
     Party _party;
 
     public DateTime Time => SavedGame.Epoch + (_game?.ElapsedTime ?? TimeSpan.Zero);
-    public float PaletteBlend => MathF.Cos((float)Time.TimeOfDay.TotalDays * MathF.PI * 2 * 60) * 0.5f + 0.5f;
     public IParty Party => _party;
     public ICharacterSheet GetSheet(CharacterId id) => _game.Sheets.TryGetValue(id, out var sheet) ? sheet : null;
     public short GetTicker(TickerId id) => _game.Tickers.TryGetValue(id, out var value) ? value : (short)0;
@@ -48,7 +47,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         On<LoadGameEvent>(e => LoadGame(e.Id));
         On<SaveGameEvent>(e => SaveGame(e.Id, e.Name));
         On<FastClockEvent>(e => TickCount += e.Frames);
-        On<GetTimeEvent>(e => Info(Time.ToString("O", CultureInfo.InvariantCulture)));
+        On<GetTimeEvent>(_ => Info(Time.ToString("O", CultureInfo.InvariantCulture)));
         On<SetTimeEvent>(e => _game.ElapsedTime = e.Time - SavedGame.Epoch);
         On<LoadMapEvent>(e =>
         {
@@ -72,7 +71,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         });
         On<ModifyHoursEvent>(_ => { });
         On<ActivateItemEvent>(ActivateItem);
-        On<EventChainOffEvent>(e =>
+        On<EventChainOffEvent>(_ =>
         {
             // TODO
         });

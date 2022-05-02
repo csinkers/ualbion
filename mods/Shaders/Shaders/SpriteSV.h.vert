@@ -46,6 +46,7 @@
 #define SKF_USE_ARRAY_TEXTURE 0x2U
 #define SKF_USE_PALETTE 0x4U
 #define SKF_NO_TRANSFORM 0x8U
+#define SKF_ZERO_OPAQUE 0x10U
 
 layout(set = 0, binding = 0) uniform _Shared {
     vec3 uWorldSpacePosition;
@@ -55,7 +56,7 @@ layout(set = 0, binding = 0) uniform _Shared {
     float uTime;
     uint uEngineFlags;
     float uPaletteBlend;
-    float uSpecial1;
+    int uPaletteFrame;
 };
 layout(set = 0, binding = 1) uniform _Projection {
     mat4 uProjection;

@@ -18,8 +18,8 @@ public class AlbionPalette : IPalette
     const int VariableEntries = EntryCount - CommonEntries;
 
     readonly int[] _periods = new int[EntryCount];
-    readonly IList<uint[]> _cache = new List<uint[]>();
     readonly IList<(byte, byte)> _ranges = new List<(byte, byte)>();
+    SimpleTexture<uint> _texture;
     uint[] _unambiguous;
 
     public uint Id { get; private set; }
@@ -63,10 +63,11 @@ public class AlbionPalette : IPalette
                 .Select(x => (long)(x.Item2 - x.Item1 + 1))
                 .Append(1));
 
-            _cache.Clear();
+            _texture = new SimpleTexture<uint>(AssetId.None, 256, totalPeriod);
+            var span = _texture.GetMutableLayerBuffer(0).Buffer;
+            int offset = 0;
             for (int cacheIndex = 0; cacheIndex < totalPeriod; cacheIndex++)
             {
-                var result = new uint[256];
                 for (int i = 0; i < EntryCount; i++)
                 {
                     int index = i;
@@ -81,9 +82,10 @@ public class AlbionPalette : IPalette
                         }
                     }
 
-                    result[i] = Entries[index];
+                    span[offset++] = Entries[index];
                 }
-                _cache.Add(result);
+
+                _texture.AddRegion(0, cacheIndex, 256, 1);
             }
 
             for (int i = 0; i < _periods.Length; i++)
@@ -112,21 +114,18 @@ public class AlbionPalette : IPalette
         if (commonPalette == null)
             throw new ArgumentNullException(nameof(commonPalette));
 
-        for (int i = VariableEntries; i < EntryCount; i++)
+        var span = _texture.GetMutableLayerBuffer(0).Buffer;
+        for (int offset = 0; offset < span.Length; offset += 256)
         {
-            Entries[i] = commonPalette.Entries[i];
-            foreach (var frame in _cache)
-                frame[i] = Entries[i];
+            for (int i = VariableEntries; i < EntryCount; i++)
+            {
+                Entries[i] = commonPalette.Entries[i];
+                span[offset + i] = Entries[i];
+            }
         }
     }
 
-    public IList<uint[]> GetCompletePalette() => _cache;
-    public uint[] GetPaletteAtTime(int tick)
-    {
-        tick = int.MaxValue - tick;
-        int index = tick % Period;
-        return _cache[index];
-    }
+    [JsonIgnore] public IReadOnlyTexture<uint> Texture => _texture;
 
     static uint Search(uint root, ISet<uint> visited)
     {
@@ -177,6 +176,7 @@ public class AlbionPalette : IPalette
         return _unambiguous;
     }
 
+    public ReadOnlySpan<uint> GetPaletteAtTime(int i) => _texture.GetLayerBuffer(0).GetRow(i % _texture.Height);
     public override string ToString() { return string.IsNullOrEmpty(Name) ? $"Palette {Id}" : $"{Name} ({Id})"; }
 
     public static AlbionPalette Serdes(AlbionPalette p, AssetInfo info, ISerializer s)

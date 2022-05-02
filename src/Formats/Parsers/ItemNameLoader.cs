@@ -9,10 +9,10 @@ namespace UAlbion.Formats.Parsers;
 public class ItemNameLoader : IAssetLoader<MultiLanguageStringDictionary>
 {
     const int StringSize = 20;
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes((MultiLanguageStringDictionary)existing, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes((MultiLanguageStringDictionary)existing, info, s, context);
 
-    public MultiLanguageStringDictionary Serdes(MultiLanguageStringDictionary names, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    public MultiLanguageStringDictionary Serdes(MultiLanguageStringDictionary names, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (s.IsWriting() && names == null) throw new ArgumentNullException(nameof(names));

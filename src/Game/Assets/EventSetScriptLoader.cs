@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -11,7 +10,7 @@ namespace UAlbion.Game.Assets;
 
 public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
 {
-    public EventSet Serdes(EventSet existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    public EventSet Serdes(EventSet existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
@@ -45,6 +44,6 @@ public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
         return sb.ToString();
     }
 
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes((EventSet)existing, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes((EventSet)existing, info, s, context);
 }

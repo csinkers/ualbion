@@ -23,12 +23,12 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
         base.Subscribed();
     }
 
-    public object LoadAsset(AssetInfo info, AssetMapping mapping, IDictionary<string, string> extraPaths, TextWriter annotationWriter = null)
+    public object LoadAsset(AssetInfo info, LoaderContext context, IDictionary<string, string> extraPaths, TextWriter annotationWriter = null)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
+        if (context == null) throw new ArgumentNullException(nameof(context));
         if (extraPaths == null) throw new ArgumentNullException(nameof(extraPaths));
         var generalConfig = Resolve<IGeneralConfig>();
-        var jsonUtil = Resolve<IJsonUtil>();
 
         using ISerializer s = Search(generalConfig, info, extraPaths, annotationWriter);
         if (s == null)
@@ -41,7 +41,7 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
         if (loader == null)
             throw new InvalidOperationException($"Could not instantiate loader \"{info.File.Loader}\" required by asset {info.AssetId}");
 
-        return loader.Serdes(null, info, mapping, s, jsonUtil);
+        return loader.Serdes(null, info, s, context);
     }
 
     public List<(int,int)> GetSubItemRangesForFile(AssetFileInfo info, IDictionary<string, string> extraPaths)

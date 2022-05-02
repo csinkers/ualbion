@@ -1,6 +1,5 @@
 ﻿using System;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 
@@ -12,10 +11,10 @@ public class SampleLoader : IAssetLoader<AlbionSample>
     const int Channels = 1;
     const int BytesPerSample = 1;
 
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes((AlbionSample) existing, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes((AlbionSample) existing, info, s, context);
 
-    public AlbionSample Serdes(AlbionSample existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    public AlbionSample Serdes(AlbionSample existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (info == null) throw new ArgumentNullException(nameof(info));

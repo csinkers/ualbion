@@ -14,10 +14,18 @@ public class MockPalette : IPalette
         (uint)(x == 0 ? 0 : 0xff) << 24
     ).ToArray();
 
+    public MockPalette()
+    {
+        var texture = new SimpleTexture<uint>(null, 256, 1);
+        texture.AddRegion(0, 0, 256, 1);
+        var span = texture.GetMutableLayerBuffer(0).Buffer;
+        _entries.AsSpan().CopyTo(span);
+        Texture = texture;
+    }
+
     public uint Id => 0;
     public string Name => "Mock";
-    public IList<uint[]> GetCompletePalette() => new[] { _entries };
     public bool IsAnimated => false;
-    public uint[] GetPaletteAtTime(int paletteFrame) => _entries;
+    public IReadOnlyTexture<uint> Texture { get; }
     public IEnumerable<(byte, int)> AnimatedEntries => Array.Empty<(byte, int)>();
 }

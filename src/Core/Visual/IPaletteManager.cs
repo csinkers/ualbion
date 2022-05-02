@@ -4,9 +4,9 @@ namespace UAlbion.Core.Visual;
 
 public interface IPaletteManager
 {
-    IPalette Palette { get; }
-    IReadOnlyTexture<uint> PaletteTexture { get; }
+    IPalette Day { get; }
+    IPalette Night { get; }
     int Version { get; }
     int Frame { get; }
-    float PaletteBlend { get; }
+    float Blend { get; }
 }

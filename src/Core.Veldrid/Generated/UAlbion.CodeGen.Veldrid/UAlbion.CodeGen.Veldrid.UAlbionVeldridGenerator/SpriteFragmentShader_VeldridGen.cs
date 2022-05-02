@@ -53,6 +53,7 @@ namespace UAlbion.Core.Veldrid.Sprites
 #define SKF_USE_ARRAY_TEXTURE 0x2U
 #define SKF_USE_PALETTE 0x4U
 #define SKF_NO_TRANSFORM 0x8U
+#define SKF_ZERO_OPAQUE 0x10U
 
 layout(set = 0, binding = 0) uniform _Shared {
     vec3 uWorldSpacePosition;
@@ -62,9 +63,11 @@ layout(set = 0, binding = 0) uniform _Shared {
     float uTime;
     uint uEngineFlags;
     float uPaletteBlend;
-    float uSpecial1;
+    int uPaletteFrame;
 };
-layout(set = 0, binding = 3) uniform texture2D uPalette; //!
+layout(set = 0, binding = 3) uniform texture2D uDayPalette; //!
+layout(set = 0, binding = 4) uniform texture2D uNightPalette; //!
+layout(set = 0, binding = 5) uniform sampler uPaletteSampler; //!
 
 layout(set = 1, binding = 0) uniform texture2D uSprite; //!
 layout(set = 1, binding = 1) uniform texture2DArray uSpriteArray; //!

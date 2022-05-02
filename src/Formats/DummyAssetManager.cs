@@ -1,4 +1,7 @@
-﻿using UAlbion.Api;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
@@ -6,9 +9,8 @@ using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
-using UAlbion.Game;
 
-namespace UAlbion.SingleAssetConverter;
+namespace UAlbion.Formats;
 
 public class DummyAssetManager : IAssetManager
 {
@@ -26,6 +28,7 @@ public class DummyAssetManager : IAssetManager
     public ITexture LoadFont(FontColor color, bool isBold) => throw new NotImplementedException();
     public ITexture LoadTexture(IAssetId id) => throw new NotImplementedException();
     public ITexture LoadTexture(SpriteId id) => throw new NotImplementedException();
+    public ITileGraphics LoadTileGraphics(TilesetGraphicsId id) => throw new NotImplementedException();
     public Inventory LoadInventory(AssetId id) => throw new NotImplementedException();
     public ItemData LoadItem(ItemId id) => throw new NotImplementedException();
     public LabyrinthData LoadLabyrinthData(LabyrinthId id) => throw new NotImplementedException();

@@ -8,7 +8,8 @@ void main()
 	oTexPosition = 
 		iTexCoords 
 		* vec2(1.0f, -uVisibleProportion) 
-		+ vec2(-uYaw * fudge, 0.38f + -uPitch * pitchFudge);
+		+ vec2(-uYaw * fudge, 1.38f - uPitch * pitchFudge)
+		;
 
 	oNormCoords = iTexCoords;
 	oWorldPosition = vec3(iPosition, 0);

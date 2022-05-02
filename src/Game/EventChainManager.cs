@@ -157,7 +157,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
     bool Trigger(TriggerChainEvent e, Action continuation)
     {
         var game = Resolve<IGameState>();
-        if (game.IsChainDisabled(e.ChainSource, e.Chain))
+        if (e.ChainSource.Type == AssetType.Map && game.IsChainDisabled(e.ChainSource, e.Chain))
             return true;
 
         var context = new EventContext(e.Source)

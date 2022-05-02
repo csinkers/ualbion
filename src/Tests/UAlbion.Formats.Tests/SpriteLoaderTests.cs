@@ -12,30 +12,34 @@ namespace UAlbion.Formats.Tests;
 public class SpriteLoaderTests
 {
     static readonly IJsonUtil JsonUtil = new FormatJsonUtil();
+    static readonly IAssetManager Assets = new DummyAssetManager();
     static readonly SingleHeaderSpriteLoader HeaderLoader = new();
     static readonly MultiHeaderSpriteLoader MultiHeaderLoader = new();
     static readonly AmorphousSpriteLoader AmorphousLoader = new();
 
-    static IReadOnlyTexture<byte> Load(byte[] bytes, Func<IReadOnlyTexture<byte>, ISerializer, IReadOnlyTexture<byte>> serdes)
+    delegate IReadOnlyTexture<byte> SerdesFunc(IReadOnlyTexture<byte> x, ISerializer s, LoaderContext context);
+    static IReadOnlyTexture<byte> Load(byte[] bytes, SerdesFunc serdes)
     {
         using var ms = new MemoryStream(bytes);
         using var br = new BinaryReader(ms);
         using var s = new AlbionReader(br);
-        return serdes(null, s);
+        var context = new LoaderContext(Assets, JsonUtil, AssetMapping.Global);
+        return serdes(null, s, context);
     }
 
-    static byte[] Save(IReadOnlyTexture<byte> sprite, Func<IReadOnlyTexture<byte>, ISerializer, IReadOnlyTexture<byte>> serdes)
+    static byte[] Save(IReadOnlyTexture<byte> sprite, SerdesFunc serdes)
     {
         using var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms);
         using var s = new AlbionWriter(bw);
-        serdes(sprite, s);
+        var context = new LoaderContext(Assets, JsonUtil, AssetMapping.Global);
+        serdes(sprite, s, context);
         ms.Position = 0;
         return ms.ToArray();
     }
 
 
-    static void RoundTrip(byte[] bytes, Func<IReadOnlyTexture<byte>, ISerializer, IReadOnlyTexture<byte>> serdes, Action<IReadOnlyTexture<byte>> assert)
+    static void RoundTrip(byte[] bytes, SerdesFunc serdes, Action<IReadOnlyTexture<byte>> assert)
     {
         var sprite = Load(bytes, serdes);
         assert(sprite);
@@ -58,7 +62,7 @@ public class SpriteLoaderTests
         };
 
         RoundTrip(oneFrame,
-            (x, s) => HeaderLoader.Serdes(x, new AssetInfo(), null, s, JsonUtil),
+            (x, s, c) => HeaderLoader.Serdes(x, new AssetInfo(), s, c),
             sprite =>
             {
                 Assert.Equal(4, sprite.Width);
@@ -88,7 +92,7 @@ public class SpriteLoaderTests
         };
 
         RoundTrip(twoFrames,
-            (x, s) => HeaderLoader.Serdes(x, new AssetInfo(), null, s, JsonUtil),
+            (x, s, c) => HeaderLoader.Serdes(x, new AssetInfo(), s, c),
             sprite =>
             {
                 Assert.Equal(4, sprite.Width);
@@ -138,7 +142,7 @@ public class SpriteLoaderTests
 
         var info = new AssetInfo();
         RoundTrip(nonUniform,
-            (x, s) => MultiHeaderLoader.Serdes(x, info, null, s, JsonUtil),
+            (x, s, c) => MultiHeaderLoader.Serdes(x, info, s, c),
             sprite =>
             {
                 Assert.Equal(5, sprite.Width);
@@ -175,7 +179,7 @@ public class SpriteLoaderTests
         var info = new AssetInfo();
         info.Set(AssetProperty.SubSprites, "(3,2,2) (2,1)");
         RoundTrip(oneFrame,
-            (x, s) => AmorphousLoader.Serdes(x, info, null, s, JsonUtil),
+            (x, s, c) => AmorphousLoader.Serdes(x, info, s, c),
             sprite =>
             {
                 Assert.Equal(3, sprite.Width);

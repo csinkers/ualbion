@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
+using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
@@ -45,6 +46,21 @@ public sealed class ExtrudedTilemap : Component, IExtrudedTilemap
         AlphaWindow = new EtmWindow($"{Name}_Alpha", this, tileCount, true);
         AttachChild(OpaqueWindow);
         AttachChild(AlphaWindow);
+
+        On<PaletteChangedEvent>(_ =>
+        {
+            var paletteManager = Resolve<IPaletteManager>();
+
+            DayFloors.Palette = paletteManager.Day;
+            DayWalls.Palette = paletteManager.Day;
+
+            if (_nightFloors == null || _nightWalls == null)
+                return;
+
+            NightFloors.Palette = paletteManager.Night;
+            NightWalls.Palette = paletteManager.Night;
+        });
+
     }
 
     protected override void Subscribed()
@@ -75,6 +91,8 @@ public sealed class ExtrudedTilemap : Component, IExtrudedTilemap
 
     public CompositedTexture DayWalls => _dayWalls;
     public CompositedTexture DayFloors => _dayFloors;
+    public CompositedTexture NightWalls => _nightWalls;
+    public CompositedTexture NightFloors => _nightFloors;
     internal EtmSet ResourceSet { get; private set; }
     public DungeonTileMapProperties Properties
     {

@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.Tracing;
 using UAlbion.Config;
-using UAlbion.Formats;
 
 namespace UAlbion.Game;
 

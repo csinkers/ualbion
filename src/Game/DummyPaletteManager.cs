@@ -6,10 +6,15 @@ namespace UAlbion.Game;
 
 public class DummyPaletteManager : IPaletteManager
 {
-    public DummyPaletteManager(AlbionPalette palette) => Palette = palette;
-    public IPalette Palette { get; }
-    public IReadOnlyTexture<uint> PaletteTexture => null;
+    public DummyPaletteManager(AlbionPalette dayPalette, AlbionPalette nightPalette)
+    {
+        Day = dayPalette;
+        Night = nightPalette;
+    }
+
+    public IPalette Day { get; }
+    public IPalette Night { get; }
     public int Version => 0;
     public int Frame => 0;
-    public float PaletteBlend => 0;
+    public float Blend => 0;
 }

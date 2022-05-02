@@ -2,6 +2,20 @@
 
 #define DEPTH_COLOR(depth) (vec4((int((depth) * 1024) % 10) / 10.0f, 20 * (max((depth), 0.95) - 0.95), 20 * min((depth), 0.05), 1.0f))
 
+vec4 Pal(float color)
+{
+	if ((uFlags & SKF_ZERO_OPAQUE) != 0 && color == 0)
+		return vec4(0, 0, 0, 1.0f);
+
+	float u = (color * 255.0f/256.f) + (0.5f/256.0f);
+    float v = fract((uPaletteFrame + 0.5f) / textureSize(sampler2D(uDayPalette, uPaletteSampler), 0).y); //! float v = 0; 
+    vec2 uv = vec2(u, v);
+
+	vec4 day = texture(sampler2D(uDayPalette, uPaletteSampler), uv); //! vec4 day = vec4(0);
+	vec4 night = texture(sampler2D(uNightPalette, uPaletteSampler), uv); //! vec4 night = vec4(0);
+	return mix(day, night, uPaletteBlend);
+}
+
 void main()
 {
     vec2 uv = ((iFlags & SF_FLIP_VERTICAL) != 0)
@@ -14,17 +28,12 @@ void main()
 		: texture(sampler2D(uSprite, uSpriteSampler), uv); //! : vec4(1.0f);
 
     if ((uFlags & SKF_USE_PALETTE) != 0)
-    {
-        color = color[0] == 0
-            ? vec4(0)
-            : texture(sampler2D(uPalette, uSpriteSampler), //! : vec4(0);
-                vec2((color[0] * 255.0f/256.f) + (0.5f/256.0f), 0)); //!
-    }
+        color = Pal(color[0]);
 
     if ((iFlags & SF_GRADIENT_PIXELS) != 0)
     {
         vec2 subPixelPos = smoothstep(0, 1, 1 - fract(uv * vec2(uTexSizeW, uTexSizeH)));
-        color = color * vec4( vec3(subPixelPos.x*subPixelPos.y + 0.4), 1.0);
+        color = color * vec4(vec3(subPixelPos.x * subPixelPos.y + 0.4), 1.0);
     }
 
 #ifdef DEBUG
@@ -32,7 +41,7 @@ void main()
     if ((uEngineFlags & EF_SHOW_BOUNDING_BOXES) != 0 && (iFlags & SF_NO_BOUNDING_BOX) == 0)
     {
         vec2 factor = step(vec2(0.02), min(iNormCoords, 1.0f - iNormCoords));
-        color = mix(color, vec4(1.0f), vec4(1.0f - min(factor.x, factor.y)));
+        color = mix(color, vec4(1.0f), 1.0f - min(factor.x, factor.y));
     }
 
     if ((uEngineFlags & EF_SHOW_CAMERA_POSITION) != 0)
@@ -40,7 +49,7 @@ void main()
 		vec2 screenCoords = gl_FragCoord.xy / uResolution;
         float dist = length(vec3(screenCoords, 0) - vec3(0.5, 0.5, 0));
         if (dist < 0.01)
-            color = mix(color, vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(0.4));
+            color = mix(color, vec4(1.0f, 0.0f, 0.0f, 1.0f), 0.4f);
     }
 
     if ((iFlags & SF_HIGHLIGHT)  != 0) color = color * 1.2;

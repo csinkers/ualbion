@@ -1,16 +1,15 @@
 ﻿using System;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Config;
 
 namespace UAlbion.Formats.Parsers;
 
 public class SongLoader : IAssetLoader<byte[]>
 {
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes((byte[])existing, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes((byte[])existing, info, s, context);
 
-    public byte[] Serdes(byte[] existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    public byte[] Serdes(byte[] existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (s.IsReading())

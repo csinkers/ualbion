@@ -11,7 +11,6 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.MapEvents;
-using UAlbion.Game;
 using UAlbion.Game.Text;
 
 namespace UAlbion;

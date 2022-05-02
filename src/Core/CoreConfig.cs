@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using UAlbion.Api;
 
 namespace UAlbion.Core;
@@ -8,25 +9,25 @@ namespace UAlbion.Core;
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
 public class CoreConfig
 {
-    public VisualT Visual { get; } = new();
+    [JsonInclude] public VisualT Visual { get; private set; } = new();
     public class VisualT
     {
-        public TextureManagerT TextureManager { get; } = new();
+        [JsonInclude] public TextureManagerT TextureManager { get; private set; } = new();
         public class TextureManagerT
         {
-            public float CacheCheckIntervalSeconds { get; private set; } = 5.0f;
+            [JsonInclude] public float CacheCheckIntervalSeconds { get; private set; } = 5.0f;
         }
 
-        public SpriteManagerT SpriteManager { get; } = new();
+        [JsonInclude] public SpriteManagerT SpriteManager { get; private set; } = new();
         public class SpriteManagerT
         {
-            public float CacheCheckIntervalSeconds { get; private set; } = 12.0f;
+            [JsonInclude] public float CacheCheckIntervalSeconds { get; private set; } = 12.0f;
         }
 
-        public SkyboxT Skybox { get; } = new();
+        [JsonInclude] public SkyboxT Skybox { get; private set; } = new();
         public class SkyboxT
         {
-            public float VisibleProportion { get; private set; }
+            [JsonInclude] public float VisibleProportion { get; private set; }
         }
     }
 

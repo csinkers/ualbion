@@ -21,6 +21,8 @@ public interface IExtrudedTilemap : IDisposable
     int TileCount { get; set; }
     CompositedTexture DayWalls { get; }
     CompositedTexture DayFloors { get; }
+    CompositedTexture NightWalls { get; }
+    CompositedTexture NightFloors { get; }
     ISet<int> AnimatedTiles { get; }
     void DefineFloor(int id, ITexture texture);
     void DefineWall(int id, ITexture texture, int x, int y, byte transparentColour, bool isAlphaTested);

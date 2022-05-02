@@ -12,7 +12,6 @@ using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
-using UAlbion.Game;
 using UAlbion.Game.Settings;
 using UAlbion.Scripting;
 using UAlbion.Scripting.Ast;

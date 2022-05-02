@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Text;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Parsers;
@@ -11,11 +10,11 @@ namespace UAlbion.Formats.Exporters.Tiled;
 
 public class StampLoader : IAssetLoader<BlockList>
 {
-    public BlockList Serdes(BlockList existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    public BlockList Serdes(BlockList existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
         if (s.IsWriting())
         {
@@ -43,7 +42,7 @@ public class StampLoader : IAssetLoader<BlockList>
                 if (existing[stampNumber].Width == 0 || existing[stampNumber].Height == 0)
                     return Array.Empty<byte>();
                 var stamp = new Stamp(stampNumber, existing[stampNumber], tileset);
-                return Encoding.UTF8.GetBytes(stamp.Serialize(jsonUtil));
+                return Encoding.UTF8.GetBytes(stamp.Serialize(context.Json));
             });
 
             return existing;
@@ -52,7 +51,7 @@ public class StampLoader : IAssetLoader<BlockList>
         var list = new BlockList();
         foreach (var (jsonBytes, _) in PackedChunks.Unpack(s))
         {
-            var stamp = Stamp.Parse(jsonBytes, jsonUtil);
+            var stamp = Stamp.Parse(jsonBytes, context.Json);
             var block = stamp != null ? stamp.ToBlock() : new Block();
             list.Add(block);
         }
@@ -63,8 +62,8 @@ public class StampLoader : IAssetLoader<BlockList>
         return list;
     }
 
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes((BlockList) existing, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes((BlockList) existing, info, s, context);
 
     /* .stamp file
 {

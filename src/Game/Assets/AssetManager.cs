@@ -4,7 +4,7 @@ using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Core.Visual;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
@@ -58,6 +58,7 @@ public class AssetManager : Component, IAssetManager
     }
 
     public ITexture LoadTexture(SpriteId id) => (ITexture)_modApplier.LoadAssetCached(id);
+    public ITileGraphics LoadTileGraphics(TilesetGraphicsId id) => (ITileGraphics)_modApplier.LoadAssetCached(id);
     public ITexture LoadTexture(IAssetId id) => (ITexture)_modApplier.LoadAssetCached(SpriteId.FromUInt32(id?.ToUInt32() ?? 0));
     public ITexture LoadFont(FontColor color, bool isBold) 
         => (ITexture)_modApplier.LoadAssetCached(new AssetId(

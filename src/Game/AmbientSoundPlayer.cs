@@ -2,6 +2,7 @@
 using ADLMidi.NET;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 

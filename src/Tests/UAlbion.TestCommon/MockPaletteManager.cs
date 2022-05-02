@@ -8,9 +8,10 @@ public class MockPaletteManager : ServiceComponent<IPaletteManager>, IPaletteMan
 {
     int _frame;
 
-    public IPalette Palette { get; set; }
-    public IReadOnlyTexture<uint> PaletteTexture { get; set; }
+    public IPalette Day { get; set; }
+    public IPalette Night { get; set; }
     public int Version { get; private set; }
+    public float Blend { get; }
 
     public int Frame
     {
@@ -21,6 +22,4 @@ public class MockPaletteManager : ServiceComponent<IPaletteManager>, IPaletteMan
             Version++;
         }
     }
-
-    public float PaletteBlend => 0;
 }

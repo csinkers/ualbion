@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -15,10 +14,10 @@ public class WordCollector : Component, IAssetLoader<ListStringCollection>
     static readonly AssetId Words2 = AssetId.From(Base.Special.Words2);
     static readonly AssetId Words3 = AssetId.From(Base.Special.Words3);
 
-    public ListStringCollection Serdes(ListStringCollection existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    public ListStringCollection Serdes(ListStringCollection existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
-        if (mapping == null) throw new ArgumentNullException(nameof(mapping));
+        if (context == null) throw new ArgumentNullException(nameof(context));
         if (s.IsWriting()) return existing;
 
         var predicate = info.AssetId switch
@@ -31,7 +30,7 @@ public class WordCollector : Component, IAssetLoader<ListStringCollection>
 
         var assets = Resolve<IAssetManager>();
         var ids =
-            mapping.EnumerateAssetsOfType(AssetType.Word)
+            context.Mapping.EnumerateAssetsOfType(AssetType.Word)
                 .Where(x => predicate(x.Id))
                 // make sure TextId->StringId resolution won't happen
                 // and get stuck in infinite recursion
@@ -52,6 +51,6 @@ public class WordCollector : Component, IAssetLoader<ListStringCollection>
         return list;
     }
 
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes((ListStringCollection) existing, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes((ListStringCollection) existing, info, s, context);
 }

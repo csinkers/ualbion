@@ -1,6 +1,5 @@
 ﻿using System;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 
@@ -9,10 +8,10 @@ namespace UAlbion.Formats.Parsers;
 public class SlabLoader : IAssetLoader<IReadOnlyTexture<byte>>
 {
     const int StatusBarHeight = 48;
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes((IReadOnlyTexture<byte>)existing, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes((IReadOnlyTexture<byte>)existing, info, s, context);
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
         IReadOnlyTexture<byte> singleFrame = null;
         if (s.IsWriting())
@@ -28,7 +27,7 @@ public class SlabLoader : IAssetLoader<IReadOnlyTexture<byte>>
                     .AddRegion(existing.Regions[0].X, existing.Regions[0].Y, existing.Regions[0].Width, existing.Regions[0].Height);
         }
 
-        var sprite = new FixedSizeSpriteLoader().Serdes(singleFrame, info, mapping, s, jsonUtil);
+        var sprite = new FixedSizeSpriteLoader().Serdes(singleFrame, info, s, context);
         if (sprite == null)
             return null;
 

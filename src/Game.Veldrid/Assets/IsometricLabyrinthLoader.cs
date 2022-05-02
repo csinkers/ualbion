@@ -5,7 +5,6 @@ using System.Linq;
 using SerdesNet;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -90,11 +89,11 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
         yield return (tsxPath, tsxBytes);
     }
 
-    byte[] SaveJson(LabyrinthData labyrinth, AssetInfo info, AssetMapping mapping, IJsonUtil jsonUtil) =>
+    byte[] SaveJson(LabyrinthData labyrinth, AssetInfo info, LoaderContext context) =>
         FormatUtil.SerializeToBytes(s =>
-            _jsonLoader.Serdes(labyrinth, info, mapping, s, jsonUtil));
+            _jsonLoader.Serdes(labyrinth, info, s, context));
 
-    public LabyrinthData Serdes(LabyrinthData existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    public LabyrinthData Serdes(LabyrinthData existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
 
@@ -107,7 +106,7 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
             var (chunk, _) = chunks.Single();
 
             return FormatUtil.DeserializeFromBytes(chunk, s2 =>
-                _jsonLoader.Serdes(null, info, mapping, s2, jsonUtil));
+                _jsonLoader.Serdes(null, info, s2, context));
         }
 
         if (existing == null) throw new ArgumentNullException(nameof(existing));
@@ -120,7 +119,7 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
         var wallPng = info.Get(AssetProperty.WallPngPattern, "Tiled/Gfx/{0}_{2}_Walls.png");
         var contentsPng = info.Get(AssetProperty.ContentsPngPattern, "Tiled/Gfx/{0}_{2}_Contents.png");
 
-        var files = new List<(string, byte[])> {(B(json), SaveJson(existing, info, mapping, jsonUtil))};
+        var files = new List<(string, byte[])> {(B(json), SaveJson(existing, info, context))};
         files.AddRange(Save(existing, info, IsometricMode.Floors, B(floorPng), B(floorTsx)));
         files.AddRange(Save(existing, info, IsometricMode.Ceilings, B(ceilingPng), B(ceilingTsx)));
         files.AddRange(Save(existing, info, IsometricMode.Walls, B(wallPng), B(wallTsx)));
@@ -130,8 +129,8 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
         return existing;
     }
 
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes((LabyrinthData)existing, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes((LabyrinthData)existing, info, s, context);
 
     public void Dispose() => _engine?.Dispose();
 }

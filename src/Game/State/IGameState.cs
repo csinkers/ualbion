@@ -11,7 +11,6 @@ public interface IGameState
     int TickCount { get; }
     int MTicksToday => (int)(48.0 * Time.TimeOfDay.TotalHours);
     DateTime Time { get; }
-    float PaletteBlend { get; }
     IParty Party { get; }
     MapId MapId { get; }
     MapId MapIdForNpcs { get; set; } // Set by NpcManagers

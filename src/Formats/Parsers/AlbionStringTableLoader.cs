@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 
@@ -9,7 +8,7 @@ namespace UAlbion.Formats.Parsers;
 
 public class AlbionStringTableLoader : IAssetLoader<ListStringCollection>
 {
-    public ListStringCollection Serdes(ListStringCollection existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
+    public ListStringCollection Serdes(ListStringCollection existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (s.IsReading())
@@ -42,6 +41,6 @@ public class AlbionStringTableLoader : IAssetLoader<ListStringCollection>
         }
     }
 
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes(existing as ListStringCollection, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes(existing as ListStringCollection, info, s, context);
 }

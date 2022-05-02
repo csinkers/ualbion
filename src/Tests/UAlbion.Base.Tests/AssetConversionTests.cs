@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
@@ -22,6 +21,7 @@ public class AssetConversionTests
     const string UnpackedAssetMod = "Unpacked";
     const string RepackedAssetMod = "Repacked";
 
+    static readonly DummyAssetManager DummyAssets = new DummyAssetManager();
     static readonly IJsonUtil JsonUtil = new FormatJsonUtil();
     readonly string _baseDir;
     readonly IFileSystem _disk;
@@ -46,10 +46,7 @@ public class AssetConversionTests
         return exchange.Resolve<IModApplier>();
     }
 
-    void Test<T>(AssetId id,
-        AssetId[] prerequisites,
-        Func<T, ISerializer, T> serdes,
-        Func<T, T> canonicalize = null) where T : class
+    void Test<T>(AssetId id, AssetId[] prerequisites, Asset.SerdesFunc<T> serdes, Func<T, T> canonicalize = null) where T : class
     {
         prerequisites ??= Array.Empty<AssetId>();
         var allIds = prerequisites.Append(id);
@@ -60,13 +57,15 @@ public class AssetConversionTests
         if (canonicalize != null)
             baseAsset = canonicalize(baseAsset);
 
-        var (baseBytes, baseNotes) = Asset.Save(baseAsset, serdes);
+        var mapping = AssetMapping.Global;
+        var context = new LoaderContext(DummyAssets, JsonUtil, mapping);
+
+        var (baseBytes, baseNotes) = Asset.Save(baseAsset, serdes, context);
         var baseJson = Asset.SaveJson(baseAsset, JsonUtil);
 
         var idStrings = allIds.Select(x => $"{x.Type}.{x.Id}").ToArray();
         var assetTypes = allIds.Select(x => x.Type).Distinct().ToHashSet();
 
-        var mapping = AssetMapping.Global;
         using (var unpacker = new AssetConverter(
                    mapping,
                    _disk,
@@ -79,7 +78,7 @@ public class AssetConversionTests
 
         var unpackedAsset = (T)BuildApplier(UnpackedAssetMod, AssetMapping.Global).LoadAsset(id);
         Assert.NotNull(unpackedAsset);
-        var (unpackedBytes, unpackedNotes) = Asset.Save(unpackedAsset, serdes);
+        var (unpackedBytes, unpackedNotes) = Asset.Save(unpackedAsset, serdes, context);
         var unpackedJson = Asset.SaveJson(unpackedAsset, JsonUtil);
 
         Asset.Compare(resultsDir,
@@ -105,7 +104,7 @@ public class AssetConversionTests
         }
 
         var repackedAsset = (T)BuildApplier(RepackedAssetMod, AssetMapping.Global).LoadAsset(id);
-        var (repackedBytes, repackedNotes) = Asset.Save(repackedAsset, serdes);
+        var (repackedBytes, repackedNotes) = Asset.Save(repackedAsset, serdes, context);
         var repackedJson = Asset.SaveJson(repackedAsset, JsonUtil);
 
         Asset.Compare(resultsDir,
@@ -139,7 +138,7 @@ public class AssetConversionTests
             .Attach(spellManager)
             .Attach(itemDataLoader);
 
-        Test<ItemData>(info.AssetId, null, (x, s) => itemDataLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<ItemData>(info.AssetId, null, (x, s, c) => itemDataLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -148,21 +147,21 @@ public class AssetConversionTests
         var info = new AssetInfo { AssetId = AssetId.From(Special.ItemNames) };
         Test<MultiLanguageStringDictionary>(info.AssetId,
             AssetMapping.Global.EnumerateAssetsOfType(AssetType.ItemName).ToArray(),
-            (x, s) => Loaders.ItemNameLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.ItemNameLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void AutomapTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Automap.Jirinaar) };
-        Test<Formats.Assets.Automap>(info.AssetId, null, (x, s) => Loaders.AutomapLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<Formats.Assets.Automap>(info.AssetId, null, (x, s, c) => Loaders.AutomapLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void BlockListTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(BlockList.Toronto) };
-        Test<Formats.Assets.BlockList>(info.AssetId, null, (x, s) => Loaders.BlockListLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<Formats.Assets.BlockList>(info.AssetId, null, (x, s, c) => Loaders.BlockListLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -172,7 +171,7 @@ public class AssetConversionTests
         Test<Inventory>(
             info.AssetId,
             AssetId.EnumerateAll(AssetType.Item).ToArray(),
-            (x, s) => Loaders.ChestLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.ChestLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -180,7 +179,7 @@ public class AssetConversionTests
     {
         var info = new AssetInfo { AssetId = AssetId.From(Palette.Common) };
         info.Set(AssetProperty.IsCommon, true);
-        Test<AlbionPalette>(info.AssetId, null, (x, s) => Loaders.PaletteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<AlbionPalette>(info.AssetId, null, (x, s, c) => Loaders.PaletteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -190,7 +189,7 @@ public class AssetConversionTests
         Test<Formats.Assets.EventSet>(
             info.AssetId,
             null,
-            (x, s) => Loaders.EventSetLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil),
+            (x, s, c) => Loaders.EventSetLoader.Serdes(x, info, s, c),
             LayoutTestUtil.CanonicalizeEventSet);
     }
 
@@ -198,14 +197,14 @@ public class AssetConversionTests
     public void EventTextTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(EventText.Frill) };
-        Test<ListStringCollection>(info.AssetId, null, (x, s) => Loaders.AlbionStringTableLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<ListStringCollection>(info.AssetId, null, (x, s, c) => Loaders.AlbionStringTableLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void LabyrinthTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Labyrinth.Jirinaar) };
-        Test<Formats.Assets.Labyrinth.LabyrinthData>(info.AssetId, null, (x, s) => Loaders.LabyrinthDataLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<Formats.Assets.Labyrinth.LabyrinthData>(info.AssetId, null, (x, s, c) => Loaders.LabyrinthDataLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -224,7 +223,7 @@ public class AssetConversionTests
         Test<MapData2D>(
             info.AssetId,
             prereqs,
-            (x, s) => MapData2D.Serdes(info, x, AssetMapping.Global, s),
+            (x, s, c) => MapData2D.Serdes(info, x, c.Mapping, s),
             LayoutTestUtil.CanonicalizeMap);
     }
 
@@ -244,7 +243,7 @@ public class AssetConversionTests
         Test<MapData2D>(
             info.AssetId,
             prereqs,
-            (x, s) => MapData2D.Serdes(info, x, AssetMapping.Global, s),
+            (x, s, c) => MapData2D.Serdes(info, x, c.Mapping, s),
             LayoutTestUtil.CanonicalizeMap);
     }
 
@@ -256,7 +255,7 @@ public class AssetConversionTests
         Test<MapData3D>(
             info.AssetId,
             prereqs,
-            (x, s) => MapData3D.Serdes(info, x, AssetMapping.Global, s),
+            (x, s, c) => MapData3D.Serdes(info, x, c.Mapping, s),
             LayoutTestUtil.CanonicalizeMap);
     }
 
@@ -268,7 +267,7 @@ public class AssetConversionTests
         Test<MapData3D>(
             info.AssetId,
             prereqs,
-            (x, s) => MapData3D.Serdes(info, x, AssetMapping.Global, s),
+            (x, s, c) => MapData3D.Serdes(info, x, c.Mapping, s),
             LayoutTestUtil.CanonicalizeMap);
     }
 
@@ -276,7 +275,7 @@ public class AssetConversionTests
     public void MapTextTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(MapText.TorontoBegin) };
-        Test<ListStringCollection>(info.AssetId, null, (x, s) => Loaders.AlbionStringTableLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<ListStringCollection>(info.AssetId, null, (x, s, c) => Loaders.AlbionStringTableLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -286,7 +285,7 @@ public class AssetConversionTests
         Test<Inventory>(
             info.AssetId,
             AssetId.EnumerateAll(AssetType.Item).ToArray(),
-            (x, s) => Loaders.MerchantLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.MerchantLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -296,14 +295,14 @@ public class AssetConversionTests
         Test<Inventory>(
             info.AssetId,
             AssetId.EnumerateAll(AssetType.Item).ToArray(),
-            (x, s) => Loaders.MerchantLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.MerchantLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void MonsterGroupTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(MonsterGroup.TwoSkrinn1OneKrondir1) };
-        Test<Formats.Assets.MonsterGroup>(info.AssetId, null, (x, s) => Loaders.MonsterGroupLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<Formats.Assets.MonsterGroup>(info.AssetId, null, (x, s, c) => Loaders.MonsterGroupLoader.Serdes(x, info, s, c));
     }
 
     static CharacterSheetLoader BuildCharacterLoader()
@@ -333,7 +332,7 @@ public class AssetConversionTests
         Test<CharacterSheet>(
             info.AssetId,
             AssetId.EnumerateAll(AssetType.Item).ToArray(),
-            (x, s) => loader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => loader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -341,14 +340,14 @@ public class AssetConversionTests
     {
         var info = new AssetInfo { AssetId = AssetId.From(Npc.Christine) };
         var loader = BuildCharacterLoader();
-        Test<CharacterSheet>(info.AssetId, null, (x, s) => loader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<CharacterSheet>(info.AssetId, null, (x, s, c) => loader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void PaletteTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Palette.Toronto2D) };
-        Test<AlbionPalette>(info.AssetId, new[] { AssetId.From(Palette.Common) }, (x, s) => Loaders.PaletteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<AlbionPalette>(info.AssetId, new[] { AssetId.From(Palette.Common) }, (x, s, c) => Loaders.PaletteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -359,14 +358,14 @@ public class AssetConversionTests
         Test<CharacterSheet>(
             info.AssetId,
             AssetId.EnumerateAll(AssetType.Item).ToArray(),
-            (x, s) => loader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => loader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void SampleTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Sample.IllTemperedLlama) };
-        Test<AlbionSample>(info.AssetId, null, (x, s) => Loaders.SampleLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<AlbionSample>(info.AssetId, null, (x, s, c) => Loaders.SampleLoader.Serdes(x, info, s, c));
     }
 
     /* They're text anyway so not too bothered - at the moment they don't round trip due to using friendly asset id names
@@ -375,35 +374,35 @@ public class AssetConversionTests
     public void ScriptTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Script.TomMeetsChristine) };
-        Test<IList<IEvent>>(info.AssetId, null, (x, s) => Loaders.ScriptLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<IList<IEvent>>(info.AssetId, null, (x, s, c) => Loaders.ScriptLoader.Serdes(x, info, s, c));
     } //*/
 
     [Fact]
     public void SongTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Song.Toronto) };
-        Test<byte[]>(info.AssetId, null, (x, s) => Loaders.SongLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<byte[]>(info.AssetId, null, (x, s, c) => Loaders.SongLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void SpellTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Spell.FrostAvalanche) };
-        Test<SpellData>(info.AssetId, null, (x, s) => Loaders.SpellLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<SpellData>(info.AssetId, null, (x, s, c) => Loaders.SpellLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void TilesetTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Tileset.Outdoors) };
-        Test<TilesetData>(info.AssetId, null, (x, s) => Loaders.TilesetLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<TilesetData>(info.AssetId, null, (x, s, c) => Loaders.TilesetLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void WaveLibTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(WaveLibrary.TorontoAmbient) };
-        Test<WaveLib>(info.AssetId, null, (x, s) => Loaders.WaveLibLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<WaveLib>(info.AssetId, null, (x, s, c) => Loaders.WaveLibLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -413,7 +412,7 @@ public class AssetConversionTests
         Test<ListStringCollection>(
             info.AssetId,
             AssetMapping.Global.EnumerateAssetsOfType(AssetType.Word).ToArray(),
-            (x, s) => Loaders.WordListLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.WordListLoader.Serdes(x, info, s, c));
     }
     //*
     [Fact]
@@ -423,7 +422,7 @@ public class AssetConversionTests
         info.Set(AssetProperty.SubSprites, "(8,8,576) (16,16)");
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.Common), AssetId.From(Palette.Unknown11) },
-            (x, s) => Loaders.AmorphousSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.AmorphousSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -436,7 +435,7 @@ public class AssetConversionTests
         };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.TorontoCombat), AssetId.From(Palette.Common) },
-            (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -450,7 +449,7 @@ public class AssetConversionTests
         };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common) },
-            (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -459,7 +458,7 @@ public class AssetConversionTests
         var info = new AssetInfo { AssetId = AssetId.From(Font.RegularFont), Width = 8, Height = 8 };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.Common) },
-            (x, s) => Loaders.FontSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.FontSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -473,7 +472,7 @@ public class AssetConversionTests
         };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.Common) },
-            (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -482,7 +481,7 @@ public class AssetConversionTests
         var info = new AssetInfo { AssetId = AssetId.From(UiBackground.Slab), Width = 360 };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.Common) },
-            (x, s) => Loaders.SlabLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.SlabLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -494,9 +493,11 @@ public class AssetConversionTests
             Width = 16,
             Height = 16
         };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+
+        var post = new TileSetPostProcessor();
+        Test<ITileGraphics>(info.AssetId,
             new[] { AssetId.From(Palette.Toronto2D), AssetId.From(Palette.Common) },
-            (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => (ITileGraphics)post.Process(Loaders.FixedSizeSpriteLoader.Serdes((IReadOnlyTexture<byte>)x.Texture, info, s, c), info));
     }
 
     [Fact]
@@ -505,7 +506,7 @@ public class AssetConversionTests
         var info = new AssetInfo { AssetId = AssetId.From(CombatGraphics.Unknown27) };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.PlainsCombat), AssetId.From(Palette.Common) },
-            (x, s) => Loaders.MultiHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.MultiHeaderSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -514,7 +515,7 @@ public class AssetConversionTests
         var info = new AssetInfo { AssetId = AssetId.From(DungeonBackground.EarlyGameL) };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common) },
-            (x, s) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -528,7 +529,7 @@ public class AssetConversionTests
         };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common) },
-            (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -537,7 +538,7 @@ public class AssetConversionTests
         var info = new AssetInfo { AssetId = AssetId.From(FullBodyPicture.Tom) };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.Inventory), AssetId.From(Palette.Common) },
-            (x, s) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -546,7 +547,7 @@ public class AssetConversionTests
         var info = new AssetInfo { AssetId = AssetId.From(LargeNpc.Christine) };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.Toronto2D), AssetId.From(Palette.Common) },
-            (x, s) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -555,7 +556,7 @@ public class AssetConversionTests
         var info = new AssetInfo { AssetId = AssetId.From(LargePartyMember.Tom) };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.IskaiIndoorDark), AssetId.From(Palette.Common) },
-            (x, s) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -564,7 +565,7 @@ public class AssetConversionTests
         var info = new AssetInfo { AssetId = AssetId.From(MonsterGraphics.Krondir) };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.DungeonCombat), AssetId.From(Palette.Common) },
-            (x, s) => Loaders.MultiHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.MultiHeaderSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -579,7 +580,7 @@ public class AssetConversionTests
         info.File.Set(AssetProperty.Transposed, true);
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common) },
-            (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 
     /* No code to write these atm, if anyone wants to mod them or add new ones they can still use ImageMagick or something to convert to ILBM
@@ -587,7 +588,7 @@ public class AssetConversionTests
     public void PictureTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Picture.OpenChestWithGold) };
-        Test<InterlacedBitmap>(info.AssetId, null, (x, s) => Loaders.InterlacedBitmapLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+        Test<InterlacedBitmap>(info.AssetId, null, (x, s, c) => Loaders.InterlacedBitmapLoader.Serdes(x, info, s, c));
     } //*/
 
     [Fact]
@@ -600,7 +601,7 @@ public class AssetConversionTests
         };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.Common) },
-            (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -609,7 +610,7 @@ public class AssetConversionTests
         var info = new AssetInfo { AssetId = AssetId.From(SmallNpc.Krondir) };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.FirstIslandDay), AssetId.From(Palette.Common) },
-            (x, s) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -618,7 +619,7 @@ public class AssetConversionTests
         var info = new AssetInfo { AssetId = AssetId.From(SmallPartyMember.Tom) };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.FirstIslandDay), AssetId.From(Palette.Common) },
-            (x, s) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -631,7 +632,7 @@ public class AssetConversionTests
         };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.Common) },
-            (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -644,7 +645,7 @@ public class AssetConversionTests
         };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.Toronto3D), AssetId.From(Palette.Common) },
-            (x, s) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, AssetMapping.Global, s, JsonUtil));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
     // */
 }

@@ -6,7 +6,7 @@ namespace UAlbion.Api.Visual;
 
 public static class BlitUtil
 {
-    static void Blit8To32Transparent(ReadOnlyImageBuffer<byte> fromBuffer, ImageBuffer<uint> toBuffer, uint[] palette, byte componentAlpha, byte transparentColor)
+    static void Blit8To32Transparent(ReadOnlyImageBuffer<byte> fromBuffer, ImageBuffer<uint> toBuffer, ReadOnlySpan<uint> palette, byte componentAlpha, byte transparentColor)
     {
         var from = fromBuffer.Buffer;
         var to = toBuffer.Buffer;
@@ -30,7 +30,7 @@ public static class BlitUtil
         }
     }
 
-    static void Blit8To32Opaque(ReadOnlyImageBuffer<byte> fromBuffer, ImageBuffer<uint> toBuffer, uint[] palette, byte componentAlpha)
+    static void Blit8To32Opaque(ReadOnlyImageBuffer<byte> fromBuffer, ImageBuffer<uint> toBuffer, ReadOnlySpan<uint> palette, byte componentAlpha)
     {
         var from = fromBuffer.Buffer;
         var to = toBuffer.Buffer;
@@ -53,7 +53,7 @@ public static class BlitUtil
         }
     }
 
-    public static void BlitTiled8To32(ReadOnlyImageBuffer<byte> from, ImageBuffer<uint> to, uint[] palette, byte componentAlpha, byte? transparentColor)
+    public static void BlitTiled8To32(ReadOnlyImageBuffer<byte> from, ImageBuffer<uint> to, ReadOnlySpan<uint> palette, byte componentAlpha, byte? transparentColor)
     {
         if (palette == null) throw new ArgumentNullException(nameof(palette));
         int remainingWidth = to.Width;

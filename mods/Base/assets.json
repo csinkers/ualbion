@@ -90,6 +90,8 @@
     "multiheader":       "UAlbion.Formats.Parsers.MultiHeaderSpriteLoader, UAlbion.Formats",
     "pal":               "UAlbion.Formats.Parsers.PaletteLoader, UAlbion.Formats",
     "png":               "UAlbion.Game.Veldrid.Assets.PngLoader, UAlbion.Game.Veldrid",
+    "pngtile8":          "UAlbion.Game.Veldrid.Assets.PngTileLoader8Bit, UAlbion.Game.Veldrid",
+    "pngtile32":         "UAlbion.Game.Veldrid.Assets.PngTileLoader32Bit, UAlbion.Game.Veldrid",
     "pngsheet":          "UAlbion.Game.Veldrid.Assets.PngSheetLoader, UAlbion.Game.Veldrid",
     "raw":               "UAlbion.Formats.Parsers.RawLoader, UAlbion.Formats",
     "sample":            "UAlbion.Formats.Parsers.SampleLoader, UAlbion.Formats",
@@ -128,13 +130,13 @@
   },
 
   "PostProcessors": {
-    "gfx":  "UAlbion.Game.Assets.AlbionSpritePostProcessor, UAlbion.Game",
     "tile": "UAlbion.Game.Assets.TilePostProcessor, UAlbion.Game",
+    "tileset": "UAlbion.Game.Assets.TileSetPostProcessor, UAlbion.Game",
     "inv":  "UAlbion.Game.Assets.InventoryPostProcessor, UAlbion.Game",
     "ilbm": "UAlbion.Game.Assets.InterlacedBitmapPostProcessor, UAlbion.Game"
   },
 
-  "Languages": { // Just used for the options screen
+  "Languages": {
     "ENGLISH": { "DisplayName": "English",  "ShortName": "EN" },
     "GERMAN":  { "DisplayName": "Deutsch",  "ShortName": "DE" },
     "FRENCH":  { "DisplayName": "François", "ShortName": "FR" }

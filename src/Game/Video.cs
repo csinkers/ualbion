@@ -4,6 +4,7 @@ using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.ScriptEvents;
@@ -77,7 +78,7 @@ public class Video : Component
             _ => _texture));
         _sprite.Size = 2 * Vector2.One;
 
-        var oldId = Resolve<IPaletteManager>().Palette?.Id;
+        var oldId = Resolve<IPaletteManager>().Day?.Id;
         if (oldId.HasValue)
             _previousPaletteId = PaletteId.FromUInt32(oldId.Value);
         Raise(new LoadRawPaletteEvent($"P:V:{_id}", _player.Palette));

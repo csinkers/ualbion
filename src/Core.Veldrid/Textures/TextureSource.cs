@@ -10,8 +10,32 @@ namespace UAlbion.Core.Veldrid.Textures;
 
 public class TextureSource : ServiceComponent<ITextureSource>, ITextureSource
 {
-    readonly TextureCache<Texture2DHolder> _simple = new(x => new Texture2DHolder(x.Name), CreateSimple);
-    readonly TextureCache<Texture2DArrayHolder> _array = new(x => new Texture2DArrayHolder(x.Name), CreateArray);
+    static void Checkerboard(Span<byte> span)
+    {
+        for (int j = 0; j < 64; j++)
+            for (int i = 0; i < 64; i++)
+                span[j * 64 + i] = (byte)(j >= 32 ^ i >= 32 ? 255 : 1);
+    }
+
+    static ITexture BuildDefaultArray()
+    {
+        var result = new ArrayTexture<byte>(null, 64, 64, 2);
+        Checkerboard(result.GetMutableLayerBuffer(0).Buffer);
+        Checkerboard(result.GetMutableLayerBuffer(1).Buffer);
+        return result;
+    }
+
+    static ITexture BuildDefault()
+    {
+        var result = new SimpleTexture<byte>(null, 64, 64);
+        Checkerboard( result.GetMutableLayerBuffer(0).Buffer);
+        return result;
+    }
+
+    static readonly ITexture DefaultTexture = BuildDefault();
+    static readonly ITexture DefaultArrayTexture = BuildDefaultArray();
+    readonly TextureCache<Texture2DHolder> _simple = new(x => new Texture2DHolder(x.Name), CreateSimple, DefaultTexture);
+    readonly TextureCache<Texture2DArrayHolder> _array = new(x => new Texture2DArrayHolder(x.Name), CreateArray, DefaultArrayTexture);
     readonly ITexture _dummySimple = new SimpleTexture<byte>(null, "Dummy Texture", 1, 1, new byte[] { 0 });
     readonly ITexture _dummyArray = new ArrayTexture<byte>(null, "Dummy ArrayTexture", 1, 1, 2, new byte[] { 0, 0 });
     float _lastCleanup;

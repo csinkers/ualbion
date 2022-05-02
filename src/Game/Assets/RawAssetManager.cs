@@ -54,6 +54,7 @@ public class RawAssetManager : Component, IRawAssetManager
         => (ITexture)_modApplier.LoadAsset(new AssetId(
             AssetType.MetaFont, (ushort)new MetaFontId(isBold, color)));
 
+    public ITileGraphics LoadTileGraphics(TilesetGraphicsId id) => (ITileGraphics)_modApplier.LoadAsset(id);
     public TilesetData LoadTileData(TilesetId id) => (TilesetData)_modApplier.LoadAsset(id);
     public LabyrinthData LoadLabyrinthData(LabyrinthId id) => (LabyrinthData)_modApplier.LoadAsset(id);
 

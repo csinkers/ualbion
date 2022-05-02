@@ -15,6 +15,19 @@ vec4 getWall(vec3 coords)
 	return mix(day, night, uPaletteBlend);
 }
 
+#ifdef USE_PALETTE
+vec4 Pal(float color)
+{
+	float u = (color * 255.0f/256.f) + (0.5f/256.0f);
+    float v = fract((uPaletteFrame + 0.5f) / textureSize(sampler2D(uDayPalette, uPaletteSampler), 0).y); //! float v = 0; 
+    vec2 uv = vec2(u, v);
+
+	vec4 day = texture(sampler2D(uDayPalette, uPaletteSampler), uv); //! vec4 day = vec4(0);
+	vec4 night = texture(sampler2D(uNightPalette, uPaletteSampler), uv); //! vec4 night = vec4(0);
+	return mix(day, night, uPaletteBlend);
+}
+#endif
+
 void main()
 {
 	float floorLayer   = float(iTextures & 0x000000ff);
@@ -37,15 +50,8 @@ void main()
 	}
 
 #ifdef USE_PALETTE
-	float redChannel = color[0];
-	float index = 255.0f * redChannel;
-	if (index == 0)
-		color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-		color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-	else
-		color = texture(sampler2D(uPalette, PaletteSampler), vec2(redChannel, 0.0f)); //! {}
+	color = Pal(color[0]); //! {}
 #endif
-	// else if (color.x != 0) color = vec4(color.xx, 0.5f, 1.0f);
 
 	float depth = (color.w == 0.0f) ?  1.0f : gl_FragCoord.z;
 
@@ -71,7 +77,9 @@ void main()
 
 	if ((uEngineFlags & EF_SHOW_BOUNDING_BOXES) != 0)
 	{
-		color = mix(color, vec4((2*color.xyz + vec3(1.0f)) * 0.333f, 1.0f),
+		color =
+			mix(color,
+				vec4((2*color.xyz + vec3(1.0f)) * 0.333f, 1.0f),
 				max(smoothstep(0.47, 0.5, abs(iTexCoords.x-0.5f)),
 					smoothstep(0.47, 0.5, abs(iTexCoords.y-0.5f))));
 	}

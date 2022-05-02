@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Numerics;
-using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 
@@ -17,20 +17,19 @@ public class MapRenderable2D : Component
     readonly InfoOverlay _info;
     readonly MapAnnotationLayer _annotations;
 
-    public MapRenderable2D(LogicalMap2D logicalMap, ITexture tileset, IGameFactory factory)
+    public MapRenderable2D(LogicalMap2D logicalMap, ITileGraphics tileset, IGameFactory factory)
     {
         if (tileset == null) throw new ArgumentNullException(nameof(tileset));
         if (factory == null) throw new ArgumentNullException(nameof(factory));
         _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
-        var subImage = tileset.Regions[0];
+        var subImage = tileset.GetRegion(0,0,0);
         TileSize = subImage.Size;
 
         _underlay = AttachChild(factory.CreateMapLayer(logicalMap, tileset, false));
         _overlay = AttachChild(factory.CreateMapLayer(logicalMap, tileset, true)); 
         _info = AttachChild(new InfoOverlay(logicalMap));
 
-        var tileSize = tileset.Regions[0].Size;
-        _annotations = AttachChild(new MapAnnotationLayer(logicalMap, tileSize));
+        _annotations = AttachChild(new MapAnnotationLayer(logicalMap, TileSize));
 
         On<ToggleUnderlayEvent>(e => _underlay.IsActive = !_underlay.IsActive);
         On<ToggleOverlayEvent>(e => _overlay.IsActive = !_overlay.IsActive);

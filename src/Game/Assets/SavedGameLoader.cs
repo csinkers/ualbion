@@ -1,5 +1,4 @@
 ﻿using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -9,9 +8,9 @@ namespace UAlbion.Game.Assets;
 
 public class SavedGameLoader : Component, IAssetLoader<SavedGame>
 {
-    public SavedGame Serdes(SavedGame existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => SavedGame.Serdes(existing, mapping, s, Resolve<ISpellManager>());
+    public SavedGame Serdes(SavedGame existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => SavedGame.Serdes(existing, context.Mapping, s, Resolve<ISpellManager>());
 
-    public object Serdes(object existing, AssetInfo info, AssetMapping mapping, ISerializer s, IJsonUtil jsonUtil)
-        => Serdes(existing as SavedGame, info, mapping, s, jsonUtil);
+    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+        => Serdes(existing as SavedGame, info, s, context);
 }

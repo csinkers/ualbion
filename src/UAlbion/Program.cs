@@ -8,7 +8,6 @@ using UAlbion.Core.Veldrid.Etm;
 using UAlbion.Core.Veldrid.Skybox;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Formats;
-using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Text;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
@@ -19,7 +20,8 @@ public sealed class SkyboxManager : ServiceComponent<ISkyboxManager>, ISkyboxMan
             AddressModeU = SamplerAddressMode.Wrap,
             AddressModeV = SamplerAddressMode.Clamp,
             AddressModeW = SamplerAddressMode.Clamp,
-            Filter = SamplerFilter.MinLinear_MagLinear_MipLinear,
+            // Filter = SamplerFilter.MinLinear_MagLinear_MipLinear,
+            Filter = SamplerFilter.MinPoint_MagPoint_MipPoint,
         };
         AttachChild(_skyboxSampler);
     }
@@ -36,7 +38,9 @@ public sealed class SkyboxManager : ServiceComponent<ISkyboxManager>, ISkyboxMan
     {
         var ts = Resolve<ITextureSource>();
         var textureHolder = ts.GetSimpleTexture(texture);
-        return new SkyboxRenderable(textureHolder, _skyboxSampler, this);
+        var renderable = new SkyboxRenderable(textureHolder, _skyboxSampler, this);
+        AttachChild(renderable);
+        return renderable;
     }
 
     internal void DisposeSkybox(SkyboxRenderable skybox)
@@ -47,7 +51,7 @@ public sealed class SkyboxManager : ServiceComponent<ISkyboxManager>, ISkyboxMan
 
     public void Dispose()
     {
-        foreach (var child in Children)
+        foreach (var child in Children.ToList())
             if (child is SkyboxRenderable skybox)
                 skybox.Dispose();
 

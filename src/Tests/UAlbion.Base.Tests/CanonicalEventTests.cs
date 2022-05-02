@@ -1,8 +1,8 @@
 ﻿using System;
 using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
-using UAlbion.Game;
 using UAlbion.Scripting;
 using UAlbion.TestCommon;
 using Xunit;

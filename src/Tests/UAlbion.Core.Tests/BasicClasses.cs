@@ -1,7 +1,5 @@
 using System;
-using UAlbion.Api;
 using UAlbion.Api.Eventing;
-using UAlbion.Core.Events;
 
 namespace UAlbion.Core.Tests;
 

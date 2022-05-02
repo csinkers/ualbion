@@ -5,7 +5,6 @@ using System.Numerics;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game.Assets;

@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats.Assets;
 

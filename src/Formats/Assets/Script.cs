@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UAlbion.Api;
 using UAlbion.Api.Eventing;
 
 #pragma warning disable CA1710 // Identifiers should have correct suffix

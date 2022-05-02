@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Core;
 using UAlbion.Formats.Assets.Save;
 
 namespace UAlbion.Game.Assets;

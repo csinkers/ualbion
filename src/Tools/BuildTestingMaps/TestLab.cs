@@ -4,7 +4,6 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using static BuildTestingMaps.Constants;
-using Wall = UAlbion.Formats.Assets.Labyrinth.Wall;
 
 namespace BuildTestingMaps;
 

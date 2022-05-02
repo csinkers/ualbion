@@ -1,5 +1,4 @@
 ﻿using UAlbion.Api.Eventing;
-using UAlbion.Core;
 using UAlbion.Core.Visual;
 
 namespace UAlbion.Game.Entities.Map2D;

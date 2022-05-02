@@ -1,5 +1,4 @@
-﻿using UAlbion.Api;
-using UAlbion.Api.Eventing;
+﻿using UAlbion.Api.Eventing;
 using Veldrid;
 
 namespace UAlbion.Core.Veldrid.Events;

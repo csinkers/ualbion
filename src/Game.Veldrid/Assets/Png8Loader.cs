@@ -11,7 +11,6 @@ using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
-using UAlbion.Core;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;

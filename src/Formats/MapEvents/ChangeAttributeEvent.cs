@@ -1,6 +1,5 @@
 ﻿using System;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats.Assets;
 using Attribute = UAlbion.Formats.Assets.Attribute;

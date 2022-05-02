@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
 using UAlbion.Api.Eventing;
-using UAlbion.Core;
 using UAlbion.Game.Input;
 
 namespace UAlbion.Game.Tests;

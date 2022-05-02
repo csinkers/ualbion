@@ -1,11 +1,6 @@
-﻿using UAlbion.Api;
-using UAlbion.Base;
-using UAlbion.Config;
+﻿using UAlbion.Config;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Assets.Maps;
-using UAlbion.Formats.Parsers;
 using static BuildTestingMaps.Constants;
-using MonsterGroup = UAlbion.Base.MonsterGroup;
 
 namespace BuildTestingMaps;
 

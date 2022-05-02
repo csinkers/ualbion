@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using UAlbion.Api.Visual;
-using UAlbion.Core.Visual;
-
-namespace UAlbion.Core.Textures;
+﻿namespace UAlbion.Core.Textures;
 
 /*
 public abstract class EightBitTexture : ITexture, IImage<byte>

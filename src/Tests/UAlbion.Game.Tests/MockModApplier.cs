@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Core;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Assets;
 

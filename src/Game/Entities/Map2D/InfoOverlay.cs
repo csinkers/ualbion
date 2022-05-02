@@ -1,7 +1,6 @@
 ﻿using System;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
-using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets.Maps;

@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Audio;
 using UAlbion.Core.Visual;

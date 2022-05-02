@@ -1,6 +1,4 @@
-﻿using UAlbion.Api;
-using UAlbion.Api.Eventing;
-using UAlbion.Core;
+﻿using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;

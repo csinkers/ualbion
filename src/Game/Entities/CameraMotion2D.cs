@@ -3,7 +3,6 @@ using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
-using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Config;

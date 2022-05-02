@@ -9,7 +9,6 @@ using System.Threading;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;

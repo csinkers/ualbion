@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Core;
 using UAlbion.Game.Events;
 using static System.FormattableString;
 

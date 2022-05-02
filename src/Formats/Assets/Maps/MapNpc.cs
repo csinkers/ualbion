@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 

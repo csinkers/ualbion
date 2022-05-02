@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Scripting.Ast;
 

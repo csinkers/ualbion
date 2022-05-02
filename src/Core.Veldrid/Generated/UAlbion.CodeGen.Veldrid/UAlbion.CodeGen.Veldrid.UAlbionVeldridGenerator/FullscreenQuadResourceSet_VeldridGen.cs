@@ -57,12 +57,20 @@ namespace UAlbion.Core.Veldrid
             }
         }
 
-        protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout) =>
-            device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
+        protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout)
+        {
+#if DEBUG
+                if (_sampler.Sampler == null) throw new System.InvalidOperationException("Tried to construct FullscreenQuadResourceSet without setting Sampler to a non-null value");
+                if (_texture.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct FullscreenQuadResourceSet without setting Texture to a non-null value");
+                if (_uniform.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct FullscreenQuadResourceSet without setting Uniform to a non-null value");
+#endif
+
+            return device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
                 layout,
                 _sampler.Sampler,
                 _texture.DeviceTexture,
                 _uniform.DeviceBuffer));
+        }
 
         protected override void Resubscribe()
         {

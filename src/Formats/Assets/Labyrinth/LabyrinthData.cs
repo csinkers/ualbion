@@ -79,7 +79,7 @@ public class LabyrinthData
         if (d.ObjectGroups.Count > WallOffset) throw new InvalidOperationException($"A labyrinth specification can only contain a maximum of {WallOffset} object groups, but {d.Id} contains {d.ObjectGroups.Count}");
         if (d.Walls.Count > MaxWalls) throw new InvalidOperationException($"A labyrinth specification can only contain a maximum of {WallOffset} walls, but {d.Id} contains {d.Walls.Count}");
 
-        PerfTracker.StartupEvent("Start loading labyrinth data");
+        // PerfTracker.StartupEvent("Start loading labyrinth data");
         // s.ByteArray("UnknownBlock6C", () => sheet.UnknownBlock6C, x => sheet.UnknownBlock6C = x, 14);
 
         d.WallHeight   = s.UInt16(nameof(d.WallHeight), d.WallHeight);     // 0
@@ -132,7 +132,7 @@ public class LabyrinthData
         ApiUtil.Assert(objectCount <= MaxWalls, "A labyrinth cannot have more than 150 wall types");
         s.List(nameof(d.Walls), d.Walls, mapping, wallCount, Wall.Serdes);
         s.Check();
-        PerfTracker.StartupEvent("Finish loading labyrinth data");
+        // PerfTracker.StartupEvent("Finish loading labyrinth data");
         return d;
     }
 }

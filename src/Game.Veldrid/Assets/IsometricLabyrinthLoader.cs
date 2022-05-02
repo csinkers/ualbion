@@ -48,7 +48,7 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
 #pragma warning restore CA2000 // Dispose objects before losing scopes
     }
 
-    IEnumerable<(string, byte[])> Save(LabyrinthData labyrinth, AssetInfo info, IsometricMode mode, string pngPath, string tsxPath)
+    IEnumerable<(string, byte[])> Save(LabyrinthData labyrinth, AssetInfo info, LoaderContext context, IsometricMode mode, string pngPath, string tsxPath)
     {
         var tileWidth = info.Get(AssetProperty.TileWidth, DefaultWidth);
         var tileHeight = info.Get(AssetProperty.TileHeight, DefaultHeight);
@@ -58,8 +58,7 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
         if (_engine == null)
             SetupEngine(tileWidth, tileHeight, baseHeight, tilesPerRow);
 
-        var assets = Resolve<IAssetManager>();
-        var frames = _builder.Build(labyrinth, info, mode, assets);
+        var frames = _builder.Build(labyrinth, info, mode, context.Assets);
 
         Image<Bgra32> image = _engine.RenderFrame(false, 0);
 
@@ -96,9 +95,11 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
     public LabyrinthData Serdes(LabyrinthData existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
-        string B(string pattern) => info.BuildFilename(pattern, 0);
-        var json = info.Get(AssetProperty.Pattern, "{0}_{2}.json");
+        var json = info.GetPattern(AssetProperty.Pattern, "{0}_{2}.json");
+        var path = new AssetPath(info);
+        string BuildPath(AssetPathPattern pattern) => pattern.Format(path);
 
         if (s.IsReading())
         {
@@ -110,20 +111,20 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
         }
 
         if (existing == null) throw new ArgumentNullException(nameof(existing));
-        var floorTsx = info.Get(AssetProperty.TiledFloorPattern, "Tiled/{0}_{2}_Floors.tsx");
-        var ceilingTsx = info.Get(AssetProperty.TiledCeilingPattern, "Tiled/{0}_{2}_Ceilings.tsx");
-        var wallTsx = info.Get(AssetProperty.TiledWallPattern, "Tiled/{0}_{2}_Walls.tsx");
-        var contentsTsx = info.Get(AssetProperty.TiledContentsPattern, "Tiled/{0}_{2}_Contents.tsx");
-        var floorPng = info.Get(AssetProperty.FloorPngPattern, "Tiled/Gfx/{0}_{2}_Floors.png");
-        var ceilingPng = info.Get(AssetProperty.CeilingPngPattern, "Tiled/Gfx/{0}_{2}_Ceilings.png");
-        var wallPng = info.Get(AssetProperty.WallPngPattern, "Tiled/Gfx/{0}_{2}_Walls.png");
-        var contentsPng = info.Get(AssetProperty.ContentsPngPattern, "Tiled/Gfx/{0}_{2}_Contents.png");
+        var floorTsx    = info.GetPattern(AssetProperty.TiledFloorPattern,    "Tiled/{0}_{2}_Floors.tsx");
+        var ceilingTsx  = info.GetPattern(AssetProperty.TiledCeilingPattern,  "Tiled/{0}_{2}_Ceilings.tsx");
+        var wallTsx     = info.GetPattern(AssetProperty.TiledWallPattern,     "Tiled/{0}_{2}_Walls.tsx");
+        var contentsTsx = info.GetPattern(AssetProperty.TiledContentsPattern, "Tiled/{0}_{2}_Contents.tsx");
+        var floorPng    = info.GetPattern(AssetProperty.FloorPngPattern,      "Tiled/Gfx/{0}_{2}_Floors.png");
+        var ceilingPng  = info.GetPattern(AssetProperty.CeilingPngPattern,    "Tiled/Gfx/{0}_{2}_Ceilings.png");
+        var wallPng     = info.GetPattern(AssetProperty.WallPngPattern,       "Tiled/Gfx/{0}_{2}_Walls.png");
+        var contentsPng = info.GetPattern(AssetProperty.ContentsPngPattern,   "Tiled/Gfx/{0}_{2}_Contents.png");
 
-        var files = new List<(string, byte[])> {(B(json), SaveJson(existing, info, context))};
-        files.AddRange(Save(existing, info, IsometricMode.Floors, B(floorPng), B(floorTsx)));
-        files.AddRange(Save(existing, info, IsometricMode.Ceilings, B(ceilingPng), B(ceilingTsx)));
-        files.AddRange(Save(existing, info, IsometricMode.Walls, B(wallPng), B(wallTsx)));
-        files.AddRange(Save(existing, info, IsometricMode.Contents, B(contentsPng), B(contentsTsx)));
+        var files = new List<(string, byte[])> {(json.Format(path), SaveJson(existing, info, context))};
+        files.AddRange(Save(existing, info, context, IsometricMode.Floors,   BuildPath(floorPng),    BuildPath(floorTsx)));
+        files.AddRange(Save(existing, info, context, IsometricMode.Ceilings, BuildPath(ceilingPng),  BuildPath(ceilingTsx)));
+        files.AddRange(Save(existing, info, context, IsometricMode.Walls,    BuildPath(wallPng),     BuildPath(wallTsx)));
+        files.AddRange(Save(existing, info, context, IsometricMode.Contents, BuildPath(contentsPng), BuildPath(contentsTsx)));
 
         PackedChunks.PackNamed(s, files.Count, i => (files[i].Item2, files[i].Item1));
         return existing;

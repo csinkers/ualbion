@@ -27,6 +27,7 @@ public static class Loaders
     public static readonly SongLoader SongLoader = new();
     public static readonly SpellLoader SpellLoader = new();
     public static readonly TilesetLoader TilesetLoader = new();
+    public static readonly TilesetGraphicsLoader TilesetGraphicsLoader = new();
     public static readonly Utf8Loader Utf8Loader = new();
     public static readonly WaveLibLoader WaveLibLoader = new();
     public static readonly WordListLoader WordListLoader = new();

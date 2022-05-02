@@ -16,7 +16,7 @@ public class DummyAssetManager : IAssetManager
 {
     static readonly AlbionPalette Greyscale = new(0, "Greyscale", Enumerable.Range(0, 256).Select(x => ApiUtil.PackColor((byte)x, (byte)x, (byte)x, 255)).ToArray());
     public AlbionPalette LoadPalette(PaletteId id) => Greyscale;
-    public AssetInfo GetAssetInfo(AssetId id, string? language = null) => throw new NotImplementedException();
+    public AssetInfo GetAssetInfo(AssetId id, string language = null) => throw new NotImplementedException();
     public Automap LoadAutomap(AutomapId id) => throw new NotImplementedException();
     public CharacterSheet LoadSheet(CharacterId id) => throw new NotImplementedException();
     public EventSet LoadEventSet(EventSetId id) => throw new NotImplementedException();

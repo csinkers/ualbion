@@ -22,6 +22,7 @@ public static class TilesetMapping
         if (tileset == null) throw new ArgumentNullException(nameof(tileset));
         if (properties == null) throw new ArgumentNullException(nameof(properties));
 
+        var graphicsPattern = AssetPathPattern.Build(properties.GraphicsTemplate);
         List<Tile> tiles =
             tileset.Tiles
                 .Where(x => !x.IsBlank)
@@ -31,7 +32,8 @@ public static class TilesetMapping
                         x.Index,
                         x.FrameCount > 0 ? x.ImageNumber : null,
                         TileMapping.BuildTileProperties(x),
-                        properties))
+                        properties,
+                        graphicsPattern))
                 .ToList();
 
         // Add tiles for the extra frames of animated tiles
@@ -52,7 +54,8 @@ public static class TilesetMapping
                     nextId,
                     (ushort)(sourceTile.ImageNumber + f),
                     new List<TiledProperty> { new(Prop.Frame, true) },
-                    properties));
+                    properties,
+                    graphicsPattern));
 
                 tile.Frames.Add(new TileFrame(nextId, properties.FrameDurationMs));
                 nextId++;
@@ -82,9 +85,10 @@ public static class TilesetMapping
         if (properties == null) throw new ArgumentNullException(nameof(properties));
 
         var t = new TilesetData(id);
+        var graphicsPattern = AssetPathPattern.Build(properties.GraphicsTemplate);
         var tileLookup =
             tileset.Tiles
-                .Select(x => TileMapping.InterpretTile(x, properties))
+                .Select(x => TileMapping.InterpretTile(x, properties, graphicsPattern))
                 .Where(x => x != null)
                 .ToDictionary(x => x.Index);
 
@@ -105,7 +109,7 @@ public static class TilesetMapping
 
         List<Tile> tiles =
             allFrames
-                .Select((x, i) => new Tile { Id = i, Properties = TileMapping.BuildIsoTileProperties(labyrinth, i, properties.IsoMode) })
+                .Select((_, i) => new Tile { Id = i, Properties = TileMapping.BuildIsoTileProperties(labyrinth, i, properties.IsoMode) })
                 .ToList();
 
         // Add tiles for the extra frames of animated tiles

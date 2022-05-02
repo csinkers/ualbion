@@ -35,6 +35,7 @@ public static class FlagTestMap
             }
 
             ushort n = 0;
+/*
             void Add(int x, int y, string name, Func<Func<string, int>, string> scriptBuilder)
             {
                 for (var index = 0; index < name.Length; index++)
@@ -43,20 +44,20 @@ public static class FlagTestMap
                     map.Underlay[Pos(x + index, y)] = Tileset1.IndexForChar(c);
                 }
 
-                builder.SetChain(n, scriptBuilder);
+                builder!.SetChain(n, scriptBuilder);
                 map.AddZone((byte)x, (byte)y, TriggerTypes.Manipulate, n);
                 n++;
             }
 
             string Script(Func<Func<string, int>, string> scriptBuilder)
             {
-                var text = scriptBuilder(builder.AddMapText);
+                var text = scriptBuilder(builder!.AddMapText);
                 var script = ScriptLoader.Parse(ApiUtil.SplitLines(text));
                 var scriptId = new ScriptId(AssetType.Script, nextScriptId++);
-                assets[scriptId] = script;
+                assets![scriptId] = script;
                 return "do_script " + scriptId.Id;
             }
-/*
+
             Add(1, n+1, "S0", s => @$"
     text {s("Setting switch 0")}
     switch 1 0

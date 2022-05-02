@@ -85,7 +85,7 @@
 
     // Fonts
     "$(MOD)/Albion/CD/XLDLIBS/FONTS0.XLD": {
-      "Post": "tile",
+      "Post": "atlas",
       "Loader": "font",
       "Width": 8,
       "Height": 8,
@@ -258,7 +258,7 @@
     "$(MOD)/Albion/CD/XLDLIBS/NPCKL0.XLD":   { "Loader": "header", "PaletteId": 1, "Map": { "0": { "Id": "snpc.1" }, "27": { "PaletteId": 4 } } },
     "$(MOD)/Albion/CD/XLDLIBS/PARTGR0.XLD":  { "Loader": "header", "PaletteId": 20, "Map": { "0": { "Id": "lparty.1" } } },
     "$(MOD)/Albion/CD/XLDLIBS/PARTKL0.XLD":  { "Loader": "header", "PaletteId": 1, "Map": { "0": { "Id": "sparty.1" } } },
-    // "$(MOD)/Albion/CD/XLDLIBS/PICTURE0.XLD": { "Post": "ilbm", "Loader": "interlaced", "Map": { "0": { "Id": "pic.1" } } },
+    // "$(MOD)/Albion/CD/XLDLIBS/PICTURE0.XLD": { "Loader": "interlaced", "Map": { "0": { "Id": "pic.1" } } },
     "$(MOD)/Albion/CD/XLDLIBS/SMLPORT0.XLD": { "Loader": "fixedsize", "Width": 34, "Max": 98, "Map": { "0": { "Id": "portrait.1" } } },
     "$(MOD)/Albion/CD/XLDLIBS/SMLPORT1.XLD": { "Loader": "fixedsize", "Width": 34, "MinimumCount": 100, "Map": { "0": { "Id": "portrait.100" } } },
     "$(MOD)/Albion/CD/XLDLIBS/TACTICO0.XLD": { "Loader": "fixedsize", "Width": 32, "Map": { "0": { "Id": "tacgfx.1" } } },
@@ -272,7 +272,7 @@
       } 
     },
     "$(MOD)/Albion/CD/XLDLIBS/AUTOGFX0.XLD": {
-      "Post": "tile",
+      "Post": "atlas",
       "Loader": "amorphous",
       "Map": {
         "0": { "Id": "autotile.1", "SubSprites": "(8,8,576) (16,16)", "PaletteId": 11 },
@@ -280,8 +280,7 @@
       }
     },
     "$(MOD)/Albion/CD/XLDLIBS/ICONGFX0.XLD": {
-      "Post": "tile",
-      "Loader": "fixedsize",
+      "Loader": "tilegfx",
       "Width": 16,
       "Height": 16,
       "Map": {

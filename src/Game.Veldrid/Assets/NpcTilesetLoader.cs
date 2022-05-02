@@ -15,23 +15,23 @@ namespace UAlbion.Game.Veldrid.Assets;
 
 public class NpcTilesetLoader : Component, IAssetLoader
 {
-    readonly PngLoader _pngLoader = new();
+    readonly Png8Loader _png8Loader = new();
 
-    public NpcTilesetLoader() => AttachChild(_pngLoader);
+    public NpcTilesetLoader() => AttachChild(_png8Loader);
     public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
         if (!s.IsWriting())
             return new object();
 
         if (existing == null) throw new ArgumentNullException(nameof(existing));
-        var graphicsPattern = info.Get(AssetProperty.GraphicsPattern, "");
+        var graphicsPattern = info.GetPattern(AssetProperty.GraphicsPattern, "");
         bool small = info.Get(AssetProperty.IsSmall, false);
 
         var tiles = new List<TileProperties>();
-        var assets = Resolve<IAssetManager>();
         var modApplier = Resolve<IModApplier>();
         var disk = Resolve<IFileSystem>();
         var config = Resolve<IGeneralConfig>();
@@ -42,17 +42,16 @@ public class NpcTilesetLoader : Component, IAssetLoader
 
         foreach (var id in assetIds)
         {
-            var sprite = assets.LoadTexture(id); // Get sprite from source mod
+            var sprite = context.Assets.LoadTexture(id); // Get sprite from source mod
             var spriteInfo = modApplier.GetAssetInfo(id, null); // But info from target mod
 
             // Ugh, hacky.
             int palId = spriteInfo.Get(AssetProperty.PaletteId, 0);
             if (palId == 0)
                 spriteInfo.Set(AssetProperty.PaletteId,
-                    assets.GetAssetInfo(id).Get(AssetProperty.PaletteId, 0));
+                    context.Assets.GetAssetInfo(id).Get(AssetProperty.PaletteId, 0));
 
-            var path = spriteInfo.BuildFilename(graphicsPattern,
-                9); // 9 = First frame facing west for both large and small
+            var path = graphicsPattern.Format(new AssetPath(spriteInfo, 9)); // 9 = First frame facing west for both large and small
             path = config.ResolvePath(path);
             WriteNpcSprite(path, sprite, spriteInfo, disk, context);
 
@@ -77,7 +76,7 @@ public class NpcTilesetLoader : Component, IAssetLoader
         if (!disk.DirectoryExists(dir))
             disk.CreateDirectory(dir);
 
-        using var s = FormatUtil.SerializeWithSerdes(s => _pngLoader.Serdes(sprite, info, s, context));
+        using var s = FormatUtil.SerializeWithSerdes(s => _png8Loader.Serdes(sprite, info, s, context));
         int i = 0;
         foreach (var (chunk, _) in PackedChunks.Unpack(s))
         {

@@ -76,9 +76,9 @@ public class WaveLibWavLoader : IAssetLoader<WaveLib>
                 return (Array.Empty<byte>(), null);
 
             string extension = Invariant($"i{sample.Instrument}t{sample.Type}");
-            var pattern = info.Get(AssetProperty.Pattern, "{0}_{1}_{2}.dat");
-            var name = info.BuildFilename(pattern, i, extension);
-            var bytes= FormatUtil.SerializeToBytes(s2 => WavLoader.Serdes(sample, null, s2, context));
+            var pattern = info.GetPattern(AssetProperty.Pattern, "{0}_{1}_{2}.dat");
+            var name = pattern.Format(new AssetPath(info, i, extension));
+            var bytes = FormatUtil.SerializeToBytes(s2 => WavLoader.Serdes(sample, null, s2, context));
             return (bytes, name);
         });
         return existing;

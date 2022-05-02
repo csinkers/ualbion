@@ -114,8 +114,18 @@ namespace UAlbion.Core.Veldrid.Etm
             }
         }
 
-        protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout) =>
-            device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
+        protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout)
+        {
+#if DEBUG
+                if (_properties.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct EtmSet without setting Properties to a non-null value");
+                if (_dayFloors.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct EtmSet without setting DayFloors to a non-null value");
+                if (_dayWalls.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct EtmSet without setting DayWalls to a non-null value");
+                if (_nightFloors.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct EtmSet without setting NightFloors to a non-null value");
+                if (_nightWalls.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct EtmSet without setting NightWalls to a non-null value");
+                if (_textureSampler.Sampler == null) throw new System.InvalidOperationException("Tried to construct EtmSet without setting TextureSampler to a non-null value");
+#endif
+
+            return device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
                 layout,
                 _properties.DeviceBuffer,
                 _dayFloors.DeviceTexture,
@@ -123,6 +133,7 @@ namespace UAlbion.Core.Veldrid.Etm
                 _nightFloors.DeviceTexture,
                 _nightWalls.DeviceTexture,
                 _textureSampler.Sampler));
+        }
 
         protected override void Resubscribe()
         {

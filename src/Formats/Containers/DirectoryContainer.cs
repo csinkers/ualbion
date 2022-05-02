@@ -21,22 +21,22 @@ public class DirectoryContainer : IAssetContainer
         if (disk == null) throw new ArgumentNullException(nameof(disk));
         var subAssets = new Dictionary<int, (string, string)>(); // path and name
         // Pattern vars: 0=Index 1=SubItem 2=Name 3=Palette
-        var pattern = info.Get(AssetProperty.Pattern, "{0}_{1}_{2}.dat");
+        var pattern = info.GetPattern(AssetProperty.Pattern, "{0}_{1}_{2}.dat");
 
         if (disk.DirectoryExists(path))
         {
             foreach (var filePath in disk.EnumerateDirectory(path, $"{info.Index}_*.*"))
             {
                 var filename = Path.GetFileName(filePath);
-                var (index, subAsset, paletteId, name) = AssetInfo.ParseFilename(pattern, filename);
+                var assetPath = pattern.Parse(filename);
 
-                if (paletteId.HasValue)
-                    info.Set(AssetProperty.PaletteId, paletteId);
+                if (assetPath.PaletteId.HasValue)
+                    info.Set(AssetProperty.PaletteId, assetPath.PaletteId);
 
-                if (index != info.Index)
+                if (assetPath.Index != info.Index)
                     continue;
 
-                subAssets[subAsset] = (filePath, name);
+                subAssets[assetPath.SubAsset] = (filePath, assetPath.Name);
             }
         }
 
@@ -82,11 +82,12 @@ public class DirectoryContainer : IAssetContainer
             using var s = new AlbionReader(br);
             var subAssets = PackedChunks.Unpack(s).ToList();
 
-            var pattern = info.Get(AssetProperty.Pattern, "{0}_{1}_{2}.dat");
+            var pattern = info.GetPattern(AssetProperty.Pattern, "{0}_{1}_{2}.dat");
+
             if (subAssets.Count == 1)
             {
                 var (subAssetBytes, name) = subAssets[0];
-                var filename = info.BuildFilename(pattern, 0, name);
+                var filename = name ?? pattern.Format(new AssetPath(info));
                 disk.WriteAllBytes(Path.Combine(path, filename), subAssetBytes);
             }
             else
@@ -100,7 +101,7 @@ public class DirectoryContainer : IAssetContainer
                     if (string.IsNullOrWhiteSpace(name))
                         name = null;
 
-                    var filename = name ?? info.BuildFilename(pattern, i, ConfigUtil.AssetName(info.AssetId));
+                    var filename = name ?? pattern.Format(new AssetPath(info, i));
                     var fullPath = Path.Combine(path, filename);
 
                     var dir = Path.GetDirectoryName(fullPath);

@@ -214,10 +214,12 @@ public class AssetConversionTests
 
         var small = AssetMapping.Global.EnumerateAssetsOfType(AssetType.SmallNpcGraphics);
         var large = AssetMapping.Global.EnumerateAssetsOfType(AssetType.LargeNpcGraphics);
+        var palettes = AssetMapping.Global.EnumerateAssetsOfType(AssetType.Palette);
         var prereqs =
             new[] { AssetId.From(Special.DummyObject) }
                 .Concat(small)
                 .Concat(large)
+                .Concat(palettes)
                 .ToArray();
 
         Test<MapData2D>(
@@ -234,10 +236,12 @@ public class AssetConversionTests
 
         var small = AssetMapping.Global.EnumerateAssetsOfType(AssetType.SmallNpcGraphics);
         var large = AssetMapping.Global.EnumerateAssetsOfType(AssetType.LargeNpcGraphics);
+        var palettes = AssetMapping.Global.EnumerateAssetsOfType(AssetType.Palette);
         var prereqs =
             new[] { AssetId.From(Special.DummyObject) }
                 .Concat(small)
                 .Concat(large)
+                .Concat(palettes)
                 .ToArray();
 
         Test<MapData2D>(
@@ -494,10 +498,9 @@ public class AssetConversionTests
             Height = 16
         };
 
-        var post = new TileSetPostProcessor();
         Test<ITileGraphics>(info.AssetId,
             new[] { AssetId.From(Palette.Toronto2D), AssetId.From(Palette.Common) },
-            (x, s, c) => (ITileGraphics)post.Process(Loaders.FixedSizeSpriteLoader.Serdes((IReadOnlyTexture<byte>)x.Texture, info, s, c), info));
+            (x, s, c) => Loaders.TilesetGraphicsLoader.Serdes(x, info, s, c));
     }
 
     [Fact]

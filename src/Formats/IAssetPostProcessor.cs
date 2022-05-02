@@ -1,6 +1,6 @@
 ﻿using UAlbion.Config;
 
-namespace UAlbion.Game.Assets;
+namespace UAlbion.Formats;
 
 public interface IAssetPostProcessor
 {

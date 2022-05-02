@@ -26,7 +26,12 @@ class TextureCache<T> : Component, IDisposable where T : TextureHolder
         if (defaultTexture == null) throw new ArgumentNullException(nameof(defaultTexture));
         _holderFactory = factory ?? throw new ArgumentNullException(nameof(factory));
         _textureFactory = textureFactory ?? throw new ArgumentNullException(nameof(textureFactory));
+
+        // Make fallback texture
         _defaultHolder = factory(defaultTexture);
+        _cache[defaultTexture] = (new WeakReference<T>(_defaultHolder), null, 0);
+        _dirtySet.Add(defaultTexture);
+
         On<DeviceCreatedEvent>(_ => Dirty());
         On<DestroyDeviceObjectsEvent>(_ => Dispose());
     }

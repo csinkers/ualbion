@@ -3,14 +3,14 @@ using SerdesNet;
 
 namespace UAlbion.Formats.Assets;
 
-public class IFFChunk
+public class IffChunk
 {
     public string TypeId { get; private set; }
     public int Length { get; private set; }
     long _lengthOffset;
 
-    IFFChunk() { }
-    public IFFChunk(string typeId, int length)
+    IffChunk() { }
+    public IffChunk(string typeId, int length)
     {
         TypeId = typeId;
         Length = length;
@@ -25,13 +25,15 @@ public class IFFChunk
         s.Seek(offset);
     }
 
-    public static IFFChunk Serdes(int _, IFFChunk c, ISerializer s)
+    public static IffChunk Serdes(int _, IffChunk c, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        c ??= new IFFChunk();
+        c ??= new IffChunk();
         c.TypeId = s.FixedLengthString(nameof(TypeId), c.TypeId, 4);
         c._lengthOffset = s.Offset;
         c.Length = s.Int32BE(nameof(Length), c.Length);
         return c;
     }
+
+    public override string ToString() => $"{TypeId}: {Length} bytes";
 }

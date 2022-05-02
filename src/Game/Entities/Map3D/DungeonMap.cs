@@ -89,6 +89,9 @@ public class DungeonMap : Component, IMap
         if (!_labyrinthData.BackgroundId.IsNone)
         {
             var background = assets.LoadTexture(_labyrinthData.BackgroundId);
+            if (background == null)
+                Error($"Could not load background image {_labyrinthData.BackgroundId}");
+
             _skybox = factory.CreateSkybox(background);
         }
 

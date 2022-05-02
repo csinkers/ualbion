@@ -135,7 +135,7 @@ class CommandLineOptions
                     DumpFormats |= Enum.Parse<DumpFormats>(type, true);
             }
 
-            if (arg is "--MODS" or "--MOD" or "-M")
+            if (arg is "--MODS" or "--MOD" or "-MODS" or "-MOD" or "-M")
             {
                 i++;
                 if (i == args.Length)

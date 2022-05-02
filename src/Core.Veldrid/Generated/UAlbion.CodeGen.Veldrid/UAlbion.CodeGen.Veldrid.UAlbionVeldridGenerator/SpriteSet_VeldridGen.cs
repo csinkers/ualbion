@@ -76,13 +76,22 @@ namespace UAlbion.Core.Veldrid.Sprites
             }
         }
 
-        protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout) =>
-            device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
+        protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout)
+        {
+#if DEBUG
+                if (_texture.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct SpriteSet without setting Texture to a non-null value");
+                if (_textureArray.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct SpriteSet without setting TextureArray to a non-null value");
+                if (_sampler.Sampler == null) throw new System.InvalidOperationException("Tried to construct SpriteSet without setting Sampler to a non-null value");
+                if (_uniform.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct SpriteSet without setting Uniform to a non-null value");
+#endif
+
+            return device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
                 layout,
                 _texture.DeviceTexture,
                 _textureArray.DeviceTexture,
                 _sampler.Sampler,
                 _uniform.DeviceBuffer));
+        }
 
         protected override void Resubscribe()
         {

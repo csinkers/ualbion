@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Text;
 using SerdesNet;
 using UAlbion.Config;
@@ -23,12 +22,8 @@ public class StampLoader : IAssetLoader<BlockList>
             var blockListId = (BlockListId)info.AssetId;
             var tilesetId = blockListId.ToTileset();
 
-            var tilesetPattern = info.Get(AssetProperty.TilesetPattern, "../Tilesets/{0}_{2}.tsx");
-            var tilesetPath = string.Format(CultureInfo.InvariantCulture,
-                tilesetPattern,
-                tilesetId.Id,
-                0,
-                ConfigUtil.AssetName(tilesetId));
+            var tilesetPattern = info.GetPattern(AssetProperty.TilesetPattern, "../Tilesets/{0}_{2}.tsx");
+            var tilesetPath = tilesetPattern.Format(new AssetPath(tilesetId.Id, 0, null, ConfigUtil.AssetName(tilesetId)));
 
             var tileset = new Tileset
             {

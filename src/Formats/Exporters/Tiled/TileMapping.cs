@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Labyrinth;
@@ -34,17 +33,13 @@ public static class TileMapping
         public const string UseUnderlayFlags =  "UseUnderlayFlags";
     }
 
-    public static Tile BuildTile(int id, int index, ushort? imageNumber, List<TiledProperty> tileProperties, Tilemap2DProperties properties)
+    public static Tile BuildTile(int id, int index, ushort? imageNumber, List<TiledProperty> tileProperties, Tilemap2DProperties properties, AssetPathPattern graphicsPattern)
     {
         var source = imageNumber switch
         {
             null => null,
             0xffff => properties.BlankTilePath,
-            _ => string.Format(CultureInfo.InvariantCulture,
-                properties.GraphicsTemplate,
-                id,
-                imageNumber
-            )
+            _ => graphicsPattern.Format(new AssetPath(id, imageNumber.Value))
         };
 
         return new Tile
@@ -60,12 +55,12 @@ public static class TileMapping
         };
     }
 
-    public static TileData InterpretTile(Tile tile, Tilemap2DProperties properties)
+    public static TileData InterpretTile(Tile tile, Tilemap2DProperties properties, AssetPathPattern graphicsPattern)
     {
         var result = new TileData
         {
             Index = (ushort)tile.Id,
-            ImageNumber = SourceStringToImageNumber(tile.Image?.Source, properties),
+            ImageNumber = SourceStringToImageNumber(tile.Image?.Source, properties, graphicsPattern),
             FrameCount = (byte)(tile.Frames?.Count ?? 0)
         };
 
@@ -108,12 +103,12 @@ public static class TileMapping
         return properties;
     }
 
-    static ushort SourceStringToImageNumber(string source, Tilemap2DProperties properties)
+    static ushort SourceStringToImageNumber(string source, Tilemap2DProperties properties, AssetPathPattern graphicsPattern)
     {
         if (string.IsNullOrEmpty(source)) return 0; 
         if (source == properties.BlankTilePath) return 0xffff;
-        var (_, subId, _, _) = AssetInfo.ParseFilename(properties.GraphicsTemplate, source);
-        return (ushort)subId;
+        var assetPath = graphicsPattern.Parse(source);
+        return (ushort)assetPath.SubAsset;
     }
 
     public static List<TiledProperty> BuildIsoTileProperties(LabyrinthData labyrinth, int index, IsometricMode isoMode)

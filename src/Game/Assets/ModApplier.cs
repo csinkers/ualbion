@@ -376,7 +376,11 @@ public class ModApplier : Component, IModApplier
 
                 var language = assetInfo.Get<string>(AssetProperty.Language, null);
                 var (asset, sourceInfo) = loaderFunc(assetInfo.AssetId, language);
-                if (asset == null) continue;
+                if (asset == null)
+                {
+                    Error($"Could not load {assetInfo.AssetId}");
+                    continue;
+                }
 
                 if (notify)
                 {

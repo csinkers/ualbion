@@ -102,8 +102,18 @@ namespace UAlbion.Core.Veldrid
             }
         }
 
-        protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout) =>
-            device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
+        protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout)
+        {
+#if DEBUG
+                if (_globalInfo.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct CommonSet without setting GlobalInfo to a non-null value");
+                if (_projection.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct CommonSet without setting Projection to a non-null value");
+                if (_view.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct CommonSet without setting View to a non-null value");
+                if (_dayPalette.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct CommonSet without setting DayPalette to a non-null value");
+                if (_nightPalette.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct CommonSet without setting NightPalette to a non-null value");
+                if (_sampler.Sampler == null) throw new System.InvalidOperationException("Tried to construct CommonSet without setting Sampler to a non-null value");
+#endif
+
+            return device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
                 layout,
                 _globalInfo.DeviceBuffer,
                 _projection.DeviceBuffer,
@@ -111,6 +121,7 @@ namespace UAlbion.Core.Veldrid
                 _dayPalette.DeviceTexture,
                 _nightPalette.DeviceTexture,
                 _sampler.Sampler));
+        }
 
         protected override void Resubscribe()
         {

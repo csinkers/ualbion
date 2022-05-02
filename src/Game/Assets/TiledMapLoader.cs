@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using SerdesNet;
 using UAlbion.Api;
@@ -24,22 +23,22 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
         if (!s.IsWriting())
             return Read(info, s);
 
-        Write(existing, info, s);
+        Write(existing, info, s, context);
         return existing;
     }
 
     static string GetScriptFilename(AssetInfo info)
     {
-        var scriptPattern = info.Get(AssetProperty.ScriptPattern, "");
-        return string.IsNullOrEmpty(scriptPattern) ? null : info.BuildFilename(scriptPattern, 0);
+        var scriptPattern = info.GetPattern(AssetProperty.ScriptPattern, "");
+        return scriptPattern.Format(info);
     }
 
-    void Write(BaseMapData existing, AssetInfo info, ISerializer s)
+    void Write(BaseMapData existing, AssetInfo info, ISerializer s, LoaderContext loaderContext)
     {
         (byte[] bytes, string script) = existing switch
         {
-            MapData2D map2d => Write2D(map2d, info),
-            MapData3D map3d => Write3D(map3d, info),
+            MapData2D map2d => Write2D(map2d, info, loaderContext),
+            MapData3D map3d => Write3D(map3d, info, loaderContext),
             _ => (null, null)
         };
 
@@ -65,6 +64,7 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
         var assetDir = GetAssetDir(info);
         if (!disk.DirectoryExists(assetDir))
             disk.CreateDirectory(assetDir);
+
         disk.WriteAllText(Path.Combine(assetDir, scriptPath), script);
     }
 
@@ -83,24 +83,19 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
         return map.ToAlbion(info, script);
     }
 
-    (byte[], string) Write2D(MapData2D map, AssetInfo info)
+    (byte[], string) Write2D(MapData2D map, AssetInfo info, LoaderContext loaderContext)
     {
-        var assets = Resolve<IAssetManager>();
         var disk = Resolve<IFileSystem>();
 
-        TilesetData tileset = assets.LoadTileData(map.TilesetId);
+        TilesetData tileset = loaderContext.Assets.LoadTileData(map.TilesetId);
         if (tileset == null)
         {
             Error($"Tileset {map.TilesetId} not found when writing map {map.Id}, aborting");
             return (null, null);
         }
 
-        var tilesetPattern = info.Get(AssetProperty.TilesetPattern, "../Tilesets/{0}_{2}.tsx");
-        var tilesetPath = string.Format(CultureInfo.InvariantCulture,
-            tilesetPattern,
-            map.TilesetId.Id,
-            0,
-            ConfigUtil.AssetName(map.TilesetId));
+        var tilesetPattern = info.GetPattern(AssetProperty.TilesetPattern, "../Tilesets/{0}_{2}.tsx");
+        var tilesetPath = tilesetPattern.Format(new AssetPath(map.TilesetId.Id, 0, null, ConfigUtil.AssetName(map.TilesetId)));
 
         var npcTilesetPath = map.MapType == MapType.TwoDOutdoors 
             ? info.Get(AssetProperty.SmallNpcs, "../Tilesets/SmallNPCs.tsx")
@@ -109,24 +104,23 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
         var assetDir = GetAssetDir(info);
         var npcTileset = Tileset.Load(Path.Combine(assetDir, npcTilesetPath), disk);
         var properties = new Tilemap2DProperties { TileWidth = 16, TileHeight = 16 };
-        var formatter = new EventFormatter(assets.LoadString, map.Id.ToMapText());
+        var formatter = new EventFormatter(loaderContext.Assets.LoadString, map.Id.ToMapText());
         var (tiledMap, script) = MapExport.FromAlbionMap2D(map, tileset, properties, tilesetPath, npcTileset, formatter);
 
         var mapBytes = FormatUtil.BytesFromTextWriter(tiledMap.Serialize);
         return (mapBytes, script);
     }
 
-    (byte[], string) Write3D(MapData3D map, AssetInfo info)
+    (byte[], string) Write3D(MapData3D map, AssetInfo info, LoaderContext loaderContext)
     {
-        var sourceAssets = Resolve<IAssetManager>();
         var destModApplier = Resolve<IModApplier>();
 
-        var floorPattern = info.Get(AssetProperty.TiledFloorPattern, "");
-        var ceilingPattern = info.Get(AssetProperty.TiledCeilingPattern, "");
-        var wallPattern = info.Get(AssetProperty.TiledWallPattern, "");
-        var contentsPattern = info.Get(AssetProperty.TiledContentsPattern, "");
+        var floorPattern    = info.GetPattern(AssetProperty.TiledFloorPattern,    "");
+        var ceilingPattern  = info.GetPattern(AssetProperty.TiledCeilingPattern,  "");
+        var wallPattern     = info.GetPattern(AssetProperty.TiledWallPattern,     "");
+        var contentsPattern = info.GetPattern(AssetProperty.TiledContentsPattern, "");
 
-        if (string.IsNullOrEmpty(floorPattern) || string.IsNullOrEmpty(ceilingPattern) || string.IsNullOrEmpty(wallPattern) || string.IsNullOrEmpty(contentsPattern))
+        if (floorPattern.IsEmpty || ceilingPattern.IsEmpty || wallPattern.IsEmpty || contentsPattern.IsEmpty)
             return (Array.Empty<byte>(), null);
 
         var labInfo = destModApplier.GetAssetInfo(map.LabDataId, null);
@@ -136,17 +130,18 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
             return (Array.Empty<byte>(), null);
         }
 
-        string B(string pattern) => labInfo.BuildFilename(pattern, 0);
+        var assetPath = new AssetPath(labInfo);
         var properties = new Tilemap3DProperties
         {
             TileWidth = info.Get(AssetProperty.TileWidth, 0),
             TileHeight = info.Get(AssetProperty.BaseHeight, 0),
-            FloorPath = B(floorPattern),
-            CeilingPath = B(ceilingPattern),
-            WallPath = B(wallPattern),
-            ContentsPath = B(contentsPattern),
+            FloorPath    = floorPattern.Format(assetPath),
+            CeilingPath  = ceilingPattern.Format(assetPath),
+            WallPath     = wallPattern.Format(assetPath),
+            ContentsPath = contentsPattern.Format(assetPath),
         };
-        var formatter = new EventFormatter(sourceAssets.LoadString, map.Id.ToMapText());
+
+        var formatter = new EventFormatter(loaderContext.Assets.LoadString, map.Id.ToMapText());
         var (tiledMap, script) = MapExport.FromAlbionMap3D(map, properties, formatter);
 
         var mapBytes = FormatUtil.BytesFromTextWriter(tiledMap.Serialize);

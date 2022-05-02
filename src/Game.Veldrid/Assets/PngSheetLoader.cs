@@ -17,7 +17,7 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Veldrid.Assets;
 
-public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>>
+public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>> // For fonts etc
 {
     static byte[] Write(IImageEncoder encoder, uint[] palette, IReadOnlyTexture<byte> existing)
     {
@@ -58,9 +58,10 @@ public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>>
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
         var paletteId = info.Get(AssetProperty.PaletteId, 0);
-        var palette = Resolve<IAssetManager>()
+        var palette = context.Assets
             .LoadPalette(new PaletteId(AssetType.Palette, paletteId))
             .GetUnambiguousPalette();
 

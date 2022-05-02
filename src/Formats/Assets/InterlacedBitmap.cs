@@ -33,7 +33,7 @@ public sealed class InterlacedBitmap
         if (s == null) throw new ArgumentNullException(nameof(s));
         img ??= new InterlacedBitmap();
 
-        var formatChunk = IFFChunk.Serdes(0, new IFFChunk(IFFChunkType.Format, 0), s);
+        var formatChunk = IffChunk.Serdes(0, new IffChunk(IFFChunkType.Format, 0), s);
         if (formatChunk.TypeId != IFFChunkType.Format)
             throw new NotSupportedException($"Invalid IFF header, expected \"FORM\", found \"{formatChunk.TypeId}\"");
 
@@ -46,7 +46,7 @@ public sealed class InterlacedBitmap
             int i = 0;
             while (s.BytesRemaining > 0)
             {
-                var chunk = IFFChunk.Serdes(i, null, s);
+                var chunk = IffChunk.Serdes(i, null, s);
                 switch (chunk.TypeId)
                 {
                     case IFFChunkType.BitmapHeader: img.SerdesHeader(s, chunk.Length); break;
@@ -71,39 +71,45 @@ public sealed class InterlacedBitmap
         }
         else
         {
-            img.WriteChunk(s, IFFChunkType.BitmapHeader, (x, n) => img.SerdesHeader(x, n));
-            img.WriteChunk(s, IFFChunkType.ColorMapping, (x, n) => img.SerdesPalette(x, n));
-            img.WriteChunk(s, IFFChunkType.Hotspot,      (x, n) => img.SerdesHotspot(x, n));
+            WriteChunk(s, IFFChunkType.BitmapHeader, (x, n) => img.SerdesHeader(x, n));
+            WriteChunk(s, IFFChunkType.ColorMapping, (x, n) => img.SerdesPalette(x, n));
+            WriteChunk(s, IFFChunkType.Hotspot,      (x, n) => img.SerdesHotspot(x, n));
             s.List(nameof(img.ColorRanges), img.ColorRanges, img.ColorRanges.Count, ColorRange.Serdes);
-            img.WriteChunk(s, IFFChunkType.Thumbnail,    (x, n) => img.SerdesThumbnail(x, n));
-            img.WriteChunk(s, IFFChunkType.Body,         (x, n) => img.SerdesPixels(x, n));
+            WriteChunk(s, IFFChunkType.Thumbnail,    (x, n) => img.SerdesThumbnail(x, n));
+            WriteChunk(s, IFFChunkType.Body,         (x, n) => img.SerdesPixels(x, n));
         }
 
         formatChunk.WriteLength(s);
         return img;
     }
 
-    void WriteChunk(ISerializer s, string chunkType, Action<ISerializer, int> serdes)
+    static void WriteChunk(ISerializer s, string chunkType, Action<ISerializer, int> serdes)
     {
-        var chunk = IFFChunk.Serdes(0, new IFFChunk(chunkType, 0), s);
+        var chunk = IffChunk.Serdes(0, new IffChunk(chunkType, 0), s);
         serdes(s, chunk.Length);
         chunk.WriteLength(s);
     }
 
-    void SerdesHeader(ISerializer s, int _)
+    void SerdesHeader(ISerializer s, int length)
     {
-        Width       = s.Int16BE(nameof(Width      ), Width      );
-        Height      = s.Int16BE(nameof(Height     ), Height     );
-        PosX        = s.Int16BE(nameof(PosX       ), PosX       );
-        PosY        = s.Int16BE(nameof(PosY       ), PosY       );
-        NumPlanes   =   s.UInt8(nameof(NumPlanes  ), NumPlanes  );
-        Mask        =   s.UInt8(nameof(Mask       ), Mask       );
-        Compression =   s.UInt8(nameof(Compression), Compression);
-        Padding     =   s.UInt8(nameof(Padding    ), Padding    );
-        Transparent = s.Int16BE(nameof(Transparent), Transparent);
-        AspectRatio = s.Int16BE(nameof(AspectRatio), AspectRatio);
-        PageWidth   = s.Int16BE(nameof(PageWidth  ), PageWidth  );
-        PageHeight  = s.Int16BE(nameof(PageHeight ), PageHeight );
+        if (length < 20)
+            throw new FormatException($"ILBM header chunk was {length} bytes, expected at least 20");
+
+        Width       = s.Int16BE(nameof(Width      ), Width      ); // 0
+        Height      = s.Int16BE(nameof(Height     ), Height     ); // 2
+        PosX        = s.Int16BE(nameof(PosX       ), PosX       ); // 4
+        PosY        = s.Int16BE(nameof(PosY       ), PosY       ); // 6
+        NumPlanes   =   s.UInt8(nameof(NumPlanes  ), NumPlanes  ); // 8
+        Mask        =   s.UInt8(nameof(Mask       ), Mask       ); // 9
+        Compression =   s.UInt8(nameof(Compression), Compression); // A
+        Padding     =   s.UInt8(nameof(Padding    ), Padding    ); // B
+        Transparent = s.Int16BE(nameof(Transparent), Transparent); // C
+        AspectRatio = s.Int16BE(nameof(AspectRatio), AspectRatio); // 8
+        PageWidth   = s.Int16BE(nameof(PageWidth  ), PageWidth  ); // 10
+        PageHeight  = s.Int16BE(nameof(PageHeight ), PageHeight ); // 12
+
+        if (length > 20)
+            s.Bytes("UnexpectedHeaderData", null, length - 20);
     }
 
     void SerdesPalette(ISerializer s, int length)

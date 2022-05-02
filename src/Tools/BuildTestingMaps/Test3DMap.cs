@@ -43,17 +43,17 @@ class Test3DMap
                     map.Floors[Pos(x + index, y)] = Lab1.FloorIndexForChar(c);
                 }
 
-                builder.SetChain(n, scriptBuilder);
+                builder!.SetChain(n, scriptBuilder);
                 map.AddZone((byte)x, (byte)y, TriggerTypes.Manipulate, n);
                 n++;
             }
 
             string Script(Func<Func<string, int>, string> scriptBuilder)
             {
-                var text = scriptBuilder(builder.AddMapText);
+                var text = scriptBuilder(builder!.AddMapText);
                 var script = ScriptLoader.Parse(ApiUtil.SplitLines(text));
                 var scriptId = new ScriptId(AssetType.Script, nextScriptId++);
-                assets[scriptId] = script;
+                assets![scriptId] = script;
                 return "do_script " + scriptId.Id;
             }
 /*

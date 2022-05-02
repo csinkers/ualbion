@@ -4,20 +4,20 @@ using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 
-namespace UAlbion.Game.Assets;
+namespace UAlbion.Formats.Parsers;
 
 /// <summary>
-/// For things like tilemaps etc we repack into a texture atlas with buffer pixels.
+/// For things like fonts etc that we repack into a texture atlas with buffer pixels.
 /// </summary>
-public class TilePostProcessor : IAssetPostProcessor
+public class AtlasPostProcessor : IAssetPostProcessor
 {
     const int MarginPixels = 1;
-    public object Process(object asset, AssetInfo info)
+
+    public static SimpleTexture<byte> Process(IReadOnlyTexture<byte> sprite, AssetInfo info)
     {
-        if (asset == null) throw new ArgumentNullException(nameof(asset));
+        if (sprite == null) throw new ArgumentNullException(nameof(sprite));
         if (info == null) throw new ArgumentNullException(nameof(info));
 
-        var sprite = (IReadOnlyTexture<byte>)asset;
         var layout = SpriteSheetUtil.ArrangeSpriteSheet(sprite.Regions.Count, 1, sprite.GetRegionBuffer);
         var totalHeight = ApiUtil.NextPowerOfTwo(layout.Height);
         byte[] pixelData = new byte[layout.Width * totalHeight];
@@ -55,4 +55,6 @@ public class TilePostProcessor : IAssetPostProcessor
             pixelData,
             subImages);
     }
+
+    public object Process(object asset, AssetInfo info) => Process((IReadOnlyTexture<byte>)asset, info);
 }

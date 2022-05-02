@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using VeldridGen;
@@ -44,21 +45,19 @@ static class ResourceSetGenerator
                 _view.DeviceBuffer,
                 _palette.DeviceTexture)); */
 
-        sb.Append(@"        protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout) =>
-            device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
-                layout");
+        sb.AppendLine(@"        protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout)
+        {
+#if DEBUG");
 
         foreach (var member in type.Members.Where(x => x.Resource != null))
         {
-            sb.AppendLine(",");
-
             if (member.Symbol is not IFieldSymbol field)
             {
                 context.Report($"Resource set backing members must be fields (member {member.Symbol.ToDisplayString()} in {type.Symbol.ToDisplayString()} was a {member.Symbol.GetType().Name})");
                 continue;
             }
 
-            sb.Append("                ");
+            sb.Append("                if (");
             sb.Append(field.Name);
             sb.Append('.');
 
@@ -66,9 +65,34 @@ static class ResourceSetGenerator
             else if (Equals(member.Resource.Kind, context.Symbols.ResourceKind.TextureReadOnly.ToDisplayString())) sb.Append("DeviceTexture");
             else if (Equals(member.Resource.Kind, context.Symbols.ResourceKind.Sampler.ToDisplayString())) sb.Append("Sampler");
             else context.Report($"Resource {member.Symbol.ToDisplayString()} in {type.Symbol.ToDisplayString()} was of unexpected kind \"{member.Resource.Kind}\"");
+
+            sb.AppendFormat(" == null) throw new System.InvalidOperationException(\"Tried to construct {0} without setting {1} to a non-null value\");{2}",
+                type.Symbol.Name,
+                VeldridGenUtil.UnderscoreToTitleCase(field.Name),
+                Environment.NewLine);
+        }
+
+        sb.AppendLine(@"#endif
+");
+
+        sb.Append(@"            return device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(
+                layout");
+
+        foreach (var member in type.Members.Where(x => x.Resource != null))
+        {
+            sb.AppendLine(",");
+            var field = (IFieldSymbol)member.Symbol;
+            sb.Append("                ");
+            sb.Append(field.Name);
+            sb.Append('.');
+
+            if (Equals(member.Resource.Kind, context.Symbols.ResourceKind.UniformBuffer.ToDisplayString())) sb.Append("DeviceBuffer");
+            else if (Equals(member.Resource.Kind, context.Symbols.ResourceKind.TextureReadOnly.ToDisplayString())) sb.Append("DeviceTexture");
+            else if (Equals(member.Resource.Kind, context.Symbols.ResourceKind.Sampler.ToDisplayString())) sb.Append("Sampler");
         }
  
         sb.AppendLine("));");
+        sb.AppendLine("        }");
 
         sb.AppendLine(@"
         protected override void Resubscribe()

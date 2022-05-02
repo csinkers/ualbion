@@ -14,12 +14,13 @@ public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
         var id = (EventSetId)info.AssetId;
         if (s.IsWriting())
         {
             if (existing == null) throw new ArgumentNullException(nameof(existing));
-            var script = Decompile(id, existing);
+            var script = Decompile(id, existing, context.Assets);
             var bytes = Encoding.UTF8.GetBytes(script);
             s.Bytes(null, bytes, bytes.Length);
         }
@@ -35,10 +36,9 @@ public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
         return existing;
     }
 
-    string Decompile(EventSetId id, EventSet set)
+    string Decompile(EventSetId id, EventSet set, IAssetManager assets)
     {
         var sb = new StringBuilder();
-        var assets = Resolve<IAssetManager>();
         var eventFormatter = new EventFormatter(assets.LoadString, id.ToEventText());
         eventFormatter.FormatEventSetDecompiled(sb, set.Events, set.Chains, null, 0);
         return sb.ToString();

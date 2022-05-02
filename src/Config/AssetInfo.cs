@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 using UAlbion.Api;
 
 #pragma warning disable CA2227 // Collection properties should be read only
@@ -38,6 +36,12 @@ public class AssetInfo
     }
 
     public override string ToString() => $"I:{AssetId} ({File.Filename}.{Index})";
+
+    public AssetPathPattern GetPattern(string property, string defaultValue)
+    {
+        var pattern = Get(property, defaultValue);
+        return AssetPathPattern.Build(pattern);
+    }
 
     public T Get<T>(string property, T defaultValue)
     {
@@ -85,53 +89,6 @@ public class AssetInfo
             Properties ??= new Dictionary<string, object>();
             Properties[property] = value;
         }
-    }
-
-    public string BuildFilename(string pattern, int frameNum, string overrideName = null)
-        => string.Format(CultureInfo.InvariantCulture,
-            pattern,
-            Index,    // 0 = Index in container
-            frameNum, // 1 = frame/sub-asset number
-            string.IsNullOrEmpty(overrideName) ? ConfigUtil.AssetName(AssetId) : overrideName, // 2 = asset name
-            Get(AssetProperty.PaletteId, 0)); // 3 = palette id
-
-    static readonly Dictionary<string, Regex> RegexCache = new();
-    static readonly Regex ParameterRegex = new(@"\\{(\d+)(:[^}]+)?}", RegexOptions.Compiled);
-    public static (int, int, int?, string) ParseFilename(string pattern, string filename) // Return index and sub-asset number, may set palette id.
-    {
-        Regex regex;
-        lock (RegexCache)
-        {
-            if (!RegexCache.TryGetValue(pattern, out regex))
-            {
-                var replaced = ParameterRegex.Replace(
-                    Regex.Escape(pattern),
-                    x => x.Groups[1].Value switch
-                    {
-                        "0" => @"(?<Index>\d+)",
-                        "1" => @"(?<SubAsset>\d+)",
-                        "2" => @"(?<Name>\w+)",
-                        "3" => @"(?<Palette>\d+)",
-                        _ => x.Groups[1].Value
-                    });
-                regex = new Regex(replaced);
-                RegexCache[pattern] = regex;
-            }
-        }
-
-        var m = regex.Match(filename);
-        if (!m.Success)
-            return (-1, -1, null, null);
-
-        var indexGroup = m.Groups["Index"];
-        var subAssetGroup = m.Groups["SubAsset"];
-        var paletteGroup = m.Groups["Palette"];
-        int? paletteId = paletteGroup.Success ? (int?)int.Parse(paletteGroup.Value, CultureInfo.InvariantCulture) : null;
-
-        int index = indexGroup.Success ? int.Parse(indexGroup.Value, CultureInfo.InvariantCulture) : -1;
-        int subAsset = subAssetGroup.Success ? int.Parse(subAssetGroup.Value, CultureInfo.InvariantCulture) : 0;
-
-        return (index, subAsset, paletteId, m.Groups["Name"].Value);
     }
 }
 #pragma warning restore CA2227 // Collection properties should be read only

@@ -89,7 +89,8 @@
     "mongrp":            "UAlbion.Formats.Parsers.MonsterGroupLoader, UAlbion.Formats",
     "multiheader":       "UAlbion.Formats.Parsers.MultiHeaderSpriteLoader, UAlbion.Formats",
     "pal":               "UAlbion.Formats.Parsers.PaletteLoader, UAlbion.Formats",
-    "png":               "UAlbion.Game.Veldrid.Assets.PngLoader, UAlbion.Game.Veldrid",
+    "png8":              "UAlbion.Game.Veldrid.Assets.Png8Loader, UAlbion.Game.Veldrid",
+    "png32":             "UAlbion.Game.Veldrid.Assets.Png32Loader, UAlbion.Game.Veldrid",
     "pngtile8":          "UAlbion.Game.Veldrid.Assets.PngTileLoader8Bit, UAlbion.Game.Veldrid",
     "pngtile32":         "UAlbion.Game.Veldrid.Assets.PngTileLoader32Bit, UAlbion.Game.Veldrid",
     "pngsheet":          "UAlbion.Game.Veldrid.Assets.PngSheetLoader, UAlbion.Game.Veldrid",
@@ -110,6 +111,7 @@
     "tiledTileGfx":      "UAlbion.Formats.Exporters.Tiled.TileGraphicsLoader, UAlbion.Formats",
     "tiledTileset":      "UAlbion.Game.Assets.TiledTilesetLoader, UAlbion.Game",
     "tileset":           "UAlbion.Formats.Parsers.TilesetLoader, UAlbion.Formats",
+    "tilegfx":           "UAlbion.Formats.Parsers.TilesetGraphicsLoader, UAlbion.Formats",
     "utf8":              "UAlbion.Formats.Parsers.Utf8Loader, UAlbion.Formats",
     "wav":               "UAlbion.Formats.Parsers.WavLoader, UAlbion.Formats",
     "wavlib":            "UAlbion.Formats.Parsers.WaveLibLoader, UAlbion.Formats",
@@ -130,10 +132,8 @@
   },
 
   "PostProcessors": {
-    "tile": "UAlbion.Game.Assets.TilePostProcessor, UAlbion.Game",
-    "tileset": "UAlbion.Game.Assets.TileSetPostProcessor, UAlbion.Game",
-    "inv":  "UAlbion.Game.Assets.InventoryPostProcessor, UAlbion.Game",
-    "ilbm": "UAlbion.Game.Assets.InterlacedBitmapPostProcessor, UAlbion.Game"
+    "atlas": "UAlbion.Formats.Parsers.AtlasPostProcessor, UAlbion.Formats",
+    "inv":  "UAlbion.Game.Assets.InventoryPostProcessor, UAlbion.Game"
   },
 
   "Languages": {

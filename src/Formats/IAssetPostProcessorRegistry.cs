@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Game.Assets;
+﻿namespace UAlbion.Formats;
 
 public interface IAssetPostProcessorRegistry
 {

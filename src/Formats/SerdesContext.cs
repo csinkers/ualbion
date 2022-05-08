@@ -4,16 +4,16 @@ using UAlbion.Config;
 
 namespace UAlbion.Formats;
 
-public class LoaderContext
+public class SerdesContext
 {
-    public LoaderContext(IAssetManager assets, IJsonUtil json, AssetMapping mapping)
+    public SerdesContext(IJsonUtil json, AssetMapping mapping, IFileSystem disk)
     {
-        Assets = assets ?? throw new ArgumentNullException(nameof(assets));
         Json = json ?? throw new ArgumentNullException(nameof(json));
         Mapping = mapping ?? throw new ArgumentNullException(nameof(mapping));
+        Disk = disk ?? throw new ArgumentNullException(nameof(disk));
     }
 
-    public IAssetManager Assets { get; }
     public IJsonUtil Json { get; }
+    public IFileSystem Disk { get; }
     public AssetMapping Mapping { get; }
 }

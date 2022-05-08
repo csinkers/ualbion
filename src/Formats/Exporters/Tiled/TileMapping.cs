@@ -107,7 +107,7 @@ public static class TileMapping
     {
         if (string.IsNullOrEmpty(source)) return 0; 
         if (source == properties.BlankTilePath) return 0xffff;
-        var assetPath = graphicsPattern.Parse(source);
+        if (!graphicsPattern.TryParse(source, out var assetPath)) return 0xffff;
         return (ushort)assetPath.SubAsset;
     }
 

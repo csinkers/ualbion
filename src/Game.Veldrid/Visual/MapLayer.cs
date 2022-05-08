@@ -14,13 +14,40 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game.Veldrid.Visual;
 
-public class MapLayer : Component, IMapLayer
+public class SimpleMapLayer : MapLayer<SpriteInfo>
 {
     static readonly Region BlankRegion = new(Vector2.Zero, Vector2.Zero, Vector2.Zero, 0);
-    static readonly SpriteInstanceData BlankInstance = new(Vector3.Zero, Vector2.Zero, BlankRegion, 0);
+    protected override SpriteInfo BlankInstance { get; } = new(0, Vector3.Zero, Vector2.Zero, BlankRegion);
+    public SimpleMapLayer(LogicalMap2D logicalMap, ITileGraphics tileset, Vector2 tileSize, bool isOverlay) : base(logicalMap, tileset, tileSize, isOverlay) { }
+    protected override SpriteInfo BuildInstance(Vector3 position, ushort imageNumber, int palFrame, SpriteFlags flags)
+    {
+        var subImage = Tileset.GetRegion(imageNumber, palFrame);
+        return new SpriteInfo(SpriteFlags.TopLeft, position, TileSize, subImage);
+    }
+}
+
+public class BlendedMapLayer : MapLayer<BlendedSpriteInfo>
+{
+    readonly TrueColorTileGraphics _tileset;
+    static readonly Region BlankRegion = new(Vector2.Zero, Vector2.Zero, Vector2.Zero, 0);
+    protected override BlendedSpriteInfo BlankInstance { get; } = new(0, Vector3.Zero, Vector2.Zero, BlankRegion, BlankRegion);
+    public BlendedMapLayer(LogicalMap2D logicalMap, TrueColorTileGraphics tileset, Vector2 tileSize, bool isOverlay) : base(logicalMap, tileset, tileSize, isOverlay) 
+        => _tileset = tileset ?? throw new ArgumentNullException(nameof(tileset));
+
+    protected override BlendedSpriteInfo BuildInstance(Vector3 position, ushort imageNumber, int palFrame, SpriteFlags flags)
+    {
+        var day = _tileset.GetRegion(imageNumber, palFrame);
+        var night = _tileset.GetNightRegion(imageNumber, palFrame);
+        return new BlendedSpriteInfo(SpriteFlags.TopLeft, position, TileSize, day, night);
+    }
+}
+
+public abstract class MapLayer<TInstance> : Component, IMapLayer
+    where TInstance : unmanaged
+{
+    protected abstract TInstance BlankInstance { get;  }
 
     readonly LogicalMap2D _logicalMap;
-    readonly ITileGraphics _tileset;
     readonly bool _isOverlay;
     readonly DrawLayer _drawLayer;
     readonly ISet<(int, int)> _dirty = new HashSet<(int, int)>();
@@ -29,16 +56,21 @@ public class MapLayer : Component, IMapLayer
 #if DEBUG
     DebugFlags _lastDebugFlags;
 #endif
-    SpriteLease _lease;
+    SpriteLease<TInstance> _lease;
     int _lastFrameCount;
     bool _allDirty = true;
 
     public int? HighlightIndex { get; set; }
     int? _highlightEvent;
 
+    protected Vector2 TileSize { get; }
+    protected ITileGraphics Tileset { get; }
+    protected abstract TInstance BuildInstance(Vector3 position, ushort imageNumber, int palFrame, SpriteFlags flags);
+
     public MapLayer(
         LogicalMap2D logicalMap,
         ITileGraphics tileset,
+        Vector2 tileSize,
         bool isOverlay)
     {
         _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
@@ -58,7 +90,8 @@ public class MapLayer : Component, IMapLayer
             _dirty.Add((args.X, args.Y));
         };
 
-        _tileset = tileset;
+        Tileset = tileset ?? throw new ArgumentNullException(nameof(tileset));
+        TileSize = tileSize;
         _isOverlay = isOverlay;
         _drawLayer = isOverlay ? DrawLayer.Overlay : DrawLayer.Underlay;
 
@@ -76,7 +109,7 @@ public class MapLayer : Component, IMapLayer
         On<RenderEvent>(_ => Render());
     }
 
-    public SpriteInstanceData? GetSpriteData(int x, int y) 
+    public object GetSpriteData(int x, int y) 
         => _lease?.GetInstance(_logicalMap.Index(x, y));
 
     protected override void Unsubscribed()
@@ -88,7 +121,7 @@ public class MapLayer : Component, IMapLayer
     TileData GetTile(int index) => _isOverlay ? _logicalMap.GetOverlay(index) : _logicalMap.GetUnderlay(index);
     TileData GetFallbackTile(int index) => !_isOverlay ? null : _logicalMap.GetUnderlay(index);
 
-    SpriteInstanceData BuildInstanceData(int index, int i, int j, int tickCount)
+    TInstance BuildInstanceData(int index, int i, int j, int tickCount)
     {
         var tile = GetTile(index);
 
@@ -97,7 +130,6 @@ public class MapLayer : Component, IMapLayer
 
         var pm = Resolve<IPaletteManager>();
         int frame = AnimUtil.GetFrame(tickCount, tile.FrameCount, tile.Bouncy);
-        var subImage = _tileset.GetRegion(tile.ImageNumber, frame, pm.Frame);
         var fallback = GetFallbackTile(index);
         var layer = tile.Layer;
 
@@ -105,26 +137,27 @@ public class MapLayer : Component, IMapLayer
             layer = fallback.Layer;
 
         var position = new Vector3(
-            new Vector2(i, j) * subImage.Size,
+            new Vector2(i, j) * TileSize,
             DepthUtil.LayerToDepth(layer.ToDepthOffset(), j));
 
-        var instance = new SpriteInstanceData(position, subImage.Size, subImage, SpriteFlags.TopLeft);
-
+        var flags = SpriteFlags.TopLeft;
+#if DEBUG
         var zone = _logicalMap.GetZone(index);
         int eventNum = zone?.Node?.Id ?? -1;
 
-#if DEBUG
-        instance.Flags = instance.Flags
-                         | ((_lastDebugFlags & DebugFlags.HighlightTile) != 0 && HighlightIndex == index ? SpriteFlags.Highlight : 0)
-                         | ((_lastDebugFlags & DebugFlags.HighlightEventChainZones) != 0 && _highlightEvent == eventNum ? SpriteFlags.GreenTint : 0)
-                         | ((_lastDebugFlags & DebugFlags.HighlightCollision) != 0 && tile.Collision != Passability.Passable ? SpriteFlags.RedTint : 0)
-                         | ((_lastDebugFlags & DebugFlags.NoMapTileBoundingBoxes) != 0 ? SpriteFlags.NoBoundingBox : 0)
-#endif
-            // | ((tile.Flags & TileFlags.TextId) != 0 ? SpriteFlags.RedTint : 0)
-            // | (((int) tile.Type) == 8 ? SpriteFlags.GreenTint : 0)
-            // | (((int) tile.Type) == 12 ? SpriteFlags.BlueTint : 0)
-            // | (((int) tile.Type) == 14 ? SpriteFlags.GreenTint | SpriteFlags.RedTint : 0) //&& tickCount % 2 == 0 ? SpriteFlags.Transparent : 0)
+        flags = flags
+             | ((_lastDebugFlags & DebugFlags.HighlightTile) != 0 && HighlightIndex == index ? SpriteFlags.Highlight : 0)
+             | ((_lastDebugFlags & DebugFlags.HighlightEventChainZones) != 0 && _highlightEvent == eventNum ? SpriteFlags.GreenTint : 0)
+             | ((_lastDebugFlags & DebugFlags.HighlightCollision) != 0 && tile.Collision != Passability.Passable ? SpriteFlags.RedTint : 0)
+             | ((_lastDebugFlags & DebugFlags.NoMapTileBoundingBoxes) != 0 ? SpriteFlags.NoBoundingBox : 0)
+        //     | ((tile.Flags & TileFlags.TextId) != 0 ? SpriteFlags.RedTint : 0)
+        //     | (((int) tile.Type) == 8 ? SpriteFlags.GreenTint : 0)
+        //     | (((int) tile.Type) == 12 ? SpriteFlags.BlueTint : 0)
+        //     | (((int) tile.Type) == 14 ? SpriteFlags.GreenTint | SpriteFlags.RedTint : 0) //&& tickCount % 2 == 0 ? SpriteFlags.Transparent : 0)
             ;
+#endif
+
+        var instance = BuildInstance(position, (ushort)(tile.ImageNumber + frame), pm.Frame, flags);
 
         return instance;
     }
@@ -145,14 +178,14 @@ public class MapLayer : Component, IMapLayer
             _allDirty = true;
 #endif
 
-        var sm = Resolve<ISpriteManager>();
+        var sm = Resolve<ISpriteManager<TInstance>>();
         if (_lease == null)
         {
             var flags = SpriteKeyFlags.NoDepthTest;
             if (!_isOverlay)
                 flags |= SpriteKeyFlags.ZeroOpaque;
 
-            var key = new SpriteKey(_tileset.Texture, SpriteSampler.Point, _drawLayer, flags);
+            var key = new SpriteKey(Tileset.Texture, SpriteSampler.Point, _drawLayer, flags);
             _lease = sm.Borrow(key, _logicalMap.Width * _logicalMap.Height, this);
             _allDirty = true;
         }

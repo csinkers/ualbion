@@ -5,6 +5,7 @@ using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Formats.Parsers;
+using UAlbion.TestCommon;
 using Xunit;
 
 namespace UAlbion.Formats.Tests;
@@ -12,18 +13,18 @@ namespace UAlbion.Formats.Tests;
 public class SpriteLoaderTests
 {
     static readonly IJsonUtil JsonUtil = new FormatJsonUtil();
-    static readonly IAssetManager Assets = new DummyAssetManager();
+    static readonly IFileSystem Disk = new StubFileSystem(); // These tests shouldn't access the disk at all - just use a stream via ISerializer directly
     static readonly SingleHeaderSpriteLoader HeaderLoader = new();
     static readonly MultiHeaderSpriteLoader MultiHeaderLoader = new();
     static readonly AmorphousSpriteLoader AmorphousLoader = new();
 
-    delegate IReadOnlyTexture<byte> SerdesFunc(IReadOnlyTexture<byte> x, ISerializer s, LoaderContext context);
+    delegate IReadOnlyTexture<byte> SerdesFunc(IReadOnlyTexture<byte> x, ISerializer s, SerdesContext context);
     static IReadOnlyTexture<byte> Load(byte[] bytes, SerdesFunc serdes)
     {
         using var ms = new MemoryStream(bytes);
         using var br = new BinaryReader(ms);
         using var s = new AlbionReader(br);
-        var context = new LoaderContext(Assets, JsonUtil, AssetMapping.Global);
+        var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
         return serdes(null, s, context);
     }
 
@@ -32,7 +33,7 @@ public class SpriteLoaderTests
         using var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms);
         using var s = new AlbionWriter(bw);
-        var context = new LoaderContext(Assets, JsonUtil, AssetMapping.Global);
+        var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
         serdes(sprite, s, context);
         ms.Position = 0;
         return ms.ToArray();

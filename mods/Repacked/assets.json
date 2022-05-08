@@ -21,28 +21,28 @@
     "dummy": { "Loader": "dummy", "Container": "dummy", "Map": { "0": {"Id": "special.DummyObject" } } },
 
     // Items
-    "$(MOD)/Albion/CD/XLDLIBS/ITEMLIST.DAT": { "Loader": "itemdata", "Container": "items", "Map": { "0": { "Id": "item.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/ITEMNAME.DAT": { "Loader": "itemname", "Container": "raw", "Max": 0, "Map": { "0": { "Id": "special.ItemNames" } } },
+    "Albion/CD/XLDLIBS/ITEMLIST.DAT": { "Loader": "itemdata", "Container": "items", "Map": { "0": { "Id": "item.1" } } },
+    "Albion/CD/XLDLIBS/ITEMNAME.DAT": { "Loader": "itemname", "Container": "raw", "Max": 0, "Map": { "0": { "Id": "special.ItemNames" } } },
 
     // Events
-    "$(MOD)/Albion/CD/XLDLIBS/EVNTSET0.XLD": { "Loader": "eset", "Max": 98, "Map": { "0": { "Id": "eset.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/EVNTSET1.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/EVNTSET2.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.200" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/EVNTSET3.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.300" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/EVNTSET9.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.900" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/SCRIPT0.XLD":  { "Loader": "script", "Map": { "0": { "Id": "script.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/SCRIPT2.XLD":  { "Loader": "script", "MinimumCount": 100, "Map": { "0": { "Id": "script.200" } } },
+    "Albion/CD/XLDLIBS/EVNTSET0.XLD": { "Loader": "eset", "Max": 98, "Map": { "0": { "Id": "eset.1" } } },
+    "Albion/CD/XLDLIBS/EVNTSET1.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.100" } } },
+    "Albion/CD/XLDLIBS/EVNTSET2.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.200" } } },
+    "Albion/CD/XLDLIBS/EVNTSET3.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.300" } } },
+    "Albion/CD/XLDLIBS/EVNTSET9.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.900" } } },
+    "Albion/CD/XLDLIBS/SCRIPT0.XLD":  { "Loader": "script", "Map": { "0": { "Id": "script.1" } } },
+    "Albion/CD/XLDLIBS/SCRIPT2.XLD":  { "Loader": "script", "MinimumCount": 100, "Map": { "0": { "Id": "script.200" } } },
 
     // Maps
-    "$(MOD)/Albion/CD/XLDLIBS/BLKLIST0.XLD": { "Loader": "block", "Map": { "0": {"Id": "block.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/LABDATA0.XLD": { "Loader": "lab", "Map": { "0": { "Id": "lab.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/LABDATA1.XLD": { "Loader": "lab", "MinimumCount": 100, "Map": { "0": { "Id": "lab.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/LABDATA2.XLD": { "Loader": "lab", "MinimumCount": 100, "Map": { "0": { "Id": "lab.200" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/MAPDATA0.XLD": { "Loader": "map", "Max": 98, "Map": { "0": { "Id": "map.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/MAPDATA1.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/MAPDATA2.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.200" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/MAPDATA3.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.300" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/ICONDAT0.XLD": {
+    "Albion/CD/XLDLIBS/BLKLIST0.XLD": { "Loader": "block", "Map": { "0": {"Id": "block.1" } } },
+    "Albion/CD/XLDLIBS/LABDATA0.XLD": { "Loader": "lab", "Map": { "0": { "Id": "lab.1" } } },
+    "Albion/CD/XLDLIBS/LABDATA1.XLD": { "Loader": "lab", "MinimumCount": 100, "Map": { "0": { "Id": "lab.100" } } },
+    "Albion/CD/XLDLIBS/LABDATA2.XLD": { "Loader": "lab", "MinimumCount": 100, "Map": { "0": { "Id": "lab.200" } } },
+    "Albion/CD/XLDLIBS/MAPDATA0.XLD": { "Loader": "map", "Max": 98, "Map": { "0": { "Id": "map.1" } } },
+    "Albion/CD/XLDLIBS/MAPDATA1.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.100" } } },
+    "Albion/CD/XLDLIBS/MAPDATA2.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.200" } } },
+    "Albion/CD/XLDLIBS/MAPDATA3.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.300" } } },
+    "Albion/CD/XLDLIBS/ICONDAT0.XLD": {
       "Loader": "tileset",
       "Map": {
         "0": { "Id": "tiledata.1", "UseSmallGraphics": true },
@@ -52,19 +52,19 @@
     },
 
     // Monster info
-    "$(MOD)/Albion/CD/XLDLIBS/MONCHAR0.XLD": { "Post": "inv", "Loader": "sheet",  "Map": { "0": { "Id": "monster.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/MONGRP0.XLD":  { "Loader": "mongrp", "Max": 98, "Map": { "0": { "Id": "mongrp.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/MONGRP1.XLD":  { "Loader": "mongrp", "MinimumCount": 100, "Map": { "0": { "Id": "mongrp.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/MONGRP2.XLD":  { "Loader": "mongrp", "MinimumCount": 100, "Map": { "0": { "Id": "mongrp.200" } } },
+    "Albion/CD/XLDLIBS/MONCHAR0.XLD": { "Post": "inv", "Loader": "sheet",  "Map": { "0": { "Id": "monster.1" } } },
+    "Albion/CD/XLDLIBS/MONGRP0.XLD":  { "Loader": "mongrp", "Max": 98, "Map": { "0": { "Id": "mongrp.1" } } },
+    "Albion/CD/XLDLIBS/MONGRP1.XLD":  { "Loader": "mongrp", "MinimumCount": 100, "Map": { "0": { "Id": "mongrp.100" } } },
+    "Albion/CD/XLDLIBS/MONGRP2.XLD":  { "Loader": "mongrp", "MinimumCount": 100, "Map": { "0": { "Id": "mongrp.200" } } },
 
     // Palettes
-    "$(MOD)/Albion/CD/XLDLIBS/PALETTE.000":  {
+    "Albion/CD/XLDLIBS/PALETTE.000":  {
       "Loader": "pal",
       "Container": "raw",
       "Max": 0,
       "Map": { "0": { "Id": "pal.0", "IsCommon": true } }
     },
-    "$(MOD)/Albion/CD/XLDLIBS/PALETTE0.XLD": {
+    "Albion/CD/XLDLIBS/PALETTE0.XLD": {
       "Loader": "pal",
       "Map": {
         "0":  { "Id": "pal.1", "AnimatedRanges": "0x99-0x9f, 0xb0-0xbf" },
@@ -84,7 +84,7 @@
     },
 
     // Fonts
-    "$(MOD)/Albion/CD/XLDLIBS/FONTS0.XLD": {
+    "Albion/CD/XLDLIBS/FONTS0.XLD": {
       "Post": "atlas",
       "Loader": "font",
       "Width": 8,
@@ -101,60 +101,60 @@
     },
 
     // Audio
-    "$(MOD)/Albion/CD/XLDLIBS/SAMPLES0.XLD": { "Loader": "sample", "Max": 98, "Map": { "0": { "Id": "sample.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/SAMPLES1.XLD": { "Loader": "sample", "MinimumCount": 100, "Map": { "0": { "Id": "sample.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/SAMPLES2.XLD": { "Loader": "sample", "MinimumCount": 100, "Map": { "0": { "Id": "sample.200" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/SONGS0.XLD":   { "Loader": "song",   "Map": { "0": { "Id": "song.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/WAVELIB0.XLD": { "Loader": "wavlib", "Map": { "0": { "Id": "wavlib.1" } } },
+    "Albion/CD/XLDLIBS/SAMPLES0.XLD": { "Loader": "sample", "Max": 98, "Map": { "0": { "Id": "sample.1" } } },
+    "Albion/CD/XLDLIBS/SAMPLES1.XLD": { "Loader": "sample", "MinimumCount": 100, "Map": { "0": { "Id": "sample.100" } } },
+    "Albion/CD/XLDLIBS/SAMPLES2.XLD": { "Loader": "sample", "MinimumCount": 100, "Map": { "0": { "Id": "sample.200" } } },
+    "Albion/CD/XLDLIBS/SONGS0.XLD":   { "Loader": "song",   "Map": { "0": { "Id": "song.1" } } },
+    "Albion/CD/XLDLIBS/WAVELIB0.XLD": { "Loader": "wavlib", "Map": { "0": { "Id": "wavlib.1" } } },
 
     // Videos
-    // "$(MOD)/Albion/CD/XLDLIBS/GERMAN/FLICS0.XLD":  { "Language": "GERMAN",  "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
-    // "$(MOD)/Albion/CD/XLDLIBS/ENGLISH/FLICS0.XLD": { "Language": "ENGLISH", "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
-    // "$(MOD)/Albion/CD/XLDLIBS/FRENCH/FLICS0.XLD":  { "Language": "FRENCH",  "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
+    // "Albion/CD/XLDLIBS/GERMAN/FLICS0.XLD":  { "Language": "GERMAN",  "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
+    // "Albion/CD/XLDLIBS/ENGLISH/FLICS0.XLD": { "Language": "ENGLISH", "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
+    // "Albion/CD/XLDLIBS/FRENCH/FLICS0.XLD":  { "Language": "FRENCH",  "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },
 
     // Text
-    "$(MOD)/Albion/CD/XLDLIBS/GERMAN/EVNTTXT0.XLD": { "Language": "GERMAN", "Loader": "stringtable", "Max": 98,  "Map": { "0": { "Id": "etext.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/GERMAN/EVNTTXT1.XLD": { "Language": "GERMAN", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/GERMAN/EVNTTXT2.XLD": { "Language": "GERMAN", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.200" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/GERMAN/EVNTTXT3.XLD": { "Language": "GERMAN", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.300" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/GERMAN/EVNTTXT9.XLD": { "Language": "GERMAN", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.900" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/GERMAN/MAPTEXT1.XLD": { "Language": "GERMAN", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/GERMAN/MAPTEXT2.XLD": { "Language": "GERMAN", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.200" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/GERMAN/MAPTEXT3.XLD": { "Language": "GERMAN", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.300" } } },
+    "Albion/CD/XLDLIBS/GERMAN/EVNTTXT0.XLD": { "Language": "GERMAN", "Loader": "stringtable", "Max": 98,  "Map": { "0": { "Id": "etext.1" } } },
+    "Albion/CD/XLDLIBS/GERMAN/EVNTTXT1.XLD": { "Language": "GERMAN", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.100" } } },
+    "Albion/CD/XLDLIBS/GERMAN/EVNTTXT2.XLD": { "Language": "GERMAN", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.200" } } },
+    "Albion/CD/XLDLIBS/GERMAN/EVNTTXT3.XLD": { "Language": "GERMAN", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.300" } } },
+    "Albion/CD/XLDLIBS/GERMAN/EVNTTXT9.XLD": { "Language": "GERMAN", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.900" } } },
+    "Albion/CD/XLDLIBS/GERMAN/MAPTEXT1.XLD": { "Language": "GERMAN", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.100" } } },
+    "Albion/CD/XLDLIBS/GERMAN/MAPTEXT2.XLD": { "Language": "GERMAN", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.200" } } },
+    "Albion/CD/XLDLIBS/GERMAN/MAPTEXT3.XLD": { "Language": "GERMAN", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.300" } } },
 
-    "$(MOD)/Albion/CD/XLDLIBS/ENGLISH/EVNTTXT0.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "Max": 98, "Map": { "0": { "Id": "etext.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/ENGLISH/EVNTTXT1.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/ENGLISH/EVNTTXT2.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.200" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/ENGLISH/EVNTTXT3.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.300" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/ENGLISH/EVNTTXT9.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.900" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/ENGLISH/MAPTEXT1.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/ENGLISH/MAPTEXT2.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.200" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/ENGLISH/MAPTEXT3.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.300" } } },
+    "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT0.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "Max": 98, "Map": { "0": { "Id": "etext.1" } } },
+    "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT1.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.100" } } },
+    "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT2.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.200" } } },
+    "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT3.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.300" } } },
+    "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT9.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.900" } } },
+    "Albion/CD/XLDLIBS/ENGLISH/MAPTEXT1.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.100" } } },
+    "Albion/CD/XLDLIBS/ENGLISH/MAPTEXT2.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.200" } } },
+    "Albion/CD/XLDLIBS/ENGLISH/MAPTEXT3.XLD": { "Language": "ENGLISH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.300" } } },
 
-    "$(MOD)/Albion/CD/XLDLIBS/FRENCH/EVNTTXT0.XLD": { "Language": "FRENCH", "Loader": "stringtable", "Max": 98, "Map": { "0": { "Id": "etext.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/FRENCH/EVNTTXT1.XLD": { "Language": "FRENCH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/FRENCH/EVNTTXT2.XLD": { "Language": "FRENCH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.200" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/FRENCH/EVNTTXT3.XLD": { "Language": "FRENCH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.300" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/FRENCH/EVNTTXT9.XLD": { "Language": "FRENCH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.900" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/FRENCH/MAPTEXT1.XLD": { "Language": "FRENCH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/FRENCH/MAPTEXT2.XLD": { "Language": "FRENCH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.200" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/FRENCH/MAPTEXT3.XLD": { "Language": "FRENCH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.300" } } },
+    "Albion/CD/XLDLIBS/FRENCH/EVNTTXT0.XLD": { "Language": "FRENCH", "Loader": "stringtable", "Max": 98, "Map": { "0": { "Id": "etext.1" } } },
+    "Albion/CD/XLDLIBS/FRENCH/EVNTTXT1.XLD": { "Language": "FRENCH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.100" } } },
+    "Albion/CD/XLDLIBS/FRENCH/EVNTTXT2.XLD": { "Language": "FRENCH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.200" } } },
+    "Albion/CD/XLDLIBS/FRENCH/EVNTTXT3.XLD": { "Language": "FRENCH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.300" } } },
+    "Albion/CD/XLDLIBS/FRENCH/EVNTTXT9.XLD": { "Language": "FRENCH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "etext.900" } } },
+    "Albion/CD/XLDLIBS/FRENCH/MAPTEXT1.XLD": { "Language": "FRENCH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.100" } } },
+    "Albion/CD/XLDLIBS/FRENCH/MAPTEXT2.XLD": { "Language": "FRENCH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.200" } } },
+    "Albion/CD/XLDLIBS/FRENCH/MAPTEXT3.XLD": { "Language": "FRENCH", "Loader": "stringtable", "MinimumCount": 100, "Map": { "0": { "Id": "mtext.300" } } },
 
-    "$(MOD)/GERMAN/strings.json": {
+    "GERMAN/strings.json": {
       "Language": "GERMAN",
       "Loader": "json",
       "Container": "raw",
       "Max": 0,
       "Map": { "0": { "Id": "special.UAlbionStrings" } }
     },
-    "$(MOD)/ENGLISH/strings.json": {
+    "ENGLISH/strings.json": {
       "Language": "ENGLISH",
       "Loader": "json",
       "Container": "raw",
       "Max": 0,
       "Map": { "0": { "Id": "special.UAlbionStrings" } }
     },
-    "$(MOD)/FRENCH/strings.json": {
+    "FRENCH/strings.json": {
       "Language": "FRENCH",
       "Loader": "json",
       "Container": "raw",
@@ -162,21 +162,21 @@
       "Map": { "0": { "Id": "special.UAlbionStrings" } }
     },
 
-    // "$(MOD)/Albion/CD/XLDLIBS/GERMAN/SYSTEXTS":     {
+    // "Albion/CD/XLDLIBS/GERMAN/SYSTEXTS":     {
     //   "Language": "GERMAN",
     //   "Loader": "stext",
     //   "Container": "raw",
     //   "Max": 0,
     //   "Map": { "0": { "Id": "special.SystemStrings" } }
     // },
-    // "$(MOD)/Albion/CD/XLDLIBS/ENGLISH/SYSTEXTS":     {
+    // "Albion/CD/XLDLIBS/ENGLISH/SYSTEXTS":     {
     //   "Language": "ENGLISH",
     //   "Loader": "stext",
     //   "Container": "raw",
     //   "Max": 0,
     //   "Map": { "0": { "Id": "special.SystemStrings" } }
     // },
-    // "$(MOD)/Albion/CD/XLDLIBS/FRENCH/SYSTEXTS":     {
+    // "Albion/CD/XLDLIBS/FRENCH/SYSTEXTS":     {
     //   "Language": "FRENCH",
     //   "Loader": "stext",
     //   "Container": "raw",
@@ -184,7 +184,7 @@
     //   "Map": { "0": { "Id": "special.SystemStrings" } }
     // },
 
-    "$(MOD)/Albion/CD/XLDLIBS/GERMAN/WORDLIS0.XLD": {
+    "Albion/CD/XLDLIBS/GERMAN/WORDLIS0.XLD": {
       "Language": "GERMAN",
       "Loader": "wordlist",
       "Max": 2, 
@@ -194,7 +194,7 @@
         "2": { "Id": "special.Words3" }
       }
     },
-    "$(MOD)/Albion/CD/XLDLIBS/ENGLISH/WORDLIS0.XLD": {
+    "Albion/CD/XLDLIBS/ENGLISH/WORDLIS0.XLD": {
       "Language": "ENGLISH",
       "Loader": "wordlist",
       "Max": 2, 
@@ -204,7 +204,7 @@
         "2": { "Id": "special.Words3" }
       }
     },
-    "$(MOD)/Albion/CD/XLDLIBS/FRENCH/WORDLIS0.XLD": {
+    "Albion/CD/XLDLIBS/FRENCH/WORDLIS0.XLD": {
       "Language": "FRENCH",
       "Loader": "wordlist",
       "Max": 2, 
@@ -216,54 +216,54 @@
     },
 
     // Spells
-    "$(MOD)/Albion/CD/XLDLIBS/SPELLDAT.DAT": { "Loader": "spell", "Container": "spells", "MapFile": "$(MOD)/Meta/SPELLDAT.json" },
+    "Albion/CD/XLDLIBS/SPELLDAT.DAT": { "Loader": "spell", "Container": "spells", "MapFile": "Meta/SPELLDAT.json" },
 
     // Initial game state data
-    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/AUTOMAP1.XLD": { "Loader": "automap", "MinimumCount": 100, "Map": { "0": { "Id": "automap.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/AUTOMAP2.XLD": { "Loader": "automap", "MinimumCount": 100, "Map": { "0": { "Id": "automap.200" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/AUTOMAP3.XLD": { "Loader": "automap", "MinimumCount": 100, "Map": { "0": { "Id": "automap.300" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/CHESTDT0.XLD": { "Post": "inv", "Loader": "chest", "Max": 98, "Map": { "0": { "Id": "chest.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/CHESTDT1.XLD": { "Post": "inv", "Loader": "chest", "MinimumCount": 100, "Map": { "0": { "Id": "chest.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/CHESTDT2.XLD": { "Post": "inv", "Loader": "chest", "MinimumCount": 100, "Map": { "0": { "Id": "chest.200" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/CHESTDT5.XLD": { "Post": "inv", "Loader": "chest", "MinimumCount": 100, "Map": { "0": { "Id": "chest.500" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/MERCHDT0.XLD": { "Post": "inv", "Loader": "merchant", "Max": 98, "Map": { "0": { "Id": "merchant.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/MERCHDT1.XLD": { "Post": "inv", "Loader": "merchant", "MinimumCount": 100, "Map": { "0": { "Id": "merchant.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/MERCHDT2.XLD": { "Post": "inv", "Loader": "merchant", "MinimumCount": 100, "Map": { "0": { "Id": "merchant.200" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/NPCCHAR0.XLD": { "Loader": "sheet", "Max": 98, "Map": { "0": { "Id": "npc.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/NPCCHAR1.XLD": { "Loader": "sheet", "MinimumCount": 100, "Map": { "0": { "Id": "npc.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/NPCCHAR2.XLD": { "Loader": "sheet", "MinimumCount": 100, "Map": { "0": { "Id": "npc.200" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/PRTCHAR0.XLD": { "Post": "inv", "Loader": "sheet", "Max": 98, "MinimumCount": 58, "Map": { "0": { "Id": "party.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/PRTCHAR1.XLD": { "Post": "inv", "Loader": "sheet", "Map": { "0": { "Id": "party.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/INITIAL/PRTCHAR2.XLD": { "Post": "inv", "Loader": "sheet", "Map": { "0": { "Id": "party.200" } } },
+    "Albion/CD/XLDLIBS/INITIAL/AUTOMAP1.XLD": { "Loader": "automap", "MinimumCount": 100, "Map": { "0": { "Id": "automap.100" } } },
+    "Albion/CD/XLDLIBS/INITIAL/AUTOMAP2.XLD": { "Loader": "automap", "MinimumCount": 100, "Map": { "0": { "Id": "automap.200" } } },
+    "Albion/CD/XLDLIBS/INITIAL/AUTOMAP3.XLD": { "Loader": "automap", "MinimumCount": 100, "Map": { "0": { "Id": "automap.300" } } },
+    "Albion/CD/XLDLIBS/INITIAL/CHESTDT0.XLD": { "Post": "inv", "Loader": "chest", "Max": 98, "Map": { "0": { "Id": "chest.1" } } },
+    "Albion/CD/XLDLIBS/INITIAL/CHESTDT1.XLD": { "Post": "inv", "Loader": "chest", "MinimumCount": 100, "Map": { "0": { "Id": "chest.100" } } },
+    "Albion/CD/XLDLIBS/INITIAL/CHESTDT2.XLD": { "Post": "inv", "Loader": "chest", "MinimumCount": 100, "Map": { "0": { "Id": "chest.200" } } },
+    "Albion/CD/XLDLIBS/INITIAL/CHESTDT5.XLD": { "Post": "inv", "Loader": "chest", "MinimumCount": 100, "Map": { "0": { "Id": "chest.500" } } },
+    "Albion/CD/XLDLIBS/INITIAL/MERCHDT0.XLD": { "Post": "inv", "Loader": "merchant", "Max": 98, "Map": { "0": { "Id": "merchant.1" } } },
+    "Albion/CD/XLDLIBS/INITIAL/MERCHDT1.XLD": { "Post": "inv", "Loader": "merchant", "MinimumCount": 100, "Map": { "0": { "Id": "merchant.100" } } },
+    "Albion/CD/XLDLIBS/INITIAL/MERCHDT2.XLD": { "Post": "inv", "Loader": "merchant", "MinimumCount": 100, "Map": { "0": { "Id": "merchant.200" } } },
+    "Albion/CD/XLDLIBS/INITIAL/NPCCHAR0.XLD": { "Loader": "sheet", "Max": 98, "Map": { "0": { "Id": "npc.1" } } },
+    "Albion/CD/XLDLIBS/INITIAL/NPCCHAR1.XLD": { "Loader": "sheet", "MinimumCount": 100, "Map": { "0": { "Id": "npc.100" } } },
+    "Albion/CD/XLDLIBS/INITIAL/NPCCHAR2.XLD": { "Loader": "sheet", "MinimumCount": 100, "Map": { "0": { "Id": "npc.200" } } },
+    "Albion/CD/XLDLIBS/INITIAL/PRTCHAR0.XLD": { "Post": "inv", "Loader": "sheet", "Max": 98, "MinimumCount": 58, "Map": { "0": { "Id": "party.1" } } },
+    "Albion/CD/XLDLIBS/INITIAL/PRTCHAR1.XLD": { "Post": "inv", "Loader": "sheet", "Map": { "0": { "Id": "party.100" } } },
+    "Albion/CD/XLDLIBS/INITIAL/PRTCHAR2.XLD": { "Post": "inv", "Loader": "sheet", "Map": { "0": { "Id": "party.200" } } },
 
     // Graphics
-    "$(MOD)/Albion/CD/XLDLIBS/3DFLOOR0.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "Max": 98, "MapFile": "$(MOD)/Meta/3DFLOOR0.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DFLOOR1.XLD": { "Loader": "fixedsize", "MinimumCount": 100, "Width": 64, "Height": 64, "MapFile": "$(MOD)/Meta/3DFLOOR1.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DFLOOR2.XLD": { "Loader": "fixedsize", "MinimumCount": 100, "Width": 64, "Height": 64, "MapFile": "$(MOD)/Meta/3DFLOOR2.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DOBJEC0.XLD": { "Loader": "fixedsize", "Max": 98, "MapFile": "$(MOD)/Meta/3DOBJEC0.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DOBJEC1.XLD": { "Loader": "fixedsize", "MapFile": "$(MOD)/Meta/3DOBJEC1.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DOBJEC2.XLD": { "Loader": "fixedsize", "MapFile": "$(MOD)/Meta/3DOBJEC2.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DOBJEC3.XLD": { "Loader": "fixedsize", "MinimumCount": 100, "MapFile": "$(MOD)/Meta/3DOBJEC3.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DOVERL0.XLD": { "Transposed": true, "Loader": "fixedsize", "Max": 98, "MapFile": "$(MOD)/Meta/3DOVERL0.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DOVERL1.XLD": { "Transposed": true, "Loader": "fixedsize", "MapFile": "$(MOD)/Meta/3DOVERL1.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DOVERL2.XLD": { "Transposed": true, "Loader": "fixedsize", "MinimumCount": 100, "MapFile": "$(MOD)/Meta/3DOVERL2.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DWALLS0.XLD": { "Transposed": true, "Loader": "fixedsize", "Max": 98, "MapFile": "$(MOD)/Meta/3DWALLS0.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/3DWALLS1.XLD": { "Transposed": true, "Loader": "fixedsize", "MinimumCount": 100, "MapFile": "$(MOD)/Meta/3DWALLS1.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/COMBACK0.XLD": { "Loader": "fixedsize", "Width": 360, "MapFile": "$(MOD)/Meta/COMBACK0.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/COMGFX0.XLD":  { "Loader": "multiheader", "PaletteId": 23, "Map": { "0": { "Id": "comgfx.1"} } },
-    "$(MOD)/Albion/CD/XLDLIBS/FBODPIX0.XLD": { "Loader": "header", "PaletteId": 19, "Map": { "0": { "Id": "fullbody.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/MONGFX0.XLD":  { "Loader": "multiheader", "PaletteId": 24, "MapFile": "$(MOD)/Meta/MONGFX0.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/NPCGR0.XLD":   { "Loader": "header", "Max": 98, "MapFile": "$(MOD)/Meta/NPCGR0.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/NPCGR1.XLD":   { "Loader": "header", "MinimumCount": 100, "MapFile": "$(MOD)/Meta/NPCGR1.json" },
-    "$(MOD)/Albion/CD/XLDLIBS/NPCKL0.XLD":   { "Loader": "header", "PaletteId": 1, "Map": { "0": { "Id": "snpc.1" }, "27": { "PaletteId": 4 } } },
-    "$(MOD)/Albion/CD/XLDLIBS/PARTGR0.XLD":  { "Loader": "header", "PaletteId": 20, "Map": { "0": { "Id": "lparty.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/PARTKL0.XLD":  { "Loader": "header", "PaletteId": 1, "Map": { "0": { "Id": "sparty.1" } } },
-    // "$(MOD)/Albion/CD/XLDLIBS/PICTURE0.XLD": { "Loader": "interlaced", "Map": { "0": { "Id": "pic.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/SMLPORT0.XLD": { "Loader": "fixedsize", "Width": 34, "Max": 98, "Map": { "0": { "Id": "portrait.1" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/SMLPORT1.XLD": { "Loader": "fixedsize", "Width": 34, "MinimumCount": 100, "Map": { "0": { "Id": "portrait.100" } } },
-    "$(MOD)/Albion/CD/XLDLIBS/TACTICO0.XLD": { "Loader": "fixedsize", "Width": 32, "Map": { "0": { "Id": "tacgfx.1" } } },
+    "Albion/CD/XLDLIBS/3DFLOOR0.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "Max": 98, "MapFile": "Meta/3DFLOOR0.json" },
+    "Albion/CD/XLDLIBS/3DFLOOR1.XLD": { "Loader": "fixedsize", "MinimumCount": 100, "Width": 64, "Height": 64, "MapFile": "Meta/3DFLOOR1.json" },
+    "Albion/CD/XLDLIBS/3DFLOOR2.XLD": { "Loader": "fixedsize", "MinimumCount": 100, "Width": 64, "Height": 64, "MapFile": "Meta/3DFLOOR2.json" },
+    "Albion/CD/XLDLIBS/3DOBJEC0.XLD": { "Loader": "fixedsize", "Max": 98, "MapFile": "Meta/3DOBJEC0.json" },
+    "Albion/CD/XLDLIBS/3DOBJEC1.XLD": { "Loader": "fixedsize", "MapFile": "Meta/3DOBJEC1.json" },
+    "Albion/CD/XLDLIBS/3DOBJEC2.XLD": { "Loader": "fixedsize", "MapFile": "Meta/3DOBJEC2.json" },
+    "Albion/CD/XLDLIBS/3DOBJEC3.XLD": { "Loader": "fixedsize", "MinimumCount": 100, "MapFile": "Meta/3DOBJEC3.json" },
+    "Albion/CD/XLDLIBS/3DOVERL0.XLD": { "Transposed": true, "Loader": "fixedsize", "Max": 98, "MapFile": "Meta/3DOVERL0.json" },
+    "Albion/CD/XLDLIBS/3DOVERL1.XLD": { "Transposed": true, "Loader": "fixedsize", "MapFile": "Meta/3DOVERL1.json" },
+    "Albion/CD/XLDLIBS/3DOVERL2.XLD": { "Transposed": true, "Loader": "fixedsize", "MinimumCount": 100, "MapFile": "Meta/3DOVERL2.json" },
+    "Albion/CD/XLDLIBS/3DWALLS0.XLD": { "Transposed": true, "Loader": "fixedsize", "Max": 98, "MapFile": "Meta/3DWALLS0.json" },
+    "Albion/CD/XLDLIBS/3DWALLS1.XLD": { "Transposed": true, "Loader": "fixedsize", "MinimumCount": 100, "MapFile": "Meta/3DWALLS1.json" },
+    "Albion/CD/XLDLIBS/COMBACK0.XLD": { "Loader": "fixedsize", "Width": 360, "MapFile": "Meta/COMBACK0.json" },
+    "Albion/CD/XLDLIBS/COMGFX0.XLD":  { "Loader": "multiheader", "PaletteId": 23, "Map": { "0": { "Id": "comgfx.1"} } },
+    "Albion/CD/XLDLIBS/FBODPIX0.XLD": { "Loader": "header", "PaletteId": 19, "Map": { "0": { "Id": "fullbody.1" } } },
+    "Albion/CD/XLDLIBS/MONGFX0.XLD":  { "Loader": "multiheader", "PaletteId": 24, "MapFile": "Meta/MONGFX0.json" },
+    "Albion/CD/XLDLIBS/NPCGR0.XLD":   { "Loader": "header", "Max": 98, "MapFile": "Meta/NPCGR0.json" },
+    "Albion/CD/XLDLIBS/NPCGR1.XLD":   { "Loader": "header", "MinimumCount": 100, "MapFile": "Meta/NPCGR1.json" },
+    "Albion/CD/XLDLIBS/NPCKL0.XLD":   { "Loader": "header", "PaletteId": 1, "Map": { "0": { "Id": "snpc.1" }, "27": { "PaletteId": 4 } } },
+    "Albion/CD/XLDLIBS/PARTGR0.XLD":  { "Loader": "header", "PaletteId": 20, "Map": { "0": { "Id": "lparty.1" } } },
+    "Albion/CD/XLDLIBS/PARTKL0.XLD":  { "Loader": "header", "PaletteId": 1, "Map": { "0": { "Id": "sparty.1" } } },
+    // "Albion/CD/XLDLIBS/PICTURE0.XLD": { "Loader": "interlaced", "Map": { "0": { "Id": "pic.1" } } },
+    "Albion/CD/XLDLIBS/SMLPORT0.XLD": { "Loader": "fixedsize", "Width": 34, "Max": 98, "Map": { "0": { "Id": "portrait.1" } } },
+    "Albion/CD/XLDLIBS/SMLPORT1.XLD": { "Loader": "fixedsize", "Width": 34, "MinimumCount": 100, "Map": { "0": { "Id": "portrait.100" } } },
+    "Albion/CD/XLDLIBS/TACTICO0.XLD": { "Loader": "fixedsize", "Width": 32, "Map": { "0": { "Id": "tacgfx.1" } } },
 
-    "$(MOD)/Albion/CD/XLDLIBS/3DBCKGR0.XLD": {
+    "Albion/CD/XLDLIBS/3DBCKGR0.XLD": {
       "Loader": "header",
       "Map": {
         "0": { "Id": "3dbg.1", "PaletteId": 3 },
@@ -271,7 +271,7 @@
         "2": { "PaletteId": 25 }
       } 
     },
-    "$(MOD)/Albion/CD/XLDLIBS/AUTOGFX0.XLD": {
+    "Albion/CD/XLDLIBS/AUTOGFX0.XLD": {
       "Post": "atlas",
       "Loader": "amorphous",
       "Map": {
@@ -279,7 +279,7 @@
         "1": { "SubSprites": "(8,8,576) (16,16)", "PaletteId": 30 }
       }
     },
-    "$(MOD)/Albion/CD/XLDLIBS/ICONGFX0.XLD": {
+    "Albion/CD/XLDLIBS/ICONGFX0.XLD": {
       "Loader": "tilegfx",
       "Width": 16,
       "Height": 16,
@@ -297,7 +297,7 @@
           "10": { "PaletteId": 56 }
       }
     },
-    "$(MOD)/Albion/CD/XLDLIBS/ITEMGFX":      {
+    "Albion/CD/XLDLIBS/ITEMGFX":      {
       "Loader": "fixedsize",
       "Container": "raw",
       "Width": 16,
@@ -305,7 +305,7 @@
       "Max":  0, 
       "Map": { "0": { "Id": "itemgfx.1" } }
     },
-    "$(MOD)/Albion/CD/XLDLIBS/SLAB": {
+    "Albion/CD/XLDLIBS/SLAB": {
       "Loader": "slab",
       "Container": "raw",
       "Width": 360,
@@ -315,12 +315,12 @@
     "$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710": { // EN+DE
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
-      "MapFile": "$(MOD)/Meta/MainExeEN_DE.json"
+      "MapFile": "Meta/MainExeEN_DE.json"
     },
     "$(ALBION)/MAIN.EXE#487da3348c367363f3efcbb22ae45c186f1fbecada73f0bf0ce2ca8377a8de14": { // FR
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
-      "MapFile": "$(MOD)/Meta/MainExeFR.json"
+      "MapFile": "Meta/MainExeFR.json"
     }
   }
 }

@@ -9,7 +9,7 @@ namespace UAlbion.Game.Gui.Controls;
 public class Divider : UiElement
 {
     readonly CommonColor _color;
-    SpriteLease _sprite;
+    SpriteLease<SpriteInfo> _sprite;
     Vector3 _lastPosition;
     Vector2 _lastSize;
 
@@ -30,7 +30,7 @@ public class Divider : UiElement
         {
             _sprite?.Dispose();
 
-            var sm = Resolve<ISpriteManager>();
+            var sm = Resolve<ISpriteManager<SpriteInfo>>();
             var key = new SpriteKey(commonColors.BorderTexture, SpriteSampler.Point, layer, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
             _sprite = sm.Borrow(key, 1, this);
         }
@@ -42,7 +42,7 @@ public class Divider : UiElement
         try
         {
             var region = commonColors.BorderTexture.Regions[(int)commonColors.Palette[_color]];
-            instances[0] = new SpriteInstanceData(position, size, region, SpriteFlags.TopLeft);
+            instances[0] = new SpriteInfo(SpriteFlags.TopLeft, position, size, region);
         }
         finally { _sprite.Unlock(lockWasTaken); }
 

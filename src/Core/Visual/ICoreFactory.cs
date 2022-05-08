@@ -5,5 +5,5 @@ namespace UAlbion.Core.Visual;
 public interface ICoreFactory
 {
     ISkybox CreateSkybox(ITexture texture);
-    SpriteBatch CreateSpriteBatch(SpriteKey key);
+    SpriteBatch<TInstance> CreateSpriteBatch<TInstance>(SpriteKey key) where TInstance : unmanaged;
 }

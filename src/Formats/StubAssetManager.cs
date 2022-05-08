@@ -13,7 +13,7 @@ using UAlbion.Formats.Assets.Save;
 
 namespace UAlbion.Formats;
 
-public class DummyAssetManager : IAssetManager
+public class StubAssetManager : IAssetManager
 {
     static readonly AlbionPalette Greyscale = new(0, "Greyscale", Enumerable.Range(0, 256).Select(x => ApiUtil.PackColor((byte)x, (byte)x, (byte)x, 255)).ToArray());
     public AlbionPalette LoadPalette(PaletteId id) => Greyscale;

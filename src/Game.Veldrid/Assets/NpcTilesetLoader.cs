@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
@@ -17,7 +16,7 @@ public class NpcTilesetLoader : Component, IAssetLoader
     readonly Png8Loader _png8Loader = new();
 
     public NpcTilesetLoader() => AttachChild(_png8Loader);
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
@@ -31,8 +30,8 @@ public class NpcTilesetLoader : Component, IAssetLoader
         bool small = info.Get(AssetProperty.IsSmall, false);
 
         var tiles = new List<TileProperties>();
+        var assets = Resolve<IAssetManager>();
         var modApplier = Resolve<IModApplier>();
-        var disk = Resolve<IFileSystem>();
         var config = Resolve<IGeneralConfig>();
         var assetIds =
             AssetMapping.Global.EnumerateAssetsOfType(small
@@ -41,18 +40,18 @@ public class NpcTilesetLoader : Component, IAssetLoader
 
         foreach (var id in assetIds)
         {
-            var sprite = context.Assets.LoadTexture(id); // Get sprite from source mod
+            var sprite = assets.LoadTexture(id); // Get sprite from source mod
             var spriteInfo = modApplier.GetAssetInfo(id, null); // But info from target mod
 
             // Ugh, hacky.
             int palId = spriteInfo.Get(AssetProperty.PaletteId, 0);
             if (palId == 0)
                 spriteInfo.Set(AssetProperty.PaletteId,
-                    context.Assets.GetAssetInfo(id).Get(AssetProperty.PaletteId, 0));
+                    assets.GetAssetInfo(id).Get(AssetProperty.PaletteId, 0));
 
             var path = graphicsPattern.Format(new AssetPath(spriteInfo, 9)); // 9 = First frame facing west for both large and small
             path = config.ResolvePath(path);
-            WriteNpcSprite(path, sprite, spriteInfo, disk, context);
+            WriteNpcSprite(path, sprite, spriteInfo, context);
 
             tiles.Add(new TileProperties
             {
@@ -69,11 +68,11 @@ public class NpcTilesetLoader : Component, IAssetLoader
         return existing;
     }
 
-    void WriteNpcSprite(string path, ITexture sprite, AssetInfo info, IFileSystem disk, LoaderContext context)
+    void WriteNpcSprite(string path, ITexture sprite, AssetInfo info, SerdesContext context)
     {
         var dir = Path.GetDirectoryName(path);
-        if (!disk.DirectoryExists(dir))
-            disk.CreateDirectory(dir);
+        if (!context.Disk.DirectoryExists(dir))
+            context.Disk.CreateDirectory(dir);
 
         using var s = FormatUtil.SerializeWithSerdes(s => _png8Loader.Serdes(sprite, info, s, context));
         int i = 0;
@@ -81,7 +80,7 @@ public class NpcTilesetLoader : Component, IAssetLoader
         {
             if (i == 9)
             {
-                disk.WriteAllBytes(path, chunk);
+                context.Disk.WriteAllBytes(path, chunk);
                 return;
             }
 

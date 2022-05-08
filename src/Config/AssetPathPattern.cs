@@ -20,7 +20,9 @@ public class AssetPathPattern
         Index,
         SubAsset,
         Name,
-        Palette
+        Palette,
+        PaletteFrame,
+        IgnoreNum,
     }
 
     readonly struct Part
@@ -34,7 +36,7 @@ public class AssetPathPattern
         public Part(string name, string value)
         {
             Type =
-                (name.ToUpperInvariant())switch
+                name.ToUpperInvariant() switch
                 {
                     "0" => PartType.Index,
                     "ID" => PartType.Index,
@@ -51,11 +53,17 @@ public class AssetPathPattern
                     "P" => PartType.Palette,
                     "PAL" => PartType.Palette,
                     "PALETTE" => PartType.Palette,
-                    _ => PartType.Text
+
+                    "4" => PartType.PaletteFrame,
+                    "PF" => PartType.PaletteFrame,
+                    "PALFRAME" => PartType.PaletteFrame,
+                    
+                    "IGNORENUM" => PartType.IgnoreNum,
+                    _ => throw new FormatException($"Tried to parse unknown asset path pattern component \"{name}\"")
                 };
 
             Value = value;
-        } 
+        }
         public PartType Type { get; }
         public string Value { get; }
     }
@@ -141,6 +149,8 @@ public class AssetPathPattern
                 case PartType.SubAsset: sb.Append(@"(?<SubAsset>\d+)"); break;
                 case PartType.Name: sb.Append(@"(?<Name>\w+)"); break;
                 case PartType.Palette: sb.Append(@"(?<Palette>\d+)"); break;
+                case PartType.PaletteFrame: sb.Append(@"(?<PFrame>\d+)"); break;
+                case PartType.IgnoreNum: sb.Append(@"\d+"); break;
             }
         }
 
@@ -164,9 +174,14 @@ public class AssetPathPattern
                 case PartType.Index: sb.Append(FormatInt(path.Index, part.Value)); break;
                 case PartType.SubAsset: sb.Append(FormatInt(path.SubAsset, part.Value)); break;
                 case PartType.Name: sb.Append(path.Name); break;
+                case PartType.IgnoreNum: sb.Append("0"); break;
                 case PartType.Palette:
                     if (path.PaletteId.HasValue)
                         sb.Append(FormatInt(path.PaletteId.Value, part.Value));
+                    break;
+                case PartType.PaletteFrame:
+                    if (path.PaletteFrame.HasValue)
+                        sb.Append(FormatInt(path.PaletteFrame.Value, part.Value));
                     break;
             }
         }
@@ -174,19 +189,25 @@ public class AssetPathPattern
         return sb.ToString();
     }
 
-    public AssetPath Parse(string filename)
+    public bool TryParse(string filename, out AssetPath path)
     {
         var m = _regex.Match(filename);
         if (!m.Success)
-            return new AssetPath(-1);
+        {
+            path = default;
+            return false;
+        }
 
         var indexGroup = m.Groups["Index"];
         var subAssetGroup = m.Groups["SubAsset"];
         var paletteGroup = m.Groups["Palette"];
+        var pframeGroup = m.Groups["PFrame"];
         int index = indexGroup.Success ? int.Parse(indexGroup.Value, CultureInfo.InvariantCulture) : -1;
         int subAsset = subAssetGroup.Success ? int.Parse(subAssetGroup.Value, CultureInfo.InvariantCulture) : 0;
         int? paletteId = paletteGroup.Success ? (int?)int.Parse(paletteGroup.Value, CultureInfo.InvariantCulture) : null;
+        int? paletteFrame = pframeGroup.Success ? (int?)int.Parse(pframeGroup.Value, CultureInfo.InvariantCulture) : null;
 
-        return new AssetPath(index, subAsset, paletteId, m.Groups["Name"].Value);
+        path = new AssetPath(index, subAsset, paletteId, m.Groups["Name"].Value, paletteFrame);
+        return true;
     }
 }

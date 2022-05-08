@@ -17,33 +17,33 @@ public class XldContainer : IAssetContainer
     const string MagicString = "XLD0I";
     static int HeaderSize(int itemCount) => MagicString.Length + 3 + 4 * itemCount;
 
-    public ISerializer Read(string file, AssetInfo info, IFileSystem disk, IJsonUtil jsonUtil)
+    public ISerializer Read(string file, AssetInfo info, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
-        using var s = new AlbionReader(new BinaryReader(disk.OpenRead(file)));
+        if (context == null) throw new ArgumentNullException(nameof(context));
+        using var s = new AlbionReader(new BinaryReader(context.Disk.OpenRead(file)));
         var bytes = LoadAsset(info.Index, s);
         var ms = new MemoryStream(bytes);
         return new AlbionReader(new BinaryReader(ms));
     }
 
-    public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk, IJsonUtil jsonUtil)
+    public void Write(string path, IList<(AssetInfo, byte[])> assets, SerdesContext context)
     {
         if (assets == null) throw new ArgumentNullException(nameof(assets));
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
         var dir = Path.GetDirectoryName(path);
-        if (!disk.DirectoryExists(dir))
-            disk.CreateDirectory(dir);
+        if (!context.Disk.DirectoryExists(dir))
+            context.Disk.CreateDirectory(dir);
 
-        var byIndex = disk.FileExists(path) 
-            ? LoadAll(disk, path) 
+        var byIndex = context.Disk.FileExists(path) 
+            ? LoadAll(context.Disk, path) 
             : new Dictionary<int, byte[]>();
 
         foreach (var (info, bytes) in assets)
             byIndex[info.Index] = bytes;
 
-        int minCount = assets[0].Item1.File.Get<int>(AssetProperty.MinimumCount, 0);
+        int minCount = assets[0].Item1.File.Get(AssetProperty.MinimumCount, 0);
         int count = byIndex
             .OrderBy(x => x.Key)
             .Last(x => x.Value.Length > 0)
@@ -56,7 +56,7 @@ public class XldContainer : IAssetContainer
         for (int i = 0; i < count; i++)
             lengths[i] = byIndex.TryGetValue(i, out var buffer) ? buffer.Length : 0;
 
-        using var fs = disk.OpenWriteTruncate(path);
+        using var fs = context.Disk.OpenWriteTruncate(path);
         using var bw = new BinaryWriter(fs);
         using var s = new AlbionWriter(bw);
         HeaderSerdes(lengths, s);
@@ -66,13 +66,14 @@ public class XldContainer : IAssetContainer
                 s.Bytes(null, buffer, buffer.Length);
     }
 
-    public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk, IJsonUtil jsonUtil)
+    public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, SerdesContext context)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
-        if (!disk.FileExists(path))
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        if (!context.Disk.FileExists(path))
             return new List<(int, int)>();
 
-        using var s = new AlbionReader(new BinaryReader(disk.OpenRead(path)));
+        using var s = new AlbionReader(new BinaryReader(context.Disk.OpenRead(path)));
         var lengths = HeaderSerdes(null, s);
         return new List<(int, int)> { (0, lengths.Length) };
     }
@@ -84,7 +85,7 @@ public class XldContainer : IAssetContainer
             throw new ArgumentOutOfRangeException($"Tried to load subItem {subItem} from XLD, but it only contains {lengths.Length} items.");
 
         long offset = s.Offset;
-        offset += lengths.Where((x, i) => i < subItem).Sum();
+        offset += lengths.Where((_, i) => i < subItem).Sum();
         s.Seek(offset);
         return s.Bytes(null, null, lengths[subItem]);
     }

@@ -7,10 +7,10 @@ namespace UAlbion.Game.Debugging;
 
 public class SpriteInstanceDataDebugBehaviour : IDebugBehaviour
 {
-    public ReadOnlyCollection<Type> HandledTypes { get; } = new(new[] { typeof(SpriteInstanceData) });
+    public ReadOnlyCollection<Type> HandledTypes { get; } = new(new[] { typeof(SpriteInfo) });
     public object Handle(DebugInspectorAction action, ReflectedObject reflected, EventExchange exchange)
     {
-        if (reflected?.Parent?.Target is not SpriteInstanceData[] array)
+        if (reflected?.Parent?.Target is not SpriteInfo[] array)
             return null;
 
         switch (action)

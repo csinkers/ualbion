@@ -16,19 +16,18 @@ namespace UAlbion.Formats.Containers;
 public class JsonObjectContainer : IAssetContainer
 {
     [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The serializer will handle it")]
-    public ISerializer Read(string path, AssetInfo info, IFileSystem disk, IJsonUtil jsonUtil)
+    public ISerializer Read(string path, AssetInfo info, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
-        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
-        if (!disk.FileExists(path))
+        if (context == null) throw new ArgumentNullException(nameof(context));
+        if (!context.Disk.FileExists(path))
             return null;
 
-        var dict = Load(path, disk, jsonUtil);
+        var dict = Load(path, context);
         if (!dict.TryGetValue(info.AssetId, out var token))
             return null;
 
-        var ms = new MemoryStream(Encoding.UTF8.GetBytes(jsonUtil.Serialize(token)));
+        var ms = new MemoryStream(Encoding.UTF8.GetBytes(context.Json.Serialize(token)));
         var br = new BinaryReader(ms);
         return new GenericBinaryReader(
             br,
@@ -38,41 +37,43 @@ public class JsonObjectContainer : IAssetContainer
             () => { br.Dispose(); ms.Dispose(); });
     }
 
-    public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk, IJsonUtil jsonUtil)
+    public void Write(string path, IList<(AssetInfo, byte[])> assets, SerdesContext context)
     {
         if (assets == null) throw new ArgumentNullException(nameof(assets));
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
-        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
         var dir = Path.GetDirectoryName(path);
-        if (!disk.DirectoryExists(dir))
-            disk.CreateDirectory(dir);
+        if (!context.Disk.DirectoryExists(dir))
+            context.Disk.CreateDirectory(dir);
 
         var dict = new Dictionary<string, object>();
         foreach (var (info, bytes) in assets)
         {
-            var jObject = jsonUtil.Deserialize<object>(bytes);
+            var jObject = context.Json.Deserialize<object>(bytes);
             dict[info.AssetId.ToString()] = jObject;
         }
 
-        var fullText = jsonUtil.Serialize(dict);
-        disk.WriteAllText(path, fullText);
+        var fullText = context.Json.Serialize(dict);
+        context.Disk.WriteAllText(path, fullText);
     }
 
-    public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk, IJsonUtil jsonUtil)
+    public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, SerdesContext context)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
-        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
-        if (!disk.FileExists(path))
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        if (!context.Disk.FileExists(path))
             return null;
-        var dict = Load(path, disk, jsonUtil);
+
+        var dict = Load(path, context);
         return FormatUtil.SortedIntsToRanges(dict.Keys.Select(x => x.Id).OrderBy(x => x));
     }
 
-    static IDictionary<AssetId, object> Load(string path, IFileSystem disk, IJsonUtil jsonUtil)
+    static IDictionary<AssetId, object> Load(string path, SerdesContext context)
     {
-        var text = disk.ReadAllBytes(path);
-        var dict = jsonUtil.Deserialize<IDictionary<string, object>>(text);
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        var text = context.Disk.ReadAllBytes(path);
+        var dict = context.Json.Deserialize<IDictionary<string, object>>(text);
         if (dict == null)
             throw new FileLoadException($"Could not deserialize \"{path}\"");
 

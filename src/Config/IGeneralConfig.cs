@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-
-namespace UAlbion.Config;
+﻿namespace UAlbion.Config;
 
 public interface IGeneralConfig
 {
-    string ResolvePath(string relative, IDictionary<string, string> extraPaths = null);
+    string ResolvePath(string relative);
+    string ResolvePathAbsolute(string relative);
     string GetPath(string pathName);
-    void SetPath(string pathName, string path);
     string BasePath { get; }
 }

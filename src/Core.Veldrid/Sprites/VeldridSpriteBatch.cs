@@ -6,11 +6,23 @@ using Veldrid;
 
 namespace UAlbion.Core.Veldrid.Sprites;
 
-public class VeldridSpriteBatch : SpriteBatch
+public class VeldridSpriteBatch<TInstance, TGpuInstance> : SpriteBatch<TInstance>
+    where TGpuInstance : unmanaged 
+    where TInstance : unmanaged
 {
     public VeldridSpriteBatch(SpriteKey key) : base(key)
     {
-        Instances = new MultiBuffer<GpuSpriteInstanceData>(MinSize, BufferUsage.VertexBuffer, $"B_Inst:{Name}");
+        unsafe
+        {
+            if (sizeof(TInstance) != sizeof(TGpuInstance))
+            {
+                throw new InvalidOperationException(
+                    $"Sprite instance type {typeof(TInstance).Name} has size {sizeof(TInstance)}, " +
+                    $"which does not match the GPU instance type {typeof(TGpuInstance).Name} of size {sizeof(TGpuInstance)}");
+            }
+        }
+
+        Instances = new MultiBuffer<TGpuInstance>(MinSize, BufferUsage.VertexBuffer, $"B_Inst:{Name}");
         Uniform = new SingleBuffer<SpriteUniform>(new SpriteUniform
         {
             Flags = Key.Flags,
@@ -21,7 +33,7 @@ public class VeldridSpriteBatch : SpriteBatch
         AttachChild(Uniform);
     }
 
-    internal MultiBuffer<GpuSpriteInstanceData> Instances { get; }
+    internal MultiBuffer<TGpuInstance> Instances { get; }
     internal SingleBuffer<SpriteUniform> Uniform { get; }
     internal SpriteSet SpriteResources { get; private set; }
     protected override void Subscribed()
@@ -46,11 +58,11 @@ public class VeldridSpriteBatch : SpriteBatch
         CleanupSet();
     }
 
-    protected override ReadOnlySpan<SpriteInstanceData> ReadOnlySprites =>
-        MemoryMarshal.Cast<GpuSpriteInstanceData, SpriteInstanceData>(Instances.Data);
+    protected override ReadOnlySpan<TInstance> ReadOnlySprites =>
+        MemoryMarshal.Cast<TGpuInstance, TInstance>(Instances.Data);
 
-    protected override Span<SpriteInstanceData> MutableSprites 
-        => MemoryMarshal.Cast<GpuSpriteInstanceData, SpriteInstanceData>(Instances.Borrow());
+    protected override Span<TInstance> MutableSprites 
+        => MemoryMarshal.Cast<TGpuInstance, TInstance>(Instances.Borrow());
 
     protected override void Resize(int instanceCount) 
         => Instances.Resize(instanceCount);

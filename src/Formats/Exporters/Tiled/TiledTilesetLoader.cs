@@ -10,10 +10,10 @@ namespace UAlbion.Formats.Exporters.Tiled;
 
 public class TiledTilesetLoader : Component, IAssetLoader<TilesetData>
 {
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((TilesetData)existing, info, s, context);
 
-    public TilesetData Serdes(TilesetData existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public TilesetData Serdes(TilesetData existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));

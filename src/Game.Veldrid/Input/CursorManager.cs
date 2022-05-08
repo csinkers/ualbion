@@ -24,9 +24,9 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
 
     public Vector2 Position { get; private set; }
     Vector2 _hotspot;
-    SpriteLease _cursorSprite;
-    SpriteLease _itemSprite;
-    SpriteLease _hotspotSprite;
+    SpriteLease<SpriteInfo> _cursorSprite;
+    SpriteLease<SpriteInfo> _itemSprite;
+    SpriteLease<SpriteInfo> _hotspotSprite;
     PositionedSpriteBatch _itemAmountSprite;
     string _lastItemAmountText;
     bool _dirty = true;
@@ -84,7 +84,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         _dirty = false;
 
         var assets = Resolve<IAssetManager>();
-        var sm = Resolve<ISpriteManager>();
+        var sm = Resolve<ISpriteManager<SpriteInfo>>();
         var window = Resolve<IWindowManager>();
 
         if (window.Size.X < 1 || window.Size.Y < 1)
@@ -96,7 +96,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         RenderHotspot(sm, window, showHotspot);
     }
 
-    void RenderHotspot(ISpriteManager sm, IWindowManager window, bool showHotspot)
+    void RenderHotspot(ISpriteManager<SpriteInfo> sm, IWindowManager window, bool showHotspot)
     {
         if(!showHotspot)
         {
@@ -120,12 +120,12 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         try
         {
             var region = _hotspotSprite.Key.Texture.Regions[(int) commonColors.Palette[CommonColor.Yellow3]];
-            instances[0] = new SpriteInstanceData(position, size, region, SpriteFlags.MidMid);
+            instances[0] = new SpriteInfo(SpriteFlags.MidMid, position, size, region);
         }
         finally { _hotspotSprite.Unlock(lockWasTaken); }
     }
 
-    void RenderCursor(IAssetManager assets, ISpriteManager sm, IWindowManager window, Vector3 position)
+    void RenderCursor(IAssetManager assets, ISpriteManager<SpriteInfo> sm, IWindowManager window, Vector3 position)
     {
         if (!_showCursor)
         {
@@ -153,12 +153,12 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         var instances = _cursorSprite.Lock(ref lockWasTaken);
         try
         {
-            instances[0] = new SpriteInstanceData(position, size, _cursorSprite.Key.Texture.Regions[0], SpriteFlags.MidMid);
+            instances[0] = new SpriteInfo(SpriteFlags.MidMid, position, size, _cursorSprite.Key.Texture.Regions[0]);
         }
         finally { _cursorSprite.Unlock(lockWasTaken); }
     }
 
-    void RenderItemInHandCursor(IAssetManager assets, ISpriteManager sm, IWindowManager window, Vector3 normPosition)
+    void RenderItemInHandCursor(IAssetManager assets, ISpriteManager<SpriteInfo> sm, IWindowManager window, Vector3 normPosition)
     {
         var held = Resolve<IInventoryManager>().ItemInHand;
         var itemAmountText = GetAmountText();
@@ -217,10 +217,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         try
         {
             // TODO: Quantity text
-            instances[0] = new SpriteInstanceData(
-                normPosition + new Vector3(window.UiToNormRelative(6, 6), 0),
-                window.UiToNormRelative(subImage.Size),
-                subImage, SpriteFlags.MidMid);
+            instances[0] = new SpriteInfo(SpriteFlags.MidMid, normPosition + new Vector3(window.UiToNormRelative(6, 6), 0), window.UiToNormRelative(subImage.Size), subImage);
         }
         finally { _itemSprite.Unlock(lockWasTaken); }
 

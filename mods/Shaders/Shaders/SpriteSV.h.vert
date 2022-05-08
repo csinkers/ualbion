@@ -80,12 +80,12 @@ layout(location = 0) in vec2 iPosition;
 layout(location = 1) in vec2 iTexCoords;
 
 // UAlbion.Core.Veldrid.Sprites.GpuSpriteInstanceData
-layout(location = 2) in vec4 iInstancePos;
-layout(location = 3) in vec2 iSize;
-layout(location = 4) in vec2 iTexOffset;
-layout(location = 5) in vec2 iTexSize;
-layout(location = 6) in uint iTexLayer;
-layout(location = 7) in uint iFlags;
+layout(location = 2) in uint iFlags;
+layout(location = 3) in vec4 iInstancePos;
+layout(location = 4) in vec2 iSize;
+layout(location = 5) in vec2 iTexOffset;
+layout(location = 6) in vec2 iTexSize;
+layout(location = 7) in uint iTexLayer;
 
 // UAlbion.Core.Veldrid.Sprites.SpriteIntermediateData
 layout(location = 0) out vec2 oTexPosition;

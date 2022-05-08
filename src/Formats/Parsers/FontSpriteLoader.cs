@@ -19,10 +19,10 @@ public class FontSpriteLoader<T> : Component, IAssetLoader<IReadOnlyTexture<byte
             AttachChild(component);
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((IReadOnlyTexture<byte>)existing, info, s, context);
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
@@ -31,7 +31,7 @@ public class FontSpriteLoader<T> : Component, IAssetLoader<IReadOnlyTexture<byte
             : Read(info, s, context);
     }
 
-    IReadOnlyTexture<byte> Read(AssetInfo info, ISerializer s, LoaderContext context)
+    IReadOnlyTexture<byte> Read(AssetInfo info, ISerializer s, SerdesContext context)
     {
         var font = _loader.Serdes(null, info, s, context);
         if (font == null)
@@ -57,7 +57,7 @@ public class FontSpriteLoader<T> : Component, IAssetLoader<IReadOnlyTexture<byte
         return new SimpleTexture<byte>(font.Id, font.Id.ToString(), font.Width, font.Height, font.PixelData, frames);
     }
 
-    IReadOnlyTexture<byte> Write(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, LoaderContext context)
+    IReadOnlyTexture<byte> Write(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (existing == null) throw new ArgumentNullException(nameof(existing));
         int width = info.Width;

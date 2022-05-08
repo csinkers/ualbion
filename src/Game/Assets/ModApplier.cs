@@ -23,7 +23,6 @@ public class ModApplier : Component, IModApplier
     readonly List<ModInfo> _modsInReverseDependencyOrder = new();
     readonly AssetCache _assetCache = new();
     readonly Dictionary<string, LanguageConfig> _languages = new();
-    readonly Dictionary<string, string> _extraPaths = new(); // Just used for $(MOD)
 
     IAssetLocator _assetLocator;
 
@@ -59,7 +58,7 @@ public class ModApplier : Component, IModApplier
         mapping.Clear();
 
         foreach (var mod in mods.Reverse())
-            LoadMod(config.ResolvePath("$(MODS)"), mod.Trim(), mapping);
+            LoadMod(config.ResolvePathAbsolute("$(MODS)"), mod.Trim(), mapping);
 
         _modsInReverseDependencyOrder.Reverse();
         Raise(ModsLoadedEvent.Instance);
@@ -89,18 +88,23 @@ public class ModApplier : Component, IModApplier
         var jsonUtil = Resolve<IJsonUtil>();
 
         string path = Path.Combine(dataDir, modName);
-
-        var assetConfigPath = Path.Combine(path, "assets.json");
-        if (!disk.FileExists(assetConfigPath))
+        if (!disk.DirectoryExists(path))
         {
-            Error($"Mod {modName} does not contain an assets.json file");
+            Error($"Mod directory {modName} does not exist in {dataDir}");
             return;
         }
 
-        var modConfigPath = Path.Combine(path, "modinfo.json");
+        var assetConfigPath = Path.Combine(path, ModConstants.AssetConfigFilename);
+        if (!disk.FileExists(assetConfigPath))
+        {
+            Error($"Mod {modName} does not contain an {ModConstants.AssetConfigFilename} file");
+            return;
+        }
+
+        var modConfigPath = Path.Combine(path, ModConstants.ModConfigFilename);
         if (!disk.FileExists(modConfigPath))
         {
-            Error($"Mod {modName} does not contain a modinfo.json file");
+            Error($"Mod {modName} does not contain a {ModConstants.ModConfigFilename} file");
             return;
         }
 
@@ -117,24 +121,23 @@ public class ModApplier : Component, IModApplier
                 return;
             }
 
-            modMapping.MergeFrom(dependencyInfo.Mapping);
+            modMapping.MergeFrom(dependencyInfo.SerdesContext.Mapping);
         }
 
         var parentConfig = modConfig.InheritTypesFrom != null && _mods.TryGetValue(modConfig.InheritTypesFrom, out var parent) ? parent.AssetConfig : null;
         var assetConfig = AssetConfig.Load(assetConfigPath, parentConfig, modMapping, disk, jsonUtil);
-        var modInfo = new ModInfo(modName, assetConfig, modConfig, modMapping, path);
+        var modInfo = new ModInfo(modName, path, assetConfig, modConfig, modMapping, jsonUtil, disk);
 
         foreach (var kvp in assetConfig.Languages)
             _languages[kvp.Key] = kvp.Value;
 
         MergeTypesToMapping(modMapping, assetConfig, assetConfigPath);
         mapping.MergeFrom(modMapping);
-        modConfig.AssetPath ??= path;
-        var extraPaths = new Dictionary<string, string> { ["MOD"] = modConfig.AssetPath };
+
         assetConfig.PopulateAssetIds(
             jsonUtil,
-            x => _assetLocator.GetSubItemRangesForFile(x, extraPaths),
-            x => disk.ReadAllBytes(generalConfig.ResolvePath(x, extraPaths)));
+            x => _assetLocator.GetSubItemRangesForFile(x, modInfo.SerdesContext),
+            x => modInfo.SerdesContext.Disk.ReadAllBytes(generalConfig.ResolvePath(x)));
         _mods.Add(modName, modInfo);
         _modsInReverseDependencyOrder.Add(modInfo);
     }
@@ -170,7 +173,7 @@ public class ModApplier : Component, IModApplier
     {
         try
         {
-            var asset = LoadAssetInternal(id, _extraPaths, language);
+            var asset = LoadAssetInternal(id, language);
             return asset is Exception ? null : asset;
         }
         catch (Exception e)
@@ -187,7 +190,7 @@ public class ModApplier : Component, IModApplier
     {
         using var ms = new MemoryStream();
         using var annotationWriter = new StreamWriter(ms);
-        LoadAssetInternal(id, _extraPaths, language, annotationWriter);
+        LoadAssetInternal(id, language, annotationWriter);
         annotationWriter.Flush();
 
         ms.Position = 0;
@@ -206,7 +209,7 @@ public class ModApplier : Component, IModApplier
 
         try
         {
-            asset = LoadAssetInternal(id, _extraPaths);
+            asset = LoadAssetInternal(id);
             _assetCache.Add(asset ?? new AssetNotFoundException($"Could not load asset for {id}"), id);
             return asset is Exception ? null : asset;
         }
@@ -221,7 +224,7 @@ public class ModApplier : Component, IModApplier
         }
     }
 
-    object LoadAssetInternal(AssetId id, Dictionary<string, string> extraPaths, string language = null, TextWriter annotationWriter = null)
+    object LoadAssetInternal(AssetId id, string language = null, TextWriter annotationWriter = null)
     {
         if (id.IsNone)
             return null;
@@ -231,16 +234,9 @@ public class ModApplier : Component, IModApplier
 
         object asset = null;
         Stack<IPatch> patches = null; // Create the stack lazily, as most assets won't have any patches.
-        var generalConfig = Resolve<IGeneralConfig>();
-        var assets = Resolve<IAssetManager>();
-        var jsonUtil = Resolve<IJsonUtil>();
 
-        var oldModPath = generalConfig.GetPath("MOD");
         foreach (var mod in _modsInReverseDependencyOrder)
         {
-            var loaderContext = new LoaderContext(assets, jsonUtil, mod.Mapping);
-            generalConfig.SetPath("MOD", mod.AssetPath);
-
             foreach (var info in mod.AssetConfig.GetAssetInfo(id))
             {
                 var assetLang = info.Get<string>(AssetProperty.Language, null);
@@ -251,7 +247,7 @@ public class ModApplier : Component, IModApplier
                         continue;
                 }
 
-                var modAsset = _assetLocator.LoadAsset(info, loaderContext, extraPaths, annotationWriter);
+                var modAsset = _assetLocator.LoadAsset(info, mod.SerdesContext, annotationWriter);
 
                 if (modAsset is IPatch patch)
                 {
@@ -277,9 +273,6 @@ public class ModApplier : Component, IModApplier
                 }
             }
         }
-
-        if (!string.IsNullOrEmpty(oldModPath))
-            generalConfig.SetPath("MOD", oldModPath);
 
         if (asset == null)
             return null;
@@ -317,23 +310,20 @@ public class ModApplier : Component, IModApplier
         if (flushCacheFunc == null) throw new ArgumentNullException(nameof(flushCacheFunc));
 
         var config = Resolve<IGeneralConfig>();
-        var assetManager = Resolve<IAssetManager>();
         var loaderRegistry = Resolve<IAssetLoaderRegistry>();
         var containerRegistry = Resolve<IContainerRegistry>();
-        var disk = Resolve<IFileSystem>();
+        var writeDisk = Resolve<IFileSystem>();
         var jsonUtil = Resolve<IJsonUtil>();
         var target = _modsInReverseDependencyOrder.First();
-        var loaderContext = new LoaderContext(assetManager, jsonUtil, target.Mapping);
 
         // Add any missing ids
         Info("Populating destination asset info...");
-        var extraPaths = new Dictionary<string, string> { ["MOD"] = target.AssetPath };
         target.AssetConfig.PopulateAssetIds(
             jsonUtil,
             file =>
             {
                 // Don't need to resolve the filename as we're not actually using the container - we just want to find the type.
-                var container = containerRegistry.GetContainer(file.Filename, file.Container, disk);
+                var container = containerRegistry.GetContainer(file.Filename, file.Container, writeDisk);
                 var firstAsset = file.Map[file.Map.Keys.Min()];
                 if (assetTypes != null && !assetTypes.Contains(firstAsset.AssetId.Type))
                     return new List<(int, int)> { (firstAsset.Index, 1) };
@@ -341,7 +331,7 @@ public class ModApplier : Component, IModApplier
                 if (filePattern != null && !filePattern.IsMatch(file.Filename))
                     return new List<(int, int)> { (firstAsset.Index, 1) };
 
-                var assets = target.Mapping.EnumerateAssetsOfType(firstAsset.AssetId.Type).ToList();
+                var assets = target.SerdesContext.Mapping.EnumerateAssetsOfType(firstAsset.AssetId.Type).ToList();
                 var idsInRange =
                     assets
                         .Where(x => x.Id >= firstAsset.AssetId.Id)
@@ -356,9 +346,8 @@ public class ModApplier : Component, IModApplier
                     idsInRange = idsInRange.Where(x => x <= maxSubId.Value);
 
                 return FormatUtil.SortedIntsToRanges(idsInRange);
-            }, x => disk.ReadAllBytes(config.ResolvePath(x, extraPaths)));
+            }, x => writeDisk.ReadAllBytes(config.ResolvePath(x)));
 
-        Resolve<IGeneralConfig>().SetPath("MOD", target.AssetPath);
         foreach (var file in target.AssetConfig.Files.Values)
         {
             if (filePattern != null && !filePattern.IsMatch(file.Filename))
@@ -368,7 +357,7 @@ public class ModApplier : Component, IModApplier
             flushCacheFunc();
             var path = config.ResolvePath(file.Filename);
             var loader = loaderRegistry.GetLoader(file.Loader);
-            var container = containerRegistry.GetContainer(path, file.Container, disk);
+            var writeContainer = containerRegistry.GetContainer(path, file.Container, writeDisk);
             var assets = new List<(AssetInfo, byte[])>();
             foreach (var assetInfo in file.Map.Values)
             {
@@ -396,14 +385,14 @@ public class ModApplier : Component, IModApplier
                 using var ms = new MemoryStream();
                 using var bw = new BinaryWriter(ms);
                 using var s = new AlbionWriter(bw);
-                loader.Serdes(asset, assetInfo, s, loaderContext);
+                loader.Serdes(asset, assetInfo, s, target.SerdesContext);
 
                 ms.Position = 0;
                 assets.Add((assetInfo, ms.ToArray()));
             }
 
             if (assets.Count > 0)
-                container.Write(path, assets, disk, jsonUtil);
+                writeContainer.Write(path, assets, target.SerdesContext);
         }
     }
 }

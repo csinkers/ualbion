@@ -24,7 +24,7 @@ public class FlatMap : Component, IMap
     public MapId MapId { get; }
     public MapType MapType => _logicalMap.UseSmallSprites ? MapType.TwoDOutdoors : MapType.TwoD;
     public Vector2 LogicalSize => new(_logicalMap.Width, _logicalMap.Height);
-    public Vector3 TileSize { get; private set; }
+    public Vector3 TileSize => new(16, 16, 1);
     public IMapData MapData => _mapData;
     public float BaseCameraHeight => 0.0f;
     public override string ToString() { return $"FlatMap: {MapId} ({MapId.Id})"; }
@@ -59,10 +59,9 @@ public class FlatMap : Component, IMap
         var tileset = assetManager.LoadTileGraphics(_logicalMap.TilesetId);
         AttachChild(new ScriptManager());
         AttachChild(new Collider2D(_logicalMap, !_logicalMap.UseSmallSprites));
-        var renderable = AttachChild(new MapRenderable2D(_logicalMap, tileset, gameFactory));
+        var renderable = AttachChild(new MapRenderable2D(_logicalMap, tileset, gameFactory, new Vector2(TileSize.X, TileSize.Y)));
         var selector = AttachChild(new SelectionHandler2D(_logicalMap, renderable));
         selector.HighlightIndexChanged += (_, x) => renderable.SetHighlightIndex(x);
-        TileSize = new Vector3(renderable.TileSize, 1.0f);
         _logicalMap.TileSize = renderable.TileSize;
 
         var movementSettings = new MovementSettings(!_logicalMap.UseSmallSprites, GetMoveConfig);

@@ -51,7 +51,7 @@ public class TextManager : ServiceComponent<ITextManager>, ITextManager
     {
         if (block == null) throw new ArgumentNullException(nameof(block));
         var assets = Resolve<IAssetManager>();
-        var sm = Resolve<ISpriteManager>();
+        var sm = Resolve<ISpriteManager<SpriteInfo>>();
         var window = Resolve<IWindowManager>();
 
         var font = assets.LoadFont(block.Color, block.Style == TextStyle.Big);
@@ -81,10 +81,7 @@ public class TextManager : ServiceComponent<ITextManager>, ITextManager
                 // var texOffset = subImage.TexOffset.Y + 0.1f / font.Height;
 
                 var normPosition = window.UiToNormRelative(offset, 0);
-                var baseInstance = new SpriteInstanceData(
-                    new Vector3(normPosition, 0),
-                    window.UiToNormRelative(subImage.Size),
-                    subImage, SpriteFlags.TopLeft);
+                var baseInstance = new SpriteInfo(SpriteFlags.TopLeft, new Vector3(normPosition, 0), window.UiToNormRelative(subImage.Size), subImage);
 
                 instances[n] = baseInstance;
                 instances[n + 1] = baseInstance;

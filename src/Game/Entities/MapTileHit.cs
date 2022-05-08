@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Game.Entities;
@@ -15,8 +14,8 @@ public class DebugMapTileHit
     public override string ToString() => "DebugTileInfo";
     public Vector2 Tile { get; set; }
     public Vector3 IntersectionPoint { get; set; }
-    public SpriteInstanceData? UnderlaySprite { get; set; }
-    public SpriteInstanceData? OverlaySprite { get; set; }
+    public object UnderlaySprite { get; set; }
+    public object OverlaySprite { get; set; }
     public TileData UnderlayTile { get; set; }
     public TileData OverlayTile { get; set; }
 }

@@ -13,7 +13,7 @@ public class WordCollector : Component, IAssetLoader<ListStringCollection>
     static readonly AssetId Words2 = AssetId.From(Base.Special.Words2);
     static readonly AssetId Words3 = AssetId.From(Base.Special.Words3);
 
-    public ListStringCollection Serdes(ListStringCollection existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public ListStringCollection Serdes(ListStringCollection existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
@@ -50,6 +50,6 @@ public class WordCollector : Component, IAssetLoader<ListStringCollection>
         return list;
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((ListStringCollection) existing, info, s, context);
 }

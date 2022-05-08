@@ -2,6 +2,7 @@
 
 namespace UAlbion.Api.Visual;
 
+public delegate ReadOnlyImageBuffer<T> GetFrameDelegate<T>(int frame);
 public static class SpriteSheetUtil
 {
     public static SpriteSheetLayout ArrangeSpriteSheet<T>(int frameCount, int margin, GetFrameDelegate<T> getFrame)

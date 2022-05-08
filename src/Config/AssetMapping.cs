@@ -128,6 +128,7 @@ public class AssetMapping
             RegisterNames(info);
     }
 
+    public override string ToString() => $"AssetMapping - {(IsGlobal ? "Global" : "Local")}, {_byEnumType.Count} enums, {_byName.Count} names";
     public bool IsGlobal => Global == this;
     public bool IsEmpty => _byEnumType.Count == 0;
 

@@ -35,9 +35,9 @@
 
     // Maps
     "$(XLD)/BLKLIST0.XLD": { "Loader": "block", "Map": { "0": {"Id": "block.1" } } },
-    "$(XLD)/LABDATA0.XLD": { "Loader": "lab", "MapFile": "$(MOD)/Meta/LABDATA0.json" },
-    "$(XLD)/LABDATA1.XLD": { "Loader": "lab", "MapFile": "$(MOD)/Meta/LABDATA1.json" },
-    "$(XLD)/LABDATA2.XLD": { "Loader": "lab", "MapFile": "$(MOD)/Meta/LABDATA2.json" },
+    "$(XLD)/LABDATA0.XLD": { "Loader": "lab", "MapFile": "Meta/LABDATA0.json" },
+    "$(XLD)/LABDATA1.XLD": { "Loader": "lab", "MapFile": "Meta/LABDATA1.json" },
+    "$(XLD)/LABDATA2.XLD": { "Loader": "lab", "MapFile": "Meta/LABDATA2.json" },
     "$(XLD)/MAPDATA1.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.100" } } },
     "$(XLD)/MAPDATA2.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.200" } } },
     "$(XLD)/MAPDATA3.XLD": { "Loader": "map", "Map": { "0": { "Id": "map.300" } } },
@@ -140,21 +140,21 @@
     "$(XLD)/FRENCH/MAPTEXT2.XLD": { "Language": "FRENCH", "Loader": "stringtable", "Map": { "0": { "Id": "mtext.200" } } },
     "$(XLD)/FRENCH/MAPTEXT3.XLD": { "Language": "FRENCH", "Loader": "stringtable", "Map": { "0": { "Id": "mtext.300" } } },
 
-    "$(MOD)/GERMAN/strings.json": {
+    "GERMAN/strings.json": {
       "Language": "GERMAN",
       "Loader": "json",
       "Container": "raw",
       "Max": 0,
       "Map": { "0": { "Id": "special.UAlbionStrings" } }
     },
-    "$(MOD)/ENGLISH/strings.json": {
+    "ENGLISH/strings.json": {
       "Language": "ENGLISH",
       "Loader": "json",
       "Container": "raw",
       "Max": 0,
       "Map": { "0": { "Id": "special.UAlbionStrings" } }
     },
-    "$(MOD)/FRENCH/strings.json": {
+    "FRENCH/strings.json": {
       "Language": "FRENCH",
       "Loader": "json",
       "Container": "raw",
@@ -216,7 +216,7 @@
     },
 
     // Spells
-    "$(XLD)/SPELLDAT.DAT": { "Loader": "spell", "Container": "spells", "MapFile": "$(MOD)/Meta/SPELLDAT.json" },
+    "$(XLD)/SPELLDAT.DAT": { "Loader": "spell", "Container": "spells", "MapFile": "Meta/SPELLDAT.json" },
 
     // Initial game state data
     "$(XLD)/INITIAL/AUTOMAP1.XLD": { "Loader": "automap", "Map": { "0": { "Id": "automap.100" } } },
@@ -237,24 +237,24 @@
     "$(XLD)/INITIAL/PRTCHAR2.XLD": { "Post": "inv", "Loader": "sheet", "Map": { "0": { "Id": "party.200" } } },
 
     // Graphics
-    "$(XLD)/3DFLOOR0.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "Max": 98, "MapFile": "$(MOD)/Meta/3DFLOOR0.json" },
-    "$(XLD)/3DFLOOR1.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "MapFile": "$(MOD)/Meta/3DFLOOR1.json" },
-    "$(XLD)/3DFLOOR2.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "MapFile": "$(MOD)/Meta/3DFLOOR2.json" },
-    "$(XLD)/3DOBJEC0.XLD": { "Loader": "fixedsize", "Max": 98, "MapFile": "$(MOD)/Meta/3DOBJEC0.json" },
-    "$(XLD)/3DOBJEC1.XLD": { "Loader": "fixedsize", "MapFile": "$(MOD)/Meta/3DOBJEC1.json" },
-    "$(XLD)/3DOBJEC2.XLD": { "Loader": "fixedsize", "MapFile": "$(MOD)/Meta/3DOBJEC2.json" },
-    "$(XLD)/3DOBJEC3.XLD": { "Loader": "fixedsize", "MapFile": "$(MOD)/Meta/3DOBJEC3.json" },
-    "$(XLD)/3DOVERL0.XLD": { "Transposed": true, "Loader": "fixedsize", "Max": 98, "MapFile": "$(MOD)/Meta/3DOVERL0.json" },
-    "$(XLD)/3DOVERL1.XLD": { "Transposed": true, "Loader": "fixedsize", "MapFile": "$(MOD)/Meta/3DOVERL1.json" },
-    "$(XLD)/3DOVERL2.XLD": { "Transposed": true, "Loader": "fixedsize", "MapFile": "$(MOD)/Meta/3DOVERL2.json" },
-    "$(XLD)/3DWALLS0.XLD": { "Transposed": true, "Loader": "fixedsize", "Max": 98, "MapFile": "$(MOD)/Meta/3DWALLS0.json" },
-    "$(XLD)/3DWALLS1.XLD": { "Transposed": true, "Loader": "fixedsize", "MapFile": "$(MOD)/Meta/3DWALLS1.json" },
-    "$(XLD)/COMBACK0.XLD": { "Loader": "fixedsize", "Width": 360, "MapFile": "$(MOD)/Meta/COMBACK0.json" },
+    "$(XLD)/3DFLOOR0.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "Max": 98, "MapFile": "Meta/3DFLOOR0.json" },
+    "$(XLD)/3DFLOOR1.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "MapFile": "Meta/3DFLOOR1.json" },
+    "$(XLD)/3DFLOOR2.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "MapFile": "Meta/3DFLOOR2.json" },
+    "$(XLD)/3DOBJEC0.XLD": { "Loader": "fixedsize", "Max": 98, "MapFile": "Meta/3DOBJEC0.json" },
+    "$(XLD)/3DOBJEC1.XLD": { "Loader": "fixedsize", "MapFile": "Meta/3DOBJEC1.json" },
+    "$(XLD)/3DOBJEC2.XLD": { "Loader": "fixedsize", "MapFile": "Meta/3DOBJEC2.json" },
+    "$(XLD)/3DOBJEC3.XLD": { "Loader": "fixedsize", "MapFile": "Meta/3DOBJEC3.json" },
+    "$(XLD)/3DOVERL0.XLD": { "Transposed": true, "Loader": "fixedsize", "Max": 98, "MapFile": "Meta/3DOVERL0.json" },
+    "$(XLD)/3DOVERL1.XLD": { "Transposed": true, "Loader": "fixedsize", "MapFile": "Meta/3DOVERL1.json" },
+    "$(XLD)/3DOVERL2.XLD": { "Transposed": true, "Loader": "fixedsize", "MapFile": "Meta/3DOVERL2.json" },
+    "$(XLD)/3DWALLS0.XLD": { "Transposed": true, "Loader": "fixedsize", "Max": 98, "MapFile": "Meta/3DWALLS0.json" },
+    "$(XLD)/3DWALLS1.XLD": { "Transposed": true, "Loader": "fixedsize", "MapFile": "Meta/3DWALLS1.json" },
+    "$(XLD)/COMBACK0.XLD": { "Loader": "fixedsize", "Width": 360, "MapFile": "Meta/COMBACK0.json" },
     "$(XLD)/COMGFX0.XLD":  { "Loader": "multiheader", "PaletteId": 23, "Map": { "0": { "Id": "comgfx.1"} } },
     "$(XLD)/FBODPIX0.XLD": { "Loader": "header", "PaletteId": 19, "Map": { "0": { "Id": "fullbody.1" } } },
-    "$(XLD)/MONGFX0.XLD":  { "Loader": "multiheader", "PaletteId": 24, "MapFile": "$(MOD)/Meta/MONGFX0.json" },
-    "$(XLD)/NPCGR0.XLD":   { "Loader": "header", "Max": 98, "MapFile": "$(MOD)/Meta/NPCGR0.json" },
-    "$(XLD)/NPCGR1.XLD":   { "Loader": "header", "MapFile": "$(MOD)/Meta/NPCGR1.json" },
+    "$(XLD)/MONGFX0.XLD":  { "Loader": "multiheader", "PaletteId": 24, "MapFile": "Meta/MONGFX0.json" },
+    "$(XLD)/NPCGR0.XLD":   { "Loader": "header", "Max": 98, "MapFile": "Meta/NPCGR0.json" },
+    "$(XLD)/NPCGR1.XLD":   { "Loader": "header", "MapFile": "Meta/NPCGR1.json" },
     "$(XLD)/NPCKL0.XLD":   { "Loader": "header", "PaletteId": 1, "Map": { "0": { "Id": "snpc.1" }, "27": { "PaletteId": 4 } } },
     "$(XLD)/PARTGR0.XLD":  { "Loader": "header", "PaletteId": 20, "Map": { "0": { "Id": "lparty.1" } } },
     "$(XLD)/PARTKL0.XLD":  { "Loader": "header", "PaletteId": 1, "Map": { "0": { "Id": "sparty.1" } } },
@@ -315,12 +315,12 @@
     "$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710": { // EN+DE
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
-      "MapFile": "$(MOD)/Meta/MainExeEN_DE.json"
+      "MapFile": "Meta/MainExeEN_DE.json"
     },
     "$(ALBION)/MAIN.EXE#487da3348c367363f3efcbb22ae45c186f1fbecada73f0bf0ce2ca8377a8de14": { // FR
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
-      "MapFile": "$(MOD)/Meta/MainExeFR.json"
+      "MapFile": "Meta/MainExeFR.json"
     }
   }
 }

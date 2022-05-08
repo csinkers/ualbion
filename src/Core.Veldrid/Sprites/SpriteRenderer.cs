@@ -68,7 +68,7 @@ public sealed class SpriteRenderer : Component, IRenderer, IDisposable
         if (cl == null) throw new ArgumentNullException(nameof(cl));
         if (commonSet == null) throw new ArgumentNullException(nameof(commonSet));
         if (framebuffer == null) throw new ArgumentNullException(nameof(framebuffer));
-        if (renderable is not VeldridSpriteBatch batch)
+        if (renderable is not VeldridSpriteBatch<SpriteInfo, GpuSpriteInstanceData> batch)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
         cl.PushDebugGroup(batch.Name);

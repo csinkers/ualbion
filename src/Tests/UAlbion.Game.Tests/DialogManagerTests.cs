@@ -49,7 +49,7 @@ public class DialogManagerTests
         ex
             .Attach(mma)
             .Attach(new AssetManager())
-            .Attach(new SpriteManager())
+            .Attach(new SpriteManager<SpriteInfo>())
             .Attach(new MockGameFactory())
             .Attach(new WordLookup())
             .Attach(new TextFormatter())

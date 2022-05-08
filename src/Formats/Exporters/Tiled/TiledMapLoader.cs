@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Maps;
@@ -10,16 +9,16 @@ namespace UAlbion.Formats.Exporters.Tiled;
 
 public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
 {
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((BaseMapData) existing, info, s, context);
 
-    public BaseMapData Serdes(BaseMapData existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public BaseMapData Serdes(BaseMapData existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
 
         if (!s.IsWriting())
-            return Read(info, s);
+            return Read(info, s, context);
 
         Write(existing, info, s, context);
         return existing;
@@ -31,12 +30,12 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
         return scriptPattern.Format(info);
     }
 
-    void Write(BaseMapData existing, AssetInfo info, ISerializer s, LoaderContext loaderContext)
+    void Write(BaseMapData existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         (byte[] bytes, string script) = existing switch
         {
-            MapData2D map2d => Write2D(map2d, info, loaderContext),
-            MapData3D map3d => Write3D(map3d, info, loaderContext),
+            MapData2D map2d => Write2D(map2d, info, context),
+            MapData3D map3d => Write3D(map3d, info),
             _ => (null, null)
         };
 
@@ -58,22 +57,20 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
             return;
         }
 
-        var disk = Resolve<IFileSystem>();
         var assetDir = GetAssetDir(info);
-        if (!disk.DirectoryExists(assetDir))
-            disk.CreateDirectory(assetDir);
+        if (!context.Disk.DirectoryExists(assetDir))
+            context.Disk.CreateDirectory(assetDir);
 
-        disk.WriteAllText(Path.Combine(assetDir, scriptPath), script);
+        context.Disk.WriteAllText(Path.Combine(assetDir, scriptPath), script);
     }
 
-    BaseMapData Read(AssetInfo info, ISerializer s)
+    BaseMapData Read(AssetInfo info, ISerializer s, SerdesContext context)
     {
-        var disk = Resolve<IFileSystem>();
         var assetDir = GetAssetDir(info);
         var scriptPath = Path.Combine(assetDir, GetScriptFilename(info));
         string script = null;
-        if (!string.IsNullOrEmpty(scriptPath) && disk.FileExists(scriptPath))
-            script = disk.ReadAllText(scriptPath);
+        if (!string.IsNullOrEmpty(scriptPath) && context.Disk.FileExists(scriptPath))
+            script = context.Disk.ReadAllText(scriptPath);
 
         var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
         using var ms = new MemoryStream(bytes);
@@ -81,11 +78,10 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
         return map.ToAlbion(info, script);
     }
 
-    (byte[], string) Write2D(MapData2D map, AssetInfo info, LoaderContext loaderContext)
+    (byte[], string) Write2D(MapData2D map, AssetInfo info, SerdesContext context)
     {
-        var disk = Resolve<IFileSystem>();
-
-        TilesetData tileset = loaderContext.Assets.LoadTileData(map.TilesetId);
+        var assets = Resolve<IAssetManager>();
+        TilesetData tileset = assets.LoadTileData(map.TilesetId);
         if (tileset == null)
         {
             Error($"Tileset {map.TilesetId} not found when writing map {map.Id}, aborting");
@@ -100,17 +96,18 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
             : info.Get(AssetProperty.LargeNpcs, "../Tilesets/LargeNPCs.tsx");
 
         var assetDir = GetAssetDir(info);
-        var npcTileset = Tileset.Load(Path.Combine(assetDir, npcTilesetPath), disk);
+        var npcTileset = Tileset.Load(Path.Combine(assetDir, npcTilesetPath), context.Disk);
         var properties = new Tilemap2DProperties { TileWidth = 16, TileHeight = 16 };
-        var formatter = new EventFormatter(loaderContext.Assets.LoadString, map.Id.ToMapText());
+        var formatter = new EventFormatter(assets.LoadString, map.Id.ToMapText());
         var (tiledMap, script) = MapExport.FromAlbionMap2D(map, tileset, properties, tilesetPath, npcTileset, formatter);
 
         var mapBytes = FormatUtil.BytesFromTextWriter(tiledMap.Serialize);
         return (mapBytes, script);
     }
 
-    (byte[], string) Write3D(MapData3D map, AssetInfo info, LoaderContext loaderContext)
+    (byte[], string) Write3D(MapData3D map, AssetInfo info)
     {
+        var assets = Resolve<IAssetManager>();
         var destModApplier = Resolve<IModApplier>();
 
         var floorPattern    = info.GetPattern(AssetProperty.TiledFloorPattern,    "");
@@ -139,7 +136,7 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
             ContentsPath = contentsPattern.Format(assetPath),
         };
 
-        var formatter = new EventFormatter(loaderContext.Assets.LoadString, map.Id.ToMapText());
+        var formatter = new EventFormatter(assets.LoadString, map.Id.ToMapText());
         var (tiledMap, script) = MapExport.FromAlbionMap3D(map, properties, formatter);
 
         var mapBytes = FormatUtil.BytesFromTextWriter(tiledMap.Serialize);

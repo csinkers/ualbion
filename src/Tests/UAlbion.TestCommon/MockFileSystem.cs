@@ -16,6 +16,7 @@ public class MockFileSystem : IFileSystem
     readonly object _syncRoot = new();
     readonly DirNode _root = new(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "" : "/");
     readonly Func<string, bool> _maskingFunc;
+    string _currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
     /// <summary>
     /// 
@@ -24,11 +25,22 @@ public class MockFileSystem : IFileSystem
     /// the on-disk version should be used as a fallback for reading, and false if
     /// the on-disk version (if any) should be ignored.</param>
     public MockFileSystem(Func<string, bool> maskingFunc) => _maskingFunc = maskingFunc ?? throw new ArgumentNullException(nameof(maskingFunc));
-    public MockFileSystem(bool fallBackToFileSystem)
-        => _maskingFunc = fallBackToFileSystem ? _ => true : _ => false;
+    public MockFileSystem(bool fallBackToFileSystem) => _maskingFunc = fallBackToFileSystem ? _ => true : _ => false;
+    public bool IsReadOnly { get; set; }
+    public override string ToString() => $"MockFileSystem @ {_currentDirectory}{(IsReadOnly ? " (ReadOnly)" : "")}";
 
     interface INode { string Path { get; } }
-    public string CurrentDirectory { get; set; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+    public string CurrentDirectory
+    {
+        get => _currentDirectory;
+        set
+        {
+            if (!DirectoryExists(value))
+                throw new InvalidOperationException($"Tried to set current directory to \"{value}\", but the directory does not exist");
+
+            _currentDirectory = value;
+        }
+    }
 
     class DirNode : Dictionary<string, INode>, INode
     {
@@ -43,6 +55,11 @@ public class MockFileSystem : IFileSystem
         public string Path { get; }
         public MemoryStream Stream { get; }
         public override string ToString() => $"{Path} ({Stream.Length} bytes)";
+    }
+
+    public IFileSystem Duplicate(string currentDirectory)
+    {
+        return new MockFileSystemChild(this, currentDirectory);
     }
 
     INode GetDir(string path)
@@ -95,6 +112,9 @@ public class MockFileSystem : IFileSystem
 
     public void CreateDirectory(string path)
     {
+        if (IsReadOnly)
+            throw new NotSupportedException();
+
         lock (_syncRoot)
         {
             path = Path.GetFullPath(path);
@@ -193,6 +213,9 @@ public class MockFileSystem : IFileSystem
 
     public Stream OpenWriteTruncate(string path)
     {
+        if (IsReadOnly)
+            throw new NotSupportedException();
+
         lock (_syncRoot)
         {
             path = Path.GetFullPath(path);
@@ -215,6 +238,9 @@ public class MockFileSystem : IFileSystem
 
     public void DeleteFile(string path)
     {
+        if (IsReadOnly)
+            throw new NotSupportedException();
+
         lock (_syncRoot)
         {
             path = Path.GetFullPath(path);
@@ -239,6 +265,9 @@ public class MockFileSystem : IFileSystem
 
     public void WriteAllText(string path, string fullText)
     {
+        if (IsReadOnly)
+            throw new NotSupportedException();
+
         lock (_syncRoot)
         {
             path = Path.GetFullPath(path);
@@ -273,6 +302,9 @@ public class MockFileSystem : IFileSystem
 
     public void WriteAllBytes(string path, byte[] bytes)
     {
+        if (IsReadOnly)
+            throw new NotSupportedException();
+
         lock (_syncRoot)
         {
             path = Path.GetFullPath(path);

@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using SerdesNet;
-using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Parsers;
 
@@ -15,20 +14,22 @@ namespace UAlbion.Formats.Containers;
 /// </summary>
 public class DirectoryContainer : IAssetContainer
 {
-    public ISerializer Read(string path, AssetInfo info, IFileSystem disk, IJsonUtil jsonUtil)
+    public ISerializer Read(string path, AssetInfo info, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
         var subAssets = new Dictionary<int, (string, string)>(); // path and name
         // Pattern vars: 0=Index 1=SubItem 2=Name 3=Palette
         var pattern = info.GetPattern(AssetProperty.Pattern, "{0}_{1}_{2}.dat");
 
-        if (disk.DirectoryExists(path))
+        if (context.Disk.DirectoryExists(path))
         {
-            foreach (var filePath in disk.EnumerateDirectory(path, $"{info.Index}_*.*"))
+            foreach (var filePath in context.Disk.EnumerateDirectory(path, $"{info.Index}_*.*"))
             {
                 var filename = Path.GetFileName(filePath);
-                var assetPath = pattern.Parse(filename);
+                if (!pattern.TryParse(filename, out var assetPath))
+                    continue;
 
                 if (assetPath.PaletteId.HasValue)
                     info.Set(AssetProperty.PaletteId, assetPath.PaletteId);
@@ -48,7 +49,7 @@ public class DirectoryContainer : IAssetContainer
             PackedChunks.PackNamed(s, subAssets.Keys.Max() + 1, i => 
                 !subAssets.TryGetValue(i, out var pathAndName)
                     ? (Array.Empty<byte>(), null)
-                    : (disk.ReadAllBytes(pathAndName.Item1), pathAndName.Item2));
+                    : (context.Disk.ReadAllBytes(pathAndName.Item1), pathAndName.Item2));
         }
 
         ms.Position = 0;
@@ -60,17 +61,17 @@ public class DirectoryContainer : IAssetContainer
         });
     }
 
-    public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk, IJsonUtil jsonUtil)
+    public void Write(string path, IList<(AssetInfo, byte[])> assets, SerdesContext context)
     {
         if (assets == null) throw new ArgumentNullException(nameof(assets));
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
-        if (disk.FileExists(path))
+        if (context == null) throw new ArgumentNullException(nameof(context));
+        if (context.Disk.FileExists(path))
             throw new InvalidOperationException($"Cannot save directory container at \"{path}\", as there is already a file with that name.");
 
         // Console.WriteLine($"Writing {string.Join(", ", assets.Select(x => $"{x.Item1.AssetId}:{x.Item2?.Length}"))} to {path}");
 
-        if (!disk.DirectoryExists(path))
-            disk.CreateDirectory(path);
+        if (!context.Disk.DirectoryExists(path))
+            context.Disk.CreateDirectory(path);
 
         foreach (var (info, assetBytes) in assets)
         {
@@ -88,7 +89,7 @@ public class DirectoryContainer : IAssetContainer
             {
                 var (subAssetBytes, name) = subAssets[0];
                 var filename = name ?? pattern.Format(new AssetPath(info));
-                disk.WriteAllBytes(Path.Combine(path, filename), subAssetBytes);
+                context.Disk.WriteAllBytes(Path.Combine(path, filename), subAssetBytes);
             }
             else
             {
@@ -105,23 +106,23 @@ public class DirectoryContainer : IAssetContainer
                     var fullPath = Path.Combine(path, filename);
 
                     var dir = Path.GetDirectoryName(fullPath);
-                    if (!disk.DirectoryExists(dir))
-                        disk.CreateDirectory(dir);
+                    if (!context.Disk.DirectoryExists(dir))
+                        context.Disk.CreateDirectory(dir);
 
-                    disk.WriteAllBytes(fullPath, subAssetBytes);
+                    context.Disk.WriteAllBytes(fullPath, subAssetBytes);
                 }
             }
         }
     }
 
-    public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk, IJsonUtil jsonUtil)
+    public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, SerdesContext context)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        if (context == null) throw new ArgumentNullException(nameof(context));
         var subIds = new List<int>();
-        if (!disk.DirectoryExists(path))
+        if (!context.Disk.DirectoryExists(path))
             return new List<(int, int)> { (0, 1) };
 
-        foreach (var filePath in disk.EnumerateDirectory(path))
+        foreach (var filePath in context.Disk.EnumerateDirectory(path))
         {
             var file = Path.GetFileName(filePath);
             int index = file.IndexOf('_', StringComparison.InvariantCulture);

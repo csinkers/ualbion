@@ -12,8 +12,9 @@ namespace UAlbion.Game.Veldrid.Assets;
 public class PngTileLoader8Bit : Component, IAssetLoader<ITileGraphics>
 {
     readonly Png8Loader _png8Loader = new();
+    public PngTileLoader8Bit() => AttachChild(_png8Loader);
 
-    public ITileGraphics Serdes(ITileGraphics existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public ITileGraphics Serdes(ITileGraphics existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
 
@@ -36,6 +37,6 @@ public class PngTileLoader8Bit : Component, IAssetLoader<ITileGraphics>
         }
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((ITileGraphics)existing, info, s, context);
 }

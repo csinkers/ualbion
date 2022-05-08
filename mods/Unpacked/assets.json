@@ -6,56 +6,56 @@
   },
 
   "Files": { // Pattern Variables: 0=SubId in container 1=frame/sub-asset number 2=Asset name 3=PaletteId. Patterns must begin with {id}_ when writing.
-    "$(MOD)/Assets/3dBackgrounds":      { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_p{pal}_{name}.png", "Map": { "1": { "Id": "3dbg.1"     } } },
-    "$(MOD)/Assets/3dFloors":           { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "floor.1"    } } },
-    "$(MOD)/Assets/3dObjects":          { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "3dobj.1"    } } },
-    "$(MOD)/Assets/3dOverlays":         { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "overlay.1"  } } },
-    "$(MOD)/Assets/3dWalls":            { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "wall.1"     } } },
-    "$(MOD)/Assets/CombatBackground":   { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_p{pal}_{name}.png", "Map": { "1": { "Id": "combg.1"    } } },
-    "$(MOD)/Assets/CombatGraphics":     { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "comgfx.1"   } } },
-    "$(MOD)/Assets/InvBackgrounds":     { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "fullbody.1" } } },
-    "$(MOD)/Assets/MonsterGraphics":    { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "mongfx.1"   } } },
-    "$(MOD)/Assets/NpcGraphicsLarge":   { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "lnpc.1"     } } },
-    "$(MOD)/Assets/NpcGraphicsSmall":   { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "snpc.1"     } } },
-    "$(MOD)/Assets/PartyGraphicsLarge": { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "lparty.1"   } } },
-    "$(MOD)/Assets/PartyGraphicsSmall": { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "sparty.1"   } } },
-    "$(MOD)/Assets/Pictures":           { "Loader": "png32", "Container": "dir", "Pattern": "{id}_{name}.png", "Map": { "1": { "Id": "pic.1" } } },
-    "$(MOD)/Assets/Portraits":          { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{name}.png", "Map": { "1": { "Id": "portrait.1" } } },
-    "$(MOD)/Assets/Slab":               { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Map": { "1": { "Id": "uibg.1"     } } },
-    "$(MOD)/Assets/TacticalIcons":      { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Map": { "1": { "Id": "tacgfx.1"   } } },
-    "$(MOD)/Assets/CoreGraphics":       { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png",      "Map": { "0": { "Id": "coregfx.0"  } } },
+    "Assets/3dBackgrounds":      { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_p{pal}_{name}.png", "Map": { "1": { "Id": "3dbg.1"     } } },
+    "Assets/3dFloors":           { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "floor.1"    } } },
+    "Assets/3dObjects":          { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "3dobj.1"    } } },
+    "Assets/3dOverlays":         { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "overlay.1"  } } },
+    "Assets/3dWalls":            { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "wall.1"     } } },
+    "Assets/CombatBackground":   { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_p{pal}_{name}.png", "Map": { "1": { "Id": "combg.1"    } } },
+    "Assets/CombatGraphics":     { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "comgfx.1"   } } },
+    "Assets/InvBackgrounds":     { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "fullbody.1" } } },
+    "Assets/MonsterGraphics":    { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "mongfx.1"   } } },
+    "Assets/NpcGraphicsLarge":   { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "lnpc.1"     } } },
+    "Assets/NpcGraphicsSmall":   { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "snpc.1"     } } },
+    "Assets/PartyGraphicsLarge": { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "lparty.1"   } } },
+    "Assets/PartyGraphicsSmall": { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "sparty.1"   } } },
+    "Assets/Pictures":           { "Loader": "png32", "Container": "dir", "Pattern": "{id}_{name}.png", "Map": { "1": { "Id": "pic.1" } } },
+    "Assets/Portraits":          { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{name}.png", "Map": { "1": { "Id": "portrait.1" } } },
+    "Assets/Slab":               { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Map": { "1": { "Id": "uibg.1"     } } },
+    "Assets/TacticalIcons":      { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Map": { "1": { "Id": "tacgfx.1"   } } },
+    "Assets/CoreGraphics":       { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png",      "Map": { "0": { "Id": "coregfx.0"  } } },
 
-    "$(MOD)/Assets/Chests":        { "Loader": "jsonInv",          "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "chest.1"    } } },
-    "$(MOD)/Assets/Events":        { "Loader": "eventSetScript",   "Container": "dir", "Pattern": "{id}_{name}.ua",   "Map": { "1": { "Id": "eset.1"     } } },
-    "$(MOD)/Assets/Merchants":     { "Loader": "jsonInv",          "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "merchant.1" } } },
-    "$(MOD)/Assets/MonsterGroups": { "Loader": "jsonMonsterGroup", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "mongrp.1"   } } },
-    "$(MOD)/Assets/Monsters":      { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "monster.1"  } } },
-    "$(MOD)/Assets/Npcs":          { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "npc.1"      } } },
-    "$(MOD)/Assets/Palettes":      { "Loader": "jsonPal",          "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "0": { "Id": "pal.0"      } } },
-    "$(MOD)/Assets/PartyMembers":  { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "party.1"    } } },
-    "$(MOD)/Assets/Samples":       { "Loader": "wav",              "Container": "dir", "Pattern": "{id}_{name}.wav",  "Map": { "1": { "Id": "sample.1"   } } },
-    "$(MOD)/Assets/Scripts":       { "Loader": "script",           "Container": "dir", "Pattern": "{id}_{name}.txt",  "Map": { "1": { "Id": "script.1"   } } },
-    "$(MOD)/Assets/Songs":         { "Loader": "song",             "Container": "dir", "Pattern": "{id}_{name}.xmi",  "Map": { "1": { "Id": "song.1"     } } },
-    "$(MOD)/Assets/WaveLib":       { "Loader": "wavlib2",          "Container": "dir", "Pattern": "{id}_{frame}_{name}.wav", "Map": { "1": { "Id": "wavlib.1" } } },
-    "$(MOD)/Assets/Items.json":    { "Loader": "jsonItems",        "Container": "jsonObj", "Map": { "1": { "Id": "item.1"  } } },
-    "$(MOD)/Assets/Spells.json":   { "Loader": "jsonSpell",        "Container": "jsonObj", "Map": { "1": { "Id": "spell.1" } } },
+    "Assets/Chests":        { "Loader": "jsonInv",          "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "chest.1"    } } },
+    "Assets/Events":        { "Loader": "eventSetScript",   "Container": "dir", "Pattern": "{id}_{name}.ua",   "Map": { "1": { "Id": "eset.1"     } } },
+    "Assets/Merchants":     { "Loader": "jsonInv",          "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "merchant.1" } } },
+    "Assets/MonsterGroups": { "Loader": "jsonMonsterGroup", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "mongrp.1"   } } },
+    "Assets/Monsters":      { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "monster.1"  } } },
+    "Assets/Npcs":          { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "npc.1"      } } },
+    "Assets/Palettes":      { "Loader": "jsonPal",          "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "0": { "Id": "pal.0"      } } },
+    "Assets/PartyMembers":  { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "party.1"    } } },
+    "Assets/Samples":       { "Loader": "wav",              "Container": "dir", "Pattern": "{id}_{name}.wav",  "Map": { "1": { "Id": "sample.1"   } } },
+    "Assets/Scripts":       { "Loader": "script",           "Container": "dir", "Pattern": "{id}_{name}.txt",  "Map": { "1": { "Id": "script.1"   } } },
+    "Assets/Songs":         { "Loader": "song",             "Container": "dir", "Pattern": "{id}_{name}.xmi",  "Map": { "1": { "Id": "song.1"     } } },
+    "Assets/WaveLib":       { "Loader": "wavlib2",          "Container": "dir", "Pattern": "{id}_{frame}_{name}.wav", "Map": { "1": { "Id": "wavlib.1" } } },
+    "Assets/Items.json":    { "Loader": "jsonItems",        "Container": "jsonObj", "Map": { "1": { "Id": "item.1"  } } },
+    "Assets/Spells.json":   { "Loader": "jsonSpell",        "Container": "jsonObj", "Map": { "1": { "Id": "spell.1" } } },
 
     "dummy_item_names": { "Loader": "itemNameCollector", "Container": "dummy", "Max": 0, "Map": { "0": { "Id": "special.ItemNames" } } },
-    "$(MOD)/Assets/ItemNamesDE.json": { "Language": "GERMAN",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "1": { "Id": "itemname.1"  } } },
-    "$(MOD)/Assets/ItemNamesEN.json": { "Language": "ENGLISH", "Loader": "utf8", "Container": "jsonStrings", "Map": { "1": { "Id": "itemname.1"  } } },
-    "$(MOD)/Assets/ItemNamesFR.json": { "Language": "FRENCH",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "1": { "Id": "itemname.1"  } } },
+    "Assets/ItemNamesDE.json": { "Language": "GERMAN",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "1": { "Id": "itemname.1"  } } },
+    "Assets/ItemNamesEN.json": { "Language": "ENGLISH", "Loader": "utf8", "Container": "jsonStrings", "Map": { "1": { "Id": "itemname.1"  } } },
+    "Assets/ItemNamesFR.json": { "Language": "FRENCH",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "1": { "Id": "itemname.1"  } } },
 
-    "$(MOD)/Assets/SystemTextDE.json": { "Language": "GERMAN",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "stext.0" } } },
-    "$(MOD)/Assets/SystemTextEN.json": { "Language": "ENGLISH", "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "stext.0" } } },
-    "$(MOD)/Assets/SystemTextFR.json": { "Language": "FRENCH",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "stext.0" } } },
+    "Assets/SystemTextDE.json": { "Language": "GERMAN",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "stext.0" } } },
+    "Assets/SystemTextEN.json": { "Language": "ENGLISH", "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "stext.0" } } },
+    "Assets/SystemTextFR.json": { "Language": "FRENCH",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "stext.0" } } },
 
-    "$(MOD)/Assets/EventTextDE": { "Language": "GERMAN",  "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "etext.1" } } },
-    "$(MOD)/Assets/EventTextEN": { "Language": "ENGLISH", "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "etext.1" } } },
-    "$(MOD)/Assets/EventTextFR": { "Language": "FRENCH",  "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "etext.1" } } },
+    "Assets/EventTextDE": { "Language": "GERMAN",  "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "etext.1" } } },
+    "Assets/EventTextEN": { "Language": "ENGLISH", "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "etext.1" } } },
+    "Assets/EventTextFR": { "Language": "FRENCH",  "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "etext.1" } } },
 
-    "$(MOD)/Assets/MapTextDE": { "Language": "GERMAN",  "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "100": { "Id": "mtext.100" } } },
-    "$(MOD)/Assets/MapTextEN": { "Language": "ENGLISH", "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "100": { "Id": "mtext.100" } } },
-    "$(MOD)/Assets/MapTextFR": { "Language": "FRENCH",  "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "100": { "Id": "mtext.100" } } },
+    "Assets/MapTextDE": { "Language": "GERMAN",  "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "100": { "Id": "mtext.100" } } },
+    "Assets/MapTextEN": { "Language": "ENGLISH", "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "100": { "Id": "mtext.100" } } },
+    "Assets/MapTextFR": { "Language": "FRENCH",  "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "100": { "Id": "mtext.100" } } },
 
     "dummy_words_de": {
       "Language": "GERMAN",
@@ -90,14 +90,14 @@
         "2": { "Id": "special.Words3" }
       }
     },
-    "$(MOD)/Assets/WordsDE.json": { "Language": "GERMAN",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "word.0" } } },
-    "$(MOD)/Assets/WordsEN.json": { "Language": "ENGLISH", "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "word.0" } } },
-    "$(MOD)/Assets/WordsFR.json": { "Language": "FRENCH",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "word.0" } } },
+    "Assets/WordsDE.json": { "Language": "GERMAN",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "word.0" } } },
+    "Assets/WordsEN.json": { "Language": "ENGLISH", "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "word.0" } } },
+    "Assets/WordsFR.json": { "Language": "FRENCH",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "word.0" } } },
 
-    "$(MOD)/Assets/Automap/1": { "Loader": "png8", "Container": "dir", "Pattern": "{id}_{frame:000}_p{pal}_{name}.png", "Max": 1, "Map": { "1": { "Id": "autotile.1" } } },
-    "$(MOD)/Assets/Automap/2": { "Loader": "png8", "Container": "dir", "Pattern": "{id}_{frame:000}_p{pal}_{name}.png", "Max": 2, "Map": { "2": { "Id": "autotile.2" } } },
-    "$(MOD)/Assets/Automap":   { "Loader": "automap", "Container": "dir", "Pattern": "{id}_{frame}_{name}.dat", "Map": { "100": { "Id": "automap.100" } } },
-    "$(MOD)/Assets/Fonts": {
+    "Assets/Automap/1": { "Loader": "png8", "Container": "dir", "Pattern": "{id}_{frame:000}_p{pal}_{name}.png", "Max": 1, "Map": { "1": { "Id": "autotile.1" } } },
+    "Assets/Automap/2": { "Loader": "png8", "Container": "dir", "Pattern": "{id}_{frame:000}_p{pal}_{name}.png", "Max": 2, "Map": { "2": { "Id": "autotile.2" } } },
+    "Assets/Automap":   { "Loader": "automap", "Container": "dir", "Pattern": "{id}_{frame}_{name}.dat", "Map": { "100": { "Id": "automap.100" } } },
+    "Assets/Fonts": {
       "Loader": "pngfont",
       "Container": "dir",
       "Pattern": "{id}_{name}.png",
@@ -108,7 +108,7 @@
         "Mapping": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\"?!/()#%*&+-=><☺♂♀éâàçêëèïîìôòûùáíóú"
       } }
     },
-    "$(MOD)/Assets/Items.png": {
+    "Assets/Items.png": {
       "Loader": "pngsheet",
       "Container": "raw",
       "Pattern": "{id}_{name}.png",
@@ -117,31 +117,31 @@
       "Map": { "0": { "Id": "itemgfx.1"  } }
     },
 
-    "$(MOD)/Assets/Tilesets/1":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  1, "Pattern": "{id}_{frame}.png", "Max":  1, "Map": {  "1": { "Id": "tilegfx.1"  } } },
-    "$(MOD)/Assets/Tilesets/2":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  2, "Pattern": "{id}_{frame}.png", "Max":  2, "Map": {  "2": { "Id": "tilegfx.2"  } } },
-    "$(MOD)/Assets/Tilesets/3":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  6, "Pattern": "{id}_{frame}.png", "Max":  3, "Map": {  "3": { "Id": "tilegfx.3"  } } },
-    "$(MOD)/Assets/Tilesets/4":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  4, "Pattern": "{id}_{frame}.png", "Max":  4, "Map": {  "4": { "Id": "tilegfx.4"  } } },
-    "$(MOD)/Assets/Tilesets/5":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  5, "Pattern": "{id}_{frame}.png", "Max":  5, "Map": {  "5": { "Id": "tilegfx.5"  } } },
-    "$(MOD)/Assets/Tilesets/6":  { "Loader": "pngtile8", "Container": "dir", "PaletteId": 16, "Pattern": "{id}_{frame}.png", "Max":  6, "Map": {  "6": { "Id": "tilegfx.6"  } } },
-    "$(MOD)/Assets/Tilesets/7":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  9, "Pattern": "{id}_{frame}.png", "Max":  7, "Map": {  "7": { "Id": "tilegfx.7"  } } },
-    "$(MOD)/Assets/Tilesets/8":  { "Loader": "pngtile8", "Container": "dir", "PaletteId": 26, "Pattern": "{id}_{frame}.png", "Max":  8, "Map": {  "8": { "Id": "tilegfx.8"  } } },
-    "$(MOD)/Assets/Tilesets/9":  { "Loader": "pngtile8", "Container": "dir", "PaletteId": 28, "Pattern": "{id}_{frame}.png", "Max":  9, "Map": {  "9": { "Id": "tilegfx.9"  } } },
-    "$(MOD)/Assets/Tilesets/10": { "Loader": "pngtile8", "Container": "dir", "PaletteId": 45, "Pattern": "{id}_{frame}.png", "Max": 10, "Map": { "10": { "Id": "tilegfx.10" } } },
-    "$(MOD)/Assets/Tilesets/11": { "Loader": "pngtile8", "Container": "dir", "PaletteId": 56, "Pattern": "{id}_{frame}.png", "Max": 11, "Map": { "11": { "Id": "tilegfx.11" } } },
+    "Assets/Tilesets/1":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  1, "Pattern": "{id}_{frame}.png", "Max":  1, "Map": {  "1": { "Id": "tilegfx.1"  } } },
+    "Assets/Tilesets/2":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  2, "Pattern": "{id}_{frame}.png", "Max":  2, "Map": {  "2": { "Id": "tilegfx.2"  } } },
+    "Assets/Tilesets/3":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  6, "Pattern": "{id}_{frame}.png", "Max":  3, "Map": {  "3": { "Id": "tilegfx.3"  } } },
+    "Assets/Tilesets/4":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  4, "Pattern": "{id}_{frame}.png", "Max":  4, "Map": {  "4": { "Id": "tilegfx.4"  } } },
+    "Assets/Tilesets/5":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  5, "Pattern": "{id}_{frame}.png", "Max":  5, "Map": {  "5": { "Id": "tilegfx.5"  } } },
+    "Assets/Tilesets/6":  { "Loader": "pngtile8", "Container": "dir", "PaletteId": 16, "Pattern": "{id}_{frame}.png", "Max":  6, "Map": {  "6": { "Id": "tilegfx.6"  } } },
+    "Assets/Tilesets/7":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  9, "Pattern": "{id}_{frame}.png", "Max":  7, "Map": {  "7": { "Id": "tilegfx.7"  } } },
+    "Assets/Tilesets/8":  { "Loader": "pngtile8", "Container": "dir", "PaletteId": 26, "Pattern": "{id}_{frame}.png", "Max":  8, "Map": {  "8": { "Id": "tilegfx.8"  } } },
+    "Assets/Tilesets/9":  { "Loader": "pngtile8", "Container": "dir", "PaletteId": 28, "Pattern": "{id}_{frame}.png", "Max":  9, "Map": {  "9": { "Id": "tilegfx.9"  } } },
+    "Assets/Tilesets/10": { "Loader": "pngtile8", "Container": "dir", "PaletteId": 45, "Pattern": "{id}_{frame}.png", "Max": 10, "Map": { "10": { "Id": "tilegfx.10" } } },
+    "Assets/Tilesets/11": { "Loader": "pngtile8", "Container": "dir", "PaletteId": 56, "Pattern": "{id}_{frame}.png", "Max": 11, "Map": { "11": { "Id": "tilegfx.11" } } },
 
-    "$(MOD)/Assets/Tilesets/1/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  1, "Map": {  "1": { "Id": "block.1" } } },
-    "$(MOD)/Assets/Tilesets/2/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  2, "Map": {  "2": { "Id": "block.2" } } },
-    "$(MOD)/Assets/Tilesets/3/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  3, "Map": {  "3": { "Id": "block.3" } } },
-    "$(MOD)/Assets/Tilesets/4/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  4, "Map": {  "4": { "Id": "block.4" } } },
-    "$(MOD)/Assets/Tilesets/5/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  5, "Map": {  "5": { "Id": "block.5" } } },
-    "$(MOD)/Assets/Tilesets/6/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  6, "Map": {  "6": { "Id": "block.6" } } },
-    "$(MOD)/Assets/Tilesets/7/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  7, "Map": {  "7": { "Id": "block.7" } } },
-    "$(MOD)/Assets/Tilesets/8/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  8, "Map": {  "8": { "Id": "block.8" } } },
-    "$(MOD)/Assets/Tilesets/9/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  9, "Map": {  "9": { "Id": "block.9" } } },
-    "$(MOD)/Assets/Tilesets/10/Stamps": { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max": 10, "Map": { "10": { "Id": "block.10" } } },
-    "$(MOD)/Assets/Tilesets/11/Stamps": { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max": 11, "Map": { "11": { "Id": "block.11" } } },
+    "Assets/Tilesets/1/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  1, "Map": {  "1": { "Id": "block.1" } } },
+    "Assets/Tilesets/2/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  2, "Map": {  "2": { "Id": "block.2" } } },
+    "Assets/Tilesets/3/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  3, "Map": {  "3": { "Id": "block.3" } } },
+    "Assets/Tilesets/4/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  4, "Map": {  "4": { "Id": "block.4" } } },
+    "Assets/Tilesets/5/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  5, "Map": {  "5": { "Id": "block.5" } } },
+    "Assets/Tilesets/6/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  6, "Map": {  "6": { "Id": "block.6" } } },
+    "Assets/Tilesets/7/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  7, "Map": {  "7": { "Id": "block.7" } } },
+    "Assets/Tilesets/8/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  8, "Map": {  "8": { "Id": "block.8" } } },
+    "Assets/Tilesets/9/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  9, "Map": {  "9": { "Id": "block.9" } } },
+    "Assets/Tilesets/10/Stamps": { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max": 10, "Map": { "10": { "Id": "block.10" } } },
+    "Assets/Tilesets/11/Stamps": { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max": 11, "Map": { "11": { "Id": "block.11" } } },
 
-    "$(MOD)/Assets/3dTilesets": {
+    "Assets/3dTilesets": {
       // "Loader": "jsonLab",
       "Loader": "tiledLabyrinth",
       "Container": "dir",
@@ -164,7 +164,7 @@
       "Map": { "1": { "Id": "lab.1" } }
     },
 
-    "$(MOD)/Assets/Tilesets": {
+    "Assets/Tilesets": {
       "Loader": "tiledTileset", // "jsonTileset"
       "Container": "dir",
       "Pattern": "{id}_{name}.tsx", // "{id}_{name}.json",
@@ -172,22 +172,22 @@
       "BlankTilePath": "../../Blank.png",
       "Map": { "1": { "Id": "tiledata.1" } }
     },
-    "$(MOD)/Assets/Tilesets/LargeNPCs.tsx": {
+    "Assets/Tilesets/LargeNPCs.tsx": {
       "Loader": "tiledNpcTileset",
       "Container": "raw",
       "IsSmall": false,
-      "GraphicsPattern": "$(MOD)/Assets/Tilesets/LargeNPCs/{id}.png",
+      "GraphicsPattern": "Assets/Tilesets/LargeNPCs/{id}.png",
       "Map": { "0": { "Id": "special.DummyObject" } }
     },
-    "$(MOD)/Assets/Tilesets/SmallNPCs.tsx": {
+    "Assets/Tilesets/SmallNPCs.tsx": {
       "Loader": "tiledNpcTileset",
       "Container": "raw",
       "IsSmall": true,
-      "GraphicsPattern": "$(MOD)/Assets/Tilesets/SmallNPCs/{id}.png",
+      "GraphicsPattern": "Assets/Tilesets/SmallNPCs/{id}.png",
       "Map": { "0": { "Id": "special.DummyObject" } }
     },
 
-    "$(MOD)/Assets/Maps": {
+    "Assets/Maps": {
       "Loader": "tiledMap",
       "Container": "dir",
       "Pattern": "{id}_{name}.tmx",

@@ -168,6 +168,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Meta", "Meta", "{A4FBE98A-3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{45789AD1-F501-469F-B410-D71AE73EE3EC}"
 	ProjectSection(SolutionItems) = preProject
+		mods\Shaders\Shaders\BlendedSpriteSF.frag = mods\Shaders\Shaders\BlendedSpriteSF.frag
+		mods\Shaders\Shaders\BlendedSpriteSF.h.frag = mods\Shaders\Shaders\BlendedSpriteSF.h.frag
+		mods\Shaders\Shaders\BlendedSpriteSV.h.vert = mods\Shaders\Shaders\BlendedSpriteSV.h.vert
+		mods\Shaders\Shaders\BlendedSpriteSV.vert = mods\Shaders\Shaders\BlendedSpriteSV.vert
 		mods\Shaders\Shaders\CommonResources.glsl = mods\Shaders\Shaders\CommonResources.glsl
 		mods\Shaders\Shaders\CylindricalSpriteSF.frag = mods\Shaders\Shaders\CylindricalSpriteSF.frag
 		mods\Shaders\Shaders\CylindricalSpriteSV.vert = mods\Shaders\Shaders\CylindricalSpriteSV.vert

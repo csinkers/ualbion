@@ -20,7 +20,7 @@ public class SoundBankLoader : Component, IAssetLoader
         return ms.ToArray();
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         var oplFile = GlobalTimbreLibrary.Serdes(null, s);
         WoplFile wopl = new WoplFile(oplFile);

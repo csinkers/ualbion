@@ -22,7 +22,6 @@ public class AssetConversionTests
     const string UnpackedAssetMod = "Unpacked";
     const string RepackedAssetMod = "Repacked";
 
-    static readonly DummyAssetManager DummyAssets = new();
     static readonly IJsonUtil JsonUtil = new FormatJsonUtil();
     readonly string _baseDir;
     readonly IFileSystem _disk;
@@ -59,7 +58,8 @@ public class AssetConversionTests
             baseAsset = canonicalize(baseAsset);
 
         var mapping = AssetMapping.Global;
-        var context = new LoaderContext(DummyAssets, JsonUtil, mapping);
+        var stubDisk = new StubFileSystem();
+        var context = new SerdesContext(JsonUtil, mapping, stubDisk);
 
         var (baseBytes, baseNotes) = Asset.Save(baseAsset, serdes, context);
         var baseJson = Asset.SaveJson(baseAsset, JsonUtil);
@@ -499,9 +499,10 @@ public class AssetConversionTests
             Height = 16
         };
 
-        Test<ITileGraphics>(info.AssetId,
-            new[] { AssetId.From(Palette.Toronto2D), AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.TilesetGraphicsLoader.Serdes(x, info, s, c));
+        var palettes = AssetMapping.Global.EnumerateAssetsOfType(AssetType.Palette);
+        var prereqs = palettes.Append(AssetId.From(Palette.Toronto2D)).ToArray();
+
+        Test<ITileGraphics>(info.AssetId, prereqs, (x, s, c) => Loaders.TilesetGraphicsLoader.Serdes(x, info, s, c));
     }
 
     [Fact]

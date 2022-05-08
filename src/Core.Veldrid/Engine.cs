@@ -349,4 +349,11 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         _windowHolder?.Dispose();
         _fence.Dispose();
     }
+
+    public GraphicsDeviceFeatures GraphicsFeatures => _graphicsDevice.Features;
+    public PixelFormatProperties? GetPixelFormatProperties(PixelFormat format) =>
+        _graphicsDevice.GetPixelFormatSupport(format, TextureType.Texture2D, TextureUsage.Sampled,
+            out var properties)
+            ? properties
+            : null;
 }

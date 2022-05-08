@@ -6,10 +6,10 @@ namespace UAlbion.Formats.Parsers;
 
 public class SongLoader : IAssetLoader<byte[]>
 {
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((byte[])existing, info, s, context);
 
-    public byte[] Serdes(byte[] existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public byte[] Serdes(byte[] existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (s.IsReading())

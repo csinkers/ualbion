@@ -13,7 +13,7 @@ class Program
     const string RelativePath = @"data\Exported\ENGLISH\FLICS0.XLD";
     static void Main()
     {
-        var disk = new FileSystem();
+        var disk = new FileSystem(Directory.GetCurrentDirectory());
         var baseDir = ConfigUtil.FindBasePath(disk);
         if (baseDir == null)
             throw new InvalidOperationException("No base directory could be found.");

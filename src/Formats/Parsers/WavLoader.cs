@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Parsers;
 
 public class WavLoader : IAssetLoader<ISample>
 {
-    public ISample Serdes(ISample w, AssetInfo info, ISerializer s, LoaderContext context)
+    public ISample Serdes(ISample w, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (s.IsWriting() && w == null)
@@ -65,6 +65,6 @@ public class WavLoader : IAssetLoader<ISample>
         w.Samples = s.Bytes(nameof(w.Samples), w.Samples, sampleCount);
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((ISample) existing, info, s, context);
 }

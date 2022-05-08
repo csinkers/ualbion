@@ -9,5 +9,5 @@ public class SimpleTileGraphics : ITileGraphics
     readonly IReadOnlyTexture<byte> _texture;
     [JsonIgnore] public ITexture Texture => _texture;
     public SimpleTileGraphics(IReadOnlyTexture<byte> texture) => _texture = texture ?? throw new ArgumentNullException(nameof(texture));
-    public Region GetRegion(int imageNumber, int frame, int paletteFrame) => _texture.Regions[imageNumber + frame];
+    public Region GetRegion(int imageNumber, int paletteFrame) => _texture.Regions[imageNumber];
 }

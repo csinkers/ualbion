@@ -12,7 +12,7 @@ public class WaveLibWavLoader : IAssetLoader<WaveLib>
 {
     static readonly WavLoader WavLoader = new();
     static readonly Regex NameRegex = new(@"i(\d+)t(\d+)");
-    public WaveLib Serdes(WaveLib existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public WaveLib Serdes(WaveLib existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         return s.IsWriting() 
@@ -20,7 +20,7 @@ public class WaveLibWavLoader : IAssetLoader<WaveLib>
             : Read(s, context);
     }
 
-    static WaveLib Read(ISerializer s, LoaderContext context)
+    static WaveLib Read(ISerializer s, SerdesContext context)
     {
         var lib = new WaveLib();
         int i = 0;
@@ -65,7 +65,7 @@ public class WaveLibWavLoader : IAssetLoader<WaveLib>
         return lib;
     }
 
-    static WaveLib Write(WaveLib existing, AssetInfo info, ISerializer s, LoaderContext context)
+    static WaveLib Write(WaveLib existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (existing == null) throw new ArgumentNullException(nameof(existing));
 
@@ -84,6 +84,6 @@ public class WaveLibWavLoader : IAssetLoader<WaveLib>
         return existing;
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((WaveLib)existing, info, s, context);
 }

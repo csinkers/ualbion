@@ -128,7 +128,7 @@ static class Program
 
     static void Main(string[] args)
     {
-        var disk = new FileSystem();
+        var disk = new FileSystem(Directory.GetCurrentDirectory());
         var exchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "Base");
 
         var commands = ParseCommands(args.Skip(1)).ToList();

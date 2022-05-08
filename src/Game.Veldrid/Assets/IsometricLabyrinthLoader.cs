@@ -49,8 +49,9 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
 #pragma warning restore CA2000 // Dispose objects before losing scopes
     }
 
-    IEnumerable<(string, byte[])> Save(LabyrinthData labyrinth, AssetInfo info, LoaderContext context, IsometricMode mode, string pngPath, string tsxPath)
+    IEnumerable<(string, byte[])> Save(LabyrinthData labyrinth, AssetInfo info, SerdesContext context, IsometricMode mode, string pngPath, string tsxPath)
     {
+        var assets = Resolve<IAssetManager>();
         var tileWidth = info.Get(AssetProperty.TileWidth, DefaultWidth);
         var tileHeight = info.Get(AssetProperty.TileHeight, DefaultHeight);
         var baseHeight = info.Get(AssetProperty.BaseHeight, DefaultBaseHeight);
@@ -59,7 +60,7 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
         if (_engine == null)
             SetupEngine(tileWidth, tileHeight, baseHeight, tilesPerRow);
 
-        var frames = _builder.Build(labyrinth, info, mode, context.Assets);
+        var frames = _builder.Build(labyrinth, info, mode, assets);
 
         Image<Bgra32> image = _engine.RenderFrame(false, 0);
 
@@ -89,11 +90,11 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
         yield return (tsxPath, tsxBytes);
     }
 
-    byte[] SaveJson(LabyrinthData labyrinth, AssetInfo info, LoaderContext context) =>
+    byte[] SaveJson(LabyrinthData labyrinth, AssetInfo info, SerdesContext context) =>
         FormatUtil.SerializeToBytes(s =>
             _jsonLoader.Serdes(labyrinth, info, s, context));
 
-    public LabyrinthData Serdes(LabyrinthData existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public LabyrinthData Serdes(LabyrinthData existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
@@ -131,7 +132,7 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
         return existing;
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((LabyrinthData)existing, info, s, context);
 
     public void Dispose() => _engine?.Dispose();

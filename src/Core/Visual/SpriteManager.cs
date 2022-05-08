@@ -5,30 +5,31 @@ using UAlbion.Core.Events;
 
 namespace UAlbion.Core.Visual;
 
-public class SpriteManager : ServiceComponent<ISpriteManager>, ISpriteManager
+public class SpriteManager<TInstance> : ServiceComponent<ISpriteManager<TInstance>>, ISpriteManager<TInstance>
+    where TInstance : unmanaged
 {
     readonly object _syncRoot = new();
-    readonly Dictionary<SpriteKey, SpriteBatch> _sprites = new();
-    readonly List<SpriteBatch> _batches = new();
+    readonly Dictionary<SpriteKey, SpriteBatch<TInstance>> _sprites = new();
+    readonly List<SpriteBatch<TInstance>> _batches = new();
     float _lastCleanup;
     float _totalTime;
 
     public SpriteManager() => On<EngineUpdateEvent>(OnUpdate);
 
-    public SpriteLease Borrow(SpriteKey key, int length, object caller)
+    public SpriteLease<TInstance> Borrow(SpriteKey key, int count, object owner)
     {
-        if (length <= 0) throw new ArgumentOutOfRangeException(nameof(length));
+        if (count <= 0) throw new ArgumentOutOfRangeException(nameof(count));
         var factory = Resolve<ICoreFactory>();
         lock (_syncRoot)
         {
             if (!_sprites.TryGetValue(key, out var entry))
             {
-                entry = AttachChild(factory.CreateSpriteBatch(key));
+                entry = AttachChild(factory.CreateSpriteBatch<TInstance>(key));
                 _sprites[key] = entry;
                 _batches.Add(entry);
             }
 
-            return entry.Grow(length, caller);
+            return entry.Grow(count, owner);
         }
     }
 
@@ -42,7 +43,7 @@ public class SpriteManager : ServiceComponent<ISpriteManager>, ISpriteManager
 
         lock (_syncRoot)
         {
-            var spritesToRemove = new List<KeyValuePair<SpriteKey, SpriteBatch>>();
+            var spritesToRemove = new List<KeyValuePair<SpriteKey, SpriteBatch<TInstance>>>();
             foreach (var kvp in _sprites)
                 if (kvp.Value.ActiveInstances == 0)
                     spritesToRemove.Add(kvp);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -28,36 +29,48 @@ public class GeneralConfig : IGeneralConfig
         config.Paths["CONFIG"] = Path.Combine(GetConfigBaseDir(), ConfigSubdir);
         config.Paths["CACHE"] = Path.Combine(GetCacheBaseDir(), ConfigSubdir);
 
+        foreach (var kvp in config.Paths.ToList())
+            if (!Path.IsPathRooted(kvp.Value))
+                config.Paths[kvp.Key] = Path.Combine(baseDir, kvp.Value);
+
         return config;
     }
 
-    public string GetPath(string pathName) => Paths.TryGetValue(pathName, out var result) ? result : null;
-    public void SetPath(string pathName, string path) => Paths[pathName] = path;
+    public string ResolvePathAbsolute(string relative)
+    {
+        var path = ResolvePath(relative);
+        if (string.IsNullOrEmpty(path))
+            return null;
 
-    public string ResolvePath(string relative, IDictionary<string, string> extraPaths = null)
+        return !Path.IsPathRooted(path) 
+            ? Path.Combine(BasePath, path) 
+            : path;
+    }
+
+    public string GetPath(string pathName) => Paths.TryGetValue(pathName, out var result) ? result : null;
+
+    public string ResolvePath(string relative)
     {
         if (string.IsNullOrEmpty(relative))
             throw new ArgumentNullException(nameof(relative));
 
         if (relative.Contains("..", StringComparison.InvariantCulture))
-            throw new ArgumentOutOfRangeException($"Paths containing .. are not allowed ({relative})");
+            throw new ArgumentOutOfRangeException($"Paths containing .. are not allowed: {relative}");
 
-        if (relative.Contains(":", StringComparison.InvariantCulture) && !relative.StartsWith(BasePath, StringComparison.InvariantCulture))
-            throw new ArgumentOutOfRangeException($"Paths containing : are not allowed ({relative})");
+        if (Path.IsPathRooted(relative) && !relative.StartsWith(BasePath, StringComparison.InvariantCulture))
+            throw new ArgumentOutOfRangeException($"Rooted paths outside outside the base relative UAlbion path ({BasePath}) are not allowed: {relative}");
 
         var resolved = Pattern.Replace(relative, x =>
         {
             var name = x.Groups[0].Value[2..].TrimEnd(')').ToUpperInvariant();
-            if (extraPaths != null && extraPaths.TryGetValue(name, out var value))
-                return value;
 
-            if (Paths.TryGetValue(name, out value))
+            if (Paths.TryGetValue(name, out var value))
                 return value;
 
             throw new InvalidOperationException($"Could not find path substitution for {name} in path {relative}");
         });
 
-        return Path.Combine(BasePath, resolved);
+        return resolved;
     }
 
     static string GetConfigBaseDir()

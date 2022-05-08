@@ -126,7 +126,7 @@ static class Program
         }
 
         var exchange = new EventExchange();
-        var assets = new DummyAssetManager();
+        var assets = new StubAssetManager();
         exchange.Register<IAssetManager>(assets);
 
         if (options.Loader is IComponent loaderComponent)
@@ -135,20 +135,21 @@ static class Program
         if (options.Saver is IComponent saverComponent)
             exchange.Attach(saverComponent);
 
-        var disk = new FileSystem();
+        var disk = new FileSystem(Directory.GetCurrentDirectory());
         var jsonUtil = new FormatJsonUtil();
+        var context = new SerdesContext(jsonUtil, AssetMapping.Global, disk);
+
         var container = options.SubItem.HasValue ? (IAssetContainer)new XldContainer() : new RawContainer();
         if (options.SubItem.HasValue)
             options.Info.Index = options.SubItem.Value;
 
-        using var inputSerializer = container.Read(options.InputPath, options.Info, disk, jsonUtil);
+        using var inputSerializer = container.Read(options.InputPath, options.Info, context);
         if (inputSerializer == null)
         {
             Console.WriteLine($"Could not extract sub-asset {options.SubItem} from {options.InputPath}");
             return;
         }
 
-        var context = new LoaderContext(assets, jsonUtil, AssetMapping.Global);
         var asset = options.Loader.Serdes(null, options.Info, inputSerializer, context);
         File.WriteAllBytes(options.OutputPath, FormatUtil.SerializeToBytes(s => options.Saver.Serdes(asset, options.Info, s, context)));
     }

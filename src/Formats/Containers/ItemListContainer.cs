@@ -14,25 +14,25 @@ namespace UAlbion.Formats.Containers;
 /// </summary>
 public class ItemListContainer : IAssetContainer
 {
-    public ISerializer Read(string file, AssetInfo info, IFileSystem disk, IJsonUtil jsonUtil)
+    public ISerializer Read(string file, AssetInfo info, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
-        var stream = disk.OpenRead(file);
+        if (context == null) throw new ArgumentNullException(nameof(context));
+        var stream = context.Disk.OpenRead(file);
         var br = new BinaryReader(stream);
         stream.Position = info.Index * ItemData.SizeOnDisk;
         return new AlbionReader(br, ItemData.SizeOnDisk);
     }
 
-    public void Write(string path, IList<(AssetInfo, byte[])> assets, IFileSystem disk, IJsonUtil jsonUtil)
+    public void Write(string path, IList<(AssetInfo, byte[])> assets, SerdesContext context)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
         var dir = Path.GetDirectoryName(path);
-        if (!disk.DirectoryExists(dir))
-            disk.CreateDirectory(dir);
+        if (!context.Disk.DirectoryExists(dir))
+            context.Disk.CreateDirectory(dir);
 
-        using var fs = disk.OpenWriteTruncate(path);
+        using var fs = context.Disk.OpenWriteTruncate(path);
         using var bw = new BinaryWriter(fs);
         foreach (var (info, bytes) in assets.OrderBy(x => x.Item1.Index))
         {
@@ -42,13 +42,13 @@ public class ItemListContainer : IAssetContainer
         }
     }
 
-    public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, IFileSystem disk, IJsonUtil jsonUtil)
+    public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, SerdesContext context)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
-        if (!disk.FileExists(path))
+        if (context == null) throw new ArgumentNullException(nameof(context));
+        if (!context.Disk.FileExists(path))
             return new List<(int, int)>();
 
-        using var f = disk.OpenRead(path);
+        using var f = context.Disk.OpenRead(path);
         return new List<(int, int)> { (0, (int)f.Length / ItemData.SizeOnDisk) };
     }
 }

@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Exporters.Tiled;
 
 public class StampLoader : IAssetLoader<BlockList>
 {
-    public BlockList Serdes(BlockList existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public BlockList Serdes(BlockList existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
@@ -57,7 +57,7 @@ public class StampLoader : IAssetLoader<BlockList>
         return list;
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((BlockList) existing, info, s, context);
 
     /* .stamp file

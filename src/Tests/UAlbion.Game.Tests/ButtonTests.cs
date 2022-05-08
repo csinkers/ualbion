@@ -53,7 +53,7 @@ public class ButtonTests : Component
             .Register<IGameConfigProvider>(configProvider)
             .Attach(modApplier)
             .Attach(new AssetManager())
-            .Attach(new SpriteManager())
+            .Attach(new SpriteManager<SpriteInfo>())
             .Attach(new WindowManager { Resolution = (1920, 1080) })
             .Attach(new MockGameFactory())
             .Attach(new TextManager())

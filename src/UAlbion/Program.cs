@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
@@ -8,6 +9,7 @@ using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Etm;
 using UAlbion.Core.Veldrid.Skybox;
 using UAlbion.Core.Veldrid.Sprites;
+using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
@@ -37,7 +39,7 @@ static class Program
             return;
 
         PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
-        var disk = new FileSystem();
+        var disk = new FileSystem(Directory.GetCurrentDirectory());
         var jsonUtil = new FormatJsonUtil();
 
         var baseDir = ConfigUtil.FindBasePath(disk);
@@ -157,7 +159,8 @@ static class Program
         var framebuffer = new MainFramebuffer();
         var renderPass = new RenderPass("Main Pass", framebuffer);
         renderPass // TODO: Populate from json so mods can add new render methods
-            .AddRenderer(new SpriteRenderer(framebuffer), typeof(VeldridSpriteBatch))
+            .AddRenderer(new SpriteRenderer(framebuffer), typeof(VeldridSpriteBatch<SpriteInfo, GpuSpriteInstanceData>))
+            .AddRenderer(new BlendedSpriteRenderer(framebuffer), typeof(VeldridSpriteBatch<BlendedSpriteInfo, GpuBlendedSpriteInstanceData>))
             .AddRenderer(new EtmRenderer(framebuffer), typeof(EtmWindow))
             .AddRenderer(new SkyboxRenderer(framebuffer), typeof(SkyboxRenderable))
             .AddRenderer(new DebugGuiRenderer(framebuffer), typeof(DebugGuiRenderable))

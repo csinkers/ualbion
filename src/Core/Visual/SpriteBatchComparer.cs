@@ -2,10 +2,11 @@
 
 namespace UAlbion.Core.Visual;
 
-public class SpriteBatchComparer : IComparer<SpriteBatch>
+public class SpriteBatchComparer<TInstance> : IComparer<SpriteBatch<TInstance>>
+    where TInstance : unmanaged
 {
-    public static SpriteBatchComparer Instance { get; } = new();
-    public int Compare(SpriteBatch x, SpriteBatch y)
+    public static SpriteBatchComparer<TInstance> Instance { get; } = new();
+    public int Compare(SpriteBatch<TInstance> x, SpriteBatch<TInstance> y)
     {
         if (ReferenceEquals(x, y)) return 0;
         if (ReferenceEquals(null, y)) return 1;

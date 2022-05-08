@@ -23,6 +23,10 @@ public static class AssetProperty
     // Tileset gfx
     public const string UseSmallGraphics = "UseSmallGraphics"; // bool
 
+    // 32-bit tileset gfx
+    public const string DayPath = "DayPath"; // string
+    public const string NightPath = "NightPath"; // string
+
     // 2D Tilesets
     public const string BlankTilePath   = "BlankTilePath"; // string
     public const string GraphicsPattern = "GraphicsPattern"; // string

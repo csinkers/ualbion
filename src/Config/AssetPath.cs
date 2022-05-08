@@ -7,15 +7,17 @@ public readonly struct AssetPath : IEquatable<AssetPath>
     public int Index { get; }
     public int SubAsset { get; }
     public int? PaletteId { get; }
+    public int? PaletteFrame { get; }
     public string Name { get; }
 
     public override string ToString() => $"{Index}:{SubAsset}{(PaletteId==null ? "" : " P"+PaletteId)} {Name}";
-    public AssetPath(int index, int subAsset = 0, int? paletteId = null, string overrideName = null)
+    public AssetPath(int index, int subAsset = 0, int? paletteId = null, string overrideName = null, int? paletteFrame = null)
     {
         Index = index;
         SubAsset = subAsset;
         PaletteId = paletteId;
         Name = overrideName;
+        PaletteFrame = paletteFrame;
     }
 
     public AssetPath(AssetInfo info, int subAsset = 0, string overrideName = null)
@@ -27,6 +29,8 @@ public readonly struct AssetPath : IEquatable<AssetPath>
         PaletteId = info.Get(AssetProperty.PaletteId, -1);
         if (PaletteId == -1)
             PaletteId = null;
+
+        PaletteFrame = null;
     }
 
     public override bool Equals(object obj) => obj is AssetPath other && Equals(other);

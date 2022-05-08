@@ -5,6 +5,9 @@ namespace UAlbion.Api;
 
 public interface IFileSystem
 {
+    bool IsReadOnly { get; }
+    string CurrentDirectory { get; }
+    IFileSystem Duplicate(string currentDirectory);
     bool FileExists(string path);
     bool DirectoryExists(string path);
     IEnumerable<string> EnumerateDirectory(string path, string filter = null);
@@ -17,5 +20,4 @@ public interface IFileSystem
     IEnumerable<string> ReadAllLines(string path);
     byte[] ReadAllBytes(string path);
     void WriteAllBytes(string path, byte[] bytes);
-    string CurrentDirectory { get; set; }
 }

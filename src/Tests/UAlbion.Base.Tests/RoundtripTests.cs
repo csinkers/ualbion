@@ -21,7 +21,6 @@ namespace UAlbion.Base.Tests;
 
 public class RoundtripTests
 {
-    static readonly IAssetManager DummyAssets = new DummyAssetManager();
     static readonly IJsonUtil JsonUtil = new FormatJsonUtil();
     static readonly GeneralConfig GeneralConfig;
     static readonly AssetMapping Mapping;
@@ -84,7 +83,7 @@ public class RoundtripTests
             }
         }
 
-        var context = new LoaderContext(DummyAssets, JsonUtil, AssetMapping.Global);
+        var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
 
         var (asset, preTxt)      = Wrap(() => Asset.Load(bytes, serdes, context), ".pre.ex.txt");
         var (postBytes, postTxt) = Wrap(() => Asset.Save(asset, serdes, context), ".post.ex.txt");
@@ -114,7 +113,8 @@ public class RoundtripTests
     void RoundTripXld<T>(string testName, string file, int subId, Asset.SerdesFunc<T> serdes) where T : class
     {
         var info = new AssetInfo { Index = subId };
-        var bytes = Asset.BytesFromXld(GeneralConfig, file, info, Disk, JsonUtil);
+        var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
+        var bytes = Asset.BytesFromXld(GeneralConfig, file, info, context);
         RoundTrip(testName, bytes, serdes);
     }
 
@@ -128,7 +128,8 @@ public class RoundtripTests
     {
         var info = new AssetInfo { Index = subId };
         var loader = new ItemListContainer();
-        using var s = loader.Read(GeneralConfig.ResolvePath(file), info, Disk, JsonUtil);
+        var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
+        using var s = loader.Read(GeneralConfig.ResolvePath(file), info, context);
         var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
         RoundTrip(testName, bytes, serdes);
     }
@@ -137,7 +138,8 @@ public class RoundtripTests
     {
         var info = new AssetInfo { Index = subId };
         var loader = new SpellListContainer();
-        using var s = loader.Read(GeneralConfig.ResolvePath(file), info, Disk, JsonUtil);
+        var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
+        using var s = loader.Read(GeneralConfig.ResolvePath(file), info, context);
         var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
         RoundTrip(testName, bytes, serdes);
     }
@@ -386,20 +388,20 @@ public class RoundtripTests
             .Attach(modApplier)
             .Attach(new AssetManager());
 
-        var bytes = Asset.BytesFromXld(GeneralConfig, "$(XLD)/ICONDAT0.XLD", info, Disk, JsonUtil);
-        var loaderContext = new LoaderContext(DummyAssets, JsonUtil, AssetMapping.Global);
+        var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
+        var bytes = Asset.BytesFromXld(GeneralConfig, "$(XLD)/ICONDAT0.XLD", info, context);
 
-        TilesetData Serdes(TilesetData x, ISerializer s, LoaderContext context) => Loaders.TilesetLoader.Serdes(x, info, s, context);
-        var (asset, preTxt) = Asset.Load<TilesetData>(bytes, Serdes, loaderContext);
+        TilesetData Serdes(TilesetData x, ISerializer s, SerdesContext context) => Loaders.TilesetLoader.Serdes(x, info, s, context);
+        var (asset, preTxt) = Asset.Load<TilesetData>(bytes, Serdes, context);
 
         var loader = new TiledTilesetLoader();
         exchange.Attach(loader);
-        var (tiledBytes, tiledTxt) = Asset.Save(asset, (x, s, c) => loader.Serdes(x, info, s, c), loaderContext);
+        var (tiledBytes, tiledTxt) = Asset.Save(asset, (x, s, c) => loader.Serdes(x, info, s, c), context);
 
         var (fromTiled, _) = Asset.Load<TilesetData>(tiledBytes,
-            (x, s, c) => loader.Serdes(x, info, s, c), loaderContext);
+            (x, s, c) => loader.Serdes(x, info, s, c), context);
 
-        var (roundTripped, roundTripTxt) = Asset.Save(fromTiled, Serdes, loaderContext);
+        var (roundTripped, roundTripTxt) = Asset.Save(fromTiled, Serdes, context);
         Asset.Compare(ResultDir,
             nameof(TiledTilesetTest),
             bytes,
@@ -411,20 +413,20 @@ public class RoundtripTests
     public void TiledStampTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(BlockList.Toronto), Index = 7 };
-        var bytes = Asset.BytesFromXld(GeneralConfig, "$(XLD)/BLKLIST0.XLD", info, Disk, JsonUtil);
-        var loaderContext = new LoaderContext(DummyAssets, JsonUtil, AssetMapping.Global);
+        var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
+        var bytes = Asset.BytesFromXld(GeneralConfig, "$(XLD)/BLKLIST0.XLD", info, context);
 
-        Formats.Assets.BlockList Serdes(Formats.Assets.BlockList x, ISerializer s, LoaderContext context) => Loaders.BlockListLoader.Serdes(x, info, s, context);
-        var (asset, preTxt) = Asset.Load<Formats.Assets.BlockList>(bytes, Serdes, loaderContext);
+        Formats.Assets.BlockList Serdes(Formats.Assets.BlockList x, ISerializer s, SerdesContext c2) => Loaders.BlockListLoader.Serdes(x, info, s, c2);
+        var (asset, preTxt) = Asset.Load<Formats.Assets.BlockList>(bytes, Serdes, context);
 
-        var loader = new Formats.Exporters.Tiled.StampLoader();
-        var (tiledBytes, tiledTxt) = Asset.Save(asset, (x, s, c) => loader.Serdes(x, info, s, c), loaderContext);
+        var loader = new StampLoader();
+        var (tiledBytes, tiledTxt) = Asset.Save(asset, (x, s, c) => loader.Serdes(x, info, s, c), context);
 
         var (fromTiled, _) = Asset.Load<Formats.Assets.BlockList>(tiledBytes,
             (x, s, c) => loader.Serdes(x, info, s, c),
-            loaderContext);
+            context);
 
-        var (roundTripped, roundTripTxt) = Asset.Save(fromTiled, Serdes, loaderContext);
+        var (roundTripped, roundTripTxt) = Asset.Save(fromTiled, Serdes, context);
         Asset.Compare(ResultDir,
             nameof(TiledStampTest),
             bytes,

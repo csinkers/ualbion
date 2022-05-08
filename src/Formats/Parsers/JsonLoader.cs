@@ -7,7 +7,7 @@ namespace UAlbion.Formats.Parsers;
 
 public class JsonLoader<T> : IAssetLoader<T> where T : class
 {
-    public T Serdes(T existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public T Serdes(T existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (context == null) throw new ArgumentNullException(nameof(context));
@@ -28,6 +28,6 @@ public class JsonLoader<T> : IAssetLoader<T> where T : class
         }
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((T)existing, info, s, context);
 }

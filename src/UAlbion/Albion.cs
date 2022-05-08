@@ -70,7 +70,8 @@ static class Albion
         {
             new SkyboxManager(),
             new EtmManager(),
-            new SpriteManager(),
+            new SpriteManager<SpriteInfo>(),
+            new SpriteManager<BlendedSpriteInfo>(),
             DebugGuiRenderable.Instance
         };
 

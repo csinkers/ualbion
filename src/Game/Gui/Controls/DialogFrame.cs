@@ -126,7 +126,7 @@ public class DialogFrame : UiElement
         var key = new SpriteKey(multi, SpriteSampler.Point, order, SpriteKeyFlags.NoTransform);
         _sprite?.Dispose();
 
-        var sm = Resolve<ISpriteManager>();
+        var sm = Resolve<ISpriteManager<SpriteInfo>>();
         var lease = sm.Borrow(key, 3, this);
         var flags = SpriteFlags.None.SetOpacity(0.5f);
         var shadowSubImage = new Region(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
@@ -144,9 +144,9 @@ public class DialogFrame : UiElement
         var instances = lease.Lock(ref lockWasTaken);
         try
         {
-            instances[0] = new SpriteInstanceData(bottomShadowPosition, bottomShadowSize, shadowSubImage, SpriteFlags.TopLeft | flags);
-            instances[1] = new SpriteInstanceData(sideShadowPosition, sideShadowSize, shadowSubImage, SpriteFlags.TopLeft | flags);
-            instances[2] = new SpriteInstanceData(Vector3.Zero, normalisedSize, subImage, SpriteFlags.TopLeft);
+            instances[0] = new SpriteInfo(SpriteFlags.TopLeft | flags, bottomShadowPosition, bottomShadowSize, shadowSubImage);
+            instances[1] = new SpriteInfo(SpriteFlags.TopLeft | flags, sideShadowPosition, sideShadowSize, shadowSubImage);
+            instances[2] = new SpriteInfo(SpriteFlags.TopLeft, Vector3.Zero, normalisedSize, subImage);
         }
         finally { lease.Unlock(lockWasTaken); }
 

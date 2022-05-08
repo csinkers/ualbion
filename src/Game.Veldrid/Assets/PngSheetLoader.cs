@@ -54,16 +54,15 @@ public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>> //
         return true;
     }
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
+        var assets = Resolve<IAssetManager>();
         var paletteId = info.Get(AssetProperty.PaletteId, 0);
-        var palette = context.Assets
-            .LoadPalette(new PaletteId(AssetType.Palette, paletteId))
-            .GetUnambiguousPalette();
+        var palette = assets.LoadPalette(new PaletteId(AssetType.Palette, paletteId)).GetUnambiguousPalette();
 
         if (info.AssetId.Type == AssetType.Font)
         {
@@ -95,6 +94,6 @@ public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>> //
         }
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((IReadOnlyTexture<byte>)existing, info, s, context);
 }

@@ -23,14 +23,13 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
         base.Subscribed();
     }
 
-    public object LoadAsset(AssetInfo info, LoaderContext context, IDictionary<string, string> extraPaths, TextWriter annotationWriter = null)
+    public object LoadAsset(AssetInfo info, SerdesContext context, TextWriter annotationWriter = null)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
-        if (extraPaths == null) throw new ArgumentNullException(nameof(extraPaths));
         var generalConfig = Resolve<IGeneralConfig>();
 
-        using ISerializer s = Search(generalConfig, info, extraPaths, annotationWriter);
+        using ISerializer s = Search(generalConfig, info, context, annotationWriter);
         if (s == null)
             return null;
 
@@ -44,28 +43,25 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
         return loader.Serdes(null, info, s, context);
     }
 
-    public List<(int,int)> GetSubItemRangesForFile(AssetFileInfo info, IDictionary<string, string> extraPaths)
+    public List<(int,int)> GetSubItemRangesForFile(AssetFileInfo info, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
         var generalConfig = Resolve<IGeneralConfig>();
-        var disk = Resolve<IFileSystem>();
-        var jsonUtil = Resolve<IJsonUtil>();
-        var resolved = generalConfig.ResolvePath(info.Filename, extraPaths);
-        var container = _containerRegistry.GetContainer(resolved, info.Container, disk);
-        return container?.GetSubItemRanges(resolved, info, disk, jsonUtil) ?? new List<(int, int)> { (0, 1) };
+        var resolved = generalConfig.ResolvePath(info.Filename);
+        var container = _containerRegistry.GetContainer(resolved, info.Container, context.Disk);
+        return container?.GetSubItemRanges(resolved, info, context) ?? new List<(int, int)> { (0, 1) };
     }
 
-    ISerializer Search(IGeneralConfig generalConfig, AssetInfo info, IDictionary<string, string> extraPaths, TextWriter annotationWriter = null)
+    ISerializer Search(IGeneralConfig generalConfig, AssetInfo info, SerdesContext context, TextWriter annotationWriter = null)
     {
-        var path = generalConfig.ResolvePath(info.File.Filename, extraPaths);
-        var disk = Resolve<IFileSystem>();
-        var jsonUtil = Resolve<IJsonUtil>();
-        if (info.File.Sha256Hash != null && !info.File.Sha256Hash.Equals(GetHash(path, disk), StringComparison.OrdinalIgnoreCase))
+        var path = generalConfig.ResolvePath(info.File.Filename);
+        if (info.File.Sha256Hash != null && !info.File.Sha256Hash.Equals(GetHash(path, context.Disk), StringComparison.OrdinalIgnoreCase))
             return null;
 
-        var container = _containerRegistry.GetContainer(path, info.File.Container, disk);
-        var s = container?.Read(path, info, disk, jsonUtil);
+        var container = _containerRegistry.GetContainer(path, info.File.Container, context.Disk);
+        var s = container?.Read(path, info, context);
         if (annotationWriter != null)
             s = new AnnotationProxySerializer(s, annotationWriter, FormatUtil.BytesFrom850String);
         return s;

@@ -2,8 +2,6 @@
 
 namespace UAlbion.Api.Visual;
 
-public delegate ReadOnlyImageBuffer<T> GetFrameDelegate<T>(int frame);
-
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Never compared")]
 public readonly ref struct ReadOnlyImageBuffer<T>
 {

@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Parsers;
 
 public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
 {
-    public EventSet Serdes(EventSet existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public EventSet Serdes(EventSet existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
@@ -19,7 +19,8 @@ public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
         if (s.IsWriting())
         {
             if (existing == null) throw new ArgumentNullException(nameof(existing));
-            var script = Decompile(id, existing, context.Assets);
+            var assets = Resolve<IAssetManager>();
+            var script = Decompile(id, existing, assets);
             var bytes = Encoding.UTF8.GetBytes(script);
             s.Bytes(null, bytes, bytes.Length);
         }
@@ -43,6 +44,6 @@ public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
         return sb.ToString();
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((EventSet)existing, info, s, context);
 }

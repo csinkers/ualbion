@@ -51,7 +51,7 @@ public class PickSaveSlotMenu : ModalDialog
     {
         var generalConfig = Resolve<IGeneralConfig>();
         // TODO: This path currently exists in two places: here and Game\State\GameState.cs
-        return generalConfig.ResolvePath($"$(SAVE)/SAVE.{i:D3}", null);
+        return generalConfig.ResolvePath($"$(SAVE)/SAVE.{i:D3}");
     }
 
     protected override void Subscribed()

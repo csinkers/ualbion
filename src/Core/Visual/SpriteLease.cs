@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Numerics;
 using System.Runtime.CompilerServices;
-using UAlbion.Api.Visual;
 
 namespace UAlbion.Core.Visual;
 
-public sealed class SpriteLease : IComparable<SpriteLease>
+public class SpriteLease<TInstance> : IComparable<SpriteLease<TInstance>>
+    where TInstance : unmanaged
 {
-    readonly SpriteBatch _spriteBatch;
+    readonly SpriteBatch<TInstance> _spriteBatch;
     public SpriteKey Key => _spriteBatch.Key;
     public int Length => To - From;
     internal int From { get; set; } // [from..to)
@@ -16,16 +15,7 @@ public sealed class SpriteLease : IComparable<SpriteLease>
     internal object Owner { get; set; } // For debugging
     public override string ToString() => $"LEASE [{From}-{To}) {_spriteBatch} for {Owner}";
 
-    public void OffsetAll(Vector3 offset)
-    {
-        bool taken = false;
-        var span = Lock(ref taken);
-        for (int i = 0; i < span.Length; i++)
-            span[i].OffsetBy(offset);
-        Unlock(taken);
-    }
-
-    public SpriteInstanceData? GetInstance(int index)
+    public TInstance? GetInstance(int index)
     {
         if (index < 0 || index >= Length)
             return null;
@@ -37,30 +27,19 @@ public sealed class SpriteLease : IComparable<SpriteLease>
         return result;
     }
 
-    public void Update(int index, Vector3 position, Vector2 size, int regionIndex, SpriteFlags flags)
-        => Update(index, position, size, Key.Texture.Regions[regionIndex], flags);
-    public void Update(int index, Vector3 position, Vector2 size, Region region, SpriteFlags flags)
-    {
-        bool taken = false;
-        var span = Lock(ref taken);
-        span[index] = new SpriteInstanceData(position, size, region, flags);
-        Unlock(taken);
-    }
-
-    public void UpdateFlags(int index, SpriteFlags flags, SpriteFlags? mask = null)
-    {
-        SpriteFlags mask2 = mask ?? flags;
-        bool taken = false;
-        var span = Lock(ref taken);
-        span[index].Flags = (span[index].Flags & ~mask2) | (flags & mask2);
-        Unlock(taken);
-    }
-
     public void Dispose()
     {
         if (Disposed) return;
         _spriteBatch.Shrink(this);
         Disposed = true;
+    }
+
+    public void Update(int index, in TInstance instance)
+    {
+        bool taken = false;
+        var span = Lock(ref taken);
+        span[index] = instance;
+        Unlock(taken);
     }
 
     /* ==== Example of using Access: ==== *\
@@ -91,7 +70,7 @@ public sealed class SpriteLease : IComparable<SpriteLease>
     /// <typeparam name="T">The type of the context object</typeparam>
     /// <param name="instances">A span pointing at the lease's instance data</param>
     /// <param name="context">The context for the mutator function</param>
-    public delegate void LeaseAccessDelegate<in T>(Span<SpriteInstanceData> instances, T context);
+    public delegate void LeaseAccessDelegate<in T>(Span<TInstance> instances, T context);
 
     /// <summary>
     /// Invokes the mutator function with a span of the lease's instance
@@ -120,7 +99,7 @@ public sealed class SpriteLease : IComparable<SpriteLease>
     /// </summary>
     /// <param name="lockWasTaken"></param>
     /// <returns>A span containing the lease's instance data</returns>
-    public Span<SpriteInstanceData> Lock(ref bool lockWasTaken)
+    public Span<TInstance> Lock(ref bool lockWasTaken)
     {
         if (Disposed)
             throw new InvalidOperationException("SpriteLease used after return");
@@ -134,14 +113,14 @@ public sealed class SpriteLease : IComparable<SpriteLease>
     public void Unlock(bool lockWasTaken) => _spriteBatch.Unlock(this, lockWasTaken);
 
     // Should only be created by SpriteBatch
-    internal SpriteLease(SpriteBatch spriteBatch, int from, int to)
+    internal SpriteLease(SpriteBatch<TInstance> spriteBatch, int from, int to)
     {
         _spriteBatch = spriteBatch ?? throw new ArgumentNullException(nameof(spriteBatch));
         From = from;
         To = to;
     }
 
-    public int CompareTo(SpriteLease other)
+    public int CompareTo(SpriteLease<TInstance> other)
     {
         if (ReferenceEquals(this, other)) return 0;
         if (other is null) return 1;
@@ -150,12 +129,12 @@ public sealed class SpriteLease : IComparable<SpriteLease>
         return To.CompareTo(other.To);
     }
 
-    public override bool Equals(object obj) => obj is SpriteLease lease && Key == lease.Key && From == lease.From && To == lease.To;
+    public override bool Equals(object obj) => obj is SpriteLease<TInstance> lease && Key == lease.Key && From == lease.From && To == lease.To;
     public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
-    public static bool operator ==(SpriteLease left, SpriteLease right) => left?.Equals(right) ?? right is null;
-    public static bool operator !=(SpriteLease left, SpriteLease right) => !(left == right);
-    public static bool operator <(SpriteLease left, SpriteLease right) => left is null ? !(right is null) : left.CompareTo(right) < 0;
-    public static bool operator <=(SpriteLease left, SpriteLease right) => left is null || left.CompareTo(right) <= 0;
-    public static bool operator >(SpriteLease left, SpriteLease right) => !(left is null) && left.CompareTo(right) > 0;
-    public static bool operator >=(SpriteLease left, SpriteLease right) => left is null ? right is null : left.CompareTo(right) >= 0;
+    public static bool operator ==(SpriteLease<TInstance> left, SpriteLease<TInstance> right) => left?.Equals(right) ?? right is null;
+    public static bool operator !=(SpriteLease<TInstance> left, SpriteLease<TInstance> right) => !(left == right);
+    public static bool operator <(SpriteLease<TInstance> left, SpriteLease<TInstance> right) => left is null ? !(right is null) : left.CompareTo(right) < 0;
+    public static bool operator <=(SpriteLease<TInstance> left, SpriteLease<TInstance> right) => left is null || left.CompareTo(right) <= 0;
+    public static bool operator >(SpriteLease<TInstance> left, SpriteLease<TInstance> right) => !(left is null) && left.CompareTo(right) > 0;
+    public static bool operator >=(SpriteLease<TInstance> left, SpriteLease<TInstance> right) => left is null ? right is null : left.CompareTo(right) >= 0;
 }

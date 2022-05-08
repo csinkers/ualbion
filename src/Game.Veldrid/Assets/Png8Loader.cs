@@ -61,15 +61,16 @@ public class Png8Loader : Component, IAssetLoader<IReadOnlyTexture<byte>>
         return new SimpleTexture<byte>(id, id.ToString(), totalWidth, totalHeight, pixels, frames);
     }
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
+        var assets = Resolve<IAssetManager>();
         var paletteNum = info.Get(AssetProperty.PaletteId, 0);
         var paletteId = new PaletteId(AssetType.Palette, paletteNum);
-        var palette = context.Assets.LoadPalette(paletteId);
+        var palette = assets.LoadPalette(paletteId);
         if (palette == null)
             throw new InvalidOperationException($"Could not load palette {paletteId} ({paletteNum}) for asset {info.AssetId} in file {info.File.Filename}");
 
@@ -102,6 +103,6 @@ public class Png8Loader : Component, IAssetLoader<IReadOnlyTexture<byte>>
         finally { foreach (var image in images) image.Dispose(); }
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((IReadOnlyTexture<byte>)existing, info, s, context);
 }

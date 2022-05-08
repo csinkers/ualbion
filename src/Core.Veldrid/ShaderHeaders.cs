@@ -9,6 +9,8 @@ public static class ShaderHeaders
     {
         SpriteVertexShader.ShaderSource(),
         SpriteFragmentShader.ShaderSource(),
+        BlendedSpriteVertexShader.ShaderSource(),
+        BlendedSpriteFragmentShader.ShaderSource(),
         Etm.EtmVertexShader.ShaderSource(),
         Etm.EtmFragmentShader.ShaderSource(),
         FullscreenQuadVertexShader.ShaderSource(),

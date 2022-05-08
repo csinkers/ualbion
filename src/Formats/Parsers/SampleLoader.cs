@@ -11,10 +11,10 @@ public class SampleLoader : IAssetLoader<AlbionSample>
     const int Channels = 1;
     const int BytesPerSample = 1;
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((AlbionSample) existing, info, s, context);
 
-    public AlbionSample Serdes(AlbionSample existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public AlbionSample Serdes(AlbionSample existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (info == null) throw new ArgumentNullException(nameof(info));

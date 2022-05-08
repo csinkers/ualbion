@@ -7,7 +7,7 @@ namespace UAlbion.Formats.Parsers;
 
 public class InterlacedBitmapLoader : IAssetLoader<IReadOnlyTexture<uint>>
 {
-    public IReadOnlyTexture<uint> Serdes(IReadOnlyTexture<uint> existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public IReadOnlyTexture<uint> Serdes(IReadOnlyTexture<uint> existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (s.IsWriting()) // TODO: Implement writing if required. May require palette generation, which can get complicated.
             return existing;
@@ -16,7 +16,7 @@ public class InterlacedBitmapLoader : IAssetLoader<IReadOnlyTexture<uint>>
         return s.IsWriting() ? existing : ConvertIlbmToTexture(ilbm, info);
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, LoaderContext context)
+    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((IReadOnlyTexture<uint>)existing, info, s, context);
 
     static IReadOnlyTexture<uint> ConvertIlbmToTexture(InterlacedBitmap bitmap, AssetInfo info)

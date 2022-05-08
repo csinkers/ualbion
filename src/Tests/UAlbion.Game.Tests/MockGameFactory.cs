@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
@@ -28,13 +29,8 @@ public class MockGameFactory : Component, IGameFactory
         throw new NotImplementedException();
     }
 
-    public SpriteBatch CreateSpriteBatch(SpriteKey key)
-    {
-        return new MockSpriteBatch(key);
-    }
-
-    public IMapLayer CreateMapLayer(LogicalMap2D logicalMap, ITileGraphics tileset, bool isOverlay)
-    {
-        throw new NotImplementedException();
-    }
+    public SpriteBatch<TInstance> CreateSpriteBatch<TInstance>(SpriteKey key) where TInstance : unmanaged
+        => new MockSpriteBatch<TInstance>(key);
+    public IMapLayer CreateMapLayer(LogicalMap2D logicalMap, ITileGraphics tileset, Vector2 tileSize, bool isOverlay)
+        => throw new NotImplementedException();
 }

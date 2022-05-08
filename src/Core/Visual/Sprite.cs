@@ -14,7 +14,7 @@ public class Sprite : Component, IPositioned
     readonly Func<IAssetId, ITexture> _loaderFunc;
     readonly Action<RenderEvent> _dirtyAction;
 
-    SpriteLease _sprite;
+    SpriteLease<SpriteInfo> _sprite;
     Vector3 _position;
     Vector2? _size;
     int _frame;
@@ -160,13 +160,13 @@ public class Sprite : Component, IPositioned
             Frame = frame;
 
             var key = new SpriteKey(texture, SpriteSampler.Point, _layer, _keyFlags);
-            var sm = Resolve<ISpriteManager>();
+            var sm = Resolve<ISpriteManager<SpriteInfo>>();
             _sprite = sm.Borrow(key, 1, this);
         }
 
         var subImage = _sprite.Key.Texture.Regions[Frame];
         _size ??= subImage.Size;
-        _sprite.Update(0, _position, Size, subImage, _flags);
+        _sprite.Update(0, new SpriteInfo(_flags, _position, Size, subImage));
     }
 
     bool Select(WorldCoordinateSelectEvent e, Action<Selection> continuation)
@@ -177,9 +177,6 @@ public class Sprite : Component, IPositioned
         var hit = RayIntersect(e.Origin, e.Direction);
         if (!hit.HasValue)
             return false;
-
-        if ((Resolve<IEngineSettings>().Flags & EngineFlags.HighlightSelection) != 0)
-            _sprite.UpdateFlags(0, SpriteFlags.Highlight);
 
         bool delegated = false;
         if (SelectionCallback != null)

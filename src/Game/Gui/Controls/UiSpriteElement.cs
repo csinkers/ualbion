@@ -13,7 +13,7 @@ public class UiSpriteElement : UiElement
 {
     SpriteId _id;
     Vector2 _size;
-    SpriteLease _sprite;
+    SpriteLease<SpriteInfo> _sprite;
     Vector3 _lastPosition;
     Vector2 _lastSize;
     int _subId;
@@ -90,7 +90,7 @@ public class UiSpriteElement : UiElement
         var instances = _sprite.Lock(ref lockWasTaken);
         try
         {
-            instances[0] = new SpriteInstanceData(position, size, _sprite.Key.Texture.Regions[_subId], SpriteFlags.TopLeft | _flags);
+            instances[0] = new SpriteInfo(SpriteFlags.TopLeft | _flags, position, size, _sprite.Key.Texture.Regions[_subId]);
         }
         finally { _sprite.Unlock(lockWasTaken); }
 
@@ -103,7 +103,7 @@ public class UiSpriteElement : UiElement
             return;
 
         var assets = Resolve<IAssetManager>();
-        var sm = Resolve<ISpriteManager>();
+        var sm = Resolve<ISpriteManager<SpriteInfo>>();
 
         _sprite?.Dispose();
         _sprite = null;

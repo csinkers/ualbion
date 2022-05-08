@@ -13,7 +13,7 @@ public static class Program
     {
         AssetSystem.LoadEvents();
 
-        var disk = new FileSystem { CurrentDirectory = @"C:\Depot\bb\ualbion" };
+        var disk = new FileSystem(@"C:\Depot\bb\ualbion");
         var baseExchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "Base");
         var testExchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "UATestDev");
         var repackedExchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "Repacked");

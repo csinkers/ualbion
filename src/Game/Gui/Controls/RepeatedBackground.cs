@@ -26,7 +26,7 @@ public class RepeatedBackground : UiElement
     {
         var shadowSubImage = new Region(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
         var window = Resolve<IWindowManager>();
-        var sm = Resolve<ISpriteManager>();
+        var sm = Resolve<ISpriteManager<SpriteInfo>>();
 
         { // Check if we need to rebuild
             var normSize = window.UiToNormRelative(width, height);
@@ -60,8 +60,8 @@ public class RepeatedBackground : UiElement
         var instances = lease.Lock(ref lockWasTaken);
         try
         {
-            instances[0] = new SpriteInstanceData(shadowPosition, shadowSize, shadowSubImage, SpriteFlags.TopLeft | flags); // Drop shadow
-            instances[1] = new SpriteInstanceData(Vector3.Zero, normalisedSize, subImage, SpriteFlags.TopLeft); // DialogFrame
+            instances[0] = new SpriteInfo(SpriteFlags.TopLeft | flags, shadowPosition, shadowSize, shadowSubImage); // Drop shadow
+            instances[1] = new SpriteInfo(SpriteFlags.TopLeft, Vector3.Zero, normalisedSize, subImage); // DialogFrame
         }
         finally { lease.Unlock(lockWasTaken); }
 

@@ -272,7 +272,7 @@ public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManage
                 _music?.CycleBuffers();
             }
 
-            var camera = Resolve<ICamera>();
+            var camera = TryResolve<ICamera>();
             if (camera != null)
                 device.Listener.Position = camera.Position;
         }

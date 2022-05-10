@@ -61,6 +61,17 @@ public class SavedGame
                || _removedNpcs.GetFlag(mapId.Id * NpcCountPerMap + npcNumber);
     }
 
+    public void SetNpcDisabled(MapId mapId, int npcNumber, bool isDisabled)
+    {
+        if (mapId.IsNone)
+            mapId = MapId;
+
+        if (npcNumber is < 0 or >= NpcCountPerMap)
+            return;
+
+        _removedNpcs.SetFlag(mapId.Id * NpcCountPerMap + npcNumber, isDisabled);
+    }
+
     public bool IsChainDisabled(MapId mapId, int chainNumber)
     {
         if (mapId.IsNone)
@@ -70,6 +81,17 @@ public class SavedGame
         return chainNumber is < 0 or >= ChainCountPerMap
                || mapId.Id is < 0 or >= MapCount
                || _disabledChains.GetFlag(mapId.Id * ChainCountPerMap + chainNumber);
+    }
+
+    public void SetChainDisabled(MapId mapId, int chainNumber, bool isDisabled)
+    {
+        if (mapId.IsNone)
+            mapId = MapId;
+
+        if (chainNumber is < 0 or >= ChainCountPerMap)
+            return;
+
+        _disabledChains.SetFlag(mapId.Id * ChainCountPerMap + chainNumber, isDisabled);
     }
 
     public ushort Unk0 { get; set; }

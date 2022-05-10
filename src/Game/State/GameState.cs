@@ -71,9 +71,14 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         });
         On<ModifyHoursEvent>(_ => { });
         On<ActivateItemEvent>(ActivateItem);
-        On<EventChainOffEvent>(_ =>
+        On<EventChainOffEvent>(e =>
         {
-            // TODO
+            switch (e.Operation)
+            {
+                case SwitchOperation.Clear: _game.SetChainDisabled(e.Map, e.ChainNumber, false); break;
+                case SwitchOperation.Set: _game.SetChainDisabled(e.Map, e.ChainNumber, true); break;
+                case SwitchOperation.Toggle: _game.SetChainDisabled(e.Map, e.ChainNumber, !_game.IsChainDisabled(e.Map, e.ChainNumber)); break;
+            }
         });
 
         AttachChild(new InventoryManager(GetWriteableInventory));

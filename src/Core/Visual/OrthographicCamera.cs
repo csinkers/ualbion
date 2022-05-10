@@ -14,7 +14,7 @@ public class OrthographicCamera : ServiceComponent<ICamera>, ICamera
     Vector2 _viewport = Vector2.One;
     Matrix4x4 _viewMatrix;       
     Matrix4x4 _projectionMatrix; 
-    float _magnification = 1.0f; // TODO: Ensure this defaults to something sensible, and at some point lock it to a value that fits the gameplay and map design.
+    float _magnification = 2.0f; // TODO: Ensure this defaults to something sensible, and at some point lock it to a value that fits the gameplay and map design.
     float _yaw;
     float _pitch;
     float _farDistance = 1;

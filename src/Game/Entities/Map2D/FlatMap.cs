@@ -10,6 +10,7 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
 
@@ -65,7 +66,9 @@ public class FlatMap : Component, IMap
         _logicalMap.TileSize = renderable.TileSize;
 
         var movementSettings = new MovementSettings(!_logicalMap.UseSmallSprites, GetMoveConfig);
-        _partyMovement = AttachChild(new PartyCaterpillar(Vector2.Zero, Direction.East, movementSettings));
+        var initialPos = new Vector2(_logicalMap.Width / 2.0f, _logicalMap.Height / 2.0f);
+        _partyMovement = AttachChild(new PartyCaterpillar(initialPos, Direction.East, movementSettings));
+        Raise(new CameraJumpEvent((int)initialPos.X, (int)initialPos.Y));
 
         AttachChild(new NpcManager2D(_logicalMap));
         RebuildPartyMembers();

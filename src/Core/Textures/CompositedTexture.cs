@@ -37,9 +37,7 @@ public class CompositedTexture : IReadOnlyTexture<uint>
     public int Height { get { Rebuild(); return _height; } private set => _height = value; }
     public int ArrayLayers => Texture.ArrayLayers;
     public int SizeInBytes => Texture.SizeInBytes;
-    public TextureDirtyType DirtyType => Texture.DirtyType;
-    public int DirtyId => Texture.DirtyId;
-    public void Clean() => Texture.Clean();
+    public int Version => Texture.Version;
 
     public IReadOnlyList<Region> Regions => Texture.Regions;
     public ReadOnlySpan<uint> PixelData => Texture.PixelData;

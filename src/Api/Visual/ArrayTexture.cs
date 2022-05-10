@@ -68,12 +68,10 @@ public class ArrayTexture<T> : IMutableTexture<T> where T : unmanaged
     public int ArrayLayers { get; }
     [JsonIgnore] public int SizeInBytes => PixelData.Length * Unsafe.SizeOf<T>();
     public IReadOnlyList<Region> Regions => _regions;
-    [JsonIgnore] public TextureDirtyType DirtyType { get; private set; }
-    [JsonIgnore] public int DirtyId { get; private set; }
+    [JsonIgnore] public int Version { get; private set; }
     [JsonIgnore] public ReadOnlySpan<T> PixelData => _pixelData;
-    [JsonIgnore] public Span<T> MutablePixelData { get { DirtyType = TextureDirtyType.All; return _pixelData; } }
+    [JsonIgnore] public Span<T> MutablePixelData { get { Version++; return _pixelData; } }
 
-    public void Clean() => DirtyType = TextureDirtyType.None;
     public override string ToString() => $"ATexture {Id} {Width}x{Height} ({Regions.Count} sub-images)";
 
     public ReadOnlySpan<T> GetRowSpan(int frameNumber, int row)
@@ -109,13 +107,7 @@ public class ArrayTexture<T> : IMutableTexture<T> where T : unmanaged
         if (i >= Regions.Count)
             throw new ArgumentOutOfRangeException($"Tried to obtain a buffer for region {i}, but there are only {Regions.Count}");
 
-        (DirtyType, DirtyId) = (DirtyType, DirtyId) switch
-        {
-            (TextureDirtyType.None, _) => (TextureDirtyType.Region, i),
-            (TextureDirtyType.Region, var x) when x == i => (TextureDirtyType.Region, i),
-            _ => (TextureDirtyType.All, 0),
-        };
-
+        Version++;
         var frame = Regions[i];
         Span<T> fromSlice = _pixelData.AsSpan(frame.PixelOffset, frame.PixelLength);
         return new ImageBuffer<T>(frame.Width, frame.Height, Width, fromSlice);
@@ -126,13 +118,7 @@ public class ArrayTexture<T> : IMutableTexture<T> where T : unmanaged
         if (i >= ArrayLayers)
             throw new ArgumentOutOfRangeException($"Tried to obtain a buffer for layer {i}, but there are only {ArrayLayers}");
 
-        (DirtyType, DirtyId) = (DirtyType, DirtyId) switch
-        {
-            (TextureDirtyType.None, _) => (TextureDirtyType.Layer, i),
-            (TextureDirtyType.Layer, var x) when x == i => (TextureDirtyType.Layer, i),
-            _ => (TextureDirtyType.All, 0),
-        };
-
+        Version++;
         Span<T> fromSlice = _pixelData.AsSpan(i * Width * Height, Width * Height);
         return new ImageBuffer<T>(Width, Height, Width, fromSlice);
     }

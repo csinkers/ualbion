@@ -13,6 +13,7 @@ public sealed class DebugGuiRenderer : Component, IRenderer, IDisposable
     readonly IFramebufferHolder _framebuffer;
     ImGuiRenderer _imguiRenderer;
 
+    public Type[] HandledTypes { get; } = { typeof(DebugGuiRenderable) };
     public DebugGuiRenderer(IFramebufferHolder framebuffer)
     {
         _framebuffer = framebuffer;

@@ -18,27 +18,35 @@ public class Video : Component
     Sprite _sprite;
     FlicPlayer _player;
     SimpleTexture<byte> _texture;
+    TextureDirtyEvent _dirtyEvent;
     PaletteId _previousPaletteId;
 
     event Action Complete;
 
     public Video(VideoId id, bool looping)
     {
-        On<IdleClockEvent>(_=>
-        {
-            if (!_looping && _player.Frame == _player.FrameCount - 1)
-            {
-                Complete?.Invoke();
-                Remove();
-            }
-            else
-            {
-                _player.NextFrame();
-                _texture.GetMutableLayerBuffer(0);
-            }
-        });
         _id = id;
         _looping = looping;
+        On<IdleClockEvent>(OnIdleClock);
+    }
+
+    void OnIdleClock(IdleClockEvent _)
+    {
+        if (_player == null)
+            return;
+
+        if (!_looping && _player.Frame == _player.FrameCount - 2)
+        {
+            Info($"Vid {_id} complete");
+            Complete?.Invoke();
+            Remove();
+        }
+        else
+        {
+            _player.NextFrame();
+            Raise(_dirtyEvent);
+            Info($"Vid {_id} loaded frame {_player.Frame} / {_player.FrameCount}");
+        }
     }
 
     public Vector3 Position
@@ -69,6 +77,7 @@ public class Video : Component
             new[] { new Region(Vector2.Zero, size, size, 0) });
 
         _texture = texture;
+        _dirtyEvent = new TextureDirtyEvent(_texture);
         _player = flic.Play(() => texture.GetMutableLayerBuffer(0).Buffer);
         _sprite = AttachChild(new Sprite(SpriteId.None,
             new Vector3(-1, -1, 0),

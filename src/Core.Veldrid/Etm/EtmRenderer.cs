@@ -13,6 +13,8 @@ public sealed class EtmRenderer : Component, IRenderer, IDisposable
     readonly EtmPipeline _normalPipeline;
     readonly EtmPipeline _nonCullingPipeline;
 
+    public Type[] HandledTypes { get; } = { typeof(EtmWindow) };
+
     public EtmRenderer(IFramebufferHolder framebuffer)
     {
         _vertexBuffer = new MultiBuffer<Vertex3DTextured>(Cube.Vertices, BufferUsage.VertexBuffer) { Name = "TileMapVertexBuffer"};

@@ -12,7 +12,6 @@ public class Sprite : Component, IPositioned
     readonly DrawLayer _layer;
     readonly SpriteKeyFlags _keyFlags;
     readonly Func<IAssetId, ITexture> _loaderFunc;
-    readonly Action<RenderEvent> _dirtyAction;
 
     SpriteLease<SpriteInfo> _sprite;
     Vector3 _position;
@@ -51,7 +50,6 @@ public class Sprite : Component, IPositioned
                 Flags &= ~SpriteFlags.Highlight;
         });
 
-        _dirtyAction = _ => UpdateSprite();
         Position = position;
         _layer = layer;
         _keyFlags = keyFlags;
@@ -115,12 +113,14 @@ public class Sprite : Component, IPositioned
             if (value == _dirty)
                 return;
 
-            if (value) On<RenderEvent>(_dirtyAction);
+            if (value) On<RenderEvent>(OnRender);
             else Off<RenderEvent>();
 
             _dirty = value;
         }
     }
+
+    void OnRender(RenderEvent _) => UpdateSprite();
 
     protected override void Subscribed()
     {

@@ -9,7 +9,6 @@ using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Etm;
 using UAlbion.Core.Veldrid.Skybox;
 using UAlbion.Core.Veldrid.Sprites;
-using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
@@ -159,11 +158,11 @@ static class Program
         var framebuffer = new MainFramebuffer();
         var renderPass = new RenderPass("Main Pass", framebuffer);
         renderPass // TODO: Populate from json so mods can add new render methods
-            .AddRenderer(new SpriteRenderer(framebuffer), typeof(VeldridSpriteBatch<SpriteInfo, GpuSpriteInstanceData>))
-            .AddRenderer(new BlendedSpriteRenderer(framebuffer), typeof(VeldridSpriteBatch<BlendedSpriteInfo, GpuBlendedSpriteInstanceData>))
-            .AddRenderer(new EtmRenderer(framebuffer), typeof(EtmWindow))
-            .AddRenderer(new SkyboxRenderer(framebuffer), typeof(SkyboxRenderable))
-            .AddRenderer(new DebugGuiRenderer(framebuffer), typeof(DebugGuiRenderable))
+            .AddRenderer(new SpriteRenderer(framebuffer))
+            .AddRenderer(new BlendedSpriteRenderer(framebuffer))
+            .AddRenderer(new EtmRenderer(framebuffer))
+            .AddRenderer(new SkyboxRenderer(framebuffer))
+            .AddRenderer(new DebugGuiRenderer(framebuffer))
             ;
 
         var engine = new Engine(commandLine.Backend, commandLine.UseRenderDoc, commandLine.StartupOnly, true);

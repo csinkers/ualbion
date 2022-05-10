@@ -19,6 +19,8 @@ public sealed class SkyboxRenderer : Component, IRenderer, IDisposable
     readonly MultiBuffer<Vertex2DTextured> _vertexBuffer;
     readonly MultiBuffer<ushort> _indexBuffer;
 
+    public Type[] HandledTypes { get; } = { typeof(SkyboxRenderable) };
+
     static SkyboxPipeline BuildPipeline(IFramebufferHolder framebuffer) => new()
     {
         Name = "P_Skybox",

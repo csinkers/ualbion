@@ -77,7 +77,7 @@ sealed class IsometricTest : Component, IDisposable // The engine construction c
         var source = new AdhocRenderableSource(new[] { quad });
         var copyPass = new RenderPass("Copy Pass", _mainFramebuffer);
         copyPass.AddSource(source);
-        copyPass.AddRenderer(_quadRenderer, typeof(FullscreenQuad));
+        copyPass.AddRenderer(_quadRenderer);
 
         engine.AddRenderPass(copyPass);
 

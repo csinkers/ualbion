@@ -20,6 +20,8 @@ public sealed class SpriteRenderer : Component, IRenderer, IDisposable
         new(-0.5f, 1.0f, 0.0f, 1.0f), new(0.5f, 1.0f, 1.0f, 1.0f),
     };
 
+    public Type[] HandledTypes { get; } = { typeof(VeldridSpriteBatch<SpriteInfo, GpuSpriteInstanceData>) };
+
     public SpriteRenderer(IFramebufferHolder framebuffer)
     {
         _vertexBuffer = new MultiBuffer<Vertex2DTextured>(Vertices, BufferUsage.VertexBuffer, "SpriteVertexBuffer");

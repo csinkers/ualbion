@@ -12,9 +12,7 @@ public interface ITexture
     int ArrayLayers { get; }
     int SizeInBytes { get; }
     IReadOnlyList<Region> Regions { get; }
-    TextureDirtyType DirtyType { get; }
-    int DirtyId { get; }
-    void Clean();
+    int Version { get; }
 }
 
 public interface IDepthTexture : ITexture

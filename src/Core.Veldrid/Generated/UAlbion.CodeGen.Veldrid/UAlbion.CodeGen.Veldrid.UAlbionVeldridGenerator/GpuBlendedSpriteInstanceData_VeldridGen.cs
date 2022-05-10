@@ -1,7 +1,7 @@
 ﻿using Veldrid;
 namespace UAlbion.Core.Veldrid.Sprites
 {
-    public partial struct GpuBlendedSpriteInstanceData
+    internal partial struct GpuBlendedSpriteInstanceData
     {
         public static VertexLayoutDescription GetLayout(bool input) => new(
             new VertexElementDescription((input ? "i" : "o") + "Flags", VertexElementSemantic.TextureCoordinate, VertexElementFormat.UInt1),

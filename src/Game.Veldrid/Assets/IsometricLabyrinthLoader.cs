@@ -49,7 +49,7 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
 #pragma warning restore CA2000 // Dispose objects before losing scopes
     }
 
-    IEnumerable<(string, byte[])> Save(LabyrinthData labyrinth, AssetInfo info, SerdesContext context, IsometricMode mode, string pngPath, string tsxPath)
+    IEnumerable<(string, byte[])> Save(LabyrinthData labyrinth, AssetInfo info, IsometricMode mode, string pngPath, string tsxPath)
     {
         var assets = Resolve<IAssetManager>();
         var tileWidth = info.Get(AssetProperty.TileWidth, DefaultWidth);
@@ -123,10 +123,10 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
         var contentsPng = info.GetPattern(AssetProperty.ContentsPngPattern,   "Tiled/Gfx/{0}_{2}_Contents.png");
 
         var files = new List<(string, byte[])> {(json.Format(path), SaveJson(existing, info, context))};
-        files.AddRange(Save(existing, info, context, IsometricMode.Floors,   BuildPath(floorPng),    BuildPath(floorTsx)));
-        files.AddRange(Save(existing, info, context, IsometricMode.Ceilings, BuildPath(ceilingPng),  BuildPath(ceilingTsx)));
-        files.AddRange(Save(existing, info, context, IsometricMode.Walls,    BuildPath(wallPng),     BuildPath(wallTsx)));
-        files.AddRange(Save(existing, info, context, IsometricMode.Contents, BuildPath(contentsPng), BuildPath(contentsTsx)));
+        files.AddRange(Save(existing, info, IsometricMode.Floors,   BuildPath(floorPng),    BuildPath(floorTsx)));
+        files.AddRange(Save(existing, info, IsometricMode.Ceilings, BuildPath(ceilingPng),  BuildPath(ceilingTsx)));
+        files.AddRange(Save(existing, info, IsometricMode.Walls,    BuildPath(wallPng),     BuildPath(wallTsx)));
+        files.AddRange(Save(existing, info, IsometricMode.Contents, BuildPath(contentsPng), BuildPath(contentsTsx)));
 
         PackedChunks.PackNamed(s, files.Count, i => (files[i].Item2, files[i].Item1));
         return existing;

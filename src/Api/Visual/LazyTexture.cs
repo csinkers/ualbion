@@ -54,10 +54,8 @@ public class LazyTexture<T> : IReadOnlyTexture<T> where T : unmanaged
     public int ArrayLayers { get; }
     [JsonIgnore] public int SizeInBytes => Width * Height * ArrayLayers * Unsafe.SizeOf<T>();
     public IReadOnlyList<Region> Regions => _regions;
-    [JsonIgnore] public TextureDirtyType DirtyType { get; private set; }
-    [JsonIgnore] public int DirtyId => 0;
+    [JsonIgnore] public int Version => 0;
 
-    public void Clean() => DirtyType = TextureDirtyType.All;
     public override string ToString() => $"LazyTexture {Id} {Width}x{Height} ({Regions.Count} sub-images)";
     public ReadOnlyImageBuffer<T> GetRegionBuffer(int i) => _regionAccessor(this, _regions[i], _regionContexts[i]);
     public ReadOnlyImageBuffer<T> GetLayerBuffer(int i) => throw new NotSupportedException();

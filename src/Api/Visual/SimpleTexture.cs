@@ -65,11 +65,9 @@ public class SimpleTexture<T> : IMutableTexture<T> where T : unmanaged
     [JsonIgnore] public int ArrayLayers => 1;
     [JsonIgnore] public int SizeInBytes => PixelData.Length * Unsafe.SizeOf<T>();
     public IReadOnlyList<Region> Regions => _regions;
-    [JsonIgnore] public TextureDirtyType DirtyType { get; private set; }
-    [JsonIgnore] public int DirtyId { get; private set; }
+    [JsonIgnore] public int Version { get; private set; }
     [JsonIgnore] public ReadOnlySpan<T> PixelData => _pixelData;
-    [JsonIgnore] public Span<T> MutablePixelData { get { DirtyType = TextureDirtyType.All; return _pixelData; } }
-    public void Clean() => DirtyType = TextureDirtyType.None;
+    [JsonIgnore] public Span<T> MutablePixelData { get { Version++; return _pixelData; } }
     public override string ToString() => $"STexture {Id} {Width}x{Height} ({Regions.Count} sub-images)";
 
     public ReadOnlySpan<T> GetRowSpan(int frameNumber, int row)
@@ -103,13 +101,7 @@ public class SimpleTexture<T> : IMutableTexture<T> where T : unmanaged
         if (i >= Regions.Count)
             throw new ArgumentOutOfRangeException($"Tried to obtain a buffer for region {i}, but there are only {Regions.Count}");
 
-        (DirtyType, DirtyId) = (DirtyType, DirtyId) switch
-        {
-            (TextureDirtyType.None, _) => (TextureDirtyType.Region, i),
-            (TextureDirtyType.Region, var x) when x == i => (TextureDirtyType.Region, i),
-            _ => (TextureDirtyType.All, 0),
-        };
-
+        Version++;
         var frame = Regions[i];
         Span<T> fromSlice = _pixelData.AsSpan(frame.PixelOffset, frame.PixelLength);
         return new ImageBuffer<T>(frame.Width, frame.Height, Width, fromSlice);
@@ -118,8 +110,6 @@ public class SimpleTexture<T> : IMutableTexture<T> where T : unmanaged
     public ImageBuffer<T> GetMutableLayerBuffer(int i)
     {
         if (i != 0) throw new ArgumentOutOfRangeException(nameof(i));
-        DirtyType = TextureDirtyType.All;
-        DirtyId = 0;
         return new ImageBuffer<T>(Width, Height, Width, MutablePixelData);
     }
 }

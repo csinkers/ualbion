@@ -50,8 +50,8 @@ public class TextureSource : ServiceComponent<ITextureSource>, ITextureSource
         On<TextureStatsEvent>(_ => Info(Stats()));
     }
 
-    public ITextureHolder GetSimpleTexture(ITexture texture, int version = 0) => _simple.GetTextureHolder(texture, version);
-    public ITextureArrayHolder GetArrayTexture(ITexture texture, int version = 0) => _array.GetTextureHolder(texture, version);
+    public ITextureHolder GetSimpleTexture(ITexture texture) => _simple.GetTextureHolder(texture);
+    public ITextureArrayHolder GetArrayTexture(ITexture texture) => _array.GetTextureHolder(texture);
     public ITextureHolder GetDummySimpleTexture() => GetSimpleTexture(_dummySimple);
     public ITextureArrayHolder GetDummyArrayTexture() => GetArrayTexture(_dummyArray);
 

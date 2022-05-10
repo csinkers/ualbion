@@ -1,5 +1,4 @@
-﻿using System;
-using UAlbion.Core.Visual;
+﻿using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 
@@ -9,6 +8,6 @@ public interface IRenderPass
 {
     void Render(GraphicsDevice device, CommandList cl);
     IFramebufferHolder Framebuffer { get; }
-    RenderPass AddRenderer(IRenderer renderer, params Type[] types);
+    RenderPass AddRenderer(IRenderer renderer);
     RenderPass AddSource(IRenderableSource source);
 }

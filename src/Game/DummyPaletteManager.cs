@@ -14,7 +14,6 @@ public class DummyPaletteManager : IPaletteManager
 
     public IPalette Day { get; }
     public IPalette Night { get; }
-    public int Version => 0;
     public int Frame => 0;
     public float Blend => 0;
 }

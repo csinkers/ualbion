@@ -47,6 +47,7 @@ public class LogExchange : ILogExchange
             case BeginFrameEvent _:
                 while (_queuedEvents.TryDequeue(out var queuedEvent))
                 {
+#pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
                         switch (queuedEvent)
@@ -63,6 +64,7 @@ public class LogExchange : ILogExchange
                         }
                     }
                     catch (Exception exception) { Console.WriteLine("Error: {0}", exception.Message); }
+#pragma warning restore CA1031 // Do not catch general exception types
                 }
                 break;
 

@@ -127,6 +127,8 @@ public sealed class FullscreenQuadRenderer : Component, IRenderer, IDisposable
     readonly MultiBuffer<Vertex2DTextured> _vertexBuffer;
     readonly MultiBuffer<ushort> _indexBuffer;
 
+    public Type[] HandledTypes { get; } = { typeof(FullscreenQuad) };
+
     static FullscreenQuadPipeline BuildPipeline(OutputDescription outputDescription) 
         => new()
         {

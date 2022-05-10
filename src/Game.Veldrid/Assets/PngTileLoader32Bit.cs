@@ -140,7 +140,7 @@ public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
     }
 
 
-    (List<TileFrameSummary> dayInfo, List<TileFrameSummary> nightInfo) FindFiles(AssetInfo info, IFileSystem disk)
+    static (List<TileFrameSummary> dayInfo, List<TileFrameSummary> nightInfo) FindFiles(AssetInfo info, IFileSystem disk)
     {
         var pattern = info.GetPattern(AssetProperty.Pattern, "{ignorenum}_{frame:0000}_{palframe:0000}.png");
         var dayPath = info.Get<string>(AssetProperty.DayPath, null);

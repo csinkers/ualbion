@@ -31,8 +31,8 @@ public static class IsometricSetup
         var config = exchange.Resolve<IGeneralConfig>();
         var shaderCache = new ShaderCache(config.ResolvePath("$(CACHE)/ShaderCache"));
         var mainPass = new RenderPass("Iso Render Pass", offscreenFB)
-                .AddRenderer(new SpriteRenderer(offscreenFB), typeof(VeldridSpriteBatch<SpriteInfo, GpuSpriteInstanceData>))
-                .AddRenderer(new EtmRenderer(offscreenFB), typeof(EtmWindow))
+                .AddRenderer(new SpriteRenderer(offscreenFB))
+                .AddRenderer(new EtmRenderer(offscreenFB))
             ;
 
         foreach (var shaderPath in exchange.Resolve<IModApplier>().ShaderPaths)

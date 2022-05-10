@@ -64,6 +64,7 @@ public class Palette8Chunk : FlicChunk
             }
         }
 
+        palette[0] = 0; // Index 0 should always be transparent
         return palette;
     }
 }

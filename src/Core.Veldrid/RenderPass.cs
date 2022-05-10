@@ -62,11 +62,13 @@ public sealed class RenderPass : Component, IRenderPass, IDisposable
         AttachChild(_commonSet);
     }
 
-    public RenderPass AddRenderer(IRenderer renderer, params Type[] types)
+    public RenderPass AddRenderer(IRenderer renderer)
     {
         if (renderer == null) throw new ArgumentNullException(nameof(renderer));
-        if (types == null) throw new ArgumentNullException(nameof(types));
-        if (types.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(types));
+
+        var types = renderer.HandledTypes;
+        if (types == null || types.Length == 0)
+            return this;
 
         if (!_renderers.Contains(renderer))
         {
@@ -145,9 +147,9 @@ public sealed class RenderPass : Component, IRenderPass, IDisposable
         var textureSource = Resolve<ITextureSource>();
 
         camera.Viewport = new Vector2(Framebuffer.Width, Framebuffer.Height);
-        var dayPalette = textureSource.GetSimpleTexture(paletteManager.Day.Texture, paletteManager.Version);
+        var dayPalette = textureSource.GetSimpleTexture(paletteManager.Day.Texture);
         var nightTexture = paletteManager.Night?.Texture ?? paletteManager.Day.Texture;
-        var nightPalette = textureSource.GetSimpleTexture(nightTexture, paletteManager.Version);
+        var nightPalette = textureSource.GetSimpleTexture(nightTexture);
 
         if (_dayPalette != dayPalette)
         {

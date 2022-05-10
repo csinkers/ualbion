@@ -15,7 +15,6 @@ public class PaletteManager : ServiceComponent<IPaletteManager>, IPaletteManager
     public IPalette Day { get; private set; }
     public IPalette Night { get; private set; }
     public int Frame { get; private set; }
-    public int Version { get; private set; }
     public float Blend
     {
         get
@@ -36,7 +35,6 @@ public class PaletteManager : ServiceComponent<IPaletteManager>, IPaletteManager
         {
             Day = new AlbionPalette(0, "Raw", e.Entries);
             Night = null;
-            Version++;
         });
     }
 
@@ -61,6 +59,5 @@ public class PaletteManager : ServiceComponent<IPaletteManager>, IPaletteManager
         Night = NightPalettes.TryGetValue(paletteId, out var nightPaletteId)
             ? assets.LoadPalette(nightPaletteId)
             : null;
-        Version++;
     }
 }

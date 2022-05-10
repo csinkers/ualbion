@@ -82,7 +82,7 @@ public abstract class MapLayer<TInstance> : Component, IMapLayer
 
             var index = _logicalMap.Index(args.X, args.Y);
 
-            if (GetTile(index)?.FrameCount > 1)
+            if (IsAnimated(index))
                 _animated.Add((args.X, args.Y));
             else
                 _animated.Remove((args.X, args.Y));
@@ -100,13 +100,22 @@ public abstract class MapLayer<TInstance> : Component, IMapLayer
         {
             for (int i = 0; i < _logicalMap.Width; i++)
             {
-                if (GetTile(index)?.FrameCount > 1)
+                if (IsAnimated(index))
                     _animated.Add((i, j));
                 index++;
             }
         }
 
         On<RenderEvent>(_ => Render());
+    }
+
+    bool IsAnimated(int index)
+    {
+        var tile = GetTile(index);
+        if (tile == null)
+            return false;
+
+        return tile.FrameCount > 1 || Tileset.IsPaletteAnimated(tile.ImageNumber);
     }
 
     public object GetSpriteData(int x, int y) 
@@ -181,11 +190,15 @@ public abstract class MapLayer<TInstance> : Component, IMapLayer
         var sm = Resolve<ISpriteManager<TInstance>>();
         if (_lease == null)
         {
-            var flags = SpriteKeyFlags.NoDepthTest;
+            var flags = SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.ClampEdges;
             if (!_isOverlay)
                 flags |= SpriteKeyFlags.ZeroOpaque;
 
-            var key = new SpriteKey(Tileset.Texture, SpriteSampler.Point, _drawLayer, flags);
+            var sampler = Tileset.Texture is IReadOnlyTexture<byte>
+                ? SpriteSampler.Point
+                : SpriteSampler.TriLinear;
+
+            var key = new SpriteKey(Tileset.Texture, sampler, _drawLayer, flags);
             _lease = sm.Borrow(key, _logicalMap.Width * _logicalMap.Height, this);
             _allDirty = true;
         }
@@ -202,7 +215,7 @@ public abstract class MapLayer<TInstance> : Component, IMapLayer
         }
         else _highlightEvent = null;
 
-        if(!_allDirty && frameCount != _lastFrameCount)
+        if (!_allDirty && frameCount != _lastFrameCount)
             _dirty.UnionWith(_animated);
 
         _lastFrameCount = frameCount;

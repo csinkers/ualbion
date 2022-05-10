@@ -6,4 +6,5 @@ public interface ITileGraphics
 {
     ITexture Texture { get; }
     Region GetRegion(int imageNumber, int paletteFrame);
+    bool IsPaletteAnimated(int imageNumber);
 }

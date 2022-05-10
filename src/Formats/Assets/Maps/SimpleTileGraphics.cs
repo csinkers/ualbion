@@ -10,4 +10,5 @@ public class SimpleTileGraphics : ITileGraphics
     [JsonIgnore] public ITexture Texture => _texture;
     public SimpleTileGraphics(IReadOnlyTexture<byte> texture) => _texture = texture ?? throw new ArgumentNullException(nameof(texture));
     public Region GetRegion(int imageNumber, int paletteFrame) => _texture.Regions[imageNumber];
+    public bool IsPaletteAnimated(int imageNumber) => false;
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Numerics;
-using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 
@@ -11,24 +9,29 @@ namespace UAlbion.Formats.Parsers;
 /// </summary>
 public class AtlasPostProcessor : IAssetPostProcessor
 {
-    const int MarginPixels = 1;
+    const int MarginPixels = 0;
 
+    public object Process(object asset, AssetInfo info) => Process((IReadOnlyTexture<byte>)asset, info);
     public static SimpleTexture<byte> Process(IReadOnlyTexture<byte> sprite, AssetInfo info)
     {
         if (sprite == null) throw new ArgumentNullException(nameof(sprite));
         if (info == null) throw new ArgumentNullException(nameof(info));
 
         var layout = SpriteSheetUtil.ArrangeSpriteSheet(sprite.Regions.Count, 1, sprite.GetRegionBuffer);
-        var totalHeight = ApiUtil.NextPowerOfTwo(layout.Height);
-        byte[] pixelData = new byte[layout.Width * totalHeight];
-        var subImages = new Region[sprite.Regions.Count];
+        if (layout.Layers > 1)
+            throw new InvalidOperationException("Could not layout atlas onto one layer");
 
+        var texture = new SimpleTexture<byte>(
+            info.AssetId, sprite.Id.ToString(),
+            layout.Width, layout.Height);
+
+        var pixelData = texture.GetMutableLayerBuffer(0).Buffer;
         for (int n = 0; n < sprite.Regions.Count; n++)
         {
             var frame = sprite.GetRegionBuffer(n);
             var destWidth = frame.Width + 2 * MarginPixels;
             var destHeight = frame.Height + 2 * MarginPixels;
-            var (x, y) = layout.Positions[n];
+            var (x, y, _) = layout.Positions[n];
             for (int j = 0; j < destHeight; j++)
             {
                 for (int i = 0; i < destWidth; i++)
@@ -42,19 +45,9 @@ public class AtlasPostProcessor : IAssetPostProcessor
                 }
             }
 
-            subImages[n] = new Region(
-                new Vector2(x + MarginPixels, y + MarginPixels),
-                new Vector2(frame.Width, frame.Height),
-                new Vector2(layout.Width, totalHeight),
-                0);
+            texture.AddRegion(x + MarginPixels, y + MarginPixels, frame.Width, frame.Height);
         }
 
-        return new SimpleTexture<byte>(
-            info.AssetId, sprite.Id.ToString(),
-            layout.Width, totalHeight,
-            pixelData,
-            subImages);
+        return texture;
     }
-
-    public object Process(object asset, AssetInfo info) => Process((IReadOnlyTexture<byte>)asset, info);
 }

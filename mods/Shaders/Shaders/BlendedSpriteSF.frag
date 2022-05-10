@@ -2,11 +2,14 @@
 
 #define DEPTH_COLOR(depth) (vec4((int((depth) * 1024) % 10) / 10.0f, 20 * (max((depth), 0.95) - 0.95), 20 * min((depth), 0.05), 1.0f))
 
-vec4 GetSample(vec2 texPosition, float layer)
+vec4 GetSample(vec2 texPosition, float layer, vec4 uvClamp)
 {
     vec2 uv = ((iFlags & SF_FLIP_VERTICAL) != 0)
         ? vec2(texPosition.x, 1 - texPosition.y)
         : texPosition;
+
+    if ((uFlags & SKF_CLAMP_EDGES) != 0)
+		uv = vec2(clamp(uv.x, uvClamp.x, uvClamp.z), clamp(uv.y, uvClamp.y, uvClamp.w));
 
     vec4 color = 
 		((uFlags & SKF_USE_ARRAY_TEXTURE) != 0)
@@ -18,8 +21,8 @@ vec4 GetSample(vec2 texPosition, float layer)
 
 void main()
 {
-    vec4 dayColor = GetSample(iTexPosition1, iLayer1);
-    vec4 nightColor = GetSample(iTexPosition2, iLayer2);
+    vec4 dayColor = GetSample(iTexPosition1, iLayer1, iUvClamp1);
+    vec4 nightColor = GetSample(iTexPosition2, iLayer2, iUvClamp2);
     vec4 color = mix(dayColor, nightColor, uPaletteBlend);
 
 #ifdef DEBUG
@@ -45,7 +48,7 @@ void main()
 #endif
 
     float depth = /*(color.w == 0.0f) ? 1.0f : */ gl_FragCoord.z;
-    if (color.w == 0.0f) discard;
+    if (color.w < 0.5f) discard;
 
     if ((iFlags & SF_DROP_SHADOW) != 0)
         color = vec4(0.0f, 0.0f, 0.0f, 1.0f);

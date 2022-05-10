@@ -269,7 +269,7 @@ public class ModApplier : Component, IModApplier
                     }
 
                     asset = modAsset;
-                    break;
+                    goto assetFound;
                 }
             }
         }
@@ -277,6 +277,7 @@ public class ModApplier : Component, IModApplier
         if (asset == null)
             return null;
 
+        assetFound:
         while (patches is { Count: > 0 })
             asset = patches.Pop().Apply(asset);
 

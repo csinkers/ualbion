@@ -38,6 +38,15 @@ void main()
 
     gl_Position = normPosition;
 
+    if ((uFlags & SKF_CLAMP_EDGES) != 0)
+    {
+        vec2 oneTexel = 1 / uTexSize;
+		oUvClamp = vec4(
+            iTexOffset + oneTexel/2,
+            iTexOffset + iTexSize - oneTexel);
+    }
+	else oUvClamp = vec4(0,0,1,1);
+
     oTexPosition = iTexCoords * iTexSize + iTexOffset;
     oLayer = float(iTexLayer);
     oFlags = iFlags;

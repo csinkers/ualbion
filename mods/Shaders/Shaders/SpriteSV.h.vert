@@ -47,6 +47,7 @@
 #define SKF_USE_PALETTE 0x4U
 #define SKF_NO_TRANSFORM 0x8U
 #define SKF_ZERO_OPAQUE 0x10U
+#define SKF_CLAMP_EDGES 0x20U
 
 layout(set = 0, binding = 0) uniform _Shared {
     vec3 uWorldSpacePosition;
@@ -69,9 +70,8 @@ layout(set = 1, binding = 0) uniform texture2D uSprite; //!
 layout(set = 1, binding = 1) uniform texture2DArray uSpriteArray; //!
 layout(set = 1, binding = 2) uniform sampler uSpriteSampler; //!
 layout(set = 1, binding = 3) uniform _Uniform {
+    vec2 uTexSize;
     uint uFlags;
-    float uTexSizeW;
-    float uTexSizeH;
     uint _pad1;
 };
 
@@ -90,7 +90,8 @@ layout(location = 7) in uint iTexLayer;
 // UAlbion.Core.Veldrid.Sprites.SpriteIntermediateData
 layout(location = 0) out vec2 oTexPosition;
 layout(location = 1) out flat float oLayer;
-layout(location = 2) out flat uint oFlags;
-layout(location = 3) out vec2 oNormCoords;
-layout(location = 4) out vec3 oWorldPosition;
+layout(location = 2) out vec4 oUvClamp;
+layout(location = 3) out flat uint oFlags;
+layout(location = 4) out vec2 oNormCoords;
+layout(location = 5) out vec3 oWorldPosition;
 

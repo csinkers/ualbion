@@ -38,6 +38,23 @@ void main()
 
     gl_Position = normPosition;
 
+    if ((uFlags & SKF_CLAMP_EDGES) != 0)
+    {
+        vec2 oneTexel = 1 / uTexSize;
+		oUvClamp1 = vec4(
+            iTexOffset1 + oneTexel/2,
+            (iTexOffset1 + iTexSize1) - oneTexel);
+
+		oUvClamp2 = vec4(
+            iTexOffset2 + oneTexel/2,
+            iTexOffset2 + iTexSize2 - oneTexel);
+    }
+	else 
+    {
+		oUvClamp1 = vec4(0,0,1,1);
+		oUvClamp2 = vec4(0,0,1,1);
+    }
+
     oTexPosition1 = iTexCoords * iTexSize1 + iTexOffset1;
     oTexPosition2 = iTexCoords * iTexSize2 + iTexOffset2;
     oLayer1 = float(iTexLayer1);

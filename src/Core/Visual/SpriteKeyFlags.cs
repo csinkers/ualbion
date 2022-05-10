@@ -13,4 +13,5 @@ public enum SpriteKeyFlags : uint
     UsePalette      = 0x4,
     NoTransform     = 0x8,
     ZeroOpaque      = 0x10, // If true then pixels of color 0 will be opaque when UsePalette is set, otherwise transparent
+    ClampEdges      = 0x20,
 }

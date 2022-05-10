@@ -8,6 +8,7 @@ internal partial struct SpriteIntermediateData : IVertexFormat
 {
     [Vertex("TexPosition")] public Vector2 TexturePosition;
     [Vertex("Layer", Flat = true)] public float TextureLayer;
+    [Vertex("UvClamp")] public Vector4 UvClamp;
     [Vertex("Flags", Flat = true, EnumPrefix = "SF")] public SpriteFlags Flags;
     [Vertex("NormCoords")] public Vector2 NormalisedSpriteCoordinates;
     [Vertex("WorldPosition")] public Vector3 WorldPosition;

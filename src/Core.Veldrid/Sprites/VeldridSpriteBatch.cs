@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
@@ -26,8 +27,7 @@ public class VeldridSpriteBatch<TInstance, TGpuInstance> : SpriteBatch<TInstance
         Uniform = new SingleBuffer<SpriteUniform>(new SpriteUniform
         {
             Flags = Key.Flags,
-            TextureWidth = key.Texture.Width,
-            TextureHeight = key.Texture.Height
+            TextureSize = new Vector2(key.Texture.Width, key.Texture.Height)
         }, BufferUsage.UniformBuffer, $"B_SpriteUniform:{Name}");
         AttachChild(Instances);
         AttachChild(Uniform);

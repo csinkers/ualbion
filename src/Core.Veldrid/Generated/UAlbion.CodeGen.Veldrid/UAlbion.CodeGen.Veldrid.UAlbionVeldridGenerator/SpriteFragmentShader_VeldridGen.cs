@@ -54,6 +54,7 @@ namespace UAlbion.Core.Veldrid.Sprites
 #define SKF_USE_PALETTE 0x4U
 #define SKF_NO_TRANSFORM 0x8U
 #define SKF_ZERO_OPAQUE 0x10U
+#define SKF_CLAMP_EDGES 0x20U
 
 layout(set = 0, binding = 0) uniform _Shared {
     vec3 uWorldSpacePosition;
@@ -73,18 +74,18 @@ layout(set = 1, binding = 0) uniform texture2D uSprite; //!
 layout(set = 1, binding = 1) uniform texture2DArray uSpriteArray; //!
 layout(set = 1, binding = 2) uniform sampler uSpriteSampler; //!
 layout(set = 1, binding = 3) uniform _Uniform {
+    vec2 uTexSize;
     uint uFlags;
-    float uTexSizeW;
-    float uTexSizeH;
     uint _pad1;
 };
 
 // UAlbion.Core.Veldrid.Sprites.SpriteIntermediateData
 layout(location = 0) in vec2 iTexPosition;
 layout(location = 1) in flat float iLayer;
-layout(location = 2) in flat uint iFlags;
-layout(location = 3) in vec2 iNormCoords;
-layout(location = 4) in vec3 iWorldPosition;
+layout(location = 2) in vec4 iUvClamp;
+layout(location = 3) in flat uint iFlags;
+layout(location = 4) in vec2 iNormCoords;
+layout(location = 5) in vec3 iWorldPosition;
 
 // UAlbion.Core.Veldrid.SimpleFramebuffer
 layout(location = 0) out vec4 oColor;

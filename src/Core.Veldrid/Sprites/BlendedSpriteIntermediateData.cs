@@ -8,10 +8,15 @@ namespace UAlbion.Core.Veldrid.Sprites;
 internal partial struct BlendedSpriteIntermediateData : IVertexFormat
 {
     [Vertex("Flags", Flat = true, EnumPrefix = "SF")] public SpriteFlags Flags;
+
     [Vertex("TexPosition1")] public Vector2 TexturePosition1;
     [Vertex("Layer1", Flat = true)] public float TextureLayer1;
+    [Vertex("UvClamp1")] public Vector4 UvClamp1;
+
     [Vertex("TexPosition2")] public Vector2 TexturePosition2;
     [Vertex("Layer2", Flat = true)] public float TextureLayer2;
+    [Vertex("UvClamp2")] public Vector4 UvClamp2;
+
     [Vertex("NormCoords")] public Vector2 NormalisedSpriteCoordinates;
     [Vertex("WorldPosition")] public Vector3 WorldPosition;
 }

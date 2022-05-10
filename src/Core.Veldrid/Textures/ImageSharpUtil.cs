@@ -37,6 +37,9 @@ public static class ImageSharpUtil
     public static Image<Rgba32> PackSpriteSheet(uint[] palette, int frameCount, GetFrameDelegate<byte> getFrame)
     {
         var layout = SpriteSheetUtil.ArrangeSpriteSheet(frameCount, 0, getFrame);
+        if (layout.Layers > 1)
+            throw new InvalidOperationException("Could not pack sprite sheet into a single layer");
+
         Image<Rgba32> image = new Image<Rgba32>(layout.Width, layout.Height);
         if (!image.TryGetSinglePixelSpan(out var rgbaSpan))
             throw new InvalidOperationException("Could not retrieve single span from Image");
@@ -45,7 +48,7 @@ public static class ImageSharpUtil
         for (var i = 0; i < frameCount; i++)
         {
             var frame = getFrame(i);
-            var (toX, toY) = layout.Positions[i];
+            var (toX, toY, toLayer) = layout.Positions[i];
             var target = pixels[(toX + toY * layout.Width)..];
             var to = new ImageBuffer<uint>(frame.Width, frame.Height, layout.Width, target);
             BlitUtil.BlitTiled8To32(frame, to, palette, 255, 0);

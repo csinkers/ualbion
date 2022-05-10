@@ -22,6 +22,9 @@ void main()
         ? vec2(iTexPosition.x, 1 - iTexPosition.y)
         : iTexPosition;
 
+    if ((uFlags & SKF_CLAMP_EDGES) != 0)
+		uv = vec2(clamp(uv.x, iUvClamp.x, iUvClamp.z), clamp(uv.y, iUvClamp.y, iUvClamp.w));
+
     vec4 color = 
 		((uFlags & SKF_USE_ARRAY_TEXTURE) != 0)
 		? texture(sampler2DArray(uSpriteArray, uSpriteSampler), vec3(uv, iLayer)) //! ? vec4(1.0f)
@@ -32,7 +35,7 @@ void main()
 
     if ((iFlags & SF_GRADIENT_PIXELS) != 0)
     {
-        vec2 subPixelPos = smoothstep(0, 1, 1 - fract(uv * vec2(uTexSizeW, uTexSizeH)));
+        vec2 subPixelPos = smoothstep(0, 1, 1 - fract(uv * uTexSize));
         color = color * vec4(vec3(subPixelPos.x * subPixelPos.y + 0.4), 1.0);
     }
 

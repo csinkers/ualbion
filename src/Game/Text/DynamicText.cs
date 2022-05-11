@@ -19,7 +19,7 @@ public class DynamicText : IText
             return _lastText;
 
         var sb = new StringBuilder();
-        int blockId = 0;
+        int blockId = -1;
         var words = new List<WordId>();
 
         void WriteWords()

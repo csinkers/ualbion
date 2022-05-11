@@ -15,8 +15,8 @@ public class StatusBar : Dialog
     const int MaxPortraits = SavedGame.MaxPartySize;
     readonly UiSpriteElement _sprite;
     readonly StatusBarPortrait[] _portraits;
-    readonly TextFilter _hoverSource = new(x => x.Alignment = TextAlignment.Center);
-    readonly TextFilter _descriptionSource = new(x => x.Alignment = TextAlignment.Center);
+    readonly TextFilter _hoverSource = new(x => { x.Alignment = TextAlignment.Center; return true; });
+    readonly TextFilter _descriptionSource = new(x => { x.Alignment = TextAlignment.Center; return true; });
     readonly FixedPosition _hoverTextContainer;
     readonly FixedPosition _descriptionTextContainer;
 

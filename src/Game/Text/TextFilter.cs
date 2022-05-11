@@ -5,11 +5,11 @@ namespace UAlbion.Game.Text;
 
 public class TextFilter : IText
 {
-    readonly Action<TextBlock> _filter;
+    readonly Func<TextBlock, bool> _filter;
     IText _source;
     int _baseVersion;
 
-    public TextFilter(Action<TextBlock> filter) 
+    public TextFilter(Func<TextBlock, bool> filter) 
         => _filter = filter ?? throw new ArgumentNullException(nameof(filter));
 
     public IText Source
@@ -29,9 +29,7 @@ public class TextFilter : IText
             yield break;
 
         foreach (var block in Source.GetBlocks())
-        {
-            _filter(block);
-            yield return block;
-        }
+            if (_filter(block))
+                yield return block;
     }
 }

@@ -7,9 +7,9 @@ namespace UAlbion.Game.Text;
 
 public class TextBlock // Logical segment of text where all glyphs share the same formatting.
 {
-    public TextBlock() : this(0, string.Empty) { }
+    public TextBlock() : this(-1, string.Empty) { }
     public TextBlock(int blockId) : this(blockId, string.Empty) { }
-    public TextBlock(string text) : this(0, text) { }
+    public TextBlock(string text) : this(-1, text) { }
     public TextBlock(int blockId, string text)
     {
         BlockId = blockId;

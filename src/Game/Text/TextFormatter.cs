@@ -57,6 +57,7 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
     public ITextFormatter Justify() => new CustomisedTextFormatter(this).Justify();
     public ITextFormatter Fat() => new CustomisedTextFormatter(this).Fat();
     public ITextFormatter Ink(FontColor color) => new CustomisedTextFormatter(this).Ink(color);
+    public ITextFormatter Block(int blockNumber) => new CustomisedTextFormatter(this).Block(blockNumber);
 
     IEnumerable<(Token, object)> Substitute(
         IAssetManager assets,

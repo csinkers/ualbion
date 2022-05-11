@@ -2,6 +2,7 @@
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Dialogs;
 
@@ -18,19 +19,33 @@ class YesNoMessageBox : ModalDialog
         Closed?.Invoke(this, EventArgs.Empty);
     }
 
-    public YesNoMessageBox(StringId stringId, int depth) : base(DialogPositioning.Center, depth)
+    static IText BuildButtonText(IText text, int blockNumber, TextId fallback, ITextFormatter textFormatter) =>
+        new TextFilter(x => { x.Alignment = TextAlignment.Center; return true; })
+            {
+                Source = 
+                    new TextFallback(
+                        new TextFilter(x => x.BlockId == blockNumber) { Source = text },
+                        textFormatter.Format(fallback))
+            };
+
+    public YesNoMessageBox(StringId stringId, int depth, ITextFormatter textFormatter) : base(DialogPositioning.Center, depth)
     {
+        var text = textFormatter.Format(stringId);
+        var body = new TextFilter(x => x.BlockId == -1) { Source = text };
+        var yesText = BuildButtonText(text, 0, Base.SystemText.MsgBox_Yes, textFormatter);
+        var noText = BuildButtonText(text, 1, Base.SystemText.MsgBox_No, textFormatter);
+
         // TODO: Block0 = yes text, Block1 = no text.
         var elements = new VerticalStack(
             new Spacing(0, 5),
-            new FixedSizePanel(231, 30, new UiTextBuilder(stringId)),
+            new FixedSizePanel(231, 30, new UiText(body)),
             new Spacing(0, 5),
             new HorizontalStack(
                 new Spacing(11, 0),
-                new Button(Base.SystemText.MsgBox_Yes) { DoubleFrame = true }
+                new Button(yesText) { DoubleFrame = true }
                     .OnClick(() => OnButton(true)),
                 new Spacing(8, 0),
-                new Button(Base.SystemText.MsgBox_No) { DoubleFrame = true }
+                new Button(noText) { DoubleFrame = true }
                     .OnClick(() => OnButton(false)),
                 new Spacing(10, 0)
             ),

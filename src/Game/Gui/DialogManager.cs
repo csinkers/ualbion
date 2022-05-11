@@ -17,7 +17,8 @@ public class DialogManager  : ServiceComponent<IDialogManager>, IDialogManager
         OnAsync<YesNoPromptEvent, bool>((e, c) =>
         {
             var maxLayer = Children.OfType<ModalDialog>().Select(x => (int?)x.Depth).Max() ?? 0;
-            var dialog = AttachChild(new YesNoMessageBox(e.StringId, maxLayer + 1));
+            var tf = Resolve<ITextFormatter>();
+            var dialog = AttachChild(new YesNoMessageBox(e.StringId, maxLayer + 1, tf));
             dialog.Closed += (sender, args) => c(dialog.Result);
             return true;
         });

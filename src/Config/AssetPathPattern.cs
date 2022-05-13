@@ -210,4 +210,24 @@ public class AssetPathPattern
         path = new AssetPath(index, subAsset, paletteId, m.Groups["Name"].Value, paletteFrame);
         return true;
     }
+
+    public string WilcardForIndex(int index)
+    {
+        var sb = new StringBuilder();
+        foreach (var part in _parts)
+        {
+            switch (part.Type)
+            {
+                case PartType.Text: sb.Append(part.Value); break;
+                case PartType.Index: sb.Append(FormatInt(index, part.Value)); break;
+                case PartType.SubAsset: sb.Append("*"); break;
+                case PartType.Name: sb.Append("*"); break;
+                case PartType.IgnoreNum: sb.Append("*"); break;
+                case PartType.Palette: sb.Append("*"); break;
+                case PartType.PaletteFrame: sb.Append("*"); break;
+            }
+        }
+
+        return sb.ToString();
+    }
 }

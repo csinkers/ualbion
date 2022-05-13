@@ -66,7 +66,7 @@ public class XldContainer : IAssetContainer
                 s.Bytes(null, buffer, buffer.Length);
     }
 
-    public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, SerdesContext context)
+    public List<(int num, int count)> GetSubItemRanges(string path, AssetFileInfo info, SerdesContext context)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
@@ -75,7 +75,12 @@ public class XldContainer : IAssetContainer
 
         using var s = new AlbionReader(new BinaryReader(context.Disk.OpenRead(path)));
         var lengths = HeaderSerdes(null, s);
-        return new List<(int, int)> { (0, lengths.Length) };
+        int i = 0;
+        for (; i < lengths.Length; i++)
+            if (lengths[i] > 0)
+                break;
+
+        return new List<(int, int)> { (i, lengths.Length - i) };
     }
 
     static byte[] LoadAsset(int subItem, ISerializer s)

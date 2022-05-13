@@ -32,7 +32,7 @@ public class Npc2D : Component
     int _targetX;
     int _targetY;
 
-    public override string ToString() => $"Npc {_state.Id} {_sprite.Id}";
+    public override string ToString() => $"Npc {_npcNumber} @ ({_state.X},{_state.Y}) {_state.Id} {_sprite.Id}";
 
     public Npc2D(NpcState state, MapNpc mapData, byte npcNumber, bool isLarge)
     {
@@ -105,8 +105,7 @@ public class Npc2D : Component
 
     void OnMove(NpcMoveEvent e)
     {
-        // _state.X = e.X;
-        // _state.Y = e.Y;
+        SetTarget(_state.X + e.X, _state.Y + e.Y);
     }
 
     void Lock(bool shouldLock)
@@ -115,6 +114,8 @@ public class Npc2D : Component
 
     void OnJump(NpcJumpEvent e)
     {
+        _state.X = (ushort)e.X;
+        _state.Y = (ushort)e.Y;
     }
 
     GameConfig.MovementT GetMoveConfig() => Resolve<IGameConfigProvider>().Game.NpcMovement;

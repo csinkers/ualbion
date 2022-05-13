@@ -787,7 +787,7 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void WaveLibTest()
     {
-        var w = Test(assets => assets.LoadWaveLib(WaveLibrary.TorontoAmbient));
+        var w = Test(assets => assets.LoadWaveLib(WaveLibrary.Unknown5));
         Assert.Equal(512, w.Samples.Length);
         var s = w[121];
         Assert.Equal(1, s.BytesPerSample);

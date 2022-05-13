@@ -406,7 +406,7 @@ public class AssetConversionTests
     [Fact]
     public void WaveLibTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(WaveLibrary.TorontoAmbient) };
+        var info = new AssetInfo { AssetId = AssetId.From(WaveLibrary.Unknown5) };
         Test<WaveLib>(info.AssetId, null, (x, s, c) => Loaders.WaveLibLoader.Serdes(x, info, s, c));
     }
 

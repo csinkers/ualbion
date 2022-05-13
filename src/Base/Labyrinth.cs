@@ -14,7 +14,6 @@ public enum Labyrinth : byte
     Unknown8 = 8,
     Unknown9 = 9,
 
-    Unknown100 = 100,
     TestSrimalinar = 101,
     Toronto1 = 102,
     Toronto2 = 103,
@@ -52,5 +51,4 @@ public enum Labyrinth : byte
     DeviceMaker = 208,
     Unknown209 = 209,
     MountainPass = 210,
-    Unknown211 = 211,
 }

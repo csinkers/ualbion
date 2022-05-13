@@ -1,6 +1,5 @@
 {
-    "0": { "Id": "lab.100", "PaletteId": 1 }, // Unknown100
-    "1": { "PaletteId": 3 }, // TestSrimalinar
+    "1": { "Id": "lab.101", "PaletteId": 3 }, // TestSrimalinar
     "2": { "PaletteId": 7 }, // Toronto1
     "3": { "PaletteId": 8 }, // Toronto2
     "4": { "PaletteId": 13 }, // TestDrinno

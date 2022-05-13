@@ -28,8 +28,8 @@
     "$(XLD)/EVNTSET0.XLD": { "Loader": "eset", "Max": 98, "Map": { "0": { "Id": "eset.1" } } },
     "$(XLD)/EVNTSET1.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.100" } } },
     "$(XLD)/EVNTSET2.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.200" } } },
-    "$(XLD)/EVNTSET3.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.300" } } },
-    "$(XLD)/EVNTSET9.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.900" } } },
+    "$(XLD)/EVNTSET3.XLD": { "Loader": "eset", "Map": { "1": { "Id": "eset.301" } } },
+    "$(XLD)/EVNTSET9.XLD": { "Loader": "eset", "Max":  98, "Map": { "81": { "Id": "eset.981" } } },
     "$(XLD)/SCRIPT0.XLD":  { "Loader": "script", "Map": { "0": { "Id": "script.1" } } },
     "$(XLD)/SCRIPT2.XLD":  { "Loader": "script", "Map": { "0": { "Id": "script.200" } } },
 
@@ -52,7 +52,7 @@
 
     // Monster info
     "$(XLD)/MONCHAR0.XLD": { "Post": "inv", "Loader": "sheet",  "Map": { "0": { "Id": "monster.1" } } },
-    "$(XLD)/MONGRP0.XLD":  { "Loader": "mongrp", "Max": 98, "Map": { "0": { "Id": "mongrp.1" } } },
+    "$(XLD)/MONGRP0.XLD":  { "Loader": "mongrp", "Max": 98, "Map": { "1": { "Id": "mongrp.2" } } },
     "$(XLD)/MONGRP1.XLD":  { "Loader": "mongrp", "Map": { "0": { "Id": "mongrp.100" } } },
     "$(XLD)/MONGRP2.XLD":  { "Loader": "mongrp", "Map": { "0": { "Id": "mongrp.200" } } },
 
@@ -103,9 +103,9 @@
     // Audio
     "$(XLD)/SAMPLES0.XLD": { "Loader": "sample", "Max": 98, "Map": { "0": { "Id": "sample.1" } } }, // TODO: Add mapping for NPC sound id -> sample id
     "$(XLD)/SAMPLES1.XLD": { "Loader": "sample", "Map": { "0": { "Id": "sample.100" } } },
-    "$(XLD)/SAMPLES2.XLD": { "Loader": "sample", "Map": { "0": { "Id": "sample.200" } } },
+    "$(XLD)/SAMPLES2.XLD": { "Loader": "sample", "Map": { "1": { "Id": "sample.201" } } },
     "$(XLD)/SONGS0.XLD":   { "Loader": "song",   "Map": { "0": { "Id": "song.1" } } }, // TODO: Add mapping for song -> ambient song id
-    "$(XLD)/WAVELIB0.XLD": { "Loader": "wavlib", "Map": { "0": { "Id": "wavlib.1" } } },
+    "$(XLD)/WAVELIB0.XLD": { "Loader": "wavlib", "Map": { "4": { "Id": "wavlib.5" } } },
 
     // Videos
     "$(XLD)/GERMAN/FLICS0.XLD":  { "Language": "GERMAN",  "Loader": "flic", "Map": { "0": { "Id": "vid.1" } } },

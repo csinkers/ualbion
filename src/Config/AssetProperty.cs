@@ -15,6 +15,7 @@ public static class AssetProperty
     public const string PaletteId  = "PaletteId"; // int
     public const string SubSprites = "SubSprites"; // string
     public const string Transposed = "Transposed"; // bool
+    public const string ExtraBytes = "ExtraBytes"; // int, used to suppress assertions when loading original assets that have incorrect sizes
 
     // Palette
     public const string IsCommon       = "IsCommon"; // bool

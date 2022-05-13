@@ -2,7 +2,7 @@
 // ReSharper disable UnusedMember.Global
 namespace UAlbion.Base;
 
-public enum Automap : ushort
+public enum Automap : ushort // Note: All the 2D map ids will be 0 bytes
 {
     Unk1 = 1, // Referenced in a ModifyNpcOffEvent in map 163
     Unk40 = 40, // Referenced in some EventChainOffEvents in maps 147, 151, 154
@@ -82,7 +82,7 @@ public enum Automap : ushort
     DjiCantosCave = 173,
     Endgame = 174,
 
-    Broken = 190,
+    // Broken = 190,
 
     LoadTestMap = 195,
     Unnamed3 = 196,

@@ -134,14 +134,14 @@ public class AssetFileInfo
         if (ranges == null)
             return;
 
-        foreach(var asset in Map.Values)
+        foreach (var asset in Map.Values)
         {
             last ??= asset; // Let last start off as the first mapped info, in case the range doesn't overlap with the mapped ids.
             if (asset.Id == null || !asset.AssetId.IsNone) continue;
             asset.AssetId = ResolveId(asset.Id);
         }
 
-        foreach(var range in ranges)
+        foreach (var range in ranges)
         {
             for (int i = range.Item1; i < range.Item1 + range.Item2; i++)
             {

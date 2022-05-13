@@ -17,7 +17,7 @@
     "015": { "PaletteId": 25, "Width": 36 },
     "016": { "PaletteId": 25, "Width": 36 },
     "017": { "PaletteId": 25, "Width": 52 },
-    "018": { "PaletteId": 25, "Width": 29 },
+    "018": { "PaletteId": 25, "Width": 29, "ExtraBytes": 10 },
     "019": { "PaletteId": 25, "Width": 30 },
     "020": { "PaletteId": 25, "Width": 52 },
     "021": { "PaletteId": 25, "Width": 51 },

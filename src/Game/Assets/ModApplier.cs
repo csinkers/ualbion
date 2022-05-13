@@ -369,7 +369,8 @@ public class ModApplier : Component, IModApplier
                 var (asset, sourceInfo) = loaderFunc(assetInfo.AssetId, language);
                 if (asset == null)
                 {
-                    Error($"Could not load {assetInfo.AssetId}");
+                    if (assetInfo.AssetId.Type != AssetType.Automap) // Automaps should only load for 3D maps, no need for 'not found' errors
+                        Error($"Could not load {assetInfo.AssetId}");
                     continue;
                 }
 

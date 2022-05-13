@@ -82,7 +82,7 @@ public enum MapText : ushort
     DjiCantosCave = 173,
     Endgame = 174,
 
-    Broken = 190,
+    // Broken = 190,
 
     LoadTestMap = 195,
     Unnamed3 = 196,

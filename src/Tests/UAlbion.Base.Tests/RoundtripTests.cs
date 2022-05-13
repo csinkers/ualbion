@@ -442,7 +442,7 @@ public class RoundtripTests
     [Fact]
     public void WaveLibTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(WaveLibrary.TorontoAmbient) };
+        var info = new AssetInfo { AssetId = AssetId.From(WaveLibrary.Unknown5) };
         RoundTripXld<WaveLib>(nameof(WaveLibTest), "$(XLD)/WAVELIB0.XLD", 4,
             (x, s, c) => Loaders.WaveLibLoader.Serdes(x, info, s, c));
     }

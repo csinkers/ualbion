@@ -62,7 +62,7 @@ public enum AssetType : byte
     Palette,
     Sample,
     Song,
-    [IsomorphicTo(Song)] WaveLibrary,
+    WaveLibrary,
     Spell,
     Switch,
     Ticker,

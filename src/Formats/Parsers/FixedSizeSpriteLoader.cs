@@ -42,7 +42,9 @@ public class FixedSizeSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 
         byte[] pixelData = s.Bytes(null, null, (int)streamLength);
         int expectedPixelCount = width * height * spriteCount;
-        ApiUtil.Assert(expectedPixelCount == (int)streamLength,
+        int extra = info.Get(AssetProperty.ExtraBytes, 0);
+
+        ApiUtil.Assert((expectedPixelCount + extra) == (int)streamLength,
             $"Extra pixels found when loading fixed size sprite {info.AssetId} " +
             $"({streamLength} bytes for a {width}x{height}x{spriteCount} image, expected {expectedPixelCount}");
 

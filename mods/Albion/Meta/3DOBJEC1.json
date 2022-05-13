@@ -64,7 +64,7 @@
     "062": { "PaletteId": 25, "Width": 75 },
     "063": { "PaletteId": 25, "Width": 75 },
     "064": { "PaletteId": 25, "Width": 92 },
-    "065": { "PaletteId": 25, "Width": 53 },
+    "065": { "PaletteId": 25, "Width": 53, "ExtraBytes": 27 },
     "066": { "PaletteId": 25, "Width": 99 },
     "067": { "PaletteId": 25, "Width": 66 },
     "068": { "PaletteId": 25, "Width": 51 },

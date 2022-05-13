@@ -24,6 +24,5 @@
     "022": { "PaletteId": 13, "Width": 75, "Height": 71 },
     "023": { "PaletteId": 13, "Width": 85, "Height": 122 },
     "024": { "PaletteId": 13, "Width": 106, "Height": 112 },
-    "025": { "PaletteId": 13, "Width": 83, "Height": 84 },
-    "026": { "Width": 33 }
+    "025": { "PaletteId": 13, "Width": 83, "Height": 84 }
 }

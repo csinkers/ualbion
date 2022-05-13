@@ -61,7 +61,7 @@ public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
             (int)limits.Value.MaxArrayLayers,
             totalPngs);
 
-        ReadOnlyImageBuffer<uint> LoadRegion(LazyTexture<uint> texture, Region region, object regionContext)
+        ReadOnlyImageBuffer<uint> AccessRegion(LazyTexture<uint> texture, Region region, object regionContext)
         {
             var path = (string)regionContext;
             var disk = context.Disk;
@@ -77,13 +77,10 @@ public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
             if (!png.TryGetSinglePixelSpan(out Span<Rgba32> rgbaSpan))
                 throw new InvalidOperationException("Could not retrieve single span from Image");
 
-            var fromSpan = MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan);
-            return new ReadOnlyImageBuffer<uint>(png.Width, png.Height, png.Width, fromSpan);
-            // var to = texture.GetMutableRegionBuffer(regionNum);
-            // BlitUtil.BlitDirect(from, to);
+            return new ReadOnlyImageBuffer<uint>(png.Width, png.Height, png.Width, MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan));
         }
 
-        var texture = new LazyTexture<uint>(LoadRegion, info.AssetId, info.ToString(), layout.Width, layout.Height, layout.Layers);
+        var texture = new LazyTexture<uint>(AccessRegion, info.AssetId, info.ToString(), layout.Width, layout.Height, layout.Layers);
         texture.AddRegion(null, 0, 0, tileWidth, tileHeight); // Region 0 is a blank one for unmapped sub-ids
 
         int regionNum = 1;
@@ -179,7 +176,7 @@ public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
         return (dayInfo, nightInfo);
     }
 
-    void LoadRegions(
+    static void LoadRegions(
         LazyTexture<uint> texture,
         List<TileFrameSummary> info,
         SpriteSheetLayout layout,

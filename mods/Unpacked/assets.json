@@ -25,10 +25,10 @@
     "Assets/TacticalIcons":      { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Map": { "1": { "Id": "tacgfx.1"   } } },
     "Assets/CoreGraphics":       { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png",      "Map": { "0": { "Id": "coregfx.0"  } } },
 
-    "Assets/Chests":        { "Loader": "jsonInv",          "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "chest.1"    } } },
-    "Assets/Events":        { "Loader": "eventSetScript",   "Container": "dir", "Pattern": "{id}_{name}.ua",   "Map": { "1": { "Id": "eset.1"     } } },
-    "Assets/Merchants":     { "Loader": "jsonInv",          "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "merchant.1" } } },
-    "Assets/MonsterGroups": { "Loader": "jsonMonsterGroup", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "mongrp.1"   } } },
+    "Assets/Chests":        { "Loader": "jsonInv",          "Container": "dir", "Pattern": "{id:000}_{name}.json", "Map": { "1": { "Id": "chest.1"    } } },
+    "Assets/Events":        { "Loader": "eventSetScript",   "Container": "dir", "Pattern": "{id:000}_{name}.ua",   "Map": { "1": { "Id": "eset.1"     } } },
+    "Assets/Merchants":     { "Loader": "jsonInv",          "Container": "dir", "Pattern": "{id:000}_{name}.json", "Map": { "1": { "Id": "merchant.1" } } },
+    "Assets/MonsterGroups": { "Loader": "jsonMonsterGroup", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "2": { "Id": "mongrp.2"   } } },
     "Assets/Monsters":      { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "monster.1"  } } },
     "Assets/Npcs":          { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "npc.1"      } } },
     "Assets/Palettes":      { "Loader": "jsonPal",          "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "0": { "Id": "pal.0"      } } },
@@ -36,7 +36,7 @@
     "Assets/Samples":       { "Loader": "wav",              "Container": "dir", "Pattern": "{id}_{name}.wav",  "Map": { "1": { "Id": "sample.1"   } } },
     "Assets/Scripts":       { "Loader": "script",           "Container": "dir", "Pattern": "{id}_{name}.txt",  "Map": { "1": { "Id": "script.1"   } } },
     "Assets/Songs":         { "Loader": "song",             "Container": "dir", "Pattern": "{id}_{name}.xmi",  "Map": { "1": { "Id": "song.1"     } } },
-    "Assets/WaveLib":       { "Loader": "wavlib2",          "Container": "dir", "Pattern": "{id}_{frame}_{name}.wav", "Map": { "1": { "Id": "wavlib.1" } } },
+    "Assets/WaveLib":       { "Loader": "wavlib2",          "Container": "dir", "Pattern": "{id}_{frame}_{name}.wav", "Map": { "5": { "Id": "wavlib.5" } } },
     "Assets/Items.json":    { "Loader": "jsonItems",        "Container": "jsonObj", "Map": { "1": { "Id": "item.1"  } } },
     "Assets/Spells.json":   { "Loader": "jsonSpell",        "Container": "jsonObj", "Map": { "1": { "Id": "spell.1" } } },
 

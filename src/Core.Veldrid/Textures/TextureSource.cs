@@ -35,8 +35,8 @@ public class TextureSource : ServiceComponent<ITextureSource>, ITextureSource
 
     static readonly ITexture DefaultTexture = BuildDefault();
     static readonly ITexture DefaultArrayTexture = BuildDefaultArray();
-    readonly TextureCache<Texture2DHolder> _simple = new(x => new Texture2DHolder(x.Name), CreateSimple, DefaultTexture);
-    readonly TextureCache<Texture2DArrayHolder> _array = new(x => new Texture2DArrayHolder(x.Name), CreateArray, DefaultArrayTexture);
+    readonly TextureCache<Texture2DHolder> _simple = new(x => new Texture2DHolder(x.Name), CreateTexture, DefaultTexture);
+    readonly TextureCache<Texture2DArrayHolder> _array = new(x => new Texture2DArrayHolder(x.Name), CreateTexture, DefaultArrayTexture);
     readonly ITexture _dummySimple = new SimpleTexture<byte>(null, "Dummy Texture", 1, 1, new byte[] { 0 });
     readonly ITexture _dummyArray = new ArrayTexture<byte>(null, "Dummy ArrayTexture", 1, 1, 2, new byte[] { 0, 0 });
     float _lastCleanup;
@@ -88,41 +88,17 @@ public class TextureSource : ServiceComponent<ITextureSource>, ITextureSource
         _array.Dispose();
     }
 
-    static Texture CreateSimple(GraphicsDevice device, ITexture texture)
+    static Texture CreateTexture(GraphicsDevice device, ITexture texture)
     {
         var deviceTexture = texture switch
         { // Note: No automatic mip-mapping for 8-bit, blending/interpolation in palette-based images typically results in nonsense.
             // TODO: Custom mip-mapping using nearest matches in the palette
-            IReadOnlyTexture<byte> eightBit => VeldridTexture.CreateSimpleTexture(device, TextureUsage.Sampled, eightBit),
-            IReadOnlyTexture<uint> trueColor => VeldridTexture.CreateSimpleTexture(
-                device,
-                TextureUsage.Sampled, // | ((trueColor.Height == 1) ? 0 : TextureUsage.GenerateMipmaps),
-                trueColor),
+            LazyTexture<byte> lazy8 => VeldridTexture.CreateLazy(device, TextureUsage.Sampled, lazy8),
+            LazyTexture<uint> lazy32 => VeldridTexture.CreateLazy(device, TextureUsage.Sampled, lazy32),
+            IReadOnlyTexture<byte> eightBit => VeldridTexture.Create(device, TextureUsage.Sampled, eightBit),
+            IReadOnlyTexture<uint> trueColor => VeldridTexture.Create(device, TextureUsage.Sampled, trueColor),
             _ => throw new NotSupportedException($"Image format {texture.GetType().GetGenericArguments()[0].Name} not currently supported")
         };
         return deviceTexture;
     }
-
-    static Texture CreateArray(GraphicsDevice device, ITexture texture) =>
-        texture switch
-        { // Note: No automatic mip-mapping for 8-bit, blending/interpolation in palette-based images typically results in nonsense.
-            // TODO: Custom mip-mapping using nearest matches in the palette
-            IReadOnlyTexture<byte> eightBitArray => 
-                VeldridTexture.CreateArrayTexture(
-                    device,
-                    TextureUsage.Sampled,
-                    eightBitArray),
-
-            // Note: Veldrid's auto-generation of mip-maps looks to
-            // be broken in Vulkan at the moment, so disabled for now.
-            IReadOnlyTexture<uint> trueColorArray =>
-                VeldridTexture.CreateArrayTexture(
-                    device,
-                    TextureUsage.Sampled,// | TextureUsage.GenerateMipmaps,
-                    trueColorArray),
-
-            _ => throw new NotSupportedException(
-                $"Image format {texture.GetType().GetGenericArguments()[0].Name}" +
-                " not currently supported")
-        };
 }

@@ -28,55 +28,7 @@ public static class VeldridTexture
         throw new NotSupportedException();
     }
 
-    public static unsafe Texture CreateSimpleTexture<T>(GraphicsDevice gd, TextureUsage usage, IReadOnlyTexture<T> texture) where T : unmanaged
-    {
-        if (gd == null) throw new ArgumentNullException(nameof(gd));
-        if (texture == null) throw new ArgumentNullException(nameof(texture));
-
-        var pixelFormat = GetFormat(typeof(T));
-        bool mip = (usage & TextureUsage.GenerateMipmaps) != 0;
-        uint mipLevels = mip ? MipLevelCount(texture.Width, texture.Height) : 1;
-        using Texture staging = gd.ResourceFactory.CreateTexture(new TextureDescription(
-            (uint)texture.Width, (uint)texture.Height, 1,
-            mipLevels,
-            1,
-            pixelFormat,
-            TextureUsage.Staging,
-            TextureType.Texture2D));
-
-        staging.Name = "T_" + texture.Name + "_Staging";
-
-        var buffer = texture.PixelData;
-        fixed (T* texDataPtr = &buffer[0])
-        {
-            gd.UpdateTexture(
-                staging, (IntPtr)texDataPtr, (uint)(buffer.Length * Unsafe.SizeOf<T>()),
-                0, 0, 0,
-                (uint)texture.Width, (uint)texture.Height, 1,
-                0, 0);
-        }
-
-        Texture veldridTexture = gd.ResourceFactory.CreateTexture(new TextureDescription(
-            (uint)texture.Width, (uint)texture.Height, 1,
-            mipLevels,
-            1,
-            pixelFormat,
-            usage,
-            TextureType.Texture2D));
-
-        veldridTexture.Name = "T_" + texture.Name;
-
-        using CommandList cl = gd.ResourceFactory.CreateCommandList();
-        cl.Begin();
-        cl.CopyTexture(staging, veldridTexture);
-        if (mip) cl.GenerateMipmaps(veldridTexture);
-        cl.End();
-        gd.SubmitCommands(cl);
-
-        return veldridTexture;
-    }
-
-    public static unsafe Texture CreateArrayTexture<T>(GraphicsDevice gd, TextureUsage usage, IReadOnlyTexture<T> texture) where T : unmanaged
+    public static unsafe Texture Create<T>(GraphicsDevice gd, TextureUsage usage, IReadOnlyTexture<T> texture) where T : unmanaged
     {
         if (gd == null) throw new ArgumentNullException(nameof(gd));
         if (texture == null) throw new ArgumentNullException(nameof(texture));
@@ -102,7 +54,7 @@ public static class VeldridTexture
                 int pitch = (int)(mapped.RowPitch / sizeof(T));
 
                 var source = texture.GetLayerBuffer(layer);
-                var dest = new ImageBuffer<T>( texture.Width, texture.Height, pitch, span);
+                var dest = new ImageBuffer<T>(texture.Width, texture.Height, pitch, span);
 
                 BlitUtil.BlitDirect(source, dest);
 
@@ -134,7 +86,61 @@ public static class VeldridTexture
 
         return veldridTexture;
     }
-    public static Texture CreateSimpleTexture(GraphicsDevice gd, TextureUsage usage, SixLabors.ImageSharp.Image<Rgba32> image, string name)
+
+    public static unsafe Texture CreateLazy<T>(GraphicsDevice gd, TextureUsage usage, LazyTexture<T> texture) where T : unmanaged
+    {
+        if (gd == null) throw new ArgumentNullException(nameof(gd));
+        if (texture == null) throw new ArgumentNullException(nameof(texture));
+
+        var pixelFormat = GetFormat(typeof(T));
+        bool mip = (usage & TextureUsage.GenerateMipmaps) != 0;
+        uint mipLevels = mip ? MipLevelCount(texture.Width, texture.Height) : 1;
+        using Texture staging = gd.ResourceFactory.CreateTexture(new TextureDescription(
+            (uint)texture.Width, (uint)texture.Height, 1,
+            mipLevels,
+            (uint)texture.ArrayLayers,
+            pixelFormat,
+            TextureUsage.Staging,
+            TextureType.Texture2D));
+
+        staging.Name = "T_" + texture.Name + "_Staging";
+
+        for (int i = 0; i < texture.Regions.Count; i++)
+        {
+            var region = texture.Regions[i];
+            var buffer = texture.GetRegionBuffer(i);
+
+            fixed (T* texDataPtr = &buffer.Buffer[0])
+            {
+                gd.UpdateTexture(
+                    staging, (IntPtr)texDataPtr, (uint)(buffer.Buffer.Length * Unsafe.SizeOf<T>()),
+                    (uint)region.X, (uint)region.Y, 0,
+                    (uint)region.Width, (uint)region.Height, 1,
+                    0, (uint)region.Layer);
+            }
+        }
+
+        Texture veldridTexture = gd.ResourceFactory.CreateTexture(new TextureDescription(
+            (uint)texture.Width, (uint)texture.Height, 1,
+            mipLevels,
+            (uint)texture.ArrayLayers,
+            pixelFormat,
+            usage,
+            TextureType.Texture2D));
+
+        veldridTexture.Name = "T_" + texture.Name;
+
+        using CommandList cl = gd.ResourceFactory.CreateCommandList();
+        cl.Begin();
+        cl.CopyTexture(staging, veldridTexture);
+        if (mip) cl.GenerateMipmaps(veldridTexture);
+        cl.End();
+        gd.SubmitCommands(cl);
+
+        return veldridTexture;
+    }
+
+    public static Texture CreateImageSharp(GraphicsDevice gd, TextureUsage usage, SixLabors.ImageSharp.Image<Rgba32> image, string name)
     {
         if (gd == null) throw new ArgumentNullException(nameof(gd));
         if (usage != TextureUsage.Sampled && usage != (TextureUsage.Sampled | TextureUsage.GenerateMipmaps))

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Api.Eventing;
+using UAlbion.Api.Settings;
 using UAlbion.Core.Events;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 
@@ -35,13 +37,13 @@ public class PartyMember : Component, IPlayer
         if (_lerp >= 1.0f)
             return;
 
-        var config = Resolve<IGameConfigProvider>().Game;
         var elapsed = (DateTime.Now - _lastChangeTime).TotalSeconds;
         var oldLerp = _lerp;
 
-        _lerp = elapsed > config.UI.Transitions.InventoryChangLerpSeconds 
+        var lerpDuration = GetVar(GameVars.Ui.Transitions.InventoryChangLerpSeconds);
+        _lerp = elapsed >  lerpDuration
             ? 1.0f 
-            : (float)(elapsed / config.UI.Transitions.InventoryChangLerpSeconds);
+            : (float)(elapsed / lerpDuration);
 
         if (Math.Abs(_lerp - oldLerp) > float.Epsilon)
             Raise(new InventoryChangedEvent(new InventoryId(Id)));
@@ -65,7 +67,7 @@ public class PartyMember : Component, IPlayer
     void UpdateInventory()
     {
         _lastEffective = Effective;
-        Effective = EffectiveSheetCalculator.GetEffectiveSheet(_base, Resolve<IGameConfigProvider>().Game);
+        Effective = EffectiveSheetCalculator.GetEffectiveSheet(_base, Resolve<IVarSet>());
         _lastEffective ??= Effective;
         _lastChangeTime = DateTime.Now;
         _lerp = 0.0f;

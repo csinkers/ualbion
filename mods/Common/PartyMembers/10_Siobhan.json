@@ -1,0 +1,12 @@
+{
+  "InventorySlots": {
+    "Head":        { "X": 45,  "Y": 2 },
+    "Neck":        { "X": 97,  "Y": 17 },
+    "RightHand":   { "X": 11,  "Y": 76 },
+    "RightFinger": { "X": 11,  "Y": 95 },
+    "LeftHand":    { "X": 105, "Y": 65 },
+    "LeftFinger":  { "X": 105, "Y": 84 },
+    "Chest":       { "X": 72,  "Y": 49 },
+    "Feet":        { "X": 74,  "Y": 146 }
+  }
+}

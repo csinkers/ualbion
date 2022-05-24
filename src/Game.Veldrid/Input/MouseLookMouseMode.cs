@@ -40,7 +40,7 @@ public class MouseLookMouseMode : Component
 {
     readonly CameraRotateEvent _cameraRotateEvent = new(0,0);
     readonly ConfineMouseToWindowEvent _confineMouseToWindowEvent = new(true);
-    readonly SetCursorEvent _setCursorEvent = new(Base.CoreSprite.CursorCrossUnselected);
+    readonly SetCursorEvent _setCursorEvent = new(Base.CoreGfx.CursorCrossUnselected);
     readonly SetRelativeMouseModeEvent _setRelativeMouseModeEvent = new(true);
     readonly UiLeftClickEvent _uiLeftClickEvent = new();
     readonly UiLeftReleaseEvent _uiLeftReleaseEvent = new();
@@ -102,8 +102,7 @@ public class MouseLookMouseMode : Component
 
         if (e.MouseDelta.LengthSquared() > float.Epsilon)
         {
-            var config = Resolve<IGameConfigProvider>().Game;
-            var sensitivity = config.UI.MouseLookSensitivity / -1000;
+            var sensitivity = GetVar(GameVars.Ui.MouseLookSensitivity) / -1000;
             _cameraRotateEvent.Yaw = e.MouseDelta.X * sensitivity;
             _cameraRotateEvent.Pitch = e.MouseDelta.Y * sensitivity;
             Raise(_cameraRotateEvent);

@@ -33,6 +33,7 @@ r.bat
 mods/*
 !mods/Albion/
 !mods/Base/
+!mods/Common/
 !mods/Shaders/
 !mods/Test/
 !mods/Repacked/

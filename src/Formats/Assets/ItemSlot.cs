@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets;
 

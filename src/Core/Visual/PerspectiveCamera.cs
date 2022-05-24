@@ -139,13 +139,13 @@ public class PerspectiveCamera : ServiceComponent<ICamera>, ICamera
 
     void UpdateBackend()
     {
-        var settings = TryResolve<IEngineSettings>();
+        var engineFlags = GetVar(CoreVars.User.EngineFlags);
         var e = TryResolve<IEngine>();
-        if (settings != null && e != null)
+        if (e != null)
         {
-            _useReverseDepth = (settings.Flags & EngineFlags.FlipDepthRange) == EngineFlags.FlipDepthRange;
+            _useReverseDepth = (engineFlags & EngineFlags.FlipDepthRange) == EngineFlags.FlipDepthRange;
             _depthZeroToOne = e.IsDepthRangeZeroToOne;
-            _isClipSpaceYInverted = (settings.Flags & EngineFlags.FlipYSpace) == EngineFlags.FlipYSpace
+            _isClipSpaceYInverted = (engineFlags & EngineFlags.FlipYSpace) == EngineFlags.FlipYSpace
                 ? !e.IsClipSpaceYInverted
                 : e.IsClipSpaceYInverted;
         }

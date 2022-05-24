@@ -5,6 +5,7 @@ using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
@@ -41,7 +42,7 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
         OnAsync(Do<QueryConsciousEvent> (q =>
         {
             var state = Resolve<IGameState>();
-            var member = state.GetSheet(q.PartyMemberId);
+            var member = state.GetSheet(q.PartyMemberId.ToSheet());
             if (member == null)
                 return false;
             return (member.Combat.Conditions & Conditions.UnconsciousMask) == 0;

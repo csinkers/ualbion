@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Text;
@@ -14,18 +15,14 @@ public class Party : ServiceComponent<IParty>, IParty
 {
     public const int MaxPartySize = 6;
 
-    readonly IDictionary<CharacterId, CharacterSheet> _characterSheets;
+    readonly IDictionary<SheetId, CharacterSheet> _characterSheets;
     readonly List<Player.PartyMember> _statusBarOrder = new();
     readonly List<Player.PartyMember> _walkOrder = new();
     readonly IReadOnlyList<Player.PartyMember> _readOnlyStatusBarOrder;
     readonly IReadOnlyList<Player.PartyMember> _readOnlyWalkOrder;
 
-    public Party(
-        IDictionary<CharacterId, CharacterSheet> characterSheets,
-        IList<PartyMemberId> statusBarOrder,
-        Func<InventoryId, Inventory> getInventory)
+    public Party(IDictionary<SheetId, CharacterSheet> characterSheets, Func<InventoryId, Inventory> getInventory)
     {
-        if (statusBarOrder == null) throw new ArgumentNullException(nameof(statusBarOrder));
         On<AddPartyMemberEvent>(e => SetLastResult(AddMember(e.PartyMemberId)));
         On<RemovePartyMemberEvent>(e => SetLastResult(RemoveMember(e.PartyMemberId)));
         On<SetPartyLeaderEvent>(e =>
@@ -39,10 +36,6 @@ public class Party : ServiceComponent<IParty>, IParty
         _readOnlyStatusBarOrder = _statusBarOrder.AsReadOnly();
         _readOnlyWalkOrder = _walkOrder.AsReadOnly();
         AttachChild(new PartyInventory(getInventory));
-
-        foreach (var member in statusBarOrder)
-            if (!member.IsNone)
-                AddMember(member);
     }
 
     [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "<Pending>")]
@@ -80,7 +73,7 @@ public class Party : ServiceComponent<IParty>, IParty
         _walkOrder.Insert(0, player);
     }
 
-    bool AddMember(PartyMemberId id)
+    public bool AddMember(PartyMemberId id)
     {
         bool InsertMember(Player.PartyMember newPlayer)
         {
@@ -98,7 +91,7 @@ public class Party : ServiceComponent<IParty>, IParty
         if (_statusBarOrder.Any(x => x.Id == id))
             return false;
 
-        var player = new Player.PartyMember(id, _characterSheets[id]);
+        var player = new Player.PartyMember(id, _characterSheets[id.ToSheet()]);
         if (!InsertMember(player)) 
             return false;
 

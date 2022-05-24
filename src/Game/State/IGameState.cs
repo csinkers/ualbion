@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.State;
 
@@ -14,7 +15,7 @@ public interface IGameState
     IParty Party { get; }
     MapId MapId { get; }
     MapId MapIdForNpcs { get; set; } // Set by NpcManagers
-    ICharacterSheet GetSheet(CharacterId id);
+    ICharacterSheet GetSheet(SheetId id);
     IInventory GetInventory(InventoryId id);
     short GetTicker(TickerId id);
     bool GetSwitch(SwitchId id);

@@ -173,10 +173,9 @@ public abstract class MapLayer<TInstance> : Component, IMapLayer
 
     void Render()
     {
-        var config = Resolve<IGameConfigProvider>().Game;
-        var frameCount =  (Resolve<IGameState>()?.TickCount ?? 0) / config.Time.FastTicksPerMapTileFrame;
+        var frameCount =  (Resolve<IGameState>()?.TickCount ?? 0) / GetVar(GameVars.Time.FastTicksPerMapTileFrame);
 #if DEBUG
-        var debug = Resolve<IDebugSettings>()?.DebugFlags ?? 0;
+        var debug = GetVar(UserVars.Debug.DebugFlags);
         if (_lastDebugFlags != debug)
             _allDirty = true;
         _lastDebugFlags = debug;

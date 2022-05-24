@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
@@ -184,5 +185,15 @@ public static class ApiUtil
                 return i;
 
         return -1;
+    }
+
+    public static string CombinePaths(string currentDirectory, string path)
+    {
+        if (string.IsNullOrEmpty(path))
+            return currentDirectory;
+
+        var rootedPath = Path.IsPathRooted(path) ? path : Path.Combine(currentDirectory, path);
+        var absolutePath = Path.GetFullPath(rootedPath);
+        return absolutePath;
     }
 }

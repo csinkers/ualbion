@@ -30,6 +30,7 @@ public class AssetCache : Component
 
         });
         On<ReloadAssetsEvent>(_ => { lock (_syncRoot) { _cache.Clear(); } });
+        On<AssetUpdatedEvent>(e => { lock (_syncRoot) { _cache.Remove(e.Id); } });
         On<AssetStatsEvent>(_ =>
         {
             var sb = new StringBuilder();

@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Linq;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
+using UAlbion.Formats.Ids;
+using UAlbion.Game.Assets;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
 
@@ -16,14 +18,13 @@ public class InventoryMidPane : UiElement
 
     protected override void Subscribed()
     {
-        var config = Resolve<IGameConfigProvider>().Game;
-        var allPositions = config.Inventory.Positions.ToDictionary(
-            x => PartyMemberId.Parse(x.Key),
-            x => x.Value);
+        var assets = Resolve<IAssetManager>();
+        var positions = assets.LoadPartyMember(_activeCharacter).InventorySlots;
+        if (positions == null)
+            throw new AssetNotFoundException($"Could not load inventory slot positions for party member {_activeCharacter}");
 
-        var positions = allPositions[_activeCharacter];
         var backgroundStack = new FixedPositionStack();
-        var background = new UiSpriteElement(_activeCharacter.ToFullBodyPicture());
+        var background = new UiSpriteElement(_activeCharacter.ToInventoryGfx());
         backgroundStack.Add(background, 3, 10 - 1); //subtract 1px because picture starts 1px above frame
 
         var bodyStack = new FixedPositionStack();
@@ -38,6 +39,7 @@ public class InventoryMidPane : UiElement
                 (int)position.X + 1, //take frame border into account
                 (int)position.Y + 1); //take frame border into account
         }
+
         bodyStack.Add(new Button(new Spacing(128, 168)) { Theme = ButtonTheme.Invisible, Margin = 0, Padding = -1 }
             .OnClick(() => Raise(new InventorySwapEvent(new InventoryId(_activeCharacter), ItemSlotId.CharacterBody))), 0, 0);
 
@@ -56,11 +58,10 @@ public class InventoryMidPane : UiElement
             new Header(new DynamicText(() =>
             {
                 var member = Resolve<IParty>()[_activeCharacter];
-                var settings = Resolve<ISettings>();
                 if (member == null)
                     return Array.Empty<TextBlock>();
 
-                var name = member.Apparent.GetName(settings.Gameplay.Language);
+                var name = member.Apparent.GetName(GetVar(UserVars.Gameplay.Language));
                 return new[] { new TextBlock(name) { Alignment = TextAlignment.Center } };
             })),
             new HorizontalStack(

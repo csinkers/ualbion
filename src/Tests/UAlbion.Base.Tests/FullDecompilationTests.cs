@@ -10,9 +10,8 @@ using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
-using UAlbion.Game.Settings;
 using UAlbion.Scripting;
 using UAlbion.Scripting.Ast;
 using UAlbion.Scripting.Tests;
@@ -38,15 +37,7 @@ public class FullDecompilationTests : IDisposable
         AssetMapping.GlobalIsThreadLocal = true;
         var disk = new MockFileSystem(true);
         var baseDir = ConfigUtil.FindBasePath(disk);
-        var generalConfig = AssetSystem.LoadGeneralConfig(baseDir, disk, JsonUtil);
-        var configProvider = AssetSystem.LoadConfig(baseDir, disk, JsonUtil);
-        var settings = new GeneralSettings
-        {
-            ActiveMods = { "Albion" },
-            Language = Language.English
-        };
-
-        Exchange = AssetSystem.Setup(Mapping, disk, JsonUtil, generalConfig, settings, configProvider, null);
+        Exchange = AssetSystem.Setup(baseDir, Mapping, disk, JsonUtil, null).Exchange;
     }
 
     public FullDecompilationTests()

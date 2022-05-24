@@ -4,6 +4,7 @@ using System.Text.Json;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using Xunit;
 
 namespace UAlbion.Formats.Tests;
@@ -15,28 +16,28 @@ public class JsonTests
     {
         AssetMapping.GlobalIsThreadLocal = true;
         AssetMapping.Global.Clear()
-            .RegisterAssetType(typeof(Base.Npc), AssetType.Npc)
-            .RegisterAssetType(typeof(Base.PartyMember), AssetType.Party)
+            .RegisterAssetType(typeof(Base.NpcSheet), AssetType.NpcSheet)
+            .RegisterAssetType(typeof(Base.PartySheet), AssetType.PartySheet)
             ;
 
-        var sheets = new Dictionary<CharacterId, CharacterSheet>
+        var sheets = new Dictionary<SheetId, CharacterSheet>
         {
-            { Base.Npc.Argim, new CharacterSheet(Base.Npc.Argim) },
-            { Base.PartyMember.Tom, new CharacterSheet(Base.PartyMember.Tom) }
+            { Base.NpcSheet.Argim, new CharacterSheet(Base.NpcSheet.Argim) },
+            { Base.PartySheet.Tom, new CharacterSheet(Base.PartySheet.Tom) }
         };
 
         var jsonUtil = new JsonUtil();
         var json = jsonUtil.Serialize(sheets);
-        var reloaded = jsonUtil.Deserialize<Dictionary<CharacterId, CharacterSheet>>(json);
+        var reloaded = jsonUtil.Deserialize<Dictionary<SheetId, CharacterSheet>>(json);
 
         Assert.Collection(reloaded.OrderBy(x => x.Key.ToString()),
             kvp =>
             {
-                Assert.Equal(Base.Npc.Argim, kvp.Key);
+                Assert.Equal(Base.NpcSheet.Argim, kvp.Key);
             },
             kvp =>
             {
-                Assert.Equal(Base.PartyMember.Tom, kvp.Key);
+                Assert.Equal(Base.PartySheet.Tom, kvp.Key);
             }
         );
     }
@@ -46,10 +47,10 @@ public class JsonTests
     {
         AssetMapping.GlobalIsThreadLocal = true;
         AssetMapping.Global.Clear()
-            .RegisterAssetType(typeof(Base.PartyMember), AssetType.Party)
+            .RegisterAssetType(typeof(Base.PartySheet), AssetType.PartySheet)
             .RegisterAssetType(typeof(Base.Item), AssetType.Item)
             ;
-        var id = new InventorySlotId((CharacterId) Base.PartyMember.Tom, ItemSlotId.Head);
+        var id = new InventorySlotId((SheetId) Base.PartySheet.Tom, ItemSlotId.Head);
         var tests = new[] {
             new ItemSlot(id),
             new ItemSlot(id).Set(Base.Item.Dagger, 1),
@@ -82,7 +83,7 @@ public class JsonTests
 
     const string InventoryJson = @"
 {
-    ""Id"": ""Monster.Magician1"",
+    ""Id"": ""MonsterSheet.Magician1"",
     ""Slots"": {
         ""3"": ""3x Item.Torch"",
         ""4"": ""Item.Clothes"",
@@ -97,7 +98,7 @@ public class JsonTests
     {
         AssetMapping.GlobalIsThreadLocal = true;
         AssetMapping.Global.Clear()
-            .RegisterAssetType(typeof(Base.Monster), AssetType.Monster)
+            .RegisterAssetType(typeof(Base.MonsterSheet), AssetType.MonsterSheet)
             .RegisterAssetType(typeof(Base.Item), AssetType.Item)
             ;
 
@@ -117,13 +118,13 @@ public class JsonTests
     {
         AssetMapping.GlobalIsThreadLocal = true;
         AssetMapping.Global.Clear()
-            .RegisterAssetType(typeof(Base.Monster), AssetType.Monster)
+            .RegisterAssetType(typeof(Base.MonsterSheet), AssetType.MonsterSheet)
             .RegisterAssetType(typeof(Base.Item), AssetType.Item)
             ;
 
         var options = new JsonSerializerOptions { Converters = { InventoryConverter.Instance } };
 
-        var inv = new Inventory(new InventoryId((MonsterId)Base.Monster.Magician1));
+        var inv = new Inventory(new InventoryId((MonsterId)Base.MonsterSheet.Magician1));
         inv.Gold.Item = Gold.Instance;
         inv.Gold.Amount = 20;
         inv.Rations.Item = Rations.Instance;

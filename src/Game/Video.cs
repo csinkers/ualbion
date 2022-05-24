@@ -5,8 +5,8 @@ using UAlbion.Api.Visual;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.ScriptEvents;
 
 namespace UAlbion.Game;

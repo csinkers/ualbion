@@ -5,8 +5,8 @@ using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
+using UAlbion.Formats.Ids;
+using TransitionVars = UAlbion.Formats.Config.GameVars.Ui.Transitions;
 
 namespace UAlbion.Game.Entities;
 
@@ -38,12 +38,11 @@ public class GravityItemTransition : Component
 
     protected override void Subscribed()
     {
-        var transitionConfig = Resolve<IGameConfigProvider>().Game.UI.Transitions;
         lock (SyncRoot)
         {
             _velocity = new Vector2(
-                (float)(Random.NextDouble() - 0.5) * transitionConfig.DiscardItemMaxInitialX,
-                (float)Random.NextDouble() * transitionConfig.DiscardItemMaxInitialY);
+                (float)(Random.NextDouble() - 0.5) * GetVar(TransitionVars.DiscardItemMaxInitialX),
+                (float)Random.NextDouble() * GetVar(TransitionVars.DiscardItemMaxInitialY));
         }
 
         base.Subscribed();
@@ -58,8 +57,7 @@ public class GravityItemTransition : Component
             return;
         }
 
-        var transitionConfig = Resolve<IGameConfigProvider>().Game.UI.Transitions;
-        _velocity += new Vector2(0, -transitionConfig.DiscardItemGravity) * deltaSeconds;
+        _velocity += new Vector2(0, -GetVar(TransitionVars.DiscardItemGravity) * deltaSeconds);
         _sprite.Position += new Vector3(_velocity, 0) * deltaSeconds;
     }
 }

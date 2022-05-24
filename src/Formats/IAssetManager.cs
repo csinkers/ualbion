@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Api.Eventing;
+using UAlbion.Api.Settings;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
@@ -7,6 +8,8 @@ using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Config;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats;
 
@@ -14,7 +17,7 @@ public interface IAssetManager : ITextureLoader
 {
     AssetInfo GetAssetInfo(AssetId id, string language = null);
     ITexture LoadTexture(SpriteId id);
-    ITileGraphics LoadTileGraphics(TilesetGraphicsId id);
+    ITileGraphics LoadTileGraphics(TilesetGfxId id);
     ITexture LoadFont(FontColor color, bool isBold);
     TilesetData LoadTileData(TilesetId id);
     LabyrinthData LoadLabyrinthData(LabyrinthId id);
@@ -30,7 +33,8 @@ public interface IAssetManager : ITextureLoader
     AlbionPalette LoadPalette(PaletteId id);
     IMapData LoadMap(MapId id);
     ItemData LoadItem(ItemId id);
-    CharacterSheet LoadSheet(CharacterId id);
+    PartyMemberInfo LoadPartyMember(PartyMemberId id);
+    CharacterSheet LoadSheet(SheetId id);
     Inventory LoadInventory(AssetId id); // TODO: Use InventoryId?
     IList<Block> LoadBlockList(BlockListId id);
     EventSet LoadEventSet(EventSetId id);
@@ -41,4 +45,6 @@ public interface IAssetManager : ITextureLoader
     MonsterGroup LoadMonsterGroup(MonsterGroupId id);
     Automap LoadAutomap(AutomapId id);
     byte[] LoadSoundBanks(); // Special assets
+    IVarSet LoadConfig();
+    InputConfig LoadInputConfig();
 }

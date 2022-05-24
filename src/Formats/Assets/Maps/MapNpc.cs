@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets.Maps;
 
@@ -82,8 +83,8 @@ public class MapNpc // 0xA = 10 bytes
         npc.SpriteOrGroup = mapType switch
         {
             MapType.ThreeD => AssetId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.ObjectGroup, mapping, s),
-            MapType.TwoD => SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.LargeNpcGraphics, mapping, s),
-            MapType.TwoDOutdoors => SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.SmallNpcGraphics, mapping, s),
+            MapType.TwoD => SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.NpcLargeGfx, mapping, s),
+            MapType.TwoDOutdoors => SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.NpcSmallGfx, mapping, s),
             _ => throw new ArgumentOutOfRangeException(nameof(mapType), mapType, null)
         };
 

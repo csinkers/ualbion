@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Config;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Save;

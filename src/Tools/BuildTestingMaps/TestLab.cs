@@ -1,8 +1,8 @@
 ﻿using UAlbion.Base;
 using UAlbion.Config;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
+using UAlbion.Formats.Ids;
 using static BuildTestingMaps.Constants;
 
 namespace BuildTestingMaps;

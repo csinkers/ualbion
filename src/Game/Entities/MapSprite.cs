@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.Entities;
 

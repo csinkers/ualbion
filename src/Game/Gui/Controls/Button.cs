@@ -5,6 +5,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Text;
@@ -84,8 +85,7 @@ public class Button : UiElement
             }
             else // For the first click, just start the double-click timer.
             {
-                var uiConfig = Resolve<IGameConfigProvider>().Game.UI;
-                Raise(new StartTimerEvent(TimerName, uiConfig.ButtonDoubleClickIntervalSeconds, this));
+                Raise(new StartTimerEvent(TimerName, GetVar(GameVars.Ui.ButtonDoubleClickIntervalSeconds), this));
                 ClickTimerPending = true;
             }
         });

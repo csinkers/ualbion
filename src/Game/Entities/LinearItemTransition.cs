@@ -4,7 +4,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.Entities;
 

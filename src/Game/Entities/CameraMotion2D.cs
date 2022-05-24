@@ -63,7 +63,8 @@ public class CameraMotion2D : Component
         else
         {
             var party = Resolve<IParty>();
-            var cameraConfig = Resolve<IGameConfigProvider>().Game.Visual.Camera2D;
+            var settings = Resolve<ISettings>();
+            var lerpRate = GameVars.Visual.Camera2D.LerpRate.Read(settings);
             if (map == null || party == null || !party.StatusBarOrder.Any()) return;
             var leader = party.Leader;
             if (leader == null)
@@ -78,8 +79,8 @@ public class CameraMotion2D : Component
             else
             {
                 _position = new Vector3(
-                    ApiUtil.Lerp(_position.X, position.X, cameraConfig.LerpRate * e.DeltaSeconds),
-                    ApiUtil.Lerp(_position.Y, position.Y, cameraConfig.LerpRate * e.DeltaSeconds),
+                    ApiUtil.Lerp(_position.X, position.X, lerpRate * e.DeltaSeconds),
+                    ApiUtil.Lerp(_position.Y, position.Y, lerpRate * e.DeltaSeconds),
                     map.BaseCameraHeight);
             }
         }

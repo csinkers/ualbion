@@ -93,13 +93,13 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
 
     protected override void Subscribed()
     {
-        Resolve<IShaderCache>().ShadersUpdated += OnShadersUpdated;
+        Resolve<IShaderLoader>().ShadersUpdated += OnShadersUpdated;
         base.Subscribed();
     }
 
     protected override void Unsubscribed()
     {
-        Resolve<IShaderCache>().ShadersUpdated -= OnShadersUpdated;
+        Resolve<IShaderLoader>().ShadersUpdated -= OnShadersUpdated;
         base.Unsubscribed();
     }
 
@@ -176,7 +176,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
             using (PerfTracker.FrameEvent("6 Drawing"))
                 Draw();
 
-            var flags = Resolve<IEngineSettings>().Flags;
+            var flags = GetVar(CoreVars.User.EngineFlags);
             if (_graphicsDevice.SyncToVerticalBlank != ((flags & EngineFlags.VSync) != 0))
                 _graphicsDevice.SyncToVerticalBlank = (flags & EngineFlags.VSync) != 0;
 
@@ -244,7 +244,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
             _renderDoc.APIValidation = true;
         }
 
-        var flags = Resolve<IEngineSettings>().Flags;
+        var flags = GetVar(CoreVars.User.EngineFlags);
         var gdOptions = new GraphicsDeviceOptions(
             _renderDoc != null,
             PixelFormat.R32_Float,

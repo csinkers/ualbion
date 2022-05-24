@@ -9,7 +9,7 @@ namespace UAlbion.Formats;
 
 public interface IModApplier : IComponent
 {
-    void LoadMods(AssetMapping mapping, IGeneralConfig config, IList<string> mods);
+    void LoadMods(AssetMapping mapping, IPathResolver pathResolver, IList<string> mods);
     AssetInfo GetAssetInfo(AssetId key, string language);
     object LoadAsset(AssetId id);
     object LoadAsset(AssetId id, string language);

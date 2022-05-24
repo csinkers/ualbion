@@ -62,7 +62,7 @@ public class DialogFrame : UiElement
             int n = 0;
             while(x < width - TileSize)
             {
-                var sprite = (Base.CoreSprite)((int)Base.CoreSprite.UiBackgroundLines1 + n % 4); // TODO: Better solution
+                var sprite = (Base.CoreGfx)((int)Base.CoreGfx.UiBackgroundLines1 + n % 4); // TODO: Better solution
                 var texture = assets.LoadTexture(Id(sprite));
                 int? w = x + 2*TileSize > width ? width - TileSize - x : (int?)null;
                 multi.AddTexture(1, texture, x, y, 0, true, w);
@@ -75,7 +75,7 @@ public class DialogFrame : UiElement
         {
             int y = TileSize;
             int n = 0;
-            var sprite = (Base.CoreSprite)(int)Base.CoreSprite.UiBackgroundLines1; // TODO: Better solution
+            var sprite = (Base.CoreGfx)(int)Base.CoreGfx.UiBackgroundLines1; // TODO: Better solution
             ITexture texture = assets.LoadTexture(Id(sprite));
             texture = CoreUtil.BuildTransposedTexture((IReadOnlyTexture<byte>)texture);
             while (y < height - TileSize)
@@ -92,7 +92,7 @@ public class DialogFrame : UiElement
         {
             case DialogFrameBackgroundStyle.MainMenuPattern:
             {
-                var background = assets.LoadTexture(Id(Base.CoreSprite.UiBackground));
+                var background = assets.LoadTexture(Id(Base.CoreGfx.UiBackground));
                 multi.AddTexture(1, background,
                     FrameOffsetX, FrameOffsetY, 0, true,
                     width - FrameOffsetX * 2, height - FrameOffsetY * 2);
@@ -110,10 +110,10 @@ public class DialogFrame : UiElement
         }
 
         // Corners
-        multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreSprite.UiWindowTopLeft)), 0, 0, 0, true);
-        multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreSprite.UiWindowTopRight)), width - TileSize, 0, 0, true);
-        multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreSprite.UiWindowBottomLeft)), 0, height - TileSize, 0, true);
-        multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreSprite.UiWindowBottomRight)), width - TileSize, height - TileSize, 0, true);
+        multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreGfx.UiWindowTopLeft)), 0, 0, 0, true);
+        multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreGfx.UiWindowTopRight)), width - TileSize, 0, 0, true);
+        multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreGfx.UiWindowBottomLeft)), 0, height - TileSize, 0, true);
+        multi.AddTexture(1, assets.LoadTexture(Id(Base.CoreGfx.UiWindowBottomRight)), width - TileSize, height - TileSize, 0, true);
 
         DrawLine(4); // Left
         DrawLine(height - FrameOffsetY); // Right

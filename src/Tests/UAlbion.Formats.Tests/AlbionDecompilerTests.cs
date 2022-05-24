@@ -129,7 +129,8 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
         AssetMapping.Global.RegisterAssetType(typeof(Base.Item), AssetType.Item);
         AssetMapping.Global.RegisterAssetType(typeof(Base.Map), AssetType.Map);
         AssetMapping.Global.RegisterAssetType(typeof(Base.MapText), AssetType.MapText);
-        AssetMapping.Global.RegisterAssetType(typeof(Base.PartyMember), AssetType.Party);
+        AssetMapping.Global.RegisterAssetType(typeof(Base.PartySheet), AssetType.PartySheet);
+        AssetMapping.Global.RegisterAssetType(typeof(Base.PartyMember), AssetType.PartyMember);
         AssetMapping.Global.RegisterAssetType(typeof(Base.Switch), AssetType.Switch);
         AssetMapping.Global.RegisterAssetType(typeof(Base.Ticker), AssetType.Ticker);
         AssetMapping.Global.RegisterAssetType(typeof(Base.Word), AssetType.Word);
@@ -265,25 +266,25 @@ if (query_verb Examine) {
  89=>90: change_item PartyMember.Sira Item.TriifalaiSeed SubtractAmount 1
 !90?!:91: result
  91=>92: execute 1 65535
- 92=>93: map_text EventText.Sira2 21 PortraitLeft PartyMember.Sira
+ 92=>93: map_text EventText.Sira2 21 PortraitLeft PartySheet.Sira
 !93?!:94: get_switch Switch.SiraAndTomDiscussedSeedSignificance
 !94?95:!: is_conscious PartyMember.Tom
- 95=>96: map_text EventText.Sira2 22 PortraitLeft PartyMember.Tom
- 96=>97: map_text EventText.Sira2 23 PortraitLeft PartyMember.Sira
- 97=>98: map_text EventText.Sira2 24 PortraitLeft PartyMember.Tom
- 98=>99: map_text EventText.Sira2 25 PortraitLeft PartyMember.Sira
+ 95=>96: map_text EventText.Sira2 22 PortraitLeft PartySheet.Tom
+ 96=>97: map_text EventText.Sira2 23 PortraitLeft PartySheet.Sira
+ 97=>98: map_text EventText.Sira2 24 PortraitLeft PartySheet.Tom
+ 98=>99: map_text EventText.Sira2 25 PortraitLeft PartySheet.Sira
  99=>!: switch Set Switch.SiraAndTomDiscussedSeedSignificance
  100=>101: action Unk17 255
  101=>102: change_item PartyMember.Sira Item.TriifalaiSeed SubtractAmount 1
 !102?!:103: result
  103=>104: execute 1 65535
- 104=>105: map_text EventText.Sira2 21 PortraitLeft PartyMember.Sira
+ 104=>105: map_text EventText.Sira2 21 PortraitLeft PartySheet.Sira
 !105?!:106: get_switch Switch.SiraAndTomDiscussedSeedSignificance
 !106?107:!: is_conscious PartyMember.Tom
- 107=>108: map_text EventText.Sira2 22 PortraitLeft PartyMember.Tom
- 108=>109: map_text EventText.Sira2 23 PortraitLeft PartyMember.Sira
- 109=>110: map_text EventText.Sira2 24 PortraitLeft PartyMember.Tom
- 110=>111: map_text EventText.Sira2 25 PortraitLeft PartyMember.Sira
+ 107=>108: map_text EventText.Sira2 22 PortraitLeft PartySheet.Tom
+ 108=>109: map_text EventText.Sira2 23 PortraitLeft PartySheet.Sira
+ 109=>110: map_text EventText.Sira2 24 PortraitLeft PartySheet.Tom
+ 110=>111: map_text EventText.Sira2 25 PortraitLeft PartySheet.Sira
  111=>!: switch Set Switch.SiraAndTomDiscussedSeedSignificance
  112=>113: action Word 0 Word.Akiir
  113=>!: map_text EventText.Sira2 38";

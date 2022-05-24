@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
+using UAlbion.Api.Settings;
 using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Magic;
 using UAlbion.Game.Settings;
 
@@ -24,25 +26,32 @@ public sealed class AssetConverter : IDisposable
 
     static (ModApplier, EventExchange, AssetLoaderRegistry) BuildModApplier(string baseDir, string[] mods, IFileSystem disk, IJsonUtil jsonUtil, AssetMapping mapping)
     {
-        var config = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir, disk, jsonUtil);
+        var pathResolver = new PathResolver(baseDir);
         var applier = new ModApplier();
         var exchange = new EventExchange(new LogExchange()) { Name = $"EventExchange for {string.Join(", ", mods)}"};
         var assetLoaderRegistry = new AssetLoaderRegistry();
+        var settings = new VarSetContainer();
+
         exchange
+            .Register<IPathResolver>(pathResolver)
             .Register(disk)
             .Register(jsonUtil)
-            .Register<IGeneralConfig>(config)
+            .Attach(settings)
             .Attach(new StdioConsoleLogger())
             .Attach(assetLoaderRegistry)
             .Attach(new ContainerRegistry())
             .Attach(new PostProcessorRegistry())
             .Attach(new AssetLocator())
             .Attach(new SpellManager())
-            .Attach(new SettingsManager(new GeneralSettings())) // Used for event comments
             .Attach(applier)
             ;
 
-        applier.LoadMods(mapping, config, mods);
+        applier.LoadMods(mapping, pathResolver, mods);
+
+        var config = (IVarSet)applier.LoadAsset(AssetId.From(Base.Special.GameConfig));
+        if (config != null) // This might fail for Unpacked etc prior to an export being done
+            settings.Set = config;
+
         return (applier, exchange, assetLoaderRegistry);
     }
 

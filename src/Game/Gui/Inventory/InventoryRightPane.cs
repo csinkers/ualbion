@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
@@ -18,6 +19,7 @@ public class InventoryRightPane : UiElement
     {
         var header = new Header(Base.SystemText.Inv_Backpack);
 
+        var sheetId = activeCharacter.ToSheet();
         var slotSpans = new IUiElement[InventoryHeight];
         for (int j = 0; j < InventoryHeight; j++)
         {
@@ -25,8 +27,7 @@ public class InventoryRightPane : UiElement
             for (int i = 0; i < InventoryWidth; i++)
             {
                 int index = j * InventoryWidth + i;
-                slotsInRow[i] = new LogicalInventorySlot(new InventorySlotId(activeCharacter,
-                    (ItemSlotId)((int)ItemSlotId.Slot0 + index)));
+                slotsInRow[i] = new LogicalInventorySlot(new InventorySlotId(sheetId, (ItemSlotId)((int)ItemSlotId.Slot0 + index)));
             }
             slotSpans[j] = new HorizontalStack(slotsInRow);
         }
@@ -42,7 +43,7 @@ public class InventoryRightPane : UiElement
             var money = new Button(
                     new VerticalStack(
                         new Spacing(64, 0),
-                        new UiSpriteElement(Base.CoreSprite.UiGold) { Flags = SpriteFlags.Highlight },
+                        new UiSpriteElement(Base.CoreGfx.UiGold) { Flags = SpriteFlags.Highlight },
                         new UiText(tf.Format(Base.SystemText.Shop_GoldAll)),
                         new SimpleText($"{total / 10}.{total % 10}")
                     ) { Greedy = false})

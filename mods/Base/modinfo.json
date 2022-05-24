@@ -1,8 +1,9 @@
 {
-    "Repo": "https://github.com/CSinkers/UAlbion",
-    "Name":" UAlbion-Base",
-    "Description": "Enum and loader definitions for the base game",
-    "Author": "Cam Sinclair et al",
-    "Version": "0.1.0",
-    "Dependencies": [ ]
+  "Repo": "https://github.com/CSinkers/UAlbion",
+  "Name": " UAlbion-Base",
+  "Description": "Enum and loader definitions for the base game",
+  "Author": "Cam Sinclair et al",
+  "Version": "0.1.0",
+  "Dependencies": [],
+  "AssetConfig": "base_assets.json" 
 }

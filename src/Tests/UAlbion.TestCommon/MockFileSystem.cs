@@ -57,12 +57,10 @@ public class MockFileSystem : IFileSystem
         public override string ToString() => $"{Path} ({Stream.Length} bytes)";
     }
 
-    public IFileSystem Duplicate(string currentDirectory)
-    {
-        return new MockFileSystemChild(this, currentDirectory);
-    }
+    public IFileSystem Duplicate(string currentDirectory) => new MockFileSystemChild(this, currentDirectory);
+    public string ToAbsolutePath(string path) => ApiUtil.CombinePaths(_currentDirectory, path);
 
-    INode GetDir(string path)
+    INode GetDir(string path) // This method assumes that the path is absolute
     {
         lock (_syncRoot)
         {
@@ -89,6 +87,7 @@ public class MockFileSystem : IFileSystem
 
     (DirNode, INode) GetFile(string path)
     {
+        path = ToAbsolutePath(path);
         lock (_syncRoot)
         {
             if (!(GetDir(Path.GetDirectoryName(path)) is DirNode dir))
@@ -117,7 +116,7 @@ public class MockFileSystem : IFileSystem
 
         lock (_syncRoot)
         {
-            path = Path.GetFullPath(path);
+            path = ToAbsolutePath(path);
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
             if (path.Length > 260) throw new PathTooLongException();
 
@@ -163,7 +162,7 @@ public class MockFileSystem : IFileSystem
     {
         lock (_syncRoot)
         {
-            path = Path.GetFullPath(path);
+            path = ToAbsolutePath(path);
             if (GetDir(Path.GetDirectoryName(path)) is not DirNode dir)
                 return false;
 
@@ -177,7 +176,7 @@ public class MockFileSystem : IFileSystem
     {
         lock (_syncRoot)
         {
-            path = Path.GetFullPath(path);
+            path = ToAbsolutePath(path);
             return GetDir(path) is DirNode;
         }
     }
@@ -186,7 +185,7 @@ public class MockFileSystem : IFileSystem
     {
         lock (_syncRoot)
         {
-            path = Path.GetFullPath(path);
+            path = ToAbsolutePath(path);
             if (!(GetDir(path) is DirNode dir))
                 return Enumerable.Empty<string>();
 
@@ -201,7 +200,8 @@ public class MockFileSystem : IFileSystem
     {
         lock (_syncRoot)
         {
-            return GetFile(Path.GetFullPath(path)) switch
+            path = ToAbsolutePath(path);
+            return GetFile(path) switch
             {
                 ({ }, FileNode file) => new MockFileStream(file.Stream, true),
                 ({ }, DirNode) =>
@@ -218,7 +218,7 @@ public class MockFileSystem : IFileSystem
 
         lock (_syncRoot)
         {
-            path = Path.GetFullPath(path);
+            path = ToAbsolutePath(path);
             var filename = Path.GetFileName(path);
             switch (GetFile(path))
             {
@@ -243,7 +243,7 @@ public class MockFileSystem : IFileSystem
 
         lock (_syncRoot)
         {
-            path = Path.GetFullPath(path);
+            path = ToAbsolutePath(path);
             var (dir, file) = GetFile(path);
             if (file == null)
                 return;
@@ -256,7 +256,7 @@ public class MockFileSystem : IFileSystem
     {
         lock (_syncRoot)
         {
-            path = Path.GetFullPath(path);
+            path = ToAbsolutePath(path);
             using var s = OpenRead(path);
             using var sr = new StreamReader(s);
             return sr.ReadToEnd();
@@ -270,7 +270,7 @@ public class MockFileSystem : IFileSystem
 
         lock (_syncRoot)
         {
-            path = Path.GetFullPath(path);
+            path = ToAbsolutePath(path);
             using var s = OpenWriteTruncate(path);
             using var sw = new StreamWriter(s);
             sw.Write(fullText);
@@ -281,7 +281,7 @@ public class MockFileSystem : IFileSystem
     {
         lock (_syncRoot)
         {
-            path = Path.GetFullPath(path);
+            path = ToAbsolutePath(path);
             using var s = OpenRead(path);
             using var sr = new StreamReader(s);
             while (!sr.EndOfStream)
@@ -293,7 +293,7 @@ public class MockFileSystem : IFileSystem
     {
         lock (_syncRoot)
         {
-            path = Path.GetFullPath(path);
+            path = ToAbsolutePath(path);
             using var s = OpenRead(path);
             using var br = new BinaryReader(s);
             return br.ReadBytes((int)s.Length);
@@ -307,10 +307,34 @@ public class MockFileSystem : IFileSystem
 
         lock (_syncRoot)
         {
-            path = Path.GetFullPath(path);
+            path = ToAbsolutePath(path);
             using var s = OpenWriteTruncate(path);
             using var bw = new BinaryWriter(s);
             bw.Write(bytes);
         }
+    }
+
+    public string ToStringRecursive()
+    {
+        lock (_syncRoot)
+        {
+            StringBuilder sb = new StringBuilder();
+            ToStringInner(sb, _root, 0);
+            return sb.ToString();
+        }
+    }
+
+    static void ToStringInner(StringBuilder sb, INode t, int level)
+    {
+        for (int i = 0; i < level - 1; i++)
+            sb.Append("| ");
+        if (level > 0)
+            sb.Append("+-");
+
+        sb.AppendLine(t.Path);
+
+        if (t is DirNode dir)
+            foreach (var child in dir.Values.OrderBy(x => x.Path))
+                ToStringInner(sb, child, level + 1);
     }
 }

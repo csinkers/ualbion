@@ -1,8 +1,8 @@
 ﻿using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Ids;
 using static BuildTestingMaps.Constants;
 
 namespace BuildTestingMaps;
@@ -150,7 +150,7 @@ public class TestTilemap
             x.UseUnderlayFlags = true;
         });
 
-        var gfxId = (SpriteId)UAlbion.Base.TilesetGraphics.Toronto;
+        var gfxId = (SpriteId)UAlbion.Base.TilesetGfx.Toronto;
         Assets[gfxId] = BlitUtil.CombineFramesVertically(gfxId, tiles);
         Assets[Tileset.Id] = Tileset;
     }

@@ -142,7 +142,7 @@ public sealed class RenderPass : Component, IRenderPass, IDisposable
     {
         var camera = Resolve<ICamera>();
         var clock = TryResolve<IClock>();
-        var settings = TryResolve<IEngineSettings>();
+        var engineFlags = GetVar(CoreVars.User.EngineFlags);
         var paletteManager = Resolve<IPaletteManager>();
         var textureSource = Resolve<ITextureSource>();
 
@@ -169,7 +169,7 @@ public sealed class RenderPass : Component, IRenderPass, IDisposable
             CameraDirection = new Vector2(camera.Pitch, camera.Yaw),
             Resolution =  new Vector2(Framebuffer.Width, Framebuffer.Height),
             Time = clock?.ElapsedTime ?? 0,
-            EngineFlags = settings?.Flags ?? 0,
+            EngineFlags = engineFlags,
             PaletteBlend = paletteManager.Blend,
             PaletteFrame = paletteManager.Frame
         };

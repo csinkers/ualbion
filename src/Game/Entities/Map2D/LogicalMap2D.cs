@@ -5,6 +5,7 @@ using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Entities.Map2D;
@@ -29,7 +30,7 @@ public class LogicalMap2D : LogicalMap
     }
 
     public bool UseSmallSprites { get; }
-    public TilesetGraphicsId TilesetId => _mapData.TilesetId.ToTilesetGraphics();
+    public TilesetGfxId TilesetId => _tileData.Id.ToTilesetGfx();
     public Vector2 TileSize { get; set; } // TODO: Tidy up how this gets initialised
 
     public TileData GetUnderlay(int x, int y) => GetUnderlay(Index(x, y));

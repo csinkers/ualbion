@@ -73,14 +73,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Game", "src\Game\UA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Game.Veldrid", "src\Game.Veldrid\UAlbion.Game.Veldrid.csproj", "{8CAAAFFC-3BE8-468B-830D-24610F4F75A2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}"
-	ProjectSection(SolutionItems) = preProject
-		data\config.json = data\config.json
-		data\core.json = data\core.json
-		data\game.json = data\game.json
-		data\input.json = data\input.json
-		data\settings.defaults.json = data\settings.defaults.json
-	EndProjectSection
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mods", "Mods", "{E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5B011D11-67A4-4DAC-BA1C-CD95C699A6B9}"
 	ProjectSection(SolutionItems) = preProject
@@ -103,7 +96,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Config", "src\Confi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Base", "Base", "{DAC01E7B-9B98-4DB3-AC5B-9D093785B17E}"
 	ProjectSection(SolutionItems) = preProject
-		mods\Base\assets.json = mods\Base\assets.json
+		mods\Base\base_assets.json = mods\Base\base_assets.json
 		mods\Base\modinfo.json = mods\Base\modinfo.json
 	EndProjectSection
 EndProject
@@ -220,8 +213,29 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.SingleAssetConverte
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Albion", "Albion", "{F0EBCFC7-8567-499A-9E42-5B89FAFE7BC2}"
 	ProjectSection(SolutionItems) = preProject
-		mods\Albion\assets.json = mods\Albion\assets.json
+		mods\Albion\alb_assets.json = mods\Albion\alb_assets.json
 		mods\Albion\modinfo.json = mods\Albion\modinfo.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{690E5E8F-C7D5-4229-ADA6-1B714B1ECC02}"
+	ProjectSection(SolutionItems) = preProject
+		mods\Common\assets.json = mods\Common\assets.json
+		mods\Common\config.json = mods\Common\config.json
+		mods\Common\input.json = mods\Common\input.json
+		mods\Common\modinfo.json = mods\Common\modinfo.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PartyMembers", "PartyMembers", "{1C6D7AF2-357C-4F59-8AB6-175926397AC5}"
+	ProjectSection(SolutionItems) = preProject
+		mods\Common\PartyMembers\01_Tom.json = mods\Common\PartyMembers\01_Tom.json
+		mods\Common\PartyMembers\02_Rainer.json = mods\Common\PartyMembers\02_Rainer.json
+		mods\Common\PartyMembers\03_Drirr.json = mods\Common\PartyMembers\03_Drirr.json
+		mods\Common\PartyMembers\04_Sira.json = mods\Common\PartyMembers\04_Sira.json
+		mods\Common\PartyMembers\05_Mellthas.json = mods\Common\PartyMembers\05_Mellthas.json
+		mods\Common\PartyMembers\06_Harriet.json = mods\Common\PartyMembers\06_Harriet.json
+		mods\Common\PartyMembers\07_Joe.json = mods\Common\PartyMembers\07_Joe.json
+		mods\Common\PartyMembers\09_Khunag.json = mods\Common\PartyMembers\09_Khunag.json
+		mods\Common\PartyMembers\10_Siobhan.json = mods\Common\PartyMembers\10_Siobhan.json
 	EndProjectSection
 EndProject
 Global
@@ -464,6 +478,8 @@ Global
 		{AA9C6E97-A39B-4774-BF42-E1B51B315EC3} = {149A8BC2-91D1-4249-9E1D-7B0054347832}
 		{74B9CB4A-DD58-4970-BF46-EA30E65EA5C7} = {149A8BC2-91D1-4249-9E1D-7B0054347832}
 		{F0EBCFC7-8567-499A-9E42-5B89FAFE7BC2} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
+		{690E5E8F-C7D5-4229-ADA6-1B714B1ECC02} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
+		{1C6D7AF2-357C-4F59-8AB6-175926397AC5} = {690E5E8F-C7D5-4229-ADA6-1B714B1ECC02}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2759A62D-227A-4D68-B6B5-966B9141AA74}

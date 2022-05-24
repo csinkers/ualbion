@@ -10,6 +10,7 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Containers;
 using UAlbion.Formats.Exporters.Tiled;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.Parsers;
 using UAlbion.Game.Assets;
@@ -22,7 +23,7 @@ namespace UAlbion.Base.Tests;
 public class RoundtripTests
 {
     static readonly IJsonUtil JsonUtil = new FormatJsonUtil();
-    static readonly GeneralConfig GeneralConfig;
+    static readonly PathResolver PathResolver;
     static readonly AssetMapping Mapping;
     static readonly IFileSystem Disk;
     static readonly string ResultDir;
@@ -30,7 +31,7 @@ public class RoundtripTests
     static RoundtripTests()
     {
         string baseDir;
-        (Disk, baseDir, GeneralConfig, Mapping) = SetupAssets(JsonUtil);
+        (Disk, baseDir, PathResolver, Mapping) = SetupAssets(JsonUtil);
         ResultDir = Path.Combine(baseDir, "re", "RoundTripTests");
     }
 
@@ -40,18 +41,18 @@ public class RoundtripTests
         AssetMapping.Global.MergeFrom(Mapping);
     }
 
-    static (MockFileSystem disk, string baseDir, GeneralConfig generalConfig, AssetMapping mapping) SetupAssets(IJsonUtil jsonUtil)
+    static (MockFileSystem disk, string baseDir, PathResolver generalConfig, AssetMapping mapping) SetupAssets(IJsonUtil jsonUtil)
     {
         Event.AddEventsFromAssembly(typeof(ActionEvent).Assembly);
         var mapping = new AssetMapping();
         var disk = new MockFileSystem(true);
         var baseDir = ConfigUtil.FindBasePath(disk);
-        var baseAssetConfigPath = Path.Combine(baseDir, "mods", "Base", "assets.json");
-        var assetConfigPath = Path.Combine(baseDir, "mods", "Albion", "assets.json");
+        var pathResolver = new PathResolver(baseDir);
+        pathResolver.RegisterPath("ALBION", Path.Combine(baseDir, "Albion"));
+        var baseAssetConfigPath = Path.Combine(baseDir, "mods", "Base", "base_assets.json");
+        var assetConfigPath = Path.Combine(baseDir, "mods", "Albion", "alb_assets.json");
         var baseAssetConfig = AssetConfig.Load(baseAssetConfigPath, null, mapping, disk, jsonUtil);
         var assetConfig = AssetConfig.Load(assetConfigPath, baseAssetConfig, mapping, disk, jsonUtil);
-
-        var generalConfig = AssetSystem.LoadGeneralConfig(baseDir, disk, jsonUtil);
 
         foreach (var assetType in assetConfig.IdTypes.Values)
         {
@@ -63,7 +64,7 @@ public class RoundtripTests
             mapping.RegisterAssetType(assetType.EnumType, assetType.AssetType);
         }
 
-        return (disk, baseDir, generalConfig, mapping);
+        return (disk, baseDir, pathResolver, mapping);
     }
 
     static T RoundTrip<T>(string testName, byte[] bytes, Asset.SerdesFunc<T> serdes) where T : class
@@ -114,13 +115,13 @@ public class RoundtripTests
     {
         var info = new AssetInfo { Index = subId };
         var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
-        var bytes = Asset.BytesFromXld(GeneralConfig, file, info, context);
+        var bytes = Asset.BytesFromXld(PathResolver, file, info, context);
         RoundTrip(testName, bytes, serdes);
     }
 
     void RoundTripRaw<T>(string testName, string file, Asset.SerdesFunc<T> serdes) where T : class
     {
-        var bytes = File.ReadAllBytes(GeneralConfig.ResolvePath(file));
+        var bytes = File.ReadAllBytes(PathResolver.ResolvePath(file));
         RoundTrip(testName, bytes, serdes);
     }
 
@@ -129,7 +130,7 @@ public class RoundtripTests
         var info = new AssetInfo { Index = subId };
         var loader = new ItemListContainer();
         var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
-        using var s = loader.Read(GeneralConfig.ResolvePath(file), info, context);
+        using var s = loader.Read(PathResolver.ResolvePath(file), info, context);
         var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
         RoundTrip(testName, bytes, serdes);
     }
@@ -139,7 +140,7 @@ public class RoundtripTests
         var info = new AssetInfo { Index = subId };
         var loader = new SpellListContainer();
         var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
-        using var s = loader.Read(GeneralConfig.ResolvePath(file), info, context);
+        using var s = loader.Read(PathResolver.ResolvePath(file), info, context);
         var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
         RoundTrip(testName, bytes, serdes);
     }
@@ -162,7 +163,7 @@ public class RoundtripTests
             .Attach(spellManager)
             .Attach(itemDataLoader);
 
-        RoundTripItem<ItemData>(nameof(ItemTest), "$(XLD)/ITEMLIST.DAT", 10,
+        RoundTripItem<ItemData>(nameof(ItemTest), "$(ALBION)/CD/XLDLIBS/ITEMLIST.DAT", 10,
             (x, s, c) => itemDataLoader.Serdes(x, info, s, c));
     }
 
@@ -170,7 +171,7 @@ public class RoundtripTests
     public void ItemNameTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Special.ItemNames) };
-        RoundTripRaw<MultiLanguageStringDictionary>(nameof(ItemNameTest), "$(XLD)/ITEMNAME.DAT",
+        RoundTripRaw<MultiLanguageStringDictionary>(nameof(ItemNameTest), "$(ALBION)/CD/XLDLIBS/ITEMNAME.DAT",
             (x, s, c) => Loaders.ItemNameLoader.Serdes(x, info, s, c));
     }
 
@@ -178,7 +179,7 @@ public class RoundtripTests
     public void AutomapTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Automap.Jirinaar) };
-        RoundTripXld<Formats.Assets.Automap>(nameof(AutomapTest), "$(XLD)/INITIAL/AUTOMAP1.XLD", 10,
+        RoundTripXld<Formats.Assets.Automap>(nameof(AutomapTest), "$(ALBION)/CD/XLDLIBS/INITIAL/AUTOMAP1.XLD", 10,
             (x, s, c) => Loaders.AutomapLoader.Serdes(x, info, s, c));
     }
 
@@ -186,7 +187,7 @@ public class RoundtripTests
     public void BlockListTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(BlockList.Toronto) };
-        RoundTripXld<Formats.Assets.BlockList>(nameof(BlockListTest), "$(XLD)/BLKLIST0.XLD", 7,
+        RoundTripXld<Formats.Assets.BlockList>(nameof(BlockListTest), "$(ALBION)/CD/XLDLIBS/BLKLIST0.XLD", 7,
             (x, s, c) => Loaders.BlockListLoader.Serdes(x, info, s, c));
     }
 
@@ -194,7 +195,7 @@ public class RoundtripTests
     public void ChestTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Chest.Unknown121) };
-        RoundTripXld<Inventory>(nameof(ChestTest), "$(XLD)/INITIAL/CHESTDT1.XLD", 21,
+        RoundTripXld<Inventory>(nameof(ChestTest), "$(ALBION)/CD/XLDLIBS/INITIAL/CHESTDT1.XLD", 21,
             (x, s, c) => Loaders.ChestLoader.Serdes(x, info, s, c));
     }
 
@@ -203,7 +204,7 @@ public class RoundtripTests
     {
         var info = new AssetInfo { AssetId = AssetId.From(Palette.Common) };
         info.Set(AssetProperty.IsCommon, true);
-        RoundTripRaw<AlbionPalette>(nameof(CommonPaletteTest), "$(XLD)/PALETTE.000",
+        RoundTripRaw<AlbionPalette>(nameof(CommonPaletteTest), "$(ALBION)/CD/XLDLIBS/PALETTE.000",
             (x, s, c) => Loaders.PaletteLoader.Serdes(x, info, s, c));
     }
 
@@ -211,7 +212,7 @@ public class RoundtripTests
     public void EventSetTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(EventSet.Frill) };
-        RoundTripXld<Formats.Assets.EventSet>(nameof(EventSetTest), "$(XLD)/EVNTSET1.XLD", 11,
+        RoundTripXld<Formats.Assets.EventSet>(nameof(EventSetTest), "$(ALBION)/CD/XLDLIBS/EVNTSET1.XLD", 11,
             (x, s, c) => Loaders.EventSetLoader.Serdes(x, info, s, c));
     }
 
@@ -219,7 +220,7 @@ public class RoundtripTests
     public void EventTextTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(EventText.Frill) };
-        RoundTripXld<ListStringCollection>(nameof(EventTextTest), "$(XLD)/ENGLISH/EVNTTXT1.XLD", 11,
+        RoundTripXld<ListStringCollection>(nameof(EventTextTest), "$(ALBION)/CD/XLDLIBS/ENGLISH/EVNTTXT1.XLD", 11,
             (x, s, c) => Loaders.AlbionStringTableLoader.Serdes(x, info, s, c));
     }
 
@@ -227,7 +228,7 @@ public class RoundtripTests
     public void LabyrinthTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Labyrinth.Jirinaar) };
-        RoundTripXld<Formats.Assets.Labyrinth.LabyrinthData>(nameof(LabyrinthTest), "$(XLD)/LABDATA1.XLD", 9,
+        RoundTripXld<Formats.Assets.Labyrinth.LabyrinthData>(nameof(LabyrinthTest), "$(ALBION)/CD/XLDLIBS/LABDATA1.XLD", 9,
             (x, s, c) => Loaders.LabyrinthDataLoader.Serdes(x, info, s, c));
     }
 
@@ -235,7 +236,7 @@ public class RoundtripTests
     public void Map2DTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Map.TorontoBegin) };
-        RoundTripXld<MapData2D>(nameof(Map2DTest), "$(XLD)/MAPDATA3.XLD", 0,
+        RoundTripXld<MapData2D>(nameof(Map2DTest), "$(ALBION)/CD/XLDLIBS/MAPDATA3.XLD", 0,
             (x, s, c) => MapData2D.Serdes(info, x, c.Mapping, s));
     }
 
@@ -243,7 +244,7 @@ public class RoundtripTests
     public void Map3DTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Map.OldFormerBuilding) };
-        RoundTripXld<MapData3D>(nameof(Map3DTest), "$(XLD)/MAPDATA1.XLD", 22,
+        RoundTripXld<MapData3D>(nameof(Map3DTest), "$(ALBION)/CD/XLDLIBS/MAPDATA1.XLD", 22,
             (x, s, c) => MapData3D.Serdes(info, x, c.Mapping, s));
     }
 
@@ -251,7 +252,7 @@ public class RoundtripTests
     public void MapTextTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(MapText.TorontoBegin) };
-        RoundTripXld<ListStringCollection>(nameof(MapTextTest), "$(XLD)/ENGLISH/MAPTEXT3.XLD", 0,
+        RoundTripXld<ListStringCollection>(nameof(MapTextTest), "$(ALBION)/CD/XLDLIBS/ENGLISH/MAPTEXT3.XLD", 0,
             (x, s, c) => Loaders.AlbionStringTableLoader.Serdes(x, info, s, c));
     }
 
@@ -259,7 +260,7 @@ public class RoundtripTests
     public void MerchantTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Merchant.Unknown109) };
-        RoundTripXld<Inventory>(nameof(MerchantTest), "$(XLD)/INITIAL/MERCHDT1.XLD", 9,
+        RoundTripXld<Inventory>(nameof(MerchantTest), "$(ALBION)/CD/XLDLIBS/INITIAL/MERCHDT1.XLD", 9,
             (x, s, c) => Loaders.MerchantLoader.Serdes(x, info, s, c));
     }
 
@@ -267,7 +268,7 @@ public class RoundtripTests
     public void MonsterGroupTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(MonsterGroup.TwoSkrinn1OneKrondir1) };
-        RoundTripXld<Formats.Assets.MonsterGroup>(nameof(MonsterGroupTest), "$(XLD)/MONGRP0.XLD", 9,
+        RoundTripXld<Formats.Assets.MonsterGroup>(nameof(MonsterGroupTest), "$(ALBION)/CD/XLDLIBS/MONGRP0.XLD", 9,
             (x, s, c) => Loaders.MonsterGroupLoader.Serdes(x, info, s, c));
     }
 
@@ -301,18 +302,18 @@ public class RoundtripTests
     [Fact]
     public void MonsterTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Monster.Krondir1) };
+        var info = new AssetInfo { AssetId = AssetId.From(MonsterSheet.Krondir1) };
         var loader = BuildCharacterLoader();
-        RoundTripXld<CharacterSheet>(nameof(MonsterTest), "$(XLD)/MONCHAR0.XLD", 9,
+        RoundTripXld<CharacterSheet>(nameof(MonsterTest), "$(ALBION)/CD/XLDLIBS/MONCHAR0.XLD", 9,
             (x, s, c) => loader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void NpcTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Npc.Christine) };
+        var info = new AssetInfo { AssetId = AssetId.From(NpcSheet.Christine) };
         var loader = BuildCharacterLoader();
-        RoundTripXld<CharacterSheet>(nameof(NpcTest), "$(XLD)/INITIAL/NPCCHAR1.XLD", 83,
+        RoundTripXld<CharacterSheet>(nameof(NpcTest), "$(ALBION)/CD/XLDLIBS/INITIAL/NPCCHAR1.XLD", 83,
             (x, s, c) => loader.Serdes(x, info, s, c));
     }
 
@@ -320,16 +321,16 @@ public class RoundtripTests
     public void PaletteTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Palette.Toronto2D) };
-        RoundTripXld<AlbionPalette>(nameof(PaletteTest), "$(XLD)/PALETTE0.XLD", 25,
+        RoundTripXld<AlbionPalette>(nameof(PaletteTest), "$(ALBION)/CD/XLDLIBS/PALETTE0.XLD", 25,
             (x, s, c) => Loaders.PaletteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void PartyMemberTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(PartyMember.Tom) };
+        var info = new AssetInfo { AssetId = AssetId.From(PartySheet.Tom) };
         var loader = BuildCharacterLoader();
-        RoundTripXld<CharacterSheet>(nameof(PartyMemberTest), "$(XLD)/INITIAL/PRTCHAR0.XLD", 0,
+        RoundTripXld<CharacterSheet>(nameof(PartyMemberTest), "$(ALBION)/CD/XLDLIBS/INITIAL/PRTCHAR0.XLD", 0,
             (x, s, c) => loader.Serdes(x, info, s, c));
     }
 
@@ -337,7 +338,7 @@ public class RoundtripTests
     public void SampleTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Sample.IllTemperedLlama) };
-        RoundTripXld<AlbionSample>(nameof(SampleTest), "$(XLD)/SAMPLES0.XLD", 47,
+        RoundTripXld<AlbionSample>(nameof(SampleTest), "$(ALBION)/CD/XLDLIBS/SAMPLES0.XLD", 47,
             (x, s, c) => Loaders.SampleLoader.Serdes(x, info, s, c));
     }
 
@@ -347,7 +348,7 @@ public class RoundtripTests
     public void ScriptTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Script.TomMeetsChristine) };
-        RoundTripXld<IList<IEvent>>(nameof(ScriptTest), "$(XLD)/SCRIPT0.XLD", 1,
+        RoundTripXld<IList<IEvent>>(nameof(ScriptTest), "$(ALBION)/CD/XLDLIBS/SCRIPT0.XLD", 1,
             (x, s, c) => Loaders.ScriptLoader.Serdes(x, info, s, c));
     } //*/
 
@@ -355,7 +356,7 @@ public class RoundtripTests
     public void SongTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Song.Toronto) };
-        RoundTripXld<byte[]>(nameof(SongTest), "$(XLD)/SONGS0.XLD", 3,
+        RoundTripXld<byte[]>(nameof(SongTest), "$(ALBION)/CD/XLDLIBS/SONGS0.XLD", 3,
             (x, s, c) => Loaders.SongLoader.Serdes(x, info, s, c));
     }
 
@@ -363,7 +364,7 @@ public class RoundtripTests
     public void SpellTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Spell.FrostAvalanche) };
-        RoundTripSpell<SpellData>(nameof(SpellTest), "$(XLD)/SPELLDAT.DAT", 7,
+        RoundTripSpell<SpellData>(nameof(SpellTest), "$(ALBION)/CD/XLDLIBS/SPELLDAT.DAT", 7,
             (x, s, c) => Loaders.SpellLoader.Serdes(x, info, s, c));
     }
 
@@ -371,7 +372,7 @@ public class RoundtripTests
     public void TilesetTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Tileset.Toronto) };
-        RoundTripXld<TilesetData>(nameof(TilesetTest), "$(XLD)/ICONDAT0.XLD", 7,
+        RoundTripXld<TilesetData>(nameof(TilesetTest), "$(ALBION)/CD/XLDLIBS/ICONDAT0.XLD", 7,
             (x, s, c) => Loaders.TilesetLoader.Serdes(x, info, s, c));
     }
 
@@ -379,7 +380,7 @@ public class RoundtripTests
     public void TiledTilesetTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Tileset.Toronto), Index = 7 };
-        var gfxInfo = new AssetInfo {AssetId = AssetId.From(TilesetGraphics.Toronto), Index = 7};
+        var gfxInfo = new AssetInfo {AssetId = AssetId.From(TilesetGfx.Toronto), Index = 7};
         gfxInfo.Set(AssetProperty.PaletteId, 26);
 
         var modApplier = new MockModApplier();
@@ -389,7 +390,7 @@ public class RoundtripTests
             .Attach(new AssetManager());
 
         var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
-        var bytes = Asset.BytesFromXld(GeneralConfig, "$(XLD)/ICONDAT0.XLD", info, context);
+        var bytes = Asset.BytesFromXld(PathResolver, "$(ALBION)/CD/XLDLIBS/ICONDAT0.XLD", info, context);
 
         TilesetData Serdes(TilesetData x, ISerializer s, SerdesContext context) => Loaders.TilesetLoader.Serdes(x, info, s, context);
         var (asset, preTxt) = Asset.Load<TilesetData>(bytes, Serdes, context);
@@ -414,7 +415,7 @@ public class RoundtripTests
     {
         var info = new AssetInfo { AssetId = AssetId.From(BlockList.Toronto), Index = 7 };
         var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
-        var bytes = Asset.BytesFromXld(GeneralConfig, "$(XLD)/BLKLIST0.XLD", info, context);
+        var bytes = Asset.BytesFromXld(PathResolver, "$(ALBION)/CD/XLDLIBS/BLKLIST0.XLD", info, context);
 
         Formats.Assets.BlockList Serdes(Formats.Assets.BlockList x, ISerializer s, SerdesContext c2) => Loaders.BlockListLoader.Serdes(x, info, s, c2);
         var (asset, preTxt) = Asset.Load<Formats.Assets.BlockList>(bytes, Serdes, context);
@@ -443,7 +444,7 @@ public class RoundtripTests
     public void WaveLibTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(WaveLibrary.Unknown5) };
-        RoundTripXld<WaveLib>(nameof(WaveLibTest), "$(XLD)/WAVELIB0.XLD", 4,
+        RoundTripXld<WaveLib>(nameof(WaveLibTest), "$(ALBION)/CD/XLDLIBS/WAVELIB0.XLD", 4,
             (x, s, c) => Loaders.WaveLibLoader.Serdes(x, info, s, c));
     }
 
@@ -451,7 +452,7 @@ public class RoundtripTests
     public void WordTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Special.Words1) };
-        RoundTripXld<ListStringCollection>(nameof(WordTest), "$(XLD)/ENGLISH/WORDLIS0.XLD", 0,
+        RoundTripXld<ListStringCollection>(nameof(WordTest), "$(ALBION)/CD/XLDLIBS/ENGLISH/WORDLIS0.XLD", 0,
             (x, s, c) => Loaders.WordListLoader.Serdes(x, info, s, c));
     }
 //*
@@ -460,7 +461,7 @@ public class RoundtripTests
     {
         var info = new AssetInfo { AssetId = AssetId.From(AutomapTiles.Set1) };
         info.Set(AssetProperty.SubSprites, "(8,8,576) (16,16)");
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(AutomapGfxTest), "$(XLD)/AUTOGFX0.XLD", 0,
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(AutomapGfxTest), "$(ALBION)/CD/XLDLIBS/AUTOGFX0.XLD", 0,
             (x, s, c) => Loaders.AmorphousSpriteLoader.Serdes(x, info, s, c));
     }
 
@@ -507,7 +508,7 @@ public class RoundtripTests
             AssetId = AssetId.From(CombatBackground.Toronto),
             Width = 360
         };
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(CombatBgTest), "$(XLD)/COMBACK0.XLD", 0,
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(CombatBgTest), "$(ALBION)/CD/XLDLIBS/COMBACK0.XLD", 0,
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 
@@ -520,7 +521,7 @@ public class RoundtripTests
             Width = 145,
             Height = 165
         };
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(DungeonObjectTest), "$(XLD)/3DOBJEC2.XLD", 81,
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(DungeonObjectTest), "$(ALBION)/CD/XLDLIBS/3DOBJEC2.XLD", 81,
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 
@@ -528,7 +529,7 @@ public class RoundtripTests
     public void FontTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Font.RegularFont), Width = 8, Height = 8 };
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(FontTest), "$(XLD)/FONTS0.XLD", 0,
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(FontTest), "$(ALBION)/CD/XLDLIBS/FONTS0.XLD", 0,
             (x, s, c) => Loaders.FontSpriteLoader.Serdes(x, info, s, c));
     }
 
@@ -537,11 +538,11 @@ public class RoundtripTests
     {
         var info = new AssetInfo
         {
-            AssetId = AssetId.From(ItemGraphics.ItemSprites),
+            AssetId = AssetId.From(ItemGfx.ItemSprites),
             Width = 16,
             Height = 16
         };
-        RoundTripRaw<IReadOnlyTexture<byte>>(nameof(ItemSpriteTest), "$(XLD)/ITEMGFX",
+        RoundTripRaw<IReadOnlyTexture<byte>>(nameof(ItemSpriteTest), "$(ALBION)/CD/XLDLIBS/ITEMGFX",
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 
@@ -549,7 +550,7 @@ public class RoundtripTests
     public void SlabTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(UiBackground.Slab), Width = 360 };
-        RoundTripRaw<IReadOnlyTexture<byte>>(nameof(SlabTest), "$(XLD)/SLAB",
+        RoundTripRaw<IReadOnlyTexture<byte>>(nameof(SlabTest), "$(ALBION)/CD/XLDLIBS/SLAB",
             (x, s, c) => Loaders.SlabLoader.Serdes(x, info, s, c));
     }
 
@@ -558,19 +559,19 @@ public class RoundtripTests
     {
         var info = new AssetInfo
         {
-            AssetId = AssetId.From(TilesetGraphics.Toronto),
+            AssetId = AssetId.From(TilesetGfx.Toronto),
             Width = 16,
             Height = 16
         };
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(TileGfxTest), "$(XLD)/ICONGFX0.XLD", 7,
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(TileGfxTest), "$(ALBION)/CD/XLDLIBS/ICONGFX0.XLD", 7,
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void CombatGfxTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(CombatGraphics.Unknown27) };
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(CombatGfxTest), "$(XLD)/COMGFX0.XLD", 26,
+        var info = new AssetInfo { AssetId = AssetId.From(CombatGfx.Unknown27) };
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(CombatGfxTest), "$(ALBION)/CD/XLDLIBS/COMGFX0.XLD", 26,
             (x, s, c) => Loaders.MultiHeaderSpriteLoader.Serdes(x, info, s, c));
     }
 
@@ -578,7 +579,7 @@ public class RoundtripTests
     public void DungeonBgTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(DungeonBackground.EarlyGameL) };
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(DungeonBgTest), "$(XLD)/3DBCKGR0.XLD", 0,
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(DungeonBgTest), "$(ALBION)/CD/XLDLIBS/3DBCKGR0.XLD", 0,
             (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
     }
 
@@ -591,39 +592,39 @@ public class RoundtripTests
             Width = 64,
             Height = 64
         };
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(FloorTest), "$(XLD)/3DFLOOR0.XLD", 2,
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(FloorTest), "$(ALBION)/CD/XLDLIBS/3DFLOOR0.XLD", 2,
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void FullBodyPictureTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(FullBodyPicture.Tom) };
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(FullBodyPictureTest), "$(XLD)/FBODPIX0.XLD", 0,
+        var info = new AssetInfo { AssetId = AssetId.From(PartyInventoryGfx.Tom) };
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(FullBodyPictureTest), "$(ALBION)/CD/XLDLIBS/FBODPIX0.XLD", 0,
             (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void LargeNpcTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(LargeNpc.Christine) };
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(LargeNpcTest), "$(XLD)/NPCGR0.XLD", 20,
+        var info = new AssetInfo { AssetId = AssetId.From(NpcLargeGfx.Christine) };
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(LargeNpcTest), "$(ALBION)/CD/XLDLIBS/NPCGR0.XLD", 20,
             (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void LargePartyMemberTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(LargePartyMember.Tom) };
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(LargePartyMemberTest), "$(XLD)/PARTGR0.XLD", 0,
+        var info = new AssetInfo { AssetId = AssetId.From(PartyLargeGfx.Tom) };
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(LargePartyMemberTest), "$(ALBION)/CD/XLDLIBS/PARTGR0.XLD", 0,
             (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void MonsterGfxTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(MonsterGraphics.Krondir) };
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(MonsterGfxTest), "$(XLD)/MONGFX0.XLD", 9,
+        var info = new AssetInfo { AssetId = AssetId.From(MonsterGfx.Krondir) };
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(MonsterGfxTest), "$(ALBION)/CD/XLDLIBS/MONGFX0.XLD", 9,
             (x, s, c) => Loaders.MultiHeaderSpriteLoader.Serdes(x, info, s, c));
     }
 
@@ -637,7 +638,7 @@ public class RoundtripTests
             File = new AssetFileInfo()
         };
         info.File.Set(AssetProperty.Transposed, true);
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(OverlayTest), "$(XLD)/3DOVERL0.XLD", 17,
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(OverlayTest), "$(ALBION)/CD/XLDLIBS/3DOVERL0.XLD", 17,
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 
@@ -652,7 +653,7 @@ public class RoundtripTests
             File = new AssetFileInfo()
         };
         info.File.Set(AssetProperty.Transposed, true);
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(OverlayTest), "$(XLD)/3DOVERL2.XLD", 1,
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(OverlayTest), "$(ALBION)/CD/XLDLIBS/3DOVERL2.XLD", 1,
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 
@@ -663,7 +664,7 @@ public class RoundtripTests
     public void PictureTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Picture.OpenChestWithGold) };
-        RoundTripXld<InterlacedBitmap>(nameof(PictureTest), "$(XLD)/PICTURE0.XLD", 11,
+        RoundTripXld<InterlacedBitmap>(nameof(PictureTest), "$(ALBION)/CD/XLDLIBS/PICTURE0.XLD", 11,
             (x, s, c) => Loaders.InterlacedBitmapLoader.Serdes(x, info, s, c));
     } //*/
 
@@ -675,23 +676,23 @@ public class RoundtripTests
             AssetId = AssetId.From(Portrait.Tom),
             Width = 34
         };
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(PortraitTest), "$(XLD)/SMLPORT0.XLD", 0,
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(PortraitTest), "$(ALBION)/CD/XLDLIBS/SMLPORT0.XLD", 0,
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void SmallNpcTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(SmallNpc.Krondir) };
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(SmallNpcTest), "$(XLD)/NPCKL0.XLD", 22,
+        var info = new AssetInfo { AssetId = AssetId.From(NpcSmallGfx.Krondir) };
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(SmallNpcTest), "$(ALBION)/CD/XLDLIBS/NPCKL0.XLD", 22,
             (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
     public void SmallPartyMemberTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(SmallPartyMember.Tom) };
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(SmallPartyMemberTest), "$(XLD)/PARTKL0.XLD", 0,
+        var info = new AssetInfo { AssetId = AssetId.From(PartySmallGfx.Tom) };
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(SmallPartyMemberTest), "$(ALBION)/CD/XLDLIBS/PARTKL0.XLD", 0,
             (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
     }
 
@@ -700,10 +701,10 @@ public class RoundtripTests
     {
         var info = new AssetInfo
         {
-            AssetId = AssetId.From(TacticalGraphics.Tom),
+            AssetId = AssetId.From(TacticalGfx.Tom),
             Width = 32
         };
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(TacticalGfxTest), "$(XLD)/TACTICO0.XLD", 0,
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(TacticalGfxTest), "$(ALBION)/CD/XLDLIBS/TACTICO0.XLD", 0,
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 
@@ -715,7 +716,7 @@ public class RoundtripTests
             AssetId = AssetId.From(Wall.TorontoPanelling),
             Width = 80
         };
-        RoundTripXld<IReadOnlyTexture<byte>>(nameof(WallTest), "$(XLD)/3DWALLS0.XLD", 11,
+        RoundTripXld<IReadOnlyTexture<byte>>(nameof(WallTest), "$(ALBION)/CD/XLDLIBS/3DWALLS0.XLD", 11,
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
 // */

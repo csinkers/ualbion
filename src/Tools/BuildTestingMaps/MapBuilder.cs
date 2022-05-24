@@ -2,6 +2,7 @@
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Ids;
 
 namespace BuildTestingMaps;
 

@@ -9,15 +9,12 @@ namespace UAlbion.CodeGenerator;
 
 static class GenerateAssetIds
 {
-    public static void Generate(Assets assets)
+    public static void Generate(Assets assets, string destinationPath, string destinationNamespace)
     {
-        const string destNamespace = "UAlbion.Formats.Assets";
-        const string destPath = "src/Formats/Assets";
-
         foreach (var assetType in assets.AssetIdConfig.Mappings)
         {
-            var outputPath = Path.Combine(assets.BaseDir, destPath, assetType.Key + ".g.cs");
-            var text = BuildClass(assets, destNamespace, assetType.Key, assetType.Value);
+            var outputPath = Path.Combine(assets.BaseDir, destinationPath, assetType.Key + ".g.cs");
+            var text = BuildClass(assets, destinationNamespace, assetType.Key, assetType.Value);
             File.WriteAllText(outputPath, text);
         }
     }
@@ -109,7 +106,7 @@ static class GenerateAssetIds
 
         // TODO: To...Id() methods for copy families.
         // TODO: Generation-time checks for copy family consistency
-        // TODO: Implicit casts from single-type ids to compound ids (e.g. PartyMemberId -> CharacterId)
+        // TODO: Implicit casts from single-type ids to compound ids (e.g. PartyMemberId -> SheetId)
 
         return $@"// Note: This file was automatically generated using Tools/CodeGenerator.
 // No changes should be made to this file by hand. Instead, the relevant json

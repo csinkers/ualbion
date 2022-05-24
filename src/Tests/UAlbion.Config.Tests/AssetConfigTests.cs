@@ -11,15 +11,15 @@ public class AssetConfigTests : Component
     const string TestConfig1 = @"{
   ""IdTypes"": {
     ""3dobj"":    { ""AssetType"": ""Object3D"",        ""EnumType"": ""UAlbion.Base.DungeonObject, UAlbion.Base"" },
-    ""autotile"": { ""AssetType"": ""AutomapGraphics"", ""EnumType"": ""UAlbion.Base.AutomapTiles, UAlbion.Base"" },
+    ""autotile"": { ""AssetType"": ""AutomapGfx"", ""EnumType"": ""UAlbion.Base.AutomapTiles, UAlbion.Base"" },
     ""block"": {
       ""AssetType"": ""BlockList"",
       ""EnumType"": ""UAlbion.Base.BlockList, UAlbion.Base"",
       ""CopiedFrom"": ""UAlbion.Base.Tileset, UAlbion.Base""
     },
     ""combg"":      { ""AssetType"": ""CombatBackground"", ""EnumType"": ""UAlbion.Base.CombatBackground, UAlbion.Base"" },
-    ""comgfx"":     { ""AssetType"": ""CombatGraphics"",   ""EnumType"": ""UAlbion.Base.CombatGraphics, UAlbion.Base"" },
-    ""coresprite"": { ""AssetType"": ""CoreGraphics"",     ""EnumType"": ""UAlbion.Base.CoreSprite, UAlbion.Base"" },
+    ""comgfx"":     { ""AssetType"": ""CombatGfx"",   ""EnumType"": ""UAlbion.Base.CombatGfx, UAlbion.Base"" },
+    ""coresprite"": { ""AssetType"": ""CoreGfx"",     ""EnumType"": ""UAlbion.Base.CoreSprite, UAlbion.Base"" },
     ""floor"":      { ""AssetType"": ""Floor"",            ""EnumType"": ""UAlbion.Base.Floor, UAlbion.Base"" },
     ""font"":       { ""AssetType"": ""Font"",             ""EnumType"": ""UAlbion.Base.Font, UAlbion.Base"" },
     ""item"":       { ""AssetType"": ""Item"",             ""EnumType"": ""UAlbion.Base.Item, UAlbion.Base"" },
@@ -29,8 +29,8 @@ public class AssetConfigTests : Component
     ""spell"":      { ""AssetType"": ""Spell"",            ""EnumType"": ""UAlbion.Base.Spell, UAlbion.Base"" },
     ""tiledata"":   { ""AssetType"": ""Tileset"",          ""EnumType"": ""UAlbion.Base.Tileset, UAlbion.Base"" },
     ""tilegfx"": {
-      ""AssetType"": ""TilesetGraphics"",
-      ""EnumType"": ""UAlbion.Base.TilesetGraphics, UAlbion.Base"",
+      ""AssetType"": ""TilesetGfx"",
+      ""EnumType"": ""UAlbion.Base.TilesetGfx, UAlbion.Base"",
       ""CopiedFrom"": ""UAlbion.Base.Tileset, UAlbion.Base""
     },
      ""word"": { ""AssetType"": ""Word"", ""EnumType"": ""UAlbion.Base.Word, UAlbion.Base"" }
@@ -183,7 +183,7 @@ public class AssetConfigTests : Component
             t =>
             {
                 Assert.Equal("autotile", t.Alias);
-                Assert.Equal(AssetType.AutomapGraphics, t.AssetType);
+                Assert.Equal(AssetType.AutomapGfx, t.AssetType);
                 Assert.Equal("UAlbion.Base.AutomapTiles, UAlbion.Base", t.EnumType);
             },
             t =>
@@ -201,13 +201,13 @@ public class AssetConfigTests : Component
             t =>
             {
                 Assert.Equal("comgfx", t.Alias);
-                Assert.Equal(AssetType.CombatGraphics, t.AssetType);
-                Assert.Equal("UAlbion.Base.CombatGraphics, UAlbion.Base", t.EnumType);
+                Assert.Equal(AssetType.CombatGfx, t.AssetType);
+                Assert.Equal("UAlbion.Base.CombatGfx, UAlbion.Base", t.EnumType);
             },
             t =>
             {
                 Assert.Equal("coresprite", t.Alias);
-                Assert.Equal(AssetType.CoreGraphics, t.AssetType);
+                Assert.Equal(AssetType.CoreGfx, t.AssetType);
                 Assert.Equal("UAlbion.Base.CoreSprite, UAlbion.Base", t.EnumType);
             },
             t =>
@@ -261,8 +261,8 @@ public class AssetConfigTests : Component
             t =>
             {
                 Assert.Equal("tilegfx", t.Alias);
-                Assert.Equal(AssetType.TilesetGraphics, t.AssetType);
-                Assert.Equal("UAlbion.Base.TilesetGraphics, UAlbion.Base", t.EnumType);
+                Assert.Equal(AssetType.TilesetGfx, t.AssetType);
+                Assert.Equal("UAlbion.Base.TilesetGfx, UAlbion.Base", t.EnumType);
             },
             t =>
             {

@@ -3,6 +3,7 @@ using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
@@ -39,7 +40,7 @@ public class ConversationManager : Component
 
     bool OnPartyMemberTextEvent(PartyMemberTextEvent e, Action continuation)
     {
-        var textEvent = new MapTextEvent(ContextTextSource, e.TextId, TextLocation.PortraitLeft, e.MemberId);
+        var textEvent = new MapTextEvent(ContextTextSource, e.TextId, TextLocation.PortraitLeft, e.MemberId.ToSheet());
         return OnBaseTextEvent(textEvent, continuation);
     }
 
@@ -96,7 +97,7 @@ public class ConversationManager : Component
         return false;
     }
 
-    SpriteId GetPortrait(CharacterId id)
+    SpriteId GetPortrait(SheetId id)
     {
         if (id.IsNone)
             return Base.Portrait.GibtEsNicht;
@@ -128,15 +129,15 @@ public class ConversationManager : Component
     bool StartPartyDialogue(StartPartyDialogueEvent e, Action continuation)
     {
         var assets = Resolve<IAssetManager>();
-        var npc = assets.LoadSheet(e.MemberId);
-        if (npc == null)
+        var sheet = assets.LoadSheet(e.MemberId.ToSheet());
+        if (sheet == null)
         {
             Error($"Could not load NPC info for \"{e.MemberId}\"");
             continuation();
             return true;
         }
 
-        _conversation = AttachChild(new Conversation(Base.PartyMember.Tom, npc));
+        _conversation = AttachChild(new Conversation(Base.PartyMember.Tom, sheet));
         _conversation.Complete += (_, _) => { _conversation = null; continuation(); };
         _conversation.StartDialogue();
         return true;

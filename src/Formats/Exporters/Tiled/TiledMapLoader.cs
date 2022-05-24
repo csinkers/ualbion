@@ -145,8 +145,8 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
 
     string GetAssetDir(AssetInfo info)
     {
-        var config = Resolve<IGeneralConfig>();
-        var destPath = config.ResolvePath(info.File.Filename);
+        var pathResolver = Resolve<IPathResolver>();
+        var destPath = pathResolver.ResolvePath(info.File.Filename);
         return destPath;
     }
 }

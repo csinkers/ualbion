@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Api.Eventing;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 

@@ -1,15 +1,10 @@
-﻿using System;
+﻿using UAlbion.Core.Visual;
 using Veldrid;
 
 namespace UAlbion.Core.Veldrid;
 
 public interface IShaderCache
 {
-    event EventHandler<EventArgs> ShadersUpdated;
-    string GetGlsl(string shaderName);
+    Shader[] GetShaderPair(ResourceFactory factory, ShaderInfo vertex, ShaderInfo fragment);
     void CleanupOldFiles();
-    IShaderCache AddShaderPath(string path);
-    Shader[] GetShaderPair(ResourceFactory factory,
-        string vertexShaderName, string fragmentShaderName,
-        string vertexShaderContent = null, string fragmentShaderContent = null);
 }

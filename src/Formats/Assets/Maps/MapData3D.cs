@@ -7,6 +7,7 @@ using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Labyrinth;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets.Maps;
 

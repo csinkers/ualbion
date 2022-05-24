@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets;
 

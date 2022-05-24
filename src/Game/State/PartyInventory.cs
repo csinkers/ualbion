@@ -8,6 +8,7 @@ using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Events.Transitions;

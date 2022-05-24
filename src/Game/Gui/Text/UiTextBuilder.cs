@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Text;

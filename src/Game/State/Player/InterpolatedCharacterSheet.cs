@@ -1,6 +1,7 @@
 ﻿using System;
 using UAlbion.Api;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.State.Player;
 
@@ -23,7 +24,7 @@ public class InterpolatedCharacterSheet : IEffectiveCharacterSheet
         Combat = new InterpolatedCombat(() => _a().Combat, () => _b().Combat, _getLerp);
     }
 
-    public CharacterId Id => _b().Id;
+    public SheetId Id => _b().Id;
     public string GetName(string language) => _b().GetName(language);
     public CharacterType Type => _b().Type;
     public Gender Gender => _b().Gender;

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.State;
 

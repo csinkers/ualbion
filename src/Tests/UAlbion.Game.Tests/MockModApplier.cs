@@ -14,7 +14,7 @@ public class MockModApplier : ServiceComponent<IModApplier>, IModApplier
     readonly Dictionary<AssetId, object> _assets = new();
     readonly Dictionary<AssetId, AssetInfo> _infos = new();
 
-    public void LoadMods(AssetMapping mapping, IGeneralConfig config, IList<string> mods) { }
+    public void LoadMods(AssetMapping mapping, IPathResolver pathResolver, IList<string> mods) { }
     public AssetInfo GetAssetInfo(AssetId id, string language) => _infos[id];
     public object LoadAsset(AssetId id) => _assets[id];
     public object LoadAsset(AssetId id, string language) => _assets[id];

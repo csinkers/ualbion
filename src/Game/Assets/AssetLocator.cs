@@ -27,13 +27,13 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
-        var generalConfig = Resolve<IGeneralConfig>();
+        var pathResolver = Resolve<IPathResolver>();
 
-        using ISerializer s = Search(generalConfig, info, context, annotationWriter);
+        using ISerializer s = Search(pathResolver, info, context, annotationWriter);
         if (s == null)
             return null;
 
-        if (s.BytesRemaining == 0) // Happens all the time when dumping, just return rather than throw to preserve perf.
+        if (s.BytesRemaining == 0 && s is not EmptySerializer) // Happens all the time when dumping, just return rather than throw to preserve perf.
             return new AssetNotFoundException($"Asset for {info.AssetId} found but size was 0 bytes.", info.AssetId);
 
         var loader = _assetLoaderRegistry.GetLoader(info.File.Loader);
@@ -48,15 +48,15 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var generalConfig = Resolve<IGeneralConfig>();
-        var resolved = generalConfig.ResolvePath(info.Filename);
+        var pathResolver = Resolve<IPathResolver>();
+        var resolved = pathResolver.ResolvePath(info.Filename);
         var container = _containerRegistry.GetContainer(resolved, info.Container, context.Disk);
         return container?.GetSubItemRanges(resolved, info, context) ?? new List<(int, int)> { (0, 1) };
     }
 
-    ISerializer Search(IGeneralConfig generalConfig, AssetInfo info, SerdesContext context, TextWriter annotationWriter = null)
+    ISerializer Search(IPathResolver pathResolver, AssetInfo info, SerdesContext context, TextWriter annotationWriter = null)
     {
-        var path = generalConfig.ResolvePath(info.File.Filename);
+        var path = pathResolver.ResolvePath(info.File.Filename);
         if (info.File.Sha256Hash != null && !info.File.Sha256Hash.Equals(GetHash(path, context.Disk), StringComparison.OrdinalIgnoreCase))
             return null;
 

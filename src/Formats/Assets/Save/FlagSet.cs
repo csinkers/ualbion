@@ -4,6 +4,7 @@ using System.Text;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets.Save;
 

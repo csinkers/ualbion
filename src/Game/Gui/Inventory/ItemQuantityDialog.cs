@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 

@@ -6,8 +6,8 @@ using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.ScriptEvents;
 
 namespace UAlbion.Game.Entities.Map3D;

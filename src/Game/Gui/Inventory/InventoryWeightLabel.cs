@@ -1,6 +1,6 @@
 ﻿using System;
 using UAlbion.Core.Events;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;

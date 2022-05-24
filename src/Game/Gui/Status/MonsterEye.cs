@@ -46,6 +46,6 @@ public class MonsterEye : Dialog
             }
         }
 
-        _sprite.Id = proximity ? Base.CoreSprite.MonsterEyeOn : Base.CoreSprite.MonsterEyeOff;
+        _sprite.Id = proximity ? Base.CoreGfx.MonsterEyeOn : Base.CoreGfx.MonsterEyeOff;
     }
 }

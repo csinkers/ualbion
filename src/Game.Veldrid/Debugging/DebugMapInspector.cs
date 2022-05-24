@@ -90,7 +90,7 @@ namespace UAlbion.Game.Veldrid.Debugging
                 return;
             }
 
-            void BoolOption(string name, Func<bool> getter, Action<bool> setter)
+            static void BoolOption(string name, Func<bool> getter, Action<bool> setter)
             {
                 bool value = getter();
                 bool initialValue = value;
@@ -201,46 +201,47 @@ namespace UAlbion.Game.Veldrid.Debugging
 
             if (ImGui.TreeNode("Settings"))
             {
-                var settings = Resolve<ISettings>();
                 ImGui.BeginGroup();
 
 #if DEBUG
                 if (ImGui.TreeNode("Debug"))
                 {
-                    void DebugFlagOption(DebugFlags flag)
+                    static void DebugFlagOption(DebugMapInspector me, DebugFlags flags, DebugFlags flag)
                     {
-                        BoolOption(flag.ToString(), () => settings.Debug.DebugFlags.HasFlag(flag),
-                            x => Raise(new DebugFlagEvent(x ? FlagOperation.Set : FlagOperation.Clear, flag)));
+                        BoolOption(flag.ToString(), () => (flags & flag) != 0,
+                            x => me.Raise(new DebugFlagEvent(x ? FlagOperation.Set : FlagOperation.Clear, flag)));
                     }
 
-                    DebugFlagOption(DebugFlags.DrawPositions);
-                    DebugFlagOption(DebugFlags.HighlightTile);
-                    DebugFlagOption(DebugFlags.HighlightEventChainZones);
-                    DebugFlagOption(DebugFlags.HighlightCollision);
-                    DebugFlagOption(DebugFlags.ShowPaths);
-                    DebugFlagOption(DebugFlags.NoMapTileBoundingBoxes);
-                    DebugFlagOption(DebugFlags.ShowCursorHotspot);
-                    DebugFlagOption(DebugFlags.TraceAttachment);
+                    var curFlags = GetVar(UserVars.Debug.DebugFlags);
+                    DebugFlagOption(this, curFlags, DebugFlags.DrawPositions);
+                    DebugFlagOption(this, curFlags, DebugFlags.HighlightTile);
+                    DebugFlagOption(this, curFlags, DebugFlags.HighlightEventChainZones);
+                    DebugFlagOption(this, curFlags, DebugFlags.HighlightCollision);
+                    DebugFlagOption(this, curFlags, DebugFlags.ShowPaths);
+                    DebugFlagOption(this, curFlags, DebugFlags.NoMapTileBoundingBoxes);
+                    DebugFlagOption(this, curFlags, DebugFlags.ShowCursorHotspot);
+                    DebugFlagOption(this, curFlags, DebugFlags.TraceAttachment);
                     ImGui.TreePop();
                 }
 #endif
 
                 if (ImGui.TreeNode("Engine"))
                 {
-                    void EngineFlagOption(EngineFlags flag)
+                    static void EngineFlagOption(DebugMapInspector me, EngineFlags flags, EngineFlags flag)
                     {
-                        BoolOption(flag.ToString(), () => settings.Engine.Flags.HasFlag(flag),
-                            x => Raise(new EngineFlagEvent(x ? FlagOperation.Set : FlagOperation.Clear, flag)));
+                        BoolOption(flag.ToString(), () => (flags & flag) != 0,
+                            x => me.Raise(new EngineFlagEvent(x ? FlagOperation.Set : FlagOperation.Clear, flag)));
                     }
 
-                    EngineFlagOption(EngineFlags.ShowBoundingBoxes);
-                    EngineFlagOption(EngineFlags.ShowCameraPosition);
-                    EngineFlagOption(EngineFlags.FlipDepthRange);
-                    EngineFlagOption(EngineFlags.FlipYSpace);
-                    EngineFlagOption(EngineFlags.VSync);
-                    EngineFlagOption(EngineFlags.HighlightSelection);
-                    EngineFlagOption(EngineFlags.UseCylindricalBillboards);
-                    EngineFlagOption(EngineFlags.RenderDepth);
+                    var curFlags = GetVar(CoreVars.User.EngineFlags);
+                    EngineFlagOption(this, curFlags, EngineFlags.ShowBoundingBoxes);
+                    EngineFlagOption(this, curFlags, EngineFlags.ShowCameraPosition);
+                    EngineFlagOption(this, curFlags, EngineFlags.FlipDepthRange);
+                    EngineFlagOption(this, curFlags, EngineFlags.FlipYSpace);
+                    EngineFlagOption(this, curFlags, EngineFlags.VSync);
+                    EngineFlagOption(this, curFlags, EngineFlags.HighlightSelection);
+                    EngineFlagOption(this, curFlags, EngineFlags.UseCylindricalBillboards);
+                    EngineFlagOption(this, curFlags, EngineFlags.RenderDepth);
                     ImGui.TreePop();
                 }
 

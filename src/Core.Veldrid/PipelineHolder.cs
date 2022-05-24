@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid.Events;
+using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 
@@ -81,14 +83,12 @@ public class PipelineHolder : Component, IPipelineHolder
             if (OutputDescription == null && Framebuffer == null && device.SwapchainFramebuffer == null)
                 throw new InvalidOperationException("An output description must be specified when running headless (i.e. without a primary swapchain)");
 
-            var shaderSource = Resolve<IShaderCache>();
-            var vertexShaderContent = shaderSource.GetGlsl(_vertexShaderName);
-            var fragmentShaderContent = shaderSource.GetGlsl(_fragmentShaderName);
+            var disk = Resolve<IFileSystem>();
+            var shaderLoader = Resolve<IShaderLoader>();
+            var vertexShader = shaderLoader.Load(_vertexShaderName, disk);
+            var fragmentShader = shaderLoader.Load(_fragmentShaderName, disk);
 
-            _shaders = shaderSource.GetShaderPair(
-                device.ResourceFactory,
-                _vertexShaderName, _fragmentShaderName,
-                vertexShaderContent, fragmentShaderContent);
+            _shaders =  Resolve<IShaderCache>().GetShaderPair(device.ResourceFactory, vertexShader, fragmentShader);
 
             var layoutSource = Resolve<IResourceLayoutSource>();
             var shaderSetDescription = new ShaderSetDescription(

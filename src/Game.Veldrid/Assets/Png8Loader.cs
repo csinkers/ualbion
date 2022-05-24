@@ -13,7 +13,7 @@ using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Game.Veldrid.Assets;

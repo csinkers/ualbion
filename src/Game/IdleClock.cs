@@ -19,8 +19,7 @@ public class IdleClock : Component
     void OnEngineUpdate(EngineUpdateEvent e)
     {
         _elapsedTimeThisGameFrame += e.DeltaSeconds;
-        var config = Resolve<IGameConfigProvider>().Game;
-        var tickDurationSeconds = 1.0f / config.Time.IdleTicksPerSecond;
+        var tickDurationSeconds = 1.0f / GetVar(GameVars.Time.IdleTicksPerSecond);
 
         // If the game was paused for a while don't try and catch up
         if (_elapsedTimeThisGameFrame > 4 * tickDurationSeconds)

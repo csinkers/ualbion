@@ -6,6 +6,7 @@ using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
+using UAlbion.Formats.Ids;
 using UAlbion.Scripting;
 
 namespace UAlbion.Formats.Assets.Maps;

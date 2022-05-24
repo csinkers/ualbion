@@ -14,7 +14,7 @@ public static class Program
         AssetSystem.LoadEvents();
 
         var disk = new FileSystem(@"C:\Depot\bb\ualbion");
-        var baseExchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "Base");
+        var baseExchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "Albion");
         var testExchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "UATestDev");
         var repackedExchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "Repacked");
         baseExchange.Name = "BaseExchange";

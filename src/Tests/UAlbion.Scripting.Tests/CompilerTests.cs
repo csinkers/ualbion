@@ -1,11 +1,9 @@
-﻿using System.IO;
-
-namespace UAlbion.Scripting.Tests;
+﻿namespace UAlbion.Scripting.Tests;
 
 public class CompilerTests
 {
-    static readonly string ResultsDir = Path.Combine(TestUtil.FindBasePath(), "re", "CompilerTests");
     /*
+    static readonly string ResultsDir = Path.Combine(TestUtil.FindBasePath(), "re", "CompilerTests");
     static void TestCompile(string script, ControlFlowGraph expected, [CallerMemberName] string method = null)
     {
         var steps = new List<(string, ControlFlowGraph)>();

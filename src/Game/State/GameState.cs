@@ -8,6 +8,7 @@ using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
@@ -23,7 +24,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
 
     public DateTime Time => SavedGame.Epoch + (_game?.ElapsedTime ?? TimeSpan.Zero);
     public IParty Party => _party;
-    public ICharacterSheet GetSheet(CharacterId id) => _game.Sheets.TryGetValue(id, out var sheet) ? sheet : null;
+    public ICharacterSheet GetSheet(SheetId id) => _game.Sheets.TryGetValue(id, out var sheet) ? sheet : null;
     public short GetTicker(TickerId id) => _game.Tickers.TryGetValue(id, out var value) ? value : (short)0;
     public bool GetSwitch(SwitchId id) => _game.GetFlag(id);
 
@@ -102,7 +103,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         switch(id.Type)
         {
             case InventoryType.Player:
-                inventory = _game.Sheets.TryGetValue(id.ToAssetId(), out var member) ? member.Inventory : null;
+                inventory = _game.Sheets.TryGetValue(id.ToSheetId(), out var member) ? member.Inventory : null;
                 break;
             case InventoryType.Chest: _game.Inventories.TryGetValue(id.ToAssetId(), out inventory); break;
             case InventoryType.Merchant: _game.Inventories.TryGetValue(id.ToAssetId(), out inventory); break;
@@ -128,10 +129,10 @@ public class GameState : ServiceComponent<IGameState>, IGameState
             ActiveMembers = { [0] = Base.PartyMember.Tom }
         };
 
-        foreach (var id in AssetMapping.Global.EnumerateAssetsOfType(AssetType.Party))
+        foreach (var id in AssetMapping.Global.EnumerateAssetsOfType(AssetType.PartySheet))
             _game.Sheets.Add(id, assets.LoadSheet(id));
 
-        foreach (var id in AssetMapping.Global.EnumerateAssetsOfType(AssetType.Npc))
+        foreach (var id in AssetMapping.Global.EnumerateAssetsOfType(AssetType.NpcSheet))
             _game.Sheets.Add(id, assets.LoadSheet(id));
 
         foreach (var id in AssetMapping.Global.EnumerateAssetsOfType(AssetType.Chest))
@@ -145,9 +146,9 @@ public class GameState : ServiceComponent<IGameState>, IGameState
 
     string IdToPath(ushort id)
     {
-        var generalConfig = Resolve<IGeneralConfig>();
+        var pathResolver = Resolve<IPathResolver>();
         // TODO: This path currently exists in two places: here and Game\Gui\Menus\PickSaveSlot.cs
-        return generalConfig.ResolvePath($"$(SAVE)/SAVE.{id:D3}");
+        return pathResolver.ResolvePath($"$(SAVES)/SAVE.{id:D3}");
     }
 
     void LoadGame(ushort id)
@@ -184,7 +185,12 @@ public class GameState : ServiceComponent<IGameState>, IGameState
     void InitialiseGame()
     {
         _party?.Remove();
-        _party = AttachChild(new Party(_game.Sheets, _game.ActiveMembers, GetWriteableInventory));
+        _party = AttachChild(new Party(_game.Sheets, GetWriteableInventory));
+
+        foreach (var member in _game.ActiveMembers)
+            if (!member.IsNone)
+                _party.AddMember(member);
+
         Raise(new LoadMapEvent(_game.MapId));
         Raise(new StartClockEvent());
         Raise(new SetContextEvent(ContextType.Leader, _party.Leader.Id));

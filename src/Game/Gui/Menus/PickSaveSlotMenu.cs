@@ -49,9 +49,9 @@ public class PickSaveSlotMenu : ModalDialog
 
     string BuildSaveFilename(ushort i)
     {
-        var generalConfig = Resolve<IGeneralConfig>();
+        var pathResolver = Resolve<IPathResolver>();
         // TODO: This path currently exists in two places: here and Game\State\GameState.cs
-        return generalConfig.ResolvePath($"$(SAVE)/SAVE.{i:D3}");
+        return pathResolver.ResolvePath($"$(SAVES)/SAVE.{i:D3}");
     }
 
     protected override void Subscribed()

@@ -1,13 +1,14 @@
 ﻿using System;
+using UAlbion.Api.Settings;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
 using Attribute = UAlbion.Formats.Assets.Attribute;
+using InvVars = UAlbion.Formats.Config.GameVars.Inventory;
 
 namespace UAlbion.Game.State.Player;
 
 public static class EffectiveSheetCalculator
 {
-    public static IEffectiveCharacterSheet GetEffectiveSheet(CharacterSheet sheet, GameConfig config)
+    public static IEffectiveCharacterSheet GetEffectiveSheet(CharacterSheet sheet, IVarSet config)
     {
         if (sheet == null) throw new ArgumentNullException(nameof(sheet));
         if (config == null) throw new ArgumentNullException(nameof(config));
@@ -33,7 +34,7 @@ public static class EffectiveSheetCalculator
             EventSetId = sheet.EventSetId,
             WordSetId = sheet.WordSetId,
             Magic = sheet.Magic.DeepClone(),
-            Inventory  = sheet.Inventory?.DeepClone(),
+            Inventory = sheet.Inventory?.DeepClone(),
             Attributes = sheet.Attributes.DeepClone(),
             Skills = sheet.Skills.DeepClone(),
             Combat = sheet.Combat.DeepClone()
@@ -45,7 +46,7 @@ public static class EffectiveSheetCalculator
         return effective;
     }
 
-    static void CalculateTotalWeight(EffectiveCharacterSheet sheet, GameConfig config)
+    static void CalculateTotalWeight(EffectiveCharacterSheet sheet, IVarSet config)
     {
         sheet.TotalWeight = 0;
         foreach (var itemSlot in sheet.Inventory.EnumerateAll())
@@ -55,9 +56,9 @@ public static class EffectiveSheetCalculator
             sheet.TotalWeight += itemSlot.Amount * item.Weight;
         }
 
-        sheet.TotalWeight += (sheet.Inventory.Gold.Amount * config.Inventory.GramsPerGold) / 10;
-        sheet.TotalWeight += sheet.Inventory.Rations.Amount * config.Inventory.GramsPerRation;
-        sheet.MaxWeight = sheet.Attributes.Strength.Current * config.Inventory.CarryWeightPerStrength;
+        sheet.TotalWeight += (sheet.Inventory.Gold.Amount * InvVars.GramsPerGold.Read(config)) / 10;
+        sheet.TotalWeight += sheet.Inventory.Rations.Amount * InvVars.GramsPerRation.Read(config);
+        sheet.MaxWeight = sheet.Attributes.Strength.Current * InvVars.CarryWeightPerStrength.Read(config);
     }
 
     static void ApplyWieldedItems(EffectiveCharacterSheet sheet)
@@ -101,7 +102,7 @@ public static class EffectiveSheetCalculator
                 }
             }
 
-            if(item.SkillTax1 != 0)
+            if (item.SkillTax1 != 0)
             {
                 switch (item.SkillTax1Type)
                 {

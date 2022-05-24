@@ -8,7 +8,7 @@ namespace UAlbion.Config;
 
 public static class ConfigUtil
 {
-    public static string FindBasePath(IFileSystem disk)
+    public static string FindBasePath(IFileSystem disk) // Should roughly match UAlbion.Scripting.Tests.TestUtil
     {
         if (disk == null) throw new ArgumentNullException(nameof(disk));
 
@@ -16,7 +16,7 @@ public static class ConfigUtil
         {
             var curDir = new DirectoryInfo(start ?? throw new InvalidOperationException());
 
-            while (curDir != null && !disk.FileExists(Path.Combine(curDir.FullName, "data", "config.json")))
+            while (curDir != null && !disk.FileExists(Path.Combine(curDir.FullName, "mods", "Base", "base_assets.json")))
                 curDir = curDir.Parent;
 
             return curDir?.FullName;
@@ -41,10 +41,10 @@ public static class ConfigUtil
                 break;
 
         var sb = new StringBuilder();
-        foreach (var _ in curDir.Substring(i).Split(OneSlash, StringSplitOptions.RemoveEmptyEntries))
+        foreach (var _ in curDir[i..].Split(OneSlash, StringSplitOptions.RemoveEmptyEntries))
             sb.Append("../");
 
-        sb.Append(path.Substring(i).Trim('/'));
+        sb.Append(path[i..].Trim('/'));
         var result = sb.ToString();
         if (result.Length == 0)
             result = ".";
@@ -55,6 +55,6 @@ public static class ConfigUtil
     {
         var full = id.ToString();
         int index = full.IndexOf('.', StringComparison.InvariantCulture);
-        return index == -1 ? full : full.Substring(index + 1);
+        return index == -1 ? full : full[(index + 1)..];
     }
 }

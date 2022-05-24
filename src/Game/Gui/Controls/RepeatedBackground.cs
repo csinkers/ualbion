@@ -41,7 +41,7 @@ public class RepeatedBackground : UiElement
         var multi = new CompositedTexture(AssetId.None, $"Background {width}x{height}", assets.LoadPalette(Base.Palette.Inventory));
 
         // Background
-        var background = assets.LoadTexture(Base.CoreSprite.UiBackground);
+        var background = assets.LoadTexture(Base.CoreGfx.UiBackground);
         multi.AddTexture(1, background, 0, 0, 0, true, width, height);
 
         var subImage = multi.Regions[multi.GetSubImageAtTime(1, 0, false)];

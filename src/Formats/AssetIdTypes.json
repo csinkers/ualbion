@@ -1,47 +1,46 @@
 {
   "Mappings": {
     "SpriteId": [
-      "AutomapGraphics",
-      "BackgroundGraphics",
+      "AutomapGfx",
+      "BackgroundGfx",
       "CombatBackground",
-      "CombatGraphics",
-      "CoreGraphics",
+      "CombatGfx",
+      "CoreGfx",
       "Floor",
       "Font",
-      "FullBodyPicture",
-      "ItemGraphics",
-      "LargeNpcGraphics",
-      "LargePartyGraphics",
-      "MonsterGraphics",
+      "ItemGfx",
+      "MonsterGfx",
+      "NpcLargeGfx",
+      "NpcSmallGfx",
       "Object3D",
+      "PartyLargeGfx",
+      "PartySmallGfx",
+      "PartyInventoryGfx",
       "Picture",
-      "Slab",
-      "SmallNpcGraphics",
-      "SmallPartyGraphics",
       "Portrait",
-      "TacticalIcon",
-      "TilesetGraphics",
+      "Slab",
+      "TacticalGfx",
+      "TilesetGfx",
       "Wall",
       "WallOverlay"
     ],
 
-    "FullBodyPictureId": [ "FullBodyPicture" ],
-    "TilesetGraphicsId": [ "TilesetGraphics" ],
+    "TilesetGfxId": [ "TilesetGfx" ],
     "PictureId": [ "Picture" ],
     "PortraitId": [ "Portrait" ],
 
-    "CharacterId": [
-      "Monster",
-      "Npc",
-      "Party"
+    "SheetId": [
+      "MonsterSheet",
+      "NpcSheet",
+      "PartySheet"
     ],
-    "MonsterId": [ "Monster" ],
-    "NpcId": [ "Npc" ],
-    "PartyMemberId": [ "Party" ],
+    "MonsterId": [ "MonsterSheet" ],
+    "NpcId": [ "NpcSheet" ],
+    "PartyMemberId": [ "PartyMember" ],
     "TargetId": [
       "Target",
-      "Party",
-      "Npc"
+      "PartyMember",
+      "NpcSheet"
     ],
 
     "ItemId": [
@@ -90,13 +89,14 @@
     "ItemId": [ "    public readonly TextId ToName() => new TextId(AssetType.ItemName, Id);" ],
     "TilesetId": [
       "    public readonly BlockListId ToBlockList() => new BlockListId(AssetType.BlockList, Id);",
-      "    public readonly TilesetGraphicsId ToTilesetGraphics() => new TilesetGraphicsId(AssetType.TilesetGraphics, Id);"
+      "    public readonly TilesetGfxId ToTilesetGfx() => new TilesetGfxId(AssetType.TilesetGfx, Id);"
     ],
     "BlockListId": [ "    public readonly TilesetId ToTileset() => new TilesetId(AssetType.Tileset, Id);" ],
     "PartyMemberId": [
-      "    public readonly SpriteId ToSmallPartyGraphics() => new SpriteId(AssetType.SmallPartyGraphics, Id);",
-      "    public readonly SpriteId ToLargePartyGraphics() => new SpriteId(AssetType.LargePartyGraphics, Id);",
-      "    public readonly SpriteId ToFullBodyPicture() => new SpriteId(AssetType.FullBodyPicture, Id);"
+      "    public readonly SheetId ToSheet() => new SheetId(AssetType.PartySheet, Id);",
+      "    public readonly SpriteId ToSmallGfx() => new SpriteId(AssetType.PartySmallGfx, Id);",
+      "    public readonly SpriteId ToLargeGfx() => new SpriteId(AssetType.PartyLargeGfx, Id);",
+      "    public readonly SpriteId ToInventoryGfx() => new SpriteId(AssetType.PartyInventoryGfx, Id);"
     ]
   }
 }

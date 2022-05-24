@@ -10,6 +10,7 @@ using UAlbion.Config;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion;
 
@@ -45,27 +46,27 @@ class DumpGraphics : Component, IAssetDumper
             switch (type)
             {
                 // case AssetType.Slab:                Export<Base.Slab>             ("SLAB");                 break;
-                case AssetType.AutomapGraphics:     Export<Base.AutomapTiles>     ("Automap");              break;
+                case AssetType.AutomapGfx:     Export<Base.AutomapTiles>     ("Automap");              break;
                 case AssetType.CombatBackground:    Export<Base.CombatBackground> ("CombatBackgrounds");    break;
-                case AssetType.CombatGraphics:      Export<Base.CombatGraphics>   ("Combat");               break;
-                case AssetType.CoreGraphics:        Export<Base.CoreSprite>       ("Core");                 break;
-                case AssetType.BackgroundGraphics:  Export<Base.DungeonBackground>("Backgrounds");          break;
+                case AssetType.CombatGfx:      Export<Base.CombatGfx>   ("Combat");               break;
+                case AssetType.CoreGfx:        Export<Base.CoreGfx>       ("Core");                 break;
+                case AssetType.BackgroundGfx:  Export<Base.DungeonBackground>("Backgrounds");          break;
                 case AssetType.Floor:               Export<Base.Floor>            ("Floors");               break;
                 case AssetType.Object3D:            Export<Base.DungeonObject>    ("Objects");              break;
                 case AssetType.WallOverlay:         Export<Base.WallOverlay>      ("Overlays");             break;
                 case AssetType.Wall:                Export<Base.Wall>             ("Walls");                break;
                 case AssetType.Font:                Export<Base.Font>             ("Fonts");                break;
-                case AssetType.FullBodyPicture:     Export<Base.FullBodyPicture>  ("InventoryBackgrounds"); break;
-                case AssetType.TilesetGraphics:     Export<Base.TilesetGraphics>  ("Tiles");                break;
-                case AssetType.ItemGraphics:        Export<Base.ItemGraphics>     ("Item");                 break;
-                case AssetType.LargeNpcGraphics:    Export<Base.LargeNpc>         ("NpcLarge");             break;
-                case AssetType.LargePartyGraphics:  Export<Base.LargePartyMember> ("PartyLarge");           break;
-                case AssetType.MonsterGraphics:     Export<Base.MonsterGraphics>  ("Monster");              break;
+                case AssetType.PartyInventoryGfx:     Export<Base.PartyInventoryGfx>  ("InventoryBackgrounds"); break;
+                case AssetType.TilesetGfx:     Export<Base.TilesetGfx>  ("Tiles");                break;
+                case AssetType.ItemGfx:        Export<Base.ItemGfx>     ("Item");                 break;
+                case AssetType.NpcLargeGfx:    Export<Base.NpcLargeGfx>         ("NpcLarge");             break;
+                case AssetType.PartyLargeGfx:  Export<Base.PartyLargeGfx> ("PartyLarge");           break;
+                case AssetType.MonsterGfx:     Export<Base.MonsterGfx>  ("Monster");              break;
                 case AssetType.Picture:             Export<Base.Picture>          ("Picture");              break;
-                case AssetType.SmallNpcGraphics:    Export<Base.SmallNpc>         ("NpcSmall");             break;
-                case AssetType.SmallPartyGraphics:  Export<Base.SmallPartyMember> ("PartySmall");           break;
+                case AssetType.NpcSmallGfx:    Export<Base.NpcSmallGfx>         ("NpcSmall");             break;
+                case AssetType.PartySmallGfx:  Export<Base.PartySmallGfx> ("PartySmall");           break;
                 case AssetType.Portrait:            Export<Base.Portrait>         ("Portrait");             break;
-                case AssetType.TacticalIcon:        Export<Base.TacticalGraphics> ("TacticalIcon");         break;
+                case AssetType.TacticalGfx:        Export<Base.TacticalGfx> ("TacticalIcon");         break;
             }
         }
     }
@@ -108,8 +109,8 @@ class DumpGraphics : Component, IAssetDumper
         }
         else if (texture is IReadOnlyTexture<byte> tilemap && (
                      assetId.Type == AssetType.Font ||
-                     assetId.Type == AssetType.TilesetGraphics ||
-                     assetId.Type == AssetType.AutomapGraphics))
+                     assetId.Type == AssetType.TilesetGfx ||
+                     assetId.Type == AssetType.AutomapGfx))
         {
             if (palette == null)
             {

@@ -3,7 +3,6 @@ using System.IO;
 using SerdesNet;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Formats.Exporters.Tiled;
@@ -18,7 +17,6 @@ public class TiledTilesetLoader : Component, IAssetLoader<TilesetData>
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
 
-        var graphicsId = ((TilesetId) info.AssetId).ToTilesetGraphics();
         var graphicsTemplate = info.Get(AssetProperty.GraphicsPattern, "{0}/{0}_{1}.png");
         var blankTilePath = info.Get(AssetProperty.BlankTilePath, "Blank.png");
 
@@ -26,7 +24,6 @@ public class TiledTilesetLoader : Component, IAssetLoader<TilesetData>
         {
             GraphicsTemplate = graphicsTemplate,
             BlankTilePath = blankTilePath,
-            TilesetId = graphicsId.Id,
             TileWidth = 16,
             TileHeight = 16
         };

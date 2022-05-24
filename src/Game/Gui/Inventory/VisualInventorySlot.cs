@@ -3,6 +3,7 @@ using System.Numerics;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
@@ -29,7 +30,7 @@ public sealed class VisualInventorySlot : UiElement
 
         _slotId = slotId;
         _getSlot = getSlot;
-        _overlay = new UiSpriteElement(Base.CoreSprite.UiBroken) { IsActive = false };
+        _overlay = new UiSpriteElement(Base.CoreGfx.UiBroken) { IsActive = false };
         var text = new UiText(amountSource);
 
         if (!slotId.Slot.IsSpecial())
@@ -65,8 +66,8 @@ public sealed class VisualInventorySlot : UiElement
         {
             _sprite = new UiSpriteElement(
                 slotId.Slot == ItemSlotId.Gold
-                    ? Base.CoreSprite.UiGold
-                    : Base.CoreSprite.UiFood);
+                    ? Base.CoreGfx.UiGold
+                    : Base.CoreGfx.UiFood);
 
             _button = AttachChild(new Button(
                     new VerticalStack(
@@ -84,7 +85,7 @@ public sealed class VisualInventorySlot : UiElement
     }
 
     // public ButtonState State { get => _frame.State; set => _frame.State = value; }
-    public override Vector2 GetSize() => _sprite.Id.Type == AssetType.CoreGraphics ? base.GetSize() : _size;
+    public override Vector2 GetSize() => _sprite.Id.Type == AssetType.CoreGfx ? base.GetSize() : _size;
     public VisualInventorySlot OnClick(Action callback) { Click += callback; return this; }
     public VisualInventorySlot OnRightClick(Action callback) { RightClick += callback; return this; }
     public VisualInventorySlot OnDoubleClick(Action callback) { DoubleClick += callback; return this; }

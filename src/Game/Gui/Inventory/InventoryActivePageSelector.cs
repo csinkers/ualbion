@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Core;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.Gui.Inventory;
 

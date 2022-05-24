@@ -128,7 +128,7 @@ public static class Asset
         return jsonUtil.Deserialize<T>(Encoding.UTF8.GetBytes(json));
     }
 
-    public static byte[] BytesFromXld(IGeneralConfig conf, string path, AssetInfo info, SerdesContext context)
+    public static byte[] BytesFromXld(IPathResolver conf, string path, AssetInfo info, SerdesContext context)
     {
         using var s = XldLoader.Read(conf.ResolvePath(path), info, context);
         return s.Bytes(null, null, (int)s.BytesRemaining);

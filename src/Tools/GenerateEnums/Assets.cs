@@ -17,15 +17,17 @@ public class Assets
     public Dictionary<string, string[]> EnumsByAssetId { get; }
     public ILookup<AssetType, string> AssetIdsByType { get; }
 
-    public Assets(IFileSystem disk, IJsonUtil jsonUtil) // Everything in this class should be treated as read-only once the constructor finishes.
+    public Assets(IFileSystem disk, IJsonUtil jsonUtil, string assetIdJsonPath, string modName) // Everything in this class should be treated as read-only once the constructor finishes.
     {
         if (disk == null) throw new ArgumentNullException(nameof(disk));
         BaseDir = ConfigUtil.FindBasePath(disk);
-        var assetIdConfigPath = Path.Combine(BaseDir, @"src/Formats/AssetIdTypes.json");
-        var config = GeneralConfig.Load(Path.Combine(BaseDir, "data/config.json"), BaseDir, disk, jsonUtil);
+        var assetIdConfigPath = Path.Combine(BaseDir, assetIdJsonPath);
+        var config = new PathResolver(BaseDir);
 
-        AssetConfig = AssetConfig.Load(config.ResolvePath("$(MODS)/Base/assets.json"), null, AssetMapping.Global, disk, jsonUtil);
-        AssetIdConfig = AssetIdConfig.Load(assetIdConfigPath, disk, jsonUtil);
+        var modDisk = disk.Duplicate(config.ResolvePath($"$(MODS)/{modName}"));
+        var modConfig = ModConfig.Load(ModConfig.ModConfigFilename, modDisk, jsonUtil);
+        AssetConfig = AssetConfig.Load(modConfig.AssetConfig, null, AssetMapping.Global, modDisk, jsonUtil);
+        AssetIdConfig = AssetIdConfig.Load(assetIdConfigPath, modDisk, jsonUtil);
 
         AssetIdsByType = FindAssetIdsByType(AssetIdConfig);
         ParentsByAssetId = FindAssetIdParents(AssetIdConfig, AssetIdsByType);
@@ -41,7 +43,7 @@ public class Assets
         // ....getting complicated.
     }
 
-    static Dictionary<string, string[]> FindEnumsByAssetId(IDictionary<string, AssetTypeInfo> enums, ILookup<AssetType, string> assetIdsByType) =>
+    static Dictionary<string, string[]> FindEnumsByAssetId(IReadOnlyDictionary<string, AssetTypeInfo> enums, ILookup<AssetType, string> assetIdsByType) =>
         (from e in enums
             from assetId in assetIdsByType[e.Value.AssetType]
             group e.Value.EnumType by assetId into g
@@ -55,7 +57,7 @@ public class Assets
             select (assetType, assetId))
         .ToLookup(x => x.assetType, x => x.assetId);
 
-    static Dictionary<string, string[]> FindAssetIdsForEnums(IDictionary<string, AssetTypeInfo> enums, ILookup<AssetType, string> assetIdsByType) =>
+    static Dictionary<string, string[]> FindAssetIdsForEnums(IReadOnlyDictionary<string, AssetTypeInfo> enums, ILookup<AssetType, string> assetIdsByType) =>
         enums.ToDictionary(
             e => e.Key,
             e => assetIdsByType[e.Value.AssetType].ToArray());

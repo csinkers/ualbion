@@ -1,6 +1,7 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Config;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets.Labyrinth;
 

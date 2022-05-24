@@ -12,4 +12,6 @@ public enum Special : ushort
     Words2 = 5,
     Words3 = 6,
     DummyObject = 7,
+    GameConfig = 8,
+    InputConfig = 9,
 }

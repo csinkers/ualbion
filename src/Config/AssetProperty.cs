@@ -21,16 +21,14 @@ public static class AssetProperty
     public const string IsCommon       = "IsCommon"; // bool
     public const string AnimatedRanges = "AnimatedRanges"; // string (e.g. "0x1-0xf, 0x12-0x1a")
 
-    // Tileset gfx
-    public const string UseSmallGraphics = "UseSmallGraphics"; // bool
-
     // 32-bit tileset gfx
-    public const string DayPath = "DayPath"; // string
+    public const string DayPath   = "DayPath"; // string
     public const string NightPath = "NightPath"; // string
 
     // 2D Tilesets
-    public const string BlankTilePath   = "BlankTilePath"; // string
-    public const string GraphicsPattern = "GraphicsPattern"; // string
+    public const string BlankTilePath    = "BlankTilePath"; // string
+    public const string GraphicsPattern  = "GraphicsPattern"; // string
+    public const string UseSmallGraphics = "UseSmallGraphics"; // bool
 
     // Maps
     public const string LargeNpcs      = "LargeNpcs"; // string
@@ -59,4 +57,7 @@ public static class AssetProperty
     public const string Name = "Name"; // StringId to use in game
     public const string MagicSchool = "School"; // SpellClass enum
     public const string SpellNumber = "SpellNumber"; // offset into school, used for save-game serialization
+
+    // Songs
+    public const string WaveLib = "WaveLib";
 }

@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Formats.Assets;
+﻿using UAlbion.Formats.Ids;
+
+namespace UAlbion.Formats.Assets;
 
 public class Rations : IContents
 {
@@ -14,7 +16,7 @@ public class Rations : IContents
     }
 
     public override int GetHashCode() => 72;
-    public SpriteId Icon => Base.CoreSprite.UiFood;
+    public SpriteId Icon => Base.CoreGfx.UiFood;
     public int IconSubId => 0;
     public byte IconAnim => 0;
 }

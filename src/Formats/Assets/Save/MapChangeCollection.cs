@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Save;

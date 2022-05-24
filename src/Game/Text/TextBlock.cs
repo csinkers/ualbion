@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.Text;
 

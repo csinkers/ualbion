@@ -1,7 +1,7 @@
 ﻿using UAlbion.Api.Eventing;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Entities;

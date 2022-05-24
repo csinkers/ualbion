@@ -23,7 +23,7 @@ public class RightButtonHeldMouseMode : Component
     public RightButtonHeldMouseMode()
     {
         On<InputEvent>(OnInput);
-        _cursor = AttachChild(new MapSprite(Base.CoreSprite.Select, DrawLayer.MaxLayer, 0, SpriteFlags.LeftAligned));
+        _cursor = AttachChild(new MapSprite(Base.CoreGfx.Select, DrawLayer.MaxLayer, 0, SpriteFlags.LeftAligned));
     }
 
     protected override void Subscribed()

@@ -2,9 +2,10 @@
 using System.Linq;
 using System.Collections.Generic;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Gui.Menus;
 
@@ -56,18 +57,17 @@ public class OptionsMenu : ModalDialog
         var stack = new VerticalStack(elements);
         AttachChild(new DialogFrame(stack));
 
-        var settings = Resolve<ISettings>();
-        _musicVolume = settings.Audio.MusicVolume;
-        _fxVolume = settings.Audio.FxVolume;
-        _combatDelay = settings.Gameplay.CombatDelay;
+        _musicVolume = GetVar(UserVars.Audio.MusicVolume);
+        _fxVolume = GetVar(UserVars.Audio.FxVolume);
+        _combatDelay = GetVar(UserVars.Gameplay.CombatDelay);
     }
 
     void SaveAndClose()
     {
         var settings = Resolve<ISettings>();
-        if (_musicVolume != settings.Audio.MusicVolume) Raise(new SetMusicVolumeEvent(_musicVolume));
-        if (_fxVolume != settings.Audio.FxVolume) Raise(new SetFxVolumeEvent(_fxVolume));
-        if (_combatDelay != settings.Gameplay.CombatDelay) Raise(new SetCombatDelayEvent(_combatDelay));
+        UserVars.Audio.MusicVolume.Write(settings, _musicVolume);
+        UserVars.Audio.FxVolume.Write(settings, _fxVolume);
+        UserVars.Gameplay.CombatDelay.Write(settings, _combatDelay);
         settings.Save();
 
         Closed?.Invoke(this, EventArgs.Empty);

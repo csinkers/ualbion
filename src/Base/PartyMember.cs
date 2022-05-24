@@ -11,9 +11,6 @@ public enum PartyMember : byte
     Mellthas = 5,
     Harriet = 6,
     Joe = 7,
-    Unknown8 = 8,
     Khunag = 9,
     Siobhan = 10,
-    Invalid11 = 11,
-    Invalid12 = 12,
 }

@@ -4,6 +4,7 @@ using System.Globalization;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
@@ -97,7 +98,7 @@ public class LogicalInventorySlot : UiElement
     {
         var inventoryManager = Resolve<IInventoryManager>();
         var hand = inventoryManager.ItemInHand;
-        Raise(new SetCursorEvent(hand.Item == null ? Base.CoreSprite.Cursor : Base.CoreSprite.CursorSmall));
+        Raise(new SetCursorEvent(hand.Item == null ? Base.CoreGfx.Cursor : Base.CoreGfx.CursorSmall));
         Raise(new HoverTextEvent(null));
     }
 
@@ -130,7 +131,7 @@ public class LogicalInventorySlot : UiElement
                 if (itemName != null)
                 {
                     Raise(new HoverTextEvent(new LiteralText(itemName)));
-                    Raise(new SetCursorEvent(Base.CoreSprite.CursorSelected));
+                    Raise(new SetCursorEvent(Base.CoreGfx.CursorSelected));
                 }
                 else if(_id.Slot is ItemSlotId.Gold or ItemSlotId.Rations)
                 {
@@ -140,7 +141,7 @@ public class LogicalInventorySlot : UiElement
                         ? tf.Format(Base.SystemText.Gold_NNGold, amount / 10, amount % 10)
                         : tf.Format(Base.SystemText.Gold_NRations, amount);
                     Raise(new HoverTextEvent(text));
-                    Raise(new SetCursorEvent(Base.CoreSprite.CursorSelected));
+                    Raise(new SetCursorEvent(Base.CoreGfx.CursorSelected));
                 }
                 break;
             }

@@ -1,9 +1,9 @@
-﻿using UAlbion.Config;
-using UAlbion.Formats;
+﻿using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Config;
+using UAlbion.Game.Entities;
 using UAlbion.Game.Entities.Map2D;
-using UAlbion.TestCommon;
 using Xunit;
 
 namespace UAlbion.Game.Tests;
@@ -31,10 +31,14 @@ public class PlayerMovementTests
             return (Passability)Map[index];
         });
 
-        var disk = new MockFileSystem(true);
-        var json = new FormatJsonUtil();
-        var configProvider = new ConfigProvider(ConfigUtil.FindBasePath(disk), disk, json);
-        var moveSettings = new MovementSettings(true, () => configProvider.Game.PartyMovement);
+        var moveSettings = new MovementSettings(LargeSpriteAnimations.Frames)
+        {
+            MinTrailDistance = GameVars.PartyMovement.MinTrailDistanceLarge.DefaultValue,
+            MaxTrailDistance = GameVars.PartyMovement.MaxTrailDistanceLarge.DefaultValue,
+            TicksPerTile = GameVars.PartyMovement.TicksPerTile.DefaultValue,
+            TicksPerFrame = GameVars.PartyMovement.TicksPerFrame.DefaultValue,
+        };
+
         var m = new PlayerMovementState(moveSettings)
         {
             X = 2,

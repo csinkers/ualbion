@@ -1,8 +1,10 @@
-﻿namespace UAlbion.Formats.Assets;
+﻿using UAlbion.Formats.Ids;
+
+namespace UAlbion.Formats.Assets;
 
 public interface ICharacterSheet
 {
-    CharacterId Id { get; }
+    SheetId Id { get; }
     string GetName(string language);
 
     CharacterType Type { get; }

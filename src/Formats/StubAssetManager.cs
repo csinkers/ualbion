@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
+using UAlbion.Api.Settings;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
@@ -10,6 +11,8 @@ using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Config;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats;
 
@@ -19,7 +22,8 @@ public class StubAssetManager : IAssetManager
     public AlbionPalette LoadPalette(PaletteId id) => Greyscale;
     public AssetInfo GetAssetInfo(AssetId id, string language = null) => throw new NotImplementedException();
     public Automap LoadAutomap(AutomapId id) => throw new NotImplementedException();
-    public CharacterSheet LoadSheet(CharacterId id) => throw new NotImplementedException();
+    public PartyMemberInfo LoadPartyMember(PartyMemberId id) => throw new NotImplementedException();
+    public CharacterSheet LoadSheet(SheetId id) => throw new NotImplementedException();
     public EventSet LoadEventSet(EventSetId id) => throw new NotImplementedException();
     public FlicFile LoadVideo(VideoId id) => throw new NotImplementedException();
     public IList<Block> LoadBlockList(BlockListId id) => throw new NotImplementedException();
@@ -29,7 +33,7 @@ public class StubAssetManager : IAssetManager
     public ITexture LoadFont(FontColor color, bool isBold) => throw new NotImplementedException();
     public ITexture LoadTexture(IAssetId id) => throw new NotImplementedException();
     public ITexture LoadTexture(SpriteId id) => throw new NotImplementedException();
-    public ITileGraphics LoadTileGraphics(TilesetGraphicsId id) => throw new NotImplementedException();
+    public ITileGraphics LoadTileGraphics(TilesetGfxId id) => throw new NotImplementedException();
     public Inventory LoadInventory(AssetId id) => throw new NotImplementedException();
     public ItemData LoadItem(ItemId id) => throw new NotImplementedException();
     public LabyrinthData LoadLabyrinthData(LabyrinthId id) => throw new NotImplementedException();
@@ -42,6 +46,9 @@ public class StubAssetManager : IAssetManager
     public bool IsStringDefined(TextId id, string language) => throw new NotImplementedException();
     public byte[] LoadSong(SongId id) => throw new NotImplementedException();
     public byte[] LoadSoundBanks() => throw new NotImplementedException();
+    public IVarSet LoadConfig() => throw new NotImplementedException();
+    public InputConfig LoadInputConfig() => throw new NotImplementedException();
+
     public string LoadString(StringId id) => throw new NotImplementedException();
     public string LoadString(StringId id, string language) => throw new NotImplementedException();
     public string LoadString(TextId id) => throw new NotImplementedException();

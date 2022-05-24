@@ -1,8 +1,8 @@
 ﻿using System;
 using UAlbion.Config;
 using UAlbion.Core.Events;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.State;
@@ -34,7 +34,7 @@ public class ClockWidget : Dialog
                 On<RenderEvent>(_ => Update());
         });
 
-        var face = new UiSpriteElement(Base.CoreSprite.Clock);
+        var face = new UiSpriteElement(Base.CoreGfx.Clock);
         _digits = new[]
         {
             new UiSpriteElement(AssetId.None),
@@ -83,15 +83,15 @@ public class ClockWidget : Dialog
 
     static SpriteId DigitToSprite(int n) => n switch
     {
-        0 => Base.CoreSprite.ClockNum0,
-        1 => Base.CoreSprite.ClockNum1,
-        2 => Base.CoreSprite.ClockNum2,
-        3 => Base.CoreSprite.ClockNum3,
-        4 => Base.CoreSprite.ClockNum4,
-        5 => Base.CoreSprite.ClockNum5,
-        6 => Base.CoreSprite.ClockNum6,
-        7 => Base.CoreSprite.ClockNum7,
-        8 => Base.CoreSprite.ClockNum8,
-        _ => Base.CoreSprite.ClockNum9
+        0 => Base.CoreGfx.ClockNum0,
+        1 => Base.CoreGfx.ClockNum1,
+        2 => Base.CoreGfx.ClockNum2,
+        3 => Base.CoreGfx.ClockNum3,
+        4 => Base.CoreGfx.ClockNum4,
+        5 => Base.CoreGfx.ClockNum5,
+        6 => Base.CoreGfx.ClockNum6,
+        7 => Base.CoreGfx.ClockNum7,
+        8 => Base.CoreGfx.ClockNum8,
+        _ => Base.CoreGfx.ClockNum9
     };
 }

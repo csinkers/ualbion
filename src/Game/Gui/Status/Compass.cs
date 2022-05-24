@@ -5,6 +5,7 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 
 namespace UAlbion.Game.Gui.Status;
@@ -52,24 +53,24 @@ public class Compass : Dialog
                     _frame = 0;
             }
 
-            var language = Resolve<ISettings>()?.Gameplay.Language;
+            var language = GetVar(UserVars.Gameplay.Language);
             _face.Id = language switch
             {
-                { } and Base.Language.German => Base.CoreSprite.CompassDe,
-                { } and Base.Language.French => Base.CoreSprite.CompassFr,
-                _ => Base.CoreSprite.CompassEn
+                Base.Language.German => Base.CoreGfx.CompassDe,
+                Base.Language.French => Base.CoreGfx.CompassFr,
+                _ => Base.CoreGfx.CompassEn
             };
 
             _marker.Id = (_frame & 0x7) switch
             {
-                0 => Base.CoreSprite.CompassDot0,
-                1 => Base.CoreSprite.CompassDot1,
-                2 => Base.CoreSprite.CompassDot2,
-                3 => Base.CoreSprite.CompassDot3,
-                4 => Base.CoreSprite.CompassDot4,
-                5 => Base.CoreSprite.CompassDot5,
-                6 => Base.CoreSprite.CompassDot6,
-                _ => Base.CoreSprite.CompassDot7
+                0 => Base.CoreGfx.CompassDot0,
+                1 => Base.CoreGfx.CompassDot1,
+                2 => Base.CoreGfx.CompassDot2,
+                3 => Base.CoreGfx.CompassDot3,
+                4 => Base.CoreGfx.CompassDot4,
+                5 => Base.CoreGfx.CompassDot5,
+                6 => Base.CoreGfx.CompassDot6,
+                _ => Base.CoreGfx.CompassDot7
             };
 
             var (mx, my) = CalculateMarkerPosition();

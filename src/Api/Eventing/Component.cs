@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using UAlbion.Api.Settings;
 
 #pragma warning disable CA1030 // Use events where appropriate
 namespace UAlbion.Api.Eventing;
@@ -374,6 +375,20 @@ public abstract class Component : IComponent
 
         if (_handlers != null && _handlers.TryGetValue(@event.GetType(), out var handler))
             handler.Invoke(@event, DummyContinuation);
+    }
+
+    /// <summary>
+    /// Gets the current value for an IVar
+    /// </summary>
+    /// <typeparam name="T">The value type of the IVar</typeparam>
+    /// <param name="varInfo">The IVar</param>
+    /// <returns>The current value</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    protected T GetVar<T>(IVar<T> varInfo)
+    {
+        if (varInfo == null) throw new ArgumentNullException(nameof(varInfo));
+        var varSet = Resolve<IVarSet>();
+        return varInfo.Read(varSet);
     }
 
     // Logging helpers

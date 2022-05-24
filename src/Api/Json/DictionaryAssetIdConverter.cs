@@ -7,8 +7,8 @@ namespace UAlbion.Api.Json;
 #pragma warning disable CA1812 // Internal class that is apparently never instantiated; this class is instantiated generically
 class DictionaryAssetIdConverter<TKey, TValue> : JsonConverter<Dictionary<TKey, TValue>> where TKey : struct, IAssetId
 {
-    static readonly Type _valueType = typeof(TValue);
-    static readonly IAssetId.ParserDelegate<TKey> _parser = IAssetId.GetParser<TKey>();
+    static readonly Type ValueType = typeof(TValue);
+    static readonly IAssetId.ParserDelegate<TKey> Parser = IAssetId.GetParser<TKey>();
     readonly JsonConverter<TValue> _valueConverter;
 
     public DictionaryAssetIdConverter(JsonSerializerOptions options)
@@ -18,7 +18,7 @@ class DictionaryAssetIdConverter<TKey, TValue> : JsonConverter<Dictionary<TKey, 
     }
 
     public override Dictionary<TKey, TValue> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
-        DictionaryConverterUtil<TKey, TValue>.Read(ref reader, typeToConvert, options, _valueConverter, _valueType, _parser);
+        DictionaryConverterUtil<TKey, TValue>.Read(ref reader, typeToConvert, options, _valueConverter, ValueType, Parser);
 
     public override void Write(Utf8JsonWriter writer, Dictionary<TKey, TValue> value, JsonSerializerOptions options) => 
         DictionaryConverterUtil<TKey, TValue>.Write(writer, value, options, _valueConverter);

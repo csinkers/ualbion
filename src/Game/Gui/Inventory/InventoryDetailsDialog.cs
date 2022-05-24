@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 

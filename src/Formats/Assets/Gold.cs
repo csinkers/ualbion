@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Formats.Assets;
+﻿using UAlbion.Formats.Ids;
+
+namespace UAlbion.Formats.Assets;
 
 public class Gold : IContents
 {
@@ -14,7 +16,7 @@ public class Gold : IContents
     }
 
     public override int GetHashCode() => 42;
-    public SpriteId Icon => Base.CoreSprite.UiGold;
+    public SpriteId Icon => Base.CoreGfx.UiGold;
     public int IconSubId => 0;
     public byte IconAnim => 0;
 }

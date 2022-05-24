@@ -30,14 +30,14 @@ public class InventoryLockPane : UiElement
         var lockButton = 
                 new Button(
                         new Padding(
-                            new UiSpriteElement(Base.CoreSprite.Lock),
+                            new UiSpriteElement(Base.CoreGfx.Lock),
                             4))
                     .OnHover(LockHovered)
                     .OnBlur(() =>
                     {
                         Raise(new HoverTextEvent(null));
                         if (Resolve<IInventoryManager>().ItemInHand.Item == null)
-                            Raise(new SetCursorEvent(Base.CoreSprite.Cursor));
+                            Raise(new SetCursorEvent(Base.CoreGfx.Cursor));
                     })
                     .OnClick(LockClicked) // If holding key etc
                     .OnRightClick(LockRightClicked)
@@ -50,7 +50,7 @@ public class InventoryLockPane : UiElement
         var tf = Resolve<ITextFormatter>();
         Raise(new HoverTextEvent(tf.Format(Base.SystemText.Lock_OpenTheLock)));
         if (Resolve<IInventoryManager>().ItemInHand.Item == null)
-            Raise(new SetCursorEvent(Base.CoreSprite.CursorSelected));
+            Raise(new SetCursorEvent(Base.CoreGfx.CursorSelected));
     }
 
     void LockClicked()

@@ -3,6 +3,7 @@ using System.Text;
 using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Exporters.Tiled;

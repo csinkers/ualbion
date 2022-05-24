@@ -42,16 +42,16 @@ public class InventoryExitButton : UiElement
 
     protected override void Subscribed()
     {
-        _sprite ??= AttachChild(new UiSpriteElement(Base.CoreSprite.UiExitButton));
+        _sprite ??= AttachChild(new UiSpriteElement(Base.CoreGfx.UiExitButton));
     }
 
     protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
     {
         _sprite.Id = _state switch
         {
-            ButtonState.Normal  => Base.CoreSprite.UiExitButton,
-            ButtonState.Hover   => Base.CoreSprite.UiExitButtonHover,
-            ButtonState.Clicked => Base.CoreSprite.UiExitButtonPressed,
+            ButtonState.Normal  => Base.CoreGfx.UiExitButton,
+            ButtonState.Hover   => Base.CoreGfx.UiExitButtonHover,
+            ButtonState.Clicked => Base.CoreGfx.UiExitButtonPressed,
             _ => _sprite.Id
         };
         return base.DoLayout(extents, order, func);

@@ -7,6 +7,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.TestCommon;
 using Xunit;
@@ -23,8 +24,8 @@ public class EventRoundTripTests
         var disk = new MockFileSystem(true);
         var jsonUtil = new FormatJsonUtil();
         var baseDir = ConfigUtil.FindBasePath(disk);
-        var baseAssetConfigPath = Path.Combine(baseDir, "mods", "Base", "assets.json");
-        var assetConfigPath = Path.Combine(baseDir, "mods", "Albion", "assets.json");
+        var baseAssetConfigPath = Path.Combine(baseDir, "mods", "Base", "base_assets.json");
+        var assetConfigPath = Path.Combine(baseDir, "mods", "Albion", "alb_assets.json");
 
         var baseAssetConfig = AssetConfig.Load(baseAssetConfigPath, null, mapping, disk, jsonUtil);
         var assetConfig = AssetConfig.Load(assetConfigPath, baseAssetConfig, mapping, disk, jsonUtil);
@@ -275,10 +276,10 @@ public class EventRoundTripTests
     [Fact]
     public void ChangeItem()
     {
-        Test(("change_item Target.Leader Item.BlueHealingPotion AddAmount 1",               new ChangeItemEvent(Target.Leader,    Item.BlueHealingPotion, NumericOperation.AddAmount,      1)),
-            ("change_item Target.Leader Item.Canister SetToMinimum",                      new ChangeItemEvent(Target.Leader,    Item.Canister,          NumericOperation.SetToMinimum,   0)),
-            ("change_item Target.Leader Item.StrengthAmulet SetToMinimum 1",                new ChangeItemEvent(Target.Leader,    Item.StrengthAmulet,    NumericOperation.SetToMinimum,   1)),
-            ("change_item Target.Leader Item.BlueStaff SubtractAmount 1",                   new ChangeItemEvent(Target.Leader,    Item.BlueStaff,         NumericOperation.SubtractAmount, 1)),
+        Test(("change_item Target.Leader Item.BlueHealingPotion AddAmount 1",    new ChangeItemEvent(Target.Leader,    Item.BlueHealingPotion, NumericOperation.AddAmount,      1)),
+            ("change_item Target.Leader Item.Canister SetToMinimum",             new ChangeItemEvent(Target.Leader,    Item.Canister,          NumericOperation.SetToMinimum,   0)),
+            ("change_item Target.Leader Item.StrengthAmulet SetToMinimum 1",     new ChangeItemEvent(Target.Leader,    Item.StrengthAmulet,    NumericOperation.SetToMinimum,   1)),
+            ("change_item Target.Leader Item.BlueStaff SubtractAmount 1",        new ChangeItemEvent(Target.Leader,    Item.BlueStaff,         NumericOperation.SubtractAmount, 1)),
             ("change_item PartyMember.Sira Item.TriifalaiSeed SubtractAmount 1", new ChangeItemEvent(PartyMember.Sira, Item.TriifalaiSeed,     NumericOperation.SubtractAmount, 1)),
             ("change_item PartyMember.Tom Item.TheSeed AddAmount 1",             new ChangeItemEvent(PartyMember.Tom,  Item.TheSeed,           NumericOperation.AddAmount,      1)));
     }
@@ -551,7 +552,7 @@ sound Sample.IllTemperedLlama 1 1 1 11000");
     [Fact]
     public void StartDialogue()
     {
-        Test(@"start_dialogue Npc.Christine");
+        Test(@"start_dialogue NpcSheet.Christine");
     }
 
     [Fact]
@@ -570,16 +571,16 @@ map_text EventText.Frill 1 Conversation
 map_text EventText.Frill 1 ConversationOptions
 map_text EventText.Frill 1 ConversationQuery
 map_text EventText.Frill 1
-map_text EventText.Frill 1 NoPortrait Npc.Christine
-map_text EventText.Frill 1 PortraitLeft Npc.Christine
+map_text EventText.Frill 1 NoPortrait NpcSheet.Christine
+map_text EventText.Frill 1 PortraitLeft NpcSheet.Christine
 map_text EventText.Frill 1 PortraitLeft2
 map_text EventText.Frill 1 StandardOptions
 map_text MapText.Jirinaar 1 1
 map_text MapText.Jirinaar 1
 map_text MapText.Jirinaar 1 PortraitLeft
-map_text MapText.Jirinaar 1 PortraitLeft Npc.Christine
+map_text MapText.Jirinaar 1 PortraitLeft NpcSheet.Christine
 map_text MapText.Jirinaar 1 PortraitLeft2
-map_text MapText.Jirinaar 1 PortraitLeft3 Npc.Christine
+map_text MapText.Jirinaar 1 PortraitLeft3 NpcSheet.Christine
 map_text MapText.Jirinaar 1 QuickInfo");
     }
 
@@ -625,7 +626,7 @@ npc_lock 12
 npc_move 16 -1 1
 npc_off 11
 npc_on 33
-npc_text Npc.Khunagh 158
+npc_text NpcSheet.Khunagh 158
 npc_turn 11 West
 npc_unlock 1
 party_jump 170 63

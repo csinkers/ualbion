@@ -19,26 +19,17 @@ public class MockFileSystemChild : IFileSystem
     public bool IsReadOnly => _parent.IsReadOnly;
     public string CurrentDirectory => _currentDirectory;
     public IFileSystem Duplicate(string currentDirectory) => _parent.Duplicate(currentDirectory);
-    public bool FileExists(string path) => _parent.FileExists(ToAbs(path));
-    public bool DirectoryExists(string path) => _parent.DirectoryExists(ToAbs(path));
-    public IEnumerable<string> EnumerateDirectory(string path, string filter = null) => _parent.EnumerateDirectory(ToAbs(path), filter);
-    public void CreateDirectory(string path) => _parent.CreateDirectory(ToAbs(path));
-    public Stream OpenRead(string path) => _parent.OpenRead(ToAbs(path));
-    public Stream OpenWriteTruncate(string path) => _parent.OpenWriteTruncate(ToAbs(path));
-    public void DeleteFile(string path) => _parent.DeleteFile(ToAbs(path));
-    public string ReadAllText(string path) => _parent.ReadAllText(ToAbs(path));
-    public void WriteAllText(string path, string fullText) => _parent.WriteAllText(ToAbs(path), fullText);
-    public IEnumerable<string> ReadAllLines(string path) => _parent.ReadAllLines(ToAbs(path));
-    public byte[] ReadAllBytes(string path) => _parent.ReadAllBytes(ToAbs(path));
-    public void WriteAllBytes(string path, byte[] bytes) => _parent.WriteAllBytes(ToAbs(path), bytes);
-
-    string ToAbs(string path)
-    {
-        if (string.IsNullOrEmpty(path))
-            return _currentDirectory;
-
-        return Path.IsPathRooted(path) 
-            ? path 
-            : Path.Combine(_currentDirectory, path);
-    }
+    public bool FileExists(string path) => _parent.FileExists(ToAbsolutePath(path));
+    public bool DirectoryExists(string path) => _parent.DirectoryExists(ToAbsolutePath(path));
+    public IEnumerable<string> EnumerateDirectory(string path, string filter = null) => _parent.EnumerateDirectory(ToAbsolutePath(path), filter);
+    public void CreateDirectory(string path) => _parent.CreateDirectory(ToAbsolutePath(path));
+    public Stream OpenRead(string path) => _parent.OpenRead(ToAbsolutePath(path));
+    public Stream OpenWriteTruncate(string path) => _parent.OpenWriteTruncate(ToAbsolutePath(path));
+    public void DeleteFile(string path) => _parent.DeleteFile(ToAbsolutePath(path));
+    public string ReadAllText(string path) => _parent.ReadAllText(ToAbsolutePath(path));
+    public void WriteAllText(string path, string fullText) => _parent.WriteAllText(ToAbsolutePath(path), fullText);
+    public IEnumerable<string> ReadAllLines(string path) => _parent.ReadAllLines(ToAbsolutePath(path));
+    public byte[] ReadAllBytes(string path) => _parent.ReadAllBytes(ToAbsolutePath(path));
+    public void WriteAllBytes(string path, byte[] bytes) => _parent.WriteAllBytes(ToAbsolutePath(path), bytes);
+    public string ToAbsolutePath(string path) => ApiUtil.CombinePaths(_currentDirectory, path);
 }

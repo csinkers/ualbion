@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets;
 

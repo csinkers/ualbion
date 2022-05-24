@@ -7,6 +7,7 @@ using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Transitions;
@@ -55,11 +56,11 @@ public class Conversation : Component
         if (Children.Any())
             return;
 
-        var game = Resolve<IGameState>();
+        var game = TryResolve<IGameState>();
         var assets = Resolve<IAssetManager>();
-        var partyMember = game?.GetSheet(_partyMemberId) ?? assets.LoadSheet(_partyMemberId);
+        var sheet = game?.GetSheet(_partyMemberId.ToSheet()) ?? assets.LoadSheet(_partyMemberId.ToSheet());
 
-        AttachChild(new ConversationParticipantLabel(partyMember, false));
+        AttachChild(new ConversationParticipantLabel(sheet, false));
         AttachChild(new ConversationParticipantLabel(_npc, true));
 
         _textWindow = AttachChild(new ConversationTextWindow());

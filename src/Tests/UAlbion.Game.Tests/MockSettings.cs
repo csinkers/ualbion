@@ -1,36 +1,25 @@
-﻿using System.Collections.Generic;
-using UAlbion.Api.Eventing;
-using UAlbion.Core;
-using UAlbion.Game.Settings;
+﻿using UAlbion.Api.Eventing;
+using UAlbion.Api.Settings;
+using UAlbion.Formats;
 
 namespace UAlbion.Game.Tests;
 
-public class MockSettings : Component, ISettings, IDebugSettings, IAudioSettings, IGameplaySettings, IEngineSettings
+public class MockSettings : Component, ISettings
 {
+    readonly VarSet _set = new();
+    public bool TryGetValue(string key, out object value) => _set.TryGetValue(key, out value);
+    public void SetValue(string key, object value) => _set.SetValue(key, value);
+    public void ClearValue(string key) => _set.ClearValue(key);
     public void Save() { }
-    public string BasePath { get; set; }
-    public IDebugSettings Debug => this;
-    public IAudioSettings Audio => this;
-    public IGameplaySettings Gameplay => this;
-    public IEngineSettings Engine => this;
-    public DebugFlags DebugFlags { get; set; }
-    public int MusicVolume { get; set; }
-    public int FxVolume { get; set; }
-    public string Language { get; set; }
-    public int CombatDelay { get; set; }
-    public IList<string> ActiveMods { get; set; }
-    public float Special1 { get; set; }
-    public float Special2 { get; set; }
-    public EngineFlags Flags { get; set; }
-
-    protected override void Subscribed()
+    protected override void Subscribing()
     {
-        Exchange.Register<ISettings>(this);
-        Exchange.Register<IDebugSettings>(this);
-        Exchange.Register<IAudioSettings>(this);
-        Exchange.Register<IGameplaySettings>(this);
-        Exchange.Register<IEngineSettings>(this);
+        Exchange.Register(typeof(ISettings), this, false);
+        Exchange.Register(typeof(IVarSet), this, false);
     }
 
-    protected override void Unsubscribed() => Exchange.Unregister(this);
+    protected override void Unsubscribed()
+    {
+        Exchange.Unregister(typeof(IVarSet), this);
+        Exchange.Unregister(typeof(ISettings), this);
+    }
 }

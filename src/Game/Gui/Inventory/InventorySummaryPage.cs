@@ -2,7 +2,7 @@
 using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.State;
@@ -54,7 +54,8 @@ public class InventorySummaryPage : UiElement // Summary
 
     protected override void Subscribed()
     {
-        var sheet = Resolve<IAssetManager>().LoadSheet(_activeMember);
+        var assets = Resolve<IAssetManager>();
+        var sheet = assets.LoadSheet(_activeMember.ToSheet());
         _portrait.Id = sheet.PortraitId;
         base.Subscribed();
     }

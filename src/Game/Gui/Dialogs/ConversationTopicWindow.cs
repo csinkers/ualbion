@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;

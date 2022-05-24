@@ -73,7 +73,7 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
         int expansionFactor = mode == IsometricMode.Contents ? IsometricBuilder.ContentsExpansionFactor : 1;
         var properties = new Tilemap3DProperties
         {
-            TilesetId = labyrinth.Id.Id,
+            // TilesetId = labyrinth.Id.Id,
             IsoMode = mode,
             TileWidth = expansionFactor * tileWidth,
             TileHeight = expansionFactor * tileHeight,

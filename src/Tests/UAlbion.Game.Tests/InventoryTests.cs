@@ -5,7 +5,7 @@ using Xunit;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.State.Player;
 
@@ -24,12 +24,13 @@ public class InventoryTests : Component
     {
         AssetMapping.GlobalIsThreadLocal = true;
         AssetMapping.Global.Clear()
-            .RegisterAssetType(typeof(Base.PartyMember), AssetType.Party)
-            .RegisterAssetType(typeof(Base.CoreSprite), AssetType.CoreGraphics)
+            .RegisterAssetType(typeof(Base.PartySheet), AssetType.PartySheet)
+            .RegisterAssetType(typeof(Base.PartyMember), AssetType.PartyMember)
+            .RegisterAssetType(typeof(Base.CoreGfx), AssetType.CoreGfx)
             .RegisterAssetType(typeof(Base.Item), AssetType.Item)
             ;
 
-        _tomInv = new InventoryId((CharacterId)Base.PartyMember.Tom);
+        _tomInv = new InventoryId((SheetId)Base.PartySheet.Tom);
         _sword = new ItemData(Base.Item.Sword) { TypeId = ItemType.CloseRangeWeapon };
         _torch = new ItemData(Base.Item.Torch)
         {
@@ -38,7 +39,7 @@ public class InventoryTests : Component
         };
 
         _tom = new Inventory(_tomInv);
-        _rainer = new Inventory(new InventoryId((CharacterId)Base.PartyMember.Rainer));
+        _rainer = new Inventory(new InventoryId((SheetId)Base.PartySheet.Rainer));
         var inventories = new Dictionary<InventoryId, Inventory>
         {
             [_tom.Id] = _tom,
@@ -49,11 +50,9 @@ public class InventoryTests : Component
         _im = new InventoryManager(x => inventories[x]);
         var wm = new WindowManager { Resolution = (1920, 1080) };
         var cm = new MockCursorManager { Position = new Vector2(1, 1) };
-        var gc = new GameConfig();
-        var mgcp = new MockGameConfigProvider(gc);
 
         exchange
-            .Register<IGameConfigProvider>(mgcp)
+            .Attach(new MockSettings())
             .Register<IInventoryManager>(_im)
             .Attach(wm)
             .Attach(cm)

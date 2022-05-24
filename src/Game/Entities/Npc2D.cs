@@ -8,7 +8,7 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
-using UAlbion.Formats.Config;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Entities.Map2D;
@@ -17,6 +17,7 @@ using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
+using NpcMoveVars = UAlbion.Formats.Config.GameVars.NpcMovement;
 
 namespace UAlbion.Game.Entities;
 
@@ -118,10 +119,14 @@ public class Npc2D : Component
         _state.Y = (ushort)e.Y;
     }
 
-    GameConfig.MovementT GetMoveConfig() => Resolve<IGameConfigProvider>().Game.NpcMovement;
     protected override void Subscribed()
     {
-        _moveSettings ??= new MovementSettings(_isLarge, GetMoveConfig);
+        _moveSettings ??= new MovementSettings(_isLarge ? LargeSpriteAnimations.Frames : SmallSpriteAnimations.Frames)
+        {
+            TicksPerFrame = GetVar(NpcMoveVars.TicksPerFrame),
+            TicksPerTile = GetVar(NpcMoveVars.TicksPerFrame)
+        };
+
         _sprite.TilePosition = new Vector3(
             _state.X,
             _state.Y,

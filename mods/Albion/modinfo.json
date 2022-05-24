@@ -4,6 +4,8 @@
   "Description": "Asset description information for the original Albion data files",
   "Author": "Cam Sinclair et al",
   "Version": "0.1.0",
-  "Dependencies": [ "Base", "Shaders" ],
-  "InheritTypesFrom": "Base" 
+  "Dependencies": [ "Base", "Shaders", "Common" ],
+  "InheritAssetConfigFrom": "Base",
+  "AssetConfig": "alb_assets.json",
+  "SymLinks": { "Albion": "$(ALBION)" }
 }

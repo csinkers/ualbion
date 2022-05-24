@@ -6,6 +6,7 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Ids;
 using UAlbion.TestCommon;
 using Xunit;
 
@@ -21,15 +22,15 @@ public class SavedGameTests
             .RegisterAssetType(typeof(Base.Chest), AssetType.Chest)
             .RegisterAssetType(typeof(Base.EventSet), AssetType.EventSet)
             .RegisterAssetType(typeof(Base.Item), AssetType.Item)
-            .RegisterAssetType(typeof(Base.LargeNpc), AssetType.LargeNpcGraphics)
-            .RegisterAssetType(typeof(Base.LargePartyMember), AssetType.LargePartyGraphics)
+            .RegisterAssetType(typeof(Base.NpcLargeGfx), AssetType.NpcLargeGfx)
+            .RegisterAssetType(typeof(Base.PartyLargeGfx), AssetType.PartyLargeGfx)
             .RegisterAssetType(typeof(Base.Map), AssetType.Map)
             .RegisterAssetType(typeof(Base.Merchant), AssetType.Merchant)
-            .RegisterAssetType(typeof(Base.Npc), AssetType.Npc)
-            .RegisterAssetType(typeof(Base.PartyMember), AssetType.Party)
+            .RegisterAssetType(typeof(Base.NpcSheet), AssetType.NpcSheet)
+            .RegisterAssetType(typeof(Base.PartySheet), AssetType.PartySheet)
             .RegisterAssetType(typeof(Base.Portrait), AssetType.Portrait)
-            .RegisterAssetType(typeof(Base.SmallNpc), AssetType.SmallNpcGraphics)
-            .RegisterAssetType(typeof(Base.SmallPartyMember), AssetType.SmallPartyGraphics)
+            .RegisterAssetType(typeof(Base.NpcSmallGfx), AssetType.NpcSmallGfx)
+            .RegisterAssetType(typeof(Base.PartySmallGfx), AssetType.PartySmallGfx)
             .RegisterAssetType(typeof(Base.Spell), AssetType.Spell)
             .RegisterAssetType(typeof(Base.Switch), AssetType.Switch)
             .RegisterAssetType(typeof(Base.Ticker), AssetType.Ticker);

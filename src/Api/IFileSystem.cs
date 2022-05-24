@@ -20,4 +20,5 @@ public interface IFileSystem
     IEnumerable<string> ReadAllLines(string path);
     byte[] ReadAllBytes(string path);
     void WriteAllBytes(string path, byte[] bytes);
+    string ToAbsolutePath(string path);
 }

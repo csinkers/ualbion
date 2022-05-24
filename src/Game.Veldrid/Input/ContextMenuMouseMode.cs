@@ -16,7 +16,7 @@ public class ContextMenuMouseMode : Component
     readonly UiLeftReleaseEvent _leftReleaseEvent = new();
 
     public ContextMenuMouseMode() => On<InputEvent>(OnInput);
-    protected override void Subscribed() => Raise(new SetCursorEvent(Base.CoreSprite.Cursor));
+    protected override void Subscribed() => Raise(new SetCursorEvent(Base.CoreGfx.Cursor));
 
     void OnInput(InputEvent e)
     {

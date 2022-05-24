@@ -22,4 +22,5 @@ public class StubFileSystem : IFileSystem
     public IEnumerable<string> ReadAllLines(string path) => throw new NotSupportedException();
     public byte[] ReadAllBytes(string path) => throw new NotSupportedException();
     public void WriteAllBytes(string path, byte[] bytes) => throw new NotSupportedException();
+    public string ToAbsolutePath(string path) => throw new NotImplementedException();
 }

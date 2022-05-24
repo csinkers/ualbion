@@ -4,6 +4,7 @@ using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets.Save;
 
@@ -23,8 +24,8 @@ public class NpcState : IMovementState
         switch (c.mapType)
         {
             case MapType.ThreeD: npc.SpriteOrGroup = AssetId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.ObjectGroup, c.mapping, s); break;
-            case MapType.TwoD: npc.SpriteOrGroup = SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.LargeNpcGraphics, c.mapping, s); break;
-            case MapType.TwoDOutdoors: npc.SpriteOrGroup = SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.SmallNpcGraphics, c.mapping, s); break;
+            case MapType.TwoD: npc.SpriteOrGroup = SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.NpcLargeGfx, c.mapping, s); break;
+            case MapType.TwoDOutdoors: npc.SpriteOrGroup = SpriteId.SerdesU16(nameof(SpriteOrGroup), npc.SpriteOrGroup, AssetType.NpcSmallGfx, c.mapping, s); break;
             default: throw new ArgumentOutOfRangeException(nameof(c), c.mapType, null);
         }
 

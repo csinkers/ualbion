@@ -9,13 +9,21 @@ namespace UAlbion.Config;
 
 public class AssetConfig : IAssetConfig
 {
-    [JsonInclude] public Dictionary<string, AssetTypeInfo> IdTypes { get; private set; } = new();
-    [JsonInclude] public Dictionary<string, string> StringMappings { get; private set; } = new();
-    [JsonInclude] public Dictionary<string, string> Loaders { get; private set; } = new();
-    [JsonInclude] public Dictionary<string, string> Containers { get; private set; } = new();
-    [JsonInclude] public Dictionary<string, string> PostProcessors { get; private set; } = new();
-    [JsonInclude] public Dictionary<string, LanguageConfig> Languages { get; private set; } = new();
-    [JsonInclude] public Dictionary<string, AssetFileInfo> Files { get; private set; } = new();
+    [JsonIgnore] public IReadOnlyDictionary<string, AssetTypeInfo>  IdTypes        { get; private set; }
+    [JsonIgnore] public IReadOnlyDictionary<string, string>         StringMappings { get; private set; }
+    [JsonIgnore] public IReadOnlyDictionary<string, string>         Loaders        { get; private set; }
+    [JsonIgnore] public IReadOnlyDictionary<string, string>         Containers     { get; private set; }
+    [JsonIgnore] public IReadOnlyDictionary<string, string>         PostProcessors { get; private set; }
+    [JsonIgnore] public IReadOnlyDictionary<string, LanguageConfig> Languages      { get; private set; }
+    [JsonIgnore] public IReadOnlyDictionary<string, AssetFileInfo>  Files          { get; private set; }
+
+    [JsonInclude, JsonPropertyName("IdTypes")]        public Dictionary<string, AssetTypeInfo>  RawIdTypes        { get; private set; } = new();
+    [JsonInclude, JsonPropertyName("StringMappings")] public Dictionary<string, string>         RawStringMappings { get; private set; } = new();
+    [JsonInclude, JsonPropertyName("Loaders")]        public Dictionary<string, string>         RawLoaders        { get; private set; } = new();
+    [JsonInclude, JsonPropertyName("Containers")]      public Dictionary<string, string>         RawContainers     { get; private set; } = new();
+    [JsonInclude, JsonPropertyName("PostProcessors")] public Dictionary<string, string>         RawPostProcessors { get; private set; } = new();
+    [JsonInclude, JsonPropertyName("Languages")]      public Dictionary<string, LanguageConfig> RawLanguages      { get; private set; } = new();
+    [JsonInclude, JsonPropertyName("Files")]          public Dictionary<string, AssetFileInfo>  RawFiles          { get; private set; } = new();
 
     Dictionary<AssetId, AssetInfo[]> _assetLookup;
     AssetMapping _mapping;
@@ -32,7 +40,25 @@ public class AssetConfig : IAssetConfig
             return null;
 
         if (parent != null)
-            config.ImportFromParent(parent);
+        {
+            config.IdTypes        = new FallbackDictionary<string, AssetTypeInfo> (config.RawIdTypes,        parent.IdTypes);
+            config.StringMappings = new FallbackDictionary<string, string>        (config.RawStringMappings, parent.StringMappings);
+            config.Loaders        = new FallbackDictionary<string, string>        (config.RawLoaders,        parent.Loaders);
+            config.Containers     = new FallbackDictionary<string, string>        (config.RawContainers,     parent.Containers);
+            config.PostProcessors = new FallbackDictionary<string, string>        (config.RawPostProcessors, parent.PostProcessors);
+            config.Languages      = new FallbackDictionary<string, LanguageConfig>(config.RawLanguages,      parent.Languages);
+            config.Files          = new FallbackDictionary<string, AssetFileInfo> (config.RawFiles,          parent.Files);
+        }
+        else
+        {
+            config.IdTypes        = config.RawIdTypes;
+            config.StringMappings = config.RawStringMappings;
+            config.Loaders        = config.RawLoaders;
+            config.Containers     = config.RawContainers;
+            config.PostProcessors = config.RawPostProcessors;
+            config.Languages      = config.RawLanguages;
+            config.Files          = config.RawFiles;
+        }
 
         config.PostLoad(mapping);
         return config;
@@ -83,9 +109,9 @@ public class AssetConfig : IAssetConfig
         {
             kvp.Value.Config = this;
             int index = kvp.Key.IndexOf('#', StringComparison.InvariantCulture);
-            kvp.Value.Filename = index == -1 ? kvp.Key : kvp.Key.Substring(0, index);
+            kvp.Value.Filename = index == -1 ? kvp.Key : kvp.Key[..index];
             if (index != -1)
-                kvp.Value.Sha256Hash = kvp.Key.Substring(index + 1);
+                kvp.Value.Sha256Hash = kvp.Key[(index + 1)..];
 
             // Resolve type aliases
             if (kvp.Value.Loader != null && Loaders.TryGetValue(kvp.Value.Loader, out var typeName)) kvp.Value.Loader = typeName;
@@ -144,6 +170,30 @@ public class AssetConfig : IAssetConfig
         }
     }
 
+    static IEnumerable<string> Validate(IEnumerable<string> types, string category, string assetConfigPath)
+    {
+        foreach (var type in types)
+        {
+            var enumType = Type.GetType(type);
+            if (enumType == null)
+               yield return $"Could not load {category} type \"{type}\" defined in \"{assetConfigPath}\"";
+        }
+    }
+
+    public void Validate(string assetConfigPath)
+    {
+        var errors = new List<string>();
+        errors.AddRange(Validate(IdTypes.Values.Select(x => x.EnumType), "enum", assetConfigPath));
+        errors.AddRange(Validate(Loaders.Values, "loader", assetConfigPath));
+        errors.AddRange(Validate(Containers.Values, "container", assetConfigPath));
+        errors.AddRange(Validate(PostProcessors.Values, "post-processor", assetConfigPath));
+        if (errors.Count > 0)
+        {
+            var combined = string.Join(Environment.NewLine, errors);
+            throw new InvalidOperationException(combined);
+        }
+    }
+
     static (int, int) ParseRange(string s)
     {
         if (s == "*")
@@ -158,8 +208,8 @@ public class AssetConfig : IAssetConfig
             return (asInt, asInt);
         }
 
-        var from = s.Substring(0, index);
-        var to = s.Substring(index + 1);
+        var from = s[..index];
+        var to = s[(index + 1)..];
         if(!int.TryParse(from, out var min))
             throw new FormatException($"Invalid id range \"{s}\"");
 
@@ -199,46 +249,5 @@ public class AssetConfig : IAssetConfig
             throw new FormatException("Asset IDs should consist of an alias type and value, separated by a '.' character");
         var enumType = ResolveIdType(type);
         return _mapping.EnumToId(enumType, val);
-    }
-
-    void ImportFromParent(AssetConfig parent)
-    {
-        if (parent == null) throw new ArgumentNullException(nameof(parent));
-
-        foreach (var kvp in parent.IdTypes)
-        {
-            if (IdTypes.ContainsKey(kvp.Key)) continue; 
-            IdTypes[kvp.Key] = kvp.Value;
-        }
-
-        foreach (var kvp in parent.StringMappings)
-        {
-            if (StringMappings.ContainsKey(kvp.Key)) continue;
-            StringMappings[kvp.Key] = kvp.Value;
-        }
-
-        foreach (var kvp in parent.Loaders)
-        {
-            if (Loaders.ContainsKey(kvp.Key)) continue;
-            Loaders[kvp.Key] = kvp.Value;
-        }
-
-        foreach (var kvp in parent.Containers)
-        {
-            if (Containers.ContainsKey(kvp.Key)) continue;
-            Containers[kvp.Key] = kvp.Value;
-        }
-
-        foreach (var kvp in parent.PostProcessors)
-        {
-            if (PostProcessors.ContainsKey(kvp.Key)) continue;
-            PostProcessors[kvp.Key] = kvp.Value;
-        }
-
-        foreach (var kvp in parent.Languages)
-        {
-            if (Languages.ContainsKey(kvp.Key)) continue;
-            Languages[kvp.Key] = kvp.Value;
-        }
     }
 }

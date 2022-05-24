@@ -9,7 +9,7 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Text;
 

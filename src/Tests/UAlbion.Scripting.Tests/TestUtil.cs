@@ -16,16 +16,21 @@ namespace UAlbion.Scripting.Tests;
 public static class TestUtil
 {
     static readonly SemaphoreSlim ProcessSemaphore = new(Environment.ProcessorCount, Environment.ProcessorCount);
-    public static string FindBasePath()
+    public static string FindBasePath() // Should roughly match UAlbion.Config.ConfigUtil
     {
+        static string Probe(string start)
+        {
+            var curDir = new DirectoryInfo(start ?? throw new InvalidOperationException());
+
+            while (curDir != null && !File.Exists(Path.Combine(curDir.FullName, "mods", "Base", "base_assets.json")))
+                curDir = curDir.Parent;
+
+            return curDir?.FullName;
+        }
+
         var exeLocation = Assembly.GetExecutingAssembly().Location;
-        var curDir = new DirectoryInfo(Path.GetDirectoryName(exeLocation) ?? throw new InvalidOperationException());
-
-        while (curDir != null && !File.Exists(Path.Combine(curDir.FullName, "data", "config.json")))
-            curDir = curDir.Parent;
-
-        var baseDir = curDir?.FullName;
-        return baseDir;
+        var result = Probe(Path.GetDirectoryName(exeLocation));
+        return result;
     }
 
     public static void VerifyAstVsScript(string expected, ICfgNode ast)
@@ -72,6 +77,7 @@ public static class TestUtil
 
     public static bool CompareNodesVsScript(IEnumerable<ICfgNode> nodes, string expected, out string message)
     {
+        if (nodes == null) throw new ArgumentNullException(nameof(nodes));
         var compact = FormatScript(nodes, false);
         var pretty = FormatScript(nodes, true);
 

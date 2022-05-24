@@ -5,6 +5,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Entities.Map2D;

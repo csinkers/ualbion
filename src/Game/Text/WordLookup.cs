@@ -2,7 +2,7 @@
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Text;

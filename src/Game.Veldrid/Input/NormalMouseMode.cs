@@ -23,7 +23,7 @@ public class NormalMouseMode : Component
     Vector2 _lastPosition;
 
     public NormalMouseMode() => On<InputEvent>(OnInput);
-    protected override void Subscribed() => Raise(new SetCursorEvent(Base.CoreSprite.Cursor));
+    protected override void Subscribed() => Raise(new SetCursorEvent(Base.CoreGfx.Cursor));
 
     void OnInput(InputEvent e)
     {

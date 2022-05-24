@@ -32,16 +32,16 @@ public class NpcTilesetLoader : Component, IAssetLoader
         var tiles = new List<TileProperties>();
         var assets = Resolve<IAssetManager>();
         var modApplier = Resolve<IModApplier>();
-        var config = Resolve<IGeneralConfig>();
+        var pathResolver = Resolve<IPathResolver>();
         var assetIds =
             AssetMapping.Global.EnumerateAssetsOfType(small
-                ? AssetType.SmallNpcGraphics
-                : AssetType.LargeNpcGraphics);
+                ? AssetType.NpcSmallGfx
+                : AssetType.NpcLargeGfx);
 
         foreach (var id in assetIds)
         {
             var sprite = assets.LoadTexture(id); // Get sprite from source mod
-            var spriteInfo = modApplier.GetAssetInfo(id, null); // But info from target mod
+            var spriteInfo = modApplier.GetAssetInfo(id, null); // But get AssetInfo from target mod
 
             // Ugh, hacky.
             int palId = spriteInfo.Get(AssetProperty.PaletteId, 0);
@@ -50,7 +50,7 @@ public class NpcTilesetLoader : Component, IAssetLoader
                     assets.GetAssetInfo(id).Get(AssetProperty.PaletteId, 0));
 
             var path = graphicsPattern.Format(new AssetPath(spriteInfo, 9)); // 9 = First frame facing west for both large and small
-            path = config.ResolvePath(path);
+            path = pathResolver.ResolvePath(path);
             WriteNpcSprite(path, sprite, spriteInfo, context);
 
             tiles.Add(new TileProperties

@@ -10,8 +10,8 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Audio;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
@@ -102,16 +102,24 @@ public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManage
             if (_waveLibCache.TryGetValue(key, out var buffer))
                 return buffer;
             var assets = Resolve<IAssetManager>();
-            var sample = assets.LoadWaveLib(songId.ToWaveLibrary())?[instrument];
-            if (sample == null)
+            var songInfo = assets.GetAssetInfo(songId);
+            var waveLibId = songInfo.Get(AssetProperty.WaveLib, WaveLibraryId.None);
+            if (waveLibId.IsNone)
+            {
+                Info($"Song {songId} has no associated wave library");
+                return null;
+            }
+
+            var waveLibrary = assets.LoadWaveLib(waveLibId)?[instrument];
+            if (waveLibrary == null)
             {
                 Error($"Could not load audio sample {key}");
                 _waveLibCache[key] = null;
                 return null;
             }
 
-            var sampleRate = sample.SampleRate == -1 ? DefaultSampleRate : sample.SampleRate;
-            buffer = new AudioBufferUInt8(sample.Samples, sampleRate);
+            var sampleRate = waveLibrary.SampleRate == -1 ? DefaultSampleRate : waveLibrary.SampleRate;
+            buffer = new AudioBufferUInt8(waveLibrary.Samples, sampleRate);
             _waveLibCache[key] = buffer;
             return buffer;
         }
@@ -243,9 +251,8 @@ public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManage
     void AudioThread()
     {
         using var device = new AudioDevice { DistanceModel = DistanceModel.InverseDistance };
-        var config = Resolve<IGameConfigProvider>().Game;
 
-        while (!_doneEvent.WaitOne((int)(config.Audio.AudioPollIntervalSeconds * 1000)))
+        while (!_doneEvent.WaitOne((int)(GetVar(GameVars.Audio.PollIntervalSeconds) * 1000)))
         {
             if (_standalone)
                 Raise(BeginFrameEvent.Instance);

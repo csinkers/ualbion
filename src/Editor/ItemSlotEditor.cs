@@ -4,6 +4,7 @@ using System.Linq;
 using ImGuiNET;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Assets;
 
 namespace UAlbion.Editor;

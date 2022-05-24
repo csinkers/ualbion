@@ -5,10 +5,10 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events.Transitions;
 using UAlbion.Game.State;
+using TransitionVars = UAlbion.Formats.Config.GameVars.Ui.Transitions;
 
 namespace UAlbion.Game.Entities;
 
@@ -58,7 +58,6 @@ public class ItemTransitionManager : Component
         Action continuation)
     {
         var assets = Resolve<IAssetManager>();
-        var transitionConfig = Resolve<IGameConfigProvider>().Game.UI.Transitions;
         var window = Resolve<IWindowManager>();
         var destPosition = window.UiToNorm(toUiPosition); // Tom's portrait, hardcoded for now.
 
@@ -67,14 +66,14 @@ public class ItemTransitionManager : Component
         {
             case AssetType.Gold:
             {
-                var texture = assets.LoadTexture(Base.CoreSprite.UiGold);
+                var texture = assets.LoadTexture(Base.CoreGfx.UiGold);
                 var subImageDetails = texture.Regions[0];
 
                 AttachChild(new LinearItemTransition(
-                    Base.CoreSprite.UiGold, 0,
+                    Base.CoreGfx.UiGold, 0,
                     fromNormPosition,
                     destPosition,
-                    transitionTimeSeconds ?? transitionConfig.DefaultTransitionTimeSeconds,
+                    transitionTimeSeconds ?? GetVar(TransitionVars.DefaultTransitionTimeSeconds),
                     window.UiToNormRelative(subImageDetails.Size),
                     continuation));
                 break;
@@ -82,14 +81,14 @@ public class ItemTransitionManager : Component
 
             case AssetType.Rations:
             {
-                var texture = assets.LoadTexture(Base.CoreSprite.UiFood);
+                var texture = assets.LoadTexture(Base.CoreGfx.UiFood);
                 var subImageDetails = texture.Regions[0];
 
                 AttachChild(new LinearItemTransition(
-                    Base.CoreSprite.UiFood, 0,
+                    Base.CoreGfx.UiFood, 0,
                     fromNormPosition,
                     destPosition,
-                    transitionTimeSeconds ?? transitionConfig.DefaultTransitionTimeSeconds,
+                    transitionTimeSeconds ?? GetVar(TransitionVars.DefaultTransitionTimeSeconds),
                     window.UiToNormRelative(subImageDetails.Size),
                     continuation));
                 break;
@@ -104,7 +103,7 @@ public class ItemTransitionManager : Component
                     item.Icon, item.IconSubId,
                     fromNormPosition,
                     destPosition,
-                    transitionTimeSeconds ?? transitionConfig.DefaultTransitionTimeSeconds,
+                    transitionTimeSeconds ?? GetVar(TransitionVars.DefaultTransitionTimeSeconds),
                     window.UiToNormRelative(subImageDetails.Size),
                     continuation));
                 break;
@@ -124,11 +123,11 @@ public class ItemTransitionManager : Component
         {
             case AssetType.Gold:
             {
-                var texture = assets.LoadTexture(Base.CoreSprite.UiGold);
+                var texture = assets.LoadTexture(Base.CoreGfx.UiGold);
                 var subImageDetails = texture.Regions[0];
 
                 AttachChild(new GravityItemTransition(
-                    Base.CoreSprite.UiGold, 0,
+                    Base.CoreGfx.UiGold, 0,
                     fromNormPosition,
                     window.UiToNormRelative(subImageDetails.Size),
                     continuation));
@@ -136,11 +135,11 @@ public class ItemTransitionManager : Component
             }
             case AssetType.Rations:
             {
-                var texture = assets.LoadTexture(Base.CoreSprite.UiFood);
+                var texture = assets.LoadTexture(Base.CoreGfx.UiFood);
                 var subImageDetails = texture.Regions[0];
 
                 AttachChild(new GravityItemTransition(
-                    Base.CoreSprite.UiFood, 0,
+                    Base.CoreGfx.UiFood, 0,
                     fromNormPosition,
                     window.UiToNormRelative(subImageDetails.Size),
                     continuation));

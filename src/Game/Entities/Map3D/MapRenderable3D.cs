@@ -143,8 +143,7 @@ public class MapRenderable3D : Component
 
     void Update()
     {
-        var config = Resolve<IGameConfigProvider>().Game;
-        var frameCount =  (Resolve<IGameState>()?.TickCount ?? 0) / config.Time.FastTicksPerMapTileFrame;
+        var frameCount =  (Resolve<IGameState>()?.TickCount ?? 0) / GetVar(GameVars.Time.FastTicksPerMapTileFrame);
 
         if (_frameCount != frameCount)
         {

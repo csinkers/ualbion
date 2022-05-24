@@ -1,0 +1,9 @@
+{
+  "Repo": "https://github.com/CSinkers/UAlbion",
+  "Name": " UAlbion-Common",
+  "Description": "Common assets between Albion, Unpacked, Repacked etc. Mostly new asset files to replace hardcoded data in the original exe",
+  "Author": "Cam Sinclair et al",
+  "Version": "0.1.0",
+  "Dependencies": [ "Base" ],
+  "InheritAssetConfigFrom": "Base"
+}

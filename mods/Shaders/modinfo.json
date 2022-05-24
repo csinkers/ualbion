@@ -5,5 +5,5 @@
     "Author": "Cam Sinclair et al",
     "Version": "0.1.0",
     "ShaderPath": "Shaders",
-    "Dependencies": []
+    "Dependencies": [ "Base" ]
 }

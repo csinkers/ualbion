@@ -132,8 +132,12 @@ public class EventMetadata
     {
         var constructor = Type.GetConstructors().Single();
         var parameters = constructor.GetParameters();
-        ApiUtil.Assert(parameters.Length == Parts.Count,
-            $"When building parser for {Type}, the public constructor had {parameters.Length} parameters but {Parts.Count} were expected.");
+        if (parameters.Length != Parts.Count)
+        {
+            throw new FormatException(
+                $"When building parser for {Type}, the public constructor had {parameters.Length} parameters but {Parts.Count} were expected. " +
+                "This may be because the property corresponding to the constructor parameter does not have an EventPart attribute.");
+        }
 
         return (Func<string[], Event>)Expression.Lambda(
             Expression.Convert(

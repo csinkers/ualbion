@@ -28,15 +28,16 @@ public static class IsometricSetup
         var builder = new IsometricBuilder(offscreenFB, tileWidth, tileHeight, baseHeight, tilesPerRow);
 
 #pragma warning disable CA2000 // Dispose objects before losing scopes
-        var config = exchange.Resolve<IGeneralConfig>();
-        var shaderCache = new ShaderCache(config.ResolvePath("$(CACHE)/ShaderCache"));
+        var pathResolver = exchange.Resolve<IPathResolver>();
+        var shaderCache = new ShaderCache(pathResolver.ResolvePath("$(CACHE)/ShaderCache"));
+        var shaderLoader = new ShaderLoader();
         var mainPass = new RenderPass("Iso Render Pass", offscreenFB)
                 .AddRenderer(new SpriteRenderer(offscreenFB))
                 .AddRenderer(new EtmRenderer(offscreenFB))
             ;
 
         foreach (var shaderPath in exchange.Resolve<IModApplier>().ShaderPaths)
-            shaderCache.AddShaderPath(shaderPath);
+            shaderLoader.AddShaderDirectory(shaderPath);
 
         var engine = new Engine(backend, useRenderDoc, false, windowRect != null, windowRect);
         engine.AddRenderPass(mainPass);
@@ -50,6 +51,7 @@ public static class IsometricSetup
         var services = new Container("IsometricLayoutServices");
         services
             .Add(shaderCache)
+            .Add(shaderLoader)
             .Add(offscreenFB)
             .Add(mainPass)
             .Add(engine)

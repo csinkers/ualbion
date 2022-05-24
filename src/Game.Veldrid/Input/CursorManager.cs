@@ -8,6 +8,7 @@ using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
@@ -20,7 +21,7 @@ namespace UAlbion.Game.Veldrid.Input;
 
 public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
 {
-    SpriteId _cursorId = Base.CoreSprite.Cursor;
+    SpriteId _cursorId = Base.CoreGfx.Cursor;
 
     public Vector2 Position { get; private set; }
     Vector2 _hotspot;
@@ -75,7 +76,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
 
     void Render()
     {
-        var showHotspot = (Resolve<IDebugSettings>()?.DebugFlags ?? 0).HasFlag(DebugFlags.ShowCursorHotspot);
+        var showHotspot = (GetVar(UserVars.Debug.DebugFlags) & DebugFlags.ShowCursorHotspot) != 0;
         if (showHotspot != (_hotspotSprite == null))
             _dirty = true;
 
@@ -173,7 +174,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
                 : tm.BuildRenderable(new TextBlock(itemAmountText), DrawLayer.MaxLayer, null, this);
         }
 
-        if (_cursorId != Base.CoreSprite.CursorSmall) // Inventory screen, check what's being held.
+        if (_cursorId != Base.CoreGfx.CursorSmall) // Inventory screen, check what's being held.
         {
             _itemSprite?.Dispose(); _itemSprite = null;
             _itemAmountSprite?.Dispose(); _itemAmountSprite = null;
@@ -185,8 +186,8 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
 
         switch (held.Item)
         {
-            case Gold: texture = assets.LoadTexture(Base.CoreSprite.UiGold); break;
-            case Rations: texture = assets.LoadTexture(Base.CoreSprite.UiFood); break;
+            case Gold: texture = assets.LoadTexture(Base.CoreGfx.UiGold); break;
+            case Rations: texture = assets.LoadTexture(Base.CoreGfx.UiFood); break;
             case ItemData item:
             {
                 texture = assets.LoadTexture(item.Icon);

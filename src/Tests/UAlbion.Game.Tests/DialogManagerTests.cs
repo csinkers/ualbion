@@ -7,6 +7,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
@@ -48,6 +49,7 @@ public class DialogManagerTests
 
         ex
             .Attach(mma)
+            .Attach(new MockSettings())
             .Attach(new AssetManager())
             .Attach(new SpriteManager<SpriteInfo>())
             .Attach(new MockGameFactory())
@@ -55,7 +57,6 @@ public class DialogManagerTests
             .Attach(new TextFormatter())
             .Attach(new TextManager())
             .Attach(new WindowManager { Resolution = (1920, 1080) })
-            .Attach(new MockSettings { Language = Base.Language.English })
             .Attach(dm)
             .Attach(lm)
             ;
@@ -63,7 +64,7 @@ public class DialogManagerTests
         var e = new YesNoPromptEvent((TextId)Base.SystemText.MainMenu_DoYouReallyWantToQuit);
 
         bool? result = null;
-        ex.RaiseAsync<bool>(e, null, x => result = x);
+        ex.RaiseAsync(e, null, x => result = x);
         Assert.Null(result);
 
         var layout = lm.GetLayout();
@@ -80,7 +81,7 @@ public class DialogManagerTests
 
         // Open another yes/no dialog
         e = new YesNoPromptEvent((TextId)Base.SystemText.MainMenu_DoYouReallyWantToQuit);
-        ex.RaiseAsync<bool>(e, this, x => result = x);
+        ex.RaiseAsync(e, this, x => result = x);
         layout = lm.GetLayout();
         Assert.Equal(1, layout.Children.Count); // Should only be one top-level dialog
         var noText = layout.DepthFirstSearch(x => x.Element is TextLine txt && txt.ToString().Contains("\"No\"")).First();

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Api.Eventing;
+using UAlbion.Config;
 using UAlbion.Core.Veldrid.Events;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Input;
 using Veldrid;
@@ -17,7 +19,6 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
 
     readonly BindingSet _bindings = new();
     readonly HashSet<Key> _pressedKeys = new();
-    IInputConfigProvider _configProvider;
     MapId _mapId = Base.Map.TestMapIskai;
 
     public bool IsAltPressed => _pressedKeys.Contains(Key.AltLeft) || _pressedKeys.Contains(Key.AltRight);
@@ -29,33 +30,21 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
         On<InputEvent>(OnInput);
         On<RebindInputEvent>(_ => Rebind());
         On<LoadMapEvent>(e => _mapId = e.MapId);
-    }
-
-    protected override void Subscribed()
-    {
-        if (_configProvider == null)
+        On<AssetUpdatedEvent>(e =>
         {
-            _configProvider = Resolve<IInputConfigProvider>();
-            _configProvider.InputChanged += OnConfigChanged;
-        }
-
-        Rebind();
+            if (e.Id == AssetId.From(Base.Special.InputConfig))
+                Rebind();
+        });
     }
 
-    protected override void Unsubscribed()
-    {
-        if (_configProvider != null)
-        {
-            _configProvider.InputChanged -= OnConfigChanged;
-            _configProvider = null;
-        }
-    }
-
-    void OnConfigChanged(object sender, EventArgs args) => Rebind();
+    protected override void Subscribed() => Rebind();
 
     void Rebind()
     {
-        var config = _configProvider.Input;
+        var config = Resolve<IAssetManager>().LoadInputConfig();
+        if (config == null)
+            throw new InvalidOperationException("Input config could not be loaded");
+
         _bindings.Clear();
 
         foreach (var rawMode in config.Bindings)

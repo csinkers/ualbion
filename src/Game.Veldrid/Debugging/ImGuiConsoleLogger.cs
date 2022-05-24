@@ -23,7 +23,7 @@ public class ImGuiConsoleLogger : Component
 
     public ImGuiConsoleLogger()
     {
-        On<EngineUpdateEvent>(e => RenderDialog());
+        On<EngineUpdateEvent>(_ => RenderDialog());
         On<ClearConsoleEvent>(_ =>
         {
             lock (_syncRoot)
@@ -55,7 +55,7 @@ public class ImGuiConsoleLogger : Component
 
     void RenderDialog()
     {
-        var debugFlags = Resolve<ISettings>().Debug.DebugFlags;
+        var debugFlags = GetVar(UserVars.Debug.DebugFlags);
         if ((debugFlags & DebugFlags.ShowConsole) == 0)
         {
             _wasShown = false;

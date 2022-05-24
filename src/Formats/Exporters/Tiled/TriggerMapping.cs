@@ -4,8 +4,8 @@ using System.Globalization;
 using System.Linq;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Exporters.Tiled;
 

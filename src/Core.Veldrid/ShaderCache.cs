@@ -5,10 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid.Events;
+using UAlbion.Core.Visual;
 using Veldrid;
 using Veldrid.SPIRV;
 
@@ -18,15 +18,12 @@ public sealed class ShaderCache : Component, IShaderCache, IDisposable
 {
     readonly object _syncRoot = new();
     readonly IDictionary<string, CacheEntry> _cache = new Dictionary<string, CacheEntry>();
-    readonly List<string> _shaderPaths = new();
-    readonly List<FileSystemWatcher> _watchers = new();
     readonly string _shaderCachePath;
     IFileSystem _disk;
 
     class CacheEntry
     {
-        public CacheEntry(string vertexPath, string fragmentPath, ShaderDescription vertexShader,
-            ShaderDescription fragmentShader)
+        public CacheEntry(string vertexPath, string fragmentPath, ShaderDescription vertexShader, ShaderDescription fragmentShader)
         {
             VertexPath = vertexPath;
             FragmentPath = fragmentPath;
@@ -60,64 +57,6 @@ public sealed class ShaderCache : Component, IShaderCache, IDisposable
         Exchange.Unregister(typeof(IShaderCache), this);
     }
 
-    public IShaderCache AddShaderPath(string path)
-    {
-        _shaderPaths.Add(path);
-        var watcher = new FileSystemWatcher(path);
-        //_watcher.Filters.Add("*.frag");
-        //_watcher.Filters.Add("*.vert");
-        watcher.Changed += (sender, e) => ShadersUpdated?.Invoke(sender, EventArgs.Empty);
-        watcher.EnableRaisingEvents = true;
-        _watchers.Add(watcher);
-        return this;
-    }
-
-    public event EventHandler<EventArgs> ShadersUpdated;
-
-    IEnumerable<string> ReadGlsl(string shaderName)
-    {
-        foreach (var dirPath in _shaderPaths)
-        {
-            var filePath = Path.Combine(dirPath, shaderName);
-            if (_disk.FileExists(filePath))
-            {
-                foreach (var line in _disk.ReadAllLines(filePath))
-                    yield return line;
-                yield break;
-            }
-        }
-
-        var fullName = $"{GetType().Namespace}.{shaderName}";
-        using var resource = GetType().Assembly.GetManifestResourceStream(fullName);
-        using var streamReader = new StreamReader(resource ?? throw new InvalidOperationException(
-            $"The shader {fullName} could not be found (checked paths {string.Join(", ", _shaderPaths)})"));
-
-        while (!streamReader.EndOfStream)
-            yield return streamReader.ReadLine();
-    }
-
-    static readonly Regex IncludeRegex = new("^#include\\s+\"([^\"]+)\"");
-    public string GetGlsl(string shaderName)
-    {
-        var lines = ReadGlsl(shaderName);
-
-        // Substitute include files
-        var sb = new StringBuilder();
-        foreach (var line in lines)
-        {
-            var match = IncludeRegex.Match(line);
-            if (match.Success)
-            {
-                var filename = match.Groups[1].Value;
-                var includedContent = GetGlsl(filename);
-                sb.AppendLine(includedContent);
-            }
-            else sb.AppendLine(line);
-        }
-
-        return sb.ToString();
-    }
-
     string GetShaderPath(string name, string content)
     {
         using var sha256 = SHA256.Create();
@@ -126,25 +65,19 @@ public sealed class ShaderCache : Component, IShaderCache, IDisposable
         return Path.Combine(_shaderCachePath, $"{name}.{hashString}.spv");
     }
 
-    (string, byte[]) LoadSpirvByteCode(string name, string content, ShaderStages stage)
+    (string, byte[]) LoadSpirvByteCode(ShaderInfo info, ShaderStages stage)
     {
-        var cachePath = GetShaderPath(name, content);
+        var cachePath = GetShaderPath(info.Name, info.Content);
         if (_disk.FileExists(cachePath))
             return (cachePath, _disk.ReadAllBytes(cachePath));
 
-        using (PerfTracker.InfrequentEvent($"Compiling {name} to SPIR-V"))
+        using (PerfTracker.InfrequentEvent($"Compiling {info.Name} to SPIR-V"))
         {
-            if (!content.StartsWith("#version", StringComparison.Ordinal))
-            {
-                content = @"#version 450
-" + content;
-            }
-
             var options = GlslCompileOptions.Default;
 #if DEBUG
             options.Debug = true;
 #endif
-            var glslCompileResult = SpirvCompilation.CompileGlslToSpirv(content, name, stage, options);
+            var glslCompileResult = SpirvCompilation.CompileGlslToSpirv(info.Content, info.Name, stage, options);
             _disk.WriteAllBytes(cachePath, glslCompileResult.SpirvBytes);
             return (cachePath, glslCompileResult.SpirvBytes);
         }
@@ -164,15 +97,12 @@ public sealed class ShaderCache : Component, IShaderCache, IDisposable
         _ => throw new SpirvCompilationException($"Invalid GraphicsBackend: {backend}")
     };
 
-    CacheEntry BuildShaderPair(
-        GraphicsBackend backend,
-        string vertexName, string fragmentName,
-        string vertexContent, string fragmentContent)
+    CacheEntry BuildShaderPair(GraphicsBackend backend, ShaderInfo vertex, ShaderInfo fragment)
     {
         string entryPoint = (backend == GraphicsBackend.Metal) ? "main0" : "main";
 
-        var (vertexPath, vertexSpirv) = LoadSpirvByteCode(vertexName, vertexContent, ShaderStages.Vertex);
-        var (fragmentPath, fragmentSpirv) = LoadSpirvByteCode(fragmentName, fragmentContent, ShaderStages.Fragment);
+        var (vertexPath, vertexSpirv) = LoadSpirvByteCode(vertex, ShaderStages.Vertex);
+        var (fragmentPath, fragmentSpirv) = LoadSpirvByteCode(fragment, ShaderStages.Fragment);
 
         var vertexShaderDescription = new ShaderDescription(ShaderStages.Vertex, vertexSpirv, entryPoint);
         var fragmentShaderDescription = new ShaderDescription(ShaderStages.Fragment, fragmentSpirv, entryPoint);
@@ -182,7 +112,7 @@ public sealed class ShaderCache : Component, IShaderCache, IDisposable
 
         CrossCompileTarget target = GetCompilationTarget(backend);
         var options = new CrossCompileOptions();
-        using (PerfTracker.InfrequentEvent($"cross compiling {vertexName} to {target}"))
+        using (PerfTracker.InfrequentEvent($"cross compiling {vertex.Name} + {fragment.Name} to {target}"))
         {
             var compilationResult = SpirvCompilation.CompileVertexFragment(vertexSpirv, fragmentSpirv, target, options);
             vertexShaderDescription.ShaderBytes = GetBytes(backend, compilationResult.VertexShader);
@@ -192,55 +122,40 @@ public sealed class ShaderCache : Component, IShaderCache, IDisposable
         }
     }
 
-    public Shader[] GetShaderPair(
-        ResourceFactory factory,
-        string vertexName, string fragmentName,
-        string vertexContent = null, string fragmentContent = null)
+    public Shader[] GetShaderPair(ResourceFactory factory, ShaderInfo vertex, ShaderInfo fragment)
     {
         if (factory == null) throw new ArgumentNullException(nameof(factory));
-        if(string.IsNullOrEmpty(vertexName)) throw new ArgumentNullException(nameof(vertexName));
-        if(string.IsNullOrEmpty(fragmentName)) throw new ArgumentNullException(nameof(fragmentName));
+        if (vertex == null) throw new ArgumentNullException(nameof(vertex));
+        if (fragment == null) throw new ArgumentNullException(nameof(fragment));
 
-        vertexContent ??= GetGlsl(vertexName);
-        fragmentContent ??= GetGlsl(fragmentName);
-
-#if DEBUG
-        vertexContent =
-            @"#define DEBUG
-" + vertexContent;
-        fragmentContent =
-            @"#define DEBUG
-" + fragmentContent;
-#endif
-
-        var vertexPath = GetShaderPath(vertexName, vertexContent);
-        var fragmentPath = GetShaderPath(fragmentName, fragmentContent);
+        var vertexPath = GetShaderPath(vertex.Name, vertex.Content);
+        var fragmentPath = GetShaderPath(fragment.Name, fragment.Content);
 
         lock (_syncRoot)
         {
-            var cacheKey = vertexName + fragmentName;
+            var cacheKey = vertex.Name + fragment.Name;
             Exception compileException = null;
             if (!_cache.TryGetValue(cacheKey, out var entry) || entry.VertexPath != vertexPath || entry.FragmentPath != fragmentPath)
             {
                 try
                 {
-                    entry = BuildShaderPair(factory.BackendType, vertexName, fragmentName, vertexContent, fragmentContent);
+                    entry = BuildShaderPair(factory.BackendType, vertex, fragment);
                     _cache[cacheKey] = entry;
                 }
                 catch (SpirvCompilationException e)
                 {
-                    Error($"Error compiling shaders ({vertexName}, {fragmentName}): {e}");
+                    Error($"Error compiling shaders ({vertex.Name}, {fragment.Name}): {e}");
                     compileException = e;
                 }
             }
 
             if (entry == null)
-                throw new InvalidOperationException($"No shader could be built for ({vertexName}, {fragmentName}): {compileException}");
+                throw new InvalidOperationException($"No shader could be built for ({vertex.Name}, {fragment.Name}): {compileException}");
 
             var vertexShader = factory.CreateShader(entry.VertexShader);
             var fragmentShader = factory.CreateShader(entry.FragmentShader);
-            vertexShader.Name = "S_" + vertexName;
-            fragmentShader.Name = "S_" + fragmentName;
+            vertexShader.Name = "S_" + vertex.Name;
+            fragmentShader.Name = "S_" + fragment.Name;
             return new[] { vertexShader, fragmentShader };
         }
     }
@@ -274,9 +189,6 @@ public sealed class ShaderCache : Component, IShaderCache, IDisposable
 
     public void Dispose()
     {
-        foreach(var watcher in _watchers)
-            watcher.Dispose();
-        _watchers.Clear();
         DestroyAllDeviceObjects();
     }
 }

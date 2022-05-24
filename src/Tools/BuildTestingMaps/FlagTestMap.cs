@@ -1,5 +1,10 @@
-﻿using UAlbion.Config;
+﻿using UAlbion.Api;
+using UAlbion.Base;
+using UAlbion.Config;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Ids;
+using UAlbion.Formats.Parsers;
 using static BuildTestingMaps.Constants;
 
 namespace BuildTestingMaps;
@@ -30,7 +35,7 @@ public static class FlagTestMap
             }
 
             ushort n = 0;
-/*
+//* -- For investigating NPC behaviour and events --
             void Add(int x, int y, string name, Func<Func<string, int>, string> scriptBuilder)
             {
                 for (var index = 0; index < name.Length; index++)
@@ -125,11 +130,11 @@ public static class FlagTestMap
             var waypoints = BuildPatrolPath(18, 6);
             map.Npcs[0] = new MapNpc
             {
-                Id = (MonsterGroupId)MonsterGroup.TwoSkrinn1OneKrondir1,
+                Id = (MonsterGroupId)UAlbion.Base.MonsterGroup.TwoSkrinn1OneKrondir1,
                 Type = NpcType.Monster,
                 Movement = NpcMovement.Waypoints,
                 Waypoints = waypoints,
-                SpriteOrGroup = (SpriteId)LargeNpc.Skrinn,
+                SpriteOrGroup = (SpriteId)NpcLargeGfx.Skrinn,
             };
 
             Add(1, n+1, "EC0", s => $@"
@@ -234,7 +239,9 @@ if (get_ticker 101 Equals 0) {{
             Add(14, 4, "^", _ => Script(_ => "npc_turn 0 0"));
             Add(15, 5, ">", _ => Script(_ => "npc_turn 0 1"));
             Add(14, 6, "v", _ => Script(_ => "npc_turn 0 2"));
-*/
+//*/
+
+/* -- For investigating map tile animation flags --
             MajMin(8, 1, (i, j) =>
             {
                 int x0 = 2 + i;
@@ -244,7 +251,8 @@ if (get_ticker 101 Equals 0) {{
                 map.Overlay[Pos(x0, y0 + 1)] = Tileset1.AnimLoopOverlayOffset  + num;
                 map.Overlay[Pos(x0, y0 + 4)] = Tileset1.AnimCycleOffset + num;
                 map.Overlay[Pos(x0, y0 + 5)] = Tileset1.AnimCycleOverlayOffset + num;
-            });
+            }); //*/
+
         });
 
         var (finalMap, mapText) = builder.Build();

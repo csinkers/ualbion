@@ -41,12 +41,12 @@ public class Sprite : Component, IPositioned
         OnAsync<WorldCoordinateSelectEvent, Selection>(Select);
         On<HoverEvent>(_ =>
         {
-            if ((Resolve<IEngineSettings>()?.Flags & EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
+            if ((GetVar(CoreVars.User.EngineFlags) & EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
                 Flags |= SpriteFlags.Highlight;
         });
         On<BlurEvent>(_ =>
         {
-            if ((Resolve<IEngineSettings>()?.Flags & EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
+            if ((GetVar(CoreVars.User.EngineFlags) & EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
                 Flags &= ~SpriteFlags.Highlight;
         });
 

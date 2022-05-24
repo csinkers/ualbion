@@ -13,17 +13,32 @@
     "Assets/3dWalls":            { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "wall.1"     } } },
     "Assets/CombatBackground":   { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_p{pal}_{name}.png", "Map": { "1": { "Id": "combg.1"    } } },
     "Assets/CombatGraphics":     { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "comgfx.1"   } } },
-    "Assets/InvBackgrounds":     { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "fullbody.1" } } },
+    "Assets/InvBackgrounds":     { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "pinvgfx.1" } } },
     "Assets/MonsterGraphics":    { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "mongfx.1"   } } },
-    "Assets/NpcGraphicsLarge":   { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "lnpc.1"     } } },
-    "Assets/NpcGraphicsSmall":   { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "snpc.1"     } } },
-    "Assets/PartyGraphicsLarge": { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "lparty.1"   } } },
-    "Assets/PartyGraphicsSmall": { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "sparty.1"   } } },
+    "Assets/NpcGraphicsLarge":   { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "npclarge.1"     } } },
+    "Assets/NpcGraphicsSmall":   { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "npcsmall.1"     } } },
+    "Assets/PartyGraphicsLarge": { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "plarge.1"   } } },
+    "Assets/PartyGraphicsSmall": { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "psmall.1"   } } },
     "Assets/Pictures":           { "Loader": "png32", "Container": "dir", "Pattern": "{id}_{name}.png", "Map": { "1": { "Id": "pic.1" } } },
     "Assets/Portraits":          { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{name}.png", "Map": { "1": { "Id": "portrait.1" } } },
     "Assets/Slab":               { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Map": { "1": { "Id": "uibg.1"     } } },
     "Assets/TacticalIcons":      { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Map": { "1": { "Id": "tacgfx.1"   } } },
     "Assets/CoreGraphics":       { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png",      "Map": { "0": { "Id": "coregfx.0"  } } },
+
+    "Assets/Tilesets/LargeNPCs.tsx": {
+      "Loader": "tiledNpcTileset",
+      "Container": "raw",
+      "IsSmall": false,
+      "GraphicsPattern": "Assets/Tilesets/LargeNPCs/{id}.png",
+      "Map": { "0": { "Id": "special.DummyObject" } }
+    },
+    "Assets/Tilesets/SmallNPCs.tsx": {
+      "Loader": "tiledNpcTileset",
+      "Container": "raw",
+      "IsSmall": true,
+      "GraphicsPattern": "Assets/Tilesets/SmallNPCs/{id}.png",
+      "Map": { "0": { "Id": "special.DummyObject" } }
+    },
 
     "Assets/Chests":        { "Loader": "jsonInv",          "Container": "dir", "Pattern": "{id:000}_{name}.json", "Map": { "1": { "Id": "chest.1"    } } },
     "Assets/Events":        { "Loader": "eventSetScript",   "Container": "dir", "Pattern": "{id:000}_{name}.ua",   "Map": { "1": { "Id": "eset.1"     } } },
@@ -32,7 +47,7 @@
     "Assets/Monsters":      { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "monster.1"  } } },
     "Assets/Npcs":          { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "npc.1"      } } },
     "Assets/Palettes":      { "Loader": "jsonPal",          "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "0": { "Id": "pal.0"      } } },
-    "Assets/PartyMembers":  { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "party.1"    } } },
+    "Assets/PartyMembers":  { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "psheet.1"    } } },
     "Assets/Samples":       { "Loader": "wav",              "Container": "dir", "Pattern": "{id}_{name}.wav",  "Map": { "1": { "Id": "sample.1"   } } },
     "Assets/Scripts":       { "Loader": "script",           "Container": "dir", "Pattern": "{id}_{name}.txt",  "Map": { "1": { "Id": "script.1"   } } },
     "Assets/Songs":         { "Loader": "song",             "Container": "dir", "Pattern": "{id}_{name}.xmi",  "Map": { "1": { "Id": "song.1"     } } },
@@ -171,20 +186,6 @@
       "GraphicsPattern": "{id}/{id}_{frame}.png",
       "BlankTilePath": "../../Blank.png",
       "Map": { "1": { "Id": "tiledata.1" } }
-    },
-    "Assets/Tilesets/LargeNPCs.tsx": {
-      "Loader": "tiledNpcTileset",
-      "Container": "raw",
-      "IsSmall": false,
-      "GraphicsPattern": "Assets/Tilesets/LargeNPCs/{id}.png",
-      "Map": { "0": { "Id": "special.DummyObject" } }
-    },
-    "Assets/Tilesets/SmallNPCs.tsx": {
-      "Loader": "tiledNpcTileset",
-      "Container": "raw",
-      "IsSmall": true,
-      "GraphicsPattern": "Assets/Tilesets/SmallNPCs/{id}.png",
-      "Map": { "0": { "Id": "special.DummyObject" } }
     },
 
     "Assets/Maps": {

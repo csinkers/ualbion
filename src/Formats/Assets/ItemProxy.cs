@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Formats.Assets;
+﻿using UAlbion.Formats.Ids;
+
+namespace UAlbion.Formats.Assets;
 
 public class ItemProxy : IItem
 {
@@ -16,7 +18,7 @@ public class ItemProxy : IItem
 
     public override string ToString() => $"Proxy for {Id}";
     public override int GetHashCode() => Id.GetHashCode();
-    public SpriteId Icon => Base.ItemGraphics.ItemSprites;
+    public SpriteId Icon => Base.ItemGfx.ItemSprites;
     public int IconSubId => 0;
     public byte IconAnim => 0;
 }

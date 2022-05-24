@@ -8,7 +8,9 @@ using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
+using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 
 namespace UAlbion.Game.Text;
@@ -31,9 +33,10 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
 
             var asset = e.AssetId.Type switch
             {
-                AssetType.Party => (object)state.GetSheet(e.AssetId), // TODO: Load game state assets via AssetManager?
-                AssetType.Npc => state.GetSheet(e.AssetId),
-                AssetType.Monster => assets.LoadSheet(e.AssetId),
+                AssetType.PartyMember => (object)state.GetSheet(((PartyMemberId)e.AssetId).ToSheet()),
+                AssetType.PartySheet => state.GetSheet(e.AssetId),
+                AssetType.NpcSheet => state.GetSheet(e.AssetId),
+                AssetType.MonsterSheet => assets.LoadSheet(e.AssetId),
                 AssetType.Item => assets.LoadItem(e.AssetId),
                 _ => null
             };
@@ -130,7 +133,7 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
                 {
                     if (active is ICharacterSheet character)
                     {
-                        var language = Resolve<ISettings>().Gameplay.Language;
+                        var language = GetVar(UserVars.Gameplay.Language);
                         yield return (Token.Text, character.GetName(language));
                     }
                     else if (active is ItemData item)

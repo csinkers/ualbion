@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Ids;
 using static UAlbion.Formats.Exporters.Tiled.MapperUtil;
 
 namespace UAlbion.Formats.Exporters.Tiled;

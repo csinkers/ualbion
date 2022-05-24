@@ -9,6 +9,7 @@ using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.TestCommon;
@@ -62,7 +63,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(18, item.Charges);
         Assert.Equal(PlayerClasses.Humans, item.Class);
         Assert.Equal(3, item.EnchantmentCount);
-        Assert.Equal(ItemGraphics.ItemSprites, item.Icon);
+        Assert.Equal(ItemGfx.ItemSprites, item.Icon);
         Assert.Equal(88, item.IconSubId);
         Assert.Equal(20, item.MaxCharges);
         Assert.Equal(20, item.MaxEnchantmentCount);
@@ -141,7 +142,7 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void CoreSpriteTest()
     {
-        var cursor = Test(assets => assets.LoadTexture(CoreSprite.Cursor));
+        var cursor = Test(assets => assets.LoadTexture(CoreGfx.Cursor));
         Assert.Equal(1, cursor.Regions.Count);
         Assert.Equal(14, cursor.Width);
         Assert.Equal(14, cursor.Height);
@@ -186,7 +187,7 @@ public class AssetLoadTests : IDisposable
                 Assert.Equal(EventText.Frill, e.TextSource);
                 Assert.Equal(7, e.SubId);
                 Assert.Equal(TextLocation.NoPortrait, e.Location);
-                Assert.Equal(CharacterId.None, e.Speaker);
+                Assert.Equal(SheetId.None, e.Speaker);
             }, // 2=>!: text EventText.Frill:7 NoPortrait None (0 0 0 0)
             x => { Assert.Equal(3, x.Id); Assert.Equal(4, x.Next.Id); }, // 3=>4: text EventText.Frill:1 NoPortrait None (0 0 0 0)
             x => { Assert.Equal(4, x.Id); Assert.Equal(5, x.Next.Id); }, // 4=>5: text EventText.Frill:2 PortraitLeft Npc.Branagh (0 0 0 0)
@@ -217,7 +218,7 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void ItemSpriteTest()
     {
-        var items = Test(assets => assets.LoadTexture(ItemGraphics.ItemSprites));
+        var items = Test(assets => assets.LoadTexture(ItemGfx.ItemSprites));
         Assert.Equal(468, items.Regions.Count);
     }
 
@@ -385,7 +386,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(96, map.Npcs.Count);
         var n = map.Npcs[2];
         Assert.Equal(AssetId.From(EventSet.Christine), n.Id);
-        Assert.Equal(AssetId.From(LargeNpc.Christine), n.SpriteOrGroup);
+        Assert.Equal(AssetId.From(NpcLargeGfx.Christine), n.SpriteOrGroup);
         Assert.Equal(NpcType.Npc, n.Type);
         Assert.Equal(TriggerTypes.Normal, n.Triggers);
         Assert.Equal(0xffff, n.Chain);
@@ -498,15 +499,15 @@ public class AssetLoadTests : IDisposable
     {
         var g = Test(assets => assets.LoadMonsterGroup(MonsterGroup.TwoSkrinn1OneKrondir1));
         Assert.Equal(18, g.Grid.Length);
-        Assert.Equal(Monster.Krondir1, g.Grid[2]);
-        Assert.Equal(Monster.Skrinn1, g.Grid[7]);
-        Assert.Equal(Monster.Skrinn1, g.Grid[16]);
+        Assert.Equal(MonsterSheet.Krondir1, g.Grid[2]);
+        Assert.Equal(MonsterSheet.Skrinn1, g.Grid[7]);
+        Assert.Equal(MonsterSheet.Skrinn1, g.Grid[16]);
     }
 
     [Fact]
     public void MonsterTest()
     {
-        var m = Test(assets => assets.LoadSheet(Monster.Krondir1));
+        var m = Test(assets => assets.LoadSheet(MonsterSheet.Krondir1));
         Assert.Equal(990, m.Magic.SpellPoints.Max);
         Assert.Empty(m.Magic.SpellStrengths);
         Assert.Equal(36, m.Attributes.Strength.Current);
@@ -526,7 +527,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(32, m.Combat.LifePoints.Current);
         Assert.Equal(990, m.Combat.LifePoints.Max);
         Assert.Equal(1, m.Combat.ActionPoints);
-        Assert.Equal(Monster.Krondir1, m.Id);
+        Assert.Equal(MonsterSheet.Krondir1, m.Id);
         Assert.Equal("", m.EnglishName);
         Assert.Equal("Krondir 1", m.GermanName);
         Assert.Equal("", m.FrenchName);
@@ -535,7 +536,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(PlayerClass.Monster, m.PlayerClass);
         Assert.Equal(PlayerLanguages.None, m.Languages);
         Assert.Equal(10, m.Level);
-        Assert.Equal(MonsterGraphics.Krondir, m.MonsterGfxId);
+        Assert.Equal(MonsterGfx.Krondir, m.MonsterGfxId);
         Assert.Equal(1, m.UnkownC);
         Assert.Equal(1, m.UnkownD);
         Assert.Equal(1, m.UnknownE);
@@ -557,11 +558,11 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void NpcTest()
     {
-        var n = Test(assets => assets.LoadSheet(Npc.Christine));
+        var n = Test(assets => assets.LoadSheet(NpcSheet.Christine));
         Assert.Equal("", n.EnglishName);
         Assert.Equal("Christine", n.GermanName);
         Assert.Equal("", n.FrenchName);
-        Assert.Equal(Npc.Christine, n.Id);
+        Assert.Equal(NpcSheet.Christine, n.Id);
         Assert.Equal(Portrait.Christine, n.PortraitId);
         Assert.Equal(EventSet.Christine, n.EventSetId);
         Assert.Equal(EventSet.TorontoWordSet, n.WordSetId);
@@ -616,7 +617,7 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void PartyMemberTest()
     {
-        var t = Test(assets => assets.LoadSheet(PartyMember.Tom));
+        var t = Test(assets => assets.LoadSheet(PartySheet.Tom));
         Assert.Equal(0, t.Magic.SpellPoints.Max);
         Assert.Empty(t.Magic.SpellStrengths);
 
@@ -654,14 +655,14 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(12, t.Combat.LifePoints.Max);
         Assert.Equal(1, t.Combat.ActionPoints);
         Assert.Equal(25, t.Combat.UnknownD8);
-        Assert.Equal(PartyMember.Tom, t.Id);
+        Assert.Equal(PartySheet.Tom, t.Id);
         Assert.Equal("", t.EnglishName);
         Assert.Equal("Tom", t.GermanName);
         Assert.Equal("", t.FrenchName);
         Assert.Equal(28, t.Age.Current);
         Assert.Equal(3, t.Level);
         Assert.Equal(PlayerLanguages.Terran, t.Languages);
-        Assert.Equal(LargePartyMember.Tom, t.SpriteId);
+        Assert.Equal(PartyLargeGfx.Tom, t.SpriteId);
         Assert.Equal(Portrait.Tom, t.PortraitId);
         Assert.Equal(EventSet.Tom, t.EventSetId);
         Assert.Equal(1, t.Unknown6);
@@ -742,7 +743,7 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void TileGfxTest()
     {
-        var tiles = Test(assets => assets.LoadTileGraphics(TilesetGraphics.Toronto));
+        var tiles = Test(assets => assets.LoadTileGraphics(TilesetGfx.Toronto));
         Assert.Equal(2014, tiles.Texture.Regions.Count);
     }
 
@@ -802,19 +803,19 @@ public class AssetLoadTests : IDisposable
         Assert.Equal("key", Test(assets => assets.LoadString(Word.Key)));
     }
 
-    [Fact] public void CombatGfxTest() { Test(assets => assets.LoadTexture(CombatGraphics.Unknown27)); }
+    [Fact] public void CombatGfxTest() { Test(assets => assets.LoadTexture(CombatGfx.Unknown27)); }
     [Fact] public void DungeonBgTest() { Test(assets => assets.LoadTexture(DungeonBackground.EarlyGameL)); }
     [Fact] public void FloorTest() { Test(assets => assets.LoadTexture(Floor.Water)); }
-    [Fact] public void FullBodyPictureTest() { Test(assets => assets.LoadTexture(FullBodyPicture.Tom)); }
-    [Fact] public void LargeNpcTest() { Test(assets => assets.LoadTexture(LargeNpc.Christine)); }
-    [Fact] public void LargePartyMemberTest() { Test(assets => assets.LoadTexture(LargePartyMember.Tom)); }
-    [Fact] public void MonsterGfxTest() { Test(assets => assets.LoadTexture(MonsterGraphics.Krondir)); }
+    [Fact] public void FullBodyPictureTest() { Test(assets => assets.LoadTexture(PartyInventoryGfx.Tom)); }
+    [Fact] public void LargeNpcTest() { Test(assets => assets.LoadTexture(NpcLargeGfx.Christine)); }
+    [Fact] public void LargePartyMemberTest() { Test(assets => assets.LoadTexture(PartyLargeGfx.Tom)); }
+    [Fact] public void MonsterGfxTest() { Test(assets => assets.LoadTexture(MonsterGfx.Krondir)); }
     [Fact] public void OverlayTest() { Test(assets => assets.LoadTexture(WallOverlay.JiriWindow)); }
     [Fact] public void PictureTest() { Test(assets => assets.LoadTexture(Picture.OpenChestWithGold)); }
     [Fact] public void PortraitTest() { Test(assets => assets.LoadTexture(Portrait.Tom)); }
-    [Fact] public void SmallNpcTest() { Test(assets => assets.LoadTexture(SmallNpc.Krondir)); }
-    [Fact] public void SmallPartyMemberTest() { Test(assets => assets.LoadTexture(SmallPartyMember.Tom)); }
-    [Fact] public void TacticalGfxTest() { Test(assets => assets.LoadTexture(TacticalGraphics.Tom)); }
+    [Fact] public void SmallNpcTest() { Test(assets => assets.LoadTexture(NpcSmallGfx.Krondir)); }
+    [Fact] public void SmallPartyMemberTest() { Test(assets => assets.LoadTexture(PartySmallGfx.Tom)); }
+    [Fact] public void TacticalGfxTest() { Test(assets => assets.LoadTexture(TacticalGfx.Tom)); }
     [Fact] public void WallTest() { Test(assets => assets.LoadTexture(Wall.TorontoPanelling)); }
 
     [Fact]

@@ -3,18 +3,18 @@ using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Entities;
 
 public class SmallPlayer : Component
 {
-    readonly CharacterId _id;
+    readonly PartyMemberId _id;
     readonly Func<(Vector3, int)> _positionFunc;
     readonly MapSprite _sprite;
 
-    public SmallPlayer(CharacterId charId, SpriteId graphicsId, Func<(Vector3, int)> positionFunc)
+    public SmallPlayer(PartyMemberId charId, Func<(Vector3, int)> positionFunc)
     {
         On<FastClockEvent>(e =>
         {
@@ -27,7 +27,7 @@ public class SmallPlayer : Component
         _id = charId;
         _positionFunc = positionFunc;
         _sprite = AttachChild(new MapSprite(
-            graphicsId,
+            charId.ToSmallGfx(),
             DrawLayer.Character,
             0,
             SpriteFlags.LeftAligned));

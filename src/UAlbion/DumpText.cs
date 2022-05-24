@@ -9,6 +9,7 @@ using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Text;
 
@@ -50,10 +51,10 @@ class DumpText : Component, IAssetDumper
                 case AssetType.Labyrinth: Labyrinths(assets, baseDir); break;
                 case AssetType.Map: MapData(assets, baseDir, dumpIds); MapEvents(assets, baseDir, dumpIds); break;
                 case AssetType.Merchant: Merchants(assets, baseDir, dumpIds); break;
-                case AssetType.Monster: MonsterCharacterSheets(assets, tf, baseDir, dumpIds); break;
+                case AssetType.MonsterSheet: MonsterCharacterSheets(assets, tf, baseDir, dumpIds); break;
                 case AssetType.MonsterGroup: MonsterGroups(assets, baseDir, dumpIds); break;
-                case AssetType.Npc: NpcCharacterSheets(assets, tf, baseDir, dumpIds); break;
-                case AssetType.Party: PartyCharacterSheets(assets, tf, baseDir, dumpIds); break;
+                case AssetType.NpcSheet: NpcCharacterSheets(assets, tf, baseDir, dumpIds); break;
+                case AssetType.PartySheet: PartyCharacterSheets(assets, tf, baseDir, dumpIds); break;
                 case AssetType.Script: Scripts(assets, baseDir, dumpIds); break;
                 case AssetType.Spell: Spells(assets, baseDir, dumpIds); break;
             }
@@ -260,25 +261,25 @@ class DumpText : Component, IAssetDumper
     static void PartyCharacterSheets(IAssetManager assets, ITextFormatter tf, string baseDir, AssetId[] dumpIds)
     {
         using var sw = Open(baseDir, PartyCharacterPath);
-        foreach (var charId in Ids<Base.PartyMember>(dumpIds))
+        foreach (var charId in Ids<Base.PartySheet>(dumpIds))
             DumpCharacterSheet(charId, assets.LoadSheet(charId), sw, assets, tf);
     }
 
     static void NpcCharacterSheets(IAssetManager assets, ITextFormatter tf, string baseDir, AssetId[] dumpIds)
     {
         using var sw = Open(baseDir, NpcCharacterPath);
-        foreach (var charId in Ids<Base.Npc>(dumpIds))
+        foreach (var charId in Ids<Base.NpcSheet>(dumpIds))
             DumpCharacterSheet(charId, assets.LoadSheet(charId), sw, assets, tf);
     }
 
     static void MonsterCharacterSheets(IAssetManager assets, ITextFormatter tf, string baseDir, AssetId[] dumpIds)
     {
         using var sw = Open(baseDir, MonsterCharacterPath);
-        foreach (var charId in Ids<Base.Monster>(dumpIds))
+        foreach (var charId in Ids<Base.MonsterSheet>(dumpIds))
             DumpCharacterSheet(charId, assets.LoadSheet(charId), sw, assets, tf);
     }
 
-    static void DumpCharacterSheet(CharacterId id, CharacterSheet c, StreamWriter sw, IAssetManager assets, ITextFormatter tf)
+    static void DumpCharacterSheet(SheetId id, CharacterSheet c, StreamWriter sw, IAssetManager assets, ITextFormatter tf)
     {
         if (c == null || string.IsNullOrEmpty(c.GermanName) && c.PortraitId.IsNone)
             return;

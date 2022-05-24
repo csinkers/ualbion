@@ -2,7 +2,7 @@
 using SerdesNet;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.MapEvents;
 
@@ -76,8 +76,8 @@ public sealed class DataChangeEvent : MapEvent, IDataChangeEvent
                 if (target == Base.Target.LastMessageTarget) return (DataChangeTarget.LastMessageTarget, 0);
                 return (DataChangeTarget.Leader, 0);
 
-            case AssetType.Npc: return (DataChangeTarget.Npc, (byte)target.Id);
-            case AssetType.Party: return (DataChangeTarget.SpecificMember, (byte)target.Id);
+            case AssetType.NpcSheet: return (DataChangeTarget.Npc, (byte)target.Id);
+            case AssetType.PartyMember: return (DataChangeTarget.SpecificMember, (byte)target.Id);
             default: return (DataChangeTarget.Leader, 0);
         }
     }
@@ -87,8 +87,8 @@ public sealed class DataChangeEvent : MapEvent, IDataChangeEvent
         {
             DataChangeTarget.Leader => Base.Target.Leader,
             DataChangeTarget.Everyone => Base.Target.Everyone,
-            DataChangeTarget.SpecificMember => new PartyMemberId(AssetType.Party, targetId),
-            DataChangeTarget.Npc => new TargetId(AssetType.Npc, targetId),
+            DataChangeTarget.SpecificMember => new PartyMemberId(AssetType.PartyMember, targetId),
+            DataChangeTarget.Npc => new TargetId(AssetType.NpcSheet, targetId),
             DataChangeTarget.Attacker => Base.Target.Attacker,
             DataChangeTarget.Target => Base.Target.Target,
             DataChangeTarget.Inventory => Base.Target.Inventory,

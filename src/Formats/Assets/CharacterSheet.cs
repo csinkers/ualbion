@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets;
 
@@ -13,10 +14,10 @@ public class CharacterSheet : ICharacterSheet
     public const int MaxSpellsPerSchool = 30;
     public const int MaxNameLength = 16;
 
-    public CharacterSheet(CharacterId id)
+    public CharacterSheet(SheetId id)
     {
         Id = id;
-        if (id.Type is AssetType.Party or AssetType.Monster)
+        if (id.Type is AssetType.PartySheet or AssetType.MonsterSheet)
             Inventory = new Inventory(new InventoryId(id));
     }
 
@@ -43,7 +44,7 @@ public class CharacterSheet : ICharacterSheet
             _ => $"{Id} UNKNOWN TYPE {Type}" };
 
     // Names
-    [JsonInclude] public CharacterId Id { get; private set; }
+    [JsonInclude] public SheetId Id { get; private set; }
     public string EnglishName { get; set; }
     public string GermanName { get; set; }
     public string FrenchName { get; set; }
@@ -102,7 +103,7 @@ public class CharacterSheet : ICharacterSheet
     public ushort UnknownEC { get; set; }
     // ReSharper restore InconsistentNaming
 
-    public static CharacterSheet Serdes(CharacterId id, CharacterSheet sheet, AssetMapping mapping, ISerializer s, ISpellManager spellManager)
+    public static CharacterSheet Serdes(SheetId id, CharacterSheet sheet, AssetMapping mapping, ISerializer s, ISpellManager spellManager)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
         if (s == null) throw new ArgumentNullException(nameof(s));
@@ -128,16 +129,16 @@ public class CharacterSheet : ICharacterSheet
 
         sheet.SpriteId = sheet.Type switch // 9
         {
-            CharacterType.Party   => SpriteId.SerdesU8(nameof(SpriteId), sheet.SpriteId, AssetType.LargePartyGraphics, mapping, s),
-            CharacterType.Npc     => SpriteId.SerdesU8(nameof(SpriteId), sheet.SpriteId, AssetType.LargeNpcGraphics, mapping, s),
-            CharacterType.Monster => SpriteId.SerdesU8(nameof(SpriteId), sheet.SpriteId, AssetType.MonsterGraphics, mapping, s),
+            CharacterType.Party   => SpriteId.SerdesU8(nameof(SpriteId), sheet.SpriteId, AssetType.PartyLargeGfx, mapping, s),
+            CharacterType.Npc     => SpriteId.SerdesU8(nameof(SpriteId), sheet.SpriteId, AssetType.NpcLargeGfx, mapping, s),
+            CharacterType.Monster => SpriteId.SerdesU8(nameof(SpriteId), sheet.SpriteId, AssetType.MonsterGfx, mapping, s),
             _ => throw new InvalidOperationException($"Unhandled character type {sheet.Type}")
         };
 
         sheet.PortraitId = SpriteId.SerdesU8(nameof(sheet.PortraitId), sheet.PortraitId, AssetType.Portrait, mapping, s); // A
 
         // Only monster graphics if monster, means something else for party members (matches PartyMemberId). Never set for NPCs.
-        sheet.MonsterGfxId = SpriteId.SerdesU8(nameof(sheet.MonsterGfxId), sheet.MonsterGfxId, AssetType.MonsterGraphics, mapping, s); // B
+        sheet.MonsterGfxId = SpriteId.SerdesU8(nameof(sheet.MonsterGfxId), sheet.MonsterGfxId, AssetType.MonsterGfx, mapping, s); // B
 
         sheet.UnkownC = s.UInt8(nameof(sheet.UnkownC), sheet.UnkownC); // C takes values [0..9], only non-zero for monsters & Drirr. Distribution of non-zero values: 42, 3, 4, 1, 1, 1, 4, 3,  1
         sheet.UnkownD = s.UInt8(nameof(sheet.UnkownD), sheet.UnkownD); // D takes values [0..4], only non-zero for monsters & Drirr. Distribution of non-zero values: 46, 3, 4, 3

@@ -1,5 +1,5 @@
 ﻿using UAlbion.Core.Events;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
@@ -34,7 +34,7 @@ public class InventoryDefensiveLabel : UiElement
                 new FixedSize(27, 8,
                     new HorizontalStack(
                         new FixedSize(6, 8,
-                            new UiSpriteElement(Base.CoreSprite.UiDefensiveValue)),
+                            new UiSpriteElement(Base.CoreGfx.UiDefensiveValue)),
                         new Spacing(1, 0),
                         new UiText(new LiteralText(":")),
                         new UiText(source)

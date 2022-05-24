@@ -1,12 +1,10 @@
 ﻿using System.Linq;
-using System.Text;
 using UAlbion.Api.Eventing;
 using Xunit;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Assets;
@@ -40,17 +38,17 @@ public class ButtonTests : Component
             .RegisterAssetType(typeof(Base.Font), AssetType.Font)
             ;
 
-        var jsonUtil = new FormatJsonUtil();
         var font = MockUniformFont.Font(AssetId.From(Base.Font.RegularFont));
         var modApplier = new MockModApplier()
                 .Add(new AssetId(AssetType.MetaFont, (ushort)new MetaFontId(false, FontColor.White)), font)
                 .AddInfo(AssetId.From(Base.Font.RegularFont), MockUniformFont.Info)
             ;
 
-        var config = GameConfig.LoadLiteral(Encoding.UTF8.GetBytes(@"{ ""UI"": { ""ButtonDoubleClickIntervalSeconds"": 0.35 } }"), jsonUtil);
-        var configProvider = new MockGameConfigProvider(config);
+        var settings = new MockSettings();
+        GameVars.Ui.ButtonDoubleClickIntervalSeconds.Write(settings, 0.35f);
+
         _exchange
-            .Register<IGameConfigProvider>(configProvider)
+            .Attach(settings)
             .Attach(modApplier)
             .Attach(new AssetManager())
             .Attach(new SpriteManager<SpriteInfo>())

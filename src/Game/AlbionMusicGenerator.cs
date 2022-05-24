@@ -3,7 +3,7 @@ using ADLMidi.NET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game;
 

@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Text.Json.Serialization;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets.Labyrinth;
 
@@ -85,7 +86,7 @@ public class LabyrinthData
         d.WallHeight   = s.UInt16(nameof(d.WallHeight), d.WallHeight);     // 0
         d.CameraHeight = s.UInt16(nameof(d.CameraHeight), d.CameraHeight); // 2
         d.Unk4         = s.UInt16(nameof(d.Unk4), d.Unk4);                 // 4
-        d.BackgroundId = SpriteId.SerdesU16(nameof(BackgroundId), d.BackgroundId, AssetType.BackgroundGraphics, mapping, s); // 6
+        d.BackgroundId = SpriteId.SerdesU16(nameof(BackgroundId), d.BackgroundId, AssetType.BackgroundGfx, mapping, s); // 6
         d.BackgroundYPosition  = s.UInt16(nameof(d.BackgroundYPosition), d.BackgroundYPosition);   // 8
         d.FogDistance          = s.UInt16(nameof(d.FogDistance), d.FogDistance);                   // A
         d.FogRed               = s.UInt16(nameof(d.FogRed), d.FogRed);                             // C

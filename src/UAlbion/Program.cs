@@ -64,12 +64,12 @@ static class Program
             return;
         }
 
-        var (exchange, services) = AssetSystem.SetupAsync(
+        var (exchange, services) = AssetSystem.Setup(
             baseDir,
             AssetMapping.Global,
             disk,
             jsonUtil,
-            commandLine.Mods).Result;
+            commandLine.Mods);
 
         IRenderPass mainPass = null;
         if (commandLine.NeedsEngine)
@@ -169,15 +169,17 @@ static class Program
         engine.AddRenderPass(renderPass);
 
 #pragma warning disable CA2000 // Dispose objects before losing scopes
-        var config = exchange.Resolve<IGeneralConfig>();
-        var shaderCache = new ShaderCache(config.ResolvePath("$(CACHE)/ShaderCache"));
+        var pathResolver = exchange.Resolve<IPathResolver>();
+        var shaderCache = new ShaderCache(pathResolver.ResolvePath("$(CACHE)/ShaderCache"));
+        var shaderLoader = new ShaderLoader();
 
         foreach (var shaderPath in exchange.Resolve<IModApplier>().ShaderPaths)
-            shaderCache.AddShaderPath(shaderPath);
+            shaderLoader.AddShaderDirectory(shaderPath);
 #pragma warning restore CA2000 // Dispose objects before losing scopes
 
         exchange
             .Attach(shaderCache)
+            .Attach(shaderLoader)
             .Attach(framebuffer)
             .Attach(renderPass)
             .Attach(engine)

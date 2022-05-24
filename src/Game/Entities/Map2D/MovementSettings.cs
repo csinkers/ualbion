@@ -3,28 +3,17 @@ using System.Collections.Generic;
 using UAlbion.Api.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
 
 namespace UAlbion.Game.Entities.Map2D;
 
 public class MovementSettings : IMovementSettings
 {
-    readonly bool _isLarge;
-    readonly Func<GameConfig.MovementT> _getConfig;
-
-    public MovementSettings(bool isLarge, Func<GameConfig.MovementT> getConfig)
-    {
-        _isLarge = isLarge;
-        _getConfig = getConfig ?? throw new ArgumentNullException(nameof(getConfig));
-        Frames = isLarge ? LargeSpriteAnimations.Frames : SmallSpriteAnimations.Frames;
-    }
-
-    GameConfig.MovementT Movement => _getConfig();
+    public MovementSettings(IDictionary<SpriteAnimation, int[]> frames) => Frames = frames;
     public IDictionary<SpriteAnimation, int[]> Frames { get; }
-    public int TicksPerTile => Movement.TicksPerTile; // Number of game ticks it takes to move across a map tile
-    public int TicksPerFrame => Movement.TicksPerFrame; // Number of game ticks it takes to advance to the next animation frame
-    public int MinTrailDistance => _isLarge ? Movement.MinTrailDistanceLarge : Movement.MinTrailDistanceSmall;
-    public int MaxTrailDistance => _isLarge ? Movement.MaxTrailDistanceLarge : Movement.MaxTrailDistanceSmall;
+    public int TicksPerTile { get; set; } // Number of game ticks it takes to move across a map tile
+    public int TicksPerFrame { get; set; } // Number of game ticks it takes to advance to the next animation frame
+    public int MinTrailDistance { get; set; }
+    public int MaxTrailDistance { get; set; }
     public int TileWidth => 16;
     public int TileHeight => 16;
     public float GetDepth(float y) => DepthUtil.LayerToDepth(0, y);

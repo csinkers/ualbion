@@ -6,6 +6,7 @@ using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Exporters.Tiled;
+using UAlbion.Formats.Ids;
 using Xunit;
 
 namespace UAlbion.Formats.Tests;

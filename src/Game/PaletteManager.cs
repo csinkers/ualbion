@@ -5,6 +5,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.State;
 

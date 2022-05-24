@@ -3,6 +3,7 @@ using SerdesNet;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.MapEvents;
 
@@ -10,7 +11,7 @@ namespace UAlbion.Formats.MapEvents;
 public class MapTextEvent : MapEvent, ITextEvent, IAsyncEvent
 {
     MapTextEvent(TextId textSourceId) => TextSource = textSourceId;
-    public MapTextEvent(TextId textSourceId, ushort subId, TextLocation location, CharacterId speaker)
+    public MapTextEvent(TextId textSourceId, ushort subId, TextLocation location, SheetId speaker)
     {
         TextSource = textSourceId;
         SubId = subId;
@@ -29,7 +30,7 @@ public class MapTextEvent : MapEvent, ITextEvent, IAsyncEvent
         e.Location = s.EnumU8(nameof(Location), e.Location); // 1
         int zeroed = s.UInt16(null, 0); // 2, 3
 
-        e.Speaker = CharacterId.SerdesU8( // 4
+        e.Speaker = SheetId.SerdesU8( // 4
             nameof(Speaker),
             e.Speaker,
             AssetTypeForTextLocation(e.Location),
@@ -46,7 +47,7 @@ public class MapTextEvent : MapEvent, ITextEvent, IAsyncEvent
     [EventPart("text")] public TextId TextSource { get; private set; }
     [EventPart("sub_id")] public ushort SubId { get; private set; }
     [EventPart("location", true, TextLocation.NoPortrait)] public TextLocation Location { get; private set; }
-    [EventPart("speaker", true, "None")] public CharacterId Speaker { get; private set; }
+    [EventPart("speaker", true, "None")] public SheetId Speaker { get; private set; }
 
     public override MapEventType EventType => MapEventType.Text;
     public StringId ToId() => new(TextSource, SubId);
@@ -55,7 +56,7 @@ public class MapTextEvent : MapEvent, ITextEvent, IAsyncEvent
         location switch
         {
             // TODO: Handle the other cases
-            TextLocation.PortraitLeft => AssetType.Party,
-            _ => AssetType.Npc
+            TextLocation.PortraitLeft => AssetType.PartySheet,
+            _ => AssetType.NpcSheet
         };
 }

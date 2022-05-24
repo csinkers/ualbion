@@ -33,7 +33,7 @@ public class EditorUi : Component
         if (Children.Count == 0)
         {
             var toronto = (MapData2D)Resolve<IRawAssetManager>().LoadMap(Base.Map.TorontoBegin);
-            var tom = Resolve<IRawAssetManager>().LoadSheet(Base.PartyMember.Tom);
+            var tom = Resolve<IRawAssetManager>().LoadSheet(Base.PartySheet.Tom);
             AttachChild(new FlatMapEditor("Map Editor", toronto));
             AttachChild(new CharacterEditor("Tom", tom));
         }

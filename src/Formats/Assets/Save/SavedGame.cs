@@ -7,6 +7,7 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Containers;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets.Save;
 
@@ -35,7 +36,7 @@ public class SavedGame
     public ushort PartyY { get; set; }
     public Direction PartyDirection { get; set; }
 
-    public IDictionary<CharacterId, CharacterSheet> Sheets { get; } = new Dictionary<CharacterId, CharacterSheet>();
+    public IDictionary<SheetId, CharacterSheet> Sheets { get; } = new Dictionary<SheetId, CharacterSheet>();
     public IDictionary<AssetId, Inventory> Inventories { get; } = new Dictionary<AssetId, Inventory>(); // TODO: Change to InventoryId?
     public IDictionary<AutomapId, byte[]> Automaps { get; } = new Dictionary<AutomapId, byte[]>();
 
@@ -223,7 +224,7 @@ public class SavedGame
         ApiUtil.Assert(visitedEventsSize == visitedEventsCount * VisitedEvent.SizeOnDisk + 2);
         save.VisitedEvents = s.List(nameof(VisitedEvents), save.VisitedEvents, mapping, visitedEventsCount, VisitedEvent.Serdes);
 
-        var partyIds = save.Sheets.Keys.Where(x => x.Type == AssetType.Party).Select(x => x.Id).ToList();
+        var partyIds = save.Sheets.Keys.Where(x => x.Type == AssetType.PartySheet).Select(x => x.Id).ToList();
         partyIds.Add(199); // Force extra XLD length fields to be written for empty objects to preserve compat with original game.
         partyIds.Add(299);
 
@@ -275,7 +276,7 @@ public class SavedGame
         if (i > 0xff)
             return;
 
-        var id = CharacterId.FromDisk(AssetType.Party, i, context.mapping);
+        var id = SheetId.FromDisk(AssetType.PartySheet, i, context.mapping);
         CharacterSheet existing = null;
         if (size > 0 || context.save.Sheets.TryGetValue(id, out existing))
             context.save.Sheets[id] = CharacterSheet.Serdes(id, existing, context.mapping, serializer, context.spellManager);
@@ -286,7 +287,7 @@ public class SavedGame
         if (i > 0xff)
             return;
 
-        var id = CharacterId.FromDisk(AssetType.Npc, i, context.mapping);
+        var id = SheetId.FromDisk(AssetType.NpcSheet, i, context.mapping);
         CharacterSheet existing = null;
         if (serializer.IsReading() || context.save.Sheets.TryGetValue(id, out existing))
             context.save.Sheets[id] = CharacterSheet.Serdes(id, existing, context.mapping, serializer, context.spellManager);

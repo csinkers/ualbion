@@ -13,5 +13,5 @@ public enum DebugFlags
     NoMapTileBoundingBoxes   = 0x20,
     ShowCursorHotspot        = 0x40,
     ShowConsole              = 0x80,
-    TraceAttachment         = 0x100,
+    TraceAttachment          = 0x100,
 }

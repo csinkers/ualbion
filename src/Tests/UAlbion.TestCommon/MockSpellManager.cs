@@ -2,6 +2,7 @@
 using UAlbion.Api.Eventing;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.TestCommon;
 

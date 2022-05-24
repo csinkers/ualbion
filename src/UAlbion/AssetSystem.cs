@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
-using UAlbion.Formats.Config;
-using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Magic;
 using UAlbion.Game.Settings;
@@ -34,58 +30,23 @@ public static class AssetSystem
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(IsoYawEvent)));
     }
 
-    public static async Task<(EventExchange, IContainer)> SetupAsync(
+    public static (EventExchange Exchange, Container Services) Setup(
         string baseDir,
         AssetMapping mapping,
         IFileSystem disk,
         IJsonUtil jsonUtil,
         List<string> mods)
     {
-        var configAndSettingsTask = Task.Run(() =>
-        {
-            var config = LoadGeneralConfig(baseDir, disk, jsonUtil);
-            var settings = LoadSettings(config, disk, jsonUtil);
-            return (config, settings);
-        });
-
-        var configTask = Task.Run(() => LoadConfig(baseDir, disk, jsonUtil));
-        return await SetupCore(mapping, disk, jsonUtil, configAndSettingsTask, configTask, mods).ConfigureAwait(false);
-    }
-
-    public static EventExchange Setup(
-        AssetMapping mapping,
-        IFileSystem disk,
-        IJsonUtil jsonUtil,
-        GeneralConfig generalConfig,
-        GeneralSettings settings,
-        IConfigProvider configProvider,
-        List<string> mods)
-    {
-        var configAndSettingsTask = Task.FromResult((generalConfig, settings));
-        var configTask = Task.FromResult(configProvider);
-        var task = SetupCore(mapping, disk, jsonUtil, configAndSettingsTask, configTask, mods);
-        return task.Result.Item1;
-    }
-
-    static async Task<(EventExchange, IContainer)> SetupCore(
-        AssetMapping mapping,
-        IFileSystem disk,
-        IJsonUtil jsonUtil,
-        Task<(GeneralConfig, GeneralSettings)> configAndSettingsTask,
-        Task<IConfigProvider> configTask,
-        List<string> mods)
-    {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
         if (disk == null) throw new ArgumentNullException(nameof(disk));
         if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
-        if (configAndSettingsTask == null) throw new ArgumentNullException(nameof(configAndSettingsTask));
-        if (configTask == null) throw new ArgumentNullException(nameof(configTask));
 
         IModApplier modApplier = new ModApplier();
+        var pathResolver = new PathResolver(baseDir);
 
-        var (generalConfig, settings) = await configAndSettingsTask.ConfigureAwait(false);
-        var settingsManager = new SettingsManager(settings);
-        var services = new Container("Services", settingsManager, // Need to register settings first, as the AssetLocator relies on it.
+        var settings = new SettingsManager();
+        var services = new Container("Services", // Need to register settings first, as the AssetLocator relies on it.
+            settings,
             new AssetLoaderRegistry(),
             new ContainerRegistry(),
             new PostProcessorRegistry(),
@@ -101,7 +62,7 @@ public static class AssetSystem
 
 #pragma warning disable CA2000 // Dispose objects before losing scope
         var exchange = new EventExchange(new LogExchange())
-            .Register<IGeneralConfig>(generalConfig)
+            .Register<IPathResolver>(pathResolver)
             .Register(disk)
             .Register(jsonUtil)
             .Attach(services);
@@ -109,53 +70,18 @@ public static class AssetSystem
 
         PerfTracker.StartupEvent("Registered asset services");
 
-        modApplier.LoadMods(mapping, generalConfig, mods ?? settings.ActiveMods);
+        modApplier.LoadMods(mapping, pathResolver, mods ?? UserVars.Gameplay.ActiveMods.Read(settings));
         mapping.ConsistencyCheck();
+        settings.Reload();
         PerfTracker.StartupEvent("Loaded mods");
-
-        var configProvider = await configTask.ConfigureAwait(false);
-        exchange // Need to load game config after mods so asset ids can be parsed.
-            .Register(configProvider)
-            .Register<IGameConfigProvider>(configProvider)
-            .Register<ICoreConfigProvider>(configProvider)
-            .Register<IInputConfigProvider>(configProvider);
-
-        PerfTracker.StartupEvent("Loaded configs");
         return (exchange, services);
     }
 
-    public static GeneralConfig LoadGeneralConfig(string baseDir, IFileSystem disk, IJsonUtil jsonUtil)
-    {
-        var result = GeneralConfig.Load(Path.Combine(baseDir, "data", "config.json"), baseDir, disk, jsonUtil);
-        PerfTracker.StartupEvent("Loaded general config");
-        return result;
-    }
-
-    static GeneralSettings LoadSettings(IGeneralConfig config, IFileSystem disk, IJsonUtil jsonUtil)
-    {
-        var result = GeneralSettings.Load(config, disk, jsonUtil);
-        PerfTracker.StartupEvent("Loaded settings");
-        return result;
-    }
-
-    public static IConfigProvider LoadConfig(string baseDir, IFileSystem disk, IJsonUtil jsonUtil)
-    {
-        var result = new ConfigProvider(baseDir, disk, jsonUtil);
-        PerfTracker.StartupEvent("Loaded game config");
-        return result;
-    }
-
-    public static EventExchange SetupSimple(IFileSystem disk, AssetMapping mapping, params string[] mods)
-    {
-        var baseDir = ConfigUtil.FindBasePath(disk);
-        var jsonUtil = new FormatJsonUtil();
-        return Setup(
+    public static EventExchange SetupSimple(IFileSystem disk, AssetMapping mapping, params string[] mods) =>
+        Setup(
+            ConfigUtil.FindBasePath(disk),
             mapping,
             disk,
-            jsonUtil,
-            LoadGeneralConfig(baseDir, disk, jsonUtil),
-            new GeneralSettings { ActiveMods = new[] { "Albion" } },
-            LoadConfig(baseDir, disk, jsonUtil),
-            mods.Length == 0 ? null : mods.ToList());
-    }
+            new FormatJsonUtil(),
+            mods.Length == 0 ? null : mods.ToList()).Exchange;
 }

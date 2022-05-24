@@ -8,11 +8,12 @@ using UAlbion.Core.Events;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
-using UAlbion.Formats.Config;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
+using MoveVars = UAlbion.Formats.Config.GameVars.PartyMovement;
 
 namespace UAlbion.Game.Entities.Map2D;
 
@@ -46,7 +47,6 @@ public class FlatMap : Component, IMap
         _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
     }
 
-    GameConfig.MovementT GetMoveConfig() => Resolve<IGameConfigProvider>().Game.PartyMovement;
     protected override void Subscribed()
     {
         Raise(new SetClearColourEvent(0,0,0, 1.0f));
@@ -65,7 +65,22 @@ public class FlatMap : Component, IMap
         selector.HighlightIndexChanged += (_, x) => renderable.SetHighlightIndex(x);
         _logicalMap.TileSize = renderable.TileSize;
 
-        var movementSettings = new MovementSettings(!_logicalMap.UseSmallSprites, GetMoveConfig);
+        var movementSettings = _logicalMap.UseSmallSprites
+            ? new MovementSettings(SmallSpriteAnimations.Frames)
+            {
+                MaxTrailDistance = GetVar(MoveVars.MaxTrailDistanceSmall),
+                MinTrailDistance = GetVar(MoveVars.MinTrailDistanceSmall),
+                TicksPerFrame = GetVar(MoveVars.TicksPerFrame),
+                TicksPerTile = GetVar(MoveVars.TicksPerTile)
+            }
+            : new MovementSettings(LargeSpriteAnimations.Frames)
+            {
+                MaxTrailDistance = GetVar(MoveVars.MaxTrailDistanceLarge),
+                MinTrailDistance = GetVar(MoveVars.MinTrailDistanceLarge),
+                TicksPerFrame = GetVar(MoveVars.TicksPerFrame),
+                TicksPerTile = GetVar(MoveVars.TicksPerTile)
+            };
+
         var initialPos = new Vector2(_logicalMap.Width / 2.0f, _logicalMap.Height / 2.0f);
         _partyMovement = AttachChild(new PartyCaterpillar(initialPos, Direction.East, movementSettings));
         Raise(new CameraJumpEvent((int)initialPos.X, (int)initialPos.Y));
@@ -81,21 +96,26 @@ public class FlatMap : Component, IMap
             player.Remove();
 
         var state = Resolve<IGameState>();
-        if (state.Party != null)
-        {
-            int i = 0;
-            foreach(var player in state.Party.StatusBarOrder)
-            {
-                var iCopy = i; // Make a copy to ensure each closure captures its own number.
-                player.SetPositionFunc(() => _partyMovement.GetPositionHistory(iCopy).Item1);
-                (Vector3, int) PositionFunc() => _partyMovement.GetPositionHistory(iCopy);
 
-                AttachChild(_logicalMap.UseSmallSprites
-                    ? (IComponent)new SmallPlayer(player.Id, player.Id.ToSmallPartyGraphics(), PositionFunc)
-                    : new LargePlayer(player.Id, player.Id.ToLargePartyGraphics(), PositionFunc));
-                i++;
-            }
+        if (state.Party == null)
+            return;
+
+
+        int i = 0;
+        foreach (var player in state.Party.StatusBarOrder)
+        {
+            var iCopy = i; // Make a copy to ensure each closure captures its own number.
+            player.SetPositionFunc(() => _partyMovement.GetPositionHistory(iCopy).Item1);
+            (Vector3, int) PositionFunc() => _partyMovement.GetPositionHistory(iCopy);
+
+            if (_logicalMap.UseSmallSprites)
+                AttachChild(new SmallPlayer(player.Id, PositionFunc));
+            else
+                AttachChild(new LargePlayer(player.Id, PositionFunc));
+
+            i++;
         }
+
     }
 
     void FireEventChains(TriggerTypes type, bool log)

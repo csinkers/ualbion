@@ -16,8 +16,8 @@ public class InputManager : ServiceComponent<IInputManager>, IInputManager
     InputMode _inputMode = InputMode.Global;
     MouseMode _mouseMode = MouseMode.Normal;
 
-    public InputMode InputMode => (Resolve<ISettings>().Debug.DebugFlags & DebugFlags.ShowConsole) != 0 ? InputMode.TextEntry : _inputMode;
-    public MouseMode MouseMode => (Resolve<ISettings>().Debug.DebugFlags & DebugFlags.ShowConsole) != 0 ? MouseMode.Normal :_mouseMode;
+    public InputMode InputMode => (GetVar(UserVars.Debug.DebugFlags) & DebugFlags.ShowConsole) != 0 ? InputMode.TextEntry : _inputMode;
+    public MouseMode MouseMode => (GetVar(UserVars.Debug.DebugFlags) & DebugFlags.ShowConsole) != 0 ? MouseMode.Normal :_mouseMode;
     public IEnumerable<InputMode> InputModeStack => _inputModeStack;
     public IEnumerable<MouseMode> MouseModeStack => _mouseModeStack;
 
@@ -40,7 +40,7 @@ public class InputManager : ServiceComponent<IInputManager>, IInputManager
             SetMouseMode(setEvent.Mode);
             Raise(setEvent);
         });
-        On<PopMouseModeEvent>(e =>
+        On<PopMouseModeEvent>(_ =>
         {
             if (_mouseModeStack.Count == 0) 
                 return;
@@ -56,7 +56,7 @@ public class InputManager : ServiceComponent<IInputManager>, IInputManager
             SetInputMode(setEvent);
             Raise(setEvent);
         });
-        On<PopInputModeEvent>(e =>
+        On<PopInputModeEvent>(_ =>
         {
             if (_inputModeStack.Count == 0) 
                 return;

@@ -8,15 +8,17 @@ namespace UAlbion.Config;
 
 public class ModConfig
 {
-    public string Repo { get; set; }
-    public string Name { get; set; }
+    public const string ModConfigFilename = "modinfo.json";
+    public string Repo { get; set; } // URL of the mod's git repo
+    public string Name { get; set; } // Display name for the mod
     public string Description { get; set; }
     public string Author { get; set; }
     public Version Version { get; set; }
-    public string AssetPath { get; set; }
     public string ShaderPath { get; set; }
-    public string InheritTypesFrom { get; set; }
+    public string AssetConfig { get; set; } = "assets.json";
+    public string InheritAssetConfigFrom { get; set; }
     [JsonInclude] public List<string> Dependencies { get; private set; } = new();
+    [JsonInclude] public Dictionary<string, string> SymLinks { get; private set; } = new();
 
     public static ModConfig Load(string configPath, IFileSystem disk, IJsonUtil jsonUtil)
     {

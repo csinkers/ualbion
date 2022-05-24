@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using SerdesNet;
 using UAlbion.Config;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets;
 
@@ -24,7 +25,7 @@ public class MonsterData
     public static MonsterData Serdes(MonsterData m, AssetMapping mapping, ISerializer s)
     {
         m ??= new MonsterData();
-        m.MonsterGraphics = SpriteId.SerdesU8(nameof(MonsterGraphics), m.MonsterGraphics, AssetType.MonsterGraphics, mapping, s);
+        m.MonsterGraphics = SpriteId.SerdesU8(nameof(MonsterGraphics), m.MonsterGraphics, AssetType.MonsterGfx, mapping, s);
         m.Unk1 = s.UInt8(nameof(Unk1), m.Unk1);
         m.Unk2 = s.Bytes(nameof(Unk2), m.Unk2, 326);
         return m;

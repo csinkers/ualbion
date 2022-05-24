@@ -97,26 +97,26 @@ class DumpJson : Component, IAssetDumper
             Flush();
         }
 
-        if (types.Contains(AssetType.Party))
+        if (types.Contains(AssetType.PartySheet))
         {
             tw = Writer("party_members.json");
-            s.Serialize(tw, DumpUtil.AllAssets(AssetType.Party, dumpIds, x => assets.LoadSheet(x)));
+            s.Serialize(tw, DumpUtil.AllAssets(AssetType.PartySheet, dumpIds, x => assets.LoadSheet(x)));
             Flush();
 
         }
 
-        if (types.Contains(AssetType.Npc))
+        if (types.Contains(AssetType.NpcSheet))
         {
             tw = Writer("npcs.json");
-            s.Serialize(tw, DumpUtil.AllAssets(AssetType.Npc, dumpIds, x => assets.LoadSheet(x)));
+            s.Serialize(tw, DumpUtil.AllAssets(AssetType.NpcSheet, dumpIds, x => assets.LoadSheet(x)));
             Flush();
         }
 
-        if (types.Contains(AssetType.Monster))
+        if (types.Contains(AssetType.MonsterSheet))
         {
 
             tw = Writer("monsters.json");
-            s.Serialize(tw, DumpUtil.AllAssets(AssetType.Monster, dumpIds, x => assets.LoadSheet(x)));
+            s.Serialize(tw, DumpUtil.AllAssets(AssetType.MonsterSheet, dumpIds, x => assets.LoadSheet(x)));
             Flush();
         }
 

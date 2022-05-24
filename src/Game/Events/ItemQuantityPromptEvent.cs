@@ -1,5 +1,6 @@
 ﻿using UAlbion.Api.Eventing;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.Events;
 

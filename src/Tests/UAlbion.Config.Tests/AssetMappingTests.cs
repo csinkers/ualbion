@@ -49,7 +49,7 @@ public class AssetMappingTests : Component
         Assert.Equal(new AssetId(AssetType.Portrait, 5), m.EnumToId(typeof(OneBasedByte), 3));
 
         Assert.Throws<InvalidOperationException>(() => m.RegisterAssetType(typeof(int), AssetType.Automap));
-        Assert.Throws<ArgumentNullException>(() => m.RegisterAssetType((Type)null, AssetType.Monster));
+        Assert.Throws<ArgumentNullException>(() => m.RegisterAssetType((Type)null, AssetType.MonsterSheet));
     }
 
     [Fact]
@@ -236,20 +236,20 @@ public class AssetMappingTests : Component
     {
         var m = AssetMapping.Global.Clear();
         m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait);
-        m.RegisterAssetType(typeof(OneBasedByte), AssetType.Npc);
+        m.RegisterAssetType(typeof(OneBasedByte), AssetType.NpcSheet);
 
         Assert.Equal(new AssetId(AssetType.Unknown), m.Parse("somethinginvalid", null));
         Assert.Equal(new AssetId(AssetType.Unknown), m.Parse("Portrait.nonsense", null));
         Assert.Throws<FormatException>(() => m.Parse("0", null));
         Assert.Equal(AssetId.From(ZeroBasedByte.Zero), m.Parse("0", new[] { AssetType.Portrait }));
         Assert.Equal(AssetId.From(ZeroBasedByte.One), m.Parse("1", new[] { AssetType.Portrait }));
-        Assert.Equal(AssetId.From(OneBasedByte.One), m.Parse("1", new[] { AssetType.Npc }));
+        Assert.Equal(AssetId.From(OneBasedByte.One), m.Parse("1", new[] { AssetType.NpcSheet }));
         // Assert.Equal(AssetId.None, m.Parse("0", new[] { AssetType.Npc })); // TODO: Decide if this should be parse to None, an unmapped Npc.0 id, or throw.
 
         Assert.Equal(AssetId.From(ZeroBasedByte.Zero), m.Parse("Portrait.0", null));
         Assert.Equal(AssetId.From(ZeroBasedByte.One), m.Parse("Portrait.1", null));
-        Assert.Equal(AssetId.From(OneBasedByte.One), m.Parse("Npc.1", null));
-        Assert.Equal(AssetId.From(OneBasedByte.Two), m.Parse("Npc.2", null));
+        Assert.Equal(AssetId.From(OneBasedByte.One), m.Parse("NpcSheet.1", null));
+        Assert.Equal(AssetId.From(OneBasedByte.Two), m.Parse("NpcSheet.2", null));
 
         m.RegisterAssetType(typeof(ZeroBasedShort), AssetType.Portrait);
         Assert.Equal(AssetId.From(ZeroBasedByte.Zero), m.Parse("0", new[] { AssetType.Portrait }));
@@ -265,14 +265,14 @@ public class AssetMappingTests : Component
     {
         var m = AssetMapping.Global.Clear();
         m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait);
-        m.RegisterAssetType(typeof(OneBasedByte), AssetType.Npc);
+        m.RegisterAssetType(typeof(OneBasedByte), AssetType.NpcSheet);
         _output.WriteLine(m.Serialize(JsonUtil));
         Assert.Equal(AssetId.From(ZeroBasedByte.Zero), m.Parse("Zero", null));
         Assert.Throws<FormatException>(() => m.Parse("One", null)); // Ambiguous
         Assert.Equal(AssetId.From(ZeroBasedByte.One), m.Parse("One", new[] {AssetType.Portrait}));
-        Assert.Equal(AssetId.From(OneBasedByte.One), m.Parse("One", new[] {AssetType.Npc}));
+        Assert.Equal(AssetId.From(OneBasedByte.One), m.Parse("One", new[] {AssetType.NpcSheet}));
         Assert.Throws<FormatException>(() =>
-            m.Parse("One", new[] {AssetType.Portrait, AssetType.Npc})); // Ambiguous
+            m.Parse("One", new[] {AssetType.Portrait, AssetType.NpcSheet})); // Ambiguous
     }
 
     [Fact]
@@ -280,10 +280,10 @@ public class AssetMappingTests : Component
     {
         var m = AssetMapping.Global.Clear();
         m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait);
-        m.RegisterAssetType(typeof(OneBasedByte), AssetType.Npc);
+        m.RegisterAssetType(typeof(OneBasedByte), AssetType.NpcSheet);
         _output.WriteLine(m.Serialize(JsonUtil));
         Assert.Equal(AssetId.From(ZeroBasedByte.One), m.Parse("Portrait.One", null));
-        Assert.Equal(AssetId.From(OneBasedByte.One), m.Parse("Npc.One", null));
+        Assert.Equal(AssetId.From(OneBasedByte.One), m.Parse("NpcSheet.One", null));
     }
 
     [Fact]
@@ -330,7 +330,7 @@ public class AssetMappingTests : Component
     {
         var m = AssetMapping.Global.Clear();
         m.RegisterAssetType(typeof(ZeroBasedByte), AssetType.Portrait);
-        m.RegisterAssetType(typeof(OneBasedByte), AssetType.Npc);
+        m.RegisterAssetType(typeof(OneBasedByte), AssetType.NpcSheet);
 
         var zbb = "UAlbion.Config.Tests.AssetMappingTests+ZeroBasedByte, UAlbion.Config.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
         var obb = "UAlbion.Config.Tests.AssetMappingTests+OneBasedByte, UAlbion.Config.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";

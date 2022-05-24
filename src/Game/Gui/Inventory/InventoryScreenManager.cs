@@ -2,7 +2,7 @@
 using System.Linq;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
@@ -75,7 +75,7 @@ public class InventoryScreenManager : Component
         if (e is ILockedInventoryEvent locked && locked.OpenedText != 255)
         {
             var state = Resolve<IGameState>();
-            Raise(new MapTextEvent(state.MapId.ToMapText(), locked.OpenedText, TextLocation.NoPortrait, CharacterId.None));
+            Raise(new MapTextEvent(state.MapId.ToMapText(), locked.OpenedText, TextLocation.NoPortrait, SheetId.None));
         }
     }
 

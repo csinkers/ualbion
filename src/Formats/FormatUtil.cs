@@ -8,6 +8,7 @@ using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats;

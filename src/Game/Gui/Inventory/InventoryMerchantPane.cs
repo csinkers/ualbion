@@ -1,4 +1,5 @@
 ﻿using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui.Inventory;

@@ -4,7 +4,6 @@ namespace UAlbion.Formats.Exporters.Tiled;
 
 public class TilemapProperties
 {
-    public int TilesetId { get; set; }
     public int TileWidth { get; set; } = 16;
     public int TileHeight { get; set; } = 16;
     public int FrameDurationMs { get; set; } = 180;

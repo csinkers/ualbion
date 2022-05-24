@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Config;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets;
 
@@ -175,7 +176,7 @@ public sealed class ItemData : IItem
         item.IconAnim            = s.UInt8(nameof(item.IconAnim), item.IconAnim);                       // 1D
         item.Weight              = s.UInt16(nameof(item.Weight), item.Weight);                          // 1E
         item.Value               = s.UInt16(nameof(item.Value), item.Value);                            // 20
-        item.Icon                = SpriteId.From(Base.ItemGraphics.ItemSprites); // TODO: Allow mods to add extra sprite sheets via specifying their ID in the AssetInfo.
+        item.Icon                = SpriteId.From(Base.ItemGfx.ItemSprites); // TODO: Allow mods to add extra sprite sheets via specifying their ID in the AssetInfo.
         item.IconSubId           = s.UInt16(nameof(item.IconSubId), (ushort)item.IconSubId);            // 22
         item.Class               = s.EnumU16(nameof(item.Class), item.Class);                           // 24
         item.Race                = s.UInt16(nameof(item.Race), item.Race);                              // 26

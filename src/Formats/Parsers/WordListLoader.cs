@@ -23,7 +23,7 @@ public class WordListLoader : IAssetLoader<ListStringCollection>
         {
             ApiUtil.Assert(s.BytesRemaining % WordLength == 0, "Expected word list file length to be a whole multiple of the string size");
             var strings = new List<string>();
-            while (!s.IsComplete())
+            while (s.BytesRemaining > 0)
                 strings.Add(s.FixedLengthString(null, null, WordLength));
             return new ListStringCollection(strings);
         }

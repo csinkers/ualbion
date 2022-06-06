@@ -104,23 +104,19 @@ public class LabyrinthData
         d.Unk20                = s.UInt16(nameof(d.Unk20), d.Unk20);                               // 20
         d.Lighting             = s.UInt16(nameof(d.Lighting), d.Lighting);                         // 22
         d.Unk24                = s.UInt16(nameof(d.Unk24), d.Unk24);                               // 24
-        s.Check();
 
         ushort objectGroupCount = s.UInt16("ObjectGroupCount", (ushort)d.ObjectGroups.Count); // 26
         s.List(nameof(d.ObjectGroups), d.ObjectGroups, objectGroupCount, ObjectGroup.Serdes);
-        s.Check();
 
         // MaxFloors = 50
         var floorAndCeilingCount = s.UInt16("FloorAndCeilingCount", (ushort)d.FloorAndCeilings.Count); // 28 + objectGroupCount * 42
         ApiUtil.Assert(floorAndCeilingCount <= 50, "A labyrinth cannot have more than 50 floors/ceilings");
         s.List(nameof(d.FloorAndCeilings), d.FloorAndCeilings, mapping, floorAndCeilingCount, FloorAndCeiling.Serdes);
-        s.Check();
 
         // MaxObjects = 100
         ushort objectCount = s.UInt16("ObjectCount", (ushort)d.Objects.Count); // 2A + objectGroupCount * 42 + floorAndCeilingCount * A
         ApiUtil.Assert(objectCount <= 100, "A labyrinth cannot have more than 100 object types");
         s.List(nameof(d.Objects), d.Objects, mapping, objectCount, LabyrinthObject.Serdes);
-        s.Check();
 
         // Populate objectIds on subobjects to improve debugging experience
         foreach (var so in d.ObjectGroups.SelectMany(x => x.SubObjects))
@@ -132,7 +128,6 @@ public class LabyrinthData
         ushort wallCount = s.UInt16("WallCount", (ushort)d.Walls.Count);
         ApiUtil.Assert(objectCount <= MaxWalls, "A labyrinth cannot have more than 150 wall types");
         s.List(nameof(d.Walls), d.Walls, mapping, wallCount, Wall.Serdes);
-        s.Check();
         // PerfTracker.StartupEvent("Finish loading labyrinth data");
         return d;
     }

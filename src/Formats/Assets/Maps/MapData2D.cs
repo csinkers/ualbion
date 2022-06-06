@@ -71,7 +71,6 @@ public class MapData2D : BaseMapData
         map.PaletteId = PaletteId.SerdesU8(nameof(PaletteId), map.PaletteId, mapping, s);
         map.FrameRate = s.UInt8(nameof(FrameRate), map.FrameRate); // 9
         ApiUtil.Assert(s.Offset == startOffset + 10);
-        s.Check();
 
         map.Npcs ??= new List<MapNpc>();
 
@@ -86,14 +85,12 @@ public class MapData2D : BaseMapData
             (n, x, s2) => MapNpc.Serdes(n, x, map.MapType, mapping, s2)).ToList();
 
         ApiUtil.Assert(s.Offset == startOffset + 10 + npcCount * MapNpc.SizeOnDisk);
-        s.Check();
 
         if (s.IsReading())
             map.RawLayout = s.Bytes("Layout", null, 3 * map.Width * map.Height);
         else
             s.Bytes("Layout", map.RawLayout, 3 * map.Width * map.Height);
 
-        s.Check();
         ApiUtil.Assert(s.Offset == startOffset + 10 + npcCount * MapNpc.SizeOnDisk + 3 * map.Width * map.Height);
 
         map.SerdesZones(s);

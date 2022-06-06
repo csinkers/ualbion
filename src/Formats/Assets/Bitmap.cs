@@ -117,7 +117,7 @@ public class Bitmap8Bit
             }
 
             if (stride - b.Width > 0) // Padding
-                s.RepeatU8(null, 0, (int)(stride - b.Width));
+                s.Pad((int)(stride - b.Width));
         }
 
         if (s.IsReading())

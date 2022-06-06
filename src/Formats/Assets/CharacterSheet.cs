@@ -114,7 +114,6 @@ public class CharacterSheet : ICharacterSheet
         if (s.IsReading() && s.BytesRemaining == 0)
             return sheet;
 
-        s.Check();
         s.Begin(id.ToString());
         sheet.Type = s.EnumU8(nameof(sheet.Type), sheet.Type); // 0
         sheet.Gender = s.EnumU8(nameof(sheet.Gender), sheet.Gender); // 1
@@ -125,7 +124,6 @@ public class CharacterSheet : ICharacterSheet
         sheet.Unknown6 = s.UInt8(nameof(sheet.Unknown6), sheet.Unknown6); //  6 takes values [0..2] except Rainer, with 255. All other party members except Siobhan are 1. Monsters are mix of 1 and 2.
         sheet.Unknown7 = s.UInt8(nameof(sheet.Unknown7), sheet.Unknown7); //  7 (always 0)
         sheet.Languages = s.EnumU8(nameof(sheet.Languages), sheet.Languages); //8
-        s.Check();
 
         sheet.SpriteId = sheet.Type switch // 9
         {
@@ -180,10 +178,9 @@ public class CharacterSheet : ICharacterSheet
         sheet.Attributes.Luck            = CharacterAttribute.Serdes(nameof(sheet.Attributes.Luck),            sheet.Attributes.Luck,            s); // 52
         sheet.Attributes.MagicResistance = CharacterAttribute.Serdes(nameof(sheet.Attributes.MagicResistance), sheet.Attributes.MagicResistance, s); // 5A
         sheet.Attributes.MagicTalent     = CharacterAttribute.Serdes(nameof(sheet.Attributes.MagicTalent),     sheet.Attributes.MagicTalent,     s); // 62
-        s.Check();
 
         sheet.Age = CharacterAttribute.Serdes(nameof(sheet.Age), sheet.Age, s); // 6A
-        s.RepeatU8("UnknownBlock72", 0, 8); // Unused attrib, for a total of 10 physical attribs?
+        s.Pad("UnknownBlock72", 8); // Unused attrib, for a total of 10 physical attribs?
 
         sheet.Skills.CloseCombat    = CharacterAttribute.Serdes(nameof(sheet.Skills.CloseCombat),    sheet.Skills.CloseCombat,    s); // 7A
         sheet.Skills.RangedCombat   = CharacterAttribute.Serdes(nameof(sheet.Skills.RangedCombat),   sheet.Skills.RangedCombat,   s); // 82
@@ -210,7 +207,6 @@ public class CharacterSheet : ICharacterSheet
 
         sheet.Combat.ExperiencePoints = s.Int32(nameof(sheet.Combat.ExperiencePoints), sheet.Combat.ExperiencePoints); // EE
         // e.g. 98406 = 0x18066 => 6680 0100 in file
-        s.Check(); // F2
 
         byte[] knownSpellBytes = null;
         byte[] spellStrengthBytes = null;
@@ -238,13 +234,11 @@ public class CharacterSheet : ICharacterSheet
         }
 
         knownSpellBytes = s.Bytes("KnownSpells", knownSpellBytes, SpellSchoolCount * sizeof(uint)); // F2
-        s.Check();
 
         sheet.Weight = s.Int32(nameof(sheet.Weight), sheet.Weight); // FA
         sheet.GermanName = s.FixedLengthString(nameof(sheet.GermanName), sheet.GermanName, MaxNameLength); // 112
         sheet.EnglishName = s.FixedLengthString(nameof(sheet.EnglishName), sheet.EnglishName, MaxNameLength);
         sheet.FrenchName = s.FixedLengthString(nameof(sheet.FrenchName), sheet.FrenchName, MaxNameLength);
-        s.Check();
 
         spellStrengthBytes = s.Bytes("SpellStrength", spellStrengthBytes, MaxSpellsPerSchool * SpellSchoolCount * sizeof(ushort));
 

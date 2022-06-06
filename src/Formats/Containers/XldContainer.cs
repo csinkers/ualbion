@@ -108,22 +108,16 @@ public class XldContainer : IAssetContainer
     static int[] HeaderSerdes(int[] lengths, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        s.Check();
         s.Begin("XldHeader");
         string magic = s.NullTerminatedString("MagicString", MagicString);
-        s.Check();
         if(magic != MagicString)
             throw new FormatException("XLD file magic string not found");
 
         ushort objectCount = s.UInt16("ObjectCount", (ushort)(lengths?.Length ?? 0));
-        s.Check();
         lengths ??= new int[objectCount];
 
         for (int i = 0; i < objectCount; i++)
-        {
             lengths[i] = s.Int32("Length" + i, lengths[i]);
-            s.Check();
-        }
 
         s.End();
         return lengths;
@@ -206,12 +200,15 @@ public class XldContainer : IAssetContainer
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (lastId < firstId) throw new ArgumentOutOfRangeException(nameof(lastId));
 
-        s.Object($"{category}.{firstId}-{lastId}", s2 =>
-        {
-            if (s2.IsReading())
-                ReadEmbedded(category, firstId, context, s2, func);
-            else
-                WriteEmbedded(category, firstId, lastId, context, s2, func, populatedIds);
-        });
+        s.Object(
+            $"{category}.{firstId}-{lastId}",
+            (category, firstId, context, lastId, func, populatedIds),
+            static (ctx, s2) =>
+            {
+                if (s2.IsReading())
+                    ReadEmbedded(ctx.category, ctx.firstId, ctx.context, s2, ctx.func);
+                else
+                    WriteEmbedded(ctx.category, ctx.firstId, ctx.lastId, ctx.context, s2, ctx.func, ctx.populatedIds);
+            });
     }
 }

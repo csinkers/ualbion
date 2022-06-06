@@ -113,7 +113,6 @@ public class AmorphousSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
                 result.GetMutableRegionBuffer(n));
         }
 
-        s.Check();
         return result;
     }
 }

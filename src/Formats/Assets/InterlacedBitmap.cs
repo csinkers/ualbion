@@ -65,7 +65,6 @@ public sealed class InterlacedBitmap
                         break;
                 }
 
-                s.Check();
                 i++;
             }
         }

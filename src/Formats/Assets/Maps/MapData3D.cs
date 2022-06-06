@@ -109,12 +109,11 @@ public class MapData3D : BaseMapData
             map.Floors[i]   = s.UInt8(null, map.Floors[i]);
             map.Ceilings[i] = s.UInt8(null, map.Ceilings[i]);
         }
-        s.Check();
         s.End();
 
         var zoneCount = map.SerdesZones(s);
 
-        if (s.IsReading() && s.IsComplete() || s.IsWriting() && map.AutomapGraphics == null)
+        if (s.IsReading() && s.BytesRemaining == 0 || s.IsWriting() && map.AutomapGraphics == null)
         {
             ApiUtil.Assert(zoneCount == 0, "Trivial test map was expected to have 0 zones");
             foreach (var npc in map.Npcs)
@@ -137,12 +136,8 @@ public class MapData3D : BaseMapData
     {
         ushort automapInfoCount = s.UInt16("AutomapInfoCount", (ushort)Automap.Count);
         if (automapInfoCount != 0xffff)
-        {
             s.List(nameof(Automap), Automap, automapInfoCount, AutomapInfo.Serdes);
-            s.Check();
-        }
 
         AutomapGraphics = s.Bytes(nameof(AutomapGraphics), AutomapGraphics, AutomapGraphicsSize);
-        s.Check();
     }
 }

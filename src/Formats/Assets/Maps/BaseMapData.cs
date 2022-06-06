@@ -124,8 +124,6 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise, IEventSet
             (_, x, y2, serializer) => MapEventZone.Serdes(x, serializer, y2),
             n => new List<MapEventZone>(n));
 
-        s.Check();
-
         for (byte y = 0; y < Height; y++)
         {
             if (s.IsCommenting())
@@ -164,8 +162,6 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise, IEventSet
 
         foreach (var node in Events)
             node.Unswizzle(Events);
-
-        s.Check();
     }
 
     protected void SerdesChains(ISerializer s, int chainCount)
@@ -175,7 +171,6 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise, IEventSet
             Chains.Add(EventNode.UnusedEventId);
 
         s.List(nameof(Chains), Chains, chainCount, (_, x, s2) => s2.UInt16(null, x));
-        s.Check();
     }
 
     public void Unswizzle() // Resolve event indices to pointers

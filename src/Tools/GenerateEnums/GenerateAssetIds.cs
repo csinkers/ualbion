@@ -171,7 +171,7 @@ public readonly struct {name} : IEquatable<{name}>, IEquatable<AssetId>, ICompar
         byte diskValue = (byte)id.ToDisk(mapping);
         diskValue = s.UInt8(name, diskValue);
         id = FromDisk({(single ? "" : "type, ")}diskValue, mapping);
-        if (s.IsCommenting()) s.Comment(id.ToString());
+        if (s.IsCommenting()) s.Comment(id.ToString(), true);
         return id;
     }}
 
@@ -182,7 +182,7 @@ public readonly struct {name} : IEquatable<{name}>, IEquatable<AssetId>, ICompar
         ushort diskValue = (ushort)id.ToDisk(mapping);
         diskValue = s.UInt16(name, diskValue);
         id = FromDisk({(single ? "" : "type, ")}diskValue, mapping);
-        if (s.IsCommenting()) s.Comment(id.ToString());
+        if (s.IsCommenting()) s.Comment(id.ToString(), true);
         return id;
     }}
 
@@ -193,7 +193,7 @@ public readonly struct {name} : IEquatable<{name}>, IEquatable<AssetId>, ICompar
         ushort diskValue = (ushort)id.ToDisk(mapping);
         diskValue = s.UInt16BE(name, diskValue);
         id = FromDisk({(single ? "" : "type, ")}diskValue, mapping);
-        if (s.IsCommenting()) s.Comment(id.ToString());
+        if (s.IsCommenting()) s.Comment(id.ToString(), true);
         return id;
     }}
 

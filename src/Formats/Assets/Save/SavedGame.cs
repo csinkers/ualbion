@@ -264,7 +264,7 @@ public class SavedGame
         XldContainer.Serdes(XldCategory.NpcCharacter, 100, 199, context3, s, SerdesNpcCharacter, npcIds);
         XldContainer.Serdes(XldCategory.NpcCharacter, 200, 299, context3, s, SerdesNpcCharacter, npcIds);
 
-        s.RepeatU8("Padding", 0, 4);
+        s.Pad("Padding", 4);
 
         // TODO: Save additional sheets & inventories from mods.
 

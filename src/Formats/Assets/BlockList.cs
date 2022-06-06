@@ -19,7 +19,7 @@ public class BlockList : List<Block>
         if (s.IsReading())
         {
             int j = 0;
-            while (!s.IsComplete())
+            while (s.BytesRemaining > 0)
             {
                 blockList.Add(Block.Serdes(j, null, s));
                 j++;

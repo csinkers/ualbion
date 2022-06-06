@@ -26,7 +26,7 @@ git clone https://github.com/mellinoe/veldrid-spirv
 echo.
 
 :l4
-if exist superpower goto l4
+if exist superpower goto l5
 echo Cloning superpower
 git clone https://github.com/datalust/superpower
 echo.
@@ -34,31 +34,31 @@ echo.
 :l5
 echo Updating AdlMidi.NET
 pushd AdlMidi.NET
-git pull --rebase
+git stash && git pull --rebase && git stash pop
 popd
 echo.
 
 echo Updating SerdesNet
 pushd SerdesNet
-git pull --rebase
+git stash && git pull --rebase && git stash pop
 popd
 echo.
 
 echo Updating veldrid
 pushd veldrid
 git checkout docking
-git pull --rebase
+git stash && git pull --rebase && git stash pop
 popd
 echo.
 
 echo Updating veldrid-spirv
 pushd veldrid-spirv
-git pull --rebase
+git stash && git pull --rebase && git stash pop
 popd
 
 echo Updating superpower
 pushd superpower
-git pull --rebase
+git stash && git pull --rebase && git stash pop
 popd
 
 popd

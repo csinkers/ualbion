@@ -37,7 +37,7 @@ public class MiscState
     public long UnkC0 { get; set; }
     public long UnkC8 { get; set; }
 
-    public static MiscState Serdes(int _, MiscState m, ISerializer s)
+    public static MiscState Serdes(string _, MiscState m, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         m ??= new MiscState();

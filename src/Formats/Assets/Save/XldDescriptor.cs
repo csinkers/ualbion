@@ -10,7 +10,7 @@ public class XldDescriptor
     public XldCategory Category { get; set; }
     public ushort Number { get; set; }
 
-    public static XldDescriptor Serdes(int _, XldDescriptor d, ISerializer s)
+    public static XldDescriptor Serdes(string _, XldDescriptor d, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         d ??= new XldDescriptor();

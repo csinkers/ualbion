@@ -56,8 +56,6 @@ public class MultiHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
             frames.Add(new SimpleTexture<byte>(null, null, width, height, frameBytes));
         }
 
-        s.Check();
-
         return BlitUtil.CombineFramesVertically<byte>(info.AssetId, frames);
     }
 

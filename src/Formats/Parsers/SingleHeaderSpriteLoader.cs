@@ -45,7 +45,6 @@ public class SingleHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
                 result.GetMutableRegionBuffer(i));
         }
 
-        s.Check();
         return result;
     }
 

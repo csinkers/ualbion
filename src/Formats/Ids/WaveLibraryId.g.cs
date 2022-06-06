@@ -58,7 +58,7 @@ public readonly struct WaveLibraryId : IEquatable<WaveLibraryId>, IEquatable<Ass
         byte diskValue = (byte)id.ToDisk(mapping);
         diskValue = s.UInt8(name, diskValue);
         id = FromDisk(diskValue, mapping);
-        if (s.IsCommenting()) s.Comment(id.ToString());
+        if (s.IsCommenting()) s.Comment(id.ToString(), true);
         return id;
     }
 
@@ -69,7 +69,7 @@ public readonly struct WaveLibraryId : IEquatable<WaveLibraryId>, IEquatable<Ass
         ushort diskValue = (ushort)id.ToDisk(mapping);
         diskValue = s.UInt16(name, diskValue);
         id = FromDisk(diskValue, mapping);
-        if (s.IsCommenting()) s.Comment(id.ToString());
+        if (s.IsCommenting()) s.Comment(id.ToString(), true);
         return id;
     }
 
@@ -80,7 +80,7 @@ public readonly struct WaveLibraryId : IEquatable<WaveLibraryId>, IEquatable<Ass
         ushort diskValue = (ushort)id.ToDisk(mapping);
         diskValue = s.UInt16BE(name, diskValue);
         id = FromDisk(diskValue, mapping);
-        if (s.IsCommenting()) s.Comment(id.ToString());
+        if (s.IsCommenting()) s.Comment(id.ToString(), true);
         return id;
     }
 

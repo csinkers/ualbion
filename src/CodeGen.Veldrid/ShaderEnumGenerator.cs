@@ -70,7 +70,10 @@ static class ShaderEnumGenerator
 
             foreach (var member in typeInfo.Members)
             {
-                var prefix = member.Vertex?.EnumPrefix ?? member.Uniform?.EnumPrefix;
+                var prefix = member.Vertex?.EnumPrefix 
+                             ?? member.UniformMember?.EnumPrefix
+                             ?? member.StructuredMember?.EnumPrefix;
+
                 if (prefix == null)
                     continue;
 

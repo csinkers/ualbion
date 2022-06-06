@@ -23,13 +23,11 @@ public class MapData2D : BaseMapData
     [JsonInclude] public byte Sound { get; set; }
     [JsonInclude] public TilesetId TilesetId { get; set; }
     [JsonInclude] public byte FrameRate { get; set; } // If set to 0, used default value (5)
-    [JsonIgnore] public int[] Underlay { get; private set; }
-    [JsonIgnore] public int[] Overlay { get; private set; }
-
+    [JsonIgnore] public MapTile[] Tiles { get; private set; }
     public byte[] RawLayout
     {
-        get => FormatUtil.ToPacked(Underlay, Overlay, 1);
-        set => (Underlay, Overlay) = FormatUtil.FromPacked(value, -1);
+        get => MapTile.ToPacked(Tiles);
+        set => Tiles = MapTile.FromPacked(value);
     }
 
     public MapData2D() { } // For JSON
@@ -45,15 +43,13 @@ public class MapData2D : BaseMapData
         IList<MapEventZone> zones) : base(id, paletteId, width, height, events, chains, npcs, zones)
     {
         TilesetId = tilesetId;
-        Underlay = new int[width * height];
-        Overlay = new int[width * height];
+        Tiles = new MapTile[width * height];
     }
 
     public MapData2D(MapId id, PaletteId paletteId, TilesetId tilesetId, byte width, byte height) : base(id, paletteId, width, height)
     {
         TilesetId = tilesetId;
-        Underlay = new int[width * height];
-        Overlay = new int[width * height];
+        Tiles = new MapTile[width * height];
     }
 
     public static MapData2D Serdes(AssetInfo info, MapData2D existing, AssetMapping mapping, ISerializer s)

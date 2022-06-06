@@ -31,6 +31,7 @@ public class MockGameFactory : Component, IGameFactory
 
     public SpriteBatch<TInstance> CreateSpriteBatch<TInstance>(SpriteKey key) where TInstance : unmanaged
         => new MockSpriteBatch<TInstance>(key);
-    public IMapLayer CreateMapLayer(LogicalMap2D logicalMap, ITileGraphics tileset, Vector2 tileSize, bool isOverlay)
+
+    public IMapLayer CreateMapLayer(LogicalMap2D logicalMap, ITileGraphics tileset, Vector2 tileSize, DrawLayer renderOrder)
         => throw new NotImplementedException();
 }

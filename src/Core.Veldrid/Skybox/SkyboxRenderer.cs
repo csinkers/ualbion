@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
+using System.Runtime.InteropServices;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Visual;
 using Veldrid;
@@ -73,3 +76,48 @@ public sealed class SkyboxRenderer : Component, IRenderer, IDisposable
         _pipeline?.Dispose();
     }
 }
+
+[VertexShader(typeof(SkyboxVertexShader))]
+[FragmentShader(typeof(SkyboxFragmentShader))]
+partial class SkyboxPipeline : PipelineHolder { }
+
+partial class SkyboxResourceSet : ResourceSetHolder
+{
+    [Sampler("uSampler", ShaderStages.Fragment)] ISamplerHolder _sampler;
+    [Texture("uTexture", ShaderStages.Fragment)] ITextureHolder _texture;
+    [UniformBuffer("_Uniform", ShaderStages.Vertex)] IBufferHolder<SkyboxUniformInfo> _uniform;
+}
+
+[Name("SkyBoxSV.vert")]
+[Input(0, typeof(Vertex2DTextured))]
+[ResourceSet(0, typeof(SkyboxResourceSet))]
+[Output(0, typeof(SkyboxIntermediate))]
+[SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
+internal partial class SkyboxVertexShader : IVertexShader { }
+
+[Name("SkyBoxSF.frag")]
+[Input(0, typeof(SkyboxIntermediate))]
+[ResourceSet(0, typeof(SkyboxResourceSet))]
+[ResourceSet(1, typeof(CommonSet))]
+[Output(0, typeof(SimpleFramebuffer))]
+[SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
+internal partial class SkyboxFragmentShader : IFragmentShader { }
+
+#pragma warning disable 649
+[StructLayout(LayoutKind.Sequential)]
+struct SkyboxUniformInfo // Length must be multiple of 16
+{
+    [Uniform("uYaw")] public float uYaw; // 4
+    [Uniform("uPitch")] public float uPitch;  // 8
+    [Uniform("uVisibleProportion")] public float uVisibleProportion;  // 12
+    [Uniform("_pad1")] readonly uint _pad1;   // 16
+}
+
+[SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
+partial struct SkyboxIntermediate : IVertexFormat
+{
+    [Vertex("TexPosition")] public Vector2 TextureCoordinates;
+    [Vertex("NormCoords")] public Vector2 NormalisedSpriteCoordinates;
+    [Vertex("WorldPosition")] public Vector3 WorldPosition;
+}
+#pragma warning restore 649

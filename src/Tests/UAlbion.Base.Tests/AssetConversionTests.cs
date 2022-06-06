@@ -59,7 +59,7 @@ public class AssetConversionTests
 
         var mapping = AssetMapping.Global;
         var stubDisk = new StubFileSystem();
-        var context = new SerdesContext(JsonUtil, mapping, stubDisk);
+        var context = new SerdesContext("Test", JsonUtil, mapping, stubDisk);
 
         var (baseBytes, baseNotes) = Asset.Save(baseAsset, serdes, context);
         var baseJson = Asset.SaveJson(baseAsset, JsonUtil);

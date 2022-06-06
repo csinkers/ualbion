@@ -1,16 +1,13 @@
 #include "SpriteSF.h.frag"
-
-#define DEPTH_COLOR(depth) (vec4((int((depth) * 1024) % 10) / 10.0f, 20 * (max((depth), 0.95) - 0.95), 20 * min((depth), 0.05), 1.0f))
+#include "CommonResources.glsl"
 
 vec4 Pal(float color)
 {
 	if ((uFlags & SKF_ZERO_OPAQUE) != 0 && color == 0)
 		return vec4(0, 0, 0, 1.0f);
 
-	float u = (color * 255.0f/256.f) + (0.5f/256.0f);
-    float v = fract((uPaletteFrame + 0.5f) / textureSize(sampler2D(uDayPalette, uPaletteSampler), 0).y); //! float v = 0; 
-    vec2 uv = vec2(u, v);
-
+	float palHeight = textureSize(sampler2D(uDayPalette, uPaletteSampler), 0).y; //! float palHeight = 1;
+	vec2 uv = PaletteUv(color, uPaletteFrame, palHeight);
 	vec4 day = texture(sampler2D(uDayPalette, uPaletteSampler), uv); //! vec4 day = vec4(0);
 	vec4 night = texture(sampler2D(uNightPalette, uPaletteSampler), uv); //! vec4 night = vec4(0);
 	return mix(day, night, uPaletteBlend);
@@ -75,7 +72,7 @@ void main()
 
 #ifdef DEBUG
     if ((uEngineFlags & EF_RENDER_DEPTH) != 0)
-        color = DEPTH_COLOR(depth);
+		color = DepthToColor(depth);
 #endif
 
     oColor = color;

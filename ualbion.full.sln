@@ -187,6 +187,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{4578
 		mods\Shaders\Shaders\SpriteSF.h.frag = mods\Shaders\Shaders\SpriteSF.h.frag
 		mods\Shaders\Shaders\SpriteSV.h.vert = mods\Shaders\Shaders\SpriteSV.h.vert
 		mods\Shaders\Shaders\SpriteSV.vert = mods\Shaders\Shaders\SpriteSV.vert
+		mods\Shaders\Shaders\TilesSF.frag = mods\Shaders\Shaders\TilesSF.frag
+		mods\Shaders\Shaders\TilesSF.h.frag = mods\Shaders\Shaders\TilesSF.h.frag
+		mods\Shaders\Shaders\TilesSV.h.vert = mods\Shaders\Shaders\TilesSV.h.vert
+		mods\Shaders\Shaders\TilesSV.vert = mods\Shaders\Shaders\TilesSV.vert
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VeldridGen", "VeldridGen", "{FF5E7ED0-5D21-4C77-884B-5CCBC063D2F7}"

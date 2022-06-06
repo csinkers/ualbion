@@ -70,8 +70,6 @@ public sealed class SelectionHandler2D : Component
         {
             _debugMapTileHit.Tile = new Vector2(x, y);
             _debugMapTileHit.IntersectionPoint = intersectionPoint;
-            _debugMapTileHit.UnderlaySprite = _renderable.GetUnderlaySpriteData(x, y);
-            _debugMapTileHit.OverlaySprite = _renderable.GetOverlaySpriteData(x, y);
             _debugMapTileHit.UnderlayTile = _map.GetUnderlay(x, y);
             _debugMapTileHit.OverlayTile = _map.GetOverlay(x, y);
             continuation(new Selection(e.Origin, e.Direction, t, _debugMapTileHit));

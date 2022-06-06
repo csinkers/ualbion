@@ -137,7 +137,7 @@ static class Program
 
         var disk = new FileSystem(Directory.GetCurrentDirectory());
         var jsonUtil = new FormatJsonUtil();
-        var context = new SerdesContext(jsonUtil, AssetMapping.Global, disk);
+        var context = new SerdesContext("AdHoc", jsonUtil, AssetMapping.Global, disk);
 
         var container = options.SubItem.HasValue ? (IAssetContainer)new XldContainer() : new RawContainer();
         if (options.SubItem.HasValue)

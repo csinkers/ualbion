@@ -326,7 +326,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise, IEventSet
     public MapEventZone GetZone(int x, int y) => GetZone(Index(x, y));
     public MapEventZone GetZone(int tileIndex)
     {
-        if (tileIndex < 0 || tileIndex > Zones.Length) return null;
+        if (tileIndex < 0 || tileIndex >= Zones.Length) return null;
         return Zones[tileIndex];
     }
 

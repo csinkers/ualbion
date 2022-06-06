@@ -14,8 +14,6 @@ public class DebugMapTileHit
     public override string ToString() => "DebugTileInfo";
     public Vector2 Tile { get; set; }
     public Vector3 IntersectionPoint { get; set; }
-    public object UnderlaySprite { get; set; }
-    public object OverlaySprite { get; set; }
     public TileData UnderlayTile { get; set; }
     public TileData OverlayTile { get; set; }
 }

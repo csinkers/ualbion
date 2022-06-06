@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
+using System.Runtime.InteropServices;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Visual;
 using Veldrid;
@@ -64,8 +67,7 @@ public sealed class SpriteRenderer : Component, IRenderer, IDisposable
         };
     }
 
-    public void Render(IRenderable renderable, CommonSet commonSet, IFramebufferHolder framebuffer, CommandList cl,
-        GraphicsDevice device)
+    public void Render(IRenderable renderable, CommonSet commonSet, IFramebufferHolder framebuffer, CommandList cl, GraphicsDevice device)
     {
         if (cl == null) throw new ArgumentNullException(nameof(cl));
         if (commonSet == null) throw new ArgumentNullException(nameof(commonSet));
@@ -107,3 +109,65 @@ public sealed class SpriteRenderer : Component, IRenderer, IDisposable
         _noCullPipeline.Dispose();
     }
 }
+
+[VertexShader(typeof(SpriteVertexShader))]
+[FragmentShader(typeof(SpriteFragmentShader))]
+internal partial class SpritePipeline : PipelineHolder { }
+
+[Name("SpriteSF.frag")]
+[Input(0, typeof(SpriteIntermediateData))]
+[ResourceSet(0, typeof(CommonSet))]
+[ResourceSet(1, typeof(SpriteSet))]
+[Output(0, typeof(SimpleFramebuffer))]
+[SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
+internal partial class SpriteFragmentShader : IFragmentShader { }
+
+[Name("SpriteSV.vert")]
+[Input(0, typeof(Vertex2DTextured))]
+[Input(1, typeof(GpuSpriteInstanceData), InstanceStep = 1)]
+[ResourceSet(0, typeof(CommonSet))]
+[ResourceSet(1, typeof(SpriteSet))]
+[Output(0, typeof(SpriteIntermediateData))]
+[SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
+internal partial class SpriteVertexShader : IVertexShader { }
+
+internal sealed partial class SpriteSet : ResourceSetHolder
+{
+    [Texture("uSprite")] ITextureHolder _texture; // Only one of texture & textureArray will be used at a time
+    [TextureArray("uSpriteArray")] ITextureArrayHolder _textureArray;
+    [Sampler("uSpriteSampler")] ISamplerHolder _sampler;
+    [UniformBuffer("_Uniform")] IBufferHolder<SpriteUniform> _uniform;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct SpriteUniform  : IUniformFormat // Length must be multiple of 16
+{
+    [Uniform("uTexSize")] public Vector2 TextureSize { get; set; } // 8 bytes
+    [Uniform("uFlags", EnumPrefix = "SKF")] public SpriteKeyFlags Flags { get; set; } // 4 bytes
+    [Uniform("_pad1")] uint Padding { get; set; } // 4 bytes
+}
+
+// ReSharper disable UnusedMember.Global
+#pragma warning disable 649 // CS0649 Field is never assigned to, and will always have its default value
+#pragma warning disable CA1051 // Do not declare visible instance fields
+internal partial struct GpuSpriteInstanceData : IVertexFormat
+{
+    [Vertex("Flags", EnumPrefix = "SF")] public SpriteFlags Flags;
+    [Vertex("InstancePos")] public Vector4 Position;
+    [Vertex("Size")]        public Vector2 Size;
+    [Vertex("TexOffset")]   public Vector2 TexPosition; // Normalised texture coordinates
+    [Vertex("TexSize")]     public Vector2 TexSize; // Normalised texture coordinates
+    [Vertex("TexLayer")]    public uint TexLayer;
+}
+#pragma warning restore CA1051 // Do not declare visible instance fields
+
+internal partial struct SpriteIntermediateData : IVertexFormat
+{
+    [Vertex("TexPosition")] public Vector2 TexturePosition;
+    [Vertex("Layer", Flat = true)] public float TextureLayer;
+    [Vertex("UvClamp")] public Vector4 UvClamp;
+    [Vertex("Flags", Flat = true, EnumPrefix = "SF")] public SpriteFlags Flags;
+    [Vertex("NormCoords")] public Vector2 NormalisedSpriteCoordinates;
+    [Vertex("WorldPosition")] public Vector3 WorldPosition;
+}
+#pragma warning restore 649

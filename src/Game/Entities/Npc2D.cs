@@ -124,13 +124,13 @@ public class Npc2D : Component
         _moveSettings ??= new MovementSettings(_isLarge ? LargeSpriteAnimations.Frames : SmallSpriteAnimations.Frames)
         {
             TicksPerFrame = GetVar(NpcMoveVars.TicksPerFrame),
-            TicksPerTile = GetVar(NpcMoveVars.TicksPerFrame)
+            TicksPerTile = GetVar(NpcMoveVars.TicksPerTile)
         };
 
         _sprite.TilePosition = new Vector3(
             _state.X,
             _state.Y,
-            DepthUtil.LayerToDepth(0, _state.Y)
+            DepthUtil.GetAbsDepth(_state.Y)
         );
     }
 

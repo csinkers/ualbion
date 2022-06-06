@@ -1,5 +1,5 @@
 ﻿#include "ExtrudedTileMapSF.h.frag"
-#define DEPTH_COLOR(depth) (vec4((int((depth) * 1024) % 10) / 10.0f, 20 * (max((depth), 0.95) - 0.95), 20 * min((depth), 0.05), 1.0f))
+#include "CommonResources.glsl"
 
 vec4 getFloor(vec3 coords)
 {
@@ -18,9 +18,8 @@ vec4 getWall(vec3 coords)
 #ifdef USE_PALETTE
 vec4 Pal(float color)
 {
-	float u = (color * 255.0f/256.f) + (0.5f/256.0f);
-    float v = fract((uPaletteFrame + 0.5f) / textureSize(sampler2D(uDayPalette, uPaletteSampler), 0).y); //! float v = 0; 
-    vec2 uv = vec2(u, v);
+	float palHeight = textureSize(sampler2D(uDayPalette, uPaletteSampler), 0).y; //! float palHeight = 1;
+	vec2 uv = PaletteUv(color, uPaletteFrame, palHeight);
 
 	vec4 day = texture(sampler2D(uDayPalette, uPaletteSampler), uv); //! vec4 day = vec4(0);
 	vec4 night = texture(sampler2D(uNightPalette, uPaletteSampler), uv); //! vec4 night = vec4(0);
@@ -73,7 +72,7 @@ void main()
 		depth = 1.0f;
  
 	if ((uEngineFlags & EF_RENDER_DEPTH) != 0)
-		color = DEPTH_COLOR(depth);
+		color = DepthToColor(depth);
 
 	if ((uEngineFlags & EF_SHOW_BOUNDING_BOXES) != 0)
 	{
@@ -85,7 +84,6 @@ void main()
 	}
 
 	oColor = color;
-
 	gl_FragDepth = ((uEngineFlags & EF_FLIP_DEPTH_RANGE) != 0) ? 1.0f - depth : depth;
 }
 

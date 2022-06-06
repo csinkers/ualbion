@@ -13,6 +13,11 @@ public enum DrawLayer : ushort
     Info       = 0x300, // Verb highlights on map etc   (for 2D levels)
     // Effects,
     Diagnostic  = 0x600, // Missing textures etc
+    DebugCollision = 0x601,
+    DebugSit = 0x602,
+    DebugZones = 0x603,
+    DebugNpcColliders = 0x604,
+    DebugNpcPaths = 0x605,
     Interface   = 0x700, // GUI
     InterfaceOverlay = 0x800,
 

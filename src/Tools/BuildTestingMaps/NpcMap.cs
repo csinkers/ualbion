@@ -29,15 +29,14 @@ public static class NpcMap
         {
             map.Flags |= MapFlags.Unk8000; 
 
-            Array.Fill(map.Overlay, 0);
-            for (int i = 0; i < map.Underlay.Length; i++)
+            for (int i = 0; i < map.Tiles.Length; i++)
             {
                 var y = i / map.Width;
                 var x = i % map.Width;
-                map.Underlay[i] = 
+                map.Tiles[i] = new MapTile(
                     x == 0 || y == 0 || x == map.Width - 1 || y == map.Height - 1
                     ? Tileset1.SolidOffset
-                    : Tileset1.BlankOffset;
+                    : Tileset1.BlankOffset, 0);
             }
 
             const int cellW = 6;
@@ -55,10 +54,10 @@ public static class NpcMap
                 MajMin(cellW, cellH, (i, j) =>
                 {
                     if (i == 0 || j == 0 || i == (cellW - 1) || j == (cellH - 1))
-                        map.Underlay[Pos(x0 + i, y0 + j)] = Tileset1.SolidOffset; // Draw cell walls
+                        map.Tiles[Pos(x0 + i, y0 + j)].Underlay = Tileset1.SolidOffset; // Draw cell walls
                 });
 
-                map.Underlay[Pos(x0 + 1, y0 + 1)] = Tileset1.UnderlayOffset + cellIndex; // Add marker
+                map.Tiles[Pos(x0 + 1, y0 + 1)].Underlay = (ushort)(Tileset1.UnderlayOffset + cellIndex); // Add marker
                 if (cellIndex < 250)
                     map.AddZone((byte)(x0 + 1), (byte)(y0 + 1), TriggerTypes.Manipulate, (ushort)cellIndex);
 

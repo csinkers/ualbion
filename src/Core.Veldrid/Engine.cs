@@ -25,10 +25,10 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
     readonly List<IRenderPass> _renderPasses = new();
     readonly bool _useRenderDoc;
     readonly bool _startupOnly;
-    readonly int _defaultWidth = 720;
-    readonly int _defaultHeight = 480;
-    readonly int _defaultX = 648;
-    readonly int _defaultY = 431;
+    readonly int _defaultWidth = 1870; // 720; // TODO: Save in user settings
+    readonly int _defaultHeight = 1400; // 480; 
+    readonly int _defaultX = 687; // 648;
+    readonly int _defaultY = 31; // 431;
 
     GraphicsDevice _graphicsDevice;
     CommandList _frameCommands;

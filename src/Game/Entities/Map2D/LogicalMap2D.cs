@@ -5,7 +5,6 @@ using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
-using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Entities.Map2D;
@@ -13,7 +12,6 @@ namespace UAlbion.Game.Entities.Map2D;
 public class LogicalMap2D : LogicalMap
 {
     readonly MapData2D _mapData;
-    readonly TilesetData _tileData;
     readonly IList<Block> _blockList;
 
     public LogicalMap2D(
@@ -24,33 +22,34 @@ public class LogicalMap2D : LogicalMap
     {
         if (assetManager == null) throw new ArgumentNullException(nameof(assetManager));
         _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
-        _tileData = assetManager.LoadTileData(_mapData.TilesetId);
+        TileData = assetManager.LoadTileData(_mapData.TilesetId);
         _blockList = assetManager.LoadBlockList(_mapData.TilesetId.ToBlockList());
-        UseSmallSprites = _tileData.UseSmallGraphics;
+        UseSmallSprites = TileData.UseSmallGraphics;
     }
 
     public bool UseSmallSprites { get; }
-    public TilesetGfxId TilesetId => _tileData.Id.ToTilesetGfx();
+    public TilesetData TileData { get; }
     public Vector2 TileSize { get; set; } // TODO: Tidy up how this gets initialised
 
+    public MapTile[] RawTiles => _mapData.Tiles;
     public TileData GetUnderlay(int x, int y) => GetUnderlay(Index(x, y));
     public TileData GetUnderlay(int index)
     {
-        if (index < 0 || index >= _mapData.Underlay.Length)
+        if (index < 0 || index >= _mapData.Tiles.Length)
             return null;
 
-        int tileIndex = _mapData.Underlay[index];
-        return tileIndex >= 1 ? _tileData.Tiles[tileIndex] : null;
+        int tileIndex = _mapData.Tiles[index].Underlay;
+        return tileIndex >= 1 ? TileData.Tiles[tileIndex] : null;
     }
 
     public TileData GetOverlay(int x, int y) => GetOverlay(Index(x, y));
     public TileData GetOverlay(int index)
     {
-        if (index < 0 || index >= _mapData.Overlay.Length)
+        if (index < 0 || index >= _mapData.Tiles.Length)
             return null;
 
-        int tileIndex = _mapData.Overlay[index];
-        return tileIndex > 1 ? _tileData.Tiles[tileIndex] : null;
+        int tileIndex = _mapData.Tiles[index].Overlay;
+        return tileIndex > 1 ? TileData.Tiles[tileIndex] : null;
     }
         
     public Passability GetPassability(int index) => 
@@ -61,13 +60,13 @@ public class LogicalMap2D : LogicalMap
     protected override void ChangeUnderlay(byte x, byte y, ushort value)
     {
         var index = Index(x, y);
-        if (index < 0 || index >= _mapData.Underlay.Length)
+        if (index < 0 || index >= _mapData.Tiles.Length)
         {
-            Error($"Tried to update invalid underlay index {index} (max {_mapData.Underlay.Length}");
+            Error($"Tried to update invalid underlay index {index} (max {_mapData.Tiles.Length}");
         }
         else
         {
-            _mapData.Underlay[index] = value - 1;
+            _mapData.Tiles[index].Underlay = (ushort)(value - 1);
             OnDirty(x, y, IconChangeType.Underlay);
         }
     }
@@ -75,13 +74,13 @@ public class LogicalMap2D : LogicalMap
     protected override void ChangeOverlay(byte x, byte y, ushort value)
     {
         var index = Index(x, y);
-        if (index < 0 || index >= _mapData.Overlay.Length)
+        if (index < 0 || index >= _mapData.Tiles.Length)
         {
-            Error($"Tried to update invalid overlay index {index} (max {_mapData.Overlay.Length}");
+            Error($"Tried to update invalid overlay index {index} (max {_mapData.Tiles.Length}");
         }
         else
         {
-            _mapData.Overlay[index] = value - 1;
+            _mapData.Tiles[index].Overlay = (ushort)(value - 1);
             OnDirty(x, y, IconChangeType.Overlay);
         }
     }
@@ -102,25 +101,25 @@ public class LogicalMap2D : LogicalMap
                 var targetIndex = Index(x + i, y + j);
                 var targetBlockIndex = j * block.Width + i;
 
-                if(targetIndex < 0 || targetIndex > _mapData.Underlay.Length)
+                if(targetIndex < 0 || targetIndex > _mapData.Tiles.Length)
                 {
                     Error($"Tried to set out-of-range index {targetIndex}, @ ({x},{y}) + ({i},{j}) for block {blockId}");
                     return;
                 }
 
-                int underlay = _mapData.Underlay[targetIndex];
-                int newUnderlay = block.Underlay[targetBlockIndex];
+                ushort underlay = _mapData.Tiles[targetIndex].Underlay;
+                ushort newUnderlay = block.Tiles[targetBlockIndex].Underlay;
                 if (newUnderlay > 1 && (overwrite || underlay <= 1))
                 {
-                    _mapData.Underlay[targetIndex] = newUnderlay;
+                    _mapData.Tiles[targetIndex].Underlay = newUnderlay;
                     OnDirty(x + i, y + j, IconChangeType.Underlay);
                 }
 
-                int overlay = _mapData.Overlay[targetIndex];
-                int newOverlay = block.Overlay[targetBlockIndex];
+                ushort overlay = _mapData.Tiles[targetIndex].Overlay;
+                ushort newOverlay = block.Tiles[targetBlockIndex].Overlay;
                 if (overwrite || overlay > 1)
                 {
-                    _mapData.Overlay[targetIndex] = newOverlay;
+                    _mapData.Tiles[targetIndex].Overlay = newOverlay;
                     OnDirty(x + i, y + j, IconChangeType.Overlay);
                 }
             }

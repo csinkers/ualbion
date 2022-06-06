@@ -102,8 +102,8 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(4095, blocks.Count);
         Assert.Equal(1, blocks[0].Width);
         Assert.Equal(1, blocks[0].Height);
-        Assert.Equal(1, blocks[0].Underlay[0]);
-        Assert.Equal(0, blocks[0].Overlay[0]);
+        Assert.Equal(1, blocks[0].Tiles[0].Underlay);
+        Assert.Equal(0, blocks[0].Tiles[0].Overlay);
     }
 
     [Fact]
@@ -362,12 +362,12 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(MapFlags.RestMode1 | MapFlags.RestMode2 | MapFlags.TorontoAutomap | MapFlags.V2NpcData | MapFlags.ExtraNpcs, map.Flags);
         Assert.Equal(MapSubMode.Unk0, map.SubMode);
         Assert.Equal(RestMode.NoResting, map.RestMode);
-        Assert.Equal(map.Width * map.Height, map.Underlay.Length);
-        Assert.Equal(871, map.Underlay[0]);
-        Assert.Equal(349, map.Underlay[75]);
-        Assert.Equal(map.Width * map.Height, map.Overlay.Length);
-        Assert.Equal(0, map.Overlay[0]);
-        Assert.Equal(2495, map.Overlay[719]);
+        Assert.Equal(map.Width * map.Height, map.Tiles.Length);
+        Assert.Equal(871, map.Tiles[0].Underlay);
+        Assert.Equal(349, map.Tiles[75].Underlay);
+        Assert.Equal(map.Width * map.Height, map.Tiles.Length);
+        Assert.Equal(0, map.Tiles[0].Overlay);
+        Assert.Equal(2495, map.Tiles[719].Overlay);
 
         Assert.Equal(657, map.Events.Count);
         var en = map.Events[0];

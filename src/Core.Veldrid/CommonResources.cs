@@ -9,12 +9,12 @@ namespace UAlbion.Core.Veldrid;
 
 public sealed partial class CommonSet : ResourceSetHolder
 {
-    [Resource("_Shared")]                          SingleBuffer<GlobalInfo>       _globalInfo; 
-    [Resource("_Projection", ShaderStages.Vertex)] SingleBuffer<ProjectionMatrix> _projection; 
-    [Resource("_View",       ShaderStages.Vertex)] SingleBuffer<ViewMatrix>       _view; 
-    [Resource("uDayPalette", ShaderStages.Fragment)]     ITextureHolder           _dayPalette;
-    [Resource("uNightPalette", ShaderStages.Fragment)]   ITextureHolder           _nightPalette;
-    [Resource("uPaletteSampler", ShaderStages.Fragment)] ISamplerHolder           _sampler;
+    [UniformBuffer("_Shared")]                          SingleBuffer<GlobalInfo>       _globalInfo; 
+    [UniformBuffer("_Projection", ShaderStages.Vertex)] SingleBuffer<ProjectionMatrix> _projection; 
+    [UniformBuffer("_View",       ShaderStages.Vertex)] SingleBuffer<ViewMatrix>       _view; 
+    [Texture("uDayPalette", ShaderStages.Fragment)]     ITextureHolder _dayPalette;
+    [Texture("uNightPalette", ShaderStages.Fragment)]   ITextureHolder _nightPalette;
+    [Sampler("uPaletteSampler", ShaderStages.Fragment)] ISamplerHolder _sampler;
 }
 
 [StructLayout(LayoutKind.Sequential)]

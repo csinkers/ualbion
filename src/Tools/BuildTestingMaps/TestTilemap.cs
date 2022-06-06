@@ -9,26 +9,26 @@ namespace BuildTestingMaps;
 
 public class TestTilemap
 {
-    public int BlankOffset { get; }
-    public int SolidOffset { get; }
-    public int UnderlayOffset { get; }
+    public ushort BlankOffset { get; }
+    public ushort SolidOffset { get; }
+    public ushort UnderlayOffset { get; }
 
-    public int OverlayOffset { get; }
+    public ushort OverlayOffset { get; }
 
     // public int FlagTileOffset { get; }
-    public int SitOffset { get; }
-    public int TextOffset { get; }
-    public int AnimLoopOffset { get; }
-    public int AnimCycleOffset { get; }
-    public int AnimLoopOverlayOffset { get; }
-    public int AnimCycleOverlayOffset { get; }
+    public ushort SitOffset { get; }
+    public ushort TextOffset { get; }
+    public ushort AnimLoopOffset { get; }
+    public ushort AnimCycleOffset { get; }
+    public ushort AnimLoopOverlayOffset { get; }
+    public ushort AnimCycleOverlayOffset { get; }
     public TilesetData Tileset { get; }
     public Dictionary<AssetId, object> Assets { get; }= new();
 
-    public int IndexForChar(char c)
+    public ushort IndexForChar(char c)
     {
         if (c is < ' ' or > '~') return 0;
-        return (c - ' ') + TextOffset;
+        return (ushort)((c - ' ') + TextOffset);
     }
 
     static IReadOnlyTexture<byte> MakeTileGfx(bool overlay, byte num, ITextureBuilderFont font)
@@ -54,13 +54,13 @@ public class TestTilemap
 
         Tileset = new TilesetData(UAlbion.Base.Tileset.Toronto) { UseSmallGraphics = false };
         Tileset.Tiles.Add(new(Tileset.Tiles.Count, 1, TileType.Unk0, TileLayer.Normal));
-        BlankOffset = Tileset.Tiles.Count;
+        BlankOffset = (ushort)Tileset.Tiles.Count;
         Tileset.Tiles.Add(new(Tileset.Tiles.Count, 1, TileType.Unk0, TileLayer.Normal));
-        SolidOffset = Tileset.Tiles.Count;
+        SolidOffset = (ushort)Tileset.Tiles.Count;
         Tileset.Tiles.Add(new(Tileset.Tiles.Count, 2, TileType.Unk0, TileLayer.Normal)
             { Collision = Passability.Solid });
 
-        UnderlayOffset = Tileset.Tiles.Count;
+        UnderlayOffset = (ushort)Tileset.Tiles.Count;
         for (int i = 0; i < 16; i++)
         {
             for (int j = 0; j < 16; j++)
@@ -71,7 +71,7 @@ public class TestTilemap
             }
         }
 
-        OverlayOffset = Tileset.Tiles.Count;
+        OverlayOffset = (ushort)Tileset.Tiles.Count;
         for (int i = 0; i < 16; i++)
         {
             for (int j = 0; j < 16; j++)
@@ -82,7 +82,7 @@ public class TestTilemap
             }
         }
 
-        SitOffset = Tileset.Tiles.Count;
+        SitOffset = (ushort)Tileset.Tiles.Count;
         for (int i = 0; i < 16; i++)
         {
             int gfxIndex = tiles.Count;
@@ -95,7 +95,7 @@ public class TestTilemap
             Tileset.Tiles.Add(new(Tileset.Tiles.Count, (ushort)gfxIndex, 0, 0) { SitMode = (SitMode)i });
         }
 
-        TextOffset = Tileset.Tiles.Count;
+        TextOffset = (ushort)Tileset.Tiles.Count;
         for (char c = ' '; c <= '~'; c++)
         {
             int gfxIndex = tiles.Count;
@@ -129,20 +129,20 @@ public class TestTilemap
             }
         }
 
-        AnimLoopOffset = Tileset.Tiles.Count;
+        AnimLoopOffset = (ushort)Tileset.Tiles.Count;
         BuildCycle(8, loopFrameCount, (x,i) => x.Type = (TileType)i);
 
-        AnimCycleOffset = Tileset.Tiles.Count;
+        AnimCycleOffset = (ushort)Tileset.Tiles.Count;
         BuildCycle(8, loopFrameCount, (x,i) => { x.Type = (TileType)i; x.Bouncy = true; });
 
-        AnimLoopOverlayOffset = Tileset.Tiles.Count;
+        AnimLoopOverlayOffset = (ushort)Tileset.Tiles.Count;
         BuildCycle(8, loopFrameCount, (x,i) =>
         {
             x.Type = (TileType)i;
             x.UseUnderlayFlags = true;
         });
 
-        AnimCycleOverlayOffset = Tileset.Tiles.Count;
+        AnimCycleOverlayOffset = (ushort)Tileset.Tiles.Count;
         BuildCycle(8, loopFrameCount, (x, i) =>
         {
             x.Type = (TileType)i;

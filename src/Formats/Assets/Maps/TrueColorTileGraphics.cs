@@ -29,5 +29,14 @@ public class TrueColorTileGraphics : ITileGraphics
 
     public Region GetRegion(int imageNumber, int paletteFrame) => GetRegionInner(_dayFrames, imageNumber, paletteFrame);
     public bool IsPaletteAnimated(int imageNumber) => _dayFrames[imageNumber].Paths.Length > 1;
+    public uint GetDayRegionId(int imageNumber) => imageNumber >= _dayFrames.Count ? (uint)imageNumber : (uint)_dayFrames[imageNumber].RegionOffset;
+    public uint GetNightRegionId(int imageNumber)
+    {
+        if (_nightFrames == null) return 0;
+        if (imageNumber >= _nightFrames.Count) return (uint)imageNumber;
+        return (uint)_nightFrames[imageNumber].RegionOffset;
+    }
+
+    public uint GetPaletteFrameCount(int imageNumber) => imageNumber >= _dayFrames.Count ? 1 : (uint)_dayFrames[imageNumber].Paths.Length;
     public Region GetNightRegion(int imageNumber, int paletteFrame) => GetRegionInner(_nightFrames ?? _dayFrames, imageNumber, paletteFrame);
 }

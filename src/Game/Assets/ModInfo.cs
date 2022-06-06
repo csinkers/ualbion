@@ -32,7 +32,7 @@ public class ModInfo
             }
         }
 
-        SerdesContext = new SerdesContext(json, mapping, disk);
+        SerdesContext = new SerdesContext(name, json, mapping, disk);
     }
 
     public string Name { get; }

@@ -6,9 +6,9 @@
     "Alt+Enter": "e:toggle_fullscreen",
     "V": "push_mouse_mode DebugPick",
     "Shift+V": "hide_debug_window",
-    "F10": "update 1",
-    "F11": "start_clock",
-    "F12": "stop_clock",
+    "F9": "update 1",
+    "F10": "start_clock",
+    "F11": "stop_clock",
     "Control+D": "engine_flag toggle RenderDepth",
     "Control+E": "push_scene Editor",
     "Control+B": "engine_flag toggle ShowBoundingBoxes",
@@ -23,7 +23,7 @@
     "Alt+F2": "load_map_prompt",
 
     "Space": "dismiss_message",
-    "Period": "dismiss_message" 
+    "Period": "dismiss_message"
   },
   "World2D": {
     "Escape": "push_scene MainMenu",
@@ -77,12 +77,11 @@
     "Control+X": "!loadprevmap",
     "Control+Q": "engine_flag toggle UseCylindricalBillboards",
 
-    "Control+Number1": "set_active_member 0",
-    "Control+Number2": "set_active_member 1",
-    "Control+Number3": "set_active_member 2",
-    "Control+Number4": "set_active_member 3",
-    "Control+Number5": "set_active_member 4",
-    "Control+Number6": "set_active_member 5",
+    "Control+Number1": "debug_flag toggle CollisionLayer",
+    "Control+Number2": "debug_flag toggle SitLayer",
+    "Control+Number3": "debug_flag toggle ZoneLayer",
+    "Control+Number4": "debug_flag toggle NpcColliderLayer",
+    "Control+Number5": "debug_flag toggle NpcPathLayer",
 
     "M": "open_map",
     "T": "wait",
@@ -144,8 +143,8 @@
 
     "Control+A": "iso_lab 1",
     "Control+X": "iso_lab -1",
-    "Control+Z": "iso_pal -1", 
-    "Control+C": "iso_pal 1", 
+    "Control+Z": "iso_pal -1",
+    "Control+C": "iso_pal 1",
     "Number1": "iso_mode Floors",
     "Number2": "iso_mode Ceilings",
     "Number3": "iso_mode Walls",

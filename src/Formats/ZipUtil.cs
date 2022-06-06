@@ -32,17 +32,20 @@ public static class ZipUtil
 
     public static byte[] Deflate(ReadOnlySpan<int> ints)
     {
-        if (ints == null) throw new ArgumentNullException(nameof(ints));
-        byte[] input = new byte[ints.Length * sizeof(int)];
+        byte[] byteArray = new byte[ints.Length * sizeof(int)];
         var asBytes = MemoryMarshal.Cast<int, byte>(ints);
-        asBytes.CopyTo(input.AsSpan());
+        asBytes.CopyTo(byteArray.AsSpan());
+        return Deflate(byteArray);
+    }
 
+    public static byte[] Deflate(byte[] bytes)
+    {
         var deflater = new Deflater();
         deflater.SetLevel(Deflater.DEFAULT_COMPRESSION);
-        deflater.SetInput(input);
+        deflater.SetInput(bytes);
         deflater.Finish();
 
-        using var ms = new MemoryStream(input.Length);
+        using var ms = new MemoryStream(bytes.Length);
         byte[] buf = new byte[1024];
         while (!deflater.IsFinished)
         {

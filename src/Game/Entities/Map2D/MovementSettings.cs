@@ -16,7 +16,7 @@ public class MovementSettings : IMovementSettings
     public int MaxTrailDistance { get; set; }
     public int TileWidth => 16;
     public int TileHeight => 16;
-    public float GetDepth(float y) => DepthUtil.LayerToDepth(0, y);
+    public float GetDepth(float y) => DepthUtil.GetAbsDepth(y);
     public int GetSpriteFrame(IMovementState state, bool isSeated)
     {
         if (state == null) throw new ArgumentNullException(nameof(state));

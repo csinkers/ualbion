@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Visual;
 using Veldrid;
@@ -107,3 +109,57 @@ public sealed class BlendedSpriteRenderer : Component, IRenderer, IDisposable
         _noCullPipeline.Dispose();
     }
 }
+
+[VertexShader(typeof(BlendedSpriteVertexShader))]
+[FragmentShader(typeof(BlendedSpriteFragmentShader))]
+internal partial class BlendedSpritePipeline : PipelineHolder { }
+
+[Name("BlendedSpriteSF.frag")]
+[Input(0, typeof(BlendedSpriteIntermediateData))]
+[ResourceSet(0, typeof(CommonSet))]
+[ResourceSet(1, typeof(SpriteSet))]
+[Output(0, typeof(SimpleFramebuffer))]
+[SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
+internal partial class BlendedSpriteFragmentShader : IFragmentShader { }
+
+[Name("BlendedSpriteSV.vert")]
+[Input(0, typeof(Vertex2DTextured))]
+[Input(1, typeof(GpuBlendedSpriteInstanceData), InstanceStep = 1)]
+[ResourceSet(0, typeof(CommonSet))]
+[ResourceSet(1, typeof(SpriteSet))]
+[Output(0, typeof(BlendedSpriteIntermediateData))]
+[SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
+internal partial class BlendedSpriteVertexShader : IVertexShader { }
+
+#pragma warning disable 649 // CS0649 Field is never assigned to, and will always have its default value
+internal partial struct BlendedSpriteIntermediateData : IVertexFormat
+{
+    [Vertex("Flags", Flat = true, EnumPrefix = "SF")] public SpriteFlags Flags;
+
+    [Vertex("TexPosition1")] public Vector2 TexturePosition1;
+    [Vertex("Layer1", Flat = true)] public float TextureLayer1;
+    [Vertex("UvClamp1")] public Vector4 UvClamp1;
+
+    [Vertex("TexPosition2")] public Vector2 TexturePosition2;
+    [Vertex("Layer2", Flat = true)] public float TextureLayer2;
+    [Vertex("UvClamp2")] public Vector4 UvClamp2;
+
+    [Vertex("NormCoords")] public Vector2 NormalisedSpriteCoordinates;
+    [Vertex("WorldPosition")] public Vector3 WorldPosition;
+}
+
+#pragma warning disable CA1051 // Do not declare visible instance fields
+internal partial struct GpuBlendedSpriteInstanceData : IVertexFormat
+{
+    [Vertex("Flags", EnumPrefix = "SF")] public SpriteFlags Flags;
+    [Vertex("InstancePos")] public Vector4 Position;
+    [Vertex("Size")]        public Vector2 Size;
+    [Vertex("TexOffset1")]  public Vector2 TexPosition1; // Normalised texture coordinates
+    [Vertex("TexSize1")]    public Vector2 TexSize1; // Normalised texture coordinates
+    [Vertex("TexLayer1")]   public uint TexLayer1;
+    [Vertex("TexOffset2")]  public Vector2 TexPosition2; // Normalised texture coordinates
+    [Vertex("TexSize2")]    public Vector2 TexSize2; // Normalised texture coordinates
+    [Vertex("TexLayer2")]   public uint TexLayer2;
+}
+#pragma warning restore CA1051 // Do not declare visible instance fields
+#pragma warning restore 649

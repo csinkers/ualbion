@@ -103,9 +103,9 @@ internal partial class FullscreenQuadFragmentShader : IFragmentShader { }
 
 partial class FullscreenQuadResourceSet : ResourceSetHolder
 {
-    [Resource("uSampler", ShaderStages.Fragment)] ISamplerHolder _sampler;
-    [Resource("uTexture", ShaderStages.Fragment)] ITextureHolder _texture;
-    [Resource("_Uniform", ShaderStages.Vertex)] IBufferHolder<FullscreenQuadUniformInfo> _uniform;
+    [Sampler("uSampler", ShaderStages.Fragment)] ISamplerHolder _sampler;
+    [Texture("uTexture", ShaderStages.Fragment)] ITextureHolder _texture;
+    [UniformBuffer("_Uniform", ShaderStages.Vertex)] IBufferHolder<FullscreenQuadUniformInfo> _uniform;
 }
 
 [StructLayout(LayoutKind.Sequential)]

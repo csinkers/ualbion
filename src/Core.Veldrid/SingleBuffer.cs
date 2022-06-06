@@ -26,11 +26,11 @@ public sealed class SingleBuffer<T> : Component, IBufferHolder<T> where T : unma
         }
     }
 
-    public delegate void ModifierFunc(ref T data);
-    public void Modify(ModifierFunc func)
+    public delegate void ModifierFunc<in TContext>(TContext context, ref T data);
+    public void Modify<TContext>(ModifierFunc<TContext> func, TContext context)
     {
         if (func == null) throw new ArgumentNullException(nameof(func));
-        func(ref _instance);
+        func(context, ref _instance);
         Dirty();
     }
 
@@ -67,6 +67,7 @@ public sealed class SingleBuffer<T> : Component, IBufferHolder<T> where T : unma
         On<DestroyDeviceObjectsEvent>(_ => Dispose());
     }
 
+    public override string ToString() => $"{Name} SingleBuffer<{typeof(T)}>";
     protected override void Subscribed() => Dirty();
     protected override void Unsubscribed() => Dispose();
     void Dirty() => On<PrepareFrameResourcesEvent>(_updateAction);

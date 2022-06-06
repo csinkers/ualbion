@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Events;
@@ -60,5 +62,13 @@ public class PaletteManager : ServiceComponent<IPaletteManager>, IPaletteManager
         Night = NightPalettes.TryGetValue(paletteId, out var nightPaletteId)
             ? assets.LoadPalette(nightPaletteId)
             : null;
+
+        if (Night != null)
+        {
+            ApiUtil.Assert(Day.AnimatedEntries.SequenceEqual(Night.AnimatedEntries),
+                "Expected day and night palettes to have identical animated entries!" +
+                $" Day palette {Day.Id} had entries [ {string.Join(", ", Day.AnimatedEntries)} ] and " +
+                $"Night palette {Night.Id} had entries [ {string.Join(", ", Night.AnimatedEntries)} ]");
+        }
     }
 }

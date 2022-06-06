@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using UAlbion.Api;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Maps;
 
 #pragma warning disable CA2227 // Collection properties should be read only
 namespace UAlbion.Formats.Exporters.Tiled;
@@ -18,8 +19,8 @@ public class Stamp
         if (block == null) throw new ArgumentNullException(nameof(block));
         if (tileset == null) throw new ArgumentNullException(nameof(tileset));
 
-        var underlay = block.Underlay;
-        var overlay = block.Overlay;
+        var underlay = MapTile.ToInts(block.Tiles, false);
+        var overlay = MapTile.ToInts(block.Tiles, true);
 
         Name = $"{blockId:000}_{block.Width}x{block.Height}";
         Variations.Add(new Variation
@@ -65,11 +66,15 @@ public class Stamp
         var map = Variations[0].Map;
         var underlayLayer = map.Layers.Find(x => x.Name == "Underlay");
         var overlayLayer = map.Layers.Find(x => x.Name == "Overlay");
+        if (underlayLayer == null) throw new FormatException($"A layer named \"Underlay\" was expected in the stamp file");
+        if (overlayLayer == null) throw new FormatException($"A layer named \"Overlay\" was expected in the stamp file");
+
         if (underlayLayer.Compression == CompressionFormat.Zlib)
         {
             var underlay = ZipUtil.Inflate(underlayLayer.Data);
             var overlay = ZipUtil.Inflate(overlayLayer.Data);
-            return new Block((byte) map.Width, (byte) map.Height, underlay, overlay);
+            var tiles = MapTile.FromInts(underlay, overlay);
+            return new Block((byte) map.Width, (byte) map.Height, tiles);
         }
         else
         {

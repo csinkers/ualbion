@@ -215,12 +215,15 @@ namespace UAlbion.Game.Veldrid.Debugging
                     var curFlags = GetVar(UserVars.Debug.DebugFlags);
                     DebugFlagOption(this, curFlags, DebugFlags.DrawPositions);
                     DebugFlagOption(this, curFlags, DebugFlags.HighlightTile);
-                    DebugFlagOption(this, curFlags, DebugFlags.HighlightEventChainZones);
-                    DebugFlagOption(this, curFlags, DebugFlags.HighlightCollision);
-                    DebugFlagOption(this, curFlags, DebugFlags.ShowPaths);
-                    DebugFlagOption(this, curFlags, DebugFlags.NoMapTileBoundingBoxes);
+                    // DebugFlagOption(this, curFlags, DebugFlags.HighlightChain);
                     DebugFlagOption(this, curFlags, DebugFlags.ShowCursorHotspot);
                     DebugFlagOption(this, curFlags, DebugFlags.TraceAttachment);
+
+                    DebugFlagOption(this, curFlags, DebugFlags.CollisionLayer);
+                    DebugFlagOption(this, curFlags, DebugFlags.SitLayer);
+                    DebugFlagOption(this, curFlags, DebugFlags.ZoneLayer);
+                    DebugFlagOption(this, curFlags, DebugFlags.NpcColliderLayer);
+                    DebugFlagOption(this, curFlags, DebugFlags.NpcPathLayer);
                     ImGui.TreePop();
                 }
 #endif

@@ -55,13 +55,13 @@ public class MapAnnotationLayer : Component
         var underlay = _logicalMap.GetUnderlay(index);
         var overlay = _logicalMap.GetOverlay(index);
         //var zone = _logicalMap.GetZone
-#if DEBUG
-        bool showCollision = (_lastDebugFlags & DebugFlags.HighlightCollision) != 0;
-        if(showCollision)
-        {
-            var passability = _logicalMap.GetPassability(index);
-        }
-#endif
+//#if DEBUG
+//        bool showCollision = (_lastDebugFlags & DebugFlags.HighlightCollision) != 0;
+//        if(showCollision)
+//        {
+//            var passability = _logicalMap.GetPassability(index);
+//        }
+//#endif
     }
 
     void Render()

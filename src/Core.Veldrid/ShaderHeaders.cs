@@ -17,5 +17,7 @@ public static class ShaderHeaders
         FullscreenQuadFragmentShader.ShaderSource(),
         Skybox.SkyboxVertexShader.ShaderSource(),
         Skybox.SkyboxFragmentShader.ShaderSource(),
+        TileVertexShader.ShaderSource(),
+        TileFragmentShader.ShaderSource(),
     };
 }

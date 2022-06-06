@@ -49,7 +49,7 @@ public static class LayerMapping2D
             for (int i = 0; i < map.Width; i++)
             {
                 int index = j * map.Width + i;
-                var tileIndex = useOverlay ? map.Overlay[index] : map.Underlay[index];
+                var tileIndex = useOverlay ? map.Tiles[index].Overlay : map.Tiles[index].Underlay;
                 var tile = tileset.Tiles[tileIndex];
                 sb.Append(tile.IsBlank ? BlankTileIndex : tileIndex);
                 sb.Append(',');
@@ -73,6 +73,6 @@ public static class LayerMapping2D
     {
         var underlay = LoadLayer(map, LayerName.Underlay);
         var overlay = LoadLayer(map, LayerName.Overlay);
-        return FormatUtil.ToPacked(underlay, overlay, 1);
+        return MapTile.ToPacked(underlay, overlay);
     }
 }

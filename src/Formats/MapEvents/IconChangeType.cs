@@ -2,6 +2,7 @@
 
 public enum IconChangeType : byte
 {
+    Unknown = 0xff,
     Underlay = 0,
     Overlay = 1,
     Wall = 2,

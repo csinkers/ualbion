@@ -1,55 +1,23 @@
-using System;
+/*using System;
 using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
-using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Entities.Map2D;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 
 namespace UAlbion.Game.Veldrid.Visual;
 
-public class SimpleMapLayer : MapLayer<SpriteInfo>
-{
-    static readonly Region BlankRegion = new(Vector2.Zero, Vector2.Zero, Vector2.Zero, 0);
-    protected override SpriteInfo BlankInstance { get; } = new(0, Vector3.Zero, Vector2.Zero, BlankRegion);
-    public SimpleMapLayer(LogicalMap2D logicalMap, ITileGraphics tileset, Vector2 tileSize, bool isOverlay) : base(logicalMap, tileset, tileSize, isOverlay) { }
-    protected override SpriteInfo BuildInstance(Vector3 position, ushort imageNumber, int palFrame, SpriteFlags flags)
-    {
-        var subImage = Tileset.GetRegion(imageNumber, palFrame);
-        return new SpriteInfo(SpriteFlags.TopLeft, position, TileSize, subImage);
-    }
-}
-
-public class BlendedMapLayer : MapLayer<BlendedSpriteInfo>
-{
-    readonly TrueColorTileGraphics _tileset;
-    static readonly Region BlankRegion = new(Vector2.Zero, Vector2.Zero, Vector2.Zero, 0);
-    protected override BlendedSpriteInfo BlankInstance { get; } = new(0, Vector3.Zero, Vector2.Zero, BlankRegion, BlankRegion);
-    public BlendedMapLayer(LogicalMap2D logicalMap, TrueColorTileGraphics tileset, Vector2 tileSize, bool isOverlay) : base(logicalMap, tileset, tileSize, isOverlay) 
-        => _tileset = tileset ?? throw new ArgumentNullException(nameof(tileset));
-
-    protected override BlendedSpriteInfo BuildInstance(Vector3 position, ushort imageNumber, int palFrame, SpriteFlags flags)
-    {
-        var day = _tileset.GetRegion(imageNumber, palFrame);
-        var night = _tileset.GetNightRegion(imageNumber, palFrame);
-        return new BlendedSpriteInfo(SpriteFlags.TopLeft, position, TileSize, day, night);
-    }
-}
-
-public abstract class MapLayer<TInstance> : Component, IMapLayer
+public class MapLayer<TInstance> : Component, IMapLayer
     where TInstance : unmanaged
 {
-    protected abstract TInstance BlankInstance { get;  }
-
     readonly LogicalMap2D _logicalMap;
-    readonly bool _isOverlay;
-    readonly DrawLayer _drawLayer;
+    readonly IMapLayerInfoBuilder<TInstance> _builder;
+    readonly IMapLayerBehavior<TInstance> _behavior;
     readonly ISet<(int, int)> _dirty = new HashSet<(int, int)>();
     readonly ISet<(int, int)> _animated = new HashSet<(int, int)>();
 
@@ -57,32 +25,30 @@ public abstract class MapLayer<TInstance> : Component, IMapLayer
     DebugFlags _lastDebugFlags;
 #endif
     SpriteLease<TInstance> _lease;
-    int _lastFrameCount;
     bool _allDirty = true;
 
     public int? HighlightIndex { get; set; }
-    int? _highlightEvent;
+    public int FrameNumber { get; set; }
 
-    protected Vector2 TileSize { get; }
-    protected ITileGraphics Tileset { get; }
-    protected abstract TInstance BuildInstance(Vector3 position, ushort imageNumber, int palFrame, SpriteFlags flags);
+    int? _highlightEvent;
 
     public MapLayer(
         LogicalMap2D logicalMap,
-        ITileGraphics tileset,
-        Vector2 tileSize,
-        bool isOverlay)
+        IMapLayerInfoBuilder<TInstance> builder,
+        IMapLayerBehavior<TInstance> behavior)
     {
+        _builder = builder ?? throw new ArgumentNullException(nameof(builder));
+        _behavior = behavior ?? throw new ArgumentNullException(nameof(behavior));
+
         _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
         _logicalMap.Dirty += (_, args) =>
         {
-            var iconChangeType = _isOverlay ? IconChangeType.Overlay : IconChangeType.Underlay;
-            if (args.Type != iconChangeType) 
+            if (!_behavior.IsChangeApplicable(args.Type))
                 return;
 
             var index = _logicalMap.Index(args.X, args.Y);
 
-            if (IsAnimated(index))
+            if (_behavior.IsAnimated(index))
                 _animated.Add((args.X, args.Y));
             else
                 _animated.Remove((args.X, args.Y));
@@ -90,17 +56,13 @@ public abstract class MapLayer<TInstance> : Component, IMapLayer
             _dirty.Add((args.X, args.Y));
         };
 
-        Tileset = tileset ?? throw new ArgumentNullException(nameof(tileset));
-        TileSize = tileSize;
-        _isOverlay = isOverlay;
-        _drawLayer = isOverlay ? DrawLayer.Overlay : DrawLayer.Underlay;
 
         int index = 0;
         for (int j = 0; j < _logicalMap.Height; j++)
         {
             for (int i = 0; i < _logicalMap.Width; i++)
             {
-                if (IsAnimated(index))
+                if (_behavior.IsAnimated(index))
                     _animated.Add((i, j));
                 index++;
             }
@@ -109,13 +71,9 @@ public abstract class MapLayer<TInstance> : Component, IMapLayer
         On<RenderEvent>(_ => Render());
     }
 
-    bool IsAnimated(int index)
+    public void SetTile(int index, int value)
     {
-        var tile = GetTile(index);
-        if (tile == null)
-            return false;
-
-        return tile.FrameCount > 1 || Tileset.IsPaletteAnimated(tile.ImageNumber);
+        // TODO
     }
 
     public object GetSpriteData(int x, int y) 
@@ -127,50 +85,6 @@ public abstract class MapLayer<TInstance> : Component, IMapLayer
         _lease = null;
     }
 
-    TileData GetTile(int index) => _isOverlay ? _logicalMap.GetOverlay(index) : _logicalMap.GetUnderlay(index);
-    TileData GetFallbackTile(int index) => !_isOverlay ? null : _logicalMap.GetUnderlay(index);
-
-    TInstance BuildInstanceData(int index, int i, int j, int tickCount)
-    {
-        var tile = GetTile(index);
-
-        if (tile == null || tile.NoDraw)
-            return BlankInstance;
-
-        var pm = Resolve<IPaletteManager>();
-        int frame = AnimUtil.GetFrame(tickCount, tile.FrameCount, tile.Bouncy);
-        var fallback = GetFallbackTile(index);
-        var layer = tile.Layer;
-
-        if (fallback != null && (int)fallback.Layer > (int)tile.Layer)
-            layer = fallback.Layer;
-
-        var position = new Vector3(
-            new Vector2(i, j) * TileSize,
-            DepthUtil.LayerToDepth(layer.ToDepthOffset(), j));
-
-        var flags = SpriteFlags.TopLeft;
-#if DEBUG
-        var zone = _logicalMap.GetZone(index);
-        int eventNum = zone?.Node?.Id ?? -1;
-
-        flags = flags
-             | ((_lastDebugFlags & DebugFlags.HighlightTile) != 0 && HighlightIndex == index ? SpriteFlags.Highlight : 0)
-             | ((_lastDebugFlags & DebugFlags.HighlightEventChainZones) != 0 && _highlightEvent == eventNum ? SpriteFlags.GreenTint : 0)
-             | ((_lastDebugFlags & DebugFlags.HighlightCollision) != 0 && tile.Collision != Passability.Passable ? SpriteFlags.RedTint : 0)
-             | ((_lastDebugFlags & DebugFlags.NoMapTileBoundingBoxes) != 0 ? SpriteFlags.NoBoundingBox : 0)
-        //     | ((tile.Flags & TileFlags.TextId) != 0 ? SpriteFlags.RedTint : 0)
-        //     | (((int) tile.Type) == 8 ? SpriteFlags.GreenTint : 0)
-        //     | (((int) tile.Type) == 12 ? SpriteFlags.BlueTint : 0)
-        //     | (((int) tile.Type) == 14 ? SpriteFlags.GreenTint | SpriteFlags.RedTint : 0) //&& tickCount % 2 == 0 ? SpriteFlags.Transparent : 0)
-            ;
-#endif
-
-        var instance = BuildInstance(position, (ushort)(tile.ImageNumber + frame), pm.Frame, flags);
-
-        return instance;
-    }
-
     void Render()
     {
         var frameCount =  (Resolve<IGameState>()?.TickCount ?? 0) / GetVar(GameVars.Time.FastTicksPerMapTileFrame);
@@ -180,8 +94,8 @@ public abstract class MapLayer<TInstance> : Component, IMapLayer
             _allDirty = true;
         _lastDebugFlags = debug;
 
-        if (frameCount != _lastFrameCount && (
-                (debug & DebugFlags.HighlightEventChainZones) != 0
+        if (frameCount != FrameNumber && (
+                (debug & DebugFlags.HighlightChain) != 0
                 || (debug & DebugFlags.HighlightTile) != 0))
             _allDirty = true;
 #endif
@@ -189,15 +103,7 @@ public abstract class MapLayer<TInstance> : Component, IMapLayer
         var sm = Resolve<ISpriteManager<TInstance>>();
         if (_lease == null)
         {
-            var flags = SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.ClampEdges;
-            if (!_isOverlay)
-                flags |= SpriteKeyFlags.ZeroOpaque;
-
-            var sampler = Tileset.Texture is IReadOnlyTexture<byte>
-                ? SpriteSampler.Point
-                : SpriteSampler.TriLinear;
-
-            var key = new SpriteKey(Tileset.Texture, sampler, _drawLayer, flags);
+            var key = _behavior.GetSpriteKey();
             _lease = sm.Borrow(key, _logicalMap.Width * _logicalMap.Height, this);
             _allDirty = true;
         }
@@ -214,10 +120,10 @@ public abstract class MapLayer<TInstance> : Component, IMapLayer
         }
         else _highlightEvent = null;
 
-        if (!_allDirty && frameCount != _lastFrameCount)
+        if (!_allDirty && frameCount != FrameNumber)
             _dirty.UnionWith(_animated);
 
-        _lastFrameCount = frameCount;
+        FrameNumber = frameCount;
         if (_allDirty)
         {
             _lease.Access(static (instances, s) =>
@@ -227,7 +133,8 @@ public abstract class MapLayer<TInstance> : Component, IMapLayer
                 {
                     for (int i = 0; i < s._logicalMap.Width; i++)
                     {
-                        instances[index] = s.BuildInstanceData(index, i, j, s._lastFrameCount);
+                        var position = new Vector3(new Vector2(i, j) * s._builder.TileSize, DepthUtil.GetAbsDepth(j));
+                        instances[index] = s._behavior.BuildInstanceData(index, s.FrameNumber, position);
                         index++;
                     }
                 }
@@ -240,14 +147,15 @@ public abstract class MapLayer<TInstance> : Component, IMapLayer
         {
             _lease.Access(static (instances, s) =>
             {
-                foreach (var (x, y) in s._dirty)
+                foreach (var (i, j) in s._dirty)
                 {
-                    int index = s._logicalMap.Index(x, y);
-                    instances[index] = s.BuildInstanceData(index, x, y, s._lastFrameCount);
+                    var position = new Vector3(new Vector2(i, j) * s._builder.TileSize, DepthUtil.GetAbsDepth(j));
+                    int index = s._logicalMap.Index(i, j);
+                    instances[index] = s._behavior.BuildInstanceData(index, s.FrameNumber, position);
                 }
 
                 s._dirty.Clear();
             }, this);
         }
     }
-}
+} */

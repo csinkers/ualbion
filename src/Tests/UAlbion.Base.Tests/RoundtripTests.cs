@@ -7,6 +7,7 @@ using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Containers;
 using UAlbion.Formats.Exporters.Tiled;
@@ -84,7 +85,7 @@ public class RoundtripTests
             }
         }
 
-        var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
+        var context = new SerdesContext("Test", JsonUtil, AssetMapping.Global, Disk);
 
         var (asset, preTxt)      = Wrap(() => Asset.Load(bytes, serdes, context), ".pre.ex.txt");
         var (postBytes, postTxt) = Wrap(() => Asset.Save(asset, serdes, context), ".post.ex.txt");
@@ -111,35 +112,35 @@ public class RoundtripTests
         return asset;
     }
 
-    void RoundTripXld<T>(string testName, string file, int subId, Asset.SerdesFunc<T> serdes) where T : class
+    static void RoundTripXld<T>(string testName, string file, int subId, Asset.SerdesFunc<T> serdes) where T : class
     {
         var info = new AssetInfo { Index = subId };
-        var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
+        var context = new SerdesContext("Test", JsonUtil, AssetMapping.Global, Disk);
         var bytes = Asset.BytesFromXld(PathResolver, file, info, context);
         RoundTrip(testName, bytes, serdes);
     }
 
-    void RoundTripRaw<T>(string testName, string file, Asset.SerdesFunc<T> serdes) where T : class
+    static void RoundTripRaw<T>(string testName, string file, Asset.SerdesFunc<T> serdes) where T : class
     {
         var bytes = File.ReadAllBytes(PathResolver.ResolvePath(file));
         RoundTrip(testName, bytes, serdes);
     }
 
-    void RoundTripItem<T>(string testName, string file, int subId, Asset.SerdesFunc<T> serdes) where T : class
+    static void RoundTripItem<T>(string testName, string file, int subId, Asset.SerdesFunc<T> serdes) where T : class
     {
         var info = new AssetInfo { Index = subId };
         var loader = new ItemListContainer();
-        var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
+        var context = new SerdesContext("Test", JsonUtil, AssetMapping.Global, Disk);
         using var s = loader.Read(PathResolver.ResolvePath(file), info, context);
         var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
         RoundTrip(testName, bytes, serdes);
     }
 
-    void RoundTripSpell<T>(string testName, string file, int subId, Asset.SerdesFunc<T> serdes) where T : class
+    static void RoundTripSpell<T>(string testName, string file, int subId, Asset.SerdesFunc<T> serdes) where T : class
     {
         var info = new AssetInfo { Index = subId };
         var loader = new SpellListContainer();
-        var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
+        var context = new SerdesContext("Test", JsonUtil, AssetMapping.Global, Disk);
         using var s = loader.Read(PathResolver.ResolvePath(file), info, context);
         var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
         RoundTrip(testName, bytes, serdes);
@@ -228,7 +229,7 @@ public class RoundtripTests
     public void LabyrinthTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Labyrinth.Jirinaar) };
-        RoundTripXld<Formats.Assets.Labyrinth.LabyrinthData>(nameof(LabyrinthTest), "$(ALBION)/CD/XLDLIBS/LABDATA1.XLD", 9,
+        RoundTripXld<LabyrinthData>(nameof(LabyrinthTest), "$(ALBION)/CD/XLDLIBS/LABDATA1.XLD", 9,
             (x, s, c) => Loaders.LabyrinthDataLoader.Serdes(x, info, s, c));
     }
 
@@ -389,7 +390,7 @@ public class RoundtripTests
             .Attach(modApplier)
             .Attach(new AssetManager());
 
-        var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
+        var context = new SerdesContext("Test", JsonUtil, AssetMapping.Global, Disk);
         var bytes = Asset.BytesFromXld(PathResolver, "$(ALBION)/CD/XLDLIBS/ICONDAT0.XLD", info, context);
 
         TilesetData Serdes(TilesetData x, ISerializer s, SerdesContext context) => Loaders.TilesetLoader.Serdes(x, info, s, context);
@@ -414,7 +415,7 @@ public class RoundtripTests
     public void TiledStampTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(BlockList.Toronto), Index = 7 };
-        var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
+        var context = new SerdesContext("Test", JsonUtil, AssetMapping.Global, Disk);
         var bytes = Asset.BytesFromXld(PathResolver, "$(ALBION)/CD/XLDLIBS/BLKLIST0.XLD", info, context);
 
         Formats.Assets.BlockList Serdes(Formats.Assets.BlockList x, ISerializer s, SerdesContext c2) => Loaders.BlockListLoader.Serdes(x, info, s, c2);

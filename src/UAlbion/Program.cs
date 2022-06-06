@@ -160,6 +160,7 @@ static class Program
         renderPass // TODO: Populate from json so mods can add new render methods
             .AddRenderer(new SpriteRenderer(framebuffer))
             .AddRenderer(new BlendedSpriteRenderer(framebuffer))
+            .AddRenderer(new TileRenderer(framebuffer))
             .AddRenderer(new EtmRenderer(framebuffer))
             .AddRenderer(new SkyboxRenderer(framebuffer))
             .AddRenderer(new DebugGuiRenderer(framebuffer))

@@ -61,6 +61,7 @@ public sealed class MultiBuffer<T> : Component, IBufferHolder<T> where T : unman
         On<DestroyDeviceObjectsEvent>(_ => Dispose());
     }
 
+    public override string ToString() => $"{Name} MultiBuffer<{typeof(T)}>[{Count}]";
     protected override void Subscribed() => Dirty();
     protected override void Unsubscribed() => Dispose();
     void Dirty() => On<PrepareFrameResourcesEvent>(_updateAction);
@@ -76,7 +77,11 @@ public sealed class MultiBuffer<T> : Component, IBufferHolder<T> where T : unman
 
         if (DeviceBuffer == null)
         {
-            DeviceBuffer = e.Device.ResourceFactory.CreateBuffer(new BufferDescription(size, _usage));
+            DeviceBuffer = e.Device.ResourceFactory.CreateBuffer(
+                _usage is BufferUsage.StructuredBufferReadOnly or BufferUsage.StructuredBufferReadWrite 
+                    ? new BufferDescription(size, _usage, (uint)Unsafe.SizeOf<T>(), true) 
+                    : new BufferDescription(size, _usage));
+
             DeviceBuffer.Name = _name;
         }
 

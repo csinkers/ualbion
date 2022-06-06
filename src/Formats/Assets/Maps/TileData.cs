@@ -49,7 +49,7 @@ public class TileData // 8 bytes per tile
             | ((value & Passability.Right ) != 0 ? TileFlags.CollRight  : 0)
             | ((value & Passability.Bottom) != 0 ? TileFlags.CollBottom : 0)
             | ((value & Passability.Left  ) != 0 ? TileFlags.CollLeft   : 0)
-            | ((value & Passability.Solid ) != 0 ? TileFlags.Solid     : 0);
+            | ((value & Passability.Solid ) != 0 ? TileFlags.Solid      : 0);
     }
 
     public SitMode SitMode
@@ -135,7 +135,7 @@ public class TileData // 8 bytes per tile
     }
 
     public override string ToString() => 
-        $"Tile L:{(int)Layer} T:{(int)Type} C:{(int)Collision} S:{(int)SitMode} ->{ImageNumber}:{FrameCount} " +
+        $"Tile {Index} L:{(int)Layer} T:{(int)Type} C:{(int)Collision} S:{(int)SitMode} ->{ImageNumber}:{FrameCount} ({ImageNumber:x}) " +
         $"U7:{Unk7} {(Bouncy ? "Bounce " : "")}{(UseUnderlayFlags ? "Fallback " : "")}{(DebugDot ? "Debug " : "")}" +
         $"{(NoDraw ? "NoDraw ":"")}{(Unk12 ? "Unk12 ":"")}{(Unk18 ? "Unk18 ":"")}";
 

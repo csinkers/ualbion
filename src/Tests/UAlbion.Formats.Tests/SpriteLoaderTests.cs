@@ -24,7 +24,7 @@ public class SpriteLoaderTests
         using var ms = new MemoryStream(bytes);
         using var br = new BinaryReader(ms);
         using var s = new AlbionReader(br);
-        var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
+        var context = new SerdesContext("Test", JsonUtil, AssetMapping.Global, Disk);
         return serdes(null, s, context);
     }
 
@@ -33,7 +33,7 @@ public class SpriteLoaderTests
         using var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms);
         using var s = new AlbionWriter(bw);
-        var context = new SerdesContext(JsonUtil, AssetMapping.Global, Disk);
+        var context = new SerdesContext("Test", JsonUtil, AssetMapping.Global, Disk);
         serdes(sprite, s, context);
         ms.Position = 0;
         return ms.ToArray();

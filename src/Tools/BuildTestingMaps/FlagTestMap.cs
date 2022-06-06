@@ -23,15 +23,14 @@ public static class FlagTestMap
         {
             map.Flags |= MapFlags.Unk8000;  
 
-            Array.Fill(map.Overlay, 0);
-            for (int i = 0; i < map.Underlay.Length; i++)
+            for (int i = 0; i < map.Tiles.Length; i++)
             {
                 var y = i / map.Width;
                 var x = i % map.Width;
-                map.Underlay[i] = 
+                map.Tiles[i] =  new MapTile(
                     x == 0 || y == 0 || x == map.Width - 1 || y == map.Height - 1
                         ? Tileset1.SolidOffset
-                        : Tileset1.BlankOffset;
+                        : Tileset1.BlankOffset, 0);
             }
 
             ushort n = 0;
@@ -41,7 +40,7 @@ public static class FlagTestMap
                 for (var index = 0; index < name.Length; index++)
                 {
                     var c = name[index];
-                    map.Underlay[Pos(x + index, y)] = Tileset1.IndexForChar(c);
+                    map.Tiles[Pos(x + index, y)].Underlay = Tileset1.IndexForChar(c);
                 }
 
                 builder!.SetChain(n, scriptBuilder);

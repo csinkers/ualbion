@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Api.Eventing;
+using UAlbion.Api.Visual;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 
@@ -11,10 +14,12 @@ namespace UAlbion.Game.Entities.Map2D;
 public class MapRenderable2D : Component
 {
     readonly LogicalMap2D _logicalMap;
-    readonly IMapLayer _underlay;
-    readonly IMapLayer _overlay;
-    readonly InfoOverlay _info;
-    readonly MapAnnotationLayer _annotations;
+    readonly IMapLayer _mapLayer;
+    // readonly IMapLayer _overlay;
+    // readonly InfoOverlay _info;
+    // readonly MapAnnotationLayer _annotations;
+    int _fastFrames;
+    int _mapFrame;
 
     public MapRenderable2D(LogicalMap2D logicalMap, ITileGraphics tileset, IGameFactory factory, Vector2 tileSize)
     {
@@ -23,27 +28,50 @@ public class MapRenderable2D : Component
         _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
         TileSize = tileSize;
 
-        _underlay = AttachChild(factory.CreateMapLayer(logicalMap, tileset, tileSize, false));
-        _overlay = AttachChild(factory.CreateMapLayer(logicalMap, tileset, tileSize, true)); 
-        _info = AttachChild(new InfoOverlay(logicalMap));
+        _mapLayer = AttachChild(factory.CreateMapLayer(logicalMap, tileset, tileSize, DrawLayer.Underlay));
+        // _info = AttachChild(new InfoOverlay(logicalMap));
+        // _annotations = AttachChild(new MapAnnotationLayer(logicalMap, TileSize));
 
-        _annotations = AttachChild(new MapAnnotationLayer(logicalMap, TileSize));
-
-        On<ToggleUnderlayEvent>(e => _underlay.IsActive = !_underlay.IsActive);
-        On<ToggleOverlayEvent>(e => _overlay.IsActive = !_overlay.IsActive);
+        On<ToggleUnderlayEvent>(_ => _mapLayer.IsUnderlayActive = !_mapLayer.IsUnderlayActive);
+        On<ToggleOverlayEvent>(_ => _mapLayer.IsOverlayActive = !_mapLayer.IsOverlayActive);
+        On<FastClockEvent>(e =>
+        {
+            _fastFrames += e.Frames;
+            var newMapFrame = _fastFrames / GetVar(GameVars.Time.FastTicksPerMapTileFrame);
+            if (newMapFrame != _mapFrame)
+            {
+                _mapFrame = newMapFrame;
+                _mapLayer.FrameNumber = _mapFrame;
+            }
+        });
     }
 
     public Vector2 TileSize { get; }
     public PaletteId Palette => _logicalMap.PaletteId;
-    public Vector2 SizePixels => new Vector2(_logicalMap.Width, _logicalMap.Height) * TileSize;
-    public object GetUnderlaySpriteData(int x, int y) => _underlay.GetSpriteData(x, y);
-    public object GetOverlaySpriteData(int x, int y) => _overlay.GetSpriteData(x, y);
 
     public void SetHighlightIndex(int? index)
     {
-        _underlay.HighlightIndex = index;
-        _overlay.HighlightIndex = index;
+        _mapLayer.HighlightIndex = index;
+        // _overlay.HighlightIndex = index;
     }
 
-    protected override void Subscribed() => Raise(new LoadPaletteEvent(Palette));
+    protected override void Subscribed()
+    {
+        Raise(new LoadPaletteEvent(Palette));
+        _logicalMap.Dirty += OnLogicalMapDirty;
+    }
+
+    void OnLogicalMapDirty(object _, DirtyTileEventArgs args)
+    {
+        if (args.Type is IconChangeType.Underlay or IconChangeType.Overlay)
+        {
+            var index = _logicalMap.Index(args.X, args.Y);
+            _mapLayer.SetTile(index, _logicalMap.RawTiles[index]);
+        }
+    }
+
+    protected override void Unsubscribed()
+    {
+        _logicalMap.Dirty -= OnLogicalMapDirty;
+    }
 }

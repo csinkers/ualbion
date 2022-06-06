@@ -6,7 +6,7 @@ namespace UAlbion.Game.Tests;
 
 public class MockSettings : Component, ISettings
 {
-    readonly VarSet _set = new();
+    readonly VarSet _set = new("Mock");
     public bool TryGetValue(string key, out object value) => _set.TryGetValue(key, out value);
     public void SetValue(string key, object value) => _set.SetValue(key, value);
     public void ClearValue(string key) => _set.ClearValue(key);

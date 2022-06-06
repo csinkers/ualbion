@@ -132,7 +132,7 @@ public sealed class RenderPass : Component, IRenderPass, IDisposable
 
             foreach (var renderable in _renderList)
             {
-                if (_rendererLookup.TryGetValue(renderable.GetType(), out var renderer))
+                if (_rendererLookup.TryGetValue(renderable.GetType(), out var renderer) && renderer.IsActive)
                     renderer.Render(renderable, _commonSet, Framebuffer, cl, device);
             }
         }

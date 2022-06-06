@@ -16,8 +16,9 @@ namespace UAlbion.Game.Settings;
 #pragma warning disable CA2227 // Collection properties should be read only
 public class SettingsManager : Component, ISettings
 {
+    const string VarSetName = "Settings";
     const string UserPath = "$(CONFIG)/settings.json";
-    VarSet _set = new();
+    VarSet _set = new(VarSetName);
 
     public SettingsManager()
     {
@@ -98,7 +99,7 @@ public class SettingsManager : Component, ISettings
         var baseConfig = assets?.LoadConfig();
 
         if (disk.FileExists(path))
-            _set = VarSetLoader.Load(path, disk, jsonUtil);
+            _set = VarSetLoader.Load(VarSetName, path, disk, jsonUtil);
 
         if (baseConfig != null)
             _set.Apply(baseConfig);

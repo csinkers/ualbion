@@ -161,42 +161,42 @@ public sealed class ExtrudedTilemap : Component, IExtrudedTilemap
     public Vector3 Scale 
     { 
         get => new(_properties.Data.Scale.X, _properties.Data.Scale.Y, _properties.Data.Scale.Z);
-        set { _properties.Modify((ref DungeonTileMapProperties x) => x.Scale = new Vector4(value, 0)); }
+        set { _properties.Modify(static (Vector3 v, ref DungeonTileMapProperties x) => x.Scale = new Vector4(v, 0), value); }
     }
 
     public Vector3 Rotation 
     { 
         get => new(_properties.Data.Rotation.X, _properties.Data.Rotation.Y, _properties.Data.Rotation.Z);
-        set { _properties.Modify((ref DungeonTileMapProperties x) => x.Rotation = new Vector4(value, 0)); }
+        set { _properties.Modify(static (Vector3 v, ref DungeonTileMapProperties x) => x.Rotation = new Vector4(v, 0), value); }
     }
     public Vector3 Origin 
     { 
         get => new(_properties.Data.Origin.X, _properties.Data.Origin.Y, _properties.Data.Origin.Z);
-        set { _properties.Modify((ref DungeonTileMapProperties x) => x.Origin = new Vector4(value, 1.0f)); }
+        set { _properties.Modify(static (Vector3 v, ref DungeonTileMapProperties x) => x.Origin = new Vector4(v, 1.0f), value); }
     }
     public Vector3 HorizontalSpacing 
     { 
         get => new(_properties.Data.HorizontalSpacing.X, _properties.Data.HorizontalSpacing.Y, _properties.Data.HorizontalSpacing.Z);
-        set { _properties.Modify((ref DungeonTileMapProperties x) => x.HorizontalSpacing = new Vector4(value, 0)); }
+        set { _properties.Modify(static (Vector3 v, ref DungeonTileMapProperties x) => x.HorizontalSpacing = new Vector4(v, 0), value); }
     }
     public Vector3 VerticalSpacing 
     { 
         get => new(_properties.Data.VerticalSpacing.X, _properties.Data.VerticalSpacing.Y, _properties.Data.VerticalSpacing.Z);
-        set { _properties.Modify((ref DungeonTileMapProperties x) => x.VerticalSpacing = new Vector4(value, 0)); }
+        set { _properties.Modify(static (Vector3 v, ref DungeonTileMapProperties x) => x.VerticalSpacing = new Vector4(v, 0), value); }
     }
     public uint Width 
     { 
         get => _properties.Data.Width;
-        set { _properties.Modify((ref DungeonTileMapProperties x) => x.Width = value); }
+        set { _properties.Modify(static (uint v, ref DungeonTileMapProperties x) => x.Width = v, value); }
     }
     public uint AmbientLightLevel 
     { 
         get => _properties.Data.AmbientLightLevel;
-        set { _properties.Modify((ref DungeonTileMapProperties x) => x.AmbientLightLevel = value); }
+        set { _properties.Modify(static (uint v, ref DungeonTileMapProperties x) => x.AmbientLightLevel = v, value); }
     }
     public uint FogColor 
     { 
         get => _properties.Data.FogColor;
-        set { _properties.Modify((ref DungeonTileMapProperties x) => x.FogColor = value); }
+        set { _properties.Modify(static (uint v, ref DungeonTileMapProperties x) => x.FogColor = v, value); }
     }
 }

@@ -4,6 +4,9 @@ namespace UAlbion.Api.Visual;
 
 public static class DepthUtil
 {
-    public static float LayerToDepth(int layer, float yCoordinateInTiles) => 1.0f - (layer + (int)Math.Ceiling(yCoordinateInTiles)) / 4095.0f;
-    public static int DepthToLayer(float depth) => (int)((1.0f - depth) * 4095.0f);
+    public const int LayerCount = 4096;
+    public const float MaxLayer = LayerCount - 1;
+    public static float GetAbsDepth(float yCoordinateInTiles) => 1.0f - (float)Math.Ceiling(yCoordinateInTiles) / MaxLayer;
+    public static float GetRelDepth(int tiles) => -tiles / MaxLayer;
+    public static int DepthToLayer(float depth) => (int)((1.0f - depth) * MaxLayer);
 }

@@ -88,8 +88,23 @@ namespace UAlbion.Api.Eventing
             if (subscribers.Capacity < tempSubscribers.Count)
                 subscribers.Capacity = tempSubscribers.Count;
 
+            List<Handler> postHandlers = null;
             foreach (var subscriber in tempSubscribers)
-                subscribers.Add(subscriber);
+            {
+                if (subscriber.IsPostHandler)
+                {
+                    postHandlers ??= _dispatchLists.Borrow();
+                    postHandlers.Add(subscriber);
+                }
+                else subscribers.Add(subscriber);
+            }
+
+            if (postHandlers != null)
+            {
+                foreach (var subscriber in postHandlers)
+                    subscribers.Add(subscriber);
+                _dispatchLists.Return(postHandlers);
+            }
         }
 
         public void Raise<T>(T e, object sender) where T : IEvent => RaiseInternal(e, sender, null);
@@ -175,8 +190,8 @@ namespace UAlbion.Api.Eventing
                 Interlocked.Decrement(ref _nesting);
         }
 
-        public void Subscribe<T>(IComponent component) where T : IEvent 
-            => Subscribe(new Handler<T>(e => component.Receive(e, null), component));
+        public void Subscribe<T>(IComponent component, bool isPostHandler = false) where T : IEvent 
+            => Subscribe(new Handler<T>(e => component.Receive(e, null), component, isPostHandler));
 
         bool CheckForDoubleRegistration(Handler handler, List<Handler> subscribedTypes)
         {

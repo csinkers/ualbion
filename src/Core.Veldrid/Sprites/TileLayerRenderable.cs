@@ -31,11 +31,35 @@ public sealed class TileLayerRenderable : Component, IRenderable, IDisposable
         get => (Uniform.Data.LayerFlags & GpuTileLayerFlags.DrawUnderlay) != 0;
         set => SetFlag(GpuTileLayerFlags.DrawUnderlay, value);
     }
-
     public bool IsOverlayActive
     {
         get => (Uniform.Data.LayerFlags & GpuTileLayerFlags.DrawOverlay) != 0;
         set => SetFlag(GpuTileLayerFlags.DrawOverlay, value);
+    }
+    public bool IsCollisionLayerActive
+    {
+        get => (Uniform.Data.LayerFlags & GpuTileLayerFlags.DrawCollision) != 0;
+        set => SetFlag(GpuTileLayerFlags.DrawCollision, value);
+    }
+    public bool IsSitLayerActive
+    {
+        get => (Uniform.Data.LayerFlags & GpuTileLayerFlags.DrawSitState) != 0;
+        set => SetFlag(GpuTileLayerFlags.DrawSitState, value);
+    }
+    public bool IsMiscLayerActive
+    {
+        get => (Uniform.Data.LayerFlags & GpuTileLayerFlags.DrawMisc) != 0;
+        set => SetFlag(GpuTileLayerFlags.DrawMisc, value);
+    }
+    public bool IsZoneLayerActive
+    {
+        get => (Uniform.Data.LayerFlags & GpuTileLayerFlags.DrawZones) != 0;
+        set => SetFlag(GpuTileLayerFlags.DrawZones, value);
+    }
+    public bool DrawDebugTiles
+    {
+        get => (Uniform.Data.LayerFlags & GpuTileLayerFlags.DrawDebug) != 0;
+        set => SetFlag(GpuTileLayerFlags.DrawDebug, value);
     }
 
     public TileLayerRenderable(string name, byte width, ReadOnlySpan<uint> map, DrawLayer renderOrder, TilesetResourceHolder tileset)

@@ -58,12 +58,13 @@
     "F5": "inv:open_pos 4",
     "F6": "inv:open_pos 5",
 
-    "Control+Number1": "set_active_member 0",
-    "Control+Number2": "set_active_member 1",
-    "Control+Number3": "set_active_member 2",
-    "Control+Number4": "set_active_member 3",
-    "Control+Number5": "set_active_member 4",
-    "Control+Number6": "set_active_member 5",
+    "Control+Number1": "debug_flag toggle CollisionLayer",
+    "Control+Number2": "debug_flag toggle SitLayer",
+    "Control+Number3": "debug_flag toggle MiscLayer",
+    "Control+Number4": "debug_flag toggle ShowDebugTiles",
+    "Control+Number5": "debug_flag toggle ZoneLayer",
+    "Control+Number6": "debug_flag toggle NpcColliderLayer",
+    "Control+Number7": "debug_flag toggle NpcPathLayer",
 
     "Q": "+cursor_mode examine",
     "E": "+cursor_mode manipulate",
@@ -76,12 +77,6 @@
     "Control+A": "!loadnextmap",
     "Control+X": "!loadprevmap",
     "Control+Q": "engine_flag toggle UseCylindricalBillboards",
-
-    "Control+Number1": "debug_flag toggle CollisionLayer",
-    "Control+Number2": "debug_flag toggle SitLayer",
-    "Control+Number3": "debug_flag toggle ZoneLayer",
-    "Control+Number4": "debug_flag toggle NpcColliderLayer",
-    "Control+Number5": "debug_flag toggle NpcPathLayer",
 
     "M": "open_map",
     "T": "wait",

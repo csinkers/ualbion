@@ -171,7 +171,7 @@ public abstract class Component : IComponent
     /// <typeparam name="T">The event type to handle</typeparam>
     /// <param name="callback">The function to call when the event is raised</param>
     protected void On<T>(Action<T> callback) where T : IEvent => 
-        OnCore<T, Action<T>>(callback, (c, x) => new Handler<T>(c, x));
+        OnCore<T, Action<T>>(callback, (c, x) => new Handler<T>(c, x, false));
 
     /// <summary>
     /// Add an event handler callback to be called when the relevant event
@@ -180,7 +180,7 @@ public abstract class Component : IComponent
     /// <typeparam name="T">The event type to handle</typeparam>
     /// <param name="callback">The function to call when the event is raised</param>
     protected void OnAsync<T>(Func<T, Action, bool> callback) where T : IAsyncEvent =>
-        OnCore<T, Func<T, Action, bool>>(callback, (c,x)=> new AsyncHandler<T>(c, x));
+        OnCore<T, Func<T, Action, bool>>(callback, (c,x)=> new AsyncHandler<T>(c, x, false));
 
     /// <summary>
     /// Add an event handler callback to be called when the relevant event
@@ -190,8 +190,9 @@ public abstract class Component : IComponent
     /// <typeparam name="TReturn">The type of value returned from async handlers for the event</typeparam>
     /// <param name="callback">The function to call when the event is raised</param>
     protected void OnAsync<TEvent, TReturn>(Func<TEvent, Action<TReturn>, bool> callback) where TEvent : IAsyncEvent<TReturn> =>
-        OnCore<TEvent, Func<TEvent, Action<TReturn>, bool>>(callback, 
-            (c,x) => new AsyncHandler<TEvent, TReturn>(c, x));
+        OnCore<TEvent, Func<TEvent, Action<TReturn>, bool>>(
+            callback, 
+            (c,x) => new AsyncHandler<TEvent, TReturn>(c, x, false));
 
     /// <summary>
     /// Add an event handler callback to be called only when the relevant event
@@ -202,6 +203,36 @@ public abstract class Component : IComponent
     /// <param name="callback">The function to call when the event is raised</param>
     protected void OnDirectCall<T>(Action<T> callback) where T : IEvent => 
         OnCore<T, Action<T>>(callback, (c, x) => new ReceiveOnlyHandler<T>(c, x));
+
+    /// <summary>
+    /// Add an event handler callback to be called after all the On handlers for
+    /// the relevant event type have been called.
+    /// </summary>
+    /// <typeparam name="T">The event type to handle</typeparam>
+    /// <param name="callback">The function to call after the event is raised</param>
+    protected void After<T>(Action<T> callback) where T : IEvent => 
+        OnCore<T, Action<T>>(callback, (c, x) => new Handler<T>(c, x, true));
+
+    /// <summary>
+    /// Add an event handler callback to be called after all the On handlers for
+    /// the relevant event type have been called.
+    /// </summary>
+    /// <typeparam name="T">The event type to handle</typeparam>
+    /// <param name="callback">The function to call when the event is raised</param>
+    protected void AfterAsync<T>(Func<T, Action, bool> callback) where T : IAsyncEvent =>
+        OnCore<T, Func<T, Action, bool>>(callback, (c,x)=> new AsyncHandler<T>(c, x, true));
+
+    /// <summary>
+    /// Add an event handler callback to be called after all the On handlers for
+    /// the relevant event type have been called.
+    /// </summary>
+    /// <typeparam name="TEvent">The event type to handle</typeparam>
+    /// <typeparam name="TReturn">The type of value returned from async handlers for the event</typeparam>
+    /// <param name="callback">The function to call when the event is raised</param>
+    protected void AfterAsync<TEvent, TReturn>(Func<TEvent, Action<TReturn>, bool> callback) where TEvent : IAsyncEvent<TReturn> =>
+        OnCore<TEvent, Func<TEvent, Action<TReturn>, bool>>(
+            callback, 
+            (c,x) => new AsyncHandler<TEvent, TReturn>(c, x, true));
 
     /// <summary>
     /// Cease handling the relevant event type.

@@ -12,15 +12,11 @@ namespace UAlbion.Game.Veldrid;
 public class VeldridGameFactory : VeldridCoreFactory, IGameFactory
 {
     //*
-    public IMapLayer CreateMapLayer(
-        LogicalMap2D logicalMap,
-        ITileGraphics tileset,
-        Vector2 tileSize,
-        DrawLayer renderOrder)
+    public IMapLayer CreateMapLayer(LogicalMap2D logicalMap, ITileGraphics tileset, Vector2 tileSize)
     {
         if (logicalMap == null) throw new ArgumentNullException(nameof(logicalMap));
         if (tileset == null) throw new ArgumentNullException(nameof(tileset));
-        return new TileRendererMapLayer(logicalMap, tileset, tileSize, renderOrder);
+        return new TileRendererMapLayer(logicalMap, tileset, tileSize, DrawLayer.Underlay);
     }
 
     /*/

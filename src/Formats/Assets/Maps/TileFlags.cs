@@ -16,7 +16,9 @@ public enum TileFlags : uint
     // Animation cycle options
     Bouncy = 1, // 0x00000001 - Animation bounces back and forth from first to last frame instead of starting over again
     UseUnderlayFlags = 1U << 1, // 0x00000002 a small orange debug marker shown in top left when this is set on an overlay tile
-    Type1      = 1U << 2,  // 0x00000004  
+    // Is this actually UseUnderlayFlags?
+    Type1      = 1U << 2,  // 0x00000004 - set for all overlay tiles.
+    // fires in 143 - makes anim cycle phases non uniform.
     Type2      = 1U << 3,  // 0x00000008  
     Type4      = 1U << 4,  // 0x00000010  
 
@@ -37,12 +39,17 @@ public enum TileFlags : uint
     Unused15   = 1U << 15, // 0x00008000  
     Unused16   = 1U << 16, // 0x00010000  
     Unused17   = 1U << 17, // 0x00020000  
-    Unk18      = 1U << 18, // 0x00040000  
+    /* Examples:
+     * Stairs up in 117 (mix of under+overlay)
+     * Also Arjano
+     */
+    Unk18      = 1U << 18, // 0x00040000
     Unused19   = 1U << 19, // 0x00080000  
     Unused20   = 1U << 20, // 0x00100000  
 
     // Debug options
     NoDraw     = 1U << 21, // 0x00200000  
+    // e.g. south-side chairs on 230
     DebugDot   = 1U << 22, // 0x00400000  Orange dot in lower right, both layers.
 
     // Sitting options

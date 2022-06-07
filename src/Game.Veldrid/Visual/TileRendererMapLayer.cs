@@ -6,6 +6,7 @@ using UAlbion.Api.Visual;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game.Entities.Map2D;
+using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Veldrid.Visual;
 
@@ -17,6 +18,7 @@ public class TileRendererMapLayer : Component, IMapLayer
     readonly DrawLayer _renderOrder;
     TileLayerRenderable _layerRenderable;
     TilesetResourceHolder _tilesetResources;
+    DebugFlags _debugFlags;
 
     public TileRendererMapLayer(
         LogicalMap2D map,
@@ -61,6 +63,21 @@ public class TileRendererMapLayer : Component, IMapLayer
         }
     }
 
+    public DebugFlags DebugFlags
+    {
+        get => _debugFlags;
+        set
+        {
+            _debugFlags = value;
+            if (_layerRenderable == null) return;
+            _layerRenderable.IsCollisionLayerActive = (value & DebugFlags.CollisionLayer) != 0;
+            _layerRenderable.IsSitLayerActive = (value & DebugFlags.SitLayer) != 0;
+            _layerRenderable.IsMiscLayerActive = (value & DebugFlags.MiscLayer) != 0;
+            _layerRenderable.IsZoneLayerActive = (value & DebugFlags.ZoneLayer) != 0;
+            _layerRenderable.DrawDebugTiles = (value & DebugFlags.ShowDebugTiles) != 0;
+        }
+    }
+
     public void SetTile(int index, MapTile value) => _layerRenderable?.SetTile(index, value.Raw);
     protected override void Subscribed()
     {
@@ -72,6 +89,8 @@ public class TileRendererMapLayer : Component, IMapLayer
             MemoryMarshal.Cast<MapTile, uint>(_map.RawTiles),
             _renderOrder,
             _tilesetResources);
+
+        DebugFlags = _debugFlags; // Make sure the flags on the new renderable are set
     }
 
     protected override void Unsubscribed()

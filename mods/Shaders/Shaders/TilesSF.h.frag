@@ -21,13 +21,40 @@
 
 // GpuTileFlags
 #define TF_BOUNCY 0x1U
-#define TF_NO_DRAW 0x2U
-#define TF_USE_UNDERLAY 0x4U
+#define TF_USE_UNDERLAY_FLAGS 0x2U
+#define TF_TYPE1 0x4U
+#define TF_TYPE2 0x8U
+#define TF_TYPE4 0x10U
+#define TF_TYPE_MASK 0x1CU
+#define TF_LAYER1 0x20U
+#define TF_LAYER2 0x40U
+#define TF_LAYER_MASK 0x60U
+#define TF_COLL_TOP 0x80U
+#define TF_COLL_RIGHT 0x100U
+#define TF_COLL_BOTTOM 0x200U
+#define TF_COLL_LEFT 0x400U
+#define TF_SOLID 0x800U
+#define TF_COLL_MASK 0xF80U
+#define TF_UNK12 0x1000U
+#define TF_UNK18 0x40000U
+#define TF_NO_DRAW 0x200000U
+#define TF_DEBUG_DOT 0x400000U
+#define TF_MISC_MASK 0x641003U
+#define TF_SIT1 0x800000U
+#define TF_SIT2 0x1000000U
+#define TF_SIT4 0x2000000U
+#define TF_SIT8 0x4000000U
+#define TF_SIT_MASK 0x7800000U
 
 // GpuTileLayerFlags
 #define TLF_DRAW_UNDERLAY 0x1U
 #define TLF_DRAW_OVERLAY 0x2U
 #define TLF_OPAQUE_UNDERLAY 0x4U
+#define TLF_DRAW_COLLISION 0x8U
+#define TLF_DRAW_SIT_STATE 0x10U
+#define TLF_DRAW_MISC 0x20U
+#define TLF_DRAW_ZONES 0x40U
+#define TLF_DRAW_DEBUG 0x80U
 
 struct GpuTileData
 {

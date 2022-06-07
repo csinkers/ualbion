@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Api.Eventing;
-using UAlbion.Api.Visual;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
+using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Entities.Map2D;
 
@@ -15,9 +15,6 @@ public class MapRenderable2D : Component
 {
     readonly LogicalMap2D _logicalMap;
     readonly IMapLayer _mapLayer;
-    // readonly IMapLayer _overlay;
-    // readonly InfoOverlay _info;
-    // readonly MapAnnotationLayer _annotations;
     int _fastFrames;
     int _mapFrame;
 
@@ -28,12 +25,12 @@ public class MapRenderable2D : Component
         _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
         TileSize = tileSize;
 
-        _mapLayer = AttachChild(factory.CreateMapLayer(logicalMap, tileset, tileSize, DrawLayer.Underlay));
-        // _info = AttachChild(new InfoOverlay(logicalMap));
-        // _annotations = AttachChild(new MapAnnotationLayer(logicalMap, TileSize));
+        _mapLayer = AttachChild(factory.CreateMapLayer(logicalMap, tileset, tileSize));
 
         On<ToggleUnderlayEvent>(_ => _mapLayer.IsUnderlayActive = !_mapLayer.IsUnderlayActive);
         On<ToggleOverlayEvent>(_ => _mapLayer.IsOverlayActive = !_mapLayer.IsOverlayActive);
+        After<DebugFlagEvent>(_ => _mapLayer.DebugFlags = GetVar(UserVars.Debug.DebugFlags));
+
         On<FastClockEvent>(e =>
         {
             _fastFrames += e.Frames;
@@ -57,6 +54,7 @@ public class MapRenderable2D : Component
 
     protected override void Subscribed()
     {
+        _mapLayer.DebugFlags = GetVar(UserVars.Debug.DebugFlags);
         Raise(new LoadPaletteEvent(Palette));
         _logicalMap.Dirty += OnLogicalMapDirty;
     }

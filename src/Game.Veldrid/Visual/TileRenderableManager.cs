@@ -47,10 +47,7 @@ public sealed class TileRenderableManager : ServiceComponent<ITileRenderableMana
                 NightImage = tileset.GetNightRegionId(tile.ImageNumber),
                 FrameCount = tile.FrameCount,
                 Unk7 = tile.Unk7,
-                Flags = 
-                    (tile.Bouncy ? GpuTileFlags.Bouncy : 0)
-                    | (tile.NoDraw ? GpuTileFlags.NoDraw : 0)
-                    | (tile.UseUnderlayFlags ? GpuTileFlags.UseUnderlay : 0),
+                Flags = (GpuTileFlags)(uint)tile.RawFlags,
                 PalFrames = tileset.GetPaletteFrameCount(tile.ImageNumber)
             };
         }

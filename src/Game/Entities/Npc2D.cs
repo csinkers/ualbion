@@ -65,6 +65,12 @@ public class Npc2D : Component
 
     void Update()
     {
+        // TODO: Fix this hacky solution to the issue where
+        // a component gets removed from the exchange, but it
+        // was already in the dispatch list for an event in progress.
+        if (Exchange == null) 
+            return;
+
         switch (_state.MovementType)
         {
             case NpcMovement.Waypoints:

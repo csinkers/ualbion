@@ -208,7 +208,7 @@ public class ComponentTests
     public void HandlerFormatTest()
     {
         var c = new BasicComponent();
-        Assert.Equal("H<BasicComponent, BasicEvent>", new Handler<BasicEvent>(_ => { }, c).ToString());
+        Assert.Equal("H<BasicComponent, BasicEvent>", new Handler<BasicEvent>(_ => { }, c, false).ToString());
     }
 
     [Fact]

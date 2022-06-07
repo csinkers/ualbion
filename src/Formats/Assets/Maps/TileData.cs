@@ -106,6 +106,7 @@ public class TileData // 8 bytes per tile
     public ushort ImageNumber { get; set; }
     [DefaultValue(1)] public byte FrameCount { get; set; } // Maximum = 8
     public byte Unk7 { get; set; }
+    public TileFlags RawFlags => _raw;
     TileFlags _raw;
 
     public TileData() { }

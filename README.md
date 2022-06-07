@@ -9,11 +9,11 @@ Prerequisites:
 <details>
   <summary>Click to expand</summary>
 
-  ![Example Screenshot 1](/data/Screenshots/1_FirstLevel.png?raw=true)
-  ![Example Screenshot 2](/data/Screenshots/2_3DWorld.png?raw=true)
-  ![Example Screenshot 3](/data/Screenshots/3_Outdoors.png?raw=true)
-  ![Example Screenshot 4](/data/Screenshots/4_Inventory.png?raw=true)
-  ![Example Screenshot 5](/data/Screenshots/5_MainMenu.png?raw=true)
+  ![Example Screenshot 1](/.github/screenshots/1_FirstLevel.png?raw=true)
+  ![Example Screenshot 2](/.github/screenshots/2_3DWorld.png?raw=true)
+  ![Example Screenshot 3](/.github/screenshots/3_Outdoors.png?raw=true)
+  ![Example Screenshot 4](/.github/screenshots/4_Inventory.png?raw=true)
+  ![Example Screenshot 5](/.github/screenshots/5_MainMenu.png?raw=true)
 </details>
 
 ## Current Status

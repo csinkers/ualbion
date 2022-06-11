@@ -87,7 +87,7 @@ vec4 DrawCollision(vec2 tileUv, uint flags, bool isUnderlay)
 	if (flag(flags, TF_SOLID))
 		t *= 1.0-FilledRect(pos, tl+.03, tl+.03, br-.03, br-.03);
 
-	vec4 color = (1-t) * (isUnderlay ? vec4(0.8, 0.8, 0., 1.) : vec4(1.0));
+	vec4 color = (1-t) * (isUnderlay ? vec4(0.65, 0.65, 0., 1.) : vec4(1.0));
 	return color;
 }
 
@@ -132,6 +132,9 @@ vec4 GetLayer(uint tileIndex, vec2 tileUv, vec2 deltaX, vec2 deltaY, bool opaque
 	const uint nightIndex  = tile.NightImage + frameOffset;
 
 	vec4 color = SampleRegion(dayIndex, tileUv, deltaX, deltaY, opaque);
+	color = ((uLayerFlags & TLF_DRAW_DEBUG) == 0 && flag(tile.Flags, TF_NO_DRAW))
+		? vec4(0)
+		: color;
 
 	if (flag(uTilesetFlags, TSF_USE_BLEND))
 	{
@@ -163,9 +166,7 @@ vec4 GetLayer(uint tileIndex, vec2 tileUv, vec2 deltaX, vec2 deltaY, bool opaque
 	}
 
 	layer = tile.Layer;
-	return ((uLayerFlags & TLF_DRAW_DEBUG) == 0 && flag(tile.Flags, TF_NO_DRAW))
-		? vec4(0)
-		: color;
+	return color;
 }
 
 void ClampTileUV(inout vec2 tileUv)

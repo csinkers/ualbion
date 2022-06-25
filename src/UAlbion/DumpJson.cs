@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
+using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats;
@@ -40,14 +40,8 @@ class DumpJson : Component, IAssetDumper
             disposeList.Clear();
         }
 
-        var settings = new JsonSerializerSettings
-        {
-            Formatting = Formatting.Indented,
-            DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
-        };
-
         var assets = Resolve<IAssetManager>();
-        var s = JsonSerializer.Create(settings);
+        var jsonUtil = Resolve<IJsonUtil>();
         TextWriter tw;
         if (types.Contains(AssetType.Tileset))
         {
@@ -56,7 +50,7 @@ class DumpJson : Component, IAssetDumper
                 TilesetData asset = assets.LoadTileData(id);
                 if (asset == null) continue;
                 tw = Writer($"tilesets/tileset{id.Id}.json");
-                s.Serialize(tw, asset);
+                tw.WriteLine(jsonUtil.Serialize(asset));
             }
 
             Flush();
@@ -69,7 +63,7 @@ class DumpJson : Component, IAssetDumper
                 LabyrinthData asset = assets.LoadLabyrinthData(id);
                 if (asset == null) continue;
                 tw = Writer($"labdata/labyrinth{id.Id}.json");
-                s.Serialize(tw, asset);
+                tw.WriteLine(jsonUtil.Serialize(asset));
             }
 
             Flush();
@@ -84,7 +78,7 @@ class DumpJson : Component, IAssetDumper
                 IMapData asset = assets.LoadMap(id);
                 if (asset == null) continue;
                 tw = Writer($"maps/map{id.Id}_{id}.json");
-                s.Serialize(tw, asset);
+                tw.WriteLine(jsonUtil.Serialize(asset));
             }
 
             Flush();
@@ -93,14 +87,14 @@ class DumpJson : Component, IAssetDumper
         if (types.Contains(AssetType.Item))
         {
             tw = Writer("items.json");
-            s.Serialize(tw, DumpUtil.AllAssets(AssetType.Item, dumpIds, x => assets.LoadItem(x)));
+            tw.WriteLine(jsonUtil.Serialize(DumpUtil.AllAssets(AssetType.Item, dumpIds, x => assets.LoadItem(x))));
             Flush();
         }
 
         if (types.Contains(AssetType.PartySheet))
         {
             tw = Writer("party_members.json");
-            s.Serialize(tw, DumpUtil.AllAssets(AssetType.PartySheet, dumpIds, x => assets.LoadSheet(x)));
+            tw.WriteLine(jsonUtil.Serialize(DumpUtil.AllAssets(AssetType.PartySheet, dumpIds, x => assets.LoadSheet(x))));
             Flush();
 
         }
@@ -108,7 +102,7 @@ class DumpJson : Component, IAssetDumper
         if (types.Contains(AssetType.NpcSheet))
         {
             tw = Writer("npcs.json");
-            s.Serialize(tw, DumpUtil.AllAssets(AssetType.NpcSheet, dumpIds, x => assets.LoadSheet(x)));
+            tw.WriteLine(jsonUtil.Serialize(DumpUtil.AllAssets(AssetType.NpcSheet, dumpIds, x => assets.LoadSheet(x))));
             Flush();
         }
 
@@ -116,7 +110,7 @@ class DumpJson : Component, IAssetDumper
         {
 
             tw = Writer("monsters.json");
-            s.Serialize(tw, DumpUtil.AllAssets(AssetType.MonsterSheet, dumpIds, x => assets.LoadSheet(x)));
+            tw.WriteLine(jsonUtil.Serialize(DumpUtil.AllAssets(AssetType.MonsterSheet, dumpIds, x => assets.LoadSheet(x))));
             Flush();
         }
 
@@ -124,7 +118,7 @@ class DumpJson : Component, IAssetDumper
         {
 
             tw = Writer("chests.json");
-            s.Serialize(tw, DumpUtil.AllAssets(AssetType.Chest, dumpIds, assets.LoadInventory));
+            tw.WriteLine(jsonUtil.Serialize(DumpUtil.AllAssets(AssetType.Chest, dumpIds, assets.LoadInventory)));
             Flush();
         }
 
@@ -132,7 +126,7 @@ class DumpJson : Component, IAssetDumper
         {
 
             tw = Writer("merchants.json");
-            s.Serialize(tw, DumpUtil.AllAssets(AssetType.Merchant, dumpIds, assets.LoadInventory));
+            tw.WriteLine(jsonUtil.Serialize(DumpUtil.AllAssets(AssetType.Merchant, dumpIds, assets.LoadInventory)));
             Flush();
         }
 
@@ -143,7 +137,7 @@ class DumpJson : Component, IAssetDumper
                 IList<Block> asset = assets.LoadBlockList(id);
                 if (asset == null) continue;
                 tw = Writer($"blocks/blocklist{id.Id}.json");
-                s.Serialize(tw, asset);
+                tw.WriteLine(jsonUtil.Serialize(asset));
             }
             Flush();
         }
@@ -151,7 +145,7 @@ class DumpJson : Component, IAssetDumper
         if (types.Contains(AssetType.EventSet))
         {
             tw = Writer("event_sets.json");
-            s.Serialize(tw, DumpUtil.AllAssets(AssetType.EventSet, dumpIds, x => assets.LoadEventSet(x)));
+            tw.WriteLine(jsonUtil.Serialize(DumpUtil.AllAssets(AssetType.EventSet, dumpIds, x => assets.LoadEventSet(x))));
             Flush();
         }
 
@@ -162,7 +156,7 @@ class DumpJson : Component, IAssetDumper
                 IList<IEvent> asset = assets.LoadScript(id);
                 if (asset == null) continue;
                 tw = Writer($"scripts/script{id.Id}.json");
-                s.Serialize(tw, asset.Select(x => x.ToString()).ToArray());
+                tw.WriteLine(jsonUtil.Serialize(asset.Select(x => x.ToString()).ToArray()));
             }
             Flush();
         }
@@ -170,14 +164,14 @@ class DumpJson : Component, IAssetDumper
         if (types.Contains(AssetType.Spell))
         {
             tw = Writer("spells.json");
-            s.Serialize(tw, DumpUtil.AllAssets(AssetType.Spell, dumpIds, x => assets.LoadSpell(x)));
+            tw.WriteLine(jsonUtil.Serialize(DumpUtil.AllAssets(AssetType.Spell, dumpIds, x => assets.LoadSpell(x))));
             Flush();
         }
 
         if (types.Contains(AssetType.MonsterGroup))
         {
             tw = Writer("monster_groups.json");
-            s.Serialize(tw, DumpUtil.AllAssets(AssetType.MonsterGroup, dumpIds, x => assets.LoadMonsterGroup(x)));
+            tw.WriteLine(jsonUtil.Serialize(DumpUtil.AllAssets(AssetType.MonsterGroup, dumpIds, x => assets.LoadMonsterGroup(x))));
             Flush();
         }
 
@@ -187,7 +181,7 @@ class DumpJson : Component, IAssetDumper
             {
                 tw = Writer($"palettes/palette{id.Id}_{id}.json");
                 var palette = assets.LoadPalette(id);
-                s.Serialize(tw, palette);
+                tw.WriteLine(jsonUtil.Serialize(palette));
             }
             Flush();
         }

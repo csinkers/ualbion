@@ -8,5 +8,5 @@ public interface ICombatAttributes
     byte ActionPoints { get; }
     ushort UnknownD6 { get; }
     ushort UnknownD8 { get; }
-    Conditions Conditions { get; }
+    PlayerConditions Conditions { get; }
 }

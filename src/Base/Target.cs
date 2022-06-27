@@ -7,5 +7,5 @@ public enum Target : byte
     Inventory,
     Attacker,
     Target,
-    LastMessageTarget
+    Subject
 }

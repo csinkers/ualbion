@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
+using UAlbion.Base;
 using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
@@ -19,8 +21,22 @@ namespace UAlbion.Game.State;
 
 public class GameState : ServiceComponent<IGameState>, IGameState
 {
+    readonly SheetApplier _sheetApplier;
     SavedGame _game;
     Party _party;
+    CharacterSheet _leader;
+    CharacterSheet _subject;
+    CharacterSheet _inventory;
+    CharacterSheet _combatant;
+    CharacterSheet _victim;
+    ItemData _weapon;
+
+    public ICharacterSheet Leader    => _leader;
+    public ICharacterSheet Subject   => _subject;
+    public ICharacterSheet Inventory => _inventory;
+    public ICharacterSheet Combatant => _combatant;
+    public ICharacterSheet Victim    => _victim;
+    public ItemData Weapon => _weapon;
 
     public DateTime Time => SavedGame.Epoch + (_game?.ElapsedTime ?? TimeSpan.Zero);
     public IParty Party => _party;
@@ -81,9 +97,77 @@ public class GameState : ServiceComponent<IGameState>, IGameState
                 case SwitchOperation.Toggle: _game.SetChainDisabled(e.Map, e.ChainNumber, !_game.IsChainDisabled(e.Map, e.ChainNumber)); break;
             }
         });
+        On<DataChangeEvent>(OnDataChange);
+        On<SetContextEvent>(e =>
+        {
+            var assets = Resolve<IAssetManager>();
+            var state = Resolve<IGameState>();
+
+            var asset = e.AssetId.Type switch
+            {
+                AssetType.PartyMember => (object)state.GetSheet(((PartyMemberId)e.AssetId).ToSheet()),
+                AssetType.PartySheet => state.GetSheet(e.AssetId),
+                AssetType.NpcSheet => state.GetSheet(e.AssetId),
+                AssetType.MonsterSheet => assets.LoadSheet(e.AssetId),
+                AssetType.Item => assets.LoadItem(e.AssetId),
+                _ => null
+            };
+
+            switch (e.Type)
+            {
+                case ContextType.Leader: _leader = (CharacterSheet)asset; break;
+                case ContextType.Subject: _subject = (CharacterSheet)asset; break;
+                case ContextType.Inventory: _inventory = (CharacterSheet)asset; break;
+                case ContextType.Combatant: _combatant = (CharacterSheet)asset; break;
+                case ContextType.Victim: _victim = (CharacterSheet)asset; break;
+                case ContextType.Weapon: _weapon = (ItemData)asset; break;
+            }
+        });
 
         AttachChild(new InventoryManager(GetWriteableInventory));
+        _sheetApplier = AttachChild(new SheetApplier());
     }
+
+    CharacterSheet GetTarget(TargetId id)
+    {
+        switch (id.Type)
+        {
+            case AssetType.PartyMember or AssetType.NpcSheet:
+                return _game.Sheets.TryGetValue((AssetId)id, out var target) ? target : null;
+
+            case AssetType.Target:
+            {
+                if (id == Target.Leader) return _leader;
+                if (id == Target.Inventory) return _inventory;
+                if (id == Target.Attacker) return _combatant;
+                if (id == Target.Target) return _victim;
+                if (id == Target.Subject) return _subject;
+                return null;
+
+            }
+            default: return null;
+        }
+    }
+
+    void OnDataChange(IDataChangeEvent e)
+    {
+        if (e.Target == Target.Everyone)
+        {
+            foreach (var member in _party.StatusBarOrder.Select(x => _game.Sheets[x.Id.ToSheet()]))
+                _sheetApplier.Apply(e, member);
+            return;
+        }
+
+        var target = GetTarget(e.Target);
+        if (target == null)
+        {
+            Warn($"Could not resolve target {e.Target} when executing \"{e}\"");
+            return;
+        }
+
+        _sheetApplier.Apply(e, target);
+    }
+
 
     public IInventory GetInventory(InventoryId id)
     {

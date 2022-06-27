@@ -73,7 +73,7 @@ public sealed class DataChangeEvent : MapEvent, IDataChangeEvent
                 if (target == Base.Target.Inventory) return (DataChangeTarget.Inventory, 0);
                 if (target == Base.Target.Attacker) return (DataChangeTarget.Attacker, 0);
                 if (target == Base.Target.Target) return (DataChangeTarget.Target, 0);
-                if (target == Base.Target.LastMessageTarget) return (DataChangeTarget.LastMessageTarget, 0);
+                if (target == Base.Target.Subject) return (DataChangeTarget.Subject, 0);
                 return (DataChangeTarget.Leader, 0);
 
             case AssetType.NpcSheet: return (DataChangeTarget.Npc, (byte)target.Id);
@@ -92,7 +92,7 @@ public sealed class DataChangeEvent : MapEvent, IDataChangeEvent
             DataChangeTarget.Attacker => Base.Target.Attacker,
             DataChangeTarget.Target => Base.Target.Target,
             DataChangeTarget.Inventory => Base.Target.Inventory,
-            DataChangeTarget.LastMessageTarget => Base.Target.LastMessageTarget,
+            DataChangeTarget.Subject => Base.Target.Subject,
             _ => TargetId.None
         };
 }

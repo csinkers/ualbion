@@ -3,7 +3,7 @@
 namespace UAlbion.Formats.Assets;
 
 [Flags]
-public enum Conditions : ushort
+public enum PlayerConditions : ushort
 {
     UnconsciousMask = Unconscious | Poisoned | Asleep,
 

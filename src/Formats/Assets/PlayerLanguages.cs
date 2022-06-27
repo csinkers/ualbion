@@ -17,3 +17,14 @@ public enum PlayerLanguage : byte
     Iskai = 1,
     Celtic = 2
 }
+
+public static class PlayerLanguageExtensions
+{
+    public static PlayerLanguages ToFlag(this PlayerLanguage language) => language switch
+    {
+        PlayerLanguage.Terran => PlayerLanguages.Terran,
+        PlayerLanguage.Iskai => PlayerLanguages.Iskai,
+        PlayerLanguage.Celtic => PlayerLanguages.Celtic,
+        _ => throw new ArgumentOutOfRangeException(nameof(language), language, null)
+    };
+}

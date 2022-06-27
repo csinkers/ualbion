@@ -5,11 +5,9 @@ using System.Linq;
 using System.Text;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
-using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
-using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 
@@ -17,42 +15,6 @@ namespace UAlbion.Game.Text;
 
 public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
 {
-    ICharacterSheet _leader;
-    ICharacterSheet _subject;
-    ICharacterSheet _inventory;
-    ICharacterSheet _combatant;
-    ICharacterSheet _victim;
-    ItemData _weapon;
-
-    public TextFormatter()
-    {
-        On<SetContextEvent>(e =>
-        {
-            var assets = Resolve<IAssetManager>();
-            var state = Resolve<IGameState>();
-
-            var asset = e.AssetId.Type switch
-            {
-                AssetType.PartyMember => (object)state.GetSheet(((PartyMemberId)e.AssetId).ToSheet()),
-                AssetType.PartySheet => state.GetSheet(e.AssetId),
-                AssetType.NpcSheet => state.GetSheet(e.AssetId),
-                AssetType.MonsterSheet => assets.LoadSheet(e.AssetId),
-                AssetType.Item => assets.LoadItem(e.AssetId),
-                _ => null
-            };
-
-            switch (e.Type)
-            {
-                case ContextType.Leader: _leader = (ICharacterSheet)asset; break;
-                case ContextType.Subject: _subject = (ICharacterSheet)asset; break;
-                case ContextType.Inventory: _inventory = (ICharacterSheet)asset; break;
-                case ContextType.Combatant: _combatant = (ICharacterSheet)asset; break;
-                case ContextType.Victim: _victim = (ICharacterSheet)asset; break;
-                case ContextType.Weapon: _weapon = (ItemData)asset; break;
-            }
-        });
-    }
-
     public ITextFormatter NoWrap() => new CustomisedTextFormatter(this).NoWrap();
     public ITextFormatter Left() => new CustomisedTextFormatter(this).Left();
     public ITextFormatter Center() => new CustomisedTextFormatter(this).Center();
@@ -197,12 +159,12 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
                 }
 
                 // Change context
-                case Token.Combatant: active = _combatant; break;
-                case Token.Inventory: active = _inventory; break;
-                case Token.Leader: active = _leader; break;
-                case Token.Subject: active = _subject; break;
-                case Token.Victim: active = _victim; break;
-                case Token.Weapon: active = _weapon; break;
+                case Token.Combatant: active = Resolve<IGameState>().Combatant; break;
+                case Token.Inventory: active = Resolve<IGameState>().Inventory; break;
+                case Token.Leader: active = Resolve<IGameState>().Leader; break;
+                case Token.Subject: active = Resolve<IGameState>().Subject; break;
+                case Token.Victim: active = Resolve<IGameState>().Victim; break;
+                case Token.Weapon: active = Resolve<IGameState>().Weapon; break;
 
                 case Token.Parameter:
                     yield return (Token.Text, args[argNumber].ToString());
@@ -233,8 +195,8 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
                     Alignment = block.Alignment,
                     Style = block.Style,
                     Color = block.Color,
+                    Raw = raw
                 };
-                block.Raw = raw;
             }
 
             switch (token)

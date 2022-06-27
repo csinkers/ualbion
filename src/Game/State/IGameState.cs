@@ -25,4 +25,10 @@ public interface IGameState
     IList<NpcState> Npcs { get; }
     bool IsChainDisabled(MapId mapId, ushort chain);
     bool IsNpcDisabled(MapId mapId, byte npcNum);
+    ICharacterSheet Leader { get; }
+    ICharacterSheet Subject { get; }
+    ICharacterSheet Inventory { get; }
+    ICharacterSheet Combatant { get; }
+    ICharacterSheet Victim { get; }
+    ItemData Weapon { get; }
 }

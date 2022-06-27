@@ -24,5 +24,5 @@ public class InterpolatedCombat : ICombatAttributes
     public byte ActionPoints => (byte)ApiUtil.Lerp(_a().ActionPoints, _b().ActionPoints, _getLerp());
     public ushort UnknownD6 => (ushort)ApiUtil.Lerp(_a().UnknownD6, _b().UnknownD6, _getLerp());
     public ushort UnknownD8 => (ushort)ApiUtil.Lerp(_a().UnknownD8, _b().UnknownD8, _getLerp());
-    public Conditions Conditions => _b().Conditions;
+    public PlayerConditions Conditions => _b().Conditions;
 }

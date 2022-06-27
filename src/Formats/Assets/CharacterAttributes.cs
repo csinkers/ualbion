@@ -1,4 +1,5 @@
 ﻿using SerdesNet;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets;
 
@@ -42,6 +43,18 @@ public class CharacterAttribute : ICharacterAttribute
             attr.Backup = s.UInt16(nameof(Backup), attr.Backup);
         s.End();
         return attr;
+    }
+
+    public void Apply(NumericOperation operation, ushort amount)
+    {
+        Current = operation.Apply16(Current, amount, 0, Max);
+    }
+
+    public void ApplyToMax(NumericOperation operation, ushort amount)
+    {
+        Max = operation.Apply16(Max, amount);
+        if (Current > Max)
+            Current = Max;
     }
 }
 

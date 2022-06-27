@@ -9,7 +9,7 @@ public class CombatAttributes : ICombatAttributes
     public byte ActionPoints { get; set; }
     public ushort UnknownD6 { get; set; }
     public ushort UnknownD8 { get; set; }
-    public Conditions Conditions { get; set; }
+    public PlayerConditions Conditions { get; set; }
     public CombatAttributes DeepClone() => new CombatAttributes().CopyFrom(this);
     public CombatAttributes CopyFrom(CombatAttributes other)
     {

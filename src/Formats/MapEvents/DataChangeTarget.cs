@@ -9,5 +9,5 @@ public enum DataChangeTarget : byte
     Target = 4,
     Npc = 5,
     Inventory = 6, // related to inventory background images?
-    LastMessageTarget = 7
+    Subject = 7
 }

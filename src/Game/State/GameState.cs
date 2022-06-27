@@ -26,7 +26,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
     public IParty Party => _party;
     public ICharacterSheet GetSheet(SheetId id) => _game.Sheets.TryGetValue(id, out var sheet) ? sheet : null;
     public short GetTicker(TickerId id) => _game.Tickers.TryGetValue(id, out var value) ? value : (short)0;
-    public bool GetSwitch(SwitchId id) => _game.GetFlag(id);
+    public bool GetSwitch(SwitchId id) => _game.GetSwitch(id);
 
     public MapChangeCollection TemporaryMapChanges => _game.TemporaryMapChanges;
     public MapChangeCollection PermanentMapChanges => _game.PermanentMapChanges;
@@ -57,11 +57,11 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         });
         On<SwitchEvent>(e =>
         {
-            _game.SetFlag(e.SwitchId, e.Operation switch
+            _game.SetSwitch(e.SwitchId, e.Operation switch
             {
                 SwitchOperation.Clear => false,
                 SwitchOperation.Set => true,
-                SwitchOperation.Toggle => !_game.GetFlag(e.SwitchId),
+                SwitchOperation.Toggle => !_game.GetSwitch(e.SwitchId),
                 _ => false
             });
         });

@@ -91,7 +91,7 @@ public class IsometricBuilder : Component
             if (newId < 0)
                 return;
 
-            _labId = new LabyrinthId(AssetType.Labyrinth, newId);
+            _labId = new LabyrinthId(newId);
             Info($"LabId: {_labId} ({_labId.Id})");
             RecreateLayout();
         });

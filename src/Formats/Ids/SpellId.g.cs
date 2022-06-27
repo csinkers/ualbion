@@ -28,6 +28,15 @@ public readonly struct SpellId : IEquatable<SpellId>, IEquatable<AssetId>, IComp
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public SpellId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a SpellId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.Spell << 24 | (uint)id;
+    }
+
     SpellId(uint id) 
     {
         _value = id;

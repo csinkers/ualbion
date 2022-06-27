@@ -28,6 +28,15 @@ public readonly struct PartyMemberId : IEquatable<PartyMemberId>, IEquatable<Ass
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public PartyMemberId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a PartyMemberId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.PartyMember << 24 | (uint)id;
+    }
+
     PartyMemberId(uint id) 
     {
         _value = id;

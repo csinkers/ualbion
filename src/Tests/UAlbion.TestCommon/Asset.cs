@@ -114,6 +114,62 @@ public static class Asset
         return (bytes, annotation);
     }
 
+    public static string Load(byte[] bytes, Action<ISerializer> serdes)
+    {
+        using var stream = new MemoryStream(bytes);
+        using var br = new BinaryReader(stream);
+        using var ar = new AlbionReader(br, stream.Length);
+
+        using var annotationStream = new MemoryStream();
+        using var annotationWriter = new StreamWriter(annotationStream);
+        using var afs = new AnnotationProxySerializer(ar, annotationWriter, FormatUtil.BytesFrom850String);
+
+        Exception exception = null;
+        try
+        {
+            serdes(afs);
+        }
+        catch (Exception ex)
+        {
+            exception = ex;
+        }
+
+        annotationWriter.Flush();
+        var annotation = ReadToEnd(annotationStream);
+
+        if (exception != null)
+            throw new AssetSerializationException(exception, annotation);
+
+        if (afs.BytesRemaining > 0)
+            throw new InvalidOperationException($"{afs.BytesRemaining} bytes left over after reading");
+
+        return annotation;
+    }
+
+    public static (byte[], string) Save(Action<ISerializer> serdes)
+    {
+        using var ms = new MemoryStream();
+        using var bw = new BinaryWriter(ms);
+        using var annotationStream = new MemoryStream();
+        using var annotationWriter = new StreamWriter(annotationStream);
+        using var aw = new AnnotationProxySerializer(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
+
+        Exception exception = null;
+        try { serdes(aw); }
+        catch (Exception ex) { exception = ex; }
+
+        ms.Position = 0;
+        var bytes = ms.ToArray();
+        annotationWriter.Flush();
+        var annotation = ReadToEnd(annotationStream);
+
+        if (exception != null)
+            throw new AssetSerializationException(exception, annotation);
+
+        return (bytes, annotation);
+    }
+
+
     public static string SaveJson(object asset, IJsonUtil jsonUtil)
     {
         if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UAlbion.Api.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Game.Entities.Map2D;
 
@@ -10,6 +11,7 @@ public class MovementSettings : IMovementSettings
 {
     public MovementSettings(IDictionary<SpriteAnimation, int[]> frames) => Frames = frames;
     public IDictionary<SpriteAnimation, int[]> Frames { get; }
+    public bool CanSit { get; set; } = true;
     public int TicksPerTile { get; set; } // Number of game ticks it takes to move across a map tile
     public int TicksPerFrame { get; set; } // Number of game ticks it takes to advance to the next animation frame
     public int MinTrailDistance { get; set; }
@@ -17,20 +19,32 @@ public class MovementSettings : IMovementSettings
     public int TileWidth => 16;
     public int TileHeight => 16;
     public float GetDepth(float y) => DepthUtil.GetAbsDepth(y);
-    public int GetSpriteFrame(IMovementState state, bool isSeated)
+    public int GetSpriteFrame(IMovementState state, Func<int, int, SitMode> getSitMode)
     {
         if (state == null) throw new ArgumentNullException(nameof(state));
-        var anim = (state.FacingDirection, isSeated) switch
+        if (getSitMode == null) throw new ArgumentNullException(nameof(getSitMode));
+        var sitMode = getSitMode(state.X, state.Y);
+
+        var anim = state.FacingDirection switch
         {
-            (Direction.West, false) => SpriteAnimation.WalkW,
-            (Direction.East, false) => SpriteAnimation.WalkE,
-            (Direction.North, false) => SpriteAnimation.WalkN,
-            (Direction.South, false) => SpriteAnimation.WalkS,
-            (Direction.West, true) => SpriteAnimation.SitW,
-            (Direction.East, true) => SpriteAnimation.SitE,
-            (Direction.North, true) => SpriteAnimation.SitN,
-            (Direction.South, true) => SpriteAnimation.SitS,
+            Direction.West => SpriteAnimation.WalkW,
+            Direction.East => SpriteAnimation.WalkE,
+            Direction.North => SpriteAnimation.WalkN,
+            Direction.South => SpriteAnimation.WalkS,
             _ => SpriteAnimation.Sleeping
+        };
+
+        anim = sitMode switch
+        {
+            SitMode.NorthLeft => SpriteAnimation.SitN,
+            SitMode.NorthRight => SpriteAnimation.SitN,
+            SitMode.East => SpriteAnimation.SitE,
+            SitMode.SouthLeft => SpriteAnimation.SitS,
+            SitMode.SouthRight => SpriteAnimation.SitS,
+            SitMode.West => SpriteAnimation.SitW,
+            SitMode.Sleep => SpriteAnimation.Sleeping,
+            SitMode.Sleep2 => SpriteAnimation.Sleeping,
+            _ => anim
         };
 
         var frames = Frames[anim];

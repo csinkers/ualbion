@@ -28,6 +28,15 @@ public readonly struct TickerId : IEquatable<TickerId>, IEquatable<AssetId>, ICo
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public TickerId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a TickerId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.Ticker << 24 | (uint)id;
+    }
+
     TickerId(uint id) 
     {
         _value = id;

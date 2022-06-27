@@ -28,6 +28,15 @@ public readonly struct VideoId : IEquatable<VideoId>, IEquatable<AssetId>, IComp
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public VideoId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a VideoId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.Video << 24 | (uint)id;
+    }
+
     VideoId(uint id) 
     {
         _value = id;

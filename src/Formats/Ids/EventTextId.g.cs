@@ -28,6 +28,15 @@ public readonly struct EventTextId : IEquatable<EventTextId>, IEquatable<AssetId
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public EventTextId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a EventTextId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.EventText << 24 | (uint)id;
+    }
+
     EventTextId(uint id) 
     {
         _value = id;

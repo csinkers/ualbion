@@ -40,17 +40,17 @@ public class SavedGame
     public IDictionary<AssetId, Inventory> Inventories { get; } = new Dictionary<AssetId, Inventory>(); // TODO: Change to InventoryId?
     public IDictionary<AutomapId, byte[]> Automaps { get; } = new Dictionary<AutomapId, byte[]>();
 
-    readonly FlagSet _switches  = new(0, SwitchCount);
-    readonly FlagSet _unlockedChests  = new(0, ChestCount);
-    readonly FlagSet _unlockedDoors  = new(0, DoorCount);
-    readonly FlagSet _removedNpcs  = new(0, MapCount * NpcCountPerMap, NpcCountPerMap);
-    readonly FlagSet _disabledChains  = new(0, MapCount * ChainCountPerMap, ChainCountPerMap);
-    readonly FlagSet _automapMarkersFound = new(0, AutomapMarkerCount);
+    readonly FlagSet _switches  = new(SwitchCount);
+    readonly FlagSet _unlockedChests  = new(ChestCount);
+    readonly FlagSet _unlockedDoors  = new(DoorCount);
+    readonly FlagSet _removedNpcs  = new(MapCount, NpcCountPerMap);
+    readonly FlagSet _disabledChains  = new(MapCount, ChainCountPerMap);
+    readonly FlagSet _automapMarkersFound = new(AutomapMarkerCount);
     readonly TickerSet _tickers = new();
 
     public IDictionary<TickerId, byte> Tickers => _tickers;
-    public bool GetFlag(SwitchId flag) => _switches.GetFlag(flag.Id);
-    public void SetFlag(SwitchId flag, bool value) => _switches.SetFlag(flag.Id, value);
+    public bool GetSwitch(SwitchId flag) => _switches.GetFlag(flag.Id);
+    public void SetSwitch(SwitchId flag, bool value) => _switches.SetFlag(flag.Id, value);
     public bool IsNpcDisabled(MapId mapId, int npcNumber)
     {
         if (mapId.IsNone)
@@ -59,7 +59,7 @@ public class SavedGame
         // TODO: Check for possible off-by-one
         return npcNumber is < 0 or >= NpcCountPerMap
                || mapId.Id is < 0 or >= MapCount
-               || _removedNpcs.GetFlag(mapId.Id * NpcCountPerMap + npcNumber);
+               || _removedNpcs.GetFlag(mapId, npcNumber);
     }
 
     public void SetNpcDisabled(MapId mapId, int npcNumber, bool isDisabled)
@@ -70,7 +70,7 @@ public class SavedGame
         if (npcNumber is < 0 or >= NpcCountPerMap)
             return;
 
-        _removedNpcs.SetFlag(mapId.Id * NpcCountPerMap + npcNumber, isDisabled);
+        _removedNpcs.SetFlag(mapId, npcNumber, isDisabled);
     }
 
     public bool IsChainDisabled(MapId mapId, int chainNumber)
@@ -81,7 +81,7 @@ public class SavedGame
         // TODO: Check for possible off-by-one
         return chainNumber is < 0 or >= ChainCountPerMap
                || mapId.Id is < 0 or >= MapCount
-               || _disabledChains.GetFlag(mapId.Id * ChainCountPerMap + chainNumber);
+               || _disabledChains.GetFlag(mapId, chainNumber);
     }
 
     public void SetChainDisabled(MapId mapId, int chainNumber, bool isDisabled)
@@ -89,10 +89,7 @@ public class SavedGame
         if (mapId.IsNone)
             mapId = MapId;
 
-        if (chainNumber is < 0 or >= ChainCountPerMap)
-            return;
-
-        _disabledChains.SetFlag(mapId.Id * ChainCountPerMap + chainNumber, isDisabled);
+        _disabledChains.SetFlag(mapId, chainNumber, isDisabled);
     }
 
     public ushort Unk0 { get; set; }

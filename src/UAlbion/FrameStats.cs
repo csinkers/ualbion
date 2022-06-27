@@ -21,7 +21,7 @@ class FrameStats
             if (texture == null)
                 continue;
 
-            var palleteId = new PaletteId(AssetType.Palette, info.Get(AssetProperty.PaletteId, 0));
+            var palleteId = new PaletteId(info.Get(AssetProperty.PaletteId, 0));
             var palette = assets.LoadPalette(palleteId);
 
             var frames = texture.Regions.Count;

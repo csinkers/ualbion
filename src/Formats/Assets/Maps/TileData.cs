@@ -38,18 +38,18 @@ public class TileData // 8 bytes per tile
     public Passability Collision
     {
         get =>
-            ((_raw & TileFlags.CollTop)    != 0 ? Passability.Top    : 0) |
-            ((_raw & TileFlags.CollRight)  != 0 ? Passability.Right  : 0) |
-            ((_raw & TileFlags.CollBottom) != 0 ? Passability.Bottom : 0) |
-            ((_raw & TileFlags.CollLeft)   != 0 ? Passability.Left   : 0) |
-            ((_raw & TileFlags.Solid)     != 0 ? Passability.Solid  : 0);
+            ((_raw & TileFlags.CollTop)    != 0 ? Passability.BlockNorth : 0) |
+            ((_raw & TileFlags.CollRight)  != 0 ? Passability.BlockEast  : 0) |
+            ((_raw & TileFlags.CollBottom) != 0 ? Passability.BlockSouth : 0) |
+            ((_raw & TileFlags.CollLeft)   != 0 ? Passability.BlockWest  : 0) |
+            ((_raw & TileFlags.Solid)      != 0 ? Passability.Solid  : 0);
         set => _raw =
             _raw & ~TileFlags.CollMask
-            | ((value & Passability.Top   ) != 0 ? TileFlags.CollTop    : 0)
-            | ((value & Passability.Right ) != 0 ? TileFlags.CollRight  : 0)
-            | ((value & Passability.Bottom) != 0 ? TileFlags.CollBottom : 0)
-            | ((value & Passability.Left  ) != 0 ? TileFlags.CollLeft   : 0)
-            | ((value & Passability.Solid ) != 0 ? TileFlags.Solid      : 0);
+            | ((value & Passability.BlockNorth) != 0 ? TileFlags.CollTop    : 0)
+            | ((value & Passability.BlockEast ) != 0 ? TileFlags.CollRight  : 0)
+            | ((value & Passability.BlockSouth) != 0 ? TileFlags.CollBottom : 0)
+            | ((value & Passability.BlockWest ) != 0 ? TileFlags.CollLeft   : 0)
+            | ((value & Passability.Solid ) != 0 ? TileFlags.Solid : 0);
     }
 
     public SitMode SitMode
@@ -106,7 +106,7 @@ public class TileData // 8 bytes per tile
     public ushort ImageNumber { get; set; }
     [DefaultValue(1)] public byte FrameCount { get; set; } // Maximum = 8
     public byte Unk7 { get; set; }
-    public TileFlags RawFlags => _raw;
+    [JsonIgnore] public TileFlags RawFlags => _raw;
     TileFlags _raw;
 
     public TileData() { }
@@ -129,7 +129,7 @@ public class TileData // 8 bytes per tile
         Index = (ushort)index;
         Layer = layer;
         Type = type;
-        Collision = Passability.Passable;
+        Collision = Passability.Open;
         ImageNumber = imageNumber;
         FrameCount = 1;
         Unk7 = 0;

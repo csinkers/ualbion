@@ -758,7 +758,7 @@ public class AssetLoadTests : IDisposable
         var t = ts.Tiles[0];
         Assert.Equal(TileLayer.Normal, t.Layer);
         Assert.Equal(TileType.Unk0, t.Type);
-        Assert.Equal(Passability.Passable, t.Collision);
+        Assert.Equal(Passability.Open, t.Collision);
         Assert.Equal(0xffff, t.ImageNumber);
         Assert.Equal(1, t.FrameCount);
         Assert.Equal(0, t.Unk7);

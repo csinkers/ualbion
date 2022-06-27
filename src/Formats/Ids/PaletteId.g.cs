@@ -28,6 +28,15 @@ public readonly struct PaletteId : IEquatable<PaletteId>, IEquatable<AssetId>, I
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public PaletteId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a PaletteId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.Palette << 24 | (uint)id;
+    }
+
     PaletteId(uint id) 
     {
         _value = id;

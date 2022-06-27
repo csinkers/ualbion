@@ -80,6 +80,17 @@ public static class Constants
     public const byte CGrey15 = (byte)CommonColor.Grey15;
     public const byte CMidGrey = (byte)CommonColor.MidGrey;
 
+    public readonly static byte[] CRainbowLoop = {
+        (byte)CommonColor.Flesh1,
+        (byte)CommonColor.Flesh2,
+        (byte)CommonColor.Flesh3,
+        (byte)CommonColor.Flesh4,
+        (byte)CommonColor.Flesh5,
+        (byte)CommonColor.Flesh6,
+        (byte)CommonColor.Flesh7,
+        (byte)CommonColor.Flesh8,
+    };
+
     static readonly uint[] RawPalette = {
                  0,          0,          0, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 
         4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 

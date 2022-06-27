@@ -1,6 +1,8 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
@@ -14,13 +16,15 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
 
     readonly (Vector3, int)[] _trail; // Positions (tile coordinates) and frame numbers.
     readonly (int, bool)[] _playerOffsets = new (int, bool)[Party.MaxPartySize]; // int = trail offset, bool = isMoving
+    readonly LogicalMap2D _logicalMap;
     Vector2 _direction;
     int _trailOffset;
     int TrailLength => Party.MaxPartySize * _settings.MaxTrailDistance; // Number of past positions to store
 
-    public PartyCaterpillar(Vector2 initialPosition, Direction initialDirection, MovementSettings settings)
+    public PartyCaterpillar(Vector2 initialPosition, Direction initialDirection, MovementSettings settings, LogicalMap2D logicalMap)
     {
-        _settings = settings;
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
         _state = new PlayerMovementState(settings)
         {
             X = (ushort)initialPosition.X,
@@ -34,8 +38,8 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
 
         var offset = initialDirection switch
         {
-            Direction.West  => new Vector2(1.0f, 0.0f),
-            Direction.East  => new Vector2(-1.0f, 0.0f),
+            Direction.West => new Vector2(1.0f, 0.0f),
+            Direction.East => new Vector2(-1.0f, 0.0f),
             Direction.North => new Vector2(0.0f, -1.0f),
             Direction.South => new Vector2(0.0f, 1.0f),
             _ => Vector2.Zero
@@ -44,7 +48,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
         for (int i = 0; i < _trail.Length; i++)
         {
             var position = initialPosition + offset * i;
-            _trail[_trailOffset - i] = (To3D(position), settings.GetSpriteFrame(_state, false));
+            _trail[_trailOffset - i] = (To3D(position), settings.GetSpriteFrame(_state, GetSitMode));
         }
 
         On<FastClockEvent>(_ => Update());
@@ -77,7 +81,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
     void Update()
     {
         var detector = Resolve<ICollisionManager>();
-        if (Movement2D.Update(_state,
+        if (Movement2D.Instance.Update(_state,
                 _settings,
                 detector,
                 (int)_direction.X,
@@ -93,19 +97,26 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
         MoveFollowers();
     }
 
+    SitMode GetSitMode(int x, int y)
+    {
+        var underlay = _logicalMap.GetUnderlay(x, y)?.SitMode ?? 0;
+        var overlay = _logicalMap.GetOverlay(x, y)?.SitMode ?? 0;
+        return overlay == 0 ? underlay : overlay;
+    }
+
     void MoveLeader(Vector2 position)
     {
         _trailOffset++;
         if (_trailOffset >= _trail.Length)
             _trailOffset = 0;
 
-        _trail[_trailOffset] = (To3D(position), _settings.GetSpriteFrame(_state, false));
+        _trail[_trailOffset] = (To3D(position), _settings.GetSpriteFrame(_state, GetSitMode));
         _playerOffsets[0] = (_trailOffset, true);
     }
 
     void MoveFollowers()
     {
-        for(int i = 1; i < _playerOffsets.Length; i++)
+        for (int i = 1; i < _playerOffsets.Length; i++)
         {
             int predecessorAge = OffsetAge(_playerOffsets[i - 1].Item1);
             int myAge = OffsetAge(_playerOffsets[i].Item1);
@@ -122,9 +133,9 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
         }
     }
 
-    public (Vector3, int) GetPositionHistory(int followerIndex) 
-        => followerIndex >= _playerOffsets.Length 
-            ? (Vector3.Zero, 0) 
+    public (Vector3, int) GetPositionHistory(int followerIndex)
+        => followerIndex >= _playerOffsets.Length
+            ? (Vector3.Zero, 0)
             : _trail[_playerOffsets[followerIndex].Item1];
 
     Vector3 To3D(Vector2 position) => new(position, _settings.GetDepth(position.Y));

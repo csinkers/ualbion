@@ -5,10 +5,10 @@ namespace UAlbion.Formats.Assets.Maps;
 [Flags]
 public enum Passability : byte
 {
-    Passable = 0,
-    Top    = 1 << 1,
-    Right  = 1 << 2,
-    Bottom = 1 << 3,
-    Left   = 1 << 4,
-    Solid  = 1 << 5,
+    Open = 0,
+    BlockNorth = 0x1,
+    BlockEast  = 0x2,
+    BlockSouth = 0x4,
+    BlockWest  = 0x8,
+    Solid = 0x10,
 }

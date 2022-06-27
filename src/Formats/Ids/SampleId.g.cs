@@ -28,6 +28,15 @@ public readonly struct SampleId : IEquatable<SampleId>, IEquatable<AssetId>, ICo
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public SampleId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a SampleId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.Sample << 24 | (uint)id;
+    }
+
     SampleId(uint id) 
     {
         _value = id;

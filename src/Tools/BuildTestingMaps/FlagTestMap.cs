@@ -34,7 +34,7 @@ public static class FlagTestMap
             }
 
             ushort n = 0;
-//* -- For investigating NPC behaviour and events --
+/* -- For investigating NPC behaviour and events --
             void Add(int x, int y, string name, Func<Func<string, int>, string> scriptBuilder)
             {
                 for (var index = 0; index < name.Length; index++)
@@ -52,7 +52,7 @@ public static class FlagTestMap
             {
                 var text = scriptBuilder(builder!.AddMapText);
                 var script = ScriptLoader.Parse(ApiUtil.SplitLines(text));
-                var scriptId = new ScriptId(AssetType.Script, nextScriptId++);
+                var scriptId = new ScriptId(nextScriptId++);
                 assets![scriptId] = script;
                 return "do_script " + scriptId.Id;
             }
@@ -89,7 +89,7 @@ public static class FlagTestMap
 
             var chest = new Inventory(new InventoryId(InventoryType.Chest, 2));
             chest.Slots[0].ItemId = Item.Sword;
-            assets[new ChestId(AssetType.Chest, 2)] = chest;
+            assets[new ChestId(2)] = chest;
             Add(1, n+1, "C0", s =>
             {
                 var openText = s("Opened chest 1");
@@ -246,12 +246,19 @@ if (get_ticker 101 Equals 0) {{
                 int x0 = 2 + i;
                 int y0 = 2 + j;
                 int num = i; // + j * 4;
-                map.Overlay[Pos(x0, y0)]     = Tileset1.AnimLoopOffset  + num;
-                map.Overlay[Pos(x0, y0 + 1)] = Tileset1.AnimLoopOverlayOffset  + num;
-                map.Overlay[Pos(x0, y0 + 4)] = Tileset1.AnimCycleOffset + num;
-                map.Overlay[Pos(x0, y0 + 5)] = Tileset1.AnimCycleOverlayOffset + num;
+                map.Tiles[Pos(x0, y0)].Overlay     = (ushort)(Tileset1.AnimLoopOffset  + num);
+                map.Tiles[Pos(x0, y0 + 1)].Overlay = (ushort)(Tileset1.AnimLoopOverlayOffset  + num);
+                map.Tiles[Pos(x0, y0 + 4)].Overlay = (ushort)(Tileset1.AnimCycleOffset + num);
+                map.Tiles[Pos(x0, y0 + 5)].Overlay = (ushort)(Tileset1.AnimCycleOverlayOffset + num);
             }); //*/
 
+            MajMin(8, 8, (i, j) =>
+            {
+                int x0 = 2 + i;
+                int y0 = 2 + j;
+                for (int unk7 = 0; unk7 < 8; unk7++)
+                    map.Tiles[Pos(x0 + (unk7 % 4) * 9, y0 + (unk7 / 4) * 9)].Overlay = (ushort)(Tileset1.Unk7Type0Offset + unk7);
+            });
         });
 
         var (finalMap, mapText) = builder.Build();

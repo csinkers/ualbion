@@ -28,6 +28,15 @@ public readonly struct PictureId : IEquatable<PictureId>, IEquatable<AssetId>, I
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public PictureId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a PictureId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.Picture << 24 | (uint)id;
+    }
+
     PictureId(uint id) 
     {
         _value = id;

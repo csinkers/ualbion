@@ -6,35 +6,43 @@ namespace UAlbion.Game.Entities.Map2D;
 
 public class Collider2D : Component, IMovementCollider
 {
-    readonly LogicalMap2D _logicalMap;
+    readonly Func<int, int, Passability> _getPassability;
     readonly bool _isLargeMap;
 
-    public Collider2D(LogicalMap2D logicalMap, bool isLargeMap)
+    public Collider2D(Func<int, int, Passability> getPassability, bool isLargeMap)
     {
-        _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
+        _getPassability = getPassability ?? throw new ArgumentNullException(nameof(getPassability));
         _isLargeMap = isLargeMap;
     }
 
     protected override void Subscribed() => Resolve<ICollisionManager>()?.Register(this);
     protected override void Unsubscribed() => Resolve<ICollisionManager>()?.Unregister(this);
-    public bool IsOccupied(int tx, int ty) => 
-        IsOccupiedCore(tx, ty) || 
-        _isLargeMap && IsOccupiedCore(tx-1, ty);
+    public bool IsOccupied(int fromX, int fromY, int toX, int toY) => 
+        IsOccupiedCore(fromX, fromY, toX, toY) ||
+        _isLargeMap && IsOccupiedCore(fromX - 1, fromY, toX - 1, toY);
 
-    bool IsOccupiedCore(int tx, int ty)
+    bool IsOccupiedCore(int fromX, int fromY, int toX, int toY)
     {
-        if (tx < 0) return true;
-        if (ty < 0) return true;
-        if (tx >= _logicalMap.Width) return true;
-        if (ty >= _logicalMap.Height) return true;
-
-        var underlayTile = _logicalMap.GetUnderlay(tx, ty);
-        var overlayTile = _logicalMap.GetOverlay(tx, ty);
-
-        bool underlayBlocked = underlayTile != null && underlayTile.Collision != Passability.Passable;
-        bool overlayBlocked = overlayTile != null && overlayTile.Collision != Passability.Passable;
-        return underlayBlocked || overlayBlocked;
+        int dx = Math.Sign(toX - fromX);
+        int dy = Math.Sign(toY - fromY);
+        var sourcePassability = _getPassability(fromX, fromY);
+        var destPassability = _getPassability(toX, toY);
+        bool sourceOk = IsAllowed(dx, dy, sourcePassability);
+        bool destOk = IsAllowed(-dx, -dy, destPassability);
+        return !sourceOk || !destOk;
     }
 
-    public Passability GetPassability(int tx, int ty) => _logicalMap.GetPassability(_logicalMap.Index(tx, ty));
+    static bool IsAllowed(int dx, int dy, Passability passability) =>
+        (passability & Passability.Solid) == 0 &&
+        dx switch
+        {
+            > 0 when (passability & Passability.BlockEast) != 0 => false,
+            < 0 when (passability & Passability.BlockWest) != 0 => false,
+            _ => dy switch
+            {
+                < 0 when (passability & Passability.BlockNorth) != 0 => false,
+                > 0 when (passability & Passability.BlockSouth) != 0 => false,
+                _ => true
+            }
+        };
 }

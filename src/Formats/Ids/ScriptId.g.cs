@@ -28,6 +28,15 @@ public readonly struct ScriptId : IEquatable<ScriptId>, IEquatable<AssetId>, ICo
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public ScriptId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a ScriptId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.Script << 24 | (uint)id;
+    }
+
     ScriptId(uint id) 
     {
         _value = id;

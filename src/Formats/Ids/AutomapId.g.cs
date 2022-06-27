@@ -28,6 +28,15 @@ public readonly struct AutomapId : IEquatable<AutomapId>, IEquatable<AssetId>, I
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public AutomapId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a AutomapId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.Automap << 24 | (uint)id;
+    }
+
     AutomapId(uint id) 
     {
         _value = id;

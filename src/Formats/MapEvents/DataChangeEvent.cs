@@ -87,7 +87,7 @@ public sealed class DataChangeEvent : MapEvent, IDataChangeEvent
         {
             DataChangeTarget.Leader => Base.Target.Leader,
             DataChangeTarget.Everyone => Base.Target.Everyone,
-            DataChangeTarget.SpecificMember => new PartyMemberId(AssetType.PartyMember, targetId),
+            DataChangeTarget.SpecificMember => new PartyMemberId(targetId),
             DataChangeTarget.Npc => new TargetId(AssetType.NpcSheet, targetId),
             DataChangeTarget.Attacker => Base.Target.Attacker,
             DataChangeTarget.Target => Base.Target.Target,

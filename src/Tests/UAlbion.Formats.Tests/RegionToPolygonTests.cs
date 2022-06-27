@@ -20,7 +20,7 @@ public class RegionToPolygonTests
         byte w = (byte)(region.Max(x => x.Item1) + 1);
         byte h = (byte)(region.Max(x => x.Item2) + 1);
 
-        var events = new List<EventNode> { new(0, new DoScriptEvent(new ScriptId(AssetType.Script))) };
+        var events = new List<EventNode> { new(0, new DoScriptEvent(new ScriptId(0))) };
         var map = new MapData2D(MapId.None, PaletteId.None, TilesetId.None,
             w, h,
             events,

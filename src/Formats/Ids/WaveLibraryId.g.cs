@@ -28,6 +28,15 @@ public readonly struct WaveLibraryId : IEquatable<WaveLibraryId>, IEquatable<Ass
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public WaveLibraryId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a WaveLibraryId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.WaveLibrary << 24 | (uint)id;
+    }
+
     WaveLibraryId(uint id) 
     {
         _value = id;

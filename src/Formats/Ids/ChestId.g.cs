@@ -28,6 +28,15 @@ public readonly struct ChestId : IEquatable<ChestId>, IEquatable<AssetId>, IComp
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public ChestId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a ChestId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.Chest << 24 | (uint)id;
+    }
+
     ChestId(uint id) 
     {
         _value = id;

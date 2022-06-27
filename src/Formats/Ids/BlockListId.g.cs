@@ -28,6 +28,15 @@ public readonly struct BlockListId : IEquatable<BlockListId>, IEquatable<AssetId
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public BlockListId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a BlockListId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.BlockList << 24 | (uint)id;
+    }
+
     BlockListId(uint id) 
     {
         _value = id;

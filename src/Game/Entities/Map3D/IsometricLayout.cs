@@ -74,7 +74,7 @@ public class IsometricLayout : Component
         bool contents = mode is IsometricMode.Contents or IsometricMode.All;
 
         paletteNumber ??= info.Get(AssetProperty.PaletteId, 0);
-        var paletteId = new PaletteId(AssetType.Palette, paletteNumber.Value);
+        var paletteId = new PaletteId(paletteNumber.Value);
         var palette = assets.LoadPalette(paletteId);
         if (palette == null)
         {

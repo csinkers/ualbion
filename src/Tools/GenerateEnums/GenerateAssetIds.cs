@@ -87,6 +87,22 @@ static class GenerateAssetIds
         return sb.ToString();
     }
 
+    static string BuildSimpleConstructor(string name, IList<AssetType> types)
+    {
+        return types.Count == 1 
+            ? @$"
+    public {name}(int id)
+    {{
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($""Tried to construct a {name} with out of range id {{id}}"");
+#endif
+        _value = (uint)AssetType.{types[0]} << 24 | (uint)id;
+    }}
+" : "";
+
+    }
+
     static string BuildClass(Assets assets, string destNamespace, string name, IList<AssetType> types)
     {
         if ((types?.Count ?? 0) == 0)
@@ -97,6 +113,7 @@ static class GenerateAssetIds
         var condition = BuildIfCondition(types, "type");
         var condition2 = BuildIfCondition(types, "Type");
 
+        string simpleConstructor = BuildSimpleConstructor(name, types);
         string familyCasts = "";
         string compoundCasts = BuildParentCasts(assets, name);
         string enumCasts = assets.EnumsByAssetId.ContainsKey(name) ? BuildEnumCasts(name, assets.EnumsByAssetId[name]) : "";
@@ -137,7 +154,7 @@ public readonly struct {name} : IEquatable<{name}>, IEquatable<AssetId>, ICompar
 #endif
         _value = (uint)type << 24 | (uint)id;
     }}
-
+{simpleConstructor}
     {name}(uint id) 
     {{
         _value = id;

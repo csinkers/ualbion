@@ -92,7 +92,7 @@ class DumpGraphics : Component, IAssetDumper
         if (config != null)
         {
             var rawPaletteId = config.Get(AssetProperty.PaletteId, 0);
-            var paletteId = new PaletteId(AssetType.Palette, rawPaletteId);
+            var paletteId = new PaletteId(rawPaletteId);
             palette = assets.LoadPalette(paletteId);
         }
         else palette = assets.LoadPalette(Base.Palette.Inventory);

@@ -28,6 +28,15 @@ public readonly struct LabyrinthId : IEquatable<LabyrinthId>, IEquatable<AssetId
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public LabyrinthId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a LabyrinthId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.Labyrinth << 24 | (uint)id;
+    }
+
     LabyrinthId(uint id) 
     {
         _value = id;

@@ -28,6 +28,15 @@ public readonly struct MerchantId : IEquatable<MerchantId>, IEquatable<AssetId>,
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public MerchantId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a MerchantId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.Merchant << 24 | (uint)id;
+    }
+
     MerchantId(uint id) 
     {
         _value = id;

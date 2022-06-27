@@ -53,7 +53,7 @@ class Test3DMap
             {
                 var text = scriptBuilder(builder!.AddMapText);
                 var script = ScriptLoader.Parse(ApiUtil.SplitLines(text));
-                var scriptId = new ScriptId(AssetType.Script, nextScriptId++);
+                var scriptId = new ScriptId(nextScriptId++);
                 assets![scriptId] = script;
                 return "do_script " + scriptId.Id;
             }

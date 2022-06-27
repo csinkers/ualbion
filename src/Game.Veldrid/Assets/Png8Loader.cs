@@ -69,7 +69,7 @@ public class Png8Loader : Component, IAssetLoader<IReadOnlyTexture<byte>>
 
         var assets = Resolve<IAssetManager>();
         var paletteNum = info.Get(AssetProperty.PaletteId, 0);
-        var paletteId = new PaletteId(AssetType.Palette, paletteNum);
+        var paletteId = new PaletteId(paletteNum);
         var palette = assets.LoadPalette(paletteId);
         if (palette == null)
             throw new InvalidOperationException($"Could not load palette {paletteId} ({paletteNum}) for asset {info.AssetId} in file {info.File.Filename}");

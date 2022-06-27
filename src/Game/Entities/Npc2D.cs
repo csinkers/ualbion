@@ -88,11 +88,11 @@ public class Npc2D : Component
                 break;
         }
 
-        if (Movement2D.Update(_state,
+        if (Movement2D.Instance.Update(_state,
                 _moveSettings,
                 Resolve<ICollisionManager>(),
-                _targetX - _state.X,
-                _targetY - _state.Y,
+                (_targetX - _state.X, _targetY - _state.Y),
+                x => x,
                 (x, y) => Raise(new NpcEnteredTileEvent(_npcNumber, x, y))))
         {
             _sprite.TilePosition =
@@ -101,9 +101,11 @@ public class Npc2D : Component
                     _state.PixelY / _moveSettings.TileHeight,
                     _moveSettings.GetDepth(_state.Y));
 
-            _sprite.Frame = _moveSettings.GetSpriteFrame(_state, false);
+            _sprite.Frame = _moveSettings.GetSpriteFrame(_state, GetSitMode);
         }
     }
+
+    static SitMode GetSitMode(int x, int y) => SitMode.None; // TODO
 
     void OnTurn(NpcTurnEvent e)
     {

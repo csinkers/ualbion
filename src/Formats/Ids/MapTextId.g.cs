@@ -28,6 +28,15 @@ public readonly struct MapTextId : IEquatable<MapTextId>, IEquatable<AssetId>, I
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public MapTextId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a MapTextId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.MapText << 24 | (uint)id;
+    }
+
     MapTextId(uint id) 
     {
         _value = id;

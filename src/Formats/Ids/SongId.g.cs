@@ -28,6 +28,15 @@ public readonly struct SongId : IEquatable<SongId>, IEquatable<AssetId>, ICompar
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public SongId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a SongId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.Song << 24 | (uint)id;
+    }
+
     SongId(uint id) 
     {
         _value = id;

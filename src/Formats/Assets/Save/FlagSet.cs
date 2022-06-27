@@ -11,29 +11,67 @@ namespace UAlbion.Formats.Assets.Save;
 public class FlagSet
 {
     readonly BitArray _set;
-
-    public int Offset { get; }
     public int BitsPerMap { get; }
     public int Count => _set.Count;
     public int PackedSize => (Count + 7) / 8;
 
-    public FlagSet(int offset, int count, int bitsPerMap = 0)
+    public FlagSet(int mapCount, int bitsPerMap)
     {
-        Offset = offset;
         BitsPerMap = bitsPerMap;
+        _set = new BitArray(mapCount * bitsPerMap);
+    }
+
+    public FlagSet(int count)
+    {
+        BitsPerMap = 0;
         _set = new BitArray(count);
     }
 
-    public bool GetFlag(int i) => i >= Offset && i < Count + Offset && _set[i - Offset];
-    public void SetFlag(int i, bool value)
+    public bool this[int i]
     {
-        if (i < Offset || i >= Count + Offset)
+        get => i >= 0 && i < Count && _set[i];
+        set
         {
-            ApiUtil.Assert($"Tried to set out of range flag {i}");
+            if(i < Count)
+                _set[i] = value;
+        }
+    }
+
+    public bool GetFlag(int i) => i >= 0 && i < Count && _set[i];
+    public bool GetFlag(MapId mapId, int i) => GetFlag(mapId.Id * BitsPerMap + i);
+    public void SetFlag(MapId mapId, int i, bool value)
+    {
+        if (i < 0)
+        {
+            ApiUtil.Assert($"Tried to set negative bit {i} for map {mapId}");
             return;
         }
 
-        _set[i - Offset] = value;
+        if (i > BitsPerMap)
+        {
+            ApiUtil.Assert($"Tried to set bit {i} for map {mapId}, but each map only contains {BitsPerMap}");
+            return;
+        }
+
+        int index = mapId.Id * BitsPerMap + i;
+        if (index > Count)
+        {
+            ApiUtil.Assert($"Tried to set bit {i} for map {mapId} (num {mapId.Id}), but there are only enough bits allocated for {Count/BitsPerMap} maps");
+            return;
+        }
+
+        SetFlag(index, value);
+    }
+
+    public void SetFlag(int i, bool value)
+    {
+        if (i < 0 || i >= Count)
+        {
+            ApiUtil.Assert($"Tried to set out of range flag {i} (max allowed is {Count - 1})");
+            return;
+        }
+
+        _set[i] = value;
     }
 
     public byte[] GetPacked()
@@ -41,7 +79,7 @@ public class FlagSet
         // TODO: Check if .CopyTo will work
         var packed = new byte[PackedSize];
         for (int i = 0; i < Count; i++)
-            packed[i / 8] |= (byte)((_set[i] ? 1 : 0) << (i % 8));
+            packed[i >> 3] |= (byte)((_set[i] ? 1 : 0) << (i & 7));
 
         return packed;
     }
@@ -77,14 +115,18 @@ public class FlagSet
         int printCount = 0;
         for (int i = 0; i < Count; i++)
         {
+            if (!_set[i])
+                continue;
+
             if (BitsPerMap > 0)
             {
                 var map = i / BitsPerMap;
                 var offset = i % BitsPerMap;
                 if (map != lastMap)
                 {
-                    sb.AppendLine();
-                    sb.Append($"{new MapId(AssetType.Map, map)} ({map}): ");
+                    s.Comment(sb.ToString());
+                    sb.Clear();
+                    sb.Append($"{new MapId(map)} ({map}): ");
                     lastMap = map;
                 }
 
@@ -98,7 +140,8 @@ public class FlagSet
                 printCount++;
                 if (printCount > 16)
                 {
-                    sb.AppendLine();
+                    s.Comment(sb.ToString());
+                    sb.Clear();
                     printCount = 0;
                 }
             }

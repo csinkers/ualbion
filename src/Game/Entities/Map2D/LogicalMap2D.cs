@@ -51,11 +51,16 @@ public class LogicalMap2D : LogicalMap
         int tileIndex = _mapData.Tiles[index].Overlay;
         return tileIndex > 1 ? TileData.Tiles[tileIndex] : null;
     }
-        
-    public Passability GetPassability(int index) => 
-        GetUnderlay(index)?.Collision 
-        ?? GetOverlay(index)?.Collision 
-        ?? Passability.Passable;
+
+    public Passability GetPassability(int index)
+    {
+        if (index < 0 || index >= _mapData.Tiles.Length)
+            return Passability.Solid;
+
+        var underlay = GetUnderlay(index)?.Collision ?? 0;
+        var overlay = GetOverlay(index)?.Collision ?? 0;
+        return underlay | overlay;
+    }
 
     protected override void ChangeUnderlay(byte x, byte y, ushort value)
     {

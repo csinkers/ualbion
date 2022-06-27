@@ -1,11 +1,8 @@
-﻿using UAlbion.Formats.Assets.Maps;
-
-namespace UAlbion.Game;
+﻿namespace UAlbion.Game;
 
 public interface ICollisionManager
 {
-    bool IsOccupied(int x, int y);
-    Passability GetPassability(int x, int y);
+    bool IsOccupied(int fromX, int fromY, int toX, int toY);
     void Register(IMovementCollider collider);
     void Unregister(IMovementCollider collider);
 }

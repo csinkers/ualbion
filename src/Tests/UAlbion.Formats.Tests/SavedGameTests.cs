@@ -41,7 +41,7 @@ public class SavedGameTests
         {
             for (byte i = 0; i < 30; i++)
             {
-                var id = new SpellId(AssetType.Spell, (int)school * 30 + i);
+                var id = new SpellId((int)school * 30 + i);
                 var spell = new SpellData(id, school, i);
                 spellManager.Add(spell);
             }

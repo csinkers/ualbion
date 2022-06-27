@@ -58,9 +58,18 @@ public class FlatMap : Component, IMap
         var gameFactory = Resolve<IGameFactory>();
         _logicalMap = new LogicalMap2D(assetManager, _mapData, state.TemporaryMapChanges, state.PermanentMapChanges);
         var tileset = assetManager.LoadTileGraphics(_logicalMap.TileData.Id.ToTilesetGfx());
+
         AttachChild(new ScriptManager());
-        AttachChild(new Collider2D(_logicalMap, !_logicalMap.UseSmallSprites));
-        var renderable = AttachChild(new MapRenderable2D(_logicalMap, tileset, gameFactory, new Vector2(TileSize.X, TileSize.Y)));
+        AttachChild(new Collider2D(
+            (x, y) => _logicalMap.GetPassability(_logicalMap.Index(x, y)),
+            !_logicalMap.UseSmallSprites));
+
+        var renderable = AttachChild(new MapRenderable2D(
+            _logicalMap,
+            tileset,
+            gameFactory,
+            new Vector2(TileSize.X, TileSize.Y)));
+
         var selector = AttachChild(new SelectionHandler2D(_logicalMap, renderable));
         selector.HighlightIndexChanged += (_, x) => renderable.SetHighlightIndex(x);
         _logicalMap.TileSize = renderable.TileSize;
@@ -82,7 +91,7 @@ public class FlatMap : Component, IMap
             };
 
         var initialPos = new Vector2(_logicalMap.Width / 2.0f, _logicalMap.Height / 2.0f);
-        _partyMovement = AttachChild(new PartyCaterpillar(initialPos, Direction.East, movementSettings));
+        _partyMovement = AttachChild(new PartyCaterpillar(initialPos, Direction.East, movementSettings, _logicalMap));
         Raise(new CameraJumpEvent((int)initialPos.X, (int)initialPos.Y));
 
         AttachChild(new NpcManager2D(_logicalMap));

@@ -28,6 +28,15 @@ public readonly struct MonsterGroupId : IEquatable<MonsterGroupId>, IEquatable<A
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public MonsterGroupId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a MonsterGroupId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.MonsterGroup << 24 | (uint)id;
+    }
+
     MonsterGroupId(uint id) 
     {
         _value = id;

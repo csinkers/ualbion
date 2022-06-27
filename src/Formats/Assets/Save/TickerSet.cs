@@ -21,7 +21,7 @@ public class TickerSet : Dictionary<TickerId, byte>
         // TODO: Proper extensible modding support
         for (int i = 0; i <= Max; i++)
         {
-            var assetId = new TickerId(AssetType.Ticker, i);
+            var assetId = new TickerId(i);
             d[assetId] = d.TryGetValue(assetId, out var existing)
                 ? s.UInt8(i.ToString(CultureInfo.InvariantCulture), existing) 
                 : s.UInt8(i.ToString(CultureInfo.InvariantCulture), 0);

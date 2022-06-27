@@ -28,6 +28,15 @@ public readonly struct SpecialId : IEquatable<SpecialId>, IEquatable<AssetId>, I
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public SpecialId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a SpecialId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.Special << 24 | (uint)id;
+    }
+
     SpecialId(uint id) 
     {
         _value = id;

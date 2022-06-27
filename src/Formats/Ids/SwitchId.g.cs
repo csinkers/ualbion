@@ -28,6 +28,15 @@ public readonly struct SwitchId : IEquatable<SwitchId>, IEquatable<AssetId>, ICo
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public SwitchId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a SwitchId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.Switch << 24 | (uint)id;
+    }
+
     SwitchId(uint id) 
     {
         _value = id;

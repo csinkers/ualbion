@@ -28,6 +28,15 @@ public readonly struct WordId : IEquatable<WordId>, IEquatable<AssetId>, ICompar
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public WordId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a WordId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.Word << 24 | (uint)id;
+    }
+
     WordId(uint id) 
     {
         _value = id;

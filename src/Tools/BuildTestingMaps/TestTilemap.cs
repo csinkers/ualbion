@@ -116,8 +116,8 @@ public class TestTilemap
                 for (int j = 0; j < frameCount; j++)
                 {
                     float t = (float)j / (frameCount - 1);
-                    tiles.Add(T16(null).FillAll(CBlack2)
-                        .FillRect(CGrey8, 0, 0, 15, (int)(15 * t))
+                    tiles.Add(T16(null).FillAll(CRainbowLoop[j % 8])
+                        //.FillRect(CGrey8, 0, 0, 15, (int)(15 * t))
                         .Border(CWhite)
                         .Text(i.ToString("X") + j, CWhite, 2, 2, font)
                         .Texture);
@@ -150,8 +150,21 @@ public class TestTilemap
             x.UseUnderlayFlags = true;
         });
 
+        Unk7Type0Offset = (ushort)Tileset.Tiles.Count;
+        BuildCycle(8, loopFrameCount, (x, i) =>
+        {
+            // Type1 = unk
+            // Type2 = add (x - y) to starting frame
+            // Type4 = crazy pattern
+            x.Type = TileType.Unk3;
+            x.Unk7 = (byte)i;
+            x.Bouncy = true;
+        });
+
         var gfxId = (SpriteId)UAlbion.Base.TilesetGfx.Toronto;
-        Assets[gfxId] = BlitUtil.CombineFramesVertically(gfxId, tiles);
+        Assets[gfxId] = new SimpleTileGraphics(BlitUtil.CombineFramesVertically(gfxId, tiles));
         Assets[Tileset.Id] = Tileset;
     }
+
+    public ushort Unk7Type0Offset { get; }
 }

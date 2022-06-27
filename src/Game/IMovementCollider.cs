@@ -1,9 +1,6 @@
-﻿using UAlbion.Formats.Assets.Maps;
-
-namespace UAlbion.Game;
+﻿namespace UAlbion.Game;
 
 public interface IMovementCollider
 {
-    bool IsOccupied(int tx, int ty);
-    Passability GetPassability(int tx, int ty);
+    bool IsOccupied(int fromX, int fromY, int toX, int toY);
 }

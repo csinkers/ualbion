@@ -271,7 +271,7 @@ public class CharacterSheet : ICharacterSheet
             s.Comment("Spells:");
             for (int i = 0; i < MaxSpellsPerSchool * SpellSchoolCount; i++)
             {
-                var spellId = new SpellId(AssetType.Spell, i + 1);
+                var spellId = new SpellId(i + 1);
                 bool known = sheet.Magic.KnownSpells.Contains(spellId);
                 sheet.Magic.SpellStrengths.TryGetValue(spellId, out var strength);
                 if (known || strength > 0)

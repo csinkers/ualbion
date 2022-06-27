@@ -312,7 +312,7 @@ class DumpText : Component, IAssetDumper
             sw.WriteLine($"    Magic: SP{c.Magic.SpellPoints} Classes: {c.Magic.SpellClasses}");
             for (int i = 0; i < CharacterSheet.MaxSpellsPerSchool * CharacterSheet.SpellSchoolCount; i++)
             {
-                var spellId = new SpellId(AssetType.Spell, i + 1);
+                var spellId = new SpellId(i + 1);
                 bool known = c.Magic.KnownSpells.Contains(spellId);
                 c.Magic.SpellStrengths.TryGetValue(spellId, out var strength);
                 if (known || strength > 0)

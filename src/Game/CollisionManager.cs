@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UAlbion.Api.Eventing;
-using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Game;
 
@@ -9,8 +7,13 @@ public class CollisionManager : ServiceComponent<ICollisionManager>, ICollisionM
 {
     readonly IList<IMovementCollider> _colliders = new List<IMovementCollider>();
 
-    public bool IsOccupied(int x, int y)
-        => _colliders.Aggregate(false, (acc, coll) => acc | coll.IsOccupied(x, y));
+    public bool IsOccupied(int fromX, int fromY, int toX, int toY)
+    {
+        foreach(var collider in _colliders)
+            if (collider.IsOccupied(fromX, fromY, toX, toY))
+                return true;
+        return false;
+    }
 
     public void Register(IMovementCollider collider)
     {
@@ -19,6 +22,4 @@ public class CollisionManager : ServiceComponent<ICollisionManager>, ICollisionM
     }
 
     public void Unregister(IMovementCollider collider) => _colliders.Remove(collider);
-    public Passability GetPassability(int x, int y)
-        => _colliders.Select(coll => coll.GetPassability(x, y)).FirstOrDefault();
 }

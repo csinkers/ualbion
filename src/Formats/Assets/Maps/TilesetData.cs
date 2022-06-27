@@ -32,7 +32,7 @@ public class TilesetData
             {
                 Layer = TileLayer.Normal,
                 Type = TileType.Unk0,
-                Collision = Passability.Passable,
+                Collision = Passability.Open,
                 ImageNumber = 0xffff,
                 FrameCount = 1,
                 Unk7 = 0

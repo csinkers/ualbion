@@ -28,6 +28,15 @@ public readonly struct NpcId : IEquatable<NpcId>, IEquatable<AssetId>, IComparab
         _value = (uint)type << 24 | (uint)id;
     }
 
+    public NpcId(int id)
+    {
+#if DEBUG
+        if (id < 0 || id > 0xffffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a NpcId with out of range id {id}");
+#endif
+        _value = (uint)AssetType.NpcSheet << 24 | (uint)id;
+    }
+
     NpcId(uint id) 
     {
         _value = id;

@@ -64,11 +64,6 @@ public class ProgressBar : UiElement
         _bar.DrawSize = _bar.MeasureSize with { X = _bar.MeasureSize.X * value / max };
     }
 
-    public override Vector2 GetSize()
-    {
-        return base.GetSize();
-    }
-
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         Update(extents);

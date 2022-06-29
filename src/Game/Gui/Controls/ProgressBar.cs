@@ -10,6 +10,7 @@ namespace UAlbion.Game.Gui.Controls;
 
 public class ProgressBar : UiElement
 {
+    const int BarHeight = 6;
     readonly ButtonFrame _frame;
     readonly UiRectangle _bar;
     readonly IText _hover;
@@ -30,7 +31,7 @@ public class ProgressBar : UiElement
         _getMax = getMax;
         _absoluteMax = absoluteMax;
 
-        _bar = new UiRectangle(CommonColor.Blue4);
+        _bar = new UiRectangle(CommonColor.Blue4) { MeasureSize = new Vector2(0, BarHeight) };
         _frame = AttachChild(new ButtonFrame(_bar) { State = ButtonState.Pressed, Padding = 0 });
     }
 
@@ -59,8 +60,13 @@ public class ProgressBar : UiElement
         if (max == 0) max = 1;
 
         _bar.Color = isSuperCharged ? CommonColor.Yellow4 : CommonColor.Blue4;
-        _bar.MeasureSize = new Vector2((extents.Width - 3) * (float)max / _absoluteMax, 6);
-        _bar.DrawSize = new Vector2(_bar.MeasureSize.X * value / max, _bar.MeasureSize.Y);
+        _bar.MeasureSize = new Vector2((extents.Width - 3) * (float)max / _absoluteMax, BarHeight);
+        _bar.DrawSize = _bar.MeasureSize with { X = _bar.MeasureSize.X * value / max };
+    }
+
+    public override Vector2 GetSize()
+    {
+        return base.GetSize();
     }
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)

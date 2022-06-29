@@ -6,7 +6,7 @@ namespace UAlbion.Game.Text;
 public class TextSourceWrapper : IText
 {
     IText _source;
-    int _version;
+    int _version = 1;
     int _baseSourceVersion;
 
     public IText Source

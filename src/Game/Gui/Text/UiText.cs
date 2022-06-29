@@ -63,11 +63,11 @@ public class UiText : UiElement
         _scrollOffset = Math.Clamp(_scrollOffset - e.Delta * 5, 0, maxScrollOffset);
     }
 
-    IEnumerable<TextLine> BuildLines(Rectangle extents, IEnumerable<TextBlock> blocks)
+    IEnumerable<UiTextLine> BuildLines(Rectangle extents, IEnumerable<TextBlock> blocks)
     {
         var textManager = Resolve<ITextManager>();
 
-        var line = new TextLine(_isScrollable ? extents : (Rectangle?)null);
+        var line = new UiTextLine(_isScrollable ? extents : null);
         foreach (var block in textManager.SplitBlocksToSingleWords(blocks))
         {
             var size = textManager.Measure(block);
@@ -77,7 +77,7 @@ public class UiText : UiElement
                 if (!forceNewLine && string.IsNullOrWhiteSpace(block.Text))
                     continue;
                 yield return line;
-                line = new TextLine(_isScrollable ? extents : (Rectangle?)null);
+                line = new UiTextLine(_isScrollable ? extents : null);
             }
 
             line.Add(block, size);
@@ -141,7 +141,7 @@ public class UiText : UiElement
         var offset = -_scrollOffset;
         foreach (var child in Children)
         {
-            if (child is TextLine line)
+            if (child is UiTextLine line)
             {
                 var lineExtents = new Rectangle(extents.X, extents.Y + offset, extents.Width, line.Height);
                 maxOrder = Math.Max(maxOrder, func(line, lineExtents, order + 1, context));

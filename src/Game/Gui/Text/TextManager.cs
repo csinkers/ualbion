@@ -62,7 +62,12 @@ public class TextManager : ServiceComponent<ITextManager>, ITextManager
         int offset = 0;
         var flags = SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.ClampEdges;
         var key = new SpriteKey(font, SpriteSampler.Point, order, flags, scissorRegion);
-        int displayableCharacterCount = text.Count(x => mapping.ContainsKey(x));
+
+        int displayableCharacterCount = 0;
+        foreach (var c in text)
+            if (mapping.ContainsKey(c))
+                displayableCharacterCount++;
+
         int instanceCount = displayableCharacterCount * (isFat ? 4 : 2);
         var lease = sm.Borrow(key, instanceCount, caller);
 

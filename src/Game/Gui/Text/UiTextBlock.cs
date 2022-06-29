@@ -7,7 +7,7 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Text;
 
-public class TextChunk : UiElement // Renders a single TextBlock in the UI
+public class UiTextBlock : UiElement // Renders a single TextBlock in the UI
 {
     // Driving properties
     readonly Rectangle? _scissorRegion;
@@ -18,7 +18,7 @@ public class TextChunk : UiElement // Renders a single TextBlock in the UI
     PositionedSpriteBatch _sprite;
     DrawLayer _lastOrder = DrawLayer.Interface;
 
-    public TextChunk(TextBlock block, Rectangle? scissorRegion)
+    public UiTextBlock(TextBlock block, Rectangle? scissorRegion)
     {
         _scissorRegion = scissorRegion;
         On<BackendChangedEvent>(_ => IsDirty = true);
@@ -32,7 +32,7 @@ public class TextChunk : UiElement // Renders a single TextBlock in the UI
         _sprite = null;
     }
 
-    public override string ToString() => _sprite == null ? $"TextChunk:{Block} (unloaded)" : $"TextChunk:{Block} ({_sprite.Size.X}x{_sprite.Size.Y})";
+    public override string ToString() => _sprite == null ? $"UiTextBlock:{Block} (unloaded)" : $"UiTextBlock:{Block} ({_sprite.Size.X}x{_sprite.Size.Y})";
 
     void Rebuild(DrawLayer order)
     {

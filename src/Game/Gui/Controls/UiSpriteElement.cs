@@ -49,7 +49,12 @@ public class UiSpriteElement : UiElement
     public SpriteFlags Flags { get => _flags; set { if (_flags == value) return; _flags = value; _dirty = true; } }
 
     public override string ToString() => $"UiSpriteElem {_id}";
-    public override Vector2 GetSize() => _size;
+    public override Vector2 GetSize()
+    {
+        UpdateSize();
+        return _size;
+    }
+
     public override int Select(Rectangle extents, int order, SelectionContext context)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
@@ -96,6 +101,23 @@ public class UiSpriteElement : UiElement
         finally { _sprite.Unlock(lockWasTaken); }
 
         return order;
+    }
+
+    void UpdateSize()
+    {
+        if (Exchange == null || !_dirty)
+            return;
+
+        var assets = Resolve<IAssetManager>();
+        if (_id.IsNone)
+        {
+            _size = Vector2.One;
+        }
+        else
+        {
+            var texture = assets.LoadTexture(_id);
+            _size = texture?.Regions[0].Size ?? Vector2.One;
+        }
     }
 
     void UpdateSprite(DrawLayer order)

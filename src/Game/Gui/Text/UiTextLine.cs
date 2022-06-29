@@ -6,7 +6,7 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Text;
 
-public class TextLine : UiElement // Multiple TextChunks arranged on a line
+public class UiTextLine : UiElement // Multiple TextChunks arranged on a line
 {
     public int Width { get; private set; }
     public int Height { get; private set; } = 8;
@@ -14,7 +14,7 @@ public class TextLine : UiElement // Multiple TextChunks arranged on a line
     readonly Rectangle? _scissorRegion;
     TextAlignment _alignment;
 
-    public TextLine(Rectangle? scissorRegion) => _scissorRegion = scissorRegion;
+    public UiTextLine(Rectangle? scissorRegion) => _scissorRegion = scissorRegion;
 
     /// <summary>
     /// Add a new block to the line.
@@ -31,7 +31,7 @@ public class TextLine : UiElement // Multiple TextChunks arranged on a line
         Height = Math.Max(Height, (int)size.Y);
         _alignment = block.Alignment;
 
-        var lastChild = Children.OfType<TextChunk>().LastOrDefault(x => x.IsActive);
+        var lastChild = Children.OfType<UiTextBlock>().LastOrDefault(x => x.IsActive);
         if(lastChild != null && block.IsMergeableWith(lastChild.Block))
         {
             lastChild.Block.Merge(block);
@@ -39,7 +39,7 @@ public class TextLine : UiElement // Multiple TextChunks arranged on a line
         }
         else
         {
-            AttachChild(new TextChunk(block, _scissorRegion));
+            AttachChild(new UiTextBlock(block, _scissorRegion));
         }
     }
 
@@ -50,8 +50,8 @@ public class TextLine : UiElement // Multiple TextChunks arranged on a line
     }
 
     public override string ToString() =>
-        "TextLine:[ " +
-        string.Join("; ", Children.OfType<TextChunk>().Where(x => x.IsActive).Select(x => x.ToString()))
+        "UiTextLine:[ " +
+        string.Join("; ", Children.OfType<UiTextBlock>().Where(x => x.IsActive).Select(x => x.ToString()))
         + " ]";
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)

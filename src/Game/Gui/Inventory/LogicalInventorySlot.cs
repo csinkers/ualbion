@@ -19,7 +19,7 @@ public class LogicalInventorySlot : UiElement
 {
     readonly InventorySlotId _id;
     readonly VisualInventorySlot _visual;
-    int _version;
+    int _version = 1;
 
     public LogicalInventorySlot(InventorySlotId id)
     {

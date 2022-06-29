@@ -12,12 +12,12 @@ namespace UAlbion.Game.Gui.Inventory;
 public class InventoryDefensiveLabel : UiElement
 {
     readonly PartyMemberId _activeCharacter;
-    int _version;
+    int _version = 1;
 
     public InventoryDefensiveLabel(PartyMemberId activeCharacter)
     {
-        On<InventoryChangedEvent>(e => _version++);
-        On<BlurEvent>(e => Raise(new HoverTextEvent(null)));
+        On<InventoryChangedEvent>(_ => _version++);
+        On<BlurEvent>(_ => Raise(new HoverTextEvent(null)));
         On<HoverEvent>(Hover);
 
         _activeCharacter = activeCharacter;
@@ -27,7 +27,7 @@ public class InventoryDefensiveLabel : UiElement
             var player = Resolve<IParty>()[_activeCharacter];
             var protection = player?.Apparent.DisplayProtection ?? 0;
             return new[] { new TextBlock($"{protection}") };
-        }, x => _version);
+        }, _ => _version);
 
         AttachChild(
             new ButtonFrame(

@@ -14,12 +14,12 @@ public class InventoryWeightLabel : UiElement
 {
     readonly PartyMemberId _activeCharacter;
     readonly IText _hoverSource;
-    int _version;
+    int _version = 1;
 
     public InventoryWeightLabel(PartyMemberId activeCharacter)
     {
-        On<LanguageChangedEvent>(e => _version++);
-        On<BlurEvent>(e => Raise(new HoverTextEvent(null)));
+        On<LanguageChangedEvent>(_ => _version++);
+        On<BlurEvent>(_ => Raise(new HoverTextEvent(null)));
         On<InventoryChangedEvent>(e =>
         {
             if (_activeCharacter == e.Id.ToAssetId())
@@ -44,7 +44,7 @@ public class InventoryWeightLabel : UiElement
                 Base.SystemText.Inv_CarriedWeightNdOfNdG,
                 player.Apparent.TotalWeight,
                 player.Apparent.MaxWeight).GetBlocks();
-        }, x => _version);
+        }, _ => _version);
 
         var source = new DynamicText(() =>
         {
@@ -59,7 +59,7 @@ public class InventoryWeightLabel : UiElement
                 .Center()
                 .Format(Base.SystemText.Inv_WeightNKg, weight)
                 .GetBlocks();
-        }, x => _version);
+        }, _ => _version);
 
         AttachChild(
             new ButtonFrame(

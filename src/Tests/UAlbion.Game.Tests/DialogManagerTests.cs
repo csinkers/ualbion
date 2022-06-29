@@ -98,7 +98,7 @@ public class DialogManagerTests
 
         var layout = lm.GetLayout();
         Assert.Equal(1, layout.Children.Count); // Should only be one top-level dialog
-        var yesText = layout.DepthFirstSearch(x => x.Element is TextLine txt && txt.ToString().Contains("\"Yes\"")).First();
+        var yesText = layout.DepthFirstSearch(x => x.Element is UiTextLine txt && txt.ToString().Contains("\"Yes\"")).First();
         var yesButton = (Button)yesText.Ancestors.First(x => x.Element is Button).Element;
         yesButton.Receive(new HoverEvent(), null);
         yesButton.Receive(new UiLeftClickEvent(), null);
@@ -113,7 +113,7 @@ public class DialogManagerTests
         ex.RaiseAsync(e, this, x => result = x);
         layout = lm.GetLayout();
         Assert.Equal(1, layout.Children.Count); // Should only be one top-level dialog
-        var noText = layout.DepthFirstSearch(x => x.Element is TextLine txt && txt.ToString().Contains("\"No\"")).First();
+        var noText = layout.DepthFirstSearch(x => x.Element is UiTextLine txt && txt.ToString().Contains("\"No\"")).First();
         var noButton = (Button)noText.Ancestors.First(x => x.Element is Button).Element;
         noButton.Receive(new HoverEvent(), null);
         noButton.Receive(new UiLeftClickEvent(), null);

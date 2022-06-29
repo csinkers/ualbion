@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -68,19 +67,19 @@ public class RepeatedBackground : UiElement
         _sprite = new PositionedSpriteBatch(lease, normalisedSize);
     }
 
-    public override int Render(Rectangle extents, int order)
+    public override int Render(Rectangle extents, int order, LayoutNode parent)
     {
         Rebuild(extents.Width, extents.Height, (DrawLayer)order);
 
         var window = Resolve<IWindowManager>();
         _sprite.Position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
 
-        return base.Render(extents, order);
+        return base.Render(extents, order, parent);
     }
 
-    public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+    public override int Select(Rectangle extents, int order, SelectionContext context)
     {
         Rebuild(extents.Width, extents.Height, _sprite?.RenderOrder ?? (DrawLayer)order);
-        return base.Select(uiPosition, extents, order, registerHitFunc);
+        return base.Select(extents, order, context);
     }
 }

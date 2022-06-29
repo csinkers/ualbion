@@ -25,12 +25,7 @@ public class Party : ServiceComponent<IParty>, IParty
     {
         On<AddPartyMemberEvent>(e => SetLastResult(AddMember(e.PartyMemberId)));
         On<RemovePartyMemberEvent>(e => SetLastResult(RemoveMember(e.PartyMemberId)));
-        On<SetPartyLeaderEvent>(e =>
-        {
-            SetLeader(e.PartyMemberId);
-            Raise(new SetContextEvent(ContextType.Leader, e.PartyMemberId));
-            Raise(e);
-        });
+        On<SetPartyLeaderEvent>(e => SetLeader(e.PartyMemberId));
 
         _characterSheets = characterSheets;
         _readOnlyStatusBarOrder = _statusBarOrder.AsReadOnly();
@@ -71,6 +66,7 @@ public class Party : ServiceComponent<IParty>, IParty
         var player = _walkOrder[index];
         _walkOrder.RemoveAt(index);
         _walkOrder.Insert(0, player);
+        Raise(new SetContextEvent(ContextType.Leader, value));
     }
 
     public bool AddMember(PartyMemberId id)

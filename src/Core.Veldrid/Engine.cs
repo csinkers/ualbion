@@ -170,13 +170,15 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
             using (PerfTracker.FrameEvent("5.1 Flushing queued events"))
                 Exchange.FlushQueuedEvents();
 
-            using (PerfTracker.FrameEvent("5.2 Calculating UI layout"))
-                Raise(new LayoutEvent());
+            var flags = GetVar(CoreVars.User.EngineFlags);
+
+            if ((flags & EngineFlags.SuppressLayout) == 0)
+                using (PerfTracker.FrameEvent("5.2 Calculating UI layout"))
+                     Raise(new LayoutEvent());
 
             using (PerfTracker.FrameEvent("6 Drawing"))
                 Draw();
 
-            var flags = GetVar(CoreVars.User.EngineFlags);
             if (_graphicsDevice.SyncToVerticalBlank != ((flags & EngineFlags.VSync) != 0))
                 _graphicsDevice.SyncToVerticalBlank = (flags & EngineFlags.VSync) != 0;
 

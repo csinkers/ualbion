@@ -20,7 +20,7 @@ public class ScrollBar : UiElement
 
     public int Width { get; }
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         var (position, totalHeight, pageHeight) = _getPosition();
         _rectangle.MeasureSize = extents.Size;
@@ -30,6 +30,6 @@ public class ScrollBar : UiElement
             extents.Y + (int)(extents.Height * ((float)position / totalHeight)),
             extents.Width,
             extents.Height);
-        return func(_rectangle, rect, order + 1);
+        return func(_rectangle, rect, order + 1, context);
     }
 }

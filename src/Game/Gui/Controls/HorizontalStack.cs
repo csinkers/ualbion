@@ -38,7 +38,7 @@ public class HorizontalStack : UiElement
         return size;
     }
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         int maxOrder = order;
         int minWidth = 0;
@@ -67,7 +67,7 @@ public class HorizontalStack : UiElement
             if (childElement is not IFixedSizeUiElement)
                 rect = new Rectangle(rect.X, rect.Y, rect.Width + spareWidth / nonFixedCount, rect.Height);
 
-            maxOrder = Math.Max(maxOrder, func(childElement, rect, order));
+            maxOrder = Math.Max(maxOrder, func(childElement, rect, order, context));
             offset += rect.Width;
         }
 

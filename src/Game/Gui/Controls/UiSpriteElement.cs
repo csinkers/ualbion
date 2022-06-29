@@ -50,19 +50,20 @@ public class UiSpriteElement : UiElement
 
     public override string ToString() => $"UiSpriteElem {_id}";
     public override Vector2 GetSize() => _size;
-    public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+    public override int Select(Rectangle extents, int order, SelectionContext context)
     {
-        if (registerHitFunc == null) throw new ArgumentNullException(nameof(registerHitFunc));
-        if (extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-            registerHitFunc(order, this);
+        if (context == null) throw new ArgumentNullException(nameof(context));
+        if (extents.Contains((int)context.UiPosition.X, (int)context.UiPosition.Y))
+            context.HitFunc(order, this);
         return order;
     }
 
-    public override int Render(Rectangle extents, int order)
+    public override int Render(Rectangle extents, int order, LayoutNode parent)
     {
         if (!IsSubscribed)
             return order;
 
+        _ = parent == null ? null : new LayoutNode(parent, this, extents, order);
         var newOrder = _sprite?.Key.RenderOrder;
         if (newOrder.HasValue && newOrder.Value != (DrawLayer)order)
             _dirty = true;

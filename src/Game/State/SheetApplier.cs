@@ -1,5 +1,6 @@
 ﻿using System;
 using UAlbion.Api.Eventing;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -91,7 +92,21 @@ public class SheetApplier : Component
                 break;
 
             case ChangeSpellsEvent spellsEvent:
-                // TODO
+                var spellManager = Resolve<ISpellManager>();
+                var spellId = spellManager.GetSpellId(spellsEvent.School, (byte)spellsEvent.SpellNumber);
+                var known = sheet.Magic.KnownSpells.Contains(spellId);
+
+                switch (known)
+                {
+                    case true when spellsEvent.Operation is NumericOperation.SetToMinimum or NumericOperation.Toggle:
+                        sheet.Magic.KnownSpells.Remove(spellId);
+                        break;
+                    case false when spellsEvent.Operation is NumericOperation.SetToMaximum or NumericOperation.Toggle:
+                        sheet.Magic.KnownSpells.Add(spellId);
+                        break;
+                }
+
+                // TODO: Verify if this event changes spell strengths, or just known spells
                 break;
 
             case DataChangeEvent generic:

@@ -177,7 +177,7 @@ public class AssetLoadTests : IDisposable
                 Assert.Equal(3, bn.NextIfFalse.Id);
                 var e = (QueryEventUsedEvent)x.Event;
                 Assert.Equal(QueryType.EventUsed, e.QueryType);
-                Assert.Equal(QueryOperation.AlwaysFalse, e.Operation);
+                Assert.Equal(QueryOperation.NonZero, e.Operation);
             }, // !1?2:3: query EventAlreadyUsed 0 (IsTrue 0)
             x =>
             {

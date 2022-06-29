@@ -307,7 +307,7 @@ public class EventRoundTripTests
         Test(("change_status Target.Leader Intoxicated SetToMaximum",    new ChangeStatusEvent(Target.Leader,   PlayerCondition.Intoxicated, NumericOperation.SetToMaximum)),
             ("change_status Target.Leader Irritated SetToMaximum",       new ChangeStatusEvent(Target.Leader,   PlayerCondition.Irritated,   NumericOperation.SetToMaximum)),
             ("change_status Target.Everyone Unconscious SetToMaximum 3", new ChangeStatusEvent(Target.Everyone, PlayerCondition.Unconscious, NumericOperation.SetToMaximum,  3)),
-            ("change_status Target.LastMessageTarget Poisoned SetToMinimum", new ChangeStatusEvent(Target.Subject, PlayerCondition.Poisoned, NumericOperation.SetToMinimum)),
+            ("change_status Target.Subject Poisoned SetToMinimum",       new ChangeStatusEvent(Target.Subject, PlayerCondition.Poisoned, NumericOperation.SetToMinimum)),
             ("change_status Target.Leader Unconscious SetToMinimum 10",  new ChangeStatusEvent(Target.Leader,   PlayerCondition.Unconscious, NumericOperation.SetToMinimum, 10)),
             ("change_status Target.Everyone Unconscious SetToMinimum 3", new ChangeStatusEvent(Target.Everyone, PlayerCondition.Unconscious, NumericOperation.SetToMinimum,  3)));
     }
@@ -403,17 +403,17 @@ place_action SleepInRoom 1 1 1 1 1 1");
         Test((@"play_anim Video.MagicDemonstration 1 2 3 4", new PlayAnimationEvent(Video.MagicDemonstration, 1, 2, 3, 4, 0, 0)));
     }
 
-    [Fact] public void FestivalQuery() => Test(@"prompt_player EventText.FestivalTime 1 AlwaysFalse 1");
+    [Fact] public void FestivalQuery() => Test(@"prompt_player EventText.FestivalTime 1 NonZero 1");
 
     [Fact]
     public void Query()
     {
         Test(@"prompt_player MapText.TestMapIskai 1
-prompt_player EventText.FestivalTime 1 AlwaysFalse 1
+prompt_player EventText.FestivalTime 1 NonZero 1
 prompt_player_numeric MapText.Jirinaar Equals 0 1
 is_conscious PartyMember.Tom
-is_conscious PartyMember.Tom AlwaysFalse 1
-is_demo_version 1 AlwaysFalse 0
+is_conscious PartyMember.Tom NonZero 1
+is_demo_version 1 NonZero 0
 event_used
 total_gold GreaterThan 0 0
 total_gold GreaterThanOrEqual 0 1
@@ -428,11 +428,11 @@ is_leader PartyMember.Tom
 current_map Equals 0 Map.Unk1
 is_npc_active 0
 is_npc_active 0 Equals
-is_npc_active 0 AlwaysFalse 1
+is_npc_active 0 NonZero 1
 is_npc_active 1
 is_npc_active 1 Equals 1
 result
-random_chance 1 AlwaysFalse 1
+random_chance 1 NonZero 1
 random_chance 1 LessThanOrEqual 0
 random_chance 1 LessThanOrEqual 1
 random_chance 1 LessThan 1
@@ -450,8 +450,8 @@ is_chain_active 1 Map.TorontoBegin GreaterThan
 is_chain_active 1 Map.TorontoBegin GreaterThan
 is_chain_active 1 Map.TorontoBegin GreaterThanOrEqual
 is_chain_active 1 Map.TorontoBegin GreaterThanOrEqual
-is_chain_active 0 None AlwaysFalse
-is_chain_active 1 None AlwaysFalse
+is_chain_active 0 None NonZero
+is_chain_active 1 None NonZero
 is_chain_active 1 Map.TorontoBegin LessThanOrEqual
 is_chain_active 1 Map.TorontoBegin LessThanOrEqual
 is_chain_active 1 Map.TorontoBegin LessThan

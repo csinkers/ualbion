@@ -160,7 +160,7 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
 
                 // Change context
                 case Token.Combatant: active = Resolve<IGameState>().Combatant; break;
-                case Token.Inventory: active = Resolve<IGameState>().Inventory; break;
+                case Token.Inventory: active = Resolve<IGameState>().CurrentInventory; break;
                 case Token.Leader: active = Resolve<IGameState>().Leader; break;
                 case Token.Subject: active = Resolve<IGameState>().Subject; break;
                 case Token.Victim: active = Resolve<IGameState>().Victim; break;

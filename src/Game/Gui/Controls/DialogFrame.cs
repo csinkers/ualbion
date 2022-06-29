@@ -155,7 +155,7 @@ public class DialogFrame : UiElement
 
     public override Vector2 GetSize() => GetMaxChildSize() + new Vector2(FrameOffsetX, FrameOffsetY) * 2;
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         var innerExtents = new Rectangle(
             extents.X + FrameOffsetX,
@@ -163,22 +163,22 @@ public class DialogFrame : UiElement
             extents.Width - FrameOffsetX * 2,
             extents.Height - FrameOffsetY * 2);
 
-        return base.DoLayout(innerExtents, order, func);
+        return base.DoLayout(innerExtents, order, context, func);
     }
 
-    public override int Render(Rectangle extents, int order)
+    public override int Render(Rectangle extents, int order, LayoutNode parent)
     {
         Rebuild(extents.Width, extents.Height, (DrawLayer)order);
 
         var window = Resolve<IWindowManager>();
         _sprite.Position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
 
-        return base.Render(extents, order);
+        return base.Render(extents, order, parent);
     }
 
-    public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+    public override int Select(Rectangle extents, int order, SelectionContext context)
     {
         Rebuild(extents.Width, extents.Height, _sprite?.RenderOrder ?? (DrawLayer)order);
-        return base.Select(uiPosition, extents, order, registerHitFunc);
+        return base.Select(extents, order, context);
     }
 }

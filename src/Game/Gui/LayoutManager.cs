@@ -24,7 +24,7 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
     public LayoutManager()
     {
         On<LayoutEvent>(RenderLayout);
-        On<DumpLayoutEvent>(DumpLayout);
+        On<DumpLayoutEvent>(_ => DumpLayout());
         OnAsync<ScreenCoordinateSelectEvent, Selection>(Select);
     }
 
@@ -59,21 +59,35 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
         }
     }
 
-    void RenderLayout(LayoutEvent e) => DoLayout((extents, order, element) => element.Render(extents, order));
+    void RenderLayout(LayoutEvent e)
+    {
+        var flags = GetVar(CoreVars.User.EngineFlags);
+        if ((flags & EngineFlags.SuppressLayout) != 0)
+        {
+            // If the user specifically requested this layout run then
+            // dump out the details of it to the console.
+            DumpLayout();
+            return;
+        }
+
+        DoLayout((extents, order, element) => element.Render(extents, order, null));
+    }
 
     bool Select(ScreenCoordinateSelectEvent selectEvent, Action<Selection> continuation)
     {
         var window = Resolve<IWindowManager>();
         var normPosition = window.PixelToNorm(selectEvent.Position);
         var uiPosition = window.NormToUi(normPosition);
-
-        DoLayout((extents, dialogOrder, element) =>
-            element.Select(uiPosition, extents, dialogOrder, (order, target) =>
+        var context = new SelectionContext(
+            uiPosition,
+            (order, target) =>
             {
                 float z = 1.0f - order / (float)DrawLayer.MaxLayer;
                 var intersectionPoint = new Vector3(normPosition, z);
                 continuation(new Selection(intersectionPoint, z, target));
-            }));
+            });
+
+        DoLayout((extents, dialogOrder, element) => element.Select(extents, dialogOrder, context));
         return true;
     }
 
@@ -133,11 +147,11 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
     public LayoutNode GetLayout()
     {
         var rootNode = new LayoutNode(null, null, UiConstants.UiExtents, 0);
-        DoLayout((extents, order, element) => element.Layout(extents, order, new LayoutNode(rootNode, element, extents, order)));
+        DoLayout((extents, order, element) => element.Render(extents, order, new LayoutNode(rootNode, element, extents, order)));
         return rootNode;
     }
 
-    void DumpLayout(DumpLayoutEvent _)
+    void DumpLayout()
     {
         var root = GetLayout();
         var sb = new StringBuilder();

@@ -26,7 +26,7 @@ public sealed class VisualInventorySlot : UiElement
 
     public VisualInventorySlot(InventorySlotId slotId, IText amountSource, Func<IReadOnlyItemSlot> getSlot)
     {
-        On<IdleClockEvent>(e => _frameNumber++);
+        On<IdleClockEvent>(_ => _frameNumber++);
 
         _slotId = slotId;
         _getSlot = getSlot;
@@ -133,9 +133,9 @@ public sealed class VisualInventorySlot : UiElement
         }
     }
 
-    public override int Render(Rectangle extents, int order)
+    public override int Render(Rectangle extents, int order, LayoutNode parent)
     {
         Rebuild(extents);
-        return base.Render(extents, order);
+        return base.Render(extents, order, parent);
     }
 }

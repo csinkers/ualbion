@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using UAlbion.Core;
 
 namespace UAlbion.Game.Gui.Controls;
@@ -39,7 +38,7 @@ public class Padding : UiElement
         return new Vector2(contentSize.X + _left + _right, contentSize.Y + _top + _bottom);
     }
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         var paddedExtents = new Rectangle(
             extents.X + _left,
@@ -47,6 +46,6 @@ public class Padding : UiElement
             extents.Width - _left - _right,
             extents.Height - _top - _bottom
         );
-        return base.DoLayout(paddedExtents, order, func);
+        return base.DoLayout(paddedExtents, order, context, func);
     }
 }

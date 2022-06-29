@@ -66,7 +66,7 @@ public class Slider : UiElement
         return size;
     }
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         if (func == null) throw new ArgumentNullException(nameof(func));
         int maxOrder = order;
@@ -75,18 +75,18 @@ public class Slider : UiElement
 
         maxOrder = Math.Max(maxOrder, func(_decrement,
             new Rectangle(extents.X, extents.Y, decWidth, extents.Height),
-            order + 1));
+            order + 1, context));
 
         maxOrder = Math.Max(maxOrder, func(_frame, new Rectangle(
             extents.X + decWidth,
             extents.Y,
             extents.Width - decWidth - incWidth,
             extents.Height
-        ), order + 1));
+        ), order + 1, context));
 
         maxOrder = Math.Max(maxOrder, func(_increment,
             new Rectangle(extents.X + extents.Width - incWidth, extents.Y, incWidth, extents.Height),
-            order + 1));
+            order + 1, context));
 
         return maxOrder;
     }

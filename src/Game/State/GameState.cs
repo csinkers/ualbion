@@ -26,14 +26,14 @@ public class GameState : ServiceComponent<IGameState>, IGameState
     Party _party;
     CharacterSheet _leader;
     CharacterSheet _subject;
-    CharacterSheet _inventory;
+    CharacterSheet _currentInventory;
     CharacterSheet _combatant;
     CharacterSheet _victim;
     ItemData _weapon;
 
     public ICharacterSheet Leader    => _leader;
     public ICharacterSheet Subject   => _subject;
-    public ICharacterSheet Inventory => _inventory;
+    public ICharacterSheet CurrentInventory => _currentInventory;
     public ICharacterSheet Combatant => _combatant;
     public ICharacterSheet Victim    => _victim;
     public ItemData Weapon => _weapon;
@@ -117,7 +117,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
             {
                 case ContextType.Leader: _leader = (CharacterSheet)asset; break;
                 case ContextType.Subject: _subject = (CharacterSheet)asset; break;
-                case ContextType.Inventory: _inventory = (CharacterSheet)asset; break;
+                case ContextType.Inventory: _currentInventory = (CharacterSheet)asset; break;
                 case ContextType.Combatant: _combatant = (CharacterSheet)asset; break;
                 case ContextType.Victim: _victim = (CharacterSheet)asset; break;
                 case ContextType.Weapon: _weapon = (ItemData)asset; break;
@@ -138,7 +138,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
             case AssetType.Target:
             {
                 if (id == Target.Leader) return _leader;
-                if (id == Target.Inventory) return _inventory;
+                if (id == Target.Inventory) return _currentInventory;
                 if (id == Target.Attacker) return _combatant;
                 if (id == Target.Target) return _victim;
                 if (id == Target.Subject) return _subject;
@@ -277,7 +277,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
 
         Raise(new LoadMapEvent(_game.MapId));
         Raise(new StartClockEvent());
-        Raise(new SetContextEvent(ContextType.Leader, _party.Leader.Id));
+        Raise(new SetPartyLeaderEvent(_party.Leader.Id, 0, 0));
         Raise(new PartyChangedEvent());
         Raise(new PartyJumpEvent(_game.PartyX, _game.PartyY));
         Raise(new CameraJumpEvent(_game.PartyX, _game.PartyY));

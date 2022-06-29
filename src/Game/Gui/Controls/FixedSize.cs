@@ -18,7 +18,7 @@ public class FixedSize : UiElement, IFixedSizeUiElement
 
     public DialogPositioning Position { get; set; } = DialogPositioning.Center;
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         int shiftX = Math.Max(0, extents.Width - _width);
         int shiftY = Math.Max(0, extents.Height - _height);
@@ -38,7 +38,7 @@ public class FixedSize : UiElement, IFixedSizeUiElement
         };
 
         var fixedExtents = new Rectangle(extents.X + shiftX, extents.Y + shiftY, _width, _height);
-        return base.DoLayout(fixedExtents, order, func);
+        return base.DoLayout(fixedExtents, order, context, func);
     }
 
     public override Vector2 GetSize() => new(_width, _height);

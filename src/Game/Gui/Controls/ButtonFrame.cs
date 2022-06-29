@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -48,7 +47,7 @@ public class ButtonFrame : UiElement
     public ButtonFrame(IUiElement child)
     {
         On<BackendChangedEvent>(_ => _lastExtents = new Rectangle());
-        On<WindowResizedEvent>(e => _lastExtents = new Rectangle());
+        On<WindowResizedEvent>(_ => _lastExtents = new Rectangle());
 
         if (child != null)
             AttachChild(child);
@@ -147,7 +146,7 @@ public class ButtonFrame : UiElement
         return GetMaxChildSize() + _padding * 2 * Vector2.One;
     }
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         var innerExtents = new Rectangle(
             extents.X + _padding,
@@ -155,18 +154,18 @@ public class ButtonFrame : UiElement
             extents.Width - _padding * 2,
             extents.Height - _padding * 2);
 
-        return base.DoLayout(innerExtents, order + 1, func);
+        return base.DoLayout(innerExtents, order + 1, context, func);
     }
 
-    public override int Render(Rectangle extents, int order)
+    public override int Render(Rectangle extents, int order, LayoutNode parent)
     {
         Rebuild(extents, (DrawLayer)order);
-        return base.Render(extents, order);
+        return base.Render(extents, order, parent);
     }
 
-    public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+    public override int Select(Rectangle extents, int order, SelectionContext context)
     {
         Rebuild(extents, (DrawLayer)order);
-        return base.Select(uiPosition, extents, order, registerHitFunc);
+        return base.Select(extents, order, context);
     }
 }

@@ -33,6 +33,7 @@ namespace UAlbion.Core.Veldrid.Etm
 #define EF_HIGHLIGHT_SELECTION 0x20U
 #define EF_USE_CYLINDRICAL_BILLBOARDS 0x40U
 #define EF_RENDER_DEPTH 0x80U
+#define EF_SUPPRESS_LAYOUT 0x100U
 
 layout(set = 0, binding = 0) uniform Properties {
     vec4 uScale;

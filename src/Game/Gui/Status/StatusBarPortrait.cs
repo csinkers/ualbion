@@ -115,7 +115,7 @@ public class StatusBarPortrait : UiElement
     public override Vector2 GetSize() => _portrait.GetSize() + new Vector2(0,6); // Add room for health + mana bars
     IPlayer PartyMember => TryResolve<IParty>()?.StatusBarOrder.ElementAtOrDefault(_order);
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         if (func == null) throw new ArgumentNullException(nameof(func));
         var party = Resolve<IParty>();
@@ -135,13 +135,13 @@ public class StatusBarPortrait : UiElement
             Raise(new SetPlayerStatusUiPositionEvent(PartyMember.Id, centreX, centreY));
         }
 
-        maxOrder = Math.Max(maxOrder, func(_portrait, portraitExtents, order));
+        maxOrder = Math.Max(maxOrder, func(_portrait, portraitExtents, order, context));
         maxOrder = Math.Max(maxOrder, func(_health, new Rectangle(
                 extents.X + 5,
                 extents.Y + extents.Height - 7,
                 extents.Width - 12,
                 4),
-            order));
+            order, context));
 
         if (member.Apparent.Magic.SpellPoints.Max > 0)
         {
@@ -150,7 +150,7 @@ public class StatusBarPortrait : UiElement
                     extents.Y + extents.Height - 4,
                     extents.Width - 12,
                     4),
-                order));
+                order, context));
         }
 
         return maxOrder;

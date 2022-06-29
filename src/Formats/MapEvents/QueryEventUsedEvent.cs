@@ -9,7 +9,7 @@ public class QueryEventUsedEvent : QueryEvent
 {
     public override QueryType QueryType => QueryType.EventUsed;
     [EventPart("arg", true, (ushort)0)] public ushort Argument { get; set; }
-    [EventPart("op", true, QueryOperation.AlwaysFalse)] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
+    [EventPart("op", true, QueryOperation.NonZero)] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
     [EventPart("imm", true, (byte)0)] public byte Immediate { get; private set; } // immediate value?
     QueryEventUsedEvent() { }
     public QueryEventUsedEvent(ushort argument, QueryOperation operation, byte immediate)

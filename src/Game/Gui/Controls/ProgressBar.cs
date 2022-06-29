@@ -22,8 +22,8 @@ public class ProgressBar : UiElement
 
     public ProgressBar(IText hover, Func<int> getValue, Func<int> getMax, int absoluteMax)
     {
-        On<HoverEvent>(e => Hover());
-        On<BlurEvent>(e => Raise(new HoverTextEvent(null)));
+        On<HoverEvent>(_ => Hover());
+        On<BlurEvent>(_ => Raise(new HoverTextEvent(null)));
 
         _hover = hover;
         _getValue = getValue;
@@ -63,10 +63,10 @@ public class ProgressBar : UiElement
         _bar.DrawSize = new Vector2(_bar.MeasureSize.X * value / max, _bar.MeasureSize.Y);
     }
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         Update(extents);
         var frameExtents = new Rectangle(extents.X, extents.Y, (int)_frame.GetSize().X, extents.Height);
-        return base.DoLayout(frameExtents, order, func);
+        return base.DoLayout(frameExtents, order, context, func);
     }
 }

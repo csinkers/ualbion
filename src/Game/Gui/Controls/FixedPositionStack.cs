@@ -79,7 +79,7 @@ public class FixedPositionStack : UiElement, IFixedSizeUiElement
         return size;
     }
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         int maxOrder = order;
         foreach (var child in _positions)
@@ -91,16 +91,17 @@ public class FixedPositionStack : UiElement, IFixedSizeUiElement
                 (int)(child.Width ?? childSize.X),
                 (int)(child.Height ?? childSize.Y));
 
-            maxOrder = Math.Max(maxOrder, func(child.Element, childExtents, order + 1));
+            maxOrder = Math.Max(maxOrder, func(child.Element, childExtents, order + 1, context));
         }
         return maxOrder;
     }
-    public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+
+    public override int Select(Rectangle extents, int order, SelectionContext context)
     {
-        if (registerHitFunc == null) throw new ArgumentNullException(nameof(registerHitFunc));
+        if (context == null) throw new ArgumentNullException(nameof(context));
         // The fixed positions may be outside the regular UI area, so don't clip to the extents that are passed in.
-        var maxOrder = DoLayout(extents, order, (x,y,z) => x.Select(uiPosition, y, z, registerHitFunc));
-        registerHitFunc(order, this);
+        var maxOrder = DoLayout(extents, order, context, SelectChild);
+        context.HitFunc(order, this);
         return maxOrder;
     }
 }

@@ -61,11 +61,11 @@ public class UiFixedPositionElement : UiElement
         finally { _sprite.Unlock(lockWasTaken); }
     }
 
-    public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+    public override int Select(Rectangle extents, int order, SelectionContext context)
     {
-        if (registerHitFunc == null) throw new ArgumentNullException(nameof(registerHitFunc));
-        if (extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
-            registerHitFunc(order, this);
+        if (context == null) throw new ArgumentNullException(nameof(context));
+        if (extents.Contains((int)context.UiPosition.X, (int)context.UiPosition.Y))
+            context.HitFunc(order, this);
         return order;
     }
 }

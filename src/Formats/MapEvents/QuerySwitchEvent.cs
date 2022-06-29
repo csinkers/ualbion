@@ -11,7 +11,7 @@ public class QuerySwitchEvent : QueryEvent
 {
     public override QueryType QueryType => QueryType.Switch;
     [EventPart("switch")] public SwitchId SwitchId { get; private set; } // => AssetType == AssetType.Switch
-    [EventPart("op", true, QueryOperation.AlwaysFalse)] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
+    [EventPart("op", true, QueryOperation.NonZero)] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
     [EventPart("imm", true, (byte)0)] public byte Immediate { get; private set; } // immediate value?
     QuerySwitchEvent() { }
     public QuerySwitchEvent(SwitchId switchId, QueryOperation operation, byte immediate)

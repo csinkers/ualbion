@@ -1,10 +1,6 @@
-﻿using UAlbion.Api;
-using UAlbion.Base;
-using UAlbion.Config;
+﻿using UAlbion.Config;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Ids;
-using UAlbion.Formats.Parsers;
 using static BuildTestingMaps.Constants;
 
 namespace BuildTestingMaps;
@@ -18,22 +14,14 @@ public static class FlagTestMap
     {
         var assets = new Dictionary<AssetId, object>();
         var builder = MapBuilder.Create2D(mapId, Palette1Id, Tileset1.Tileset.Id, MapWidth, MapHeight);
-        int nextScriptId = 1;
+        // int nextScriptId = 1;
+
+        builder.DrawBorder();
         builder.Draw2D(map =>
         {
             map.Flags |= MapFlags.Unk8000;  
 
-            for (int i = 0; i < map.Tiles.Length; i++)
-            {
-                var y = i / map.Width;
-                var x = i % map.Width;
-                map.Tiles[i] =  new MapTile(
-                    x == 0 || y == 0 || x == map.Width - 1 || y == map.Height - 1
-                        ? Tileset1.SolidOffset
-                        : Tileset1.BlankOffset, 0);
-            }
-
-            ushort n = 0;
+            // ushort n = 0;
 /* -- For investigating NPC behaviour and events --
             void Add(int x, int y, string name, Func<Func<string, int>, string> scriptBuilder)
             {

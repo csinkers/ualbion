@@ -16,8 +16,8 @@ public class SliderThumb : UiElement
 
     public SliderThumb(Func<int> getter, Func<int, string> format = null)
     {
-        On<HoverEvent>(e => _frame.State = ButtonState.Hover);
-        On<BlurEvent>(e => _frame.State = ButtonState.Normal);
+        On<HoverEvent>(_ => _frame.State = ButtonState.Hover);
+        On<BlurEvent>(_ => _frame.State = ButtonState.Normal);
 
         _getter = getter;
         _format = format;
@@ -41,9 +41,9 @@ public class SliderThumb : UiElement
             : _format(currentValue);
     }
 
-    public override int Render(Rectangle extents, int order)
+    public override int Render(Rectangle extents, int order, LayoutNode parent)
     {
         Rebuild();
-        return base.Render(extents, order);
+        return base.Render(extents, order, parent);
     }
 }

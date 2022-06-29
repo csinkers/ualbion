@@ -11,7 +11,7 @@ public class PromptPlayerEvent : QueryEvent
     public override QueryType QueryType => QueryType.PromptPlayer;
     [EventPart("text_src")] public TextId TextSourceId { get; }
     [EventPart("arg")] public ushort Argument { get; set; }
-    [EventPart("op", true, QueryOperation.AlwaysFalse)] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
+    [EventPart("op", true, QueryOperation.NonZero)] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
     [EventPart("imm", true, (byte)0)] public byte Immediate { get; private set; } // immediate value?
     PromptPlayerEvent(TextId textSourceId) => TextSourceId = textSourceId;
     public PromptPlayerEvent(TextId textSourceId, ushort argument, QueryOperation operation, byte immediate)

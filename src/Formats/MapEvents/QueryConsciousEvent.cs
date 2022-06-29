@@ -11,7 +11,7 @@ public class QueryConsciousEvent : QueryEvent
 {
     public override QueryType QueryType => QueryType.Conscious;
     [EventPart("party_member")] public PartyMemberId PartyMemberId { get; private set; } // => AssetType == AssetType.PartyMember
-    [EventPart("op", true, QueryOperation.AlwaysFalse)] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
+    [EventPart("op", true, QueryOperation.NonZero)] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
     [EventPart("imm", true, (byte)0)] public byte Immediate { get; private set; } // immediate value?
     QueryConsciousEvent() { }
     public QueryConsciousEvent(PartyMemberId partyMemberId, QueryOperation operation, byte immediate)

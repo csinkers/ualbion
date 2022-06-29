@@ -12,6 +12,8 @@
     "Control+D": "engine_flag toggle RenderDepth",
     "Control+E": "push_scene Editor",
     "Control+B": "engine_flag toggle ShowBoundingBoxes",
+    "Shift+L": "engine_flag toggle SuppressLayout",
+    "L": "eng:layout",
     "Control+M": "mute",
     "Control+R": "e:run_renderdoc",
     "Control+V": "engine_flag toggle VSync",
@@ -40,10 +42,10 @@
     "A": "+party_move -1  0",
     "D": "+party_move  1  0",
 
-    "Shift+W": "+camera_move  0 -16",
-    "Shift+A": "+camera_move -16  0",
-    "Shift+S": "+camera_move  0  16",
-    "Shift+D": "+camera_move  16  0",
+    "Shift+W": "+party_move  0 -1",
+    "Shift+S": "+party_move  0  1",
+    "Shift+A": "+party_move -1  0",
+    "Shift+D": "+party_move  1  0",
 
     "Up": "+party_move  0 -1",
     "Down": "+party_move  0  1",
@@ -108,7 +110,13 @@
     "Control+A": "take_all",
     "E": "inv:equip",
     "Escape": "inv:close",
-    "Tab": "inv:close"
+    "Tab": "inv:close",
+    "F1": "inv:open_pos 0",
+    "F2": "inv:open_pos 1",
+    "F3": "inv:open_pos 2",
+    "F4": "inv:open_pos 3",
+    "F5": "inv:open_pos 4",
+    "F6": "inv:open_pos 5"
   },
   "Conversation": {
     "Number1": "respond 1",

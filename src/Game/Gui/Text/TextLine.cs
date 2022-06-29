@@ -54,7 +54,7 @@ public class TextLine : UiElement // Multiple TextChunks arranged on a line
         string.Join("; ", Children.OfType<TextChunk>().Where(x => x.IsActive).Select(x => x.ToString()))
         + " ]";
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         var lineExtents = _alignment switch
         {
@@ -77,7 +77,7 @@ public class TextLine : UiElement // Multiple TextChunks arranged on a line
                     (int)(lineExtents.Y + lineExtents.Height - size.Y),
                     (int)size.X,
                     (int)size.Y),
-                order + 1));
+                order + 1, context));
             offset += (int)size.X;
         }
 

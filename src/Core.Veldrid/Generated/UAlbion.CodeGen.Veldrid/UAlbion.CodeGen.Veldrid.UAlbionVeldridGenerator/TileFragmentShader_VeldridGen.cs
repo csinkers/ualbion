@@ -20,6 +20,7 @@ namespace UAlbion.Core.Veldrid.Sprites
 #define EF_HIGHLIGHT_SELECTION 0x20U
 #define EF_USE_CYLINDRICAL_BILLBOARDS 0x40U
 #define EF_RENDER_DEPTH 0x80U
+#define EF_SUPPRESS_LAYOUT 0x100U
 
 // GpuTilesetFlags
 #define TSF_USE_ARRAY 0x1U

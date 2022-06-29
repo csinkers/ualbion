@@ -15,7 +15,8 @@ public static class NpcMap
     public static Dictionary<AssetId, object> Build(MapId mapId)
     {
         var builder = MapBuilder.Create2D(mapId, Palette1Id, Tileset1.Tileset.Id, MapWidth, MapHeight);
-                
+        builder.DrawBorder();
+
         for (int index = 0; index < 250; index++)
         {
             int i = index;
@@ -28,16 +29,6 @@ public static class NpcMap
         builder.Draw2D(map =>
         {
             map.Flags |= MapFlags.Unk8000; 
-
-            for (int i = 0; i < map.Tiles.Length; i++)
-            {
-                var y = i / map.Width;
-                var x = i % map.Width;
-                map.Tiles[i] = new MapTile(
-                    x == 0 || y == 0 || x == map.Width - 1 || y == map.Height - 1
-                    ? Tileset1.SolidOffset
-                    : Tileset1.BlankOffset, 0);
-            }
 
             const int cellW = 6;
             const int cellH = 7;

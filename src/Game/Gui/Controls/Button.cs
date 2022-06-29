@@ -167,10 +167,10 @@ public class Button : UiElement
 
     public override Vector2 GetSize() => GetMaxChildSize() + new Vector2(2 * Margin, 0);
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         var innerExtents = new Rectangle(extents.X + Margin, extents.Y, extents.Width - 2 * Margin, extents.Height);
-        return base.DoLayout(innerExtents, order, func);
+        return base.DoLayout(innerExtents, order, context, func);
     }
 
     #region Flag Helpers

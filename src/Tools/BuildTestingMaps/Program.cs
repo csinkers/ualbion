@@ -3,6 +3,7 @@ using UAlbion.Api;
 using UAlbion.Base;
 using UAlbion.Config;
 using UAlbion.Formats;
+using UAlbion.Formats.Ids;
 using static BuildTestingMaps.Constants;
 
 namespace BuildTestingMaps;
@@ -36,11 +37,17 @@ public static class Program
                 assets[kvp.Key] = kvp.Value;
         }
 
-        Merge(JumpMap.Build((Map)300, (Map)100, 5, 5));
-        //Merge(JumpMap.Build((Map)300, (Map)101, 5, 5));
         Merge(NpcMap.Build((Map)301));
         Merge(FlagTestMap.Build((Map)100));
         Merge(Test3DMap.Build((Map)101));
+        Merge(EventMap.Build((Map)302));
+        Merge(JumpMap.Build((Map)300, new[]
+        {
+            ((MapId)(Map)301, "NPC test map"),
+            ((Map)100, "Flag test map"),
+            ((Map)101, "3D test map"),
+            ((Map)302, "Event test map"),
+        }));
 
         (object? asset, AssetInfo? info) LoaderFunc(AssetId id, string lang)
             => assets.TryGetValue(id, out var asset)

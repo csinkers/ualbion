@@ -34,7 +34,7 @@ public class SliderTrack : UiElement
             e.Propagating = false;
             // Raise(new SetExclusiveMouseModeEvent(this));
         });
-        On<UiLeftReleaseEvent>(e =>
+        On<UiLeftReleaseEvent>(_ =>
         {
             _state = SliderState.Normal;
             _thumb.State = ButtonState.Normal;
@@ -74,11 +74,12 @@ public class SliderTrack : UiElement
         return new Rectangle(position, extents.Y, (int)size.X, extents.Height);
     }
 
-    public override int Render(Rectangle extents, int order) => _thumb.Render(ThumbExtents(extents), order);
+    public override int Render(Rectangle extents, int order, LayoutNode parent) => _thumb.Render(ThumbExtents(extents), order, parent);
 
-    public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+    public override int Select(Rectangle extents, int order, SelectionContext context)
     {
-        if (!extents.Contains((int)uiPosition.X, (int)uiPosition.Y))
+        if (context == null) throw new ArgumentNullException(nameof(context));
+        if (!extents.Contains((int)context.UiPosition.X, (int)context.UiPosition.Y))
             return order;
 
         _lastExtents = extents;
@@ -89,13 +90,13 @@ public class SliderTrack : UiElement
             case SliderState.Normal:
             case SliderState.ClickHandled: break; // Nothing to be done
             case SliderState.Clicked:
-                if (thumbExtents.Contains((int) uiPosition.X, (int) uiPosition.Y))
+                if (thumbExtents.Contains((int)context.UiPosition.X, (int)context.UiPosition.Y))
                 {
                     // Not sure why the -1 is necessary, can't be bothered investigating further as it works well enough.
-                    _clickPosition = uiPosition.X - thumbExtents.X - 1;
+                    _clickPosition = context.UiPosition.X - thumbExtents.X - 1;
                     _state = SliderState.DraggingThumb;
                 }
-                else if (uiPosition.X < thumbExtents.X)
+                else if (context.UiPosition.X < thumbExtents.X)
                 {
                     value -= Math.Max(1, (_max - _min) / 10);
                     _setter(value);
@@ -113,8 +114,8 @@ public class SliderTrack : UiElement
                 break;
         }
 
-        var maxOrder = _thumb.Select(uiPosition, thumbExtents, order + 1, registerHitFunc);
-        registerHitFunc(order, this);
+        var maxOrder = _thumb.Select(thumbExtents, order + 1, context);
+        context.HitFunc(order, this);
         return maxOrder;
     }
 }

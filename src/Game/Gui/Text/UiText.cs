@@ -33,7 +33,7 @@ public class UiText : UiElement
     void RegisterEvents()
     {
         On<BackendChangedEvent>(_ => _lastVersion = 0);
-        On<LanguageChangedEvent>(e => _lastVersion = 0); // Force a rebuild on next render
+        On<LanguageChangedEvent>(_ => _lastVersion = 0); // Force a rebuild on next render
         On<UiScrollEvent>(OnScroll);
     }
 
@@ -133,7 +133,7 @@ public class UiText : UiElement
         return size;
     }
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         Rebuild(extents);
 
@@ -144,13 +144,13 @@ public class UiText : UiElement
             if (child is TextLine line)
             {
                 var lineExtents = new Rectangle(extents.X, extents.Y + offset, extents.Width, line.Height);
-                maxOrder = Math.Max(maxOrder, func(line, lineExtents, order + 1));
+                maxOrder = Math.Max(maxOrder, func(line, lineExtents, order + 1, context));
                 offset += line.Height;
             }
             else if (child is ScrollBar scrollBar)
             {
                 var scrollExtents = new Rectangle(extents.Right - scrollBar.Width, extents.Y, scrollBar.Width, extents.Height);
-                maxOrder = Math.Max(maxOrder, func(scrollBar, scrollExtents, order + 1));
+                maxOrder = Math.Max(maxOrder, func(scrollBar, scrollExtents, order + 1, context));
             }
         }
 

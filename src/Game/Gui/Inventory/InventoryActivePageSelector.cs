@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Numerics;
 using UAlbion.Core;
 using UAlbion.Formats.Ids;
 
@@ -36,15 +35,15 @@ public class InventoryActivePageSelector : UiElement
 
         AttachChild(page);
     }
-    public override int Render(Rectangle extents, int order)
+    public override int Render(Rectangle extents, int order, LayoutNode parent)
     {
         ChangePage();
-        return base.Render(extents, order);
+        return base.Render(extents, order, parent);
     }
 
-    public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+    public override int Select(Rectangle extents, int order, SelectionContext context)
     {
         ChangePage();
-        return base.Select(uiPosition, extents, order, registerHitFunc);
+        return base.Select(extents, order, context);
     }
 }

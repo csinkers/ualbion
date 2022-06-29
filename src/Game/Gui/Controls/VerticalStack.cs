@@ -40,7 +40,7 @@ public class VerticalStack : UiElement
         return size;
     }
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         int offset = extents.Y;
         int maxOrder = order;
@@ -55,7 +55,7 @@ public class VerticalStack : UiElement
                 ? new Rectangle(extents.X, offset, extents.Width, height)
                 : new Rectangle(extents.X + (int)(extents.Width - childSize.X) / 2, offset, (int)childSize.X, height);
 
-            maxOrder = Math.Max(maxOrder, func(childElement, childExtents, order + 1));
+            maxOrder = Math.Max(maxOrder, func(childElement, childExtents, order + 1, context));
             // Rendering may have altered the size of any text elements, so retrieve it
             // again to ensure correct rendering on the first frame.
             height = (int)childElement.GetSize().Y;

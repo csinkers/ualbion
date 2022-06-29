@@ -16,19 +16,18 @@ public class UiBlocker : Component, IUiElement // Used to prevent the user from 
     }
 
     public Vector2 GetSize() => UiConstants.UiExtents.Size;
-    public int Render(Rectangle extents, int order) => order;
-    public int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
-    {
-        if (registerHitFunc == null) throw new ArgumentNullException(nameof(registerHitFunc));
-        registerHitFunc(order, this);
-        return order;
-    }
-
-    public int Layout(Rectangle extents, int order, LayoutNode parent)
+    public int Render(Rectangle extents, int order, LayoutNode parent)
     {
         // Note: Construction is side-effectful: Adds the node to its parent's children.
         // ReSharper disable once AssignmentIsFullyDiscarded
-        _ = new LayoutNode(parent, this, UiConstants.UiExtents, order);
+        _ = parent == null ? null : new LayoutNode(parent, this, UiConstants.UiExtents, order);
+        return order;
+    }
+
+    public int Select(Rectangle extents, int order, SelectionContext context)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+        context.HitFunc(order, this);
         return order;
     }
 }

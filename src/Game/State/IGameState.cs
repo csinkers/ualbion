@@ -27,7 +27,7 @@ public interface IGameState
     bool IsNpcDisabled(MapId mapId, byte npcNum);
     ICharacterSheet Leader { get; }
     ICharacterSheet Subject { get; }
-    ICharacterSheet Inventory { get; }
+    ICharacterSheet CurrentInventory { get; }
     ICharacterSheet Combatant { get; }
     ICharacterSheet Victim { get; }
     ItemData Weapon { get; }

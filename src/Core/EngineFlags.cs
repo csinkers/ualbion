@@ -13,4 +13,5 @@ public enum EngineFlags : uint
     HighlightSelection       =  0x20,
     UseCylindricalBillboards =  0x40,
     RenderDepth              =  0x80,
+    SuppressLayout           = 0x100,
 }

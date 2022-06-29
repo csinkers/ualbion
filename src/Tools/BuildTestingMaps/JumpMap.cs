@@ -1,26 +1,31 @@
 ﻿using UAlbion.Config;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Ids;
+using static BuildTestingMaps.Constants;
 
 namespace BuildTestingMaps;
 
 public static class JumpMap
 {
-    const byte MapWidth = 255;
-    const byte MapHeight = 255;
-    public static Dictionary<AssetId, object> Build(MapId mapId, MapId targetId, byte x, byte y)
-    {
-        var builder = MapBuilder.Create2D(mapId, Constants.Palette1Id, Constants.Tileset1.Tileset.Id, MapWidth, MapHeight);
-        builder.SetChain(0, _ => @$"
-	teleport {targetId.Id} {x} {y}
-	");
+    const byte MapWidth = 64;
+    const byte MapHeight = 64;
 
-        builder.Draw2D(map =>
+    public static Dictionary<AssetId, object> Build(MapId mapId, (MapId id, string name)[] portals)
+    {
+        var builder = MapBuilder.Create2D(mapId, Palette1Id, Tileset1.Tileset.Id, MapWidth, MapHeight);
+        builder.DrawBorder();
+        builder.SetChain(portals.Length, _ => @$"teleport Map.300 8 8, chain_off Set {portals.Length}");
+        builder.AddGlobalZone(TriggerTypes.EveryStep, portals.Length);
+
+        var columns = (int)Math.Ceiling(Math.Sqrt(portals.Length));
+        for (int i = 0, j = 0, index = 0; index < portals.Length; index++, i++)
         {
-            map.Flags |= MapFlags.Unk8000; 
-            map.AddGlobalZone(TriggerTypes.MapInit, 0);
-        });
+            if (i == columns) { i = 0; j++; }
+            var portal = portals[index];
+            builder.Marker(index, 3 + i * 2, 3 + j * 2, portal.name, s => @$"
+teleport {portal.id} 8 8
+");
+        }
 
         var (map, mapText) = builder.Build();
         return new Dictionary<AssetId, object>

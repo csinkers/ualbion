@@ -13,7 +13,7 @@ public class CentreContent : UiElement, IFixedSizeUiElement
         _content = content;
     }
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         if (func == null) throw new ArgumentNullException(nameof(func));
         var childSize = _content.GetSize();
@@ -23,6 +23,6 @@ public class CentreContent : UiElement, IFixedSizeUiElement
             (int)childSize.X,
             (int)childSize.Y);
 
-        return Math.Max(order, func(_content, childExtents, order + 1));
+        return Math.Max(order, func(_content, childExtents, order + 1, context));
     }
 }

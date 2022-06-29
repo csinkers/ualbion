@@ -55,12 +55,13 @@ public class TextChunk : UiElement // Renders a single TextBlock in the UI
         return _sprite?.Size ?? Vector2.Zero;
     }
 
-    public override int Render(Rectangle extents, int order)
+    public override int Render(Rectangle extents, int order, LayoutNode parent)
     {
         Rebuild((DrawLayer)order);
         if (_sprite == null)
             return order;
 
+        _ = parent == null ? null : new LayoutNode(parent, this, extents, order);
         var window = Resolve<IWindowManager>();
         var newPosition = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
 

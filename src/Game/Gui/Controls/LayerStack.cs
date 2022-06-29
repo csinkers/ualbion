@@ -19,7 +19,7 @@ public class LayerStack : UiElement
             AttachChild(child);
     }
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         foreach(var child in Children)
         {
@@ -33,7 +33,7 @@ public class LayerStack : UiElement
                 (int)childSize.X,
                 (int)childSize.Y);
 
-            order = Math.Max(order, func(childElement, childExtents, order + 1));
+            order = Math.Max(order, func(childElement, childExtents, order + 1, context));
         }
         return order;
     }

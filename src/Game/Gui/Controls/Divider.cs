@@ -50,8 +50,9 @@ public class Divider : UiElement
         _lastSize = size;
     }
 
-    public override int Render(Rectangle extents, int order)
+    public override int Render(Rectangle extents, int order, LayoutNode parent)
     {
+        var _ = parent == null ? null : new LayoutNode(parent, this, extents, order);
         var window = Resolve<IWindowManager>();
         var size = window.UiToNormRelative(extents.Width, extents.Height);
         var position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);

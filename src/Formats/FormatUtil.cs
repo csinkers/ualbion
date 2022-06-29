@@ -155,7 +155,7 @@ public static class FormatUtil
     public static bool Compare(QueryOperation operation, int value, int immediate) =>
         operation switch
         {
-            QueryOperation.AlwaysFalse        => false,
+            QueryOperation.NonZero            => value != 0,
             QueryOperation.LessThan           => value < immediate,
             QueryOperation.LessThanOrEqual    => value <= immediate,
             QueryOperation.Equals             => value == immediate,

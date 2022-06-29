@@ -15,20 +15,20 @@ public class InventoryExitButton : UiElement
 
     public InventoryExitButton()
     {
-        On<HoverEvent>(e =>
+        On<HoverEvent>(_ =>
         {
             var im = Resolve<IInventoryManager>();
             if (im?.ItemInHand?.Item == null)
                 _state = ButtonState.Hover;
         });
-        On<BlurEvent>(e => _state = ButtonState.Normal);
-        On<UiLeftClickEvent>(e =>
+        On<BlurEvent>(_ => _state = ButtonState.Normal);
+        On<UiLeftClickEvent>(_ =>
         {
             var im = Resolve<IInventoryManager>();
             if (im?.ItemInHand?.Item == null)
                 _state = ButtonState.Clicked;
         });
-        On<UiLeftReleaseEvent>(e =>
+        On<UiLeftReleaseEvent>(_ =>
         {
             if (_state != ButtonState.Clicked)
                 return;
@@ -45,7 +45,7 @@ public class InventoryExitButton : UiElement
         _sprite ??= AttachChild(new UiSpriteElement(Base.CoreGfx.UiExitButton));
     }
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         _sprite.Id = _state switch
         {
@@ -54,6 +54,6 @@ public class InventoryExitButton : UiElement
             ButtonState.Clicked => Base.CoreGfx.UiExitButtonPressed,
             _ => _sprite.Id
         };
-        return base.DoLayout(extents, order, func);
+        return base.DoLayout(extents, order, context, func);
     }
 }

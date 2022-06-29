@@ -17,19 +17,19 @@ public class ContextMenu : Dialog
     public ContextMenu() : base(DialogPositioning.TopLeft, int.MaxValue)
     {
         On<ContextMenuEvent>(Display);
-        On<CloseWindowEvent>(e => Display(null));
+        On<CloseWindowEvent>(_ => Display(null));
     }
 
-    public override int Select(Vector2 uiPosition, Rectangle extents, int order, Action<int, object> registerHitFunc)
+    public override int Select(Rectangle extents, int order, SelectionContext context)
     {
-        if (registerHitFunc == null) throw new ArgumentNullException(nameof(registerHitFunc));
+        if (context == null) throw new ArgumentNullException(nameof(context));
         // Just the default condition without the extents check, as the use of a fixed position stack means the extents passed in are ignored.
-        var maxOrder = DoLayout(extents, order, (x,y,z) => x.Select(uiPosition, y, z, registerHitFunc));
-        registerHitFunc(order, this);
+        var maxOrder = DoLayout(extents, order, context, SelectChild);
+        context.HitFunc(order, this);
         return maxOrder;
     }
 
-    protected override int DoLayout(Rectangle extents, int order, Func<IUiElement, Rectangle, int, int> func)
+    protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         int maxOrder = order;
         foreach (var child in Children)
@@ -53,7 +53,7 @@ public class ContextMenu : Dialog
                 (int)size.X,
                 (int)size.Y);
 
-            maxOrder = Math.Max(maxOrder, func(childElement, childExtents, order + 1));
+            maxOrder = Math.Max(maxOrder, func(childElement, childExtents, order + 1, context));
         }
         return maxOrder;
     }

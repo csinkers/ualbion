@@ -49,12 +49,12 @@ public class InventoryCharacterPane : UiElement
         AttachChild(new InventoryActivePageSelector(activeCharacter, getPage));
     }
 
-    public override int Render(Rectangle extents, int order)
+    public override int Render(Rectangle extents, int order, LayoutNode parent)
     {
         var page = _getPage();
         _summaryButton.IsPressed = page == InventoryPage.Summary;
         _statsButton.IsPressed = page == InventoryPage.Stats;
         _miscButton.IsPressed = page == InventoryPage.Misc;
-        return base.Render(extents, order);
+        return base.Render(extents, order, parent);
     }
 }

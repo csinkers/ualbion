@@ -85,11 +85,12 @@ public class UiRectangle : UiElement
         finally { _sprite.Unlock(lockWasTaken); }
     }
 
-    public override int Render(Rectangle extents, int order)
+    public override int Render(Rectangle extents, int order, LayoutNode parent)
     {
         if (!IsSubscribed)
             return order;
 
+        _ = parent == null ? null : new LayoutNode(parent, this, extents, order);
         var window = Resolve<IWindowManager>();
         var position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
         if (_dirty || position != _lastPosition || _sprite?.Key.RenderOrder != (DrawLayer)order)

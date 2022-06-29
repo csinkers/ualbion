@@ -46,16 +46,53 @@ public class MapBuilder
         return this;
     }
 
-    public MapBuilder AddGlobalZone(TriggerTypes trigger, ushort chain)
+    public MapBuilder AddGlobalZone(TriggerTypes trigger, int chain)
     {
-        _map.AddGlobalZone(trigger, chain);
+        if (chain is > ushort.MaxValue or < 0)
+            throw new ArgumentOutOfRangeException(nameof(chain));
+        _map.AddGlobalZone(trigger, (ushort)chain);
         return this;
     }
 
-    public MapBuilder SetZone(byte x, byte y, TriggerTypes trigger, ushort chain)
+    public MapBuilder SetZone(byte x, byte y, TriggerTypes trigger, int chain)
     {
-        _map.AddZone(x, y, trigger, chain);
+        if (chain is > ushort.MaxValue or < 0)
+            throw new ArgumentOutOfRangeException(nameof(chain));
+        _map.AddZone(x, y, trigger, (ushort)chain);
         return this;
+    }
+
+    public void DrawBorder()
+    {
+        Draw2D(m =>
+        {
+            for (int i = 0; i < m.Tiles.Length; i++)
+            {
+                var y = i / m.Width;
+                var x = i % m.Width;
+                m.Tiles[i] = new MapTile(
+                    x == 0 || y == 0 || x == m.Width - 1 || y == m.Height - 1
+                        ? Constants.Tileset1.SolidOffset
+                        : Constants.Tileset1.BlankOffset, 0);
+            }
+        });
+    }
+
+    public void Marker(int index, int x, int y, string description, Func<Func<string,int>, string> script)
+    {
+        SetChain(index, s => @$"
+if (query_verb examine) {{
+    text {s(description)}
+}} else {{
+   {script(s)}
+}}
+");
+
+        Draw2D(m =>
+        {
+            m.AddZone((byte)x, (byte)y, TriggerTypes.Examine | TriggerTypes.Manipulate, (ushort)index);
+            m.Tiles[ y * m.Width + x].Underlay = (ushort)(Constants.Tileset1.TextOffset + description[0]);
+        });
     }
 
     public MapBuilder Draw2D(Action<MapData2D> func)

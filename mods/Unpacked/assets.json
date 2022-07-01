@@ -2,7 +2,7 @@
   "Languages": { // Just used for the options screen
     "ENGLISH": { "DisplayName": "English",  "ShortName": "EN" },
     "GERMAN":  { "DisplayName": "Deutsch",  "ShortName": "DE" },
-    "FRENCH":  { "DisplayName": "François", "ShortName": "FR" }
+    "FRENCH":  { "DisplayName": "Français", "ShortName": "FR" }
   },
 
   "Files": { // Pattern Variables: 0=SubId in container 1=frame/sub-asset number 2=Asset name 3=PaletteId. Patterns must begin with {id}_ when writing.

@@ -149,7 +149,7 @@
   "Languages": {
     "ENGLISH": { "DisplayName": "English",  "ShortName": "EN" },
     "GERMAN":  { "DisplayName": "Deutsch",  "ShortName": "DE" },
-    "FRENCH":  { "DisplayName": "François", "ShortName": "FR" }
+    "FRENCH":  { "DisplayName": "Français", "ShortName": "FR" }
   }
 }
 // vim: tabstop=2 shiftwidth=2 expandtab

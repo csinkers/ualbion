@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="dotnet &quot;$(TargetPath)&quot; &quot;$(SolutionDir)mods\Shaders\Shaders&quot;" />
+    <Exec Command="dotnet &quot;$(TargetPath)&quot; &quot;$(ProjectDir)..\..\..\mods\Shaders\Shaders&quot;" />
   </Target>
 
   <ItemGroup>

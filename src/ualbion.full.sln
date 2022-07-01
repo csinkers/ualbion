@@ -5,242 +5,119 @@ VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{B2D034E4-684C-48C8-85C4-A74AFEDF9BEA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ADLMidi.NET", "deps\AdlMidi.NET\src\ADLMidi.NET.csproj", "{097660C0-D1D2-4AA3-801C-C7D0458FC44A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ADLMidi.NET", "..\deps\AdlMidi.NET\src\ADLMidi.NET.csproj", "{097660C0-D1D2-4AA3-801C-C7D0458FC44A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerdesNet", "deps\SerdesNet\src\SerdesNet.csproj", "{88B45D1E-E323-4B3C-B6AF-7EFFB7AEA496}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerdesNet", "..\deps\SerdesNet\src\SerdesNet.csproj", "{88B45D1E-E323-4B3C-B6AF-7EFFB7AEA496}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerdesNet.Tests", "deps\SerdesNet\test\SerdesNet.Tests\SerdesNet.Tests.csproj", "{3C02E45C-ABD8-4B3A-B49E-70E3C3D70936}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerdesNet.Tests", "..\deps\SerdesNet\test\SerdesNet.Tests\SerdesNet.Tests.csproj", "{3C02E45C-ABD8-4B3A-B49E-70E3C3D70936}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{EC61DB68-353D-4825-B221-FADABA7ADFF3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Api.Tests", "src\Tests\UAlbion.Api.Tests\UAlbion.Api.Tests.csproj", "{480BEB1D-4045-411D-9AA1-3C20D29C5347}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Api.Tests", "Tests\UAlbion.Api.Tests\UAlbion.Api.Tests.csproj", "{480BEB1D-4045-411D-9AA1-3C20D29C5347}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Benchmarks", "src\Tests\UAlbion.Benchmarks\UAlbion.Benchmarks.csproj", "{04CF6C1C-F6CD-441E-B70E-DACA79D95AC6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Benchmarks", "Tests\UAlbion.Benchmarks\UAlbion.Benchmarks.csproj", "{04CF6C1C-F6CD-441E-B70E-DACA79D95AC6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core.Tests", "src\Tests\UAlbion.Core.Tests\UAlbion.Core.Tests.csproj", "{2C41FA26-ABB3-41CA-B4E9-4BF41D0742BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core.Tests", "Tests\UAlbion.Core.Tests\UAlbion.Core.Tests.csproj", "{2C41FA26-ABB3-41CA-B4E9-4BF41D0742BC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Formats.Tests", "src\Tests\UAlbion.Formats.Tests\UAlbion.Formats.Tests.csproj", "{74E34718-8403-4DD1-A77B-7E95DE0EFCE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Formats.Tests", "Tests\UAlbion.Formats.Tests\UAlbion.Formats.Tests.csproj", "{74E34718-8403-4DD1-A77B-7E95DE0EFCE2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Game.Tests", "src\Tests\UAlbion.Game.Tests\UAlbion.Game.Tests.csproj", "{DCC26137-4310-4346-BE93-67FCE778C210}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Game.Tests", "Tests\UAlbion.Game.Tests\UAlbion.Game.Tests.csproj", "{DCC26137-4310-4346-BE93-67FCE778C210}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.TestCommon", "src\Tests\UAlbion.TestCommon\UAlbion.TestCommon.csproj", "{73195431-48D0-4951-96F9-46BD22A84AD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.TestCommon", "Tests\UAlbion.TestCommon\UAlbion.TestCommon.csproj", "{73195431-48D0-4951-96F9-46BD22A84AD0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{149A8BC2-91D1-4249-9E1D-7B0054347832}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DumpSave", "src\Tools\DumpSave\DumpSave.csproj", "{EE1EC7F8-2D85-49A4-9477-EED30D2B4FB8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DumpSave", "Tools\DumpSave\DumpSave.csproj", "{EE1EC7F8-2D85-49A4-9477-EED30D2B4FB8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExportFlic", "src\Tools\ExportFlic\ExportFlic.csproj", "{BDB4E7D8-54E9-48B0-9980-574F96B49B51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExportFlic", "Tools\ExportFlic\ExportFlic.csproj", "{BDB4E7D8-54E9-48B0-9980-574F96B49B51}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.CodeGenerator", "src\Tools\GenerateEnums\UAlbion.CodeGenerator.csproj", "{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.CodeGenerator", "Tools\GenerateEnums\UAlbion.CodeGenerator.csproj", "{F1CAE7BE-2B7F-461B-94DC-2D216345EBB9}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "UAlbion.Tools.Exporter", "src\Tools\Exporter\UAlbion.Tools.Exporter.fsproj", "{8611136B-B88E-498C-9F5B-5CF22EE48D32}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "UAlbion.Tools.Exporter", "Tools\Exporter\UAlbion.Tools.Exporter.fsproj", "{8611136B-B88E-498C-9F5B-5CF22EE48D32}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Veldrid", "Veldrid", "{DB6A1F1D-5617-4750-A609-506067B01336}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid", "deps\veldrid\src\Veldrid\Veldrid.csproj", "{229A9BFA-B737-40B3-87FA-BACE20587C46}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid", "..\deps\veldrid\src\Veldrid\Veldrid.csproj", "{229A9BFA-B737-40B3-87FA-BACE20587C46}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.ImGui", "deps\veldrid\src\Veldrid.ImGui\Veldrid.ImGui.csproj", "{433026E0-3C04-490D-85C6-BCBFF4ABA75A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.ImGui", "..\deps\veldrid\src\Veldrid.ImGui\Veldrid.ImGui.csproj", "{433026E0-3C04-490D-85C6-BCBFF4ABA75A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.ImageSharp", "deps\veldrid\src\Veldrid.ImageSharp\Veldrid.ImageSharp.csproj", "{0E8DF225-AFF9-41E1-BE3F-CDDDCF0CE32E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.ImageSharp", "..\deps\veldrid\src\Veldrid.ImageSharp\Veldrid.ImageSharp.csproj", "{0E8DF225-AFF9-41E1-BE3F-CDDDCF0CE32E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.MetalBindings", "deps\veldrid\src\Veldrid.MetalBindings\Veldrid.MetalBindings.csproj", "{ECE8BD8B-8CAC-4E94-9D8C-1A004AB659F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.MetalBindings", "..\deps\veldrid\src\Veldrid.MetalBindings\Veldrid.MetalBindings.csproj", "{ECE8BD8B-8CAC-4E94-9D8C-1A004AB659F4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.OpenGLBindings", "deps\veldrid\src\Veldrid.OpenGLBindings\Veldrid.OpenGLBindings.csproj", "{E3615811-FD58-43C0-98F6-925C19595880}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.OpenGLBindings", "..\deps\veldrid\src\Veldrid.OpenGLBindings\Veldrid.OpenGLBindings.csproj", "{E3615811-FD58-43C0-98F6-925C19595880}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.RenderDoc", "deps\veldrid\src\Veldrid.RenderDoc\Veldrid.RenderDoc.csproj", "{C1AA221E-83B2-42DB-9BD3-D221DF7D85DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.RenderDoc", "..\deps\veldrid\src\Veldrid.RenderDoc\Veldrid.RenderDoc.csproj", "{C1AA221E-83B2-42DB-9BD3-D221DF7D85DB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.SDL2", "deps\veldrid\src\Veldrid.SDL2\Veldrid.SDL2.csproj", "{CBDF8BE3-7BBE-4931-96D7-74F192FA8B43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.SDL2", "..\deps\veldrid\src\Veldrid.SDL2\Veldrid.SDL2.csproj", "{CBDF8BE3-7BBE-4931-96D7-74F192FA8B43}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.SPIRV", "deps\veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj", "{8E4A3651-9264-4FD6-AA1C-E48AEF26EFCA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.SPIRV", "..\deps\veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj", "{8E4A3651-9264-4FD6-AA1C-E48AEF26EFCA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.StartupUtilities", "deps\veldrid\src\Veldrid.StartupUtilities\Veldrid.StartupUtilities.csproj", "{FDCD4C59-2D82-43EF-B148-064AAEBA02D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.StartupUtilities", "..\deps\veldrid\src\Veldrid.StartupUtilities\Veldrid.StartupUtilities.csproj", "{FDCD4C59-2D82-43EF-B148-064AAEBA02D9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.Utilities", "deps\veldrid\src\Veldrid.Utilities\Veldrid.Utilities.csproj", "{8F54D7C3-67CF-4058-BFB5-8FBCF327B355}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Veldrid.Utilities", "..\deps\veldrid\src\Veldrid.Utilities\Veldrid.Utilities.csproj", "{8F54D7C3-67CF-4058-BFB5-8FBCF327B355}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion", "src\UAlbion\UAlbion.csproj", "{215725EE-7C55-49B6-97C1-88CDC163A8B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion", "UAlbion\UAlbion.csproj", "{215725EE-7C55-49B6-97C1-88CDC163A8B0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Api", "src\Api\UAlbion.Api.csproj", "{20D41E69-C260-461F-A0B9-89920F133F60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Api", "Api\UAlbion.Api.csproj", "{20D41E69-C260-461F-A0B9-89920F133F60}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core", "src\Core\UAlbion.Core.csproj", "{4B3B467B-2E99-4836-B589-A69D272417F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core", "Core\UAlbion.Core.csproj", "{4B3B467B-2E99-4836-B589-A69D272417F0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core.Veldrid", "src\Core.Veldrid\UAlbion.Core.Veldrid.csproj", "{EF1027DF-951A-4544-8780-5D190EE3725E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Core.Veldrid", "Core.Veldrid\UAlbion.Core.Veldrid.csproj", "{EF1027DF-951A-4544-8780-5D190EE3725E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Editor", "src\Editor\UAlbion.Editor.csproj", "{5EAFB2A6-635A-42BF-A0CE-794A430B20E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Editor", "Editor\UAlbion.Editor.csproj", "{5EAFB2A6-635A-42BF-A0CE-794A430B20E3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Formats", "src\Formats\UAlbion.Formats.csproj", "{78B55A1C-1200-4C6E-A9D3-9C04D65F0AF9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Formats", "Formats\UAlbion.Formats.csproj", "{78B55A1C-1200-4C6E-A9D3-9C04D65F0AF9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Game", "src\Game\UAlbion.Game.csproj", "{CE0E2DB4-828A-45F4-9C41-20A7C5522DA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Game", "Game\UAlbion.Game.csproj", "{CE0E2DB4-828A-45F4-9C41-20A7C5522DA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Game.Veldrid", "src\Game.Veldrid\UAlbion.Game.Veldrid.csproj", "{8CAAAFFC-3BE8-468B-830D-24610F4F75A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Game.Veldrid", "Game.Veldrid\UAlbion.Game.Veldrid.csproj", "{8CAAAFFC-3BE8-468B-830D-24610F4F75A2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mods", "Mods", "{E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5B011D11-67A4-4DAC-BA1C-CD95C699A6B9}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-		.gitignore = .gitignore
-		build.bat = build.bat
-		build.sh = build.sh
-		get_dependencies.bat = get_dependencies.bat
-		get_dependencies.sh = get_dependencies.sh
-		LICENSE = LICENSE
-		publish.bat = publish.bat
-		README.md = README.md
-		run.bat = run.bat
-		run.sh = run.sh
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Base", "Base\UAlbion.Base.csproj", "{86A29314-DA10-4D0D-B727-D715CD205862}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Base", "src\Base\UAlbion.Base.csproj", "{86A29314-DA10-4D0D-B727-D715CD205862}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Config", "Config\UAlbion.Config.csproj", "{9AD96F20-81BA-465F-925A-89544C64ADF8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Config", "src\Config\UAlbion.Config.csproj", "{9AD96F20-81BA-465F-925A-89544C64ADF8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PaletteBuilder", "Tools\PaletteBuilder\PaletteBuilder.csproj", "{E770E959-7E1E-4395-B6E9-CFC03EFBC7E8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Base", "Base", "{DAC01E7B-9B98-4DB3-AC5B-9D093785B17E}"
-	ProjectSection(SolutionItems) = preProject
-		mods\Base\base_assets.json = mods\Base\base_assets.json
-		mods\Base\modinfo.json = mods\Base\modinfo.json
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Config.Tests", "Tests\UAlbion.Config.Tests\UAlbion.Config.Tests.csproj", "{BDDB3782-96AE-4D83-8F67-680DD55BC2E4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "English", "English", "{913D6C98-B30D-4DBA-B5FB-F35A52725C43}"
-	ProjectSection(SolutionItems) = preProject
-		mods\Albion\English\strings.json = mods\Albion\English\strings.json
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "French", "French", "{14B52D81-C751-45B6-AD71-873FB26C80F7}"
-	ProjectSection(SolutionItems) = preProject
-		mods\Albion\French\strings.json = mods\Albion\French\strings.json
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "German", "German", "{2735FEDB-7AFC-442A-ADDE-2B88B0A6E078}"
-	ProjectSection(SolutionItems) = preProject
-		mods\Albion\German\strings.json = mods\Albion\German\strings.json
-	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PaletteBuilder", "src\Tools\PaletteBuilder\PaletteBuilder.csproj", "{E770E959-7E1E-4395-B6E9-CFC03EFBC7E8}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Config.Tests", "src\Tests\UAlbion.Config.Tests\UAlbion.Config.Tests.csproj", "{BDDB3782-96AE-4D83-8F67-680DD55BC2E4}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Base.Tests", "src\Tests\UAlbion.Base.Tests\UAlbion.Base.Tests.csproj", "{8F548F05-E3CF-4929-B341-C2AC179612F7}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unpacked", "Unpacked", "{DC1CBF5C-D2A8-4617-B6B0-F91A91216B7C}"
-	ProjectSection(SolutionItems) = preProject
-		mods\Unpacked\assets.json = mods\Unpacked\assets.json
-		mods\Unpacked\modinfo.json = mods\Unpacked\modinfo.json
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repacked", "Repacked", "{8BC04F87-80BC-42D4-8BA3-25913BA6C13A}"
-	ProjectSection(SolutionItems) = preProject
-		mods\Repacked\assets.json = mods\Repacked\assets.json
-		mods\Repacked\modinfo.json = mods\Repacked\modinfo.json
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Meta", "Meta", "{A4FBE98A-3624-44A9-8DAB-1B3D58B10F70}"
-	ProjectSection(SolutionItems) = preProject
-		mods\Albion\Meta\3DFLOOR0.json = mods\Albion\Meta\3DFLOOR0.json
-		mods\Albion\Meta\3DFLOOR1.json = mods\Albion\Meta\3DFLOOR1.json
-		mods\Albion\Meta\3DFLOOR2.json = mods\Albion\Meta\3DFLOOR2.json
-		mods\Albion\Meta\3DOBJEC0.json = mods\Albion\Meta\3DOBJEC0.json
-		mods\Albion\Meta\3DOBJEC1.json = mods\Albion\Meta\3DOBJEC1.json
-		mods\Albion\Meta\3DOBJEC2.json = mods\Albion\Meta\3DOBJEC2.json
-		mods\Albion\Meta\3DOBJEC3.json = mods\Albion\Meta\3DOBJEC3.json
-		mods\Albion\Meta\3DOVERL0.json = mods\Albion\Meta\3DOVERL0.json
-		mods\Albion\Meta\3DOVERL1.json = mods\Albion\Meta\3DOVERL1.json
-		mods\Albion\Meta\3DOVERL2.json = mods\Albion\Meta\3DOVERL2.json
-		mods\Albion\Meta\3DWALLS0.json = mods\Albion\Meta\3DWALLS0.json
-		mods\Albion\Meta\3DWALLS1.json = mods\Albion\Meta\3DWALLS1.json
-		mods\Albion\Meta\COMBACK0.json = mods\Albion\Meta\COMBACK0.json
-		mods\Albion\Meta\LABDATA0.json = mods\Albion\Meta\LABDATA0.json
-		mods\Albion\Meta\LABDATA1.json = mods\Albion\Meta\LABDATA1.json
-		mods\Albion\Meta\LABDATA2.json = mods\Albion\Meta\LABDATA2.json
-		mods\Albion\Meta\MainExeEN_DE.json = mods\Albion\Meta\MainExeEN_DE.json
-		mods\Albion\Meta\MainExeFR.json = mods\Albion\Meta\MainExeFR.json
-		mods\Albion\Meta\MONGFX0.json = mods\Albion\Meta\MONGFX0.json
-		mods\Albion\Meta\NPCGR0.json = mods\Albion\Meta\NPCGR0.json
-		mods\Albion\Meta\NPCGR1.json = mods\Albion\Meta\NPCGR1.json
-		mods\Albion\Meta\SPELLDAT.json = mods\Albion\Meta\SPELLDAT.json
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{45789AD1-F501-469F-B410-D71AE73EE3EC}"
-	ProjectSection(SolutionItems) = preProject
-		mods\Shaders\Shaders\BlendedSpriteSF.frag = mods\Shaders\Shaders\BlendedSpriteSF.frag
-		mods\Shaders\Shaders\BlendedSpriteSF.h.frag = mods\Shaders\Shaders\BlendedSpriteSF.h.frag
-		mods\Shaders\Shaders\BlendedSpriteSV.h.vert = mods\Shaders\Shaders\BlendedSpriteSV.h.vert
-		mods\Shaders\Shaders\BlendedSpriteSV.vert = mods\Shaders\Shaders\BlendedSpriteSV.vert
-		mods\Shaders\Shaders\CommonResources.glsl = mods\Shaders\Shaders\CommonResources.glsl
-		mods\Shaders\Shaders\CylindricalSpriteSF.frag = mods\Shaders\Shaders\CylindricalSpriteSF.frag
-		mods\Shaders\Shaders\CylindricalSpriteSV.vert = mods\Shaders\Shaders\CylindricalSpriteSV.vert
-		mods\Shaders\Shaders\ExtrudedTileMapSF.frag = mods\Shaders\Shaders\ExtrudedTileMapSF.frag
-		mods\Shaders\Shaders\ExtrudedTileMapSF.h.frag = mods\Shaders\Shaders\ExtrudedTileMapSF.h.frag
-		mods\Shaders\Shaders\ExtrudedTileMapSV.h.vert = mods\Shaders\Shaders\ExtrudedTileMapSV.h.vert
-		mods\Shaders\Shaders\ExtrudedTileMapSV.vert = mods\Shaders\Shaders\ExtrudedTileMapSV.vert
-		mods\Shaders\Shaders\FullscreenQuadSF.frag = mods\Shaders\Shaders\FullscreenQuadSF.frag
-		mods\Shaders\Shaders\FullscreenQuadSF.h.frag = mods\Shaders\Shaders\FullscreenQuadSF.h.frag
-		mods\Shaders\Shaders\FullscreenQuadSV.h.vert = mods\Shaders\Shaders\FullscreenQuadSV.h.vert
-		mods\Shaders\Shaders\FullscreenQuadSV.vert = mods\Shaders\Shaders\FullscreenQuadSV.vert
-		mods\Shaders\Shaders\InfoOverlaySF.frag = mods\Shaders\Shaders\InfoOverlaySF.frag
-		mods\Shaders\Shaders\InfoOverlaySV.vert = mods\Shaders\Shaders\InfoOverlaySV.vert
-		mods\Shaders\modinfo.json = mods\Shaders\modinfo.json
-		mods\Shaders\Shaders\SkyBoxSF.frag = mods\Shaders\Shaders\SkyBoxSF.frag
-		mods\Shaders\Shaders\SkyBoxSF.h.frag = mods\Shaders\Shaders\SkyBoxSF.h.frag
-		mods\Shaders\Shaders\SkyBoxSV.h.vert = mods\Shaders\Shaders\SkyBoxSV.h.vert
-		mods\Shaders\Shaders\SkyBoxSV.vert = mods\Shaders\Shaders\SkyBoxSV.vert
-		mods\Shaders\Shaders\SpriteSF.frag = mods\Shaders\Shaders\SpriteSF.frag
-		mods\Shaders\Shaders\SpriteSF.h.frag = mods\Shaders\Shaders\SpriteSF.h.frag
-		mods\Shaders\Shaders\SpriteSV.h.vert = mods\Shaders\Shaders\SpriteSV.h.vert
-		mods\Shaders\Shaders\SpriteSV.vert = mods\Shaders\Shaders\SpriteSV.vert
-		mods\Shaders\Shaders\TilesSF.frag = mods\Shaders\Shaders\TilesSF.frag
-		mods\Shaders\Shaders\TilesSF.h.frag = mods\Shaders\Shaders\TilesSF.h.frag
-		mods\Shaders\Shaders\TilesSV.h.vert = mods\Shaders\Shaders\TilesSV.h.vert
-		mods\Shaders\Shaders\TilesSV.vert = mods\Shaders\Shaders\TilesSV.vert
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Base.Tests", "Tests\UAlbion.Base.Tests\UAlbion.Base.Tests.csproj", "{8F548F05-E3CF-4929-B341-C2AC179612F7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VeldridGen", "VeldridGen", "{FF5E7ED0-5D21-4C77-884B-5CCBC063D2F7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VeldridGen", "deps\VeldridGen\VeldridGen\VeldridGen.csproj", "{840FFBFA-A9A9-4EC9-9FDE-4506888C24CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VeldridGen", "..\deps\VeldridGen\VeldridGen\VeldridGen.csproj", "{840FFBFA-A9A9-4EC9-9FDE-4506888C24CA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VeldridGen.Interfaces", "deps\VeldridGen\VeldridGen.Interfaces\VeldridGen.Interfaces.csproj", "{D5585B99-526A-4348-B58B-B5FD38F0A141}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VeldridGen.Interfaces", "..\deps\VeldridGen\VeldridGen.Interfaces\VeldridGen.Interfaces.csproj", "{D5585B99-526A-4348-B58B-B5FD38F0A141}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VeldridGen.Tests", "deps\VeldridGen\VeldridGen.Tests\VeldridGen.Tests.csproj", "{13BB3E3F-C4B2-4F76-ACE8-0D910A6CCA69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VeldridGen.Tests", "..\deps\VeldridGen\VeldridGen.Tests\VeldridGen.Tests.csproj", "{13BB3E3F-C4B2-4F76-ACE8-0D910A6CCA69}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.ShaderWriter", "src\Tools\ShaderWriter\UAlbion.ShaderWriter.csproj", "{844F634D-F7ED-44AA-A1F8-021144F429D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.ShaderWriter", "Tools\ShaderWriter\UAlbion.ShaderWriter.csproj", "{844F634D-F7ED-44AA-A1F8-021144F429D1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.CodeGen.Veldrid", "src\CodeGen.Veldrid\UAlbion.CodeGen.Veldrid.csproj", "{C9418659-7F4B-40DF-BA8C-48E61E823A76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.CodeGen.Veldrid", "CodeGen.Veldrid\UAlbion.CodeGen.Veldrid.csproj", "{C9418659-7F4B-40DF-BA8C-48E61E823A76}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Scripting", "src\Scripting\UAlbion.Scripting.csproj", "{C16097FB-F65D-43CA-9373-6C07A32CEE97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Scripting", "Scripting\UAlbion.Scripting.csproj", "{C16097FB-F65D-43CA-9373-6C07A32CEE97}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Scripting.Tests", "src\Tests\UAlbion.Scripting.Tests\UAlbion.Scripting.Tests.csproj", "{BFBED7AA-8DC1-4307-A8B2-23339EEF8930}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Scripting.Tests", "Tests\UAlbion.Scripting.Tests\UAlbion.Scripting.Tests.csproj", "{BFBED7AA-8DC1-4307-A8B2-23339EEF8930}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Superpower", "deps\superpower\src\Superpower\Superpower.csproj", "{749431A9-1911-4361-AE08-AD91C99F43C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Superpower", "..\deps\superpower\src\Superpower\Superpower.csproj", "{749431A9-1911-4361-AE08-AD91C99F43C5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildTestingMaps", "src\Tools\BuildTestingMaps\BuildTestingMaps.csproj", "{AA9C6E97-A39B-4774-BF42-E1B51B315EC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildTestingMaps", "Tools\BuildTestingMaps\BuildTestingMaps.csproj", "{AA9C6E97-A39B-4774-BF42-E1B51B315EC3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.SingleAssetConverter", "src\Tools\SingleAssetConverter\UAlbion.SingleAssetConverter.csproj", "{74B9CB4A-DD58-4970-BF46-EA30E65EA5C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.SingleAssetConverter", "Tools\SingleAssetConverter\UAlbion.SingleAssetConverter.csproj", "{74B9CB4A-DD58-4970-BF46-EA30E65EA5C7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Albion", "Albion", "{F0EBCFC7-8567-499A-9E42-5B89FAFE7BC2}"
-	ProjectSection(SolutionItems) = preProject
-		mods\Albion\alb_assets.json = mods\Albion\alb_assets.json
-		mods\Albion\modinfo.json = mods\Albion\modinfo.json
-	EndProjectSection
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Base", "..\mods\Base\Base.shproj", "{5991A27C-8030-4607-AEE5-EB9D4C924321}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{690E5E8F-C7D5-4229-ADA6-1B714B1ECC02}"
-	ProjectSection(SolutionItems) = preProject
-		mods\Common\assets.json = mods\Common\assets.json
-		mods\Common\config.json = mods\Common\config.json
-		mods\Common\input.json = mods\Common\input.json
-		mods\Common\modinfo.json = mods\Common\modinfo.json
-	EndProjectSection
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Albion", "..\mods\Albion\Albion.shproj", "{AFA1A549-E421-48C4-8A11-2766682D70BE}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PartyMembers", "PartyMembers", "{1C6D7AF2-357C-4F59-8AB6-175926397AC5}"
-	ProjectSection(SolutionItems) = preProject
-		mods\Common\PartyMembers\01_Tom.json = mods\Common\PartyMembers\01_Tom.json
-		mods\Common\PartyMembers\02_Rainer.json = mods\Common\PartyMembers\02_Rainer.json
-		mods\Common\PartyMembers\03_Drirr.json = mods\Common\PartyMembers\03_Drirr.json
-		mods\Common\PartyMembers\04_Sira.json = mods\Common\PartyMembers\04_Sira.json
-		mods\Common\PartyMembers\05_Mellthas.json = mods\Common\PartyMembers\05_Mellthas.json
-		mods\Common\PartyMembers\06_Harriet.json = mods\Common\PartyMembers\06_Harriet.json
-		mods\Common\PartyMembers\07_Joe.json = mods\Common\PartyMembers\07_Joe.json
-		mods\Common\PartyMembers\09_Khunag.json = mods\Common\PartyMembers\09_Khunag.json
-		mods\Common\PartyMembers\10_Siobhan.json = mods\Common\PartyMembers\10_Siobhan.json
-	EndProjectSection
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Common", "..\mods\Common\Common.shproj", "{7264C4A9-3614-4928-9596-FA0E7D1B7414}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Repacked", "..\mods\Repacked\Repacked.shproj", "{BBE1D977-E9B9-4D0B-A6DF-AD91EC1AD15A}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shaders", "..\mods\Shaders\Shaders.shproj", "{852FA5D7-3FFF-415C-A20C-F682BBFCE0C7}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Unpacked", "..\mods\Unpacked\Unpacked.shproj", "{63A4D9A8-4AE4-4BC4-9047-E242706B3C82}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -461,17 +338,9 @@ Global
 		{8E4A3651-9264-4FD6-AA1C-E48AEF26EFCA} = {DB6A1F1D-5617-4750-A609-506067B01336}
 		{FDCD4C59-2D82-43EF-B148-064AAEBA02D9} = {DB6A1F1D-5617-4750-A609-506067B01336}
 		{8F54D7C3-67CF-4058-BFB5-8FBCF327B355} = {DB6A1F1D-5617-4750-A609-506067B01336}
-		{DAC01E7B-9B98-4DB3-AC5B-9D093785B17E} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
-		{913D6C98-B30D-4DBA-B5FB-F35A52725C43} = {F0EBCFC7-8567-499A-9E42-5B89FAFE7BC2}
-		{14B52D81-C751-45B6-AD71-873FB26C80F7} = {F0EBCFC7-8567-499A-9E42-5B89FAFE7BC2}
-		{2735FEDB-7AFC-442A-ADDE-2B88B0A6E078} = {F0EBCFC7-8567-499A-9E42-5B89FAFE7BC2}
 		{E770E959-7E1E-4395-B6E9-CFC03EFBC7E8} = {149A8BC2-91D1-4249-9E1D-7B0054347832}
 		{BDDB3782-96AE-4D83-8F67-680DD55BC2E4} = {EC61DB68-353D-4825-B221-FADABA7ADFF3}
 		{8F548F05-E3CF-4929-B341-C2AC179612F7} = {EC61DB68-353D-4825-B221-FADABA7ADFF3}
-		{DC1CBF5C-D2A8-4617-B6B0-F91A91216B7C} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
-		{8BC04F87-80BC-42D4-8BA3-25913BA6C13A} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
-		{A4FBE98A-3624-44A9-8DAB-1B3D58B10F70} = {F0EBCFC7-8567-499A-9E42-5B89FAFE7BC2}
-		{45789AD1-F501-469F-B410-D71AE73EE3EC} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
 		{FF5E7ED0-5D21-4C77-884B-5CCBC063D2F7} = {B2D034E4-684C-48C8-85C4-A74AFEDF9BEA}
 		{840FFBFA-A9A9-4EC9-9FDE-4506888C24CA} = {FF5E7ED0-5D21-4C77-884B-5CCBC063D2F7}
 		{D5585B99-526A-4348-B58B-B5FD38F0A141} = {FF5E7ED0-5D21-4C77-884B-5CCBC063D2F7}
@@ -481,9 +350,12 @@ Global
 		{749431A9-1911-4361-AE08-AD91C99F43C5} = {B2D034E4-684C-48C8-85C4-A74AFEDF9BEA}
 		{AA9C6E97-A39B-4774-BF42-E1B51B315EC3} = {149A8BC2-91D1-4249-9E1D-7B0054347832}
 		{74B9CB4A-DD58-4970-BF46-EA30E65EA5C7} = {149A8BC2-91D1-4249-9E1D-7B0054347832}
-		{F0EBCFC7-8567-499A-9E42-5B89FAFE7BC2} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
-		{690E5E8F-C7D5-4229-ADA6-1B714B1ECC02} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
-		{1C6D7AF2-357C-4F59-8AB6-175926397AC5} = {690E5E8F-C7D5-4229-ADA6-1B714B1ECC02}
+		{5991A27C-8030-4607-AEE5-EB9D4C924321} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
+		{AFA1A549-E421-48C4-8A11-2766682D70BE} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
+		{7264C4A9-3614-4928-9596-FA0E7D1B7414} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
+		{BBE1D977-E9B9-4D0B-A6DF-AD91EC1AD15A} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
+		{852FA5D7-3FFF-415C-A20C-F682BBFCE0C7} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
+		{63A4D9A8-4AE4-4BC4-9047-E242706B3C82} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2759A62D-227A-4D68-B6B5-966B9141AA74}

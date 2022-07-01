@@ -21,4 +21,4 @@ jobs:
     - name: Build with dotnet
       run: dotnet build --configuration Release src/UAlbion/UAlbion.csproj
     - name: Test with dotnet
-      run: dotnet test ./ualbion.sln --configuration Release
+      run: dotnet test ./src/ualbion.ci.sln --configuration Release

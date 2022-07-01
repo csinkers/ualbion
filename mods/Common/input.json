@@ -76,6 +76,13 @@
   "World3D": {
     "Escape": "push_scene MainMenu",
     "Tab": "inv:open Tom",
+    "F1": "inv:open_pos 0",
+    "F2": "inv:open_pos 1",
+    "F3": "inv:open_pos 2",
+    "F4": "inv:open_pos 3",
+    "F5": "inv:open_pos 4",
+    "F6": "inv:open_pos 5",
+
     "Control+A": "!loadnextmap",
     "Control+X": "!loadprevmap",
     "Control+Q": "engine_flag toggle UseCylindricalBillboards",
@@ -116,7 +123,10 @@
     "F3": "inv:open_pos 2",
     "F4": "inv:open_pos 3",
     "F5": "inv:open_pos 4",
-    "F6": "inv:open_pos 5"
+    "F6": "inv:open_pos 5",
+    "Control+1": "inv:set_page Summary",
+    "Control+2": "inv:set_page Stats",
+    "Control+3": "inv:set_page Misc"
   },
   "Conversation": {
     "Number1": "respond 1",

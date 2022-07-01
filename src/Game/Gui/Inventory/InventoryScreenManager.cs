@@ -26,6 +26,7 @@ public class InventoryScreenManager : Component
         OnAsync<DoorEvent, bool>(OpenDoor);
         OnAsync<MerchantEvent>(TalkToMerchant);
         On<InventoryOpenEvent>(e => SetDisplayedPartyMember(e.PartyMemberId));
+        On<InventorySetPageEvent>(e => _page = e.Page);
         On<InventoryOpenPositionEvent>(e =>
         {
             var party = Resolve<IParty>();
@@ -102,11 +103,7 @@ public class InventoryScreenManager : Component
     {
         _screen?.Remove();
         var scene = Resolve<ISceneManager>().GetScene(SceneId.Inventory);
-        _screen = new InventoryScreen(
-            _modeEvent,
-            _activeCharacter,
-            () => _page,
-            x => _page = x);
+        _screen = new InventoryScreen(_modeEvent, _activeCharacter, () => _page);
         scene.Add(_screen);
     }
 

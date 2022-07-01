@@ -1,6 +1,7 @@
 ﻿using System;
 using UAlbion.Core;
 using UAlbion.Formats.Ids;
+using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui.Inventory;
@@ -13,28 +14,27 @@ public class InventoryCharacterPane : UiElement
     readonly Button _statsButton;
     readonly Button _miscButton;
 
-    public InventoryCharacterPane(PartyMemberId activeCharacter, Func<InventoryPage> getPage, Action<InventoryPage> setPage)
+    public InventoryCharacterPane(PartyMemberId activeCharacter, Func<InventoryPage> getPage)
     {
-        if (setPage == null) throw new ArgumentNullException(nameof(setPage));
         _getPage = getPage ?? throw new ArgumentNullException(nameof(getPage));
         var page = _getPage();
         _summaryButton = new Button("I")
         {
             DoubleFrame = true,
             IsPressed = page == InventoryPage.Summary
-        }.OnClick(() => setPage(InventoryPage.Summary));
+        }.OnClick(() => Raise(new InventorySetPageEvent(InventoryPage.Summary)));
 
         _statsButton = new Button("II")
         {
             DoubleFrame = true,
             IsPressed = page == InventoryPage.Stats
-        }.OnClick(() => setPage(InventoryPage.Stats));
+        }.OnClick(() => Raise(new InventorySetPageEvent(InventoryPage.Stats)));
 
         _miscButton = new Button("III")
         {
             DoubleFrame = true,
             IsPressed = page == InventoryPage.Misc
-        }.OnClick(() => setPage(InventoryPage.Misc));
+        }.OnClick(() => Raise(new InventorySetPageEvent(InventoryPage.Misc)));
 
         var buttonStack =
             new FixedPosition(

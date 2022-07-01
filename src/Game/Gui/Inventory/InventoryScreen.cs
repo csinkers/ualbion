@@ -3,6 +3,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui.Inventory;
@@ -12,17 +13,15 @@ public class InventoryScreen : Dialog
     public InventoryScreen(
         IEvent modeEvent,
         PartyMemberId activeCharacter,
-        Func<InventoryPage> getPage,
-        Action<InventoryPage> setPage) : base(DialogPositioning.TopLeft)
+        Func<InventoryPage> getPage) : base(DialogPositioning.TopLeft)
     {
         if (modeEvent == null) throw new ArgumentNullException(nameof(modeEvent));
         if (getPage == null) throw new ArgumentNullException(nameof(getPage));
-        if (setPage == null) throw new ArgumentNullException(nameof(setPage));
 
         var leftPane =
             modeEvent switch
             {
-                InventoryOpenEvent ioe => new InventoryCharacterPane(activeCharacter, getPage, setPage),
+                InventoryOpenEvent ioe => new InventoryCharacterPane(activeCharacter, getPage),
                 MerchantEvent me => new InventoryMerchantPane(me.MerchantId),
                 ChestEvent ce => ce.PickDifficulty == 0 ? (IUiElement)new InventoryChestPane(ce.ChestId) : new InventoryLockPane(ce),
                 DoorEvent de => new InventoryLockPane(de),

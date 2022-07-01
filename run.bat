@@ -12,19 +12,18 @@ dotnet run --project src\Tools\Exporter
 goto end
 
 :build
-dotnet build -c Release src\ualbion.sln
-copy /Y src\UAlbion\bin\Release\netcoreapp3.1\native\win-x64\SDL2.dll src\UAlbion\bin\Release\netcoreapp3.1
-copy /Y deps\veldrid-spirv\bin\Debug\libveldrid-spirv.dll src\UAlbion\bin\Release\netcoreapp3.1
-pushd src\UAlbion\bin\Release\netcoreapp3.1
+dotnet build -c Release src\ualbion.full.sln
+copy /Y build\UAlbion\bin\Release\net6.0\native\win-x64\SDL2.dll build\UAlbion\bin\Release\net6.0
+copy /Y deps\veldrid-spirv\bin\Debug\libveldrid-spirv.dll build\UAlbion\bin\Release\net6.0
+pushd src\UAlbion\bin\Release\net6.0
 goto end
 
 :publish
-set UALBION_PUB=src\UAlbion\bin\Release\netcoreapp3.1\publish
+set UALBION_PUB=build\UAlbion\bin\Release\net6.0\publish
 if not exist %UALBION_PUB% goto l1
 RD /S /Q %UALBION_PUB%
 :l1
-dotnet publish -c Release src\ualbion.sln
-::copy %UALBION_PUB%\native\win-x64\SDL2.dll src\ualbion\bin\Release\netcoreapp3.0\win-x64\publish
+dotnet publish -c Release src\ualbion.nodeps.sln
 ::copy libveldrid-spirv.dll %UALBION_PUB%
 pushd %UALBION_PUB%
 goto end

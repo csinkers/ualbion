@@ -69,10 +69,10 @@ public static class LayerMapping2D
         return ParseCsv(layer.Data.Content).ToArray();
     }
 
-    public static byte[] ReadLayout(Map map)
+    public static MapTile[] ReadLayout(Map map)
     {
         var underlay = LoadLayer(map, LayerName.Underlay);
         var overlay = LoadLayer(map, LayerName.Overlay);
-        return MapTile.ToPacked(underlay, overlay);
+        return MapTile.FromInts(underlay, overlay);
     }
 }

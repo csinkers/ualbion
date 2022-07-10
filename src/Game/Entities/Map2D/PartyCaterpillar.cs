@@ -72,7 +72,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
         On<NoClipEvent>(_ =>
         {
             _state.NoClip = !_state.NoClip;
-            Info($"Clipping {(_state.NoClip ? "on" : "off")}");
+            Info($"Clipping {(_state.NoClip ? "off" : "on")}");
         });
     }
 

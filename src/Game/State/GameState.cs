@@ -21,6 +21,9 @@ namespace UAlbion.Game.State;
 
 public class GameState : ServiceComponent<IGameState>, IGameState
 {
+    const int DaysPerMonth = 30;
+    const int HoursPerDay = 24;
+
     readonly SheetApplier _sheetApplier;
     SavedGame _game;
     Party _party;
@@ -86,17 +89,82 @@ public class GameState : ServiceComponent<IGameState>, IGameState
             _game.Tickers.TryGetValue(e.TickerId, out var curValue);
             _game.Tickers[e.TickerId] = (byte)e.Operation.Apply(curValue, e.Amount, 0, 255);
         });
-        On<ModifyHoursEvent>(_ => { });
-        On<ActivateItemEvent>(ActivateItem);
-        On<EventChainOffEvent>(e =>
+
+        void AdvanceTimeInHours(int hours)
+        {
+            _game.ElapsedTime += TimeSpan.FromHours(hours);
+            // TODO
+        }
+
+        On<ModifyDaysEvent>(e => // Only SetAmount + AddAmount
         {
             switch (e.Operation)
             {
-                case SwitchOperation.Clear: _game.SetChainDisabled(e.Map, e.ChainNumber, false); break;
-                case SwitchOperation.Set: _game.SetChainDisabled(e.Map, e.ChainNumber, true); break;
-                case SwitchOperation.Toggle: _game.SetChainDisabled(e.Map, e.ChainNumber, !_game.IsChainDisabled(e.Map, e.ChainNumber)); break;
+                case NumericOperation.SetAmount:
+                {
+                    var time = _game.ElapsedTime;
+                    var dayOfMonth = e.Amount % DaysPerMonth;
+                    int month = time.Days / DaysPerMonth;
+                    int newDays = month * DaysPerMonth + dayOfMonth;
+                    _game.ElapsedTime = new TimeSpan(newDays, time.Hours, time.Minutes, time.Seconds, time.Milliseconds);
+                    break;
+                }
+                case NumericOperation.AddAmount:
+                    for(int i = 0; i < e.Amount; i++)
+                        AdvanceTimeInHours(e.Amount * HoursPerDay);
+                    break;
             }
         });
+
+        On<ModifyHoursEvent>(e => // Only SetAmount + AddAmount
+        {
+            switch (e.Operation)
+            {
+                case NumericOperation.SetAmount:
+                {
+                    var time = _game.ElapsedTime;
+                    _game.ElapsedTime = new TimeSpan(time.Days, e.Amount % HoursPerDay, time.Minutes, time.Seconds);
+                    break;
+                }
+                case NumericOperation.AddAmount:
+                    AdvanceTimeInHours(e.Amount);
+                    _game.ElapsedTime += TimeSpan.FromHours(e.Amount);
+                    break;
+            }
+        });
+
+        On<ModifyMTicksEvent>(e => // Only SetAmount + AddAmount
+        {
+            switch (e.Operation)
+            {
+                case NumericOperation.SetAmount:
+                {
+                    var time = _game.ElapsedTime;
+                    var minutes = e.Amount * 60.0f / 48;
+                    _game.ElapsedTime = new TimeSpan(time.Days, time.Hours, 0, 0) + TimeSpan.FromMinutes(minutes);
+                    break;
+                }
+                case NumericOperation.AddAmount:
+                {
+                    var minutes = e.Amount * 60.0f / 48;
+                    _game.ElapsedTime += TimeSpan.FromMinutes(minutes);
+                    // AdvanceTimeInTicks(e.Amount);
+                    break;
+                }
+            }
+        });
+
+        On<ModifyGoldEvent>(e => Warn($"TODO: {e} not handled"));
+        On<ModifyRationsEvent>(e => Warn($"TODO: {e} not handled"));
+        On<ModifyItemCountEvent>(e => Warn($"TODO: {e} not handled"));
+        On<ActivateItemEvent>(ActivateItem);
+
+        On<EventChainOffEvent>(e => _game.SetChainDisabled(e.Map, e.ChainNumber, SetFlag(e.Operation, _game.IsChainDisabled(e.Map, e.ChainNumber))));
+        On<ModifyNpcOffEvent>(e => _game.SetNpcDisabled(e.Map, e.NpcNum, SetFlag(e.Operation, _game.IsNpcDisabled(e.Map, e.NpcNum))));
+        On<NpcOffEvent>(e => _game.SetNpcDisabled(MapId.None, e.NpcNum, true));
+        On<NpcOnEvent>(e => _game.SetNpcDisabled(MapId.None, e.NpcNum, false));
+        On<ChestOpenEvent>(e => _game.SetChestOpen(e.Chest, SetFlag(e.Operation, _game.IsChestOpen(e.Chest))));
+        On<DoorOpenEvent>(e => _game.SetDoorOpen(e.Door, SetFlag(e.Operation, _game.IsDoorOpen(e.Door))));
         On<DataChangeEvent>(OnDataChange);
         On<SetContextEvent>(e =>
         {
@@ -127,6 +195,15 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         AttachChild(new InventoryManager(GetWriteableInventory));
         _sheetApplier = AttachChild(new SheetApplier());
     }
+
+    static bool SetFlag(SwitchOperation operation, bool value) =>
+        operation switch
+        {
+            SwitchOperation.Clear => false,
+            SwitchOperation.Set => true,
+            SwitchOperation.Toggle => !value,
+            _ => value
+        };
 
     CharacterSheet GetTarget(TargetId id)
     {

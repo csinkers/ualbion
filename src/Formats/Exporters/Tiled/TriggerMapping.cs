@@ -150,7 +150,7 @@ public static class TriggerMapping
             results.Add(new MapEventZone
             {
                 Global = true,
-                X = 255,
+                X = 0,
                 Y = 0,
                 ChainSource = mapId,
                 Node = global.EventIndex == EventNode.UnusedEventId ? null : new DummyEventNode(global.EventIndex),

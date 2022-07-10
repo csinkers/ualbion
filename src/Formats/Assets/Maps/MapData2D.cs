@@ -24,20 +24,26 @@ public class MapData2D : BaseMapData
     [JsonInclude] public TilesetId TilesetId { get; set; }
     [JsonInclude] public byte FrameRate { get; set; } // If set to 0, used default value (5)
     [JsonIgnore] public MapTile[] Tiles { get; private set; }
-    public byte[] RawLayout
+    public byte[] JsonTiles
     {
-        get => MapTile.ToPacked(Tiles);
-        set => Tiles = MapTile.FromPacked(value);
+        get => MapTile.ToPacked(Tiles, 1, 0, 0);
+        set => Tiles = MapTile.FromPacked(value, 1, 0, 0);
+    }
+
+    byte[] RawLayout
+    {
+        get => MapTile.ToPacked(Tiles, Width, OffsetX, OffsetY);
+        set => Tiles = MapTile.FromPacked(value, Width, OffsetX, OffsetY);
     }
 
     public MapData2D() { } // For JSON
-    public MapData2D(MapId id, PaletteId paletteId, TilesetId tilesetId, byte width, byte height, EventLayout layout, IEnumerable<MapNpc> npcs, IList<MapEventZone> zones)
+    public MapData2D(MapId id, PaletteId paletteId, TilesetId tilesetId, int width, int height, EventLayout layout, IEnumerable<MapNpc> npcs, IList<MapEventZone> zones)
         : this(id, paletteId, tilesetId, width, height, layout.Events, layout.Chains, npcs, zones) { }
 
     public MapData2D(MapId id,
         PaletteId paletteId,
         TilesetId tilesetId,
-        byte width, byte height,
+        int width, int height,
         IList<EventNode> events, IList<ushort> chains,
         IEnumerable<MapNpc> npcs,
         IList<MapEventZone> zones) : base(id, paletteId, width, height, events, chains, npcs, zones)
@@ -64,8 +70,11 @@ public class MapData2D : BaseMapData
         _ = s.UInt8("MapType", (byte)MapType.TwoD); // 2 (always Map2D to start with, may shift to outdoors once we assign the tileset)
 
         map.SongId = SongId.SerdesU8(nameof(SongId), map.SongId, mapping, s); // 3
-        map.Width = s.UInt8(nameof(Width), map.Width); // 4
-        map.Height = s.UInt8(nameof(Height), map.Height); // 5
+        if (map.Width > byte.MaxValue + OffsetX) throw new InvalidOperationException($"Cannot save a map with a width above {byte.MaxValue + OffsetX} using original game formats");
+        if (map.Height > byte.MaxValue + OffsetY) throw new InvalidOperationException($"Cannot save a map with a height above {byte.MaxValue + OffsetY} using original game formats");
+
+        map.Width = s.UInt8(nameof(Width), (byte)(map.Width - OffsetX)) + OffsetX; // 4
+        map.Height = s.UInt8(nameof(Height), (byte)(map.Height - OffsetY)) + OffsetY; // 5
         map.TilesetId = TilesetId.SerdesU8(nameof(TilesetId), map.TilesetId, mapping, s); //6
         map.CombatBackgroundId = SpriteId.SerdesU8(nameof(CombatBackgroundId), map.CombatBackgroundId, AssetType.CombatBackground, mapping, s); // 7
         map.PaletteId = PaletteId.SerdesU8(nameof(PaletteId), map.PaletteId, mapping, s);
@@ -87,9 +96,9 @@ public class MapData2D : BaseMapData
         ApiUtil.Assert(s.Offset == startOffset + 10 + npcCount * MapNpc.SizeOnDisk);
 
         if (s.IsReading())
-            map.RawLayout = s.Bytes("Layout", null, 3 * map.Width * map.Height);
+            map.RawLayout = s.Bytes("Layout", null, 3 * (map.Width - OffsetX) * (map.Height - OffsetY));
         else
-            s.Bytes("Layout", map.RawLayout, 3 * map.Width * map.Height);
+            s.Bytes("Layout", map.RawLayout, 3 * (map.Width - OffsetX) * (map.Height - OffsetY));
 
         ApiUtil.Assert(s.Offset == startOffset + 10 + npcCount * MapNpc.SizeOnDisk + 3 * map.Width * map.Height);
 

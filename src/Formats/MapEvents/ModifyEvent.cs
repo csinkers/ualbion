@@ -21,7 +21,7 @@ public abstract class ModifyEvent : MapEvent
             ModifyType.AddPartyMember =>  AddPartyMemberEvent.Serdes( (AddPartyMemberEvent)genericEvent, mapping, s), // 5
             ModifyType.ItemCount      => ModifyItemCountEvent.Serdes((ModifyItemCountEvent)genericEvent, mapping, s), // 6
             ModifyType.WordKnown      =>       WordKnownEvent.Serdes(      (WordKnownEvent)genericEvent, mapping, s), // 8
-            ModifyType.MapLighting    =>  MapLightingEvent.Serdes( (MapLightingEvent)genericEvent, s),          // B
+            ModifyType.MapLighting    =>     MapLightingEvent.Serdes(    (MapLightingEvent)genericEvent, s),          // B
             ModifyType.PartyGold      =>      ModifyGoldEvent.Serdes(     (ModifyGoldEvent)genericEvent, s),          // F
             ModifyType.PartyRations   =>   ModifyRationsEvent.Serdes(  (ModifyRationsEvent)genericEvent, s),          // 10
             ModifyType.TimeHours      =>    ModifyHoursEvent.Serdes(     (ModifyHoursEvent)genericEvent, s),          // 12

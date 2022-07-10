@@ -10,8 +10,8 @@ public interface IMapData
     MapFlags Flags { get; }
     MapType MapType { get; }
     SongId SongId { get; }
-    byte Width { get;  }
-    byte Height { get;  }
+    int Width { get;  }
+    int Height { get;  }
     SpriteId CombatBackgroundId { get;  }
     PaletteId PaletteId { get;  }
 

@@ -78,45 +78,42 @@ public struct MapTile : IEquatable<MapTile>
         return result;
     }
 
-    public static byte[] ToPacked(ReadOnlySpan<MapTile> tiles)
+    public static byte[] ToPacked(ReadOnlySpan<MapTile> tiles, int sourceWidth, int offsetX, int offsetY)
     {
-        if (tiles == null) throw new ArgumentNullException(nameof(tiles));
+        if (tiles == null || tiles.Length == 0)
+            return Array.Empty<byte>();
 
-        var buf = new byte[3 * tiles.Length];
+        int sourceHeight = tiles.Length / sourceWidth;
+        int destWidth = sourceWidth - offsetX;
+        int destHeight = sourceHeight - offsetY;
+
+        var buf = new byte[3 * destWidth * destHeight];
         for (int i = 0; i < tiles.Length; i++)
-            (
-                buf[i * 3],
-                buf[i * 3 + 1],
-                buf[i * 3 + 2]
-            ) = tiles[i].Packed;
-        return buf;
-    }
-
-    public static byte[] ToPacked(ReadOnlySpan<int> underlay, ReadOnlySpan<int> overlay)
-    {
-        if (underlay == null) throw new ArgumentNullException(nameof(underlay));
-        if (overlay == null) throw new ArgumentNullException(nameof(overlay));
-
-        if (underlay.Length != overlay.Length)
         {
-            throw new ArgumentOutOfRangeException(
-                "Tried to pack tiledata, but the underlay count " +
-                $"({underlay.Length}) differed from the overlay count ({overlay.Length})");
+            int x = i % sourceWidth;
+            int y = i / sourceWidth;
+            if (x < offsetX || y < offsetY)
+                continue;
+
+            int destX = x - offsetX;
+            int destY = y - offsetY;
+            int destIndex = destY * destWidth + destX;
+
+            (
+                buf[destIndex * 3],
+                buf[destIndex * 3 + 1],
+                buf[destIndex * 3 + 2]
+            ) = tiles[i].Packed;
         }
 
-        var buf = new byte[3 * underlay.Length];
-        for (int i = 0; i < underlay.Length; i++)
-            (
-                buf[i * 3],
-                buf[i * 3 + 1],
-                buf[i * 3 + 2]
-            ) = new MapTile((ushort)underlay[i], (ushort)overlay[i]).Packed;
         return buf;
     }
 
-    public static MapTile[] FromPacked(ReadOnlySpan<byte> buf)
+    public static MapTile[] FromPacked(ReadOnlySpan<byte> buf, int destWidth, int offsetX, int offsetY)
     {
-        if (buf == null) return null;
+        if (buf == null || buf.Length == 0)
+            return Array.Empty<MapTile>();
+
         if (buf.Length % 3 != 0)
         {
             throw new InvalidOperationException(
@@ -125,11 +122,29 @@ public struct MapTile : IEquatable<MapTile>
                 $"but was given {buf.Length})");
         }
 
-        int tileCount = buf.Length / 3;
-        var tiles = new MapTile[tileCount];
-        for (int i = 0; i < tileCount; i++)
+        int sourceWidth = destWidth - offsetX;
+        int sourceCount = buf.Length / 3;
+        if (sourceCount % sourceWidth != 0)
         {
-            tiles[i] = new MapTile(
+            throw new InvalidOperationException(
+                "Tried to set raw map data with incorrect " +
+                $"size (expected a multiple of width ({sourceWidth}), " +
+                $"but was given {sourceCount} tiles)");
+        }
+
+        int sourceHeight = sourceCount / sourceWidth;
+        int destHeight = sourceHeight + offsetY;
+
+        var tiles = new MapTile[destWidth * destHeight];
+        for (int i = 0; i < sourceCount; i++)
+        {
+            int x = i % sourceWidth;
+            int y = i / sourceWidth;
+            int destX = x + offsetX;
+            int destY = y + offsetY;
+            int destIndex = destY * destWidth + destX;
+
+            tiles[destIndex] = new MapTile(
                 buf[i * 3],
                 buf[i * 3 + 1],
                 buf[i * 3 + 2]);

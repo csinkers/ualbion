@@ -88,7 +88,7 @@ public class SheetApplier : Component
                 break;
 
             case ChangeItemEvent itemEvent:
-                // TODO
+                Warn($"TODO: {itemEvent} not handled");
                 break;
 
             case ChangeSpellsEvent spellsEvent:
@@ -151,17 +151,14 @@ public class SheetApplier : Component
                         break;
 
                     case ChangeProperty.Unused4:
-                        break;
                     case ChangeProperty.Unused6:
-                        break;
                     case ChangeProperty.UnusedA:
-                        break;
                     case ChangeProperty.UnusedB:
-                        break;
                     case ChangeProperty.UnusedE:
-                        break;
                     case ChangeProperty.UnusedF:
+                        Warn($"TODO: {generic} not handled");
                         break;
+
                     default:
                         throw new ArgumentOutOfRangeException();
                 }

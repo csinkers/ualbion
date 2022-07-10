@@ -4,9 +4,9 @@ using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
-using UAlbion.Game.Events;
 using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities.Map2D;
@@ -21,9 +21,9 @@ class NpcManager2D : Component
         _logicalMap = logicalMap2D ?? throw new ArgumentNullException(nameof(logicalMap2D));
         _npcs = new Npc2D[_logicalMap.Npcs.Count];
 
-        On<ModifyNpcOffEvent>(e => SetNpcActive(e.NpcNum, e.Operation));
-        On<NpcOffEvent>(e => SetNpcActive(e.NpcNum, SwitchOperation.Set));
-        On<NpcOnEvent>(e => SetNpcActive(e.NpcNum, SwitchOperation.Clear));
+        After<ModifyNpcOffEvent>(e => UpdateNpcStatus(e.NpcNum));
+        After<NpcOffEvent>(e => UpdateNpcStatus(e.NpcNum));
+        After<NpcOnEvent>(e => UpdateNpcStatus(e.NpcNum));
 
         On<NpcJumpEvent>(DispatchNpcEvent);
         On<NpcLockEvent>(DispatchNpcEvent);
@@ -32,13 +32,15 @@ class NpcManager2D : Component
         On<NpcUnlockEvent>(DispatchNpcEvent);
     }
 
-    void SetNpcActive(byte npcNum, SwitchOperation operation)
+    void UpdateNpcStatus(byte npcNum)
     {
-        Raise(new SetFlagArrayEvent(
-            FlagArray.NpcInactive,
-            _logicalMap.Id,
-            npcNum,
-            operation));
+        if (npcNum >= _npcs.Length)
+            return;
+
+        var game = Resolve<IGameState>();
+        bool active = !game.IsNpcDisabled(MapId.None, npcNum);
+        _npcs[npcNum].IsActive = active;
+        game.Npcs[npcNum].WasActive = (ushort)(active ? 1 : 0);
     }
 
     protected override void Subscribed()
@@ -65,8 +67,10 @@ class NpcManager2D : Component
                 continue;
 
             _npcs[index] = new Npc2D(state, npc, (byte)index, _logicalMap.UseSmallSprites);
+            _npcs[index].IsActive = !isDisabled;
             AttachChild(_npcs[index]);
         }
+
         game.MapIdForNpcs = _logicalMap.Id;
     }
 

@@ -353,8 +353,8 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(MapType.TwoD, map.MapType);
         Assert.Equal(12, map.FrameRate);
         Assert.Equal(0, map.Sound);
-        Assert.Equal(216, map.Width);
-        Assert.Equal(81, map.Height);
+        Assert.Equal(217, map.Width);
+        Assert.Equal(82, map.Height);
         Assert.Equal(SpriteId.None, map.CombatBackgroundId);
         Assert.Equal(Song.Toronto, map.SongId);
         Assert.Equal(Tileset.Toronto, map.TilesetId);
@@ -363,11 +363,11 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(MapSubMode.Unk0, map.SubMode);
         Assert.Equal(RestMode.NoResting, map.RestMode);
         Assert.Equal(map.Width * map.Height, map.Tiles.Length);
-        Assert.Equal(871, map.Tiles[0].Underlay);
-        Assert.Equal(349, map.Tiles[75].Underlay);
+        Assert.Equal(871, map.Tiles[map.Width + 1].Underlay);
+        Assert.Equal(349, map.Tiles[map.Width + 76].Underlay);
         Assert.Equal(map.Width * map.Height, map.Tiles.Length);
-        Assert.Equal(0, map.Tiles[0].Overlay);
-        Assert.Equal(2495, map.Tiles[719].Overlay);
+        Assert.Equal(0, map.Tiles[map.Width + 1].Overlay);
+        Assert.Equal(2495, map.Tiles[4 * map.Width + 72].Overlay);
 
         Assert.Equal(657, map.Events.Count);
         var en = map.Events[0];
@@ -399,7 +399,7 @@ public class AssetLoadTests : IDisposable
         Assert.True(z.Global);
         Assert.Equal(TriggerTypes.MapInit, z.Trigger);
         Assert.Equal(0, z.Unk1);
-        Assert.Equal(255, z.X);
+        Assert.Equal(0, z.X);
         Assert.Equal(0, z.Y);
     }
 
@@ -408,8 +408,8 @@ public class AssetLoadTests : IDisposable
     {
         var map = (MapData3D)Test(assets => assets.LoadMap(Map.OldFormerBuilding));
         Assert.Equal(MapType.ThreeD, map.MapType);
-        Assert.Equal(100, map.Width);
-        Assert.Equal(50, map.Height);
+        Assert.Equal(101, map.Width);
+        Assert.Equal(51, map.Height);
         Assert.Equal(SpriteId.None, map.CombatBackgroundId);
         Assert.Equal(Song.Ethereal, map.SongId);
         Assert.Equal(Palette.Argim, map.PaletteId);
@@ -420,11 +420,11 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(MapSubMode.Unk1, map.SubMode);
         Assert.Equal(RestMode.RestEightHours, map.RestMode);
         Assert.Equal(map.Width * map.Height, map.Ceilings.Length);
-        Assert.Equal(2, map.Ceilings[101]);
+        Assert.Equal(2, map.Ceilings[2 * map.Width + 2]);
         Assert.Equal(map.Width * map.Height, map.Floors.Length);
-        Assert.Equal(1, map.Floors[101]);
+        Assert.Equal(1, map.Floors[2 * map.Width + 2]);
         Assert.Equal(map.Width * map.Height, map.Contents.Length);
-        Assert.Equal(117, map.Contents[212]);
+        Assert.Equal(117, map.Contents[3 * map.Width + 13]);
 
         Assert.Empty(map.Automap);
 
@@ -459,13 +459,13 @@ public class AssetLoadTests : IDisposable
                 Assert.Equal(12, x.Y);
             });
 
-        var z = map.GetZone(72, 3);
+        var z = map.GetZone(73, 4);
         Assert.Equal(15, z.Chain);
         Assert.False(z.Global);
         Assert.Equal(TriggerTypes.Normal | TriggerTypes.Examine | TriggerTypes.UseItem, z.Trigger);
         Assert.Equal(0, z.Unk1);
-        Assert.Equal(72, z.X);
-        Assert.Equal(3, z.Y);
+        Assert.Equal(73, z.X);
+        Assert.Equal(4, z.Y);
     }
 
     [Fact]

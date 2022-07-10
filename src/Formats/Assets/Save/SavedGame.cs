@@ -89,7 +89,26 @@ public class SavedGame
         if (mapId.IsNone)
             mapId = MapId;
 
+        if (chainNumber is < 0 or >= ChainCountPerMap)
+            return;
+
+        if (mapId.Id is < 0 or >= MapCount)
+            return;
+
         _disabledChains.SetFlag(mapId, chainNumber, isDisabled);
+    }
+
+    public bool IsChestOpen(ChestId id) => id.Id is < 0 or >= ChestCount || _unlockedChests.GetFlag(id.Id);
+    public bool IsDoorOpen(DoorId id) => id.Id is < 0 or >= DoorCount || _unlockedDoors.GetFlag(id.Id);
+    public void SetChestOpen(ChestId id, bool value)
+    {
+        if (id.Id is < 0 or >= DoorCount) return;
+        _unlockedChests.SetFlag(id.Id, value);
+    }
+    public void SetDoorOpen(DoorId id, bool value)
+    {
+        if (id.Id is < 0 or >= DoorCount) return;
+        _unlockedDoors.SetFlag(id.Id, value);
     }
 
     public ushort Unk0 { get; set; }

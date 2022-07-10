@@ -31,8 +31,8 @@ public class Block
 
     public byte[] RawLayout
     {
-        get => MapTile.ToPacked(_tiles);
-        set => _tiles = MapTile.FromPacked(value);
+        get => MapTile.ToPacked(_tiles, Width, 0, 0);
+        set => _tiles = MapTile.FromPacked(value, Width, 0, 0);
     }
 
     public static Block Serdes(int _, Block b, ISerializer s)

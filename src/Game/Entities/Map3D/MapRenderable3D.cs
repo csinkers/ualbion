@@ -158,7 +158,7 @@ public class MapRenderable3D : Component
             {
                 for (int i = 0; i < _logicalMap.Width; i++)
                 {
-                    int index = j * _logicalMap.Width + i;
+                    int index = _logicalMap.Index(i, j);
                     SetTile(index, index, _frameCount);
                 }
             }

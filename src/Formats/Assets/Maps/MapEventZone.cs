@@ -38,7 +38,7 @@ public class MapEventZone
             Chain = EventNode.UnusedEventId
         };
 
-        zone.X = s.Transform<byte, byte>(nameof(X), zone.X, S.UInt8, StoreIncrementedConverter.Instance);
+        zone.X = s.UInt8(nameof(X), zone.X);
         // ApiUtil.Assert(global && zone.X == 0xff || !global && zone.X != 0xff);
         zone.Unk1 = s.UInt8(nameof(Unk1), zone.Unk1);
         zone.Trigger = s.EnumU16(nameof(Trigger), zone.Trigger);

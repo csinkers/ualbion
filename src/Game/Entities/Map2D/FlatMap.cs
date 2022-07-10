@@ -17,6 +17,20 @@ using MoveVars = UAlbion.Formats.Config.GameVars.PartyMovement;
 
 namespace UAlbion.Game.Entities.Map2D;
 
+public class TriggerMapTileEvent : Event, IVerboseEvent
+{
+    public TriggerMapTileEvent(TriggerTypes type, int x, int y)
+    {
+        Type = type;
+        X = x;
+        Y = y;
+    }
+
+    public TriggerTypes Type { get; }
+    public int X { get; }
+    public int Y { get; }
+}
+
 public class FlatMap : Component, IMap
 {
     readonly MapData2D _mapData;
@@ -41,6 +55,7 @@ public class FlatMap : Component, IMap
         On<HourElapsedEvent>(_ => FireEventChains(TriggerTypes.EveryHour, true));
         On<DayElapsedEvent>(_ => FireEventChains(TriggerTypes.EveryDay, true));
         On<PartyChangedEvent>(_ => RebuildPartyMembers());
+        On<TriggerMapTileEvent>(TileTriggered);
         // On<UnloadMapEvent>(_ => Unload());
 
         MapId = mapId;
@@ -142,43 +157,54 @@ public class FlatMap : Component, IMap
 
     void OnNpcEnteredTile(NpcEnteredTileEvent e)
     {
-        MapEventZone zone;
-        while (true)
-        {
-            zone = _logicalMap.GetZone(e.X, e.Y);
-            if (zone == null || !zone.Trigger.HasFlag(TriggerTypes.Npc))
-                return;
+        var zone = ResolveOffsetEvents(e.X, e.Y, TriggerTypes.Npc);
+        if (zone == null)
+            return;
 
-            if (zone.Node.Event is not OffsetEvent offset)
-                break;
-
-            e = new NpcEnteredTileEvent(e.NpcNum, e.X + offset.X, e.Y + offset.Y);
-        }
-
-        Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Npc, e.X, e.Y)));
+        var source = new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Npc, zone.X, zone.Y);
+        Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, source));
     }
 
     void OnPlayerEnteredTile(PlayerEnteredTileEvent e)
     {
+        var zone = ResolveOffsetEvents(e.X, e.Y, TriggerTypes.Normal);
+        if (zone == null)
+            return;
+
+        var source = new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Normal, zone.X, zone.Y);
+        Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, source));
+    }
+
+    void TileTriggered(TriggerMapTileEvent e)
+    {
+        var zone = ResolveOffsetEvents(e.X, e.Y, e.Type);
+        if (zone == null)
+            return;
+
+        var source = new EventSource(_mapData.Id, _mapData.Id.ToMapText(), e.Type, zone.X, zone.Y);
+        Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, source));
+    }
+
+    MapEventZone ResolveOffsetEvents(int tileX, int tileY, TriggerTypes filter)
+    {
         MapEventZone zone = null;
+
         for (int i = 0; i < 255; i++) // Offset chains should have no need to ever be longer than the map width/height.
         {
-            zone = _logicalMap.GetZone(e.X, e.Y);
-            if (zone?.Node == null || !zone.Trigger.HasFlag(TriggerTypes.Normal))
-                return;
+            zone = _logicalMap.GetZone(tileX, tileY);
+            if (zone?.Node == null || (zone.Trigger & filter) == 0)
+                return null;
 
             if (zone.Node.Event is not OffsetEvent offset)
                 break;
-            e = new PlayerEnteredTileEvent(e.X + offset.X, e.Y + offset.Y);
+
+            var (newTileX, newTileY) = (tileX + offset.X, tileY + offset.Y);
+            Info($"Offset from ({tileX}, {tileY}) to ({newTileX}, {newTileY}) (offset {offset.X}, {offset.Y})");
+            tileX = newTileX;
+            tileY = newTileY;
         }
 
-        if (zone == null)
-        {
-            Error($"Encountered infinite offset event loop including ({e.X}, {e.Y})");
-            return;
-        }
-
-        Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Normal, e.X, e.Y)));
+        return zone;
     }
 
     void ChangeIcon(ChangeIconEvent e)

@@ -49,7 +49,7 @@ public class MapData3D : BaseMapData
     public MapData3D(MapId id,
         PaletteId paletteId,
         LabyrinthId labyrinthId,
-        byte width, byte height,
+        int width, int height,
         IList<EventNode> events, IList<ushort> chains,
         IEnumerable<MapNpc> npcs,
         IList<MapEventZone> zones) : base(id, paletteId, width, height, events, chains, npcs, zones)
@@ -61,7 +61,7 @@ public class MapData3D : BaseMapData
         AutomapGraphics = new byte[AutomapGraphicsSize];
     }
 
-    public MapData3D(MapId id, PaletteId paletteId, LabyrinthId labyrinthId, byte width, byte height) : base(id, paletteId, width, height)
+    public MapData3D(MapId id, PaletteId paletteId, LabyrinthId labyrinthId, int width, int height) : base(id, paletteId, width, height)
     {
         LabDataId = labyrinthId;
         Floors = new byte[width * height];
@@ -79,9 +79,12 @@ public class MapData3D : BaseMapData
         map.Flags = s.EnumU16(nameof(Flags), map.Flags); // 0
         var _ = s.UInt8("MapType", (byte)map.MapType); // 2
 
+        if (map.Width > byte.MaxValue + OffsetX) throw new InvalidOperationException($"Cannot save a map with a width above {byte.MaxValue + OffsetX} using original game formats");
+        if (map.Height > byte.MaxValue + OffsetY) throw new InvalidOperationException($"Cannot save a map with a height above {byte.MaxValue + OffsetY} using original game formats");
+
         map.SongId = SongId.SerdesU8(nameof(SongId), map.SongId, mapping, s); // 3
-        map.Width = s.UInt8(nameof(Width), map.Width); // 4
-        map.Height = s.UInt8(nameof(Height), map.Height); // 5
+        map.Width = s.UInt8(nameof(Width), (byte)(map.Width - OffsetX)) + OffsetX; // 4
+        map.Height = s.UInt8(nameof(Height), (byte)(map.Height - OffsetY)) + OffsetY; // 5
         map.LabDataId = LabyrinthId.SerdesU8(nameof(LabDataId), map.LabDataId, mapping, s); // 6
         map.CombatBackgroundId = SpriteId.SerdesU8(nameof(CombatBackgroundId), map.CombatBackgroundId, AssetType.CombatBackground, mapping, s); // 7 TODO: Verify this is combat background
         map.PaletteId = PaletteId.SerdesU8(nameof(PaletteId), map.PaletteId, mapping, s);
@@ -103,11 +106,18 @@ public class MapData3D : BaseMapData
         map.Floors   ??= new byte[map.Width * map.Height];
         map.Ceilings ??= new byte[map.Width * map.Height];
 
-        for (int i = 0; i < map.Width * map.Height; i++)
+        int diskWidth = map.Width - OffsetX;
+        for (int i = 0; i < (map.Width - OffsetX) * (map.Height - OffsetY); i++)
         {
-            map.Contents[i] = s.UInt8(null, map.Contents[i]);
-            map.Floors[i]   = s.UInt8(null, map.Floors[i]);
-            map.Ceilings[i] = s.UInt8(null, map.Ceilings[i]);
+            int diskX = i % diskWidth;
+            int diskY = i / diskWidth;
+            int memX = diskX + OffsetX;
+            int memY = diskY + OffsetY;
+            int memIndex = memY * map.Width + memX;
+
+            map.Contents[memIndex] = s.UInt8(null, map.Contents[memIndex]);
+            map.Floors[memIndex]   = s.UInt8(null, map.Floors[memIndex]);
+            map.Ceilings[memIndex] = s.UInt8(null, map.Ceilings[memIndex]);
         }
         s.End();
 

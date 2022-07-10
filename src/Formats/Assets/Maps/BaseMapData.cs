@@ -13,6 +13,9 @@ namespace UAlbion.Formats.Assets.Maps;
 
 public abstract class BaseMapData : IMapData, IJsonPostDeserialise, IEventSet
 {
+    protected const int OffsetX = 1; // Compensation for all absolute map coordinates being relative to (1,1).
+    protected const int OffsetY = 1;
+
     readonly Dictionary<TriggerTypes, HashSet<MapEventZone>> _zoneTypeLookup = new();
     ushort[] _chainMapping;
 
@@ -21,8 +24,8 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise, IEventSet
     [JsonIgnore] public TextId TextId => Id.ToMapText();
     public abstract MapType MapType { get; }
     [JsonInclude] public MapFlags Flags { get; set; } // Wait/Rest, Light-Environment, NPC converge range
-    [JsonInclude] public byte Width { get; protected set; }
-    [JsonInclude] public byte Height { get; protected set; }
+    [JsonInclude] public int Width { get; protected set; }
+    [JsonInclude] public int Height { get; protected set; }
     [JsonInclude] public SongId SongId { get; set; }
     [JsonInclude] public PaletteId PaletteId { get; set; }
     [JsonInclude] public SpriteId CombatBackgroundId { get; set; }
@@ -76,7 +79,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise, IEventSet
     protected BaseMapData() { }
     protected BaseMapData(MapId id,
         PaletteId paletteId,
-        byte width, byte height,
+        int width, int height,
         IList<EventNode> events, IList<ushort> chains,
         IEnumerable<MapNpc> npcs,
         IList<MapEventZone> zones)
@@ -100,7 +103,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise, IEventSet
         Unswizzle();
     }
 
-    protected BaseMapData(MapId id, PaletteId paletteId, byte width, byte height)
+    protected BaseMapData(MapId id, PaletteId paletteId, int width, int height)
     {
         Id = id;
         PaletteId = paletteId;
@@ -121,10 +124,10 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise, IEventSet
             GlobalZones,
             (byte)255,
             zoneCount,
-            (_, x, y2, serializer) => MapEventZone.Serdes(x, serializer, y2),
+            (_, zone, y2, serializer) => MapEventZone.Serdes(zone, serializer, y2),
             n => new List<MapEventZone>(n));
 
-        for (byte y = 0; y < Height; y++)
+        for (int y = OffsetY; y < Height + OffsetY - 1; y++)
         {
             if (s.IsCommenting())
                 s.Comment($"Line {y}");
@@ -133,7 +136,12 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise, IEventSet
             zoneCount = s.UInt16("RowZones", (ushort)(row?.Count ?? 0));
             totalCount += zoneCount;
 
-            row = (List<MapEventZone>)s.List(nameof(Zones), row, y, zoneCount, (_, x, y2, s2) => MapEventZone.Serdes(x, s2, y2), n => new List<MapEventZone>(n));
+            row = (List<MapEventZone>)s.List(
+                nameof(Zones),
+                row, y, zoneCount,
+                (_, zone, y2, s2) => MapEventZone.Serdes(zone, s2, (byte)y2),
+                n => new List<MapEventZone>(n));
+
             if (s.IsReading())
                 foreach (var zone in row)
                     Zones[Index(zone.X, zone.Y)] = zone;

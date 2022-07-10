@@ -137,7 +137,7 @@ public class SheetApplier : Component
 
                     case ChangeProperty.Experience:
                         sheet.Combat.ExperiencePoints = e.Operation.Apply(sheet.Combat.ExperiencePoints, amount);
-                        ExperienceChecks(sheet);
+                        // ExperienceChecks(sheet);
                         break;
 
                     case ChangeProperty.TrainingPoints:
@@ -160,7 +160,7 @@ public class SheetApplier : Component
                         break;
 
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        throw new ArgumentOutOfRangeException(nameof(e), $"Event was of unexpected generic type {generic.ChangeProperty}");
                 }
                 break;
             }
@@ -182,8 +182,8 @@ public class SheetApplier : Component
             Raise(new DeathEvent(sheet.Id)); // TODO: Death handling
     }
 
-    void ExperienceChecks(CharacterSheet sheet)
-    {
-        // TODO: Handle leveling up.
-    }
+    // void ExperienceChecks(CharacterSheet sheet)
+    // {
+    //     // TODO: Handle leveling up.
+    // }
 }

@@ -24,7 +24,7 @@ public class UiBlocker : Component, IUiElement // Used to prevent the user from 
         return order;
     }
 
-    public int Select(Rectangle extents, int order, SelectionContext context)
+    public int Selection(Rectangle extents, int order, SelectionContext context)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
         context.HitFunc(order, this);

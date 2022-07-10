@@ -34,7 +34,7 @@ public interface IUiElement : IComponent
     /// <param name="c">The selection context, containing the cursor position and
     /// a callback for elements containing the cursor to call to alert the
     /// caller to their presence</param>
-    int Select(Rectangle extents, int order, SelectionContext c);
+    int Selection(Rectangle extents, int order, SelectionContext c);
 
     /// <summary>
     /// A delegate for hit-reporting callbacks

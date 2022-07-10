@@ -34,8 +34,18 @@ public abstract class UiElement : Component, IUiElement
     }
 
     protected delegate int LayoutFunc<in T>(IUiElement element, Rectangle extents, int order, T context);
-    protected static int RenderChild(IUiElement child, Rectangle extents, int order, LayoutNode parent) => child.Render(extents, order, parent);
-    protected static int SelectChild(IUiElement child, Rectangle extents, int order, SelectionContext context) => child.Select(extents, order, context);
+    protected static int RenderChild(IUiElement child, Rectangle extents, int order, LayoutNode parent)
+    {
+        if (child == null) throw new ArgumentNullException(nameof(child));
+        return child.Render(extents, order, parent);
+    }
+
+    protected static int SelectChild(IUiElement child, Rectangle extents, int order, SelectionContext context)
+    {
+        if (child == null) throw new ArgumentNullException(nameof(child));
+        return child.Selection(extents, order, context);
+    }
+
     protected virtual int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
         int maxOrder = order;
@@ -58,12 +68,15 @@ public abstract class UiElement : Component, IUiElement
         return DoLayout(extents, order, node, RenderChild);
     }
 
-    public virtual int Select(Rectangle extents, int order, SelectionContext c)
+    public virtual int Selection(Rectangle extents, int order, SelectionContext c)
     {
+        if (c == null)
+            throw new ArgumentNullException(nameof(c));
+
         if (!extents.Contains((int)c.UiPosition.X, (int)c.UiPosition.Y))
             return order;
 
-        var maxOrder = DoLayout(extents, order, c, (x,y,z, context) => x.Select(y, z, context));
+        var maxOrder = DoLayout(extents, order, c, (x,y,z, context) => x.Selection(y, z, context));
         c.HitFunc(order, this);
         return maxOrder;
     }

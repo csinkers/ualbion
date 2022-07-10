@@ -33,7 +33,7 @@ public class ModalDialog : Dialog // A bit hacky, and UiBlocker doesn't currentl
         return size;
     }
 
-    public override int Select(Rectangle extents, int order, SelectionContext context)
+    public override int Selection(Rectangle extents, int order, SelectionContext context)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
         int maxOrder = order;
@@ -46,13 +46,13 @@ public class ModalDialog : Dialog // A bit hacky, and UiBlocker doesn't currentl
 
                 if (childElement == _blocker)
                     continue;
-                maxOrder = Math.Max(maxOrder, childElement.Select(extents, order + 1, context));
+                maxOrder = Math.Max(maxOrder, childElement.Selection(extents, order + 1, context));
             }
 
             context.HitFunc(order, this);
         }
 
-        _blocker.Select(extents, order, context);
+        _blocker.Selection(extents, order, context);
         return maxOrder;
     }
 }

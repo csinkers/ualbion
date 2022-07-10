@@ -59,8 +59,8 @@ public class Npc2D : Component
         OnDirectCall<NpcJumpEvent>(OnJump);
         OnDirectCall<NpcMoveEvent>(OnMove);
         OnDirectCall<NpcTurnEvent>(OnTurn);
-        OnDirectCall<NpcLockEvent>(_ => Lock(true));
-        OnDirectCall<NpcUnlockEvent>(_ => Lock(false));
+        // OnDirectCall<NpcLockEvent>(_ => Lock(true));
+        // OnDirectCall<NpcUnlockEvent>(_ => Lock(false));
     }
 
     void Update()
@@ -117,9 +117,9 @@ public class Npc2D : Component
         SetTarget(_state.X + e.X, _state.Y + e.Y);
     }
 
-    void Lock(bool shouldLock)
-    {
-    }
+    // void Lock(bool shouldLock)
+    // { // TODO
+    // }
 
     void OnJump(NpcJumpEvent e)
     {

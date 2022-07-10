@@ -163,9 +163,9 @@ public class ButtonFrame : UiElement
         return base.Render(extents, order, parent);
     }
 
-    public override int Select(Rectangle extents, int order, SelectionContext context)
+    public override int Selection(Rectangle extents, int order, SelectionContext context)
     {
         Rebuild(extents, (DrawLayer)order);
-        return base.Select(extents, order, context);
+        return base.Selection(extents, order, context);
     }
 }

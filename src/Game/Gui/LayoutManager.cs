@@ -87,7 +87,7 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
                 continuation(new Selection(intersectionPoint, z, target));
             });
 
-        DoLayout((extents, dialogOrder, element) => element.Select(extents, dialogOrder, context));
+        DoLayout((extents, dialogOrder, element) => element.Selection(extents, dialogOrder, context));
         return true;
     }
 

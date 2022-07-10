@@ -55,7 +55,7 @@ public class UiSpriteElement : UiElement
         return _size;
     }
 
-    public override int Select(Rectangle extents, int order, SelectionContext context)
+    public override int Selection(Rectangle extents, int order, SelectionContext context)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
         if (extents.Contains((int)context.UiPosition.X, (int)context.UiPosition.Y))

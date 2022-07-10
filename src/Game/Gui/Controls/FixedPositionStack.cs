@@ -96,7 +96,7 @@ public class FixedPositionStack : UiElement, IFixedSizeUiElement
         return maxOrder;
     }
 
-    public override int Select(Rectangle extents, int order, SelectionContext context)
+    public override int Selection(Rectangle extents, int order, SelectionContext context)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
         // The fixed positions may be outside the regular UI area, so don't clip to the extents that are passed in.

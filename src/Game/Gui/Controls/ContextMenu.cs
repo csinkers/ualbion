@@ -20,7 +20,7 @@ public class ContextMenu : Dialog
         On<CloseWindowEvent>(_ => Display(null));
     }
 
-    public override int Select(Rectangle extents, int order, SelectionContext context)
+    public override int Selection(Rectangle extents, int order, SelectionContext context)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
         // Just the default condition without the extents check, as the use of a fixed position stack means the extents passed in are ignored.

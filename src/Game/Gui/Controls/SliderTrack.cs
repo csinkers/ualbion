@@ -76,7 +76,7 @@ public class SliderTrack : UiElement
 
     public override int Render(Rectangle extents, int order, LayoutNode parent) => _thumb.Render(ThumbExtents(extents), order, parent);
 
-    public override int Select(Rectangle extents, int order, SelectionContext context)
+    public override int Selection(Rectangle extents, int order, SelectionContext context)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
         if (!extents.Contains((int)context.UiPosition.X, (int)context.UiPosition.Y))
@@ -114,7 +114,7 @@ public class SliderTrack : UiElement
                 break;
         }
 
-        var maxOrder = _thumb.Select(thumbExtents, order + 1, context);
+        var maxOrder = _thumb.Selection(thumbExtents, order + 1, context);
         context.HitFunc(order, this);
         return maxOrder;
     }

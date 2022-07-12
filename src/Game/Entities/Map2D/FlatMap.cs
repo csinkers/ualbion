@@ -157,8 +157,11 @@ public class FlatMap : Component, IMap
 
     void OnNpcEnteredTile(NpcEnteredTileEvent e)
     {
-        var zone = _logicalMap.GetZone(e.X, e.Y);
+        var zone = _logicalMap.GetOffsetZone(e.X, e.Y);
         if (zone?.Node == null)
+            return;
+
+        if ((zone.Trigger & TriggerTypes.Npc) == 0)
             return;
 
         var source = new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Npc, zone.X, zone.Y);
@@ -167,8 +170,11 @@ public class FlatMap : Component, IMap
 
     void OnPlayerEnteredTile(PlayerEnteredTileEvent e)
     {
-        var zone = _logicalMap.GetZone(e.X, e.Y);
+        var zone = _logicalMap.GetOffsetZone(e.X, e.Y);
         if (zone?.Node == null)
+            return;
+
+        if ((zone.Trigger & TriggerTypes.Normal) == 0)
             return;
 
         var source = new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Normal, zone.X, zone.Y);
@@ -177,7 +183,7 @@ public class FlatMap : Component, IMap
 
     void TileTriggered(TriggerMapTileEvent e)
     {
-        var zone = _logicalMap.GetZone(e.X, e.Y);
+        var zone = _logicalMap.GetOffsetZone(e.X, e.Y);
         if (zone?.Node == null)
             return;
 

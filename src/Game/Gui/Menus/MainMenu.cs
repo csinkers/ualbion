@@ -74,7 +74,7 @@ public class MainMenu : Dialog
         {
             Attach(exchange);
             if (response)
-                Raise(new NewGameEvent(Base.Map.TorontoBegin, 30, 75)); // TODO: Move this to config?
+                Raise(new NewGameEvent(Base.Map.TorontoBegin, 31, 76)); // TODO: Move this to config?
         });
         Detach();
     }

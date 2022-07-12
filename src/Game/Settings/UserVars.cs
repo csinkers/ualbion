@@ -3,6 +3,7 @@ using System.Linq;
 using UAlbion.Api.Settings;
 
 #pragma warning disable CA1034 // Nested types should not be visible
+#pragma warning disable CA1724 // Type names should not match namespaces
 namespace UAlbion.Game.Settings;
 
 public static class UserVars
@@ -36,4 +37,5 @@ public static class UserVars
         public static readonly StringVar Saves = new("User.Path.SAVE", "$(ALBION)/SAVES");
     }
 }
+#pragma warning restore CA1724 // Type names should not match namespaces
 #pragma warning restore CA1034 // Nested types should not be visible

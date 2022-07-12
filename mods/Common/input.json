@@ -138,9 +138,9 @@
     "Number7": "respond 7"
   },
   "MainMenu": {
-    "Control+N": "new_game TorontoBegin 32 75",
+    "Control+N": "new_game TorontoBegin 32 76",
     "Control+3": "new_game Jirinaar 20 20",
-    "Control+Shift+N": "new_game TorontoBegin 32 75",
+    "Control+Shift+N": "new_game TorontoBegin 32 76",
     "Escape": "close_window"
   },
   "Editor": {

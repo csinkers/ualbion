@@ -80,12 +80,12 @@ If you're not using the GOG version or want to select your game files manually, 
 
 ### Compile and run
 
-To compile and run the project, open `ualbion.sln` in the C# IDE of your choice or run `./run.sh` in Linux (ensure `dotnet-host`, `dotnet-runtime` and `dotnet-sdk` are installed) or `run.bat` in Windows. Any extra parameters to `run` will be passed through to UAlbion, `--help` will show the available options.
-- To show available options: `run -h`
+To compile and run the project, open `ualbion.sln` in the C# IDE of your choice or run `./run.sh` in Linux (ensure `dotnet-host`, `dotnet-runtime` and `dotnet-sdk` are installed) or `run.bat` in Windows. Any extra parameters to `run` will be passed through to UAlbion.
+- To show available options: `run -h` or `run --help`
 - To run with Vulkan: `run -vk`
 - To run with OpenGL: `run -gl`
 - To run with Direct3D: `run -d3d`
-- To extract all game resources into modern formats under the mods/Unpacked dir: `run -b Base Unpacked`
+- To extract all game resources into modern formats under the mods/Unpacked dir: `run -b Albion Unpacked`
 - To repack the (possibly modified) assets in mods/Unpacked back into the original binary formats: `run -b Unpacked Repacked` (outputs to mods/Repacked)
 
 ## Attributions

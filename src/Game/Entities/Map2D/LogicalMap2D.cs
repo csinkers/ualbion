@@ -57,9 +57,12 @@ public class LogicalMap2D : LogicalMap
         if (index < 0 || index >= _mapData.Tiles.Length)
             return Passability.Solid;
 
-        var underlay = GetUnderlay(index)?.Collision ?? 0;
-        var overlay = GetOverlay(index)?.Collision ?? 0;
-        return underlay | overlay;
+        var underlay = GetUnderlay(index);
+        var overlay = GetOverlay(index);
+
+        return overlay == null || overlay.UseUnderlayFlags 
+            ? underlay?.Collision ?? 0 
+            : overlay.Collision;
     }
 
     protected override void ChangeUnderlay(byte x, byte y, ushort value)
@@ -90,7 +93,7 @@ public class LogicalMap2D : LogicalMap
         }
     }
 
-    protected override void PlaceBlock(byte x, byte y, ushort blockId, bool overwrite)
+    protected override void PlaceBlock(byte x, byte y, bool overwrite, ChangeIconLayers layers, ushort blockId)
     {
         if (blockId >= _blockList.Count)
         {
@@ -112,17 +115,15 @@ public class LogicalMap2D : LogicalMap
                     return;
                 }
 
-                ushort underlay = _mapData.Tiles[targetIndex].Underlay;
                 ushort newUnderlay = block.Tiles[targetBlockIndex].Underlay;
-                if (newUnderlay > 1 && (overwrite || underlay <= 1))
+                if ((layers & ChangeIconLayers.Underlay) != 0 && (overwrite || newUnderlay > 1))
                 {
                     _mapData.Tiles[targetIndex].Underlay = newUnderlay;
                     OnDirty(x + i, y + j, IconChangeType.Underlay);
                 }
 
-                ushort overlay = _mapData.Tiles[targetIndex].Overlay;
                 ushort newOverlay = block.Tiles[targetBlockIndex].Overlay;
-                if (overwrite || overlay > 1)
+                if ((layers & ChangeIconLayers.Overlay) != 0 && (overwrite || newOverlay > 1))
                 {
                     _mapData.Tiles[targetIndex].Overlay = newOverlay;
                     OnDirty(x + i, y + j, IconChangeType.Overlay);

@@ -41,10 +41,10 @@ public abstract class LogicalMap : Component
 
         // Replay any changes for this map
         foreach (var change in PermChanges.Where(x => x.MapId == _mapData.Id))
-            ApplyChange(change.X, change.Y, change.ChangeType, change.Value);
+            ApplyChange(change.X, change.Y, change.ChangeType, change.Layers, change.Value);
 
         foreach (var change in TempChanges)
-            ApplyChange(change.X, change.Y, change.ChangeType, change.Value);
+            ApplyChange(change.X, change.Y, change.ChangeType, change.Layers, change.Value);
 
         _replayed = true;
     }
@@ -59,17 +59,32 @@ public abstract class LogicalMap : Component
     public IEventSet Events => _mapData;
     public MapEventZone GetZone(int x, int y) => GetZone(Index(x, y));
     public MapEventZone GetZone(int index) => _mapData.GetZone(index);
-
-    public void Modify(byte x, byte y, IconChangeType changeType, ushort value, bool isTemporary)
+    public MapEventZone GetOffsetZone(int x, int y)
     {
-        ApplyChange(x, y, changeType, value);
+        int steps = 0;
+        MapEventZone zone;
+        do
+        {
+            zone = GetZone(x, y);
+            if (zone?.Node?.Event is not OffsetEvent offset)
+                break;
+
+            (x, y) = (x + offset.X, y + offset.Y);
+        } while (steps++ < 255); // Avoid infinite offset loops
+
+        return zone;
+    }
+
+    public void Modify(byte x, byte y, IconChangeType changeType, bool isTemporary, ChangeIconLayers layers, ushort value)
+    {
+        ApplyChange(x, y, changeType, layers, value);
         var collection = isTemporary ? TempChanges : PermChanges;
         collection.Update(Id, x, y, changeType, value);
     }
 
     public IEnumerable<MapEventZone> GetZonesOfType(TriggerTypes triggerType) => _mapData.GetZonesOfType(triggerType);
 
-    void ApplyChange(byte x, byte y, IconChangeType changeType, ushort value)
+    void ApplyChange(byte x, byte y, IconChangeType changeType, ChangeIconLayers layers, ushort value)
     {
         switch (changeType)
         {
@@ -81,8 +96,8 @@ public abstract class LogicalMap : Component
             case IconChangeType.NpcMovement: break;
             case IconChangeType.NpcSprite: break;
             case IconChangeType.Chain: _mapData.SetZoneChain(x, y, value); break;
-            case IconChangeType.BlockHard: PlaceBlock(x, y, value, true); break;
-            case IconChangeType.BlockSoft: PlaceBlock(x, y, value, false); break;
+            case IconChangeType.BlockHard: PlaceBlock(x, y, true, layers, value); break;
+            case IconChangeType.BlockSoft: PlaceBlock(x, y, false, layers, value); break;
             case IconChangeType.Trigger: _mapData.SetZoneTrigger(x, y, (TriggerTypes)value); break;
             default: throw new ArgumentOutOfRangeException(nameof(changeType), changeType, $"Unexpected change type \"{changeType}\"");
         }
@@ -90,7 +105,7 @@ public abstract class LogicalMap : Component
 
     protected virtual void ChangeUnderlay(byte x, byte y, ushort value) { } // 2D only
     protected virtual void ChangeOverlay(byte x, byte y, ushort value) { } // 2D only
-    protected virtual void PlaceBlock(byte x, byte y, ushort blockId, bool overwrite) { } // 2D only
+    protected virtual void PlaceBlock(byte x, byte y, bool overwrite, ChangeIconLayers layers, ushort blockId) { } // 2D only
     protected virtual void ChangeWall(byte x, byte y, ushort value) { } // 3D only
     protected virtual void ChangeFloor(byte x, byte y, ushort value) { } // 3D only
     protected virtual void ChangeCeiling(byte x, byte y, ushort value) { } // 3D only

@@ -157,8 +157,8 @@ public class FlatMap : Component, IMap
 
     void OnNpcEnteredTile(NpcEnteredTileEvent e)
     {
-        var zone = ResolveOffsetEvents(e.X, e.Y, TriggerTypes.Npc);
-        if (zone == null)
+        var zone = _logicalMap.GetZone(e.X, e.Y);
+        if (zone?.Node == null)
             return;
 
         var source = new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Npc, zone.X, zone.Y);
@@ -167,8 +167,8 @@ public class FlatMap : Component, IMap
 
     void OnPlayerEnteredTile(PlayerEnteredTileEvent e)
     {
-        var zone = ResolveOffsetEvents(e.X, e.Y, TriggerTypes.Normal);
-        if (zone == null)
+        var zone = _logicalMap.GetZone(e.X, e.Y);
+        if (zone?.Node == null)
             return;
 
         var source = new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Normal, zone.X, zone.Y);
@@ -177,51 +177,30 @@ public class FlatMap : Component, IMap
 
     void TileTriggered(TriggerMapTileEvent e)
     {
-        var zone = ResolveOffsetEvents(e.X, e.Y, e.Type);
-        if (zone == null)
+        var zone = _logicalMap.GetZone(e.X, e.Y);
+        if (zone?.Node == null)
             return;
 
         var source = new EventSource(_mapData.Id, _mapData.Id.ToMapText(), e.Type, zone.X, zone.Y);
         Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, source));
     }
 
-    MapEventZone ResolveOffsetEvents(int tileX, int tileY, TriggerTypes filter)
-    {
-        MapEventZone zone = null;
-
-        for (int i = 0; i < 255; i++) // Offset chains should have no need to ever be longer than the map width/height.
-        {
-            zone = _logicalMap.GetZone(tileX, tileY);
-            if (zone?.Node == null || (zone.Trigger & filter) == 0)
-                return null;
-
-            if (zone.Node.Event is not OffsetEvent offset)
-                break;
-
-            var (newTileX, newTileY) = (tileX + offset.X, tileY + offset.Y);
-            Info($"Offset from ({tileX}, {tileY}) to ({newTileX}, {newTileY}) (offset {offset.X}, {offset.Y})");
-            tileX = newTileX;
-            tileY = newTileY;
-        }
-
-        return zone;
-    }
-
     void ChangeIcon(ChangeIconEvent e)
     {
         var context = Resolve<IEventManager>().Context;
-        if (context.Source.AssetId.Type != AssetType.Map)
-        {
-            ApiUtil.Assert($"Expected event {e} to be triggered from a map event");
-            return;
-        }
 
         bool relative = e.Scope is EventScope.RelPerm or EventScope.RelTemp;
         bool temp = e.Scope is EventScope.AbsTemp or EventScope.RelTemp;
 
+        if (relative && context.Source.AssetId.Type != AssetType.Map)
+        {
+            ApiUtil.Assert($"Event {e} must be triggered from a map event if using relative coordinates");
+            return;
+        }
+
         byte x = relative ? (byte)(e.X + context.Source.X) : (byte)e.X;
         byte y = relative ? (byte)(e.Y + context.Source.Y) : (byte)e.Y;
 
-        _logicalMap.Modify(x, y, e.ChangeType, e.Value, temp);
+        _logicalMap.Modify(x, y, e.ChangeType, temp, e.Layers, e.Value);
     }
 }

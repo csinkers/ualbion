@@ -72,6 +72,9 @@ vec4 DrawCollision(vec2 tileUv, uint flags, bool isUnderlay)
 	const float width = 0.03;
 	float t = 1.0;
 
+	// This is for overlay tiles that force a normally impassable underlay to allow movement
+	bool isOverride = !isUnderlay && !flag(flags, (TF_USE_UNDERLAY_FLAGS | TF_SOLID));
+
 	if (flag(flags, TF_COLL_TOP))
 		t *= 1.0-FilledRect(pos, tl, tl, br, tl+width);
 
@@ -84,10 +87,14 @@ vec4 DrawCollision(vec2 tileUv, uint flags, bool isUnderlay)
 	if (flag(flags, TF_COLL_RIGHT))
 		t *= 1.0-FilledRect(pos, br-width, tl, br, br);
 
-	if (flag(flags, TF_SOLID))
+	if (flag(flags, TF_SOLID) || isOverride)
 		t *= 1.0-FilledRect(pos, tl+.03, tl+.03, br-.03, br-.03);
 
-	vec4 color = (1-t) * (isUnderlay ? vec4(0.65, 0.65, 0., 1.) : vec4(1.0));
+	vec3 layerColor = isUnderlay 
+		? vec3(1.0) 
+		: (isOverride ? vec3(0.) : vec3(0.9, 0.55, 0.));
+
+	vec4 color = (1-t) * vec4(layerColor, 1.);
 	return color;
 }
 

@@ -112,14 +112,15 @@ public sealed class SelectionHandler2D : Component
         var heading = S(Base.SystemText.MapPopup_Environment);
         var options = new List<ContextMenuOption>();
 
-        var zone = _map.GetZone(x, y);
+        var zone = _map.GetOffsetZone(x, y);
+
         if (zone?.Chain != null && zone.Node != null)
         {
             if (zone.Trigger.HasFlag(TriggerTypes.Examine))
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.MapPopup_Examine),
-                    new TriggerMapTileEvent(TriggerTypes.Examine, x, y),
+                    new TriggerMapTileEvent(TriggerTypes.Examine, zone.X, zone.Y),
                     ContextMenuGroup.Actions));
             }
 
@@ -127,7 +128,7 @@ public sealed class SelectionHandler2D : Component
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.MapPopup_Manipulate),
-                    new TriggerMapTileEvent(TriggerTypes.Manipulate, x, y),
+                    new TriggerMapTileEvent(TriggerTypes.Manipulate, zone.X, zone.Y),
                     ContextMenuGroup.Actions));
             }
 
@@ -135,7 +136,7 @@ public sealed class SelectionHandler2D : Component
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.MapPopup_Take),
-                    new TriggerMapTileEvent(TriggerTypes.Take, x, y),
+                    new TriggerMapTileEvent(TriggerTypes.Take, zone.X, zone.Y),
                     ContextMenuGroup.Actions));
             }
 
@@ -143,7 +144,7 @@ public sealed class SelectionHandler2D : Component
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.MapPopup_TalkTo),
-                    new TriggerMapTileEvent(TriggerTypes.TalkTo, x, y),
+                    new TriggerMapTileEvent(TriggerTypes.TalkTo, zone.X, zone.Y),
                     ContextMenuGroup.Actions));
             }
         }

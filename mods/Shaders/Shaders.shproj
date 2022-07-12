@@ -10,5 +10,6 @@
     <Content Include="$(MSBuildThisFileDirectory)\Meta\**\*.json" />
     <Content Include="$(MSBuildThisFileDirectory)\**\*.frag" />
     <Content Include="$(MSBuildThisFileDirectory)\**\*.vert" />
+    <Content Include="$(MSBuildThisFileDirectory)\**\*.glsl" />
   </ItemGroup>
 </Project>

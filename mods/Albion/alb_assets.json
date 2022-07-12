@@ -18,7 +18,7 @@
     },
 
     // Dummy item for some dodgy edge cases
-    "dummy": { "Loader": "dummy", "Container": "dummy", "Map": { "0": {"Id": "special.DummyObject" } } },
+    "dummy": { "Loader": "dummy", "Container": "dummy", "Max": 0, "Map": { "0": {"Id": "special.DummyObject" } } },
 
     // Items
     "Albion/CD/XLDLIBS/ITEMLIST.DAT": { "Loader": "itemdata", "Container": "items", "Map": { "0": { "Id": "item.1" } } },

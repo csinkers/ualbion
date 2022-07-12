@@ -97,6 +97,7 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
 
         var assetDir = GetAssetDir(info);
         var npcTileset = Tileset.Load(Path.Combine(assetDir, npcTilesetPath), context.Disk);
+        npcTileset.Filename = npcTilesetPath; // The path in the map file should be relative to the map path, not to the mod dir so replace it here.
         var properties = new Tilemap2DProperties { TileWidth = 16, TileHeight = 16 };
         var formatter = new EventFormatter(assets.LoadString, map.Id.ToMapText());
         var (tiledMap, script) = MapExport.FromAlbionMap2D(map, tileset, properties, tilesetPath, npcTileset, formatter);

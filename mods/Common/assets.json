@@ -1,7 +1,7 @@
 {
   "Files": {
-    "config.json": { "Container": "dummy", "Loader": "varset", "Map": { "0": { "Id": "special.GameConfig" } } },
-    "input.json": { "Container": "dummy", "Loader": "inputconfig", "Map": { "0": { "Id": "special.InputConfig" } } },
+    "config.json": { "Container": "dummy", "Loader": "varset", "Max": 0, "Map": { "0": { "Id": "special.GameConfig" } } },
+    "input.json": { "Container": "dummy", "Loader": "inputconfig", "Max": 0, "Map": { "0": { "Id": "special.InputConfig" } } },
     "PartyMembers": { "Loader": "jsonParty", "Pattern": "{id:00}_{name}.json", "Map": { "1": { "Id": "party.1" } } }
   }
 }

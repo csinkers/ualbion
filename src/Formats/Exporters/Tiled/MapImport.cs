@@ -54,7 +54,7 @@ public static class MapImport
         else
         {
             var tilesetId = MapperUtil.PropId(map, MapMapping.Prop.Tileset, true);
-            var tiles = LayerMapping2D.ReadLayout(map);
+            var tiles = LayerMapping2D.ReadMapLayers(map);
             var albionMap2d = new MapData2D(info.AssetId, paletteId, tilesetId, map.Width, map.Height, eventLayout.Events, eventLayout.Chains, npcs, zones);
             Array.Copy(tiles, albionMap2d.Tiles, albionMap2d.Tiles.Length);
             albionMap = albionMap2d;

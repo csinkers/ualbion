@@ -58,7 +58,7 @@ public static class MapExport
                 new() { FirstGid = 0, Source = tilesetPath, },
                 new() { FirstGid = npcGidOffset, Source = npcTileset.Filename }
             },
-            Layers = LayerMapping2D.BuildLayers(map, tileset, ref nextLayerId),
+            Layers = LayerMapping2D.BuildMapLayers(map, tileset, ref nextLayerId),
             ObjectGroups = ObjectGroupMapping.BuildObjectGroups(map, properties.TileWidth, properties.TileHeight, GetNpcTileInfo, functionsByEventId, ref nextLayerId, ref nextObjectId)
         };
 

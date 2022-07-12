@@ -51,7 +51,6 @@ public struct MapTile : IEquatable<MapTile>
         if (isOverlay)
             for (int i = 0; i < tiles.Length; i++)
                 result[i] = tiles[i].Overlay;
-
         else
             for (int i = 0; i < tiles.Length; i++)
                 result[i] = tiles[i].Underlay;

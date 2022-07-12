@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UAlbion.Formats.Assets.Maps;
-using static UAlbion.Formats.Exporters.Tiled.MapperUtil;
 
 namespace UAlbion.Formats.Exporters.Tiled;
 
@@ -16,48 +14,52 @@ public static class LayerMapping2D
         public const string Overlay = "Overlay";
     }
 
-    public static List<TiledMapLayer> BuildLayers(MapData2D map, TilesetData tileset, ref int nextLayerId)
+    public static MapTile[] ReadMapLayers(Map map)
     {
+        var underlay = LoadLayer(map, LayerName.Underlay);
+        var overlay = LoadLayer(map, LayerName.Overlay);
+        return MapTile.FromInts(underlay, overlay);
+    }
+
+    public static List<TiledMapLayer> BuildMapLayers(MapData2D map, TilesetData tileset, ref int nextLayerId)
+    {
+        var encoding = UncompressedCsvTileEncoding.Instance;
+
         var underlayId = nextLayerId++;
         var overlayId = nextLayerId++;
         return new()
         {
-            new()
-            {
-                Id = underlayId,
-                Name = LayerName.Underlay,
-                Width = map.Width,
-                Height = map.Height,
-                Data = new LayerData { Encoding = "csv", Content = BuildCsvData(map, tileset, false) }
-            },
-            new()
-            {
-                Id = overlayId,
-                Name = LayerName.Overlay,
-                Width = map.Width,
-                Height = map.Height,
-                Data = new LayerData { Encoding = "csv", Content = BuildCsvData(map, tileset, true) }
-            }
+            BuildLayer(encoding, underlayId, LayerName.Underlay, map.Width, map.Height, TilesToInts(map.Tiles, tileset, false)),
+            BuildLayer(encoding, overlayId, LayerName.Overlay, map.Width, map.Height, TilesToInts(map.Tiles, tileset, true))
         };
     }
 
-    static string BuildCsvData(MapData2D map, TilesetData tileset, bool useOverlay)
-    {
-        var sb = new StringBuilder();
-        for (int j = 0; j < map.Height; j++)
+    static TiledMapLayer BuildLayer(ITileEncoding encoding, int id, string name, int width, int height, int[] data) =>
+        new()
         {
-            for (int i = 0; i < map.Width; i++)
+            Id = id,
+            Name = name,
+            Width = width,
+            Height = height,
+            Data = new LayerData
             {
-                int index = j * map.Width + i;
-                var tileIndex = useOverlay ? map.Tiles[index].Overlay : map.Tiles[index].Underlay;
-                var tile = tileset.Tiles[tileIndex];
-                sb.Append(tile.IsBlank ? BlankTileIndex : tileIndex);
-                sb.Append(',');
+                Encoding = encoding.Encoding,
+                Compression = encoding.Compression,
+                Content = encoding.Encode(data, width)
             }
+        };
 
-            sb.AppendLine();
+    static int[] TilesToInts(Span<MapTile> tiles, TilesetData tileset, bool useOverlay)
+    {
+        var result = new int[tiles.Length];
+        for (int i = 0; i < tiles.Length; i++)
+        {
+            var tileIndex = useOverlay ? tiles[i].Overlay : tiles[i].Underlay;
+            var tile = tileset.Tiles[tileIndex];
+            result[i] = tile.IsBlank ? BlankTileIndex : tileIndex;
         }
-        return sb.ToString(0, sb.Length - (Environment.NewLine.Length + 1));
+
+        return result;
     }
 
     static int[] LoadLayer(Map map, string name)
@@ -66,13 +68,10 @@ public static class LayerMapping2D
         if (layer == null)
             throw new FormatException($"Expected to find a layer named \"{name}\" in map");
 
-        return ParseCsv(layer.Data.Content).ToArray();
-    }
+        var tileEncoding = TileEncodings.TryGetEncoding(layer.Data.Encoding, layer.Data.Compression);
+        if (tileEncoding == null)
+            throw new NotSupportedException($"No encoder could be found for encoding \"{layer.Data.Encoding}\" and compression \"{layer.Data.Compression}\"");
 
-    public static MapTile[] ReadLayout(Map map)
-    {
-        var underlay = LoadLayer(map, LayerName.Underlay);
-        var overlay = LoadLayer(map, LayerName.Overlay);
-        return MapTile.FromInts(underlay, overlay);
+        return tileEncoding.Decode(layer.Data.Content);
     }
 }

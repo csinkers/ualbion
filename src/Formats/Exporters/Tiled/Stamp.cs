@@ -19,8 +19,7 @@ public class Stamp
         if (block == null) throw new ArgumentNullException(nameof(block));
         if (tileset == null) throw new ArgumentNullException(nameof(tileset));
 
-        var underlay = MapTile.ToInts(block.Tiles, false);
-        var overlay = MapTile.ToInts(block.Tiles, true);
+        var encoding = ZlibBase64TileEncoding.Instance;
 
         Name = $"{blockId:000}_{block.Width}x{block.Height}";
         Variations.Add(new Variation
@@ -36,29 +35,31 @@ public class Stamp
                 NextObjectId = 1,
                 Tilesets = new List<VariationTileset> 
                 {
-                    new() { FirstGid = 1, Source = tileset.Filename }
+                    new() { FirstGid = 0, Source = tileset.Filename }
                 },
                 Layers = new List<VariationLayer> 
                 {
-                    new()
-                    {
-                        Id = 1,
-                        Name = "Underlay",
-                        Width = block.Width,
-                        Height = block.Height,
-                        Data = ZipUtil.Deflate(underlay)
-                    },
-                    new()
-                    {
-                        Id = 2,
-                        Name = "Overlay",
-                        Width = block.Width,
-                        Height = block.Height,
-                        Data = ZipUtil.Deflate(overlay)
-                    }
+                    BuildStampLayer(encoding, 1, "Underlay", block.Width, block.Height, MapTile.ToInts(block.Tiles, false)),
+                    BuildStampLayer(encoding, 2, "Overlay", block.Width, block.Height, MapTile.ToInts(block.Tiles, true))
                 }
             }
         });
+    }
+
+    static VariationLayer BuildStampLayer(ITileEncoding encoding, int id, string name, int width, int height, int[] data)
+    {
+        if (encoding == null) throw new ArgumentNullException(nameof(encoding));
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        return new()
+        {
+            Id = id,
+            Name = name,
+            Width = width,
+            Height = height,
+            Encoding = encoding.Encoding,
+            Compression = encoding.Compression,
+            Data = encoding.Encode(data, int.MaxValue) // The width is just used to add line breaks for readability in XML, but we don't want them in JSON
+        };
     }
 
     public Block ToBlock()
@@ -66,20 +67,22 @@ public class Stamp
         var map = Variations[0].Map;
         var underlayLayer = map.Layers.Find(x => x.Name == "Underlay");
         var overlayLayer = map.Layers.Find(x => x.Name == "Overlay");
-        if (underlayLayer == null) throw new FormatException($"A layer named \"Underlay\" was expected in the stamp file");
-        if (overlayLayer == null) throw new FormatException($"A layer named \"Overlay\" was expected in the stamp file");
+        if (underlayLayer == null) throw new FormatException("A layer named \"Underlay\" was expected in the stamp file");
+        if (overlayLayer == null) throw new FormatException("A layer named \"Overlay\" was expected in the stamp file");
 
-        if (underlayLayer.Compression == CompressionFormat.Zlib)
-        {
-            var underlay = ZipUtil.Inflate(underlayLayer.Data);
-            var overlay = ZipUtil.Inflate(overlayLayer.Data);
-            var tiles = MapTile.FromInts(underlay, overlay);
-            return new Block((byte) map.Width, (byte) map.Height, tiles);
-        }
-        else
-        {
-            throw new NotImplementedException();
-        }
+        var underlay = ReadStampLayer(underlayLayer);
+        var overlay = ReadStampLayer(overlayLayer);
+        var tiles = MapTile.FromInts(underlay, overlay);
+        return new Block((byte) map.Width, (byte) map.Height, tiles);
+    }
+
+    static ReadOnlySpan<int> ReadStampLayer(VariationLayer layer)
+    {
+        var tileEncoding = TileEncodings.TryGetEncoding(layer.Encoding, layer.Compression);
+        if (tileEncoding == null)
+            throw new NotSupportedException($"No encoder could be found for encoding \"{layer.Encoding}\" and compression \"{layer.Compression}\"");
+
+        return tileEncoding.Decode(layer.Data);
     }
 
     /*
@@ -198,13 +201,13 @@ public class VariationLayer
     [JsonPropertyName("name")] public string Name { get; set; }
     [JsonPropertyName("width")] public int Width { get; set; }
     [JsonPropertyName("height")] public int Height { get; set; }
-    [JsonPropertyName("data")] public byte[] Data { get; set; }
+    [JsonPropertyName("data")] public string Data { get; set; }
 
     [JsonPropertyName("x")] public int X { get; set; } = 0;
     [JsonPropertyName("y")] public int Y { get; set; } = 0;
     [JsonPropertyName("type")] public string Type { get; set; } = "tilelayer";
-    [JsonPropertyName("compression")] public string Compression { get; set; } = Tiled.CompressionFormat.Zlib;
-    [JsonPropertyName("encoding")] public string Encoding { get; set; } = "base64";
+    [JsonPropertyName("compression")] public string Compression { get; set; }
+    [JsonPropertyName("encoding")] public string Encoding { get; set; }
     [JsonPropertyName("opacity")] public int Opacity { get; set; } = 1;
     [JsonPropertyName("visible")] public bool Visible { get; set; } = true;
 }

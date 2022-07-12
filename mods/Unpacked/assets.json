@@ -30,6 +30,7 @@
       "Container": "raw",
       "IsSmall": false,
       "GraphicsPattern": "Assets/Tilesets/LargeNPCs/{id}.png",
+      "Max": 0, 
       "Map": { "0": { "Id": "special.DummyObject" } }
     },
     "Assets/Tilesets/SmallNPCs.tsx": {
@@ -37,6 +38,7 @@
       "Container": "raw",
       "IsSmall": true,
       "GraphicsPattern": "Assets/Tilesets/SmallNPCs/{id}.png",
+      "Max": 0, 
       "Map": { "0": { "Id": "special.DummyObject" } }
     },
 

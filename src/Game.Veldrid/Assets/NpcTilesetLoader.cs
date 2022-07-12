@@ -29,6 +29,7 @@ public class NpcTilesetLoader : Component, IAssetLoader
         var graphicsPattern = info.GetPattern(AssetProperty.GraphicsPattern, "");
         bool small = info.Get(AssetProperty.IsSmall, false);
 
+        var tsxDir = Path.GetDirectoryName(info.File.Filename);
         var tiles = new List<TileProperties>();
         var assets = Resolve<IAssetManager>();
         var modApplier = Resolve<IModApplier>();
@@ -53,11 +54,13 @@ public class NpcTilesetLoader : Component, IAssetLoader
             path = pathResolver.ResolvePath(path);
             WriteNpcSprite(path, sprite, spriteInfo, context);
 
+            var pathRelativeToTsx = ConfigUtil.GetRelativePath(path, tsxDir, true);
+
             tiles.Add(new TileProperties
             {
                 Name = id.ToString(),
                 Frames = 1,
-                Source = path
+                Source = pathRelativeToTsx
             }); // TODO: Add object templates 
         }
 

@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
-using static UAlbion.Formats.Exporters.Tiled.MapperUtil;
 
 namespace UAlbion.Formats.Exporters.Tiled;
 
@@ -30,6 +27,8 @@ public static class LayerMapping3D
         int wallId = nextLayerId++;
         int contentId = nextLayerId++;
         int ceilingid = nextLayerId++;
+        var encoding = UncompressedCsvTileEncoding.Instance;
+
         return new List<TiledMapLayer>
         {
             new()
@@ -38,7 +37,7 @@ public static class LayerMapping3D
                 Name = LayerName.Floors,
                 Width = map.Width,
                 Height = map.Height,
-                Data = new LayerData { Encoding = "csv", Content = BuildCsvData(map, IsometricMode.Floors) }
+                Data = new LayerData { Encoding = "csv", Content = EncodeLayer(map, IsometricMode.Floors, encoding) }
             },
             new()
             {
@@ -46,7 +45,7 @@ public static class LayerMapping3D
                 Name = LayerName.Walls,
                 Width = map.Width,
                 Height = map.Height,
-                Data = new LayerData { Encoding = "csv", Content = BuildCsvData(map, IsometricMode.Walls) }
+                Data = new LayerData { Encoding = "csv", Content = EncodeLayer(map, IsometricMode.Walls, encoding) }
             },
             new()
             {
@@ -54,7 +53,7 @@ public static class LayerMapping3D
                 Name = LayerName.Contents,
                 Width = map.Width,
                 Height = map.Height,
-                Data = new LayerData { Encoding = "csv", Content = BuildCsvData(map, IsometricMode.Contents) }
+                Data = new LayerData { Encoding = "csv", Content = EncodeLayer(map, IsometricMode.Contents, encoding) }
             },
             new()
             {
@@ -63,7 +62,7 @@ public static class LayerMapping3D
                 Width = map.Width,
                 Height = map.Height,
                 Opacity = 0.5,
-                Data = new LayerData { Encoding = "csv", Content = BuildCsvData(map, IsometricMode.Ceilings) }
+                Data = new LayerData { Encoding = "csv", Content = EncodeLayer(map, IsometricMode.Ceilings, encoding) }
             }
         };
     }
@@ -72,7 +71,11 @@ public static class LayerMapping3D
     {
         foreach (var layer in layers)
         {
-            var values = ParseCsv(layer.Data.Content).ToArray();
+            var tileEncoding = TileEncodings.TryGetEncoding(layer.Data.Encoding, layer.Data.Compression);
+            if (tileEncoding == null)
+                throw new NotSupportedException($"No encoder could be found for encoding \"{layer.Data.Encoding}\" and compression \"{layer.Data.Compression}\" in layer {layer.Name}");
+
+            var values = tileEncoding.Decode(layer.Data.Content);
             if (values.Length != albionMap.Width * albionMap.Height)
                 throw new FormatException($"Map layer {layer.Id} had {values.Length}, but {albionMap.Width * albionMap.Height} were expected ({albionMap.Width} x {albionMap.Height})");
 
@@ -106,7 +109,7 @@ public static class LayerMapping3D
             _ => throw new ArgumentOutOfRangeException($"Tile {tile} did not fall into any of the expected ranges")
         };
 
-    static string BuildCsvData(MapData3D map, IsometricMode mode)
+    static string EncodeLayer(MapData3D map, IsometricMode mode, ITileEncoding encoding)
     {
         var (gidOffset, tiles) = mode switch
         {
@@ -117,22 +120,17 @@ public static class LayerMapping3D
             _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null)
         };
 
-        var sb = new StringBuilder();
-        for (int j = 0; j < map.Height; j++)
+        var indices = new int[map.Width * map.Height];
+        for (int i = 0; i < indices.Length; i++)
         {
-            for (int i = 0; i < map.Width; i++)
-            {
-                int index = j * map.Width + i;
-                int tile = tiles[index];
-                if (tile == 0)
-                    sb.Append(0);
-                else
-                    sb.Append(gidOffset + tiles[index]);
-                sb.Append(',');
-            }
+            int tile = tiles[i];
+            if (tile == 0)
+                indices[i] = 0;
 
-            sb.AppendLine();
+            else
+                indices[i] = gidOffset + tiles[i];
         }
-        return sb.ToString(0, sb.Length - (Environment.NewLine.Length + 1));
+
+        return encoding.Encode(indices, map.Width);
     }
 }

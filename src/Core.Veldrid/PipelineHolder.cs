@@ -88,7 +88,7 @@ public class PipelineHolder : Component, IPipelineHolder
             var vertexShader = shaderLoader.Load(_vertexShaderName, disk);
             var fragmentShader = shaderLoader.Load(_fragmentShaderName, disk);
 
-            _shaders =  Resolve<IShaderCache>().GetShaderPair(device.ResourceFactory, vertexShader, fragmentShader);
+            _shaders = Resolve<IShaderCache>().GetShaderPair(device.ResourceFactory, vertexShader, fragmentShader);
 
             var layoutSource = Resolve<IResourceLayoutSource>();
             var shaderSetDescription = new ShaderSetDescription(

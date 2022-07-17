@@ -69,6 +69,7 @@
     "font":              "UAlbion.Formats.Parsers.FontSpriteLoader`1[[UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats]], UAlbion.Formats",
     "pngfont":           "UAlbion.Formats.Parsers.FontSpriteLoader`1[[UAlbion.Game.Veldrid.Assets.PngSheetLoader, UAlbion.Game.Veldrid]], UAlbion.Formats",
     "header":            "UAlbion.Formats.Parsers.SingleHeaderSpriteLoader, UAlbion.Formats",
+    "inputconfig":       "UAlbion.Formats.Parsers.InputConfigLoader, UAlbion.Formats",
     "interlaced":        "UAlbion.Formats.Parsers.InterlacedBitmapLoader, UAlbion.Formats",
     "itemNameCollector": "UAlbion.Formats.Parsers.ItemNameCollector, UAlbion.Formats",
     "itemdata":          "UAlbion.Formats.Parsers.ItemDataLoader, UAlbion.Formats",
@@ -106,6 +107,7 @@
     "tileset":           "UAlbion.Formats.Parsers.TilesetLoader, UAlbion.Formats",
     "tilegfx":           "UAlbion.Formats.Parsers.TilesetGraphicsLoader, UAlbion.Formats",
     "utf8":              "UAlbion.Formats.Parsers.Utf8Loader, UAlbion.Formats",
+    "varset":            "UAlbion.Formats.Parsers.VarSetLoader, UAlbion.Formats",
     "wav":               "UAlbion.Formats.Parsers.WavLoader, UAlbion.Formats",
     "wavlib":            "UAlbion.Formats.Parsers.WaveLibLoader, UAlbion.Formats",
     "wavlib2":           "UAlbion.Formats.Parsers.WaveLibWavLoader, UAlbion.Formats",
@@ -124,10 +126,7 @@
 
     // These are in Game.Veldrid as they require the 3D engine to render isometric tiles to offscreen buffers
     "tiledLabyrinth":    "UAlbion.Game.Veldrid.Assets.IsometricLabyrinthLoader, UAlbion.Game.Veldrid",
-    "tiledNpcTileset":   "UAlbion.Game.Veldrid.Assets.NpcTilesetLoader, UAlbion.Game.Veldrid",
-
-    "varset":      "UAlbion.Formats.Parsers.VarSetLoader, UAlbion.Formats",
-    "inputconfig": "UAlbion.Formats.Parsers.InputConfigLoader, UAlbion.Formats"
+    "tiledNpcTileset":   "UAlbion.Game.Veldrid.Assets.NpcTilesetLoader, UAlbion.Game.Veldrid"
   },
 
   "Containers": {

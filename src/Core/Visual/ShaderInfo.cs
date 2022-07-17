@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Globalization;
+using System.Text;
+using UAlbion.Api;
 
 namespace UAlbion.Core.Visual;
 
@@ -10,8 +13,11 @@ public class ShaderInfo
         if (string.IsNullOrEmpty(content)) throw new ArgumentNullException(content);
         Name = name;
         Content = content;
+        Hash = HashUtil.FNV1a(Encoding.UTF8.GetBytes(Content)).ToString("X8", CultureInfo.InvariantCulture);
     }
 
     public string Name { get; }
     public string Content { get; }
+    public string Hash { get; }
+    public override string ToString() => $"{Name}.{Hash}";
 }

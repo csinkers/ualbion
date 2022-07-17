@@ -139,8 +139,6 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
             InnerLoop();
             DestroyAllObjects();
         }
-
-        Resolve<IShaderCache>()?.CleanupOldFiles();
     }
 
     void InnerLoop()

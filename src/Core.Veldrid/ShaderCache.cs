@@ -1,20 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
-using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Visual;
 using Veldrid;
 using Veldrid.SPIRV;
 
 namespace UAlbion.Core.Veldrid;
 
-public sealed class ShaderCache : Component, IShaderCache, IDisposable
+public sealed class ShaderCache : Component, IShaderCache
 {
     readonly object _syncRoot = new();
     readonly IDictionary<string, CacheEntry> _cache = new Dictionary<string, CacheEntry>();
@@ -23,25 +19,23 @@ public sealed class ShaderCache : Component, IShaderCache, IDisposable
 
     class CacheEntry
     {
-        public CacheEntry(string vertexPath, string fragmentPath, ShaderDescription vertexShader, ShaderDescription fragmentShader)
+        public CacheEntry(ShaderDescription vertexShader, ShaderDescription fragmentShader, GraphicsBackend backend, string vertexHash, string fragmentHash)
         {
-            VertexPath = vertexPath;
-            FragmentPath = fragmentPath;
             VertexShader = vertexShader;
             FragmentShader = fragmentShader;
+            Backend = backend;
+            VertexHash = vertexHash;
+            FragmentHash = fragmentHash;
         }
 
-        public string VertexPath { get; }
-        public string FragmentPath { get; }
+        public GraphicsBackend Backend { get; }
+        public string VertexHash { get; }
+        public string FragmentHash { get; }
         public ShaderDescription VertexShader { get; }
         public ShaderDescription FragmentShader { get; }
     }
 
-    public ShaderCache(string shaderCachePath)
-    {
-        On<DestroyDeviceObjectsEvent>(_ => DestroyAllDeviceObjects());
-        _shaderCachePath = shaderCachePath;
-    }
+    public ShaderCache(string shaderCachePath) => _shaderCachePath = shaderCachePath ?? throw new ArgumentNullException(nameof(shaderCachePath));
 
     protected override void Subscribed()
     {
@@ -57,19 +51,13 @@ public sealed class ShaderCache : Component, IShaderCache, IDisposable
         Exchange.Unregister(typeof(IShaderCache), this);
     }
 
-    string GetShaderPath(string name, string content)
-    {
-        using var sha256 = SHA256.Create();
-        var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(content));
-        var hashString = string.Join("", hash.Select(x => x.ToString("X2", CultureInfo.InvariantCulture)));
-        return Path.Combine(_shaderCachePath, $"{name}.{hashString}.spv");
-    }
+    string GetShaderPath(ShaderInfo info, string extension) => Path.Combine(_shaderCachePath, $"{info.Name}.{info.Hash}.{extension}");
 
     (string, byte[]) LoadSpirvByteCode(ShaderInfo info, ShaderStages stage)
     {
-        var cachePath = GetShaderPath(info.Name, info.Content);
-        if (_disk.FileExists(cachePath))
-            return (cachePath, _disk.ReadAllBytes(cachePath));
+        var cachedSpirvPath = GetShaderPath(info, "spirv");
+        if (_disk.FileExists(cachedSpirvPath))
+            return (cachedSpirvPath, _disk.ReadAllBytes(cachedSpirvPath));
 
         using (PerfTracker.InfrequentEvent($"Compiling {info.Name} to SPIR-V"))
         {
@@ -78,8 +66,8 @@ public sealed class ShaderCache : Component, IShaderCache, IDisposable
             options.Debug = true;
 #endif
             var glslCompileResult = SpirvCompilation.CompileGlslToSpirv(info.Content, info.Name, stage, options);
-            _disk.WriteAllBytes(cachePath, glslCompileResult.SpirvBytes);
-            return (cachePath, glslCompileResult.SpirvBytes);
+            _disk.WriteAllBytes(cachedSpirvPath, glslCompileResult.SpirvBytes);
+            return (cachedSpirvPath, glslCompileResult.SpirvBytes);
         }
     }
 
@@ -101,24 +89,69 @@ public sealed class ShaderCache : Component, IShaderCache, IDisposable
     {
         string entryPoint = (backend == GraphicsBackend.Metal) ? "main0" : "main";
 
-        var (vertexPath, vertexSpirv) = LoadSpirvByteCode(vertex, ShaderStages.Vertex);
-        var (fragmentPath, fragmentSpirv) = LoadSpirvByteCode(fragment, ShaderStages.Fragment);
+        var (vertexSpirvPath, vertexSpirv) = LoadSpirvByteCode(vertex, ShaderStages.Vertex);
+        var (fragmentSpirvPath, fragmentSpirv) = LoadSpirvByteCode(fragment, ShaderStages.Fragment);
 
         var vertexShaderDescription = new ShaderDescription(ShaderStages.Vertex, vertexSpirv, entryPoint);
         var fragmentShaderDescription = new ShaderDescription(ShaderStages.Fragment, fragmentSpirv, entryPoint);
 
         if (backend == GraphicsBackend.Vulkan)
-            return new CacheEntry(vertexPath, fragmentPath, vertexShaderDescription, fragmentShaderDescription);
+            return new CacheEntry(vertexShaderDescription, fragmentShaderDescription, backend, vertex.Hash, fragment.Hash);
 
-        CrossCompileTarget target = GetCompilationTarget(backend);
-        var options = new CrossCompileOptions();
-        using (PerfTracker.InfrequentEvent($"cross compiling {vertex.Name} + {fragment.Name} to {target}"))
+        var extension = backend switch
         {
-            var compilationResult = SpirvCompilation.CompileVertexFragment(vertexSpirv, fragmentSpirv, target, options);
-            vertexShaderDescription.ShaderBytes = GetBytes(backend, compilationResult.VertexShader);
-            fragmentShaderDescription.ShaderBytes = GetBytes(backend, compilationResult.FragmentShader);
+            GraphicsBackend.Direct3D11 => "hlsl",
+            GraphicsBackend.Metal      => "msl",
+            GraphicsBackend.OpenGL     => "glsl",
+            GraphicsBackend.OpenGLES   => "essl",
+            GraphicsBackend.Vulkan     => "spirv",
+            _ => throw new ArgumentOutOfRangeException(nameof(backend), backend, null)
+        };
 
-            return new CacheEntry(vertexPath, fragmentPath, vertexShaderDescription, fragmentShaderDescription);
+        var vertexPath = Path.ChangeExtension(vertexSpirvPath, extension);
+        var fragmentPath = Path.ChangeExtension(fragmentSpirvPath, extension);
+
+        string vertexCode;
+        string fragmentCode;
+
+        if (!_disk.FileExists(vertexPath) || !_disk.FileExists(fragmentPath))
+        {
+            var target = GetCompilationTarget(backend);
+            using (PerfTracker.InfrequentEvent($"cross compiling {vertex.Name} + {fragment.Name} to {target}"))
+            {
+                var options = new CrossCompileOptions();
+                var compilationResult = SpirvCompilation.CompileVertexFragment(vertexSpirv, fragmentSpirv, target, options);
+                vertexCode = compilationResult.VertexShader;
+                fragmentCode = compilationResult.FragmentShader;
+
+                _disk.WriteAllText(vertexPath, vertexCode);
+                _disk.WriteAllText(fragmentPath, fragmentCode);
+
+                // Once it succeeds, remove any old results
+                RemoveOldFiles(vertex.Name, vertex.Hash);
+            }
+        }
+        else
+        {
+            vertexCode = _disk.ReadAllText(vertexPath);
+            fragmentCode = _disk.ReadAllText(fragmentPath);
+        }
+
+        vertexShaderDescription.ShaderBytes = GetBytes(backend, vertexCode);
+        fragmentShaderDescription.ShaderBytes = GetBytes(backend, fragmentCode);
+
+        return new CacheEntry(vertexShaderDescription, fragmentShaderDescription, backend, vertex.Hash, fragment.Hash);
+    }
+    void RemoveOldFiles(string name, string goodHash)
+    {
+        foreach (var file in _disk.EnumerateDirectory(_shaderCachePath, $"{name}.*"))
+        {
+            var parts = file[name.Length..].Split('.');
+            if (parts[0] == goodHash) 
+                continue;
+
+            Info($"Removing old cached shader {file}");
+            _disk.DeleteFile(file);
         }
     }
 
@@ -128,14 +161,11 @@ public sealed class ShaderCache : Component, IShaderCache, IDisposable
         if (vertex == null) throw new ArgumentNullException(nameof(vertex));
         if (fragment == null) throw new ArgumentNullException(nameof(fragment));
 
-        var vertexPath = GetShaderPath(vertex.Name, vertex.Content);
-        var fragmentPath = GetShaderPath(fragment.Name, fragment.Content);
-
         lock (_syncRoot)
         {
-            var cacheKey = vertex.Name + fragment.Name;
+            var cacheKey = vertex.Name + "|" + fragment.Name;
             Exception compileException = null;
-            if (!_cache.TryGetValue(cacheKey, out var entry) || entry.VertexPath != vertexPath || entry.FragmentPath != fragmentPath)
+            if (!_cache.TryGetValue(cacheKey, out var entry) || entry.VertexHash != vertex.Hash || entry.FragmentHash != fragment.Hash || entry.Backend != factory.BackendType)
             {
                 try
                 {
@@ -158,37 +188,5 @@ public sealed class ShaderCache : Component, IShaderCache, IDisposable
             fragmentShader.Name = "S_" + fragment.Name;
             return new[] { vertexShader, fragmentShader };
         }
-    }
-
-    public void CleanupOldFiles()
-    {
-        lock (_syncRoot)
-        {
-            var files = _disk.EnumerateDirectory(_shaderCachePath, "*.spv").ToHashSet();
-            foreach (var entry in _cache)
-            {
-                files.Remove(entry.Value.VertexPath);
-                files.Remove(entry.Value.FragmentPath);
-            }
-
-            foreach (var file in files)
-            {
-                //if (DateTime.Now - _disk.GetLastAccessTime(file) > TimeSpan.FromDays(7))
-                _disk.DeleteFile(file);
-            }
-        }
-    }
-
-    public void DestroyAllDeviceObjects()
-    {
-        lock (_syncRoot)
-        {
-            _cache.Clear();
-        }
-    }
-
-    public void Dispose()
-    {
-        DestroyAllDeviceObjects();
     }
 }

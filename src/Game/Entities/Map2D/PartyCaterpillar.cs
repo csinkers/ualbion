@@ -3,6 +3,7 @@ using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
@@ -15,11 +16,11 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
     readonly PlayerMovementState _state;
 
     readonly (Vector3, int)[] _trail; // Positions (tile coordinates) and frame numbers.
-    readonly (int, bool)[] _playerOffsets = new (int, bool)[Party.MaxPartySize]; // int = trail offset, bool = isMoving
+    readonly (int, bool)[] _playerOffsets = new (int, bool)[SavedGame.MaxPartySize]; // int = trail offset, bool = isMoving
     readonly LogicalMap2D _logicalMap;
     Vector2 _direction;
     int _trailOffset;
-    int TrailLength => Party.MaxPartySize * _settings.MaxTrailDistance; // Number of past positions to store
+    int TrailLength => SavedGame.MaxPartySize * _settings.MaxTrailDistance; // Number of past positions to store
 
     public PartyCaterpillar(Vector2 initialPosition, Direction initialDirection, MovementSettings settings, LogicalMap2D logicalMap)
     {

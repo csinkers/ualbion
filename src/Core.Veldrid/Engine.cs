@@ -293,8 +293,8 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
     {
         using (PerfTracker.InfrequentEvent("Destroying objects"))
         {
-            Raise(new DestroyDeviceObjectsEvent());
             _graphicsDevice?.WaitForIdle();
+            Raise(new DestroyDeviceObjectsEvent());
             _frameCommands?.Dispose();
             _graphicsDevice?.Dispose();
             _frameCommands = null;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
@@ -65,9 +66,16 @@ public sealed class ShaderCache : Component, IShaderCache
 #if DEBUG
             options.Debug = true;
 #endif
-            var glslCompileResult = SpirvCompilation.CompileGlslToSpirv(info.Content, info.Name, stage, options);
-            _disk.WriteAllBytes(cachedSpirvPath, glslCompileResult.SpirvBytes);
-            return (cachedSpirvPath, glslCompileResult.SpirvBytes);
+            try
+            {
+                var glslCompileResult = SpirvCompilation.CompileGlslToSpirv(info.Content, info.Name, stage, options);
+                _disk.WriteAllBytes(cachedSpirvPath, glslCompileResult.SpirvBytes);
+                return (cachedSpirvPath, glslCompileResult.SpirvBytes);
+            }
+            catch (DllNotFoundException ex)
+            {
+                throw new DllNotFoundException( $"Could not find dll, search path was {Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}. {ex.Message}", ex);
+            }
         }
     }
 
@@ -144,14 +152,15 @@ public sealed class ShaderCache : Component, IShaderCache
     }
     void RemoveOldFiles(string name, string goodHash)
     {
-        foreach (var file in _disk.EnumerateDirectory(_shaderCachePath, $"{name}.*"))
+        foreach (var path in _disk.EnumerateDirectory(_shaderCachePath, $"{name}.*"))
         {
-            var parts = file[name.Length..].Split('.');
+            var filename = Path.GetFileName(path);
+            var parts = filename[(name.Length + 1)..].Split('.');
             if (parts[0] == goodHash) 
                 continue;
 
-            Info($"Removing old cached shader {file}");
-            _disk.DeleteFile(file);
+            Info($"Removing old cached shader {filename}");
+            _disk.DeleteFile(path);
         }
     }
 

@@ -17,7 +17,7 @@ static class Program
 {
     class Command
     {
-        public Command(string name, Action<EventExchange, string> action, string description)
+        public Command(string name, Action<EventExchange, string, TextWriter> action, string description)
         {
             Name = name;
             Action = action;
@@ -25,7 +25,7 @@ static class Program
         }
 
         public string Name { get; }
-        public Action<EventExchange, string> Action { get; }
+        public Action<EventExchange, string, TextWriter> Action { get; }
         public string Description { get; }
     }
 
@@ -37,31 +37,31 @@ static class Program
         new("a", DumpAnnotated, "Dump annotated")
     };
 
-    static void DumpVisitedEvents(EventExchange exchange, string filename)
+    static void DumpVisitedEvents(EventExchange exchange, string filename, TextWriter writer)
     {
-        var save = VerifiedLoad(exchange, filename);
-        Console.WriteLine("VisitedEvents:");
+        var save = VerifiedLoad(exchange, filename, writer);
+        writer.WriteLine("VisitedEvents:");
         foreach (var e in save.VisitedEvents)
-            Console.WriteLine(e);
+            writer.WriteLine(e);
     }
 
-    static void DumpTempMapChanges(EventExchange exchange, string filename)
+    static void DumpTempMapChanges(EventExchange exchange, string filename, TextWriter writer)
     {
-        var save = VerifiedLoad(exchange, filename);
-        Console.WriteLine("Temp Map Changes:");
+        var save = VerifiedLoad(exchange, filename, writer);
+        writer.WriteLine("Temp Map Changes:");
         foreach (var e in save.TemporaryMapChanges)
-            Console.WriteLine(e);
+            writer.WriteLine(e);
     }
 
-    static void DumpPermMapChanges(EventExchange exchange, string filename)
+    static void DumpPermMapChanges(EventExchange exchange, string filename, TextWriter writer)
     {
-        var save = VerifiedLoad(exchange, filename);
-        Console.WriteLine("Perm Map Changes:");
+        var save = VerifiedLoad(exchange, filename, writer);
+        writer.WriteLine("Perm Map Changes:");
         foreach (var e in save.PermanentMapChanges)
-            Console.WriteLine(e);
+            writer.WriteLine(e);
     }
 
-    static void DumpAnnotated(EventExchange exchange, string filename)
+    static void DumpAnnotated(EventExchange exchange, string filename, TextWriter writer)
     {
         var disk = exchange.Resolve<IFileSystem>();
         var stream = disk.OpenRead(filename);
@@ -70,18 +70,19 @@ static class Program
         var s1 = new AlbionReader(br, stream.Length);
 
         using var ms = new MemoryStream();
-        using var annotationWriter = new StreamWriter(ms);
-        var s2 = new AnnotationProxySerializer(s1, annotationWriter, FormatUtil.BytesFrom850String);
-        SavedGame.Serdes(null, AssetMapping.Global, s2, spellManager);
-        annotationWriter.Flush();
-
-        ms.Position = 0;
-        using var reader = new StreamReader(ms, null, true, -1, true);
-        var annotated = reader.ReadToEnd();
-        Console.WriteLine(annotated);
+        var s2 = new AnnotationProxySerializer(s1, writer, FormatUtil.BytesFrom850String);
+        try
+        {
+            SavedGame.Serdes(null, AssetMapping.Global, s2, spellManager);
+        }
+        catch (Exception ex)
+        {
+            writer.WriteLine();
+            writer.WriteLine($"Exception: {ex}");
+        }
     }
 
-    static bool VerifyRoundTrip(Stream fileStream, SavedGame save, AssetMapping mapping, ISpellManager spellManager)
+    static bool VerifyRoundTrip(Stream fileStream, TextWriter writer, SavedGame save, AssetMapping mapping, ISpellManager spellManager)
     {
         using var ms = new MemoryStream((int)fileStream.Length);
         using var bw = new BinaryWriter(ms, Encoding.GetEncoding(850));
@@ -89,7 +90,7 @@ static class Program
 
         if (ms.Position != fileStream.Length)
         {
-            Console.WriteLine($"Assertion failed: Round-trip length mismatch (read {fileStream.Length}, wrote {ms.Position}");
+            writer.WriteLine($"Assertion failed: Round-trip length mismatch (read {fileStream.Length}, wrote {ms.Position}");
             return false;
         }
 
@@ -104,14 +105,14 @@ static class Program
             if (a == b) 
                 continue;
 
-            Console.WriteLine($"Assertion failed: Round-trip mismatch at {ms.Position:X}: read {a}, wrote {b}");
+            writer.WriteLine($"Assertion failed: Round-trip mismatch at {ms.Position:X}: read {a}, wrote {b}");
             errors++;
         }
 
         return errors == 0;
     }
 
-    static SavedGame VerifiedLoad(EventExchange exchange, string filename)
+    static SavedGame VerifiedLoad(EventExchange exchange, string filename, TextWriter writer)
     {
         var disk = exchange.Resolve<IFileSystem>();
         var stream = disk.OpenRead(filename);
@@ -120,7 +121,7 @@ static class Program
         var spellManager = exchange.Resolve<ISpellManager>();
         var save = SavedGame.Serdes(null, AssetMapping.Global, new AlbionReader(br, stream.Length), spellManager);
 
-        if (!VerifyRoundTrip(stream, save, AssetMapping.Global, spellManager))
+        if (!VerifyRoundTrip(stream, writer, save, AssetMapping.Global, spellManager))
             throw new InvalidOperationException("Saved-game round-tripping failed");
 
         return save;
@@ -128,6 +129,7 @@ static class Program
 
     static void Main(string[] args)
     {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
         var disk = new FileSystem(Directory.GetCurrentDirectory());
         var exchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "Base");
 
@@ -139,11 +141,20 @@ static class Program
         }
 
         var filename = args[0];
+        using var outputStream = 
+        //*/ // Add/remove first / to switch between file & stdout
+            File.Open(@"C:\Depot\bb\ualbion\re\save001.txt", FileMode.Create, FileAccess.Write); /*/
+            Console.OpenStandardOutput();
+        //*/
+
+        using var writer = new StreamWriter(outputStream);
         foreach (var command in commands)
         {
-            command.Action(exchange, filename);
-            Console.WriteLine();
+            command.Action(exchange, filename, writer);
+            writer.WriteLine();
         }
+
+        writer.Flush();
     }
 
     static void PrintUsage()

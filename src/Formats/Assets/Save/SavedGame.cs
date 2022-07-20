@@ -115,11 +115,11 @@ public class SavedGame
     public uint MagicNumber { get; set; }
     public uint Unk9 { get; set; }
     public ushort[] ActiveSpells { get; set; }
-    public byte[] UnkB5 { get; set; }
+    public byte[] UnkB1 { get; set; }
     public MiscState Misc { get; private set; } = new();
-    public byte[] Unknown5B90 { get; set; }
+    public byte[] Unknown5B8c { get; set; }
     public NpcState[] Npcs { get; } = new NpcState[NpcCountPerMap];
-    public byte[] Unknown5B71 { get; set; } 
+    public byte[] Unknown8bb8 { get; set; } 
     public MapChangeCollection PermanentMapChanges { get; private set; } = new();
     public MapChangeCollection TemporaryMapChanges { get; private set; } = new();
     public IList<VisitedEvent> VisitedEvents { get; private set; } = new List<VisitedEvent>();
@@ -147,14 +147,17 @@ public class SavedGame
         save.Name = s.FixedLengthString(nameof(Name), save.Name, nameLength);
 
         save.MagicNumber = s.UInt32(nameof(MagicNumber), save.MagicNumber);
-        ApiUtil.Assert(save.MagicNumber == 0x25051971, "Magic number was expected to be 0x25051971"); // Must be someone's birthday
+        ApiUtil.Assert(save.MagicNumber == 0x25051971, $"Magic number was expected to be 0x25051971 but it was 0x{save.MagicNumber:x}"); // Must be someone's birthday
         save.Version = s.UInt32(nameof(Version), save.Version);
-        ApiUtil.Assert(save.Version == 138); // TODO: Throw error for other versions?
+        ApiUtil.Assert(save.Version == 138, $"Expected save version to be 138, but it was {save.Version}");
 
         // ------------------------------
         // ---- START OF GAME HEADER ----
         // ------------------------------
         var headerOffset = s.Offset;
+
+        // Comments with hex values after this point are relative to headerOffset
+        // (i.e. a watch on "s.Offset - headerOffset" should match the comments while stepping through)
         save.Unk9 = s.UInt32(nameof(Unk9), save.Unk9, 4); // 0
         ushort days = s.UInt16("Days", (ushort)save.ElapsedTime.TotalDays);  // 4
         ushort hours = s.UInt16("Hours", (ushort)save.ElapsedTime.Hours);    // 6
@@ -173,9 +176,9 @@ public class SavedGame
             (_, x,s2) => s2.UInt16(null, x),
             n => new ushort[n]); // 11
 
-        save.UnkB5 = s.Bytes(nameof(UnkB5), save.UnkB5, 0xE5);
+        save.UnkB1 = s.Bytes(nameof(UnkB1), save.UnkB1, 0xE5); // B1
 
-        save.ActiveMembers = s.List(
+        save.ActiveMembers = s.List( // 196
             nameof(ActiveMembers),
             save.ActiveMembers,
             MaxPartySize,
@@ -193,29 +196,36 @@ public class SavedGame
         // save._unk6Flags.Serdes("Unk6Flags", s);
         // save._unk8Flags.Serdes("Unk8Flags", s);
 
-        // TODO: Chain, Door, Chest, Npc, KnownWord flag dictionaries. Known 3D automap info markers? Battle positions?
-        save._disabledChains.Serdes("DisabledChains", s);
-        save._removedNpcs.Serdes("RemovedNpcs", s); // 2f6 + 3e80 = 4176
+        // TODO: KnownWord flag dictionaries. Known 3D automap info markers? Battle positions?
+        save._disabledChains.Serdes("DisabledChains", s); // 2f2
+        save._removedNpcs.Serdes("RemovedNpcs", s); // 2f2 + 3e80 = 4172
         save._automapMarkersFound.Serdes("AutomapMarkers", s); // 5972
         save._unlockedChests.Serdes("UnlockedChests", s); // 5992
-        save._unlockedDoors.Serdes("UnlockedDoors", s); // 5A0E
+        save._unlockedDoors.Serdes("UnlockedDoors", s); // 5A0F
         s.Object(nameof(Tickers), save._tickers, TickerSet.Serdes); // 5A8C
 
         // ----------------------------
         // ---- END OF GAME HEADER ----
         // ----------------------------
 
-        ApiUtil.Assert(s.Offset - headerOffset == 0x5b8e);
-        save.Unknown5B90 = s.Bytes(nameof(Unknown5B90), save.Unknown5B90, 0x2C);
+        ApiUtil.Assert(s.Offset - headerOffset == 0x5b8c, $"Expected header to be 0x5b8c bytes, but it was {s.Offset - headerOffset:x}");
+        save.Unknown5B8c = s.Bytes(nameof(Unknown5B8c), save.Unknown5B8c, 0x2C);
         var mapType = MapType.TwoD;
-        s.List(nameof(save.Npcs), save.Npcs, (mapType, mapping), NpcCountPerMap, NpcState.Serdes);
+        s.List(nameof(save.Npcs), save.Npcs, (mapType, mapping), NpcCountPerMap, NpcState.Serdes); // 5bb8
 
-        save.Unknown5B71 = s.Bytes( nameof(Unknown5B71), save.Unknown5B71, 0x8c0);
+        save.Unknown8bb8 = s.Bytes( nameof(Unknown8bb8), save.Unknown8bb8, 0x8c0); // 8bb8
 
-        uint permChangesSize = s.UInt32("PermanentMapChanges_Size", (uint)(save.PermanentMapChanges.Count * MapChange.SizeOnDisk + 2));
-        ushort permChangesCount = s.UInt16("PermanentMapChanges_Count", (ushort)save.PermanentMapChanges.Count);
-        ApiUtil.Assert(permChangesSize == permChangesCount * MapChange.SizeOnDisk + 2);
-        save.PermanentMapChanges = (MapChangeCollection)s.List(
+        uint permChangesSize = s.UInt32("PermanentMapChanges_Size", (uint)(save.PermanentMapChanges.Count * MapChange.SizeOnDisk + 2)); // 9478
+        ushort permChangesCount = s.UInt16("PermanentMapChanges_Count", (ushort)save.PermanentMapChanges.Count); // 947c
+        int expectedSize = permChangesCount * MapChange.SizeOnDisk + 2;
+        if (permChangesSize != expectedSize)
+        {
+            ApiUtil.Assert($"Expected perm changes size to be count ({permChangesCount}) * {MapChange.SizeOnDisk} + 2 == {expectedSize}, but it was {permChangesSize}");
+            // When the size and count disagree the size seems to be more reliable
+            permChangesCount = (ushort)((permChangesSize - 2) / MapChange.SizeOnDisk);
+        }
+
+        save.PermanentMapChanges = (MapChangeCollection)s.List( // 947e
             nameof(PermanentMapChanges),
             save.PermanentMapChanges,
             mapping,
@@ -225,7 +235,13 @@ public class SavedGame
 
         uint tempChangesSize = s.UInt32("TemporaryMapChanges_Size", (uint)(save.TemporaryMapChanges.Count * MapChange.SizeOnDisk + 2));
         ushort tempChangesCount = s.UInt16("TemporaryMapChanges_Count", (ushort)save.TemporaryMapChanges.Count);
-        ApiUtil.Assert(tempChangesSize == tempChangesCount * MapChange.SizeOnDisk + 2);
+
+        expectedSize = tempChangesCount * MapChange.SizeOnDisk + 2;
+        if (tempChangesSize != expectedSize)
+        {
+            ApiUtil.Assert($"Expected temp changes size to be count ({tempChangesCount}) * {MapChange.SizeOnDisk} + 2 == {expectedSize}, but it was {tempChangesSize}");
+            tempChangesCount = (ushort)((tempChangesSize - 2) / MapChange.SizeOnDisk);
+        }
 
         save.TemporaryMapChanges = (MapChangeCollection)s.List(
             nameof(TemporaryMapChanges),
@@ -237,7 +253,14 @@ public class SavedGame
 
         uint visitedEventsSize = s.UInt32("VisitedEvents_Size", (uint)(save.VisitedEvents.Count * VisitedEvent.SizeOnDisk + 2));
         ushort visitedEventsCount = s.UInt16("VisitedEvents_Count", (ushort)save.VisitedEvents.Count);
-        ApiUtil.Assert(visitedEventsSize == visitedEventsCount * VisitedEvent.SizeOnDisk + 2);
+
+        expectedSize = visitedEventsCount * VisitedEvent.SizeOnDisk + 2;
+        if (visitedEventsSize != expectedSize)
+        {
+            ApiUtil.Assert($"Expected visited events size to be count ({visitedEventsCount}) * {VisitedEvent.SizeOnDisk} + 2 == {expectedSize}, but it was {visitedEventsSize}");
+            visitedEventsCount = (ushort)((visitedEventsSize - 2) / VisitedEvent.SizeOnDisk);
+        }
+
         save.VisitedEvents = s.List(nameof(VisitedEvents), save.VisitedEvents, mapping, visitedEventsCount, VisitedEvent.Serdes);
 
         var partyIds = save.Sheets.Keys.Where(x => x.Type == AssetType.PartySheet).Select(x => x.Id).ToList();

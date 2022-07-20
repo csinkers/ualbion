@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Config;
 using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets.Save;
@@ -14,6 +14,18 @@ public class FlagSet
     public int BitsPerMap { get; }
     public int Count => _set.Count;
     public int PackedSize => (Count + 7) / 8;
+
+    public IEnumerable<int> ActiveFlagIndices // Debugging convenience property
+    {
+        get
+        {
+            for (int i = 0; i < _set.Count; i++)
+            {
+                if (_set[i])
+                    yield return i;
+            }
+        }
+    }
 
     public FlagSet(int mapCount, int bitsPerMap)
     {

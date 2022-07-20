@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -13,8 +14,6 @@ namespace UAlbion.Game.State;
 
 public class Party : ServiceComponent<IParty>, IParty
 {
-    public const int MaxPartySize = 6;
-
     readonly IDictionary<SheetId, CharacterSheet> _characterSheets;
     readonly List<Player.PartyMember> _statusBarOrder = new();
     readonly List<Player.PartyMember> _walkOrder = new();
@@ -73,7 +72,7 @@ public class Party : ServiceComponent<IParty>, IParty
     {
         bool InsertMember(Player.PartyMember newPlayer)
         {
-            for (int i = 0; i < MaxPartySize; i++)
+            for (int i = 0; i < SavedGame.MaxPartySize; i++)
             {
                 if (_statusBarOrder.Count == i || _statusBarOrder[i].Id.Id > id.Id)
                 {

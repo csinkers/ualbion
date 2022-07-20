@@ -36,6 +36,7 @@ public class MiscState
     public long UnkB8 { get; set; }
     public long UnkC0 { get; set; }
     public long UnkC8 { get; set; }
+    public byte[] CombatPositions { get; private set; } = new byte[SavedGame.MaxPartySize];
 
     public static MiscState Serdes(string _, MiscState m, ISerializer s)
     {
@@ -44,9 +45,7 @@ public class MiscState
         m.Unk0 = s.Int32(nameof(Unk0), m.Unk0); // 0
         m.ActiveItems = s.EnumU32(nameof(ActiveItems), m.ActiveItems); // 4
         m.HoursSinceResting = s.UInt16(nameof(HoursSinceResting), m.HoursSinceResting);
-        m.UnkA = s.UInt16(nameof(UnkA), m.UnkA);
-        m.UnkC = s.UInt16(nameof(UnkC), m.UnkC);
-        m.UnkE = s.UInt16(nameof(UnkE), m.UnkE);
+        m.CombatPositions = s.Bytes(nameof(CombatPositions), m.CombatPositions, SavedGame.MaxPartySize);
         m.Unk10 = s.Int64(nameof(Unk10), m.Unk10);
         m.Unk18 = s.Int64(nameof(Unk18), m.Unk18);
         m.Unk20 = s.Int64(nameof(Unk20), m.Unk20);

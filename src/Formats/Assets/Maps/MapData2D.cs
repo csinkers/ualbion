@@ -79,7 +79,8 @@ public class MapData2D : BaseMapData
         map.CombatBackgroundId = SpriteId.SerdesU8(nameof(CombatBackgroundId), map.CombatBackgroundId, AssetType.CombatBackground, mapping, s); // 7
         map.PaletteId = PaletteId.SerdesU8(nameof(PaletteId), map.PaletteId, mapping, s);
         map.FrameRate = s.UInt8(nameof(FrameRate), map.FrameRate); // 9
-        ApiUtil.Assert(s.Offset == startOffset + 10);
+        int expectedOffset = 10;
+        ApiUtil.Assert(s.Offset - startOffset == expectedOffset, $"Map2D: Expected offset after header to be {expectedOffset:x}, but it was {s.Offset - startOffset:x}");
 
         map.Npcs ??= new List<MapNpc>();
 
@@ -93,14 +94,18 @@ public class MapData2D : BaseMapData
             npcCount,
             (n, x, s2) => MapNpc.Serdes(n, x, map.MapType, mapping, s2)).ToList();
 
-        ApiUtil.Assert(s.Offset == startOffset + 10 + npcCount * MapNpc.SizeOnDisk);
+        expectedOffset = 10 + npcCount * MapNpc.SizeOnDisk;
+        ApiUtil.Assert(s.Offset - startOffset == expectedOffset, $"Map2D: Expected offset after NPCs to be {expectedOffset:x}, but it was {s.Offset - startOffset:x}");
+
+        int tileCount = (map.Width - OffsetX) * (map.Height - OffsetY);
 
         if (s.IsReading())
-            map.RawLayout = s.Bytes("Layout", null, 3 * (map.Width - OffsetX) * (map.Height - OffsetY));
+            map.RawLayout = s.Bytes("Layout", null, 3 * tileCount);
         else
-            s.Bytes("Layout", map.RawLayout, 3 * (map.Width - OffsetX) * (map.Height - OffsetY));
+            s.Bytes("Layout", map.RawLayout, 3 * tileCount);
 
-        ApiUtil.Assert(s.Offset == startOffset + 10 + npcCount * MapNpc.SizeOnDisk + 3 * map.Width * map.Height);
+        expectedOffset = 10 + npcCount * MapNpc.SizeOnDisk + 3 * tileCount;
+        ApiUtil.Assert(s.Offset - startOffset == expectedOffset, $"Map2D: Expected offset after layout to be {expectedOffset:x}, but it was {s.Offset - startOffset:x}");
 
         map.SerdesZones(s);
         map.SerdesEvents(mapping, s);

@@ -22,6 +22,10 @@ namespace UAlbion.Game.Veldrid.Input;
 public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
 {
     SpriteId _cursorId = Base.CoreGfx.Cursor;
+    SpriteId _heldItemId = SpriteId.None;
+    int _heldSubItem = 0;
+    int _heldItemCount = 0;
+    int _heldItemFrames;
 
     public Vector2 Position { get; private set; }
     Vector2 _hotspot;
@@ -29,6 +33,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
     SpriteLease<SpriteInfo> _itemSprite;
     SpriteLease<SpriteInfo> _hotspotSprite;
     PositionedSpriteBatch _itemAmountSprite;
+
     string _lastItemAmountText;
     bool _dirty = true;
     bool _showCursor = true;
@@ -43,6 +48,12 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         On<SetCursorEvent>(e => SetCursor(e.CursorId));
         On<ShowCursorEvent>(e => { _showCursor = e.Show; _dirty = true; });
         On<SetRelativeMouseModeEvent>(e => _relative = e.Enabled);
+        On<SetHeldItemCursorEvent>(e =>
+        {
+            _heldItemId = e.Sprite;
+            _heldSubItem = e.SubItem;
+            _heldItemFrames = e.FrameCount < 1 ? 1 : e.FrameCount;
+        });
         On<InputEvent>(e =>
         {
             if (_relative)
@@ -161,7 +172,6 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
 
     void RenderItemInHandCursor(IAssetManager assets, ISpriteManager<SpriteInfo> sm, IWindowManager window, Vector3 normPosition)
     {
-        var held = Resolve<IInventoryManager>().ItemInHand;
         var itemAmountText = GetAmountText();
 
         if (_lastItemAmountText != itemAmountText)
@@ -174,34 +184,22 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
                 : tm.BuildRenderable(new TextBlock(itemAmountText), DrawLayer.MaxLayer, null, this);
         }
 
-        if (_cursorId != Base.CoreGfx.CursorSmall) // Inventory screen, check what's being held.
+        if (_heldItemId.IsNone)
         {
             _itemSprite?.Dispose(); _itemSprite = null;
             _itemAmountSprite?.Dispose(); _itemAmountSprite = null;
             return;
         }
 
-        int subItem = 0;
-        ITexture texture = null;
-
-        switch (held.Item)
-        {
-            case Gold: texture = assets.LoadTexture(Base.CoreGfx.UiGold); break;
-            case Rations: texture = assets.LoadTexture(Base.CoreGfx.UiFood); break;
-            case ItemData item:
-            {
-                texture = assets.LoadTexture(item.Icon);
-                subItem = item.IconSubId + _frame % item.IconAnim;
-                break;
-            }
-        }
-
-        if (texture == null)
+        if (_heldItemId.IsNone)
         {
             _itemSprite?.Dispose();
             _itemSprite = null;
             return;
         }
+
+        ITexture texture = assets.LoadTexture(_heldItemId);
+        int subItem = _heldSubItem + _frame % _heldItemFrames;
 
         if (texture != _itemSprite?.Key.Texture)
         {

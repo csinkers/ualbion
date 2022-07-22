@@ -5,13 +5,9 @@ namespace UAlbion.Formats.Assets.Save;
 
 public class MiscState
 {
-    // Len: 0xD0
-    public int Unk0 { get; set; }
-    public ActiveItems ActiveItems { get; set; }
-    public ushort HoursSinceResting { get; set; }
-    public ushort UnkA { get; set; }
-    public ushort UnkC { get; set; }
-    public ushort UnkE { get; set; }
+    // Len: 0xC0
+    public long Unk0 { get; set; }
+    public long Unk8 { get; set; }
     public long Unk10 { get; set; }
     public long Unk18 { get; set; }
     public long Unk20 { get; set; }
@@ -34,18 +30,13 @@ public class MiscState
     public long UnkA8 { get; set; }
     public long UnkB0 { get; set; }
     public long UnkB8 { get; set; }
-    public long UnkC0 { get; set; }
-    public long UnkC8 { get; set; }
-    public byte[] CombatPositions { get; private set; } = new byte[SavedGame.MaxPartySize];
 
     public static MiscState Serdes(string _, MiscState m, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         m ??= new MiscState();
-        m.Unk0 = s.Int32(nameof(Unk0), m.Unk0); // 0
-        m.ActiveItems = s.EnumU32(nameof(ActiveItems), m.ActiveItems); // 4
-        m.HoursSinceResting = s.UInt16(nameof(HoursSinceResting), m.HoursSinceResting);
-        m.CombatPositions = s.Bytes(nameof(CombatPositions), m.CombatPositions, SavedGame.MaxPartySize);
+        m.Unk0 = s.Int64(nameof(Unk0), m.Unk0);
+        m.Unk8 = s.Int64(nameof(Unk8), m.Unk8);
         m.Unk10 = s.Int64(nameof(Unk10), m.Unk10);
         m.Unk18 = s.Int64(nameof(Unk18), m.Unk18);
         m.Unk20 = s.Int64(nameof(Unk20), m.Unk20);
@@ -68,8 +59,6 @@ public class MiscState
         m.UnkA8 = s.Int64(nameof(UnkA8), m.UnkA8);
         m.UnkB0 = s.Int64(nameof(UnkB0), m.UnkB0);
         m.UnkB8 = s.Int64(nameof(UnkB8), m.UnkB8);
-        m.UnkC0 = s.Int64(nameof(UnkC0), m.UnkC0);
-        m.UnkC8 = s.Int64(nameof(UnkC8), m.UnkC8);
         return m;
     }
 }

@@ -1,4 +1,5 @@
-﻿using UAlbion.Game.Gui.Controls;
+﻿using UAlbion.Game.Events;
+using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui.Inventory;
 
@@ -13,7 +14,10 @@ public class InventoryMiscPage : UiElement
             new Spacing(0, 23),
             new Header(Base.SystemText.Inv3_TemporarySpells),
             new Spacing(0, 45),
-            new Button(Base.SystemText.Inv3_CombatPositions) // TODO: Make functional
+            new Button(Base.SystemText.Inv3_CombatPositions)
+                {
+                    DoubleFrame = true
+                }.OnClick(() => Raise(new ShowCombatPositionsDialogEvent()))
         );
         AttachChild(stack);
     }

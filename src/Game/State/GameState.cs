@@ -14,6 +14,7 @@ using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
+using UAlbion.Game.Gui.Inventory;
 using UAlbion.Game.State.Player;
 using UAlbion.Game.Text;
 
@@ -46,10 +47,22 @@ public class GameState : ServiceComponent<IGameState>, IGameState
     public ICharacterSheet GetSheet(SheetId id) => _game.Sheets.TryGetValue(id, out var sheet) ? sheet : null;
     public short GetTicker(TickerId id) => _game.Tickers.TryGetValue(id, out var value) ? value : (short)0;
     public bool GetSwitch(SwitchId id) => _game.GetSwitch(id);
+    public IPlayer GetPlayerForCombatPosition(int position) => 
+        _party.StatusBarOrder
+            .Where((_, i) => _game.CombatPositions[i] == position)
+            .FirstOrDefault();
+
+    public int? GetCombatPositionForPlayer(PartyMemberId id)
+    {
+        for (int i = 0; i < _party.StatusBarOrder.Count; i++)
+            if (_party.StatusBarOrder[i].Id == id)
+                return _game.CombatPositions[i];
+        return null;
+    }
 
     public MapChangeCollection TemporaryMapChanges => _game.TemporaryMapChanges;
     public MapChangeCollection PermanentMapChanges => _game.PermanentMapChanges;
-    public ActiveItems ActiveItems => _game.Misc.ActiveItems;
+    public ActiveItems ActiveItems => _game.ActiveItems;
     public IList<NpcState> Npcs => _game.Npcs;
     public bool IsChainDisabled(MapId mapId, ushort chain) => _game.IsChainDisabled(mapId, chain);
     public bool IsNpcDisabled(MapId mapId, byte npcNum) => _game.IsNpcDisabled(mapId, npcNum);
@@ -287,7 +300,8 @@ public class GameState : ServiceComponent<IGameState>, IGameState
             MapId = mapId,
             PartyX = x,
             PartyY = y,
-            ActiveMembers = { [0] = Base.PartyMember.Tom }
+            ActiveMembers = { [0] = Base.PartyMember.Tom },
+            CombatPositions = { [0] = 1 } // Tom starts off in the second position
         };
 
         foreach (var id in AssetMapping.Global.EnumerateAssetsOfType(AssetType.PartySheet))
@@ -346,7 +360,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
     void InitialiseGame()
     {
         _party?.Remove();
-        _party = AttachChild(new Party(_game.Sheets, GetWriteableInventory));
+        _party = AttachChild(new Party(_game.Sheets, GetWriteableInventory, _game.CombatPositions));
 
         foreach (var member in _game.ActiveMembers)
             if (!member.IsNone)
@@ -363,8 +377,8 @@ public class GameState : ServiceComponent<IGameState>, IGameState
 
     void ActivateItem(ActivateItemEvent e)
     {
-        if (e.Item == Base.Item.Clock) _game.Misc.ActiveItems |= ActiveItems.Clock;
-        else if (e.Item == Base.Item.Compass) _game.Misc.ActiveItems |= ActiveItems.Compass;
-        else if (e.Item == Base.Item.MonsterEye) _game.Misc.ActiveItems |= ActiveItems.MonsterEye;
+        if (e.Item == Base.Item.Clock) _game.ActiveItems |= ActiveItems.Clock;
+        else if (e.Item == Base.Item.Compass) _game.ActiveItems |= ActiveItems.Compass;
+        else if (e.Item == Base.Item.MonsterEye) _game.ActiveItems |= ActiveItems.MonsterEye;
     }
 }

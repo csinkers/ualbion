@@ -6,7 +6,7 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Gui.Controls;
 
-public class UiBlocker : Component, IUiElement // Used to prevent the user from clicking any controls behind a modal dialog.
+public class UiBlocker : Component, IUiElement, ISelectionBlocker // Used to prevent the user from clicking any controls behind a modal dialog.
 {
     public UiBlocker()
     {

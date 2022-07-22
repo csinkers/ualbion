@@ -14,6 +14,8 @@ namespace UAlbion.Formats.Assets.Save;
 public class SavedGame
 {
     public const int MaxPartySize = 6;
+    public const int CombatSlotRows = 2;
+    public const int CombatSlotColumns = 6;
     const int MapCount = 512; // TODO
     const int SwitchCount = 1024; // 0x80 bytes
     const int ChestCount = 999; // 7D bytes
@@ -116,6 +118,10 @@ public class SavedGame
     public uint Unk9 { get; set; }
     public ushort[] ActiveSpells { get; set; }
     public byte[] UnkB1 { get; set; }
+    public int Unk1A2 { get; set; }
+    public ActiveItems ActiveItems { get; set; }
+    public ushort HoursSinceResting { get; set; }
+    public byte[] CombatPositions { get; private set; } = new byte[MaxPartySize];
     public MiscState Misc { get; private set; } = new();
     public byte[] Unknown5B8c { get; set; }
     public NpcState[] Npcs { get; } = new NpcState[NpcCountPerMap];
@@ -189,7 +195,12 @@ public class SavedGame
                 return value;
             });
 
-        save.Misc = s.Object(nameof(Misc), save.Misc, MiscState.Serdes); // 1A2
+        save.Unk1A2 = s.Int32(nameof(Unk1A2), save.Unk1A2); // 1A2
+        save.ActiveItems = s.EnumU32(nameof(ActiveItems), save.ActiveItems); // 1A6
+        save.HoursSinceResting = s.UInt16(nameof(HoursSinceResting), save.HoursSinceResting); // 1AA
+        save.CombatPositions = s.Bytes(nameof(CombatPositions), save.CombatPositions, MaxPartySize); // 1AC
+
+        save.Misc = s.Object(nameof(Misc), save.Misc, MiscState.Serdes); // 1B2
         save._switches.Serdes("Switches", s); // 272
 
         // save._unk5Flags.Serdes("Unk5Flags", s);

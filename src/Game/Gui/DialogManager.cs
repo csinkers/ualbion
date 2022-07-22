@@ -37,10 +37,17 @@ public class DialogManager  : ServiceComponent<IDialogManager>, IDialogManager
             dialog.Closed += (sender, _) => c(dialog.Value);
             return true;
         });
-        On<LoadMapPromptEvent>(e =>
+
+        On<LoadMapPromptEvent>(_ =>
         {
             var dialog = AttachChild(new LoadMapPromptDialog(new LiteralText("Select map"), 100, 399));
             dialog.Closed += (sender, _) => Raise(new LoadMapEvent((Base.Map)dialog.Value)); // TODO: Include mod maps
+        });
+
+        On<ShowCombatPositionsDialogEvent>(_ =>
+        {
+            var maxLayer = Children.OfType<ModalDialog>().Select(x => (int?)x.Depth).Max() ?? 0;
+            AttachChild(new CombatPositionDialog(maxLayer + 1));
         });
     }
 }

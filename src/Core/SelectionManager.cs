@@ -40,8 +40,18 @@ public class SelectionManager : ServiceComponent<ISelectionManager>, ISelectionM
 
         _selection.Swap();
         _selection.Front.Clear();
-        foreach (var hit in hits)
+
+        for (int index = 0; index < hits.Count; index++)
+        {
+            var hit = hits[index];
             _selection.Front.Add(hit.Target);
+
+            if (hit.Target is ISelectionBlocker)
+            {
+                hits.RemoveRange(index + 1, hits.Count - index - 1);
+                break;
+            }
+        }
 
         Distribute(_hoverEvent, hits, HoverSelector);
         Distribute(_blurEvent, _selection.Back, BlurSelector);

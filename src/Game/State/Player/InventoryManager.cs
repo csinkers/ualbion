@@ -456,7 +456,24 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
 
     void SetCursor()
     {
+        SpriteId sprite = SpriteId.None;
+        int subItem = 0;
+        int frameCount = 1; 
+        switch (_hand.Item)
+        {
+            case Gold: sprite = Base.CoreGfx.UiGold; break;
+            case Rations: sprite = Base.CoreGfx.UiFood; break;
+            case ItemData item:
+            {
+                sprite= item.Icon;
+                subItem = item.IconSubId;
+                frameCount = item.IconAnim;
+                break;
+            }
+        }
+
         Raise(new SetCursorEvent(_hand.Item == null ? Base.CoreGfx.Cursor : Base.CoreGfx.CursorSmall));
+        Raise(new SetHeldItemCursorEvent(sprite, subItem, frameCount));
     }
 
     void CoalesceItems(ItemSlot slot)

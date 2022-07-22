@@ -50,7 +50,7 @@ public class PartyMember : Component, IPlayer
     }
 
     public PartyMemberId Id { get; }
-    public int CombatPosition { get; set; }
+    public int CombatPosition => Resolve<IGameState>().GetCombatPositionForPlayer(Id) ?? -1;
     public IEffectiveCharacterSheet Effective { get; private set; }
     public IEffectiveCharacterSheet Apparent { get; }
     public Vector3 GetPosition() => _positionFunc();

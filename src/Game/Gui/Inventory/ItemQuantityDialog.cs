@@ -34,7 +34,7 @@ public class ItemQuantityDialog : ModalDialog
             new GroupingFrame(new FixedSize(151, 30, new UiTextBuilder(stringId)))
         );
 
-        Func<int, string> formatFunc = useTenths ? (Func<int, string>)FormatTenths : FormatUnits;
+        Func<int, string> formatFunc = useTenths ? FormatTenths : FormatUnits;
 
         var stack = new VerticalStack(
             topStack,

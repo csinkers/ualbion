@@ -16,6 +16,8 @@ public interface IGameState
     MapId MapId { get; }
     MapId MapIdForNpcs { get; set; } // Set by NpcManagers
     ICharacterSheet GetSheet(SheetId id);
+    IPlayer GetPlayerForCombatPosition(int position);
+    int? GetCombatPositionForPlayer(PartyMemberId id);
     IInventory GetInventory(InventoryId id);
     short GetTicker(TickerId id);
     bool GetSwitch(SwitchId id);

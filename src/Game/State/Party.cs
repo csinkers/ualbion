@@ -8,6 +8,7 @@ using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
+using UAlbion.Game.Gui.Inventory;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.State;
@@ -19,17 +20,33 @@ public class Party : ServiceComponent<IParty>, IParty
     readonly List<Player.PartyMember> _walkOrder = new();
     readonly IReadOnlyList<Player.PartyMember> _readOnlyStatusBarOrder;
     readonly IReadOnlyList<Player.PartyMember> _readOnlyWalkOrder;
+    readonly byte[] _combatPositions;
 
-    public Party(IDictionary<SheetId, CharacterSheet> characterSheets, Func<InventoryId, Inventory> getInventory)
+    public Party(IDictionary<SheetId, CharacterSheet> characterSheets, Func<InventoryId, Inventory> getInventory, byte[] combatPositions)
     {
+        _characterSheets = characterSheets ?? throw new ArgumentNullException(nameof(characterSheets));
+        _combatPositions = combatPositions ?? throw new ArgumentNullException(nameof(combatPositions));
+        _readOnlyStatusBarOrder = _statusBarOrder.AsReadOnly();
+        _readOnlyWalkOrder = _walkOrder.AsReadOnly();
+
         On<AddPartyMemberEvent>(e => SetLastResult(AddMember(e.PartyMemberId)));
         On<RemovePartyMemberEvent>(e => SetLastResult(RemoveMember(e.PartyMemberId)));
         On<SetPartyLeaderEvent>(e => SetLeader(e.PartyMemberId));
+        On<SetPlayerCombatSlotEvent>(OnSetCombatSlot);
 
-        _characterSheets = characterSheets;
-        _readOnlyStatusBarOrder = _statusBarOrder.AsReadOnly();
-        _readOnlyWalkOrder = _walkOrder.AsReadOnly();
         AttachChild(new PartyInventory(getInventory));
+    }
+
+    void OnSetCombatSlot(SetPlayerCombatSlotEvent e)
+    {
+        for (int i = 0; i < _statusBarOrder.Count; i++)
+        {
+            if (_statusBarOrder[i].Id != e.Id)
+                continue;
+
+            _combatPositions[i] = (byte)e.Slot;
+            return;
+        }
     }
 
     [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "<Pending>")]
@@ -38,7 +55,7 @@ public class Party : ServiceComponent<IParty>, IParty
         get
         {
             foreach (var x in _statusBarOrder) // Don't use LINQ, we want to avoid allocations
-                if (x.Id == id) 
+                if (x.Id == id)
                     return x;
             return null;
         }
@@ -70,25 +87,33 @@ public class Party : ServiceComponent<IParty>, IParty
 
     public bool AddMember(PartyMemberId id)
     {
-        bool InsertMember(Player.PartyMember newPlayer)
-        {
-            for (int i = 0; i < SavedGame.MaxPartySize; i++)
-            {
-                if (_statusBarOrder.Count == i || _statusBarOrder[i].Id.Id > id.Id)
-                {
-                    _statusBarOrder.Insert(i, newPlayer);
-                    return true;
-                }
-            }
-            return false;
-        }
-
         if (_statusBarOrder.Any(x => x.Id == id))
             return false;
 
         var player = new Player.PartyMember(id, _characterSheets[id.ToSheet()]);
-        if (!InsertMember(player)) 
+        if (_statusBarOrder.Count >= SavedGame.MaxPartySize) 
             return false;
+
+        int index = _statusBarOrder.Count;
+        _statusBarOrder.Add(player);
+
+        // Allocate combat position
+        if (_combatPositions[index] == 0)
+        {
+            for (int combatSlot = SavedGame.CombatSlotColumns * SavedGame.CombatSlotRows - 1; combatSlot >= 0; combatSlot--)
+            {
+                bool occupied = false;
+                for (int i = 0; i < index && !occupied; i++)
+                    if (_combatPositions[i] == combatSlot)
+                        occupied = true;
+
+                if (occupied)
+                    continue;
+
+                _combatPositions[index] = (byte)combatSlot;
+                break;
+            }
+        }
 
         _walkOrder.Add(player);
         AttachChild(player);

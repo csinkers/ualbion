@@ -166,7 +166,7 @@ public class LogExchange : ILogExchange
         else
         {
             var regex = new Regex(pattern, RegexOptions.IgnoreCase);
-            var matchingEvents = Event.GetEventMetadata().Where(x => regex.IsMatch(x.Name)).ToList();
+            var matchingEvents = Event.GetEventMetadata().Where(x => regex.IsMatch(x.Name)).Distinct().ToList();
 
             if (matchingEvents.Any())
                 PrintHelpSummary(sb, matchingEvents);
@@ -185,6 +185,9 @@ public class LogExchange : ILogExchange
                     e.Parts.Select(x => x.IsOptional ? $"[{x.Name}]" : x.Name));
 
             sb.AppendFormat(CultureInfo.InvariantCulture, "    {0}{1}: {2}" + Environment.NewLine, e.Name, paramList, e.HelpText);
+            foreach(var alias in e.Aliases)
+                sb.AppendFormat(CultureInfo.InvariantCulture, "    {0}{1}: {2}" + Environment.NewLine, alias, paramList, e.HelpText);
+
         }
     }
 

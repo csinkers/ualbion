@@ -173,7 +173,9 @@ vec4 GetLayer(uint tileIndex, vec2 tileUv, vec2 deltaX, vec2 deltaY, bool opaque
 	}
 
 	layer = tile.Layer;
-	return color;
+	return tileIndex == 0
+		? color = vec4(0)
+		: color;
 }
 
 void ClampTileUV(inout vec2 tileUv)

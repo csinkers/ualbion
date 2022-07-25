@@ -21,6 +21,7 @@ public class MapSprite : Sprite
         }
     }
 
+    public override string ToString() => $"MapSprite {Id} @ {TilePosition}";
     public MapSprite(SpriteId id, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
         : base(id, Vector3.Zero, layer, keyFlags, flags) { }
 }

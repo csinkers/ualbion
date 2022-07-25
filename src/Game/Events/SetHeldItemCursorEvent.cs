@@ -7,13 +7,18 @@ namespace UAlbion.Game.Events;
 public class SetHeldItemCursorEvent : Event, IVerboseEvent
 {
     [EventPart("sprite")] public SpriteId Sprite { get; }
-    [EventPart("subItem")] public int SubItem { get; }
-    [EventPart("frames")] public int FrameCount { get; }
+    [EventPart("subItem", true, 0)] public int SubItem { get; }
+    [EventPart("frames", true, 1)] public int FrameCount { get; }
+    [EventPart("count", true, 1)] public int ItemCount { get; }
+    [EventPart("tenths", true, false)] public bool UseTenths { get; }
 
-    public SetHeldItemCursorEvent(SpriteId sprite, int subItem, int frameCount)
+    public SetHeldItemCursorEvent(SpriteId sprite, int subItem, int frameCount, int itemCount, bool useTenths)
     {
         Sprite = sprite;
         SubItem = subItem;
         FrameCount = frameCount;
+        ItemCount = itemCount;
+        UseTenths = useTenths;
     }
+
 }

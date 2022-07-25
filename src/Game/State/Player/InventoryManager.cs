@@ -473,7 +473,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         }
 
         Raise(new SetCursorEvent(_hand.Item == null ? Base.CoreGfx.Cursor : Base.CoreGfx.CursorSmall));
-        Raise(new SetHeldItemCursorEvent(sprite, subItem, frameCount));
+        Raise(new SetHeldItemCursorEvent(sprite, subItem, frameCount, _hand.Amount, _hand.Item is Gold));
     }
 
     void CoalesceItems(ItemSlot slot)

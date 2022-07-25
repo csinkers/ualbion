@@ -61,7 +61,7 @@ right clicking returns held to original loc or undoes last swap
             _inHand = value;
             var sheet = Resolve<IParty>()[_inHand]?.Effective;
             Raise(new SetCursorEvent(_inHand.IsNone ? Base.CoreGfx.Cursor : Base.CoreGfx.CursorSmall));
-            Raise(new SetHeldItemCursorEvent(sheet?.PortraitId ?? SpriteId.None, 0, 1));
+            Raise(new SetHeldItemCursorEvent(sheet?.PortraitId ?? SpriteId.None, 0, 1, 1, false));
         }
     }
 

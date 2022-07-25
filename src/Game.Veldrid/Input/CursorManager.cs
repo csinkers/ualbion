@@ -14,18 +14,13 @@ using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
 using UAlbion.Game.Input;
 using UAlbion.Game.Settings;
-using UAlbion.Game.State.Player;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Veldrid.Input;
 
 public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
 {
-    SpriteId _cursorId = Base.CoreGfx.Cursor;
-    SpriteId _heldItemId = SpriteId.None;
-    int _heldSubItem = 0;
-    int _heldItemCount = 0;
-    int _heldItemFrames;
+    static readonly Vector2 ItemSpriteOffset = new(3, 3);
 
     public Vector2 Position { get; private set; }
     Vector2 _hotspot;
@@ -34,7 +29,14 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
     SpriteLease<SpriteInfo> _hotspotSprite;
     PositionedSpriteBatch _itemAmountSprite;
 
-    string _lastItemAmountText;
+    SpriteId _cursorId = Base.CoreGfx.Cursor;
+    SpriteId _heldItemId = SpriteId.None;
+    int _heldSubItem;
+    int _heldItemFrames;
+    int _heldItemCount;
+    bool _heldItemCountUsesTenths;
+
+    int _lastAmount;
     bool _dirty = true;
     bool _showCursor = true;
     bool _relative;
@@ -52,6 +54,8 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         {
             _heldItemId = e.Sprite;
             _heldSubItem = e.SubItem;
+            _heldItemCount = e.ItemCount;
+            _heldItemCountUsesTenths = e.UseTenths;
             _heldItemFrames = e.FrameCount < 1 ? 1 : e.FrameCount;
         });
         On<InputEvent>(e =>
@@ -172,15 +176,15 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
 
     void RenderItemInHandCursor(IAssetManager assets, ISpriteManager<SpriteInfo> sm, IWindowManager window, Vector3 normPosition)
     {
-        var itemAmountText = GetAmountText();
-
-        if (_lastItemAmountText != itemAmountText)
+        if (_lastAmount != _heldItemCount)
         {
             var tm = Resolve<ITextManager>();
-            _lastItemAmountText = itemAmountText;
+            _lastAmount = _heldItemCount;
             _itemAmountSprite?.Dispose();
-            _itemAmountSprite = itemAmountText == null 
-                ? null 
+
+            var itemAmountText = GetAmountText();
+            _itemAmountSprite = itemAmountText == null
+                ? null
                 : tm.BuildRenderable(new TextBlock(itemAmountText), DrawLayer.MaxLayer, null, this);
         }
 
@@ -215,25 +219,22 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         var instances = _itemSprite.Lock(ref lockWasTaken);
         try
         {
-            // TODO: Quantity text
-            instances[0] = new SpriteInfo(SpriteFlags.TopLeft, normPosition + new Vector3(window.UiToNormRelative(6, 6), 0), window.UiToNormRelative(subImage.Size), subImage);
+            instances[0] = new SpriteInfo(SpriteFlags.TopLeft, normPosition + new Vector3(window.UiToNormRelative(ItemSpriteOffset.X, ItemSpriteOffset.Y), 0), window.UiToNormRelative(subImage.Size), subImage);
         }
         finally { _itemSprite.Unlock(lockWasTaken); }
 
         if (_itemAmountSprite != null)
-            _itemAmountSprite.Position = normPosition + new Vector3(window.UiToNormRelative(16, 17), 0);
+            _itemAmountSprite.Position = normPosition + new Vector3(window.UiToNormRelative(subImage.Size), 0);
     }
 
     string GetAmountText()
     {
-        var hand = Resolve<IInventoryManager>().ItemInHand;
-        var amount = hand.Amount;
-        if (amount < 2)
+        if (_heldItemCount < 2)
             return null;
 
         return
-            hand.Item is Gold
-                ? $"{amount / 10}.{amount % 10}"
-                : amount.ToString(CultureInfo.InvariantCulture); // i18n: Will need updating if we want separators or non-Hindu-Arabic numerals.
+            _heldItemCountUsesTenths
+                ? $"{_heldItemCount / 10}.{_heldItemCount % 10}"
+                : _heldItemCount.ToString(CultureInfo.InvariantCulture); // i18n: Will need updating if we want separators or non-Hindu-Arabic numerals.
     }
 }

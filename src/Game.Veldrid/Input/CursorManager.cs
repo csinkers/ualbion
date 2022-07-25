@@ -132,7 +132,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         try
         {
             var region = _hotspotSprite.Key.Texture.Regions[(int) commonColors.Palette[CommonColor.Yellow3]];
-            instances[0] = new SpriteInfo(SpriteFlags.MidMid, position, size, region);
+            instances[0] = new SpriteInfo(SpriteFlags.TopLeft, position, size, region);
         }
         finally { _hotspotSprite.Unlock(lockWasTaken); }
     }
@@ -165,7 +165,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         var instances = _cursorSprite.Lock(ref lockWasTaken);
         try
         {
-            instances[0] = new SpriteInfo(SpriteFlags.MidMid, position, size, _cursorSprite.Key.Texture.Regions[0]);
+            instances[0] = new SpriteInfo(SpriteFlags.TopLeft, position, size, _cursorSprite.Key.Texture.Regions[0]);
         }
         finally { _cursorSprite.Unlock(lockWasTaken); }
     }
@@ -216,12 +216,12 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         try
         {
             // TODO: Quantity text
-            instances[0] = new SpriteInfo(SpriteFlags.MidMid, normPosition + new Vector3(window.UiToNormRelative(6, 6), 0), window.UiToNormRelative(subImage.Size), subImage);
+            instances[0] = new SpriteInfo(SpriteFlags.TopLeft, normPosition + new Vector3(window.UiToNormRelative(6, 6), 0), window.UiToNormRelative(subImage.Size), subImage);
         }
         finally { _itemSprite.Unlock(lockWasTaken); }
 
         if (_itemAmountSprite != null)
-            _itemAmountSprite.Position = normPosition + new Vector3(window.UiToNormRelative(6, 10), 0);
+            _itemAmountSprite.Position = normPosition + new Vector3(window.UiToNormRelative(16, 17), 0);
     }
 
     string GetAmountText()

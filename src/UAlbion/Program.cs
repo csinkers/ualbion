@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using UAlbion.Api;
@@ -36,6 +37,12 @@ static class Program
         var commandLine = new CommandLineOptions(args);
         if (commandLine.Mode == ExecutionMode.Exit)
             return;
+
+        CultureInfo.CurrentCulture
+            = CultureInfo.CurrentUICulture
+            = CultureInfo.DefaultThreadCurrentCulture
+            = CultureInfo.DefaultThreadCurrentUICulture
+            = CultureInfo.InvariantCulture;
 
         PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
         var disk = new FileSystem(Directory.GetCurrentDirectory());

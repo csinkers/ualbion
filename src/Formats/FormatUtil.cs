@@ -61,6 +61,9 @@ public static class FormatUtil
         return sb.ToString();
     }
 
+    public static bool TryParseFloat(string s, out float result)
+        => float.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out result);
+
     public static int ParseHex(string s) =>
         s != null && s.StartsWith("0x", StringComparison.InvariantCulture)
             ? int.Parse(s[2..], NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture)

@@ -315,17 +315,17 @@
     "Albion/MAIN.EXE#476227B0391CF3452166B7A1D52B012CCF6C86BC9E46886DAFBED343E9140710": { // EN+DE Aug 22 1996
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
-      "MapFile": "Meta/MainExeEN_DE.json"
+      "MapFile": "Meta/MainExe.json"
     },
     "Albion/MAIN.EXE#9FC7ABCF1A1EFC2F0AF3D90B7E23E03B5D5F58A4D04AE81E66EFD1717EE0245A": { // EN Jul 25 1996
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
-      "MapFile": "Meta/MainExeEN_DE.json"
+      "MapFile": "Meta/MainExe.json"
     },
     "Albion/MAIN.EXE#487DA3348C367363F3EFCBB22AE45C186F1FBECADA73F0BF0CE2CA8377A8DE14": { // FR
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
-      "MapFile": "Meta/MainExeFR.json"
+      "MapFile": "Meta/MainExe.json"
     }
   }
 }

@@ -312,12 +312,17 @@
       "Max":  0, 
       "Map": { "0": { "Id": "uibg.1" } }
     },
-    "Albion/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710": { // EN+DE
+    "Albion/MAIN.EXE#476227B0391CF3452166B7A1D52B012CCF6C86BC9E46886DAFBED343E9140710": { // EN+DE Aug 22 1996
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
       "MapFile": "Meta/MainExeEN_DE.json"
     },
-    "Albion/MAIN.EXE#487da3348c367363f3efcbb22ae45c186f1fbecada73f0bf0ce2ca8377a8de14": { // FR
+    "Albion/MAIN.EXE#9FC7ABCF1A1EFC2F0AF3D90B7E23E03B5D5F58A4D04AE81E66EFD1717EE0245A": { // EN Jul 25 1996
+      "Loader": "fixedsize",
+      "Container": "binaryoffsets",
+      "MapFile": "Meta/MainExeEN_DE.json"
+    },
+    "Albion/MAIN.EXE#487DA3348C367363F3EFCBB22AE45C186F1FBECADA73F0BF0CE2CA8377A8DE14": { // FR
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
       "MapFile": "Meta/MainExeFR.json"

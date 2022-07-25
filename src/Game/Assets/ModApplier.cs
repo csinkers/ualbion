@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
@@ -246,9 +247,22 @@ public class ModApplier : Component, IModApplier
         object asset = null;
         Stack<IPatch> patches = null; // Create the stack lazily, as most assets won't have any patches.
 
+        List<string> filesSearched =
+#if DEBUG
+            new List<string>();
+        var loaderWarnings = new StringBuilder();
+#else
+            null;
+#endif
+
         foreach (var mod in _modsInReverseDependencyOrder)
         {
-            foreach (var info in mod.AssetConfig.GetAssetInfo(id))
+#if DEBUG
+            filesSearched?.Clear();
+#endif
+
+            var assetLocations = mod.AssetConfig.GetAssetInfo(id);
+            foreach (var info in assetLocations)
             {
                 var assetLang = info.Get<string>(AssetProperty.Language, null);
                 if (assetLang != null)
@@ -258,7 +272,7 @@ public class ModApplier : Component, IModApplier
                         continue;
                 }
 
-                var modAsset = _assetLocator.LoadAsset(info, mod.SerdesContext, annotationWriter);
+                var modAsset = _assetLocator.LoadAsset(info, mod.SerdesContext, annotationWriter, filesSearched);
 
                 if (modAsset is IPatch patch)
                 {
@@ -283,11 +297,36 @@ public class ModApplier : Component, IModApplier
                     goto assetFound;
                 }
             }
+
+#if DEBUG
+            if (asset == null && assetLocations.Length > 0 && filesSearched is { Count: > 0 })
+            {
+                loaderWarnings.AppendLine($"Tried to load asset {id} from mod {mod.Name}");
+                loaderWarnings.AppendLine("  Files searched:");
+                foreach (var info in assetLocations)
+                {
+                    var hash = string.IsNullOrEmpty(info.File.Sha256Hash) ? "" : $" (expected hash {info.File.Sha256Hash})";
+                    loaderWarnings.AppendLine($"    {info.File.Filename}{hash}");
+                }
+
+                loaderWarnings.AppendLine("  Files found:");
+                foreach (var path in filesSearched.Distinct())
+                {
+                    loaderWarnings.Append("    ");
+                    loaderWarnings.AppendLine(path);
+                }
+            }
+#endif
         }
 
         assetFound:
         while (patches is { Count: > 0 })
             asset = patches.Pop().Apply(asset);
+
+#if DEBUG
+        if (asset == null)
+            Warn(loaderWarnings.ToString());
+#endif
 
         return asset;
     }

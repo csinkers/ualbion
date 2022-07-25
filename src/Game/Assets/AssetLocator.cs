@@ -23,13 +23,13 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
         base.Subscribed();
     }
 
-    public object LoadAsset(AssetInfo info, SerdesContext context, TextWriter annotationWriter = null)
+    public object LoadAsset(AssetInfo info, SerdesContext context, TextWriter annotationWriter, List<string> filesSearched)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
         var pathResolver = Resolve<IPathResolver>();
 
-        using ISerializer s = Search(pathResolver, info, context, annotationWriter);
+        using ISerializer s = Search(pathResolver, info, context, annotationWriter, filesSearched);
         if (s == null)
             return null;
 
@@ -54,11 +54,17 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
         return container?.GetSubItemRanges(resolved, info, context) ?? new List<(int, int)> { (0, 1) };
     }
 
-    ISerializer Search(IPathResolver pathResolver, AssetInfo info, SerdesContext context, TextWriter annotationWriter = null)
+    ISerializer Search(IPathResolver pathResolver, AssetInfo info, SerdesContext context, TextWriter annotationWriter, List<string> filesSearched)
     {
         var path = pathResolver.ResolvePath(info.File.Filename);
-        if (info.File.Sha256Hash != null && !info.File.Sha256Hash.Equals(GetHash(path, context.Disk), StringComparison.OrdinalIgnoreCase))
-            return null;
+        if (info.File.Sha256Hash != null)
+        {
+            var hash = GetHash(path, context.Disk);
+            filesSearched?.Add($"{context.Disk.ToAbsolutePath(path)} (actual hash {hash})");
+            if (!info.File.Sha256Hash.Equals(hash, StringComparison.OrdinalIgnoreCase))
+                return null;
+        }
+        else filesSearched?.Add(context.Disk.ToAbsolutePath(path));
 
         var container = _containerRegistry.GetContainer(path, info.File.Container, context.Disk);
         var s = container?.Read(path, info, context);

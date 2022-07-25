@@ -8,6 +8,6 @@ namespace UAlbion.Game.Assets;
 
 public interface IAssetLocator : IComponent
 {
-    object LoadAsset(AssetInfo info, SerdesContext context, TextWriter annotationWriter);
+    object LoadAsset(AssetInfo info, SerdesContext context, TextWriter annotationWriter, List<string> filesSearched);
     List<(int,int)> GetSubItemRangesForFile(AssetFileInfo info, SerdesContext context);
 }

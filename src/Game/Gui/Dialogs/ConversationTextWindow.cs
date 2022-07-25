@@ -21,7 +21,7 @@ public class ConversationTextWindow : ModalDialog
             new Padding(
                 new UiText(_text)
                     .Scrollable()
-                    .Filter(0),
+                    .Filter((int)Conversation.SpecialBlockId.MainText),
                 3));
 
         // Transparent background, scrollable

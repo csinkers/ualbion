@@ -2,7 +2,7 @@
 
 namespace UAlbion.Scripting.Ast;
 
-public record SingleEvent(IEvent Event) : ICfgNode
+public record SingleEvent(IEvent Event, int OriginalIndex) : ICfgNode
 {
     public override string ToString() => Event.ToString();
     public void Accept(IAstVisitor visitor) => visitor.Visit(this);

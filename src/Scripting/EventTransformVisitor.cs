@@ -11,6 +11,6 @@ public class EventTransformVisitor : BaseAstBuilderVisitor
     protected override ICfgNode Build(SingleEvent e)
     {
         var transformed = _transform(e.Event);
-        return transformed == null || transformed == e.Event ? null : Emit.Event(transformed);
+        return transformed == null || transformed == e.Event ? null : Emit.Event(transformed, e.OriginalIndex);
     }
 }

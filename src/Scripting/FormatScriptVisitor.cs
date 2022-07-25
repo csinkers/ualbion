@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using UAlbion.Scripting.Ast;
 
@@ -6,14 +7,16 @@ namespace UAlbion.Scripting;
 
 public class FormatScriptVisitor : IAstVisitor
 {
-    readonly StringBuilder _sb = new();
+    readonly StringBuilder _sb;
+    readonly Dictionary<int, (int start, int end)> _mapping;
     readonly long _initialPos;
     bool _inCondition;
 
-    public FormatScriptVisitor() { }
-    public FormatScriptVisitor(StringBuilder sb)
+    public FormatScriptVisitor() { _sb = new StringBuilder(); }
+    public FormatScriptVisitor(StringBuilder sb, Dictionary<int, (int start, int end)> mapping)
     {
         _sb = sb ?? throw new ArgumentNullException(nameof(sb));
+        _mapping = mapping;
         _initialPos = _sb.Length;
     }
 
@@ -48,15 +51,21 @@ public class FormatScriptVisitor : IAstVisitor
     public void Visit(SingleEvent e)
     {
         Indent();
+        int startPosition = _sb.Length;
         if (!_inCondition && PrettyPrint && Formatter != null)
         {
             _sb.Append(Formatter.Format(e.Event, UseNumericIds));
+            if (_mapping != null)
+                _mapping[e.OriginalIndex] = (startPosition, _sb.Length);
             return;
         }
 
         _sb.Append(UseNumericIds 
             ? e.Event.ToStringNumeric() 
             : e.Event.ToString());
+
+        if (_mapping != null)
+            _mapping[e.OriginalIndex] = (startPosition, _sb.Length);
     }
 
     public void Visit(BreakStatement breakStatement) { Indent(); _sb.Append("break"); }

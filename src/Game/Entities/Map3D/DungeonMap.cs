@@ -166,7 +166,7 @@ public class DungeonMap : Component, IMap
             Raise(new SetLogLevelEvent(LogLevel.Warning));
 
         foreach (var zone in zones)
-            Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), type, zone.X, zone.Y)));
+            Raise(new TriggerChainEvent(_mapData, zone.EventIndex, new EventSource(_mapData.Id, type, zone.X, zone.Y)));
 
         if (!log)
             Raise(new SetLogLevelEvent(LogLevel.Info));

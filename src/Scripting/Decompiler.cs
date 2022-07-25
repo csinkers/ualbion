@@ -183,7 +183,7 @@ public static class Decompiler
 
     public static ControlFlowGraph BuildDisconnectedGraphFromEvents<T>(IList<T> events) where T : IEventNode
     {
-        var nodes = events.Select(x => (ICfgNode)Emit.Event(x.Event)).ToList();
+        var nodes = events.Select((x, i) => (ICfgNode)Emit.Event(x.Event, i)).ToList();
 
         // Add empty nodes for the unique entry/exit points
         var entry = nodes.Count;

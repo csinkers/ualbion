@@ -11,7 +11,7 @@ using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Maps;
 
-public abstract class BaseMapData : IMapData, IJsonPostDeserialise, IEventSet
+public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 {
     protected const int OffsetX = 1; // Compensation for all absolute map coordinates being relative to (1,1).
     protected const int OffsetY = 1;
@@ -30,8 +30,20 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise, IEventSet
     [JsonInclude] public PaletteId PaletteId { get; set; }
     [JsonInclude] public SpriteId CombatBackgroundId { get; set; }
     [JsonInclude] public List<MapNpc> Npcs { get; protected set; }
-    [JsonIgnore] public List<EventNode> Events { get; private set; } = new();
-    [JsonInclude] public List<ushort> Chains { get; private set; } = new();
+    [JsonIgnore] public IList<EventNode> Events { get; private set; } = new List<EventNode>();
+    [JsonInclude] public IList<ushort> Chains { get; private set; } = new List<ushort>();
+
+    [JsonIgnore]
+    public IList<ushort> ExtraEntryPoints
+    {
+        get
+        {
+            var npcRefs = Npcs.Where(x => x.Node != null).Select(x => x.Node.Id).ToHashSet();
+            var zoneRefs = UniqueZoneNodeIds;
+            return npcRefs.Union(zoneRefs).Except(Chains).ToList();
+        }
+    }
+
     [JsonInclude] public string[] ZoneText // for JSON
     {
         get => GlobalZones.Concat(Zones).Where(x => x != null).Select(x => x.ToString()).ToArray();
@@ -303,7 +315,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise, IEventSet
         Unswizzle();
     }
 
-    public void RemapChains(List<EventNode> events, List<ushort> chains)
+    public void RemapChains(IList<EventNode> events, IList<ushort> chains)
     {
         foreach (var npc in Npcs)
             if (npc.Chain != EventNode.UnusedEventId)
@@ -318,9 +330,9 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise, IEventSet
                 zone.EventIndex = chains[zone.Chain];
 
         Events.Clear();
-        Events.AddRange(events);
+        ((List<EventNode>)Events).AddRange(events);
         Chains.Clear();
-        Chains.AddRange(chains);
+        ((List<ushort>)Chains).AddRange(chains);
 
         Unswizzle();
     }

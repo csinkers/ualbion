@@ -2,6 +2,7 @@
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
@@ -35,8 +36,9 @@ public class ScriptManager : Component
         for (ushort i = 0; i < events.Count;     i++) nodes[i] = new EventNode(i, events[i]);
         for (ushort i = 0; i < events.Count - 1; i++) nodes[i].Next = nodes[i + 1];
 
-        var source = new EventSource(mapManager.Current.MapId, mapManager.Current.MapId.ToMapText(), TriggerTypes.Default); // TODO: Is there a better trigger type for this?
-        var trigger = new TriggerChainEvent(AssetId.None, 0, nodes[0], source);
+        var set = new ScriptEventSet(doScriptEvent.ScriptId, mapManager.Current.MapId.ToMapText(), nodes);
+        var source = new EventSource(mapManager.Current.MapId, TriggerTypes.Default); // TODO: Is there a better trigger type for this?
+        var trigger = new TriggerChainEvent(set, 0, source);
         return RaiseAsync(trigger, continuation) > 0;
     }
 

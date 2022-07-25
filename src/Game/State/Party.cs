@@ -134,7 +134,7 @@ public class Party : ServiceComponent<IParty>, IParty
         return true;
     }
 
-    void SetLastResult(bool result) => Resolve<IEventManager>().LastEventResult = result;
+    void SetLastResult(bool result) => Resolve<IEventManager>().Context.LastEventResult = result;
 
     public void Clear()
     {

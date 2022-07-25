@@ -16,36 +16,26 @@ namespace UAlbion.Base.Tests;
 public static class LayoutTestUtil
 {
     public delegate (List<EventNode> events, List<ushort> chains, List<ushort> extra) LayoutExtractor<in T>(T value);
-    public delegate T LayoutConstructor<T>(T value, EventLayout layout);
+    public delegate T LayoutConstructor<T>(T value, EventLayout layout) where T : IEventSet;
 
-    public static Formats.Assets.EventSet CanonicalizeEventSet(Formats.Assets.EventSet set) => Canonicalize(set, ExtractSetLayout, ConstructSet);
-    public static T CanonicalizeMap<T>(T map) where T : BaseMapData => Canonicalize(map, ExtractMapLayout, ConstructMap);
+    public static Formats.Assets.EventSet CanonicalizeEventSet(Formats.Assets.EventSet set) => Canonicalize(set, ConstructSet);
+    public static T CanonicalizeMap<T>(T map) where T : BaseMapData => Canonicalize(map, ConstructMap);
 
-    public static EventLayout BuildLayout<T>(T value, LayoutExtractor<T> extractor)
+    public static EventLayout BuildLayout(IEventSet set)
     {
-        var (events, chains, extra) = extractor(value);
-        var regions = Decompiler.BuildEventRegions(events, chains, extra);
+        var regions = Decompiler.BuildEventRegions(set.Events, set.Chains, set.ExtraEntryPoints);
         return EventLayout.Build(regions);
     }
 
-    public static T Canonicalize<T>(T value, LayoutExtractor<T> extractor, LayoutConstructor<T> constructor) => constructor(value, BuildLayout(value, extractor)); 
-    public static Formats.Assets.EventSet ConstructSet(Formats.Assets.EventSet x, EventLayout layout) => new(x.Id, layout.Events, layout.Chains);
-    public static (List<EventNode> events, List<ushort> chains, List<ushort> extra) ExtractSetLayout(Formats.Assets.EventSet x) => (x.Events, x.Chains, null);
+    public static T Canonicalize<T>(T value, LayoutConstructor<T> constructor) where T : IEventSet
+        => constructor(value, BuildLayout(value)); 
+    public static Formats.Assets.EventSet ConstructSet(Formats.Assets.EventSet x, EventLayout layout)
+        => new(x.Id, layout.Events, layout.Chains);
 
     public static T ConstructMap<T>(T x, EventLayout layout) where T : BaseMapData
     {
         x.RemapChains(layout.Events, layout.Chains);
         return x;
-    }
-
-    public static (List<EventNode> events, List<ushort> chains, List<ushort> extra) ExtractMapLayout(IMapData map)
-    {
-        var entryPoints = map.Npcs.Select(x => x.EventIndex).ToHashSet();
-        entryPoints.UnionWith(map.UniqueZoneNodeIds);
-        entryPoints.ExceptWith(map.Chains);
-        entryPoints.Remove(0xffff);
-
-        return (map.Events, map.Chains, entryPoints.ToList());
     }
 
     static void TrimTrailingEmptyChains(IList<ushort> chains)

@@ -6,7 +6,6 @@ using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
@@ -15,18 +14,19 @@ namespace UAlbion.Game;
 
 public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventManager, IDisposable
 {
-    static readonly EventContext BaseContext = new(new EventSource(AssetId.None, TextId.None, 0));
+    static readonly EventContext BaseContext = new(new EventSource(AssetId.None, 0));
+    static readonly ResumeChainsEvent ResumeChainsEvent = new();
+    static readonly StartClockEvent StartClockEvent = new();
+    static readonly StopClockEvent StopClockEvent = new();
 
     readonly ThreadLocal<Stack<EventContext>> _threadContexts = new(() => new Stack<EventContext>());
-    readonly HashSet<EventContext> _activeContexts = new();
-    readonly StartClockEvent _startClockEvent = new();
-    readonly StopClockEvent _stopClockEvent = new();
-    readonly ResumeChainsEvent _resumeChainsEvent = new();
+    readonly List<EventContext> _contexts = new();
+    public IReadOnlyList<EventContext> Contexts => _contexts;
 
     public EventChainManager()
     {
         // Need to enqueue without a sender if we want to handle it ourselves.
-        On<BeginFrameEvent>(_ => Exchange?.Enqueue(_resumeChainsEvent, null)); 
+        On<BeginFrameEvent>(_ => Exchange?.Enqueue(ResumeChainsEvent, null)); 
         On<ResumeChainsEvent>(ResumeChains);
         OnAsync<TriggerChainEvent>(Trigger);
     }
@@ -40,9 +40,6 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
             return BaseContext;
         }
     }
-
-    public bool LastEventResult { get; set; }
-    public IEnumerable<EventContext> DebugActiveContexts => _activeContexts;
 
     bool HandleBoolEvent(EventContext context, IAsyncEvent<bool> boolEvent, IBranchNode branch) // Return value = whether to return.
     {
@@ -59,7 +56,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
             // and the LastEventResult can mean successful opening, exiting the screen without success or a
             // trap has been triggered.
             if (boolEvent is QueryEvent) 
-                LastEventResult = result;
+                context.LastEventResult = result;
             context.Status = EventContextStatus.Ready;
         });
 
@@ -100,6 +97,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
             _threadContexts.Value.Pop();
             return true;
         }
+
         // If the continuation was called already then continue iterating.
         return false;
     }
@@ -107,13 +105,13 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
     void HandleChainCompletion(EventContext context)
     {
         if (context.ClockWasRunning)
-            Raise(_startClockEvent);
+            Raise(StartClockEvent);
 
         context.Status = EventContextStatus.Completing;
         context.CompletionCallback?.Invoke();
         context.Status = EventContextStatus.Complete;
         _threadContexts.Value.Pop();
-        _activeContexts.Remove(context);
+        _contexts.Remove(context);
     }
 
     void Resume(EventContext context)
@@ -143,12 +141,12 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         HandleChainCompletion(context);
     }
 
-    void ResumeChains(ResumeChainsEvent obj)
+    void ResumeChains(ResumeChainsEvent _)
     {
         EventContext context;
         do
         {
-            context = _activeContexts.FirstOrDefault(x => x.Status == EventContextStatus.Ready);
+            context = _contexts.FirstOrDefault(x => x.Status == EventContextStatus.Ready);
             if (context != null)
                 Resume(context);
         } while (context != null);
@@ -157,22 +155,23 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
     bool Trigger(TriggerChainEvent e, Action continuation)
     {
         var game = Resolve<IGameState>();
-        if (e.ChainSource.Type == AssetType.Map && game.IsChainDisabled(e.ChainSource, e.Chain))
+        if (e.EventSet.Id.Type == AssetType.Map && game.IsChainDisabled(e.EventSet.Id, e.EventSet.GetChainForEvent(e.EntryPoint)))
             return true;
 
         var context = new EventContext(e.Source)
         {
-            Chain = e.Chain,
-            Node = e.Node,
+            EntryPoint = e.EntryPoint,
+            EventSet = e.EventSet,
+            Node = e.EventSet.Events[e.EntryPoint],
             ClockWasRunning = Resolve<IClock>().IsRunning,
             CompletionCallback = continuation,
             Status = EventContextStatus.Ready
         };
 
         if (context.ClockWasRunning)
-            Raise(_stopClockEvent);
+            Raise(StopClockEvent);
 
-        _activeContexts.Add(context);
+        _contexts.Add(context);
         Resume(context);
         return true;
     }

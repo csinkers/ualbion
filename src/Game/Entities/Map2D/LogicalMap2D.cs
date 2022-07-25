@@ -32,6 +32,8 @@ public class LogicalMap2D : LogicalMap
     public Vector2 TileSize { get; set; } // TODO: Tidy up how this gets initialised
 
     public MapTile[] RawTiles => _mapData.Tiles;
+    public IEventSet EventSet => _mapData;
+
     public TileData GetUnderlay(int x, int y) => GetUnderlay(Index(x, y));
     public TileData GetUnderlay(int index)
     {

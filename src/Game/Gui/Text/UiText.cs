@@ -24,10 +24,12 @@ public class UiText : UiElement
 
     // public UiText() => RegisterEvents();
 
-    public UiText(IText source)
+    public UiText(IText source, int? maxWidth = null)
     {
         RegisterEvents();
         _source = source;
+        if (maxWidth.HasValue)
+            _lastExtents = new Rectangle(_lastExtents.X, _lastExtents.Y, maxWidth.Value, _lastExtents.Height);
     }
 
     void RegisterEvents()
@@ -40,7 +42,7 @@ public class UiText : UiElement
     public override string ToString() => $"UiText source:\"{_source}\"";
     // public UiText Source(IText source) { _source = source; _lastVersion = 0; return this; }
     public UiText Scrollable() { _isScrollable = true; return this; }
-    public UiText Filter(int filter) { _blockFilter = filter; return this; }
+    public UiText Filter(int? filter) { _blockFilter = filter; return this; }
     public int? BlockFilter
     {
         get => _blockFilter;

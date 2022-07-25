@@ -16,8 +16,9 @@ public class EventSet : IEventSet
     AssetId IEventSet.Id => Id;
     [JsonIgnore] public TextId TextId => Id.ToEventText();
     [JsonInclude] public EventSetId Id { get; private init; }
-    [JsonInclude] public List<ushort> Chains { get; private set; }
-    [JsonIgnore] public List<EventNode> Events { get; private set; }
+    [JsonInclude] public IList<ushort> Chains { get; private set; }
+    [JsonIgnore] public IList<ushort> ExtraEntryPoints => null;
+    [JsonIgnore] public IList<EventNode> Events { get; private set; }
 
     public EventSet() { }
 

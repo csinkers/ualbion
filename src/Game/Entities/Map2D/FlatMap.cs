@@ -149,7 +149,7 @@ public class FlatMap : Component, IMap
             Raise(new SetLogLevelEvent(LogLevel.Warning));
 
         foreach (var zone in zones)
-            Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, new EventSource(_mapData.Id, _mapData.Id.ToMapText(), type, zone.X, zone.Y)));
+            Raise(new TriggerChainEvent(_logicalMap.EventSet, zone.EventIndex, new EventSource(_mapData.Id, type, zone.X, zone.Y)));
 
         if (!log)
             Raise(new SetLogLevelEvent(LogLevel.Info));
@@ -164,8 +164,8 @@ public class FlatMap : Component, IMap
         if ((zone.Trigger & TriggerTypes.Npc) == 0)
             return;
 
-        var source = new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Npc, zone.X, zone.Y);
-        Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, source));
+        var source = new EventSource(_mapData.Id, TriggerTypes.Npc, zone.X, zone.Y);
+        Raise(new TriggerChainEvent(_logicalMap.EventSet, zone.EventIndex, source));
     }
 
     void OnPlayerEnteredTile(PlayerEnteredTileEvent e)
@@ -177,8 +177,8 @@ public class FlatMap : Component, IMap
         if ((zone.Trigger & TriggerTypes.Normal) == 0)
             return;
 
-        var source = new EventSource(_mapData.Id, _mapData.Id.ToMapText(), TriggerTypes.Normal, zone.X, zone.Y);
-        Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, source));
+        var source = new EventSource(_mapData.Id, TriggerTypes.Normal, zone.X, zone.Y);
+        Raise(new TriggerChainEvent(_mapData, zone.EventIndex, source));
     }
 
     void TileTriggered(TriggerMapTileEvent e)
@@ -187,8 +187,8 @@ public class FlatMap : Component, IMap
         if (zone?.Node == null)
             return;
 
-        var source = new EventSource(_mapData.Id, _mapData.Id.ToMapText(), e.Type, zone.X, zone.Y);
-        Raise(new TriggerChainEvent(zone.ChainSource, zone.Chain, zone.Node, source));
+        var source = new EventSource(_mapData.Id, e.Type, zone.X, zone.Y);
+        Raise(new TriggerChainEvent(_logicalMap.EventSet, zone.EventIndex, source));
     }
 
     void ChangeIcon(ChangeIconEvent e)

@@ -73,7 +73,7 @@ public class PartyInventory : Component
         Raise(new InventoryChangedEvent(new InventoryId(e.ChestId)));
     }
 
-    void SetLastResult(bool result) => Resolve<IEventManager>().LastEventResult = result;
+    void SetLastResult(bool result) => Resolve<IEventManager>().Context.LastEventResult = result;
 
     int GetTotalItemCount(ItemId itemId)
     {

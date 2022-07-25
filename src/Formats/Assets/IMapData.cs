@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
-using UAlbion.Api.Eventing;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets;
 
-public interface IMapData
+public interface IMapData : IEventSet
 {
     MapFlags Flags { get; }
     MapType MapType { get; }
@@ -16,7 +15,5 @@ public interface IMapData
     PaletteId PaletteId { get;  }
 
     List<MapNpc> Npcs { get; }
-    List<EventNode> Events { get; }
-    List<ushort> Chains { get; }
     HashSet<ushort> UniqueZoneNodeIds { get; }
 }

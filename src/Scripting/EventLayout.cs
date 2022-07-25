@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UAlbion.Api.Eventing;
 using UAlbion.Scripting.Ast;
 
@@ -13,16 +14,16 @@ public class EventLayout
 
     EventLayout(IList<ControlFlowGraph> graphs) => _graphs = graphs ?? throw new ArgumentNullException(nameof(graphs));
 
-    public EventLayout(List<EventNode> events, List<ushort> chains, List<ushort> extraEntryPoints)
+    public EventLayout(IList<EventNode> events, IList<ushort> chains, IList<ushort> extraEntryPoints)
     {
         Events = events ?? throw new ArgumentNullException(nameof(events));
         Chains = chains ?? throw new ArgumentNullException(nameof(chains));
         ExtraEntryPoints = extraEntryPoints ?? new List<ushort>();
     }
 
-    public List<EventNode> Events { get; } = new();
-    public List<ushort> Chains { get; } = new();
-    public List<ushort> ExtraEntryPoints { get; } = new();
+    public IList<EventNode> Events { get; } = new List<EventNode>();
+    public IList<ushort> Chains { get; } = new List<ushort>();
+    public IList<ushort> ExtraEntryPoints { get; private set; } = new List<ushort>();
 
     public static EventLayout Build(IList<ControlFlowGraph> graphs)
     {
@@ -67,7 +68,7 @@ public class EventLayout
         }
 
         layout.LinkNodes();
-        layout.ExtraEntryPoints.Sort();
+        layout.ExtraEntryPoints = layout.ExtraEntryPoints.OrderBy(x => x).ToList();
         return layout;
     }
 

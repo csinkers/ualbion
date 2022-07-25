@@ -2,6 +2,7 @@
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Scripting;
 using UAlbion.TestCommon;
@@ -29,21 +30,20 @@ public class CanonicalEventTests
     {
         var assets = Exchange.Resolve<IAssetManager>();
         var eventSet = assets.LoadEventSet(eventSetId);
-        Test(eventSetId, eventSet, LayoutTestUtil.ExtractSetLayout);
+        Test(eventSetId, eventSet);
     }
 
     void TestMap(MapId mapId)
     {
         var assets = Exchange.Resolve<IAssetManager>();
         var map = assets.LoadMap(mapId);
-        Test(mapId, map, LayoutTestUtil.ExtractMapLayout);
+        Test(mapId, map);
     }
 
-    static void Test<T>(AssetId id, T asset, LayoutTestUtil.LayoutExtractor<T> extractor)
+    static void Test<T>(AssetId id, T set) where T : IEventSet
     {
-        var (e, c, x) = extractor(asset);
-        var expectedLayout = new EventLayout(e, c, x);
-        var result = LayoutTestUtil.BuildLayout(asset, extractor);
+        var expectedLayout = new EventLayout(set.Events, set.Chains, set.ExtraEntryPoints);
+        var result = LayoutTestUtil.BuildLayout(set);
 
         if (!LayoutTestUtil.CompareLayoutBytes(result, expectedLayout, id, out var message))
             throw new InvalidOperationException($"Difference detected: {message}");

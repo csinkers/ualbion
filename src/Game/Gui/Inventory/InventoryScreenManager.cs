@@ -110,7 +110,7 @@ public class InventoryScreenManager : Component
     void LockOpened()
     {
         var em = Resolve<IEventManager>();
-        em.LastEventResult = true;
+        em.Context.LastEventResult = true;
         InventoryClosed();
     }
 

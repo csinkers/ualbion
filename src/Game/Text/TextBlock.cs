@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
+using UAlbion.Game.Gui.Dialogs;
 
 namespace UAlbion.Game.Text;
 
 public class TextBlock // Logical segment of text where all glyphs share the same formatting.
 {
-    public TextBlock() : this(-1, string.Empty) { }
+    public TextBlock() : this((int)Conversation.SpecialBlockId.MainText, string.Empty) { }
     public TextBlock(int blockId) : this(blockId, string.Empty) { }
-    public TextBlock(string text) : this(-1, text) { }
+    public TextBlock(string text) : this((int)Conversation.SpecialBlockId.MainText, text) { }
     public TextBlock(int blockId, string text)
     {
         BlockId = blockId;

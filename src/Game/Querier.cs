@@ -30,14 +30,14 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
         OnAsync(          Do<QueryHourEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Time.Hour, q.Argument)));
         OnAsync(        Do<QueryLeaderEvent>(q => Resolve<IGameState>().Party.Leader.Id == q.PartyMemberId));
         OnAsync(           Do<QueryMapEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().MapId.Id, q.MapId.Id)));
-        OnAsync(Do<QueryPreviousActionResultEvent> (q => Resolve<IEventManager>().LastEventResult));
+        OnAsync(Do<QueryPreviousActionResultEvent> (_ => Resolve<IEventManager>().Context.LastEventResult));
         OnAsync(   Do<QueryRandomChanceEvent>(q => Resolve<IRandom>().Generate(100) < q.Argument));
         OnAsync(         Do<QuerySwitchEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().GetSwitch(q.SwitchId) ? 1 : 0, q.Immediate)));
         OnAsync(         Do<QueryTickerEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().GetTicker(q.TickerId), q.Immediate)));
         OnAsync(    Do<QueryTriggerTypeEvent>(q => Resolve<IEventManager>().Context.Source.Trigger == (TriggerTypes)q.Argument));
         OnAsync(       Do<QueryUsedItemEvent>(q => Resolve<IEventManager>().Context.Source.AssetId == (AssetId)q.ItemId));
         OnAsync(      Do<QueryNpcActiveEvent>(q => Resolve<IGameState>().IsNpcDisabled(MapId.None, q.Immediate)));
-        OnAsync(Do<QueryScriptDebugModeEvent>(q => false));
+        OnAsync(Do<QueryScriptDebugModeEvent>(_ => false));
 
         OnAsync(Do<QueryConsciousEvent> (q =>
         {
@@ -48,13 +48,13 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
             return (member.Combat.Conditions & PlayerConditions.UnconsciousMask) == 0;
         }));
 
-        OnAsync(Do<QueryEventUsedEvent> (q =>
+        OnAsync(Do<QueryEventUsedEvent> (_ =>
         {
             Error("TODO: Query event already used");
             return false;
         }));
 
-        OnAsync(Do<QueryDemoVersionEvent> (q =>
+        OnAsync(Do<QueryDemoVersionEvent> (_ =>
         {
             Error("TODO: Query is demo");
             return false;

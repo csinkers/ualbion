@@ -9,6 +9,7 @@ namespace UAlbion.Game.Gui.Dialogs;
 
 public class ConversationOptionsWindow : ModalDialog
 {
+    const int MaxConversationOptionWidth = 283;
     List<IUiElement> _optionElements;
     // Opaque background
     // Yellow options, gap, then white options.
@@ -37,7 +38,7 @@ public class ConversationOptionsWindow : ModalDialog
         _optionElements = new List<IUiElement>();
         if (options != null)
             foreach (var (text, blockId, action) in options)
-                _optionElements.Add(new ConversationOption(text, blockId, action));
+                _optionElements.Add(new ConversationOption(text, MaxConversationOptionWidth, blockId, action));
 
         if (standardOptions != null)
         {
@@ -45,10 +46,10 @@ public class ConversationOptionsWindow : ModalDialog
                 _optionElements.Add(new Spacing(0, 10));
 
             foreach (var (text, blockId, action) in standardOptions)
-                _optionElements.Add(new ConversationOption(text, blockId, action));
+                _optionElements.Add(new ConversationOption(text, MaxConversationOptionWidth, blockId, action));
         }
 
-        _optionElements.Add(new Spacing(283, 0));
+        _optionElements.Add(new Spacing(MaxConversationOptionWidth, 0));
 
         var stack = new VerticalStack(_optionElements);
         var content = new Padding(stack, 3);

@@ -9,7 +9,8 @@ public interface IEventSet
 {
     AssetId Id { get; }
     TextId TextId { get; }
-    List<ushort> Chains { get; }
-    List<EventNode> Events { get; }
+    IList<EventNode> Events { get; }
+    IList<ushort> Chains { get; }
+    IList<ushort> ExtraEntryPoints { get; }
     ushort GetChainForEvent(ushort index);
 }

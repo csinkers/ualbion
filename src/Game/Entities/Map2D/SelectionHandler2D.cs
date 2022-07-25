@@ -9,7 +9,6 @@ using UAlbion.Formats;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
-using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Scenes;

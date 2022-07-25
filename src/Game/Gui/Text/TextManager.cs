@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
@@ -50,8 +49,8 @@ public class TextManager : ServiceComponent<ITextManager>, ITextManager
     public PositionedSpriteBatch BuildRenderable(TextBlock block, DrawLayer order, Rectangle? scissorRegion, object caller)
     {
         if (block == null) throw new ArgumentNullException(nameof(block));
-        var assets = Resolve<IAssetManager>();
         var sm = Resolve<ISpriteManager<SpriteInfo>>();
+        var assets = Resolve<IAssetManager>();
         var window = Resolve<IWindowManager>();
 
         var font = assets.LoadFont(block.Color, block.Style == TextStyle.Big);
@@ -61,6 +60,7 @@ public class TextManager : ServiceComponent<ITextManager>, ITextManager
 
         int offset = 0;
         var flags = SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.ClampEdges;
+        scissorRegion = scissorRegion == null ? null : Resolve<IWindowManager>().UiToPixel(scissorRegion.Value);
         var key = new SpriteKey(font, SpriteSampler.Point, order, flags, scissorRegion);
 
         int displayableCharacterCount = 0;
@@ -170,8 +170,8 @@ public class TextManager : ServiceComponent<ITextManager>, ITextManager
                 }
             }
         }
-
     }
+
     Dictionary<char, int> GetFontMapping(IAssetId fontId, IAssetManager assets)
     {
         var id = AssetId.FromUInt32(fontId.ToUInt32());

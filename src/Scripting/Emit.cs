@@ -6,7 +6,7 @@ namespace UAlbion.Scripting;
 
 public static class Emit
 {
-    public static SingleEvent Event(IEvent e) => new(e ?? throw new ArgumentNullException(nameof(e)));
+    public static SingleEvent Event(IEvent e, int originalIndex) => new(e ?? throw new ArgumentNullException(nameof(e)), originalIndex);
     public static BreakStatement Break() => new();
     public static ContinueStatement Continue() => new();
     public static ControlFlowNode Cfg(ControlFlowGraph graph) => new(graph ?? throw new ArgumentNullException(nameof(graph)));

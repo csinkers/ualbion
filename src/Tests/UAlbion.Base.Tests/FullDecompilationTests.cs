@@ -493,7 +493,8 @@ public class FullDecompilationTests : IDisposable
             {
                 var decompiled = Decompile(graph, steps);
                 var sb = new StringBuilder();
-                formatter.FormatGraphsAsBlocks(sb, new []  { decompiled }, 0);
+                Dictionary<int, (int start, int end)> mapping = new();
+                formatter.FormatGraphsAsBlocks(sb, mapping, new []  { decompiled }, 0);
                 scripts[index] = sb.ToString();
 
                 var roundTripLayout = AlbionCompiler.Compile(scripts[index], contextId, steps);

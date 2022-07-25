@@ -120,26 +120,23 @@ public static class MapExport
         return (result, script);
     }
 
-    static (string script, Dictionary<ushort, string> functionsByEventId) BuildScript(IMapData map, EventFormatter eventFormatter)
+    static (string script, Dictionary<ushort, string> functionsByEventId) BuildScript(IEventSet eventSet, EventFormatter eventFormatter)
     {
         var sb = new StringBuilder();
-        var mapping = new Dictionary<ushort, string>();
+        var functionMapping = new Dictionary<ushort, string>();
 
-        if (map.Events.Count <= 0)
-            return ("", mapping);
+        if (eventSet.Events.Count <= 0)
+            return ("", functionMapping);
 
-        var npcRefs = map.Npcs.Where(x => x.Node != null).Select(x => x.Node.Id).ToHashSet();
-        var zoneRefs = map.UniqueZoneNodeIds;
-        var refs = npcRefs.Union(zoneRefs).Except(map.Chains).ToList();
+        var extraEntries = eventSet.ExtraEntryPoints;
+        eventFormatter.FormatEventSetDecompiled(sb, null, eventSet.Events, eventSet.Chains, extraEntries, 0);
 
-        eventFormatter.FormatEventSetDecompiled(sb, map.Events, map.Chains, refs, 0);
+        foreach (var entryEventId in extraEntries)
+            functionMapping[entryEventId] = ScriptConstants.BuildAdditionalEntryLabel(entryEventId);
 
-        foreach (var entryEventId in refs)
-            mapping[entryEventId] = ScriptConstants.BuildAdditionalEntryLabel(entryEventId);
+        for (int chainId = 0; chainId < eventSet.Chains.Count; chainId++)
+            functionMapping[eventSet.Chains[chainId]] = ScriptConstants.BuildChainLabel(chainId);
 
-        for (int chainId = 0; chainId < map.Chains.Count; chainId++)
-            mapping[map.Chains[chainId]] = ScriptConstants.BuildChainLabel(chainId);
-
-        return (sb.ToString(), mapping);
+        return (sb.ToString(), functionMapping);
     }
 }

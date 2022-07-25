@@ -50,6 +50,7 @@ public class EventFormatter : IEventFormatter
 
     public void FormatEventSetDecompiled<T>(
         StringBuilder sb,
+        Dictionary<int, (int start, int end)> mapping,
         IList<T> events,
         IEnumerable<ushort> chains,
         IEnumerable<ushort> additionalEntryPoints,
@@ -62,15 +63,15 @@ public class EventFormatter : IEventFormatter
         try
         {
             var trees = Decompiler.Decompile(events, chains, additionalEntryPoints, steps);
-            FormatGraphsAsBlocks(sb, trees, indent);
+            FormatGraphsAsBlocks(sb, mapping, trees, indent);
         }
         catch (ControlFlowGraphException)
         {
-            FormatEventSet(sb, events, indent); // Fallback to raw view
+            FormatEventSet(sb, mapping, events, indent); // Fallback to raw view
         }
     }
 
-    public void FormatGraphsAsBlocks(StringBuilder sb, IEnumerable<ICfgNode> trees, int indent)
+    public void FormatGraphsAsBlocks(StringBuilder sb, Dictionary<int, (int start, int end)> mapping, IEnumerable<ICfgNode> trees, int indent)
     {
         var counter = new CountEventsVisitor();
 
@@ -91,7 +92,7 @@ public class EventFormatter : IEventFormatter
                     sb.AppendLine();
                 sb.AppendLine("{");
 
-                var visitor = new FormatScriptVisitor(sb) { PrettyPrint = true, IndentLevel = indent, Formatter = this };
+                var visitor = new FormatScriptVisitor(sb, mapping) { PrettyPrint = true, IndentLevel = indent, Formatter = this };
                 visitor.IndentLevel += visitor.TabSize;
                 tree.Accept(visitor);
 
@@ -102,7 +103,7 @@ public class EventFormatter : IEventFormatter
             else
             {
                 sb.Append("{ ");
-                var visitor = new FormatScriptVisitor(sb) { PrettyPrint = false };
+                var visitor = new FormatScriptVisitor(sb, mapping) { PrettyPrint = false };
                 tree.Accept(visitor);
                 sb.Append(" }");
                 lastWasTrivial = true;
@@ -155,7 +156,7 @@ public class EventFormatter : IEventFormatter
         }
     }
 
-    public void FormatEventSet<T>(StringBuilder sb, IList<T> events, int indent = 0) where T : IEventNode
+    public void FormatEventSet<T>(StringBuilder sb, Dictionary<int, (int start, int end)> mapping, IList<T> events, int indent = 0) where T : IEventNode
     {
         if (sb == null) throw new ArgumentNullException(nameof(sb));
         if (events == null) return;
@@ -163,7 +164,10 @@ public class EventFormatter : IEventFormatter
         foreach (var e in events)
         {
             sb.Append(new string(' ', 4 * indent));
+            int startOffset = sb.Length;
             sb.AppendLine(Format(e, events[0].Id));
+            if (mapping != null)
+                mapping[e.Id] = (startOffset, sb.Length);
         }
     }
 }

@@ -28,6 +28,16 @@ public class Conversation : Component
     ConversationTopicWindow _topicsWindow;
     ConversationOptionsWindow _optionsWindow;
 
+    public enum SpecialBlockId
+    {
+        MainText = -1, // Pseudo-block id for text filtering purposes in UiText
+        Profession = 0,
+        QueryWord = 1,
+        QueryItem = 2,
+        Farewell = 3
+        // Regular blocks start at 10
+    }
+
     public Conversation(PartyMemberId partyMemberId, ICharacterSheet npc)
     {
         On<EndDialogueEvent>(_ => Close());
@@ -100,9 +110,9 @@ public class Conversation : Component
         _optionsWindow.IsActive = false;
         var tf = Resolve<ITextFormatter>();
 
-        switch(blockId)
+        switch ((SpecialBlockId)blockId)
         {
-            case 0: // Profession
+            case SpecialBlockId.Profession:
             { 
                 void OnClicked()
                 {
@@ -116,14 +126,14 @@ public class Conversation : Component
                 return;
             }
 
-            case 1: // Query word
+            case SpecialBlockId.QueryWord:
             {
                 _topicsWindow.IsActive = true;
                 _topicsWindow.SetOptions(_topics);
                 return;
             }
 
-            case 2: // Query item
+            case SpecialBlockId.QueryItem:
                 void OnClicked2()
                 {
                     _textWindow.Clicked -= OnClicked2;
@@ -134,7 +144,7 @@ public class Conversation : Component
                 _textWindow.Clicked += OnClicked2;
                 return;
 
-            case 3: // Bye
+            case SpecialBlockId.Farewell:
                 TriggerAction(ActionType.FinishDialogue, 0, 0, () => Complete?.Invoke(this, EventArgs.Empty));
                 return;
         }
@@ -147,7 +157,7 @@ public class Conversation : Component
         if (mapTextEvent == null) throw new ArgumentNullException(nameof(mapTextEvent));
         if (continuation == null) throw new ArgumentNullException(nameof(continuation));
         var tf = Resolve<ITextFormatter>();
-        switch(mapTextEvent.Location)
+        switch (mapTextEvent.Location)
         {
             case TextLocation.Conversation:
             case TextLocation.NoPortrait:
@@ -276,14 +286,14 @@ public class Conversation : Component
         if (chain != null)
         {
             var triggerEvent = new TriggerChainEvent(
-                chainSource.Id,
+                chainSource,
                 chain.Value,
-                chainSource.Events[chain.Value],
-                new EventSource(chainSource.Id, chainSource.Id.ToEventText(), TriggerTypes.Action));
+                new EventSource(chainSource.Id, TriggerTypes.Action));
 
             RaiseAsync(triggerEvent, () => continuation?.Invoke());
             return true;
         }
+
         return false;
     }
 }

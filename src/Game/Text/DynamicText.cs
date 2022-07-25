@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UAlbion.Formats.Ids;
+using UAlbion.Game.Gui.Dialogs;
 
 namespace UAlbion.Game.Text;
 
@@ -11,6 +12,7 @@ public class DynamicText : IText
     public delegate IEnumerable<TextBlock> GeneratorFunc();
     readonly GeneratorFunc _generator;
     readonly Func<int, int> _getVersion;
+    int _version = 1;
 #if DEBUG
     string _lastText;
     public override string ToString()
@@ -19,7 +21,7 @@ public class DynamicText : IText
             return _lastText;
 
         var sb = new StringBuilder();
-        int blockId = -1;
+        int blockId = (int)Conversation.SpecialBlockId.MainText;
         var words = new List<WordId>();
 
         void WriteWords()
@@ -55,7 +57,6 @@ public class DynamicText : IText
         return _lastText;
     }
 #endif
-    int _version = 1;
 
     public DynamicText(GeneratorFunc generator)
     {

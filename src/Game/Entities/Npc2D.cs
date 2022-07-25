@@ -187,13 +187,10 @@ public class Npc2D : Component
         if (_state.EventIndex == EventNode.UnusedEventId)
             return null;
 
-        var node = _state.EventSet.Events[_state.EventIndex];
-        var chain = _state.EventSet.GetChainForEvent(_state.EventIndex);
-
-        return new TriggerChainEvent(_state.EventSet.Id,
-            chain,
-            node,
-            new EventSource(_state.Id, TextId.None, TriggerTypes.TalkTo));
+        return new TriggerChainEvent(
+            _state.EventSet,
+            _state.EventIndex,
+            new EventSource(_state.Id, TriggerTypes.TalkTo));
     }
 
     void SetTarget(int x, int y)

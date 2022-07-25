@@ -54,6 +54,7 @@ public class PickSaveSlotMenu : ModalDialog
         return pathResolver.ResolvePath($"$(SAVES)/SAVE.{i:D3}");
     }
 
+    const int MaxSaveSlotWidth = 280;
     protected override void Subscribed()
     {
         var disk = Resolve<IFileSystem>();
@@ -81,17 +82,17 @@ public class PickSaveSlotMenu : ModalDialog
                 var name = SavedGame.GetName(br) ?? "Invalid";
                 var text = $"{i,2}    {name}";
                 ushort slotNumber = i;
-                buttons.Add(new ConversationOption(new LiteralText(text), null, () => PickSlot(slotNumber)));
+                buttons.Add(new ConversationOption(new LiteralText(text), MaxSaveSlotWidth, null, () => PickSlot(slotNumber)));
             }
             else if (_showEmptySlots)
             {
                 var text = BuildEmptySlotText(i);
                 ushort slotNumber = i;
-                buttons.Add(new ConversationOption(text, null, () => PickSlot(slotNumber)));
+                buttons.Add(new ConversationOption(text, MaxSaveSlotWidth, null, () => PickSlot(slotNumber)));
             }
         }
 
-        var elements = new List<IUiElement> { new Spacing(280, 0) };
+        var elements = new List<IUiElement> { new Spacing(MaxSaveSlotWidth, 0) };
         elements.AddRange(buttons);
         elements.Add(new Spacing(0, 4));
 

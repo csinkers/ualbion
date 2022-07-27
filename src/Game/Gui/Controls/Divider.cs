@@ -41,8 +41,7 @@ public class Divider : UiElement
         var instances = _sprite.Lock(ref lockWasTaken);
         try
         {
-            var region = commonColors.BorderTexture.Regions[(int)commonColors.Palette[_color]];
-            instances[0] = new SpriteInfo(SpriteFlags.TopLeft, position, size, region);
+            instances[0] = new SpriteInfo(SpriteFlags.TopLeft, position, size, commonColors.GetRegion(_color));
         }
         finally { _sprite.Unlock(lockWasTaken); }
 

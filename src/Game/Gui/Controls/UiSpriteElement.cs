@@ -12,10 +12,10 @@ namespace UAlbion.Game.Gui.Controls;
 public class UiSpriteElement : UiElement
 {
     SpriteId _id;
-    Vector2 _size;
     SpriteLease<SpriteInfo> _sprite;
     Vector3 _lastPosition;
     Vector2 _lastSize;
+    Vector2 _size;
     int _subId;
     SpriteFlags _flags;
     bool _dirty = true;

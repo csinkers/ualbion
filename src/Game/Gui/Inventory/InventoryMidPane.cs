@@ -63,7 +63,7 @@ public class InventoryMidPane : UiElement
 
                 var name = member.Apparent.GetName(GetVar(UserVars.Gameplay.Language));
                 return new[] { new TextBlock(name) { Alignment = TextAlignment.Center } };
-            })),
+            }), 18),
             new HorizontalStack(
                 new Spacing(3, 0),
                 frame,

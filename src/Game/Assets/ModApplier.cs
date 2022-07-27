@@ -15,6 +15,7 @@ using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Containers;
 using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
+using static System.FormattableString;
 
 namespace UAlbion.Game.Assets;
 
@@ -258,7 +259,7 @@ public class ModApplier : Component, IModApplier
         foreach (var mod in _modsInReverseDependencyOrder)
         {
 #if DEBUG
-            filesSearched?.Clear();
+            filesSearched.Clear();
 #endif
 
             var assetLocations = mod.AssetConfig.GetAssetInfo(id);
@@ -301,12 +302,12 @@ public class ModApplier : Component, IModApplier
 #if DEBUG
             if (asset == null && assetLocations.Length > 0 && filesSearched is { Count: > 0 })
             {
-                loaderWarnings.AppendLine($"Tried to load asset {id} from mod {mod.Name}");
+                loaderWarnings.AppendLine(Invariant($"Tried to load asset {id} from mod {mod.Name}"));
                 loaderWarnings.AppendLine("  Files searched:");
                 foreach (var info in assetLocations)
                 {
                     var hash = string.IsNullOrEmpty(info.File.Sha256Hash) ? "" : $" (expected hash {info.File.Sha256Hash})";
-                    loaderWarnings.AppendLine($"    {info.File.Filename}{hash}");
+                    loaderWarnings.AppendLine(Invariant($"    {info.File.Filename}{hash}"));
                 }
 
                 loaderWarnings.AppendLine("  Files found:");

@@ -70,17 +70,15 @@ public class UiRectangle : UiElement
             _sprite = sm.Borrow(key, 1, this);
         }
 
-        var subImage = new Region(
-            Vector2.Zero,
-            Vector2.One,
-            Vector2.One,
-            (int)commonColors.Palette[_color]);
-
         bool lockWasTaken = false;
         var instances = _sprite.Lock(ref lockWasTaken);
         try
         {
-            instances[0] = new SpriteInfo(SpriteFlags.TopLeft, position, window.UiToNormRelative(DrawSize), subImage);
+            instances[0] = new SpriteInfo(
+                SpriteFlags.TopLeft,
+                position,
+                window.UiToNormRelative(DrawSize),
+                commonColors.GetRegion(_color));
         }
         finally { _sprite.Unlock(lockWasTaken); }
     }

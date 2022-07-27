@@ -8,16 +8,17 @@ public class InventoryMiscPage : UiElement
     public InventoryMiscPage()
     {
         var stack = new VerticalStack(
-            new Header(Base.SystemText.Inv3_Conditions),
-            new Spacing(0, 64),
-            new Header(Base.SystemText.Inv3_Languages),
+            new Spacing(0, 1),
+            new Header(Base.SystemText.Inv3_Conditions, 4),
+            new Spacing(0, 63),
+            new Header(Base.SystemText.Inv3_Languages, 3),
             new Spacing(0, 23),
-            new Header(Base.SystemText.Inv3_TemporarySpells),
+            new Header(Base.SystemText.Inv3_TemporarySpells, 3),
             new Spacing(0, 45),
             new Button(Base.SystemText.Inv3_CombatPositions)
-                {
-                    DoubleFrame = true
-                }.OnClick(() => Raise(new ShowCombatPositionsDialogEvent()))
+            {
+                DoubleFrame = true
+            }.OnClick(() => Raise(new ShowCombatPositionsDialogEvent()))
         );
         AttachChild(stack);
     }

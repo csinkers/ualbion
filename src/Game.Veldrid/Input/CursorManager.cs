@@ -135,8 +135,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         var instances = _hotspotSprite.Lock(ref lockWasTaken);
         try
         {
-            var region = _hotspotSprite.Key.Texture.Regions[(int) commonColors.Palette[CommonColor.Yellow3]];
-            instances[0] = new SpriteInfo(SpriteFlags.TopLeft, position, size, region);
+            instances[0] = new SpriteInfo(SpriteFlags.TopLeft, position, size, commonColors.GetRegion(CommonColor.Yellow3));
         }
         finally { _hotspotSprite.Unlock(lockWasTaken); }
     }
@@ -203,6 +202,13 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         }
 
         ITexture texture = assets.LoadTexture(_heldItemId);
+        if (texture == null)
+        {
+            _itemSprite?.Dispose();
+            _itemSprite = null;
+            return;
+        }
+
         int subItem = _heldSubItem + _frame % _heldItemFrames;
 
         if (texture != _itemSprite?.Key.Texture)
@@ -219,7 +225,12 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         var instances = _itemSprite.Lock(ref lockWasTaken);
         try
         {
-            instances[0] = new SpriteInfo(SpriteFlags.TopLeft, normPosition + new Vector3(window.UiToNormRelative(ItemSpriteOffset.X, ItemSpriteOffset.Y), 0), window.UiToNormRelative(subImage.Size), subImage);
+            var normOffset = window.UiToNormRelative(ItemSpriteOffset.X, ItemSpriteOffset.Y);
+            instances[0] = new SpriteInfo(
+                SpriteFlags.TopLeft,
+                normPosition + new Vector3(normOffset, 0),
+                window.UiToNormRelative(subImage.Size), 
+                subImage);
         }
         finally { _itemSprite.Unlock(lockWasTaken); }
 

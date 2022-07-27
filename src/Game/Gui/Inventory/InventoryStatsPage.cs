@@ -49,6 +49,7 @@ public class InventoryStatsPage : UiElement // Stats
         }
 
         var stack = new VerticalStack(
+            new Spacing(0, 1),
             new Header(Base.SystemText.Inv2_Attributes),
             new HorizontalStack(
                 new VerticalStack(

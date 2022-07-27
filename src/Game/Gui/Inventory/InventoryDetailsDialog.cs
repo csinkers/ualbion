@@ -29,7 +29,7 @@ public class InventoryDetailsDialog : ModalDialog
         if (item == null)
             throw new ArgumentNullException(nameof(item));
 
-        var heading = new Header(item.Name);
+        var heading = new Header(item.Name, 0, FontColor.Yellow);
         var itemPic = new UiSpriteElement(item.Icon)
         {
             SubId = item.IconSubId,

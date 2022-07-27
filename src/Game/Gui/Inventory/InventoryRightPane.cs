@@ -57,16 +57,16 @@ public class InventoryRightPane : UiElement
             moneyAndFoodStack = new HorizontalStack(goldButton, foodButton);
         }
 
-        var stack = new VerticalStack(
+        var stack = new FixedWidth(77, new VerticalStack(
             new Spacing(0, 1),
-            header,
+            new Greedy(header),
             new Spacing(0, 1),
             slotHalfFrame,
             new Spacing(0, 2),
             moneyAndFoodStack,
             new Spacing(0, 9),
             new InventoryExitButton().OnClick(() => Raise(new InventoryCloseEvent()))
-        ) { Greedy = false };
+        ) { Greedy = false });
 
         AttachChild(stack);
     }

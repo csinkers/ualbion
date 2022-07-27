@@ -16,6 +16,7 @@ public class CommonColors : ICommonColors
             .ToDictionary(x => x.x, x => (uint)x.i);
 
     public IReadOnlyTexture<byte> BorderTexture { get; }
+    public Region GetRegion(CommonColor color) => BorderTexture.Regions[(int)Palette[color]];
 
     public CommonColors()
     {

@@ -8,4 +8,5 @@ public interface ICommonColors
 {
     IDictionary<CommonColor, uint> Palette { get; }
     IReadOnlyTexture<byte> BorderTexture { get; }
+    Region GetRegion(CommonColor color);
 }

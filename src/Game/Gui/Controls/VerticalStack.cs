@@ -49,9 +49,11 @@ public class VerticalStack : UiElement
             if (child is not IUiElement { IsActive: true } childElement)
                 continue;
 
+            bool greedy = Greedy || child is IGreedyUiElement;
+
             var childSize = childElement.GetSize();
             int height = (int)childSize.Y;
-            var childExtents = Greedy
+            var childExtents = greedy
                 ? new Rectangle(extents.X, offset, extents.Width, height)
                 : new Rectangle(extents.X + (int)(extents.Width - childSize.X) / 2, offset, (int)childSize.X, height);
 

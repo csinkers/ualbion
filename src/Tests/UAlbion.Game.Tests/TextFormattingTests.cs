@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Linq;
+using UAlbion.Config;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Text;
 using Xunit;
+// ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
 
 namespace UAlbion.Game.Tests;
 
 public class TextFormattingTests
 {
-    Action<(Token token, object arg)> Check(Token expectedToken, object expectedArg) => t =>
+    static Action<(Token token, object arg)> Check(Token expectedToken, object expectedArg) => t =>
     {
         Assert.Equal(expectedToken, t.token);
         if (expectedArg == null)
@@ -64,6 +67,10 @@ public class TextFormattingTests
             "{INVE}{SUBJ}{VICT}{WEAP}{LEAD}{BIG }{FAT }{LEFT}{CNTR}{JUST}"+
             "{FAHI}{HIGH}{NORS}{TECF}{UNKN}{BLOK010}{INK 006}{WORDtoronto}"
         ).ToList();
+
+        AssetMapping.GlobalIsThreadLocal = true;
+        AssetMapping.Global.RegisterAssetType(typeof(Base.Ink), AssetType.Ink);
+
         Assert.Collection(tokens,
             Check(Token.He, null),
             Check(Token.Him, null),
@@ -92,18 +99,20 @@ public class TextFormattingTests
             Check(Token.Tecf, null),
             Check(Token.Unknown, null),
             Check(Token.Block, 10),
-            Check(Token.Ink, 6),
+            Check(Token.Ink, (InkId)(Base.Ink)6),
             Check(Token.Word, "toronto")
         );
-
     }
 
     [Fact]
     public void MultilineTokenTest()
     {
+        AssetMapping.GlobalIsThreadLocal = true;
+        AssetMapping.Global.RegisterAssetType(typeof(Base.Ink), AssetType.Ink);
+
         var tokens = Tokeniser.Tokenise("{INK 006}{CNTR}{BIG }Title.^^{NORS}Description").ToList();
         Assert.Collection(tokens,
-            Check(Token.Ink, 6),
+            Check(Token.Ink, (InkId)(Base.Ink)6),
             Check(Token.Centre, null),
             Check(Token.Big, null),
             Check(Token.Text, "Title."),
@@ -112,7 +121,6 @@ public class TextFormattingTests
             Check(Token.NormalSize, null),
             Check(Token.Text, "Description")
         );
-
     }
 
     [Fact]

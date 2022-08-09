@@ -120,7 +120,7 @@ public class Conversation : Component
                     DefaultIdleHandler();
                 }
 
-                var text = tf.Ink(FontColor.Yellow).Format(_npc.EventSetId.ToEventText());
+                var text = tf.Ink(Base.Ink.Yellow).Format(_npc.EventSetId.ToEventText());
                 _textWindow.Text = text;
                 _textWindow.Clicked += OnClicked;
                 return;
@@ -168,7 +168,7 @@ public class Conversation : Component
                     continuation();
                 }
 
-                var text = tf.Ink(FontColor.Yellow).Format(mapTextEvent.ToId());
+                var text = tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId());
                 DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
                 _textWindow.Text = text;
                 _textWindow.Clicked += OnConversationClicked;
@@ -177,7 +177,7 @@ public class Conversation : Component
 
             case TextLocation.ConversationOptions:
             {
-                var text = tf.Ink(FontColor.Yellow).Format(mapTextEvent.ToId());
+                var text = tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId());
                 DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
                 _textWindow.Text = text;
 
@@ -195,7 +195,7 @@ public class Conversation : Component
 
             case TextLocation.ConversationQuery:
             {
-                var text = tf.Ink(FontColor.Yellow).Format(mapTextEvent.ToId());
+                var text = tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId());
 
                 DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
 

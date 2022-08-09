@@ -9,7 +9,7 @@ public enum EventSet : ushort
     Unknown3 = 3,
 
     IskaiWordSet = 100,
-    Unknown101 = 101,
+    // Unknown101 = 101, // Only 4 bytes
     IskaiChildWordSet = 102,
     Giria = 103,
     SebaiLiWrinn = 104,
@@ -202,8 +202,8 @@ public enum EventSet : ushort
     Coskon = 294,
     Kossea = 295,
     Sojekos = 296,
-    Unknown297 = 297,
-    Unknown298 = 298,
+    // Unknown297 = 297, // only 6 bytes
+    // Unknown298 = 298, // only 6 bytes
     // Unknown299 = 299,
     // Unknown300 = 300,
     KamulosWordSet = 301,

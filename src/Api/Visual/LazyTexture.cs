@@ -57,6 +57,7 @@ public class LazyTexture<T> : IReadOnlyTexture<T> where T : unmanaged
     [JsonIgnore] public int Version => 0;
 
     public override string ToString() => $"LazyTexture {Id} {Width}x{Height} ({Regions.Count} sub-images)";
+    public ReadOnlyImageBuffer<T> GetRegionBuffer(Region region) => throw new NotSupportedException("Getting arbitrary regions is not supported on lazy textures");
     public ReadOnlyImageBuffer<T> GetRegionBuffer(int i) => _regionAccessor(this, _regions[i], _regionContexts[i]);
     public ReadOnlyImageBuffer<T> GetLayerBuffer(int i) => throw new NotSupportedException();
     [JsonIgnore] public ReadOnlySpan<T> PixelData => throw new NotSupportedException();

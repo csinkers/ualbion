@@ -59,7 +59,7 @@ public enum ActionType : byte
     PickupItem = 0x36,
     Unk37 = 0x37,
     Unk38 = 0x38,
-    Unk39 = 0x39,
+    SignalTarget = 0x39,
     Unk3A = 0x3A,
     Unk3B = 0x3B,
     Unk3C = 0x3C,

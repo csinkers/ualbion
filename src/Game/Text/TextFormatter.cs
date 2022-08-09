@@ -21,7 +21,7 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
     public ITextFormatter Right() => new CustomisedTextFormatter(this).Right();
     public ITextFormatter Justify() => new CustomisedTextFormatter(this).Justify();
     public ITextFormatter Fat() => new CustomisedTextFormatter(this).Fat();
-    public ITextFormatter Ink(FontColor color) => new CustomisedTextFormatter(this).Ink(color);
+    public ITextFormatter Ink(InkId id) => new CustomisedTextFormatter(this).Ink(id);
     public ITextFormatter Block(int blockNumber) => new CustomisedTextFormatter(this).Block(blockNumber);
 
     IEnumerable<(Token, object)> Substitute(
@@ -194,14 +194,14 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
                 {
                     Alignment = block.Alignment,
                     Style = block.Style,
-                    Color = block.Color,
+                    InkId = block.InkId,
                     Raw = raw
                 };
             }
 
             switch (token)
             {
-                case Token.Ink: block.Color = (FontColor)(int)p; break;
+                case Token.Ink: block.InkId = (InkId)p; break;
 
                 case Token.NormalSize: block.Style = TextStyle.Normal; break;
                 case Token.Big: block.Style = TextStyle.Big; break;

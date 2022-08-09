@@ -19,7 +19,7 @@ public enum AssetType : byte
     CombatGfx,
     CoreGfx,
     Floor,
-    Font,
+    FontGfx,
     ItemGfx,
     MonsterGfx,
     NpcLargeGfx,
@@ -35,6 +35,10 @@ public enum AssetType : byte
     [IsomorphicTo(Tileset)] TilesetGfx,
     Wall,
     WallOverlay,
+
+    Ink,
+    FontDefinition,
+    [Unmapped] MetaFont,
 
     Chest,
     Merchant,
@@ -57,7 +61,6 @@ public enum AssetType : byte
     MonsterSheet,
     NpcSheet,
 
-    [Unmapped] MetaFont,
     MonsterGroup,
     [Unmapped] ObjectGroup,
     Palette,

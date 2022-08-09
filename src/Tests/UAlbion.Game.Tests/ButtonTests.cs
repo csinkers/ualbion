@@ -7,6 +7,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
@@ -35,22 +36,26 @@ public class ButtonTests : Component
         _exchange = new EventExchange(new LogExchange());
         AssetMapping.GlobalIsThreadLocal = true;
         AssetMapping.Global.Clear()
-            .RegisterAssetType(typeof(Base.Font), AssetType.Font)
+            .RegisterAssetType(typeof(Base.Ink), AssetType.Ink)
+            .RegisterAssetType(typeof(Base.FontGfx), AssetType.FontGfx)
+            .RegisterAssetType(typeof(Base.Font), AssetType.FontDefinition)
             ;
 
-        var font = MockUniformFont.Font(AssetId.From(Base.Font.RegularFont));
+        var font = MockUniformFont.BuildFontDefinition();
         var modApplier = new MockModApplier()
-                .Add(new AssetId(AssetType.MetaFont, (ushort)new MetaFontId(false, FontColor.White)), font)
-                .AddInfo(AssetId.From(Base.Font.RegularFont), MockUniformFont.Info)
+                .Add((FontId)Base.Font.Regular, font)
+                .Add((InkId)Base.Ink.White, MockUniformFont.BuildInk())
+                .Add((SpriteId)Base.FontGfx.RegularFont, MockUniformFont.BuildFontTexture())
             ;
 
         var settings = new MockSettings();
         GameVars.Ui.ButtonDoubleClickIntervalSeconds.Write(settings, 0.35f);
 
+        var assetManager = new AssetManager();
         _exchange
             .Attach(settings)
             .Attach(modApplier)
-            .Attach(new AssetManager())
+            .Attach(assetManager)
             .Attach(new SpriteManager<SpriteInfo>())
             .Attach(new WindowManager { Resolution = (1920, 1080) })
             .Attach(new MockGameFactory())
@@ -58,6 +63,9 @@ public class ButtonTests : Component
             .Register<ICommonColors>(new CommonColors())
             .Attach(this)
             ;
+
+        var metaFont = font.Build(Base.Font.Regular, Base.Ink.White, assetManager);
+        modApplier.Add(metaFont.Id, metaFont);
     }
 
     [Fact]

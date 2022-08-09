@@ -1,50 +1,62 @@
 ﻿using System;
+using System.Globalization;
+using UAlbion.Api;
+using UAlbion.Config;
 using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets;
 
-public struct MetaFontId : IConvertible, IEquatable<MetaFontId>
+public readonly struct MetaFontId : IEquatable<MetaFontId>, IEquatable<AssetId>, IComparable, IAssetId
 {
-    public MetaFontId(bool isBold, FontColor color)
+    readonly uint _value;
+
+    public MetaFontId(FontId fontId, InkId inkId)
     {
-        IsBold = isBold;
-        Color = color;
+#if DEBUG
+        if (fontId.Id is < 0 or > 0xffff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a MetaFontId with out of range font id {fontId} ({fontId.Id})");
+
+        if (inkId.Id is < 0 or > 0xff)
+            throw new ArgumentOutOfRangeException($"Tried to construct a MetaFontId with out of range ink id {inkId} ({inkId.Id})");
+#endif
+        _value = (uint)AssetType.MetaFont << 24 | (uint)((byte)inkId.Id << 16) | (uint)fontId.Id;
     }
 
-    public bool IsBold { get; }
-    public FontColor Color { get; }
-    public SpriteId FontId => IsBold ? Base.Font.BoldFont : Base.Font.RegularFont;
+    MetaFontId(uint id) 
+    {
+        _value = id;
+        if (Type is not (AssetType.None or AssetType.MetaFont))
+            throw new ArgumentOutOfRangeException($"Tried to construct a MetaFontId with a type of {Type}");
+    }
 
-    public static explicit operator int(MetaFontId id) => (byte)id.Color << 8 | (id.IsBold ? 1 : 0);
-    public static explicit operator MetaFontId(int id) => ToMetaFontId(id);
+    public InkId InkId => new((int)((_value & 0xff_0000) >> 16));
+    public FontId FontId => new((int)(_value & 0xffff));
+    public AssetType Type => (AssetType)((_value & 0xff00_0000) >> 24);
+    public int Id => (int)(_value & 0xffffff);
+    public static MetaFontId None => new(0);
+    public bool IsNone => Type == AssetType.None;
 
-    public static explicit operator ushort(MetaFontId id) => (ushort)((byte)id.Color << 8 | (id.IsBold ? 1 : 0));
-    public static explicit operator MetaFontId(ushort id) => ToMetaFontId(id);
-    public static MetaFontId ToMetaFontId(int id) => new((id & 1) != 0, (FontColor)((id & 0xff00) >> 8));
-    public static MetaFontId ToMetaFontId(ushort id) => new((id & 1) != 0, (FontColor)((id & 0xff00) >> 8));
+    public override string ToString() => $"{AssetMapping.Global.IdToName(FontId)}:{InkId}";
+    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
 
-    public int ToInt32(IFormatProvider provider) => (int)this;
+    public static implicit operator AssetId(MetaFontId id) => AssetId.FromUInt32(id._value);
+    public static implicit operator MetaFontId(AssetId id) => new(id.ToUInt32());
 
-    public TypeCode GetTypeCode() => throw new NotImplementedException();
-    public bool ToBoolean(IFormatProvider provider) => throw new NotImplementedException();
-    public byte ToByte(IFormatProvider provider) => throw new NotImplementedException();
-    public char ToChar(IFormatProvider provider) => throw new NotImplementedException();
-    public DateTime ToDateTime(IFormatProvider provider) => throw new NotImplementedException();
-    public decimal ToDecimal(IFormatProvider provider) => throw new NotImplementedException();
-    public double ToDouble(IFormatProvider provider) => throw new NotImplementedException();
-    public short ToInt16(IFormatProvider provider) => throw new NotImplementedException();
-    public long ToInt64(IFormatProvider provider) => throw new NotImplementedException();
-    public sbyte ToSByte(IFormatProvider provider) => throw new NotImplementedException();
-    public float ToSingle(IFormatProvider provider) => throw new NotImplementedException();
-    public string ToString(IFormatProvider provider) => throw new NotImplementedException();
-    public ushort ToUInt16(IFormatProvider provider) => throw new NotImplementedException();
-    public uint ToUInt32(IFormatProvider provider) => throw new NotImplementedException();
-    public ulong ToUInt64(IFormatProvider provider) => throw new NotImplementedException();
-    public object ToType(Type conversionType, IFormatProvider provider) => throw new NotImplementedException();
-
-    public override bool Equals(object obj) => obj is MetaFontId other && Equals(other);
-    public override int GetHashCode() => (int)this;
-    public static bool operator ==(MetaFontId left, MetaFontId right) => left.Equals(right);
-    public static bool operator !=(MetaFontId left, MetaFontId right) => !(left == right);
-    public bool Equals(MetaFontId other) => IsBold == other.IsBold && Color == other.Color;
+    public int ToInt32() => unchecked((int)_value);
+    public uint ToUInt32() => _value;
+    public static MetaFontId FromInt32(int id) => new(unchecked((uint)id));
+    public static MetaFontId FromUInt32(uint id) => new(id);
+    public static bool operator ==(MetaFontId x, MetaFontId y) => x.Equals(y);
+    public static bool operator !=(MetaFontId x, MetaFontId y) => !(x == y);
+    public static bool operator ==(MetaFontId x, AssetId y) => x.Equals(y);
+    public static bool operator !=(MetaFontId x, AssetId y) => !(x == y);
+    public static bool operator <(MetaFontId x, MetaFontId y) => x.CompareTo(y) == -1;
+    public static bool operator >(MetaFontId x, MetaFontId y) => x.CompareTo(y) == 1;
+    public static bool operator <=(MetaFontId x, MetaFontId y) => x.CompareTo(y) != 1;
+    public static bool operator >=(MetaFontId x, MetaFontId y) => x.CompareTo(y) != -1;
+    public bool Equals(MetaFontId other) => _value == other._value;
+    public bool Equals(AssetId other) => _value == other.ToUInt32();
+    public override bool Equals(object obj) => obj is IAssetId other && other.ToUInt32() == _value;
+    public int CompareTo(object obj) => (obj is IAssetId other) ? _value.CompareTo(other.ToUInt32()) : -1;
+    public override int GetHashCode() => unchecked((int)_value);
 }

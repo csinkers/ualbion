@@ -13,21 +13,41 @@ public class AddPartyMemberEvent : ModifyEvent
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         e ??= new AddPartyMemberEvent();
-        int op = s.UInt8("b2", 1);
-        s.Assert(op == 1, "Expected AddPartyMember operation to be SetToMaximum");
+        e.Operation = s.EnumU8(nameof(e.Operation), e.Operation);
+        if (e.Operation != NumericOperation.SetAmount)
+            s.Assert(false, $"Expected AddPartyMember operation to be SetAmount (3), but it was {e.Operation} ({(int)e.Operation})");
 
-        int zeroed = s.UInt8("b3", 0);
-        zeroed += s.UInt8("b4", 0);
-        zeroed += s.UInt8("b5", 0);
+        e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
+        if (e.Unk3 > 10)
+            s.Assert(false, $"Expected field 3 of AddPartyMemberEvent to be in the range [0..10], but it was {e.Unk3}");
+
+        int temp = s.UInt8("b4", 0);
+        if (temp != 0)
+            s.Assert(false, $"Expected field 4 of AddPartyMemberEvent to be 0, but it was {temp}");
+
+        temp = s.UInt8("b5", 0);
+        if (temp != 0) 
+            s.Assert(false, $"Expected field 5 of AddPartyMemberEvent to be 0, but it was {temp}");
+
         e.PartyMemberId = PartyMemberId.SerdesU16(nameof(PartyMemberId), e.PartyMemberId, mapping, s);
-        zeroed += s.UInt16("w8", 0);
-        s.Assert(zeroed == 0, "Expected fields 3-5, 8 of AddPartyMemberEvent to be 0");
+
+        temp = s.UInt16("w8", 0);
+        if (temp != 0) 
+            s.Assert(false, $"Expected field 8 of AddPartyMemberEvent to be 0, but it was {temp}");
+
         return e;
     }
 
     AddPartyMemberEvent() { }
-    public AddPartyMemberEvent(PartyMemberId partyMemberId) => PartyMemberId = partyMemberId;
+    public AddPartyMemberEvent(PartyMemberId partyMemberId, NumericOperation op, byte unk3)
+    {
+        Operation = op;
+        PartyMemberId = partyMemberId;
+        Unk3 = unk3;
+    }
 
     [EventPart("id")] public PartyMemberId PartyMemberId { get; private set; }
+    [EventPart("op", true, NumericOperation.SetAmount)] public NumericOperation Operation { get; private set; }
+    [EventPart("unk3", true, (byte)0)] public byte Unk3 { get; private set; }
     public override ModifyType SubType => ModifyType.AddPartyMember;
 }

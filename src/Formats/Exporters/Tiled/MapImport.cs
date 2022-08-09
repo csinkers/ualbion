@@ -15,8 +15,8 @@ public static class MapImport
         if (info == null) throw new ArgumentNullException(nameof(info));
 
         // Check width/height <= 255
-        if (map.Width > 255) throw new FormatException($"Map widths above 255 are not currently supported (was {map.Width})");
-        if (map.Height > 255) throw new FormatException($"Map heights above 255 are not currently supported (was {map.Height})");
+        if (map.Width > 256) throw new FormatException($"Map widths above 256 are not currently supported (was {map.Width})");
+        if (map.Height > 256) throw new FormatException($"Map heights above 256 are not currently supported (was {map.Height})");
 
         bool is3d = map.Orientation == "isometric";
         var mapId = (MapId)info.AssetId;

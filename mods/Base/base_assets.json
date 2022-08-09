@@ -13,7 +13,9 @@
     "eset":     { "AssetType": "EventSet",           "EnumType": "UAlbion.Base.EventSet, UAlbion.Base" },
     "etext":    { "AssetType": "EventText",          "EnumType": "UAlbion.Base.EventText, UAlbion.Base" },
     "floor":    { "AssetType": "Floor",              "EnumType": "UAlbion.Base.Floor, UAlbion.Base" },
-    "font":     { "AssetType": "Font",               "EnumType": "UAlbion.Base.Font, UAlbion.Base" },
+    "font":     { "AssetType": "FontDefinition",     "EnumType": "UAlbion.Base.Font, UAlbion.Base" },
+    "fontgfx":  { "AssetType": "FontGfx",            "EnumType": "UAlbion.Base.FontGfx, UAlbion.Base" },
+    "ink":      { "AssetType": "Ink",                "EnumType": "UAlbion.Base.Ink, UAlbion.Base" },
     "item":     { "AssetType": "Item",               "EnumType": "UAlbion.Base.Item, UAlbion.Base" },
     "itemgfx":  { "AssetType": "ItemGfx",            "EnumType": "UAlbion.Base.ItemGfx, UAlbion.Base" },
     "itemname": { "AssetType": "ItemName",           "EnumType": "UAlbion.Base.ItemName, UAlbion.Base" },
@@ -66,9 +68,9 @@
     "eventSetScript":    "UAlbion.Formats.Parsers.EventSetScriptLoader, UAlbion.Formats",
     "fixedsize":         "UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats",
     "flic":              "UAlbion.Formats.Parsers.FlicLoader, UAlbion.Formats",
-    "font":              "UAlbion.Formats.Parsers.FontSpriteLoader`1[[UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats]], UAlbion.Formats",
-    "pngfont":           "UAlbion.Formats.Parsers.FontSpriteLoader`1[[UAlbion.Game.Veldrid.Assets.PngSheetLoader, UAlbion.Game.Veldrid]], UAlbion.Formats",
+    "font":              "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.FontDefinition, UAlbion.Formats]], UAlbion.Formats",
     "header":            "UAlbion.Formats.Parsers.SingleHeaderSpriteLoader, UAlbion.Formats",
+    "ink":               "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.Ink, UAlbion.Formats]], UAlbion.Formats",
     "inputconfig":       "UAlbion.Formats.Parsers.InputConfigLoader, UAlbion.Formats",
     "interlaced":        "UAlbion.Formats.Parsers.InterlacedBitmapLoader, UAlbion.Formats",
     "itemNameCollector": "UAlbion.Formats.Parsers.ItemNameCollector, UAlbion.Formats",
@@ -123,6 +125,7 @@
 
     // This is in Game due to a dependency on AdlMidi.NET
     "soundbank":         "UAlbion.Game.Assets.SoundBankLoader, UAlbion.Game",
+    "jsonSoundbank":     "UAlbion.Formats.Parsers.JsonLoader`1[[ADLMidi.NET.GlobalTimbreLibrary, ADLMidi.NET]], UAlbion.Formats",
 
     // These are in Game.Veldrid as they require the 3D engine to render isometric tiles to offscreen buffers
     "tiledLabyrinth":    "UAlbion.Game.Veldrid.Assets.IsometricLabyrinthLoader, UAlbion.Game.Veldrid",

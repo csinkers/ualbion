@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.Text;
 
@@ -93,17 +94,17 @@ public static class Tokeniser
                                 default:
                                     if (inner.StartsWith("BLOK", StringComparison.Ordinal))
                                     {
-                                        var number = int.Parse(inner.Substring(4), CultureInfo.InvariantCulture);
+                                        var number = int.Parse(inner[4..], CultureInfo.InvariantCulture);
                                         yield return (Token.Block, number);
                                     }
                                     else if (inner.StartsWith("INK ", StringComparison.Ordinal))
                                     {
-                                        var number = int.Parse(inner.Substring(4), CultureInfo.InvariantCulture);
-                                        yield return (Token.Ink, number);
+                                        var number = int.Parse(inner[4..], CultureInfo.InvariantCulture);
+                                        yield return (Token.Ink, new InkId(number));
                                     }
                                     else if (inner.StartsWith("WORD", StringComparison.Ordinal))
                                     {
-                                        var word = inner.Substring(4);
+                                        var word = inner[4..];
                                         yield return (Token.Word, word);
                                     }
                                     break;

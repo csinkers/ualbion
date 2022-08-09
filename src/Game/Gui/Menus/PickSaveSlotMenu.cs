@@ -64,7 +64,7 @@ public class PickSaveSlotMenu : ModalDialog
             {
                 var textFormatter = Resolve<ITextFormatter>();
                 var block = textFormatter
-                    .Ink(FontColor.Gray)
+                    .Ink(Base.Ink.Gray)
                     .Format(Base.SystemText.MainMenu_EmptyPosition)
                     .GetBlocks().Single();
                 block.Text = $"{x,2}    {block.Text}";

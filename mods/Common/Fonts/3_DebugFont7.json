@@ -1,0 +1,14 @@
+{
+  "LineHeight": 7,
+  "SpaceSize": 3,
+  "Components": [
+    {
+      "GraphicsId": "fontgfx.DebugFonts",
+      "X": 6,
+      "Width": 7,
+      "Height": 7,
+      "Mapping": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890-=~!@#$%^&*()_+;[]\\',./:{}|\"<>? "
+    }
+  ]
+}
+// vim: tabstop=2 shiftwidth=2 expandtab

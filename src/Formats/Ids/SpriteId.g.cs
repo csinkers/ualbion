@@ -94,7 +94,14 @@ public readonly struct SpriteId : IEquatable<SpriteId>, IEquatable<AssetId>, ICo
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
     public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
-    public static AssetType[] ValidTypes = { AssetType.AutomapGfx, AssetType.BackgroundGfx, AssetType.CombatBackground, AssetType.CombatGfx, AssetType.CoreGfx, AssetType.Floor, AssetType.Font, AssetType.ItemGfx, AssetType.MonsterGfx, AssetType.NpcLargeGfx, AssetType.NpcSmallGfx, AssetType.Object3D, AssetType.PartyLargeGfx, AssetType.PartySmallGfx, AssetType.PartyInventoryGfx, AssetType.Picture, AssetType.Portrait, AssetType.Slab, AssetType.TacticalGfx, AssetType.TilesetGfx, AssetType.Wall, AssetType.WallOverlay };
+    public static AssetType[] ValidTypes = { 
+        AssetType.AutomapGfx, AssetType.BackgroundGfx, AssetType.CombatBackground, 
+        AssetType.CombatGfx, AssetType.CoreGfx, AssetType.Floor, AssetType.FontGfx, 
+        AssetType.ItemGfx, AssetType.MonsterGfx, AssetType.NpcLargeGfx, 
+        AssetType.NpcSmallGfx, AssetType.Object3D, AssetType.PartyLargeGfx, 
+        AssetType.PartySmallGfx, AssetType.PartyInventoryGfx, AssetType.Picture, 
+        AssetType.Portrait, AssetType.Slab, AssetType.TacticalGfx, AssetType.TilesetGfx, 
+        AssetType.Wall, AssetType.WallOverlay };
     public static SpriteId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 
     public static implicit operator AssetId(SpriteId id) => AssetId.FromUInt32(id._value);
@@ -106,7 +113,7 @@ public readonly struct SpriteId : IEquatable<SpriteId>, IEquatable<AssetId>, ICo
     public static implicit operator SpriteId(UAlbion.Base.DungeonBackground id) => SpriteId.From(id);
     public static implicit operator SpriteId(UAlbion.Base.DungeonObject id) => SpriteId.From(id);
     public static implicit operator SpriteId(UAlbion.Base.Floor id) => SpriteId.From(id);
-    public static implicit operator SpriteId(UAlbion.Base.Font id) => SpriteId.From(id);
+    public static implicit operator SpriteId(UAlbion.Base.FontGfx id) => SpriteId.From(id);
     public static implicit operator SpriteId(UAlbion.Base.ItemGfx id) => SpriteId.From(id);
     public static implicit operator SpriteId(UAlbion.Base.MonsterGfx id) => SpriteId.From(id);
     public static implicit operator SpriteId(UAlbion.Base.NpcLargeGfx id) => SpriteId.From(id);

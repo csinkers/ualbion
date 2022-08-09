@@ -53,6 +53,7 @@ public class CompositedTexture : IReadOnlyTexture<uint>
         }
     }
 
+    public ReadOnlyImageBuffer<uint> GetRegionBuffer(Region region) => Texture.GetRegionBuffer(region);
     public ReadOnlyImageBuffer<uint> GetRegionBuffer(int i) => Texture.GetRegionBuffer(i);
     public ReadOnlyImageBuffer<uint> GetLayerBuffer(int i) => Texture.GetLayerBuffer(i);
 

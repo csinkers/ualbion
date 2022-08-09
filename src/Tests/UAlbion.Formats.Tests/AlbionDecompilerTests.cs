@@ -300,7 +300,7 @@ if (query_verb Examine) {
                 discrep.Add($"{i}: Expected \"{expectedLines[i]}\", but was \"{lines[i]}\"");
 
         if (discrep.Any())
-            throw new InvalidOperationException( string.Join(Environment.NewLine, discrep));
+            throw new InvalidOperationException(string.Join(Environment.NewLine, discrep));
     }
 
     [Fact]

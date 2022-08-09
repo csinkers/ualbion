@@ -53,6 +53,30 @@ public static class BlitUtil
         }
     }
 
+    public static void Blit8Translated(ReadOnlyImageBuffer<byte> fromBuffer, ImageBuffer<byte> toBuffer, ReadOnlySpan<byte> mapping)
+    {
+        var from = fromBuffer.Buffer;
+        var to = toBuffer.Buffer;
+        int fromOffset = 0;
+        int toOffset = 0;
+
+        for (int j = 0; j < fromBuffer.Height; j++)
+        {
+            for (int i = 0; i < fromBuffer.Width; i++)
+            {
+                byte index = from[fromOffset];
+                byte color = index < mapping.Length ? mapping[index] : (byte)0;
+
+                to[toOffset] = color;
+                fromOffset++;
+                toOffset++;
+            }
+
+            fromOffset += fromBuffer.Stride - fromBuffer.Width;
+            toOffset += toBuffer.Stride - toBuffer.Width;
+        }
+    }
+
     public static void BlitTiled8To32(ReadOnlyImageBuffer<byte> from, ImageBuffer<uint> to, ReadOnlySpan<uint> palette, byte componentAlpha, byte? transparentColor)
     {
         if (palette == null) throw new ArgumentNullException(nameof(palette));
@@ -268,6 +292,8 @@ public static class BlitUtil
         ImageBuffer<byte> dest,
         Action<int, int, int, int> frameFunc)
     {
+        if (frameWidth <= 0) throw new ArgumentOutOfRangeException(nameof(frameWidth), "Tried to unpack with a frame width of 0");
+        if (frameHeight <= 0) throw new ArgumentOutOfRangeException(nameof(frameHeight), "Tried to unpack with a frame height of 0");
         if (dest.Width < source.Width) throw new ArgumentOutOfRangeException(nameof(dest), "Tried to unpack to a smaller destination");
         if (dest.Height < source.Height) throw new ArgumentOutOfRangeException(nameof(dest), "Tried to unpack to a smaller destination");
 

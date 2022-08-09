@@ -132,6 +132,23 @@ public class AssetMapping
     public bool IsGlobal => Global == this;
     public bool IsEmpty => _byEnumType.Count == 0;
 
+    public bool IsMapped(AssetId id) // Returns true if this id is mapped to an enum value
+    {
+        var (enumType, enumValue) = IdToEnum(id);
+        if (enumType == null)
+            return false;
+
+        var underlying = enumType.GetEnumUnderlyingType();
+        if (underlying == typeof(int))
+            return Enum.IsDefined(enumType, enumValue);
+        if (underlying == typeof(ushort))
+            return Enum.IsDefined(enumType, (ushort)enumValue);
+        if (underlying == typeof(byte))
+            return Enum.IsDefined(enumType, (byte)enumValue);
+
+        return false;
+    }
+
     /// <summary>
     /// Convert a run-time AssetId to its unambiguous enum representation.
     /// </summary>
@@ -449,11 +466,12 @@ public class AssetMapping
 
         s = s.Trim().ToUpperInvariant();
         int index = s.LastIndexOf('.');
-        var valueName = index == -1 ? s : s.Substring(index + 1);
-        var typeName = index == -1 ? null : s.Substring(0, index);
+        var valueName = index == -1 ? s : s[(index + 1)..];
+        var typeName = index == -1 ? null : s[..index];
 
         // Special case so we don't have ugly "None.0"s everywhere.
-        if (typeName == null && string.Equals(s, "NONE", StringComparison.Ordinal)) return AssetId.None;
+        if (typeName == null && string.Equals(s, "NONE", StringComparison.Ordinal))
+            return AssetId.None;
 
         return _byName.TryGetValue(valueName, out var matches)
             ? ParseTextual(s, typeName, matches, validTypes)
@@ -517,6 +535,9 @@ public class AssetMapping
                 result = new AssetId(assetType, intValue);
             }
         }
+
+        if (result.Type == AssetType.Unknown && result.Id == 0)
+            ApiUtil.Assert($"Could not parse \"{s}\" as an asset id.");
 
         return result;
     }

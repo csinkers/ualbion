@@ -27,7 +27,7 @@ public class Region
         PixelLength = Width + (Height - 1) * stride;
     }
 
-    public override string ToString() => $"({Size} {TexOffset} {TexSize} L{Layer})";
+    public override string ToString() => $"({Offset} {Size} {TexOffset} {TexSize} L{Layer})";
 
     /// <summary>
     /// The offset of the upper-left corner of the sub-image in the entire image (in pixels)

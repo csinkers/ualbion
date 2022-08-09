@@ -17,27 +17,24 @@ public class SlabLoader : IAssetLoader<IReadOnlyTexture<byte>>
         if (s.IsWriting())
         {
             if (existing == null) throw new ArgumentNullException(nameof(existing));
-            singleFrame =
-                new SimpleTexture<byte>(
+            var texture = new SimpleTexture<byte>(
                         existing.Id,
                         existing.Name,
                         existing.Width,
                         existing.Height,
-                        existing.PixelData.ToArray())
-                    .AddRegion(existing.Regions[0].X, existing.Regions[0].Y, existing.Regions[0].Width, existing.Regions[0].Height);
+                        existing.PixelData.ToArray());
+
+            texture.AddRegion(existing.Regions[0].X, existing.Regions[0].Y, existing.Regions[0].Width, existing.Regions[0].Height);
+            singleFrame = texture;
         }
 
         var sprite = new FixedSizeSpriteLoader().Serdes(singleFrame, info, s, context);
         if (sprite == null)
             return null;
 
-        return new SimpleTexture<byte>(
-                sprite.Id,
-                sprite.Name,
-                sprite.Width,
-                sprite.Height,
-                sprite.PixelData.ToArray())
-            .AddRegion(0, 0, sprite.Width, sprite.Height)
-            .AddRegion(0, sprite.Height - StatusBarHeight, sprite.Width, StatusBarHeight);
+        var result = new SimpleTexture<byte>(sprite.Id, sprite.Name, sprite.Width, sprite.Height, sprite.PixelData.ToArray());
+        result.AddRegion(0, 0, sprite.Width, sprite.Height);
+        result.AddRegion(0, sprite.Height - StatusBarHeight, sprite.Width, StatusBarHeight);
+        return result;
     }
 }

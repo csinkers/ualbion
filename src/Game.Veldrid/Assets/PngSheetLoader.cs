@@ -13,6 +13,7 @@ using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Formats;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.Veldrid.Assets;
@@ -62,17 +63,9 @@ public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>> //
 
         var assets = Resolve<IAssetManager>();
         var paletteId = info.Get(AssetProperty.PaletteId, 0);
-        var palette = assets.LoadPalette(new PaletteId(paletteId)).GetUnambiguousPalette();
-
-        if (info.AssetId.Type == AssetType.Font)
-        {
-            palette = new uint[256];
-            palette[1] = 0xffffffff;
-            palette[2] = 0xffcccccc;
-            palette[3] = 0xffaaaaaa;
-            palette[4] = 0xff777777;
-            palette[5] = 0xff555555;
-        }
+        var palette = info.AssetId.Type == AssetType.FontGfx 
+            ? FontDefinition.ExportPalette 
+            : assets.LoadPalette(new PaletteId(paletteId)).GetUnambiguousPalette();
 
         if (s.IsWriting())
         {
@@ -85,6 +78,18 @@ public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>> //
         }
         else // Read
         {
+            if (info.Width == 0)
+            {
+                throw new InvalidOperationException($"The asset {info.AssetId} ({info.File.Filename}) is set to use " +
+                                                    "PngSheetLoader, but does not have its Width property set");
+            }
+
+            if (info.Height == 0)
+            {
+                throw new InvalidOperationException($"The asset {info.AssetId} ({info.File.Filename}) is set to use " +
+                                                    "PngSheetLoader, but does not have its Height property set");
+            }
+
             var decoder = new PngDecoder();
             var configuration = new Configuration();
             var bytes = s.Bytes(null, null, (int) s.BytesRemaining);

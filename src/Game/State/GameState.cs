@@ -14,7 +14,6 @@ using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
-using UAlbion.Game.Gui.Inventory;
 using UAlbion.Game.State.Player;
 using UAlbion.Game.Text;
 

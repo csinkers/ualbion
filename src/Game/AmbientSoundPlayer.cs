@@ -1,5 +1,6 @@
 ﻿using System;
 using ADLMidi.NET;
+using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 using UAlbion.Formats;
@@ -33,9 +34,19 @@ public class AmbientSoundPlayer : Component
         if ((xmiBytes?.Length ?? 0) == 0)
             return;
 
+        var soundBanks = assets.LoadSoundBanks();
+        if (soundBanks is not GlobalTimbreLibrary timbreLibrary)
+        {
+            Error("AlbionMusicGenerator: Could not load sound banks");
+            return;
+        }
+
+        var wopl = new WoplFile(timbreLibrary);
+        var woplBytes = wopl.GetRawWoplBytes(ApiUtil.Assert);
+
         _player = AdlMidi.Init();
         _player.SetNoteHook(_hook, IntPtr.Zero);
-        _player.OpenBankData(assets.LoadSoundBanks());
+        _player.OpenBankData(woplBytes);
         _player.OpenData(xmiBytes);
         _player.SetLoopEnabled(true);
     }

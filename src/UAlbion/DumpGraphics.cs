@@ -46,27 +46,27 @@ class DumpGraphics : Component, IAssetDumper
             switch (type)
             {
                 // case AssetType.Slab:                Export<Base.Slab>             ("SLAB");                 break;
-                case AssetType.AutomapGfx:     Export<Base.AutomapTiles>     ("Automap");              break;
-                case AssetType.CombatBackground:    Export<Base.CombatBackground> ("CombatBackgrounds");    break;
-                case AssetType.CombatGfx:      Export<Base.CombatGfx>   ("Combat");               break;
-                case AssetType.CoreGfx:        Export<Base.CoreGfx>       ("Core");                 break;
-                case AssetType.BackgroundGfx:  Export<Base.DungeonBackground>("Backgrounds");          break;
-                case AssetType.Floor:               Export<Base.Floor>            ("Floors");               break;
-                case AssetType.Object3D:            Export<Base.DungeonObject>    ("Objects");              break;
-                case AssetType.WallOverlay:         Export<Base.WallOverlay>      ("Overlays");             break;
-                case AssetType.Wall:                Export<Base.Wall>             ("Walls");                break;
-                case AssetType.Font:                Export<Base.Font>             ("Fonts");                break;
-                case AssetType.PartyInventoryGfx:     Export<Base.PartyInventoryGfx>  ("InventoryBackgrounds"); break;
-                case AssetType.TilesetGfx:     Export<Base.TilesetGfx>  ("Tiles");                break;
-                case AssetType.ItemGfx:        Export<Base.ItemGfx>     ("Item");                 break;
-                case AssetType.NpcLargeGfx:    Export<Base.NpcLargeGfx>         ("NpcLarge");             break;
-                case AssetType.PartyLargeGfx:  Export<Base.PartyLargeGfx> ("PartyLarge");           break;
-                case AssetType.MonsterGfx:     Export<Base.MonsterGfx>  ("Monster");              break;
-                case AssetType.Picture:             Export<Base.Picture>          ("Picture");              break;
-                case AssetType.NpcSmallGfx:    Export<Base.NpcSmallGfx>         ("NpcSmall");             break;
-                case AssetType.PartySmallGfx:  Export<Base.PartySmallGfx> ("PartySmall");           break;
-                case AssetType.Portrait:            Export<Base.Portrait>         ("Portrait");             break;
-                case AssetType.TacticalGfx:        Export<Base.TacticalGfx> ("TacticalIcon");         break;
+                case AssetType.AutomapGfx:        Export<Base.AutomapTiles>     ("Automap");              break;
+                case AssetType.CombatBackground:  Export<Base.CombatBackground> ("CombatBackgrounds");    break;
+                case AssetType.CombatGfx:         Export<Base.CombatGfx>        ("Combat");               break;
+                case AssetType.CoreGfx:           Export<Base.CoreGfx>          ("Core");                 break;
+                case AssetType.BackgroundGfx:     Export<Base.DungeonBackground>("Backgrounds");          break;
+                case AssetType.Floor:             Export<Base.Floor>            ("Floors");               break;
+                case AssetType.Object3D:          Export<Base.DungeonObject>    ("Objects");              break;
+                case AssetType.WallOverlay:       Export<Base.WallOverlay>      ("Overlays");             break;
+                case AssetType.Wall:              Export<Base.Wall>             ("Walls");                break;
+                case AssetType.FontGfx:           Export<Base.Font>             ("Fonts");                break;
+                case AssetType.PartyInventoryGfx: Export<Base.PartyInventoryGfx>("InventoryBackgrounds"); break;
+                case AssetType.TilesetGfx:        Export<Base.TilesetGfx>       ("Tiles");                break;
+                case AssetType.ItemGfx:           Export<Base.ItemGfx>          ("Item");                 break;
+                case AssetType.NpcLargeGfx:       Export<Base.NpcLargeGfx>      ("NpcLarge");             break;
+                case AssetType.PartyLargeGfx:     Export<Base.PartyLargeGfx>    ("PartyLarge");           break;
+                case AssetType.MonsterGfx:        Export<Base.MonsterGfx>       ("Monster");              break;
+                case AssetType.Picture:           Export<Base.Picture>          ("Picture");              break;
+                case AssetType.NpcSmallGfx:       Export<Base.NpcSmallGfx>      ("NpcSmall");             break;
+                case AssetType.PartySmallGfx:     Export<Base.PartySmallGfx>    ("PartySmall");           break;
+                case AssetType.Portrait:          Export<Base.Portrait>         ("Portrait");             break;
+                case AssetType.TacticalGfx:       Export<Base.TacticalGfx>      ("TacticalIcon");         break;
             }
         }
     }
@@ -107,10 +107,7 @@ class DumpGraphics : Component, IAssetDumper
             var image = ImageSharpUtil.ToImageSharp(trueColor.GetLayerBuffer(0));
             Save(image, path, formats, filenames);
         }
-        else if (texture is IReadOnlyTexture<byte> tilemap && (
-                     assetId.Type == AssetType.Font ||
-                     assetId.Type == AssetType.TilesetGfx ||
-                     assetId.Type == AssetType.AutomapGfx))
+        else if (texture is IReadOnlyTexture<byte> tilemap && assetId.Type is AssetType.FontGfx or AssetType.TilesetGfx or AssetType.AutomapGfx)
         {
             if (palette == null)
             {

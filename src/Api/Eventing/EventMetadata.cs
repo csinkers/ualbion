@@ -16,6 +16,7 @@ public class EventMetadata
     public ReadOnlyCollection<EventPartMetadata> Parts { get; }
     public Func<string[], Event> Parser { get; }
     public Type Type { get; }
+    public override string ToString() => $"{Name} {HelpText}";
 
     public EventMetadata(Type type)
     {

@@ -103,6 +103,34 @@ static class GenerateAssetIds
 
     }
 
+    static string FormatAssetTypeList(IList<AssetType> types)
+    {
+        var sb = new StringBuilder(types.Count * 30);
+        int lineOffset = 0;
+        bool first = true;
+        foreach (var type in types)
+        {
+            if (!first)
+                sb.Append(", ");
+
+            if (sb.Length - lineOffset > 60)
+            {
+                sb.AppendLine();
+                sb.Append("        ");
+                lineOffset = sb.Length;
+            }
+
+            sb.Append("AssetType.");
+            sb.Append(type);
+
+            first = false;
+        }
+        if (lineOffset == 0)
+            return sb.ToString();
+
+        return Environment.NewLine + "        " + sb;
+    }
+
     static string BuildClass(Assets assets, string destNamespace, string name, IList<AssetType> types)
     {
         if ((types?.Count ?? 0) == 0)
@@ -221,7 +249,7 @@ public readonly struct {name} : IEquatable<{name}>, IEquatable<AssetId>, ICompar
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
     public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
-    public static AssetType[] ValidTypes = {{ {string.Join(", ", types.Select(x => "AssetType." + x))} }};
+    public static AssetType[] ValidTypes = {{ {FormatAssetTypeList(types)} }};
     public static {name} Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 
     public static implicit operator AssetId({name} id) => AssetId.FromUInt32(id._value);

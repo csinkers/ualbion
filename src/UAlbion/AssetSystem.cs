@@ -50,7 +50,6 @@ public static class AssetSystem
             new AssetLoaderRegistry(),
             new ContainerRegistry(),
             new PostProcessorRegistry(),
-            new MetafontBuilder(),
             new StdioConsoleLogger(),
             // new ClipboardManager(),
             new ImGuiConsoleLogger(),

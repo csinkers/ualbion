@@ -77,6 +77,6 @@ public class JsonObjectContainer : IAssetContainer
         if (dict == null)
             throw new FileLoadException($"Could not deserialize \"{path}\"");
 
-        return dict.ToDictionary(x => AssetId.Parse(x.Key), x => x.Value);
+        return dict.ToDictionary(x => context.Mapping.Parse(x.Key, null), x => x.Value);
     }
 }

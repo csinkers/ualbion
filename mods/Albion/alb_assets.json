@@ -30,7 +30,7 @@
     "Albion/CD/XLDLIBS/EVNTSET2.XLD": { "Loader": "eset", "Map": { "0": { "Id": "eset.200" } } },
     "Albion/CD/XLDLIBS/EVNTSET3.XLD": { "Loader": "eset", "Map": { "1": { "Id": "eset.301" } } },
     "Albion/CD/XLDLIBS/EVNTSET9.XLD": { "Loader": "eset", "Max":  98, "Map": { "81": { "Id": "eset.981" } } },
-    "Albion/CD/XLDLIBS/SCRIPT0.XLD":  { "Loader": "script", "Map": { "0": { "Id": "script.1" } } },
+    "Albion/CD/XLDLIBS/SCRIPT0.XLD":  { "Loader": "script", "Map": { "1": { "Id": "script.2" } } },
     "Albion/CD/XLDLIBS/SCRIPT2.XLD":  { "Loader": "script", "MinimumCount": 100, "Map": { "0": { "Id": "script.200" } } },
 
     // Maps
@@ -85,20 +85,21 @@
 
     // Fonts
     "Albion/CD/XLDLIBS/FONTS0.XLD": {
-      "Post": "atlas",
-      "Loader": "font",
+      "Loader": "fixedsize",
       "Width": 8,
       "Height": 8,
+      "Max": 2,
       "Map": {
         "0": {
-          "Id": "font.1",
+          "Id": "fontgfx.RegularFont",
           "Mapping": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\"?!/()#%*&+-=><☺♂♀éâàçêëèïîìôòûùáíóú"
         },
         "1": {
+          "Id": "fontgfx.BoldFont",
           "Mapping": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\"?!/()#%*&+-=><☺♂♀éâàçêëèïîìôòûùáíóú"
         }
       }
-    },
+    }, 
 
     // Audio
     "Albion/CD/XLDLIBS/SAMPLES0.XLD": { "Loader": "sample", "Max": 98, "Map": { "0": { "Id": "sample.1" } } }, // TODO: Add mapping for NPC sound id -> sample id
@@ -258,7 +259,7 @@
     "Albion/CD/XLDLIBS/NPCKL0.XLD":   { "Loader": "header", "PaletteId": 1, "Map": { "0": { "Id": "npcsmall.1" }, "27": { "PaletteId": 4 } } },
     "Albion/CD/XLDLIBS/PARTGR0.XLD":  { "Loader": "header", "PaletteId": 20, "Map": { "0": { "Id": "plarge.1" } } },
     "Albion/CD/XLDLIBS/PARTKL0.XLD":  { "Loader": "header", "PaletteId": 1, "Map": { "0": { "Id": "psmall.1" } } },
-    "Albion/CD/XLDLIBS/PICTURE0.XLD": { "Loader": "interlaced", "Map": { "0": { "Id": "pic.1" } } },
+    "Albion/CD/XLDLIBS/PICTURE0.XLD": { "Loader": "interlaced", "IsReadOnly": true, "Map": { "0": { "Id": "pic.1" } } },
     "Albion/CD/XLDLIBS/SMLPORT0.XLD": { "Loader": "fixedsize", "Width": 34, "Max": 98, "Map": { "0": { "Id": "portrait.1" } } },
     "Albion/CD/XLDLIBS/SMLPORT1.XLD": { "Loader": "fixedsize", "Width": 34, "MinimumCount": 100, "Map": { "0": { "Id": "portrait.100" } } },
     "Albion/CD/XLDLIBS/TACTICO0.XLD": { "Loader": "fixedsize", "Width": 32, "Map": { "0": { "Id": "tacgfx.1" } } },
@@ -313,16 +314,19 @@
       "Map": { "0": { "Id": "uibg.1" } }
     },
     "Albion/MAIN.EXE#476227B0391CF3452166B7A1D52B012CCF6C86BC9E46886DAFBED343E9140710": { // EN+DE Aug 22 1996
+      "IsReadOnly": true, 
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
       "MapFile": "Meta/MainExe.json"
     },
     "Albion/MAIN.EXE#9FC7ABCF1A1EFC2F0AF3D90B7E23E03B5D5F58A4D04AE81E66EFD1717EE0245A": { // EN Jul 25 1996
+      "IsReadOnly": true, 
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
       "MapFile": "Meta/MainExe.json"
     },
     "Albion/MAIN.EXE#487DA3348C367363F3EFCBB22AE45C186F1FBECADA73F0BF0CE2CA8377A8DE14": { // FR
+      "IsReadOnly": true, 
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
       "MapFile": "Meta/MainExe.json"

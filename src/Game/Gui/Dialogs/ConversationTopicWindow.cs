@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
@@ -32,9 +31,9 @@ public class ConversationTopicWindow : ModalDialog
             {
                 var color = x.Value switch
                 {
-                    WordStatus.Mentioned => FontColor.Yellow,
-                    WordStatus.Discussed => FontColor.White,
-                    _ => FontColor.Gray,
+                    WordStatus.Mentioned => Base.Ink.Yellow,
+                    WordStatus.Discussed => Base.Ink.White,
+                    _ => Base.Ink.Gray,
                 };
 
                 var textElement = (IUiElement)new UiTextBuilder((TextId)x.Key).Ink(color);

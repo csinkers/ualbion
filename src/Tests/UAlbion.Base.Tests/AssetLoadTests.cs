@@ -17,6 +17,7 @@ using Xunit;
 
 namespace UAlbion.Base.Tests;
 
+// ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
 public class AssetLoadTests : IDisposable
 {
     static readonly EventExchange Exchange;
@@ -211,7 +212,7 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void FontTest()
     {
-        var font = Test(assets => assets.LoadTexture(Font.RegularFont));
+        var font = Test(assets => assets.LoadTexture(FontGfx.RegularFont));
         Assert.Equal(111, font.Regions.Count);
     }
 
@@ -490,8 +491,8 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void MetaFontTest()
     {
-        var font = Test(assets => assets.LoadFont(FontColor.White, false));
-        Assert.Equal(111, font.Regions.Count);
+        var font = Test(assets => assets.LoadFont(Font.Regular, Ink.White));
+        Assert.Equal(111, font.Texture.Regions.Count);
     }
 
     [Fact]

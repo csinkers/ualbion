@@ -11,7 +11,6 @@ public static class Loaders
     public static readonly ChestLoader ChestLoader = new();
     public static readonly EventSetLoader EventSetLoader = new();
     public static readonly FixedSizeSpriteLoader FixedSizeSpriteLoader = new();
-    public static readonly FontSpriteLoader<FixedSizeSpriteLoader> FontSpriteLoader = new();
     public static readonly SingleHeaderSpriteLoader SingleHeaderSpriteLoader = new();
     public static readonly MultiHeaderSpriteLoader MultiHeaderSpriteLoader = new();
     // public static readonly InterlacedBitmapLoader InterlacedBitmapLoader = new InterlacedBitmapLoader();

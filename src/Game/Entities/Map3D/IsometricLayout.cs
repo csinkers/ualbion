@@ -140,8 +140,8 @@ public class IsometricLayout : Component
 
         if (contents)
         {
-            var transparent = new SimpleTexture<byte>(AssetId.None, "Transparent", 1, 1, new byte[] { 0 })
-                .AddRegion(Vector2.Zero, Vector2.One, 0);
+            var transparent = new SimpleTexture<byte>(AssetId.None, "Transparent", 1, 1, new byte[] { 0 });
+            transparent.AddRegion(Vector2.Zero, Vector2.One, 0);
 
             for (byte i = 1; i <= labyrinthData.ObjectGroups.Count; i++)
             {

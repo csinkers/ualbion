@@ -70,7 +70,7 @@ public class MockFileSystem : IFileSystem
             INode node = _root;
             foreach (var part in path.Split(SeparatorChars, StringSplitOptions.RemoveEmptyEntries))
             {
-                if (!(node is DirNode dir)) return null;
+                if (node is not DirNode dir) return null;
                 if (dir.TryGetValue(part, out node)) continue;
 
                 var nodePath = Path.Combine(dir.Path, part);
@@ -90,7 +90,7 @@ public class MockFileSystem : IFileSystem
         path = ToAbsolutePath(path);
         lock (_syncRoot)
         {
-            if (!(GetDir(Path.GetDirectoryName(path)) is DirNode dir))
+            if (GetDir(Path.GetDirectoryName(path)) is not DirNode dir)
                 throw new DirectoryNotFoundException($"Could not find a part of the path '{path}'.");
 
             var filename = Path.GetFileName(path);
@@ -186,13 +186,33 @@ public class MockFileSystem : IFileSystem
         lock (_syncRoot)
         {
             path = ToAbsolutePath(path);
-            if (!(GetDir(path) is DirNode dir))
-                return Enumerable.Empty<string>();
+            if (GetDir(path) is not DirNode dir)
+                yield break;
 
             var regex = filter == null ? null : FilterToRegex(filter);
-            return dir
-                .Where(kvp => kvp.Value is FileNode && (regex?.IsMatch(kvp.Key) ?? true))
-                .Select(x => x.Value.Path);
+
+            if (Directory.Exists(path))
+            {
+                var actualFiles = filter == null
+                        ? Directory.EnumerateFiles(path)
+                        : Directory.EnumerateFiles(path, filter);
+
+                foreach (var filePath in actualFiles)
+                {
+                    if (!_maskingFunc(filePath)) // If it's hidden, ignore it
+                        continue;
+
+                    var filename = Path.GetFileName(filePath);
+                    if (dir.ContainsKey(filename)) // If a mocked copy doesn't exist yet, create one
+                        continue;
+
+                    yield return filePath;
+                }
+            }
+
+            foreach (var kvp in dir)
+                if (kvp.Value is FileNode && (regex?.IsMatch(kvp.Key) ?? true))
+                    yield return kvp.Value.Path;
         }
     }
 

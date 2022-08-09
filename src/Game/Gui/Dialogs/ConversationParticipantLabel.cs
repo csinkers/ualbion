@@ -65,8 +65,8 @@ public class ConversationParticipantLabel : Dialog
             new TextBlock(name)
             {
                 Alignment = isRight ? TextAlignment.Right : TextAlignment.Left,
-                Color = FontColor.White,
                 ArrangementFlags = TextArrangementFlags.NoWrap,
+                InkId = Base.Ink.White,
             }
         };
     });

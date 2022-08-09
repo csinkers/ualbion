@@ -1,0 +1,8 @@
+Known bugs etc in original game:
+
+* French SYSTEXTS has a space instead of a ':' for 0605 (party rests for 8 hours)
+* Cup and ladle items have gold value and weight transposed
+* Feeding fruits to glowing traps in Argim's dungeon removes knives instead of fruits
+* Possible to cheat shopkeepers by having player characters with 0.1 gold etc
+* Excessive reach distance shortly after colliding with terrain
+

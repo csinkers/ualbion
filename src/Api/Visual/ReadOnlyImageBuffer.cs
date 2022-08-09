@@ -5,6 +5,7 @@ namespace UAlbion.Api.Visual;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Never compared")]
 public readonly ref struct ReadOnlyImageBuffer<T>
 {
+    public static ReadOnlyImageBuffer<T> Empty => new(0, 0, 0, ReadOnlySpan<T>.Empty);
     public ReadOnlyImageBuffer(int width, int height, int stride, ReadOnlySpan<T> buffer)
     {
         Width = width;

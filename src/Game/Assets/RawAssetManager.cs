@@ -54,9 +54,10 @@ public class RawAssetManager : Component, IRawAssetManager
 
     public ITexture LoadTexture(SpriteId id) => (ITexture)_modApplier.LoadAsset(id);
     public ITexture LoadTexture(IAssetId id) => (ITexture)_modApplier.LoadAsset(SpriteId.FromUInt32(id?.ToUInt32() ?? 0));
-    public ITexture LoadFont(FontColor color, bool isBold) 
-        => (ITexture)_modApplier.LoadAsset(new AssetId(
-            AssetType.MetaFont, (ushort)new MetaFontId(isBold, color)));
+
+    public Ink LoadInk(InkId inkId) => (Ink)_modApplier.LoadAsset(inkId);
+    public FontDefinition LoadFontDefinition(FontId id) => (FontDefinition)_modApplier.LoadAsset(id);
+    public MetaFont LoadFont(FontId fontId, InkId inkId) => (MetaFont)_modApplier.LoadAsset(new MetaFontId(fontId, inkId));
 
     public ITileGraphics LoadTileGraphics(TilesetGfxId id) => (ITileGraphics)_modApplier.LoadAsset(id);
     public TilesetData LoadTileData(TilesetId id) => (TilesetData)_modApplier.LoadAsset(id);
@@ -95,7 +96,7 @@ public class RawAssetManager : Component, IRawAssetManager
     public SavedGame LoadSavedGame(string path) => _modApplier.LoadSavedGame(path);
     public MonsterGroup LoadMonsterGroup(MonsterGroupId id) => (MonsterGroup)_modApplier.LoadAsset(id);
     public Automap LoadAutomap(AutomapId id) => (Automap) _modApplier.LoadAsset(id);
-    public byte[] LoadSoundBanks() => (byte[]) _modApplier.LoadAsset(AssetId.From(Base.Special.SoundBank));
+    public object LoadSoundBanks() => _modApplier.LoadAsset(AssetId.From(Base.Special.SoundBank));
     public IVarSet LoadConfig() => (IVarSet)_modApplier.LoadAsset(AssetId.From(Base.Special.GameConfig));
     public InputConfig LoadInputConfig() => (InputConfig)_modApplier.LoadAsset(AssetId.From(Base.Special.InputConfig));
 }

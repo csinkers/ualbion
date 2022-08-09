@@ -243,7 +243,12 @@ public class ModApplier : Component, IModApplier
             return null;
 
         if (id.Type == AssetType.MetaFont)
-            return Resolve<IMetafontBuilder>().Build((MetaFontId)id.Id);
+        {
+            var assets = Resolve<IAssetManager>();
+            var metaId = (MetaFontId)id;
+            var font = assets.LoadFontDefinition(metaId.FontId);
+            return font.Build(metaId.FontId, metaId.InkId, assets);
+        }
 
         object asset = null;
         Stack<IPatch> patches = null; // Create the stack lazily, as most assets won't have any patches.
@@ -325,7 +330,7 @@ public class ModApplier : Component, IModApplier
             asset = patches.Pop().Apply(asset);
 
 #if DEBUG
-        if (asset == null)
+        if (asset == null && loaderWarnings.Length > 0)
             Warn(loaderWarnings.ToString());
 #endif
 
@@ -402,6 +407,9 @@ public class ModApplier : Component, IModApplier
             if (filePattern != null && !filePattern.IsMatch(file.Filename))
                 continue;
 
+            if (file.Get(AssetProperty.IsReadOnly, false))
+                continue;
+
             bool notify = true;
             flushCacheFunc();
             var path = pathResolver.ResolvePath(file.Filename);
@@ -417,7 +425,10 @@ public class ModApplier : Component, IModApplier
                 var (asset, sourceInfo) = loaderFunc(assetInfo.AssetId, language);
                 if (asset == null)
                 {
-                    if (assetInfo.AssetId.Type != AssetType.Automap) // Automaps should only load for 3D maps, no need for 'not found' errors
+                    // Automaps should only load for 3D maps, no need for 'not found' errors, also unmapped ids might be getting requested
+                    // due to populating the full range of an XLD, as the ids aren't actually in use it's fine to ignore their absence.
+                    var id = assetInfo.AssetId;
+                    if (id.Type != AssetType.Automap && AssetMapping.Global.IsMapped(id))
                         Error($"Could not load {assetInfo.AssetId}");
                     continue;
                 }

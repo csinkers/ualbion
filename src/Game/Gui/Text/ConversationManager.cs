@@ -2,7 +2,6 @@
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
@@ -71,7 +70,7 @@ public class ConversationManager : Component
             case TextLocation.PortraitLeft3:
                 {
                     var portraitId = GetPortrait(mapTextEvent.Speaker);
-                    var text = tf.Ink(FontColor.Yellow).Format(mapTextEvent.ToId());
+                    var text = tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId());
                     var dialog = AttachChild(new TextDialog(text, portraitId));
                     dialog.Closed += (_, _) => continuation();
                     return true;

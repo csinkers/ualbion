@@ -1,4 +1,4 @@
-﻿using UAlbion.Formats.Assets;
+﻿using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.Text;
 
@@ -11,5 +11,5 @@ public interface ITextBuilder<out T>
     T Justify();
     T Fat();
     T Language(string language);
-    T Ink(FontColor color);
+    T Ink(InkId id);
 }

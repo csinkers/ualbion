@@ -1,0 +1,24 @@
+{
+  "ink.White": {
+    "PaletteLineColor": "White",
+    "PaletteMapping": [ 0, 194, 194, 195, 196, 197 ],
+    "SaturationOffset": -100,
+    "ValueOffset": 20
+  },
+  "ink.Yellow": {
+    "PaletteLineColor": "Yellow5",
+    "PaletteMapping": [ 0, 194, 219, 220, 221, 222 ],
+    "HueOffset": 30
+  },
+  "ink.YellowOrange": {
+    "PaletteLineColor": "Orange5", // TODO: Verify
+    "PaletteMapping": [ 0, 194, 208, 209, 210, 211 ],
+    "HueOffset": 20
+  },
+  "ink.Gray": {
+    "PaletteLineColor": "Grey6", // TODO: Verify
+    "PaletteMapping": [ 0, 196, 197, 198, 199, 200 ],
+    "SaturationOffset": -100
+  }
+}
+// vim: tabstop=2 shiftwidth=2 expandtab

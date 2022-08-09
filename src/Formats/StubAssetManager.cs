@@ -30,7 +30,9 @@ public class StubAssetManager : IAssetManager
     public IList<IEvent> LoadScript(ScriptId id) => throw new NotImplementedException();
     public IMapData LoadMap(MapId id) => throw new NotImplementedException();
     public ISample LoadSample(SampleId id) => throw new NotImplementedException();
-    public ITexture LoadFont(FontColor color, bool isBold) => throw new NotImplementedException();
+    public Ink LoadInk(InkId inkId) => throw new NotImplementedException();
+    public FontDefinition LoadFontDefinition(FontId fontId) => throw new NotImplementedException();
+    public MetaFont LoadFont(FontId fontId, InkId inkId) => throw new NotImplementedException();
     public ITexture LoadTexture(IAssetId id) => throw new NotImplementedException();
     public ITexture LoadTexture(SpriteId id) => throw new NotImplementedException();
     public ITileGraphics LoadTileGraphics(TilesetGfxId id) => throw new NotImplementedException();
@@ -45,7 +47,7 @@ public class StubAssetManager : IAssetManager
     public bool IsStringDefined(StringId id, string language) => throw new NotImplementedException();
     public bool IsStringDefined(TextId id, string language) => throw new NotImplementedException();
     public byte[] LoadSong(SongId id) => throw new NotImplementedException();
-    public byte[] LoadSoundBanks() => throw new NotImplementedException();
+    public object LoadSoundBanks() => throw new NotImplementedException();
     public IVarSet LoadConfig() => throw new NotImplementedException();
     public InputConfig LoadInputConfig() => throw new NotImplementedException();
 

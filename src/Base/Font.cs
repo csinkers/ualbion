@@ -4,6 +4,12 @@ namespace UAlbion.Base;
 
 public enum Font : byte
 {
-    RegularFont = 1,
-    BoldFont = 2,
+    Regular = 1,
+    Bold = 2,
+    DebugFont6,
+    DebugFont7,
+    DebugFont10,
+    DebugFont11,
+    DebugFont14,
+    DebugFont17
 }

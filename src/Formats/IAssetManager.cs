@@ -18,7 +18,9 @@ public interface IAssetManager : ITextureLoader
     AssetInfo GetAssetInfo(AssetId id, string language = null);
     ITexture LoadTexture(SpriteId id);
     ITileGraphics LoadTileGraphics(TilesetGfxId id);
-    ITexture LoadFont(FontColor color, bool isBold);
+    Ink LoadInk(InkId id);
+    FontDefinition LoadFontDefinition(FontId id);
+    MetaFont LoadFont(FontId fontId, InkId inkId);
     TilesetData LoadTileData(TilesetId id);
     LabyrinthData LoadLabyrinthData(LabyrinthId id);
     bool IsStringDefined(TextId id, string language);
@@ -44,7 +46,7 @@ public interface IAssetManager : ITextureLoader
     SavedGame LoadSavedGame(string path);
     MonsterGroup LoadMonsterGroup(MonsterGroupId id);
     Automap LoadAutomap(AutomapId id);
-    byte[] LoadSoundBanks(); // Special assets
+    object LoadSoundBanks(); // Should always return a GlobalTimbreLibrary, but we don't want to force a dependency on ADLMidi.NET in UAlbion.Formats, so use object
     IVarSet LoadConfig();
     InputConfig LoadInputConfig();
 }

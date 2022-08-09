@@ -49,17 +49,8 @@ public class ArrayTexture<T> : IMutableTexture<T> where T : unmanaged
         _regions = regions?.ToList() ?? new List<Region>();
     }
 
-    public ArrayTexture<T> AddRegion(int x, int y, int w, int h, int layer = 0)
-    {
-        _regions.Add(new Region(x, y, w, h, Width, Height, layer));
-        return this;
-    }
-
-    public ArrayTexture<T> AddRegion(Vector2 offset, Vector2 size, int layer)
-    {
-        _regions.Add(new Region(offset, size, new Vector2(Width, Height), layer));
-        return this;
-    }
+    public void AddRegion(int x, int y, int w, int h, int layer = 0) => _regions.Add(new Region(x, y, w, h, Width, Height, layer));
+    public void AddRegion(Vector2 offset, Vector2 size, int layer) => _regions.Add(new Region(offset, size, new Vector2(Width, Height), layer));
 
     [JsonIgnore] public IAssetId Id { get; }
     public string Name { get; }
@@ -74,23 +65,31 @@ public class ArrayTexture<T> : IMutableTexture<T> where T : unmanaged
 
     public override string ToString() => $"ATexture {Id} {Width}x{Height} ({Regions.Count} sub-images)";
 
-    public ReadOnlySpan<T> GetRowSpan(int frameNumber, int row)
+    public ReadOnlySpan<T> GetRowSpan(int regionNumber, int row)
     {
-        if(frameNumber >= Regions.Count)
-            throw new ArgumentOutOfRangeException(nameof(frameNumber), $"Tried to get span for frame {frameNumber}, but the image only has {Regions.Count} sub-images");
+        if(regionNumber >= Regions.Count)
+            throw new ArgumentOutOfRangeException(nameof(regionNumber), $"Tried to get span for region {regionNumber}, but the image only has {Regions.Count} sub-images");
 
-        var frame = Regions[frameNumber];
-        if (row >= frame.Height)
-            throw new ArgumentOutOfRangeException(nameof(row), $"Tried to get span for row {row}, but the frame only has a height of {frame.Height}");
-        int index = frame.X + Width * (frame.Y + row);
-        return _pixelData.AsSpan(index, frame.Width);
+        var region = Regions[regionNumber];
+        if (row >= region.Height)
+            throw new ArgumentOutOfRangeException(nameof(row), $"Tried to get span for row {row}, but the region only has a height of {region.Height}");
+        int index = region.X + Width * (region.Y + row);
+        return _pixelData.AsSpan(index, region.Width);
+    }
+
+    public ReadOnlyImageBuffer<T> GetRegionBuffer(Region region)
+    {
+        if (region == null) throw new ArgumentNullException(nameof(region));
+        ReadOnlySpan<T> fromSlice = _pixelData.AsSpan(region.PixelOffset, region.PixelLength);
+        return new ReadOnlyImageBuffer<T>(region.Width, region.Height, Width, fromSlice);
     }
 
     public ReadOnlyImageBuffer<T> GetRegionBuffer(int i)
     {
-        var frame = Regions[i];
-        ReadOnlySpan<T> fromSlice = _pixelData.AsSpan(frame.PixelOffset, frame.PixelLength);
-        return new ReadOnlyImageBuffer<T>(frame.Width, frame.Height, Width, fromSlice);
+        if (i >= Regions.Count)
+            throw new ArgumentOutOfRangeException($"Tried to obtain a buffer for region {i}, but there are only {Regions.Count}");
+
+        return GetRegionBuffer(Regions[i]);
     }
 
     public ReadOnlyImageBuffer<T> GetLayerBuffer(int i)
@@ -102,15 +101,20 @@ public class ArrayTexture<T> : IMutableTexture<T> where T : unmanaged
         return new ReadOnlyImageBuffer<T>(Width, Height, Width, fromSlice);
     }
 
+    public ImageBuffer<T> GetMutableRegionBuffer(Region region)
+    {
+        if (region == null) throw new ArgumentNullException(nameof(region));
+        Version++;
+        Span<T> fromSlice = _pixelData.AsSpan(region.PixelOffset, region.PixelLength);
+        return new ImageBuffer<T>(region.Width, region.Height, Width, fromSlice);
+    }
+
     public ImageBuffer<T> GetMutableRegionBuffer(int i)
     {
         if (i >= Regions.Count)
             throw new ArgumentOutOfRangeException($"Tried to obtain a buffer for region {i}, but there are only {Regions.Count}");
 
-        Version++;
-        var frame = Regions[i];
-        Span<T> fromSlice = _pixelData.AsSpan(frame.PixelOffset, frame.PixelLength);
-        return new ImageBuffer<T>(frame.Width, frame.Height, Width, fromSlice);
+        return GetMutableRegionBuffer(Regions[i]);
     }
 
     public ImageBuffer<T> GetMutableLayerBuffer(int i)

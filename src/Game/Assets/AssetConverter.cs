@@ -7,7 +7,6 @@ using UAlbion.Api.Eventing;
 using UAlbion.Api.Settings;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Magic;

@@ -4,17 +4,17 @@ public static class AssetProperty
 {
     // General
     public const string Language = "Language"; // string
-    public const string Mapping  = "Mapping"; // string
-    public const string Offset   = "Offset"; // int
-    public const string Pattern  = "Pattern"; // string
+    public const string Offset   = "Offset"; // int, used for BinaryOffsetContainer, e.g. MAIN.EXE
+    public const string Pattern  = "Pattern"; // string, mostly for DirectoryContainer
     public const string MinimumCount = "MinimumCount"; // Just used to get closer to 1:1 round-tripping of XLDs
+    public const string IsReadOnly = "IsReadOnly"; // To prevent zeroing out files when repacking formats that don't have writing code yet, e.g. ILBM images
 
     // Textures
     public const string Width      = "Width"; // int
     public const string Height     = "Height"; // int
-    public const string PaletteId  = "PaletteId"; // int
+    public const string PaletteId  = "PaletteId"; // int, for providing context when exporting 8-bit images to true-colour PNGs
     public const string SubSprites = "SubSprites"; // string
-    public const string Transposed = "Transposed"; // bool
+    public const string Transposed = "Transposed"; // bool, for various textures in the 3D world that are stored with rows/columns flipped
     public const string ExtraBytes = "ExtraBytes"; // int, used to suppress assertions when loading original assets that have incorrect sizes
 
     // Palette

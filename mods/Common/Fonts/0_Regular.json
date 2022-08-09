@@ -1,0 +1,25 @@
+{
+  "LineHeight": 8,
+  "SpaceSize": 3,
+  "Components": [
+    {
+      "GraphicsId": "fontgfx.RegularFont",
+      "Width": 8,
+      "Height": 8,
+      "Mapping": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\"?!/()#%*&+-=><☺♂♀éâàçêëèïîìôòûùáíóú"
+    }
+  ],
+  "Kerning": {
+    "T": {
+      "a": 5,
+      "e": 5,
+      "o": 5
+    },
+    "l": {
+      "a": 2,
+      "e": 2,
+      "o": 2
+    } 
+  }
+}
+// vim: tabstop=2 shiftwidth=2 expandtab

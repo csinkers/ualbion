@@ -193,7 +193,7 @@ public class LogicalInventorySlot : UiElement
             => tf
                 .Center()
                 .NoWrap()
-                .Ink(disabled ? FontColor.Yellow : FontColor.White)
+                .Ink(disabled ? Base.Ink.Yellow : Base.Ink.White)
                 .Format(textId);
 
         // Drop (Yellow inactive when critical)

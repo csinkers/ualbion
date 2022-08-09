@@ -4,22 +4,23 @@ using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.Gui.Text;
 
 public class MidLine : UiElement
 {
     const int MarginX = 1;
-    readonly CommonColor _color;
+    readonly InkId _ink;
     SpriteLease<SpriteInfo> _sprite;
     Vector3 _lastPosition;
     Vector2 _lastSize;
     bool _dirty = true;
 
-    public MidLine(CommonColor color = CommonColor.White)
+    public MidLine(InkId ink)
     {
-        _color = color;
+        _ink = ink;
         On<BackendChangedEvent>(_ => _dirty = true);
     }
 
@@ -51,6 +52,7 @@ public class MidLine : UiElement
 
         UpdateSprite((DrawLayer)order);
 
+        var assets = Resolve<IAssetManager>();
         var window = Resolve<IWindowManager>();
         var yPosition = extents.Y + extents.Height / 2;
         var position = new Vector3(window.UiToNorm(extents.X + MarginX, yPosition), 0);
@@ -68,7 +70,8 @@ public class MidLine : UiElement
         try
         {
             // Shrink by 1 pix from either end
-            var region = Resolve<ICommonColors>().GetRegion(_color);
+            var ink = assets.LoadInk(_ink);
+            var region = Resolve<ICommonColors>().GetRegion(ink.PaletteLineColor);
             var shadowOffset = window.UiToNormRelative(1, 1);
             instances[0] = new SpriteInfo(SpriteFlags.TopLeft, position, size, region);
             instances[1] = new SpriteInfo(

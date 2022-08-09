@@ -1,5 +1,6 @@
 ﻿using System;
 using ADLMidi.NET;
+using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -30,14 +31,17 @@ public class AlbionMusicGenerator : Component, IAudioGenerator
         if ((xmiBytes?.Length ?? 0) == 0)
             return;
 
-        var banks = assets.LoadSoundBanks();
-        if(banks == null)
+        var soundBanks = assets.LoadSoundBanks();
+        if (soundBanks is not GlobalTimbreLibrary timbreLibrary)
         {
             Error("AlbionMusicGenerator: Could not load sound banks");
             return;
         }
 
-        _player.OpenBankData(banks);
+        var wopl = new WoplFile(timbreLibrary);
+        var woplBytes = wopl.GetRawWoplBytes(ApiUtil.Assert);
+
+        _player.OpenBankData(woplBytes);
         _player.OpenData(xmiBytes);
         _player.SetLoopEnabled(true);
     }

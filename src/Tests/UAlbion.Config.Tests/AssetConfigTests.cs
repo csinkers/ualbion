@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using UAlbion.Api;
 using Xunit;
+// ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
 
 namespace UAlbion.Config.Tests;
 
@@ -18,10 +19,11 @@ public class AssetConfigTests : Component
       ""CopiedFrom"": ""UAlbion.Base.Tileset, UAlbion.Base""
     },
     ""combg"":      { ""AssetType"": ""CombatBackground"", ""EnumType"": ""UAlbion.Base.CombatBackground, UAlbion.Base"" },
-    ""comgfx"":     { ""AssetType"": ""CombatGfx"",   ""EnumType"": ""UAlbion.Base.CombatGfx, UAlbion.Base"" },
-    ""coresprite"": { ""AssetType"": ""CoreGfx"",     ""EnumType"": ""UAlbion.Base.CoreSprite, UAlbion.Base"" },
+    ""comgfx"":     { ""AssetType"": ""CombatGfx"",        ""EnumType"": ""UAlbion.Base.CombatGfx, UAlbion.Base"" },
+    ""coresprite"": { ""AssetType"": ""CoreGfx"",          ""EnumType"": ""UAlbion.Base.CoreSprite, UAlbion.Base"" },
     ""floor"":      { ""AssetType"": ""Floor"",            ""EnumType"": ""UAlbion.Base.Floor, UAlbion.Base"" },
-    ""font"":       { ""AssetType"": ""Font"",             ""EnumType"": ""UAlbion.Base.Font, UAlbion.Base"" },
+    ""font"":       { ""AssetType"": ""FontDefinition"",   ""EnumType"": ""UAlbion.Base.Font, UAlbion.Base"" },
+    ""fontgfx"":    { ""AssetType"": ""FontGfx"",          ""EnumType"": ""UAlbion.Base.FontGfx, UAlbion.Base"" },
     ""item"":       { ""AssetType"": ""Item"",             ""EnumType"": ""UAlbion.Base.Item, UAlbion.Base"" },
     ""overlay"":    { ""AssetType"": ""WallOverlay"",      ""EnumType"": ""UAlbion.Base.WallOverlay, UAlbion.Base"" },
     ""pal"":        { ""AssetType"": ""Palette"",          ""EnumType"": ""UAlbion.Base.Palette, UAlbion.Base"" },
@@ -119,9 +121,9 @@ public class AssetConfigTests : Component
       ""Loader"": ""font"",
       ""Width"": 8,
       ""Height"": 8,
+      ""Max"": 2,
       ""Map"": {
-        ""0"": { ""Id"": ""font.1"", ""Mapping"": ""abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\""?!/()#%*&+-=><☺♂♀éâàçêëèïîìôòûùáíóú"" },
-        ""1"": { ""Mapping"": ""abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\""?!/()#%*&+-=><☺♂♀éâàçêëèïîìôòûùáíóú"" }
+        ""0"": { ""Id"": ""font.1"" }
       }
     },
 
@@ -219,8 +221,14 @@ public class AssetConfigTests : Component
             t =>
             {
                 Assert.Equal("font", t.Alias);
-                Assert.Equal(AssetType.Font, t.AssetType);
+                Assert.Equal(AssetType.FontDefinition, t.AssetType);
                 Assert.Equal("UAlbion.Base.Font, UAlbion.Base", t.EnumType);
+            },
+            t =>
+            {
+                Assert.Equal("fontgfx", t.Alias);
+                Assert.Equal(AssetType.FontGfx, t.AssetType);
+                Assert.Equal("UAlbion.Base.FontGfx, UAlbion.Base", t.EnumType);
             },
             t =>
             {
@@ -562,16 +570,6 @@ public class AssetConfigTests : Component
             {
                 Assert.Equal(0, m.Key);
                 Assert.Equal("font.1", m.Value.Id);
-                Assert.Equal(
-                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\"?!/()#%*&+-=><☺♂♀éâàçêëèïîìôòûùáíóú",
-                    m.Value.Get<string>(AssetProperty.Mapping, null));
-            },
-            m =>
-            {
-                Assert.Equal(1, m.Key);
-                Assert.Equal(
-                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\"?!/()#%*&+-=><☺♂♀éâàçêëèïîìôòûùáíóú",
-                    m.Value.Get<string>(AssetProperty.Mapping, null));
             });
     }
 

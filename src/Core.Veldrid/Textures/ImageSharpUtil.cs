@@ -62,7 +62,8 @@ public static class ImageSharpUtil
         if (image == null) throw new ArgumentNullException(nameof(image));
         image.TryGetSinglePixelSpan(out var pixels);
         var asUint = MemoryMarshal.Cast<Rgba32, uint>(pixels);
-        return new SimpleTexture<uint>(id, name, image.Width, image.Height, asUint)
-            .AddRegion(0, 0, image.Width, image.Height, 0);
+        var result = new SimpleTexture<uint>(id, name, image.Width, image.Height, asUint);
+        result.AddRegion(0, 0, image.Width, image.Height);
+        return result;
     }
 }

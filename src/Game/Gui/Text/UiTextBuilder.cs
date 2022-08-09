@@ -26,7 +26,7 @@ public class UiTextBuilder : UiElement, IText, ITextBuilder<UiTextBuilder>
     public UiTextBuilder Right() { _implicitTokens.Add((Token.Right, null)); return this; }
     public UiTextBuilder Justify() { _implicitTokens.Add((Token.Justify, null)); return this; }
     public UiTextBuilder Fat() { _implicitTokens.Add((Token.Fat, null)); return this; }
-    public UiTextBuilder Ink(FontColor color) { _implicitTokens.Add((Token.Ink, (int)color)); return this; }
+    public UiTextBuilder Ink(InkId id) { _implicitTokens.Add((Token.Ink, id)); return this; }
     public UiTextBuilder Language(string language) { _language = language; return this; }
 
     protected override void Subscribed()

@@ -1,0 +1,13 @@
+{
+  "LineHeight": 8,
+  "SpaceSize": 3,
+  "Components": [
+    {
+      "GraphicsId": "fontgfx.BoldFont",
+      "Width": 8,
+      "Height": 8,
+      "Mapping": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\"?!/()#%*&+-=><☺♂♀éâàçêëèïîìôòûùáíóú"
+    }
+  ]
+}
+// vim: tabstop=2 shiftwidth=2 expandtab

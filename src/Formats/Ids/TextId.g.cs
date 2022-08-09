@@ -94,7 +94,9 @@ public readonly struct TextId : IEquatable<TextId>, IEquatable<AssetId>, ICompar
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
     public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
-    public static AssetType[] ValidTypes = { AssetType.EventText, AssetType.ItemName, AssetType.MapText, AssetType.Special, AssetType.Text, AssetType.Word };
+    public static AssetType[] ValidTypes = { 
+        AssetType.EventText, AssetType.ItemName, AssetType.MapText, AssetType.Special, 
+        AssetType.Text, AssetType.Word };
     public static TextId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 
     public static implicit operator AssetId(TextId id) => AssetId.FromUInt32(id._value);

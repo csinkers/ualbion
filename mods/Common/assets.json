@@ -1,8 +1,38 @@
 {
   "Files": {
-    "config.json": { "Container": "dummy", "Loader": "varset", "Max": 0, "Map": { "0": { "Id": "special.GameConfig" } } },
-    "input.json": { "Container": "dummy", "Loader": "inputconfig", "Max": 0, "Map": { "0": { "Id": "special.InputConfig" } } },
-    "PartyMembers": { "Loader": "jsonParty", "Pattern": "{id:00}_{name}.json", "Map": { "1": { "Id": "party.1" } } }
+    "config.json": {
+      "Container": "dummy",
+      "Loader": "varset",
+      "Max": 0,
+      "Map": { "0": { "Id": "special.GameConfig" } }
+    },
+    "input.json": {
+      "Container": "dummy",
+      "Loader": "inputconfig",
+      "Max": 0,
+      "Map": { "0": { "Id": "special.InputConfig" } }
+    },
+    "PartyMembers": {
+      "Loader": "jsonParty",
+      "Pattern": "{id:00}_{name}.json",
+      "Map": { "1": { "Id": "party.1" } }
+    },
+    "Fonts": {
+      "Loader": "font",
+      "Pattern": "{id}_{name}.json",
+      "Map": { "0": { "Id": "font.Regular" } }
+    },
+    "Fonts/DebugFonts.png": {
+      "Container": "raw",
+      "Loader": "png8",
+      "Max": 0,
+      "Map": { "0": { "Id": "fontgfx.DebugFonts" } }
+    },
+    "Inks.json": {
+      "Container": "jsonObj",
+      "Loader": "ink",
+      "Map": { "0": { "Id": "ink.White" } }
+    }
   }
 }
 // vim: tabstop=2 shiftwidth=2 expandtab

@@ -29,7 +29,9 @@ public class DialogManagerTests
             .RegisterAssetType(typeof(Base.SystemText), AssetType.Text)
             .RegisterAssetType(typeof(Base.Palette), AssetType.Palette)
             .RegisterAssetType(typeof(Base.CoreGfx), AssetType.CoreGfx)
-            .RegisterAssetType(typeof(Base.Font), AssetType.Font)
+            .RegisterAssetType(typeof(Base.Ink), AssetType.Ink)
+            .RegisterAssetType(typeof(Base.Font), AssetType.FontDefinition)
+            .RegisterAssetType(typeof(Base.FontGfx), AssetType.FontGfx)
             ;
 
         var systemText = new Dictionary<TextId, string>
@@ -45,11 +47,13 @@ public class DialogManagerTests
         var comPalId = (PaletteId)Base.Palette.Common;
         var palId = (PaletteId)Base.Palette.Inventory;
 
+        var font = MockUniformFont.BuildFontDefinition();
         var mma = new MockModApplier()
-                .Add(new AssetId(AssetType.MetaFont, (ushort)new MetaFontId(false, FontColor.White)), MockUniformFont.Font(AssetId.From(Base.Font.RegularFont)))
+                .Add((FontId)Base.Font.Regular, font)
+                .Add((InkId)Base.Ink.White, MockUniformFont.BuildInk())
+                .Add((SpriteId)Base.FontGfx.RegularFont, MockUniformFont.BuildFontTexture())
                 .Add(comPalId, new AlbionPalette(comPalId.ToUInt32(), "PCommon", Enumerable.Repeat(0xffffffu, 256).ToArray()))
                 .Add(palId, new AlbionPalette(palId.ToUInt32(), "PInv", Enumerable.Repeat(0xffffffu, 256).ToArray()))
-                .AddInfo(AssetId.From(Base.Font.RegularFont), MockUniformFont.Info)
             ;
 
         void AddDummySprite(SpriteId id)
@@ -75,10 +79,11 @@ public class DialogManagerTests
         foreach (var kvp in systemText)
             mma.Add(kvp.Key, kvp.Value);
 
+        var assetManager = new AssetManager();
         ex
             .Attach(mma)
+            .Attach(assetManager)
             .Attach(new MockSettings())
-            .Attach(new AssetManager())
             .Attach(new SpriteManager<SpriteInfo>())
             .Attach(new MockGameFactory())
             .Attach(new WordLookup())
@@ -89,6 +94,9 @@ public class DialogManagerTests
             .Attach(lm)
             .Register<ICommonColors>(new CommonColors())
             ;
+
+        var metaFont = font.Build(Base.Font.Regular, Base.Ink.White, assetManager);
+        mma.Add(metaFont.Id, metaFont);
 
         var e = new YesNoPromptEvent((TextId)Base.SystemText.MainMenu_DoYouReallyWantToQuit);
 

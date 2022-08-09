@@ -7,6 +7,7 @@
     <Content Include="$(MSBuildThisFileDirectory)\ENGLISH\**\*.json" />
     <Content Include="$(MSBuildThisFileDirectory)\GERMAN\**\*.json" />
     <Content Include="$(MSBuildThisFileDirectory)\FRENCH\**\*.json" />
+    <Content Include="$(MSBuildThisFileDirectory)\Fonts\**\*.json" />
     <Content Include="$(MSBuildThisFileDirectory)\Meta\**\*.json" />
     <Content Include="$(MSBuildThisFileDirectory)\PartyMembers\**\*.json" />
     <Content Include="$(MSBuildThisFileDirectory)\**\*.frag" />

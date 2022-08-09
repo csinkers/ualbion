@@ -20,5 +20,5 @@ public interface ITextFormatter
     ITextFormatter Justify();
     ITextFormatter Fat();
     ITextFormatter Block(int blockNumber); // -1 = unlabelled text before the first block
-    ITextFormatter Ink(FontColor color);
+    ITextFormatter Ink(InkId id);
 }

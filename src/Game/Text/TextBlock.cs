@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Gui.Dialogs;
 
@@ -16,7 +15,7 @@ public class TextBlock // Logical segment of text where all glyphs share the sam
     {
         BlockId = blockId;
         Text = text ?? "";
-        Color = FontColor.White;
+        InkId = Base.Ink.White;
     }
 
     string _text;
@@ -24,7 +23,7 @@ public class TextBlock // Logical segment of text where all glyphs share the sam
     public string Raw { get; set; }
     public int BlockId { get; }
     public string Text { get => _text; set => _text = value ?? ""; }
-    public FontColor Color { get; set; }
+    public InkId InkId { get; set; }
     public TextStyle Style { get; set; }
     public TextAlignment Alignment { get; set; }
     public TextArrangementFlags ArrangementFlags { get; set; }
@@ -32,7 +31,7 @@ public class TextBlock // Logical segment of text where all glyphs share the sam
     public void AddWord(WordId word) { _words ??= new HashSet<WordId>(); _words.Add(word); }
     ISet<WordId> _words;
 
-    public override string ToString() => $"[\"{Text}\" {Color} {Style} {Alignment} {ArrangementFlags}]";
+    public override string ToString() => $"[\"{Text}\" {InkId} {Style} {Alignment} {ArrangementFlags}]";
 
     public bool IsMergeableWith(TextBlock other)
     {
@@ -40,7 +39,7 @@ public class TextBlock // Logical segment of text where all glyphs share the sam
         return
             other.BlockId == BlockId &&
             (string.IsNullOrWhiteSpace(other.Text) ||
-             other.Color == Color &&
+             other.InkId == InkId &&
              other.Style == Style &&
              other.Alignment == Alignment &&
              other.ArrangementFlags == ArrangementFlags);

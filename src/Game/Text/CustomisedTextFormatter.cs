@@ -40,6 +40,6 @@ public class CustomisedTextFormatter : ITextFormatter
     public ITextFormatter Right(){ _implicitTokens.Add((Token.Right, null)); return this; }
     public ITextFormatter Justify(){ _implicitTokens.Add((Token.Justify, null)); return this; }
     public ITextFormatter Fat() { _implicitTokens.Add((Token.Fat, null)); return this; }
-    public ITextFormatter Ink(FontColor color) { _implicitTokens.Add((Token.Ink, (int)color)); return this; }
+    public ITextFormatter Ink(InkId id) { _implicitTokens.Add((Token.Ink, id)); return this; }
     public ITextFormatter Block(int blockNumber) { _blockFilter = blockNumber; return this; }
 }

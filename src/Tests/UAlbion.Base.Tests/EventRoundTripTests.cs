@@ -171,7 +171,8 @@ public class EventRoundTripTests
     [Fact]
     public void AddPartyMember()
     {
-        Test(("add_party_member PartyMember.Tom", new AddPartyMemberEvent(PartyMember.Tom)));
+        Test(("add_party_member PartyMember.Tom", new AddPartyMemberEvent(PartyMember.Tom, NumericOperation.SetAmount, 0)));
+        Test(("add_party_member PartyMember.Tom SetToMaximum", new AddPartyMemberEvent(PartyMember.Tom, NumericOperation.SetToMaximum, 0)));
     }
 
     [Fact]
@@ -196,18 +197,18 @@ public class EventRoundTripTests
     [Fact]
     public void ModifyGold()
     {
-        Test(("modify_gold AddAmount 1", new ModifyGoldEvent(NumericOperation.AddAmount, 1)),
-            ("modify_gold SetToMinimum 0", new ModifyGoldEvent(NumericOperation.SetToMinimum, 0)),
-            ("modify_gold SubtractAmount 0", new ModifyGoldEvent(NumericOperation.SubtractAmount, 0)),
-            ("modify_gold SubtractAmount 1", new ModifyGoldEvent(NumericOperation.SubtractAmount, 1)));
+        Test(("modify_gold AddAmount 1", new ModifyGoldEvent(NumericOperation.AddAmount, 1, 0)),
+            ("modify_gold SetToMinimum 0", new ModifyGoldEvent(NumericOperation.SetToMinimum, 0, 0)),
+            ("modify_gold SubtractAmount 0", new ModifyGoldEvent(NumericOperation.SubtractAmount, 0, 0)),
+            ("modify_gold SubtractAmount 1", new ModifyGoldEvent(NumericOperation.SubtractAmount, 1, 0)));
     }
 
     [Fact]
     public void ModifyRations()
     {
-        Test(("modify_rations AddAmount 1", new ModifyRationsEvent(NumericOperation.AddAmount, 1)),
-            ("modify_rations SetToMinimum 0", new ModifyRationsEvent(NumericOperation.SetToMinimum, 0)),
-            ("modify_rations SubtractAmount 1", new ModifyRationsEvent(NumericOperation.SubtractAmount, 1)));
+        Test(("modify_rations AddAmount 1", new ModifyRationsEvent(NumericOperation.AddAmount, 1, 0)),
+            ("modify_rations SetToMinimum 0", new ModifyRationsEvent(NumericOperation.SetToMinimum, 0, 0)),
+            ("modify_rations SubtractAmount 1", new ModifyRationsEvent(NumericOperation.SubtractAmount, 1, 0)));
     }
 
     [Fact]
@@ -331,7 +332,7 @@ chain_off Set 1 Map.Jirinaar");
     [Fact]
     public void DoScript()
     {
-        Test(@"do_script Script.Unknown1");
+        Test(@"do_script Script.TomMeetsChristine");
     }
 
     [Fact]
@@ -477,7 +478,8 @@ remove_party_member PartyMember.Tom 1 1");
     [Fact]
     public void MapLighting()
     {
-        Test(@"map_lighting SetAmount NeedTorch");
+        Test(@"map_lighting NeedTorch");
+        Test(@"map_lighting NeedTorch 1");
     }
 
     [Fact]

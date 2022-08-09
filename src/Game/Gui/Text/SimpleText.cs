@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Text;
@@ -34,7 +34,7 @@ public class SimpleText : UiElement, IText, ITextBuilder<SimpleText>
     public SimpleText Right() { _block.Alignment = TextAlignment.Right; Version++; return this; }
     public SimpleText Justify() { _block.Alignment = TextAlignment.Justified; Version++; return this; }
     public SimpleText NoWrap() { _block.ArrangementFlags |= TextArrangementFlags.NoWrap; Version++; return this; }
-    public SimpleText Ink(FontColor color) { _block.Color = color; Version++; return this; }
+    public SimpleText Ink(InkId id) { _block.InkId = id; Version++; return this; }
     public SimpleText Language(string language) => this;
     public override string ToString() => $"SimpleText \"{_block.Text}\"";
 }

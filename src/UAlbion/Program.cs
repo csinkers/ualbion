@@ -27,9 +27,7 @@ static class Program
 {
     static void Main(string[] args)
     {
-#if DEBUG
         PerfTracker.IsTracing = true;
-#endif
         PerfTracker.StartupEvent("Entered main");
         AssetSystem.LoadEvents();
         PerfTracker.StartupEvent("Built event parsers");

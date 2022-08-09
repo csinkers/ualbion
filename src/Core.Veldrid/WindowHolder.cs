@@ -79,7 +79,7 @@ class WindowHolder : Component, IDisposable
         _lastTitleUpdateTime = DateTime.UtcNow;
     }
 
-    public void Dispose() => _window.Close();
+    public void Dispose() => _window?.Close();
     public void PumpEvents(double deltaSeconds)
     {
         SetTitle();

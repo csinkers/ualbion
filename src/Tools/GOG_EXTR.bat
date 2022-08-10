@@ -1,6 +1,6 @@
 @echo off
 
-if not exist "C:\ualbion.sln" goto c_dir_err
+if not exist "C:\src\UAlbion\Program.cs" goto c_dir_err
 goto c_dir_ok
 
 :c_dir_err

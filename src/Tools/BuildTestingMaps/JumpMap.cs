@@ -10,9 +10,11 @@ public static class JumpMap
     const byte MapWidth = 64;
     const byte MapHeight = 64;
 
-    public static Dictionary<AssetId, object> Build(MapId mapId, (MapId id, string name)[] portals)
+    public static Dictionary<AssetId, object> Build(MapId mapId, (MapId id, string name)[] portals, TestTilemap tileset1)
     {
-        var builder = MapBuilder.Create2D(mapId, Palette1Id, Tileset1.Tileset.Id, MapWidth, MapHeight);
+        if (tileset1 == null) throw new ArgumentNullException(nameof(tileset1));
+
+        var builder = MapBuilder.Create2D(mapId, Palette1Id, tileset1, MapWidth, MapHeight);
         builder.DrawBorder();
         builder.SetChain(portals.Length, _ => @$"teleport Map.300 8 8, chain_off Set {portals.Length}");
         builder.AddGlobalZone(TriggerTypes.EveryStep, portals.Length);

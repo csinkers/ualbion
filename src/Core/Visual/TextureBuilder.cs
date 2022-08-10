@@ -100,7 +100,7 @@ namespace UAlbion.Core.Visual
 
         public TextureBuilder<T> Border(T color, bool[] pattern = null) => Rect(color, 0, 0, Width - 1, Height - 1, pattern);
 
-        public TextureBuilder<T> Text(string text, T color, int x, int y, ITextureBuilderFont font)
+        public TextureBuilder<T> Text(string text, T color, int x, int y, IFont font)
         {
             if (font == null) throw new ArgumentNullException(nameof(font));
             if (text == null)
@@ -110,13 +110,13 @@ namespace UAlbion.Core.Visual
             var toBuffer = _texture.GetMutableLayerBuffer(0);
             foreach (var c in text)
             {
-                var fromBuffer = font.GetRegion(c);
+                var fromBuffer = font.GetRegionBuffer(c);
                 for (int j = 0; j < fromBuffer.Height; j++)
                 {
                     var fromSlice = fromBuffer.Buffer.Slice(j * fromBuffer.Stride, fromBuffer.Width);
                     var toSlice = toBuffer.Buffer.Slice((y + j) * toBuffer.Stride + x, toBuffer.Width);
                     for (int i = 0; i < fromSlice.Length; i++)
-                        if (!font.IsTransparent(fromSlice[i]))
+                        if (fromSlice[i] != 0)
                             toSlice[i] = color;
                 }
 

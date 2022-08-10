@@ -1,6 +1,6 @@
 ﻿using UAlbion.Base;
 using UAlbion.Config;
-using UAlbion.Core.Visual;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Ids;
 using static BuildTestingMaps.Constants;
@@ -16,7 +16,6 @@ public class TestLab
     // public int OneMonsterObjGroupOffset { get; }
     // public int TwoMonstersObjGroupOffset { get; }
     public LabyrinthData Lab { get; }
-    public Dictionary<AssetId, object> Assets { get; } = new();
 
     const string ValidCharacters = " abcdefghijklmnopqrstuvwxyz0123456789";
     public byte FloorIndexForChar(char c)
@@ -27,7 +26,7 @@ public class TestLab
         return (byte)(index + TextFloorOffset);
     }
 
-    public TestLab(ITextureBuilderFont font, ITextureBuilderFont bigFont)
+    public TestLab(Dictionary<AssetId, object> assets, IAssetManager assetManager)
     {
         Lab = new LabyrinthData(Labyrinth.Jirinaar)
         {
@@ -50,7 +49,7 @@ public class TestLab
 
         BlankFloorOffset = Lab.FloorAndCeilings.Count + 1; // Skip 'blank' pseudo entry
         var brick = T64((SpriteId)Floor.Brick).FillAll(CGrey12).Border(CBlue2).Texture;
-        Assets[(SpriteId)brick.Id] = brick;
+        assets[(SpriteId)brick.Id] = brick;
         Lab.FloorAndCeilings.Add(new() { SpriteId = Floor.Brick, });
 /*
         MonsterObjOffset = Lab.Objects.Count;
@@ -92,15 +91,15 @@ public class TestLab
 */
         TextFloorOffset = Lab.FloorAndCeilings.Count + 1;
         int gfxIndex = 2;
+        var bigFont = assetManager.LoadFont(Font.DebugFont10, Ink.White);
         foreach (var c in ValidCharacters)
         {
             var spriteId = new SpriteId(AssetType.Floor, gfxIndex);
-            Assets[spriteId] = T64(spriteId).FillAll(CBlueGrey7).Border(COrange3).Text(c.ToString(), CGreen5, 2, 2, bigFont).Texture;
+            assets[spriteId] = T64(spriteId).FillAll(CBlueGrey7).Border(COrange3).Text(c.ToString(), CGreen5, 2, 2, bigFont).Texture;
             Lab.FloorAndCeilings.Add(new FloorAndCeiling { Properties = 0, SpriteId = spriteId, });
             gfxIndex++;
         }
 
-        Assets[Lab.Id] = Lab;
+        assets[Lab.Id] = Lab;
     }
-
 }

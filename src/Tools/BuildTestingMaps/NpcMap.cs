@@ -12,9 +12,11 @@ public static class NpcMap
     const byte MapWidth = 255;
     const byte MapHeight = 255;
     static int Pos(int x, int y) => y * MapWidth + x;
-    public static Dictionary<AssetId, object> Build(MapId mapId)
+    public static Dictionary<AssetId, object> Build(MapId mapId, TestTilemap tileset1)
     {
-        var builder = MapBuilder.Create2D(mapId, Palette1Id, Tileset1.Tileset.Id, MapWidth, MapHeight);
+        if (tileset1 == null) throw new ArgumentNullException(nameof(tileset1));
+
+        var builder = MapBuilder.Create2D(mapId, Palette1Id, tileset1, MapWidth, MapHeight);
         builder.DrawBorder();
 
         for (int index = 0; index < 250; index++)
@@ -45,10 +47,10 @@ public static class NpcMap
                 MajMin(cellW, cellH, (i, j) =>
                 {
                     if (i == 0 || j == 0 || i == (cellW - 1) || j == (cellH - 1))
-                        map.Tiles[Pos(x0 + i, y0 + j)].Underlay = Tileset1.SolidOffset; // Draw cell walls
+                        map.Tiles[Pos(x0 + i, y0 + j)].Underlay = tileset1.SolidOffset; // Draw cell walls
                 });
 
-                map.Tiles[Pos(x0 + 1, y0 + 1)].Underlay = (ushort)(Tileset1.UnderlayOffset + cellIndex); // Add marker
+                map.Tiles[Pos(x0 + 1, y0 + 1)].Underlay = (ushort)(tileset1.UnderlayOffset + cellIndex); // Add marker
                 if (cellIndex < 250)
                     map.AddZone((byte)(x0 + 1), (byte)(y0 + 1), TriggerTypes.Manipulate, (ushort)cellIndex);
 

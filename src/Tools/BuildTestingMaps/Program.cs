@@ -28,8 +28,10 @@ public static class Program
             [Palette1Id] = Palette1,
         };
 
-        foreach (var kvp in Tileset1.Assets) assets[kvp.Key] = kvp.Value;
-        foreach (var kvp in Lab1.Assets) assets[kvp.Key] = kvp.Value;
+        var assetManager = baseExchange.Resolve<IAssetManager>();
+
+        var tileset1 = new TestTilemap(assets, assetManager);
+        var lab1 = new TestLab(assets, assetManager);
 
         void Merge(Dictionary<AssetId, object> newAssets)
         {
@@ -37,17 +39,17 @@ public static class Program
                 assets[kvp.Key] = kvp.Value;
         }
 
-        Merge(NpcMap.Build((Map)301));
-        Merge(FlagTestMap.Build((Map)100));
-        Merge(Test3DMap.Build((Map)101));
-        Merge(EventMap.Build((Map)302));
+        Merge(NpcMap.Build((Map)301, tileset1));
+        Merge(FlagTestMap.Build((Map)100, tileset1));
+        Merge(Test3DMap.Build((Map)101, lab1));
+        Merge(EventMap.Build((Map)302, tileset1));
         Merge(JumpMap.Build((Map)300, new[]
         {
             ((MapId)(Map)301, "NPC test map"),
             ((Map)100, "Flag test map"),
             ((Map)101, "3D test map"),
             ((Map)302, "Event test map"),
-        }));
+        }, tileset1));
 
         (object? asset, AssetInfo? info) LoaderFunc(AssetId id, string lang)
             => assets.TryGetValue(id, out var asset)

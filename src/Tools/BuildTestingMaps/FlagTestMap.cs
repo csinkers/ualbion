@@ -10,10 +10,12 @@ public static class FlagTestMap
     const byte MapWidth = 255;
     const byte MapHeight = 255;
     static int Pos(int x, int y) => y * MapWidth + x;
-    public static Dictionary<AssetId, object> Build(MapId mapId)
+    public static Dictionary<AssetId, object> Build(MapId mapId, TestTilemap tileset1)
     {
+        if (tileset1 == null) throw new ArgumentNullException(nameof(tileset1));
+
         var assets = new Dictionary<AssetId, object>();
-        var builder = MapBuilder.Create2D(mapId, Palette1Id, Tileset1.Tileset.Id, MapWidth, MapHeight);
+        var builder = MapBuilder.Create2D(mapId, Palette1Id, tileset1, MapWidth, MapHeight);
         // int nextScriptId = 1;
 
         builder.DrawBorder();
@@ -245,7 +247,7 @@ if (get_ticker 101 Equals 0) {{
                 int x0 = 2 + i;
                 int y0 = 2 + j;
                 for (int unk7 = 0; unk7 < 8; unk7++)
-                    map.Tiles[Pos(x0 + (unk7 % 4) * 9, y0 + (unk7 / 4) * 9)].Overlay = (ushort)(Tileset1.Unk7Type0Offset + unk7);
+                    map.Tiles[Pos(x0 + (unk7 % 4) * 9, y0 + (unk7 / 4) * 9)].Overlay = (ushort)(tileset1.Unk7Type0Offset + unk7);
             });
         });
 

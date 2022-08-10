@@ -123,11 +123,15 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         }
 
         bool first = true;
+        GraphicsBackend? oldBackend = null;
+
         while (!_done)
         {
             GraphicsBackend backend = _newBackend ?? _graphicsDevice.BackendType;
             using (PerfTracker.InfrequentEvent($"change backend to {backend}"))
-                ChangeBackend(backend);
+                ChangeBackend(backend, oldBackend);
+
+            oldBackend = _newBackend;
             _newBackend = null;
 
             if (first)
@@ -231,7 +235,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         }
     }
 
-    void ChangeBackend(GraphicsBackend backend)
+    void ChangeBackend(GraphicsBackend backend, GraphicsBackend? oldBackend)
     {
         if (_useRenderDoc)
         {
@@ -264,29 +268,40 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         // if (singleThreadedProperty != null)
         //     singleThreadedProperty.SetValueDirect(__makeref(gdOptions), true);
 
-        if (_windowHolder != null)
+        try
         {
-            _windowHolder.CreateWindow(_defaultX, _defaultY, _defaultWidth, _defaultHeight);
-            _graphicsDevice = VeldridStartup.CreateGraphicsDevice(_windowHolder.Window, gdOptions, backend);
-        }
-        else
-        {
-            _graphicsDevice = backend switch
+            if (_windowHolder != null)
             {
-                GraphicsBackend.Direct3D11 => GraphicsDevice.CreateD3D11(gdOptions),
-                GraphicsBackend.Metal => GraphicsDevice.CreateMetal(gdOptions),
-                GraphicsBackend.Vulkan => GraphicsDevice.CreateVulkan(gdOptions),
-                _ => throw new InvalidOperationException($"Unsupported backend for headless rendering: {backend}")
-            };
+                _windowHolder.CreateWindow(_defaultX, _defaultY, _defaultWidth, _defaultHeight);
+                _graphicsDevice = VeldridStartup.CreateGraphicsDevice(_windowHolder.Window, gdOptions, backend);
+            }
+            else
+            {
+                _graphicsDevice = backend switch
+                {
+                    GraphicsBackend.Direct3D11 => GraphicsDevice.CreateD3D11(gdOptions),
+                    GraphicsBackend.Metal => GraphicsDevice.CreateMetal(gdOptions),
+                    GraphicsBackend.Vulkan => GraphicsDevice.CreateVulkan(gdOptions),
+                    _ => throw new InvalidOperationException($"Unsupported backend for headless rendering: {backend}")
+                };
+            }
+
+            _graphicsDevice.WaitForIdle();
+            _frameCommands = _graphicsDevice.ResourceFactory.CreateCommandList();
+            _frameCommands.Name = "Frame Commands List";
+
+            Raise(new DeviceCreatedEvent(_graphicsDevice));
+            Raise(new BackendChangedEvent());
         }
+        catch (Exception ex)
+        {
+            if (!oldBackend.HasValue)
+                throw;
 
-        _graphicsDevice.WaitForIdle();
-
-        _frameCommands = _graphicsDevice.ResourceFactory.CreateCommandList();
-        _frameCommands.Name = "Frame Commands List";
-
-        Raise(new DeviceCreatedEvent(_graphicsDevice));
-        Raise(new BackendChangedEvent());
+            Error($"Failed to create graphics device for {backend}: {ex}");
+            Error($"Falling back to {oldBackend}");
+            ChangeBackend(oldBackend.Value, null);
+        }
     }
 
     void DestroyAllObjects()
@@ -305,7 +320,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
     public unsafe Image<Bgra32> RenderFrame(bool captureWithRenderDoc, int phase)
     {
         if(_newBackend != null)
-            ChangeBackend(_newBackend.Value);
+            ChangeBackend(_newBackend.Value, _graphicsDevice?.BackendType);
         _newBackend = null;
 
         if (captureWithRenderDoc)

@@ -11,30 +11,34 @@ public class MapBuilder
     readonly ListStringCollection _mapStrings = new();
     readonly Dictionary<int, string> _scripts = new();
     readonly BaseMapData _map;
+    readonly TestTilemap _tilemap;
+    readonly TestLab _lab;
 
-    MapBuilder(MapId id, PaletteId palette, TilesetId tileset, byte width, byte height)
+    MapBuilder(MapId id, PaletteId palette, TestTilemap tilemap, byte width, byte height)
     {
         Id = id;
         Width = width;
         Height = height;
-        _map = new MapData2D(id, palette, tileset, width, height) { Flags = MapFlags.V2NpcData | MapFlags.ExtraNpcs };
+        _tilemap = tilemap ?? throw new ArgumentNullException(nameof(tilemap));
+        _map = new MapData2D(id, palette, tilemap.Tileset.Id, width, height) { Flags = MapFlags.V2NpcData | MapFlags.ExtraNpcs };
         while (_map.Npcs.Count < 96)
             _map.Npcs.Add(MapNpc.Unused);
     }
 
-    MapBuilder(MapId id, PaletteId palette, LabyrinthId labyrinth, byte width, byte height)
+    MapBuilder(MapId id, PaletteId palette, TestLab lab, byte width, byte height)
     {
         Id = id;
         Width = width;
         Height = height;
-        _map = new MapData3D(id, palette, labyrinth, width, height) { Flags = MapFlags.V2NpcData | MapFlags.ExtraNpcs };
+        _lab = lab;
+        _map = new MapData3D(id, palette, lab.Lab.Id, width, height) { Flags = MapFlags.V2NpcData | MapFlags.ExtraNpcs };
         while (_map.Npcs.Count < 96)
             _map.Npcs.Add(MapNpc.Unused);
     }
 
     public int AddMapText(string text) => _mapStrings.FindOrAdd(text);
-    public static MapBuilder Create2D(MapId id, PaletteId palette, TilesetId tileset, byte width, byte height) => new(id, palette, tileset, width, height);
-    public static MapBuilder Create3D(MapId id, PaletteId palette, LabyrinthId lab, byte width, byte height) => new(id, palette, lab, width, height);
+    public static MapBuilder Create2D(MapId id, PaletteId palette, TestTilemap tilemap, byte width, byte height) => new(id, palette, tilemap, width, height);
+    public static MapBuilder Create3D(MapId id, PaletteId palette, TestLab lab, byte width, byte height) => new(id, palette, lab, width, height);
 
     public MapId Id { get; }
     public int Width { get; }
@@ -72,8 +76,8 @@ public class MapBuilder
                 var x = i % m.Width;
                 m.Tiles[i] = new MapTile(
                     x == 0 || y == 0 || x == m.Width - 1 || y == m.Height - 1
-                        ? Constants.Tileset1.SolidOffset
-                        : Constants.Tileset1.BlankOffset, 0);
+                        ? _tilemap.SolidOffset
+                        : _tilemap.BlankOffset, 0);
             }
         });
     }
@@ -91,7 +95,7 @@ if (query_verb examine) {{
         Draw2D(m =>
         {
             m.AddZone((byte)x, (byte)y, TriggerTypes.Examine | TriggerTypes.Manipulate, (ushort)index);
-            m.Tiles[ y * m.Width + x].Underlay = (ushort)(Constants.Tileset1.TextOffset + description[0]);
+            m.Tiles[ y * m.Width + x].Underlay = (ushort)(_tilemap.TextOffset + description[0]);
         });
     }
 

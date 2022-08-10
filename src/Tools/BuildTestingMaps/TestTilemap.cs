@@ -1,6 +1,7 @@
 ﻿using UAlbion.Api.Visual;
 using UAlbion.Config;
-using UAlbion.Core.Visual;
+using UAlbion.Formats;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Ids;
 using static BuildTestingMaps.Constants;
@@ -23,7 +24,6 @@ public class TestTilemap
     public ushort AnimLoopOverlayOffset { get; }
     public ushort AnimCycleOverlayOffset { get; }
     public TilesetData Tileset { get; }
-    public Dictionary<AssetId, object> Assets { get; }= new();
 
     public ushort IndexForChar(char c)
     {
@@ -31,7 +31,7 @@ public class TestTilemap
         return (ushort)((c - ' ') + TextOffset);
     }
 
-    static IReadOnlyTexture<byte> MakeTileGfx(bool overlay, byte num, ITextureBuilderFont font)
+    static IReadOnlyTexture<byte> MakeTileGfx(bool overlay, byte num, MetaFont font)
     {
         var t = T16(null).FillRect(overlay ? CBlue2 : CGrey6, 0, 0, TileWidth, overlay ? TileHeight / 2 : TileHeight);
 
@@ -43,8 +43,14 @@ public class TestTilemap
                 .Texture;
     }
 
-    public TestTilemap(ITextureBuilderFont font, ITextureBuilderFont bigFont)
+    public TestTilemap(Dictionary<AssetId, object> assets, IAssetManager assetManager)
     {
+        if (assets == null) throw new ArgumentNullException(nameof(assets));
+        if (assetManager == null) throw new ArgumentNullException(nameof(assetManager));
+
+        var font = assetManager.LoadFont(UAlbion.Base.Font.DebugFont6, UAlbion.Base.Ink.White);
+        var bigFont = assetManager.LoadFont(UAlbion.Base.Font.DebugFont10, UAlbion.Base.Ink.White);
+
         var tiles = new List<IReadOnlyTexture<byte>>
         {
             T16(null).FillAll(CBlack1).Texture,
@@ -162,8 +168,8 @@ public class TestTilemap
         });
 
         var gfxId = (SpriteId)UAlbion.Base.TilesetGfx.Toronto;
-        Assets[gfxId] = new SimpleTileGraphics(BlitUtil.CombineFramesVertically(gfxId, tiles));
-        Assets[Tileset.Id] = Tileset;
+        assets[gfxId] = new SimpleTileGraphics(BlitUtil.CombineFramesVertically(gfxId, tiles));
+        assets[Tileset.Id] = Tileset;
     }
 
     public ushort Unk7Type0Offset { get; }

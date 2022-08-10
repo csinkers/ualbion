@@ -3,14 +3,11 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Ids;
-using UAlbion.Game.Veldrid.Assets;
 
 namespace BuildTestingMaps;
 
 public static class Constants
 {
-    const string FontInfoPath = @"C:\Depot\bb\ualbion\mods\UATestDev\Fonts.json";
-    const string FontPngPath = @"C:\Depot\bb\ualbion\mods\UATestDev\Fonts.png";
     public const int TileWidth = 16;
     public const int TileHeight = 16;
 
@@ -80,7 +77,7 @@ public static class Constants
     public const byte CGrey15 = (byte)CommonColor.Grey15;
     public const byte CMidGrey = (byte)CommonColor.MidGrey;
 
-    public readonly static byte[] CRainbowLoop = {
+    public static readonly byte[] CRainbowLoop = {
         (byte)CommonColor.Flesh1,
         (byte)CommonColor.Flesh2,
         (byte)CommonColor.Flesh3,
@@ -129,20 +126,12 @@ public static class Constants
 
     public static TextureBuilder<byte> T16(IAssetId? id) => TextureBuilder.Create<byte>(id, TileWidth, TileHeight);
     public static TextureBuilder<byte> T64(IAssetId? id) => TextureBuilder.Create<byte>(id, 64, 64);
-    public static MultiFont? Font { get; }
-    public static SingleFont Font6 { get; }
-    public static SingleFont Font10 { get; }
     public static AlbionPalette PaletteCommon { get; }
     public static PaletteId Palette1Id { get; }
     public static AlbionPalette Palette1 { get; }
-    public static TestTilemap Tileset1 { get; }
-    public static TestLab Lab1 { get; }
 
     static Constants()
     {
-        Font = MultiFont.Load(FontInfoPath, FontPngPath);
-        Font6 = Font.GetFont(6);
-        Font10 = Font.GetFont(10);
         Palette1Id = UAlbion.Base.Palette.Toronto2D;
         var commonRaw = new uint[256];
         var torontoRaw = new uint[256];
@@ -150,8 +139,6 @@ public static class Constants
         Array.Copy(RawPalette, 0, torontoRaw, 0, 255);
         PaletteCommon = new AlbionPalette(((PaletteId)UAlbion.Base.Palette.Common).ToUInt32(), null, commonRaw);
         Palette1 = new AlbionPalette(Palette1Id.ToUInt32(), Palette1Id.ToString(), torontoRaw);
-        Tileset1 = new TestTilemap(Font6, Font10);
-        Lab1 = new TestLab(Font6, Font10);
     }
 
     public static void MajMin(int min, int maj, Action<int, int> func)

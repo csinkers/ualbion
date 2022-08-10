@@ -11,10 +11,12 @@ class Test3DMap
     const byte MapWidth = 64;
     const byte MapHeight = 64;
     //  static int Pos(int x, int y) => y * MapWidth + x;
-    public static Dictionary<AssetId, object> Build(MapId mapId)
+    public static Dictionary<AssetId, object> Build(MapId mapId, TestLab lab1)
     {
+        if (lab1 == null) throw new ArgumentNullException(nameof(lab1));
+
         var assets = new Dictionary<AssetId, object>();
-        var builder = MapBuilder.Create3D(mapId, Palette1Id, Lab1.Lab.Id, MapWidth, MapHeight);
+        var builder = MapBuilder.Create3D(mapId, Palette1Id, lab1, MapWidth, MapHeight);
         // int nextScriptId = 1;
         builder.Draw3D(map =>
         {
@@ -22,7 +24,7 @@ class Test3DMap
             map.RestMode = RestMode.NoResting;
             map.SubMode = MapSubMode.Unk1;
 
-            Array.Fill(map.Floors, (byte)Lab1.BlankFloorOffset);
+            Array.Fill(map.Floors, (byte)lab1.BlankFloorOffset);
             /*for (int i = 0; i < map.Contents.Length; i++)
             {
                 var y = i / map.Width;

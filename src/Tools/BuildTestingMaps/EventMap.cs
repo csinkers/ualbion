@@ -12,7 +12,7 @@ public static class EventMap
     {
         if (tileset1 == null) throw new ArgumentNullException(nameof(tileset1));
 
-        var builder = MapBuilder.Create2D(mapId, Constants.Palette1Id, tileset1, MapWidth, MapHeight);
+        var builder = new MapBuilder2D(mapId, Constants.Palette1Id, tileset1, MapWidth, MapHeight);
         builder.DrawBorder();
         builder.Marker(1, 3, 3, "Give 10 gold to everyone", s => "change everyone gold AddAmount 100");
 

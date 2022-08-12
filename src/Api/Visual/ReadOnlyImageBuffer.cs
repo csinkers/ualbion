@@ -2,6 +2,7 @@
 
 namespace UAlbion.Api.Visual;
 
+#pragma warning disable CA1000 // Do not declare static members on generic types
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Never compared")]
 public readonly ref struct ReadOnlyImageBuffer<T>
 {
@@ -28,3 +29,4 @@ public readonly ref struct ReadOnlyImageBuffer<T>
     public ReadOnlySpan<T> Buffer { get; }
     public ReadOnlySpan<T> GetRow(int row) => Buffer.Slice(Stride * row, Width);
 }
+#pragma warning restore CA1000 // Do not declare static members on generic types

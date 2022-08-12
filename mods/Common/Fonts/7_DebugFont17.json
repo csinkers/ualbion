@@ -8,6 +8,7 @@
       "X": 52,
       "Width": 17,
       "Height": 17,
+      "PadY": 1,
       "Mapping": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890-=~!@#$%^&*()_+;[]\\',./:{}|\"<>? "
     }
   ]

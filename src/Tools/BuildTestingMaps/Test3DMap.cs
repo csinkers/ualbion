@@ -16,9 +16,9 @@ class Test3DMap
         if (lab1 == null) throw new ArgumentNullException(nameof(lab1));
 
         var assets = new Dictionary<AssetId, object>();
-        var builder = MapBuilder.Create3D(mapId, Palette1Id, lab1, MapWidth, MapHeight);
+        var builder = new MapBuilder3D(mapId, Palette1Id, lab1, MapWidth, MapHeight);
         // int nextScriptId = 1;
-        builder.Draw3D(map =>
+        builder.Draw(map =>
         {
             map.Flags |= MapFlags.Unk8000;
             map.RestMode = RestMode.NoResting;

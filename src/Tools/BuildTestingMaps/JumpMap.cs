@@ -14,7 +14,7 @@ public static class JumpMap
     {
         if (tileset1 == null) throw new ArgumentNullException(nameof(tileset1));
 
-        var builder = MapBuilder.Create2D(mapId, Palette1Id, tileset1, MapWidth, MapHeight);
+        var builder = new MapBuilder2D(mapId, Palette1Id, tileset1, MapWidth, MapHeight);
         builder.DrawBorder();
         builder.SetChain(portals.Length, _ => @$"teleport Map.300 8 8, chain_off Set {portals.Length}");
         builder.AddGlobalZone(TriggerTypes.EveryStep, portals.Length);

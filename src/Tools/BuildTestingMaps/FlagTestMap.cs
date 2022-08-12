@@ -15,11 +15,11 @@ public static class FlagTestMap
         if (tileset1 == null) throw new ArgumentNullException(nameof(tileset1));
 
         var assets = new Dictionary<AssetId, object>();
-        var builder = MapBuilder.Create2D(mapId, Palette1Id, tileset1, MapWidth, MapHeight);
+        var builder = new MapBuilder2D(mapId, Palette1Id, tileset1, MapWidth, MapHeight);
         // int nextScriptId = 1;
 
         builder.DrawBorder();
-        builder.Draw2D(map =>
+        builder.Draw(map =>
         {
             map.Flags |= MapFlags.Unk8000;  
 

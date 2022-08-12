@@ -11,6 +11,7 @@ public class FontComponent
     public int Height { get; set; }
     public int X { get; set; }
     public int Y { get; set; }
+    public int PadY { get; set; }
     public string Mapping { get; set; }
 
     public Region TryGetRegion(char c, ITexture texture)
@@ -20,7 +21,7 @@ public class FontComponent
             return null;
 
         int x = X;
-        int y = Y + Height * index;
+        int y = Y + (Height + PadY) * index;
 
         if (x + Width > texture.Width || y + Height > texture.Height)
         {

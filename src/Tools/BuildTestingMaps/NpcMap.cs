@@ -16,7 +16,7 @@ public static class NpcMap
     {
         if (tileset1 == null) throw new ArgumentNullException(nameof(tileset1));
 
-        var builder = MapBuilder.Create2D(mapId, Palette1Id, tileset1, MapWidth, MapHeight);
+        var builder = new MapBuilder2D(mapId, Palette1Id, tileset1, MapWidth, MapHeight);
         builder.DrawBorder();
 
         for (int index = 0; index < 250; index++)
@@ -28,7 +28,7 @@ public static class NpcMap
 	");
         }
 
-        builder.Draw2D(map =>
+        builder.Draw(map =>
         {
             map.Flags |= MapFlags.Unk8000; 
 

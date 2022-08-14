@@ -18,7 +18,7 @@
     "015": { "Offset": 1029760, "Width": 16, "Height": 16, "Hotspot": " 7  7" } , // Cursor2dDownRight
     "016": { "Offset": 1030016, "Width": 16, "Height": 16, "Hotspot": " 7  7" } , // Cursor2dDownLeft
     "017": { "Offset": 1030272, "Width": 14, "Height": 12, "Hotspot": " 1  1" } , // CursorSelected
-    "018": { "Offset": 1030452, "Width": 24, "height": 15, "Hotspot": "12  7" } , // CursorCdLoad
+    "018": { "Offset": 1030452, "Width": 24, "Height": 15, "Hotspot": "12  7" } , // CursorCdLoad
     "019": { "Offset": 1030788, "Width": 16, "Height": 19, "Hotspot": " 8  9" } , // CursorWait
     "020": { "Offset": 1031092, "Width": 18, "Height": 25, "Hotspot": " 8 12" } , // CursorMouseClick
     "021": { "Offset": 1031542, "Width":  8, "Height":  8, "Hotspot": " 1  1" } , // CursorSmall

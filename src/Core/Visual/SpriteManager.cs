@@ -37,7 +37,7 @@ public class SpriteManager<TInstance> : ServiceComponent<ISpriteManager<TInstanc
     {
         _totalTime += e.DeltaSeconds;
 
-        if (_totalTime - _lastCleanup <= GetVar(CoreVars.Visual.SpriteManager.CacheCheckIntervalSeconds))
+        if (_totalTime - _lastCleanup <= GetVar(CoreVars.Gfx.SpriteManager.CacheCheckIntervalSeconds))
             return;
 
         lock (_syncRoot)

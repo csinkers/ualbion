@@ -4,7 +4,7 @@
 namespace UAlbion.Core;
 public static class CoreVars
 {
-    public static class Visual
+    public static class Gfx
     {
         public static class TextureSource
         {

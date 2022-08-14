@@ -20,7 +20,7 @@ public static class AssetSystem
 {
     public static void LoadEvents()
     {
-        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(Event)));
+        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Api.Eventing.Event)));
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Core.Events.HelpEvent)));
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Core.Veldrid.Events.InputEvent)));
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Editor.EditorSetPropertyEvent)));
@@ -30,7 +30,8 @@ public static class AssetSystem
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(IsoYawEvent)));
     }
 
-    public static (EventExchange Exchange, Container Services) Setup(
+#pragma warning disable CA2000 // Dispose objects before losing scope
+    public static EventExchange Setup(
         string baseDir,
         AssetMapping mapping,
         IFileSystem disk,
@@ -41,40 +42,44 @@ public static class AssetSystem
         if (disk == null) throw new ArgumentNullException(nameof(disk));
         if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
 
-        IModApplier modApplier = new ModApplier();
         var pathResolver = new PathResolver(baseDir);
-
         var settings = new SettingsManager();
-        var services = new Container("Services", // Need to register settings first, as the AssetLocator relies on it.
-            settings,
-            new AssetLoaderRegistry(),
-            new ContainerRegistry(),
-            new PostProcessorRegistry(),
-            new StdioConsoleLogger(),
-            // new ClipboardManager(),
-            new ImGuiConsoleLogger(),
-            new WordLookup(),
-            new AssetLocator(),
-            modApplier,
-            new AssetManager(),
-            new SpellManager());
 
-#pragma warning disable CA2000 // Dispose objects before losing scope
+        var assetServices = new Container("AssetServices");
         var exchange = new EventExchange(new LogExchange())
             .Register<IPathResolver>(pathResolver)
             .Register(disk)
             .Register(jsonUtil)
-            .Attach(services);
-#pragma warning restore CA2000 // Dispose objects before losing scope
+            .Attach(assetServices);
 
+        assetServices
+            .Add(settings)
+            .Add(new AssetLoaderRegistry())
+            .Add(new ContainerRegistry())
+            .Add(new PostProcessorRegistry())
+            .Add(new AssetLocator());
         PerfTracker.StartupEvent("Registered asset services");
 
+        IModApplier modApplier = new ModApplier();
+        exchange.Attach(modApplier);
         modApplier.LoadMods(mapping, pathResolver, mods ?? UserVars.Gameplay.ActiveMods.Read(settings));
         mapping.ConsistencyCheck();
-        settings.Reload();
         PerfTracker.StartupEvent("Loaded mods");
-        return (exchange, services);
+
+        exchange.Attach(new Container("Logging",
+            new StdioConsoleLogger(),
+            //.Add(new ClipboardManager())
+            new ImGuiConsoleLogger()));
+
+        assetServices
+            .Add(new WordLookup())
+            .Add(new AssetManager())
+            .Add(new SpellManager());
+
+        settings.Reload();
+        return exchange;
     }
+#pragma warning restore CA2000 // Dispose objects before losing scope
 
     public static EventExchange SetupSimple(IFileSystem disk, AssetMapping mapping, params string[] mods) =>
         Setup(
@@ -82,5 +87,5 @@ public static class AssetSystem
             mapping,
             disk,
             new FormatJsonUtil(),
-            mods.Length == 0 ? null : mods.ToList()).Exchange;
+            mods.Length == 0 ? null : mods.ToList());
 }

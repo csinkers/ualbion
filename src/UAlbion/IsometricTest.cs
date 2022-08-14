@@ -74,10 +74,9 @@ sealed class IsometricTest : Component, IDisposable // The engine construction c
         firstPass.Framebuffer.PropertyChanged += (_, _) => UpdateDestRectangle();
         _mainFramebuffer.PropertyChanged += (_, _) => UpdateDestRectangle();
 
-        var source = new AdhocRenderableSource(new[] { quad });
         var copyPass = new RenderPass("Copy Pass", _mainFramebuffer);
-        copyPass.AddSource(source);
-        copyPass.AddRenderer(_quadRenderer);
+        copyPass.Add(new AdhocRenderableSource(new[] { quad }));
+        copyPass.Add(_quadRenderer);
 
         engine.AddRenderPass(copyPass);
 

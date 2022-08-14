@@ -20,7 +20,9 @@ public class WordLookup : ServiceComponent<IWordLookup>, IWordLookup
         if (_lookup.Count == 0)
             Rebuild();
 
-        return _lookup.TryGetValue(s.Trim().ToUpperInvariant(), out var id) ? id : (WordId)AssetId.None;
+        return _lookup.TryGetValue(s.Trim().ToUpperInvariant(), out var id) 
+            ? id 
+            : WordId.None;
     }
 
     void Rebuild()

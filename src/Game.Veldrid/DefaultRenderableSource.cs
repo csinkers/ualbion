@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using UAlbion.Api.Eventing;
 using UAlbion.Core.Visual;
 
 namespace UAlbion.Game.Veldrid;
 
-public class AdhocRenderableSource : IRenderableSource
+public class AdhocRenderableSource : Component, IRenderableSource
 {
     readonly IEnumerable<IRenderable> _renderables;
     public AdhocRenderableSource(IEnumerable<IRenderable> renderables) 

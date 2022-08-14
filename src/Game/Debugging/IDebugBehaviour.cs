@@ -4,8 +4,8 @@ using UAlbion.Api.Eventing;
 
 namespace UAlbion.Game.Debugging;
 
-public interface IDebugBehaviour
+public interface IDebugBehaviour : IComponent
 {
     ReadOnlyCollection<Type> HandledTypes { get; }
-    object Handle(DebugInspectorAction action, ReflectedObject reflected, EventExchange exchange);
+    object Handle(DebugInspectorAction action, ReflectedObject reflected);
 }

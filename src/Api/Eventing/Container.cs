@@ -5,7 +5,7 @@ namespace UAlbion.Api.Eventing;
 public class Container : Component, IContainer
 {
     readonly object _syncRoot = new();
-    public string Name { get; }
+    public virtual string Name { get; }
     public Container(string name) { Name = name; }
     public Container(string name, params IComponent[] components)
     {
@@ -14,8 +14,14 @@ public class Container : Component, IContainer
             Add(component);
     }
 
+    protected virtual bool AddingChild(IComponent child) => true;
+    protected virtual bool RemovingChild(IComponent child) => true;
+
     public IContainer Add(IComponent child)
     {
+        if (!AddingChild(child))
+            return this;
+
         lock (_syncRoot)
             AttachChild(child);
         return this;
@@ -24,6 +30,9 @@ public class Container : Component, IContainer
     public void Remove(IComponent child)
     {
         if (child == null) throw new ArgumentNullException(nameof(child));
+        if (!RemovingChild(child))
+            return;
+
         lock (_syncRoot)
             child.Remove();
     }

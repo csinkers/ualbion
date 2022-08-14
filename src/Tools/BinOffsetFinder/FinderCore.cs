@@ -11,9 +11,7 @@ public class FinderCore : IDisposable
 {
     const int FineBits = 12;
     const int FineMask = (1 << FineBits) - 1;
-    const PixelFormat PixFormat = 
-        //PixelFormat.R8_G8_B8_A8_SNorm;
-        PixelFormat.R8_G8_B8_A8_UNorm;
+    const PixelFormat PixFormat = PixelFormat.R8_G8_B8_A8_UNorm;
     const string VertexShader = @"#version 450
 
 layout(location = 0) in vec2 iPosition;
@@ -76,10 +74,10 @@ void main()
 
     const uint offset = columnOffset + uint(logicalPos.y) * columnWidth + columnX;
 
-    uint slot = Bytes[offset >> 2].B;
-    uint bitOffset = (offset & 0x3) * 8;
-    uint shifted = slot >> bitOffset;
-    uint masked = shifted & 0xff;
+    const uint slot = Bytes[offset >> 2].B;
+    const uint bitOffset = (offset & 0x3) * 8;
+    const uint shifted = slot >> bitOffset;
+    const uint masked = shifted & 0xff;
 
     oColor =
         columnX >= columnWidth
@@ -159,7 +157,7 @@ void main()
         _indexBuffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)(sizeof(short) * Indices.Length), BufferUsage.IndexBuffer));
         _vertexBuffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)(sizeof(Vertex2DTextured) * Vertices.Length), BufferUsage.VertexBuffer));
         _miscBuffer =  gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)sizeof(MiscInfo), BufferUsage.UniformBuffer));
-        var paletteTexture = gd.ResourceFactory.CreateTexture(new TextureDescription(256, 1, 1, 1, 1, PixelFormat.R8_G8_B8_A8_UNorm, TextureUsage.Sampled, TextureType.Texture1D));
+        var paletteTexture = gd.ResourceFactory.CreateTexture(new TextureDescription(256, 1, 1, 1, 1, PixFormat, TextureUsage.Sampled, TextureType.Texture1D));
         _miscDirty = true;
 
         gd.UpdateBuffer(buffer, 0, _data);
@@ -283,7 +281,6 @@ void main()
                 TextureUsage.Sampled | TextureUsage.RenderTarget,
                 TextureType.Texture2D));
 
-
         _framebuffer = _gd.ResourceFactory.CreateFramebuffer(new FramebufferDescription(_depthTarget, _colorTarget));
         _textureId = _imGuiRenderer.GetOrCreateImGuiBinding(_gd.ResourceFactory, _colorTarget);
 
@@ -300,13 +297,12 @@ void main()
             return;
 
         _imGuiRenderer.RemoveImGuiBinding(_colorTarget);
-        _framebuffer.Dispose();
+        _framebuffer?.Dispose();
         _colorTarget.Dispose();
-        _depthTarget.Dispose();
+        _depthTarget?.Dispose();
 
         _colorTarget = null;
     }
-
 
     public void RenderViewer()
     {
@@ -357,15 +353,13 @@ void main()
         Adjuster("Fine", ref _fineOffset, 0, FineMask);
 
         ImGui.Columns(3);
-        ImGui.LabelText("Offset", $"{Offset:x8} = {Offset}");
-        ImGui.SameLine();
 
+        ImGui.LabelText("Offset", $"{Offset:x8} = {Offset}");
         ImGui.NextColumn(); Adjuster("Mag", ref _mag, 1, 32);
         ImGui.NextColumn(); Adjuster("Width", ref _width, 0, 360);
 
         ImGui.Columns(1);
 
-        ImGui.PushStyleColor(ImGuiCol.ChildBg, 0xff00ffff);
         ImGui.Image(_textureId, _childRect);
         ImGui.EndChild();
 
@@ -375,14 +369,11 @@ void main()
             _childRect = childRect;
             _sizeChanged = true;
         }
-
-        ImGui.PopStyleColor();
     }
 
     public void Dispose()
     {
         Cleanup();
-
         _disposer.Dispose();
     }
 }

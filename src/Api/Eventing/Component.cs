@@ -170,7 +170,7 @@ public abstract class Component : IComponent
     /// </summary>
     /// <typeparam name="T">The event type to handle</typeparam>
     /// <param name="callback">The function to call when the event is raised</param>
-    protected void On<T>(Action<T> callback) where T : IEvent => 
+    protected void On<T>(Action<T> callback) where T : IEvent =>
         OnCore<T, Action<T>>(callback, (c, x) => new Handler<T>(c, x, false));
 
     /// <summary>
@@ -179,8 +179,8 @@ public abstract class Component : IComponent
     /// </summary>
     /// <typeparam name="T">The event type to handle</typeparam>
     /// <param name="callback">The function to call when the event is raised</param>
-    protected void OnAsync<T>(Func<T, Action, bool> callback) where T : IAsyncEvent =>
-        OnCore<T, Func<T, Action, bool>>(callback, (c,x)=> new AsyncHandler<T>(c, x, false));
+    protected void OnAsync<T>(AsyncMethod<T> callback) where T : IAsyncEvent =>
+        OnCore<T, AsyncMethod<T>>(callback, (c, x) => new AsyncHandler<T>(c, x, false));
 
     /// <summary>
     /// Add an event handler callback to be called when the relevant event
@@ -189,8 +189,8 @@ public abstract class Component : IComponent
     /// <typeparam name="TEvent">The event type to handle</typeparam>
     /// <typeparam name="TReturn">The type of value returned from async handlers for the event</typeparam>
     /// <param name="callback">The function to call when the event is raised</param>
-    protected void OnAsync<TEvent, TReturn>(Func<TEvent, Action<TReturn>, bool> callback) where TEvent : IAsyncEvent<TReturn> =>
-        OnCore<TEvent, Func<TEvent, Action<TReturn>, bool>>(
+    protected void OnAsync<TEvent, TReturn>(AsyncMethod<TEvent, TReturn> callback) where TEvent : IAsyncEvent<TReturn> =>
+        OnCore<TEvent, AsyncMethod<TEvent, TReturn>>(
             callback, 
             (c,x) => new AsyncHandler<TEvent, TReturn>(c, x, false));
 
@@ -219,8 +219,8 @@ public abstract class Component : IComponent
     /// </summary>
     /// <typeparam name="T">The event type to handle</typeparam>
     /// <param name="callback">The function to call when the event is raised</param>
-    protected void AfterAsync<T>(Func<T, Action, bool> callback) where T : IAsyncEvent =>
-        OnCore<T, Func<T, Action, bool>>(callback, (c,x)=> new AsyncHandler<T>(c, x, true));
+    protected void AfterAsync<T>(AsyncMethod<T> callback) where T : IAsyncEvent =>
+        OnCore<T, AsyncMethod<T>>(callback, (c,x)=> new AsyncHandler<T>(c, x, true));
 
     /// <summary>
     /// Add an event handler callback to be called after all the On handlers for
@@ -229,8 +229,8 @@ public abstract class Component : IComponent
     /// <typeparam name="TEvent">The event type to handle</typeparam>
     /// <typeparam name="TReturn">The type of value returned from async handlers for the event</typeparam>
     /// <param name="callback">The function to call when the event is raised</param>
-    protected void AfterAsync<TEvent, TReturn>(Func<TEvent, Action<TReturn>, bool> callback) where TEvent : IAsyncEvent<TReturn> =>
-        OnCore<TEvent, Func<TEvent, Action<TReturn>, bool>>(
+    protected void AfterAsync<TEvent, TReturn>(AsyncMethod<TEvent, TReturn> callback) where TEvent : IAsyncEvent<TReturn> =>
+        OnCore<TEvent, AsyncMethod<TEvent, TReturn>>(
             callback, 
             (c,x) => new AsyncHandler<TEvent, TReturn>(c, x, true));
 
@@ -356,7 +356,13 @@ public abstract class Component : IComponent
         _children ??= new List<IComponent>();
         _children.Add(child);
         if (child is Component component)
+        {
+#if DEBUG
+            if (component.Parent != this && component.Parent != null)
+                throw new InvalidOperationException($"Attempted to attach {component} to {this}, but it is already attached to {component.Parent}");
+#endif
             component.Parent = this;
+        }
 
         return child;
     }

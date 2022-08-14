@@ -61,7 +61,7 @@ public class AssetFileInfo
 
     internal AssetConfig Config { get; set; }
 
-    public override string ToString() => $"AssetFile: {Filename} ({Map.Count})";
+    public override string ToString() => $"AssetFile: {Filename}{(string.IsNullOrEmpty(Sha256Hash) ? "" : $"#{Sha256Hash}")} ({Map.Count})";
 
     /// <summary>
     /// Retrieve a property's value by name

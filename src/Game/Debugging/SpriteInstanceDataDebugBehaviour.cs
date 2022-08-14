@@ -5,10 +5,10 @@ using UAlbion.Core.Visual;
 
 namespace UAlbion.Game.Debugging;
 
-public class SpriteInstanceDataDebugBehaviour : IDebugBehaviour
+public class SpriteInstanceDataDebugBehaviour : Component, IDebugBehaviour
 {
     public ReadOnlyCollection<Type> HandledTypes { get; } = new(new[] { typeof(SpriteInfo) });
-    public object Handle(DebugInspectorAction action, ReflectedObject reflected, EventExchange exchange)
+    public object Handle(DebugInspectorAction action, ReflectedObject reflected)
     {
         if (reflected?.Parent?.Target is not SpriteInfo[] array)
             return null;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Numerics;
 using ImGuiNET;
 using UAlbion.Api;
@@ -48,19 +47,17 @@ namespace UAlbion.Game.Veldrid.Debugging
 
     */
 
-    public class DebugMapInspector : Component
+    public class DebugMapInspector : Container
     {
-        delegate object DebugBehavior(DebugInspectorAction action, ReflectedObject target, EventExchange exchange);
+        delegate object DebugBehavior(DebugInspectorAction action, ReflectedObject target);
         readonly Dictionary<Type, DebugBehavior> _behaviours = new(); // TODO: Initial size
-        readonly IContainer _services;
         readonly IList<object> _fixedObjects = new List<object>();
         IList<Selection> _hits;
         Vector2 _mousePosition;
         ReflectedObject _lastHoveredItem;
 
-        public DebugMapInspector(IContainer services)
+        public DebugMapInspector() : base("DebugInspector")
         {
-            _services = services;
             On<EngineUpdateEvent>(_ => RenderDialog());
             On<HideDebugWindowEvent>(_ => _hits = null);
             On<ShowDebugInfoEvent>(e =>
@@ -70,12 +67,13 @@ namespace UAlbion.Game.Veldrid.Debugging
             });
         }
 
-        public DebugMapInspector AddBehaviour(IDebugBehaviour behaviour)
+        protected override bool AddingChild(IComponent child)
         {
-            if (behaviour == null) throw new ArgumentNullException(nameof(behaviour));
-            foreach(var type in behaviour.HandledTypes)
-                _behaviours[type] = behaviour.Handle;
-            return this;
+            if (child is IDebugBehaviour behaviour)
+                foreach (var type in behaviour.HandledTypes)
+                    _behaviours[type] = behaviour.Handle;
+
+            return true;
         }
 
         static void BoolOption(string name, Func<bool> getter, Action<bool> setter)
@@ -157,7 +155,6 @@ namespace UAlbion.Game.Veldrid.Debugging
             DrawStats();
             DrawSettings();
             DrawPositions();
-            DrawServices(ref anyHovered);
             DrawExchange(ref anyHovered);
             DrawHits(ref anyHovered);
 
@@ -165,7 +162,9 @@ namespace UAlbion.Game.Veldrid.Debugging
 
             if (!anyHovered && _lastHoveredItem?.Target != null &&
                 _behaviours.TryGetValue(_lastHoveredItem.Target.GetType(), out var callback))
-                callback(DebugInspectorAction.Blur, _lastHoveredItem, Exchange);
+            {
+                callback(DebugInspectorAction.Blur, _lastHoveredItem);
+            }
         }
 
         void DrawStats()
@@ -348,19 +347,6 @@ namespace UAlbion.Game.Veldrid.Debugging
             ImGui.TreePop();
         }
 
-        void DrawServices(ref bool anyHovered)
-        {
-            if (!ImGui.TreeNode("Services")) 
-                return;
-
-            var reflected = Reflector.Reflect(null, _services, null);
-            if (reflected.SubObjects != null)
-                foreach (var child in reflected.SubObjects.OrderBy(x => x.Name))
-                    anyHovered |= RenderNode(child, false);
-
-            ImGui.TreePop();
-        }
-
         void DrawExchange(ref bool anyHovered)
         {
             if (!ImGui.TreeNode("Exchange"))
@@ -401,11 +387,11 @@ namespace UAlbion.Game.Veldrid.Debugging
             {
                 if (_lastHoveredItem?.Target != null &&
                     _behaviours.TryGetValue(_lastHoveredItem.Target.GetType(), out var blurredCallback))
-                    blurredCallback(DebugInspectorAction.Blur, _lastHoveredItem, Exchange);
+                    blurredCallback(DebugInspectorAction.Blur, _lastHoveredItem);
 
                 if (reflected.Target != null &&
                     _behaviours.TryGetValue(reflected.Target.GetType(), out var hoverCallback))
-                    hoverCallback(DebugInspectorAction.Hover, reflected, Exchange);
+                    hoverCallback(DebugInspectorAction.Hover, reflected);
 
                 _lastHoveredItem = reflected;
             }
@@ -425,7 +411,7 @@ namespace UAlbion.Game.Veldrid.Debugging
 
             if (type != null &&
                 _behaviours.TryGetValue(type, out var callback) &&
-                callback(DebugInspectorAction.Format, reflected, Exchange) is string formatted)
+                callback(DebugInspectorAction.Format, reflected) is string formatted)
             {
                 description += " " + formatted;
             }

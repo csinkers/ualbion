@@ -69,7 +69,7 @@ static class Program
             return;
         }
 
-        var (exchange, services) = AssetSystem.Setup(
+        var exchange = AssetSystem.Setup(
             baseDir,
             AssetMapping.Global,
             disk,
@@ -80,14 +80,14 @@ static class Program
         if (commandLine.NeedsEngine)
             mainPass = BuildEngine(commandLine, exchange);
 
-        services.Add(new StdioConsoleReader());
+        exchange.Attach(new StdioConsoleReader()); // TODO: Only add this if running with a console window
 
         var assets = exchange.Resolve<IAssetManager>();
         AutodetectLanguage(exchange, assets);
 
         switch (commandLine.Mode) // ConvertAssets handled above as it requires a specialised asset system setup
         {
-            case ExecutionMode.Game: Albion.RunGame(exchange, services, mainPass, commandLine); break;
+            case ExecutionMode.Game: Albion.RunGame(exchange, mainPass, commandLine); break;
             case ExecutionMode.BakeIsometric: IsometricTest.Run(exchange, commandLine); break;
 
             case ExecutionMode.DumpData:
@@ -163,12 +163,12 @@ static class Program
         var framebuffer = new MainFramebuffer();
         var renderPass = new RenderPass("Main Pass", framebuffer);
         renderPass // TODO: Populate from json so mods can add new render methods
-            .AddRenderer(new SpriteRenderer(framebuffer))
-            .AddRenderer(new BlendedSpriteRenderer(framebuffer))
-            .AddRenderer(new TileRenderer(framebuffer))
-            .AddRenderer(new EtmRenderer(framebuffer))
-            .AddRenderer(new SkyboxRenderer(framebuffer))
-            .AddRenderer(new DebugGuiRenderer(framebuffer))
+            .Add(new SpriteRenderer(framebuffer))
+            .Add(new BlendedSpriteRenderer(framebuffer))
+            .Add(new TileRenderer(framebuffer))
+            .Add(new EtmRenderer(framebuffer))
+            .Add(new SkyboxRenderer(framebuffer))
+            .Add(new DebugGuiRenderer(framebuffer))
             ;
 
         var engine = new Engine(commandLine.Backend, commandLine.UseRenderDoc, commandLine.StartupOnly, true);
@@ -183,15 +183,15 @@ static class Program
             shaderLoader.AddShaderDirectory(shaderPath);
 #pragma warning restore CA2000 // Dispose objects before losing scopes
 
-        exchange
-            .Attach(shaderCache)
-            .Attach(shaderLoader)
-            .Attach(framebuffer)
-            .Attach(renderPass)
-            .Attach(engine)
-            .Attach(new ResourceLayoutSource())
-            ;
+        var engineServices = new Container("Engine", 
+            shaderCache,
+            shaderLoader,
+            framebuffer,
+            renderPass,
+            engine,
+            new ResourceLayoutSource());
 
+        exchange.Attach(engineServices);
         return renderPass;
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;

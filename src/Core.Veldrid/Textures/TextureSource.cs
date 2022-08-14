@@ -6,7 +6,7 @@ using UAlbion.Core.Events;
 using Veldrid;
 using VeldridGen.Interfaces;
 using static System.FormattableString;
-using Vars = UAlbion.Core.CoreVars.Visual.TextureSource;
+using Vars = UAlbion.Core.CoreVars.Gfx.TextureSource;
 
 namespace UAlbion.Core.Veldrid.Textures;
 

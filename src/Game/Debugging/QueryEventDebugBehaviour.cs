@@ -6,7 +6,7 @@ using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Debugging
 {
-    public class QueryEventDebugBehaviour : IDebugBehaviour
+    public class QueryEventDebugBehaviour : Component, IDebugBehaviour
     {
         public ReadOnlyCollection<Type> HandledTypes { get; } = new ReadOnlyCollection<Type>(new[] { typeof(QueryEvent) });
         public object Handle(DebugInspectorAction action, ReflectedObject reflected)
@@ -17,8 +17,8 @@ namespace UAlbion.Game.Debugging
             if (!(reflected.Target is QueryEvent query))
                 return null;
 
-            var querier = Engine.GlobalExchange?.Resolve<IQuerier>();
-            var eventManager = Engine.GlobalExchange?.Resolve<IEventManager>();
+            var querier = Resolve<IQuerier>();
+            var eventManager = Resolve<IEventManager>();
             if (querier == null || eventManager == null)
                 return null;
 

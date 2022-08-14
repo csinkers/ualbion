@@ -12,7 +12,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
-public sealed class RenderPass : Component, IRenderPass, IDisposable
+public sealed class RenderPass : Container, IRenderPass, IDisposable
 {
     readonly Dictionary<Type, IRenderer> _rendererLookup = new();
     readonly List<IRenderer> _renderers = new();
@@ -27,10 +27,9 @@ public sealed class RenderPass : Component, IRenderPass, IDisposable
     ITextureHolder _nightPalette;
     (float Red, float Green, float Blue, float Alpha) _clearColour;
 
-    public RenderPass(string name, IFramebufferHolder framebuffer)
+    public RenderPass(string name, IFramebufferHolder framebuffer) : base(name)
     {
         Framebuffer = framebuffer ?? throw new ArgumentNullException(nameof(framebuffer));
-        Name = name;
 
         On<SetClearColourEvent>(e => _clearColour = (e.Red, e.Green, e.Blue, e.Alpha));
         On<RenderEvent>(_ => UpdatePerFrameResources());
@@ -62,13 +61,24 @@ public sealed class RenderPass : Component, IRenderPass, IDisposable
         AttachChild(_commonSet);
     }
 
-    public RenderPass AddRenderer(IRenderer renderer)
+    protected override bool AddingChild(IComponent child)
+    {
+        if (child is IRenderer renderer)
+            AddRenderer(renderer);
+
+        if (child is IRenderableSource source)
+            AddSource(source);
+
+        return true;
+    }
+
+    void AddRenderer(IRenderer renderer)
     {
         if (renderer == null) throw new ArgumentNullException(nameof(renderer));
 
         var types = renderer.HandledTypes;
         if (types == null || types.Length == 0)
-            return this;
+            return;
 
         if (!_renderers.Contains(renderer))
         {
@@ -86,18 +96,14 @@ public sealed class RenderPass : Component, IRenderPass, IDisposable
                     _rendererLookup[type].GetType().Name);
             }
         }
-
-        return this;
     }
 
-    public RenderPass AddSource(IRenderableSource source)
+    void AddSource(IRenderableSource source)
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
         _sources.Add(source);
-        return this;
     }
 
-    public string Name { get; }
     public IFramebufferHolder Framebuffer { get; }
     public override string ToString() => $"Scene:{Name}";
     public void Render(GraphicsDevice device, CommandList cl)

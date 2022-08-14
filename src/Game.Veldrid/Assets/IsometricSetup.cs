@@ -31,9 +31,9 @@ public static class IsometricSetup
         var pathResolver = exchange.Resolve<IPathResolver>();
         var shaderCache = new ShaderCache(pathResolver.ResolvePath("$(CACHE)/ShaderCache"));
         var shaderLoader = new ShaderLoader();
-        var mainPass = new RenderPass("Iso Render Pass", offscreenFB)
-                .AddRenderer(new SpriteRenderer(offscreenFB))
-                .AddRenderer(new EtmRenderer(offscreenFB))
+        var mainPass = (RenderPass)new RenderPass("Iso Render Pass", offscreenFB)
+                .Add(new SpriteRenderer(offscreenFB))
+                .Add(new EtmRenderer(offscreenFB))
             ;
 
         foreach (var shaderPath in exchange.Resolve<IModApplier>().ShaderPaths)
@@ -41,12 +41,6 @@ public static class IsometricSetup
 
         var engine = new Engine(backend, useRenderDoc, false, windowRect != null, windowRect);
         engine.AddRenderPass(mainPass);
-
-        var renderableSources = new IRenderableSource[]
-        {
-            new EtmManager(),
-            new SpriteManager<SpriteInfo>(),
-        };
 
         var services = new Container("IsometricLayoutServices");
         services
@@ -61,18 +55,15 @@ public static class IsometricSetup
             .Add(new VeldridCoreFactory())
             .Add(new SceneStack())
             .Add(new SceneManager()
-                .AddScene(new EmptyScene())
-                .AddScene((IScene)new IsometricBakeScene()
+                .Add(new EmptyScene())
+                .Add((IScene)new IsometricBakeScene()
                     .Add(new PaletteManager())
                     .Add(builder)))
             ;
 
-        foreach (var source in renderableSources)
-        {
-            if (source is IComponent component)
-                services.Add(component);
-            mainPass.AddSource(source);
-        }
+        mainPass
+            .Add(new EtmManager())
+            .Add(new SpriteManager<SpriteInfo>());
 
         return (services, builder);
     }

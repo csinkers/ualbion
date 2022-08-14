@@ -43,20 +43,20 @@ public class ReceiveOnlyHandler<TEvent> : Handler
     public override bool Invoke(IEvent e, object _) { Callback((TEvent) e); return false; }
 }
 
-public class AsyncHandler<TEvent> : Handler
+public class AsyncHandler<TEvent> : Handler where TEvent : IAsyncEvent
 {
     public override bool ShouldSubscribe => true;
-    Func<TEvent, Action, bool> Callback { get; }
-    public AsyncHandler(Func<TEvent, Action, bool> callback, IComponent component, bool isPostHandler)
+    AsyncMethod<TEvent> Callback { get; }
+    public AsyncHandler(AsyncMethod<TEvent> callback, IComponent component, bool isPostHandler)
         : base(typeof(TEvent), component, isPostHandler) => Callback = callback;
     public override bool Invoke(IEvent e, object continuation) => Callback((TEvent)e, (Action)continuation ?? DummyContinuation.Instance);
 }
 
-public class AsyncHandler<TEvent, TReturn> : Handler
+public class AsyncHandler<TEvent, TReturn> : Handler where TEvent : IAsyncEvent<TReturn>
 {
     public override bool ShouldSubscribe => true;
-    Func<TEvent, Action<TReturn>, bool> Callback { get; }
-    public AsyncHandler(Func<TEvent, Action<TReturn>, bool> callback, IComponent component, bool isPostHandler)
+    AsyncMethod<TEvent, TReturn> Callback { get; }
+    public AsyncHandler(AsyncMethod<TEvent, TReturn> callback, IComponent component, bool isPostHandler)
         : base(typeof(TEvent), component, isPostHandler) => Callback = callback;
     public override bool Invoke(IEvent e, object continuation) 
         => Callback((TEvent)e, (Action<TReturn>)continuation ?? DummyContinuation<TReturn>.Instance);

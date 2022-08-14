@@ -14,7 +14,7 @@ namespace UAlbion.Game;
 
 public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
 {
-    static Func<T, Action<bool>, bool> Do<T>(Func<T, bool> func) =>
+    static AsyncMethod<T, bool> Do<T>(Func<T, bool> func) where T : IAsyncEvent<bool> =>
         (e, continuation) =>
         {
             continuation(func(e));

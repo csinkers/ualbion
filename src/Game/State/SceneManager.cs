@@ -9,11 +9,11 @@ using UAlbion.Game.Scenes;
 
 namespace UAlbion.Game.State;
 
-public class SceneManager : ServiceComponent<ISceneManager>, ISceneManager
+public class SceneManager : Container, ISceneManager
 {
     readonly IDictionary<SceneId, IScene> _scenes = new Dictionary<SceneId, IScene>();
 
-    public SceneManager()
+    public SceneManager() : base("SceneManager")
     {
         On<SetSceneEvent>(Set);
     }
@@ -21,17 +21,21 @@ public class SceneManager : ServiceComponent<ISceneManager>, ISceneManager
     public SceneId ActiveSceneId { get; private set; }
     public IScene GetScene(SceneId sceneId) => _scenes.TryGetValue(sceneId, out var scene) ? scene : null;
     public IScene ActiveScene => _scenes[ActiveSceneId];
+    protected override void Subscribing() => Exchange.Register(typeof(ISceneManager), this, false);
+    protected override void Unsubscribed() => Exchange.Unregister(typeof(ISceneManager), this);
 
-    public SceneManager AddScene(IScene scene)
+    protected override bool AddingChild(IComponent child)
     {
-        if (scene == null) throw new ArgumentNullException(nameof(scene));
+        if (child is not IScene scene)
+            return true;
+
         var attrib = (SceneAttribute)scene.GetType().GetCustomAttribute(typeof(SceneAttribute));
-        if (attrib == null) throw new InvalidOperationException($"Expected a Scene attribute on type {scene.GetType().Name}");
+        if (attrib == null)
+            throw new InvalidOperationException($"Expected a Scene attribute on type {scene.GetType().Name}");
 
         scene.IsActive = false;
-        AttachChild(scene);
         _scenes.Add(attrib.SceneId, scene);
-        return this;
+        return true;
     }
 
     void Set(SetSceneEvent e)

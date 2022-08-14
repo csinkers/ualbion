@@ -18,7 +18,7 @@ namespace UAlbion.Game.Gui.Dialogs;
 
 public class Conversation : Component
 {
-    static readonly Vector2 ConversationPositionLeft = new(20, 20); // For give item transitions
+    static readonly Vector2 ConversationPositionLeft = new(20, 20); // For 'give item' transitions
     static readonly Vector2 ConversationPositionRight = new(335, 20);
 
     readonly PartyMemberId _partyMemberId;

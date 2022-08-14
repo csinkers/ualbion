@@ -8,7 +8,7 @@ public static class AssetProperty
     public const string Pattern  = "Pattern"; // string, mostly for DirectoryContainer
     public const string MinimumCount = "MinimumCount"; // Just used to get closer to 1:1 round-tripping of XLDs
     public const string IsReadOnly = "IsReadOnly"; // To prevent zeroing out files when repacking formats that don't have writing code yet, e.g. ILBM images
-    public static string Optional = "Optional"; // bool, will suppress missing-asset warnings when true
+    public const string Optional = "Optional"; // bool, will suppress missing-asset warnings when true
 
     // Textures
     public const string Width      = "Width"; // int

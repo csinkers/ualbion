@@ -35,7 +35,11 @@ public class AssetInfo
             Set(property.Key, property.Value);
     }
 
-    public override string ToString() => $"I:{AssetId} ({File.Filename}.{Index})";
+    public override string ToString()
+    {
+        var hashPart = (string.IsNullOrEmpty(File.Sha256Hash) ? "" : $"#{File.Sha256Hash}");
+        return $"I:{AssetId} ({File.Filename}{hashPart}.{Index})";
+    }
 
     public AssetPathPattern GetPattern(string property, string defaultValue)
     {

@@ -256,6 +256,8 @@ public class ModApplier : Component, IModApplier
         List<string> filesSearched =
 #if DEBUG
             new List<string>();
+
+        bool isOptional = false;
         var loaderWarnings = new StringBuilder();
 #else
             null;
@@ -302,10 +304,14 @@ public class ModApplier : Component, IModApplier
                     asset = modAsset;
                     goto assetFound;
                 }
+
+#if DEBUG
+                isOptional |= info.Get(AssetProperty.Optional, false);
+#endif
             }
 
 #if DEBUG
-            if (asset == null && assetLocations.Length > 0 && filesSearched is { Count: > 0 })
+            if (!isOptional && asset == null && assetLocations.Length > 0 && filesSearched is { Count: > 0 })
             {
                 loaderWarnings.AppendLine(Invariant($"Tried to load asset {id} from mod {mod.Name}"));
                 loaderWarnings.AppendLine("  Files searched:");

@@ -85,6 +85,7 @@
 
     // Fonts
     "Albion/CD/XLDLIBS/FONTS0.XLD#33906F62": { // EN+FR
+      "Optional": true,
       "Loader": "fixedsize",
       "Width": 8,
       "Height": 8,
@@ -95,6 +96,7 @@
       }
     }, 
     "Albion/CD/XLDLIBS/FONTS0.XLD#A70E9601": { // DE
+      "Optional": true,
       "Loader": "fixedsize",
       "Width": 8,
       "Height": 8,

@@ -78,10 +78,7 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
         if (_hashCache.TryGetValue(filename, out var hash))
             return hash;
 
-        using var sha256 = SHA256.Create();
-        using var stream = disk.OpenRead(filename);
-        var hashBytes = sha256.ComputeHash(stream);
-        hash = FormatUtil.BytesToHexString(hashBytes);
+        hash = FormatUtil.GetReducedSha256HexString(filename, disk);
 
         _hashCache[filename] = hash;
         return hash;

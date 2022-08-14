@@ -4,6 +4,7 @@ namespace UAlbion.Base;
 
 public enum Spell : ushort
 {
+    // Dji-Kas
     ThornSnare = 1,
     Unused2 = 2,
     Unused3 = 3,
@@ -35,6 +36,7 @@ public enum Spell : ushort
     Unused29 = 29,
     Unused30 = 30,
 
+    // Dji-Kantos
     Regeneration = 31,
     MapView = 32,
     Lifebringer = 33,
@@ -66,6 +68,7 @@ public enum Spell : ushort
     Unused59 = 59,
     Unused60 = 60,
 
+    // Druid
     Berserk = 61,
     BanishDemon = 62,
     BanishDemons = 63,
@@ -97,6 +100,7 @@ public enum Spell : ushort
     Unused89 = 89,
     Unused90 = 90,
 
+    // Oqulo Kamulos
     Fireball = 91,
     LightningStrike = 92,
     FireRain = 93,
@@ -128,6 +132,7 @@ public enum Spell : ushort
     Unused119 = 119,
     Unused120 = 120,
 
+    // Unk4
     Unused121 = 121,
     Unused122 = 122,
     Unused123 = 123,
@@ -159,6 +164,7 @@ public enum Spell : ushort
     Unused149 = 149,
     Unused150 = 150,
 
+    // Zombie Magic
     ZombiePanic = 151,
     ZombiePoisonBreeze = 152,
     ZombieIrritation = 153,
@@ -190,6 +196,7 @@ public enum Spell : ushort
     Unused179 = 179,
     Unused180 = 180,
 
+    // Unk6
     Unused181 = 181,
     Unused182 = 182,
     Unused183 = 183,

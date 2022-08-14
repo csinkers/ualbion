@@ -212,7 +212,7 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void FontTest()
     {
-        var font = Test(assets => assets.LoadTexture(FontGfx.RegularFont));
+        var font = Test(assets => assets.LoadTexture(FontGfx.Regular));
         Assert.Equal(111, font.Regions.Count);
     }
 

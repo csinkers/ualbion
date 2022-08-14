@@ -4,7 +4,7 @@
   "Margin": 2,
   "Components": [
     {
-      "GraphicsId": "fontgfx.DebugFonts",
+      "GraphicsId": "fontgfx.Debug",
       "X": 37,
       "Width": 14,
       "Height": 14,

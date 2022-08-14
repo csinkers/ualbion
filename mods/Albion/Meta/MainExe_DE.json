@@ -1,0 +1,94 @@
+{
+    "000": { "Id": "coregfx.0",
+             "Offset": 1025980, "Width": 14, "Height": 14, "Hotspot": " 1  1" } , // Cursor
+    "001": { "Offset": 1026176, "Width": 16, "Height": 16, "Hotspot": " 7  3" } , // Cursor3dUp
+    "002": { "Offset": 1026432, "Width": 16, "Height": 16, "Hotspot": " 7 10" } , // Cursor3dDown
+    "003": { "Offset": 1026688, "Width": 16, "Height": 16, "Hotspot": " 2  6" } , // Cursor3dLeft
+    "004": { "Offset": 1026944, "Width": 16, "Height": 16, "Hotspot": "13  6" } , // Cursor3dRight
+    "005": { "Offset": 1027200, "Width": 16, "Height": 16, "Hotspot": " 1  7" } , // Cursor3dTurnLeft90
+    "006": { "Offset": 1027456, "Width": 16, "Height": 16, "Hotspot": "14  7" } , // Cursor3dTurnRight90
+    "007": { "Offset": 1027712, "Width": 16, "Height": 16, "Hotspot": " 5 13" } , // Cursor3dTurnLeft180
+    "008": { "Offset": 1027968, "Width": 16, "Height": 16, "Hotspot": "10 13" } , // Cursor3dTurnRight180
+    "009": { "Offset": 1028224, "Width": 16, "Height": 16, "Hotspot": " 7  7" } , // Cursor2dUp
+    "010": { "Offset": 1028480, "Width": 16, "Height": 16, "Hotspot": " 7  7" } , // Cursor2dDown
+    "011": { "Offset": 1028736, "Width": 16, "Height": 16, "Hotspot": " 7  7" } , // Cursor2dLeft
+    "012": { "Offset": 1028992, "Width": 16, "Height": 16, "Hotspot": " 7  7" } , // Cursor2dRight
+    "013": { "Offset": 1029248, "Width": 16, "Height": 16, "Hotspot": " 7  7" } , // Cursor2dUpLeft
+    "014": { "Offset": 1029504, "Width": 16, "Height": 16, "Hotspot": " 7  7" } , // Cursor2dUpRight
+    "015": { "Offset": 1029760, "Width": 16, "Height": 16, "Hotspot": " 7  7" } , // Cursor2dDownRight
+    "016": { "Offset": 1030016, "Width": 16, "Height": 16, "Hotspot": " 7  7" } , // Cursor2dDownLeft
+    "017": { "Offset": 1030272, "Width": 14, "Height": 12, "Hotspot": " 1  1" } , // CursorSelected
+    "018": { "Offset": 1030452, "Width": 24, "height": 15, "Hotspot": "12  7" } , // CursorCdLoad
+    "019": { "Offset": 1030788, "Width": 16, "Height": 19, "Hotspot": " 8  9" } , // CursorWait
+    "020": { "Offset": 1031092, "Width": 18, "Height": 25, "Hotspot": " 8 12" } , // CursorMouseClick
+    "021": { "Offset": 1031542, "Width":  8, "Height":  8, "Hotspot": " 1  1" } , // CursorSmall
+    "022": { "Offset": 1031606, "Width": 20, "Height": 19, "Hotspot": " 9  9" } , // CursorCrossSelected
+    "023": { "Offset": 1031986, "Width": 22, "Height": 21, "Hotspot": "10 10" } , // CursorCrossUnselected
+    "024": { "Offset": 1032448, "Width": 28, "Height": 20, "Hotspot": "14 10" } , // CursorMemoryLoad
+    "025": { "Offset": 1033038, "Width": 16, "Height": 16, "Hotspot": " 3  3" } , // CursorUpLeft
+    "026": { "Offset": 1033296, "Width": 16, "Height": 14, "Hotspot": "13  3" } , // CursorUpRight
+    "027": { "Offset": 1033844, "Width": 32, "Height": 64 },                      // UiBackground
+    "028": { "Offset": 1035892, "Width": 16, "Height": 12 },                      // UiBackgroundStriped
+    "029": { "Offset": 1036084, "Width": 16, "Height":  3 },                      // UiBackgroundLines1
+    "030": { "Offset": 1036132, "Width": 16, "Height":  3 },                      // UiBackgroundLines2
+    "031": { "Offset": 1036180, "Width": 16, "Height":  3 },                      // UiBackgroundLines3
+    "032": { "Offset": 1036228, "Width": 16, "Height":  3 },                      // UiBackgroundLines4
+    "033": { "Offset": 1036276, "Width": 16, "Height": 16 },                      // UiWindowTopLeft
+    "034": { "Offset": 1036532, "Width": 16, "Height": 16 },                      // UiWindowTopRight
+    "035": { "Offset": 1036788, "Width": 16, "Height": 16 },                      // UiWindowBottomLeft
+    "036": { "Offset": 1037044, "Width": 16, "Height": 16 },                      // UiWindowBottomRight
+    "037": { "Offset": 1037300, "Width": 56, "Height": 16 },                      // UiExitButton
+    "038": { "Offset": 1038196, "Width": 56, "Height": 16 },                      // UiExitButtonPressed
+    "039": { "Offset": 1039092, "Width": 56, "Height": 16 },                      // UiExitButtonHover
+    "040": { "Offset": 1039988, "Width":  8, "Height":  8 },                      // UiOffensiveValue
+    "041": { "Offset": 1040052, "Width":  6, "Height":  8 },                      // UiDefensiveValue
+    "042": { "Offset": 1040100, "Width": 12, "Height": 10 },                      // UiGold
+    "043": { "Offset": 1040220, "Width": 20, "Height": 10 },                      // UiFood
+    "044": { "Offset": 1040420, "Width": 16, "Height": 16 },                      // UiNa
+    "045": { "Offset": 1040676, "Width": 16, "Height": 16 },                      // UiBroken
+    "046": { "Offset": 1040932, "Width": 50, "Height":  8 },                      // UiSpellAdvance
+    "047": { "Offset": 1041332, "Width": 16, "Height": 16 },                      // CombatMove
+    "048": { "Offset": 1041588, "Width": 16, "Height": 16 },                      // CombatAttackMelee
+    "049": { "Offset": 1041844, "Width": 16, "Height": 16 },                      // CombatAttackRange
+    "050": { "Offset": 1042100, "Width": 16, "Height": 16 },                      // CombatRetreat
+    "051": { "Offset": 1042356, "Width": 16, "Height": 16 },                      // CombatMagic
+    "052": { "Offset": 1042612, "Width": 16, "Height": 16 },                      // CombatMagicItem
+    "053": { "Offset": 1042868, "Width": 32, "Height": 27 },                      // MonsterEyeOff
+    "054": { "Offset": 1043732, "Width": 32, "Height": 27 },                      // MonsterEyeOn
+    "055": { "Offset": 1044596, "Width": 32, "Height": 25 },                      // Clock
+    "056": { "Offset": 1045396, "Width":  6, "Height":  7 },                      // ClockNum0
+    "057": { "Offset": 1045438, "Width":  6, "Height":  7 },                      // ClockNum1
+    "058": { "Offset": 1045480, "Width":  6, "Height":  7 },                      // ClockNum2
+    "059": { "Offset": 1045522, "Width":  6, "Height":  7 },                      // ClockNum3
+    "060": { "Offset": 1045564, "Width":  6, "Height":  7 },                      // ClockNum4
+    "061": { "Offset": 1045606, "Width":  6, "Height":  7 },                      // ClockNum5
+    "062": { "Offset": 1045648, "Width":  6, "Height":  7 },                      // ClockNum6
+    "063": { "Offset": 1045690, "Width":  6, "Height":  7 },                      // ClockNum7
+    "064": { "Offset": 1045732, "Width":  6, "Height":  7 },                      // ClockNum8
+    "065": { "Offset": 1045774, "Width":  6, "Height":  7 },                      // ClockNum9
+    "066": { "Offset": 1045816, "Width": 30, "Height": 29 },                      // CompassDe
+    // "067": { "Offset": 1046686, "Width": 30, "Height": 29 },                      // CompassEn
+    // "068": { "Offset": 1047556, "Width": 30, "Height": 29 },                      // CompassFr
+    "069": { "Offset": 1046686, "Width":  6, "Height":  6 },                      // CompassDot0
+    "070": { "Offset": 1046722, "Width":  6, "Height":  6 },                      // CompassDot1
+    "071": { "Offset": 1046758, "Width":  6, "Height":  6 },                      // CompassDot2
+    "072": { "Offset": 1046794, "Width":  6, "Height":  6 },                      // CompassDot3
+    "073": { "Offset": 1046830, "Width":  6, "Height":  6 },                      // CompassDot4
+    "074": { "Offset": 1046866, "Width":  6, "Height":  6 },                      // CompassDot5
+    "075": { "Offset": 1046902, "Width":  6, "Height":  6 },                      // CompassDot6
+    "076": { "Offset": 1046938, "Width":  6, "Height":  6 },                      // CompassDot7
+    "077": { "Offset": 1046974, "Width": 18, "Height": 18 },                      // Select
+    "078": { "Offset": 1047298, "Width": 22, "Height": 22 },                      // Lock
+    "079": { "Offset": 1047782, "Width": 34, "Height": 48 },                      // Producer
+    "080": { "Offset": 1049414, "Width": 32, "Height": 32 },                      // CharEffect1
+    "081": { "Offset": 1050438, "Width": 32, "Height": 32 },                      // CharEffect2
+    "082": { "Offset": 1051461, "Width": 14, "Height": 13 },                      // CharEffect3
+    "083": { "Offset": 1051643, "Width": 16, "Height": 16 },                      // ArrowTurnLeft90
+    "084": { "Offset": 1051899, "Width": 16, "Height": 16 },                      // ArrowTurnRight90
+    "085": { "Offset": 1052155, "Width": 16, "Height": 16 },                      // ArrowTurnLeft180
+    "086": { "Offset": 1052411, "Width": 16, "Height": 16 },                      // ArrowTurnRight180
+    "087": { "Offset": 1052667, "Width": 16, "Height": 16 },                      // ArrowLookUp
+    "088": { "Offset": 1052923, "Width": 16, "Height": 16 }                       // ArrowLookDown
+    // Strange cursor at 1067914 (0x104b8a), width 11
+    // Circular thingy at 1068065 (0x104c21), width 16
+}

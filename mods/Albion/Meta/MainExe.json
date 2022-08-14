@@ -1,94 +1,94 @@
 {
     "000": { "Id": "coregfx.0",
-             "Offset": 1031768, "Width": 14, "Height": 14, "Hotspot": " 1  1" } ,
-    "001": { "Offset": 1031964, "Width": 16, "Height": 16, "Hotspot": " 7  3" } ,
-    "002": { "Offset": 1032220, "Width": 16, "Height": 16, "Hotspot": " 7 10" } ,
-    "003": { "Offset": 1032476, "Width": 16, "Height": 16, "Hotspot": " 2  6" } ,
-    "004": { "Offset": 1032732, "Width": 16, "Height": 16, "Hotspot": "13  6" } ,
-    "005": { "Offset": 1032988, "Width": 16, "Height": 16, "Hotspot": " 1  7" } ,
-    "006": { "Offset": 1033244, "Width": 16, "Height": 16, "Hotspot": "14  7" } ,
-    "007": { "Offset": 1033500, "Width": 16, "Height": 16, "Hotspot": " 5 13" } ,
-    "008": { "Offset": 1033756, "Width": 16, "Height": 16, "Hotspot": "10 13" } ,
-    "009": { "Offset": 1034012, "Width": 16, "Height": 16, "Hotspot": " 7  7" } ,
-    "010": { "Offset": 1034268, "Width": 16, "Height": 16, "Hotspot": " 7  7" } ,
-    "011": { "Offset": 1034524, "Width": 16, "Height": 16, "Hotspot": " 7  7" } ,
-    "012": { "Offset": 1034780, "Width": 16, "Height": 16, "Hotspot": " 7  7" } ,
-    "013": { "Offset": 1035036, "Width": 16, "Height": 16, "Hotspot": " 7  7" } ,
-    "014": { "Offset": 1035292, "Width": 16, "Height": 16, "Hotspot": " 7  7" } ,
-    "015": { "Offset": 1035548, "Width": 16, "Height": 16, "Hotspot": " 7  7" } ,
-    "016": { "Offset": 1035804, "Width": 16, "Height": 16, "Hotspot": " 7  7" } ,
-    "017": { "Offset": 1036060, "Width": 14, "Height": 12, "Hotspot": " 1  1" } ,
-    "018": { "Offset": 1036240, "Width": 24, "height": 15, "Hotspot": "12  7" } ,
-    "019": { "Offset": 1036576, "Width": 16, "Height": 19, "Hotspot": " 8  9" } ,
-    "020": { "Offset": 1036880, "Width": 18, "Height": 25, "Hotspot": " 8 12" } ,
-    "021": { "Offset": 1037330, "Width":  8, "Height":  8, "Hotspot": " 1  1" } ,
-    "022": { "Offset": 1037394, "Width": 20, "Height": 19, "Hotspot": " 9  9" } ,
-    "023": { "Offset": 1037774, "Width": 22, "Height": 21, "Hotspot": "10 10" } ,
-    "024": { "Offset": 1038236, "Width": 28, "Height": 20, "Hotspot": "14 10" } ,
-    "025": { "Offset": 1038826, "Width": 16, "Height": 16, "Hotspot": " 3  3" } ,
-    "026": { "Offset": 1039084, "Width": 16, "Height": 14, "Hotspot": "13  3" } ,
-    "027": { "Offset": 1039632, "Width": 32, "Height": 64 },
-    "028": { "Offset": 1041680, "Width": 16, "Height": 12 },
-    "029": { "Offset": 1041872, "Width": 16, "Height":  3 },
-    "030": { "Offset": 1041920, "Width": 16, "Height":  3 },
-    "031": { "Offset": 1041968, "Width": 16, "Height":  3 },
-    "032": { "Offset": 1042016, "Width": 16, "Height":  3 },
-    "033": { "Offset": 1042064, "Width": 16, "Height": 16 },
-    "034": { "Offset": 1042320, "Width": 16, "Height": 16 },
-    "035": { "Offset": 1042576, "Width": 16, "Height": 16 },
-    "036": { "Offset": 1042832, "Width": 16, "Height": 16 },
-    "037": { "Offset": 1043088, "Width": 56, "Height": 16 },
-    "038": { "Offset": 1043984, "Width": 56, "Height": 16 },
-    "039": { "Offset": 1044880, "Width": 56, "Height": 16 },
-    "040": { "Offset": 1045776, "Width":  8, "Height":  8 },
-    "041": { "Offset": 1045840, "Width":  6, "Height":  8 },
-    "042": { "Offset": 1045888, "Width": 12, "Height": 10 },
-    "043": { "Offset": 1046008, "Width": 20, "Height": 10 },
-    "044": { "Offset": 1046208, "Width": 16, "Height": 16 },
-    "045": { "Offset": 1046464, "Width": 16, "Height": 16 },
-    "046": { "Offset": 1046720, "Width": 50, "Height":  8 },
-    "047": { "Offset": 1047120, "Width": 16, "Height": 16 },
-    "048": { "Offset": 1047376, "Width": 16, "Height": 16 },
-    "049": { "Offset": 1047632, "Width": 16, "Height": 16 },
-    "050": { "Offset": 1047888, "Width": 16, "Height": 16 },
-    "051": { "Offset": 1048144, "Width": 16, "Height": 16 },
-    "052": { "Offset": 1048400, "Width": 16, "Height": 16 },
-    "053": { "Offset": 1048656, "Width": 32, "Height": 27 },
-    "054": { "Offset": 1049520, "Width": 32, "Height": 27 },
-    "055": { "Offset": 1050384, "Width": 32, "Height": 25 },
-    "056": { "Offset": 1051184, "Width":  6, "Height":  7 },
-    "057": { "Offset": 1051226, "Width":  6, "Height":  7 },
-    "058": { "Offset": 1051268, "Width":  6, "Height":  7 },
-    "059": { "Offset": 1051310, "Width":  6, "Height":  7 },
-    "060": { "Offset": 1051352, "Width":  6, "Height":  7 },
-    "061": { "Offset": 1051394, "Width":  6, "Height":  7 },
-    "062": { "Offset": 1051436, "Width":  6, "Height":  7 },
-    "063": { "Offset": 1051478, "Width":  6, "Height":  7 },
-    "064": { "Offset": 1051520, "Width":  6, "Height":  7 },
-    "065": { "Offset": 1051562, "Width":  6, "Height":  7 },
-    "066": { "Offset": 1051604, "Width": 30, "Height": 29 },
-    "067": { "Offset": 1052474, "Width": 30, "Height": 29 },
-    "068": { "Offset": 1053344, "Width": 30, "Height": 29 },
-    "069": { "Offset": 1054214, "Width":  6, "Height":  6 },
-    "070": { "Offset": 1054250, "Width":  6, "Height":  6 },
-    "071": { "Offset": 1054286, "Width":  6, "Height":  6 },
-    "072": { "Offset": 1054322, "Width":  6, "Height":  6 },
-    "073": { "Offset": 1054358, "Width":  6, "Height":  6 },
-    "074": { "Offset": 1054394, "Width":  6, "Height":  6 },
-    "075": { "Offset": 1054430, "Width":  6, "Height":  6 },
-    "076": { "Offset": 1054466, "Width":  6, "Height":  6 },
-    "077": { "Offset": 1054502, "Width": 18, "Height": 18 },
-    "078": { "Offset": 1054826, "Width": 22, "Height": 22 },
-    "079": { "Offset": 1055310, "Width": 34, "Height": 48 },
-    "080": { "Offset": 1056942, "Width": 32, "Height": 32 },
-    "081": { "Offset": 1057966, "Width": 32, "Height": 32 },
-    "082": { "Offset": 1058989, "Width": 14, "Height": 13 },
-    "083": { "Offset": 1059171, "Width": 16, "Height": 16 },
-    "084": { "Offset": 1059427, "Width": 16, "Height": 16 },
-    "085": { "Offset": 1059683, "Width": 16, "Height": 16 },
-    "086": { "Offset": 1059939, "Width": 16, "Height": 16 },
-    "087": { "Offset": 1060195, "Width": 16, "Height": 16 },
-    "088": { "Offset": 1060451, "Width": 16, "Height": 16 }
+             "Offset": 1031768, "Width": 14, "Height": 14, "Hotspot": " 1  1" }, // Cursor
+    "001": { "Offset": 1031964, "Width": 16, "Height": 16, "Hotspot": " 7  3" }, // Cursor3dUp
+    "002": { "Offset": 1032220, "Width": 16, "Height": 16, "Hotspot": " 7 10" }, // Cursor3dDown
+    "003": { "Offset": 1032476, "Width": 16, "Height": 16, "Hotspot": " 2  6" }, // Cursor3dLeft
+    "004": { "Offset": 1032732, "Width": 16, "Height": 16, "Hotspot": "13  6" }, // Cursor3dRight
+    "005": { "Offset": 1032988, "Width": 16, "Height": 16, "Hotspot": " 1  7" }, // Cursor3dTurnLeft90
+    "006": { "Offset": 1033244, "Width": 16, "Height": 16, "Hotspot": "14  7" }, // Cursor3dTurnRight90
+    "007": { "Offset": 1033500, "Width": 16, "Height": 16, "Hotspot": " 5 13" }, // Cursor3dTurnLeft180
+    "008": { "Offset": 1033756, "Width": 16, "Height": 16, "Hotspot": "10 13" }, // Cursor3dTurnRight180
+    "009": { "Offset": 1034012, "Width": 16, "Height": 16, "Hotspot": " 7  7" }, // Cursor2dUp
+    "010": { "Offset": 1034268, "Width": 16, "Height": 16, "Hotspot": " 7  7" }, // Cursor2dDown
+    "011": { "Offset": 1034524, "Width": 16, "Height": 16, "Hotspot": " 7  7" }, // Cursor2dLeft
+    "012": { "Offset": 1034780, "Width": 16, "Height": 16, "Hotspot": " 7  7" }, // Cursor2dRight
+    "013": { "Offset": 1035036, "Width": 16, "Height": 16, "Hotspot": " 7  7" }, // Cursor2dUpLeft
+    "014": { "Offset": 1035292, "Width": 16, "Height": 16, "Hotspot": " 7  7" }, // Cursor2dUpRight
+    "015": { "Offset": 1035548, "Width": 16, "Height": 16, "Hotspot": " 7  7" }, // Cursor2dDownRight
+    "016": { "Offset": 1035804, "Width": 16, "Height": 16, "Hotspot": " 7  7" }, // Cursor2dDownLeft
+    "017": { "Offset": 1036060, "Width": 14, "Height": 12, "Hotspot": " 1  1" }, // CursorSelected
+    "018": { "Offset": 1036240, "Width": 24, "height": 15, "Hotspot": "12  7" }, // CursorCdLoad
+    "019": { "Offset": 1036576, "Width": 16, "Height": 19, "Hotspot": " 8  9" }, // CursorWait
+    "020": { "Offset": 1036880, "Width": 18, "Height": 25, "Hotspot": " 8 12" }, // CursorMouseClick
+    "021": { "Offset": 1037330, "Width":  8, "Height":  8, "Hotspot": " 1  1" }, // CursorSmall
+    "022": { "Offset": 1037394, "Width": 20, "Height": 19, "Hotspot": " 9  9" }, // CursorCrossSelected
+    "023": { "Offset": 1037774, "Width": 22, "Height": 21, "Hotspot": "10 10" }, // CursorCrossUnselected
+    "024": { "Offset": 1038236, "Width": 28, "Height": 20, "Hotspot": "14 10" }, // CursorMemoryLoad
+    "025": { "Offset": 1038826, "Width": 16, "Height": 16, "Hotspot": " 3  3" }, // CursorUpLeft
+    "026": { "Offset": 1039084, "Width": 16, "Height": 14, "Hotspot": "13  3" }, // CursorUpRight
+    "027": { "Offset": 1039632, "Width": 32, "Height": 64 },                     // UiBackground
+    "028": { "Offset": 1041680, "Width": 16, "Height": 12 },                     // UiBackgroundStriped
+    "029": { "Offset": 1041872, "Width": 16, "Height":  3 },                     // UiBackgroundLines1
+    "030": { "Offset": 1041920, "Width": 16, "Height":  3 },                     // UiBackgroundLines2
+    "031": { "Offset": 1041968, "Width": 16, "Height":  3 },                     // UiBackgroundLines3
+    "032": { "Offset": 1042016, "Width": 16, "Height":  3 },                     // UiBackgroundLines4
+    "033": { "Offset": 1042064, "Width": 16, "Height": 16 },                     // UiWindowTopLeft
+    "034": { "Offset": 1042320, "Width": 16, "Height": 16 },                     // UiWindowTopRight
+    "035": { "Offset": 1042576, "Width": 16, "Height": 16 },                     // UiWindowBottomLeft
+    "036": { "Offset": 1042832, "Width": 16, "Height": 16 },                     // UiWindowBottomRight
+    "037": { "Offset": 1043088, "Width": 56, "Height": 16 },                     // UiExitButton
+    "038": { "Offset": 1043984, "Width": 56, "Height": 16 },                     // UiExitButtonPressed
+    "039": { "Offset": 1044880, "Width": 56, "Height": 16 },                     // UiExitButtonHover
+    "040": { "Offset": 1045776, "Width":  8, "Height":  8 },                     // UiOffensiveValue
+    "041": { "Offset": 1045840, "Width":  6, "Height":  8 },                     // UiDefensiveValue
+    "042": { "Offset": 1045888, "Width": 12, "Height": 10 },                     // UiGold
+    "043": { "Offset": 1046008, "Width": 20, "Height": 10 },                     // UiFood
+    "044": { "Offset": 1046208, "Width": 16, "Height": 16 },                     // UiNa
+    "045": { "Offset": 1046464, "Width": 16, "Height": 16 },                     // UiBroken
+    "046": { "Offset": 1046720, "Width": 50, "Height":  8 },                     // UiSpellAdvance
+    "047": { "Offset": 1047120, "Width": 16, "Height": 16 },                     // CombatMove
+    "048": { "Offset": 1047376, "Width": 16, "Height": 16 },                     // CombatAttackMelee
+    "049": { "Offset": 1047632, "Width": 16, "Height": 16 },                     // CombatAttackRange
+    "050": { "Offset": 1047888, "Width": 16, "Height": 16 },                     // CombatRetreat
+    "051": { "Offset": 1048144, "Width": 16, "Height": 16 },                     // CombatMagic
+    "052": { "Offset": 1048400, "Width": 16, "Height": 16 },                     // CombatMagicItem
+    "053": { "Offset": 1048656, "Width": 32, "Height": 27 },                     // MonsterEyeOff
+    "054": { "Offset": 1049520, "Width": 32, "Height": 27 },                     // MonsterEyeOn
+    "055": { "Offset": 1050384, "Width": 32, "Height": 25 },                     // Clock
+    "056": { "Offset": 1051184, "Width":  6, "Height":  7 },                     // ClockNum0
+    "057": { "Offset": 1051226, "Width":  6, "Height":  7 },                     // ClockNum1
+    "058": { "Offset": 1051268, "Width":  6, "Height":  7 },                     // ClockNum2
+    "059": { "Offset": 1051310, "Width":  6, "Height":  7 },                     // ClockNum3
+    "060": { "Offset": 1051352, "Width":  6, "Height":  7 },                     // ClockNum4
+    "061": { "Offset": 1051394, "Width":  6, "Height":  7 },                     // ClockNum5
+    "062": { "Offset": 1051436, "Width":  6, "Height":  7 },                     // ClockNum6
+    "063": { "Offset": 1051478, "Width":  6, "Height":  7 },                     // ClockNum7
+    "064": { "Offset": 1051520, "Width":  6, "Height":  7 },                     // ClockNum8
+    "065": { "Offset": 1051562, "Width":  6, "Height":  7 },                     // ClockNum9
+    "066": { "Offset": 1051604, "Width": 30, "Height": 29 },                     // CompassDe
+    "067": { "Offset": 1052474, "Width": 30, "Height": 29 },                     // CompassEn
+    "068": { "Offset": 1053344, "Width": 30, "Height": 29 },                     // CompassFr
+    "069": { "Offset": 1054214, "Width":  6, "Height":  6 },                     // CompassDot0
+    "070": { "Offset": 1054250, "Width":  6, "Height":  6 },                     // CompassDot1
+    "071": { "Offset": 1054286, "Width":  6, "Height":  6 },                     // CompassDot2
+    "072": { "Offset": 1054322, "Width":  6, "Height":  6 },                     // CompassDot3
+    "073": { "Offset": 1054358, "Width":  6, "Height":  6 },                     // CompassDot4
+    "074": { "Offset": 1054394, "Width":  6, "Height":  6 },                     // CompassDot5
+    "075": { "Offset": 1054430, "Width":  6, "Height":  6 },                     // CompassDot6
+    "076": { "Offset": 1054466, "Width":  6, "Height":  6 },                     // CompassDot7
+    "077": { "Offset": 1054502, "Width": 18, "Height": 18 },                     // Select
+    "078": { "Offset": 1054826, "Width": 22, "Height": 22 },                     // Lock
+    "079": { "Offset": 1055310, "Width": 34, "Height": 48 },                     // Producer
+    "080": { "Offset": 1056942, "Width": 32, "Height": 32 },                     // CharEffect1
+    "081": { "Offset": 1057966, "Width": 32, "Height": 32 },                     // CharEffect2
+    "082": { "Offset": 1058989, "Width": 14, "Height": 13 },                     // CharEffect3
+    "083": { "Offset": 1059171, "Width": 16, "Height": 16 },                     // ArrowTurnLeft90
+    "084": { "Offset": 1059427, "Width": 16, "Height": 16 },                     // ArrowTurnRight90
+    "085": { "Offset": 1059683, "Width": 16, "Height": 16 },                     // ArrowTurnLeft180
+    "086": { "Offset": 1059939, "Width": 16, "Height": 16 },                     // ArrowTurnRight180
+    "087": { "Offset": 1060195, "Width": 16, "Height": 16 },                     // ArrowLookUp
+    "088": { "Offset": 1060451, "Width": 16, "Height": 16 }                      // ArrowLookDown
 }
 
 

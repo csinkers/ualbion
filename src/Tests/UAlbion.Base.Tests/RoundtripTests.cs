@@ -529,7 +529,7 @@ public class RoundtripTests
     [Fact]
     public void FontGfxTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(FontGfx.RegularFont), Width = 8, Height = 8 };
+        var info = new AssetInfo { AssetId = AssetId.From(FontGfx.Regular), Width = 8, Height = 8 };
         RoundTripXld<IReadOnlyTexture<byte>>(nameof(FontGfxTest), "$(ALBION)/CD/XLDLIBS/FONTS0.XLD", 0,
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }

@@ -45,7 +45,7 @@ public class ButtonTests : Component
         var modApplier = new MockModApplier()
                 .Add((FontId)Base.Font.Regular, font)
                 .Add((InkId)Base.Ink.White, MockUniformFont.BuildInk())
-                .Add((SpriteId)Base.FontGfx.RegularFont, MockUniformFont.BuildFontTexture())
+                .Add((SpriteId)Base.FontGfx.Regular, MockUniformFont.BuildFontTexture())
             ;
 
         var settings = new MockSettings();

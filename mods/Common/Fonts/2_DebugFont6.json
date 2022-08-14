@@ -3,7 +3,7 @@
   "SpaceSize": 3,
   "Components": [
     {
-      "GraphicsId": "fontgfx.DebugFonts",
+      "GraphicsId": "fontgfx.Debug",
       "X":  0,
       "Width": 5,
       "Height": 6,

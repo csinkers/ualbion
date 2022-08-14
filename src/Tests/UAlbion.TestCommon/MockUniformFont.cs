@@ -15,7 +15,7 @@ public static class MockUniformFont
             {
                 new()
                 {
-                    GraphicsId = Base.FontGfx.RegularFont,
+                    GraphicsId = Base.FontGfx.Regular,
                     Width = 6,
                     Height = 8,
                     Mapping = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\""?!/()#%*&+-=><☺♀♂éâàçêëèïîìôòûùáíóú"
@@ -32,7 +32,7 @@ public static class MockUniformFont
 
     public static ITexture BuildFontTexture() =>
         new SimpleTexture<byte>(
-            (SpriteId)Base.FontGfx.RegularFont,
+            (SpriteId)Base.FontGfx.Regular,
             "FakeFont", 6, 8 * 256,
             new byte[6 * 8 * 256],
             Enumerable.Range(0, 256).Select(x =>

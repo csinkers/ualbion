@@ -7,16 +7,41 @@ using UAlbion.Api;
 
 namespace UAlbion.Config;
 
+/// <summary>
+/// A JSON configuration file containing all details of how to load and save assets for a given mod.
+/// </summary>
 public class AssetConfig : IAssetConfig
 {
+    /// <summary>
+    /// A set of aliases for enums to be used as asset ids
+    /// </summary>
     [JsonIgnore] public IReadOnlyDictionary<string, AssetTypeInfo>  IdTypes        { get; private set; }
+    /// <summary>
+    /// A set of mappings between asset ids and string ids
+    /// </summary>
     [JsonIgnore] public IReadOnlyDictionary<string, string>         StringMappings { get; private set; }
+    /// <summary>
+    /// A set of aliases for .NET types (deriving from IAssetLoader) to be used for loading assets
+    /// </summary>
     [JsonIgnore] public IReadOnlyDictionary<string, string>         Loaders        { get; private set; }
+    /// <summary>
+    /// A set of aliases for .NET types (deriving from IAssetContainer) to be used for extracting individual assets from container formats.
+    /// </summary>
     [JsonIgnore] public IReadOnlyDictionary<string, string>         Containers     { get; private set; }
+    /// <summary>
+    /// A set of aliases for .NET types (deriving from IAssetPostProcessor) to be used for additional post-load asset processing.
+    /// </summary>
     [JsonIgnore] public IReadOnlyDictionary<string, string>         PostProcessors { get; private set; }
+    /// <summary>
+    /// A set of supported natural languages that the player can choose to play the game in.
+    /// </summary>
     [JsonIgnore] public IReadOnlyDictionary<string, LanguageConfig> Languages      { get; private set; }
+    /// <summary>
+    /// The collection of files comprising the mod, paths are relative to the mod directory by default.
+    /// </summary>
     [JsonIgnore] public IReadOnlyDictionary<string, AssetFileInfo>  Files          { get; private set; }
 
+    // Dictionaries containing only the details defined in this particular mod, and not in any that this mod inherits from.
     [JsonInclude, JsonPropertyName("IdTypes")]        public Dictionary<string, AssetTypeInfo>  RawIdTypes        { get; private set; } = new();
     [JsonInclude, JsonPropertyName("StringMappings")] public Dictionary<string, string>         RawStringMappings { get; private set; } = new();
     [JsonInclude, JsonPropertyName("Loaders")]        public Dictionary<string, string>         RawLoaders        { get; private set; } = new();

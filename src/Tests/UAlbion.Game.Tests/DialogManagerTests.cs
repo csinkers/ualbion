@@ -51,7 +51,7 @@ public class DialogManagerTests
         var mma = new MockModApplier()
                 .Add((FontId)Base.Font.Regular, font)
                 .Add((InkId)Base.Ink.White, MockUniformFont.BuildInk())
-                .Add((SpriteId)Base.FontGfx.RegularFont, MockUniformFont.BuildFontTexture())
+                .Add((SpriteId)Base.FontGfx.Regular, MockUniformFont.BuildFontTexture())
                 .Add(comPalId, new AlbionPalette(comPalId.ToUInt32(), "PCommon", Enumerable.Repeat(0xffffffu, 256).ToArray()))
                 .Add(palId, new AlbionPalette(palId.ToUInt32(), "PInv", Enumerable.Repeat(0xffffffu, 256).ToArray()))
             ;

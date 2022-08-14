@@ -6,28 +6,53 @@ using UAlbion.Api;
 
 namespace UAlbion.Config;
 
+/// <summary>
+/// Represents all information about a given file on disk that is required by the asset loading / saving system.
+/// </summary>
 public class AssetFileInfo
 {
+    /// <summary>The filename, relative to the mod directory</summary>
     [JsonIgnore] public string Filename { get; set; } // Just mirrors the dictionary key
-    [JsonIgnore] public string Sha256Hash { get; set; } // Currently only used for MAIN.EXE
 
+    /// <summary>The first 32-bits of the file's SHA256 hash (if specified)</summary>
+    [JsonIgnore] public string Sha256Hash { get; set; }
+
+    /// <summary>The alias of the IAssetContainer to use for loading the file</summary>
     public string Container { get; set; }
+
+    /// <summary>The alias of the IAssetLoad to use for loading assets in this file</summary>
     public string Loader { get; set; }
+    /// <summary>The alias of the IAssetPostProcessor to run on assets in this file after loading</summary>
     public string Post { get; set; }
+
+    /// <summary>The maximum container-index to load from this file.</summary>
     [JsonInclude] public int? Max { get; private set; }
+
+    /// <summary>The mapping from container indices to assets</summary>
     [JsonInclude] public Dictionary<int, AssetInfo> Map { get; private set; } = new();
+
+    /// <summary>Path to an optional JSON file containing the mapping (for cases where the mapping is complicated and would clutter the main assets.json file)</summary>
     public string MapFile { get; set; }
 
+    /// <summary>
+    /// The set of additional properties that relate to assets in the file
+    /// </summary>
     [JsonInclude]
     [JsonExtensionData] 
     public Dictionary<string, object> Properties { get; private set; }
 
+    /// <summary>
+    /// The default width, in pixels, of frames in images inside the file
+    /// </summary>
     public int? Width // For sprites only
     {
         get => Get(AssetProperty.Width, (int?)null);
         set => Set(AssetProperty.Width, value);
     }
 
+    /// <summary>
+    /// The default height, in pixels, of frames in images inside the file
+    /// </summary>
     public int? Height // For sprites only
     {
         get => Get(AssetProperty.Height, (int?)null);
@@ -38,6 +63,13 @@ public class AssetFileInfo
 
     public override string ToString() => $"AssetFile: {Filename} ({Map.Count})";
 
+    /// <summary>
+    /// Retrieve a property's value by name
+    /// </summary>
+    /// <typeparam name="T">The type to interpret the property value as</typeparam>
+    /// <param name="property">The property name</param>
+    /// <param name="defaultValue">The value to use if the property does not exist, or cannot be parsed as the requested type</param>
+    /// <returns>The parsed value, or defaultValue if no value existed or could be parsed.</returns>
     public T Get<T>(string property, T defaultValue)
     {
         if (Properties == null || !Properties.TryGetValue(property, out var token))
@@ -71,6 +103,12 @@ public class AssetFileInfo
         return (T)token;
     }
 
+    /// <summary>
+    /// Set's a property by name
+    /// </summary>
+    /// <typeparam name="T">The type of value to set</typeparam>
+    /// <param name="property">The property name</param>
+    /// <param name="value">The value to set the property to</param>
     public void Set<T>(string property, T value)
     {
         if (value == null)
@@ -112,6 +150,14 @@ public class AssetFileInfo
         }
     }
 
+    /// <summary>
+    /// Uses the given callbacks to determine which assets are actually present in the file in the current file system.
+    /// </summary>
+    /// <param name="jsonUtil">The JSON parsing utility</param>
+    /// <param name="getSubItemCountForFile">A method which takes an AssetFileInfo and returns the list of container id ranges (offsets + lengths) that the file contains.</param>
+    /// <param name="readAllBytesFunc">A method which takes a relative filename and returns the file contents as a byte array</param>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="FormatException"></exception>
     public void PopulateAssetIds(
         IJsonUtil jsonUtil,
         Func<AssetFileInfo, IList<(int, int)>> getSubItemCountForFile,

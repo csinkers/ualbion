@@ -121,7 +121,7 @@
     "Assets/Automap/1": { "Loader": "png8", "Container": "dir", "Pattern": "{id}_{frame:000}_p{pal}_{name}.png", "Max": 1, "Map": { "1": { "Id": "autotile.1" } } },
     "Assets/Automap/2": { "Loader": "png8", "Container": "dir", "Pattern": "{id}_{frame:000}_p{pal}_{name}.png", "Max": 2, "Map": { "2": { "Id": "autotile.2" } } },
     "Assets/Automap":   { "Loader": "automap", "Container": "dir", "Pattern": "{id}_{frame}_{name}.dat", "Map": { "100": { "Id": "automap.100" } } },
-    "Assets/Fonts/Gfx": {
+    "Assets/FontGfx": {
       "Container": "dir",
       "Loader": "pngsheet",
       "Width": 8, 

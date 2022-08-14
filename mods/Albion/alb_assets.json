@@ -84,20 +84,24 @@
     },
 
     // Fonts
-    "Albion/CD/XLDLIBS/FONTS0.XLD": {
+    "Albion/CD/XLDLIBS/FONTS0.XLD#33906F62": { // EN+FR
       "Loader": "fixedsize",
       "Width": 8,
       "Height": 8,
-      "Max": 2,
+      "Max": 1,
       "Map": {
-        "0": {
-          "Id": "fontgfx.RegularFont",
-          "Mapping": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\"?!/()#%*&+-=><☺♂♀éâàçêëèïîìôòûùáíóú"
-        },
-        "1": {
-          "Id": "fontgfx.BoldFont",
-          "Mapping": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\"?!/()#%*&+-=><☺♂♀éâàçêëèïîìôòûùáíóú"
-        }
+        "0": { "Id": "fontgfx.Regular" },
+        "1": { "Id": "fontgfx.Bold" }
+      }
+    }, 
+    "Albion/CD/XLDLIBS/FONTS0.XLD#A70E9601": { // DE
+      "Loader": "fixedsize",
+      "Width": 8,
+      "Height": 8,
+      "Max": 1,
+      "Map": {
+        "0": { "Id": "fontgfx.GermanRegular" },
+        "1": { "Id": "fontgfx.GermanBold" }
       }
     }, 
 
@@ -313,23 +317,29 @@
       "Max":  0, 
       "Map": { "0": { "Id": "uibg.1" } }
     },
-    "Albion/MAIN.EXE#476227B0391CF3452166B7A1D52B012CCF6C86BC9E46886DAFBED343E9140710": { // EN+DE Aug 22 1996
+    "Albion/MAIN.EXE#476227B0": { // EN GOG Installed Aug 22 1996
       "IsReadOnly": true, 
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
       "MapFile": "Meta/MainExe.json"
     },
-    "Albion/MAIN.EXE#9FC7ABCF1A1EFC2F0AF3D90B7E23E03B5D5F58A4D04AE81E66EFD1717EE0245A": { // EN Jul 25 1996
+    "Albion/MAIN.EXE#9FC7ABCF": { // EN Jul 25 1996
       "IsReadOnly": true, 
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
       "MapFile": "Meta/MainExe.json"
     },
-    "Albion/MAIN.EXE#487DA3348C367363F3EFCBB22AE45C186F1FBECADA73F0BF0CE2CA8377A8DE14": { // FR
+    "Albion/MAIN.EXE#487DA334": { // FR
       "IsReadOnly": true, 
       "Loader": "fixedsize",
       "Container": "binaryoffsets",
       "MapFile": "Meta/MainExe.json"
+    },
+    "Albion/MAIN.EXE#EC6D6389": { // DE GOG ISO Dec 14 1995
+      "IsReadOnly": true, 
+      "Loader": "fixedsize",
+      "Container": "binaryoffsets",
+      "MapFile": "Meta/MainExe_DE.json"
     }
   }
 }

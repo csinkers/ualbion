@@ -87,7 +87,7 @@ namespace UAlbion.Formats.Assets
                 {
                     var texture = (IReadOnlyTexture<byte>)assets.LoadTexture(component.GraphicsId);
                     if (texture == null)
-                        throw new InvalidOperationException($"FontDefinition.Build: Could not load font graphics {component.GraphicsId}");
+                        continue;
 
                     PopulateRegions(component, texture);
                 }

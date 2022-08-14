@@ -26,7 +26,7 @@
       "Container": "raw",
       "Loader": "png8",
       "Max": 0,
-      "Map": { "0": { "Id": "fontgfx.DebugFonts" } }
+      "Map": { "0": { "Id": "fontgfx.Debug" } }
     },
     "Inks.json": {
       "Container": "jsonObj",

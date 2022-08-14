@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using SerdesNet;
 using UAlbion.Api;
@@ -224,5 +225,13 @@ public static class FormatUtil
         var br = new BinaryReader(ms);
         using var s = new AlbionReader(br);
         return serdes(s);
+    }
+
+    public static string GetReducedSha256HexString(string filename, IFileSystem disk)
+    {
+        using var sha256 = SHA256.Create();
+        using var stream = disk.OpenRead(filename);
+        var hashBytes = sha256.ComputeHash(stream);
+        return BytesToHexString(hashBytes.AsSpan(0, 4));
     }
 }

@@ -460,12 +460,11 @@ public class AssetConversionTests
     [Fact]
     public void FontGfxTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(FontGfx.RegularFont), Width = 8, Height = 8 };
+        var info = new AssetInfo { AssetId = AssetId.From(FontGfx.Regular), Width = 8, Height = 8 };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
-            new[] { AssetId.From(Palette.Common) },
+            new[] { AssetId.From(Palette.Common), AssetId.From(FontGfx.Bold) },
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
     }
-
 
     [Fact]
     public void ItemSpriteTest()

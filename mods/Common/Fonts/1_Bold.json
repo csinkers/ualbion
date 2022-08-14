@@ -3,10 +3,16 @@
   "SpaceSize": 3,
   "Components": [
     {
-      "GraphicsId": "fontgfx.BoldFont",
+      "GraphicsId": "fontgfx.Bold",
       "Width": 8,
       "Height": 8,
       "Mapping": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\"?!/()#%*&+-=><☺♂♀éâàçêëèïîìôòûùáíóú"
+    },
+    {
+      "GraphicsId": "fontgfx.GermanBold",
+      "Width": 8,
+      "Height": 8,
+      "Mapping": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'…\"?!/()#%*^+-=><♂♀"
     }
   ]
 }

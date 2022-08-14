@@ -119,6 +119,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shaders", "..\mods\Shaders\
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Unpacked", "..\mods\Unpacked\Unpacked.shproj", "{63A4D9A8-4AE4-4BC4-9047-E242706B3C82}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BinOffsetFinder", "Tools\BinOffsetFinder\BinOffsetFinder.csproj", "{75E1C38E-ED34-4CB2-9EF9-0DC57E1FDF6C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -309,6 +311,10 @@ Global
 		{74B9CB4A-DD58-4970-BF46-EA30E65EA5C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74B9CB4A-DD58-4970-BF46-EA30E65EA5C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74B9CB4A-DD58-4970-BF46-EA30E65EA5C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75E1C38E-ED34-4CB2-9EF9-0DC57E1FDF6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75E1C38E-ED34-4CB2-9EF9-0DC57E1FDF6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75E1C38E-ED34-4CB2-9EF9-0DC57E1FDF6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75E1C38E-ED34-4CB2-9EF9-0DC57E1FDF6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -356,6 +362,7 @@ Global
 		{BBE1D977-E9B9-4D0B-A6DF-AD91EC1AD15A} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
 		{852FA5D7-3FFF-415C-A20C-F682BBFCE0C7} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
 		{63A4D9A8-4AE4-4BC4-9047-E242706B3C82} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
+		{75E1C38E-ED34-4CB2-9EF9-0DC57E1FDF6C} = {149A8BC2-91D1-4249-9E1D-7B0054347832}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2759A62D-227A-4D68-B6B5-966B9141AA74}

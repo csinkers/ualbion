@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>UAlbion.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
+
+    <PackageReference Include="Veldrid" Version="4.9.0-gf94814eecc" />
+    <PackageReference Include="Veldrid.ImGui" Version="5.72.0-gac88c7210e" />
+    <PackageReference Include="Veldrid.RenderDoc" Version="1.0.1-gac88c7210e" />
+    <PackageReference Include="Veldrid.SDL2" Version="4.9.0-gac88c7210e" />
+    <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0-gac88c7210e" />
+    <PackageReference Include="Veldrid.Utilities" Version="4.9.0-gf94814eecc" />
+    <PackageReference Include="Veldrid.SPIRV" Version="1.0.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\deps\veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj" />
+  </ItemGroup>
+</Project>

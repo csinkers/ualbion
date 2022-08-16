@@ -23,7 +23,7 @@ public class InventoryScreen : Dialog
             {
                 InventoryOpenEvent ioe => new InventoryCharacterPane(activeCharacter, getPage),
                 MerchantEvent me => new InventoryMerchantPane(me.MerchantId),
-                ChestEvent ce => ce.PickDifficulty == 0 ? (IUiElement)new InventoryChestPane(ce.ChestId) : new InventoryLockPane(ce),
+                OpenChestEvent ce => ce.PickDifficulty == 0 ? (IUiElement)new InventoryChestPane(ce.ChestId) : new InventoryLockPane(ce),
                 DoorEvent de => new InventoryLockPane(de),
                 _ => throw new InvalidOperationException($"Unexpected inventory mode event {modeEvent}")
             };

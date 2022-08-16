@@ -5,17 +5,16 @@ namespace UAlbion.Base;
 public enum MonsterGfx : byte
 {
     FloatingHand = 1,
-    // Unknown2 = 2,
-    // Unknown3 = 3,
+
     Unknown4 = 4,
     Unknown5 = 5,
     Unknown6 = 6,
     EvilKangaroo = 7,
     EvilKangaroo2 = 8,
-    // Unknown9 = 9,
+
     Krondir = 10,
     Krondir2 = 11,
-    // Unknown12 = 12,
+
     PeskyWasp = 13,
     PeskyWasp2 = 14,
     PeskyWasp3 = 15,
@@ -32,8 +31,7 @@ public enum MonsterGfx : byte
     Unknown26 = 26,
     Unknown27 = 27,
     Robot = 28,
-    // Unknown29 = 29,
-    // Unknown30 = 30,
+
     Iskai = 31,
     Iskai2 = 32,
     Iskai3 = 33,
@@ -48,10 +46,10 @@ public enum MonsterGfx : byte
     Celt6 = 42,
     Security = 43,
     Security2 = 44,
-    // Unknown45 = 45,
+
     Ned = 46,
     Ned2 = 47,
-    // Unknown48 = 48,
+
     Demon = 49,
     Demon2 = 50,
     Demon3 = 51,

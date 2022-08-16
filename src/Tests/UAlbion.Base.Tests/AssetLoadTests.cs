@@ -110,7 +110,7 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void ChestTest()
     {
-        var chest = Test(assets => assets.LoadInventory(AssetId.From(Chest.Unknown121)));
+        var chest = Test(assets => assets.LoadInventory(AssetId.From(Chest.HClanCellar_ID_IKn_ILC_StC_LSh_3g)));
         Assert.Equal(25, chest.Gold.Amount);
         Assert.Equal(Gold.Instance, chest.Gold.Item);
         Assert.Equal(1, chest.Slots[0].Amount);
@@ -479,7 +479,7 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void MerchantTest()
     {
-        var i = Test(assets => assets.LoadInventory(AssetId.From(Merchant.Unknown109)));
+        var i = Test(assets => assets.LoadInventory(AssetId.From(Merchant.AltheaSpells)));
         Assert.Equal(Item.Fireball, i.Slots[0].ItemId);
         Assert.Equal(25, i.Slots[0].Amount);
         Assert.Equal(1, i.Slots[0].Charges);
@@ -622,7 +622,6 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(0, t.Magic.SpellPoints.Max);
         Assert.Empty(t.Magic.SpellStrengths);
 
-        var s = t.Inventory.Slots;
         Assert.Equal(0, t.Inventory.Gold.Amount);
         Assert.Equal(5, t.Inventory.Rations.Amount);
         Assert.Equal(Item.Overall, t.Inventory.Chest.ItemId);
@@ -690,7 +689,7 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void ScriptTest()
     {
-        var s = Test(assets => assets.LoadScript(Script.TomMeetsChristine));
+        var s = Test(assets => assets.LoadScript(Script.TomMeetsChristine_300));
         Assert.Equal(106, s.Count);
         Assert.IsType<CommentEvent>(s[0]);
         Assert.IsType<CommentEvent>(s[1]);

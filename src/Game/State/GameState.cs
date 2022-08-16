@@ -175,7 +175,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         On<ModifyNpcOffEvent>(e => _game.SetNpcDisabled(e.Map, e.NpcNum, SetFlag(e.Operation, _game.IsNpcDisabled(e.Map, e.NpcNum))));
         On<NpcOffEvent>(e => _game.SetNpcDisabled(MapId.None, e.NpcNum, true));
         On<NpcOnEvent>(e => _game.SetNpcDisabled(MapId.None, e.NpcNum, false));
-        On<ChestOpenEvent>(e => _game.SetChestOpen(e.Chest, SetFlag(e.Operation, _game.IsChestOpen(e.Chest))));
+        On<SetChestOpenEvent>(e => _game.SetChestOpen(e.Chest, SetFlag(e.Operation, _game.IsChestOpen(e.Chest))));
         On<DoorOpenEvent>(e => _game.SetDoorOpen(e.Door, SetFlag(e.Operation, _game.IsDoorOpen(e.Door))));
         On<DataChangeEvent>(OnDataChange);
         On<SetContextEvent>(e =>

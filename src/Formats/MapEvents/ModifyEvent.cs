@@ -16,7 +16,7 @@ public abstract class ModifyEvent : MapEvent
             ModifyType.Switch         =>          SwitchEvent.Serdes(         (SwitchEvent)genericEvent, mapping, s), // 0
             ModifyType.EventChainOff  =>   EventChainOffEvent.Serdes(  (EventChainOffEvent)genericEvent, mapping, s), // 1
             ModifyType.DoorOpen       =>        DoorOpenEvent.Serdes(       (DoorOpenEvent)genericEvent, mapping, s), // 2
-            ModifyType.ChestOpen      =>       ChestOpenEvent.Serdes(      (ChestOpenEvent)genericEvent, mapping, s), // 3
+            ModifyType.ChestOpen      =>       SetChestOpenEvent.Serdes(      (SetChestOpenEvent)genericEvent, mapping, s), // 3
             ModifyType.NpcOff         =>    ModifyNpcOffEvent.Serdes(   (ModifyNpcOffEvent)genericEvent, mapping, s), // 4
             ModifyType.AddPartyMember =>  AddPartyMemberEvent.Serdes( (AddPartyMemberEvent)genericEvent, mapping, s), // 5
             ModifyType.ItemCount      => ModifyItemCountEvent.Serdes((ModifyItemCountEvent)genericEvent, mapping, s), // 6

@@ -2,20 +2,20 @@
 
 public enum Door : ushort
 {
-    HunterClanCellar = 100,
-    HunterClan = 101,
-    Unknown102 = 102,
-    Unknown103 = 103,
+    HClanCellar_HCK = 100,
+    HClan_HCK = 101,
+    Drinno2_Door1_DoorKey3 = 102,
+    Drinno2_Door2_DoorKey3 = 103,
     Beastmaster = 104,
-    Unknown105 = 105,
+    KPrison_DungeonKey = 105,
     EquipmentMaker = 205,
-    Unknown207 = 207,
-    Unknown208 = 208,
-    Unknown209 = 209,
-    Unknown210 = 210,
-    Unknown212 = 212,
-    HerrasDoor = 214,
-    Unknown224 = 224,
+    Umajo_Knife = 207,
+    UmajoPrison_CellKey = 208,
+    DevMaker2D_DoorKey4 = 209,
+    DevMaker2D_Pick = 210,
+    DevMaker2D_DoorKey = 212,
+    HerrasDoor_HerrasKey = 214,
+    BeloHostel_Knife = 224,
     Unknown256 = 256,
     Unknown257 = 257
 }

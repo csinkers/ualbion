@@ -168,7 +168,7 @@ public class AssetConversionTests
     [Fact]
     public void ChestTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Chest.Unknown121) };
+        var info = new AssetInfo { AssetId = AssetId.From(Chest.HClanCellar_ID_IKn_ILC_StC_LSh_3g) };
         Test<Inventory>(
             info.AssetId,
             AssetId.EnumerateAll(AssetType.Item).ToArray(),
@@ -286,7 +286,7 @@ public class AssetConversionTests
     [Fact]
     public void MerchantTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Merchant.Unknown109) };
+        var info = new AssetInfo { AssetId = AssetId.From(Merchant.AltheaSpells) };
         Test<Inventory>(
             info.AssetId,
             AssetId.EnumerateAll(AssetType.Item).ToArray(),

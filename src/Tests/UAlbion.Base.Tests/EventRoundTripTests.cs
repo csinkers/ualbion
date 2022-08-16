@@ -332,7 +332,7 @@ chain_off Set 1 Map.Jirinaar");
     [Fact]
     public void DoScript()
     {
-        Test(@"do_script Script.TomMeetsChristine");
+        Test(@"do_script Script.TomMeetsChristine_300");
     }
 
     [Fact]
@@ -357,10 +357,10 @@ execute 1 1");
     [Fact]
     public void Inv()
     {
-        Test(@"open_chest Chest.Unknown1 MapText.Jirinaar Item.Pistol 1 2 3
-open_chest Chest.Unknown1 MapText.Jirinaar
-open_door Door.HerrasDoor MapText.Jirinaar Item.Pistol 1 2 3
-open_door Door.HerrasDoor MapText.Jirinaar");
+        Test(@"open_chest Chest.HClan_3Stim25r MapText.HunterClan Item.Pistol 1 2 3
+open_chest Chest.HClan_3Stim25r MapText.Jirinaar
+open_door Door.HerrasDoor_HerrasKey MapText.Jirinaar Item.HerrasKey 1 2 3
+open_door Door.HerrasDoor_HerrasKey MapText.Jirinaar");
     }
 
     [Fact]

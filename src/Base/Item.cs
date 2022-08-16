@@ -92,7 +92,7 @@ public enum Item : ushort
     CellKey = 86,
     ChestKey = 87,
     DungeonKey = 88,
-    HerrassKey = 89,
+    HerrasKey = 89,
     DoorKey4 = 90,
     BeastmastersKey = 91,
     Rope = 92,

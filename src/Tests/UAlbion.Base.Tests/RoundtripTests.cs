@@ -195,7 +195,7 @@ public class RoundtripTests
     [Fact]
     public void ChestTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Chest.Unknown121) };
+        var info = new AssetInfo { AssetId = AssetId.From(Chest.HClanCellar_ID_IKn_ILC_StC_LSh_3g) };
         RoundTripXld<Inventory>(nameof(ChestTest), "$(ALBION)/CD/XLDLIBS/INITIAL/CHESTDT1.XLD", 21,
             (x, s, c) => Loaders.ChestLoader.Serdes(x, info, s, c));
     }
@@ -260,7 +260,7 @@ public class RoundtripTests
     [Fact]
     public void MerchantTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Merchant.Unknown109) };
+        var info = new AssetInfo { AssetId = AssetId.From(Merchant.AltheaSpells) };
         RoundTripXld<Inventory>(nameof(MerchantTest), "$(ALBION)/CD/XLDLIBS/INITIAL/MERCHDT1.XLD", 9,
             (x, s, c) => Loaders.MerchantLoader.Serdes(x, info, s, c));
     }

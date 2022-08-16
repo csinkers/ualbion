@@ -148,9 +148,9 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
         const string script = 
             @"!0?1:2: query_verb Examine
  1=>!: map_text MapText.Jirinaar 37 NoPortrait None ; ""The door to the house of the Hunter Clan. It is secured with a lock.""
-!2?3:!: open_door Door.HunterClan MapText.Jirinaar Item.HunterClanKey 100 32 33
+!2?3:!: open_door Door.HClan_HCK MapText.Jirinaar Item.HunterClanKey 100 32 33
 !3?4:!: result
- 4=>5: door_open Set Door.HunterClan
+ 4=>5: door_open Set Door.HClan_HCK
  5=>!: teleport Map.HunterClan 69 67 Unchanged 255 0";
 
         string expected = 
@@ -158,9 +158,9 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
 if (query_verb Examine) {
     map_text MapText.Jirinaar 37
 } else {
-    if (open_door Door.HunterClan MapText.Jirinaar Item.HunterClanKey 100 32 33) {
+    if (open_door Door.HClan_HCK MapText.Jirinaar Item.HunterClanKey 100 32 33) {
         if (result) {
-            door_open Set Door.HunterClan
+            door_open Set Door.HClan_HCK
             teleport Map.HunterClan 69 67 Unchanged 255 0
         }
     }

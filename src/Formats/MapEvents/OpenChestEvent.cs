@@ -7,10 +7,10 @@ using UAlbion.Formats.Ids;
 namespace UAlbion.Formats.MapEvents;
 
 [Event("open_chest", "Opens the inventory screen for the given chest")]
-public class ChestEvent : MapEvent, ILockedInventoryEvent
+public class OpenChestEvent : MapEvent, ILockedInventoryEvent
 {
-    ChestEvent(TextId textSource) => TextSource = textSource;
-    public ChestEvent(ChestId chestId, TextId textSource, ItemId key, byte difficulty, byte openedText, byte unlockedText)
+    OpenChestEvent(TextId textSource) => TextSource = textSource;
+    public OpenChestEvent(ChestId chestId, TextId textSource, ItemId key, byte difficulty, byte openedText, byte unlockedText)
     {
         ChestId = chestId;
         TextSource = textSource;
@@ -20,10 +20,10 @@ public class ChestEvent : MapEvent, ILockedInventoryEvent
         UnlockedText = unlockedText;
     }
 
-    public static ChestEvent Serdes(ChestEvent e, AssetMapping mapping, ISerializer s, TextId textSourceId)
+    public static OpenChestEvent Serdes(OpenChestEvent e, AssetMapping mapping, ISerializer s, TextId textSourceId)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        e ??= new ChestEvent(textSourceId);
+        e ??= new OpenChestEvent(textSourceId);
         e.PickDifficulty = s.UInt8(nameof(PickDifficulty), e.PickDifficulty);
         e.Key = ItemId.SerdesU16(nameof(Key), e.Key, AssetType.Item, mapping, s);
         e.UnlockedText = s.UInt8(nameof(UnlockedText), e.UnlockedText);

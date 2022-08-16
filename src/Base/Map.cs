@@ -183,7 +183,7 @@ public enum Map : ushort
     KengetPrison = 310,
     Kenget2D = 311,
     KengetSlaveQuarters = 312,
-    Unnamed12 = 313,
+    KengetBoss = 313,
 
     IsleOfPeace = 320,
 

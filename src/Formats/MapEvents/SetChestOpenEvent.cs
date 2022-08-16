@@ -7,13 +7,13 @@ using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.MapEvents;
 
-[Event("chest_open")]
-public class ChestOpenEvent : ModifyEvent
+[Event("set_chest_open")]
+public class SetChestOpenEvent : ModifyEvent
 {
-    public static ChestOpenEvent Serdes(ChestOpenEvent e, AssetMapping mapping, ISerializer s)
+    public static SetChestOpenEvent Serdes(SetChestOpenEvent e, AssetMapping mapping, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        e ??= new ChestOpenEvent();
+        e ??= new SetChestOpenEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         int zeroes = s.UInt8("byte3", 0);
         zeroes += s.UInt8("byte4", 0);
@@ -24,8 +24,8 @@ public class ChestOpenEvent : ModifyEvent
         return e;
     }
 
-    ChestOpenEvent() { }
-    public ChestOpenEvent(SwitchOperation operation, ChestId chest)
+    SetChestOpenEvent() { }
+    public SetChestOpenEvent(SwitchOperation operation, ChestId chest)
     {
         Operation = operation;
         Chest = chest;

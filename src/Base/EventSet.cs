@@ -9,7 +9,7 @@ public enum EventSet : ushort
     Unknown3 = 3,
 
     IskaiWordSet = 100,
-    // Unknown101 = 101, // Only 4 bytes
+
     IskaiChildWordSet = 102,
     Giria = 103,
     SebaiLiWrinn = 104,
@@ -85,12 +85,11 @@ public enum EventSet : ushort
     Bero = 174,
     Frinos = 175,
     Roves = 176,
-    // Unknown177 = 177,
-    // Unknown178 = 178,
-    Unknown179 = 179,
+
+    CaveTeleporter = 179,
     TorontoWordSet = 180,
     RainerWordSet = 181,
-    // Unknown182 = 182,
+
     Christine = 183,
     JoeBernard = 184,
     ColonelPriver = 185,
@@ -109,12 +108,7 @@ public enum EventSet : ushort
     MainiKounosWordSet = 201,
     MainiUmajoKentaWordSet = 202,
     MainiSrimalinarWordSet = 203,
-    // Unknown204 = 204,
-    // Unknown205 = 205,
-    // Unknown206 = 206,
-    // Unknown207 = 207,
-    // Unknown208 = 208,
-    // Unknown209 = 209,
+
     Kryte = 210,
     Unknown211 = 211,
     Unknown212 = 212,
@@ -126,7 +120,7 @@ public enum EventSet : ushort
     Unknown218 = 218,
     Kariah = 219,
     Unknown220 = 220,
-    // Unknown221 = 221,
+
     Unknown222 = 222,
     Unknown223 = 223,
     Unknown224 = 224,
@@ -137,7 +131,7 @@ public enum EventSet : ushort
     Perron = 229,
     Unknown230 = 230,
     Unknown231 = 231,
-    // Unknown232 = 232,
+
     Melthar = 233,
     Unknown234 = 234,
     Unknown235 = 235,
@@ -159,7 +153,7 @@ public enum EventSet : ushort
     Zerruma = 251,
     Unknown252 = 252,
     Unknown253 = 253,
-    // Unknown254 = 254,
+
     Unknown255 = 255,
     Arrim = 256,
     Unknown257 = 257,
@@ -170,7 +164,7 @@ public enum EventSet : ushort
     Edjirr = 262,
     Unknown263 = 263,
     Unknown264 = 264,
-    // Unknown265 = 265,
+
     Unknown266 = 266,
     Unknown267 = 267,
     Nodd = 268,
@@ -202,10 +196,7 @@ public enum EventSet : ushort
     Coskon = 294,
     Kossea = 295,
     Sojekos = 296,
-    // Unknown297 = 297, // only 6 bytes
-    // Unknown298 = 298, // only 6 bytes
-    // Unknown299 = 299,
-    // Unknown300 = 300,
+
     KamulosWordSet = 301,
     Cuarnainn = 302,
     Branagh = 303,
@@ -214,11 +205,10 @@ public enum EventSet : ushort
     Jonatharh = 306,
     Rhunagh = 307,
     Arthor = 308,
-    // Unknown309 = 309,
-    // Unknown310 = 310,
+
     Brann = 311,
     ColonelPriver2 = 312,
-    // Unknown313 = 313,
+
     Drannagh = 314,
     Llanaer = 315,
     Irkith = 316,
@@ -238,16 +228,7 @@ public enum EventSet : ushort
     Mellthas = 985,
     Harriet = 986,
     Joe = 987,
-    // Unknown988 = 988,
+
     Khunag2 = 989,
     Siobhan2 = 990,
-    // Unknown991 = 991,
-    // Unknown992 = 992,
-    // Unknown993 = 993,
-    // Unknown994 = 994,
-    // Unknown995 = 995,
-    // Unknown996 = 996,
-    // Unknown997 = 997,
-    // Unknown998 = 998,
-    // Unknown999 = 999,
 }

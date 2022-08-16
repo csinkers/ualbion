@@ -1,27 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Globalization;
+using UAlbion.Api.Eventing;
 using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting;
 
 public class FormatScriptVisitor : IAstVisitor
 {
-    readonly StringBuilder _sb;
-    readonly Dictionary<int, (int start, int end)> _mapping;
+    readonly IScriptBuilder _builder;
     readonly long _initialPos;
     bool _inCondition;
 
-    public FormatScriptVisitor() { _sb = new StringBuilder(); }
-    public FormatScriptVisitor(StringBuilder sb, Dictionary<int, (int start, int end)> mapping)
+    public FormatScriptVisitor(IScriptBuilder builder)
     {
-        _sb = sb ?? throw new ArgumentNullException(nameof(sb));
-        _mapping = mapping;
-        _initialPos = _sb.Length;
+        _builder = builder ?? throw new ArgumentNullException(nameof(builder));
+        _initialPos = _builder.Length;
     }
 
-    public string Code => _sb.ToString();
-    public bool UseNumericIds { get; init; }
     public bool PrettyPrint { get; init; } = true;
     public bool WrapStatements { get; init; } = true;
     public int IndentLevel { get; set; }
@@ -35,14 +30,14 @@ public class FormatScriptVisitor : IAstVisitor
 
         if (!PrettyPrint)
         {
-            if (_sb.Length != _initialPos)
-                _sb.Append(' ');
+            if (_builder.Length != _initialPos)
+                _builder.Append(' ');
             return;
         }
 
-        if (_sb.Length != _initialPos)
-            _sb.AppendLine();
-        _sb.Append(new string(' ', IndentLevel));
+        if (_builder.Length != _initialPos)
+            _builder.AppendLine();
+        _builder.Append(new string(' ', IndentLevel));
     }
 
     void Push() => IndentLevel += TabSize;
@@ -51,96 +46,107 @@ public class FormatScriptVisitor : IAstVisitor
     public void Visit(SingleEvent e)
     {
         Indent();
-        int startPosition = _sb.Length;
-        if (!_inCondition && PrettyPrint && Formatter != null)
+        _builder.EventScope(e.OriginalIndex, (e, this), static x =>
         {
-            _sb.Append(Formatter.Format(e.Event, UseNumericIds));
-            if (_mapping != null)
-                _mapping[e.OriginalIndex] = (startPosition, _sb.Length);
-            return;
-        }
+            var visitor = x.Item2;
+            if (!visitor._inCondition && visitor.PrettyPrint && visitor.Formatter != null)
+            {
+                // Print with a comment when the event contains a string reference
+                visitor.Formatter.Format(visitor._builder, x.e.Event);
+                return;
+            }
 
-        _sb.Append(UseNumericIds 
-            ? e.Event.ToStringNumeric() 
-            : e.Event.ToString());
-
-        if (_mapping != null)
-            _mapping[e.OriginalIndex] = (startPosition, _sb.Length);
+            x.e.Event.Format(visitor._builder);
+        });
     }
 
-    public void Visit(BreakStatement breakStatement) { Indent(); _sb.Append("break"); }
-    public void Visit(ContinueStatement continueStatement) { Indent(); _sb.Append("continue"); }
-    public void Visit(ControlFlowNode cfgNode) { Indent(); _sb.Append("!!!ARBITRARY CONTROL FLOW!!!"); }
-    public void Visit(EmptyNode empty) { _sb.Append('ø'); }
-    public void Visit(Name name) => _sb.Append(name.Value);
+    public void Visit(BreakStatement breakStatement) { Indent(); _builder.Add(ScriptPartType.Keyword, "break"); }
+    public void Visit(ContinueStatement continueStatement) { Indent(); _builder.Add(ScriptPartType.Keyword, "continue"); }
+    public void Visit(ControlFlowNode cfgNode) { Indent(); _builder.Add(ScriptPartType.Error, "!!!ARBITRARY CONTROL FLOW!!!"); }
+    public void Visit(EmptyNode empty) { _builder.Add(ScriptPartType.Comment, "ø"); }
+    public void Visit(Name name) => _builder.Add(ScriptPartType.Identifier, name.Value);
 
     public void Visit(Negation negation)
     {
-        _sb.Append('!');
+        _builder.Add(ScriptPartType.Operator, "!");
         bool parens = negation.Expression.Priority > negation.Priority;
-        if (parens) _sb.Append('(');
+        if (parens) _builder.Append('(');
         negation.Expression.Accept(this);
-        if (parens) _sb.Append(')');
+        if (parens) _builder.Append(')');
     }
-    public void Visit(Numeric numeric) => _sb.Append(numeric.Value);
+    public void Visit(Numeric numeric) => _builder.Add(ScriptPartType.Number, numeric.Value.ToString(CultureInfo.InvariantCulture));
 
     public void Visit(IfThen ifThen)
     {
         Indent();
-        _sb.Append("if (");
+        _builder.Add(ScriptPartType.Keyword, "if");
+        _builder.Append(" (");
+
         _inCondition = true;
         ifThen.Condition.Accept(this);
         _inCondition = false;
-        _sb.Append(") {");
+
+        _builder.Append(") {");
+
         Push();
         ifThen.Body?.Accept(this);
         Pop();
         Indent();
-        _sb.Append("}");
+
+        _builder.Append("}");
     }
 
     public void Visit(IfThenElse ifElse)
     {
         Indent();
-        _sb.Append("if (");
+        _builder.Add(ScriptPartType.Keyword, "if");
+        _builder.Append(" (");
+
         _inCondition = true;
         ifElse.Condition.Accept(this);
         _inCondition = false;
-        _sb.Append(") {");
+
+        _builder.Append(") {");
+
         Push();
         ifElse.TrueBody?.Accept(this);
         Pop();
         Indent();
-        _sb.Append("} else {");
+
+        _builder.Append("} ");
+        _builder.Add(ScriptPartType.Keyword, "else");
+        _builder.Append(" {");
+
         Push();
         ifElse.FalseBody?.Accept(this);
         Pop();
         Indent();
-        _sb.Append("}");
+
+        _builder.Append("}");
     }
 
     public void Visit(Goto jump)
     {
         Indent();
-        _sb.Append("goto ");
-        _sb.Append(jump.Label);
+        _builder.Add(ScriptPartType.Keyword, "goto ");
+        _builder.Add(ScriptPartType.Label, jump.Label);
     }
 
     public void Visit(Statement statement)
     {
         Indent();
         if (WrapStatements)
-            _sb.Append("S(");
+            _builder.Append("S(");
 
         statement.Head.Accept(this);
         foreach (var part in statement.Parameters)
         {
-            _sb.Append(' ');
+            _builder.Append(' ');
             part.Accept(this);
         }
 
         if (WrapStatements)
-            _sb.Append(")");
+            _builder.Append(")");
     }
 
     public void Visit(Sequence sequence)
@@ -149,7 +155,7 @@ public class FormatScriptVisitor : IAstVisitor
         foreach (var node in sequence.Statements)
         {
             if (!first && !PrettyPrint)
-                _sb.Append(",");
+                _builder.Append(",");
             node.Accept(this);
             first = false;
         }
@@ -158,65 +164,83 @@ public class FormatScriptVisitor : IAstVisitor
     public void Visit(DoLoop doLoop)
     {
         Indent();
-        _sb.Append("do {");
+        _builder.Add(ScriptPartType.Keyword, "do");
+        _builder.Append(" {");
+
         Push();
         doLoop.Body?.Accept(this);
         Pop();
         Indent();
-        _sb.Append("} while (");
+
+        _builder.Append("} ");
+        _builder.Add(ScriptPartType.Keyword, "while");
+        _builder.Append(" (");
+
         _inCondition = true;
         doLoop.Condition.Accept(this);
         _inCondition = false;
-        _sb.Append(")");
+
+        _builder.Append(")");
     }
 
     public void Visit(EndlessLoop loop)
     {
         Indent();
-        _sb.Append("loop {");
+        _builder.Add(ScriptPartType.Keyword, "loop");
+        _builder.Append(" {");
+
         Push();
         loop.Body?.Accept(this);
         Pop();
         Indent();
-        _sb.Append("}");
+
+        _builder.Append("}");
     }
 
     public void Visit(WhileLoop whileLoop)
     {
         Indent();
-        _sb.Append("while (");
+        _builder.Add(ScriptPartType.Keyword, "while");
+        _builder.Append(" (");
+
         _inCondition = true;
         whileLoop.Condition.Accept(this);
         _inCondition = false;
-        _sb.Append(") {");
+
+        _builder.Append(") {");
+
         Push();
         whileLoop.Body?.Accept(this);
         Pop();
         Indent();
-        _sb.Append("}");
+
+        _builder.Append("}");
     }
 
     public void Visit(Label label)
     {
         Indent();
-        _sb.Append(label.Name);
-        _sb.Append(":");
+        _builder.Add(ScriptPartType.Label, label, (l, sb) =>
+        {
+            sb.Append(l.Name);
+            sb.Append(':');
+        });
     }
 
     public void Visit(BinaryOp binaryOp)
     {
         bool parens = binaryOp.Left.Priority > binaryOp.Priority;
-        if (parens) _sb.Append('(');
+        if (parens) _builder.Append('(');
         binaryOp.Left.Accept(this);
-        if (parens) _sb.Append(')');
+        if (parens) _builder.Append(')');
 
-        if(binaryOp.Operation != ScriptOp.Member) _sb.Append(' ');
-        _sb.Append(binaryOp.Operation.ToPseudocode());
-        if (binaryOp.Operation != ScriptOp.Member) _sb.Append(' ');
+        if(binaryOp.Operation != ScriptOp.Member) _builder.Append(' ');
+        _builder.Add(ScriptPartType.Operator, binaryOp.Operation.ToPseudocode());
+        if (binaryOp.Operation != ScriptOp.Member) _builder.Append(' ');
 
         parens = binaryOp.Right.Priority > binaryOp.Priority;
-        if (parens) _sb.Append('(');
+        if (parens) _builder.Append('(');
         binaryOp.Right.Accept(this);
-        if (parens) _sb.Append(')');
+        if (parens) _builder.Append(')');
     }
 }

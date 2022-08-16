@@ -16,11 +16,28 @@ public class TriggerChainEvent : IAsyncEvent
             throw new InvalidOperationException($"Tried to trigger chain with invalid entry point {entryPoint} (max event index {eventSet.Events.Count - 1})");
     }
 
-    public string ToStringNumeric() => ToString();
-    public override string ToString() =>
-        $"Triggering chain {EventSet.Id}:{EventSet.GetChainForEvent(EntryPoint)} due to {Source} (first event {EventSet.Events[EntryPoint]})";
-
     public IEventSet EventSet { get; }
     public ushort EntryPoint { get; }
     public EventSource Source { get; }
+
+    public override string ToString()
+    {
+        var builder = new UnformattedScriptBuilder(false);
+        Format(builder);
+        return builder.Build();
+    }
+
+    public void Format(IScriptBuilder builder)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        builder.Append("Triggering chain ");
+        builder.Append(EventSet.Id);
+        builder.Append(":");
+        builder.Append(EventSet.GetChainForEvent(EntryPoint));
+        builder.Append(" due to ");
+        builder.Append(Source);
+        builder.Append(" (first event ");
+        builder.Append(EventSet.Events[EntryPoint]);
+        builder.Append(")");
+    }
 }

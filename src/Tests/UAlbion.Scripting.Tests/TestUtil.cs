@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using UAlbion.Api.Eventing;
 using UAlbion.Scripting.Ast;
 using Xunit;
 
@@ -35,9 +36,10 @@ public static class TestUtil
 
     public static void VerifyAstVsScript(string expected, ICfgNode ast)
     {
-        var visitor = new FormatScriptVisitor { PrettyPrint = false, WrapStatements = false };
+        var builder = new UnformattedScriptBuilder(false);
+        var visitor = new FormatScriptVisitor(builder) { PrettyPrint = false, WrapStatements = false };
         ast.Accept(visitor);
-        Assert.Equal(expected, visitor.Code);
+        Assert.Equal(expected, builder.Build());
     }
 
     public static void VerifyCfgVsScript(
@@ -68,11 +70,12 @@ public static class TestUtil
 
     static string FormatScript(IEnumerable<ICfgNode> nodes, bool pretty)
     {
-        var visitor = new FormatScriptVisitor { PrettyPrint = pretty, WrapStatements = false };
+        var builder = new UnformattedScriptBuilder(false);
+        var visitor = new FormatScriptVisitor(builder) { PrettyPrint = pretty, WrapStatements = false };
         foreach (var node in nodes)
             node.Accept(visitor);
 
-        return visitor.Code;
+        return builder.Build();
     }
 
     public static bool CompareNodesVsScript(IEnumerable<ICfgNode> nodes, string expected, out string message)

@@ -23,6 +23,12 @@ public class EventPartParsers
         _parsers[typeof(float)]   =  typeof(float).GetMethod("Parse", new[] { typeof(string) });
     }
 
+    public void AddParser(Type type, MethodInfo method)
+    {
+        if (type == null) throw new ArgumentNullException(nameof(type));
+        _parsers[type] = method ?? throw new ArgumentNullException(nameof(method));
+    }
+
     public Expression GetParser(Type type, Expression argument)
     {
         if (type == null) throw new ArgumentNullException(nameof(type));

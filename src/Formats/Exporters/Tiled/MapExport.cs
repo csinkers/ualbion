@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
@@ -120,16 +119,15 @@ public static class MapExport
         return (result, script);
     }
 
-    static (string script, Dictionary<ushort, string> functionsByEventId) BuildScript(IEventSet eventSet, EventFormatter eventFormatter)
+    static (string script, Dictionary<ushort, string> functionsByEventId) BuildScript(IEventSet eventSet, IEventFormatter eventFormatter)
     {
-        var sb = new StringBuilder();
         var functionMapping = new Dictionary<ushort, string>();
 
         if (eventSet.Events.Count <= 0)
             return ("", functionMapping);
 
         var extraEntries = eventSet.ExtraEntryPoints;
-        eventFormatter.FormatEventSetDecompiled(sb, null, eventSet.Events, eventSet.Chains, extraEntries, 0);
+        var decompiled = eventFormatter.Decompile(eventSet.Events, eventSet.Chains, extraEntries);
 
         foreach (var entryEventId in extraEntries)
             functionMapping[entryEventId] = ScriptConstants.BuildAdditionalEntryLabel(entryEventId);
@@ -137,6 +135,6 @@ public static class MapExport
         for (int chainId = 0; chainId < eventSet.Chains.Count; chainId++)
             functionMapping[eventSet.Chains[chainId]] = ScriptConstants.BuildChainLabel(chainId);
 
-        return (sb.ToString(), functionMapping);
+        return (decompiled.Script, functionMapping);
     }
 }

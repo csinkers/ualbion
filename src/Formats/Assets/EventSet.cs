@@ -7,6 +7,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Scripting;
 
 namespace UAlbion.Formats.Assets;
 
@@ -19,6 +20,8 @@ public class EventSet : IEventSet
     [JsonInclude] public IList<ushort> Chains { get; private set; }
     [JsonIgnore] public IList<ushort> ExtraEntryPoints => null;
     [JsonIgnore] public IList<EventNode> Events { get; private set; }
+    [JsonIgnore] public DecompilationResult Decompiled { get; set; }
+    public override string ToString() => $"{Id} ({Events.Count} events)";
 
     public EventSet() { }
 
@@ -32,6 +35,7 @@ public class EventSet : IEventSet
     }
 
     public ushort GetChainForEvent(ushort index) => index >= Events.Count ? EventNode.UnusedEventId : _chainMapping[index];
+
     public string[] EventStrings // Used for JSON
     {
         get => Events?.Select(x => x.ToString()).ToArray();
@@ -60,7 +64,7 @@ public class EventSet : IEventSet
             set.Chains[i] = s.UInt16(null, set.Chains[i]);
 
         for (ushort i = 0; i < set.Events.Count; i++)
-            set.Events[i] = MapEvent.SerdesNode(i, set.Events[i], s, id, id.ToEventText(), mapping);
+            set.Events[i] = MapEvent.SerdesNode(i, set.Events[i], s, id.ToEventText(), mapping);
 
         foreach (var e in set.Events)
             e.Unswizzle(set.Events);

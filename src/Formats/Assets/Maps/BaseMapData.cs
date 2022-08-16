@@ -8,6 +8,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Scripting;
 
 namespace UAlbion.Formats.Assets.Maps;
 
@@ -32,6 +33,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
     [JsonInclude] public List<MapNpc> Npcs { get; protected set; }
     [JsonIgnore] public IList<EventNode> Events { get; private set; } = new List<EventNode>();
     [JsonInclude] public IList<ushort> Chains { get; private set; } = new List<ushort>();
+    [JsonIgnore] public DecompilationResult Decompiled { get; set; }
 
     [JsonIgnore]
     public IList<ushort> ExtraEntryPoints
@@ -174,7 +176,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
         s.List(nameof(Events), Events, eventCount, (i, x, serializer)
             =>
         {
-            var node = MapEvent.SerdesNode((ushort)i, x, serializer, Id, Id.ToMapText(), mapping);
+            var node = MapEvent.SerdesNode((ushort)i, x, serializer, Id.ToMapText(), mapping);
             if (serializer.IsCommenting())
                 serializer.Comment(node.ToString());
             return node;

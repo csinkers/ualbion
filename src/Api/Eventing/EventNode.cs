@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using static System.FormattableString;
 
 namespace UAlbion.Api.Eventing;
 
@@ -12,12 +11,25 @@ public class EventNode : IEventNode, IEquatable<EventNode>
 {
     public const ushort UnusedEventId = 0xffff;
     bool DirectSequence => (Next?.Id ?? Id + 1) == Id + 1;
-    public override string ToString() => ToString(0);
-    public virtual string ToString(int idOffset)
+    public override string ToString()
     {
+        var builder = new UnformattedScriptBuilder(false);
+        Format(builder, 0);
+        return builder.Build();
+    }
+
+    public virtual void Format(IScriptBuilder builder, int idOffset)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
         int id = Id - idOffset;
         int? next = Next?.Id - idOffset;
-        return Invariant($"{(DirectSequence ? " " : "#")}{id}=>{next?.ToString(CultureInfo.InvariantCulture) ?? "!"}: {Event}");
+
+        builder.Append(DirectSequence ? " " : "#");
+        builder.Append(id);
+        builder.Append("=>");
+        builder.Append(next?.ToString(CultureInfo.InvariantCulture) ?? "!");
+        builder.Append(": ");
+        Event.Format(builder);
     }
 
     public ushort Id { get; set; }
@@ -138,7 +150,7 @@ public class EventNode : IEventNode, IEquatable<EventNode>
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
         return Id == other.Id && 
-               Equals(Event.ToStringNumeric(), other.Event.ToStringNumeric()) && 
+               Equals(Event.ToString(), other.Event.ToString()) && 
                Equals(Next?.Id, other.Next?.Id);
     }
 
@@ -150,46 +162,5 @@ public class EventNode : IEventNode, IEquatable<EventNode>
         return Equals((EventNode)obj);
     }
 
-    public override int GetHashCode() => HashCode.Combine(Id, Event.ToStringNumeric(), Next?.Id);
-}
-
-[DebuggerDisplay("{ToString()}")]
-public class BranchNode : EventNode, IBranchNode
-{
-    public BranchNode(ushort id, IBranchingEvent @event) : base(id, @event) { }
-    public override string ToString() => ToString(0);
-
-    public override string ToString(int idOffset)
-    {
-        var id = Id - idOffset;
-        var ifTrue = (Next?.Id - idOffset)?.ToString(CultureInfo.InvariantCulture) ?? "!";
-        var ifFalse = (NextIfFalse?.Id - idOffset)?.ToString(CultureInfo.InvariantCulture) ?? "!";
-        return Invariant($"!{id}?{ifTrue}:{ifFalse}: {Event}");
-    }
-
-    public IEventNode NextIfFalse { get; set; }
-    public override void Unswizzle(IList<EventNode> nodes)
-    {
-        if (nodes == null) throw new ArgumentNullException(nameof(nodes));
-        if (NextIfFalse is DummyEventNode dummy)
-        {
-            if (dummy.Id >= nodes.Count)
-            {
-                // ApiUtil.Assert($"Invalid event id: {Id} links to {dummy.Id} when false, but the set only contains {nodes.Count} events");
-                NextIfFalse = null;
-            }
-            else NextIfFalse = nodes[dummy.Id];
-
-        }
-        base.Unswizzle(nodes);
-    }
-}
-public class DummyEventNode : IEventNode // These should only exist temporarily during deserialisation
-{
-    public DummyEventNode(ushort id) => Id = id;
-    public ushort Id { get; }
-    public IEvent Event => throw new InvalidOperationException("All DummyEventNodes should be removed during the unswizzling process.");
-    public IEventNode Next => throw new InvalidOperationException("All DummyEventNodes should be removed during the unswizzling process.");
-    public override string ToString() => ToString(0);
-    public string ToString(int idOffset) => $"DummyNode {Id - idOffset}";
+    public override int GetHashCode() => HashCode.Combine(Id, Event.GetHashCode(), Next?.Id);
 }

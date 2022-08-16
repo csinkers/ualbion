@@ -57,12 +57,15 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
 
     static void Verify(ICfgNode tree, List<(string, IGraph)> steps, string expected, [CallerMemberName] string method = null)
     {
-        var visitor = new FormatScriptVisitor();
+        var builder = new UnformattedScriptBuilder(false);
+        var visitor = new FormatScriptVisitor(builder);
         tree.Accept(visitor);
-        if (expected != visitor.Code)
+
+        var code = builder.Build();
+        if (expected != code)
             DumpSteps(steps, method);
 
-        Assert.Equal(expected, visitor.Code);
+        Assert.Equal(expected, code);
     }
 
     static void DumpSteps(List<(string, IGraph)> steps, string method)

@@ -7,5 +7,5 @@ public class CommentEvent : IVerboseEvent // No-op event for preserving comments
     [EventPart("msg")] public string Comment { get; }
     public CommentEvent(string comment) => Comment = comment;
     public override string ToString() => Comment == null ? "" : $";{Comment}";
-    public string ToStringNumeric() => ToString();
+    public void Format(IScriptBuilder builder) => builder.Add(ScriptPartType.Comment, ToString());
 }

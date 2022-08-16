@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
@@ -22,57 +21,59 @@ public class EventFormatter : IEventFormatter
         _textSourceId = textSourceId;
     }
 
-    public string Format(IEventNode e, int idOffset = 0)
+    public void Format(IScriptBuilder builder, IEventNode e, int idOffset = 0)
     {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
         if (e == null) throw new ArgumentNullException(nameof(e));
-        var nodeText = e.ToString(idOffset);
+        e.Format(builder, idOffset);
+
         if (e.Event is MapTextEvent textEvent && _stringLoadFunc != null)
         {
             var text = _stringLoadFunc(new StringId(_textSourceId, textEvent.SubId)).Replace("\"", "\\\"");
-            return $"{nodeText} ; \"{text}\"";
+            builder.Add(ScriptPartType.Comment, $" ; \"{text}\"");
         }
-
-        return nodeText;
     }
 
-    public string Format(IEvent e, bool useNumeric)
+    public void Format(IScriptBuilder builder, IEvent e)
     {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
         if (e == null) throw new ArgumentNullException(nameof(e));
-        var eventText = useNumeric ? e.ToStringNumeric() : e.ToString();
+        e.Format(builder);
+
         if (e is MapTextEvent textEvent && _stringLoadFunc != null)
         {
             var text = _stringLoadFunc(new StringId(_textSourceId, textEvent.SubId)).Replace("\"", "\\\"");
-            return $"{eventText} ; \"{text}\"";
+            builder.Add(ScriptPartType.Comment, $" ; \"{text}\"");
         }
-
-        return eventText;
     }
 
-    public void FormatEventSetDecompiled<T>(
-        StringBuilder sb,
-        Dictionary<int, (int start, int end)> mapping,
+    public DecompilationResult Decompile<T>(
         IList<T> events,
         IEnumerable<ushort> chains,
         IEnumerable<ushort> additionalEntryPoints,
-        int indent) where T : IEventNode
+        int indent = 0) where T : IEventNode
     {
         if (events.Count == 0)
-            return;
+            return new DecompilationResult();
 
         List<(string, IGraph)> steps = new();
         try
         {
             var trees = Decompiler.Decompile(events, chains, additionalEntryPoints, steps);
-            FormatGraphsAsBlocks(sb, mapping, trees, indent);
+            return FormatGraphsAsBlocks(trees, indent);
         }
         catch (ControlFlowGraphException)
         {
-            FormatEventSet(sb, mapping, events, indent); // Fallback to raw view
+            var builder = new DecompilationResultBuilder(false);
+            FormatEventSet(builder, events, indent); // Fallback to raw view
+            return builder.Build(Enumerable.Empty<ICfgNode>());
         }
     }
 
-    public void FormatGraphsAsBlocks(StringBuilder sb, Dictionary<int, (int start, int end)> mapping, IEnumerable<ICfgNode> trees, int indent)
+    public DecompilationResult FormatGraphsAsBlocks(IEnumerable<ICfgNode> trees, int indent)
     {
+        if (trees == null) throw new ArgumentNullException(nameof(trees));
+        var builder = new DecompilationResultBuilder(false);
         var counter = new CountEventsVisitor();
 
         bool first = true;
@@ -80,7 +81,7 @@ public class EventFormatter : IEventFormatter
         foreach (var tree in trees)
         {
             if (!first)
-                sb.AppendLine();
+                builder.AppendLine();
 
             tree.Accept(counter);
             var eventCount = counter.Count;
@@ -89,27 +90,30 @@ public class EventFormatter : IEventFormatter
             if (eventCount > 1)
             {
                 if (lastWasTrivial)
-                    sb.AppendLine();
-                sb.AppendLine("{");
+                    builder.AppendLine();
+                builder.AppendLine("{");
 
-                var visitor = new FormatScriptVisitor(sb, mapping) { PrettyPrint = true, IndentLevel = indent, Formatter = this };
+                var visitor = new FormatScriptVisitor(builder) { PrettyPrint = true, IndentLevel = indent, Formatter = this };
                 visitor.IndentLevel += visitor.TabSize;
                 tree.Accept(visitor);
 
-                sb.AppendLine();
-                sb.AppendLine("}");
+                builder.AppendLine();
+                builder.AppendLine("}");
                 lastWasTrivial = false;
             }
             else
             {
-                sb.Append("{ ");
-                var visitor = new FormatScriptVisitor(sb, mapping) { PrettyPrint = false };
+                builder.Append("{ ");
+                var visitor = new FormatScriptVisitor(builder) { PrettyPrint = false };
                 tree.Accept(visitor);
-                sb.Append(" }");
+                builder.Append(" }");
                 lastWasTrivial = true;
             }
             first = false;
         }
+
+        builder.AppendLine();
+        return builder.Build(trees);
     }
 
     static HashSet<IEventNode> ExploreGraph(IEventNode head)
@@ -135,39 +139,29 @@ public class EventFormatter : IEventFormatter
         return uniqueEvents;
     }
 
-    public string FormatChain(IEventNode firstEvent, int indent = 0)
+    public void FormatChain(IScriptBuilder builder, IEventNode firstEvent, int indent = 0)
     {
-        var sb = new StringBuilder();
-        FormatChain(sb, firstEvent, indent);
-        return sb.ToString();
-    }
-
-    public void FormatChain(StringBuilder sb, IEventNode firstEvent, int indent = 0)
-    {
-        if (sb == null) throw new ArgumentNullException(nameof(sb));
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
         if (firstEvent == null) return;
 
         var uniqueEvents = ExploreGraph(firstEvent);
         var sorted = uniqueEvents.OrderBy(x => x.Id).ToList();
         foreach (var e in sorted)
         {
-            sb.Append(new string(' ', 4 * indent));
-            sb.AppendLine(Format(e, sorted[0].Id));
+            builder.Append(new string(' ', 4 * indent));
+            Format(builder, e, sorted[0].Id);
         }
     }
 
-    public void FormatEventSet<T>(StringBuilder sb, Dictionary<int, (int start, int end)> mapping, IList<T> events, int indent = 0) where T : IEventNode
+    public void FormatEventSet<T>(IScriptBuilder builder, IList<T> events, int indent = 0) where T : IEventNode
     {
-        if (sb == null) throw new ArgumentNullException(nameof(sb));
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
         if (events == null) return;
 
         foreach (var e in events)
         {
-            sb.Append(new string(' ', 4 * indent));
-            int startOffset = sb.Length;
-            sb.AppendLine(Format(e, events[0].Id));
-            if (mapping != null)
-                mapping[e.Id] = (startOffset, sb.Length);
+            builder.Append(new string(' ', 4 * indent));
+            Format(builder, e, events[0].Id);
         }
     }
 }

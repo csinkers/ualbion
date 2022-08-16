@@ -35,15 +35,18 @@ public class EventRegionTests
         if (expected.Length != results.Count)
             errors.Add($"Unexpected number of regions built: {results.Count} (expected {expected.Length})");
 
+        var builder = new UnformattedScriptBuilder(false);
         for (int i = 0; i < results.Count && i < expected.Length; i++)
         {
-            var visitor = new FormatScriptVisitor { PrettyPrint = false, WrapStatements = false };
+            builder.Clear();
+            var visitor = new FormatScriptVisitor(builder) { PrettyPrint = false, WrapStatements = false };
             results[i].Accept(visitor);
-            var compact = visitor.Code;
+            var compact = builder.Build();
 
-            visitor = new FormatScriptVisitor { PrettyPrint = true, WrapStatements = false };
+            builder.Clear();
+            visitor = new FormatScriptVisitor(builder) { PrettyPrint = true, WrapStatements = false };
             results[i].Accept(visitor);
-            var pretty = visitor.Code;
+            var pretty = builder.Build();
 
             if (compact != expected[i] && pretty != expected[i])
                 errors.Add($"Graph {i} was expected to be \"{expected[i]}\" but was \"{compact}\", or with full formatting:{Environment.NewLine}{pretty}");

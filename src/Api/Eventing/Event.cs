@@ -59,10 +59,15 @@ public abstract class Event : IEvent // Contains no fields, only helper methods 
             ? metadata.Serialize(this, false)
             : GetType().Name;
 
-    public string ToStringNumeric() =>
-        Serializers.TryGetValue(GetType(), out var metadata)
-            ? metadata.Serialize(this, true)
-            : GetType().Name;
+    public void Format(IScriptBuilder builder)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        if (Serializers.TryGetValue(GetType(), out var metadata))
+            metadata.Serialize(builder, this);
+        else
+            builder.Add(ScriptPartType.EventName, GetType().Name);
+    }
 
     public static IEnumerable<EventMetadata> GetEventMetadata() =>
         Events.Values.OrderBy(x => x.Name);
@@ -144,6 +149,7 @@ public abstract class Event : IEvent // Contains no fields, only helper methods 
 
         if (parts.Length < metadata.Parts.Count + 1)
         {
+            var builder = new UnformattedScriptBuilder(false);
             var newParts = new string[metadata.Parts.Count + 1];
             for (int i = 0; i < newParts.Length; i++)
             {
@@ -151,10 +157,10 @@ public abstract class Event : IEvent // Contains no fields, only helper methods 
                     newParts[i] = parts[i];
                 else
                 {
-                    var sb = new StringBuilder();
+                    builder.Clear();
                     var part = metadata.Parts[i - 1];
-                    EventMetadata.SerializePart(sb, part, part.Default, false);
-                    newParts[i] = sb.ToString();
+                    EventMetadata.SerializePart(builder, part, part.Default);
+                    newParts[i] = builder.Build();
                 }
             }
             parts = newParts;

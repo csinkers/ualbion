@@ -5,7 +5,7 @@ using UAlbion.Formats.Ids;
 namespace UAlbion.Game.Events;
 
 [Event("prompt:item_quantity")]
-public class ItemQuantityPromptEvent : IAsyncEvent<int>
+public class ItemQuantityPromptEvent : Event, IAsyncEvent<int>
 {
     public ItemQuantityPromptEvent(StringId text, SpriteId icon, int iconSubId, int max, bool useTenths)
     {
@@ -21,6 +21,4 @@ public class ItemQuantityPromptEvent : IAsyncEvent<int>
     [EventPart("iconSubId")] public int IconSubId { get; }
     [EventPart("max")] public int Max { get; }
     [EventPart("useTenths")] public bool UseTenths { get; }
-
-    public string ToStringNumeric() => ToString();
 }

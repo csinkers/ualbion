@@ -3,7 +3,7 @@
 namespace UAlbion.Api.Eventing;
 // Some of these interfaces are checked for extremely frequently and the performance cost of using attributes instead would be excessive.
 #pragma warning disable CA1040 // Avoid empty interfaces
-public interface IEvent { string ToStringNumeric(); }
+public interface IEvent { void Format(IScriptBuilder builder); }
 public interface IAsyncEvent : IEvent { }
 // ReSharper disable once UnusedTypeParameter
 public interface IAsyncEvent<T> : IEvent { }
@@ -20,7 +20,7 @@ public interface IEventNode
 
     [SuppressMessage("Naming", "CA1716:Identifiers should not match keywords", Justification = "Don't care about VB")]
     IEventNode Next { get; }
-    string ToString(int idOffset);
+    void Format(IScriptBuilder builder, int idOffset);
 }
 public interface IBranchNode : IEventNode
 {

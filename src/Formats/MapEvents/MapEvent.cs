@@ -11,7 +11,7 @@ public abstract class MapEvent : Event, IMapEvent
 {
     public abstract MapEventType EventType { get; }
 
-    public static EventNode SerdesNode(ushort id, EventNode node, ISerializer s, AssetId chainSource, TextId textAssetId, AssetMapping mapping)
+    public static EventNode SerdesNode(ushort id, EventNode node, ISerializer s, TextId textAssetId, AssetMapping mapping)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         var initialPosition = s.Offset;

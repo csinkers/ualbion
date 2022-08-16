@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 
 namespace UAlbion.Api.Eventing;
 
@@ -60,14 +59,21 @@ public class EventMetadata
 
     public string Serialize(object instance, bool useNumericIds)
     {
-        var sb = new StringBuilder();
-        sb.Append(Name);
+        var builder = new UnformattedScriptBuilder(useNumericIds);
+        Serialize(builder, instance);
+        return builder.Build();
+    }
+
+    public void Serialize(IScriptBuilder builder, object instance)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        builder.Add(ScriptPartType.EventName, Name);
 
         int skipCount = 0;
         for (int i = Parts.Count - 1; i >= 0; i--)
         {
             var part = Parts[i];
-            if (!part.IsOptional || part.Default == null)
+            if (!part.IsOptional)
                 break;
 
             var value = part.Getter(instance);
@@ -79,53 +85,59 @@ public class EventMetadata
         for (var index = 0; index < Parts.Count - skipCount; index++)
         {
             var part = Parts[index];
-            sb.Append(' ');
+            builder.Append(' ');
             var value = part.Getter(instance);
-            SerializePart(sb, part, value, useNumericIds);
+            SerializePart(builder, part, value);
         }
-
-        return sb.ToString().TrimEnd();
     }
 
-    public static void SerializePart(StringBuilder sb, EventPartMetadata part, object value, bool useNumericIds)
+    public static void SerializePart(IScriptBuilder builder, EventPartMetadata part, object value)
     {
-        if (sb == null) throw new ArgumentNullException(nameof(sb));
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
         if (part == null) throw new ArgumentNullException(nameof(part));
+
         switch (value)
         {
             case string s when part.PropertyType == typeof(string):
-            {
-                sb.Append('"');
-                foreach (var c in s)
                 {
-                    switch (c)
+                    builder.Add(ScriptPartType.StringConstant, '\"');
+                    foreach (var c in s)
                     {
-                        case '\\': sb.Append("\\\\"); break;
-                        case '"': sb.Append("\\\""); break;
-                        case '\t': sb.Append("\\t"); break;
-                        default: sb.Append(c); break;
+                        switch (c)
+                        {
+                            case '\\': builder.Add(ScriptPartType.StringConstant, "\\\\"); break;
+                            case '"': builder.Add(ScriptPartType.StringConstant, "\\\""); break;
+                            case '\t': builder.Add(ScriptPartType.StringConstant, "\\t"); break;
+                            default: builder.Add(ScriptPartType.StringConstant, c); break;
+                        }
                     }
+
+                    builder.Add(ScriptPartType.StringConstant, '"');
+                    break;
                 }
 
-                sb.Append('"');
-                break;
-            }
-
             case IAssetId id:
-                sb.Append(useNumericIds ? id.ToStringNumeric() : id.ToString());
+                if (builder.UseNumericIds)
+                    builder.Add(ScriptPartType.Number, id.ToStringNumeric());
+                else
+                    builder.Add(ScriptPartType.Identifier, id.ToString());
+
                 break;
 
-            case Enum enumValue when useNumericIds:
-            {
-                object numeric = Convert.ChangeType(enumValue, enumValue.GetTypeCode(), CultureInfo.InvariantCulture);
-                sb.Append(numeric);
-                break;
-            }
+            case Enum enumValue when builder.UseNumericIds:
+                {
+                    object numeric = Convert.ChangeType(enumValue, enumValue.GetTypeCode(), CultureInfo.InvariantCulture);
+                    builder.Add(ScriptPartType.Number, numeric.ToString());
+                    break;
+                }
 
             case Enum enumValue:
-                sb.Append(enumValue.ToString().Replace(", ", "|", StringComparison.InvariantCulture)); 
+                builder.Add(ScriptPartType.Identifier, enumValue.ToString().Replace(", ", "|", StringComparison.InvariantCulture));
                 break;
-            default: sb.Append(value); break;
+
+            default: // ints, bytes etc
+                builder.Append(value); 
+                break;
         }
     }
 

@@ -604,6 +604,12 @@ wipe 1");
     }
 
     [Fact]
+    public void TestTrailingNullEvent()
+    {
+        Test("camera_jump 300 300", true);
+    }
+
+    [Fact]
     public void TestScriptEvents()
     {
         Test(

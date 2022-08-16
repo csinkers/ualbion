@@ -4,7 +4,7 @@ using UAlbion.Formats.Assets;
 namespace UAlbion.Game.Events;
 
 [Event("prompt:numeric")]
-public class NumericPromptEvent : IAsyncEvent<int>
+public class NumericPromptEvent : Event, IAsyncEvent<int>
 {
     public NumericPromptEvent(StringId text, int min, int max)
     {
@@ -16,6 +16,4 @@ public class NumericPromptEvent : IAsyncEvent<int>
     [EventPart("id")] public StringId Text { get; }
     [EventPart("min")] public int Min { get; }
     [EventPart("max")] public int Max { get; }
-
-    public string ToStringNumeric() => ToString();
 }

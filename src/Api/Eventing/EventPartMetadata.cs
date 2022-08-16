@@ -7,6 +7,7 @@ namespace UAlbion.Api.Eventing;
 public class EventPartMetadata
 {
     static readonly EventPartParsers Parsers = new();
+    public static void AddParser(Type type, MethodInfo method) => Parsers.AddParser(type, method);
 
     public string Name { get; }
     public string HelpText { get; }

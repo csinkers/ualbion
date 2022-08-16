@@ -1,4 +1,5 @@
-﻿using UAlbion.Api.Eventing;
+﻿using System;
+using UAlbion.Api.Eventing;
 
 namespace UAlbion.Formats.MapEvents;
 
@@ -7,5 +8,9 @@ public class UnparsableEvent : IVerboseEvent // No-op event for parsing failures
     public UnparsableEvent(string rawEventText) => RawEventText = rawEventText;
     public string RawEventText { get; }
     public override string ToString() => RawEventText;
-    public string ToStringNumeric() => ToString();
+    public void Format(IScriptBuilder builder)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        builder.Add(ScriptPartType.Error, RawEventText);
+    }
 }

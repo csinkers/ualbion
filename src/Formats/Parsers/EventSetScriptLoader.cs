@@ -39,10 +39,8 @@ public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
 
     static string Decompile(EventSetId id, EventSet set, IAssetManager assets)
     {
-        var sb = new StringBuilder();
         var eventFormatter = new EventFormatter(assets.LoadString, id.ToEventText());
-        eventFormatter.FormatEventSetDecompiled(sb, null, set.Events, set.Chains, null, 0);
-        return sb.ToString();
+        return eventFormatter.Decompile(set.Events, set.Chains, null).Script;
     }
 
     public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)

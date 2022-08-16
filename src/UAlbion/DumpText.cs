@@ -251,7 +251,9 @@ class DumpText : Component, IAssetDumper
                 {
                     sw.WriteLine($"        EventChain: {npc.Chain}");
                     var formatter = new EventFormatter(assets.LoadString, id.ToMapText());
-                    sw.WriteLine(formatter.FormatChain(npc.Node, 2));
+                    var builder = new UnformattedScriptBuilder(false);
+                    formatter.FormatChain(builder, npc.Node, 2);
+                    sw.WriteLine(builder.Build());
                 }
             }
             sw.WriteLine();
@@ -439,36 +441,18 @@ class DumpText : Component, IAssetDumper
         }
     }
 
-    static void PrintChain(StreamWriter sw, EventFormatter formatter, IEventNode e, int indent)
-    {
-        do
-        {
-            sw.Write($"{e.Id:000}");
-            sw.Write("".PadRight(indent * 4));
-            if(e is IBranchNode branch)
-            {
-                sw.WriteLine($"if (!{formatter.Format(e)}) {{");
-                if (branch.NextIfFalse != null)
-                    PrintChain(sw, formatter, branch.NextIfFalse, indent + 1);
-                sw.WriteLine("}".PadLeft(4 + indent * 4));
-                sw.WriteLine("else...".PadLeft(10 + indent * 4));
-            }
-            else sw.WriteLine(formatter.Format(e));
-            e = e.Next;
-        } while (e != null);
-    }
-
-    static void PrintEvent(StreamWriter sw, EventFormatter formatter, IEventNode e, int? chainId)
+    static void PrintEvent(IScriptBuilder builder, EventFormatter formatter, IEventNode e, int? chainId)
     {
         if(chainId.HasValue)
         {
-            sw.Write('C');
-            sw.Write(chainId.Value.ToString(CultureInfo.InvariantCulture).PadRight(3));
+            builder.Append('C');
+            builder.Append(chainId.Value.ToString(CultureInfo.InvariantCulture).PadRight(3));
         }
         else
-            sw.Write("    ");
+            builder.Append("    ");
 
-        sw.WriteLine(formatter.Format(e));
+        formatter.Format(builder, e);
+        builder.AppendLine();
     }
 
     static void DumpMapEvents(StreamWriter sw, IAssetManager assets, MapId mapId, IMapData map)
@@ -476,11 +460,14 @@ class DumpText : Component, IAssetDumper
         var formatter = new EventFormatter(assets.LoadString, mapId.ToMapText());
         sw.WriteLine();
         sw.WriteLine($"Map {mapId.Id} {mapId}:");
+        var builder = new UnformattedScriptBuilder(false);
         foreach (var e in map.Events)
         {
             var chainId = map.Chains.Select((x, i) => x == e.Id ? i : (int?)null).FirstOrDefault(x => x != null);
-            PrintEvent(sw, formatter, e, chainId);
+            PrintEvent(builder, formatter, e, chainId);
         }
+
+        sw.WriteLine(builder.Build());
 
         /*
         var rootNodes = new HashSet<(bool, TriggerType, int)>();
@@ -525,11 +512,13 @@ class DumpText : Component, IAssetDumper
                 continue;
 
             var formatter = new EventFormatter(assets.LoadString, ((EventSetId)eventSetId).ToEventText());
+            var builder = new UnformattedScriptBuilder(false);
             foreach (var e in set.Events)
             {
                 var chainId = set.Chains.Select((x, i) => x == e.Id ? i : (int?)null).FirstOrDefault(x => x != null);
-                PrintEvent(sw, formatter, e, chainId);
+                PrintEvent(builder, formatter, e, chainId);
             }
+            sw.WriteLine(builder.Build());
         }
     }
 

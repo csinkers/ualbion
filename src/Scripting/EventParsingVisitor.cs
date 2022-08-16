@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using UAlbion.Api.Eventing;
 using UAlbion.Scripting.Ast;
 
@@ -10,18 +9,19 @@ public class EventParsingVisitor : BaseAstBuilderVisitor
     int _nextEventId;
     protected override ICfgNode Build(Statement statement)
     {
-        var sb = new StringBuilder();
-        var formatter = new FormatScriptVisitor(sb, null);
+        var builder = new UnformattedScriptBuilder(false);
+        var formatter = new FormatScriptVisitor(builder);
         statement.Head.Accept(formatter);
         foreach (var part in statement.Parameters)
         {
-            sb.Append(' ');
+            builder.Append(' ');
             part.Accept(formatter);
         }
 
-        var e = Event.Parse(formatter.Code);
+        var formatted = builder.Build();
+        var e = Event.Parse(formatted);
         if (e == null)
-            throw new InvalidOperationException($"Could not parse \"{formatter.Code}\" as an event");
+            throw new InvalidOperationException($"Could not parse \"{formatted}\" as an event");
 
         return Emit.Event(e, _nextEventId++);
     }

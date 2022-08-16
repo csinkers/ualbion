@@ -143,7 +143,7 @@ public class EventTests
 
         [EventPart("mandatory")]
         public int Mandatory { get; }
-        [EventPart("optional")]
+        [EventPart("optional", true)]
         public int? Optional { get; }
     }
 
@@ -207,9 +207,9 @@ public class EventTests
         }
 
         [EventPart("float")] public float Float { get; }
-        [EventPart("nbool")] public bool? NullableBool { get; }
-        [EventPart("nfloat")] public float? NullableFloat { get; }
-        [EventPart("nenum")] public SomeEnum? NullableEnum { get; }
+        [EventPart("nbool", true)] public bool? NullableBool { get; }
+        [EventPart("nfloat", true)] public float? NullableFloat { get; }
+        [EventPart("nenum", true)] public SomeEnum? NullableEnum { get; }
     }
 
     [Fact]

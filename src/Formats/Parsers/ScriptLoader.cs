@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
@@ -25,17 +24,23 @@ public class ScriptLoader : IAssetLoader<Script>
 
     public Script Serdes(Script script, AssetInfo info, ISerializer s, SerdesContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        if (s == null)
+            throw new ArgumentNullException(nameof(s));
 
         if (s.IsReading())
             return Parse(ReadLines(s));
 
-        if (script == null) throw new ArgumentNullException(nameof(script));
-        var sb = new StringBuilder();
-        foreach (var e in script)
-            sb.AppendLine(e.ToStringNumeric());
+        if (script == null)
+            throw new ArgumentNullException(nameof(script));
 
-        var text = sb.ToString().TrimEnd() + Environment.NewLine;
+        var builder = new UnformattedScriptBuilder(true);
+        foreach (var e in script)
+        {
+            e.Format(builder);
+            builder.AppendLine();
+        }
+
+        var text = builder.Build().TrimEnd() + Environment.NewLine;
         s.FixedLengthString(null, text, text.Length);
 
         return script;
@@ -43,7 +48,9 @@ public class ScriptLoader : IAssetLoader<Script>
 
     public static Script Parse(IEnumerable<string> lines)
     {
-        if (lines == null) throw new ArgumentNullException(nameof(lines));
+        if (lines == null)
+            throw new ArgumentNullException(nameof(lines));
+
         var script = new Script();
         foreach (var line in lines)
         {

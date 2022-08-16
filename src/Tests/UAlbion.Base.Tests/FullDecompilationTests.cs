@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
@@ -491,11 +490,9 @@ public class FullDecompilationTests : IDisposable
             var graph = graphs[index];
             try
             {
-                var decompiled = Decompile(graph, steps);
-                var sb = new StringBuilder();
-                Dictionary<int, (int start, int end)> mapping = new();
-                formatter.FormatGraphsAsBlocks(sb, mapping, new []  { decompiled }, 0);
-                scripts[index] = sb.ToString();
+                var decompiledGraph = Decompile(graph, steps);
+                var result = formatter.FormatGraphsAsBlocks(new[] { decompiledGraph }, 0);
+                scripts[index] = result.Script;
 
                 var roundTripLayout = AlbionCompiler.Compile(scripts[index], contextId, steps);
                 var expectedLayout = EventLayout.Build(new[] { graph });

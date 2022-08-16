@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using UAlbion.Api.Eventing;
 using UAlbion.Scripting.Ast;
 
 #pragma warning disable 8321 // Stop warnings about Vis() debug functions
@@ -667,6 +668,7 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
         sb.AppendLine("digraph G {");
         sb.AppendLine($"    graph [ dpi = {dpi} ];");
 
+        var builder = new UnformattedScriptBuilder(false);
         for (int i = 0; i < Nodes.Count; i++)
         {
             if (Nodes[i] == null) continue;
@@ -684,9 +686,10 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
             {
                 sb.Append("\\l");
 
-                var visitor = new FormatScriptVisitor();
+                builder.Clear();
+                var visitor = new FormatScriptVisitor(builder);
                 Nodes[i].Accept(visitor);
-                sb.Append(visitor.Code.Replace(Environment.NewLine, "\\l", StringComparison.InvariantCulture));
+                sb.Append(builder.Build().Replace(Environment.NewLine, "\\l", StringComparison.InvariantCulture));
             }
 
             sb.AppendLine("\\l\"];");

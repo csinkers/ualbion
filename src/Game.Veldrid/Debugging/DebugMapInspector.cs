@@ -13,6 +13,7 @@ using UAlbion.Game.Debugging;
 using UAlbion.Game.Input;
 using UAlbion.Game.State;
 using UAlbion.Game.Veldrid.Audio;
+using UAlbion.Scripting;
 
 #if DEBUG
 using UAlbion.Game.Events;
@@ -124,7 +125,7 @@ namespace UAlbion.Game.Veldrid.Debugging
         int _currentContextIndex;
         string[] _contextNames = Array.Empty<string>();
 
-        void DrawDebuggerTab()
+        unsafe void DrawDebuggerTab()
         {
             if (!ImGui.BeginTabItem("Debugger"))
                 return;
@@ -138,7 +139,59 @@ namespace UAlbion.Game.Veldrid.Debugging
 
             ImGui.ListBox("Active Contexts", ref _currentContextIndex, _contextNames, _contextNames.Length);
 
+            if (_currentContextIndex >= 0 && _currentContextIndex < _contextNames.Length)
+            {
+                var context = chainManager.Contexts[_currentContextIndex];
+                var set = context.EventSet;
+                if (set.Decompiled == null)
+                {
+                    var assets = Resolve<IAssetManager>();
+                    var eventFormatter = new EventFormatter(assets.LoadString, context.EventSet.TextId);
+                    set.Decompiled = eventFormatter.Decompile(set.Events, set.Chains, set.ExtraEntryPoints);
+                }
+
+                var code = set.Decompiled.Script;
+                ImGui.InputTextMultiline("Script",
+                    ref code,
+                    (uint)code.Length,
+                    new Vector2(-1, ImGui.GetTextLineHeight() * 64),
+                    ImGuiInputTextFlags.ReadOnly,
+                    CodeEditorCallback);
+            }
+
             ImGui.EndTabItem();
+        }
+
+        unsafe int CodeEditorCallback(ImGuiInputTextCallbackData* data)
+        {
+            switch (data->EventFlag)
+            {
+                case ImGuiInputTextFlags.None:
+                case ImGuiInputTextFlags.CharsDecimal:
+                case ImGuiInputTextFlags.CharsHexadecimal:
+                case ImGuiInputTextFlags.CharsUppercase:
+                case ImGuiInputTextFlags.CharsNoBlank:
+                case ImGuiInputTextFlags.AutoSelectAll:
+                case ImGuiInputTextFlags.EnterReturnsTrue:
+                case ImGuiInputTextFlags.CallbackCompletion:
+                case ImGuiInputTextFlags.CallbackHistory:
+                case ImGuiInputTextFlags.CallbackAlways:
+                case ImGuiInputTextFlags.CallbackCharFilter:
+                case ImGuiInputTextFlags.AllowTabInput:
+                case ImGuiInputTextFlags.CtrlEnterForNewLine:
+                case ImGuiInputTextFlags.NoHorizontalScroll:
+                case ImGuiInputTextFlags.AlwaysInsertMode:
+                case ImGuiInputTextFlags.ReadOnly:
+                case ImGuiInputTextFlags.Password:
+                case ImGuiInputTextFlags.NoUndoRedo:
+                case ImGuiInputTextFlags.CharsScientific:
+                case ImGuiInputTextFlags.CallbackResize:
+                case ImGuiInputTextFlags.Multiline:
+                case ImGuiInputTextFlags.NoMarkEdited:
+                    break;
+            }
+
+            return 0;
         }
 
         void DrawInspectorTab()

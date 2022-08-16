@@ -45,7 +45,12 @@ public sealed class SelectionHandler2D : Component
     {
         var assets = Resolve<IAssetManager>();
         var eventFormatter = new EventFormatter(assets.LoadString, _map.Id.ToMapText());
-        _formatChain = x => eventFormatter.FormatChain((IEventNode)x);
+        _formatChain = x =>
+        {
+            var builder = new UnformattedScriptBuilder(false);
+            eventFormatter.FormatChain(builder, (IEventNode)x);
+            return builder.Build();
+        };
     }
 
     bool OnSelect(WorldCoordinateSelectEvent e, Action<Selection> continuation)

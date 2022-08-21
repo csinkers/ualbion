@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
-using UAlbion.Base;
 using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
@@ -169,7 +168,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         On<ModifyGoldEvent>(e => Warn($"TODO: {e} not handled"));
         On<ModifyRationsEvent>(e => Warn($"TODO: {e} not handled"));
         On<ModifyItemCountEvent>(e => Warn($"TODO: {e} not handled"));
-        On<ActivateItemEvent>(ActivateItem);
+        On<SetSpecialItemActiveEvent>(ActivateItem);
 
         On<EventChainOffEvent>(e => _game.SetChainDisabled(e.Map, e.ChainNumber, SetFlag(e.Operation, _game.IsChainDisabled(e.Map, e.ChainNumber))));
         On<ModifyNpcOffEvent>(e => _game.SetNpcDisabled(e.Map, e.NpcNum, SetFlag(e.Operation, _game.IsNpcDisabled(e.Map, e.NpcNum))));
@@ -226,11 +225,11 @@ public class GameState : ServiceComponent<IGameState>, IGameState
 
             case AssetType.Target:
             {
-                if (id == Target.Leader) return _leader;
-                if (id == Target.Inventory) return _currentInventory;
-                if (id == Target.Attacker) return _combatant;
-                if (id == Target.Target) return _victim;
-                if (id == Target.Subject) return _subject;
+                if (id == Base.Target.Leader) return _leader;
+                if (id == Base.Target.Inventory) return _currentInventory;
+                if (id == Base.Target.Attacker) return _combatant;
+                if (id == Base.Target.Target) return _victim;
+                if (id == Base.Target.Subject) return _subject;
                 return null;
 
             }
@@ -240,7 +239,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
 
     void OnDataChange(IDataChangeEvent e)
     {
-        if (e.Target == Target.Everyone)
+        if (e.Target == Base.Target.Everyone)
         {
             foreach (var member in _party.StatusBarOrder.Select(x => _game.Sheets[x.Id.ToSheet()]))
                 _sheetApplier.Apply(e, member);
@@ -374,10 +373,19 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         Raise(new PlayerEnteredTileEvent(_game.PartyX, _game.PartyY));
     }
 
-    void ActivateItem(ActivateItemEvent e)
+    void ActivateItem(SetSpecialItemActiveEvent e)
     {
-        if (e.Item == Base.Item.Clock) _game.ActiveItems |= ActiveItems.Clock;
-        else if (e.Item == Base.Item.Compass) _game.ActiveItems |= ActiveItems.Compass;
-        else if (e.Item == Base.Item.MonsterEye) _game.ActiveItems |= ActiveItems.MonsterEye;
+        if (e.IsActive)
+        {
+            if (e.Item == Base.Item.Clock) _game.ActiveItems |= ActiveItems.Clock;
+            else if (e.Item == Base.Item.Compass) _game.ActiveItems |= ActiveItems.Compass;
+            else if (e.Item == Base.Item.MonsterEye) _game.ActiveItems |= ActiveItems.MonsterEye;
+        }
+        else
+        {
+            if (e.Item == Base.Item.Clock) _game.ActiveItems &= ~ActiveItems.Clock;
+            else if (e.Item == Base.Item.Compass) _game.ActiveItems &= ~ActiveItems.Compass;
+            else if (e.Item == Base.Item.MonsterEye) _game.ActiveItems &= ~ActiveItems.MonsterEye;
+        }
     }
 }

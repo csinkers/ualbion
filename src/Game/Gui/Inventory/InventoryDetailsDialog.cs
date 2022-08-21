@@ -1,4 +1,4 @@
-﻿using System;
+﻿    using System;
 using System.Globalization;
 using System.Linq;
 using UAlbion.Core.Visual;
@@ -95,7 +95,7 @@ public class InventoryDetailsDialog : ModalDialog
     void Close()
     {
         Remove();
-        Closed?.Invoke(this, new EventArgs());
+        Closed?.Invoke(this, EventArgs.Empty);
     }
 
     public event EventHandler<EventArgs> Closed;

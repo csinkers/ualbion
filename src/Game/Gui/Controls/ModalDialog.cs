@@ -4,7 +4,7 @@ using UAlbion.Core;
 
 namespace UAlbion.Game.Gui.Controls;
 
-public class ModalDialog : Dialog // A bit hacky, and UiBlocker doesn't currently block hover / blur events :/
+public class ModalDialog : Dialog
 {
     readonly UiBlocker _blocker;
         

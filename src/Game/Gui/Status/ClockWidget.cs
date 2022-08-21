@@ -28,7 +28,7 @@ public class ClockWidget : Dialog
     public ClockWidget() : base(DialogPositioning.TopLeft)
     {
         On<MinuteElapsedEvent>(_ => Update());
-        On<ActivateItemEvent>(e =>
+        After<SetSpecialItemActiveEvent>(e =>
         {
             if (e.Item == Base.Item.Clock) // Do a one shot update next time the scene is being drawn.
                 On<RenderEvent>(_ => Update());

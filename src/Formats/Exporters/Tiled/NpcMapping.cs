@@ -100,8 +100,10 @@ public static class NpcMapping
             new(Prop.Type, npc.Type.ToString()),
         };
 
+        var script = npc.Node != null ? functionsByEventId[npc.Node.Id] : null;
+
         if (!npc.Id.IsNone) objProps.Add(new TiledProperty(Prop.Id, npc.Id.ToString()));
-        if (npc.Node != null) objProps.Add(new TiledProperty(Prop.Script, functionsByEventId[npc.Node.Id]));
+        if (npc.Node != null) objProps.Add(new TiledProperty(Prop.Script, script));
         if (npc.Sound != 0) objProps.Add(new TiledProperty(Prop.Sound, npc.Sound.ToString()));
         if (npcPathIndices.TryGetValue(npcIndex, out var pathObjectId)) objProps.Add(TiledProperty.Object(Prop.Path, pathObjectId));
 
@@ -110,7 +112,7 @@ public static class NpcMapping
         {
             Id = nextId++,
             Gid = tileId ?? 0,
-            Name = $"NPC{npcIndex} {npc.Id}",
+            Name = $"NPC{npcIndex} {npc.Id} {script}",
             Type = ObjectGroupMapping.TypeName.Npc,
             X = npc.Waypoints[0].X * tileWidth,
             Y = npc.Waypoints[0].Y * tileHeight,

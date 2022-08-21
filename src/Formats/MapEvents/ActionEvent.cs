@@ -34,7 +34,7 @@ public class ActionEvent : MapEvent
                 or ActionType.UseItem 
                 or ActionType.EquipItem 
                 or ActionType.UnequipItem 
-                or ActionType.PickupItem => AssetType.Item,
+                or ActionType.DropItem => AssetType.Item,
             ActionType.Word => AssetType.Word,
             ActionType.DialogueLine => AssetType.Unknown,
             _ => AssetType.Unknown

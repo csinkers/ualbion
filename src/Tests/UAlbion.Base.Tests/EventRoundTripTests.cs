@@ -51,7 +51,11 @@ public class EventRoundTripTests
             try
             {
                 var e = Event.Parse(line);
-                var s = e?.ToString();
+
+                var builder = new UnformattedScriptBuilder(useNumeric);
+                e?.Format(builder);
+                var s = builder.Build();
+
                 if (!string.Equals(s, line, StringComparison.OrdinalIgnoreCase))
                     results.Add((line, s));
             }
@@ -157,7 +161,7 @@ public class EventRoundTripTests
             ("action DialogueLine 1 Unknown.1",   new ActionEvent(ActionType.DialogueLine,   1, unknown1, 1)),
             ("action EquipItem 1 Item.Pistol",    new ActionEvent(ActionType.EquipItem,      1, (ItemId)Item.Pistol, 1)),
             ("action FinishDialogue 1 Unknown.0", new ActionEvent(ActionType.FinishDialogue, 1, unknown0, 1)),
-            ("action PickupItem 1 Item.Pistol",   new ActionEvent(ActionType.PickupItem,     1, (ItemId)Item.Pistol, 1)),
+            ("action DropItem 1 Item.Pistol",     new ActionEvent(ActionType.DropItem,     1, (ItemId)Item.Pistol, 1)),
             ("action StartDialogue 1 Unknown.0",  new ActionEvent(ActionType.StartDialogue,  1, unknown0, 1)),
             ("action StartDialogue 1 Unknown.1",  new ActionEvent(ActionType.StartDialogue,  1, unknown1, 1)),
             ("action UnequipItem 1 Item.Pistol",  new ActionEvent(ActionType.UnequipItem,    1, (ItemId)Item.Pistol, 1)),
@@ -662,10 +666,14 @@ start_anim 3 25 24 2
 stop_anim
 text 101
 update 1
-update 200", true);
+update 200");
+    }
 
-/* Original text w/ numeric ids
-active_member_text 100
+    [Fact]
+    public void TestScriptEventsNumeric()
+    {
+        Test(
+@"active_member_text 100
 ambient 32
 camera_jump 300 300
 camera_lock
@@ -714,7 +722,6 @@ start_anim 3 25 24 2
 stop_anim
 text 101
 update 1
-update 200
- */
+update 200", true);
     }
 }

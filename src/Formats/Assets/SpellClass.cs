@@ -23,4 +23,23 @@ public enum SpellClasses : byte
     OquloKamulos =  8,
     Unk4         = 16,
     ZombieMagic  = 32,
+    Unk6         = 64,
+}
+
+public static class SpellClassExtensions
+{
+    public static SpellClasses ToFlag(this SpellClass c)
+    {
+        return c switch
+        {
+            SpellClass.DjiKas       => SpellClasses.DjiKas,
+            SpellClass.DjiKantos    => SpellClasses.DjiKantos,
+            SpellClass.Druid        => SpellClasses.Druid,
+            SpellClass.OquloKamulos => SpellClasses.OquloKamulos,
+            SpellClass.Unk4         => SpellClasses.Unk4,
+            SpellClass.ZombieMagic  => SpellClasses.ZombieMagic,
+            SpellClass.Unk6         => SpellClasses.Unk6,
+            _ => throw new ArgumentOutOfRangeException(nameof(c), c, null)
+        };
+    }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using UAlbion.Core;
 using UAlbion.Formats.Ids;
-using UAlbion.Game.Events;
+using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui.Inventory;

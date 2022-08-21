@@ -163,7 +163,7 @@ public sealed class ItemData : IItem
 
         var spell = item.Spell.IsNone ? null : spellManager.GetSpellOrDefault(item.Spell);
         SpellClass spellClass = s.EnumU8("SpellClass", spell?.Class ?? 0);                  // 15
-        byte spellNumber = s.UInt8("SpellNumber", (byte)((spell?.OffsetInClass + 1) ?? 0)); // 16
+        byte spellNumber = s.UInt8("SpellNumber", (byte)(spell?.OffsetInClass + 1 ?? 0)); // 16
         item.Spell = spellNumber == 0 
             ? SpellId.None 
             : spellManager.GetSpellId(spellClass, (byte)(spellNumber - 1));

@@ -1,9 +1,12 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UAlbion.Api.Eventing;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Dialogs;
 using UAlbion.Game.Gui.Inventory;
+using UAlbion.Game.State;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui;
@@ -19,7 +22,7 @@ public class DialogManager  : ServiceComponent<IDialogManager>, IDialogManager
             var maxLayer = Children.OfType<ModalDialog>().Select(x => (int?)x.Depth).Max() ?? 0;
             var tf = Resolve<ITextFormatter>();
             var dialog = AttachChild(new YesNoMessageBox(e.StringId, maxLayer + 1, tf));
-            dialog.Closed += (sender, args) => c(dialog.Result);
+            dialog.Closed += (_, _) => c(dialog.Result);
             return true;
         });
 
@@ -34,14 +37,25 @@ public class DialogManager  : ServiceComponent<IDialogManager>, IDialogManager
         {
             var tf = Resolve<ITextFormatter>();
             var dialog = AttachChild(new NumericPromptDialog(tf.Format(e.Text), e.Min, e.Max));
-            dialog.Closed += (sender, _) => c(dialog.Value);
+            dialog.Closed += (_, _) => c(dialog.Value);
+            return true;
+        });
+
+        OnAsync<PartyMemberPromptEvent, PartyMemberId>((e, c) =>
+        {
+            var tf = Resolve<ITextFormatter>();
+            var party = Resolve<IParty>();
+            var maxLayer = Children.OfType<ModalDialog>().Select(x => (int?)x.Depth).Max() ?? 0;
+            var members = party.StatusBarOrder.Where(x => e.Members == null || e.Members.Contains(x.Id)).ToArray();
+            var dialog = AttachChild(new PartyMemberPromptDialog(tf, maxLayer + 1, e.Prompt, members));
+            dialog.Closed += (_, _) => c(dialog.Result);
             return true;
         });
 
         On<LoadMapPromptEvent>(_ =>
         {
             var dialog = AttachChild(new LoadMapPromptDialog(new LiteralText("Select map"), 100, 399));
-            dialog.Closed += (sender, _) => Raise(new LoadMapEvent((Base.Map)dialog.Value)); // TODO: Include mod maps
+            dialog.Closed += (_, _) => Raise(new LoadMapEvent((Base.Map)dialog.Value)); // TODO: Include mod maps
         });
 
         On<ShowCombatPositionsDialogEvent>(_ =>

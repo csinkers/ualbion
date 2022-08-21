@@ -13,7 +13,7 @@ public class EventMetadata
     public string HelpText { get; }
     public ReadOnlyCollection<string> Aliases { get; }
     public ReadOnlyCollection<EventPartMetadata> Parts { get; }
-    public Func<string[], Event> Parser { get; }
+    public Func<string[], IEvent> Parser { get; }
     public Type Type { get; }
     public override string ToString() => $"{Name} {HelpText}";
 
@@ -43,9 +43,9 @@ public class EventMetadata
             var parameters = parser.GetParameters();
             if (parameters.Length == 1 && parameters[0].ParameterType == typeof(string[]))
             {
-                Parser = (Func<string[], Event>)Expression.Lambda(
+                Parser = (Func<string[], IEvent>)Expression.Lambda(
                     Expression.Convert(
-                        Expression.Call(parser, partsParameter), typeof(Event)),
+                        Expression.Call(parser, partsParameter), typeof(IEvent)),
                     partsParameter).Compile();
             }
         }
@@ -141,7 +141,7 @@ public class EventMetadata
         }
     }
 
-    Func<string[], Event> BuildParser(ParameterExpression partsParameter)
+    Func<string[], IEvent> BuildParser(ParameterExpression partsParameter)
     {
         var constructor = Type.GetConstructors().Single();
         var parameters = constructor.GetParameters();
@@ -152,9 +152,9 @@ public class EventMetadata
                 "This may be because the property corresponding to the constructor parameter does not have an EventPart attribute.");
         }
 
-        return (Func<string[], Event>)Expression.Lambda(
+        return (Func<string[], IEvent>)Expression.Lambda(
             Expression.Convert(
-                Expression.New(constructor, Parts.Select(x => x.Parser)), typeof(Event)),
+                Expression.New(constructor, Parts.Select(x => x.Parser)), typeof(IEvent)),
             partsParameter).Compile();
     }
 }

@@ -5,9 +5,12 @@ using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
+using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Events.Transitions;
@@ -42,6 +45,12 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         OnAsync<InventoryGiveItemEvent>(OnGiveItem);
         OnAsync<InventoryDiscardEvent>(OnDiscard);
         On<SetInventorySlotUiPositionEvent>(OnSetSlotUiPosition);
+        On<ActivateItemEvent>(OnActivateItem);
+        On<ActivateItemSpellEvent>(OnActivateItemSpell);
+        On<DrinkItemEvent>(OnDrinkItem);
+        On<ReadItemEvent>(OnReadItem);
+        On<ReadSpellScrollEvent>(OnReadSpellScroll);
+
         _getInventory = getInventory;
         ItemInHand = new ReadOnlyItemSlot(_hand);
     }
@@ -550,5 +559,141 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         }
 
         return totalTransferred;
+    }
+
+    void OnActivateItem(ActivateItemEvent e)
+    {
+        var inv = _getInventory(e.SlotId.Id);
+        var slot = inv.GetSlot(e.SlotId.Slot);
+        if (slot.Item is not ItemData item) return;
+        if (item.TypeId != ItemType.HeadsUpDisplayItem) return;
+
+        var tf = Resolve<ITextFormatter>();
+        Raise(new SetSpecialItemActiveEvent(item.Id, true));
+
+        var textId = TextId.None;
+        if (item.Id == Base.Item.Clock)
+            textId = Base.SystemText.SpecialItem_TheClockHasBeenActivated;
+        if (item.Id == Base.Item.Compass)
+            textId = Base.SystemText.SpecialItem_TheCompassHasBeenActivated;
+        if (item.Id == Base.Item.MonsterEye)
+            textId = Base.SystemText.SpecialItem_TheMonsterEyeHasBeenActivated;
+
+        if (!textId.IsNone)
+            Raise(new HoverTextEvent(tf.Format(Base.SystemText.Item_Add)));
+
+        slot.Amount--;
+        Update(e.SlotId.Id);
+    }
+
+    void OnActivateItemSpell(ActivateItemSpellEvent e)
+    {
+        var inv = _getInventory(e.SlotId.Id);
+        var slot = inv.GetSlot(e.SlotId.Slot);
+        if (slot.Item is not ItemData item) return;
+        if (item.Charges <= 0 || item.Spell.IsNone) return;
+
+        Warn("TODO: Actually cast the spell once the magic system is implemented");
+
+        item.Charges--;
+        Update(e.SlotId.Id);
+    }
+
+    void OnDrinkItem(DrinkItemEvent e)
+    {
+        var inv = _getInventory(e.SlotId.Id);
+        var slot = inv.GetSlot(e.SlotId.Slot);
+        if (slot.Item is not ItemData item) return;
+        if (item.TypeId != ItemType.Drink) return;
+
+        RaiseAsync(new PartyMemberPromptEvent((TextId)Base.SystemText.InvMsg_WhoShouldDrinkThis), result =>
+        {
+            if (result == PartyMemberId.None)
+                return;
+
+            Raise(new SetContextEvent(ContextType.Subject, result));
+            TriggerItemChain(slot.ItemId, () =>
+            {
+                slot.Amount--;
+                Update(e.SlotId.Id);
+            });
+        });
+    }
+
+    void OnReadItem(ReadItemEvent e)
+    {
+        var inv = _getInventory(e.SlotId.Id);
+        var slot = inv.GetSlot(e.SlotId.Slot);
+        if (slot.Item is not ItemData item) return;
+        if (item.TypeId != ItemType.Document) return;
+
+        TriggerItemChain(item.Id, () => { });
+    }
+
+    void OnReadSpellScroll(ReadSpellScrollEvent e)
+    {
+        var inv = _getInventory(e.SlotId.Id);
+        var slot = inv.GetSlot(e.SlotId.Slot);
+        if (slot.Item is not ItemData item) return;
+        if (item.TypeId != ItemType.SpellScroll) return;
+
+        var spell = Resolve<IAssetManager>().LoadSpell(item.Spell);
+        if (spell == null)
+            return;
+
+        var tf = Resolve<ITextFormatter>();
+        var party = Resolve<IParty>();
+
+        var target = party.StatusBarOrder
+            .FirstOrDefault(x => (x.Effective.Magic.SpellClasses & spell.Class.ToFlag()) != 0);
+
+        if (target == null)
+        {
+            Raise(new HoverTextEvent(tf.Format(Base.SystemText.InvMsg_NoOneKnowsThisSpellClass)));
+            return;
+        }
+
+        if (target.Effective.Magic.KnownSpells.Contains(spell.Id))
+        {
+            Raise(new HoverTextEvent(tf.Format(Base.SystemText.InvMsg_ThisSpellIsAlreadyKnown)));
+            return;
+        }
+
+        if (target.Effective.Level < spell.LevelRequirement)
+        {
+            Raise(new HoverTextEvent(tf.Format(Base.SystemText.InvMsg_ThisSpellsLevelIsTooHigh)));
+            return;
+        }
+
+
+        Raise(new LearnSpellEvent(e.SlotId.Id.ToSheetId(), item.Spell));
+        Raise(new HoverTextEvent(tf.Format(Base.SystemText.InvMsg_XLearnedTheSpell)));
+        
+        slot.Amount--;
+        Update(e.SlotId.Id);
+    }
+
+    void TriggerItemChain(ItemId itemId, Action continuation)
+    {
+        var eventSet = Resolve<IAssetManager>().LoadEventSet(Base.EventSet.InventoryItems);
+        foreach (var eventIndex in eventSet.Chains)
+        {
+            if (eventSet.Events[eventIndex].Event is not ActionEvent action)
+                continue;
+
+            if (action.ActionType != ActionType.UseItem || action.Argument != (AssetId)itemId)
+                continue;
+
+            var triggerEvent = new TriggerChainEvent(
+                eventSet,
+                eventIndex,
+                new EventSource(eventSet.Id, TriggerTypes.Action));
+
+            RaiseAsync(triggerEvent, continuation);
+            return;
+        }
+
+        // If no chain was found just continue immediately
+        continuation.Invoke();
     }
 }

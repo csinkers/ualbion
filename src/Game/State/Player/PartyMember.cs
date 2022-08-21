@@ -16,13 +16,13 @@ public class PartyMember : Component, IPlayer
     readonly CharacterSheet _base;
     IEffectiveCharacterSheet _lastEffective;
     DateTime _lastChangeTime;
-    float _lerp;
+    float _lerp = 1.0f;
     Func<Vector3> _positionFunc;
 
     public PartyMember(PartyMemberId id, CharacterSheet sheet)
     {
         On<InventoryChangedEvent>(InventoryChanged);
-        On<EngineUpdateEvent>(EngineUpdate);
+        On<LearnSpellEvent>(LearnSpell);
         On<SetPlayerStatusUiPositionEvent>(e => { if (id == e.Id) StatusBarUiPosition = new Vector2(e.CentreX, e.CentreY); });
 
         Id = id;
@@ -30,12 +30,21 @@ public class PartyMember : Component, IPlayer
         Apparent = new InterpolatedCharacterSheet(() => _lastEffective, () => Effective, () => _lerp);
     }
 
-    protected override void Subscribed() => UpdateInventory();
+    void LearnSpell(LearnSpellEvent e)
+    {
+        if (e.Target != _base.Id)
+            return;
+
+        _base.Magic.KnownSpells.Add(e.Spell);
+        UpdateSheet();
+    }
+
+    protected override void Subscribed() => UpdateSheet();
 
     void EngineUpdate(EngineUpdateEvent e)
     {
         if (_lerp >= 1.0f)
-            return;
+            Off<EngineUpdateEvent>();
 
         var elapsed = (DateTime.Now - _lastChangeTime).TotalSeconds;
         var oldLerp = _lerp;
@@ -61,15 +70,16 @@ public class PartyMember : Component, IPlayer
     void InventoryChanged(InventoryChangedEvent e)
     {
         if (e.Id == _base.Inventory.Id)
-            UpdateInventory();
+            UpdateSheet();
     }
 
-    void UpdateInventory()
+    void UpdateSheet()
     {
         _lastEffective = Effective;
         Effective = EffectiveSheetCalculator.GetEffectiveSheet(_base, Resolve<IVarSet>());
         _lastEffective ??= Effective;
         _lastChangeTime = DateTime.Now;
         _lerp = 0.0f;
+        On<EngineUpdateEvent>(EngineUpdate);
     }
 }

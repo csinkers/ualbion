@@ -188,10 +188,10 @@ if (query_verb Examine) {
  8=>9: map_text EventText.Sira2 7 StandardOptions
  9=>10: map_text EventText.Sira2 8 ConversationOptions
  10=>!: map_text EventText.Sira2 8 Conversation
-!11?12:13: get_switch Switch.Switch76
+!11?12:13: get_switch Switch.TalkedToSiraAndMellthasAboutRejoining
 #12=>14: map_text EventText.Sira2 16
  13=>14: map_text EventText.Sira2 15
- 14=>15: switch Set Switch.Switch76
+ 14=>15: switch Set Switch.TalkedToSiraAndMellthasAboutRejoining
 !15?18:16: prompt_player EventText.Sira2 17
  16=>17: map_text EventText.Sira2 20
  17=>!: end_dialogue
@@ -331,12 +331,12 @@ if (in_party PartyMember.Sira) {
         map_text EventText.Sira2 1 Conversation
     }
 } else {
-    if (get_switch Switch.Switch76) {
+    if (get_switch Switch.TalkedToSiraAndMellthasAboutRejoining) {
         map_text EventText.Sira2 16
     } else {
         map_text EventText.Sira2 15
     }
-    switch Set Switch.Switch76
+    switch Set Switch.TalkedToSiraAndMellthasAboutRejoining
     if (prompt_player EventText.Sira2 17) {
         map_text EventText.Sira2 19
         add_party_member PartyMember.Sira

@@ -283,17 +283,15 @@ public class Conversation : Component
             action.Block == small &&
             action.Argument.Id == large);
 
-        if (chain != null)
-        {
-            var triggerEvent = new TriggerChainEvent(
-                chainSource,
-                chain.Value,
-                new EventSource(chainSource.Id, TriggerTypes.Action));
+        if (chain == null) 
+            return false;
 
-            RaiseAsync(triggerEvent, () => continuation?.Invoke());
-            return true;
-        }
+        var triggerEvent = new TriggerChainEvent(
+            chainSource,
+            chain.Value,
+            new EventSource(chainSource.Id, TriggerTypes.Action));
 
-        return false;
+        RaiseAsync(triggerEvent, () => continuation?.Invoke());
+        return true;
     }
 }

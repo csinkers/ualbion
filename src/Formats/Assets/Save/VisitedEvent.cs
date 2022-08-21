@@ -31,7 +31,7 @@ public class VisitedEvent
             case ActionType.UseItem:
             case ActionType.EquipItem:
             case ActionType.UnequipItem:
-            case ActionType.PickupItem:
+            case ActionType.DropItem:
                 u._value = ItemId.SerdesU16("Value", ItemId.FromUInt32(u._value), AssetType.Item, mapping, s).ToUInt32();
                 break;
             case ActionType.Word:
@@ -71,7 +71,7 @@ public class VisitedEvent
             or ActionType.UseItem 
             or ActionType.EquipItem 
             or ActionType.UnequipItem 
-            or ActionType.PickupItem
+            or ActionType.DropItem
             ? ItemId.FromUInt32(_value)
             : throw new InvalidOperationException("Tried to retrieve ItemId of a non-item VisitedEvent");
 
@@ -82,7 +82,7 @@ public class VisitedEvent
             ActionType.UseItem => ItemId.ToString(),
             ActionType.EquipItem => ItemId.ToString(),
             ActionType.UnequipItem => ItemId.ToString(),
-            ActionType.PickupItem => ItemId.ToString(),
+            ActionType.DropItem => ItemId.ToString(),
             ActionType.Word => WordId.ToString(),
             ActionType.DialogueLine => $"Text:{_value >> 8} Block:{_value & 0xff}",
             _ => _value.ToString(CultureInfo.InvariantCulture)

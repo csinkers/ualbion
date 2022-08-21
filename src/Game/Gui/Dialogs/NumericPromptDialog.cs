@@ -43,7 +43,7 @@ public class NumericPromptDialog : ModalDialog
     void Close()
     {
         Remove();
-        Closed?.Invoke(this, new EventArgs());
+        Closed?.Invoke(this, EventArgs.Empty);
     }
 
     public event EventHandler<EventArgs> Closed;

@@ -104,7 +104,7 @@ public class LogExchange : ILogExchange
                     sb.AppendLine();
                     sb.AppendLine("Command Usage Help:");
                     sb.AppendLine("-------------------------------------");
-                    PrintHelpSummary(sb, Event.GetEventMetadata());
+                    PrintHelpSummary(sb, EventSerializer.Instance.GetEventMetadata());
                     sb.AppendLine();
                 }
                 else
@@ -154,7 +154,7 @@ public class LogExchange : ILogExchange
     void PrintHelp(StringBuilder sb, string pattern)
     {
         sb.AppendLine();
-        var metadata = Event.GetEventMetadata()
+        var metadata = EventSerializer.Instance.GetEventMetadata()
             .FirstOrDefault(x => x.Name.Equals(pattern, StringComparison.InvariantCultureIgnoreCase)
                                  || x.Aliases != null &&
                                  x.Aliases.Any(y => y.Equals(pattern, StringComparison.InvariantCultureIgnoreCase)));
@@ -166,7 +166,11 @@ public class LogExchange : ILogExchange
         else
         {
             var regex = new Regex(pattern, RegexOptions.IgnoreCase);
-            var matchingEvents = Event.GetEventMetadata().Where(x => regex.IsMatch(x.Name)).Distinct().ToList();
+            var matchingEvents = 
+                EventSerializer.Instance.GetEventMetadata()
+                    .Where(x => regex.IsMatch(x.Name))
+                    .Distinct()
+                    .ToList();
 
             if (matchingEvents.Any())
                 PrintHelpSummary(sb, matchingEvents);
@@ -191,7 +195,7 @@ public class LogExchange : ILogExchange
         }
     }
 
-    public static void PrintDetailedHelp(StringBuilder sb, EventMetadata metadata)
+    static void PrintDetailedHelp(StringBuilder sb, EventMetadata metadata)
     {
         if (sb == null) throw new ArgumentNullException(nameof(sb));
         if (metadata == null) throw new ArgumentNullException(nameof(metadata));
@@ -211,7 +215,7 @@ public class LogExchange : ILogExchange
             return;
 
         var regex = new Regex(pattern, RegexOptions.IgnoreCase);
-        var matchingEvents = Event.GetEventMetadata()
+        var matchingEvents = EventSerializer.Instance.GetEventMetadata()
             .Where(x => regex.IsMatch(x.Name))
             .ToList();
 
@@ -226,7 +230,7 @@ public class LogExchange : ILogExchange
             }
         }
 
-        var eventsByTypeName = Event.AllEventTypes
+        var eventsByTypeName = EventSerializer.Instance.AllEventTypes
             .Where(x =>
                 x.FullName != null &&
                 regex.IsMatch(x.FullName) &&

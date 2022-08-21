@@ -202,7 +202,7 @@ public class LogicalInventorySlot : UiElement
         // Drink
         // Activate (compass, clock, monster eye)
         // Activate spell (if has spell, yellow if combat spell & not in combat etc)
-        // Read (e.g. metalmagic knowledge, maps)
+        // Read (e.g. metal-magic knowledge, maps)
 
         bool isPlotItem = (item.Flags & ItemFlags.PlotItem) != 0;
         var options = new List<ContextMenuOption>();
@@ -239,29 +239,48 @@ public class LogicalInventorySlot : UiElement
             ContextMenuGroup.Actions));
 
         if (item.TypeId == ItemType.Document && _id.Id.Type == InventoryType.Player)
-            options.Add(new ContextMenuOption(S(Base.SystemText.InvPopup_Read), null, ContextMenuGroup.Actions));
+        {
+            options.Add(new ContextMenuOption(
+                S(Base.SystemText.InvPopup_Read),
+                new ReadItemEvent(_id),
+                ContextMenuGroup.Actions));
+        }
 
-        // TODO: Remove scroll if event successful
         if (item.TypeId == ItemType.SpellScroll && _id.Id.Type == InventoryType.Player)
-            options.Add(new ContextMenuOption(S(Base.SystemText.InvPopup_LearnSpell), null, ContextMenuGroup.Actions));
+        {
+            options.Add(new ContextMenuOption(
+                S(Base.SystemText.InvPopup_LearnSpell),
+                new ReadSpellScrollEvent(_id),
+                ContextMenuGroup.Actions));
+        }
 
-        // TODO: Remove drink if event successful
         if (item.TypeId == ItemType.Drink && _id.Id.Type == InventoryType.Player)
-            options.Add(new ContextMenuOption(S(Base.SystemText.InvPopup_Drink), null, ContextMenuGroup.Actions));
+        {
+            options.Add(new ContextMenuOption(
+                S(Base.SystemText.InvPopup_Drink),
+                new DrinkItemEvent(_id),
+                ContextMenuGroup.Actions));
+        }
 
-        // TODO: Remove item if event successful
         if (item.TypeId == ItemType.HeadsUpDisplayItem && _id.Id.Type == InventoryType.Player)
         {
             options.Add(new ContextMenuOption(
                 S(Base.SystemText.InvPopup_Activate),
-                new ActivateItemEvent(item.Id),
+                new ActivateItemEvent(_id),
                 ContextMenuGroup.Actions));
         }
 
-        if (item.Charges > 0 && _id.Id.Type == InventoryType.Player) // TODO: Disable based on spell context
-            options.Add(new ContextMenuOption(S(Base.SystemText.InvPopup_ActivateSpell), null, ContextMenuGroup.Actions));
+        // TODO: Disable based on spell context
+        if (item.Charges > 0 && _id.Id.Type == InventoryType.Player)
+        {
+            options.Add(new ContextMenuOption(
+                S(Base.SystemText.InvPopup_ActivateSpell),
+                new ActivateItemSpellEvent(_id),
+                ContextMenuGroup.Actions));
+        }
 
         var uiPosition = window.PixelToUi(cursorManager.Position);
         Raise(new ContextMenuEvent(uiPosition, heading, options));
     }
 }
+

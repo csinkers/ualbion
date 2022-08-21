@@ -59,13 +59,22 @@ public class StatusBar : Dialog
                 break;
 
             var portrait = _portraits[i];
+            var member = party.StatusBarOrder[i];
             var portraitExtents = new Rectangle(
                 extents.X + 4 + 28 * i,
                 extents.Y + 3,
                 (int)portrait.GetSize().X - (trimOverlap ? 6 : 0),
                 (int)portrait.GetSize().Y);
-            maxOrder = Math.Max(maxOrder, func(portrait, portraitExtents, order + 2, context));
+
+            // Make sure to break any ties between the images so
+            // there's a consistent order.
+            int orderBias = 2 + i;
+            if (party.Leader == member)
+                orderBias = 2 + SavedGame.MaxPartySize;
+
+            maxOrder = Math.Max(maxOrder, func(portrait, portraitExtents, order + orderBias, context));
         }
+
         return maxOrder;
     }
 

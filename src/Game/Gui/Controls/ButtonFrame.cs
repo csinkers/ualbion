@@ -93,19 +93,19 @@ public class ButtonFrame : UiElement
         try
         {
             var position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
-            var flags = SpriteFlags.None.SetOpacity(theme.Alpha);
+            var flags = SpriteFlags.TopLeft | SpriteFlags.None.SetOpacity(theme.Alpha);
 
             int curInstance = 0;
             if (theme.TopLeft.HasValue)
             {
                 instances[curInstance] = new SpriteInfo( // Top
-                    SpriteFlags.TopLeft | flags,
+                    flags,
                     position,
                     window.UiToNormRelative(extents.Width - 1, 1),
                     cc.GetRegion(theme.TopLeft.Value));
 
                 instances[curInstance + 1] = new SpriteInfo( // Left
-                    SpriteFlags.TopLeft | flags,
+                    flags,
                     position + new Vector3(window.UiToNormRelative(0, 1), 0),
                     window.UiToNormRelative(1, extents.Height - 2),
                     cc.GetRegion(theme.TopLeft.Value));
@@ -116,13 +116,13 @@ public class ButtonFrame : UiElement
             if (theme.BottomRight.HasValue)
             {
                 instances[curInstance] = new SpriteInfo( // Bottom
-                    SpriteFlags.TopLeft | flags,
+                    flags,
                     position + new Vector3(window.UiToNormRelative(1, extents.Height - 1), 0),
                     window.UiToNormRelative(extents.Width - 1, 1),
                     cc.GetRegion(theme.BottomRight.Value));
 
                 instances[curInstance + 1] = new SpriteInfo( // Right
-                    SpriteFlags.TopLeft | flags,
+                    flags,
                     position + new Vector3(window.UiToNormRelative(extents.Width - 1, 1), 0),
                     window.UiToNormRelative(1, extents.Height - 2),
                     cc.GetRegion(theme.BottomRight.Value));
@@ -133,7 +133,7 @@ public class ButtonFrame : UiElement
             if (theme.Corners.HasValue)
             {
                 instances[curInstance] = new SpriteInfo( // Bottom Left Corner
-                    SpriteFlags.TopLeft | flags,
+                    flags,
                     position + new Vector3(window.UiToNormRelative(0, extents.Height - 1), 0),
                     window.UiToNormRelative(Vector2.One),
                     cc.GetRegion(theme.Corners.Value));
@@ -149,7 +149,7 @@ public class ButtonFrame : UiElement
             if (theme.Background.HasValue)
             {
                 instances[curInstance] = new SpriteInfo( // Background
-                    SpriteFlags.TopLeft | flags.SetOpacity(theme.Alpha < 1.0f ? theme.Alpha / 2 : theme.Alpha),
+                    flags.SetOpacity(theme.Alpha < 1.0f ? theme.Alpha / 2 : theme.Alpha),
                     position + new Vector3(window.UiToNormRelative(1, 1), 0),
                     window.UiToNormRelative(extents.Width - 2, extents.Height - 2),
                     cc.GetRegion(theme.Background.Value));

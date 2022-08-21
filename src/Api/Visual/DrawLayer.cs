@@ -10,16 +10,11 @@ public enum DrawLayer : ushort
     Underlay   = 0x100, // for 2D levels
     Overlay    = 0x101, // for 2D levels
     Character  = 0x102, // for 2D levels
+    // The above will get increased by up to 256, so everything up to 0x202 should be blocked out.
+
     Info       = 0x300, // Verb highlights on map etc   (for 2D levels)
-    // Effects,
-    Diagnostic  = 0x600, // Missing textures etc
-    DebugCollision = 0x601,
-    DebugSit = 0x602,
-    DebugZones = 0x603,
-    DebugNpcColliders = 0x604,
-    DebugNpcPaths = 0x605,
-    Interface   = 0x700, // GUI
-    InterfaceOverlay = 0x800,
+    Interface   = 0x301, // GUI
+    InterfaceOverlay = 0xf00, // GUI effects, like item transitions, discards etc
 
     Debug = 0xff0, // ImGui
     Cursor = 0xffd, // Mouse cursor

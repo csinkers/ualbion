@@ -56,7 +56,7 @@ public class Button : UiElement
             e.Propagating = false;
         });
 
-        On<UiLeftReleaseEvent>(e =>
+        On<UiLeftReleaseEvent>(_ =>
         {
             if (!IsClicked)
                 return;
@@ -92,14 +92,16 @@ public class Button : UiElement
 
         On<UiRightClickEvent>(e =>
         {
+            if (RightClick == null) return;
             e.Propagating = false;
             IsRightClicked = true;
         });
 
-        On<UiRightReleaseEvent>(e =>
+        On<UiRightReleaseEvent>(_ =>
         {
+            if (RightClick == null) return;
             if (IsRightClicked && IsHovered)
-                RightClick?.Invoke();
+                RightClick.Invoke();
             IsRightClicked = false;
         });
 

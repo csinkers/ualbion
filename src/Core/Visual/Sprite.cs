@@ -20,14 +20,6 @@ public class Sprite : Component, IPositioned
     SpriteFlags _flags;
     bool _dirty = true;
 
-    public static Sprite CharacterSprite(IAssetId id) =>
-        new(id, Vector3.Zero, DrawLayer.Character, 0, SpriteFlags.BottomAligned);
-
-    public static Sprite ScreenSpaceSprite(IAssetId id, Vector2 position, Vector2 size) =>
-        new(id, new Vector3(position, 0), DrawLayer.Interface,
-            SpriteKeyFlags.NoTransform,
-            SpriteFlags.LeftAligned) { Size = size };
-
     public Sprite(
         IAssetId id,
         Vector3 position,

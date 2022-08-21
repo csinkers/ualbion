@@ -8,7 +8,7 @@ public static class ButtonTheme
 {
     public static ButtonColorScheme Default(ButtonState state)
     {
-        var c = new ButtonColorScheme { Alpha = 0.4f, Corners = CommonColor.Grey8 };
+        var c = new ButtonColorScheme { Alpha = 0.3f, Corners = CommonColor.Grey8 };
         switch (state)
         {
             case ButtonState.Normal:

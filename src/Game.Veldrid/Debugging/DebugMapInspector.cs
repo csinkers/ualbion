@@ -10,10 +10,10 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Game.Debugging;
+using UAlbion.Game.Gui;
 using UAlbion.Game.Input;
 using UAlbion.Game.State;
 using UAlbion.Game.Veldrid.Audio;
-using UAlbion.Scripting;
 
 #if DEBUG
 using UAlbion.Game.Events;
@@ -419,6 +419,7 @@ namespace UAlbion.Game.Veldrid.Debugging
             {
                 if (ImGui.TreeNode($"{hitId} {hit.Target}"))
                 {
+                    RenderUiPos(hit.Target);
                     var target = hit.Formatter == null ? hit.Target : hit.Formatter(hit.Target);
                     var reflected = Reflector.Reflect(null, target, null);
                     if (reflected.SubObjects != null)
@@ -505,6 +506,7 @@ namespace UAlbion.Game.Veldrid.Debugging
                         _fixedObjects.Remove(reflected.Target);
 
                     anyHovered |= CheckHover(reflected);
+                    RenderUiPos(reflected.Target);
                     foreach (var child in reflected.SubObjects)
                         anyHovered |= RenderNode(child, false);
                     ImGui.TreePop();
@@ -518,6 +520,18 @@ namespace UAlbion.Game.Veldrid.Debugging
             }
 
             return anyHovered;
+        }
+
+        void RenderUiPos(object target)
+        {
+            if (target is not IUiElement element)
+                return;
+
+            var snapshot = Resolve<ILayoutManager>().LastSnapshot;
+            if (!snapshot.TryGetValue(element, out var node))
+                return;
+
+            ImGui.Text($"UI {node.Extents} {node.Order}");
         }
     }
 }

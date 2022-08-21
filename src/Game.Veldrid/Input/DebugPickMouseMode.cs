@@ -5,6 +5,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Game.Events;
+using UAlbion.Game.Gui;
 using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Input;
@@ -20,6 +21,8 @@ public class DebugPickMouseMode : Component
     {
         if(e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && x.Down))
         {
+            var layoutManager = TryResolve<ILayoutManager>();
+            layoutManager?.RequestSnapshot();
             Raise(_popMouseModeEvent);
             return;
         }

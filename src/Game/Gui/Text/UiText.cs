@@ -156,6 +156,6 @@ public class UiText : UiElement
             }
         }
 
-        return order;
+        return maxOrder;
     }
 }

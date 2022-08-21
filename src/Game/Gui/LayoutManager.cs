@@ -17,16 +17,23 @@ namespace UAlbion.Game.Gui;
 public interface ILayoutManager
 {
     LayoutNode GetLayout();
+    IDictionary<IUiElement, LayoutNode> LastSnapshot { get; }
+    void RequestSnapshot();
 }
 
 public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
 {
+    public IDictionary<IUiElement, LayoutNode> LastSnapshot { get; private set; } =
+        new Dictionary<IUiElement, LayoutNode>();
+
     public LayoutManager()
     {
         On<LayoutEvent>(RenderLayout);
         On<DumpLayoutEvent>(_ => DumpLayout());
         OnAsync<ScreenCoordinateSelectEvent, Selection>(Select);
     }
+
+    public void RequestSnapshot() => CaptureSnapshot();
 
     void DoLayout(Func<Rectangle, int, IUiElement, int> action)
     {
@@ -35,7 +42,7 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
         int uiHeight = UiConstants.ActiveAreaExtents.Height;
         var dialogs = new List<IDialog>();
         Raise(new CollectDialogsEvent(dialogs.Add));
-        dialogs.Sort((x,y) => x.Depth.CompareTo(y.Depth));
+        dialogs.Sort((x, y) => x.Depth.CompareTo(y.Depth));
 
         foreach (var dialog in dialogs)
         {
@@ -46,6 +53,7 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
                 var (x, y) = GetDialogPosition(dialog, dialogSize, uiWidth, uiHeight);
                 order = action(new Rectangle(x, y, (int)dialogSize.X, (int)dialogSize.Y), order + 1, dialog);
             }
+
             LayoutDialog(size);
 
 #if DEBUG
@@ -98,47 +106,48 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
         switch (dialog.Positioning)
         {
             case DialogPositioning.Center:
-                x = (uiWidth - (int) size.X) / 2;
-                y = (uiHeight - (int) size.Y) / 2;
+                x = (uiWidth - (int)size.X) / 2;
+                y = (uiHeight - (int)size.Y) / 2;
                 break;
             case DialogPositioning.Bottom:
-                x = (uiWidth - (int) size.X) / 2;
-                y = uiHeight - (int) size.Y;
+                x = (uiWidth - (int)size.X) / 2;
+                y = uiHeight - (int)size.Y;
                 break;
             case DialogPositioning.Top:
-                x = (uiWidth - (int) size.X) / 2;
+                x = (uiWidth - (int)size.X) / 2;
                 y = 0;
                 break;
             case DialogPositioning.Left:
                 x = 0;
-                y = (uiHeight - (int) size.Y) / 2;
+                y = (uiHeight - (int)size.Y) / 2;
                 break;
             case DialogPositioning.Right:
-                x = uiWidth - (int) size.X;
-                y = (uiHeight - (int) size.Y) / 2;
+                x = uiWidth - (int)size.X;
+                y = (uiHeight - (int)size.Y) / 2;
                 break;
             case DialogPositioning.BottomLeft:
                 x = 0;
-                y = uiHeight - (int) size.Y;
+                y = uiHeight - (int)size.Y;
                 break;
             case DialogPositioning.TopLeft:
                 x = 0;
                 y = 0;
                 break;
             case DialogPositioning.TopRight:
-                x = uiWidth - (int) size.X;
+                x = uiWidth - (int)size.X;
                 y = 0;
                 break;
             case DialogPositioning.BottomRight:
-                x = uiWidth - (int) size.X;
-                y = uiHeight - (int) size.Y;
+                x = uiWidth - (int)size.X;
+                y = uiHeight - (int)size.Y;
                 break;
             case DialogPositioning.StatusBar:
-                x = (uiWidth - (int) size.X) / 2;
+                x = (uiWidth - (int)size.X) / 2;
                 y = UiConstants.StatusBarExtents.Y;
                 break;
             default:
-                throw new InvalidEnumArgumentException(nameof(dialog.Positioning), (int)dialog.Positioning, typeof(DialogPositioning));
+                throw new InvalidEnumArgumentException(nameof(dialog.Positioning), (int)dialog.Positioning,
+                    typeof(DialogPositioning));
         }
 
         return (x, y);
@@ -147,7 +156,8 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
     public LayoutNode GetLayout()
     {
         var rootNode = new LayoutNode(null, null, UiConstants.UiExtents, 0);
-        DoLayout((extents, order, element) => element.Render(extents, order, new LayoutNode(rootNode, element, extents, order)));
+        DoLayout((extents, order, element) =>
+            element.Render(extents, order, new LayoutNode(rootNode, element, extents, order)));
         return rootNode;
     }
 
@@ -169,5 +179,23 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
         Aux(root, 0);
         Info(sb.ToString());
         Raise(new SetClipboardTextEvent(sb.ToString()));
+    }
+
+    void CaptureSnapshot()
+    {
+        var snapshot = new Dictionary<IUiElement, LayoutNode>();
+        var root = GetLayout();
+
+        void Aux(LayoutNode node)
+        {
+            if (node.Element != null)
+                snapshot[node.Element] = node;
+
+            foreach (var child in node.Children)
+                Aux(child);
+        }
+
+        Aux(root);
+        LastSnapshot = snapshot;
     }
 }

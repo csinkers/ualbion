@@ -17,6 +17,7 @@ public class ReflectedObject
     public string Name { get; set; }
     public string Value { get; set; }
     public IEnumerable<ReflectedObject> SubObjects { get; set; }
+    public override string ToString() => $"{CollectionIndex} {Name} = {Value}";
 }
 
 public static class Reflector
@@ -57,23 +58,31 @@ public static class Reflector
         var publicProperties =
             t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(x => !x.GetIndexParameters().Any());
+
         var publicFields = t.GetFields(BindingFlags.Public | BindingFlags.Instance);
+
         var privateProperties =
             t.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance)
                 .Where(x => !x.GetIndexParameters().Any());
+
         var privateFields = t.GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
             .Where(x => !x.Name.Contains("__BackingField", StringComparison.InvariantCulture));
 
         ReflectedObject FormatProperty(PropertyInfo x) => Reflect(x.Name, GetPropertySafe(x, o), result);
         ReflectedObject FormatField(FieldInfo x) => Reflect(x.Name, GetFieldSafe(x, o), result);
 
-        result.SubObjects =
+        var formattedPublic =
             publicProperties.Select(FormatProperty)
-                .Concat(publicFields.Select(FormatField)).OrderBy(x => x.Name)
-                .Concat(
-                    privateProperties.Select(FormatProperty)
-                        .Concat(privateFields.Select(FormatField)).OrderBy(x => x.Name));
+                .Concat(publicFields.Select(FormatField))
+                .OrderBy(x => x.Name);
 
+        var formattedPrivate =
+            privateProperties
+                .Select(FormatProperty)
+                .Concat(privateFields.Select(FormatField))
+                .OrderBy(x => x.Name);
+
+        result.SubObjects = formattedPublic.Concat(formattedPrivate);
         return result;
     }
 

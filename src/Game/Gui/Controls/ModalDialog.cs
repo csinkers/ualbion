@@ -44,12 +44,16 @@ public class ModalDialog : Dialog
                 if (child is not IUiElement { IsActive: true } childElement)
                     continue;
 
-                if (childElement == _blocker)
+                // Leave the blocker til last - we only want it to block windows beneath
+                // this one, not children of this window.
+                if (childElement == _blocker) 
                     continue;
-                maxOrder = Math.Max(maxOrder, childElement.Selection(extents, order + 1, context));
+
+                maxOrder = Math.Max(maxOrder, childElement.Selection(extents, order + 2, context));
             }
 
-            context.HitFunc(order, this);
+            // Add one to prevent a tie between the dialog and its UiBlocker
+            context.HitFunc(order + 1, this);
         }
 
         _blocker.Selection(extents, order, context);

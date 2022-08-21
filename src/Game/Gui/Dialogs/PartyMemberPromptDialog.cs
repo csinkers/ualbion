@@ -16,16 +16,16 @@ namespace UAlbion.Game.Gui.Dialogs;
 /// </summary>
 class PartyMemberPromptDialog : ModalDialog
 {
-    public PartyMemberPromptDialog(ITextFormatter textFormatter, int depth, StringId promptId, IReadOnlyList<IPlayer> members) : base(DialogPositioning.Center, depth)
+    public PartyMemberPromptDialog(ITextFormatter textFormatter, int depth, StringId promptId, IReadOnlyList<IPlayer> members) 
+        : base(DialogPositioning.Center, depth)
     {
         On<DismissMessageEvent>(_ => Close());
         On<UiRightClickEvent>(e => { Close(); e.Propagating = false; });
-        On<CloseWindowEvent>(e => Close());
+        On<CloseWindowEvent>(_ => Close());
 
         var text = textFormatter.Format(promptId);
         var prompt = new TextFilter(x => x.BlockId == -1) { Source = text };
-        var portraits = new List<IUiElement>();
-        portraits.Add(new VariableSpacing(0, 1));
+        var portraits = new List<IUiElement> { new VariableSpacing(0, 1) };
         bool first = true;
         foreach (var member in members)
         {

@@ -77,7 +77,7 @@ public class ButtonTests : Component
         var order = button.Render(new Rectangle(0, 0, (int)size.X, (int)size.Y), 0, null);
         var size2 = button.GetSize();
         Assert.Equal(size, size2);
-        Assert.Equal(4, order);
+        Assert.Equal(6, order);
     }
 
     [Fact]

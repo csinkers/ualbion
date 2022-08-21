@@ -38,19 +38,18 @@ public sealed class VisualInventorySlot : UiElement
             _size = slotId.Slot.IsBodyPart() ?
                 new Vector2(18, 18) : //16x16 surrounded by 1px borders
                 new Vector2(16, 20);
+
             _sprite = new UiSpriteElement(SpriteId.None);
             _button = AttachChild(new Button(new FixedPositionStack()
                     .Add(
-                        new LayerStack(
-                            _sprite,
-                            _overlay),
+                        new LayerStack(_sprite, _overlay),
                         1, 1, 16, 16) //16x16 surrounded by 1px borders
                     .Add(text, 0, 20 - 9, 16, 9))
                 {
                     Padding = -1,
                     Margin = 0,
                     Theme = slotId.Slot.IsBodyPart()
-                        ? (ButtonFrame.ThemeFunction)ButtonTheme.Default
+                        ? ButtonTheme.Default
                         : ButtonTheme.InventorySlot,
 
                     IsPressed = !slotId.Slot.IsBodyPart()

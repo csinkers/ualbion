@@ -29,7 +29,12 @@ public class ButtonFrame : UiElement
     public ThemeFunction Theme
     {
         get => _theme;
-        set { if (_theme != value) { _theme = value; _lastExtents = new Rectangle(); } }
+        set
+        {
+            if (_theme == value) return;
+            _theme = value;
+            _lastExtents = new Rectangle();
+        }
     }
 
     public ButtonState State
@@ -72,9 +77,9 @@ public class ButtonFrame : UiElement
 
         int instanceCount =
             (theme.TopLeft.HasValue     ? 2 : 0)
-            + (theme.BottomRight.HasValue ? 2 : 0)
-            + (theme.Corners.HasValue     ? 2 : 0)
-            + (theme.Background.HasValue  ? 1 : 0);
+          + (theme.BottomRight.HasValue ? 2 : 0)
+          + (theme.Corners.HasValue     ? 2 : 0)
+          + (theme.Background.HasValue  ? 1 : 0);
 
         if (_sprite?.Key.RenderOrder != order || instanceCount != _sprite?.Length)
         {
@@ -90,78 +95,60 @@ public class ButtonFrame : UiElement
 
         bool lockWasTaken = false;
         var instances = _sprite.Lock(ref lockWasTaken);
+        SpriteInfo Build(SpriteFlags flags,
+            int x, int y, int w, int h,
+            CommonColor color) => new(
+                flags,
+                new Vector3(window.UiToNorm(x, y), 0),
+                window.UiToNormRelative(w, h),
+                cc.GetRegion(color));
+
         try
         {
-            var position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
+            var (x, y, w, h) = (extents.X, extents.Y, extents.Width, extents.Height);
+            int curInstance = 0;
             var flags = SpriteFlags.TopLeft | SpriteFlags.None.SetOpacity(theme.Alpha);
 
-            int curInstance = 0;
             if (theme.TopLeft.HasValue)
             {
-                instances[curInstance] = new SpriteInfo( // Top
-                    flags,
-                    position,
-                    window.UiToNormRelative(extents.Width - 1, 1),
-                    cc.GetRegion(theme.TopLeft.Value));
+                // Top
+                instances[curInstance++] = Build(flags, x, y, w - 1, 1, theme.TopLeft.Value);
 
-                instances[curInstance + 1] = new SpriteInfo( // Left
-                    flags,
-                    position + new Vector3(window.UiToNormRelative(0, 1), 0),
-                    window.UiToNormRelative(1, extents.Height - 2),
-                    cc.GetRegion(theme.TopLeft.Value));
-
-                curInstance += 2;
+                // Left
+                instances[curInstance++] = Build(flags, x, y + 1, 1, h - 2, theme.TopLeft.Value);
             }
 
             if (theme.BottomRight.HasValue)
             {
-                instances[curInstance] = new SpriteInfo( // Bottom
-                    flags,
-                    position + new Vector3(window.UiToNormRelative(1, extents.Height - 1), 0),
-                    window.UiToNormRelative(extents.Width - 1, 1),
-                    cc.GetRegion(theme.BottomRight.Value));
+                // Bottom
+                instances[curInstance++] = Build(flags, x + 1, y + h - 1, w - 1, 1, theme.BottomRight.Value);
 
-                instances[curInstance + 1] = new SpriteInfo( // Right
-                    flags,
-                    position + new Vector3(window.UiToNormRelative(extents.Width - 1, 1), 0),
-                    window.UiToNormRelative(1, extents.Height - 2),
-                    cc.GetRegion(theme.BottomRight.Value));
-
-                curInstance += 2;
+                // Right
+                instances[curInstance++] = Build(flags, x + w - 1, y + 1, 1, h - 2, theme.BottomRight.Value);
             }
 
             if (theme.Corners.HasValue)
             {
-                instances[curInstance] = new SpriteInfo( // Bottom Left Corner
-                    flags,
-                    position + new Vector3(window.UiToNormRelative(0, extents.Height - 1), 0),
-                    window.UiToNormRelative(Vector2.One),
-                    cc.GetRegion(theme.Corners.Value));
+                // Bottom Left Corner
+                instances[curInstance++] = Build(flags, x, y + h - 1, 1, 1, theme.Corners.Value);
 
-                instances[curInstance + 1] = new SpriteInfo( // Top Right Corner
-                    SpriteFlags.TopLeft | flags,
-                    position + new Vector3(window.UiToNormRelative(extents.Width - 1, 0), 0),
-                    window.UiToNormRelative(Vector2.One),
-                    cc.GetRegion(theme.Corners.Value));
-                curInstance += 2;
+                // Top Right Corner
+                instances[curInstance++] = Build(flags, x + w - 1, y, 1, 1, theme.Corners.Value);
             }
 
             if (theme.Background.HasValue)
             {
-                instances[curInstance] = new SpriteInfo( // Background
+                // Background
+                instances[curInstance] = Build(
                     flags.SetOpacity(theme.Alpha < 1.0f ? theme.Alpha / 2 : theme.Alpha),
-                    position + new Vector3(window.UiToNormRelative(1, 1), 0),
-                    window.UiToNormRelative(extents.Width - 2, extents.Height - 2),
-                    cc.GetRegion(theme.Background.Value));
+                    x + 1, y + 1, w - 2, h - 2,
+                    theme.Background.Value);
             }
         }
         finally { _sprite.Unlock(lockWasTaken); }
     }
 
-    public override Vector2 GetSize()
-    {
-        return GetMaxChildSize() + _padding * 2 * Vector2.One;
-    }
+    public override Vector2 GetSize() => GetMaxChildSize() + _padding * 2 * Vector2.One;
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {

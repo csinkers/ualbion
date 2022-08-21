@@ -178,13 +178,17 @@ public class LogicalInventorySlot : UiElement
 
     void OnRightClick()
     {
-        var window = Resolve<IWindowManager>();
-        var cursorManager = Resolve<ICursorManager>();
         var inventory = Resolve<IGameState>().GetInventory(_id.Id);
-        var tf = Resolve<ITextFormatter>();
         var slotInfo = inventory.GetSlot(_id.Slot);
         if (slotInfo?.Item is not ItemData item)
+        {
+            OnRightClickSpecial(slotInfo);
             return;
+        }
+
+        var tf = Resolve<ITextFormatter>();
+        var window = Resolve<IWindowManager>();
+        var cursorManager = Resolve<ICursorManager>();
 
         var itemPosition = window.UiToNorm(slotInfo.LastUiPosition);
         var heading = tf.Center().NoWrap().Fat().Format(item.Name);
@@ -278,6 +282,33 @@ public class LogicalInventorySlot : UiElement
                 new ActivateItemSpellEvent(_id),
                 ContextMenuGroup.Actions));
         }
+
+        var uiPosition = window.PixelToUi(cursorManager.Position);
+        Raise(new ContextMenuEvent(uiPosition, heading, options));
+    }
+
+    void OnRightClickSpecial(IReadOnlyItemSlot slotInfo)
+    {
+        if (slotInfo.Item == null)
+            return;
+
+        var tf = Resolve<ITextFormatter>();
+        var window = Resolve<IWindowManager>();
+        var cursorManager = Resolve<ICursorManager>();
+        var headingText = slotInfo.Item is Gold 
+            ? Base.SystemText.Gold_Gold 
+            : Base.SystemText.Gold_Rations;
+
+        var itemPosition = window.UiToNorm(slotInfo.LastUiPosition);
+        var heading = tf.Center().NoWrap().Fat().Format(headingText);
+
+        IText S(TextId textId) => tf.Center().NoWrap().Ink(Base.Ink.White).Format(textId);
+        var options = new List<ContextMenuOption>
+        {
+            new(S( Base.SystemText.Gold_ThrowAway),
+                new InventoryDiscardEvent(itemPosition.X, itemPosition.Y, _id.Id, _id.Slot),
+                ContextMenuGroup.Actions)
+        };
 
         var uiPosition = window.PixelToUi(cursorManager.Position);
         Raise(new ContextMenuEvent(uiPosition, heading, options));

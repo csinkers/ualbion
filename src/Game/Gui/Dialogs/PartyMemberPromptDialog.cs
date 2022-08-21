@@ -38,7 +38,8 @@ class PartyMemberPromptDialog : ModalDialog
                     new Button(pic)
                     {
                         IsPressed = true,
-                        Margin = 0
+                        Padding = -1,
+                        Margin = 0,
                     }
                     .OnClick(() => OnButton(member.Id))
                     .OnHover(() =>

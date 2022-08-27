@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using UAlbion.Api.Eventing;
+using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
@@ -11,6 +12,7 @@ using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Transitions;
+using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
 
@@ -79,10 +81,11 @@ public class Conversation : Component
         _topicsWindow.WordSelected += TopicsWindowOnWordSelected;
     }
 
-    public void StartDialogue()
-    {
-        TriggerAction(ActionType.StartDialogue, 0, 0, DefaultIdleHandler);
-    }
+    public void StartDialogue() => TriggerAction(
+        ActionType.StartDialogue,
+        0,
+        AssetId.None,
+        DefaultIdleHandler);
 
     void TopicsWindowOnWordSelected(object sender, WordId? e)
     {
@@ -117,10 +120,27 @@ public class Conversation : Component
                 void OnClicked()
                 {
                     _textWindow.Clicked -= OnClicked;
+                    _textWindow.BlockFilter = SpecialBlockId.MainText;
                     DefaultIdleHandler();
                 }
 
-                var text = tf.Ink(Base.Ink.Yellow).Format(_npc.EventSetId.ToEventText());
+                var etId = _npc.EventSetId.ToEventText();
+                var strings = (IStringCollection)Resolve<IModApplier>().LoadAssetCached(etId);
+                var lang = GetVar(UserVars.Gameplay.Language);
+
+                ushort subId = 0;
+                for (ushort i = 0; i < strings.Count; i++)
+                {
+                    var s = strings.GetString(new StringId(etId, i), lang);
+                    if (Tokeniser.Tokenise(s).Any(x => x.Item1 == Token.Block && x.Item2 is 0))
+                    {
+                        subId = i;
+                        break;
+                    }
+                }
+
+                var text = tf.Ink(Base.Ink.Yellow).Format(new StringId(etId, subId));
+                _textWindow.BlockFilter = SpecialBlockId.Profession;
                 _textWindow.Text = text;
                 _textWindow.Clicked += OnClicked;
                 return;
@@ -145,14 +165,14 @@ public class Conversation : Component
                 return;
 
             case SpecialBlockId.Farewell:
-                TriggerAction(ActionType.FinishDialogue, 0, 0, () => Complete?.Invoke(this, EventArgs.Empty));
+                TriggerAction(ActionType.FinishDialogue, 0, AssetId.None, () => Complete?.Invoke(this, EventArgs.Empty));
                 return;
         }
 
         TriggerLineAction(blockId, textId);
     }
 
-    public bool? OnText(MapTextEvent mapTextEvent, Action continuation)
+    public bool? OnText(TextEvent mapTextEvent, Action continuation)
     {
         if (mapTextEvent == null) throw new ArgumentNullException(nameof(mapTextEvent));
         if (continuation == null) throw new ArgumentNullException(nameof(continuation));
@@ -168,7 +188,7 @@ public class Conversation : Component
                     continuation();
                 }
 
-                var text = tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId());
+                var text = tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId(_npc.EventSetId.ToEventText()));
                 DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
                 _textWindow.Text = text;
                 _textWindow.Clicked += OnConversationClicked;
@@ -177,7 +197,7 @@ public class Conversation : Component
 
             case TextLocation.ConversationOptions:
             {
-                var text = tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId());
+                var text = tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId(_npc.EventSetId.ToEventText()));
                 DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
                 _textWindow.Text = text;
 
@@ -195,7 +215,7 @@ public class Conversation : Component
 
             case TextLocation.ConversationQuery:
             {
-                var text = tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId());
+                var text = tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId(_npc.EventSetId.ToEventText()));
 
                 DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
 
@@ -254,44 +274,61 @@ public class Conversation : Component
         yield return Build(Base.SystemText.Dialog_ItsBeenNiceTalkingToYou, 3);
     }
 
-    void OnDataChange(IDataChangeEvent e)
+    void OnDataChange(IDataChangeEvent e) // Handle item transitions when the party receives items
     {
-        if (e is ChangeItemEvent { Operation: NumericOperation.AddAmount } cie)
-        {
-            var transitionEvent = new LinearItemTransitionEvent(cie.ItemId,
-                (int)ConversationPositionRight.X,
-                (int)ConversationPositionRight.Y,
-                (int)ConversationPositionLeft.X,
-                (int)ConversationPositionLeft.Y, 
-                null);
-            Raise(transitionEvent);
-        }
+        if (e is not ChangeItemEvent { Operation: NumericOperation.AddAmount } cie)
+            return;
+
+        var transitionEvent = new LinearItemTransitionEvent(cie.ItemId,
+            (int)ConversationPositionRight.X,
+            (int)ConversationPositionRight.Y,
+            (int)ConversationPositionLeft.X,
+            (int)ConversationPositionLeft.Y, 
+            null);
+        Raise(transitionEvent);
     }
 
-    bool TriggerWordAction(ushort wordId) => TriggerAction(ActionType.Word, 0, wordId);
-    bool TriggerLineAction(int blockId, int textId) => TriggerAction(ActionType.DialogueLine, (byte)blockId, (ushort)textId);
-    bool TriggerAction(ActionType type, byte small, ushort large, Action continuation = null)
+    bool TriggerWordAction(WordId wordId) 
+        => TriggerAction(
+            ActionType.Word,
+            0,
+            wordId,
+            DefaultIdleHandler);
+
+    bool TriggerLineAction(int blockId, int textId) 
+        => TriggerAction(
+            ActionType.DialogueLine,
+            (byte)blockId,
+            new AssetId(AssetType.PromptNumber, textId),
+            DefaultIdleHandler);
+    bool TriggerAction(ActionType type, byte small, AssetId argument, Action continuation)
     {
+        if (continuation == null) throw new ArgumentNullException(nameof(continuation));
         var assets = Resolve<IAssetManager>();
         var eventSet = _npc.EventSetId.IsNone ? null : assets.LoadEventSet(_npc.EventSetId);
         var wordSet = _npc.WordSetId.IsNone ? null : assets.LoadEventSet(_npc.WordSetId);
 
         var chainSource = eventSet ?? wordSet;
-        var chain = eventSet?.Chains.FirstOrDefault(x =>
+        var eventIndex = eventSet?.Chains.FirstOrDefault(x =>
             eventSet.Events[x].Event is ActionEvent action && 
             action.ActionType == type && 
             action.Block == small &&
-            action.Argument.Id == large);
+            action.Argument == argument);
 
-        if (chain == null) 
+        if (eventIndex == null) 
             return false;
 
         var triggerEvent = new TriggerChainEvent(
             chainSource,
-            chain.Value,
+            eventIndex.Value,
             new EventSource(chainSource.Id, TriggerTypes.Action));
 
-        RaiseAsync(triggerEvent, () => continuation?.Invoke());
+        RaiseAsync(triggerEvent, () =>
+        {
+            var action = (ActionEvent)eventSet.Events[eventIndex.Value].Event;
+            Raise(new GameState.EventVisitedEvent(eventSet.Id, action));
+            continuation?.Invoke();
+        });
         return true;
     }
 }

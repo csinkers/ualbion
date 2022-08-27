@@ -57,8 +57,9 @@ public class ContainerRegistry : ServiceComponent<IContainerRegistry>, IContaine
 
         var container = (IAssetContainer)constructor.Invoke(Array.Empty<object>());
 
-        if (container is IComponent component)
-            AttachChild(component);
+        // Can uncomment if we ever end up needing this
+        // if (container is IComponent component)
+        //     AttachChild(component);
 
         _containers[type] = container;
         return container;

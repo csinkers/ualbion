@@ -80,8 +80,8 @@ public class AssetManager : Component, IAssetManager
             cached = false;
         language ??= currentLanguage;
 
-        var asset = cached 
-            ?  _modApplier.LoadAssetCached(id.Id)
+        var asset = cached
+            ? _modApplier.LoadAssetCached(id.Id)
             : _modApplier.LoadAsset(id.Id, language);
 
         return asset switch

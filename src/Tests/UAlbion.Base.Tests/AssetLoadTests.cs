@@ -178,14 +178,12 @@ public class AssetLoadTests : IDisposable
                 Assert.Equal(3, bn.NextIfFalse.Id);
                 var e = (QueryEventUsedEvent)x.Event;
                 Assert.Equal(QueryType.EventUsed, e.QueryType);
-                Assert.Equal(QueryOperation.NonZero, e.Operation);
             }, // !1?2:3: query EventAlreadyUsed 0 (IsTrue 0)
             x =>
             {
                 Assert.Equal(2, x.Id);
                 Assert.Null(x.Next);
-                var e = (MapTextEvent)x.Event;
-                Assert.Equal(EventText.Frill, e.TextSource);
+                var e = (TextEvent)x.Event;
                 Assert.Equal(7, e.SubId);
                 Assert.Equal(TextLocation.NoPortrait, e.Location);
                 Assert.Equal(SheetId.None, e.Speaker);
@@ -697,7 +695,7 @@ public class AssetLoadTests : IDisposable
         Assert.IsType<ShowMapEvent>(s[3]);
         Assert.IsType<CommentEvent>(s[4]);
         Assert.IsType<CommentEvent>(s[5]);
-        Assert.IsType<ScriptTextEvent>(s[6]);
+        Assert.IsType<TextEvent>(s[6]);
         Assert.IsType<CommentEvent>(s[7]);
         Assert.IsType<CommentEvent>(s[8]);
         Assert.IsType<PartyMoveEvent>(s[9]);

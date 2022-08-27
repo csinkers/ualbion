@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Globalization;
-using System.Text.Json.Serialization;
 using SerdesNet;
+using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
@@ -14,6 +13,18 @@ public class VisitedEvent
     public byte Unk0 { get; set; }
     public EventSetId EventSetId { get; set; }
     public ActionType Type { get; set; }
+    public AssetId Argument { get; private set; }
+
+    VisitedEvent() { }
+    public VisitedEvent(EventSetId eventSetId, ActionType type, AssetId argument)
+    {
+        if (argument.Type != type.GetAssetType())
+            ApiUtil.Assert($"Expected argument to have asset type {type.GetAssetType()} to correspond with action type ({type}, but it was {argument}");
+
+        EventSetId = eventSetId;
+        Type = type;
+        Argument = argument;
+    }
 
     public static VisitedEvent Serdes(int n, VisitedEvent u, AssetMapping mapping, ISerializer s)
     {
@@ -24,23 +35,7 @@ public class VisitedEvent
         u.Unk0 = s.UInt8(nameof(Unk0), u.Unk0);
         u.EventSetId = EventSetId.SerdesU16(nameof(EventSetId), u.EventSetId, mapping, s);
         u.Type = s.EnumU8(nameof(Type), u.Type);
-
-        switch (u.Type)
-        {
-            case ActionType.AskAboutItem:
-            case ActionType.UseItem:
-            case ActionType.EquipItem:
-            case ActionType.UnequipItem:
-            case ActionType.DropItem:
-                u._value = ItemId.SerdesU16("Value", ItemId.FromUInt32(u._value), AssetType.Item, mapping, s).ToUInt32();
-                break;
-            case ActionType.Word:
-                u._value = WordId.SerdesU16("Value", WordId.FromUInt32(u._value), mapping, s).ToUInt32();
-                break;
-            default:
-                u._value = s.UInt16("Value", (ushort)u._value);
-                break;
-        }
+        u.Argument = AssetId.SerdesU16(nameof(Argument), u.Argument, u.Type.GetAssetType(), mapping, s);
 
         if (s.IsCommenting())
             s.Comment(u.ToString());
@@ -48,47 +43,7 @@ public class VisitedEvent
         return u;
     }
 
-    uint _value;
-
-    [JsonInclude] public uint Value { get => _value; private set => _value = value; }
-
-    [JsonIgnore]
-    public WordId WordId =>
-        Type == ActionType.Word
-            ? WordId.FromUInt32(_value)
-            : throw new InvalidOperationException("Tried to retrieve WordId of a non-word VisitedEvent");
-    /*
-    public WordId WordId => Word switch
-    {
-        // TODO: Ugh... finish reversing this and then fix up via asset mappings?
-        { } x when x <= 193 => (WordId)(Word + 502), 
-        _ => (WordId) (Word + 503)
-    }; */
-
-    [JsonIgnore]
-    public ItemId ItemId => 
-        Type is ActionType.AskAboutItem 
-            or ActionType.UseItem 
-            or ActionType.EquipItem 
-            or ActionType.UnequipItem 
-            or ActionType.DropItem
-            ? ItemId.FromUInt32(_value)
-            : throw new InvalidOperationException("Tried to retrieve ItemId of a non-item VisitedEvent");
-
-    string ItemString =>
-        Type switch
-        {
-            ActionType.AskAboutItem => ItemId.ToString(),
-            ActionType.UseItem => ItemId.ToString(),
-            ActionType.EquipItem => ItemId.ToString(),
-            ActionType.UnequipItem => ItemId.ToString(),
-            ActionType.DropItem => ItemId.ToString(),
-            ActionType.Word => WordId.ToString(),
-            ActionType.DialogueLine => $"Text:{_value >> 8} Block:{_value & 0xff}",
-            _ => _value.ToString(CultureInfo.InvariantCulture)
-        };
-
-    public override string ToString() => $"{Unk0} {EventSetId} {Type} {ItemString}";
+    public override string ToString() => $"{Unk0} {EventSetId} {Type} {Argument}";
 
     /*
      Logical to textual word id mapping clues:

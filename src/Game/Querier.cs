@@ -48,10 +48,14 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
             return (member.Combat.Conditions & PlayerConditions.UnconsciousMask) == 0;
         }));
 
-        OnAsync(Do<QueryEventUsedEvent> (_ =>
+        OnAsync(Do<QueryEventUsedEvent> (e =>
         {
-            Error("TODO: Query event already used");
-            return false;
+            var game = Resolve<IGameState>();
+            var context = Resolve<IEventManager>().Context;
+            if (context.EventSet.Id.Type != AssetType.EventSet)
+                return false;
+
+            return game.IsEventUsed(context.EventSet.Id, context.LastAction);
         }));
 
         OnAsync(Do<QueryDemoVersionEvent> (_ =>
@@ -66,7 +70,7 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
             if (context.Source == null)
                 return false;
 
-            return RaiseAsync(new YesNoPromptEvent(new StringId(q.TextSourceId, q.Argument)), continuation) > 0;
+            return RaiseAsync(new YesNoPromptEvent(new StringId(context.EventSet.TextId, q.Argument)), continuation) > 0;
         });
 
         OnAsync<PromptPlayerNumericEvent, bool>((q, continuation) =>

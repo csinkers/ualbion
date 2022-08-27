@@ -27,8 +27,8 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
     readonly bool _startupOnly;
     readonly int _defaultWidth = 720; // TODO: Save in user settings
     readonly int _defaultHeight = 480;
-    readonly int _defaultX = 648;
-    readonly int _defaultY = 431;
+    readonly int _defaultX = 1100;
+    readonly int _defaultY = 50;
 
     GraphicsDevice _graphicsDevice;
     CommandList _frameCommands;

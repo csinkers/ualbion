@@ -147,8 +147,8 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
 
         const string script = 
             @"!0?1:2: query_verb Examine
- 1=>!: map_text MapText.Jirinaar 37 NoPortrait None ; ""The door to the house of the Hunter Clan. It is secured with a lock.""
-!2?3:!: open_door Door.HClan_HCK MapText.Jirinaar Item.HunterClanKey 100 32 33
+ 1=>!: text 37 NoPortrait None ; ""The door to the house of the Hunter Clan. It is secured with a lock.""
+!2?3:!: open_door Door.HClan_HCK Item.HunterClanKey 100 32 33
 !3?4:!: result
  4=>5: door_open Set Door.HClan_HCK
  5=>!: teleport Map.HunterClan 69 67 Unchanged 255 0";
@@ -156,9 +156,9 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
         string expected = 
             @"Chain0:
 if (query_verb Examine) {
-    map_text MapText.Jirinaar 37
+    text 37
 } else {
-    if (open_door Door.HClan_HCK MapText.Jirinaar Item.HunterClanKey 100 32 33) {
+    if (open_door Door.HClan_HCK Item.HunterClanKey 100 32 33) {
         if (result) {
             door_open Set Door.HClan_HCK
             teleport Map.HunterClan 69 67 Unchanged 255 0
@@ -179,59 +179,59 @@ if (query_verb Examine) {
 
         const string expectedScript = @" 0=>1: action StartDialogue
 !1?2:11: in_party PartyMember.Sira
-!2?6:3: get_switch Switch.Switch597
- 3=>4: map_text EventText.Sira2 7 StandardOptions
- 4=>5: map_text EventText.Sira2 1 ConversationOptions
- 5=>!: map_text EventText.Sira2 1 Conversation
+!2?6:3: get_switch Switch.SiraAndMellthasTogether
+ 3=>4: text 7 StandardOptions
+ 4=>5: text 1 ConversationOptions
+ 5=>!: text 1 Conversation
 !6?7:8: get_switch Switch.Switch77
-#7=>9: map_text EventText.Sira2 11 StandardOptions
- 8=>9: map_text EventText.Sira2 7 StandardOptions
- 9=>10: map_text EventText.Sira2 8 ConversationOptions
- 10=>!: map_text EventText.Sira2 8 Conversation
+#7=>9: text 11 StandardOptions
+ 8=>9: text 7 StandardOptions
+ 9=>10: text 8 ConversationOptions
+ 10=>!: text 8 Conversation
 !11?12:13: get_switch Switch.TalkedToSiraAndMellthasAboutRejoining
-#12=>14: map_text EventText.Sira2 16
- 13=>14: map_text EventText.Sira2 15
+#12=>14: text 16
+ 13=>14: text 15
  14=>15: switch Set Switch.TalkedToSiraAndMellthasAboutRejoining
-!15?18:16: prompt_player EventText.Sira2 17
- 16=>17: map_text EventText.Sira2 20
+!15?18:16: prompt_player 17
+ 16=>17: text 20
  17=>!: end_dialogue
- 18=>19: map_text EventText.Sira2 19
+ 18=>19: text 19
  19=>20: add_party_member PartyMember.Sira
 !20?21:23: result
  21=>22: add_party_member PartyMember.Mellthas
 !22?24:23: result
-#23=>27: map_text EventText.Sira2 18
+#23=>27: text 18
  24=>25: modify_npc_off Set 8 Map.Edjirr
  25=>26: modify_npc_off Set 9 Map.Edjirr
  26=>!: end_dialogue
  27=>28: remove_party_member PartyMember.Sira 1 26888
  28=>!: remove_party_member PartyMember.Mellthas 1 26889
- 29=>30: action DialogueLine 10 Unknown.1
+ 29=>30: action DialogueLine 10 PromptNumber.1
 !30?32:31: event_used
- 31=>!: map_text EventText.Sira2 2
- 32=>!: map_text EventText.Sira2 3
- 33=>34: action DialogueLine 10 Unknown.8
+ 31=>!: text 2
+ 32=>!: text 3
+ 33=>34: action DialogueLine 10 PromptNumber.8
 !34?36:35: event_used
- 35=>!: map_text EventText.Sira2 2
- 36=>!: map_text EventText.Sira2 3
- 37=>38: action DialogueLine 11 Unknown.8
- 38=>!: map_text EventText.Sira2 9
+ 35=>!: text 2
+ 36=>!: text 3
+ 37=>38: action DialogueLine 11 PromptNumber.8
+ 38=>!: text 9
  39=>40: action Word 0 Word.DjiFadh
 !40?41:42: event_used
- 41=>!: map_text EventText.Sira2 5
- 42=>!: map_text EventText.Sira2 4
+ 41=>!: text 5
+ 42=>!: text 4
  43=>44: action Word 0 Word.DjiKas
- 44=>!: map_text EventText.Sira2 6
+ 44=>!: text 6
  45=>46: action Word 0 Word.Magic1
- 46=>!: map_text EventText.Sira2 6
+ 46=>!: text 6
  47=>48: action Word 0 Word.Triifalai
- 48=>!: map_text EventText.Sira2 10
+ 48=>!: text 10
  49=>50: action AskAboutItem 255 Item.TriifalaiSeed
- 50=>!: map_text EventText.Sira2 10
+ 50=>!: text 10
  51=>52: action AskToLeave
-!52?54:53: prompt_player EventText.Sira2 12
- 53=>!: map_text EventText.Sira2 14
- 54=>55: map_text EventText.Sira2 13
+!52?54:53: prompt_player 12
+ 53=>!: text 14
+ 54=>55: text 13
  55=>56: remove_party_member PartyMember.Sira 1 26888
  56=>57: remove_party_member PartyMember.Mellthas 1 26889
  57=>!: end_dialogue
@@ -239,58 +239,58 @@ if (query_verb Examine) {
  59=>60: action StartDialogue
 !60?61:71: in_party PartyMember.Drirr
 !61?65:62: get_switch Switch.Switch599
- 62=>63: map_text EventText.Sira2 12 StandardOptions
- 63=>64: map_text EventText.Sira2 1 ConversationOptions
- 64=>!: map_text EventText.Sira2 1 Conversation
+ 62=>63: text 12 StandardOptions
+ 63=>64: text 1 ConversationOptions
+ 64=>!: text 1 Conversation
 !65?67:66: get_switch Switch.OnMissionToObtainHighKnowledge
 !66?67:68: get_switch Switch.OnMissionToDestroyShip
-#67=>69: map_text EventText.Sira2 20 StandardOptions
- 68=>69: map_text EventText.Sira2 13 StandardOptions
- 69=>70: map_text EventText.Sira2 2 ConversationOptions
- 70=>!: map_text EventText.Sira2 2 Conversation
+#67=>69: text 20 StandardOptions
+ 68=>69: text 13 StandardOptions
+ 69=>70: text 2 ConversationOptions
+ 70=>!: text 2 Conversation
 !71?72:73: event_used
-#72=>74: map_text EventText.Sira2 25
- 73=>74: map_text EventText.Sira2 24
-!74?77:75: prompt_player EventText.Sira2 26
- 75=>76: map_text EventText.Sira2 28
+#72=>74: text 25
+ 73=>74: text 24
+!74?77:75: prompt_player 26
+ 75=>76: text 28
  76=>!: end_dialogue
- 77=>78: map_text EventText.Sira2 27
+ 77=>78: text 27
  78=>79: add_party_member PartyMember.Drirr
  79=>!: end_dialogue
- 80=>81: action Unk3D
+ 80=>81: action PartySleeps
 !81?82:!: in_party PartyMember.Mellthas
-!82?!:86: get_switch Switch.Switch597
+!82?!:86: get_switch Switch.SiraAndMellthasTogether
  83=>84: change PartyMember.Sira Health AddAmount 2
  84=>85: change PartyMember.Mellthas Health AddAmount 2
 !85?86:!: is_conscious PartyMember.Mellthas
  86=>87: do_script Script.60
- 87=>!: switch Set Switch.Switch597
+ 87=>!: switch Set Switch.SiraAndMellthasTogether
  88=>89: action Unk2D 255
  89=>90: change_item PartyMember.Sira Item.TriifalaiSeed SubtractAmount 1
 !90?!:91: result
  91=>92: execute 1 65535
- 92=>93: map_text EventText.Sira2 21 PortraitLeft PartySheet.Sira
+ 92=>93: text 21 PortraitLeft PartySheet.Sira
 !93?!:94: get_switch Switch.SiraAndTomDiscussedSeedSignificance
 !94?95:!: is_conscious PartyMember.Tom
- 95=>96: map_text EventText.Sira2 22 PortraitLeft PartySheet.Tom
- 96=>97: map_text EventText.Sira2 23 PortraitLeft PartySheet.Sira
- 97=>98: map_text EventText.Sira2 24 PortraitLeft PartySheet.Tom
- 98=>99: map_text EventText.Sira2 25 PortraitLeft PartySheet.Sira
+ 95=>96: text 22 PortraitLeft PartySheet.Tom
+ 96=>97: text 23 PortraitLeft PartySheet.Sira
+ 97=>98: text 24 PortraitLeft PartySheet.Tom
+ 98=>99: text 25 PortraitLeft PartySheet.Sira
  99=>!: switch Set Switch.SiraAndTomDiscussedSeedSignificance
  100=>101: action Unk17 255
  101=>102: change_item PartyMember.Sira Item.TriifalaiSeed SubtractAmount 1
 !102?!:103: result
  103=>104: execute 1 65535
- 104=>105: map_text EventText.Sira2 21 PortraitLeft PartySheet.Sira
+ 104=>105: text 21 PortraitLeft PartySheet.Sira
 !105?!:106: get_switch Switch.SiraAndTomDiscussedSeedSignificance
 !106?107:!: is_conscious PartyMember.Tom
- 107=>108: map_text EventText.Sira2 22 PortraitLeft PartySheet.Tom
- 108=>109: map_text EventText.Sira2 23 PortraitLeft PartySheet.Sira
- 109=>110: map_text EventText.Sira2 24 PortraitLeft PartySheet.Tom
- 110=>111: map_text EventText.Sira2 25 PortraitLeft PartySheet.Sira
+ 107=>108: text 22 PortraitLeft PartySheet.Tom
+ 108=>109: text 23 PortraitLeft PartySheet.Sira
+ 109=>110: text 24 PortraitLeft PartySheet.Tom
+ 110=>111: text 25 PortraitLeft PartySheet.Sira
  111=>!: switch Set Switch.SiraAndTomDiscussedSeedSignificance
  112=>113: action Word 0 Word.Akiir
- 113=>!: map_text EventText.Sira2 38";
+ 113=>!: text 38";
 
         var lines = ApiUtil.SplitLines(script);
         var expectedLines = ApiUtil.SplitLines(expectedScript);
@@ -317,28 +317,28 @@ if (query_verb Examine) {
         const string expected = @"Chain0:
 action StartDialogue
 if (in_party PartyMember.Sira) {
-    if (get_switch Switch.Switch597) {
+    if (get_switch Switch.SiraAndMellthasTogether) {
         if (get_switch Switch.Switch77) {
-            map_text EventText.Sira2 11 StandardOptions
+            text 11 StandardOptions
         } else {
-            map_text EventText.Sira2 7 StandardOptions
+            text 7 StandardOptions
         }
-        map_text EventText.Sira2 8 ConversationOptions
-        map_text EventText.Sira2 8 Conversation
+        text 8 ConversationOptions
+        text 8 Conversation
     } else {
-        map_text EventText.Sira2 7 StandardOptions
-        map_text EventText.Sira2 1 ConversationOptions
-        map_text EventText.Sira2 1 Conversation
+        text 7 StandardOptions
+        text 1 ConversationOptions
+        text 1 Conversation
     }
 } else {
     if (get_switch Switch.TalkedToSiraAndMellthasAboutRejoining) {
-        map_text EventText.Sira2 16
+        text 16
     } else {
-        map_text EventText.Sira2 15
+        text 15
     }
     switch Set Switch.TalkedToSiraAndMellthasAboutRejoining
-    if (prompt_player EventText.Sira2 17) {
-        map_text EventText.Sira2 19
+    if (prompt_player 17) {
+        text 19
         add_party_member PartyMember.Sira
         if (result) {
             add_party_member PartyMember.Mellthas
@@ -348,7 +348,7 @@ if (in_party PartyMember.Sira) {
                 end_dialogue
             } else {
                 L1:
-                map_text EventText.Sira2 18
+                text 18
                 remove_party_member PartyMember.Sira 1 26888
                 remove_party_member PartyMember.Mellthas 1 26889
             }
@@ -356,7 +356,7 @@ if (in_party PartyMember.Sira) {
             goto L1
         }
     } else {
-        map_text EventText.Sira2 20
+        text 20
         end_dialogue
     }
 }";

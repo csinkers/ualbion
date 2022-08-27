@@ -160,6 +160,9 @@ static class Albion
             gameServices.Add(new AudioManager(false));
 
         global.Attach(gameServices);
+#if DEBUG
+        G.Instance.Attach(global); // Add convenience class that holds globals for debugging
+#endif
 #pragma warning restore CA2000 // Dispose objects before losing scope
     }
 }

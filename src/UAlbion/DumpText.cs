@@ -331,9 +331,9 @@ class DumpText : Component, IAssetDumper
             sw.WriteLine("    Chain Offsets: " + string.Join(", ", eventSet.Chains.Select((x, i) => $"{i}:{x}")));
             foreach (var e in eventSet.Events)
             {
-                if (e.Event is MapTextEvent textEvent)
+                if (e.Event is TextEvent textEvent)
                 {
-                    var textSource = tf.Format(textEvent.ToId());
+                    var textSource = tf.Format(textEvent.ToId(eventSet.TextId));
                     var text = string.Join(", ", textSource.GetBlocks().Select(x => x.Text));
                     sw.WriteLine($"        {e} = {text}");
                 }

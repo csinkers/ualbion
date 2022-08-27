@@ -3,7 +3,6 @@ using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.MapEvents;
 
@@ -11,7 +10,7 @@ public abstract class MapEvent : Event, IMapEvent
 {
     public abstract MapEventType EventType { get; }
 
-    public static EventNode SerdesNode(ushort id, EventNode node, ISerializer s, TextId textAssetId, AssetMapping mapping)
+    public static EventNode SerdesNode(ushort id, EventNode node, ISerializer s, AssetMapping mapping)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         var initialPosition = s.Offset;
@@ -19,7 +18,7 @@ public abstract class MapEvent : Event, IMapEvent
         if (node?.Event != null && mapEvent == null)
             throw new ArgumentOutOfRangeException($"Tried to serialise a non-map event \"{node.Event}\" to bytes");
 
-        var @event = SerdesEvent(mapEvent, s, textAssetId, mapping);
+        var @event = SerdesEvent(mapEvent, s, mapping);
 
         if (@event is IBranchingEvent be)
         {
@@ -49,7 +48,7 @@ public abstract class MapEvent : Event, IMapEvent
         return node;
     }
 
-    public static IMapEvent SerdesEvent(IMapEvent e, ISerializer s, TextId textSourceId, AssetMapping mapping)
+    public static IMapEvent SerdesEvent(IMapEvent e, ISerializer s, AssetMapping mapping)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         var initialPosition = s.Offset;
@@ -61,11 +60,11 @@ public abstract class MapEvent : Event, IMapEvent
             MapEventType.AskSurrender => AskSurrenderEvent.Serdes((AskSurrenderEvent)e, s),
             MapEventType.ChangeIcon => ChangeIconEvent.Serdes((ChangeIconEvent)e, mapping, s),
             MapEventType.ChangeUsedItem => ChangeUsedItemEvent.Serdes((ChangeUsedItemEvent)e, mapping, s),
-            MapEventType.Chest => OpenChestEvent.Serdes((OpenChestEvent)e, mapping, s, textSourceId),
+            MapEventType.Chest => OpenChestEvent.Serdes((OpenChestEvent)e, mapping, s),
             MapEventType.CloneAutomap => CloneAutomapEvent.Serdes((CloneAutomapEvent)e, mapping, s),
             MapEventType.CreateTransport => CreateTransportEvent.Serdes((CreateTransportEvent)e, s),
             MapEventType.DataChange => DataChangeEvent.Serdes((IDataChangeEvent)e, mapping, s),
-            MapEventType.Door => DoorEvent.Serdes((DoorEvent)e, mapping, s, textSourceId),
+            MapEventType.Door => DoorEvent.Serdes((DoorEvent)e, mapping, s),
             MapEventType.Encounter => EncounterEvent.Serdes((EncounterEvent)e, s),
             MapEventType.EndDialogue => EndDialogueEvent.Serdes((EndDialogueEvent)e, s),
             MapEventType.Execute => ExecuteEvent.Serdes((ExecuteEvent)e, s),
@@ -75,7 +74,7 @@ public abstract class MapEvent : Event, IMapEvent
             MapEventType.Pause => PauseEvent.Serdes((PauseEvent)e, s),
             MapEventType.PlaceAction => PlaceActionEvent.Serdes((PlaceActionEvent)e, s),
             MapEventType.PlayAnimation => PlayAnimationEvent.Serdes((PlayAnimationEvent)e, mapping, s),
-            MapEventType.Query => QueryEvent.Serdes((QueryEvent)e, mapping, s, textSourceId),
+            MapEventType.Query => QueryEvent.Serdes((QueryEvent)e, mapping, s),
             MapEventType.RemovePartyMember => RemovePartyMemberEvent.Serdes((RemovePartyMemberEvent)e, mapping, s),
             MapEventType.Script => DoScriptEvent.Serdes((DoScriptEvent)e, mapping, s),
             MapEventType.Signal => SignalEvent.Serdes((SignalEvent)e, s),
@@ -83,7 +82,7 @@ public abstract class MapEvent : Event, IMapEvent
             MapEventType.Sound => SoundEvent.Serdes((SoundEvent)e, mapping, s),
             MapEventType.Spinner => SpinnerEvent.Serdes((SpinnerEvent)e, s),
             MapEventType.StartDialogue => StartDialogueEvent.Serdes((StartDialogueEvent)e, mapping, s),
-            MapEventType.Text => MapTextEvent.Serdes((MapTextEvent)e, mapping, s, textSourceId),
+            MapEventType.Text => TextEvent.Serdes((TextEvent)e, mapping, s),
             MapEventType.Trap => TrapEvent.Serdes((TrapEvent)e, s),
             MapEventType.Wipe => WipeEvent.Serdes((WipeEvent)e, s),
             _ => DummyMapEvent.Serdes((DummyMapEvent)e, s, type)

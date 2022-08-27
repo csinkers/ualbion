@@ -22,5 +22,7 @@ public class EventContext
     public EventContextStatus Status { get; set; } = EventContextStatus.Ready;
     public IEventNode LastNode { get; set; }
     public bool LastEventResult { get; set; }
+    public ActionEvent LastAction { get; set; }
+
     public override string ToString() => $"{Id} Status:{Status} Src:{Source} Node:{Node}";
 }

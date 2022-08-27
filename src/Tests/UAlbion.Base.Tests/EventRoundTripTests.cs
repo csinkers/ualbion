@@ -80,7 +80,7 @@ public class EventRoundTripTests
         using var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms);
         using var s = new AlbionWriter(bw);
-        MapEvent.SerdesEvent(e, s, TextId.None, AssetMapping.Global);
+        MapEvent.SerdesEvent(e, s, AssetMapping.Global);
         bw.Flush();
         ms.Position = 0;
         return ms.ToArray();
@@ -91,7 +91,7 @@ public class EventRoundTripTests
         using var ms = new MemoryStream(bytes);
         using var br = new BinaryReader(ms);
         using var s = new AlbionReader(br);
-        return MapEvent.SerdesEvent(null, s, TextId.None, AssetMapping.Global);
+        return MapEvent.SerdesEvent(null, s, AssetMapping.Global);
     }
 
     static string Test(string scriptFormat, string expectedToStringResult, IMapEvent e)
@@ -361,10 +361,10 @@ execute 1 1");
     [Fact]
     public void Inv()
     {
-        Test(@"open_chest Chest.HClan_3Stim25r MapText.HunterClan Item.Pistol 1 2 3
-open_chest Chest.HClan_3Stim25r MapText.Jirinaar
-open_door Door.HerrasDoor_HerrasKey MapText.Jirinaar Item.HerrasKey 1 2 3
-open_door Door.HerrasDoor_HerrasKey MapText.Jirinaar");
+        Test(@"open_chest Chest.HClan_3Stim25r Item.Pistol 1 2 3
+open_chest Chest.HClan_3Stim25r
+open_door Door.HerrasDoor_HerrasKey Item.HerrasKey 1 2 3
+open_door Door.HerrasDoor_HerrasKey");
     }
 
     [Fact]
@@ -408,14 +408,14 @@ place_action SleepInRoom 1 1 1 1 1 1");
         Test((@"play_anim Video.MagicDemonstration 1 2 3 4", new PlayAnimationEvent(Video.MagicDemonstration, 1, 2, 3, 4, 0, 0)));
     }
 
-    [Fact] public void FestivalQuery() => Test(@"prompt_player EventText.FestivalTime 1 NonZero 1");
+    [Fact] public void FestivalQuery() => Test(@"prompt_player 1 NonZero 1");
 
     [Fact]
     public void Query()
     {
-        Test(@"prompt_player MapText.TestMapIskai 1
-prompt_player EventText.FestivalTime 1 NonZero 1
-prompt_player_numeric MapText.Jirinaar Equals 0 1
+        Test(@"prompt_player 1
+prompt_player 1 NonZero 1
+prompt_player_numeric Equals 0 1
 is_conscious PartyMember.Tom
 is_conscious PartyMember.Tom NonZero 1
 is_demo_version 1 NonZero 0
@@ -572,22 +572,19 @@ teleport None 1 1 North 1 1");
     [Fact]
     public void Text()
     {
-        Test(@"map_text EventText.Frill 1 1
-map_text EventText.Frill 1 Conversation
-map_text EventText.Frill 1 ConversationOptions
-map_text EventText.Frill 1 ConversationQuery
-map_text EventText.Frill 1
-map_text EventText.Frill 1 NoPortrait NpcSheet.Christine
-map_text EventText.Frill 1 PortraitLeft NpcSheet.Christine
-map_text EventText.Frill 1 PortraitLeft2
-map_text EventText.Frill 1 StandardOptions
-map_text MapText.Jirinaar 1 1
-map_text MapText.Jirinaar 1
-map_text MapText.Jirinaar 1 PortraitLeft
-map_text MapText.Jirinaar 1 PortraitLeft NpcSheet.Christine
-map_text MapText.Jirinaar 1 PortraitLeft2
-map_text MapText.Jirinaar 1 PortraitLeft3 NpcSheet.Christine
-map_text MapText.Jirinaar 1 QuickInfo");
+        Test(@"text 1
+text 1 1
+text 1 Conversation
+text 1 ConversationOptions
+text 1 ConversationQuery
+text 1 NoPortrait NpcSheet.Christine
+text 1 PortraitLeft PartySheet.Rainer
+text 1 PortraitLeft2
+text 1 StandardOptions
+text 1 PortraitLeft
+text 1 PortraitLeft2
+text 1 PortraitLeft3 NpcSheet.Christine
+text 1 QuickInfo");
     }
 
     [Fact]

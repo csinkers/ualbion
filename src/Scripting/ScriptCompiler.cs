@@ -58,7 +58,10 @@ public static class ScriptCompiler
         graph = record("Remove loop successor edges", RemoveLoopSuccessors(graph));
         graph = record("Resolve goto", ResolveGotos(graph));
         graph = record("Parse events", ParseEvents(graph));
-        graph = record("Transform events", TransformEvents(graph, eventTransformer));
+
+        if (eventTransformer != null)
+            graph = record("Transform events", TransformEvents(graph, eventTransformer));
+
         graph = record("Remove empty nodes", RemoveEmptyNodes(graph));
         graph = record("Defragment", graph.Defragment());
         return graph;

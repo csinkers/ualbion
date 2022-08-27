@@ -28,24 +28,12 @@ public class ActionEvent : MapEvent
         if (s == null) throw new ArgumentNullException(nameof(s));
         var actionType = s.EnumU8(nameof(ActionType), e?.ActionType ?? 0);
         e ??= new ActionEvent();
-        var assetType = actionType switch
-        {
-            ActionType.AskAboutItem 
-                or ActionType.UseItem 
-                or ActionType.EquipItem 
-                or ActionType.UnequipItem 
-                or ActionType.DropItem => AssetType.Item,
-            ActionType.Word => AssetType.Word,
-            ActionType.DialogueLine => AssetType.Unknown,
-            _ => AssetType.Unknown
-        };
-
         e.ActionType = actionType;
         e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
         e.Block = s.UInt8(nameof(Block), e.Block);
         e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
         e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-        e.Argument = AssetId.SerdesU16(nameof(Argument), e.Argument, assetType, mapping, s);
+        e.Argument = AssetId.SerdesU16(nameof(Argument), e.Argument, actionType.GetAssetType(), mapping, s);
         e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
 
         ApiUtil.Assert(e.Unk2 == 1 || ((int)e.ActionType == 14 && e.Unk2 == 2));

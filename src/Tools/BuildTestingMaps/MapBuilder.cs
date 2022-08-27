@@ -59,7 +59,7 @@ public abstract class MapBuilder
         }
 
         var script = sb.ToString();
-        var compiled = AlbionCompiler.Compile(script, Map.Id.ToMapText());
+        var compiled = AlbionCompiler.Compile(script);
 
         foreach (var e in compiled.Events) Map.Events.Add(e);
         foreach (var c in compiled.Chains) Map.Chains.Add(c);

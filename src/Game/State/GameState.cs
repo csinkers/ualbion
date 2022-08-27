@@ -64,6 +64,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
     public IList<NpcState> Npcs => _game.Npcs;
     public bool IsChainDisabled(MapId mapId, ushort chain) => _game.IsChainDisabled(mapId, chain);
     public bool IsNpcDisabled(MapId mapId, byte npcNum) => _game.IsNpcDisabled(mapId, npcNum);
+    public bool IsEventUsed(AssetId eventSetId, ActionEvent action) => _game.IsEventUsed(eventSetId, action);
 
     public MapId MapId => _game.MapId;
     public MapId MapIdForNpcs
@@ -72,6 +73,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         set => _game.MapIdForNpcs = value;
     }
 
+    public record EventVisitedEvent(EventSetId Id, ActionEvent Action) : EventRecord, IVerboseEvent;
     public GameState()
     {
         On<NewGameEvent>(e => NewGame(e.MapId, e.X, e.Y));
@@ -80,6 +82,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         On<FastClockEvent>(e => TickCount += e.Frames);
         On<GetTimeEvent>(_ => Info(Time.ToString("O", CultureInfo.InvariantCulture)));
         On<SetTimeEvent>(e => _game.ElapsedTime = e.Time - SavedGame.Epoch);
+        On<EventVisitedEvent>(e => _game?.UseEvent(e.Id, e.Action));
         On<LoadMapEvent>(e =>
         {
             if (_game != null)

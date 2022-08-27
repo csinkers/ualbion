@@ -494,7 +494,7 @@ public class FullDecompilationTests : IDisposable
                 var result = formatter.FormatGraphsAsBlocks(new[] { decompiledGraph }, 0);
                 scripts[index] = result.Script;
 
-                var roundTripLayout = AlbionCompiler.Compile(scripts[index], contextId, steps);
+                var roundTripLayout = AlbionCompiler.Compile(scripts[index], steps);
                 var expectedLayout = EventLayout.Build(new[] { graph });
 
                 if (!TestUtil.CompareLayout(roundTripLayout, expectedLayout, out var error))

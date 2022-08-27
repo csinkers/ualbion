@@ -1,7 +1,6 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Api.Eventing;
-using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.MapEvents;
 
@@ -9,22 +8,20 @@ namespace UAlbion.Formats.MapEvents;
 public class PromptPlayerNumericEvent : QueryEvent
 {
     public override QueryType QueryType => QueryType.PromptPlayerNumeric;
-    [EventPart("text_src")] public TextId TextSourceId { get; }
     [EventPart("op")] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
     [EventPart("imm")] public byte Immediate { get; private set; } // immediate value?
     [EventPart("src")] public ushort Argument { get; set; }
-    PromptPlayerNumericEvent(TextId textSourceId) => TextSourceId = textSourceId;
-    public PromptPlayerNumericEvent(TextId textSourceId, QueryOperation operation, byte immediate, ushort argument)
+    PromptPlayerNumericEvent() { }
+    public PromptPlayerNumericEvent(QueryOperation operation, byte immediate, ushort argument)
     {
-        TextSourceId = textSourceId;
         Operation = operation;
         Immediate = immediate;
         Argument = argument;
     }
-    public static PromptPlayerNumericEvent Serdes(PromptPlayerNumericEvent e, TextId textSourceId, ISerializer s)
+    public static PromptPlayerNumericEvent Serdes(PromptPlayerNumericEvent e, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        e ??= new PromptPlayerNumericEvent(textSourceId);
+        e ??= new PromptPlayerNumericEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         e.Immediate = s.UInt8(nameof(Immediate), e.Immediate);
         int zeroes = s.UInt8(null, 0);

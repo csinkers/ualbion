@@ -27,10 +27,9 @@ public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
         }
         else
         {
-            var eventSetId = (EventSetId)info.AssetId;
             var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
             var script = Encoding.UTF8.GetString(bytes);
-            var eventLayout = AlbionCompiler.Compile(script, eventSetId.ToEventText());
+            var eventLayout = AlbionCompiler.Compile(script);
             return new EventSet(info.AssetId, eventLayout.Events, eventLayout.Chains);
         }
 

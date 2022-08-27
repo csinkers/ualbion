@@ -76,7 +76,7 @@ public class InventoryScreenManager : Component
         if (e is ILockedInventoryEvent locked && locked.OpenedText != 255)
         {
             var state = Resolve<IGameState>();
-            Raise(new MapTextEvent(state.MapId.ToMapText(), locked.OpenedText, TextLocation.NoPortrait, SheetId.None));
+            Raise(new TextEvent(locked.OpenedText, TextLocation.NoPortrait, SheetId.None));
         }
     }
 

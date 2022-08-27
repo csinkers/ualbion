@@ -64,7 +64,7 @@ public class EventSet : IEventSet
             set.Chains[i] = s.UInt16(null, set.Chains[i]);
 
         for (ushort i = 0; i < set.Events.Count; i++)
-            set.Events[i] = MapEvent.SerdesNode(i, set.Events[i], s, id.ToEventText(), mapping);
+            set.Events[i] = MapEvent.SerdesNode(i, set.Events[i], s, mapping);
 
         foreach (var e in set.Events)
             e.Unswizzle(set.Events);

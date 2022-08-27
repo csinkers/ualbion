@@ -116,7 +116,7 @@ public static class LayoutTestUtil
                 if (node.Next != null)
                     stack.Push(node.Next.Id);
 
-                MapEvent.SerdesEvent(mapEvent, s, textSource, AssetMapping.Global);
+                MapEvent.SerdesEvent(mapEvent, s, AssetMapping.Global);
             }
         });
 }

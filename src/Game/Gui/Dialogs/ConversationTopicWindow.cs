@@ -12,6 +12,7 @@ public class ConversationTopicWindow : ModalDialog
 {
     public ConversationTopicWindow() : base(DialogPositioning.Center, 2)
     {
+        // TODO: Keyboard support
         On<UiRightClickEvent>(e =>
         {
             e.Propagating = false;

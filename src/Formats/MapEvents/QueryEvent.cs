@@ -2,7 +2,6 @@
 using SerdesNet;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.MapEvents;
 
@@ -10,7 +9,7 @@ public abstract class QueryEvent : MapEvent, IBranchingEvent
 {
     public override MapEventType EventType => MapEventType.Query;
     public abstract QueryType QueryType { get; }
-    public static QueryEvent Serdes(QueryEvent e, AssetMapping mapping, ISerializer s, TextId textSourceId)
+    public static QueryEvent Serdes(QueryEvent e, AssetMapping mapping, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (s.IsWriting() && e == null) throw new ArgumentNullException(nameof(e));
@@ -38,7 +37,7 @@ public abstract class QueryEvent : MapEvent, IBranchingEvent
             QueryType.Ticker => QueryTickerEvent.Serdes((QueryTickerEvent)e, mapping, s),
             QueryType.Map => QueryMapEvent.Serdes((QueryMapEvent)e, mapping, s),
             QueryType.Unk1E => QueryUnk1EEvent.Serdes((QueryUnk1EEvent)e, s),
-            QueryType.PromptPlayer => PromptPlayerEvent.Serdes((PromptPlayerEvent)e, textSourceId, s),
+            QueryType.PromptPlayer => PromptPlayerEvent.Serdes((PromptPlayerEvent)e, s),
             QueryType.Unk19 => QueryUnk19Event.Serdes((QueryUnk19Event)e, s),
             QueryType.TriggerType => QueryTriggerTypeEvent.Serdes((QueryTriggerTypeEvent)e, s),
             QueryType.Unk21 => QueryUnk21Event.Serdes((QueryUnk21Event)e, s),
@@ -46,7 +45,7 @@ public abstract class QueryEvent : MapEvent, IBranchingEvent
             QueryType.DemoVersion => QueryDemoVersionEvent.Serdes((QueryDemoVersionEvent)e, s),
             QueryType.NpcXCoord => QueryNpcXEvent.Serdes((QueryNpcXEvent)e, s),
             QueryType.NpcYCoord => QueryNpcYEvent.Serdes((QueryNpcYEvent)e, s),
-            QueryType.PromptPlayerNumeric => PromptPlayerNumericEvent.Serdes((PromptPlayerNumericEvent)e, textSourceId, s),
+            QueryType.PromptPlayerNumeric => PromptPlayerNumericEvent.Serdes((PromptPlayerNumericEvent)e, s),
             _ => throw new FormatException($"Unexpected query type \"queryType\"")
         };
     }

@@ -27,9 +27,9 @@ public class EventFormatter : IEventFormatter
         if (e == null) throw new ArgumentNullException(nameof(e));
         e.Format(builder, idOffset);
 
-        if (e.Event is MapTextEvent textEvent && _stringLoadFunc != null)
+        if (e.Event is TextEvent textEvent && _stringLoadFunc != null)
         {
-            var text = _stringLoadFunc(new StringId(_textSourceId, textEvent.SubId)).Replace("\"", "\\\"");
+            var text = _stringLoadFunc(textEvent.ToId(_textSourceId)).Replace("\"", "\\\"");
             builder.Add(ScriptPartType.Comment, $" ; \"{text}\"");
         }
     }
@@ -40,9 +40,9 @@ public class EventFormatter : IEventFormatter
         if (e == null) throw new ArgumentNullException(nameof(e));
         e.Format(builder);
 
-        if (e is MapTextEvent textEvent && _stringLoadFunc != null)
+        if (e is TextEvent textEvent && _stringLoadFunc != null)
         {
-            var text = _stringLoadFunc(new StringId(_textSourceId, textEvent.SubId)).Replace("\"", "\\\"");
+            var text = _stringLoadFunc(textEvent.ToId(_textSourceId)).Replace("\"", "\\\"");
             builder.Add(ScriptPartType.Comment, $" ; \"{text}\"");
         }
     }

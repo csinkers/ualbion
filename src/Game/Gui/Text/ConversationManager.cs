@@ -1,6 +1,7 @@
 ﻿using System;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
+using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
@@ -12,18 +13,18 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Text;
 
-public class ConversationManager : Component
+public class ConversationManager : ServiceComponent<IConversationManager>, IConversationManager
 {
-    Conversation _conversation;
+    public Conversation Conversation { get; private set; }
 
     public ConversationManager()
     {
-        OnAsync<ScriptTextEvent>(OnTextEvent);
-        OnAsync<MapTextEvent>(OnBaseTextEvent);
-        OnAsync<NpcTextEvent>(OnNpcTextEvent);
-        OnAsync<PartyMemberTextEvent>(OnPartyMemberTextEvent);
         OnAsync<StartDialogueEvent>(StartDialogue);
         OnAsync<StartPartyDialogueEvent>(StartPartyDialogue);
+        OnAsync<TextEvent>(OnTextEvent);
+        OnAsync<TextEvent>(OnBaseTextEvent);
+        OnAsync<NpcTextEvent>(OnNpcTextEvent);
+        OnAsync<PartyMemberTextEvent>(OnPartyMemberTextEvent);
     }
 
     TextId ContextTextSource =>
@@ -33,25 +34,25 @@ public class ConversationManager : Component
 
     bool OnNpcTextEvent(NpcTextEvent e, Action continuation)
     {
-        var textEvent = new MapTextEvent(ContextTextSource, e.TextId, TextLocation.PortraitLeft2, e.NpcId);
+        var textEvent = new TextEvent(e.TextId, TextLocation.PortraitLeft2, e.NpcId);
         return OnBaseTextEvent(textEvent, continuation);
     }
 
     bool OnPartyMemberTextEvent(PartyMemberTextEvent e, Action continuation)
     {
-        var textEvent = new MapTextEvent(ContextTextSource, e.TextId, TextLocation.PortraitLeft, e.MemberId.ToSheet());
+        var textEvent = new TextEvent(e.TextId, TextLocation.PortraitLeft, e.MemberId.ToSheet());
         return OnBaseTextEvent(textEvent, continuation);
     }
 
-    bool OnTextEvent(ScriptTextEvent e, Action continuation)
+    bool OnTextEvent(TextEvent e, Action continuation)
     {
-        var textEvent = new MapTextEvent(ContextTextSource, e.TextId, e.Location, e.Speaker);
+        var textEvent = new TextEvent(e.SubId, e.Location, e.Speaker);
         return OnBaseTextEvent(textEvent, continuation);
     }
 
-    bool OnBaseTextEvent(MapTextEvent mapTextEvent, Action continuation)
+    bool OnBaseTextEvent(TextEvent mapTextEvent, Action continuation)
     {
-        var conversationResult = _conversation?.OnText(mapTextEvent, continuation);
+        var conversationResult = Conversation?.OnText(mapTextEvent, continuation);
         if (conversationResult.HasValue)
             return conversationResult.Value;
 
@@ -60,7 +61,7 @@ public class ConversationManager : Component
         {
             case TextLocation.NoPortrait:
                 {
-                    var dialog = AttachChild(new TextDialog(tf.Format(mapTextEvent.ToId())));
+                    var dialog = AttachChild(new TextDialog(tf.Format(mapTextEvent.ToId(ContextTextSource))));
                     dialog.Closed += (_, _) => continuation();
                     return true;
                 }
@@ -70,14 +71,14 @@ public class ConversationManager : Component
             case TextLocation.PortraitLeft3:
                 {
                     var portraitId = GetPortrait(mapTextEvent.Speaker);
-                    var text = tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId());
+                    var text = tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId(ContextTextSource));
                     var dialog = AttachChild(new TextDialog(text, portraitId));
                     dialog.Closed += (_, _) => continuation();
                     return true;
                 }
 
             case TextLocation.QuickInfo:
-                Raise(new DescriptionTextEvent(tf.Format(mapTextEvent.ToId())));
+                Raise(new DescriptionTextEvent(tf.Format(mapTextEvent.ToId(ContextTextSource))));
                 continuation();
                 return true;
 
@@ -88,7 +89,7 @@ public class ConversationManager : Component
                 break; // Handled by Conversation
 
             default:
-                Raise(new DescriptionTextEvent(tf.Format(mapTextEvent.ToId()))); // TODO:
+                Raise(new DescriptionTextEvent(tf.Format(mapTextEvent.ToId(ContextTextSource)))); // TODO:
                 continuation();
                 return true;
         }
@@ -113,15 +114,28 @@ public class ConversationManager : Component
         var party = Resolve<IParty>();
         var assets = Resolve<IAssetManager>();
         var npc = assets.LoadSheet(e.NpcId);
-        if(npc == null)
+        if (npc == null)
         {
             ApiUtil.Assert($"Could not load NPC {e.NpcId}");
             return false;
         }
 
-        _conversation = AttachChild(new Conversation(party?.Leader.Id ?? Base.PartyMember.Tom, npc));
-        _conversation.Complete += (_, _) => { _conversation = null; continuation(); };
-        _conversation.StartDialogue();
+        var wasRunning = Resolve<IClock>().IsRunning;
+        if (wasRunning)
+            Raise(new StopClockEvent());
+
+        Conversation = AttachChild(new Conversation(party?.Leader.Id ?? Base.PartyMember.Tom, npc));
+        Conversation.Complete += (_, _) =>
+        {
+            Conversation.Remove();
+            Conversation = null;
+
+            if (wasRunning)
+                Raise(new StartClockEvent());
+
+            continuation();
+        };
+        Conversation.StartDialogue();
         return true;
     }
 
@@ -136,9 +150,9 @@ public class ConversationManager : Component
             return true;
         }
 
-        _conversation = AttachChild(new Conversation(Base.PartyMember.Tom, sheet));
-        _conversation.Complete += (_, _) => { _conversation = null; continuation(); };
-        _conversation.StartDialogue();
+        Conversation = AttachChild(new Conversation(Base.PartyMember.Tom, sheet));
+        Conversation.Complete += (_, _) => { Conversation = null; continuation(); };
+        Conversation.StartDialogue();
         return true;
     }
 }

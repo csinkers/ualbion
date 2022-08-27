@@ -3,7 +3,7 @@ using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.MapEvents;
 
-public interface ILockedInventoryEvent : IBranchingEvent, ITextEvent
+public interface ILockedInventoryEvent : IBranchingEvent
 {
     byte PickDifficulty { get; }
     ItemId Key { get; }

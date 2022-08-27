@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Ids;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.State;
 
@@ -27,6 +29,7 @@ public interface IGameState
     IList<NpcState> Npcs { get; }
     bool IsChainDisabled(MapId mapId, ushort chain);
     bool IsNpcDisabled(MapId mapId, byte npcNum);
+    bool IsEventUsed(AssetId eventSetId, ActionEvent contextLastAction);
     ICharacterSheet Leader { get; }
     ICharacterSheet Subject { get; }
     ICharacterSheet CurrentInventory { get; }

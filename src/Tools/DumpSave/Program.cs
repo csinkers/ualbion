@@ -141,13 +141,10 @@ static class Program
         }
 
         var filename = args[0];
-        using var outputStream = 
-        //*/ // Add/remove first / to switch between file & stdout
-            File.Open(@"C:\Depot\bb\ualbion\re\save001.txt", FileMode.Create, FileAccess.Write); /*/
-            Console.OpenStandardOutput();
-        //*/
-
+        var outPath = filename + ".txt";
+        using var outputStream = File.Open(outPath, FileMode.Create, FileAccess.Write);
         using var writer = new StreamWriter(outputStream);
+
         foreach (var command in commands)
         {
             command.Action(exchange, filename, writer);
@@ -160,7 +157,9 @@ static class Program
     static void PrintUsage()
     {
         Console.WriteLine("UAlbion Save Dumping and Editing Utility");
-        Console.WriteLine("Usage:");
+        Console.WriteLine("Usage: DumpSave <SavePath> [Commands]");
+        Console.WriteLine();
+        Console.WriteLine("Valid commands:");
         var longestCommand = Commands.Max(x => x.Name.Length);
         foreach(var command in Commands)
             Console.WriteLine($"    {command.Name.PadRight(longestCommand)}: {command.Description}");

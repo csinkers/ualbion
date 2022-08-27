@@ -62,7 +62,7 @@ public enum Script : ushort
     ShuttleGrabsTom_219 = 57,
     DesertReunion_219 = 58,
     EndSequence1_174_305 = 59,
-    DebugMapScript_199 = 60,
+    SiraAndMellthas_E984 = 60,
     EndSequence2_174 = 61,
     EndOfDemo_200 = 62,
     OhlAsksForGem_217 = 200,

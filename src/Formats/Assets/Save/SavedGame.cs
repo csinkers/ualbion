@@ -8,6 +8,7 @@ using UAlbion.Config;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Containers;
 using UAlbion.Formats.Ids;
+using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets.Save;
 
@@ -377,5 +378,22 @@ public class SavedGame
 
         if (serializer.IsReading() || save.Inventories.TryGetValue(key, out existing))
             save.Inventories[key] = Inventory.SerdesMerchant(i, existing, mapping, serializer);
+    }
+
+    public bool IsEventUsed(AssetId eventSetId, ActionEvent action)
+    {
+        foreach (var e in VisitedEvents)
+            if (e.EventSetId == eventSetId && e.Type == action.ActionType && e.Argument == action.Argument)
+                return true;
+
+        return false;
+    }
+
+    public void UseEvent(AssetId eventSetId, ActionEvent action)
+    {
+        if (IsEventUsed(eventSetId, action))
+            return;
+
+        VisitedEvents.Add(new VisitedEvent(eventSetId, action.ActionType, action.Argument));
     }
 }

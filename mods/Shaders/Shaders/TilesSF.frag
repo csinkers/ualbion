@@ -3,7 +3,7 @@
 
 vec4 Pal(float color, bool opaque)
 {
-	const float palHeight = textureSize(sampler2D(uDayPalette, uPaletteSampler), 0).y; //! float palHeight = 1;
+	const float palHeight = textureSize(sampler2D(uDayPalette, uPaletteSampler), 0).y; //! const float palHeight = 1;
 	const vec2 uv = PaletteUv(color, uPaletteFrame, palHeight);
 	const vec4   day = textureGrad(sampler2D(uDayPalette, uPaletteSampler), uv, vec2(0), vec2(0)); //! vec4 day = vec4(0);
 	const vec4 night = textureGrad(sampler2D(uNightPalette, uPaletteSampler), uv, vec2(0), vec2(0)); //! vec4 night = vec4(0);
@@ -174,7 +174,7 @@ vec4 GetLayer(uint tileIndex, vec2 tileUv, vec2 deltaX, vec2 deltaY, bool opaque
 
 	layer = tile.Layer;
 	return tileIndex == 0
-		? color = vec4(0)
+		? vec4(0)
 		: color;
 }
 

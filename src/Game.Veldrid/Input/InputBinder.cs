@@ -130,8 +130,11 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
 
             var binding = new KeyBinding(keyEvent.Key, keyEvent.Modifiers);
             var mode = _bindings.ContainsKey(inputManager.InputMode) ? inputManager.InputMode : InputMode.Global;
+            if (mode == InputMode.TextEntry)
+                continue;
+
             if (!_bindings[mode].TryGetValue(binding, out var action))
-                if (mode == InputMode.TextEntry || !_bindings[InputMode.Global].TryGetValue(binding, out action))
+                if (!_bindings[InputMode.Global].TryGetValue(binding, out action))
                     continue;
 
             action = action.Trim();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading;
 using ImGuiNET;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -34,6 +35,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
     CommandList _frameCommands;
     GraphicsBackend? _newBackend;
     bool _done;
+    bool _active = true;
 
     public bool IsDepthRangeZeroToOne => _graphicsDevice?.IsDepthRangeZeroToOne ?? false;
     public bool IsClipSpaceYInverted => _graphicsDevice?.IsClipSpaceYInverted ?? false;
@@ -59,6 +61,12 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
             _defaultHeight = windowRect.Value.Height;
         }
 
+        On<WindowHiddenEvent>(_ => _active = false);
+        On<WindowShownEvent>(_ =>
+        {
+            Raise(new RefreshFramebuffersEvent());
+            _active = true;
+        });
         On<WindowClosedEvent>(_ =>
         {
             if (_newBackend == null)
@@ -178,18 +186,22 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
                 using (PerfTracker.FrameEvent("5.2 Calculating UI layout"))
                      Raise(new LayoutEvent());
 
-            using (PerfTracker.FrameEvent("6 Drawing"))
-                Draw();
-
-            if (_graphicsDevice.SyncToVerticalBlank != ((flags & EngineFlags.VSync) != 0))
-                _graphicsDevice.SyncToVerticalBlank = (flags & EngineFlags.VSync) != 0;
-
-            using (PerfTracker.FrameEvent("7 Swap buffers"))
+            if (_active)
             {
-                CoreTrace.Log.Info("Engine", "Swapping buffers...");
-                _graphicsDevice.SwapBuffers();
-                CoreTrace.Log.Info("Engine", "Draw complete");
+                using (PerfTracker.FrameEvent("6 Drawing"))
+                    Draw();
+
+                if (_graphicsDevice.SyncToVerticalBlank != ((flags & EngineFlags.VSync) != 0))
+                    _graphicsDevice.SyncToVerticalBlank = (flags & EngineFlags.VSync) != 0;
+
+                using (PerfTracker.FrameEvent("7 Swap buffers"))
+                {
+                    CoreTrace.Log.Info("Engine", "Swapping buffers...");
+                    _graphicsDevice.SwapBuffers();
+                    CoreTrace.Log.Info("Engine", "Draw complete");
+                }
             }
+            else Thread.Sleep(16);
 
             if (_startupOnly)
                 _done = true;

@@ -326,7 +326,7 @@ public class Conversation : Component
         RaiseAsync(triggerEvent, () =>
         {
             var action = (ActionEvent)eventSet.Events[eventIndex.Value].Event;
-            Raise(new GameState.EventVisitedEvent(eventSet.Id, action));
+            Raise(new EventVisitedEvent(eventSet.Id, action));
             continuation?.Invoke();
         });
         return true;

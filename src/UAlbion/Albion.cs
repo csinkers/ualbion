@@ -146,6 +146,7 @@ static class Albion
             new InputManager()
                 .RegisterInputMode(InputMode.ContextMenu, new ContextMenuInputMode())
                 .RegisterInputMode(InputMode.World2D, new World2DInputMode())
+                .RegisterInputMode(InputMode.TextEntry, new TextEntryInputMode())
                 .RegisterMouseMode(MouseMode.DebugPick, new DebugPickMouseMode())
                 .RegisterMouseMode(MouseMode.MouseLook, new MouseLookMouseMode())
                 .RegisterMouseMode(MouseMode.Normal, new NormalMouseMode())

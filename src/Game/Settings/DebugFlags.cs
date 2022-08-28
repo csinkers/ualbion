@@ -18,4 +18,5 @@ public enum DebugFlags
     NpcColliderLayer   = 0x400,
     NpcPathLayer       = 0x800,
     ShowDebugTiles     = 0x1000,
+    FastMovement       = 0x2000,
 }

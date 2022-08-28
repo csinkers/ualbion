@@ -47,7 +47,8 @@ public class RightButtonHeldMouseMode : Component
     {
         _hits.Clear();
         Resolve<ISelectionManager>().CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, false);
-        if (_hits.Count == 0) return;
+        if (_hits.Count == 0)
+            return;
 
         if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && !x.Down))
             ShowContextMenu(_hits);

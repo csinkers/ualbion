@@ -5,6 +5,7 @@ using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Dialogs;
 
@@ -37,7 +38,7 @@ public class ConversationTopicWindow : ModalDialog
                     _ => Base.Ink.Gray,
                 };
 
-                var textElement = (IUiElement)new UiTextBuilder((TextId)x.Key).Ink(color);
+                var textElement = (IUiElement)new UiTextBuilder(x.Key).Ink(color);
                 return (IUiElement)new Button(textElement)
                 {
                     Theme = ButtonTheme.Frameless
@@ -53,8 +54,12 @@ public class ConversationTopicWindow : ModalDialog
 
         elements.Add(new Button(Base.SystemText.MsgBox_EnterWord).OnClick(() =>
         {
-            // TODO
-            OnWordSelected(null);
+            RaiseAsync(new TextPromptEvent(), wordString =>
+            {
+                var wordLookup = Resolve<IWordLookup>();
+                var wordId = wordLookup.Parse(wordString);
+                OnWordSelected(wordId);
+            });
         }));
 
         AttachChild(new DialogFrame(new Padding(new VerticalStack(elements), 3))

@@ -31,6 +31,7 @@
     "Escape": "push_scene MainMenu",
     "Control+A": "!loadnextmap",
     "Control+X": "!loadprevmap",
+    "Control+Q": "debug_flag toggle FastMovement",
     "BracketLeft": "e:mag -1",
     "BracketRight": "e:mag 1",
     "Shift+BracketLeft": "toggle_underlay",
@@ -85,7 +86,6 @@
 
     "Control+A": "!loadnextmap",
     "Control+X": "!loadprevmap",
-    "Control+Q": "engine_flag toggle UseCylindricalBillboards",
 
     "M": "open_map",
     "T": "wait",

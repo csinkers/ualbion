@@ -73,7 +73,6 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         set => _game.MapIdForNpcs = value;
     }
 
-    public record EventVisitedEvent(EventSetId Id, ActionEvent Action) : EventRecord, IVerboseEvent;
     public GameState()
     {
         On<NewGameEvent>(e => NewGame(e.MapId, e.X, e.Y));

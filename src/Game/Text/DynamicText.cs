@@ -61,8 +61,9 @@ public class DynamicText : IText
     public DynamicText(GeneratorFunc generator)
     {
         _generator = generator;
-        _getVersion = x => _version;
+        _getVersion = _ => _version;
     }
+
     public DynamicText(GeneratorFunc generator, Func<int, int> getVersion)
     {
         _generator = generator;

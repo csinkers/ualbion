@@ -2,4 +2,6 @@
 
 namespace UAlbion.Core.Veldrid.Events;
 
-public class WindowClosedEvent : Event { } // Emitted after the window has been closed
+public record WindowClosedEvent : EventRecord; // Emitted after the window has been closed
+public record WindowHiddenEvent : EventRecord;
+public record WindowShownEvent : EventRecord;

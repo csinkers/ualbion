@@ -2,6 +2,7 @@
 
 public enum CommonColor : byte
 {
+    Transparent   = 0,
     Black1        = 192, // #000000
     Black2        = 193, // #000000
     White         = 194, // #ffffff

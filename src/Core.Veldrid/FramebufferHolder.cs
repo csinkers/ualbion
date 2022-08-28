@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid.Events;
 using Veldrid;
 using VeldridGen.Interfaces;
@@ -8,6 +9,7 @@ using Component = UAlbion.Api.Eventing.Component;
 
 namespace UAlbion.Core.Veldrid;
 
+public record RefreshFramebuffersEvent : EventRecord;
 public abstract class FramebufferHolder : Component, IFramebufferHolder
 {
     class TextureHolder : ITextureHolder
@@ -26,6 +28,21 @@ public abstract class FramebufferHolder : Component, IFramebufferHolder
     uint _width;
     uint _height;
 
+    protected FramebufferHolder(uint width, uint height, string name)
+    {
+        On<DeviceCreatedEvent>(e => Update(e.Device));
+        On<DestroyDeviceObjectsEvent>(_ => Dispose());
+        On<RefreshFramebuffersEvent>(_ =>
+        {
+            Dispose();
+            Dirty();
+        });
+
+        _width = width;
+        _height = height;
+        Name = name;
+    }
+
     public string Name { get; }
 
     public uint Width
@@ -35,6 +52,9 @@ public abstract class FramebufferHolder : Component, IFramebufferHolder
         {
             if (_width == value)
                 return;
+
+            if (value == 0)
+                throw new InvalidOperationException("Tried to resize framebuffer width to 0");
 
             _width = value;
             Dirty();
@@ -49,6 +69,10 @@ public abstract class FramebufferHolder : Component, IFramebufferHolder
         {
             if (_height == value)
                 return;
+
+            if (value == 0)
+                throw new InvalidOperationException("Tried to resize framebuffer width to 0");
+
             _height = value;
             Dirty();
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Height)));
@@ -70,15 +94,6 @@ public abstract class FramebufferHolder : Component, IFramebufferHolder
     {
         Dispose(true);
         GC.SuppressFinalize(this);
-    }
-
-    protected FramebufferHolder(uint width, uint height, string name)
-    {
-        On<DeviceCreatedEvent>(e => Update(e.Device));
-        On<DestroyDeviceObjectsEvent>(_ => Dispose());
-        _width = width;
-        _height = height;
-        Name = name;
     }
 
     protected override void Subscribed() => Dirty();

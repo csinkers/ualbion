@@ -6,6 +6,7 @@ using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
+using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities.Map2D;
@@ -26,6 +27,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
     {
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
+
         _state = new PlayerMovementState(settings)
         {
             X = (ushort)initialPosition.X,
@@ -51,6 +53,24 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
             var position = initialPosition + offset * i;
             _trail[_trailOffset - i] = (To3D(position), settings.GetSpriteFrame(_state, GetSitMode));
         }
+
+        var oldTicksPerTile = _settings.TicksPerTile;
+        var oldTicksPerFrame = _settings.TicksPerFrame;
+        After<DebugFlagEvent>(_ =>
+        {
+            var debugFlags = GetVar(UserVars.Debug.DebugFlags);
+            if ((debugFlags & DebugFlags.FastMovement) != 0)
+            {
+                _settings.TicksPerTile = (oldTicksPerTile + 3) / 4;
+                _settings.TicksPerTile = (oldTicksPerFrame + 3) / 4;
+            }
+            else
+            {
+                _settings.TicksPerTile = oldTicksPerTile;
+                _settings.TicksPerTile = oldTicksPerFrame;
+            }
+
+        });
 
         On<FastClockEvent>(_ => Update());
         On<PartyMoveEvent>(e => _direction += new Vector2(e.X, e.Y));

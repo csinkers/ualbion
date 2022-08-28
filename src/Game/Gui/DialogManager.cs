@@ -41,6 +41,13 @@ public class DialogManager  : ServiceComponent<IDialogManager>, IDialogManager
             return true;
         });
 
+        OnAsync<TextPromptEvent, string>((e, c) =>
+        {
+            var dialog = AttachChild(new TextPromptDialog());
+            dialog.Closed += (_, _) => c(dialog.Value);
+            return true;
+        });
+
         OnAsync<PartyMemberPromptEvent, PartyMemberId>((e, c) =>
         {
             var tf = Resolve<ITextFormatter>();

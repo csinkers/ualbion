@@ -12,20 +12,20 @@ namespace UAlbion.Core.Veldrid;
 
 class WindowHolder : Component, IDisposable
 {
-    readonly WindowManager _windowManager;
     Sdl2Window _window;
     DateTime _lastTitleUpdateTime;
     Vector2? _pendingCursorUpdate;
+    WindowState _lastState;
     public Sdl2Window Window => _window;
     public string WindowTitle { get; set; }
 
     public WindowHolder()
     {
         On<SetCursorPositionEvent>(e => _pendingCursorUpdate = new Vector2(e.X, e.Y));
-        On<ToggleFullscreenEvent>(e => ToggleFullscreenState());
-        On<ToggleHardwareCursorEvent>(e => { if (_window != null) _window.CursorVisible = !_window.CursorVisible; });
-        On<ToggleResizableEvent>(e => { if (_window != null) _window.Resizable = !_window.Resizable; });
-        On<ToggleVisibleBorderEvent>(e => { if (_window != null) _window.BorderVisible = !_window.BorderVisible; });
+        On<ToggleFullscreenEvent>(_ => ToggleFullscreenState());
+        On<ToggleHardwareCursorEvent>(_ => { if (_window != null) _window.CursorVisible = !_window.CursorVisible; });
+        On<ToggleResizableEvent>(_ => { if (_window != null) _window.Resizable = !_window.Resizable; });
+        On<ToggleVisibleBorderEvent>(_ => { if (_window != null) _window.BorderVisible = !_window.BorderVisible; });
         On<ConfineMouseToWindowEvent>(e => { if (_window != null) Sdl2Native.SDL_SetWindowGrab(_window.SdlWindowHandle, e.Enabled); });
         On<SetRelativeMouseModeEvent>(e =>
         {
@@ -34,7 +34,8 @@ class WindowHolder : Component, IDisposable
             if (!e.Enabled)
                 Sdl2Native.SDL_WarpMouseInWindow(_window.SdlWindowHandle, _window.Width / 2, _window.Height / 2);
         });
-        _windowManager = AttachChild(new WindowManager());
+
+        AttachChild(new WindowManager());
     }
 
     public void CreateWindow(int x, int y, int width, int height)
@@ -54,10 +55,24 @@ class WindowHolder : Component, IDisposable
 
         _window = VeldridStartup.CreateWindow(ref windowInfo);
         _window.CursorVisible = false;
-        _window.Resized += () => Raise(new WindowResizedEvent(_window.Width, _window.Height));
+        _window.Resized += () =>
+        {
+            if (_lastState != _window.WindowState)
+            {
+                if (_window.WindowState == WindowState.Minimized)
+                    Raise(new WindowHiddenEvent());
+                else
+                    Raise(new WindowShownEvent());
+
+                _lastState = _window.WindowState;
+            }
+
+            Raise(new WindowResizedEvent(_window.Width, _window.Height));
+        };
         _window.Closed += () => Raise(new WindowClosedEvent());
         _window.FocusGained += () => Raise(new FocusGainedEvent());
         _window.FocusLost += () => Raise(new FocusLostEvent());
+        _lastState = _window.WindowState;
         Raise(new WindowResizedEvent(_window.Width, _window.Height));
     }
 

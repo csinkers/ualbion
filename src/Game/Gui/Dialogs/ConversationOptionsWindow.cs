@@ -14,7 +14,7 @@ public class ConversationOptionsWindow : ModalDialog
     // Opaque background
     // Yellow options, gap, then white options.
 
-    public ConversationOptionsWindow() : base(DialogPositioning.Bottom, 1)
+    public ConversationOptionsWindow(int depth) : base(DialogPositioning.Bottom, depth)
     {
         On<RespondEvent>(e =>
         {

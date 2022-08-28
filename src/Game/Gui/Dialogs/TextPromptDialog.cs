@@ -15,18 +15,18 @@ public class TextPromptDialog : ModalDialog
     readonly TextBlock _block;
     readonly UiRectangle _cursor;
 
-    public TextPromptDialog(int depth = 0) : base(DialogPositioning.Center, depth)
+    public TextPromptDialog(int depth) : base(DialogPositioning.Center, depth)
     {
-        On<CloseWindowEvent>(_ => Close());
+        On<TextEntryCompleteEvent>(_ => Close());
+        On<CloseWindowEvent>(_ => { Value = null; Close(); });
+        On<TextEntryAbortEvent>(_ => { Value = null; Close(); });
         On<IdleClockEvent>(IdleTick);
+        On<TextEntryCharEvent>(e => Value += e.Character);
         On<TextEntryBackspaceEvent>(_ =>
         {
             if (Value.Length > 0)
                 Value = Value[..^1];
         });
-        On<TextEntryCharEvent>(e => Value += e.Character);
-        On<TextEntryCompleteEvent>(_ => Close());
-        On<TextEntryAbortEvent>(_ => { Value = null; Close(); });
 
         // outer frame dims = 183x34
         // TextBox: 162x13 (incl. border)

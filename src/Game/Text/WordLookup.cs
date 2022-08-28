@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats;
@@ -9,29 +10,48 @@ namespace UAlbion.Game.Text;
 
 public class WordLookup : ServiceComponent<IWordLookup>, IWordLookup
 {
-    readonly Dictionary<string, WordId> _lookup = new();
+    readonly Dictionary<string, List<WordId>> _lookup = new();
+    readonly Dictionary<WordId, string> _reverse = new();
 
     public WordLookup() => On<LanguageChangedEvent>(_ => _lookup.Clear());
     public WordId Parse(string s)
     {
         if (string.IsNullOrEmpty(s))
-            return AssetId.None;
+            return WordId.None;
 
         if (_lookup.Count == 0)
             Rebuild();
 
-        return _lookup.TryGetValue(s.Trim().ToUpperInvariant(), out var id) 
-            ? id 
+        var key = s.Trim().ToUpperInvariant();
+        return _lookup.TryGetValue(key, out var ids)
+            ? ids[0]
             : WordId.None;
     }
+
+    public IEnumerable<WordId> GetHomonyms(WordId word) =>
+        _reverse.TryGetValue(word, out var text) 
+            ? _lookup[text] 
+            : Array.Empty<WordId>();
+
+    public string GetText(WordId id, string language) 
+        => _reverse.TryGetValue(id, out var text) ? text : id.ToString();
 
     void Rebuild()
     {
         var assets = Resolve<IAssetManager>();
-        foreach(var id in AssetId.EnumerateAll(AssetType.Word))
+        _reverse.Clear();
+
+        foreach (var id in AssetId.EnumerateAll(AssetType.Word))
         {
-            var text = assets.LoadString(id);
-            _lookup[text.Trim().ToUpperInvariant()] = id;
+            var text = assets.LoadString(id).Trim().ToUpperInvariant();
+            if (!_lookup.TryGetValue(text, out var ids))
+            {
+                ids = new List<WordId>();
+                _lookup[text] = ids;
+            }
+
+            ids.Add(id);
+            _reverse[id] = text;
         }
     }
 }

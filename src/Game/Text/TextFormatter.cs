@@ -183,7 +183,7 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
 
         foreach (var (token, p) in tokens)
         {
-            if (sb.Length > 0 && token != Token.Text || token == Token.Block)
+            if (sb.Length > 0 && (token != Token.Text && token != Token.Word) || token == Token.Block)
             {
                 block.Text = sb.ToString();
                 yield return block;

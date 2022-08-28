@@ -158,7 +158,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         if (e.EventSet.Id.Type == AssetType.Map && game.IsChainDisabled(e.EventSet.Id, e.EventSet.GetChainForEvent(e.EntryPoint)))
             return true;
 
-        var action = e.EventSet.Events[0].Event as ActionEvent;
+        var action = e.EventSet.Events[e.EntryPoint].Event as ActionEvent;
         var context = new EventContext(e.Source)
         {
             EntryPoint = e.EntryPoint,

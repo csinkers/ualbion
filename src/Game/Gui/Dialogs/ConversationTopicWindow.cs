@@ -5,32 +5,55 @@ using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
+using UAlbion.Game.Settings;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Dialogs;
 
 public class ConversationTopicWindow : ModalDialog
 {
-    public ConversationTopicWindow() : base(DialogPositioning.Center, 2)
+    readonly List<WordId> _currentWords = new();
+
+    public ConversationTopicWindow(int depth) : base(DialogPositioning.Center, depth)
     {
         // TODO: Keyboard support
         On<UiRightClickEvent>(e =>
         {
             e.Propagating = false;
-            OnWordSelected(null);
+            OnWordSelected(WordId.None);
+        });
+
+        On<DismissMessageEvent>(_ => OnWordSelected(WordId.None));
+        On<EnterWordEvent>(_ => ShowWordEntryPrompt());
+        On<RespondEvent>(e =>
+        {
+            int index = e.Option - 1;
+            if (_currentWords.Count <= e.Option)
+                return;
+
+            OnWordSelected(_currentWords[index]);
         });
     }
 
-    public event EventHandler<WordId?> WordSelected;
-    void OnWordSelected(WordId? e) => WordSelected?.Invoke(this, e);
+    public event EventHandler<WordId> WordSelected;
+    void OnWordSelected(WordId e) => WordSelected?.Invoke(this, e);
 
     public void SetOptions(IDictionary<WordId, WordStatus> words)
     {
         RemoveAllChildren();
 
         var elements = new List<IUiElement>();
-        var wordButtons = words.Select(x =>
+        var lookup = Resolve<IWordLookup>();
+        var language = GetVar(UserVars.Gameplay.Language);
+
+        _currentWords.Clear();
+        var wordButtons = 
+            words
+            .OrderBy(x => x.Value)
+            .ThenBy(x => lookup.GetText(x.Key, language))
+            .Select(x =>
             {
+                _currentWords.Add(x.Key);
                 var color = x.Value switch
                 {
                     WordStatus.Mentioned => Base.Ink.Yellow,
@@ -52,19 +75,19 @@ public class ConversationTopicWindow : ModalDialog
             elements.Add(new Spacing(0, 3));
         }
 
-        elements.Add(new Button(Base.SystemText.MsgBox_EnterWord).OnClick(() =>
-        {
-            RaiseAsync(new TextPromptEvent(), wordString =>
-            {
-                var wordLookup = Resolve<IWordLookup>();
-                var wordId = wordLookup.Parse(wordString);
-                OnWordSelected(wordId);
-            });
-        }));
+        elements.Add(new Button(Base.SystemText.MsgBox_EnterWord).OnClick(ShowWordEntryPrompt));
 
         AttachChild(new DialogFrame(new Padding(new VerticalStack(elements), 3))
         {
             Background = DialogFrameBackgroundStyle.MainMenuPattern
         });
     }
+
+    void ShowWordEntryPrompt() =>
+        RaiseAsync(new TextPromptEvent(), wordString =>
+        {
+            var wordLookup = Resolve<IWordLookup>();
+            var wordId = wordLookup.Parse(wordString);
+            OnWordSelected(wordId);
+        });
 }

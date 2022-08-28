@@ -135,7 +135,10 @@
     "Number4": "respond 4",
     "Number5": "respond 5",
     "Number6": "respond 6",
-    "Number7": "respond 7"
+    "Number7": "respond 7",
+    "Number8": "respond 8",
+    "Number9": "respond 9",
+    "Number0": "enter_word" // Used to trigger 'Enter word' in conversation
   },
   "MainMenu": {
     "Control+N": "new_game TorontoBegin 32 76",

@@ -13,7 +13,7 @@ public class ConversationTextWindow : ModalDialog
 
     public event Action Clicked;
 
-    public ConversationTextWindow() : base(DialogPositioning.Bottom)
+    public ConversationTextWindow(int depth) : base(DialogPositioning.Bottom, depth)
     {
         On<UiLeftClickEvent>(_ => Clicked?.Invoke());
         On<DismissMessageEvent>(_ => Clicked?.Invoke());

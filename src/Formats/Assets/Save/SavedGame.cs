@@ -129,7 +129,9 @@ public class SavedGame
     public byte[] Unknown8bb8 { get; set; } 
     public MapChangeCollection PermanentMapChanges { get; private set; } = new();
     public MapChangeCollection TemporaryMapChanges { get; private set; } = new();
-    public IList<VisitedEvent> VisitedEvents { get; private set; } = new List<VisitedEvent>();
+    HashSet<VisitedEvent> _visitedSet = new();
+    List<VisitedEvent> _visitedEvents = new();
+    public IReadOnlyList<VisitedEvent> VisitedEvents => _visitedEvents;
     public IList<PartyMemberId> ActiveMembers { get; private set; } = new PartyMemberId[MaxPartySize];
 
     public static string GetName(BinaryReader br)
@@ -189,7 +191,7 @@ public class SavedGame
             nameof(ActiveMembers),
             save.ActiveMembers,
             MaxPartySize,
-            (i, x, s2) =>
+            (i, _, s2) =>
             {
                 var value = PartyMemberId.SerdesU8(null, save.ActiveMembers[i], mapping, s);
                 s2.Pad(1);
@@ -273,7 +275,14 @@ public class SavedGame
             visitedEventsCount = (ushort)((visitedEventsSize - 2) / VisitedEvent.SizeOnDisk);
         }
 
-        save.VisitedEvents = s.List(nameof(VisitedEvents), save.VisitedEvents, mapping, visitedEventsCount, VisitedEvent.Serdes);
+        save._visitedEvents = 
+            (List<VisitedEvent>)s.List(
+                nameof(VisitedEvents),
+                save._visitedEvents,
+                mapping,
+                visitedEventsCount,
+                VisitedEvent.Serdes);
+        save._visitedSet = save._visitedEvents.ToHashSet();
 
         var partyIds = save.Sheets.Keys.Where(x => x.Type == AssetType.PartySheet).Select(x => x.Id).ToList();
         partyIds.Add(199); // Force extra XLD length fields to be written for empty objects to preserve compat with original game.
@@ -382,18 +391,14 @@ public class SavedGame
 
     public bool IsEventUsed(AssetId eventSetId, ActionEvent action)
     {
-        foreach (var e in VisitedEvents)
-            if (e.EventSetId == eventSetId && e.Type == action.ActionType && e.Argument == action.Argument)
-                return true;
-
-        return false;
+        var visited = new VisitedEvent(eventSetId, action.ActionType, action.Argument);
+        return _visitedSet.Contains(visited);
     }
 
     public void UseEvent(AssetId eventSetId, ActionEvent action)
     {
-        if (IsEventUsed(eventSetId, action))
-            return;
-
-        VisitedEvents.Add(new VisitedEvent(eventSetId, action.ActionType, action.Argument));
+        var visited = new VisitedEvent(eventSetId, action.ActionType, action.Argument);
+        if (_visitedSet.Add(visited))
+            _visitedEvents.Add(visited);
     }
 }

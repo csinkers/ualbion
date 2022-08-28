@@ -65,19 +65,20 @@ public class Conversation : Component
     protected override void Subscribed()
     {
         Raise(new PushInputModeEvent(InputMode.Conversation));
-        if (Children.Any())
+        if (_textWindow != null)
             return;
 
         var game = TryResolve<IGameState>();
         var assets = Resolve<IAssetManager>();
+        var dialogs = Resolve<IDialogManager>();
         var sheet = game?.GetSheet(_partyMemberId.ToSheet()) ?? assets.LoadSheet(_partyMemberId.ToSheet());
 
         AttachChild(new ConversationParticipantLabel(sheet, false));
         AttachChild(new ConversationParticipantLabel(_npc, true));
 
-        _textWindow = AttachChild(new ConversationTextWindow());
-        _optionsWindow = AttachChild(new ConversationOptionsWindow { IsActive = false});
-        _topicsWindow = AttachChild(new ConversationTopicWindow { IsActive = false });
+        _textWindow = dialogs.AddDialog(depth => new ConversationTextWindow(depth));
+        _optionsWindow = dialogs.AddDialog(depth => new ConversationOptionsWindow(depth) { IsActive = false});
+        _topicsWindow = dialogs.AddDialog(depth => new ConversationTopicWindow(depth) { IsActive = false });
         _topicsWindow.WordSelected += TopicsWindowOnWordSelected;
     }
 
@@ -87,23 +88,34 @@ public class Conversation : Component
         AssetId.None,
         DefaultIdleHandler);
 
-    void TopicsWindowOnWordSelected(object sender, WordId? e)
+    void TopicsWindowOnWordSelected(object sender, WordId word)
     {
         _topicsWindow.IsActive = false;
-        DefaultIdleHandler();
+        if (word.IsNone)
+            DefaultIdleHandler();
+        else
+        {
+            var lookup = Resolve<IWordLookup>();
+            foreach (var homonym in lookup.GetHomonyms(word))
+                if (TriggerWordAction(homonym))
+                    break;
+        }
     }
 
     protected override void Unsubscribed() => Raise(new PopInputModeEvent());
 
     void Close()
     {
+        _textWindow.Remove();
+        _optionsWindow.Remove();
+        _topicsWindow.Remove();
         Remove();
         Complete?.Invoke(this, EventArgs.Empty);
     }
 
     void DiscoverTopics(IEnumerable<WordId> topics)
     {
-        foreach(var topic in topics)
+        foreach (var topic in topics)
             if (!_topics.TryGetValue(topic, out var currentStatus) || currentStatus == WordStatus.Unknown)
                 _topics[topic] = WordStatus.Mentioned;
     }
@@ -165,8 +177,21 @@ public class Conversation : Component
                 return;
 
             case SpecialBlockId.Farewell:
-                TriggerAction(ActionType.FinishDialogue, 0, AssetId.None, () => Complete?.Invoke(this, EventArgs.Empty));
+            {
+                if (TriggerAction(ActionType.FinishDialogue, 0, AssetId.None, Close)) 
+                    return;
+
+                void OnConversationClicked()
+                {
+                    _textWindow.Clicked -= OnConversationClicked;
+                    Close();
+                }
+
+                var text = tf.Ink(Base.Ink.Yellow).Format(Base.SystemText.Dialog_Farewell);
+                _textWindow.Text = text;
+                _textWindow.Clicked += OnConversationClicked;
                 return;
+            }
         }
 
         TriggerLineAction(blockId, textId);
@@ -262,16 +287,16 @@ public class Conversation : Component
 
     IEnumerable<(IText, int?, Action)> GetStandardOptions(ITextFormatter tf)
     {
-        (IText, int?, Action) Build(TextId id, int block)
+        (IText, int?, Action) Build(TextId id, SpecialBlockId block)
         {
             var text = tf.Format(id);
-            return (text, null, () => BlockClicked(block, 0));
+            return (text, null, () => BlockClicked((int)block, 0));
         }
 
-        yield return Build(Base.SystemText.Dialog_WhatsYourProfession, 0);
-        yield return Build(Base.SystemText.Dialog_WhatDoYouKnowAbout, 1);
-        yield return Build(Base.SystemText.Dialog_WhatDoYouKnowAboutThisItem, 2);
-        yield return Build(Base.SystemText.Dialog_ItsBeenNiceTalkingToYou, 3);
+        yield return Build(Base.SystemText.Dialog_WhatsYourProfession, SpecialBlockId.Profession);
+        yield return Build(Base.SystemText.Dialog_WhatDoYouKnowAbout, SpecialBlockId.QueryWord);
+        yield return Build(Base.SystemText.Dialog_WhatDoYouKnowAboutThisItem, SpecialBlockId.QueryItem);
+        yield return Build(Base.SystemText.Dialog_ItsBeenNiceTalkingToYou, SpecialBlockId.Farewell);
     }
 
     void OnDataChange(IDataChangeEvent e) // Handle item transitions when the party receives items
@@ -293,7 +318,11 @@ public class Conversation : Component
             ActionType.Word,
             0,
             wordId,
-            DefaultIdleHandler);
+            () =>
+            {
+                _topics[wordId] = WordStatus.Discussed;
+                DefaultIdleHandler();
+            });
 
     bool TriggerLineAction(int blockId, int textId) 
         => TriggerAction(
@@ -301,21 +330,44 @@ public class Conversation : Component
             (byte)blockId,
             new AssetId(AssetType.PromptNumber, textId),
             DefaultIdleHandler);
+
+    static ushort? FindActionChain(IEventSet set, ActionType type, byte block, AssetId argument)
+    {
+        foreach (var x in set.Chains)
+        {
+            if (set.Events[x].Event is not ActionEvent action)
+                continue;
+
+            if (action.ActionType == type
+                && action.Block == block
+                && action.Argument == argument)
+            {
+                return x;
+            }
+        }
+
+        return null;
+    }
+
     bool TriggerAction(ActionType type, byte small, AssetId argument, Action continuation)
     {
         if (continuation == null) throw new ArgumentNullException(nameof(continuation));
         var assets = Resolve<IAssetManager>();
-        var eventSet = _npc.EventSetId.IsNone ? null : assets.LoadEventSet(_npc.EventSetId);
-        var wordSet = _npc.WordSetId.IsNone ? null : assets.LoadEventSet(_npc.WordSetId);
 
-        var chainSource = eventSet ?? wordSet;
-        var eventIndex = eventSet?.Chains.FirstOrDefault(x =>
-            eventSet.Events[x].Event is ActionEvent action && 
-            action.ActionType == type && 
-            action.Block == small &&
-            action.Argument == argument);
+        var chainSource = _npc.EventSetId.IsNone ? null : assets.LoadEventSet(_npc.EventSetId);
+        ushort? eventIndex = null;
 
-        if (eventIndex == null) 
+        if (chainSource != null)
+            eventIndex = FindActionChain(chainSource, type, small, argument);
+
+        if (eventIndex == null) // Fall back to the word set
+        {
+            chainSource = _npc.WordSetId.IsNone ? null : assets.LoadEventSet(_npc.WordSetId);
+            if (chainSource != null)
+                eventIndex = FindActionChain(chainSource, type, small, argument);
+        }
+
+        if (eventIndex == null)
             return false;
 
         var triggerEvent = new TriggerChainEvent(
@@ -325,9 +377,9 @@ public class Conversation : Component
 
         RaiseAsync(triggerEvent, () =>
         {
-            var action = (ActionEvent)eventSet.Events[eventIndex.Value].Event;
-            Raise(new EventVisitedEvent(eventSet.Id, action));
-            continuation?.Invoke();
+            var action = (ActionEvent)chainSource.Events[eventIndex.Value].Event;
+            Raise(new EventVisitedEvent(chainSource.Id, action));
+            continuation.Invoke();
         });
         return true;
     }

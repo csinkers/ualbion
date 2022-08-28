@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats.Ids;
@@ -11,39 +11,43 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui;
 
-public interface IDialogManager { }
-
 public class DialogManager  : ServiceComponent<IDialogManager>, IDialogManager
 {
+    int MaxLayer => Children.OfType<ModalDialog>().Select(x => (int?)x.Depth).Max() ?? 0;
+
+    public T AddDialog<T>(Func<int, T> constructor) where T : ModalDialog
+    {
+        if (constructor == null) throw new ArgumentNullException(nameof(constructor));
+        return AttachChild(constructor(MaxLayer + 1));
+    }
+
     public DialogManager()
     {
         OnAsync<YesNoPromptEvent, bool>((e, c) =>
         {
-            var maxLayer = Children.OfType<ModalDialog>().Select(x => (int?)x.Depth).Max() ?? 0;
             var tf = Resolve<ITextFormatter>();
-            var dialog = AttachChild(new YesNoMessageBox(e.StringId, maxLayer + 1, tf));
+            var dialog = AttachChild(new YesNoMessageBox(e.StringId, MaxLayer + 1, tf));
             dialog.Closed += (_, _) => c(dialog.Result);
             return true;
         });
 
         OnAsync<ItemQuantityPromptEvent, int>((e, c) =>
         {
-            var maxLayer = Children.OfType<ModalDialog>().Select(x => (int?)x.Depth).Max() ?? 0;
-            AttachChild(new ItemQuantityDialog(maxLayer + 1, e.Text, e.Icon, e.IconSubId, e.Max, e.UseTenths, c));
+            AttachChild(new ItemQuantityDialog(MaxLayer + 1, e.Text, e.Icon, e.IconSubId, e.Max, e.UseTenths, c));
             return true; 
         });
 
         OnAsync<NumericPromptEvent, int>((e, c) =>
         {
             var tf = Resolve<ITextFormatter>();
-            var dialog = AttachChild(new NumericPromptDialog(tf.Format(e.Text), e.Min, e.Max));
+            var dialog = AttachChild(new NumericPromptDialog(tf.Format(e.Text), e.Min, e.Max, MaxLayer + 1));
             dialog.Closed += (_, _) => c(dialog.Value);
             return true;
         });
 
-        OnAsync<TextPromptEvent, string>((e, c) =>
+        OnAsync<TextPromptEvent, string>((_, c) =>
         {
-            var dialog = AttachChild(new TextPromptDialog());
+            var dialog = AttachChild(new TextPromptDialog(MaxLayer + 1));
             dialog.Closed += (_, _) => c(dialog.Value);
             return true;
         });
@@ -52,9 +56,8 @@ public class DialogManager  : ServiceComponent<IDialogManager>, IDialogManager
         {
             var tf = Resolve<ITextFormatter>();
             var party = Resolve<IParty>();
-            var maxLayer = Children.OfType<ModalDialog>().Select(x => (int?)x.Depth).Max() ?? 0;
             var members = party.StatusBarOrder.Where(x => e.Members == null || e.Members.Contains(x.Id)).ToArray();
-            var dialog = AttachChild(new PartyMemberPromptDialog(tf, maxLayer + 1, e.Prompt, members));
+            var dialog = AttachChild(new PartyMemberPromptDialog(tf, MaxLayer + 1, e.Prompt, members));
             dialog.Closed += (_, _) => c(dialog.Result);
             return true;
         });
@@ -67,8 +70,7 @@ public class DialogManager  : ServiceComponent<IDialogManager>, IDialogManager
 
         On<ShowCombatPositionsDialogEvent>(_ =>
         {
-            var maxLayer = Children.OfType<ModalDialog>().Select(x => (int?)x.Depth).Max() ?? 0;
-            AttachChild(new CombatPositionDialog(maxLayer + 1));
+            AttachChild(new CombatPositionDialog(MaxLayer + 1));
         });
     }
 }

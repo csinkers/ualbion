@@ -10,9 +10,9 @@ namespace UAlbion.Formats.Assets.Save;
 public class VisitedEvent
 {
     public const int SizeOnDisk = 6;
-    public byte Unk0 { get; set; }
-    public EventSetId EventSetId { get; set; }
-    public ActionType Type { get; set; }
+    public byte Unk0 { get; private set; }
+    public EventSetId EventSetId { get; private set; }
+    public ActionType Type { get; private set; }
     public AssetId Argument { get; private set; }
 
     VisitedEvent() { }
@@ -44,6 +44,13 @@ public class VisitedEvent
     }
 
     public override string ToString() => $"{Unk0} {EventSetId} {Type} {Argument}";
+    public override int GetHashCode() =>
+        (int)HashUtil.FNV1a()
+            .Combine(Unk0)
+            .Combine(EventSetId.ToUInt32())
+            .Combine((int)Type)
+            .Combine(Argument.ToUInt32())
+            .Hash;
 
     /*
      Logical to textual word id mapping clues:

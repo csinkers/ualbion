@@ -9,6 +9,7 @@ namespace UAlbion.Core.Visual;
 public class OrthographicCamera : ServiceComponent<ICamera>, ICamera
 {
     readonly bool _yAxisIncreasesDownTheScreen;
+    readonly WorldCoordinateSelectEvent _selectEvent = new();
     Vector3 _position = new(0, 0, 0);
     Vector3 _lookDirection = new(0, 0, -1f);
     Vector2 _viewport = Vector2.One;
@@ -58,7 +59,7 @@ public class OrthographicCamera : ServiceComponent<ICamera>, ICamera
     public OrthographicCamera(bool yAxisIncreasesDownTheScreen = true)
     {
         _yAxisIncreasesDownTheScreen = yAxisIncreasesDownTheScreen;
-        OnAsync<ScreenCoordinateSelectEvent, Selection>(TransformSelect);
+        On<ScreenCoordinateSelectEvent>(TransformSelect);
         On<BackendChangedEvent>(_ => _dirty = true);
         On<CameraPositionEvent>(e => Position = new Vector3(e.X, e.Y, e.Z));
         On<CameraPlanesEvent>(e => FarDistance = e.Far);
@@ -85,13 +86,16 @@ public class OrthographicCamera : ServiceComponent<ICamera>, ICamera
         _dirty = true;
     }
 
-    bool TransformSelect(ScreenCoordinateSelectEvent e, Action<Selection> continuation)
+    void TransformSelect(ScreenCoordinateSelectEvent e)
     {
         var normalisedScreenPosition = new Vector3(2 * e.Position.X / _viewport.X - 1.0f, -2 * e.Position.Y / _viewport.Y + 1.0f, 0.0f);
         var rayOrigin = UnprojectNormToWorld(normalisedScreenPosition + Vector3.UnitZ);
         var rayDirection = UnprojectNormToWorld(normalisedScreenPosition) - rayOrigin;
-        RaiseAsync(new WorldCoordinateSelectEvent(rayOrigin, rayDirection, e.Debug), continuation);
-        return true;
+        _selectEvent.Origin = rayOrigin;
+        _selectEvent.Direction = rayDirection;
+        _selectEvent.Debug = e.Debug;
+        _selectEvent.Selections = e.Selections;
+        Raise(_selectEvent);
     }
 
     Matrix4x4 CalculateProjection()

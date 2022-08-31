@@ -1,16 +1,14 @@
-﻿using System.Numerics;
+﻿using System.Collections.Generic;
+using System.Numerics;
 using UAlbion.Api.Eventing;
 
 namespace UAlbion.Core.Events;
 
-public class ScreenCoordinateSelectEvent : EngineEvent, IVerboseEvent, IAsyncEvent<Selection>
+#pragma warning disable CA2227 // Collection properties should be read only - we want to avoid per-frame allocations
+public class ScreenCoordinateSelectEvent : EngineEvent, IVerboseEvent
 {
-    public ScreenCoordinateSelectEvent(Vector2 position, bool debug)
-    {
-        Position = position;
-        Debug = debug;
-    }
-
-    public Vector2 Position { get; }
-    public bool Debug { get; }
+    public Vector2 Position { get; set; }
+    public bool Debug { get; set; }
+    public List<Selection> Selections { get; set; }
 }
+#pragma warning restore CA2227 // Collection properties should be read only

@@ -29,7 +29,7 @@ public class MapObject : Component
         {
             Size = size,
             Position = initialPosition,
-            SelectionCallback = registerHit => { registerHit(this); return false; }
+            SelectionCallback = () => this
         });
 
         On<SlowClockEvent>(AdvanceFrame);

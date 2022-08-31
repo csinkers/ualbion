@@ -28,7 +28,7 @@ public sealed class SelectionHandler2D : Component
 
     public SelectionHandler2D(LogicalMap2D map, MapRenderable2D renderable)
     {
-        OnAsync<WorldCoordinateSelectEvent, Selection>(OnSelect);
+        On<WorldCoordinateSelectEvent>(OnSelect);
         On<ShowMapMenuEvent>(_ => ShowMapMenu());
         On<UiRightClickEvent>(e =>
         {
@@ -53,22 +53,22 @@ public sealed class SelectionHandler2D : Component
         };
     }
 
-    bool OnSelect(WorldCoordinateSelectEvent e, Action<Selection> continuation)
+    void OnSelect(WorldCoordinateSelectEvent e)
     {
         float denominator = Vector3.Dot(Normal, e.Direction);
         if (Math.Abs(denominator) < 0.00001f)
-            return false;
+            return;
 
         float t = Vector3.Dot(-e.Origin, Normal) / denominator;
         if (t < 0)
-            return false;
+            return;
 
         Vector3 intersectionPoint = e.Origin + t * e.Direction;
         int x = (int)(intersectionPoint.X / _renderable.TileSize.X);
         int y = (int)(intersectionPoint.Y / _renderable.TileSize.Y);
 
         _mapTileHit.Tile = new Vector2(x, y);
-        continuation(new Selection(e.Origin, e.Direction, t, _mapTileHit));
+        e.Selections.Add(new Selection(e.Origin, e.Direction, t, _mapTileHit));
 
         if (e.Debug)
         {
@@ -76,19 +76,19 @@ public sealed class SelectionHandler2D : Component
             _debugMapTileHit.IntersectionPoint = intersectionPoint;
             _debugMapTileHit.UnderlayTile = _map.GetUnderlay(x, y);
             _debugMapTileHit.OverlayTile = _map.GetOverlay(x, y);
-            continuation(new Selection(e.Origin, e.Direction, t, _debugMapTileHit));
+            e.Selections.Add(new Selection(e.Origin, e.Direction, t, _debugMapTileHit));
         }
-        continuation(new Selection(e.Origin, e.Direction, t, this));
+        e.Selections.Add(new Selection(e.Origin, e.Direction, t, this));
 
         if (e.Debug)
         {
             var zone = _map.GetZone(x, y);
             if (zone != null)
-                continuation(new Selection(e.Origin, e.Direction, t, zone));
+                e.Selections.Add(new Selection(e.Origin, e.Direction, t, zone));
 
             var chain = zone?.Chain;
             if (chain != null)
-                continuation(new Selection(e.Origin, e.Direction, t, zone.Node, _formatChain));
+                e.Selections.Add(new Selection(e.Origin, e.Direction, t, zone.Node, _formatChain));
         }
 
         int highlightIndex = y * _map.Width + x;
@@ -97,8 +97,6 @@ public sealed class SelectionHandler2D : Component
             HighlightIndexChanged?.Invoke(this, highlightIndex);
             _lastHighlightIndex = highlightIndex;
         }
-
-        return true;
     }
 
     void ShowMapMenu()

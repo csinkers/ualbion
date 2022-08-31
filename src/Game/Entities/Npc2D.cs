@@ -47,11 +47,7 @@ public class Npc2D : Component
             0,
             SpriteFlags.BottomAligned)
         {
-            SelectionCallback = registerHit =>
-            {
-                registerHit(this);
-                return true;
-            }
+            SelectionCallback = () => this
         });
 
         On<FastClockEvent>(_ => Update());

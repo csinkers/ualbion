@@ -54,7 +54,7 @@ public class Conversation : Component
 
     void DefaultIdleHandler()
     {
-        if (_optionsWindow.IsActive || !IsActive)
+        if (_optionsWindow.IsActive || !IsSubscribed)
             return;
 
         var tf = Resolve<ITextFormatter>();

@@ -30,7 +30,7 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
     {
         On<LayoutEvent>(RenderLayout);
         On<DumpLayoutEvent>(_ => DumpLayout());
-        OnAsync<ScreenCoordinateSelectEvent, Selection>(Select);
+        On<ScreenCoordinateSelectEvent>(Select);
     }
 
     public void RequestSnapshot() => CaptureSnapshot();
@@ -81,10 +81,10 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
         DoLayout((extents, order, element) => element.Render(extents, order, null));
     }
 
-    bool Select(ScreenCoordinateSelectEvent selectEvent, Action<Selection> continuation)
+    void Select(ScreenCoordinateSelectEvent e)
     {
         var window = Resolve<IWindowManager>();
-        var normPosition = window.PixelToNorm(selectEvent.Position);
+        var normPosition = window.PixelToNorm(e.Position);
         var uiPosition = window.NormToUi(normPosition);
         var context = new SelectionContext(
             uiPosition,
@@ -92,11 +92,10 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
             {
                 float z = 1.0f - order / (float)DrawLayer.MaxLayer;
                 var intersectionPoint = new Vector3(normPosition, z);
-                continuation(new Selection(intersectionPoint, z, target));
+                e.Selections.Add(new Selection(intersectionPoint, z, target));
             });
 
         DoLayout((extents, dialogOrder, element) => element.Selection(extents, dialogOrder, context));
-        return true;
     }
 
     static (int, int) GetDialogPosition(IDialog dialog, Vector2 size, int uiWidth, int uiHeight)

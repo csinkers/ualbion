@@ -130,6 +130,8 @@ namespace UAlbion.Game.Veldrid.Debugging
             if (!ImGui.BeginTabItem("Debugger"))
                 return;
 
+            ImGui.TextUnformatted(Context.ToString());
+
             var chainManager = Resolve<IEventManager>();
             if (_contextNames.Length != chainManager.Contexts.Count)
                 _contextNames = new string[chainManager.Contexts.Count];

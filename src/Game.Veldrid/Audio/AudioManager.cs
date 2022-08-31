@@ -78,6 +78,7 @@ public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManage
         {
             if (_sampleCache.TryGetValue(id, out var buffer))
                 return buffer;
+
             var assets = Resolve<IAssetManager>();
             var sample = assets.LoadSample(id);
             if (sample == null)
@@ -152,7 +153,7 @@ public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManage
         if (buffer == null)
             return;
 
-        var context = Resolve<IEventManager>().Context;
+        var context = (EventContext)Context;
         var map = Resolve<IMapManager>()?.Current;
         var tileSize = map?.TileSize ?? Vector3.One;
         var source = new SimpleAudioSource(buffer)

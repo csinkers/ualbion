@@ -33,7 +33,7 @@ public class InventoryScreenManager : Component
             if (party?.StatusBarOrder.Count > e.Position)
                 SetDisplayedPartyMember(party.StatusBarOrder[e.Position].Id);
         });
-        On<InventoryCloseEvent>(_ => InventoryClosed());
+        On<InventoryCloseEvent>(_ => InventoryClosed(false, false));
         On<LockOpenedEvent>(_ => LockOpened());
         On<TakeAllEvent>(_ =>
         {
@@ -74,10 +74,7 @@ public class InventoryScreenManager : Component
         SetDisplayedPartyMember(null);
 
         if (e is ILockedInventoryEvent locked && locked.OpenedText != 255)
-        {
-            var state = Resolve<IGameState>();
             Raise(new TextEvent(locked.OpenedText, TextLocation.NoPortrait, SheetId.None));
-        }
     }
 
     void SetDisplayedPartyMember(PartyMemberId? member)
@@ -109,12 +106,10 @@ public class InventoryScreenManager : Component
 
     void LockOpened()
     {
-        var em = Resolve<IEventManager>();
-        em.Context.LastEventResult = true;
-        InventoryClosed();
+        InventoryClosed(false, true);
     }
 
-    void InventoryClosed()
+    void InventoryClosed(bool triggeredTrap, bool unlocked)
     {
         _modeEvent = new InventoryOpenEvent(PartyMemberId.None);
         _screen?.Remove();
@@ -123,6 +118,7 @@ public class InventoryScreenManager : Component
 
         var continuation = _continuation;
         _continuation = null;
-        continuation?.Invoke(true); // TODO: Test with trapped chests / doors
+        continuation?.Invoke(!triggeredTrap); // TODO: Test with trapped chests / doors
+        ((EventContext)Context).LastEventResult = unlocked;
     }
 }

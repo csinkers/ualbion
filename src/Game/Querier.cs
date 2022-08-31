@@ -23,19 +23,19 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
 
     public Querier()
     {
-        OnAsync(    Do<QueryChosenVerbEvent>(q => Resolve<IEventManager>().Context.Source.Trigger.HasFlag((TriggerTypes)(1 << (int)q.TriggerType))));
+        OnAsync(    Do<QueryChosenVerbEvent>(q => ((EventContext)Context).Source.Trigger.HasFlag((TriggerTypes)(1 << (int)q.TriggerType))));
         OnAsync(          Do<QueryGoldEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Party.TotalGold, q.Argument)));
         OnAsync(       Do<QueryHasItemEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Party.GetItemCount(q.ItemId), q.Immediate)));
         OnAsync(Do<QueryHasPartyMemberEvent>(q => Resolve<IGameState>().Party.StatusBarOrder.Any(x => x.Id == q.PartyMemberId)));
         OnAsync(          Do<QueryHourEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Time.Hour, q.Argument)));
         OnAsync(        Do<QueryLeaderEvent>(q => Resolve<IGameState>().Party.Leader.Id == q.PartyMemberId));
         OnAsync(           Do<QueryMapEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().MapId.Id, q.MapId.Id)));
-        OnAsync(Do<QueryPreviousActionResultEvent> (_ => Resolve<IEventManager>().Context.LastEventResult));
+        OnAsync(Do<QueryPreviousActionResultEvent> (_ => ((EventContext)Context).LastEventResult));
         OnAsync(   Do<QueryRandomChanceEvent>(q => Resolve<IRandom>().Generate(100) < q.Argument));
         OnAsync(         Do<QuerySwitchEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().GetSwitch(q.SwitchId) ? 1 : 0, q.Immediate)));
         OnAsync(         Do<QueryTickerEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().GetTicker(q.TickerId), q.Immediate)));
-        OnAsync(    Do<QueryTriggerTypeEvent>(q => Resolve<IEventManager>().Context.Source.Trigger == (TriggerTypes)q.Argument));
-        OnAsync(       Do<QueryUsedItemEvent>(q => Resolve<IEventManager>().Context.Source.AssetId == (AssetId)q.ItemId));
+        OnAsync(    Do<QueryTriggerTypeEvent>(q => ((EventContext)Context).Source.Trigger == (TriggerTypes)q.Argument));
+        OnAsync(       Do<QueryUsedItemEvent>(q => ((EventContext)Context).Source.AssetId == (AssetId)q.ItemId));
         OnAsync(      Do<QueryNpcActiveEvent>(q => Resolve<IGameState>().IsNpcDisabled(MapId.None, q.Immediate)));
         OnAsync(Do<QueryScriptDebugModeEvent>(_ => false));
 
@@ -48,13 +48,13 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
             return (member.Combat.Conditions & PlayerConditions.UnconsciousMask) == 0;
         }));
 
-        OnAsync(Do<QueryEventUsedEvent> (e =>
+        OnAsync(Do<QueryEventUsedEvent> (_ =>
         {
-            var game = Resolve<IGameState>();
-            var context = Resolve<IEventManager>().Context;
+            var context = (EventContext)Context;
             if (context.EventSet.Id.Type != AssetType.EventSet)
                 return false;
 
+            var game = Resolve<IGameState>();
             return game.IsEventUsed(context.EventSet.Id, context.LastAction);
         }));
 
@@ -66,7 +66,7 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
 
         OnAsync<PromptPlayerEvent, bool>((q, continuation) =>
         {
-            var context = Resolve<IEventManager>().Context;
+            var context = (EventContext)Context;
             if (context.Source == null)
                 return false;
 
@@ -75,7 +75,7 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
 
         OnAsync<PromptPlayerNumericEvent, bool>((q, continuation) =>
         {
-            var context = Resolve<IEventManager>().Context;
+            var context = (EventContext)Context;
             if (context?.Source == null)
                 return false;
 

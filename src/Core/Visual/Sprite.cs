@@ -30,7 +30,7 @@ public class Sprite : Component, IPositioned
     {
         On<BackendChangedEvent>(_ => Dirty = true);
         On<RenderEvent>(_ => UpdateSprite());
-        OnAsync<WorldCoordinateSelectEvent, Selection>(Select);
+        On<WorldCoordinateSelectEvent>(Select);
         On<HoverEvent>(_ =>
         {
             if ((GetVar(CoreVars.User.EngineFlags) & EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
@@ -51,7 +51,7 @@ public class Sprite : Component, IPositioned
     }
 
     public IAssetId Id { get; }
-    public Func<Action<object>, bool> SelectionCallback { get; init; } // Returns true if handled
+    public Func<object> SelectionCallback { get; init; }
     static Vector3 Normal => Vector3.UnitZ; // TODO
 
     public Vector3 Position
@@ -161,23 +161,21 @@ public class Sprite : Component, IPositioned
         _sprite.Update(0, new SpriteInfo(_flags, _position, Size, subImage));
     }
 
-    bool Select(WorldCoordinateSelectEvent e, Action<Selection> continuation)
+    void Select(WorldCoordinateSelectEvent e)
     {
         if (_sprite == null)
-            return false;
+            return;
 
         var hit = RayIntersect(e.Origin, e.Direction);
         if (!hit.HasValue)
-            return false;
+            return;
 
-        bool delegated = false;
+        object selected = this;
         if (SelectionCallback != null)
-            delegated = SelectionCallback(x => continuation(new Selection(e.Origin, e.Direction, hit.Value.Item1, x)));
+             selected = SelectionCallback();
 
-        if (!delegated)
-            continuation(new Selection(hit.Value.Item2, hit.Value.Item1, this));
-
-        return true;
+        if (selected != null)
+            e.Selections.Add(new Selection(hit.Value.Item2, hit.Value.Item1, this));
     }
 
     public (float, Vector3)? RayIntersect(Vector3 origin, Vector3 direction)

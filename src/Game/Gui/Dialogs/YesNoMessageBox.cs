@@ -1,6 +1,7 @@
 ﻿using System;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
+using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Text;
@@ -31,6 +32,12 @@ class YesNoMessageBox : ModalDialog
 
     public YesNoMessageBox(StringId stringId, int depth, ITextFormatter textFormatter) : base(DialogPositioning.Center, depth)
     {
+        On<RespondEvent>(e =>
+        {
+            if (e.Option != 1 && e.Option != 2) return;
+            OnButton(e.Option == 1);
+        });
+
         var text = textFormatter.Format(stringId);
         var body = new TextFilter(x => x.BlockId == -1) { Source = text };
         var yesText = BuildButtonText(text, 0, Base.SystemText.MsgBox_Yes, textFormatter);

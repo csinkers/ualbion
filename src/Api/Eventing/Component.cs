@@ -22,8 +22,9 @@ namespace UAlbion.Api.Eventing;
 public abstract class Component : IComponent
 {
     public static bool TraceAttachment { get; set; }
-    static readonly Action<object> DummyContinuation = _ => { };
     static readonly List<IComponent> EmptyChildren = new();
+    static readonly ThreadLocal<object> ThreadContext = new();
+    protected static object Context { get => ThreadContext.Value; set => ThreadContext.Value = value; }
     static int _nesting;
     static int _nextId;
     List<IComponent> _children;
@@ -93,7 +94,19 @@ public abstract class Component : IComponent
     /// <param name="event">The event to raise</param>
     /// <param name="continuation">The continuation to be called by async handlers upon completion</param>
     /// <returns>The number of async handlers which have either already called the continuation or intend to call it in the future.</returns>
-    protected int RaiseAsync(IAsyncEvent @event, Action continuation) => Exchange?.RaiseAsync(@event, this, continuation) ?? 0;
+    protected int RaiseAsync(IAsyncEvent @event, Action continuation)
+    {
+        var context = Context;
+        int promisedCalls = Exchange?.RaiseAsync(@event, this, 
+            () =>
+            {
+                Context = context;
+                continuation();
+            }) ?? 0;
+
+        Context = context;
+        return promisedCalls;
+    }
 
     /// <summary>
     /// Raise an event via the currently subscribed event exchange (if subscribed), and
@@ -105,7 +118,19 @@ public abstract class Component : IComponent
     /// <param name="event">The event to raise</param>
     /// <param name="continuation">The continuation to be called by async handlers upon completion</param>
     /// <returns>The number of async handlers which have either already called the continuation or intend to call it in the future.</returns>
-    protected int RaiseAsync<T>(IAsyncEvent<T> @event, Action<T> continuation) => Exchange?.RaiseAsync(@event, this, continuation) ?? 0;
+    protected int RaiseAsync<T>(IAsyncEvent<T> @event, Action<T> continuation)
+    {
+        var context = Context;
+        int promisedCalls = Exchange?.RaiseAsync(@event, this,
+            x =>
+            {
+                Context = context;
+                continuation(x);
+            }) ?? 0;
+
+        Context = context;
+        return promisedCalls;
+    }
 
     /// <summary>
     /// Enqueue an event with the currently subscribed event exchange to be raised
@@ -411,7 +436,7 @@ public abstract class Component : IComponent
             return;
 
         if (_handlers != null && _handlers.TryGetValue(@event.GetType(), out var handler))
-            handler.Invoke(@event, DummyContinuation);
+            handler.Invoke(@event, DummyContinuation.Instance);
     }
 
     /// <summary>

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
@@ -14,12 +13,10 @@ namespace UAlbion.Game;
 
 public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventManager, IDisposable
 {
-    static readonly EventContext BaseContext = new(new EventSource(AssetId.None, 0));
     static readonly ResumeChainsEvent ResumeChainsEvent = new();
     static readonly StartClockEvent StartClockEvent = new();
     static readonly StopClockEvent StopClockEvent = new();
 
-    readonly ThreadLocal<Stack<EventContext>> _threadContexts = new(() => new Stack<EventContext>());
     readonly List<EventContext> _contexts = new();
     public IReadOnlyList<EventContext> Contexts => _contexts;
 
@@ -29,16 +26,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         On<BeginFrameEvent>(_ => Exchange?.Enqueue(ResumeChainsEvent, null)); 
         On<ResumeChainsEvent>(ResumeChains);
         OnAsync<TriggerChainEvent>(Trigger);
-    }
-
-    public EventContext Context
-    {
-        get
-        {
-            foreach (var context in _threadContexts.Value)
-                return context;
-            return BaseContext;
-        }
+        Context = new EventContext(new EventSource(AssetId.None, 0), null);
     }
 
     bool HandleBoolEvent(EventContext context, IAsyncEvent<bool> boolEvent, IBranchNode branch) // Return value = whether to return.
@@ -69,7 +57,6 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         else if (context.Status == EventContextStatus.Waiting)
         {
             // If the continuation hasn't been called then stop iterating for now and wait for completion.
-            _threadContexts.Value.Pop();
             return true;
         }
 
@@ -94,7 +81,6 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         }
         else if (context.Status == EventContextStatus.Waiting)
         {
-            _threadContexts.Value.Pop();
             return true;
         }
 
@@ -110,13 +96,13 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         context.Status = EventContextStatus.Completing;
         context.CompletionCallback?.Invoke();
         context.Status = EventContextStatus.Complete;
-        _threadContexts.Value.Pop();
         _contexts.Remove(context);
     }
 
     void Resume(EventContext context)
     {
-        _threadContexts.Value.Push(context);
+        var oldContext = Context;
+        Context = context; // Set thread-local context for all components
         context.Status = EventContextStatus.Ready;
 
         while (context.Node != null)
@@ -125,12 +111,18 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
             if (context.Node is IBranchNode branch && context.Node.Event is IAsyncEvent<bool> boolEvent)
             {
                 if (HandleBoolEvent(context, boolEvent, branch))
+                {
+                    Context = oldContext;
                     return;
+                }
             }
             else if (context.Node.Event is IAsyncEvent asyncEvent)
             {
                 if (HandleAsyncEvent(context, asyncEvent))
+                {
+                    Context = oldContext;
                     return;
+                }
             }
             else
             {
@@ -138,7 +130,11 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
                 context.Node = context.Node.Next;
             }
         }
+
         HandleChainCompletion(context);
+
+        if (context.Parent != null)
+            Context = context.Parent;
     }
 
     void ResumeChains(ResumeChainsEvent _)
@@ -159,7 +155,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
             return true;
 
         var action = e.EventSet.Events[e.EntryPoint].Event as ActionEvent;
-        var context = new EventContext(e.Source)
+        var context = new EventContext(e.Source, (EventContext)Context)
         {
             EntryPoint = e.EntryPoint,
             EventSet = e.EventSet,
@@ -178,5 +174,5 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         return true;
     }
 
-    public void Dispose() => _threadContexts?.Dispose();
+    public void Dispose() { }
 }

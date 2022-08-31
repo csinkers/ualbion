@@ -8,6 +8,7 @@ namespace UAlbion.Core.Visual;
 
 public class PerspectiveCamera : ServiceComponent<ICamera>, ICamera
 {
+    readonly WorldCoordinateSelectEvent _selectEvent = new();
     Matrix4x4 _viewMatrix;
     Matrix4x4 _projectionMatrix;
     Vector3 _position = new(0, 0, 0);
@@ -89,7 +90,7 @@ public class PerspectiveCamera : ServiceComponent<ICamera>, ICamera
 
     public PerspectiveCamera(bool legacyPitch = false)
     {
-        OnAsync<ScreenCoordinateSelectEvent, Selection>(TransformSelect);
+        On<ScreenCoordinateSelectEvent>(TransformSelect);
         On<BackendChangedEvent>(_ => UpdateBackend());
         On<EngineFlagEvent>(_ => UpdateBackend());
         On<CameraPositionEvent>(e => Position = new Vector3(e.X, e.Y, e.Z));
@@ -128,13 +129,15 @@ public class PerspectiveCamera : ServiceComponent<ICamera>, ICamera
         base.Subscribed();
     }
 
-    bool TransformSelect(ScreenCoordinateSelectEvent e, Action<Selection> continuation)
+    void TransformSelect(ScreenCoordinateSelectEvent e)
     {
         var normalisedScreenPosition = new Vector3(2 * e.Position.X / _viewport.X - 1.0f, -2 * e.Position.Y / _viewport.Y + 1.0f, 0.0f);
-        var rayOrigin = UnprojectNormToWorld(normalisedScreenPosition + Vector3.UnitZ);
-        var rayDirection = UnprojectNormToWorld(normalisedScreenPosition) - rayOrigin;
-        RaiseAsync(new WorldCoordinateSelectEvent(rayOrigin, rayDirection, e.Debug), continuation);
-        return true;
+
+        _selectEvent.Origin = UnprojectNormToWorld(normalisedScreenPosition + Vector3.UnitZ);
+        _selectEvent.Direction = UnprojectNormToWorld(normalisedScreenPosition) - _selectEvent.Origin;
+        _selectEvent.Debug = e.Debug;
+        _selectEvent.Selections = e.Selections;
+        Raise(_selectEvent);
     }
 
     void UpdateBackend()

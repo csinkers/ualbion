@@ -27,6 +27,12 @@ public class PartyInventory : Component
         On<ModifyGoldEvent>(e => ChangePartyItemAmount(AssetId.Gold, e.Operation, e.Amount));
         On<ModifyRationsEvent>(e => ChangePartyItemAmount(AssetId.Rations, e.Operation, e.Amount));
         On<ModifyItemCountEvent>(e => GiveToParty(e.ItemId, e.Amount));
+        On<ChangeItemEvent>(e =>
+        {
+            var amount = e.IsRandom ? (ushort)Resolve<IRandom>().Generate(e.Amount) : e.Amount;
+            ChangePartyItemAmount(e.ItemId, e.Operation, amount);
+        });
+
         On<SimpleChestEvent>(e =>
         {
             var itemId = e.ChestType switch
@@ -73,7 +79,7 @@ public class PartyInventory : Component
         Raise(new InventoryChangedEvent(new InventoryId(e.ChestId)));
     }
 
-    void SetLastResult(bool result) => Resolve<IEventManager>().Context.LastEventResult = result;
+    static void SetLastResult(bool result) => ((EventContext)Context).LastEventResult = result;
 
     int GetTotalItemCount(ItemId itemId)
     {
@@ -93,7 +99,7 @@ public class PartyInventory : Component
     PartyMemberId? ChangePartyItemAmount(ItemId itemId, NumericOperation operation, ushort amount)
     {
         int currentTotal = GetTotalItemCount(itemId);
-        int newTotal = operation.Apply(currentTotal, amount, 0, int.MaxValue);
+        int newTotal = operation.Apply(currentTotal, amount);
         var delta = newTotal - currentTotal;
 
         if (delta > 0)
@@ -156,7 +162,7 @@ public class PartyInventory : Component
 
     void MapItemTransition(ItemId itemId, PartyMemberId recipientId)
     {
-        var context = TryResolve<IEventManager>()?.Context;
+        var context = (EventContext)Context;
         if (context?.Source.AssetId.Type != AssetType.Map)
             return;
 

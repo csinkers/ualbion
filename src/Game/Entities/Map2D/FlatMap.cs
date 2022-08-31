@@ -193,7 +193,7 @@ public class FlatMap : Component, IMap
 
     void ChangeIcon(ChangeIconEvent e)
     {
-        var context = Resolve<IEventManager>().Context;
+        var context = (EventContext)Context;
 
         bool relative = e.Scope is EventScope.RelPerm or EventScope.RelTemp;
         bool temp = e.Scope is EventScope.AbsTemp or EventScope.RelTemp;

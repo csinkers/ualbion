@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UAlbion.Api.Eventing;
+﻿using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 
@@ -10,20 +8,16 @@ public class Selection3D : Component
 {
     public Selection3D()
     {
-        OnAsync<WorldCoordinateSelectEvent, Selection>(OnSelect);
+        On<WorldCoordinateSelectEvent>(OnSelect);
     }
 
-    bool OnSelect(WorldCoordinateSelectEvent e, Action<Selection> continuation)
+    void OnSelect(WorldCoordinateSelectEvent e)
     {
         var scene = TryResolve<ISceneGraph>();
         if (scene == null)
-            return false;
+            return;
 
-        var hits = new List<Selection>(); // TODO: Get rid of the extra allocation and copying
-        scene.RayIntersect(e.Origin, e.Direction, hits);
-        foreach (var hit in hits)
-            continuation(hit);
-        return true;
+        scene.RayIntersect(e.Origin, e.Direction, e.Selections);
 
         // Find floor / ceiling hit (furthest point)
         // Iterate all tiles on a straight-line path between origin and floor hit

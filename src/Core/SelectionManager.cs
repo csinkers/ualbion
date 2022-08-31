@@ -11,6 +11,7 @@ public class SelectionManager : ServiceComponent<ISelectionManager>, ISelectionM
 {
     readonly BlurEvent _blurEvent = new();
     readonly HoverEvent _hoverEvent = new();
+    readonly ScreenCoordinateSelectEvent _selectEvent = new();
     readonly DoubleBuffered<HashSet<object>> _selection = new(() => new HashSet<object>());
 
     IComponent HoverSelector(Selection o)
@@ -32,7 +33,10 @@ public class SelectionManager : ServiceComponent<ISelectionManager>, ISelectionM
     public void CastRayFromScreenSpace(List<Selection> hits, Vector2 pixelPosition, bool debug, bool performFocusAlerts)
     {
         if (hits == null) throw new ArgumentNullException(nameof(hits));
-        RaiseAsync(new ScreenCoordinateSelectEvent(pixelPosition, debug), hits.Add);
+        _selectEvent.Position = pixelPosition;
+        _selectEvent.Debug = debug;
+        _selectEvent.Selections = hits;
+        Raise(_selectEvent);
         hits.Sort(static (x, y) => x.Distance.CompareTo(y.Distance));
 
         if (!performFocusAlerts)

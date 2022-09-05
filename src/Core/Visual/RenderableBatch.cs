@@ -8,7 +8,8 @@ using UAlbion.Api.Visual;
 
 namespace UAlbion.Core.Visual;
 
-public abstract class SpriteBatch<TInstance> : Component, IRenderable, IDisposable
+public abstract class RenderableBatch<TKey, TInstance> : Component, IRenderable, IDisposable
+    where TKey : IBatchKey, IEquatable<TKey>
     where TInstance : unmanaged
 {
     protected const int MinSize = 4;
@@ -16,34 +17,34 @@ public abstract class SpriteBatch<TInstance> : Component, IRenderable, IDisposab
     protected const double ShrinkFactor = 0.3;
 
     readonly object _syncRoot = new();
-    readonly List<SpriteLease<TInstance>> _leases = new();
+    readonly List<BatchLease<TKey, TInstance>> _leases = new();
 
-    protected SpriteBatch(SpriteKey key)
+    protected RenderableBatch(TKey key)
     {
         Key = key;
-        Name = $"Sprite:{Key.Texture.Name}";
+        Name = $"Batch:{Key}";
     }
 
-    protected abstract ReadOnlySpan<TInstance> ReadOnlySprites { get; }
-    protected abstract Span<TInstance> MutableSprites { get; }
+    protected abstract ReadOnlySpan<TInstance> ReadOnlyInstances { get; }
+    protected abstract Span<TInstance> MutableInstances { get; }
     protected abstract void Resize(int instanceCount);
 
-    public SpriteKey Key { get; }
+    public TKey Key { get; }
     public string Name { get; }
     public DrawLayer RenderOrder => Key.RenderOrder;
-    public override string ToString() => $"Multi:{Name} Flags:{Key.Flags} ({ActiveInstances}/{ReadOnlySprites.Length} instances)";
+    public override string ToString() => $"Multi:{Name} ({ActiveInstances}/{ReadOnlyInstances.Length} instances)";
     public int ActiveInstances { get; private set; }
 
-    internal SpriteLease<TInstance> Grow(int length, object caller)
+    internal BatchLease<TKey, TInstance> Grow(int length, object caller)
     {
         lock (_syncRoot)
         {
-            PerfTracker.IncrementFrameCounter("Sprite Borrows");
+            PerfTracker.IncrementFrameCounter("Lease Borrows");
             int from = ActiveInstances;
             ActiveInstances += length;
-            if (ActiveInstances >= ReadOnlySprites.Length)
+            if (ActiveInstances >= ReadOnlyInstances.Length)
             {
-                int newSize = ReadOnlySprites.Length;
+                int newSize = ReadOnlyInstances.Length;
                 if (newSize < MinSize) newSize = MinSize;
                 while (newSize <= ActiveInstances)
                     newSize = (int)(newSize * GrowthFactor);
@@ -51,22 +52,22 @@ public abstract class SpriteBatch<TInstance> : Component, IRenderable, IDisposab
                 Resize(newSize);
             }
 
-            var lease = new SpriteLease<TInstance>(this, from, ActiveInstances) { Owner = caller };
+            var lease = new BatchLease<TKey, TInstance>(this, from, ActiveInstances) { Owner = caller };
             _leases.Add(lease);
             VerifyConsistency();
             return lease;
         }
     }
 
-    public void Shrink(SpriteLease<TInstance> leaseToRemove)
+    public void Shrink(BatchLease<TKey, TInstance> leaseToRemove)
     {
         if (leaseToRemove == null) throw new ArgumentNullException(nameof(leaseToRemove));
         // TODO: Use a more efficient algorithm, e.g. look for equal sized lease at end of list and swap, use linked list for lease list etc
         lock (_syncRoot)
         {
-            var buffer = MutableSprites;
+            var buffer = MutableInstances;
             VerifyConsistency();
-            PerfTracker.IncrementFrameCounter("Sprite Returns");
+            PerfTracker.IncrementFrameCounter("Lease Returns");
             bool shifting = false;
             for (int n = 0; n < _leases.Count; n++)
             {
@@ -116,15 +117,15 @@ public abstract class SpriteBatch<TInstance> : Component, IRenderable, IDisposab
         else ApiUtil.Assert(ActiveInstances == 0);
     }
 
-    public Span<TInstance> Lock(SpriteLease<TInstance> lease, ref bool lockWasTaken)
+    public Span<TInstance> Lock(BatchLease<TKey, TInstance> lease, ref bool lockWasTaken)
     {
         if (lease == null) throw new ArgumentNullException(nameof(lease));
-        PerfTracker.IncrementFrameCounter("Sprite Accesses");
+        PerfTracker.IncrementFrameCounter("Lease Accesses");
         Monitor.Enter(_syncRoot, ref lockWasTaken);
-        return MutableSprites.Slice(lease.From, lease.Length);
+        return MutableInstances.Slice(lease.From, lease.Length);
     }
 
-    public void Unlock(SpriteLease<TInstance> _, bool lockWasTaken) // Might need the lease param later if we do more fine grained locking
+    public void Unlock(BatchLease<TKey, TInstance> _, bool lockWasTaken) // Might need the lease param later if we do more fine grained locking
     {
         if (lockWasTaken)
             Monitor.Exit(_syncRoot);

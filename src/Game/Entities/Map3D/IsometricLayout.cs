@@ -296,7 +296,7 @@ public class IsometricLayout : Component
         var objectInfo = labyrinthData.ObjectGroups[contents - 1];
         foreach (var subObject in objectInfo.SubObjects)
         {
-            var mapObject = AttachChild(MapObject.Build(x, y, labyrinthData, subObject, request, SpriteKeyFlags.NoDepthTest));
+            var mapObject = AttachChild(MapObject.Build(x, y, labyrinthData, subObject, request, false));
             if (mapObject != null)
             {
                 _relativeSpritePositions[mapObject] = mapObject.Position;

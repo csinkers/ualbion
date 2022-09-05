@@ -117,6 +117,7 @@
     "wordlist":          "UAlbion.Formats.Parsers.WordListLoader, UAlbion.Formats",
 
     // These are in Game.Veldrid due to a dependency on ImageSharp
+    "mesh":              "UAlbion.Game.Veldrid.Assets.MeshLoader, UAlbion.Game.Veldrid",
     "png8":              "UAlbion.Game.Veldrid.Assets.Png8Loader, UAlbion.Game.Veldrid",
     "png32":             "UAlbion.Game.Veldrid.Assets.Png32Loader, UAlbion.Game.Veldrid",
     "pngtile8":          "UAlbion.Game.Veldrid.Assets.PngTileLoader8Bit, UAlbion.Game.Veldrid",

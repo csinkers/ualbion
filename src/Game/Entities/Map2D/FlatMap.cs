@@ -110,7 +110,6 @@ public class FlatMap : Component, IMap
         if (state.Party == null)
             return;
 
-
         int i = 0;
         foreach (var player in state.Party.StatusBarOrder)
         {
@@ -125,7 +124,6 @@ public class FlatMap : Component, IMap
 
             i++;
         }
-
     }
 
     void FireEventChains(TriggerTypes type, bool log)

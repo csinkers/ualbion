@@ -105,12 +105,12 @@ namespace UAlbion.Core.Veldrid.Sprites
         protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout)
         {
 #if DEBUG
-                if (_texture.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct TilesetResourceSet without setting Texture to a non-null value");
-                if (_textureArray.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct TilesetResourceSet without setting TextureArray to a non-null value");
-                if (_sampler.Sampler == null) throw new System.InvalidOperationException("Tried to construct TilesetResourceSet without setting Sampler to a non-null value");
-                if (_uniform.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct TilesetResourceSet without setting Uniform to a non-null value");
-                if (_tiles.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct TilesetResourceSet without setting Tiles to a non-null value");
-                if (_regions.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct TilesetResourceSet without setting Regions to a non-null value");
+                if (_texture.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct TilesetResourceSet, but Texture has not been initialised. It may not have been attached to the exchange.");
+                if (_textureArray.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct TilesetResourceSet, but TextureArray has not been initialised. It may not have been attached to the exchange.");
+                if (_sampler.Sampler == null) throw new System.InvalidOperationException("Tried to construct TilesetResourceSet, but Sampler has not been initialised. It may not have been attached to the exchange.");
+                if (_uniform.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct TilesetResourceSet, but Uniform has not been initialised. It may not have been attached to the exchange.");
+                if (_tiles.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct TilesetResourceSet, but Tiles has not been initialised. It may not have been attached to the exchange.");
+                if (_regions.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct TilesetResourceSet, but Regions has not been initialised. It may not have been attached to the exchange.");
 #endif
 
             return device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(

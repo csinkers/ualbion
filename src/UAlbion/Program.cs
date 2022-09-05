@@ -8,6 +8,7 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Etm;
+using UAlbion.Core.Veldrid.Meshes;
 using UAlbion.Core.Veldrid.Skybox;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Formats;
@@ -167,6 +168,7 @@ static class Program
             .Add(new BlendedSpriteRenderer(framebuffer))
             .Add(new TileRenderer(framebuffer))
             .Add(new EtmRenderer(framebuffer))
+            .Add(new MeshRenderer(framebuffer))
             .Add(new SkyboxRenderer(framebuffer))
             .Add(new DebugGuiRenderer(framebuffer))
             ;

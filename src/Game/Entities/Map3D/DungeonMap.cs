@@ -51,6 +51,15 @@ public class DungeonMap : Component, IMap
 
     protected override void Subscribed()
     {
+        var state = Resolve<IGameState>();
+        var camera = Resolve<ICamera>();
+
+        if (state.Party == null)
+            return;
+
+        foreach (var player in state.Party.StatusBarOrder)
+            player.SetPositionFunc(() => camera.Position / TileSize);
+
         if (_labyrinthData != null)
         {
             Raise(new SetClearColourEvent(_backgroundRed, _backgroundGreen, _backgroundBlue, 1.0f));
@@ -58,7 +67,6 @@ public class DungeonMap : Component, IMap
         }
 
         var assets = Resolve<IAssetManager>();
-        var state = Resolve<IGameState>();
         var factory = Resolve<ICoreFactory>();
         _labyrinthData = assets.LoadLabyrinthData(_mapData.LabDataId);
 

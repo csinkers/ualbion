@@ -3,7 +3,7 @@ using UAlbion.Api.Visual;
 
 namespace UAlbion.Core.Visual;
 
-public readonly struct SpriteKey : IEquatable<SpriteKey>, IComparable<SpriteKey>
+public readonly struct SpriteKey : IEquatable<SpriteKey>, IComparable<SpriteKey>, IBatchKey
 {
     public SpriteKey(ITexture texture, SpriteSampler sampler, DrawLayer renderOrder, SpriteKeyFlags flags, Rectangle? scissorRegion = null)
     {
@@ -33,6 +33,7 @@ public readonly struct SpriteKey : IEquatable<SpriteKey>, IComparable<SpriteKey>
 
     public override bool Equals(object obj) => obj is SpriteKey other && Equals(other);
     public override int GetHashCode() => HashCode.Combine(Texture, Sampler, RenderOrder, (int)Flags, ScissorRegion);
+    public override string ToString() => $"{Texture.Name} Flags:{Flags}";
     public static bool operator ==(SpriteKey a, SpriteKey b) => Equals(a, b);
     public static bool operator !=(SpriteKey a, SpriteKey b) => !(a == b);
     public static bool operator >(SpriteKey a, SpriteKey b) => a.CompareTo(b) > 0;

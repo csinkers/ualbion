@@ -1,6 +1,10 @@
-﻿namespace UAlbion.Core.Visual;
+﻿using System;
 
-public interface ISpriteManager<TInstance> : IRenderableSource where TInstance : unmanaged
+namespace UAlbion.Core.Visual;
+
+public interface IBatchManager<TKey, TInstance> : IRenderableSource 
+    where TKey : IBatchKey, IEquatable<TKey>
+    where TInstance : unmanaged
 {
-    SpriteLease<TInstance> Borrow(SpriteKey key, int count, object owner);
+    BatchLease<TKey, TInstance> Borrow(TKey key, int count, object owner);
 }

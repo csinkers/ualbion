@@ -10,7 +10,7 @@ namespace UAlbion.Game.Gui.Controls;
 public class UiRectangle : UiElement
 {
     CommonColor _color;
-    SpriteLease<SpriteInfo> _sprite;
+    BatchLease<SpriteKey, SpriteInfo> _sprite;
     bool _dirty = true;
     Vector2 _drawSize;
     Vector3 _lastPosition;
@@ -60,7 +60,7 @@ public class UiRectangle : UiElement
         _lastPosition = position;
 
         var window = Resolve<IWindowManager>();
-        var sm = Resolve<ISpriteManager<SpriteInfo>>();
+        var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
         var commonColors = Resolve<ICommonColors>();
 
         var key = new SpriteKey(commonColors.BorderTexture, SpriteSampler.Point, order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);

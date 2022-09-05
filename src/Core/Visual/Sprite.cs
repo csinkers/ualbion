@@ -14,7 +14,7 @@ public class Sprite : Component, IPositioned
     readonly SpriteKeyFlags _keyFlags;
     readonly Func<IAssetId, ITexture> _loaderFunc;
 
-    SpriteLease<SpriteInfo> _sprite;
+    BatchLease<SpriteKey, SpriteInfo> _sprite;
     Vector3 _position;
     Vector2? _size;
     int _frame;
@@ -154,7 +154,7 @@ public class Sprite : Component, IPositioned
             Frame = frame;
 
             var key = new SpriteKey(texture, SpriteSampler.Point, _layer, _keyFlags);
-            var sm = Resolve<ISpriteManager<SpriteInfo>>();
+            var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
             _sprite = sm.Borrow(key, 1, this);
         }
 

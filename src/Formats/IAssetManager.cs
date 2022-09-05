@@ -18,6 +18,7 @@ public interface IAssetManager : ITextureLoader
     AssetInfo GetAssetInfo(AssetId id, string language = null);
     ITexture LoadTexture(SpriteId id);
     ITileGraphics LoadTileGraphics(TilesetGfxId id);
+    object LoadMapObject(MapObjectId id); // Might be an ITexture or a Mesh
     Ink LoadInk(InkId id);
     FontDefinition LoadFontDefinition(FontId id);
     MetaFont LoadFont(FontId fontId, InkId inkId);

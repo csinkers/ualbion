@@ -1,5 +1,11 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
+using Superpower.Model;
+using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
+using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Ids;
 

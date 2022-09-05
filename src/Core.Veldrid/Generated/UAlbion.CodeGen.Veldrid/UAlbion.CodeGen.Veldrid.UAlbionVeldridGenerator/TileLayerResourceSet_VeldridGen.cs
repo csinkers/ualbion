@@ -34,8 +34,8 @@ namespace UAlbion.Core.Veldrid.Sprites
         protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout)
         {
 #if DEBUG
-                if (_uniform.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct TileLayerResourceSet without setting Uniform to a non-null value");
-                if (_map.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct TileLayerResourceSet without setting Map to a non-null value");
+                if (_uniform.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct TileLayerResourceSet, but Uniform has not been initialised. It may not have been attached to the exchange.");
+                if (_map.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct TileLayerResourceSet, but Map has not been initialised. It may not have been attached to the exchange.");
 #endif
 
             return device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(

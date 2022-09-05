@@ -56,7 +56,7 @@ public class ButtonTests : Component
             .Attach(settings)
             .Attach(modApplier)
             .Attach(assetManager)
-            .Attach(new SpriteManager<SpriteInfo>())
+            .Attach(new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key)))
             .Attach(new WindowManager { Resolution = (1920, 1080) })
             .Attach(new MockGameFactory())
             .Attach(new TextManager())

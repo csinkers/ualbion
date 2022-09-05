@@ -30,6 +30,7 @@ public class StubAssetManager : IAssetManager
     public IList<IEvent> LoadScript(ScriptId id) => throw new NotImplementedException();
     public IMapData LoadMap(MapId id) => throw new NotImplementedException();
     public ISample LoadSample(SampleId id) => throw new NotImplementedException();
+    public object LoadMapObject(MapObjectId id) => throw new NotImplementedException();
     public Ink LoadInk(InkId inkId) => throw new NotImplementedException();
     public FontDefinition LoadFontDefinition(FontId fontId) => throw new NotImplementedException();
     public MetaFont LoadFont(FontId fontId, InkId inkId) => throw new NotImplementedException();

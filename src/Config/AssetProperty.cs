@@ -37,6 +37,9 @@ public static class AssetProperty
     public const string TilesetPattern = "TilesetPattern"; // string
     public const string ScriptPattern  = "ScriptPattern"; // string
 
+    // Meshes
+    public const string MaterialPattern = "MaterialPattern"; // string
+
     // NPC tileset
     public const string IsSmall = "IsSmall"; // bool
 

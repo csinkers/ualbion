@@ -7,7 +7,7 @@ using Veldrid;
 
 namespace UAlbion.Core.Veldrid.Sprites;
 
-public class VeldridSpriteBatch<TInstance, TGpuInstance> : SpriteBatch<TInstance>
+public class VeldridSpriteBatch<TInstance, TGpuInstance> : RenderableBatch<SpriteKey, TInstance>
     where TGpuInstance : unmanaged 
     where TInstance : unmanaged
 {
@@ -53,19 +53,10 @@ public class VeldridSpriteBatch<TInstance, TGpuInstance> : SpriteBatch<TInstance
         AttachChild(SpriteResources);
     }
 
-    protected override void Unsubscribed()
-    {
-        CleanupSet();
-    }
-
-    protected override ReadOnlySpan<TInstance> ReadOnlySprites =>
-        MemoryMarshal.Cast<TGpuInstance, TInstance>(Instances.Data);
-
-    protected override Span<TInstance> MutableSprites 
-        => MemoryMarshal.Cast<TGpuInstance, TInstance>(Instances.Borrow());
-
-    protected override void Resize(int instanceCount) 
-        => Instances.Resize(instanceCount);
+    protected override void Unsubscribed() => CleanupSet();
+    protected override ReadOnlySpan<TInstance> ReadOnlyInstances => MemoryMarshal.Cast<TGpuInstance, TInstance>(Instances.Data);
+    protected override Span<TInstance> MutableInstances => MemoryMarshal.Cast<TGpuInstance, TInstance>(Instances.Borrow());
+    protected override void Resize(int instanceCount) => Instances.Resize(instanceCount);
 
     void CleanupSet()
     {

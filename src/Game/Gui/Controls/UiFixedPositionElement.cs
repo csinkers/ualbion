@@ -13,7 +13,7 @@ public class UiFixedPositionElement : UiElement
 {
     readonly SpriteId _id;
     readonly Rectangle _extents;
-    SpriteLease<SpriteInfo> _sprite;
+    BatchLease<SpriteKey, SpriteInfo> _sprite;
 
     public UiFixedPositionElement(SpriteId id, Rectangle extents)
     {
@@ -31,7 +31,7 @@ public class UiFixedPositionElement : UiElement
         if (_sprite == null)
         {
             var assets = Resolve<IAssetManager>();
-            var sm = Resolve<ISpriteManager<SpriteInfo>>();
+            var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
             var texture = assets.LoadTexture(_id);
             var key = new SpriteKey(texture, SpriteSampler.Point, DrawLayer.Interface, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
             _sprite = sm.Borrow(key, 1, this);

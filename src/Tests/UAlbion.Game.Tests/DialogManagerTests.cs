@@ -84,7 +84,7 @@ public class DialogManagerTests
             .Attach(mma)
             .Attach(assetManager)
             .Attach(new MockSettings())
-            .Attach(new SpriteManager<SpriteInfo>())
+            .Attach(new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key)))
             .Attach(new MockGameFactory())
             .Attach(new WordLookup())
             .Attach(new TextFormatter())

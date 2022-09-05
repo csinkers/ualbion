@@ -13,7 +13,7 @@ public class MidLine : UiElement
 {
     const int MarginX = 1;
     readonly InkId _ink;
-    SpriteLease<SpriteInfo> _sprite;
+    BatchLease<SpriteKey, SpriteInfo> _sprite;
     Vector3 _lastPosition;
     Vector2 _lastSize;
     bool _dirty = true;
@@ -93,7 +93,7 @@ public class MidLine : UiElement
         _sprite?.Dispose();
         _sprite = null;
 
-        var sm = Resolve<ISpriteManager<SpriteInfo>>();
+        var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
         var commonColors = Resolve<ICommonColors>();
         var key = new SpriteKey(commonColors.BorderTexture, SpriteSampler.Point, order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
         _sprite = sm.Borrow(key, 2, this);

@@ -79,10 +79,10 @@ namespace UAlbion.Core.Veldrid.Sprites
         protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout)
         {
 #if DEBUG
-                if (_texture.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct SpriteSet without setting Texture to a non-null value");
-                if (_textureArray.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct SpriteSet without setting TextureArray to a non-null value");
-                if (_sampler.Sampler == null) throw new System.InvalidOperationException("Tried to construct SpriteSet without setting Sampler to a non-null value");
-                if (_uniform.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct SpriteSet without setting Uniform to a non-null value");
+                if (_texture.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct SpriteSet, but Texture has not been initialised. It may not have been attached to the exchange.");
+                if (_textureArray.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct SpriteSet, but TextureArray has not been initialised. It may not have been attached to the exchange.");
+                if (_sampler.Sampler == null) throw new System.InvalidOperationException("Tried to construct SpriteSet, but Sampler has not been initialised. It may not have been attached to the exchange.");
+                if (_uniform.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct SpriteSet, but Uniform has not been initialised. It may not have been attached to the exchange.");
 #endif
 
             return device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(

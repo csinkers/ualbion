@@ -260,7 +260,7 @@ public class AssetLoadTests : IDisposable
 
         Assert.Equal(61, lab.Objects.Count);
         var o = lab.Objects[0];
-        Assert.Equal(DungeonObject.LightCover, o.SpriteId);
+        Assert.Equal(DungeonObject.LightCover, o.Id);
         Assert.Equal(1, o.FrameCount);
         Assert.Equal(0u, o.Collision);
         Assert.Equal(32, o.Width);
@@ -270,7 +270,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(LabyrinthObjectFlags.FloorObject, o.Properties);
 
         o = lab.Objects[1];
-        Assert.Equal(DungeonObject.Pylon, o.SpriteId);
+        Assert.Equal(DungeonObject.Pylon, o.Id);
         Assert.Equal(1, o.FrameCount);
         Assert.Equal(8u, o.Collision);
         Assert.Equal(16, o.Width);

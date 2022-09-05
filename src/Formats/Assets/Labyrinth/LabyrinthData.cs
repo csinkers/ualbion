@@ -122,7 +122,7 @@ public class LabyrinthData
         foreach (var so in d.ObjectGroups.SelectMany(x => x.SubObjects))
         {
             if (so == null || so.ObjectInfoNumber >= d.Objects.Count) continue;
-            so.SpriteId = d.Objects[so.ObjectInfoNumber].SpriteId;
+            so.Id = d.Objects[so.ObjectInfoNumber].Id;
         }
 
         ushort wallCount = s.UInt16("WallCount", (ushort)d.Walls.Count);

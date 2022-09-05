@@ -54,7 +54,7 @@ public class RawAssetManager : Component, IRawAssetManager
 
     public ITexture LoadTexture(SpriteId id) => (ITexture)_modApplier.LoadAsset(id);
     public ITexture LoadTexture(IAssetId id) => (ITexture)_modApplier.LoadAsset(SpriteId.FromUInt32(id?.ToUInt32() ?? 0));
-
+    public object LoadMapObject(MapObjectId id) => _modApplier.LoadAsset(id);
     public Ink LoadInk(InkId inkId) => (Ink)_modApplier.LoadAsset(inkId);
     public FontDefinition LoadFontDefinition(FontId id) => (FontDefinition)_modApplier.LoadAsset(id);
     public MetaFont LoadFont(FontId fontId, InkId inkId) => (MetaFont)_modApplier.LoadAsset(new MetaFontId(fontId, inkId));

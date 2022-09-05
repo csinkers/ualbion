@@ -62,6 +62,7 @@ public class AssetManager : Component, IAssetManager
 
     public ITexture LoadTexture(SpriteId id) => (ITexture)_modApplier.LoadAssetCached(id);
     public ITileGraphics LoadTileGraphics(TilesetGfxId id) => (ITileGraphics)_modApplier.LoadAssetCached(id);
+    public object LoadMapObject(MapObjectId id) => _modApplier.LoadAssetCached(id);
     public ITexture LoadTexture(IAssetId id) => (ITexture)_modApplier.LoadAssetCached(SpriteId.FromUInt32(id?.ToUInt32() ?? 0));
 
     public Ink LoadInk(InkId inkId) => (Ink)_modApplier.LoadAssetCached(inkId);

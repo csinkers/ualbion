@@ -63,7 +63,8 @@ public static class IsometricSetup
 
         mainPass
             .Add(new EtmManager())
-            .Add(new SpriteManager<SpriteInfo>());
+            .Add(new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key)))
+            ;
 
         return (services, builder);
     }

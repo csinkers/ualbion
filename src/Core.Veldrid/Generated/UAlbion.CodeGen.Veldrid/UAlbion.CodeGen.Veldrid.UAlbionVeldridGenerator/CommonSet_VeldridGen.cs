@@ -105,12 +105,12 @@ namespace UAlbion.Core.Veldrid
         protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout)
         {
 #if DEBUG
-                if (_globalInfo.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct CommonSet without setting GlobalInfo to a non-null value");
-                if (_projection.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct CommonSet without setting Projection to a non-null value");
-                if (_view.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct CommonSet without setting View to a non-null value");
-                if (_dayPalette.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct CommonSet without setting DayPalette to a non-null value");
-                if (_nightPalette.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct CommonSet without setting NightPalette to a non-null value");
-                if (_sampler.Sampler == null) throw new System.InvalidOperationException("Tried to construct CommonSet without setting Sampler to a non-null value");
+                if (_globalInfo.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct CommonSet, but GlobalInfo has not been initialised. It may not have been attached to the exchange.");
+                if (_projection.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct CommonSet, but Projection has not been initialised. It may not have been attached to the exchange.");
+                if (_view.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct CommonSet, but View has not been initialised. It may not have been attached to the exchange.");
+                if (_dayPalette.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct CommonSet, but DayPalette has not been initialised. It may not have been attached to the exchange.");
+                if (_nightPalette.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct CommonSet, but NightPalette has not been initialised. It may not have been attached to the exchange.");
+                if (_sampler.Sampler == null) throw new System.InvalidOperationException("Tried to construct CommonSet, but Sampler has not been initialised. It may not have been attached to the exchange.");
 #endif
 
             return device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(

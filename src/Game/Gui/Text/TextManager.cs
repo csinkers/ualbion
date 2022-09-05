@@ -38,7 +38,7 @@ public class TextManager : ServiceComponent<ITextManager>, ITextManager
     public PositionedSpriteBatch BuildRenderable(TextBlock block, DrawLayer order, Rectangle? scissorRegion, object caller)
     {
         if (block == null) throw new ArgumentNullException(nameof(block));
-        var sm = Resolve<ISpriteManager<SpriteInfo>>();
+        var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
         var assets = Resolve<IAssetManager>();
         var window = Resolve<IWindowManager>();
 

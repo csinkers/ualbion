@@ -12,7 +12,7 @@
       "MonsterGfx",
       "NpcLargeGfx",
       "NpcSmallGfx",
-      "Object3D",
+      "Object3D", // Note: these might end up being meshes! They should be loaded via IAssetManager.LoadMapObject and only treated as sprites if an ITexture was returned.
       "PartyLargeGfx",
       "PartySmallGfx",
       "PartyInventoryGfx",
@@ -30,6 +30,7 @@
     "TilesetGfxId": [ "TilesetGfx" ],
     "PictureId": [ "Picture" ],
     "PortraitId": [ "Portrait" ],
+    "MapObjectId":  [ "Object3D" ],
 
     "SheetId": [
       "MonsterSheet",

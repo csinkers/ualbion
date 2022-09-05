@@ -20,7 +20,7 @@ public class ButtonFrame : UiElement
 {
     public delegate ButtonColorScheme ThemeFunction(ButtonState state);
 
-    SpriteLease<SpriteInfo> _sprite;
+    BatchLease<SpriteKey, SpriteInfo> _sprite;
     Rectangle _lastExtents;
     ButtonState _state = ButtonState.Normal;
     ThemeFunction _theme = ButtonTheme.Default;
@@ -88,7 +88,7 @@ public class ButtonFrame : UiElement
             if (instanceCount == 0)
                 return;
 
-            var sm = Resolve<ISpriteManager<SpriteInfo>>();
+            var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
             var key = new SpriteKey(cc.BorderTexture, SpriteSampler.Point, order, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
             _sprite = sm.Borrow(key, instanceCount, this);
         }

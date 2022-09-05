@@ -5,6 +5,7 @@ using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Etm;
+using UAlbion.Core.Veldrid.Meshes;
 using UAlbion.Core.Veldrid.Skybox;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
@@ -64,8 +65,10 @@ static class Albion
         mainPass
             .Add(new SkyboxManager())
             .Add(new EtmManager())
-            .Add(new SpriteManager<SpriteInfo>())
-            .Add(new SpriteManager<BlendedSpriteInfo>())
+            .Add(new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key)))
+            .Add(new BatchManager<SpriteKey, BlendedSpriteInfo>(static (key, f) => f.CreateBlendedSpriteBatch(key)))
+            .Add(new BatchManager<MeshId, GpuMeshInstanceData>(static (key, f) => ((VeldridCoreFactory)f).CreateMeshBatch(key)))
+            .Add(new MeshManager())
             .Add(new TileRenderableManager())
             .Add(new DebugGuiRenderable());
 

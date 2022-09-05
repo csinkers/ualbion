@@ -29,8 +29,8 @@ public class MockGameFactory : Component, IGameFactory
         throw new NotImplementedException();
     }
 
-    public SpriteBatch<TInstance> CreateSpriteBatch<TInstance>(SpriteKey key) where TInstance : unmanaged
-        => new MockSpriteBatch<TInstance>(key);
+    public RenderableBatch<SpriteKey, SpriteInfo> CreateSpriteBatch(SpriteKey key) => new MockSpriteBatch<SpriteInfo>(key);
+    public RenderableBatch<SpriteKey, BlendedSpriteInfo> CreateBlendedSpriteBatch(SpriteKey key) => new MockSpriteBatch<BlendedSpriteInfo>(key);
 
     public IMapLayer CreateMapLayer(LogicalMap2D logicalMap, ITileGraphics tileset, Vector2 tileSize)
         => throw new NotImplementedException();

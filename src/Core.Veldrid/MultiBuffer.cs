@@ -61,6 +61,17 @@ public sealed class MultiBuffer<T> : Component, IBufferHolder<T> where T : unman
         On<DestroyDeviceObjectsEvent>(_ => Dispose());
     }
 
+    public MultiBuffer(in T[] data, BufferUsage usage, string name = null)
+    {
+        _buffer = data; // Use the source data directly
+        _usage = usage;
+        _name = name;
+        _updateAction = Update;
+
+        On<DeviceCreatedEvent>(_ => Dirty());
+        On<DestroyDeviceObjectsEvent>(_ => Dispose());
+    }
+
     public override string ToString() => $"{Name} MultiBuffer<{typeof(T)}>[{Count}]";
     protected override void Subscribed() => Dirty();
     protected override void Unsubscribed() => Dispose();

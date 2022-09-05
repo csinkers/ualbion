@@ -2,13 +2,13 @@
 
 namespace UAlbion.Core.Visual;
 
-public class SpriteBatchComparer<TInstance> : IComparer<SpriteBatch<TInstance>>
+public class RenderableBatchComparer<TInstance> : IComparer<RenderableBatch<SpriteKey, TInstance>>
     where TInstance : unmanaged
 {
 #pragma warning disable CA1000 // Do not declare visible instance fields
-    public static SpriteBatchComparer<TInstance> Instance { get; } = new();
+    public static RenderableBatchComparer<TInstance> Instance { get; } = new();
 #pragma warning restore CA1000 // Do not declare visible instance fields
-    public int Compare(SpriteBatch<TInstance> x, SpriteBatch<TInstance> y)
+    public int Compare(RenderableBatch<SpriteKey, TInstance> x, RenderableBatch<SpriteKey, TInstance> y)
     {
         if (ReferenceEquals(x, y)) return 0;
         if (ReferenceEquals(null, y)) return 1;

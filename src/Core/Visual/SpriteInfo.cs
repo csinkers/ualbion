@@ -10,7 +10,7 @@ public partial struct SpriteInfo
 {
     public override string ToString() => $"SID {Position}:{TexLayer} ({Flags & ~SpriteFlags.DebugMask}) Z:{DebugZ}";
 
-    // State
+    // Note: This struct layout should exactly match GpuSpriteInstanceData in UAlbion.Core.Veldrid
     public SpriteFlags Flags;
     public Vector4 Position;
     public Vector2 Size;

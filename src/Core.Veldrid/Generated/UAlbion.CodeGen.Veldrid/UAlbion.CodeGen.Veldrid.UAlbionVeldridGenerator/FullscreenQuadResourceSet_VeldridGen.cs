@@ -60,9 +60,9 @@ namespace UAlbion.Core.Veldrid
         protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout)
         {
 #if DEBUG
-                if (_sampler.Sampler == null) throw new System.InvalidOperationException("Tried to construct FullscreenQuadResourceSet without setting Sampler to a non-null value");
-                if (_texture.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct FullscreenQuadResourceSet without setting Texture to a non-null value");
-                if (_uniform.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct FullscreenQuadResourceSet without setting Uniform to a non-null value");
+                if (_sampler.Sampler == null) throw new System.InvalidOperationException("Tried to construct FullscreenQuadResourceSet, but Sampler has not been initialised. It may not have been attached to the exchange.");
+                if (_texture.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct FullscreenQuadResourceSet, but Texture has not been initialised. It may not have been attached to the exchange.");
+                if (_uniform.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct FullscreenQuadResourceSet, but Uniform has not been initialised. It may not have been attached to the exchange.");
 #endif
 
             return device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(

@@ -24,9 +24,9 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
 
     public Vector2 Position { get; private set; }
     Vector2 _hotspot;
-    SpriteLease<SpriteInfo> _cursorSprite;
-    SpriteLease<SpriteInfo> _itemSprite;
-    SpriteLease<SpriteInfo> _hotspotSprite;
+    BatchLease<SpriteKey, SpriteInfo> _cursorSprite;
+    BatchLease<SpriteKey, SpriteInfo> _itemSprite;
+    BatchLease<SpriteKey, SpriteInfo> _hotspotSprite;
     PositionedSpriteBatch _itemAmountSprite;
 
     SpriteId _cursorId = Base.CoreGfx.Cursor;
@@ -100,7 +100,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         _dirty = false;
 
         var assets = Resolve<IAssetManager>();
-        var sm = Resolve<ISpriteManager<SpriteInfo>>();
+        var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
         var window = Resolve<IWindowManager>();
 
         if (window.Size.X < 1 || window.Size.Y < 1)
@@ -112,7 +112,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         RenderHotspot(sm, window, showHotspot);
     }
 
-    void RenderHotspot(ISpriteManager<SpriteInfo> sm, IWindowManager window, bool showHotspot)
+    void RenderHotspot(IBatchManager<SpriteKey, SpriteInfo> sm, IWindowManager window, bool showHotspot)
     {
         if(!showHotspot)
         {
@@ -140,7 +140,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         finally { _hotspotSprite.Unlock(lockWasTaken); }
     }
 
-    void RenderCursor(IAssetManager assets, ISpriteManager<SpriteInfo> sm, IWindowManager window, Vector3 position)
+    void RenderCursor(IAssetManager assets, IBatchManager<SpriteKey, SpriteInfo> sm, IWindowManager window, Vector3 position)
     {
         if (!_showCursor)
         {
@@ -173,7 +173,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         finally { _cursorSprite.Unlock(lockWasTaken); }
     }
 
-    void RenderItemInHandCursor(IAssetManager assets, ISpriteManager<SpriteInfo> sm, IWindowManager window, Vector3 normPosition)
+    void RenderItemInHandCursor(IAssetManager assets, IBatchManager<SpriteKey, SpriteInfo> sm, IWindowManager window, Vector3 normPosition)
     {
         if (_lastAmount != _heldItemCount)
         {

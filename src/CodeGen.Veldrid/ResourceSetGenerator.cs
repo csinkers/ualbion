@@ -85,7 +85,7 @@ static class ResourceSetGenerator
             sb.Append('.');
             AppendDeviceMemberForKind(sb, member, context);
 
-            sb.AppendFormat(" == null) throw new System.InvalidOperationException(\"Tried to construct {0} without setting {1} to a non-null value\");{2}",
+            sb.AppendFormat(" == null) throw new System.InvalidOperationException(\"Tried to construct {0}, but {1} has not been initialised. It may not have been attached to the exchange.\");{2}",
                 type.Symbol.Name,
                 VeldridGenUtil.UnderscoreToTitleCase(field.Name),
                 Environment.NewLine);

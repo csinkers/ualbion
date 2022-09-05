@@ -12,7 +12,7 @@ namespace UAlbion.Game.Gui.Controls;
 public class UiSpriteElement : UiElement
 {
     SpriteId _id;
-    SpriteLease<SpriteInfo> _sprite;
+    BatchLease<SpriteKey, SpriteInfo> _sprite;
     Vector3 _lastPosition;
     Vector2 _lastSize;
     Vector2 _size;
@@ -126,7 +126,7 @@ public class UiSpriteElement : UiElement
             return;
 
         var assets = Resolve<IAssetManager>();
-        var sm = Resolve<ISpriteManager<SpriteInfo>>();
+        var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
 
         _sprite?.Dispose();
         _sprite = null;

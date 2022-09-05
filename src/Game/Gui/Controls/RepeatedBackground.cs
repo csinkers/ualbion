@@ -25,7 +25,7 @@ public class RepeatedBackground : UiElement
     {
         var shadowSubImage = new Region(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
         var window = Resolve<IWindowManager>();
-        var sm = Resolve<ISpriteManager<SpriteInfo>>();
+        var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
 
         { // Check if we need to rebuild
             var normSize = window.UiToNormRelative(width, height);

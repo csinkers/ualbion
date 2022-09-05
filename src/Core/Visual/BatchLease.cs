@@ -3,17 +3,18 @@ using System.Runtime.CompilerServices;
 
 namespace UAlbion.Core.Visual;
 
-public class SpriteLease<TInstance> : IComparable<SpriteLease<TInstance>>
+public class BatchLease<TKey, TInstance> : IComparable<BatchLease<TKey, TInstance>>
+    where TKey : IBatchKey, IEquatable<TKey>
     where TInstance : unmanaged
 {
-    readonly SpriteBatch<TInstance> _spriteBatch;
-    public SpriteKey Key => _spriteBatch.Key;
+    readonly RenderableBatch<TKey, TInstance> _batch;
+    public TKey Key => _batch.Key;
     public int Length => To - From;
     internal int From { get; set; } // [from..to)
     internal int To { get; set; }
     public bool Disposed { get; private set; }
     internal object Owner { get; set; } // For debugging
-    public override string ToString() => $"LEASE [{From}-{To}) {_spriteBatch} for {Owner}";
+    public override string ToString() => $"LEASE [{From}-{To}) {_batch} for {Owner}";
 
     public TInstance? GetInstance(int index)
     {
@@ -30,7 +31,7 @@ public class SpriteLease<TInstance> : IComparable<SpriteLease<TInstance>>
     public void Dispose()
     {
         if (Disposed) return;
-        _spriteBatch.Shrink(this);
+        _batch.Shrink(this);
         Disposed = true;
     }
 
@@ -102,25 +103,25 @@ public class SpriteLease<TInstance> : IComparable<SpriteLease<TInstance>>
     public Span<TInstance> Lock(ref bool lockWasTaken)
     {
         if (Disposed)
-            throw new InvalidOperationException("SpriteLease used after return");
-        return _spriteBatch.Lock(this, ref lockWasTaken);
+            throw new InvalidOperationException("BatchLease used after return");
+        return _batch.Lock(this, ref lockWasTaken);
     }
 
     /// <summary>
     /// Releases the lock on the lease's underlying memory.
     /// </summary>
     /// <param name="lockWasTaken">This should be the value returned as a ref parameter from Lock. It is important for re-entrant calls.</param>
-    public void Unlock(bool lockWasTaken) => _spriteBatch.Unlock(this, lockWasTaken);
+    public void Unlock(bool lockWasTaken) => _batch.Unlock(this, lockWasTaken);
 
-    // Should only be created by SpriteBatch
-    internal SpriteLease(SpriteBatch<TInstance> spriteBatch, int from, int to)
+    // Should only be created by RenderableBatch
+    internal BatchLease(RenderableBatch<TKey, TInstance> spriteBatch, int from, int to)
     {
-        _spriteBatch = spriteBatch ?? throw new ArgumentNullException(nameof(spriteBatch));
+        _batch = spriteBatch ?? throw new ArgumentNullException(nameof(spriteBatch));
         From = from;
         To = to;
     }
 
-    public int CompareTo(SpriteLease<TInstance> other)
+    public int CompareTo(BatchLease<TKey, TInstance> other)
     {
         if (ReferenceEquals(this, other)) return 0;
         if (other is null) return 1;
@@ -129,12 +130,12 @@ public class SpriteLease<TInstance> : IComparable<SpriteLease<TInstance>>
         return To.CompareTo(other.To);
     }
 
-    public override bool Equals(object obj) => obj is SpriteLease<TInstance> lease && Key == lease.Key && From == lease.From && To == lease.To;
+    public override bool Equals(object obj) => obj is BatchLease<TKey, TInstance> lease && Equals(Key, lease.Key) && From == lease.From && To == lease.To;
     public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
-    public static bool operator ==(SpriteLease<TInstance> left, SpriteLease<TInstance> right) => left?.Equals(right) ?? right is null;
-    public static bool operator !=(SpriteLease<TInstance> left, SpriteLease<TInstance> right) => !(left == right);
-    public static bool operator <(SpriteLease<TInstance> left, SpriteLease<TInstance> right) => left is null ? !(right is null) : left.CompareTo(right) < 0;
-    public static bool operator <=(SpriteLease<TInstance> left, SpriteLease<TInstance> right) => left is null || left.CompareTo(right) <= 0;
-    public static bool operator >(SpriteLease<TInstance> left, SpriteLease<TInstance> right) => !(left is null) && left.CompareTo(right) > 0;
-    public static bool operator >=(SpriteLease<TInstance> left, SpriteLease<TInstance> right) => left is null ? right is null : left.CompareTo(right) >= 0;
+    public static bool operator ==(BatchLease<TKey, TInstance> left, BatchLease<TKey, TInstance> right) => left?.Equals(right) ?? right is null;
+    public static bool operator !=(BatchLease<TKey, TInstance> left, BatchLease<TKey, TInstance> right) => !(left == right);
+    public static bool operator <(BatchLease<TKey, TInstance> left, BatchLease<TKey, TInstance> right) => left is null ? right is not null : left.CompareTo(right) < 0;
+    public static bool operator <=(BatchLease<TKey, TInstance> left, BatchLease<TKey, TInstance> right) => left is null || left.CompareTo(right) <= 0;
+    public static bool operator >(BatchLease<TKey, TInstance> left, BatchLease<TKey, TInstance> right) => !(left is null) && left.CompareTo(right) > 0;
+    public static bool operator >=(BatchLease<TKey, TInstance> left, BatchLease<TKey, TInstance> right) => left is null ? right is null : left.CompareTo(right) >= 0;
 }

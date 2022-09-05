@@ -117,7 +117,7 @@ class DumpText : Component, IAssetDumper
                 {
                     if (subObject == null) continue;
                     var definition = l.Objects[subObject.ObjectInfoNumber];
-                    sw.Write(definition.SpriteId);
+                    sw.Write(definition.Id);
                     sw.Write(" ");
                 }
 
@@ -159,7 +159,7 @@ class DumpText : Component, IAssetDumper
             {
                 var o = l.Objects[j];
                 sw.WriteLine(
-                    $"    Extra {j}: {o.SpriteId} {o.FrameCount} {o.Width}x{o.Height} M:{o.MapWidth}x{o.MapHeight}");
+                    $"    Extra {j}: {o.Id} {o.FrameCount} {o.Width}x{o.Height} M:{o.MapWidth}x{o.MapHeight}");
             }
         }
     }
@@ -236,7 +236,7 @@ class DumpText : Component, IAssetDumper
                                     if (!first) sw.Write(", ");
                                     first = false;
                                     var def = lab.Objects[subObject.ObjectInfoNumber];
-                                    sw.Write(def.SpriteId);
+                                    sw.Write(def.Id);
                                 }
 
                                 sw.Write(")");

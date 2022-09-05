@@ -60,9 +60,9 @@ namespace UAlbion.Core.Veldrid.Skybox
         protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout)
         {
 #if DEBUG
-                if (_sampler.Sampler == null) throw new System.InvalidOperationException("Tried to construct SkyboxResourceSet without setting Sampler to a non-null value");
-                if (_texture.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct SkyboxResourceSet without setting Texture to a non-null value");
-                if (_uniform.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct SkyboxResourceSet without setting Uniform to a non-null value");
+                if (_sampler.Sampler == null) throw new System.InvalidOperationException("Tried to construct SkyboxResourceSet, but Sampler has not been initialised. It may not have been attached to the exchange.");
+                if (_texture.DeviceTexture == null) throw new System.InvalidOperationException("Tried to construct SkyboxResourceSet, but Texture has not been initialised. It may not have been attached to the exchange.");
+                if (_uniform.DeviceBuffer == null) throw new System.InvalidOperationException("Tried to construct SkyboxResourceSet, but Uniform has not been initialised. It may not have been attached to the exchange.");
 #endif
 
             return device.ResourceFactory.CreateResourceSet(new ResourceSetDescription(

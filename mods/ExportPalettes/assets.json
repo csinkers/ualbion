@@ -1,0 +1,10 @@
+{
+  "Files": { // Pattern Variables: 0=SubId in container 1=frame/sub-asset number 2=Asset name 3=PaletteId. Patterns must begin with {id}_ when writing.
+    "Palettes": {
+      "Loader": "palpng",
+      "Container": "dir",
+      "Pattern": "{id}_{name}.png",
+      "Map": { "0": { "Id": "pal.0" } } }
+  }
+}
+// vim: tabstop=2 shiftwidth=2 expandtab

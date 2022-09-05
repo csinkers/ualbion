@@ -27,8 +27,10 @@ public class Mesh : IMesh
     }
 
     public MeshId Id { get; }
+#pragma warning disable CA1051 // Do not declare visible instance fields - 
     public readonly MeshVertex[] Vertices;
     public readonly ushort[] Indices;
+#pragma warning restore CA1051 // Do not declare visible instance fields
     public Dictionary<string, ITexture> Textures { get; }
     public MaterialDefinition Material { get; }
     public Vector3 BoxMax => BoundingBox.Max;

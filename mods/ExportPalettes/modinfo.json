@@ -1,0 +1,7 @@
+{
+  "Name": "UAlbion-ExportPalettes",
+  "Description": "A simple mod spec for exporting palettes to png",
+  "Version": "0.1.0",
+  "Dependencies": [ "Base", "Shaders", "Common" ],
+  "InheritAssetConfigFrom": "Base"
+}

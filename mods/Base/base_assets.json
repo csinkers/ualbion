@@ -123,6 +123,7 @@
     "pngtile8":          "UAlbion.Game.Veldrid.Assets.PngTileLoader8Bit, UAlbion.Game.Veldrid",
     "pngtile32":         "UAlbion.Game.Veldrid.Assets.PngTileLoader32Bit, UAlbion.Game.Veldrid",
     "pngsheet":          "UAlbion.Game.Veldrid.Assets.PngSheetLoader, UAlbion.Game.Veldrid",
+    "palpng":            "UAlbion.Game.Veldrid.Assets.PalettePng32Loader, UAlbion.Game.Veldrid",
 
     // This is in Game due to a dependency on AdlMidi.NET
     "soundbank":         "UAlbion.Game.Assets.SoundBankLoader, UAlbion.Game",

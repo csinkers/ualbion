@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
@@ -36,10 +35,10 @@ public class NormalMouseMode : Component
         // it wouldn't be able to transition back to Normal
         if (_hits.Count > 0)
         {
-            if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && x.Down))
+            if (e.Snapshot.CheckMouse(MouseButton.Right, true))
                 Distribute(_rightClickEvent, _hits, x => x.Target as IComponent);
 
-            if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && x.Down))
+            if (e.Snapshot.CheckMouse(MouseButton.Left, true))
                 Distribute(_leftClickEvent, _hits, x => x.Target as IComponent);
 
             if ((int)e.Snapshot.WheelDelta != 0)
@@ -49,10 +48,10 @@ public class NormalMouseMode : Component
             }
         }
 
-        if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && !x.Down))
+        if (e.Snapshot.CheckMouse(MouseButton.Left, false))
             Raise(_leftReleaseEvent);
 
-        if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && !x.Down))
+        if (e.Snapshot.CheckMouse(MouseButton.Right, false))
             Raise(_rightReleaseEvent);
 
         if (_lastPosition != e.Snapshot.MousePosition)

@@ -23,6 +23,8 @@ namespace UAlbion.Game.Entities;
 
 public class Npc2D : Component
 {
+    readonly Func<(int, int), (int, int)> _getDesiredDirectionDelegate = x => x;
+    readonly Action<int, int> _onTileEnteredDelegate;
     readonly NpcState _state;
     readonly MapNpc _mapData;
     readonly MapSprite _sprite;
@@ -49,6 +51,8 @@ public class Npc2D : Component
         {
             SelectionCallback = () => this
         });
+
+        _onTileEnteredDelegate = (x, y) => Raise(new NpcEnteredTileEvent(_npcNumber, x, y));
 
         On<FastClockEvent>(_ => Update());
         OnDirectCall<ShowMapMenuEvent>(OnRightClick);
@@ -88,8 +92,8 @@ public class Npc2D : Component
                 _moveSettings,
                 Resolve<ICollisionManager>(),
                 (_targetX - _state.X, _targetY - _state.Y),
-                x => x,
-                (x, y) => Raise(new NpcEnteredTileEvent(_npcNumber, x, y))))
+                _getDesiredDirectionDelegate,
+                _onTileEnteredDelegate))
         {
             _sprite.TilePosition =
                 new Vector3(
@@ -97,21 +101,14 @@ public class Npc2D : Component
                     _state.PixelY / _moveSettings.TileHeight,
                     _moveSettings.GetDepth(_state.Y));
 
-            _sprite.Frame = _moveSettings.GetSpriteFrame(_state, GetSitMode);
+            _sprite.Frame = _moveSettings.GetSpriteFrame(_state, _getSitModeDelegate);
         }
     }
 
+    static readonly Func<int, int, SitMode> _getSitModeDelegate = GetSitMode;
     static SitMode GetSitMode(int x, int y) => SitMode.None; // TODO
-
-    void OnTurn(NpcTurnEvent e)
-    {
-        _state.NpcMoveState.Direction = e.Direction;
-    }
-
-    void OnMove(NpcMoveEvent e)
-    {
-        SetTarget(_state.X + e.X, _state.Y + e.Y);
-    }
+    void OnTurn(NpcTurnEvent e) => _state.NpcMoveState.Direction = e.Direction;
+    void OnMove(NpcMoveEvent e) => SetTarget(_state.X + e.X, _state.Y + e.Y);
 
     // void Lock(bool shouldLock)
     // { // TODO

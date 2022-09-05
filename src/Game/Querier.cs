@@ -23,7 +23,13 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
 
     public Querier()
     {
-        OnAsync(    Do<QueryChosenVerbEvent>(q => ((EventContext)Context).Source.Trigger.HasFlag((TriggerTypes)(1 << (int)q.TriggerType))));
+        OnAsync(Do<QueryChosenVerbEvent>(q =>
+            {
+                var triggers = ((EventContext)Context).Source.Trigger;
+                var queryTrigger = (TriggerTypes)(1 << (int)q.TriggerType);
+                return (triggers & queryTrigger) != 0;
+            }));
+
         OnAsync(          Do<QueryGoldEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Party.TotalGold, q.Argument)));
         OnAsync(       Do<QueryHasItemEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Party.GetItemCount(q.ItemId), q.Immediate)));
         OnAsync(Do<QueryHasPartyMemberEvent>(q => Resolve<IGameState>().Party.StatusBarOrder.Any(x => x.Id == q.PartyMemberId)));

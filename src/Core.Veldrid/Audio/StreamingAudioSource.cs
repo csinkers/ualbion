@@ -10,6 +10,8 @@ public class StreamingAudioSource : AudioSource
     const int BufferCount = 3;
     const int BufferSize = 16384;
 
+    readonly uint[] _tempBufferIds = new uint[1];
+    readonly short[] _tempBuffer = new short[BufferSize];
     readonly IAudioGenerator _generator;
     readonly AudioBufferInt16Stereo[] _buffers;
     bool _playing;
@@ -44,14 +46,12 @@ public class StreamingAudioSource : AudioSource
 
         while (BuffersProcessed > BufferCount / 2)
         {
-            uint[] bufferIds = new uint[1];
-            AL10.alSourceUnqueueBuffers(Source, 1, bufferIds);
+            AL10.alSourceUnqueueBuffers(Source, 1, _tempBufferIds);
 
-            short[] buffer = new short[BufferSize];
-            int length = _generator.FillBuffer(buffer);
-            _buffers.First(x => x.Buffer == bufferIds[0]).Update(buffer);
+            _generator.FillBuffer(_tempBuffer);
+            _buffers.First(x => x.Buffer == _tempBufferIds[0]).Update(_tempBuffer);
 
-            AL10.alSourceQueueBuffers(Source, 1, bufferIds);
+            AL10.alSourceQueueBuffers(Source, 1, _tempBufferIds);
         }
     }
 

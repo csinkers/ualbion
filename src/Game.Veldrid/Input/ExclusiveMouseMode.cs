@@ -20,13 +20,13 @@ public class ExclusiveMouseMode : Component
         _hits.Clear();
         Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, true);
 
-        if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && !x.Down))
+        if (e.Snapshot.CheckMouse(MouseButton.Left, false))
         {
             Raise(new UiLeftReleaseEvent());
             Raise(new MouseModeEvent(MouseMode.Normal));
         }
 
-        if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && !x.Down))
+        if (e.Snapshot.CheckMouse(MouseButton.Right, false))
         {
             Raise(new UiRightReleaseEvent());
             Raise(new MouseModeEvent(MouseMode.Normal));

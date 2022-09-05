@@ -180,13 +180,21 @@ public abstract class Component : IComponent
     void OnCore<T, TCallback>(TCallback callback, Func<TCallback, Component, Handler> handlerConstructor)
     {
         _handlers ??= new Dictionary<Type, Handler>();
-        if (_handlers.ContainsKey(typeof(T)))
+        _handlers.TryGetValue(typeof(T), out var handler);
+
+        if (handler == null)
+        {
+            handler = handlerConstructor(callback, this);
+            _handlers.Add(typeof(T), handler);
+        }
+
+        if (handler.IsActive)
             return;
 
-        var handler = handlerConstructor(callback, this);
-        _handlers.Add(typeof(T), handler);
         if (IsSubscribed)
             Exchange.Subscribe(handler);
+
+        handler.IsActive = true;
     }
 
     /// <summary>
@@ -265,7 +273,11 @@ public abstract class Component : IComponent
     /// <typeparam name="T">The event type which should no longer be handled by this component.</typeparam>
     protected void Off<T>()
     {
-        if (_handlers?.Remove(typeof(T)) == true && IsSubscribed)
+        if (_handlers?.TryGetValue(typeof(T), out var handler) != true)
+            return;
+
+        handler.IsActive = false;
+        if (IsSubscribed)
             Exchange.Unsubscribe<T>(this);
     }
 
@@ -435,7 +447,7 @@ public abstract class Component : IComponent
         if (sender == this || !IsSubscribed || Exchange == null)
             return;
 
-        if (_handlers != null && _handlers.TryGetValue(@event.GetType(), out var handler))
+        if (_handlers != null && _handlers.TryGetValue(@event.GetType(), out var handler) && handler.IsActive)
             handler.Invoke(@event, DummyContinuation.Instance);
     }
 

@@ -53,7 +53,7 @@ public class ModalDialog : Dialog
             }
 
             // Add one to prevent a tie between the dialog and its UiBlocker
-            context.HitFunc(order + 1, this);
+            context.AddHit(order + 1, this);
         }
 
         _blocker.Selection(extents, order, context);

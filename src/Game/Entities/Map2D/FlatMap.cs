@@ -17,20 +17,6 @@ using MoveVars = UAlbion.Formats.Config.GameVars.PartyMovement;
 
 namespace UAlbion.Game.Entities.Map2D;
 
-public class TriggerMapTileEvent : Event, IVerboseEvent
-{
-    public TriggerMapTileEvent(TriggerTypes type, int x, int y)
-    {
-        Type = type;
-        X = x;
-        Y = y;
-    }
-
-    public TriggerTypes Type { get; }
-    public int X { get; }
-    public int Y { get; }
-}
-
 public class FlatMap : Component, IMap
 {
     readonly MapData2D _mapData;

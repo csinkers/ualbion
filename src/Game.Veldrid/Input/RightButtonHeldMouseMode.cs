@@ -50,7 +50,7 @@ public class RightButtonHeldMouseMode : Component
         if (_hits.Count == 0)
             return;
 
-        if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && !x.Down))
+        if (e.Snapshot.CheckMouse(MouseButton.Right, false))
             ShowContextMenu(_hits);
         else
             UpdateCursorPosition(_hits);

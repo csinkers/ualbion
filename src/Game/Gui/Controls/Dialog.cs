@@ -12,7 +12,7 @@ public class Dialog : UiElement, IDialog
 {
     protected Dialog(DialogPositioning position, int depth = 0)
     {
-        On<CollectDialogsEvent>(e => e.AddDialog(this));
+        On<CollectDialogsEvent>(e => e.Dialogs.Add(this));
         Positioning = position;
         Depth = depth;
     }

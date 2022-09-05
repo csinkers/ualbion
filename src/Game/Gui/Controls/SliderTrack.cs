@@ -115,7 +115,7 @@ public class SliderTrack : UiElement
         }
 
         var maxOrder = _thumb.Selection(thumbExtents, order + 1, context);
-        context.HitFunc(order, this);
+        context.AddHit(order, this);
         return maxOrder;
     }
 }

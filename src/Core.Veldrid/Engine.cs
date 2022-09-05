@@ -23,6 +23,9 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
     readonly FrameTimeAverager _frameTimeAverager = new(0.5);
     readonly FenceHolder _fence;
     readonly WindowHolder _windowHolder;
+    readonly RenderEvent _renderEvent = new();
+    readonly PrepareFrameResourcesEvent _prepareFrameResourcesEvent = new();
+    readonly PrepareFrameResourceSetsEvent _prepareFrameResourceSetsEvent = new();
     readonly List<IRenderPass> _renderPasses = new();
     readonly bool _useRenderDoc;
     readonly bool _startupOnly;
@@ -219,9 +222,17 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         using (PerfTracker.FrameEvent("6.1 Prepare scenes"))
         {
             _frameCommands.Begin();
-            Raise(new RenderEvent(camera));
-            Raise(new PrepareFrameResourcesEvent(_graphicsDevice, _frameCommands));
-            Raise(new PrepareFrameResourceSetsEvent(_graphicsDevice, _frameCommands));
+
+            _renderEvent.Camera = camera;
+            _prepareFrameResourcesEvent.Device = _graphicsDevice;
+            _prepareFrameResourcesEvent.CommandList = _frameCommands;
+            _prepareFrameResourceSetsEvent.Device = _graphicsDevice;
+            _prepareFrameResourceSetsEvent.CommandList = _frameCommands;
+
+            Raise(_renderEvent);
+            Raise(_prepareFrameResourcesEvent);
+            Raise(_prepareFrameResourceSetsEvent);
+
             _frameCommands.End();
             _graphicsDevice.SubmitCommands(_frameCommands, _fence.Fence);
         }

@@ -35,11 +35,4 @@ public interface IUiElement : IComponent
     /// a callback for elements containing the cursor to call to alert the
     /// caller to their presence</param>
     int Selection(Rectangle extents, int order, SelectionContext c);
-
-    /// <summary>
-    /// A delegate for hit-reporting callbacks
-    /// </summary>
-    /// <param name="order"></param>
-    /// <param name="element"></param>
-    public delegate void RegisterHitFunc(int order, object element);
 }

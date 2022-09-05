@@ -5,6 +5,7 @@ namespace UAlbion.Api.Eventing;
 public abstract class Handler
 {
     public abstract bool ShouldSubscribe { get; }
+    public bool IsActive { get; set; }
     public bool IsPostHandler { get; }
     public Type Type { get; }
     public IComponent Component { get; }

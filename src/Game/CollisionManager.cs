@@ -5,11 +5,11 @@ namespace UAlbion.Game;
 
 public class CollisionManager : ServiceComponent<ICollisionManager>, ICollisionManager
 {
-    readonly IList<IMovementCollider> _colliders = new List<IMovementCollider>();
+    readonly List<IMovementCollider> _colliders = new();
 
     public bool IsOccupied(int fromX, int fromY, int toX, int toY)
     {
-        foreach(var collider in _colliders)
+        foreach (var collider in _colliders)
             if (collider.IsOccupied(fromX, fromY, toX, toY))
                 return true;
         return false;

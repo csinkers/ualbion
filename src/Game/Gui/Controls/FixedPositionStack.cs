@@ -101,7 +101,7 @@ public class FixedPositionStack : UiElement, IFixedSizeUiElement
         if (context == null) throw new ArgumentNullException(nameof(context));
         // The fixed positions may be outside the regular UI area, so don't clip to the extents that are passed in.
         var maxOrder = DoLayout(extents, order, context, SelectChild);
-        context.HitFunc(order, this);
+        context.AddHit(order, this);
         return maxOrder;
     }
 }

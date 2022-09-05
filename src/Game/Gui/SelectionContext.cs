@@ -1,16 +1,21 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Numerics;
+using UAlbion.Api.Visual;
+using UAlbion.Core.Events;
 
 namespace UAlbion.Game.Gui;
 
+#pragma warning disable CA2227 // Collection properties should be read only - for perf reasons
 public class SelectionContext
 {
-    public SelectionContext(Vector2 uiPosition, IUiElement.RegisterHitFunc hitFunc)
+    public Vector2 UiPosition { get; set; }
+    public Vector2 NormPosition { get; set; }
+    public List<Selection> Selections { get; set; }
+    public void AddHit(int order, object target)
     {
-        UiPosition = uiPosition;
-        HitFunc = hitFunc ?? throw new ArgumentNullException(nameof(hitFunc));
+        float z = 1.0f - order / (float)DrawLayer.MaxLayer;
+        var intersectionPoint = new Vector3(NormPosition, z);
+        Selections.Add(new Selection(intersectionPoint, z, target));
     }
-
-    public Vector2 UiPosition { get; }
-    public IUiElement.RegisterHitFunc HitFunc { get; }
 }
+#pragma warning restore CA2227 // Collection properties should be read only

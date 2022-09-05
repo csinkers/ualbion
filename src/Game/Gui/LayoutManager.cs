@@ -23,6 +23,9 @@ public interface ILayoutManager
 
 public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
 {
+    readonly CollectDialogsEvent _collectDialogsEvent = new();
+    readonly SelectionContext _selectionContext = new();
+
     public IDictionary<IUiElement, LayoutNode> LastSnapshot { get; private set; } =
         new Dictionary<IUiElement, LayoutNode>();
 
@@ -34,24 +37,23 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
     }
 
     public void RequestSnapshot() => CaptureSnapshot();
-
-    void DoLayout(Func<Rectangle, int, IUiElement, int> action)
+    void DoLayout<TContext>(Func<TContext, Rectangle, int, IUiElement, int> action, TContext context)
     {
         int order = (int)DrawLayer.Interface;
         int uiWidth = UiConstants.ActiveAreaExtents.Width;
         int uiHeight = UiConstants.ActiveAreaExtents.Height;
-        var dialogs = new List<IDialog>();
-        Raise(new CollectDialogsEvent(dialogs.Add));
-        dialogs.Sort((x, y) => x.Depth.CompareTo(y.Depth));
+        _collectDialogsEvent.Dialogs.Clear();
+        Raise(_collectDialogsEvent);
+        _collectDialogsEvent.Dialogs.Sort((x, y) => x.Depth.CompareTo(y.Depth));
 
-        foreach (var dialog in dialogs)
+        foreach (var dialog in _collectDialogsEvent.Dialogs)
         {
             var size = dialog.GetSize();
 
             void LayoutDialog(Vector2 dialogSize)
             {
                 var (x, y) = GetDialogPosition(dialog, dialogSize, uiWidth, uiHeight);
-                order = action(new Rectangle(x, y, (int)dialogSize.X, (int)dialogSize.Y), order + 1, dialog);
+                order = action(context, new Rectangle(x, y, (int)dialogSize.X, (int)dialogSize.Y), order + 1, dialog);
             }
 
             LayoutDialog(size);
@@ -78,24 +80,16 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
             return;
         }
 
-        DoLayout((extents, order, element) => element.Render(extents, order, null));
+        DoLayout(static (_, extents, order, element) => element.Render(extents, order, null), 0);
     }
 
     void Select(ScreenCoordinateSelectEvent e)
     {
         var window = Resolve<IWindowManager>();
-        var normPosition = window.PixelToNorm(e.Position);
-        var uiPosition = window.NormToUi(normPosition);
-        var context = new SelectionContext(
-            uiPosition,
-            (order, target) =>
-            {
-                float z = 1.0f - order / (float)DrawLayer.MaxLayer;
-                var intersectionPoint = new Vector3(normPosition, z);
-                e.Selections.Add(new Selection(intersectionPoint, z, target));
-            });
-
-        DoLayout((extents, dialogOrder, element) => element.Selection(extents, dialogOrder, context));
+        _selectionContext.NormPosition = window.PixelToNorm(e.Position);
+        _selectionContext.UiPosition = window.NormToUi(_selectionContext.NormPosition);
+        _selectionContext.Selections = e.Selections;
+        DoLayout(static (c, extents, order, x) => x.Selection(extents, order, c), _selectionContext);
     }
 
     static (int, int) GetDialogPosition(IDialog dialog, Vector2 size, int uiWidth, int uiHeight)
@@ -155,8 +149,10 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
     public LayoutNode GetLayout()
     {
         var rootNode = new LayoutNode(null, null, UiConstants.UiExtents, 0);
-        DoLayout((extents, order, element) =>
-            element.Render(extents, order, new LayoutNode(rootNode, element, extents, order)));
+        DoLayout(static (root, extents, order, element) =>
+            element.Render(extents, order, new LayoutNode(root, element, extents, order)),
+            rootNode);
+
         return rootNode;
     }
 

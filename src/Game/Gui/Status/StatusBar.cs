@@ -87,10 +87,10 @@ public class StatusBar : Dialog
             return order;
 
         int maxOrder = DoLayout(extents, order, context, SelectChild, true);
-        context.HitFunc(order, this);
+        context.AddHit(order, this);
         return maxOrder;
     }
 
     public override int Render(Rectangle extents, int order, LayoutNode parent) =>
-        DoLayout(extents, order, parent, RenderChild, false);
+        DoLayout(extents, order, parent, _renderChildDelegate, false);
 }

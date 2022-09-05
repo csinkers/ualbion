@@ -34,6 +34,7 @@ public abstract class UiElement : Component, IUiElement
     }
 
     protected delegate int LayoutFunc<in T>(IUiElement element, Rectangle extents, int order, T context);
+    protected static readonly LayoutFunc<LayoutNode> _renderChildDelegate = RenderChild;
     protected static int RenderChild(IUiElement child, Rectangle extents, int order, LayoutNode parent)
     {
         if (child == null) throw new ArgumentNullException(nameof(child));
@@ -65,7 +66,7 @@ public abstract class UiElement : Component, IUiElement
     public virtual int Render(Rectangle extents, int order, LayoutNode parent)
     {
         var node = parent == null ? null : new LayoutNode(parent, this, extents, order);
-        return DoLayout(extents, order, node, RenderChild);
+        return DoLayout(extents, order, node, _renderChildDelegate);
     }
 
     public virtual int Selection(Rectangle extents, int order, SelectionContext c)
@@ -77,7 +78,7 @@ public abstract class UiElement : Component, IUiElement
             return order;
 
         var maxOrder = DoLayout(extents, order, c, (x,y,z, context) => x.Selection(y, z, context));
-        c.HitFunc(order, this);
+        c.AddHit(order, this);
         return maxOrder;
     }
 }

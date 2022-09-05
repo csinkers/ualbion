@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
+using System.Runtime.InteropServices;
 using UAlbion.Api;
 
 namespace UAlbion.Core;
@@ -11,6 +11,7 @@ public class FrameCounter
     readonly int _a;
     readonly short _b;
     readonly short _c;
+    readonly byte[] _d = new byte[8];
     long _previousFrameTicks;
 
     public long FrameCount { get; private set; }
@@ -31,7 +32,14 @@ public class FrameCounter
         _previousFrameTicks = currentFrameTicks;
 
         FrameCount++;
-        var correlationId = new Guid(_a, _b, _c, BitConverter.GetBytes(FrameCount).Reverse().ToArray());
+
+        long frameCount = FrameCount;
+        var span = MemoryMarshal.CreateReadOnlySpan(ref frameCount, 1);
+        var byteSpan = MemoryMarshal.Cast<long, byte>(span);
+        for (int i = 0; i < 8; i++)
+            _d[7 - i] = byteSpan[i];
+
+        var correlationId = new Guid(_a, _b, _c, _d);
         CoreTrace.SetCorrelationId(correlationId);
         CoreTrace.Log.StartFrame(FrameCount, deltaSeconds * 1.0e6);
         return deltaSeconds;

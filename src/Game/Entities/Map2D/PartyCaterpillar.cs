@@ -107,7 +107,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
                 detector,
                 (int)_direction.X,
                 (int)_direction.Y,
-                (x, y) => Raise(new PlayerEnteredTileEvent(x, y))))
+                OnEnteredTile))
         {
             MoveLeader(new Vector2(
                 _state.PixelX / _state.Settings.TileWidth,
@@ -117,6 +117,8 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
         _direction = Vector2.Zero;
         MoveFollowers();
     }
+
+    void OnEnteredTile(int x, int y) => Raise(new PlayerEnteredTileEvent(x, y));
 
     SitMode GetSitMode(int x, int y)
     {

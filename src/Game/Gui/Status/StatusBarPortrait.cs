@@ -113,7 +113,14 @@ public class StatusBarPortrait : UiElement
 
     protected override void Subscribed() => LoadSprite();
     public override Vector2 GetSize() => _portrait.GetSize() + new Vector2(0,6); // Add room for health + mana bars
-    IPlayer PartyMember => TryResolve<IParty>()?.StatusBarOrder.ElementAtOrDefault(_order);
+    IPlayer PartyMember
+    {
+        get
+        {
+            var ordered = TryResolve<IParty>()?.StatusBarOrder;
+            return ordered == null || _order >= ordered.Count ? null : ordered[_order];
+        }
+    }
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {

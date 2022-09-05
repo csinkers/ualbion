@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using Veldrid;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Input;
 /*
@@ -114,10 +113,10 @@ public class MouseLookMouseMode : Component
         // it wouldn't be able to transition back to Normal
         if (_hits.Count > 0)
         {
-            if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Right && x.Down))
+            if (e.Snapshot.CheckMouse(MouseButton.Right, true))
                 Distribute(_uiRightClickEvent, _hits, x => x.Target as IComponent);
 
-            if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && x.Down))
+            if (e.Snapshot.CheckMouse(MouseButton.Left, true))
                 Distribute(_uiLeftClickEvent, _hits, x => x.Target as IComponent);
 
             if ((int)e.Snapshot.WheelDelta != 0)
@@ -127,7 +126,7 @@ public class MouseLookMouseMode : Component
             }
         }
 
-        if (e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && !x.Down))
+        if (e.Snapshot.CheckMouse(MouseButton.Left, false))
             Raise(_uiLeftReleaseEvent);
     }
 }

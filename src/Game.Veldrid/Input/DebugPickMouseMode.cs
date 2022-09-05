@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using Veldrid;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Input;
 
@@ -19,7 +18,7 @@ public class DebugPickMouseMode : Component
 
     void OnInput(InputEvent e)
     {
-        if(e.Snapshot.MouseEvents.Any(x => x.MouseButton == MouseButton.Left && x.Down))
+        if (e.Snapshot.CheckMouse(MouseButton.Left, true))
         {
             var layoutManager = TryResolve<ILayoutManager>();
             layoutManager?.RequestSnapshot();

@@ -65,7 +65,7 @@ public class UiFixedPositionElement : UiElement
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
         if (extents.Contains((int)context.UiPosition.X, (int)context.UiPosition.Y))
-            context.HitFunc(order, this);
+            context.AddHit(order, this);
         return order;
     }
 }

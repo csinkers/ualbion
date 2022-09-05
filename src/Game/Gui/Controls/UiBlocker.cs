@@ -27,7 +27,7 @@ public class UiBlocker : Component, IUiElement, ISelectionBlocker // Used to pre
     public int Selection(Rectangle extents, int order, SelectionContext context)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
-        context.HitFunc(order, this);
+        context.AddHit(order, this);
         return order;
     }
 }

@@ -9,6 +9,7 @@ namespace UAlbion.Core.Visual;
 
 public class Sprite : Component, IPositioned
 {
+    readonly Action<RenderEvent> _onRenderDelegate;
     readonly DrawLayer _layer;
     readonly SpriteKeyFlags _keyFlags;
     readonly Func<IAssetId, ITexture> _loaderFunc;
@@ -28,8 +29,9 @@ public class Sprite : Component, IPositioned
         SpriteFlags flags,
         Func<IAssetId, ITexture> loaderFunc = null)
     {
+        _onRenderDelegate = OnRender;
         On<BackendChangedEvent>(_ => Dirty = true);
-        On<RenderEvent>(_ => UpdateSprite());
+        On(_onRenderDelegate);
         On<WorldCoordinateSelectEvent>(Select);
         On<HoverEvent>(_ =>
         {
@@ -105,7 +107,7 @@ public class Sprite : Component, IPositioned
             if (value == _dirty)
                 return;
 
-            if (value) On<RenderEvent>(OnRender);
+            if (value) On(_onRenderDelegate);
             else Off<RenderEvent>();
 
             _dirty = value;

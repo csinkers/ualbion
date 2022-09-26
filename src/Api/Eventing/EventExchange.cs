@@ -201,7 +201,7 @@ namespace UAlbion.Api.Eventing
                     continue;
 
                 Raise(new LogEvent(LogLevel.Error,
-                    $"Component of type \"{handler.Component.GetType()}\" tried to register " +
+                    $"Component {handler.Component.ComponentId} of type \"{handler.Component.GetType()}\" tried to register " +
                     $"handler for event {handler.Type}, but it has already registered a handler for that event."), this);
                 return true;
             }

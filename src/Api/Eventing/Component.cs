@@ -330,7 +330,9 @@ public abstract class Component : IComponent
         // exchange.Subscribe(null, this); // Ensure we always get added to the subscriber list, even if this component only uses subscription notifications.
         if (_handlers != null)
             foreach (var kvp in _handlers)
-                exchange.Subscribe(kvp.Value);
+                if (kvp.Value.IsActive)
+                    exchange.Subscribe(kvp.Value);
+
         IsSubscribed = true;
         Subscribed();
     }

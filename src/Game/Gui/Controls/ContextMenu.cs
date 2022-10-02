@@ -64,7 +64,7 @@ public class ContextMenu : Dialog
             Close();
 
         if (option.Event is IAsyncEvent asyncEvent)
-            RaiseAsync(asyncEvent, null);
+            RaiseAsync(asyncEvent, () => { });
         else if (option.Event != null)
             Raise(option.Event);
     }

@@ -167,9 +167,6 @@ public class GameState : ServiceComponent<IGameState>, IGameState
             }
         });
 
-        On<ModifyGoldEvent>(e => Warn($"TODO: {e} not handled"));
-        On<ModifyRationsEvent>(e => Warn($"TODO: {e} not handled"));
-        On<ModifyItemCountEvent>(e => Warn($"TODO: {e} not handled"));
         On<SetSpecialItemActiveEvent>(ActivateItem);
 
         On<EventChainOffEvent>(e => _game.SetChainDisabled(e.Map, e.ChainNumber, SetFlag(e.Operation, _game.IsChainDisabled(e.Map, e.ChainNumber))));

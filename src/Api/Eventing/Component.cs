@@ -96,6 +96,7 @@ public abstract class Component : IComponent
     /// <returns>The number of async handlers which have either already called the continuation or intend to call it in the future.</returns>
     protected int RaiseAsync(IAsyncEvent @event, Action continuation)
     {
+        if (continuation == null) throw new ArgumentNullException(nameof(continuation));
         var context = Context;
         int promisedCalls = Exchange?.RaiseAsync(@event, this, 
             () =>
@@ -120,6 +121,7 @@ public abstract class Component : IComponent
     /// <returns>The number of async handlers which have either already called the continuation or intend to call it in the future.</returns>
     protected int RaiseAsync<T>(IAsyncEvent<T> @event, Action<T> continuation)
     {
+        if (continuation == null) throw new ArgumentNullException(nameof(continuation));
         var context = Context;
         int promisedCalls = Exchange?.RaiseAsync(@event, this,
             x =>

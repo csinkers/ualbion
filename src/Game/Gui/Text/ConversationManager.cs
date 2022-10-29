@@ -27,9 +27,9 @@ public class ConversationManager : ServiceComponent<IConversationManager>, IConv
     }
 
     TextId ContextTextSource =>
-        ((EventContext)Context)?.EventSet.TextId 
-        ?? 
-        Resolve<IMapManager>().Current.MapId.ToMapText();
+        Context is EventContext { EventSet: { } } context
+            ? context.EventSet.TextId
+            : Resolve<IMapManager>().Current.MapId.ToMapText();
 
     bool OnNpcTextEvent(NpcTextEvent e, Action continuation)
     {

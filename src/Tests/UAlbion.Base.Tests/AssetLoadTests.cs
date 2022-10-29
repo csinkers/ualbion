@@ -384,7 +384,7 @@ public class AssetLoadTests : IDisposable
 
         Assert.Equal(96, map.Npcs.Count);
         var n = map.Npcs[2];
-        Assert.Equal(AssetId.From(EventSet.Christine), n.Id);
+        Assert.Equal(AssetId.From(NpcSheet.Christine), n.Id);
         Assert.Equal(AssetId.From(NpcLargeGfx.Christine), n.SpriteOrGroup);
         Assert.Equal(NpcType.Npc, n.Type);
         Assert.Equal(TriggerTypes.Normal, n.Triggers);
@@ -444,7 +444,7 @@ public class AssetLoadTests : IDisposable
 
         Assert.Equal(96, map.Npcs.Count);
         var n = map.Npcs[2];
-        Assert.Equal(AssetId.From(MonsterGroup.Empty), n.Id);
+        Assert.Equal(new AssetId(AssetType.MapTextIndex, 1), n.Id);
         Assert.Equal(new AssetId(AssetType.ObjectGroup, 68), n.SpriteOrGroup);
         Assert.Equal(NpcType.Prop, n.Type);
         Assert.Equal(MapNpcFlags.SimpleMsg | MapNpcFlags.Unk5, n.Flags);

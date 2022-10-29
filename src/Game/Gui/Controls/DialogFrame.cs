@@ -104,7 +104,8 @@ public class DialogFrame : UiElement
                 var colors = Resolve<ICommonColors>();
                 multi.AddTexture(1, colors.BorderTexture,
                     FrameOffsetX, FrameOffsetY, 0, false,
-                    width - FrameOffsetX * 2, height - FrameOffsetY * 2, 128);
+                    width - FrameOffsetX * 2, height - FrameOffsetY * 2, 128,
+                    new[] { 1 }); // Just the black region
                 break;
             }
         }

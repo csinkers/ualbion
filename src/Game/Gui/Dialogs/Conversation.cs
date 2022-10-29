@@ -201,6 +201,7 @@ public class Conversation : Component
     {
         if (mapTextEvent == null) throw new ArgumentNullException(nameof(mapTextEvent));
         if (continuation == null) throw new ArgumentNullException(nameof(continuation));
+
         var tf = Resolve<ITextFormatter>();
         switch (mapTextEvent.Location)
         {

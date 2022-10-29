@@ -92,7 +92,8 @@ public class CompositedTexture : IReadOnlyTexture<uint>
         bool isAlphaTested,
         int? w = null,
         int? h = null,
-        byte alpha = 255) 
+        byte alpha = 255,
+        int[] regions = null) 
     {
         if (logicalId == 0)
             throw new InvalidOperationException("Logical Subimage Index 0 is reserved for a blank / transparent state");
@@ -113,7 +114,8 @@ public class CompositedTexture : IReadOnlyTexture<uint>
             Y = y,
             W = w,
             H = h,
-            Alpha = alpha
+            Alpha = alpha,
+            Regions = regions
         });
 
         _isMetadataDirty = true;
@@ -179,7 +181,8 @@ public class CompositedTexture : IReadOnlyTexture<uint>
                 if (lsi.H < component.Y + size.Y)
                     lsi.H = component.Y + (int)size.Y;
 
-                frames = ApiUtil.Lcm(frames, component.Texture.Regions.Count);
+                int componentFrameCount = component.Regions?.Length ?? component.Texture.Regions.Count;
+                frames = ApiUtil.Lcm(frames, componentFrameCount);
                 if (component.Texture is IReadOnlyTexture<byte> eightBit)
                 {
                     var colours = new HashSet<byte>();
@@ -229,7 +232,10 @@ public class CompositedTexture : IReadOnlyTexture<uint>
             if (component.Texture == null)
                 continue;
 
-            int frame = frameNumber % component.Texture.Regions.Count;
+            int frame = component.Regions == null
+                ? frameNumber % component.Texture.Regions.Count
+                : component.Regions[frameNumber % component.Regions.Length];
+
             if (component.Texture is IReadOnlyTexture<byte> eightBitTexture)
             {
                 int palFrame = frameNumber % palette.Height;

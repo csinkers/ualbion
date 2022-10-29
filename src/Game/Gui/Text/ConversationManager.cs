@@ -21,7 +21,6 @@ public class ConversationManager : ServiceComponent<IConversationManager>, IConv
     {
         OnAsync<StartDialogueEvent>(StartDialogue);
         OnAsync<StartPartyDialogueEvent>(StartPartyDialogue);
-        OnAsync<TextEvent>(OnTextEvent);
         OnAsync<TextEvent>(OnBaseTextEvent);
         OnAsync<NpcTextEvent>(OnNpcTextEvent);
         OnAsync<PartyMemberTextEvent>(OnPartyMemberTextEvent);
@@ -44,12 +43,6 @@ public class ConversationManager : ServiceComponent<IConversationManager>, IConv
         return OnBaseTextEvent(textEvent, continuation);
     }
 
-    bool OnTextEvent(TextEvent e, Action continuation)
-    {
-        var textEvent = new TextEvent(e.SubId, e.Location, e.Speaker);
-        return OnBaseTextEvent(textEvent, continuation);
-    }
-
     bool OnBaseTextEvent(TextEvent mapTextEvent, Action continuation)
     {
         var conversationResult = Conversation?.OnText(mapTextEvent, continuation);
@@ -57,7 +50,7 @@ public class ConversationManager : ServiceComponent<IConversationManager>, IConv
             return conversationResult.Value;
 
         var tf = Resolve<ITextFormatter>();
-        switch(mapTextEvent.Location)
+        switch (mapTextEvent.Location)
         {
             case TextLocation.NoPortrait:
                 {

@@ -10,5 +10,6 @@ class SubImageComponent
     public int? W { get; set; }
     public int? H { get; set; }
     public byte Alpha { get; set; } = 0xff;
+    public int[] Regions { get; set; } // null = use all regions in Texture
     public override string ToString() => $"({X}, {Y}) {Texture}";
 }

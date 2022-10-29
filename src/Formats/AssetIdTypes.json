@@ -38,7 +38,7 @@
       "PartySheet"
     ],
     "MonsterId": [ "MonsterSheet" ],
-    "NpcId": [ "NpcSheet" ],
+    "NpcSheetId": [ "NpcSheet" ],
     "PartyMemberId": [ "PartyMember" ],
     "TargetId": [
       "Target",

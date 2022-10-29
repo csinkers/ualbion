@@ -59,7 +59,7 @@ public static class NpcMap
 
                 var waypoints = BuildPatrolPath(x0+3, y0+6);
                 map.Npcs.Add(new MapNpc {
-                    Id = (NpcId)NpcSheet.Cuarnainn, // (NpcId)(UAlbion.Base.Npc)(index+1),
+                    Id = (NpcSheetId)NpcSheet.Cuarnainn, // (NpcId)(UAlbion.Base.Npc)(index+1),
                     Type = NpcType.Npc,
                     SpriteOrGroup = (SpriteId)NpcLargeGfx.Rainer, // (SpriteId)(UAlbion.Base.LargeNpc)(index+1),
                     Flags = 0, // (NpcFlags.SimpleMsg), // (NpcFlags)index,

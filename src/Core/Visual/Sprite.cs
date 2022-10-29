@@ -172,12 +172,11 @@ public class Sprite : Component, IPositioned
         if (!hit.HasValue)
             return;
 
-        object selected = this;
-        if (SelectionCallback != null)
-             selected = SelectionCallback();
+        e.Selections.Add(new Selection(hit.Value.Item2, hit.Value.Item1, this));
 
+        var selected = SelectionCallback?.Invoke();
         if (selected != null)
-            e.Selections.Add(new Selection(hit.Value.Item2, hit.Value.Item1, this));
+            e.Selections.Add(new Selection(hit.Value.Item2, hit.Value.Item1, selected));
     }
 
     public (float, Vector3)? RayIntersect(Vector3 origin, Vector3 direction)

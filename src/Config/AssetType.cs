@@ -80,6 +80,7 @@ public enum AssetType : byte
     [Localised] Text,
     [Localised] Word,
 
+    [Unmapped] MapTextIndex = 252, // Used for NPCs with the SimpleMsg flag
     [Unmapped] PromptNumber = 251, // Used for DialogueLine actions
     [Unmapped] LocalNpc = 252, // For identifying NPCs in a map by their slot number
     Target = 253, // For targeting DataChangeEvents etc

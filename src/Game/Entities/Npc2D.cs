@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
@@ -135,9 +136,13 @@ public class Npc2D : Component
         );
     }
 
+    bool CanTalk => 
+        _state.Id.Type is AssetType.NpcSheet or AssetType.MapTextIndex 
+        || _state.EventIndex != EventNode.UnusedEventId;
+
     void OnRightClick(ShowMapMenuEvent e)
     {
-        if (_state.EventIndex == EventNode.UnusedEventId)
+        if (!CanTalk)
             return;
 
         var window = Resolve<IWindowManager>();
@@ -176,14 +181,19 @@ public class Npc2D : Component
 
     IEvent BuildInteractionEvent()
     {
-        // TODO: SimpleMsg handling, monster handling
-        if (_state.EventIndex == EventNode.UnusedEventId)
-            return null;
+        if (_state.EventIndex != EventNode.UnusedEventId)
+            return new TriggerChainEvent(
+                _state.EventSet,
+                _state.EventIndex,
+                new EventSource(_state.Id, TriggerTypes.TalkTo));
 
-        return new TriggerChainEvent(
-            _state.EventSet,
-            _state.EventIndex,
-            new EventSource(_state.Id, TriggerTypes.TalkTo));
+        if (_state.Id.Type == AssetType.NpcSheet)
+            return new StartDialogueEvent(_state.Id);
+
+        if (_state.Id.Type == AssetType.MapTextIndex)
+            return new TextEvent((ushort)_state.Id.Id, TextLocation.NoPortrait, SheetId.None);
+
+        return null;
     }
 
     void SetTarget(int x, int y)

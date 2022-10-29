@@ -28,7 +28,7 @@ public class ConversationManager : ServiceComponent<IConversationManager>, IConv
     }
 
     TextId ContextTextSource =>
-        ((EventContext)Context)?.EventSet.TextId 
+        ((EventContext)Context)?.EventSet?.TextId 
         ?? 
         Resolve<IMapManager>().Current.MapId.ToMapText();
 

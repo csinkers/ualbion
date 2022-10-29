@@ -12,10 +12,10 @@ namespace UAlbion.Formats.MapEvents;
 public class StartDialogueEvent : MapEvent, IAsyncEvent
 {
     StartDialogueEvent() { }
-    public StartDialogueEvent(NpcId npcId) => NpcId = npcId;
+    public StartDialogueEvent(NpcSheetId npcId) => NpcId = npcId;
 
     [EventPart("npc_id")]
-    public NpcId NpcId { get; private set; }
+    public NpcSheetId NpcId { get; private set; }
 
     public static StartDialogueEvent Serdes(StartDialogueEvent e, AssetMapping mapping, ISerializer s)
     {
@@ -26,7 +26,7 @@ public class StartDialogueEvent : MapEvent, IAsyncEvent
         s.UInt8("Pad3", 0);
         s.UInt8("Pad4", 0);
         s.UInt8("Pad5", 0);
-        e.NpcId = NpcId.SerdesU8(nameof(NpcId), e.NpcId, mapping, s);
+        e.NpcId = NpcSheetId.SerdesU8(nameof(NpcId), e.NpcId, mapping, s);
         s.UInt8("Pad7", 0);
         s.UInt16("Pad8", 0);
         return e;

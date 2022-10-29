@@ -13,9 +13,22 @@ public class ContextMenuMouseMode : Component
     readonly List<Selection> _hits = new();
     readonly UiLeftClickEvent _leftClickEvent = new();
     readonly UiLeftReleaseEvent _leftReleaseEvent = new();
+    bool _wasClockRunning;
 
     public ContextMenuMouseMode() => On<InputEvent>(OnInput);
-    protected override void Subscribed() => Raise(new SetCursorEvent(Base.CoreGfx.Cursor));
+    protected override void Subscribed()
+    {
+        Raise(new SetCursorEvent(Base.CoreGfx.Cursor));
+        _wasClockRunning = Resolve<IClock>()?.IsRunning ?? false;
+        if(_wasClockRunning)
+            Raise(new StopClockEvent());
+    }
+
+    protected override void Unsubscribed()
+    {
+        if (_wasClockRunning)
+            Raise(new StartClockEvent());
+    }
 
     void OnInput(InputEvent e)
     {

@@ -82,7 +82,7 @@ public class NpcState : IMovementState
         NpcMoveState.Serdes(npc.NpcMoveState, s);
 
         // TODO
-        var assetType = MapNpc.AssetTypeForNpcType(npc.Type);
+        var assetType = MapNpc.AssetTypeForNpcType(npc.Type, (npc.Flags & NpcFlags.SimpleMsg) != 0);
         npc.Id = AssetId.FromDisk(assetType, id, c.mapping);
 
         ApiUtil.Assert(s.Offset == startOffset + 0x80);

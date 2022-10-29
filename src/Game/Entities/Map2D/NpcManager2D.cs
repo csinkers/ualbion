@@ -66,8 +66,7 @@ class NpcManager2D : Component
             if (npc.IsUnused)
                 continue;
 
-            _npcs[index] = new Npc2D(state, npc, (byte)index, _logicalMap.UseSmallSprites);
-            _npcs[index].IsActive = !isDisabled;
+            _npcs[index] = new Npc2D(state, npc, (byte)index, _logicalMap.UseSmallSprites) { IsActive = !isDisabled };
             AttachChild(_npcs[index]);
         }
 
@@ -88,6 +87,7 @@ class NpcManager2D : Component
         state.Triggers = npc.Triggers;
         state.EventSet = mapEvents;
         state.EventIndex = npc.EventIndex;
+
         state.MovementType = npc.Movement;
         state.WasActive = (ushort)(active ? 1 : 0);
         state.Flags =

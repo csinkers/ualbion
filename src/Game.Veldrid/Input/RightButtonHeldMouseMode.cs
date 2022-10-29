@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
@@ -15,6 +14,8 @@ namespace UAlbion.Game.Veldrid.Input;
 
 public class RightButtonHeldMouseMode : Component
 {
+    static readonly PopMouseModeEvent _popMouseModeEvent = new();
+    static readonly ShowMapMenuEvent _showMapMenuEvent = new();
     readonly List<Selection> _hits = new();
     readonly MapSprite _cursor;
     Vector2 _lastTilePosition;
@@ -76,7 +77,8 @@ public class RightButtonHeldMouseMode : Component
 
     void ShowContextMenu(IEnumerable<Selection> orderedHits)
     {
-        Raise(new PopMouseModeEvent());
-        Distribute(new ShowMapMenuEvent(), orderedHits, x => x.Target as IComponent);
+        _showMapMenuEvent.Propagating = true;
+        Raise(_popMouseModeEvent);
+        Distribute(_showMapMenuEvent, orderedHits, x => x.Target as IComponent);
     }
 }

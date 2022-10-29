@@ -90,7 +90,7 @@ public class MapNpc // 0xA = 10 bytes
 
         npc._raw = s.EnumU16(nameof(Flags), npc._raw);
         npc.Triggers = s.EnumU16(nameof(Triggers), npc.Triggers);
-        var assetType = AssetTypeForNpcType(npc.Type);
+        var assetType = AssetTypeForNpcType(npc.Type, (npc.Flags & MapNpcFlags.SimpleMsg) != 0);
         npc.Id = AssetId.FromDisk(assetType, id, mapping);
 
         s.End();
@@ -100,15 +100,20 @@ public class MapNpc // 0xA = 10 bytes
         return npc;
     }
 
-    public static AssetType AssetTypeForNpcType(NpcType type) =>
-        type switch
+    public static AssetType AssetTypeForNpcType(NpcType type, bool simpleMessageFlag)
+    {
+        if (simpleMessageFlag)
+            return AssetType.MapTextIndex;
+
+        return type switch
         {
             NpcType.Party => AssetType.EventSet, // TODO: Add the 980 offset
             NpcType.Monster => AssetType.MonsterGroup,
             NpcType.Prop => AssetType.MonsterGroup,
-            _ => AssetType.EventSet
+            _ => AssetType.NpcSheet // NPCs
         };
 
+    }
     public void LoadWaypoints(ISerializer s, bool useWaypoints)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));

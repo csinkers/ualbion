@@ -31,7 +31,8 @@
     "Inks.json": {
       "Container": "jsonObj",
       "Loader": "ink",
-      "Map": { "0": { "Id": "ink.White" } }
+      "Max": 99,
+      "Map": { "1": { "Id": "ink.White" } }
     }
   }
 }

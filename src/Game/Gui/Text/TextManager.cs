@@ -6,6 +6,7 @@ using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
+using UAlbion.Game.Assets;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Text;
 
@@ -19,6 +20,9 @@ public class TextManager : ServiceComponent<ITextManager>, ITextManager
         int offset = 0;
         var assets = Resolve<IAssetManager>();
         var font = assets.LoadFont(block.Style == TextStyle.Big ? Base.Font.Bold : Base.Font.Regular, block.InkId);
+        if (font == null)
+            throw new AssetNotFoundException($"Could not load font {block.Style}.{block.InkId}");
+
         if (block.Text == null)
             return Vector2.Zero;
 

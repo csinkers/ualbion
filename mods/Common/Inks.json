@@ -11,9 +11,9 @@
     "HueOffset": 30
   },
   "ink.YellowOrange": {
-    "PaletteLineColor": "Orange5", // TODO: Verify
-    "PaletteMapping": [ 0, 194, 208, 209, 210, 211 ],
-    "HueOffset": 20
+    "PaletteLineColor": "Yellow4",
+    "PaletteMapping": [ 0, 219, 220, 221, 222, 223 ],
+    "HueOffset": 30
   },
   "ink.Gray": {
     "PaletteLineColor": "Grey6", // TODO: Verify

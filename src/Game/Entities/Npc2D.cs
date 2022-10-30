@@ -31,6 +31,7 @@ public class Npc2D : Component
     readonly MapSprite _sprite;
     readonly byte _npcNumber;
     readonly bool _isLarge;
+
     IMovementSettings _moveSettings;
     // int _frameCount;
     int _targetX;
@@ -247,6 +248,6 @@ public class Npc2D : Component
             _ => (0, -1),
         };
 
-        SetTarget(x,y);
+        SetTarget(x + _state.X, y + _state.Y);
     }
 }

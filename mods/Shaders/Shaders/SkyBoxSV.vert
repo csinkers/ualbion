@@ -1,4 +1,4 @@
-﻿#include "SkyboxSV.h.vert"
+﻿#include "SkyBoxSV.h.vert"
 
 void main()
 {

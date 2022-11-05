@@ -1,4 +1,4 @@
-﻿#include "SkyboxSF.h.frag"
+﻿#include "SkyBoxSF.h.frag"
 
 vec4 Pal(float color)
 {

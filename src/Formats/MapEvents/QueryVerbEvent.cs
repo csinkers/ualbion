@@ -5,24 +5,24 @@ using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Formats.MapEvents;
 
-[Event("query_verb")]
-public class QueryChosenVerbEvent : QueryEvent
+[Event("verb")]
+public class QueryVerbEvent : QueryEvent
 {
     public override QueryType QueryType => QueryType.ChosenVerb;
     [EventPart("arg")] public TriggerType TriggerType { get; set; }
     [EventPart("op", true, QueryOperation.NonZero)] public QueryOperation Operation { get; private set; } // method to use for check? 0,1,2,3,4,5
     [EventPart("imm", true, (byte)0)] public byte Immediate { get; private set; } // immediate value?
-    QueryChosenVerbEvent() { }
-    public QueryChosenVerbEvent(TriggerType triggerType, QueryOperation operation, byte immediate)
+    QueryVerbEvent() { }
+    public QueryVerbEvent(TriggerType triggerType, QueryOperation operation, byte immediate)
     {
         TriggerType = triggerType;
         Operation = operation;
         Immediate = immediate;
     }
-    public static QueryChosenVerbEvent Serdes(QueryChosenVerbEvent e, ISerializer s)
+    public static QueryVerbEvent Serdes(QueryVerbEvent e, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        e ??= new QueryChosenVerbEvent();
+        e ??= new QueryVerbEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         e.Immediate = s.UInt8(nameof(Immediate), e.Immediate);
         int zeroes = s.UInt8(null, 0);

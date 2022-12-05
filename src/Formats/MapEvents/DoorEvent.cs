@@ -6,7 +6,7 @@ using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.MapEvents;
 
-[Event("open_door", "Opens the inventory screen for the given door")]
+[Event("door", "Opens the inventory screen for the given door")]
 public class DoorEvent : MapEvent, ILockedInventoryEvent
 {
     public static DoorEvent Serdes(DoorEvent e, AssetMapping mapping, ISerializer s)

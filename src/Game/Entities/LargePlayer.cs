@@ -10,6 +10,7 @@ namespace UAlbion.Game.Entities;
 
 public class LargePlayer : Component
 {
+    static readonly Vector3 SpriteTileOffset = new(1.0f, 1.0f, 0.0f);
     readonly PartyMemberId _id;
     readonly Func<(Vector3, int)> _positionFunc;
     readonly MapSprite _sprite;
@@ -17,8 +18,8 @@ public class LargePlayer : Component
 
     public LargePlayer(PartyMemberId charId, Func<(Vector3, int)> positionFunc)
     {
-        On<FastClockEvent>(e => Update());
-        On<MapInitEvent>(e => Update());
+        On<FastClockEvent>(_ => Update());
+        On<MapInitEvent>(_ => Update());
 
         _id = charId;
         _positionFunc = positionFunc;
@@ -33,7 +34,7 @@ public class LargePlayer : Component
     void Update()
     {
         var (pos, frame) = _positionFunc();
-        _sprite.TilePosition = pos + new Vector3(0.0f, 1.0f, 0.0f); // TODO: Hacky, find a better way of fixing.
+        _sprite.TilePosition = pos + SpriteTileOffset;
         _sprite.Frame = frame;
     }
 }

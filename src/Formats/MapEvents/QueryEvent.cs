@@ -31,7 +31,7 @@ public abstract class QueryEvent : MapEvent, IBranchingEvent
             // QueryType.Rations => TODO
             QueryType.RandomChance => QueryRandomChanceEvent.Serdes((QueryRandomChanceEvent)e, s),
             QueryType.Hour => QueryHourEvent.Serdes((QueryHourEvent)e, s),
-            QueryType.ChosenVerb => QueryChosenVerbEvent.Serdes((QueryChosenVerbEvent)e, s),
+            QueryType.ChosenVerb => QueryVerbEvent.Serdes((QueryVerbEvent)e, s),
             QueryType.Conscious => QueryConsciousEvent.Serdes((QueryConsciousEvent)e, mapping, s),
             QueryType.Leader => QueryLeaderEvent.Serdes((QueryLeaderEvent)e, mapping, s),
             QueryType.Ticker => QueryTickerEvent.Serdes((QueryTickerEvent)e, mapping, s),

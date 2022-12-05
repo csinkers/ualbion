@@ -40,6 +40,7 @@ public class CameraMotion2D : Component
                 _camera.Position = _position;
             }
         });
+
         On<CameraMoveEvent>(e =>
         {
             var map = TryResolve<IMapManager>()?.Current;
@@ -70,7 +71,13 @@ public class CameraMotion2D : Component
             if (leader == null)
                 return;
 
-            var position = leader.GetPosition() * map.TileSize;
+            var tileOffset = new Vector3(
+                GameVars.Visual.Camera2D.TileOffsetX.Read(settings),
+                GameVars.Visual.Camera2D.TileOffsetY.Read(settings),
+                0);
+
+            var tilePosition = leader.GetPosition() + tileOffset;
+            var position = tilePosition * map.TileSize;
             var curPosition2 = new Vector2(_position.X, _position.Y);
             var position2 = new Vector2(position.X, position.Y);
 

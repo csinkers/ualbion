@@ -174,7 +174,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         On<NpcOffEvent>(e => _game.SetNpcDisabled(MapId.None, e.NpcNum, true));
         On<NpcOnEvent>(e => _game.SetNpcDisabled(MapId.None, e.NpcNum, false));
         On<SetChestOpenEvent>(e => _game.SetChestOpen(e.Chest, SetFlag(e.Operation, _game.IsChestOpen(e.Chest))));
-        On<DoorOpenEvent>(e => _game.SetDoorOpen(e.Door, SetFlag(e.Operation, _game.IsDoorOpen(e.Door))));
+        On<SetDoorOpenEvent>(e => _game.SetDoorOpen(e.Door, SetFlag(e.Operation, _game.IsDoorOpen(e.Door))));
         On<DataChangeEvent>(OnDataChange);
         On<SetContextEvent>(e =>
         {
@@ -297,6 +297,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
             MapId = mapId,
             PartyX = x,
             PartyY = y,
+            PartyDirection = Direction.East,
             ActiveMembers = { [0] = Base.PartyMember.Tom },
             CombatPositions = { [0] = 1 } // Tom starts off in the second position
         };
@@ -369,6 +370,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         Raise(new PartyChangedEvent());
         Raise(new PartyJumpEvent(_game.PartyX, _game.PartyY));
         Raise(new CameraJumpEvent(_game.PartyX, _game.PartyY));
+        Raise(new PartyTurnEvent(_game.PartyDirection));
         Raise(new PlayerEnteredTileEvent(_game.PartyX, _game.PartyY));
     }
 

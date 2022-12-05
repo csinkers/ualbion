@@ -60,6 +60,8 @@ public static class GameVars
         public static class Camera2D
         {
             public static readonly FloatVar LerpRate = new("Visual.Camera2D.LerpRate", 3.0f);
+            public static readonly FloatVar TileOffsetX = new("Visual.Camera2D.TileOffsetX", 0.0f);
+            public static readonly FloatVar TileOffsetY = new("Visual.Camera2D.TileOffsetY", 0.0f);
         }
     }
 }

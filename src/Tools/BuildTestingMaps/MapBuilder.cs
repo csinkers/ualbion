@@ -6,6 +6,8 @@ using UAlbion.Formats.Ids;
 
 namespace BuildTestingMaps;
 
+public delegate int StringCreationFunc(string text);
+public delegate string ScriptBuilderFunc(StringCreationFunc createString);
 public abstract class MapBuilder
 {
     protected BaseMapData Map { get; }
@@ -25,7 +27,7 @@ public abstract class MapBuilder
     public int Width => Map.Width;
     public int Height => Map.Height;
 
-    public MapBuilder SetChain(int i, Func<Func<string, int>, string> func)
+    public MapBuilder SetChain(int i, ScriptBuilderFunc func)
     {
         _scripts[i] = func(AddMapText);
         return this;

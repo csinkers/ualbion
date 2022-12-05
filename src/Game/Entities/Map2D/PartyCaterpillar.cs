@@ -32,6 +32,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
         {
             X = (ushort)initialPosition.X,
             Y = (ushort)initialPosition.Y,
+            FacingDirection = initialDirection
         };
 
         _trail = new (Vector3, int)[TrailLength];
@@ -78,7 +79,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
         {
             var position = new Vector2(e.X, e.Y);
             for (int i = 0; i < _trail.Length; i++)
-                _trail[i] = (To3D(position), 0);
+                _trail[i] = (To3D(position), _settings.GetSpriteFrame(_state, GetSitMode));
 
             _state.X = (ushort)e.X;
             _state.Y = (ushort)e.Y;

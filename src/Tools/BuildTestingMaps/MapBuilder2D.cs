@@ -29,10 +29,10 @@ public class MapBuilder2D : MapBuilder
         });
     }
 
-    public void Marker(int index, int x, int y, string description, Func<Func<string,int>, string> script)
+    public void Marker(int index, int x, int y, string description, ScriptBuilderFunc script)
     {
         SetChain(index, s => @$"
-if (query_verb examine) {{
+if (verb examine) {{
     text {s(description)}
 }} else {{
    {script(s)}

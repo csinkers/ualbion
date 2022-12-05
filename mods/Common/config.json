@@ -33,6 +33,8 @@
   "UI.Transitions.MaxDiscardTransitions": 24,
 
   "Visual.Camera2D.LerpRate": 3.0,
+  "Visual.Camera2D.TileOffsetX": 1.0,
+  "Visual.Camera2D.TileOffsetY": 2.0,
   "Visual.Skybox.VisibleProportion": 0.8,
   "Visual.SpriteManager.CacheCheckIntervalSeconds": 12.0,
   "Visual.TextureSource.CacheCheckIntervalSeconds": 5.0,

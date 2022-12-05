@@ -7,13 +7,13 @@ using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.MapEvents;
 
-[Event("door_open")]
-public class DoorOpenEvent : ModifyEvent
+[Event("set_door_open")]
+public class SetDoorOpenEvent : ModifyEvent
 {
-    public static DoorOpenEvent Serdes(DoorOpenEvent e, AssetMapping mapping, ISerializer s)
+    public static SetDoorOpenEvent Serdes(SetDoorOpenEvent e, AssetMapping mapping, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        e ??= new DoorOpenEvent();
+        e ??= new SetDoorOpenEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         int zeroes = s.UInt8("byte3", 0);
         zeroes += s.UInt8("byte4", 0);
@@ -24,8 +24,8 @@ public class DoorOpenEvent : ModifyEvent
         return e;
     }
 
-    DoorOpenEvent() { }
-    public DoorOpenEvent(SwitchOperation operation, DoorId door)
+    SetDoorOpenEvent() { }
+    public SetDoorOpenEvent(SwitchOperation operation, DoorId door)
     {
         Operation = operation;
         Door = door;

@@ -149,7 +149,7 @@ public class EventRoundTripTests
     [Fact]
     public void DoorOpen()
     {
-        Test(("door_open Set Door.Beastmaster", new DoorOpenEvent(SwitchOperation.Set, Base.Door.Beastmaster)));
+        Test(("set_door_open Set Door.Beastmaster", new SetDoorOpenEvent(SwitchOperation.Set, Base.Door.Beastmaster)));
     }
 
     [Fact]
@@ -361,10 +361,10 @@ execute 1 1");
     [Fact]
     public void Inv()
     {
-        Test(@"open_chest Chest.HClan_3Stim25r Item.Pistol 1 2 3
-open_chest Chest.HClan_3Stim25r
-open_door Door.HerrasDoor_HerrasKey Item.HerrasKey 1 2 3
-open_door Door.HerrasDoor_HerrasKey");
+        Test(@"chest Chest.HClan_3Stim25r Item.Pistol 1 2 3
+chest Chest.HClan_3Stim25r
+door Door.HerrasDoor_HerrasKey Item.HerrasKey 1 2 3
+door Door.HerrasDoor_HerrasKey");
     }
 
     [Fact]
@@ -469,7 +469,7 @@ query_unkc Equals 0 0
 query_unkc Equals 0 1
 used_item Item.Pistol Equals
 used_item Item.Pistol
-query_verb MapInit");
+verb MapInit");
     }
 
     [Fact]

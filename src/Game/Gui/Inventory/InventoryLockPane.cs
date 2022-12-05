@@ -21,7 +21,7 @@ public class InventoryLockPane : UiElement
     {
         On<PickLockEvent>(_ => PickLock());
         _lockEvent = lockEvent;
-        bool isChest = lockEvent is OpenChestEvent;
+        bool isChest = lockEvent is ChestEvent;
         var background = new UiSpriteElement(isChest ? Base.Picture.ClosedChest : Base.Picture.WoodenDoor);
         var backgroundStack = new FixedPositionStack();
         backgroundStack.Add(background, 0, 0);

@@ -22,7 +22,7 @@ public class InventoryScreenManager : Component
 
     public InventoryScreenManager()
     {
-        OnAsync<OpenChestEvent, bool>(OpenChest);
+        OnAsync<ChestEvent, bool>(OpenChest);
         OnAsync<DoorEvent, bool>(OpenDoor);
         OnAsync<MerchantEvent>(TalkToMerchant);
         On<InventoryOpenEvent>(e => SetDisplayedPartyMember(e.PartyMemberId));
@@ -37,7 +37,7 @@ public class InventoryScreenManager : Component
         On<LockOpenedEvent>(_ => LockOpened());
         On<TakeAllEvent>(_ =>
         {
-            if (_modeEvent is OpenChestEvent chest)
+            if (_modeEvent is ChestEvent chest)
                 Raise(new InventoryTakeAllEvent(chest.ChestId));
         });
     }
@@ -59,7 +59,7 @@ public class InventoryScreenManager : Component
         return true;
     }
 
-    bool OpenChest(OpenChestEvent e, Action<bool> continuation)
+    bool OpenChest(ChestEvent e, Action<bool> continuation)
     {
         Raise(new PushSceneEvent(SceneId.Inventory));
         _continuation?.Invoke(false);

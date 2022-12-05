@@ -19,7 +19,7 @@ public class Collider2D : Component, IMovementCollider
     protected override void Unsubscribed() => Resolve<ICollisionManager>()?.Unregister(this);
     public bool IsOccupied(int fromX, int fromY, int toX, int toY) => 
         IsOccupiedCore(fromX, fromY, toX, toY) ||
-        _isLargeMap && IsOccupiedCore(fromX - 1, fromY, toX - 1, toY);
+        _isLargeMap && IsOccupiedCore(fromX + 1, fromY, toX + 1, toY);
 
     bool IsOccupiedCore(int fromX, int fromY, int toX, int toY)
     {

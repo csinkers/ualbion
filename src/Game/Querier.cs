@@ -23,7 +23,7 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
 
     public Querier()
     {
-        OnAsync(Do<QueryChosenVerbEvent>(q =>
+        OnAsync(Do<QueryVerbEvent>(q =>
             {
                 var triggers = ((EventContext)Context).Source.Trigger;
                 var queryTrigger = (TriggerTypes)(1 << (int)q.TriggerType);

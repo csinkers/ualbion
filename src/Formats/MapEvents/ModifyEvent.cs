@@ -15,8 +15,8 @@ public abstract class ModifyEvent : MapEvent
         {
             ModifyType.Switch         =>          SwitchEvent.Serdes(         (SwitchEvent)genericEvent, mapping, s), // 0
             ModifyType.EventChainOff  =>   EventChainOffEvent.Serdes(  (EventChainOffEvent)genericEvent, mapping, s), // 1
-            ModifyType.DoorOpen       =>        DoorOpenEvent.Serdes(       (DoorOpenEvent)genericEvent, mapping, s), // 2
-            ModifyType.ChestOpen      =>       SetChestOpenEvent.Serdes(      (SetChestOpenEvent)genericEvent, mapping, s), // 3
+            ModifyType.DoorOpen       =>     SetDoorOpenEvent.Serdes(    (SetDoorOpenEvent)genericEvent, mapping, s), // 2
+            ModifyType.ChestOpen      =>    SetChestOpenEvent.Serdes(   (SetChestOpenEvent)genericEvent, mapping, s), // 3
             ModifyType.NpcOff         =>    ModifyNpcOffEvent.Serdes(   (ModifyNpcOffEvent)genericEvent, mapping, s), // 4
             ModifyType.AddPartyMember =>  AddPartyMemberEvent.Serdes( (AddPartyMemberEvent)genericEvent, mapping, s), // 5
             ModifyType.ItemCount      => ModifyItemCountEvent.Serdes((ModifyItemCountEvent)genericEvent, mapping, s), // 6
@@ -24,11 +24,11 @@ public abstract class ModifyEvent : MapEvent
             ModifyType.MapLighting    =>     MapLightingEvent.Serdes(    (MapLightingEvent)genericEvent, s),          // B
             ModifyType.PartyGold      =>      ModifyGoldEvent.Serdes(     (ModifyGoldEvent)genericEvent, s),          // F
             ModifyType.PartyRations   =>   ModifyRationsEvent.Serdes(  (ModifyRationsEvent)genericEvent, s),          // 10
-            ModifyType.TimeHours      =>    ModifyHoursEvent.Serdes(     (ModifyHoursEvent)genericEvent, s),          // 12
+            ModifyType.TimeHours      =>     ModifyHoursEvent.Serdes(    (ModifyHoursEvent)genericEvent, s),          // 12
             ModifyType.Leader         =>  SetPartyLeaderEvent.Serdes( (SetPartyLeaderEvent)genericEvent, mapping, s), // 1A
             ModifyType.TimeDays       =>      ModifyDaysEvent.Serdes(     (ModifyDaysEvent)genericEvent, s),          // 1B
             ModifyType.Ticker         =>          TickerEvent.Serdes(         (TickerEvent)genericEvent, mapping, s), // 1C
-            ModifyType.TimeMTicks     =>  ModifyMTicksEvent.Serdes(     (ModifyMTicksEvent)genericEvent, s),          // 1E
+            ModifyType.TimeMTicks     =>    ModifyMTicksEvent.Serdes(   (ModifyMTicksEvent)genericEvent, s),          // 1E
             _ => throw new InvalidEnumArgumentException(nameof(subType), (int)subType, typeof(ModifyType))
         };
     }

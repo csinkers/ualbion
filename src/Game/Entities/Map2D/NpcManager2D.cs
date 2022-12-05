@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
@@ -61,19 +63,19 @@ class NpcManager2D : Component
             bool isDisabled = game.IsNpcDisabled(_logicalMap.Id, (byte)index);
 
             if (initialise)
-                InitialiseState(npc, state, !isDisabled, _logicalMap.Events);
+                InitialiseState(npc, state, !isDisabled, _logicalMap.Events, _logicalMap.TileSize);
 
             if (npc.IsUnused)
                 continue;
 
-            _npcs[index] = new Npc2D(state, npc, (byte)index, _logicalMap.UseSmallSprites) { IsActive = !isDisabled };
+            _npcs[index] = new Npc2D(state, npc, (byte)index, !_logicalMap.UseSmallSprites) { IsActive = !isDisabled };
             AttachChild(_npcs[index]);
         }
 
         game.MapIdForNpcs = _logicalMap.Id;
     }
 
-    void InitialiseState(MapNpc npc, NpcState state, bool active, IEventSet mapEvents)
+    static void InitialiseState(MapNpc npc, NpcState state, bool active, IEventSet mapEvents, Vector2 tileSize)
     {
         state.Id = npc.Id;
         state.SpriteOrGroup = npc.SpriteOrGroup;
@@ -107,8 +109,8 @@ class NpcManager2D : Component
         state.Y = npc.Waypoints[0].Y;
         state.X2 = 0;
         state.Y2 = 0;
-        state.PixelX = 0; // initial pos * tileWidth
-        state.PixelY = 0; // initial pos * tileHeight
+        state.PixelX = state.X * tileSize.X;
+        state.PixelY = state.Y * tileSize.Y;
         state.PixelDeltaX = 0;
         state.PixelDeltaY = 0;
         state.Unk42 = 0;
@@ -153,6 +155,13 @@ class NpcManager2D : Component
         if (npcEvent.NpcNum > _npcs.Length)
             return;
 
-        _npcs[npcEvent.NpcNum].Receive(npcEvent, this);
+        var npc = _npcs[npcEvent.NpcNum];
+        if (npc == null)
+        {
+            ApiUtil.Assert($"Tried to send event {npcEvent} to NPC {npcEvent.NpcNum}, but no such NPC exists!");
+            return;
+        }
+
+        npc.Receive(npcEvent, this);
     }
 }

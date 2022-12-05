@@ -24,6 +24,8 @@ namespace UAlbion.Game.Entities;
 
 public class Npc2D : Component
 {
+    static readonly Vector3 LargeTileOffset = new(1, 1, 0);
+    static readonly Vector3 SmallTileOffset = new(0, 0, 0);
     readonly Func<(int, int), (int, int)> _getDesiredDirectionDelegate = x => x;
     readonly Action<int, int> _onTileEnteredDelegate;
     readonly NpcState _state;
@@ -97,19 +99,31 @@ public class Npc2D : Component
                 _getDesiredDirectionDelegate,
                 _onTileEnteredDelegate))
         {
-            _sprite.TilePosition =
-                new Vector3(
-                    _state.PixelX / _moveSettings.TileWidth,
-                    _state.PixelY / _moveSettings.TileHeight,
-                    _moveSettings.GetDepth(_state.Y));
-
-            _sprite.Frame = _moveSettings.GetSpriteFrame(_state, _getSitModeDelegate);
+            SyncSprite();
         }
+    }
+
+    void SyncSprite()
+    {
+        _state.X = (ushort)(_state.PixelX / _moveSettings.TileWidth);
+        _state.Y = (ushort)(_state.PixelY / _moveSettings.TileHeight);
+        _sprite.TilePosition =
+            new Vector3(
+                _state.PixelX / _moveSettings.TileWidth,
+                _state.PixelY / _moveSettings.TileHeight,
+                _moveSettings.GetDepth(_state.Y))
+            + (_isLarge ? LargeTileOffset : SmallTileOffset);
+        _sprite.Frame = _moveSettings.GetSpriteFrame(_state, _getSitModeDelegate);
     }
 
     static readonly Func<int, int, SitMode> _getSitModeDelegate = GetSitMode;
     static SitMode GetSitMode(int x, int y) => SitMode.None; // TODO
-    void OnTurn(NpcTurnEvent e) => _state.NpcMoveState.Direction = e.Direction;
+    void OnTurn(NpcTurnEvent e)
+    {
+        _state.NpcMoveState.Direction = e.Direction;
+        SyncSprite();
+    }
+
     void OnMove(NpcMoveEvent e) => SetTarget(_state.X + e.X, _state.Y + e.Y);
 
     // void Lock(bool shouldLock)
@@ -118,8 +132,9 @@ public class Npc2D : Component
 
     void OnJump(NpcJumpEvent e)
     {
-        _state.X = (ushort)e.X;
-        _state.Y = (ushort)e.Y;
+        _state.PixelX = (ushort)(e.X ?? _state.X) * _moveSettings.TileWidth;
+        _state.PixelY = (ushort)(e.Y ?? _state.Y) * _moveSettings.TileHeight;
+        SyncSprite();
     }
 
     protected override void Subscribed()
@@ -130,11 +145,7 @@ public class Npc2D : Component
             TicksPerTile = GetVar(NpcMoveVars.TicksPerTile)
         };
 
-        _sprite.TilePosition = new Vector3(
-            _state.X,
-            _state.Y,
-            DepthUtil.GetAbsDepth(_state.Y)
-        );
+        SyncSprite();
     }
 
     bool CanTalk => 

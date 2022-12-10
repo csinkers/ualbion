@@ -130,7 +130,7 @@ public static class FlagTestMap
             {
                 Id = (MonsterGroupId)UAlbion.Base.MonsterGroup.TwoSkrinn1OneKrondir1,
                 Type = NpcType.Monster,
-                Movement = NpcMovement.Stationary,
+                Movement = NpcMovement.Waypoints,
                 Waypoints = waypoints,
                 SpriteOrGroup = (SpriteId)NpcLargeGfx.Skrinn,
             };
@@ -141,92 +141,53 @@ public static class FlagTestMap
 
             Add( 9, 5, "<", "NPC0 left", _ => Script(s => $@"
 npc_lock 0
-npc_move 0 -4  0
+npc_move 0 -1  0
 update 1
-text {s("A")}
 update 1
-text {s("B")}
 update 1
-text {s("C")}
 update 1
-text {s("D")}
 npc_unlock 0
 "));
             Add(10, 4, "^", "NPC0 up", _ => Script(_ => @"
 npc_lock 0
-npc_move 0  0 -2
+npc_move 0  0 -1
 update 4
 npc_unlock 0
 "));
             Add(11, 5, ">", "NPC0 rigth", _ => Script(_ => @"
 npc_lock 0
-npc_move 0  2  0
+npc_move 0  1  0
 update 4
 npc_unlock 0
 "));
             Add(10, 6, "v", "NPC0 down", _ => Script(_ => @"
 npc_lock 0
-npc_move 0  0  2
+npc_move 0  0  1
 update 4
 npc_unlock 0
 "));
 
-            Add( 9, 4, "m", "Cycle NPC0 movement", s => $@"
-if (get_ticker 100 Equals 0) {{
-    text {s("Setting movement to 1 (Random)")}
-    ticker 100 SetAmount 1
-    change_icon 0 0 AbsTemp NpcMovement 1
-}} else if (get_ticker 100 Equals 1) {{ 
-    text {s("Setting movement to 2 (Stationary)")}
-    ticker 100 SetAmount 2
-    change_icon 0 0 AbsTemp NpcMovement 2
-}} else if (get_ticker 100 Equals 2) {{ 
-    text {s("Setting movement to 3 (Chase)")}
-    ticker 100 SetAmount 3
-    change_icon 0 0 AbsTemp NpcMovement 3
-}} else if (get_ticker 100 Equals 3) {{ 
-    text {s("Setting movement to 4 (Unk4)")}
-    ticker 100 SetAmount 4
-    change_icon 0 0 AbsTemp NpcMovement 4
-}} else if (get_ticker 100 Equals 4) {{ 
-    text {s("Setting movement to 5 (Unk5)")}
-    ticker 100 SetAmount 5
-    change_icon 0 0 AbsTemp NpcMovement 5
-}} else if (get_ticker 100 Equals 5) {{ 
-    text {s("Setting movement to 6 (Unk6)")}
-    ticker 100 SetAmount 6
-    change_icon 0 0 AbsTemp NpcMovement 6
-}} else if (get_ticker 100 Equals 6) {{ 
-    text {s("Setting movement to 7 (Unk7)")}
-    ticker 100 SetAmount 7
-    change_icon 0 0 AbsTemp NpcMovement 7
-}} else if (get_ticker 100 Equals 7) {{ 
-    text {s("Setting movement to 8 (Unk8)")}
-    ticker 100 SetAmount 8
-    change_icon 0 0 AbsTemp NpcMovement 8
-}} else if (get_ticker 100 Equals 8) {{ 
-    text {s("Setting movement to 9 (Unk9)")}
-    ticker 100 SetAmount 9
-    change_icon 0 0 AbsTemp NpcMovement 9
-}} else if (get_ticker 100 Equals 9) {{ 
-    text {s("Setting movement to 10 (Unk10)")}
-    ticker 100 SetAmount 10
-    change_icon 0 0 AbsTemp NpcMovement 10
-}} else {{
-    text {s("Setting movement to 0 (Waypoints)")}
-    ticker 100 SetAmount 0
-    change_icon 0 0 AbsTemp NpcMovement 0
-}}");
+            Add(5, 2, "m0",  "Setting movement to 0 (Waypoints)",  _ => "change_npc_movement 0 0 AbsTemp");
+            Add(5, 3, "m1",  "Setting movement to 1 (Random)",     _ => "change_npc_movement 0 1 AbsTemp");
+            Add(5, 4, "m2",  "Setting movement to 2 (Stationary)", _ => "change_npc_movement 0 2 AbsTemp");
+            Add(5, 5, "m3",  "Setting movement to 3 (Chase)",      _ => "change_npc_movement 0 3 AbsTemp");
+            Add(5, 6, "m4",  "Setting movement to 4 (Unk4)",       _ => "change_npc_movement 0 4 AbsTemp");
+            Add(5, 7, "m5",  "Setting movement to 5 (Unk5)",       _ => "change_npc_movement 0 5 AbsTemp");
+            Add(5, 8, "m6",  "Setting movement to 6 (Unk6)",       _ => "change_npc_movement 0 6 AbsTemp");
+            Add(5, 9, "m7",  "Setting movement to 7 (Unk7)",       _ => "change_npc_movement 0 7 AbsTemp");
+            Add(5, 10, "m8", "Setting movement to 8 (Unk8)",       _ => "change_npc_movement 0 8 AbsTemp");
+            Add(5, 11, "m9", "Setting movement to 9 (Unk9)",       _ => "change_npc_movement 0 9 AbsTemp");
+            Add(5, 12, "mA", "Setting movement to 10 (Unk10)",     _ => "change_npc_movement 0 10 AbsTemp");
 
             Add(11, 4, "s", "Cycle sprite", s => $@"
 if (get_ticker 101 Equals 0) {{
     text {s("Setting sprite to 26 (Rainer)")}
     ticker 101 SetAmount 1
-    change_icon 0 0 AbsTemp NpcSprite 26
+    change_npc_sprite 0 NpcLargeGfx.Rainer AbsTemp
 }} else {{
     text {s("Setting sprite to 21 (Christine)")}
     ticker 101 SetAmount 0
-    change_icon 0 0 AbsTemp NpcSprite 21
+    change_npc_sprite 0 NpcLargeGfx.Christine AbsTemp
 }}
 ");
             Add(9, 6, "L",  "Lock NPC0", _ => Script(_ => "npc_lock 0"));

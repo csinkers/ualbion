@@ -25,7 +25,6 @@ public static class ScriptParser
                 Token.EqualTo(ScriptToken.RParen))
             .Or(Identifier);
 
-
     public static readonly TokenListParser<ScriptToken, ICfgNode> Negation =
         (from op in Token.EqualTo(ScriptToken.Not)
             from val in Factor
@@ -44,33 +43,40 @@ public static class ScriptParser
     public static readonly TokenListParser<ScriptToken, ScriptOp> And = Token.EqualTo(ScriptToken.And).Value(ScriptOp.And);
     public static readonly TokenListParser<ScriptToken, ScriptOp> Or = Token.EqualTo(ScriptToken.Or).Value(ScriptOp.Or);
 
+    public static readonly TokenListParser<ScriptToken, ScriptOp> BitwiseAnd = Token.EqualTo(ScriptToken.BitwiseAnd).Value(ScriptOp.BitwiseAnd);
+    public static readonly TokenListParser<ScriptToken, ScriptOp> BitwiseOr = Token.EqualTo(ScriptToken.BitwiseOr).Value(ScriptOp.BitwiseOr);
+
     /*
     1 LtR () [] . (postfix inc/dec)
     2 RtL ! (prefix inc/dec)       
     3 LtR < <= > >=                
     4 LtR == !=                    
-    5 LtR &&                       
-    6 LtR ||                       
-    7 RtL = += -=                  
-    8 LtR , 
+    5 LtR &
+    6 LtR |
+    7 LtR &&                       
+    8 LtR ||                       
+    9 RtL = += -=                  
+    10 LtR , 
     */
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> Op1 = Parse.Chain(Member, Factor, Emit.Op);
     public static readonly TokenListParser<ScriptToken, ICfgNode> Op2 = Negation.Or(Op1);
     public static readonly TokenListParser<ScriptToken, ICfgNode> Op3 = Parse.Chain(Lte.Or(Lt).Or(Gte).Or(Gt), Op2, Emit.Op);
     public static readonly TokenListParser<ScriptToken, ICfgNode> Op4 = Parse.Chain(Eq.Or(Neq), Op3, Emit.Op);
-    public static readonly TokenListParser<ScriptToken, ICfgNode> Op5 = Parse.Chain(And, Op4, Emit.Op);
-    public static readonly TokenListParser<ScriptToken, ICfgNode> Op6 = Parse.Chain(Or, Op5, Emit.Op);
-    public static readonly TokenListParser<ScriptToken, ICfgNode> Op7 = Parse.ChainRight(Assign.Or(Add).Or(Sub), Op6, Emit.Op);
+    public static readonly TokenListParser<ScriptToken, ICfgNode> Op5 = Parse.Chain(BitwiseAnd, Op4, Emit.Op);
+    public static readonly TokenListParser<ScriptToken, ICfgNode> Op6 = Parse.Chain(BitwiseOr, Op5, Emit.Op);
+    public static readonly TokenListParser<ScriptToken, ICfgNode> Op7 = Parse.Chain(And, Op6, Emit.Op);
+    public static readonly TokenListParser<ScriptToken, ICfgNode> Op8 = Parse.Chain(Or, Op7, Emit.Op);
+    public static readonly TokenListParser<ScriptToken, ICfgNode> Op9 = Parse.ChainRight(Assign.Or(Add).Or(Sub), Op8, Emit.Op);
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> Expression =
-        (from first in Op7
-            from rest in Op7.Many()
+        (from first in Op9
+            from rest in Op9.Many()
             select rest.Length == 0 ? first : Emit.Statement(first, rest)).Named("Expression");
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> EventStatement =
-        (from first in Op7
-            from rest in Op7.Many()
+        (from first in Op9
+            from rest in Op9.Many()
             select (ICfgNode)Emit.Statement(first, rest)).Named("EventStatement");
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> Label =

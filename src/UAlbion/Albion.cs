@@ -48,7 +48,13 @@ static class Albion
         if (commandLine.Commands != null)
         {
             foreach (var command in commandLine.Commands)
-                global.Raise(Event.Parse(command), null);
+            {
+                var e = Event.Parse(command, out var error);
+                if (e == null)
+                    ApiUtil.Assert(error);
+                else
+                    global.Raise(e, null);
+            }
         }
         else global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
 

@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Scripting;
@@ -64,7 +65,7 @@ public class EventSet : IEventSet
             set.Chains[i] = s.UInt16(null, set.Chains[i]);
 
         for (ushort i = 0; i < set.Events.Count; i++)
-            set.Events[i] = MapEvent.SerdesNode(i, set.Events[i], s, mapping);
+            set.Events[i] = MapEvent.SerdesNode(i, set.Events[i], s, mapping, MapType.Unknown);
 
         foreach (var e in set.Events)
             e.Unswizzle(set.Events);

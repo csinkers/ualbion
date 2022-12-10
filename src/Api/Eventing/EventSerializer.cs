@@ -77,7 +77,7 @@ public class EventSerializer
 
     public IEnumerable<EventMetadata> GetEventMetadata() => Events.Values.OrderBy(x => x.Name);
 
-    public IEvent Parse(string s)
+    public IEvent Parse(string s, out string error)
     {
         static IEnumerable<string> Split(string input)
         {
@@ -143,14 +143,23 @@ public class EventSerializer
         }
 
         if (s == null)
+        {
+            error = "Null string";
             return null;
+        }
 
         string[] parts = Split(s).ToArray();
         if (parts.Length == 0)
+        {
+            error = "No parts";
             return null;
+        }
 
         if (!Events.TryGetValue(parts[0].ToUpperInvariant(), out var metadata))
+        {
+            error = $"Could not find event \"{parts[0]}\"";
             return null;
+        }
 
         if (parts.Length < metadata.Parts.Count + 1)
         {
@@ -174,11 +183,14 @@ public class EventSerializer
 #pragma warning disable CA1031 // Do not catch general exception types
         try
         {
-            return metadata.Parser(parts);
+            var result = metadata.Parser(parts);
+            error = null;
+            return result;
         }
         catch (Exception ex)
         {
-            ApiUtil.Assert($"Failed to parse \"{s}\" as a {metadata.Name} ({metadata.Type}): {ex.Message}");
+            error = $"Failed to parse \"{s}\" as a {metadata.Name} ({metadata.Type}): {ex.Message}";
+            ApiUtil.Assert(error);
             return null;
         }
 #pragma warning restore CA1031 // Do not catch general exception types

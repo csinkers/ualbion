@@ -37,6 +37,7 @@ public class CanonicalEventTests
     {
         var assets = Exchange.Resolve<IAssetManager>();
         var map = assets.LoadMap(mapId);
+        Assert.NotNull(map);
         Test(mapId, map);
     }
 

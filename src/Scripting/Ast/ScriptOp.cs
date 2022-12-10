@@ -16,6 +16,8 @@ public enum ScriptOp
     NotEqual,
     Or,
     Subtract,
+    BitwiseAnd,
+    BitwiseOr
 }
 
 public static class OperationExtensions
@@ -34,6 +36,8 @@ public static class OperationExtensions
         ScriptOp.NotEqual => "!=",
         ScriptOp.Or => "||",
         ScriptOp.Subtract => "-=",
+        ScriptOp.BitwiseAnd => "&",
+        ScriptOp.BitwiseOr => "|",
         _ => throw new ArgumentOutOfRangeException(nameof(op), op, null)
     };
 
@@ -49,12 +53,14 @@ public static class OperationExtensions
         ScriptOp.Equal => 4,
         ScriptOp.NotEqual => 4,
 
-        ScriptOp.And => 5,
-        ScriptOp.Or => 6,
+        ScriptOp.BitwiseAnd => 5,
+        ScriptOp.BitwiseOr => 6,
+        ScriptOp.And => 7,
+        ScriptOp.Or => 8,
 
-        ScriptOp.Add => 7,
-        ScriptOp.Assign => 7,
-        ScriptOp.Subtract => 7,
+        ScriptOp.Add => 9,
+        ScriptOp.Assign => 9,
+        ScriptOp.Subtract => 9,
         _ => throw new ArgumentOutOfRangeException(nameof(op), op, null)
     };
 }

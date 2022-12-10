@@ -154,8 +154,8 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
                 continue;
             }
 
-            var actionEvent = Event.Parse(action);
-            Raise(actionEvent ?? new LogEvent(LogLevel.Error, $"The action \"{action}\" could not be parsed."));
+            var actionEvent = Event.Parse(action, out var error);
+            Raise(actionEvent ?? new LogEvent(LogLevel.Error, $"The action \"{action}\" could not be parsed: {error}"));
         }
 
         // Handle continuous bindings
@@ -171,7 +171,7 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
             if (!action.StartsWith('+'))
                 continue;
 
-            var actionEvent = Event.Parse(action.Substring(1));
+            var actionEvent = Event.Parse(action.Substring(1), out _);
             if(actionEvent != null)
                 Raise(actionEvent);
         }

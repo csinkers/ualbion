@@ -131,7 +131,7 @@ public class MapData3D : BaseMapData
             return map;
         }
 
-        map.SerdesEvents(mapping, s);
+        map.SerdesEvents(mapping, map.MapType, s);
         map.SerdesNpcWaypoints(s);
         map.SerdesAutomap(s);
         map.SerdesChains(s, 64);

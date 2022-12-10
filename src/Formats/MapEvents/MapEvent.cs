@@ -3,6 +3,7 @@ using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
+using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Formats.MapEvents;
 
@@ -10,7 +11,7 @@ public abstract class MapEvent : Event, IMapEvent
 {
     public abstract MapEventType EventType { get; }
 
-    public static EventNode SerdesNode(ushort id, EventNode node, ISerializer s, AssetMapping mapping)
+    public static EventNode SerdesNode(ushort id, EventNode node, ISerializer s, AssetMapping mapping, MapType mapType)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         var initialPosition = s.Offset;
@@ -18,7 +19,7 @@ public abstract class MapEvent : Event, IMapEvent
         if (node?.Event != null && mapEvent == null)
             throw new ArgumentOutOfRangeException($"Tried to serialise a non-map event \"{node.Event}\" to bytes");
 
-        var @event = SerdesEvent(mapEvent, s, mapping);
+        var @event = SerdesEvent(mapEvent, s, mapping, mapType);
 
         if (@event is IBranchingEvent be)
         {
@@ -36,7 +37,12 @@ public abstract class MapEvent : Event, IMapEvent
         else
             node ??= new EventNode(id, @event);
 
-        ushort? nextEventId = s.Transform<ushort, ushort?>(nameof(node.Next), node.Next?.Id, S.UInt16, MaxToNullConverter.Instance);
+        ushort? nextEventId = s.Transform<ushort, ushort?>(
+            nameof(node.Next),
+            node.Next?.Id,
+            S.UInt16,
+            MaxToNullConverter.Instance);
+
         if (nextEventId != null && node.Next == null)
             node.Next = new DummyEventNode(nextEventId.Value);
 
@@ -48,7 +54,7 @@ public abstract class MapEvent : Event, IMapEvent
         return node;
     }
 
-    public static IMapEvent SerdesEvent(IMapEvent e, ISerializer s, AssetMapping mapping)
+    public static IMapEvent SerdesEvent(IMapEvent e, ISerializer s, AssetMapping mapping, MapType mapType)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         var initialPosition = s.Offset;
@@ -58,7 +64,7 @@ public abstract class MapEvent : Event, IMapEvent
         {
             MapEventType.Action => ActionEvent.Serdes((ActionEvent)e, mapping, s),
             MapEventType.AskSurrender => AskSurrenderEvent.Serdes((AskSurrenderEvent)e, s),
-            MapEventType.ChangeIcon => ChangeIconEvent.Serdes((ChangeIconEvent)e, mapping, s),
+            MapEventType.ChangeIcon => ChangeIconEvent.Serdes((MapEvent)e, mapping, mapType, s),
             MapEventType.ChangeUsedItem => ChangeUsedItemEvent.Serdes((ChangeUsedItemEvent)e, mapping, s),
             MapEventType.Chest => ChestEvent.Serdes((ChestEvent)e, mapping, s),
             MapEventType.CloneAutomap => CloneAutomapEvent.Serdes((CloneAutomapEvent)e, mapping, s),

@@ -45,6 +45,7 @@ public class ParseTests
     [Fact] public void TestAssign() => TestRoundTrip("foo = 12", Emit.Assign(Emit.Name("foo"), Emit.Const(12)), ScriptParser.Expression);
     [Fact] public void TestAdd() => TestRoundTrip("x += 3", Emit.Add(Emit.Name("x"), Emit.Const(3)), ScriptParser.Expression);
     [Fact] public void TestSub() => TestRoundTrip("x -= 3", Emit.Sub(Emit.Name("x"), Emit.Const(3)), ScriptParser.Expression);
+    [Fact] public void TestBitwiseOr() => TestRoundTrip("Underlay|Overlay", Emit.BitwiseOr(Emit.Name("Underlay"), Emit.Name("Overlay")), ScriptParser.Expression);
 
     [Fact] public void ExpressionNameTest() => TestRoundTrip("foo", Emit.Name("foo"), ScriptParser.Expression);
     [Fact] public void ExpressionNumberTest() => TestRoundTrip("100", Emit.Const(100), ScriptParser.Expression);

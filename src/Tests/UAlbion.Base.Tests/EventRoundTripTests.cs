@@ -7,6 +7,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.TestCommon;
@@ -50,7 +51,7 @@ public class EventRoundTripTests
         {
             try
             {
-                var e = Event.Parse(line);
+                var e = Event.Parse(line, out _);
 
                 var builder = new UnformattedScriptBuilder(useNumeric);
                 e?.Format(builder);
@@ -80,7 +81,7 @@ public class EventRoundTripTests
         using var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms);
         using var s = new AlbionWriter(bw);
-        MapEvent.SerdesEvent(e, s, AssetMapping.Global);
+        MapEvent.SerdesEvent(e, s, AssetMapping.Global, MapType.Unknown);
         bw.Flush();
         ms.Position = 0;
         return ms.ToArray();
@@ -91,7 +92,7 @@ public class EventRoundTripTests
         using var ms = new MemoryStream(bytes);
         using var br = new BinaryReader(ms);
         using var s = new AlbionReader(br);
-        return MapEvent.SerdesEvent(null, s, AssetMapping.Global);
+        return MapEvent.SerdesEvent(null, s, AssetMapping.Global, MapType.Unknown);
     }
 
     static string Test(string scriptFormat, string expectedToStringResult, IMapEvent e)
@@ -100,9 +101,13 @@ public class EventRoundTripTests
             return $"Event \"{e}\" did not serialise to the expected string \"{expectedToStringResult}\"";
 
         IMapEvent parsed;
-        try { parsed = (IMapEvent)Event.Parse(scriptFormat); }
+        try
+        {
+            parsed = (IMapEvent)Event.Parse(scriptFormat, out var error);
+            if (parsed == null)
+                return $"Could not parse \"{scriptFormat}\": {error}";
+        }
         catch (Exception ex) { return $"Could not parse \"{scriptFormat}\": {ex}"; }
-
 
         var bytes1 = EventToBytes(e);
         var bytes2 = EventToBytes(parsed);
@@ -114,7 +119,12 @@ public class EventRoundTripTests
         if (scriptFormat != expectedToStringResult)
         {
             IMapEvent roundTripped;
-            try { roundTripped = (IMapEvent) Event.Parse(expectedToStringResult); }
+            try
+            {
+                roundTripped = (IMapEvent) Event.Parse(expectedToStringResult, out var error);
+                if (roundTripped == null)
+                    return $"Could not parse \"{expectedToStringResult}\": {error}";
+            }
             catch (Exception ex) { return $"Could not parse \"{expectedToStringResult}\": {ex}"; }
 
             var bytes3 = EventToBytes(roundTripped);
@@ -191,11 +201,45 @@ public class EventRoundTripTests
     [Fact]
     public void ChangeIcon()
     {
-        Test(("change_icon 1 1 AbsPerm BlockHard 0 Underlay", new ChangeIconEvent(1, 1, EventScope.AbsPerm, IconChangeType.BlockHard, 0, ChangeIconLayers.Underlay)),
-            ("change_icon 1 1 AbsPerm BlockHard 1 None", new ChangeIconEvent(1, 1, EventScope.AbsPerm, IconChangeType.BlockHard, 1, 0)),
-            ("change_icon 1 1 RelPerm BlockHard 1", new ChangeIconEvent(1, 1, EventScope.RelPerm, IconChangeType.BlockHard, 1, ChangeIconLayers.Underlay | ChangeIconLayers.Overlay)),
-            ("change_icon 1 1 RelTemp BlockHard 1 Overlay", new ChangeIconEvent(1, 1, EventScope.RelTemp, IconChangeType.BlockHard, 1,  ChangeIconLayers.Overlay)),
-            ("change_icon 1 1 AbsTemp BlockHard 1 None", new ChangeIconEvent(1, 1, EventScope.AbsTemp, IconChangeType.BlockHard, 1, 0)));
+        Test(("change_icon 1 1 AbsPerm BlockHard 0 Underlay", new ChangeIconEvent(1, 1, EventScope.AbsPerm, IconChangeType.BlockHard, 0, ChangeIconLayers.Underlay, MapId.None)),
+            ("change_icon 1 1 AbsPerm BlockHard 1 None", new ChangeIconEvent(1, 1, EventScope.AbsPerm, IconChangeType.BlockHard, 1, 0, MapId.None)),
+            ("change_icon 1 1 RelPerm BlockHard 1", new ChangeIconEvent(1, 1, EventScope.RelPerm, IconChangeType.BlockHard, 1, ChangeIconLayers.Underlay | ChangeIconLayers.Overlay, MapId.None)),
+            ("change_icon 1 1 RelTemp BlockHard 1 Overlay", new ChangeIconEvent(1, 1, EventScope.RelTemp, IconChangeType.BlockHard, 1,  ChangeIconLayers.Overlay, MapId.None)),
+            ("change_icon 1 1 AbsTemp BlockHard 1 None", new ChangeIconEvent(1, 1, EventScope.AbsTemp, IconChangeType.BlockHard, 1, 0, MapId.None)),
+            ("change_icon 3 25 AbsPerm Wall 108 Underlay|Overlay Map.TorontoPart22", new ChangeIconEvent(3,25,EventScope.AbsPerm,IconChangeType.Wall,108, (ChangeIconLayers)3, Map.TorontoPart22) )
+        );
+    }
+
+    [Fact]
+    public void ChangeNpcMovement()
+    {
+        Test(
+            ("change_npc_movement 1 Stationary AbsPerm Underlay",
+            new ChangeNpcMovementEvent(1,
+                NpcMovement.Stationary,
+                EventScope.AbsPerm,
+                ChangeIconLayers.Underlay, MapId.None, 0)),
+            ("change_npc_movement 23 RandomWander AbsPerm Underlay",
+            new ChangeNpcMovementEvent(23,
+                NpcMovement.RandomWander,
+                EventScope.AbsPerm,
+                ChangeIconLayers.Underlay, MapId.None, 0)));
+    }
+
+    [Fact]
+    public void ChangeNpcSprite()
+    {
+        Test(
+            ("change_npc_sprite 1 NpcLargeGfx.Rainer AbsPerm Underlay",
+            new ChangeNpcSpriteEvent(1,
+                (SpriteId)NpcLargeGfx.Rainer,
+                EventScope.AbsPerm,
+                ChangeIconLayers.Underlay, MapId.None)),
+            ("change_npc_sprite 23 ObjectGroup.15 AbsPerm Underlay",
+            new ChangeNpcSpriteEvent(23,
+                new AssetId(AssetType.ObjectGroup, 15),
+                EventScope.AbsPerm,
+                ChangeIconLayers.Underlay, MapId.None)));
     }
 
     [Fact]

@@ -107,9 +107,9 @@ public class EventNode : IEventNode, IEquatable<EventNode>
 
         done:
         if (id < 0) throw new FormatException($"Error parsing node id of event node \"{s}\"");
-        var e = Eventing.Event.Parse(s[i..]);
+        var e = Eventing.Event.Parse(s[i..], out var error);
         if (e == null)
-            throw new FormatException($"Could not parse \"{s[i..]}\" as an event");
+            throw new FormatException($"Could not parse \"{s[i..]}\" as an event: {error}");
 
         if (step == 5) // Branch node
         {

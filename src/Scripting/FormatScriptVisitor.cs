@@ -234,9 +234,11 @@ public class FormatScriptVisitor : IAstVisitor
         binaryOp.Left.Accept(this);
         if (parens) _builder.Append(')');
 
-        if(binaryOp.Operation != ScriptOp.Member) _builder.Append(' ');
+        bool useSpaces = binaryOp.Operation is not ScriptOp.Member and not ScriptOp.BitwiseAnd and not ScriptOp.BitwiseOr;
+
+        if(useSpaces) _builder.Append(' ');
         _builder.Add(ScriptPartType.Operator, binaryOp.Operation.ToPseudocode());
-        if (binaryOp.Operation != ScriptOp.Member) _builder.Append(' ');
+        if (useSpaces) _builder.Append(' ');
 
         parens = binaryOp.Right.Priority > binaryOp.Priority;
         if (parens) _builder.Append('(');

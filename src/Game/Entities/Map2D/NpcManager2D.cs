@@ -32,6 +32,8 @@ class NpcManager2D : Component
         On<NpcMoveEvent>(DispatchNpcEvent);
         On<NpcTurnEvent>(DispatchNpcEvent);
         On<NpcUnlockEvent>(DispatchNpcEvent);
+        On<ChangeNpcMovementEvent>(DispatchNpcEvent);
+        On<ChangeNpcSpriteEvent>(DispatchNpcEvent);
     }
 
     void UpdateNpcStatus(byte npcNum)

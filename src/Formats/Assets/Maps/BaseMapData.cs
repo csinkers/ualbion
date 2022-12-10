@@ -164,7 +164,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
         return totalCount;
     }
 
-    protected void SerdesEvents(AssetMapping mapping, ISerializer s)
+    protected void SerdesEvents(AssetMapping mapping, MapType mapType, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         ushort eventCount = s.UInt16("EventCount", (ushort)Events.Count);
@@ -176,7 +176,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
         s.List(nameof(Events), Events, eventCount,
             (i, x, serializer) =>
         {
-            var node = MapEvent.SerdesNode((ushort)i, x, serializer, mapping);
+            var node = MapEvent.SerdesNode((ushort)i, x, serializer, mapping, mapType);
             if (serializer.IsCommenting())
                 serializer.Comment(node.ToString());
             return node;

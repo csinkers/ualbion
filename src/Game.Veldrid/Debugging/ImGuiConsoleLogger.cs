@@ -149,11 +149,11 @@ public class ImGuiConsoleLogger : Component
                 for (int i = 0; i < command.Length; i++)
                     _inputBuffer[i] = 0;
 
-                var @event = Event.Parse(command);
+                var @event = Event.Parse(command, out var error);
                 if (@event != null)
                     logExchange.EnqueueEvent(@event);
                 else
-                    PrintMessage($"Unknown event \"{command}\"", ConsoleColor.Red);
+                    PrintMessage(error, ConsoleColor.Red);
             }
             catch (Exception e) { PrintMessage($"Parse error: {e}", ConsoleColor.Red); }
 

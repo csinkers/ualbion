@@ -19,16 +19,19 @@ public class EventParsingVisitor : BaseAstBuilderVisitor
         }
 
         var formatted = builder.Build();
-        var e = Event.Parse(formatted);
+        var e = Event.Parse(formatted, out var error);
         if (e == null)
-            throw new InvalidOperationException($"Could not parse \"{formatted}\" as an event");
+            throw new InvalidOperationException($"Could not parse \"{formatted}\" as an event: {error}");
 
         return Emit.Event(e, _nextEventId++);
     }
 
     protected override ICfgNode Build(Name name)
     {
-        var e = Event.Parse(name.Value);
+        var e = Event.Parse(name.Value, out var error);
+        if (e == null)
+            throw new InvalidOperationException($"Could not parse \"{name.Value}\" as an event: {error}");
+
         return Emit.Event(e, _nextEventId++);
     }
 }

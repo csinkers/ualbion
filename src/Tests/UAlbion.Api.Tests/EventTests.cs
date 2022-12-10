@@ -18,16 +18,16 @@ public class EventTests
     [Fact]
     public void Event0Test()
     {
-        var e = Event.Parse("event0");
+        var e = Event.Parse("event0", out _);
         Assert.IsType<Event0>(e);
         Assert.Equal("event0", e.ToString());
-        Assert.IsType<Event0>(Event.Parse("EvEnT0")); // Case insensitive
-        Assert.Equal("event0", Event.Parse("EvEnT0").ToString()); // Case insensitive
+        Assert.IsType<Event0>(Event.Parse("EvEnT0", out _)); // Case insensitive
+        Assert.Equal("event0", Event.Parse("EvEnT0", out _).ToString()); // Case insensitive
 
-        Assert.Null(Event.Parse("some_nonsense_that_matches_nothing"));
-        Assert.Null(Event.Parse(null));
-        Assert.Null(Event.Parse(""));
-        Assert.Null(Event.Parse(" "));
+        Assert.Null(Event.Parse("some_nonsense_that_matches_nothing", out _));
+        Assert.Null(Event.Parse(null, out _));
+        Assert.Null(Event.Parse("", out _));
+        Assert.Null(Event.Parse(" ", out _));
     }
 
     [Event("event1", "A simple event", "event_1")]
@@ -41,7 +41,7 @@ public class EventTests
     [Fact]
     public void Event1Test()
     {
-        var e = Event.Parse("event1 72");
+        var e = Event.Parse("event1 72", out _);
         Assert.IsType<Event1>(e);
         Assert.Equal(72, ((Event1) e).Id);
         Assert.Equal("event1 72", e.ToString());
@@ -81,16 +81,16 @@ public class EventTests
     [Fact]
     public void EnumEventTest()
     {
-        var e = Event.Parse("enum_evt First");
+        var e = Event.Parse("enum_evt First", out _);
         Assert.IsType<EnumEvent>(e);
         Assert.Equal(SomeEnum.First, ((EnumEvent)e).Value);
         Assert.Equal("enum_evt First", e.ToString());
 
-        e = Event.Parse("enum_evt 1");
+        e = Event.Parse("enum_evt 1", out _);
         Assert.IsType<EnumEvent>(e);
         Assert.Equal(SomeEnum.First, ((EnumEvent)e).Value);
 
-        e = Event.Parse("enum_evt 3");
+        e = Event.Parse("enum_evt 3", out _);
         Assert.IsType<EnumEvent>(e);
         Assert.Equal((SomeEnum)3, ((EnumEvent)e).Value);
         Assert.Equal("enum_evt 3", e.ToString());
@@ -106,27 +106,27 @@ public class EventTests
     [Fact]
     public void StringEventTest()
     {
-        var e = Event.Parse("string_evt simple_text");
+        var e = Event.Parse("string_evt simple_text", out _);
         Assert.IsType<StringEvent>(e);
         Assert.Equal("simple_text", ((StringEvent)e).Text);
         Assert.Equal("string_evt \"simple_text\"", e.ToString());
 
-        e = Event.Parse("string_evt \"Some text\"");
+        e = Event.Parse("string_evt \"Some text\"", out _);
         Assert.IsType<StringEvent>(e);
         Assert.Equal("Some text", ((StringEvent)e).Text);
         Assert.Equal("string_evt \"Some text\"", e.ToString());
 
-        e = Event.Parse("string_evt \"Some\\ttext\"");
+        e = Event.Parse("string_evt \"Some\\ttext\"", out _);
         Assert.IsType<StringEvent>(e);
         Assert.Equal("Some\ttext", ((StringEvent)e).Text);
         Assert.Equal("string_evt \"Some\\ttext\"", e.ToString());
 
-        e = Event.Parse("string_evt \"Some \\\"text\\\"\"");
+        e = Event.Parse("string_evt \"Some \\\"text\\\"\"", out _);
         Assert.IsType<StringEvent>(e);
         Assert.Equal("Some \"text\"", ((StringEvent)e).Text);
         Assert.Equal("string_evt \"Some \\\"text\\\"\"", e.ToString());
 
-        e = Event.Parse("string_evt \"Some \\\\slash\"");
+        e = Event.Parse("string_evt \"Some \\\\slash\"", out _);
         Assert.IsType<StringEvent>(e);
         Assert.Equal("Some \\slash", ((StringEvent)e).Text);
         Assert.Equal("string_evt \"Some \\\\slash\"", e.ToString());
@@ -150,13 +150,13 @@ public class EventTests
     [Fact]
     public void OptionalEventTest()
     {
-        var e = Event.Parse("opt_evt 1 2");
+        var e = Event.Parse("opt_evt 1 2", out _);
         Assert.IsType<OptionalEvent>(e);
         Assert.Equal(1, ((OptionalEvent)e).Mandatory);
         Assert.Equal(2, ((OptionalEvent)e).Optional);
         Assert.Equal("opt_evt 1 2", e.ToString());
 
-        e = Event.Parse("opt_evt 1");
+        e = Event.Parse("opt_evt 1", out _);
         Assert.IsType<OptionalEvent>(e);
         Assert.Equal(1, ((OptionalEvent)e).Mandatory);
         Assert.Null(((OptionalEvent)e).Optional);
@@ -186,13 +186,13 @@ public class EventTests
     [Fact]
     public void CustomParseEventTest()
     {
-        var e = Event.Parse("custom_evt 1 12");
+        var e = Event.Parse("custom_evt 1 12", out _);
         Assert.IsType<CustomParseEvent>(e);
         Assert.Equal(SomeEnum.First, ((CustomParseEvent)e).MaybeEnum);
         Assert.Equal(12, ((CustomParseEvent)e).Other);
         Assert.Equal("custom_evt First 12", e.ToString());
 
-        Assert.Null(Event.Parse("custom_evt First 12"));
+        Assert.Null(Event.Parse("custom_evt First 12", out _));
     }
 
     [Event("misc")]
@@ -215,7 +215,7 @@ public class EventTests
     [Fact]
     public void MiscEventTest()
     {
-        var e = Event.Parse("misc 1");
+        var e = Event.Parse("misc 1", out _);
         Assert.IsType<MiscEvent>(e);
         Assert.Equal(1.0f, ((MiscEvent)e).Float);
         Assert.Null(((MiscEvent)e).NullableBool);
@@ -223,7 +223,7 @@ public class EventTests
         Assert.Null(((MiscEvent)e).NullableEnum);
         Assert.Equal("misc 1", e.ToString());
 
-        e = Event.Parse("misc 1 true");
+        e = Event.Parse("misc 1 true", out _);
         Assert.IsType<MiscEvent>(e);
         Assert.Equal(1.0f, ((MiscEvent)e).Float);
         Assert.Equal(true, ((MiscEvent)e).NullableBool);
@@ -231,7 +231,7 @@ public class EventTests
         Assert.Null(((MiscEvent)e).NullableEnum);
         Assert.Equal("misc 1 True", e.ToString());
 
-        e = Event.Parse("misc 1 True");
+        e = Event.Parse("misc 1 True", out _);
         Assert.IsType<MiscEvent>(e);
         Assert.Equal(1.0f, ((MiscEvent)e).Float);
         Assert.Equal(true, ((MiscEvent)e).NullableBool);
@@ -239,7 +239,7 @@ public class EventTests
         Assert.Null(((MiscEvent)e).NullableEnum);
         Assert.Equal("misc 1 True", e.ToString());
 
-        e = Event.Parse("misc 1 false");
+        e = Event.Parse("misc 1 false", out _);
         Assert.IsType<MiscEvent>(e);
         Assert.Equal(1.0f, ((MiscEvent)e).Float);
         Assert.Equal(false, ((MiscEvent)e).NullableBool);
@@ -247,7 +247,7 @@ public class EventTests
         Assert.Null(((MiscEvent)e).NullableEnum);
         Assert.Equal("misc 1 False", e.ToString());
 
-        e = Event.Parse("misc 1 True 3.1415");
+        e = Event.Parse("misc 1 True 3.1415", out _);
         Assert.IsType<MiscEvent>(e);
         Assert.Equal(1.0f, ((MiscEvent)e).Float);
         Assert.Equal(true, ((MiscEvent)e).NullableBool);
@@ -256,7 +256,7 @@ public class EventTests
         Assert.Null(((MiscEvent)e).NullableEnum);
         Assert.Equal("misc 1 True 3.1415", e.ToString());
 
-        e = Event.Parse("misc 1 True 3.1415 Second");
+        e = Event.Parse("misc 1 True 3.1415 Second", out _);
         Assert.IsType<MiscEvent>(e);
         Assert.Equal(1.0f, ((MiscEvent)e).Float);
         Assert.Equal(true, ((MiscEvent)e).NullableBool);
@@ -274,7 +274,7 @@ public class EventTests
     [Fact]
     public void OddEventTest()
     {
-        var e = Event.Parse(@"odd\event");
+        var e = Event.Parse(@"odd\event", out _);
         Assert.IsType<OddEvent>(e);
         Assert.Equal(@"odd\event", e.ToString());
     }

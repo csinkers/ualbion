@@ -60,12 +60,13 @@ public class ScriptLoader : IAssetLoader<Script>
             else if (line.StartsWith(";", StringComparison.Ordinal))
                 e = new CommentEvent(line[1..]);
             else
-                e = Event.Parse(line);
-
-            if (e == null)
             {
-                ApiUtil.Assert($"Script line \"{line}\" could not be parsed to an event");
-                e = new UnparsableEvent(line);
+                e = Event.Parse(line, out var error);
+                if (e == null)
+                {
+                    ApiUtil.Assert($"Script line \"{line}\" could not be parsed to an event: {error}");
+                    e = new UnparsableEvent(line);
+                }
             }
 
             script.Add(e);

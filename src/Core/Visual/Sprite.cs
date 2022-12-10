@@ -17,6 +17,7 @@ public class Sprite : Component, IPositioned
     BatchLease<SpriteKey, SpriteInfo> _sprite;
     Vector3 _position;
     Vector2? _size;
+    IAssetId _id;
     int _frame;
     SpriteFlags _flags;
     bool _dirty = true;
@@ -48,11 +49,22 @@ public class Sprite : Component, IPositioned
         _layer = layer;
         _keyFlags = keyFlags;
         _flags = flags;
-        Id = id;
+        _id = id;
         _loaderFunc = loaderFunc ?? DefaultLoader;
     }
 
-    public IAssetId Id { get; }
+    public IAssetId Id
+    {
+        get => _id;
+        set
+        {
+            _id = value;
+            _sprite?.Dispose();
+            _sprite = null;
+            Dirty = true;
+        }
+    }
+
     public Func<object> SelectionCallback { get; init; }
     static Vector3 Normal => Vector3.UnitZ; // TODO
 

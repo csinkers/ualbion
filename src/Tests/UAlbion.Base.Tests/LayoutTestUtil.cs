@@ -75,16 +75,16 @@ public static class LayoutTestUtil
         var sb = new StringBuilder();
         for (int i = 0; i < actual.Chains.Count; i++)
         {
-            var expectedBytes = BytesForEventChain(expected.Events, expected.Chains[i], textSource);
-            var actualBytes = BytesForEventChain(actual.Events, actual.Chains[i], textSource);
+            var expectedBytes = BytesForEventChain(expected.Events, expected.Chains[i]);
+            var actualBytes = BytesForEventChain(actual.Events, actual.Chains[i]);
             if (!expectedBytes.SequenceEqual(actualBytes))
                 sb.AppendLine($"Chain{i} mismatch on {assetId}");
         }
 
         for (int i = 0; i < actual.ExtraEntryPoints.Count; i++)
         {
-            var expectedBytes = BytesForEventChain(expected.Events, expected.ExtraEntryPoints[i], textSource);
-            var actualBytes = BytesForEventChain(actual.Events, actual.ExtraEntryPoints[i], textSource);
+            var expectedBytes = BytesForEventChain(expected.Events, expected.ExtraEntryPoints[i]);
+            var actualBytes = BytesForEventChain(actual.Events, actual.ExtraEntryPoints[i]);
             if (!expectedBytes.SequenceEqual(actualBytes))
                 sb.AppendLine($"Extra entry {i} ({actual.ExtraEntryPoints[i]}) mismatch on {assetId}");
         }
@@ -93,7 +93,7 @@ public static class LayoutTestUtil
         return sb.Length == 0;
     }
 
-    static byte[] BytesForEventChain(IList<EventNode> events, int entryPoint, AssetId textSource) =>
+    static byte[] BytesForEventChain(IList<EventNode> events, int entryPoint) =>
         FormatUtil.SerializeToBytes(s =>
         {
             var visited = new bool[events.Count];
@@ -116,7 +116,7 @@ public static class LayoutTestUtil
                 if (node.Next != null)
                     stack.Push(node.Next.Id);
 
-                MapEvent.SerdesEvent(mapEvent, s, AssetMapping.Global);
+                MapEvent.SerdesEvent(mapEvent, s, AssetMapping.Global, MapType.Unknown);
             }
         });
 }

@@ -108,7 +108,7 @@ public class MapData2D : BaseMapData
         ApiUtil.Assert(s.Offset - startOffset == expectedOffset, $"Map2D: Expected offset after layout to be {expectedOffset:x}, but it was {s.Offset - startOffset:x}");
 
         map.SerdesZones(s);
-        map.SerdesEvents(mapping, s);
+        map.SerdesEvents(mapping, map.MapType, s);
         map.SerdesNpcWaypoints(s);
         if (map.Events.Any())
             map.SerdesChains(s, 250);

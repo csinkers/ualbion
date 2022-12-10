@@ -63,8 +63,21 @@ public class Npc2D : Component
         OnDirectCall<NpcJumpEvent>(OnJump);
         OnDirectCall<NpcMoveEvent>(OnMove);
         OnDirectCall<NpcTurnEvent>(OnTurn);
+        OnDirectCall<ChangeNpcMovementEvent>(OnChangeMovement);
+        OnDirectCall<ChangeNpcSpriteEvent>(OnChangeIcon);
         // OnDirectCall<NpcLockEvent>(_ => Lock(true));
         // OnDirectCall<NpcUnlockEvent>(_ => Lock(false));
+    }
+
+    void OnChangeMovement(ChangeNpcMovementEvent e)
+    {
+        _state.MovementType = e.Mode;
+    }
+
+    void OnChangeIcon(ChangeNpcSpriteEvent e)
+    {
+        _state.SpriteOrGroup = e.SpriteOrGroup;
+        _sprite.Id = e.SpriteOrGroup;
     }
 
     void Update()

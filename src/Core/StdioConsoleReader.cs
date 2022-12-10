@@ -31,11 +31,11 @@ public class StdioConsoleReader : Component
             if (string.IsNullOrWhiteSpace(command))
                 continue;
 
-            var @event = Event.Parse(command);
+            var @event = Event.Parse(command, out var error);
             if (@event != null)
                 logExchange.EnqueueEvent(@event);
             else
-                Console.WriteLine("Unknown event \"{0}\"", command);
+                Console.WriteLine("Unknown event \"{0}\": {1}", command, error);
         } while (!_done);
     }
 }

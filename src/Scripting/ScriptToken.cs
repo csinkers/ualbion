@@ -40,5 +40,6 @@ public enum ScriptToken
     [Token(Example = "+=")] Add,
     [Token(Example = "-=")] Sub,
 
+    [Token(Example = "&")] BitwiseAnd,
     [Token(Example = "|")] BitwiseOr,
 }

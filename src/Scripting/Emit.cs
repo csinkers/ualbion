@@ -60,6 +60,8 @@ public static class Emit
     public static BinaryOp Add(ICfgNode parent, ICfgNode child) => new(ScriptOp.Add, parent, child);
     public static BinaryOp And(ICfgNode parent, ICfgNode child) => new(ScriptOp.And, parent, child);
     public static BinaryOp Assign(ICfgNode parent, ICfgNode child) => new(ScriptOp.Assign, parent, child);
+    public static BinaryOp BitwiseAnd(ICfgNode parent, ICfgNode child) => new(ScriptOp.BitwiseAnd, parent, child);
+    public static BinaryOp BitwiseOr(ICfgNode parent, ICfgNode child) => new(ScriptOp.BitwiseOr, parent, child);
     public static BinaryOp Eq(ICfgNode parent, ICfgNode child) => new(ScriptOp.Equal, parent, child);
     public static BinaryOp Gt(ICfgNode parent, ICfgNode child) => new(ScriptOp.Greater, parent, child);
     public static BinaryOp Gte(ICfgNode parent, ICfgNode child) => new(ScriptOp.GreaterEqual, parent, child);

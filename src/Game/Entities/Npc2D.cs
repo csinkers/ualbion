@@ -32,6 +32,7 @@ public class Npc2D : Component
     readonly MapSprite _sprite;
     readonly byte _npcNumber;
     readonly bool _isLarge;
+    bool _isLocked;
 
     IMovementSettings _moveSettings;
     // int _frameCount;
@@ -64,8 +65,8 @@ public class Npc2D : Component
         OnDirectCall<NpcTurnEvent>(OnTurn);
         OnDirectCall<ChangeNpcMovementEvent>(OnChangeMovement);
         OnDirectCall<ChangeNpcSpriteEvent>(OnChangeIcon);
-        // OnDirectCall<NpcLockEvent>(_ => Lock(true));
-        // OnDirectCall<NpcUnlockEvent>(_ => Lock(false));
+        OnDirectCall<NpcLockEvent>(_ => _isLocked = true);
+        OnDirectCall<NpcUnlockEvent>(_ => _isLocked = false);
     }
 
     void OnChangeMovement(ChangeNpcMovementEvent e)
@@ -87,21 +88,24 @@ public class Npc2D : Component
         if (Exchange == null) 
             return;
 
-        switch (_state.MovementType)
+        if (!_isLocked)
         {
-            case NpcMovement.Waypoints:
-            case NpcMovement.Waypoints2:
-                MovementFollowWaypoints();
-                break;
-            case NpcMovement.RandomWander:
-                MovementRandom();
-                break;
-            case NpcMovement.ChaseParty:
-                MovementChaseParty();
-                break;
-            default:
-                MovementStationary();
-                break;
+            switch (_state.MovementType)
+            {
+                case NpcMovement.Waypoints:
+                case NpcMovement.Waypoints2:
+                    MovementFollowWaypoints();
+                    break;
+                case NpcMovement.RandomWander:
+                    MovementRandom();
+                    break;
+                case NpcMovement.ChaseParty:
+                    MovementChaseParty();
+                    break;
+                default:
+                    MovementStationary();
+                    break;
+            }
         }
 
         if (Movement2D.Instance.Update(_state,
@@ -138,14 +142,12 @@ public class Npc2D : Component
 
     void OnMove(NpcMoveEvent e) => SetTarget(_state.X + e.X, _state.Y + e.Y);
 
-    // void Lock(bool shouldLock)
-    // { // TODO
-    // }
-
     void OnJump(NpcJumpEvent e)
     {
-        _state.PixelX = (ushort)(e.X ?? _state.X) * _moveSettings.TileWidth;
-        _state.PixelY = (ushort)(e.Y ?? _state.Y) * _moveSettings.TileHeight;
+        _state.X = (ushort)(e.X ?? _state.X);
+        _state.Y = (ushort)(e.Y ?? _state.Y);
+        _state.PixelX = _state.X * _moveSettings.TileWidth;
+        _state.PixelY = _state.Y * _moveSettings.TileHeight;
         SyncSprite();
     }
 

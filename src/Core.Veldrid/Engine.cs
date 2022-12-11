@@ -164,7 +164,12 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         var frameCounter = new FrameCounter();
         while (!_done && _newBackend == null)
         {
-            var deltaSeconds = (1 / 60.0f); // frameCounter.StartFrame();
+            var flags = GetVar(CoreVars.User.EngineFlags);
+            var deltaSeconds =
+                (flags & EngineFlags.FixedTimeStep) != 0
+                ? 1 / 60.0f
+                : frameCounter.StartFrame();
+
             _frameTimeAverager.AddTime(deltaSeconds);
 
             PerfTracker.BeginFrame();
@@ -182,8 +187,6 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
 
             using (PerfTracker.FrameEvent("5.1 Flushing queued events"))
                 Exchange.FlushQueuedEvents();
-
-            var flags = GetVar(CoreVars.User.EngineFlags);
 
             if ((flags & EngineFlags.SuppressLayout) == 0)
                 using (PerfTracker.FrameEvent("5.2 Calculating UI layout"))

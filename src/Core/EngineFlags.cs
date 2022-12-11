@@ -14,4 +14,5 @@ public enum EngineFlags : uint
     UseCylindricalBillboards =  0x40,
     RenderDepth              =  0x80,
     SuppressLayout           = 0x100,
+    FixedTimeStep            = 0x200,
 }

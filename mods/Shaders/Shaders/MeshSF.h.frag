@@ -14,6 +14,7 @@
 #define EF_USE_CYLINDRICAL_BILLBOARDS 0x40U
 #define EF_RENDER_DEPTH 0x80U
 #define EF_SUPPRESS_LAYOUT 0x100U
+#define EF_FIXED_TIME_STEP 0x200U
 
 layout(set = 0, binding = 0) uniform texture2D Diffuse; //!
 layout(set = 0, binding = 1) uniform sampler Sampler; //!

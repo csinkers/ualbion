@@ -364,6 +364,7 @@ namespace UAlbion.Game.Veldrid.Debugging
                 EngineFlagOption(this, curFlags, EngineFlags.HighlightSelection);
                 EngineFlagOption(this, curFlags, EngineFlags.UseCylindricalBillboards);
                 EngineFlagOption(this, curFlags, EngineFlags.RenderDepth);
+                EngineFlagOption(this, curFlags, EngineFlags.FixedTimeStep);
                 ImGui.TreePop();
             }
 

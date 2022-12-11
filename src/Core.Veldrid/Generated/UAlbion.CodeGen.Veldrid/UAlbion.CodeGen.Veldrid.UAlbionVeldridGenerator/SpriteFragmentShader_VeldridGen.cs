@@ -48,6 +48,7 @@ namespace UAlbion.Core.Veldrid.Sprites
 #define EF_USE_CYLINDRICAL_BILLBOARDS 0x40U
 #define EF_RENDER_DEPTH 0x80U
 #define EF_SUPPRESS_LAYOUT 0x100U
+#define EF_FIXED_TIME_STEP 0x200U
 
 // SpriteKeyFlags
 #define SKF_NO_DEPTH_TEST 0x1U

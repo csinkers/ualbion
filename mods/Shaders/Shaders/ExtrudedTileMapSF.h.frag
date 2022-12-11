@@ -27,6 +27,7 @@
 #define EF_USE_CYLINDRICAL_BILLBOARDS 0x40U
 #define EF_RENDER_DEPTH 0x80U
 #define EF_SUPPRESS_LAYOUT 0x100U
+#define EF_FIXED_TIME_STEP 0x200U
 
 layout(set = 0, binding = 1) uniform texture2DArray DayFloors; //!
 layout(set = 0, binding = 2) uniform texture2DArray DayWalls; //!

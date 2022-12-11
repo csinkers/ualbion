@@ -164,7 +164,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         var frameCounter = new FrameCounter();
         while (!_done && _newBackend == null)
         {
-            var deltaSeconds = frameCounter.StartFrame();
+            var deltaSeconds = (1 / 60.0f); // frameCounter.StartFrame();
             _frameTimeAverager.AddTime(deltaSeconds);
 
             PerfTracker.BeginFrame();

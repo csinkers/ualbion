@@ -1,7 +1,10 @@
-﻿namespace UAlbion.Formats.Assets;
+﻿using UAlbion.Config;
+
+namespace UAlbion.Formats.Assets;
 
 public interface IMovementState
 {
+    AssetId Id { get; }
     bool NoClip { get; }
     ushort X { get; set; }
     ushort Y { get; set; }

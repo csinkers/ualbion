@@ -24,8 +24,7 @@ namespace UAlbion.Game.Entities;
 
 public class Npc2D : Component
 {
-    static readonly Vector3 LargeTileOffset = new(1, 1, 0);
-    static readonly Vector3 SmallTileOffset = new(0, 0, 0);
+    static readonly Vector2 LargeTileOffset = new(1, 1);
     readonly Func<(int, int), (int, int)> _getDesiredDirectionDelegate = x => x;
     readonly Action<int, int> _onTileEnteredDelegate;
     readonly NpcState _state;
@@ -118,14 +117,14 @@ public class Npc2D : Component
 
     void SyncSprite()
     {
-        _state.X = (ushort)(_state.PixelX / _moveSettings.TileWidth);
-        _state.Y = (ushort)(_state.PixelY / _moveSettings.TileHeight);
-        _sprite.TilePosition =
-            new Vector3(
-                _state.PixelX / _moveSettings.TileWidth,
-                _state.PixelY / _moveSettings.TileHeight,
-                _moveSettings.GetDepth(_state.Y))
-            + (_isLarge ? LargeTileOffset : SmallTileOffset);
+        var pos = new Vector2(
+            _state.PixelX / _moveSettings.TileWidth,
+            _state.PixelY / _moveSettings.TileHeight);
+
+        if (_isLarge)
+            pos += LargeTileOffset;
+
+        _sprite.TilePosition = new Vector3(pos.X, pos.Y, _moveSettings.GetDepth(pos.Y));
         _sprite.Frame = _moveSettings.GetSpriteFrame(_state, _getSitModeDelegate);
     }
 

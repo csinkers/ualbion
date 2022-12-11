@@ -21,7 +21,8 @@ public class Movement2D : IMovementController
         if (state == null) throw new ArgumentNullException(nameof(state));
         if (settings == null) throw new ArgumentNullException(nameof(settings));
         if (getDesiredDirection == null) throw new ArgumentNullException(nameof(getDesiredDirection));
-        // GameTrace.Log.MoveStart(id, state.X, state.Y, state.PixelX, state.PixelY);
+
+        GameTrace.Log.MoveStart(state.Id.ToString(), state.X, state.Y, state.PixelX, state.PixelY);
 
         bool moved = false;
         if (!state.HasTarget)
@@ -31,9 +32,12 @@ public class Movement2D : IMovementController
                 (dx, dy) = CheckForCollisions(state.NoClip ? null : detector, state.X, state.Y, dx, dy);
 
             if (dx == 0 && dy == 0)
+            {
+                GameTrace.Log.MoveStop(state.Id.ToString(), false);
                 return false;
+            }
 
-            // var oldDirection = state.FacingDirection;
+            var oldDirection = state.FacingDirection;
             var desiredDirection = state.FacingDirection;
 
             if (dx > 0) desiredDirection = Direction.East;
@@ -61,8 +65,8 @@ public class Movement2D : IMovementController
             else
                 onTileEntered?.Invoke(state.MoveToX, state.MoveToY);
 
-            // GameTrace.Log.MoveDir(oldDirection, desiredDirection, state.FacingDirection);
-            // GameTrace.Log.MovePos(state.X, state.Y, state.MoveToX, state.MoveToY, 0);
+            GameTrace.Log.MoveDir(oldDirection, desiredDirection, state.FacingDirection);
+            GameTrace.Log.MovePos(state.X, state.Y, state.MoveToX, state.MoveToY, 0);
         }
 
         if (state.HasTarget)
@@ -73,8 +77,8 @@ public class Movement2D : IMovementController
             state.PixelY = settings.TileHeight * ApiUtil.Lerp(state.Y, state.MoveToY, t);
             moved = true;
 
-            // GameTrace.Log.MoveDir(state.FacingDirection, state.FacingDirection, state.FacingDirection);
-            // GameTrace.Log.MovePos(state.X, state.Y, state.MoveToX, state.MoveToY, state.MovementTick - state.StartTick);
+            GameTrace.Log.MoveDir(state.FacingDirection, state.FacingDirection, state.FacingDirection);
+            GameTrace.Log.MovePos(state.X, state.Y, state.MoveToX, state.MoveToY, state.MovementTick - state.StartTick);
 
             if (state.MovementTick - state.StartTick >= settings.TicksPerTile)
             {
@@ -89,7 +93,7 @@ public class Movement2D : IMovementController
             state.PixelY = settings.TileHeight * state.Y;
         }
 
-        // GameTrace.Log.MoveStop(id, moved);
+        GameTrace.Log.MoveStop(state.Id.ToString(), moved);
         return moved;
     }
 

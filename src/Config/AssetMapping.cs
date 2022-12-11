@@ -35,6 +35,7 @@ public class AssetMapping
     // Always built dynamically based on the current set of active mods
     public static AssetMapping Global => GlobalIsThreadLocal ? ThreadLocalGlobal.Value : TrueGlobal;
     public static bool GlobalIsThreadLocal { get; set; } // Set to true for unit tests.
+    readonly Dictionary<AssetId, string> _nameCache = new();
 
     readonly struct Range
     {
@@ -205,15 +206,24 @@ public class AssetMapping
         if (id == AssetId.None) // Special case to keep things tidy
             return "None";
 
+        if (_nameCache.TryGetValue(id, out var name))
+            return name;
+
         var (enumType, enumValue) = IdToEnum(id);
         if (enumType == null)
-            return $"{id.Type}.{id.Id}";
+        {
+            name = $"{id.Type}.{id.Id}";
+        }
+        else
+        {
+            var enumName = Enum.GetName(enumType, enumValue);
+            name = string.IsNullOrEmpty(enumName)
+                ? enumType.Name + "." + enumValue
+                : enumType.Name + "." + enumName;
+        }
 
-        var enumName = Enum.GetName(enumType, enumValue);
-        if (!string.IsNullOrEmpty(enumName))
-            return enumType.Name + "." + enumName;
-
-        return $"{enumType.Name}.{enumValue}";
+        _nameCache[id] = name;
+        return name;
     }
 
     /// <summary>

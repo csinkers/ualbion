@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
@@ -179,6 +180,8 @@ public class PlayerMovementTests
     [Fact]
     public void Turn()
     {
+        AssetMapping.GlobalIsThreadLocal = true;
+        AssetMapping.Global.RegisterAssetType(typeof(Base.PartyMember), AssetType.PartyMember);
         var collider = new Collider2D((x, y) =>
         {
             if (x < 0 || y < 0 || x > MapWidth) return Passability.Solid;

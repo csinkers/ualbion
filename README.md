@@ -92,7 +92,7 @@ To compile and run the project the easiest way is to use the run script (i.e. `r
 For developers, any C# IDE should work (e.g. VS Code, Visual Studio, Rider etc). The available solutions are:
 - `src/ualbion.nodeps.sln`: Loads ualbion with dependencies from NuGet (recommended for getting started)
 - `src/ualbion.full.sln`: Loads ualbion with local dependencies (requires `get_dependencies` to have been run, recommended for advanced development, e.g. if debugging into the dependencies is required)
-- `src/ualbion.ci.sln`: A solution for use by the continuous integration environment in github. Only includes tests that don't rely on the original assets being present.
+- `src/ualbion.ci.sln`: A solution for use by the continuous integration environment in github. Excludes tests that rely on the original assets being present.
 
 ## Attributions
 Many thanks to Florian Ziesche and the other contributers to the [freealbion wiki](https://github.com/freealbion/freealbion/wiki) for their efforts in discovering and documenting the Albion file formats.

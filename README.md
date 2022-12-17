@@ -80,13 +80,19 @@ If you're not using the GOG version or want to select your game files manually, 
 
 ### Compile and run
 
-To compile and run the project, open `ualbion.sln` in the C# IDE of your choice or run `./run.sh` in Linux (ensure `dotnet-host`, `dotnet-runtime` and `dotnet-sdk` are installed) or `run.bat` in Windows. Any extra parameters to `run` will be passed through to UAlbion.
+To compile and run the project the easiest way is to use the run script (i.e. `run.bat` on Windows and `run.sh` on Linux).
+- To start with default options, use `run` without parameters
 - To show available options: `run -h` or `run --help`
 - To run with Vulkan: `run -vk`
 - To run with OpenGL: `run -gl`
 - To run with Direct3D: `run -d3d`
 - To extract all game resources into modern formats under the mods/Unpacked dir: `run -b Albion Unpacked`
 - To repack the (possibly modified) assets in mods/Unpacked back into the original binary formats: `run -b Unpacked Repacked` (outputs to mods/Repacked)
+
+For developers, any C# IDE should work (e.g. VS Code, Visual Studio, Rider etc). The available solutions are:
+- `src/ualbion.nodeps.sln`: Loads ualbion with dependencies from NuGet (recommended for getting started)
+- `src/ualbion.full.sln`: Loads ualbion with local dependencies (requires `get_dependencies` to have been run, recommended for advanced development, e.g. if debugging into the dependencies is required)
+- `src/ualbion.ci.sln`: A solution for use by the continuous integration environment in github. Only includes tests that don't rely on the original assets being present.
 
 ## Attributions
 Many thanks to Florian Ziesche and the other contributers to the [freealbion wiki](https://github.com/freealbion/freealbion/wiki) for their efforts in discovering and documenting the Albion file formats.

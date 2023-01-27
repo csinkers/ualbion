@@ -36,10 +36,10 @@ public class FlatMap : Component, IMap
         On<PlayerEnteredTileEvent>(OnPlayerEnteredTile);
         On<NpcEnteredTileEvent>(OnNpcEnteredTile);
         On<ChangeIconEvent>(ChangeIcon);
-        On<MapInitEvent>(_ => FireEventChains(TriggerTypes.MapInit, true));
-        On<SlowClockEvent>(_ => FireEventChains(TriggerTypes.EveryStep, false));
-        On<HourElapsedEvent>(_ => FireEventChains(TriggerTypes.EveryHour, true));
-        On<DayElapsedEvent>(_ => FireEventChains(TriggerTypes.EveryDay, true));
+        On<MapInitEvent>(_ => FireEventChains(TriggerType.MapInit, true));
+        On<SlowClockEvent>(_ => FireEventChains(TriggerType.EveryStep, false));
+        On<HourElapsedEvent>(_ => FireEventChains(TriggerType.EveryHour, true));
+        On<DayElapsedEvent>(_ => FireEventChains(TriggerType.EveryDay, true));
         On<PartyChangedEvent>(_ => RebuildPartyMembers());
         On<TriggerMapTileEvent>(TileTriggered);
         // On<UnloadMapEvent>(_ => Unload());
@@ -78,17 +78,17 @@ public class FlatMap : Component, IMap
         var movementSettings = _logicalMap.UseSmallSprites
             ? new MovementSettings(SmallSpriteAnimations.Frames)
             {
-                MaxTrailDistance = GetVar(MoveVars.MaxTrailDistanceSmall),
-                MinTrailDistance = GetVar(MoveVars.MinTrailDistanceSmall),
-                TicksPerFrame = GetVar(MoveVars.TicksPerFrame),
-                TicksPerTile = GetVar(MoveVars.TicksPerTile)
+                MaxTrailDistance = Var(MoveVars.MaxTrailDistanceSmall),
+                MinTrailDistance = Var(MoveVars.MinTrailDistanceSmall),
+                TicksPerFrame = Var(MoveVars.TicksPerFrame),
+                TicksPerTile = Var(MoveVars.TicksPerTile)
             }
             : new MovementSettings(LargeSpriteAnimations.Frames)
             {
-                MaxTrailDistance = GetVar(MoveVars.MaxTrailDistanceLarge),
-                MinTrailDistance = GetVar(MoveVars.MinTrailDistanceLarge),
-                TicksPerFrame = GetVar(MoveVars.TicksPerFrame),
-                TicksPerTile = GetVar(MoveVars.TicksPerTile)
+                MaxTrailDistance = Var(MoveVars.MaxTrailDistanceLarge),
+                MinTrailDistance = Var(MoveVars.MinTrailDistanceLarge),
+                TicksPerFrame = Var(MoveVars.TicksPerFrame),
+                TicksPerTile = Var(MoveVars.TicksPerTile)
             };
 
         var initialPos = new Vector2(_logicalMap.Width / 2.0f, _logicalMap.Height / 2.0f);
@@ -126,9 +126,9 @@ public class FlatMap : Component, IMap
         }
     }
 
-    void FireEventChains(TriggerTypes type, bool log)
+    void FireEventChains(TriggerType type, bool log)
     {
-        var zones = _logicalMap.GetZonesOfType(type);
+        var zones = _logicalMap.GetZonesOfType(type.ToBitField());
         if (!log)
             Raise(new SetLogLevelEvent(LogLevel.Warning));
 
@@ -148,7 +148,7 @@ public class FlatMap : Component, IMap
         if ((zone.Trigger & TriggerTypes.Npc) == 0)
             return;
 
-        var source = new EventSource(_mapData.Id, TriggerTypes.Npc, zone.X, zone.Y);
+        var source = new EventSource(_mapData.Id, TriggerType.Npc, zone.X, zone.Y);
         Raise(new TriggerChainEvent(_logicalMap.EventSet, zone.EventIndex, source));
     }
 
@@ -161,7 +161,7 @@ public class FlatMap : Component, IMap
         if ((zone.Trigger & TriggerTypes.Normal) == 0)
             return;
 
-        var source = new EventSource(_mapData.Id, TriggerTypes.Normal, zone.X, zone.Y);
+        var source = new EventSource(_mapData.Id, TriggerType.Normal, zone.X, zone.Y);
         Raise(new TriggerChainEvent(_mapData, zone.EventIndex, source));
     }
 

@@ -46,7 +46,7 @@ public enum Ticker : ushort
     Ticker140 = 140,
     Ticker141 = 141,
     Ticker142 = 142,
-    Ticker143 = 143,
+    FestivalTimer = 143,
     Ticker144 = 144,
     Ticker145 = 145,
     Ticker146 = 146,

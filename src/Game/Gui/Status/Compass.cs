@@ -53,7 +53,7 @@ public class Compass : Dialog
                     _frame = 0;
             }
 
-            var language = GetVar(UserVars.Gameplay.Language);
+            var language = Var(UserVars.Gameplay.Language);
             _face.Id = language switch
             {
                 Base.Language.German => Base.CoreGfx.CompassDe,

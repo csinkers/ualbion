@@ -83,7 +83,7 @@ public class MapObject : Component
             if (_sprite.FrameCount <= 1) // Can't check this until after subscription
                 Off<SlowClockEvent>();
 
-            _frame += e.Delta;
+            _frame++;
             _sprite.Frame = AnimUtil.GetFrame(_frame, _sprite.FrameCount, _isBouncy);
         }
 

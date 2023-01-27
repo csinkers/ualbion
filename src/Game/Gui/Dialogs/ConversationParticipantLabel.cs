@@ -59,7 +59,7 @@ public class ConversationParticipantLabel : Dialog
 
     IText GetName(ICharacterSheet sheet, bool isRight) => new DynamicText(() =>
     {
-        var name = sheet.GetName(GetVar(UserVars.Gameplay.Language));
+        var name = sheet.GetName(Var(UserVars.Gameplay.Language));
         return new[] 
         {
             new TextBlock(name)

@@ -18,4 +18,10 @@
     <ProjectReference Include="..\Game\UAlbion.Game.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="!Exists('..\..\deps\ImGuiColorTextEditNet\')">
+    <PackageReference Include="ImGuiColorTextEditNet" Version="0.1.0" />
+  </ItemGroup>
+  <ItemGroup Condition="Exists('..\..\deps\ImGuiColorTextEditNet\')">
+    <ProjectReference Include="..\..\deps\ImGuiColorTextEditNet\src\TextEdit\ImGuiColorTextEditNet.csproj" />
+  </ItemGroup>
 </Project>

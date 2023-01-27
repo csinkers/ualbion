@@ -253,7 +253,7 @@ public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManage
     {
         using var device = new AudioDevice { DistanceModel = DistanceModel.InverseDistance };
 
-        while (!_doneEvent.WaitOne((int)(GetVar(GameVars.Audio.PollIntervalSeconds) * 1000)))
+        while (!_doneEvent.WaitOne((int)(Var(GameVars.Audio.PollIntervalSeconds) * 1000)))
         {
             if (_standalone)
                 Raise(BeginFrameEvent.Instance);

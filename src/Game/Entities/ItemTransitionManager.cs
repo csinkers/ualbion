@@ -73,7 +73,7 @@ public class ItemTransitionManager : Component
                     Base.CoreGfx.UiGold, 0,
                     fromNormPosition,
                     destPosition,
-                    transitionTimeSeconds ?? GetVar(TransitionVars.DefaultTransitionTimeSeconds),
+                    transitionTimeSeconds ?? Var(TransitionVars.DefaultTransitionTimeSeconds),
                     window.UiToNormRelative(subImageDetails.Size),
                     continuation));
                 break;
@@ -88,7 +88,7 @@ public class ItemTransitionManager : Component
                     Base.CoreGfx.UiFood, 0,
                     fromNormPosition,
                     destPosition,
-                    transitionTimeSeconds ?? GetVar(TransitionVars.DefaultTransitionTimeSeconds),
+                    transitionTimeSeconds ?? Var(TransitionVars.DefaultTransitionTimeSeconds),
                     window.UiToNormRelative(subImageDetails.Size),
                     continuation));
                 break;
@@ -103,7 +103,7 @@ public class ItemTransitionManager : Component
                     item.Icon, item.IconSubId,
                     fromNormPosition,
                     destPosition,
-                    transitionTimeSeconds ?? GetVar(TransitionVars.DefaultTransitionTimeSeconds),
+                    transitionTimeSeconds ?? Var(TransitionVars.DefaultTransitionTimeSeconds),
                     window.UiToNormRelative(subImageDetails.Size),
                     continuation));
                 break;

@@ -55,8 +55,8 @@ public class ModApplier : Component, IModApplier
         if (pathResolver == null) throw new ArgumentNullException(nameof(pathResolver));
         if (mods == null) throw new ArgumentNullException(nameof(mods));
 
-        pathResolver.RegisterPath("ALBION", pathResolver.ResolvePathAbsolute(GetVar(UserVars.Path.Albion)));
-        pathResolver.RegisterPath("SAVES", pathResolver.ResolvePathAbsolute(GetVar(UserVars.Path.Saves)));
+        pathResolver.RegisterPath("ALBION", pathResolver.ResolvePathAbsolute(Var(UserVars.Path.Albion)));
+        pathResolver.RegisterPath("SAVES", pathResolver.ResolvePathAbsolute(Var(UserVars.Path.Saves)));
 
         _mods.Clear();
         _modsInReverseDependencyOrder.Clear();
@@ -275,7 +275,7 @@ public class ModApplier : Component, IModApplier
                 var assetLang = info.Get<string>(AssetProperty.Language, null);
                 if (assetLang != null)
                 {
-                    language ??= GetVar(UserVars.Gameplay.Language);
+                    language ??= Var(UserVars.Gameplay.Language);
                     if (!string.Equals(assetLang, language, StringComparison.OrdinalIgnoreCase))
                         continue;
                 }

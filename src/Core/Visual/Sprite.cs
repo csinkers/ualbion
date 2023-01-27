@@ -36,12 +36,12 @@ public class Sprite : Component, IPositioned
         On<WorldCoordinateSelectEvent>(Select);
         On<HoverEvent>(_ =>
         {
-            if ((GetVar(CoreVars.User.EngineFlags) & EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
+            if ((Var(CoreVars.User.EngineFlags) & EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
                 Flags |= SpriteFlags.Highlight;
         });
         On<BlurEvent>(_ =>
         {
-            if ((GetVar(CoreVars.User.EngineFlags) & EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
+            if ((Var(CoreVars.User.EngineFlags) & EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
                 Flags &= ~SpriteFlags.Highlight;
         });
 

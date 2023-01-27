@@ -33,7 +33,7 @@ public class PaletteManager : ServiceComponent<IPaletteManager>, IPaletteManager
     public PaletteManager()
     {
         On<LoadPaletteEvent>(e => SetPalette(e.PaletteId));
-        On<SlowClockEvent>(e => Frame += e.Delta);
+        On<SlowClockEvent>(_ => Frame++);
         On<LoadRawPaletteEvent>(e =>
         {
             Day = new AlbionPalette(0, "Raw", e.Entries);

@@ -65,6 +65,10 @@ public sealed class MeshRenderer : Component, IRenderer, IDisposable
     }
 }
 
+#pragma warning disable CA1815 // Override equals and operator equals on value types
+#pragma warning disable CA1051 // Do not declare visible instance fields
+#pragma warning disable 649
+
 [VertexShader(typeof(MeshVertexShader))]
 [FragmentShader(typeof(MeshFragmentShader))]
 partial class MeshPipeline : PipelineHolder { }
@@ -93,7 +97,6 @@ partial class MeshVertexShader : IVertexShader { }
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
 partial class MeshFragmentShader : IFragmentShader { }
 
-#pragma warning restore CA1815 // Override equals and operator equals on value types
 public partial struct MeshVertex : IVertexFormat
 { // Should match Veldrid.Utilities.VertexPositionNormalTexture exactly as Unsafe.As is used for casting
     [Vertex("Position")]  public readonly Vector3 Position;
@@ -111,9 +114,7 @@ public partial struct GpuMeshInstanceData : IVertexFormat
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
 partial struct MeshIntermediate : IVertexFormat
 {
-#pragma warning disable 649
     [Vertex("TexCoords")] public Vector2 TextureCordinates;
-#pragma warning restore 649
 }
 
 partial struct MeshUniform : IUniformFormat
@@ -133,3 +134,7 @@ partial struct MeshUniform : IUniformFormat
     [Uniform("uTransFilter")] public Vector3 TransmissionFilter;
     [Uniform("uIllumModel")]  public int IlluminationModel;
 }
+
+#pragma warning restore 649
+#pragma warning restore CA1051
+#pragma warning restore CA1815 // Override equals and operator equals on value types

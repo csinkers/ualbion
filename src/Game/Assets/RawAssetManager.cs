@@ -65,7 +65,7 @@ public class RawAssetManager : Component, IRawAssetManager
 
     string LoadStringCore(StringId id, string language)
     {
-        language ??= GetVar(UserVars.Gameplay.Language);
+        language ??= Var(UserVars.Gameplay.Language);
         var asset = _modApplier.LoadAsset(id.Id, language);
         return asset switch
         {

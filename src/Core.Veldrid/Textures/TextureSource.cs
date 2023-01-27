@@ -73,7 +73,7 @@ public class TextureSource : ServiceComponent<ITextureSource>, ITextureSource
     void OnUpdate(EngineUpdateEvent e)
     {
         _totalTime += e.DeltaSeconds;
-        if (_totalTime - _lastCleanup <= GetVar(Vars.CacheCheckIntervalSeconds))
+        if (_totalTime - _lastCleanup <= Var(Vars.CacheCheckIntervalSeconds))
             return;
 
         _simple.Cleanup();

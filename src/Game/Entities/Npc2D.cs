@@ -148,6 +148,7 @@ public class Npc2D : Component
         _state.Y = (ushort)(e.Y ?? _state.Y);
         _state.PixelX = _state.X * _moveSettings.TileWidth;
         _state.PixelY = _state.Y * _moveSettings.TileHeight;
+        SetTarget(_state.X, _state.Y);
         SyncSprite();
     }
 
@@ -155,8 +156,8 @@ public class Npc2D : Component
     {
         _moveSettings ??= new MovementSettings(_isLarge ? LargeSpriteAnimations.Frames : SmallSpriteAnimations.Frames)
         {
-            TicksPerFrame = GetVar(NpcMoveVars.TicksPerFrame),
-            TicksPerTile = GetVar(NpcMoveVars.TicksPerTile)
+            TicksPerFrame = Var(NpcMoveVars.TicksPerFrame),
+            TicksPerTile = Var(NpcMoveVars.TicksPerTile)
         };
 
         SyncSprite();
@@ -211,7 +212,7 @@ public class Npc2D : Component
             return new TriggerChainEvent(
                 _state.EventSet,
                 _state.EventIndex,
-                new EventSource(_state.Id, TriggerTypes.TalkTo));
+                new EventSource(_state.Id, TriggerType.TalkTo));
 
         if (_state.Id.Type == AssetType.NpcSheet)
             return new StartDialogueEvent(_state.Id);

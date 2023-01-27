@@ -57,9 +57,9 @@ public class OptionsMenu : ModalDialog
         var stack = new VerticalStack(elements);
         AttachChild(new DialogFrame(stack));
 
-        _musicVolume = GetVar(UserVars.Audio.MusicVolume);
-        _fxVolume = GetVar(UserVars.Audio.FxVolume);
-        _combatDelay = GetVar(UserVars.Gameplay.CombatDelay);
+        _musicVolume = Var(UserVars.Audio.MusicVolume);
+        _fxVolume = Var(UserVars.Audio.FxVolume);
+        _combatDelay = Var(UserVars.Gameplay.CombatDelay);
     }
 
     void SaveAndClose()

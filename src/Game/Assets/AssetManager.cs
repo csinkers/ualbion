@@ -76,7 +76,7 @@ public class AssetManager : Component, IAssetManager
 
     string LoadStringCore(StringId id, string language, bool cached)
     {
-        var currentLanguage = GetVar(UserVars.Gameplay.Language);
+        var currentLanguage = Var(UserVars.Gameplay.Language);
         if (language != null && language != currentLanguage)
             cached = false;
         language ??= currentLanguage;

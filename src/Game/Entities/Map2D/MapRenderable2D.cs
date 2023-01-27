@@ -29,12 +29,12 @@ public class MapRenderable2D : Component
 
         On<ToggleUnderlayEvent>(_ => _mapLayer.IsUnderlayActive = !_mapLayer.IsUnderlayActive);
         On<ToggleOverlayEvent>(_ => _mapLayer.IsOverlayActive = !_mapLayer.IsOverlayActive);
-        After<DebugFlagEvent>(_ => _mapLayer.DebugFlags = GetVar(UserVars.Debug.DebugFlags));
+        After<DebugFlagEvent>(_ => _mapLayer.DebugFlags = Var(UserVars.Debug.DebugFlags));
 
         On<FastClockEvent>(e =>
         {
             _fastFrames += e.Frames;
-            var newMapFrame = _fastFrames / GetVar(GameVars.Time.FastTicksPerMapTileFrame);
+            var newMapFrame = _fastFrames / Var(GameVars.Time.FastTicksPerMapTileFrame);
             if (newMapFrame != _mapFrame)
             {
                 _mapFrame = newMapFrame;
@@ -54,7 +54,7 @@ public class MapRenderable2D : Component
 
     protected override void Subscribed()
     {
-        _mapLayer.DebugFlags = GetVar(UserVars.Debug.DebugFlags);
+        _mapLayer.DebugFlags = Var(UserVars.Debug.DebugFlags);
         Raise(new LoadPaletteEvent(Palette));
         _logicalMap.Dirty += OnLogicalMapDirty;
     }

@@ -295,6 +295,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         _game = new SavedGame
         {
             MapId = mapId,
+            ElapsedTime = TimeSpan.FromHours(8), // Game starts at 8:00 AM
             PartyX = x,
             PartyY = y,
             PartyDirection = Direction.East,

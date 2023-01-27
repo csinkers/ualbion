@@ -41,8 +41,8 @@ public class GravityItemTransition : Component
         lock (SyncRoot)
         {
             _velocity = new Vector2(
-                (float)(Random.NextDouble() - 0.5) * GetVar(TransitionVars.DiscardItemMaxInitialX),
-                (float)Random.NextDouble() * GetVar(TransitionVars.DiscardItemMaxInitialY));
+                (float)(Random.NextDouble() - 0.5) * Var(TransitionVars.DiscardItemMaxInitialX),
+                (float)Random.NextDouble() * Var(TransitionVars.DiscardItemMaxInitialY));
         }
 
         base.Subscribed();
@@ -57,7 +57,7 @@ public class GravityItemTransition : Component
             return;
         }
 
-        _velocity += new Vector2(0, -GetVar(TransitionVars.DiscardItemGravity) * deltaSeconds);
+        _velocity += new Vector2(0, -Var(TransitionVars.DiscardItemGravity) * deltaSeconds);
         _sprite.Position += new Vector3(_velocity, 0) * deltaSeconds;
     }
 }

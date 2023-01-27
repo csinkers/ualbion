@@ -44,7 +44,7 @@ class PartyMemberPromptDialog : ModalDialog
                     .OnClick(() => OnButton(member.Id))
                     .OnHover(() =>
                     {
-                        var name = member.Effective.GetName(GetVar(UserVars.Gameplay.Language));
+                        var name = member.Effective.GetName(Var(UserVars.Gameplay.Language));
                         Raise(new HoverTextEvent(new LiteralText(name)));
                     })
                     .OnBlur(() => Raise(new HoverTextEvent(null))

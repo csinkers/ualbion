@@ -49,7 +49,7 @@ public class PartyMember : Component, IPlayer
         var elapsed = (DateTime.Now - _lastChangeTime).TotalSeconds;
         var oldLerp = _lerp;
 
-        var lerpDuration = GetVar(GameVars.Ui.Transitions.InventoryChangLerpSeconds);
+        var lerpDuration = Var(GameVars.Ui.Transitions.InventoryChangLerpSeconds);
         _lerp = elapsed >  lerpDuration
             ? 1.0f 
             : (float)(elapsed / lerpDuration);

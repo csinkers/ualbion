@@ -16,8 +16,8 @@ public class InputManager : ServiceComponent<IInputManager>, IInputManager
     InputMode _inputMode = InputMode.Global;
     MouseMode _mouseMode = MouseMode.Normal;
 
-    public InputMode InputMode => (GetVar(UserVars.Debug.DebugFlags) & DebugFlags.ShowConsole) != 0 ? InputMode.TextEntry : _inputMode;
-    public MouseMode MouseMode => (GetVar(UserVars.Debug.DebugFlags) & DebugFlags.ShowConsole) != 0 ? MouseMode.Normal :_mouseMode;
+    public InputMode InputMode => (Var(UserVars.Debug.DebugFlags) & DebugFlags.ShowConsole) != 0 ? InputMode.TextEntry : _inputMode;
+    public MouseMode MouseMode => (Var(UserVars.Debug.DebugFlags) & DebugFlags.ShowConsole) != 0 ? MouseMode.Normal :_mouseMode;
     public IEnumerable<InputMode> InputModeStack => _inputModeStack;
     public IEnumerable<MouseMode> MouseModeStack => _mouseModeStack;
 

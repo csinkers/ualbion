@@ -51,12 +51,14 @@ public class MeshBatch : RenderableBatch<MeshId, GpuMeshInstanceData>
                 TransmissionFilter = mesh.Material.TransmissionFilter
             };
 
+#pragma warning disable CA2000
             VertexBuffer = AttachChild(new MultiBuffer<MeshVertex>(in mesh.Vertices, BufferUsage.VertexBuffer, $"VB_{mesh.Id}"));
             Instances = AttachChild(new MultiBuffer<GpuMeshInstanceData>(MinSize, BufferUsage.VertexBuffer, $"VB_Inst:{Name}"));
             IndexBuffer = AttachChild(new MultiBuffer<ushort>(in mesh.Indices, BufferUsage.IndexBuffer, $"IB_{mesh.Id}"));
 
             Uniform = AttachChild(new SingleBuffer<MeshUniform>(in uniform, BufferUsage.UniformBuffer, $"UB_{mesh.Id}"));
             Diffuse = source.GetSimpleTexture(texture);
+#pragma warning restore CA2000
         }
 
         ResourceSet = new MeshResourceSet

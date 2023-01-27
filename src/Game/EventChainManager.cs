@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
@@ -13,97 +12,124 @@ namespace UAlbion.Game;
 
 public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventManager, IDisposable
 {
-    static readonly ResumeChainsEvent ResumeChainsEvent = new();
+    class ResumeChainsEvent : Event, IVerboseEvent { }
+    static readonly ResumeChainsEvent ResumeChainsInstance = new();
     static readonly StartClockEvent StartClockEvent = new();
     static readonly StopClockEvent StopClockEvent = new();
 
     readonly List<EventContext> _contexts = new();
+    readonly List<Breakpoint> _breakpoints = new();
     public IReadOnlyList<EventContext> Contexts => _contexts;
-
+    public IReadOnlyList<Breakpoint> Breakpoints => _breakpoints;
     public EventChainManager()
     {
         // Need to enqueue without a sender if we want to handle it ourselves.
-        On<BeginFrameEvent>(_ => Exchange?.Enqueue(ResumeChainsEvent, null)); 
+        On<BeginFrameEvent>(_ => Exchange?.Enqueue(ResumeChainsInstance, null)); 
         On<ResumeChainsEvent>(ResumeChains);
         OnAsync<TriggerChainEvent>(Trigger);
         Context = new EventContext(new EventSource(AssetId.None, 0), null);
     }
 
-    bool HandleBoolEvent(EventContext context, IAsyncEvent<bool> boolEvent, IBranchNode branch) // Return value = whether to return.
+    public void AddBreakpoint(Breakpoint bp) => _breakpoints.Add(bp);
+    public void RemoveBreakpoint(int index) => _breakpoints.RemoveAt(index);
+    public void Continue(EventContext context)
     {
-        context.Status = EventContextStatus.Waiting;
-        int waiting = RaiseAsync(boolEvent, result =>
-        {
-#if DEBUG
-            Info($"if ({context.Node.Event}) => {result}");
-#endif
-            context.Node = result ? branch.Next : branch.NextIfFalse;
-
-            // If a non-query event needs to set this it will have to do it itself. This is to allow
-            // things like chest / door events where different combinations of their IAsyncEvent<bool> result 
-            // and the LastEventResult can mean successful opening, exiting the screen without success or a
-            // trap has been triggered.
-            if (boolEvent is QueryEvent) 
-                context.LastEventResult = result;
+        if (context == null) throw new ArgumentNullException(nameof(context));
+        if (context.Status == EventContextStatus.Breakpoint)
             context.Status = EventContextStatus.Ready;
-        });
-
-        if (waiting == 0)
-        {
-            ApiUtil.Assert($"Async event {boolEvent} not acknowledged. Continuing immediately.");
-            context.Node = context.Node.Next;
-            context.Status = EventContextStatus.Ready;
-        }
-        else if (context.Status == EventContextStatus.Waiting)
-        {
-            // If the continuation hasn't been called then stop iterating for now and wait for completion.
-            return true;
-        }
-
-        // If the continuation was called already then continue iterating.
-        return false;
     }
 
-    bool HandleAsyncEvent(EventContext context, IAsyncEvent asyncEvent)
+    public void SingleStep(EventContext context)
     {
-        context.Status = EventContextStatus.Waiting;
-        int waiting = RaiseAsync(asyncEvent, () =>
-        {
-            context.Node = context.Node?.Next;
+        if (context == null) throw new ArgumentNullException(nameof(context));
+        if (context.Status == EventContextStatus.Breakpoint)
             context.Status = EventContextStatus.Ready;
-        });
 
-        if (waiting == 0)
-        {
-            ApiUtil.Assert($"Async event {asyncEvent} not acknowledged. Continuing immediately.");
-            context.Node = context.Node.Next;
-            context.Status = EventContextStatus.Ready;
-        }
-        else if (context.Status == EventContextStatus.Waiting)
-        {
-            return true;
-        }
-
-        // If the continuation was called already then continue iterating.
-        return false;
+        context.BreakOnReturn = true;
     }
 
-    void HandleChainCompletion(EventContext context)
+    bool Trigger(TriggerChainEvent e, Action continuation)
     {
-        if (context.ClockWasRunning)
-            Raise(StartClockEvent);
+        // If the event chain is from a map, check if it's already been disabled in the game state
+        var game = Resolve<IGameState>();
+        if (e.EventSet.Id.Type == AssetType.Map && game.IsChainDisabled(e.EventSet.Id, e.EventSet.GetChainForEvent(e.EntryPoint)))
+            return true;
 
-        context.Status = EventContextStatus.Completing;
-        context.CompletionCallback?.Invoke();
-        context.Status = EventContextStatus.Complete;
-        _contexts.Remove(context);
+        var isClockRunning = Resolve<IClock>().IsRunning;
+        var firstNode = e.EventSet.Events[e.EntryPoint];
+        var context = new EventContext(e.Source, (EventContext)Context)
+        {
+            EntryPoint = e.EntryPoint,
+            EventSet = e.EventSet,
+            Node = firstNode,
+            ClockWasRunning = isClockRunning,
+            CompletionCallback = continuation,
+            LastAction = firstNode.Event as ActionEvent
+        };
+
+        if (isClockRunning)
+            Raise(StopClockEvent);
+
+        ReadyContext(context);
+        _contexts.Add(context);
+        Resume(context);
+        return true;
+    }
+
+    void ReadyContext(EventContext context)
+    {
+        var breakpointHit = false;
+        if (context.BreakOnReturn)
+        {
+            context.BreakOnReturn = false;
+            breakpointHit = true;
+        }
+        else
+        {
+            foreach (var breakpoint in _breakpoints)
+            {
+                if (!breakpoint.Target.IsNone && breakpoint.Target != context.EventSet.Id)
+                    continue;
+
+                if (breakpoint.TriggerType.HasValue && breakpoint.TriggerType.Value != context.Source.Trigger)
+                    continue;
+
+                if (breakpoint.EventId.HasValue && breakpoint.EventId.Value != context.Node?.Id)
+                    continue;
+
+                breakpointHit = true;
+                break;
+            }
+        }
+
+        context.Status = breakpointHit ? EventContextStatus.Breakpoint : EventContextStatus.Ready;
+    }
+
+    void ResumeChains(ResumeChainsEvent _)
+    {
+        bool ran;
+        do
+        {
+            ran = false;
+            foreach (var context in _contexts)
+            {
+                if (context.Status == EventContextStatus.Ready)
+                {
+                    Resume(context);
+                    ran = true;
+                    break;
+                }
+            }
+        } while (ran);
     }
 
     void Resume(EventContext context)
     {
+        if (context.Status != EventContextStatus.Ready)
+            return;
+
         var oldContext = Context;
         Context = context; // Set thread-local context for all components
-        context.Status = EventContextStatus.Ready;
 
         while (context.Node != null)
         {
@@ -137,41 +163,75 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
             Context = context.Parent;
     }
 
-    void ResumeChains(ResumeChainsEvent _)
+    void HandleChainCompletion(EventContext context)
     {
-        EventContext context;
-        do
-        {
-            context = _contexts.FirstOrDefault(x => x.Status == EventContextStatus.Ready);
-            if (context != null)
-                Resume(context);
-        } while (context != null);
+        if (context.ClockWasRunning)
+            Raise(StartClockEvent);
+
+        context.Status = EventContextStatus.Completing;
+        context.CompletionCallback?.Invoke();
+        context.Status = EventContextStatus.Complete;
+        _contexts.Remove(context);
     }
 
-    bool Trigger(TriggerChainEvent e, Action continuation)
+    bool HandleAsyncEvent(EventContext context, IAsyncEvent asyncEvent)
     {
-        var game = Resolve<IGameState>();
-        if (e.EventSet.Id.Type == AssetType.Map && game.IsChainDisabled(e.EventSet.Id, e.EventSet.GetChainForEvent(e.EntryPoint)))
-            return true;
-
-        var action = e.EventSet.Events[e.EntryPoint].Event as ActionEvent;
-        var context = new EventContext(e.Source, (EventContext)Context)
+        context.Status = EventContextStatus.Waiting;
+        int waiting = RaiseAsync(asyncEvent, () =>
         {
-            EntryPoint = e.EntryPoint,
-            EventSet = e.EventSet,
-            Node = e.EventSet.Events[e.EntryPoint],
-            ClockWasRunning = Resolve<IClock>().IsRunning,
-            CompletionCallback = continuation,
-            Status = EventContextStatus.Ready,
-            LastAction = action
-        };
+            context.Node = context.Node?.Next;
+            ReadyContext(context);
+        });
 
-        if (context.ClockWasRunning)
-            Raise(StopClockEvent);
+        if (waiting == 0)
+        {
+            ApiUtil.Assert($"Async event {asyncEvent} not acknowledged. Continuing immediately.");
+            context.Node = context.Node.Next;
+            ReadyContext(context);
+        }
+        else if (context.Status == EventContextStatus.Waiting)
+        {
+            return true;
+        }
 
-        _contexts.Add(context);
-        Resume(context);
-        return true;
+        // If the continuation was called already then continue iterating.
+        return false;
+    }
+
+    bool HandleBoolEvent(EventContext context, IAsyncEvent<bool> boolEvent, IBranchNode branch) // Return value = whether to return.
+    {
+        context.Status = EventContextStatus.Waiting;
+        int waiting = RaiseAsync(boolEvent, result =>
+        {
+#if DEBUG
+            Info($"if ({context.Node.Event}) => {result}");
+#endif
+            context.Node = result ? branch.Next : branch.NextIfFalse;
+
+            // If a non-query event needs to set this it will have to do it itself. This is to allow
+            // things like chest / door events where different combinations of their IAsyncEvent<bool> result 
+            // and the LastEventResult can mean successful opening, exiting the screen without success or a
+            // trap has been triggered.
+            if (boolEvent is QueryEvent) 
+                context.LastEventResult = result;
+
+            ReadyContext(context);
+        });
+
+        if (waiting == 0)
+        {
+            ApiUtil.Assert($"Async event {boolEvent} not acknowledged. Continuing immediately.");
+            context.Node = context.Node.Next;
+            ReadyContext(context);
+        }
+        else if (context.Status == EventContextStatus.Waiting)
+        {
+            // If the continuation hasn't been called then stop iterating for now and wait for completion.
+            return true;
+        }
+
+        // If the continuation was called already then continue iterating.
+        return false;
     }
 
     public void Dispose() { }

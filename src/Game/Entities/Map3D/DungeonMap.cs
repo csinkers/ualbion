@@ -31,10 +31,10 @@ public class DungeonMap : Component, IMap
     public DungeonMap(MapId mapId, MapData3D mapData)
     {
         On<WorldCoordinateSelectEvent>(Select);
-        On<MapInitEvent>(_ => FireEventChains(TriggerTypes.MapInit, true));
-        On<SlowClockEvent>(_ => FireEventChains(TriggerTypes.EveryStep, false));
-        On<HourElapsedEvent>(_ => FireEventChains(TriggerTypes.EveryHour, false));
-        On<DayElapsedEvent>(_ => FireEventChains(TriggerTypes.EveryDay, false));
+        On<MapInitEvent>(_ => FireEventChains(TriggerType.MapInit, true));
+        On<SlowClockEvent>(_ => FireEventChains(TriggerType.EveryStep, false));
+        On<HourElapsedEvent>(_ => FireEventChains(TriggerType.EveryHour, false));
+        On<DayElapsedEvent>(_ => FireEventChains(TriggerType.EveryDay, false));
         // On<UnloadMapEvent>(_ => Unload());
 
         MapId = mapId;
@@ -167,9 +167,9 @@ public class DungeonMap : Component, IMap
     }
 
     IEnumerable<MapEventZone> GetZonesOfType(TriggerTypes triggerType) => _mapData.GetZonesOfType(triggerType);
-    void FireEventChains(TriggerTypes type, bool log)
+    void FireEventChains(TriggerType type, bool log)
     {
-        var zones = GetZonesOfType(type);
+        var zones = GetZonesOfType(type.ToBitField());
         if (!log)
             Raise(new SetLogLevelEvent(LogLevel.Warning));
 

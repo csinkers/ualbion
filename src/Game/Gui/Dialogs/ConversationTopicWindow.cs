@@ -44,7 +44,7 @@ public class ConversationTopicWindow : ModalDialog
 
         var elements = new List<IUiElement>();
         var lookup = Resolve<IWordLookup>();
-        var language = GetVar(UserVars.Gameplay.Language);
+        var language = Var(UserVars.Gameplay.Language);
 
         _currentWords.Clear();
         var wordButtons = 

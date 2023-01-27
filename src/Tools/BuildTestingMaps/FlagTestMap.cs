@@ -1,5 +1,4 @@
-﻿using UAlbion.Api;
-using UAlbion.Base;
+﻿using UAlbion.Base;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
@@ -42,17 +41,17 @@ public static class FlagTestMap
                     map.Tiles[Pos(x + index, y)].Underlay = tileset1.IndexForChar(c);
                 }
 
-                builder!.SetChain(n, IfBuilder);
+                builder.SetChain(n, IfBuilder);
                 map.AddZone((byte)x, (byte)y, TriggerTypes.Examine | TriggerTypes.Manipulate, n);
                 n++;
             }
 
             string Script(ScriptBuilderFunc scriptBuilder)
             {
-                var text = scriptBuilder(builder!.AddMapText);
-                var script = ScriptLoader.Parse(ApiUtil.SplitLines(text));
+                var text = scriptBuilder(builder.AddMapText);
+                var script = ScriptLoader.Parse(text);
                 var scriptId = new ScriptId(nextScriptId++);
-                assets![scriptId] = script;
+                assets[scriptId] = script;
                 return "do_script " + scriptId.Id;
             }
 
@@ -135,17 +134,24 @@ public static class FlagTestMap
                 SpriteOrGroup = (SpriteId)NpcLargeGfx.Skrinn,
             };
 
-            Add(1, n+1, "EC0", "Chain 0 off", s => $@"
+            Add(1, n+1, "EC0", "Chain 0 off", _ => @"
     chain_off Set 0
 ");
 
-            Add( 9, 5, "<", "NPC0 left", _ => Script(s => $@"
+            Add( 9, 5, "<", "NPC0 left", _ => Script(_ => @"
 npc_lock 0
 npc_move 0 -1  0
-update 1
-update 1
-update 1
-update 1
+update 4
+npc_move 0 -1  0
+update 4
+npc_move 0 -1  0
+update 4
+npc_move 0 -1  0
+update 4
+npc_move 0 -1  0
+update 4
+npc_move 0 -1  0
+update 4
 npc_unlock 0
 "));
             Add(10, 4, "^", "NPC0 up", _ => Script(_ => @"

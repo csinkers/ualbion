@@ -18,7 +18,7 @@
   "Time.FastTicksPerAssetCacheCycle": 3600,
   "Time.FastTicksPerMapTileFrame": 10,
   "Time.FastTicksPerSecond": 60.0,
-  "Time.FastTicksPerSlowTick": 8, // Used for palette cycling & 'every-step' events
+  "Time.FastTicksPerSlowTick": 6, // Used for palette cycling & 'every-step' events
   "Time.GameSecondsPerSecond": 180.0,
   "Time.IdleTicksPerSecond": 8,
 

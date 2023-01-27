@@ -1,23 +1,9 @@
 {
   // Global key-bindings that are active in every game mode / scene
   "Global": {
-    "Tilde": "debug_flag toggle ShowConsole",
     "Alt+F4": "quit",
     "Alt+Enter": "e:toggle_fullscreen",
-    "V": "push_mouse_mode DebugPick",
-    "Shift+V": "hide_debug_window",
-    "F9": "update 1",
-    "F10": "start_clock",
-    "F11": "stop_clock",
-    "Control+D": "engine_flag toggle RenderDepth",
-    "Control+E": "push_scene Editor",
-    "Control+B": "engine_flag toggle ShowBoundingBoxes",
-    "Shift+L": "engine_flag toggle SuppressLayout",
-    "L": "eng:layout",
     "Control+M": "mute",
-    "Control+R": "e:run_renderdoc",
-    "Control+V": "engine_flag toggle VSync",
-    "Pause": "e:run_renderdoc",
 
     "Alt+1": "set_language English",
     "Alt+2": "set_language German",
@@ -25,7 +11,25 @@
     "Alt+F2": "load_map_prompt",
 
     "Space": "dismiss_message",
-    "Period": "dismiss_message"
+    "Period": "dismiss_message",
+
+    // Debugging
+    "Tilde": "debug_flag toggle ShowConsole",
+    "V": "push_mouse_mode DebugPick",
+    "Shift+V": "hide_debug_window",
+    "Control+D": "engine_flag toggle RenderDepth",
+    "Control+E": "push_scene Editor",
+    "Control+B": "engine_flag toggle ShowBoundingBoxes",
+    "Shift+L": "engine_flag toggle SuppressLayout",
+    "L": "eng:layout",
+    "Control+R": "e:run_renderdoc",
+    "Control+V": "engine_flag toggle VSync",
+    "Pause": "e:run_renderdoc",
+    "F1": "toggle_clock",
+    "F2": "update 1",
+    "F5": "debug_run",
+    "F9": "debug_break",
+    "F10": "debug_step"
   },
   "World2D": {
     "Escape": "push_scene MainMenu",
@@ -54,12 +58,12 @@
     "Right": "+party_move  1  0",
 
     "Tab": "inv:open Tom",
-    "F1": "inv:open_pos 0",
+    /*"F1": "inv:open_pos 0",
     "F2": "inv:open_pos 1",
     "F3": "inv:open_pos 2",
     "F4": "inv:open_pos 3",
     "F5": "inv:open_pos 4",
-    "F6": "inv:open_pos 5",
+    "F6": "inv:open_pos 5",*/
 
     "Control+Number1": "debug_flag toggle CollisionLayer",
     "Control+Number2": "debug_flag toggle SitLayer",
@@ -77,12 +81,12 @@
   "World3D": {
     "Escape": "push_scene MainMenu",
     "Tab": "inv:open Tom",
-    "F1": "inv:open_pos 0",
+    /*"F1": "inv:open_pos 0",
     "F2": "inv:open_pos 1",
     "F3": "inv:open_pos 2",
     "F4": "inv:open_pos 3",
     "F5": "inv:open_pos 4",
-    "F6": "inv:open_pos 5",
+    "F6": "inv:open_pos 5",*/
 
     "Control+A": "!loadnextmap",
     "Control+X": "!loadprevmap",
@@ -118,12 +122,12 @@
     "E": "inv:equip",
     "Escape": "inv:close",
     "Tab": "inv:close",
-    "F1": "inv:open_pos 0",
+    /*"F1": "inv:open_pos 0",
     "F2": "inv:open_pos 1",
     "F3": "inv:open_pos 2",
     "F4": "inv:open_pos 3",
     "F5": "inv:open_pos 4",
-    "F6": "inv:open_pos 5",
+    "F6": "inv:open_pos 5",*/
     "Control+1": "inv:set_page Summary",
     "Control+2": "inv:set_page Stats",
     "Control+3": "inv:set_page Misc"

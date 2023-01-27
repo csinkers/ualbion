@@ -27,6 +27,12 @@ class GameTrace : EventSource
     public void TeleportNpc(int npc, int x, int y) => WriteEvent(7, npc, x, y);
     public void MoveStart(string id, ushort x, ushort y, float pixelX, float pixelY) => WriteEvent(8, id, x, y, pixelX, pixelY);
     public void MoveDir(Direction oldDir, Direction desiredDir, Direction facingDir) => WriteEvent(9, oldDir, desiredDir, facingDir);
-    public void MovePos(int frame, float fromX, float fromY, float toX, float toY) => WriteEvent(10, frame, fromX, fromY, toX, toY);
+    public void MovePos(float fromX, float fromY, float toX, float toY, int frame) => WriteEvent(10, fromX, fromY, toX, toY, frame);
     public void MoveStop(string id, bool moved) => WriteEvent(11, id, moved);
+    public void FastTick(int ticks) => WriteEvent(12, ticks);
+    public void MinuteElapsed(int time) => WriteEvent(13, time);
+    public void HourElapsed(int time) => WriteEvent(14, time);
+    public void DayElapsed(int time) => WriteEvent(15, time);
+    public void SlowTick(int ticks) => WriteEvent(16, ticks);
+    public void IdleTick(int ticks) => WriteEvent(17, ticks);
 }

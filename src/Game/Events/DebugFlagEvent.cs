@@ -18,3 +18,6 @@ public class DebugFlagEvent : GameEvent, IVerboseEvent
     [EventPart("flag", "Valid values: ShowBoundingBoxes ShowCameraPosition, FlipDepthRange, FlipYSpace")]
     public DebugFlags Flag { get; }
 }
+
+[Event("debug_break")] public class DebugBreakEvent : GameEvent { }
+[Event("debug_step")] public class DebugStepEvent : GameEvent { }

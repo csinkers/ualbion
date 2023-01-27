@@ -69,7 +69,7 @@ public class LogicalCombatPositionSlot : UiElement
         var party = Resolve<IParty>();
 
         var sheet = GetSheet(_slotNumber);
-        var lang = GetVar(UserVars.Gameplay.Language);
+        var lang = Var(UserVars.Gameplay.Language);
 
         string inHandName = null;
         if (!_owner.InHand.IsNone)

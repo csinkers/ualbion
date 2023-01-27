@@ -4,36 +4,24 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game;
 
+[Event("slow_clock")] public class SlowClockEvent : GameEvent, IVerboseEvent { }
 public class SlowClock : Component
 {
+    readonly SlowClockEvent _event = new();
     int _ticks;
+    int _slowTicks;
 
     public SlowClock() => On<FastClockEvent>(OnUpdate);
 
     void OnUpdate(FastClockEvent updateEvent)
     {
         _ticks += updateEvent.Frames;
-        int delta = 0;
-        var ticksPerSlow = GetVar(GameVars.Time.FastTicksPerSlowTick);
+        var ticksPerSlow = Var(GameVars.Time.FastTicksPerSlowTick);
         while(_ticks >= ticksPerSlow)
         {
             _ticks -= ticksPerSlow;
-            delta++;
+            GameTrace.Log.SlowTick(_slowTicks++);
+            Raise(_event);
         }
-
-        if (delta <= 0)
-            return;
-
-        Raise(new SlowClockEvent(delta));
-    }
-}
-
-[Event("slow_clock")]
-public class SlowClockEvent : GameEvent, IVerboseEvent
-{
-    [EventPart("delta")] public int Delta { get; }
-    public SlowClockEvent(int delta)
-    {
-        Delta = delta;
     }
 }

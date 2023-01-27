@@ -10,6 +10,7 @@ public class IdleClock : Component
 {
     readonly IdleClockEvent _event = new();
     float _elapsedTimeThisGameFrame;
+    int _total;
 
     public IdleClock()
     {
@@ -19,7 +20,7 @@ public class IdleClock : Component
     void OnEngineUpdate(EngineUpdateEvent e)
     {
         _elapsedTimeThisGameFrame += e.DeltaSeconds;
-        var tickDurationSeconds = 1.0f / GetVar(GameVars.Time.IdleTicksPerSecond);
+        var tickDurationSeconds = 1.0f / Var(GameVars.Time.IdleTicksPerSecond);
 
         // If the game was paused for a while don't try and catch up
         if (_elapsedTimeThisGameFrame > 4 * tickDurationSeconds)
@@ -28,6 +29,7 @@ public class IdleClock : Component
         while (_elapsedTimeThisGameFrame >= tickDurationSeconds)
         {
             _elapsedTimeThisGameFrame -= tickDurationSeconds;
+            GameTrace.Log.IdleTick(_total++);
             Raise(_event);
         }
     }

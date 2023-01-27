@@ -40,7 +40,7 @@ public sealed class SkyboxRenderable : Component, ISkybox
             {
                 uYaw = camera.Yaw,
                 uPitch = camera.Pitch,
-                uVisibleProportion = GetVar(CoreVars.Gfx.Skybox.VisibleProportion)
+                uVisibleProportion = Var(CoreVars.Gfx.Skybox.VisibleProportion)
             };
         });
 

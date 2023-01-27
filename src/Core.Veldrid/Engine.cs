@@ -164,7 +164,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         var frameCounter = new FrameCounter();
         while (!_done && _newBackend == null)
         {
-            var flags = GetVar(CoreVars.User.EngineFlags);
+            var flags = Var(CoreVars.User.EngineFlags);
             var deltaSeconds =
                 (flags & EngineFlags.FixedTimeStep) != 0
                 ? 1 / 60.0f
@@ -274,7 +274,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
             _renderDoc.APIValidation = true;
         }
 
-        var flags = GetVar(CoreVars.User.EngineFlags);
+        var flags = Var(CoreVars.User.EngineFlags);
         var gdOptions = new GraphicsDeviceOptions(
             _renderDoc != null,
             PixelFormat.R32_Float,

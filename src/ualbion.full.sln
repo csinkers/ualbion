@@ -119,7 +119,9 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shaders", "..\mods\Shaders\
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Unpacked", "..\mods\Unpacked\Unpacked.shproj", "{63A4D9A8-4AE4-4BC4-9047-E242706B3C82}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BinOffsetFinder", "Tools\BinOffsetFinder\BinOffsetFinder.csproj", "{75E1C38E-ED34-4CB2-9EF9-0DC57E1FDF6C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BinOffsetFinder", "Tools\BinOffsetFinder\BinOffsetFinder.csproj", "{75E1C38E-ED34-4CB2-9EF9-0DC57E1FDF6C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImGuiColorTextEditNet", "..\deps\ImGuiColorTextEditNet\src\TextEdit\ImGuiColorTextEditNet.csproj", "{D88C3948-818A-4E31-9356-8129FF1FAC89}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -315,6 +317,10 @@ Global
 		{75E1C38E-ED34-4CB2-9EF9-0DC57E1FDF6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75E1C38E-ED34-4CB2-9EF9-0DC57E1FDF6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75E1C38E-ED34-4CB2-9EF9-0DC57E1FDF6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D88C3948-818A-4E31-9356-8129FF1FAC89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D88C3948-818A-4E31-9356-8129FF1FAC89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D88C3948-818A-4E31-9356-8129FF1FAC89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D88C3948-818A-4E31-9356-8129FF1FAC89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -363,6 +369,7 @@ Global
 		{852FA5D7-3FFF-415C-A20C-F682BBFCE0C7} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
 		{63A4D9A8-4AE4-4BC4-9047-E242706B3C82} = {E4F7A1D2-3BB2-46C4-B8E5-4FD4CADB94CA}
 		{75E1C38E-ED34-4CB2-9EF9-0DC57E1FDF6C} = {149A8BC2-91D1-4249-9E1D-7B0054347832}
+		{D88C3948-818A-4E31-9356-8129FF1FAC89} = {B2D034E4-684C-48C8-85C4-A74AFEDF9BEA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2759A62D-227A-4D68-B6B5-966B9141AA74}

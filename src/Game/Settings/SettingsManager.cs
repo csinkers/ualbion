@@ -29,7 +29,7 @@ public class SettingsManager : Component, ISettings
         });
         On<SetLanguageEvent>(e =>
         {
-            if (GetVar(UserVars.Gameplay.Language) == e.Language)
+            if (Var(UserVars.Gameplay.Language) == e.Language)
                 return;
             SetVar(UserVars.Gameplay.Language, e.Language);
         });
@@ -39,26 +39,26 @@ public class SettingsManager : Component, ISettings
         On<SetCombatDelayEvent>(e => SetVar(UserVars.Gameplay.CombatDelay, e.Value));
         On<DebugFlagEvent>(e =>
         {
-            var debugFlags = GetVar(UserVars.Debug.DebugFlags);
+            var debugFlags = Var(UserVars.Debug.DebugFlags);
             debugFlags = (DebugFlags)CoreUtil.UpdateFlag((uint)debugFlags, e.Operation, (uint)e.Flag);
             TraceAttachment = (debugFlags & DebugFlags.TraceAttachment) != 0;
             SetVar(UserVars.Debug.DebugFlags, debugFlags);
         });
         On<SpecialEvent>(e =>
         {
-            var value = GetVar(CoreVars.User.Special1);
+            var value = Var(CoreVars.User.Special1);
             value = CoreUtil.UpdateValue(value, e.Operation, e.Argument);
             SetVar(CoreVars.User.Special1, value);
         });
         On<Special2Event>(e =>
         {
-            var value = GetVar(CoreVars.User.Special2);
+            var value = Var(CoreVars.User.Special2);
             value = CoreUtil.UpdateValue(value, e.Operation, e.Argument);
             SetVar(CoreVars.User.Special2, value);
         });
         On<EngineFlagEvent>(e =>
         {
-            var value = GetVar(CoreVars.User.EngineFlags);
+            var value = Var(CoreVars.User.EngineFlags);
             value = (EngineFlags)CoreUtil.UpdateFlag((uint)value, e.Operation, (uint)e.Flag);
             SetVar(CoreVars.User.EngineFlags, value);
         });

@@ -134,8 +134,8 @@ namespace UAlbion.Api.Eventing
                     if (handler.Invoke(e, continuation))
                         inProgressHandlers++;
 
-            _dispatchLists.Return(handlers);
             LogRaiseEnd(e, verbose, eventId, eventText, handlers.Count);
+            _dispatchLists.Return(handlers);
             return inProgressHandlers;
         }
 

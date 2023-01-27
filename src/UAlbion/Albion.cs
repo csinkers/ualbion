@@ -146,7 +146,7 @@ static class Albion
             new LayoutManager(),
             new DialogManager(),
             new InventoryScreenManager(),
-            new DebugMapInspector()
+            new DiagWindow()
                 .Add(new SpriteInstanceDataDebugBehaviour())
                 .Add(new FormatTextEventBehaviour()),
                 // .Add(new QueryEventDebugBehaviour()))

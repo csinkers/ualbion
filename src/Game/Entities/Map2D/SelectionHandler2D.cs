@@ -122,7 +122,7 @@ public sealed class SelectionHandler2D : Component
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.MapPopup_Examine),
-                    new TriggerMapTileEvent(TriggerTypes.Examine, zone.X, zone.Y),
+                    new TriggerMapTileEvent(TriggerType.Examine, zone.X, zone.Y),
                     ContextMenuGroup.Actions));
             }
 
@@ -130,7 +130,7 @@ public sealed class SelectionHandler2D : Component
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.MapPopup_Manipulate),
-                    new TriggerMapTileEvent(TriggerTypes.Manipulate, zone.X, zone.Y),
+                    new TriggerMapTileEvent(TriggerType.Manipulate, zone.X, zone.Y),
                     ContextMenuGroup.Actions));
             }
 
@@ -138,7 +138,7 @@ public sealed class SelectionHandler2D : Component
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.MapPopup_Take),
-                    new TriggerMapTileEvent(TriggerTypes.Take, zone.X, zone.Y),
+                    new TriggerMapTileEvent(TriggerType.Take, zone.X, zone.Y),
                     ContextMenuGroup.Actions));
             }
 
@@ -146,7 +146,7 @@ public sealed class SelectionHandler2D : Component
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.MapPopup_TalkTo),
-                    new TriggerMapTileEvent(TriggerTypes.TalkTo, zone.X, zone.Y),
+                    new TriggerMapTileEvent(TriggerType.TalkTo, zone.X, zone.Y),
                     ContextMenuGroup.Actions));
             }
         }

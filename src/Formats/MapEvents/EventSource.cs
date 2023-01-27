@@ -5,7 +5,7 @@ namespace UAlbion.Formats.MapEvents;
 
 public class EventSource
 {
-    public EventSource(AssetId assetId, TriggerTypes trigger, int x = 0, int y = 0)
+    public EventSource(AssetId assetId, TriggerType trigger, int x = 0, int y = 0)
     {
         // Trigger = TalkTo for NPC, UseItem for item, Action for event set, Default for none
         AssetId = assetId;
@@ -15,7 +15,7 @@ public class EventSource
     }
 
     public AssetId AssetId { get; }
-    public TriggerTypes Trigger { get; }
+    public TriggerType Trigger { get; }
     public int X { get; }
     public int Y { get; }
     public override string ToString() => $"ESrc({Trigger} {AssetId} @ ({X},{Y}))";

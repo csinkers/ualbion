@@ -26,6 +26,7 @@ public class EventContext
     public IEventNode Node { get => _node; set { LastNode = _node; _node = value; } }
     public EventSource Source { get; }
     public EventContextStatus Status { get; set; } = EventContextStatus.Ready;
+    public bool BreakOnReturn { get; set; }
     public IEventNode LastNode { get; set; }
     public bool LastEventResult { get; set; }
     public ActionEvent LastAction { get; set; }

@@ -36,7 +36,7 @@ public class ScriptManager : Component
         for (ushort i = 0; i < events.Count - 1; i++) nodes[i].Next = nodes[i + 1];
 
         var set = new ScriptEventSet(doScriptEvent.ScriptId, mapManager.Current.MapId.ToMapText(), nodes);
-        var source = new EventSource(mapManager.Current.MapId, TriggerTypes.Default); // TODO: Is there a better trigger type for this?
+        var source = new EventSource(mapManager.Current.MapId, TriggerType.Default); // TODO: Is there a better trigger type for this?
         var trigger = new TriggerChainEvent(set, 0, source);
         return RaiseAsync(trigger, continuation) > 0;
     }

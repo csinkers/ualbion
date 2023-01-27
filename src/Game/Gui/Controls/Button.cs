@@ -85,7 +85,7 @@ public class Button : UiElement
             }
             else // For the first click, just start the double-click timer.
             {
-                Raise(new StartTimerEvent(TimerName, GetVar(GameVars.Ui.ButtonDoubleClickIntervalSeconds), this));
+                Raise(new StartTimerEvent(TimerName, Var(GameVars.Ui.ButtonDoubleClickIntervalSeconds), this));
                 ClickTimerPending = true;
             }
         });

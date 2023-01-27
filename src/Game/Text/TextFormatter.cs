@@ -95,7 +95,7 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
                 {
                     if (active is ICharacterSheet character)
                     {
-                        var language = GetVar(UserVars.Gameplay.Language);
+                        var language = Var(UserVars.Gameplay.Language);
                         yield return (Token.Text, character.GetName(language));
                     }
                     else if (active is ItemData item)

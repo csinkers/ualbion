@@ -46,6 +46,7 @@ public class ScriptLoader : IAssetLoader<Script>
         return script;
     }
 
+    public static Script Parse(string text) => Parse(ApiUtil.SplitLines(text));
     public static Script Parse(IEnumerable<string> lines)
     {
         if (lines == null)

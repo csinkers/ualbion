@@ -148,7 +148,7 @@ public sealed class RenderPass : Container, IRenderPass, IDisposable
     {
         var camera = Resolve<ICamera>();
         var clock = TryResolve<IClock>();
-        var engineFlags = GetVar(CoreVars.User.EngineFlags);
+        var engineFlags = Var(CoreVars.User.EngineFlags);
         var paletteManager = Resolve<IPaletteManager>();
         var textureSource = Resolve<ITextureSource>();
 

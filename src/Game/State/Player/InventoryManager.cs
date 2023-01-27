@@ -324,7 +324,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                         (int)cursorUiPosition.Y,
                         (int)slot.LastUiPosition.X,
                         (int)slot.LastUiPosition.Y,
-                        GetVar(GameVars.Ui.Transitions.ItemMovementTransitionTimeSeconds));
+                        Var(GameVars.Ui.Transitions.ItemMovementTransitionTimeSeconds));
 
                     ItemSlot temp = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
                     temp.TransferFrom(_hand, null);
@@ -354,7 +354,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                         (int)cursorUiPosition.Y,
                         (int)slot.LastUiPosition.X,
                         (int)slot.LastUiPosition.Y,
-                        GetVar(GameVars.Ui.Transitions.ItemMovementTransitionTimeSeconds));
+                        Var(GameVars.Ui.Transitions.ItemMovementTransitionTimeSeconds));
 
                     var transitionEvent2 = new LinearItemTransitionEvent(
                         slot.ItemId,
@@ -362,7 +362,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                         (int)slot.LastUiPosition.Y,
                         (int)cursorUiPosition.X,
                         (int)cursorUiPosition.Y,
-                        GetVar(GameVars.Ui.Transitions.ItemMovementTransitionTimeSeconds));
+                        Var(GameVars.Ui.Transitions.ItemMovementTransitionTimeSeconds));
 
                     ItemSlot temp1 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
                     ItemSlot temp2 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
@@ -449,7 +449,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
 
                 if (!slot.ItemId.IsNone)
                 {
-                    var maxTransitions = GetVar(GameVars.Ui.Transitions.MaxDiscardTransitions);
+                    var maxTransitions = Var(GameVars.Ui.Transitions.MaxDiscardTransitions);
                     for (int i = 0; i < itemsToDrop && i < maxTransitions; i++)
                         Raise(new GravityItemTransitionEvent(slot.ItemId, e.NormX, e.NormY));
                 }
@@ -687,7 +687,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
             var triggerEvent = new TriggerChainEvent(
                 eventSet,
                 eventIndex,
-                new EventSource(eventSet.Id, TriggerTypes.Action));
+                new EventSource(eventSet.Id, TriggerType.Action));
 
             RaiseAsync(triggerEvent, continuation);
             return;

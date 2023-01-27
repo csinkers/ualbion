@@ -55,7 +55,7 @@ public class ImGuiConsoleLogger : Component
 
     void RenderDialog()
     {
-        var debugFlags = GetVar(UserVars.Debug.DebugFlags);
+        var debugFlags = Var(UserVars.Debug.DebugFlags);
         if ((debugFlags & DebugFlags.ShowConsole) == 0)
         {
             _wasShown = false;

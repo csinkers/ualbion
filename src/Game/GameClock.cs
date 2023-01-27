@@ -16,23 +16,16 @@ public class GameClock : ServiceComponent<IClock>, IClock
     float _elapsedTimeThisGameFrame;
     int _ticksRemaining;
     int _stoppedFrames;
+    int _totalFastTicks;
     float _stoppedMs;
     Action _pendingContinuation;
+    bool _isRunning;
 
     public GameClock()
     {
-        On<StartClockEvent>(_ =>
-        {
-            GameTrace.Log.ClockStart(_stoppedFrames, _stoppedMs);
-            _stoppedFrames = 0;
-            _stoppedMs = 0;
-            IsRunning = true;
-        });
-        On<StopClockEvent>(_ =>
-        {
-            GameTrace.Log.ClockStop();
-            IsRunning = false;
-        });
+        On<StartClockEvent>(_ => IsRunning = true);
+        On<StopClockEvent>(_ => IsRunning = false);
+        On<ToggleClockEvent>(_ => IsRunning = !IsRunning);
         On<EngineUpdateEvent>(OnEngineUpdate);
         On<StartTimerEvent>(StartTimer);
 
@@ -43,14 +36,33 @@ public class GameClock : ServiceComponent<IClock>, IClock
 
             GameTrace.Log.ClockUpdating(e.Cycles);
             _pendingContinuation = c;
-            _ticksRemaining = e.Cycles * 3;
+            _ticksRemaining = e.Cycles * Var(GameVars.Time.FastTicksPerSlowTick);
             IsRunning = true;
             return true;
         });
     }
 
     public float ElapsedTime { get; private set; }
-    public bool IsRunning { get; private set; }
+
+    public bool IsRunning
+    {
+        get => _isRunning;
+        private set
+        {
+            if (_isRunning == value)
+                return;
+
+            if (value)
+            {
+                GameTrace.Log.ClockStart(_stoppedFrames, _stoppedMs);
+                _stoppedFrames = 0;
+                _stoppedMs = 0;
+            }
+            else GameTrace.Log.ClockStop();
+
+            _isRunning = value;
+        }
+    }
 
     void StartTimer(StartTimerEvent e) => _activeTimers.Add((e.Id, ElapsedTime + e.IntervalSeconds));
 
@@ -74,21 +86,31 @@ public class GameClock : ServiceComponent<IClock>, IClock
             if (state != null)
             {
                 var lastGameTime = state.Time;
-                var newGameTime = lastGameTime.AddSeconds(e.DeltaSeconds * GetVar(GameVars.Time.GameSecondsPerSecond));
+                var newGameTime = lastGameTime.AddSeconds(e.DeltaSeconds * Var(GameVars.Time.GameSecondsPerSecond));
                 ((IComponent) state).Receive(new SetTimeEvent(newGameTime), this);
 
+                int time = newGameTime.Day * 10000 + newGameTime.Hour * 100 + newGameTime.Minute;
                 if (newGameTime.Minute != lastGameTime.Minute)
+                {
+                    GameTrace.Log.MinuteElapsed(time);
                     Raise(MinuteElapsedEvent.Instance);
+                }
 
                 if (newGameTime.Hour != lastGameTime.Hour)
+                {
+                    GameTrace.Log.HourElapsed(time);
                     Raise(HourElapsedEvent.Instance);
+                }
 
                 if (newGameTime.Date != lastGameTime.Date)
+                {
+                    GameTrace.Log.DayElapsed(time);
                     Raise(DayElapsedEvent.Instance);
+                }
             }
 
             _elapsedTimeThisGameFrame += e.DeltaSeconds;
-            var tickDurationSeconds = 1.0f / GetVar(GameVars.Time.FastTicksPerSecond);
+            var tickDurationSeconds = 1.0f / Var(GameVars.Time.FastTicksPerSecond);
 
             // If the game was paused for a while don't try and catch up
             if (_elapsedTimeThisGameFrame > 4 * tickDurationSeconds)
@@ -99,7 +121,7 @@ public class GameClock : ServiceComponent<IClock>, IClock
                 _elapsedTimeThisGameFrame -= tickDurationSeconds;
                 RaiseTick();
 
-                var ticksPerCycle = GetVar(GameVars.Time.FastTicksPerAssetCacheCycle);
+                var ticksPerCycle = Var(GameVars.Time.FastTicksPerAssetCacheCycle);
                 if ((state?.TickCount ?? 0) % ticksPerCycle == ticksPerCycle - 1)
                     Raise(new CycleCacheEvent());
             }
@@ -115,6 +137,7 @@ public class GameClock : ServiceComponent<IClock>, IClock
 
     void RaiseTick()
     {
+        GameTrace.Log.FastTick(_totalFastTicks++);
         Raise(new FastClockEvent(1));
         if (_ticksRemaining <= 0)
             return;

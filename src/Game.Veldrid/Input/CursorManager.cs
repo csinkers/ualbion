@@ -91,7 +91,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
 
     void Render()
     {
-        var showHotspot = (GetVar(UserVars.Debug.DebugFlags) & DebugFlags.ShowCursorHotspot) != 0;
+        var showHotspot = (Var(UserVars.Debug.DebugFlags) & DebugFlags.ShowCursorHotspot) != 0;
         if (showHotspot != (_hotspotSprite == null))
             _dirty = true;
 

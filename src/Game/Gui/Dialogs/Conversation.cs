@@ -138,7 +138,7 @@ public class Conversation : Component
 
                 var etId = _npc.EventSetId.ToEventText();
                 var strings = (IStringCollection)Resolve<IModApplier>().LoadAssetCached(etId);
-                var lang = GetVar(UserVars.Gameplay.Language);
+                var lang = Var(UserVars.Gameplay.Language);
 
                 ushort subId = 0;
                 for (ushort i = 0; i < strings.Count; i++)
@@ -374,7 +374,7 @@ public class Conversation : Component
         var triggerEvent = new TriggerChainEvent(
             chainSource,
             eventIndex.Value,
-            new EventSource(chainSource.Id, TriggerTypes.Action));
+            new EventSource(chainSource.Id, TriggerType.Action));
 
         RaiseAsync(triggerEvent, () =>
         {

@@ -21,10 +21,10 @@ public class NormalMouseMode : Component
 
     Vector2 _lastPosition;
 
-    public NormalMouseMode() => On<InputEvent>(OnInput);
+    public NormalMouseMode() => On<MouseInputEvent>(OnInput);
     protected override void Subscribed() => Raise(new SetCursorEvent(Base.CoreGfx.Cursor));
 
-    void OnInput(InputEvent e)
+    void OnInput(MouseInputEvent e)
     {
         _hits.Clear();
         Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, true);

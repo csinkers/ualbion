@@ -58,7 +58,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
             _heldItemCountUsesTenths = e.UseTenths;
             _heldItemFrames = e.FrameCount < 1 ? 1 : e.FrameCount;
         });
-        On<InputEvent>(e =>
+        On<PreviewInputEvent>(e =>
         {
             if (_relative)
             {

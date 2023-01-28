@@ -51,7 +51,7 @@ public class MouseLookMouseMode : Component
 
     public MouseLookMouseMode()
     {
-        On<InputEvent>(OnInput);
+        On<MouseInputEvent>(OnInput);
         On<FocusGainedEvent>(_ => AcquireMouse());
         On<FocusLostEvent>(_ => ReleaseMouse());
         On<PostGameUpdateEvent>(_ =>
@@ -86,7 +86,7 @@ public class MouseLookMouseMode : Component
         Raise(_confineMouseToWindowEvent);
     }
 
-    void OnInput(InputEvent e)
+    void OnInput(MouseInputEvent e)
     {
         if (_firstEvent) // Ignore the first event to prevent the view jumping about due to the prior cursor position
         {

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -13,9 +12,9 @@ namespace UAlbion.Game.Veldrid.Input;
 public class ExclusiveMouseMode : Component
 {
     readonly List<Selection> _hits = new();
-    public ExclusiveMouseMode() => On<InputEvent>(OnInput);
+    public ExclusiveMouseMode() => On<MouseInputEvent>(OnInput);
 
-    void OnInput(InputEvent e)
+    void OnInput(MouseInputEvent e)
     {
         _hits.Clear();
         Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, true);

@@ -12,6 +12,9 @@ namespace UAlbion.Core.Veldrid;
 
 class WindowHolder : Component, IDisposable
 {
+    readonly PreviewInputEvent _previewEvent = new();
+    readonly KeyboardInputEvent _keyboardEvent = new();
+    readonly MouseInputEvent _mouseEvent = new();
     Sdl2Window _window;
     DateTime _lastTitleUpdateTime;
     Vector2? _pendingCursorUpdate;
@@ -99,24 +102,46 @@ class WindowHolder : Component, IDisposable
     {
         SetTitle();
         Sdl2Events.ProcessEvents();
-        var snapshot = _window.PumpEvents();
-        if (_window != null)
-        {
-            if (_pendingCursorUpdate.HasValue && _window.Focused)
-            {
-                using (PerfTracker.FrameEvent("3 Warping mouse"))
-                {
-                    Sdl2Native.SDL_WarpMouseInWindow(
-                        _window.SdlWindowHandle,
-                        (int)_pendingCursorUpdate.Value.X,
-                        (int)_pendingCursorUpdate.Value.Y);
 
-                    _pendingCursorUpdate = null;
-                }
+        var snapshot = _window.PumpEvents();
+
+        if (_window == null) // Check if the window was closed while pumping events
+            return;
+
+        if (_pendingCursorUpdate.HasValue && _window.Focused)
+        {
+            using (PerfTracker.FrameEvent("3 Warping mouse"))
+            {
+                Sdl2Native.SDL_WarpMouseInWindow(
+                    _window.SdlWindowHandle,
+                    (int)_pendingCursorUpdate.Value.X,
+                    (int)_pendingCursorUpdate.Value.Y);
+
+                _pendingCursorUpdate = null;
+            }
+        }
+
+        using (PerfTracker.FrameEvent("4 Raising input event"))
+        {
+            _previewEvent.DeltaSeconds = deltaSeconds;
+            _previewEvent.Snapshot = snapshot;
+            Raise(_previewEvent);
+
+            if (!_previewEvent.SuppressKeyboard)
+            {
+                _keyboardEvent.DeltaSeconds = deltaSeconds;
+                _keyboardEvent.KeyCharPresses = snapshot.KeyCharPresses;
+                _keyboardEvent.KeyEvents = snapshot.KeyEvents;
+                Raise(_keyboardEvent);
             }
 
-            using (PerfTracker.FrameEvent("4 Raising input event"))
-                Raise(new InputEvent(deltaSeconds, snapshot, _window.MouseDelta));
+            if (!_previewEvent.SuppressMouse)
+            {
+                _mouseEvent.DeltaSeconds = deltaSeconds;
+                _mouseEvent.Snapshot = snapshot;
+                _mouseEvent.MouseDelta = _window.MouseDelta;
+                Raise(_mouseEvent);
+            }
         }
     }
 }

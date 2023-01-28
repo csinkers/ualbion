@@ -27,7 +27,7 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
 
     public InputBinder()
     {
-        On<InputEvent>(OnInput);
+        On<KeyboardInputEvent>(OnKeyboard);
         On<RebindInputEvent>(_ => Rebind());
         On<LoadMapEvent>(e => _mapId = e.MapId);
         On<AssetUpdatedEvent>(e =>
@@ -112,10 +112,10 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
         }
     }
 
-    void OnInput(InputEvent e)
+    void OnKeyboard(KeyboardInputEvent e)
     {
         var inputManager = Resolve<IInputManager>();
-        foreach (var keyEvent in e.Snapshot.KeyEvents)
+        foreach (var keyEvent in e.KeyEvents)
         {
             if (!keyEvent.Down)
             {

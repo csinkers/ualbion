@@ -23,7 +23,7 @@ public class RightButtonHeldMouseMode : Component
 
     public RightButtonHeldMouseMode()
     {
-        On<InputEvent>(OnInput);
+        On<MouseInputEvent>(OnInput);
         _cursor = AttachChild(new MapSprite(Base.CoreGfx.Select, DrawLayer.MaxLayer, 0, SpriteFlags.LeftAligned));
     }
 
@@ -44,7 +44,7 @@ public class RightButtonHeldMouseMode : Component
             Raise(new StartClockEvent());
     }
 
-    void OnInput(InputEvent e)
+    void OnInput(MouseInputEvent e)
     {
         _hits.Clear();
         Resolve<ISelectionManager>().CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, false);

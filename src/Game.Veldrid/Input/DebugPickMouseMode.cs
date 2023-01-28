@@ -14,9 +14,9 @@ public class DebugPickMouseMode : Component
     readonly List<Selection> _hits = new();
     readonly PopMouseModeEvent _popMouseModeEvent = new();
 
-    public DebugPickMouseMode() => On<InputEvent>(OnInput);
+    public DebugPickMouseMode() => On<MouseInputEvent>(OnInput);
 
-    void OnInput(InputEvent e)
+    void OnInput(MouseInputEvent e)
     {
         if (e.Snapshot.CheckMouse(MouseButton.Left, true))
         {

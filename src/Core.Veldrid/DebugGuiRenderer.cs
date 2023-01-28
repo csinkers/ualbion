@@ -1,4 +1,5 @@
 ﻿using System;
+using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
@@ -17,7 +18,17 @@ public sealed class DebugGuiRenderer : Component, IRenderer, IDisposable
     public DebugGuiRenderer(IFramebufferHolder framebuffer)
     {
         _framebuffer = framebuffer;
-        On<InputEvent>(e => _imguiRenderer?.Update((float)e.DeltaSeconds, e.Snapshot));
+        On<PreviewInputEvent>(e =>
+        {
+            _imguiRenderer?.Update((float)e.DeltaSeconds, e.Snapshot);
+            if (ImGui.GetCurrentContext() != IntPtr.Zero)
+            {
+                var io = ImGui.GetIO();
+                e.SuppressKeyboard = io.WantCaptureKeyboard;
+                e.SuppressMouse = io.WantCaptureMouse;
+            }
+        });
+
         On<WindowResizedEvent>(e => _imguiRenderer?.WindowResized(e.Width, e.Height));
         On<DeviceCreatedEvent>(_ => Dirty());
         On<DestroyDeviceObjectsEvent>(_ => Dispose());

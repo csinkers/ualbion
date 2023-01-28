@@ -15,7 +15,7 @@ public class ContextMenuMouseMode : Component
     readonly UiLeftReleaseEvent _leftReleaseEvent = new();
     bool _wasClockRunning;
 
-    public ContextMenuMouseMode() => On<InputEvent>(OnInput);
+    public ContextMenuMouseMode() => On<MouseInputEvent>(OnInput);
     protected override void Subscribed()
     {
         Raise(new SetCursorEvent(Base.CoreGfx.Cursor));
@@ -30,7 +30,7 @@ public class ContextMenuMouseMode : Component
             Raise(new StartClockEvent());
     }
 
-    void OnInput(InputEvent e)
+    void OnInput(MouseInputEvent e)
     {
         _hits.Clear();
         Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, true);

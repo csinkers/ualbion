@@ -19,10 +19,6 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.State.Player;
 
-public class InventoryEventManager : Component
-{
-}
-
 public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryManager
 {
     readonly Func<InventoryId, Inventory> _getInventory;
@@ -125,7 +121,8 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         // if (!item.Races.IsAllowed(sheet.Races)) // Apparently never implemented in original game?
         //     return false;
 
-        if (item.SlotType != slotId)
+        bool force = item.SlotType == ItemSlotId.RightHandOrTail && slotId is ItemSlotId.RightHand or ItemSlotId.Tail;
+        if (item.SlotType != slotId && !force)
             return false;
 
         switch (slotId)

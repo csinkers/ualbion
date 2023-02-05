@@ -6,8 +6,11 @@ using UAlbion.Api.Eventing;
 
 namespace UAlbion.Game.Diag;
 
-public static class ObjectTypeReflectorBuilder
+public class ObjectTypeReflectorBuilder : IReflectorBuilder
 {
+    public static ObjectTypeReflectorBuilder Instance { get; } = new();
+    ObjectTypeReflectorBuilder() { }
+
     record SubObjectGetter(string Name, Func<object, object> Getter);
 
     static readonly Dictionary<string, string[]> MembersToIgnore = new()
@@ -25,11 +28,10 @@ public static class ObjectTypeReflectorBuilder
         { "RuntimeType", new[] { "DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition" } },
     };
 
-    public static void Build(IReflectorConfigurer config, Reflector reflector, Type type)
+    public Reflector Build(ReflectorManager manager, string name, Type type)
     {
         // Generic object handling
-        if (config == null) throw new ArgumentNullException(nameof(config));
-        if (reflector == null) throw new ArgumentNullException(nameof(reflector));
+        if (manager == null) throw new ArgumentNullException(nameof(manager));
         if (type == null) throw new ArgumentNullException(nameof(type));
 
         var subObjects = new Dictionary<string, SubObjectGetter>();
@@ -40,8 +42,7 @@ public static class ObjectTypeReflectorBuilder
             .Select(x => x.Value)
             .ToArray();
 
-        var manager = config.GetManager(reflector);
-        IEnumerable<ReflectorState> VisitObject(object target)
+        IEnumerable<ReflectorState> VisitChildren(object target)
         {
             if (target == null) yield break;
             foreach (var subObject in subObjectArray)
@@ -52,7 +53,7 @@ public static class ObjectTypeReflectorBuilder
             }
         }
 
-        config.AssignSubObjectsFunc(reflector, VisitObject);
+        return new Reflector(name, null, null, VisitChildren);
     }
 
     static void PopulateMembers(Type type, Dictionary<string, SubObjectGetter> subObjects)

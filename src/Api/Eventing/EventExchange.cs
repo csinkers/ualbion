@@ -16,23 +16,23 @@ namespace UAlbion.Api.Eventing
     public sealed class EventExchange : IDisposable
     {
         readonly object _syncRoot = new();
-        readonly ILogExchange _logExchange;
-        readonly PooledThreadSafe<List<Handler>> _dispatchLists = new(() => new List<Handler>(), x => x.Clear());
-        readonly DoubleBuffered<List<(IEvent, object)>> _queuedEvents = new(() => new List<(IEvent, object)>());
+        [DiagIgnore] readonly ILogExchange _logExchange;
+        [DiagIgnore] readonly PooledThreadSafe<List<Handler>> _dispatchLists = new(() => new List<Handler>(), x => x.Clear());
+        [DiagIgnore] readonly DoubleBuffered<List<(IEvent, object)>> _queuedEvents = new(() => new List<(IEvent, object)>());
         readonly IDictionary<Type, object> _registrations = new Dictionary<Type, object>();
         readonly IDictionary<Type, List<Handler>> _subscriptions = new Dictionary<Type, List<Handler>>();
         readonly IDictionary<IComponent, List<Handler>> _subscribers = new Dictionary<IComponent, List<Handler>>();
 
-        int _nesting = -1;
-        long _nextEventId;
-        public int Nesting => _nesting;
+        [DiagIgnore] int _nesting = -1;
+        [DiagIgnore] long _nextEventId;
+        [DiagIgnore] public int Nesting => _nesting;
         public string Name { get; set; }
         public override string ToString() => Name ?? "EventExchange";
 
 #if DEBUG
         // ReSharper disable once CollectionNeverQueried.Local
-        readonly List<IEvent> _frameEvents = new();
-        List<IComponent> _sortedSubscribersCached = new();
+        [DiagIgnore] readonly List<IEvent> _frameEvents = new();
+        [DiagIgnore] List<IComponent> _sortedSubscribersCached = new();
         public List<IComponent> SortedSubscribers // Just for debugging
         {
             get

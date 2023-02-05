@@ -57,7 +57,7 @@ public class FlatMap : Component, IMap
         var assetManager = Resolve<IAssetManager>();
         var state = Resolve<IGameState>();
         var gameFactory = Resolve<IGameFactory>();
-        _logicalMap = new LogicalMap2D(assetManager, _mapData, state.TemporaryMapChanges, state.PermanentMapChanges);
+        _logicalMap = AttachChild(new LogicalMap2D(assetManager, _mapData, state.TemporaryMapChanges, state.PermanentMapChanges));
         var tileset = assetManager.LoadTileGraphics(_logicalMap.TileData.Id.ToTilesetGfx());
 
         AttachChild(new ScriptManager());

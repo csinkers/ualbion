@@ -5,16 +5,16 @@ using System.Globalization;
 
 namespace UAlbion.Game.Diag;
 
-public static class EnumerableReflectorBuilder
+public class EnumerableReflectorBuilder : IReflectorBuilder
 {
-    public static void Build(IReflectorConfigurer config, Reflector reflector, Type type)
+    public static EnumerableReflectorBuilder Instance { get; } = new();
+    EnumerableReflectorBuilder() { } 
+    public Reflector Build(ReflectorManager manager, string name, Type type)
     {
-        if (config == null) throw new ArgumentNullException(nameof(config));
         var getValueFunc = typeof(ICollection).IsAssignableFrom(type)
             ? (Reflector.GetValueDelegate)CollectionGetValue
             : DummyGetValue;
 
-        var manager = config.GetManager(reflector);
         IEnumerable<ReflectorState> VisitEnumerable(object target)
         {
             if (target == null) yield break;
@@ -27,8 +27,7 @@ public static class EnumerableReflectorBuilder
             }
         }
 
-        config.AssignGetValueFunc(reflector, getValueFunc);
-        config.AssignSubObjectsFunc(reflector, VisitEnumerable);
+        return new Reflector(name, getValueFunc, null, VisitEnumerable);
     }
 
     static string DummyGetValue(object x) => x == null ? "null" : "<...>";

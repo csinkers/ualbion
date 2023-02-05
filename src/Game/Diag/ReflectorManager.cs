@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Text;
 
 namespace UAlbion.Game.Diag;
 
@@ -13,10 +15,10 @@ public class ReflectorManager
 
     ReflectorManager()
     {
-        _nullReflector = new Reflector(this, "null", null, _ => "null");
+        _nullReflector = new Reflector("null", _ => "null");
 
         void Add<T>(string name, Reflector.GetValueDelegate getValue)
-            => _reflectors[typeof(T)] = new Reflector(this, name, typeof(T), getValue);
+            => _reflectors[typeof(T)] = new Reflector(name, getValue);
 
         Add<string>("string", x => $"\"{((string)x)?.Replace("\"", "\\\"", StringComparison.Ordinal)}\"");
         Add<bool>("bool", x => x.ToString());
@@ -43,9 +45,50 @@ public class ReflectorManager
         if (_reflectors.TryGetValue(type, out var reflector))
             return reflector;
 
-        reflector = new Reflector(this, type);
-        _reflectors[type] = reflector; // Needs to be added prior to reflection to prevent infinite recursion
-        reflector.Reflect();
+        reflector = Reflect(type);
+        _reflectors[type] = reflector;
         return reflector;
+    }
+
+    Reflector Reflect(Type type)
+    {
+        var name = BuildTypeName(type);
+        if (typeof(Enum).IsAssignableFrom(type))
+            return new Reflector(name);
+
+        if (typeof(IEnumerable).IsAssignableFrom(type))
+            return EnumerableReflectorBuilder.Instance.Build(this, name, type);
+
+        return ObjectTypeReflectorBuilder.Instance.Build(this, name, type);
+    }
+
+    static string BuildTypeName(Type type)
+    {
+        if (type == null)
+            return "null";
+
+        var generic = type.GetGenericArguments();
+        if (generic.Length == 0)
+            return type.Name;
+
+        int index = type.Name.IndexOf('`', StringComparison.Ordinal);
+        if (index == -1)
+            return type.Name;
+
+        var sb = new StringBuilder();
+        sb.Append(type.Name[..index]);
+        sb.Append('<');
+        bool first = true;
+        foreach (var arg in generic)
+        {
+            if (!first)
+                sb.Append(", ");
+
+            sb.Append(BuildTypeName(arg));
+            first = false;
+        }
+
+        sb.Append('>');
+        return sb.ToString();
     }
 }

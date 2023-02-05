@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Game.Diag;
 
 namespace UAlbion.Game;
 

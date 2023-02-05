@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Numerics;
 using ImGuiNET;
 using UAlbion.Api;
@@ -9,7 +8,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
-using UAlbion.Game.Debugging;
+using UAlbion.Game.Diag;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
 using UAlbion.Game.Input;
@@ -21,11 +20,11 @@ namespace UAlbion.Game.Veldrid.Debugging;
 
 public class DiagInspector : Component
 {
-    readonly IList<object> _fixedObjects = new List<object>();
+    // readonly IList<object> _fixedObjects = new List<object>();
     readonly Dictionary<Type, DiagInspectorBehaviour> _behaviours = new();
     IList<Selection> _hits;
     Vector2 _mousePosition;
-    ReflectedObject _lastHoveredItem;
+    ReflectorState _lastHoveredItem;
 
     public DiagInspector()
     {
@@ -44,19 +43,20 @@ public class DiagInspector : Component
         if (state == null)
             return;
 
-        bool anyHovered = RenderNode(Reflector.Reflect("State", state, null), false, false);
-        DrawFixedObjects(ref anyHovered);
+        bool anyHovered = RenderNode("State", state);
+        // DrawFixedObjects(ref anyHovered);
         DrawStats();
         DrawSettings();
         DrawPositions();
         DrawExchange(ref anyHovered);
         DrawHits(ref anyHovered);
 
-        if (!anyHovered && _lastHoveredItem?.Target != null &&
-            _behaviours.TryGetValue(_lastHoveredItem.Target.GetType(), out var callback))
+        if (!anyHovered && _lastHoveredItem.Target != null &&
+            _behaviours.TryGetValue(_lastHoveredItem.GetType(), out var callback))
         {
             callback(DebugInspectorAction.Blur, _lastHoveredItem);
         }
+
     }
 
     static void BoolOption(string name, Func<bool> getter, Action<bool> setter)
@@ -146,20 +146,18 @@ public class DiagInspector : Component
 
         ImGui.TreePop();
     }
-
+/*
     void DrawFixedObjects(ref bool anyHovered)
     {
         if (!ImGui.TreeNode("Fixed"))
             return;
 
         for (int i = 0; i < _fixedObjects.Count; i++)
-        {
-            var thing = _fixedObjects[i];
-            ReflectedObject reflected = Reflector.Reflect($"Fixed{i}", thing, null);
-            anyHovered |= RenderNode(reflected, true);
-        }
+            anyHovered |= RenderNode($"Fixed{i}", _fixedObjects[i]);
+
         ImGui.TreePop();
     }
+*/
 
     void DrawSettings()
     {
@@ -251,14 +249,7 @@ public class DiagInspector : Component
 
     void DrawExchange(ref bool anyHovered)
     {
-        if (!ImGui.TreeNode("Exchange"))
-            return;
-
-        var reflected = Reflector.Reflect(null, Exchange, null);
-        if (reflected.SubObjects != null)
-            foreach (var child in reflected.SubObjects)
-                anyHovered |= RenderNode(child, false);
-        ImGui.TreePop();
+        anyHovered |= RenderNode("Exchange", Exchange);
     }
 
     void DrawHits(ref bool anyHovered)
@@ -266,72 +257,71 @@ public class DiagInspector : Component
         int hitId = 0;
         foreach (var hit in _hits)
         {
-            if (ImGui.TreeNode($"{hitId} {hit.Target}"))
-            {
-                RenderUiPos(hit.Target);
-                var target = hit.Formatter == null ? hit.Target : hit.Formatter(hit.Target);
-                var reflected = Reflector.Reflect(null, target, null);
-                if (reflected.SubObjects != null)
-                    foreach (var child in reflected.SubObjects)
-                        anyHovered |= RenderNode(child, false);
-                ImGui.TreePop();
-            }
-
+            var target = hit.Formatter == null ? hit.Target : hit.Formatter(hit.Target);
+            anyHovered |= RenderNode($"{hitId}", target);
             hitId++;
         }
     }
 
-    bool CheckHover(ReflectedObject reflected)
+    bool CheckHover(in ReflectorState state)
     {
         if (!ImGui.IsItemHovered())
             return false;
 
-        if (_lastHoveredItem != reflected)
+        if (_lastHoveredItem.Target != state.Target)
         {
-            if (_lastHoveredItem?.Target != null &&
+            if (_lastHoveredItem.Target != null &&
                 _behaviours.TryGetValue(_lastHoveredItem.Target.GetType(), out var blurredCallback))
                 blurredCallback(DebugInspectorAction.Blur, _lastHoveredItem);
 
-            if (reflected.Target != null &&
-                _behaviours.TryGetValue(reflected.Target.GetType(), out var hoverCallback))
-                hoverCallback(DebugInspectorAction.Hover, reflected);
+            if (state.Target != null &&
+                _behaviours.TryGetValue(state.Target.GetType(), out var hoverCallback))
+                hoverCallback(DebugInspectorAction.Hover, state);
 
-            _lastHoveredItem = reflected;
+            _lastHoveredItem = state;
         }
 
         return true;
     }
 
-    bool RenderNode(ReflectedObject reflected, bool fixedObject, bool showCheckbox = true)
+    bool RenderNode(string name, object target)
     {
-        var type = reflected.Target?.GetType();
-        var typeName = type?.Name ?? "null";
+        var reflector = Reflector.Instance.GetReflectorForInstance(target);
+        var state = new ReflectorState(name, target, reflector, null, -1);
+        return RenderNode(state);
+    }
+
+    bool RenderNode(in ReflectorState state)
+    {
+        var type = state.Target?.GetType();
+        var typeName = state.Reflector.TypeName;
+        var value = state.Reflector.GetValue(state.Target);
         var description =
-            reflected.Name == null
-                ? $"{reflected.Value} ({typeName})"
-                : $"{reflected.Name}: {reflected.Value} ({typeName})";
+            state.Name == null
+                ? $"{value} ({typeName})"
+                : $"{state.Name}: {value} ({typeName})";
 
 
         if (type != null &&
             _behaviours.TryGetValue(type, out var callback) &&
-            callback(DebugInspectorAction.Format, reflected) is string formatted)
+            callback(DebugInspectorAction.Format, state) is string formatted)
         {
             description += " " + formatted;
         }
 
         description = FormatUtil.WordWrap(description, 120);
         bool anyHovered = false;
-        if (reflected.SubObjects != null)
+        if (state.Reflector.HasSubObjects && state.Target != null)
         {
             bool customStyle = false;
-            if (reflected.Target is Component component)
+            if (state.Target is Component component)
             {
                 if (!component.IsSubscribed)
                 {
                     ImGui.PushStyleColor(0, new Vector4(0.6f, 0.6f, 0.6f, 1));
                     customStyle = true;
                 }
-
+                /*
                 if (showCheckbox)
                 {
                     bool active = component.IsActive;
@@ -340,6 +330,7 @@ public class DiagInspector : Component
                     if (active != component.IsActive)
                         component.IsActive = active;
                 }
+                */
             }
 
             bool treeOpen = ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowItemOverlap);
@@ -348,24 +339,26 @@ public class DiagInspector : Component
 
             if (treeOpen)
             {
-                if (!fixedObject && ImGui.Button("Track"))
-                    _fixedObjects.Add(reflected.Target);
+                // if (!fixedObject && ImGui.Button("Track"))
+                //     _fixedObjects.Add(state.Target);
 
-                if (fixedObject && ImGui.Button("Stop tracking"))
-                    _fixedObjects.Remove(reflected.Target);
+                // if (fixedObject && ImGui.Button("Stop tracking"))
+                //     _fixedObjects.Remove(state.Target);
 
-                anyHovered |= CheckHover(reflected);
-                RenderUiPos(reflected.Target);
-                foreach (var child in reflected.SubObjects)
-                    anyHovered |= RenderNode(child, false);
+                anyHovered |= CheckHover(state);
+                RenderUiPos(state.Target);
+                foreach (var child in state.Reflector.SubObjects(state.Target))
+                    anyHovered |= RenderNode(child);
                 ImGui.TreePop();
             }
-            anyHovered |= CheckHover(reflected);
+            anyHovered |= CheckHover(state);
         }
         else
         {
+            ImGui.Indent();
             ImGui.TextWrapped(description);
-            anyHovered |= CheckHover(reflected);
+            ImGui.Unindent();
+            anyHovered |= CheckHover(state);
         }
 
         return anyHovered;

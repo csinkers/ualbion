@@ -3,7 +3,7 @@ using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Game.Debugging;
+using UAlbion.Game.Diag;
 
 namespace UAlbion.Game.Veldrid.Debugging;
 

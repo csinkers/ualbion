@@ -2,7 +2,7 @@
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Maps;
 
-namespace UAlbion.Game;
+namespace UAlbion.Game.Diag;
 
 public record Breakpoint(
     TriggerType? TriggerType,

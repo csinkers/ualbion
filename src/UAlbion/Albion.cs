@@ -15,7 +15,7 @@ using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
-using UAlbion.Game.Debugging;
+using UAlbion.Game.Diag;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;

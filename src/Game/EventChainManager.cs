@@ -5,6 +5,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Game.Diag;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
 

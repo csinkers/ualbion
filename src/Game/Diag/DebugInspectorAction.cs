@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Game.Debugging;
+﻿namespace UAlbion.Game.Diag;
 
 public enum DebugInspectorAction
 {

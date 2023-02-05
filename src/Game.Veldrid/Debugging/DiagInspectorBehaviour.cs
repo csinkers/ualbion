@@ -1,5 +1,5 @@
-﻿using UAlbion.Game.Debugging;
+﻿using UAlbion.Game.Diag;
 
 namespace UAlbion.Game.Veldrid.Debugging;
 
-public delegate object DiagInspectorBehaviour(DebugInspectorAction action, ReflectedObject target);
+public delegate object DiagInspectorBehaviour(DebugInspectorAction action, in ReflectorState target);

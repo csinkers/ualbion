@@ -1,51 +1,95 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Numerics;
+using System.Linq;
+using System.Text;
 
 namespace UAlbion.Game.Diag;
 
 public class Reflector
 {
-    readonly TypeReflector _nullReflector;
-    readonly Dictionary<Type, TypeReflector> _reflectors = new();
-
-    public static Reflector Instance { get; } = new();
-
-    Reflector()
+    class Configurer : IReflectorConfigurer
     {
-        _nullReflector = new TypeReflector(this, "null", null, _ => "null");
-
-        void Add<T>(string name, TypeReflector.GetValueDelegate getValue)
-            => _reflectors[typeof(T)] = new TypeReflector(this, name, typeof(T), getValue);
-
-        Add<string>("string", x => $"\"{((string)x)?.Replace("\"", "\\\"", StringComparison.Ordinal)}\"");
-        Add<bool>("bool", x => x.ToString());
-        Add<byte>("byte", x => x.ToString());
-        Add<ushort>("ushort", x => x.ToString());
-        Add<short>("short", x => x.ToString());
-        Add<uint>("uint", x => x.ToString());
-        Add<int>("int", x => x.ToString());
-        Add<ulong>("ulong", x => x.ToString());
-        Add<long>("long", x => x.ToString());
-        Add<float>("float", x => x.ToString());
-        Add<double>("double", x => x.ToString());
-        Add<Vector2>("Vector2", x => { var v = (Vector2)x; return $"({v.X}, {v.Y})"; });
-        Add<Vector3>("Vector3", x => { var v = (Vector3)x; return $"({v.X}, {v.Y}, {v.Z})"; });
+        public ReflectorManager GetManager(Reflector reflector) => reflector._manager;
+        public void AssignGetValueFunc(Reflector reflector, GetValueDelegate func) => reflector.GetValue = func;
+        public void AssignSetValueFunc(Reflector reflector, SetValueDelegate func) => reflector.SetValue = func;
+        public void AssignSubObjectsFunc(Reflector reflector, VisitChildrenDelegate func) => reflector.SubObjects = func;
     }
 
-    public TypeReflector GetReflectorForInstance(object target)
-        => target == null
-            ? _nullReflector
-            : GetReflectorForType(target.GetType());
+    static string DefaultGetValue(object target) => target?.ToString() ?? "null";
+    static IEnumerable<ReflectorState> NoChildren(object target) => Enumerable.Empty<ReflectorState>();
+    static readonly Configurer ConfigurerInstance = new();
 
-    public TypeReflector GetReflectorForType(Type type)
+    public delegate IEnumerable<ReflectorState> VisitChildrenDelegate(object target);
+    public delegate string GetValueDelegate(object target);
+    public delegate void SetValueDelegate(object target, object value);
+
+    readonly ReflectorManager _manager;
+    readonly Type _type;
+
+    public string TypeName { get; }
+    public bool HasSubObjects => SubObjects != NoChildren;
+    public GetValueDelegate GetValue { get; private set; } = DefaultGetValue;
+    public SetValueDelegate SetValue { get; private set; } = null;
+    public VisitChildrenDelegate SubObjects { get; private set; } = NoChildren;
+    public override string ToString() => $"{TypeName} reflector";
+
+    public Reflector(ReflectorManager manager, string name, Type type, GetValueDelegate getValue)
     {
-        if (_reflectors.TryGetValue(type, out var reflector))
-            return reflector;
+        _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+        _type = type;
+        TypeName = name;
+        GetValue = getValue ?? throw new ArgumentNullException(nameof(getValue));
+    }
 
-        reflector = new TypeReflector(this, type);
-        _reflectors[type] = reflector; // Needs to be added prior to reflection to prevent infinite recursion
-        reflector.Reflect();
-        return reflector;
+    public Reflector(ReflectorManager manager, Type type)
+    {
+        _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+        _type = type ?? throw new ArgumentNullException(nameof(type));
+        TypeName = BuildTypeName(type);
+    }
+
+    internal void Reflect() // Only called by Reflector
+    {
+        if (typeof(Enum).IsAssignableFrom(_type))
+            return;
+
+        if (typeof(IEnumerable).IsAssignableFrom(_type))
+        {
+            EnumerableReflectorBuilder.Build(ConfigurerInstance, this, _type);
+            return;
+        }
+
+        ObjectTypeReflectorBuilder.Build(ConfigurerInstance, this, _type);
+    }
+
+    static string BuildTypeName(Type type)
+    {
+        if (type == null)
+            return "null";
+
+        var generic = type.GetGenericArguments();
+        if (generic.Length == 0)
+            return type.Name;
+
+        int index = type.Name.IndexOf('`', StringComparison.Ordinal);
+        if (index == -1)
+            return type.Name;
+
+        var sb = new StringBuilder();
+        sb.Append(type.Name[..index]);
+        sb.Append('<');
+        bool first = true;
+        foreach (var arg in generic)
+        {
+            if (!first)
+                sb.Append(", ");
+
+            sb.Append(BuildTypeName(arg));
+            first = false;
+        }
+
+        sb.Append('>');
+        return sb.ToString();
     }
 }

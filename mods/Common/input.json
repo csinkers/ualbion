@@ -15,13 +15,13 @@
 
     // Debugging
     "Tilde": "debug_flag toggle ShowConsole",
-    "V": "push_mouse_mode DebugPick",
+    "Control+Shift+V": "push_mouse_mode DebugPick",
     "Shift+V": "hide_debug_window",
     "Control+D": "engine_flag toggle RenderDepth",
     "Control+E": "push_scene Editor",
     "Control+B": "engine_flag toggle ShowBoundingBoxes",
-    "Shift+L": "engine_flag toggle SuppressLayout",
-    "L": "eng:layout",
+    "Control+Shift+L": "engine_flag toggle SuppressLayout",
+    "Control+L": "eng:layout",
     "Control+R": "e:run_renderdoc",
     "Control+V": "engine_flag toggle VSync",
     "Pause": "e:run_renderdoc",
@@ -29,7 +29,8 @@
     "F2": "update 1",
     "F5": "debug_run",
     "F9": "debug_break",
-    "F10": "debug_step"
+    "F10": "debug_step",
+    "F12": "toggle_diagnostics"
   },
   "World2D": {
     "Escape": "push_scene MainMenu",

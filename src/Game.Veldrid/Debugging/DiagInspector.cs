@@ -286,7 +286,7 @@ public class DiagInspector : Component
 
     bool RenderNode(string name, object target)
     {
-        var reflector = Reflector.Instance.GetReflectorForInstance(target);
+        var reflector = ReflectorManager.Instance.GetReflectorForInstance(target);
         var state = new ReflectorState(name, target, reflector, null, -1);
         return RenderNode(state);
     }
@@ -316,11 +316,20 @@ public class DiagInspector : Component
             bool customStyle = false;
             if (state.Target is Component component)
             {
-                if (!component.IsSubscribed)
+                Vector4 color;
+                if (component.IsActive)
                 {
-                    ImGui.PushStyleColor(0, new Vector4(0.6f, 0.6f, 0.6f, 1));
-                    customStyle = true;
+                    color = component.IsSubscribed
+                        ? new Vector4(0.4f, 0.9f, 0.4f, 1)
+                        : new Vector4(0.6f, 0.6f, 0.6f, 1);
                 }
+                else
+                {
+                    color = new Vector4(1.0f, 0.6f, 0.6f, 1);
+                }
+
+                ImGui.PushStyleColor(0, color);
+                customStyle = true;
                 /*
                 if (showCheckbox)
                 {

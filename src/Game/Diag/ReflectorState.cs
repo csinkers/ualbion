@@ -1,3 +1,8 @@
 ﻿namespace UAlbion.Game.Diag;
 
-public readonly record struct ReflectorState(string Name, object Target, TypeReflector Reflector, object Parent, int CollectionIndex);
+public readonly record struct ReflectorState(
+    string Name,
+    object Target,
+    Reflector Reflector,
+    object Parent,
+    int CollectionIndex);

@@ -27,27 +27,27 @@ public abstract class Component : IComponent
     protected static object Context { get => ThreadContext.Value; set => ThreadContext.Value = value; }
     static int _nesting;
     static int _nextId;
-    List<IComponent> _children;
-    Dictionary<Type, Handler> _handlers;
-    bool _isActive = true; // If false, then this component will not be attached to the exchange even if its parent is.
+    [DiagIgnore] List<IComponent> _children;
+    [DiagIgnore] Dictionary<Type, Handler> _handlers;
+    [DiagIgnore] bool _isActive = true; // If false, then this component will not be attached to the exchange even if its parent is.
     protected Component() => ComponentId = Interlocked.Increment(ref _nextId);
 
     /// <summary>
     /// Sequential id to uniquely identify a given component
     /// </summary>
-    public int ComponentId { get; }
+    [DiagIgnore] public int ComponentId { get; }
 
     /// <summary>
     /// True if this component is currently attached to an event exchange
     /// </summary>
-    public bool IsSubscribed { get; private set; }
+    [DiagIgnore] public bool IsSubscribed { get; private set; }
 
     /// <summary>
     /// The most recently attached event exchange, may currently be attached but
     /// not necessarily (e.g. if this component or any of its parents is inactive).
     /// Will be null until Attach has been called.
     /// </summary>
-    protected EventExchange Exchange { get; private set; }
+    [DiagIgnore] protected EventExchange Exchange { get; private set; }
 
     /// <summary>
     /// The parent of this component, if it is a child.
@@ -288,7 +288,7 @@ public abstract class Component : IComponent
     /// inactive all event handlers are removed from the exchange, all child
     /// components are also recursively removed from the exchange.
     /// </summary>
-    public bool IsActive
+    [DiagIgnore] public bool IsActive
     {
         get => _isActive;
         set
@@ -481,4 +481,5 @@ public abstract class Component : IComponent
     protected void Critical(string msg, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
         => Raise(new LogEvent(LogLevel.Critical, msg, file, member, line));
 }
+
 #pragma warning restore CA1030 // Use events where appropriate

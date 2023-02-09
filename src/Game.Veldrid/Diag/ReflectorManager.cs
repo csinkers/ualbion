@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 using ImGuiNET;
 
 namespace UAlbion.Game.Veldrid.Diag;
@@ -17,32 +16,31 @@ public class ReflectorManager
     {
         _nullReflector = (in ReflectorState state) =>
         {
-            var description =
-                state.Meta?.Name == null
-                    ? "null (null)"
-                    : $"{state.Meta.Name}: null (null)";
-
+            var description = ReflectorUtil.Describe(state, "null", "null");
             ImGui.Indent();
-            ImGui.TextWrapped(description);
+            ImGui.TextUnformatted(description);
             ImGui.Unindent();
         };
 
-        void Add<T>(string name) => _reflectors[typeof(T)] = ValueReflectorBuilder.Build(name);
-        void Add2<T>(string name, Func<object, string> toString) => _reflectors[typeof(T)] = ValueReflectorBuilder.Build(name, toString);
+        void Add<T>(string name) => _reflectors[typeof(T)] = ValueReflector.Build(name);
+        void Add2<T>(string name, Func<object, string> toString) => _reflectors[typeof(T)] = ValueReflector.Build(name, toString);
+
+        _reflectors[typeof(byte)]   = IntegralValueReflector.Build("byte",   x => (byte)x);
+        _reflectors[typeof(sbyte)]  = IntegralValueReflector.Build("sbyte",  x => (sbyte)x);
+        _reflectors[typeof(ushort)] = IntegralValueReflector.Build("ushort", x => (ushort)x);
+        _reflectors[typeof(short)]  = IntegralValueReflector.Build("short",  x => (short)x);
+        _reflectors[typeof(uint)]   = IntegralValueReflector.Build("uint",   x => (int)(uint)x);
+        _reflectors[typeof(int)]    = IntegralValueReflector.Build("int",    x => (int)x);
+        _reflectors[typeof(ulong)]  = IntegralValueReflector.Build("ulong",  x => (int)(ulong)x);
+        _reflectors[typeof(long)]   = IntegralValueReflector.Build("long",   x => (int)(long)x);
 
         Add<bool>("bool");
-        Add<byte>("byte");
-        Add<ushort>("ushort");
-        Add<short>("short");
-        Add<uint>("uint");
-        Add<int>("int");
-        Add<ulong>("ulong");
-        Add<long>("long");
         Add<float>("float");
         Add<double>("double");
         Add2<string>("string", x => $"\"{((string)x)?.Replace("\"", "\\\"", StringComparison.Ordinal)}\"");
         Add2<Vector2>("Vector2", x => { var v = (Vector2)x; return $"({v.X}, {v.Y})"; });
         Add2<Vector3>("Vector3", x => { var v = (Vector3)x; return $"({v.X}, {v.Y}, {v.Z})"; });
+        Add2<Vector4>("Vector4", x => { var v = (Vector4)x; return $"({v.X}, {v.Y}, {v.Z}, {v.W})"; });
     }
 
     public Reflector GetReflectorForInstance(object target)
@@ -69,35 +67,5 @@ public class ReflectorManager
             return EnumerableReflectorBuilder.Build(this, type);
 
         return ObjectReflectorBuilder.Build(this, type);
-    }
-
-    public static string BuildTypeName(Type type)
-    {
-        if (type == null)
-            return "null";
-
-        var generic = type.GetGenericArguments();
-        if (generic.Length == 0)
-            return type.Name;
-
-        int index = type.Name.IndexOf('`', StringComparison.Ordinal);
-        if (index == -1)
-            return type.Name;
-
-        var sb = new StringBuilder();
-        sb.Append(type.Name[..index]);
-        sb.Append('<');
-        bool first = true;
-        foreach (var arg in generic)
-        {
-            if (!first)
-                sb.Append(", ");
-
-            sb.Append(BuildTypeName(arg));
-            first = false;
-        }
-
-        sb.Append('>');
-        return sb.ToString();
     }
 }

@@ -9,7 +9,7 @@ namespace UAlbion.Api.Eventing;
 public class DiagEditAttribute : Attribute
 {
     public DiagEditStyle Style { get; set; }
-    public int? MaxLength { get; set; } // For strings
-    public int? Min { get; set; } // For numeric types
-    public int? Max { get; set; } // For numeric types
+    public int MaxLength { get; set; } = int.MaxValue; // For strings
+    public int Min { get; set; } = int.MaxValue; // For sliders
+    public int Max { get; set; } = int.MinValue; // For sliders
 }

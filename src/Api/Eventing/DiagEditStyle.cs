@@ -8,4 +8,5 @@ public enum DiagEditStyle
     ColorPicker, // for Vector3, Vector4
     Dropdown, // For enum
     Checkboxes, // For flags enum
+    Text, // For strings
 }

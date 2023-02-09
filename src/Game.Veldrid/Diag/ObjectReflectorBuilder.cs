@@ -5,7 +5,6 @@ using System.Numerics;
 using System.Reflection;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
-using UAlbion.Formats;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -51,16 +50,10 @@ public static class ObjectReflectorBuilder
 
     static Reflector Render(Type type, ReflectorMetadata[] subObjects, ReflectorManager manager)
     {
-        var typeName = ReflectorManager.BuildTypeName(type);
+        var typeName = ReflectorUtil.BuildTypeName(type);
         return (in ReflectorState state) =>
         {
-            var value = state.Target.ToString();
-            var description =
-                state.Meta?.Name == null
-                    ? $"{value} ({typeName})"
-                    : $"{state.Meta.Name}: {value} ({typeName})";
-
-            description = FormatUtil.WordWrap(description, 120);
+            var description = ReflectorUtil.Describe(state, typeName, state.Target);
             bool treeOpen = ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowItemOverlap);
             if (treeOpen)
             {
@@ -79,18 +72,11 @@ public static class ObjectReflectorBuilder
 
     static Reflector RenderComponent(Type type, ReflectorMetadata[] subObjects, ReflectorManager manager)
     {
-        var typeName = ReflectorManager.BuildTypeName(type);
+        var typeName = ReflectorUtil.BuildTypeName(type);
         return (in ReflectorState state) =>
         {
             var component = (Component)state.Target;
-            var value = state.Target.ToString();
-            var description =
-                state.Meta?.Name == null
-                    ? $"{value} ({typeName})"
-                    : $"{state.Meta.Name}: {value} ({typeName})";
-
-            description = FormatUtil.WordWrap(description, 120);
-
+            var description = ReflectorUtil.Describe(state, typeName, component);
             Vector4 color = GetComponentColor(component);
             ImGui.PushStyleColor(0, color);
             bool treeOpen = ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowItemOverlap);
@@ -274,7 +260,7 @@ public static class ObjectReflectorBuilder
     {
         if (field.FieldType.Name.StartsWith("Span", StringComparison.Ordinal)) return NullSetter;
         if (field.FieldType.Name.StartsWith("ReadOnlySpan", StringComparison.Ordinal)) return NullSetter;
-        return (in ReflectorState state, object value) => SetFieldSafe(field, state.Target, value);
+        return (in ReflectorState state, object value) => SetFieldSafe(field, state.Parent, value);
     }
 
     static ReflectorSetter BuildPropertySetter(PropertyInfo prop)
@@ -282,7 +268,7 @@ public static class ObjectReflectorBuilder
         if (prop.PropertyType.Name.StartsWith("Span", StringComparison.Ordinal)) return NullSetter;
         if (prop.PropertyType.Name.StartsWith("ReadOnlySpan", StringComparison.Ordinal)) return NullSetter;
         if (!prop.CanWrite) return NullSetter;
-        return (in ReflectorState state, object value) => SetPropertySafe(prop, state.Target, value);
+        return (in ReflectorState state, object value) => SetPropertySafe(prop, state.Parent, value);
     }
 
     static object GetPropertySafe(PropertyInfo x, object o)

@@ -1,42 +1,28 @@
 ﻿using System;
 using ImGuiNET;
-using UAlbion.Formats;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
-public static class ValueReflectorBuilder
+public class ValueReflector
 {
-    public static Reflector Build(string typeName)
-    {
-        return (in ReflectorState state) =>
-        {
-            var value = state.Target;
-            var description =
-                state.Meta?.Name == null
-                    ? $"{value} ({typeName})"
-                    : $"{state.Meta.Name}: {value} ({typeName})";
+    readonly string _typeName;
+    readonly Func<object, object> _toValue;
 
-            description = FormatUtil.WordWrap(description, 120);
-            ImGui.Indent();
-            ImGui.TextWrapped(description);
-            ImGui.Unindent();
-        };
+    ValueReflector(string typeName, Func<object, object> toValue)
+    {
+        _typeName = typeName;
+        _toValue = toValue ?? (x => x);
     }
 
-    public static Reflector Build(string typeName, Func<object, string> toString)
-    {
-        return (in ReflectorState state) =>
-        {
-            var value = toString(state.Target);
-            var description =
-                state.Meta?.Name == null
-                    ? $"{value} ({typeName})"
-                    : $"{state.Meta.Name}: {value} ({typeName})";
+    public static Reflector Build(string typeName) => new ValueReflector(typeName, null).Render;
+    public static Reflector Build(string typeName, Func<object, object> toValue) => new ValueReflector(typeName, toValue).Render;
 
-            description = FormatUtil.WordWrap(description, 120);
-            ImGui.Indent();
-            ImGui.TextWrapped(description);
-            ImGui.Unindent();
-        };
+    void Render(in ReflectorState state)
+    {
+        var value = _toValue(state.Target);
+        var description = ReflectorUtil.Describe(state, _typeName, value);
+        ImGui.Indent();
+        ImGui.TextWrapped(description);
+        ImGui.Unindent();
     }
 }

@@ -6,7 +6,7 @@ using UAlbion.Config;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game.Diag;
 
-namespace UAlbion.Game.Veldrid.Debugging;
+namespace UAlbion.Game.Veldrid.Diag;
 
 public class DiagNewBreakpoint : Component
 {

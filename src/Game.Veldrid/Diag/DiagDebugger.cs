@@ -4,7 +4,7 @@ using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats;
 
-namespace UAlbion.Game.Veldrid.Debugging;
+namespace UAlbion.Game.Veldrid.Diag;
 
 public class DiagDebugger : Component
 {

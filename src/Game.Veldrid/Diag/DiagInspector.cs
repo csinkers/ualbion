@@ -7,24 +7,18 @@ using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
-using UAlbion.Game.Diag;
 using UAlbion.Game.Events;
-using UAlbion.Game.Gui;
 using UAlbion.Game.Input;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 using UAlbion.Game.Veldrid.Audio;
 
-namespace UAlbion.Game.Veldrid.Debugging;
+namespace UAlbion.Game.Veldrid.Diag;
 
 public class DiagInspector : Component
 {
-    // readonly IList<object> _fixedObjects = new List<object>();
-    readonly Dictionary<Type, DiagInspectorBehaviour> _behaviours = new();
     IList<Selection> _hits;
     Vector2 _mousePosition;
-    ReflectorState _lastHoveredItem;
 
     public DiagInspector()
     {
@@ -35,28 +29,18 @@ public class DiagInspector : Component
         });
     }
 
-    public void AddBehaviour(Type type, DiagInspectorBehaviour behaviour) => _behaviours[type] = behaviour;
-
     public void Render()
     {
         var state = TryResolve<IGameState>();
         if (state == null)
             return;
 
-        bool anyHovered = RenderNode("State", state);
-        // DrawFixedObjects(ref anyHovered);
+        RenderNode("State", state);
         DrawStats();
         DrawSettings();
         DrawPositions();
-        DrawExchange(ref anyHovered);
-        DrawHits(ref anyHovered);
-
-        if (!anyHovered && _lastHoveredItem.Target != null &&
-            _behaviours.TryGetValue(_lastHoveredItem.GetType(), out var callback))
-        {
-            callback(DebugInspectorAction.Blur, _lastHoveredItem);
-        }
-
+        RenderNode("Exchange", Exchange);
+        DrawHits();
     }
 
     static void BoolOption(string name, Func<bool> getter, Action<bool> setter)
@@ -110,7 +94,7 @@ public class DiagInspector : Component
 
         // if (ImGui.TreeNode("DeviceObjects"))
         // {
-        //     ImGui.Text(Resolve<IDeviceObjectManager>()?.Stats());
+        //     ImGui.Text(TryResolve<IDeviceObjectManager>()?.Stats());
         //     ImGui.TreePop();
         // }
 
@@ -140,7 +124,7 @@ public class DiagInspector : Component
 
         // if (ImGui.TreeNode("Textures"))
         // {
-        //     ImGui.Text(Resolve<ITextureSource>()?.Stats());
+        //     ImGui.Text(TryResolve<ITextureSource>()?.Stats());
         //     ImGui.TreePop();
         // }
 
@@ -247,141 +231,22 @@ public class DiagInspector : Component
         ImGui.TreePop();
     }
 
-    void DrawExchange(ref bool anyHovered)
-    {
-        anyHovered |= RenderNode("Exchange", Exchange);
-    }
-
-    void DrawHits(ref bool anyHovered)
+    void DrawHits()
     {
         int hitId = 0;
         foreach (var hit in _hits)
         {
             var target = hit.Formatter == null ? hit.Target : hit.Formatter(hit.Target);
-            anyHovered |= RenderNode($"{hitId}", target);
+            RenderNode($"{hitId}", target);
             hitId++;
         }
     }
 
-    bool CheckHover(in ReflectorState state)
+    static void RenderNode(string name, object target)
     {
-        if (!ImGui.IsItemHovered())
-            return false;
-
-        if (_lastHoveredItem.Target != state.Target)
-        {
-            if (_lastHoveredItem.Target != null &&
-                _behaviours.TryGetValue(_lastHoveredItem.Target.GetType(), out var blurredCallback))
-                blurredCallback(DebugInspectorAction.Blur, _lastHoveredItem);
-
-            if (state.Target != null &&
-                _behaviours.TryGetValue(state.Target.GetType(), out var hoverCallback))
-                hoverCallback(DebugInspectorAction.Hover, state);
-
-            _lastHoveredItem = state;
-        }
-
-        return true;
-    }
-
-    bool RenderNode(string name, object target)
-    {
-        var reflector = ReflectorManager.Instance.GetReflectorForInstance(target);
-        var state = new ReflectorState(name, target, reflector, null, -1);
-        return RenderNode(state);
-    }
-
-    bool RenderNode(in ReflectorState state)
-    {
-        var type = state.Target?.GetType();
-        var typeName = state.Reflector.TypeName;
-        var value = state.Reflector.GetValue(state.Target);
-        var description =
-            state.Name == null
-                ? $"{value} ({typeName})"
-                : $"{state.Name}: {value} ({typeName})";
-
-
-        if (type != null &&
-            _behaviours.TryGetValue(type, out var callback) &&
-            callback(DebugInspectorAction.Format, state) is string formatted)
-        {
-            description += " " + formatted;
-        }
-
-        description = FormatUtil.WordWrap(description, 120);
-        bool anyHovered = false;
-        if (state.Reflector.HasSubObjects && state.Target != null)
-        {
-            bool customStyle = false;
-            if (state.Target is Component component)
-            {
-                Vector4 color;
-                if (component.IsActive)
-                {
-                    color = component.IsSubscribed
-                        ? new Vector4(0.4f, 0.9f, 0.4f, 1)
-                        : new Vector4(0.6f, 0.6f, 0.6f, 1);
-                }
-                else
-                {
-                    color = new Vector4(1.0f, 0.6f, 0.6f, 1);
-                }
-
-                ImGui.PushStyleColor(0, color);
-                customStyle = true;
-                /*
-                if (showCheckbox)
-                {
-                    bool active = component.IsActive;
-                    ImGui.Checkbox(component.ComponentId.ToString(CultureInfo.InvariantCulture), ref active);
-                    ImGui.SameLine();
-                    if (active != component.IsActive)
-                        component.IsActive = active;
-                }
-                */
-            }
-
-            bool treeOpen = ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowItemOverlap);
-            if (customStyle)
-                ImGui.PopStyleColor();
-
-            if (treeOpen)
-            {
-                // if (!fixedObject && ImGui.Button("Track"))
-                //     _fixedObjects.Add(state.Target);
-
-                // if (fixedObject && ImGui.Button("Stop tracking"))
-                //     _fixedObjects.Remove(state.Target);
-
-                anyHovered |= CheckHover(state);
-                RenderUiPos(state.Target);
-                foreach (var child in state.Reflector.SubObjects(state.Target))
-                    anyHovered |= RenderNode(child);
-                ImGui.TreePop();
-            }
-            anyHovered |= CheckHover(state);
-        }
-        else
-        {
-            ImGui.Indent();
-            ImGui.TextWrapped(description);
-            ImGui.Unindent();
-            anyHovered |= CheckHover(state);
-        }
-
-        return anyHovered;
-    }
-
-    void RenderUiPos(object target)
-    {
-        if (target is not IUiElement element)
-            return;
-
-        var snapshot = Resolve<ILayoutManager>().LastSnapshot;
-        if (!snapshot.TryGetValue(element, out var node))
-            return;
-
-        ImGui.Text($"UI {node.Extents} {node.Order}");
+        var meta = new ReflectorMetadata(name, null, null, null);
+        var state = new ReflectorState(target, null, -1, meta);
+        var reflector = ReflectorManager.Instance.GetReflectorForInstance(state.Target);
+        reflector(state);
     }
 }

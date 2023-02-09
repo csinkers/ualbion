@@ -8,7 +8,7 @@ namespace UAlbion.Game.Diag;
 public class SpriteInstanceDataDebugBehaviour : Component, IDebugBehaviour
 {
     public ReadOnlyCollection<Type> HandledTypes { get; } = new(new[] { typeof(SpriteInfo) });
-    public object Handle(DebugInspectorAction action, in ReflectorState state)
+    /*public object Handle(DebugInspectorAction action, in ReflectorState state)
     {
         if (state.Parent is not SpriteInfo[] array)
             return null;
@@ -20,5 +20,5 @@ public class SpriteInstanceDataDebugBehaviour : Component, IDebugBehaviour
         }
 
         return null;
-    }
+    }*/
 }

@@ -7,4 +7,5 @@ public enum DiagEditStyle
     NumericSlider, // Requires min+max
     ColorPicker, // for Vector3, Vector4
     Dropdown, // For enum
+    Checkboxes, // For flags enum
 }

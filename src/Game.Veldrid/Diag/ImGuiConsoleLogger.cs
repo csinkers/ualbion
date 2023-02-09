@@ -8,7 +8,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Settings;
 
-namespace UAlbion.Game.Veldrid.Debugging;
+namespace UAlbion.Game.Veldrid.Diag;
 
 public class ImGuiConsoleLogger : Component
 {

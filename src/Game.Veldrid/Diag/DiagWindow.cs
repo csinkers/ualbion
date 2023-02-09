@@ -3,9 +3,8 @@ using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Game.Diag;
 
-namespace UAlbion.Game.Veldrid.Debugging;
+namespace UAlbion.Game.Veldrid.Diag;
 
 [Event("hide_diag_window", "Hide the diagnostics window", "hdw")]
 public class HideDiagWindowEvent : Event { }
@@ -50,9 +49,9 @@ public class DiagWindow : Container
 
     protected override bool AddingChild(IComponent child)
     {
-        if (child is IDebugBehaviour behaviour)
-            foreach (var type in behaviour.HandledTypes)
-                _inspector.AddBehaviour(type, behaviour.Handle);
+        // if (child is IDebugBehaviour behaviour)
+        //     foreach (var type in behaviour.HandledTypes)
+        //         _inspector.AddBehaviour(type, behaviour.Handle);
 
         return true;
     }

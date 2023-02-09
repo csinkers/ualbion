@@ -30,7 +30,7 @@ using UAlbion.Game.State;
 using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid;
 using UAlbion.Game.Veldrid.Audio;
-using UAlbion.Game.Veldrid.Debugging;
+using UAlbion.Game.Veldrid.Diag;
 using UAlbion.Game.Veldrid.Input;
 using UAlbion.Game.Veldrid.Visual;
 

@@ -3,36 +3,46 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
+using ImGuiNET;
 
-namespace UAlbion.Game.Diag;
+namespace UAlbion.Game.Veldrid.Diag;
 
 public class ReflectorManager
 {
     readonly Reflector _nullReflector;
     readonly Dictionary<Type, Reflector> _reflectors = new();
-
     public static ReflectorManager Instance { get; } = new();
 
     ReflectorManager()
     {
-        _nullReflector = new Reflector("null", _ => "null");
+        _nullReflector = (in ReflectorState state) =>
+        {
+            var description =
+                state.Meta?.Name == null
+                    ? "null (null)"
+                    : $"{state.Meta.Name}: null (null)";
 
-        void Add<T>(string name, Reflector.GetValueDelegate getValue)
-            => _reflectors[typeof(T)] = new Reflector(name, getValue);
+            ImGui.Indent();
+            ImGui.TextWrapped(description);
+            ImGui.Unindent();
+        };
 
-        Add<string>("string", x => $"\"{((string)x)?.Replace("\"", "\\\"", StringComparison.Ordinal)}\"");
-        Add<bool>("bool", x => x.ToString());
-        Add<byte>("byte", x => x.ToString());
-        Add<ushort>("ushort", x => x.ToString());
-        Add<short>("short", x => x.ToString());
-        Add<uint>("uint", x => x.ToString());
-        Add<int>("int", x => x.ToString());
-        Add<ulong>("ulong", x => x.ToString());
-        Add<long>("long", x => x.ToString());
-        Add<float>("float", x => x.ToString());
-        Add<double>("double", x => x.ToString());
-        Add<Vector2>("Vector2", x => { var v = (Vector2)x; return $"({v.X}, {v.Y})"; });
-        Add<Vector3>("Vector3", x => { var v = (Vector3)x; return $"({v.X}, {v.Y}, {v.Z})"; });
+        void Add<T>(string name) => _reflectors[typeof(T)] = ValueReflectorBuilder.Build(name);
+        void Add2<T>(string name, Func<object, string> toString) => _reflectors[typeof(T)] = ValueReflectorBuilder.Build(name, toString);
+
+        Add<bool>("bool");
+        Add<byte>("byte");
+        Add<ushort>("ushort");
+        Add<short>("short");
+        Add<uint>("uint");
+        Add<int>("int");
+        Add<ulong>("ulong");
+        Add<long>("long");
+        Add<float>("float");
+        Add<double>("double");
+        Add2<string>("string", x => $"\"{((string)x)?.Replace("\"", "\\\"", StringComparison.Ordinal)}\"");
+        Add2<Vector2>("Vector2", x => { var v = (Vector2)x; return $"({v.X}, {v.Y})"; });
+        Add2<Vector3>("Vector3", x => { var v = (Vector3)x; return $"({v.X}, {v.Y}, {v.Z})"; });
     }
 
     public Reflector GetReflectorForInstance(object target)
@@ -40,7 +50,7 @@ public class ReflectorManager
             ? _nullReflector
             : GetReflectorForType(target.GetType());
 
-    public Reflector GetReflectorForType(Type type)
+    Reflector GetReflectorForType(Type type)
     {
         if (_reflectors.TryGetValue(type, out var reflector))
             return reflector;
@@ -52,17 +62,16 @@ public class ReflectorManager
 
     Reflector Reflect(Type type)
     {
-        var name = BuildTypeName(type);
         if (typeof(Enum).IsAssignableFrom(type))
-            return new Reflector(name);
+            return EnumReflector.Build(type);
 
         if (typeof(IEnumerable).IsAssignableFrom(type))
-            return EnumerableReflectorBuilder.Instance.Build(this, name, type);
+            return EnumerableReflectorBuilder.Build(this, type);
 
-        return ObjectTypeReflectorBuilder.Instance.Build(this, name, type);
+        return ObjectReflectorBuilder.Build(this, type);
     }
 
-    static string BuildTypeName(Type type)
+    public static string BuildTypeName(Type type)
     {
         if (type == null)
             return "null";

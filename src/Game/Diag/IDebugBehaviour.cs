@@ -7,5 +7,5 @@ namespace UAlbion.Game.Diag;
 public interface IDebugBehaviour : IComponent
 {
     ReadOnlyCollection<Type> HandledTypes { get; }
-    object Handle(DebugInspectorAction action, in ReflectorState state);
+    // object Handle(DebugInspectorAction action, in ReflectorState state);
 }

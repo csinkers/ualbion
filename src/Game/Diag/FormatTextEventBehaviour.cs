@@ -8,6 +8,7 @@ namespace UAlbion.Game.Diag;
 public class FormatTextEventBehaviour : Component, IDebugBehaviour
 {
     public ReadOnlyCollection<Type> HandledTypes { get; } = new(new[] { typeof(TextEvent) });
+    /*
     public object Handle(DebugInspectorAction action, in ReflectorState state)
     {
         if (action != DebugInspectorAction.Format)
@@ -17,4 +18,5 @@ public class FormatTextEventBehaviour : Component, IDebugBehaviour
             ? text.ToString() 
             : null;
     }
+    */
 }

@@ -5,20 +5,18 @@ using UAlbion.Api.Eventing;
 
 namespace UAlbion.Game.Veldrid.Diag.Reflection;
 
-public class IntegralValueReflector
+public class IntegralValueReflector : IReflector
 {
     readonly string _typeName;
     readonly Func<object, int> _toInt;
 
-    IntegralValueReflector(string typeName, Func<object, int> toInt)
+    public IntegralValueReflector(string typeName, Func<object, int> toInt)
     {
         _typeName = typeName;
         _toInt = toInt;
     }
 
-    public static Reflector Build(string typeName, Func<object, int> toInt) => new IntegralValueReflector(typeName, toInt).Render;
-
-    void Render(in ReflectorState state)
+    public void Reflect(in ReflectorState state)
     {
         ImGui.Indent();
         var style = state.Meta?.Options?.Style ?? DiagEditStyle.Label;

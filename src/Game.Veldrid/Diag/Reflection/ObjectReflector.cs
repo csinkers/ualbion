@@ -8,8 +8,10 @@ using UAlbion.Api.Eventing;
 
 namespace UAlbion.Game.Veldrid.Diag.Reflection;
 
-public static class ObjectReflectorBuilder
+public class ObjectReflector : IReflector
 {
+    readonly ReflectorManager _manager;
+
     static readonly Dictionary<string, string[]> MembersToIgnore = new()
     {
         // Type starting with:
@@ -28,84 +30,74 @@ public static class ObjectReflectorBuilder
         { "RuntimeType", new[] { "DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition" } },
     };
 
-    public static Reflector Build(ReflectorManager manager, Type type)
+    readonly string _typeName;
+    readonly ReflectorMetadata[] _subObjects;
+
+    public ObjectReflector(ReflectorManager manager, Type type)
     {
-        // Generic object handling
-        if (manager == null) throw new ArgumentNullException(nameof(manager));
+        _manager = manager ?? throw new ArgumentNullException(nameof(manager));
         if (type == null) throw new ArgumentNullException(nameof(type));
 
+        _typeName = ReflectorUtil.BuildTypeName(type);
         var subObjects = new Dictionary<string, ReflectorMetadata>();
         PopulateMembers(type, subObjects);
 
-        ReflectorMetadata[] subObjectArray = subObjects
+        _subObjects = subObjects
             .OrderBy(x => x.Key)
             .Select(x => x.Value)
             .ToArray();
-
-        if (type.IsAssignableTo(typeof(Component)))
-            return RenderComponent(type, subObjectArray, manager);
-
-        return Render(type, subObjectArray, manager);
     }
 
-    static Reflector Render(Type type, ReflectorMetadata[] subObjects, ReflectorManager manager)
+    public void Reflect(in ReflectorState state)
     {
-        var typeName = ReflectorUtil.BuildTypeName(type);
-        return (in ReflectorState state) =>
+        var description = ReflectorUtil.Describe(state, _typeName, state.Target);
+        bool treeOpen = ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowItemOverlap);
+        if (treeOpen)
         {
-            var description = ReflectorUtil.Describe(state, typeName, state.Target);
-            bool treeOpen = ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowItemOverlap);
-            if (treeOpen)
-            {
-                foreach (var subObject in subObjects)
-                {
-                    var child = subObject.Getter(state);
-                    var childState = new ReflectorState(child, state.Target, -1, subObject);
-                    var childReflector = manager.GetReflectorForInstance(child);
-                    childReflector(childState);
-                }
-
-                ImGui.TreePop();
-            }
-        };
-    }
-
-    static Reflector RenderComponent(Type type, ReflectorMetadata[] subObjects, ReflectorManager manager)
-    {
-        var typeName = ReflectorUtil.BuildTypeName(type);
-        return (in ReflectorState state) =>
-        {
-            var component = (Component)state.Target;
-            var description = ReflectorUtil.Describe(state, typeName, component);
-            Vector4 color = GetComponentColor(component);
-            ImGui.PushStyleColor(0, color);
-            bool treeOpen = ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowItemOverlap);
-            ImGui.PopStyleColor();
-
-            if (!treeOpen)
-                return;
-
-            /*
-            if (component is IUiElement element)
-            {
-                var snapshot = Resolve<ILayoutManager>().LastSnapshot;
-                if (!snapshot.TryGetValue(element, out var node))
-                    return;
-
-                ImGui.Text($"UI {node.Extents} {node.Order}");
-            }
-            */
-
-            foreach (var subObject in subObjects)
+            foreach (var subObject in _subObjects)
             {
                 var child = subObject.Getter(state);
                 var childState = new ReflectorState(child, state.Target, -1, subObject);
-                var childReflector = manager.GetReflectorForInstance(child);
+                var childReflector = _manager.GetReflectorForInstance(child);
                 childReflector(childState);
             }
 
             ImGui.TreePop();
-        };
+        }
+    }
+
+    public void ReflectComponent(in ReflectorState state)
+    {
+        var component = (Component)state.Target;
+        var description = ReflectorUtil.Describe(state, _typeName, component);
+        Vector4 color = GetComponentColor(component);
+        ImGui.PushStyleColor(0, color);
+        bool treeOpen = ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowItemOverlap);
+        ImGui.PopStyleColor();
+
+        if (!treeOpen)
+            return;
+
+        /*
+        if (component is IUiElement element)
+        {
+            var snapshot = Resolve<ILayoutManager>().LastSnapshot;
+            if (!snapshot.TryGetValue(element, out var node))
+                return;
+
+            ImGui.Text($"UI {node.Extents} {node.Order}");
+        }
+        */
+
+        foreach (var subObject in _subObjects)
+        {
+            var child = subObject.Getter(state);
+            var childState = new ReflectorState(child, state.Target, -1, subObject);
+            var childReflector = _manager.GetReflectorForInstance(child);
+            childReflector(childState);
+        }
+
+        ImGui.TreePop();
     }
 
     static Vector4 GetComponentColor(Component component) =>

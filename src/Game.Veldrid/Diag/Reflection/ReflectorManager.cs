@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Numerics;
 
 namespace UAlbion.Game.Veldrid.Diag.Reflection;
@@ -13,20 +14,20 @@ public class ReflectorManager
 
     ReflectorManager()
     {
-        void Add<T>(string name) => _reflectors[typeof(T)] = ValueReflector.Build(name);
-        void Add2<T>(string name, Func<object, string> toString) => _reflectors[typeof(T)] = ValueReflector.Build(name, toString);
+        void Add<T>(string name) => _reflectors[typeof(T)] = new ValueReflector(name).Reflect;
+        void Add2<T>(string name, Func<object, string> toString) => _reflectors[typeof(T)] = new ValueReflector(name, toString).Reflect;
 
         _nullReflector              = NullReflector.Instance.Reflect;
         _reflectors[typeof(bool)]   = BoolReflector.Instance.Reflect;
         _reflectors[typeof(string)] = StringReflector.Instance.Reflect;
-        _reflectors[typeof(byte)]   = IntegralValueReflector.Build("byte",   x => (byte)x);
-        _reflectors[typeof(sbyte)]  = IntegralValueReflector.Build("sbyte",  x => (sbyte)x);
-        _reflectors[typeof(ushort)] = IntegralValueReflector.Build("ushort", x => (ushort)x);
-        _reflectors[typeof(short)]  = IntegralValueReflector.Build("short",  x => (short)x);
-        _reflectors[typeof(uint)]   = IntegralValueReflector.Build("uint",   x => (int)(uint)x);
-        _reflectors[typeof(int)]    = IntegralValueReflector.Build("int",    x => (int)x);
-        _reflectors[typeof(ulong)]  = IntegralValueReflector.Build("ulong",  x => (int)(ulong)x);
-        _reflectors[typeof(long)]   = IntegralValueReflector.Build("long",   x => (int)(long)x);
+        _reflectors[typeof(byte)]   = new IntegralValueReflector("byte",   x => (byte)x).Reflect;
+        _reflectors[typeof(sbyte)]  = new IntegralValueReflector("sbyte",  x => (sbyte)x).Reflect;
+        _reflectors[typeof(ushort)] = new IntegralValueReflector("ushort", x => (ushort)x).Reflect;
+        _reflectors[typeof(short)]  = new IntegralValueReflector("short",  x => (short)x).Reflect;
+        _reflectors[typeof(uint)]   = new IntegralValueReflector("uint",   x => (int)(uint)x).Reflect;
+        _reflectors[typeof(int)]    = new IntegralValueReflector("int",    x => (int)x).Reflect;
+        _reflectors[typeof(ulong)]  = new IntegralValueReflector("ulong",  x => (int)(ulong)x).Reflect;
+        _reflectors[typeof(long)]   = new IntegralValueReflector("long",   x => (int)(long)x).Reflect;
 
         Add<float>("float");
         Add<double>("double");
@@ -45,19 +46,24 @@ public class ReflectorManager
         if (_reflectors.TryGetValue(type, out var reflector))
             return reflector;
 
-        reflector = Reflect(type);
+        reflector = BuildReflector(type);
         _reflectors[type] = reflector;
         return reflector;
     }
 
-    Reflector Reflect(Type type)
+    Reflector BuildReflector(Type type)
     {
+        if (type == null)
+            throw new ArgumentNullException(nameof(type));
         if (typeof(Enum).IsAssignableFrom(type))
             return EnumReflector.Build(type);
 
         if (typeof(IEnumerable).IsAssignableFrom(type))
-            return EnumerableReflectorBuilder.Build(this, type);
+            return new EnumerableReflector(this, type).Reflect;
 
-        return ObjectReflectorBuilder.Build(this, type);
+        if (type.IsAssignableTo(typeof(Component)))
+            return new ObjectReflector(this, type).ReflectComponent;
+
+        return new ObjectReflector(this, type).Reflect;
     }
 }

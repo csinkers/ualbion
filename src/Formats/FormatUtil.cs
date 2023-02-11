@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
@@ -16,11 +15,7 @@ namespace UAlbion.Formats;
 
 public static class FormatUtil
 {
-    public static readonly Encoding AlbionEncoding;
-
-    [SuppressMessage("Performance",
-        "CA1810:Initialize reference type static fields inline",
-        Justification = "Encoding.GetEncoding must happen after Encoding.RegisterProvider")]
+    static readonly Encoding AlbionEncoding;
     static FormatUtil()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core

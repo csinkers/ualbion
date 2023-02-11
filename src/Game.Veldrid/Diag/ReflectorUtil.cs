@@ -6,6 +6,13 @@ namespace UAlbion.Game.Veldrid.Diag;
 
 public static class ReflectorUtil
 {
+    public static string NameText(in ReflectorState state) =>
+        state.Meta.Name != null
+            ? $"{state.Meta.Name}: "
+            : state.Index == -1
+                ? ""
+                : $"{state.Index}: ";
+
     public static string Describe(in ReflectorState state, string typeName, object target)
     {
         target ??= state.Target;

@@ -20,6 +20,8 @@ public class ReflectorManager
         _nullReflector              = NullReflector.Instance.Reflect;
         _reflectors[typeof(bool)]   = BoolReflector.Instance.Reflect;
         _reflectors[typeof(string)] = StringReflector.Instance.Reflect;
+        _reflectors[typeof(Vector3)] = Vec3Reflector.Instance.Reflect;
+        _reflectors[typeof(Vector4)] = Vec4Reflector.Instance.Reflect;
         _reflectors[typeof(byte)]   = new IntegralValueReflector("byte",   x => (byte)x).Reflect;
         _reflectors[typeof(sbyte)]  = new IntegralValueReflector("sbyte",  x => (sbyte)x).Reflect;
         _reflectors[typeof(ushort)] = new IntegralValueReflector("ushort", x => (ushort)x).Reflect;
@@ -32,8 +34,6 @@ public class ReflectorManager
         Add<float>("float");
         Add<double>("double");
         Add2<Vector2>("Vector2", x => { var v = (Vector2)x; return $"({v.X}, {v.Y})"; });
-        Add2<Vector3>("Vector3", x => { var v = (Vector3)x; return $"({v.X}, {v.Y}, {v.Z})"; });
-        Add2<Vector4>("Vector4", x => { var v = (Vector4)x; return $"({v.X}, {v.Y}, {v.Z}, {v.W})"; });
     }
 
     public Reflector GetReflectorForInstance(object target)
@@ -55,13 +55,14 @@ public class ReflectorManager
     {
         if (type == null)
             throw new ArgumentNullException(nameof(type));
+
         if (typeof(Enum).IsAssignableFrom(type))
             return EnumReflector.Build(type);
 
         if (typeof(IEnumerable).IsAssignableFrom(type))
             return new EnumerableReflector(this, type).Reflect;
 
-        if (type.IsAssignableTo(typeof(Component)))
+        if (typeof(Component).IsAssignableFrom(type))
             return new ObjectReflector(this, type).ReflectComponent;
 
         return new ObjectReflector(this, type).Reflect;

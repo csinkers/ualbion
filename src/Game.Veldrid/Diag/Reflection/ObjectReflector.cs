@@ -12,14 +12,15 @@ public class ObjectReflector : IReflector
 {
     readonly ReflectorManager _manager;
 
+    // For ignoring fields on built-in types where we can't just add a [DiagIgnore] attribute.
     static readonly Dictionary<string, string[]> MembersToIgnore = new()
     {
         // Type starting with:
-        //     * = matches anything
-        //     ~ = "contains"
-        //     ! = "full type name"
-        //     > = "starts with"
-        //     none = exact short name match
+        // * = matches anything
+        // ~ = contains
+        // ! = full type name
+        // > = starts with
+        // anything else = exact short name match
 
         { "*", new [] { "~__BackingField", "_syncRoot" } }, // ignore backing fields, lock objects etc
 
@@ -52,18 +53,18 @@ public class ObjectReflector : IReflector
     {
         var description = ReflectorUtil.Describe(state, _typeName, state.Target);
         bool treeOpen = ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowItemOverlap);
-        if (treeOpen)
-        {
-            foreach (var subObject in _subObjects)
-            {
-                var child = subObject.Getter(state);
-                var childState = new ReflectorState(child, state.Target, -1, subObject);
-                var childReflector = _manager.GetReflectorForInstance(child);
-                childReflector(childState);
-            }
+        if (!treeOpen)
+            return;
 
-            ImGui.TreePop();
+        foreach (var subObject in _subObjects)
+        {
+            var child = subObject.Getter(state);
+            var childState = new ReflectorState(child, state.Target, -1, subObject);
+            var childReflector = _manager.GetReflectorForInstance(child);
+            childReflector(childState);
         }
+
+        ImGui.TreePop();
     }
 
     public void ReflectComponent(in ReflectorState state)
@@ -197,7 +198,11 @@ public class ObjectReflector : IReflector
             options);
     }
 
-    static bool IsMemberIgnored(List<string> ignoreList, string name, IEnumerable<Attribute> customAttributes, out DiagEditAttribute options)
+    static bool IsMemberIgnored(
+        List<string> ignoreList,
+        string name,
+        IEnumerable<Attribute> customAttributes,
+        out DiagEditAttribute options)
     {
         options = null;
         bool isIgnored = false;

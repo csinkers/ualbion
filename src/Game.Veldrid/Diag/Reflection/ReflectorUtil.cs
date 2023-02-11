@@ -2,7 +2,7 @@
 using System.Text;
 using UAlbion.Formats;
 
-namespace UAlbion.Game.Veldrid.Diag;
+namespace UAlbion.Game.Veldrid.Diag.Reflection;
 
 public static class ReflectorUtil
 {

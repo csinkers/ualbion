@@ -2,19 +2,19 @@
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 
-namespace UAlbion.Game.Veldrid.Diag;
+namespace UAlbion.Game.Veldrid.Diag.Reflection;
 
 #pragma warning disable CA1812 // Class is instantiated via reflection
-class SignedEnumReflector<T> : EnumReflector, IReflector where T : struct, Enum
+class UnsignedEnumReflector<T> : EnumReflector, IReflector where T : struct, Enum
 {
-    readonly Func<T, long> _toNum;
-    readonly Func<long, T> _fromNum;
+    readonly Func<T, ulong> _toNum;
+    readonly Func<ulong, T> _fromNum;
     readonly EnumValue[] _values;
     readonly string[] _names;
 
-    record EnumValue(long Numeric, string Name, bool IsPowerOfTwo);
+    record EnumValue(ulong Numeric, string Name, bool IsPowerOfTwo);
 
-    public SignedEnumReflector(Func<T, long> toNum, Func<long, T> fromNum) : base(typeof(T))
+    public UnsignedEnumReflector(Func<T, ulong> toNum, Func<ulong, T> fromNum) : base(typeof(T))
     {
         _toNum = toNum ?? throw new ArgumentNullException(nameof(toNum));
         _fromNum = fromNum ?? throw new ArgumentNullException(nameof(fromNum));
@@ -25,7 +25,7 @@ class SignedEnumReflector<T> : EnumReflector, IReflector where T : struct, Enum
 
         for (int i = 0; i < values.Length; i++)
         {
-            long numeric = _toNum(values[i]);
+            ulong numeric = _toNum(values[i]);
             bool isPowerOfTwo = numeric != 0 && (numeric & (numeric - 1)) == 0;
             _values[i] = new EnumValue(numeric, values[i].ToString(), isPowerOfTwo);
             _names[i] = values[i].ToString();
@@ -56,8 +56,8 @@ class SignedEnumReflector<T> : EnumReflector, IReflector where T : struct, Enum
         if (!treeOpen)
             return;
 
-        long numeric = _toNum((T)state.Target);
-        long oldNumeric = numeric;
+        ulong numeric = _toNum((T)state.Target);
+        ulong oldNumeric = numeric;
         foreach (var value in _values)
         {
             if (!value.IsPowerOfTwo) continue;
@@ -80,7 +80,7 @@ class SignedEnumReflector<T> : EnumReflector, IReflector where T : struct, Enum
 
     void RenderDropdown(in ReflectorState state)
     {
-        long fullNumeric =_toNum((T)state.Target);
+        ulong fullNumeric = _toNum((T)state.Target);
         if (fullNumeric > int.MaxValue)
         {
             RenderLabel(state);
@@ -91,13 +91,12 @@ class SignedEnumReflector<T> : EnumReflector, IReflector where T : struct, Enum
         var label = ReflectorUtil.NameText(state);
 
         ImGui.Indent();
-        ImGui.TextUnformatted(label); // Property names need to go on the left
+        ImGui.TextUnformatted(label);
         ImGui.SameLine();
 
-        // ## suppresses printing the label
         if (ImGui.Combo("##" + label, ref numeric, _names, _names.Length))
         {
-            var newValue = _fromNum(numeric);
+            var newValue = _fromNum((ulong)numeric);
             state.Meta.Setter(state, newValue);
         }
 

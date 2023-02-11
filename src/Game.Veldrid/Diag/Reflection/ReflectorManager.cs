@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace UAlbion.Game.Veldrid.Diag;
+namespace UAlbion.Game.Veldrid.Diag.Reflection;
 
 public class ReflectorManager
 {

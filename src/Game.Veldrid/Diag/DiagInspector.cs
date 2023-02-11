@@ -12,6 +12,7 @@ using UAlbion.Game.Input;
 using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 using UAlbion.Game.Veldrid.Audio;
+using UAlbion.Game.Veldrid.Diag.Reflection;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -35,7 +36,6 @@ public class DiagInspector : Component
         var state = TryResolve<IGameState>();
         if (state == null)
             return;
-
         RenderNode("State", state);
         DrawStats();
         DrawSettings();

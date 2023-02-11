@@ -3,7 +3,7 @@ using System.Collections;
 using System.Globalization;
 using ImGuiNET;
 
-namespace UAlbion.Game.Veldrid.Diag;
+namespace UAlbion.Game.Veldrid.Diag.Reflection;
 
 public static class EnumerableReflectorBuilder
 {

@@ -6,7 +6,7 @@ using System.Reflection;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 
-namespace UAlbion.Game.Veldrid.Diag;
+namespace UAlbion.Game.Veldrid.Diag.Reflection;
 
 public static class ObjectReflectorBuilder
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using ImGuiNET;
 
-namespace UAlbion.Game.Veldrid.Diag;
+namespace UAlbion.Game.Veldrid.Diag.Reflection;
 
 public class ValueReflector
 {

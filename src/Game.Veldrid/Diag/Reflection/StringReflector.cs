@@ -4,7 +4,7 @@ using System.Text;
 using ImGuiNET;
 using UAlbion.Formats;
 
-namespace UAlbion.Game.Veldrid.Diag;
+namespace UAlbion.Game.Veldrid.Diag.Reflection;
 
 class StringReflector : IReflector
 {

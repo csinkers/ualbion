@@ -31,6 +31,7 @@ public class DiagInspector : Component
 
     public void Render()
     {
+        ReflectorUtil.SwapAuxiliaryState();
         var state = TryResolve<IGameState>();
         if (state == null)
             return;

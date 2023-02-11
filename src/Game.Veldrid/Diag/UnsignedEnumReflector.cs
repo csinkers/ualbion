@@ -46,6 +46,8 @@ class UnsignedEnumReflector<T> : EnumReflector, IReflector where T : struct, Enu
 
     void RenderCheckboxes(in ReflectorState state)
     {
+        // Note: Don't include the value in the node label or changing the value will
+        // collapse the tree.
         var label = ReflectorUtil.NameText(state);
         bool treeOpen = ImGui.TreeNode(label);
         ImGui.SameLine();

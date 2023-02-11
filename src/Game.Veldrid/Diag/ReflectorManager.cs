@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
-using ImGuiNET;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -14,17 +13,12 @@ public class ReflectorManager
 
     ReflectorManager()
     {
-        _nullReflector = (in ReflectorState state) =>
-        {
-            var description = ReflectorUtil.Describe(state, "null", "null");
-            ImGui.Indent();
-            ImGui.TextUnformatted(description);
-            ImGui.Unindent();
-        };
-
         void Add<T>(string name) => _reflectors[typeof(T)] = ValueReflector.Build(name);
         void Add2<T>(string name, Func<object, string> toString) => _reflectors[typeof(T)] = ValueReflector.Build(name, toString);
 
+        _nullReflector              = NullReflector.Instance.Reflect;
+        _reflectors[typeof(bool)]   = BoolReflector.Instance.Reflect;
+        _reflectors[typeof(string)] = StringReflector.Instance.Reflect;
         _reflectors[typeof(byte)]   = IntegralValueReflector.Build("byte",   x => (byte)x);
         _reflectors[typeof(sbyte)]  = IntegralValueReflector.Build("sbyte",  x => (sbyte)x);
         _reflectors[typeof(ushort)] = IntegralValueReflector.Build("ushort", x => (ushort)x);
@@ -34,10 +28,8 @@ public class ReflectorManager
         _reflectors[typeof(ulong)]  = IntegralValueReflector.Build("ulong",  x => (int)(ulong)x);
         _reflectors[typeof(long)]   = IntegralValueReflector.Build("long",   x => (int)(long)x);
 
-        Add<bool>("bool");
         Add<float>("float");
         Add<double>("double");
-        Add2<string>("string", x => $"\"{((string)x)?.Replace("\"", "\\\"", StringComparison.Ordinal)}\"");
         Add2<Vector2>("Vector2", x => { var v = (Vector2)x; return $"({v.X}, {v.Y})"; });
         Add2<Vector3>("Vector3", x => { var v = (Vector3)x; return $"({v.X}, {v.Y}, {v.Z})"; });
         Add2<Vector4>("Vector4", x => { var v = (Vector4)x; return $"({v.X}, {v.Y}, {v.Z}, {v.W})"; });

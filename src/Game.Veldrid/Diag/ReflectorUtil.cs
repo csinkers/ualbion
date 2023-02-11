@@ -55,4 +55,29 @@ public static class ReflectorUtil
         sb.Append('>');
         return sb.ToString();
     }
+
+    static readonly object SyncRoot = new();
+    static readonly AuxiliaryReflectorStateCache AuxState = new();
+    public static void SwapAuxiliaryState()
+    {
+        lock (SyncRoot)
+            AuxState.Swap();
+    }
+
+    public static T GetAuxiliaryState<T>(in ReflectorState state, string type, Func<ReflectorState, T> auxStateBuilder)
+    {
+        if (auxStateBuilder == null) throw new ArgumentNullException(nameof(auxStateBuilder));
+
+        lock (AuxState)
+        {
+            var result = AuxState.Get(state, type);
+            if (result == null)
+            {
+                result = auxStateBuilder(state);
+                AuxState.Set(state, type, result);
+            }
+
+            return (T)result;
+        }
+    }
 }

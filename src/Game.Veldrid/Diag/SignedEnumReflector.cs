@@ -46,6 +46,8 @@ class SignedEnumReflector<T> : EnumReflector, IReflector where T : struct, Enum
 
     void RenderCheckboxes(in ReflectorState state)
     {
+        // Note: Don't include the value in the node label or changing the value will
+        // collapse the tree.
         var label = ReflectorUtil.NameText(state);
         bool treeOpen = ImGui.TreeNode(label);
         ImGui.SameLine();
@@ -89,9 +91,10 @@ class SignedEnumReflector<T> : EnumReflector, IReflector where T : struct, Enum
         var label = ReflectorUtil.NameText(state);
 
         ImGui.Indent();
-        ImGui.TextUnformatted(label);
+        ImGui.TextUnformatted(label); // Property names need to go on the left
         ImGui.SameLine();
 
+        // ## suppresses printing the label
         if (ImGui.Combo("##" + label, ref numeric, _names, _names.Length))
         {
             var newValue = _fromNum(numeric);

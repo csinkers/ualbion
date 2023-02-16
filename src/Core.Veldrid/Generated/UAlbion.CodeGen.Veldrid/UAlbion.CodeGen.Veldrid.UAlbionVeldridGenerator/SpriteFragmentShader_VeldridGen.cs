@@ -59,23 +59,28 @@ namespace UAlbion.Core.Veldrid.Sprites
 #define SKF_CLAMP_EDGES 0x20U
 
 layout(set = 0, binding = 0) uniform _Shared {
-    vec3 uWorldSpacePosition;
-    uint _globalInfo_pad1;
-    vec2 uCameraLookDirection;
-    vec2 uResolution;
     float uTime;
     uint uEngineFlags;
     float uPaletteBlend;
     int uPaletteFrame;
 };
-layout(set = 0, binding = 3) uniform texture2D uDayPalette; //!
-layout(set = 0, binding = 4) uniform texture2D uNightPalette; //!
-layout(set = 0, binding = 5) uniform sampler uPaletteSampler; //!
+layout(set = 0, binding = 1) uniform texture2D uDayPalette; //!
+layout(set = 0, binding = 2) uniform texture2D uNightPalette; //!
+layout(set = 0, binding = 3) uniform sampler uPaletteSampler; //!
 
-layout(set = 1, binding = 0) uniform texture2D uSprite; //!
-layout(set = 1, binding = 1) uniform texture2DArray uSpriteArray; //!
-layout(set = 1, binding = 2) uniform sampler uSpriteSampler; //!
-layout(set = 1, binding = 3) uniform _Uniform {
+layout(set = 1, binding = 0) uniform _Camera {
+    mat4 uProjection;
+    mat4 uView;
+    vec3 uWorldSpacePosition;
+    uint _globalInfo_pad1;
+    vec2 uCameraLookDirection;
+    vec2 uResolution;
+};
+
+layout(set = 2, binding = 0) uniform texture2D uSprite; //!
+layout(set = 2, binding = 1) uniform texture2DArray uSpriteArray; //!
+layout(set = 2, binding = 2) uniform sampler uSpriteSampler; //!
+layout(set = 2, binding = 3) uniform _Uniform {
     vec2 uTexSize;
     uint uFlags;
     uint _pad1;

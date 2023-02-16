@@ -1,14 +1,14 @@
 ﻿using System;
-using UAlbion.Api.Eventing;
 using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
-public interface IRenderer : IComponent
+public interface IRenderer<in TGlobalSet, in TRenderPassSet> 
+    where TGlobalSet : IResourceSetHolder 
+    where TRenderPassSet : IResourceSetHolder
 {
     Type[] HandledTypes { get; }
-    void Render(IRenderable renderable, CommonSet commonSet, IFramebufferHolder framebuffer, CommandList cl,
-        GraphicsDevice device);
+    void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, TGlobalSet globalSet, TRenderPassSet renderPassSet);
 }

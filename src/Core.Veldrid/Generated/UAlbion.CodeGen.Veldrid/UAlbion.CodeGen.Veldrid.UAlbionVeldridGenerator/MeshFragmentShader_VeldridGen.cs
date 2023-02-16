@@ -23,9 +23,28 @@ namespace UAlbion.Core.Veldrid.Meshes
 #define EF_SUPPRESS_LAYOUT 0x100U
 #define EF_FIXED_TIME_STEP 0x200U
 
-layout(set = 0, binding = 0) uniform texture2D Diffuse; //!
-layout(set = 0, binding = 1) uniform sampler Sampler; //!
-layout(set = 0, binding = 2) uniform MeshUniform {
+layout(set = 0, binding = 0) uniform _Shared {
+    float uTime;
+    uint uEngineFlags;
+    float uPaletteBlend;
+    int uPaletteFrame;
+};
+layout(set = 0, binding = 1) uniform texture2D uDayPalette; //!
+layout(set = 0, binding = 2) uniform texture2D uNightPalette; //!
+layout(set = 0, binding = 3) uniform sampler uPaletteSampler; //!
+
+layout(set = 1, binding = 0) uniform _Camera {
+    mat4 uProjection;
+    mat4 uView;
+    vec3 uWorldSpacePosition;
+    uint _globalInfo_pad1;
+    vec2 uCameraLookDirection;
+    vec2 uResolution;
+};
+
+layout(set = 2, binding = 0) uniform texture2D Diffuse; //!
+layout(set = 2, binding = 1) uniform sampler Sampler; //!
+layout(set = 2, binding = 2) uniform MeshUniform {
     vec3 uAmbRef;
     float uOpacity;
     vec3 uDiffRef;
@@ -37,20 +56,6 @@ layout(set = 0, binding = 2) uniform MeshUniform {
     vec3 uTransFilter;
     int uIllumModel;
 };
-
-layout(set = 1, binding = 0) uniform _Shared {
-    vec3 uWorldSpacePosition;
-    uint _globalInfo_pad1;
-    vec2 uCameraLookDirection;
-    vec2 uResolution;
-    float uTime;
-    uint uEngineFlags;
-    float uPaletteBlend;
-    int uPaletteFrame;
-};
-layout(set = 1, binding = 3) uniform texture2D uDayPalette; //!
-layout(set = 1, binding = 4) uniform texture2D uNightPalette; //!
-layout(set = 1, binding = 5) uniform sampler uPaletteSampler; //!
 
 // UAlbion.Core.Veldrid.Meshes.MeshIntermediate
 layout(location = 0) in vec2 iTexCoords;

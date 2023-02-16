@@ -169,7 +169,15 @@ public class LogExchange : ILogExchange
             var regex = new Regex(pattern, RegexOptions.IgnoreCase);
             var matchingEvents = 
                 EventSerializer.Instance.GetEventMetadata()
-                    .Where(x => regex.IsMatch(x.Name))
+                    .Where(x =>
+                    {
+                        if (regex.IsMatch(x.Name))
+                            return true;
+                        foreach(var alias in x.Aliases)
+                            if (regex.IsMatch(alias))
+                                return true;
+                        return false;
+                    })
                     .Distinct()
                     .ToList();
 

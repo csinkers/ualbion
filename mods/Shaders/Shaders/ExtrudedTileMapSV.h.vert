@@ -29,7 +29,23 @@
 #define EF_SUPPRESS_LAYOUT 0x100U
 #define EF_FIXED_TIME_STEP 0x200U
 
-layout(set = 0, binding = 0) uniform Properties {
+layout(set = 0, binding = 0) uniform _Shared {
+    float uTime;
+    uint uEngineFlags;
+    float uPaletteBlend;
+    int uPaletteFrame;
+};
+
+layout(set = 1, binding = 0) uniform _Camera {
+    mat4 uProjection;
+    mat4 uView;
+    vec3 uWorldSpacePosition;
+    uint _globalInfo_pad1;
+    vec2 uCameraLookDirection;
+    vec2 uResolution;
+};
+
+layout(set = 2, binding = 0) uniform Properties {
     vec4 uScale;
     vec4 uRotation;
     vec4 uOrigin;
@@ -39,23 +55,6 @@ layout(set = 0, binding = 0) uniform Properties {
     uint uAmbient;
     uint uFogColor;
     float uYScale;
-};
-
-layout(set = 1, binding = 0) uniform _Shared {
-    vec3 uWorldSpacePosition;
-    uint _globalInfo_pad1;
-    vec2 uCameraLookDirection;
-    vec2 uResolution;
-    float uTime;
-    uint uEngineFlags;
-    float uPaletteBlend;
-    int uPaletteFrame;
-};
-layout(set = 1, binding = 1) uniform _Projection {
-    mat4 uProjection;
-};
-layout(set = 1, binding = 2) uniform _View {
-    mat4 uView;
 };
 
 // UAlbion.Core.Veldrid.Vertex3DTextured

@@ -7,10 +7,6 @@ using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
-using UAlbion.Core.Veldrid.Etm;
-using UAlbion.Core.Veldrid.Meshes;
-using UAlbion.Core.Veldrid.Skybox;
-using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Formats;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
@@ -77,9 +73,8 @@ static class Program
             jsonUtil,
             commandLine.Mods);
 
-        IRenderPass mainPass = null;
         if (commandLine.NeedsEngine)
-            mainPass = BuildEngine(commandLine, exchange);
+            BuildEngine(commandLine, exchange);
 
         exchange.Attach(new StdioConsoleReader()); // TODO: Only add this if running with a console window
 
@@ -88,8 +83,14 @@ static class Program
 
         switch (commandLine.Mode) // ConvertAssets handled above as it requires a specialised asset system setup
         {
-            case ExecutionMode.Game: Albion.RunGame(exchange, mainPass, commandLine); break;
-            case ExecutionMode.BakeIsometric: IsometricTest.Run(exchange, commandLine); break;
+            case ExecutionMode.Game: Albion.RunGame(exchange, commandLine); break;
+            case ExecutionMode.BakeIsometric:
+                {
+                    using var test = new IsometricTest(commandLine);
+                    exchange.Attach(test);
+                    exchange.Resolve<IEngine>().Run();
+                    break;
+                }
 
             case ExecutionMode.DumpData:
                 PerfTracker.BeginFrame(); // Don't need to show verbose startup logging while dumping
@@ -158,23 +159,16 @@ static class Program
         }
     }
 
-    static IRenderPass BuildEngine(CommandLineOptions commandLine, EventExchange exchange)
+    static void BuildEngine(CommandLineOptions commandLine, EventExchange exchange)
     {
         PerfTracker.StartupEvent("Creating engine");
-        var framebuffer = new MainFramebuffer();
-        var renderPass = new RenderPass("Main Pass", framebuffer);
-        renderPass // TODO: Populate from json so mods can add new render methods
-            .Add(new SpriteRenderer(framebuffer))
-            .Add(new BlendedSpriteRenderer(framebuffer))
-            .Add(new TileRenderer(framebuffer))
-            .Add(new EtmRenderer(framebuffer))
-            .Add(new MeshRenderer(framebuffer))
-            .Add(new SkyboxRenderer(framebuffer))
-            .Add(new DebugGuiRenderer(framebuffer))
-            ;
-
-        var engine = new Engine(commandLine.Backend, commandLine.UseRenderDoc, commandLine.StartupOnly, true);
-        engine.AddRenderPass(renderPass);
+        var engine = new Engine(
+            commandLine.Backend,
+            commandLine.UseRenderDoc,
+            true)
+        {
+            StartupOnly = commandLine.StartupOnly
+        };
 
 #pragma warning disable CA2000 // Dispose objects before losing scopes
         var pathResolver = exchange.Resolve<IPathResolver>();
@@ -188,13 +182,10 @@ static class Program
         var engineServices = new Container("Engine", 
             shaderCache,
             shaderLoader,
-            framebuffer,
-            renderPass,
             engine,
             new ResourceLayoutSource());
 
         exchange.Attach(engineServices);
-        return renderPass;
     }
 }
 #pragma warning restore CA2000 // Dispose objects before losing scopes

@@ -9,7 +9,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid.Etm;
 
-public sealed class EtmRenderer : Component, IRenderer, IDisposable
+public sealed class EtmRenderer : Component, IRenderer<GlobalSet, MainPassSet>, IDisposable
 {
     readonly MultiBuffer<Vertex3DTextured> _vertexBuffer;
     readonly MultiBuffer<ushort> _indexBuffer;
@@ -18,26 +18,26 @@ public sealed class EtmRenderer : Component, IRenderer, IDisposable
 
     public Type[] HandledTypes { get; } = { typeof(EtmWindow) };
 
-    public EtmRenderer(IFramebufferHolder framebuffer)
+    public EtmRenderer(in OutputDescription outputFormat)
     {
         _vertexBuffer = new MultiBuffer<Vertex3DTextured>(Cube.Vertices, BufferUsage.VertexBuffer) { Name = "TileMapVertexBuffer"};
         _indexBuffer = new MultiBuffer<ushort>(Cube.Indices, BufferUsage.IndexBuffer) { Name = "TileMapIndexBuffer"};
-        _normalPipeline = BuildPipeline("P_TileMapRenderer", FaceCullMode.Back, framebuffer);
-        _nonCullingPipeline = BuildPipeline("P_TileMapRendererNoCull", FaceCullMode.None, framebuffer);
+        _normalPipeline = BuildPipeline("P_TileMapRenderer", FaceCullMode.Back, outputFormat);
+        _nonCullingPipeline = BuildPipeline("P_TileMapRendererNoCull", FaceCullMode.None, outputFormat);
         AttachChild(_vertexBuffer);
         AttachChild(_indexBuffer);
         AttachChild(_normalPipeline);
         AttachChild(_nonCullingPipeline);
     }
 
-    static EtmPipeline BuildPipeline(string name, FaceCullMode cullMode, IFramebufferHolder framebuffer)
+    static EtmPipeline BuildPipeline(string name, FaceCullMode cullMode, in OutputDescription outputFormat)
         => new()
         {
             AlphaBlend = BlendStateDescription.SingleAlphaBlend,
             CullMode = cullMode,
             DepthStencilMode = DepthStencilStateDescription.DepthOnlyLessEqual,
             FillMode = PolygonFillMode.Solid,
-            Framebuffer = framebuffer,
+            OutputDescription = outputFormat,
             Name = name,
             Topology = PrimitiveTopology.TriangleList,
             UseDepthTest = true,
@@ -45,12 +45,11 @@ public sealed class EtmRenderer : Component, IRenderer, IDisposable
             Winding = FrontFace.CounterClockwise,
         };
 
-    public void Render(IRenderable renderable, CommonSet commonSet, IFramebufferHolder framebuffer, CommandList cl,
-        GraphicsDevice device)
+    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, MainPassSet mainPassSet)
     {
         if (cl == null) throw new ArgumentNullException(nameof(cl));
-        if (commonSet == null) throw new ArgumentNullException(nameof(commonSet));
-        if (framebuffer == null) throw new ArgumentNullException(nameof(framebuffer));
+        if (globalSet == null) throw new ArgumentNullException(nameof(globalSet));
+        if (mainPassSet == null) throw new ArgumentNullException(nameof(mainPassSet));
         if (renderable is not EtmWindow window)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
@@ -62,12 +61,12 @@ public sealed class EtmRenderer : Component, IRenderer, IDisposable
             ? _nonCullingPipeline.Pipeline 
             : _normalPipeline.Pipeline);
 
-        cl.SetGraphicsResourceSet(0, tilemap.ResourceSet.ResourceSet);
-        cl.SetGraphicsResourceSet(1, commonSet.ResourceSet);
+        cl.SetGraphicsResourceSet(0, globalSet.ResourceSet);
+        cl.SetGraphicsResourceSet(1, mainPassSet.ResourceSet);
+        cl.SetGraphicsResourceSet(2, tilemap.ResourceSet.ResourceSet);
         cl.SetVertexBuffer(0, _vertexBuffer.DeviceBuffer);
         cl.SetVertexBuffer(1, tilemap.TileBuffer);
         cl.SetIndexBuffer(_indexBuffer.DeviceBuffer, IndexFormat.UInt16);
-        cl.SetFramebuffer(framebuffer.Framebuffer);
 
         cl.DrawIndexed((uint)Cube.Indices.Length, (uint)tilemap.Tiles.Length, 0, 0, 0);
         cl.PopDebugGroup();
@@ -99,16 +98,18 @@ partial class EtmSet : ResourceSetHolder
 [Name("ExtrudedTileMapSV.vert")]
 [Input(0, typeof(Vertex3DTextured))]
 [Input(1, typeof(DungeonTile), InstanceStep = 1)]
-[ResourceSet(0, typeof(EtmSet))]
-[ResourceSet(1, typeof(CommonSet))]
+[ResourceSet(0, typeof(GlobalSet))]
+[ResourceSet(1, typeof(MainPassSet))]
+[ResourceSet(2, typeof(EtmSet))]
 [Output(0, typeof(EtmIntermediate))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
 partial class EtmVertexShader : IVertexShader { }
 
 [Name( "ExtrudedTileMapSF.frag")]
 [Input(0, typeof(EtmIntermediate))]
-[ResourceSet(0, typeof(EtmSet))]
-[ResourceSet(1, typeof(CommonSet))]
+[ResourceSet(0, typeof(GlobalSet))]
+[ResourceSet(1, typeof(MainPassSet))]
+[ResourceSet(2, typeof(EtmSet))]
 [Output(0, typeof(SimpleFramebuffer))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
 partial class EtmFragmentShader : IFragmentShader { }

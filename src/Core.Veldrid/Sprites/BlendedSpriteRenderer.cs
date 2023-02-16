@@ -8,7 +8,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid.Sprites;
 
-public sealed class BlendedSpriteRenderer : Component, IRenderer, IDisposable
+public sealed class BlendedSpriteRenderer : Component, IRenderer<GlobalSet, MainPassSet>, IDisposable
 {
     readonly MultiBuffer<Vertex2DTextured> _vertexBuffer;
     readonly MultiBuffer<ushort> _indexBuffer;
@@ -24,7 +24,7 @@ public sealed class BlendedSpriteRenderer : Component, IRenderer, IDisposable
 
     public Type[] HandledTypes { get; } = { typeof(VeldridSpriteBatch<BlendedSpriteInfo, GpuBlendedSpriteInstanceData>) };
 
-    public BlendedSpriteRenderer(IFramebufferHolder framebuffer)
+    public BlendedSpriteRenderer(in OutputDescription outputFormat)
     {
         _vertexBuffer = new MultiBuffer<Vertex2DTextured>(Vertices, BufferUsage.VertexBuffer, "BSpriteVBuffer");
         _indexBuffer = new MultiBuffer<ushort>(Indices, BufferUsage.IndexBuffer, "BSpriteIBuffer");
@@ -34,7 +34,7 @@ public sealed class BlendedSpriteRenderer : Component, IRenderer, IDisposable
                 DepthTestEnabled = true,
                 DepthWriteEnabled = true,
                 DepthComparison = ComparisonKind.LessEqual
-            }, framebuffer);
+            }, outputFormat);
 
         _noCullPipeline = BuildPipeline(
             new DepthStencilStateDescription
@@ -42,14 +42,14 @@ public sealed class BlendedSpriteRenderer : Component, IRenderer, IDisposable
                 DepthTestEnabled = true,
                 DepthWriteEnabled = true,
                 DepthComparison = ComparisonKind.Always
-            }, framebuffer);
+            }, outputFormat);
         AttachChild(_vertexBuffer);
         AttachChild(_indexBuffer);
         AttachChild(_pipeline);
         AttachChild(_noCullPipeline);
     }
 
-    static BlendedSpritePipeline BuildPipeline(DepthStencilStateDescription depthMode, IFramebufferHolder framebuffer)
+    static BlendedSpritePipeline BuildPipeline(DepthStencilStateDescription depthMode, in OutputDescription outputFormat)
     {
         return new()
         {
@@ -58,7 +58,7 @@ public sealed class BlendedSpriteRenderer : Component, IRenderer, IDisposable
             CullMode = FaceCullMode.None,
             DepthStencilMode = depthMode,
             FillMode = PolygonFillMode.Solid,
-            Framebuffer = framebuffer,
+            OutputDescription = outputFormat,
             Topology = PrimitiveTopology.TriangleList,
             UseDepthTest = true,
             UseScissorTest = true,
@@ -66,12 +66,11 @@ public sealed class BlendedSpriteRenderer : Component, IRenderer, IDisposable
         };
     }
 
-    public void Render(IRenderable renderable, CommonSet commonSet, IFramebufferHolder framebuffer, CommandList cl,
-        GraphicsDevice device)
+    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, MainPassSet mainPassSet)
     {
         if (cl == null) throw new ArgumentNullException(nameof(cl));
-        if (commonSet == null) throw new ArgumentNullException(nameof(commonSet));
-        if (framebuffer == null) throw new ArgumentNullException(nameof(framebuffer));
+        if (globalSet == null) throw new ArgumentNullException(nameof(globalSet));
+        if (mainPassSet == null) throw new ArgumentNullException(nameof(mainPassSet));
         if (renderable is not VeldridSpriteBatch<BlendedSpriteInfo, GpuBlendedSpriteInstanceData> batch)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
@@ -87,12 +86,12 @@ public sealed class BlendedSpriteRenderer : Component, IRenderer, IDisposable
                 ? _noCullPipeline.Pipeline 
                 : _pipeline.Pipeline);
 
-        cl.SetGraphicsResourceSet(0, commonSet.ResourceSet);
-        cl.SetGraphicsResourceSet(1, batch.SpriteResources.ResourceSet);
+        cl.SetGraphicsResourceSet(0, globalSet.ResourceSet);
+        cl.SetGraphicsResourceSet(1, mainPassSet.ResourceSet);
+        cl.SetGraphicsResourceSet(2, batch.SpriteResources.ResourceSet);
         cl.SetVertexBuffer(0, _vertexBuffer.DeviceBuffer);
         cl.SetVertexBuffer(1, batch.Instances.DeviceBuffer);
         cl.SetIndexBuffer(_indexBuffer.DeviceBuffer, IndexFormat.UInt16);
-        cl.SetFramebuffer(framebuffer.Framebuffer);
 
         cl.DrawIndexed((uint)Indices.Length, (uint)batch.ActiveInstances, 0, 0, 0);
 
@@ -116,8 +115,9 @@ internal partial class BlendedSpritePipeline : PipelineHolder { }
 
 [Name("BlendedSpriteSF.frag")]
 [Input(0, typeof(BlendedSpriteIntermediateData))]
-[ResourceSet(0, typeof(CommonSet))]
-[ResourceSet(1, typeof(SpriteSet))]
+[ResourceSet(0, typeof(GlobalSet))]
+[ResourceSet(1, typeof(MainPassSet))]
+[ResourceSet(2, typeof(SpriteSet))]
 [Output(0, typeof(SimpleFramebuffer))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
 internal partial class BlendedSpriteFragmentShader : IFragmentShader { }
@@ -125,8 +125,9 @@ internal partial class BlendedSpriteFragmentShader : IFragmentShader { }
 [Name("BlendedSpriteSV.vert")]
 [Input(0, typeof(Vertex2DTextured))]
 [Input(1, typeof(GpuBlendedSpriteInstanceData), InstanceStep = 1)]
-[ResourceSet(0, typeof(CommonSet))]
-[ResourceSet(1, typeof(SpriteSet))]
+[ResourceSet(0, typeof(GlobalSet))]
+[ResourceSet(1, typeof(MainPassSet))]
+[ResourceSet(2, typeof(SpriteSet))]
 [Output(0, typeof(BlendedSpriteIntermediateData))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
 internal partial class BlendedSpriteVertexShader : IVertexShader { }

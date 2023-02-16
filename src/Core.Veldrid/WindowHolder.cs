@@ -101,7 +101,8 @@ class WindowHolder : Component, IDisposable
     public void PumpEvents(double deltaSeconds)
     {
         SetTitle();
-        Sdl2Events.ProcessEvents();
+        using (PerfTracker.FrameEvent("2.1 SDL events"))
+            Sdl2Events.ProcessEvents();
 
         var snapshot = _window.PumpEvents();
 
@@ -110,7 +111,7 @@ class WindowHolder : Component, IDisposable
 
         if (_pendingCursorUpdate.HasValue && _window.Focused)
         {
-            using (PerfTracker.FrameEvent("3 Warping mouse"))
+            using (PerfTracker.FrameEvent("2.2 Warping mouse"))
             {
                 Sdl2Native.SDL_WarpMouseInWindow(
                     _window.SdlWindowHandle,
@@ -121,21 +122,27 @@ class WindowHolder : Component, IDisposable
             }
         }
 
-        using (PerfTracker.FrameEvent("4 Raising input event"))
+        using (PerfTracker.FrameEvent("2.3 Raising preview input event"))
         {
             _previewEvent.DeltaSeconds = deltaSeconds;
             _previewEvent.Snapshot = snapshot;
             Raise(_previewEvent);
+        }
 
-            if (!_previewEvent.SuppressKeyboard)
+        if (!_previewEvent.SuppressKeyboard)
+        {
+            using (PerfTracker.FrameEvent("2.4 Raising keyboard event"))
             {
                 _keyboardEvent.DeltaSeconds = deltaSeconds;
                 _keyboardEvent.KeyCharPresses = snapshot.KeyCharPresses;
                 _keyboardEvent.KeyEvents = snapshot.KeyEvents;
                 Raise(_keyboardEvent);
             }
+        }
 
-            if (!_previewEvent.SuppressMouse)
+        if (!_previewEvent.SuppressMouse)
+        {
+            using (PerfTracker.FrameEvent("2.5 Raising mouse event"))
             {
                 _mouseEvent.DeltaSeconds = deltaSeconds;
                 _mouseEvent.Snapshot = snapshot;

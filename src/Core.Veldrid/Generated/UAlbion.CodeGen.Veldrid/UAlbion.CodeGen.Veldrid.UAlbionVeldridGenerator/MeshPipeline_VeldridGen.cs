@@ -13,10 +13,16 @@ namespace UAlbion.Core.Veldrid.Meshes
             }
         }
 
-
         public MeshPipeline() : base("MeshSV.vert", "MeshSF.frag",
-            new[] { global::UAlbion.Core.Veldrid.Meshes.MeshVertex.GetLayout(true), GpuMeshInstanceDataLayout},
-            new[] { typeof(global::UAlbion.Core.Veldrid.Meshes.MeshResourceSet), typeof(global::UAlbion.Core.Veldrid.CommonSet) })
+            new[] {
+                global::UAlbion.Core.Veldrid.Meshes.MeshVertex.GetLayout(true), 
+                GpuMeshInstanceDataLayout
+            },
+            new[] {
+                typeof(global::UAlbion.Core.Veldrid.GlobalSet), 
+                typeof(global::UAlbion.Core.Veldrid.MainPassSet), 
+                typeof(global::UAlbion.Core.Veldrid.Meshes.MeshResourceSet)
+            })
         { }
     }
 }

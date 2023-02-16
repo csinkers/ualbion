@@ -19,6 +19,7 @@ public sealed class FullscreenQuad : Component, IRenderable, IDisposable
     public string Name { get; }
     public DrawLayer RenderOrder { get; }
     public ITextureHolder Source { get; }
+    public OutputDescription OutputFormat { get; }
     public Vector4 NormalisedDestRectangle
     {
         get => _uniform.Data.uRect;
@@ -29,11 +30,13 @@ public sealed class FullscreenQuad : Component, IRenderable, IDisposable
     public FullscreenQuad(string name,
         DrawLayer renderOrder,
         ITextureHolder source,
-        Vector4 normalisedDestWindowXYWH)
+        Vector4 normalisedDestWindowXYWH,
+        OutputDescription outputFormat)
     {
         Name = name;
         RenderOrder = renderOrder;
         Source = source ?? throw new ArgumentNullException(nameof(source));
+        OutputFormat = outputFormat;
         _uniform = new SingleBuffer<FullscreenQuadUniformInfo>(new FullscreenQuadUniformInfo
         {
             uRect = normalisedDestWindowXYWH
@@ -114,7 +117,8 @@ struct FullscreenQuadUniformInfo // Length must be multiple of 16
     [Uniform("uRect")] public Vector4 uRect;
 }
 #pragma warning restore 649
-public sealed class FullscreenQuadRenderer : Component, IRenderer, IDisposable
+public sealed class FullscreenQuadRenderer<TPassSet> : Component, IRenderer<GlobalSet, TPassSet>, IDisposable
+    where TPassSet : IResourceSetHolder
 {
     static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
     static readonly Vertex2DTextured[] Vertices =
@@ -152,22 +156,17 @@ public sealed class FullscreenQuadRenderer : Component, IRenderer, IDisposable
         AttachChild(_indexBuffer);
     }
 
-    public void Render(IRenderable renderable, CommonSet commonSet, IFramebufferHolder framebuffer, CommandList cl, GraphicsDevice device)
+    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet set, TPassSet passSet)
     {
         if (cl == null) throw new ArgumentNullException(nameof(cl));
-        if (commonSet == null) throw new ArgumentNullException(nameof(commonSet));
-        if (framebuffer == null) throw new ArgumentNullException(nameof(framebuffer));
         if (renderable is not FullscreenQuad fullscreenQuad)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
-        if (framebuffer.OutputDescription == null)
-            return;
-
-        if (!_pipelines.TryGetValue(framebuffer.OutputDescription.Value, out var pipeline))
+        if (!_pipelines.TryGetValue(fullscreenQuad.OutputFormat, out var pipeline))
         {
-            pipeline = BuildPipeline(framebuffer.OutputDescription.Value);
+            pipeline = BuildPipeline(fullscreenQuad.OutputFormat);
             AttachChild(pipeline);
-            _pipelines[framebuffer.OutputDescription.Value] = pipeline;
+            _pipelines[fullscreenQuad.OutputFormat] = pipeline;
         }
 
         if (pipeline.Pipeline == null)
@@ -179,7 +178,6 @@ public sealed class FullscreenQuadRenderer : Component, IRenderer, IDisposable
         cl.SetGraphicsResourceSet(0, fullscreenQuad.ResourceSet.ResourceSet);
         cl.SetVertexBuffer(0, _vertexBuffer.DeviceBuffer);
         cl.SetIndexBuffer(_indexBuffer.DeviceBuffer, IndexFormat.UInt16);
-        cl.SetFramebuffer(framebuffer.Framebuffer);
 
         cl.DrawIndexed((uint)Indices.Length);
         cl.PopDebugGroup();

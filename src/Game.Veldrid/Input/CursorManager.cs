@@ -44,7 +44,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
 
     public CursorManager()
     {
-        On<RenderEvent>(_ => Render());
+        On<PrepareFrameEvent>(_ => Render());
         On<IdleClockEvent>(_ => _frame++);
         On<WindowResizedEvent>(_ => SetCursor(_cursorId));
         On<SetCursorEvent>(e => SetCursor(e.CursorId));

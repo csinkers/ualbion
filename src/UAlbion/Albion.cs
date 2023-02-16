@@ -4,9 +4,6 @@ using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
-using UAlbion.Core.Veldrid.Etm;
-using UAlbion.Core.Veldrid.Meshes;
-using UAlbion.Core.Veldrid.Skybox;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
@@ -32,15 +29,18 @@ using UAlbion.Game.Veldrid;
 using UAlbion.Game.Veldrid.Audio;
 using UAlbion.Game.Veldrid.Diag;
 using UAlbion.Game.Veldrid.Input;
-using UAlbion.Game.Veldrid.Visual;
 
 namespace UAlbion;
 
 static class Albion
 {
-    public static void RunGame(EventExchange global, IRenderPass mainPass, CommandLineOptions commandLine)
+    public static void RunGame(EventExchange global, CommandLineOptions commandLine)
     {
-        RegisterComponents(global, mainPass, commandLine);
+        RegisterComponents(global, commandLine);
+        using var renderSystem = new RenderSystem();
+        global.Attach(renderSystem);
+        var engine = (Engine)global.Resolve<IEngine>();
+        engine.RenderSystem = renderSystem;
 
         PerfTracker.StartupEvent("Running game");
         global.Raise(new SetSceneEvent(SceneId.Empty), null);
@@ -58,25 +58,15 @@ static class Albion
         }
         else global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
 
-        global.Resolve<IEngine>().Run();
+        engine.Run();
         // TODO: Ensure all sprite leases returned etc to weed out memory leaks
     }
 
-    static void RegisterComponents(EventExchange global, IRenderPass mainPass, CommandLineOptions commandLine)
+    static void RegisterComponents(EventExchange global, CommandLineOptions commandLine)
     {
 #pragma warning disable CA2000 // Dispose objects before losing scope
         PerfTracker.StartupEvent("Creating main components");
         global.Register<ICommonColors>(new CommonColors());
-
-        mainPass
-            .Add(new SkyboxManager())
-            .Add(new EtmManager())
-            .Add(new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key)))
-            .Add(new BatchManager<SpriteKey, BlendedSpriteInfo>(static (key, f) => f.CreateBlendedSpriteBatch(key)))
-            .Add(new BatchManager<MeshId, GpuMeshInstanceData>(static (key, f) => ((VeldridCoreFactory)f).CreateMeshBatch(key)))
-            .Add(new MeshManager())
-            .Add(new TileRenderableManager())
-            .Add(new DebugGuiRenderable());
 
         var gameServices = new Container("Game",
             new TextureSource(),
@@ -170,6 +160,7 @@ static class Albion
             gameServices.Add(new AudioManager(false));
 
         global.Attach(gameServices);
+
 #if DEBUG
         G.Instance.Attach(global); // Add convenience class that holds globals for debugging
 #endif

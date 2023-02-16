@@ -31,7 +31,7 @@ public class ClockWidget : Dialog
         After<SetSpecialItemActiveEvent>(e =>
         {
             if (e.Item == Base.Item.Clock) // Do a one shot update next time the scene is being drawn.
-                On<RenderEvent>(_ => Update());
+                On<PrepareFrameEvent>(_ => Update());
         });
 
         var face = new UiSpriteElement(Base.CoreGfx.Clock);
@@ -78,7 +78,7 @@ public class ClockWidget : Dialog
         foreach (var child in Children)
             child.IsActive = active;
 
-        Off<RenderEvent>();
+        Off<PrepareFrameEvent>();
     }
 
     static SpriteId DigitToSprite(int n) => n switch

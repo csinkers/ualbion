@@ -31,7 +31,7 @@ namespace UAlbion.Api.Eventing
 
 #if DEBUG
         // ReSharper disable once CollectionNeverQueried.Local
-        [DiagIgnore] readonly List<IEvent> _frameEvents = new();
+        [DiagIgnore] readonly List<(IEvent, long)> _frameEvents = new();
         [DiagIgnore] List<IComponent> _sortedSubscribersCached = new();
         public List<IComponent> SortedSubscribers // Just for debugging
         {
@@ -123,7 +123,11 @@ namespace UAlbion.Api.Eventing
             {
 #if DEBUG
                 if (e is BeginFrameEvent) _frameEvents.Clear();
-                else _frameEvents.Add(e);
+                else
+                {
+                    long time = System.Diagnostics.Stopwatch.GetTimestamp();
+                    _frameEvents.Add((e, time));
+                }
 #endif
                 Collect(handlers, e.GetType());
             }
@@ -152,7 +156,7 @@ namespace UAlbion.Api.Eventing
             {
                 if (verbose)
                 {
-                    eventText =  e.GetType().Name;
+                    eventText = e.GetType().Name;
                     CoreTrace.Log.StartRaiseVerbose(eventId, _nesting, e.GetType().Name, eventText);
                 }
                 else if (e is LogEvent log)

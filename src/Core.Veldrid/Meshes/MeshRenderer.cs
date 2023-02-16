@@ -8,26 +8,26 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid.Meshes;
 
-public sealed class MeshRenderer : Component, IRenderer, IDisposable
+public sealed class MeshRenderer : Component, IRenderer<GlobalSet, MainPassSet>, IDisposable
 {
     readonly MeshPipeline _pipeline;
 
     public Type[] HandledTypes { get; } = { typeof(MeshBatch) };
 
-    public MeshRenderer(IFramebufferHolder framebuffer)
+    public MeshRenderer(in OutputDescription outputFormat)
     {
-        _pipeline = BuildPipeline("P_TileMapRenderer", FaceCullMode.Back, framebuffer);
+        _pipeline = BuildPipeline("P_TileMapRenderer", FaceCullMode.Back, outputFormat);
         AttachChild(_pipeline);
     }
 
-    static MeshPipeline BuildPipeline(string name, FaceCullMode cullMode, IFramebufferHolder framebuffer)
+    static MeshPipeline BuildPipeline(string name, FaceCullMode cullMode, in OutputDescription outputFormat)
         => new()
         {
             AlphaBlend = BlendStateDescription.SingleAlphaBlend,
             CullMode = cullMode,
             DepthStencilMode = DepthStencilStateDescription.DepthOnlyLessEqual,
             FillMode = PolygonFillMode.Solid,
-            Framebuffer = framebuffer,
+            OutputDescription = outputFormat,
             Name = name,
             Topology = PrimitiveTopology.TriangleList,
             UseDepthTest = true,
@@ -35,12 +35,11 @@ public sealed class MeshRenderer : Component, IRenderer, IDisposable
             Winding = FrontFace.CounterClockwise,
         };
 
-    public void Render(IRenderable renderable, CommonSet commonSet, IFramebufferHolder framebuffer, CommandList cl,
-        GraphicsDevice device)
+    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, MainPassSet mainPassSet)
     {
         if (cl == null) throw new ArgumentNullException(nameof(cl));
-        if (commonSet == null) throw new ArgumentNullException(nameof(commonSet));
-        if (framebuffer == null) throw new ArgumentNullException(nameof(framebuffer));
+        if (globalSet == null) throw new ArgumentNullException(nameof(globalSet));
+        if (mainPassSet == null) throw new ArgumentNullException(nameof(mainPassSet));
         if (renderable is not MeshBatch batch)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
@@ -48,12 +47,12 @@ public sealed class MeshRenderer : Component, IRenderer, IDisposable
 
         cl.SetPipeline(_pipeline.Pipeline);
 
-        cl.SetGraphicsResourceSet(0, batch.ResourceSet.ResourceSet);
-        cl.SetGraphicsResourceSet(1, commonSet.ResourceSet);
+        cl.SetGraphicsResourceSet(0, globalSet.ResourceSet);
+        cl.SetGraphicsResourceSet(1, mainPassSet.ResourceSet);
+        cl.SetGraphicsResourceSet(2, batch.ResourceSet.ResourceSet);
         cl.SetVertexBuffer(0, batch.VertexBuffer.DeviceBuffer);
         cl.SetVertexBuffer(1, batch.Instances.DeviceBuffer);
         cl.SetIndexBuffer(batch.IndexBuffer.DeviceBuffer, IndexFormat.UInt16);
-        cl.SetFramebuffer(framebuffer.Framebuffer);
 
         cl.DrawIndexed((uint)batch.IndexBuffer.Count, (uint)batch.Instances.Count, 0, 0, 0);
         cl.PopDebugGroup();
@@ -83,16 +82,18 @@ partial class MeshResourceSet : ResourceSetHolder
 [Name("MeshSV.vert")]
 [Input(0, typeof(MeshVertex))]
 [Input(1, typeof(GpuMeshInstanceData), InstanceStep = 1)]
-[ResourceSet(0, typeof(MeshResourceSet))]
-[ResourceSet(1, typeof(CommonSet))]
+[ResourceSet(0, typeof(GlobalSet))]
+[ResourceSet(1, typeof(MainPassSet))]
+[ResourceSet(2, typeof(MeshResourceSet))]
 [Output(0, typeof(MeshIntermediate))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
 partial class MeshVertexShader : IVertexShader { }
 
 [Name("MeshSF.frag")]
 [Input(0, typeof(MeshIntermediate))]
-[ResourceSet(0, typeof(MeshResourceSet))]
-[ResourceSet(1, typeof(CommonSet))]
+[ResourceSet(0, typeof(GlobalSet))]
+[ResourceSet(1, typeof(MainPassSet))]
+[ResourceSet(2, typeof(MeshResourceSet))]
 [Output(0, typeof(SimpleFramebuffer))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
 partial class MeshFragmentShader : IFragmentShader { }

@@ -2,5 +2,5 @@
 
 namespace UAlbion.Core.Events;
 
-[Event("trd", "Capture the next frame in RenderDoc", "e:trigger_renderdoc")]
+[Event("e:trigger_renderdoc", "Capture the next frame in RenderDoc", "trd")]
 public class TriggerRenderDocEvent : EngineEvent { }

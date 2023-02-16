@@ -9,15 +9,16 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
-public sealed class DebugGuiRenderer : Component, IRenderer, IDisposable
+public sealed class DebugGuiRenderer<TPassSet> : Component, IRenderer<GlobalSet, TPassSet>, IDisposable
+    where TPassSet : IResourceSetHolder
 {
-    readonly IFramebufferHolder _framebuffer;
+    readonly OutputDescription _outputFormat;
     ImGuiRenderer _imguiRenderer;
 
     public Type[] HandledTypes { get; } = { typeof(DebugGuiRenderable) };
-    public DebugGuiRenderer(IFramebufferHolder framebuffer)
+    public DebugGuiRenderer(in OutputDescription outputFormat)
     {
-        _framebuffer = framebuffer;
+        _outputFormat = outputFormat;
         On<PreviewInputEvent>(e =>
         {
             _imguiRenderer?.Update((float)e.DeltaSeconds, e.Snapshot);
@@ -46,7 +47,7 @@ public sealed class DebugGuiRenderer : Component, IRenderer, IDisposable
             var window = Resolve<IWindowManager>();
             _imguiRenderer = new ImGuiRenderer(
                 graphicsDevice,
-                _framebuffer.Framebuffer.OutputDescription,
+                _outputFormat,
                 window.PixelWidth,
                 window.PixelHeight,
                 ColorSpaceHandling.Linear);
@@ -64,7 +65,7 @@ public sealed class DebugGuiRenderer : Component, IRenderer, IDisposable
         _imguiRenderer = null;
     }
 
-    public void Render(IRenderable renderable, CommonSet commonSet, IFramebufferHolder framebuffer, CommandList cl, GraphicsDevice device)
+    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, TPassSet passSet)
     {
         if (cl == null) throw new ArgumentNullException(nameof(cl));
         if (device == null) throw new ArgumentNullException(nameof(device));

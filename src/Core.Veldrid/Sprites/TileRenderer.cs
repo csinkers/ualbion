@@ -9,7 +9,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid.Sprites;
 
-public sealed class TileRenderer : Component, IRenderer, IDisposable
+public sealed class TileRenderer : Component, IRenderer<GlobalSet, MainPassSet>, IDisposable
 {
     public Type[] HandledTypes { get; } = { typeof(TileLayerRenderable) };
     static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
@@ -23,7 +23,7 @@ public sealed class TileRenderer : Component, IRenderer, IDisposable
     readonly MultiBuffer<Vertex2D> _vertexBuffer;
     readonly MultiBuffer<ushort> _indexBuffer;
 
-    public TileRenderer(IFramebufferHolder framebuffer) {
+    public TileRenderer(in OutputDescription outputFormat) {
         _vertexBuffer = new MultiBuffer<Vertex2D>(Vertices, BufferUsage.VertexBuffer, "TilesVertexBuffer");
         _indexBuffer = new MultiBuffer<ushort>(Indices, BufferUsage.IndexBuffer, "TilesIndexBuffer");
         _pipeline = new()
@@ -38,7 +38,7 @@ public sealed class TileRenderer : Component, IRenderer, IDisposable
                     DepthComparison = ComparisonKind.Always
                 },
                 FillMode = PolygonFillMode.Solid,
-                Framebuffer = framebuffer,
+                OutputDescription = outputFormat,
                 Topology = PrimitiveTopology.TriangleList,
                 UseDepthTest = true,
                 UseScissorTest = true,
@@ -50,11 +50,11 @@ public sealed class TileRenderer : Component, IRenderer, IDisposable
         AttachChild(_pipeline);
     }
 
-    public void Render(IRenderable renderable, CommonSet commonSet, IFramebufferHolder framebuffer, CommandList cl, GraphicsDevice device)
+    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, MainPassSet mainPassSet)
     {
         if (cl == null) throw new ArgumentNullException(nameof(cl));
-        if (commonSet == null) throw new ArgumentNullException(nameof(commonSet));
-        if (framebuffer == null) throw new ArgumentNullException(nameof(framebuffer));
+        if (globalSet == null) throw new ArgumentNullException(nameof(globalSet));
+        if (mainPassSet == null) throw new ArgumentNullException(nameof(mainPassSet));
         if (renderable is not TileLayerRenderable tileLayer)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
@@ -66,11 +66,11 @@ public sealed class TileRenderer : Component, IRenderer, IDisposable
 
         cl.SetVertexBuffer(0, _vertexBuffer.DeviceBuffer);
         cl.SetIndexBuffer(_indexBuffer.DeviceBuffer, IndexFormat.UInt16);
-        cl.SetFramebuffer(framebuffer.Framebuffer);
 
-        cl.SetGraphicsResourceSet(0, commonSet.ResourceSet);
-        cl.SetGraphicsResourceSet(1, tileLayer.Tileset.Resources.ResourceSet);
-        cl.SetGraphicsResourceSet(2, tileLayer.Resources.ResourceSet);
+        cl.SetGraphicsResourceSet(0, globalSet.ResourceSet);
+        cl.SetGraphicsResourceSet(1, mainPassSet.ResourceSet);
+        cl.SetGraphicsResourceSet(2, tileLayer.Tileset.Resources.ResourceSet);
+        cl.SetGraphicsResourceSet(3, tileLayer.Resources.ResourceSet);
         cl.DrawIndexed((uint)Indices.Length);
 
         cl.PopDebugGroup();
@@ -94,18 +94,20 @@ internal partial class TilePipeline : PipelineHolder { }
 
 [Name("TilesSF.frag")]
 [Input(0, typeof(TileIntermediateData))]
-[ResourceSet(0, typeof(CommonSet))]
-[ResourceSet(1, typeof(TilesetResourceSet))]
-[ResourceSet(2, typeof(TileLayerResourceSet))]
+[ResourceSet(0, typeof(GlobalSet))]
+[ResourceSet(1, typeof(MainPassSet))]
+[ResourceSet(2, typeof(TilesetResourceSet))]
+[ResourceSet(3, typeof(TileLayerResourceSet))]
 [Output(0, typeof(SimpleFramebuffer))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
 internal partial class TileFragmentShader : IFragmentShader { }
 
 [Name("TilesSV.vert")]
 [Input(0, typeof(Vertex2D))]
-[ResourceSet(0, typeof(CommonSet))]
-[ResourceSet(1, typeof(TilesetResourceSet))]
-[ResourceSet(2, typeof(TileLayerResourceSet))]
+[ResourceSet(0, typeof(GlobalSet))]
+[ResourceSet(1, typeof(MainPassSet))]
+[ResourceSet(2, typeof(TilesetResourceSet))]
+[ResourceSet(3, typeof(TileLayerResourceSet))]
 [Output(0, typeof(TileIntermediateData))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
 internal partial class TileVertexShader : IVertexShader { }

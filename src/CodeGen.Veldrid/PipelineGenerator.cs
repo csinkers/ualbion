@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using VeldridGen;
@@ -29,9 +30,8 @@ static class PipelineGenerator
 ");
         }
 
-        sb.Append($@"
-        public {type.Symbol.Name}() : base(""{vshader.Shader.Filename}"", ""{fshader.Shader.Filename}"",
-            new[] {{ ");
+        sb.Append($@"        public {type.Symbol.Name}() : base(""{vshader.Shader.Filename}"", ""{fshader.Shader.Filename}"",
+            new[] {{");
 
         // e.g. Vertex2DTextured.Layout, SpriteInstanceDataLayout 
         bool first = true;
@@ -40,27 +40,56 @@ static class PipelineGenerator
             if (!first)
                 sb.Append(", ");
 
+            sb.AppendLine();
+            sb.Append("                ");
             sb.Append(input.instanceStep == 0
                 ? $"{input.type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}.GetLayout(true)"
                 : LayoutHelperName(input.type));
             first = false;
         }
 
-        sb.AppendLine("},");
-
-        sb.Append(@"            new[] { ");
+        sb.AppendLine();
+        sb.AppendLine("            },");
+        sb.Append("            new[] {");
         // e.g. typeof(CommonSet), typeof(SpriteArraySet) }})
-        first = true;
+
+        var sets = new List<INamedTypeSymbol>();
         foreach (var set in vshader.Shader.ResourceSets.Union(fshader.Shader.ResourceSets))
+        {
+            while (sets.Count <= set.slot)
+                sets.Add(null);
+
+            if (SymbolEqualityComparer.Default.Equals(sets[set.slot], set.type))
+                continue;
+
+            if (sets[set.slot] == null)
+                sets[set.slot] = set.type;
+            else
+            {
+                context.Report(DiagnosticSeverity.Error,
+                    $"Tried to define ResourceSlot {set.slot} as {set.type}, " +
+                    $"but it is already defined as {sets[set.slot]}!");
+            }
+        }
+
+        for(int i = 0; i < sets.Count; i++)
+            if (sets[i] == null)
+                context.Report(DiagnosticSeverity.Error, $"No resource layout is defined for slot {i}!");
+
+        first = true;
+        foreach (var set in sets)
         {
             if (!first)
                 sb.Append(", ");
 
-            sb.Append($"typeof({set.type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)})");
+            sb.AppendLine();
+            sb.Append("                typeof(");
+            sb.Append(set.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+            sb.Append(")");
             first = false;
         }
-        sb.AppendLine(" })");
-
+        sb.AppendLine();
+        sb.AppendLine("            })");
         sb.AppendLine(@"        { }");
 
         /* e.g.

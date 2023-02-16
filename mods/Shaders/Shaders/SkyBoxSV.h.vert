@@ -4,7 +4,7 @@
 //!#version 450 // Comments with //! are just for the VS GLSL plugin
 //!#extension GL_KHR_vulkan_glsl: enable
 
-layout(set = 0, binding = 2) uniform _Uniform {
+layout(set = 2, binding = 2) uniform _Uniform {
     float uYaw;
     float uPitch;
     float uVisibleProportion;

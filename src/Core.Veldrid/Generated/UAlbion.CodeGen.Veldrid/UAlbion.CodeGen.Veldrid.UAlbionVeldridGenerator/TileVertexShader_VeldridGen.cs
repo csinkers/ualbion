@@ -66,23 +66,22 @@ namespace UAlbion.Core.Veldrid.Sprites
 #define TLF_DRAW_DEBUG 0x80U
 
 layout(set = 0, binding = 0) uniform _Shared {
-    vec3 uWorldSpacePosition;
-    uint _globalInfo_pad1;
-    vec2 uCameraLookDirection;
-    vec2 uResolution;
     float uTime;
     uint uEngineFlags;
     float uPaletteBlend;
     int uPaletteFrame;
 };
-layout(set = 0, binding = 1) uniform _Projection {
+
+layout(set = 1, binding = 0) uniform _Camera {
     mat4 uProjection;
-};
-layout(set = 0, binding = 2) uniform _View {
     mat4 uView;
+    vec3 uWorldSpacePosition;
+    uint _globalInfo_pad1;
+    vec2 uCameraLookDirection;
+    vec2 uResolution;
 };
 
-layout(set = 1, binding = 3) uniform _SetUniform {
+layout(set = 2, binding = 3) uniform _SetUniform {
     vec2 uTileWorldSize;
     vec2 uTileUvSize;
     uint uTilesetFlags;
@@ -90,7 +89,7 @@ layout(set = 1, binding = 3) uniform _SetUniform {
     vec2 uPad2;
 };
 
-layout(set = 2, binding = 0) uniform _LayerUniform {
+layout(set = 3, binding = 0) uniform _LayerUniform {
     uint uMapWidth;
     uint uMapHeight;
     int uFrame;

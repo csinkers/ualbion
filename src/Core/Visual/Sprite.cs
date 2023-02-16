@@ -9,7 +9,7 @@ namespace UAlbion.Core.Visual;
 
 public class Sprite : Component, IPositioned
 {
-    readonly Action<RenderEvent> _onRenderDelegate;
+    readonly Action<PrepareFrameEvent> _onRenderDelegate;
     readonly DrawLayer _layer;
     readonly SpriteKeyFlags _keyFlags;
     readonly Func<IAssetId, ITexture> _loaderFunc;
@@ -120,13 +120,13 @@ public class Sprite : Component, IPositioned
                 return;
 
             if (value) On(_onRenderDelegate);
-            else Off<RenderEvent>();
+            else Off<PrepareFrameEvent>();
 
             _dirty = value;
         }
     }
 
-    void OnRender(RenderEvent _) => UpdateSprite();
+    void OnRender(PrepareFrameEvent _) => UpdateSprite();
 
     protected override void Subscribed()
     {

@@ -7,11 +7,9 @@ using Veldrid;
 #pragma warning disable CA1815 // Override equals and operator equals on value types
 namespace UAlbion.Core.Veldrid;
 
-public sealed partial class CommonSet : ResourceSetHolder
+public sealed partial class GlobalSet : ResourceSetHolder
 {
-    [UniformBuffer("_Shared")]                          SingleBuffer<GlobalInfo>       _globalInfo; 
-    [UniformBuffer("_Projection", ShaderStages.Vertex)] SingleBuffer<ProjectionMatrix> _projection; 
-    [UniformBuffer("_View",       ShaderStages.Vertex)] SingleBuffer<ViewMatrix>       _view; 
+    [UniformBuffer("_Shared")]                SingleBuffer<GlobalInfo> _global; 
     [Texture("uDayPalette", ShaderStages.Fragment)]     ITextureHolder _dayPalette;
     [Texture("uNightPalette", ShaderStages.Fragment)]   ITextureHolder _nightPalette;
     [Sampler("uPaletteSampler", ShaderStages.Fragment)] ISamplerHolder _sampler;
@@ -20,28 +18,29 @@ public sealed partial class CommonSet : ResourceSetHolder
 [StructLayout(LayoutKind.Sequential)]
 public partial struct GlobalInfo : IUniformFormat
 {
-    [Uniform("uWorldSpacePosition")] public Vector3 WorldSpacePosition;
-    [Uniform("_globalInfo_pad1")] readonly uint _padding1;
-
-    [Uniform("uCameraLookDirection")] public Vector2 CameraDirection;
-    [Uniform("uResolution")] public Vector2 Resolution;
-
     [Uniform("uTime")] public float Time;
     [Uniform("uEngineFlags", EnumPrefix = "EF")] public EngineFlags EngineFlags;
     [Uniform("uPaletteBlend")] public float PaletteBlend;
     [Uniform("uPaletteFrame")] public int PaletteFrame;
 }
 
-public partial struct ProjectionMatrix : IUniformFormat
+public sealed partial class MainPassSet : ResourceSetHolder
 {
-    public ProjectionMatrix(Matrix4x4 matrix) => Matrix = matrix;
-    [Uniform("uProjection")] public Matrix4x4 Matrix { get; }
+    [UniformBuffer("_Camera")] SingleBuffer<CameraUniform> _camera; 
 }
 
-public partial struct ViewMatrix : IUniformFormat
+public partial struct CameraUniform : IUniformFormat
 {
-    public ViewMatrix(Matrix4x4 matrix) => Matrix = matrix;
-    [Uniform("uView")] public Matrix4x4 Matrix { get; }
+    [Uniform("uProjection")] public Matrix4x4 Projection;
+    [Uniform("uView")] public Matrix4x4 View;
+
+    [Uniform("uWorldSpacePosition")] public Vector3 WorldSpacePosition;
+    [Uniform("_globalInfo_pad1")] readonly uint _padding1;
+
+    [Uniform("uCameraLookDirection")] public Vector2 CameraDirection;
+    [Uniform("uResolution")] public Vector2 Resolution;
 }
+
 #pragma warning restore CA1051 // Do not declare visible instance fields
 #pragma warning restore CA1815 // Override equals and operator equals on value types
+

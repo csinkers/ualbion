@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using ImGuiNET;
@@ -13,6 +12,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Visual;
+using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
@@ -23,12 +23,10 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
     readonly FrameTimeAverager _frameTimeAverager = new(0.5);
     readonly FenceHolder _fence;
     readonly WindowHolder _windowHolder;
-    readonly RenderEvent _renderEvent = new();
+    readonly PrepareFrameEvent _prepareFrameEvent = new();
     readonly PrepareFrameResourcesEvent _prepareFrameResourcesEvent = new();
     readonly PrepareFrameResourceSetsEvent _prepareFrameResourceSetsEvent = new();
-    readonly List<IRenderPass> _renderPasses = new();
     readonly bool _useRenderDoc;
-    readonly bool _startupOnly;
     readonly int _defaultWidth = 720; // TODO: Save in user settings
     readonly int _defaultHeight = 480;
     readonly int _defaultX = 1100;
@@ -40,15 +38,16 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
     bool _done;
     bool _active = true;
 
+    public bool StartupOnly { get; set; }
     public bool IsDepthRangeZeroToOne => _graphicsDevice?.IsDepthRangeZeroToOne ?? false;
     public bool IsClipSpaceYInverted => _graphicsDevice?.IsClipSpaceYInverted ?? false;
     public string FrameTimeText => $"{_graphicsDevice.BackendType} {_frameTimeAverager.CurrentAverageFramesPerSecond:N2} fps ({_frameTimeAverager.CurrentAverageFrameTimeMilliseconds:N3} ms)";
+    public IRenderSystem RenderSystem { get; set; }
 
-    public Engine(GraphicsBackend backend, bool useRenderDoc, bool startupOnly, bool showWindow, Rectangle? windowRect = null)
+    public Engine(GraphicsBackend backend, bool useRenderDoc, bool showWindow, Rectangle? windowRect = null)
     {
         _newBackend = backend;
         _useRenderDoc = useRenderDoc;
-        _startupOnly = startupOnly;
         _windowHolder = showWindow ? new WindowHolder() : null;
         _fence = new FenceHolder("RenderStage fence");
         AttachChild(_fence);
@@ -76,10 +75,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
                 _done = true;
         });
         On<QuitEvent>(_ => _done = true);
-        On<WindowResizedEvent>(e =>
-        {
-            _graphicsDevice?.ResizeMainWindow((uint)e.Width, (uint)e.Height);
-        });
+        On<WindowResizedEvent>(e => _graphicsDevice?.ResizeMainWindow((uint)e.Width, (uint)e.Height));
 
         On<LoadRenderDocEvent>(_ =>
         {
@@ -93,13 +89,6 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         On<GarbageCollectionEvent>(_ => GC.Collect());
         // On<RecreateWindowEvent>(e => { _recreateWindow = true; _newBackend = _graphicsDevice.BackendType; });
         // Raise(new EngineFlagEvent(e.Value ? FlagOperation.Set : FlagOperation.Clear, EngineFlags.VSync));
-    }
-
-    public IList<IRenderPass> RenderPasses => _renderPasses.AsReadOnly();
-    public Engine AddRenderPass(IRenderPass pass)
-    {
-        _renderPasses.Add(pass);
-        return this;
     }
 
     protected override void Subscribed()
@@ -176,20 +165,17 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
             using (PerfTracker.FrameEvent("1 Raising begin frame"))
                 Raise(BeginFrameEvent.Instance);
 
-            using (PerfTracker.FrameEvent("2 Processing SDL events"))
-            {
-                Sdl2Events.ProcessEvents();
+            using (PerfTracker.FrameEvent("2 Processing window events"))
                 _windowHolder.PumpEvents(deltaSeconds);
-            }
 
-            using (PerfTracker.FrameEvent("5 Performing update"))
+            using (PerfTracker.FrameEvent("3 Performing update"))
                 Raise(new EngineUpdateEvent((float)deltaSeconds));
 
-            using (PerfTracker.FrameEvent("5.1 Flushing queued events"))
+            using (PerfTracker.FrameEvent("4 Flushing queued events"))
                 Exchange.FlushQueuedEvents();
 
             if ((flags & EngineFlags.SuppressLayout) == 0)
-                using (PerfTracker.FrameEvent("5.2 Calculating UI layout"))
+                using (PerfTracker.FrameEvent("5 Calculating UI layout"))
                      Raise(new LayoutEvent());
 
             if (_active)
@@ -209,7 +195,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
             }
             else Thread.Sleep(16);
 
-            if (_startupOnly)
+            if (StartupOnly)
                 _done = true;
 
             //Console.WriteLine($"Frame {frameCounter.FrameCount} complete, press Enter to continue");
@@ -219,46 +205,30 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
 
     void Draw()
     {
-        var camera = Resolve<ICamera>(); // TODO: More sophisticated approach, support multiple cameras etc
-        _fence.Fence.Reset();
-
         using (PerfTracker.FrameEvent("6.1 Prepare scenes"))
         {
             _frameCommands.Begin();
 
-            _renderEvent.Camera = camera;
             _prepareFrameResourcesEvent.Device = _graphicsDevice;
             _prepareFrameResourcesEvent.CommandList = _frameCommands;
             _prepareFrameResourceSetsEvent.Device = _graphicsDevice;
             _prepareFrameResourceSetsEvent.CommandList = _frameCommands;
 
-            Raise(_renderEvent);
+            Raise(_prepareFrameEvent);
             Raise(_prepareFrameResourcesEvent);
             Raise(_prepareFrameResourceSetsEvent);
 
             _frameCommands.End();
-            _graphicsDevice.SubmitCommands(_frameCommands, _fence.Fence);
         }
 
-        _graphicsDevice.WaitForFence(_fence.Fence);
-        foreach (var phase in _renderPasses)
+        using (PerfTracker.FrameEvent("6.2 Submit prepare commands"))
         {
             _fence.Fence.Reset();
-            using (PerfTracker.FrameEvent("6.2 Render scenes"))
-            {
-                _frameCommands.Begin();
-                phase.Render(_graphicsDevice, _frameCommands);
-                _frameCommands.End();
-            }
-
-            using (PerfTracker.FrameEvent("6.3 Submit commandlist"))
-            {
-                CoreTrace.Log.Info("Scene", "Submitting commands");
-                _graphicsDevice.SubmitCommands(_frameCommands, _fence.Fence);
-                CoreTrace.Log.Info("Scene", "Submitted commands");
-                _graphicsDevice.WaitForFence(_fence.Fence);
-            }
+            _graphicsDevice.SubmitCommands(_frameCommands, _fence.Fence);
+            _graphicsDevice.WaitForFence(_fence.Fence);
         }
+
+        RenderSystem.Render(_graphicsDevice, _frameCommands, _fence);
     }
 
     void ChangeBackend(GraphicsBackend backend, GraphicsBackend? oldBackend)
@@ -343,7 +313,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         }
     }
 
-    public unsafe Image<Bgra32> RenderFrame(bool captureWithRenderDoc, int phase)
+    public void RenderFrame(bool captureWithRenderDoc)
     {
         if(_newBackend != null)
             ChangeBackend(_newBackend.Value, _graphicsDevice?.BackendType);
@@ -353,35 +323,49 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
             _renderDoc.TriggerCapture();
 
         Draw();
+    }
 
-        var color = _renderPasses[phase].Framebuffer.Framebuffer.ColorTargets[0].Target;
-        var stagingDesc = new TextureDescription(color.Width, color.Height, 1, 1, 1, color.Format, TextureUsage.Staging, TextureType.Texture2D);
-        var staging = _graphicsDevice.ResourceFactory.CreateTexture(ref stagingDesc);
+    public unsafe Image<Bgra32> ReadTexture2D(ITextureHolder textureHolder)
+    {
+        if (textureHolder == null) throw new ArgumentNullException(nameof(textureHolder));
+        var texture = textureHolder.DeviceTexture;
+        var stagingDesc = new TextureDescription(
+            texture.Width, texture.Height,
+            1, 1, 1,
+            texture.Format,
+            TextureUsage.Staging,
+            TextureType.Texture2D);
 
-        var cl = _graphicsDevice.ResourceFactory.CreateCommandList();
-        cl.Name = "CL:RetrieveFramebuffer";
+        using var staging = _graphicsDevice.ResourceFactory.CreateTexture(ref stagingDesc);
+        using var cl = _graphicsDevice.ResourceFactory.CreateCommandList();
+
+        cl.Name = "CL:ReadTexture2D";
         cl.Begin();
-        cl.CopyTexture(color, staging);
+        cl.CopyTexture(texture, staging);
         cl.End();
         _graphicsDevice.SubmitCommands(cl);
         _graphicsDevice.WaitForIdle();
-        cl.Dispose();
 
         var mapped = _graphicsDevice.Map(staging, MapMode.Read);
-        var result = new Image<Bgra32>((int)color.Width, (int)color.Height);
-        var sourceSpan = new Span<uint>(mapped.Data.ToPointer(), (int)mapped.SizeInBytes);
-        var stride = (int)mapped.RowPitch / sizeof(uint);
-
-        for (int j = 0; j < color.Height; j++)
+        try
         {
-            var sourceRow = sourceSpan.Slice(stride * j, (int)color.Width);
-            var destRow = MemoryMarshal.Cast<Bgra32, uint>(result.GetPixelRowSpan(j));
-            sourceRow.CopyTo(destRow);
-        }
+            var result = new Image<Bgra32>((int)texture.Width, (int)texture.Height);
+            var sourceSpan = new Span<uint>(mapped.Data.ToPointer(), (int)mapped.SizeInBytes);
+            var stride = (int)mapped.RowPitch / sizeof(uint);
 
-        _graphicsDevice.Unmap(staging);
-        staging.Dispose();
-        return result;
+            for (int j = 0; j < texture.Height; j++)
+            {
+                var sourceRow = sourceSpan.Slice(stride * j, (int)texture.Width);
+                var destRow = MemoryMarshal.Cast<Bgra32, uint>(result.GetPixelRowSpan(j));
+                sourceRow.CopyTo(destRow);
+            }
+
+            return result;
+        }
+        finally
+        {
+            _graphicsDevice.Unmap(staging);
+        }
     }
 
     public void Dispose()

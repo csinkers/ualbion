@@ -13,10 +13,16 @@ namespace UAlbion.Core.Veldrid.Sprites
             }
         }
 
-
         public BlendedSpritePipeline() : base("BlendedSpriteSV.vert", "BlendedSpriteSF.frag",
-            new[] { global::UAlbion.Core.Veldrid.Vertex2DTextured.GetLayout(true), GpuBlendedSpriteInstanceDataLayout},
-            new[] { typeof(global::UAlbion.Core.Veldrid.CommonSet), typeof(global::UAlbion.Core.Veldrid.Sprites.SpriteSet) })
+            new[] {
+                global::UAlbion.Core.Veldrid.Vertex2DTextured.GetLayout(true), 
+                GpuBlendedSpriteInstanceDataLayout
+            },
+            new[] {
+                typeof(global::UAlbion.Core.Veldrid.GlobalSet), 
+                typeof(global::UAlbion.Core.Veldrid.MainPassSet), 
+                typeof(global::UAlbion.Core.Veldrid.Sprites.SpriteSet)
+            })
         { }
     }
 }

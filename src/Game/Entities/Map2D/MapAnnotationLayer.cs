@@ -27,7 +27,7 @@ public class MapAnnotationLayer : Component
         _tileSize = tileSize;
         _logicalMap.Dirty += (sender, args) => _dirty.Add((args.X, args.Y));
         // _drawLayer = DrawLayer.Diagnostic;
-        On<RenderEvent>(e => Render());
+        On<PrepareFrameEvent>(e => Render());
     }
 
     readonly LogicalMap2D _logicalMap;

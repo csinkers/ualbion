@@ -7,7 +7,6 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
 using UAlbion.Formats;
@@ -32,21 +31,27 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
     const int HackyContentsOffsetY = 235;
 
     readonly JsonLoader<LabyrinthData> _jsonLoader = new();
+    IsometricRenderSystem _renderSystem;
     Engine _engine;
-    IsometricBuilder _builder;
+    ShaderLoader _shaderLoader;
 
+#pragma warning disable CA2000 // Dispose objects before losing scopes
     void SetupEngine(int tileWidth, int tileHeight, int baseHeight, int tilesPerRow)
     {
-        var (services, builder) = IsometricSetup.SetupEngine(Exchange,
-            tileWidth, tileHeight, baseHeight, tilesPerRow,
-            GraphicsBackend.Vulkan, false, null);
-        AttachChild(services);
-        _engine = (Engine)Resolve<IEngine>();
-        _builder = builder;
+        var pathResolver = Resolve<IPathResolver>();
+        AttachChild(new ShaderCache(pathResolver.ResolvePath("$(CACHE)/ShaderCache")));
+        _shaderLoader = AttachChild(new ShaderLoader());
+
+        foreach (var shaderPath in Resolve<IModApplier>().ShaderPaths)
+            _shaderLoader.AddShaderDirectory(shaderPath);
+
+        _engine = AttachChild(new Engine(GraphicsBackend.Vulkan, false, false));
+        _renderSystem = AttachChild(new IsometricRenderSystem(tileWidth, tileHeight, baseHeight, tilesPerRow));
+        _engine.RenderSystem = _renderSystem;
+
         Raise(new SetSceneEvent(SceneId.IsometricBake));
         Raise(new SetClearColourEvent(0, 0, 0, 0));
         // Raise(new EngineFlagEvent(FlagOperation.Set, EngineFlags.ShowBoundingBoxes));
-#pragma warning restore CA2000 // Dispose objects before losing scopes
     }
 
     IEnumerable<(string, byte[])> Save(LabyrinthData labyrinth, AssetInfo info, IsometricMode mode, string pngPath, string tsxPath)
@@ -60,9 +65,10 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
         if (_engine == null)
             SetupEngine(tileWidth, tileHeight, baseHeight, tilesPerRow);
 
-        var frames = _builder.Build(labyrinth, info, mode, assets);
+        var frames = _renderSystem.Builder.Build(labyrinth, info, mode, assets);
 
-        Image<Bgra32> image = _engine.RenderFrame(false, 0);
+        _engine.RenderFrame(false);
+        Image<Bgra32> image = _engine.ReadTexture2D(_renderSystem.Framebuffer.Color);
 
         using var stream = new MemoryStream();
         image.SaveAsPng(stream);
@@ -135,5 +141,10 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
     public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((LabyrinthData)existing, info, s, context);
 
-    public void Dispose() => _engine?.Dispose();
+    public void Dispose()
+    {
+        _engine?.Dispose();
+        _renderSystem?.Dispose();
+        _shaderLoader?.Dispose();
+    }
 }

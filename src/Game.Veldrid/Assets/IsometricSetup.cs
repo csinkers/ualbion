@@ -1,71 +1,87 @@
 ﻿using System;
+using System.Collections.Generic;
 using UAlbion.Api.Eventing;
-using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Etm;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.State;
+using UAlbion.Game.Veldrid.Visual;
 using Veldrid;
-using Rectangle = UAlbion.Core.Rectangle;
 
 namespace UAlbion.Game.Veldrid.Assets;
 
-public static class IsometricSetup
+public sealed class IsometricRenderSystem : Component, IRenderSystem, IDisposable
 {
-    public static (Container, IsometricBuilder) SetupEngine(
-        EventExchange exchange,
-        int tileWidth, int tileHeight,
-        int baseHeight, int tilesPerRow,
-        GraphicsBackend backend, bool useRenderDoc, Rectangle? windowRect)
+    readonly List<IRenderPass<GlobalSet>> _renderPasses = new();
+    readonly GlobalResourceSetManager _globalManager;
+    readonly MainRenderPass _mainPass;
+    readonly SpriteRenderer _spriteRenderer;
+    readonly EtmRenderer _etmRenderer;
+
+    public SimpleFramebuffer Framebuffer { get; }
+    public IsometricBuilder Builder { get; }
+
+    public IsometricRenderSystem(int tileWidth, int tileHeight, int baseHeight, int tilesPerRow)
     {
-        if (exchange == null) throw new ArgumentNullException(nameof(exchange));
-        var offscreenFB = new SimpleFramebuffer((uint)(tileWidth * tilesPerRow), (uint)tileHeight, "FB_Offscreen");
-        var builder = new IsometricBuilder(offscreenFB, tileWidth, tileHeight, baseHeight, tilesPerRow);
+        Framebuffer = AttachChild(new SimpleFramebuffer((uint)(tileWidth * tilesPerRow), (uint)tileHeight, "FB_Offscreen"));
+        Builder = new IsometricBuilder(Framebuffer, tileWidth, tileHeight, baseHeight, tilesPerRow);
+        var outputFormat = Framebuffer.OutputDescription ?? throw new InvalidOperationException("Offscreen framebuffer had no output description");
 
-#pragma warning disable CA2000 // Dispose objects before losing scopes
-        var pathResolver = exchange.Resolve<IPathResolver>();
-        var shaderCache = new ShaderCache(pathResolver.ResolvePath("$(CACHE)/ShaderCache"));
-        var shaderLoader = new ShaderLoader();
-        var mainPass = (RenderPass)new RenderPass("Iso Render Pass", offscreenFB)
-                .Add(new SpriteRenderer(offscreenFB))
-                .Add(new EtmRenderer(offscreenFB))
-            ;
+        _globalManager = AttachChild(new GlobalResourceSetManager());
+        _spriteRenderer = AttachChild(new SpriteRenderer(outputFormat));
+        _etmRenderer = AttachChild(new EtmRenderer(outputFormat));
+        _mainPass = AttachChild(new MainRenderPass(Framebuffer));
+        _mainPass.AddRenderer(_spriteRenderer);
+        _mainPass.AddRenderer(_etmRenderer);
 
-        foreach (var shaderPath in exchange.Resolve<IModApplier>().ShaderPaths)
-            shaderLoader.AddShaderDirectory(shaderPath);
+        var etmManager = AttachChild(new EtmManager());
+        var spriteBatcher = AttachChild(new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key)));
+        _mainPass.AddSource(etmManager);
+        _mainPass.AddSource(spriteBatcher);
+        _renderPasses.Add(_mainPass);
 
-        var engine = new Engine(backend, useRenderDoc, false, windowRect != null, windowRect);
-        engine.AddRenderPass(mainPass);
+        AttachChild(new SpriteSamplerSource());
+        AttachChild(new TextureSource());
+        AttachChild(new ResourceLayoutSource());
+        AttachChild(new VeldridCoreFactory());
+        AttachChild(new SceneStack());
+        AttachChild(new SceneManager()
+            .Add(new EmptyScene())
+            .Add((IScene)new IsometricBakeScene()
+                .Add(new PaletteManager())
+                .Add(Builder)));
+    }
 
-        var services = new Container("IsometricLayoutServices");
-        services
-            .Add(shaderCache)
-            .Add(shaderLoader)
-            .Add(offscreenFB)
-            .Add(mainPass)
-            .Add(engine)
-            .Add(new SpriteSamplerSource())
-            .Add(new TextureSource())
-            .Add(new ResourceLayoutSource())
-            .Add(new VeldridCoreFactory())
-            .Add(new SceneStack())
-            .Add(new SceneManager()
-                .Add(new EmptyScene())
-                .Add((IScene)new IsometricBakeScene()
-                    .Add(new PaletteManager())
-                    .Add(builder)))
-            ;
+    public void Render(GraphicsDevice graphicsDevice, CommandList frameCommands, FenceHolder fence)
+    {
+        if (graphicsDevice == null) throw new ArgumentNullException(nameof(graphicsDevice));
+        if (frameCommands == null) throw new ArgumentNullException(nameof(frameCommands));
+        if (fence == null) throw new ArgumentNullException(nameof(fence));
 
-        mainPass
-            .Add(new EtmManager())
-            .Add(new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key)))
-            ;
+        foreach (var phase in _renderPasses)
+        {
+            frameCommands.Begin();
+            phase.Render(graphicsDevice, frameCommands, _globalManager.GlobalSet);
+            frameCommands.End();
 
-        return (services, builder);
+            fence.Fence.Reset();
+            graphicsDevice.SubmitCommands(frameCommands, fence.Fence);
+            graphicsDevice.WaitForFence(fence.Fence);
+        }
+    }
+
+    public void AddRenderPass(IRenderPass<GlobalSet> pass) => _renderPasses.Add(pass);
+
+    public void Dispose()
+    {
+        _mainPass.Dispose();
+        _spriteRenderer.Dispose();
+        _etmRenderer.Dispose();
+        Framebuffer.Dispose();
     }
 }
+

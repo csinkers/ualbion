@@ -13,10 +13,16 @@ namespace UAlbion.Core.Veldrid.Etm
             }
         }
 
-
         public EtmPipeline() : base("ExtrudedTileMapSV.vert", "ExtrudedTileMapSF.frag",
-            new[] { global::UAlbion.Core.Veldrid.Vertex3DTextured.GetLayout(true), DungeonTileLayout},
-            new[] { typeof(global::UAlbion.Core.Veldrid.Etm.EtmSet), typeof(global::UAlbion.Core.Veldrid.CommonSet) })
+            new[] {
+                global::UAlbion.Core.Veldrid.Vertex3DTextured.GetLayout(true), 
+                DungeonTileLayout
+            },
+            new[] {
+                typeof(global::UAlbion.Core.Veldrid.GlobalSet), 
+                typeof(global::UAlbion.Core.Veldrid.MainPassSet), 
+                typeof(global::UAlbion.Core.Veldrid.Etm.EtmSet)
+            })
         { }
     }
 }

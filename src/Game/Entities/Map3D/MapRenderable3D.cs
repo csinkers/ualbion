@@ -33,7 +33,7 @@ public class MapRenderable3D : Component
         if (logicalMap == null) throw new ArgumentNullException(nameof(logicalMap));
         if (labyrinthData == null) throw new ArgumentNullException(nameof(labyrinthData));
 
-        On<RenderEvent>(_ => Update());
+        On<PrepareFrameEvent>(_ => Update());
         // On<SortMapTilesEvent>(e => _isSorting = e.IsSorting);
         _logicalMap = logicalMap;
         _labyrinthData = labyrinthData;

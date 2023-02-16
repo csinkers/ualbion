@@ -9,7 +9,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid.Skybox;
 
-public sealed class SkyboxRenderer : Component, IRenderer, IDisposable
+public sealed class SkyboxRenderer : Component, IRenderer<GlobalSet, MainPassSet>, IDisposable
 {
     static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
     static readonly Vertex2DTextured[] Vertices =
@@ -24,13 +24,13 @@ public sealed class SkyboxRenderer : Component, IRenderer, IDisposable
 
     public Type[] HandledTypes { get; } = { typeof(SkyboxRenderable) };
 
-    static SkyboxPipeline BuildPipeline(IFramebufferHolder framebuffer) => new()
+    static SkyboxPipeline BuildPipeline(in OutputDescription outputFormat) => new()
     {
         Name = "P_Skybox",
         AlphaBlend = BlendStateDescription.SingleDisabled,
         CullMode = FaceCullMode.None,
         FillMode = PolygonFillMode.Solid,
-        Framebuffer = framebuffer,
+        OutputDescription = outputFormat,
         DepthStencilMode = DepthStencilStateDescription.Disabled,
         Winding = FrontFace.Clockwise,
         UseDepthTest = false,
@@ -38,32 +38,33 @@ public sealed class SkyboxRenderer : Component, IRenderer, IDisposable
         Topology = PrimitiveTopology.TriangleList,
     };
 
-    public SkyboxRenderer(IFramebufferHolder framebuffer)
+    public SkyboxRenderer(in OutputDescription outputFormat)
     {
         _vertexBuffer = new MultiBuffer<Vertex2DTextured>(Vertices, BufferUsage.VertexBuffer, "SpriteVertexBuffer");
         _indexBuffer = new MultiBuffer<ushort>(Indices, BufferUsage.IndexBuffer, "SpriteIndexBuffer");
-        _pipeline = BuildPipeline(framebuffer);
+        _pipeline = BuildPipeline(outputFormat);
         AttachChild(_vertexBuffer);
         AttachChild(_indexBuffer);
         AttachChild(_pipeline);
     }
 
-    public void Render(IRenderable renderable, CommonSet commonSet, IFramebufferHolder framebuffer, CommandList cl, GraphicsDevice device)
+    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, MainPassSet mainPassSet)
     {
         if (cl == null) throw new ArgumentNullException(nameof(cl));
-        if (commonSet == null) throw new ArgumentNullException(nameof(commonSet));
-        if (framebuffer == null) throw new ArgumentNullException(nameof(framebuffer));
+        if (globalSet == null) throw new ArgumentNullException(nameof(globalSet));
+        if (mainPassSet == null) throw new ArgumentNullException(nameof(mainPassSet));
         if (renderable is not SkyboxRenderable skybox)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
         cl.PushDebugGroup(skybox.Name);
 
         cl.SetPipeline(_pipeline.Pipeline);
-        cl.SetGraphicsResourceSet(0, skybox.ResourceSet.ResourceSet);
-        cl.SetGraphicsResourceSet(1, commonSet.ResourceSet);
+
+        cl.SetGraphicsResourceSet(0, globalSet.ResourceSet);
+        cl.SetGraphicsResourceSet(1, mainPassSet.ResourceSet);
+        cl.SetGraphicsResourceSet(2, skybox.ResourceSet.ResourceSet);
         cl.SetVertexBuffer(0, _vertexBuffer.DeviceBuffer);
         cl.SetIndexBuffer(_indexBuffer.DeviceBuffer, IndexFormat.UInt16);
-        cl.SetFramebuffer(framebuffer.Framebuffer);
 
         cl.DrawIndexed((uint)Indices.Length, 1, 0, 0, 0);
         cl.PopDebugGroup();
@@ -90,15 +91,16 @@ partial class SkyboxResourceSet : ResourceSetHolder
 
 [Name("SkyBoxSV.vert")]
 [Input(0, typeof(Vertex2DTextured))]
-[ResourceSet(0, typeof(SkyboxResourceSet))]
+[ResourceSet(2, typeof(SkyboxResourceSet))]
 [Output(0, typeof(SkyboxIntermediate))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
 internal partial class SkyboxVertexShader : IVertexShader { }
 
 [Name("SkyBoxSF.frag")]
 [Input(0, typeof(SkyboxIntermediate))]
-[ResourceSet(0, typeof(SkyboxResourceSet))]
-[ResourceSet(1, typeof(CommonSet))]
+[ResourceSet(0, typeof(GlobalSet))]
+[ResourceSet(1, typeof(MainPassSet))]
+[ResourceSet(2, typeof(SkyboxResourceSet))]
 [Output(0, typeof(SimpleFramebuffer))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
 internal partial class SkyboxFragmentShader : IFragmentShader { }

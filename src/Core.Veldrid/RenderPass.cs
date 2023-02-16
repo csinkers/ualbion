@@ -1,78 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
-using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
-public sealed class RenderPass : Container, IRenderPass, IDisposable
+public sealed class MainRenderPass : Component, IRenderPass<GlobalSet>, IDisposable
 {
-    readonly Dictionary<Type, IRenderer> _rendererLookup = new();
-    readonly List<IRenderer> _renderers = new();
+    readonly Dictionary<Type, IRenderer<GlobalSet, MainPassSet>> _rendererLookup = new();
+    readonly List<IRenderer<GlobalSet, MainPassSet>> _renderers = new();
     readonly List<IRenderable> _renderList = new();
     readonly List<IRenderableSource> _sources = new();
-    readonly SingleBuffer<GlobalInfo> _globalInfo;
-    readonly SingleBuffer<ProjectionMatrix> _projection;
-    readonly SingleBuffer<ViewMatrix> _view;
-    readonly SamplerHolder _paletteSampler;
-    readonly CommonSet _commonSet;
-    ITextureHolder _dayPalette;
-    ITextureHolder _nightPalette;
+    readonly SingleBuffer<CameraUniform> _camera;
+    readonly MainPassSet _passSet;
     (float Red, float Green, float Blue, float Alpha) _clearColour;
 
-    public RenderPass(string name, IFramebufferHolder framebuffer) : base(name)
+    public string Name => "Main";
+    public IFramebufferHolder Framebuffer { get; }
+    public override string ToString() => $"Pass:{Name}";
+
+    public MainRenderPass(IFramebufferHolder framebuffer)
     {
         Framebuffer = framebuffer ?? throw new ArgumentNullException(nameof(framebuffer));
 
         On<SetClearColourEvent>(e => _clearColour = (e.Red, e.Green, e.Blue, e.Alpha));
-        On<RenderEvent>(_ => UpdatePerFrameResources());
+        On<PrepareFrameEvent>(_ => UpdatePerFrameResources());
 
-        _projection = new SingleBuffer<ProjectionMatrix>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "M_Projection");
-        _view = new SingleBuffer<ViewMatrix>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "M_View");
-        _globalInfo = new SingleBuffer<GlobalInfo>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "B_GlobalInfo");
-        _paletteSampler = new SamplerHolder
-            {
-                AddressModeU = SamplerAddressMode.Clamp,
-                AddressModeV = SamplerAddressMode.Clamp,
-                AddressModeW = SamplerAddressMode.Clamp,
-                BorderColor = SamplerBorderColor.TransparentBlack,
-                Filter = SamplerFilter.MinPoint_MagPoint_MipPoint,
-            };
-
-        _commonSet = new CommonSet
+        _camera = new SingleBuffer<CameraUniform>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "B_Camera");
+        _passSet = new MainPassSet
         {
-            Name = "RS_Common",
-            GlobalInfo = _globalInfo,
-            Projection = _projection,
-            View = _view,
-            Sampler = _paletteSampler,
+            Name = "RS_MainPass",
+            Camera = _camera,
         };
-        AttachChild(_projection);
-        AttachChild(_view);
-        AttachChild(_globalInfo);
-        AttachChild(_paletteSampler);
-        AttachChild(_commonSet);
+
+        AttachChild(_camera);
+        AttachChild(_passSet);
     }
 
-    protected override bool AddingChild(IComponent child)
-    {
-        if (child is IRenderer renderer)
-            AddRenderer(renderer);
-
-        if (child is IRenderableSource source)
-            AddSource(source);
-
-        return true;
-    }
-
-    void AddRenderer(IRenderer renderer)
+    public void AddRenderer(IRenderer<GlobalSet, MainPassSet> renderer)
     {
         if (renderer == null) throw new ArgumentNullException(nameof(renderer));
 
@@ -81,10 +50,7 @@ public sealed class RenderPass : Container, IRenderPass, IDisposable
             return;
 
         if (!_renderers.Contains(renderer))
-        {
             _renderers.Add(renderer);
-            AttachChild(renderer);
-        }
 
         foreach (var type in types)
         {
@@ -98,15 +64,13 @@ public sealed class RenderPass : Container, IRenderPass, IDisposable
         }
     }
 
-    void AddSource(IRenderableSource source)
+    public void AddSource(IRenderableSource source)
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
         _sources.Add(source);
     }
 
-    public IFramebufferHolder Framebuffer { get; }
-    public override string ToString() => $"Scene:{Name}";
-    public void Render(GraphicsDevice device, CommandList cl)
+    public void Render(GraphicsDevice device, CommandList cl, GlobalSet globalSet)
     {
         if (device == null) throw new ArgumentNullException(nameof(device));
         if (cl == null) throw new ArgumentNullException(nameof(cl));
@@ -117,84 +81,46 @@ public sealed class RenderPass : Container, IRenderPass, IDisposable
         // CoreTrace.Log.Info("Scene", "Sorted processed renderables");
 
         // Main scene
-        using (PerfTracker.FrameEvent("6.2.3 Main scene pass"))
+        cl.SetFramebuffer(Framebuffer.Framebuffer);
+        cl.SetFullViewports();
+        cl.SetFullScissorRects();
+        cl.ClearColorTarget(0, new RgbaFloat(_clearColour.Red, _clearColour.Green, _clearColour.Blue, _clearColour.Alpha));
+        cl.ClearDepthStencil(device.IsDepthRangeZeroToOne ? 1f : 0f);
+
+        _renderList.Clear();
+        foreach (var source in _sources)
+            source.Collect(_renderList);
+
+        _renderList.Sort((x, y) =>
         {
-            cl.SetFramebuffer(Framebuffer.Framebuffer);
-            cl.SetFullViewports();
-            cl.SetFullScissorRects();
-            cl.ClearColorTarget(0, new RgbaFloat(_clearColour.Red, _clearColour.Green, _clearColour.Blue, _clearColour.Alpha));
-            cl.ClearDepthStencil(device.IsDepthRangeZeroToOne ? 1f : 0f);
+            var x2 = (ushort)x.RenderOrder;
+            var y2 = (ushort)y.RenderOrder;
+            return x2 < y2 ? -1 : x2 > y2 ? 1 : 0;
+        });
 
-            _renderList.Clear();
-            foreach (var source in _sources)
-                source.Collect(_renderList);
-
-            _renderList.Sort((x, y) =>
-            {
-                var x2 = (ushort)x.RenderOrder;
-                var y2 = (ushort)y.RenderOrder;
-                return x2 < y2 ? -1 : x2 > y2 ? 1 : 0;
-            });
-
-            foreach (var renderable in _renderList)
-            {
-                if (_rendererLookup.TryGetValue(renderable.GetType(), out var renderer) && renderer.IsActive)
-                    renderer.Render(renderable, _commonSet, Framebuffer, cl, device);
-            }
-        }
+        foreach (var renderable in _renderList)
+            if (_rendererLookup.TryGetValue(renderable.GetType(), out var renderer))
+                renderer.Render(renderable, cl, device, globalSet, _passSet);
     }
 
     void UpdatePerFrameResources()
     {
         var camera = Resolve<ICamera>();
-        var clock = TryResolve<IClock>();
-        var engineFlags = Var(CoreVars.User.EngineFlags);
-        var paletteManager = Resolve<IPaletteManager>();
-        var textureSource = Resolve<ITextureSource>();
-
         camera.Viewport = new Vector2(Framebuffer.Width, Framebuffer.Height);
-        var dayPalette = textureSource.GetSimpleTexture(paletteManager.Day.Texture);
-        var nightTexture = paletteManager.Night?.Texture ?? paletteManager.Day.Texture;
-        var nightPalette = textureSource.GetSimpleTexture(nightTexture);
 
-        if (_dayPalette != dayPalette)
-        {
-            _dayPalette = dayPalette;
-            _commonSet.DayPalette = dayPalette;
-        }
-
-        if (_nightPalette != nightPalette)
-        {
-            _nightPalette = nightPalette;
-            _commonSet.NightPalette = nightPalette;
-        }
-
-        var info = new GlobalInfo
+        _camera.Data = new CameraUniform
         {
             WorldSpacePosition = camera.Position,
             CameraDirection = new Vector2(camera.Pitch, camera.Yaw),
             Resolution =  new Vector2(Framebuffer.Width, Framebuffer.Height),
-            Time = clock?.ElapsedTime ?? 0,
-            EngineFlags = engineFlags,
-            PaletteBlend = paletteManager.Blend,
-            PaletteFrame = paletteManager.Frame
+            Projection = camera.ProjectionMatrix,
+            View = camera.ViewMatrix,
         };
-
-        _projection.Data = new ProjectionMatrix(camera.ProjectionMatrix);
-        _view.Data = new ViewMatrix(camera.ViewMatrix);
-        _globalInfo.Data = info;
     }
 
     public void Dispose()
     {
-        _commonSet?.Dispose();
-        _paletteSampler.Dispose();
-        _globalInfo.Dispose();
-        _projection.Dispose();
-        _view.Dispose();
-        foreach (var renderer in _renderers.OfType<IDisposable>())
-            renderer.Dispose();
-        _renderers.Clear();
-        _rendererLookup.Clear();
+        _camera?.Dispose();
+        _passSet?.Dispose();
     }
 }

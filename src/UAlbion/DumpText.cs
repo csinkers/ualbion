@@ -381,7 +381,7 @@ class DumpText : Component, IAssetDumper
         foreach (var chest in chests.Where(x => x.Value != null))
         {
             sw.WriteLine($"Chest {chest.Key.Id} {chest.Key}: ({chest.Value.Gold.Amount / 10.0} gold, {chest.Value.Rations} rations)");
-            foreach (var x in chest.Value.Slots.Where(x => x.Item != null))
+            foreach (var x in chest.Value.Slots.Where(x => !x.Item.IsNone))
                 sw.WriteLine($"    {x.Amount}x{x.Item} Charges:{x.Charges} Enchantment:{x.Enchantment} Flags:{x.Flags}");
         }
     }
@@ -395,7 +395,7 @@ class DumpText : Component, IAssetDumper
         foreach (var merchant in merchants.Where(x => x.Value != null))
         {
             sw.WriteLine($"Merchant {merchant.Key.Id} {merchant.Key}");
-            foreach(var x in merchant.Value.Slots.Where(x => x.Item != null))
+            foreach(var x in merchant.Value.Slots.Where(x => !x.Item.IsNone))
                 sw.WriteLine($"    {x.Amount}x{x.Item} Charges:{x.Charges} Enchantment:{x.Enchantment} Flags:{x.Flags}");
         }
     }

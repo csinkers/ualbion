@@ -18,20 +18,20 @@ public class ItemSlot : IReadOnlyItemSlot
 
     void CheckAssumptions()
     {
-        if (Item == null && Amount != 0)
+        if (Item.IsNone && Amount != 0)
             ApiUtil.Assert("Item is not set but amount is non-zero");
 
-        if (Item != null && Amount == 0)
+        if (!Item.IsNone && Amount == 0)
             ApiUtil.Assert("Item is set but amount is zero");
 
-        if (Item is ItemData && Amount > MaxItemCount && Amount != Unlimited)
+        if (Item.Type == AssetType.Item && Amount > MaxItemCount && Amount != Unlimited)
             ApiUtil.Assert($"Amount ({Amount}) is above the limit of {MaxItemCount}x{Item}");
 
         if (Amount > short.MaxValue && Amount != Unlimited)
             ApiUtil.Assert($"Tried to put more than {short.MaxValue} items in a gold/rations inventory slot");
     }
 
-    IContents _item;
+    ItemId _item;
     public ItemSlot(InventorySlotId id) => Id = id;
     [JsonIgnore] public InventorySlotId Id { get; }
     [JsonIgnore] public Vector2 LastUiPosition { get; set; }
@@ -41,13 +41,13 @@ public class ItemSlot : IReadOnlyItemSlot
     public byte Enchantment { get; set; }
 
     [JsonIgnore]
-    public IContents Item
+    public ItemId Item
     {
-        get => Amount == 0 ? null : _item;
+        get => Amount == 0 ? ItemId.None : _item;
         set
         {
             _item = value;
-            if (_item == null)
+            if (_item.IsNone)
             {
                 Amount = 0;
                 Charges = 0;
@@ -59,29 +59,7 @@ public class ItemSlot : IReadOnlyItemSlot
         }
     }
 
-    public ItemId ItemId
-    {
-        get => Item switch
-        {
-            Gold => AssetId.Gold,
-            Rations => AssetId.Rations,
-            ItemData item => item.Id,
-            ItemProxy item => item.Id,
-            _ => AssetId.None
-        };
-        set
-        {
-            Item = value.Type switch
-            {
-                AssetType.Gold => Gold.Instance,
-                AssetType.Rations => Rations.Instance,
-                AssetType.Item => new ItemProxy(value),
-                _ => null
-            };
-        }
-    }
-
-    public ItemSlot DeepClone() => (ItemSlot) MemberwiseClone();
+    public ItemSlot DeepClone() => (ItemSlot)MemberwiseClone();
 
     /* Test cases:
     Empty
@@ -105,7 +83,7 @@ public class ItemSlot : IReadOnlyItemSlot
             sb.Append("x ");
         }
 
-        sb.Append(ItemId);
+        sb.Append(Item);
         if (Flags != 0)
         {
             sb.Append(" F(");
@@ -154,7 +132,7 @@ public class ItemSlot : IReadOnlyItemSlot
 
         int index2 = s.IndexOf(' ', index);
         var itemId = index2 == -1 ? s[index..] : s[index..index2];
-        slot.ItemId = ItemId.Parse(itemId);
+        slot.Item = ItemId.Parse(itemId);
         if (index2 == -1)
             return slot;
 
@@ -204,22 +182,19 @@ public class ItemSlot : IReadOnlyItemSlot
         slot.Charges = s.UInt8(nameof(slot.Charges), slot.Charges);
         slot.Enchantment = s.UInt8(nameof(slot.Enchantment), slot.Enchantment);
         slot.Flags = s.EnumU8(nameof(slot.Flags), slot.Flags);
-
-        ItemId itemId = slot.ItemId;
-        itemId = ItemId.SerdesU16(nameof(ItemId), itemId, AssetType.Item, mapping, s);
-        if (slot.Item == null && !itemId.IsNone)
-            slot.Item = new ItemProxy(itemId);
+        slot.Item = ItemId.SerdesU16(nameof(ItemId), slot.Item, AssetType.Item, mapping, s);
         return slot;
     }
 
-    ushort TransferInner(ItemSlot other, ushort? quantity) // Return the number of items transferred
+    ushort TransferInner(ItemSlot other, ushort? quantity, Func<ItemId, ItemData> getItem) // Return the number of items transferred
     {
-        switch (other.Item)
+        // Transfer items from 'other' to this instance
+        switch (other.Item.Type)
         {
-            case null: return 0;
+            case AssetType.None: return 0;
 
-            case Gold when Item is Gold:
-            case Rations when Item is Rations:
+            case AssetType.Gold when Item.Type == AssetType.Gold:
+            case AssetType.Rations when Item.Type == AssetType.Rations:
             {
                 ushort amountToTransfer = Math.Min(other.Amount, quantity ?? (ushort)short.MaxValue);
                 amountToTransfer = Math.Min((ushort)(short.MaxValue - Amount), amountToTransfer);
@@ -228,8 +203,9 @@ public class ItemSlot : IReadOnlyItemSlot
                 return amountToTransfer;
             }
 
-            case ItemData newItem when Item is ItemData item && item.Id == newItem.Id:
+            case AssetType.Item when Item == other.Item:
             {
+                var item = getItem(Item);
                 if (!item.IsStackable)
                 {
                     ApiUtil.Assert($"Tried to combine non-stackable item {item}");
@@ -248,13 +224,13 @@ public class ItemSlot : IReadOnlyItemSlot
                 return amountToTransfer;
             }
 
-            case { } when Item == null:
+            case { } when Item.IsNone:
             {
                 Item = other.Item;
                 Charges = other.Charges;
                 Enchantment = other.Enchantment;
                 Flags = other.Flags;
-                ushort max = other.ItemId == AssetId.Gold || other.ItemId == AssetId.Rations 
+                ushort max = other.Item == AssetId.Gold || other.Item == AssetId.Rations 
                     ? (ushort)short.MaxValue 
                     : MaxItemCount;
 
@@ -272,14 +248,15 @@ public class ItemSlot : IReadOnlyItemSlot
         }
     }
 
-    public ushort TransferFrom(ItemSlot other, ushort? quantity) // Return the number of items transferred
+    public ushort TransferFrom(ItemSlot other, ushort? quantity, Func<ItemId, ItemData> getItem) // Return the number of items transferred
     {
         if (other == null) throw new ArgumentNullException(nameof(other));
+        if (getItem == null) throw new ArgumentNullException(nameof(getItem));
         if (quantity == 0) throw new ArgumentOutOfRangeException(nameof(quantity));
         CheckAssumptions();
         other.CheckAssumptions();
 
-        ushort itemsTransferred = TransferInner(other, quantity);
+        ushort itemsTransferred = TransferInner(other, quantity, getItem);
 
         CheckAssumptions();
         other.CheckAssumptions();
@@ -287,8 +264,6 @@ public class ItemSlot : IReadOnlyItemSlot
     }
 
     public ItemSlot Set(ItemId item, ushort amount, ItemSlotFlags flags = 0, byte charges = 0, byte enchantment = 0) // Just for tests
-        => Set(new ItemProxy(item), amount, flags, charges, enchantment);
-    public ItemSlot Set(IContents item, ushort amount, ItemSlotFlags flags = 0, byte charges = 0, byte enchantment = 0) // Just for tests
     {
         Item = item;
         Amount = amount;
@@ -298,30 +273,33 @@ public class ItemSlot : IReadOnlyItemSlot
         return this;
     }
 
-    public bool CanCoalesce(ItemSlot y)
+    public bool CanCoalesce(ItemSlot y, Func<ItemId, ItemData> getItem)
     {
         if (y == null) throw new ArgumentNullException(nameof(y));
-        if (Item == null || y.Item == null) return true; // Anything can coalesce with nothing
-        if (ItemId != y.ItemId) return false; // Can't stack dissimilar items
-        if (Item is Gold or Rations) return true;
-        if (!(Item is ItemData xi) || !(y.Item is ItemData)) return false; // If not gold/rations, then both must be items
+        if (getItem == null) throw new ArgumentNullException(nameof(getItem));
+
+        if (Item.IsNone || y.Item.IsNone) return true; // Anything can coalesce with nothing
+        if (Item != y.Item) return false; // Can't stack dissimilar items
+        if (Item.Type is AssetType.Gold or AssetType.Rations) return true;
+        if (Item.Type != AssetType.Item || y.Item.Type != AssetType.Item) return false; // If not gold/rations, then both must be items
         if (Id.Slot.IsBodyPart() || y.Id.Slot.IsBodyPart()) return false; // Can't wield / wear stacks
+        var xi = getItem(Item);
         return xi.IsStackable;
     }
 
     public void Swap(ItemSlot other)
     {
         if (other == null) throw new ArgumentNullException(nameof(other));
-        var oldItem = Item; Item = other.Item; other.Item = oldItem;
-        var oldAmount = Amount; Amount = other.Amount; other.Amount = oldAmount;
-        var oldCharges = Charges; Charges = other.Charges; other.Charges = oldCharges;
-        var oldEnchantment = Enchantment; Enchantment = other.Enchantment; other.Enchantment = oldEnchantment;
-        var oldFlags = Flags; Flags = other.Flags; other.Flags = oldFlags;
+        (Item, other.Item)               = (other.Item, Item);
+        (Amount, other.Amount)           = (other.Amount, Amount);
+        (Charges, other.Charges)         = (other.Charges, Charges);
+        (Enchantment, other.Enchantment) = (other.Enchantment, Enchantment);
+        (Flags, other.Flags)             = (other.Flags, Flags);
     }
 
     public void Clear()
     {
-        Item = null;
+        Item = ItemId.None;
         Amount = 0;
         Charges = 0;
         Enchantment = 0;

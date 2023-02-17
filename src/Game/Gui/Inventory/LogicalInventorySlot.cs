@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
@@ -64,7 +65,7 @@ public class LogicalInventorySlot : UiElement
             {
                 var im = Resolve<IInventoryManager>();
                 var inputBinder = Resolve<IInputBinder>();
-                if (im.ItemInHand.Item != null
+                if (!im.ItemInHand.Item.IsNone
                     || inputBinder.IsCtrlPressed
                     || inputBinder.IsShiftPressed
                     || inputBinder.IsAltPressed)
@@ -98,7 +99,7 @@ public class LogicalInventorySlot : UiElement
     {
         var inventoryManager = Resolve<IInventoryManager>();
         var hand = inventoryManager.ItemInHand;
-        Raise(new SetCursorEvent(hand.Item == null ? Base.CoreGfx.Cursor : Base.CoreGfx.CursorSmall));
+        Raise(new SetCursorEvent(hand.Item.IsNone ? Base.CoreGfx.Cursor : Base.CoreGfx.CursorSmall));
         Raise(new HoverTextEvent(null));
     }
 
@@ -111,13 +112,19 @@ public class LogicalInventorySlot : UiElement
 
         var slotInfo = Slot;
         string itemName = null;
-        if (slotInfo?.Item is ItemData item)
+        if (slotInfo?.Item.Type == AssetType.Item)
+        {
+            var item = assets.LoadItem(slotInfo.Item);
             itemName = assets.LoadString(item.Name);
+        }
 
         var hand = inventoryManager.ItemInHand;
         string itemInHandName = null;
-        if (hand.Item is ItemData itemInHand)
+        if (hand.Item.Type == AssetType.Item)
+        {
+            var itemInHand = assets.LoadItem(hand.Item);
             itemInHandName = assets.LoadString(itemInHand.Name);
+        }
 
         var action = inventoryManager.GetInventoryAction(_id);
         _visual.Hoverable = true;
@@ -180,7 +187,7 @@ public class LogicalInventorySlot : UiElement
     {
         var inventory = Resolve<IGameState>().GetInventory(_id.Id);
         var slotInfo = inventory.GetSlot(_id.Slot);
-        if (slotInfo?.Item is not ItemData item)
+        if (slotInfo?.Item.Type != AssetType.Item)
         {
             OnRightClickSpecial(slotInfo);
             return;
@@ -190,6 +197,7 @@ public class LogicalInventorySlot : UiElement
         var window = Resolve<IWindowManager>();
         var cursorManager = Resolve<ICursorManager>();
 
+        var item = Resolve<IAssetManager>().LoadItem(slotInfo.Item);
         var itemPosition = window.UiToNorm(slotInfo.LastUiPosition);
         var heading = tf.Center().NoWrap().Fat().Format(item.Name);
 
@@ -289,13 +297,13 @@ public class LogicalInventorySlot : UiElement
 
     void OnRightClickSpecial(IReadOnlyItemSlot slotInfo)
     {
-        if (slotInfo.Item == null)
+        if (slotInfo.Item.IsNone)
             return;
 
         var tf = Resolve<ITextFormatter>();
         var window = Resolve<IWindowManager>();
         var cursorManager = Resolve<ICursorManager>();
-        var headingText = slotInfo.Item is Gold 
+        var headingText = slotInfo.Item == AssetId.Gold
             ? Base.SystemText.Gold_Gold 
             : Base.SystemText.Gold_Rations;
 

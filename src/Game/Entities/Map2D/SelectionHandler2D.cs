@@ -118,7 +118,7 @@ public sealed class SelectionHandler2D : Component
 
         if (zone?.Chain != null && zone.Node != null)
         {
-            if (zone.Trigger.HasFlag(TriggerTypes.Examine))
+            if ((zone.Trigger & TriggerTypes.Examine) != 0)
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.MapPopup_Examine),
@@ -126,7 +126,7 @@ public sealed class SelectionHandler2D : Component
                     ContextMenuGroup.Actions));
             }
 
-            if (zone.Trigger.HasFlag(TriggerTypes.Manipulate))
+            if ((zone.Trigger & TriggerTypes.Manipulate) != 0)
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.MapPopup_Manipulate),
@@ -134,7 +134,7 @@ public sealed class SelectionHandler2D : Component
                     ContextMenuGroup.Actions));
             }
 
-            if (zone.Trigger.HasFlag(TriggerTypes.Take))
+            if ((zone.Trigger & TriggerTypes.Take) != 0)
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.MapPopup_Take),
@@ -142,7 +142,7 @@ public sealed class SelectionHandler2D : Component
                     ContextMenuGroup.Actions));
             }
 
-            if (zone.Trigger.HasFlag(TriggerTypes.TalkTo))
+            if ((zone.Trigger & TriggerTypes.TalkTo) != 0)
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.MapPopup_TalkTo),

@@ -86,7 +86,7 @@ public static class FlagTestMap
             });
 
             var chest = new Inventory(new InventoryId(InventoryType.Chest, 2));
-            chest.Slots[0].ItemId = Item.Sword;
+            chest.Slots[0].Item = Item.Sword;
             assets[new ChestId(2)] = chest;
             Add(1, n+1, "C0", "Open chest 1", s =>
             {

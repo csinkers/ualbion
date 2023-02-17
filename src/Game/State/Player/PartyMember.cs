@@ -3,6 +3,7 @@ using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Settings;
 using UAlbion.Core.Events;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
@@ -73,10 +74,11 @@ public class PartyMember : Component, IPlayer
             UpdateSheet();
     }
 
+    ItemData LoadItem(ItemId x) => Resolve<IAssetManager>().LoadItemStrict(x);
     void UpdateSheet()
     {
         _lastEffective = Effective;
-        Effective = EffectiveSheetCalculator.GetEffectiveSheet(_base, Resolve<IVarSet>());
+        Effective = EffectiveSheetCalculator.GetEffectiveSheet(_base, Resolve<IVarSet>(), LoadItem);
         _lastEffective ??= Effective;
         _lastChangeTime = DateTime.Now;
         _lerp = 0.0f;

@@ -89,8 +89,8 @@ public class Inventory : IInventory
         {
             if (s.IsReading())
             {
-                inv.Gold.Item = Assets.Gold.Instance;
-                inv.Rations.Item = Assets.Rations.Instance;
+                inv.Gold.Item = AssetId.Gold;
+                inv.Rations.Item = AssetId.Rations;
             }
 
             inv.Gold.Amount = s.UInt16(nameof(inv.Gold), inv.Gold.Amount);
@@ -119,12 +119,10 @@ public class Inventory : IInventory
     public ItemSlot GetSlot(ItemSlotId itemSlotId)
     {
         int slotNumber = (int)itemSlotId;
-        if (slotNumber < 0 || slotNumber >= Slots.Length)
-            return null;
-        return Slots[slotNumber];
+        return slotNumber >= Slots.Length ? null : Slots[slotNumber];
     }
 
-    [JsonIgnore] public bool IsEmpty => !EnumerateAll().Any(x => x.Item != null && x.Amount > 0);
+    [JsonIgnore] public bool IsEmpty => !EnumerateAll().Any(x => !x.Item.IsNone && x.Amount > 0);
 
     public void SetSlotUiPosition(ItemSlotId itemSlotId, Vector2 position)
     {

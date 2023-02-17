@@ -8,7 +8,7 @@ using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets;
 
-public sealed class ItemData : IItem
+public sealed class ItemData
 {
     public const int SizeOnDisk = 0x28;
     public ItemData(ItemId id) => Id = id;
@@ -184,7 +184,6 @@ public sealed class ItemData : IItem
     }
 
     bool Equals(ItemData other) => Id == other.Id;
-    public bool Equals(IContents obj) => Equals((object) obj);
     public override bool Equals(object obj) => obj is ItemData other && Equals(other);
     public override int GetHashCode() => Id.GetHashCode();
 }

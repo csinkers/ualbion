@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
@@ -220,22 +222,25 @@ public class StatusBarPortrait : UiElement
         var tf = Resolve<ITextFormatter>();
 
         IText text;
-        switch (inventoryManager.ItemInHand.Item)
+        switch (inventoryManager.ItemInHand.Item.Type)
         {
-            case ItemData item:
+            case AssetType.Item:
+            {
                 // Give %s to %s
+                var item = Resolve<IAssetManager>().LoadItem(inventoryManager.ItemInHand.Item);
                 text = tf.Format(
                     Base.SystemText.PartyPortrait_GiveXToX,
                     item.Name,
                     member.Apparent.GetName(Var(UserVars.Gameplay.Language)));
                 break;
-            case Gold:
+            }
+            case AssetType.Gold:
                 // Give gold to %s
                 text = tf.Format(
                     Base.SystemText.PartyPortrait_GiveGoldToX,
                     member.Apparent.GetName(Var(UserVars.Gameplay.Language)));
                 break;
-            case Rations:
+            case AssetType.Rations:
                 // Give food to %s
                 text = tf.Format(
                     Base.SystemText.PartyPortrait_GiveFoodToX,

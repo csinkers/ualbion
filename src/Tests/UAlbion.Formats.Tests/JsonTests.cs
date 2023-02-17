@@ -124,15 +124,15 @@ public class JsonTests
 
         var options = new JsonSerializerOptions { Converters = { InventoryConverter.Instance } };
 
-        var inv = new Inventory(new InventoryId((MonsterId)Base.MonsterSheet.Magician1));
-        inv.Gold.Item = Gold.Instance;
-        inv.Gold.Amount = 20;
-        inv.Rations.Item = Rations.Instance;
-        inv.Rations.Amount = 1;
-        inv.Slots[3].ItemId = Base.Item.Torch;
+        var inv = new Inventory(new InventoryId((MonsterId)Base.MonsterSheet.Magician1))
+        {
+            Gold = { Item = AssetId.Gold, Amount = 20 },
+            Rations = { Item = AssetId.Rations, Amount = 1 }
+        };
+        inv.Slots[3].Item = Base.Item.Torch;
         inv.Slots[3].Amount = 3;
-        inv.Slots[4].ItemId = Base.Item.Clothes;
-        inv.Slots[7].ItemId = Base.Item.Shoes;
+        inv.Slots[4].Item = Base.Item.Clothes;
+        inv.Slots[7].Item = Base.Item.Shoes;
 
         var json = JsonSerializer.Serialize(inv, options);
         var roundTripped = JsonSerializer.Deserialize<Inventory>(json, options);
@@ -140,9 +140,9 @@ public class JsonTests
         Assert.NotNull(roundTripped);
         Assert.Equal(20, roundTripped.Gold.Amount);
         Assert.Equal(1, roundTripped.Rations.Amount);
-        Assert.Equal(Base.Item.Torch, roundTripped.Slots[3].ItemId);
+        Assert.Equal(Base.Item.Torch, roundTripped.Slots[3].Item);
         Assert.Equal(3, roundTripped.Slots[3].Amount);
-        Assert.Equal(Base.Item.Clothes, roundTripped.Slots[4].ItemId);
-        Assert.Equal(Base.Item.Shoes, roundTripped.Slots[7].ItemId);
+        Assert.Equal(Base.Item.Clothes, roundTripped.Slots[4].Item);
+        Assert.Equal(Base.Item.Shoes, roundTripped.Slots[7].Item);
     }
 }

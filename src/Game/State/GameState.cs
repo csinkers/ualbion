@@ -202,7 +202,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
             }
         });
 
-        AttachChild(new InventoryManager(GetWriteableInventory));
+        AttachChild(new InventoryManager(GetWriteableInventory, GetItem));
         _sheetApplier = AttachChild(new SheetApplier());
     }
 
@@ -284,6 +284,8 @@ public class GameState : ServiceComponent<IGameState>, IGameState
 
         return inventory;
     }
+
+    ItemData GetItem(ItemId id) => Resolve<IAssetManager>().LoadItemStrict(id);
 
     public int TickCount { get; private set; }
     public bool Loaded => _game != null;

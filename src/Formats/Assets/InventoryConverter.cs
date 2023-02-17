@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets;
 
@@ -59,9 +60,10 @@ public class InventoryConverter : JsonConverter<Inventory>
                 {
                     var amount = (int)(reader.GetDecimal() * 10m);
                     if (amount is < 0 or > ushort.MaxValue)
-                        throw new JsonException($"Gold value {amount} out of range, max gold: {ushort.MaxValue / 10m}");
+                        throw new JsonException($"Gold value AssetId.{amount} out of range, max gold: {ushort.MaxValue / 10m}");
 
-                    slots.Add(slotId, new ItemSlot(new InventorySlotId(inventoryId, ItemSlotId.Gold)).Set(Gold.Instance, (ushort)amount));
+                    var goldSlot = new ItemSlot(new InventorySlotId(inventoryId, ItemSlotId.Gold));
+                    slots.Add(slotId, goldSlot.Set(AssetId.Gold, (ushort)amount));
                     break;
                 }
 
@@ -73,7 +75,8 @@ public class InventoryConverter : JsonConverter<Inventory>
                     if (amount is < 0 or > ushort.MaxValue)
                         throw new JsonException($"Rations value {amount} out of range, max rations: {ushort.MaxValue}");
 
-                    slots.Add(slotId, new ItemSlot(new InventorySlotId(inventoryId, ItemSlotId.Rations)).Set(Rations.Instance, (ushort)amount));
+                    var rationSlot = new ItemSlot(new InventorySlotId(inventoryId, ItemSlotId.Rations));
+                    slots.Add(slotId, rationSlot.Set(AssetId.Rations, (ushort)amount));
                     break;
                 }
                 default:

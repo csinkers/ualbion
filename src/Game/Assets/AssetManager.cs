@@ -34,15 +34,7 @@ public class AssetManager : Component, IAssetManager
     protected override void Unsubscribed() => Exchange.Unregister(this);
     public AssetInfo GetAssetInfo(AssetId id, string language = null) => _modApplier.GetAssetInfo(id, language);
     public IMapData LoadMap(MapId id) => (IMapData)_modApplier.LoadAsset(id); // No caching for map data
-    public ItemData LoadItem(ItemId id)
-    {
-        return (ItemData)_modApplier.LoadAssetCached(id);
-        /*var data = (IList<ItemData>)_modApplier.LoadAssetCached(ItemListId.Only.Id());
-        if ((int)id >= data.Count)
-            return null;
-
-        return data[(int)id]; */
-    }
+    public ItemData LoadItem(ItemId id) => (ItemData)_modApplier.LoadAssetCached(id);
 
     public AlbionPalette LoadPalette(PaletteId id)
     {

@@ -22,13 +22,17 @@ namespace UAlbion.Game.State.Player;
 public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryManager
 {
     readonly Func<InventoryId, Inventory> _getInventory;
+    readonly Func<ItemId, ItemData> _getItem;
     readonly ItemSlot _hand = new(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.None));
     IEvent _returnItemInHandEvent;
 
     ItemSlot GetSlot(InventorySlotId id) => _getInventory(id.Id)?.GetSlot(id.Slot);
     public ReadOnlyItemSlot ItemInHand { get; }
-    public InventoryManager(Func<InventoryId, Inventory> getInventory)
+    public InventoryManager(Func<InventoryId, Inventory> getInventory, Func<ItemId, ItemData> getItem)
     {
+        _getInventory = getInventory ?? throw new ArgumentNullException(nameof(getInventory));
+        _getItem = getItem ?? throw new ArgumentNullException(nameof(getItem));
+
         On<InventoryReturnItemInHandEvent>(_ => ReturnItemInHand());
         On<InventoryDestroyItemInHandEvent>(_ =>
         {
@@ -47,13 +51,12 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         On<ReadItemEvent>(OnReadItem);
         On<ReadSpellScrollEvent>(OnReadSpellScroll);
 
-        _getInventory = getInventory;
         ItemInHand = new ReadOnlyItemSlot(_hand);
     }
 
     void ReturnItemInHand()
     {
-        if (_returnItemInHandEvent == null || _hand.Item == null)
+        if (_returnItemInHandEvent == null || _hand.Item.IsNone)
             return;
 
         Receive(_returnItemInHandEvent, null);
@@ -71,23 +74,37 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         if (slot == null || slot.Id.Slot == ItemSlotId.None)
             return InventoryAction.Nothing;
 
-        switch (_hand.Item, slot.Item)
+        switch (_hand.Item.Type, slot.Item.Type)
         {
-            case (null, null): return InventoryAction.Nothing;
-            case (null, _): return InventoryAction.Pickup;
+            case (AssetType.None, AssetType.None):
+                return InventoryAction.Nothing;
 
-            case (Gold, Gold):
-            case (Rations, Rations): return InventoryAction.Coalesce;
-            case (Gold, null): return slotId.Slot == ItemSlotId.Gold ? InventoryAction.PutDown : InventoryAction.Nothing;
-            case (Rations, null): return slotId.Slot == ItemSlotId.Rations ? InventoryAction.PutDown : InventoryAction.Nothing;
+            case (AssetType.None, _):
+                return InventoryAction.Pickup;
 
-            case (ItemData, null): return InventoryAction.PutDown;
-            case (ItemData, ItemData) when slot.CanCoalesce(_hand):
+            case (AssetType.Gold, AssetType.Gold):
+            case (AssetType.Rations, AssetType.Rations):
+                return InventoryAction.Coalesce;
+
+            case (AssetType.Gold, AssetType.None):
+                return slotId.Slot == ItemSlotId.Gold 
+                    ? InventoryAction.PutDown 
+                    : InventoryAction.Nothing;
+
+            case (AssetType.Rations, AssetType.None):
+                return slotId.Slot == ItemSlotId.Rations 
+                    ? InventoryAction.PutDown 
+                    : InventoryAction.Nothing;
+
+            case (AssetType.Item, AssetType.None):
+                return InventoryAction.PutDown;
+
+            case (AssetType.Item, AssetType.Item) when slot.CanCoalesce(_hand, _getItem):
                 return slot.Amount >= ItemSlot.MaxItemCount
                     ? InventoryAction.NoCoalesceFullStack
                     : InventoryAction.Coalesce;
 
-            case (ItemData, ItemData):
+            case (AssetType.Item, AssetType.Item):
                 return InventoryAction.Swap;
 
             default:
@@ -102,17 +119,17 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         if (!CanItemBeTaken(slot))
             return; // TODO: Message
 
-        _hand.TransferFrom(slot, quantity);
+        _hand.TransferFrom(slot, quantity, _getItem);
         _returnItemInHandEvent = new InventorySwapEvent(slot.Id.Id, slot.Id.Slot);
     }
 
-    static bool DoesSlotAcceptItem(ICharacterSheet sheet, ItemSlotId slotId, ItemData item)
+    bool DoesSlotAcceptItem(ICharacterSheet sheet, ItemSlotId slotId, ItemData item)
     {
         switch (sheet.Gender)
         {
-            case Gender.Male: if (!item.AllowedGender.HasFlag(Genders.Male)) return false; break;
-            case Gender.Female: if (!item.AllowedGender.HasFlag(Genders.Female)) return false; break;
-            case Gender.Neuter: if (!item.AllowedGender.HasFlag(Genders.Neutral)) return false; break;
+            case Gender.Male: if ((item.AllowedGender & Genders.Male) == 0) return false; break;
+            case Gender.Female: if ((item.AllowedGender & Genders.Female) == 0) return false; break;
+            case Gender.Neuter: if ((item.AllowedGender & Genders.Neutral) == 0) return false; break;
         }
 
         if (!item.Class.IsAllowed(sheet.PlayerClass))
@@ -129,7 +146,12 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         {
             case ItemSlotId.LeftHand:
             {
-                return sheet.Inventory.RightHand.Item is not ItemData { Hands: > 1 };
+                var rightHandId = sheet.Inventory.RightHand.Item;
+                if (rightHandId.Type != AssetType.Item)
+                    return false;
+
+                var rightHandItem = _getItem(rightHandId);
+                return rightHandItem.Hands <= 1;
             }
             case ItemSlotId.Tail:
                 return
@@ -142,36 +164,39 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
 
     bool DoesSlotAcceptItemInHand(InventoryId id, ItemSlotId slotId)
     {
-        switch (_hand?.Item)
+        switch (_hand?.Item.Type ?? AssetType.None)
         {
-            case null: return true;
-            case Gold: return slotId == ItemSlotId.Gold;
-            case Rations: return slotId == ItemSlotId.Rations;
-            case ItemData when slotId < ItemSlotId.NormalSlotCount: return true;
-            case ItemData when id.Type != InventoryType.Player: return false;
-            case ItemData item:
+            case AssetType.None: return true;
+            case AssetType.Gold: return slotId == ItemSlotId.Gold;
+            case AssetType.Rations: return slotId == ItemSlotId.Rations;
+            case AssetType.Item when slotId < ItemSlotId.NormalSlotCount: return true;
+            case AssetType.Item when id.Type != InventoryType.Player: return false;
+            case AssetType.Item:
             {
+                var item = _getItem(_hand!.Item);
                 var state = Resolve<IGameState>();
                 var sheet = state.GetSheet(id.ToSheetId());
                 return DoesSlotAcceptItem(sheet, slotId, item);
             }
 
             default:
-                throw new InvalidOperationException($"Unexpected item type in hand: {_hand.GetType()}");
+                throw new InvalidOperationException($"Unexpected item type in hand: {_hand?.GetType()}");
         }
     }
 
     ItemSlotId GetBestSlot(InventorySlotId id)
     {
-        if (_hand.Item is Gold) return ItemSlotId.Gold;
-        if (_hand.Item is Rations) return ItemSlotId.Rations;
-        if (_hand.Item is not ItemData item) return id.Slot; // Shouldn't be possible
+        if (_hand.Item.Type == AssetType.Gold) return ItemSlotId.Gold;
+        if (_hand.Item.Type == AssetType.Rations) return ItemSlotId.Rations;
+        if (_hand.Item.Type != AssetType.Item) return id.Slot; // Shouldn't be possible
 
         if (id.Id.Type != InventoryType.Player || !id.Slot.IsBodyPart())
             return ItemSlotId.None;
 
         var state = Resolve<IGameState>();
         var sheet = state.GetSheet(id.Id.ToSheetId());
+        var item = _getItem(_hand.Item);
+
         if (DoesSlotAcceptItem(sheet, id.Slot, item)) return id.Slot;
         if (DoesSlotAcceptItem(sheet, ItemSlotId.Head, item)) return ItemSlotId.Head;
         if (DoesSlotAcceptItem(sheet, ItemSlotId.Neck, item)) return ItemSlotId.Neck;
@@ -186,17 +211,17 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         return ItemSlotId.None;
     }
 
-    static bool CanItemBeTaken(ItemSlot slot)
+    bool CanItemBeTaken(ItemSlot slot)
     {
         // TODO: Goddess' amulet etc
-        switch (slot.Item)
+        switch (slot.Item.Type)
         {
-            case Gold:
-            case Rations: return true;
-            case ItemData item when
-                slot.Id.Slot < ItemSlotId.Slot0 &&
-                item.Flags.HasFlag(ItemSlotFlags.Cursed):
-                return false;
+            case AssetType.Gold:
+            case AssetType.Rations: return true;
+            case AssetType.Item:
+                bool curseActive = (slot.Flags & ItemSlotFlags.Cursed) != 0 &&
+                                   slot.Id.Slot.IsBodyPart();
+                return !curseActive;
             default: return true;
         }
     }
@@ -204,22 +229,19 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
     bool OnGiveItem(InventoryGiveItemEvent e, Action continuation)
     {
         var inventory = _getInventory((InventoryId)e.MemberId);
-        switch (_hand.Item)
+        switch (_hand.Item.Type)
         {
-            case Gold: inventory.Gold.TransferFrom(_hand, null); break;
-            case Rations: inventory.Rations.TransferFrom(_hand, null); break;
-            case ItemData item:
+            case AssetType.Gold: inventory.Gold.TransferFrom(_hand, null, _getItem); break;
+            case AssetType.Rations: inventory.Rations.TransferFrom(_hand, null, _getItem); break;
+            case AssetType.Item:
             {
+                var item = _getItem(_hand.Item);
                 ItemSlot slot = null;
                 if (item.IsStackable)
-                {
-                    slot = inventory.BackpackSlots.FirstOrDefault(x =>
-                        x.Item is ItemData existing &&
-                        existing.Id == item.Id);
-                }
+                    slot = inventory.BackpackSlots.FirstOrDefault(x => x.Item == _hand.Item);
 
-                slot ??= inventory.BackpackSlots.FirstOrDefault(x => x.Item == null);
-                slot?.TransferFrom(_hand, null);
+                slot ??= inventory.BackpackSlots.FirstOrDefault(x => x.Item.IsNone);
+                slot?.TransferFrom(_hand, null, _getItem);
 
                 break;
             }
@@ -241,21 +263,42 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
             return;
         }
 
-        var text = (slot.Item, discard) switch
+        var text = (slot.Item.Type, discard) switch
         {
-            (Gold, true) => Base.SystemText.Gold_ThrowHowMuchGoldAway,
-            (Gold, false) => Base.SystemText.Gold_TakeHowMuchGold,
-            (Rations, true) => Base.SystemText.Gold_ThrowHowManyRationsAway,
-            (Rations, false) => Base.SystemText.Gold_TakeHowManyRations,
-            (ItemData, true) => Base.SystemText.InvMsg_ThrowHowManyItemsAway,
-            (ItemData, false) => Base.SystemText.InvMsg_TakeHowManyItems,
+            (AssetType.Gold, true) => Base.SystemText.Gold_ThrowHowMuchGoldAway,
+            (AssetType.Gold, false) => Base.SystemText.Gold_TakeHowMuchGold,
+            (AssetType.Rations, true) => Base.SystemText.Gold_ThrowHowManyRationsAway,
+            (AssetType.Rations, false) => Base.SystemText.Gold_TakeHowManyRations,
+            (AssetType.Item, true) => Base.SystemText.InvMsg_ThrowHowManyItemsAway,
+            (AssetType.Item, false) => Base.SystemText.InvMsg_TakeHowManyItems,
             var x => throw new InvalidOperationException($"Unexpected item contents {x}")
         };
 
-        if (RaiseAsync(new ItemQuantityPromptEvent((TextId)text, slot.Item.Icon, slot.Item.IconSubId, slot.Amount, slotId == ItemSlotId.Gold), continuation) == 0)
+        var (sprite, subId, _) = GetSprite(slot.Item);
+        if (RaiseAsync(new ItemQuantityPromptEvent((TextId)text, sprite, subId, slot.Amount, slotId == ItemSlotId.Gold), continuation) == 0)
         {
             ApiUtil.Assert("ItemManager.GetQuantity tried to open a quantity dialog, but no-one was listening for the event.");
             continuation(0);
+        }
+    }
+
+    (SpriteId sprite, int subId, int frameCount) GetSprite(ItemId id)
+    {
+        switch (_hand.Item.Type)
+        {
+            case AssetType.None: return (AssetId.None, 0, 1);
+            case AssetType.Gold: return (Base.CoreGfx.UiGold, 0, 1);
+            case AssetType.Rations: return (Base.CoreGfx.UiFood, 0, 1);
+            case AssetType.Item:
+                {
+                    var item = _getItem(_hand.Item);
+                    return (item.Icon, item.IconSubId, item.IconAnim);
+                }
+            default:
+                throw new ArgumentOutOfRangeException(
+                    nameof(id),
+                    id,
+                    $"{id} was expected to be None, Gold, Rations or an Item");
         }
     }
 
@@ -316,7 +359,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                 if (redirected)
                 {
                     var transitionEvent = new LinearItemTransitionEvent(
-                        _hand.ItemId,
+                        _hand.Item,
                         (int)cursorUiPosition.X,
                         (int)cursorUiPosition.Y,
                         (int)slot.LastUiPosition.X,
@@ -324,18 +367,18 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                         Var(GameVars.Ui.Transitions.ItemMovementTransitionTimeSeconds));
 
                     ItemSlot temp = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
-                    temp.TransferFrom(_hand, null);
+                    temp.TransferFrom(_hand, null, _getItem);
                     SetCursor();
                     RaiseAsync(transitionEvent, () =>
                     {
-                        slot.TransferFrom(temp, null);
+                        slot.TransferFrom(temp, null, _getItem);
                         Update(slotId.Id);
                         continuation();
                     });
                 }
                 else
                 {
-                    slot.TransferFrom(_hand, null);
+                    slot.TransferFrom(_hand, null, _getItem);
                     complete = true;
                 }
                 break;
@@ -346,7 +389,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                 {
                     // Original game didn't handle this, but doesn't hurt.
                     var transitionEvent1 = new LinearItemTransitionEvent(
-                        _hand.ItemId,
+                        _hand.Item,
                         (int)cursorUiPosition.X,
                         (int)cursorUiPosition.Y,
                         (int)slot.LastUiPosition.X,
@@ -354,7 +397,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                         Var(GameVars.Ui.Transitions.ItemMovementTransitionTimeSeconds));
 
                     var transitionEvent2 = new LinearItemTransitionEvent(
-                        slot.ItemId,
+                        slot.Item,
                         (int)slot.LastUiPosition.X,
                         (int)slot.LastUiPosition.Y,
                         (int)cursorUiPosition.X,
@@ -363,12 +406,12 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
 
                     ItemSlot temp1 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
                     ItemSlot temp2 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
-                    temp1.TransferFrom(_hand, null);
-                    temp2.TransferFrom(slot, null);
+                    temp1.TransferFrom(_hand, null, _getItem);
+                    temp2.TransferFrom(slot, null, _getItem);
 
                     RaiseAsync(transitionEvent1, () =>
                     {
-                        slot.TransferFrom(temp1, null);
+                        slot.TransferFrom(temp1, null, _getItem);
                         Update(slotId.Id);
                         SetCursor();
                         continuation();
@@ -376,7 +419,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
 
                     RaiseAsync(transitionEvent2, () =>
                     {
-                        _hand.TransferFrom(temp2, null);
+                        _hand.TransferFrom(temp2, null, _getItem);
                         _returnItemInHandEvent = new InventorySwapEvent(slot.Id.Id, slot.Id.Slot);
                         SetCursor();
                     });
@@ -428,11 +471,11 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
             var slot = inventory.GetSlot(e.SlotId);
             ushort itemsToDrop = Math.Min((ushort)quantity, slot.Amount);
 
-            var prompt = slot.Item switch
+            var prompt = slot.Item.Type switch
             {
-                Gold => Base.SystemText.Gold_ReallyThrowTheGoldAway,
-                Rations => Base.SystemText.Gold_ReallyThrowTheRationsAway,
-                ItemData when itemsToDrop == 1 => Base.SystemText.InvMsg_ReallyThrowThisItemAway,
+                AssetType.Gold => Base.SystemText.Gold_ReallyThrowTheGoldAway,
+                AssetType.Rations => Base.SystemText.Gold_ReallyThrowTheRationsAway,
+                AssetType.Item when itemsToDrop == 1 => Base.SystemText.InvMsg_ReallyThrowThisItemAway,
                 _ => Base.SystemText.InvMsg_ReallyThrowTheseItemsAway,
             };
 
@@ -444,11 +487,11 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                     return;
                 }
 
-                if (!slot.ItemId.IsNone)
+                if (!slot.Item.IsNone)
                 {
                     var maxTransitions = Var(GameVars.Ui.Transitions.MaxDiscardTransitions);
                     for (int i = 0; i < itemsToDrop && i < maxTransitions; i++)
-                        Raise(new GravityItemTransitionEvent(slot.ItemId, e.NormX, e.NormY));
+                        Raise(new GravityItemTransitionEvent(slot.Item, e.NormX, e.NormY));
                 }
 
                 slot.Amount -= itemsToDrop;
@@ -462,31 +505,16 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
 
     void SetCursor()
     {
-        SpriteId sprite = SpriteId.None;
-        int subItem = 0;
-        int frameCount = 1; 
-        switch (_hand.Item)
-        {
-            case Gold: sprite = Base.CoreGfx.UiGold; break;
-            case Rations: sprite = Base.CoreGfx.UiFood; break;
-            case ItemData item:
-            {
-                sprite= item.Icon;
-                subItem = item.IconSubId;
-                frameCount = item.IconAnim;
-                break;
-            }
-        }
-
-        Raise(new SetCursorEvent(_hand.Item == null ? Base.CoreGfx.Cursor : Base.CoreGfx.CursorSmall));
-        Raise(new SetHeldItemCursorEvent(sprite, subItem, frameCount, _hand.Amount, _hand.Item is Gold));
+        var (sprite, subId, frameCount) = GetSprite(_hand.Item);
+        Raise(new SetCursorEvent(_hand.Item.IsNone ? Base.CoreGfx.Cursor : Base.CoreGfx.CursorSmall));
+        Raise(new SetHeldItemCursorEvent(sprite, subId, frameCount, _hand.Amount, _hand.Item == AssetId.Gold));
     }
 
     void CoalesceItems(ItemSlot slot)
     {
-        ApiUtil.Assert(slot.CanCoalesce(_hand));
-        ApiUtil.Assert(slot.Amount < ItemSlot.MaxItemCount || slot.Item is Gold or Rations);
-        slot.TransferFrom(_hand, null);
+        ApiUtil.Assert(slot.CanCoalesce(_hand, _getItem));
+        ApiUtil.Assert(slot.Amount < ItemSlot.MaxItemCount || slot.Item.Type is AssetType.Gold or AssetType.Rations);
+        slot.TransferFrom(_hand, null, _getItem);
     }
 
     void SwapItems(ItemSlot slot)
@@ -502,7 +530,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
     void RaiseStatusMessage(TextId textId)
         => Raise(new DescriptionTextEvent(Resolve<ITextFormatter>().Format(textId)));
 
-    public int GetItemCount(InventoryId id, ItemId item) => _getInventory(id).EnumerateAll().Where(x => x.ItemId == item).Sum(x => (int?)x.Amount) ?? 0;
+    public int GetItemCount(InventoryId id, ItemId item) => _getInventory(id).EnumerateAll().Where(x => x.Item == item).Sum(x => (int?)x.Amount) ?? 0;
     public ushort TryGiveItems(InventoryId id, ItemSlot donor, ushort? amount)
     {
         // TODO: Ensure weight limit is not exceeded?
@@ -510,21 +538,21 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         ushort remaining = amount ?? ushort.MaxValue;
         var inventory = _getInventory(id);
 
-        if (donor.ItemId == AssetId.Gold)
-            return inventory.Gold.TransferFrom(donor, remaining);
+        if (donor.Item == AssetId.Gold)
+            return inventory.Gold.TransferFrom(donor, remaining, _getItem);
 
-        if (donor.ItemId == AssetId.Rations)
-            return inventory.Rations.TransferFrom(donor, remaining);
+        if (donor.Item == AssetId.Rations)
+            return inventory.Rations.TransferFrom(donor, remaining, _getItem);
 
         for (int i = 0; i < (int)ItemSlotId.NormalSlotCount && amount != 0; i++)
         {
-            if (!inventory.Slots[i].CanCoalesce(donor))
+            if (!inventory.Slots[i].CanCoalesce(donor, _getItem))
                 continue;
 
-            ushort transferred = inventory.Slots[i].TransferFrom(donor, remaining);
+            ushort transferred = inventory.Slots[i].TransferFrom(donor, remaining, _getItem);
             remaining -= transferred;
             totalTransferred += transferred;
-            if (remaining == 0 || donor.Item == null)
+            if (remaining == 0 || donor.Item.IsNone)
                 break;
         }
 
@@ -538,17 +566,17 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         var inventory = _getInventory(id);
 
         if (item == AssetId.Gold)
-            return acceptor.TransferFrom(inventory.Gold, remaining);
+            return acceptor.TransferFrom(inventory.Gold, remaining, _getItem);
 
         if (item == AssetId.Rations)
-            return acceptor.TransferFrom(inventory.Rations, remaining);
+            return acceptor.TransferFrom(inventory.Rations, remaining, _getItem);
 
         for (int i = 0; i < (int)ItemSlotId.NormalSlotCount && amount != 0; i++)
         {
-            if (inventory.Slots[i].ItemId != item) 
+            if (inventory.Slots[i].Item != item) 
                 continue;
 
-            ushort transferred = acceptor.TransferFrom(inventory.Slots[i], remaining);
+            ushort transferred = acceptor.TransferFrom(inventory.Slots[i], remaining, _getItem);
             totalTransferred += transferred;
             remaining -= transferred;
             if (remaining == 0)
@@ -562,11 +590,12 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
     {
         var inv = _getInventory(e.SlotId.Id);
         var slot = inv.GetSlot(e.SlotId.Slot);
-        if (slot.Item is not ItemData item) return;
-        if (item.TypeId != ItemType.HeadsUpDisplayItem) return;
+        if (slot.Item.Type != AssetType.Item)
+            return;
 
-        var tf = Resolve<ITextFormatter>();
-        Raise(new SetSpecialItemActiveEvent(item.Id, true));
+        var item = _getItem(slot.Item);
+        if (item.TypeId != ItemType.HeadsUpDisplayItem)
+            return;
 
         var textId = TextId.None;
         if (item.Id == Base.Item.Clock)
@@ -576,8 +605,12 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         if (item.Id == Base.Item.MonsterEye)
             textId = Base.SystemText.SpecialItem_TheMonsterEyeHasBeenActivated;
 
-        if (!textId.IsNone)
-            Raise(new HoverTextEvent(tf.Format(Base.SystemText.Item_Add)));
+        if (textId.IsNone)
+            return;
+
+        var tf = Resolve<ITextFormatter>();
+        Raise(new SetSpecialItemActiveEvent(item.Id, true));
+        Raise(new HoverTextEvent(tf.Format(Base.SystemText.Item_Add)));
 
         slot.Amount--;
         Update(e.SlotId.Id);
@@ -587,8 +620,12 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
     {
         var inv = _getInventory(e.SlotId.Id);
         var slot = inv.GetSlot(e.SlotId.Slot);
-        if (slot.Item is not ItemData item) return;
-        if (item.Charges <= 0 || item.Spell.IsNone) return;
+        if (slot.Item.Type != AssetType.Item)
+            return;
+
+        var item = _getItem(slot.Item);
+        if (item.Charges <= 0 || item.Spell.IsNone)
+            return;
 
         Warn("TODO: Actually cast the spell once the magic system is implemented");
 
@@ -600,8 +637,12 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
     {
         var inv = _getInventory(e.SlotId.Id);
         var slot = inv.GetSlot(e.SlotId.Slot);
-        if (slot.Item is not ItemData item) return;
-        if (item.TypeId != ItemType.Drink) return;
+        if (slot.Item.Type != AssetType.Item)
+            return;
+
+        var item = _getItem(slot.Item);
+        if (item.TypeId != ItemType.Drink)
+            return;
 
         RaiseAsync(new PartyMemberPromptEvent((TextId)Base.SystemText.InvMsg_WhoShouldDrinkThis), result =>
         {
@@ -609,7 +650,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                 return;
 
             Raise(new SetContextEvent(ContextType.Subject, result));
-            TriggerItemChain(slot.ItemId, () =>
+            TriggerItemChain(slot.Item, () =>
             {
                 slot.Amount--;
                 Update(e.SlotId.Id);
@@ -621,8 +662,12 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
     {
         var inv = _getInventory(e.SlotId.Id);
         var slot = inv.GetSlot(e.SlotId.Slot);
-        if (slot.Item is not ItemData item) return;
-        if (item.TypeId != ItemType.Document) return;
+        if (slot.Item.Type != AssetType.Item)
+            return;
+
+        var item = _getItem(slot.Item);
+        if (item.TypeId != ItemType.Document)
+            return;
 
         TriggerItemChain(item.Id, () => { });
     }
@@ -631,8 +676,12 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
     {
         var inv = _getInventory(e.SlotId.Id);
         var slot = inv.GetSlot(e.SlotId.Slot);
-        if (slot.Item is not ItemData item) return;
-        if (item.TypeId != ItemType.SpellScroll) return;
+        if (slot.Item.Type != AssetType.Item)
+            return;
+
+        var item = _getItem(slot.Item);
+        if (item.TypeId != ItemType.SpellScroll)
+            return;
 
         var spell = Resolve<IAssetManager>().LoadSpell(item.Spell);
         if (spell == null)

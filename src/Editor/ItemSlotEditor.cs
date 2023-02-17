@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using ImGuiNET;
 using UAlbion.Config;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
-using UAlbion.Game.Assets;
 
 namespace UAlbion.Editor;
 
@@ -40,52 +40,46 @@ public class ItemSlotEditor : AssetEditor
 
     public override void Render()
     {
-        int index = IndexForItemId(_slot.ItemId);
+        int index = IndexForItemId(_slot.Item);
         int oldIndex = index;
         ImGui.Combo(_slot.Id.Slot.ToString(), ref index, _itemNames, _itemNames.Length);
         if (index != oldIndex)
         {
             var assetId = Resolve<IEditorAssetManager>().GetIdForAsset(Asset);
             var itemId = ItemIdForIndex(index);
-            var newItem = itemId.Type switch
-            {
-                AssetType.None => (IContents)null,
-                AssetType.Gold => Gold.Instance,
-                AssetType.Rations => Rations.Instance,
-                _ => Resolve<IRawAssetManager>().LoadItem(itemId)
-            };
-            Raise(new EditorSetPropertyEvent(assetId, nameof(_slot.Item), _slot.Item, newItem));
+            Raise(new EditorSetPropertyEvent(assetId, nameof(_slot.Item), _slot.Item, itemId));
         }
 
-        if (_slot.Item != null)
+        if (_slot.Item.IsNone) 
+            return;
+
+        if (_slot.Item.Type == AssetType.Item)
         {
-            if (_slot.Item is ItemData item)
-            {
-                if (item.IsStackable)
-                {
-                    ImGui.SameLine();
-                    UInt16Slider(nameof(_slot.Amount), _slot.Amount, 1, ItemSlot.MaxItemCount);
-                }
-
-                if (item.MaxCharges > 0)
-                {
-                    ImGui.SameLine();
-                    UInt8Slider(nameof(_slot.Charges), _slot.Charges, 0, item.MaxCharges);
-                }
-
-                if (item.MaxEnchantmentCount > 0)
-                {
-                    ImGui.SameLine();
-                    UInt8Slider(nameof(_slot.Enchantment), _slot.Enchantment, 0, item.MaxEnchantmentCount);
-                }
-                // TODO Flags: Broken, Cursed, Extra Info, unk, show as icons?
-                // TODO: Clear button?
-            }
-            else
+            var item = Resolve<IAssetManager>().LoadItem(_slot.Item);
+            if (item.IsStackable)
             {
                 ImGui.SameLine();
                 UInt16Slider(nameof(_slot.Amount), _slot.Amount, 1, ItemSlot.MaxItemCount);
             }
+
+            if (item.MaxCharges > 0)
+            {
+                ImGui.SameLine();
+                UInt8Slider(nameof(_slot.Charges), _slot.Charges, 0, item.MaxCharges);
+            }
+
+            if (item.MaxEnchantmentCount > 0)
+            {
+                ImGui.SameLine();
+                UInt8Slider(nameof(_slot.Enchantment), _slot.Enchantment, 0, item.MaxEnchantmentCount);
+            }
+            // TODO Flags: Broken, Cursed, Extra Info, unk, show as icons?
+            // TODO: Clear button?
+        }
+        else
+        {
+            ImGui.SameLine();
+            UInt16Slider(nameof(_slot.Amount), _slot.Amount, 1, ItemSlot.MaxItemCount);
         }
     }
 }

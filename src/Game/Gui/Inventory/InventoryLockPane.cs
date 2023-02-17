@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -36,7 +38,7 @@ public class InventoryLockPane : UiElement
                     .OnBlur(() =>
                     {
                         Raise(new HoverTextEvent(null));
-                        if (Resolve<IInventoryManager>().ItemInHand.Item == null)
+                        if (Resolve<IInventoryManager>().ItemInHand.Item.IsNone)
                             Raise(new SetCursorEvent(Base.CoreGfx.Cursor));
                     })
                     .OnClick(LockClicked) // If holding key etc
@@ -49,24 +51,24 @@ public class InventoryLockPane : UiElement
     {
         var tf = Resolve<ITextFormatter>();
         Raise(new HoverTextEvent(tf.Format(Base.SystemText.Lock_OpenTheLock)));
-        if (Resolve<IInventoryManager>().ItemInHand.Item == null)
+        if (Resolve<IInventoryManager>().ItemInHand.Item.IsNone)
             Raise(new SetCursorEvent(Base.CoreGfx.CursorSelected));
     }
 
     void LockClicked()
     {
         var hand = Resolve<IInventoryManager>().ItemInHand;
-        if (hand.ItemId.IsNone)
+        if (hand.Item.IsNone)
             return;
 
         var tf = Resolve<ITextFormatter>();
-        if (hand.ItemId == _lockEvent.Key)
+        if (hand.Item == _lockEvent.Key)
         {
             Raise(new HoverTextEvent(tf.Format(Base.SystemText.Lock_LeaderOpenedTheLock)));
             Raise(new InventoryReturnItemInHandEvent());
             Raise(new LockOpenedEvent());
         }
-        else if (hand.ItemId == Base.Item.Lockpick)
+        else if (hand.Item == Base.Item.Lockpick)
         {
             if (_lockEvent.PickDifficulty == 100)
             {
@@ -80,8 +82,11 @@ public class InventoryLockPane : UiElement
                 Raise(new LockOpenedEvent());
             }
         }
-        else if (hand.Item is ItemData item)
+        else if (hand.Item.Type == AssetType.Item)
         {
+            var item = Resolve<IAssetManager>().LoadItem(hand.Item) 
+                       ?? throw new AssetNotFoundException($"Could not load item {hand.Item}", hand.Item);
+
             Raise(new DescriptionTextEvent(tf.Format(
                 item.TypeId == ItemType.Key 
                     ? Base.SystemText.Lock_ThisIsNotTheRightKey 

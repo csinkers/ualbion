@@ -6,7 +6,6 @@ using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
@@ -35,9 +34,9 @@ public class PartyInventory : Component
 
         On<SimpleChestEvent>(e =>
         {
-            var itemId = e.ChestType switch
+            ItemId itemId = e.ChestType switch
             {
-                SimpleChestItemType.Item => (AssetId)e.ItemId,
+                SimpleChestItemType.Item => e.ItemId,
                 SimpleChestItemType.Gold => AssetId.Gold,
                 SimpleChestItemType.Rations => AssetId.Rations,
                 _ => throw new System.ComponentModel.InvalidEnumArgumentException(nameof(e.ChestType), (int)e.ChestType, typeof(SimpleChestItemType))
@@ -60,7 +59,7 @@ public class PartyInventory : Component
         var changedMembers = new HashSet<PartyMemberId>();
         foreach (var slot in chest.EnumerateAll())
         {
-            if (slot.ItemId.IsNone) 
+            if (slot.Item.IsNone) 
                 continue;
 
             foreach (var member in party.WalkOrder)
@@ -69,7 +68,7 @@ public class PartyInventory : Component
                 if (itemsGiven > 0)
                     changedMembers.Add(member.Id);
 
-                if (slot.ItemId.IsNone)
+                if (slot.Item.IsNone)
                     break;
             }
         }
@@ -87,14 +86,6 @@ public class PartyInventory : Component
         var party = Resolve<IParty>();
         return party.WalkOrder.Sum(x => im.GetItemCount(new InventoryId(x.Id), itemId));
     }
-
-    IContents ContentsFromItemId(ItemId itemId) =>
-        itemId.Type switch
-        {
-            AssetType.Gold => Gold.Instance,
-            AssetType.Rations => Rations.Instance,
-            _ => Resolve<IAssetManager>().LoadItem(itemId),
-        };
 
     PartyMemberId? ChangePartyItemAmount(ItemId itemId, NumericOperation operation, ushort amount)
     {
@@ -115,8 +106,7 @@ public class PartyInventory : Component
         var party = Resolve<IParty>();
         var inventoryManager = Resolve<IInventoryManager>();
         var slot = new ItemSlot(new InventorySlotId(new InventoryId(InventoryType.Temporary, 0), 0));
-        var contents = ContentsFromItemId(itemId);
-        slot.Set(contents, amount);
+        slot.Set(itemId, amount);
 
         foreach (var member in party.WalkOrder)
         {

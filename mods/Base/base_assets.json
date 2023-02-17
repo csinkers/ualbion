@@ -146,8 +146,7 @@
   },
 
   "PostProcessors": {
-    "atlas": "UAlbion.Formats.Parsers.AtlasPostProcessor, UAlbion.Formats",
-    "inv":   "UAlbion.Formats.Parsers.InventoryPostProcessor, UAlbion.Formats"
+    "atlas": "UAlbion.Formats.Parsers.AtlasPostProcessor, UAlbion.Formats"
   },
 
   "Languages": {

@@ -68,7 +68,7 @@ public class Party : ServiceComponent<IParty>, IParty
     public int GetItemCount(ItemId itemId) =>
         _statusBarOrder
             .SelectMany(x => x.Effective.Inventory.EnumerateAll())
-            .Where(x => x.Item is ItemData item && item.Id == itemId)
+            .Where(x => x.Item == itemId)
             .Sum(x => x.Amount);
 
     // The current party leader (shown with a white outline on

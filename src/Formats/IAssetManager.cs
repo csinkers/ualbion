@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Settings;
 using UAlbion.Api.Visual;
@@ -50,4 +51,19 @@ public interface IAssetManager : ITextureLoader
     object LoadSoundBanks(); // Should always return a GlobalTimbreLibrary, but we don't want to force a dependency on ADLMidi.NET in UAlbion.Formats, so use object
     IVarSet LoadConfig();
     InputConfig LoadInputConfig();
+}
+
+public static class AssetManagerExtensions
+{
+    public static ItemData LoadItemStrict(this IAssetManager assets, ItemId id)
+    {
+        if (id.Type != AssetType.Item)
+            throw new ArgumentOutOfRangeException(nameof(id), id, $"Tried to get item for {id}, but it is not an item id");
+
+        var item = assets.LoadItem(id);
+        if (item == null)
+            throw new AssetNotFoundException($"Could not find item data for {id}", id);
+
+        return item;
+    }
 }

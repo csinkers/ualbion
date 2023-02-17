@@ -112,9 +112,9 @@ public class AssetLoadTests : IDisposable
     {
         var chest = Test(assets => assets.LoadInventory(AssetId.From(Chest.HClanCellar_ID_IKn_ILC_StC_LSh_3g)));
         Assert.Equal(25, chest.Gold.Amount);
-        Assert.Equal(Gold.Instance, chest.Gold.Item);
+        Assert.Equal(AssetId.Gold, (AssetId)chest.Gold.Item);
         Assert.Equal(1, chest.Slots[0].Amount);
-        Assert.Equal(Item.IskaiDagger, chest.Slots[0].ItemId);
+        Assert.Equal(Item.IskaiDagger, chest.Slots[0].Item);
     }
 
     [Fact]
@@ -478,10 +478,10 @@ public class AssetLoadTests : IDisposable
     public void MerchantTest()
     {
         var i = Test(assets => assets.LoadInventory(AssetId.From(Merchant.AltheaSpells)));
-        Assert.Equal(Item.Fireball, i.Slots[0].ItemId);
+        Assert.Equal(Item.Fireball, i.Slots[0].Item);
         Assert.Equal(25, i.Slots[0].Amount);
         Assert.Equal(1, i.Slots[0].Charges);
-        Assert.Equal(Item.BanishDemons, i.Slots[1].ItemId);
+        Assert.Equal(Item.BanishDemons, i.Slots[1].Item);
         Assert.Equal(34, i.Slots[1].Amount);
         Assert.Equal(1, i.Slots[1].Charges);
     }
@@ -622,9 +622,9 @@ public class AssetLoadTests : IDisposable
 
         Assert.Equal(0, t.Inventory.Gold.Amount);
         Assert.Equal(5, t.Inventory.Rations.Amount);
-        Assert.Equal(Item.Overall, t.Inventory.Chest.ItemId);
+        Assert.Equal(Item.Overall, t.Inventory.Chest.Item);
         Assert.Equal(1, t.Inventory.Chest.Amount);
-        Assert.Equal(Item.Shoes, t.Inventory.Feet.ItemId);
+        Assert.Equal(Item.Shoes, t.Inventory.Feet.Item);
         Assert.Equal(1, t.Inventory.Feet.Amount);
 
         Assert.Equal(42, t.Attributes.Strength.Current);

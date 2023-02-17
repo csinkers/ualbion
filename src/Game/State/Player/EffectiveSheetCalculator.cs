@@ -1,6 +1,8 @@
 ﻿using System;
 using UAlbion.Api.Settings;
+using UAlbion.Config;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using Attribute = UAlbion.Formats.Assets.Attribute;
 using InvVars = UAlbion.Formats.Config.GameVars.Inventory;
 
@@ -8,7 +10,10 @@ namespace UAlbion.Game.State.Player;
 
 public static class EffectiveSheetCalculator
 {
-    public static IEffectiveCharacterSheet GetEffectiveSheet(CharacterSheet sheet, IVarSet config)
+    public static IEffectiveCharacterSheet GetEffectiveSheet(
+        CharacterSheet sheet,
+        IVarSet config,
+        Func<ItemId, ItemData> getItem)
     {
         if (sheet == null) throw new ArgumentNullException(nameof(sheet));
         if (config == null) throw new ArgumentNullException(nameof(config));
@@ -40,19 +45,21 @@ public static class EffectiveSheetCalculator
             Combat = sheet.Combat.DeepClone()
         };
 
-        ApplyWieldedItems(effective);
-        CalculateTotalWeight(effective, config);
+        ApplyWieldedItems(effective, getItem);
+        CalculateTotalWeight(effective, config, getItem);
 
         return effective;
     }
 
-    static void CalculateTotalWeight(EffectiveCharacterSheet sheet, IVarSet config)
+    static void CalculateTotalWeight(EffectiveCharacterSheet sheet, IVarSet config, Func<ItemId, ItemData> getItem)
     {
         sheet.TotalWeight = 0;
         foreach (var itemSlot in sheet.Inventory.EnumerateAll())
         {
-            if (itemSlot.Item is not ItemData item)
+            if (itemSlot.Item.Type != AssetType.Item)
                 continue;
+
+            var item = getItem(itemSlot.Item);
             sheet.TotalWeight += itemSlot.Amount * item.Weight;
         }
 
@@ -61,16 +68,17 @@ public static class EffectiveSheetCalculator
         sheet.MaxWeight = sheet.Attributes.Strength.Current * InvVars.CarryWeightPerStrength.Read(config);
     }
 
-    static void ApplyWieldedItems(EffectiveCharacterSheet sheet)
+    static void ApplyWieldedItems(EffectiveCharacterSheet sheet, Func<ItemId, ItemData> getItem)
     {
         int initialDamage = sheet.Combat.UnknownD8;
         int initialProtection = sheet.Combat.UnknownD6;
 
         foreach (var itemSlot in sheet.Inventory.EnumerateBodyParts())
         {
-            if (itemSlot.Item is not ItemData item)
+            if (itemSlot.Item.Type != AssetType.Item)
                 continue;
 
+            var item = getItem(itemSlot.Item);
             sheet.Combat.UnknownD8 += item.Damage;
             sheet.Combat.UnknownD6 += item.Protection;
             sheet.Combat.LifePoints.Max += item.LpMaxBonus;

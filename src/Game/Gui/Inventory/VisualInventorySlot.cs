@@ -2,6 +2,7 @@
 using System.Numerics;
 using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events.Inventory;
@@ -21,8 +22,6 @@ public sealed class VisualInventorySlot : UiElement
     readonly Vector2 _size;
 
     int _frameNumber;
-
-    IContents Contents => _getSlot().Item;
 
     public VisualInventorySlot(InventorySlotId slotId, IText amountSource, Func<IReadOnlyItemSlot> getSlot)
     {
@@ -107,24 +106,31 @@ public sealed class VisualInventorySlot : UiElement
         if (slot == null)
             return;
 
-        var contents = Contents;
         _button.AllowDoubleClick = slot.Amount > 1;
 
         if ((int)slot.LastUiPosition.X != extents.X || (int)slot.LastUiPosition.Y != extents.Y)
             Raise(new SetInventorySlotUiPositionEvent(_slotId, extents.X, extents.Y));
 
-        if (contents != null)
+        if (_slotId.Slot.IsSpecial()) // Special slots (i.e. rations + gold) keep their sprite when empty.
         {
-            int frames = contents.IconAnim == 0 ? 1 : contents.IconAnim;
+            if (_slotId.Slot == ItemSlotId.Gold)
+                _sprite.Id = Base.CoreGfx.UiGold;
+            else if (_slotId.Slot == ItemSlotId.Rations)
+                _sprite.Id = Base.CoreGfx.UiFood;
+        }
+        else if (slot.Item.Type == AssetType.Item)
+        {
+            var item = Resolve<IAssetManager>().LoadItem(slot.Item);
+            int frames = item.IconAnim == 0 ? 1 : item.IconAnim;
             while (_frameNumber >= frames)
                 _frameNumber -= frames;
 
-            int itemSpriteId = contents.IconSubId + _frameNumber;
-            _sprite.Id = contents.Icon;
+            int itemSpriteId = item.IconSubId + _frameNumber;
+            _sprite.Id = item.Icon;
             _sprite.SubId = itemSpriteId;
             _overlay.IsActive = (slot.Flags & ItemSlotFlags.Broken) != 0;
         }
-        else if (!_slotId.Slot.IsSpecial()) // Special slots (i.e. rations + gold) keep their sprite when empty.
+        else // Special slots (i.e. rations + gold) keep their sprite when empty.
         {
             _sprite.Id = AssetId.None; // Nothing
             _sprite.SubId = 0;

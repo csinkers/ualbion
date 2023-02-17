@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api.Eventing;
 using Xunit;
@@ -19,6 +20,20 @@ public class InventoryTests : Component
     readonly Inventory _rainer;
     readonly InventoryManager _im;
     readonly InventoryId _tomInv;
+
+    ItemData GetItem(ItemId id)
+    {
+        switch (id)
+        {
+            case { } when id == Base.Item.Sword: return _sword;
+            case { } when id == Base.Item.Torch: return _torch;
+            default:
+                throw new ArgumentOutOfRangeException(
+                    nameof(id),
+                    id,
+                    "Only the sword and torch items are supported in this test");
+        }
+    }
 
     public InventoryTests()
     {
@@ -47,7 +62,7 @@ public class InventoryTests : Component
         };
 
         var exchange = new EventExchange(new LogExchange());
-        _im = new InventoryManager(x => inventories[x]);
+        _im = new InventoryManager(x => inventories[x], GetItem);
         var wm = new WindowManager { Resolution = (1920, 1080) };
         var cm = new MockCursorManager { Position = new Vector2(1, 1) };
 
@@ -62,118 +77,118 @@ public class InventoryTests : Component
     [Fact]
     public void PickupItemTest()
     {
-        _tom.Slots[0].Set(_torch, 1);
-        Assert.True(_im.ItemInHand.ItemId.IsNone);
+        _tom.Slots[0].Set(_torch.Id, 1);
+        Assert.True(_im.ItemInHand.Item.IsNone);
         Raise(new InventorySwapEvent(_tomInv, 0));
-        Assert.False(_im.ItemInHand.ItemId.IsNone);
-        Assert.Equal(Base.Item.Torch, _im.ItemInHand.ItemId);
+        Assert.False(_im.ItemInHand.Item.IsNone);
+        Assert.Equal(Base.Item.Torch, _im.ItemInHand.Item);
         Assert.Equal(1, _im.ItemInHand.Amount);
     }
 
     [Fact]
     public void PutDownItemTest()
     {
-        _tom.Slots[0].Set(_torch, 1);
+        _tom.Slots[0].Set(_torch.Id, 1);
 
-        Assert.True(_im.ItemInHand.ItemId.IsNone);
+        Assert.True(_im.ItemInHand.Item.IsNone);
         Raise(new InventorySwapEvent(_tomInv, 0));
-        Assert.False(_im.ItemInHand.ItemId.IsNone);
+        Assert.False(_im.ItemInHand.Item.IsNone);
         Raise(new InventorySwapEvent(_tomInv, (ItemSlotId)1));
-        Assert.True(_im.ItemInHand.ItemId.IsNone);
-        Assert.Equal(Base.Item.Torch, _tom.Slots[1].ItemId);
+        Assert.True(_im.ItemInHand.Item.IsNone);
+        Assert.Equal(Base.Item.Torch, _tom.Slots[1].Item);
         Assert.Equal(1, _tom.Slots[1].Amount);
     }
 
     [Fact]
     public void CoalesceTest()
     {
-        _tom.Slots[0].Set(_torch, 1);
-        _tom.Slots[1].Set(_torch, 1);
+        _tom.Slots[0].Set(_torch.Id, 1);
+        _tom.Slots[1].Set(_torch.Id, 1);
 
-        Assert.True(_im.ItemInHand.ItemId.IsNone);
+        Assert.True(_im.ItemInHand.Item.IsNone);
         Raise(new InventorySwapEvent(_tomInv, 0));
-        Assert.False(_im.ItemInHand.ItemId.IsNone);
+        Assert.False(_im.ItemInHand.Item.IsNone);
         Raise(new InventorySwapEvent(_tomInv, (ItemSlotId)1));
-        Assert.True(_im.ItemInHand.ItemId.IsNone);
-        Assert.Equal(Base.Item.Torch, _tom.Slots[1].ItemId);
+        Assert.True(_im.ItemInHand.Item.IsNone);
+        Assert.Equal(Base.Item.Torch, _tom.Slots[1].Item);
         Assert.Equal(2, _tom.Slots[1].Amount);
     }
 
     [Fact]
     public void SwapTest()
     {
-        _tom.Slots[0].Set(_torch, 1);
-        _tom.Slots[1].Set(_sword, 1);
+        _tom.Slots[0].Set(_torch.Id, 1);
+        _tom.Slots[1].Set(_sword.Id, 1);
 
-        Assert.True(_im.ItemInHand.ItemId.IsNone);
+        Assert.True(_im.ItemInHand.Item.IsNone);
         Raise(new InventorySwapEvent(_tomInv, 0));
-        Assert.False(_im.ItemInHand.ItemId.IsNone);
+        Assert.False(_im.ItemInHand.Item.IsNone);
         Raise(new InventorySwapEvent(_tomInv, (ItemSlotId)1));
-        Assert.False(_im.ItemInHand.ItemId.IsNone);
-        Assert.Equal(Base.Item.Sword, _im.ItemInHand.ItemId);
+        Assert.False(_im.ItemInHand.Item.IsNone);
+        Assert.Equal(Base.Item.Sword, _im.ItemInHand.Item);
         Assert.Equal(1, _im.ItemInHand.Amount);
-        Assert.Equal(Base.Item.Torch, _tom.Slots[1].ItemId);
+        Assert.Equal(Base.Item.Torch, _tom.Slots[1].Item);
         Assert.Equal(1, _tom.Slots[1].Amount);
     }
 
     [Fact]
     public void PickupAllTest()
     {
-        _tom.Slots[0].Set(_torch, 5);
+        _tom.Slots[0].Set(_torch.Id, 5);
 
-        Assert.True(_im.ItemInHand.ItemId.IsNone);
+        Assert.True(_im.ItemInHand.Item.IsNone);
         Raise(new InventoryPickupEvent(null, _tomInv, 0));
-        Assert.Equal(Base.Item.Torch, _im.ItemInHand.ItemId);
+        Assert.Equal(Base.Item.Torch, _im.ItemInHand.Item);
         Assert.Equal(5, _im.ItemInHand.Amount);
-        Assert.True(_tom.Slots[0].ItemId.IsNone);
+        Assert.True(_tom.Slots[0].Item.IsNone);
     }
 
     [Fact]
     public void GiveItemTest()
     {
-        _tom.Slots[0].Set(_torch, 1);
-        _tom.Slots[1].Set(_torch, 1);
-        _tom.Slots[2].Set(_sword, 1);
-        _tom.Slots[3].Set(_sword, 1);
+        _tom.Slots[0].Set(_torch.Id, 1);
+        _tom.Slots[1].Set(_torch.Id, 1);
+        _tom.Slots[2].Set(_sword.Id, 1);
+        _tom.Slots[3].Set(_sword.Id, 1);
 
         Raise(new InventorySwapEvent(_tomInv, 0));
-        Assert.Equal(Base.Item.Torch, _im.ItemInHand.ItemId);
+        Assert.Equal(Base.Item.Torch, _im.ItemInHand.Item);
         Assert.Equal(1, _im.ItemInHand.Amount);
 
         Raise(new InventoryGiveItemEvent(Base.PartyMember.Rainer));
-        Assert.True(_im.ItemInHand.ItemId.IsNone);
-        Assert.Equal(Base.Item.Torch, _rainer.Slots[0].ItemId);
+        Assert.True(_im.ItemInHand.Item.IsNone);
+        Assert.Equal(Base.Item.Torch, _rainer.Slots[0].Item);
         Assert.Equal(1, _rainer.Slots[0].Amount);
-        Assert.True(_tom.Slots[0].ItemId.IsNone);
+        Assert.True(_tom.Slots[0].Item.IsNone);
         Assert.Equal(0, _tom.Slots[0].Amount);
 
         Raise(new InventorySwapEvent(_tomInv, (ItemSlotId)1));
-        Assert.Equal(Base.Item.Torch, _im.ItemInHand.ItemId);
+        Assert.Equal(Base.Item.Torch, _im.ItemInHand.Item);
         Assert.Equal(1, _im.ItemInHand.Amount);
 
         Raise(new InventoryGiveItemEvent(Base.PartyMember.Rainer));
-        Assert.True(_im.ItemInHand.ItemId.IsNone);
-        Assert.Equal(Base.Item.Torch, _rainer.Slots[0].ItemId);
+        Assert.True(_im.ItemInHand.Item.IsNone);
+        Assert.Equal(Base.Item.Torch, _rainer.Slots[0].Item);
         Assert.Equal(2, _rainer.Slots[0].Amount);
 
         Raise(new InventorySwapEvent(_tomInv, (ItemSlotId)2));
-        Assert.Equal(Base.Item.Sword, _im.ItemInHand.ItemId);
+        Assert.Equal(Base.Item.Sword, _im.ItemInHand.Item);
         Assert.Equal(1, _im.ItemInHand.Amount);
 
         Raise(new InventoryGiveItemEvent(Base.PartyMember.Rainer));
-        Assert.True(_im.ItemInHand.ItemId.IsNone);
-        Assert.Equal(Base.Item.Sword, _rainer.Slots[1].ItemId);
+        Assert.True(_im.ItemInHand.Item.IsNone);
+        Assert.Equal(Base.Item.Sword, _rainer.Slots[1].Item);
         Assert.Equal(1, _rainer.Slots[1].Amount);
 
         Raise(new InventorySwapEvent(_tomInv, (ItemSlotId)3));
-        Assert.Equal(Base.Item.Sword, _im.ItemInHand.ItemId);
+        Assert.Equal(Base.Item.Sword, _im.ItemInHand.Item);
         Assert.Equal(1, _im.ItemInHand.Amount);
 
         Raise(new InventoryGiveItemEvent(Base.PartyMember.Rainer));
-        Assert.True(_im.ItemInHand.ItemId.IsNone);
-        Assert.Equal(Base.Item.Sword, _rainer.Slots[1].ItemId);
+        Assert.True(_im.ItemInHand.Item.IsNone);
+        Assert.Equal(Base.Item.Sword, _rainer.Slots[1].Item);
         Assert.Equal(1, _rainer.Slots[1].Amount);
-        Assert.Equal(Base.Item.Sword, _rainer.Slots[2].ItemId);
+        Assert.Equal(Base.Item.Sword, _rainer.Slots[2].Item);
         Assert.Equal(1, _rainer.Slots[2].Amount);
     }
 

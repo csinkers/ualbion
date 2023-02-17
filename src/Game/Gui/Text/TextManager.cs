@@ -126,7 +126,7 @@ public class TextManager : ServiceComponent<ITextManager>, ITextManager
         if (blocks == null) throw new ArgumentNullException(nameof(blocks));
         foreach (var block in blocks)
         {
-            if (block.ArrangementFlags.HasFlag(TextArrangementFlags.NoWrap))
+            if ((block.ArrangementFlags & TextArrangementFlags.NoWrap) != 0)
             {
                 yield return block;
                 continue;

@@ -97,7 +97,7 @@ public class ItemSlot : IReadOnlyItemSlot
             sb.Append(Charges);
         }
 
-        if (Charges != 0)
+        if (Enchantment != 0)
         {
             sb.Append(" E");
             sb.Append(Enchantment);
@@ -106,9 +106,9 @@ public class ItemSlot : IReadOnlyItemSlot
         return sb.ToString();
     }
 
-    public static ItemSlot Parse(string s)
+    public static ItemSlot Parse(string s, InventorySlotId id)
     {
-        var slot = new ItemSlot(new InventorySlotId());
+        var slot = new ItemSlot(id);
         if (string.IsNullOrWhiteSpace(s) || "Empty".Equals(s, StringComparison.InvariantCultureIgnoreCase))
             return slot;
 

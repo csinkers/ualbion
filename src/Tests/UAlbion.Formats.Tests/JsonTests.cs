@@ -75,7 +75,7 @@ public class JsonTests
         {
             Assert.Equal(expected[i], tests[i].ToString());
 
-            var parsed = ItemSlot.Parse(expected[i]);
+            var parsed = ItemSlot.Parse(expected[i], new InventorySlotId());
             var reprint = parsed.ToString();
             Assert.Equal(reprint, tests[i].ToString());
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using UAlbion.Api;
 using UAlbion.Config;
 
 namespace UAlbion.Formats.Assets;
@@ -56,6 +57,7 @@ public class InventoryConverter : JsonConverter<Inventory>
             {
                 case ItemSlotId.Gold when reader.TokenType != JsonTokenType.Number:
                     throw new JsonException($"Unexpected token when reading gold slot: {reader.TokenType}, expected Number");
+
                 case ItemSlotId.Gold:
                 {
                     var amount = (int)(reader.GetDecimal() * 10m);
@@ -84,7 +86,7 @@ public class InventoryConverter : JsonConverter<Inventory>
                     if (reader.TokenType != JsonTokenType.String)
                         throw new JsonException($"Unexpected token when reading Inventory slots: {reader.TokenType}, expected String");
 
-                    slots.Add(slotId, ItemSlot.Parse(reader.GetString()));
+                    slots.Add(slotId, ItemSlot.Parse(reader.GetString(), new InventorySlotId(inventoryId, slotId)));
                     break;
                 }
             }
@@ -112,7 +114,11 @@ public class InventoryConverter : JsonConverter<Inventory>
                 {
                     var slotId = (ItemSlotId)i;
                     if (slots.TryGetValue(slotId, out var slot))
+                    {
+                        ApiUtil.Assert(invId == slot.Id.Id, $"Slot's inventory id {slot.Id.Id} did not match expected value ({invId})");
+                        ApiUtil.Assert(slotId == slot.Id.Slot, $"Slot id {slot.Id.Slot} did not match expected value ({slotId})");
                         result.Slots[i] = slot;
+                    }
                 }
                 return result;
             }

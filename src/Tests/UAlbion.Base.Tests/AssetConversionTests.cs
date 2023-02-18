@@ -46,7 +46,11 @@ public class AssetConversionTests
         return exchange.Resolve<IModApplier>();
     }
 
-    void Test<T>(AssetId id, AssetId[] prerequisites, Asset.SerdesFunc<T> serdes, Func<T, T> canonicalize = null) where T : class
+    void Test<T>(
+        AssetId id,
+        AssetId[] prerequisites,
+        Asset.SerdesFunc<T> serdes,
+        Func<T, T> canonicalize = null) where T : class
     {
         prerequisites ??= Array.Empty<AssetId>();
         var allIds = prerequisites.Append(id);

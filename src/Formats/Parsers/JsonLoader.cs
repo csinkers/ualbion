@@ -17,7 +17,8 @@ public class JsonLoader<T> : IAssetLoader<T> where T : class
             if (existing == null)
                 throw new ArgumentNullException(nameof(existing));
 
-            var json = Encoding.UTF8.GetBytes(context.Json.Serialize(existing));
+            var jsonText = context.Json.Serialize(existing);
+            var json = Encoding.UTF8.GetBytes(jsonText);
             s.Bytes(null, json, json.Length);
             return existing;
         }

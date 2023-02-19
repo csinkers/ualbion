@@ -5,6 +5,8 @@ using Veldrid;
 
 #pragma warning disable CA1051 // Do not declare visible instance fields
 #pragma warning disable CA1815 // Override equals and operator equals on value types
+#pragma warning disable CS0169
+#pragma warning disable IDE0051
 namespace UAlbion.Core.Veldrid;
 
 public sealed partial class GlobalSet : ResourceSetHolder
@@ -41,6 +43,8 @@ public partial struct CameraUniform : IUniformFormat
     [Uniform("uResolution")] public Vector2 Resolution;
 }
 
+#pragma warning restore IDE0051
+#pragma warning restore CS0169
 #pragma warning restore CA1051 // Do not declare visible instance fields
 #pragma warning restore CA1815 // Override equals and operator equals on value types
 

@@ -7,7 +7,6 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Ids;
-using UAlbion.Game.Assets;
 
 namespace UAlbion.Game.Entities;
 

@@ -16,7 +16,7 @@ echo.
 if exist veldrid goto l3
 echo Cloning veldrid
 git clone https://github.com/csinkers/veldrid
-git checkout -b docking origin/docking
+git checkout -b master origin/master
 echo.
 
 :l3
@@ -46,7 +46,7 @@ echo.
 
 echo Updating veldrid
 pushd veldrid
-git checkout docking
+git checkout master
 git stash && git pull --rebase && git stash pop
 popd
 echo.

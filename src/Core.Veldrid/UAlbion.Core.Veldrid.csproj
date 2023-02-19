@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net6.0</TargetFramework>
@@ -9,10 +8,6 @@
     <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
     <IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">true</IsOSX>
     <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
-    <!-- -->
-    <EmitCompilerGeneratedFiles>True</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
-    <!-- -->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsWindows)'=='true'">
@@ -41,16 +36,16 @@
     <ProjectReference Include="..\Formats\UAlbion.Formats.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="!Exists('..\..\deps\veldrid\')">
-    <PackageReference Include="Veldrid" Version="4.9.0-gf94814eecc" />
-    <PackageReference Include="Veldrid.ImageSharp" Version="4.9.0-gac88c7210e" />
-    <PackageReference Include="Veldrid.ImGui" Version="5.72.0-gac88c7210e" />
-    <PackageReference Include="Veldrid.RenderDoc" Version="1.0.1-gac88c7210e" />
-    <PackageReference Include="Veldrid.SDL2" Version="4.9.0-gac88c7210e" />
-    <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0-gac88c7210e" />
-    <PackageReference Include="Veldrid.Utilities" Version="4.9.0-gf94814eecc" />
+  <ItemGroup Condition="!Exists('..\..\deps\veldrid\src\')">
+    <PackageReference Include="Veldrid" Version="4.9.0" />
+    <PackageReference Include="Veldrid.ImageSharp" Version="4.9.0" />
+    <PackageReference Include="Veldrid.ImGui" Version="5.89.2-ga121087cad" />
+    <PackageReference Include="Veldrid.RenderDoc" Version="1.0.1-ga121087cad" />
+    <PackageReference Include="Veldrid.SDL2" Version="4.9.0" />
+    <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0" />
+    <PackageReference Include="Veldrid.Utilities" Version="4.9.0" />
   </ItemGroup>
-  <ItemGroup Condition="Exists('..\..\deps\veldrid\')">
+  <ItemGroup Condition="Exists('..\..\deps\veldrid\src\')">
     <ProjectReference Include="..\..\deps\veldrid\src\Veldrid\Veldrid.csproj" />
     <ProjectReference Include="..\..\deps\veldrid\src\Veldrid.ImageSharp\Veldrid.ImageSharp.csproj" />
     <ProjectReference Include="..\..\deps\veldrid\src\Veldrid.ImGui\Veldrid.ImGui.csproj" />
@@ -61,10 +56,10 @@
     <ProjectReference Include="..\..\deps\veldrid\src\Veldrid.Utilities\Veldrid.Utilities.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="!Exists('..\..\deps\veldrid-spirv\')">
-    <PackageReference Include="Veldrid.SPIRV" Version="1.0.14" />
+  <ItemGroup Condition="!Exists('..\..\deps\veldrid-spirv\src\')">
+    <PackageReference Include="Veldrid.SPIRV" Version="1.0.15" />
   </ItemGroup>
-  <ItemGroup Condition="Exists('..\..\deps\veldrid-spirv\')">
+  <ItemGroup Condition="Exists('..\..\deps\veldrid-spirv\src\')">
     <ProjectReference Include="..\..\deps\veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj" />
   </ItemGroup>
 
@@ -76,6 +71,10 @@
   </ItemGroup>
 
   <!-- -->
+  <PropertyGroup>
+    <EmitCompilerGeneratedFiles>True</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
   <Target Name="RemoveGenerated" BeforeTargets="CoreCompile">
     <ItemGroup>
       <Compile Remove="$(CompilerGeneratedFilesOutputPath)/*/**/*.cs" />

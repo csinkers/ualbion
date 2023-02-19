@@ -6,7 +6,6 @@ using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
-using UAlbion.Game.Assets;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Text;
 

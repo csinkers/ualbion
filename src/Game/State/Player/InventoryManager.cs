@@ -211,7 +211,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         return ItemSlotId.None;
     }
 
-    bool CanItemBeTaken(ItemSlot slot)
+    static bool CanItemBeTaken(ItemSlot slot)
     {
         // TODO: Goddess' amulet etc
         switch (slot.Item.Type)

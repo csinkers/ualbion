@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -26,7 +27,7 @@ static class ShaderEnumGenerator
                 sb.Append("#define ");
                 sb.Append(TweakEnumMemberName(value.field.Name, kvp.Value));
                 sb.Append(" 0x");
-                sb.AppendFormat("{0:X}", value.value);
+                sb.AppendFormat(CultureInfo.InvariantCulture, "{0:X}", value.value);
                 sb.AppendLine(affix);
             }
 

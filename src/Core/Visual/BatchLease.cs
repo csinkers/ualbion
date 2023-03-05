@@ -71,7 +71,7 @@ public class BatchLease<TKey, TInstance> : IComparable<BatchLease<TKey, TInstanc
     /// <typeparam name="T">The type of the context object</typeparam>
     /// <param name="instances">A span pointing at the lease's instance data</param>
     /// <param name="context">The context for the mutator function</param>
-    public delegate void LeaseAccessDelegate<in T>(Span<TInstance> instances, T context);
+    public delegate void LeaseAccessor<in T>(Span<TInstance> instances, T context);
 
     /// <summary>
     /// Invokes the mutator function with a span of the lease's instance
@@ -81,7 +81,7 @@ public class BatchLease<TKey, TInstance> : IComparable<BatchLease<TKey, TInstanc
     /// <typeparam name="T">The type of the context object</typeparam>
     /// <param name="mutatorFunc">The function used to modify the instance data</param>
     /// <param name="context">The context for the mutator function</param>
-    public void Access<T>(LeaseAccessDelegate<T> mutatorFunc, T context)
+    public void Access<T>(LeaseAccessor<T> mutatorFunc, T context)
     {
         if (mutatorFunc == null) throw new ArgumentNullException(nameof(mutatorFunc));
         bool lockWasTaken = false;

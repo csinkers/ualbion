@@ -11,7 +11,7 @@ namespace UAlbion.Scripting;
 
 public static class Decompiler
 {
-    public static readonly List<ControlFlowRuleDelegate> DefaultRules = new()
+    public static readonly List<ControlFlowRuleMethod> DefaultRules = new()
     {
         ConnectDisjointNodeToExit.Decompile,
         ReduceSimpleWhile.Decompile,
@@ -31,7 +31,7 @@ public static class Decompiler
         IEnumerable<ushort> chains,
         IEnumerable<ushort> additionalEntryPoints,
         List<(string, IGraph)> steps = null,
-        IList<ControlFlowRuleDelegate> rules = null) where T : IEventNode
+        IList<ControlFlowRuleMethod> rules = null) where T : IEventNode
     {
         rules ??= DefaultRules;
         if (nodes == null) throw new ArgumentNullException(nameof(nodes));
@@ -70,9 +70,11 @@ public static class Decompiler
         return results;
     }
 
-    public static ICfgNode SimplifyGraph(ControlFlowGraph graph, RecordFunc record, IList<ControlFlowRuleDelegate> rules = null)
+    public static ICfgNode SimplifyGraph(ControlFlowGraph graph, RecordFunc record, IList<ControlFlowRuleMethod> rules = null)
     {
         if (graph == null) throw new ArgumentNullException(nameof(graph));
+        if (record == null) throw new ArgumentNullException(nameof(record));
+
         record("Begin decompilation", graph);
         // Func<string> vis = () => graph.Visualize(); // For VS Code debug visualisation
         ControlFlowGraph previous = null;
@@ -93,8 +95,9 @@ public static class Decompiler
         return graph.Entry;
     }
 
-    public static ControlFlowGraph SimplifyOnce(ControlFlowGraph previous, RecordFunc record, IList<ControlFlowRuleDelegate> rules = null)
+    public static ControlFlowGraph SimplifyOnce(ControlFlowGraph previous, RecordFunc record, IList<ControlFlowRuleMethod> rules = null)
     {
+        if (record == null) throw new ArgumentNullException(nameof(record));
         rules ??= DefaultRules;
 
         var graph = previous;

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -196,7 +195,7 @@ public class AlbionPalette : IPalette
             {
                 Id = info.AssetId.IsNone ? (uint)info.Index : info.AssetId.ToUInt32(),
                 Name = info.AssetId.IsNone 
-                    ? info.Index.ToString(CultureInfo.InvariantCulture) 
+                    ? info.Index.ToString() 
                     : info.AssetId.ToString()
             };
         }

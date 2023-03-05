@@ -85,7 +85,7 @@ static class PipelineGenerator
             sb.AppendLine();
             sb.Append("                typeof(");
             sb.Append(set.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
-            sb.Append(")");
+            sb.Append(')');
             first = false;
         }
         sb.AppendLine();

@@ -36,7 +36,7 @@ public static class AssetSystem
         AssetMapping mapping,
         IFileSystem disk,
         IJsonUtil jsonUtil,
-        List<string> mods)
+        IReadOnlyList<string> mods)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
         if (disk == null) throw new ArgumentNullException(nameof(disk));

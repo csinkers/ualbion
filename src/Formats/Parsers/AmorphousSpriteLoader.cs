@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text.RegularExpressions;
 using SerdesNet;
 using UAlbion.Api.Visual;
@@ -24,13 +23,13 @@ public class AmorphousSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
         var matches = SizesRegex.Matches(s);
         foreach (Match match in matches)
         {
-            var width = int.Parse(match.Groups["width"].Value, CultureInfo.InvariantCulture);
-            var height = int.Parse(match.Groups["height"].Value, CultureInfo.InvariantCulture);
+            var width = int.Parse(match.Groups["width"].Value);
+            var height = int.Parse(match.Groups["height"].Value);
             var countString = match.Groups["count"].Value;
 
             if (!string.IsNullOrEmpty(countString))
             {
-                var count = int.Parse(countString, CultureInfo.InvariantCulture);
+                var count = int.Parse(countString);
                 for(int i = 0; i < count; i++)
                     yield return (width, height);
             }

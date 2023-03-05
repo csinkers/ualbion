@@ -24,6 +24,12 @@ static class Program
 {
     static void Main(string[] args)
     {
+        CultureInfo.CurrentCulture
+            = CultureInfo.CurrentUICulture
+            = CultureInfo.DefaultThreadCurrentCulture
+            = CultureInfo.DefaultThreadCurrentUICulture
+            = CultureInfo.InvariantCulture;
+
         PerfTracker.IsTracing = true;
         PerfTracker.StartupEvent("Entered main");
         AssetSystem.LoadEvents();
@@ -32,12 +38,6 @@ static class Program
         var commandLine = new CommandLineOptions(args);
         if (commandLine.Mode == ExecutionMode.Exit)
             return;
-
-        CultureInfo.CurrentCulture
-            = CultureInfo.CurrentUICulture
-            = CultureInfo.DefaultThreadCurrentCulture
-            = CultureInfo.DefaultThreadCurrentUICulture
-            = CultureInfo.InvariantCulture;
 
         PerfTracker.StartupEvent($"Running as {commandLine.Mode}");
         var disk = new FileSystem(Directory.GetCurrentDirectory());

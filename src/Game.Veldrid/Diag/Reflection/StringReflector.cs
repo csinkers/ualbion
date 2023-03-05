@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Text;
 using ImGuiNET;
 using UAlbion.Formats;
@@ -73,7 +72,7 @@ class BoolReflector : IReflector
                 state.Meta.Setter(state, value);
         }
         else
-            ImGui.TextWrapped(value.ToString(CultureInfo.InvariantCulture));
+            ImGui.TextWrapped(value.ToString());
 
         ImGui.Unindent();
     }

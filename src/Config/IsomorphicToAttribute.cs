@@ -9,7 +9,7 @@ namespace UAlbion.Config;
 /// the AssetType / most significant byte. Helper methods are also created by the code generator.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field)]
-public class IsomorphicToAttribute : Attribute
+public sealed class IsomorphicToAttribute : Attribute
 {
     public AssetType Type { get; }
     public IsomorphicToAttribute(AssetType type) => Type = type;

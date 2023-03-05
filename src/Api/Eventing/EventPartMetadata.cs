@@ -31,7 +31,7 @@ public class EventPartMetadata
         Name = attribute.Name;
         HelpText = attribute.HelpText;
         IsOptional = attribute.IsOptional;
-        Default = attribute.Default;
+        Default = attribute.DefaultValue;
         PropertyType = property.PropertyType;
         Getter = BuildGetter(property, declaringType);
 

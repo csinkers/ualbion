@@ -2,6 +2,7 @@
 
 namespace UAlbion.Formats.Assets.Maps;
 
+#pragma warning disable CA1069 // Enums values should not be duplicated
 [Flags]
 public enum MapNpcFlags : ushort
 {
@@ -37,3 +38,4 @@ public enum MapNpcFlags : ushort
     Unused14 = 0x4000,
     Unused15 = 0x8000,
 }
+#pragma warning restore CA1069 // Enums values should not be duplicated

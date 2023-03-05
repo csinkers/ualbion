@@ -21,7 +21,7 @@ public static class ReduceSeseRegions
             {
                  var d = graph.ToVis(); 
                  foreach(var n in d.Nodes)
-                    if (region.Contains(int.Parse(n.Id, CultureInfo.InvariantCulture)))
+                    if (region.Contains(int.Parse(n.Id)))
                         n.Color = "#4040b0";
                  return d.ToString();
             }; */

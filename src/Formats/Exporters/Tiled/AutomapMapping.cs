@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Formats.Assets;
@@ -51,8 +50,8 @@ public static class AutomapMapping
             Properties = new List<TiledProperty>
             {
                 new(Prop.Visual, tile.ToString()),
-                new(Prop.Unk2, marker.Unk2.ToString(CultureInfo.InvariantCulture)),
-                new(Prop.Unk3, marker.MarkerId.ToString(CultureInfo.InvariantCulture))
+                new(Prop.Unk2, marker.Unk2.ToString()),
+                new(Prop.Unk3, marker.MarkerId.ToString())
             }
         };
 

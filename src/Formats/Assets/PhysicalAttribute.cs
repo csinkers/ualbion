@@ -1,6 +1,7 @@
-﻿namespace UAlbion.Formats.Assets;
+﻿#pragma warning disable CA1711
+namespace UAlbion.Formats.Assets;
 
-public enum Attribute : byte
+public enum PhysicalAttribute : byte
 {
     Strength = 0,
     Intelligence = 1,

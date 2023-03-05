@@ -27,16 +27,16 @@ public class ItemNameCollector : Component, IAssetLoader<MultiLanguageStringDict
         var english = ids.ToDictionary(x => x.Id.Id, x => assets.LoadString(x, Base.Language.English));
         var french = ids.ToDictionary(x => x.Id.Id, x => assets.LoadString(x, Base.Language.French));
 
-        static void Add(ListStringCollection collection, int i, string value)
+        static void Add(ListStringSet collection, int i, string value)
         {
             while (collection.Count <= i)
                 collection.Add(null);
             collection[i] = value;
         }
 
-        static ListStringCollection Build(IDictionary<int, string> dict)
+        static ListStringSet Build(IDictionary<int, string> dict)
         {
-            var list = new ListStringCollection();
+            var list = new ListStringSet();
             foreach (var kvp in dict)
                 Add(list, kvp.Key, kvp.Value);
             return list;

@@ -43,28 +43,28 @@ public sealed class StoreIncrementedConverter :
         return Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing), 0));
     }
 
-    public uint   FromNumeric(uint   x) => x - 1;
-    public int    FromNumeric(int    x) => x - 1;
-    public ushort FromNumeric(ushort x) => (ushort)(x - 1);
-    public short  FromNumeric(short  x) => (short)(x - 1);
-    public byte   FromNumeric(byte   x) => (byte)(x - 1);
+    public uint   FromNumeric(uint   persistent) => persistent - 1;
+    public int    FromNumeric(int    persistent) => persistent - 1;
+    public ushort FromNumeric(ushort persistent) => (ushort)(persistent - 1);
+    public short  FromNumeric(short  persistent) => (short)(persistent - 1);
+    public byte   FromNumeric(byte   persistent) => (byte)(persistent - 1);
 
-    public uint   ToNumeric(uint x) => x + 1;
-    public int    ToNumeric(int x) => x + 1;
-    public ushort ToNumeric(ushort x) => (ushort)(x + 1);
-    public short  ToNumeric(short x) => (short)(x + 1);
-    public byte   ToNumeric(byte x) => (byte)(x + 1);
+    public uint   ToNumeric(uint memory) => memory + 1;
+    public int    ToNumeric(int memory) => memory + 1;
+    public ushort ToNumeric(ushort memory) => (ushort)(memory + 1);
+    public short  ToNumeric(short memory) => (short)(memory + 1);
+    public byte   ToNumeric(byte memory) => (byte)(memory + 1);
 
     public string ToSymbolic(uint   memory) => memory.ToString(CultureInfo.InvariantCulture);
     public string ToSymbolic(int    memory) => memory.ToString(CultureInfo.InvariantCulture);
     public string ToSymbolic(ushort memory) => memory.ToString(CultureInfo.InvariantCulture);
     public string ToSymbolic(short  memory) => memory.ToString(CultureInfo.InvariantCulture);
     public string ToSymbolic(byte   memory) => memory.ToString(CultureInfo.InvariantCulture);
-    uint   IConverter<uint,     uint>.FromSymbolic(string symbolic) =>   uint.Parse(symbolic, CultureInfo.InvariantCulture);
-    int    IConverter<int,       int>.FromSymbolic(string symbolic) =>    int.Parse(symbolic, CultureInfo.InvariantCulture);
-    ushort IConverter<ushort, ushort>.FromSymbolic(string symbolic) => ushort.Parse(symbolic, CultureInfo.InvariantCulture);
-    short  IConverter<short,   short>.FromSymbolic(string symbolic) =>  short.Parse(symbolic, CultureInfo.InvariantCulture);
-    byte   IConverter<byte,     byte>.FromSymbolic(string symbolic) =>   byte.Parse(symbolic, CultureInfo.InvariantCulture);
+    uint   IConverter<uint,     uint>.FromSymbolic(string symbolic) =>   uint.Parse(symbolic);
+    int    IConverter<int,       int>.FromSymbolic(string symbolic) =>    int.Parse(symbolic);
+    ushort IConverter<ushort, ushort>.FromSymbolic(string symbolic) => ushort.Parse(symbolic);
+    short  IConverter<short,   short>.FromSymbolic(string symbolic) =>  short.Parse(symbolic);
+    byte   IConverter<byte,     byte>.FromSymbolic(string symbolic) =>   byte.Parse(symbolic);
 }
 
 public sealed class StoreIncrementedConverter<T> :
@@ -98,6 +98,6 @@ public sealed class StoreIncrementedConverter<T> :
     ulong  IConverter< ulong, T>.ToNumeric(T x) => (ulong)(object)x + 1;
     long   IConverter<  long, T>.ToNumeric(T x) => ( long)(object)x + 1;
 
-    public string ToSymbolic(T x) => Enum.GetName(typeof(T), x);
-    public T FromSymbolic(string x) => (T)Enum.Parse(typeof(T), x);
+    public string ToSymbolic(T memory) => Enum.GetName(typeof(T), memory);
+    public T FromSymbolic(string symbolic) => (T)Enum.Parse(typeof(T), symbolic);
 }

@@ -12,7 +12,6 @@ using UAlbion.Game.Input;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.Veldrid.Assets;
 using UAlbion.Game.Veldrid.Input;
-using Veldrid;
 using Rectangle = UAlbion.Core.Rectangle;
 
 namespace UAlbion;
@@ -86,9 +85,5 @@ sealed class IsometricTest : Component, IDisposable // The engine construction c
     {
         _mainFramebuffer?.Dispose();
         _copyPass?.Dispose();
-    }
-
-    public void Render(GraphicsDevice graphicsDevice, CommandList frameCommands, FenceHolder fence)
-    {
     }
 }

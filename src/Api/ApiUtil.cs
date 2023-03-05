@@ -181,7 +181,7 @@ public static class ApiUtil
         if (string.IsNullOrEmpty(str)) throw new ArgumentNullException(nameof(str));
 
         for (int i = 0; i < list.Count; i++)
-            if (str.Equals(list[i], StringComparison.InvariantCultureIgnoreCase))
+            if (str.Equals(list[i], StringComparison.OrdinalIgnoreCase))
                 return i;
 
         return -1;

@@ -9,6 +9,7 @@ public class Container : Component, IContainer
     public Container(string name) { Name = name; }
     public Container(string name, params IComponent[] components)
     {
+        if (components == null) throw new ArgumentNullException(nameof(components));
         Name = name;
         foreach (var component in components)
             Add(component);

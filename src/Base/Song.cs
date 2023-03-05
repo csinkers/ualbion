@@ -68,6 +68,7 @@ L Song    Ambient
 
 */
 
+#pragma warning disable CA1027
 public enum Song : byte
 {
     SomewhatMenacing = 1,

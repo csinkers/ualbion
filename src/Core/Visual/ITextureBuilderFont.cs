@@ -1,3 +1,1 @@
-﻿using UAlbion.Api.Visual;
-
-namespace UAlbion.Core.Visual;
+﻿namespace UAlbion.Core.Visual;

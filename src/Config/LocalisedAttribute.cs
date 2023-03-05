@@ -8,4 +8,4 @@ namespace UAlbion.Config;
 /// game language is changed.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field)]
-public class LocalisedAttribute : Attribute { }
+public sealed class LocalisedAttribute : Attribute { }

@@ -51,8 +51,8 @@ public class ItemQuantityDialog : ModalDialog
         });
     }
 
-    static string FormatTenths(int x) => $"{x / 10}.{x % 10}"; // i18n
-    static string FormatUnits(int x) => x.ToString(CultureInfo.InvariantCulture); // i18n
+    static string FormatTenths(int x) => $"{x / 10}.{x % 10}"; // todo: i18n
+    static string FormatUnits(int x) => x.ToString(CultureInfo.InvariantCulture); // todo: i18n
 
     void Close()
     {

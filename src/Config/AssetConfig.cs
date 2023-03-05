@@ -133,7 +133,7 @@ public class AssetConfig : IAssetConfig
         foreach (var kvp in Files)
         {
             kvp.Value.Config = this;
-            int index = kvp.Key.IndexOf('#', StringComparison.InvariantCulture);
+            int index = kvp.Key.IndexOf('#', StringComparison.Ordinal);
             kvp.Value.Filename = index == -1 ? kvp.Key : kvp.Key[..index];
             if (index != -1)
                 kvp.Value.Sha256Hash = kvp.Key[(index + 1)..];
@@ -224,7 +224,7 @@ public class AssetConfig : IAssetConfig
         if (s == "*")
             return (0, int.MaxValue);
 
-        int index = s.IndexOf('-', StringComparison.InvariantCulture);
+        int index = s.IndexOf('-', StringComparison.Ordinal);
         if (index == -1)
         {
             if(!int.TryParse(s, out var asInt))
@@ -246,7 +246,7 @@ public class AssetConfig : IAssetConfig
 
     static (string, string) SplitId(string id, char separator)
     {
-        int index = id.IndexOf(separator, StringComparison.InvariantCulture);
+        int index = id.IndexOf(separator, StringComparison.Ordinal);
         if (index == -1)
             return (id, null);
 

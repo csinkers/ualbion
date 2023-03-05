@@ -137,7 +137,7 @@ public class Conversation : Component
                 }
 
                 var etId = _npc.EventSetId.ToEventText();
-                var strings = (IStringCollection)Resolve<IModApplier>().LoadAssetCached(etId);
+                var strings = (IStringSet)Resolve<IModApplier>().LoadAssetCached(etId);
                 var lang = Var(UserVars.Gameplay.Language);
 
                 ushort subId = 0;

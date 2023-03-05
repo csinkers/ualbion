@@ -9,7 +9,7 @@ namespace UAlbion.Formats;
 
 public interface IModApplier : IComponent
 {
-    void LoadMods(AssetMapping mapping, IPathResolver pathResolver, IList<string> mods);
+    void LoadMods(AssetMapping mapping, IPathResolver pathResolver, IReadOnlyList<string> mods);
     AssetInfo GetAssetInfo(AssetId key, string language);
     object LoadAsset(AssetId id);
     object LoadAsset(AssetId id, string language);
@@ -19,9 +19,9 @@ public interface IModApplier : IComponent
     IReadOnlyDictionary<string, LanguageConfig> Languages { get; }
     IEnumerable<string> ShaderPaths { get; }
 
-    delegate (object asset, AssetInfo info) AssetLoaderDelegate(AssetId id, string language);
+    delegate (object asset, AssetInfo info) AssetLoader(AssetId id, string language);
     void SaveAssets(
-        AssetLoaderDelegate loaderFunc,
+        AssetLoader loaderFunc,
         Action flushCacheFunc,
         ISet<AssetId> ids,
         ISet<AssetType> assetTypes,

@@ -1,0 +1,7 @@
+﻿[*.cs]
+
+# CA1008: Enums should have zero value
+# Enums in the Base project are for assigning names to assets
+# Declaring a "None = 0" member would define a new asset.
+dotnet_diagnostic.CA1008.severity = none
+

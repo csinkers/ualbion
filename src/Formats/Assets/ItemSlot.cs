@@ -88,7 +88,7 @@ public class ItemSlot : IReadOnlyItemSlot
         {
             sb.Append(" F(");
             sb.Append(Flags);
-            sb.Append(")");
+            sb.Append(')');
         }
 
         if (Charges != 0)
@@ -109,11 +109,11 @@ public class ItemSlot : IReadOnlyItemSlot
     public static ItemSlot Parse(string s, InventorySlotId id)
     {
         var slot = new ItemSlot(id);
-        if (string.IsNullOrWhiteSpace(s) || "Empty".Equals(s, StringComparison.InvariantCultureIgnoreCase))
+        if (string.IsNullOrWhiteSpace(s) || "Empty".Equals(s, StringComparison.OrdinalIgnoreCase))
             return slot;
 
         int index = 0;
-        if (s.StartsWith("(Inf) ", true, CultureInfo.InvariantCulture))
+        if (s.StartsWith("(Inf) ", StringComparison.OrdinalIgnoreCase))
         {
             slot.Amount = Unlimited;
             index = "(Inf) ".Length;
@@ -158,7 +158,7 @@ public class ItemSlot : IReadOnlyItemSlot
                     index = s.IndexOf(' ', i);
                     if (index == -1) index = s.Length;
                     var valueString = s[i..index];
-                    var value = byte.Parse(valueString, CultureInfo.InvariantCulture);
+                    var value = byte.Parse(valueString);
                     if (mode == 'C') slot.Charges = value;
                     else slot.Enchantment = value;
                     i = index;

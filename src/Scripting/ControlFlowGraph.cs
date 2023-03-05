@@ -689,7 +689,7 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
                 builder.Clear();
                 var visitor = new FormatScriptVisitor(builder);
                 Nodes[i].Accept(visitor);
-                sb.Append(builder.Build().Replace(Environment.NewLine, "\\l", StringComparison.InvariantCulture));
+                sb.Append(builder.Build().Replace(Environment.NewLine, "\\l", StringComparison.Ordinal));
             }
 
             sb.AppendLine("\\l\"];");

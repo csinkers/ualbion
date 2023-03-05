@@ -107,7 +107,7 @@ static class ShaderGenerator
                     sb.Append(resource.Name);
                     sb.Append("Buffer { ");
                     sb.Append(bufferType.Symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat));
-                    sb.Append(" ");
+                    sb.Append(' ');
                     sb.Append(resource.Name);
                     sb.AppendLine("[]; };");
                     break;

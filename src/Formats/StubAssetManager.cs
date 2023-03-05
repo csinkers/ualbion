@@ -31,8 +31,8 @@ public class StubAssetManager : IAssetManager
     public IMapData LoadMap(MapId id) => throw new NotImplementedException();
     public ISample LoadSample(SampleId id) => throw new NotImplementedException();
     public object LoadMapObject(MapObjectId id) => throw new NotImplementedException();
-    public Ink LoadInk(InkId inkId) => throw new NotImplementedException();
-    public FontDefinition LoadFontDefinition(FontId fontId) => throw new NotImplementedException();
+    public Ink LoadInk(InkId id) => throw new NotImplementedException();
+    public FontDefinition LoadFontDefinition(FontId id) => throw new NotImplementedException();
     public MetaFont LoadFont(FontId fontId, InkId inkId) => throw new NotImplementedException();
     public ITexture LoadTexture(IAssetId id) => throw new NotImplementedException();
     public ITexture LoadTexture(SpriteId id) => throw new NotImplementedException();

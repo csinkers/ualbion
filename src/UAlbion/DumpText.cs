@@ -78,7 +78,7 @@ class DumpText : Component, IAssetDumper
         {
             var events = assets.LoadScript(id);
             if (events == null) continue;
-            using var sw = Open(baseDir, string.Format(CultureInfo.InvariantCulture, ScriptPath, id));
+            using var sw = Open(baseDir, string.Format(ScriptPath, id));
             foreach (var e in events)
                 sw.WriteLine(e.ToString());
         }
@@ -152,7 +152,7 @@ class DumpText : Component, IAssetDumper
                 sw.WriteLine(string.Join(", ",
                     o.SubObjects
                         .Where(x => x != null)
-                        .Select(x => x.ObjectInfoNumber.ToString(CultureInfo.InvariantCulture))));
+                        .Select(x => x.ObjectInfoNumber.ToString())));
             }
 
             for (int j = 0; j < l.Objects.Count; j++)
@@ -406,7 +406,7 @@ class DumpText : Component, IAssetDumper
         var items = new List<ItemData>();
         foreach (ItemId itemId in Ids<Base.Item>(dumpIds))
         {
-            sw.Write(itemId.Id.ToString(CultureInfo.InvariantCulture).PadLeft(3)); 
+            sw.Write(itemId.Id.ToString().PadLeft(3)); 
             sw.Write(' ');
             sw.Write(itemId.ToString().PadRight(20));
 
@@ -446,7 +446,7 @@ class DumpText : Component, IAssetDumper
         if(chainId.HasValue)
         {
             builder.Append('C');
-            builder.Append(chainId.Value.ToString(CultureInfo.InvariantCulture).PadRight(3));
+            builder.Append(chainId.Value.ToString().PadRight(3));
         }
         else
             builder.Append("    ");

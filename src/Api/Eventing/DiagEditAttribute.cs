@@ -6,7 +6,7 @@ namespace UAlbion.Api.Eventing;
 /// Allow editing this value in the diag inspector
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-public class DiagEditAttribute : Attribute
+public sealed class DiagEditAttribute : Attribute
 {
     public DiagEditStyle Style { get; set; }
     public int MaxLength { get; set; } = int.MaxValue; // For strings

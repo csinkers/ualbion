@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using UAlbion.Api;
@@ -170,7 +169,7 @@ public class InventoryConverter : JsonConverter<Inventory>
 
             writer.WritePropertyName(
                 slot.Id.Slot < ItemSlotId.NormalSlotCount
-                    ? ((int) slot.Id.Slot).ToString(CultureInfo.InvariantCulture)
+                    ? ((int) slot.Id.Slot).ToString()
                     : slot.Id.Slot.ToString());
 
             if (slot.Id.Slot == ItemSlotId.Gold)

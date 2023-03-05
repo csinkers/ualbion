@@ -6,9 +6,9 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers;
 
-public class AlbionStringTableLoader : IAssetLoader<ListStringCollection>
+public class AlbionStringTableLoader : IAssetLoader<ListStringSet>
 {
-    public ListStringCollection Serdes(ListStringCollection existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public ListStringSet Serdes(ListStringSet existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (s.IsReading())
@@ -21,7 +21,7 @@ public class AlbionStringTableLoader : IAssetLoader<ListStringCollection>
             var strings = new string[stringCount];
             for (int i = 0; i < stringCount; i++)
                 strings[i] = s.FixedLengthString(null, null, stringLengths[i]);
-            return new ListStringCollection(strings);
+            return new ListStringSet(strings);
         }
         else
         {
@@ -42,5 +42,5 @@ public class AlbionStringTableLoader : IAssetLoader<ListStringCollection>
     }
 
     public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes(existing as ListStringCollection, info, s, context);
+        => Serdes(existing as ListStringSet, info, s, context);
 }

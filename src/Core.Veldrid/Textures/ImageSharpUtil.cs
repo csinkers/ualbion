@@ -34,7 +34,7 @@ public static class ImageSharpUtil
         return image;
     }
 
-    public static Image<Rgba32> PackSpriteSheet(uint[] palette, int frameCount, GetFrameDelegate<byte> getFrame)
+    public static Image<Rgba32> PackSpriteSheet(uint[] palette, int frameCount, GetFrameMethod<byte> getFrame)
     {
         var layout = SpriteSheetUtil.ArrangeSpriteSheet(frameCount, 0, getFrame);
         if (layout.Layers > 1)

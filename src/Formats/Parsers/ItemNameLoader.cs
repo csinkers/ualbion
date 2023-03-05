@@ -12,19 +12,19 @@ public class ItemNameLoader : IAssetLoader<MultiLanguageStringDictionary>
     public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((MultiLanguageStringDictionary)existing, info, s, context);
 
-    public MultiLanguageStringDictionary Serdes(MultiLanguageStringDictionary names, AssetInfo info, ISerializer s, SerdesContext context)
+    public MultiLanguageStringDictionary Serdes(MultiLanguageStringDictionary existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (s.IsWriting() && names == null) throw new ArgumentNullException(nameof(names));
+        if (s.IsWriting() && existing == null) throw new ArgumentNullException(nameof(existing));
 
-        names ??= new MultiLanguageStringDictionary();
-        if (!names.ContainsKey(Base.Language.German)) names[Base.Language.German] = new ListStringCollection();
-        if (!names.ContainsKey(Base.Language.English)) names[Base.Language.English] = new ListStringCollection();
-        if (!names.ContainsKey(Base.Language.French)) names[Base.Language.French] = new ListStringCollection();
+        existing ??= new MultiLanguageStringDictionary();
+        if (!existing.ContainsKey(Base.Language.German)) existing[Base.Language.German] = new ListStringSet();
+        if (!existing.ContainsKey(Base.Language.English)) existing[Base.Language.English] = new ListStringSet();
+        if (!existing.ContainsKey(Base.Language.French)) existing[Base.Language.French] = new ListStringSet();
 
-        static void Inner(IStringCollection collection, int i, ISerializer s2)
+        static void Inner(IStringSet collection, int i, ISerializer s2)
         {
-            var concrete = (ListStringCollection)collection;
+            var concrete = (ListStringSet)collection;
             while (collection.Count <= i)
                 concrete.Add(null);
             concrete[i] = s2.FixedLengthString(null, concrete[i], StringSize);
@@ -39,23 +39,23 @@ public class ItemNameLoader : IAssetLoader<MultiLanguageStringDictionary>
             long end = s.Offset + streamLength;
             while (s.Offset < end)
             {
-                Inner(names[Base.Language.German], i, s);
-                Inner(names[Base.Language.English], i, s);
-                Inner(names[Base.Language.French], i, s);
+                Inner(existing[Base.Language.German], i, s);
+                Inner(existing[Base.Language.English], i, s);
+                Inner(existing[Base.Language.French], i, s);
                 i++;
             }
         }
         else
         {
-            var stringCount = names[Base.Language.German].Count;
+            var stringCount = existing[Base.Language.German].Count;
             for (int i = 1; i < stringCount; i++)
             {
-                Inner(names[Base.Language.German], i, s);
-                Inner(names[Base.Language.English], i, s);
-                Inner(names[Base.Language.French], i, s);
+                Inner(existing[Base.Language.German], i, s);
+                Inner(existing[Base.Language.English], i, s);
+                Inner(existing[Base.Language.French], i, s);
             }
         }
 
-        return names;
+        return existing;
     }
 }

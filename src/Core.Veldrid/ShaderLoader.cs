@@ -55,7 +55,7 @@ public sealed class ShaderLoader : ServiceComponent<IShaderLoader>, IShaderLoade
         {
             if (first)
             {
-                if (!line.StartsWith("#version", StringComparison.InvariantCulture))
+                if (!line.StartsWith("#version", StringComparison.Ordinal))
                 {
                     sb.AppendLine("#version 450");
                 }

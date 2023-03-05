@@ -7,9 +7,9 @@ namespace UAlbion.Game.Events;
 public class AttributeChangedEvent : GameEvent, IVerboseEvent
 {
     public SheetId SheetId { get; }
-    public Attribute Attribute { get; }
+    public PhysicalAttribute Attribute { get; }
 
-    public AttributeChangedEvent(SheetId sheetId, Attribute attribute)
+    public AttributeChangedEvent(SheetId sheetId, PhysicalAttribute attribute)
     {
         SheetId = sheetId;
         Attribute = attribute;

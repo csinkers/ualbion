@@ -21,6 +21,7 @@ public static class GameVars
         public static readonly IntVar TicksPerFrame = new("NpcMovement.TicksPerFrame", 12); // Number of game ticks it takes to advance to the next animation frame
         public static readonly IntVar TicksPerTile = new("NpcMovement.TicksPerTile", 24); // Number of game ticks it takes to move across a map tile
     }
+
     public static class PartyMovement
     {
         public static readonly IntVar MaxTrailDistanceLarge = new("PartyMovement.MaxTrailDistanceLarge", 18);
@@ -30,6 +31,7 @@ public static class GameVars
         public static readonly IntVar TicksPerFrame = new("PartyMovement.TicksPerFrame", 9); // Number of game ticks it takes to advance to the next animation frame
         public static readonly IntVar TicksPerTile = new("PartyMovement.TicksPerTile", 12); // Number of game ticks it takes to move across a map tile
     }
+
     public static class Time
     {
         public static readonly IntVar FastTicksPerAssetCacheCycle = new("Time.FastTicksPerAssetCacheCycle", 3600);
@@ -39,6 +41,7 @@ public static class GameVars
         public static readonly FloatVar GameSecondsPerSecond = new("Time.GameSecondsPerSecond", 180.0f);
         public static readonly FloatVar IdleTicksPerSecond = new("Time.IdleTicksPerSecond", 8.0f);
     }
+
     public static class Ui
     {
         public static readonly FloatVar ButtonDoubleClickIntervalSeconds = new("UI.ButtonDoubleClickIntervalSeconds", 0.35f);
@@ -55,7 +58,8 @@ public static class GameVars
             public static readonly IntVar MaxDiscardTransitions = new("UI.Transitions.MaxDiscardTransitions", 24);
         }
     }
-    public static class Visual
+
+    public static class VisualVars // added Vars suffix to avoid clashing with UAlbion.Api.Visual namespace etc
     {
         public static class Camera2D
         {

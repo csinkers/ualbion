@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -25,7 +24,7 @@ public class DebugVisualizerGraphData
             if (node == null)
                 continue;
 
-            data.Nodes.Add(new DebugVisualizerNodeData(i.ToString(CultureInfo.InvariantCulture))
+            data.Nodes.Add(new DebugVisualizerNodeData(i.ToString())
             {
                 Label = node.ToString()
                 // Color = ...
@@ -36,8 +35,8 @@ public class DebugVisualizerGraphData
         {
             var label = graph.GetEdgeLabel(start, end);
             data.Edges.Add(new DebugVisualizerEdgeData(
-                start.ToString(CultureInfo.InvariantCulture),
-                end.ToString(CultureInfo.InvariantCulture))
+                start.ToString(),
+                end.ToString())
             {
                 Label = label switch
                 {
@@ -55,7 +54,7 @@ public class DebugVisualizerGraphData
     public DebugVisualizerGraphData AddPointer(string name, int target)
     {
         Nodes.Add(new DebugVisualizerNodeData(name) { Color = "#30a030" });
-        Edges.Add(new DebugVisualizerEdgeData(name, target.ToString(CultureInfo.InvariantCulture)));
+        Edges.Add(new DebugVisualizerEdgeData(name, target.ToString()));
         return this;
     }
 

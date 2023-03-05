@@ -92,7 +92,7 @@ public sealed class AssetConverter : IDisposable
                 ? cached
                 : cache[(id, language)] = _from.LoadAsset(id, language);
 
-            if (stringId.HasValue && asset is IStringCollection collection)
+            if (stringId.HasValue && asset is IStringSet collection)
                 asset = collection.GetString(stringId.Value, language);
 
             if (converter != null)

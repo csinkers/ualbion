@@ -125,7 +125,7 @@ public class DirectoryContainer : IAssetContainer
         foreach (var filePath in context.Disk.EnumerateDirectory(path))
         {
             var file = Path.GetFileName(filePath);
-            int index = file.IndexOf('_', StringComparison.InvariantCulture);
+            int index = file.IndexOf('_', StringComparison.Ordinal);
             var part = index == -1 ? file : file.Substring(0, index);
             if (!int.TryParse(part, out var asInt))
                 continue;

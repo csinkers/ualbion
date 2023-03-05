@@ -54,7 +54,7 @@ public static class ConfigUtil
     public static string AssetName(AssetId id)
     {
         var full = id.ToString();
-        int index = full.IndexOf('.', StringComparison.InvariantCulture);
+        int index = full.IndexOf('.', StringComparison.Ordinal);
         return index == -1 ? full : full[(index + 1)..];
     }
 }

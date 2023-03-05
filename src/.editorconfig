@@ -1,4 +1,6 @@
-﻿[*.cs]
+﻿root = true
+
+[*.cs]
 
 # CA1303: Do not pass literals as localized parameters
 # Most string literals aren't shown to the users, any user-visible text 
@@ -21,3 +23,25 @@ dotnet_diagnostic.CA1819.severity = none
 # Many of the enums need to exactly correspond to the existing on-disk formats, making them ints 
 # complicates type casting in the serialisation code.
 dotnet_diagnostic.CA1028.severity = none
+
+# CA1014: Mark assemblies with CLSCompliant
+# Don't really care about interoperability with other .NET languages in this project.
+dotnet_diagnostic.CA1014.severity = none
+
+# CA1021: Avoid 'out' parameters as they are not designed for general audience
+# In a gamedev context, handling errors via exceptions can be disastrour for performance.
+dotnet_diagnostic.CA1021.severity = none
+
+# CA1002: Do not expose generic lists
+# In a gamedev context accessing concrete types rather than interfaces
+# can make an appreciable perf difference. Also, IList<T> doesn't derive 
+# from IReadOnlyList<T>, so some very annoying casting can be required.
+dotnet_diagnostic.CA1002.severity = none
+
+dotnet_code_quality.ca1711.allowed_suffixes = Flag|Flags
+
+# CA1305: String behaviour can vary based on CurrentCulture. The culture
+# in UAlbion is set to InvariantCulture on startup and should always
+# remain so. Any culture-specific formatting must be done with an explicit
+# culture.
+dotnet_diagnostic.CA1305.severity = none

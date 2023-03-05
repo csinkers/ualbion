@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Config;
@@ -19,7 +18,7 @@ public class MonsterGroup
         for(int i = 0; i < m.Grid.Length; i++)
         {
             m.Grid[i] = MonsterId.SerdesU8(
-                i.ToString(CultureInfo.InvariantCulture),
+                i.ToString(),
                 m.Grid[i],
                 mapping, s);
             s.UInt8(null, 0);

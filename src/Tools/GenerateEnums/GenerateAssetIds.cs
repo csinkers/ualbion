@@ -248,7 +248,7 @@ public readonly struct {name} : IEquatable<{name}>, IEquatable<AssetId>, ICompar
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = {{ {FormatAssetTypeList(types)} }};
     public static {name} Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

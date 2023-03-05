@@ -174,7 +174,7 @@ public class AssetPathPattern
                 case PartType.Index: sb.Append(FormatInt(path.Index, part.Value)); break;
                 case PartType.SubAsset: sb.Append(FormatInt(path.SubAsset, part.Value)); break;
                 case PartType.Name: sb.Append(path.Name); break;
-                case PartType.IgnoreNum: sb.Append("0"); break;
+                case PartType.IgnoreNum: sb.Append('0'); break;
                 case PartType.Palette:
                     if (path.PaletteId.HasValue)
                         sb.Append(FormatInt(path.PaletteId.Value, part.Value));
@@ -202,10 +202,10 @@ public class AssetPathPattern
         var subAssetGroup = m.Groups["SubAsset"];
         var paletteGroup = m.Groups["Palette"];
         var pframeGroup = m.Groups["PFrame"];
-        int index = indexGroup.Success ? int.Parse(indexGroup.Value, CultureInfo.InvariantCulture) : -1;
-        int subAsset = subAssetGroup.Success ? int.Parse(subAssetGroup.Value, CultureInfo.InvariantCulture) : 0;
-        int? paletteId = paletteGroup.Success ? (int?)int.Parse(paletteGroup.Value, CultureInfo.InvariantCulture) : null;
-        int? paletteFrame = pframeGroup.Success ? (int?)int.Parse(pframeGroup.Value, CultureInfo.InvariantCulture) : null;
+        int index = indexGroup.Success ? int.Parse(indexGroup.Value) : -1;
+        int subAsset = subAssetGroup.Success ? int.Parse(subAssetGroup.Value) : 0;
+        int? paletteId = paletteGroup.Success ? (int?)int.Parse(paletteGroup.Value) : null;
+        int? paletteFrame = pframeGroup.Success ? (int?)int.Parse(pframeGroup.Value) : null;
 
         path = new AssetPath(index, subAsset, paletteId, m.Groups["Name"].Value, paletteFrame);
         return true;
@@ -220,11 +220,11 @@ public class AssetPathPattern
             {
                 case PartType.Text: sb.Append(part.Value); break;
                 case PartType.Index: sb.Append(FormatInt(index, part.Value)); break;
-                case PartType.SubAsset: sb.Append("*"); break;
-                case PartType.Name: sb.Append("*"); break;
-                case PartType.IgnoreNum: sb.Append("*"); break;
-                case PartType.Palette: sb.Append("*"); break;
-                case PartType.PaletteFrame: sb.Append("*"); break;
+                case PartType.SubAsset: sb.Append('*'); break;
+                case PartType.Name: sb.Append('*'); break;
+                case PartType.IgnoreNum: sb.Append('*'); break;
+                case PartType.Palette: sb.Append('*'); break;
+                case PartType.PaletteFrame: sb.Append('*'); break;
             }
         }
 

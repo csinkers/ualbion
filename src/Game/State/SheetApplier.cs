@@ -5,7 +5,6 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
-using Attribute = UAlbion.Formats.Assets.Attribute;
 
 namespace UAlbion.Game.State;
 
@@ -25,14 +24,14 @@ public class SheetApplier : Component
             {
                 var attrib = attribEvent.Attribute switch
                 {
-                    Attribute.Strength        => sheet.Attributes.Strength,
-                    Attribute.Intelligence    => sheet.Attributes.Intelligence,
-                    Attribute.Dexterity       => sheet.Attributes.Dexterity,
-                    Attribute.Speed           => sheet.Attributes.Speed,
-                    Attribute.Stamina         => sheet.Attributes.Stamina,
-                    Attribute.Luck            => sheet.Attributes.Luck,
-                    Attribute.MagicResistance => sheet.Attributes.MagicResistance,
-                    Attribute.MagicTalent     => sheet.Attributes.MagicTalent,
+                    PhysicalAttribute.Strength        => sheet.Attributes.Strength,
+                    PhysicalAttribute.Intelligence    => sheet.Attributes.Intelligence,
+                    PhysicalAttribute.Dexterity       => sheet.Attributes.Dexterity,
+                    PhysicalAttribute.Speed           => sheet.Attributes.Speed,
+                    PhysicalAttribute.Stamina         => sheet.Attributes.Stamina,
+                    PhysicalAttribute.Luck            => sheet.Attributes.Luck,
+                    PhysicalAttribute.MagicResistance => sheet.Attributes.MagicResistance,
+                    PhysicalAttribute.MagicTalent     => sheet.Attributes.MagicTalent,
                     _ => throw new ArgumentException(nameof(attribEvent), $"Unknown attribute {attribEvent.Attribute} in event {e}")
                 };
 

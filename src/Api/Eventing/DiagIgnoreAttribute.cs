@@ -6,4 +6,4 @@ namespace UAlbion.Api.Eventing;
 /// Don't show this member in the diag inspector
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-public class DiagIgnoreAttribute : Attribute { }
+public sealed class DiagIgnoreAttribute : Attribute { }

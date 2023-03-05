@@ -901,5 +901,5 @@ t  ^   l
     \--3-t\|
            4 */
     public const string LoopBreaksBothEndsCode = "while (1) { 2, if (3) { break } }";
-    public static ControlFlowGraph LoopBreaksBothEnds = ControlFlowGraph.FromString("[0,4,5,0+1 1+2 2+3 3-1 1-4 3+4]");
+    public static ControlFlowGraph LoopBreaksBothEnds => ControlFlowGraph.FromString("[0,4,5,0+1 1+2 2+3 3-1 1-4 3+4]");
 }

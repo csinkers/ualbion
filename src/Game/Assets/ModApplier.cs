@@ -49,7 +49,7 @@ public class ModApplier : Component, IModApplier
         Exchange.Register<IModApplier>(this);
     }
 
-    public void LoadMods(AssetMapping mapping, IPathResolver pathResolver, IList<string> mods)
+    public void LoadMods(AssetMapping mapping, IPathResolver pathResolver, IReadOnlyList<string> mods)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
         if (pathResolver == null) throw new ArgumentNullException(nameof(pathResolver));
@@ -360,7 +360,7 @@ public class ModApplier : Component, IModApplier
     }
 
     public void SaveAssets(
-        IModApplier.AssetLoaderDelegate loaderFunc,
+        IModApplier.AssetLoader loaderFunc,
         Action flushCacheFunc,
         ISet<AssetId> ids,
         ISet<AssetType> assetTypes,

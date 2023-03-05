@@ -1,8 +1,8 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Api.Eventing;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
-using Attribute = UAlbion.Formats.Assets.Attribute;
 
 namespace UAlbion.Formats.MapEvents;
 
@@ -12,13 +12,13 @@ public class ChangeAttributeEvent : MapEvent, IDataChangeEvent
     public override MapEventType EventType => MapEventType.DataChange;
     public ChangeProperty ChangeProperty => ChangeProperty.Attribute;
     [EventPart("target")] public TargetId Target { get; private set; }
-    [EventPart("attribute")] public Attribute Attribute { get; private set; }
+    [EventPart("attribute")] public PhysicalAttribute Attribute { get; private set; }
     [EventPart("op")] public NumericOperation Operation { get; private set; }
     [EventPart("amount", true, (ushort)0)] public ushort Amount { get; private set; }
     [EventPart("random", true, false)] public bool IsRandom { get; private set; }
 
     ChangeAttributeEvent() { }
-    public ChangeAttributeEvent(TargetId target, Attribute attribute, NumericOperation operation, ushort amount = 0, bool isRandom = false)
+    public ChangeAttributeEvent(TargetId target, PhysicalAttribute attribute, NumericOperation operation, ushort amount = 0, bool isRandom = false)
     {
         Attribute = attribute;
         Target = target;

@@ -7,13 +7,13 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers;
 
-public class WordCollector : Component, IAssetLoader<ListStringCollection>
+public class WordCollector : Component, IAssetLoader<ListStringSet>
 {
     static readonly AssetId Words1 = AssetId.From(Base.Special.Words1);
     static readonly AssetId Words2 = AssetId.From(Base.Special.Words2);
     static readonly AssetId Words3 = AssetId.From(Base.Special.Words3);
 
-    public ListStringCollection Serdes(ListStringCollection existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public ListStringSet Serdes(ListStringSet existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
@@ -41,7 +41,7 @@ public class WordCollector : Component, IAssetLoader<ListStringCollection>
             x => x.Id.Id,
             x => assets.LoadString(x, language));
 
-        var list = new ListStringCollection();
+        var list = new ListStringSet();
         for (int i = 0; i < 1500; i++)
             list.Add(null);
 
@@ -51,5 +51,5 @@ public class WordCollector : Component, IAssetLoader<ListStringCollection>
     }
 
     public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((ListStringCollection) existing, info, s, context);
+        => Serdes((ListStringSet) existing, info, s, context);
 }

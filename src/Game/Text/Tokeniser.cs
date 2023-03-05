@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
 using UAlbion.Formats.Ids;
 
@@ -94,12 +93,12 @@ public static class Tokeniser
                                 default:
                                     if (inner.StartsWith("BLOK", StringComparison.Ordinal))
                                     {
-                                        var number = int.Parse(inner[4..], CultureInfo.InvariantCulture);
+                                        var number = int.Parse(inner[4..]);
                                         yield return (Token.Block, number);
                                     }
                                     else if (inner.StartsWith("INK ", StringComparison.Ordinal))
                                     {
-                                        var number = int.Parse(inner[4..], CultureInfo.InvariantCulture);
+                                        var number = int.Parse(inner[4..]);
                                         yield return (Token.Ink, new InkId(number));
                                     }
                                     else if (inner.StartsWith("WORD", StringComparison.Ordinal))

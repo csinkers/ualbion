@@ -33,7 +33,7 @@ namespace UAlbion.Api.Eventing
         // ReSharper disable once CollectionNeverQueried.Local
         [DiagIgnore] readonly List<(IEvent, long)> _frameEvents = new();
         [DiagIgnore] List<IComponent> _sortedSubscribersCached = new();
-        public List<IComponent> SortedSubscribers // Just for debugging
+        public IReadOnlyList<IComponent> SortedSubscribers // Just for debugging
         {
             get
             {

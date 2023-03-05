@@ -2,10 +2,10 @@
 
 namespace UAlbion.Formats.Assets;
 
-public class ListStringCollection : List<string>, IStringCollection
+public class ListStringSet : List<string>, IStringSet
 {
-    public ListStringCollection() { }
-    public ListStringCollection(IList<string> existing)
+    public ListStringSet() { }
+    public ListStringSet(IList<string> existing)
     {
         Clear();
         if (existing != null)

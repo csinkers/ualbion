@@ -31,7 +31,7 @@ public class FileSystem : IFileSystem
     public Stream OpenRead(string path)                   => File.OpenRead(ToAbsolutePath(path));
     public Stream OpenWriteTruncate(string path)          => File.Open(ToAbsolutePath(path), FileMode.Create, FileAccess.ReadWrite);
     public string ReadAllText(string path)                => File.ReadAllText(ToAbsolutePath(path));
-    public void WriteAllText(string path, string text)    => File.WriteAllText(ToAbsolutePath(path), text);
+    public void WriteAllText(string path, string fullText) => File.WriteAllText(ToAbsolutePath(path), fullText);
     public IEnumerable<string> ReadAllLines(string path)  => File.ReadAllLines(ToAbsolutePath(path));
     public byte[] ReadAllBytes(string path)               => File.ReadAllBytes(ToAbsolutePath(path));
     public void WriteAllBytes(string path, byte[] bytes)  => File.WriteAllBytes(ToAbsolutePath(path), bytes);

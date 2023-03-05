@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 
 namespace UAlbion.Api.Eventing;
@@ -27,7 +26,7 @@ public class EventNode : IEventNode, IEquatable<EventNode>
         builder.Append(DirectSequence ? " " : "#");
         builder.Append(id);
         builder.Append("=>");
-        builder.Append(next?.ToString(CultureInfo.InvariantCulture) ?? "!");
+        builder.Append(next?.ToString() ?? "!");
         builder.Append(": ");
         Event.Format(builder);
     }
@@ -55,7 +54,7 @@ public class EventNode : IEventNode, IEquatable<EventNode>
         else Next = nodes[dummy.Id];
     }
 
-    public static List<EventNode> ParseRawEvents(string script)
+    public static IList<EventNode> ParseRawEvents(string script)
     {
         if (string.IsNullOrWhiteSpace(script))
             return null;
@@ -66,6 +65,7 @@ public class EventNode : IEventNode, IEquatable<EventNode>
         return events;
     }
 
+#pragma warning disable CA1502
     public static EventNode Parse(string s)
     {
         if (s == null || s.Length < 8)
@@ -128,7 +128,7 @@ public class EventNode : IEventNode, IEquatable<EventNode>
             Next = next == -1 ? null : new DummyEventNode((ushort)next)
         };
 
-        //  "{(DirectSequence ? " " : "#")}{id}=>{next?.ToString(CultureInfo.InvariantCulture) ?? "!"}: {Event}");
+        //  "{(DirectSequence ? " " : "#")}{id}=>{next?.ToString() ?? "!"}: {Event}");
         // 00001
         //  1=>!: foo
         // #1=>!: foo
@@ -144,6 +144,7 @@ public class EventNode : IEventNode, IEquatable<EventNode>
         //  1?!:3: foo
         // #1?!:3: foo
     }
+#pragma warning restore CA1502
 
     public bool Equals(EventNode other)
     {

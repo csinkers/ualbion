@@ -8,7 +8,7 @@ public enum DungeonTileFlags : uint
     TextureTypeFloor = 0x0,
     TextureTypeCeiling = 0x1,
     TextureTypeWall = 0x2,
-    TextureTypeMask = 0x3,
+    TextureTypeMask = TextureTypeCeiling | TextureTypeWall,
 
     UsePalette = 0x4,
     Highlight = 0x8,

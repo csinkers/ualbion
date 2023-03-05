@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using UAlbion.Api;
@@ -79,7 +78,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         On<LoadGameEvent>(e => LoadGame(e.Id));
         On<SaveGameEvent>(e => SaveGame(e.Id, e.Name));
         On<FastClockEvent>(e => TickCount += e.Frames);
-        On<GetTimeEvent>(_ => Info(Time.ToString("O", CultureInfo.InvariantCulture)));
+        On<GetTimeEvent>(_ => Info(Time.ToString("O")));
         On<SetTimeEvent>(e => _game.ElapsedTime = e.Time - SavedGame.Epoch);
         On<EventVisitedEvent>(e => _game?.UseEvent(e.Id, e.Action));
         On<LoadMapEvent>(e =>

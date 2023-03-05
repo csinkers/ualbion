@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Text.RegularExpressions;
 using SerdesNet;
 using UAlbion.Api;
@@ -28,7 +27,7 @@ public class SystemTextLoader : IAssetLoader<IntStringDictionary>
             if (!m.Success)
                 continue;
 
-            var subId = int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture);
+            var subId = int.Parse(m.Groups[1].Value);
             var text = m.Groups[2].Value;
             results[subId] = text;
         }

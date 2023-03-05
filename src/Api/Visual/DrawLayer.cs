@@ -2,6 +2,7 @@
 
 public enum DrawLayer : ushort
 {
+    None = 0,
     Background = 1, // Skybox in 3D
     OpaqueTerrain = 64, // Opaque 3D level geometry
     Billboards = 65, // Sprites in 3D levels

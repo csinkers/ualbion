@@ -21,11 +21,18 @@ public class AssetMapping
             .OfType<AssetType>()
             .ToArray();
 
-    static T GetAttribute<T>(object x) where T : Attribute =>
-        (T)x.GetType()
-            .GetMember(x.ToString())[0]
+    static T GetAttribute<T>(object x) where T : Attribute
+    {
+        if (x == null) throw new ArgumentNullException(nameof(x));
+        var str = x.ToString();
+        if (str == null)
+            return null;
+
+        return (T)x.GetType()
+            .GetMember(str)[0]
             .GetCustomAttributes(typeof(T), false)
             .FirstOrDefault();
+    }
 
 #if DEBUG
     static readonly AssetType[] UnmappedTypes = AllAssetTypes.Where(x => GetAttribute<UnmappedAttribute>(x) != null).ToArray();
@@ -497,8 +504,8 @@ public class AssetMapping
                 continue;
 
             if (!string.IsNullOrEmpty(typeName)
-                && !match.Item1.EnumType.Name.Equals(typeName, StringComparison.InvariantCultureIgnoreCase)
-                && !match.Item1.AssetType.ToString().Equals(typeName, StringComparison.InvariantCultureIgnoreCase))
+                && !match.Item1.EnumType.Name.Equals(typeName, StringComparison.OrdinalIgnoreCase)
+                && !match.Item1.AssetType.ToString().Equals(typeName, StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }
@@ -531,7 +538,7 @@ public class AssetMapping
             foreach (var assetType in validTypes)
             {
                 if (!string.IsNullOrEmpty(typeName)
-                    && !assetType.ToString().Equals(typeName, StringComparison.InvariantCultureIgnoreCase))
+                    && !assetType.ToString().Equals(typeName, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }

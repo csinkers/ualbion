@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Xml.Serialization;
 
 namespace UAlbion.Formats.Exporters.Tiled;
@@ -19,21 +18,21 @@ public class TiledProperty
     public TiledProperty(string key, int value)
     {
         Name = key;
-        Value = value.ToString(CultureInfo.InvariantCulture);
+        Value = value.ToString();
         Type = TiledPropertyType.Int;
     }
 
     public TiledProperty(string key, float value)
     {
         Name = key;
-        Value = value.ToString(CultureInfo.InvariantCulture);
+        Value = value.ToString();
         Type = TiledPropertyType.Float;
     }
 
     public TiledProperty(string key, bool value)
     {
         Name = key;
-        Value = value.ToString(CultureInfo.InvariantCulture);
+        Value = value.ToString();
         Type = TiledPropertyType.Bool;
     }
 
@@ -42,7 +41,7 @@ public class TiledProperty
     {
         Name = key,
         Type = TiledPropertyType.Object,
-        Value = objectId.ToString(CultureInfo.InvariantCulture)
+        Value = objectId.ToString()
     };
 #pragma warning restore CA1720 // Identifier contains type name
 

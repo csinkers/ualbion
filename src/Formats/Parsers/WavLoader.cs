@@ -8,13 +8,13 @@ namespace UAlbion.Formats.Parsers;
 
 public class WavLoader : IAssetLoader<ISample>
 {
-    public ISample Serdes(ISample w, AssetInfo info, ISerializer s, SerdesContext context)
+    public ISample Serdes(ISample existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (s.IsWriting() && w == null)
-            throw new ArgumentNullException(nameof(w));
+        if (s.IsWriting() && existing == null)
+            throw new ArgumentNullException(nameof(existing));
 
-        w ??= new AlbionSample();
+        existing ??= new AlbionSample();
 
         var tag = s.FixedLengthString("Tag", "RIFF", 4); // Container format chunk
         ApiUtil.Assert(tag == "RIFF", "tag == 'RIFF'");
@@ -25,8 +25,8 @@ public class WavLoader : IAssetLoader<ISample>
         tag = s.FixedLengthString(null, "WAVE",4);
         ApiUtil.Assert(tag == "WAVE", "tag == 'WAVE'");
 
-        SerdesFormatTag(w, s);
-        SerdesDataTag(w, s);
+        SerdesFormatTag(existing, s);
+        SerdesDataTag(existing, s);
 
         if (s.IsWriting())
         {
@@ -37,7 +37,7 @@ public class WavLoader : IAssetLoader<ISample>
         }
         else ApiUtil.Assert(fullSize == (int)s.Offset - 4, "Full size of WAV doesn't match bytes read");
 
-        return w;
+        return existing;
     }
 
     static void SerdesFormatTag(ISample w, ISerializer s)

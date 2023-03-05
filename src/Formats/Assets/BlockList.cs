@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using SerdesNet;
 
 #pragma warning disable CA1710 // Identifiers should have correct suffix
@@ -14,7 +13,7 @@ public class BlockList : List<Block>
         if (s == null) throw new ArgumentNullException(nameof(s));
         blockList ??= new BlockList();
         if (s.IsCommenting())
-            s.Begin(blockNumber.ToString(CultureInfo.InvariantCulture));
+            s.Begin(blockNumber.ToString());
 
         if (s.IsReading())
         {

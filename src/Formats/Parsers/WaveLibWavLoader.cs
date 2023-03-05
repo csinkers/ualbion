@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Text.RegularExpressions;
 using SerdesNet;
 using UAlbion.Config;
@@ -43,8 +42,8 @@ public class WaveLibWavLoader : IAssetLoader<WaveLib>
                     "instrument and D is the type, e.g. 0_5_i129t63.wav");
             }
 
-            var instrument = int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture);
-            var type = int.Parse(m.Groups[2].Value, CultureInfo.InvariantCulture);
+            var instrument = int.Parse(m.Groups[1].Value);
+            var type = int.Parse(m.Groups[2].Value);
             var sample = FormatUtil.DeserializeFromBytes(bytes, s2 => WavLoader.Serdes(null, null, s2, context));
             lib.Samples[i] = new WaveLibSample
             {

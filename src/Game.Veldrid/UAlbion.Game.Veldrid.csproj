@@ -4,10 +4,12 @@
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>10</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AnalysisMode>Recommended</AnalysisMode>
+    <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6">
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -19,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\deps\ImGuiColorTextEditNet\')">
-    <PackageReference Include="ImGuiColorTextEditNet" Version="0.1.0" />
+    <PackageReference Include="ImGuiColorTextEditNet" Version="0.1.1" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\deps\ImGuiColorTextEditNet\')">
     <ProjectReference Include="..\..\deps\ImGuiColorTextEditNet\src\TextEdit\ImGuiColorTextEditNet.csproj" />

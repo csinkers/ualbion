@@ -3,4 +3,4 @@
 namespace UAlbion.Config;
 
 [AttributeUsage(AttributeTargets.Field)]
-public class UnmappedAttribute : Attribute { }
+public sealed class UnmappedAttribute : Attribute { }

@@ -103,6 +103,60 @@ public class CharacterSheet : ICharacterSheet
     public ushort UnknownEC { get; set; }
     // ReSharper restore InconsistentNaming
 
+    static byte[] GetKnownSpellBytes(CharacterSheet sheet, ISpellManager spellManager)
+    {
+        var knownSpells = new uint[SpellSchoolCount];
+        foreach (var spellId in sheet.Magic.KnownSpells)
+        {
+            var spell = spellManager.GetSpellOrDefault(spellId);
+            if (spell == null) continue;
+            knownSpells[(int)spell.Class] |= 1U << spell.OffsetInClass;
+        }
+
+        return knownSpells.Select(BitConverter.GetBytes).SelectMany(x => x).ToArray();
+    }
+
+    static byte[] GetSpellStrengthBytes(CharacterSheet sheet, ISpellManager spellManager)
+    {
+        var spellStrengths = new ushort[MaxSpellsPerSchool * SpellSchoolCount];
+        foreach (var kvp in sheet.Magic.SpellStrengths)
+        {
+            var spell = spellManager.GetSpellOrDefault(kvp.Key);
+            if (spell == null) continue;
+            spellStrengths[(int)spell.Class * MaxSpellsPerSchool + spell.OffsetInClass] = kvp.Value;
+        }
+
+        return spellStrengths.Select(BitConverter.GetBytes).SelectMany(x => x).ToArray();
+    }
+
+    static void SetSpellData(
+        CharacterSheet sheet,
+        ISpellManager spellManager,
+        byte[] knownSpellBytes,
+        byte[] spellStrengthBytes)
+    {
+        for (int school = 0; school < SpellSchoolCount; school++)
+        {
+            byte knownSpells = 0;
+            for (byte offset = 0; offset < MaxSpellsPerSchool; offset++)
+            {
+                if (offset % 8 == 0)
+                    knownSpells = knownSpellBytes[school * 4 + offset / 8];
+                int i = school * MaxSpellsPerSchool + offset;
+                bool isKnown = (knownSpells & (1 << (offset % 8))) != 0;
+                ushort spellStrength = BitConverter.ToUInt16(spellStrengthBytes, i * sizeof(ushort));
+                var spellId = spellManager.GetSpellId((SpellClass)school, offset);
+
+                if (isKnown)
+                    sheet.Magic.KnownSpells.Add(spellId);
+
+                if (spellStrength > 0)
+                    sheet.Magic.SpellStrengths[spellId] = spellStrength;
+            }
+        }
+    }
+
+
     public static CharacterSheet Serdes(SheetId id, CharacterSheet sheet, AssetMapping mapping, ISerializer s, ISpellManager spellManager)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
@@ -208,30 +262,8 @@ public class CharacterSheet : ICharacterSheet
         sheet.Combat.ExperiencePoints = s.Int32(nameof(sheet.Combat.ExperiencePoints), sheet.Combat.ExperiencePoints); // EE
         // e.g. 98406 = 0x18066 => 6680 0100 in file
 
-        byte[] knownSpellBytes = null;
-        byte[] spellStrengthBytes = null;
-
-        if (s.IsWriting())
-        {
-            var knownSpells = new uint[SpellSchoolCount];
-            foreach (var spellId in sheet.Magic.KnownSpells)
-            {
-                var spell = spellManager.GetSpellOrDefault(spellId);
-                if (spell == null) continue;
-                knownSpells[(int)spell.Class] |= 1U << spell.OffsetInClass;
-            }
-
-            var spellStrengths = new ushort[MaxSpellsPerSchool * SpellSchoolCount];
-            foreach (var kvp in sheet.Magic.SpellStrengths)
-            {
-                var spell = spellManager.GetSpellOrDefault(kvp.Key);
-                if (spell == null) continue;
-                spellStrengths[(int)spell.Class * MaxSpellsPerSchool + spell.OffsetInClass] = kvp.Value;
-            }
-
-            knownSpellBytes = knownSpells.Select(BitConverter.GetBytes).SelectMany(x => x).ToArray();
-            spellStrengthBytes = spellStrengths.Select(BitConverter.GetBytes).SelectMany(x => x).ToArray();
-        }
+        byte[] knownSpellBytes = s.IsWriting() ? GetKnownSpellBytes(sheet, spellManager) : null;
+        byte[] spellStrengthBytes = s.IsWriting() ? GetSpellStrengthBytes(sheet, spellManager) : null;
 
         knownSpellBytes = s.Bytes("KnownSpells", knownSpellBytes, SpellSchoolCount * sizeof(uint)); // F2
 
@@ -243,27 +275,7 @@ public class CharacterSheet : ICharacterSheet
         spellStrengthBytes = s.Bytes("SpellStrength", spellStrengthBytes, MaxSpellsPerSchool * SpellSchoolCount * sizeof(ushort));
 
         if (s.IsReading())
-        {
-            for (int school = 0; school < SpellSchoolCount; school++)
-            {
-                byte knownSpells = 0;
-                for (byte offset = 0; offset < MaxSpellsPerSchool; offset++)
-                {
-                    if (offset % 8 == 0)
-                        knownSpells = knownSpellBytes[school * 4 + offset / 8];
-                    int i = school * MaxSpellsPerSchool + offset;
-                    bool isKnown = (knownSpells & (1 << (offset % 8))) != 0;
-                    ushort spellStrength = BitConverter.ToUInt16(spellStrengthBytes, i * sizeof(ushort));
-                    var spellId = spellManager.GetSpellId((SpellClass)school, offset);
-
-                    if (isKnown)
-                        sheet.Magic.KnownSpells.Add(spellId);
-
-                    if (spellStrength > 0)
-                        sheet.Magic.SpellStrengths[spellId] = spellStrength;
-                }
-            }
-        }
+            SetSpellData(sheet, spellManager, knownSpellBytes, spellStrengthBytes);
 
         if ((s.Flags & SerializerFlags.Comments) != 0 && sheet.Magic.SpellStrengths.Count > 0)
         {

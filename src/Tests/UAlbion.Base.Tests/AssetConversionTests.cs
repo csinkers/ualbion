@@ -202,7 +202,7 @@ public class AssetConversionTests
     public void EventTextTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(EventText.Frill) };
-        Test<ListStringCollection>(info.AssetId, null, (x, s, c) => Loaders.AlbionStringTableLoader.Serdes(x, info, s, c));
+        Test<ListStringSet>(info.AssetId, null, (x, s, c) => Loaders.AlbionStringTableLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -284,7 +284,7 @@ public class AssetConversionTests
     public void MapTextTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(MapText.TorontoBegin) };
-        Test<ListStringCollection>(info.AssetId, null, (x, s, c) => Loaders.AlbionStringTableLoader.Serdes(x, info, s, c));
+        Test<ListStringSet>(info.AssetId, null, (x, s, c) => Loaders.AlbionStringTableLoader.Serdes(x, info, s, c));
     }
 
     [Fact]
@@ -418,7 +418,7 @@ public class AssetConversionTests
     public void WordTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Special.Words1) };
-        Test<ListStringCollection>(
+        Test<ListStringSet>(
             info.AssetId,
             AssetMapping.Global.EnumerateAssetsOfType(AssetType.Word).ToArray(),
             (x, s, c) => Loaders.WordListLoader.Serdes(x, info, s, c));

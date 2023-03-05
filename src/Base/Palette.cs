@@ -2,6 +2,7 @@
 // ReSharper disable UnusedMember.Global
 namespace UAlbion.Base;
 
+#pragma warning disable CA1027
 public enum Palette : byte // TODO: Add night/day lookup to metadata in assets.json
 {
     Common = 0,

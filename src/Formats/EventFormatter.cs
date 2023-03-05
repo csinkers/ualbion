@@ -29,7 +29,10 @@ public class EventFormatter : IEventFormatter
 
         if (e.Event is TextEvent textEvent && _stringLoadFunc != null)
         {
-            var text = _stringLoadFunc(textEvent.ToId(_textSourceId)).Replace("\"", "\\\"");
+            var text = 
+                _stringLoadFunc(textEvent.ToId(_textSourceId))
+                .Replace("\"", "\\\"", StringComparison.Ordinal);
+
             builder.Add(ScriptPartType.Comment, $" ; \"{text}\"");
         }
     }
@@ -42,7 +45,10 @@ public class EventFormatter : IEventFormatter
 
         if (e is TextEvent textEvent && _stringLoadFunc != null)
         {
-            var text = _stringLoadFunc(textEvent.ToId(_textSourceId)).Replace("\"", "\\\"");
+            var text = 
+                _stringLoadFunc(textEvent.ToId(_textSourceId))
+                .Replace("\"", "\\\"", StringComparison.Ordinal);
+
             builder.Add(ScriptPartType.Comment, $" ; \"{text}\"");
         }
     }

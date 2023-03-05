@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Threading;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats.Assets;
@@ -10,7 +9,7 @@ public class EventContext
 {
     static int _nextContextId;
     IEventNode _node;
-    public string Id { get; } = Interlocked.Increment(ref _nextContextId).ToString(CultureInfo.InvariantCulture);
+    public string Id { get; } = Interlocked.Increment(ref _nextContextId).ToString();
     public EventContext(EventSource source, EventContext parent)
     {
         Source = source ?? throw new ArgumentNullException(nameof(source));

@@ -14,7 +14,7 @@ public class MockModApplier : ServiceComponent<IModApplier>, IModApplier
     readonly Dictionary<AssetId, object> _assets = new();
     readonly Dictionary<AssetId, AssetInfo> _infos = new();
 
-    public void LoadMods(AssetMapping mapping, IPathResolver pathResolver, IList<string> mods) { }
+    public void LoadMods(AssetMapping mapping, IPathResolver pathResolver, IReadOnlyList<string> mods) { }
     public AssetInfo GetAssetInfo(AssetId id, string language) => _infos[id];
     public object LoadAsset(AssetId id) => _assets[id];
     public object LoadAsset(AssetId id, string language) => _assets[id];
@@ -27,7 +27,7 @@ public class MockModApplier : ServiceComponent<IModApplier>, IModApplier
             new Dictionary<string, LanguageConfig>());
 
     public IEnumerable<string> ShaderPaths => Array.Empty<string>();
-    public void SaveAssets(IModApplier.AssetLoaderDelegate loaderFunc, Action flushCacheFunc, ISet<AssetId> ids, ISet<AssetType> assetTypes, Regex filePattern)
+    public void SaveAssets(IModApplier.AssetLoader loaderFunc, Action flushCacheFunc, ISet<AssetId> ids, ISet<AssetType> assetTypes, Regex filePattern)
     {
         throw new NotImplementedException();
     }

@@ -3,7 +3,6 @@ using UAlbion.Api.Settings;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
-using Attribute = UAlbion.Formats.Assets.Attribute;
 using InvVars = UAlbion.Formats.Config.GameVars.Inventory;
 
 namespace UAlbion.Game.State.Player;
@@ -88,14 +87,14 @@ public static class EffectiveSheetCalculator
             {
                 switch (item.AttributeType)
                 {
-                    case Attribute.Strength: sheet.Attributes.Strength.Current += item.AttributeBonus; break;
-                    case Attribute.Intelligence: sheet.Attributes.Intelligence.Current += item.AttributeBonus; break;
-                    case Attribute.Dexterity: sheet.Attributes.Dexterity.Current += item.AttributeBonus; break;
-                    case Attribute.Speed: sheet.Attributes.Speed.Current += item.AttributeBonus; break;
-                    case Attribute.Stamina: sheet.Attributes.Stamina.Current += item.AttributeBonus; break;
-                    case Attribute.Luck: sheet.Attributes.Luck.Current += item.AttributeBonus; break;
-                    case Attribute.MagicResistance: sheet.Attributes.MagicResistance.Current += item.AttributeBonus; break;
-                    case Attribute.MagicTalent: sheet.Attributes.MagicTalent.Current += item.AttributeBonus; break;
+                    case PhysicalAttribute.Strength: sheet.Attributes.Strength.Current += item.AttributeBonus; break;
+                    case PhysicalAttribute.Intelligence: sheet.Attributes.Intelligence.Current += item.AttributeBonus; break;
+                    case PhysicalAttribute.Dexterity: sheet.Attributes.Dexterity.Current += item.AttributeBonus; break;
+                    case PhysicalAttribute.Speed: sheet.Attributes.Speed.Current += item.AttributeBonus; break;
+                    case PhysicalAttribute.Stamina: sheet.Attributes.Stamina.Current += item.AttributeBonus; break;
+                    case PhysicalAttribute.Luck: sheet.Attributes.Luck.Current += item.AttributeBonus; break;
+                    case PhysicalAttribute.MagicResistance: sheet.Attributes.MagicResistance.Current += item.AttributeBonus; break;
+                    case PhysicalAttribute.MagicTalent: sheet.Attributes.MagicTalent.Current += item.AttributeBonus; break;
                 }
             }
 

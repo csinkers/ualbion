@@ -91,7 +91,7 @@ public static class LayerMapping3D
                     IsometricMode.Floors => albionMap.Floors,
                     IsometricMode.Ceilings => albionMap.Ceilings,
                     IsometricMode.Contents => albionMap.Contents,
-                    _ => throw new ArgumentOutOfRangeException()
+                    _ => throw new InvalidOperationException($"Unexpected isometric mode \"{type}\"")
                 };
 
                 array[i] = value;

@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Numerics;
+﻿using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
@@ -246,6 +245,6 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         return
             _heldItemCountUsesTenths
                 ? $"{_heldItemCount / 10}.{_heldItemCount % 10}"
-                : _heldItemCount.ToString(CultureInfo.InvariantCulture); // i18n: Will need updating if we want separators or non-Hindu-Arabic numerals.
+                : _heldItemCount.ToString(); // todo i18n: Will need updating if we want separators or non-Hindu-Arabic numerals.
     }
 }

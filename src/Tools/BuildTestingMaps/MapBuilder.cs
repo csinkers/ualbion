@@ -11,7 +11,7 @@ public delegate string ScriptBuilderFunc(StringCreationFunc createString);
 public abstract class MapBuilder
 {
     protected BaseMapData Map { get; }
-    readonly ListStringCollection _mapStrings = new();
+    readonly ListStringSet _mapStrings = new();
     readonly Dictionary<int, string> _scripts = new();
 
     public int AddMapText(string text) => _mapStrings.FindOrAdd(text);
@@ -49,7 +49,7 @@ public abstract class MapBuilder
         return this;
     }
 
-    public (BaseMapData, ListStringCollection) Build()
+    public (BaseMapData, ListStringSet) Build()
     {
         var sb = new StringBuilder();
         foreach (var key in _scripts.Keys)

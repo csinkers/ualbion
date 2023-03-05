@@ -79,7 +79,7 @@ public class AssetManager : Component, IAssetManager
 
         return asset switch
         {
-            IStringCollection collection => collection.GetString(id, language),
+            IStringSet collection => collection.GetString(id, language),
             string s => s,
             _ => null
         };

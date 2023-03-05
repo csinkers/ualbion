@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using static System.FormattableString;
 
 namespace UAlbion.Api;
@@ -92,7 +91,7 @@ public static class PerfTracker
         if (!IsTracing)
             return;
 
-        var tid = Thread.CurrentThread.ManagedThreadId;
+        var tid = Environment.CurrentManagedThreadId;
         Console.WriteLine($"[{tid}] at {StartupStopwatch.ElapsedMilliseconds}: {name}");
         CoreTrace.Log.StartupEvent(name);
     }

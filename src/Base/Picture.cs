@@ -2,6 +2,7 @@
 // ReSharper disable UnusedMember.Global
 namespace UAlbion.Base;
 
+#pragma warning disable CA1027
 public enum Picture : byte
 {
     SmallWizard = 1,

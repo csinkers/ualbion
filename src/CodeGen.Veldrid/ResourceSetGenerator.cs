@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -22,7 +23,7 @@ static class ResourceSetGenerator
             if (!first)
                 sb.AppendLine(",");
 
-            var shaderStages = member.Resource.Stages.ToString(); // Util.FormatFlagsEnum(member.Resource.Stages);
+            var shaderStages = member.Resource.Stages.ToString(CultureInfo.InvariantCulture); // Util.FormatFlagsEnum(member.Resource.Stages);
             var kindString = context.Symbols.Veldrid.ResourceKind.KnownKindString(member.Resource.Kind);
             var resourceName =
                 member.Resource.Kind is KnownResourceKind.StructuredBufferReadOnly or KnownResourceKind.StructuredBufferReadWrite
@@ -85,7 +86,8 @@ static class ResourceSetGenerator
             sb.Append('.');
             AppendDeviceMemberForKind(sb, member, context);
 
-            sb.AppendFormat(" == null) throw new System.InvalidOperationException(\"Tried to construct {0}, but {1} has not been initialised. It may not have been attached to the exchange.\");{2}",
+            sb.AppendFormat(CultureInfo.InvariantCulture,
+                " == null) throw new System.InvalidOperationException(\"Tried to construct {0}, but {1} has not been initialised. It may not have been attached to the exchange.\");{2}",
                 type.Symbol.Name,
                 VeldridGenUtil.UnderscoreToTitleCase(field.Name),
                 Environment.NewLine);

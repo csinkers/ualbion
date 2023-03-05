@@ -1,12 +1,14 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace UAlbion.Scripting.Rules;
 
-public class ConnectDisjointNodeToExit 
+public static class ConnectDisjointNodeToExit 
 {
     const string Description = "Connect disjoint node to exit";
     public static (ControlFlowGraph, string) Decompile(ControlFlowGraph graph)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
         var (reachability, reachableCount) = graph.Reverse().GetReachability(graph.ExitIndex);
         if (reachableCount == graph.ActiveNodeCount)
             return (graph, null);

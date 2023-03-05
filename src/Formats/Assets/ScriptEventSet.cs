@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats.Ids;
@@ -13,7 +14,7 @@ public class ScriptEventSet : IEventSet
     {
         Id = id;
         TextId = textId;
-        Events = events ?? throw new ArgumentNullException(nameof(events));
+        Events = events?.ToArray() ?? throw new ArgumentNullException(nameof(events));
     }
 
     public AssetId Id { get; }

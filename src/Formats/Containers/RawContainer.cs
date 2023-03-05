@@ -13,16 +13,16 @@ namespace UAlbion.Formats.Containers;
 /// </summary>
 public class RawContainer : IAssetContainer
 {
-    public ISerializer Read(string file, AssetInfo info, SerdesContext context)
+    public ISerializer Read(string path, AssetInfo info, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
         ApiUtil.Assert(info.Index == 0, "SubItem should always be 0 when accessing a non-container file");
 
-        if (!context.Disk.FileExists(file))
+        if (!context.Disk.FileExists(path))
             return null;
 
-        var stream = context.Disk.OpenRead(file);
+        var stream = context.Disk.OpenRead(path);
         var br = new BinaryReader(stream);
         return new AlbionReader(br);
     }

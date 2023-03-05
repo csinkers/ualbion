@@ -2,7 +2,9 @@
 // ReSharper disable UnusedMember.Global
 namespace UAlbion.Base;
 
+#pragma warning disable CA1008 // Enums should have zero value
 public enum Automap : ushort // Note: All the 2D map ids will be 0 bytes
+#pragma warning restore CA1008 // Enums should have zero value
 {
     Unk1 = 1, // Referenced in a ModifyNpcOffEvent in map 163
     Unk40 = 40, // Referenced in some EventChainOffEvents in maps 147, 151, 154

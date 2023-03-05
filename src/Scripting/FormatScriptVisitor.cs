@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using UAlbion.Api.Eventing;
 using UAlbion.Scripting.Ast;
 
@@ -74,7 +73,7 @@ public class FormatScriptVisitor : IAstVisitor
         negation.Expression.Accept(this);
         if (parens) _builder.Append(')');
     }
-    public void Visit(Numeric numeric) => _builder.Add(ScriptPartType.Number, numeric.Value.ToString(CultureInfo.InvariantCulture));
+    public void Visit(Numeric numeric) => _builder.Add(ScriptPartType.Number, numeric.Value.ToString());
 
     public void Visit(IfThen ifThen)
     {

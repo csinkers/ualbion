@@ -25,7 +25,7 @@ public struct StringId : System.IEquatable<StringId>
         if (string.IsNullOrEmpty(s))
             throw new ArgumentNullException(nameof(s));
 
-        int index = s.IndexOf(':');
+        int index = s.IndexOf(':', StringComparison.Ordinal);
         if (index == -1)
             throw new FormatException($"Expected ':' in StringId: \"{s}\"");
 

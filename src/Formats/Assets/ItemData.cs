@@ -22,7 +22,7 @@ public sealed class ItemData
     [DefaultValue(1)] public byte Hands { get; set; } //  5 Determines how many free hands are required to equip the item.
     public byte LpMaxBonus { get; set; } //  6 Bonus value to life points.
     public byte SpMaxBonus { get; set; } //  7 Bonus value to spell points.
-    public Attribute AttributeType { get; set; } //  8 Attribute bonus type
+    public PhysicalAttribute AttributeType { get; set; } //  8 Attribute bonus type
     public byte AttributeBonus { get; set; } //  9 Attribute bonus value.
     public Skill SkillType { get; set; } // 10 Skill bonus type
     public byte SkillBonus { get; set; } // 11 Skill bonus value.
@@ -89,21 +89,21 @@ public sealed class ItemData
             sb.Append(' ');
         }
 
-        if(LpMaxBonus != 0)
+        if (LpMaxBonus != 0)
         {
             sb.Append("LP+");
             sb.Append(LpMaxBonus);
             sb.Append(' ');
         }
 
-        if(SpMaxBonus != 0)
+        if (SpMaxBonus != 0)
         {
             sb.Append("SP+");
             sb.Append(SpMaxBonus);
             sb.Append(' ');
         }
 
-        if(AllowedGender != Genders.Any)
+        if (AllowedGender != Genders.Any)
         {
             sb.Append(AllowedGender.ToString());
             sb.Append("Only ");
@@ -124,7 +124,7 @@ public sealed class ItemData
             sb.Append($"E:{EnchantmentCount} MaxE:{MaxEnchantmentCount} ");
 
         if(Flags != 0)
-            sb.Append($"F:{Flags} ".Replace(", ", "|", StringComparison.InvariantCulture));
+            sb.Append($"F:{Flags} ".Replace(", ", "|", StringComparison.Ordinal));
 
         if (Value != 0)
             sb.Append($"${(decimal)Value / 10:F}");

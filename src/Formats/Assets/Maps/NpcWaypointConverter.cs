@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using static System.FormattableString;
@@ -53,11 +52,11 @@ class NpcWaypointConverter : JsonConverter<NpcWaypoint[]>
         var parts = s.Trim('(', ')').Split(',');
         int count = 1;
         if (parts.Length == 3)
-            count = int.Parse(parts[2], CultureInfo.InvariantCulture);
+            count = int.Parse(parts[2]);
 
         return (new NpcWaypoint(
-            byte.Parse(parts[0], CultureInfo.InvariantCulture),
-            byte.Parse(parts[1], CultureInfo.InvariantCulture)), count);
+            byte.Parse(parts[0]),
+            byte.Parse(parts[1])), count);
     }
 
     static IEnumerable<(int x, int y, int count)> FindCounts(NpcWaypoint[] points)

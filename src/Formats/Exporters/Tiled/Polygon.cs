@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
 using System.Xml.Serialization;
 
@@ -28,8 +27,8 @@ public class Polygon
             foreach (var part in parts)
             {
                 var subParts = part.Split(',', StringSplitOptions.RemoveEmptyEntries);
-                int x = int.Parse(subParts[0], CultureInfo.InvariantCulture);
-                int y = int.Parse(subParts[1], CultureInfo.InvariantCulture);
+                int x = int.Parse(subParts[0]);
+                int y = int.Parse(subParts[1]);
                 yield return (x, y);
             }
         }

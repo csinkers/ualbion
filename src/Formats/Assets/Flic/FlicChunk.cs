@@ -8,7 +8,7 @@ public abstract class FlicChunk
 {
     const uint ChunkHeaderSize = 6;
     public abstract FlicChunkType Type { get; }
-    protected abstract uint LoadChunk(uint length, ISerializer br);
+    protected abstract uint LoadChunk(uint length, ISerializer s);
 
     public static FlicChunk Load(ISerializer s, int width, int height) 
     {

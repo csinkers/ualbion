@@ -65,7 +65,7 @@ public static class FormatUtil
             ? int.Parse(s[2..], NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture)
             : s == null
                 ? 0
-                : int.Parse(s, CultureInfo.InvariantCulture);
+                : int.Parse(s);
 
 
     const string HexChars = "0123456789ABCDEF";

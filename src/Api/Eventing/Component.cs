@@ -60,7 +60,7 @@ public abstract class Component : IComponent
     /// detached when the parent component is.
     /// This collection should only be modified by the AttachChild, RemoveChild and RemoveAllChildren methods.
     /// </summary>
-    protected List<IComponent> Children => _children ?? EmptyChildren;
+    protected IReadOnlyList<IComponent> Children => _children ?? EmptyChildren;
 
     /// <summary>
     /// Resolve the currently active object that provides the given interface.
@@ -153,6 +153,7 @@ public abstract class Component : IComponent
     {
         if (@event == null) throw new ArgumentNullException(nameof(@event));
         if (targets == null) throw new ArgumentNullException(nameof(targets));
+        if (projection == null) throw new ArgumentNullException(nameof(projection));
 
         @event.Propagating = true;
         foreach (var target in targets)
@@ -443,16 +444,16 @@ public abstract class Component : IComponent
     /// component-component invocations (rare), event exchange handlers
     /// typically bypass this step and call into the handler function directly.
     /// </summary>
-    /// <param name="event">The event being raised</param>
+    /// <param name="e">The event being raised</param>
     /// <param name="sender">The component which generated the event</param>
-    public void Receive(IEvent @event, object sender)
+    public void Receive(IEvent e, object sender)
     {
-        if (@event == null) throw new ArgumentNullException(nameof(@event));
+        if (e == null) throw new ArgumentNullException(nameof(e));
         if (sender == this || !IsSubscribed || Exchange == null)
             return;
 
-        if (_handlers != null && _handlers.TryGetValue(@event.GetType(), out var handler) && handler.IsActive)
-            handler.Invoke(@event, DummyContinuation.Instance);
+        if (_handlers != null && _handlers.TryGetValue(e.GetType(), out var handler) && handler.IsActive)
+            handler.Invoke(e, DummyContinuation.Instance);
     }
 
     /// <summary>

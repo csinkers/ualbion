@@ -31,7 +31,7 @@ public class ToStringJsonConverter<T> : JsonConverter<T>
         {
             long longValue = reader.GetInt64();
             if (typeToConvert.IsEnum)
-                return (T)Enum.Parse(typeToConvert, longValue.ToString(CultureInfo.InvariantCulture));
+                return (T)Enum.Parse(typeToConvert, longValue.ToString());
         }
 
         throw new JsonException($"The {typeToConvert.Name} type does not have a public " +

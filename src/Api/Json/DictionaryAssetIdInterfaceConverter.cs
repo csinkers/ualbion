@@ -9,7 +9,7 @@ class DictionaryAssetIdInterfaceConverter<TKey, TValue> : JsonConverter<IDiction
 {
     readonly JsonConverter<TValue> _valueConverter;
     readonly Type _valueType = typeof(TValue);
-    readonly IAssetId.ParserDelegate<TKey> _parser = IAssetId.GetParser<TKey>();
+    readonly IAssetId.ParserMethod<TKey> _parser = IAssetId.GetParser<TKey>();
 
     public DictionaryAssetIdInterfaceConverter(JsonSerializerOptions options)
     {

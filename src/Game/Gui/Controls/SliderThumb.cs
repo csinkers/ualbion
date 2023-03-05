@@ -37,7 +37,7 @@ public class SliderThumb : UiElement
 
         _lastValue = currentValue;
         _text.Text = _format == null
-            ? currentValue.ToString(CultureInfo.InvariantCulture) // i18n
+            ? currentValue.ToString(CultureInfo.InvariantCulture) // todo: i18n
             : _format(currentValue);
     }
 

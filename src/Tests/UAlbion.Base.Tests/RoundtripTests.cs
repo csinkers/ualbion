@@ -221,7 +221,7 @@ public class RoundtripTests
     public void EventTextTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(EventText.Frill) };
-        RoundTripXld<ListStringCollection>(nameof(EventTextTest), "$(ALBION)/CD/XLDLIBS/ENGLISH/EVNTTXT1.XLD", 11,
+        RoundTripXld<ListStringSet>(nameof(EventTextTest), "$(ALBION)/CD/XLDLIBS/ENGLISH/EVNTTXT1.XLD", 11,
             (x, s, c) => Loaders.AlbionStringTableLoader.Serdes(x, info, s, c));
     }
 
@@ -253,7 +253,7 @@ public class RoundtripTests
     public void MapTextTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(MapText.TorontoBegin) };
-        RoundTripXld<ListStringCollection>(nameof(MapTextTest), "$(ALBION)/CD/XLDLIBS/ENGLISH/MAPTEXT3.XLD", 0,
+        RoundTripXld<ListStringSet>(nameof(MapTextTest), "$(ALBION)/CD/XLDLIBS/ENGLISH/MAPTEXT3.XLD", 0,
             (x, s, c) => Loaders.AlbionStringTableLoader.Serdes(x, info, s, c));
     }
 
@@ -453,7 +453,7 @@ public class RoundtripTests
     public void WordTest()
     {
         var info = new AssetInfo { AssetId = AssetId.From(Special.Words1) };
-        RoundTripXld<ListStringCollection>(nameof(WordTest), "$(ALBION)/CD/XLDLIBS/ENGLISH/WORDLIS0.XLD", 0,
+        RoundTripXld<ListStringSet>(nameof(WordTest), "$(ALBION)/CD/XLDLIBS/ENGLISH/WORDLIS0.XLD", 0,
             (x, s, c) => Loaders.WordListLoader.Serdes(x, info, s, c));
     }
 //*

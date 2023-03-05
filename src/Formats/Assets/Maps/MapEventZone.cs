@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using SerdesNet;
@@ -84,12 +83,12 @@ E\((?<Event>[^)]+)\)\s*", RegexOptions.IgnorePatternWhitespace);
         return new MapEventZone
         {
             Global = m.Groups["Type"].Value == "GZ",
-            X = byte.Parse(m.Groups["X"].Value, CultureInfo.InvariantCulture),
-            Y = byte.Parse(m.Groups["Y"].Value, CultureInfo.InvariantCulture),
+            X = byte.Parse(m.Groups["X"].Value),
+            Y = byte.Parse(m.Groups["Y"].Value),
             Trigger = (TriggerTypes)Enum.Parse(typeof(TriggerTypes), m.Groups["Trigger"].Value),
-            Unk1 = byte.Parse(m.Groups["Mode"].Value, CultureInfo.InvariantCulture),
-            Chain = ushort.Parse(m.Groups["Chain"].Value, CultureInfo.InvariantCulture),
-            Node = new DummyEventNode(ushort.Parse(m.Groups["Event"].Value, CultureInfo.InvariantCulture))
+            Unk1 = byte.Parse(m.Groups["Mode"].Value),
+            Chain = ushort.Parse(m.Groups["Chain"].Value),
+            Node = new DummyEventNode(ushort.Parse(m.Groups["Event"].Value))
         };
     }
 }

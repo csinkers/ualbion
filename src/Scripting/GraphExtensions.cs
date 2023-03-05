@@ -104,7 +104,7 @@ public static class GraphExtensions
                 {
                     var d = ToVis();
                     foreach (var n in d.Nodes)
-                        if (visited[int.Parse(n.Id, CultureInfo.InvariantCulture)])
+                        if (visited[int.Parse(n.Id)])
                             n.Color = "#a0a0a0";
                     for (int ri = 0; ri < result.Count; ri++)
                         d.AddPointer($"r{ri}", result[ri]);
@@ -426,7 +426,7 @@ public static class GraphExtensions
             {
                 var d = ToVis();
                 foreach (var n in d.Nodes)
-                    if (component.Contains(int.Parse(n.Id, CultureInfo.InvariantCulture)))
+                    if (component.Contains(int.Parse(n.Id)))
                         n.Color = "#4040b0";
                 return d.AddPointer("header", header).ToString();
             };*/

@@ -1,5 +1,6 @@
 ﻿namespace UAlbion.Base;
 
+#pragma warning disable CA1712 // Do not prefix enum values with type name
 public enum Switch : ushort
 {
     Switch0 = 0, // "get_switch 0" used as a NOP?
@@ -604,3 +605,4 @@ public enum Switch : ushort
     Switch599 = 599,
     Switch600 = 600,
 }
+#pragma warning restore CA1712 // Do not prefix enum values with type name

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using SerdesNet;
-using UAlbion.Config;
 using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets.Save;
@@ -23,8 +21,8 @@ public class TickerSet : Dictionary<TickerId, byte>
         {
             var assetId = new TickerId(i);
             d[assetId] = d.TryGetValue(assetId, out var existing)
-                ? s.UInt8(i.ToString(CultureInfo.InvariantCulture), existing) 
-                : s.UInt8(i.ToString(CultureInfo.InvariantCulture), 0);
+                ? s.UInt8(i.ToString(), existing) 
+                : s.UInt8(i.ToString(), 0);
         }
         return d;
     }

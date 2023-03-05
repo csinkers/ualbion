@@ -14,11 +14,11 @@ namespace UAlbion.Formats.Containers;
 /// </summary>
 public class ItemListContainer : IAssetContainer
 {
-    public ISerializer Read(string file, AssetInfo info, SerdesContext context)
+    public ISerializer Read(string path, AssetInfo info, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
-        var stream = context.Disk.OpenRead(file);
+        var stream = context.Disk.OpenRead(path);
         var br = new BinaryReader(stream);
         stream.Position = info.Index * ItemData.SizeOnDisk;
         return new AlbionReader(br, ItemData.SizeOnDisk);

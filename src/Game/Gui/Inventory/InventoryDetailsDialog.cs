@@ -1,6 +1,5 @@
 ﻿    using System;
-using System.Globalization;
-using System.Linq;
+    using System.Linq;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
@@ -52,8 +51,8 @@ public class InventoryDetailsDialog : ModalDialog
             new VerticalStack(
                 new UiTextBuilder(Describe.DescribeItemType(item.TypeId)).NoWrap(),
                 new SimpleText($"{item.Weight} g").NoWrap(), // i18n Literal String
-                new SimpleText(item.Damage.ToString(CultureInfo.InvariantCulture)).NoWrap(), // i18n
-                new SimpleText(item.Protection.ToString(CultureInfo.InvariantCulture)).NoWrap() // i18n
+                new SimpleText(item.Damage.ToString()).NoWrap(), // i18n
+                new SimpleText(item.Protection.ToString()).NoWrap() // i18n
             )
         );
 

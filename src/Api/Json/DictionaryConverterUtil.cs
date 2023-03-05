@@ -13,7 +13,7 @@ static class DictionaryConverterUtil<TKey, TValue>
         JsonSerializerOptions options,
         JsonConverter<TValue> valueConverter,
         Type valueType,
-        IAssetId.ParserDelegate<TKey> parser)
+        IAssetId.ParserMethod<TKey> parser)
     {
         if (reader.TokenType != JsonTokenType.StartObject)
             throw new JsonException($"Expected '{{' when reading {typeToConvert}, but was {reader.TokenType}");

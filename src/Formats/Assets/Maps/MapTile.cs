@@ -4,7 +4,7 @@ namespace UAlbion.Formats.Assets.Maps;
 
 public struct MapTile : IEquatable<MapTile>
 {
-    public uint Raw;
+    public uint Raw { get; private set; }
     public MapTile(uint raw) => Raw = raw;
     public MapTile(ushort underlay, ushort overlay) => Raw = underlay | ((uint)overlay << 16);
     public MapTile(byte b1, byte b2, byte b3)
@@ -29,6 +29,8 @@ public struct MapTile : IEquatable<MapTile>
     public override string ToString() => $"Tile U{Underlay} O{Overlay}";
     public bool Equals(MapTile other) => Raw == other.Raw;
     public override bool Equals(object obj) => obj is MapTile other && Equals(other);
+    public static bool operator ==(MapTile lhs, MapTile rhs) => lhs.Equals(rhs);
+    public static bool operator !=(MapTile lhs, MapTile rhs) => !(lhs == rhs);
     public override int GetHashCode() => (int)Raw;
 
     public (byte, byte, byte) Packed

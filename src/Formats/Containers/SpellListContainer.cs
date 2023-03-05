@@ -15,12 +15,12 @@ namespace UAlbion.Formats.Containers;
 public class SpellListContainer : IAssetContainer
 {
     static readonly byte[] Blank = { 0, 0, 0, 0, 0 };
-    public ISerializer Read(string file, AssetInfo info, SerdesContext context)
+    public ISerializer Read(string path, AssetInfo info, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var stream = context.Disk.OpenRead(file);
+        var stream = context.Disk.OpenRead(path);
         var br = new BinaryReader(stream);
         stream.Position = info.Index * SpellData.SizeOnDisk;
         return new AlbionReader(br, SpellData.SizeOnDisk);

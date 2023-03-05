@@ -8,8 +8,8 @@ public interface IAssetId
     uint ToUInt32();
     string ToStringNumeric();
 
-    delegate T ParserDelegate<out T>(string s);
-    static ParserDelegate<T> GetParser<T>() where T : IAssetId
+    delegate T ParserMethod<out T>(string s);
+    static ParserMethod<T> GetParser<T>() where T : IAssetId
     {
         var type = typeof(T);
 
@@ -28,6 +28,6 @@ public interface IAssetId
         if (parser.ReturnType != type)
             throw new InvalidOperationException($"Asset type \"{type}\" contains a static Parse method, but it return a {parser.ReturnType}, rather than the type itself.");
 
-        return (ParserDelegate<T>)Delegate.CreateDelegate(typeof(ParserDelegate<T>), parser);
+        return (ParserMethod<T>)Delegate.CreateDelegate(typeof(ParserMethod<T>), parser);
     }
 }

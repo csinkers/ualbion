@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
@@ -87,7 +86,7 @@ public static class TriggerMapping
             properties.Add(new TiledProperty(Prop.Script, functionsByEventId[zone.Node.Id]));
 
         if (zone.Unk1 != 0)
-            properties.Add(new TiledProperty(Prop.Unk1, zone.Unk1.ToString(CultureInfo.InvariantCulture)));
+            properties.Add(new TiledProperty(Prop.Unk1, zone.Unk1.ToString()));
 
         if (zone.Global)
             properties.Add(new TiledProperty(Prop.Global, "true"));
@@ -122,7 +121,7 @@ public static class TriggerMapping
         {
             Id = objectGroupId,
             Name = name,
-            Color = "#" + (name.GetHashCode(StringComparison.InvariantCulture) & 0x00ffffff).ToString("x", CultureInfo.InvariantCulture),
+            Color = "#" + (name.GetHashCode(StringComparison.InvariantCulture) & 0x00ffffff).ToString("x"),
             Opacity = 0.5f,
             Objects = zonePolygons.ToList(),
         };
@@ -207,7 +206,7 @@ public static class TriggerMapping
             Global = global,
             ObjectId = obj.Id,
             TriggerType = (TriggerTypes)Enum.Parse(typeof(TriggerTypes), trigger),
-            Unk1 = string.IsNullOrEmpty(unk1) ? (byte)0 : byte.Parse(unk1, CultureInfo.InvariantCulture),
+            Unk1 = string.IsNullOrEmpty(unk1) ? (byte)0 : byte.Parse(unk1),
             EventIndex = entryPoint,
             Points = points
         };

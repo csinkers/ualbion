@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -38,7 +37,7 @@ public class LogicalInventorySlot : UiElement
             amountSource = new DynamicText(() =>
             {
                 var gold = Inventory?.Gold.Amount ?? 0;
-                return new[] { new TextBlock($"{gold / 10}.{gold % 10}") }; // i18n: May need to vary based on the current game language
+                return new[] { new TextBlock($"{gold / 10}.{gold % 10}") }; // todo: i18n: May need to vary based on the current game language
             }, _ => _version);
         }
         else if (id.Slot == ItemSlotId.Rations)
@@ -46,7 +45,7 @@ public class LogicalInventorySlot : UiElement
             amountSource = new DynamicText(() =>
             {
                 var food = Inventory?.Rations.Amount ?? 0;
-                return new[] { new TextBlock(food.ToString(CultureInfo.InvariantCulture)) }; // i18n: Will need to be changed if we support a language that doesn't use Hindu-Arabic numerals.
+                return new[] { new TextBlock(food.ToString()) }; // todo: i18n: Will need to be changed if we support a language that doesn't use Hindu-Arabic numerals.
             }, _ => _version);
         }
         else
@@ -56,7 +55,7 @@ public class LogicalInventorySlot : UiElement
                 var slotInfo = Slot;
                 return slotInfo == null || slotInfo.Amount < 2
                     ? Array.Empty<TextBlock>()
-                    : new[] { new TextBlock(slotInfo.Amount.ToString(CultureInfo.InvariantCulture)) { Alignment = TextAlignment.Right } }; // i18n: Will need to be changed if we support a language that doesn't use Hindu-Arabic numerals.
+                    : new[] { new TextBlock(slotInfo.Amount.ToString()) { Alignment = TextAlignment.Right } }; // todo: i18n: Will need to be changed if we support a language that doesn't use Hindu-Arabic numerals.
             }, _ => _version);
         }
 

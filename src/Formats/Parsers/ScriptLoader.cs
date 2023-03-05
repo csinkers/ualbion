@@ -22,7 +22,7 @@ public class ScriptLoader : IAssetLoader<Script>
     public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
         => Serdes((Script)existing, info, s, context);
 
-    public Script Serdes(Script script, AssetInfo info, ISerializer s, SerdesContext context)
+    public Script Serdes(Script existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (s == null)
             throw new ArgumentNullException(nameof(s));
@@ -30,11 +30,11 @@ public class ScriptLoader : IAssetLoader<Script>
         if (s.IsReading())
             return Parse(ReadLines(s));
 
-        if (script == null)
-            throw new ArgumentNullException(nameof(script));
+        if (existing == null)
+            throw new ArgumentNullException(nameof(existing));
 
         var builder = new UnformattedScriptBuilder(true);
-        foreach (var e in script)
+        foreach (var e in existing)
         {
             e.Format(builder);
             builder.AppendLine();
@@ -43,7 +43,7 @@ public class ScriptLoader : IAssetLoader<Script>
         var text = builder.Build().TrimEnd() + Environment.NewLine;
         s.FixedLengthString(null, text, text.Length);
 
-        return script;
+        return existing;
     }
 
     public static Script Parse(string text) => Parse(ApiUtil.SplitLines(text));

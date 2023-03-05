@@ -12,6 +12,7 @@ public class MagicSkills : IMagicSkills
     public SpellClasses SpellClasses { get; set; }
     [JsonInclude] public IList<SpellId> KnownSpells { get; private set; } = new List<SpellId>();
     [JsonInclude] public IDictionary<SpellId, ushort> SpellStrengths { get; private set; } = new Dictionary<SpellId, ushort>();
+
     /*
     #pragma warning disable CA2227 // Collection properties should be read only
             [JsonInclude, JsonPropertyName("SpellStrengths")]

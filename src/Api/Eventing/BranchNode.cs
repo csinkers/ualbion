@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 
 namespace UAlbion.Api.Eventing;
 
@@ -20,8 +19,8 @@ public class BranchNode : EventNode, IBranchNode
     {
         if (builder == null) throw new ArgumentNullException(nameof(builder));
         var id = Id - idOffset;
-        var ifTrue = (Next?.Id - idOffset)?.ToString(CultureInfo.InvariantCulture) ?? "!";
-        var ifFalse = (NextIfFalse?.Id - idOffset)?.ToString(CultureInfo.InvariantCulture) ?? "!";
+        var ifTrue = (Next?.Id - idOffset)?.ToString() ?? "!";
+        var ifFalse = (NextIfFalse?.Id - idOffset)?.ToString() ?? "!";
 
         builder.Append('!');
         builder.Append(id);

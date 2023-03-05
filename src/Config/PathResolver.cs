@@ -52,10 +52,10 @@ public class PathResolver : IPathResolver
         if (string.IsNullOrEmpty(relative))
             throw new ArgumentNullException(nameof(relative));
 
-        if (relative.Contains("..", StringComparison.InvariantCulture))
+        if (relative.Contains("..", StringComparison.Ordinal))
             throw new ArgumentOutOfRangeException($"Paths containing '..' are not allowed: {relative}");
 
-        if (Path.IsPathRooted(relative) && !relative.StartsWith(BasePath, StringComparison.InvariantCulture))
+        if (Path.IsPathRooted(relative) && !relative.StartsWith(BasePath, StringComparison.Ordinal))
             throw new ArgumentOutOfRangeException($"Rooted paths outside outside the base relative UAlbion path ({BasePath}) are not allowed: {relative}");
 
         var resolved = Pattern.Replace(relative, x =>

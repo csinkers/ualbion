@@ -17,11 +17,11 @@ public class XldContainer : IAssetContainer
     const string MagicString = "XLD0I";
     static int HeaderSize(int itemCount) => MagicString.Length + 3 + 4 * itemCount;
 
-    public ISerializer Read(string file, AssetInfo info, SerdesContext context)
+    public ISerializer Read(string path, AssetInfo info, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
-        using var s = new AlbionReader(new BinaryReader(context.Disk.OpenRead(file)));
+        using var s = new AlbionReader(new BinaryReader(context.Disk.OpenRead(path)));
         var bytes = LoadAsset(info.Index, s);
         var ms = new MemoryStream(bytes);
         return new AlbionReader(new BinaryReader(ms));

@@ -32,7 +32,7 @@ public class Handler<TEvent> : Handler
     Action<TEvent> Callback { get; }
     public Handler(Action<TEvent> callback, IComponent component, bool isPostHandler) 
         : base(typeof(TEvent), component, isPostHandler) => Callback = callback;
-    public override bool Invoke(IEvent e, object _) { Callback((TEvent) e); return false; }
+    public override bool Invoke(IEvent e, object continuation) { Callback((TEvent) e); return false; }
 }
 
 public class ReceiveOnlyHandler<TEvent> : Handler
@@ -41,7 +41,7 @@ public class ReceiveOnlyHandler<TEvent> : Handler
     Action<TEvent> Callback { get; }
     public ReceiveOnlyHandler(Action<TEvent> callback, IComponent component) 
         : base(typeof(TEvent), component, false) => Callback = callback;
-    public override bool Invoke(IEvent e, object _) { Callback((TEvent) e); return false; }
+    public override bool Invoke(IEvent e, object continuation) { Callback((TEvent) e); return false; }
 }
 
 public class AsyncHandler<TEvent> : Handler where TEvent : IAsyncEvent

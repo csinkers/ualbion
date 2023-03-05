@@ -2,6 +2,7 @@
 
 namespace UAlbion.Formats.Assets;
 
+#pragma warning disable CA1069 // Enums values should not be duplicated
 public enum ItemSlotId : byte // Enum values that are more convenient for in-memory use (item slot array accessing etc)
 {
     NormalSlotCount = 24,
@@ -34,6 +35,7 @@ public enum ItemSlotId : byte // Enum values that are more convenient for in-mem
 
     None = 0xff,
 }
+#pragma warning restore CA1069 // Enums values should not be duplicated
 
 enum PersistedItemSlotId : byte // Enum values used by the actual game data files
 {

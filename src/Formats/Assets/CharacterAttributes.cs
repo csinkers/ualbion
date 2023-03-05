@@ -1,8 +1,10 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets;
 
+#pragma warning disable CA1711
 public interface ICharacterAttribute
 {
     ushort Current { get; }
@@ -34,6 +36,7 @@ public class CharacterAttribute : ICharacterAttribute
 
     public static CharacterAttribute Serdes(string name, CharacterAttribute attr, ISerializer s, bool hasBackup = true)
     {
+        if (s == null) throw new ArgumentNullException(nameof(s));
         s.Begin(name);
         attr ??= new CharacterAttribute();
         attr.Current = s.UInt16(nameof(Current), attr.Current);
@@ -81,6 +84,7 @@ public class CharacterAttributes : ICharacterAttributes
     public CharacterAttributes DeepClone() => new CharacterAttributes().CopyFrom(this);
     public CharacterAttributes CopyFrom(CharacterAttributes other)
     {
+        if (other == null) throw new ArgumentNullException(nameof(other));
         Strength = other.Strength.DeepClone();
         Intelligence = other.Intelligence.DeepClone();
         Dexterity = other.Dexterity.DeepClone();

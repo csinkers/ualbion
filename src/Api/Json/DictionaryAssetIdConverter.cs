@@ -8,7 +8,7 @@ namespace UAlbion.Api.Json;
 class DictionaryAssetIdConverter<TKey, TValue> : JsonConverter<Dictionary<TKey, TValue>> where TKey : struct, IAssetId
 {
     static readonly Type ValueType = typeof(TValue);
-    static readonly IAssetId.ParserDelegate<TKey> Parser = IAssetId.GetParser<TKey>();
+    static readonly IAssetId.ParserMethod<TKey> Parser = IAssetId.GetParser<TKey>();
     readonly JsonConverter<TValue> _valueConverter;
 
     public DictionaryAssetIdConverter(JsonSerializerOptions options)

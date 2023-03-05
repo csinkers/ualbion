@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -18,7 +17,7 @@ public class LogExchange : ILogExchange
 
     public bool IsActive { get; set; } // Dummy implementation, value not currently used.
     public int ComponentId => -1;
-    public void EnqueueEvent(IEvent @event) => _queuedEvents.Enqueue(@event);
+    public void EnqueueEvent(IEvent e) => _queuedEvents.Enqueue(e);
     public event EventHandler<LogEventArgs> Log;
 
     public void Attach(EventExchange exchange)
@@ -39,11 +38,11 @@ public class LogExchange : ILogExchange
         _exchange = null;
     }
 
-    public void Receive(IEvent @event, object sender)
+    public void Receive(IEvent e, object sender)
     {
-        if (@event == null) throw new ArgumentNullException(nameof(@event));
-        bool highlight = @event is IHighlightEvent;
-        switch(@event)
+        if (e == null) throw new ArgumentNullException(nameof(e));
+        bool highlight = e is IHighlightEvent;
+        switch(e)
         {
             case BeginFrameEvent _:
                 while (_queuedEvents.TryDequeue(out var queuedEvent))
@@ -70,23 +69,23 @@ public class LogExchange : ILogExchange
                 break;
 
             case ClearConsoleEvent _: break; // Handled by loggers directly
-            case SetLogLevelEvent e:
-                _logLevel = e.Level;
+            case SetLogLevelEvent setLogLevelEvent:
+                _logLevel = setLogLevelEvent.Level;
                 break;
 
             case IVerboseEvent _: break;
-            case LogEvent e:
+            case LogEvent logEvent:
             {
-                if (e.Severity < _logLevel)
+                if (logEvent.Severity < _logLevel)
                     break;
 
                 Log?.Invoke(this, new LogEventArgs
                 {
                     Time = DateTime.Now,
                     Nesting = _exchange.Nesting,
-                    Message = e.Message,
+                    Message = logEvent.Message,
                     Color =
-                        e.Severity switch
+                        logEvent.Severity switch
                         {
                             LogLevel.Critical => Console.ForegroundColor = ConsoleColor.Red,
                             LogLevel.Error => Console.ForegroundColor = ConsoleColor.Red,
@@ -144,7 +143,7 @@ public class LogExchange : ILogExchange
                     Time = DateTime.Now,
                     Color = highlight ? ConsoleColor.Cyan : ConsoleColor.Gray,
                     Nesting = _exchange.Nesting,
-                    Message = @event.ToString()
+                    Message = e.ToString()
                 });
 
                 break;
@@ -152,13 +151,13 @@ public class LogExchange : ILogExchange
         }
     }
 
-    void PrintHelp(StringBuilder sb, string pattern)
+    static void PrintHelp(StringBuilder sb, string pattern)
     {
         sb.AppendLine();
         var metadata = EventSerializer.Instance.GetEventMetadata()
-            .FirstOrDefault(x => x.Name.Equals(pattern, StringComparison.InvariantCultureIgnoreCase)
+            .FirstOrDefault(x => x.Name.Equals(pattern, StringComparison.OrdinalIgnoreCase)
                                  || x.Aliases != null &&
-                                 x.Aliases.Any(y => y.Equals(pattern, StringComparison.InvariantCultureIgnoreCase)));
+                                 x.Aliases.Any(y => y.Equals(pattern, StringComparison.OrdinalIgnoreCase)));
 
         if (metadata != null)
         {
@@ -184,7 +183,7 @@ public class LogExchange : ILogExchange
             if (matchingEvents.Any())
                 PrintHelpSummary(sb, matchingEvents);
             else
-                sb.AppendFormat(CultureInfo.InvariantCulture, "The command \"{0}\" is not recognised." + Environment.NewLine, pattern);
+                sb.AppendFormat("The command \"{0}\" is not recognised." + Environment.NewLine, pattern);
         }
     }
 
@@ -197,9 +196,9 @@ public class LogExchange : ILogExchange
                 : " " + string.Join(" ",
                     e.Parts.Select(x => x.IsOptional ? $"[{x.Name}]" : x.Name));
 
-            sb.AppendFormat(CultureInfo.InvariantCulture, "    {0}{1}: {2}" + Environment.NewLine, e.Name, paramList, e.HelpText);
+            sb.AppendFormat("    {0}{1}: {2}" + Environment.NewLine, e.Name, paramList, e.HelpText);
             foreach(var alias in e.Aliases)
-                sb.AppendFormat(CultureInfo.InvariantCulture, "    {0}{1}: {2}" + Environment.NewLine, alias, paramList, e.HelpText);
+                sb.AppendFormat("    {0}{1}: {2}" + Environment.NewLine, alias, paramList, e.HelpText);
 
         }
     }
@@ -213,9 +212,9 @@ public class LogExchange : ILogExchange
             : " " + string.Join(" ",
                 metadata.Parts.Select(x => x.IsOptional ? $"[{x.Name}]" : x.Name));
 
-        sb.AppendFormat(CultureInfo.InvariantCulture, "    {0}{1}: {2}" + Environment.NewLine, metadata.Name, paramList, metadata.HelpText);
+        sb.AppendFormat("    {0}{1}: {2}" + Environment.NewLine, metadata.Name, paramList, metadata.HelpText);
         foreach (var param in metadata.Parts)
-            sb.AppendFormat(CultureInfo.InvariantCulture, "        {0} ({1}): {2}" + Environment.NewLine, param.Name, param.PropertyType, param.HelpText);
+            sb.AppendFormat("        {0} ({1}): {2}" + Environment.NewLine, param.Name, param.PropertyType, param.HelpText);
     }
 
     void PrintEventConsumers(StringBuilder sb, string pattern)

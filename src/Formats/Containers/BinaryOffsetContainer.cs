@@ -13,12 +13,12 @@ namespace UAlbion.Formats.Containers;
 /// </summary>
 public class BinaryOffsetContainer : IAssetContainer
 {
-    public ISerializer Read(string file, AssetInfo info, SerdesContext context)
+    public ISerializer Read(string path, AssetInfo info, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        using var stream = context.Disk.OpenRead(file);
+        using var stream = context.Disk.OpenRead(path);
         using var br = new BinaryReader(stream);
         stream.Position = info.Get(AssetProperty.Offset, 0);
         var bytes = br.ReadBytes(info.Width * info.Height);

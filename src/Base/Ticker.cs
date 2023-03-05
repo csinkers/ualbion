@@ -1,5 +1,6 @@
 ﻿namespace UAlbion.Base;
 
+#pragma warning disable CA1712
 public enum Ticker : ushort
 {
     // Don't think 0..99 are used by anything 
@@ -161,3 +162,4 @@ public enum Ticker : ushort
     Ticker254 = 254,
     Ticker255 = 255,
 }
+#pragma warning restore CA1712

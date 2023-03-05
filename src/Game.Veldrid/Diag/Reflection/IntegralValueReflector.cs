@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 
@@ -38,7 +37,7 @@ public class IntegralValueReflector : IReflector
         }
 
         int value = _toInt(state.Target);
-        var label = state.Meta.Name ?? state.Index.ToString(CultureInfo.InvariantCulture);
+        var label = state.Meta.Name ?? state.Index.ToString();
         var options = state.Meta.Options;
         ImGui.TextUnformatted(label);
         ImGui.SameLine();
@@ -49,7 +48,7 @@ public class IntegralValueReflector : IReflector
     void RenderInput(in ReflectorState state)
     {
         int value = _toInt(state.Target);
-        var label = state.Meta.Name ?? state.Index.ToString(CultureInfo.InvariantCulture);
+        var label = state.Meta.Name ?? state.Index.ToString();
         ImGui.TextUnformatted(label);
         ImGui.SameLine();
         if (ImGui.InputInt("##" + label, ref value))

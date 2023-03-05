@@ -69,7 +69,7 @@ public class RawAssetManager : Component, IRawAssetManager
         var asset = _modApplier.LoadAsset(id.Id, language);
         return asset switch
         {
-            IStringCollection collection => collection.GetString(id, language),
+            IStringSet collection => collection.GetString(id, language),
             string s => s,
             _ => null
         };

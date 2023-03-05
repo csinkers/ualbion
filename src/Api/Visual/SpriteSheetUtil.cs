@@ -2,14 +2,14 @@
 
 namespace UAlbion.Api.Visual;
 
-public delegate (int Width, int Height) GetFrameSizeDelegate(int frame);
-public delegate ReadOnlyImageBuffer<T> GetFrameDelegate<T>(int frame);
+public delegate (int Width, int Height) GetFrameSizeMethod(int frame);
+public delegate ReadOnlyImageBuffer<T> GetFrameMethod<T>(int frame);
 public static class SpriteSheetUtil
 {
-    public static SpriteSheetLayout ArrangeSpriteSheet<T>( int frameCount, int margin, GetFrameDelegate<T> getFrame) 
+    public static SpriteSheetLayout ArrangeSpriteSheet<T>( int frameCount, int margin, GetFrameMethod<T> getFrame) 
         => ArrangeSpriteSheet(frameCount, margin, AdaptDelegate(getFrame));
 
-    static GetFrameSizeDelegate AdaptDelegate<T>(GetFrameDelegate<T> getFrame) =>
+    static GetFrameSizeMethod AdaptDelegate<T>(GetFrameMethod<T> getFrame) =>
         x =>
         {
             var frame = getFrame(x);
@@ -19,8 +19,9 @@ public static class SpriteSheetUtil
     public static SpriteSheetLayout ArrangeSpriteSheet(
         int frameCount,
         int margin,
-        GetFrameSizeDelegate getFrameSize)
+        GetFrameSizeMethod getFrameSize)
     {
+        if (getFrameSize == null) throw new ArgumentNullException(nameof(getFrameSize));
         long totalPixels = 0;
         int width = 0;
         int layers = 1;

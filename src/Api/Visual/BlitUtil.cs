@@ -183,6 +183,7 @@ public static class BlitUtil
 
     public static void BlitMasked<T>(ReadOnlyImageBuffer<T> fromBuffer, ImageBuffer<T> toBuffer, Func<T, bool> opacityFunc) where T : unmanaged
     {
+        if (opacityFunc == null) throw new ArgumentNullException(nameof(opacityFunc));
         var from = fromBuffer.Buffer;
         var to = toBuffer.Buffer;
         int fromOffset = 0;
@@ -292,6 +293,7 @@ public static class BlitUtil
         ImageBuffer<byte> dest,
         Action<int, int, int, int> frameFunc)
     {
+        if (frameFunc == null) throw new ArgumentNullException(nameof(frameFunc));
         if (frameWidth <= 0) throw new ArgumentOutOfRangeException(nameof(frameWidth), "Tried to unpack with a frame width of 0");
         if (frameHeight <= 0) throw new ArgumentOutOfRangeException(nameof(frameHeight), "Tried to unpack with a frame height of 0");
         if (dest.Width < source.Width) throw new ArgumentOutOfRangeException(nameof(dest), "Tried to unpack to a smaller destination");

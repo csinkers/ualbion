@@ -124,7 +124,7 @@ public class FormatScriptVisitor : IAstVisitor
         _builder.Append("}");
     }
 
-    public void Visit(Goto jump)
+    public void Visit(GotoStatement jump)
     {
         Indent();
         _builder.Add(ScriptPartType.Keyword, "goto ");
@@ -182,14 +182,14 @@ public class FormatScriptVisitor : IAstVisitor
         _builder.Append(")");
     }
 
-    public void Visit(EndlessLoop loop)
+    public void Visit(EndlessLoop endlessLoop)
     {
         Indent();
         _builder.Add(ScriptPartType.Keyword, "loop");
         _builder.Append(" {");
 
         Push();
-        loop.Body?.Accept(this);
+        endlessLoop.Body?.Accept(this);
         Pop();
         Indent();
 

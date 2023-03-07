@@ -5,6 +5,7 @@ using UAlbion.Game.Scenes;
 
 namespace UAlbion.Game.State;
 
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
 public class SceneStack : Component
 {
     readonly Stack<SceneId> _stack = new();
@@ -26,3 +27,4 @@ public class SceneStack : Component
         });
     }
 }
+#pragma warning restore CA1711 // Identifiers should not have incorrect suffix

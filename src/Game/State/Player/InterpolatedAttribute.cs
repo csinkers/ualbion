@@ -4,6 +4,7 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.State.Player;
 
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
 public class InterpolatedAttribute : ICharacterAttribute
 {
     readonly Func<ICharacterAttribute> _a;
@@ -23,3 +24,4 @@ public class InterpolatedAttribute : ICharacterAttribute
     public ushort Backup => (ushort)ApiUtil.Lerp(_a().Backup, _b().Backup, _getLerp());
     public override string ToString() => $"[{Current}/{Max}]{(Boost > 0 ? $"+{Boost}" : "")}{(Backup > 0 ? $" (was {Backup})" : "")}";
 }
+#pragma warning restore CA1711 // Identifiers should not have incorrect suffix

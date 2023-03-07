@@ -30,7 +30,7 @@ public class DynamicText : IText
             {
                 sb.Append(" (");
                 sb.Append(string.Join(", ", words.Select(x => x.ToString())));
-                sb.Append(")");
+                sb.Append(')');
                 words.Clear();
             }
         }

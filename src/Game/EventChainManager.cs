@@ -33,7 +33,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
 
     public void AddBreakpoint(Breakpoint bp) => _breakpoints.Add(bp);
     public void RemoveBreakpoint(int index) => _breakpoints.RemoveAt(index);
-    public void Continue(EventContext context)
+    public void ContinueExecution(EventContext context)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
         if (context.Status == EventContextStatus.Breakpoint)

@@ -50,11 +50,11 @@ public sealed class TileRenderer : Component, IRenderer<GlobalSet, MainPassSet>,
         AttachChild(_pipeline);
     }
 
-    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, MainPassSet mainPassSet)
+    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, MainPassSet renderPassSet)
     {
         if (cl == null) throw new ArgumentNullException(nameof(cl));
         if (globalSet == null) throw new ArgumentNullException(nameof(globalSet));
-        if (mainPassSet == null) throw new ArgumentNullException(nameof(mainPassSet));
+        if (renderPassSet == null) throw new ArgumentNullException(nameof(renderPassSet));
         if (renderable is not TileLayerRenderable tileLayer)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
@@ -68,7 +68,7 @@ public sealed class TileRenderer : Component, IRenderer<GlobalSet, MainPassSet>,
         cl.SetIndexBuffer(_indexBuffer.DeviceBuffer, IndexFormat.UInt16);
 
         cl.SetGraphicsResourceSet(0, globalSet.ResourceSet);
-        cl.SetGraphicsResourceSet(1, mainPassSet.ResourceSet);
+        cl.SetGraphicsResourceSet(1, renderPassSet.ResourceSet);
         cl.SetGraphicsResourceSet(2, tileLayer.Tileset.Resources.ResourceSet);
         cl.SetGraphicsResourceSet(3, tileLayer.Resources.ResourceSet);
         cl.DrawIndexed((uint)Indices.Length);

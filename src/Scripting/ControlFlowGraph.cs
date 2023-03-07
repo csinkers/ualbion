@@ -54,7 +54,7 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
     public ImmutableArray<int> Parents(int i) => _edgesByEnd.TryGetValue(i, out var nodes) ? nodes : ImmutableArray<int>.Empty;
     IList<int> IGraph.Children(int i) => Children(i);
     IList<int> IGraph.Parents(int i) => Parents(i);
-    public CfgEdge GetEdgeLabel(int start, int end) => _labels.TryGetValue((start, end), out var label) ? label : CfgEdge.True;
+    public CfgEdge GetEdgeLabel(int startNode, int endNode) => _labels.TryGetValue((startNode, endNode), out var label) ? label : CfgEdge.True;
     public DominatorTree GetDominatorTree() => _cachedDominatorTree ??= this.GetDominatorTree(EntryIndex);
     public DominatorTree GetPostDominatorTree() => Reverse().GetDominatorTree();
     public bool IsCyclic() => GetBackEdges().Any();
@@ -776,10 +776,10 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
         if (count < 2)
             throw new InvalidOperationException("All control flow graphs require an entry and exit node");
 
-        yield return Emit.Empty();
+        yield return UAEmit.Empty();
         for (int i = 1; i < count - 1; i++)
-            yield return Emit.Statement(Emit.Const(i));
-        yield return Emit.Empty();
+            yield return UAEmit.Statement(UAEmit.Const(i));
+        yield return UAEmit.Empty();
     }
 
     public override string ToString() // Emit structural representation without details of node contents

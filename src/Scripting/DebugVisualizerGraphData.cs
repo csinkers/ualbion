@@ -8,11 +8,12 @@ namespace UAlbion.Scripting;
 
 public class DebugVisualizerGraphData
 {
+#pragma warning disable CA1822 // Mark members as static
     [JsonPropertyName("kind")] public Dictionary<string, bool> Kind => Tags.ToDictionary(tag => tag, _ => true);
-    // ReSharper disable once MemberCanBeMadeStatic.Global
     [JsonIgnore] public string[] Tags => new[] { "graph" };
     [JsonPropertyName("nodes")] public List<DebugVisualizerNodeData> Nodes { get; } = new(); 
     [JsonPropertyName("edges")] public List<DebugVisualizerEdgeData> Edges { get; } = new(); 
+#pragma warning restore CA1822 // Mark members as static
 
     public static DebugVisualizerGraphData FromCfg(ControlFlowGraph graph)
     {

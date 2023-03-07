@@ -6,7 +6,7 @@ using UAlbion.Core;
 
 namespace UAlbion.Game.Gui.Controls;
 
-public class FixedPositionStack : UiElement, IFixedSizeUiElement
+public class FixedPositionStacker : UiElement, IFixedSizeUiElement
 {
     readonly IList<Child> _positions = new List<Child>();
 
@@ -29,14 +29,14 @@ public class FixedPositionStack : UiElement, IFixedSizeUiElement
         public override string ToString() => $"{Element} @ <{X}, {Y}>";
     }
 
-    public FixedPositionStack Add(IUiElement child, int x, int y)
+    public FixedPositionStacker Add(IUiElement child, int x, int y)
     {
         _positions.Add(new Child(child, x, y, null, null));
         AttachChild(child);
         return this;
     }
 
-    public FixedPositionStack Add(IUiElement child, int x, int y, int w, int h)
+    public FixedPositionStacker Add(IUiElement child, int x, int y, int w, int h)
     {
         _positions.Add(new Child(child, x, y, w, h));
         AttachChild(child);

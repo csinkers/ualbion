@@ -31,9 +31,7 @@ public class RawAssetManager : Component, IRawAssetManager
 
     protected override void Unsubscribed() => Exchange.Unregister(this);
 
-    public void Save(AssetId id, object asset)
-    {
-    }
+    public void Save(AssetId key, object asset) { }
 
     public IEnumerable<AssetId> EnumerateAssets(AssetType type) => AssetMapping.Global.EnumerateAssetsOfType(type);
     public AssetInfo GetAssetInfo(AssetId id, string language = null) => _modApplier.GetAssetInfo(id, language);
@@ -55,7 +53,7 @@ public class RawAssetManager : Component, IRawAssetManager
     public ITexture LoadTexture(SpriteId id) => (ITexture)_modApplier.LoadAsset(id);
     public ITexture LoadTexture(IAssetId id) => (ITexture)_modApplier.LoadAsset(SpriteId.FromUInt32(id?.ToUInt32() ?? 0));
     public object LoadMapObject(MapObjectId id) => _modApplier.LoadAsset(id);
-    public Ink LoadInk(InkId inkId) => (Ink)_modApplier.LoadAsset(inkId);
+    public Ink LoadInk(InkId id) => (Ink)_modApplier.LoadAsset(id);
     public FontDefinition LoadFontDefinition(FontId id) => (FontDefinition)_modApplier.LoadAsset(id);
     public MetaFont LoadFont(FontId fontId, InkId inkId) => (MetaFont)_modApplier.LoadAsset(new MetaFontId(fontId, inkId));
 
@@ -88,10 +86,10 @@ public class RawAssetManager : Component, IRawAssetManager
     public PartyMemberInfo LoadPartyMember(PartyMemberId id) => (PartyMemberInfo)_modApplier.LoadAsset(id);
     public CharacterSheet LoadSheet(SheetId id) => (CharacterSheet)_modApplier.LoadAsset(id);
     public Inventory LoadInventory(AssetId id) => (Inventory)_modApplier.LoadAsset(id);
-    public IList<Block> LoadBlockList(BlockListId blockListId) => (IList<Block>)_modApplier.LoadAsset(blockListId);
-    public EventSet LoadEventSet(EventSetId eventSetId) => (EventSet)_modApplier.LoadAsset(eventSetId);
-    public byte[] LoadSong(SongId songId) => (byte[]) _modApplier.LoadAsset(songId);
-    public IList<IEvent> LoadScript(ScriptId scriptId) => (IList<IEvent>) _modApplier.LoadAsset(scriptId);
+    public IList<Block> LoadBlockList(BlockListId id) => (IList<Block>)_modApplier.LoadAsset(id);
+    public EventSet LoadEventSet(EventSetId id) => (EventSet)_modApplier.LoadAsset(id);
+    public byte[] LoadSong(SongId id) => (byte[]) _modApplier.LoadAsset(id);
+    public IList<IEvent> LoadScript(ScriptId id) => (IList<IEvent>) _modApplier.LoadAsset(id);
     public SpellData LoadSpell(SpellId id) => (SpellData)_modApplier.LoadAsset(id);
     public SavedGame LoadSavedGame(string path) => _modApplier.LoadSavedGame(path);
     public MonsterGroup LoadMonsterGroup(MonsterGroupId id) => (MonsterGroup)_modApplier.LoadAsset(id);

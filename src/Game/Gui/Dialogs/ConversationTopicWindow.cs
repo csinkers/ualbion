@@ -71,13 +71,13 @@ public class ConversationTopicWindow : ModalDialog
 
         if (wordButtons.Any())
         {
-            elements.Add(new GroupingFrame(new VerticalStack(wordButtons)));
+            elements.Add(new GroupingFrame(new VerticalStacker(wordButtons)));
             elements.Add(new Spacing(0, 3));
         }
 
         elements.Add(new Button(Base.SystemText.MsgBox_EnterWord).OnClick(ShowWordEntryPrompt));
 
-        AttachChild(new DialogFrame(new Padding(new VerticalStack(elements), 3))
+        AttachChild(new DialogFrame(new Padding(new VerticalStacker(elements), 3))
         {
             Background = DialogFrameBackgroundStyle.MainMenuPattern
         });

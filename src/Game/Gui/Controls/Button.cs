@@ -41,99 +41,97 @@ public class Button : UiElement
     {
         On<HoverEvent>(_ => { IsHovered = true; Hover?.Invoke(); });
         On<BlurEvent>(_ => { IsHovered = false; Blur?.Invoke(); });
-        On<UiLeftClickEvent>(e =>
-        {
-            if (!IsHovered)
-                return;
-
-            if (!IsClicked)
-                ButtonDown?.Invoke();
-
-            IsClicked = true;
-            if (Typematic)
-                Click?.Invoke();
-
-            e.Propagating = false;
-        });
-
-        On<UiLeftReleaseEvent>(_ =>
-        {
-            if (!IsClicked)
-                return;
-            IsClicked = false;
-
-            if (Typematic)
-            {
-                _typematicAccrual = 0;
-                return;
-            }
-
-            if (!IsHovered)
-                return;
-
-            if (DoubleClick == null || !AllowDoubleClick || SuppressNextDoubleClick) // Simple single click only button
-            {
-                Click?.Invoke();
-                SuppressNextDoubleClick = false;
-                return;
-            }
-
-            if (ClickTimerPending) // If they double-clicked...
-            {
-                DoubleClick?.Invoke();
-                ClickTimerPending = false; // Ensure the single-click behaviour doesn't happen.
-            }
-            else // For the first click, just start the double-click timer.
-            {
-                Raise(new StartTimerEvent(TimerName, Var(GameVars.Ui.ButtonDoubleClickIntervalSeconds), this));
-                ClickTimerPending = true;
-            }
-        });
-
-        On<UiRightClickEvent>(e =>
-        {
-            if (RightClick == null) return;
-            e.Propagating = false;
-            IsRightClicked = true;
-        });
-
-        On<UiRightReleaseEvent>(_ =>
-        {
-            if (RightClick == null) return;
-            if (IsRightClicked && IsHovered)
-                RightClick.Invoke();
-            IsRightClicked = false;
-        });
-
-        On<TimerElapsedEvent>(e =>
-        {
-            if (e.Id != TimerName)
-                return;
-
-            if (!ClickTimerPending) // They've already double-clicked
-                return;
-
-            Click?.Invoke();
-            ClickTimerPending = false;
-        });
-
-        On<EngineUpdateEvent>(e =>
-        {
-            if (!Typematic || !IsClicked)
-                return;
-
-            var oldAccrual = _typematicAccrual;
-            _typematicAccrual += e.DeltaSeconds;
-            var rate = 8 * (int)(2 * oldAccrual);
-            var oldAmount = (int)(oldAccrual * rate);
-            var newAmount = (int)(_typematicAccrual * rate);
-            var delta = newAmount - oldAmount;
-            for (int i = 0; i < delta; i++)
-                Click?.Invoke();
-        });
+        On<UiLeftClickEvent>(OnLeftClick);
+        On<UiLeftReleaseEvent>(OnLeftRelease);
+        On<UiRightClickEvent>(OnRightClick);
+        On<UiRightReleaseEvent>(OnRightRelease);
+        On<TimerElapsedEvent>(OnTimerElapsed);
+        On<EngineUpdateEvent>(OnEngineUpdate);
 
         _id = Interlocked.Increment(ref _nextId);
         _frame = AttachChild(new ButtonFrame(content));
+    }
+
+    void OnLeftClick(UiLeftClickEvent e)
+    {
+        if (!IsHovered) return;
+
+        if (!IsClicked) ButtonDown?.Invoke();
+
+        IsClicked = true;
+        if (Typematic) Click?.Invoke();
+
+        e.Propagating = false;
+    }
+
+    void OnLeftRelease(UiLeftReleaseEvent _)
+    {
+        if (!IsClicked) return;
+        IsClicked = false;
+
+        if (Typematic)
+        {
+            _typematicAccrual = 0;
+            return;
+        }
+
+        if (!IsHovered) return;
+
+        if (DoubleClick == null || !AllowDoubleClick || SuppressNextDoubleClick) // Simple single click only button
+        {
+            Click?.Invoke();
+            SuppressNextDoubleClick = false;
+            return;
+        }
+
+        if (ClickTimerPending) // If they double-clicked...
+        {
+            DoubleClick?.Invoke();
+            ClickTimerPending = false; // Ensure the single-click behaviour doesn't happen.
+        }
+        else // For the first click, just start the double-click timer.
+        {
+            Raise(new StartTimerEvent(TimerName, Var(GameVars.Ui.ButtonDoubleClickIntervalSeconds), this));
+            ClickTimerPending = true;
+        }
+    }
+
+    void OnRightClick(UiRightClickEvent e)
+    {
+        if (RightClick == null) return;
+        e.Propagating = false;
+        IsRightClicked = true;
+    }
+
+    void OnRightRelease(UiRightReleaseEvent _)
+    {
+        if (RightClick == null) return;
+        if (IsRightClicked && IsHovered) RightClick.Invoke();
+        IsRightClicked = false;
+    }
+
+    void OnTimerElapsed(TimerElapsedEvent e)
+    {
+        if (e.Id != TimerName) return;
+
+        if (!ClickTimerPending) // They've already double-clicked
+            return;
+
+        Click?.Invoke();
+        ClickTimerPending = false;
+    }
+
+    void OnEngineUpdate(EngineUpdateEvent e)
+    {
+        if (!Typematic || !IsClicked) return;
+
+        var oldAccrual = _typematicAccrual;
+        _typematicAccrual += e.DeltaSeconds;
+        var rate = 8 * (int)(2 * oldAccrual);
+        var oldAmount = (int)(oldAccrual * rate);
+        var newAmount = (int)(_typematicAccrual * rate);
+        var delta = newAmount - oldAmount;
+        for (int i = 0; i < delta; i++) Click?.Invoke();
     }
 
     public Button(IText textSource) : this(new UiText(textSource)) { }

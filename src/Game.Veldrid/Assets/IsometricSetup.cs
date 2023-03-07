@@ -82,6 +82,7 @@ public sealed class IsometricRenderSystem : Component, IRenderSystem, IDisposabl
         _spriteRenderer.Dispose();
         _etmRenderer.Dispose();
         Framebuffer.Dispose();
+        _globalManager.Dispose();
     }
 }
 

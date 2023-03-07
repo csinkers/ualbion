@@ -15,6 +15,7 @@ public class InventoryMidPane : UiElement
     readonly PartyMemberId _activeCharacter;
     public InventoryMidPane(PartyMemberId activeCharacter) => _activeCharacter = activeCharacter;
 
+#pragma warning disable CA1506 // 'Subscribed' is coupled with '44' different types from '15' different namespaces. Rewrite or refactor the code to decrease its class coupling below '41'.
     protected override void Subscribed()
     {
         var assets = Resolve<IAssetManager>();
@@ -22,11 +23,11 @@ public class InventoryMidPane : UiElement
         if (positions == null)
             throw new AssetNotFoundException($"Could not load inventory slot positions for party member {_activeCharacter}");
 
-        var backgroundStack = new FixedPositionStack();
+        var backgroundStack = new FixedPositionStacker();
         var background = new UiSpriteElement(_activeCharacter.ToInventoryGfx());
         backgroundStack.Add(background, 3, 10 - 1); //subtract 1px because picture starts 1px above frame
 
-        var bodyStack = new FixedPositionStack();
+        var bodyStack = new FixedPositionStacker();
         foreach (var bodyPart in positions)
         {
             var itemSlotId = bodyPart.Key;
@@ -44,7 +45,7 @@ public class InventoryMidPane : UiElement
 
         var frame = new GroupingFrame(bodyStack) { Theme = GroupingFrame.FrameThemeBackgroundless, Padding = -1 };
 
-        var labelStack = new HorizontalStack(
+        var labelStack = new HorizontalStacker(
             new InventoryOffensiveLabel(_activeCharacter),
             new Spacing(4, 0),
             new InventoryWeightLabel(_activeCharacter),
@@ -52,7 +53,7 @@ public class InventoryMidPane : UiElement
             new InventoryDefensiveLabel(_activeCharacter)
         );
 
-        var mainStack = new VerticalStack(
+        var mainStack = new VerticalStacker(
             new Spacing(0, 1),
             new Header(new DynamicText(() =>
             {
@@ -63,7 +64,7 @@ public class InventoryMidPane : UiElement
                 var name = member.Apparent.GetName(Var(UserVars.Gameplay.Language));
                 return new[] { new TextBlock(name) { Alignment = TextAlignment.Center } };
             }), 18),
-            new HorizontalStack(
+            new HorizontalStacker(
                 new Spacing(3, 0),
                 frame,
                 new Spacing(3, 0)),
@@ -71,6 +72,7 @@ public class InventoryMidPane : UiElement
             labelStack
         );
 
-        AttachChild(new LayerStack(backgroundStack, mainStack));
+        AttachChild(new LayerStacker(backgroundStack, mainStack));
     }
+#pragma warning restore CA1506 // 'Subscribed' is coupled with '44' different types from '15' different namespaces. Rewrite or refactor the code to decrease its class coupling below '41'.
 }

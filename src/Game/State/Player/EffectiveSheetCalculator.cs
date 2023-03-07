@@ -78,61 +78,78 @@ public static class EffectiveSheetCalculator
                 continue;
 
             var item = getItem(itemSlot.Item);
-            sheet.Combat.UnknownD8 += item.Damage;
-            sheet.Combat.UnknownD6 += item.Protection;
+            sheet.Combat.UnknownD8      += item.Damage;
+            sheet.Combat.UnknownD6      += item.Protection;
             sheet.Combat.LifePoints.Max += item.LpMaxBonus;
             sheet.Magic.SpellPoints.Max += item.SpMaxBonus;
 
-            if (item.AttributeBonus != 0)
-            {
-                switch (item.AttributeType)
-                {
-                    case PhysicalAttribute.Strength: sheet.Attributes.Strength.Current += item.AttributeBonus; break;
-                    case PhysicalAttribute.Intelligence: sheet.Attributes.Intelligence.Current += item.AttributeBonus; break;
-                    case PhysicalAttribute.Dexterity: sheet.Attributes.Dexterity.Current += item.AttributeBonus; break;
-                    case PhysicalAttribute.Speed: sheet.Attributes.Speed.Current += item.AttributeBonus; break;
-                    case PhysicalAttribute.Stamina: sheet.Attributes.Stamina.Current += item.AttributeBonus; break;
-                    case PhysicalAttribute.Luck: sheet.Attributes.Luck.Current += item.AttributeBonus; break;
-                    case PhysicalAttribute.MagicResistance: sheet.Attributes.MagicResistance.Current += item.AttributeBonus; break;
-                    case PhysicalAttribute.MagicTalent: sheet.Attributes.MagicTalent.Current += item.AttributeBonus; break;
-                }
-            }
-
-            if (item.SkillBonus != 0)
-            {
-                switch (item.SkillType)
-                {
-                    case Skill.Melee: sheet.Skills.CloseCombat.Current += item.SkillBonus; break;
-                    case Skill.Ranged: sheet.Skills.RangedCombat.Current += item.SkillBonus; break;
-                    case Skill.CriticalChance: sheet.Skills.CriticalChance.Current += item.SkillBonus; break;
-                    case Skill.LockPicking: sheet.Skills.LockPicking.Current += item.SkillBonus; break;
-                }
-            }
-
-            if (item.SkillTax1 != 0)
-            {
-                switch (item.SkillTax1Type)
-                {
-                    case Skill.Melee: sheet.Skills.CloseCombat.Current -= item.SkillTax1; break;
-                    case Skill.Ranged: sheet.Skills.RangedCombat.Current -= item.SkillTax1; break;
-                    case Skill.CriticalChance: sheet.Skills.CriticalChance.Current -= item.SkillTax1; break;
-                    case Skill.LockPicking: sheet.Skills.LockPicking.Current -= item.SkillTax1; break;
-                }
-            }
-
-            if (item.SkillTax2 != 0)
-            {
-                switch (item.SkillTax2Type)
-                {
-                    case Skill.Melee: sheet.Skills.CloseCombat.Current -= item.SkillTax2; break;
-                    case Skill.Ranged: sheet.Skills.RangedCombat.Current -= item.SkillTax2; break;
-                    case Skill.CriticalChance: sheet.Skills.CriticalChance.Current -= item.SkillTax2; break;
-                    case Skill.LockPicking: sheet.Skills.LockPicking.Current -= item.SkillTax2; break;
-                }
-            }
+            ApplyAttribute(sheet, item);
+            ApplySkillBonus(sheet, item);
+            ApplySkillTax1(sheet, item);
+            ApplySkillTax2(sheet, item);
         }
 
         sheet.DisplayDamage = sheet.Combat.UnknownD8 - initialDamage;
         sheet.DisplayProtection = sheet.Combat.UnknownD6 - initialProtection;
+    }
+
+    static void ApplySkillTax1(CharacterSheet sheet, ItemData item)
+    {
+        if (item.SkillTax1 == 0)
+            return;
+
+        switch (item.SkillTax1Type)
+        {
+            case Skill.Melee: sheet.Skills.CloseCombat.Current -= item.SkillTax1; break;
+            case Skill.Ranged: sheet.Skills.RangedCombat.Current -= item.SkillTax1; break;
+            case Skill.CriticalChance: sheet.Skills.CriticalChance.Current -= item.SkillTax1; break;
+            case Skill.LockPicking: sheet.Skills.LockPicking.Current -= item.SkillTax1; break;
+        }
+    }
+
+    static void ApplySkillTax2(CharacterSheet sheet, ItemData item)
+    {
+        if (item.SkillTax2 == 0)
+            return;
+
+        switch (item.SkillTax2Type)
+        {
+            case Skill.Melee: sheet.Skills.CloseCombat.Current -= item.SkillTax2; break;
+            case Skill.Ranged: sheet.Skills.RangedCombat.Current -= item.SkillTax2; break;
+            case Skill.CriticalChance: sheet.Skills.CriticalChance.Current -= item.SkillTax2; break;
+            case Skill.LockPicking: sheet.Skills.LockPicking.Current -= item.SkillTax2; break;
+        }
+    }
+
+    static void ApplySkillBonus(CharacterSheet sheet, ItemData item)
+    {
+        if (item.SkillBonus == 0)
+            return;
+
+        switch (item.SkillType)
+        {
+            case Skill.Melee: sheet.Skills.CloseCombat.Current += item.SkillBonus; break;
+            case Skill.Ranged: sheet.Skills.RangedCombat.Current += item.SkillBonus; break;
+            case Skill.CriticalChance: sheet.Skills.CriticalChance.Current += item.SkillBonus; break;
+            case Skill.LockPicking: sheet.Skills.LockPicking.Current += item.SkillBonus; break;
+        }
+    }
+
+    static void ApplyAttribute(CharacterSheet sheet, ItemData item)
+    {
+        if (item.AttributeBonus == 0)
+            return;
+
+        switch (item.AttributeType)
+        {
+            case PhysicalAttribute.Strength: sheet.Attributes.Strength.Current += item.AttributeBonus; break;
+            case PhysicalAttribute.Intelligence: sheet.Attributes.Intelligence.Current += item.AttributeBonus; break;
+            case PhysicalAttribute.Dexterity: sheet.Attributes.Dexterity.Current += item.AttributeBonus; break;
+            case PhysicalAttribute.Speed: sheet.Attributes.Speed.Current += item.AttributeBonus; break;
+            case PhysicalAttribute.Stamina: sheet.Attributes.Stamina.Current += item.AttributeBonus; break;
+            case PhysicalAttribute.Luck: sheet.Attributes.Luck.Current += item.AttributeBonus; break;
+            case PhysicalAttribute.MagicResistance: sheet.Attributes.MagicResistance.Current += item.AttributeBonus; break;
+            case PhysicalAttribute.MagicTalent: sheet.Attributes.MagicTalent.Current += item.AttributeBonus; break;
+        }
     }
 }

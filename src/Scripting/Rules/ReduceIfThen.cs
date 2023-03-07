@@ -42,8 +42,8 @@ public static class ReduceIfThen
             if (after == -1 || then == -1 || after == head)
                 continue;
 
-            var condition = then == falseChild.Value ? Emit.Negation(graph.Nodes[head]) : graph.Nodes[head];
-            var newNode = Emit.If(condition, graph.Nodes[then]);
+            var condition = then == falseChild.Value ? UAEmit.Negation(graph.Nodes[head]) : graph.Nodes[head];
+            var newNode = UAEmit.If(condition, graph.Nodes[then]);
             return (graph.RemoveNode(then).ReplaceNode(head, newNode), Description);
         }
 

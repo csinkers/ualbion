@@ -57,7 +57,7 @@ public class AssetManager : Component, IAssetManager
     public object LoadMapObject(MapObjectId id) => _modApplier.LoadAssetCached(id);
     public ITexture LoadTexture(IAssetId id) => (ITexture)_modApplier.LoadAssetCached(SpriteId.FromUInt32(id?.ToUInt32() ?? 0));
 
-    public Ink LoadInk(InkId inkId) => (Ink)_modApplier.LoadAssetCached(inkId);
+    public Ink LoadInk(InkId id) => (Ink)_modApplier.LoadAssetCached(id);
     public FontDefinition LoadFontDefinition(FontId id) => (FontDefinition)_modApplier.LoadAssetCached(id);
     public MetaFont LoadFont(FontId fontId, InkId inkId) => (MetaFont)_modApplier.LoadAssetCached(new MetaFontId(fontId, inkId));
 

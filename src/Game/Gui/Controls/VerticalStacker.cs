@@ -10,10 +10,10 @@ namespace UAlbion.Game.Gui.Controls;
 /// elements will be arranged with the width of the widest element (unless the
 /// entire stack is otherwise constrained).
 /// </summary>
-public class VerticalStack : UiElement
+public class VerticalStacker : UiElement
 {
-    public VerticalStack(params IUiElement[] children) : this((IList<IUiElement>)children) { }
-    public VerticalStack(IList<IUiElement> children)
+    public VerticalStacker(params IUiElement[] children) : this((IList<IUiElement>)children) { }
+    public VerticalStacker(IList<IUiElement> children)
     {
         if (children == null) throw new ArgumentNullException(nameof(children));
         foreach(var child in children)

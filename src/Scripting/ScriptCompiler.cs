@@ -33,8 +33,8 @@ public static class ScriptCompiler
     public static ControlFlowGraph ExpandAstToGraph(ICfgNode ast, Func<IEvent, IEvent> eventTransformer, RecordFunc record)
     {
         if (ast == null) throw new ArgumentNullException(nameof(ast));
-        var start = Emit.Empty();
-        var end = Emit.Empty();
+        var start = UAEmit.Empty();
+        var end = UAEmit.Empty();
         var graph = new ControlFlowGraph(new[] { start, ast, end }, new[] { (0, 1, CfgEdge.True), (1, 2, CfgEdge.True) });
         return ExpandGraph(graph, eventTransformer, record);
     }
@@ -180,7 +180,7 @@ public static class ScriptCompiler
                     ifElse.Condition, // 0
                     ifElse.TrueBody, // 1
                     ifElse.FalseBody, // 2
-                    Emit.Empty() // 3
+                    UAEmit.Empty() // 3
                 },
                 new []
                 {
@@ -216,7 +216,7 @@ public static class ScriptCompiler
                 {
                     condition, // 0
                     ifThen.Body, // 1
-                    Emit.Empty() // 2
+                    UAEmit.Empty() // 2
                 },
                 new []
                 {
@@ -260,7 +260,7 @@ public static class ScriptCompiler
         foreach (var index in order)
         {
             var node = graph.Nodes[index];
-            if (node is not Goto statement)
+            if (node is not GotoStatement statement)
                 continue;
 
             if (!mapping.TryGetValue(statement.Label, out var target))

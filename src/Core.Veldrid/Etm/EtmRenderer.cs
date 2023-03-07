@@ -45,11 +45,11 @@ public sealed class EtmRenderer : Component, IRenderer<GlobalSet, MainPassSet>, 
             Winding = FrontFace.CounterClockwise,
         };
 
-    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, MainPassSet mainPassSet)
+    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, MainPassSet renderPassSet)
     {
         if (cl == null) throw new ArgumentNullException(nameof(cl));
         if (globalSet == null) throw new ArgumentNullException(nameof(globalSet));
-        if (mainPassSet == null) throw new ArgumentNullException(nameof(mainPassSet));
+        if (renderPassSet == null) throw new ArgumentNullException(nameof(renderPassSet));
         if (renderable is not EtmWindow window)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
@@ -62,7 +62,7 @@ public sealed class EtmRenderer : Component, IRenderer<GlobalSet, MainPassSet>, 
             : _normalPipeline.Pipeline);
 
         cl.SetGraphicsResourceSet(0, globalSet.ResourceSet);
-        cl.SetGraphicsResourceSet(1, mainPassSet.ResourceSet);
+        cl.SetGraphicsResourceSet(1, renderPassSet.ResourceSet);
         cl.SetGraphicsResourceSet(2, tilemap.ResourceSet.ResourceSet);
         cl.SetVertexBuffer(0, _vertexBuffer.DeviceBuffer);
         cl.SetVertexBuffer(1, tilemap.TileBuffer);

@@ -166,7 +166,7 @@ public static class Decompiler
         edges = edges.Concat(trueExits).Concat(falseExits).Append((entry, start, CfgEdge.True));
         edges = FilterOutDuplicateEdges(edges);
         var result = new ControlFlowGraph(subset, edges);
-        return result.InsertBefore(start, Emit.Label(label));
+        return result.InsertBefore(start, UAEmit.Label(label));
     }
 
     static IEnumerable<(int start, int end, CfgEdge label)> FilterOutDuplicateEdges(IEnumerable<(int start, int end, CfgEdge label)> edges)
@@ -186,13 +186,13 @@ public static class Decompiler
 
     public static ControlFlowGraph BuildDisconnectedGraphFromEvents<T>(IList<T> events) where T : IEventNode
     {
-        var nodes = events.Select((x, i) => (ICfgNode)Emit.Event(x.Event, i)).ToList();
+        var nodes = events.Select((x, i) => (ICfgNode)UAEmit.Event(x.Event, i)).ToList();
 
         // Add empty nodes for the unique entry/exit points
         var entry = nodes.Count;
-        nodes.Add(Emit.Empty());
+        nodes.Add(UAEmit.Empty());
         var exit = nodes.Count;
-        nodes.Add(Emit.Empty());
+        nodes.Add(UAEmit.Empty());
 
         var trueEdges = events.Where(x => x.Next != null).Select(x => ((int)x.Id, (int)x.Next.Id, CfgEdge.True));
         var falseEdges = events.OfType<IBranchNode>().Where(x => x.NextIfFalse != null).Select(x => ((int)x.Id, (int)x.NextIfFalse.Id, CfgEdge.False));

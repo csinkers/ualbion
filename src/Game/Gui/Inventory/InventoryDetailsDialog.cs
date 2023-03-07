@@ -1,8 +1,7 @@
-﻿    using System;
-    using System.Linq;
+﻿using System;
+using System.Linq;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Ids;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 
@@ -23,6 +22,7 @@ public class InventoryDetailsDialog : ModalDialog
     |                 Enlightened One                    |
     |                 Technician                         |
     \---------------------------------------------------*/
+#pragma warning disable CA1506 // '.ctor' is coupled with '41' different types from '12' different namespaces. Rewrite or refactor the code to decrease its class coupling below '41'.
     public InventoryDetailsDialog(ItemData item) : base(DialogPositioning.Center, 1)
     {
         if (item == null)
@@ -40,15 +40,15 @@ public class InventoryDetailsDialog : ModalDialog
             Position = DialogPositioning.Top
         };
 
-        var attribStack = new HorizontalStack(
-            new VerticalStack(
+        var attribStack = new HorizontalStacker(
+            new VerticalStacker(
                 new UiTextBuilder(Base.SystemText.Examine1_Type).NoWrap(),
                 new UiTextBuilder(Base.SystemText.Examine1_Weight).NoWrap(),
                 new UiTextBuilder(Base.SystemText.Examine1_Damage).NoWrap(),
                 new UiTextBuilder(Base.SystemText.Examine1_Protection).NoWrap()
             ),
-            new Spacing(2,0),
-            new VerticalStack(
+            new Spacing(2, 0),
+            new VerticalStacker(
                 new UiTextBuilder(Describe.DescribeItemType(item.TypeId)).NoWrap(),
                 new SimpleText($"{item.Weight} g").NoWrap(), // i18n Literal String
                 new SimpleText(item.Damage.ToString()).NoWrap(), // i18n
@@ -56,30 +56,30 @@ public class InventoryDetailsDialog : ModalDialog
             )
         );
 
-        var classElements = 
+        var classElements =
             Enum.GetValues(typeof(PlayerClass))
                 .Cast<PlayerClass>()
                 .Where(x => item.Class.IsAllowed(x))
                 .Select(x => (IUiElement)new UiTextBuilder(Describe.DescribePlayerClass(x)).NoWrap());
 
-        var classStack = new HorizontalStack(
-            new VerticalStack(classElements.Take(5).ToArray()),
-            new Spacing(2,0),
-            new VerticalStack(classElements.Skip(5).ToArray())
+        var classStack = new HorizontalStacker(
+            new VerticalStacker(classElements.Take(5).ToArray()),
+            new Spacing(2, 0),
+            new VerticalStacker(classElements.Skip(5).ToArray())
         );
 
-        var stack = new VerticalStack(
+        var stack = new VerticalStacker(
             heading,
             new Spacing(0, 2),
-            new HorizontalStack(
+            new HorizontalStacker(
                 picFrame,
                 new Spacing(4, 0),
-                new VerticalStack(
+                new VerticalStacker(
                     attribStack,
                     new Spacing(0, 2),
                     new Divider(CommonColor.Yellow4),
                     new Spacing(0, 2),
-                    new UiTextBuilder((TextId)Base.SystemText.Misc_CanBeUsedBy),
+                    new UiTextBuilder(Base.SystemText.Misc_CanBeUsedBy),
                     classStack
                 )
             ),
@@ -90,6 +90,7 @@ public class InventoryDetailsDialog : ModalDialog
 
         AttachChild(new DialogFrame(new Padding(stack, 6)) { Background = DialogFrameBackgroundStyle.MainMenuPattern });
     }
+#pragma warning restore CA1506 // '.ctor' is coupled with '41' different types from '12' different namespaces. Rewrite or refactor the code to decrease its class coupling below '41'.
 
     void Close()
     {

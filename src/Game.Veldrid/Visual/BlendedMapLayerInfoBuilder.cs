@@ -15,7 +15,7 @@ public class BlendedMapLayerInfoBuilder : Component, IMapLayerInfoBuilder<Blende
     public Vector2 TileSize { get; }
     static readonly Region BlankRegion = new(Vector2.Zero, Vector2.Zero, Vector2.Zero, 0);
     public BlendedSpriteInfo BlankInstance { get; } = new(0, Vector3.Zero, Vector2.Zero, BlankRegion, BlankRegion);
-    public SpriteKey GetSpriteKey(DrawLayer drawLayer, SpriteKeyFlags flags) => new(_tileset.Texture, SpriteSampler.TriLinear, drawLayer, flags);
+    public SpriteKey GetSpriteKey(DrawLayer drawLayer, SpriteKeyFlags spriteKeyFlags) => new(_tileset.Texture, SpriteSampler.TriLinear, drawLayer, spriteKeyFlags);
     protected override void Subscribed() => _paletteManager = Resolve<IPaletteManager>();
     public BlendedMapLayerInfoBuilder(TrueColorTileGraphics tileset, Vector2 tileSize)
     {

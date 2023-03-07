@@ -95,60 +95,13 @@ public class IsometricLayout : Component
 
         int totalTiles = 1;
         if (floors || ceilings)
-        {
-            for (int i = 0; i < labyrinthData.FloorAndCeilings.Count; i++)
-            {
-                var floorInfo = labyrinthData.FloorAndCeilings[i];
-                var floor = floorInfo == null ? null : assets.LoadTexture(floorInfo.SpriteId);
-                _tilemap.DefineFloor(i + 1, floor);
-            }
-
-            // Count the frames in a separate loop to avoid rebuilding the composited texture over and over
-            for (int i = 0; i < labyrinthData.FloorAndCeilings.Count; i++)
-            {
-                if (floors) totalTiles += _tilemap.DayFloors.GetFrameCountForLogicalId(i + 1);
-                if (ceilings) totalTiles += _tilemap.DayFloors.GetFrameCountForLogicalId(i + 1);
-            }
-        }
+            totalTiles = DefineFloors(labyrinthData, assets, floors, totalTiles, ceilings);
 
         if (walls)
-        {
-            for (int i = 0; i < labyrinthData.Walls.Count; i++)
-            {
-                var wallInfo = labyrinthData.Walls[i];
-                bool isAlphaTested = wallInfo != null && (wallInfo.Properties & Wall.WallFlags.AlphaTested) != 0;
-                var wall = wallInfo == null ? null : assets.LoadTexture(wallInfo.SpriteId);
-                _tilemap.DefineWall(i + 1, wall, 0, 0, wallInfo?.TransparentColour ?? 0, isAlphaTested);
-
-                foreach (var overlayInfo in wallInfo?.Overlays ?? Array.Empty<Overlay>())
-                {
-                    if (overlayInfo.SpriteId.IsNone)
-                        continue;
-
-                    var overlay = assets.LoadTexture(overlayInfo.SpriteId);
-                    _tilemap.DefineWall(i + 1,
-                        overlay,
-                        overlayInfo.XOffset, overlayInfo.YOffset,
-                        wallInfo?.TransparentColour ?? 0, isAlphaTested);
-                }
-            }
-
-            // Count the frames in a separate loop to avoid rebuilding the composited texture over and over
-            for (int i = 0; i < labyrinthData.Walls.Count; i++)
-                totalTiles += _tilemap.DayWalls.GetFrameCountForLogicalId(i + 1);
-        }
+            totalTiles = DefineWalls(labyrinthData, assets, totalTiles);
 
         if (contents)
-        {
-            var transparent = new SimpleTexture<byte>(AssetId.None, "Transparent", 1, 1, new byte[] { 0 });
-            transparent.AddRegion(Vector2.Zero, Vector2.One, 0);
-
-            for (byte i = 1; i <= labyrinthData.ObjectGroups.Count; i++)
-            {
-                _tilemap.DefineWall(i, transparent, 0, 0, 0, true);
-                totalTiles += labyrinthData.FrameCountForObjectGroup(i - 1);
-            }
-        }
+            totalTiles = DefineContents(labyrinthData, totalTiles);
 
         _wallCount = labyrinthData.Walls.Count;
         _floors = new byte[totalTiles];
@@ -159,83 +112,44 @@ public class IsometricLayout : Component
         int index = 1;
 
         // Add initial frames
-        if (floors)
-        {
-            FloorFrames = new List<int>[labyrinthData.FloorAndCeilings.Count + 1];
-            FloorFrames[0] = new List<int> { 0 };
-            for (byte i = 1; i <= labyrinthData.FloorAndCeilings.Count; i++)
-            {
-                _floors[index] = i;
-                FloorFrames[i] = new List<int> { index };
-                index++;
-            }
-        }
-
-        if (ceilings)
-        {
-            CeilingFrames = new List<int>[labyrinthData.FloorAndCeilings.Count + 1];
-            CeilingFrames[0] = new List<int> { 0 };
-            for (byte i = 1; i <= labyrinthData.FloorAndCeilings.Count; i++)
-            {
-                _ceilings[index] = i;
-                CeilingFrames[i] = new List<int> { index };
-                index++;
-            }
-        }
-
-        if (walls)
-        {
-            WallFrames = new List<int>[labyrinthData.Walls.Count + 1];
-            WallFrames[0] = new List<int> { 0 };
-            for (byte i = 1; i <= labyrinthData.Walls.Count; i++)
-            {
-                _contents[index] = (byte)(i + 100);
-                WallFrames[i] = new List<int> { index };
-                index++;
-            }
-        }
-
-        if (contents)
-        {
-            ContentsFrames = new List<int>[labyrinthData.ObjectGroups.Count + 1];
-            ContentsFrames[0] = new List<int> { 0 };
-            for (byte i = 1; i <= labyrinthData.ObjectGroups.Count; i++)
-            {
-                _contents[index] = i;
-                ContentsFrames[i] = new List<int> { index };
-                index++;
-            }
-        }
+        index = BuildFloorFrames(labyrinthData, floors, index);
+        index = BuildCeilingFrames(labyrinthData, ceilings, index);
+        index = BuildWallFrames(labyrinthData, walls, index);
+        index = BuildContentFrames(labyrinthData, contents, index);
 
         // Add animation frames
-        if (floors)
+        index = BuildExtraFloorFrames(labyrinthData, floors, index, frames);
+        index = BuildExtraCeilingFrames(labyrinthData, ceilings, index, frames);
+        index = BuildExtraWallFrames(labyrinthData, walls, index, frames);
+        BuildExtraContentFrames(labyrinthData, contents, index, frames);
+
+        _tilemap.TileCount = totalTiles;
+        for (int i = 0; i < totalTiles; i++)
+            SetTile(i, i, frames[i]);
+
+        for (int i = 0; i < totalTiles; i++)
+            AddSprites(labyrinthData, i,  request);
+    }
+
+    void BuildExtraContentFrames(LabyrinthData labyrinthData, bool contents, int index, int[] frames)
+    {
+        if (contents)
         {
-            for (byte i = 1; i <= labyrinthData.FloorAndCeilings.Count; i++)
+            for (byte i = 1; i <= labyrinthData.ObjectGroups.Count; i++)
             {
-                int frameCount = _tilemap.DayFloors.GetFrameCountForLogicalId(i);
+                int frameCount = labyrinthData.FrameCountForObjectGroup(i - 1);
                 for (int j = 1; j < frameCount; j++)
                 {
-                    _floors[index] = i;
-                    FloorFrames[i].Add(index);
+                    _contents[index] = i;
+                    ContentsFrames[i].Add(index);
                     frames[index++] = j;
                 }
             }
         }
+    }
 
-        if (ceilings)
-        {
-            for (byte i = 1; i <= labyrinthData.FloorAndCeilings.Count; i++)
-            {
-                int frameCount = _tilemap.DayFloors.GetFrameCountForLogicalId(i);
-                for (int j = 1; j < frameCount; j++)
-                {
-                    _ceilings[index] = i;
-                    CeilingFrames[i].Add(index);
-                    frames[index++] = j;
-                }
-            }
-        }
-
+    int BuildExtraWallFrames(LabyrinthData labyrinthData, bool walls, int index, int[] frames)
+    {
         if (walls)
         {
             for (byte i = 1; i <= labyrinthData.Walls.Count; i++)
@@ -250,26 +164,174 @@ public class IsometricLayout : Component
             }
         }
 
-        if (contents)
+        return index;
+    }
+
+    int BuildExtraCeilingFrames(LabyrinthData labyrinthData, bool ceilings, int index, int[] frames)
+    {
+        if (ceilings)
         {
-            for (byte i = 1; i <= labyrinthData.ObjectGroups.Count; i++)
+            for (byte i = 1; i <= labyrinthData.FloorAndCeilings.Count; i++)
             {
-                int frameCount = labyrinthData.FrameCountForObjectGroup(i - 1);
+                int frameCount = _tilemap.DayFloors.GetFrameCountForLogicalId(i);
                 for (int j = 1; j < frameCount; j++)
                 {
-                    _contents[index] = i;
-                    ContentsFrames[i].Add(index);
+                    _ceilings[index] = i;
+                    CeilingFrames[i].Add(index);
                     frames[index++] = j;
                 }
             }
         }
 
-        _tilemap.TileCount = totalTiles;
-        for (int i = 0; i < totalTiles; i++)
-            SetTile(i, i, frames[i]);
+        return index;
+    }
 
-        for (int i = 0; i < totalTiles; i++)
-            AddSprites(labyrinthData, i,  request);
+    int BuildExtraFloorFrames(LabyrinthData labyrinthData, bool floors, int index, int[] frames)
+    {
+        if (floors)
+        {
+            for (byte i = 1; i <= labyrinthData.FloorAndCeilings.Count; i++)
+            {
+                int frameCount = _tilemap.DayFloors.GetFrameCountForLogicalId(i);
+                for (int j = 1; j < frameCount; j++)
+                {
+                    _floors[index] = i;
+                    FloorFrames[i].Add(index);
+                    frames[index++] = j;
+                }
+            }
+        }
+
+        return index;
+    }
+
+    int BuildContentFrames(LabyrinthData labyrinthData, bool contents, int index)
+    {
+        if (contents)
+        {
+            ContentsFrames = new List<int>[labyrinthData.ObjectGroups.Count + 1];
+            ContentsFrames[0] = new List<int> { 0 };
+            for (byte i = 1; i <= labyrinthData.ObjectGroups.Count; i++)
+            {
+                _contents[index] = i;
+                ContentsFrames[i] = new List<int> { index };
+                index++;
+            }
+        }
+
+        return index;
+    }
+
+    int BuildWallFrames(LabyrinthData labyrinthData, bool walls, int index)
+    {
+        if (walls)
+        {
+            WallFrames = new List<int>[labyrinthData.Walls.Count + 1];
+            WallFrames[0] = new List<int> { 0 };
+            for (byte i = 1; i <= labyrinthData.Walls.Count; i++)
+            {
+                _contents[index] = (byte)(i + 100);
+                WallFrames[i] = new List<int> { index };
+                index++;
+            }
+        }
+
+        return index;
+    }
+
+    int BuildCeilingFrames(LabyrinthData labyrinthData, bool ceilings, int index)
+    {
+        if (ceilings)
+        {
+            CeilingFrames = new List<int>[labyrinthData.FloorAndCeilings.Count + 1];
+            CeilingFrames[0] = new List<int> { 0 };
+            for (byte i = 1; i <= labyrinthData.FloorAndCeilings.Count; i++)
+            {
+                _ceilings[index] = i;
+                CeilingFrames[i] = new List<int> { index };
+                index++;
+            }
+        }
+
+        return index;
+    }
+
+    int BuildFloorFrames(LabyrinthData labyrinthData, bool floors, int index)
+    {
+        if (floors)
+        {
+            FloorFrames = new List<int>[labyrinthData.FloorAndCeilings.Count + 1];
+            FloorFrames[0] = new List<int> { 0 };
+            for (byte i = 1; i <= labyrinthData.FloorAndCeilings.Count; i++)
+            {
+                _floors[index] = i;
+                FloorFrames[i] = new List<int> { index };
+                index++;
+            }
+        }
+
+        return index;
+    }
+
+    int DefineContents(LabyrinthData labyrinthData, int totalTiles)
+    {
+        var transparent = new SimpleTexture<byte>(AssetId.None, "Transparent", 1, 1, new byte[] { 0 });
+        transparent.AddRegion(Vector2.Zero, Vector2.One, 0);
+
+        for (byte i = 1; i <= labyrinthData.ObjectGroups.Count; i++)
+        {
+            _tilemap.DefineWall(i, transparent, 0, 0, 0, true);
+            totalTiles += labyrinthData.FrameCountForObjectGroup(i - 1);
+        }
+
+        return totalTiles;
+    }
+
+    int DefineWalls(LabyrinthData labyrinthData, IAssetManager assets, int totalTiles)
+    {
+        for (int i = 0; i < labyrinthData.Walls.Count; i++)
+        {
+            var wallInfo = labyrinthData.Walls[i];
+            bool isAlphaTested = wallInfo != null && (wallInfo.Properties & Wall.WallFlags.AlphaTested) != 0;
+            var wall = wallInfo == null ? null : assets.LoadTexture(wallInfo.SpriteId);
+            _tilemap.DefineWall(i + 1, wall, 0, 0, wallInfo?.TransparentColour ?? 0, isAlphaTested);
+
+            foreach (var overlayInfo in wallInfo?.Overlays ?? Array.Empty<Overlay>())
+            {
+                if (overlayInfo.SpriteId.IsNone)
+                    continue;
+
+                var overlay = assets.LoadTexture(overlayInfo.SpriteId);
+                _tilemap.DefineWall(i + 1,
+                    overlay,
+                    overlayInfo.XOffset, overlayInfo.YOffset,
+                    wallInfo?.TransparentColour ?? 0, isAlphaTested);
+            }
+        }
+
+        // Count the frames in a separate loop to avoid rebuilding the composited texture over and over
+        for (int i = 0; i < labyrinthData.Walls.Count; i++)
+            totalTiles += _tilemap.DayWalls.GetFrameCountForLogicalId(i + 1);
+        return totalTiles;
+    }
+
+    int DefineFloors(LabyrinthData labyrinthData, IAssetManager assets, bool floors, int totalTiles, bool ceilings)
+    {
+        for (int i = 0; i < labyrinthData.FloorAndCeilings.Count; i++)
+        {
+            var floorInfo = labyrinthData.FloorAndCeilings[i];
+            var floor = floorInfo == null ? null : assets.LoadTexture(floorInfo.SpriteId);
+            _tilemap.DefineFloor(i + 1, floor);
+        }
+
+        // Count the frames in a separate loop to avoid rebuilding the composited texture over and over
+        for (int i = 0; i < labyrinthData.FloorAndCeilings.Count; i++)
+        {
+            if (floors) totalTiles += _tilemap.DayFloors.GetFrameCountForLogicalId(i + 1);
+            if (ceilings) totalTiles += _tilemap.DayFloors.GetFrameCountForLogicalId(i + 1);
+        }
+
+        return totalTiles;
     }
 
     void SetTile(int index, int order, int frameCount)

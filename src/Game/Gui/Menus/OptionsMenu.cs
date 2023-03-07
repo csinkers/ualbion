@@ -40,7 +40,7 @@ public class OptionsMenu : ModalDialog
         {
             new Spacing(156,2),
             new Label(TextId.From(Base.UAlbionString.LanguageLabel)),
-            new HorizontalStack(languageButtons),
+            new HorizontalStacker(languageButtons),
             new Spacing(0,2),
             new Label((TextId)Base.SystemText.Options_MusicVolume),
             new Slider(() => _musicVolume, x => _musicVolume = x, 0, 127),
@@ -54,7 +54,7 @@ public class OptionsMenu : ModalDialog
             new Button(Base.SystemText.MsgBox_OK).OnClick(SaveAndClose),
             new Spacing(0,2),
         };
-        var stack = new VerticalStack(elements);
+        var stack = new VerticalStacker(elements);
         AttachChild(new DialogFrame(stack));
 
         _musicVolume = Var(UserVars.Audio.MusicVolume);

@@ -38,7 +38,7 @@ public class TextManager : ServiceComponent<ITextManager>, ITextManager
         return new Vector2(offset + 1, font.Definition.LineHeight + 1); // +1 for the drop shadow
     }
 
-    public PositionedSpriteBatch BuildRenderable(TextBlock block, DrawLayer order, Rectangle? scissorRegion, object caller)
+    public PositionedSpriteBatch BuildRenderable(TextBlock block, DrawLayer layer, Rectangle? scissorRegion, object caller)
     {
         if (block == null) throw new ArgumentNullException(nameof(block));
         var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
@@ -52,7 +52,7 @@ public class TextManager : ServiceComponent<ITextManager>, ITextManager
         int offset = 0;
         var flags = SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.ClampEdges;
         scissorRegion = scissorRegion == null ? null : Resolve<IWindowManager>().UiToPixel(scissorRegion.Value);
-        var key = new SpriteKey(font.Texture, SpriteSampler.Point, order, flags, scissorRegion);
+        var key = new SpriteKey(font.Texture, SpriteSampler.Point, layer, flags, scissorRegion);
 
         int displayableCharacterCount = 0;
         foreach (var c in text)

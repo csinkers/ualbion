@@ -10,7 +10,7 @@ using Vars = UAlbion.Core.CoreVars.Gfx.TextureSource;
 
 namespace UAlbion.Core.Veldrid.Textures;
 
-public class TextureSource : ServiceComponent<ITextureSource>, ITextureSource
+public class TextureSource : ServiceComponent<ITextureSource>, ITextureSource, IDisposable
 {
     static void Checkerboard(Span<byte> span)
     {
@@ -99,5 +99,12 @@ public class TextureSource : ServiceComponent<ITextureSource>, ITextureSource
             _ => throw new NotSupportedException($"Image format {texture.GetType().GetGenericArguments()[0].Name} not currently supported")
         };
         return deviceTexture;
+    }
+
+    public void Dispose()
+    {
+        _simple?.Dispose();
+        _array?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

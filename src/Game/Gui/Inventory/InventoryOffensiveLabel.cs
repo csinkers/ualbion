@@ -31,7 +31,7 @@ public class InventoryOffensiveLabel : UiElement
         AttachChild(
             new ButtonFrame(
                 new FixedSize(27, 8,
-                    new HorizontalStack(
+                    new HorizontalStacker(
                         new FixedSize(8, 8,
                             new UiSpriteElement(Base.CoreGfx.UiOffensiveValue)),
                         new Spacing(1, 0),

@@ -28,7 +28,7 @@ public class TextDialog : ModalDialog
                     State = ButtonState.Pressed,
                     Padding = 0
                 });
-            content = new HorizontalStack( new CentreContent(portrait), padding);
+            content = new HorizontalStacker( new CentreContent(portrait), padding);
         }
         else
             content = padding;

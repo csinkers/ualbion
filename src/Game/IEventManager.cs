@@ -10,6 +10,6 @@ public interface IEventManager
     IReadOnlyList<Breakpoint> Breakpoints { get; }
     void AddBreakpoint(Breakpoint bp);
     void RemoveBreakpoint(int index);
-    void Continue(EventContext context);
+    void ContinueExecution(EventContext context);
     void SingleStep(EventContext context);
 }

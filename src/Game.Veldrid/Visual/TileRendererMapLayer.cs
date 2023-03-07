@@ -78,7 +78,7 @@ public class TileRendererMapLayer : Component, IMapLayer
         }
     }
 
-    public void SetTile(int index, MapTile value) => _layerRenderable?.SetTile(index, value.Raw);
+    public void SetTile(int index, MapTile tile) => _layerRenderable?.SetTile(index, tile.Raw);
     protected override void Subscribed()
     {
         var manager = Resolve<ITileRenderableManager>();

@@ -65,7 +65,7 @@ public sealed class DebugGuiRenderer<TPassSet> : Component, IRenderer<GlobalSet,
         _imguiRenderer = null;
     }
 
-    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, TPassSet passSet)
+    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, TPassSet renderPassSet)
     {
         if (cl == null) throw new ArgumentNullException(nameof(cl));
         if (device == null) throw new ArgumentNullException(nameof(device));

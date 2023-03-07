@@ -72,6 +72,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         set => _game.MapIdForNpcs = value;
     }
 
+#pragma warning disable CA1506 // '.ctor' is coupled with '42' different types from '11' different namespaces. Rewrite or refactor the code to decrease its class coupling below '41'.
     public GameState()
     {
         On<NewGameEvent>(e => NewGame(e.MapId, e.X, e.Y));
@@ -81,93 +82,13 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         On<GetTimeEvent>(_ => Info(Time.ToString("O")));
         On<SetTimeEvent>(e => _game.ElapsedTime = e.Time - SavedGame.Epoch);
         On<EventVisitedEvent>(e => _game?.UseEvent(e.Id, e.Action));
-        On<LoadMapEvent>(e =>
-        {
-            if (_game != null)
-                _game.MapId = e.MapId;
-        });
-        On<SwitchEvent>(e =>
-        {
-            _game.SetSwitch(e.SwitchId, e.Operation switch
-            {
-                SwitchOperation.Clear => false,
-                SwitchOperation.Set => true,
-                SwitchOperation.Toggle => !_game.GetSwitch(e.SwitchId),
-                _ => false
-            });
-        });
-        On<TickerEvent>(e =>
-        {
-            _game.Tickers.TryGetValue(e.TickerId, out var curValue);
-            _game.Tickers[e.TickerId] = (byte)e.Operation.Apply(curValue, e.Amount, 0, 255);
-        });
-
-        void AdvanceTimeInHours(int hours)
-        {
-            _game.ElapsedTime += TimeSpan.FromHours(hours);
-            // TODO
-        }
-
-        On<ModifyDaysEvent>(e => // Only SetAmount + AddAmount
-        {
-            switch (e.Operation)
-            {
-                case NumericOperation.SetAmount:
-                {
-                    var time = _game.ElapsedTime;
-                    var dayOfMonth = e.Amount % DaysPerMonth;
-                    int month = time.Days / DaysPerMonth;
-                    int newDays = month * DaysPerMonth + dayOfMonth;
-                    _game.ElapsedTime = new TimeSpan(newDays, time.Hours, time.Minutes, time.Seconds, time.Milliseconds);
-                    break;
-                }
-                case NumericOperation.AddAmount:
-                    for(int i = 0; i < e.Amount; i++)
-                        AdvanceTimeInHours(e.Amount * HoursPerDay);
-                    break;
-            }
-        });
-
-        On<ModifyHoursEvent>(e => // Only SetAmount + AddAmount
-        {
-            switch (e.Operation)
-            {
-                case NumericOperation.SetAmount:
-                {
-                    var time = _game.ElapsedTime;
-                    _game.ElapsedTime = new TimeSpan(time.Days, e.Amount % HoursPerDay, time.Minutes, time.Seconds);
-                    break;
-                }
-                case NumericOperation.AddAmount:
-                    AdvanceTimeInHours(e.Amount);
-                    _game.ElapsedTime += TimeSpan.FromHours(e.Amount);
-                    break;
-            }
-        });
-
-        On<ModifyMTicksEvent>(e => // Only SetAmount + AddAmount
-        {
-            switch (e.Operation)
-            {
-                case NumericOperation.SetAmount:
-                {
-                    var time = _game.ElapsedTime;
-                    var minutes = e.Amount * 60.0f / 48;
-                    _game.ElapsedTime = new TimeSpan(time.Days, time.Hours, 0, 0) + TimeSpan.FromMinutes(minutes);
-                    break;
-                }
-                case NumericOperation.AddAmount:
-                {
-                    var minutes = e.Amount * 60.0f / 48;
-                    _game.ElapsedTime += TimeSpan.FromMinutes(minutes);
-                    // AdvanceTimeInTicks(e.Amount);
-                    break;
-                }
-            }
-        });
-
+        On<LoadMapEvent>(OnLoadMap);
+        On<SwitchEvent>(OnSwitch);
+        On<TickerEvent>(OnTicker);
+        On<ModifyDaysEvent>(OnModifyDays);
+        On<ModifyHoursEvent>(OnModifyHours);
+        On<ModifyMTicksEvent>(OnModifyMTicks);
         On<SetSpecialItemActiveEvent>(ActivateItem);
-
         On<EventChainOffEvent>(e => _game.SetChainDisabled(e.Map, e.ChainNumber, SetFlag(e.Operation, _game.IsChainDisabled(e.Map, e.ChainNumber))));
         On<ModifyNpcOffEvent>(e => _game.SetNpcDisabled(e.Map, e.NpcNum, SetFlag(e.Operation, _game.IsNpcDisabled(e.Map, e.NpcNum))));
         On<NpcOffEvent>(e => _game.SetNpcDisabled(MapId.None, e.NpcNum, true));
@@ -175,34 +96,135 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         On<SetChestOpenEvent>(e => _game.SetChestOpen(e.Chest, SetFlag(e.Operation, _game.IsChestOpen(e.Chest))));
         On<SetDoorOpenEvent>(e => _game.SetDoorOpen(e.Door, SetFlag(e.Operation, _game.IsDoorOpen(e.Door))));
         On<DataChangeEvent>(OnDataChange);
-        On<SetContextEvent>(e =>
-        {
-            var assets = Resolve<IAssetManager>();
-            var state = Resolve<IGameState>();
-
-            var asset = e.AssetId.Type switch
-            {
-                AssetType.PartyMember => (object)state.GetSheet(((PartyMemberId)e.AssetId).ToSheet()),
-                AssetType.PartySheet => state.GetSheet(e.AssetId),
-                AssetType.NpcSheet => state.GetSheet(e.AssetId),
-                AssetType.MonsterSheet => assets.LoadSheet(e.AssetId),
-                AssetType.Item => assets.LoadItem(e.AssetId),
-                _ => null
-            };
-
-            switch (e.Type)
-            {
-                case ContextType.Leader: _leader = (CharacterSheet)asset; break;
-                case ContextType.Subject: _subject = (CharacterSheet)asset; break;
-                case ContextType.Inventory: _currentInventory = (CharacterSheet)asset; break;
-                case ContextType.Combatant: _combatant = (CharacterSheet)asset; break;
-                case ContextType.Victim: _victim = (CharacterSheet)asset; break;
-                case ContextType.Weapon: _weapon = (ItemData)asset; break;
-            }
-        });
+        On<SetContextEvent>(OnSetContext);
 
         AttachChild(new InventoryManager(GetWriteableInventory, GetItem));
         _sheetApplier = AttachChild(new SheetApplier());
+    }
+#pragma warning restore CA1506 // '.ctor' is coupled with '42' different types from '11' different namespaces. Rewrite or refactor the code to decrease its class coupling below '41'.
+
+    void OnLoadMap(LoadMapEvent e)
+    {
+        if (_game != null)
+            _game.MapId = e.MapId;
+    }
+
+    void OnSwitch(SwitchEvent e)
+    {
+        _game.SetSwitch(e.SwitchId, e.Operation switch
+        {
+            SwitchOperation.Clear => false,
+            SwitchOperation.Set => true,
+            SwitchOperation.Toggle => !_game.GetSwitch(e.SwitchId),
+            _ => false
+        });
+    }
+
+    void OnTicker(TickerEvent e)
+    {
+        _game.Tickers.TryGetValue(e.TickerId, out var curValue);
+        _game.Tickers[e.TickerId] = (byte)e.Operation.Apply(curValue, e.Amount, 0, 255);
+    }
+
+    void OnModifyDays(ModifyDaysEvent e) // Only SetAmount + AddAmount
+    {
+        switch (e.Operation)
+        {
+            case NumericOperation.SetAmount:
+            {
+                var time = _game.ElapsedTime;
+                var dayOfMonth = e.Amount % DaysPerMonth;
+                int month = time.Days / DaysPerMonth;
+                int newDays = month * DaysPerMonth + dayOfMonth;
+                _game.ElapsedTime = new TimeSpan(newDays, time.Hours, time.Minutes, time.Seconds, time.Milliseconds);
+                break;
+            }
+            case NumericOperation.AddAmount:
+                for (int i = 0; i < e.Amount; i++) AdvanceTimeInHours(e.Amount * HoursPerDay);
+                break;
+        }
+    }
+
+    void OnModifyHours(ModifyHoursEvent e) // Only SetAmount + AddAmount
+    {
+        switch (e.Operation)
+        {
+            case NumericOperation.SetAmount:
+            {
+                var time = _game.ElapsedTime;
+                _game.ElapsedTime = new TimeSpan(time.Days, e.Amount % HoursPerDay, time.Minutes, time.Seconds);
+                break;
+            }
+            case NumericOperation.AddAmount:
+                AdvanceTimeInHours(e.Amount);
+                _game.ElapsedTime += TimeSpan.FromHours(e.Amount);
+                break;
+        }
+    }
+
+    void OnModifyMTicks(ModifyMTicksEvent e) // Only SetAmount + AddAmount
+    {
+        switch (e.Operation)
+        {
+            case NumericOperation.SetAmount:
+            {
+                var time = _game.ElapsedTime;
+                var minutes = e.Amount * 60.0f / 48;
+                _game.ElapsedTime = new TimeSpan(time.Days, time.Hours, 0, 0) + TimeSpan.FromMinutes(minutes);
+                break;
+            }
+            case NumericOperation.AddAmount:
+            {
+                var minutes = e.Amount * 60.0f / 48;
+                _game.ElapsedTime += TimeSpan.FromMinutes(minutes);
+                // AdvanceTimeInTicks(e.Amount);
+                break;
+            }
+        }
+    }
+
+    void OnSetContext(SetContextEvent e)
+    {
+        var assets = Resolve<IAssetManager>();
+        var state = Resolve<IGameState>();
+
+        var asset = e.AssetId.Type switch
+        {
+            AssetType.PartyMember => (object)state.GetSheet(((PartyMemberId)e.AssetId).ToSheet()),
+            AssetType.PartySheet => state.GetSheet(e.AssetId),
+            AssetType.NpcSheet => state.GetSheet(e.AssetId),
+            AssetType.MonsterSheet => assets.LoadSheet(e.AssetId),
+            AssetType.Item => assets.LoadItem(e.AssetId),
+            _ => null
+        };
+
+        switch (e.Type)
+        {
+            case ContextType.Leader:
+                _leader = (CharacterSheet)asset;
+                break;
+            case ContextType.Subject:
+                _subject = (CharacterSheet)asset;
+                break;
+            case ContextType.Inventory:
+                _currentInventory = (CharacterSheet)asset;
+                break;
+            case ContextType.Combatant:
+                _combatant = (CharacterSheet)asset;
+                break;
+            case ContextType.Victim:
+                _victim = (CharacterSheet)asset;
+                break;
+            case ContextType.Weapon:
+                _weapon = (ItemData)asset;
+                break;
+        }
+    }
+
+    void AdvanceTimeInHours(int hours)
+    {
+        _game.ElapsedTime += TimeSpan.FromHours(hours);
+        // TODO
     }
 
     static bool SetFlag(SwitchOperation operation, bool value) =>

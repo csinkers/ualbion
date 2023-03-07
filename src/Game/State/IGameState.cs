@@ -29,7 +29,7 @@ public interface IGameState
     IList<NpcState> Npcs { get; }
     bool IsChainDisabled(MapId mapId, ushort chain);
     bool IsNpcDisabled(MapId mapId, byte npcNum);
-    bool IsEventUsed(AssetId eventSetId, ActionEvent contextLastAction);
+    bool IsEventUsed(AssetId eventSetId, ActionEvent action);
     ICharacterSheet Leader { get; }
     ICharacterSheet Subject { get; }
     ICharacterSheet CurrentInventory { get; }

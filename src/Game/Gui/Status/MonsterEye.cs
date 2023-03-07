@@ -18,7 +18,7 @@ public class MonsterEye : Dialog
     {
         On<FastClockEvent>(_ => Update());
         _sprite = new UiSpriteElement(AssetId.None);
-        AttachChild(new FixedPositionStack().Add(_sprite, Position.Item1, Position.Item2, Size.Item1, Size.Item2));
+        AttachChild(new FixedPositionStacker().Add(_sprite, Position.Item1, Position.Item2, Size.Item1, Size.Item2));
     }
 
     void Update()

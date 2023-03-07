@@ -21,6 +21,7 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
             return true;
         };
 
+#pragma warning disable CA1506 // '.ctor' is coupled with '66' different types from '15' different namespaces. Rewrite or refactor the code to decrease its class coupling below '41'.
     public Querier()
     {
         OnAsync(          Do<QueryVerbEvent>(q => ((EventContext)Context).Source.Trigger == q.TriggerType));
@@ -95,6 +96,8 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
         OnAsync(Do<QueryUnk1EEvent>(_ => false));
         OnAsync(Do<QueryUnk21Event>(_ => false));
     }
+#pragma warning restore CA1506 // '.ctor' is coupled with '66' different types from '15' different namespaces. Rewrite or refactor the code to decrease its class coupling below '41'.
+
 /*
         bool Query(QueryEvent query, Action<bool> continuation)
         {

@@ -15,6 +15,7 @@ public class InventoryRightPane : UiElement
     const int InventoryWidth = 4;
     const int InventoryHeight = 6;
 
+#pragma warning disable CA1506 // '.ctor' is coupled with '41' different types from '15' different namespaces. Rewrite or refactor the code to decrease its class coupling below '41'.
     public InventoryRightPane(PartyMemberId activeCharacter, bool showTotalPartyGold)
     {
         var header = new Header(Base.SystemText.Inv_Backpack);
@@ -29,45 +30,46 @@ public class InventoryRightPane : UiElement
                 int index = j * InventoryWidth + i;
                 slotsInRow[i] = new LogicalInventorySlot(new InventorySlotId(sheetId, (ItemSlotId)((int)ItemSlotId.Slot0 + index)));
             }
-            slotSpans[j] = new HorizontalStack(slotsInRow);
+            slotSpans[j] = new HorizontalStacker(slotsInRow);
         }
 
-        var slotStack = new VerticalStack(slotSpans);
+        var slotStack = new VerticalStacker(slotSpans);
         var slotHalfFrame = new ButtonFrame(slotStack) {Theme = ButtonTheme.InventoryOuterFrame, Padding = -1 };
 
-        HorizontalStack moneyAndFoodStack;
+        HorizontalStacker moneyAndFoodStacker;
         if (showTotalPartyGold)
         {
             var tf = Resolve<ITextFormatter>();
             int total = Resolve<IParty>().StatusBarOrder.Sum(x => x.Apparent.Inventory.Gold.Amount);
             var money = new Button(
-                    new VerticalStack(
+                    new VerticalStacker(
                         new Spacing(64, 0),
                         new UiSpriteElement(Base.CoreGfx.UiGold) { Flags = SpriteFlags.Highlight },
                         new UiText(tf.Format(Base.SystemText.Shop_GoldAll)),
                         new SimpleText($"{total / 10}.{total % 10}")
                     ) { Greedy = false})
                 { IsPressed = true };
-            moneyAndFoodStack = new HorizontalStack(money);
+            moneyAndFoodStacker = new HorizontalStacker(money);
         }
         else
         {
             var goldButton = new LogicalInventorySlot(new InventorySlotId(activeCharacter, ItemSlotId.Gold));
             var foodButton = new LogicalInventorySlot(new InventorySlotId(activeCharacter, ItemSlotId.Rations));
-            moneyAndFoodStack = new HorizontalStack(goldButton, foodButton);
+            moneyAndFoodStacker = new HorizontalStacker(goldButton, foodButton);
         }
 
-        var stack = new FixedWidth(77, new VerticalStack(
+        var stack = new FixedWidth(77, new VerticalStacker(
             new Spacing(0, 1),
             new Greedy(header),
             new Spacing(0, 1),
             slotHalfFrame,
             new Spacing(0, 2),
-            moneyAndFoodStack,
+            moneyAndFoodStacker,
             new Spacing(0, 9),
             new InventoryExitButton().OnClick(() => Raise(new InventoryCloseEvent()))
         ) { Greedy = false });
 
         AttachChild(stack);
     }
+#pragma warning restore CA1506 // '.ctor' is coupled with '41' different types from '15' different namespaces. Rewrite or refactor the code to decrease its class coupling below '41'.
 }

@@ -28,7 +28,7 @@ public class InventoryChestPane : UiElement
         _id = id;
         _background = new UiSpriteElement(Base.Picture.OpenChestWithGold);
 
-        var backgroundStack = new FixedPositionStack();
+        var backgroundStack = new FixedPositionStacker();
         backgroundStack.Add(_background, 0, 0);
         AttachChild(backgroundStack);
 
@@ -41,10 +41,10 @@ public class InventoryChestPane : UiElement
                 int index = j * InventoryWidth + i;
                 slotsInRow[i] = new LogicalInventorySlot(new InventorySlotId(_id, (ItemSlotId)((int)ItemSlotId.Slot0 + index)));
             }
-            slotSpans[j] = new HorizontalStack(slotsInRow);
+            slotSpans[j] = new HorizontalStacker(slotsInRow);
         }
 
-        var slotStack = new VerticalStack(slotSpans);
+        var slotStack = new VerticalStacker(slotSpans);
         var slotHalfFrame = new ButtonFrame(slotStack) {Theme = ButtonTheme.InventoryOuterFrame, Padding = -1 };
         var goldButton = new LogicalInventorySlot(new InventorySlotId(_id, ItemSlotId.Gold));
         var foodButton = new LogicalInventorySlot(new InventorySlotId(_id, ItemSlotId.Rations));
@@ -55,9 +55,9 @@ public class InventoryChestPane : UiElement
             ).OnClick(() => Raise(new InventoryTakeAllEvent(_id)));
 
         var header = new Header(Base.SystemText.Chest_Chest);
-        var moneyAndFoodStack = new HorizontalStack(goldButton, takeAllButton, foodButton);
+        var moneyAndFoodStack = new HorizontalStacker(goldButton, takeAllButton, foodButton);
 
-        var stack = new VerticalStack(
+        var stack = new VerticalStacker(
             header,
             slotHalfFrame,
             new Spacing(0, 78),

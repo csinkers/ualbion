@@ -151,10 +151,12 @@ public class AssetConfig : IAssetConfig
         }
     }
 
+    public delegate IList<(int RangeStart, int RangeLength)> GetSubItemCountMethod(AssetFileInfo info);
+    public delegate byte[] ReadAllBytesMethod(string path);
     public void PopulateAssetIds(
         IJsonUtil jsonUtil,
-        Func<AssetFileInfo, IList<(int, int)>> getSubItemCountForFile,
-        Func<string, byte[]> readAllBytesFunc)
+        GetSubItemCountMethod getSubItemCountForFile,
+        ReadAllBytesMethod readAllBytesFunc)
     {
         if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
 

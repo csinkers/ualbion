@@ -22,8 +22,8 @@ public class Compass : Dialog
 
     readonly UiSpriteElement _face;
     readonly UiSpriteElement _marker;
-    readonly FixedPositionStack _markerStack;
-    readonly FixedPositionStack _mainStack;
+    readonly FixedPositionStacker _markerStacker;
+    readonly FixedPositionStacker _mainStacker;
     byte _ticks;
     byte _frame;
 
@@ -33,9 +33,9 @@ public class Compass : Dialog
         On<FastClockEvent>(_ => Update());
         _face = new UiSpriteElement(AssetId.None);
         _marker = new UiSpriteElement(AssetId.None);
-        _markerStack = new FixedPositionStack().Add(_marker, 0, 0);
-        var layerStack = new LayerStack(_face, _markerStack);
-        _mainStack = AttachChild(new FixedPositionStack()
+        _markerStacker = new FixedPositionStacker().Add(_marker, 0, 0);
+        var layerStack = new LayerStacker(_face, _markerStacker);
+        _mainStacker = AttachChild(new FixedPositionStacker()
             .Add(layerStack, Position.Item1, Position.Item2, Size.Item1, Size.Item2));
     }
 
@@ -74,10 +74,10 @@ public class Compass : Dialog
             };
 
             var (mx, my) = CalculateMarkerPosition();
-            _markerStack.Move(_marker, mx, my);
+            _markerStacker.Move(_marker, mx, my);
         }
 
-        _mainStack.IsActive = active;
+        _mainStacker.IsActive = active;
     }
 
     (int,int) CalculateMarkerPosition()

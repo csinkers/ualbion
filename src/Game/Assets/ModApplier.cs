@@ -170,9 +170,9 @@ public class ModApplier : Component, IModApplier
         config.RegisterStringRedirects(mapping);
     }
 
-    public AssetInfo GetAssetInfo(AssetId id, string language = null) =>
+    public AssetInfo GetAssetInfo(AssetId key, string language = null) =>
         _modsInReverseDependencyOrder
-            .SelectMany(x => x.AssetConfig.GetAssetInfo(id))
+            .SelectMany(x => x.AssetConfig.GetAssetInfo(key))
             .FirstOrDefault(x =>
             {
                 var assetLanguage = x.Get<string>(AssetProperty.Language, null);
@@ -211,9 +211,9 @@ public class ModApplier : Component, IModApplier
         return reader.ReadToEnd();
     }
 
-    public object LoadAssetCached(AssetId id)
+    public object LoadAssetCached(AssetId assetId)
     {
-        object asset = _assetCache.Get(id);
+        object asset = _assetCache.Get(assetId);
         if (asset is Exception) // If it failed to load once then stop trying (at least until an asset:reload / cycle)
             return null;
 
@@ -222,8 +222,8 @@ public class ModApplier : Component, IModApplier
 
         try
         {
-            asset = LoadAssetInternal(id);
-            _assetCache.Add(asset ?? new AssetNotFoundException($"Could not load asset for {id}"), id);
+            asset = LoadAssetInternal(assetId);
+            _assetCache.Add(asset ?? new AssetNotFoundException($"Could not load asset for {assetId}"), assetId);
             return asset is Exception ? null : asset;
         }
         catch (Exception e)
@@ -231,8 +231,8 @@ public class ModApplier : Component, IModApplier
             if (CoreUtil.IsCriticalException(e))
                 throw;
 
-            Error($"Could not load asset {id}: {e}");
-            _assetCache.Add(e, id);
+            Error($"Could not load asset {assetId}: {e}");
+            _assetCache.Add(e, assetId);
             return null;
         }
     }
@@ -380,33 +380,8 @@ public class ModApplier : Component, IModApplier
         Info("Populating destination asset info...");
         target.AssetConfig.PopulateAssetIds(
             jsonUtil,
-            file =>
-            {
-                // Don't need to resolve the filename as we're not actually using the container - we just want to find the type.
-                var container = containerRegistry.GetContainer(file.Filename, file.Container, writeDisk);
-                var firstAsset = file.Map[file.Map.Keys.Min()];
-                if (assetTypes != null && !assetTypes.Contains(firstAsset.AssetId.Type))
-                    return new List<(int, int)> { (firstAsset.Index, 1) };
-
-                if (filePattern != null && !filePattern.IsMatch(file.Filename))
-                    return new List<(int, int)> { (firstAsset.Index, 1) };
-
-                var assets = target.SerdesContext.Mapping.EnumerateAssetsOfType(firstAsset.AssetId.Type).ToList();
-                var idsInRange =
-                    assets
-                        .Where(x => x.Id >= firstAsset.AssetId.Id)
-                        .OrderBy(x => x.Id)
-                        .Select(x => x.Id - firstAsset.AssetId.Id + firstAsset.Index);
-
-                if (container is XldContainer)
-                    idsInRange = idsInRange.Where(x => x < 100);
-
-                int? maxSubId = file.Max;
-                if (maxSubId.HasValue)
-                    idsInRange = idsInRange.Where(x => x <= maxSubId.Value);
-
-                return FormatUtil.SortedIntsToRanges(idsInRange);
-            }, x => writeDisk.ReadAllBytes(pathResolver.ResolvePath(x)));
+            BuildSubItemCountMethod(assetTypes, filePattern),
+            x => writeDisk.ReadAllBytes(pathResolver.ResolvePath(x)));
 
         foreach (var file in target.AssetConfig.Files.Values)
         {
@@ -463,5 +438,40 @@ public class ModApplier : Component, IModApplier
         }
 
         Info("Finished saving assets");
+    }
+
+    AssetConfig.GetSubItemCountMethod BuildSubItemCountMethod(ISet<AssetType> assetTypes, Regex filePattern)
+    {
+        var containerRegistry = Resolve<IContainerRegistry>();
+        var writeDisk = Resolve<IFileSystem>();
+        var target = _modsInReverseDependencyOrder.First();
+
+        return file =>
+        {
+            // Don't need to resolve the filename as we're not actually using the container - we just want to find the type.
+            var container = containerRegistry.GetContainer(file.Filename, file.Container, writeDisk);
+            var firstAsset = file.Map[file.Map.Keys.Min()];
+            if (assetTypes != null && !assetTypes.Contains(firstAsset.AssetId.Type))
+                return new List<(int, int)> { (firstAsset.Index, 1) };
+
+            if (filePattern != null && !filePattern.IsMatch(file.Filename))
+                return new List<(int, int)> { (firstAsset.Index, 1) };
+
+            var assets = target.SerdesContext.Mapping.EnumerateAssetsOfType(firstAsset.AssetId.Type).ToList();
+            var idsInRange =
+                assets
+                    .Where(x => x.Id >= firstAsset.AssetId.Id)
+                    .OrderBy(x => x.Id)
+                    .Select(x => x.Id - firstAsset.AssetId.Id + firstAsset.Index);
+
+            if (container is XldContainer)
+                idsInRange = idsInRange.Where(x => x < 100);
+
+            int? maxSubId = file.Max;
+            if (maxSubId.HasValue)
+                idsInRange = idsInRange.Where(x => x <= maxSubId.Value);
+
+            return FormatUtil.SortedIntsToRanges(idsInRange);
+        };
     }
 }

@@ -18,9 +18,9 @@ public class LoadMapPromptDialog : ModalDialog // TODO: Use textbox
         Value = min;
 
         // 30
-        var stack = new VerticalStack(
+        var stack = new VerticalStacker(
             new ButtonFrame(
-                new HorizontalStack(
+                new HorizontalStacker(
                     textSection,
                     new Spacing(0, 31)))
             {

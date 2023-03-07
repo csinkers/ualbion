@@ -48,11 +48,11 @@ public class InventoryStatsPage : UiElement // Stats
                 100);
         }
 
-        var stack = new VerticalStack(
+        var stack = new VerticalStacker(
             new Spacing(0, 1),
             new Header(Base.SystemText.Inv2_Attributes),
-            new HorizontalStack(
-                new VerticalStack(
+            new HorizontalStacker(
+                new VerticalStacker(
                     new UiTextBuilder(Base.SystemText.Attrib_STR).Right(),
                     new Spacing(0,2),
                     new UiTextBuilder(Base.SystemText.Attrib_INT).Right(),
@@ -70,7 +70,7 @@ public class InventoryStatsPage : UiElement // Stats
                     new UiTextBuilder(Base.SystemText.Attrib_MT).Right()
                 ),
                 new Spacing(2,0),
-                new VerticalStack(
+                new VerticalStacker(
                     new Spacing(105, 0),
                     Progress(Base.SystemText.Attrib_Strength, x => x.Attributes.Strength.Current, x => x.Attributes.Strength.Max),
                     new Spacing(0,3),
@@ -90,8 +90,8 @@ public class InventoryStatsPage : UiElement // Stats
                 )
             ),
             new Header(Base.SystemText.Inv2_Skills),
-            new HorizontalStack(
-                new VerticalStack(
+            new HorizontalStacker(
+                new VerticalStacker(
                     new UiTextBuilder(Base.SystemText.Skill_CLO).Right(),
                     new Spacing(0,2),
                     new UiTextBuilder(Base.SystemText.Skill_LON).Right(),
@@ -101,7 +101,7 @@ public class InventoryStatsPage : UiElement // Stats
                     new UiTextBuilder(Base.SystemText.Skill_LP).Right()
                 ),
                 new Spacing(2,0),
-                new VerticalStack(
+                new VerticalStacker(
                     new Spacing(105, 0),
                     Progress(Base.SystemText.Skill_CloseRangeCombat, x => x.Skills.CloseCombat.Current, x => x.Skills.CloseCombat.Max),
                     new Spacing(0,3),
@@ -114,6 +114,6 @@ public class InventoryStatsPage : UiElement // Stats
             )
         );
 
-        AttachChild(new HorizontalStack(new Spacing(4,0), stack, new Spacing(4,0)));
+        AttachChild(new HorizontalStacker(new Spacing(4,0), stack, new Spacing(4,0)));
     }
 }

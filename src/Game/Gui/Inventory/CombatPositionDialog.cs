@@ -90,19 +90,19 @@ right clicking returns held to original loc or undoes last swap
         stack.Add(new FixedSize(52, 13, okButton));
         stack.Add(new Spacing(0, 3));
 
-        AttachChild(new DialogFrame(new Padding(new VerticalStack(stack), 6))
+        AttachChild(new DialogFrame(new Padding(new VerticalStacker(stack), 6))
         {
             Background = DialogFrameBackgroundStyle.MainMenuPattern
         });
     }
 
-    HorizontalStack BuildRow(int row)
+    HorizontalStacker BuildRow(int row)
     {
         var stack = new List<IUiElement> { new Spacing(15, 0) };
         for (int col = 0; col < SavedGame.CombatSlotColumns; col++)
             stack.Add(new LogicalCombatPositionSlot(col + row * SavedGame.CombatSlotColumns, this));
 
         stack.Add(new Spacing(15, 0));
-        return new HorizontalStack(stack);
+        return new HorizontalStacker(stack);
     }
 }

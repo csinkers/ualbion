@@ -18,6 +18,7 @@ public class MainFramebuffer : FramebufferHolder
     protected override void Dispose(bool disposing)
     {
         Framebuffer = null; // Main frame buffer is owned by GraphicsDevice
+        base.Dispose(disposing);
     }
 
     protected override Framebuffer CreateFramebuffer(GraphicsDevice device)

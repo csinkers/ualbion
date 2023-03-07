@@ -44,11 +44,11 @@ class YesNoMessageBox : ModalDialog
         var noText = BuildButtonText(text, 1, Base.SystemText.MsgBox_No, textFormatter);
 
         // TODO: Block0 = yes text, Block1 = no text.
-        var elements = new VerticalStack(
+        var elements = new VerticalStacker(
             new Spacing(0, 5),
             new FixedSizePanel(231, 30, new UiText(body)),
             new Spacing(0, 5),
-            new HorizontalStack(
+            new HorizontalStacker(
                 new Spacing(11, 0),
                 new Button(yesText) { DoubleFrame = true }
                     .OnClick(() => OnButton(true)),
@@ -60,7 +60,7 @@ class YesNoMessageBox : ModalDialog
             new Spacing(0, 5)
         );
 
-        var horizontalPad = new HorizontalStack(
+        var horizontalPad = new HorizontalStacker(
             new Spacing(6, 0),
             elements,
             new Spacing(6, 0)

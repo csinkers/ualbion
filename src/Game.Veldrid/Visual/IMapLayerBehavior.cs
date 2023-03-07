@@ -9,5 +9,5 @@ public interface IMapLayerBehavior<out TInstance>
     bool IsAnimated(int index);
     TInstance BuildInstanceData(int index, int tickCount, Vector3 position);
     SpriteKey GetSpriteKey();
-    bool IsChangeApplicable(IconChangeType argsType);
+    bool IsChangeApplicable(IconChangeType type);
 }

@@ -64,7 +64,7 @@ public class InventoryWeightLabel : UiElement
         AttachChild(
             new ButtonFrame(
                 new FixedSize(66, 8,
-                    new HorizontalStack(
+                    new HorizontalStacker(
                         new Spacing(1, 0),
                         new UiText(source)
                     )

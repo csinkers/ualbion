@@ -31,8 +31,8 @@ public interface IUiElement : IComponent
     /// </summary>
     /// <param name="extents">The rectangle the element would normally draw into</param>
     /// <param name="order">The render order that would be used</param>
-    /// <param name="c">The selection context, containing the cursor position and
+    /// <param name="context">The selection context, containing the cursor position and
     /// a callback for elements containing the cursor to call to alert the
     /// caller to their presence</param>
-    int Selection(Rectangle extents, int order, SelectionContext c);
+    int Selection(Rectangle extents, int order, SelectionContext context);
 }

@@ -4,7 +4,7 @@ using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting;
 
-public static class Emit
+public static class UAEmit
 {
     public static SingleEvent Event(IEvent e, int originalIndex) => new(e ?? throw new ArgumentNullException(nameof(e)), originalIndex);
     public static BreakStatement Break() => new();
@@ -15,7 +15,7 @@ public static class Emit
     public static EndlessLoop Loop(ICfgNode body) => new(body);
     public static IfThen If(ICfgNode condition, ICfgNode body) => new(condition, body);
     public static IfThenElse IfElse(ICfgNode condition, ICfgNode body, ICfgNode elseBody) => new(condition, body, elseBody);
-    public static Goto Goto(string label) => new(label ?? throw new ArgumentNullException(nameof(label)));
+    public static GotoStatement Goto(string label) => new(label ?? throw new ArgumentNullException(nameof(label)));
     public static Label Label(string name) => new(name ?? throw new ArgumentNullException(nameof(name)));
     public static Name Name(string name) => new(name ?? throw new ArgumentNullException(nameof(name)));
     public static Negation Negation(ICfgNode expression) => new(expression ?? throw new ArgumentNullException(nameof(expression)));

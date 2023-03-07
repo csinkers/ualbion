@@ -69,16 +69,16 @@ public abstract class UiElement : Component, IUiElement
         return DoLayout(extents, order, node, _renderChildDelegate);
     }
 
-    public virtual int Selection(Rectangle extents, int order, SelectionContext c)
+    public virtual int Selection(Rectangle extents, int order, SelectionContext context)
     {
-        if (c == null)
-            throw new ArgumentNullException(nameof(c));
+        if (context == null)
+            throw new ArgumentNullException(nameof(context));
 
-        if (!extents.Contains((int)c.UiPosition.X, (int)c.UiPosition.Y))
+        if (!extents.Contains((int)context.UiPosition.X, (int)context.UiPosition.Y))
             return order;
 
-        var maxOrder = DoLayout(extents, order, c, (x,y,z, context) => x.Selection(y, z, context));
-        c.AddHit(order, this);
+        var maxOrder = DoLayout(extents, order, context, (x,y,z, context) => x.Selection(y, z, context));
+        context.AddHit(order, this);
         return maxOrder;
     }
 }

@@ -103,12 +103,12 @@ public class ContextMenu : Dialog
         var elements = new List<IUiElement>
         {
             new Spacing(0, 2),
-            new HorizontalStack(new Spacing(5, 0), new BoldHeader(_event.Heading), new Spacing(5, 0)),
+            new HorizontalStacker(new Spacing(5, 0), new BoldHeader(_event.Heading), new Spacing(5, 0)),
             new Divider(CommonColor.Yellow3),
-            new Padding(new VerticalStack(optionElements), 0, 2)
+            new Padding(new VerticalStacker(optionElements), 0, 2)
         };
 
-        var frame = new DialogFrame(new VerticalStack(elements));
+        var frame = new DialogFrame(new VerticalStacker(elements));
         AttachChild(frame);
         Raise(new PushInputModeEvent(InputMode.ContextMenu));
     }

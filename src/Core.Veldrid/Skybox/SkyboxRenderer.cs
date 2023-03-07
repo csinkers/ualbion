@@ -48,11 +48,11 @@ public sealed class SkyboxRenderer : Component, IRenderer<GlobalSet, MainPassSet
         AttachChild(_pipeline);
     }
 
-    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, MainPassSet mainPassSet)
+    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, MainPassSet renderPassSet)
     {
         if (cl == null) throw new ArgumentNullException(nameof(cl));
         if (globalSet == null) throw new ArgumentNullException(nameof(globalSet));
-        if (mainPassSet == null) throw new ArgumentNullException(nameof(mainPassSet));
+        if (renderPassSet == null) throw new ArgumentNullException(nameof(renderPassSet));
         if (renderable is not SkyboxRenderable skybox)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
@@ -61,7 +61,7 @@ public sealed class SkyboxRenderer : Component, IRenderer<GlobalSet, MainPassSet
         cl.SetPipeline(_pipeline.Pipeline);
 
         cl.SetGraphicsResourceSet(0, globalSet.ResourceSet);
-        cl.SetGraphicsResourceSet(1, mainPassSet.ResourceSet);
+        cl.SetGraphicsResourceSet(1, renderPassSet.ResourceSet);
         cl.SetGraphicsResourceSet(2, skybox.ResourceSet.ResourceSet);
         cl.SetVertexBuffer(0, _vertexBuffer.DeviceBuffer);
         cl.SetIndexBuffer(_indexBuffer.DeviceBuffer, IndexFormat.UInt16);

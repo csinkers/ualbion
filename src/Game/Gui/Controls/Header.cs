@@ -51,7 +51,7 @@ public class Header : UiElement // Header with midlines on either side
         if (_padding > 0)
             elements.Add(new Spacing(_padding, 0));
 
-        AttachChild(new HorizontalStack(elements));
+        AttachChild(new HorizontalStacker(elements));
     }
 
     protected override void Subscribed()

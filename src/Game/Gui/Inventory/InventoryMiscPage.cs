@@ -7,7 +7,7 @@ public class InventoryMiscPage : UiElement
 {
     public InventoryMiscPage()
     {
-        var stack = new VerticalStack(
+        var stack = new VerticalStacker(
             new Spacing(0, 1),
             new Header(Base.SystemText.Inv3_Conditions, 4),
             new Spacing(0, 63),

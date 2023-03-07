@@ -9,7 +9,7 @@ public abstract class BaseAstVisitor : IAstVisitor
     public virtual void Visit(ContinueStatement continueStatement) { }
     public virtual void Visit(ControlFlowNode cfgNode) { }
     public virtual void Visit(EmptyNode empty) { }
-    public virtual void Visit(Goto jump) { }
+    public virtual void Visit(GotoStatement jump) { }
     public virtual void Visit(Label label) { } 
     public virtual void Visit(Name name) { }
     public virtual void Visit(Numeric numeric) { }
@@ -46,9 +46,9 @@ public abstract class BaseAstVisitor : IAstVisitor
         doLoop.Condition.Accept(this);
     }
 
-    public virtual void Visit(EndlessLoop loop)
+    public virtual void Visit(EndlessLoop endlessLoop)
     {
-        loop.Body?.Accept(this);
+        endlessLoop.Body?.Accept(this);
     }
 
     public virtual void Visit(WhileLoop whileLoop)

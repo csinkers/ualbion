@@ -30,14 +30,14 @@ public class LoopLoweringVisitor : BaseAstBuilderVisitor
             negated = true;
         }
 
-        return Emit.Cfg(new ControlFlowGraph(new[]
+        return UAEmit.Cfg(new ControlFlowGraph(new[]
             {
-                Emit.Empty(), // 0
-                Emit.Label(headLabel), // 1
+                UAEmit.Empty(), // 0
+                UAEmit.Label(headLabel), // 1
                 body, // 2
                 condition, // 3
-                Emit.Label(tailLabel), // 4
-                Emit.Empty() // 5
+                UAEmit.Label(tailLabel), // 4
+                UAEmit.Empty() // 5
             },
             new[]
             {
@@ -69,14 +69,14 @@ public class LoopLoweringVisitor : BaseAstBuilderVisitor
             negated = true;
         }
 
-        return Emit.Cfg(new ControlFlowGraph(new[]
+        return UAEmit.Cfg(new ControlFlowGraph(new[]
             {
-                Emit.Empty(), // 0
-                Emit.Label(headLabel), // 1
+                UAEmit.Empty(), // 0
+                UAEmit.Label(headLabel), // 1
                 condition, // 2
                 body, // 3
-                Emit.Label(tailLabel), // 4
-                Emit.Empty() // 5
+                UAEmit.Label(tailLabel), // 4
+                UAEmit.Empty() // 5
             },
             new[]
             {
@@ -87,26 +87,26 @@ public class LoopLoweringVisitor : BaseAstBuilderVisitor
             }));
     }
 
-    protected override ICfgNode Build(EndlessLoop loop)
+    protected override ICfgNode Build(EndlessLoop endlessLoop)
     {
         var headLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
         var tailLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
         _headStack.Push(headLabel);
         _tailStack.Push(tailLabel);
 
-        loop.Body?.Accept(this);
-        var body = Result ?? loop.Body;
+        endlessLoop.Body?.Accept(this);
+        var body = Result ?? endlessLoop.Body;
 
         _tailStack.Pop();
         _headStack.Pop();
 
-        return Emit.Cfg(new ControlFlowGraph(new[]
+        return UAEmit.Cfg(new ControlFlowGraph(new[]
             {
-                Emit.Empty(), // 0
-                Emit.Label(headLabel), // 1
+                UAEmit.Empty(), // 0
+                UAEmit.Label(headLabel), // 1
                 body, // 2
-                Emit.Label(tailLabel), // 3
-                Emit.Empty() // 4
+                UAEmit.Label(tailLabel), // 3
+                UAEmit.Empty() // 4
             },
             new[]
             {
@@ -121,13 +121,13 @@ public class LoopLoweringVisitor : BaseAstBuilderVisitor
     {
         if (_headStack.Count == 0)
             throw new InvalidOperationException("Break statement detected outside of a loop");
-        return Emit.Goto(_tailStack.Peek());
+        return UAEmit.Goto(_tailStack.Peek());
     }
 
     protected override ICfgNode Build(ContinueStatement continueStatement)
     {
         if (_headStack.Count == 0)
             throw new InvalidOperationException("Continue statement detected outside of a loop");
-        return Emit.Goto(_headStack.Peek());
+        return UAEmit.Goto(_headStack.Peek());
     }
 }

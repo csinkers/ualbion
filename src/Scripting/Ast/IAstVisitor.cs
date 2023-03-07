@@ -8,10 +8,10 @@ public interface IAstVisitor
     void Visit(ControlFlowNode cfgNode);
     void Visit(DoLoop doLoop);
     void Visit(EmptyNode empty);
-    void Visit(EndlessLoop loop);
+    void Visit(EndlessLoop endlessLoop);
     void Visit(IfThen ifThen);
     void Visit(IfThenElse ifElse);
-    void Visit(Goto jump);
+    void Visit(GotoStatement jump);
     void Visit(Label label);
     void Visit(Name name);
     void Visit(Negation negation);

@@ -89,12 +89,12 @@ public static class ReduceSeseRegions
 
     static ControlFlowGraph SeverEdge(ControlFlowGraph graph, int start, int end)
     {
-        var labelName = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
-        var gotoNode = Emit.Goto(labelName);
-
         if (graph == null) throw new ArgumentNullException(nameof(graph));
-        if (gotoNode == null) throw new ArgumentNullException(nameof(gotoNode));
+
+        var labelName = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
+        var gotoNode = UAEmit.Goto(labelName);
         var label = graph.GetEdgeLabel(start, end);
+
         graph = graph
             .RemoveEdge(start, end)
             .AddNode(gotoNode, out var sourceNodeIndex)
@@ -105,7 +105,7 @@ public static class ReduceSeseRegions
         {
             graph = graph.ReplaceNode(end,
                 new ControlFlowGraph(0, 1,
-                    new[] { Emit.Label(labelName), graph.Nodes[end] },
+                    new[] { UAEmit.Label(labelName), graph.Nodes[end] },
                     new[] { (0, 1, CfgEdge.True) }));
         }
 

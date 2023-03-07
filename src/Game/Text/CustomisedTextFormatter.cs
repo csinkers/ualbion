@@ -18,8 +18,8 @@ public class CustomisedTextFormatter : ITextFormatter
     public IText Format(StringId stringId, params object[] arguments) 
         => Filter(_formatter.Format(stringId, _implicitTokens, arguments));
 
-    public IText Format(string template, params object[] arguments)
-        => Filter(_formatter.Format(template, _implicitTokens, arguments));
+    public IText Format(string templateText, params object[] arguments)
+        => Filter(_formatter.Format(templateText, _implicitTokens, arguments));
 
     public IText Format(TextId textId, IList<(Token, object)> implicitTokens, params object[] arguments)
         => Filter(_formatter.Format(textId, implicitTokens, arguments));
@@ -27,8 +27,8 @@ public class CustomisedTextFormatter : ITextFormatter
     public IText Format(StringId stringId, IList<(Token, object)> implicitTokens, params object[] arguments)
         => Filter(_formatter.Format(stringId, implicitTokens, arguments));
 
-    public IText Format(string template, IList<(Token, object)> implicitTokens, params object[] arguments)
-        => Filter(_formatter.Format(template, implicitTokens, arguments));
+    public IText Format(string templateText, IList<(Token, object)> implicitTokens, params object[] arguments)
+        => Filter(_formatter.Format(templateText, implicitTokens, arguments));
 
     IText Filter(IText text) => _blockFilter != null
         ? new TextFilter(x => x.BlockId == _blockFilter.Value) { Source = text }

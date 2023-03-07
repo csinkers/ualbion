@@ -243,7 +243,7 @@ public class EventLayout
 
     static ushort? GetLabelNumber(string prefix, string label)
     {
-        if (!label.StartsWith(prefix))
+        if (!label.StartsWith(prefix, StringComparison.Ordinal))
             return null;
 
         var tail = label[prefix.Length..];

@@ -42,7 +42,7 @@ public class TextPromptDialog : ModalDialog
 
         var stack = new FixedSize(162, 13,
             new ButtonFrame(
-                new HorizontalStack(
+                new HorizontalStacker(
                     new NonGreedy(new UiText(_textSource)),
                     _cursor,
                     new Spacing(0,0)))

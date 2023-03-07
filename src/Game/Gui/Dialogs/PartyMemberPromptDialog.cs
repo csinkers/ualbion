@@ -55,9 +55,9 @@ class PartyMemberPromptDialog : ModalDialog
         }
         portraits.Add(new VariableSpacing(0, 1));
 
-        var elements = new VerticalStack(
+        var elements = new VerticalStacker(
             new Spacing(0, 5),
-            new HorizontalStack(
+            new HorizontalStacker(
                 portraits
             ),
             new Spacing(0, 5),
@@ -65,7 +65,7 @@ class PartyMemberPromptDialog : ModalDialog
             new Spacing(0, 5)
         );
 
-        var horizontalPad = new HorizontalStack(
+        var horizontalPad = new HorizontalStacker(
             new Spacing(6, 0),
             elements,
             new Spacing(6, 0)

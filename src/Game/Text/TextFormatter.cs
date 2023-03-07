@@ -39,124 +39,34 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
                 case Token.Me: throw new NotImplementedException();
 
                 case Token.Class:
-                {
-                    if (active is not ICharacterSheet character)
-                    {
-                        yield return (Token.Text, "{CLAS}");
-                        break; // throw new FormatException($"Expected the active item to be a character, was actually {active ?? "null"}");
-                    }
-
-                    switch (character.PlayerClass)
-                    {
-                        case PlayerClass.Pilot: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Pilot)); break;
-                        case PlayerClass.Scientist: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Scientist)); break;
-                        case PlayerClass.IskaiWarrior: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Warrior)); break;
-                        case PlayerClass.DjiKasMage: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_DjiKasMage)); break;
-                        case PlayerClass.Druid: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Druid)); break;
-                        case PlayerClass.EnlightenedOne: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_EnlightenedOne)); break;
-                        case PlayerClass.Technician: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Technician)); break;
-                        case PlayerClass.OquloKamulos: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_OquloKamulos)); break;
-                        case PlayerClass.Warrior: yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Warrior2)); break;
-                        case PlayerClass.Monster: yield return (Token.Text, "Monster"); break;
-                        default: throw new InvalidEnumArgumentException(nameof(character.PlayerClass), (int)character.PlayerClass, typeof(PlayerClass));
-                    }
+                    foreach (var valueTuple in SubstituteClass(assets, active))
+                        yield return valueTuple;
                     break;
-                }
 
                 case Token.He:
                 case Token.Him:
                 case Token.His:
-                {
-                    if (active is not ICharacterSheet character)
-                    {
-                        yield return (Token.Text, $"{{{token}}}");
-                        break; // throw new FormatException($"Expected the active item to be a character, was actually {active ?? "null"}");
-                    }
-
-                    var word = (token, character.Gender) switch
-                    {
-                        (Token.He, Gender.Male) => Base.SystemText.Meta_He,
-                        (Token.He, Gender.Female) => Base.SystemText.Meta_She,
-                        (Token.He, Gender.Neuter) => Base.SystemText.Meta_ItNominative,
-                        (Token.Him, Gender.Male) => Base.SystemText.Meta_HimAccusative,
-                        (Token.Him, Gender.Female) => Base.SystemText.Meta_HerAccusative,
-                        (Token.Him, Gender.Neuter) => Base.SystemText.Meta_ItAccusative,
-                        (Token.His, Gender.Male) => Base.SystemText.Meta_His,
-                        (Token.His, Gender.Female) => Base.SystemText.Meta_Her,
-                        (Token.His, Gender.Neuter) => Base.SystemText.Meta_Its,
-                        _ => throw new NotImplementedException()
-                    };
-
-                    yield return (Token.Text, assets.LoadString(word));
+                    foreach (var valueTuple1 in SubstitutePronoun(assets, active, token))
+                        yield return valueTuple1;
                     break;
-                }
 
                 case Token.Name:
-                {
-                    if (active is ICharacterSheet character)
-                    {
-                        var language = Var(UserVars.Gameplay.Language);
-                        yield return (Token.Text, character.GetName(language));
-                    }
-                    else if (active is ItemData item)
-                        yield return (Token.Text, item.Name);
-                    else 
-                        yield return (Token.Text, "{NAME}");
+                    yield return SubstituteName(active);
                     break;
-                }
 
                 case Token.Price:
-                {
-                    if (active is not ItemData item)
-                    {
-                        yield return (Token.Text, "{PRIC}");
-                        break; // throw new FormatException($"Expected the active item to be an item, was actually {active ?? "null"}");
-                    }
-
-                    yield return (Token.Text, $"${item.Value/10}.{item.Value % 10}"); // TODO: Does this need extra logic?
+                    yield return SubstitutePrice(active);
                     break;
-                }
 
                 case Token.Race:
-                {
-                    if (active is not ICharacterSheet character)
-                    {
-                        yield return (Token.Text, "{RACE}");
-                        break; // throw new FormatException($"Expected the active item to be a character, was actually {active ?? "null"}");
-                    }
-
-                    switch (character.Race)
-                    {
-                        case PlayerRace.Terran: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Terran)); break;
-                        case PlayerRace.Iskai: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Iskai)); break;
-                        case PlayerRace.Celt: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Celt)); break;
-                        case PlayerRace.KengetKamulos: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_KengetKamulos)); break;
-                        case PlayerRace.DjiCantos: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_DjiCantos)); break;
-                        case PlayerRace.Mahino: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Mahino)); break;
-                        case PlayerRace.Decadent: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Decadent)); break;
-                        case PlayerRace.Umajo: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Umajo)); break;
-                        case PlayerRace.Monster: yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Monster)); break;
-                        default: throw new InvalidEnumArgumentException(nameof(character.Race), (int)character.Race, typeof(PlayerRace));
-                    }
+                    foreach (var valueTuple2 in SubstituteRace(assets, active))
+                        yield return valueTuple2;
                     break;
-                }
 
                 case Token.Sex:
-                {
-                    if (active is not ICharacterSheet character)
-                    {
-                        yield return (Token.Text, "{SEX}");
-                        break; // throw new FormatException($"Expected the active item to be a character, was actually {active ?? "null"}");
-                    }
-
-                    switch (character.Gender)
-                    {
-                        case Gender.Male: yield return (Token.Text, "♂"); break;
-                        case Gender.Female: yield return (Token.Text, "♀"); break;
-                    }
-
+                    foreach (var valueTuple3 in SubstituteSex(active))
+                        yield return valueTuple3;
                     break;
-                }
 
                 // Change context
                 case Token.Combatant: active = Resolve<IGameState>().Combatant; break;
@@ -173,6 +83,157 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
 
                 default: yield return (token, p); break;
             }
+        }
+    }
+
+    static IEnumerable<(Token, object)> SubstituteSex(object active)
+    {
+        if (active is not ICharacterSheet character)
+        {
+            yield return (Token.Text, "{SEX}");
+            yield break;
+        }
+
+        switch (character.Gender)
+        {
+            case Gender.Male:
+                yield return (Token.Text, "♂");
+                break;
+            case Gender.Female:
+                yield return (Token.Text, "♀");
+                break;
+        }
+    }
+
+    static IEnumerable<(Token, object)> SubstituteRace(IAssetManager assets, object active)
+    {
+        if (active is not ICharacterSheet character)
+        {
+            yield return (Token.Text, "{RACE}");
+            yield break;
+        }
+
+        switch (character.Race)
+        {
+            case PlayerRace.Terran:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Terran));
+                break;
+            case PlayerRace.Iskai:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Iskai));
+                break;
+            case PlayerRace.Celt:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Celt));
+                break;
+            case PlayerRace.KengetKamulos:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_KengetKamulos));
+                break;
+            case PlayerRace.DjiCantos:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_DjiCantos));
+                break;
+            case PlayerRace.Mahino:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Mahino));
+                break;
+            case PlayerRace.Decadent:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Decadent));
+                break;
+            case PlayerRace.Umajo:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Umajo));
+                break;
+            case PlayerRace.Monster:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Monster));
+                break;
+            default:
+                throw new InvalidEnumArgumentException(nameof(character.Race), (int)character.Race, typeof(PlayerRace));
+        }
+    }
+
+    static (Token, object) SubstitutePrice(object active) =>
+        active is not ItemData item 
+            ? (Token.Text, "{PRIC}") 
+            : (Token.Text, $"${item.Value / 10}.{item.Value % 10}"); // TODO:  i18n
+
+    (Token, object) SubstituteName(object active)
+    {
+        switch (active)
+        {
+            case ICharacterSheet character:
+            {
+                var language = Var(UserVars.Gameplay.Language);
+                return (Token.Text, character.GetName(language));
+            }
+            case ItemData item: return (Token.Text, item.Name);
+            default: return (Token.Text, "{NAME}");
+        }
+    }
+
+    static IEnumerable<(Token, object)> SubstitutePronoun(IAssetManager assets, object active, Token token)
+    {
+        if (active is not ICharacterSheet character)
+        {
+            yield return (Token.Text, $"{{{token}}}");
+            yield break;
+        }
+
+        var word = (token, character.Gender) switch
+        {
+            (Token.He, Gender.Male) => Base.SystemText.Meta_He,
+            (Token.He, Gender.Female) => Base.SystemText.Meta_She,
+            (Token.He, Gender.Neuter) => Base.SystemText.Meta_ItNominative,
+            (Token.Him, Gender.Male) => Base.SystemText.Meta_HimAccusative,
+            (Token.Him, Gender.Female) => Base.SystemText.Meta_HerAccusative,
+            (Token.Him, Gender.Neuter) => Base.SystemText.Meta_ItAccusative,
+            (Token.His, Gender.Male) => Base.SystemText.Meta_His,
+            (Token.His, Gender.Female) => Base.SystemText.Meta_Her,
+            (Token.His, Gender.Neuter) => Base.SystemText.Meta_Its,
+            _ => throw new NotImplementedException()
+        };
+
+        yield return (Token.Text, assets.LoadString(word));
+    }
+
+    static IEnumerable<(Token, object)> SubstituteClass(IAssetManager assets, object active)
+    {
+        if (active is not ICharacterSheet character)
+        {
+            yield return (Token.Text, "{CLAS}");
+            yield break;
+        }
+
+        switch (character.PlayerClass)
+        {
+            case PlayerClass.Pilot:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Pilot));
+                break;
+            case PlayerClass.Scientist:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Scientist));
+                break;
+            case PlayerClass.IskaiWarrior:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Warrior));
+                break;
+            case PlayerClass.DjiKasMage:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_DjiKasMage));
+                break;
+            case PlayerClass.Druid:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Druid));
+                break;
+            case PlayerClass.EnlightenedOne:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_EnlightenedOne));
+                break;
+            case PlayerClass.Technician:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Technician));
+                break;
+            case PlayerClass.OquloKamulos:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_OquloKamulos));
+                break;
+            case PlayerClass.Warrior:
+                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Warrior2));
+                break;
+            case PlayerClass.Monster:
+                yield return (Token.Text, "Monster");
+                break;
+            default:
+                throw new InvalidEnumArgumentException(nameof(character.PlayerClass), (int)character.PlayerClass,
+                    typeof(PlayerClass));
         }
     }
 
@@ -272,8 +333,8 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
     public IText Format(StringId stringId, params object[] arguments)
         => Format(stringId, null, arguments);
 
-    public IText Format(string template, params object[] arguments)
-        => Format(template, null, arguments);
+    public IText Format(string templateText, params object[] arguments)
+        => Format(templateText, null, arguments);
 
     public IText Format(TextId textId, IList<(Token, object)> implicitTokens, params object[] arguments)
         => Format((StringId)textId, implicitTokens, arguments);
@@ -282,14 +343,14 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
         => new DynamicText(() =>
         {
             var assets = Resolve<IAssetManager>();
-            string template = assets.LoadString(stringId);
-            return InnerFormat(template, arguments, implicitTokens, assets);
+            string templateText = assets.LoadString(stringId);
+            return InnerFormat(templateText, arguments, implicitTokens, assets);
         });
 
-    public IText Format(string template, IList<(Token, object)> implicitTokens, params object[] arguments)
+    public IText Format(string templateText, IList<(Token, object)> implicitTokens, params object[] arguments)
         => new DynamicText(() =>
         {
             var assets = Resolve<IAssetManager>();
-            return InnerFormat(template, arguments, implicitTokens, assets);
+            return InnerFormat(templateText, arguments, implicitTokens, assets);
         });
 }

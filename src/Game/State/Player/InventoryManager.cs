@@ -19,6 +19,8 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.State.Player;
 
+// TODO: Refactor / break this class up if possible
+#pragma warning disable CA1506 // 'InventoryManager' is coupled with '111' different types from '23' different namespaces. Rewrite or refactor the code to decrease its class coupling below '96'.
 public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryManager
 {
     readonly Func<InventoryId, Inventory> _getInventory;
@@ -68,9 +70,9 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         inventory.SetSlotUiPosition(e.InventorySlotId.Slot, new Vector2(e.X, e.Y));
     }
 
-    public InventoryAction GetInventoryAction(InventorySlotId slotId)
+    public InventoryAction GetInventoryAction(InventorySlotId id)
     {
-        var slot = GetSlot(slotId);
+        var slot = GetSlot(id);
         if (slot == null || slot.Id.Slot == ItemSlotId.None)
             return InventoryAction.Nothing;
 
@@ -87,12 +89,12 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                 return InventoryAction.Coalesce;
 
             case (AssetType.Gold, AssetType.None):
-                return slotId.Slot == ItemSlotId.Gold 
+                return id.Slot == ItemSlotId.Gold 
                     ? InventoryAction.PutDown 
                     : InventoryAction.Nothing;
 
             case (AssetType.Rations, AssetType.None):
-                return slotId.Slot == ItemSlotId.Rations 
+                return id.Slot == ItemSlotId.Rations 
                     ? InventoryAction.PutDown 
                     : InventoryAction.Nothing;
 
@@ -743,3 +745,4 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         continuation.Invoke();
     }
 }
+#pragma warning restore CA1506 // 'InventoryManager' is coupled with '111' different types from '23' different namespaces. Rewrite or refactor the code to decrease its class coupling below '96'.

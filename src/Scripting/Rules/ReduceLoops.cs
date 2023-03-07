@@ -30,7 +30,7 @@ public static class ReduceLoops
                 foreach (var child in graph.Children(loop.Header.Index).Where(x => graph.GetEdgeLabel(loop.Header.Index, x) == CfgEdge.LoopSuccessor))
                     successor = child;
 
-                graph = graph.InsertBefore(loop.Header.Index, Emit.Empty(), out var newHeaderIndex);
+                graph = graph.InsertBefore(loop.Header.Index, UAEmit.Empty(), out var newHeaderIndex);
 
                 if (successor.HasValue)
                 {
@@ -68,7 +68,7 @@ public static class ReduceLoops
                         continue;
 
                     int tail = loop.Body[0].Index;
-                    var loopNode = Emit.Loop(Emit.Seq(graph.Nodes[index], graph.Nodes[tail]));
+                    var loopNode = UAEmit.Loop(UAEmit.Seq(graph.Nodes[index], graph.Nodes[tail]));
                     return (graph
                         .RemoveNode(tail)
                         .ReplaceNode(index, loopNode), "Reduce generic loop");
@@ -95,7 +95,7 @@ public static class ReduceLoops
         {
             case 1:
             {
-                var seq = Emit.Seq(graph.Nodes[part.Index], Emit.Continue());
+                var seq = UAEmit.Seq(graph.Nodes[part.Index], UAEmit.Continue());
                 var tailIndex = loop.Body.First(x => x.Tail).Index;
                 return graph
                     .ReplaceNode(part.Index, seq)
@@ -104,7 +104,7 @@ public static class ReduceLoops
             }
 
             case 2:
-                return ReplaceLoopBranch(graph, part.Index, loop.Header.Index, Emit.Continue());
+                return ReplaceLoopBranch(graph, part.Index, loop.Header.Index, UAEmit.Continue());
 
             default:
                 throw new ControlFlowGraphException($"Continue at {part.Index} has unexpected child count ({children.Length})", graph);
@@ -149,15 +149,15 @@ public static class ReduceLoops
 
             var condition = graph.Nodes[part.Index];
             if (graph.GetEdgeLabel(part.Index, exitTarget) == CfgEdge.False)
-                condition = Emit.Negation(condition);
+                condition = UAEmit.Negation(condition);
 
-            var ifNode = Emit.If(condition, Emit.Seq(graph.Nodes[exitTarget], Emit.Break()));
+            var ifNode = UAEmit.If(condition, UAEmit.Seq(graph.Nodes[exitTarget], UAEmit.Break()));
             return graph
                 .RemoveNode(exitTarget)
                 .ReplaceNode(part.Index, ifNode);
         }
 
-        return ReplaceLoopBranch(graph, part.Index, exitTarget, Emit.Break());
+        return ReplaceLoopBranch(graph, part.Index, exitTarget, UAEmit.Break());
     }
 
     static ControlFlowGraph ReplaceLoopBranch(ControlFlowGraph graph, int index, int target, ICfgNode newNode)
@@ -166,9 +166,9 @@ public static class ReduceLoops
         var condition = graph.Nodes[index];
 
         if (label == CfgEdge.False)
-            condition = Emit.Negation(condition);
+            condition = UAEmit.Negation(condition);
 
-        var ifNode = Emit.If(condition, newNode);
+        var ifNode = UAEmit.If(condition, newNode);
         return graph
             .ReplaceNode(index, ifNode)
             .RemoveEdge(index, target);

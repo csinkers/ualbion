@@ -51,7 +51,7 @@ public class ConversationOptionsWindow : ModalDialog
 
         _optionElements.Add(new Spacing(MaxConversationOptionWidth, 0));
 
-        var stack = new VerticalStack(_optionElements);
+        var stack = new VerticalStacker(_optionElements);
         var content = new Padding(stack, 3);
 
         var frame = new DialogFrame(content);

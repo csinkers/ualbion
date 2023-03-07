@@ -160,8 +160,8 @@ public class AssetFileInfo
     /// <exception cref="FormatException"></exception>
     public void PopulateAssetIds(
         IJsonUtil jsonUtil,
-        Func<AssetFileInfo, IList<(int, int)>> getSubItemCountForFile,
-        Func<string, byte[]> readAllBytesFunc)
+        AssetConfig.GetSubItemCountMethod getSubItemCountForFile,
+        AssetConfig.ReadAllBytesMethod readAllBytesFunc)
     {
         if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
         if (getSubItemCountForFile == null) throw new ArgumentNullException(nameof(getSubItemCountForFile));
@@ -189,7 +189,7 @@ public class AssetFileInfo
 
         foreach (var range in ranges)
         {
-            for (int i = range.Item1; i < range.Item1 + range.Item2; i++)
+            for (int i = range.RangeStart; i < range.RangeStart + range.RangeLength; i++)
             {
                 if (last != null && i < last.Index) // Don't add any assets below the mapped range
                     break;

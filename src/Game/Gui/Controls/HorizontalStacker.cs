@@ -10,10 +10,10 @@ namespace UAlbion.Game.Gui.Controls;
 /// the available width evenly, excepting elements that implement
 /// IFixedSizeUiElement.
 /// </summary>
-public class HorizontalStack : UiElement
+public class HorizontalStacker : UiElement
 {
-    public HorizontalStack(params IUiElement[] args) : this((IList<IUiElement>)args) { }
-    public HorizontalStack(IList<IUiElement> children)
+    public HorizontalStacker(params IUiElement[] args) : this((IList<IUiElement>)args) { }
+    public HorizontalStacker(IList<IUiElement> children)
     {
         if (children == null) throw new ArgumentNullException(nameof(children));
         foreach(var child in children)

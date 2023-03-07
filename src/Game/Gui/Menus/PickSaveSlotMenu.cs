@@ -99,7 +99,7 @@ public class PickSaveSlotMenu : ModalDialog
         var header = new UiTextBuilder(_stringId).Center().NoWrap();
         elements.Add(new ButtonFrame(new Padding(header, 2)) { State = ButtonState.Pressed });
 
-        var stack = new VerticalStack(elements);
+        var stack = new VerticalStacker(elements);
         AttachChild(new DialogFrame(new Padding(stack, 4, 5, 6, 5)));
     }
 }

@@ -18,6 +18,7 @@ namespace UAlbion.Game.Veldrid.Diag;
 
 public class DiagInspector : Component
 {
+#if false
     public enum SomeEnum
     {
         First,
@@ -49,6 +50,7 @@ public class DiagInspector : Component
         [DiagEdit(Style = DiagEditStyle.Text, MaxLength = 32)] public string Text { get; set; } = "Foo";
     }
     readonly TestObject _testObject = new();
+#endif
 
     IList<Selection> _hits;
     Vector2 _mousePosition;

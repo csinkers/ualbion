@@ -40,9 +40,9 @@ public static class SimplifyLabels
         readonly IDictionary<string, (string target, bool removed)> _mapping;
         public RelabellingAstVisitor(IDictionary<string, (string target, bool removed)> mapping)
             => _mapping = mapping ?? throw new ArgumentNullException(nameof(mapping));
-        protected override ICfgNode Build(Goto jump) => 
+        protected override ICfgNode Build(GotoStatement jump) => 
             _mapping.ContainsKey(jump.Label) 
-                ? Emit.Goto(_mapping[jump.Label].target) 
+                ? UAEmit.Goto(_mapping[jump.Label].target) 
                 : null;
 
         protected override ICfgNode Build(Label label)
@@ -51,8 +51,8 @@ public static class SimplifyLabels
                 return null;
 
             return value.removed 
-                ? Emit.Empty() 
-                : Emit.Label(value.target);
+                ? UAEmit.Empty() 
+                : UAEmit.Label(value.target);
         }
     }
 
@@ -68,7 +68,7 @@ public static class SimplifyLabels
         // Remove non-dummy labels
         foreach (var (label, target) in collector.Labels)
         {
-            if (!label.StartsWith(dummyLabelPrefix))
+            if (!label.StartsWith(dummyLabelPrefix, StringComparison.Ordinal))
                 continue;
 
             if (targets.TryGetValue(target, out var existingLabel))

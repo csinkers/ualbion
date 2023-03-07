@@ -43,14 +43,14 @@ public class ClockWidget : Dialog
             new UiSpriteElement(AssetId.None)
         };
 
-        var digitStack = new FixedPositionStack()
+        var digitStack = new FixedPositionStacker()
             .Add(_digits[0], Digits[0].Item1, Digits[0].Item2, DigitSize.Item1, DigitSize.Item2)
             .Add(_digits[1], Digits[1].Item1, Digits[1].Item2, DigitSize.Item1, DigitSize.Item2)
             .Add(_digits[2], Digits[2].Item1, Digits[2].Item2, DigitSize.Item1, DigitSize.Item2)
             .Add(_digits[3], Digits[3].Item1, Digits[3].Item2, DigitSize.Item1, DigitSize.Item2);
 
-        var layerStack = new LayerStack(face, digitStack);
-        AttachChild(new FixedPositionStack().Add(layerStack, Position.Item1, Position.Item2, Size.Item1, Size.Item2));
+        var layerStack = new LayerStacker(face, digitStack);
+        AttachChild(new FixedPositionStacker().Add(layerStack, Position.Item1, Position.Item2, Size.Item1, Size.Item2));
     }
 
     protected override void Subscribed()

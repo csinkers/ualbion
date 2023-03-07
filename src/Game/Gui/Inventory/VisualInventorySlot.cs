@@ -39,9 +39,9 @@ public sealed class VisualInventorySlot : UiElement
                 new Vector2(16, 20);
 
             _sprite = new UiSpriteElement(SpriteId.None);
-            _button = AttachChild(new Button(new FixedPositionStack()
+            _button = AttachChild(new Button(new FixedPositionStacker()
                     .Add(
-                        new LayerStack(_sprite, _overlay),
+                        new LayerStacker(_sprite, _overlay),
                         1, 1, 16, 16) //16x16 surrounded by 1px borders
                     .Add(text, 0, 20 - 9, 16, 9))
                 {
@@ -68,7 +68,7 @@ public sealed class VisualInventorySlot : UiElement
                     : Base.CoreGfx.UiFood);
 
             _button = AttachChild(new Button(
-                    new VerticalStack(
+                    new VerticalStacker(
                         new Spacing(31, 0),
                         _sprite,
                         new UiText(amountSource)

@@ -17,8 +17,9 @@ public static class Tokeniser
     public static IEnumerable<(Token, object)> Tokenise(string template)
     {
         if (template == null) yield break;
-        StringBuilder sb = new StringBuilder();
-        TokeniserState state = TokeniserState.Neutral;
+        var sb = new StringBuilder();
+        var state = TokeniserState.Neutral;
+
         foreach (var c in template)
         {
             switch (state)
@@ -32,6 +33,7 @@ public static class Tokeniser
                                 yield return (Token.Text, sb.ToString());
                                 sb.Clear();
                             }
+
                             state = TokeniserState.InPercentage;
                             break;
 
@@ -41,6 +43,7 @@ public static class Tokeniser
                                 yield return (Token.Text, sb.ToString());
                                 sb.Clear();
                             }
+
                             state = TokeniserState.InBraces;
                             break;
 
@@ -50,11 +53,15 @@ public static class Tokeniser
                                 yield return (Token.Text, sb.ToString());
                                 sb.Clear();
                             }
+
                             yield return (Token.NewLine, null);
                             break;
 
-                        default: sb.Append(c); break;
+                        default:
+                            sb.Append(c);
+                            break;
                     }
+
                     break;
 
                 case TokeniserState.InBraces:
@@ -62,58 +69,17 @@ public static class Tokeniser
                     {
                         case '}':
                             var inner = sb.ToString().Trim();
-                            switch (inner)
-                            {
-                                case "HE": yield return (Token.He, null); break;
-                                case "HIM": yield return (Token.Him, null); break;
-                                case "HIS": yield return (Token.His, null); break;
-                                case "ME": yield return (Token.Me, null); break;
-                                case "CLAS": yield return (Token.Class, null); break;
-                                case "RACE": yield return (Token.Race, null); break;
-                                case "SEXC": yield return (Token.Sex, null); break;
-                                case "NAME": yield return (Token.Name, null); break;
-                                case "DAMG": yield return (Token.Damage, null); break;
-                                case "PRIC": yield return (Token.Price, null); break;
-                                case "COMB": yield return (Token.Combatant, null); break;
-                                case "INVE": yield return (Token.Inventory, null); break;
-                                case "SUBJ": yield return (Token.Subject, null); break;
-                                case "VICT": yield return (Token.Victim, null); break;
-                                case "WEAP": yield return (Token.Weapon, null); break;
-                                case "LEAD": yield return (Token.Leader, null); break;
-                                case "BIG": yield return (Token.Big, null); break;
-                                case "FAT": yield return (Token.Fat, null); break;
-                                case "LEFT": yield return (Token.Left, null); break;
-                                case "CNTR": yield return (Token.Centre, null); break;
-                                case "JUST": yield return (Token.Justify, null); break;
-                                case "FAHI": yield return (Token.FatHigh, null); break;
-                                case "HIGH": yield return (Token.High, null); break;
-                                case "NORS": yield return (Token.NormalSize, null); break;
-                                case "TECF": yield return (Token.Tecf, null); break;
-                                case "UNKN": yield return (Token.Unknown, null); break;
-                                default:
-                                    if (inner.StartsWith("BLOK", StringComparison.Ordinal))
-                                    {
-                                        var number = int.Parse(inner[4..]);
-                                        yield return (Token.Block, number);
-                                    }
-                                    else if (inner.StartsWith("INK ", StringComparison.Ordinal))
-                                    {
-                                        var number = int.Parse(inner[4..]);
-                                        yield return (Token.Ink, new InkId(number));
-                                    }
-                                    else if (inner.StartsWith("WORD", StringComparison.Ordinal))
-                                    {
-                                        var word = inner[4..];
-                                        yield return (Token.Word, word);
-                                    }
-                                    break;
-                            }
+                            var token = GetBraceToken(inner);
+                            if (token != null)
+                                yield return token.Value;
 
                             state = TokeniserState.Neutral;
                             sb.Clear();
                             break;
 
-                        default: sb.Append(c); break;
+                        default:
+                            sb.Append(c);
+                            break;
                     }
 
                     break;
@@ -145,6 +111,7 @@ public static class Tokeniser
                             sb.Clear();
                             break;
                     }
+
                     break;
             }
         }
@@ -154,5 +121,62 @@ public static class Tokeniser
             yield return (Token.Text, sb.ToString());
             sb.Clear();
         }
+    }
+
+ 
+    static readonly Dictionary<string, Token> SimpleBraceTokens = new()
+    {
+        { "HE",  Token.He },
+        { "HIM", Token.Him },
+        { "HIS", Token.His },
+        { "ME",  Token.Me },
+        { "CLAS", Token.Class },
+        { "RACE", Token.Race },
+        { "SEXC", Token.Sex },
+        { "NAME", Token.Name },
+        { "DAMG", Token.Damage },
+        { "PRIC", Token.Price },
+        { "COMB", Token.Combatant },
+        { "INVE", Token.Inventory },
+        { "SUBJ", Token.Subject },
+        { "VICT", Token.Victim },
+        { "WEAP", Token.Weapon },
+        { "LEAD", Token.Leader },
+        { "BIG",  Token.Big },
+        { "FAT",  Token.Fat },
+        { "LEFT", Token.Left },
+        { "CNTR", Token.Centre },
+        { "JUST", Token.Justify },
+        { "FAHI", Token.FatHigh },
+        { "HIGH", Token.High },
+        { "NORS", Token.NormalSize },
+        { "TECF", Token.Tecf },
+        { "UNKN", Token.Unknown },
+    };
+
+    static (Token, object)? GetBraceToken(string inner)
+    {
+        if (SimpleBraceTokens.TryGetValue(inner, out var token))
+            return (token, null);
+
+        if (inner.StartsWith("BLOK", StringComparison.Ordinal))
+        {
+            var number = int.Parse(inner[4..]);
+            return (Token.Block, number);
+        }
+
+        if (inner.StartsWith("INK ", StringComparison.Ordinal))
+        {
+            var number = int.Parse(inner[4..]);
+            return (Token.Ink, new InkId(number));
+        }
+
+        if (inner.StartsWith("WORD", StringComparison.Ordinal))
+        {
+            var word = inner[4..];
+            return (Token.Word, word);
+        }
+
+        return null;
     }
 }

@@ -19,7 +19,7 @@ public class SimpleMapLayerInfoBuilder : IMapLayerInfoBuilder<SpriteInfo>
     }
 
     public SpriteInfo BlankInstance { get; } = new(0, Vector3.Zero, Vector2.Zero, BlankRegion);
-    public SpriteKey GetSpriteKey(DrawLayer drawLayer, SpriteKeyFlags flags) => new(_tileset.Texture, SpriteSampler.Point, drawLayer, flags);
+    public SpriteKey GetSpriteKey(DrawLayer drawLayer, SpriteKeyFlags spriteKeyFlags) => new(_tileset.Texture, SpriteSampler.Point, drawLayer, spriteKeyFlags);
     public SpriteInfo BuildInstance(Vector3 position, ushort imageNumber, SpriteFlags flags)
     {
         var subImage = _tileset.GetRegion(imageNumber, 0);

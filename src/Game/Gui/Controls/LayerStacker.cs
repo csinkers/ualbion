@@ -9,10 +9,10 @@ namespace UAlbion.Game.Gui.Controls;
 /// same area, but elements that appear later in the child list
 /// are rendered above the elements that appear earlier.
 /// </summary>
-public class LayerStack : UiElement
+public class LayerStacker : UiElement
 {
-    public LayerStack(params IUiElement[] children) : this((IList<IUiElement>)children) { }
-    public LayerStack(IList<IUiElement> children)
+    public LayerStacker(params IUiElement[] children) : this((IList<IUiElement>)children) { }
+    public LayerStacker(IList<IUiElement> children)
     {
         if (children == null) throw new ArgumentNullException(nameof(children));
         foreach(var child in children)

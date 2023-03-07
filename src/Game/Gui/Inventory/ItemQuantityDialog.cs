@@ -28,7 +28,7 @@ public class ItemQuantityDialog : ModalDialog
     {
         _continuation = continuation;
         IUiElement itemPic = new UiSpriteElement(id) { SubId = subId }; 
-        var topStack = new HorizontalStack(
+        var topStack = new HorizontalStacker(
             new NonGreedy(new GroupingFrame(itemPic)),
             new Spacing(2,0),
             new GroupingFrame(new FixedSize(151, 30, new UiTextBuilder(stringId)))
@@ -36,7 +36,7 @@ public class ItemQuantityDialog : ModalDialog
 
         Func<int, string> formatFunc = useTenths ? FormatTenths : FormatUnits;
 
-        var stack = new VerticalStack(
+        var stack = new VerticalStacker(
             topStack,
             new Spacing(0, 5),
             new FixedSize(106, 14, new Slider(() => _quantity, x => _quantity = x, 0, max, formatFunc)),

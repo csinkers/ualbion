@@ -15,7 +15,7 @@ public class ConversationParticipantLabel : Dialog
         if (sheet == null) throw new ArgumentNullException(nameof(sheet));
         var name = GetName(sheet, false);
 
-        var fixedPos = new FixedPositionStack();
+        var fixedPos = new FixedPositionStacker();
         fixedPos.Add(
             new RepeatedBackground(
                 new ButtonFrame(

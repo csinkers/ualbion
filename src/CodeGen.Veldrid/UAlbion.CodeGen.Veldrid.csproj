@@ -6,7 +6,8 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IsRoslynComponent></IsRoslynComponent>
     <AnalysisMode>Recommended</AnalysisMode>
-    <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
+    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+    <_SkipUpgradeNetAnalyzersNuGetWarning>true</_SkipUpgradeNetAnalyzersNuGetWarning>
   </PropertyGroup>
 
   <ItemGroup>

@@ -23,6 +23,6 @@ public interface IGraph
 public interface IGraph<out TNode, TLabel> : IGraph
 {
     TNode GetNode(int i);
-    TLabel GetEdgeLabel(int start, int end);
+    TLabel GetEdgeLabel(int startNode, int endNode);
     IEnumerable<(int start, int end, TLabel label)> LabelledEdges { get; }
 }

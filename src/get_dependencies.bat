@@ -32,6 +32,12 @@ git clone https://github.com/datalust/superpower
 echo.
 
 :l5
+if exist ImGuiColorTextEditNet
+echo Cloning ImGuiColorTextEditNet
+git clone https://github.com/csinkers/ImGuiColorTextEditNet
+echo.
+
+:l6
 echo Updating AdlMidi.NET
 pushd AdlMidi.NET
 git stash && git pull --rebase && git stash pop
@@ -58,6 +64,11 @@ popd
 
 echo Updating superpower
 pushd superpower
+git stash && git pull --rebase && git stash pop
+popd
+
+echo Updating ImGuiColorTextEditNet
+pushd ImGuiColorTextEditNet
 git stash && git pull --rebase && git stash pop
 popd
 

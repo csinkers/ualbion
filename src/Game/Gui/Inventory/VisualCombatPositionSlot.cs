@@ -20,7 +20,7 @@ public sealed class VisualCombatPositionSlot : UiElement
 
         _sprite = new UiSpriteElement(SpriteId.None);
         _button = AttachChild(new Button(
-                new FixedPositionStack().Add(_sprite, 0, 0, 36, 38))
+                new FixedPositionStacker().Add(_sprite, 0, 0, 36, 38))
             {
                 Padding = -1,
                 Margin = 0,

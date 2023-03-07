@@ -27,8 +27,8 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
     public void Visit(ControlFlowNode cfgNode) => Result = Build(cfgNode);
     public void Visit(DoLoop doLoop) => Result = Build(doLoop);
     public void Visit(EmptyNode empty) => Result = Build(empty);
-    public void Visit(EndlessLoop loop) => Result = Build(loop);
-    public void Visit(Goto jump) => Result = Build(jump);
+    public void Visit(EndlessLoop endlessLoop) => Result = Build(endlessLoop);
+    public void Visit(GotoStatement jump) => Result = Build(jump);
     public void Visit(IfThen ifThen) => Result = Build(ifThen);
     public void Visit(IfThenElse ifElse) => Result = Build(ifElse);
     public void Visit(Label label) => Result = Build(label);
@@ -44,7 +44,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
     protected virtual ICfgNode Build(ContinueStatement continueStatement) => null;
     protected virtual ICfgNode Build(ControlFlowNode cfgNode) => null;
     protected virtual ICfgNode Build(EmptyNode empty) => null;
-    protected virtual ICfgNode Build(Goto jump) => null;
+    protected virtual ICfgNode Build(GotoStatement jump) => null;
     protected virtual ICfgNode Build(Label label) => null;
     protected virtual ICfgNode Build(Name name) => null;
     protected virtual ICfgNode Build(Numeric numeric) => null;
@@ -52,7 +52,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
     protected virtual ICfgNode Build(Negation negation)
     {
         negation.Expression.Accept(this);
-        return Result == null ? null : Emit.Negation(Result);
+        return Result == null ? null : UAEmit.Negation(Result);
     }
 
     protected virtual ICfgNode Build(IfThen ifThen)
@@ -65,7 +65,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
         if (condition == null && body == null)
             return null;
 
-        return Emit.If(condition ?? ifThen.Condition, body ?? ifThen.Body);
+        return UAEmit.If(condition ?? ifThen.Condition, body ?? ifThen.Body);
     }
 
     protected virtual ICfgNode Build(IfThenElse ifElse)
@@ -80,7 +80,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
         if (condition == null && trueBody == null && falseBody == null)
             return null;
 
-        return Emit.IfElse(
+        return UAEmit.IfElse(
             condition ?? ifElse.Condition,
             trueBody ?? ifElse.TrueBody,
             falseBody ?? ifElse.FalseBody);
@@ -113,7 +113,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
         head ??= statement.Head;
         parts ??= statement.Parameters;
 
-        return Emit.Statement(head, parts);
+        return UAEmit.Statement(head, parts);
     }
 
     protected virtual ICfgNode Build(Sequence sequence)
@@ -141,7 +141,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
             else result.Add(Result ?? node);
         }
 
-        return result == null ? null : Emit.Seq(result.ToArray());
+        return result == null ? null : UAEmit.Seq(result.ToArray());
     }
 
     protected virtual ICfgNode Build(DoLoop doLoop)
@@ -154,20 +154,20 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
         if (condition == null && body == null)
             return null;
 
-        return Emit.Do(
+        return UAEmit.Do(
             condition ?? doLoop.Condition,
             body ?? doLoop.Body);
     }
 
-    protected virtual ICfgNode Build(EndlessLoop loop)
+    protected virtual ICfgNode Build(EndlessLoop endlessLoop)
     {
-        loop.Body?.Accept(this);
+        endlessLoop.Body?.Accept(this);
         var body = Result;
 
         if (body == null)
             return null;
 
-        return Emit.Loop(body);
+        return UAEmit.Loop(body);
     }
 
     protected virtual ICfgNode Build(WhileLoop whileLoop)
@@ -180,7 +180,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
         if (condition == null && body == null)
             return null;
 
-        return Emit.While(
+        return UAEmit.While(
             condition ?? whileLoop.Condition,
             body ?? whileLoop.Body);
     }
@@ -195,7 +195,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
         if (left == null && right == null)
             return null;
 
-        return Emit.Op(
+        return UAEmit.Op(
             binaryOp.Operation,
             left ?? binaryOp.Left,
             right ?? binaryOp.Right);

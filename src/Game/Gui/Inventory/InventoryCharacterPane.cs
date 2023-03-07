@@ -39,7 +39,7 @@ public class InventoryCharacterPane : UiElement
         var buttonStack =
             new FixedPosition(
                 new Rectangle(84, 174, 50, 15),
-                new HorizontalStack(
+                new HorizontalStacker(
                     new FixedSize(16, 15, _summaryButton),
                     new FixedSize(16, 15, _statsButton),
                     new FixedSize(16, 15, _miscButton)

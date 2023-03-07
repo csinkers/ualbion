@@ -24,15 +24,15 @@ public class InventorySummaryPage : UiElement // Summary
         var pointsHeadingSource = new DynamicText(BuildPointsHeadings);
 
         var stack =
-            new HorizontalStack(
+            new HorizontalStacker(
                 new Spacing(4,0),
-                new VerticalStack(
+                new VerticalStacker(
                     new Spacing(0, 4),
                     new GroupingFrame(new FixedSize(125, 41, new UiText(summarySource))),
                     new Spacing(0, 80),
                     new GroupingFrame(
                         new FixedSize(125, 41,
-                            new HorizontalStack(
+                            new HorizontalStacker(
                                 new UiText(pointsHeadingSource),
                                 new Spacing(5,0),
                                 new FixedSize(41, 41,
@@ -47,7 +47,7 @@ public class InventorySummaryPage : UiElement // Summary
             Flags = SpriteFlags.GradientPixels
         };
 
-        AttachChild(new LayerStack(
+        AttachChild(new LayerStacker(
             new FixedPosition( new Rectangle(0, 25, 135, 145), _portrait),
             stack));
     }

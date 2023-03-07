@@ -20,9 +20,13 @@ public enum SpriteFlags : uint
     BottomMid = BottomAligned,
     BottomLeft = BottomAligned | LeftAligned,
 
+#pragma warning disable CA1069 // Enums values should not be duplicated
+
     LeftAligned    =      0x1, // Horizontal alignment (default is mid aligned)
     MidAligned     =      0x2, // Vertical alignment (default is top aligned)
     BottomAligned  =      0x4, // Vertical alignment
+
+#pragma warning restore CA1069 // Enums values should not be duplicated
 
     FlipVertical   =      0x8, // Flip vertical texture coordinate
     Floor          =     0x10, // On the floor rather than standing upright

@@ -23,7 +23,7 @@ public class MainMenu : Dialog
         var elements = new List<IUiElement>
         {
             new Spacing(0, 2),
-            new HorizontalStack(new Spacing(5, 0), new BoldHeader((TextId)Base.SystemText.MainMenu_MainMenu), new Spacing(5, 0)),
+            new HorizontalStacker(new Spacing(5, 0), new BoldHeader((TextId)Base.SystemText.MainMenu_MainMenu), new Spacing(5, 0)),
             new Divider(CommonColor.Yellow3),
             new Spacing(0, 2),
         };
@@ -57,7 +57,7 @@ public class MainMenu : Dialog
             new Spacing(0,2),
         });
 
-        var stack = new VerticalStack(elements);
+        var stack = new VerticalStacker(elements);
         AttachChild(new DialogFrame(stack));
     }
 

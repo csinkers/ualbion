@@ -23,7 +23,7 @@ public static class ReduceSimpleWhile
             foreach (var child in graph.Children(index).Where(x => graph.GetEdgeLabel(index, x) == CfgEdge.LoopSuccessor))
                 successor = child;
 
-            graph = graph.InsertBefore(index, Emit.Empty(), out var newHeaderIndex);
+            graph = graph.InsertBefore(index, UAEmit.Empty(), out var newHeaderIndex);
 
             if (successor.HasValue)
             {

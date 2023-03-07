@@ -65,10 +65,10 @@ public class Party : ServiceComponent<IParty>, IParty
     public IReadOnlyList<IPlayer> StatusBarOrder => _readOnlyStatusBarOrder;
     public IReadOnlyList<IPlayer> WalkOrder => _readOnlyWalkOrder;
     public int TotalGold => _statusBarOrder.Sum(x => x.Effective.Inventory.Gold.Amount);
-    public int GetItemCount(ItemId itemId) =>
+    public int GetItemCount(ItemId item) =>
         _statusBarOrder
             .SelectMany(x => x.Effective.Inventory.EnumerateAll())
-            .Where(x => x.Item == itemId)
+            .Where(x => x.Item == item)
             .Sum(x => x.Amount);
 
     // The current party leader (shown with a white outline on
@@ -134,7 +134,7 @@ public class Party : ServiceComponent<IParty>, IParty
         return true;
     }
 
-    void SetLastResult(bool result) => ((EventContext)Context).LastEventResult = result;
+    static void SetLastResult(bool result) => ((EventContext)Context).LastEventResult = result;
 
     public void Clear()
     {

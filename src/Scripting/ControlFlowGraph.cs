@@ -24,7 +24,6 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
 
     // Memoised results
     ControlFlowGraph _cachedReverse;
-    DominatorTree _cachedDominatorTree;
     ImmutableArray<int>? _cachedOrder;
     ImmutableArray<int>? _cachedPostOrder;
     ImmutableArray<(int start, int end)>? _cachedBackEdges;
@@ -55,7 +54,7 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
     IList<int> IGraph.Children(int i) => Children(i);
     IList<int> IGraph.Parents(int i) => Parents(i);
     public CfgEdge GetEdgeLabel(int startNode, int endNode) => _labels.TryGetValue((startNode, endNode), out var label) ? label : CfgEdge.True;
-    public DominatorTree GetDominatorTree() => _cachedDominatorTree ??= this.GetDominatorTree(EntryIndex);
+    public DominatorTree GetDominatorTree() => this.GetDominatorTree(EntryIndex);
     public DominatorTree GetPostDominatorTree() => Reverse().GetDominatorTree();
     public bool IsCyclic() => GetBackEdges().Any();
 
@@ -453,8 +452,9 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
     IEnumerable<(int, int)> IGraph.GetBackEdges() => GetBackEdges();
     public ImmutableArray<(int start, int end)> GetBackEdges()
     {
-        if (!_cachedOrder.HasValue)
-            (_cachedOrder, _cachedBackEdges) = ToImmutable(GetDfsOrderAndBackEdges(true, false)); // Use post-order, more likely we'll need the cached order later
+        if (!_cachedBackEdges.HasValue)
+            (_cachedPostOrder, _cachedBackEdges) = ToImmutable(GetDfsOrderAndBackEdges(true, false)); // Use post-order, more likely we'll need the cached order later
+
         return _cachedBackEdges.Value;
     }
 
@@ -463,6 +463,7 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
     {
         if (!_cachedOrder.HasValue)
             (_cachedOrder, _cachedBackEdges) = ToImmutable(GetDfsOrderAndBackEdges(false, false));
+
         return _cachedOrder.Value;
     }
 

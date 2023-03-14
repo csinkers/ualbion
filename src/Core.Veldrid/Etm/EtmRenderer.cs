@@ -9,7 +9,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid.Etm;
 
-public sealed class EtmRenderer : Component, IRenderer<GlobalSet, MainPassSet>, IDisposable
+public sealed class EtmRenderer : Component, IRenderer, IDisposable
 {
     readonly MultiBuffer<Vertex3DTextured> _vertexBuffer;
     readonly MultiBuffer<ushort> _indexBuffer;
@@ -45,11 +45,12 @@ public sealed class EtmRenderer : Component, IRenderer<GlobalSet, MainPassSet>, 
             Winding = FrontFace.CounterClockwise,
         };
 
-    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, MainPassSet renderPassSet)
+    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, IResourceSetHolder set1, IResourceSetHolder set2)
     {
+        var globalSet = (GlobalSet)set1 ?? throw new ArgumentNullException(nameof(set1));
+        var renderPassSet = (MainPassSet)set2 ?? throw new ArgumentNullException(nameof(set2));
+
         if (cl == null) throw new ArgumentNullException(nameof(cl));
-        if (globalSet == null) throw new ArgumentNullException(nameof(globalSet));
-        if (renderPassSet == null) throw new ArgumentNullException(nameof(renderPassSet));
         if (renderable is not EtmWindow window)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 

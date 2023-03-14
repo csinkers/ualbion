@@ -9,8 +9,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
-public sealed class DebugGuiRenderer<TPassSet> : Component, IRenderer<GlobalSet, TPassSet>, IDisposable
-    where TPassSet : IResourceSetHolder
+public sealed class DebugGuiRenderer : Component, IRenderer, IDisposable
 {
     readonly OutputDescription _outputFormat;
     ImGuiRenderer _imguiRenderer;
@@ -65,7 +64,7 @@ public sealed class DebugGuiRenderer<TPassSet> : Component, IRenderer<GlobalSet,
         _imguiRenderer = null;
     }
 
-    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, TPassSet renderPassSet)
+    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, IResourceSetHolder set1, IResourceSetHolder set2)
     {
         if (cl == null) throw new ArgumentNullException(nameof(cl));
         if (device == null) throw new ArgumentNullException(nameof(device));

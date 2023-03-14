@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
@@ -87,3 +87,4 @@ sealed class IsometricTest : Component, IDisposable // The engine construction c
         _copyPass?.Dispose();
     }
 }
+*/

@@ -9,7 +9,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid.Skybox;
 
-public sealed class SkyboxRenderer : Component, IRenderer<GlobalSet, MainPassSet>, IDisposable
+public sealed class SkyboxRenderer : Component, IRenderer, IDisposable
 {
     static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
     static readonly Vertex2DTextured[] Vertices =
@@ -48,11 +48,12 @@ public sealed class SkyboxRenderer : Component, IRenderer<GlobalSet, MainPassSet
         AttachChild(_pipeline);
     }
 
-    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, MainPassSet renderPassSet)
+    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, IResourceSetHolder set1, IResourceSetHolder set2)
     {
+        var globalSet = (GlobalSet)set1 ?? throw new ArgumentNullException(nameof(set1));
+        var renderPassSet = (MainPassSet)set2 ?? throw new ArgumentNullException(nameof(set2));
+
         if (cl == null) throw new ArgumentNullException(nameof(cl));
-        if (globalSet == null) throw new ArgumentNullException(nameof(globalSet));
-        if (renderPassSet == null) throw new ArgumentNullException(nameof(renderPassSet));
         if (renderable is not SkyboxRenderable skybox)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 

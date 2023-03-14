@@ -205,6 +205,10 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
 
     void Draw()
     {
+        var renderSystem = RenderSystem;
+        if (renderSystem == null)
+            return;
+
         using (PerfTracker.FrameEvent("6.1 Prepare scenes"))
         {
             _frameCommands.Begin();
@@ -228,7 +232,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
             _graphicsDevice.WaitForFence(_fence.Fence);
         }
 
-        RenderSystem.Render(_graphicsDevice, _frameCommands, _fence);
+        renderSystem.Render(_graphicsDevice, _frameCommands, _fence);
     }
 
     void ChangeBackend(GraphicsBackend backend, GraphicsBackend? oldBackend)

@@ -117,8 +117,7 @@ struct FullscreenQuadUniformInfo // Length must be multiple of 16
     [Uniform("uRect")] public Vector4 uRect;
 }
 #pragma warning restore 649
-public sealed class FullscreenQuadRenderer<TPassSet> : Component, IRenderer<GlobalSet, TPassSet>, IDisposable
-    where TPassSet : IResourceSetHolder
+public sealed class FullscreenQuadRenderer : Component, IRenderer, IDisposable
 {
     static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
     static readonly Vertex2DTextured[] Vertices =
@@ -156,7 +155,7 @@ public sealed class FullscreenQuadRenderer<TPassSet> : Component, IRenderer<Glob
         AttachChild(_indexBuffer);
     }
 
-    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, TPassSet renderPassSet)
+    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, IResourceSetHolder set1, IResourceSetHolder set2)
     {
         if (cl == null) throw new ArgumentNullException(nameof(cl));
         if (renderable is not FullscreenQuad fullscreenQuad)

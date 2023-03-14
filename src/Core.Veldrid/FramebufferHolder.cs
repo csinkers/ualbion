@@ -28,7 +28,7 @@ public abstract class FramebufferHolder : Component, IFramebufferHolder
     uint _width;
     uint _height;
 
-    protected FramebufferHolder(uint width, uint height, string name)
+    protected FramebufferHolder(string name, uint width, uint height)
     {
         On<DeviceCreatedEvent>(e => Update(e.Device));
         On<DestroyDeviceObjectsEvent>(_ => Dispose());
@@ -131,8 +131,12 @@ public abstract class FramebufferHolder : Component, IFramebufferHolder
     {
         Dispose();
         Framebuffer = CreateFramebuffer(device);
-        _width = Framebuffer.Width;
-        _height = Framebuffer.Height;
+        if (Framebuffer != null)
+        {
+            _width = Framebuffer.Width;
+            _height = Framebuffer.Height;
+        }
+
         Off<PrepareFrameResourcesEvent>();
     }
 }

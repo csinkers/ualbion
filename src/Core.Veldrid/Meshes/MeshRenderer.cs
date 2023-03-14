@@ -8,7 +8,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid.Meshes;
 
-public sealed class MeshRenderer : Component, IRenderer<GlobalSet, MainPassSet>, IDisposable
+public sealed class MeshRenderer : Component, IRenderer, IDisposable
 {
     readonly MeshPipeline _pipeline;
 
@@ -35,11 +35,12 @@ public sealed class MeshRenderer : Component, IRenderer<GlobalSet, MainPassSet>,
             Winding = FrontFace.CounterClockwise,
         };
 
-    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, GlobalSet globalSet, MainPassSet renderPassSet)
+    public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, IResourceSetHolder set1, IResourceSetHolder set2)
     {
+        var globalSet = (GlobalSet)set1 ?? throw new ArgumentNullException(nameof(set1));
+        var renderPassSet = (MainPassSet)set2 ?? throw new ArgumentNullException(nameof(set2));
+
         if (cl == null) throw new ArgumentNullException(nameof(cl));
-        if (globalSet == null) throw new ArgumentNullException(nameof(globalSet));
-        if (renderPassSet == null) throw new ArgumentNullException(nameof(renderPassSet));
         if (renderable is not MeshBatch batch)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 

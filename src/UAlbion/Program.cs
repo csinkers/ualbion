@@ -84,13 +84,13 @@ static class Program
         switch (commandLine.Mode) // ConvertAssets handled above as it requires a specialised asset system setup
         {
             case ExecutionMode.Game: Albion.RunGame(exchange, commandLine); break;
-            case ExecutionMode.BakeIsometric:
-                {
-                    using var test = new IsometricTest(commandLine);
-                    exchange.Attach(test);
-                    exchange.Resolve<IEngine>().Run();
-                    break;
-                }
+            //case ExecutionMode.BakeIsometric:
+            //    {
+            //        using var test = new IsometricTest(commandLine);
+            //        exchange.Attach(test);
+            //        exchange.Resolve<IEngine>().Run();
+            //        break;
+            //    }
 
             case ExecutionMode.DumpData:
                 PerfTracker.BeginFrame(); // Don't need to show verbose startup logging while dumping

@@ -10,16 +10,17 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Game.Veldrid.Visual;
 
-public sealed class GlobalResourceSetManager: Component, IDisposable
+public sealed class GlobalResourceSetProvider : Component, IResourceProvider, IDisposable
 {
     readonly SingleBuffer<GlobalInfo> _globalInfo;
     readonly SamplerHolder _paletteSampler;
+    readonly GlobalSet _globalSet;
     ITextureHolder _dayPalette;
     ITextureHolder _nightPalette;
 
-    public GlobalSet GlobalSet { get; }
+    public IResourceSetHolder ResourceSet => _globalSet;
 
-    public GlobalResourceSetManager()
+    public GlobalResourceSetProvider()
     {
         _paletteSampler = AttachChild(new SamplerHolder
         {
@@ -31,7 +32,7 @@ public sealed class GlobalResourceSetManager: Component, IDisposable
         });
 
         _globalInfo = AttachChild(new SingleBuffer<GlobalInfo>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "B_Global"));
-        GlobalSet = AttachChild(new GlobalSet
+        _globalSet = AttachChild(new GlobalSet
         {
             Name = "RS_Global",
             Global = _globalInfo,
@@ -55,13 +56,13 @@ public sealed class GlobalResourceSetManager: Component, IDisposable
         if (_dayPalette != dayPalette)
         {
             _dayPalette = dayPalette;
-            GlobalSet.DayPalette = dayPalette;
+            _globalSet.DayPalette = dayPalette;
         }
 
         if (_nightPalette != nightPalette)
         {
             _nightPalette = nightPalette;
-            GlobalSet.NightPalette = nightPalette;
+            _globalSet.NightPalette = nightPalette;
         }
 
         var info = new GlobalInfo
@@ -79,6 +80,7 @@ public sealed class GlobalResourceSetManager: Component, IDisposable
     {
         _globalInfo?.Dispose();
         _paletteSampler?.Dispose();
-        GlobalSet?.Dispose();
+        _globalSet?.Dispose();
     }
+
 }

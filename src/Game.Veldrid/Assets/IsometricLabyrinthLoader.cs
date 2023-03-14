@@ -31,11 +31,10 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
     const int HackyContentsOffsetY = 235;
 
     readonly JsonLoader<LabyrinthData> _jsonLoader = new();
-    IsometricRenderSystem _renderSystem;
+    IsometricRenderSystem _isoRsm;
     Engine _engine;
     ShaderLoader _shaderLoader;
 
-#pragma warning disable CA2000 // Dispose objects before losing scopes
     void SetupEngine(int tileWidth, int tileHeight, int baseHeight, int tilesPerRow)
     {
         var pathResolver = Resolve<IPathResolver>();
@@ -46,8 +45,8 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
             _shaderLoader.AddShaderDirectory(shaderPath);
 
         _engine = AttachChild(new Engine(GraphicsBackend.Vulkan, false, false));
-        _renderSystem = AttachChild(new IsometricRenderSystem(tileWidth, tileHeight, baseHeight, tilesPerRow));
-        _engine.RenderSystem = _renderSystem;
+        _isoRsm = AttachChild(new IsometricRenderSystem(tileWidth, tileHeight, baseHeight, tilesPerRow));
+        _engine.RenderSystem = _isoRsm.OffScreen;
 
         Raise(new SetSceneEvent(SceneId.IsometricBake));
         Raise(new SetClearColourEvent(0, 0, 0, 0));
@@ -65,10 +64,10 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
         if (_engine == null)
             SetupEngine(tileWidth, tileHeight, baseHeight, tilesPerRow);
 
-        var frames = _renderSystem.Builder.Build(labyrinth, info, mode, assets);
+        var frames = _isoRsm.Builder.Build(labyrinth, info, mode, assets);
 
         _engine.RenderFrame(false);
-        Image<Bgra32> image = _engine.ReadTexture2D(_renderSystem.Framebuffer.Color);
+        Image<Bgra32> image = _engine.ReadTexture2D(_isoRsm.IsoBuffer.GetColorTexture(0));
 
         using var stream = new MemoryStream();
         image.SaveAsPng(stream);
@@ -144,7 +143,8 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
     public void Dispose()
     {
         _engine?.Dispose();
-        _renderSystem?.Dispose();
+        _isoRsm?.Dispose();
         _shaderLoader?.Dispose();
     }
 }
+

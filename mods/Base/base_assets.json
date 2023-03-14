@@ -86,7 +86,7 @@
     "jsonParty":         "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.PartyMemberInfo, UAlbion.Formats]], UAlbion.Formats",
     "jsonSheet":         "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.CharacterSheet, UAlbion.Formats]], UAlbion.Formats",
     "jsonSpell":         "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.SpellData, UAlbion.Formats]], UAlbion.Formats",
-    "jsonText":          "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.ListStringCollection, UAlbion.Formats]], UAlbion.Formats",
+    "jsonText":          "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.ListStringSet, UAlbion.Formats]], UAlbion.Formats",
     "jsonTileset":       "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.Maps.TilesetData, UAlbion.Formats]], UAlbion.Formats",
     "lab":               "UAlbion.Formats.Parsers.LabyrinthDataLoader, UAlbion.Formats",
     "map":               "UAlbion.Formats.Parsers.MapLoader, UAlbion.Formats",

@@ -37,10 +37,8 @@ static class Albion
     public static void RunGame(EventExchange global, CommandLineOptions commandLine)
     {
         RegisterComponents(global, commandLine);
-        using var renderSystem = new RenderSystem();
-        global.Attach(renderSystem);
-        var engine = (Engine)global.Resolve<IEngine>();
-        engine.RenderSystem = renderSystem;
+        var renderManager = new AlbionRenderSystem();
+        global.Attach(renderManager);
 
         PerfTracker.StartupEvent("Running game");
         global.Raise(new SetSceneEvent(SceneId.Empty), null);
@@ -58,6 +56,7 @@ static class Albion
         }
         else global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
 
+        var engine = (Engine)global.Resolve<IEngine>();
         engine.Run();
         // TODO: Ensure all sprite leases returned etc to weed out memory leaks
     }

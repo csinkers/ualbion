@@ -20,6 +20,27 @@ using Xunit.Sdk;
 
 namespace UAlbion.Base.Tests;
 
+public class TestFixture : IDisposable
+{
+    public TestFixture()
+    {
+        Console.WriteLine("Start tests");
+    }
+
+    public void Dispose()
+    {
+        // For collecting stats etc over the whole test run
+        // Console.WriteLine("CFG stats:");
+        // foreach (var stat in Enum.GetValues<ControlFlowGraph.Stat>())
+        //     Console.WriteLine($"    {stat}: {ControlFlowGraph.Stats[(int)stat]}");
+        Console.WriteLine("End tests");
+    }
+}
+
+[CollectionDefinition("DecompTests")]
+public class DummyForTestFixture : ICollectionFixture<TestFixture> { }
+
+[Collection("DecompTests")]
 public class FullDecompilationTests : IDisposable
 {
     static readonly string ResultsDir = Path.Combine(TestUtil.FindBasePath(), "re", "FullDecomp");
@@ -47,6 +68,7 @@ public class FullDecompilationTests : IDisposable
         _testNum = Interlocked.Increment(ref _nextTestNum);
         PerfTracker.StartupEvent($"Start decompilation test {_testNum}");
     }
+
     public void Dispose() => PerfTracker.StartupEvent($"Finish decompilation test {_testNum}");
 
     [Fact] public void EventSet1() => TestEventSet(new EventSetId(1));

@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
@@ -10,7 +10,6 @@ namespace UAlbion;
 
 public sealed class CopyRenderPass : Component, IRenderPass<GlobalSet>, IDisposable
 {
-
     readonly FullscreenQuadRenderer<DummyResourceSet> _quadRenderer;
     readonly FullscreenQuad _quad;
 
@@ -54,3 +53,4 @@ public sealed class CopyRenderPass : Component, IRenderPass<GlobalSet>, IDisposa
         _quad?.Dispose();
     }
 }
+*/

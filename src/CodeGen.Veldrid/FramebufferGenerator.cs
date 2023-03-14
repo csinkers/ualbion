@@ -20,7 +20,7 @@ static class FramebufferGenerator
     {
         var typeName = type.Symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
         sb.AppendLine(
-            $@"        public {typeName}(uint width, uint height, string name) : base(width, height, name)
+            $@"        public {typeName}(string name, uint width, uint height) : base(name, width, height)
         {{");
         if (depth != null)
             sb.AppendLine($@"            {depth.Symbol.Name} = new global::UAlbion.Core.Veldrid.Textures.Texture2DHolder(name + "".{depth.Symbol.Name}"");");
@@ -76,7 +76,7 @@ static class FramebufferGenerator
 
     static void BuildOutputDescription(StringBuilder sb, VeldridTypeInfo type, VeldridMemberInfo depth)
     {
-        sb.AppendLine($@"        public override OutputDescription? OutputDescription
+        sb.AppendLine($@"        public static OutputDescription Output
         {{
             get
             {{
@@ -97,7 +97,10 @@ static class FramebufferGenerator
                 return new OutputDescription(depthAttachment, colorAttachments);
             }
         }
+
+        public override OutputDescription? OutputDescription => Output;
 ");
+
     }
 
     static void BuildDispose(StringBuilder sb, VeldridTypeInfo type, VeldridMemberInfo depth)
@@ -151,7 +154,8 @@ public partial class SimpleFramebuffer
     public global::UAlbion.Core.Veldrid.Textures.Texture2DHolder Depth { get; }
     public global::UAlbion.Core.Veldrid.Textures.Texture2DHolder Color { get; }
 
-    public override OutputDescription? OutputDescription
+    public override OutputDescription? OutputDescription => Output;
+    public static OutputDescription OutputDescription
     {
         get
         {

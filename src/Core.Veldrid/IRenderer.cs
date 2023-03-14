@@ -5,10 +5,8 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
-public interface IRenderer<in TGlobalSet, in TRenderPassSet> 
-    where TGlobalSet : IResourceSetHolder 
-    where TRenderPassSet : IResourceSetHolder
+public interface IRenderer
 {
     Type[] HandledTypes { get; }
-    void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, TGlobalSet globalSet, TRenderPassSet renderPassSet);
+    void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, IResourceSetHolder set1, IResourceSetHolder set2);
 }

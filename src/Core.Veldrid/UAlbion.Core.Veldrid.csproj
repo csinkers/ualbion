@@ -67,7 +67,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\deps\VeldridGen\')">
-    <PackageReference Include="VeldridGen.Interfaces" Version="0.1.8" />
+    <PackageReference Include="VeldridGen.Interfaces" Version="0.2.1" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\deps\VeldridGen\')">
     <ProjectReference Include="..\..\deps\VeldridGen\VeldridGen.Interfaces\VeldridGen.Interfaces.csproj" />

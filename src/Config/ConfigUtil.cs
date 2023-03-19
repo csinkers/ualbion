@@ -8,6 +8,7 @@ namespace UAlbion.Config;
 
 public static class ConfigUtil
 {
+    static readonly string ProbePath = Path.Combine("mods", "Base", "base_assets.json");
     public static string FindBasePath(IFileSystem disk) // Should roughly match UAlbion.Scripting.Tests.TestUtil
     {
         if (disk == null) throw new ArgumentNullException(nameof(disk));
@@ -16,7 +17,7 @@ public static class ConfigUtil
         {
             var curDir = new DirectoryInfo(start ?? throw new InvalidOperationException());
 
-            while (curDir != null && !disk.FileExists(Path.Combine(curDir.FullName, "mods", "Base", "base_assets.json")))
+            while (curDir != null && !disk.FileExists(Path.Combine(curDir.FullName, ProbePath)))
                 curDir = curDir.Parent;
 
             return curDir?.FullName;

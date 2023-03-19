@@ -13,7 +13,7 @@ public sealed class SkyboxRenderable : Component, ISkybox
     readonly SkyboxManager _manager;
     readonly SingleBuffer<SkyboxUniformInfo> _uniformBuffer;
 
-    internal SkyboxRenderable(ITextureHolder texture, ISamplerHolder sampler, SkyboxManager manager)
+    internal SkyboxRenderable(ITextureHolder texture, ISamplerHolder sampler, SkyboxManager manager, ICamera camera)
     {
         if (texture == null) throw new ArgumentNullException(nameof(texture));
         if (sampler == null) throw new ArgumentNullException(nameof(sampler));
@@ -33,9 +33,6 @@ public sealed class SkyboxRenderable : Component, ISkybox
 
         On<EngineUpdateEvent>(_ =>
         {
-            if (Resolve<ICamera>() is not PerspectiveCamera camera)
-                return;
-
             _uniformBuffer.Data = new SkyboxUniformInfo
             {
                 uYaw = camera.Yaw,

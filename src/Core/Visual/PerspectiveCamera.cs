@@ -6,7 +6,7 @@ using UAlbion.Core.Events;
 
 namespace UAlbion.Core.Visual;
 
-public class PerspectiveCamera : ServiceComponent<ICamera>, ICamera
+public class PerspectiveCamera : Component, ICamera
 {
     readonly WorldCoordinateSelectEvent _selectEvent = new();
     Matrix4x4 _viewMatrix;

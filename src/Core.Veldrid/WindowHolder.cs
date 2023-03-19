@@ -26,7 +26,7 @@ class WindowHolder : Component, IDisposable
     {
         On<SetCursorPositionEvent>(e => _pendingCursorUpdate = new Vector2(e.X, e.Y));
         On<ToggleFullscreenEvent>(_ => ToggleFullscreenState());
-        On<ToggleHardwareCursorEvent>(_ => { if (_window != null) _window.CursorVisible = !_window.CursorVisible; });
+        On<ShowHardwareCursorEvent>(e => { if (_window != null) _window.CursorVisible = e.Show; });
         On<ToggleResizableEvent>(_ => { if (_window != null) _window.Resizable = !_window.Resizable; });
         On<ToggleVisibleBorderEvent>(_ => { if (_window != null) _window.BorderVisible = !_window.BorderVisible; });
         On<ConfineMouseToWindowEvent>(e => { if (_window != null) Sdl2Native.SDL_SetWindowGrab(_window.SdlWindowHandle, e.Enabled); });
@@ -57,7 +57,6 @@ class WindowHolder : Component, IDisposable
         };
 
         _window = VeldridStartup.CreateWindow(ref windowInfo);
-        _window.CursorVisible = false;
         _window.Resized += () =>
         {
             if (_lastState != _window.WindowState)

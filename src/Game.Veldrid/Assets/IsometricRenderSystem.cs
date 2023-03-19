@@ -8,7 +8,6 @@ using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.State;
-using UAlbion.Game.Veldrid.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 
@@ -26,6 +25,7 @@ public class IsometricRenderSystem : Component, IDisposable
     {
         OutputDescription screenFormat = SimpleFramebuffer.Output;
 
+        var sceneManager = AttachChild(new SceneManager());
         _system = RenderSystemBuilder.Create()
             .Framebuffer("fb_iso", new SimpleFramebuffer("fb_iso", (uint)(tileWidth * tilesPerRow), (uint)tileHeight))
             .Renderer("r_sprite", new SpriteRenderer(screenFormat))
@@ -39,7 +39,7 @@ public class IsometricRenderSystem : Component, IDisposable
                 .Resources(new GlobalResourceSetProvider())
                 .Pass("p_iso", pb => 
                     pb
-                    .Resources(new MainPassResourceProvider(pipe.GetFramebuffer("fb_iso")))
+                    .Resources(new MainPassResourceProvider(pipe.GetFramebuffer("fb_iso"), sceneManager))
                     .Renderers("r_sprite", "r_etm")
                     .Sources("s_sprite", "s_etm")
                     .Target("fb_iso")
@@ -58,7 +58,7 @@ public class IsometricRenderSystem : Component, IDisposable
                 .Resources(new GlobalResourceSetProvider())
                 .Pass("p_iso", pb => 
                     pb
-                    .Resources(new MainPassResourceProvider(pipe.GetFramebuffer("fb_iso")))
+                    .Resources(new MainPassResourceProvider(pipe.GetFramebuffer("fb_iso"), sceneManager))
                     .Renderers("r_sprite", "r_etm")
                     .Sources("s_sprite", "s_etm")
                     .Target("fb_iso")
@@ -73,8 +73,24 @@ public class IsometricRenderSystem : Component, IDisposable
         IsoBuffer = _system.GetFramebuffer("fb_iso");
         AttachChild(_system);
 
-        Builder = new IsometricBuilder(_system.GetFramebuffer("fb_iso"), tileWidth, tileHeight, baseHeight, tilesPerRow);
-        BuildHelpers();
+        Builder = new IsometricBuilder(_system.GetFramebuffer("fb_iso"), sceneManager, tileWidth, tileHeight, baseHeight, tilesPerRow);
+
+        AddHelpers();
+        sceneManager
+            .Add(new EmptyScene())
+            .Add((IScene)new IsometricBakeScene()
+                .Add(new PaletteManager())
+                .Add(Builder));
+    }
+
+    void AddHelpers()
+    {
+
+        AttachChild(new SpriteSamplerSource());
+        AttachChild(new TextureSource());
+        AttachChild(new ResourceLayoutSource());
+        AttachChild(new VeldridCoreFactory());
+        AttachChild(new SceneStack());
     }
 
     void CopyFunc(RenderPass pass, GraphicsDevice device, CommandList cl, IResourceSetHolder set1)
@@ -82,23 +98,8 @@ public class IsometricRenderSystem : Component, IDisposable
         throw new NotImplementedException();
     }
 
-    void BuildHelpers()
-    {
-        AttachChild(new SpriteSamplerSource());
-        AttachChild(new TextureSource());
-        AttachChild(new ResourceLayoutSource());
-        AttachChild(new VeldridCoreFactory());
-        AttachChild(new SceneStack());
-        AttachChild(new SceneManager()
-            .Add(new EmptyScene())
-            .Add((IScene)new IsometricBakeScene()
-                .Add(new PaletteManager())
-                .Add(Builder)));
-    }
-
     static void RenderFunc(RenderPass pass, GraphicsDevice device, CommandList cl, IResourceSetHolder set1)
     {
-        cl.SetFramebuffer(pass.Target.Framebuffer);
         cl.SetFullViewports();
         cl.SetFullScissorRects();
         cl.ClearColorTarget(0, new RgbaFloat(0, 0, 0, 0.0f));

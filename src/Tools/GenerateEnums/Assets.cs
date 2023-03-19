@@ -17,12 +17,12 @@ public class Assets
     public Dictionary<string, string[]> EnumsByAssetId { get; }
     public ILookup<AssetType, string> AssetIdsByType { get; }
 
-    public Assets(IFileSystem disk, IJsonUtil jsonUtil, string assetIdJsonPath, string modName) // Everything in this class should be treated as read-only once the constructor finishes.
+    public Assets(string appName, IFileSystem disk, IJsonUtil jsonUtil, string assetIdJsonPath, string modName) // Everything in this class should be treated as read-only once the constructor finishes.
     {
         if (disk == null) throw new ArgumentNullException(nameof(disk));
         BaseDir = ConfigUtil.FindBasePath(disk);
         var assetIdConfigPath = Path.Combine(BaseDir, assetIdJsonPath);
-        var config = new PathResolver(BaseDir);
+        var config = new PathResolver(BaseDir, appName);
 
         var modDisk = disk.Duplicate(config.ResolvePath($"$(MODS)/{modName}"));
         var modConfig = ModConfig.Load(ModConfig.ModConfigFilename, modDisk, jsonUtil);

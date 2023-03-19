@@ -9,8 +9,6 @@ public interface IEmptyScene : IScene { }
 [Scene(SceneId.Empty)]
 public class EmptyScene : Container, IEmptyScene
 {
-    public EmptyScene() : base("Empty")
-    {
-        AttachChild(new OrthographicCamera());
-    }
+    public EmptyScene() : base("Empty") => Camera = AttachChild(new OrthographicCamera());
+    public ICamera Camera { get; }
 }

@@ -2,7 +2,7 @@
 
 namespace UAlbion.Core.Veldrid;
 
-public interface IRenderSystem
+public interface IRenderPipeline
 {
     void Render(GraphicsDevice graphicsDevice, CommandList frameCommands, FenceHolder fence);
 }

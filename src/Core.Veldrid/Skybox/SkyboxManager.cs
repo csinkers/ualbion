@@ -35,11 +35,11 @@ public sealed class SkyboxManager : ServiceComponent<ISkyboxManager>, ISkyboxMan
                 renderables.Add(skybox);
     }
 
-    public SkyboxRenderable CreateSkybox(ITexture texture)
+    public SkyboxRenderable CreateSkybox(ITexture texture, ICamera camera)
     {
         var ts = Resolve<ITextureSource>();
         var textureHolder = ts.GetSimpleTexture(texture);
-        var renderable = new SkyboxRenderable(textureHolder, _skyboxSampler, this);
+        var renderable = new SkyboxRenderable(textureHolder, _skyboxSampler, this, camera);
         AttachChild(renderable);
         return renderable;
     }

@@ -11,12 +11,12 @@ public interface IEditorScene : IScene { }
 [Scene(SceneId.Editor)]
 public class EditorScene : Container, IEditorScene
 {
+    public ICamera Camera { get; }
     public EditorScene() : base(nameof(SceneId.Editor))
     {
-        var camera = AttachChild(new OrthographicCamera());
-        AttachChild(new CameraMotion2D(camera));
+        Camera = AttachChild(new OrthographicCamera());
+        AttachChild(new CameraMotion2D(Camera));
     }
-
 
     protected override void Subscribed() => Raise(new PushInputModeEvent(InputMode.Editor));
     protected override void Unsubscribed() => Raise(new PopInputModeEvent());

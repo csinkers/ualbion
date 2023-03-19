@@ -57,7 +57,7 @@ public class FullDecompilationTests : IDisposable
         AssetMapping.GlobalIsThreadLocal = true;
         var disk = new MockFileSystem(true);
         var baseDir = ConfigUtil.FindBasePath(disk);
-        Exchange = AssetSystem.Setup(baseDir, Mapping, disk, JsonUtil, null);
+        Exchange = AssetSystem.Setup(baseDir, "ualbion-tests", Mapping, disk, JsonUtil, null);
     }
 
     public FullDecompilationTests()

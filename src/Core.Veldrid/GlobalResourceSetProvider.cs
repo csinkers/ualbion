@@ -1,14 +1,12 @@
 ﻿using System;
 using UAlbion.Api.Eventing;
-using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 
-namespace UAlbion.Game.Veldrid.Visual;
+namespace UAlbion.Core.Veldrid;
 
 public sealed class GlobalResourceSetProvider : Component, IResourceProvider, IDisposable
 {

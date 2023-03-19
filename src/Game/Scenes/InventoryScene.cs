@@ -13,10 +13,11 @@ public interface IInventoryScene : IScene { }
 public class InventoryScene : Container, IInventoryScene
 {
     bool _clockWasRunning;
+    public ICamera Camera { get; }
 
     public InventoryScene() : base("Inventory")
     {
-        AttachChild(new OrthographicCamera());
+        Camera = AttachChild(new OrthographicCamera());
     }
 
     protected override void Subscribed()

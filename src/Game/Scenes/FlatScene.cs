@@ -11,10 +11,11 @@ public interface IFlatScene : IScene { }
 [Scene(SceneId.World2D)]
 public class FlatScene : Container, IFlatScene
 {
+    public ICamera Camera { get; }
     public FlatScene() : base(nameof(SceneId.World2D))
     {
-        var camera = AttachChild(new OrthographicCamera());
-        AttachChild(new CameraMotion2D(camera));
+        Camera = AttachChild(new OrthographicCamera());
+        AttachChild(new CameraMotion2D(Camera));
     }
 
     protected override void Subscribed() => Raise(new PushInputModeEvent(InputMode.World2D));

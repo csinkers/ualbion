@@ -1,5 +1,8 @@
 ﻿using UAlbion.Api.Eventing;
+using UAlbion.Core.Visual;
 
 namespace UAlbion.Core;
 
-public interface IScene : IContainer, IComponent { }
+public interface IScene : IContainer, ICameraProvider
+{
+}

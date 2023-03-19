@@ -13,12 +13,12 @@ namespace UAlbion.Game.Entities;
 
 public class CameraMotion2D : Component
 {
-    readonly OrthographicCamera _camera;
+    readonly ICamera _camera;
     Vector3 _position;
     Vector3 _velocity;
     bool _locked;
 
-    public CameraMotion2D(OrthographicCamera camera)
+    public CameraMotion2D(ICamera camera)
     {
         _camera = camera ?? throw new ArgumentNullException(nameof(camera));
 

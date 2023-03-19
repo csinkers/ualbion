@@ -33,6 +33,7 @@ public static class AssetSystem
 #pragma warning disable CA2000 // Dispose objects before losing scope
     public static EventExchange Setup(
         string baseDir,
+        string appName,
         AssetMapping mapping,
         IFileSystem disk,
         IJsonUtil jsonUtil,
@@ -42,7 +43,7 @@ public static class AssetSystem
         if (disk == null) throw new ArgumentNullException(nameof(disk));
         if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
 
-        var pathResolver = new PathResolver(baseDir);
+        var pathResolver = new PathResolver(baseDir, appName);
         var settings = new SettingsManager();
 
         var assetServices = new Container("AssetServices");
@@ -84,6 +85,7 @@ public static class AssetSystem
     public static EventExchange SetupSimple(IFileSystem disk, AssetMapping mapping, params string[] mods) =>
         Setup(
             ConfigUtil.FindBasePath(disk),
+            Program.AppName,
             mapping,
             disk,
             new FormatJsonUtil(),

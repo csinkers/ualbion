@@ -42,7 +42,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
     public bool IsDepthRangeZeroToOne => _graphicsDevice?.IsDepthRangeZeroToOne ?? false;
     public bool IsClipSpaceYInverted => _graphicsDevice?.IsClipSpaceYInverted ?? false;
     public string FrameTimeText => $"{_graphicsDevice.BackendType} {_frameTimeAverager.CurrentAverageFramesPerSecond:N2} fps ({_frameTimeAverager.CurrentAverageFrameTimeMilliseconds:N3} ms)";
-    public IRenderSystem RenderSystem { get; set; }
+    public IRenderPipeline RenderSystem { get; set; }
 
     public Engine(GraphicsBackend backend, bool useRenderDoc, bool showWindow, Rectangle? windowRect = null)
     {

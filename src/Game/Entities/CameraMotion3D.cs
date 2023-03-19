@@ -10,17 +10,19 @@ namespace UAlbion.Game.Entities;
 
 public class CameraMotion3D : Component
 {
-    readonly PerspectiveCamera _camera;
+    readonly ICamera _camera;
     Vector3 _velocity;
 
-    public CameraMotion3D(PerspectiveCamera camera)
+    public CameraMotion3D(ICamera camera)
     {
         _camera = camera ?? throw new ArgumentNullException(nameof(camera));
         On<BeginFrameEvent>(_ => _velocity = Vector3.Zero);
         On<CameraJumpEvent>(e =>
         {
             var map = Resolve<IMapManager>().Current;
-            if (map == null) return;
+            if (map == null)
+                return;
+
             _camera.Position = new Vector3(e.X * map.TileSize.X, map.BaseCameraHeight, e.Y * map.TileSize.Y);
         });
         On<CameraMoveEvent>(e =>
@@ -38,7 +40,7 @@ public class CameraMotion3D : Component
             if (_velocity == Vector3.Zero)
                 return;
 
-            Quaternion lookRotation = Quaternion.CreateFromYawPitchRoll(_camera.Yaw, 0f, 0f);
+            var lookRotation = Quaternion.CreateFromYawPitchRoll(_camera.Yaw, 0f, 0f);
             _camera.Position += Vector3.Transform(_velocity, lookRotation) * e.DeltaSeconds;
         });
     }

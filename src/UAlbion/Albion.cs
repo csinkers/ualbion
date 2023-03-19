@@ -37,8 +37,6 @@ static class Albion
     public static void RunGame(EventExchange global, CommandLineOptions commandLine)
     {
         RegisterComponents(global, commandLine);
-        var renderManager = new AlbionRenderSystem();
-        global.Attach(renderManager);
 
         PerfTracker.StartupEvent("Running game");
         global.Raise(new SetSceneEvent(SceneId.Empty), null);
@@ -67,7 +65,58 @@ static class Albion
         PerfTracker.StartupEvent("Creating main components");
         global.Register<ICommonColors>(new CommonColors());
 
+        var sceneManager = new SceneManager();
+        sceneManager
+            .Add(new EmptyScene()
+                .Add(new StatusBar())
+                .Add(new PaletteManager()))
+
+            .Add(new AutomapScene()
+                .Add(new StatusBar())
+                .Add(new PaletteManager()))
+
+            .Add(new FlatScene()
+                .Add(new StatusBar())
+                .Add(new ConversationManager())
+                .Add(new PaletteManager())
+                .Add(new ClockWidget())
+                .Add(new MonsterEye()))
+
+            .Add(new DungeonScene()
+                .Add(new SceneGraph())
+                .Add(new StatusBar())
+                .Add(new ConversationManager())
+                .Add(new PaletteManager())
+                .Add(new ClockWidget())
+                .Add(new Compass())
+                .Add(new MonsterEye()))
+
+            .Add(new MenuScene()
+                .Add(new StatusBar())
+                .Add(new PaletteManager())
+                .Add(new MainMenu())
+                .Add(new Sprite(
+                    (SpriteId)Base.Picture.MenuBackground8,
+                    new Vector3(-1.0f, 1.0f, 0),
+                    DrawLayer.Interface,
+                    SpriteKeyFlags.NoTransform,
+                    SpriteFlags.LeftAligned) { Size = new Vector2(2.0f, -2.0f) }))
+
+            .Add(new InventoryScene()
+                .Add(new StatusBar())
+                .Add(new ConversationManager())
+                .Add(new PaletteManager())
+                .Add(new InventoryInspector()))
+
+            .Add(new EditorScene()
+                .Add(new RawAssetManager())
+                .Add(new PaletteManager())
+                .Add(new EditorAssetManager())
+                .Add(new EditorUi()));
+
         var gameServices = new Container("Game",
+            sceneManager,
+            new AlbionRenderSystem(sceneManager),
             new TextureSource(),
             new VeldridGameFactory(),
             new GameState(),
@@ -82,54 +131,6 @@ static class Albion
             new MapManager(),
             new CollisionManager(),
             new SceneStack(),
-            new SceneManager()
-                .Add(new EmptyScene()
-                    .Add(new StatusBar())
-                    .Add(new PaletteManager()))
-
-                .Add(new AutomapScene()
-                    .Add(new StatusBar())
-                    .Add(new PaletteManager()))
-
-                .Add(new FlatScene()
-                    .Add(new StatusBar())
-                    .Add(new ConversationManager())
-                    .Add(new PaletteManager())
-                    .Add(new ClockWidget())
-                    .Add(new MonsterEye()))
-
-                .Add(new DungeonScene()
-                    .Add(new SceneGraph())
-                    .Add(new StatusBar())
-                    .Add(new ConversationManager())
-                    .Add(new PaletteManager())
-                    .Add(new ClockWidget())
-                    .Add(new Compass())
-                    .Add(new MonsterEye()))
-
-                .Add(new MenuScene()
-                    .Add(new StatusBar())
-                    .Add(new PaletteManager())
-                    .Add(new MainMenu())
-                    .Add(new Sprite(
-                        (SpriteId)Base.Picture.MenuBackground8,
-                        new Vector3(-1.0f, 1.0f, 0),
-                        DrawLayer.Interface,
-                        SpriteKeyFlags.NoTransform,
-                        SpriteFlags.LeftAligned) { Size = new Vector2(2.0f, -2.0f) }))
-
-                .Add(new InventoryScene()
-                    .Add(new StatusBar())
-                    .Add(new ConversationManager())
-                    .Add(new PaletteManager())
-                    .Add(new InventoryInspector()))
-
-                .Add(new EditorScene()
-                    .Add(new RawAssetManager())
-                    .Add(new PaletteManager())
-                    .Add(new EditorAssetManager())
-                    .Add(new EditorUi())),
-
             new TextFormatter(),
             new TextManager(),
             new LayoutManager(),

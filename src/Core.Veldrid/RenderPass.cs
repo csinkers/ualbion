@@ -58,5 +58,13 @@ public sealed class RenderPass : Component
                 renderer.Render(renderable, cl, device, set1, set2);
     }
 
-    public void Render(GraphicsDevice device, CommandList cl, IResourceSetHolder set1) => RenderFunc(this, device, cl, set1);
+    public void Render(GraphicsDevice device, CommandList cl, IResourceSetHolder set1)
+    {
+        var framebuffer = Target.Framebuffer;
+        if (framebuffer == null)
+            throw new InvalidOperationException($"Framebuffer {Target.Name} for pass {Name} has not been created");
+
+        cl.SetFramebuffer(Target.Framebuffer);
+        RenderFunc(this, device, cl, set1);
+    }
 }

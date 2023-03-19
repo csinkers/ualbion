@@ -12,9 +12,11 @@ public class IsometricBakeScene : Container, IIsometricBakeScene
 {
     public IsometricBakeScene() : base(nameof(SceneId.IsometricBake))
     {
-        var camera = AttachChild(new OrthographicCamera(false));
-        AttachChild(new CameraMotion2D(camera));
+        Camera = AttachChild(new OrthographicCamera(false));
+        AttachChild(new CameraMotion2D(Camera));
     }
+
+    public ICamera Camera { get; }
 
     protected override void Subscribed() { }
     protected override void Unsubscribed() { }

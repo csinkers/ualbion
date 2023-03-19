@@ -6,7 +6,7 @@ using UAlbion.Core.Events;
 
 namespace UAlbion.Core.Visual;
 
-public class OrthographicCamera : ServiceComponent<ICamera>, ICamera
+public class OrthographicCamera : Component, ICamera
 {
     readonly bool _yAxisIncreasesDownTheScreen;
     readonly WorldCoordinateSelectEvent _selectEvent = new();
@@ -37,8 +37,8 @@ public class OrthographicCamera : ServiceComponent<ICamera>, ICamera
     public Vector3 Position { get => _position; set { _position = value; _dirty = true; } }
     public float Magnification { get => _magnification; private set { _magnification = value; _dirty = true; } }
     public float FarDistance { get => _farDistance; private set { _farDistance = value; _dirty = true; } } 
-    public float Yaw { get => _yaw; private set { _yaw = value; _dirty = true; } } // Radians
-    public float Pitch { get => _pitch; private set { _pitch = Math.Clamp(value, (float)-Math.PI / 2, (float)Math.PI / 2); _dirty = true; } } // Radians
+    public float Yaw { get => _yaw; set { _yaw = value; _dirty = true; } } // Radians
+    public float Pitch { get => _pitch; set { _pitch = Math.Clamp(value, (float)-Math.PI / 2, (float)Math.PI / 2); _dirty = true; } } // Radians
     public float AspectRatio => _viewport.X / _viewport.Y;
     public Vector3 LookDirection => _lookDirection;
     public float FieldOfView => 1f;

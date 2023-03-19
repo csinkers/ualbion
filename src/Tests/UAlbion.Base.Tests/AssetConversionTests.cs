@@ -72,6 +72,7 @@ public class AssetConversionTests
         var assetTypes = allIds.Select(x => x.Type).Distinct().ToHashSet();
 
         using (var unpacker = new AssetConverter(
+                   "ualbion-tests",
                    mapping,
                    _disk,
                    JsonUtil,
@@ -99,6 +100,7 @@ public class AssetConversionTests
             });
 
         using (var repacker = new AssetConverter(
+                   "ualbion-tests", 
                    mapping,
                    _disk,
                    JsonUtil,

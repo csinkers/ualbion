@@ -8,8 +8,8 @@ namespace UAlbion.Core.Veldrid;
 
 public class VeldridCoreFactory : ServiceComponent<ICoreFactory>, ICoreFactory
 {
-    public ISkybox CreateSkybox(ITexture texture)
-        => Resolve<ISkyboxManager>().CreateSkybox(texture);
+    public ISkybox CreateSkybox(ITexture texture, ICamera camera)
+        => Resolve<ISkyboxManager>().CreateSkybox(texture, camera);
 
     public RenderableBatch<SpriteKey, SpriteInfo> CreateSpriteBatch(SpriteKey key) => new VeldridSpriteBatch<SpriteInfo, GpuSpriteInstanceData>(key);
     public RenderableBatch<SpriteKey, BlendedSpriteInfo> CreateBlendedSpriteBatch(SpriteKey key) => new VeldridSpriteBatch<BlendedSpriteInfo, GpuBlendedSpriteInstanceData>(key);

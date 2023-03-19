@@ -22,7 +22,7 @@ public class AlbionRenderSystem : Component, IDisposable
     (float Red, float Green, float Blue, float Alpha) _clearColour;
     bool _debugMode;
 
-    public AlbionRenderSystem()
+    public AlbionRenderSystem(ICameraProvider mainCamera)
     {
         OutputDescription screenFormat = new(
             new OutputAttachmentDescription(PixelFormat.R32_Float),
@@ -39,9 +39,9 @@ public class AlbionRenderSystem : Component, IDisposable
 
             .Source("s_sprite", new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key)))
             .Source("s_blended", new BatchManager<SpriteKey, BlendedSpriteInfo>(static (key, f) => f.CreateBlendedSpriteBatch(key)))
+            .Source("s_mesh", new BatchManager<MeshId, GpuMeshInstanceData>(static (key, f) => ((VeldridCoreFactory)f).CreateMeshBatch(key)))
             .Source("s_tile", new TileRenderableManager())
             .Source("s_etm", new EtmManager())
-            .Source("s_mesh", new BatchManager<MeshId, GpuMeshInstanceData>(static (key, f) => ((VeldridCoreFactory)f).CreateMeshBatch(key)))
             .Source("s_sky", new SkyboxManager())
             .Source("s_debug", new DebugGuiRenderable())
 
@@ -54,7 +54,7 @@ public class AlbionRenderSystem : Component, IDisposable
                     .Renderers("r_sprite", "r_blended", "r_tile", "r_etm", "r_mesh", "r_sky")
                     .Sources("s_sprite", "s_blended", "s_tile", "s_etm", "s_mesh", "s_sky")
                     .Target("fb_screen")
-                    .Resources(new MainPassResourceProvider(pb.GetFramebuffer("fb_screen")))
+                    .Resources(new MainPassResourceProvider(pb.GetFramebuffer("fb_screen"), mainCamera))
                     .Render(MainRenderFunc)
                     .Build()
                 )
@@ -70,7 +70,7 @@ public class AlbionRenderSystem : Component, IDisposable
                     .Renderers("r_sprite", "r_blended", "r_tile", "r_etm", "r_mesh", "r_sky")
                     .Sources("s_sprite", "s_blended", "s_tile", "s_etm", "s_mesh", "s_sky")
                     .Target("fb_game")
-                    .Resources(new MainPassResourceProvider(pb.GetFramebuffer("fb_game")))
+                    .Resources(new MainPassResourceProvider(pb.GetFramebuffer("fb_game"), mainCamera))
                     .Render(MainRenderFunc)
                     .Build()
                 )
@@ -87,11 +87,10 @@ public class AlbionRenderSystem : Component, IDisposable
             )
             .Build();
 
+        AttachChild(_system);
+
         _default = _system.GetPipeline("pl_default");
         _debug = _system.GetPipeline("pl_debug");
-        _default.IsActive = !_debugMode;
-        _debug.IsActive = _debugMode;
-        AttachChild(_system);
 
         On<ToggleDiagnosticsEvent>(_ =>
         {
@@ -109,13 +108,15 @@ public class AlbionRenderSystem : Component, IDisposable
         _default.IsActive = !_debugMode;
         _debug.IsActive = _debugMode;
 
-        var engine = (Engine)Resolve<IEngine>();
-        engine.RenderSystem = _debugMode ? _debug : _default;
+        Enqueue(new ShowHardwareCursorEvent(_debugMode));
+
+        var engine = (Engine)TryResolve<IEngine>();
+        if (engine != null)
+            engine.RenderSystem = _debugMode ? _debug : _default;
     }
 
     void MainRenderFunc(RenderPass pass, GraphicsDevice device, CommandList cl, IResourceSetHolder set1)
     {
-        cl.SetFramebuffer(pass.Target.Framebuffer);
         cl.SetFullViewports();
         cl.SetFullScissorRects();
         cl.ClearColorTarget(0, new RgbaFloat(_clearColour.Red, _clearColour.Green, _clearColour.Blue, _clearColour.Alpha));
@@ -125,7 +126,6 @@ public class AlbionRenderSystem : Component, IDisposable
 
     void DebugRenderFunc(RenderPass pass, GraphicsDevice device, CommandList cl, IResourceSetHolder set1)
     {
-        cl.SetFramebuffer(pass.Target.Framebuffer);
         cl.SetFullViewports();
         cl.SetFullScissorRects();
         cl.ClearColorTarget(0, new RgbaFloat(_clearColour.Red, _clearColour.Green, _clearColour.Blue, _clearColour.Alpha));

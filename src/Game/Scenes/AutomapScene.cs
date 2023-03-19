@@ -11,10 +11,11 @@ public interface IAutoMapScene : IScene { }
 [Scene(SceneId.Automap)]
 public class AutomapScene : Container, IAutoMapScene
 {
+    public ICamera Camera { get; }
     public AutomapScene() : base(nameof(SceneId.Automap))
     {
-        var camera = AttachChild(new OrthographicCamera());
-        AttachChild(new CameraMotion2D(camera));
+        Camera = AttachChild(new OrthographicCamera());
+        AttachChild(new CameraMotion2D(Camera));
     }
 
     protected override void Subscribed()

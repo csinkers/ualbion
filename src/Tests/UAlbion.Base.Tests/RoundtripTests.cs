@@ -48,7 +48,7 @@ public class RoundtripTests
         var mapping = new AssetMapping();
         var disk = new MockFileSystem(true);
         var baseDir = ConfigUtil.FindBasePath(disk);
-        var pathResolver = new PathResolver(baseDir);
+        var pathResolver = new PathResolver(baseDir, "ualbion-tests");
         pathResolver.RegisterPath("ALBION", Path.Combine(baseDir, "Albion"));
         var baseAssetConfigPath = Path.Combine(baseDir, "mods", "Base", "base_assets.json");
         var assetConfigPath = Path.Combine(baseDir, "mods", "Albion", "alb_assets.json");

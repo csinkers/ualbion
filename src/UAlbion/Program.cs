@@ -22,6 +22,7 @@ namespace UAlbion;
 
 static class Program
 {
+    internal const string AppName = "ualbion"; // Determines the AppData directory name where config settings, saved games etc will be stored.
     static void Main(string[] args)
     {
         CultureInfo.CurrentCulture
@@ -52,6 +53,7 @@ static class Program
         if (commandLine.Mode == ExecutionMode.ConvertAssets)
         {
             using var converter = new AssetConverter(
+                AppName,
                 AssetMapping.Global,
                 disk,
                 jsonUtil,
@@ -68,6 +70,7 @@ static class Program
 
         var exchange = AssetSystem.Setup(
             baseDir,
+            AppName,
             AssetMapping.Global,
             disk,
             jsonUtil,

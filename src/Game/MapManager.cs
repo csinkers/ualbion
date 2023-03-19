@@ -69,10 +69,12 @@ public class MapManager : ServiceComponent<IMapManager>, IMapManager
         if (mapData == null)
             return null;
 
+        var scene3d = Resolve<ISceneManager>().GetScene(SceneId.World3D);
+
         return mapData switch
         {
             MapData2D map2d => new Entities.Map2D.FlatMap(mapId, map2d),
-            MapData3D map3d => new Entities.Map3D.DungeonMap(mapId, map3d),
+            MapData3D map3d => new Entities.Map3D.DungeonMap(mapId, map3d, scene3d.Camera),
             _ => null
         };
     }

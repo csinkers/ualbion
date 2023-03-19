@@ -11,10 +11,11 @@ public interface IMenuScene : IScene { }
 public class MenuScene : Container, IMenuScene
 {
     bool _clockWasRunning;
+    public ICamera Camera { get; }
 
     public MenuScene() : base(nameof(SceneId.MainMenu))
     {
-        AttachChild(new OrthographicCamera());
+        Camera = AttachChild(new OrthographicCamera());
     }
 
     protected override void Subscribed()

@@ -1,12 +1,10 @@
 ﻿using UAlbion.Api.Visual;
-using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets;
 
-namespace UAlbion.Game;
+namespace UAlbion.Core.Visual;
 
 public class DummyPaletteManager : IPaletteManager
 {
-    public DummyPaletteManager(AlbionPalette dayPalette, AlbionPalette nightPalette)
+    public DummyPaletteManager(IPalette dayPalette, IPalette nightPalette)
     {
         Day = dayPalette;
         Night = nightPalette;

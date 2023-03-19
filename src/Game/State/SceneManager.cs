@@ -4,12 +4,13 @@ using System.Linq;
 using System.Reflection;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
+using UAlbion.Core.Visual;
 using UAlbion.Game.Events;
 using UAlbion.Game.Scenes;
 
 namespace UAlbion.Game.State;
 
-public class SceneManager : Container, ISceneManager
+public class SceneManager : Container, ISceneManager, ICameraProvider
 {
     readonly IDictionary<SceneId, IScene> _scenes = new Dictionary<SceneId, IScene>();
 
@@ -59,4 +60,6 @@ public class SceneManager : Container, ISceneManager
 
         ActiveSceneId = e.SceneId;
     }
+
+    public ICamera Camera => ActiveScene.Camera;
 }

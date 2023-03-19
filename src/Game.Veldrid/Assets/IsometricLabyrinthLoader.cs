@@ -9,6 +9,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Exporters.Tiled;

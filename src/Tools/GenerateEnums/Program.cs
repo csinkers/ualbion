@@ -15,7 +15,7 @@ static class Program
         // TODO: Add verify mode
         var disk = new FileSystem(Directory.GetCurrentDirectory());
         var jsonUtil = new JsonUtil();
-        var assets = new Assets(disk, jsonUtil, AssetIdTypesJsonPath, ModName);
+        var assets = new Assets("ualbion-codegen", disk, jsonUtil, AssetIdTypesJsonPath, ModName);
         GenerateAssetIds.Generate(assets, DestinationPath, DestinationNamespace);
     }
 }

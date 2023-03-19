@@ -24,7 +24,7 @@ public class MockGameFactory : Component, IGameFactory
         Exchange.Unregister(this);
     }
 
-    public ISkybox CreateSkybox(ITexture texture)
+    public ISkybox CreateSkybox(ITexture texture, ICamera camera)
     {
         throw new NotImplementedException();
     }

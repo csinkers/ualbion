@@ -26,6 +26,7 @@ public class IsometricBuilder : Component
     IsometricMode _mode = IsometricMode.Floors;
     float _pitch;
     float _yaw = 45;
+    readonly ICameraProvider _cameraProvider;
     int _width;
     int _height;
     int _tilesPerRow;
@@ -42,11 +43,12 @@ public class IsometricBuilder : Component
     public IFramebufferHolder Framebuffer { get; }
     int ExpansionFactor => _mode == IsometricMode.Contents ? ContentsExpansionFactor : 1;
 
-    public IsometricBuilder(IFramebufferHolder framebuffer, int width, int height, int diamondHeight, int tilesPerRow)
+    public IsometricBuilder(IFramebufferHolder framebuffer, ICameraProvider cameraProvider, int width, int height, int diamondHeight, int tilesPerRow)
     {
         Framebuffer = framebuffer ?? throw new ArgumentNullException(nameof(framebuffer));
         _labId = Base.Labyrinth.Test1;
         _layout = AttachChild(new IsometricLayout());
+        _cameraProvider = cameraProvider ?? throw new ArgumentNullException(nameof(cameraProvider));
         _width = width;
         _height = height;
         _pitch = ApiUtil.RadToDeg(MathF.Asin((float)diamondHeight / _width));
@@ -164,7 +166,7 @@ public class IsometricBuilder : Component
                  $"Total Dims: {viewport}");
         }
 
-        var camera = Resolve<ICamera>();
+        var camera = _cameraProvider.Camera;
         camera.Viewport = viewport;
         var topLeft = camera.UnprojectNormToWorld(new Vector3(-1, 1, -0.5f));
 

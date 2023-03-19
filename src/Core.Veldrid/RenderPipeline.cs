@@ -7,7 +7,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
-public sealed class RenderPipeline : Component, IRenderSystem, IDisposable
+public sealed class RenderPipeline : Component, IRenderPipeline, IDisposable
 {
     public string Name { get; init; }
     internal List<RenderPass> Passes { get; init; }

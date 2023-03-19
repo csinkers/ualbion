@@ -9,17 +9,19 @@ namespace UAlbion.Config;
 
 public class PathResolver : IPathResolver
 {
-    const string ConfigSubdir = "ualbion";
     const string ModsDirectory = "mods";
     static readonly Regex Pattern = new(@"(\$\([A-Z]+\))");
     public string BasePath { get; }
     IDictionary<string, string> Paths { get; } = new Dictionary<string, string>();
 
-    public PathResolver(string baseDir)
+    public PathResolver(string baseDir, string appName)
     {
+        if (string.IsNullOrEmpty(appName))
+            throw new ArgumentNullException(nameof(appName));
+
         BasePath = baseDir;
-        Paths["CONFIG"] = Path.Combine(GetConfigBaseDir(), ConfigSubdir);
-        Paths["CACHE"] = Path.Combine(GetCacheBaseDir(), ConfigSubdir);
+        Paths["CONFIG"] = Path.Combine(GetConfigBaseDir(), appName);
+        Paths["CACHE"] = Path.Combine(GetCacheBaseDir(), appName);
         Paths["MODS"] = Path.Combine(baseDir, ModsDirectory);
 
         foreach (var kvp in Paths.ToList())
@@ -122,6 +124,8 @@ public class PathResolver : IPathResolver
             return cacheHome;
         }
 
-        throw new NotSupportedException();
+        throw new NotSupportedException(
+            $"An implementation of {nameof(PathResolver)}.{nameof(GetCacheBaseDir)} has not been " +
+            $"added for the operating system \"{RuntimeInformation.OSDescription}\" yet");
     }
 }

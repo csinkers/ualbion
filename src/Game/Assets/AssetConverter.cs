@@ -23,9 +23,9 @@ public sealed class AssetConverter : IDisposable
     readonly AssetLoaderRegistry _fromLoaderRegistry;
     readonly AssetLoaderRegistry _toLoaderRegistry;
 
-    static (ModApplier, EventExchange, AssetLoaderRegistry) BuildModApplier(string baseDir, string[] mods, IFileSystem disk, IJsonUtil jsonUtil, AssetMapping mapping)
+    static (ModApplier, EventExchange, AssetLoaderRegistry) BuildModApplier(string baseDir, string appName, string[] mods, IFileSystem disk, IJsonUtil jsonUtil, AssetMapping mapping)
     {
-        var pathResolver = new PathResolver(baseDir);
+        var pathResolver = new PathResolver(baseDir, appName);
         var applier = new ModApplier();
         var exchange = new EventExchange(new LogExchange()) { Name = $"EventExchange for {string.Join(", ", mods)}"};
         var assetLoaderRegistry = new AssetLoaderRegistry();
@@ -54,14 +54,14 @@ public sealed class AssetConverter : IDisposable
         return (applier, exchange, assetLoaderRegistry);
     }
 
-    public AssetConverter(AssetMapping mapping, IFileSystem disk, IJsonUtil jsonUtil, string[] fromMods, string toMod)
+    public AssetConverter(string appName, AssetMapping mapping, IFileSystem disk, IJsonUtil jsonUtil, string[] fromMods, string toMod)
     {
         if (disk == null) throw new ArgumentNullException(nameof(disk));
         if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
 
         var baseDir = ConfigUtil.FindBasePath(disk);
-        (_from, _fromExchange, _fromLoaderRegistry) = BuildModApplier(baseDir, fromMods, disk, jsonUtil, mapping);
-        (_to, _toExchange, _toLoaderRegistry) = BuildModApplier(baseDir, new[] { toMod }, disk, jsonUtil, mapping);
+        (_from, _fromExchange, _fromLoaderRegistry) = BuildModApplier(baseDir, appName, fromMods, disk, jsonUtil, mapping);
+        (_to, _toExchange, _toLoaderRegistry) = BuildModApplier(baseDir, appName, new[] { toMod }, disk, jsonUtil, mapping);
 
         // Give the "from" universe's asset manager "to" the to exchange so we can import the assets.
         _toExchange.Attach(new AssetManager(_from));

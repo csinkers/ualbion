@@ -13,8 +13,8 @@ public sealed class RenderSystem : Component, IDisposable
     internal List<IRenderableSource> Sources { private get; init; }
     internal List<IFramebufferHolder> Framebuffers { private get; init; }
     internal Dictionary<string, RenderPipeline> Pipelines { private get; init; }
-
     public RenderPipeline GetPipeline(string name) => Pipelines[name];
+
     public IFramebufferHolder GetFramebuffer(string name) => Framebuffers.Single(x => x.Name == name);
 
     protected override void Subscribed()

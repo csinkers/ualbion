@@ -8,11 +8,11 @@ public interface ICamera : IComponent
     int Version { get; }
     Matrix4x4 ViewMatrix { get; }
     Matrix4x4 ProjectionMatrix { get; }
-    Vector3 Position { get; }
+    Vector3 Position { get; set; }
     Vector3 LookDirection { get; }
     Vector2 Viewport { get; set; }
-    float Yaw { get; }
-    float Pitch { get; }
+    float Yaw { get; set; }
+    float Pitch { get; set; }
     float NearDistance { get; }
     float FarDistance { get; }
     float FieldOfView { get; }

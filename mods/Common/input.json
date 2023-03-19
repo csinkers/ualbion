@@ -25,12 +25,12 @@
     "Control+R": "e:run_renderdoc",
     "Control+V": "engine_flag toggle VSync",
     "Pause": "e:run_renderdoc",
-    "F1": "toggle_clock",
-    "F2": "update 1",
+    "F1": "toggle_diagnostics",
+    "F2": "toggle_clock",
+    "F3": "update 1",
     "F5": "debug_run",
     "F9": "debug_break",
-    "F10": "debug_step",
-    "F12": "toggle_diagnostics"
+    "F10": "debug_step"
   },
   "World2D": {
     "Escape": "push_scene MainMenu",

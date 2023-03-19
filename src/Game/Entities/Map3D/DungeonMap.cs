@@ -20,6 +20,7 @@ namespace UAlbion.Game.Entities.Map3D;
 public class DungeonMap : Component, IMap
 {
     readonly MapData3D _mapData;
+    readonly ICamera _camera;
     LabyrinthData _labyrinthData;
     LogicalMap3D _logicalMap;
     Selection3D _selection;
@@ -28,17 +29,18 @@ public class DungeonMap : Component, IMap
     float _backgroundBlue;
     ISkybox _skybox;
 
-    public DungeonMap(MapId mapId, MapData3D mapData)
+    public DungeonMap(MapId mapId, MapData3D mapData, ICamera camera)
     {
+        MapId = mapId;
+        _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
+        _camera = camera ?? throw new ArgumentNullException(nameof(camera));
+
         On<WorldCoordinateSelectEvent>(Select);
         On<MapInitEvent>(_ => FireEventChains(TriggerType.MapInit, true));
         On<SlowClockEvent>(_ => FireEventChains(TriggerType.EveryStep, false));
         On<HourElapsedEvent>(_ => FireEventChains(TriggerType.EveryHour, false));
         On<DayElapsedEvent>(_ => FireEventChains(TriggerType.EveryDay, false));
         // On<UnloadMapEvent>(_ => Unload());
-
-        MapId = mapId;
-        _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
     }
 
     public override string ToString() => $"DungeonMap:{MapId} {LogicalSize.X}x{LogicalSize.Y} TileSize: {TileSize}";
@@ -52,13 +54,11 @@ public class DungeonMap : Component, IMap
     protected override void Subscribed()
     {
         var state = Resolve<IGameState>();
-        var camera = Resolve<ICamera>();
-
         if (state.Party == null)
             return;
 
         foreach (var player in state.Party.StatusBarOrder)
-            player.SetPositionFunc(() => camera.Position / TileSize);
+            player.SetPositionFunc(() => _camera.Position / TileSize);
 
         if (_labyrinthData != null)
         {
@@ -100,7 +100,7 @@ public class DungeonMap : Component, IMap
             if (background == null)
                 Error($"Could not load background image {_labyrinthData.BackgroundId}");
 
-            _skybox = factory.CreateSkybox(background);
+            _skybox = factory.CreateSkybox(background, _camera);
         }
 
         var palette = assets.LoadPalette(_logicalMap.PaletteId);

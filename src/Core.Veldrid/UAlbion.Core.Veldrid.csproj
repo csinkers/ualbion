@@ -36,7 +36,6 @@
     <ProjectReference Include="..\Api\UAlbion.Api.csproj" />
     <ProjectReference Include="..\Core\UAlbion.Core.csproj" />
     <ProjectReference Include="..\CodeGen.Veldrid\UAlbion.CodeGen.Veldrid.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=netstandard2.0" />
-    <ProjectReference Include="..\Formats\UAlbion.Formats.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\deps\veldrid\src\')">

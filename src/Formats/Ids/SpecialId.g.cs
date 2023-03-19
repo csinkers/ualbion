@@ -44,6 +44,13 @@ public readonly struct SpecialId : IEquatable<SpecialId>, IEquatable<AssetId>, I
             throw new ArgumentOutOfRangeException($"Tried to construct a SpecialId with a type of {Type}");
     }
 
+    public SpecialId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.Special))
+            throw new ArgumentOutOfRangeException($"Tried to construct a SpecialId with a type of {Type}");
+    }
+
     public static SpecialId From<T>(T id) where T : unmanaged, Enum => (SpecialId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct SpecialId : IEquatable<SpecialId>, IEquatable<AssetId>, I
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.Special };
     public static SpecialId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

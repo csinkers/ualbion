@@ -44,6 +44,13 @@ public readonly struct PartyMemberId : IEquatable<PartyMemberId>, IEquatable<Ass
             throw new ArgumentOutOfRangeException($"Tried to construct a PartyMemberId with a type of {Type}");
     }
 
+    public PartyMemberId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.PartyMember))
+            throw new ArgumentOutOfRangeException($"Tried to construct a PartyMemberId with a type of {Type}");
+    }
+
     public static PartyMemberId From<T>(T id) where T : unmanaged, Enum => (PartyMemberId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct PartyMemberId : IEquatable<PartyMemberId>, IEquatable<Ass
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.PartyMember };
     public static PartyMemberId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

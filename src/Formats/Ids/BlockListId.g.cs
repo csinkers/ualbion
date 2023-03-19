@@ -44,6 +44,13 @@ public readonly struct BlockListId : IEquatable<BlockListId>, IEquatable<AssetId
             throw new ArgumentOutOfRangeException($"Tried to construct a BlockListId with a type of {Type}");
     }
 
+    public BlockListId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.BlockList))
+            throw new ArgumentOutOfRangeException($"Tried to construct a BlockListId with a type of {Type}");
+    }
+
     public static BlockListId From<T>(T id) where T : unmanaged, Enum => (BlockListId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct BlockListId : IEquatable<BlockListId>, IEquatable<AssetId
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.BlockList };
     public static BlockListId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

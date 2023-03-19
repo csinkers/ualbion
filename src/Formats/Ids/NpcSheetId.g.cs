@@ -44,6 +44,13 @@ public readonly struct NpcSheetId : IEquatable<NpcSheetId>, IEquatable<AssetId>,
             throw new ArgumentOutOfRangeException($"Tried to construct a NpcSheetId with a type of {Type}");
     }
 
+    public NpcSheetId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.NpcSheet))
+            throw new ArgumentOutOfRangeException($"Tried to construct a NpcSheetId with a type of {Type}");
+    }
+
     public static NpcSheetId From<T>(T id) where T : unmanaged, Enum => (NpcSheetId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct NpcSheetId : IEquatable<NpcSheetId>, IEquatable<AssetId>,
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.NpcSheet };
     public static NpcSheetId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

@@ -57,8 +57,6 @@ public class MapObject : Component
                 break;
 
             case IMesh:
-                var manager = Resolve<IMeshManager>();
-
                 // TODO: Load these from JSON or something
                 float widthCoefficient = 1 / 4.0f;
                 float heightCoefficient = 1 / 10.0f;
@@ -66,7 +64,9 @@ public class MapObject : Component
                 if (Id == Base.DungeonObject.Pylon)
                     widthCoefficient = 1 / 2.0f;
 
+                var manager = Resolve<IMeshManager>();
                 var adjustedSize = new Vector3(_size.X * widthCoefficient, _size.Y * heightCoefficient, _size.X * widthCoefficient);
+
                 _mesh = AttachChild(manager.BuildInstance(new MeshId(Id), _initialPosition, adjustedSize));
                 break;
 

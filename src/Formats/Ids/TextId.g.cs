@@ -35,6 +35,13 @@ public readonly struct TextId : IEquatable<TextId>, IEquatable<AssetId>, ICompar
             throw new ArgumentOutOfRangeException($"Tried to construct a TextId with a type of {Type}");
     }
 
+    public TextId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type >= AssetType.EventText && Type <= AssetType.Word || Type == AssetType.Special))
+            throw new ArgumentOutOfRangeException($"Tried to construct a TextId with a type of {Type}");
+    }
+
     public static TextId From<T>(T id) where T : unmanaged, Enum => (TextId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -93,7 +100,7 @@ public readonly struct TextId : IEquatable<TextId>, IEquatable<AssetId>, ICompar
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { 
         AssetType.EventText, AssetType.ItemName, AssetType.MapText, AssetType.Special, 
         AssetType.Text, AssetType.Word };

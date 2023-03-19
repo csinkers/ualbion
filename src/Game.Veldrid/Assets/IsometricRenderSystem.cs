@@ -6,6 +6,8 @@ using UAlbion.Core.Veldrid.Etm;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
+using UAlbion.Formats;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.State;
 using Veldrid;
@@ -85,11 +87,19 @@ public class IsometricRenderSystem : Component, IDisposable
 
     void AddHelpers()
     {
+        Mesh LoadMesh(MeshId id)
+        {
+            var assets = Resolve<IAssetManager>();
+            if (assets.LoadMapObject((MapObjectId)id.Id) is not Mesh mesh)
+                throw new InvalidOperationException($"Could not load mesh for {id}");
+
+            return mesh;
+        }
 
         AttachChild(new SpriteSamplerSource());
         AttachChild(new TextureSource());
         AttachChild(new ResourceLayoutSource());
-        AttachChild(new VeldridCoreFactory());
+        AttachChild(new VeldridCoreFactory(LoadMesh));
         AttachChild(new SceneStack());
     }
 

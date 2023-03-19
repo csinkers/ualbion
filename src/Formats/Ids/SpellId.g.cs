@@ -44,6 +44,13 @@ public readonly struct SpellId : IEquatable<SpellId>, IEquatable<AssetId>, IComp
             throw new ArgumentOutOfRangeException($"Tried to construct a SpellId with a type of {Type}");
     }
 
+    public SpellId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.Spell))
+            throw new ArgumentOutOfRangeException($"Tried to construct a SpellId with a type of {Type}");
+    }
+
     public static SpellId From<T>(T id) where T : unmanaged, Enum => (SpellId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct SpellId : IEquatable<SpellId>, IEquatable<AssetId>, IComp
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.Spell };
     public static SpellId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

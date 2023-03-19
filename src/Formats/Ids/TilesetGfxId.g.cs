@@ -44,6 +44,13 @@ public readonly struct TilesetGfxId : IEquatable<TilesetGfxId>, IEquatable<Asset
             throw new ArgumentOutOfRangeException($"Tried to construct a TilesetGfxId with a type of {Type}");
     }
 
+    public TilesetGfxId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.TilesetGfx))
+            throw new ArgumentOutOfRangeException($"Tried to construct a TilesetGfxId with a type of {Type}");
+    }
+
     public static TilesetGfxId From<T>(T id) where T : unmanaged, Enum => (TilesetGfxId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct TilesetGfxId : IEquatable<TilesetGfxId>, IEquatable<Asset
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.TilesetGfx };
     public static TilesetGfxId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

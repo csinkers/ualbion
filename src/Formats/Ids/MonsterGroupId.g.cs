@@ -44,6 +44,13 @@ public readonly struct MonsterGroupId : IEquatable<MonsterGroupId>, IEquatable<A
             throw new ArgumentOutOfRangeException($"Tried to construct a MonsterGroupId with a type of {Type}");
     }
 
+    public MonsterGroupId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.MonsterGroup))
+            throw new ArgumentOutOfRangeException($"Tried to construct a MonsterGroupId with a type of {Type}");
+    }
+
     public static MonsterGroupId From<T>(T id) where T : unmanaged, Enum => (MonsterGroupId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct MonsterGroupId : IEquatable<MonsterGroupId>, IEquatable<A
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.MonsterGroup };
     public static MonsterGroupId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

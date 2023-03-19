@@ -2,8 +2,6 @@
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
-using UAlbion.Formats.Ids;
 using Veldrid;
 using VeldridGen.Interfaces;
 
@@ -11,6 +9,7 @@ namespace UAlbion.Core.Veldrid.Meshes;
 
 public class MeshBatch : RenderableBatch<MeshId, GpuMeshInstanceData>
 {
+    readonly Func<MeshId, Mesh> _loadFunc;
     internal MultiBuffer<MeshVertex> VertexBuffer { get; private set; }
     internal MultiBuffer<ushort> IndexBuffer { get; private set; }
     internal MultiBuffer<GpuMeshInstanceData> Instances { get; private set; }
@@ -18,15 +17,14 @@ public class MeshBatch : RenderableBatch<MeshId, GpuMeshInstanceData>
     public ITextureHolder Diffuse { get; private set; }
     internal MeshResourceSet ResourceSet { get; private set; }
 
-    public MeshBatch(MeshId id) : base(id) { }
+    public MeshBatch(MeshId id, Func<MeshId, Mesh> loadFunc) : base(id)
+        => _loadFunc = loadFunc ?? throw new ArgumentNullException(nameof(loadFunc));
 
     protected override void Subscribed()
     {
-        var objId = MapObjectId.FromUInt32(Key.Id.ToUInt32());
-        var assets = Resolve<IAssetManager>();
-
-        if (assets.LoadMapObject(objId) is not Mesh mesh)
-            throw new InvalidOperationException($"Could not load mesh for {Key}");
+        var mesh = _loadFunc(Key);
+        if (mesh == null)
+            throw new InvalidOperationException($"Could not load mesh {Key}");
 
         var samplerSource = Resolve<ISpriteSamplerSource>();
         var source = Resolve<ITextureSource>();

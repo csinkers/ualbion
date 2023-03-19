@@ -35,6 +35,13 @@ public readonly struct SpriteId : IEquatable<SpriteId>, IEquatable<AssetId>, ICo
             throw new ArgumentOutOfRangeException($"Tried to construct a SpriteId with a type of {Type}");
     }
 
+    public SpriteId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type >= AssetType.None && Type <= AssetType.WallOverlay))
+            throw new ArgumentOutOfRangeException($"Tried to construct a SpriteId with a type of {Type}");
+    }
+
     public static SpriteId From<T>(T id) where T : unmanaged, Enum => (SpriteId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -93,7 +100,7 @@ public readonly struct SpriteId : IEquatable<SpriteId>, IEquatable<AssetId>, ICo
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { 
         AssetType.AutomapGfx, AssetType.BackgroundGfx, AssetType.CombatBackground, 
         AssetType.CombatGfx, AssetType.CoreGfx, AssetType.Floor, AssetType.FontGfx, 

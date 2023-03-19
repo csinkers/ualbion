@@ -44,6 +44,13 @@ public readonly struct PictureId : IEquatable<PictureId>, IEquatable<AssetId>, I
             throw new ArgumentOutOfRangeException($"Tried to construct a PictureId with a type of {Type}");
     }
 
+    public PictureId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.Picture))
+            throw new ArgumentOutOfRangeException($"Tried to construct a PictureId with a type of {Type}");
+    }
+
     public static PictureId From<T>(T id) where T : unmanaged, Enum => (PictureId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct PictureId : IEquatable<PictureId>, IEquatable<AssetId>, I
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.Picture };
     public static PictureId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

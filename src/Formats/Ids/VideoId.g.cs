@@ -44,6 +44,13 @@ public readonly struct VideoId : IEquatable<VideoId>, IEquatable<AssetId>, IComp
             throw new ArgumentOutOfRangeException($"Tried to construct a VideoId with a type of {Type}");
     }
 
+    public VideoId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.Video))
+            throw new ArgumentOutOfRangeException($"Tried to construct a VideoId with a type of {Type}");
+    }
+
     public static VideoId From<T>(T id) where T : unmanaged, Enum => (VideoId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct VideoId : IEquatable<VideoId>, IEquatable<AssetId>, IComp
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.Video };
     public static VideoId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

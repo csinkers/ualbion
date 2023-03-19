@@ -44,6 +44,13 @@ public readonly struct FontId : IEquatable<FontId>, IEquatable<AssetId>, ICompar
             throw new ArgumentOutOfRangeException($"Tried to construct a FontId with a type of {Type}");
     }
 
+    public FontId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.FontDefinition))
+            throw new ArgumentOutOfRangeException($"Tried to construct a FontId with a type of {Type}");
+    }
+
     public static FontId From<T>(T id) where T : unmanaged, Enum => (FontId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct FontId : IEquatable<FontId>, IEquatable<AssetId>, ICompar
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.FontDefinition };
     public static FontId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

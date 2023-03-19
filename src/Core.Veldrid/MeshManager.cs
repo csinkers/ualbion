@@ -3,20 +3,18 @@ using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid.Meshes;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
-using UAlbion.Formats.Ids;
 
 namespace UAlbion.Core.Veldrid;
 
 public class MeshManager : ServiceComponent<IMeshManager>, IMeshManager
 {
-    // new BatchManager<MeshId, GpuMeshInstanceData>(key => ((VeldridCoreFactory)Resolve<ICoreFactory>()).CreateMeshBatch(key));
+    readonly Func<MeshId, Mesh> _loadFunc;
+    public MeshManager(Func<MeshId, Mesh> loadFunc) 
+        => _loadFunc = loadFunc ?? throw new ArgumentNullException(nameof(loadFunc));
+
     public IMeshInstance BuildInstance(MeshId id, Vector3 position, Vector3 scale)
     {
-        var assets = Resolve<IAssetManager>();
-        if (assets.LoadMapObject((MapObjectId)id.Id) is not Mesh mesh)
-            throw new InvalidOperationException($"Could not load mesh for {id}");
-
+        var mesh = _loadFunc(id);
         return new MeshInstance(mesh, position, scale);
     }
 }

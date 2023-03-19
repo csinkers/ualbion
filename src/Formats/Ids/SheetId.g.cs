@@ -35,6 +35,13 @@ public readonly struct SheetId : IEquatable<SheetId>, IEquatable<AssetId>, IComp
             throw new ArgumentOutOfRangeException($"Tried to construct a SheetId with a type of {Type}");
     }
 
+    public SheetId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type >= AssetType.PartySheet && Type <= AssetType.NpcSheet))
+            throw new ArgumentOutOfRangeException($"Tried to construct a SheetId with a type of {Type}");
+    }
+
     public static SheetId From<T>(T id) where T : unmanaged, Enum => (SheetId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -93,7 +100,7 @@ public readonly struct SheetId : IEquatable<SheetId>, IEquatable<AssetId>, IComp
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.MonsterSheet, AssetType.NpcSheet, AssetType.PartySheet };
     public static SheetId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

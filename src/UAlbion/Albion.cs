@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
@@ -8,6 +9,7 @@ using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
 using UAlbion.Editor;
+using UAlbion.Formats;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Game;
@@ -114,11 +116,23 @@ static class Albion
                 .Add(new EditorAssetManager())
                 .Add(new EditorUi()));
 
+        Mesh LoadMesh(MeshId id)
+        {
+            var assets = global.Resolve<IAssetManager>();
+            var objId = new MapObjectId(id.Id);
+            var mapObj = assets.LoadMapObject(objId);
+            if (mapObj is not Mesh mesh)
+                throw new InvalidOperationException($"Could not load mesh for {id}");
+
+            return mesh;
+        }
+
         var gameServices = new Container("Game",
             sceneManager,
             new AlbionRenderSystem(sceneManager),
             new TextureSource(),
-            new VeldridGameFactory(),
+            new VeldridGameFactory(LoadMesh),
+            new MeshManager(LoadMesh),
             new GameState(),
             new GameClock(),
             new IdleClock(),

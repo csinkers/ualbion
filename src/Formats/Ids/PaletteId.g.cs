@@ -44,6 +44,13 @@ public readonly struct PaletteId : IEquatable<PaletteId>, IEquatable<AssetId>, I
             throw new ArgumentOutOfRangeException($"Tried to construct a PaletteId with a type of {Type}");
     }
 
+    public PaletteId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.Palette))
+            throw new ArgumentOutOfRangeException($"Tried to construct a PaletteId with a type of {Type}");
+    }
+
     public static PaletteId From<T>(T id) where T : unmanaged, Enum => (PaletteId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct PaletteId : IEquatable<PaletteId>, IEquatable<AssetId>, I
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.Palette };
     public static PaletteId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

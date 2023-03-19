@@ -44,6 +44,13 @@ public readonly struct WordId : IEquatable<WordId>, IEquatable<AssetId>, ICompar
             throw new ArgumentOutOfRangeException($"Tried to construct a WordId with a type of {Type}");
     }
 
+    public WordId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.Word))
+            throw new ArgumentOutOfRangeException($"Tried to construct a WordId with a type of {Type}");
+    }
+
     public static WordId From<T>(T id) where T : unmanaged, Enum => (WordId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct WordId : IEquatable<WordId>, IEquatable<AssetId>, ICompar
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.Word };
     public static WordId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

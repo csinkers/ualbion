@@ -44,6 +44,13 @@ public readonly struct InkId : IEquatable<InkId>, IEquatable<AssetId>, IComparab
             throw new ArgumentOutOfRangeException($"Tried to construct a InkId with a type of {Type}");
     }
 
+    public InkId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.Ink))
+            throw new ArgumentOutOfRangeException($"Tried to construct a InkId with a type of {Type}");
+    }
+
     public static InkId From<T>(T id) where T : unmanaged, Enum => (InkId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct InkId : IEquatable<InkId>, IEquatable<AssetId>, IComparab
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.Ink };
     public static InkId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

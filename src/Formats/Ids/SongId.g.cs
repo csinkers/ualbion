@@ -44,6 +44,13 @@ public readonly struct SongId : IEquatable<SongId>, IEquatable<AssetId>, ICompar
             throw new ArgumentOutOfRangeException($"Tried to construct a SongId with a type of {Type}");
     }
 
+    public SongId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.Song))
+            throw new ArgumentOutOfRangeException($"Tried to construct a SongId with a type of {Type}");
+    }
+
     public static SongId From<T>(T id) where T : unmanaged, Enum => (SongId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct SongId : IEquatable<SongId>, IEquatable<AssetId>, ICompar
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.Song };
     public static SongId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

@@ -44,6 +44,13 @@ public readonly struct MapTextId : IEquatable<MapTextId>, IEquatable<AssetId>, I
             throw new ArgumentOutOfRangeException($"Tried to construct a MapTextId with a type of {Type}");
     }
 
+    public MapTextId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.MapText))
+            throw new ArgumentOutOfRangeException($"Tried to construct a MapTextId with a type of {Type}");
+    }
+
     public static MapTextId From<T>(T id) where T : unmanaged, Enum => (MapTextId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct MapTextId : IEquatable<MapTextId>, IEquatable<AssetId>, I
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.MapText };
     public static MapTextId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

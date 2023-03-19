@@ -44,6 +44,13 @@ public readonly struct MapObjectId : IEquatable<MapObjectId>, IEquatable<AssetId
             throw new ArgumentOutOfRangeException($"Tried to construct a MapObjectId with a type of {Type}");
     }
 
+    public MapObjectId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.Object3D))
+            throw new ArgumentOutOfRangeException($"Tried to construct a MapObjectId with a type of {Type}");
+    }
+
     public static MapObjectId From<T>(T id) where T : unmanaged, Enum => (MapObjectId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct MapObjectId : IEquatable<MapObjectId>, IEquatable<AssetId
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.Object3D };
     public static MapObjectId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

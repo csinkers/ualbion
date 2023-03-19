@@ -190,6 +190,13 @@ public readonly struct {name} : IEquatable<{name}>, IEquatable<AssetId>, ICompar
             throw new ArgumentOutOfRangeException($""Tried to construct a {name} with a type of {{Type}}"");
     }}
 
+    public {name}(IAssetId id)
+    {{
+        _value = id.ToUInt32();
+        if (!({condition2}))
+            throw new ArgumentOutOfRangeException($""Tried to construct a {name} with a type of {{Type}}"");
+    }}
+
     public static {name} From<T>(T id) where T : unmanaged, Enum => ({name})AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)

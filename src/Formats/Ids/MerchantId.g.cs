@@ -44,6 +44,13 @@ public readonly struct MerchantId : IEquatable<MerchantId>, IEquatable<AssetId>,
             throw new ArgumentOutOfRangeException($"Tried to construct a MerchantId with a type of {Type}");
     }
 
+    public MerchantId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.Merchant))
+            throw new ArgumentOutOfRangeException($"Tried to construct a MerchantId with a type of {Type}");
+    }
+
     public static MerchantId From<T>(T id) where T : unmanaged, Enum => (MerchantId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct MerchantId : IEquatable<MerchantId>, IEquatable<AssetId>,
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.Merchant };
     public static MerchantId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

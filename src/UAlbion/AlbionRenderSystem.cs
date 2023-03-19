@@ -14,7 +14,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion;
 
-public class AlbionRenderSystem : Component, IDisposable
+public sealed class AlbionRenderSystem : Component, IDisposable
 {
     readonly RenderSystem _system;
     readonly RenderPipeline _default;

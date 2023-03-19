@@ -44,6 +44,13 @@ public readonly struct ChestId : IEquatable<ChestId>, IEquatable<AssetId>, IComp
             throw new ArgumentOutOfRangeException($"Tried to construct a ChestId with a type of {Type}");
     }
 
+    public ChestId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.Chest))
+            throw new ArgumentOutOfRangeException($"Tried to construct a ChestId with a type of {Type}");
+    }
+
     public static ChestId From<T>(T id) where T : unmanaged, Enum => (ChestId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct ChestId : IEquatable<ChestId>, IEquatable<AssetId>, IComp
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.Chest };
     public static ChestId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

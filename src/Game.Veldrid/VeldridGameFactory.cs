@@ -2,6 +2,7 @@
 using System.Numerics;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Entities.Map2D;
@@ -11,6 +12,11 @@ namespace UAlbion.Game.Veldrid;
 
 public class VeldridGameFactory : VeldridCoreFactory, IGameFactory
 {
+    public VeldridGameFactory(Func<MeshId, Mesh> meshLoaderFunc)
+        : base(meshLoaderFunc)
+    {
+    }
+
     //*
     public IMapLayer CreateMapLayer(LogicalMap2D logicalMap, ITileGraphics tileset, Vector2 tileSize)
     {

@@ -21,7 +21,7 @@ namespace UiTest
             var disk = new FileSystem(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             var baseDir = ConfigUtil.FindBasePath(disk);
             if (baseDir == null)
-                throw new DirectoryNotFoundException($"Could not determine base directory");
+                throw new DirectoryNotFoundException("Could not determine base directory");
 
             var pathResolver = new PathResolver(baseDir, "UiTest");
             var shaderCache = new ShaderCache(pathResolver.ResolvePath("$(CACHE)/ShaderCache"));
@@ -46,6 +46,9 @@ namespace UiTest
                 ;
 
             engine.RenderSystem = renderSystem.GetPipeline("pl_main");
+
+            // var texture = new SimpleTexture<uint>(new AssetId(AssetType.))
+
             engine.Run();
         }
 

@@ -44,6 +44,13 @@ public readonly struct WaveLibraryId : IEquatable<WaveLibraryId>, IEquatable<Ass
             throw new ArgumentOutOfRangeException($"Tried to construct a WaveLibraryId with a type of {Type}");
     }
 
+    public WaveLibraryId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.WaveLibrary))
+            throw new ArgumentOutOfRangeException($"Tried to construct a WaveLibraryId with a type of {Type}");
+    }
+
     public static WaveLibraryId From<T>(T id) where T : unmanaged, Enum => (WaveLibraryId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct WaveLibraryId : IEquatable<WaveLibraryId>, IEquatable<Ass
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.WaveLibrary };
     public static WaveLibraryId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

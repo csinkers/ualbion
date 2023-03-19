@@ -44,6 +44,13 @@ public readonly struct EventTextId : IEquatable<EventTextId>, IEquatable<AssetId
             throw new ArgumentOutOfRangeException($"Tried to construct a EventTextId with a type of {Type}");
     }
 
+    public EventTextId(IAssetId id)
+    {
+        _value = id.ToUInt32();
+        if (!(Type == AssetType.None || Type == AssetType.EventText))
+            throw new ArgumentOutOfRangeException($"Tried to construct a EventTextId with a type of {Type}");
+    }
+
     public static EventTextId From<T>(T id) where T : unmanaged, Enum => (EventTextId)AssetMapping.Global.EnumToId(id);
 
     public int ToDisk(AssetMapping mapping)
@@ -99,7 +106,7 @@ public readonly struct EventTextId : IEquatable<EventTextId>, IEquatable<AssetId
     public bool IsNone => Type == AssetType.None;
 
     public override string ToString() => AssetMapping.Global.IdToName(this);
-    public string ToStringNumeric() => Id.ToString(CultureInfo.InvariantCulture);
+    public string ToStringNumeric() => Id.ToString();
     public static AssetType[] ValidTypes = { AssetType.EventText };
     public static EventTextId Parse(string s) => AssetMapping.Global.Parse(s, ValidTypes);
 

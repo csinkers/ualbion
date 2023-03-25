@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
 using System.Reflection;
-using ImGuiNET;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Settings;
@@ -25,37 +24,6 @@ namespace UiTest
             exchange.Resolve<IEngine>().Run();
         }
 
-        static void DrawMenus(IImGuiManager manager)
-        {
-            if (ImGui.BeginMainMenuBar())
-            {
-                if (ImGui.BeginMenu("Windows"))
-                {
-                    if (ImGui.BeginMenu("Debug"))
-                    {
-                        if (ImGui.MenuItem("Breakpoints")) manager.AddWindow(new BreakpointsWindow(manager.GetNextWindowId()));
-                        // if (ImGui.MenuItem("Code")) manager.AddWindow(new CodeWindow(manager.GetNextWindowId()));
-                        if (ImGui.MenuItem("Threads")) manager.AddWindow(new ThreadsWindow(manager.GetNextWindowId()));
-                        if (ImGui.MenuItem("Watch")) manager.AddWindow(new WatchWindow(manager.GetNextWindowId()));
-                        ImGui.EndMenu();
-                    }
-
-                    if (ImGui.MenuItem("Asset Explorer")) manager.AddWindow(new AssetExplorerWindow(manager.GetNextWindowId()));
-                    if (ImGui.MenuItem("Console")) manager.AddWindow(new ImGuiConsoleLogger(manager.GetNextWindowId()));
-                    if (ImGui.MenuItem("Demo Window")) manager.AddWindow(new DemoWindow(manager.GetNextWindowId()));
-                    if (ImGui.MenuItem("Inspector Demo")) manager.AddWindow(new InspectorDemoWindow(manager.GetNextWindowId()));
-                    if (ImGui.MenuItem("Inspector")) manager.AddWindow(new InspectorWindow(manager.GetNextWindowId()));
-                    // if (ImGui.MenuItem("Profiler")) manager.AddWindow(new ProfilerWindow(manager.GetNextWindowId()));
-                    if (ImGui.MenuItem("Positions")) manager.AddWindow(new PositionsWindow(manager.GetNextWindowId()));
-                    if (ImGui.MenuItem("Settings")) manager.AddWindow(new SettingsWindow(manager.GetNextWindowId()));
-                    if (ImGui.MenuItem("Stats")) manager.AddWindow(new StatsWindow(manager.GetNextWindowId()));
-
-                    ImGui.EndMenu();
-                }
-                ImGui.EndMainMenuBar();
-            }
-        }
-
         static EventExchange Setup()
         {
             var exchange = new EventExchange();
@@ -70,7 +38,7 @@ namespace UiTest
             shaderLoader.AddShaderDirectory(pathResolver.ResolvePath("$(MODS)/Shaders/Shaders"));
             var engine = new Engine(GraphicsBackend.Direct3D11, true, true);
             var camera = new OrthographicCamera();
-            var imgui = new ImGuiManager(DrawMenus);
+            var imgui = new ImGuiManager(DiagMenus.Draw);
             var renderManager = BuildRenderManager(new SimpleCameraProvider(camera), imgui);
 
             exchange
@@ -117,7 +85,7 @@ namespace UiTest
                 .Source("s_ui", new DebugGuiRenderable())
                 .Source("s_sprite", new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key)))
                 .System("pl_main", pb => pb
-                    .PreRender(device => imgui.Draw())
+                    .PreRender(_ => imgui.Draw())
                     .Resources(new GlobalResourceSetProvider())
                     .Pass("rp_game", rp => rp
                         .Target("fb_game")
@@ -148,17 +116,6 @@ namespace UiTest
             }
 
             return new SimplePalette(1, "Palette", new SimpleTexture<uint>(new PaletteId(1), "Palette", 256, 1, pal));
-        }
-    }
-
-    class AssetExplorerWindow : Component, IImGuiWindow
-    {
-        readonly string _name;
-        public AssetExplorerWindow(int id) => _name = $"Asset Explorer###{id}";
-        public void Draw()
-        {
-            ImGui.Begin(_name);
-            ImGui.End();
         }
     }
 }

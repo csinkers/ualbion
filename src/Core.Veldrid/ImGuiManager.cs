@@ -9,7 +9,6 @@ using Veldrid;
 
 namespace UAlbion.Core.Veldrid;
 
-public record ImGuiMenu(string Name, params ImGuiMenu[] SubMenus);
 public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
 {
     readonly Action<IImGuiManager> _menuFunc;
@@ -51,17 +50,9 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
         ReflectorUtil.SwapAuxiliaryState();
         _menuFunc(this);
 
-        var flags = ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoTitleBar;
-        var viewport = ImGui.GetMainViewport();
-        ImGui.SetNextWindowPos(viewport.WorkPos);
-        ImGui.SetNextWindowSize(viewport.WorkSize);
-        if (ImGui.Begin("MainWindow", flags))
-        {
-            ImGui.DockSpace(0);
-            ImGui.ShowDemoWindow(ref _demoOpen);
-            foreach (var window in _windows)
-                window.Draw();
-        }
-        ImGui.End();
+        ImGui.DockSpaceOverViewport();
+        ImGui.ShowDemoWindow(ref _demoOpen);
+        foreach (var window in _windows)
+            window.Draw();
     }
 }

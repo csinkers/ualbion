@@ -22,7 +22,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
     (float Red, float Green, float Blue, float Alpha) _clearColour;
     bool _debugMode;
 
-    public AlbionRenderSystem(ICameraProvider mainCamera)
+    public AlbionRenderSystem(ICameraProvider mainCamera, IImGuiManager imgui)
     {
         OutputDescription screenFormat = new(
             new OutputAttachmentDescription(PixelFormat.R32_Float),
@@ -65,6 +65,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                 .Framebuffer("fb_screen", new MainFramebuffer("fb_screen"))
                 .Framebuffer("fb_game", new SimpleFramebuffer("fb_game", 1, 1))
                 .Resources(new GlobalResourceSetProvider())
+                .PreRender(_ => imgui.Draw())
                 .Pass("p_game", passBuilder => 
                     passBuilder
                     .Renderers("r_sprite", "r_blended", "r_tile", "r_etm", "r_mesh", "r_sky")

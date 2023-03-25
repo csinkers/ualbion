@@ -28,6 +28,7 @@ using UAlbion.Game.State;
 using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid;
 using UAlbion.Game.Veldrid.Audio;
+using UAlbion.Game.Veldrid.Diag;
 using UAlbion.Game.Veldrid.Input;
 
 namespace UAlbion;
@@ -125,9 +126,12 @@ static class Albion
             return mesh;
         }
 
+        var imgui = new ImGuiManager(DiagMenus.Draw);
+
         var gameServices = new Container("Game",
             sceneManager,
-            new AlbionRenderSystem(sceneManager),
+            imgui,
+            new AlbionRenderSystem(sceneManager, imgui),
             new TextureSource(),
             new VeldridGameFactory(LoadMesh),
             new MeshManager(LoadMesh),

@@ -7,12 +7,12 @@ using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
+using UAlbion.Game;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Magic;
 using UAlbion.Game.Settings;
 using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid.Assets;
-using UAlbion.Game.Veldrid.Diag;
 
 namespace UAlbion;
 
@@ -26,7 +26,7 @@ public static class AssetSystem
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Editor.EditorSetPropertyEvent)));
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Formats.ScriptEvents.PartyMoveEvent)));
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Game.Events.StartEvent)));
-        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(HideDiagWindowEvent)));
+        Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Game.Veldrid.Assets.IsoModeEvent)));
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(IsoYawEvent)));
     }
 
@@ -68,9 +68,8 @@ public static class AssetSystem
         PerfTracker.StartupEvent("Loaded mods");
 
         exchange.Attach(new Container("Logging",
-            new StdioConsoleLogger(),
-            //.Add(new ClipboardManager())
-            new ImGuiConsoleLogger()));
+            new LogHistory(),
+            new StdioConsoleLogger()));
 
         assetServices
             .Add(new WordLookup())

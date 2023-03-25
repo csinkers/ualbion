@@ -14,13 +14,6 @@ using static System.FormattableString;
 
 namespace UAlbion.Game.Gui;
 
-public interface ILayoutManager
-{
-    LayoutNode GetLayout();
-    IDictionary<IUiElement, LayoutNode> LastSnapshot { get; }
-    void RequestSnapshot();
-}
-
 public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
 {
     readonly CollectDialogsEvent _collectDialogsEvent = new();

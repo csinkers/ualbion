@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Text;
-using UAlbion.Formats;
 
-namespace UAlbion.Game.Veldrid.Diag.Reflection;
+namespace UAlbion.Core.Veldrid.Reflection;
 
 public static class ReflectorUtil
 {
@@ -23,7 +22,7 @@ public static class ReflectorUtil
                     ? $"{target} ({typeName})"
                     : $"{state.Index}: {target} ({typeName})";
 
-        return FormatUtil.WordWrap(description, 120);
+        return CoreUtil.WordWrap(description, 120);
     }
 
     public static string BuildTypeName(Type type)

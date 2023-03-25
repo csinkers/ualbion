@@ -23,6 +23,7 @@ public sealed class RenderPass : Component
 
     internal string[] Dependencies { get; init; }
     internal RenderMethod RenderFunc { get; init; }
+    internal RgbaFloat ClearColor { get; init; }
     public override string ToString() => $"Pass:{Name}";
 
     protected override void Subscribed()
@@ -58,13 +59,22 @@ public sealed class RenderPass : Component
                 renderer.Render(renderable, cl, device, set1, set2);
     }
 
+    public static void DefaultRender(RenderPass pass, GraphicsDevice device, CommandList cl, IResourceSetHolder set1)
+    {
+        cl.SetFramebuffer(pass.Target.Framebuffer);
+        cl.SetFullViewports();
+        cl.SetFullScissorRects();
+        cl.ClearColorTarget(0, pass.ClearColor);
+        cl.ClearDepthStencil(device.IsDepthRangeZeroToOne ? 1f : 0f);
+        pass.CollectAndDraw(device, cl, set1);
+    }
+
     public void Render(GraphicsDevice device, CommandList cl, IResourceSetHolder set1)
     {
         var framebuffer = Target.Framebuffer;
         if (framebuffer == null)
             throw new InvalidOperationException($"Framebuffer {Target.Name} for pass {Name} has not been created");
 
-        cl.SetFramebuffer(Target.Framebuffer);
         RenderFunc(this, device, cl, set1);
     }
 }

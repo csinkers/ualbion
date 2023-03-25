@@ -9,8 +9,7 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Veldrid.Input;
 /*
-if (!ImGui.GetIO().WantCaptureMouse
-    && (InputTracker.GetMouseButton(MouseButton.Left) || InputTracker.GetMouseButton(MouseButton.Right)))
+if (!ImGui.GetIO().WantCaptureMouse && (InputTracker.GetMouseButton(MouseButton.Left) || InputTracker.GetMouseButton(MouseButton.Right)))
 {
     if (!_mousePressed)
     {

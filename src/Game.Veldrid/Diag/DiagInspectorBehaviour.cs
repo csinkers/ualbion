@@ -1,5 +1,5 @@
-﻿using UAlbion.Game.Diag;
-using UAlbion.Game.Veldrid.Diag.Reflection;
+﻿using UAlbion.Core.Veldrid.Reflection;
+using UAlbion.Game.Diag;
 
 namespace UAlbion.Game.Veldrid.Diag;
 

@@ -2,7 +2,7 @@
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 
-namespace UAlbion.Game.Veldrid.Diag.Reflection;
+namespace UAlbion.Core.Veldrid.Reflection;
 
 #pragma warning disable CA1812 // Class is instantiated via reflection
 class UnsignedEnumReflector<T> : EnumReflector, IReflector where T : struct, Enum

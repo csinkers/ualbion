@@ -28,6 +28,6 @@ public class DebugPickMouseMode : Component
 
         _hits.Clear();
         Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, true, true);
-        Raise(new ShowDebugInfoEvent(_hits, e.Snapshot.MousePosition));
+        Raise(new InspectorPickEvent(_hits));
     }
 }

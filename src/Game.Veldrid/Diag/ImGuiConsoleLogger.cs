@@ -1,72 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
-using UAlbion.Core.Events;
-using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
-public class ImGuiConsoleLogger : Component
+public class ImGuiConsoleLogger : Component, IImGuiWindow
 {
     // TODO: Initial size
-    const int MaxHistory = 1000;
-    readonly object _syncRoot = new();
-    readonly Queue<LogEventArgs> _history = new();
     readonly byte[] _inputBuffer = new byte[512];
+    readonly string _name;
     bool _autoScroll = true;
-    bool _scrollToBottom;
+    bool _scrollToBottom = true;
     bool _wasShown;
 
-    public ImGuiConsoleLogger()
+    public ImGuiConsoleLogger(int id) => _name = $"Console###{id}";
+
+    public void Draw()
     {
-        On<EngineUpdateEvent>(_ => RenderDialog());
-        On<ClearConsoleEvent>(_ =>
-        {
-            lock (_syncRoot)
-                _history.Clear();
-        });
-    }
-
-    protected override void Subscribed()
-    {
-        var logExchange = Resolve<ILogExchange>();
-        logExchange.Log += Print;
-    }
-
-    protected override void Unsubscribed()
-    {
-        var logExchange = Resolve<ILogExchange>();
-        logExchange.Log -= Print;
-    }
-
-    void Print(object sender, LogEventArgs e)
-    {
-        lock (_syncRoot)
-        {
-            _history.Enqueue(e);
-            if (_history.Count > MaxHistory)
-                _history.Dequeue();
-        }
-    }
-
-    void RenderDialog()
-    {
-        var debugFlags = Var(UserVars.Debug.DebugFlags);
-        if ((debugFlags & DebugFlags.ShowConsole) == 0)
-        {
-            _wasShown = false;
-            return;
-        }
-
-        if (!_wasShown)
-            _scrollToBottom = true;
-
         var window = Resolve<IWindowManager>();
-        ImGui.Begin("Console");
+        ImGui.Begin(_name);
         ImGui.SetWindowPos(Vector2.Zero, ImGuiCond.FirstUseEver);
         ImGui.SetWindowSize(new Vector2(window.PixelWidth / 3.0f, window.PixelHeight), ImGuiCond.FirstUseEver);
 
@@ -104,9 +59,10 @@ public class ImGuiConsoleLogger : Component
 
         ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(4,1)); // Tighten spacing
 
-        lock (_syncRoot)
+        var history = Resolve<ILogHistory>();
+        history.Access(0, (_, logs) =>
         {
-            foreach (var log in _history)
+            foreach (var log in logs)
             {
                 //if (!Filter.PassFilter(item))
                 //    continue;
@@ -119,7 +75,7 @@ public class ImGuiConsoleLogger : Component
                 ImGui.Unindent(log.Nesting);
                 ImGui.PopStyleColor();
             }
-        }
+        });
 
         if (_scrollToBottom || (_autoScroll && ImGui.GetScrollY() >= ImGui.GetScrollMaxY()))
             ImGui.SetScrollHereY(1.0f);
@@ -153,9 +109,9 @@ public class ImGuiConsoleLogger : Component
                 if (@event != null)
                     logExchange.EnqueueEvent(@event);
                 else
-                    PrintMessage(error, ConsoleColor.Red);
+                    PrintMessage(logExchange, error, LogLevel.Error);
             }
-            catch (Exception e) { PrintMessage($"Parse error: {e}", ConsoleColor.Red); }
+            catch (Exception e) { PrintMessage(logExchange, $"Parse error: {e}", LogLevel.Error); }
 
             reclaimFocus = true;
         }
@@ -170,16 +126,9 @@ public class ImGuiConsoleLogger : Component
         _wasShown = true;
     }
 
-    void PrintMessage(string message, ConsoleColor color)
-    {
-        Print(this, new LogEventArgs
-        {
-            Time = DateTime.Now,
-            Color = color,
-            Message = message,
-            Nesting = 0
-        });
-    }
+    void PrintMessage(ILogExchange logExchange, string message, LogLevel level) 
+        => logExchange.Receive(new LogEvent(level, message), this);
+
     /*
             unsafe int TextEditCallbackStub(ImGuiInputTextCallbackData* data)
             {

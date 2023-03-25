@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
-using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Input;
 
@@ -13,11 +12,9 @@ public class InputManager : ServiceComponent<IInputManager>, IInputManager
     readonly IDictionary<MouseMode, IComponent> _mouseModes = new Dictionary<MouseMode, IComponent>();
     readonly Stack<MouseMode> _mouseModeStack = new();
     readonly Stack<InputMode> _inputModeStack = new();
-    InputMode _inputMode = InputMode.Global;
-    MouseMode _mouseMode = MouseMode.Normal;
 
-    public InputMode InputMode => (Var(UserVars.Debug.DebugFlags) & DebugFlags.ShowConsole) != 0 ? InputMode.TextEntry : _inputMode;
-    public MouseMode MouseMode => (Var(UserVars.Debug.DebugFlags) & DebugFlags.ShowConsole) != 0 ? MouseMode.Normal :_mouseMode;
+    public InputMode InputMode { get; private set; } = InputMode.Global;
+    public MouseMode MouseMode { get; private set; } = MouseMode.Normal;
     public IEnumerable<InputMode> InputModeStack => _inputModeStack;
     public IEnumerable<MouseMode> MouseModeStack => _mouseModeStack;
 
@@ -27,7 +24,7 @@ public class InputManager : ServiceComponent<IInputManager>, IInputManager
         On<MouseModeEvent>(e => SetMouseMode(e.Mode));
         On<ToggleMouseLookEvent>(_ =>
         {
-            switch (_mouseMode)
+            switch (MouseMode)
             {
                 case MouseMode.Normal: SetMouseMode(MouseMode.MouseLook); break;
                 case MouseMode.MouseLook: SetMouseMode(MouseMode.Normal); break;
@@ -35,7 +32,7 @@ public class InputManager : ServiceComponent<IInputManager>, IInputManager
         });
         On<PushMouseModeEvent>(e =>
         {
-            _mouseModeStack.Push(_mouseMode);
+            _mouseModeStack.Push(MouseMode);
             var setEvent = new MouseModeEvent(e.Mode);
             SetMouseMode(setEvent.Mode);
             Raise(setEvent);
@@ -51,7 +48,7 @@ public class InputManager : ServiceComponent<IInputManager>, IInputManager
         });
         On<PushInputModeEvent>(e =>
         {
-            _inputModeStack.Push(_inputMode);
+            _inputModeStack.Push(InputMode);
             var setEvent = new InputModeEvent(e.Mode);
             SetInputMode(setEvent);
             Raise(setEvent);
@@ -94,7 +91,7 @@ public class InputManager : ServiceComponent<IInputManager>, IInputManager
         }
 
         _mouseModes.TryGetValue(mode.Value, out var activeMode);
-        if (_mouseMode == mode && activeMode?.IsActive == true)
+        if (MouseMode == mode && activeMode?.IsActive == true)
             return;
 
         foreach (var otherMode in _mouseModes.Values)
@@ -103,7 +100,7 @@ public class InputManager : ServiceComponent<IInputManager>, IInputManager
         if (activeMode != null)
             activeMode.IsActive = true;
 
-        _mouseMode = mode.Value;
+        MouseMode = mode.Value;
     }
 
     void SetInputMode(InputModeEvent e)
@@ -115,7 +112,7 @@ public class InputManager : ServiceComponent<IInputManager>, IInputManager
         }
 
         _inputModes.TryGetValue(e.Mode.Value, out var activeMode);
-        if (_inputMode == e.Mode && activeMode?.IsActive == true)
+        if (InputMode == e.Mode && activeMode?.IsActive == true)
             return;
 
         foreach (var mode in _inputModes.Values)
@@ -124,6 +121,6 @@ public class InputManager : ServiceComponent<IInputManager>, IInputManager
         if (activeMode != null)
             activeMode.IsActive = true;
 
-        _inputMode = e.Mode.Value;
+        InputMode = e.Mode.Value;
     }
 }

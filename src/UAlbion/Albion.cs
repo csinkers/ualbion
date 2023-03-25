@@ -14,7 +14,6 @@ using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
-using UAlbion.Game.Diag;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
@@ -29,7 +28,6 @@ using UAlbion.Game.State;
 using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid;
 using UAlbion.Game.Veldrid.Audio;
-using UAlbion.Game.Veldrid.Diag;
 using UAlbion.Game.Veldrid.Input;
 
 namespace UAlbion;
@@ -150,10 +148,10 @@ static class Albion
             new LayoutManager(),
             new DialogManager(),
             new InventoryScreenManager(),
-            new DiagWindow()
-                .Add(new SpriteInstanceDataDebugBehaviour())
-                .Add(new FormatTextEventBehaviour()),
-                // .Add(new QueryEventDebugBehaviour()))
+            //new DiagWindow()
+            //    .Add(new SpriteInstanceDataDebugBehaviour())
+            //    .Add(new FormatTextEventBehaviour()),
+            //    // .Add(new QueryEventDebugBehaviour()))
             new ContextMenu(),
             new CursorManager(),
             new InputManager()

@@ -1,3 +1,3 @@
-﻿namespace UAlbion.Game.Veldrid.Diag.Reflection;
+﻿namespace UAlbion.Core.Veldrid.Reflection;
 
 public delegate void Reflector(in ReflectorState state);

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Threading;
-using ImGuiNET;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using Veldrid;
@@ -113,15 +112,6 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         PerfTracker.StartupEvent("Set up backend");
         Sdl2Native.SDL_Init(SDLInitFlags.GameController);
 
-        if (ImGui.GetCurrentContext() != IntPtr.Zero)
-        {
-            ImGui.StyleColorsClassic();
-
-            // Turn on ImGui docking if it's supported
-            if (Enum.TryParse(typeof(ImGuiConfigFlags), "DockingEnable", out var dockingFlag) && dockingFlag != null)
-                ImGui.GetIO().ConfigFlags |= (ImGuiConfigFlags)dockingFlag;
-        }
-
         bool first = true;
         GraphicsBackend? oldBackend = null;
 
@@ -162,31 +152,31 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
             _frameTimeAverager.AddTime(deltaSeconds);
 
             PerfTracker.BeginFrame();
-            using (PerfTracker.FrameEvent("1 Raising begin frame"))
+            using (PerfTracker.FrameEvent("Raising begin frame"))
                 Raise(BeginFrameEvent.Instance);
 
-            using (PerfTracker.FrameEvent("2 Processing window events"))
+            using (PerfTracker.FrameEvent("Processing window events"))
                 _windowHolder.PumpEvents(deltaSeconds);
 
-            using (PerfTracker.FrameEvent("3 Performing update"))
+            using (PerfTracker.FrameEvent("Performing update"))
                 Raise(new EngineUpdateEvent((float)deltaSeconds));
 
-            using (PerfTracker.FrameEvent("4 Flushing queued events"))
+            using (PerfTracker.FrameEvent("Flushing queued events"))
                 Exchange.FlushQueuedEvents();
 
             if ((flags & EngineFlags.SuppressLayout) == 0)
-                using (PerfTracker.FrameEvent("5 Calculating UI layout"))
+                using (PerfTracker.FrameEvent("Calculating UI layout"))
                      Raise(new LayoutEvent());
 
             if (_active)
             {
-                using (PerfTracker.FrameEvent("6 Drawing"))
+                using (PerfTracker.FrameEvent("Render "))
                     Draw();
 
                 if (_graphicsDevice.SyncToVerticalBlank != ((flags & EngineFlags.VSync) != 0))
                     _graphicsDevice.SyncToVerticalBlank = (flags & EngineFlags.VSync) != 0;
 
-                using (PerfTracker.FrameEvent("7 Swap buffers"))
+                using (PerfTracker.FrameEvent("Swap buffers"))
                 {
                     CoreTrace.Log.Info("Engine", "Swapping buffers...");
                     _graphicsDevice.SwapBuffers();
@@ -209,7 +199,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         if (renderSystem == null)
             return;
 
-        using (PerfTracker.FrameEvent("6.1 Prepare scenes"))
+        using (PerfTracker.FrameEvent("Prepare scenes"))
         {
             _frameCommands.Begin();
 
@@ -225,14 +215,14 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
             _frameCommands.End();
         }
 
-        using (PerfTracker.FrameEvent("6.2 Submit prepare commands"))
+        using (PerfTracker.FrameEvent("Submit prepare commands"))
         {
             _fence.Fence.Reset();
             _graphicsDevice.SubmitCommands(_frameCommands, _fence.Fence);
             _graphicsDevice.WaitForFence(_fence.Fence);
         }
 
-        renderSystem.Render(_graphicsDevice, _frameCommands, _fence);
+        renderSystem.Render(_graphicsDevice);
     }
 
     void ChangeBackend(GraphicsBackend backend, GraphicsBackend? oldBackend)

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Text;
 using ImGuiNET;
-using UAlbion.Formats;
 
-namespace UAlbion.Game.Veldrid.Diag.Reflection;
+namespace UAlbion.Core.Veldrid.Reflection;
 
 class StringReflector : IReflector
 {
@@ -45,7 +44,7 @@ class StringReflector : IReflector
         else
         {
             var value = $"\"{((string)state.Target)?.Replace("\"", "\\\"", StringComparison.Ordinal)}\"";
-            value = FormatUtil.WordWrap(value, 120);
+            value = CoreUtil.WordWrap(value, 120);
             ImGui.TextWrapped(value);
         }
 

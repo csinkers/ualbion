@@ -13,7 +13,7 @@ public class VarSet : IVarSet
         _values = new Dictionary<string, object>();
     }
 
-    public bool TryGetValue(string key, out object value) => _values.TryGetValue(key, out value);
+    public bool TryGetValue(string key, out object? value) => _values.TryGetValue(key, out value);
     public override string ToString() => $"VarSet {_name}";
     public void SetValue(string key, object value) => _values[key] = value;
     public void ClearValue(string key) => _values.Remove(key);

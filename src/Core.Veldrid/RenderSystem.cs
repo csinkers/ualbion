@@ -1,53 +1,111 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using UAlbion.Api;
 using UAlbion.Api.Eventing;
-using UAlbion.Core.Visual;
+using UAlbion.Core.Veldrid.Events;
+using Veldrid;
 using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
-public sealed class RenderSystem : Component, IDisposable
+public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
 {
-    internal List<IRenderer> Renderers { private get; init; }
-    internal List<IRenderableSource> Sources { private get; init; }
-    internal List<IFramebufferHolder> Framebuffers { private get; init; }
-    internal Dictionary<string, RenderPipeline> Pipelines { private get; init; }
-    public RenderPipeline GetPipeline(string name) => Pipelines[name];
+    public string Name { get; init; }
+    internal List<RenderPass> Passes { get; init; }
+    internal List<IFramebufferHolder> Framebuffers { get; init; }
+    internal IResourceProvider ResourceProvider { get; init; }
+    internal Action<RenderSystem> PreRender { get; init; }
+    internal Action<RenderSystem> PostRender { get; init; }
 
-    public IFramebufferHolder GetFramebuffer(string name) => Framebuffers.Single(x => x.Name == name);
+    CommandList _frameCommands;
+    Fence _fence;
+
+    public RenderSystem()
+    {
+        On<DeviceCreatedEvent>(e => RebuildDeviceObjects(e.Device));
+        On<DestroyDeviceObjectsEvent>(_ => DestroyDeviceObjects());
+    }
+
+    void RebuildDeviceObjects(GraphicsDevice device)
+    {
+        if (_frameCommands != null)
+            return;
+
+        _frameCommands = device.ResourceFactory.CreateCommandList();
+        _fence = device.ResourceFactory.CreateFence(false);
+    }
+
+    void DestroyDeviceObjects()
+    {
+        _frameCommands?.Dispose();
+        _fence?.Dispose();
+        _frameCommands = null;
+        _fence = null;
+    }
 
     protected override void Subscribed()
     {
         if (Children.Count > 0)
-            return;
+            return; // Already initialised?
 
-        foreach (var renderer in Renderers)
-            if (renderer is IComponent component)
-                AttachChild(component);
-
-        foreach (var source in Sources)
-            if (source is IComponent component)
-                AttachChild(component);
+        if (ResourceProvider is IComponent rpComponent)
+            AttachChild(rpComponent);
 
         foreach (var framebuffer in Framebuffers)
             if (framebuffer is IComponent component)
                 AttachChild(component);
 
-        foreach (var pipeline in Pipelines.Values)
-            if (pipeline is IComponent component)
-                AttachChild(component);
+        foreach (var pass in Passes)
+            AttachChild(pass);
+    }
 
-        base.Subscribed();
+    public void Render(GraphicsDevice graphicsDevice)
+    {
+        if (graphicsDevice == null) throw new ArgumentNullException(nameof(graphicsDevice));
+        if (_frameCommands == null)
+            RebuildDeviceObjects(graphicsDevice);
+
+        PreRender?.Invoke(this);
+
+        int i = 0;
+        foreach (var phase in Passes)
+        {
+            using (FrameEventCached(ref i, phase, (x, n) => $"{n} {Name} Render - {x.Name}"))
+            {
+                _frameCommands.Begin();
+                phase.Render(graphicsDevice, _frameCommands, ResourceProvider?.ResourceSet);
+                _frameCommands.End();
+            }
+
+            _fence.Reset();
+            using (FrameEventCached(ref i, phase, (x, n) => $"{n} {Name} Submit commands - {x.Name}"))
+                graphicsDevice.SubmitCommands(_frameCommands, _fence);
+
+            using (FrameEventCached(ref i, phase, (x, n) => $"{n} {Name} Complete - {x.Name}"))
+                graphicsDevice.WaitForFence(_fence);
+        }
+
+        PostRender?.Invoke(this);
     }
 
     public void Dispose()
     {
-        foreach(var child in Children)
+        foreach (var child in Children)
             if (child is IDisposable disposable)
                 disposable.Dispose();
 
         RemoveAllChildren();
-        GC.SuppressFinalize(this);
+        DestroyDeviceObjects();
+    }
+
+    readonly List<string> _cachedStrings = new();
+
+    FrameTimeTracker FrameEventCached<T>(ref int num, T context, Func<T, int, string> builder)
+    {
+        if (_cachedStrings.Count <= num)
+            _cachedStrings.Add(builder(context, num));
+
+        var message = _cachedStrings[num++];
+        return PerfTracker.FrameEvent(message);
     }
 }

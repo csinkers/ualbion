@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Game.Veldrid.Diag.Reflection;
+﻿namespace UAlbion.Core.Veldrid.Reflection;
 
 public interface IReflector
 {

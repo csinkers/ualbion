@@ -2,7 +2,7 @@
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 
-namespace UAlbion.Game.Veldrid.Diag.Reflection;
+namespace UAlbion.Core.Veldrid.Reflection;
 
 public class IntegralValueReflector : IReflector
 {

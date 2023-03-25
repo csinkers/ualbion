@@ -17,9 +17,9 @@ namespace UAlbion.Game.Veldrid.Assets;
 
 public class IsometricRenderSystem : Component, IDisposable
 {
-    readonly RenderSystem _system;
-    public RenderPipeline OnScreen { get; }
-    public RenderPipeline OffScreen { get; }
+    readonly RenderManager _manager;
+    public RenderSystem OnScreen { get; }
+    public RenderSystem OffScreen { get; }
     public IsometricBuilder Builder { get; }
     public IFramebufferHolder IsoBuffer { get; }
 
@@ -28,14 +28,14 @@ public class IsometricRenderSystem : Component, IDisposable
         OutputDescription screenFormat = SimpleFramebuffer.Output;
 
         var sceneManager = AttachChild(new SceneManager());
-        _system = RenderSystemBuilder.Create()
+        _manager = RenderManagerBuilder.Create()
             .Framebuffer("fb_iso", new SimpleFramebuffer("fb_iso", (uint)(tileWidth * tilesPerRow), (uint)tileHeight))
             .Renderer("r_sprite", new SpriteRenderer(screenFormat))
             .Renderer("r_etm", new EtmRenderer(screenFormat))
             .Renderer("r_quad", new FullscreenQuadRenderer())
             .Source("s_sprite", new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key)))
             .Source("s_etm", new EtmManager())
-            .Pipeline("pl_onscreen", pipe => 
+            .System("sys_onscreen", pipe => 
                 pipe
                 .Framebuffer("fb_screen", new MainFramebuffer("fb_screen"))
                 .Resources(new GlobalResourceSetProvider())
@@ -45,17 +45,15 @@ public class IsometricRenderSystem : Component, IDisposable
                     .Renderers("r_sprite", "r_etm")
                     .Sources("s_sprite", "s_etm")
                     .Target("fb_iso")
-                    .Render(RenderFunc)
                     .Build())
                 .Pass("p_copy", pb =>
                     pb
                     .Renderer("r_quad")
                     .Target("fb_screen")
-                    .Render(CopyFunc)
                     .Build())
                 .Build()
             )
-            .Pipeline("pl_offscreen", pipe => 
+            .System("sys_offscreen", pipe => 
                 pipe
                 .Resources(new GlobalResourceSetProvider())
                 .Pass("p_iso", pb => 
@@ -64,18 +62,17 @@ public class IsometricRenderSystem : Component, IDisposable
                     .Renderers("r_sprite", "r_etm")
                     .Sources("s_sprite", "s_etm")
                     .Target("fb_iso")
-                    .Render(RenderFunc)
                     .Build())
                 .Build()
             )
             .Build();
 
-        OnScreen = _system.GetPipeline("pl_onscreen");
-        OffScreen = _system.GetPipeline("pl_offscreen");
-        IsoBuffer = _system.GetFramebuffer("fb_iso");
-        AttachChild(_system);
+        OnScreen = _manager.GetSystem("sys_onscreen");
+        OffScreen = _manager.GetSystem("sys_offscreen");
+        IsoBuffer = _manager.GetFramebuffer("fb_iso");
+        AttachChild(_manager);
 
-        Builder = new IsometricBuilder(_system.GetFramebuffer("fb_iso"), sceneManager, tileWidth, tileHeight, baseHeight, tilesPerRow);
+        Builder = new IsometricBuilder(_manager.GetFramebuffer("fb_iso"), sceneManager, tileWidth, tileHeight, baseHeight, tilesPerRow);
 
         AddHelpers();
         sceneManager
@@ -103,23 +100,9 @@ public class IsometricRenderSystem : Component, IDisposable
         AttachChild(new SceneStack());
     }
 
-    void CopyFunc(RenderPass pass, GraphicsDevice device, CommandList cl, IResourceSetHolder set1)
-    {
-        throw new NotImplementedException();
-    }
-
-    static void RenderFunc(RenderPass pass, GraphicsDevice device, CommandList cl, IResourceSetHolder set1)
-    {
-        cl.SetFullViewports();
-        cl.SetFullScissorRects();
-        cl.ClearColorTarget(0, new RgbaFloat(0, 0, 0, 0.0f));
-        cl.ClearDepthStencil(device.IsDepthRangeZeroToOne ? 1f : 0f);
-        pass.CollectAndDraw(device, cl, set1);
-    }
-
     public void Dispose()
     {
-        _system?.Dispose();
+        _manager?.Dispose();
         GC.SuppressFinalize(this);
     }
 }

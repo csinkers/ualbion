@@ -21,12 +21,12 @@ public sealed class DebugGuiRenderer : Component, IRenderer, IDisposable
         On<PreviewInputEvent>(e =>
         {
             _imguiRenderer?.Update((float)e.DeltaSeconds, e.Snapshot);
-            if (ImGui.GetCurrentContext() != IntPtr.Zero)
-            {
-                var io = ImGui.GetIO();
-                e.SuppressKeyboard = io.WantCaptureKeyboard;
-                e.SuppressMouse = io.WantCaptureMouse;
-            }
+            if (ImGui.GetCurrentContext() == IntPtr.Zero)
+                return;
+
+            var io = ImGui.GetIO();
+            e.SuppressKeyboard = io.WantCaptureKeyboard;
+            e.SuppressMouse = io.WantCaptureMouse;
         });
 
         On<WindowResizedEvent>(e => _imguiRenderer?.WindowResized(e.Width, e.Height));
@@ -40,7 +40,9 @@ public sealed class DebugGuiRenderer : Component, IRenderer, IDisposable
 
     void CreateDeviceObjects(GraphicsDevice graphicsDevice)
     {
-        if (graphicsDevice == null) throw new ArgumentNullException(nameof(graphicsDevice));
+        if (graphicsDevice == null)
+            throw new ArgumentNullException(nameof(graphicsDevice));
+
         if (_imguiRenderer == null)
         {
             var window = Resolve<IWindowManager>();
@@ -53,7 +55,10 @@ public sealed class DebugGuiRenderer : Component, IRenderer, IDisposable
         }
         else
         {
-            _imguiRenderer.CreateDeviceResources(graphicsDevice, graphicsDevice.SwapchainFramebuffer.OutputDescription, ColorSpaceHandling.Linear);
+            _imguiRenderer.CreateDeviceResources(
+                graphicsDevice,
+                graphicsDevice.SwapchainFramebuffer.OutputDescription,
+                ColorSpaceHandling.Linear);
         }
         Off<PrepareFrameResourcesEvent>();
     }

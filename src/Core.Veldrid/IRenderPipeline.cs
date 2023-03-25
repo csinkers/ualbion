@@ -4,5 +4,5 @@ namespace UAlbion.Core.Veldrid;
 
 public interface IRenderPipeline
 {
-    void Render(GraphicsDevice graphicsDevice, CommandList frameCommands, FenceHolder fence);
+    void Render(GraphicsDevice graphicsDevice);
 }

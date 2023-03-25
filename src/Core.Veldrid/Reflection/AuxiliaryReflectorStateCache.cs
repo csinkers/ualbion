@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UAlbion.Game.Veldrid.Diag.Reflection;
+namespace UAlbion.Core.Veldrid.Reflection;
 
 public class AuxiliaryReflectorStateCache
 {

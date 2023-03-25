@@ -16,9 +16,9 @@ namespace UAlbion;
 
 public sealed class AlbionRenderSystem : Component, IDisposable
 {
-    readonly RenderSystem _system;
-    readonly RenderPipeline _default;
-    readonly RenderPipeline _debug;
+    readonly RenderManager _manager;
+    readonly RenderSystem _default;
+    readonly RenderSystem _debug;
     (float Red, float Green, float Blue, float Alpha) _clearColour;
     bool _debugMode;
 
@@ -28,7 +28,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
             new OutputAttachmentDescription(PixelFormat.R32_Float),
             new OutputAttachmentDescription(PixelFormat.B8_G8_R8_A8_UNorm));
 
-        _system = RenderSystemBuilder.Create()
+        _manager = RenderManagerBuilder.Create()
             .Renderer("r_sprite", new SpriteRenderer(screenFormat))
             .Renderer("r_blended", new BlendedSpriteRenderer(screenFormat))
             .Renderer("r_tile", new TileRenderer(screenFormat))
@@ -45,7 +45,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
             .Source("s_sky", new SkyboxManager())
             .Source("s_debug", new DebugGuiRenderable())
 
-            .Pipeline("pl_default", pb => 
+            .System("sys_default", pb => 
                 pb
                 .Framebuffer("fb_screen", new MainFramebuffer("fb_screen"))
                 .Resources(new GlobalResourceSetProvider())
@@ -60,7 +60,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                 )
                 .Build()
             )
-            .Pipeline("pl_debug", pb => 
+            .System("sys_debug", pb => 
                 pb
                 .Framebuffer("fb_screen", new MainFramebuffer("fb_screen"))
                 .Framebuffer("fb_game", new SimpleFramebuffer("fb_game", 1, 1))
@@ -79,18 +79,18 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                     .Renderer("r_debug")
                     .Source("s_debug")
                     .Target("fb_screen")
+                    .ClearColor(RgbaFloat.Grey)
                     .Dependency("p_game")
-                    .Render(DebugRenderFunc)
                     .Build()
                 )
                 .Build()
             )
             .Build();
 
-        AttachChild(_system);
+        AttachChild(_manager);
 
-        _default = _system.GetPipeline("pl_default");
-        _debug = _system.GetPipeline("pl_debug");
+        _default = _manager.GetSystem("sys_default");
+        _debug = _manager.GetSystem("sys_debug");
 
         On<ToggleDiagnosticsEvent>(_ =>
         {
@@ -117,15 +117,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
 
     void MainRenderFunc(RenderPass pass, GraphicsDevice device, CommandList cl, IResourceSetHolder set1)
     {
-        cl.SetFullViewports();
-        cl.SetFullScissorRects();
-        cl.ClearColorTarget(0, new RgbaFloat(_clearColour.Red, _clearColour.Green, _clearColour.Blue, _clearColour.Alpha));
-        cl.ClearDepthStencil(device.IsDepthRangeZeroToOne ? 1f : 0f);
-        pass.CollectAndDraw(device, cl, set1);
-    }
-
-    void DebugRenderFunc(RenderPass pass, GraphicsDevice device, CommandList cl, IResourceSetHolder set1)
-    {
+        cl.SetFramebuffer(pass.Target.Framebuffer);
         cl.SetFullViewports();
         cl.SetFullScissorRects();
         cl.ClearColorTarget(0, new RgbaFloat(_clearColour.Red, _clearColour.Green, _clearColour.Blue, _clearColour.Alpha));
@@ -135,6 +127,6 @@ public sealed class AlbionRenderSystem : Component, IDisposable
 
     public void Dispose()
     {
-        _system.Dispose();
+        _manager.Dispose();
     }
 }

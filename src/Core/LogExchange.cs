@@ -24,7 +24,7 @@ public class LogExchange : ILogExchange
     {
         _exchange = exchange ?? throw new ArgumentNullException(nameof(exchange));
         // Only need to subscribe to verbose events, as all non-verbose events will be delivered
-        // here anyway as long as this was given to Engine as the logger component.
+        // here anyway as long as this was given to the exchange as the logger component.
         exchange.Subscribe<BeginFrameEvent>(this);
         exchange.Subscribe<SetLogLevelEvent>(this);
         exchange.Register<ILogExchange>(this);
@@ -199,7 +199,6 @@ public class LogExchange : ILogExchange
             sb.AppendFormat("    {0}{1}: {2}" + Environment.NewLine, e.Name, paramList, e.HelpText);
             foreach(var alias in e.Aliases)
                 sb.AppendFormat("    {0}{1}: {2}" + Environment.NewLine, alias, paramList, e.HelpText);
-
         }
     }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using System.Threading;
 using UAlbion.Api.Settings;
 
@@ -35,12 +36,14 @@ public abstract class Component : IComponent
     /// <summary>
     /// Sequential id to uniquely identify a given component
     /// </summary>
-    [DiagIgnore] public int ComponentId { get; }
+    [DiagIgnore, JsonIgnore]
+    public int ComponentId { get; }
 
     /// <summary>
     /// True if this component is currently attached to an event exchange
     /// </summary>
-    [DiagIgnore] public bool IsSubscribed { get; private set; }
+    [DiagIgnore, JsonIgnore]
+    public bool IsSubscribed { get; private set; }
 
     /// <summary>
     /// The most recently attached event exchange, may currently be attached but
@@ -52,7 +55,7 @@ public abstract class Component : IComponent
     /// <summary>
     /// The parent of this component, if it is a child.
     /// </summary>
-    public IComponent Parent { get; private set; }
+    [JsonIgnore] public IComponent Parent { get; private set; }
 
     /// <summary>
     /// The list of this component's child components.
@@ -289,7 +292,8 @@ public abstract class Component : IComponent
     /// inactive all event handlers are removed from the exchange, all child
     /// components are also recursively removed from the exchange.
     /// </summary>
-    [DiagIgnore] public bool IsActive
+    [DiagIgnore, JsonIgnore]
+    public bool IsActive
     {
         get => _isActive;
         set

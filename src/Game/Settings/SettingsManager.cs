@@ -116,8 +116,7 @@ public class SettingsManager : Component, ISettings
         if (!disk.DirectoryExists(dir))
             disk.CreateDirectory(dir);
 
-        var json = jsonUtil.Serialize(this);
-        disk.WriteAllText(path, json);
+        VarSetLoader.Save(_set, path, disk, jsonUtil);
     }
 
     public bool TryGetValue(string key, out object value) => _set.TryGetValue(key, out value);

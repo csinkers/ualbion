@@ -172,6 +172,7 @@ public class MapRenderable3D : Component
         }
         _dirty.Clear();
     }
+
 /*
     void SortingUpdate()
     {
@@ -180,7 +181,8 @@ public class MapRenderable3D : Component
         foreach (var list in _tilesByDistance.Values)
             list.Clear();
 
-        var cameraTilePosition = Resolve<ICamera>().Position;
+        var camera = Resolve<ICameraProvider>().Camera;
+        var cameraTilePosition = camera.Position;
 
         var map = Resolve<IMapManager>().Current;
         if (map != null)

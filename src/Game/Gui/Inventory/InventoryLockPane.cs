@@ -138,7 +138,7 @@ public class InventoryLockPane : UiElement
         // ContextMenu: Lock, Pick the lock
         var options = new List<ContextMenuOption>();
         var tf = Resolve<ITextFormatter>();
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         var cursorManager = Resolve<ICursorManager>();
 
         options.Add(new ContextMenuOption(

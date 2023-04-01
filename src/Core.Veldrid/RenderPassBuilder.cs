@@ -18,6 +18,7 @@ public class RenderPassBuilder
     IFramebufferHolder _target;
     RenderPass.RenderMethod _renderFunc;
     RgbaFloat _clearColor = RgbaFloat.Clear;
+    bool _built;
 
     RenderPassBuilder(string name, RenderSystemBuilder systemBuilder, RenderManagerBuilder manager)
     {
@@ -29,31 +30,36 @@ public class RenderPassBuilder
     public static RenderPassBuilder Create(string name, RenderSystemBuilder systemBuilder, RenderManagerBuilder manager) 
         => new(name, systemBuilder, manager);
 
-    public RenderPassBuilder Resources(IResourceProvider resourceProvider) { _resourceProvider = resourceProvider; return this; }
-    public RenderPassBuilder Target(string name) { _target = _system.GetFramebuffer(name); return this; }
+    public RenderPassBuilder Resources(IResourceProvider resourceProvider) { Check(); _resourceProvider = resourceProvider; return this; }
+    public RenderPassBuilder Target(string name) { Check(); _target = _system.GetFramebuffer(name); return this; }
 
-    public RenderPassBuilder Renderer(string name) { _renderers.Add(_manager.GetRenderer(name)); return this; }
+    public RenderPassBuilder Renderer(string name) { Check(); _renderers.Add(_manager.GetRenderer(name)); return this; }
     public RenderPassBuilder Renderers(params string[] names)
     {
-        foreach(var name in names)
+        Check();
+        foreach (var name in names)
             _renderers.Add(_manager.GetRenderer(name));
         return this;
     }
 
-    public RenderPassBuilder Source(string name) { _sources.Add(_manager.GetSource(name)); return this; }
+    public RenderPassBuilder Source(string name) { Check(); _sources.Add(_manager.GetSource(name)); return this; }
     public RenderPassBuilder Sources(params string[] names)
     {
-        foreach(var name in names)
+        Check();
+        foreach (var name in names)
             _sources.Add(_manager.GetSource(name));
 
         return this;
     }
-    public RenderPassBuilder Dependency(string name) { _dependencies.Add(name); return this; }
-    public RenderPassBuilder Render(RenderPass.RenderMethod renderFunc) { _renderFunc = renderFunc; return this; }
-    public RenderPassBuilder ClearColor(RgbaFloat clearColor) { _clearColor = clearColor; return this; }
+    public RenderPassBuilder Dependency(string name) { Check(); _dependencies.Add(name); return this; }
+    public RenderPassBuilder Render(RenderPass.RenderMethod renderFunc) { Check(); _renderFunc = renderFunc; return this; }
+    public RenderPassBuilder ClearColor(RgbaFloat clearColor) { Check(); _clearColor = clearColor; return this; }
 
-    public RenderPass Build() =>
-        new()
+    public RenderPass Build()
+    {
+        Check();
+        _built = true;
+        return new()
         {
             Name = _name,
             RenderFunc = _renderFunc ?? RenderPass.DefaultRender,
@@ -64,4 +70,11 @@ public class RenderPassBuilder
             Sources = _sources,
             ClearColor = _clearColor
         };
+    }
+
+    void Check()
+    {
+        if (_built)
+            throw new InvalidOperationException($"Tried to access a {nameof(RenderPassBuilder)} for {_name}, but it has already been built!");
+    }
 }

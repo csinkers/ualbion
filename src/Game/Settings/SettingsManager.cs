@@ -16,6 +16,8 @@ namespace UAlbion.Game.Settings;
 #pragma warning disable CA2227 // Collection properties should be read only
 public class SettingsManager : Component, ISettings
 {
+    const int ConfigVersion = 1;
+    static readonly IntVar Version = new("ConfigVersion", 0);
     const string VarSetName = "Settings";
     const string UserPath = "$(CONFIG)/settings.json";
     VarSet _set = new(VarSetName);
@@ -31,6 +33,7 @@ public class SettingsManager : Component, ISettings
         {
             if (Var(UserVars.Gameplay.Language) == e.Language)
                 return;
+
             SetVar(UserVars.Gameplay.Language, e.Language);
         });
 
@@ -67,7 +70,7 @@ public class SettingsManager : Component, ISettings
     void SetVar<T>(IVar<T> varInfo, T value)
     {
         if (varInfo == null) throw new ArgumentNullException(nameof(varInfo));
-        varInfo.Write(_set, value);
+        varInfo.Write(this, value);
     }
 
     protected override void Subscribed() => Reload();
@@ -87,22 +90,43 @@ public class SettingsManager : Component, ISettings
     // After the mods are loaded, Reload() is called manually to ensure that the values from config.json etc come through.
     public void Reload()
     {
-        if (AssetMapping.Global.IsEmpty)
-            return;
-
         var disk = Resolve<IFileSystem>();
         var pathResolver = Resolve<IPathResolver>();
         var jsonUtil = Resolve<IJsonUtil>();
-        var assets = TryResolve<IAssetManager>();
-
         var path = pathResolver.ResolvePath(UserPath);
-        var baseConfig = assets?.LoadConfig();
 
         if (disk.FileExists(path))
+        {
             _set = VarSetLoader.Load(VarSetName, path, disk, jsonUtil);
 
-        if (baseConfig != null)
-            _set.Apply(baseConfig);
+            // Note: If version doesn't match discard old config and go back to defaults.
+            // This is just to clear out any bad entries from before the format was stabilised,
+            // if future changes are made to the format we can implement an actual upgrade process.
+            if (Version.Read(_set) != ConfigVersion)
+            {
+                Warn($"Settings file was not version {ConfigVersion} - discarding settings");
+                _set = new VarSet(VarSetName);
+            }
+            else
+                _set.ClearValue(Version.Key);
+        }
+
+        var assets = TryResolve<IAssetManager>();
+        var baseConfig = assets?.LoadConfig();
+        if (AssetMapping.Global.IsEmpty || baseConfig == null) 
+            return;
+
+        _set.Apply(baseConfig);
+
+        var registry = TryResolve<IVarRegistry>();
+        if (registry != null)
+        {
+            foreach (var key in _set.Keys)
+                if (!registry.IsVarRegistered(key))
+                    Error($"Setting \"{key}\" has a value, but no Var has been registered with that key");
+        }
+        else
+            Warn("No VarRegistry found, skipping var validation");
     }
 
     public void Save()
@@ -116,11 +140,14 @@ public class SettingsManager : Component, ISettings
         if (!disk.DirectoryExists(dir))
             disk.CreateDirectory(dir);
 
+        Version.Write(this, ConfigVersion);
         VarSetLoader.Save(_set, path, disk, jsonUtil);
+        _set.ClearValue(Version.Key);
     }
 
     public bool TryGetValue(string key, out object value) => _set.TryGetValue(key, out value);
     public void SetValue(string key, object value) => _set.SetValue(key, value);
     public void ClearValue(string key) => _set.ClearValue(key);
+    public void SetConfig(IVarSet config) => _set.Apply(config);
 }
 #pragma warning restore CA2227 // Collection properties should be read only

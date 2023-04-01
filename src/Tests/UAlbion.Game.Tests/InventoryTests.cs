@@ -63,7 +63,7 @@ public class InventoryTests : Component
 
         var exchange = new EventExchange(new LogExchange());
         _im = new InventoryManager(x => inventories[x], GetItem);
-        var wm = new WindowManager { Resolution = (1920, 1080) };
+        var wm = new GameWindow(1920, 1080);
         var cm = new MockCursorManager { Position = new Vector2(1, 1) };
 
         exchange

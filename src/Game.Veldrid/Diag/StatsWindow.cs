@@ -2,8 +2,10 @@
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
+using UAlbion.Core.Veldrid;
 using UAlbion.Game.Input;
 using UAlbion.Game.Veldrid.Audio;
+using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -16,7 +18,7 @@ public class StatsWindow : Component, IImGuiWindow
         _name = $"Stats###Stats{id}";
     }
 
-    public void Draw()
+    public void Draw(GraphicsDevice device)
     {
         ImGui.Begin(_name);
 

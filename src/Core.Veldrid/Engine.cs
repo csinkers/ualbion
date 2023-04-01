@@ -26,10 +26,6 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
     readonly PrepareFrameResourcesEvent _prepareFrameResourcesEvent = new();
     readonly PrepareFrameResourceSetsEvent _prepareFrameResourceSetsEvent = new();
     readonly bool _useRenderDoc;
-    readonly int _defaultWidth = 720; // TODO: Save in user settings
-    readonly int _defaultHeight = 480;
-    readonly int _defaultX = 1100;
-    readonly int _defaultY = 50;
 
     GraphicsDevice _graphicsDevice;
     CommandList _frameCommands;
@@ -43,7 +39,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
     public string FrameTimeText => $"{_graphicsDevice.BackendType} {_frameTimeAverager.CurrentAverageFramesPerSecond:N2} fps ({_frameTimeAverager.CurrentAverageFrameTimeMilliseconds:N3} ms)";
     public IRenderPipeline RenderSystem { get; set; }
 
-    public Engine(GraphicsBackend backend, bool useRenderDoc, bool showWindow, Rectangle? windowRect = null)
+    public Engine(GraphicsBackend backend, bool useRenderDoc, bool showWindow)
     {
         _newBackend = backend;
         _useRenderDoc = useRenderDoc;
@@ -53,14 +49,6 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
 
         if (_windowHolder != null)
             AttachChild(_windowHolder);
-
-        if (windowRect.HasValue)
-        {
-            _defaultX = windowRect.Value.X;
-            _defaultY = windowRect.Value.Y;
-            _defaultWidth = windowRect.Value.Width;
-            _defaultHeight = windowRect.Value.Height;
-        }
 
         On<WindowHiddenEvent>(_ => _active = false);
         On<WindowShownEvent>(_ =>
@@ -262,7 +250,12 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         {
             if (_windowHolder != null)
             {
-                _windowHolder.CreateWindow(_defaultX, _defaultY, _defaultWidth, _defaultHeight);
+                var x = Var(CoreVars.Ui.WindowPosX);
+                var y = Var(CoreVars.Ui.WindowPosY);
+                var w = Var(CoreVars.Ui.WindowWidth);
+                var h = Var(CoreVars.Ui.WindowHeight);
+
+                _windowHolder.CreateWindow(x, y, w, h);
                 _graphicsDevice = VeldridStartup.CreateGraphicsDevice(_windowHolder.Window, gdOptions, backend);
             }
             else

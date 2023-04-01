@@ -2,9 +2,10 @@
 using System.Numerics;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
-using UAlbion.Core;
+using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Reflection;
 using UAlbion.Game.State;
+using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -51,7 +52,7 @@ public class InspectorDemoWindow : Component, IImGuiWindow
         _name = $"Inspector Demo###IDemo{id}";
     }
 
-    public void Draw()
+    public void Draw(GraphicsDevice device)
     {
         ReflectorUtil.SwapAuxiliaryState();
         var state = TryResolve<IGameState>();

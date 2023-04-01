@@ -193,7 +193,7 @@ public class LogicalInventorySlot : UiElement
         }
 
         var tf = Resolve<ITextFormatter>();
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         var cursorManager = Resolve<ICursorManager>();
 
         var item = Resolve<IAssetManager>().LoadItem(slotInfo.Item);
@@ -300,7 +300,7 @@ public class LogicalInventorySlot : UiElement
             return;
 
         var tf = Resolve<ITextFormatter>();
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         var cursorManager = Resolve<ICursorManager>();
         var headingText = slotInfo.Item == AssetId.Gold
             ? Base.SystemText.Gold_Gold 

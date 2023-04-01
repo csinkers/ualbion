@@ -3,7 +3,6 @@ using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events.Transitions;
@@ -25,15 +24,15 @@ public class ItemTransitionManager : Component
 
     bool LinearFromTilePosition(int x, int y, ItemId itemId, float? transitionTime, Action continuation)
     {
-        var scene = TryResolve<ISceneManager>()?.ActiveScene;
+        var sceneManager = TryResolve<ISceneManager>();
+        var scene = sceneManager?.ActiveScene;
         var map = TryResolve<IMapManager>()?.Current;
 
         if (scene == null || map == null)
             return false;
 
-        var camera = Resolve<ICamera>();
         var worldPosition = new Vector3(x, y, 0) * map.TileSize;
-        var normPosition = camera.ProjectWorldToNorm(worldPosition);
+        var normPosition = sceneManager.Camera.ProjectWorldToNorm(worldPosition);
 
         return LinearFromNormPosition(
             new Vector2(normPosition.X, normPosition.Y),
@@ -45,7 +44,7 @@ public class ItemTransitionManager : Component
 
     bool LinearFromUiPositions(ItemId itemId, int fromX, int fromY, int toX, int toY, float? transitionTime, Action continuation)
     {
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         var fromPosition = window.UiToNorm(new Vector2(fromX, fromY));
         return LinearFromNormPosition(fromPosition, new Vector2(toX, toY), itemId, transitionTime, continuation);
     }
@@ -58,7 +57,7 @@ public class ItemTransitionManager : Component
         Action continuation)
     {
         var assets = Resolve<IAssetManager>();
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         var destPosition = window.UiToNorm(toUiPosition); // Tom's portrait, hardcoded for now.
 
         // Note: no need to attach as child as transitions clean themselves up.
@@ -116,7 +115,7 @@ public class ItemTransitionManager : Component
     bool GravityFromNormPosition(Vector2 fromNormPosition, ItemId itemId, Action continuation)
     {
         var assets = Resolve<IAssetManager>();
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
 
         // Note: no need to attach as child as transitions clean themselves up.
         switch (itemId.Type)

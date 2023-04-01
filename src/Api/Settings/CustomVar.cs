@@ -5,7 +5,6 @@ namespace UAlbion.Api.Settings;
 
 public class CustomVar<TLogical, TPersistent> : IVar<TLogical>
 {
-    readonly TLogical _defaultValue;
     readonly Func<TLogical, TPersistent> _castTo;
     readonly Func<TPersistent, TLogical> _castFrom;
     readonly Func<JsonElement, TPersistent> _castJson;
@@ -13,13 +12,15 @@ public class CustomVar<TLogical, TPersistent> : IVar<TLogical>
     public CustomVar(string key, TLogical defaultValue, Func<TLogical, TPersistent> castTo, Func<TPersistent, TLogical> castFrom, Func<JsonElement, TPersistent> castJson)
     {
         Key = key;
-        _defaultValue = defaultValue;
+        DefaultValue = defaultValue;
         _castTo = castTo ?? throw new ArgumentNullException(nameof(castTo));
         _castFrom = castFrom ?? throw new ArgumentNullException(nameof(castFrom));
         _castJson = castJson;
     }
 
     public string Key { get; }
+    public TLogical DefaultValue { get; }
+
     public TLogical Read(IVarSet varSet)
     {
         if (varSet == null) throw new ArgumentNullException(nameof(varSet));
@@ -30,10 +31,10 @@ public class CustomVar<TLogical, TPersistent> : IVar<TLogical>
             throw new FormatException($"Var {Key} was of unexpected type {objValue.GetType()}, expected {typeof(TPersistent)}");
         }
 
-        return _defaultValue;
+        return DefaultValue;
     }
 
-    public void Write(IVarSet varSet, TLogical value)
+    public void Write(ISettings varSet, TLogical value)
     {
         if (varSet == null) throw new ArgumentNullException(nameof(varSet));
         varSet.SetValue(Key, _castTo(value));

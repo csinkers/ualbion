@@ -42,7 +42,7 @@ public class DialogFrame : UiElement
     void Rebuild(int width, int height, DrawLayer order)
     {
         static AssetId Id<T>(T enumValue) where T : unmanaged, Enum => AssetId.From(enumValue);
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
 
         { // Check if we need to rebuild
             var normSize = window.UiToNormRelative(width, height);
@@ -171,7 +171,7 @@ public class DialogFrame : UiElement
     {
         Rebuild(extents.Width, extents.Height, (DrawLayer)order);
 
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         _sprite.Position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
 
         return base.Render(extents, order, parent);

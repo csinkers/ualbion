@@ -63,7 +63,7 @@ public class StatusBarPortrait : UiElement
 
         e.Propagating = false;
         var party = Resolve<IParty>();
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         var cursorManager = Resolve<ICursorManager>();
         var tf = Resolve<ITextFormatter>();
 

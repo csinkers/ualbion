@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
+using UAlbion.Api.Settings;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -21,9 +22,9 @@ namespace UAlbion.Game.Assets;
 
 public class ModApplier : Component, IModApplier
 {
+    readonly AssetCache _assetCache = new();
     readonly Dictionary<string, ModInfo> _mods = new();
     readonly List<ModInfo> _modsInReverseDependencyOrder = new();
-    readonly AssetCache _assetCache = new();
     readonly Dictionary<string, LanguageConfig> _languages = new();
 
     IAssetLocator _assetLocator;
@@ -60,12 +61,14 @@ public class ModApplier : Component, IModApplier
 
         _mods.Clear();
         _modsInReverseDependencyOrder.Clear();
+        TryResolve<IVarRegistry>()?.Clear();
         mapping.Clear();
 
         foreach (var mod in mods.Reverse())
             LoadMod(pathResolver.ResolvePathAbsolute("$(MODS)"), mod.Trim(), mapping);
 
         _modsInReverseDependencyOrder.Reverse();
+
         Raise(ModsLoadedEvent.Instance);
     }
 
@@ -151,6 +154,10 @@ public class ModApplier : Component, IModApplier
             jsonUtil,
             x => _assetLocator.GetSubItemRangesForFile(x, modInfo.SerdesContext),
             x => modInfo.SerdesContext.Disk.ReadAllBytes(pathResolver.ResolvePath(x)));
+
+        if (assetConfig.VarTypes != null)
+            LoadVarTypes(modName, assetConfig.VarTypes);
+
         _mods.Add(modName, modInfo);
         _modsInReverseDependencyOrder.Add(modInfo);
     }
@@ -170,16 +177,46 @@ public class ModApplier : Component, IModApplier
         config.RegisterStringRedirects(mapping);
     }
 
-    public AssetInfo GetAssetInfo(AssetId key, string language = null) =>
-        _modsInReverseDependencyOrder
-            .SelectMany(x => x.AssetConfig.GetAssetInfo(key))
-            .FirstOrDefault(x =>
+    void LoadVarTypes(string modName, IEnumerable<string> varTypes)
+    {
+        var registry = TryResolve<IVarRegistry>();
+        if (registry == null)
+        {
+            Warn("No VarRegistry found, skipping var registration");
+            return;
+        }
+
+        foreach (var typeName in varTypes)
+        {
+            var type = Type.GetType(typeName);
+            if (type == null)
+                throw new InvalidOperationException($"Could not load type \"{typeName}\" as Var container from mod {modName}");
+
+            registry.Register(type);
+        }
+    }
+
+    public AssetInfo GetAssetInfo(AssetId key, string language = null)
+    {
+        foreach (var mod in _modsInReverseDependencyOrder)
+        {
+            var assetInfos = mod.AssetConfig.GetAssetInfo(key);
+            foreach(var info in assetInfos)
             {
-                var assetLanguage = x.Get<string>(AssetProperty.Language, null);
-                return language == null || 
-                       assetLanguage == null || 
-                       string.Equals(assetLanguage, language, StringComparison.OrdinalIgnoreCase);
-            });
+                if (language == null)
+                    return info;
+
+                var assetLanguage = info.Get<string>(AssetProperty.Language, null);
+                if (assetLanguage == null)
+                    return info;
+
+                if (string.Equals(assetLanguage, language, StringComparison.OrdinalIgnoreCase))
+                    return info;
+            }
+        }
+
+        return null;
+    }
 
     public object LoadAsset(AssetId id) => LoadAsset(id, null);
     public object LoadAsset(AssetId id, string language)

@@ -41,11 +41,16 @@ public class AssetConfig : IAssetConfig
     /// </summary>
     [JsonIgnore] public IReadOnlyDictionary<string, AssetFileInfo>  Files          { get; private set; }
 
+    /// <summary>
+    /// The collection of types containing static IVar instances to be registered
+    /// </summary>
+    [JsonInclude, JsonPropertyName("VarTypes")] public List<string> VarTypes { get; private set; } = new();
+
     // Dictionaries containing only the details defined in this particular mod, and not in any that this mod inherits from.
     [JsonInclude, JsonPropertyName("IdTypes")]        public Dictionary<string, AssetTypeInfo>  RawIdTypes        { get; private set; } = new();
     [JsonInclude, JsonPropertyName("StringMappings")] public Dictionary<string, string>         RawStringMappings { get; private set; } = new();
     [JsonInclude, JsonPropertyName("Loaders")]        public Dictionary<string, string>         RawLoaders        { get; private set; } = new();
-    [JsonInclude, JsonPropertyName("Containers")]      public Dictionary<string, string>         RawContainers     { get; private set; } = new();
+    [JsonInclude, JsonPropertyName("Containers")]     public Dictionary<string, string>         RawContainers     { get; private set; } = new();
     [JsonInclude, JsonPropertyName("PostProcessors")] public Dictionary<string, string>         RawPostProcessors { get; private set; } = new();
     [JsonInclude, JsonPropertyName("Languages")]      public Dictionary<string, LanguageConfig> RawLanguages      { get; private set; } = new();
     [JsonInclude, JsonPropertyName("Files")]          public Dictionary<string, AssetFileInfo>  RawFiles          { get; private set; } = new();

@@ -89,7 +89,7 @@ public class DialogManagerTests
             .Attach(new WordLookup())
             .Attach(new TextFormatter())
             .Attach(new TextManager())
-            .Attach(new WindowManager { Resolution = (1920, 1080) })
+            .Attach(new GameWindow(1920, 1080))
             .Attach(dm)
             .Attach(lm)
             .Register<ICommonColors>(new CommonColors())

@@ -325,7 +325,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
             return false;
 
         var cursorManager = Resolve<ICursorManager>();
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         var cursorUiPosition = window.PixelToUi(cursorManager.Position);
 
         switch (GetInventoryAction(slotId))

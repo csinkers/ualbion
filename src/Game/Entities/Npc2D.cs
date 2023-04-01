@@ -172,8 +172,8 @@ public class Npc2D : Component
         if (!CanTalk)
             return;
 
-        var window = Resolve<IWindowManager>();
-        var camera = Resolve<ICamera>();
+        var window = Resolve<IGameWindow>();
+        var camera = Resolve<ICameraProvider>().Camera;
         var tf = Resolve<ITextFormatter>();
 
         var normPosition = camera.ProjectWorldToNorm(_sprite.Position);

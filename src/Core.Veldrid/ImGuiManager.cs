@@ -5,18 +5,19 @@ using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Veldrid.Reflection;
+using UAlbion.Core.Visual;
 using Veldrid;
+using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
 public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
 {
-    readonly Action<IImGuiManager> _menuFunc;
+    readonly Action<IImGuiManager, IFramebufferHolder, ICameraProvider, GameWindow> _menuFunc;
     readonly List<IImGuiWindow> _windows = new();
     int _nextWindowId;
-    bool _demoOpen;
 
-    public ImGuiManager(Action<IImGuiManager> menuFunc)
+    public ImGuiManager(Action<IImGuiManager, IFramebufferHolder, ICameraProvider, GameWindow> menuFunc)
     {
         _menuFunc = menuFunc ?? throw new ArgumentNullException(nameof(menuFunc));
         On<DeviceCreatedEvent>(_ => Dirty());
@@ -45,14 +46,13 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
         _windows.Add(window);
     }
 
-    public void Draw()
+    public void Draw(GraphicsDevice device, IFramebufferHolder gameFramebuffer, ICameraProvider mainCamera, GameWindow gameWindow)
     {
         ReflectorUtil.SwapAuxiliaryState();
-        _menuFunc(this);
+        _menuFunc(this, gameFramebuffer, mainCamera, gameWindow);
 
         ImGui.DockSpaceOverViewport();
-        ImGui.ShowDemoWindow(ref _demoOpen);
         foreach (var window in _windows)
-            window.Draw();
+            window.Draw(device);
     }
 }

@@ -59,7 +59,7 @@ public class UiRectangle : UiElement
         _dirty = false;
         _lastPosition = position;
 
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
         var commonColors = Resolve<ICommonColors>();
 
@@ -89,7 +89,7 @@ public class UiRectangle : UiElement
             return order;
 
         _ = parent == null ? null : new LayoutNode(parent, this, extents, order);
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         var position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
         if (_dirty || position != _lastPosition || _sprite?.Key.RenderOrder != (DrawLayer)order)
             Rebuild(position, (DrawLayer)order);

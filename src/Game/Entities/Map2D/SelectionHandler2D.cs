@@ -103,8 +103,8 @@ public sealed class SelectionHandler2D : Component
     {
         int x = _lastHighlightIndex % _map.Width;
         int y = _lastHighlightIndex / _map.Width;
-        var window = Resolve<IWindowManager>();
-        var camera = Resolve<ICamera>();
+        var window = Resolve<IGameWindow>();
+        var camera = Resolve<ICameraProvider>().Camera;
         var tf = Resolve<ITextFormatter>();
 
         IText S(TextId textId) => tf.Center().Format(textId);
@@ -175,8 +175,8 @@ public sealed class SelectionHandler2D : Component
       x MapPopup_TalkTo
         MapPopup_Rest
       x MapPopup_MainMenu
-        MapPopup_Map (3D only0
-        MapPopup_Wait (3D only0
+        MapPopup_Map (3D only)
+        MapPopup_Wait (3D only)
 
         MapPopup_Blocked1
         MapPopup_Blocked2

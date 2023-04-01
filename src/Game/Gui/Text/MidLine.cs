@@ -53,7 +53,7 @@ public class MidLine : UiElement
         UpdateSprite((DrawLayer)order);
 
         var assets = Resolve<IAssetManager>();
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         var yPosition = extents.Y + extents.Height / 2;
         var position = new Vector3(window.UiToNorm(extents.X + MarginX, yPosition), 0);
         var size = window.UiToNormRelative(extents.Width - 2 * MarginX, 1);

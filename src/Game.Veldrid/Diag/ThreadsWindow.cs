@@ -1,7 +1,8 @@
 ﻿using System;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
-using UAlbion.Core;
+using UAlbion.Core.Veldrid;
+using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -14,7 +15,7 @@ public class ThreadsWindow : Component, IImGuiWindow
 
     public ThreadsWindow(int id) => _name = $"Threads###Threads{id}";
 
-    public void Draw()
+    public void Draw(GraphicsDevice device)
     {
         ImGui.Begin(_name);
         ImGui.TextUnformatted(Context.ToString());

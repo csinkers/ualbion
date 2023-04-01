@@ -14,8 +14,8 @@ namespace UAlbion.Game.Veldrid.Input;
 
 public class RightButtonHeldMouseMode : Component
 {
-    static readonly PopMouseModeEvent _popMouseModeEvent = new();
-    static readonly ShowMapMenuEvent _showMapMenuEvent = new();
+    static readonly PopMouseModeEvent PopMouseModeEvent = new();
+    static readonly ShowMapMenuEvent ShowMapMenuEvent = new();
     readonly List<Selection> _hits = new();
     readonly MapSprite _cursor;
     Vector2 _lastTilePosition;
@@ -77,8 +77,8 @@ public class RightButtonHeldMouseMode : Component
 
     void ShowContextMenu(IEnumerable<Selection> orderedHits)
     {
-        _showMapMenuEvent.Propagating = true;
-        Raise(_popMouseModeEvent);
-        Distribute(_showMapMenuEvent, orderedHits, x => x.Target as IComponent);
+        ShowMapMenuEvent.Propagating = true;
+        Raise(PopMouseModeEvent);
+        Distribute(ShowMapMenuEvent, orderedHits, x => x.Target as IComponent);
     }
 }

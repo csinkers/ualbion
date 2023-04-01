@@ -78,7 +78,7 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
 
     void Select(ScreenCoordinateSelectEvent e)
     {
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         _selectionContext.NormPosition = window.PixelToNorm(e.Position);
         _selectionContext.UiPosition = window.NormToUi(_selectionContext.NormPosition);
         _selectionContext.Selections = e.Selections;

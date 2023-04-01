@@ -28,7 +28,7 @@ public class FloatVar : IVar<float>
         return DefaultValue;
     }
 
-    public void Write(IVarSet varSet, float value)
+    public void Write(ISettings varSet, float value)
     {
         if (varSet == null) throw new ArgumentNullException(nameof(varSet));
         varSet.SetValue(Key, value);

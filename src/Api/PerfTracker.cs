@@ -142,4 +142,8 @@ public static class PerfTracker
             FrameCounters[name] = count + 1;
         }
     }
+
+    public static void Skip()
+    {
+    }
 }

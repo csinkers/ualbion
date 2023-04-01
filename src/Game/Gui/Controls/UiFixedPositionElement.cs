@@ -48,7 +48,7 @@ public class UiFixedPositionElement : UiElement
 
     void Rebuild()
     {
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         var position = new Vector3(window.UiToNorm(_extents.X, _extents.Y), 0);
         var size = window.UiToNormRelative(_extents.Width, _extents.Height);
 

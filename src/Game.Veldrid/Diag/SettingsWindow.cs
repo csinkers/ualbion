@@ -3,8 +3,10 @@ using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Core.Veldrid;
 using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
+using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -17,7 +19,7 @@ public class SettingsWindow : Component, IImGuiWindow
         _name = $"Settings###Settings{id}";
     }
 
-    public void Draw()
+    public void Draw(GraphicsDevice device)
     {
         ImGui.Begin(_name);
 

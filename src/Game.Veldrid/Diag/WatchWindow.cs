@@ -1,8 +1,9 @@
 ﻿using ImGuiNET;
 using UAlbion.Api.Eventing;
-using UAlbion.Core;
+using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Reflection;
 using UAlbion.Game.State;
+using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -15,7 +16,7 @@ public class WatchWindow : Component, IImGuiWindow
         _name = $"Watch###Watch{id}";
     }
 
-    public void Draw()
+    public void Draw(GraphicsDevice device)
     {
         ImGui.Begin(_name);
 

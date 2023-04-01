@@ -1,51 +1,51 @@
 {
-  "Audio.PollIntervalSeconds": 0.1,
+  "Game.Audio.PollIntervalSeconds": 0.1,
 
-  "Inventory.CarryWeightPerStrength": 1000,
-  "Inventory.GramsPerGold": 20,
-  "Inventory.GramsPerRation": 250,
+  "Game.Inventory.CarryWeightPerStrength": 1000,
+  "Game.Inventory.GramsPerGold": 20,
+  "Game.Inventory.GramsPerRation": 250,
 
-  "NpcMovement.TicksPerFrame": 12, // Number of game ticks it takes to advance to the next animation frame
-  "NpcMovement.TicksPerTile": 24, // Number of game ticks it takes to move across a map tile
+  "Game.NpcMovement.TicksPerFrame": 12, // Number of game ticks it takes to advance to the next animation frame
+  "Game.NpcMovement.TicksPerTile": 24, // Number of game ticks it takes to move across a map tile
 
-  "PartyMovement.MaxTrailDistanceLarge": 18,
-  "PartyMovement.MaxTrailDistanceSmall": 12,
-  "PartyMovement.MinTrailDistanceLarge": 12,
-  "PartyMovement.MinTrailDistanceSmall": 6,
-  "PartyMovement.TicksPerFrame": 9, // Number of game ticks it takes to advance to the next animation frame
-  "PartyMovement.TicksPerTile": 12, // Number of game ticks it takes to move across a map tile
+  "Game.PartyMovement.MaxTrailDistanceLarge": 18,
+  "Game.PartyMovement.MaxTrailDistanceSmall": 12,
+  "Game.PartyMovement.MinTrailDistanceLarge": 12,
+  "Game.PartyMovement.MinTrailDistanceSmall": 6,
+  "Game.PartyMovement.TicksPerFrame": 9, // Number of game ticks it takes to advance to the next animation frame
+  "Game.PartyMovement.TicksPerTile": 12, // Number of game ticks it takes to move across a map tile
 
-  "Time.FastTicksPerAssetCacheCycle": 3600,
-  "Time.FastTicksPerMapTileFrame": 10,
-  "Time.FastTicksPerSecond": 60.0,
-  "Time.FastTicksPerSlowTick": 6, // Used for palette cycling & 'every-step' events
-  "Time.GameSecondsPerSecond": 180.0,
-  "Time.IdleTicksPerSecond": 8,
+  "Game.Time.FastTicksPerAssetCacheCycle": 3600,
+  "Game.Time.FastTicksPerMapTileFrame": 10,
+  "Game.Time.FastTicksPerSecond": 60.0,
+  "Game.Time.FastTicksPerSlowTick": 6, // Used for palette cycling & 'every-step' events
+  "Game.Time.GameSecondsPerSecond": 180.0,
+  "Game.Time.IdleTicksPerSecond": 8,
 
-  "UI.ButtonDoubleClickIntervalSeconds": 0.35,
-  "UI.MouseLookSensitivity": 2.0,
-  "UI.Transitions.DefaultTransitionTimeSeconds": 0.35,
-  "UI.Transitions.DiscardItemGravity": 9.8,
-  "UI.Transitions.DiscardItemMaxInitialX": 2.0,
-  "UI.Transitions.DiscardItemMaxInitialY": 2.2,
-  "UI.Transitions.InventoryChangLerpSeconds": 0.25,
-  "UI.Transitions.ItemMovementTransitionTimeSeconds": 0.2,
-  "UI.Transitions.MaxDiscardTransitions": 24,
+  "Game.UI.ButtonDoubleClickIntervalSeconds": 0.35,
+  "Game.UI.MouseLookSensitivity": 2.0,
+  "Game.UI.Transitions.DefaultTransitionTimeSeconds": 0.35,
+  "Game.UI.Transitions.DiscardItemGravity": 9.8,
+  "Game.UI.Transitions.DiscardItemMaxInitialX": 2.0,
+  "Game.UI.Transitions.DiscardItemMaxInitialY": 2.2,
+  "Game.UI.Transitions.InventoryChangLerpSeconds": 0.25,
+  "Game.UI.Transitions.ItemMovementTransitionTimeSeconds": 0.2,
+  "Game.UI.Transitions.MaxDiscardTransitions": 24,
 
-  "Visual.Camera2D.LerpRate": 3.0,
-  "Visual.Camera2D.TileOffsetX": 1.0,
-  "Visual.Camera2D.TileOffsetY": 2.0,
-  "Visual.Skybox.VisibleProportion": 0.8,
-  "Visual.SpriteManager.CacheCheckIntervalSeconds": 12.0,
-  "Visual.TextureSource.CacheCheckIntervalSeconds": 5.0,
+  "Game.Visual.Camera2D.LerpRate": 3.0,
+  "Game.Visual.Camera2D.TileOffsetX": 1.0,
+  "Game.Visual.Camera2D.TileOffsetY": 2.0,
+  "Core.Visual.Skybox.VisibleProportion": 0.8,
+  "Core.Visual.SpriteManager.CacheCheckIntervalSeconds": 12.0,
+  "Core.Visual.TextureSource.CacheCheckIntervalSeconds": 5.0,
 
-  "User.ActiveMods": "Albion", // Comma separated list
+  "Core.User.Visual.EngineFlags": 16,
   "User.Audio.FxVolume": 48,
   "User.Audio.MusicVolume": 32,
-  "User.Combat.MessageDelay": 3,
   "User.Debug.Flags": 0,
-  "User.Visual.EngineFlags": 16,
-  "User.Language": "ENGLISH",
+  "User.Gameplay.ActiveMods": "Albion", // Comma separated list
+  "User.Gameplay.Language": "ENGLISH",
+  "User.Gameplay.Combat.MessageDelay": 3,
 
   // Directory to look for the files from the original game.
   // Should contain MAIN.EXE, DRIVERS/ALBISND.OPL, and all the files in CD/XLDS.

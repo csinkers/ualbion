@@ -126,12 +126,9 @@ static class Albion
             return mesh;
         }
 
-        var imgui = new ImGuiManager(DiagMenus.Draw);
-
         var gameServices = new Container("Game",
             sceneManager,
-            imgui,
-            new AlbionRenderSystem(sceneManager, imgui),
+            new AlbionRenderSystem(sceneManager),
             new TextureSource(),
             new VeldridGameFactory(LoadMesh),
             new MeshManager(LoadMesh),

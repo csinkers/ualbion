@@ -157,9 +157,9 @@ public class PartyInventory : Component
             return;
 
         var map = TryResolve<IMapManager>()?.Current;
-        var window = TryResolve<IWindowManager>();
+        var window = TryResolve<IGameWindow>();
         var party = TryResolve<IParty>();
-        var camera = TryResolve<ICamera>();
+        var camera = TryResolve<ICameraProvider>()?.Camera;
 
         if (map == null || window == null || party == null || camera == null)
             return;

@@ -81,7 +81,7 @@ public class UiSpriteElement : UiElement
             return order;
         }
 
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         var position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
         var size = window.UiToNormRelative(extents.Width, extents.Height);
 

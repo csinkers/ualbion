@@ -14,14 +14,18 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
     internal List<RenderPass> Passes { get; init; }
     internal List<IFramebufferHolder> Framebuffers { get; init; }
     internal IResourceProvider ResourceProvider { get; init; }
-    internal Action<RenderSystem> PreRender { get; init; }
-    internal Action<RenderSystem> PostRender { get; init; }
+    internal Action<RenderSystem, GraphicsDevice> PreRender { get; init; }
+    internal Action<RenderSystem, GraphicsDevice> PostRender { get; init; }
 
     CommandList _frameCommands;
     Fence _fence;
+    bool _addedChildren;
 
-    public RenderSystem()
+    public RenderSystem(IEnumerable<IComponent> extraComponents)
     {
+        foreach (var component in extraComponents)
+            AttachChild(component);
+
         On<DeviceCreatedEvent>(e => RebuildDeviceObjects(e.Device));
         On<DestroyDeviceObjectsEvent>(_ => DestroyDeviceObjects());
     }
@@ -45,7 +49,7 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
 
     protected override void Subscribed()
     {
-        if (Children.Count > 0)
+        if (_addedChildren)
             return; // Already initialised?
 
         if (ResourceProvider is IComponent rpComponent)
@@ -57,6 +61,8 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
 
         foreach (var pass in Passes)
             AttachChild(pass);
+
+        _addedChildren = true;
     }
 
     public void Render(GraphicsDevice graphicsDevice)
@@ -65,7 +71,7 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
         if (_frameCommands == null)
             RebuildDeviceObjects(graphicsDevice);
 
-        PreRender?.Invoke(this);
+        PreRender?.Invoke(this, graphicsDevice);
 
         int i = 0;
         foreach (var phase in Passes)
@@ -85,7 +91,7 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
                 graphicsDevice.WaitForFence(_fence);
         }
 
-        PostRender?.Invoke(this);
+        PostRender?.Invoke(this, graphicsDevice);
     }
 
     public void Dispose()

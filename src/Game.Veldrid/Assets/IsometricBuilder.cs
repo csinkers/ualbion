@@ -105,7 +105,8 @@ public class IsometricBuilder : Component
         if (Framebuffer == null) 
             return;
 
-        var mag = TryResolve<ICamera>()?.Magnification ?? 1.0f;
+        var camera = TryResolve<ICameraProvider>()?.Camera;
+        var mag = camera?.Magnification ?? 1.0f;
         Framebuffer.Width = (uint)(ExpansionFactor * _width * _tilesPerRow * mag);
         Framebuffer.Height = (uint)(ExpansionFactor * _height * rows * mag);
     }

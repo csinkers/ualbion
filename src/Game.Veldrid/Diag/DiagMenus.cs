@@ -1,11 +1,14 @@
 ﻿using ImGuiNET;
+using UAlbion.Core;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Visual;
+using VeldridGen.Interfaces;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
 public static class DiagMenus
 {
-    public static void Draw(IImGuiManager manager)
+    public static void Draw(IImGuiManager manager, IFramebufferHolder gameFramebuffer, ICameraProvider mainCamera, GameWindow gameWindow)
     {
         if (!ImGui.BeginMainMenuBar())
             return;
@@ -24,10 +27,11 @@ public static class DiagMenus
             if (ImGui.MenuItem("Asset Explorer")) manager.AddWindow(new AssetExplorerWindow(manager.GetNextWindowId()));
             if (ImGui.MenuItem("Console")) manager.AddWindow(new ImGuiConsoleLogger(manager.GetNextWindowId()));
             if (ImGui.MenuItem("Demo Window")) manager.AddWindow(new DemoWindow(manager.GetNextWindowId()));
+            if (ImGui.MenuItem("Game")) manager.AddWindow(new ImGuiGameWindow(manager.GetNextWindowId(), gameFramebuffer, gameWindow));
             if (ImGui.MenuItem("Inspector Demo")) manager.AddWindow(new InspectorDemoWindow(manager.GetNextWindowId()));
             if (ImGui.MenuItem("Inspector")) manager.AddWindow(new InspectorWindow(manager.GetNextWindowId()));
             // if (ImGui.MenuItem("Profiler")) manager.AddWindow(new ProfilerWindow(manager.GetNextWindowId()));
-            if (ImGui.MenuItem("Positions")) manager.AddWindow(new PositionsWindow(manager.GetNextWindowId()));
+            if (ImGui.MenuItem("Positions")) manager.AddWindow(new PositionsWindow(manager.GetNextWindowId(), mainCamera));
             if (ImGui.MenuItem("Settings")) manager.AddWindow(new SettingsWindow(manager.GetNextWindowId()));
             if (ImGui.MenuItem("Stats")) manager.AddWindow(new StatsWindow(manager.GetNextWindowId()));
 

@@ -71,7 +71,7 @@ public class ButtonFrame : UiElement
 
         _lastExtents = extents;
 
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         var cc = Resolve<ICommonColors>();
         var theme = _theme(_state);
 

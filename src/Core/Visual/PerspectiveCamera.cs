@@ -124,7 +124,7 @@ public class PerspectiveCamera : Component, ICamera
 
     protected override void Subscribed()
     {
-        Viewport = Resolve<IWindowManager>().Size;
+        Viewport = Resolve<IGameWindow>().Size;
         _dirty = true;
         base.Subscribed();
     }

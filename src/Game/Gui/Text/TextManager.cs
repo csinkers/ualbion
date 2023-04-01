@@ -43,7 +43,7 @@ public class TextManager : ServiceComponent<ITextManager>, ITextManager
         if (block == null) throw new ArgumentNullException(nameof(block));
         var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
         var assets = Resolve<IAssetManager>();
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
 
         var font = assets.LoadFont(block.Style == TextStyle.Big ? Base.Font.Bold : Base.Font.Regular, block.InkId);
         var text = block.Text ?? "";
@@ -51,7 +51,7 @@ public class TextManager : ServiceComponent<ITextManager>, ITextManager
 
         int offset = 0;
         var flags = SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.ClampEdges;
-        scissorRegion = scissorRegion == null ? null : Resolve<IWindowManager>().UiToPixel(scissorRegion.Value);
+        scissorRegion = scissorRegion == null ? null : Resolve<IGameWindow>().UiToPixel(scissorRegion.Value);
         var key = new SpriteKey(font.Texture, SpriteSampler.Point, layer, flags, scissorRegion);
 
         int displayableCharacterCount = 0;

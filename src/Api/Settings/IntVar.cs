@@ -27,7 +27,7 @@ public class IntVar : IVar<int>
         return DefaultValue;
     }
 
-    public void Write(IVarSet varSet, int value)
+    public void Write(ISettings varSet, int value)
     {
         if (varSet == null) throw new ArgumentNullException(nameof(varSet));
         varSet.SetValue(Key, value);

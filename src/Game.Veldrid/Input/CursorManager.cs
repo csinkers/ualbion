@@ -61,8 +61,10 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         {
             if (_relative)
             {
-                var windowState = Resolve<IWindowManager>();
-                Position = new Vector2((int)(windowState.PixelWidth / 2), (int)(windowState.PixelHeight / 2));
+                var windowState = Resolve<IGameWindow>();
+                int posX = windowState.PixelWidth / 2;
+                int posY = windowState.PixelHeight / 2;
+                Position = new Vector2(posX, posY);
             }
             else Position = e.Snapshot.MousePosition;
             _dirty = true;
@@ -77,7 +79,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
     void SetCursor(SpriteId cursorId)
     {
         var assets = Resolve<IAssetManager>();
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         var config = assets.GetAssetInfo(cursorId);
 
         _cursorId = cursorId;
@@ -100,7 +102,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
 
         var assets = Resolve<IAssetManager>();
         var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
 
         if (window.Size.X < 1 || window.Size.Y < 1)
             return;
@@ -111,7 +113,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         RenderHotspot(sm, window, showHotspot);
     }
 
-    void RenderHotspot(IBatchManager<SpriteKey, SpriteInfo> sm, IWindowManager window, bool showHotspot)
+    void RenderHotspot(IBatchManager<SpriteKey, SpriteInfo> sm, IGameWindow gameWindow, bool showHotspot)
     {
         if(!showHotspot)
         {
@@ -127,8 +129,8 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
             _hotspotSprite = sm.Borrow(key, 1, this);
         }
 
-        var position = new Vector3(window.PixelToNorm(Position), 0.0f);
-        var size = window.UiToNormRelative(Vector2.One);
+        var position = new Vector3(gameWindow.PixelToNorm(Position), 0.0f);
+        var size = gameWindow.UiToNormRelative(Vector2.One);
 
         bool lockWasTaken = false;
         var instances = _hotspotSprite.Lock(ref lockWasTaken);
@@ -139,7 +141,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         finally { _hotspotSprite.Unlock(lockWasTaken); }
     }
 
-    void RenderCursor(IAssetManager assets, IBatchManager<SpriteKey, SpriteInfo> sm, IWindowManager window, Vector3 position)
+    void RenderCursor(IAssetManager assets, IBatchManager<SpriteKey, SpriteInfo> sm, IGameWindow gameWindow, Vector3 position)
     {
         if (!_showCursor)
         {
@@ -161,7 +163,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
             _cursorSprite = sm.Borrow(key, 1, this);
         }
 
-        var size = window.UiToNormRelative(new Vector2(cursorTexture.Width, cursorTexture.Height));
+        var size = gameWindow.UiToNormRelative(new Vector2(cursorTexture.Width, cursorTexture.Height));
 
         bool lockWasTaken = false;
         var instances = _cursorSprite.Lock(ref lockWasTaken);
@@ -172,7 +174,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         finally { _cursorSprite.Unlock(lockWasTaken); }
     }
 
-    void RenderItemInHandCursor(IAssetManager assets, IBatchManager<SpriteKey, SpriteInfo> sm, IWindowManager window, Vector3 normPosition)
+    void RenderItemInHandCursor(IAssetManager assets, IBatchManager<SpriteKey, SpriteInfo> sm, IGameWindow gameWindow, Vector3 normPosition)
     {
         if (_lastAmount != _heldItemCount)
         {
@@ -224,17 +226,17 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         var instances = _itemSprite.Lock(ref lockWasTaken);
         try
         {
-            var normOffset = window.UiToNormRelative(ItemSpriteOffset.X, ItemSpriteOffset.Y);
+            var normOffset = gameWindow.UiToNormRelative(ItemSpriteOffset.X, ItemSpriteOffset.Y);
             instances[0] = new SpriteInfo(
                 SpriteFlags.TopLeft,
                 normPosition + new Vector3(normOffset, 0),
-                window.UiToNormRelative(subImage.Size), 
+                gameWindow.UiToNormRelative(subImage.Size), 
                 subImage);
         }
         finally { _itemSprite.Unlock(lockWasTaken); }
 
         if (_itemAmountSprite != null)
-            _itemAmountSprite.Position = normPosition + new Vector3(window.UiToNormRelative(subImage.Size), 0);
+            _itemAmountSprite.Position = normPosition + new Vector3(gameWindow.UiToNormRelative(subImage.Size), 0);
     }
 
     string GetAmountText()

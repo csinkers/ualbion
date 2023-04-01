@@ -149,6 +149,12 @@
     "atlas": "UAlbion.Formats.Parsers.AtlasPostProcessor, UAlbion.Formats"
   },
 
+  "VarTypes": [
+    "UAlbion.Formats.Config.GameVars, UAlbion.Formats",
+    "UAlbion.Game.Settings.UserVars, UAlbion.Game",
+    "UAlbion.Core.CoreVars, UAlbion.Core"
+  ],
+
   "Languages": {
     "ENGLISH": { "DisplayName": "English",  "ShortName": "EN" },
     "GERMAN":  { "DisplayName": "Deutsch",  "ShortName": "DE" },

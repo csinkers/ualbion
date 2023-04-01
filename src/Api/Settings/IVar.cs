@@ -1,8 +1,13 @@
 ﻿namespace UAlbion.Api.Settings;
 
-public interface IVar<T>
+public interface IVar
 {
     string Key { get; }
+}
+
+public interface IVar<T> : IVar
+{
+    T DefaultValue { get; }
     T Read(IVarSet varSet);
-    void Write(IVarSet varSet, T value);
+    void Write(ISettings varSet, T value);
 }

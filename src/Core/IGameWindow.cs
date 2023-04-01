@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace UAlbion.Core;
 
-public interface IWindowManager
+public interface IGameWindow
 {
     int PixelWidth { get; }
     int PixelHeight { get; }
@@ -25,49 +25,49 @@ public interface IWindowManager
 
 public static class WindowManagerExtensions
 {
-    public static Vector2 UiToNorm(this IWindowManager wm, float x, float y)
+    public static Vector2 UiToNorm(this IGameWindow wm, float x, float y)
     {
         if (wm == null) throw new ArgumentNullException(nameof(wm));
         return wm.UiToNorm(new Vector2(x, y));
     }
 
-    public static Vector2 NormToUi(this IWindowManager wm, float x, float y)
+    public static Vector2 NormToUi(this IGameWindow wm, float x, float y)
     {
         if (wm == null) throw new ArgumentNullException(nameof(wm));
         return wm.NormToUi(new Vector2(x, y));
     }
 
-    public static Vector2 NormToPixel(this IWindowManager wm, float x, float y)
+    public static Vector2 NormToPixel(this IGameWindow wm, float x, float y)
     {
         if (wm == null) throw new ArgumentNullException(nameof(wm));
         return wm.NormToPixel(new Vector2(x, y));
     }
 
-    public static Vector2 PixelToNorm(this IWindowManager wm, float x, float y)
+    public static Vector2 PixelToNorm(this IGameWindow wm, float x, float y)
     {
         if (wm == null) throw new ArgumentNullException(nameof(wm));
         return wm.PixelToNorm(new Vector2(x, y));
     }
 
-    public static Vector2 UiToNormRelative(this IWindowManager wm, float x, float y)
+    public static Vector2 UiToNormRelative(this IGameWindow wm, float x, float y)
     {
         if (wm == null) throw new ArgumentNullException(nameof(wm));
         return wm.UiToNormRelative(new Vector2(x, y));
     }
 
-    public static Vector2 NormToUiRelative(this IWindowManager wm, float x, float y)
+    public static Vector2 NormToUiRelative(this IGameWindow wm, float x, float y)
     {
         if (wm == null) throw new ArgumentNullException(nameof(wm));
         return wm.NormToUiRelative(new Vector2(x, y));
     }
 
-    public static Vector2 NormToPixelRelative(this IWindowManager wm, float x, float y)
+    public static Vector2 NormToPixelRelative(this IGameWindow wm, float x, float y)
     {
         if (wm == null) throw new ArgumentNullException(nameof(wm));
         return wm.NormToPixelRelative(new Vector2(x, y));
     }
 
-    public static Vector2 PixelToNormRelative(this IWindowManager wm, float x, float y)
+    public static Vector2 PixelToNormRelative(this IGameWindow wm, float x, float y)
     {
         if (wm == null) throw new ArgumentNullException(nameof(wm));
         return wm.PixelToNormRelative(new Vector2(x, y));

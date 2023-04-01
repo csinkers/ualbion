@@ -57,7 +57,7 @@ public class NormalMouseMode : Component
         if (_lastPosition != e.Snapshot.MousePosition)
         {
             _lastPosition = e.Snapshot.MousePosition;
-            var window = Resolve<IWindowManager>();
+            var window = Resolve<IGameWindow>();
             var uiPosition = window.NormToUi(window.PixelToNorm(e.Snapshot.MousePosition));
             _moveEvent.X = (int)uiPosition.X;
             _moveEvent.Y = (int)uiPosition.Y;

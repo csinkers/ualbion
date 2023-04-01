@@ -24,7 +24,7 @@ public class RepeatedBackground : UiElement
     void Rebuild(int width, int height, DrawLayer order)
     {
         var shadowSubImage = new Region(Vector2.Zero, Vector2.Zero, Vector2.One, 0);
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
 
         { // Check if we need to rebuild
@@ -71,7 +71,7 @@ public class RepeatedBackground : UiElement
     {
         Rebuild(extents.Width, extents.Height, (DrawLayer)order);
 
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         _sprite.Position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
 
         return base.Render(extents, order, parent);

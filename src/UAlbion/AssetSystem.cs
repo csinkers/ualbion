@@ -58,6 +58,7 @@ public static class AssetSystem
             .Add(new AssetLoaderRegistry())
             .Add(new ContainerRegistry())
             .Add(new PostProcessorRegistry())
+            .Add(new VarRegistry())
             .Add(new AssetLocator());
         PerfTracker.StartupEvent("Registered asset services");
 
@@ -65,7 +66,6 @@ public static class AssetSystem
         exchange.Attach(modApplier);
         modApplier.LoadMods(mapping, pathResolver, mods ?? UserVars.Gameplay.ActiveMods.Read(settings));
         mapping.ConsistencyCheck();
-        PerfTracker.StartupEvent("Loaded mods");
 
         exchange.Attach(new Container("Logging",
             new LogHistory(),
@@ -77,6 +77,8 @@ public static class AssetSystem
             .Add(new SpellManager());
 
         settings.Reload();
+        PerfTracker.StartupEvent("Loaded mods");
+
         return exchange;
     }
 #pragma warning restore CA2000 // Dispose objects before losing scope

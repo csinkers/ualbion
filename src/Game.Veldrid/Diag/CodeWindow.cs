@@ -2,9 +2,10 @@
 using ImGuiColorTextEditNet;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
-using UAlbion.Core;
+using UAlbion.Core.Veldrid;
 using UAlbion.Formats;
 using UAlbion.Formats.MapEvents;
+using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -49,7 +50,7 @@ public class CodeWindow : Component, IImGuiWindow
         };
     }
 
-    public void Draw()
+    public void Draw(GraphicsDevice device)
     {
         var context = _getContext();
         if (context == null)

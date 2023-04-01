@@ -9,7 +9,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
-public sealed class DebugGuiRenderer : Component, IRenderer, IDisposable
+public sealed class DebugGuiRenderer : ServiceComponent<IImGuiTextureProvider>, IImGuiTextureProvider, IRenderer, IDisposable
 {
     readonly OutputDescription _outputFormat;
     ImGuiRenderer _imguiRenderer;
@@ -45,7 +45,7 @@ public sealed class DebugGuiRenderer : Component, IRenderer, IDisposable
 
         if (_imguiRenderer == null)
         {
-            var window = Resolve<IWindowManager>();
+            var window = Resolve<IGameWindow>();
             _imguiRenderer = new ImGuiRenderer(
                 graphicsDevice,
                 _outputFormat,
@@ -79,4 +79,9 @@ public sealed class DebugGuiRenderer : Component, IRenderer, IDisposable
         _imguiRenderer.Render(device, cl);
         cl.SetFullScissorRects();
     }
+
+    public IntPtr GetOrCreateImGuiBinding(ResourceFactory factory, TextureView textureView) => _imguiRenderer.GetOrCreateImGuiBinding(factory, textureView);
+    public IntPtr GetOrCreateImGuiBinding(ResourceFactory factory, Texture texture) => _imguiRenderer.GetOrCreateImGuiBinding(factory, texture);
+    public void RemoveImGuiBinding(TextureView textureView) => _imguiRenderer.RemoveImGuiBinding(textureView);
+    public void RemoveImGuiBinding(Texture texture) => _imguiRenderer.RemoveImGuiBinding(texture);
 }

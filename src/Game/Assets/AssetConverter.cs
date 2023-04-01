@@ -7,10 +7,10 @@ using UAlbion.Api.Eventing;
 using UAlbion.Api.Settings;
 using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Magic;
-using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Assets;
 
@@ -29,13 +29,13 @@ public sealed class AssetConverter : IDisposable
         var applier = new ModApplier();
         var exchange = new EventExchange(new LogExchange()) { Name = $"EventExchange for {string.Join(", ", mods)}"};
         var assetLoaderRegistry = new AssetLoaderRegistry();
-        var settings = new VarSetContainer();
+        var settings = new VarSet("ConfigOnly");
 
         exchange
             .Register<IPathResolver>(pathResolver)
+            .Register<IVarSet>(settings)
             .Register(disk)
             .Register(jsonUtil)
-            .Attach(settings)
             .Attach(new StdioConsoleLogger())
             .Attach(assetLoaderRegistry)
             .Attach(new ContainerRegistry())
@@ -49,7 +49,7 @@ public sealed class AssetConverter : IDisposable
 
         var config = (IVarSet)applier.LoadAsset(AssetId.From(Base.Special.GameConfig));
         if (config != null) // This might fail for Unpacked etc prior to an export being done
-            settings.Set = config;
+            settings.Apply(config);
 
         return (applier, exchange, assetLoaderRegistry);
     }

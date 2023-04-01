@@ -11,7 +11,7 @@ public class OrthographicCameraTests
     public void TestPickingRay()
     {
         var ee = new EventExchange(new LogExchange());
-        var wm = new WindowManager { Resolution = (1024, 1024) };
+        var wm = new GameWindow(1024, 1024);
         var camera = new OrthographicCamera { Position = Vector3.Zero };
         ee.Attach(wm).Attach(camera);
 

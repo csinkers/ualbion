@@ -1,29 +1,41 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
+using UAlbion.Core.Veldrid;
 using UAlbion.Core.Visual;
 using UAlbion.Game.Input;
 using UAlbion.Game.State;
+using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
 public class PositionsWindow : Component, IImGuiWindow
 {
+    readonly ICameraProvider _cameraProvider;
     readonly string _name;
 
-    public PositionsWindow(int id)
+    public PositionsWindow(int id, ICameraProvider cameraProvider)
     {
+        _cameraProvider = cameraProvider ?? throw new ArgumentNullException(nameof(cameraProvider));
         _name = $"Positions###Positions{id}";
     }
 
-    public void Draw()
+    public void Draw(GraphicsDevice device)
     {
         ImGui.Begin(_name);
 
-        var window = Resolve<IWindowManager>();
-        var camera = Resolve<ICamera>();
+        var window = Resolve<IGameWindow>();
         var mousePosition = Resolve<ICursorManager>().Position;
+        var camera = _cameraProvider.Camera;
+        if (camera == null)
+        {
+            ImGui.Text("No camera found");
+            ImGui.End();
+            return;
+        }
+
         Vector3 cameraPosition = camera.Position;
         Vector3 cameraTilePosition = cameraPosition;
 

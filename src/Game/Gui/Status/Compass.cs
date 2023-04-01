@@ -82,7 +82,7 @@ public class Compass : Dialog
 
     (int,int) CalculateMarkerPosition()
     {
-        var camera = Resolve<ICamera>() as PerspectiveCamera;
+        var camera = Resolve<ICameraProvider>().Camera as PerspectiveCamera;
         var angle = camera?.Yaw ?? 0;
         angle += (float)Math.PI / 2;
         var direction = new Vector2((float)Math.Cos(angle), -(float)Math.Sin(angle));

@@ -12,8 +12,9 @@ namespace UAlbion.Core.Veldrid.Textures;
 
 class TextureCache<T> : Component, IDisposable where T : TextureHolder
 {
+    record struct CacheEntry(WeakReference<T> Holder, Texture Texture, int Version);
     readonly object _syncRoot = new();
-    readonly Dictionary<ITexture, (WeakReference<T>, Texture, int)> _cache = new(); // (holderRef, texture, version)
+    readonly Dictionary<ITexture, CacheEntry> _cache = new();
     readonly Func<ITexture, T> _holderFactory;
     readonly Func<GraphicsDevice, ITexture, Texture> _textureFactory;
     readonly HashSet<ITexture> _dirtySet = new();
@@ -30,7 +31,7 @@ class TextureCache<T> : Component, IDisposable where T : TextureHolder
 
         // Make fallback texture
         _defaultHolder = factory(defaultTexture);
-        _cache[defaultTexture] = (new WeakReference<T>(_defaultHolder), null, 0);
+        _cache[defaultTexture] = new CacheEntry(new WeakReference<T>(_defaultHolder), null, 0);
         _dirtySet.Add(defaultTexture);
 
         On<TextureDirtyEvent>(e =>
@@ -63,13 +64,13 @@ class TextureCache<T> : Component, IDisposable where T : TextureHolder
         lock (_syncRoot)
         {
             if (_cache.TryGetValue(texture, out var entry)
-                && entry.Item1.TryGetTarget(out var holder))
+                && entry.Holder.TryGetTarget(out var holder))
             {
-                if (entry.Item3 != texture.Version)
+                if (entry.Version != texture.Version)
                 {
                     holder.DeviceTexture = null;
-                    entry.Item2?.Dispose();
-                    _cache[texture] = (entry.Item1, null, texture.Version);
+                    entry.Texture?.Dispose();
+                    _cache[texture] = new(entry.Holder, null, texture.Version);
                     Dirty(texture);
                 }
 
@@ -77,7 +78,7 @@ class TextureCache<T> : Component, IDisposable where T : TextureHolder
             }
 
             holder = _holderFactory(texture);
-            _cache[texture] = (new WeakReference<T>(holder), null, texture.Version);
+            _cache[texture] = new(new WeakReference<T>(holder), null, texture.Version);
             Dirty();
 
             return holder;
@@ -91,7 +92,7 @@ class TextureCache<T> : Component, IDisposable where T : TextureHolder
             long totalSize = 0;
             foreach (var entry in _cache.OrderBy(x => x.Key.SizeInBytes))
             {
-                entry.Value.Item1.TryGetTarget(out var holder);
+                entry.Value.Holder.TryGetTarget(out var holder);
                 var status = holder == null
                     ? "(unused)"
                     : "(active)";
@@ -132,8 +133,8 @@ class TextureCache<T> : Component, IDisposable where T : TextureHolder
     {
         lock (_syncRoot)
         {
-            IEnumerable<ITexture> keys = action == CacheAction.Update && _allDirty == false 
-                ? _dirtySet 
+            IEnumerable<ITexture> keys = action == CacheAction.Update && _allDirty == false
+                ? _dirtySet
                 : _cache.Keys.ToList();
 
             foreach (var key in keys)
@@ -147,21 +148,21 @@ class TextureCache<T> : Component, IDisposable where T : TextureHolder
                         {
                             texture = _textureFactory(device, key);
                             holder.DeviceTexture = texture;
-                            _cache[key] = (holderRef, texture, version);
+                            _cache[key] = new(holderRef, texture, version);
                         }
                         else if (key.Version != version) // Texture out of date? Refresh it
                         {
                             texture.Dispose();
                             texture = _textureFactory(device, key); // TODO: More efficient updates, partial updates etc
                             holder.DeviceTexture = texture;
-                            _cache[key] = (holderRef, texture, key.Version);
+                            _cache[key] = new(holderRef, texture, key.Version);
                         }
                     }
                     else if (texture != null && action == CacheAction.ForceCleanup) // Gfx subsystem shutting down? Dispose all
                     {
                         texture.Dispose();
                         holder.DeviceTexture = null;
-                        _cache[key] = (holderRef, null, version);
+                        _cache[key] = new(holderRef, null, version);
                     }
                 }
                 else // No longer used, always clean up the texture and remove cache entry

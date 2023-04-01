@@ -8,6 +8,7 @@ using UAlbion.Core.Veldrid.Meshes;
 using UAlbion.Core.Veldrid.Skybox;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Visual;
+using UAlbion.Game.Veldrid.Diag;
 using UAlbion.Game.Veldrid.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
@@ -22,7 +23,10 @@ public sealed class AlbionRenderSystem : Component, IDisposable
     (float Red, float Green, float Blue, float Alpha) _clearColour;
     bool _debugMode;
 
-    public AlbionRenderSystem(ICameraProvider mainCamera, IImGuiManager imgui)
+    static Action<RenderSystem, GraphicsDevice> BuildPreRender(IImGuiManager imgui, IFramebufferHolder gameFramebuffer, ICameraProvider mainCamera, GameWindow gameWindow)
+        => (_, device) => imgui.Draw(device, gameFramebuffer, mainCamera, gameWindow);
+
+    public AlbionRenderSystem(ICameraProvider mainCamera)
     {
         OutputDescription screenFormat = new(
             new OutputAttachmentDescription(PixelFormat.R32_Float),
@@ -45,38 +49,49 @@ public sealed class AlbionRenderSystem : Component, IDisposable
             .Source("s_sky", new SkyboxManager())
             .Source("s_debug", new DebugGuiRenderable())
 
-            .System("sys_default", pb => 
-                pb
+            .System("sys_default", sys => 
+                sys
                 .Framebuffer("fb_screen", new MainFramebuffer("fb_screen"))
+                .Component("c_gamewindow", new GameWindow(1,1))
+                .Component("c_windowupdater", AdHocComponent.Build((GameWindow)sys.GetComponent("c_gamewindow"), (gameWindow, x) =>
+                {
+                    x.On<WindowResizedEvent>(e => gameWindow.Resize(e.Width, e.Height));
+                }))
                 .Resources(new GlobalResourceSetProvider())
-                .Pass("p_game", passBuilder => 
-                    passBuilder
+                .Pass("p_game", pass => 
+                    pass
                     .Renderers("r_sprite", "r_blended", "r_tile", "r_etm", "r_mesh", "r_sky")
                     .Sources("s_sprite", "s_blended", "s_tile", "s_etm", "s_mesh", "s_sky")
                     .Target("fb_screen")
-                    .Resources(new MainPassResourceProvider(pb.GetFramebuffer("fb_screen"), mainCamera))
+                    .Resources(new MainPassResourceProvider(sys.GetFramebuffer("fb_screen"), mainCamera))
                     .Render(MainRenderFunc)
                     .Build()
                 )
                 .Build()
             )
-            .System("sys_debug", pb => 
-                pb
+            .System("sys_debug", sys => 
+                sys
                 .Framebuffer("fb_screen", new MainFramebuffer("fb_screen"))
-                .Framebuffer("fb_game", new SimpleFramebuffer("fb_game", 1, 1))
+                .Framebuffer("fb_game", new SimpleFramebuffer("fb_game", 360, 240))
+                .Component("c_imgui", new ImGuiManager(DiagMenus.Draw))
+                .Component("c_gamewindow", new GameWindow(360, 240))
                 .Resources(new GlobalResourceSetProvider())
-                .PreRender(_ => imgui.Draw())
-                .Pass("p_game", passBuilder => 
-                    passBuilder
+                .PreRender(BuildPreRender(
+                    (IImGuiManager)sys.GetComponent("c_imgui"),
+                    sys.GetFramebuffer("fb_game"),
+                    mainCamera,
+                    (GameWindow)sys.GetComponent("c_gamewindow")))
+                .Pass("p_game", pass => 
+                    pass
                     .Renderers("r_sprite", "r_blended", "r_tile", "r_etm", "r_mesh", "r_sky")
                     .Sources("s_sprite", "s_blended", "s_tile", "s_etm", "s_mesh", "s_sky")
                     .Target("fb_game")
-                    .Resources(new MainPassResourceProvider(pb.GetFramebuffer("fb_game"), mainCamera))
+                    .Resources(new MainPassResourceProvider(sys.GetFramebuffer("fb_game"), mainCamera))
                     .Render(MainRenderFunc)
                     .Build()
                 )
-                .Pass("Debug", passBuilder =>
-                    passBuilder
+                .Pass("Debug", pass =>
+                    pass
                     .Renderer("r_debug")
                     .Source("s_debug")
                     .Target("fb_screen")
@@ -106,8 +121,11 @@ public sealed class AlbionRenderSystem : Component, IDisposable
 
     void SetRenderSystem()
     {
-        _default.IsActive = !_debugMode;
-        _debug.IsActive = _debugMode;
+        var activeSystem = _debugMode ? _debug : _default;
+        var inactiveSystem = _debugMode ? _default : _debug;
+
+        inactiveSystem.IsActive = false; // Make sure both systems aren't active at the same time, or any overlapping ServiceComponents will throw
+        activeSystem.IsActive = true;
 
         Enqueue(new ShowHardwareCursorEvent(_debugMode));
 

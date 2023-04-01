@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
-using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Reflection;
+using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -18,7 +19,7 @@ public class InspectorWindow : Component, IImGuiWindow
         On<InspectorPickEvent>(e => _hits = e.Selections);
     }
 
-    public void Draw()
+    public void Draw(GraphicsDevice device)
     {
         ImGui.Begin(_name);
         int hitId = 0;

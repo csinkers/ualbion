@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using UAlbion.Api.Settings;
 using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
@@ -58,7 +59,7 @@ public class OptionsMenu : ModalDialog
         AttachChild(new DialogFrame(stack));
 
         _musicVolume = Var(UserVars.Audio.MusicVolume);
-        _fxVolume = Var(UserVars.Audio.FxVolume);
+        _fxVolume    = Var(UserVars.Audio.FxVolume);
         _combatDelay = Var(UserVars.Gameplay.CombatDelay);
     }
 

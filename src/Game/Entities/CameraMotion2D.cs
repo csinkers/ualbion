@@ -64,16 +64,15 @@ public class CameraMotion2D : Component
         else
         {
             var party = Resolve<IParty>();
-            var settings = Resolve<ISettings>();
-            var lerpRate = GameVars.VisualVars.Camera2D.LerpRate.Read(settings);
+            var lerpRate = Var(GameVars.VisualVars.Camera2D.LerpRate);
             if (map == null || party == null || !party.StatusBarOrder.Any()) return;
             var leader = party.Leader;
             if (leader == null)
                 return;
 
             var tileOffset = new Vector3(
-                GameVars.VisualVars.Camera2D.TileOffsetX.Read(settings),
-                GameVars.VisualVars.Camera2D.TileOffsetY.Read(settings),
+                Var(GameVars.VisualVars.Camera2D.TileOffsetX),
+                Var(GameVars.VisualVars.Camera2D.TileOffsetY),
                 0);
 
             var tilePosition = leader.GetPosition() + tileOffset;

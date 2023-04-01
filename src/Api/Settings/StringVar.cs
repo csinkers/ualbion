@@ -8,11 +8,11 @@ public class StringVar : IVar<string>
     public StringVar(string key, string defaultValue)
     {
         Key = key;
-        _defaultValue = defaultValue;
+        DefaultValue = defaultValue;
     }
 
     public string Key { get; }
-    readonly string _defaultValue;
+    public string DefaultValue { get; }
 
     public string Read(IVarSet varSet)
     {
@@ -24,10 +24,10 @@ public class StringVar : IVar<string>
             throw new FormatException($"Var {Key} was of unexpected type {objValue.GetType()}, expected string");
         }
 
-        return _defaultValue;
+        return DefaultValue;
     }
 
-    public void Write(IVarSet varSet, string value)
+    public void Write(ISettings varSet, string value)
     {
         if (varSet == null) throw new ArgumentNullException(nameof(varSet));
         varSet.SetValue(Key, value);

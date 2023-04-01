@@ -62,7 +62,7 @@ public class UiTextBlock : UiElement // Renders a single TextBlock in the UI
             return order;
 
         _ = parent == null ? null : new LayoutNode(parent, this, extents, order);
-        var window = Resolve<IWindowManager>();
+        var window = Resolve<IGameWindow>();
         var newPosition = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);
 
         switch (Block.Alignment)

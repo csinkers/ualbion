@@ -34,9 +34,14 @@ public sealed class RenderManager : Component, IDisposable
             if (framebuffer is IComponent component)
                 AttachChild(component);
 
-        foreach (var pipeline in Systems.Values)
-            if (pipeline is IComponent component)
+        foreach (var system in Systems.Values)
+        {
+            if (system is IComponent component)
+            {
+                system.IsActive = false; // Systems start inactive to avoid clashes between any ServiceComponents they provide
                 AttachChild(component);
+            }
+        }
 
         base.Subscribed();
     }

@@ -10,7 +10,7 @@ using UAlbion.Game.Scenes;
 
 namespace UAlbion.Game.State;
 
-public class SceneManager : Container, ISceneManager, ICameraProvider
+public class SceneManager : Container, ISceneManager
 {
     readonly IDictionary<SceneId, IScene> _scenes = new Dictionary<SceneId, IScene>();
 
@@ -22,8 +22,17 @@ public class SceneManager : Container, ISceneManager, ICameraProvider
     public SceneId ActiveSceneId { get; private set; }
     public IScene GetScene(SceneId sceneId) => _scenes.TryGetValue(sceneId, out var scene) ? scene : null;
     public IScene ActiveScene => _scenes[ActiveSceneId];
-    protected override void Subscribing() => Exchange.Register(typeof(ISceneManager), this, false);
-    protected override void Unsubscribed() => Exchange.Unregister(typeof(ISceneManager), this);
+    protected override void Subscribing()
+    {
+        Exchange.Register(typeof(ISceneManager), this, false);
+        Exchange.Register(typeof(ICameraProvider), this, false);
+    }
+
+    protected override void Unsubscribed()
+    {
+        Exchange.Unregister(typeof(ISceneManager), this);
+        Exchange.Unregister(typeof(ICameraProvider), this);
+    }
 
     protected override bool AddingChild(IComponent child)
     {

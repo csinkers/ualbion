@@ -30,7 +30,7 @@ public class TextureSource : ServiceComponent<ITextureSource>, ITextureSource, I
     static ITexture BuildDefault()
     {
         var result = new SimpleTexture<byte>(null, 64, 64);
-        Checkerboard( result.GetMutableLayerBuffer(0).Buffer);
+        Checkerboard(result.GetMutableLayerBuffer(0).Buffer);
         return result;
     }
 

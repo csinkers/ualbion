@@ -280,7 +280,7 @@ public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManage
                 _music?.CycleBuffers();
             }
 
-            var camera = TryResolve<ICamera>();
+            var camera = TryResolve<ICameraProvider>()?.Camera;
             if (camera != null)
                 device.Listener.Position = camera.Position;
         }
@@ -292,7 +292,9 @@ public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManage
     {
         get
         {
-            var position = Resolve<ICamera>()?.Position ?? Vector3.Zero;
+            var camera = TryResolve<ICameraProvider>()?.Camera;
+            var position = camera?.Position ?? Vector3.Zero;
+
             lock (_syncRoot)
             {
                 return _activeSounds

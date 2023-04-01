@@ -37,8 +37,6 @@ class WindowHolder : Component, IDisposable
             if (!e.Enabled)
                 Sdl2Native.SDL_WarpMouseInWindow(_window.SdlWindowHandle, _window.Width / 2, _window.Height / 2);
         });
-
-        AttachChild(new WindowManager());
     }
 
     public void CreateWindow(int x, int y, int width, int height)
@@ -100,7 +98,7 @@ class WindowHolder : Component, IDisposable
     public void PumpEvents(double deltaSeconds)
     {
         SetTitle();
-        using (PerfTracker.FrameEvent("2.1 SDL events"))
+        using (PerfTracker.FrameEvent("SDL events"))
             Sdl2Events.ProcessEvents();
 
         var snapshot = _window.PumpEvents();
@@ -110,7 +108,7 @@ class WindowHolder : Component, IDisposable
 
         if (_pendingCursorUpdate.HasValue && _window.Focused)
         {
-            using (PerfTracker.FrameEvent("2.2 Warping mouse"))
+            using (PerfTracker.FrameEvent("Warping mouse"))
             {
                 Sdl2Native.SDL_WarpMouseInWindow(
                     _window.SdlWindowHandle,
@@ -120,8 +118,9 @@ class WindowHolder : Component, IDisposable
                 _pendingCursorUpdate = null;
             }
         }
+        else PerfTracker.Skip();
 
-        using (PerfTracker.FrameEvent("2.3 Raising preview input event"))
+        using (PerfTracker.FrameEvent("Raising preview input event"))
         {
             _previewEvent.DeltaSeconds = deltaSeconds;
             _previewEvent.Snapshot = snapshot;
@@ -130,7 +129,7 @@ class WindowHolder : Component, IDisposable
 
         if (!_previewEvent.SuppressKeyboard)
         {
-            using (PerfTracker.FrameEvent("2.4 Raising keyboard event"))
+            using (PerfTracker.FrameEvent("Raising keyboard event"))
             {
                 _keyboardEvent.DeltaSeconds = deltaSeconds;
                 _keyboardEvent.KeyCharPresses = snapshot.KeyCharPresses;
@@ -138,10 +137,11 @@ class WindowHolder : Component, IDisposable
                 Raise(_keyboardEvent);
             }
         }
+        else PerfTracker.Skip();
 
         if (!_previewEvent.SuppressMouse)
         {
-            using (PerfTracker.FrameEvent("2.5 Raising mouse event"))
+            using (PerfTracker.FrameEvent("Raising mouse event"))
             {
                 _mouseEvent.DeltaSeconds = deltaSeconds;
                 _mouseEvent.Snapshot = snapshot;
@@ -149,5 +149,6 @@ class WindowHolder : Component, IDisposable
                 Raise(_mouseEvent);
             }
         }
+        else PerfTracker.Skip();
     }
 }

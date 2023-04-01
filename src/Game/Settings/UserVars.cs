@@ -15,16 +15,16 @@ public static class UserVars
 
     public static class Audio
     {
-        public static readonly IntVar FxVolume = new("User.Audio.FxVolume", 48);
+        public static readonly IntVar FxVolume    = new("User.Audio.FxVolume", 48);
         public static readonly IntVar MusicVolume = new("User.Audio.MusicVolume", 32);
     }
 
     public static class Gameplay
     {
-        public static readonly StringVar Language = new("User.Language", Base.Language.English);
-        public static readonly IntVar CombatDelay = new("User.Combat.MessageDelay", 3);
+        public static readonly StringVar Language = new("User.Gameplay.Language", Base.Language.English);
+        public static readonly IntVar CombatDelay = new("User.Gameplay.Combat.MessageDelay", 3);
         public static readonly CustomVar<List<string>, string> ActiveMods = new(
-            "User.ActiveMods",
+            "User.Gameplay.ActiveMods",
             new List<string> { "Albion" },
             x => string.Join(",", x),
             x => (x ?? "").Split(',').ToList(),

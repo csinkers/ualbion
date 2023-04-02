@@ -2,6 +2,7 @@
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
+using UAlbion.Api.Settings;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using Veldrid;
@@ -24,11 +25,11 @@ class WindowHolder : Component, IDisposable
 
     public WindowHolder()
     {
-        On<SetCursorPositionEvent>(e => _pendingCursorUpdate = new Vector2(e.X, e.Y));
-        On<ToggleFullscreenEvent>(_ => ToggleFullscreenState());
-        On<ShowHardwareCursorEvent>(e => { if (_window != null) _window.CursorVisible = e.Show; });
-        On<ToggleResizableEvent>(_ => { if (_window != null) _window.Resizable = !_window.Resizable; });
-        On<ToggleVisibleBorderEvent>(_ => { if (_window != null) _window.BorderVisible = !_window.BorderVisible; });
+        On<SetCursorPositionEvent>(e    => _pendingCursorUpdate = new Vector2(e.X, e.Y));
+        On<ToggleFullscreenEvent>(_     => ToggleFullscreenState());
+        On<ShowHardwareCursorEvent>(e   => { if (_window != null) _window.CursorVisible = e.Show; });
+        On<ToggleResizableEvent>(_      => { if (_window != null) _window.Resizable = !_window.Resizable; });
+        On<ToggleVisibleBorderEvent>(_  => { if (_window != null) _window.BorderVisible = !_window.BorderVisible; });
         On<ConfineMouseToWindowEvent>(e => { if (_window != null) Sdl2Native.SDL_SetWindowGrab(_window.SdlWindowHandle, e.Enabled); });
         On<SetRelativeMouseModeEvent>(e =>
         {
@@ -39,22 +40,34 @@ class WindowHolder : Component, IDisposable
         });
     }
 
-    public void CreateWindow(int x, int y, int width, int height)
+    public void CreateWindow()
     {
         if (_window != null)
             return;
+
+        var x = Var(CoreVars.Ui.WindowPosX);
+        var y = Var(CoreVars.Ui.WindowPosY);
+        var w = Var(CoreVars.Ui.WindowWidth);
+        var h = Var(CoreVars.Ui.WindowHeight);
 
         var windowInfo = new WindowCreateInfo
         {
             X = x,
             Y = y,
-            WindowWidth = _window?.Width ?? width,
-            WindowHeight = _window?.Height ?? height,
-            WindowInitialState = _window?.WindowState ?? WindowState.Normal,
+            WindowWidth = w,
+            WindowHeight = h,
+            WindowInitialState = WindowState.Normal,
             WindowTitle = "UAlbion"
         };
 
         _window = VeldridStartup.CreateWindow(ref windowInfo);
+        _window.Moved += pos =>
+        {
+            var settings = Resolve<ISettings>();
+            CoreVars.Ui.WindowPosX.Write(settings, pos.X);
+            CoreVars.Ui.WindowPosY.Write(settings, pos.Y);
+        };
+
         _window.Resized += () =>
         {
             if (_lastState != _window.WindowState)
@@ -67,11 +80,15 @@ class WindowHolder : Component, IDisposable
                 _lastState = _window.WindowState;
             }
 
+            var settings = Resolve<ISettings>();
+            CoreVars.Ui.WindowWidth.Write(settings, _window.Width);
+            CoreVars.Ui.WindowHeight.Write(settings, _window.Height);
             Raise(new WindowResizedEvent(_window.Width, _window.Height));
         };
-        _window.Closed += () => Raise(new WindowClosedEvent());
+
+        _window.Closed      += () => Raise(new WindowClosedEvent());
         _window.FocusGained += () => Raise(new FocusGainedEvent());
-        _window.FocusLost += () => Raise(new FocusLostEvent());
+        _window.FocusLost   += () => Raise(new FocusLostEvent());
         _lastState = _window.WindowState;
         Raise(new WindowResizedEvent(_window.Width, _window.Height));
     }
@@ -80,6 +97,7 @@ class WindowHolder : Component, IDisposable
     {
         if (_window == null)
             return;
+
         bool isFullscreen = _window.WindowState == WindowState.BorderlessFullScreen;
         _window.WindowState = isFullscreen ? WindowState.Normal : WindowState.BorderlessFullScreen;
     }

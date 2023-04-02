@@ -250,12 +250,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         {
             if (_windowHolder != null)
             {
-                var x = Var(CoreVars.Ui.WindowPosX);
-                var y = Var(CoreVars.Ui.WindowPosY);
-                var w = Var(CoreVars.Ui.WindowWidth);
-                var h = Var(CoreVars.Ui.WindowHeight);
-
-                _windowHolder.CreateWindow(x, y, w, h);
+                _windowHolder.CreateWindow();
                 _graphicsDevice = VeldridStartup.CreateGraphicsDevice(_windowHolder.Window, gdOptions, backend);
             }
             else

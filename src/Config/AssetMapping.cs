@@ -11,6 +11,10 @@ using static System.FormattableString;
 
 namespace UAlbion.Config;
 
+/// <summary>
+/// This class manages the mapping between AssetId values (and the various specialised asset id types)
+/// and C# enum types.
+/// </summary>
 public class AssetMapping
 {
     static readonly ThreadLocal<AssetMapping> ThreadLocalGlobal = new(() => new AssetMapping());

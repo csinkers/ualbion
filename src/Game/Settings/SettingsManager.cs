@@ -113,6 +113,8 @@ public class SettingsManager : Component, ISettings
 
         var assets = TryResolve<IAssetManager>();
         var baseConfig = assets?.LoadConfig();
+
+        // The global mapping may be empty for unit tests that construct the asset system statically 
         if (AssetMapping.Global.IsEmpty || baseConfig == null) 
             return;
 
@@ -148,6 +150,5 @@ public class SettingsManager : Component, ISettings
     public bool TryGetValue(string key, out object value) => _set.TryGetValue(key, out value);
     public void SetValue(string key, object value) => _set.SetValue(key, value);
     public void ClearValue(string key) => _set.ClearValue(key);
-    public void SetConfig(IVarSet config) => _set.Apply(config);
 }
 #pragma warning restore CA2227 // Collection properties should be read only

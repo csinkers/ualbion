@@ -9,7 +9,6 @@ using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
-using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Exporters.Tiled;
@@ -47,6 +46,7 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
 
         _engine = AttachChild(new Engine(GraphicsBackend.Vulkan, false, false));
         _isoRsm = AttachChild(new IsometricRenderSystem(tileWidth, tileHeight, baseHeight, tilesPerRow));
+        _isoRsm.OffScreen.IsActive = true;
         _engine.RenderSystem = _isoRsm.OffScreen;
 
         Raise(new SetSceneEvent(SceneId.IsometricBake));

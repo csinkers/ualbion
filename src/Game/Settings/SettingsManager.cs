@@ -111,11 +111,14 @@ public class SettingsManager : Component, ISettings
                 _set.ClearValue(Version.Key);
         }
 
+        // The global mapping may be empty for unit tests that construct the asset system statically 
+        if (AssetMapping.Global.IsEmpty)
+            return;
+
         var assets = TryResolve<IAssetManager>();
         var baseConfig = assets?.LoadConfig();
 
-        // The global mapping may be empty for unit tests that construct the asset system statically 
-        if (AssetMapping.Global.IsEmpty || baseConfig == null) 
+        if (baseConfig == null) 
             return;
 
         _set.Apply(baseConfig);

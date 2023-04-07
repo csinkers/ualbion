@@ -43,3 +43,5 @@ mods/ExportPalettes/Palettes/*
 mods/Repacked/Albion/*
 !mods/Unpacked/
 mods/Unpacked/Assets/*
+!mods/UATest/
+mods/UATest/Saves/*.json

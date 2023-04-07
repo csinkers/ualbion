@@ -47,7 +47,7 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
         _fence = null;
     }
 
-    protected override void Subscribed()
+    protected override void Subscribing()
     {
         if (_addedChildren)
             return; // Already initialised?
@@ -67,7 +67,12 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
 
     public void Render(GraphicsDevice graphicsDevice)
     {
-        if (graphicsDevice == null) throw new ArgumentNullException(nameof(graphicsDevice));
+        if (graphicsDevice == null)
+            throw new ArgumentNullException(nameof(graphicsDevice));
+
+        if (!IsActive)
+            throw new InvalidOperationException($"Tried to render using an inactive RenderSystem ({Name})");
+
         if (_frameCommands == null)
             RebuildDeviceObjects(graphicsDevice);
 

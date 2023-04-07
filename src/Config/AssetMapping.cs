@@ -246,7 +246,7 @@ public class AssetMapping
     public AssetId EnumToId<T>(T id) where T : unmanaged, Enum
     {
         if (!_byEnumType.TryGetValue(typeof(T), out var info))
-            throw new ArgumentOutOfRangeException($"Type {typeof(T)} is not currently mapped.");
+            throw new ArgumentOutOfRangeException(nameof(T), $"Type {typeof(T)} is not currently mapped.");
 
         unsafe
         {

@@ -26,7 +26,7 @@ public sealed class RenderPass : Component
     internal RgbaFloat ClearColor { get; init; }
     public override string ToString() => $"Pass:{Name}";
 
-    protected override void Subscribed()
+    protected override void Subscribing()
     {
         if (_rendererLookup != null)
             return;

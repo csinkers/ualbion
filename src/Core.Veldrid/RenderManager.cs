@@ -17,7 +17,7 @@ public sealed class RenderManager : Component, IDisposable
 
     public IFramebufferHolder GetFramebuffer(string name) => Framebuffers.Single(x => x.Name == name);
 
-    protected override void Subscribed()
+    protected override void Subscribing()
     {
         if (Children.Count > 0)
             return;
@@ -43,7 +43,7 @@ public sealed class RenderManager : Component, IDisposable
             }
         }
 
-        base.Subscribed();
+        base.Subscribing();
     }
 
     public void Dispose()

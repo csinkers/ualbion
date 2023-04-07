@@ -1,4 +1,0 @@
-[submodule "mods/UATest"]
-	path = mods/UATest
-	url = https://github.com/csinkers/UATest
-	shallow = true

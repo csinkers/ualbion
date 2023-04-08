@@ -1,6 +1,6 @@
-﻿using UAlbion.Core.Visual;
+﻿using System;
+using UAlbion.Core.Veldrid.Events;
 using Veldrid;
-using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
@@ -8,5 +8,9 @@ public interface IImGuiManager
 {
     int GetNextWindowId();
     void AddWindow(IImGuiWindow window);
-    void Draw(GraphicsDevice device, IFramebufferHolder gameFramebuffer, ICameraProvider mainCamera, GameWindow gameWindow);
+    IntPtr GetOrCreateImGuiBinding(TextureView textureView);
+    IntPtr GetOrCreateImGuiBinding(Texture texture);
+    void RemoveImGuiBinding(TextureView textureView);
+    void RemoveImGuiBinding(Texture texture);
+    InputEvent LastInput { get; }
 }

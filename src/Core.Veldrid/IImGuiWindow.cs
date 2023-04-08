@@ -1,8 +1,8 @@
-﻿using Veldrid;
+﻿using UAlbion.Api.Eventing;
 
 namespace UAlbion.Core.Veldrid;
 
-public interface IImGuiWindow
+public interface IImGuiWindow : IComponent
 {
-    void Draw(GraphicsDevice device);
+    void Draw();
 }

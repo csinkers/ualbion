@@ -32,6 +32,8 @@ public class RenderSystemBuilder
     public RenderSystemBuilder Resources(IResourceProvider resourceProvider) { Check(); _resourceProvider = resourceProvider; return this; }
     public RenderSystemBuilder Framebuffer(string name, IFramebufferHolder framebuffer) { Check(); _framebuffers.Add(name, framebuffer); return this; }
     public IComponent GetComponent(string name) { Check(); return _components[name]; }
+    public IRenderer GetRenderer(string name) => _manager.GetRenderer(name);
+
     public IFramebufferHolder GetFramebuffer(string name)
     {
         Check();

@@ -3,7 +3,6 @@ using ImGuiColorTextEditNet;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -27,9 +26,10 @@ public class BreakpointsWindow : Component, IImGuiWindow
         };
     }
 
-    public void Draw(GraphicsDevice device)
+    public void Draw()
     {
-        ImGui.Begin(_name);
+        bool open = true;
+        ImGui.Begin(_name, ref open);
         ImGui.TextUnformatted(Context.ToString());
 
         var chainManager = Resolve<IEventManager>();
@@ -53,5 +53,8 @@ public class BreakpointsWindow : Component, IImGuiWindow
         }
 
         ImGui.End();
+
+        if (!open)
+            Remove();
     }
 }

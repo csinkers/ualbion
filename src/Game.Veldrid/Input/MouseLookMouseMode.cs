@@ -94,9 +94,9 @@ public class MouseLookMouseMode : Component
         }
 
         // var windowState = Resolve<IWindowManager>();
-        // var delta = e.Snapshot.MousePosition - new Vector2((int)(windowState.PixelWidth / 2), (int)(windowState.PixelHeight / 2));
+        // var delta = e.MousePosition - new Vector2((int)(windowState.PixelWidth / 2), (int)(windowState.PixelHeight / 2));
         _hits.Clear();
-        Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, true);
+        Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.MousePosition, false, true);
 
         if (e.MouseDelta.LengthSquared() > float.Epsilon)
         {
@@ -112,20 +112,20 @@ public class MouseLookMouseMode : Component
         // it wouldn't be able to transition back to Normal
         if (_hits.Count > 0)
         {
-            if (e.Snapshot.CheckMouse(MouseButton.Right, true))
+            if (e.CheckMouse(MouseButton.Right, true))
                 Distribute(_uiRightClickEvent, _hits, x => x.Target as IComponent);
 
-            if (e.Snapshot.CheckMouse(MouseButton.Left, true))
+            if (e.CheckMouse(MouseButton.Left, true))
                 Distribute(_uiLeftClickEvent, _hits, x => x.Target as IComponent);
 
-            if ((int)e.Snapshot.WheelDelta != 0)
+            if ((int)e.WheelDelta != 0)
             {
-                _uiScrollEvent.Delta = (int)e.Snapshot.WheelDelta;
+                _uiScrollEvent.Delta = (int)e.WheelDelta;
                 Distribute(_uiScrollEvent, _hits, x => x.Target as IComponent);
             }
         }
 
-        if (e.Snapshot.CheckMouse(MouseButton.Left, false))
+        if (e.CheckMouse(MouseButton.Left, false))
             Raise(_uiLeftReleaseEvent);
     }
 }

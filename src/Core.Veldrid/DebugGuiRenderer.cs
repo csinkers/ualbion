@@ -1,5 +1,4 @@
 ﻿using System;
-using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
@@ -9,27 +8,16 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
-public sealed class DebugGuiRenderer : ServiceComponent<IImGuiTextureProvider>, IImGuiTextureProvider, IRenderer, IDisposable
+public sealed class DebugGuiRenderer : Component, IRenderer, IDisposable
 {
     readonly OutputDescription _outputFormat;
-    ImGuiRenderer _imguiRenderer;
+    public ImGuiRenderer ImGuiRenderer { get; private set; }
 
     public Type[] HandledTypes { get; } = { typeof(DebugGuiRenderable) };
     public DebugGuiRenderer(in OutputDescription outputFormat)
     {
         _outputFormat = outputFormat;
-        On<PreviewInputEvent>(e =>
-        {
-            _imguiRenderer?.Update((float)e.DeltaSeconds, e.Snapshot);
-            if (ImGui.GetCurrentContext() == IntPtr.Zero)
-                return;
-
-            var io = ImGui.GetIO();
-            e.SuppressKeyboard = io.WantCaptureKeyboard;
-            e.SuppressMouse = io.WantCaptureMouse;
-        });
-
-        On<WindowResizedEvent>(e => _imguiRenderer?.WindowResized(e.Width, e.Height));
+        On<WindowResizedEvent>(e => ImGuiRenderer?.WindowResized(e.Width, e.Height));
         On<DeviceCreatedEvent>(_ => Dirty());
         On<DestroyDeviceObjectsEvent>(_ => Dispose());
     }
@@ -43,10 +31,10 @@ public sealed class DebugGuiRenderer : ServiceComponent<IImGuiTextureProvider>, 
         if (graphicsDevice == null)
             throw new ArgumentNullException(nameof(graphicsDevice));
 
-        if (_imguiRenderer == null)
+        if (ImGuiRenderer == null)
         {
             var window = Resolve<IGameWindow>();
-            _imguiRenderer = new ImGuiRenderer(
+            ImGuiRenderer = new ImGuiRenderer(
                 graphicsDevice,
                 _outputFormat,
                 window.PixelWidth,
@@ -55,7 +43,7 @@ public sealed class DebugGuiRenderer : ServiceComponent<IImGuiTextureProvider>, 
         }
         else
         {
-            _imguiRenderer.CreateDeviceResources(
+            ImGuiRenderer.CreateDeviceResources(
                 graphicsDevice,
                 graphicsDevice.SwapchainFramebuffer.OutputDescription,
                 ColorSpaceHandling.Linear);
@@ -65,8 +53,8 @@ public sealed class DebugGuiRenderer : ServiceComponent<IImGuiTextureProvider>, 
 
     public void Dispose()
     {
-        _imguiRenderer?.Dispose();
-        _imguiRenderer = null;
+        ImGuiRenderer?.Dispose();
+        ImGuiRenderer = null;
     }
 
     public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, IResourceSetHolder set1, IResourceSetHolder set2)
@@ -76,12 +64,7 @@ public sealed class DebugGuiRenderer : ServiceComponent<IImGuiTextureProvider>, 
         if (renderable is not DebugGuiRenderable)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
-        _imguiRenderer.Render(device, cl);
+        ImGuiRenderer.Render(device, cl);
         cl.SetFullScissorRects();
     }
-
-    public IntPtr GetOrCreateImGuiBinding(ResourceFactory factory, TextureView textureView) => _imguiRenderer.GetOrCreateImGuiBinding(factory, textureView);
-    public IntPtr GetOrCreateImGuiBinding(ResourceFactory factory, Texture texture) => _imguiRenderer.GetOrCreateImGuiBinding(factory, texture);
-    public void RemoveImGuiBinding(TextureView textureView) => _imguiRenderer.RemoveImGuiBinding(textureView);
-    public void RemoveImGuiBinding(Texture texture) => _imguiRenderer.RemoveImGuiBinding(texture);
 }

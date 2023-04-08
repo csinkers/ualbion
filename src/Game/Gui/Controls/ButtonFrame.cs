@@ -52,7 +52,7 @@ public class ButtonFrame : UiElement
     public ButtonFrame(IUiElement child)
     {
         On<BackendChangedEvent>(_ => _lastExtents = new Rectangle());
-        On<WindowResizedEvent>(_ => _lastExtents = new Rectangle());
+        On<GameWindowResizedEvent>(_ => _lastExtents = new Rectangle());
 
         if (child != null)
             AttachChild(child);

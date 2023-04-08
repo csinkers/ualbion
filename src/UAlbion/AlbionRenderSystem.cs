@@ -4,6 +4,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Etm;
+using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Veldrid.Meshes;
 using UAlbion.Core.Veldrid.Skybox;
 using UAlbion.Core.Veldrid.Sprites;
@@ -22,9 +23,6 @@ public sealed class AlbionRenderSystem : Component, IDisposable
     readonly RenderSystem _debug;
     (float Red, float Green, float Blue, float Alpha) _clearColour;
     bool _debugMode;
-
-    static Action<RenderSystem, GraphicsDevice> BuildPreRender(IImGuiManager imgui, IFramebufferHolder gameFramebuffer, ICameraProvider mainCamera, GameWindow gameWindow)
-        => (_, device) => imgui.Draw(device, gameFramebuffer, mainCamera, gameWindow);
 
     public AlbionRenderSystem(ICameraProvider mainCamera)
     {
@@ -52,11 +50,34 @@ public sealed class AlbionRenderSystem : Component, IDisposable
             .System("sys_default", sys => 
                 sys
                 .Framebuffer("fb_screen", new MainFramebuffer("fb_screen"))
+                .Component("c_inputrouter", new AdHocComponent("c_inputrouter",
+                    static x =>
+                    { // When running fullscreen, just echo the mouse input through to the game's mouse modes
+                        var mouseEvent = new MouseInputEvent();
+                        var keyboardEvent = new KeyboardInputEvent();
+                        x.On<InputEvent>(e =>
+                        {
+                            keyboardEvent.DeltaSeconds   = e.DeltaSeconds;
+                            keyboardEvent.KeyCharPresses = e.Snapshot.KeyCharPresses;
+                            keyboardEvent.KeyEvents      = e.Snapshot.KeyEvents;
+                            x.Raise(keyboardEvent);
+
+                            mouseEvent.DeltaSeconds  = e.DeltaSeconds;
+                            mouseEvent.MouseDelta    = e.MouseDelta;
+                            mouseEvent.WheelDelta    = e.Snapshot.WheelDelta;
+                            mouseEvent.MousePosition = e.Snapshot.MousePosition;
+                            mouseEvent.MouseEvents   = e.Snapshot.MouseEvents;
+                            mouseEvent.IsMouseDown   = e.Snapshot.IsMouseDown;
+                            x.Raise(mouseEvent);
+                        });
+                    }))
                 .Component("c_gamewindow", new GameWindow(1,1))
-                .Component("c_windowupdater", AdHocComponent.Build((GameWindow)sys.GetComponent("c_gamewindow"), (gameWindow, x) =>
-                {
-                    x.On<WindowResizedEvent>(e => gameWindow.Resize(e.Width, e.Height));
-                }))
+                .Component("c_windowupdater", // Minimal component to ensure the game resizes with the window
+                    AdHocComponent.Build("c_windowupdater",
+                        (GameWindow)sys.GetComponent("c_gamewindow"),
+                        static (gameWindow, x) 
+                            => x.On<WindowResizedEvent>(e 
+                                => gameWindow.Resize(e.Width, e.Height))))
                 .Resources(new GlobalResourceSetProvider())
                 .Pass("p_game", pass => 
                     pass
@@ -73,14 +94,16 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                 sys
                 .Framebuffer("fb_screen", new MainFramebuffer("fb_screen"))
                 .Framebuffer("fb_game", new SimpleFramebuffer("fb_game", 360, 240))
-                .Component("c_imgui", new ImGuiManager(DiagMenus.Draw))
                 .Component("c_gamewindow", new GameWindow(360, 240))
-                .Resources(new GlobalResourceSetProvider())
-                .PreRender(BuildPreRender(
-                    (IImGuiManager)sys.GetComponent("c_imgui"),
+                // When running windowed, the ImGuiGameWindow will handle translating the mouse input
+                .Component("c_imgui", new ImGuiManager(
+                    (DebugGuiRenderer)sys.GetRenderer("r_debug"),
                     sys.GetFramebuffer("fb_game"),
+                    (GameWindow)sys.GetComponent("c_gamewindow"),
                     mainCamera,
-                    (GameWindow)sys.GetComponent("c_gamewindow")))
+                    DiagMenus.Draw
+                ))
+                .Resources(new GlobalResourceSetProvider())
                 .Pass("p_game", pass => 
                     pass
                     .Renderers("r_sprite", "r_blended", "r_tile", "r_etm", "r_mesh", "r_sky")
@@ -144,8 +167,5 @@ public sealed class AlbionRenderSystem : Component, IDisposable
         pass.CollectAndDraw(device, cl, set1);
     }
 
-    public void Dispose()
-    {
-        _manager.Dispose();
-    }
+    public void Dispose() => _manager.Dispose();
 }

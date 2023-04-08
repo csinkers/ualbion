@@ -102,7 +102,8 @@ public class SettingsManager : Component, ISettings
             // Note: If version doesn't match discard old config and go back to defaults.
             // This is just to clear out any bad entries from before the format was stabilised,
             // if future changes are made to the format we can implement an actual upgrade process.
-            if (Version.Read(_set) != ConfigVersion)
+            int version = Version.Read(_set);
+            if (version != ConfigVersion)
             {
                 Warn($"Settings file was not version {ConfigVersion} - discarding settings");
                 _set = new VarSet(VarSetName);

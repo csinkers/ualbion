@@ -5,7 +5,6 @@ using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -20,10 +19,11 @@ public class ImGuiConsoleLogger : Component, IImGuiWindow
 
     public ImGuiConsoleLogger(int id) => _name = $"Console###{id}";
 
-    public void Draw(GraphicsDevice device)
+    public void Draw()
     {
         var window = Resolve<IGameWindow>();
-        ImGui.Begin(_name);
+        bool open = true;
+        ImGui.Begin(_name, ref open);
         ImGui.SetWindowPos(Vector2.Zero, ImGuiCond.FirstUseEver);
         ImGui.SetWindowSize(new Vector2(window.PixelWidth / 3.0f, window.PixelHeight), ImGuiCond.FirstUseEver);
 
@@ -126,6 +126,9 @@ public class ImGuiConsoleLogger : Component, IImGuiWindow
 
         ImGui.End();
         _wasShown = true;
+
+        if (!open)
+            Remove();
     }
 
     void PrintMessage(ILogExchange logExchange, string message, LogLevel level) 

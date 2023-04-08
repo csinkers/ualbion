@@ -3,7 +3,6 @@ using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Reflection;
 using UAlbion.Game.State;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -16,17 +15,22 @@ public class WatchWindow : Component, IImGuiWindow
         _name = $"Watch###Watch{id}";
     }
 
-    public void Draw(GraphicsDevice device)
+    public void Draw()
     {
-        ImGui.Begin(_name);
+        bool open = true;
+        ImGui.Begin(_name, ref open);
 
         var state = TryResolve<IGameState>();
         if (state != null)
             RenderNode("State", state);
 
         RenderNode("Exchange", Exchange);
+        RenderNode("ImGui", Resolve<IImGuiManager>());
 
         ImGui.End();
+
+        if (!open)
+            Remove();
     }
 
     static void RenderNode(string name, object target)

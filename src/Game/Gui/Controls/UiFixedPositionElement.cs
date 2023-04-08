@@ -18,7 +18,7 @@ public class UiFixedPositionElement : UiElement
     public UiFixedPositionElement(SpriteId id, Rectangle extents)
     {
         On<BackendChangedEvent>(_ => Rebuild());
-        On<WindowResizedEvent>(_ => Rebuild());
+        On<GameWindowResizedEvent>(_ => Rebuild());
         _id = id;
         _extents = extents;
     }

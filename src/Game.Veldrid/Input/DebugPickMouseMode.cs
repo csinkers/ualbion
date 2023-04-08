@@ -18,7 +18,7 @@ public class DebugPickMouseMode : Component
 
     void OnInput(MouseInputEvent e)
     {
-        if (e.Snapshot.CheckMouse(MouseButton.Left, true))
+        if (e.CheckMouse(MouseButton.Left, true))
         {
             var layoutManager = TryResolve<ILayoutManager>();
             layoutManager?.RequestSnapshot();
@@ -27,7 +27,7 @@ public class DebugPickMouseMode : Component
         }
 
         _hits.Clear();
-        Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, true, true);
+        Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.MousePosition, true, true);
         Raise(new InspectorPickEvent(_hits));
     }
 }

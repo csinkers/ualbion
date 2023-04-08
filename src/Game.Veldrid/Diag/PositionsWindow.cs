@@ -7,7 +7,6 @@ using UAlbion.Core.Veldrid;
 using UAlbion.Core.Visual;
 using UAlbion.Game.Input;
 using UAlbion.Game.State;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -22,9 +21,10 @@ public class PositionsWindow : Component, IImGuiWindow
         _name = $"Positions###Positions{id}";
     }
 
-    public void Draw(GraphicsDevice device)
+    public void Draw()
     {
-        ImGui.Begin(_name);
+        bool open = true;
+        ImGui.Begin(_name, ref open);
 
         var window = Resolve<IGameWindow>();
         var mousePosition = Resolve<ICursorManager>().Position;
@@ -59,5 +59,8 @@ public class PositionsWindow : Component, IImGuiWindow
         ImGui.Text($"TileSize: {map?.TileSize} PlayerTilePos: {playerTilePos}");
 
         ImGui.End();
+
+        if (!open)
+            Remove();
     }
 }

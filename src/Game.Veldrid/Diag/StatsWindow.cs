@@ -5,7 +5,6 @@ using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Game.Input;
 using UAlbion.Game.Veldrid.Audio;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -18,9 +17,10 @@ public class StatsWindow : Component, IImGuiWindow
         _name = $"Stats###Stats{id}";
     }
 
-    public void Draw(GraphicsDevice device)
+    public void Draw()
     {
-        ImGui.Begin(_name);
+        bool open = true;
+        ImGui.Begin(_name, ref open);
 
         if (ImGui.Button("Clear"))
             PerfTracker.Clear();
@@ -95,5 +95,8 @@ public class StatsWindow : Component, IImGuiWindow
 
         ImGui.TreePop();
         ImGui.End();
+
+        if (!open)
+            Remove();
     }
 }

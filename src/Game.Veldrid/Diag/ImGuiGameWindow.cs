@@ -4,7 +4,6 @@ using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
-using Veldrid;
 using VeldridGen.Interfaces;
 
 namespace UAlbion.Game.Veldrid.Diag;
@@ -25,25 +24,42 @@ public class ImGuiGameWindow : Component, IImGuiWindow
 
     protected override void Subscribed() => _dirty = true; // Make sure GameWindow gets resized when first displayed
 
-    public void Draw(GraphicsDevice device)
+    public void Draw()
     {
-        var textureProvider = Resolve<IImGuiTextureProvider>();
-        var texture = _framebuffer.Framebuffer.ColorTargets[0].Target;
-        var handle = textureProvider.GetOrCreateImGuiBinding(device.ResourceFactory, texture);
+        var manager = Resolve<IImGuiManager>();
+        var texture = _framebuffer.Framebuffer?.ColorTargets[0].Target;
 
         ImGui.SetNextWindowSize(new Vector2(720 + 8, 480 + 8), ImGuiCond.FirstUseEver);
-        ImGui.Begin(_name);
-        ImGui.Image(handle, new Vector2(_framebuffer.Width, _framebuffer.Height));
-        var contentSize = ImGui.GetWindowContentRegionMax();
-        ImGui.End();
+        ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, Vector2.Zero);
 
-        if (_dirty ||  (int)contentSize.X != _framebuffer.Width || (int)contentSize.Y != _framebuffer.Height)
+        bool open = true;
+        ImGui.Begin(_name, ref open);
+
+        if (texture != null)
+        {
+            var handle = manager.GetOrCreateImGuiBinding(texture);
+            ImGui.Image(handle, new Vector2(_framebuffer.Width, _framebuffer.Height));
+        }
+
+        var vMin = ImGui.GetWindowContentRegionMin();
+        var vMax = ImGui.GetWindowContentRegionMax();
+        var width = (int)(vMax.X - vMin.X);
+        var height = (int)(vMax.Y - vMin.Y);
+
+        ImGui.End();
+        ImGui.PopStyleVar();
+
+        if (_dirty || width != _framebuffer.Width || height != _framebuffer.Height)
         {
             // Framebuffer requires resizing
-            _framebuffer.Width = (uint)contentSize.X;
-            _framebuffer.Height = (uint)contentSize.Y;
-            _gameWindow.Resize((int)contentSize.X, (int)contentSize.Y);
+            _framebuffer.Width = (uint)width;
+            _framebuffer.Height = (uint)height;
+            _gameWindow.Resize(width, height);
+
             _dirty = false;
         }
+
+        if (!open)
+            Remove();
     }
 }

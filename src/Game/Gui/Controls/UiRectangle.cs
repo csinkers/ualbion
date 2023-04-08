@@ -18,7 +18,7 @@ public class UiRectangle : UiElement
     public UiRectangle(CommonColor color)
     {
         On<BackendChangedEvent>(_ => _dirty = true);
-        On<WindowResizedEvent>(_ => _dirty = true);
+        On<GameWindowResizedEvent>(_ => _dirty = true);
         _color = color;
     }
 

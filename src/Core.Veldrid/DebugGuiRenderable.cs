@@ -6,9 +6,11 @@ using UAlbion.Core.Visual;
 
 namespace UAlbion.Core.Veldrid;
 
+/// <summary>
+/// A dummy renderable object to trigger drawing of the ImGui UI
+/// </summary>
 public class DebugGuiRenderable : Component, IRenderable, IRenderableSource
 {
-    public DebugGuiRenderable() { }
     public string Name => "DebugGui";
     public DrawLayer RenderOrder => DrawLayer.Debug;
     public void Collect(List<IRenderable> renderables)

@@ -41,7 +41,7 @@ public class CodeWindow : Component, IImGuiWindow
         // var context = chainManager.Contexts[_currentContextIndex];
 
         _getContext = getContext ?? throw new ArgumentNullException(nameof(getContext));
-        _name = $"Code###Code{id}";
+        _name = $"Code##{id}";
         _editor = new TextEditor
         {
             IsReadOnly = true,

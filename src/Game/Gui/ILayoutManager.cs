@@ -5,6 +5,7 @@ namespace UAlbion.Game.Gui;
 public interface ILayoutManager
 {
     LayoutNode GetLayout();
-    IDictionary<IUiElement, LayoutNode> LastSnapshot { get; }
     void RequestSnapshot();
+    IDictionary<IUiElement, LayoutNode> LastSnapshot { get; }
+    LayoutNode LastLayout { get; }
 }

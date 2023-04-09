@@ -24,7 +24,7 @@ public class ImGuiGameWindow : Component, IImGuiWindow
     {
         _framebuffer = framebuffer ?? throw new ArgumentNullException(nameof(framebuffer));
         _gameWindow = gameWindow ?? throw new ArgumentNullException(nameof(gameWindow));
-        _name = $"Game###Game{id}";
+        _name = $"Game##{id}";
     }
 
     protected override void Subscribed() => _dirty = true; // Make sure GameWindow gets resized when first displayed

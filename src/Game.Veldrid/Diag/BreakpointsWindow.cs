@@ -17,7 +17,7 @@ public class BreakpointsWindow : Component, IImGuiWindow
 
     public BreakpointsWindow(int id)
     {
-        _name = $"Breakpoints###Breakpoints{id}";
+        _name = $"Breakpoints##{id}";
         _newBreakpoint = AttachChild(new DiagNewBreakpoint());
         _editor = new TextEditor
         {

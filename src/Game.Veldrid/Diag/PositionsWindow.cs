@@ -54,8 +54,10 @@ public class PositionsWindow : Component, IImGuiWindow
         var walkOrder = Resolve<IParty>()?.WalkOrder;
         Vector3? playerTilePos = walkOrder?[0].GetPosition();
 
+        static string Vec(Vector3 v) => $"<{v.X:N2}, {v.Y:N2}, {v.Z:N2}>";
+
         ImGui.Text($"Cursor Pix: {mousePosition} UI: {uiPos} Scale: {window.GuiScale} PixSize: {window.Size} Norm: {normPos}");
-        ImGui.Text($"Camera World: {cameraPosition} Tile: {cameraTilePosition} Dir: {cameraDirection} Mag: {cameraMagnification}");
+        ImGui.Text($"Camera World: {Vec(cameraPosition)} Tile: {Vec(cameraTilePosition)} Dir: {Vec(cameraDirection)} Mag: {cameraMagnification}");
         ImGui.Text($"TileSize: {map?.TileSize} PlayerTilePos: {playerTilePos}");
 
         ImGui.End();

@@ -3,16 +3,21 @@ using System.Numerics;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Events;
 using VeldridGen.Interfaces;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
 public class ImGuiGameWindow : Component, IImGuiWindow
 {
+    readonly KeyboardInputEvent _keyboardEvent = new();
+    readonly MouseInputEvent _mouseEvent = new();
     readonly IFramebufferHolder _framebuffer;
     readonly GameWindow _gameWindow;
     readonly string _name;
+    bool _wasHovered;
     bool _dirty;
 
     public ImGuiGameWindow(int id, IFramebufferHolder framebuffer, GameWindow gameWindow)
@@ -27,7 +32,16 @@ public class ImGuiGameWindow : Component, IImGuiWindow
     public void Draw()
     {
         var manager = Resolve<IImGuiManager>();
-        var texture = _framebuffer.Framebuffer?.ColorTargets[0].Target;
+        var input = manager.LastInput;
+
+        if (!manager.ConsumedKeyboard)
+        {
+            _keyboardEvent.DeltaSeconds = input.DeltaSeconds;
+            _keyboardEvent.KeyCharPresses = input.Snapshot.KeyCharPresses;
+            _keyboardEvent.KeyEvents = input.Snapshot.KeyEvents;
+            Raise(_keyboardEvent);
+            manager.ConsumedKeyboard = true;
+        }
 
         ImGui.SetNextWindowSize(new Vector2(720 + 8, 480 + 8), ImGuiCond.FirstUseEver);
         ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, Vector2.Zero);
@@ -35,6 +49,7 @@ public class ImGuiGameWindow : Component, IImGuiWindow
         bool open = true;
         ImGui.Begin(_name, ref open);
 
+        var texture = _framebuffer.Framebuffer?.ColorTargets[0].Target;
         if (texture != null)
         {
             var handle = manager.GetOrCreateImGuiBinding(texture);
@@ -45,6 +60,26 @@ public class ImGuiGameWindow : Component, IImGuiWindow
         var vMax = ImGui.GetWindowContentRegionMax();
         var width = (int)(vMax.X - vMin.X);
         var height = (int)(vMax.Y - vMin.Y);
+
+        var isHovered = ImGui.IsItemHovered();
+        if (isHovered != _wasHovered)
+        {
+            Raise(new ShowHardwareCursorEvent(!isHovered));
+            _wasHovered = isHovered;
+        }
+
+        if (isHovered)
+        {
+            var itemPos = ImGui.GetItemRectMin();
+            _mouseEvent.DeltaSeconds = input.DeltaSeconds;
+            _mouseEvent.MouseDelta = input.MouseDelta;
+            _mouseEvent.WheelDelta = input.Snapshot.WheelDelta;
+            _mouseEvent.MousePosition = input.Snapshot.MousePosition - itemPos;
+            _mouseEvent.MouseEvents = input.Snapshot.MouseEvents;
+            _mouseEvent.IsMouseDown = input.Snapshot.IsMouseDown;
+            Raise(_mouseEvent);
+            manager.ConsumedMouse = true;
+        }
 
         ImGui.End();
         ImGui.PopStyleVar();

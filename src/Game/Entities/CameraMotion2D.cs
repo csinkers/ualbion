@@ -65,7 +65,6 @@ public class CameraMotion2D : Component
         else
         {
             var party = Resolve<IParty>();
-            var lerpRate = Var(GameVars.VisualVars.Camera2D.LerpRate);
             if (map == null || party == null || !party.StatusBarOrder.Any())
                 return;
 
@@ -79,21 +78,24 @@ public class CameraMotion2D : Component
                 0);
 
             var tilePosition = leader.GetPosition() + tileOffset;
-            var position = tilePosition * map.TileSize;
-            var curPosition2 = new Vector2(_position.X, _position.Y);
-            var position2 = new Vector2(position.X, position.Y);
-            var len2 = (curPosition2 - position2).LengthSquared();
-
-            if (len2 < 0.01f)
-                return;
+            var posXYZ = tilePosition * map.TileSize;
+            var curPosXY = new Vector2(_position.X, _position.Y);
+            var posXY = new Vector2(posXYZ.X, posXYZ.Y);
+            var len2 = (curPosXY - posXY).LengthSquared();
 
             if (len2 < 0.25f)
-                _position = new Vector3(position2, _position.Z);
+            {
+                if (len2 < 0.001f) // Stop updating the position if we're close enough
+                    return;
+
+                _position = new Vector3(posXY, _position.Z);
+            }
             else
             {
+                var lerpRate = Var(GameVars.VisualVars.Camera2D.LerpRate);
                 _position = new Vector3(
-                    ApiUtil.Lerp(_position.X, position.X, lerpRate * e.DeltaSeconds),
-                    ApiUtil.Lerp(_position.Y, position.Y, lerpRate * e.DeltaSeconds),
+                    ApiUtil.Lerp(_position.X, posXY.X, lerpRate * e.DeltaSeconds),
+                    ApiUtil.Lerp(_position.Y, posXY.Y, lerpRate * e.DeltaSeconds),
                     map.BaseCameraHeight);
             }
         }

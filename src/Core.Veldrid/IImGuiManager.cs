@@ -13,4 +13,6 @@ public interface IImGuiManager
     void RemoveImGuiBinding(TextureView textureView);
     void RemoveImGuiBinding(Texture texture);
     InputEvent LastInput { get; }
+    bool ConsumedKeyboard { get; set; }
+    bool ConsumedMouse { get; set; }
 }

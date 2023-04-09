@@ -21,6 +21,7 @@ public class SettingsManager : Component, ISettings
     const string VarSetName = "Settings";
     const string UserPath = "$(CONFIG)/settings.json";
     VarSet _set = new(VarSetName);
+    bool _dirty;
 
     public SettingsManager()
     {
@@ -137,6 +138,9 @@ public class SettingsManager : Component, ISettings
 
     public void Save()
     {
+        if (!_dirty)
+            return;
+
         var pathResolver = Resolve<IPathResolver>();
         var disk = Resolve<IFileSystem>();
         var jsonUtil = Resolve<IJsonUtil>();
@@ -149,10 +153,20 @@ public class SettingsManager : Component, ISettings
         Version.Write(this, ConfigVersion);
         VarSetLoader.Save(_set, path, disk, jsonUtil);
         _set.ClearValue(Version.Key);
+        _dirty = false;
     }
 
     public bool TryGetValue(string key, out object value) => _set.TryGetValue(key, out value);
-    public void SetValue(string key, object value) => _set.SetValue(key, value);
-    public void ClearValue(string key) => _set.ClearValue(key);
+    public void SetValue(string key, object value)
+    {
+        _set.SetValue(key, value);
+        _dirty = true;
+    }
+
+    public void ClearValue(string key)
+    {
+        _set.ClearValue(key);
+        _dirty = true;
+    }
 }
 #pragma warning restore CA2227 // Collection properties should be read only

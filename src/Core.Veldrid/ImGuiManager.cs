@@ -20,14 +20,19 @@ public delegate void ImGuiMenuFunc(
 
 public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
 {
+    static readonly TimeSpan LayoutUpdateInterval = TimeSpan.FromSeconds(10);
     readonly ImGuiMenuFunc _menuFunc;
     readonly DebugGuiRenderer _renderer;
     readonly IFramebufferHolder _framebuffer;
     readonly GameWindow _gameWindow;
     readonly ICameraProvider _camera;
     int _nextWindowId;
+    bool _initialised;
+    DateTime _lastLayoutUpdate;
 
     public InputEvent LastInput { get; private set; }
+    public bool ConsumedKeyboard { get; set; }
+    public bool ConsumedMouse { get; set; }
 
     public ImGuiManager(
         DebugGuiRenderer renderer,
@@ -69,6 +74,9 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
     void OnInput(InputEvent e)
     {
         _renderer.ImGuiRenderer?.Update((float)e.DeltaSeconds, e.Snapshot);
+        var io = ImGui.GetIO();
+        ConsumedKeyboard = io.WantCaptureKeyboard;
+        ConsumedMouse = io.WantCaptureMouse;
         LastInput = e;
 
         ReflectorUtil.SwapAuxiliaryState();
@@ -79,6 +87,7 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
         // Build array of windows before iterating, as closing a window will modify the Children collection.
         int windowCount = 0;
         var array = ArrayPool<IImGuiWindow>.Shared.Rent(Children.Count);
+
         foreach (var child in Children)
             if (child is IImGuiWindow window)
                 array[windowCount++] = window;
@@ -87,6 +96,12 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
             array[i].Draw();
 
         ArrayPool<IImGuiWindow>.Shared.Return(array);
+
+        if (DateTime.UtcNow - _lastLayoutUpdate > LayoutUpdateInterval)
+        {
+            _lastLayoutUpdate = DateTime.UtcNow.Date;
+            var ini = ImGui.SaveIniSettingsToMemory();
+        }
     }
 
     void Dirty() => On<PrepareFrameResourcesEvent>(CreateDeviceObjects);
@@ -101,7 +116,16 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
         Off<PrepareFrameResourcesEvent>();
     }
 
-    protected override void Subscribed() => Dirty();
+    protected override void Subscribed()
+    {
+        if (!_initialised)
+        {
+            var layout = Var(CoreVars.Ui.ImGuiLayout);
+            // ImGui.LoadIniSettingsFromMemory();
+        }
+
+        Dirty();
+    }
     // protected override void Unsubscribed() => Dispose();
 
     public int GetNextWindowId() => Interlocked.Increment(ref _nextWindowId);

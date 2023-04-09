@@ -23,6 +23,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
     readonly RenderSystem _debug;
     (float Red, float Green, float Blue, float Alpha) _clearColour;
     bool _debugMode;
+    bool _modeDirty;
 
     public AlbionRenderSystem(ICameraProvider mainCamera)
     {
@@ -134,9 +135,14 @@ public sealed class AlbionRenderSystem : Component, IDisposable
         On<ToggleDiagnosticsEvent>(_ =>
         {
             _debugMode = !_debugMode;
-            SetRenderSystem();
+            _modeDirty = true;
         });
 
+        On<BeginFrameEvent>(_ =>
+        {
+            if (_modeDirty)
+                SetRenderSystem();
+        });
         On<SetClearColourEvent>(e => _clearColour = (e.Red, e.Green, e.Blue, e.Alpha));
     }
 
@@ -155,6 +161,8 @@ public sealed class AlbionRenderSystem : Component, IDisposable
         var engine = (Engine)TryResolve<IEngine>();
         if (engine != null)
             engine.RenderSystem = _debugMode ? _debug : _default;
+
+        _modeDirty = false;
     }
 
     void MainRenderFunc(RenderPass pass, GraphicsDevice device, CommandList cl, IResourceSetHolder set1)

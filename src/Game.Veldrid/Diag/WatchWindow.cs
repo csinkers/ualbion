@@ -9,11 +9,7 @@ namespace UAlbion.Game.Veldrid.Diag;
 public class WatchWindow : Component, IImGuiWindow
 {
     readonly string _name;
-
-    public WatchWindow(int id)
-    {
-        _name = $"Watch###Watch{id}";
-    }
+    public WatchWindow(string name) => _name = name;
 
     public void Draw()
     {

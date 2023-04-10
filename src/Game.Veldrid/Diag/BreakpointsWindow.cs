@@ -1,5 +1,4 @@
 ﻿using System;
-using ImGuiColorTextEditNet;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid;
@@ -9,21 +8,15 @@ namespace UAlbion.Game.Veldrid.Diag;
 public class BreakpointsWindow : Component, IImGuiWindow
 {
     readonly DiagNewBreakpoint _newBreakpoint;
-    readonly TextEditor _editor;
     readonly string _name;
 
     int _currentBreakpointIndex;
     string[] _breakpointNames = Array.Empty<string>();
 
-    public BreakpointsWindow(int id)
+    public BreakpointsWindow(string name)
     {
-        _name = $"Breakpoints##{id}";
+        _name = name;
         _newBreakpoint = AttachChild(new DiagNewBreakpoint());
-        _editor = new TextEditor
-        {
-            IsReadOnly = true,
-            SyntaxHighlighter = new AlbionSyntaxHighlighter()
-        };
     }
 
     public void Draw()

@@ -7,7 +7,7 @@ namespace UAlbion.Game.Veldrid.Diag;
 public class AssetExplorerWindow : Component, IImGuiWindow
 {
     readonly string _name;
-    public AssetExplorerWindow(int id) => _name = $"Asset Explorer##{id}";
+    public AssetExplorerWindow(string name) => _name = name;
     public void Draw()
     {
         bool open = true;

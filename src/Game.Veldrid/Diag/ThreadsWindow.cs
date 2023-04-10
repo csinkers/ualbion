@@ -12,7 +12,7 @@ public class ThreadsWindow : Component, IImGuiWindow
     int _currentContextIndex;
     string[] _contextNames = Array.Empty<string>();
 
-    public ThreadsWindow(int id) => _name = $"Threads###Threads{id}";
+    public ThreadsWindow(string name) => _name = name;
 
     public void Draw()
     {

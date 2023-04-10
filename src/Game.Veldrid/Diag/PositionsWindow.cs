@@ -15,10 +15,10 @@ public class PositionsWindow : Component, IImGuiWindow
     readonly ICameraProvider _cameraProvider;
     readonly string _name;
 
-    public PositionsWindow(int id, ICameraProvider cameraProvider)
+    public PositionsWindow(string name, ICameraProvider cameraProvider)
     {
+        _name = name;
         _cameraProvider = cameraProvider ?? throw new ArgumentNullException(nameof(cameraProvider));
-        _name = $"Positions###Positions{id}";
     }
 
     public void Draw()
@@ -56,9 +56,14 @@ public class PositionsWindow : Component, IImGuiWindow
 
         static string Vec(Vector3 v) => $"<{v.X:N2}, {v.Y:N2}, {v.Z:N2}>";
 
-        ImGui.Text($"Cursor Pix: {mousePosition} UI: {uiPos} Scale: {window.GuiScale} PixSize: {window.Size} Norm: {normPos}");
-        ImGui.Text($"Camera World: {Vec(cameraPosition)} Tile: {Vec(cameraTilePosition)} Dir: {Vec(cameraDirection)} Mag: {cameraMagnification}");
-        ImGui.Text($"TileSize: {map?.TileSize} PlayerTilePos: {playerTilePos}");
+        ImGui.TextUnformatted($"Mouse Pos: {mousePosition} UI: {uiPos}");
+        ImGui.TextUnformatted($"Scale: {window.GuiScale}x Game Window: {window.Size}");
+        ImGui.TextUnformatted($"Mouse Norm: {normPos}");
+        ImGui.TextUnformatted($"Player Tile: {playerTilePos}");
+        ImGui.TextUnformatted($"Camera Tile: {Vec(cameraTilePosition)}");
+        ImGui.TextUnformatted($"Camera World: {Vec(cameraPosition)}");
+        ImGui.TextUnformatted($"Camera Dir: {Vec(cameraDirection)} Mag: {cameraMagnification}");
+        ImGui.TextUnformatted($"TileSize: {map?.TileSize}");
 
         ImGui.End();
 

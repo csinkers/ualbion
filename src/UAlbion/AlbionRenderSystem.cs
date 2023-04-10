@@ -25,7 +25,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
     bool _debugMode;
     bool _modeDirty;
 
-    public AlbionRenderSystem(ICameraProvider mainCamera)
+    public AlbionRenderSystem(ICameraProvider mainCamera, IImGuiMenuManager menus)
     {
         OutputDescription screenFormat = new(
             new OutputAttachmentDescription(PixelFormat.R32_Float),
@@ -53,7 +53,9 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                 .Framebuffer("fb_screen", new MainFramebuffer("fb_screen"))
                 .Component("c_inputrouter", new AdHocComponent("c_inputrouter",
                     static x =>
-                    { // When running fullscreen, just echo the mouse input through to the game's mouse modes
+                    { 
+                        // When running fullscreen, just echo the mouse input through to the game's mouse modes,
+                        // when showing the debug UI the pass-through of input is done in ImGuiGameWindow.
                         var mouseEvent = new MouseInputEvent();
                         var keyboardEvent = new KeyboardInputEvent();
                         x.On<InputEvent>(e =>
@@ -96,14 +98,21 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                 .Framebuffer("fb_screen", new MainFramebuffer("fb_screen"))
                 .Framebuffer("fb_game", new SimpleFramebuffer("fb_game", 360, 240))
                 .Component("c_gamewindow", new GameWindow(360, 240))
-                // When running windowed, the ImGuiGameWindow will handle translating the mouse input
-                .Component("c_imgui", new ImGuiManager(
-                    (DebugGuiRenderer)sys.GetRenderer("r_debug"),
-                    sys.GetFramebuffer("fb_game"),
-                    (GameWindow)sys.GetComponent("c_gamewindow"),
-                    mainCamera,
-                    DiagMenus.Draw
-                ))
+                .Component("c_imgui", new ImGuiManager((DebugGuiRenderer)sys.GetRenderer("r_debug")))
+                .Action(() =>
+                {
+                    var framebuffer = sys.GetFramebuffer("fb_game");
+                    var window =  (GameWindow)sys.GetComponent("c_gamewindow");
+                    menus.AddMenuItem(new ShowWindowMenuItem(
+                        "Game",
+                        "Windows",
+                        x => new ImGuiGameWindow(x, framebuffer, window)));
+
+                    menus.AddMenuItem(new ShowWindowMenuItem(
+                        "Positions",
+                        "Windows",
+                        name => new PositionsWindow(name, mainCamera)));
+                })
                 .Resources(new GlobalResourceSetProvider())
                 .Pass("p_game", pass => 
                     pass

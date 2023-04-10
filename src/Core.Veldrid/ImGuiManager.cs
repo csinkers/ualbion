@@ -1,31 +1,19 @@
 ﻿using System;
 using System.Buffers;
-using System.Numerics;
 using System.Threading;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
+using UAlbion.Api.Settings;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Veldrid.Reflection;
-using UAlbion.Core.Visual;
 using Veldrid;
-using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
-
-public delegate void ImGuiMenuFunc(
-    IImGuiManager manager,
-    IFramebufferHolder framebuffer,
-    ICameraProvider camera,
-    GameWindow gameWindow);
 
 public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
 {
     static readonly TimeSpan LayoutUpdateInterval = TimeSpan.FromSeconds(10);
-    readonly ImGuiMenuFunc _menuFunc;
     readonly DebugGuiRenderer _renderer;
-    readonly IFramebufferHolder _framebuffer;
-    readonly GameWindow _gameWindow;
-    readonly ICameraProvider _camera;
     int _nextWindowId;
     bool _initialised;
     DateTime _lastLayoutUpdate;
@@ -34,42 +22,13 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
     public bool ConsumedKeyboard { get; set; }
     public bool ConsumedMouse { get; set; }
 
-    public ImGuiManager(
-        DebugGuiRenderer renderer,
-        IFramebufferHolder framebuffer,
-        GameWindow gameWindow,
-        ICameraProvider camera,
-        ImGuiMenuFunc menuFunc)
+    public ImGuiManager(DebugGuiRenderer renderer)
     {
-        _renderer    = renderer    ?? throw new ArgumentNullException(nameof(renderer));
-        _framebuffer = framebuffer ?? throw new ArgumentNullException(nameof(framebuffer));
-        _gameWindow  = gameWindow  ?? throw new ArgumentNullException(nameof(gameWindow));
-        _camera      = camera      ?? throw new ArgumentNullException(nameof(camera));
-        _menuFunc    = menuFunc    ?? throw new ArgumentNullException(nameof(menuFunc));
+        _renderer = renderer ?? throw new ArgumentNullException(nameof(renderer));
 
         On<DeviceCreatedEvent>(_ => Dirty());
         On<InputEvent>(OnInput);
     }
-
-#pragma warning disable CA1822 // Mark members as static
-    public object IoInfo
-    {
-        get
-        {
-            if (ImGui.GetCurrentContext() == IntPtr.Zero)
-                return null;
-
-            var io = ImGui.GetIO();
-            return new Foo
-            {
-                MouseDelta = io.MouseDelta,
-                DeltaTime = io.DeltaTime,
-                WantCaptureKeyboard = io.WantCaptureKeyboard,
-                WantCaptureMouse = io.WantCaptureMouse
-            };
-        }
-    }
-#pragma warning restore CA1822 // Mark members as static
 
     void OnInput(InputEvent e)
     {
@@ -80,7 +39,7 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
         LastInput = e;
 
         ReflectorUtil.SwapAuxiliaryState();
-        _menuFunc(this, _framebuffer, _camera, _gameWindow);
+        TryResolve<IImGuiMenuManager>()?.Draw(this);
 
         ImGui.DockSpaceOverViewport();
 
@@ -100,7 +59,13 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
         if (DateTime.UtcNow - _lastLayoutUpdate > LayoutUpdateInterval)
         {
             _lastLayoutUpdate = DateTime.UtcNow.Date;
+            var lastLayout = Var(CoreVars.Ui.ImGuiLayout);
             var ini = ImGui.SaveIniSettingsToMemory();
+            if (!string.Equals(lastLayout, ini, StringComparison.Ordinal))
+            {
+                var settings = Resolve<ISettings>();
+                CoreVars.Ui.ImGuiLayout.Write(settings, ini);
+            }
         }
     }
 
@@ -110,22 +75,23 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
         if (ImGui.GetCurrentContext() == IntPtr.Zero)
             return;
 
-        ImGui.StyleColorsClassic();
         var io = ImGui.GetIO();
+        unsafe { io.NativePtr->IniFilename = null; } // Turn off ini file
         io.ConfigFlags |= ImGuiConfigFlags.DockingEnable;
-        Off<PrepareFrameResourcesEvent>();
-    }
 
-    protected override void Subscribed()
-    {
+        ImGui.StyleColorsClassic();
+
         if (!_initialised)
         {
             var layout = Var(CoreVars.Ui.ImGuiLayout);
-            // ImGui.LoadIniSettingsFromMemory();
+            ImGui.LoadIniSettingsFromMemory(layout);
+            _initialised = true;
         }
 
-        Dirty();
+        Off<PrepareFrameResourcesEvent>();
     }
+
+    protected override void Subscribed() => Dirty();
     // protected override void Unsubscribed() => Dispose();
 
     public int GetNextWindowId() => Interlocked.Increment(ref _nextWindowId);
@@ -148,12 +114,4 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
 
     public void RemoveImGuiBinding(TextureView textureView) 
         => _renderer.ImGuiRenderer.RemoveImGuiBinding(textureView);
-}
-
-public class Foo
-{
-    public Vector2 MouseDelta { get; set; }
-    public float DeltaTime { get; set; }
-    public bool WantCaptureKeyboard { get; set; }
-    public bool WantCaptureMouse { get; set; }
 }

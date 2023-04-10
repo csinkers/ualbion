@@ -20,11 +20,11 @@ public class ImGuiGameWindow : Component, IImGuiWindow
     bool _wasHovered;
     bool _dirty;
 
-    public ImGuiGameWindow(int id, IFramebufferHolder framebuffer, GameWindow gameWindow)
+    public ImGuiGameWindow(string name, IFramebufferHolder framebuffer, GameWindow gameWindow)
     {
+        _name = name;
         _framebuffer = framebuffer ?? throw new ArgumentNullException(nameof(framebuffer));
         _gameWindow = gameWindow ?? throw new ArgumentNullException(nameof(gameWindow));
-        _name = $"Game##{id}";
     }
 
     protected override void Subscribed() => _dirty = true; // Make sure GameWindow gets resized when first displayed

@@ -12,11 +12,7 @@ namespace UAlbion.Game.Veldrid.Diag;
 public class SettingsWindow : Component, IImGuiWindow
 {
     readonly string _name;
-
-    public SettingsWindow(int id)
-    {
-        _name = $"Settings###Settings{id}";
-    }
+    public SettingsWindow(string name) => _name = name;
 
     public void Draw()
     {

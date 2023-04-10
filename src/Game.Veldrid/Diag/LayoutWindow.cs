@@ -11,8 +11,7 @@ namespace UAlbion.Game.Veldrid.Diag;
 public class LayoutWindow : Component, IImGuiWindow
 {
     readonly string _name;
-
-    public LayoutWindow(int id) => _name = $"UI Layout##{id}";
+    public LayoutWindow(string name) => _name = name;
 
     public void Draw()
     {

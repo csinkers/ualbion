@@ -46,10 +46,7 @@ public class InspectorDemoWindow : Component, IImGuiWindow
     readonly TestObject _testObject = new();
     readonly string _name;
 
-    public InspectorDemoWindow(int id)
-    {
-        _name = $"Inspector Demo###IDemo{id}";
-    }
+    public InspectorDemoWindow(string name) => _name = name;
 
     public void Draw()
     {

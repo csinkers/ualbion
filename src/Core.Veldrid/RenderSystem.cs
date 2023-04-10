@@ -15,8 +15,6 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
     internal List<RenderPass> Passes { get; init; }
     internal List<IFramebufferHolder> Framebuffers { get; init; }
     internal IResourceProvider ResourceProvider { get; init; }
-    internal Action<RenderSystem, GraphicsDevice> PreRender { get; init; }
-    internal Action<RenderSystem, GraphicsDevice> PostRender { get; init; }
 
     readonly PrepareFrameEvent _prepareFrameEvent = new();
     readonly PrepareFrameResourcesEvent _prepareFrameResourcesEvent = new();
@@ -85,8 +83,6 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
                 return;
         }
 
-        PreRender?.Invoke(this, graphicsDevice);
-
         using (PerfTracker.FrameEvent("Prepare resources"))
         {
             _frameCommands.Begin();
@@ -127,8 +123,6 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
             using (FrameEventCached(ref i, phase, (x, n) => $"{n} {Name} Complete - {x.Name}"))
                 graphicsDevice.WaitForFence(_fence);
         }
-
-        PostRender?.Invoke(this, graphicsDevice);
     }
 
     public void Dispose()

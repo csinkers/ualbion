@@ -17,7 +17,7 @@ public class ImGuiConsoleLogger : Component, IImGuiWindow
     bool _scrollToBottom = true;
     bool _wasShown;
 
-    public ImGuiConsoleLogger(int id) => _name = $"Console###{id}";
+    public ImGuiConsoleLogger(string name) => _name = name;
 
     public void Draw()
     {

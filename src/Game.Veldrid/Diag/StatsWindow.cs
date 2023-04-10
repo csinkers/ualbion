@@ -11,11 +11,7 @@ namespace UAlbion.Game.Veldrid.Diag;
 public class StatsWindow : Component, IImGuiWindow
 {
     readonly string _name;
-
-    public StatsWindow(int id)
-    {
-        _name = $"Stats###Stats{id}";
-    }
+    public StatsWindow(string name) => _name = name;
 
     public void Draw()
     {

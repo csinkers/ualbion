@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Api.Eventing;
-using Veldrid;
 using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
@@ -15,8 +14,6 @@ public class RenderSystemBuilder
     readonly Dictionary<string, IComponent> _components = new();
     readonly Dictionary<string, IFramebufferHolder> _framebuffers = new();
     IResourceProvider _resourceProvider;
-    Action<RenderSystem, GraphicsDevice> _preRender;
-    Action<RenderSystem, GraphicsDevice> _postRender;
     bool _built;
 
     RenderSystemBuilder(string name, RenderManagerBuilder manager)
@@ -26,8 +23,11 @@ public class RenderSystemBuilder
     }
 
     public static RenderSystemBuilder Create(string name, RenderManagerBuilder manager) => new(name, manager);
-    public RenderSystemBuilder PreRender(Action<RenderSystem, GraphicsDevice> method) { Check(); _preRender = method; return this; }
-    public RenderSystemBuilder PostRender(Action<RenderSystem, GraphicsDevice> method) { Check(); _postRender = method; return this; }
+
+    /// <summary>
+    /// For running an ad-hoc action in the context of the builder so components can be wired up
+    /// </summary>
+    public RenderSystemBuilder Action(Action action) { Check(); action(); return this; }
     public RenderSystemBuilder Component(string name, IComponent component) { Check(); _components.Add(name, component); return this; }
     public RenderSystemBuilder Resources(IResourceProvider resourceProvider) { Check(); _resourceProvider = resourceProvider; return this; }
     public RenderSystemBuilder Framebuffer(string name, IFramebufferHolder framebuffer) { Check(); _framebuffers.Add(name, framebuffer); return this; }
@@ -59,8 +59,6 @@ public class RenderSystemBuilder
             ResourceProvider = _resourceProvider,
             Framebuffers = _framebuffers.Select(x => x.Value).ToList(),
             Passes = GetTopogicalOrder(),
-            PreRender = _preRender,
-            PostRender = _postRender,
         };
     }
 

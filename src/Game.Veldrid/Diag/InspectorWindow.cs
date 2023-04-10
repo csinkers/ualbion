@@ -12,9 +12,9 @@ public class InspectorWindow : Component, IImGuiWindow
     readonly string _name;
     IList<Selection> _hits;
 
-    public InspectorWindow(int id)
+    public InspectorWindow(string name)
     {
-        _name = $"Inspector###Inspect{id}";
+        _name = name;
         On<InspectorPickEvent>(e => _hits = e.Selections);
     }
 

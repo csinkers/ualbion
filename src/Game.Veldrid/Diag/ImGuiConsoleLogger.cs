@@ -12,18 +12,18 @@ public class ImGuiConsoleLogger : Component, IImGuiWindow
 {
     // TODO: Initial size
     readonly byte[] _inputBuffer = new byte[512];
-    readonly string _name;
     bool _autoScroll = true;
     bool _scrollToBottom = true;
     bool _wasShown;
 
-    public ImGuiConsoleLogger(string name) => _name = name;
+    public string Name { get; }
+    public ImGuiConsoleLogger(string name) => Name = name;
 
     public void Draw()
     {
         var window = Resolve<IGameWindow>();
         bool open = true;
-        ImGui.Begin(_name, ref open);
+        ImGui.Begin(Name, ref open);
         ImGui.SetWindowPos(Vector2.Zero, ImGuiCond.FirstUseEver);
         ImGui.SetWindowSize(new Vector2(window.PixelWidth / 3.0f, window.PixelHeight), ImGuiCond.FirstUseEver);
 

@@ -10,13 +10,13 @@ namespace UAlbion.Game.Veldrid.Diag;
 
 public class StatsWindow : Component, IImGuiWindow
 {
-    readonly string _name;
-    public StatsWindow(string name) => _name = name;
+    public string Name { get; }
+    public StatsWindow(string name) => Name = name;
 
     public void Draw()
     {
         bool open = true;
-        ImGui.Begin(_name, ref open);
+        ImGui.Begin(Name, ref open);
 
         if (ImGui.Button("Clear"))
             PerfTracker.Clear();

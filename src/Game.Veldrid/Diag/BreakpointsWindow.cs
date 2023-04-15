@@ -8,21 +8,21 @@ namespace UAlbion.Game.Veldrid.Diag;
 public class BreakpointsWindow : Component, IImGuiWindow
 {
     readonly DiagNewBreakpoint _newBreakpoint;
-    readonly string _name;
-
     int _currentBreakpointIndex;
     string[] _breakpointNames = Array.Empty<string>();
 
+    public string Name { get; }
+
     public BreakpointsWindow(string name)
     {
-        _name = name;
+        Name = name;
         _newBreakpoint = AttachChild(new DiagNewBreakpoint());
     }
 
     public void Draw()
     {
         bool open = true;
-        ImGui.Begin(_name, ref open);
+        ImGui.Begin(Name, ref open);
         ImGui.TextUnformatted(Context.ToString());
 
         var chainManager = Resolve<IEventManager>();

@@ -7,17 +7,17 @@ namespace UAlbion.Game.Veldrid.Diag;
 
 public class ThreadsWindow : Component, IImGuiWindow
 {
-    readonly string _name;
 
     int _currentContextIndex;
     string[] _contextNames = Array.Empty<string>();
 
-    public ThreadsWindow(string name) => _name = name;
+    public string Name { get; }
+    public ThreadsWindow(string name) => Name = name;
 
     public void Draw()
     {
         bool open = true;
-        ImGui.Begin(_name, ref open);
+        ImGui.Begin(Name, ref open);
         ImGui.TextUnformatted(Context.ToString());
 
         var chainManager = Resolve<IEventManager>();

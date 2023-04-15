@@ -11,13 +11,13 @@ namespace UAlbion.Game.Veldrid.Diag;
 
 public class SettingsWindow : Component, IImGuiWindow
 {
-    readonly string _name;
-    public SettingsWindow(string name) => _name = name;
+    public string Name { get; }
+    public SettingsWindow(string name) => Name = name;
 
     public void Draw()
     {
         bool open = true;
-        ImGui.Begin(_name, ref open);
+        ImGui.Begin(Name, ref open);
 
 #if DEBUG
         if (ImGui.TreeNode("Debug"))

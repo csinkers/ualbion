@@ -16,13 +16,13 @@ public class ImGuiGameWindow : Component, IImGuiWindow
     readonly MouseInputEvent _mouseEvent = new();
     readonly IFramebufferHolder _framebuffer;
     readonly GameWindow _gameWindow;
-    readonly string _name;
     bool _wasHovered;
     bool _dirty;
 
+    public string Name { get; }
     public ImGuiGameWindow(string name, IFramebufferHolder framebuffer, GameWindow gameWindow)
     {
-        _name = name;
+        Name = name;
         _framebuffer = framebuffer ?? throw new ArgumentNullException(nameof(framebuffer));
         _gameWindow = gameWindow ?? throw new ArgumentNullException(nameof(gameWindow));
     }
@@ -47,7 +47,9 @@ public class ImGuiGameWindow : Component, IImGuiWindow
         ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, Vector2.Zero);
 
         bool open = true;
-        ImGui.Begin(_name, ref open);
+        ImGui.Begin(Name, ref open);
+        uint dockId = ImGui.GetWindowDockID();
+        TODO
 
         var texture = _framebuffer.Framebuffer?.ColorTargets[0].Target;
         if (texture != null)

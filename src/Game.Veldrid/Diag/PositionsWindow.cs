@@ -13,18 +13,18 @@ namespace UAlbion.Game.Veldrid.Diag;
 public class PositionsWindow : Component, IImGuiWindow
 {
     readonly ICameraProvider _cameraProvider;
-    readonly string _name;
 
+    public string Name { get; }
     public PositionsWindow(string name, ICameraProvider cameraProvider)
     {
-        _name = name;
+        Name = name;
         _cameraProvider = cameraProvider ?? throw new ArgumentNullException(nameof(cameraProvider));
     }
 
     public void Draw()
     {
         bool open = true;
-        ImGui.Begin(_name, ref open);
+        ImGui.Begin(Name, ref open);
 
         var window = Resolve<IGameWindow>();
         var mousePosition = Resolve<ICursorManager>().Position;

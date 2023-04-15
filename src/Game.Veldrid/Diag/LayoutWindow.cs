@@ -10,13 +10,13 @@ namespace UAlbion.Game.Veldrid.Diag;
 
 public class LayoutWindow : Component, IImGuiWindow
 {
-    readonly string _name;
-    public LayoutWindow(string name) => _name = name;
+    public string Name { get; }
+    public LayoutWindow(string name) => Name = name;
 
     public void Draw()
     {
         bool open = true;
-        ImGui.Begin(_name, ref open);
+        ImGui.Begin(Name, ref open);
 
         var manager = Resolve<ILayoutManager>();
         var engineFlags = Var(CoreVars.User.EngineFlags);

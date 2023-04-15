@@ -9,19 +9,19 @@ namespace UAlbion.Game.Veldrid.Diag;
 
 public class InspectorWindow : Component, IImGuiWindow
 {
-    readonly string _name;
     IList<Selection> _hits;
 
+    public string Name { get; }
     public InspectorWindow(string name)
     {
-        _name = name;
+        Name = name;
         On<InspectorPickEvent>(e => _hits = e.Selections);
     }
 
     public void Draw()
     {
         bool open = true;
-        ImGui.Begin(_name, ref open);
+        ImGui.Begin(Name, ref open);
         int hitId = 0;
         if (_hits != null)
         {

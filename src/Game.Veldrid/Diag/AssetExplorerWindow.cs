@@ -6,12 +6,12 @@ namespace UAlbion.Game.Veldrid.Diag;
 
 public class AssetExplorerWindow : Component, IImGuiWindow
 {
-    readonly string _name;
-    public AssetExplorerWindow(string name) => _name = name;
+    public string Name { get; }
+    public AssetExplorerWindow(string name) => Name = name;
     public void Draw()
     {
         bool open = true;
-        ImGui.Begin(_name, ref open);
+        ImGui.Begin(Name, ref open);
         ImGui.End();
 
         if (!open)

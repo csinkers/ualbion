@@ -16,12 +16,13 @@ public class ShowWindowMenuItem : IMenuItem
     public string Path { get; }
     public Func<string, IImGuiWindow> Constructor { get; }
     public override string ToString() => $"Show {Name} ({Path})";
+    public string BuildName(int id) => $"{Name}##{id}";
     public void Draw(IImGuiManager manager)
     {
         if (!ImGui.MenuItem(Name))
             return;
 
-        var windowName = $"{Name}##{manager.GetNextWindowId()}";
+        var windowName = BuildName(manager.GetNextWindowId());
         var window = Constructor(windowName);
         manager.AddWindow(window);
     }

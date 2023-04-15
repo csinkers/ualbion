@@ -33,15 +33,15 @@ public class CodeWindow : Component, IImGuiWindow
 {
     readonly Func<EventContext> _getContext;
     readonly TextEditor _editor;
-    readonly string _name;
+    public string Name { get; }
 
-    public CodeWindow(int id, Func<EventContext> getContext)
+    public CodeWindow(string name, Func<EventContext> getContext)
     {
         // var chainManager = Resolve<IEventManager>();
         // var context = chainManager.Contexts[_currentContextIndex];
 
+        Name = name;
         _getContext = getContext ?? throw new ArgumentNullException(nameof(getContext));
-        _name = $"Code##{id}";
         _editor = new TextEditor
         {
             IsReadOnly = true,
@@ -56,7 +56,7 @@ public class CodeWindow : Component, IImGuiWindow
             return;
 
         bool open = true;
-        ImGui.Begin(_name, ref open);
+        ImGui.Begin(Name, ref open);
         ImGui.TextUnformatted(Context.ToString());
 
         var set = context.EventSet;

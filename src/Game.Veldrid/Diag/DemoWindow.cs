@@ -6,7 +6,9 @@ namespace UAlbion.Game.Veldrid.Diag;
 
 public class DemoWindow : Component, IImGuiWindow
 {
-    public DemoWindow(string name) { }
+    public string Name { get; }
+    public DemoWindow(string name) => Name = name;
+
     public void Draw()
     {
         bool open = true;

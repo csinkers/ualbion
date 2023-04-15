@@ -8,13 +8,13 @@ namespace UAlbion.Game.Veldrid.Diag;
 
 public class WatchWindow : Component, IImGuiWindow
 {
-    readonly string _name;
-    public WatchWindow(string name) => _name = name;
+    public string Name { get; }
+    public WatchWindow(string name) => Name = name;
 
     public void Draw()
     {
         bool open = true;
-        ImGui.Begin(_name, ref open);
+        ImGui.Begin(Name, ref open);
 
         var state = TryResolve<IGameState>();
         if (state != null)

@@ -32,6 +32,9 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
 
     void OnInput(InputEvent e)
     {
+        if (!_initialised)
+            return;
+
         _renderer.ImGuiRenderer?.Update((float)e.DeltaSeconds, e.Snapshot);
         var io = ImGui.GetIO();
         ConsumedKeyboard = io.WantCaptureKeyboard;
@@ -58,9 +61,10 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
 
         if (DateTime.UtcNow - _lastLayoutUpdate > LayoutUpdateInterval)
         {
-            _lastLayoutUpdate = DateTime.UtcNow.Date;
+            _lastLayoutUpdate = DateTime.UtcNow;
             var lastLayout = Var(CoreVars.Ui.ImGuiLayout);
             var ini = ImGui.SaveIniSettingsToMemory();
+
             if (!string.Equals(lastLayout, ini, StringComparison.Ordinal))
             {
                 var settings = Resolve<ISettings>();
@@ -83,12 +87,54 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
 
         if (!_initialised)
         {
-            var layout = Var(CoreVars.Ui.ImGuiLayout);
-            ImGui.LoadIniSettingsFromMemory(layout);
+            InitialiseLayout();
             _initialised = true;
         }
 
         Off<PrepareFrameResourcesEvent>();
+    }
+
+    void InitialiseLayout()
+    {
+        var layout = Var(CoreVars.Ui.ImGuiLayout);
+        var config = ImGuiConfig.Load(layout);
+        var newConfig = new ImGuiConfig();
+
+        // Create windows
+        var menus = Resolve<IImGuiMenuManager>();
+
+        const string prefix = "[Window]";
+        foreach (var section in config.Sections)
+        {
+            if (!section.Name.StartsWith(prefix, StringComparison.Ordinal))
+            {
+                newConfig.Sections.Add(section);
+                continue;
+            }
+
+            var windowName = section.Name[(prefix.Length + 1)..].TrimEnd(']');
+            var index = windowName.IndexOf("##", StringComparison.Ordinal);
+            if (index == -1)
+            {
+                newConfig.Sections.Add(section);
+                continue;
+            }
+
+            if (!int.TryParse(windowName[(index + 2)..], out _))
+            {
+                newConfig.Sections.Add(section);
+                continue;
+            }
+
+            var windowType = windowName[..index];
+            var window = menus.CreateWindow(windowType, this);
+            if (window == null)
+                continue;
+
+            newConfig.Sections.Add(new ImGuiConfigSection(window.Name, section.Lines));
+        }
+
+        ImGui.LoadIniSettingsFromMemory(newConfig.ToString());
     }
 
     protected override void Subscribed() => Dirty();

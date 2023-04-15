@@ -44,9 +44,8 @@ public class InspectorDemoWindow : Component, IImGuiWindow
     }
 
     readonly TestObject _testObject = new();
-    readonly string _name;
-
-    public InspectorDemoWindow(string name) => _name = name;
+    public string Name { get; }
+    public InspectorDemoWindow(string name) => Name = name;
 
     public void Draw()
     {
@@ -56,7 +55,7 @@ public class InspectorDemoWindow : Component, IImGuiWindow
             return;
 
         bool open = true;
-        ImGui.Begin(_name, ref open);
+        ImGui.Begin(Name, ref open);
         RenderNode("Test", _testObject);
         ImGui.End();
 

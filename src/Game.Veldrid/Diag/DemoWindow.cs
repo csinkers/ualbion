@@ -1,12 +1,20 @@
 ﻿using ImGuiNET;
+using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
-public class DemoWindow : IImGuiWindow
+public class DemoWindow : Component, IImGuiWindow
 {
-    bool _open;
-    public DemoWindow(int id) { }
-    public void Draw(GraphicsDevice device) => ImGui.ShowDemoWindow(ref _open);
+    public string Name { get; }
+    public DemoWindow(string name) => Name = name;
+
+    public void Draw()
+    {
+        bool open = true;
+        ImGui.ShowDemoWindow(ref open);
+
+        if (!open)
+            Remove();
+    }
 }

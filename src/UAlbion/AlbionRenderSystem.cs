@@ -4,6 +4,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Etm;
+using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Veldrid.Meshes;
 using UAlbion.Core.Veldrid.Skybox;
 using UAlbion.Core.Veldrid.Sprites;
@@ -22,11 +23,9 @@ public sealed class AlbionRenderSystem : Component, IDisposable
     readonly RenderSystem _debug;
     (float Red, float Green, float Blue, float Alpha) _clearColour;
     bool _debugMode;
+    bool _modeDirty;
 
-    static Action<RenderSystem, GraphicsDevice> BuildPreRender(IImGuiManager imgui, IFramebufferHolder gameFramebuffer, ICameraProvider mainCamera, GameWindow gameWindow)
-        => (_, device) => imgui.Draw(device, gameFramebuffer, mainCamera, gameWindow);
-
-    public AlbionRenderSystem(ICameraProvider mainCamera)
+    public AlbionRenderSystem(ICameraProvider mainCamera, IImGuiMenuManager menus)
     {
         OutputDescription screenFormat = new(
             new OutputAttachmentDescription(PixelFormat.R32_Float),
@@ -39,7 +38,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
             .Renderer("r_etm", new EtmRenderer(screenFormat))
             .Renderer("r_mesh", new MeshRenderer(screenFormat))
             .Renderer("r_sky", new SkyboxRenderer(screenFormat))
-            .Renderer("r_debug", new DebugGuiRenderer(screenFormat))
+            .Renderer("r_debug", new ImGuiRenderer(screenFormat))
 
             .Source("s_sprite", new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key)))
             .Source("s_blended", new BatchManager<SpriteKey, BlendedSpriteInfo>(static (key, f) => f.CreateBlendedSpriteBatch(key)))
@@ -52,11 +51,35 @@ public sealed class AlbionRenderSystem : Component, IDisposable
             .System("sys_default", sys => 
                 sys
                 .Framebuffer("fb_screen", new MainFramebuffer("fb_screen"))
+                .Component("c_inputrouter", new AdHocComponent("c_inputrouter",
+                    static x =>
+                    { 
+                        // When running fullscreen, just echo the mouse input through to the game's mouse modes,
+                        // when showing the debug UI the pass-through of input is done in ImGuiGameWindow.
+                        var mouseEvent = new MouseInputEvent();
+                        var keyboardEvent = new KeyboardInputEvent();
+                        x.On<InputEvent>(e =>
+                        {
+                            keyboardEvent.DeltaSeconds   = e.DeltaSeconds;
+                            keyboardEvent.KeyCharPresses = e.Snapshot.KeyCharPresses;
+                            keyboardEvent.KeyEvents      = e.Snapshot.KeyEvents;
+                            x.Raise(keyboardEvent);
+
+                            mouseEvent.DeltaSeconds  = e.DeltaSeconds;
+                            mouseEvent.MouseDelta    = e.MouseDelta;
+                            mouseEvent.WheelDelta    = e.Snapshot.WheelDelta;
+                            mouseEvent.MousePosition = e.Snapshot.MousePosition;
+                            mouseEvent.MouseEvents   = e.Snapshot.MouseEvents;
+                            mouseEvent.IsMouseDown   = e.Snapshot.IsMouseDown;
+                            x.Raise(mouseEvent);
+                        });
+                    }))
                 .Component("c_gamewindow", new GameWindow(1,1))
-                .Component("c_windowupdater", AdHocComponent.Build((GameWindow)sys.GetComponent("c_gamewindow"), (gameWindow, x) =>
-                {
-                    x.On<WindowResizedEvent>(e => gameWindow.Resize(e.Width, e.Height));
-                }))
+                .Component("c_windowupdater", // Minimal component to ensure the game resizes with the window
+                    AdHocComponent.Build("c_windowupdater",
+                        (GameWindow)sys.GetComponent("c_gamewindow"),
+                        static (gameWindow, x) 
+                            => x.On<WindowResizedEvent>(e => gameWindow.Resize(e.Width, e.Height))))
                 .Resources(new GlobalResourceSetProvider())
                 .Pass("p_game", pass => 
                     pass
@@ -73,14 +96,23 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                 sys
                 .Framebuffer("fb_screen", new MainFramebuffer("fb_screen"))
                 .Framebuffer("fb_game", new SimpleFramebuffer("fb_game", 360, 240))
-                .Component("c_imgui", new ImGuiManager(DiagMenus.Draw))
                 .Component("c_gamewindow", new GameWindow(360, 240))
+                .Component("c_imgui", new ImGuiManager((ImGuiRenderer)sys.GetRenderer("r_debug")))
+                .Action(() =>
+                {
+                    var framebuffer = sys.GetFramebuffer("fb_game");
+                    var window =  (GameWindow)sys.GetComponent("c_gamewindow");
+                    menus.AddMenuItem(new ShowWindowMenuItem(
+                        "Game",
+                        "Windows",
+                        x => new ImGuiGameWindow(x, framebuffer, window)));
+
+                    menus.AddMenuItem(new ShowWindowMenuItem(
+                        "Positions",
+                        "Windows",
+                        name => new PositionsWindow(name, mainCamera)));
+                })
                 .Resources(new GlobalResourceSetProvider())
-                .PreRender(BuildPreRender(
-                    (IImGuiManager)sys.GetComponent("c_imgui"),
-                    sys.GetFramebuffer("fb_game"),
-                    mainCamera,
-                    (GameWindow)sys.GetComponent("c_gamewindow")))
                 .Pass("p_game", pass => 
                     pass
                     .Renderers("r_sprite", "r_blended", "r_tile", "r_etm", "r_mesh", "r_sky")
@@ -111,9 +143,14 @@ public sealed class AlbionRenderSystem : Component, IDisposable
         On<ToggleDiagnosticsEvent>(_ =>
         {
             _debugMode = !_debugMode;
-            SetRenderSystem();
+            _modeDirty = true;
         });
 
+        On<BeginFrameEvent>(_ =>
+        {
+            if (_modeDirty)
+                SetRenderSystem();
+        });
         On<SetClearColourEvent>(e => _clearColour = (e.Red, e.Green, e.Blue, e.Alpha));
     }
 
@@ -132,6 +169,8 @@ public sealed class AlbionRenderSystem : Component, IDisposable
         var engine = (Engine)TryResolve<IEngine>();
         if (engine != null)
             engine.RenderSystem = _debugMode ? _debug : _default;
+
+        _modeDirty = false;
     }
 
     void MainRenderFunc(RenderPass pass, GraphicsDevice device, CommandList cl, IResourceSetHolder set1)
@@ -144,8 +183,5 @@ public sealed class AlbionRenderSystem : Component, IDisposable
         pass.CollectAndDraw(device, cl, set1);
     }
 
-    public void Dispose()
-    {
-        _manager.Dispose();
-    }
+    public void Dispose() => _manager.Dispose();
 }

@@ -4,24 +4,24 @@ using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Reflection;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
 public class InspectorWindow : Component, IImGuiWindow
 {
-    readonly string _name;
     IList<Selection> _hits;
 
-    public InspectorWindow(int id)
+    public string Name { get; }
+    public InspectorWindow(string name)
     {
-        _name = $"Inspector###Inspect{id}";
+        Name = name;
         On<InspectorPickEvent>(e => _hits = e.Selections);
     }
 
-    public void Draw(GraphicsDevice device)
+    public void Draw()
     {
-        ImGui.Begin(_name);
+        bool open = true;
+        ImGui.Begin(Name, ref open);
         int hitId = 0;
         if (_hits != null)
         {
@@ -33,6 +33,9 @@ public class InspectorWindow : Component, IImGuiWindow
             }
         }
         ImGui.End();
+
+        if (!open)
+            Remove();
     }
 
     static void RenderNode(string name, object target)

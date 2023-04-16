@@ -6,22 +6,18 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
 using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
 public class SettingsWindow : Component, IImGuiWindow
 {
-    readonly string _name;
+    public string Name { get; }
+    public SettingsWindow(string name) => Name = name;
 
-    public SettingsWindow(int id)
+    public void Draw()
     {
-        _name = $"Settings###Settings{id}";
-    }
-
-    public void Draw(GraphicsDevice device)
-    {
-        ImGui.Begin(_name);
+        bool open = true;
+        ImGui.Begin(Name, ref open);
 
 #if DEBUG
         if (ImGui.TreeNode("Debug"))
@@ -70,6 +66,9 @@ public class SettingsWindow : Component, IImGuiWindow
         }
 
         ImGui.End();
+
+        if (!open)
+            Remove();
     }
 
     static void BoolOption(string name, Func<bool> getter, Action<bool> setter)

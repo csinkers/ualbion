@@ -38,6 +38,7 @@ static class Albion
     public static void RunGame(EventExchange global, CommandLineOptions commandLine)
     {
         RegisterComponents(global, commandLine);
+        ConfigureMenus(global);
 
         PerfTracker.StartupEvent("Running game");
         global.Raise(new SetSceneEvent(SceneId.Empty), null);
@@ -126,9 +127,11 @@ static class Albion
             return mesh;
         }
 
+        var menuManager = new ImGuiMenuManager();
         var gameServices = new Container("Game",
             sceneManager,
-            new AlbionRenderSystem(sceneManager),
+            menuManager,
+            new AlbionRenderSystem(sceneManager, menuManager),
             new TextureSource(),
             new VeldridGameFactory(LoadMesh),
             new MeshManager(LoadMesh),
@@ -178,5 +181,29 @@ static class Albion
         G.Instance.Attach(global); // Add convenience class that holds globals for debugging
 #endif
 #pragma warning restore CA2000 // Dispose objects before losing scope
+    }
+
+    static void ConfigureMenus(EventExchange eventExchange)
+    {
+        var menus = eventExchange.Resolve<IImGuiMenuManager>();
+
+        // Note: ImGuiGameWindow and PositionsWindow are added in AlbionRenderSystem so they can have access to internal render system components.
+        var items = new[] { 
+            new ShowWindowMenuItem("Asset Explorer", "Windows", name => new AssetExplorerWindow(name)),
+            new ShowWindowMenuItem("Breakpoints",    "Windows", name => new BreakpointsWindow(name)),
+            new ShowWindowMenuItem("Script",         "Windows", name => new CodeWindow(name)),
+            new ShowWindowMenuItem("Console",        "Windows", name => new ImGuiConsoleLogger(name)),
+            new ShowWindowMenuItem("ImGuiDemo",      "Windows", name => new DemoWindow(name)),
+            new ShowWindowMenuItem("Inspector Demo", "Windows", name => new InspectorDemoWindow(name)),
+            new ShowWindowMenuItem("Inspector",      "Windows", name => new InspectorWindow(name)),
+            new ShowWindowMenuItem("Settings",       "Windows", name => new SettingsWindow(name)),
+            new ShowWindowMenuItem("Stats",          "Windows", name => new StatsWindow(name)),
+            new ShowWindowMenuItem("Threads",        "Windows", name => new ThreadsWindow(name)),
+            new ShowWindowMenuItem("UI Layout",      "Windows", name => new LayoutWindow(name)),
+            new ShowWindowMenuItem("Watch",          "Windows", name => new WatchWindow(name)),
+            // new ShowWindowMenuItem("Profiler", "Windows", name => new ProfilerWindow(name)),
+        };
+        foreach(var item in items)
+            menus.AddMenuItem(item);
     }
 }

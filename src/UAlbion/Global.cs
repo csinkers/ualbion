@@ -59,7 +59,6 @@ public class G : Component
     public static CollisionManager Coll => Instance._coll;
     public static SceneManager Scenes => Instance._scenes;
     public static LayoutManager LayoutManager => Instance._layoutManager;
-    public static LayoutNode Layout => LayoutManager?.GetLayout();
     public static DialogManager Dialogs => Instance._dialogs;
     public static CursorManager Cursors => Instance._cursors;
     public static InputManager Input => Instance._input;

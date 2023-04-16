@@ -5,7 +5,6 @@ using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Reflection;
 using UAlbion.Game.State;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -45,23 +44,23 @@ public class InspectorDemoWindow : Component, IImGuiWindow
     }
 
     readonly TestObject _testObject = new();
-    readonly string _name;
+    public string Name { get; }
+    public InspectorDemoWindow(string name) => Name = name;
 
-    public InspectorDemoWindow(int id)
-    {
-        _name = $"Inspector Demo###IDemo{id}";
-    }
-
-    public void Draw(GraphicsDevice device)
+    public void Draw()
     {
         ReflectorUtil.SwapAuxiliaryState();
         var state = TryResolve<IGameState>();
         if (state == null)
             return;
 
-        ImGui.Begin(_name);
+        bool open = true;
+        ImGui.Begin(Name, ref open);
         RenderNode("Test", _testObject);
         ImGui.End();
+
+        if (!open)
+            Remove();
     }
 
     static void RenderNode(string name, object target)

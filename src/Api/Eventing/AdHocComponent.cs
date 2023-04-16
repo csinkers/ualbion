@@ -6,11 +6,17 @@ namespace UAlbion.Api.Eventing;
 
 public class AdHocComponent : Component
 {
-    public AdHocComponent(Action<IAdHocComponentHelper> constructor)
-        => constructor(new Helper(this));
+    public string Name { get; }
+    public override string ToString() => $"AdHoc:{Name}";
 
-    public static AdHocComponent Build<T>(T context, Action<T, IAdHocComponentHelper> constructor)
-        => new(x => constructor(context, x));
+    public AdHocComponent(string name, Action<IAdHocComponentHelper> constructor)
+    {
+        Name = name;
+        constructor(new Helper(this));
+    }
+
+    public static AdHocComponent Build<T>(string name, T context, Action<T, IAdHocComponentHelper> constructor)
+        => new(name, x => constructor(context, x));
 
     public Action OnSubscribing { get; init; }
     public Action OnSubscribed { get; init; }

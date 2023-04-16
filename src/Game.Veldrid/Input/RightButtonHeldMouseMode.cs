@@ -47,11 +47,11 @@ public class RightButtonHeldMouseMode : Component
     void OnInput(MouseInputEvent e)
     {
         _hits.Clear();
-        Resolve<ISelectionManager>().CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, false);
+        Resolve<ISelectionManager>().CastRayFromScreenSpace(_hits, e.MousePosition, false, false);
         if (_hits.Count == 0)
             return;
 
-        if (e.Snapshot.CheckMouse(MouseButton.Right, false))
+        if (e.CheckMouse(MouseButton.Right, false))
             ShowContextMenu(_hits);
         else
             UpdateCursorPosition(_hits);

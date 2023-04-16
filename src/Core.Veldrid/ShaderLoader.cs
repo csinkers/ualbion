@@ -41,6 +41,21 @@ public sealed class ShaderLoader : ServiceComponent<IShaderLoader>, IShaderLoade
         throw new FileNotFoundException($"Could not find shader \"{path}\" in any loaded mod's ShaderPath directory");
     }
 
+    public byte[] LoadRaw(string path, IFileSystem disk)
+    {
+        if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
+        if (disk == null) throw new ArgumentNullException(nameof(disk));
+
+        foreach (var dir in _directories)
+        {
+            var candidate = Path.Combine(dir, path);
+            if (disk.FileExists(candidate))
+                return disk.ReadAllBytes(candidate);
+        }
+
+        throw new FileNotFoundException($"Could not find shader \"{path}\" in any loaded mod's ShaderPath directory");
+    }
+
     static ShaderInfo LoadInner(string path, IFileSystem disk)
     {
         var name = Path.GetFileName(path);

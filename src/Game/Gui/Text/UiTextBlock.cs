@@ -22,7 +22,7 @@ public class UiTextBlock : UiElement // Renders a single TextBlock in the UI
     {
         _scissorRegion = scissorRegion;
         On<BackendChangedEvent>(_ => IsDirty = true);
-        On<WindowResizedEvent>(_ => IsDirty = true);
+        On<GameWindowResizedEvent>(_ => IsDirty = true);
         Block = block;
     }
     protected override void Subscribed() { IsDirty = true;}

@@ -45,7 +45,7 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
     {
         On<PrepareFrameEvent>(_ => Render());
         On<IdleClockEvent>(_ => _frame++);
-        On<WindowResizedEvent>(_ => SetCursor(_cursorId));
+        On<GameWindowResizedEvent>(_ => SetCursor(_cursorId));
         On<SetCursorEvent>(e => SetCursor(e.CursorId));
         On<ShowCursorEvent>(e => { _showCursor = e.Show; _dirty = true; });
         On<SetRelativeMouseModeEvent>(e => _relative = e.Enabled);
@@ -57,7 +57,14 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
             _heldItemCountUsesTenths = e.UseTenths;
             _heldItemFrames = e.FrameCount < 1 ? 1 : e.FrameCount;
         });
-        On<PreviewInputEvent>(e =>
+
+        On<MouseInputEvent>(e =>
+        {
+            Position = e.MousePosition;
+            _dirty = true;
+        });
+
+        /* On<PreviewInputEvent>(e =>
         {
             if (_relative)
             {
@@ -68,7 +75,8 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
             }
             else Position = e.Snapshot.MousePosition;
             _dirty = true;
-        });
+        }); */
+
         On<SetCursorPositionEvent>(e =>
         {
             Position = new Vector2(e.X, e.Y);

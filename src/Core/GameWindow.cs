@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Api.Eventing;
+using UAlbion.Core.Events;
 
 namespace UAlbion.Core;
 
 public class GameWindow : ServiceComponent<IGameWindow>, IGameWindow
 {
+    readonly GameWindowResizedEvent _resizedEvent = new();
     int _width;
     int _height;
 
@@ -26,6 +28,7 @@ public class GameWindow : ServiceComponent<IGameWindow>, IGameWindow
         _width = width;
         _height = height;
         Recalculate();
+        Raise(_resizedEvent);
     }
 
     public int GuiScale { get; private set; }

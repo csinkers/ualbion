@@ -19,13 +19,13 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
     readonly CollectDialogsEvent _collectDialogsEvent = new();
     readonly SelectionContext _selectionContext = new();
 
+    public LayoutNode LastLayout { get; private set; }
     public IDictionary<IUiElement, LayoutNode> LastSnapshot { get; private set; } =
         new Dictionary<IUiElement, LayoutNode>();
 
     public LayoutManager()
     {
         On<LayoutEvent>(RenderLayout);
-        On<DumpLayoutEvent>(_ => DumpLayout());
         On<ScreenCoordinateSelectEvent>(Select);
     }
 
@@ -67,13 +67,24 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
         var flags = Var(CoreVars.User.EngineFlags);
         if ((flags & EngineFlags.SuppressLayout) != 0)
         {
-            // If the user specifically requested this layout run then
-            // dump out the details of it to the console.
-            DumpLayout();
+            // If the user specifically requested this layout run then record the layout tree
+            GetLayout();
             return;
         }
 
         DoLayout(static (_, extents, order, element) => element.Render(extents, order, null), 0);
+    }
+
+    public LayoutNode GetLayout()
+    {
+        var rootNode = new LayoutNode(null, null, UiConstants.UiExtents, 0);
+        DoLayout(
+            static (root, extents, order, element) 
+                => element.Render(extents, order, new LayoutNode(root, element, extents, order)),
+            rootNode);
+
+        LastLayout = rootNode;
+        return rootNode;
     }
 
     void Select(ScreenCoordinateSelectEvent e)
@@ -139,16 +150,6 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
         return (x, y);
     }
 
-    public LayoutNode GetLayout()
-    {
-        var rootNode = new LayoutNode(null, null, UiConstants.UiExtents, 0);
-        DoLayout(static (root, extents, order, element) =>
-            element.Render(extents, order, new LayoutNode(root, element, extents, order)),
-            rootNode);
-
-        return rootNode;
-    }
-
     void DumpLayout()
     {
         var root = GetLayout();
@@ -166,7 +167,6 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
 
         Aux(root, 0);
         Info(sb.ToString());
-        Raise(new SetClipboardTextEvent(sb.ToString()));
     }
 
     void CaptureSnapshot()

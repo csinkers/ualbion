@@ -13,12 +13,17 @@ public class DebugPickMouseMode : Component
 {
     readonly List<Selection> _hits = new();
     readonly PopMouseModeEvent _popMouseModeEvent = new();
+    readonly InspectorPickEvent _pickEvent;
 
-    public DebugPickMouseMode() => On<MouseInputEvent>(OnInput);
+    public DebugPickMouseMode()
+    {
+        _pickEvent = new InspectorPickEvent(_hits);
+        On<MouseInputEvent>(OnInput);
+    }
 
     void OnInput(MouseInputEvent e)
     {
-        if (e.Snapshot.CheckMouse(MouseButton.Left, true))
+        if (e.CheckMouse(MouseButton.Left, true))
         {
             var layoutManager = TryResolve<ILayoutManager>();
             layoutManager?.RequestSnapshot();
@@ -27,7 +32,12 @@ public class DebugPickMouseMode : Component
         }
 
         _hits.Clear();
-        Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, true, true);
-        Raise(new InspectorPickEvent(_hits));
+        Resolve<ISelectionManager>()?.CastRayFromScreenSpace(
+            _hits,
+            e.MousePosition,
+            true,
+            true);
+
+        Raise(_pickEvent);
     }
 }

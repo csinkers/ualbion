@@ -21,6 +21,7 @@ public class SettingsManager : Component, ISettings
     const string VarSetName = "Settings";
     const string UserPath = "$(CONFIG)/settings.json";
     VarSet _set = new(VarSetName);
+    bool _dirty;
 
     public SettingsManager()
     {
@@ -102,7 +103,8 @@ public class SettingsManager : Component, ISettings
             // Note: If version doesn't match discard old config and go back to defaults.
             // This is just to clear out any bad entries from before the format was stabilised,
             // if future changes are made to the format we can implement an actual upgrade process.
-            if (Version.Read(_set) != ConfigVersion)
+            int version = Version.Read(_set);
+            if (version != ConfigVersion)
             {
                 Warn($"Settings file was not version {ConfigVersion} - discarding settings");
                 _set = new VarSet(VarSetName);
@@ -136,6 +138,9 @@ public class SettingsManager : Component, ISettings
 
     public void Save()
     {
+        if (!_dirty)
+            return;
+
         var pathResolver = Resolve<IPathResolver>();
         var disk = Resolve<IFileSystem>();
         var jsonUtil = Resolve<IJsonUtil>();
@@ -148,10 +153,20 @@ public class SettingsManager : Component, ISettings
         Version.Write(this, ConfigVersion);
         VarSetLoader.Save(_set, path, disk, jsonUtil);
         _set.ClearValue(Version.Key);
+        _dirty = false;
     }
 
     public bool TryGetValue(string key, out object value) => _set.TryGetValue(key, out value);
-    public void SetValue(string key, object value) => _set.SetValue(key, value);
-    public void ClearValue(string key) => _set.ClearValue(key);
+    public void SetValue(string key, object value)
+    {
+        _set.SetValue(key, value);
+        _dirty = true;
+    }
+
+    public void ClearValue(string key)
+    {
+        _set.ClearValue(key);
+        _dirty = true;
+    }
 }
 #pragma warning restore CA2227 // Collection properties should be read only

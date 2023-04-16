@@ -2,22 +2,22 @@
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
 public class ThreadsWindow : Component, IImGuiWindow
 {
-    readonly string _name;
 
     int _currentContextIndex;
     string[] _contextNames = Array.Empty<string>();
 
-    public ThreadsWindow(int id) => _name = $"Threads###Threads{id}";
+    public string Name { get; }
+    public ThreadsWindow(string name) => Name = name;
 
-    public void Draw(GraphicsDevice device)
+    public void Draw()
     {
-        ImGui.Begin(_name);
+        bool open = true;
+        ImGui.Begin(Name, ref open);
         ImGui.TextUnformatted(Context.ToString());
 
         var chainManager = Resolve<IEventManager>();
@@ -30,5 +30,8 @@ public class ThreadsWindow : Component, IImGuiWindow
 
         ImGui.ListBox("Active Contexts", ref _currentContextIndex, _contextNames, _contextNames.Length);
         ImGui.End();
+
+        if (!open)
+            Remove();
     }
 }

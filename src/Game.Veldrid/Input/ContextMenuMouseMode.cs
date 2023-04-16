@@ -33,14 +33,14 @@ public class ContextMenuMouseMode : Component
     void OnInput(MouseInputEvent e)
     {
         _hits.Clear();
-        Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, true);
-        if (_hits.Count > 0 && e.Snapshot.CheckMouse(MouseButton.Left, true))
+        Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.MousePosition, false, true);
+        if (_hits.Count > 0 && e.CheckMouse(MouseButton.Left, true))
             Distribute(_leftClickEvent, _hits, x => x.Target as IComponent);
 
-        if (e.Snapshot.CheckMouse(MouseButton.Left, false))
+        if (e.CheckMouse(MouseButton.Left, false))
             Raise(_leftReleaseEvent);
 
-        if (e.Snapshot.CheckMouse(MouseButton.Right, true))
+        if (e.CheckMouse(MouseButton.Right, true))
             Raise(new CloseWindowEvent());
     }
 }

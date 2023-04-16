@@ -27,7 +27,7 @@ public class NormalMouseMode : Component
     void OnInput(MouseInputEvent e)
     {
         _hits.Clear();
-        Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.Snapshot.MousePosition, false, true);
+        Resolve<ISelectionManager>()?.CastRayFromScreenSpace(_hits, e.MousePosition, false, true);
 
         // Clicks are targeted, releases are broadcast. e.g. if you click and drag a slider and move outside
         // its hover area, then it should switch to "ClickedBlurred". If you then release the button while
@@ -35,30 +35,30 @@ public class NormalMouseMode : Component
         // it wouldn't be able to transition back to Normal
         if (_hits.Count > 0)
         {
-            if (e.Snapshot.CheckMouse(MouseButton.Right, true))
+            if (e.CheckMouse(MouseButton.Right, true))
                 Distribute(_rightClickEvent, _hits, x => x.Target as IComponent);
 
-            if (e.Snapshot.CheckMouse(MouseButton.Left, true))
+            if (e.CheckMouse(MouseButton.Left, true))
                 Distribute(_leftClickEvent, _hits, x => x.Target as IComponent);
 
-            if ((int)e.Snapshot.WheelDelta != 0)
+            if ((int)e.WheelDelta != 0)
             {
-                _scrollEvent.Delta = (int)e.Snapshot.WheelDelta;
+                _scrollEvent.Delta = (int)e.WheelDelta;
                 Distribute(_scrollEvent, _hits, x => x.Target as IComponent);
             }
         }
 
-        if (e.Snapshot.CheckMouse(MouseButton.Left, false))
+        if (e.CheckMouse(MouseButton.Left, false))
             Raise(_leftReleaseEvent);
 
-        if (e.Snapshot.CheckMouse(MouseButton.Right, false))
+        if (e.CheckMouse(MouseButton.Right, false))
             Raise(_rightReleaseEvent);
 
-        if (_lastPosition != e.Snapshot.MousePosition)
+        if (_lastPosition != e.MousePosition)
         {
-            _lastPosition = e.Snapshot.MousePosition;
+            _lastPosition = e.MousePosition;
             var window = Resolve<IGameWindow>();
-            var uiPosition = window.NormToUi(window.PixelToNorm(e.Snapshot.MousePosition));
+            var uiPosition = window.NormToUi(window.PixelToNorm(e.MousePosition));
             _moveEvent.X = (int)uiPosition.X;
             _moveEvent.Y = (int)uiPosition.Y;
             Raise(_moveEvent);

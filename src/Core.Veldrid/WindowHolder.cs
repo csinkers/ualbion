@@ -13,9 +13,7 @@ namespace UAlbion.Core.Veldrid;
 
 class WindowHolder : Component, IDisposable
 {
-    readonly PreviewInputEvent _previewEvent = new();
-    readonly KeyboardInputEvent _keyboardEvent = new();
-    readonly MouseInputEvent _mouseEvent = new();
+    readonly InputEvent _inputEvent = new();
     Sdl2Window _window;
     DateTime _lastTitleUpdateTime;
     Vector2? _pendingCursorUpdate;
@@ -31,6 +29,7 @@ class WindowHolder : Component, IDisposable
         On<ToggleResizableEvent>(_      => { if (_window != null) _window.Resizable = !_window.Resizable; });
         On<ToggleVisibleBorderEvent>(_  => { if (_window != null) _window.BorderVisible = !_window.BorderVisible; });
         On<ConfineMouseToWindowEvent>(e => { if (_window != null) Sdl2Native.SDL_SetWindowGrab(_window.SdlWindowHandle, e.Enabled); });
+        On<RenderSystemChangedEvent>(_  => { if (_window != null) Raise(new WindowResizedEvent(_window.Width, _window.Height)); });
         On<SetRelativeMouseModeEvent>(e =>
         {
             if (_window == null) return;
@@ -138,35 +137,12 @@ class WindowHolder : Component, IDisposable
         }
         else PerfTracker.Skip();
 
-        using (PerfTracker.FrameEvent("Raising preview input event"))
+        using (PerfTracker.FrameEvent("Raising input event"))
         {
-            _previewEvent.DeltaSeconds = deltaSeconds;
-            _previewEvent.Snapshot = snapshot;
-            Raise(_previewEvent);
+            _inputEvent.DeltaSeconds = deltaSeconds;
+            _inputEvent.MouseDelta = _window.MouseDelta;
+            _inputEvent.Snapshot = snapshot;
+            Raise(_inputEvent);
         }
-
-        if (!_previewEvent.SuppressKeyboard)
-        {
-            using (PerfTracker.FrameEvent("Raising keyboard event"))
-            {
-                _keyboardEvent.DeltaSeconds = deltaSeconds;
-                _keyboardEvent.KeyCharPresses = snapshot.KeyCharPresses;
-                _keyboardEvent.KeyEvents = snapshot.KeyEvents;
-                Raise(_keyboardEvent);
-            }
-        }
-        else PerfTracker.Skip();
-
-        if (!_previewEvent.SuppressMouse)
-        {
-            using (PerfTracker.FrameEvent("Raising mouse event"))
-            {
-                _mouseEvent.DeltaSeconds = deltaSeconds;
-                _mouseEvent.Snapshot = snapshot;
-                _mouseEvent.MouseDelta = _window.MouseDelta;
-                Raise(_mouseEvent);
-            }
-        }
-        else PerfTracker.Skip();
     }
 }

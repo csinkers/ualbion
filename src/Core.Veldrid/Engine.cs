@@ -15,29 +15,36 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
-public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
+public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldridEngine, IDisposable
 {
     static RenderDoc _renderDoc;
 
     readonly FrameTimeAverager _frameTimeAverager = new(0.5);
     readonly FenceHolder _fence;
     readonly WindowHolder _windowHolder;
-    readonly PrepareFrameEvent _prepareFrameEvent = new();
-    readonly PrepareFrameResourcesEvent _prepareFrameResourcesEvent = new();
-    readonly PrepareFrameResourceSetsEvent _prepareFrameResourceSetsEvent = new();
     readonly bool _useRenderDoc;
 
-    GraphicsDevice _graphicsDevice;
+    public GraphicsDevice Device { get; private set; }
     CommandList _frameCommands;
     GraphicsBackend? _newBackend;
+    IRenderPipeline _renderSystem;
     bool _done;
     bool _active = true;
 
     public bool StartupOnly { get; set; }
-    public bool IsDepthRangeZeroToOne => _graphicsDevice?.IsDepthRangeZeroToOne ?? false;
-    public bool IsClipSpaceYInverted => _graphicsDevice?.IsClipSpaceYInverted ?? false;
-    public string FrameTimeText => $"{_graphicsDevice.BackendType} {_frameTimeAverager.CurrentAverageFramesPerSecond:N2} fps ({_frameTimeAverager.CurrentAverageFrameTimeMilliseconds:N3} ms)";
-    public IRenderPipeline RenderSystem { get; set; }
+    public bool IsDepthRangeZeroToOne => Device?.IsDepthRangeZeroToOne ?? false;
+    public bool IsClipSpaceYInverted => Device?.IsClipSpaceYInverted ?? false;
+    public string FrameTimeText => $"{Device.BackendType} {_frameTimeAverager.CurrentAverageFramesPerSecond:N2} fps ({_frameTimeAverager.CurrentAverageFrameTimeMilliseconds:N3} ms)";
+
+    public IRenderPipeline RenderSystem
+    {
+        get => _renderSystem;
+        set
+        {
+            _renderSystem = value;
+            Raise(new RenderSystemChangedEvent());
+        }
+    }
 
     public Engine(GraphicsBackend backend, bool useRenderDoc, bool showWindow)
     {
@@ -62,19 +69,19 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
                 _done = true;
         });
         On<QuitEvent>(_ => _done = true);
-        On<WindowResizedEvent>(e => _graphicsDevice?.ResizeMainWindow((uint)e.Width, (uint)e.Height));
+        On<WindowResizedEvent>(e => Device?.ResizeMainWindow((uint)e.Width, (uint)e.Height));
 
         On<LoadRenderDocEvent>(_ =>
         {
             if (_renderDoc != null || !RenderDoc.Load(out _renderDoc)) return;
-            _newBackend = _graphicsDevice.BackendType;
+            _newBackend = Device.BackendType;
         });
 
         On<RunRenderDocEvent>(_ => _renderDoc?.LaunchReplayUI());
         On<TriggerRenderDocEvent>(_ => _renderDoc?.TriggerCapture());
         On<SetBackendEvent>(e => _newBackend = e.Value);
         On<GarbageCollectionEvent>(_ => GC.Collect());
-        // On<RecreateWindowEvent>(e => { _recreateWindow = true; _newBackend = _graphicsDevice.BackendType; });
+        // On<RecreateWindowEvent>(e => { _recreateWindow = true; _newBackend = Device.BackendType; });
         // Raise(new EngineFlagEvent(e.Value ? FlagOperation.Set : FlagOperation.Clear, EngineFlags.VSync));
     }
 
@@ -90,7 +97,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         base.Unsubscribed();
     }
 
-    void OnShadersUpdated(object _, EventArgs eventArgs) => _newBackend = _graphicsDevice?.BackendType;
+    void OnShadersUpdated(object _, EventArgs eventArgs) => _newBackend = Device?.BackendType;
 
     public void Run()
     {
@@ -105,7 +112,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
 
         while (!_done)
         {
-            GraphicsBackend backend = _newBackend ?? _graphicsDevice.BackendType;
+            GraphicsBackend backend = _newBackend ?? Device.BackendType;
             using (PerfTracker.InfrequentEvent($"change backend to {backend}"))
                 ChangeBackend(backend, oldBackend);
 
@@ -125,7 +132,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
 
     void InnerLoop()
     {
-        if (_graphicsDevice == null)
+        if (Device == null)
             throw new InvalidOperationException("GraphicsDevice not initialised");
 
         var frameCounter = new FrameCounter();
@@ -158,16 +165,16 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
 
             if (_active)
             {
-                using (PerfTracker.FrameEvent("Render "))
-                    Draw();
+                using (PerfTracker.FrameEvent("Render"))
+                    RenderSystem?.Render(Device);
 
-                if (_graphicsDevice.SyncToVerticalBlank != ((flags & EngineFlags.VSync) != 0))
-                    _graphicsDevice.SyncToVerticalBlank = (flags & EngineFlags.VSync) != 0;
+                if (Device.SyncToVerticalBlank != ((flags & EngineFlags.VSync) != 0))
+                    Device.SyncToVerticalBlank = (flags & EngineFlags.VSync) != 0;
 
                 using (PerfTracker.FrameEvent("Swap buffers"))
                 {
                     CoreTrace.Log.Info("Engine", "Swapping buffers...");
-                    _graphicsDevice.SwapBuffers();
+                    Device.SwapBuffers();
                     CoreTrace.Log.Info("Engine", "Draw complete");
                 }
             }
@@ -179,38 +186,6 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
             //Console.WriteLine($"Frame {frameCounter.FrameCount} complete, press Enter to continue");
             //Console.ReadLine();
         }
-    }
-
-    void Draw()
-    {
-        var renderSystem = RenderSystem;
-        if (renderSystem == null)
-            return;
-
-        using (PerfTracker.FrameEvent("Prepare scenes"))
-        {
-            _frameCommands.Begin();
-
-            _prepareFrameResourcesEvent.Device = _graphicsDevice;
-            _prepareFrameResourcesEvent.CommandList = _frameCommands;
-            _prepareFrameResourceSetsEvent.Device = _graphicsDevice;
-            _prepareFrameResourceSetsEvent.CommandList = _frameCommands;
-
-            Raise(_prepareFrameEvent);
-            Raise(_prepareFrameResourcesEvent);
-            Raise(_prepareFrameResourceSetsEvent);
-
-            _frameCommands.End();
-        }
-
-        using (PerfTracker.FrameEvent("Submit prepare commands"))
-        {
-            _fence.Fence.Reset();
-            _graphicsDevice.SubmitCommands(_frameCommands, _fence.Fence);
-            _graphicsDevice.WaitForFence(_fence.Fence);
-        }
-
-        renderSystem.Render(_graphicsDevice);
     }
 
     void ChangeBackend(GraphicsBackend backend, GraphicsBackend? oldBackend)
@@ -251,11 +226,11 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
             if (_windowHolder != null)
             {
                 _windowHolder.CreateWindow();
-                _graphicsDevice = VeldridStartup.CreateGraphicsDevice(_windowHolder.Window, gdOptions, backend);
+                Device = VeldridStartup.CreateGraphicsDevice(_windowHolder.Window, gdOptions, backend);
             }
             else
             {
-                _graphicsDevice = backend switch
+                Device = backend switch
                 {
                     GraphicsBackend.Direct3D11 => GraphicsDevice.CreateD3D11(gdOptions),
                     GraphicsBackend.Metal => GraphicsDevice.CreateMetal(gdOptions),
@@ -264,11 +239,11 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
                 };
             }
 
-            _graphicsDevice.WaitForIdle();
-            _frameCommands = _graphicsDevice.ResourceFactory.CreateCommandList();
+            Device.WaitForIdle();
+            _frameCommands = Device.ResourceFactory.CreateCommandList();
             _frameCommands.Name = "Frame Commands List";
 
-            Raise(new DeviceCreatedEvent(_graphicsDevice));
+            Raise(new DeviceCreatedEvent(Device));
             Raise(new BackendChangedEvent());
         }
         catch (Exception ex)
@@ -286,25 +261,25 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
     {
         using (PerfTracker.InfrequentEvent("Destroying objects"))
         {
-            _graphicsDevice?.WaitForIdle();
+            Device?.WaitForIdle();
             Raise(new DestroyDeviceObjectsEvent());
             _frameCommands?.Dispose();
-            _graphicsDevice?.Dispose();
+            Device?.Dispose();
             _frameCommands = null;
-            _graphicsDevice = null;
+            Device = null;
         }
     }
 
     public void RenderFrame(bool captureWithRenderDoc)
     {
         if(_newBackend != null)
-            ChangeBackend(_newBackend.Value, _graphicsDevice?.BackendType);
+            ChangeBackend(_newBackend.Value, Device?.BackendType);
         _newBackend = null;
 
         if (captureWithRenderDoc)
             _renderDoc.TriggerCapture();
 
-        Draw();
+        RenderSystem?.Render(Device);
     }
 
     public unsafe Image<Bgra32> ReadTexture2D(ITextureHolder textureHolder)
@@ -318,17 +293,17 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
             TextureUsage.Staging,
             TextureType.Texture2D);
 
-        using var staging = _graphicsDevice.ResourceFactory.CreateTexture(ref stagingDesc);
-        using var cl = _graphicsDevice.ResourceFactory.CreateCommandList();
+        using var staging = Device.ResourceFactory.CreateTexture(ref stagingDesc);
+        using var cl = Device.ResourceFactory.CreateCommandList();
 
         cl.Name = "CL:ReadTexture2D";
         cl.Begin();
         cl.CopyTexture(texture, staging);
         cl.End();
-        _graphicsDevice.SubmitCommands(cl);
-        _graphicsDevice.WaitForIdle();
+        Device.SubmitCommands(cl);
+        Device.WaitForIdle();
 
-        var mapped = _graphicsDevice.Map(staging, MapMode.Read);
+        var mapped = Device.Map(staging, MapMode.Read);
         try
         {
             var result = new Image<Bgra32>((int)texture.Width, (int)texture.Height);
@@ -346,7 +321,7 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         }
         finally
         {
-            _graphicsDevice.Unmap(staging);
+            Device.Unmap(staging);
         }
     }
 
@@ -357,9 +332,9 @@ public sealed class Engine : ServiceComponent<IEngine>, IEngine, IDisposable
         _fence.Dispose();
     }
 
-    public GraphicsDeviceFeatures GraphicsFeatures => _graphicsDevice.Features;
+    public GraphicsDeviceFeatures GraphicsFeatures => Device.Features;
     public PixelFormatProperties? GetPixelFormatProperties(PixelFormat format) =>
-        _graphicsDevice.GetPixelFormatSupport(format, TextureType.Texture2D, TextureUsage.Sampled,
+        Device.GetPixelFormatSupport(format, TextureType.Texture2D, TextureUsage.Sampled,
             out var properties)
             ? properties
             : null;

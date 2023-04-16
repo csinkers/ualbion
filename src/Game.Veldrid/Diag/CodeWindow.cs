@@ -1,11 +1,9 @@
-﻿using System;
-using ImGuiColorTextEditNet;
+﻿using ImGuiColorTextEditNet;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid;
 using UAlbion.Formats;
 using UAlbion.Formats.MapEvents;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -32,17 +30,12 @@ namespace UAlbion.Game.Veldrid.Diag;
 
 public class CodeWindow : Component, IImGuiWindow
 {
-    readonly Func<EventContext> _getContext;
     readonly TextEditor _editor;
-    readonly string _name;
+    public string Name { get; }
 
-    public CodeWindow(int id, Func<EventContext> getContext)
+    public CodeWindow(string name)
     {
-        // var chainManager = Resolve<IEventManager>();
-        // var context = chainManager.Contexts[_currentContextIndex];
-
-        _getContext = getContext ?? throw new ArgumentNullException(nameof(getContext));
-        _name = $"Code###Code{id}";
+        Name = name;
         _editor = new TextEditor
         {
             IsReadOnly = true,
@@ -50,13 +43,24 @@ public class CodeWindow : Component, IImGuiWindow
         };
     }
 
-    public void Draw(GraphicsDevice device)
+    public void Draw()
     {
-        var context = _getContext();
-        if (context == null)
-            return;
+        var chainManager = Resolve<IEventManager>();
+        var context = chainManager.CurrentDebugContext;
 
-        ImGui.Begin(_name);
+        bool open = true;
+        ImGui.Begin(Name, ref open);
+        if (context != null)
+            DrawContext(context);
+
+        ImGui.End();
+
+        if (!open)
+            Remove();
+    }
+
+    void DrawContext(EventContext context)
+    {
         ImGui.TextUnformatted(Context.ToString());
 
         var set = context.EventSet;
@@ -67,9 +71,9 @@ public class CodeWindow : Component, IImGuiWindow
             set.Decompiled = eventFormatter.Decompile(set.Events, set.Chains, set.ExtraEntryPoints);
             var code = set.Decompiled.Script;
             _editor.Text = code;
+            // TODO: Add breakpoints
         }
 
         _editor.Render("Script");
-        ImGui.End();
     }
 }

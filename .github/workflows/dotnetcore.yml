@@ -1,6 +1,14 @@
 name: .NET Core
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      - release/**
+  pull_request:
+    branches:
+      - master
+      - release/**
 
 jobs:
   build:
@@ -12,8 +20,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      with:
-          submodules: true
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
@@ -22,3 +28,4 @@ jobs:
       run: dotnet build --configuration Release src/UAlbion/UAlbion.csproj
     - name: Test with dotnet
       run: dotnet test ./src/ualbion.ci.sln --configuration Release
+

@@ -18,14 +18,14 @@ public class InventoryExitButton : UiElement
         On<HoverEvent>(_ =>
         {
             var im = Resolve<IInventoryManager>();
-            if (im?.ItemInHand?.Item == null)
+            if (im.ItemInHand.Item.IsNone)
                 _state = ButtonState.Hover;
         });
         On<BlurEvent>(_ => _state = ButtonState.Normal);
         On<UiLeftClickEvent>(_ =>
         {
             var im = Resolve<IInventoryManager>();
-            if (im?.ItemInHand?.Item == null)
+            if (im.ItemInHand.Item.IsNone)
                 _state = ButtonState.Clicked;
         });
         On<UiLeftReleaseEvent>(_ =>

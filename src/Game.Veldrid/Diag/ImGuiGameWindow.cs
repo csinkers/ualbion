@@ -48,8 +48,6 @@ public class ImGuiGameWindow : Component, IImGuiWindow
 
         bool open = true;
         ImGui.Begin(Name, ref open);
-        uint dockId = ImGui.GetWindowDockID();
-        TODO
 
         var texture = _framebuffer.Framebuffer?.ColorTargets[0].Target;
         if (texture != null)

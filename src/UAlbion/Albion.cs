@@ -191,6 +191,7 @@ static class Albion
         var items = new[] { 
             new ShowWindowMenuItem("Asset Explorer", "Windows", name => new AssetExplorerWindow(name)),
             new ShowWindowMenuItem("Breakpoints",    "Windows", name => new BreakpointsWindow(name)),
+            new ShowWindowMenuItem("Script",         "Windows", name => new CodeWindow(name)),
             new ShowWindowMenuItem("Console",        "Windows", name => new ImGuiConsoleLogger(name)),
             new ShowWindowMenuItem("ImGuiDemo",      "Windows", name => new DemoWindow(name)),
             new ShowWindowMenuItem("Inspector Demo", "Windows", name => new InspectorDemoWindow(name)),

@@ -38,7 +38,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
             .Renderer("r_etm", new EtmRenderer(screenFormat))
             .Renderer("r_mesh", new MeshRenderer(screenFormat))
             .Renderer("r_sky", new SkyboxRenderer(screenFormat))
-            .Renderer("r_debug", new DebugGuiRenderer(screenFormat))
+            .Renderer("r_debug", new ImGuiRenderer(screenFormat))
 
             .Source("s_sprite", new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key)))
             .Source("s_blended", new BatchManager<SpriteKey, BlendedSpriteInfo>(static (key, f) => f.CreateBlendedSpriteBatch(key)))
@@ -79,8 +79,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                     AdHocComponent.Build("c_windowupdater",
                         (GameWindow)sys.GetComponent("c_gamewindow"),
                         static (gameWindow, x) 
-                            => x.On<WindowResizedEvent>(e 
-                                => gameWindow.Resize(e.Width, e.Height))))
+                            => x.On<WindowResizedEvent>(e => gameWindow.Resize(e.Width, e.Height))))
                 .Resources(new GlobalResourceSetProvider())
                 .Pass("p_game", pass => 
                     pass
@@ -98,7 +97,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                 .Framebuffer("fb_screen", new MainFramebuffer("fb_screen"))
                 .Framebuffer("fb_game", new SimpleFramebuffer("fb_game", 360, 240))
                 .Component("c_gamewindow", new GameWindow(360, 240))
-                .Component("c_imgui", new ImGuiManager((DebugGuiRenderer)sys.GetRenderer("r_debug")))
+                .Component("c_imgui", new ImGuiManager((ImGuiRenderer)sys.GetRenderer("r_debug")))
                 .Action(() =>
                 {
                     var framebuffer = sys.GetFramebuffer("fb_game");

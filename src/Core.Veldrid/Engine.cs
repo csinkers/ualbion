@@ -27,6 +27,7 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
     public GraphicsDevice Device { get; private set; }
     CommandList _frameCommands;
     GraphicsBackend? _newBackend;
+    IRenderPipeline _renderSystem;
     bool _done;
     bool _active = true;
 
@@ -34,7 +35,16 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
     public bool IsDepthRangeZeroToOne => Device?.IsDepthRangeZeroToOne ?? false;
     public bool IsClipSpaceYInverted => Device?.IsClipSpaceYInverted ?? false;
     public string FrameTimeText => $"{Device.BackendType} {_frameTimeAverager.CurrentAverageFramesPerSecond:N2} fps ({_frameTimeAverager.CurrentAverageFrameTimeMilliseconds:N3} ms)";
-    public IRenderPipeline RenderSystem { get; set; }
+
+    public IRenderPipeline RenderSystem
+    {
+        get => _renderSystem;
+        set
+        {
+            _renderSystem = value;
+            Raise(new RenderSystemChangedEvent());
+        }
+    }
 
     public Engine(GraphicsBackend backend, bool useRenderDoc, bool showWindow)
     {

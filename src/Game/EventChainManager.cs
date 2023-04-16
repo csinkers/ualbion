@@ -20,8 +20,10 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
 
     readonly List<EventContext> _contexts = new();
     readonly List<Breakpoint> _breakpoints = new();
+    public EventContext CurrentDebugContext { get; }
     public IReadOnlyList<EventContext> Contexts => _contexts;
     public IReadOnlyList<Breakpoint> Breakpoints => _breakpoints;
+
     public EventChainManager()
     {
         // Need to enqueue without a sender if we want to handle it ourselves.

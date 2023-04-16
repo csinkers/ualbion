@@ -13,7 +13,7 @@ namespace UAlbion.Core.Veldrid;
 public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
 {
     static readonly TimeSpan LayoutUpdateInterval = TimeSpan.FromSeconds(10);
-    readonly DebugGuiRenderer _renderer;
+    readonly ImGuiRenderer _renderer;
     int _nextWindowId;
     bool _initialised;
     DateTime _lastLayoutUpdate;
@@ -22,7 +22,7 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
     public bool ConsumedKeyboard { get; set; }
     public bool ConsumedMouse { get; set; }
 
-    public ImGuiManager(DebugGuiRenderer renderer)
+    public ImGuiManager(ImGuiRenderer renderer)
     {
         _renderer = renderer ?? throw new ArgumentNullException(nameof(renderer));
 
@@ -35,7 +35,8 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
         if (!_initialised)
             return;
 
-        _renderer.ImGuiRenderer?.Update((float)e.DeltaSeconds, e.Snapshot);
+        _renderer.Update((float)e.DeltaSeconds, e.Snapshot);
+
         var io = ImGui.GetIO();
         ConsumedKeyboard = io.WantCaptureKeyboard;
         ConsumedMouse = io.WantCaptureMouse;
@@ -146,18 +147,18 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
     public IntPtr GetOrCreateImGuiBinding(Texture texture)
     {
         var engine = Resolve<IVeldridEngine>();
-        return _renderer.ImGuiRenderer.GetOrCreateImGuiBinding(engine.Device.ResourceFactory, texture);
+        return _renderer.GetOrCreateImGuiBinding(engine.Device.ResourceFactory, texture);
     }
 
     public IntPtr GetOrCreateImGuiBinding(TextureView textureView)
     {
         var engine = Resolve<IVeldridEngine>();
-        return _renderer.ImGuiRenderer.GetOrCreateImGuiBinding(engine.Device.ResourceFactory, textureView);
+        return _renderer.GetOrCreateImGuiBinding(engine.Device.ResourceFactory, textureView);
     }
 
     public void RemoveImGuiBinding(Texture texture) 
-        => _renderer.ImGuiRenderer.RemoveImGuiBinding(texture);
+        => _renderer.RemoveImGuiBinding(texture);
 
     public void RemoveImGuiBinding(TextureView textureView) 
-        => _renderer.ImGuiRenderer.RemoveImGuiBinding(textureView);
+        => _renderer.RemoveImGuiBinding(textureView);
 }

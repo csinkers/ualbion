@@ -29,6 +29,7 @@ class WindowHolder : Component, IDisposable
         On<ToggleResizableEvent>(_      => { if (_window != null) _window.Resizable = !_window.Resizable; });
         On<ToggleVisibleBorderEvent>(_  => { if (_window != null) _window.BorderVisible = !_window.BorderVisible; });
         On<ConfineMouseToWindowEvent>(e => { if (_window != null) Sdl2Native.SDL_SetWindowGrab(_window.SdlWindowHandle, e.Enabled); });
+        On<RenderSystemChangedEvent>(_  => { if (_window != null) Raise(new WindowResizedEvent(_window.Width, _window.Height)); });
         On<SetRelativeMouseModeEvent>(e =>
         {
             if (_window == null) return;

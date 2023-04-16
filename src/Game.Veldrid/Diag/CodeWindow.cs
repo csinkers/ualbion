@@ -1,5 +1,4 @@
-﻿using System;
-using ImGuiColorTextEditNet;
+﻿using ImGuiColorTextEditNet;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid;
@@ -31,17 +30,12 @@ namespace UAlbion.Game.Veldrid.Diag;
 
 public class CodeWindow : Component, IImGuiWindow
 {
-    readonly Func<EventContext> _getContext;
     readonly TextEditor _editor;
     public string Name { get; }
 
-    public CodeWindow(string name, Func<EventContext> getContext)
+    public CodeWindow(string name)
     {
-        // var chainManager = Resolve<IEventManager>();
-        // var context = chainManager.Contexts[_currentContextIndex];
-
         Name = name;
-        _getContext = getContext ?? throw new ArgumentNullException(nameof(getContext));
         _editor = new TextEditor
         {
             IsReadOnly = true,
@@ -51,12 +45,22 @@ public class CodeWindow : Component, IImGuiWindow
 
     public void Draw()
     {
-        var context = _getContext();
-        if (context == null)
-            return;
+        var chainManager = Resolve<IEventManager>();
+        var context = chainManager.CurrentDebugContext;
 
         bool open = true;
         ImGui.Begin(Name, ref open);
+        if (context != null)
+            DrawContext(context);
+
+        ImGui.End();
+
+        if (!open)
+            Remove();
+    }
+
+    void DrawContext(EventContext context)
+    {
         ImGui.TextUnformatted(Context.ToString());
 
         var set = context.EventSet;
@@ -67,12 +71,9 @@ public class CodeWindow : Component, IImGuiWindow
             set.Decompiled = eventFormatter.Decompile(set.Events, set.Chains, set.ExtraEntryPoints);
             var code = set.Decompiled.Script;
             _editor.Text = code;
+            // TODO: Add breakpoints
         }
 
         _editor.Render("Script");
-        ImGui.End();
-
-        if (!open)
-            Remove();
     }
 }

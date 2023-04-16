@@ -25,15 +25,19 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
     public ImGuiManager(ImGuiRenderer renderer)
     {
         _renderer = renderer ?? throw new ArgumentNullException(nameof(renderer));
-
-        On<DeviceCreatedEvent>(_ => Dirty());
         On<InputEvent>(OnInput);
     }
 
     void OnInput(InputEvent e)
     {
         if (!_initialised)
-            return;
+        {
+            if (ImGui.GetCurrentContext() == IntPtr.Zero)
+                return;
+
+            InitialiseLayout();
+            _initialised = true;
+        }
 
         _renderer.Update((float)e.DeltaSeconds, e.Snapshot);
 
@@ -74,32 +78,13 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
         }
     }
 
-    void Dirty() => On<PrepareFrameResourcesEvent>(CreateDeviceObjects);
-    void CreateDeviceObjects(PrepareFrameResourcesEvent e)
-    {
-        if (ImGui.GetCurrentContext() == IntPtr.Zero)
-            return;
-
-        var io = ImGui.GetIO();
-        unsafe { io.NativePtr->IniFilename = null; } // Turn off ini file
-        io.ConfigFlags |= ImGuiConfigFlags.DockingEnable;
-
-        ImGui.StyleColorsClassic();
-
-        if (!_initialised)
-        {
-            InitialiseLayout();
-            _initialised = true;
-        }
-
-        Off<PrepareFrameResourcesEvent>();
-    }
-
     void InitialiseLayout()
     {
         var layout = Var(CoreVars.Ui.ImGuiLayout);
         var config = ImGuiConfig.Load(layout);
         var newConfig = new ImGuiConfig();
+
+        var oldIni = ImGui.SaveIniSettingsToMemory();
 
         // Create windows
         var menus = Resolve<IImGuiMenuManager>();
@@ -122,24 +107,21 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
             }
 
             if (!int.TryParse(windowName[(index + 2)..], out _))
-            {
-                newConfig.Sections.Add(section);
                 continue;
-            }
 
             var windowType = windowName[..index];
             var window = menus.CreateWindow(windowType, this);
             if (window == null)
                 continue;
 
-            newConfig.Sections.Add(new ImGuiConfigSection(window.Name, section.Lines));
+            newConfig.Sections.Add(new ImGuiConfigSection($"[Window][{window.Name}]", section.Lines));
         }
 
-        ImGui.LoadIniSettingsFromMemory(newConfig.ToString());
+        var newConfigText = newConfig.ToString();
+        ImGui.LoadIniSettingsFromMemory(newConfigText);
+        var roundTrip = ImGui.SaveIniSettingsToMemory();
+        int diff = roundTrip.Length - newConfigText.Length;
     }
-
-    protected override void Subscribed() => Dirty();
-    // protected override void Unsubscribed() => Dispose();
 
     public int GetNextWindowId() => Interlocked.Increment(ref _nextWindowId);
     public void AddWindow(IImGuiWindow window) => AttachChild(window);

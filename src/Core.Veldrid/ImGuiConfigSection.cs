@@ -14,4 +14,5 @@ public class ImGuiConfigSection
 
     public string Name { get; set; }
     public List<string> Lines { get; } = new();
+    public override string ToString() => $"{Name} ({Lines.Count} lines)";
 }

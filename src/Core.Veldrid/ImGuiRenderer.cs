@@ -67,7 +67,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     public void Update(float deltaSeconds, InputSnapshot snapshot)
     {
         if (_frameBegun)
-            ImGui.Render();
+            return;
 
         SetPerFrameImGuiData(deltaSeconds);
         UpdateImGuiInput(snapshot);
@@ -234,14 +234,16 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
         IntPtr context = ImGui.CreateContext();
         ImGui.SetCurrentContext(context);
 
-        ImGui.GetIO().Fonts.AddFontDefault();
-        ImGui.GetIO().Fonts.Flags |= ImFontAtlasFlags.NoBakedLines;
+        var io = ImGui.GetIO();
+        unsafe { io.NativePtr->IniFilename = null; } // Turn off ini file
+        io.ConfigFlags |= ImGuiConfigFlags.DockingEnable;
+        io.Fonts.AddFontDefault();
+        io.Fonts.Flags |= ImFontAtlasFlags.NoBakedLines;
 
+        ImGui.StyleColorsClassic();
         CreateDeviceResources(graphicsDevice, _outputFormat);
         SetPerFrameImGuiData(1f / 60f);
 
-        ImGui.NewFrame();
-        _frameBegun = true;
         Off<PrepareFrameResourcesEvent>();
     }
 

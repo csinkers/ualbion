@@ -4,6 +4,7 @@ using System.Text;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
 
 namespace UAlbion.Game.Veldrid.Diag;
@@ -14,10 +15,14 @@ public class ImGuiConsoleLogger : Component, IImGuiWindow
     readonly byte[] _inputBuffer = new byte[512];
     bool _autoScroll = true;
     bool _scrollToBottom = true;
-    bool _wasShown;
+    bool _focus;
 
     public string Name { get; }
-    public ImGuiConsoleLogger(string name) => Name = name;
+    public ImGuiConsoleLogger(string name)
+    {
+        Name = name;
+        On<FocusConsoleEvent>(_ => _focus = true);
+    }
 
     public void Draw()
     {
@@ -94,8 +99,11 @@ public class ImGuiConsoleLogger : Component, IImGuiWindow
         //  | ImGuiInputTextFlags.CallbackCompletion
         //  | ImGuiInputTextFlags.CallbackHistory;
 
-        if(!_wasShown)
+        if (_focus)
+        {
             ImGui.SetKeyboardFocusHere(0);
+            _focus = false;
+        }
 
         if (ImGui.InputText("", _inputBuffer, (uint)_inputBuffer.Length, inputTextFlags))
         {
@@ -117,6 +125,7 @@ public class ImGuiConsoleLogger : Component, IImGuiWindow
 
             reclaimFocus = true;
         }
+
         ImGui.SetItemDefaultFocus();
         if (reclaimFocus)
             ImGui.SetKeyboardFocusHere(-1); // Auto focus previous widget
@@ -125,7 +134,6 @@ public class ImGuiConsoleLogger : Component, IImGuiWindow
         ImGui.Checkbox("Scroll", ref _autoScroll);
 
         ImGui.End();
-        _wasShown = true;
 
         if (!open)
             Remove();

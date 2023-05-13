@@ -1,30 +1,46 @@
 ﻿using System;
 using SerdesNet;
+using UAlbion.Api.Eventing;
+using UAlbion.Config;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.MapEvents;
 
+[Event("create_transport")]
 public class CreateTransportEvent : MapEvent
 {
-    public static CreateTransportEvent Serdes(CreateTransportEvent e, ISerializer s)
+    public CreateTransportEvent(byte x, byte y, byte id, MapId mapId)
+    {
+        X = x;
+        Y = y;
+        Id = id;
+        MapId = mapId;
+    }
+
+    CreateTransportEvent() { }
+
+    public static CreateTransportEvent Serdes(CreateTransportEvent e, AssetMapping mapping, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         e ??= new CreateTransportEvent();
-        e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);
-        e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
-        e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);
-        e.Unk4 = s.UInt8(nameof(Unk4), e.Unk4);
-        e.Unk5 = s.UInt8(nameof(Unk5), e.Unk5);
-        e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
-        e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+        e.X = s.UInt8(nameof(X), e.X);
+        e.Y = s.UInt8(nameof(Y), e.Y);
+        e.Id = s.UInt8(nameof(Id), e.Id);
+
+        int zeroed = s.UInt8(null, 0);
+        zeroed += s.UInt8(null, 0);
+
+        e.MapId = MapId.SerdesU16(nameof(MapId), e.MapId, mapping, s);
+
+        zeroed += s.UInt16(null, 0);
         return e;
     }
 
-    public byte Unk1 { get; private set; }
-    public byte Unk2 { get; private set; }
-    public byte Unk3 { get; private set; }
-    public byte Unk4 { get; private set; }
-    public byte Unk5 { get; private set; }
-    public ushort Unk6 { get; private set; }
-    public ushort Unk8 { get; private set; }
+    [EventPart("x")] public byte X { get; private set; }
+    [EventPart("y")] public byte Y { get; private set; }
+    [EventPart("id")] public byte Id { get; private set; } // TODO: What kind of id is this?
+    [EventPart("map")] public MapId MapId { get; private set; } // 0 = stay on current map
+
     public override MapEventType EventType => MapEventType.CreateTransport;
 }
+

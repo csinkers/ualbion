@@ -100,7 +100,7 @@ public enum EventSet : ushort
     AliceTakashi = 190,
     RobertAshley = 191,
     RainerHofstedt = 192,
-    KapitänBrandt = 193,
+    CaptainBrandt = 193,
     Ned = 194,
     Argim = 195,
 

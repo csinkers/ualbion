@@ -123,7 +123,7 @@ public enum NpcSheet : byte
     AliceTakashi = 190,
     RobertAshley = 191,
     RainerHofstedt2 = 192,
-    KapitänBrandt = 193,
+    CaptainBrandt = 193,
     Ned = 194,
     Argim = 195,
     Ned2 = 196,

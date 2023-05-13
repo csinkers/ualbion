@@ -1,4 +1,6 @@
 @echo off
+set BINDIR=%~dp0\build\UAlbion\bin\Release\net6.0
+
 if x%1 == xextract goto extract
 if x%1 == xbuild goto build
 if x%1 == xpublish goto publish
@@ -13,13 +15,13 @@ goto end
 
 :build
 dotnet build -c Release src\ualbion.full.sln
-copy /Y build\UAlbion\bin\Release\net6.0\native\win-x64\SDL2.dll build\UAlbion\bin\Release\net6.0
-copy /Y deps\veldrid-spirv\bin\Debug\libveldrid-spirv.dll build\UAlbion\bin\Release\net6.0
-pushd src\UAlbion\bin\Release\net6.0
+copy /Y %BINDIR%\native\win-x64\SDL2.dll %BINDIR%
+copy /Y deps\veldrid-spirv\bin\Debug\libveldrid-spirv.dll %BINDIR%
+pushd %BINDIR%
 goto end
 
 :publish
-set UALBION_PUB=build\UAlbion\bin\Release\net6.0\publish
+set UALBION_PUB=%BINDIR%\publish
 if not exist %UALBION_PUB% goto l1
 RD /S /Q %UALBION_PUB%
 :l1

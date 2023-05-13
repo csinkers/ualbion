@@ -106,7 +106,7 @@ public enum Portrait : byte
     AliceTakashi = 100,
     RobertAshley = 101,
     RainerHofstedt = 102,
-    KapitänBrandt = 103,
+    CaptainBrandt = 103,
     NedAndRhain = 104,
     Argim = 105,
     Ned = 106,

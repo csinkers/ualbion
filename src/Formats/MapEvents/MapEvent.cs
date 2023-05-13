@@ -68,7 +68,7 @@ public abstract class MapEvent : Event, IMapEvent
             MapEventType.ChangeUsedItem => ChangeUsedItemEvent.Serdes((ChangeUsedItemEvent)e, mapping, s),
             MapEventType.Chest => ChestEvent.Serdes((ChestEvent)e, mapping, s),
             MapEventType.CloneAutomap => CloneAutomapEvent.Serdes((CloneAutomapEvent)e, mapping, s),
-            MapEventType.CreateTransport => CreateTransportEvent.Serdes((CreateTransportEvent)e, s),
+            MapEventType.CreateTransport => CreateTransportEvent.Serdes((CreateTransportEvent)e, mapping, s),
             MapEventType.DataChange => DataChangeEvent.Serdes((IDataChangeEvent)e, mapping, s),
             MapEventType.Door => DoorEvent.Serdes((DoorEvent)e, mapping, s),
             MapEventType.Encounter => EncounterEvent.Serdes((EncounterEvent)e, s),

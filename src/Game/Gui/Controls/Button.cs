@@ -86,7 +86,7 @@ public class Button : UiElement
 
         if (ClickTimerPending) // If they double-clicked...
         {
-            DoubleClick?.Invoke();
+            DoubleClick.Invoke();
             ClickTimerPending = false; // Ensure the single-click behaviour doesn't happen.
         }
         else // For the first click, just start the double-click timer.

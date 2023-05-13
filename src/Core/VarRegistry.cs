@@ -16,6 +16,8 @@ public class VarRegistry : ServiceComponent<IVarRegistry>, IVarRegistry
 
     public void Register(Type type)
     {
+        if (type is null) throw new ArgumentNullException(nameof(type));
+
         var subClasess = type.GetNestedTypes(BindingFlags.Public);
         foreach(var  sub in subClasess)
             Register(sub);

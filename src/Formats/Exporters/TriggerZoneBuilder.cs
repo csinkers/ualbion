@@ -80,6 +80,8 @@ public static class TriggerZoneBuilder
 
     public static string PrintRegion(IList<(int x, int y)> region)
     {
+        if (region == null) throw new ArgumentNullException(nameof(region));
+
         var extents = GetExtents(region);
         var width = 1 + extents.x1 - extents.x0;
         var height = 1 + extents.y1 - extents.y0;
@@ -114,6 +116,8 @@ public static class TriggerZoneBuilder
 
     public static void RemoveVoids(List<(ZoneKey key, IList<(int x, int y)> points)> regions)
     {
+        if (regions == null) throw new ArgumentNullException(nameof(regions));
+
         for (int regionIndex = 0; regionIndex < regions.Count; regionIndex++)
         {
             var region = regions[regionIndex];
@@ -434,6 +438,7 @@ public static class TriggerZoneBuilder
 
     public static IList<(int x, int y)> GetPointsInsidePolygon(IEnumerable<(int, int)> polygon)
     {
+        if (polygon == null) throw new ArgumentNullException(nameof(polygon));
         var shape = PolygonToShape(polygon);
         return GetPointsInsideShape(shape);
     }

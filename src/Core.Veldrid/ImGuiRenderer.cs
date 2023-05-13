@@ -66,6 +66,8 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     /// </summary>
     public void Update(float deltaSeconds, InputSnapshot snapshot)
     {
+        if (snapshot == null) throw new ArgumentNullException(nameof(snapshot));
+
         if (_frameBegun)
             return;
 
@@ -107,6 +109,9 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     /// </summary>
     public IntPtr GetOrCreateImGuiBinding(ResourceFactory factory, TextureView textureView)
     {
+        if (factory == null) throw new ArgumentNullException(nameof(factory));
+        if (textureView == null) throw new ArgumentNullException(nameof(textureView));
+
         if (!_setsByView.TryGetValue(textureView, out ResourceSetInfo rsi))
         {
             ResourceSet resourceSet = factory.CreateResourceSet(new ResourceSetDescription(_textureLayout, textureView));
@@ -138,6 +143,9 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     /// </summary>
     public IntPtr GetOrCreateImGuiBinding(ResourceFactory factory, Texture texture)
     {
+        if (factory == null) throw new ArgumentNullException(nameof(factory));
+        if (texture == null) throw new ArgumentNullException(nameof(texture));
+
         if (!_autoViewsByTexture.TryGetValue(texture, out TextureView textureView))
         {
             textureView = factory.CreateTextureView(texture);

@@ -8,6 +8,8 @@ public static class MapperUtil
 {
     public static string PropString(ITiledPropertySource source, string key, bool required = false)
     {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+
         if (source.Properties == null || source.Properties.Count == 0)
         {
             if (required)

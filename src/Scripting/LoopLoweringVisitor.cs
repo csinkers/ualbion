@@ -10,6 +10,8 @@ public class LoopLoweringVisitor : BaseAstBuilderVisitor
     readonly Stack<string> _tailStack = new();
     protected override ICfgNode Build(DoLoop doLoop)
     {
+        if (doLoop == null) throw new ArgumentNullException(nameof(doLoop));
+
         var headLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
         var tailLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
         _headStack.Push(headLabel);
@@ -49,6 +51,8 @@ public class LoopLoweringVisitor : BaseAstBuilderVisitor
 
     protected override ICfgNode Build(WhileLoop whileLoop)
     {
+        if (whileLoop == null) throw new ArgumentNullException(nameof(whileLoop));
+
         var headLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
         var tailLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
         _headStack.Push(headLabel);
@@ -89,6 +93,8 @@ public class LoopLoweringVisitor : BaseAstBuilderVisitor
 
     protected override ICfgNode Build(EndlessLoop endlessLoop)
     {
+        if (endlessLoop == null) throw new ArgumentNullException(nameof(endlessLoop));
+
         var headLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
         var tailLabel = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
         _headStack.Push(headLabel);

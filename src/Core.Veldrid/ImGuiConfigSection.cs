@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace UAlbion.Core.Veldrid;
 
@@ -7,6 +8,8 @@ public class ImGuiConfigSection
     public ImGuiConfigSection(string name) => Name = name;
     public ImGuiConfigSection(string name, List<string> lines)
     {
+        if (lines == null) throw new ArgumentNullException(nameof(lines));
+
         Name = name;
         foreach (var line in lines)
             Lines.Add(line);

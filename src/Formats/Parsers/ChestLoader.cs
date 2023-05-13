@@ -10,6 +10,7 @@ public class ChestLoader : IAssetLoader<Inventory>
     public Inventory Serdes(Inventory existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
+        if (context == null) throw new ArgumentNullException(nameof(context));
         return Inventory.SerdesChest(info.AssetId.ToInt32(), existing, context.Mapping, s);
     }
 

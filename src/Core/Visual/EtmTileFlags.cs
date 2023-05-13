@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace UAlbion.Core.Visual;
 
 [Flags]
+[SuppressMessage("", "CA2217")]
 public enum EtmTileFlags : uint
 {
     FloorBackAndForth = 1,

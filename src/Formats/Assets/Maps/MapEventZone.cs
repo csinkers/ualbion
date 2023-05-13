@@ -56,6 +56,8 @@ public class MapEventZone
     {
         if (getEvent == null) throw new ArgumentNullException(nameof(getEvent));
         if (getChain == null) throw new ArgumentNullException(nameof(getChain));
+        if (getEventForChain == null) throw new ArgumentNullException(nameof(getEventForChain));
+
         ChainSource = mapId;
         if (Node is DummyEventNode dummy)
             Node = dummy.Id == EventNode.UnusedEventId ? null : getEvent(dummy.Id);

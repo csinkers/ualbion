@@ -1,5 +1,7 @@
-﻿namespace UAlbion.Formats.MapEvents;
+﻿using System.Diagnostics.CodeAnalysis;
+namespace UAlbion.Formats.MapEvents;
 
+[SuppressMessage("", "CA1027")]
 public enum SoundMode : byte
 {
     Silent = 0, // ??

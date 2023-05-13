@@ -111,6 +111,8 @@ public class FlagSet
 
     public void Serdes(string name, ISerializer s)
     {
+        if (s == null) throw new ArgumentNullException(nameof(s));
+
         if (s.IsReading())
             SetPacked(s.Bytes(name, null, PackedSize));
         else

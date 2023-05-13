@@ -39,15 +39,19 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
     {
         var pathResolver = Resolve<IPathResolver>();
         AttachChild(new ShaderCache(pathResolver.ResolvePath("$(CACHE)/ShaderCache")));
-        _shaderLoader = AttachChild(new ShaderLoader());
+        _shaderLoader = new ShaderLoader();
 
         foreach (var shaderPath in Resolve<IModApplier>().ShaderPaths)
             _shaderLoader.AddShaderDirectory(shaderPath);
 
-        _engine = AttachChild(new Engine(GraphicsBackend.Vulkan, false, false));
-        _isoRsm = AttachChild(new IsometricRenderSystem(tileWidth, tileHeight, baseHeight, tilesPerRow));
+        _engine = new Engine(GraphicsBackend.Vulkan, false, false);
+        _isoRsm = new IsometricRenderSystem(tileWidth, tileHeight, baseHeight, tilesPerRow);
         _isoRsm.OffScreen.IsActive = true;
         _engine.RenderSystem = _isoRsm.OffScreen;
+
+        AttachChild(_shaderLoader);
+        AttachChild(_engine);
+        AttachChild(_isoRsm);
 
         Raise(new SetSceneEvent(SceneId.IsometricBake));
         Raise(new SetClearColourEvent(0, 0, 0, 0));

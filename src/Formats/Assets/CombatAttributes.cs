@@ -1,4 +1,5 @@
-﻿namespace UAlbion.Formats.Assets;
+﻿using System;
+namespace UAlbion.Formats.Assets;
 
 public class CombatAttributes : ICombatAttributes
 {
@@ -13,6 +14,8 @@ public class CombatAttributes : ICombatAttributes
     public CombatAttributes DeepClone() => new CombatAttributes().CopyFrom(this);
     public CombatAttributes CopyFrom(CombatAttributes other)
     {
+        if (other == null) throw new ArgumentNullException(nameof(other));
+
         ExperiencePoints = other.ExperiencePoints;
         TrainingPoints = other.TrainingPoints;
         LifePoints = other.LifePoints.DeepClone();

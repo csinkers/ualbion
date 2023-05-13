@@ -137,6 +137,8 @@ public class UiText : UiElement
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
+        if (func == null) throw new ArgumentNullException(nameof(func));
+
         Rebuild(extents);
 
         int maxOrder = order;

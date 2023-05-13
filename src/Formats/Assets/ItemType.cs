@@ -1,5 +1,7 @@
-﻿namespace UAlbion.Formats.Assets;
+﻿using System.Diagnostics.CodeAnalysis;
+namespace UAlbion.Formats.Assets;
 
+[SuppressMessage("", "CA1027")] // Nonsensical "use flags" warnings when underlying type is byte.
 public enum ItemType : byte
 {
     Armor              = 1,

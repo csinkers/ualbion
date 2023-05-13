@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace UAlbion.Core.Visual;
 
@@ -6,6 +7,7 @@ namespace UAlbion.Core.Visual;
 /// Flags that can vary per-instance.
 /// </summary>
 [Flags]
+[SuppressMessage("", "CA2217")]
 public enum SpriteFlags : uint
 {
     None           =        0,

@@ -82,6 +82,7 @@ public static class TilesetMapping
 
     public static TilesetData ToAlbion(Tileset tileset, TilesetId id, Tilemap2DProperties properties)
     {
+        if (tileset == null) throw new ArgumentNullException(nameof(tileset));
         if (properties == null) throw new ArgumentNullException(nameof(properties));
 
         var t = new TilesetData(id);

@@ -16,6 +16,8 @@ public static class EffectiveSheetCalculator
     {
         if (sheet == null) throw new ArgumentNullException(nameof(sheet));
         if (config == null) throw new ArgumentNullException(nameof(config));
+        if (getItem == null) throw new ArgumentNullException(nameof(getItem));
+
         var effective = new EffectiveCharacterSheet(sheet.Id)
         {
             // Names

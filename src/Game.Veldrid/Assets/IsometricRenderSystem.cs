@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
@@ -15,7 +16,9 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Game.Veldrid.Assets;
 
-public class IsometricRenderSystem : Component, IDisposable
+[SuppressMessage("", "CA2000")] // Analysis thinks disposable resources won't get cleaned up, but the manager, systems & passes will.
+[SuppressMessage("", "CA2213")] // Analysis thinks disposable resources won't get cleaned up, but the manager, systems & passes will.
+public sealed class IsometricRenderSystem : Component, IDisposable
 {
     readonly RenderManager _manager;
     public RenderSystem OnScreen { get; }
@@ -102,7 +105,10 @@ public class IsometricRenderSystem : Component, IDisposable
 
     public void Dispose()
     {
-        _manager?.Dispose();
+        foreach(var child in Children)
+            if (child is IDisposable disposable)
+                disposable.Dispose();
+        RemoveAllChildren();
         GC.SuppressFinalize(this);
     }
 }

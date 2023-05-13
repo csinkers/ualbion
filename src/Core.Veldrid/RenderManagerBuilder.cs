@@ -23,6 +23,8 @@ public class RenderManagerBuilder
     public RenderManagerBuilder Source(string name, IRenderableSource source) { Check(); _sources.Add(name, source); return this; }
     public RenderManagerBuilder System(string name, Func<RenderSystemBuilder, RenderSystem> build)
     {
+        if (build == null) throw new ArgumentNullException(nameof(build));
+
         Check();
         _pipelines.Add(name, build(RenderSystemBuilder.Create(name, this)));
         return this;

@@ -17,7 +17,7 @@ public class ModInfo
     {
         if (json == null) throw new ArgumentNullException(nameof(json));
         if (disk == null) throw new ArgumentNullException(nameof(disk));
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+
         Name = name ?? throw new ArgumentNullException(nameof(name));
         AssetConfig = assetConfig ?? throw new ArgumentNullException(nameof(assetConfig));
         ModConfig = modConfig ?? throw new ArgumentNullException(nameof(modConfig));

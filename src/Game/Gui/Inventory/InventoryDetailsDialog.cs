@@ -60,7 +60,8 @@ public class InventoryDetailsDialog : ModalDialog
             Enum.GetValues(typeof(PlayerClass))
                 .Cast<PlayerClass>()
                 .Where(x => item.Class.IsAllowed(x))
-                .Select(x => (IUiElement)new UiTextBuilder(Describe.DescribePlayerClass(x)).NoWrap());
+                .Select(x => (IUiElement)new UiTextBuilder(Describe.DescribePlayerClass(x)).NoWrap())
+                .ToArray();
 
         var classStack = new HorizontalStacker(
             new VerticalStacker(classElements.Take(5).ToArray()),

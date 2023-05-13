@@ -40,6 +40,8 @@ public static class ZipUtil
 
     public static byte[] Deflate(byte[] bytes)
     {
+        if (bytes == null) throw new ArgumentNullException(nameof(bytes));
+
         var deflater = new Deflater();
         deflater.SetLevel(Deflater.DEFAULT_COMPRESSION);
         deflater.SetInput(bytes);

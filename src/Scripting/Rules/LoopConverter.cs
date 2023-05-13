@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting.Rules;
@@ -7,6 +8,7 @@ public static class LoopConverter
 {
     public static (ControlFlowGraph result, string description) Apply(ControlFlowGraph graph)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
         var visitor = new LoopConversionVisitor();
         return (graph.AcceptBuilder(visitor), "Convert loops");
     }

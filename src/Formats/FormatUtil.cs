@@ -15,12 +15,12 @@ namespace UAlbion.Formats;
 
 public static class FormatUtil
 {
-    static readonly Encoding AlbionEncoding;
-    static FormatUtil()
+    static readonly Encoding AlbionEncoding = GetEncoding850();
+    static Encoding GetEncoding850()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core
         PerfTracker.StartupEvent("Registered encodings");
-        AlbionEncoding = Encoding.GetEncoding(850);
+        return Encoding.GetEncoding(850);
     }
 
     public static string BytesTo850String(byte[] bytes) =>
@@ -202,6 +202,8 @@ public static class FormatUtil
 
     public static string GetReducedSha256HexString(string filename, IFileSystem disk)
     {
+        if (disk == null) throw new ArgumentNullException(nameof(disk));
+
         using var sha256 = SHA256.Create();
         using var stream = disk.OpenRead(filename);
         var hashBytes = sha256.ComputeHash(stream);

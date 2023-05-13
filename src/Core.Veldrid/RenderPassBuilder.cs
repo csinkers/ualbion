@@ -36,6 +36,8 @@ public class RenderPassBuilder
     public RenderPassBuilder Renderer(string name) { Check(); _renderers.Add(_manager.GetRenderer(name)); return this; }
     public RenderPassBuilder Renderers(params string[] names)
     {
+        if (names == null) throw new ArgumentNullException(nameof(names));
+
         Check();
         foreach (var name in names)
             _renderers.Add(_manager.GetRenderer(name));
@@ -45,6 +47,8 @@ public class RenderPassBuilder
     public RenderPassBuilder Source(string name) { Check(); _sources.Add(_manager.GetSource(name)); return this; }
     public RenderPassBuilder Sources(params string[] names)
     {
+        if (names == null) throw new ArgumentNullException(nameof(names));
+
         Check();
         foreach (var name in names)
             _sources.Add(_manager.GetSource(name));

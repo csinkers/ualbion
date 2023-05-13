@@ -10,6 +10,9 @@ public class VarSetLoader : IAssetLoader<VarSet>
 {
     public VarSet Serdes(VarSet existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
+        if (info == null) throw new ArgumentNullException(nameof(info));
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
         if (!context.Disk.FileExists(info.File.Filename))
             throw new FileNotFoundException($"Could not find game config file at expected path {info.File.Filename}");
 

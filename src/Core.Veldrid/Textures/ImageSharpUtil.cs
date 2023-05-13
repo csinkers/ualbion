@@ -36,6 +36,8 @@ public static class ImageSharpUtil
 
     public static Image<Rgba32> PackSpriteSheet(uint[] palette, int frameCount, GetFrameMethod<byte> getFrame)
     {
+        if (getFrame == null) throw new ArgumentNullException(nameof(getFrame));
+
         var layout = SpriteSheetUtil.ArrangeSpriteSheet(frameCount, 0, getFrame);
         if (layout.Layers > 1)
             throw new InvalidOperationException("Could not pack sprite sheet into a single layer");

@@ -591,6 +591,8 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
 
     public (ControlFlowGraph result, int[] mapping) Merge(ControlFlowGraph other)
     {
+        if (other == null) throw new ArgumentNullException(nameof(other));
+
         var result = this;
         var mapping = new int[other.Nodes.Count];
         Array.Fill(mapping, -1);
@@ -646,6 +648,8 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
 
     public ControlFlowGraph AcceptBuilder(IAstBuilderVisitor visitor)
     {
+        if (visitor == null) throw new ArgumentNullException(nameof(visitor));
+
         var result = this;
         foreach (var index in GetDfsOrder())
         {
@@ -722,6 +726,8 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
 
     public static ControlFlowGraph FromString(string s) // For test case graphs where we don't care about node contents, just the structure.
     {
+        if (string.IsNullOrEmpty(s)) throw new ArgumentNullException(nameof(s));
+
         // Syntax: [NodeCount, Entry, Exit, Edges]
         // Edges: 0+1 0-2 2+3 etc. Use + for true, - for false
         // e.g. [5,0,4,0+1 1+2 2+3 3+4]
@@ -803,7 +809,7 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
                 CfgEdge.DisjointGraphFixup => 'd',
                 CfgEdge.LoopSuccessor => 'l',
                 CfgEdge.EntryPoint => 'n',
-                _ => throw new ArgumentOutOfRangeException()
+                _ => '?'
             };
 
             if (!first)

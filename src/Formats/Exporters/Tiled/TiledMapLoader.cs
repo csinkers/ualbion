@@ -16,6 +16,7 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
         if (!s.IsWriting())
             return Read(info, s, context);

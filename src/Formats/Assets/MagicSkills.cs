@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using UAlbion.Formats.Ids;
@@ -27,6 +28,8 @@ public class MagicSkills : IMagicSkills
     public MagicSkills DeepClone() => new MagicSkills().CopyFrom(this);
     public MagicSkills CopyFrom(MagicSkills other)
     {
+        if (other == null) throw new ArgumentNullException(nameof(other));
+
         SpellPoints = other.SpellPoints.DeepClone();
         SpellClasses = other.SpellClasses;
         KnownSpells = other.KnownSpells.ToList();

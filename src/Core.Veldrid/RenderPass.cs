@@ -61,6 +61,10 @@ public sealed class RenderPass : Component
 
     public static void DefaultRender(RenderPass pass, GraphicsDevice device, CommandList cl, IResourceSetHolder set1)
     {
+        if (pass == null) throw new ArgumentNullException(nameof(pass));
+        if (device == null) throw new ArgumentNullException(nameof(device));
+        if (cl == null) throw new ArgumentNullException(nameof(cl));
+
         cl.SetFramebuffer(pass.Target.Framebuffer);
         cl.SetFullViewports();
         cl.SetFullScissorRects();

@@ -42,6 +42,7 @@ public static class ScriptCompiler
     public static ControlFlowGraph ExpandGraph(ControlFlowGraph graph, Func<IEvent, IEvent> eventTransformer, RecordFunc record)
     {
         if (graph == null) throw new ArgumentNullException(nameof(graph));
+        if (record == null) throw new ArgumentNullException(nameof(record));
         ControlFlowGraph previous = null;
         graph = record("Begin compilation", graph);
         graph = record("Lower loops", LowerLoops(graph));
@@ -147,6 +148,7 @@ public static class ScriptCompiler
 
     public static ControlFlowGraph ExpandSequence(ControlFlowGraph graph)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
         foreach (var index in graph.GetDfsOrder())
         {
             var node = graph.Nodes[index];
@@ -168,6 +170,7 @@ public static class ScriptCompiler
 
     public static ControlFlowGraph ExpandIfThenElse(ControlFlowGraph graph)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
         foreach (var index in graph.GetDfsOrder())
         {
             var node = graph.Nodes[index];
@@ -197,6 +200,7 @@ public static class ScriptCompiler
 
     public static ControlFlowGraph ExpandIfThen(ControlFlowGraph graph)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
         foreach (var index in graph.GetDfsOrder())
         {
             var node = graph.Nodes[index];
@@ -232,6 +236,8 @@ public static class ScriptCompiler
 
     public static ControlFlowGraph RemoveLoopSuccessors(ControlFlowGraph graph)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+
         var edgesToRemove = graph.LabelledEdges.Where(x => x.label == CfgEdge.LoopSuccessor);
         foreach (var (start, end, _) in edgesToRemove)
             graph = graph.RemoveEdge(start, end);
@@ -240,6 +246,8 @@ public static class ScriptCompiler
 
     public static ControlFlowGraph ResolveGotos(ControlFlowGraph graph)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+
         // Build label name -> target dict
         var mapping = new Dictionary<string, int>();
 

@@ -60,6 +60,8 @@ public class GenericTreeNode<T>
 
     public GenericTreeNode<T> FindChild(T value, Func<T, T, bool> equalityFunc, bool recursive = false)
     {
+        if (equalityFunc == null) throw new ArgumentNullException(nameof(equalityFunc));
+
         foreach (GenericTreeNode<T> child in Children)
         {
             if (equalityFunc(child.Value, value))
@@ -78,6 +80,8 @@ public class GenericTreeNode<T>
 
     public List<T> FindPath(T value, Func<T, T, bool> equalityFunc)
     {
+        if (equalityFunc == null) throw new ArgumentNullException(nameof(equalityFunc));
+
         foreach (GenericTreeNode<T> child in Children)
         {
             if (equalityFunc(child.Value, value))

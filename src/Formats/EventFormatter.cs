@@ -59,6 +59,7 @@ public class EventFormatter : IEventFormatter
         IEnumerable<ushort> additionalEntryPoints,
         int indent = 0) where T : IEventNode
     {
+        if (events == null) throw new ArgumentNullException(nameof(events));
         if (events.Count == 0)
             return new DecompilationResult();
 

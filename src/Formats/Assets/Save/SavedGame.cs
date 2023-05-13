@@ -434,12 +434,16 @@ public class SavedGame
 
     public bool IsEventUsed(AssetId eventSetId, ActionEvent action)
     {
+        if (action == null) throw new ArgumentNullException(nameof(action));
+
         var visited = new VisitedEvent(eventSetId, action.ActionType, action.Argument);
         return _visitedSet.Contains(visited);
     }
 
     public void UseEvent(AssetId eventSetId, ActionEvent action)
     {
+        if (action == null) throw new ArgumentNullException(nameof(action));
+
         var visited = new VisitedEvent(eventSetId, action.ActionType, action.Argument);
         if (_visitedSet.Add(visited))
             _visitedEvents.Add(visited);

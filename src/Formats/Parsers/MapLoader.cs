@@ -11,6 +11,7 @@ public class MapLoader : IAssetLoader<IMapData>
     public IMapData Serdes(IMapData existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
+        if (context == null) throw new ArgumentNullException(nameof(context));
         return BaseMapData.Serdes(info, existing, context.Mapping, s);
     }
 

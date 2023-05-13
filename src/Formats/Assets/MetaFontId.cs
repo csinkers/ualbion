@@ -41,6 +41,8 @@ public readonly struct MetaFontId : IEquatable<MetaFontId>, IEquatable<AssetId>,
 
     public static implicit operator AssetId(MetaFontId id) => AssetId.FromUInt32(id._value);
     public static implicit operator MetaFontId(AssetId id) => new(id.ToUInt32());
+    public static AssetId ToAssetId(MetaFontId id) => AssetId.FromUInt32(id._value);
+    public static MetaFontId ToMetaFontId(AssetId id) => new(id.ToUInt32());
 
     public int ToInt32() => unchecked((int)_value);
     public uint ToUInt32() => _value;

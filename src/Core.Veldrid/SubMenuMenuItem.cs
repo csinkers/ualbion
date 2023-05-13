@@ -20,6 +20,8 @@ public class SubMenuMenuItem : IMenuItem
 
     public void Add(IMenuItem item)
     {
+        if (item == null) throw new ArgumentNullException(nameof(item));
+
         string path = string.IsNullOrEmpty(Path) 
             ? Name 
             : $"{Path}/{Name}";

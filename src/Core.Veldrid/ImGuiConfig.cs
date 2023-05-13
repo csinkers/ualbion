@@ -7,7 +7,7 @@ namespace UAlbion.Core.Veldrid;
 public class ImGuiConfig
 {
     public List<ImGuiConfigSection> Sections { get; } = new();
-    public static ImGuiConfig Load(string raw) => new(raw);
+    public static ImGuiConfig Load(string raw) => new(raw ?? "");
 
     public ImGuiConfig() { }
 

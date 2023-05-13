@@ -22,6 +22,7 @@ public static class MapExport
         if (tileset == null) throw new ArgumentNullException(nameof(tileset));
         if (properties == null) throw new ArgumentNullException(nameof(properties));
         if (npcTileset == null) throw new ArgumentNullException(nameof(npcTileset));
+        if (eventFormatter == null) throw new ArgumentNullException(nameof(eventFormatter));
 
         int npcGidOffset = tileset.Tiles.Count;
         var (script, functionsByEventId) = BuildScript(map, eventFormatter);

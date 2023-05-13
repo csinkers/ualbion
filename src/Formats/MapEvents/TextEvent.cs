@@ -35,6 +35,8 @@ public class TextEvent : MapEvent, IAsyncEvent // Relies on event chain context 
 
     public static TextEvent Parse(string[] parts)
     {
+        if (parts == null) throw new ArgumentNullException(nameof(parts));
+
         var subId = ushort.Parse(parts[1]);
         var location = parts.Length > 2 ? (TextLocation)Enum.Parse(typeof(TextLocation), parts[2]) : TextLocation.NoPortrait;
 

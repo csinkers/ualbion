@@ -21,6 +21,8 @@ public class LayerStacker : UiElement
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
+        if (func == null) throw new ArgumentNullException(nameof(func));
+
         foreach(var child in Children)
         {
             if (child is not IUiElement { IsActive: true } childElement)

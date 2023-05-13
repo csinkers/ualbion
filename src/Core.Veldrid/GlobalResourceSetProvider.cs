@@ -20,22 +20,26 @@ public sealed class GlobalResourceSetProvider : Component, IResourceProvider, ID
 
     public GlobalResourceSetProvider()
     {
-        _paletteSampler = AttachChild(new SamplerHolder
+        _paletteSampler = new SamplerHolder
         {
             AddressModeU = SamplerAddressMode.Clamp,
             AddressModeV = SamplerAddressMode.Clamp,
             AddressModeW = SamplerAddressMode.Clamp,
             BorderColor = SamplerBorderColor.TransparentBlack,
             Filter = SamplerFilter.MinPoint_MagPoint_MipPoint,
-        });
+        };
 
-        _globalInfo = AttachChild(new SingleBuffer<GlobalInfo>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "B_Global"));
-        _globalSet = AttachChild(new GlobalSet
+        _globalInfo = new SingleBuffer<GlobalInfo>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "B_Global");
+        _globalSet = new GlobalSet
         {
             Name = "RS_Global",
             Global = _globalInfo,
             Sampler = _paletteSampler,
-        });
+        };
+
+        AttachChild(_paletteSampler);
+        AttachChild(_globalInfo);
+        AttachChild(_globalSet);
 
         On<PrepareFrameEvent>(_ => UpdatePerFrameResources());
     }

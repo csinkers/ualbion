@@ -22,6 +22,8 @@ public class ScrollBar : UiElement
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
+        if (func == null) throw new ArgumentNullException(nameof(func));
+
         var (position, totalHeight, pageHeight) = _getPosition();
         _rectangle.MeasureSize = extents.Size;
         _rectangle.DrawSize = new Vector2(Width, extents.Height * (float)pageHeight / totalHeight);

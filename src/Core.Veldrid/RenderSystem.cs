@@ -25,6 +25,8 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
 
     public RenderSystem(IEnumerable<IComponent> extraComponents)
     {
+        if (extraComponents == null) throw new ArgumentNullException(nameof(extraComponents));
+
         foreach (var component in extraComponents)
             AttachChild(component);
 

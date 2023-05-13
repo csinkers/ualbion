@@ -187,6 +187,7 @@ public static class ReduceLoops
 
     public static CfgLoop GetLoopInformation(ControlFlowGraph graph, List<int> nodes)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
         if (nodes == null) throw new ArgumentNullException(nameof(nodes));
         if (nodes.Count == 0) throw new ArgumentException("Empty loop provided to GetLoopInformation", nameof(nodes));
 

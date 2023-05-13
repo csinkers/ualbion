@@ -49,6 +49,8 @@ public abstract class UiElement : Component, IUiElement
 
     protected virtual int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
+        if (func == null) throw new ArgumentNullException(nameof(func));
+
         int maxOrder = order;
         foreach (var child in Children)
         {

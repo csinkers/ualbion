@@ -38,7 +38,18 @@ public class MapData2D : BaseMapData
 
     public MapData2D() { } // For JSON
     public MapData2D(MapId id, PaletteId paletteId, TilesetId tilesetId, int width, int height, EventLayout layout, IEnumerable<MapNpc> npcs, IList<MapEventZone> zones)
-        : this(id, paletteId, tilesetId, width, height, layout.Events, layout.Chains, npcs, zones) { }
+        : this(
+            id,
+            paletteId,
+            tilesetId,
+            width,
+            height,
+            layout != null ? layout.Events : throw new ArgumentNullException(nameof(layout)),
+            layout.Chains,
+            npcs,
+            zones)
+    {
+    }
 
     public MapData2D(MapId id,
         PaletteId paletteId,

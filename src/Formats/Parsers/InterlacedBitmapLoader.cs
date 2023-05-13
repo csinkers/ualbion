@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
@@ -9,6 +10,8 @@ public class InterlacedBitmapLoader : IAssetLoader<IReadOnlyTexture<uint>>
 {
     public IReadOnlyTexture<uint> Serdes(IReadOnlyTexture<uint> existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
+        if (info == null) throw new ArgumentNullException(nameof(info));
+
         if (s.IsWriting()) // TODO: Implement writing if required. May require palette generation, which can get complicated.
             return existing;
 

@@ -19,7 +19,7 @@ public sealed record Sequence : ICfgNode
     public void Deconstruct(out ICfgNode[] statements) => statements = Statements;
 
     public override string ToString() => $"Seq({string.Join(", ", Statements.Select(x => x.ToString()))})";
-    public void Accept(IAstVisitor visitor) => visitor.Visit(this);
+    public void Accept(IAstVisitor visitor) => visitor?.Visit(this);
     public override int GetHashCode() => Statements != null ? Statements.GetHashCode() : 0;
     public bool Equals(Sequence other)
     {

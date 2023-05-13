@@ -56,6 +56,8 @@ public class UiTextLine : UiElement // Multiple TextChunks arranged on a line
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
+        if (func == null) throw new ArgumentNullException(nameof(func));
+
         var lineExtents = _alignment switch
         {
             TextAlignment.Center => new Rectangle(extents.X + (extents.Width - Width) / 2, extents.Y, Width, Height),

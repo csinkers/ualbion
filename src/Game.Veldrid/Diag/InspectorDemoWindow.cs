@@ -32,7 +32,7 @@ public class InspectorDemoWindow : Component, IImGuiWindow
     {
         [DiagEdit(Style = DiagEditStyle.Checkboxes)] public bool BoolProp { get; set; }
         [DiagEdit(Style = DiagEditStyle.NumericSlider, Min = 0, Max = 100)] public int[] IntArray = new int[16];
-        [DiagEdit(Style = DiagEditStyle.NumericInput)] public int IntField;
+        [DiagEdit(Style = DiagEditStyle.NumericInput)] public int IntField = 5;
         [DiagEdit(Style = DiagEditStyle.NumericSlider, Min = 0, Max = 100)] public int IntProp { get; set; }
         [DiagEdit(Style = DiagEditStyle.NumericSlider, Min = -32, Max = 32)] public int? NullableIntProp { get; set; }
         [DiagEdit(Style = DiagEditStyle.NumericSlider, Min = -1, Max = 1)] public float FloatProp { get; set; }

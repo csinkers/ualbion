@@ -35,6 +35,9 @@ public static class TileMapping
 
     public static Tile BuildTile(int id, int index, ushort? imageNumber, List<TiledProperty> tileProperties, Tilemap2DProperties properties, AssetPathPattern graphicsPattern)
     {
+        if (properties == null) throw new ArgumentNullException(nameof(properties));
+        if (graphicsPattern == null) throw new ArgumentNullException(nameof(graphicsPattern));
+
         var source = imageNumber switch
         {
             null => null,
@@ -57,6 +60,10 @@ public static class TileMapping
 
     public static TileData InterpretTile(Tile tile, Tilemap2DProperties properties, AssetPathPattern graphicsPattern)
     {
+        if (tile == null) throw new ArgumentNullException(nameof(tile));
+        if (properties == null) throw new ArgumentNullException(nameof(properties));
+        if (graphicsPattern == null) throw new ArgumentNullException(nameof(graphicsPattern));
+
         var result = new TileData
         {
             Index = (ushort)tile.Id,
@@ -84,6 +91,8 @@ public static class TileMapping
 
     public static List<TiledProperty> BuildTileProperties(TileData x)
     {
+        if (x == null) throw new ArgumentNullException(nameof(x));
+
         var properties = new List<TiledProperty>
         {
             new(Prop.Layer, x.Layer.ToString()),
@@ -113,6 +122,8 @@ public static class TileMapping
 
     public static List<TiledProperty> BuildIsoTileProperties(LabyrinthData labyrinth, int index, IsometricMode isoMode)
     {
+        if (labyrinth == null) throw new ArgumentNullException(nameof(labyrinth));
+
         var properties = new List<TiledProperty>();
         if (index == 0) // First tile always blank
             return properties;

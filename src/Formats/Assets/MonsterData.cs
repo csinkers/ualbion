@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Formats.Ids;
@@ -34,6 +35,8 @@ public class MonsterData
     public MonsterData DeepCopy() => new MonsterData().CopyFrom(this);
     public MonsterData CopyFrom(MonsterData other)
     {
+        if (other == null) throw new ArgumentNullException(nameof(other));
+
         MonsterGraphics = other.MonsterGraphics;
         Unk1 = other.Unk1;
         Unk2 = other.Unk2.ToArray();

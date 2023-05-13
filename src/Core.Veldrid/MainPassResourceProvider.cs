@@ -8,7 +8,7 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
-public class MainPassResourceProvider : Component, IResourceProvider, IDisposable
+public sealed class MainPassResourceProvider : Component, IResourceProvider, IDisposable
 {
     readonly ICameraProvider _cameraProvider;
     readonly SingleBuffer<CameraUniform> _cameraUniform;

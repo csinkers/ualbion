@@ -6,11 +6,22 @@ namespace UAlbion.Scripting;
 
 public static class GraphExtensions
 {
-    public static int InDegree(this IGraph graph, int node) => graph.Parents(node).Count;
-    public static int OutDegree(this IGraph graph, int node) => graph.Children(node).Count;
+    public static int InDegree(this IGraph graph, int node)
+    {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        return graph.Parents(node).Count;
+    }
+
+    public static int OutDegree(this IGraph graph, int node)
+    {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        return graph.Children(node).Count;
+    }
 
     public static int GetEntryNode(this IGraph graph)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+
         // Should be the only node with indegree 0
         int result = -1;
         for (int i = 0; i < graph.NodeCount; i++)
@@ -28,6 +39,8 @@ public static class GraphExtensions
 
     public static int GetExitNode(this IGraph graph)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+
         // Should be the only node with outdegree 0
         int result = -1;
         for (int i = 0; i < graph.NodeCount; i++)
@@ -45,6 +58,8 @@ public static class GraphExtensions
 
     public static IEnumerable<int> GetExitNodes(this IGraph graph)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+
         for (int i = 0; i < graph.NodeCount; i++)
         {
             if (!graph.IsNodeActive(i) || graph.Children(i).Count != 0)
@@ -62,6 +77,10 @@ public static class GraphExtensions
         List<(int, int)> backEdges,
         bool postOrder)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        if (visited == null) throw new ArgumentNullException(nameof(visited));
+        if (stack == null) throw new ArgumentNullException(nameof(stack));
+
         visited[index] = true;
         stack.Add(index);
         if (!postOrder && results != null)
@@ -82,6 +101,8 @@ public static class GraphExtensions
 
     public static List<int> GetDfsOrder(this IGraph graph, int start, bool postOrder)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+
         var results = new List<int>();
         var visited = new bool[graph.NodeCount];
         var stack = new List<int>();
@@ -91,6 +112,8 @@ public static class GraphExtensions
 
     public static List<int> GetTopogicalOrder(this IGraph graph)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+
         var result = new List<int>();
         var visited = new bool[graph.NodeCount];
 
@@ -132,6 +155,8 @@ public static class GraphExtensions
 
     public static int[] GetShortestPaths(this IGraph graph, int entry)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+
         var result = new int[graph.NodeCount];
         Array.Fill(result, int.MaxValue);
         result[entry] = 0;
@@ -146,6 +171,8 @@ public static class GraphExtensions
 
     public static int[] GetLongestPaths(this IGraph graph, int entry)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+
         var result = new int[graph.NodeCount];
         Array.Fill(result, int.MinValue);
         result[entry] = 0;
@@ -160,6 +187,8 @@ public static class GraphExtensions
 
     public static List<List<int>> GetAllReachingPaths(this IGraph graph, int from, int to)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+
         var result = new List<List<int>>();
         GetReachingPath(graph, from, to, new List<int>(), result);
         return result;
@@ -167,6 +196,7 @@ public static class GraphExtensions
 
     static void GetReachingPath(IGraph graph, int start, int target, List<int> path, List<List<int>> stack)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
         if (path == null) throw new ArgumentNullException(nameof(path));
         if (stack == null) throw new ArgumentNullException(nameof(stack));
 
@@ -192,6 +222,8 @@ public static class GraphExtensions
 
     public static DominatorTree GetDominatorTree(this IGraph graph, int entry)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+
         // TODO: Use more efficient Lengauer-Tarjan algorithm if required
         if (graph.Parents(entry).Any())
             throw new ControlFlowGraphException("Tried to obtain dominator tree of graph, but the entry was not parentless.", graph);
@@ -261,6 +293,8 @@ public static class GraphExtensions
 
     public static (int[], int componentCount) GetComponentMapping(this IGraph graph)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+
         int componentIndex = 0;
         var mapping = new int[graph.NodeCount];
         var stack = new Stack<int>();
@@ -292,6 +326,8 @@ public static class GraphExtensions
 
     public static (bool[] reachability, int reachableCount) GetReachability(this IGraph graph, int start)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+
         int reachableCount = 0;
         var visited = new bool[graph.NodeCount];
         var stack = new Stack<int>();
@@ -313,6 +349,8 @@ public static class GraphExtensions
 
     public static List<List<int>> GetStronglyConnectedComponents(this IGraph graph)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+
         List<List<int>> result = new();
         List<int> finished = new();
         var visited = new bool[graph.NodeCount];
@@ -354,6 +392,7 @@ public static class GraphExtensions
 
     public static List<List<int>> GetAllSimpleCyclePaths(this IGraph graph, IList<int> component)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
         if (component == null) throw new ArgumentNullException(nameof(component));
         List<int> stack = new();
         List<int> blocked = new();
@@ -415,6 +454,9 @@ public static class GraphExtensions
 
     public static List<List<int>> GetAllSimpleLoops(this IGraph graph, List<int> component)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        if (component == null) throw new ArgumentNullException(nameof(component));
+
         var result = new List<List<int>>();
         var backEdges = graph.GetBackEdges().ToHashSet();
         var headers = backEdges.Select(e => e.Item2).Distinct().ToList();
@@ -461,6 +503,8 @@ public static class GraphExtensions
 
     public static HashSet<int> GetRegionParts(this IGraph graph, int entry, int exit)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+
         var result = new HashSet<int>();
         GetRegionParts(graph, result, entry, exit);
         return result;
@@ -468,6 +512,9 @@ public static class GraphExtensions
 
     static void GetRegionParts(IGraph graph, HashSet<int> region, int entry, int exit)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        if (region == null) throw new ArgumentNullException(nameof(region));
+
         if (!region.Add(entry))
             return;
 
@@ -477,6 +524,8 @@ public static class GraphExtensions
 
     public static List<(HashSet<int> nodes, int entry, int exit)> GetAllSeseRegions(this IGraph graph)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+
         var domTree = graph.GetDominatorTree();
         var postDomTree = graph.GetPostDominatorTree();
         List<(HashSet<int>, int, int)> regions = new();
@@ -500,5 +549,5 @@ public static class GraphExtensions
         return regions;
     }
 
-    static bool ListEquals(List<int> x, List<int> y) => x.Count == y.Count && !x.Except(y).Any();
+    static bool ListEquals(List<int> x, List<int> y) => x != null && y != null && x.Count == y.Count && !x.Except(y).Any();
 }

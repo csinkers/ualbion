@@ -27,7 +27,14 @@ public class RenderSystemBuilder
     /// <summary>
     /// For running an ad-hoc action in the context of the builder so components can be wired up
     /// </summary>
-    public RenderSystemBuilder Action(Action action) { Check(); action(); return this; }
+    public RenderSystemBuilder Action(Action action)
+    {
+        if (action == null) throw new ArgumentNullException(nameof(action));
+        Check();
+        action();
+        return this;
+    }
+
     public RenderSystemBuilder Component(string name, IComponent component) { Check(); _components.Add(name, component); return this; }
     public RenderSystemBuilder Resources(IResourceProvider resourceProvider) { Check(); _resourceProvider = resourceProvider; return this; }
     public RenderSystemBuilder Framebuffer(string name, IFramebufferHolder framebuffer) { Check(); _framebuffers.Add(name, framebuffer); return this; }
@@ -44,6 +51,8 @@ public class RenderSystemBuilder
 
     public RenderSystemBuilder Pass(string name, Func<RenderPassBuilder, RenderPass> builderFunc)
     {
+        if (builderFunc == null) throw new ArgumentNullException(nameof(builderFunc));
+
         Check();
         _passes.Add(name, builderFunc(RenderPassBuilder.Create(name, this, _manager)));
         return this;

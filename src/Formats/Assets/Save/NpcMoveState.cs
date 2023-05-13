@@ -1,4 +1,5 @@
-﻿using SerdesNet;
+﻿using System;
+using SerdesNet;
 
 namespace UAlbion.Formats.Assets.Save;
 
@@ -20,6 +21,8 @@ public class NpcMoveState
 
     public static NpcMoveState Serdes(NpcMoveState ms, ISerializer s)
     {
+        if (s == null) throw new ArgumentNullException(nameof(s));
+
         ms ??= new NpcMoveState();
         s.Begin("NpcMoveState");
         ms.Flags = s.UInt16(nameof(Flags), ms.Flags); // 0

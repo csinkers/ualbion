@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 
@@ -19,6 +20,8 @@ public class ImGuiMenuManager : ServiceComponent<IImGuiMenuManager>, IImGuiMenuM
 
     public IImGuiWindow CreateWindow(string name, IImGuiManager manager)
     {
+        if (manager == null) throw new ArgumentNullException(nameof(manager));
+
         if (!_windowTypes.TryGetValue(name, out var showWindow))
         {
             Warn($"Could not created window \"{name}\", no such window type registered");

@@ -58,6 +58,7 @@ public static class SimplifyLabels
 
     public static ControlFlowGraph Relabel(ControlFlowGraph graph, string dummyLabelPrefix)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
         var collector = new LabelCollectionAstVisitor();
         graph.Accept(collector);
 

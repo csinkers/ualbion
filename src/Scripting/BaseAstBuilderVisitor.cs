@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting;
@@ -9,6 +10,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
 
     public ControlFlowGraph Apply(ControlFlowGraph graph)
     {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
         foreach (var index in graph.GetDfsOrder())
         {
             var node = graph.Nodes[index];
@@ -51,12 +53,15 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
 
     protected virtual ICfgNode Build(Negation negation)
     {
+        if (negation == null) throw new ArgumentNullException(nameof(negation));
         negation.Expression.Accept(this);
         return Result == null ? null : UAEmit.Negation(Result);
     }
 
     protected virtual ICfgNode Build(IfThen ifThen)
     {
+        if (ifThen == null) throw new ArgumentNullException(nameof(ifThen));
+
         ifThen.Condition.Accept(this);
         var condition = Result;
         ifThen.Body?.Accept(this);
@@ -70,6 +75,8 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
 
     protected virtual ICfgNode Build(IfThenElse ifElse)
     {
+        if (ifElse == null) throw new ArgumentNullException(nameof(ifElse));
+
         ifElse.Condition.Accept(this);
         var condition = Result;
         ifElse.TrueBody?.Accept(this);
@@ -88,6 +95,8 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
 
     protected virtual ICfgNode Build(Statement statement)
     {
+        if (statement == null) throw new ArgumentNullException(nameof(statement));
+
         statement.Head.Accept(this);
         var head = Result;
         ICfgNode[] parts = null;
@@ -118,6 +127,8 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
 
     protected virtual ICfgNode Build(Sequence sequence)
     {
+        if (sequence == null) throw new ArgumentNullException(nameof(sequence));
+
         List<ICfgNode> result = null;
         for (var index = 0; index < sequence.Statements.Length; index++)
         {
@@ -146,6 +157,8 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
 
     protected virtual ICfgNode Build(DoLoop doLoop)
     {
+        if (doLoop == null) throw new ArgumentNullException(nameof(doLoop));
+
         doLoop.Body?.Accept(this);
         var body = Result;
         doLoop.Condition.Accept(this);
@@ -161,6 +174,8 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
 
     protected virtual ICfgNode Build(EndlessLoop endlessLoop)
     {
+        if (endlessLoop == null) throw new ArgumentNullException(nameof(endlessLoop));
+
         endlessLoop.Body?.Accept(this);
         var body = Result;
 
@@ -172,6 +187,8 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
 
     protected virtual ICfgNode Build(WhileLoop whileLoop)
     {
+        if (whileLoop == null) throw new ArgumentNullException(nameof(whileLoop));
+
         whileLoop.Condition.Accept(this);
         var condition = Result;
         whileLoop.Body?.Accept(this);
@@ -187,6 +204,8 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
 
     protected virtual ICfgNode Build(BinaryOp binaryOp)
     {
+        if (binaryOp == null) throw new ArgumentNullException(nameof(binaryOp));
+
         binaryOp.Left.Accept(this);
         var left = Result;
         binaryOp.Right.Accept(this);

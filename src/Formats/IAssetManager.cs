@@ -57,6 +57,8 @@ public static class AssetManagerExtensions
 {
     public static ItemData LoadItemStrict(this IAssetManager assets, ItemId id)
     {
+        if (assets == null) throw new ArgumentNullException(nameof(assets));
+
         if (id.Type != AssetType.Item)
             throw new ArgumentOutOfRangeException(nameof(id), id, $"Tried to get item for {id}, but it is not an item id");
 

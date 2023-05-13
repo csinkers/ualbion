@@ -5,6 +5,6 @@ namespace UAlbion.Game.Scenes;
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class SceneAttribute : Attribute
 {
-    public SceneAttribute(SceneId id) => SceneId = id;
+    public SceneAttribute(SceneId sceneId) => SceneId = sceneId;
     public SceneId SceneId { get; }
 }

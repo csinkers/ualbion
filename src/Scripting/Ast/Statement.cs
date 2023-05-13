@@ -24,7 +24,7 @@ public sealed record Statement(ICfgNode Head, params ICfgNode[] Parameters) : IC
         return sb.ToString();
     }
 
-    public void Accept(IAstVisitor visitor) => visitor.Visit(this);
+    public void Accept(IAstVisitor visitor) => visitor?.Visit(this);
     public int Priority => int.MaxValue;
 
     public bool Equals(Statement other)

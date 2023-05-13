@@ -2,13 +2,15 @@
 
 [*.cs]
 
+# IDE0040: Add accessibility modifiers
+dotnet_style_require_accessibility_modifiers = never:silent
+
+dotnet_code_quality.ca1711.allowed_suffixes = Flag|Flags
+
 # CA1303: Do not pass literals as localized parameters
 # Most string literals aren't shown to the users, any user-visible text 
 # will go through the whole TextFormatter flow and be localised appropriately.
 dotnet_diagnostic.CA1303.severity = none
-
-# IDE0040: Add accessibility modifiers
-dotnet_style_require_accessibility_modifiers = never:silent
 
 # CA1707: Identifiers should not contain underscores
 # Analysers aren't familiar with the new discard notation consisting of a single underscore.
@@ -38,10 +40,32 @@ dotnet_diagnostic.CA1021.severity = none
 # from IReadOnlyList<T>, so some very annoying casting can be required.
 dotnet_diagnostic.CA1002.severity = none
 
-dotnet_code_quality.ca1711.allowed_suffixes = Flag|Flags
-
 # CA1305: String behaviour can vary based on CurrentCulture. The culture
 # in UAlbion is set to InvariantCulture on startup and should always
 # remain so. Any culture-specific formatting must be done with an explicit
 # culture.
 dotnet_diagnostic.CA1305.severity = none
+
+# CA1003: Use EventHandler types for events
+# In many situations we don't need the sender, and allocating 
+# an EventArgs object just to raise an event can be wasteful.
+dotnet_diagnostic.CA1003.severity = none
+
+# CA1008: Enum values 0 should be named None
+# Many of the enums in UAlbion.Formats need to match conventions in the original game
+dotnet_diagnostic.CA1008.severity = none
+
+# CA2227: Change collection to be read-only by removing the property setter
+# Would interfere with JSON deserialisation in many cases.
+dotnet_diagnostic.CA2227.severity = none
+
+# CA1045: Consider a design that does not require that '...' be a reference parameter
+dotnet_diagnostic.CA1045.severity = none
+
+# CA1034: Do not nest type '...'. Alternatively, change its accessibility so that it is not externally visible.
+# Stylistic choice - nested types should not be widely used, but for things like organising Vars they can work well.
+dotnet_diagnostic.CA1034.severity = none
+
+# CA5394: Random is an insecure random number generator. Use cryptographically secure random number generators when randomness is required for security.
+# No security-sensitive code in this project.
+dotnet_diagnostic.CA5394.severity = none

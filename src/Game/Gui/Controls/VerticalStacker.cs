@@ -42,6 +42,8 @@ public class VerticalStacker : UiElement
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
+        if (func == null) throw new ArgumentNullException(nameof(func));
+
         int offset = extents.Y;
         int maxOrder = order;
         foreach(var child in Children)

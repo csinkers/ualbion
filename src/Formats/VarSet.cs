@@ -58,9 +58,17 @@ public class VarSet : IVarSet, IPatch
         return this;
     }
 
-    public string ToJson(IJsonUtil jsonUtil) => jsonUtil.Serialize(_values);
+    public string ToJson(IJsonUtil jsonUtil)
+    {
+        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        return jsonUtil.Serialize(_values);
+    }
+
     public static VarSet FromJsonBytes(string name, byte[] bytes, IJsonUtil json)
     {
+        if (bytes == null) throw new ArgumentNullException(nameof(bytes));
+        if (json == null) throw new ArgumentNullException(nameof(json));
+
         var dictionary = json.Deserialize<Dictionary<string, object>>(bytes);
         return new VarSet(name, dictionary);
     }

@@ -31,8 +31,8 @@ public enum PlayerClasses : ushort
 
     Iskai = 0xc,
     Magicians = 0x138,
-    Humans = 0xfff3,
-    Anyone = 0xffff,
+    Humans = Pilot | Scientist,
+    Anyone = Pilot | Scientist | IskaiWarrior | DjiKasMage | Druid | EnlightenedOne | Technician | OquloKamulos | Warrior,
 }
 
 public static class PlayerClassExtensions

@@ -1,4 +1,5 @@
-﻿namespace UAlbion.Formats.Assets;
+﻿using System;
+namespace UAlbion.Formats.Assets;
 
 public interface ICharacterSkills
 {
@@ -22,6 +23,8 @@ public class CharacterSkills : ICharacterSkills
     public CharacterSkills DeepClone() => new CharacterSkills().CopyFrom(this);
     public CharacterSkills CopyFrom(CharacterSkills other)
     {
+        if (other == null) throw new ArgumentNullException(nameof(other));
+
         CloseCombat = other.CloseCombat.DeepClone();
         RangedCombat = other.RangedCombat.DeepClone();
         CriticalChance = other.CriticalChance.DeepClone();

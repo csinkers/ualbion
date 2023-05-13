@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -13,6 +14,8 @@ public class UncompressedCsvTileEncoding : ITileEncoding
     public string Encoding => "csv";
     public string Encode(int[] data, int width)
     {
+        if (data == null) throw new ArgumentNullException(nameof(data));
+
         var sb = new StringBuilder();
         int lineLength = 0;
         bool first = true;

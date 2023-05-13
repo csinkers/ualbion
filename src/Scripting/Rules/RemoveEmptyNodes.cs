@@ -1,12 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting.Rules;
 
 public static class RemoveEmptyNodes
 {
-    public static (ControlFlowGraph result, string description) Apply(ControlFlowGraph graph) 
-        => (graph.AcceptBuilder(new EmptyNodeRemovalVisitor()), "Remove empty nodes");
+    public static (ControlFlowGraph result, string description) Apply(ControlFlowGraph graph)
+    {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        return (graph.AcceptBuilder(new EmptyNodeRemovalVisitor()), "Remove empty nodes");
+    }
 
     class EmptyNodeRemovalVisitor : BaseAstBuilderVisitor
     {

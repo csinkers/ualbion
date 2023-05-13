@@ -319,6 +319,8 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 
     public void RemapChains(IList<EventNode> events, IList<ushort> chains)
     {
+        if (chains == null) throw new ArgumentNullException(nameof(chains));
+
         foreach (var npc in Npcs)
             if (npc.Chain != EventNode.UnusedEventId)
                 npc.EventIndex = chains[npc.Chain];

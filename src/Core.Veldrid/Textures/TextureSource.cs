@@ -10,7 +10,7 @@ using Vars = UAlbion.Core.CoreVars.Gfx.TextureSource;
 
 namespace UAlbion.Core.Veldrid.Textures;
 
-public class TextureSource : ServiceComponent<ITextureSource>, ITextureSource, IDisposable
+public sealed class TextureSource : ServiceComponent<ITextureSource>, ITextureSource, IDisposable
 {
     static void Checkerboard(Span<byte> span)
     {

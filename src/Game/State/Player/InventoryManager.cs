@@ -535,6 +535,8 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
     public int GetItemCount(InventoryId id, ItemId item) => _getInventory(id).EnumerateAll().Where(x => x.Item == item).Sum(x => (int?)x.Amount) ?? 0;
     public ushort TryGiveItems(InventoryId id, ItemSlot donor, ushort? amount)
     {
+        if (donor == null) throw new ArgumentNullException(nameof(donor));
+
         // TODO: Ensure weight limit is not exceeded?
         ushort totalTransferred = 0;
         ushort remaining = amount ?? ushort.MaxValue;
@@ -563,6 +565,8 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
 
     public ushort TryTakeItems(InventoryId id, ItemSlot acceptor, ItemId item, ushort? amount)
     {
+        if (acceptor == null) throw new ArgumentNullException(nameof(acceptor));
+
         ushort totalTransferred = 0;
         ushort remaining = amount ?? ushort.MaxValue;
         var inventory = _getInventory(id);

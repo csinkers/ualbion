@@ -108,20 +108,16 @@ public class ImGuiConsoleLogger : Component, IImGuiWindow
         if (ImGui.InputText("", _inputBuffer, (uint)_inputBuffer.Length, inputTextFlags))
         {
             var logExchange = Resolve<ILogExchange>();
-            try
-            {
-                var command = Encoding.ASCII.GetString(_inputBuffer);
-                command = command.Substring(0, command.IndexOf((char)0, StringComparison.Ordinal));
-                for (int i = 0; i < command.Length; i++)
-                    _inputBuffer[i] = 0;
+            var command = Encoding.ASCII.GetString(_inputBuffer);
+            command = command.Substring(0, command.IndexOf((char)0, StringComparison.Ordinal));
+            for (int i = 0; i < command.Length; i++)
+                _inputBuffer[i] = 0;
 
-                var @event = Event.Parse(command, out var error);
-                if (@event != null)
-                    logExchange.EnqueueEvent(@event);
-                else
-                    PrintMessage(logExchange, error, LogLevel.Error);
-            }
-            catch (Exception e) { PrintMessage(logExchange, $"Parse error: {e}", LogLevel.Error); }
+            IEvent parsedEvent = Event.Parse(command, out var error);
+            if (parsedEvent != null)
+                logExchange.EnqueueEvent(parsedEvent);
+            else
+                PrintMessage(logExchange, error, LogLevel.Error);
 
             reclaimFocus = true;
         }

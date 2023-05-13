@@ -4,6 +4,7 @@ using VeldridGen.Interfaces;
 using Veldrid;
 
 #pragma warning disable CA1051 // Do not declare visible instance fields
+#pragma warning disable CA1815 // Struct should override equals
 #pragma warning disable CS0169
 #pragma warning disable IDE0051
 namespace UAlbion.Core.Veldrid;
@@ -47,4 +48,3 @@ public partial struct CameraUniform : IUniformFormat
 #pragma warning restore IDE0051
 #pragma warning restore CS0169
 #pragma warning restore CA1051 // Do not declare visible instance fields
-

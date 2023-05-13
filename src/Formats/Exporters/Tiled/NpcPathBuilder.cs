@@ -11,6 +11,8 @@ public static class NpcPathBuilder
     public const string TimePropertyName = "Time";
     public static IEnumerable<(int index, int x, int y)> CombineRuns(NpcWaypoint[] points)
     {
+        if (points == null) throw new ArgumentNullException(nameof(points));
+
         var waypoints = IdentifyWaypoints(points).ToList();
         int last = -1;
         foreach (var (i, mustEmit) in waypoints)

@@ -10,6 +10,7 @@ public class EventSetLoader : IAssetLoader<EventSet>
     public EventSet Serdes(EventSet existing, AssetInfo info, ISerializer s, SerdesContext context)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));
+        if (context == null) throw new ArgumentNullException(nameof(context));
         return EventSet.Serdes(info.AssetId, existing, context.Mapping, s);
     }
 

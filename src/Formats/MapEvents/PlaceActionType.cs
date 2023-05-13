@@ -1,5 +1,7 @@
-﻿namespace UAlbion.Formats.MapEvents;
+﻿using System.Diagnostics.CodeAnalysis;
+namespace UAlbion.Formats.MapEvents;
 
+[SuppressMessage("", "CA1027")]
 public enum PlaceActionType : byte
 {
     LearnCloseCombat  = 0x0,

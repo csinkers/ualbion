@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Exporters.Tiled;
 public static class LayerMapping2D
 {
     const ushort BlankTileIndex = 0;
-    public static class LayerName
+    static class LayerName
     {
         public const string Underlay = "Underlay";
         public const string Overlay = "Overlay";
@@ -16,6 +16,7 @@ public static class LayerMapping2D
 
     public static MapTile[] ReadMapLayers(Map map)
     {
+        if (map == null) throw new ArgumentNullException(nameof(map));
         var underlay = LoadLayer(map, LayerName.Underlay);
         var overlay = LoadLayer(map, LayerName.Overlay);
         return MapTile.FromInts(underlay, overlay);
@@ -23,6 +24,8 @@ public static class LayerMapping2D
 
     public static List<TiledMapLayer> BuildMapLayers(MapData2D map, TilesetData tileset, ref int nextLayerId)
     {
+        if (map == null) throw new ArgumentNullException(nameof(map));
+        if (tileset == null) throw new ArgumentNullException(nameof(tileset));
         var encoding = UncompressedCsvTileEncoding.Instance;
 
         var underlayId = nextLayerId++;
@@ -34,8 +37,10 @@ public static class LayerMapping2D
         };
     }
 
-    static TiledMapLayer BuildLayer(ITileEncoding encoding, int id, string name, int width, int height, int[] data) =>
-        new()
+    static TiledMapLayer BuildLayer(ITileEncoding encoding, int id, string name, int width, int height, int[] data)
+    {
+        if (encoding == null) throw new ArgumentNullException(nameof(encoding));
+        return new()
         {
             Id = id,
             Name = name,
@@ -48,6 +53,7 @@ public static class LayerMapping2D
                 Content = encoding.Encode(data, width)
             }
         };
+    }
 
     static int[] TilesToInts(Span<MapTile> tiles, TilesetData tileset, bool useOverlay)
     {

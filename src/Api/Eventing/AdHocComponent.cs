@@ -11,6 +11,7 @@ public class AdHocComponent : Component
 
     public AdHocComponent(string name, Action<IAdHocComponentHelper> constructor)
     {
+        if (constructor == null) throw new ArgumentNullException(nameof(constructor));
         Name = name;
         constructor(new Helper(this));
     }

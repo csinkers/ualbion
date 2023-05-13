@@ -12,9 +12,13 @@ public interface IAdHocComponentHelper
     IReadOnlyList<IComponent> Children { get; }
     T Resolve<T>();
     T TryResolve<T>();
+
+#pragma warning disable CA1030
     void Raise<T>(T @event) where T : IEvent;
     int RaiseAsync(IAsyncEvent @event, Action continuation);
     int RaiseAsync<T>(IAsyncEvent<T> @event, Action<T> continuation);
+#pragma warning restore CA1030
+
     void Enqueue(IEvent @event);
     void Distribute<T>(ICancellableEvent @event, IEnumerable<T> targets, Func<T, IComponent> projection);
     void On<T>(Action<T> callback) where T : IEvent;

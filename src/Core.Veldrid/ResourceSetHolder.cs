@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using UAlbion.Core.Veldrid.Events;
 using Veldrid;
 using VeldridGen.Interfaces;
@@ -39,6 +40,7 @@ public abstract class ResourceSetHolder : Component, IResourceSetHolder
 
     protected override void Unsubscribed() => Dispose();
     protected void Dirty() => On<PrepareFrameResourceSetsEvent>(Update);
+    [SuppressMessage("", "CA2109")]
     protected void PropertyDirty(object sender, PropertyChangedEventArgs _) => Dirty();
     protected abstract ResourceSet Build(GraphicsDevice device, ResourceLayout layout);
     protected abstract void Resubscribe();

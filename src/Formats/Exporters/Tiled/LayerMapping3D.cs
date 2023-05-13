@@ -13,7 +13,7 @@ public static class LayerMapping3D
     public const int ContentsGid = 2 * TilesetSpacing;
     public const int CeilingGid = 3 * TilesetSpacing;
 
-    public static class LayerName
+    static class LayerName
     {
         public const string Floors = "Floors";
         public const string Ceilings = "Ceilings";
@@ -23,6 +23,8 @@ public static class LayerMapping3D
 
     public static List<TiledMapLayer> BuildLayers(MapData3D map, ref int nextLayerId)
     {
+        if (map == null) throw new ArgumentNullException(nameof(map));
+
         int floorId = nextLayerId++;
         int wallId = nextLayerId++;
         int contentId = nextLayerId++;
@@ -69,6 +71,9 @@ public static class LayerMapping3D
 
     public static void ReadLayers(MapData3D albionMap, List<TiledMapLayer> layers)
     {
+        if (albionMap == null) throw new ArgumentNullException(nameof(albionMap));
+        if (layers == null) throw new ArgumentNullException(nameof(layers));
+
         foreach (var layer in layers)
         {
             var tileEncoding = TileEncodings.TryGetEncoding(layer.Data.Encoding, layer.Data.Compression);

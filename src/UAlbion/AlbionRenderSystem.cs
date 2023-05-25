@@ -40,9 +40,9 @@ public sealed class AlbionRenderSystem : Component, IDisposable
             .Renderer("r_sky", new SkyboxRenderer(screenFormat))
             .Renderer("r_debug", new ImGuiRenderer(screenFormat))
 
-            .Source("s_sprite", new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key)))
+            .Source("s_sprite",  new BatchManager<SpriteKey, SpriteInfo>(       static (key, f) => f.CreateSpriteBatch(key)))
             .Source("s_blended", new BatchManager<SpriteKey, BlendedSpriteInfo>(static (key, f) => f.CreateBlendedSpriteBatch(key)))
-            .Source("s_mesh", new BatchManager<MeshId, GpuMeshInstanceData>(static (key, f) => ((VeldridCoreFactory)f).CreateMeshBatch(key)))
+            .Source("s_mesh",    new BatchManager<MeshId, GpuMeshInstanceData>( static (key, f) => ((VeldridCoreFactory)f).CreateMeshBatch(key)))
             .Source("s_tile", new TileRenderableManager())
             .Source("s_etm", new EtmManager())
             .Source("s_sky", new SkyboxManager())

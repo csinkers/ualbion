@@ -90,6 +90,7 @@ public class MapNpc // 0xA = 10 bytes
 
         npc._raw = s.EnumU16(nameof(Flags), npc._raw);
         npc.Triggers = s.EnumU16(nameof(Triggers), npc.Triggers);
+
         var assetType = AssetTypeForNpcType(npc.Type, (npc.Flags & MapNpcFlags.SimpleMsg) != 0);
         npc.Id = AssetId.FromDisk(assetType, id, mapping);
 

@@ -801,7 +801,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal("key", Test(assets => assets.LoadString(Word.Key)));
     }
 
-    [Fact] public void CombatGfxTest() { Test(assets => assets.LoadTexture(CombatGfx.Unknown27)); }
+    [Fact] public void CombatGfxTest() { Test(assets => assets.LoadTexture(CombatGfx.SplashYellow)); }
     [Fact] public void DungeonBgTest() { Test(assets => assets.LoadTexture(DungeonBackground.EarlyGameL)); }
     [Fact] public void FloorTest() { Test(assets => assets.LoadTexture(Floor.Water)); }
     [Fact] public void FullBodyPictureTest() { Test(assets => assets.LoadTexture(PartyInventoryGfx.Tom)); }

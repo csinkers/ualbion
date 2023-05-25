@@ -99,10 +99,13 @@ static class Albion
                 .Add(new MainMenu())
                 .Add(new Sprite(
                     (SpriteId)Base.Picture.MenuBackground8,
-                    new Vector3(-1.0f, 1.0f, 0),
                     DrawLayer.Interface,
                     SpriteKeyFlags.NoTransform,
-                    SpriteFlags.LeftAligned) { Size = new Vector2(2.0f, -2.0f) }))
+                    SpriteFlags.LeftAligned)
+                {
+                    Position = new Vector3(-1.0f, 1.0f, 0),
+                    Size = new Vector2(2.0f, -2.0f)
+                }))
 
             .Add(new InventoryScene()
                 .Add(new StatusBar())

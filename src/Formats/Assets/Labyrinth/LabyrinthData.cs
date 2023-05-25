@@ -19,7 +19,7 @@ public class LabyrinthData
     public const int WallOffset = 100; // Any content value below this refers to an object group, any equal or above refers to a wall.
 
     [JsonInclude] public LabyrinthId Id { get; private set; }
-    public ushort WallHeight { get; set; }
+    public ushort WallHeight { get; set; } // in cm?
     public ushort CameraHeight { get; set; } // EffectiveHeight = (CameraHeight << 16) + 165??
     public ushort Unk4 { get; set; }
     public SpriteId BackgroundId { get; set; }

@@ -1,4 +1,6 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
+using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Ids;
@@ -22,6 +24,15 @@ public class MapSprite : Sprite
     }
 
     public override string ToString() => $"MapSprite {Id} @ {TilePosition}";
-    public MapSprite(SpriteId id, DrawLayer layer, SpriteKeyFlags keyFlags, SpriteFlags flags)
-        : base(id, Vector3.Zero, layer, keyFlags, flags) { }
+
+    public MapSprite(
+        SpriteId id,
+        DrawLayer layer,
+        SpriteKeyFlags keyFlags,
+        SpriteFlags flags,
+        Func<IAssetId, ITexture> textureLoaderFunc = null,
+        IBatchManager<SpriteKey, SpriteInfo> batchManager = null)
+        : base(id, layer, keyFlags, flags, textureLoaderFunc, batchManager)
+    {
+    }
 }

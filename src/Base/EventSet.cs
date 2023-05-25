@@ -6,7 +6,7 @@ public enum EventSet : ushort
 {
     FestivalTime = 1,
     InventoryItems = 2,
-    Unknown3 = 3,
+    SpellsUnused = 3,
 
     IskaiWordSet = 100,
 

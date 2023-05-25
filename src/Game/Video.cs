@@ -80,11 +80,14 @@ public class Video : Component
         _dirtyEvent = new TextureDirtyEvent(_texture);
         _player = flic.Play(() => texture.GetMutableLayerBuffer(0).Buffer);
         _sprite = AttachChild(new Sprite(SpriteId.None,
-            new Vector3(-1, -1, 0),
             DrawLayer.Interface,
             SpriteKeyFlags.NoTransform,
             SpriteFlags.LeftAligned | SpriteFlags.FlipVertical,
-            _ => _texture));
+            _ => _texture)
+        {
+            Position = new Vector3(-1, -1, 0),
+        });
+
         _sprite.Size = 2 * Vector2.One;
 
         var oldId = Resolve<IPaletteManager>().Day?.Id;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace UAlbion.Formats.Assets;
 
@@ -17,6 +18,7 @@ public enum PlayerClass : byte
 }
 
 [Flags]
+[SuppressMessage("", "CA2217")]
 public enum PlayerClasses : ushort
 {
     Pilot = 0x1,
@@ -26,13 +28,16 @@ public enum PlayerClasses : ushort
     Druid = 0x10,
     EnlightenedOne = 0x20, // aka DjiKantos
     Technician = 0x40,
+    // 0x80 missing
     OquloKamulos = 0x100,
     Warrior = 0x200, // 100%
 
-    Iskai = 0xc,
-    Magicians = 0x138,
-    Humans = Pilot | Scientist,
-    Anyone = Pilot | Scientist | IskaiWarrior | DjiKasMage | Druid | EnlightenedOne | Technician | OquloKamulos | Warrior,
+    Unused = 0xfc80,
+
+    Iskai = DjiKasMage | IskaiWarrior,
+    Magicians = OquloKamulos | EnlightenedOne | Druid | DjiKasMage,
+    Humans = Unused | Pilot | Scientist |                             Druid | EnlightenedOne | Technician | OquloKamulos | Warrior,
+    Anyone = Unused | Pilot | Scientist | IskaiWarrior | DjiKasMage | Druid | EnlightenedOne | Technician | OquloKamulos | Warrior,
 }
 
 public static class PlayerClassExtensions

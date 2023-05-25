@@ -26,11 +26,11 @@ public class GravityItemTransition : Component
 
         _sprite = AttachChild(new Sprite(
             spriteId,
-            new Vector3(fromPosition, 0),
             DrawLayer.InterfaceOverlay,
             SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest,
             SpriteFlags.LeftAligned)
         {
+            Position = new Vector3(fromPosition, 0),
             Size = size,
             Frame = subImage
         });

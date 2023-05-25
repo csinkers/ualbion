@@ -514,7 +514,7 @@ public class AssetConversionTests
     [Fact]
     public void CombatGfxTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(CombatGfx.Unknown27) };
+        var info = new AssetInfo { AssetId = AssetId.From(CombatGfx.SplashYellow) };
         Test<IReadOnlyTexture<byte>>(info.AssetId,
             new[] { AssetId.From(Palette.PlainsCombat), AssetId.From(Palette.Common) },
             (x, s, c) => Loaders.MultiHeaderSpriteLoader.Serdes(x, info, s, c));

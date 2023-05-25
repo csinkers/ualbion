@@ -37,7 +37,7 @@ class StringReflector : IReflector
 
             if (ImGui.InputText(name, buf, (uint)buf.Length))
             {
-                var str = Encoding.UTF8.GetString(buf);
+                var str = ImGuiUtil.GetString(buf);
                 state.Meta.Setter(state, str);
             }
         }

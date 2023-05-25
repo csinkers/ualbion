@@ -12,7 +12,7 @@ public class Sprite : Component, IPositioned
     readonly Action<PrepareFrameEvent> _onRenderDelegate;
     readonly DrawLayer _layer;
     readonly SpriteKeyFlags _keyFlags;
-    readonly Func<IAssetId, ITexture> _loaderFunc;
+    readonly Func<IAssetId, ITexture> _textureLoaderFunc;
 
     BatchLease<SpriteKey, SpriteInfo> _sprite;
     Vector3 _position;
@@ -20,15 +20,16 @@ public class Sprite : Component, IPositioned
     IAssetId _id;
     int _frame;
     SpriteFlags _flags;
+    readonly IBatchManager<SpriteKey, SpriteInfo> _batchManager;
     bool _dirty = true;
 
     public Sprite(
         IAssetId id,
-        Vector3 position,
         DrawLayer layer,
         SpriteKeyFlags keyFlags,
         SpriteFlags flags,
-        Func<IAssetId, ITexture> loaderFunc = null)
+        Func<IAssetId, ITexture> textureLoaderFunc = null,
+        IBatchManager<SpriteKey, SpriteInfo> batchManager = null)
     {
         _onRenderDelegate = OnRender;
         On<BackendChangedEvent>(_ => Dirty = true);
@@ -45,12 +46,12 @@ public class Sprite : Component, IPositioned
                 Flags &= ~SpriteFlags.Highlight;
         });
 
-        Position = position;
         _layer = layer;
         _keyFlags = keyFlags;
         _flags = flags;
+        _batchManager = batchManager;
         _id = id;
-        _loaderFunc = loaderFunc ?? DefaultLoader;
+        _textureLoaderFunc = textureLoaderFunc ?? DefaultLoader;
     }
 
     public IAssetId Id
@@ -151,7 +152,7 @@ public class Sprite : Component, IPositioned
 
         if (_sprite == null)
         {
-            var texture = _loaderFunc(Id);
+            var texture = _textureLoaderFunc(Id);
             if (texture == null)
             {
                 _sprite?.Dispose();
@@ -166,8 +167,8 @@ public class Sprite : Component, IPositioned
             Frame = frame;
 
             var key = new SpriteKey(texture, SpriteSampler.Point, _layer, _keyFlags);
-            var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
-            _sprite = sm.Borrow(key, 1, this);
+            var batchManager = _batchManager ?? Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
+            _sprite = batchManager.Borrow(key, 1, this);
         }
 
         var subImage = _sprite.Key.Texture.Regions[Frame];

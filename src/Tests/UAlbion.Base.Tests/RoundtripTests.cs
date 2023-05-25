@@ -571,7 +571,7 @@ public class RoundtripTests
     [Fact]
     public void CombatGfxTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(CombatGfx.Unknown27) };
+        var info = new AssetInfo { AssetId = AssetId.From(CombatGfx.SplashYellow) };
         RoundTripXld<IReadOnlyTexture<byte>>(nameof(CombatGfxTest), "$(ALBION)/CD/XLDLIBS/COMGFX0.XLD", 26,
             (x, s, c) => Loaders.MultiHeaderSpriteLoader.Serdes(x, info, s, c));
     }

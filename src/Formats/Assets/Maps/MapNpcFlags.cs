@@ -23,7 +23,7 @@ public enum MapNpcFlags : ushort
 
     Unk3      = 0x8,
     SimpleMsg = 0x10, // When talked to, shows a simple msg (i.e. interprets Id as a MapText sub-id). When not set, Id = EventSetId.
-    Unk5      = 0x20, // 277 times
+    Unk5      = 0x20, // 277 times - IconPriority?
     NoClip    = 0x40,
     Unused7   = 0x80, // ??
 

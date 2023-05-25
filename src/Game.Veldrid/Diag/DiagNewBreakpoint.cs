@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Text;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
+using UAlbion.Core.Veldrid;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game.Diag;
 
@@ -47,13 +47,13 @@ public class DiagNewBreakpoint : Component
         if (ImGui.Button("Done"))
         {
             var triggerType = _triggerTypes[_curTriggerIndex];
-            var targetStr = Encoding.UTF8.GetString(_targetBuf);
+            var targetStr = ImGuiUtil.GetString(_targetBuf);
             var target = AssetId.Parse(targetStr);
 
-            // var eventTypeStr = Encoding.UTF8.GetString(_eventTypeBuf);
+            // var eventTypeStr = ImGuiUtil.GetString(_eventTypeBuf);
             // var eventType = eventTypeStr;
 
-            var eventIdStr = Encoding.UTF8.GetString(_eventIdBuf);
+            var eventIdStr = ImGuiUtil.GetString(_eventIdBuf);
             var eventId = ushort.TryParse(eventIdStr, out var rawEventId) ? (ushort?)rawEventId : null;
 
             var bp = new Breakpoint(triggerType, target, eventId);

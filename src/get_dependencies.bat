@@ -32,7 +32,7 @@ git clone https://github.com/datalust/superpower
 echo.
 
 :l5
-if exist ImGuiColorTextEditNet
+if exist ImGuiColorTextEditNet goto l6
 echo Cloning ImGuiColorTextEditNet
 git clone https://github.com/csinkers/ImGuiColorTextEditNet
 echo.

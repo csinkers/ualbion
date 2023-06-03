@@ -46,12 +46,13 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
 
         _engine = new Engine(GraphicsBackend.Vulkan, false, false);
         _isoRsm = new IsometricRenderSystem(tileWidth, tileHeight, baseHeight, tilesPerRow);
-        _isoRsm.OffScreen.IsActive = true;
-        _engine.RenderSystem = _isoRsm.OffScreen;
 
         AttachChild(_shaderLoader);
         AttachChild(_engine);
         AttachChild(_isoRsm);
+
+        _isoRsm.OffScreen.IsActive = true;
+        _engine.RenderSystem = _isoRsm.OffScreen;
 
         Raise(new SetSceneEvent(SceneId.IsometricBake));
         Raise(new SetClearColourEvent(0, 0, 0, 0));

@@ -6,6 +6,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Events;
+using Veldrid;
 using VeldridGen.Interfaces;
 
 namespace UAlbion.Game.Veldrid.Diag;
@@ -53,7 +54,13 @@ public class ImGuiGameWindow : Component, IImGuiWindow
         if (texture != null)
         {
             var handle = manager.GetOrCreateImGuiBinding(texture);
-            ImGui.Image(handle, new Vector2(_framebuffer.Width, _framebuffer.Height));
+
+            // Compensate for OpenGL's inverted texture coordinates compared to the other backends
+            var engine = (IVeldridEngine)Resolve<IEngine>();
+            if (engine.Device.BackendType is GraphicsBackend.OpenGL or GraphicsBackend.OpenGLES)
+                ImGui.Image(handle, new Vector2(_framebuffer.Width, _framebuffer.Height), new Vector2(0, 1.0f), new Vector2(1.0f, 0));
+            else
+                ImGui.Image(handle, new Vector2(_framebuffer.Width, _framebuffer.Height));
         }
 
         var vMin = ImGui.GetWindowContentRegionMin();

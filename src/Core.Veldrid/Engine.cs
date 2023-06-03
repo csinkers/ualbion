@@ -204,7 +204,7 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
         var flags = Var(CoreVars.User.EngineFlags);
         var gdOptions = new GraphicsDeviceOptions(
             _renderDoc != null,
-            PixelFormat.R32_Float,
+            PixelFormat.D24_UNorm_S8_UInt,
             (flags & EngineFlags.VSync) != 0,
             ResourceBindingModel.Improved,
             true,

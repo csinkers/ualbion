@@ -30,6 +30,9 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
 
     void OnInput(InputEvent e)
     {
+        if (!_renderer.IsReady)
+            return;
+
         if (!_initialised)
         {
             if (ImGui.GetCurrentContext() == IntPtr.Zero)

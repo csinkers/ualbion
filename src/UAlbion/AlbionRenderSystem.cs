@@ -28,7 +28,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
     public AlbionRenderSystem(ICameraProvider mainCamera, IImGuiMenuManager menus)
     {
         OutputDescription screenFormat = new(
-            new OutputAttachmentDescription(PixelFormat.R32_Float),
+            new OutputAttachmentDescription(PixelFormat.D24_UNorm_S8_UInt),
             new OutputAttachmentDescription(PixelFormat.B8_G8_R8_A8_UNorm));
 
         _manager = RenderManagerBuilder.Create()

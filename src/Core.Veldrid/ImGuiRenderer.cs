@@ -45,6 +45,8 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     int _windowHeight;
 
     public Type[] HandledTypes { get; } = { typeof(DebugGuiRenderable) };
+    public bool IsReady => _pipeline != null;
+
     public ImGuiRenderer(in OutputDescription outputFormat)
     {
         _outputFormat = outputFormat;

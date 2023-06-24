@@ -70,7 +70,9 @@ public class InventoryChestPane : UiElement
     void UpdateBackground()
     {
         var inv = Resolve<IGameState>().GetInventory(new InventoryId(_id));
-        _background.Id = inv.IsEmpty ? Base.Picture.OpenChest : Base.Picture.OpenChestWithGold;
+        _background.Id = inv == null || inv.IsEmpty 
+            ? Base.Picture.OpenChest 
+            : Base.Picture.OpenChestWithGold;
     }
 
     protected override void Subscribed() => UpdateBackground();

@@ -12,7 +12,15 @@ namespace UAlbion.Game.Assets;
 public class AssetCache : Component
 {
     readonly object _syncRoot = new();
-    readonly Dictionary<AssetId, WeakReference> _cache = new();
+
+    class Entry
+    {
+        public WeakReference Weak;
+        public object Strong;
+        public DateTime LastAccessed;
+    }
+
+    readonly Dictionary<AssetId, Entry> _cache = new();
 
     public AssetCache()
     {
@@ -20,15 +28,26 @@ public class AssetCache : Component
         {
             lock (_syncRoot)
             {
+                var utcNow = DateTime.UtcNow;
+                var threshold = utcNow.AddSeconds(30);
+
                 foreach (var key in _cache.Keys.ToList())
                 {
-                    var weakRef = _cache[key];
-                    if (weakRef.Target == null)
+                    var entry = _cache[key];
+                    if (entry.Strong != null)
+                    {
+                        if (entry.LastAccessed > threshold)
+                            continue;
+
+                        entry.Strong = null;
+                    }
+
+                    if (entry.Strong == null && entry.Weak.Target == null)
                         _cache.Remove(key);
                 }
             }
-
         });
+
         On<ReloadAssetsEvent>(_ => { lock (_syncRoot) { _cache.Clear(); } });
         On<AssetUpdatedEvent>(e => { lock (_syncRoot) { _cache.Remove(e.Id); } });
         On<AssetStatsEvent>(_ =>
@@ -53,7 +72,11 @@ public class AssetCache : Component
     {
         lock (_syncRoot)
         {
-            return _cache.TryGetValue(key, out var cachedAsset) ? cachedAsset.Target : null;
+            if (!_cache.TryGetValue(key, out var entry))
+                return null;
+
+            entry.LastAccessed = DateTime.UtcNow;
+            return entry.Strong ?? entry.Weak.Target;
         }
     }
 
@@ -61,7 +84,12 @@ public class AssetCache : Component
     {
         lock (_syncRoot)
         {
-            _cache[key] = new WeakReference(asset);
+            _cache[key] = new Entry
+            {
+                LastAccessed = DateTime.UtcNow,
+                Strong = asset,
+                Weak = new WeakReference(asset),
+            };
         }
     }
 }

@@ -17,8 +17,9 @@ public static class LayerMapping2D
     public static MapTile[] ReadMapLayers(Map map)
     {
         if (map == null) throw new ArgumentNullException(nameof(map));
-        var underlay = LoadLayer(map, LayerName.Underlay);
-        var overlay = LoadLayer(map, LayerName.Overlay);
+        var firstGid = map.Tilesets[0].FirstGid; // Assume the main tileset always comes first
+        var underlay = LoadLayer(map, LayerName.Underlay, firstGid);
+        var overlay = LoadLayer(map, LayerName.Overlay, firstGid);
         return MapTile.FromInts(underlay, overlay);
     }
 
@@ -68,7 +69,7 @@ public static class LayerMapping2D
         return result;
     }
 
-    static int[] LoadLayer(Map map, string name)
+    static int[] LoadLayer(Map map, string name, int firstGid)
     {
         var layer = map.Layers.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
         if (layer == null)
@@ -78,6 +79,14 @@ public static class LayerMapping2D
         if (tileEncoding == null)
             throw new NotSupportedException($"No encoder could be found for encoding \"{layer.Data.Encoding}\" and compression \"{layer.Data.Compression}\"");
 
-        return tileEncoding.Decode(layer.Data.Content);
+        var tiles = tileEncoding.Decode(layer.Data.Content);
+        for (int i = 0; i < tiles.Length; i++)
+        {
+            var tile = tiles[i];
+            if (tile >= firstGid)
+                tiles[i] = tile - firstGid;
+        }
+
+        return tiles;
     }
 }

@@ -38,7 +38,7 @@ public class CodeWindow : Component, IImGuiWindow
         Name = name;
         _editor = new TextEditor
         {
-            IsReadOnly = true,
+            Options = { IsReadOnly = true },
             SyntaxHighlighter = new AlbionSyntaxHighlighter()
         };
     }
@@ -70,7 +70,7 @@ public class CodeWindow : Component, IImGuiWindow
             var eventFormatter = new EventFormatter(assets.LoadString, context.EventSet.TextId);
             set.Decompiled = eventFormatter.Decompile(set.Events, set.Chains, set.ExtraEntryPoints);
             var code = set.Decompiled.Script;
-            _editor.Text = code;
+            _editor.AllText = code;
             // TODO: Add breakpoints
         }
 

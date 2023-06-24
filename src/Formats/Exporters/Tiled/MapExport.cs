@@ -49,9 +49,9 @@ public static class MapExport
             TileWidth = properties.TileWidth,
             TileHeight = properties.TileHeight,
             Infinite = 0,
+            BackgroundColor = "#000000",
             Orientation = "orthogonal",
             RenderOrder = "right-down",
-            BackgroundColor = "#000000",
             Properties = MapMapping.BuildMapProperties(map),
             Tilesets = new List<MapTileset>
             {

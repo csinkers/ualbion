@@ -13,7 +13,7 @@ public sealed class ItemData
     public const int SizeOnDisk = 0x28;
     public ItemData(ItemId id) => Id = id;
     [JsonIgnore] public StringId Name => Id.ToName();
-    [JsonIgnore] public ItemId Id { get; }
+    public ItemId Id { get; }
     public byte Unknown { get; set; } //  0 Always 0
     public ItemType TypeId { get; set; } //  1 Item type
     public ItemSlotId SlotType { get; set; } //  2 Slot that can hold the item

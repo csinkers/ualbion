@@ -22,8 +22,29 @@ public class FontComponent
         if (index == -1)
             return null;
 
-        int x = X;
-        int y = Y + (Height + PadY) * index;
+        /* This needs to work with native layouts and sprite-sheet layouts
+        e.g. native:
+            a
+            b
+            c
+            d
+            e
+            ...
+
+        spritesheet:
+            a b c d e
+            f g h i j
+            ...
+        */
+
+        int x = X + Width * index;
+        int y = Y; // + (Height + PadY) * index;
+
+        while (x >= texture.Width)
+        {
+            x -= texture.Width;
+            y += Height + PadY;
+        }
 
         if (x + Width > texture.Width || y + Height > texture.Height)
         {

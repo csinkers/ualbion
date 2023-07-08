@@ -1,13 +1,13 @@
 {
-    "0": { "Id": "lab.200", "PaletteId": 22 }, // KounosCave
-    "1": { "PaletteId": 25 }, // Unknown201
-    "2": { "PaletteId": 13 }, // Kontos
-    "3": { "PaletteId": 25 }, // Beloveno
-    "4": { "PaletteId": 3 }, // Srimalinar
-    "5": { "PaletteId": 25 }, // Unknown205
-    "6": { "PaletteId": 25 }, // UmajoKenta
-    "7": { "PaletteId": 30 }, // UmajoPrison
-    "8": { "PaletteId": 13 }, // DeviceMaker
-    "9": { "PaletteId": 13 }, // Unknown209
-    "10": { "PaletteId": 30 }  // MountainPass
+  "lab.200": { "Palette": "pal.22" }, // KounosCave
+  "lab.201": { "Palette": "pal.25" }, // Unknown201
+  "lab.202": { "Palette": "pal.13" }, // Kontos
+  "lab.203": { "Palette": "pal.25" }, // Beloveno
+  "lab.204": { "Palette": "pal.3" }, // Srimalinar
+  "lab.205": { "Palette": "pal.25" }, // Unknown205
+  "lab.206": { "Palette": "pal.25" }, // UmajoKenta
+  "lab.207": { "Palette": "pal.30" }, // UmajoPrison
+  "lab.208": { "Palette": "pal.13" }, // DeviceMaker
+  "lab.209": { "Palette": "pal.13" }, // Unknown209
+  "lab.210": { "Palette": "pal.30" }  // MountainPass
 }

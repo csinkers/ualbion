@@ -7,6 +7,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
+using UAlbion.Config.Properties;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
@@ -91,7 +92,7 @@ class DumpGraphics : Component, IAssetDumper
         AlbionPalette palette;
         if (config != null)
         {
-            var rawPaletteId = config.Get(AssetProperty.PaletteId, 0);
+            var rawPaletteId = config.GetProperty(AssetProps.Palette);
             var paletteId = new PaletteId(rawPaletteId);
             palette = assets.LoadPalette(paletteId);
         }

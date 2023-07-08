@@ -4,6 +4,7 @@ using System.Linq;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Ids;
 using static UAlbion.Formats.Exporters.Tiled.MapperUtil;
 
 namespace UAlbion.Formats.Exporters.Tiled;
@@ -33,7 +34,7 @@ public static class TileMapping
         public const string UseUnderlayFlags =  "UseUnderlayFlags";
     }
 
-    public static Tile BuildTile(int id, int index, ushort? imageNumber, List<TiledProperty> tileProperties, Tilemap2DProperties properties, AssetPathPattern graphicsPattern)
+    public static Tile BuildTile(TilesetId id, int index, ushort? imageNumber, List<TiledProperty> tileProperties, Tilemap2DProperties properties, AssetPathPattern graphicsPattern)
     {
         if (properties == null) throw new ArgumentNullException(nameof(properties));
         if (graphicsPattern == null) throw new ArgumentNullException(nameof(graphicsPattern));
@@ -116,7 +117,7 @@ public static class TileMapping
     {
         if (string.IsNullOrEmpty(source)) return 0; 
         if (source == properties.BlankTilePath) return 0xffff;
-        if (!graphicsPattern.TryParse(source, out var assetPath)) return 0xffff;
+        if (!graphicsPattern.TryParse(source, AssetType.Unknown, out var assetPath)) return 0xffff;
         return (ushort)assetPath.SubAsset;
     }
 

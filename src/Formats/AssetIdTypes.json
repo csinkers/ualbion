@@ -73,22 +73,23 @@
     "VideoId": [ "Video" ],
     "WaveLibraryId": [ "WaveLibrary" ],
 
-    "EventTextId": [ "EventText" ],
-    "MapTextId": [ "MapText" ],
     "WordId": [ "Word" ],
 
-    "TextId": [
+    "StringSetId": [
       "EventText",
-      "ItemName",
       "MapText",
-      "Special",
+      "Special"
+    ],
+
+    "TextId": [
+      "ItemName",
       "Text",
       "Word"
     ]
   },
   "Extras": {
-    "EventSetId": [ "    public readonly TextId ToEventText() => new TextId(AssetType.EventText, Id);" ],
-    "MapId": [ "    public readonly TextId ToMapText() => new TextId(AssetType.MapText, Id);" ],
+    "EventSetId": [ "    public readonly StringSetId ToEventText() => new StringSetId(AssetType.EventText, Id);" ],
+    "MapId": [ "    public readonly StringSetId ToMapText() => new StringSetId(AssetType.MapText, Id);" ],
     "ItemId": [ "    public readonly TextId ToName() => new TextId(AssetType.ItemName, Id);" ],
     "TilesetId": [
       "    public readonly BlockListId ToBlockList() => new BlockListId(AssetType.BlockList, Id);",

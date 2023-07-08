@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using UAlbion.Api.Eventing;
@@ -333,7 +332,7 @@ class DumpText : Component, IAssetDumper
             {
                 if (e.Event is TextEvent textEvent)
                 {
-                    var textSource = tf.Format(textEvent.ToId(eventSet.TextId));
+                    var textSource = tf.Format(textEvent.ToId(eventSet.StringSetId));
                     var text = string.Join(", ", textSource.GetBlocks().Select(x => x.Text));
                     sw.WriteLine($"        {e} = {text}");
                 }

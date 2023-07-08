@@ -12,10 +12,10 @@ namespace UAlbion.Game.Tests;
 public class MockModApplier : ServiceComponent<IModApplier>, IModApplier
 {
     readonly Dictionary<AssetId, object> _assets = new();
-    readonly Dictionary<AssetId, AssetInfo> _infos = new();
+    readonly Dictionary<AssetId, AssetNode> _infos = new();
 
     public void LoadMods(AssetMapping mapping, IPathResolver pathResolver, IReadOnlyList<string> mods) { }
-    public AssetInfo GetAssetInfo(AssetId id, string language) => _infos[id];
+    public AssetNode GetAssetInfo(AssetId id, string language) => _infos[id];
     public object LoadAsset(AssetId id) => _assets[id];
     public object LoadAsset(AssetId id, string language) => _assets[id];
     public object LoadAssetCached(AssetId id) => _assets[id];
@@ -27,7 +27,13 @@ public class MockModApplier : ServiceComponent<IModApplier>, IModApplier
             new Dictionary<string, LanguageConfig>());
 
     public IEnumerable<string> ShaderPaths => Array.Empty<string>();
-    public void SaveAssets(IModApplier.AssetLoader loaderFunc, Action flushCacheFunc, ISet<AssetId> ids, ISet<AssetType> assetTypes, Regex filePattern)
+    public void SaveAssets(
+        IModApplier.AssetLoader loaderFunc,
+        Action flushCacheFunc,
+        ISet<AssetId> ids,
+        ISet<AssetType> assetTypes,
+        string[] languages,
+        Regex filePattern)
     {
         throw new NotImplementedException();
     }
@@ -38,7 +44,7 @@ public class MockModApplier : ServiceComponent<IModApplier>, IModApplier
         return this;
     }
 
-    public MockModApplier AddInfo(AssetId id, AssetInfo asset)
+    public MockModApplier AddInfo(AssetId id, AssetNode asset)
     {
         _infos[id] = asset;
         return this;

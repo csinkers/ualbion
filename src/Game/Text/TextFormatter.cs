@@ -337,7 +337,7 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
         => Format(templateText, null, arguments);
 
     public IText Format(TextId textId, IList<(Token, object)> implicitTokens, params object[] arguments)
-        => Format((StringId)textId, implicitTokens, arguments);
+        => Format(new StringId(textId), implicitTokens, arguments);
 
     public IText Format(StringId stringId, IList<(Token, object)> implicitTokens, params object[] arguments)
         => new DynamicText(() =>

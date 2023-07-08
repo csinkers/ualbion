@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Core.Events;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.State;
@@ -12,7 +11,7 @@ public class MainMenu : Dialog
 {
     public MainMenu() : base(DialogPositioning.Center)
     {
-        On<CloseWindowEvent>(e => Raise(new PopSceneEvent()));
+        On<CloseWindowEvent>(_ => Raise(new PopSceneEvent()));
     }
 
     protected override void Subscribed()
@@ -23,7 +22,7 @@ public class MainMenu : Dialog
         var elements = new List<IUiElement>
         {
             new Spacing(0, 2),
-            new HorizontalStacker(new Spacing(5, 0), new BoldHeader((TextId)Base.SystemText.MainMenu_MainMenu), new Spacing(5, 0)),
+            new HorizontalStacker(new Spacing(5, 0), new BoldHeader(Base.SystemText.MainMenu_MainMenu), new Spacing(5, 0)),
             new Divider(CommonColor.Yellow3),
             new Spacing(0, 2),
         };
@@ -68,7 +67,7 @@ public class MainMenu : Dialog
 
     void NewGame()
     {
-        var e = new YesNoPromptEvent((TextId)Base.SystemText.MainMenu_DoYouReallyWantToStartANewGame);
+        var e = new YesNoPromptEvent(Base.SystemText.MainMenu_DoYouReallyWantToStartANewGame);
         var exchange = Exchange;
         RaiseAsync(e, response =>
         {
@@ -81,7 +80,7 @@ public class MainMenu : Dialog
 
     void LoadGame()
     {
-        var menu = new PickSaveSlotMenu(false, (TextId)Base.SystemText.MainMenu_WhichSavedGameDoYouWantToLoad, 1);
+        var menu = new PickSaveSlotMenu(false, Base.SystemText.MainMenu_WhichSavedGameDoYouWantToLoad, 1);
         var exchange = Exchange;
         menu.Closed += (args, id) =>
         {
@@ -95,7 +94,7 @@ public class MainMenu : Dialog
 
     void SaveGame()
     {
-        var menu = new PickSaveSlotMenu(true, (TextId)Base.SystemText.MainMenu_SaveOnWhichPosition, 1);
+        var menu = new PickSaveSlotMenu(true, Base.SystemText.MainMenu_SaveOnWhichPosition, 1);
         var exchange = Exchange;
         menu.Closed += (args, _) =>
         {

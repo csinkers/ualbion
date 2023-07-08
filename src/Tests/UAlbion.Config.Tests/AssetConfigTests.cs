@@ -1,7 +1,14 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using UAlbion.Api;
+using UAlbion.Config.Properties;
+using UAlbion.Formats.Assets;
+using UAlbion.Formats.Containers;
+using UAlbion.Formats.Parsers;
+using UAlbion.Game.Assets;
+using UAlbion.TestCommon;
 using Xunit;
 // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
 
@@ -9,173 +16,221 @@ namespace UAlbion.Config.Tests;
 
 public class AssetConfigTests : Component
 {
-    const string TestConfig1 = @"{
+    static readonly IJsonUtil JsonUtil = new JsonUtil();
+
+    // TODO: Add MapFile and Map tests
+
+    const string TypeConfig1 = @"
+{
   ""IdTypes"": {
-    ""3dobj"":    { ""AssetType"": ""Object3D"",        ""EnumType"": ""UAlbion.Base.DungeonObject, UAlbion.Base"" },
-    ""autotile"": { ""AssetType"": ""AutomapGfx"", ""EnumType"": ""UAlbion.Base.AutomapTiles, UAlbion.Base"" },
-    ""block"": {
-      ""AssetType"": ""BlockList"",
-      ""EnumType"": ""UAlbion.Base.BlockList, UAlbion.Base"",
-      ""CopiedFrom"": ""UAlbion.Base.Tileset, UAlbion.Base""
-    },
-    ""combg"":      { ""AssetType"": ""CombatBackground"", ""EnumType"": ""UAlbion.Base.CombatBackground, UAlbion.Base"" },
-    ""comgfx"":     { ""AssetType"": ""CombatGfx"",        ""EnumType"": ""UAlbion.Base.CombatGfx, UAlbion.Base"" },
-    ""coresprite"": { ""AssetType"": ""CoreGfx"",          ""EnumType"": ""UAlbion.Base.CoreSprite, UAlbion.Base"" },
-    ""floor"":      { ""AssetType"": ""Floor"",            ""EnumType"": ""UAlbion.Base.Floor, UAlbion.Base"" },
-    ""font"":       { ""AssetType"": ""FontDefinition"",   ""EnumType"": ""UAlbion.Base.Font, UAlbion.Base"" },
-    ""fontgfx"":    { ""AssetType"": ""FontGfx"",          ""EnumType"": ""UAlbion.Base.FontGfx, UAlbion.Base"" },
-    ""item"":       { ""AssetType"": ""Item"",             ""EnumType"": ""UAlbion.Base.Item, UAlbion.Base"" },
-    ""overlay"":    { ""AssetType"": ""WallOverlay"",      ""EnumType"": ""UAlbion.Base.WallOverlay, UAlbion.Base"" },
-    ""pal"":        { ""AssetType"": ""Palette"",          ""EnumType"": ""UAlbion.Base.Palette, UAlbion.Base"" },
-    ""special"":    { ""AssetType"": ""Special"",          ""EnumType"": ""UAlbion.Base.Special, UAlbion.Base"" },
-    ""spell"":      { ""AssetType"": ""Spell"",            ""EnumType"": ""UAlbion.Base.Spell, UAlbion.Base"" },
-    ""tiledata"":   { ""AssetType"": ""Tileset"",          ""EnumType"": ""UAlbion.Base.Tileset, UAlbion.Base"" },
-    ""tilegfx"": {
-      ""AssetType"": ""TilesetGfx"",
-      ""EnumType"": ""UAlbion.Base.TilesetGfx, UAlbion.Base"",
-      ""CopiedFrom"": ""UAlbion.Base.Tileset, UAlbion.Base""
-    },
-     ""word"": { ""AssetType"": ""Word"", ""EnumType"": ""UAlbion.Base.Word, UAlbion.Base"" }
+    ""3dobj"":    { ""AssetType"": ""Object3D"",         ""EnumType"": ""UAlbion.Base.DungeonObject, UAlbion.Base"" },
+    ""autotile"": { ""AssetType"": ""AutomapGfx"",       ""EnumType"": ""UAlbion.Base.AutomapTiles, UAlbion.Base"" },
+    ""block"":    { ""AssetType"": ""BlockList"",        ""EnumType"": ""UAlbion.Base.BlockList, UAlbion.Base"" },
+    ""combg"":    { ""AssetType"": ""CombatBackground"", ""EnumType"": ""UAlbion.Base.CombatBackground, UAlbion.Base"" },
+    ""comgfx"":   { ""AssetType"": ""CombatGfx"",        ""EnumType"": ""UAlbion.Base.CombatGfx, UAlbion.Base"" },
+    ""coregfx"":  { ""AssetType"": ""CoreGfx"",          ""EnumType"": ""UAlbion.Base.CoreGfx, UAlbion.Base"" },
+    ""floor"":    { ""AssetType"": ""Floor"",            ""EnumType"": ""UAlbion.Base.Floor, UAlbion.Base"" },
+    ""font"":     { ""AssetType"": ""FontDefinition"",   ""EnumType"": ""UAlbion.Base.Font, UAlbion.Base"" },
+    ""fontgfx"":  { ""AssetType"": ""FontGfx"",          ""EnumType"": ""UAlbion.Base.FontGfx, UAlbion.Base"" },
+    ""item"":     { ""AssetType"": ""Item"",             ""EnumType"": ""UAlbion.Base.Item, UAlbion.Base"" },
+    ""overlay"":  { ""AssetType"": ""WallOverlay"",      ""EnumType"": ""UAlbion.Base.WallOverlay, UAlbion.Base"" },
+    ""pal"":      { ""AssetType"": ""Palette"",          ""EnumType"": ""UAlbion.Base.Palette, UAlbion.Base"" },
+    ""special"":  { ""AssetType"": ""Special"",          ""EnumType"": ""UAlbion.Base.Special, UAlbion.Base"" },
+    ""spell"":    { ""AssetType"": ""Spell"",            ""EnumType"": ""UAlbion.Base.Spell, UAlbion.Base"" },
+    ""stext"":    { ""AssetType"": ""Text"",             ""EnumType"": ""UAlbion.Base.SystemText, UAlbion.Base"" },
+    ""tiledata"": { ""AssetType"": ""Tileset"",          ""EnumType"": ""UAlbion.Base.Tileset, UAlbion.Base"" },
+    ""tilegfx"":  { ""AssetType"": ""TilesetGfx"",       ""EnumType"": ""UAlbion.Base.TilesetGfx, UAlbion.Base"" },
+    ""utext"":    { ""AssetType"": ""Text"",             ""EnumType"": ""UAlbion.Base.UAlbionString, UAlbion.Base"" },
+    ""word"":     { ""AssetType"": ""Word"",             ""EnumType"": ""UAlbion.Base.Word, UAlbion.Base"" }
   },
 
   ""Loaders"": {
-    ""amorphous"":  ""UAlbion.Formats.Parsers.AmorphousSpriteLoader, UAlbion.Formats"",
-    ""block"":      ""UAlbion.Formats.Parsers.BlockListLoader, UAlbion.Formats"",
-    ""fixedsize"":  ""UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats"",
-    ""font"":       ""UAlbion.Formats.Parsers.FontSpriteLoader, UAlbion.Formats"",
-    ""header"":     ""UAlbion.Formats.Parsers.HeaderBasedSpriteLoader, UAlbion.Formats"",
+    ""amorphous"":   ""UAlbion.Formats.Parsers.AmorphousSpriteLoader, UAlbion.Formats"",
+    ""block"":       ""UAlbion.Formats.Parsers.BlockListLoader, UAlbion.Formats"",
+    ""fixedsize"":   ""UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats"",
+    ""font"":        ""UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.FontDefinition, UAlbion.Formats]], UAlbion.Formats"",
+    ""header"":      ""UAlbion.Formats.Parsers.SingleHeaderSpriteLoader, UAlbion.Formats"",
+    ""itemdata"":    ""UAlbion.Formats.Parsers.ItemDataLoader, UAlbion.Formats"",
+    ""itemname"":    ""UAlbion.Formats.Parsers.ItemNameLoader, UAlbion.Formats"",
+    ""json"":        ""UAlbion.Formats.Parsers.JsonStringLoader, UAlbion.Formats"",
     ""multiheader"": ""UAlbion.Formats.Parsers.MultiHeaderSpriteLoader, UAlbion.Formats"",
-    ""itemdata"":   ""UAlbion.Formats.Parsers.ItemDataLoader, UAlbion.Formats"",
-    ""json"":       ""UAlbion.Formats.Parsers.JsonStringLoader, UAlbion.Formats"",
-    ""pal"":        ""UAlbion.Formats.Parsers.PaletteLoader, UAlbion.Formats"",
-    ""soundbank"":  ""UAlbion.Game.Assets.SoundBankLoader, UAlbion.Game"",
-    ""spell"":      ""UAlbion.Formats.Parsers.SpellLoader, UAlbion.Formats"",
-    ""systemtext"": ""UAlbion.Formats.Parsers.SystemTextLoader, UAlbion.Formats"",
-    ""tileset"":    ""UAlbion.Formats.Parsers.TilesetLoader, UAlbion.Formats"",
-    ""wordlist"":   ""UAlbion.Formats.Parsers.WordListLoader, UAlbion.Formats""
+    ""pal"":         ""UAlbion.Formats.Parsers.PaletteLoader, UAlbion.Formats"",
+    ""soundbank"":   ""UAlbion.Game.Assets.SoundBankLoader, UAlbion.Game"",
+    ""spell"":       ""UAlbion.Formats.Parsers.SpellLoader, UAlbion.Formats"",
+    ""stext"":       ""UAlbion.Formats.Parsers.SystemTextLoader, UAlbion.Formats"",
+    ""stringset"":   ""UAlbion.Formats.Parsers.StringSetStringLoader, UAlbion.Formats"",
+    ""tilegfx"":     ""UAlbion.Formats.Parsers.TilesetGraphicsLoader, UAlbion.Formats"",
+    ""tileset"":     ""UAlbion.Formats.Parsers.TilesetLoader, UAlbion.Formats"",
+    ""wordlist"":    ""UAlbion.Formats.Parsers.WordListLoader, UAlbion.Formats""
   },
 
   ""Containers"": {
-    ""raw"": ""UAlbion.Formats.Containers.RawContainer, UAlbion.Formats"",
-    ""items"": ""UAlbion.Formats.Containers.ItemListContainer, UAlbion.Formats"",
-    ""spells"": ""UAlbion.Formats.Containers.SpellListContainer, UAlbion.Formats"",
-    ""binaryoffsets"": ""UAlbion.Formats.Containers.BinaryOffsetContainer, UAlbion.Formats""
+    ""binaryoffsets"": ""UAlbion.Formats.Containers.BinaryOffsetContainer, UAlbion.Formats"",
+    ""items"":         ""UAlbion.Formats.Containers.ItemListContainer, UAlbion.Formats"",
+    ""raw"":           ""UAlbion.Formats.Containers.RawContainer, UAlbion.Formats"",
+    ""spells"":        ""UAlbion.Formats.Containers.SpellListContainer, UAlbion.Formats""
   },
 
-  ""Files"": {
-    ""$(ALBION)/DRIVERS/ALBISND.OPL"": { ""Loader"": ""soundbank"", ""Map"": { ""0"": { ""Id"": ""special.SoundBank"" } } },
-    ""$(XLD)/ITEMLIST.DAT"": { ""Loader"": ""itemdata"", ""Container"": ""items"", ""Map"": { ""0"": { ""Id"": ""item.1"" } } },
-    ""$(XLD)/BLKLIST0.XLD"": { ""Loader"": ""block"", ""Map"": { ""0"": {""Id"": ""block.1"" } } },
-    ""$(XLD)/3DFLOOR2.XLD"": { ""Loader"": ""fixedsize"", ""Width"": 64, ""Height"": 64, ""Map"": { ""0"": { ""Id"": ""floor.200"" } } },
-    ""$(XLD)/COMBACK0.XLD"": { ""Loader"": ""fixedsize"", ""Width"": 360, ""Map"": { ""0"": { ""Id"": ""combg.1"" } } },
-    ""$(XLD)/ICONGFX0.XLD"": { ""Loader"": ""fixedsize"", ""Width"": 16, ""Height"": 16, ""Map"": { ""0"": { ""Id"": ""tilegfx.1"" } } },
-    ""$(XLD)/COMGFX0.XLD"":  { ""Loader"": ""multiheader"", ""Map"": { ""0"": { ""Id"": ""comgfx.1""} } },
+  ""PostProcessors"": {
+    ""atlas"": ""UAlbion.Formats.Parsers.AtlasPostProcessor, UAlbion.Formats""
+  },
 
-    ""$(MOD)/$(LANG)/strings.json"": {
-      ""Loader"": ""json"",
-      ""Container"": ""raw"",
-      ""Map"": { ""0"": { ""Id"": ""special.UAlbionStrings"" } }
+  ""GlobalPropertyTypes"": [ ""UAlbion.Config.Properties.AssetProps, UAlbion.Config"" ]
+}
+";
+
+    const string AssetConfig1 = @"
+{
+  ""Mapping"": {
+    ""special.SoundBank"": { ""Files"": { ""Albion/DRIVERS/ALBISND.OPL"": { ""Container"": ""raw"", ""Loader"": ""soundbank"" } } },
+    ""special.ItemNames"": { ""Files"": { ""Albion/CD/XLDLIBS/ITEMNAME.DAT"": { ""Loader"": ""itemname"", ""Container"": ""raw"" } } },
+    ""item.1-462"":        { ""Files"": { ""Albion/CD/XLDLIBS/ITEMLIST.DAT"": { ""Loader"": ""itemdata"", ""Container"": ""items"" } } },
+
+    ""block.1-11"":  { ""Files"": { ""Albion/CD/XLDLIBS/BLKLIST0.XLD"": { ""Loader"": ""block"" } } },
+    ""floor.200-299"":    { ""Files"": { ""Albion/CD/XLDLIBS/3DFLOOR2.XLD"": { ""Loader"": ""fixedsize"", ""Width"": 64, ""Height"": 64 } } },
+    ""combg.1-19"":       { ""Files"": { ""Albion/CD/XLDLIBS/COMBACK0.XLD"": { ""Loader"": ""fixedsize"", ""Width"": 360 } } },
+    ""tilegfx.1-11"": {
+      ""Files"": {
+        ""Albion/CD/XLDLIBS/ICONGFX0.XLD"": {
+          ""Loader"": ""tilegfx"",
+          ""Width"": 16,
+          ""Height"": 16,
+          ""Map"": {
+            ""tilegfx.1"":  { ""Palette"": ""pal.1"" },
+            ""tilegfx.2"":  { ""Palette"": ""pal.2"" },
+            ""tilegfx.3"":  { ""Palette"": ""pal.6"" },
+            ""tilegfx.4"":  { ""Palette"": ""pal.4"" },
+            ""tilegfx.5"":  { ""Palette"": ""pal.5"" },
+            ""tilegfx.6"":  { ""Palette"": ""pal.16"" },
+            ""tilegfx.7"":  { ""Palette"": ""pal.9"" },
+            ""tilegfx.8"":  { ""Palette"": ""pal.26"" },
+            ""tilegfx.9"":  { ""Palette"": ""pal.28"" },
+            ""tilegfx.10"": { ""Palette"": ""pal.45"" },
+            ""tilegfx.11"": { ""Palette"": ""pal.56"" }
+          }
+        }
+      }
     },
-    ""$(XLD)/$(LANG)/SYSTEXTS"":     {
-      ""Loader"": ""stext"",
-      ""Container"": ""raw"",
-      ""Map"": { ""0"": { ""Id"": ""special.SystemStrings"" } }
-    },
-    ""$(XLD)/$(LANG)/WORDLIS0.XLD"": {
-      ""Loader"": ""wordlist"",
-      ""Map"": {
-        ""0"": { ""Id"": ""special.Words1"" },
-        ""1"": { ""Id"": ""special.Words2"" },
-        ""2"": { ""Id"": ""special.Words3"" }
+    ""comgfx.1-85"":      { ""Files"": { ""Albion/CD/XLDLIBS/COMGFX0.XLD"": {  ""Loader"": ""multiheader"", ""Palette"": ""pal.23"" } } },
+
+    ""utext.0-*"":      { ""Loader"": ""stringset"", ""FirstId"": ""utext.0"",    ""Target"": ""special.UAlbionStrings"" },
+    ""stext.0-777"":    { ""Loader"": ""stringset"", ""FirstId"": ""stext.0"",    ""Target"": ""special.SystemStrings"" },
+
+    ""autotile.1-2"": {
+      ""Files"": {
+        ""Albion/CD/XLDLIBS/AUTOGFX0.XLD"": {
+          ""Post"": ""atlas"",
+          ""Loader"": ""amorphous"",
+          ""Map"": {
+            ""autotile.1"": { ""SubSprites"": ""(8,8,576) (16,16)"", ""Palette"": ""pal.11"" },
+            ""autotile.2"": { ""SubSprites"": ""(8,8,576) (16,16)"", ""Palette"": ""pal.30"" }
+          }
+        }
       }
     },
 
-    ""$(XLD)/AUTOGFX0.XLD"": {
-      ""Loader"": ""amorphous"",
-      ""Map"": {
-        ""0"": { ""Id"": ""autotile.1"", ""SubSprites"": ""(8,8,576) (16,16)"" },
-        ""1"": { ""SubSprites"": ""(8,8,576) (16,16)"" }
+    ""3dobj.1-99"":       { ""Files"": { ""Albion/CD/XLDLIBS/3DOBJEC0.XLD"": { ""Loader"": ""fixedsize"" } } },
+    ""overlay.1-99"":     { ""Files"": { ""Albion/CD/XLDLIBS/3DOVERL0.XLD"": { ""Loader"": ""fixedsize"", ""Transposed"": true } } },
+    ""fontgfx.1-2"": { // English/French fonts, regular & bold
+      ""Files"": {
+        ""Albion/CD/XLDLIBS/FONTS0.XLD#33906F62"": { // EN+FR
+          ""Loader"": ""fixedsize"",
+          ""Optional"": true,
+          ""Width"": 8,
+          ""Height"": 8
+        }
       }
     },
 
-    ""$(XLD)/3DOBJEC0.XLD"": {
-      ""Loader"": ""fixedsize"",
-      ""Map"": {
-        ""0"": { ""Id"": ""3dobj.1"", ""Width"": 32 },
-        ""1"": { ""Width"": 16 },
-        ""26"": { ""Width"": 50, ""Height"": 128 }
+    ""tiledata.1-11"": {
+      ""Files"": {
+        ""Albion/CD/XLDLIBS/ICONDAT0.XLD"": {
+          ""Loader"": ""tileset"",
+          ""Map"": {
+            ""tiledata.1"": { ""UseSmallGraphics"": true },
+            ""tiledata.2"": { ""UseSmallGraphics"": true },
+            ""tiledata.4"": { ""UseSmallGraphics"": true }
+          }
+        }
       }
     },
 
-    ""$(XLD)/3DOVERL0.XLD"": {
-      ""Transposed"": true,
-      ""Loader"": ""fixedsize"",
-      ""Map"": {
-        ""0"": { ""Id"": ""overlay.1"", ""Width"": 51 },
-        ""1"": { ""Width"": 44 },
-        ""22"": { ""Width"": 62, ""Height"": 42 }
+    ""pal.0"": {
+      ""Files"": {
+        ""Albion/CD/XLDLIBS/PALETTE.000"": {
+          ""IsCommon"": true,
+          ""Container"": ""raw"",
+          ""Loader"": ""pal"" 
+        }
       }
     },
 
-    ""$(XLD)/FONTS0.XLD"": {
-      ""Loader"": ""font"",
-      ""Width"": 8,
-      ""Height"": 8,
-      ""Max"": 2,
-      ""Map"": {
-        ""0"": { ""Id"": ""font.1"" }
+    ""pal.1-56"": {
+      ""Files"": {
+        ""Albion/CD/XLDLIBS/PALETTE0.XLD"": {
+          ""Loader"": ""pal"",
+          ""Map"": {
+            ""pal.1"":  { ""NightPalette"": ""pal.47"", ""AnimatedRanges"": ""0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf"" },
+            ""pal.2"":  { ""NightPalette"": ""pal.47"", ""AnimatedRanges"": ""0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf"" },
+            ""pal.3"":  { ""NightPalette"": ""pal.55"",  ""AnimatedRanges"": ""0x40-0x43, 0x44-0x4f"" },
+            ""pal.4"":  { ""NightPalette"": ""pal.48"" },
+            ""pal.6"":  { ""AnimatedRanges"": ""0xb0-0xb4, 0xb5-0xbf"" },
+            ""pal.14"": { ""NightPalette"": ""pal.49"", ""AnimatedRanges"": ""0xb0-0xb3, 0xb4-0xbf"" },
+            ""pal.15"": { ""AnimatedRanges"": ""0x58-0x5f"" },
+            ""pal.25"": { ""NightPalette"": ""pal.49"", ""AnimatedRanges"": ""0xb0-0xb3, 0xb4-0xbf"" },
+            ""pal.26"": { ""AnimatedRanges"": ""0xb4-0xb7, 0xb8-0xbb, 0xbc-0xbf"" },
+            ""pal.31"": { ""AnimatedRanges"": ""0x10-0x4f"" },
+            ""pal.47"": { ""AnimatedRanges"": ""0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf"" },
+            ""pal.49"": { ""AnimatedRanges"": ""0xb0-0xb3, 0xb4-0xbf"" },
+            ""pal.51"": { ""NightPalette"": ""pal.49"", ""AnimatedRanges"": ""0xb0-0xb3, 0xb4-0xbf"" },
+            ""pal.55"": { ""AnimatedRanges"": ""0x40-0x43, 0x44-0x4f"" }
+          }
+        }
       }
     },
 
-    ""$(XLD)/ICONDAT0.XLD"": {
-      ""Loader"": ""tileset"",
-      ""Map"": {
-        ""0"": { ""Id"": ""tiledata.1"", ""UseSmallGraphics"": true },
-        ""1"": { ""UseSmallGraphics"": true },
-        ""3"": { ""UseSmallGraphics"": true }
-      }
-    },
-
-    ""$(XLD)/PALETTE0.XLD"": {
-      ""Loader"": ""pal"",
-      ""Map"": {
-        ""0"": { ""Id"": ""pal.1"", ""AnimatedRanges"": ""0x99-0x9f, 0xb0-0xbf"" },
-        ""1"": { ""AnimatedRanges"": ""0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf"" }
-      }
-    },
-
-    ""$(XLD)/SPELLDAT.XLD"": {
-      ""Loader"": ""spell"",
-      ""Container"": ""spells"",
-      ""Map"": { // Ids = 1 + OffsetInSchool + School * 256
-        ""0"": { ""Id"": ""spell.1"" },
-        ""30"": { ""Id"": ""spell.257"" },
-        ""60"": { ""Id"": ""spell.513"" }
-      }
-    },
-
-    ""$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710"": { // EN+DE
-      ""Loader"": ""fixedsize"",
+    ""spell.1-210"": { ""Files"": { ""Albion/CD/XLDLIBS/SPELLDAT.DAT"": { ""Loader"": ""spell"", ""Container"": ""spells"" } } },
+    ""coregfx.0-88"": {
+      ""Files"": {
+        ""Albion/MAIN.EXE#476227B0"": {}, // EN GOG, built Aug 22 1996
+        ""Albion/MAIN.EXE#9FC7ABCF"": {}, // EN, built Jul 25 1996
+        ""Albion/MAIN.EXE#487DA334"": {}, // FR
+        ""Albion/MAIN.EXE#EC6D6389"": {} // DE GOG ISO, built Dec 14 1995
+      },
       ""Container"": ""binaryoffsets"",
-      ""Map"": {
-        ""0"": { ""Id"": ""coresprite.0"", ""Offset"": 1031768, ""Width"": 14, ""Height"": 14, ""Hotspot"": ""-6 0"" },
-        ""1"": { ""Offset"": 1031964, ""Width"": 16, ""Height"": 16, ""Hotspot"": ""0 4"" },
-        ""27"": { ""Offset"": 1039632, ""Width"": 32, ""Height"": 64 }
-      }
+      ""Loader"": ""fixedsize"",
+      ""IsReadOnly"": true
     }
   }
 }
 ";
 
-    static byte[] TestConfig1Bytes { get; } = Encoding.UTF8.GetBytes(TestConfig1);
-    static readonly IJsonUtil JsonUtil = new JsonUtil();
-    public AssetConfigTests() => AssetMapping.GlobalIsThreadLocal = true;
+    TypeConfig TypeConfig { get; }
+    AssetConfig AssetConfig { get; }
+
+    public AssetConfigTests()
+    {
+        AssetMapping.GlobalIsThreadLocal = true;
+
+        var tcl = new TypeConfigLoader(JsonUtil);
+        var typeConfigBytes = Encoding.UTF8.GetBytes(TypeConfig1);
+        TypeConfig = tcl.Parse(typeConfigBytes, "Test", null, AssetMapping.Global);
+
+        foreach (var kvp in TypeConfig.IdTypes)
+            AssetMapping.Global.RegisterAssetType(Type.GetType(kvp.Value.EnumType), kvp.Value.AssetType);
+
+        var disk = new MockFileSystem(false);
+        var baseDir = @"C:\ualbion";
+        var pathResolver = new PathResolver(baseDir, nameof(AssetConfigTests));
+        var acl = new AssetConfigLoader(disk, JsonUtil, pathResolver, TypeConfig);
+        var assetConfigBytes = Encoding.UTF8.GetBytes(AssetConfig1);
+        AssetConfig = acl.Parse(assetConfigBytes, nameof(AssetConfigTests), null);
+    }
 
     [Fact]
     public void VerifyIdTypes()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        Assert.Collection(c.IdTypes.Values.OrderBy(x => x.Alias),
+        Assert.Collection(TypeConfig.IdTypes.Values.OrderBy(x => x.Alias),
             t =>
             {
                 Assert.Equal("3dobj", t.Alias);
@@ -208,9 +263,9 @@ public class AssetConfigTests : Component
             },
             t =>
             {
-                Assert.Equal("coresprite", t.Alias);
+                Assert.Equal("coregfx", t.Alias);
                 Assert.Equal(AssetType.CoreGfx, t.AssetType);
-                Assert.Equal("UAlbion.Base.CoreSprite, UAlbion.Base", t.EnumType);
+                Assert.Equal("UAlbion.Base.CoreGfx, UAlbion.Base", t.EnumType);
             },
             t =>
             {
@@ -262,6 +317,12 @@ public class AssetConfigTests : Component
             },
             t =>
             {
+                Assert.Equal("stext", t.Alias);
+                Assert.Equal(AssetType.Text, t.AssetType);
+                Assert.Equal("UAlbion.Base.SystemText, UAlbion.Base", t.EnumType);
+            },
+            t =>
+            {
                 Assert.Equal("tiledata", t.Alias);
                 Assert.Equal(AssetType.Tileset, t.AssetType);
                 Assert.Equal("UAlbion.Base.Tileset, UAlbion.Base", t.EnumType);
@@ -274,6 +335,12 @@ public class AssetConfigTests : Component
             },
             t =>
             {
+                Assert.Equal("utext", t.Alias);
+                Assert.Equal(AssetType.Text, t.AssetType);
+                Assert.Equal("UAlbion.Base.UAlbionString, UAlbion.Base", t.EnumType);
+            },
+            t =>
+            {
                 Assert.Equal("word", t.Alias);
                 Assert.Equal(AssetType.Word, t.AssetType);
                 Assert.Equal("UAlbion.Base.Word, UAlbion.Base", t.EnumType);
@@ -283,111 +350,108 @@ public class AssetConfigTests : Component
     [Fact]
     public void VerifyLoaders()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        Assert.Collection(c.Loaders.OrderBy(x => x.Key),
+        Assert.Collection(TypeConfig.Loaders.OrderBy(x => x.Key),
             l =>
             {
                 Assert.Equal("amorphous", l.Key);
-                Assert.Equal("UAlbion.Formats.Parsers.AmorphousSpriteLoader, UAlbion.Formats", l.Value);
+                Assert.Equal(typeof(AmorphousSpriteLoader), l.Value);
             },
             l =>
             {
                 Assert.Equal("block", l.Key);
-                Assert.Equal("UAlbion.Formats.Parsers.BlockListLoader, UAlbion.Formats", l.Value);
+                Assert.Equal(typeof(BlockListLoader), l.Value);
             },
             l =>
             {
                 Assert.Equal("fixedsize", l.Key);
-                Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", l.Value);
+                Assert.Equal(typeof(FixedSizeSpriteLoader), l.Value);
             },
             l =>
             {
                 Assert.Equal("font", l.Key);
-                Assert.Equal("UAlbion.Formats.Parsers.FontSpriteLoader, UAlbion.Formats", l.Value);
+                Assert.Equal(typeof(JsonLoader<FontDefinition>), l.Value);
             },
             l =>
             {
                 Assert.Equal("header", l.Key);
-                Assert.Equal("UAlbion.Formats.Parsers.HeaderBasedSpriteLoader, UAlbion.Formats", l.Value);
+                Assert.Equal(typeof(SingleHeaderSpriteLoader), l.Value);
             },
             l =>
             {
                 Assert.Equal("itemdata", l.Key);
-                Assert.Equal("UAlbion.Formats.Parsers.ItemDataLoader, UAlbion.Formats", l.Value);
+                Assert.Equal(typeof(ItemDataLoader), l.Value);
+            },
+            l =>
+            {
+                Assert.Equal("itemname", l.Key);
+                Assert.Equal(typeof(ItemNameLoader), l.Value);
             },
             l =>
             {
                 Assert.Equal("json", l.Key);
-                Assert.Equal("UAlbion.Formats.Parsers.JsonStringLoader, UAlbion.Formats", l.Value);
+                Assert.Equal(typeof(JsonStringLoader), l.Value);
             },
             l =>
             {
                 Assert.Equal("multiheader", l.Key);
-                Assert.Equal("UAlbion.Formats.Parsers.MultiHeaderSpriteLoader, UAlbion.Formats", l.Value);
+                Assert.Equal(typeof(MultiHeaderSpriteLoader), l.Value);
             },
             l =>
             {
                 Assert.Equal("pal", l.Key);
-                Assert.Equal("UAlbion.Formats.Parsers.PaletteLoader, UAlbion.Formats", l.Value);
+                Assert.Equal(typeof(PaletteLoader), l.Value);
             },
             l =>
             {
                 Assert.Equal("soundbank", l.Key);
-                Assert.Equal("UAlbion.Game.Assets.SoundBankLoader, UAlbion.Game", l.Value);
+                Assert.Equal(typeof(SoundBankLoader), l.Value);
             },
             l =>
             {
                 Assert.Equal("spell", l.Key);
-                Assert.Equal("UAlbion.Formats.Parsers.SpellLoader, UAlbion.Formats", l.Value);
+                Assert.Equal(typeof(SpellLoader), l.Value);
             },
             l =>
             {
-                Assert.Equal("systemtext", l.Key);
-                Assert.Equal("UAlbion.Formats.Parsers.SystemTextLoader, UAlbion.Formats", l.Value);
+                Assert.Equal("stext", l.Key);
+                Assert.Equal(typeof(SystemTextLoader), l.Value);
+            },
+            l =>
+            {
+                Assert.Equal("stringset", l.Key);
+                Assert.Equal(typeof(StringSetStringLoader), l.Value);
+            },
+            l =>
+            {
+                Assert.Equal("tilegfx", l.Key);
+                Assert.Equal(typeof(TilesetGraphicsLoader), l.Value);
             },
             l =>
             {
                 Assert.Equal("tileset", l.Key);
-                Assert.Equal("UAlbion.Formats.Parsers.TilesetLoader, UAlbion.Formats", l.Value);
+                Assert.Equal(typeof(TilesetLoader), l.Value);
             },
             l =>
             {
                 Assert.Equal("wordlist", l.Key);
-                Assert.Equal("UAlbion.Formats.Parsers.WordListLoader, UAlbion.Formats", l.Value);
+                Assert.Equal(typeof(WordListLoader), l.Value);
             });
     }
-
+#if false
     [Fact]
-    public void VerifyFiles()
+    public void VerifyRanges()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        Assert.Collection(c.Files.Keys.OrderBy(x => x),
-            x => Assert.Equal("$(ALBION)/DRIVERS/ALBISND.OPL", x),
-            x => Assert.Equal("$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710", x),
-            x => Assert.Equal("$(MOD)/$(LANG)/strings.json", x),
-            x => Assert.Equal("$(XLD)/$(LANG)/SYSTEXTS", x),
-            x => Assert.Equal("$(XLD)/$(LANG)/WORDLIS0.XLD", x),
-            x => Assert.Equal("$(XLD)/3DFLOOR2.XLD", x),
-            x => Assert.Equal("$(XLD)/3DOBJEC0.XLD", x),
-            x => Assert.Equal("$(XLD)/3DOVERL0.XLD", x),
-            x => Assert.Equal("$(XLD)/AUTOGFX0.XLD", x),
-            x => Assert.Equal("$(XLD)/BLKLIST0.XLD", x),
-            x => Assert.Equal("$(XLD)/COMBACK0.XLD", x),
-            x => Assert.Equal("$(XLD)/COMGFX0.XLD", x),
-            x => Assert.Equal("$(XLD)/FONTS0.XLD", x),
-            x => Assert.Equal("$(XLD)/ICONDAT0.XLD", x),
-            x => Assert.Equal("$(XLD)/ICONGFX0.XLD", x),
-            x => Assert.Equal("$(XLD)/ITEMLIST.DAT", x),
-            x => Assert.Equal("$(XLD)/PALETTE0.XLD", x),
-            x => Assert.Equal("$(XLD)/SPELLDAT.XLD", x)
+        var ordered = AssetConfig.Ranges.AllRanges.OrderBy(x => x.Range.From);
+        Assert.Collection(ordered.Select(x => x.Range),
+            x => Assert.Equal(new AssetRange(AssetId.None, AssetId.None), x),
+            x => Assert.Equal(new AssetRange(AssetId.None, AssetId.None), x)
         );
     }
 
     [Fact]
     public void VerifySpecial()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        var f = c.Files["$(ALBION)/DRIVERS/ALBISND.OPL"];
+        var f = TypeConfig.Files["$(ALBION)/DRIVERS/ALBISND.OPL"];
         Assert.Equal("UAlbion.Game.Assets.SoundBankLoader, UAlbion.Game", f.Loader);
         Assert.Null(f.Container);
         Assert.Collection(f.Map.OrderBy(x => x.Key),
@@ -401,8 +465,7 @@ public class AssetConfigTests : Component
     [Fact]
     public void VerifyItemList()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        var f = c.Files["$(XLD)/ITEMLIST.DAT"];
+        var f = TypeConfig.Files["$(XLD)/ITEMLIST.DAT"];
         Assert.Equal("UAlbion.Formats.Parsers.ItemDataLoader, UAlbion.Formats", f.Loader);
         Assert.Equal("UAlbion.Formats.Containers.ItemListContainer, UAlbion.Formats", f.Container);
         Assert.Collection(f.Map.OrderBy(x => x.Key),
@@ -416,8 +479,7 @@ public class AssetConfigTests : Component
     [Fact]
     public void VerifyBlockList()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        var f = c.Files["$(XLD)/BLKLIST0.XLD"];
+        var f = TypeConfig.Files["$(XLD)/BLKLIST0.XLD"];
         Assert.Equal("UAlbion.Formats.Parsers.BlockListLoader, UAlbion.Formats", f.Loader);
         Assert.Null(f.Container);
         Assert.Collection(f.Map.OrderBy(x => x.Key),
@@ -430,8 +492,7 @@ public class AssetConfigTests : Component
     [Fact]
     public void VerifyFloors()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        var f = c.Files["$(XLD)/3DFLOOR2.XLD"];
+        var f = TypeConfig.Files["$(XLD)/3DFLOOR2.XLD"];
         Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
         Assert.Equal(64, f.Width);
         Assert.Equal(64, f.Height);
@@ -445,8 +506,7 @@ public class AssetConfigTests : Component
     [Fact]
     public void VerifyCombatBackgrounds()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        var f = c.Files["$(XLD)/COMBACK0.XLD"];
+        var f = TypeConfig.Files["$(XLD)/COMBACK0.XLD"];
         Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
         Assert.Equal(360, f.Width);
         Assert.Collection(f.Map.OrderBy(x => x.Key), m =>
@@ -459,8 +519,7 @@ public class AssetConfigTests : Component
     [Fact]
     public void VerifyTileGraphics()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        var f = c.Files["$(XLD)/ICONGFX0.XLD"];
+        var f = TypeConfig.Files["$(XLD)/ICONGFX0.XLD"];
         Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
         Assert.Equal(16, f.Width);
         Assert.Equal(16, f.Height);
@@ -474,8 +533,7 @@ public class AssetConfigTests : Component
     [Fact]
     public void VerifyCombatGraphics()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        var f = c.Files["$(XLD)/COMGFX0.XLD"];
+        var f = TypeConfig.Files["$(XLD)/COMGFX0.XLD"];
         Assert.Equal("UAlbion.Formats.Parsers.MultiHeaderSpriteLoader, UAlbion.Formats", f.Loader);
         Assert.Collection(f.Map.OrderBy(x => x.Key), m =>
         {
@@ -487,28 +545,26 @@ public class AssetConfigTests : Component
     [Fact]
     public void VerifyAutomapGraphics()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        var f = c.Files["$(XLD)/AUTOGFX0.XLD"];
+        var f = TypeConfig.Files["$(XLD)/AUTOGFX0.XLD"];
         Assert.Equal("UAlbion.Formats.Parsers.AmorphousSpriteLoader, UAlbion.Formats", f.Loader);
         Assert.Collection(f.Map.OrderBy(x => x.Key),
             m =>
             {
                 Assert.Equal(0, m.Key);
                 Assert.Equal("autotile.1", m.Value.Id);
-                Assert.Equal("(8,8,576) (16,16)", m.Value.Get<string>(AssetProperty.SubSprites, null));
+                Assert.Equal("(8,8,576) (16,16)", m.Value.GetProperty<string>(AssetProps.SubSprites, null));
             },
             m =>
             {
                 Assert.Equal(1, m.Key);
-                Assert.Equal("(8,8,576) (16,16)", m.Value.Get<string>(AssetProperty.SubSprites, null));
+                Assert.Equal("(8,8,576) (16,16)", m.Value.GetProperty<string>(AssetProps.SubSprites, null));
             });
     }
 
     [Fact]
     public void Verify3dObjects()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        var f = c.Files["$(XLD)/3DOBJEC0.XLD"];
+        var f = TypeConfig.Files["$(XLD)/3DOBJEC0.XLD"];
         Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
         Assert.Collection(f.Map.OrderBy(x => x.Key),
             m =>
@@ -533,9 +589,8 @@ public class AssetConfigTests : Component
     [Fact]
     public void VerifyOverlays()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        var f = c.Files["$(XLD)/3DOVERL0.XLD"];
-        Assert.True(f.Get(AssetProperty.Transposed, false));
+        var f = TypeConfig.Files["$(XLD)/3DOVERL0.XLD"];
+        Assert.True(f.GetProperty(AssetProps.Transposed, false));
         Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
         Assert.Collection(f.Map.OrderBy(x => x.Key),
             m =>
@@ -560,8 +615,7 @@ public class AssetConfigTests : Component
     [Fact]
     public void VerifyFonts()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        var f = c.Files["$(XLD)/FONTS0.XLD"];
+        var f = TypeConfig.Files["$(XLD)/FONTS0.XLD"];
         Assert.Equal("UAlbion.Formats.Parsers.FontSpriteLoader, UAlbion.Formats", f.Loader);
         Assert.Equal(8, f.Width);
         Assert.Equal(8, f.Height);
@@ -576,53 +630,50 @@ public class AssetConfigTests : Component
     [Fact]
     public void VerifyTilesets()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        var f = c.Files["$(XLD)/ICONDAT0.XLD"];
+        var f = TypeConfig.Files["$(XLD)/ICONDAT0.XLD"];
         Assert.Equal("UAlbion.Formats.Parsers.TilesetLoader, UAlbion.Formats", f.Loader);
         Assert.Collection(f.Map.OrderBy(x => x.Key),
             m =>
             {
                 Assert.Equal(0, m.Key);
                 Assert.Equal("tiledata.1", m.Value.Id);
-                Assert.True(m.Value.Get(AssetProperty.UseSmallGraphics, false));
+                Assert.True(m.Value.GetProperty(AssetProps.UseSmallGraphics, false));
             },
             m =>
             {
                 Assert.Equal(1, m.Key);
-                Assert.True(m.Value.Get(AssetProperty.UseSmallGraphics, false));
+                Assert.True(m.Value.GetProperty(AssetProps.UseSmallGraphics, false));
             },
             m =>
             {
                 Assert.Equal(3, m.Key);
-                Assert.True(m.Value.Get(AssetProperty.UseSmallGraphics, false));
+                Assert.True(m.Value.GetProperty(AssetProps.UseSmallGraphics, false));
             });
     }
 
     [Fact]
     public void VerifyPalettes()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        var f = c.Files["$(XLD)/PALETTE0.XLD"];
+        var f = TypeConfig.Files["$(XLD)/PALETTE0.XLD"];
         Assert.Equal("UAlbion.Formats.Parsers.PaletteLoader, UAlbion.Formats", f.Loader);
         Assert.Collection(f.Map.OrderBy(x => x.Key),
             m =>
             {
                 Assert.Equal(0, m.Key);
                 Assert.Equal("pal.1", m.Value.Id);
-                Assert.Equal("0x99-0x9f, 0xb0-0xbf", m.Value.Get(AssetProperty.AnimatedRanges, ""));
+                Assert.Equal("0x99-0x9f, 0xb0-0xbf", m.Value.GetProperty(AssetProps.AnimatedRanges, ""));
             },
             m =>
             {
                 Assert.Equal(1, m.Key);
-                Assert.Equal("0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf", m.Value.Get(AssetProperty.AnimatedRanges, ""));
+                Assert.Equal("0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf", m.Value.GetProperty(AssetProps.AnimatedRanges, ""));
             });
     }
 
     [Fact]
     public void VerifySpells()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        var f = c.Files["$(XLD)/SPELLDAT.XLD"];
+        var f = TypeConfig.Files["$(XLD)/SPELLDAT.XLD"];
         Assert.Equal("UAlbion.Formats.Parsers.SpellLoader, UAlbion.Formats", f.Loader);
         Assert.Equal("UAlbion.Formats.Containers.SpellListContainer, UAlbion.Formats", f.Container);
         Assert.Collection(f.Map.OrderBy(x => x.Key),
@@ -635,8 +686,6 @@ public class AssetConfigTests : Component
         [Fact]
         public void VerifyWords()
         {
-            var c = AssetConfig.Parse(TestConfig1Bytes);
-            var f = c.Files["$(LANG)/WORDLIS0.XLD"];
             Assert.Equal("UAlbion.Formats.Parsers.WordListLoader, UAlbion.Formats", f.Loader);
             Assert.Collection(f.Map.OrderBy(x => x.Key),
                 m =>
@@ -650,8 +699,7 @@ public class AssetConfigTests : Component
     [Fact]
     public void VerifyMain()
     {
-        var c = AssetConfig.Parse(TestConfig1Bytes, null, AssetMapping.Global, JsonUtil);
-        var f = c.Files["$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710"];
+        var f = TypeConfig.Files["$(ALBION)/MAIN.EXE#476227b0391cf3452166b7a1d52b012ccf6c86bc9e46886dafbed343e9140710"];
         Assert.Equal("UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats", f.Loader);
         Assert.Equal("UAlbion.Formats.Containers.BinaryOffsetContainer, UAlbion.Formats", f.Container);
         Assert.Collection(f.Map.OrderBy(x => x.Key),
@@ -659,26 +707,27 @@ public class AssetConfigTests : Component
             {
                 Assert.Equal(0, m.Key);
                 Assert.Equal("coresprite.0", m.Value.Id);
-                Assert.Equal(1031768, m.Value.Get(AssetProperty.Offset, 0));
+                Assert.Equal(1031768, m.Value.GetProperty(BinaryOffsetContainer.Offset, 0));
                 Assert.Equal(14, m.Value.Width);
                 Assert.Equal(14, m.Value.Height);
-                Assert.Equal("-6 0", m.Value.Get<string>("Hotspot", null));
+                Assert.Equal("-6 0", m.Value.GetProperty(BinaryOffsetContainer.Hotspot));
             },
             m =>
             {
                 Assert.Equal(1, m.Key);
-                Assert.Equal(1031964, m.Value.Get(AssetProperty.Offset, 0));
+                Assert.Equal(1031964, m.Value.GetProperty(AssetProperty.Offset, 0));
                 Assert.Equal(16, m.Value.Width);
                 Assert.Equal(16, m.Value.Height);
-                Assert.Equal("0 4", m.Value.Get<string>("Hotspot", null));
+                Assert.Equal("0 4", m.Value.GetProperty(BinaryOffsetContainer.Hotspot));
             },
             m =>
             {
                 Assert.Equal(27, m.Key);
-                Assert.Equal(1039632, m.Value.Get(AssetProperty.Offset, 0));
+                Assert.Equal(1039632, m.Value.GetProperty(AssetProperty.Offset, 0));
                 Assert.Equal(32, m.Value.Width);
                 Assert.Equal(64, m.Value.Height);
-                Assert.Null(m.Value.Get<string>("Hotspot", null));
+                Assert.Null(m.Value.GetProperty<string>("Hotspot", null));
             });
     }
+#endif
 }

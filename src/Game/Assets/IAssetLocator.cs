@@ -2,12 +2,10 @@
 using System.IO;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Formats;
 
 namespace UAlbion.Game.Assets;
 
 public interface IAssetLocator : IComponent
 {
-    object LoadAsset(AssetInfo info, SerdesContext context, TextWriter annotationWriter, List<string> filesSearched);
-    List<(int,int)> GetSubItemRangesForFile(AssetFileInfo info, SerdesContext context);
+    object LoadAsset(AssetLoadContext context, TextWriter annotationWriter, List<string> filesSearched);
 }

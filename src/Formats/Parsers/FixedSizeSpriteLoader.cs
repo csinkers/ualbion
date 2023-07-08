@@ -4,6 +4,7 @@ using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
+using UAlbion.Config.Properties;
 
 namespace UAlbion.Formats.Parsers;
 
@@ -11,24 +12,25 @@ public class FixedSizeSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 {
     public const string TypeString = "UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats";
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((IReadOnlyTexture<byte>) existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((IReadOnlyTexture<byte>) existing, s, context);
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (info == null) throw new ArgumentNullException(nameof(info));
+        if (context == null) throw new ArgumentNullException(nameof(context));
         return s.IsWriting()
-            ? Write(existing, info, s)
-            : Read(info, s);
+            ? Write(existing, context, s)
+            : Read(context, s);
     }
 
-    static IReadOnlyTexture<byte> Read(AssetInfo info, ISerializer s)
+    static IReadOnlyTexture<byte> Read(AssetLoadContext context, ISerializer s)
     {
         var streamLength = s.BytesRemaining;
         if (streamLength == 0)
             return null;
 
+        var info = context.Node;
         int width = info.Width;
         int height = info.Height;
 
@@ -42,10 +44,10 @@ public class FixedSizeSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 
         byte[] pixelData = s.Bytes(null, null, (int)streamLength);
         int expectedPixelCount = width * height * spriteCount;
-        int extra = info.Get(AssetProperty.ExtraBytes, 0);
+        int extra = info.GetProperty(AssetProps.ExtraBytes);
 
         ApiUtil.Assert((expectedPixelCount + extra) == (int)streamLength,
-            $"Extra pixels found when loading fixed size sprite {info.AssetId} " +
+            $"Extra pixels found when loading fixed size sprite {context.AssetId} " +
             $"({streamLength} bytes for a {width}x{height}x{spriteCount} image, expected {expectedPixelCount}");
 
         var frames = new Region[spriteCount];
@@ -53,17 +55,17 @@ public class FixedSizeSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
             frames[n] = new Region(0, height * n, width, height, width, totalHeight, 0);
 
         var sprite = new SimpleTexture<byte>(
-            info.AssetId,
-            info.AssetId.ToString(),
+            context.AssetId,
+            context.AssetId.ToString(),
             width,
             height * spriteCount,
             pixelData.AsSpan(0, expectedPixelCount), // May be less than the streamlength
             frames);
 
-        return info.Get(AssetProperty.Transposed, false) ? Transpose(sprite) : sprite;
+        return info.GetProperty(AssetProps.Transposed) ? Transpose(sprite) : sprite;
     }
 
-    static IReadOnlyTexture<byte> Write(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s)
+    static IReadOnlyTexture<byte> Write(IReadOnlyTexture<byte> existing, AssetLoadContext context, ISerializer s)
     {
         if (existing == null) throw new ArgumentNullException(nameof(existing));
 
@@ -74,7 +76,7 @@ public class FixedSizeSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
             ApiUtil.Assert(f.Height == frame.Height, "FixedSizeSpriteLoader tried to serialise sprite with non-uniform frames");
         }
 
-        var sprite = info.Get(AssetProperty.Transposed, false)
+        var sprite = context.GetProperty(AssetProps.Transposed)
             ? Transpose(existing)
             : existing;
 

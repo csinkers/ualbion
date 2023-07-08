@@ -11,7 +11,7 @@ public class UiTextBuilder : UiElement, IText, ITextBuilder<UiTextBuilder>
     readonly StringId _stringId;
     string _language;
 
-    public UiTextBuilder(TextId textId) => _stringId = textId;
+    public UiTextBuilder(TextId textId) => _stringId = new StringId(textId);
     public UiTextBuilder(StringId stringId) => _stringId = stringId;
     public int Version => _implicitTokens.Count + 1;
     public IEnumerable<TextBlock> GetBlocks()

@@ -69,14 +69,13 @@ public class MapData2D : BaseMapData
         Tiles = new MapTile[width * height];
     }
 
-    public static MapData2D Serdes(AssetInfo info, MapData2D existing, AssetMapping mapping, ISerializer s)
+    public static MapData2D Serdes(AssetId id, MapData2D existing, AssetMapping mapping, ISerializer s)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
         if (s == null) throw new ArgumentNullException(nameof(s));
 
         var startOffset = s.Offset;
-        var map = existing ?? new MapData2D { Id = info.AssetId };
+        var map = existing ?? new MapData2D { Id = id };
         map.Flags = s.EnumU16(nameof(Flags), map.Flags); // 0
         _ = s.UInt8("MapType", (byte)MapType.TwoD); // 2 (always Map2D to start with, may shift to outdoors once we assign the tileset)
 

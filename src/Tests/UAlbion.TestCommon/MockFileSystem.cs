@@ -181,7 +181,7 @@ public class MockFileSystem : IFileSystem
         }
     }
 
-    public IEnumerable<string> EnumerateDirectory(string path, string filter = null)
+    public IEnumerable<string> EnumerateFiles(string path, string filter = null)
     {
         lock (_syncRoot)
         {
@@ -213,6 +213,37 @@ public class MockFileSystem : IFileSystem
             foreach (var kvp in dir)
                 if (kvp.Value is FileNode && (regex?.IsMatch(kvp.Key) ?? true))
                     yield return kvp.Value.Path;
+        }
+    }
+
+    public IEnumerable<string> EnumerateDirectories(string path)
+    {
+        lock (_syncRoot)
+        {
+            path = ToAbsolutePath(path);
+            if (GetDir(path) is not DirNode dir)
+                yield break;
+
+            if (Directory.Exists(path))
+            {
+                var actualDirectories = Directory.EnumerateDirectories(path);
+
+                foreach (var filePath in actualDirectories)
+                {
+                    if (!_maskingFunc(filePath)) // If it's hidden, ignore it
+                        continue;
+
+                    var filename = Path.GetFileName(filePath);
+                    if (dir.ContainsKey(filename)) // If a mocked copy doesn't exist yet, create one
+                        continue;
+
+                    yield return filePath;
+                }
+            }
+
+            foreach (var kvp in dir)
+                if (kvp.Value is DirNode dirNode)
+                    yield return dirNode.Path;
         }
     }
 

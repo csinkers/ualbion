@@ -16,7 +16,7 @@ namespace UAlbion.Formats;
 
 public interface IAssetManager : ITextureLoader
 {
-    AssetInfo GetAssetInfo(AssetId id, string language = null);
+    AssetNode GetAssetInfo(AssetId id, string language = null);
     ITexture LoadTexture(SpriteId id);
     ITileGraphics LoadTileGraphics(TilesetGfxId id);
     object LoadMapObject(MapObjectId id); // Might be an ITexture or a Mesh
@@ -31,6 +31,7 @@ public interface IAssetManager : ITextureLoader
     string LoadString(StringId id);
     string LoadString(TextId id, string language);
     string LoadString(StringId id, string language);
+    IStringSet LoadStringSet(StringSetId id, string language);
     ISample LoadSample(SampleId id);
     WaveLib LoadWaveLib(WaveLibraryId waveLibraryId);
     FlicFile LoadVideo(VideoId id);

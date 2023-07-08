@@ -3,7 +3,6 @@ using System.Linq;
 using System.Collections.Generic;
 using UAlbion.Api.Settings;
 using UAlbion.Formats;
-using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Settings;
@@ -40,16 +39,16 @@ public class OptionsMenu : ModalDialog
         var elements = new List<IUiElement>
         {
             new Spacing(156,2),
-            new Label(TextId.From(Base.UAlbionString.LanguageLabel)),
+            new Label(Base.UAlbionString.LanguageLabel),
             new HorizontalStacker(languageButtons),
             new Spacing(0,2),
-            new Label((TextId)Base.SystemText.Options_MusicVolume),
+            new Label(Base.SystemText.Options_MusicVolume),
             new Slider(() => _musicVolume, x => _musicVolume = x, 0, 127),
             new Spacing(0,2),
-            new Label((TextId)Base.SystemText.Options_FXVolume),
+            new Label(Base.SystemText.Options_FXVolume),
             new Slider(() => _fxVolume, x => _fxVolume = x, 0, 127),
             new Spacing(0,2),
-            new Label((TextId)Base.SystemText.Options_CombatTextDelay),
+            new Label(Base.SystemText.Options_CombatTextDelay),
             new Slider(() => _combatDelay, x => _combatDelay = x, 1, 50),
             new Spacing(0,2),
             new Button(Base.SystemText.MsgBox_OK).OnClick(SaveAndClose),

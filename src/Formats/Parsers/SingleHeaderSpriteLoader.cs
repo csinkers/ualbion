@@ -9,13 +9,13 @@ namespace UAlbion.Formats.Parsers;
 
 public class SingleHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 {
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((IReadOnlyTexture<byte>)existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((IReadOnlyTexture<byte>)existing, s, context);
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (info == null) throw new ArgumentNullException(nameof(info));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
         if (s.IsWriting())
         {
@@ -24,10 +24,10 @@ public class SingleHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
             return existing;
         }
 
-        return Read(info, s);
+        return Read(context, s);
     }
 
-    static IReadOnlyTexture<byte> Read(AssetInfo info, ISerializer s)
+    static IReadOnlyTexture<byte> Read(AssetLoadContext context, ISerializer s)
     {
         ushort width = s.UInt16("Width", 0);
         ushort height = s.UInt16("Height", 0);
@@ -35,7 +35,7 @@ public class SingleHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
         ApiUtil.Assert(something == 0);
         byte frameCount = s.UInt8("Frames", 1);
 
-        var result = new SimpleTexture<byte>(info.AssetId, width, height * frameCount);
+        var result = new SimpleTexture<byte>(context.AssetId, width, height * frameCount);
         for (int i = 0; i < frameCount; i++)
         {
             byte[] frameBytes = s.Bytes("Frame" + i, null, width * height);

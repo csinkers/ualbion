@@ -24,7 +24,8 @@ public class RedirectionFileSystemDecorator : IFileSystem
     public IFileSystem Duplicate(string currentDirectory) => _disk.Duplicate(currentDirectory);
     public bool FileExists(string path) => _disk.FileExists(ToAbsolutePath(path));
     public bool DirectoryExists(string path) => _disk.DirectoryExists(ToAbsolutePath(path));
-    public IEnumerable<string> EnumerateDirectory(string path, string filter = null) => _disk.EnumerateDirectory(ToAbsolutePath(path), filter);
+    public IEnumerable<string> EnumerateFiles(string path, string filter = null) => _disk.EnumerateFiles(ToAbsolutePath(path), filter);
+    public IEnumerable<string> EnumerateDirectories(string path) => _disk.EnumerateDirectories(ToAbsolutePath(path));
     public void CreateDirectory(string path) => _disk.CreateDirectory(ToAbsolutePath(path));
     public Stream OpenRead(string path) => _disk.OpenRead(ToAbsolutePath(path));
     public Stream OpenWriteTruncate(string path) => _disk.OpenWriteTruncate(ToAbsolutePath(path));

@@ -16,15 +16,14 @@ namespace UAlbion.Formats.Containers;
 public class JsonObjectContainer : IAssetContainer
 {
     [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The serializer will handle it")]
-    public ISerializer Read(string path, AssetInfo info, SerdesContext context)
+    public ISerializer Read(string path, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
         if (!context.Disk.FileExists(path))
             return null;
 
         var dict = Load(path, context);
-        if (!dict.TryGetValue(info.AssetId, out var token))
+        if (!dict.TryGetValue(context.AssetId, out var token))
             return null;
 
         var ms = new MemoryStream(Encoding.UTF8.GetBytes(context.Json.Serialize(token)));
@@ -37,7 +36,7 @@ public class JsonObjectContainer : IAssetContainer
             () => { br.Dispose(); ms.Dispose(); });
     }
 
-    public void Write(string path, IList<(AssetInfo, byte[])> assets, SerdesContext context)
+    public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
     {
         if (assets == null) throw new ArgumentNullException(nameof(assets));
         if (context == null) throw new ArgumentNullException(nameof(context));
@@ -57,18 +56,7 @@ public class JsonObjectContainer : IAssetContainer
         context.Disk.WriteAllText(path, fullText);
     }
 
-    public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, SerdesContext context)
-    {
-        if (context == null) throw new ArgumentNullException(nameof(context));
-
-        if (!context.Disk.FileExists(path))
-            return null;
-
-        var dict = Load(path, context);
-        return FormatUtil.SortedIntsToRanges(dict.Keys.Select(x => x.Id).OrderBy(x => x));
-    }
-
-    static IDictionary<AssetId, object> Load(string path, SerdesContext context)
+    static IDictionary<AssetId, object> Load(string path, AssetLoadContext context)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 

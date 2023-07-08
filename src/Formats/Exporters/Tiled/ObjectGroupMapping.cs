@@ -39,7 +39,8 @@ public static class ObjectGroupMapping
     }
 
 
-    public static void LoadObjectGroups(AssetInfo info,
+    public static void LoadObjectGroups(
+        AssetId assetId,
         Map map,
         int tileWidth,
         int tileHeight,
@@ -50,7 +51,6 @@ public static class ObjectGroupMapping
         List<AutomapInfo> markers,
         List<byte> markerTiles)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (map == null) throw new ArgumentNullException(nameof(map));
         if (triggers == null) throw new ArgumentNullException(nameof(triggers));
         if (npcs == null) throw new ArgumentNullException(nameof(npcs));
@@ -86,6 +86,6 @@ public static class ObjectGroupMapping
             }
         }
 
-        TriggerMapping.LoadZones(zones, info.AssetId, triggers, map);
+        TriggerMapping.LoadZones(zones, assetId, triggers, map);
     }
 }

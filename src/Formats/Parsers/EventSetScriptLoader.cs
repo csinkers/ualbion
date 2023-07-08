@@ -10,13 +10,12 @@ namespace UAlbion.Formats.Parsers;
 
 public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
 {
-    public EventSet Serdes(EventSet existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public EventSet Serdes(EventSet existing, ISerializer s, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var id = (EventSetId)info.AssetId;
+        var id = (EventSetId)context.AssetId;
         if (s.IsWriting())
         {
             if (existing == null) throw new ArgumentNullException(nameof(existing));
@@ -30,7 +29,7 @@ public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
             var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
             var script = Encoding.UTF8.GetString(bytes);
             var eventLayout = AlbionCompiler.Compile(script);
-            return new EventSet(info.AssetId, eventLayout.Events, eventLayout.Chains);
+            return new EventSet(context.AssetId, eventLayout.Events, eventLayout.Chains);
         }
 
         return existing;
@@ -42,6 +41,6 @@ public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
         return eventFormatter.Decompile(set.Events, set.Chains, null).Script;
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((EventSet)existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((EventSet)existing, s, context);
 }

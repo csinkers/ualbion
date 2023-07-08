@@ -46,16 +46,13 @@ public class AssetMapping
     // Always built dynamically based on the current set of active mods
     public static AssetMapping Global => GlobalIsThreadLocal ? ThreadLocalGlobal.Value : TrueGlobal;
     public static bool GlobalIsThreadLocal { get; set; } // Set to true for unit tests.
-    readonly Dictionary<AssetId, string> _nameCache = new();
+    readonly Dictionary<AssetId, string> _idToNameCache = new();
 
     readonly struct Range
     {
-        [JsonConstructor]
-        public Range(int from, int to) { From = from; To = to; }
-        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-        public int From { get; }
-        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-        public int To { get; }
+        [JsonConstructor] public Range(int from, int to) { From = from; To = to; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)] public int From { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)] public int To { get; }
         public override string ToString() => $"{From}:{To}";
     }
 
@@ -122,8 +119,7 @@ public class AssetMapping
             .ToArray(); // Keyed by AssetType, a byte enum
 
     readonly Dictionary<Type, EnumInfo> _byEnumType = new();
-    readonly Dictionary<string, List<(EnumInfo, int)>> _byName = new();
-    readonly Dictionary<AssetId, (AssetId, ushort)> _stringLookup = new();
+    readonly Dictionary<string, List<(EnumInfo Info, int Value)>> _byName = new();
 
     public AssetMapping() { }
     AssetMapping(Dictionary<Type, EnumInfo> byEnumType)
@@ -217,7 +213,7 @@ public class AssetMapping
         if (id == AssetId.None) // Special case to keep things tidy
             return "None";
 
-        if (_nameCache.TryGetValue(id, out var name))
+        if (_idToNameCache.TryGetValue(id, out var name))
             return name;
 
         var (enumType, enumValue) = IdToEnum(id);
@@ -233,7 +229,7 @@ public class AssetMapping
                 : enumType.Name + "." + enumName;
         }
 
-        _nameCache[id] = name;
+        _idToNameCache[id] = name;
         return name;
     }
 
@@ -263,7 +259,7 @@ public class AssetMapping
         }
     }
 
-    public AssetId EnumToId((Type, int) value) => EnumToId(value.Item1, value.Item2);
+    public AssetId EnumToId((Type Type, int Value) value) => EnumToId(value.Type, value.Value);
     public AssetId EnumToId(Type enumType, int enumValue)
     {
         if (enumType == null)
@@ -297,16 +293,16 @@ public class AssetMapping
             throw new FormatException($"Could not parse a value of type \"{enumType}\", as it has not been registered in the asset mapping");
 
         if (int.TryParse(value, out int intValue))
-            return new AssetId(enumInfo.AssetType, intValue);
+            return new AssetId(enumInfo.AssetType, enumInfo.Offset + intValue);
 
         if (!_byName.TryGetValue(value.ToUpperInvariant(), out var matches))
             throw new FormatException($"Could not parse id \"{value}\" as \"{enumType}\": no such value");
 
-        var match = matches.FirstOrDefault(x => x.Item1 == enumInfo);
+        var match = matches.FirstOrDefault(x => x.Info == enumInfo);
         if (match == (null, 0))
             throw new FormatException($"Could not parse id \"{value}\" as \"{enumType}\": no such value");
 
-        return new AssetId(match.Item1.AssetType, match.Item2);
+        return new AssetId(match.Info.AssetType, match.Value);
     }
 
     public AssetMapping Clear()
@@ -358,24 +354,11 @@ public class AssetMapping
             var key = value.Item1.ToUpperInvariant();
             if (!_byName.TryGetValue(key, out var entries))
             {
-                entries = new List<(EnumInfo, int)>();
+                entries = new List<(EnumInfo Info, int Value)>();
                 _byName[key] = entries;
             }
             entries.Add((info, value.Item2 + info.Offset));
         }
-    }
-
-    public AssetMapping RegisterStringRedirect(Type enumType, AssetId target, int min, int max, int offset)
-    {
-        foreach (var id in EnumerateAssetsOfType(enumType))
-        {
-            var (_, numeric) = IdToEnum(id);
-            if (numeric < min || numeric > max)
-                continue;
-
-            _stringLookup[id] = (target, (ushort)(offset + numeric - min));
-        }
-        return this;
     }
 
     public void ConsistencyCheck()
@@ -420,11 +403,6 @@ public class AssetMapping
                 + string.Join(Environment.NewLine, issues));
         }
     }
-
-    public (AssetId, ushort)? TextIdToStringId(AssetId id)
-        => _stringLookup.ContainsKey(id)
-            ? _stringLookup[id]
-            : ((AssetId, ushort)?)null;
 
     public IEnumerable<AssetId> EnumerateAssetsOfType(AssetType type)
     {
@@ -475,9 +453,6 @@ public class AssetMapping
             if (!_byEnumType.ContainsKey(info.EnumType))
                 RegisterAssetType(info.EnumTypeString, info.AssetType);
         }
-
-        foreach (var redirect in other._stringLookup)
-            _stringLookup[redirect.Key] = redirect.Value;
     }
 
     public AssetId Parse(string s, AssetType[] validTypes) // pass null for validTypes to allow any type
@@ -499,17 +474,17 @@ public class AssetMapping
             : ParseNumeric(s, typeName, valueName, validTypes);
     }
 
-    static AssetId ParseTextual(string s, string typeName, IList<(EnumInfo, int)> matches, AssetType[] validTypes)
+    static AssetId ParseTextual(string s, string typeName, IList<(EnumInfo Info, int Value)> matches, AssetType[] validTypes)
     {
         AssetId result = new AssetId(AssetType.Unknown);
         foreach (var match in matches)
         {
-            if (validTypes != null && !validTypes.Contains(match.Item1.AssetType))
+            if (validTypes != null && !validTypes.Contains(match.Info.AssetType))
                 continue;
 
             if (!string.IsNullOrEmpty(typeName)
-                && !match.Item1.EnumType.Name.Equals(typeName, StringComparison.OrdinalIgnoreCase)
-                && !match.Item1.AssetType.ToString().Equals(typeName, StringComparison.OrdinalIgnoreCase))
+                && !match.Info.EnumType.Name.Equals(typeName, StringComparison.OrdinalIgnoreCase)
+                && !match.Info.AssetType.ToString().Equals(typeName, StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }
@@ -518,13 +493,13 @@ public class AssetMapping
             {
                 var candidates = string.Join(", ",
                     matches
-                        .Where(x => validTypes == null || validTypes.Contains(x.Item1.AssetType))
-                        .Select(x => x.Item1.EnumType.Name));
+                        .Where(x => validTypes == null || validTypes.Contains(x.Info.AssetType))
+                        .Select(x => x.Info.EnumType.Name));
 
                 throw new FormatException($"Could not unambiguously parse \"{s}\" as an asset id. Candidate types: {candidates}");
             }
 
-            result = new AssetId(match.Item1.AssetType, match.Item2);
+            result = new AssetId(match.Info.AssetType, match.Value);
         }
 
         if (result.Type == AssetType.Unknown)
@@ -561,5 +536,27 @@ public class AssetMapping
             ApiUtil.Assert($"Could not parse \"{s}\" as an asset id.");
 
         return result;
+    }
+
+    public bool IsAssetOptional(AssetId id)
+    {
+        var (type, value) = IdToEnum(id);
+        if (type == null)
+            return false;
+
+        var enumMember = Enum.ToObject(type, value);
+        var attrib = GetAttribute<OptionalAssetAttribute>(enumMember);
+
+        return attrib != null;
+    }
+
+    public AssetId MaxIdForType(Type type)
+    {
+        if (type == null) throw new ArgumentNullException(nameof(type));
+        if (!_byEnumType.TryGetValue(type, out var result))
+            throw new FormatException($"Could not get max id for unmapped type \"{type.FullName}\"");
+
+        var max = result.EnumMax;
+        return EnumToId(type, max);
     }
 }

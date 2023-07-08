@@ -1,6 +1,9 @@
-﻿namespace UAlbion.Formats;
+﻿using System;
+using UAlbion.Config;
+
+namespace UAlbion.Formats;
 
 public interface IAssetPostProcessorRegistry
 {
-    IAssetPostProcessor GetPostProcessor(string postProcessorName);
+    IAssetPostProcessor GetPostProcessor(Type postProcessorType);
 }

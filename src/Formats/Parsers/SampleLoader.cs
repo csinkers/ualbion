@@ -11,13 +11,12 @@ public class SampleLoader : IAssetLoader<AlbionSample>
     const int Channels = 1;
     const int BytesPerSample = 1;
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((AlbionSample) existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((AlbionSample) existing, s, context);
 
-    public AlbionSample Serdes(AlbionSample existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public AlbionSample Serdes(AlbionSample existing, ISerializer s, AssetLoadContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (info == null) throw new ArgumentNullException(nameof(info));
         return s.IsWriting() ? Write(existing, s) : Read(s);
     }
 

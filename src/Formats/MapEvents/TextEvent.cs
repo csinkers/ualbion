@@ -11,27 +11,27 @@ namespace UAlbion.Formats.MapEvents;
 public class TextEvent : MapEvent, IAsyncEvent // Relies on event chain context to resolve TextId to an enum type / AssetId
 {
     TextEvent() { }
-    public TextEvent(ushort subId, TextLocation location, SheetId SheetId)
+    public TextEvent(ushort subId, TextLocation location, SheetId sheetId)
     {
         SubId = subId;
         Location = location;
 
         var expectedType = AssetTypeForTextLocation(location);
-        if (SheetId.Type != expectedType && !SheetId.IsNone)
+        if (sheetId.Type != expectedType && !sheetId.IsNone)
         {
             throw new FormatException(
                 "Tried to construct a text event with location " +
-                $"{location} and a character id of type {SheetId.Type}, but a {expectedType} was expected");
+                $"{location} and a character id of type {sheetId.Type}, but a {expectedType} was expected");
         }
 
-        Speaker = SheetId;
+        Speaker = sheetId;
     }
 
     [EventPart("id")] public ushort SubId { get; private set; }
     [EventPart("location", true, TextLocation.NoPortrait)] public TextLocation Location { get; private set; }
     [EventPart("speaker", true, "None")] public SheetId Speaker { get; private set; }
     public override MapEventType EventType => MapEventType.Text;
-    public StringId ToId(TextId textId) => new(textId, SubId);
+    public StringId ToId(StringSetId textId) => new(textId, SubId);
 
     public static TextEvent Parse(string[] parts)
     {

@@ -117,7 +117,7 @@ public enum Song : byte
     // Unknown44 = 44,
     // Unknown45 = 45,
     // ShortOptimisticGlissando = 46,
-    Invalid51 = 51,
-    Invalid53 = 53,
-    Invalid58 = 58,
+    // Invalid51 = 51,
+    // Invalid53 = 53,
+    // Invalid58 = 58,
 }

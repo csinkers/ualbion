@@ -21,7 +21,8 @@ public class MockFileSystemChild : IFileSystem
     public IFileSystem Duplicate(string currentDirectory) => _parent.Duplicate(currentDirectory);
     public bool FileExists(string path) => _parent.FileExists(ToAbsolutePath(path));
     public bool DirectoryExists(string path) => _parent.DirectoryExists(ToAbsolutePath(path));
-    public IEnumerable<string> EnumerateDirectory(string path, string filter = null) => _parent.EnumerateDirectory(ToAbsolutePath(path), filter);
+    public IEnumerable<string> EnumerateFiles(string path, string filter = null) => _parent.EnumerateFiles(ToAbsolutePath(path), filter);
+    public IEnumerable<string> EnumerateDirectories(string path) => _parent.EnumerateDirectories(ToAbsolutePath(path));
     public void CreateDirectory(string path) => _parent.CreateDirectory(ToAbsolutePath(path));
     public Stream OpenRead(string path) => _parent.OpenRead(ToAbsolutePath(path));
     public Stream OpenWriteTruncate(string path) => _parent.OpenWriteTruncate(ToAbsolutePath(path));

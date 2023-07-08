@@ -15,7 +15,7 @@ public static class Program
         var enumsDir = Path.Combine(baseDir, @"src/Base");
         var outputDir = @"D:\Depot\AlbionRE\scripts";
 
-        foreach (var file in disk.EnumerateDirectory(enumsDir, "*.cs"))
+        foreach (var file in disk.EnumerateFiles(enumsDir, "*.cs"))
         {
             var lines = disk.ReadAllLines(file);
             var enums = Collect(ParseLines(lines));

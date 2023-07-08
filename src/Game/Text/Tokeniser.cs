@@ -14,7 +14,7 @@ public static class Tokeniser
         InPercentage,
     }
 
-    public static IEnumerable<(Token, object)> Tokenise(string template)
+    public static IEnumerable<(Token Token, object Argument)> Tokenise(string template)
     {
         if (template == null) yield break;
         var sb = new StringBuilder();

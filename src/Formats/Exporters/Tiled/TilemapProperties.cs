@@ -1,4 +1,5 @@
-﻿using UAlbion.Formats.Assets.Labyrinth;
+﻿using UAlbion.Config;
+using UAlbion.Formats.Assets.Labyrinth;
 
 namespace UAlbion.Formats.Exporters.Tiled;
 
@@ -12,7 +13,7 @@ public class TilemapProperties
 
 public class Tilemap2DProperties : TilemapProperties
 {
-    public string GraphicsTemplate { get; set; }
+    public AssetPathPattern GraphicsTemplate { get; set; }
 }
 
 public class Tilemap3DProperties : TilemapProperties

@@ -12,7 +12,8 @@ public class StubFileSystem : IFileSystem
     public IFileSystem Duplicate(string currentDirectory) => throw new NotSupportedException();
     public bool FileExists(string path) => throw new NotSupportedException();
     public bool DirectoryExists(string path) => throw new NotSupportedException();
-    public IEnumerable<string> EnumerateDirectory(string path, string filter = null) => throw new NotSupportedException();
+    public IEnumerable<string> EnumerateFiles(string path, string filter = null) => throw new NotSupportedException();
+    public IEnumerable<string> EnumerateDirectories(string path) => throw new NotSupportedException();
     public void CreateDirectory(string path) => throw new NotSupportedException();
     public Stream OpenRead(string path) => throw new NotSupportedException();
     public Stream OpenWriteTruncate(string path) => throw new NotSupportedException();

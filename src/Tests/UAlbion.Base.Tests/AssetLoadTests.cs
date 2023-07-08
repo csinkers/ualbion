@@ -729,7 +729,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(SpellTargets.AllMonsters, s.Targets);
         Assert.Equal(SpellClass.DjiKas, s.Class);
         Assert.Equal(7, s.OffsetInClass);
-        Assert.Equal((TextId)SystemText.Spell0_7_FrostAvalanche, s.Name);
+        Assert.Equal((AssetId)(TextId)SystemText.Spell0_7_FrostAvalanche, s.Name);
     }
 
     [Fact]

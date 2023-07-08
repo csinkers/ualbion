@@ -22,51 +22,54 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
         base.Subscribed();
     }
 
-    public object LoadAsset(AssetInfo info, SerdesContext context, TextWriter annotationWriter, List<string> filesSearched)
+    public object LoadAsset(AssetLoadContext context, TextWriter annotationWriter, List<string> filesSearched)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
         var pathResolver = Resolve<IPathResolver>();
 
-        using ISerializer s = Search(pathResolver, info, context, annotationWriter, filesSearched);
+        if (context.Node.Filename == null || context.Node.Filename.StartsWith('!')) // If this is a meta-asset (e.g. is loaded from another asset)
+        {
+            var metaLoader = _assetLoaderRegistry.GetLoader(context.Node.Loader);
+            if (metaLoader == null)
+                throw new InvalidOperationException($"Could not instantiate loader \"{context.Node.Loader}\" required by asset {context.AssetId}");
+
+            return metaLoader.Serdes(null, null, context);
+        }
+
+        using ISerializer s = Search(pathResolver, context, annotationWriter, filesSearched);
         if (s == null)
             return null;
 
         if (s.BytesRemaining == 0 && s is not EmptySerializer) // Happens all the time when dumping, just return rather than throw to preserve perf.
-            return new AssetNotFoundException($"Asset for {info.AssetId} found but size was 0 bytes.", info.AssetId);
+            return new AssetNotFoundException($"Asset for {context.AssetId} found but size was 0 bytes.", context.AssetId);
 
-        var loader = _assetLoaderRegistry.GetLoader(info.File.Loader);
+        var loader = _assetLoaderRegistry.GetLoader(context.Node.Loader);
         if (loader == null)
-            throw new InvalidOperationException($"Could not instantiate loader \"{info.File.Loader}\" required by asset {info.AssetId}");
+            throw new InvalidOperationException($"Could not instantiate loader \"{context.Node.Loader}\" required by asset {context.AssetId}");
 
-        return loader.Serdes(null, info, s, context);
+        return loader.Serdes(null, s, context);
     }
 
-    public List<(int,int)> GetSubItemRangesForFile(AssetFileInfo info, SerdesContext context)
+    ISerializer Search(IPathResolver pathResolver, AssetLoadContext context, TextWriter annotationWriter, List<string> filesSearched)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        var node = context.Node;
+        var disk = context.ModContext.Disk;
+        var path = pathResolver.ResolvePath(node.Filename);
 
-        var pathResolver = Resolve<IPathResolver>();
-        var resolved = pathResolver.ResolvePath(info.Filename);
-        var container = _containerRegistry.GetContainer(resolved, info.Container, context.Disk);
-        return container?.GetSubItemRanges(resolved, info, context) ?? new List<(int, int)> { (0, 1) };
-    }
-
-    ISerializer Search(IPathResolver pathResolver, AssetInfo info, SerdesContext context, TextWriter annotationWriter, List<string> filesSearched)
-    {
-        var path = pathResolver.ResolvePath(info.File.Filename);
-        if (info.File.Sha256Hash != null)
+        if (disk.FileExists(path) || disk.DirectoryExists(path))
         {
-            var hash = GetHash(path, context.Disk);
-            filesSearched?.Add($"{context.Disk.ToAbsolutePath(path)} (actual hash {hash})");
-            if (!info.File.Sha256Hash.Equals(hash, StringComparison.OrdinalIgnoreCase))
-                return null;
+            if (node.Sha256Hash != null)
+            {
+                var hash = GetHash(path, disk);
+                filesSearched?.Add($"{disk.ToAbsolutePath(path)} (actual hash {hash})");
+                if (!node.Sha256Hash.Equals(hash, StringComparison.OrdinalIgnoreCase))
+                    return null;
+            }
+            else filesSearched?.Add(disk.ToAbsolutePath(path));
         }
-        else filesSearched?.Add(context.Disk.ToAbsolutePath(path));
 
-        var container = _containerRegistry.GetContainer(path, info.File.Container, context.Disk);
-        var s = container?.Read(path, info, context);
+        var container = _containerRegistry.GetContainer(path, node.Container, disk);
+        var s = container?.Read(path, context);
         if (annotationWriter != null)
             s = new AnnotationProxySerializer(s, annotationWriter, FormatUtil.BytesFrom850String);
         return s;

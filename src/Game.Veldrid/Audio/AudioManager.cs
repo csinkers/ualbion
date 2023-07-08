@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
+using UAlbion.Config.Properties;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Audio;
 using UAlbion.Core.Visual;
@@ -21,6 +22,8 @@ namespace UAlbion.Game.Veldrid.Audio;
 public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManager, IDisposable
 {
     const int DefaultSampleRate = 11025;
+    public static readonly AssetIdAssetProperty<WaveLibraryId> WaveLibProperty = new("WaveLib", WaveLibraryId.None, x => x);
+
     readonly bool _standalone;
     readonly IDictionary<SampleId, AudioBuffer> _sampleCache = new Dictionary<SampleId, AudioBuffer>();
     readonly IDictionary<(SongId, int), AudioBuffer> _waveLibCache = new Dictionary<(SongId, int), AudioBuffer>();
@@ -104,7 +107,7 @@ public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManage
                 return buffer;
             var assets = Resolve<IAssetManager>();
             var songInfo = assets.GetAssetInfo(songId);
-            var waveLibId = songInfo.Get(AssetProperty.WaveLib, WaveLibraryId.None);
+            var waveLibId = songInfo.GetProperty(WaveLibProperty);
             if (waveLibId.IsNone)
             {
                 Info($"Song {songId} has no associated wave library");

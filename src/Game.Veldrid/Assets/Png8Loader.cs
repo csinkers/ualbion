@@ -61,18 +61,17 @@ public class Png8Loader : Component, IAssetLoader<IReadOnlyTexture<byte>>
         return new SimpleTexture<byte>(id, id.ToString(), totalWidth, totalHeight, pixels, frames);
     }
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
         var assets = Resolve<IAssetManager>();
-        var paletteNum = info.Get(AssetProperty.PaletteId, 0);
+        var paletteNum = context.PaletteId;
         var paletteId = new PaletteId(paletteNum);
         var palette = assets.LoadPalette(paletteId);
         if (palette == null)
-            throw new InvalidOperationException($"Could not load palette {paletteId} ({paletteNum}) for asset {info.AssetId} in file {info.File.Filename}");
+            throw new InvalidOperationException($"Could not load palette {paletteId} ({paletteNum}) for asset {context.AssetId} in file {context.Filename}");
 
         var unambiguousPalette = palette.GetUnambiguousPalette();
 
@@ -98,11 +97,11 @@ public class Png8Loader : Component, IAssetLoader<IReadOnlyTexture<byte>>
                 images.Add(decoder.Decode<Rgba32>(configuration, stream));
             }
 
-            return Read(info.AssetId, unambiguousPalette, images);
+            return Read(context.AssetId, unambiguousPalette, images);
         }
         finally { foreach (var image in images) image.Dispose(); }
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((IReadOnlyTexture<byte>)existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((IReadOnlyTexture<byte>)existing, s, context);
 }

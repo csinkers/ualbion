@@ -43,11 +43,11 @@ public class IsometricBuilder : Component
     public IFramebufferHolder Framebuffer { get; }
     int ExpansionFactor => _mode == IsometricMode.Contents ? ContentsExpansionFactor : 1;
 
-    public IsometricBuilder(IFramebufferHolder framebuffer, ICameraProvider cameraProvider, int width, int height, int diamondHeight, int tilesPerRow)
+    public IsometricBuilder(ModContext modContext, IFramebufferHolder framebuffer, ICameraProvider cameraProvider, int width, int height, int diamondHeight, int tilesPerRow)
     {
         Framebuffer = framebuffer ?? throw new ArgumentNullException(nameof(framebuffer));
         _labId = Base.Labyrinth.Test1;
-        _layout = AttachChild(new IsometricLayout());
+        _layout = AttachChild(new IsometricLayout(modContext));
         _cameraProvider = cameraProvider ?? throw new ArgumentNullException(nameof(cameraProvider));
         _width = width;
         _height = height;
@@ -111,13 +111,13 @@ public class IsometricBuilder : Component
         Framebuffer.Height = (uint)(ExpansionFactor * _height * rows * mag);
     }
 
-    public List<int>[] Build(LabyrinthData labyrinth, AssetInfo info, IsometricMode mode, IAssetManager assets)
+    public List<int>[] Build(LabyrinthData labyrinth, AssetLoadContext context, IsometricMode mode, IAssetManager assets)
     {
         if (labyrinth == null) throw new ArgumentNullException(nameof(labyrinth));
         _labId = labyrinth.Id;
         _mode = mode;
 
-        _layout.Load(labyrinth, info, _mode, BuildProperties(), _paletteId, assets);
+        _layout.Load(labyrinth, context, _mode, BuildProperties(), _paletteId, assets);
         ResizeFramebuffer();
         Update();
 

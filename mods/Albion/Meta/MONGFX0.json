@@ -1,8 +1,7 @@
 {
-    "000": { "Id": "mongfx.1" },
-    "027": { "PaletteId": 38 },
-    "045": { "PaletteId": 38 },
-    "046": { "PaletteId": 38 },
-    "058": { "PaletteId": 39 },
-    "059": { "PaletteId": 38 }
+  "mongfx.28": { "Palette": "pal.38" },
+  "mongfx.46": { "Palette": "pal.38" },
+  "mongfx.47": { "Palette": "pal.38" },
+  "mongfx.59": { "Palette": "pal.39" },
+  "mongfx.60": { "Palette": "pal.38" }
 }

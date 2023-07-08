@@ -1,6 +1,6 @@
 ﻿namespace UAlbion.Formats.Assets;
 
-public static class IFFChunkType
+public static class IffChunkType
 {
     public const string Format = "FORM";
     public const string PackedBitmap = "PBM ";

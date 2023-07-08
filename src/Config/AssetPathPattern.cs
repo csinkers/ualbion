@@ -16,8 +16,8 @@ public class AssetPathPattern
 
     enum PartType
     {
+        Id,
         Text,
-        Index,
         SubAsset,
         Name,
         Palette,
@@ -38,9 +38,8 @@ public class AssetPathPattern
             Type =
                 name.ToUpperInvariant() switch
                 {
-                    "0" => PartType.Index,
-                    "ID" => PartType.Index,
-                    "INDEX" => PartType.Index,
+                    "0" => PartType.Id,
+                    "ID" => PartType.Id,
 
                     "1" => PartType.SubAsset,
                     "FRAME" => PartType.SubAsset,
@@ -144,13 +143,13 @@ public class AssetPathPattern
         {
             switch (part.Type)
             {
-                case PartType.Text: sb.Append(Regex.Escape(part.Value)); break;
-                case PartType.Index: sb.Append(@"(?<Index>\d+)"); break;
-                case PartType.SubAsset: sb.Append(@"(?<SubAsset>\d+)"); break;
-                case PartType.Name: sb.Append(@"(?<Name>\w+)"); break;
-                case PartType.Palette: sb.Append(@"(?<Palette>\d+)"); break;
+                case PartType.Id:           sb.Append(@"(?<Id>\d+)"); break;
+                case PartType.Text:         sb.Append(Regex.Escape(part.Value)); break;
+                case PartType.SubAsset:     sb.Append(@"(?<SubAsset>\d+)"); break;
+                case PartType.Name:         sb.Append(@"(?<Name>\w+)"); break;
+                case PartType.Palette:      sb.Append(@"(?<Palette>\d+)"); break;
                 case PartType.PaletteFrame: sb.Append(@"(?<PFrame>\d+)"); break;
-                case PartType.IgnoreNum: sb.Append(@"\d+"); break;
+                case PartType.IgnoreNum:    sb.Append(@"\d+"); break;
             }
         }
 
@@ -162,7 +161,6 @@ public class AssetPathPattern
             ? v.ToString(format, CultureInfo.InvariantCulture)
             : v.ToString(CultureInfo.InvariantCulture);
 
-    public string Format(AssetInfo info) => Format(new AssetPath(info));
     public string Format(in AssetPath path)
     {
         var sb = new StringBuilder();
@@ -170,9 +168,9 @@ public class AssetPathPattern
         {
             switch (part.Type)
             {
-                case PartType.Text: sb.Append(part.Value); break;
-                case PartType.Index: sb.Append(FormatInt(path.Index, part.Value)); break;
+                case PartType.Id: sb.Append(FormatInt(path.AssetId.Id, part.Value)); break;
                 case PartType.SubAsset: sb.Append(FormatInt(path.SubAsset, part.Value)); break;
+                case PartType.Text: sb.Append(part.Value); break;
                 case PartType.Name: sb.Append(path.Name); break;
                 case PartType.IgnoreNum: sb.Append('0'); break;
                 case PartType.Palette:
@@ -189,7 +187,7 @@ public class AssetPathPattern
         return sb.ToString();
     }
 
-    public bool TryParse(string filename, out AssetPath path)
+    public bool TryParse(string filename, AssetType type, out AssetPath path)
     {
         var m = _regex.Match(filename);
         if (!m.Success)
@@ -198,28 +196,28 @@ public class AssetPathPattern
             return false;
         }
 
-        var indexGroup = m.Groups["Index"];
+        var idGroup = m.Groups["Id"];
         var subAssetGroup = m.Groups["SubAsset"];
         var paletteGroup = m.Groups["Palette"];
         var pframeGroup = m.Groups["PFrame"];
-        int index = indexGroup.Success ? int.Parse(indexGroup.Value) : -1;
+        int id = idGroup.Success ? int.Parse(idGroup.Value) : -1;
         int subAsset = subAssetGroup.Success ? int.Parse(subAssetGroup.Value) : 0;
         int? paletteId = paletteGroup.Success ? (int?)int.Parse(paletteGroup.Value) : null;
         int? paletteFrame = pframeGroup.Success ? (int?)int.Parse(pframeGroup.Value) : null;
 
-        path = new AssetPath(index, subAsset, paletteId, m.Groups["Name"].Value, paletteFrame);
+        path = new AssetPath(new AssetId(type, id), subAsset, paletteId, m.Groups["Name"].Value, paletteFrame);
         return true;
     }
 
-    public string WilcardForIndex(int index)
+    public string WilcardForId(AssetId id)
     {
         var sb = new StringBuilder();
         foreach (var part in _parts)
         {
             switch (part.Type)
             {
+                case PartType.Id: sb.Append(FormatInt(id.Id, part.Value)); break;
                 case PartType.Text: sb.Append(part.Value); break;
-                case PartType.Index: sb.Append(FormatInt(index, part.Value)); break;
                 case PartType.SubAsset: sb.Append('*'); break;
                 case PartType.Name: sb.Append('*'); break;
                 case PartType.IgnoreNum: sb.Append('*'); break;

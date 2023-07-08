@@ -8,7 +8,6 @@ using UAlbion.Api.Settings;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Magic;
 
@@ -40,6 +39,7 @@ public sealed class AssetConverter : IDisposable
             .Attach(assetLoaderRegistry)
             .Attach(new ContainerRegistry())
             .Attach(new PostProcessorRegistry())
+            .Attach(new VarRegistry())
             .Attach(new AssetLocator())
             .Attach(new SpellManager())
             .Attach(applier)
@@ -68,40 +68,43 @@ public sealed class AssetConverter : IDisposable
         _fromExchange.Attach(new AssetManager(_from)); // From also needs an asset manager for the inventory post-processor etc
     }
 
-    public void Convert(string[] ids, ISet<AssetType> assetTypes, Regex filePattern, Func<AssetId, object, object> converter = null)
+    public void Convert(string[] ids, ISet<AssetType> assetTypes, Regex filePattern, Func<AssetId, object, object> converter = null, string[] validLanguages = null)
     {
         var parsedIds = ids?.Select(AssetId.Parse).ToHashSet();
         var cache = new Dictionary<(AssetId, string), object>();
 
-        (object, AssetInfo) LoaderFunc(AssetId id, string language)
+        object LoaderFunc(AssetId assetId, string language)
         {
-            StringId? stringId = TextId.ValidTypes.Contains(id.Type)
-                ? (TextId)id
-                : null;
-
-            if (stringId != null)
-            {
-                if (stringId.Value.Id == id)
-                    stringId = null;
-                else
-                    id = stringId.Value.Id;
-            }
-
-            var info = _from.GetAssetInfo(id, language);
-            var asset = cache.TryGetValue((id, language), out var cached)
+            var asset = cache.TryGetValue((assetId, language), out var cached)
                 ? cached
-                : cache[(id, language)] = _from.LoadAsset(id, language);
-
-            if (stringId.HasValue && asset is IStringSet collection)
-                asset = collection.GetString(stringId.Value, language);
+                : cache[(assetId, language)] = _from.LoadAsset(assetId, language);
 
             if (converter != null)
-                asset = converter(id, asset);
+                asset = converter(assetId, asset);
 
-            return (asset, info);
+            return asset;
         }
 
-        _to.SaveAssets(LoaderFunc, () => cache.Clear(), parsedIds, assetTypes, filePattern);
+        _to.SaveAssets(LoaderFunc, () => cache.Clear(), parsedIds, assetTypes, validLanguages, filePattern);
+    }
+
+    public string[] DiscoverLanguages(TextId? languageSearchId = null)
+    {
+        languageSearchId ??= Base.SystemText.MainMenu_MainMenu;
+        var fromAssets = _fromExchange.Resolve<IAssetManager>();
+
+        // Return null if no languages are found, this will cause all languages defined to be searched for
+        // on language-specific assets. In practice this scenario will happen in minimal round-trip tests
+        // which don't export system text.
+        List<string> validLanguages = null;
+        foreach (var language in _from.Languages.Keys)
+        {
+            if (!fromAssets.IsStringDefined(languageSearchId.Value, language)) continue;
+            validLanguages ??= new List<string>();
+            validLanguages.Add(language);
+        }
+
+        return validLanguages?.ToArray();
     }
 
     public void Dispose()

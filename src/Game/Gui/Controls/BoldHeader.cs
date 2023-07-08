@@ -1,4 +1,5 @@
 ﻿using UAlbion.Formats.Assets;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Text;
 
@@ -8,6 +9,7 @@ class BoldHeader : UiElement
 {
     readonly StringId _id;
 
+    public BoldHeader(TextId id) : this(new StringId(id)) { }
     public BoldHeader(StringId id) => _id = id;
     public BoldHeader(IText source) => AttachChild(new UiText(source));
 

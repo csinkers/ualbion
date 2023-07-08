@@ -1,17 +1,16 @@
 ﻿using System;
 using UAlbion.Api;
-using UAlbion.Config;
 
-namespace UAlbion.Formats;
+namespace UAlbion.Config;
 
-public class SerdesContext
+public class ModContext
 {
-    public SerdesContext(string modName, IJsonUtil json, AssetMapping mapping, IFileSystem disk)
+    public ModContext(string modName, IJsonUtil json, IFileSystem disk, AssetMapping mapping)
     {
         ModName = modName;
         Json = json ?? throw new ArgumentNullException(nameof(json));
-        Mapping = mapping ?? throw new ArgumentNullException(nameof(mapping));
         Disk = disk ?? throw new ArgumentNullException(nameof(disk));
+        Mapping = mapping ?? throw new ArgumentNullException(nameof(mapping));
     }
 
     public string ModName { get; }

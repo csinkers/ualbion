@@ -7,6 +7,7 @@ using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets;
 
@@ -178,12 +179,12 @@ public class AlbionPalette : IPalette
     public ReadOnlySpan<uint> GetPaletteAtTime(int i) => _texture.GetLayerBuffer(0).GetRow(i % _texture.Height);
     public override string ToString() { return string.IsNullOrEmpty(Name) ? $"Palette {Id}" : $"{Name} ({Id})"; }
 
-    public static AlbionPalette Serdes(AlbionPalette p, AssetInfo info, ISerializer s)
+    public static AlbionPalette Serdes(AlbionPalette p, AssetLoadContext context, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (info == null) throw new ArgumentNullException(nameof(info));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
-        bool isCommon = info.Get(AssetProperty.IsCommon, false);
+        bool isCommon = context.GetProperty(PaletteLoader.IsCommon);
         long entryCount = isCommon ? CommonEntries : VariableEntries;
 
         if (p == null)
@@ -191,12 +192,13 @@ public class AlbionPalette : IPalette
             if (s.IsWriting()) throw new ArgumentNullException(nameof(p));
 
             // AssetId is None when loading palettes from raw data in ImageReverser
+            int index = context.Index;
             p = new AlbionPalette
             {
-                Id = info.AssetId.IsNone ? (uint)info.Index : info.AssetId.ToUInt32(),
-                Name = info.AssetId.IsNone 
-                    ? info.Index.ToString() 
-                    : info.AssetId.ToString()
+                Id = context.AssetId.IsNone ? (uint)index : context.AssetId.ToUInt32(),
+                Name = context.AssetId.IsNone 
+                    ? index.ToString() 
+                    : context.AssetId.ToString()
             };
         }
 
@@ -216,13 +218,13 @@ public class AlbionPalette : IPalette
         }
 
         if (s.IsReading())
-            p.Ranges = ParseRanges(info);
+            p.Ranges = ParseRanges(context);
 
         return p;
     }
 
-    static IEnumerable<(byte, byte)> ParseRanges(AssetInfo info) =>
-        info.Get<string>(AssetProperty.AnimatedRanges, null)?.Split(',').Select(x =>
+    static IEnumerable<(byte, byte)> ParseRanges(AssetLoadContext context) =>
+        context.GetProperty(PaletteLoader.AnimatedRanges)?.Split(',').Select(x =>
         {
             var parts = x.Trim().Split('-');
             if (parts.Length != 2)

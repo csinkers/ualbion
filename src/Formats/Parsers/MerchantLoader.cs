@@ -7,13 +7,12 @@ namespace UAlbion.Formats.Parsers;
 
 public class MerchantLoader : IAssetLoader<Inventory>
 {
-    public Inventory Serdes(Inventory existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public Inventory Serdes(Inventory existing, ISerializer s, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
-        return Inventory.SerdesMerchant(info.AssetId.ToInt32(), existing, context.Mapping, s);
+        return Inventory.SerdesMerchant(context.AssetId.ToInt32(), existing, context.Mapping, s);
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes(existing as Inventory, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes(existing as Inventory, s, context);
 }

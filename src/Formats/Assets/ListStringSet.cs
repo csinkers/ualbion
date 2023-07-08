@@ -13,7 +13,14 @@ public class ListStringSet : List<string>, IStringSet
                 Add(s);
     }
 
-    public string GetString(StringId id, string language) => Count > id.SubId ? this[id.SubId] : null;
+    public string GetString(StringId id) => Count > id.SubId ? this[id.SubId] : null;
+    public void SetString(StringId id, string value)
+    {
+        while (Count <= id.SubId)
+            Add(null);
+
+        this[id.SubId] = value;
+    }
 
     public int FindOrAdd(string text)
     {

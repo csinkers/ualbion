@@ -32,7 +32,7 @@ public class AssetManager : Component, IAssetManager
     }
 
     protected override void Unsubscribed() => Exchange.Unregister(this);
-    public AssetInfo GetAssetInfo(AssetId id, string language = null) => _modApplier.GetAssetInfo(id, language);
+    public AssetNode GetAssetInfo(AssetId id, string language = null) => _modApplier.GetAssetInfo(id, language);
     public IMapData LoadMap(MapId id) => (IMapData)_modApplier.LoadAsset(id); // No caching for map data
     public ItemData LoadItem(ItemId id) => (ItemData)_modApplier.LoadAssetCached(id);
 
@@ -66,6 +66,20 @@ public class AssetManager : Component, IAssetManager
     public TilesetData LoadTileData(TilesetId id) => (TilesetData)_modApplier.LoadAssetCached(id);
     public LabyrinthData LoadLabyrinthData(LabyrinthId id) => (LabyrinthData)_modApplier.LoadAssetCached(id);
 
+    public IStringSet LoadStringSet(StringSetId id) => LoadStringSet(id, null);
+    public IStringSet LoadStringSet(StringSetId id, string language)
+    {
+        var currentLanguage = Var(UserVars.Gameplay.Language);
+        bool cached = !(language != null && language != currentLanguage);
+        language ??= currentLanguage;
+
+        var asset = cached
+            ? _modApplier.LoadAssetCached(id)
+            : _modApplier.LoadAsset(id, language);
+
+        return (IStringSet)asset;
+    }
+
     string LoadStringCore(StringId id, string language, bool cached)
     {
         var currentLanguage = Var(UserVars.Gameplay.Language);
@@ -79,18 +93,19 @@ public class AssetManager : Component, IAssetManager
 
         return asset switch
         {
-            IStringSet collection => collection.GetString(id, language),
+            IStringSet collection => collection.GetString(id),
             string s => s,
             _ => null
         };
     }
-    public bool IsStringDefined(TextId id, string language) => LoadStringCore(id, language, false) != null;
+    public bool IsStringDefined(TextId id, string language) => LoadStringCore(new StringId(id), language, false) != null;
     public bool IsStringDefined(StringId id, string language) => LoadStringCore(id, language, false) != null;
-    public string LoadString(TextId id) => LoadString((StringId)id, null);
+    public string LoadString(TextId id) => LoadString(new StringId(id), null);
     public string LoadString(StringId id) => LoadString(id, null);
-    public string LoadString(TextId id, string language) => LoadString((StringId)id, language);
+    public string LoadString(TextId id, string language) => LoadString(new StringId(id), language);
     public string LoadString(StringId id, string language)
-        => LoadStringCore(id, language, true) ?? $"!MISSING STRING {id.Id}:{id.SubId}!";
+        => LoadStringCore(id, language, true) 
+           ?? $"!MISSING STRING {id.Id}:{id.SubId}!";
 
     public ISample LoadSample(SampleId id) => (AlbionSample)_modApplier.LoadAssetCached(id);
     public WaveLib LoadWaveLib(WaveLibraryId waveLibraryId) => (WaveLib)_modApplier.LoadAssetCached(waveLibraryId);

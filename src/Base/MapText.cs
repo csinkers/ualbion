@@ -1,5 +1,8 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
+
+using UAlbion.Config;
+
 namespace UAlbion.Base;
 
 public enum MapText : ushort
@@ -128,9 +131,9 @@ public enum MapText : ushort
     DeviceMaker3D3 = 246,
     DeviceMakerChamber = 247,
     MineEntrance = 248,
-    Unnamed5 = 249,
-    Unnamed6 = 250,
-    Unnamed7 = 251,
+    [OptionalAsset] Unnamed5 = 249,
+    [OptionalAsset] Unnamed6 = 250,
+    [OptionalAsset] Unnamed7 = 251,
     KounosCave = 252,
     KounosCave2 = 253,
     KounosCave3 = 254,
@@ -149,7 +152,7 @@ public enum MapText : ushort
     PoschWeapons = 269,
     RioleaMixedGoods = 270,
     RaminaHealer = 271,
-    Unnamed8 = 272,
+    [OptionalAsset] Unnamed8 = 272,
     KounosTrader = 273,
     Darios = 274,
     KounosGuestHouse = 275,
@@ -165,13 +168,13 @@ public enum MapText : ushort
 
     TestMapDesert = 290,
     TestMapDjiCantos = 291,
-    Unnamed9 = 292,
+    [OptionalAsset] Unnamed9 = 292,
     TestItems = 293,
     TestMapKengetKamulos = 294,
     TestMapMahinoHouse = 295,
 
-    Unnamed10 = 297,
-    Unnamed11 = 298,
+    [OptionalAsset] Unnamed10 = 297,
+    [OptionalAsset] Unnamed11 = 298,
     TestMapHouse = 299,
     TorontoBegin = 300,
     TorontoReactor = 301,
@@ -189,10 +192,10 @@ public enum MapText : ushort
 
     CantosHouse = 322,
 
-    Unnamed13 = 388,
-    Unnamed14 = 389,
+    [OptionalAsset] Unnamed13 = 388,
+    [OptionalAsset] Unnamed14 = 389,
     Unnamed15 = 390,
 
-    Unnamed16 = 398,
-    Unnamed17 = 399,
+    [OptionalAsset] Unnamed16 = 398,
+    [OptionalAsset] Unnamed17 = 399,
 }

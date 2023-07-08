@@ -22,13 +22,13 @@ public static class TilesetMapping
         if (tileset == null) throw new ArgumentNullException(nameof(tileset));
         if (properties == null) throw new ArgumentNullException(nameof(properties));
 
-        var graphicsPattern = AssetPathPattern.Build(properties.GraphicsTemplate);
+        var graphicsPattern = properties.GraphicsTemplate;
         List<Tile> tiles =
             tileset.Tiles
                 .Where(x => !x.IsBlank)
                 .Select(x =>
                     TileMapping.BuildTile(
-                        tileset.Id.Id,
+                        tileset.Id,
                         x.Index,
                         x.FrameCount > 0 ? x.ImageNumber : null,
                         TileMapping.BuildTileProperties(x),
@@ -50,7 +50,7 @@ public static class TilesetMapping
             for (int f = 1; f < sourceTile.FrameCount; f++)
             {
                 tiles.Add(TileMapping.BuildTile(
-                    tileset.Id.Id,
+                    tileset.Id,
                     nextId,
                     (ushort)(sourceTile.ImageNumber + f),
                     new List<TiledProperty> { new(Prop.Frame, true) },
@@ -86,7 +86,7 @@ public static class TilesetMapping
         if (properties == null) throw new ArgumentNullException(nameof(properties));
 
         var t = new TilesetData(id);
-        var graphicsPattern = AssetPathPattern.Build(properties.GraphicsTemplate);
+        var graphicsPattern = properties.GraphicsTemplate;
         var tileLookup =
             tileset.Tiles
                 .Select(x => TileMapping.InterpretTile(x, properties, graphicsPattern))

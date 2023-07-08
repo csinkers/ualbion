@@ -7,12 +7,12 @@ namespace UAlbion.Formats.Parsers;
 
 public class MonsterGroupLoader : IAssetLoader<MonsterGroup>
 {
-    public MonsterGroup Serdes(MonsterGroup existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public MonsterGroup Serdes(MonsterGroup existing, ISerializer s, AssetLoadContext context)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
-        return MonsterGroup.Serdes(info?.AssetId.Id ?? 0, existing, context.Mapping, s);
+        return MonsterGroup.Serdes(context.AssetId.Id, existing, context.Mapping, s);
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes(existing as MonsterGroup, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes(existing as MonsterGroup, s, context);
 }

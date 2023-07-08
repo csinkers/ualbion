@@ -10,7 +10,8 @@ public interface IFileSystem
     IFileSystem Duplicate(string currentDirectory);
     bool FileExists(string path);
     bool DirectoryExists(string path);
-    IEnumerable<string> EnumerateDirectory(string path, string filter = null);
+    IEnumerable<string> EnumerateFiles(string path, string filter = null);
+    IEnumerable<string> EnumerateDirectories(string path);
     void CreateDirectory(string path);
     Stream OpenRead(string path);
     Stream OpenWriteTruncate(string path);

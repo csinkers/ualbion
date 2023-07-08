@@ -8,7 +8,7 @@ namespace UAlbion.Config;
 
 public static class ConfigUtil
 {
-    static readonly string ProbePath = Path.Combine("mods", "Base", "base_assets.json");
+    static readonly string ProbePath = Path.Combine("mods", "Base", "types.json");
     public static string FindBasePath(IFileSystem disk) // Should roughly match UAlbion.Scripting.Tests.TestUtil
     {
         if (disk == null) throw new ArgumentNullException(nameof(disk));

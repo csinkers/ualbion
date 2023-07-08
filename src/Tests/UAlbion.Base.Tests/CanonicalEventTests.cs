@@ -26,10 +26,13 @@ public class CanonicalEventTests
         AssetMapping.Global.MergeFrom(Mapping);
     }
 
-    void TestEventSet(EventSetId eventSetId)
+    static void TestEventSet(EventSetId eventSetId)
     {
         var assets = Exchange.Resolve<IAssetManager>();
         var eventSet = assets.LoadEventSet(eventSetId);
+        if (eventSet == null)
+            throw new AssetNotFoundException($"Could not load event set {eventSetId}");
+
         Test(eventSetId, eventSet);
     }
 

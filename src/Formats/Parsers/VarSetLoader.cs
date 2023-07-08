@@ -8,24 +8,23 @@ namespace UAlbion.Formats.Parsers;
 
 public class VarSetLoader : IAssetLoader<VarSet>
 {
-    public VarSet Serdes(VarSet existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public VarSet Serdes(VarSet existing, ISerializer s, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        if (!context.Disk.FileExists(info.File.Filename))
-            throw new FileNotFoundException($"Could not find game config file at expected path {info.File.Filename}");
+        if (!context.Disk.FileExists(context.Filename))
+            throw new FileNotFoundException($"Could not find game config file at expected path {context.Filename}");
 
         if (s.IsWriting())
-            Save(existing, info.File.Filename, context.Disk, context.Json);
+            Save(existing, context.Filename, context.Disk, context.Json);
         else
-            existing = Load(context.ModName, info.File.Filename, context.Disk, context.Json);
+            existing = Load(context.ModName, context.Filename, context.Disk, context.Json);
 
         return existing;
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((VarSet)existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((VarSet)existing, s, context);
 
     public static VarSet Load(string name, string path, IFileSystem disk, IJsonUtil json)
     {

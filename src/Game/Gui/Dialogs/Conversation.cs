@@ -12,7 +12,6 @@ using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Transitions;
-using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
 
@@ -138,13 +137,12 @@ public class Conversation : Component
 
                 var etId = _npc.EventSetId.ToEventText();
                 var strings = (IStringSet)Resolve<IModApplier>().LoadAssetCached(etId);
-                var lang = Var(UserVars.Gameplay.Language);
 
                 ushort subId = 0;
                 for (ushort i = 0; i < strings.Count; i++)
                 {
-                    var s = strings.GetString(new StringId(etId, i), lang);
-                    if (Tokeniser.Tokenise(s).Any(x => x.Item1 == Token.Block && x.Item2 is 0))
+                    var s = strings.GetString(new StringId(etId, i));
+                    if (Tokeniser.Tokenise(s).Any(x => x.Token == Token.Block && x.Argument is 0))
                     {
                         subId = i;
                         break;

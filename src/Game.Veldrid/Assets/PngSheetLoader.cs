@@ -11,6 +11,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
+using UAlbion.Config.Properties;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
@@ -55,15 +56,14 @@ public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>> //
         return true;
     }
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
         var assets = Resolve<IAssetManager>();
-        var paletteId = info.Get(AssetProperty.PaletteId, 0);
-        var palette = info.AssetId.Type == AssetType.FontGfx 
+        var paletteId = context.GetProperty(AssetProps.Palette);
+        var palette = context.AssetId.Type == AssetType.FontGfx 
             ? FontDefinition.ExportPalette 
             : assets.LoadPalette(new PaletteId(paletteId)).GetUnambiguousPalette();
 
@@ -78,15 +78,15 @@ public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>> //
         }
         else // Read
         {
-            if (info.Width == 0)
+            if (context.Width == 0)
             {
-                throw new InvalidOperationException($"The asset {info.AssetId} ({info.File.Filename}) is set to use " +
+                throw new InvalidOperationException($"The asset {context.AssetId} ({context.Filename}) is set to use " +
                                                     "PngSheetLoader, but does not have its Width property set");
             }
 
-            if (info.Height == 0)
+            if (context.Height == 0)
             {
-                throw new InvalidOperationException($"The asset {info.AssetId} ({info.File.Filename}) is set to use " +
+                throw new InvalidOperationException($"The asset {context.AssetId} ({context.Filename}) is set to use " +
                                                     "PngSheetLoader, but does not have its Height property set");
             }
 
@@ -95,10 +95,10 @@ public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>> //
             var bytes = s.Bytes(null, null, (int) s.BytesRemaining);
             using var stream = new MemoryStream(bytes);
             using var image = decoder.Decode<Rgba32>(configuration, stream);
-            return Read(info.AssetId, palette, image, info.Width, info.Height);
+            return Read(context.AssetId, palette, image, context.Width, context.Height);
         }
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((IReadOnlyTexture<byte>)existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((IReadOnlyTexture<byte>)existing, s, context);
 }

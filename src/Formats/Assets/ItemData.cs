@@ -12,7 +12,7 @@ public sealed class ItemData
 {
     public const int SizeOnDisk = 0x28;
     public ItemData(ItemId id) => Id = id;
-    [JsonIgnore] public StringId Name => Id.ToName();
+    [JsonIgnore] public StringId Name => new(Id.ToName());
     public ItemId Id { get; }
     public byte Unknown { get; set; } //  0 Always 0
     public ItemType TypeId { get; set; } //  1 Item type
@@ -132,13 +132,12 @@ public sealed class ItemData
         return sb.ToString();
     }
 
-    public static ItemData Serdes(AssetInfo info, ItemData item, ISerializer s, ISpellManager spellManager)
+    public static ItemData Serdes(AssetId id, ItemData item, ISerializer s, ISpellManager spellManager)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (spellManager == null) throw new ArgumentNullException(nameof(spellManager));
 
-        item ??= new ItemData(info.AssetId);
+        item ??= new ItemData(id);
         item.Unknown  = s.UInt8(nameof(item.Unknown), item.Unknown); // 0
         item.TypeId   = s.EnumU8(nameof(item.TypeId), item.TypeId);   // 1
         item.SlotType = ((PersistedItemSlotId)s.UInt8(nameof(item.SlotType), (byte)item.SlotType.ToPersisted())).ToMemory(); // 2

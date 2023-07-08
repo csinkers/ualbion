@@ -5,6 +5,7 @@ using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Config.Properties;
 using UAlbion.Formats.Assets.Save;
 
 namespace UAlbion.Formats.Containers;
@@ -15,19 +16,22 @@ namespace UAlbion.Formats.Containers;
 public class XldContainer : IAssetContainer
 {
     const string MagicString = "XLD0I";
+    static readonly IntAssetProperty MinimumCount = new("MinimumCount");
     static int HeaderSize(int itemCount) => MagicString.Length + 3 + 4 * itemCount;
 
-    public ISerializer Read(string path, AssetInfo info, SerdesContext context)
+    public ISerializer Read(string path, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
+        if (!context.Disk.FileExists(path))
+            return null;
+
         using var s = new AlbionReader(new BinaryReader(context.Disk.OpenRead(path)));
-        var bytes = LoadAsset(info.Index, s);
+        var bytes = LoadAsset(context.Index, s);
         var ms = new MemoryStream(bytes);
         return new AlbionReader(new BinaryReader(ms));
     }
 
-    public void Write(string path, IList<(AssetInfo, byte[])> assets, SerdesContext context)
+    public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
     {
         if (assets == null) throw new ArgumentNullException(nameof(assets));
         if (context == null) throw new ArgumentNullException(nameof(context));
@@ -43,7 +47,7 @@ public class XldContainer : IAssetContainer
         foreach (var (info, bytes) in assets)
             byIndex[info.Index] = bytes;
 
-        int minCount = assets[0].Item1.File.Get(AssetProperty.MinimumCount, 0);
+        int minCount = assets[0].Item1.GetProperty(MinimumCount);
         int count = byIndex
             .OrderBy(x => x.Key)
             .Last(x => x.Value.Length > 0)
@@ -64,23 +68,6 @@ public class XldContainer : IAssetContainer
         for (int i = 0; i < count; i++)
             if (byIndex.TryGetValue(i, out var buffer))
                 s.Bytes(null, buffer, buffer.Length);
-    }
-
-    public List<(int num, int count)> GetSubItemRanges(string path, AssetFileInfo info, SerdesContext context)
-    {
-        if (context == null) throw new ArgumentNullException(nameof(context));
-
-        if (!context.Disk.FileExists(path))
-            return new List<(int, int)>();
-
-        using var s = new AlbionReader(new BinaryReader(context.Disk.OpenRead(path)));
-        var lengths = HeaderSerdes(null, s);
-        int i = 0;
-        for (; i < lengths.Length; i++)
-            if (lengths[i] > 0)
-                break;
-
-        return new List<(int, int)> { (i, lengths.Length - i) };
     }
 
     static byte[] LoadAsset(int subItem, ISerializer s)

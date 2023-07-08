@@ -22,7 +22,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 
     AssetId IEventSet.Id => Id;
     [JsonInclude] public MapId Id { get; protected set; }
-    [JsonIgnore] public TextId TextId => Id.ToMapText();
+    [JsonIgnore] public StringSetId StringSetId => Id.ToMapText();
     public abstract MapType MapType { get; }
     [JsonInclude] public MapFlags Flags { get; set; } // Wait/Rest, Light-Environment, NPC converge range
     [JsonInclude] public int Width { get; protected set; }
@@ -269,7 +269,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
         }
     }
 
-    public static IMapData Serdes(AssetInfo info, IMapData existing, AssetMapping mapping, ISerializer s)
+    public static IMapData Serdes(AssetId id, IMapData existing, AssetMapping mapping, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (s.BytesRemaining == 0)
@@ -290,8 +290,8 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
         return mapType switch
         {
             // Indoor/outdoor maps aren't distinguished on disk - it has to be inferred from the tileset
-            MapType.TwoD => MapData2D.Serdes(info, (MapData2D)existing, mapping, s),
-            MapType.ThreeD => MapData3D.Serdes(info, (MapData3D)existing, mapping, s),
+            MapType.TwoD => MapData2D.Serdes(id, (MapData2D)existing, mapping, s),
+            MapType.ThreeD => MapData3D.Serdes(id, (MapData3D)existing, mapping, s),
             _ => throw new NotImplementedException($"Unrecognised map type {mapType} found.")
         };
     }

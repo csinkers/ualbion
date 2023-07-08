@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Parsers;
 
 public class WavLoader : IAssetLoader<ISample>
 {
-    public ISample Serdes(ISample existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public ISample Serdes(ISample existing, ISerializer s, AssetLoadContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (s.IsWriting() && existing == null)
@@ -35,7 +35,7 @@ public class WavLoader : IAssetLoader<ISample>
             s.UInt32("TotalSize", (uint)s.Offset - 4); // Write actual length to container format chunk
             s.Seek(offset);
         }
-        else ApiUtil.Assert(fullSize == (int)s.Offset - 4, "Full size of WAV doesn't match bytes read");
+        // else ApiUtil.Assert(fullSize == (int)s.Offset - 4, "Full size of WAV doesn't match bytes read"); // Lots of these in the original game's wav libraries
 
         return existing;
     }
@@ -65,6 +65,6 @@ public class WavLoader : IAssetLoader<ISample>
         w.Samples = s.Bytes(nameof(w.Samples), w.Samples, sampleCount);
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((ISample) existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((ISample) existing, s, context);
 }

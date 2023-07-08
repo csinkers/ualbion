@@ -12,7 +12,6 @@ using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 
 namespace UAlbion.Game.Veldrid.Assets;
 

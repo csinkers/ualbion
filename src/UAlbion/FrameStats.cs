@@ -22,8 +22,7 @@ class FrameStats
             if (texture == null)
                 continue;
 
-            var palleteId = new PaletteId(info.GetProperty(AssetProps.Palette));
-            var palette = assets.LoadPalette(palleteId);
+            var palette = assets.LoadPalette(info.PaletteId);
 
             var frames = texture.Regions.Count;
             var uniqueColours = new HashSet<byte>();

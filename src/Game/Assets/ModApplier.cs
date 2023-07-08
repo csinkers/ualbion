@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
-using UAlbion.Api.Settings;
 using UAlbion.Config;
 using UAlbion.Config.Properties;
 using UAlbion.Core;
@@ -23,15 +21,12 @@ namespace UAlbion.Game.Assets;
 public class ModApplier : Component, IModApplier
 {
     readonly AssetCache _assetCache = new();
-    readonly Dictionary<string, ModInfo> _mods = new();
-    readonly List<ModInfo> _modsInReverseDependencyOrder = new();
-    readonly Dictionary<string, LanguageConfig> _languages = new();
-
+    readonly ModLoader _mods = new();
     IAssetLocator _assetLocator;
 
     public ModApplier()
     {
-        Languages = new ReadOnlyDictionary<string, LanguageConfig>(_languages);
+        AttachChild(_mods);
         AttachChild(_assetCache);
         On<SetLanguageEvent>(_ =>
         {
@@ -42,7 +37,7 @@ public class ModApplier : Component, IModApplier
         });
     }
 
-    public IReadOnlyDictionary<string, LanguageConfig> Languages { get; }
+    public IReadOnlyDictionary<string, LanguageConfig> Languages => _mods.Languages;
 
     protected override void Subscribed()
     {
@@ -50,164 +45,18 @@ public class ModApplier : Component, IModApplier
         Exchange.Register<IModApplier>(this);
     }
 
-    public void LoadMods(AssetMapping mapping, IPathResolver pathResolver, IReadOnlyList<string> mods)
-    {
-        if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        if (pathResolver == null) throw new ArgumentNullException(nameof(pathResolver));
-        if (mods == null) throw new ArgumentNullException(nameof(mods));
-
-        pathResolver.RegisterPath("ALBION", pathResolver.ResolvePathAbsolute(Var(UserVars.Path.Albion)));
-        pathResolver.RegisterPath("SAVES", pathResolver.ResolvePathAbsolute(Var(UserVars.Path.Saves)));
-
-        _mods.Clear();
-        _modsInReverseDependencyOrder.Clear();
-        TryResolve<IVarRegistry>()?.Clear();
-        mapping.Clear();
-
-        foreach (var mod in mods.Reverse())
-            LoadMod(pathResolver.ResolvePathAbsolute("$(MODS)"), mod.Trim(), mapping);
-
-        _modsInReverseDependencyOrder.Reverse();
-
-        Raise(ModsLoadedEvent.Instance);
-    }
-
     public IEnumerable<string> ShaderPaths =>
-        _modsInReverseDependencyOrder
+        _mods.ModsInReverseDependencyOrder
             .Where(x => !string.IsNullOrEmpty(x.ModConfig.ShaderPath))
             .Select(mod => mod.ModContext.Disk.ToAbsolutePath(mod.ShaderPath));
 
-    void LoadMod(string dataDir, string modName, AssetMapping mapping)
-    {
-        if (string.IsNullOrEmpty(modName))
-            return;
 
-        if (_mods.ContainsKey(modName))
-            return;
-
-        if (modName.Any(c => c is '\\' or '/' || c == Path.DirectorySeparatorChar))
-        {
-            Error($"Mod {modName} is not a simple directory name");
-            return;
-        }
-
-        var disk = Resolve<IFileSystem>();
-        var pathResolver = Resolve<IPathResolver>();
-        var jsonUtil = Resolve<IJsonUtil>();
-
-        string path = Path.Combine(dataDir, modName);
-        if (!disk.DirectoryExists(path))
-        {
-            Error($"Mod directory {modName} does not exist in {dataDir}");
-            return;
-        }
-
-        var modDisk = disk.Duplicate(path);
-        var modConfigPath = Path.Combine(path, ModConfig.ModConfigFilename);
-        if (!modDisk.FileExists(modConfigPath))
-        {
-            Error($"Mod {modName} does not contain a {ModConfig.ModConfigFilename} file");
-            return;
-        }
-
-        var modConfig = ModConfig.Load(modConfigPath, modDisk, jsonUtil);
-        if (modConfig.SymLinks != null)
-            foreach (var kvp in modConfig.SymLinks)
-                modDisk = new RedirectionFileSystemDecorator(modDisk, kvp.Key, pathResolver.ResolvePath(kvp.Value));
-
-        var modMapping = new AssetMapping();
-
-        // Load dependencies
-        foreach (var dependency in modConfig.Dependencies)
-        {
-            LoadMod(dataDir, dependency, mapping);
-            if (!_mods.TryGetValue(dependency, out var dependencyInfo))
-            {
-                Error($"Dependency {dependency} of mod {modName} could not be loaded, skipping load of {modName}");
-                return;
-            }
-
-            modMapping.MergeFrom(dependencyInfo.ModContext.Mapping);
-        }
-
-        var parentTypeConfig  = modConfig.InheritTypeConfigFrom  != null && _mods.TryGetValue(modConfig.InheritTypeConfigFrom, out var parentMod) ? parentMod.TypeConfig  : null;
-        var parentAssetConfig = modConfig.InheritAssetConfigFrom != null && _mods.TryGetValue(modConfig.InheritAssetConfigFrom, out parentMod)    ? parentMod.AssetConfig : null;
-
-        TypeConfig typeConfig = parentTypeConfig;
-        if (modConfig.TypeConfig != null)
-        {
-            var typeConfigPath = Path.Combine(path, modConfig.TypeConfig);
-            if (!modDisk.FileExists(typeConfigPath))
-            {
-                Error($"Mod {modName} specifies {modConfig.TypeConfig} as a type config file, but it could not be found.");
-                return;
-            }
-            var tcl = new TypeConfigLoader(jsonUtil);
-            typeConfig = tcl.Load(typeConfigPath, modName, parentTypeConfig, modMapping, modDisk);
-
-            if (typeConfig.VarTypes != null)
-                LoadVarTypes(modName, typeConfig.VarTypes);
-
-            MergeTypesToMapping(modMapping, typeConfig, typeConfigPath);
-        }
-        typeConfig ??= new TypeConfig(modName, modMapping);
-
-        AssetConfig assetConfig = parentAssetConfig;
-        if (modConfig.AssetConfig != null)
-        {
-            var assetConfigPath = Path.Combine(path, modConfig.AssetConfig);
-            if (!modDisk.FileExists(assetConfigPath))
-            {
-                Error($"Mod {modName} specifies {modConfig.AssetConfig} as an asset config file, but it could not be found.");
-                return;
-            }
-
-            var acl = new AssetConfigLoader(modDisk, jsonUtil, pathResolver, typeConfig);
-            assetConfig = acl.Load(assetConfigPath, modName, parentAssetConfig);
-        }
-
-        assetConfig ??= new AssetConfig(modName, new RangeLookup());
-
-        var modInfo = new ModInfo(modName, typeConfig, assetConfig, modConfig, modMapping, jsonUtil, modDisk);
-
-        if (typeConfig.Languages != null)
-            foreach (var kvp in typeConfig.Languages)
-                _languages[kvp.Key] = kvp.Value;
-
-        mapping.MergeFrom(modMapping);
-
-        _mods.Add(modName, modInfo);
-        _modsInReverseDependencyOrder.Add(modInfo);
-    }
-
-    void LoadVarTypes(string modName, IEnumerable<string> varTypes)
-    {
-        var varRegistry = Resolve<IVarRegistry>();
-        foreach (var typeName in varTypes)
-        {
-            var type = Type.GetType(typeName);
-            if (type == null)
-                throw new InvalidOperationException($"Could not load type \"{typeName}\" as Var container from mod {modName}");
-
-            varRegistry.Register(type);
-        }
-    }
-
-    static void MergeTypesToMapping(AssetMapping mapping, TypeConfig config, string typeConfigPath)
-    {
-        foreach (var assetType in config.IdTypes.Values)
-        {
-            var enumType = Type.GetType(assetType.EnumType);
-            if (enumType == null)
-                throw new InvalidOperationException($"Could not load enum type \"{assetType.EnumType}\" defined in \"{typeConfigPath}\"");
-
-            mapping.RegisterAssetType(assetType.EnumType, assetType.AssetType);
-        }
-    }
+    public void LoadMods(AssetMapping mapping, IPathResolver pathResolver, IReadOnlyList<string> mods) 
+        => _mods.LoadMods(mapping, pathResolver, mods);
 
     public AssetNode GetAssetInfo(AssetId key, string language = null)
     {
-        foreach (var mod in _modsInReverseDependencyOrder)
+        foreach (var mod in _mods.ModsInReverseDependencyOrder)
         {
             var assetNodes = mod.AssetConfig.GetAssetInfo(key);
             foreach(var node in assetNodes)
@@ -227,13 +76,12 @@ public class ModApplier : Component, IModApplier
         return null;
     }
 
-    public object LoadAsset(AssetId id) => LoadAsset(id, null);
-    public object LoadAsset(AssetId id, string language)
+    public object LoadAsset(AssetId id, string language = null)
     {
         try
         {
-            var asset = LoadAssetInternal(id, language);
-            return asset is Exception ? null : asset;
+            var result = LoadAssetInternal(id, language);
+            return result.Asset is Exception ? null : result.Asset;
         }
         catch (Exception e)
         {
@@ -245,7 +93,24 @@ public class ModApplier : Component, IModApplier
         }
     }
 
-    public string LoadAssetAnnotated(AssetId id, string language)
+    public AssetLoadResult LoadAssetAndNode(AssetId assetId, string language = null)
+    {
+        try
+        {
+            var result = LoadAssetInternal(assetId, language);
+            return result.Asset is Exception ? null : result;
+        }
+        catch (Exception e)
+        {
+            if (CoreUtil.IsCriticalException(e))
+                throw;
+
+            Error($"Could not load asset {assetId}: {e}");
+            return null;
+        }
+    }
+
+    public string LoadAssetAnnotated(AssetId id, string language = null)
     {
         using var ms = new MemoryStream();
         using var annotationWriter = new StreamWriter(ms);
@@ -257,33 +122,38 @@ public class ModApplier : Component, IModApplier
         return reader.ReadToEnd();
     }
 
-    public object LoadAssetCached(AssetId assetId)
+    public object LoadAssetCached(AssetId id, string language = null)
     {
-        object asset = _assetCache.Get(assetId);
-        if (asset is Exception) // If it failed to load once then stop trying (at least until an asset:reload / cycle)
-            return null;
-
-        if (asset != null)
-            return asset;
+        var result = GetCached(id, language);
+        if (result != null)
+            return result.Asset;
 
         try
         {
-            asset = LoadAssetInternal(assetId);
-            _assetCache.Add(asset ?? new AssetNotFoundException($"Could not load asset for {assetId}"), assetId);
-            return asset is Exception ? null : asset;
+            result = LoadAssetInternal(id, language);
+            _assetCache.Add(id, language, result?.Asset ?? new AssetNotFoundException($"Could not load asset for {id}"), result?.Node);
+            return result?.Asset is Exception ? null : result?.Asset;
         }
         catch (Exception e)
         {
             if (CoreUtil.IsCriticalException(e))
                 throw;
 
-            Error($"Could not load asset {assetId}: {e}");
-            _assetCache.Add(e, assetId);
+            Error($"Could not load asset {id}: {e}");
+            _assetCache.Add(id, language, e, null);
             return null;
         }
     }
 
-    object LoadAssetInternal(AssetId id, string language = null, TextWriter annotationWriter = null)
+    AssetLoadResult GetCached(AssetId assetId, string language)
+    {
+        var (asset, node) = _assetCache.Get(assetId, language);
+        return asset is null or Exception 
+            ? null // If it failed to load once then stop trying (at least until an asset:reload / cycle)
+            : new AssetLoadResult(assetId, asset, node);
+    }
+
+    AssetLoadResult LoadAssetInternal(AssetId id, string language, TextWriter annotationWriter = null)
     {
         if (id.IsNone)
             return null;
@@ -292,6 +162,7 @@ public class ModApplier : Component, IModApplier
             return LoadMetaFont(id);
 
         object asset = null;
+        AssetNode loadedNode = null;
         Stack<IPatch> patches = null; // Create the stack lazily, as most assets won't have any patches.
         language ??= Var(UserVars.Gameplay.Language);
 
@@ -305,7 +176,7 @@ public class ModApplier : Component, IModApplier
             null;
 #endif
 
-        foreach (var mod in _modsInReverseDependencyOrder)
+        foreach (var mod in _mods.ModsInReverseDependencyOrder)
         {
 #if DEBUG
             filesSearched.Clear();
@@ -349,6 +220,7 @@ public class ModApplier : Component, IModApplier
                     }
 
                     asset = modAsset;
+                    loadedNode = node;
                     goto assetFound;
                 }
 
@@ -387,15 +259,16 @@ public class ModApplier : Component, IModApplier
             Warn(loaderWarnings.ToString());
 #endif
 
-        return asset;
+        return new AssetLoadResult(id, asset, loadedNode);
     }
 
-    object LoadMetaFont(AssetId id)
+    AssetLoadResult LoadMetaFont(AssetId id)
     {
         var assets = Resolve<IAssetManager>();
         var metaId = (MetaFontId)id;
         var font = assets.LoadFontDefinition(metaId.FontId);
-        return font.Build(metaId.FontId, metaId.InkId, assets);
+        var metaFont = font.Build(metaId.FontId, metaId.InkId, assets);
+        return new AssetLoadResult(id, metaFont, null);
     }
 
     public SavedGame LoadSavedGame(string path)
@@ -415,7 +288,7 @@ public class ModApplier : Component, IModApplier
     }
 
     public void SaveAssets(
-        IModApplier.AssetLoader loaderFunc,
+        AssetLoaderMethod loaderFunc,
         Action flushCacheFunc,
         ISet<AssetId> ids,
         ISet<AssetType> assetTypes,
@@ -428,7 +301,7 @@ public class ModApplier : Component, IModApplier
         var pathResolver = Resolve<IPathResolver>();
         var containerRegistry = Resolve<IContainerRegistry>();
         var writeDisk = Resolve<IFileSystem>();
-        var target = _modsInReverseDependencyOrder.First();
+        var target = _mods.ModsInReverseDependencyOrder[0];
         var filesWritten = new HashSet<string>();
 
         foreach (var rangeInfo in target.AssetConfig.Ranges.AllRanges)
@@ -436,7 +309,7 @@ public class ModApplier : Component, IModApplier
             if (assetTypes != null && !assetTypes.Contains(rangeInfo.Range.From.Type))
                 continue;
 
-            var assets = new Dictionary<string, List<(AssetLoadContext, byte[])>>();
+            var assets = new Dictionary<string, List<(AssetLoadContext Context, byte[] Bytes)>>();
             foreach (var assetId in rangeInfo.Range)
             {
                 if (ids != null && !ids.Contains(assetId)) continue;
@@ -450,8 +323,8 @@ public class ModApplier : Component, IModApplier
                     if (node.GetProperty(AssetProps.IsReadOnly)) continue;
 
                     var language = node.GetProperty(AssetProps.Language);
-                    var asset = loaderFunc(assetId, language);
-                    if (asset == null)
+                    var result = loaderFunc(assetId, language);
+                    if (result == null)
                     {
                         // if (language == null || languages == null || languages.Contains(language))
                         {
@@ -464,17 +337,22 @@ public class ModApplier : Component, IModApplier
                         continue;
                     }
 
+                    // Hacky copying of palette property to make png export/import work
+                    var sourcePalette = result.Node?.PaletteId ?? AssetId.None;
+                    if (!sourcePalette.IsNone && node.PaletteId.IsNone)
+                        node.SetProperty(AssetProps.Palette, sourcePalette);
+
                     if (filesWritten.Add(filename))
                         Info($"Saving {filename}...");
 
                     var saveContext = new AssetLoadContext(assetId, node, target.ModContext);
-                    SaveAsset(saveContext, asset, assets);
+                    SaveAsset(saveContext, result.Asset, assets);
                 }
             }
 
             foreach (var kvp in assets)
             {
-                var first = kvp.Value[0].Item1;
+                var first = kvp.Value[0].Context;
                 var path = pathResolver.ResolvePath(first.Filename);
                 var writeContainer = containerRegistry.GetContainer(path, first.Node.Container, writeDisk);
                 writeContainer.Write(path, kvp.Value, target.ModContext);

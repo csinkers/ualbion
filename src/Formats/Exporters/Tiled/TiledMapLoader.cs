@@ -138,14 +138,14 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
         if (floorPattern.IsEmpty || ceilingPattern.IsEmpty || wallPattern.IsEmpty || contentsPattern.IsEmpty)
             return (Array.Empty<byte>(), null);
 
-        var labInfo = destModApplier.GetAssetInfo(map.LabDataId, null);
+        var labInfo = destModApplier.GetAssetInfo(map.LabDataId);
         if (labInfo == null)
         {
             Error($"Could not load asset info for lab {map.LabDataId} in map {map.Id}");
             return (Array.Empty<byte>(), null);
         }
 
-        var assetPath = new AssetPath(map.LabDataId, 0, labInfo.GetProperty(AssetProps.Palette).Id);
+        var assetPath = new AssetPath(map.LabDataId, 0, labInfo.PaletteId.Id);
         var properties = new Tilemap3DProperties
         {
             TileWidth    = context.GetProperty(TileWidth, 0),

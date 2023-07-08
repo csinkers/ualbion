@@ -27,7 +27,8 @@ public class DirectoryContainer : IAssetContainer
 
         if (context.Disk.DirectoryExists(path))
         {
-            foreach (var filePath in context.Disk.EnumerateFiles(path, pattern.WilcardForId(context.AssetId)))
+            var wildcardPattern = pattern.WilcardForId(context.AssetId);
+            foreach (var filePath in context.Disk.EnumerateFiles(path, wildcardPattern))
             {
                 var filename = Path.GetFileName(filePath);
                 if (!pattern.TryParse(filename, context.AssetId.Type, out var assetPath))

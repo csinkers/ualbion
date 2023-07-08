@@ -31,7 +31,7 @@ public class NpcTilesetLoader : Component, IAssetLoader
 
         var tsxDir = Path.GetDirectoryName(context.Filename);
         var tiles = new List<TileProperties>();
-        var assets = Resolve<IAssetManager>();
+        var sourceAssets = Resolve<IAssetManager>();
         var modApplier = Resolve<IModApplier>();
         var pathResolver = Resolve<IPathResolver>();
         var assetIds =
@@ -41,16 +41,13 @@ public class NpcTilesetLoader : Component, IAssetLoader
 
         foreach (var id in assetIds)
         {
-            var sprite = assets.LoadTexture(id); // Get sprite from source mod
-            var spriteInfo = modApplier.GetAssetInfo(id, null); // But get AssetInfo from target mod
-
+            var sprite = sourceAssets.LoadTexture(id); // Get sprite from source mod
+            var sourceNode = sourceAssets.GetAssetInfo(id);
             // Ugh, hacky.
-            var palId = spriteInfo.GetProperty(AssetProps.Palette);
-            if (palId.IsNone)
-                spriteInfo.SetProperty(AssetProps.Palette,
-                    assets.GetAssetInfo(id).GetProperty(AssetProps.Palette));
+            var npcNode = new AssetNode(id, null);
+            npcNode.SetProperty(AssetProps.Palette, sourceNode.PaletteId);
 
-            var subContext = new AssetLoadContext(id, spriteInfo, context.ModContext);
+            var subContext = new AssetLoadContext(id, npcNode, context.ModContext);
             var assetPath = subContext.BuildAssetPath(9); // 9 = First frame facing west for both large and small
 
             var path = graphicsPattern.Format(assetPath);

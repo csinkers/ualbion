@@ -3,7 +3,6 @@ using SerdesNet;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Parsers;
 

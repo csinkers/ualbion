@@ -16,10 +16,15 @@ public class MockModApplier : ServiceComponent<IModApplier>, IModApplier
 
     public void LoadMods(AssetMapping mapping, IPathResolver pathResolver, IReadOnlyList<string> mods) { }
     public AssetNode GetAssetInfo(AssetId id, string language) => _infos[id];
-    public object LoadAsset(AssetId id) => _assets[id];
     public object LoadAsset(AssetId id, string language) => _assets[id];
-    public object LoadAssetCached(AssetId id) => _assets[id];
+    public object LoadAssetCached(AssetId id, string language) => _assets[id];
     public string LoadAssetAnnotated(AssetId id, string language) => throw new NotImplementedException();
+    public AssetLoadResult LoadAssetAndNode(AssetId assetId, string language = null)
+    {
+        var asset = LoadAsset(assetId, language);
+        var node = GetAssetInfo(assetId, language);
+        return new AssetLoadResult(assetId, asset, node);
+    }
 
     public SavedGame LoadSavedGame(string path) => throw new NotImplementedException();
     public IReadOnlyDictionary<string, LanguageConfig> Languages { get; } 
@@ -28,7 +33,7 @@ public class MockModApplier : ServiceComponent<IModApplier>, IModApplier
 
     public IEnumerable<string> ShaderPaths => Array.Empty<string>();
     public void SaveAssets(
-        IModApplier.AssetLoader loaderFunc,
+        AssetLoaderMethod loaderFunc,
         Action flushCacheFunc,
         ISet<AssetId> ids,
         ISet<AssetType> assetTypes,

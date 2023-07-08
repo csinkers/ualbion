@@ -27,7 +27,8 @@ public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>> //
         return FormatUtil.BytesFromStream(stream => encoder.Encode(image, stream));
     }
 
-    static IReadOnlyTexture<byte> Read(AssetId id, uint[] palette, Image<Rgba32> image, int subItemWidth, int subItemHeight)
+    static IReadOnlyTexture<byte> Read(AssetId id, uint[] palette, AssetId paletteId, Image<Rgba32> image,
+        int subItemWidth, int subItemHeight)
     {
         var pixels = new byte[image.Width * image.Height];
         var frames = new List<Region>();
@@ -95,7 +96,7 @@ public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>> //
             var bytes = s.Bytes(null, null, (int) s.BytesRemaining);
             using var stream = new MemoryStream(bytes);
             using var image = decoder.Decode<Rgba32>(configuration, stream);
-            return Read(context.AssetId, palette, image, context.Width, context.Height);
+            return Read(context.AssetId, palette, paletteId, image, context.Width, context.Height);
         }
     }
 

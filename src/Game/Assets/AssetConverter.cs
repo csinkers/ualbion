@@ -68,21 +68,21 @@ public sealed class AssetConverter : IDisposable
         _fromExchange.Attach(new AssetManager(_from)); // From also needs an asset manager for the inventory post-processor etc
     }
 
-    public void Convert(string[] ids, ISet<AssetType> assetTypes, Regex filePattern, Func<AssetId, object, object> converter = null, string[] validLanguages = null)
+    public void Convert(string[] ids, ISet<AssetType> assetTypes, Regex filePattern, Func<AssetLoadResult, AssetLoadResult> converter = null, string[] validLanguages = null)
     {
         var parsedIds = ids?.Select(AssetId.Parse).ToHashSet();
-        var cache = new Dictionary<(AssetId, string), object>();
+        var cache = new Dictionary<(AssetId, string), AssetLoadResult>();
 
-        object LoaderFunc(AssetId assetId, string language)
+        AssetLoadResult LoaderFunc(AssetId assetId, string language)
         {
-            var asset = cache.TryGetValue((assetId, language), out var cached)
+            var result = cache.TryGetValue((assetId, language), out var cached)
                 ? cached
-                : cache[(assetId, language)] = _from.LoadAsset(assetId, language);
+                : cache[(assetId, language)] = _from.LoadAssetAndNode(assetId, language);
 
             if (converter != null)
-                asset = converter(assetId, asset);
+                result = converter(result);
 
-            return asset;
+            return result;
         }
 
         _to.SaveAssets(LoaderFunc, () => cache.Clear(), parsedIds, assetTypes, validLanguages, filePattern);

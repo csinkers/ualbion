@@ -53,12 +53,13 @@ public static class Program
 
         Merge(AutoJumpMap.Build((Map)300, (Map)100, 7, 7, tileset1));
 
-        object? LoaderFunc(AssetId assetId, string language)
+        AssetLoadResult LoaderFunc(AssetId assetId, string language)
         {
-            // info.SetProperty(AssetProps.Palette, Palette1Id);
+            var node = new AssetNode(assetId, null);
+            node.SetProperty(AssetProps.Palette, Palette1Id);
             return assets.TryGetValue(assetId, out var asset)
-                ? asset
-                : null;
+                ? new AssetLoadResult(assetId, asset, null)
+                : null!;
         }
 
         // Create 3D lab graphics

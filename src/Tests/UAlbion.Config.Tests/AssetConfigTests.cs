@@ -33,6 +33,7 @@ public class AssetConfigTests : Component
     ""font"":     { ""AssetType"": ""FontDefinition"",   ""EnumType"": ""UAlbion.Base.Font, UAlbion.Base"" },
     ""fontgfx"":  { ""AssetType"": ""FontGfx"",          ""EnumType"": ""UAlbion.Base.FontGfx, UAlbion.Base"" },
     ""item"":     { ""AssetType"": ""Item"",             ""EnumType"": ""UAlbion.Base.Item, UAlbion.Base"" },
+    ""itemname"": { ""AssetType"": ""ItemName"",         ""EnumType"": ""UAlbion.Base.ItemName, UAlbion.Base"" },
     ""overlay"":  { ""AssetType"": ""WallOverlay"",      ""EnumType"": ""UAlbion.Base.WallOverlay, UAlbion.Base"" },
     ""pal"":      { ""AssetType"": ""Palette"",          ""EnumType"": ""UAlbion.Base.Palette, UAlbion.Base"" },
     ""special"":  { ""AssetType"": ""Special"",          ""EnumType"": ""UAlbion.Base.Special, UAlbion.Base"" },
@@ -45,23 +46,24 @@ public class AssetConfigTests : Component
   },
 
   ""Loaders"": {
-    ""amorphous"":   ""UAlbion.Formats.Parsers.AmorphousSpriteLoader, UAlbion.Formats"",
-    ""block"":       ""UAlbion.Formats.Parsers.BlockListLoader, UAlbion.Formats"",
-    ""fixedsize"":   ""UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats"",
-    ""font"":        ""UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.FontDefinition, UAlbion.Formats]], UAlbion.Formats"",
-    ""header"":      ""UAlbion.Formats.Parsers.SingleHeaderSpriteLoader, UAlbion.Formats"",
-    ""itemdata"":    ""UAlbion.Formats.Parsers.ItemDataLoader, UAlbion.Formats"",
-    ""itemname"":    ""UAlbion.Formats.Parsers.ItemNameLoader, UAlbion.Formats"",
-    ""json"":        ""UAlbion.Formats.Parsers.JsonStringLoader, UAlbion.Formats"",
-    ""multiheader"": ""UAlbion.Formats.Parsers.MultiHeaderSpriteLoader, UAlbion.Formats"",
-    ""pal"":         ""UAlbion.Formats.Parsers.PaletteLoader, UAlbion.Formats"",
-    ""soundbank"":   ""UAlbion.Game.Assets.SoundBankLoader, UAlbion.Game"",
-    ""spell"":       ""UAlbion.Formats.Parsers.SpellLoader, UAlbion.Formats"",
-    ""stext"":       ""UAlbion.Formats.Parsers.SystemTextLoader, UAlbion.Formats"",
-    ""stringset"":   ""UAlbion.Formats.Parsers.StringSetStringLoader, UAlbion.Formats"",
-    ""tilegfx"":     ""UAlbion.Formats.Parsers.TilesetGraphicsLoader, UAlbion.Formats"",
-    ""tileset"":     ""UAlbion.Formats.Parsers.TilesetLoader, UAlbion.Formats"",
-    ""wordlist"":    ""UAlbion.Formats.Parsers.WordListLoader, UAlbion.Formats""
+    ""amorphous"":    ""UAlbion.Formats.Parsers.AmorphousSpriteLoader, UAlbion.Formats"",
+    ""block"":        ""UAlbion.Formats.Parsers.BlockListLoader, UAlbion.Formats"",
+    ""fixedsize"":    ""UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats"",
+    ""font"":         ""UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.FontDefinition, UAlbion.Formats]], UAlbion.Formats"",
+    ""header"":       ""UAlbion.Formats.Parsers.SingleHeaderSpriteLoader, UAlbion.Formats"",
+    ""itemdata"":     ""UAlbion.Formats.Parsers.ItemDataLoader, UAlbion.Formats"",
+    ""itemname"":     ""UAlbion.Formats.Parsers.ItemNameLoader, UAlbion.Formats"",
+    ""itemnameMeta"": ""UAlbion.Formats.Parsers.ItemNameMetaLoader, UAlbion.Formats"",
+    ""json"":         ""UAlbion.Formats.Parsers.JsonStringLoader, UAlbion.Formats"",
+    ""multiheader"":  ""UAlbion.Formats.Parsers.MultiHeaderSpriteLoader, UAlbion.Formats"",
+    ""pal"":          ""UAlbion.Formats.Parsers.PaletteLoader, UAlbion.Formats"",
+    ""soundbank"":    ""UAlbion.Game.Assets.SoundBankLoader, UAlbion.Game"",
+    ""spell"":        ""UAlbion.Formats.Parsers.SpellLoader, UAlbion.Formats"",
+    ""stext"":        ""UAlbion.Formats.Parsers.SystemTextLoader, UAlbion.Formats"",
+    ""stringset"":    ""UAlbion.Formats.Parsers.StringSetStringLoader, UAlbion.Formats"",
+    ""tilegfx"":      ""UAlbion.Formats.Parsers.TilesetGraphicsLoader, UAlbion.Formats"",
+    ""tileset"":      ""UAlbion.Formats.Parsers.TilesetLoader, UAlbion.Formats"",
+    ""wordlist"":     ""UAlbion.Formats.Parsers.WordListLoader, UAlbion.Formats""
   },
 
   ""Containers"": {
@@ -81,126 +83,154 @@ public class AssetConfigTests : Component
 
     const string AssetConfig1 = @"
 {
-  ""Mapping"": {
-    ""special.SoundBank"": { ""Files"": { ""Albion/DRIVERS/ALBISND.OPL"": { ""Container"": ""raw"", ""Loader"": ""soundbank"" } } },
-    ""special.ItemNames"": { ""Files"": { ""Albion/CD/XLDLIBS/ITEMNAME.DAT"": { ""Loader"": ""itemname"", ""Container"": ""raw"" } } },
-    ""item.1-462"":        { ""Files"": { ""Albion/CD/XLDLIBS/ITEMLIST.DAT"": { ""Loader"": ""itemdata"", ""Container"": ""items"" } } },
-
-    ""block.1-11"":  { ""Files"": { ""Albion/CD/XLDLIBS/BLKLIST0.XLD"": { ""Loader"": ""block"" } } },
-    ""floor.200-299"":    { ""Files"": { ""Albion/CD/XLDLIBS/3DFLOOR2.XLD"": { ""Loader"": ""fixedsize"", ""Width"": 64, ""Height"": 64 } } },
-    ""combg.1-19"":       { ""Files"": { ""Albion/CD/XLDLIBS/COMBACK0.XLD"": { ""Loader"": ""fixedsize"", ""Width"": 360 } } },
-    ""tilegfx.1-11"": {
-      ""Files"": {
-        ""Albion/CD/XLDLIBS/ICONGFX0.XLD"": {
-          ""Loader"": ""tilegfx"",
-          ""Width"": 16,
-          ""Height"": 16,
-          ""Map"": {
-            ""tilegfx.1"":  { ""Palette"": ""pal.1"" },
-            ""tilegfx.2"":  { ""Palette"": ""pal.2"" },
-            ""tilegfx.3"":  { ""Palette"": ""pal.6"" },
-            ""tilegfx.4"":  { ""Palette"": ""pal.4"" },
-            ""tilegfx.5"":  { ""Palette"": ""pal.5"" },
-            ""tilegfx.6"":  { ""Palette"": ""pal.16"" },
-            ""tilegfx.7"":  { ""Palette"": ""pal.9"" },
-            ""tilegfx.8"":  { ""Palette"": ""pal.26"" },
-            ""tilegfx.9"":  { ""Palette"": ""pal.28"" },
-            ""tilegfx.10"": { ""Palette"": ""pal.45"" },
-            ""tilegfx.11"": { ""Palette"": ""pal.56"" }
-          }
-        }
-      }
+  ""special.SoundBank"": { ""Files"": { ""Albion/DRIVERS/ALBISND.OPL"": { ""Container"": ""raw"", ""Loader"": ""soundbank"" } } },
+  ""itemname.1-462"": {
+    ""Files"": { // Dummy files used for ensuring the language is available on the AssetLoadContext
+      ""!GERMAN"": { ""Language"": ""GERMAN"" },
+      ""!ENGLISH"": { ""Language"": ""ENGLISH"" },
+      ""!FRENCH"": { ""Language"": ""FRENCH"" }
     },
-    ""comgfx.1-85"":      { ""Files"": { ""Albion/CD/XLDLIBS/COMGFX0.XLD"": {  ""Loader"": ""multiheader"", ""Palette"": ""pal.23"" } } },
+    ""Loader"": ""stringset"",
+    ""FirstId"": ""itemname.1"",
+    ""Target"": ""special.ItemNamesSingleLang"",
+    ""IsReadOnly"": true 
+  },
 
-    ""utext.0-*"":      { ""Loader"": ""stringset"", ""FirstId"": ""utext.0"",    ""Target"": ""special.UAlbionStrings"" },
-    ""stext.0-777"":    { ""Loader"": ""stringset"", ""FirstId"": ""stext.0"",    ""Target"": ""special.SystemStrings"" },
-
-    ""autotile.1-2"": {
-      ""Files"": {
-        ""Albion/CD/XLDLIBS/AUTOGFX0.XLD"": {
-          ""Post"": ""atlas"",
-          ""Loader"": ""amorphous"",
-          ""Map"": {
-            ""autotile.1"": { ""SubSprites"": ""(8,8,576) (16,16)"", ""Palette"": ""pal.11"" },
-            ""autotile.2"": { ""SubSprites"": ""(8,8,576) (16,16)"", ""Palette"": ""pal.30"" }
-          }
-        }
-      }
+  ""special.ItemNamesSingleLang"": {
+    ""Files"": {
+      ""!GERMAN"": { ""Language"": ""GERMAN"" },
+      ""!ENGLISH"": { ""Language"": ""ENGLISH"" },
+      ""!FRENCH"": { ""Language"": ""FRENCH"" }
     },
+    ""Loader"": ""itemnameMeta"",
+    ""Target"": ""special.ItemNamesMultiLang"",
+    ""IsReadOnly"": true 
+  },
 
-    ""3dobj.1-99"":       { ""Files"": { ""Albion/CD/XLDLIBS/3DOBJEC0.XLD"": { ""Loader"": ""fixedsize"" } } },
-    ""overlay.1-99"":     { ""Files"": { ""Albion/CD/XLDLIBS/3DOVERL0.XLD"": { ""Loader"": ""fixedsize"", ""Transposed"": true } } },
-    ""fontgfx.1-2"": { // English/French fonts, regular & bold
-      ""Files"": {
-        ""Albion/CD/XLDLIBS/FONTS0.XLD#33906F62"": { // EN+FR
-          ""Loader"": ""fixedsize"",
-          ""Optional"": true,
-          ""Width"": 8,
-          ""Height"": 8
-        }
+  ""special.ItemNamesMultiLang"": {
+    ""Files"": {
+      ""Albion/CD/XLDLIBS/ITEMNAME.DAT"": {
+        ""Loader"": ""itemname"",
+        ""Container"": ""raw""
       }
-    },
-
-    ""tiledata.1-11"": {
-      ""Files"": {
-        ""Albion/CD/XLDLIBS/ICONDAT0.XLD"": {
-          ""Loader"": ""tileset"",
-          ""Map"": {
-            ""tiledata.1"": { ""UseSmallGraphics"": true },
-            ""tiledata.2"": { ""UseSmallGraphics"": true },
-            ""tiledata.4"": { ""UseSmallGraphics"": true }
-          }
-        }
-      }
-    },
-
-    ""pal.0"": {
-      ""Files"": {
-        ""Albion/CD/XLDLIBS/PALETTE.000"": {
-          ""IsCommon"": true,
-          ""Container"": ""raw"",
-          ""Loader"": ""pal"" 
-        }
-      }
-    },
-
-    ""pal.1-56"": {
-      ""Files"": {
-        ""Albion/CD/XLDLIBS/PALETTE0.XLD"": {
-          ""Loader"": ""pal"",
-          ""Map"": {
-            ""pal.1"":  { ""NightPalette"": ""pal.47"", ""AnimatedRanges"": ""0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf"" },
-            ""pal.2"":  { ""NightPalette"": ""pal.47"", ""AnimatedRanges"": ""0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf"" },
-            ""pal.3"":  { ""NightPalette"": ""pal.55"",  ""AnimatedRanges"": ""0x40-0x43, 0x44-0x4f"" },
-            ""pal.4"":  { ""NightPalette"": ""pal.48"" },
-            ""pal.6"":  { ""AnimatedRanges"": ""0xb0-0xb4, 0xb5-0xbf"" },
-            ""pal.14"": { ""NightPalette"": ""pal.49"", ""AnimatedRanges"": ""0xb0-0xb3, 0xb4-0xbf"" },
-            ""pal.15"": { ""AnimatedRanges"": ""0x58-0x5f"" },
-            ""pal.25"": { ""NightPalette"": ""pal.49"", ""AnimatedRanges"": ""0xb0-0xb3, 0xb4-0xbf"" },
-            ""pal.26"": { ""AnimatedRanges"": ""0xb4-0xb7, 0xb8-0xbb, 0xbc-0xbf"" },
-            ""pal.31"": { ""AnimatedRanges"": ""0x10-0x4f"" },
-            ""pal.47"": { ""AnimatedRanges"": ""0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf"" },
-            ""pal.49"": { ""AnimatedRanges"": ""0xb0-0xb3, 0xb4-0xbf"" },
-            ""pal.51"": { ""NightPalette"": ""pal.49"", ""AnimatedRanges"": ""0xb0-0xb3, 0xb4-0xbf"" },
-            ""pal.55"": { ""AnimatedRanges"": ""0x40-0x43, 0x44-0x4f"" }
-          }
-        }
-      }
-    },
-
-    ""spell.1-210"": { ""Files"": { ""Albion/CD/XLDLIBS/SPELLDAT.DAT"": { ""Loader"": ""spell"", ""Container"": ""spells"" } } },
-    ""coregfx.0-88"": {
-      ""Files"": {
-        ""Albion/MAIN.EXE#476227B0"": {}, // EN GOG, built Aug 22 1996
-        ""Albion/MAIN.EXE#9FC7ABCF"": {}, // EN, built Jul 25 1996
-        ""Albion/MAIN.EXE#487DA334"": {}, // FR
-        ""Albion/MAIN.EXE#EC6D6389"": {} // DE GOG ISO, built Dec 14 1995
-      },
-      ""Container"": ""binaryoffsets"",
-      ""Loader"": ""fixedsize"",
-      ""IsReadOnly"": true
     }
+  },
+  ""item.1-462"":        { ""Files"": { ""Albion/CD/XLDLIBS/ITEMLIST.DAT"": { ""Loader"": ""itemdata"", ""Container"": ""items"" } } },
+
+  ""block.1-11"":  { ""Files"": { ""Albion/CD/XLDLIBS/BLKLIST0.XLD"": { ""Loader"": ""block"" } } },
+  ""floor.200-299"":    { ""Files"": { ""Albion/CD/XLDLIBS/3DFLOOR2.XLD"": { ""Loader"": ""fixedsize"", ""Width"": 64, ""Height"": 64 } } },
+  ""combg.1-19"":       { ""Files"": { ""Albion/CD/XLDLIBS/COMBACK0.XLD"": { ""Loader"": ""fixedsize"", ""Width"": 360 } } },
+  ""tilegfx.1-11"": {
+    ""Files"": {
+      ""Albion/CD/XLDLIBS/ICONGFX0.XLD"": {
+        ""Loader"": ""tilegfx"",
+        ""Width"": 16,
+        ""Height"": 16,
+        ""Map"": {
+          ""tilegfx.1"":  { ""Palette"": ""pal.1"" },
+          ""tilegfx.2"":  { ""Palette"": ""pal.2"" },
+          ""tilegfx.3"":  { ""Palette"": ""pal.6"" },
+          ""tilegfx.4"":  { ""Palette"": ""pal.4"" },
+          ""tilegfx.5"":  { ""Palette"": ""pal.5"" },
+          ""tilegfx.6"":  { ""Palette"": ""pal.16"" },
+          ""tilegfx.7"":  { ""Palette"": ""pal.9"" },
+          ""tilegfx.8"":  { ""Palette"": ""pal.26"" },
+          ""tilegfx.9"":  { ""Palette"": ""pal.28"" },
+          ""tilegfx.10"": { ""Palette"": ""pal.45"" },
+          ""tilegfx.11"": { ""Palette"": ""pal.56"" }
+        }
+      }
+    }
+  },
+  ""comgfx.1-85"":      { ""Files"": { ""Albion/CD/XLDLIBS/COMGFX0.XLD"": {  ""Loader"": ""multiheader"", ""Palette"": ""pal.23"" } } },
+
+  ""utext.0-*"":      { ""Loader"": ""stringset"", ""FirstId"": ""utext.0"",    ""Target"": ""special.UAlbionStrings"" },
+  ""stext.0-777"":    { ""Loader"": ""stringset"", ""FirstId"": ""stext.0"",    ""Target"": ""special.SystemStrings"" },
+
+  ""autotile.1-2"": {
+    ""Files"": {
+      ""Albion/CD/XLDLIBS/AUTOGFX0.XLD"": {
+        ""Post"": ""atlas"",
+        ""Loader"": ""amorphous"",
+        ""Map"": {
+          ""autotile.1"": { ""SubSprites"": ""(8,8,576) (16,16)"", ""Palette"": ""pal.11"" },
+          ""autotile.2"": { ""SubSprites"": ""(8,8,576) (16,16)"", ""Palette"": ""pal.30"" }
+        }
+      }
+    }
+  },
+
+  ""3dobj.1-99"":       { ""Files"": { ""Albion/CD/XLDLIBS/3DOBJEC0.XLD"": { ""Loader"": ""fixedsize"" } } },
+  ""overlay.1-99"":     { ""Files"": { ""Albion/CD/XLDLIBS/3DOVERL0.XLD"": { ""Loader"": ""fixedsize"", ""Transposed"": true } } },
+  ""fontgfx.1-2"": { // English/French fonts, regular & bold
+    ""Files"": {
+      ""Albion/CD/XLDLIBS/FONTS0.XLD#33906F62"": { // EN+FR
+        ""Loader"": ""fixedsize"",
+        ""Optional"": true,
+        ""Width"": 8,
+        ""Height"": 8
+      }
+    }
+  },
+
+  ""tiledata.1-11"": {
+    ""Files"": {
+      ""Albion/CD/XLDLIBS/ICONDAT0.XLD"": {
+        ""Loader"": ""tileset"",
+        ""Map"": {
+          ""tiledata.1"": { ""UseSmallGraphics"": true },
+          ""tiledata.2"": { ""UseSmallGraphics"": true },
+          ""tiledata.4"": { ""UseSmallGraphics"": true }
+        }
+      }
+    }
+  },
+
+  ""pal.0"": {
+    ""Files"": {
+      ""Albion/CD/XLDLIBS/PALETTE.000"": {
+        ""IsCommon"": true,
+        ""Container"": ""raw"",
+        ""Loader"": ""pal"" 
+      }
+    }
+  },
+
+  ""pal.1-56"": {
+    ""Files"": {
+      ""Albion/CD/XLDLIBS/PALETTE0.XLD"": {
+        ""Loader"": ""pal"",
+        ""Map"": {
+          ""pal.1"":  { ""NightPalette"": ""pal.47"", ""AnimatedRanges"": ""0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf"" },
+          ""pal.2"":  { ""NightPalette"": ""pal.47"", ""AnimatedRanges"": ""0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf"" },
+          ""pal.3"":  { ""NightPalette"": ""pal.55"",  ""AnimatedRanges"": ""0x40-0x43, 0x44-0x4f"" },
+          ""pal.4"":  { ""NightPalette"": ""pal.48"" },
+          ""pal.6"":  { ""AnimatedRanges"": ""0xb0-0xb4, 0xb5-0xbf"" },
+          ""pal.14"": { ""NightPalette"": ""pal.49"", ""AnimatedRanges"": ""0xb0-0xb3, 0xb4-0xbf"" },
+          ""pal.15"": { ""AnimatedRanges"": ""0x58-0x5f"" },
+          ""pal.25"": { ""NightPalette"": ""pal.49"", ""AnimatedRanges"": ""0xb0-0xb3, 0xb4-0xbf"" },
+          ""pal.26"": { ""AnimatedRanges"": ""0xb4-0xb7, 0xb8-0xbb, 0xbc-0xbf"" },
+          ""pal.31"": { ""AnimatedRanges"": ""0x10-0x4f"" },
+          ""pal.47"": { ""AnimatedRanges"": ""0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf"" },
+          ""pal.49"": { ""AnimatedRanges"": ""0xb0-0xb3, 0xb4-0xbf"" },
+          ""pal.51"": { ""NightPalette"": ""pal.49"", ""AnimatedRanges"": ""0xb0-0xb3, 0xb4-0xbf"" },
+          ""pal.55"": { ""AnimatedRanges"": ""0x40-0x43, 0x44-0x4f"" }
+        }
+      }
+    }
+  },
+
+  ""spell.1-210"": { ""Files"": { ""Albion/CD/XLDLIBS/SPELLDAT.DAT"": { ""Loader"": ""spell"", ""Container"": ""spells"" } } },
+  ""coregfx.0-88"": {
+    ""Files"": {
+      ""Albion/MAIN.EXE#476227B0"": {}, // EN GOG, built Aug 22 1996
+      ""Albion/MAIN.EXE#9FC7ABCF"": {}, // EN, built Jul 25 1996
+      ""Albion/MAIN.EXE#487DA334"": {}, // FR
+      ""Albion/MAIN.EXE#EC6D6389"": {} // DE GOG ISO, built Dec 14 1995
+    },
+    ""Container"": ""binaryoffsets"",
+    ""Loader"": ""fixedsize"",
+    ""IsReadOnly"": true
   }
 }
 ";
@@ -290,6 +320,12 @@ public class AssetConfigTests : Component
                 Assert.Equal("item", t.Alias);
                 Assert.Equal(AssetType.Item, t.AssetType);
                 Assert.Equal("UAlbion.Base.Item, UAlbion.Base", t.EnumType);
+            },
+            t =>
+            {
+                Assert.Equal("itemname", t.Alias);
+                Assert.Equal(AssetType.ItemName, t.AssetType);
+                Assert.Equal("UAlbion.Base.ItemName, UAlbion.Base", t.EnumType);
             },
             t =>
             {
@@ -385,6 +421,11 @@ public class AssetConfigTests : Component
             {
                 Assert.Equal("itemname", l.Key);
                 Assert.Equal(typeof(ItemNameLoader), l.Value);
+            },
+            l =>
+            {
+                Assert.Equal("itemnameMeta", l.Key);
+                Assert.Equal(typeof(ItemNameMetaLoader), l.Value);
             },
             l =>
             {

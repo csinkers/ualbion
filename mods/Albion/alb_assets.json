@@ -400,7 +400,17 @@
     }
   },
 
-  "itemgfx.1": { "Files": { "Albion/CD/XLDLIBS/ITEMGFX": { "Loader": "fixedsize", "Container": "raw", "Width": 16, "Height": 16 } } },
+  "itemgfx.1": {
+    "Files": {
+      "Albion/CD/XLDLIBS/ITEMGFX": {
+        "Loader": "fixedsize",
+        "Container": "raw",
+        "Palette": "pal.0",
+        "Width": 16,
+        "Height": 16
+      }
+    }
+  },
   "uibg.1":    { "Files": { "Albion/CD/XLDLIBS/SLAB": { "Loader": "slab", "Container": "raw", "Width": 360 } } },
 
   "coregfx.0-88": {

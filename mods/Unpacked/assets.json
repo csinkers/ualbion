@@ -113,6 +113,7 @@
     "Container": "dir",
     "Loader": "pngsheet",
     "Width": 8,
+    "Height": 8,
     "Pattern": "{id}_{name}.png"
   },
 

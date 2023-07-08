@@ -324,14 +324,14 @@ public class ModApplier : Component, IModApplier
 
                     var language = node.GetProperty(AssetProps.Language);
                     var result = loaderFunc(assetId, language);
-                    if (result == null)
+                    if (result?.Asset == null)
                     {
                         // if (language == null || languages == null || languages.Contains(language))
                         {
                             // Automaps should only load for 3D maps, no need for 'not found' errors, also unmapped ids might be getting requested
                             // due to populating the full range of an XLD, as the ids aren't actually in use it's fine to ignore their absence.
                             if (assetId.Type != AssetType.Automap && AssetMapping.Global.IsMapped(assetId) && !AssetMapping.Global.IsAssetOptional(assetId))
-                                Error($"Could not load {assetId}");
+                                Error($"Could not load {assetId} {language}");
                         }
 
                         continue;

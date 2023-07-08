@@ -75,9 +75,17 @@ public sealed class AssetConverter : IDisposable
 
         AssetLoadResult LoaderFunc(AssetId assetId, string language)
         {
-            var result = cache.TryGetValue((assetId, language), out var cached)
-                ? cached
-                : cache[(assetId, language)] = _from.LoadAssetAndNode(assetId, language);
+            AssetLoadResult result;
+
+            if (cache.TryGetValue((assetId, language), out var cached))
+            {
+                result = cached;
+            }
+            else
+            {
+                result = _from.LoadAssetAndNode(assetId, language);
+                cache[(assetId, language)] = result;
+            }
 
             if (converter != null)
                 result = converter(result);

@@ -64,9 +64,12 @@ public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>> //
 
         var assets = Resolve<IAssetManager>();
         var paletteId = context.GetProperty(AssetProps.Palette);
+        if (paletteId.IsNone)
+            paletteId = (PaletteId)Base.Palette.Common;
+
         var palette = context.AssetId.Type == AssetType.FontGfx 
             ? FontDefinition.ExportPalette 
-            : assets.LoadPalette(new PaletteId(paletteId)).GetUnambiguousPalette();
+            : assets.LoadPalette(paletteId).GetUnambiguousPalette();
 
         if (s.IsWriting())
         {

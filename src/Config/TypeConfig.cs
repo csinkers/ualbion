@@ -81,7 +81,8 @@ public class TypeConfig // Defines the vocabulary to be used in assets.json file
 
         var (type, val) = SplitId(id, '.');
         if (val == null)
-            throw new FormatException("Asset IDs should consist of an alias type and value, separated by a '.' character");
+            throw new FormatException($"Asset IDs should consist of an alias type and value, separated by a '.' character (string was \"{id}\")");
+
         var enumType = ResolveIdType(type);
         return _mapping.EnumToId(enumType, val);
     }

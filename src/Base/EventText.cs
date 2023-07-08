@@ -231,4 +231,6 @@ public enum EventText : ushort
 
     Khunag2 = 989,
     Siobhan2 = 990,
+
+    Empty999 = 999
 }

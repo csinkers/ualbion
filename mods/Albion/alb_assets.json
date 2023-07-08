@@ -1,395 +1,393 @@
 {
-  "Mapping": {
-    "itemname.1-462": {
-      "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
-        "!GERMAN":  { "Language": "GERMAN" },
-        "!ENGLISH": { "Language": "ENGLISH" },
-        "!FRENCH":  { "Language": "FRENCH" }
-      },
-      "Loader": "stringset",
-      "FirstId": "itemname.1",
-      "Target": "special.ItemNames"
+  "itemname.1-462": {
+    "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
+      "!GERMAN":  { "Language": "GERMAN" },
+      "!ENGLISH": { "Language": "ENGLISH" },
+      "!FRENCH":  { "Language": "FRENCH" }
     },
+    "Loader": "stringset",
+    "FirstId": "itemname.1",
+    "Target": "special.ItemNames"
+  },
 
-    "stext.0-777": {
-      "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
-        "!GERMAN":  { "Language": "GERMAN" },
-        "!ENGLISH": { "Language": "ENGLISH" },
-        "!FRENCH":  { "Language": "FRENCH" }
-      },
-      "Loader": "stringset",
-      "FirstId": "stext.0",
-      "Target": "special.SystemStrings"
+  "stext.0-777": {
+    "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
+      "!GERMAN":  { "Language": "GERMAN" },
+      "!ENGLISH": { "Language": "ENGLISH" },
+      "!FRENCH":  { "Language": "FRENCH" }
     },
+    "Loader": "stringset",
+    "FirstId": "stext.0",
+    "Target": "special.SystemStrings"
+  },
 
-    "utext.0-*": {
-      "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
-        "!GERMAN":  { "Language": "GERMAN" },
-        "!ENGLISH": { "Language": "ENGLISH" },
-        "!FRENCH":  { "Language": "FRENCH" }
-      },
-      "Loader": "stringset",
-      "FirstId": "utext.0",
-      "Target": "special.UAlbionStrings"
+  "utext.0-*": {
+    "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
+      "!GERMAN":  { "Language": "GERMAN" },
+      "!ENGLISH": { "Language": "ENGLISH" },
+      "!FRENCH":  { "Language": "FRENCH" }
     },
+    "Loader": "stringset",
+    "FirstId": "utext.0",
+    "Target": "special.UAlbionStrings"
+  },
 
-    "word.0-499": {
-      "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
-        "!GERMAN":  { "Language": "GERMAN" },
-        "!ENGLISH": { "Language": "ENGLISH" },
-        "!FRENCH":  { "Language": "FRENCH" }
-      },
-      "Loader": "stringset",
-      "FirstId": "word.0",
-      "Target": "special.Words1"
+  "word.0-499": {
+    "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
+      "!GERMAN":  { "Language": "GERMAN" },
+      "!ENGLISH": { "Language": "ENGLISH" },
+      "!FRENCH":  { "Language": "FRENCH" }
     },
+    "Loader": "stringset",
+    "FirstId": "word.0",
+    "Target": "special.Words1"
+  },
 
-    "word.500-999": {
-      "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
-        "!GERMAN":  { "Language": "GERMAN" },
-        "!ENGLISH": { "Language": "ENGLISH" },
-        "!FRENCH":  { "Language": "FRENCH" }
-      },
-      "Loader": "stringset",
-      "FirstId": "word.500",
-      "Target": "special.Words2"
+  "word.500-999": {
+    "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
+      "!GERMAN":  { "Language": "GERMAN" },
+      "!ENGLISH": { "Language": "ENGLISH" },
+      "!FRENCH":  { "Language": "FRENCH" }
     },
+    "Loader": "stringset",
+    "FirstId": "word.500",
+    "Target": "special.Words2"
+  },
 
-    "word.1000-1499": {
-      "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
-        "!GERMAN":  { "Language": "GERMAN" },
-        "!ENGLISH": { "Language": "ENGLISH" },
-        "!FRENCH":  { "Language": "FRENCH" }
-      },
-      "Loader": "stringset",
-      "FirstId": "word.1000",
-      "Target": "special.Words3"
+  "word.1000-1499": {
+    "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
+      "!GERMAN":  { "Language": "GERMAN" },
+      "!ENGLISH": { "Language": "ENGLISH" },
+      "!FRENCH":  { "Language": "FRENCH" }
     },
+    "Loader": "stringset",
+    "FirstId": "word.1000",
+    "Target": "special.Words3"
+  },
 
-    "special.SoundBank": { "Files": { "Albion/DRIVERS/ALBISND.OPL": { "Container": "raw", "Loader": "soundbank" } } },
-    "special.ItemNames": { "Files": { "Albion/CD/XLDLIBS/ITEMNAME.DAT": { "Loader": "itemname", "Container": "raw" } } },
-    "special.UAlbionStrings": {
-      "Files": {
-        "GERMAN/strings.json":  { "Language": "GERMAN"  },
-        "ENGLISH/strings.json": { "Language": "ENGLISH" },
-        "FRENCH/strings.json":  { "Language": "FRENCH"  }
-      },
-      "Loader": "json",
-      "Container": "raw" 
+  "special.SoundBank": { "Files": { "Albion/DRIVERS/ALBISND.OPL": { "Container": "raw", "Loader": "soundbank" } } },
+  "special.ItemNames": { "Files": { "Albion/CD/XLDLIBS/ITEMNAME.DAT": { "Loader": "itemname", "Container": "raw" } } },
+  "special.UAlbionStrings": {
+    "Files": {
+      "GERMAN/strings.json":  { "Language": "GERMAN"  },
+      "ENGLISH/strings.json": { "Language": "ENGLISH" },
+      "FRENCH/strings.json":  { "Language": "FRENCH"  }
     },
+    "Loader": "json",
+    "Container": "raw" 
+  },
 
-    "special.SystemStrings": {
-      "Files": {
-        "Albion/CD/XLDLIBS/GERMAN/SYSTEXTS":  { "Language": "GERMAN"  },
-        "Albion/CD/XLDLIBS/ENGLISH/SYSTEXTS": { "Language": "ENGLISH" },
-        "Albion/CD/XLDLIBS/FRENCH/SYSTEXTS":  { "Language": "FRENCH"  }
-      },
-      "Loader": "stext",
-      "Container": "raw"
+  "special.SystemStrings": {
+    "Files": {
+      "Albion/CD/XLDLIBS/GERMAN/SYSTEXTS":  { "Language": "GERMAN"  },
+      "Albion/CD/XLDLIBS/ENGLISH/SYSTEXTS": { "Language": "ENGLISH" },
+      "Albion/CD/XLDLIBS/FRENCH/SYSTEXTS":  { "Language": "FRENCH"  }
     },
+    "Loader": "stext",
+    "Container": "raw"
+  },
 
-    "special.Words1-Words3": {
-      "Files": {
-        "Albion/CD/XLDLIBS/GERMAN/WORDLIS0.XLD":  { "Language": "GERMAN"  },
-        "Albion/CD/XLDLIBS/ENGLISH/WORDLIS0.XLD": { "Language": "ENGLISH" },
-        "Albion/CD/XLDLIBS/FRENCH/WORDLIS0.XLD":  { "Language": "FRENCH"  }
-      },
-      "Loader": "wordlist" 
+  "special.Words1-Words3": {
+    "Files": {
+      "Albion/CD/XLDLIBS/GERMAN/WORDLIS0.XLD":  { "Language": "GERMAN"  },
+      "Albion/CD/XLDLIBS/ENGLISH/WORDLIS0.XLD": { "Language": "ENGLISH" },
+      "Albion/CD/XLDLIBS/FRENCH/WORDLIS0.XLD":  { "Language": "FRENCH"  }
     },
+    "Loader": "wordlist" 
+  },
 
-    // Items
-    "item.1-462":        { "Files": { "Albion/CD/XLDLIBS/ITEMLIST.DAT": { "Loader": "itemdata", "Container": "items" } } },
+  // Items
+  "item.1-462":        { "Files": { "Albion/CD/XLDLIBS/ITEMLIST.DAT": { "Loader": "itemdata", "Container": "items" } } },
 
-    // Events
-    "eset.1-99":      { "Files": { "Albion/CD/XLDLIBS/EVNTSET0.XLD": { "Loader": "eset"   } } },
-    "eset.100-199":   { "Files": { "Albion/CD/XLDLIBS/EVNTSET1.XLD": { "Loader": "eset"   } } },
-    "eset.200-299":   { "Files": { "Albion/CD/XLDLIBS/EVNTSET2.XLD": { "Loader": "eset"   } } },
-    "eset.300-324":   { "Files": { "Albion/CD/XLDLIBS/EVNTSET3.XLD": { "Loader": "eset"   } } },
-    "eset.900-990":   { "Files": { "Albion/CD/XLDLIBS/EVNTSET9.XLD": { "Loader": "eset"   } } },
-    "script.1-62":    { "Files": { "Albion/CD/XLDLIBS/SCRIPT0.XLD":  { "Loader": "script" } } },
-    "script.200-211": { "Files": { "Albion/CD/XLDLIBS/SCRIPT2.XLD":  { "Loader": "script" } } },
+  // Events
+  "eset.1-99":      { "Files": { "Albion/CD/XLDLIBS/EVNTSET0.XLD": { "Loader": "eset"   } } },
+  "eset.100-199":   { "Files": { "Albion/CD/XLDLIBS/EVNTSET1.XLD": { "Loader": "eset"   } } },
+  "eset.200-299":   { "Files": { "Albion/CD/XLDLIBS/EVNTSET2.XLD": { "Loader": "eset"   } } },
+  "eset.300-324":   { "Files": { "Albion/CD/XLDLIBS/EVNTSET3.XLD": { "Loader": "eset"   } } },
+  "eset.900-999":   { "Files": { "Albion/CD/XLDLIBS/EVNTSET9.XLD": { "Loader": "eset"   } } },
+  "script.1-62":    { "Files": { "Albion/CD/XLDLIBS/SCRIPT0.XLD":  { "Loader": "script" } } },
+  "script.200-211": { "Files": { "Albion/CD/XLDLIBS/SCRIPT2.XLD":  { "Loader": "script" } } },
 
-    // Maps
-    "block.1-11":  { "Files": { "Albion/CD/XLDLIBS/BLKLIST0.XLD": { "Loader": "block" } } },
-    "lab.1-99":    { "Files": { "Albion/CD/XLDLIBS/LABDATA0.XLD": { "Loader": "lab", "MapFile": "Meta/LABDATA0.json" } } },
-    "lab.100-199": { "Files": { "Albion/CD/XLDLIBS/LABDATA1.XLD": { "Loader": "lab", "MapFile": "Meta/LABDATA1.json" } } },
-    "lab.200-210": { "Files": { "Albion/CD/XLDLIBS/LABDATA2.XLD": { "Loader": "lab", "MapFile": "Meta/LABDATA2.json" } } },
-    "map.100-199": { "Files": { "Albion/CD/XLDLIBS/MAPDATA1.XLD": { "Loader": "map" } } },
-    "map.200-299": { "Files": { "Albion/CD/XLDLIBS/MAPDATA2.XLD": { "Loader": "map" } } },
-    "map.300-399": { "Files": { "Albion/CD/XLDLIBS/MAPDATA3.XLD": { "Loader": "map" } } },
+  // Maps
+  "block.1-11":  { "Files": { "Albion/CD/XLDLIBS/BLKLIST0.XLD": { "Loader": "block" } } },
+  "lab.1-99":    { "Files": { "Albion/CD/XLDLIBS/LABDATA0.XLD": { "Loader": "lab", "MapFile": "Meta/LABDATA0.json" } } },
+  "lab.100-199": { "Files": { "Albion/CD/XLDLIBS/LABDATA1.XLD": { "Loader": "lab", "MapFile": "Meta/LABDATA1.json" } } },
+  "lab.200-210": { "Files": { "Albion/CD/XLDLIBS/LABDATA2.XLD": { "Loader": "lab", "MapFile": "Meta/LABDATA2.json" } } },
+  "map.100-199": { "Files": { "Albion/CD/XLDLIBS/MAPDATA1.XLD": { "Loader": "map" } } },
+  "map.200-299": { "Files": { "Albion/CD/XLDLIBS/MAPDATA2.XLD": { "Loader": "map" } } },
+  "map.300-399": { "Files": { "Albion/CD/XLDLIBS/MAPDATA3.XLD": { "Loader": "map" } } },
 
-    "tiledata.1-11": {
-      "Files": {
-        "Albion/CD/XLDLIBS/ICONDAT0.XLD": {
-          "Loader": "tileset",
-          "Map": {
-            "tiledata.1": { "UseSmallGraphics": true },
-            "tiledata.2": { "UseSmallGraphics": true },
-            "tiledata.4": { "UseSmallGraphics": true }
-          }
+  "tiledata.1-11": {
+    "Files": {
+      "Albion/CD/XLDLIBS/ICONDAT0.XLD": {
+        "Loader": "tileset",
+        "Map": {
+          "tiledata.1": { "UseSmallGraphics": true },
+          "tiledata.2": { "UseSmallGraphics": true },
+          "tiledata.4": { "UseSmallGraphics": true }
         }
       }
-    },
-
-    // Monster info
-    "monster.1-59":    { "Files": { "Albion/CD/XLDLIBS/MONCHAR0.XLD": { "Loader": "sheet" } } },
-    "mongrp.1-99":     { "Files": { "Albion/CD/XLDLIBS/MONGRP0.XLD": {  "Loader": "mongrp" } } },
-    "mongrp.100-199":  { "Files": { "Albion/CD/XLDLIBS/MONGRP1.XLD": {  "Loader": "mongrp" } } },
-    "mongrp.200-251":  { "Files": { "Albion/CD/XLDLIBS/MONGRP2.XLD": {  "Loader": "mongrp" } } },
-
-    // Palettes
-    "pal.0": {
-      "Files": {
-        "Albion/CD/XLDLIBS/PALETTE.000": {
-          "IsCommon": true,
-          "Container": "raw",
-          "Loader": "pal" 
-        }
-      }
-    },
-
-    "pal.1-56": {
-      "Files": {
-        "Albion/CD/XLDLIBS/PALETTE0.XLD": {
-          "Loader": "pal",
-          "Map": {
-            "pal.1":  { "NightPalette": "pal.47", "AnimatedRanges": "0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf" },
-            "pal.2":  { "NightPalette": "pal.47", "AnimatedRanges": "0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf" },
-            "pal.3":  { "NightPalette": "pal.55",  "AnimatedRanges": "0x40-0x43, 0x44-0x4f" },
-            "pal.4":  { "NightPalette": "pal.48" },
-            "pal.6":  { "AnimatedRanges": "0xb0-0xb4, 0xb5-0xbf" },
-            "pal.14": { "NightPalette": "pal.49", "AnimatedRanges": "0xb0-0xb3, 0xb4-0xbf" },
-            "pal.15": { "AnimatedRanges": "0x58-0x5f" },
-            "pal.25": { "NightPalette": "pal.49", "AnimatedRanges": "0xb0-0xb3, 0xb4-0xbf" },
-            "pal.26": { "AnimatedRanges": "0xb4-0xb7, 0xb8-0xbb, 0xbc-0xbf" },
-            "pal.31": { "AnimatedRanges": "0x10-0x4f" },
-            "pal.47": { "AnimatedRanges": "0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf" },
-            "pal.49": { "AnimatedRanges": "0xb0-0xb3, 0xb4-0xbf" },
-            "pal.51": { "NightPalette": "pal.49", "AnimatedRanges": "0xb0-0xb3, 0xb4-0xbf" },
-            "pal.55": { "AnimatedRanges": "0x40-0x43, 0x44-0x4f" }
-          }
-        }
-      }
-    },
-
-    // Fonts
-    "fontgfx.1-2": { // English/French fonts, regular & bold
-      "Files": {
-        "Albion/CD/XLDLIBS/FONTS0.XLD#33906F62": { // EN+FR
-          "Loader": "fixedsize",
-          "Optional": true,
-          "Width": 8,
-          "Height": 8
-        }
-      }
-    },
-    "fontgfx.4-5": { // German fonts
-      "Files": {
-        "Albion/CD/XLDLIBS/FONTS0.XLD#A70E9601": { // DE
-          "Loader": "fixedsize",
-          "Optional": true,
-          "Width": 8,
-          "Height": 8
-        }
-      }
-    },
-
-    // Audio
-    "sample.1-99":    { "Files": { "Albion/CD/XLDLIBS/SAMPLES0.XLD": { "Loader": "sample" } } }, // TODO: Add mapping for NPC sound id -> sample id
-    "sample.100-199": { "Files": { "Albion/CD/XLDLIBS/SAMPLES1.XLD": { "Loader": "sample" } } },
-    "sample.200-299": { "Files": { "Albion/CD/XLDLIBS/SAMPLES2.XLD": { "Loader": "sample" } } },
-    "song.1-99":      { "Files": { "Albion/CD/XLDLIBS/SONGS0.XLD": {   "Loader": "song"   } } }, // TODO: Add mapping for song -> ambient song id
-    "wavlib.1-99":    { "Files": { "Albion/CD/XLDLIBS/WAVELIB0.XLD": { "Loader": "wavlib" } } },
-
-    // Videos
-    "vid.1-99": {
-      "Loader": "flic",
-      "Files": {
-        "Albion/CD/XLDLIBS/GERMAN/FLICS0.XLD":  { "Language": "GERMAN" },
-        "Albion/CD/XLDLIBS/ENGLISH/FLICS0.XLD": { "Language": "ENGLISH" },
-        "Albion/CD/XLDLIBS/FRENCH/FLICS0.XLD":  { "Language": "FRENCH" }
-      }
-    },
-
-    // Event Text
-    "etext.1-99": {
-      "Loader": "stringtable",
-      "Files": {
-        "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT0.XLD": { "Language": "ENGLISH" },
-        "Albion/CD/XLDLIBS/FRENCH/EVNTTXT0.XLD":  { "Language": "FRENCH" },
-        "Albion/CD/XLDLIBS/GERMAN/EVNTTXT0.XLD":  { "Language": "GERMAN" }
-      }
-    },
-    "etext.100-199": {
-      "Loader": "stringtable",
-      "Files": {
-        "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT1.XLD": { "Language": "ENGLISH" },
-        "Albion/CD/XLDLIBS/FRENCH/EVNTTXT1.XLD":  { "Language": "FRENCH" },
-        "Albion/CD/XLDLIBS/GERMAN/EVNTTXT1.XLD":  { "Language": "GERMAN" }
-      }
-    },
-    "etext.200-299": {
-      "Loader": "stringtable",
-      "Files": {
-        "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT2.XLD": { "Language": "ENGLISH" },
-        "Albion/CD/XLDLIBS/FRENCH/EVNTTXT2.XLD":  { "Language": "FRENCH" },
-        "Albion/CD/XLDLIBS/GERMAN/EVNTTXT2.XLD":  { "Language": "GERMAN" }
-      }
-    },
-    "etext.300-399": {
-      "Loader": "stringtable",
-      "Files": {
-        "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT3.XLD": { "Language": "ENGLISH" },
-        "Albion/CD/XLDLIBS/FRENCH/EVNTTXT3.XLD":  { "Language": "FRENCH" },
-        "Albion/CD/XLDLIBS/GERMAN/EVNTTXT3.XLD":  { "Language": "GERMAN" }
-      }
-    },
-    "etext.900-999": {
-      "Loader": "stringtable",
-      "Files": {
-        "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT9.XLD": { "Language": "ENGLISH" },
-        "Albion/CD/XLDLIBS/FRENCH/EVNTTXT9.XLD":  { "Language": "FRENCH" },
-        "Albion/CD/XLDLIBS/GERMAN/EVNTTXT9.XLD":  { "Language": "GERMAN" }
-      }
-    },
-
-    // Map Text
-    "mtext.100-199": {
-      "Loader": "stringtable",
-      "Files": {
-        "Albion/CD/XLDLIBS/ENGLISH/MAPTEXT1.XLD": { "Language": "ENGLISH" },
-        "Albion/CD/XLDLIBS/FRENCH/MAPTEXT1.XLD":  { "Language": "FRENCH" },
-        "Albion/CD/XLDLIBS/GERMAN/MAPTEXT1.XLD":  { "Language": "GERMAN" }
-      }
-    },
-    "mtext.200-299": {
-      "Loader": "stringtable",
-      "Files": {
-        "Albion/CD/XLDLIBS/ENGLISH/MAPTEXT2.XLD": { "Language": "ENGLISH" },
-        "Albion/CD/XLDLIBS/FRENCH/MAPTEXT2.XLD":  { "Language": "FRENCH" },
-        "Albion/CD/XLDLIBS/GERMAN/MAPTEXT2.XLD":  { "Language": "GERMAN" }
-      }
-    },
-    "mtext.300-399": {
-      "Loader": "stringtable",
-      "Files": {
-        "Albion/CD/XLDLIBS/ENGLISH/MAPTEXT3.XLD": { "Language": "ENGLISH" },
-        "Albion/CD/XLDLIBS/FRENCH/MAPTEXT3.XLD":  { "Language": "FRENCH" },
-        "Albion/CD/XLDLIBS/GERMAN/MAPTEXT3.XLD":  { "Language": "GERMAN" }
-      }
-    },
-
-    // Spells
-    "spell.1-210": { "Files": { "Albion/CD/XLDLIBS/SPELLDAT.DAT": { "Loader": "spell", "Container": "spells", "MapFile": "Meta/SPELLDAT.json" } } },
-
-    // Initial game state data
-    "automap.100-199":  { "Files": { "Albion/CD/XLDLIBS/INITIAL/AUTOMAP1.XLD": { "Loader": "automap" } } },
-    "automap.200-299":  { "Files": { "Albion/CD/XLDLIBS/INITIAL/AUTOMAP2.XLD": { "Loader": "automap" } } },
-    "automap.300-399":  { "Files": { "Albion/CD/XLDLIBS/INITIAL/AUTOMAP3.XLD": { "Loader": "automap" } } },
-    "chest.1-99":       { "Files": { "Albion/CD/XLDLIBS/INITIAL/CHESTDT0.XLD": { "Loader": "chest" } } },
-    "chest.100-199":    { "Files": { "Albion/CD/XLDLIBS/INITIAL/CHESTDT1.XLD": { "Loader": "chest" } } },
-    "chest.200-299":    { "Files": { "Albion/CD/XLDLIBS/INITIAL/CHESTDT2.XLD": { "Loader": "chest" } } },
-    "chest.500-574":    { "Files": { "Albion/CD/XLDLIBS/INITIAL/CHESTDT5.XLD": { "Loader": "chest" } } },
-    "merchant.1":       { "Files": { "Albion/CD/XLDLIBS/INITIAL/MERCHDT0.XLD": { "Loader": "merchant" } } },
-    "merchant.100-109": { "Files": { "Albion/CD/XLDLIBS/INITIAL/MERCHDT1.XLD": { "Loader": "merchant" } } },
-    "merchant.200-210": { "Files": { "Albion/CD/XLDLIBS/INITIAL/MERCHDT2.XLD": { "Loader": "merchant" } } },
-    "npc.1-99":         { "Files": { "Albion/CD/XLDLIBS/INITIAL/NPCCHAR0.XLD": { "Loader": "sheet" } } },
-    "npc.100-199":      { "Files": { "Albion/CD/XLDLIBS/INITIAL/NPCCHAR1.XLD": { "Loader": "sheet" } } },
-    "npc.200-299":      { "Files": { "Albion/CD/XLDLIBS/INITIAL/NPCCHAR2.XLD": { "Loader": "sheet" } } },
-    "psheet.1-59":      { "Files": { "Albion/CD/XLDLIBS/INITIAL/PRTCHAR0.XLD": { "Loader": "sheet" } } },
-    "psheet.100-199":   { "Files": { "Albion/CD/XLDLIBS/INITIAL/PRTCHAR1.XLD": { "Loader": "sheet" } } },
-    "psheet.200-299":   { "Files": { "Albion/CD/XLDLIBS/INITIAL/PRTCHAR2.XLD": { "Loader": "sheet" } } },
-
-    // Graphics
-    "floor.1-99":       { "Files": { "Albion/CD/XLDLIBS/3DFLOOR0.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "MapFile": "Meta/3DFLOOR0.json" } } },
-    "floor.100-199":    { "Files": { "Albion/CD/XLDLIBS/3DFLOOR1.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "MapFile": "Meta/3DFLOOR1.json" } } },
-    "floor.200-299":    { "Files": { "Albion/CD/XLDLIBS/3DFLOOR2.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "MapFile": "Meta/3DFLOOR2.json" } } },
-    "combg.1-19":       { "Files": { "Albion/CD/XLDLIBS/COMBACK0.XLD": { "Loader": "fixedsize", "Width": 360, "MapFile": "Meta/COMBACK0.json" } } },
-    "comgfx.1-85":      { "Files": { "Albion/CD/XLDLIBS/COMGFX0.XLD": {  "Loader": "multiheader", "Palette": "pal.23" } } },
-    "pinvgfx.1":        { "Files": { "Albion/CD/XLDLIBS/FBODPIX0.XLD": { "Loader": "header", "Palette": "pal.19" } } },
-    "mongfx.1-60":      { "Files": { "Albion/CD/XLDLIBS/MONGFX0.XLD": {  "Loader": "multiheader", "Palette": "pal.24", "MapFile": "Meta/MONGFX0.json" } } },
-    "npclarge.1-99":    { "Files": { "Albion/CD/XLDLIBS/NPCGR0.XLD": {   "Loader": "header", "MapFile": "Meta/NPCGR0.json" } } },
-    "npclarge.100-199": { "Files": { "Albion/CD/XLDLIBS/NPCGR1.XLD": {   "Loader": "header", "MapFile": "Meta/NPCGR1.json" } } },
-    "npcsmall.1-29":    { "Files": { "Albion/CD/XLDLIBS/NPCKL0.XLD": {   "Loader": "header", "Palette": "pal.1", "Map": { "npcsmall.28": { "Palette": "pal.4" } } } } },
-    "plarge.1-10":      { "Files": { "Albion/CD/XLDLIBS/PARTGR0.XLD": {  "Loader": "header", "Palette": "pal.20" } } },
-    "psmall.1-10":      { "Files": { "Albion/CD/XLDLIBS/PARTKL0.XLD": {  "Loader": "header", "Palette": "pal.1" } } },
-    "portrait.1-99":    { "Files": { "Albion/CD/XLDLIBS/SMLPORT0.XLD": { "Loader": "fixedsize", "Width": 34 } } },
-    "portrait.100-175": { "Files": { "Albion/CD/XLDLIBS/SMLPORT1.XLD": { "Loader": "fixedsize", "Width": 34 } } },
-    "tacgfx.1-72":      { "Files": { "Albion/CD/XLDLIBS/TACTICO0.XLD": { "Loader": "fixedsize", "Width": 32 } } },
-    "pic.1-45":         { "Files": { "Albion/CD/XLDLIBS/PICTURE0.XLD": { "Loader": "interlaced", "IsReadOnly": true } } },
-    "3dobj.1-99":       { "Files": { "Albion/CD/XLDLIBS/3DOBJEC0.XLD": { "Loader": "fixedsize", "MapFile": "Meta/3DOBJEC0.json" } } },
-    "3dobj.100-199":    { "Files": { "Albion/CD/XLDLIBS/3DOBJEC1.XLD": { "Loader": "fixedsize", "MapFile": "Meta/3DOBJEC1.json" } } },
-    "3dobj.200-299":    { "Files": { "Albion/CD/XLDLIBS/3DOBJEC2.XLD": { "Loader": "fixedsize", "MapFile": "Meta/3DOBJEC2.json" } } },
-    "3dobj.300-399":    { "Files": { "Albion/CD/XLDLIBS/3DOBJEC3.XLD": { "Loader": "fixedsize", "MapFile": "Meta/3DOBJEC3.json" } } },
-    "overlay.1-99":     { "Files": { "Albion/CD/XLDLIBS/3DOVERL0.XLD": { "Loader": "fixedsize", "Transposed": true, "MapFile": "Meta/3DOVERL0.json" } } },
-    "overlay.100-199":  { "Files": { "Albion/CD/XLDLIBS/3DOVERL1.XLD": { "Loader": "fixedsize", "Transposed": true, "MapFile": "Meta/3DOVERL1.json" } } },
-    "overlay.200-299":  { "Files": { "Albion/CD/XLDLIBS/3DOVERL2.XLD": { "Loader": "fixedsize", "Transposed": true, "MapFile": "Meta/3DOVERL2.json" } } },
-    "wall.1-99":        { "Files": { "Albion/CD/XLDLIBS/3DWALLS0.XLD": { "Loader": "fixedsize", "Transposed": true, "MapFile": "Meta/3DWALLS0.json" } } },
-    "wall.100-199":     { "Files": { "Albion/CD/XLDLIBS/3DWALLS1.XLD": { "Loader": "fixedsize", "Transposed": true, "MapFile": "Meta/3DWALLS1.json" } } },
-
-    "3dbg.1-3": {
-      "Files": {
-        "Albion/CD/XLDLIBS/3DBCKGR0.XLD": {
-          "Loader": "header",
-          "Map": {
-            "3dbg.1": { "Palette": "pal.3" },
-            "3dbg.2": { "Palette": "pal.3" },
-            "3dbg.3": { "Palette": "pal.25" }
-          }
-        }
-      }
-    },
-
-    "autotile.1-2": {
-      "Files": {
-        "Albion/CD/XLDLIBS/AUTOGFX0.XLD": {
-          "Post": "atlas",
-          "Loader": "amorphous",
-          "Map": {
-            "autotile.1": { "SubSprites": "(8,8,576) (16,16)", "Palette": "pal.11" },
-            "autotile.2": { "SubSprites": "(8,8,576) (16,16)", "Palette": "pal.30" }
-          }
-        }
-      }
-    },
-
-    "tilegfx.1-11": {
-      "Files": {
-        "Albion/CD/XLDLIBS/ICONGFX0.XLD": {
-          "Loader": "tilegfx",
-          "Width": 16,
-          "Height": 16,
-          "Map": {
-            "tilegfx.1":  { "Palette": "pal.1" },
-            "tilegfx.2":  { "Palette": "pal.2" },
-            "tilegfx.3":  { "Palette": "pal.6" },
-            "tilegfx.4":  { "Palette": "pal.4" },
-            "tilegfx.5":  { "Palette": "pal.5" },
-            "tilegfx.6":  { "Palette": "pal.16" },
-            "tilegfx.7":  { "Palette": "pal.9" },
-            "tilegfx.8":  { "Palette": "pal.26" },
-            "tilegfx.9":  { "Palette": "pal.28" },
-            "tilegfx.10": { "Palette": "pal.45" },
-            "tilegfx.11": { "Palette": "pal.56" }
-          }
-        }
-      }
-    },
-
-    "itemgfx.1": { "Files": { "Albion/CD/XLDLIBS/ITEMGFX": { "Loader": "fixedsize", "Container": "raw", "Width": 16, "Height": 16 } } },
-    "uibg.1":    { "Files": { "Albion/CD/XLDLIBS/SLAB": { "Loader": "slab", "Container": "raw", "Width": 360 } } },
-
-    "coregfx.0-88": {
-      "Files": {
-        "Albion/MAIN.EXE#476227B0": { "MapFile": "Meta/MainExe.json" }, // EN GOG, built Aug 22 1996
-        "Albion/MAIN.EXE#9FC7ABCF": { "MapFile": "Meta/MainExe.json" }, // EN, built Jul 25 1996
-        "Albion/MAIN.EXE#487DA334": { "MapFile": "Meta/MainExe.json" }, // FR
-        "Albion/MAIN.EXE#EC6D6389": { "MapFile": "Meta/MainExe_DE.json" } // DE GOG ISO, built Dec 14 1995
-      },
-      "Container": "binaryoffsets",
-      "Loader": "fixedsize",
-      "IsReadOnly": true
     }
+  },
+
+  // Monster info
+  "monster.1-59":    { "Files": { "Albion/CD/XLDLIBS/MONCHAR0.XLD": { "Loader": "sheet" } } },
+  "mongrp.1-99":     { "Files": { "Albion/CD/XLDLIBS/MONGRP0.XLD": {  "Loader": "mongrp" } } },
+  "mongrp.100-199":  { "Files": { "Albion/CD/XLDLIBS/MONGRP1.XLD": {  "Loader": "mongrp" } } },
+  "mongrp.200-251":  { "Files": { "Albion/CD/XLDLIBS/MONGRP2.XLD": {  "Loader": "mongrp" } } },
+
+  // Palettes
+  "pal.0": {
+    "Files": {
+      "Albion/CD/XLDLIBS/PALETTE.000": {
+        "IsCommon": true,
+        "Container": "raw",
+        "Loader": "pal" 
+      }
+    }
+  },
+
+  "pal.1-56": {
+    "Files": {
+      "Albion/CD/XLDLIBS/PALETTE0.XLD": {
+        "Loader": "pal",
+        "Map": {
+          "pal.1":  { "NightPalette": "pal.47", "AnimatedRanges": "0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf" },
+          "pal.2":  { "NightPalette": "pal.47", "AnimatedRanges": "0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf" },
+          "pal.3":  { "NightPalette": "pal.55",  "AnimatedRanges": "0x40-0x43, 0x44-0x4f" },
+          "pal.4":  { "NightPalette": "pal.48" },
+          "pal.6":  { "AnimatedRanges": "0xb0-0xb4, 0xb5-0xbf" },
+          "pal.14": { "NightPalette": "pal.49", "AnimatedRanges": "0xb0-0xb3, 0xb4-0xbf" },
+          "pal.15": { "AnimatedRanges": "0x58-0x5f" },
+          "pal.25": { "NightPalette": "pal.49", "AnimatedRanges": "0xb0-0xb3, 0xb4-0xbf" },
+          "pal.26": { "AnimatedRanges": "0xb4-0xb7, 0xb8-0xbb, 0xbc-0xbf" },
+          "pal.31": { "AnimatedRanges": "0x10-0x4f" },
+          "pal.47": { "AnimatedRanges": "0x99-0x9f, 0xb0-0xb4, 0xb5-0xbf" },
+          "pal.49": { "AnimatedRanges": "0xb0-0xb3, 0xb4-0xbf" },
+          "pal.51": { "NightPalette": "pal.49", "AnimatedRanges": "0xb0-0xb3, 0xb4-0xbf" },
+          "pal.55": { "AnimatedRanges": "0x40-0x43, 0x44-0x4f" }
+        }
+      }
+    }
+  },
+
+  // Fonts
+  "fontgfx.1-2": { // English/French fonts, regular & bold
+    "Files": {
+      "Albion/CD/XLDLIBS/FONTS0.XLD#33906F62": { // EN+FR
+        "Loader": "fixedsize",
+        "Optional": true,
+        "Width": 8,
+        "Height": 8
+      }
+    }
+  },
+  "fontgfx.4-5": { // German fonts
+    "Files": {
+      "Albion/CD/XLDLIBS/FONTS0.XLD#A70E9601": { // DE
+        "Loader": "fixedsize",
+        "Optional": true,
+        "Width": 8,
+        "Height": 8
+      }
+    }
+  },
+
+  // Audio
+  "sample.1-99":    { "Files": { "Albion/CD/XLDLIBS/SAMPLES0.XLD": { "Loader": "sample" } } }, // TODO: Add mapping for NPC sound id -> sample id
+  "sample.100-199": { "Files": { "Albion/CD/XLDLIBS/SAMPLES1.XLD": { "Loader": "sample" } } },
+  "sample.200-299": { "Files": { "Albion/CD/XLDLIBS/SAMPLES2.XLD": { "Loader": "sample" } } },
+  "song.1-99":      { "Files": { "Albion/CD/XLDLIBS/SONGS0.XLD": {   "Loader": "song"   } } }, // TODO: Add mapping for song -> ambient song id
+  "wavlib.1-99":    { "Files": { "Albion/CD/XLDLIBS/WAVELIB0.XLD": { "Loader": "wavlib" } } },
+
+  // Videos
+  "vid.1-99": {
+    "Loader": "flic",
+    "Files": {
+      "Albion/CD/XLDLIBS/GERMAN/FLICS0.XLD":  { "Language": "GERMAN" },
+      "Albion/CD/XLDLIBS/ENGLISH/FLICS0.XLD": { "Language": "ENGLISH" },
+      "Albion/CD/XLDLIBS/FRENCH/FLICS0.XLD":  { "Language": "FRENCH" }
+    }
+  },
+
+  // Event Text
+  "etext.1-99": {
+    "Loader": "stringtable",
+    "Files": {
+      "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT0.XLD": { "Language": "ENGLISH" },
+      "Albion/CD/XLDLIBS/FRENCH/EVNTTXT0.XLD":  { "Language": "FRENCH" },
+      "Albion/CD/XLDLIBS/GERMAN/EVNTTXT0.XLD":  { "Language": "GERMAN" }
+    }
+  },
+  "etext.100-199": {
+    "Loader": "stringtable",
+    "Files": {
+      "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT1.XLD": { "Language": "ENGLISH" },
+      "Albion/CD/XLDLIBS/FRENCH/EVNTTXT1.XLD":  { "Language": "FRENCH" },
+      "Albion/CD/XLDLIBS/GERMAN/EVNTTXT1.XLD":  { "Language": "GERMAN" }
+    }
+  },
+  "etext.200-299": {
+    "Loader": "stringtable",
+    "Files": {
+      "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT2.XLD": { "Language": "ENGLISH" },
+      "Albion/CD/XLDLIBS/FRENCH/EVNTTXT2.XLD":  { "Language": "FRENCH" },
+      "Albion/CD/XLDLIBS/GERMAN/EVNTTXT2.XLD":  { "Language": "GERMAN" }
+    }
+  },
+  "etext.300-399": {
+    "Loader": "stringtable",
+    "Files": {
+      "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT3.XLD": { "Language": "ENGLISH" },
+      "Albion/CD/XLDLIBS/FRENCH/EVNTTXT3.XLD":  { "Language": "FRENCH" },
+      "Albion/CD/XLDLIBS/GERMAN/EVNTTXT3.XLD":  { "Language": "GERMAN" }
+    }
+  },
+  "etext.900-999": {
+    "Loader": "stringtable",
+    "Files": {
+      "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT9.XLD": { "Language": "ENGLISH" },
+      "Albion/CD/XLDLIBS/FRENCH/EVNTTXT9.XLD":  { "Language": "FRENCH" },
+      "Albion/CD/XLDLIBS/GERMAN/EVNTTXT9.XLD":  { "Language": "GERMAN" }
+    }
+  },
+
+  // Map Text
+  "mtext.100-199": {
+    "Loader": "stringtable",
+    "Files": {
+      "Albion/CD/XLDLIBS/ENGLISH/MAPTEXT1.XLD": { "Language": "ENGLISH" },
+      "Albion/CD/XLDLIBS/FRENCH/MAPTEXT1.XLD":  { "Language": "FRENCH" },
+      "Albion/CD/XLDLIBS/GERMAN/MAPTEXT1.XLD":  { "Language": "GERMAN" }
+    }
+  },
+  "mtext.200-299": {
+    "Loader": "stringtable",
+    "Files": {
+      "Albion/CD/XLDLIBS/ENGLISH/MAPTEXT2.XLD": { "Language": "ENGLISH" },
+      "Albion/CD/XLDLIBS/FRENCH/MAPTEXT2.XLD":  { "Language": "FRENCH" },
+      "Albion/CD/XLDLIBS/GERMAN/MAPTEXT2.XLD":  { "Language": "GERMAN" }
+    }
+  },
+  "mtext.300-399": {
+    "Loader": "stringtable",
+    "Files": {
+      "Albion/CD/XLDLIBS/ENGLISH/MAPTEXT3.XLD": { "Language": "ENGLISH" },
+      "Albion/CD/XLDLIBS/FRENCH/MAPTEXT3.XLD":  { "Language": "FRENCH" },
+      "Albion/CD/XLDLIBS/GERMAN/MAPTEXT3.XLD":  { "Language": "GERMAN" }
+    }
+  },
+
+  // Spells
+  "spell.1-210": { "Files": { "Albion/CD/XLDLIBS/SPELLDAT.DAT": { "Loader": "spell", "Container": "spells", "MapFile": "Meta/SPELLDAT.json" } } },
+
+  // Initial game state data
+  "automap.100-199":  { "Files": { "Albion/CD/XLDLIBS/INITIAL/AUTOMAP1.XLD": { "Loader": "automap" } } },
+  "automap.200-299":  { "Files": { "Albion/CD/XLDLIBS/INITIAL/AUTOMAP2.XLD": { "Loader": "automap" } } },
+  "automap.300-399":  { "Files": { "Albion/CD/XLDLIBS/INITIAL/AUTOMAP3.XLD": { "Loader": "automap" } } },
+  "chest.1-99":       { "Files": { "Albion/CD/XLDLIBS/INITIAL/CHESTDT0.XLD": { "Loader": "chest" } } },
+  "chest.100-199":    { "Files": { "Albion/CD/XLDLIBS/INITIAL/CHESTDT1.XLD": { "Loader": "chest" } } },
+  "chest.200-299":    { "Files": { "Albion/CD/XLDLIBS/INITIAL/CHESTDT2.XLD": { "Loader": "chest" } } },
+  "chest.500-574":    { "Files": { "Albion/CD/XLDLIBS/INITIAL/CHESTDT5.XLD": { "Loader": "chest" } } },
+  "merchant.1":       { "Files": { "Albion/CD/XLDLIBS/INITIAL/MERCHDT0.XLD": { "Loader": "merchant" } } },
+  "merchant.100-109": { "Files": { "Albion/CD/XLDLIBS/INITIAL/MERCHDT1.XLD": { "Loader": "merchant" } } },
+  "merchant.200-210": { "Files": { "Albion/CD/XLDLIBS/INITIAL/MERCHDT2.XLD": { "Loader": "merchant" } } },
+  "npc.1-99":         { "Files": { "Albion/CD/XLDLIBS/INITIAL/NPCCHAR0.XLD": { "Loader": "sheet" } } },
+  "npc.100-199":      { "Files": { "Albion/CD/XLDLIBS/INITIAL/NPCCHAR1.XLD": { "Loader": "sheet" } } },
+  "npc.200-299":      { "Files": { "Albion/CD/XLDLIBS/INITIAL/NPCCHAR2.XLD": { "Loader": "sheet" } } },
+  "psheet.1-59":      { "Files": { "Albion/CD/XLDLIBS/INITIAL/PRTCHAR0.XLD": { "Loader": "sheet" } } },
+  "psheet.100-199":   { "Files": { "Albion/CD/XLDLIBS/INITIAL/PRTCHAR1.XLD": { "Loader": "sheet" } } },
+  "psheet.200-299":   { "Files": { "Albion/CD/XLDLIBS/INITIAL/PRTCHAR2.XLD": { "Loader": "sheet" } } },
+
+  // Graphics
+  "floor.1-99":       { "Files": { "Albion/CD/XLDLIBS/3DFLOOR0.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "MapFile": "Meta/3DFLOOR0.json" } } },
+  "floor.100-199":    { "Files": { "Albion/CD/XLDLIBS/3DFLOOR1.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "MapFile": "Meta/3DFLOOR1.json" } } },
+  "floor.200-299":    { "Files": { "Albion/CD/XLDLIBS/3DFLOOR2.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "MapFile": "Meta/3DFLOOR2.json" } } },
+  "combg.1-19":       { "Files": { "Albion/CD/XLDLIBS/COMBACK0.XLD": { "Loader": "fixedsize", "Width": 360, "MapFile": "Meta/COMBACK0.json" } } },
+  "comgfx.1-85":      { "Files": { "Albion/CD/XLDLIBS/COMGFX0.XLD": {  "Loader": "multiheader", "Palette": "pal.23" } } },
+  "pinvgfx.1":        { "Files": { "Albion/CD/XLDLIBS/FBODPIX0.XLD": { "Loader": "header", "Palette": "pal.19" } } },
+  "mongfx.1-60":      { "Files": { "Albion/CD/XLDLIBS/MONGFX0.XLD": {  "Loader": "multiheader", "Palette": "pal.24", "MapFile": "Meta/MONGFX0.json" } } },
+  "npclarge.1-99":    { "Files": { "Albion/CD/XLDLIBS/NPCGR0.XLD": {   "Loader": "header", "MapFile": "Meta/NPCGR0.json" } } },
+  "npclarge.100-199": { "Files": { "Albion/CD/XLDLIBS/NPCGR1.XLD": {   "Loader": "header", "MapFile": "Meta/NPCGR1.json" } } },
+  "npcsmall.1-29":    { "Files": { "Albion/CD/XLDLIBS/NPCKL0.XLD": {   "Loader": "header", "Palette": "pal.1", "Map": { "npcsmall.28": { "Palette": "pal.4" } } } } },
+  "plarge.1-10":      { "Files": { "Albion/CD/XLDLIBS/PARTGR0.XLD": {  "Loader": "header", "Palette": "pal.20" } } },
+  "psmall.1-10":      { "Files": { "Albion/CD/XLDLIBS/PARTKL0.XLD": {  "Loader": "header", "Palette": "pal.1" } } },
+  "portrait.1-99":    { "Files": { "Albion/CD/XLDLIBS/SMLPORT0.XLD": { "Loader": "fixedsize", "Width": 34 } } },
+  "portrait.100-175": { "Files": { "Albion/CD/XLDLIBS/SMLPORT1.XLD": { "Loader": "fixedsize", "Width": 34 } } },
+  "tacgfx.1-72":      { "Files": { "Albion/CD/XLDLIBS/TACTICO0.XLD": { "Loader": "fixedsize", "Width": 32 } } },
+  "pic.1-45":         { "Files": { "Albion/CD/XLDLIBS/PICTURE0.XLD": { "Loader": "interlaced", "IsReadOnly": true } } },
+  "3dobj.1-99":       { "Files": { "Albion/CD/XLDLIBS/3DOBJEC0.XLD": { "Loader": "fixedsize", "MapFile": "Meta/3DOBJEC0.json" } } },
+  "3dobj.100-199":    { "Files": { "Albion/CD/XLDLIBS/3DOBJEC1.XLD": { "Loader": "fixedsize", "MapFile": "Meta/3DOBJEC1.json" } } },
+  "3dobj.200-299":    { "Files": { "Albion/CD/XLDLIBS/3DOBJEC2.XLD": { "Loader": "fixedsize", "MapFile": "Meta/3DOBJEC2.json" } } },
+  "3dobj.300-399":    { "Files": { "Albion/CD/XLDLIBS/3DOBJEC3.XLD": { "Loader": "fixedsize", "MapFile": "Meta/3DOBJEC3.json" } } },
+  "overlay.1-99":     { "Files": { "Albion/CD/XLDLIBS/3DOVERL0.XLD": { "Loader": "fixedsize", "Transposed": true, "MapFile": "Meta/3DOVERL0.json" } } },
+  "overlay.100-199":  { "Files": { "Albion/CD/XLDLIBS/3DOVERL1.XLD": { "Loader": "fixedsize", "Transposed": true, "MapFile": "Meta/3DOVERL1.json" } } },
+  "overlay.200-299":  { "Files": { "Albion/CD/XLDLIBS/3DOVERL2.XLD": { "Loader": "fixedsize", "Transposed": true, "MapFile": "Meta/3DOVERL2.json" } } },
+  "wall.1-99":        { "Files": { "Albion/CD/XLDLIBS/3DWALLS0.XLD": { "Loader": "fixedsize", "Transposed": true, "MapFile": "Meta/3DWALLS0.json" } } },
+  "wall.100-199":     { "Files": { "Albion/CD/XLDLIBS/3DWALLS1.XLD": { "Loader": "fixedsize", "Transposed": true, "MapFile": "Meta/3DWALLS1.json" } } },
+
+  "3dbg.1-3": {
+    "Files": {
+      "Albion/CD/XLDLIBS/3DBCKGR0.XLD": {
+        "Loader": "header",
+        "Map": {
+          "3dbg.1": { "Palette": "pal.3" },
+          "3dbg.2": { "Palette": "pal.3" },
+          "3dbg.3": { "Palette": "pal.25" }
+        }
+      }
+    }
+  },
+
+  "autotile.1-2": {
+    "Files": {
+      "Albion/CD/XLDLIBS/AUTOGFX0.XLD": {
+        "Post": "atlas",
+        "Loader": "amorphous",
+        "Map": {
+          "autotile.1": { "SubSprites": "(8,8,576) (16,16)", "Palette": "pal.11" },
+          "autotile.2": { "SubSprites": "(8,8,576) (16,16)", "Palette": "pal.30" }
+        }
+      }
+    }
+  },
+
+  "tilegfx.1-11": {
+    "Files": {
+      "Albion/CD/XLDLIBS/ICONGFX0.XLD": {
+        "Loader": "tilegfx",
+        "Width": 16,
+        "Height": 16,
+        "Map": {
+          "tilegfx.1":  { "Palette": "pal.1" },
+          "tilegfx.2":  { "Palette": "pal.2" },
+          "tilegfx.3":  { "Palette": "pal.6" },
+          "tilegfx.4":  { "Palette": "pal.4" },
+          "tilegfx.5":  { "Palette": "pal.5" },
+          "tilegfx.6":  { "Palette": "pal.16" },
+          "tilegfx.7":  { "Palette": "pal.9" },
+          "tilegfx.8":  { "Palette": "pal.26" },
+          "tilegfx.9":  { "Palette": "pal.28" },
+          "tilegfx.10": { "Palette": "pal.45" },
+          "tilegfx.11": { "Palette": "pal.56" }
+        }
+      }
+    }
+  },
+
+  "itemgfx.1": { "Files": { "Albion/CD/XLDLIBS/ITEMGFX": { "Loader": "fixedsize", "Container": "raw", "Width": 16, "Height": 16 } } },
+  "uibg.1":    { "Files": { "Albion/CD/XLDLIBS/SLAB": { "Loader": "slab", "Container": "raw", "Width": 360 } } },
+
+  "coregfx.0-88": {
+    "Files": {
+      "Albion/MAIN.EXE#476227B0": { "MapFile": "Meta/MainExe.json" }, // EN GOG, built Aug 22 1996
+      "Albion/MAIN.EXE#9FC7ABCF": { "MapFile": "Meta/MainExe.json" }, // EN, built Jul 25 1996
+      "Albion/MAIN.EXE#487DA334": { "MapFile": "Meta/MainExe.json" }, // FR
+      "Albion/MAIN.EXE#EC6D6389": { "MapFile": "Meta/MainExe_DE.json" } // DE GOG ISO, built Dec 14 1995
+    },
+    "Container": "binaryoffsets",
+    "Loader": "fixedsize",
+    "IsReadOnly": true
   }
 }
 // vim: tabstop=2 shiftwidth=2 expandtab

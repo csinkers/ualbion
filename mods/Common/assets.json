@@ -1,77 +1,38 @@
 {
-  "Mapping": {
-    "special.GameConfig": {
-      "Files": { "config.json": {} },
-      "Container": "dummy",
-      "Loader": "varset" 
-    },
-
-    "special.InputConfig": {
-      "Files": { "input.json": {} },
-      "Container": "dummy",
-      "Loader": "inputconfig" 
-    },
-
-    "party.1-*": {
-      "Files": { "PartyMembers": {} },
-      "Loader": "jsonParty",
-      "Pattern": "{id:00}_{name}.json" 
-    },
-
-    "font.0-*": {
-      "Files": { "Fonts": {} },
-      "Loader": "font",
-      "Pattern": "{id}_{name}.json" 
-    },
-
-    "fontgfx.Debug": {
-      "Files": { "Fonts/DebugFonts.png": {} },
-      "Container": "raw",
-      "Loader": "png8" 
-    },
-
-    "ink.1-*": {
-      "Files": { "Inks.json": {} },
-      "Container": "jsonObj",
-      "Loader": "ink" 
-    }
+  "special.GameConfig": {
+    "Files": { "config.json": {} },
+    "Container": "dummy",
+    "Loader": "varset"
   },
 
-  "Files": {
-    "config.json": {
-      "Container": "dummy",
-      "Loader": "varset",
-      "Max": 0,
-      "Map": { "0": { "Id": "special.GameConfig" } }
-    },
-    "input.json": {
-      "Container": "dummy",
-      "Loader": "inputconfig",
-      "Max": 0,
-      "Map": { "0": { "Id": "special.InputConfig" } }
-    },
-    "PartyMembers": {
-      "Loader": "jsonParty",
-      "Pattern": "{id:00}_{name}.json",
-      "Map": { "1": { "Id": "party.1" } }
-    },
-    "Fonts": {
-      "Loader": "font",
-      "Pattern": "{id}_{name}.json",
-      "Map": { "0": { "Id": "font.Regular" } }
-    },
-    "Fonts/DebugFonts.png": {
-      "Container": "raw",
-      "Loader": "png8",
-      "Max": 0,
-      "Map": { "0": { "Id": "fontgfx.Debug" } }
-    },
-    "Inks.json": {
-      "Container": "jsonObj",
-      "Loader": "ink",
-      "Max": 99,
-      "Map": { "1": { "Id": "ink.White" } }
-    }
+  "special.InputConfig": {
+    "Files": { "input.json": {} },
+    "Container": "dummy",
+    "Loader": "inputconfig"
+  },
+
+  "party.1-*": {
+    "Files": { "PartyMembers": {} },
+    "Loader": "jsonParty",
+    "Pattern": "{id:00}_{name}.json"
+  },
+
+  "font.1-*": {
+    "Files": { "Fonts": {} },
+    "Loader": "font",
+    "Pattern": "{id}_{name}.json"
+  },
+
+  "fontgfx.Debug": {
+    "Files": { "Fonts/DebugFonts.png": {} },
+    "Container": "raw",
+    "Loader": "png8"
+  },
+
+  "ink.1-*": {
+    "Files": { "Inks.json": {} },
+    "Container": "jsonObj",
+    "Loader": "ink"
   }
 }
 // vim: tabstop=2 shiftwidth=2 expandtab

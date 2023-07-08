@@ -26,15 +26,6 @@ public class AssetConfigLoader
         _typeConfig = typeConfig;
     }
 
-#pragma warning disable CA1812 // 'AssetConfigLoader.RawAssetConfig' is an internal class that is apparently never instantiated. If so, remove the code from the assembly. If this class is intended to contain only static members, make it 'static' (Module in Visual Basic).
-    class RawAssetConfig
-    {
-        // Dictionaries containing only the details defined in this particular mod, and not in any that this mod inherits from.
-        [JsonInclude, JsonPropertyName("Mapping")]
-        public Dictionary<string, LoadAssetRangeInfo> Ranges { get; private set; } = new();
-    }
-#pragma warning restore CA1812 // 'AssetConfigLoader.RawAssetConfig' is an internal class that is apparently never instantiated. If so, remove the code from the assembly. If this class is intended to contain only static members, make it 'static' (Module in Visual Basic).
-
     public AssetConfig Load(string configPath, string modName, AssetConfig parent)
     {
         if (!_disk.FileExists(configPath))
@@ -59,7 +50,7 @@ public class AssetConfigLoader
 
     public AssetConfig Parse(byte[] configText, string modName, AssetConfig parent)
     {
-        var raw = _jsonUtil.Deserialize<RawAssetConfig>(configText);
+        var raw = _jsonUtil.Deserialize<Dictionary<string, LoadAssetRangeInfo>>(configText);
         if (raw == null)
             return null;
 
@@ -68,10 +59,10 @@ public class AssetConfigLoader
         return assetConfig;
     }
 
-    RangeLookup BuildRanges(RawAssetConfig raw, AssetConfig parent)
+    RangeLookup BuildRanges(Dictionary<string, LoadAssetRangeInfo> raw, AssetConfig parent)
     {
         var rangeInfos = new List<AssetRangeInfo>();
-        foreach (var kvp in raw.Ranges)
+        foreach (var kvp in raw)
             rangeInfos.Add(BuildRange(kvp.Key, kvp.Value));
 
         return new RangeLookup(parent?.Ranges, rangeInfos);

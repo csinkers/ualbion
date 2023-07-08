@@ -16,6 +16,9 @@ public class StringSetStringLoader : Component, IAssetLoader<string>
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
+        if (existing != null)
+            throw new NotSupportedException($"{nameof(StringSetStringLoader)} is read-only");
+
         var target = context.GetProperty(TargetProperty);
         var firstId = context.GetProperty(FirstIdProperty);
         if (target == AssetId.None)
@@ -24,15 +27,15 @@ public class StringSetStringLoader : Component, IAssetLoader<string>
         var assets = Resolve<IAssetManager>();
         var set = assets.LoadStringSet(target, context.Language);
 
+        if (set == null)
+            return null;
+
         if (context.AssetId.Type != firstId.Type)
             throw new InvalidOperationException($"The FirstId for {context.AssetId} ({firstId}) had a mismatched type");
 
         int thisId = context.AssetId.Id;
         ushort subId = (ushort)(thisId - firstId.Id);
         var stringId = new StringId(target, subId);
-        if (existing != null)
-            set.SetString(stringId, existing);
-
         return set.GetString(stringId);
     }
 

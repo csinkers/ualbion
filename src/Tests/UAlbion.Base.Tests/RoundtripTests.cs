@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using SerdesNet;
 using UAlbion.Api;
@@ -52,11 +53,11 @@ public class RoundtripTests
         var baseDir = ConfigUtil.FindBasePath(disk);
         var pathResolver = new PathResolver(baseDir, "ualbion-tests");
         pathResolver.RegisterPath("ALBION", Path.Combine(baseDir, "Albion"));
-        var baseAssetConfigPath = Path.Combine(baseDir, "mods", "Base", "base_assets.json");
+        var typeConfigPath = Path.Combine(baseDir, "mods", "Base", "types.json");
         var assetConfigPath = Path.Combine(baseDir, "mods", "Albion", "alb_assets.json");
 
         var tcl = new TypeConfigLoader(jsonUtil);
-        var typeConfig = tcl.Load(baseAssetConfigPath, "RoundtripTests", null, mapping, disk);
+        var typeConfig = tcl.Load(typeConfigPath, "RoundtripTests", null, mapping, disk);
 
         foreach (var assetType in typeConfig.IdTypes.Values)
         {
@@ -71,11 +72,11 @@ public class RoundtripTests
         return (disk, baseDir, pathResolver, mapping);
     }
 
-    static T RoundTrip<T>(string testName, byte[] bytes, Asset.SerdesFunc<T> serdes, AssetId id, AssetNode node) where T : class
+    static T RoundTrip<T>(string testName, byte[] bytes, Asset.SerdesFunc<T> serdes, AssetId id, AssetNode node, string language = null) where T : class
     {
         node ??= new AssetNode(id, null);
         var modContext = new ModContext("Test", JsonUtil, Disk, AssetMapping.Global);
-        var context = new AssetLoadContext(id, node, modContext);
+        var context = new AssetLoadContext(id, node, modContext, language);
         return RoundTrip(testName, bytes, serdes, context);
     }
 
@@ -139,10 +140,10 @@ public class RoundtripTests
         RoundTrip(testName, bytes, serdes, context);
     }
 
-    static void RoundTripRaw<T>(string testName, string file, Asset.SerdesFunc<T> serdes) where T : class
+    static void RoundTripRaw<T>(string testName, string file, Asset.SerdesFunc<T> serdes, string language) where T : class
     {
         var bytes = File.ReadAllBytes(PathResolver.ResolvePath(file));
-        RoundTrip(testName, bytes, serdes, AssetId.None, null);
+        RoundTrip(testName, bytes, serdes, AssetId.None, null, language);
     }
 
     static void RoundTripRaw<T>(string testName, string file, Asset.SerdesFunc<T> serdes, AssetId id, AssetNode node) where T : class
@@ -179,12 +180,16 @@ public class RoundtripTests
     public void ItemTest()
     {
         var id = (ItemId)Item.DanusLight;
-        var spell = new SpellData(Spell.ThornSnare, SpellClass.DjiKas, 0)
+        var spell = new SpellData(Spell.Lifebringer, SpellClass.DjiKantos, 2)
         {
-            Cost = 1,
-            Environments = SpellEnvironments.Combat,
-            LevelRequirement = 2,
-            Targets = SpellTargets.OneMonster,
+            Cost = 60,
+            Environments = SpellEnvironments.Indoors
+                         | SpellEnvironments.Outdoors
+                         | SpellEnvironments.Dungeon
+                         | SpellEnvironments.Inventory,
+
+            LevelRequirement = 13,
+            Targets = SpellTargets.DeadParty,
         };
 
         var spellManager = new MockSpellManager().Add(spell);
@@ -200,9 +205,10 @@ public class RoundtripTests
     [Fact]
     public void ItemNameTest()
     {
-        RoundTripRaw<ListStringSet>(nameof(ItemNameTest),
+        RoundTripRaw<Dictionary<string, ListStringSet>>(nameof(ItemNameTest),
             "$(ALBION)/CD/XLDLIBS/ITEMNAME.DAT",
-            (x, s, c) => Loaders.ItemNameLoader.Serdes(x, s, c));
+            (x, s, c) => Loaders.ItemNameLoader.Serdes(x, s, c),
+            Language.English);
     }
 
     [Fact]
@@ -211,7 +217,7 @@ public class RoundtripTests
         RoundTripXld<Formats.Assets.Automap>(
             nameof(AutomapTest),
             "$(ALBION)/CD/XLDLIBS/INITIAL/AUTOMAP1.XLD",
-            (AutomapId)Automap.Unk1,
+            (AutomapId)(Automap)100,
             (AutomapId)Automap.Jirinaar,
             (x, s, c) => Loaders.AutomapLoader.Serdes(x, s, c));
     }
@@ -231,7 +237,7 @@ public class RoundtripTests
     {
         RoundTripXld<Inventory>(nameof(ChestTest),
             "$(ALBION)/CD/XLDLIBS/INITIAL/CHESTDT1.XLD",
-            (ChestId)(Chest)1,
+            (ChestId)(Chest)100,
             (ChestId)Chest.HClanCellar_ID_IKn_ILC_StC_LSh_3g,
             (x, s, c) => Loaders.ChestLoader.Serdes(x, s, c));
     }
@@ -254,7 +260,7 @@ public class RoundtripTests
     {
         RoundTripXld<Formats.Assets.EventSet>(nameof(EventSetTest),
             "$(ALBION)/CD/XLDLIBS/EVNTSET1.XLD", 
-            (EventSetId)(EventSet)1,
+            (EventSetId)(EventSet)100,
             (EventSetId)EventSet.Frill,
             (x, s, c) => Loaders.EventSetLoader.Serdes(x, s, c));
     }
@@ -264,7 +270,7 @@ public class RoundtripTests
     {
         RoundTripXld<ListStringSet>(nameof(EventTextTest),
             "$(ALBION)/CD/XLDLIBS/ENGLISH/EVNTTXT1.XLD",
-            (StringSetId)(EventText)1,
+            (StringSetId)(EventText)100,
             (StringSetId)EventText.Frill,
             (x, s, c) => Loaders.AlbionStringTableLoader.Serdes(x, s, c));
     }
@@ -274,7 +280,7 @@ public class RoundtripTests
     {
         RoundTripXld<LabyrinthData>(nameof(LabyrinthTest),
             "$(ALBION)/CD/XLDLIBS/LABDATA1.XLD",
-            (LabyrinthId)(Labyrinth)1,
+            (LabyrinthId)(Labyrinth)100,
             (LabyrinthId)Labyrinth.Jirinaar,
             (x, s, c) => Loaders.LabyrinthDataLoader.Serdes(x, s, c));
     }
@@ -314,7 +320,7 @@ public class RoundtripTests
     {
         RoundTripXld<Inventory>(nameof(MerchantTest),
             "$(ALBION)/CD/XLDLIBS/INITIAL/MERCHDT1.XLD", 
-            (MerchantId)(Merchant)1,
+            (MerchantId)(Merchant)100,
             (MerchantId)Merchant.AltheaSpells,
             (x, s, c) => Loaders.MerchantLoader.Serdes(x, s, c));
     }
@@ -373,7 +379,7 @@ public class RoundtripTests
         var loader = BuildCharacterLoader();
         RoundTripXld<CharacterSheet>(nameof(NpcTest),
             "$(ALBION)/CD/XLDLIBS/INITIAL/NPCCHAR1.XLD", 
-            (SheetId)(NpcSheet)1,
+            (SheetId)(NpcSheet)100,
             (SheetId)NpcSheet.Christine,
             (x, s, c) => loader.Serdes(x, s, c));
     }
@@ -534,7 +540,7 @@ public class RoundtripTests
     {
         RoundTripXld<ListStringSet>(nameof(WordTest),
             "$(ALBION)/CD/XLDLIBS/ENGLISH/WORDLIS0.XLD",
-            (SpecialId)(Special)1,
+            (SpecialId)Special.Words1,
             (SpecialId)Special.Words1,
             (x, s, c) => Loaders.WordListLoader.Serdes(x, s, c));
     }
@@ -605,7 +611,7 @@ public class RoundtripTests
     {
         RoundTripXld<IReadOnlyTexture<byte>>(nameof(DungeonObjectTest),
             "$(ALBION)/CD/XLDLIBS/3DOBJEC2.XLD",
-            (SpriteId)(DungeonObject)1,
+            (SpriteId)(DungeonObject)200,
             (SpriteId)DungeonObject.Krondir,
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c),
             node =>

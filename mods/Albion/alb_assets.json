@@ -1,13 +1,34 @@
 {
   "itemname.1-462": {
     "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
-      "!GERMAN":  { "Language": "GERMAN" },
+      "!GERMAN": { "Language": "GERMAN" },
       "!ENGLISH": { "Language": "ENGLISH" },
-      "!FRENCH":  { "Language": "FRENCH" }
+      "!FRENCH": { "Language": "FRENCH" }
     },
     "Loader": "stringset",
     "FirstId": "itemname.1",
-    "Target": "special.ItemNames"
+    "Target": "special.ItemNamesSingleLang",
+    "IsReadOnly": true 
+  },
+
+  "special.ItemNamesSingleLang": {
+    "Files": {
+      "!GERMAN": { "Language": "GERMAN" },
+      "!ENGLISH": { "Language": "ENGLISH" },
+      "!FRENCH": { "Language": "FRENCH" }
+    },
+    "Loader": "itemnameMeta",
+    "Target": "special.ItemNamesMultiLang",
+    "IsReadOnly": true 
+  },
+
+  "special.ItemNamesMultiLang": {
+    "Files": {
+      "Albion/CD/XLDLIBS/ITEMNAME.DAT": {
+        "Loader": "itemname",
+        "Container": "raw"
+      }
+    }
   },
 
   "stext.0-777": {
@@ -18,7 +39,8 @@
     },
     "Loader": "stringset",
     "FirstId": "stext.0",
-    "Target": "special.SystemStrings"
+    "Target": "special.SystemStrings",
+    "IsReadOnly": true 
   },
 
   "utext.0-*": {
@@ -29,7 +51,8 @@
     },
     "Loader": "stringset",
     "FirstId": "utext.0",
-    "Target": "special.UAlbionStrings"
+    "Target": "special.UAlbionStrings",
+    "IsReadOnly": true 
   },
 
   "word.0-499": {
@@ -40,7 +63,8 @@
     },
     "Loader": "stringset",
     "FirstId": "word.0",
-    "Target": "special.Words1"
+    "Target": "special.Words1",
+    "IsReadOnly": true 
   },
 
   "word.500-999": {
@@ -50,8 +74,9 @@
       "!FRENCH":  { "Language": "FRENCH" }
     },
     "Loader": "stringset",
-    "FirstId": "word.500",
-    "Target": "special.Words2"
+    "FirstId": "word.0",
+    "Target": "special.Words2",
+    "IsReadOnly": true 
   },
 
   "word.1000-1499": {
@@ -61,12 +86,12 @@
       "!FRENCH":  { "Language": "FRENCH" }
     },
     "Loader": "stringset",
-    "FirstId": "word.1000",
-    "Target": "special.Words3"
+    "FirstId": "word.0",
+    "Target": "special.Words3",
+    "IsReadOnly": true 
   },
 
   "special.SoundBank": { "Files": { "Albion/DRIVERS/ALBISND.OPL": { "Container": "raw", "Loader": "soundbank" } } },
-  "special.ItemNames": { "Files": { "Albion/CD/XLDLIBS/ITEMNAME.DAT": { "Loader": "itemname", "Container": "raw" } } },
   "special.UAlbionStrings": {
     "Files": {
       "GERMAN/strings.json":  { "Language": "GERMAN"  },

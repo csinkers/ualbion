@@ -75,6 +75,8 @@
     "interlaced":        "UAlbion.Formats.Parsers.InterlacedBitmapLoader, UAlbion.Formats",
     "itemdata":          "UAlbion.Formats.Parsers.ItemDataLoader, UAlbion.Formats",
     "itemname":          "UAlbion.Formats.Parsers.ItemNameLoader, UAlbion.Formats",
+    "itemnameCollector": "UAlbion.Formats.Parsers.ItemNameCollectorLoader, UAlbion.Formats",
+    "itemnameMeta":      "UAlbion.Formats.Parsers.ItemNameMetaLoader, UAlbion.Formats",
     "json":              "UAlbion.Formats.Parsers.JsonStringLoader, UAlbion.Formats",
     "jsonEventSet":      "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.EventSet, UAlbion.Formats]], UAlbion.Formats",
     "jsonInv":           "UAlbion.Formats.Parsers.JsonLoader`1[[UAlbion.Formats.Assets.Inventory, UAlbion.Formats]], UAlbion.Formats",

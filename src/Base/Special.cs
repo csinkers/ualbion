@@ -5,13 +5,14 @@ namespace UAlbion.Base;
 public enum Special : ushort
 {
     SoundBank = 0,
-    ItemNames = 1,
-    SystemStrings = 2,
-    UAlbionStrings = 3,
-    Words1 = 4,
-    Words2 = 5,
-    Words3 = 6,
-    DummyObject = 7,
-    GameConfig = 8,
-    InputConfig = 9,
+    SystemStrings,
+    UAlbionStrings,
+    Words1,
+    Words2,
+    Words3,
+    DummyObject,
+    GameConfig,
+    InputConfig,
+    ItemNamesMultiLang,
+    ItemNamesSingleLang
 }

@@ -431,13 +431,13 @@ public class ModApplier : Component, IModApplier
         var target = _modsInReverseDependencyOrder.First();
         var filesWritten = new HashSet<string>();
 
-        foreach (var range in target.AssetConfig.Ranges.AllRanges)
+        foreach (var rangeInfo in target.AssetConfig.Ranges.AllRanges)
         {
-            if (assetTypes != null && !assetTypes.Contains(range.Range.From.Type))
+            if (assetTypes != null && !assetTypes.Contains(rangeInfo.Range.From.Type))
                 continue;
 
             var assets = new Dictionary<string, List<(AssetLoadContext, byte[])>>();
-            foreach (var assetId in range.Assets)
+            foreach (var assetId in rangeInfo.Range)
             {
                 if (ids != null && !ids.Contains(assetId)) continue;
                 flushCacheFunc();

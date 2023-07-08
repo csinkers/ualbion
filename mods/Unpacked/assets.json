@@ -55,6 +55,13 @@
     }
   },
 
+  "special.ItemNamesMultiLang": { // This is just for repacking back to the binary formats
+    "Loader": "itemnameCollector",
+    "TargetRange": "itemname.1-*",
+    "TargetLanguages": [ "GERMAN", "ENGLISH", "FRENCH" ],
+    "IsReadOnly": true
+  },
+
   "stext.0-*": {
     "Loader": "utf8",
     "Container": "jsonStrings",

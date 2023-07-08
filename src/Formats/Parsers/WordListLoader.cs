@@ -25,6 +25,7 @@ public class WordListLoader : IAssetLoader<ListStringSet>
             var strings = new List<string>();
             while (s.BytesRemaining > 0)
                 strings.Add(s.FixedLengthString(null, null, WordLength));
+
             return new ListStringSet(strings);
         }
         else

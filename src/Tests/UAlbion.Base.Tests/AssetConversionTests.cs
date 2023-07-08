@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UAlbion.Api;
@@ -153,9 +154,9 @@ public class AssetConversionTests
     [Fact]
     public void ItemNameTest()
     {
-        var id = AssetId.From(Special.ItemNames);
-        Test<ListStringSet>(id,
-            AssetMapping.Global.EnumerateAssetsOfType(AssetType.ItemName).ToArray(),
+        var id = AssetId.From(Special.ItemNamesMultiLang);
+        Test<Dictionary<string, ListStringSet>>(id,
+            AssetId.EnumerateAll(AssetType.ItemName).ToArray(),
             (x, s, c) => Loaders.ItemNameLoader.Serdes(x, s, c));
     }
 

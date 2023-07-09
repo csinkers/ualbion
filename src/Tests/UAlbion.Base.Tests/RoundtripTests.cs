@@ -553,7 +553,7 @@ public class RoundtripTests
             (SpriteId)(AutomapTiles)1,
             (SpriteId)AutomapTiles.Set1,
             (x, s, c) => Loaders.AmorphousSpriteLoader.Serdes(x, s, c),
-            node => node.SetProperty(AssetProps.SubSprites, "(8,8,576) (16,16)"));
+            node => node.SetProperty(AmorphousSpriteLoader.SubSpritesProperty, "(8,8,576) (16,16)"));
     }
 
     [Fact]
@@ -574,7 +574,7 @@ public class RoundtripTests
 
         var id = (SpriteId)AutomapTiles.Set1;
         var node = new AssetNode((SpriteId)(AutomapTiles)1, null);
-        node.SetProperty(AssetProps.SubSprites, "(1,1,3) (2,2)");
+        node.SetProperty(AmorphousSpriteLoader.SubSpritesProperty, "(1,1,3) (2,2)");
 
         var sprite = RoundTrip<IReadOnlyTexture<byte>>(
             nameof(AmorphousTest),
@@ -763,7 +763,7 @@ public class RoundtripTests
             node =>
             {
                 node.SetProperty(AssetProps.Width, 112);
-                node.SetProperty(AssetProps.Transposed, true);
+                node.SetProperty(FixedSizeSpriteLoader.TransposedProperty, true);
             });
     }
 
@@ -779,7 +779,7 @@ public class RoundtripTests
             {
                 node.SetProperty(AssetProps.Width, 6);
                 node.SetProperty(AssetProps.Height, 20);
-                node.SetProperty(AssetProps.Transposed, true);
+                node.SetProperty(FixedSizeSpriteLoader.TransposedProperty, true);
             });
     }
 

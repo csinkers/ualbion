@@ -10,6 +10,7 @@ namespace UAlbion.Formats.Parsers;
 
 public class AmorphousSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 {
+    public static readonly StringAssetProperty SubSpritesProperty = new("SubSprites"); 
     static readonly Regex SizesRegex = new(@"
             \(\s*
                 (?'width'\d+),\s*
@@ -81,7 +82,7 @@ public class AmorphousSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 
     static IReadOnlyTexture<byte> Read(AssetLoadContext context, ISerializer s)
     {
-        var sizes = ParseSpriteSizes(context.Node.GetProperty(AssetProps.SubSprites));
+        var sizes = ParseSpriteSizes(context.Node.GetProperty(SubSpritesProperty));
 
         int totalWidth = 0;
         int totalHeight = 0;

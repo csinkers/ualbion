@@ -14,6 +14,8 @@ namespace UAlbion.Game.Veldrid.Assets;
 
 public class NpcTilesetLoader : Component, IAssetLoader
 {
+    public static readonly BoolAssetProperty IsSmallProperty = new("IsSmall"); //  TODO, combine with UseSmallGraphics
+    public static readonly PathPatternProperty GraphicsPattern = new("GraphicsPattern"); 
     readonly Png8Loader _png8Loader = new();
 
     public NpcTilesetLoader() => AttachChild(_png8Loader);
@@ -26,8 +28,8 @@ public class NpcTilesetLoader : Component, IAssetLoader
             return new object();
 
         if (existing == null) throw new ArgumentNullException(nameof(existing));
-        var graphicsPattern = context.GetProperty(AssetProps.GraphicsPattern);
-        bool small = context.GetProperty(AssetProps.IsSmall);
+        var graphicsPattern = context.GetProperty(GraphicsPattern);
+        bool small = context.GetProperty(IsSmallProperty);
 
         var tsxDir = Path.GetDirectoryName(context.Filename);
         var tiles = new List<TileProperties>();

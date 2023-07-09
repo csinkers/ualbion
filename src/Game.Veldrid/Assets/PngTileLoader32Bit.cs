@@ -22,6 +22,8 @@ namespace UAlbion.Game.Veldrid.Assets;
 public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
 {
     const PixelFormat TextureFormat = PixelFormat.R8_G8_B8_A8_UNorm;
+    public static readonly StringAssetProperty DayPath = new("DayPath"); 
+    public static readonly StringAssetProperty NightPath = new("NightPath"); 
     record FrameInfo(string Path, int SubId, int PalFrame);
     readonly PngDecoder _decoder = new();
     readonly Configuration _configuration = new();
@@ -161,8 +163,8 @@ public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
     static (List<TileFrameSummary> dayInfo, List<TileFrameSummary> nightInfo) FindFiles(AssetLoadContext context)
     {
         var pattern = context.GetProperty(AssetProps.Pattern, AssetPathPattern.Build("{ignorenum}_{frame:0000}_{palframe:0000}.png"));
-        var dayPath = context.GetProperty(AssetProps.DayPath);
-        var nightPath = context.GetProperty(AssetProps.NightPath);
+        var dayPath = context.GetProperty(DayPath);
+        var nightPath = context.GetProperty(NightPath);
 
         if (!string.IsNullOrEmpty(dayPath))
             dayPath = Path.Combine(context.Filename, dayPath);

@@ -11,6 +11,8 @@ namespace UAlbion.Formats.Parsers;
 public class FixedSizeSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 {
     public const string TypeString = "UAlbion.Formats.Parsers.FixedSizeSpriteLoader, UAlbion.Formats";
+    public static readonly BoolAssetProperty TransposedProperty = new("Transposed"); // For various textures in the 3D world that are stored with rows/columns flipped
+    public static readonly IntAssetProperty ExtraBytesProperty = new("ExtraBytes"); // Used to suppress assertions when loading original assets that have incorrect sizes
 
     public object Serdes(object existing, ISerializer s, AssetLoadContext context)
         => Serdes((IReadOnlyTexture<byte>) existing, s, context);
@@ -44,7 +46,7 @@ public class FixedSizeSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 
         byte[] pixelData = s.Bytes(null, null, (int)streamLength);
         int expectedPixelCount = width * height * spriteCount;
-        int extra = info.GetProperty(AssetProps.ExtraBytes);
+        int extra = info.GetProperty(ExtraBytesProperty);
 
         ApiUtil.Assert((expectedPixelCount + extra) == (int)streamLength,
             $"Extra pixels found when loading fixed size sprite {context.AssetId} " +
@@ -62,7 +64,7 @@ public class FixedSizeSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
             pixelData.AsSpan(0, expectedPixelCount), // May be less than the streamlength
             frames);
 
-        return info.GetProperty(AssetProps.Transposed) ? Transpose(sprite) : sprite;
+        return info.GetProperty(TransposedProperty) ? Transpose(sprite) : sprite;
     }
 
     static IReadOnlyTexture<byte> Write(IReadOnlyTexture<byte> existing, AssetLoadContext context, ISerializer s)
@@ -76,7 +78,7 @@ public class FixedSizeSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
             ApiUtil.Assert(f.Height == frame.Height, "FixedSizeSpriteLoader tried to serialise sprite with non-uniform frames");
         }
 
-        var sprite = context.GetProperty(AssetProps.Transposed)
+        var sprite = context.GetProperty(TransposedProperty)
             ? Transpose(existing)
             : existing;
 

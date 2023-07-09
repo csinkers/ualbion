@@ -10,6 +10,8 @@ namespace UAlbion.Formats.Exporters.Tiled;
 
 public class TiledTilesetLoader : Component, IAssetLoader<TilesetData>
 {
+    public static readonly StringAssetProperty BlankTilePathProperty = new("BlankTilePath"); 
+    public static readonly PathPatternProperty GraphicsPattern = new("GraphicsPattern"); 
     public object Serdes(object existing, ISerializer s, AssetLoadContext context)
         => Serdes((TilesetData)existing, s, context);
 
@@ -18,8 +20,8 @@ public class TiledTilesetLoader : Component, IAssetLoader<TilesetData>
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var graphicsTemplate = context.GetProperty(AssetProps.GraphicsPattern, AssetPathPattern.Build("{0}/{0}_{1}.png"));
-        var blankTilePath = context.GetProperty(AssetProps.BlankTilePath, "Blank.png");
+        var graphicsTemplate = context.GetProperty(GraphicsPattern, AssetPathPattern.Build("{0}/{0}_{1}.png"));
+        var blankTilePath = context.GetProperty(BlankTilePathProperty, "Blank.png");
 
         var properties = new Tilemap2DProperties
         {

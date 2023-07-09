@@ -3,9 +3,7 @@ using System.IO;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
-using UAlbion.Base;
 using UAlbion.Config;
-using UAlbion.Config.Properties;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.Parsers;
 using UAlbion.TestCommon;
@@ -183,7 +181,7 @@ public class SpriteLoaderTests
 
         var id = SpriteId.None;
         var node = new AssetNode(id, null);
-        node.SetProperty(AssetProps.SubSprites, "(3,2,2) (2,1)");
+        node.SetProperty(AmorphousSpriteLoader.SubSpritesProperty, "(3,2,2) (2,1)");
         RoundTrip(oneFrame,
             (x, s, c) => AmorphousLoader.Serdes(x, s, c),
             sprite =>

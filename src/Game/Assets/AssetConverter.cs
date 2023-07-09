@@ -67,7 +67,12 @@ public sealed class AssetConverter : IDisposable
         _fromExchange.Attach(new AssetManager(_from)); // From also needs an asset manager for the inventory post-processor etc
     }
 
-    public void Convert(ISet<AssetId> ids, ISet<AssetType> assetTypes, Regex filePattern, Func<AssetLoadResult, AssetLoadResult> converter = null, string[] validLanguages = null)
+    public void Convert(
+        ISet<AssetId> ids,
+        ISet<AssetType> assetTypes,
+        Regex filePattern,
+        Func<AssetLoadResult, AssetLoadResult> converter = null,
+        string[] validLanguages = null)
     {
         var cache = new Dictionary<(AssetId, string), AssetLoadResult>();
 
@@ -91,7 +96,15 @@ public sealed class AssetConverter : IDisposable
             return result;
         }
 
-        _to.SaveAssets(LoaderFunc, () => cache.Clear(), ids, assetTypes, validLanguages, filePattern);
+        var options = new AssetConversionOptions(
+            LoaderFunc,
+            () => cache.Clear(),
+            ids,
+            assetTypes,
+            validLanguages,
+            filePattern);
+
+        _to.SaveAssets(options);
     }
 
     public string[] DiscoverLanguages(TextId? languageSearchId = null)

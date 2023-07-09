@@ -27,6 +27,9 @@ public class XldContainer : IAssetContainer
 
         using var s = new AlbionReader(new BinaryReader(context.Disk.OpenRead(path)));
         var bytes = LoadAsset(context.Index, s);
+        if (bytes == null)
+            return null;
+
         var ms = new MemoryStream(bytes);
         return new AlbionReader(new BinaryReader(ms));
     }
@@ -74,7 +77,7 @@ public class XldContainer : IAssetContainer
     {
         var lengths = HeaderSerdes(null, s);
         if (subItem >= lengths.Length)
-            throw new ArgumentOutOfRangeException($"Tried to load subItem {subItem} from XLD, but it only contains {lengths.Length} items.");
+            return null;
 
         long offset = s.Offset;
         offset += lengths.Where((_, i) => i < subItem).Sum();

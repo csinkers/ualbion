@@ -60,7 +60,7 @@ static class Program
                 commandLine.ConvertFrom,
                 commandLine.ConvertTo);
 
-            var languages = converter.DiscoverLanguages();
+            var languages = commandLine.DumpLanguages ?? converter.DiscoverLanguages();
 
             var parsedIds = commandLine.DumpIds?.Select(AssetId.Parse).ToHashSet();
             converter.Convert(

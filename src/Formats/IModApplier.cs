@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Save;
@@ -21,13 +19,5 @@ public interface IModApplier : IComponent
     string LoadAssetAnnotated(AssetId id, string language = null);
 
     AssetLoadResult LoadAssetAndNode(AssetId assetId, string language = null);
-
-
-    void SaveAssets(
-        AssetLoaderMethod loaderFunc,
-        Action flushCacheFunc,
-        ISet<AssetId> ids,
-        ISet<AssetType> assetTypes,
-        string[] languages,
-        Regex filePattern);
+    void SaveAssets(AssetConversionOptions options);
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats;
@@ -32,16 +31,7 @@ public class MockModApplier : ServiceComponent<IModApplier>, IModApplier
             new Dictionary<string, LanguageConfig>());
 
     public IEnumerable<string> ShaderPaths => Array.Empty<string>();
-    public void SaveAssets(
-        AssetLoaderMethod loaderFunc,
-        Action flushCacheFunc,
-        ISet<AssetId> ids,
-        ISet<AssetType> assetTypes,
-        string[] languages,
-        Regex filePattern)
-    {
-        throw new NotImplementedException();
-    }
+    public void SaveAssets(AssetConversionOptions options) => throw new NotImplementedException();
 
     public MockModApplier Add(AssetId id, object asset)
     {

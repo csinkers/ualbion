@@ -3,12 +3,14 @@
   "special.SoundBank": { "Files": { "Assets/Soundbank.json": { "Container": "raw", "Loader": "jsonSoundbank" } } },
 
   "special.TiledNpcsLarge": {
+    "Sequence": 1, // Needs to happen before maps are exported
     "Loader": "tiledNpcTileset",
     "Container": "raw",
     "UseDummyRead": true,
     "Files": { "Assets/Tilesets/LargeNPCs.tsx": { "IsSmall": false, "GraphicsPattern": "Assets/Tilesets/LargeNPCs/{id}.png" } }
   },
   "special.TiledNpcsSmall": {
+    "Sequence": 1, // Needs to happen before maps are exported
     "Loader": "tiledNpcTileset",
     "Container": "raw",
     "UseDummyRead": true,
@@ -73,7 +75,7 @@
   "portrait.1-*": { "Files": { "Assets/Portraits": {} },          "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{name}.png", "Palette": "pal.0" },
   "uibg.1-*":     { "Files": { "Assets/Slab": {} },               "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Palette": "pal.0" },
   "tacgfx.1-*":   { "Files": { "Assets/TacticalIcons": {} },      "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Palette": "pal.0" },
-  "coregfx.0-*":  { "Files": { "Assets/CoreGraphics": {} },       "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png" },
+  "coregfx.0-*":  { "Files": { "Assets/CoreGraphics": {} },       "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Palette": "pal.0" },
 
   "chest.1-*":    { "Files": { "Assets/Chests": {} },        "Loader": "jsonInv",          "Container": "dir", "Pattern": "{id:000}_{name}.json"    },
   "eset.1-*":     { "Files": { "Assets/Events": {} },        "Loader": "eventSetScript",   "Container": "dir", "Pattern": "{id:000}_{name}.ua"      },
@@ -124,6 +126,7 @@
   "mtext.100-*": {
     "Loader": "jsonText",
     "Container": "dir",
+    "Optional": true, // Not every map has text
     "Pattern": "{id}_{name}.json",
     "Files": {
       "Assets/MapTextDE": { "Language": "GERMAN"  },
@@ -144,10 +147,10 @@
 
   "autotile.1":    { "Files": { "Assets/Automap/1": {} }, "Loader": "png8",    "Container": "dir", "Pattern": "{id}_{frame:000}_p{pal}_{name}.png" },
   "autotile.2":    { "Files": { "Assets/Automap/2": {} }, "Loader": "png8",    "Container": "dir", "Pattern": "{id}_{frame:000}_p{pal}_{name}.png" },
-  "automap.100-*": { "Files": { "Assets/Automap": {} },   "Loader": "automap", "Container": "dir", "Pattern": "{id}_{frame}_{name}.dat" },
+  "automap.100-*": { "Files": { "Assets/Automap": {} },   "Loader": "automap", "Container": "dir", "Pattern": "{id}_{frame}_{name}.dat", "Optional": true  },
 
   "fontgfx.1-*": {
-    "Files": { "Assets/FontGfx": {} },
+    "Files": { "Assets/FontGfx": { } },
     "Container": "dir",
     "Loader": "pngsheet",
     "Width": 8,

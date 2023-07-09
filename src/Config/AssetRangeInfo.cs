@@ -6,10 +6,12 @@ public class AssetRangeInfo
 {
     public AssetRange Range { get; }
     public AssetNode Node { get; }
+    public int Sequence { get; }
     public List<AssetFileInfo> Files { get; } = new();
-    public AssetRangeInfo(AssetRange range)
+    public AssetRangeInfo(AssetRange range, int sequence)
     {
         Range = range;
+        Sequence = sequence;
         Node = new AssetNode(range.From, null);
     }
 

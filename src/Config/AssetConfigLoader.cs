@@ -73,7 +73,7 @@ public class AssetConfigLoader
         try
         {
             range = _typeConfig.ParseIdRange(key);
-            var rangeInfo = new AssetRangeInfo(range);
+            var rangeInfo = new AssetRangeInfo(range, load.Sequence ?? int.MaxValue);
 
             if (load.Properties != null)
                 rangeInfo.Node.SetProperties(load.Properties, _typeConfig, "range", range);

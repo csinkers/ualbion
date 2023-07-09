@@ -125,7 +125,8 @@
   "item.1-462":        { "Files": { "Albion/CD/XLDLIBS/ITEMLIST.DAT": { "Loader": "itemdata", "Container": "items" } } },
 
   // Events
-  "eset.1-99":      { "Files": { "Albion/CD/XLDLIBS/EVNTSET0.XLD": { "Loader": "eset"   } } },
+  "eset.1-32":      { "Files": { "Albion/CD/XLDLIBS/EVNTSET0.XLD": { "Loader": "eset"   } } },
+  "eset.33-99":     { "Files": { "Albion/CD/XLDLIBS/EVNTSET0.XLD": { "Loader": "eset"   } }, "Optional": true }, // not in original game
   "eset.100-199":   { "Files": { "Albion/CD/XLDLIBS/EVNTSET1.XLD": { "Loader": "eset"   } } },
   "eset.200-299":   { "Files": { "Albion/CD/XLDLIBS/EVNTSET2.XLD": { "Loader": "eset"   } } },
   "eset.300-324":   { "Files": { "Albion/CD/XLDLIBS/EVNTSET3.XLD": { "Loader": "eset"   } } },
@@ -135,7 +136,8 @@
 
   // Maps
   "block.1-11":  { "Files": { "Albion/CD/XLDLIBS/BLKLIST0.XLD": { "Loader": "block" } } },
-  "lab.1-99":    { "Files": { "Albion/CD/XLDLIBS/LABDATA0.XLD": { "Loader": "lab", "MapFile": "Meta/LABDATA0.json" } } },
+  "lab.1-9":     { "Files": { "Albion/CD/XLDLIBS/LABDATA0.XLD": { "Loader": "lab", "MapFile": "Meta/LABDATA0.json" } } },
+  "lab.10-99":   { "Files": { "Albion/CD/XLDLIBS/LABDATA0.XLD": { "Loader": "lab", "MapFile": "Meta/LABDATA0.json" } }, "Optional": true }, // not in original game
   "lab.100-199": { "Files": { "Albion/CD/XLDLIBS/LABDATA1.XLD": { "Loader": "lab", "MapFile": "Meta/LABDATA1.json" } } },
   "lab.200-210": { "Files": { "Albion/CD/XLDLIBS/LABDATA2.XLD": { "Loader": "lab", "MapFile": "Meta/LABDATA2.json" } } },
   "map.100-199": { "Files": { "Albion/CD/XLDLIBS/MAPDATA1.XLD": { "Loader": "map" } } },
@@ -228,6 +230,7 @@
   // Videos
   "vid.1-99": {
     "Loader": "flic",
+    "IsReadOnly": true, 
     "Files": {
       "Albion/CD/XLDLIBS/GERMAN/FLICS0.XLD":  { "Language": "GERMAN" },
       "Albion/CD/XLDLIBS/ENGLISH/FLICS0.XLD": { "Language": "ENGLISH" },
@@ -236,7 +239,7 @@
   },
 
   // Event Text
-  "etext.1-99": {
+  "etext.1-32": {
     "Loader": "stringtable",
     "Files": {
       "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT0.XLD": { "Language": "ENGLISH" },
@@ -244,6 +247,16 @@
       "Albion/CD/XLDLIBS/GERMAN/EVNTTXT0.XLD":  { "Language": "GERMAN" }
     }
   },
+  "etext.33-99": { // Not in original game
+    "Loader": "stringtable",
+    "Optional": true, 
+    "Files": {
+      "Albion/CD/XLDLIBS/ENGLISH/EVNTTXT0.XLD": { "Language": "ENGLISH" },
+      "Albion/CD/XLDLIBS/FRENCH/EVNTTXT0.XLD":  { "Language": "FRENCH" },
+      "Albion/CD/XLDLIBS/GERMAN/EVNTTXT0.XLD":  { "Language": "GERMAN" }
+    }
+  },
+
   "etext.100-199": {
     "Loader": "stringtable",
     "Files": {
@@ -282,9 +295,10 @@
     "Loader": "stringtable",
     "Files": {
       "Albion/CD/XLDLIBS/ENGLISH/MAPTEXT1.XLD": { "Language": "ENGLISH" },
-      "Albion/CD/XLDLIBS/FRENCH/MAPTEXT1.XLD":  { "Language": "FRENCH" },
-      "Albion/CD/XLDLIBS/GERMAN/MAPTEXT1.XLD":  { "Language": "GERMAN" }
-    }
+      "Albion/CD/XLDLIBS/FRENCH/MAPTEXT1.XLD": { "Language": "FRENCH" },
+      "Albion/CD/XLDLIBS/GERMAN/MAPTEXT1.XLD": { "Language": "GERMAN" }
+    },
+    "Optional": true // test maps etc don't have any text so don't be as strict
   },
   "mtext.200-299": {
     "Loader": "stringtable",
@@ -292,7 +306,8 @@
       "Albion/CD/XLDLIBS/ENGLISH/MAPTEXT2.XLD": { "Language": "ENGLISH" },
       "Albion/CD/XLDLIBS/FRENCH/MAPTEXT2.XLD":  { "Language": "FRENCH" },
       "Albion/CD/XLDLIBS/GERMAN/MAPTEXT2.XLD":  { "Language": "GERMAN" }
-    }
+    },
+    "Optional": true 
   },
   "mtext.300-399": {
     "Loader": "stringtable",
@@ -300,17 +315,19 @@
       "Albion/CD/XLDLIBS/ENGLISH/MAPTEXT3.XLD": { "Language": "ENGLISH" },
       "Albion/CD/XLDLIBS/FRENCH/MAPTEXT3.XLD":  { "Language": "FRENCH" },
       "Albion/CD/XLDLIBS/GERMAN/MAPTEXT3.XLD":  { "Language": "GERMAN" }
-    }
+    },
+    "Optional": true 
   },
 
   // Spells
   "spell.1-210": { "Files": { "Albion/CD/XLDLIBS/SPELLDAT.DAT": { "Loader": "spell", "Container": "spells", "MapFile": "Meta/SPELLDAT.json" } } },
 
   // Initial game state data
-  "automap.100-199":  { "Files": { "Albion/CD/XLDLIBS/INITIAL/AUTOMAP1.XLD": { "Loader": "automap" } } },
-  "automap.200-299":  { "Files": { "Albion/CD/XLDLIBS/INITIAL/AUTOMAP2.XLD": { "Loader": "automap" } } },
-  "automap.300-399":  { "Files": { "Albion/CD/XLDLIBS/INITIAL/AUTOMAP3.XLD": { "Loader": "automap" } } },
-  "chest.1-99":       { "Files": { "Albion/CD/XLDLIBS/INITIAL/CHESTDT0.XLD": { "Loader": "chest" } } },
+  "automap.100-199":  { "Files": { "Albion/CD/XLDLIBS/INITIAL/AUTOMAP1.XLD": { "Loader": "automap" } }, "Optional": true }, // Marked as optional as 2D maps won't have automaps and we don't want to spam errors when unpacking
+  "automap.200-299":  { "Files": { "Albion/CD/XLDLIBS/INITIAL/AUTOMAP2.XLD": { "Loader": "automap" } }, "Optional": true },
+  "automap.300-399":  { "Files": { "Albion/CD/XLDLIBS/INITIAL/AUTOMAP3.XLD": { "Loader": "automap" } }, "Optional": true },
+  "chest.1-2":        { "Files": { "Albion/CD/XLDLIBS/INITIAL/CHESTDT0.XLD": { "Loader": "chest" } } },
+  "chest.3-99":       { "Files": { "Albion/CD/XLDLIBS/INITIAL/CHESTDT0.XLD": { "Loader": "chest" } }, "Optional": true }, // Not in original game but defined here to allow extension
   "chest.100-199":    { "Files": { "Albion/CD/XLDLIBS/INITIAL/CHESTDT1.XLD": { "Loader": "chest" } } },
   "chest.200-299":    { "Files": { "Albion/CD/XLDLIBS/INITIAL/CHESTDT2.XLD": { "Loader": "chest" } } },
   "chest.500-574":    { "Files": { "Albion/CD/XLDLIBS/INITIAL/CHESTDT5.XLD": { "Loader": "chest" } } },
@@ -330,7 +347,7 @@
   "floor.200-299":    { "Files": { "Albion/CD/XLDLIBS/3DFLOOR2.XLD": { "Loader": "fixedsize", "Width": 64, "Height": 64, "MapFile": "Meta/3DFLOOR2.json" } } },
   "combg.1-19":       { "Files": { "Albion/CD/XLDLIBS/COMBACK0.XLD": { "Loader": "fixedsize", "Width": 360, "MapFile": "Meta/COMBACK0.json" } } },
   "comgfx.1-85":      { "Files": { "Albion/CD/XLDLIBS/COMGFX0.XLD":  { "Loader": "multiheader", "Palette": "pal.23" } } },
-  "pinvgfx.1":        { "Files": { "Albion/CD/XLDLIBS/FBODPIX0.XLD": { "Loader": "header", "Palette": "pal.19" } } },
+  "pinvgfx.1-10":     { "Files": { "Albion/CD/XLDLIBS/FBODPIX0.XLD": { "Loader": "header", "Palette": "pal.19" } } },
   "mongfx.1-60":      { "Files": { "Albion/CD/XLDLIBS/MONGFX0.XLD":  { "Loader": "multiheader", "Palette": "pal.24", "MapFile": "Meta/MONGFX0.json" } } },
   "npclarge.1-99":    { "Files": { "Albion/CD/XLDLIBS/NPCGR0.XLD":   { "Loader": "header", "MapFile": "Meta/NPCGR0.json" } } },
   "npclarge.100-199": { "Files": { "Albion/CD/XLDLIBS/NPCGR1.XLD":   { "Loader": "header", "MapFile": "Meta/NPCGR1.json" } } },

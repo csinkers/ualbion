@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
@@ -230,7 +229,7 @@ public class ModApplier : Component, IModApplier
             }
 
 #if DEBUG
-            if (!isOptional && asset == null && anyFiles && filesSearched is { Count: > 0 })
+            if (!isOptional && asset == null && anyFiles && filesSearched is { Count: > 0 } && AssetMapping.Global.IsMapped(id))
             {
                 loaderWarnings.AppendLine(Invariant($"Tried to load asset {id} from mod {mod.Name}"));
                 loaderWarnings.AppendLine("  Files searched:");
@@ -287,16 +286,11 @@ public class ModApplier : Component, IModApplier
         return SavedGame.Serdes(null, AssetMapping.Global, s, spellManager);
     }
 
-    public void SaveAssets(
-        AssetLoaderMethod loaderFunc,
-        Action flushCacheFunc,
-        ISet<AssetId> ids,
-        ISet<AssetType> assetTypes,
-        string[] languages,
-        Regex filePattern)
+    public void SaveAssets(AssetConversionOptions options)
     {
-        if (loaderFunc == null) throw new ArgumentNullException(nameof(loaderFunc));
-        if (flushCacheFunc == null) throw new ArgumentNullException(nameof(flushCacheFunc));
+        if (options == null) throw new ArgumentNullException(nameof(options));
+        if (options.LoaderFunc == null) throw new ArgumentException(nameof(options.LoaderFunc));
+        if (options.FlushCacheFunc == null) throw new ArgumentException(nameof(options.FlushCacheFunc));
 
         var pathResolver = Resolve<IPathResolver>();
         var containerRegistry = Resolve<IContainerRegistry>();
@@ -306,55 +300,20 @@ public class ModApplier : Component, IModApplier
 
         foreach (var rangeInfo in target.AssetConfig.Ranges.AllRanges)
         {
-            if (assetTypes != null && !assetTypes.Contains(rangeInfo.Range.From.Type))
+            if (options.AssetTypes != null && !options.AssetTypes.Contains(rangeInfo.Range.From.Type))
                 continue;
 
             var assets = new Dictionary<string, List<(AssetLoadContext Context, byte[] Bytes)>>();
             foreach (var assetId in rangeInfo.Range)
             {
-                if (ids != null && !ids.Contains(assetId)) continue;
-                flushCacheFunc();
+                if (options.Ids != null && !options.Ids.Contains(assetId)) continue;
+                options.FlushCacheFunc();
 
                 var nodes = target.AssetConfig.GetAssetInfo(assetId);
                 foreach (var node in nodes)
                 {
-                    var filename = node.Filename;
-                    if (filePattern != null && !filePattern.IsMatch(filename)) continue;
-                    if (node.GetProperty(AssetProps.IsReadOnly)) continue;
-
-                    var language = node.GetProperty(AssetProps.Language);
-                    AssetLoadResult result;
-                    if (node.GetProperty(AssetProps.UseDummyRead))
-                    {
-                        result = new AssetLoadResult(assetId, new object(), node);
-                    }
-                    else
-                    {
-                        result = loaderFunc(assetId, language);
-                        if (result?.Asset == null)
-                        {
-                            // if (language == null || languages == null || languages.Contains(language))
-                            {
-                                // Automaps should only load for 3D maps, no need for 'not found' errors, also unmapped ids might be getting requested
-                                // due to populating the full range of an XLD, as the ids aren't actually in use it's fine to ignore their absence.
-                                if (assetId.Type != AssetType.Automap && AssetMapping.Global.IsMapped(assetId) && !AssetMapping.Global.IsAssetOptional(assetId))
-                                    Error($"Could not load {assetId} {language}");
-                            }
-
-                            continue;
-                        }
-                    }
-
-                    // Hacky copying of palette property to make png export/import work
-                    var sourcePalette = result.Node?.PaletteId ?? AssetId.None;
-                    if (!sourcePalette.IsNone && node.PaletteId.IsNone)
-                        node.SetProperty(AssetProps.Palette, sourcePalette);
-
-                    if (filesWritten.Add(filename))
-                        Info($"Saving {filename}...");
-
                     var saveContext = new AssetLoadContext(assetId, node, target.ModContext);
-                    SaveAsset(saveContext, result.Asset, assets);
+                    ConvertAsset(options, saveContext, filesWritten, assets);
                 }
             }
 
@@ -368,6 +327,48 @@ public class ModApplier : Component, IModApplier
         }
 
         Info("Finished saving assets");
+    }
+
+    void ConvertAsset(
+        AssetConversionOptions options,
+        AssetLoadContext saveContext,
+        HashSet<string> filesWritten,
+        Dictionary<string, List<(AssetLoadContext Context, byte[] Bytes)>> assets)
+    {
+        var filename = saveContext.Filename;
+        if (options.FilePattern != null && !options.FilePattern.IsMatch(filename)) return;
+        if (saveContext.GetProperty(AssetProps.IsReadOnly)) return;
+
+        var language = saveContext.GetProperty(AssetProps.Language);
+        if (language != null && options.Languages != null && !options.Languages.Contains(language))
+            return;
+
+        AssetLoadResult result;
+        if (saveContext.GetProperty(AssetProps.UseDummyRead))
+        {
+            result = new AssetLoadResult(saveContext.AssetId, new object(), saveContext.Node);
+        }
+        else
+        {
+            result = options.LoaderFunc(saveContext.AssetId, language);
+            if (result?.Asset == null)
+            {
+                if (AssetMapping.Global.IsMapped(saveContext.AssetId) && !saveContext.GetProperty(AssetProps.Optional))
+                    Error($"Could not load {saveContext.AssetId} {language}");
+
+                return;
+            }
+        }
+
+        // Hacky copying of palette property to make png export/import work
+        var sourcePalette = result.Node?.PaletteId ?? AssetId.None;
+        if (!sourcePalette.IsNone && saveContext.PaletteId.IsNone)
+            saveContext.SetProperty(AssetProps.Palette, sourcePalette);
+
+        if (filesWritten.Add(filename))
+            Info($"Saving {filename}...");
+
+        SaveAsset(saveContext, result.Asset, assets);
     }
 
     void SaveAsset(AssetLoadContext targetInfo, object asset, Dictionary<string, List<(AssetLoadContext, byte[])>> assets)

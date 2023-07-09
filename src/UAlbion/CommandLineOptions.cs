@@ -25,6 +25,7 @@ class CommandLineOptions
     public List<string> Mods { get; }
     public DumpFormats DumpFormats { get; } = DumpFormats.Json;
     public ISet<AssetType> DumpAssetTypes { get; }
+    public string[] DumpLanguages { get; }
 
     public CommandLineOptions(string[] args)
     {
@@ -106,6 +107,18 @@ class CommandLineOptions
                     return;
                 }
                 DumpIds = args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            if (arg is "--LANGUAGES" or "--LANG" or "-L")
+            {
+                i++;
+                if (i == args.Length)
+                {
+                    Console.WriteLine("\"-l\" requires an argument specifying the languages to process");
+                    Mode = ExecutionMode.Exit;
+                    return;
+                }
+                DumpLanguages = args[i].ToUpperInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries);
             }
 
             if (arg is "--FILES" or "-F")

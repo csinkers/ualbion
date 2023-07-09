@@ -144,7 +144,9 @@ public class MapObject : Component
         if (subObject == null) return null;
         if (subObject.ObjectInfoNumber >= labyrinth.Objects.Count)
         {
-            ApiUtil.Assert($"Tried to build object {subObject.ObjectInfoNumber} in {labyrinth.Id}, but there are only {labyrinth.Objects.Count} objects");
+            ApiUtil.Assert(labyrinth.Objects.Count == 0
+                ? $"Tried to place object with index {subObject.ObjectInfoNumber} in {labyrinth.Id}, but the labyrinth has no objects defined"
+                : $"Tried to place object with index {subObject.ObjectInfoNumber} in {labyrinth.Id}, but the maximum defined index is {labyrinth.Objects.Count - 1}");
             return null;
         }
 

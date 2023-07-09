@@ -26,7 +26,8 @@
   "fontgfx.Debug": {
     "Files": { "Fonts/DebugFonts.png": {} },
     "Container": "raw",
-    "Loader": "png8"
+    "Loader": "png8",
+    "Palette": "pal.0" 
   },
 
   "ink.1-*": {

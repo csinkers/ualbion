@@ -89,8 +89,9 @@ public static class Program
         mem monitoring, movement details
          */
 
-        testExchange.Resolve<IModApplier>().SaveAssets(LoaderFunc, () => { }, assets.Keys.ToHashSet(), null, null, null);
-        repackedExchange.Resolve<IModApplier>().SaveAssets(LoaderFunc, () => { }, assets.Keys.ToHashSet(), null, null, null);
+        var options = new AssetConversionOptions(LoaderFunc, () => { }, assets.Keys.ToHashSet(), null, null, null);
+        testExchange.Resolve<IModApplier>().SaveAssets(options);
+        repackedExchange.Resolve<IModApplier>().SaveAssets(options);
         Console.WriteLine("Done");
     }
 }

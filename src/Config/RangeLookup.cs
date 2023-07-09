@@ -21,18 +21,12 @@ public class RangeLookup // Note: it is assumed that id ranges in a given config
             _byType[(int)type] = group;
     }
 
-    public IEnumerable<AssetRangeInfo> AllRanges
-    {
-        get
-        {
-            foreach (var forType in _byType)
-            {
-                if (forType == null) continue;
-                foreach (var range in forType)
-                    yield return range;
-            }
-        }
-    }
+    public IEnumerable<AssetRangeInfo> AllRanges =>
+        _byType
+            .Where(x => x != null)
+            .SelectMany(x => x)
+            .OrderBy(x => x.Sequence)
+            .ThenBy(x => x.Range.From.ToString());
 
     public AssetRangeInfo TryFindAssetRangeInfo(AssetId id)
     {

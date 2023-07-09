@@ -538,18 +538,6 @@ public class AssetMapping
         return result;
     }
 
-    public bool IsAssetOptional(AssetId id)
-    {
-        var (type, value) = IdToEnum(id);
-        if (type == null)
-            return false;
-
-        var enumMember = Enum.ToObject(type, value);
-        var attrib = GetAttribute<OptionalAssetAttribute>(enumMember);
-
-        return attrib != null;
-    }
-
     public AssetId MaxIdForType(Type type)
     {
         if (type == null) throw new ArgumentNullException(nameof(type));

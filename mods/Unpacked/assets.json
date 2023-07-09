@@ -29,9 +29,9 @@
   "plarge.1-*":   { "Files": { "Assets/PartyGraphicsLarge": {} }, "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png" },
   "psmall.1-*":   { "Files": { "Assets/PartyGraphicsSmall": {} }, "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png" },
   "pic.1-*":      { "Files": { "Assets/Pictures": {} },           "Loader": "png32", "Container": "dir", "Pattern": "{id}_{name}.png" },
-  "portrait.1-*": { "Files": { "Assets/Portraits": {} },          "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{name}.png" },
-  "uibg.1-*":     { "Files": { "Assets/Slab": {} },               "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png" },
-  "tacgfx.1-*":   { "Files": { "Assets/TacticalIcons": {} },      "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png" },
+  "portrait.1-*": { "Files": { "Assets/Portraits": {} },          "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{name}.png", "Palette": "pal.0" },
+  "uibg.1-*":     { "Files": { "Assets/Slab": {} },               "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Palette": "pal.0" },
+  "tacgfx.1-*":   { "Files": { "Assets/TacticalIcons": {} },      "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Palette": "pal.0" },
   "coregfx.0-*":  { "Files": { "Assets/CoreGraphics": {} },       "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png" },
 
   "chest.1-*":    { "Files": { "Assets/Chests": {} },        "Loader": "jsonInv",          "Container": "dir", "Pattern": "{id:000}_{name}.json"    },

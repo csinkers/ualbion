@@ -31,7 +31,6 @@ public class RoundtripTests
     static readonly IFileSystem Disk;
     static readonly string ResultDir;
 
-
     static RoundtripTests()
     {
         string baseDir;
@@ -74,7 +73,7 @@ public class RoundtripTests
 
     static T RoundTrip<T>(string testName, byte[] bytes, Asset.SerdesFunc<T> serdes, AssetId id, AssetNode node, string language = null) where T : class
     {
-        node ??= new AssetNode(id, null);
+        node ??= new AssetNode(id);
         var modContext = new ModContext("Test", JsonUtil, Disk, AssetMapping.Global);
         var context = new AssetLoadContext(id, node, modContext, language);
         return RoundTrip(testName, bytes, serdes, context);
@@ -130,7 +129,7 @@ public class RoundtripTests
         Asset.SerdesFunc<T> serdes,
         Action<AssetNode> propertySetter = null) where T : class
     {
-        var node = new AssetNode(firstId, null);
+        var node = new AssetNode(firstId);
         if (propertySetter != null)
             propertySetter(node);
 
@@ -155,7 +154,7 @@ public class RoundtripTests
     static void RoundTripItem<T>(string testName, string file, ItemId id, Asset.SerdesFunc<T> serdes) where T : class
     {
         var loader = new ItemListContainer();
-        var node = new AssetNode((ItemId)Item.Knife, null);
+        var node = new AssetNode((ItemId)Item.Knife);
         var modContext = new ModContext("Test", JsonUtil, Disk, AssetMapping.Global);
         var context = new AssetLoadContext(id, node, modContext);
 
@@ -167,7 +166,7 @@ public class RoundtripTests
     static void RoundTripSpell<T>(string testName, string file, SpellId id, Asset.SerdesFunc<T> serdes) where T : class
     {
         var loader = new SpellListContainer();
-        var node = new AssetNode((SpellId)Spell.ThornSnare, null);
+        var node = new AssetNode((SpellId)Spell.ThornSnare);
         var modContext = new ModContext("Test", JsonUtil, Disk, AssetMapping.Global);
         var context = new AssetLoadContext(id, node, modContext);
 
@@ -245,7 +244,7 @@ public class RoundtripTests
     [Fact]
     public void CommonPaletteTest()
     {
-        var node = new AssetNode((PaletteId)Palette.Common, null);
+        var node = new AssetNode((PaletteId)Palette.Common);
         node.SetProperty(PaletteLoader.IsCommon, true);
 
         RoundTripRaw<AlbionPalette>(nameof(CommonPaletteTest),
@@ -461,7 +460,7 @@ public class RoundtripTests
         var tilesetId = (TilesetId)Tileset.Toronto;
 
         var gfxId = (SpriteId)TilesetGfx.Toronto;
-        var gfxNode = new AssetNode((SpriteId)(TilesetGfx)1, null);
+        var gfxNode = new AssetNode((SpriteId)(TilesetGfx)1);
         gfxNode.SetProperty(AssetProps.Palette, (PaletteId)Palette.Toronto2D);
 
         var modApplier = new MockModApplier();
@@ -472,7 +471,7 @@ public class RoundtripTests
             .Attach(new AssetManager());
 
         var modContext = new ModContext("Test", JsonUtil, Disk, AssetMapping.Global);
-        var context = new AssetLoadContext(tilesetId, new AssetNode((TilesetId)(Tileset)1, null), modContext);
+        var context = new AssetLoadContext(tilesetId, new AssetNode((TilesetId)(Tileset)1), modContext);
 
         var bytes = Asset.BytesFromXld(PathResolver, "$(ALBION)/CD/XLDLIBS/ICONDAT0.XLD", context);
 
@@ -499,7 +498,7 @@ public class RoundtripTests
     {
         var id = (BlockListId)BlockList.Toronto;
         var modContext = new ModContext("Test", JsonUtil, Disk, AssetMapping.Global);
-        var context = new AssetLoadContext(id, new AssetNode((BlockListId)(BlockList)1, null), modContext);
+        var context = new AssetLoadContext(id, new AssetNode((BlockListId)(BlockList)1), modContext);
         var bytes = Asset.BytesFromXld(PathResolver, "$(ALBION)/CD/XLDLIBS/BLKLIST0.XLD", context);
 
         Formats.Assets.BlockList Serdes(Formats.Assets.BlockList x, ISerializer s, AssetLoadContext c2) => Loaders.BlockListLoader.Serdes(x, s, c2);
@@ -573,7 +572,7 @@ public class RoundtripTests
         };
 
         var id = (SpriteId)AutomapTiles.Set1;
-        var node = new AssetNode((SpriteId)(AutomapTiles)1, null);
+        var node = new AssetNode((SpriteId)(AutomapTiles)1);
         node.SetProperty(AmorphousSpriteLoader.SubSpritesProperty, "(1,1,3) (2,2)");
 
         var sprite = RoundTrip<IReadOnlyTexture<byte>>(
@@ -640,7 +639,7 @@ public class RoundtripTests
     public void ItemSpriteTest()
     {
         var id = (SpriteId)ItemGfx.ItemSprites;
-        var node = new AssetNode((SpriteId)(ItemGfx)1, null);
+        var node = new AssetNode((SpriteId)(ItemGfx)1);
         node.SetProperty(AssetProps.Width, 16);
         node.SetProperty(AssetProps.Height, 16);
 
@@ -654,7 +653,7 @@ public class RoundtripTests
     public void SlabTest()
     {
         var id = (SpriteId)UiBackground.Slab;
-        var node = new AssetNode((SpriteId)UiBackground.Slab, null);
+        var node = new AssetNode((SpriteId)UiBackground.Slab);
         node.SetProperty(AssetProps.Width, 360);
         RoundTripRaw<IReadOnlyTexture<byte>>(nameof(SlabTest),
             "$(ALBION)/CD/XLDLIBS/SLAB",

@@ -232,7 +232,6 @@
     "LargeNpcs": "../Tilesets/LargeNPCs.tsx",
 
     "TileWidth": 96,
-    "TileHeight": 128,
     "BaseHeight": 68,
     "TiledFloorPattern": "../3dTilesets/Tiled/{id}_{name}_Floors.tsx",
     "TiledCeilingPattern": "../3dTilesets/Tiled/{id}_{name}_Ceilings.tsx",

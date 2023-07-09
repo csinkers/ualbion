@@ -55,7 +55,7 @@ public static class Program
 
         AssetLoadResult LoaderFunc(AssetId assetId, string language)
         {
-            var node = new AssetNode(assetId, null);
+            var node = new AssetNode(assetId);
             node.SetProperty(AssetProps.Palette, Palette1Id);
             return assets.TryGetValue(assetId, out var asset)
                 ? new AssetLoadResult(assetId, asset, null)

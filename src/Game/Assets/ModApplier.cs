@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
@@ -13,7 +12,11 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
+
+#if DEBUG
+using System.Text;
 using static System.FormattableString;
+#endif
 
 namespace UAlbion.Game.Assets;
 
@@ -165,38 +168,38 @@ public class ModApplier : Component, IModApplier
         Stack<IPatch> patches = null; // Create the stack lazily, as most assets won't have any patches.
         language ??= Var(UserVars.Gameplay.Language);
 
-        List<string> filesSearched =
 #if DEBUG
-            new List<string>();
-
+        var filesSearched = new List<string>();
         bool isOptional = false;
         var loaderWarnings = new StringBuilder();
-#else
-            null;
-#endif
 
         foreach (var mod in _mods.ModsInReverseDependencyOrder)
         {
-#if DEBUG
             filesSearched.Clear();
-#endif
-
-            var assetLocations = mod.AssetConfig.GetAssetInfo(id)
-#if DEBUG
-                    .ToArray()
-#endif
-                ;
-
             bool anyFiles = false;
+            var assetLocations = mod.AssetConfig.GetAssetInfo(id).ToArray();
+#else
+        foreach (var mod in _mods.ModsInReverseDependencyOrder)
+        {
+            var assetLocations = mod.AssetConfig.GetAssetInfo(id);
+#endif
+
             foreach (AssetNode node in assetLocations)
             {
+#if DEBUG
                 anyFiles = true;
+#endif
                 var assetLang = node.GetProperty(AssetProps.Language);
                 if (assetLang != null && !string.Equals(assetLang, language, StringComparison.OrdinalIgnoreCase))
                     continue;
 
                 var context = new AssetLoadContext(id, node, mod.ModContext, language);
+
+#if DEBUG
                 var modAsset = _assetLocator.LoadAsset(context, annotationWriter, filesSearched);
+#else
+                var modAsset = _assetLocator.LoadAsset(context, annotationWriter, null);
+#endif
 
                 if (modAsset is IPatch patch)
                 {
@@ -318,7 +321,7 @@ public class ModApplier : Component, IModApplier
                 }
             }
 
-            foreach (var kvp in assets)
+            foreach (var kvp in assets.OrderBy(x => x.Key))
             {
                 var first = kvp.Value[0].Context;
                 var path = pathResolver.ResolvePath(first.Filename);
@@ -363,8 +366,11 @@ public class ModApplier : Component, IModApplier
 
         // Hacky copying of palette property to make png export/import work
         var sourcePalette = result.Node?.PaletteId ?? AssetId.None;
-        if (!sourcePalette.IsNone && saveContext.PaletteId.IsNone)
+        if (!sourcePalette.IsNone)
+        {
+            saveContext = saveContext with { Node = new AssetNode(saveContext.Node) }; // Clone the node to prevent affecting any other assets that share the node
             saveContext.SetProperty(AssetProps.Palette, sourcePalette);
+        }
 
         if (filesWritten.Add(filename))
             Info($"Saving {filename}...");
@@ -381,17 +387,27 @@ public class ModApplier : Component, IModApplier
         using var bw = new BinaryWriter(ms);
         using var s = new AlbionWriter(bw);
 
-        loader.Serdes(asset, s, targetInfo);
-
-        ms.Position = 0;
-
-        assets ??= new Dictionary<string, List<(AssetLoadContext, byte[])>>();
-        if (!assets.TryGetValue(targetInfo.Filename, out var list))
+        try
         {
-            list = new List<(AssetLoadContext, byte[])>();
-            assets[targetInfo.Filename] = list;
-        }
+            loader.Serdes(asset, s, targetInfo);
 
-        list.Add((targetInfo, ms.ToArray()));
+            ms.Position = 0;
+
+            assets ??= new Dictionary<string, List<(AssetLoadContext, byte[])>>();
+            if (!assets.TryGetValue(targetInfo.Filename, out var list))
+            {
+                list = new List<(AssetLoadContext, byte[])>();
+                assets[targetInfo.Filename] = list;
+            }
+
+            list.Add((targetInfo, ms.ToArray()));
+        }
+        catch (Exception e)
+        {
+            if (CoreUtil.IsCriticalException(e))
+                throw;
+
+            Error($"Could not save asset {targetInfo.AssetId}: {e}");
+        }
     }
 }

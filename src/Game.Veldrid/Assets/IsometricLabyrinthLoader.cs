@@ -31,14 +31,14 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
     public static readonly IntAssetProperty TileHeight              = new("TileHeight"); // int
     public static readonly IntAssetProperty BaseHeight              = new("BaseHeight"); // int
     public static readonly IntAssetProperty TileWidth               = new("TileWidth"); // int
-    public static readonly PathPatternProperty TiledFloorPattern    = new("TiledFloorPattern", "Tiled/{0}_{2}_Floors.tsx");
-    public static readonly PathPatternProperty TiledCeilingPattern  = new("TiledCeilingPattern", "Tiled/{0}_{2}_Ceilings.tsx");
-    public static readonly PathPatternProperty TiledWallPattern     = new("TiledWallPattern", "Tiled/{0}_{2}_Walls.tsx");
+    public static readonly PathPatternProperty TiledFloorPattern    = new("TiledFloorPattern",    "Tiled/{0}_{2}_Floors.tsx");
+    public static readonly PathPatternProperty TiledCeilingPattern  = new("TiledCeilingPattern",  "Tiled/{0}_{2}_Ceilings.tsx");
+    public static readonly PathPatternProperty TiledWallPattern     = new("TiledWallPattern",     "Tiled/{0}_{2}_Walls.tsx");
     public static readonly PathPatternProperty TiledContentsPattern = new("TiledContentsPattern", "Tiled/{0}_{2}_Contents.tsx");
-    public static readonly PathPatternProperty FloorPngPattern      = new("FloorPngPattern", "Tiled/Gfx/{0}_{2}_Floors.png");
-    public static readonly PathPatternProperty CeilingPngPattern    = new("CeilingPngPattern", "Tiled/Gfx/{0}_{2}_Ceilings.png");
-    public static readonly PathPatternProperty WallPngPattern       = new("WallPngPattern", "Tiled/Gfx/{0}_{2}_Walls.png");
-    public static readonly PathPatternProperty ContentsPngPattern   = new("ContentsPngPattern", "Tiled/Gfx/{0}_{2}_Contents.png");
+    public static readonly PathPatternProperty FloorPngPattern      = new("FloorPngPattern",      "Tiled/Gfx/{0}_{2}_Floors.png");
+    public static readonly PathPatternProperty CeilingPngPattern    = new("CeilingPngPattern",    "Tiled/Gfx/{0}_{2}_Ceilings.png");
+    public static readonly PathPatternProperty WallPngPattern       = new("WallPngPattern",       "Tiled/Gfx/{0}_{2}_Walls.png");
+    public static readonly PathPatternProperty ContentsPngPattern   = new("ContentsPngPattern",   "Tiled/Gfx/{0}_{2}_Contents.png");
 
 
     // TODO: Calculate these properly

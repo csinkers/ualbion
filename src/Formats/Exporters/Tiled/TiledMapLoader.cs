@@ -11,18 +11,12 @@ namespace UAlbion.Formats.Exporters.Tiled;
 public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
 {
     // Isometric tileset/map properties
-    public static readonly IntAssetProperty TilesPerRow             = new("TilesPerRow"); // int
-    public static readonly PathPatternProperty WallPngPattern       = new("WallPngPattern"); // string
-    public static readonly PathPatternProperty CeilingPngPattern    = new("CeilingPngPattern"); // string
-    public static readonly PathPatternProperty ContentsPngPattern   = new("ContentsPngPattern"); // string
-    public static readonly PathPatternProperty FloorPngPattern      = new("FloorPngPattern"); // string
-    public static readonly IntAssetProperty TileHeight              = new("TileHeight"); // int
-    public static readonly IntAssetProperty BaseHeight              = new("BaseHeight"); // int
-    public static readonly IntAssetProperty TileWidth               = new("TileWidth"); // int
-    public static readonly PathPatternProperty TiledCeilingPattern  = new("TiledCeilingPattern"); // string
-    public static readonly PathPatternProperty TiledContentsPattern = new("TiledContentsPattern"); // string
-    public static readonly PathPatternProperty TiledFloorPattern    = new("TiledFloorPattern"); // string
-    public static readonly PathPatternProperty TiledWallPattern     = new("TiledWallPattern"); // string
+    public static readonly IntAssetProperty BaseHeight              = new("BaseHeight");
+    public static readonly IntAssetProperty TileWidth               = new("TileWidth");
+    public static readonly PathPatternProperty TiledCeilingPattern  = new("TiledCeilingPattern");
+    public static readonly PathPatternProperty TiledContentsPattern = new("TiledContentsPattern");
+    public static readonly PathPatternProperty TiledFloorPattern    = new("TiledFloorPattern");
+    public static readonly PathPatternProperty TiledWallPattern     = new("TiledWallPattern");
     public static readonly StringAssetProperty LargeNpcs      = new("LargeNpcs"); // string
     public static readonly StringAssetProperty SmallNpcs      = new("SmallNpcs"); // string
     public static readonly PathPatternProperty TilesetPattern = new("TilesetPattern", "../Tilesets/{0}_{2}.tsx"); // string

@@ -12,7 +12,7 @@ public class AssetRangeInfo
     {
         Range = range;
         Sequence = sequence;
-        Node = new AssetNode(range.From, null);
+        Node = new AssetNode(range.From);
     }
 
     public override string ToString() => $"{Range} ({Files.Count} files)";

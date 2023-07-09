@@ -45,7 +45,7 @@ public class NpcTilesetLoader : Component, IAssetLoader
             var sprite = sourceAssets.LoadTexture(id); // Get sprite from source mod
             var sourceNode = sourceAssets.GetAssetInfo(id);
             // Ugh, hacky.
-            var npcNode = new AssetNode(id, null);
+            var npcNode = new AssetNode(id);
             npcNode.SetProperty(AssetProps.Palette, sourceNode.PaletteId);
 
             var subContext = new AssetLoadContext(id, npcNode, context.ModContext);

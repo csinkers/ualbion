@@ -42,7 +42,7 @@ public class SpriteLoaderTests
     static void RoundTrip(byte[] bytes, SerdesFunc serdes, Action<IReadOnlyTexture<byte>> assert, AssetId assetId, AssetNode node = null)
     {
         var mod = new ModContext("Test", JsonUtil, Disk, AssetMapping.Global);
-        var context = new AssetLoadContext(assetId, node ?? new AssetNode(assetId, null), mod);
+        var context = new AssetLoadContext(assetId, node ?? new AssetNode(assetId), mod);
 
         var sprite = Load(bytes, context, serdes);
         assert(sprite);
@@ -180,7 +180,7 @@ public class SpriteLoaderTests
         };
 
         var id = SpriteId.None;
-        var node = new AssetNode(id, null);
+        var node = new AssetNode(id);
         node.SetProperty(AmorphousSpriteLoader.SubSpritesProperty, "(3,2,2) (2,1)");
         RoundTrip(oneFrame,
             (x, s, c) => AmorphousLoader.Serdes(x, s, c),

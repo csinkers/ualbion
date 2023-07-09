@@ -29,7 +29,7 @@ public class Png8Loader : Component, IAssetLoader<IReadOnlyTexture<byte>>
         var paletteId = context.PaletteId;
 
         if (paletteId.IsNone)
-            throw new InvalidOperationException($"No palette id specified for {context.AssetId}");
+            throw new InvalidOperationException($"No palette id specified for {context.AssetId} ({context.AssetId.Id})");
 
         var palette = assets.LoadPalette(paletteId);
         if (palette == null)

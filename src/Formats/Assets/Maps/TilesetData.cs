@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Config;
-using UAlbion.Config.Properties;
 using UAlbion.Formats.Ids;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets.Maps;
 
 public class TilesetData
 {
     public const int TileCount = 4097;
-    public static readonly BoolAssetProperty UseSmallGraphicsProperty = new("UseSmallGraphics"); 
     public TilesetData() { }
     public TilesetData(TilesetId id) => Id = id;
     [JsonInclude] public TilesetId Id { get; private set; } // Setter required for JSON
@@ -26,7 +25,7 @@ public class TilesetData
 
         int tileCount = td?.Tiles.Count ?? (int)(s.BytesRemaining / 8) + dummyTileCount;
         td ??= new TilesetData(context.AssetId);
-        td.UseSmallGraphics = context.GetProperty(UseSmallGraphicsProperty, td.UseSmallGraphics);
+        td.UseSmallGraphics = context.GetProperty(TilesetLoader.UseSmallGraphicsProperty, td.UseSmallGraphics);
 
         if (td.Tiles.Count == 0)
         {

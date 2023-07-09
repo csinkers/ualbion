@@ -12,6 +12,6 @@ public class AssetInfo
     {
         Id = id;
         File = file ?? throw new ArgumentNullException(nameof(file));
-        Node = new AssetNode(file.Range.Range.From, file.Node);
+        Node = new AssetNode(file.Node);
     }
 }

@@ -10,10 +10,13 @@ public class AssetNode
 {
     readonly AssetId _startOfRangeId;
     readonly AssetNode _parent;
-    public AssetNode(AssetId startOfRangeId, AssetNode parent)
+    bool _frozen;
+
+    public AssetNode(AssetId startOfRangeId) => _startOfRangeId = startOfRangeId;
+    public AssetNode(AssetNode parent)
     {
-        _startOfRangeId = startOfRangeId;
-        _parent = parent;
+        _parent = parent ?? throw new ArgumentNullException(nameof(parent));
+        _startOfRangeId = parent._startOfRangeId;
     }
 
     /// <summary>
@@ -77,6 +80,8 @@ public class AssetNode
     public void SetProperty(IAssetProperty assetProperty, JsonElement value, TypeConfig typeConfig)
     {
         if (assetProperty == null) throw new ArgumentNullException(nameof(assetProperty));
+        if (_frozen) throw new InvalidOperationException("Tried to modify asset node after it was frozen. Asset nodes are immutable after mods have been loaded.");
+
         try
         {
             Properties ??= new Dictionary<string, object>();
@@ -93,6 +98,7 @@ public class AssetNode
     public void SetProperty<T>(IAssetProperty<T> assetProperty, T value)
     {
         if (assetProperty == null) throw new ArgumentNullException(nameof(assetProperty));
+        if (_frozen) throw new InvalidOperationException("Tried to modify asset node after it was frozen. Asset nodes are immutable after mods have been loaded.");
         Properties ??= new Dictionary<string, object>();
         Properties[assetProperty.Name] = value;
     }
@@ -126,6 +132,8 @@ public class AssetNode
 
             SetProperty(assetProperty, kvp.Value, typeConfig);
         }
+
+        _frozen = true;
     }
 
     // Asset loading control props

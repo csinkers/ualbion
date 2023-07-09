@@ -11,7 +11,7 @@ public class AssetFileInfo
     public AssetFileInfo(AssetRangeInfo range)
     {
         Range = range ?? throw new ArgumentNullException(nameof(range));
-        Node = new AssetNode(range.Range.From, range.Node);
+        Node = new AssetNode(range.Node);
     }
 
     public Dictionary<AssetId, AssetInfo> Map { get; } = new();

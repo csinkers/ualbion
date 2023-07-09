@@ -306,6 +306,7 @@ public class ModApplier : Component, IModApplier
             var assets = new Dictionary<string, List<(AssetLoadContext Context, byte[] Bytes)>>();
             foreach (var assetId in rangeInfo.Range)
             {
+                if (!AssetMapping.Global.IsMapped(assetId)) continue;
                 if (options.Ids != null && !options.Ids.Contains(assetId)) continue;
                 options.FlushCacheFunc();
 

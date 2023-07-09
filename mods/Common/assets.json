@@ -11,6 +11,28 @@
     "Loader": "inputconfig"
   },
 
+  "special.UAlbionStrings": {
+    "Files": {
+      "GERMAN/strings.json":  { "Language": "GERMAN"  },
+      "ENGLISH/strings.json": { "Language": "ENGLISH" },
+      "FRENCH/strings.json":  { "Language": "FRENCH"  }
+    },
+    "Loader": "json",
+    "Container": "raw" 
+  },
+
+  "utext.0-*": {
+    "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
+      "!GERMAN":  { "Language": "GERMAN" },
+      "!ENGLISH": { "Language": "ENGLISH" },
+      "!FRENCH":  { "Language": "FRENCH" }
+    },
+    "Loader": "stringset",
+    "FirstId": "utext.0",
+    "Target": "special.UAlbionStrings",
+    "IsReadOnly": true 
+  },
+
   "party.1-*": {
     "Files": { "PartyMembers": {} },
     "Loader": "jsonParty",

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Text;
 using SerdesNet;
 using UAlbion.Api;
@@ -61,6 +60,9 @@ public class JsonStringContainer : IAssetContainer
         if (dict == null)
             throw new FileLoadException($"Could not deserialize \"{path}\"");
 
-        return dict.ToDictionary(x => AssetId.Parse(x.Key), x => x.Value);
+        var dictionary = new Dictionary<AssetId, string>();
+        foreach (var pair in dict)
+            dictionary.Add(AssetId.Parse(pair.Key), pair.Value);
+        return dictionary;
     }
 }

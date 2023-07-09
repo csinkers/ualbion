@@ -1,14 +1,12 @@
 {
-  "itemname.1-462": {
-    "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
-      "!GERMAN": { "Language": "GERMAN" },
-      "!ENGLISH": { "Language": "ENGLISH" },
-      "!FRENCH": { "Language": "FRENCH" }
-    },
-    "Loader": "stringset",
-    "FirstId": "itemname.1",
-    "Target": "special.ItemNamesSingleLang",
-    "IsReadOnly": true 
+  "special.SoundBank": {
+    "Files": {
+      "Albion/DRIVERS/ALBISND.OPL": {
+        "Container": "raw",
+        "Loader": "soundbank",
+        "IsReadOnly": true 
+      }
+    }
   },
 
   "special.ItemNamesSingleLang": {
@@ -31,6 +29,38 @@
     }
   },
 
+  "special.SystemStrings": {
+    "Files": {
+      "Albion/CD/XLDLIBS/GERMAN/SYSTEXTS":  { "Language": "GERMAN"  },
+      "Albion/CD/XLDLIBS/ENGLISH/SYSTEXTS": { "Language": "ENGLISH" },
+      "Albion/CD/XLDLIBS/FRENCH/SYSTEXTS":  { "Language": "FRENCH"  }
+    },
+    "Loader": "stext",
+    "Container": "raw",
+    "IsReadOnly": true 
+  },
+
+  "special.Words1-Words3": {
+    "Files": {
+      "Albion/CD/XLDLIBS/GERMAN/WORDLIS0.XLD":  { "Language": "GERMAN"  },
+      "Albion/CD/XLDLIBS/ENGLISH/WORDLIS0.XLD": { "Language": "ENGLISH" },
+      "Albion/CD/XLDLIBS/FRENCH/WORDLIS0.XLD":  { "Language": "FRENCH"  }
+    },
+    "Loader": "wordlist" 
+  },
+
+  "itemname.1-462": {
+    "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
+      "!GERMAN": { "Language": "GERMAN" },
+      "!ENGLISH": { "Language": "ENGLISH" },
+      "!FRENCH": { "Language": "FRENCH" }
+    },
+    "Loader": "stringset",
+    "FirstId": "itemname.1",
+    "Target": "special.ItemNamesSingleLang",
+    "IsReadOnly": true 
+  },
+
   "stext.0-777": {
     "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
       "!GERMAN":  { "Language": "GERMAN" },
@@ -40,18 +70,6 @@
     "Loader": "stringset",
     "FirstId": "stext.0",
     "Target": "special.SystemStrings",
-    "IsReadOnly": true 
-  },
-
-  "utext.0-*": {
-    "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
-      "!GERMAN":  { "Language": "GERMAN" },
-      "!ENGLISH": { "Language": "ENGLISH" },
-      "!FRENCH":  { "Language": "FRENCH" }
-    },
-    "Loader": "stringset",
-    "FirstId": "utext.0",
-    "Target": "special.UAlbionStrings",
     "IsReadOnly": true 
   },
 
@@ -91,38 +109,8 @@
     "IsReadOnly": true 
   },
 
-  "special.SoundBank": { "Files": { "Albion/DRIVERS/ALBISND.OPL": { "Container": "raw", "Loader": "soundbank" } } },
-  "special.UAlbionStrings": {
-    "Files": {
-      "GERMAN/strings.json":  { "Language": "GERMAN"  },
-      "ENGLISH/strings.json": { "Language": "ENGLISH" },
-      "FRENCH/strings.json":  { "Language": "FRENCH"  }
-    },
-    "Loader": "json",
-    "Container": "raw" 
-  },
-
-  "special.SystemStrings": {
-    "Files": {
-      "Albion/CD/XLDLIBS/GERMAN/SYSTEXTS":  { "Language": "GERMAN"  },
-      "Albion/CD/XLDLIBS/ENGLISH/SYSTEXTS": { "Language": "ENGLISH" },
-      "Albion/CD/XLDLIBS/FRENCH/SYSTEXTS":  { "Language": "FRENCH"  }
-    },
-    "Loader": "stext",
-    "Container": "raw"
-  },
-
-  "special.Words1-Words3": {
-    "Files": {
-      "Albion/CD/XLDLIBS/GERMAN/WORDLIS0.XLD":  { "Language": "GERMAN"  },
-      "Albion/CD/XLDLIBS/ENGLISH/WORDLIS0.XLD": { "Language": "ENGLISH" },
-      "Albion/CD/XLDLIBS/FRENCH/WORDLIS0.XLD":  { "Language": "FRENCH"  }
-    },
-    "Loader": "wordlist" 
-  },
-
   // Items
-  "item.1-462":        { "Files": { "Albion/CD/XLDLIBS/ITEMLIST.DAT": { "Loader": "itemdata", "Container": "items" } } },
+  "item.1-462":     { "Files": { "Albion/CD/XLDLIBS/ITEMLIST.DAT": { "Loader": "itemdata", "Container": "items" } } },
 
   // Events
   "eset.1-32":      { "Files": { "Albion/CD/XLDLIBS/EVNTSET0.XLD": { "Loader": "eset"   } } },

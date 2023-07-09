@@ -14,7 +14,7 @@ namespace UAlbion.TestCommon;
 public static class Asset
 {
     static readonly XldContainer XldLoader = new();
-    public delegate T SerdesFunc<T>(T x, ISerializer s, SerdesContext context) where T : class;
+    public delegate T SerdesFunc<T>(T x, ISerializer s, AssetLoadContext context) where T : class;
     public static void Compare(
         string resultDir,
         string testName,
@@ -57,7 +57,7 @@ public static class Asset
         return reader.ReadToEnd();
     }
 
-    public static (T, string) Load<T>(byte[] bytes, SerdesFunc<T> serdes, SerdesContext context) where T : class
+    public static (T, string) Load<T>(byte[] bytes, SerdesFunc<T> serdes, AssetLoadContext context) where T : class
     {
         using var stream = new MemoryStream(bytes);
         using var br = new BinaryReader(stream);
@@ -91,7 +91,7 @@ public static class Asset
         return (result, annotation);
     }
 
-    public static (byte[], string) Save<T>(T asset, SerdesFunc<T> serdes, SerdesContext context) where T : class
+    public static (byte[], string) Save<T>(T asset, SerdesFunc<T> serdes, AssetLoadContext context) where T : class
     {
         using var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms);
@@ -184,9 +184,9 @@ public static class Asset
         return jsonUtil.Deserialize<T>(Encoding.UTF8.GetBytes(json));
     }
 
-    public static byte[] BytesFromXld(IPathResolver conf, string path, AssetInfo info, SerdesContext context)
+    public static byte[] BytesFromXld(IPathResolver conf, string path, AssetLoadContext context)
     {
-        using var s = XldLoader.Read(conf.ResolvePath(path), info, context);
+        using var s = XldLoader.Read(conf.ResolvePath(path), context);
         return s.Bytes(null, null, (int)s.BytesRemaining);
     }
 }

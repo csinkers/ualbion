@@ -16,7 +16,7 @@ public class EventSet : IEventSet
 {
     ushort[] _chainMapping;
     AssetId IEventSet.Id => Id;
-    [JsonIgnore] public TextId TextId => Id.ToEventText();
+    [JsonIgnore] public StringSetId StringSetId => Id.ToEventText();
     [JsonInclude] public EventSetId Id { get; private init; }
     [JsonInclude] public IList<ushort> Chains { get; private set; }
     [JsonIgnore] public IList<ushort> ExtraEntryPoints => null;
@@ -70,18 +70,23 @@ public class EventSet : IEventSet
         foreach (var e in set.Events)
             e.Unswizzle(set.Events);
 
-        // TODO: Unify this with the code in BaseMapData
-        var sortedChains = set.Chains
+        set.BuildChainMapping();
+        return set;
+    }
+
+    // TODO: Unify this with the code in BaseMapData
+    void BuildChainMapping()
+    {
+        var sortedChains = Chains
             .Select((eventId, chainId) => (eventId, chainId))
             .OrderBy(x => x)
             .ToArray();
 
-        set._chainMapping = new ushort[set.Events.Count];
-        for (int i = 0, j = 0; i < set.Events.Count; i++)
+        _chainMapping = new ushort[Events.Count];
+        for (int i = 0, j = 0; i < Events.Count; i++)
         {
             while (sortedChains.Length > j + 1 && sortedChains[j].eventId < i) j++;
-            set._chainMapping[i] = (ushort)sortedChains[j].chainId;
+            _chainMapping[i] = (ushort)sortedChains[j].chainId;
         }
-        return set;
     }
 }

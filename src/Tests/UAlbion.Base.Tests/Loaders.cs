@@ -16,6 +16,7 @@ public static class Loaders
     // public static readonly InterlacedBitmapLoader InterlacedBitmapLoader = new InterlacedBitmapLoader();
     public static readonly ItemNameLoader ItemNameLoader = new();
     public static readonly LabyrinthDataLoader LabyrinthDataLoader = new();
+    public static readonly MapLoader MapLoader = new();
     public static readonly MerchantLoader MerchantLoader = new();
     public static readonly MonsterGroupLoader MonsterGroupLoader = new();
     public static readonly PaletteLoader PaletteLoader = new();

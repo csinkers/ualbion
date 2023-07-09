@@ -1,6 +1,8 @@
-﻿namespace UAlbion.Config;
+﻿using System.Collections.Generic;
+
+namespace UAlbion.Config;
 
 public interface IAssetConfig
 {
-    AssetInfo[] GetAssetInfo(AssetId id);
+    IEnumerable<AssetNode> GetAssetInfo(AssetId id);
 }

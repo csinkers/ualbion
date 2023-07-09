@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
+using UAlbion.Config.Properties;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
@@ -20,7 +21,7 @@ namespace UAlbion.Game.Veldrid.Input;
 public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
 {
     static readonly Vector2 ItemSpriteOffset = new(3, 3);
-
+    static readonly StringAssetProperty Hotspot = new("Hotspot");
     public Vector2 Position { get; private set; }
     Vector2 _hotspot;
     BatchLease<SpriteKey, SpriteInfo> _cursorSprite;
@@ -91,12 +92,13 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
         var config = assets.GetAssetInfo(cursorId);
 
         _cursorId = cursorId;
-        var hotspot = CursorHotspot.Parse(config?.Get<string>("Hotspot", null));
+        var hotspot = CursorHotspot.Parse(config?.GetProperty(Hotspot, null));
         _hotspot = hotspot == null
             ? Vector2.Zero
             : window.GuiScale * new Vector2(hotspot.X, hotspot.Y);
         _dirty = true;
     }
+
 
     void Render()
     {

@@ -10,7 +10,7 @@ namespace UAlbion.CodeGenerator;
 public class Assets
 {
     public string BaseDir { get; }
-    public AssetConfig AssetConfig { get; }
+    public IReadOnlyDictionary<string, AssetTypeInfo> IdTypes { get; }
     public AssetIdConfig AssetIdConfig { get; }
     public Dictionary<string, string[]> ParentsByAssetId { get; }
     public Dictionary<string, string[]> AssetIdsByEnum { get; }
@@ -26,13 +26,15 @@ public class Assets
 
         var modDisk = disk.Duplicate(config.ResolvePath($"$(MODS)/{modName}"));
         var modConfig = ModConfig.Load(ModConfig.ModConfigFilename, modDisk, jsonUtil);
-        AssetConfig = AssetConfig.Load(modConfig.AssetConfig, null, AssetMapping.Global, modDisk, jsonUtil);
+
+        var typeConfigLoader = new TypeConfigLoader(jsonUtil);
+        IdTypes = typeConfigLoader.LoadIdTypesOnly(config.ResolvePath(modConfig.TypeConfig), modDisk);
         AssetIdConfig = AssetIdConfig.Load(assetIdConfigPath, modDisk, jsonUtil);
 
         AssetIdsByType = FindAssetIdsByType(AssetIdConfig);
         ParentsByAssetId = FindAssetIdParents(AssetIdConfig, AssetIdsByType);
-        AssetIdsByEnum = FindAssetIdsForEnums(AssetConfig.IdTypes, AssetIdsByType);
-        EnumsByAssetId = FindEnumsByAssetId(AssetConfig.IdTypes, AssetIdsByType);
+        AssetIdsByEnum = FindAssetIdsForEnums(IdTypes, AssetIdsByType);
+        EnumsByAssetId = FindEnumsByAssetId(IdTypes, AssetIdsByType);
         // HandleIsomorphism(AssetConfig.IdTypes);
 
         // TODO: Build family based on IsomorphicToAttribute.

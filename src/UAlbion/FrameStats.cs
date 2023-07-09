@@ -4,6 +4,7 @@ using System.Linq;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
+using UAlbion.Config.Properties;
 using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 
@@ -21,8 +22,7 @@ class FrameStats
             if (texture == null)
                 continue;
 
-            var palleteId = new PaletteId(info.Get(AssetProperty.PaletteId, 0));
-            var palette = assets.LoadPalette(palleteId);
+            var palette = assets.LoadPalette(info.PaletteId);
 
             var frames = texture.Regions.Count;
             var uniqueColours = new HashSet<byte>();

@@ -5,6 +5,7 @@ using SerdesNet;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
+using UAlbion.Config.Properties;
 using UAlbion.Formats;
 using UAlbion.Formats.Exporters.Tiled;
 using UAlbion.Formats.Parsers;
@@ -13,12 +14,13 @@ namespace UAlbion.Game.Veldrid.Assets;
 
 public class NpcTilesetLoader : Component, IAssetLoader
 {
+    public static readonly BoolAssetProperty IsSmallProperty = new("IsSmall"); //  TODO, combine with UseSmallGraphics
+    public static readonly PathPatternProperty GraphicsPattern = new("GraphicsPattern"); 
     readonly Png8Loader _png8Loader = new();
 
     public NpcTilesetLoader() => AttachChild(_png8Loader);
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
@@ -26,13 +28,12 @@ public class NpcTilesetLoader : Component, IAssetLoader
             return new object();
 
         if (existing == null) throw new ArgumentNullException(nameof(existing));
-        var graphicsPattern = info.GetPattern(AssetProperty.GraphicsPattern, "");
-        bool small = info.Get(AssetProperty.IsSmall, false);
+        var graphicsPattern = context.GetProperty(GraphicsPattern);
+        bool small = context.GetProperty(IsSmallProperty);
 
-        var tsxDir = Path.GetDirectoryName(info.File.Filename);
+        var tsxDir = Path.GetDirectoryName(context.Filename);
         var tiles = new List<TileProperties>();
-        var assets = Resolve<IAssetManager>();
-        var modApplier = Resolve<IModApplier>();
+        var sourceAssets = Resolve<IAssetManager>();
         var pathResolver = Resolve<IPathResolver>();
         var assetIds =
             AssetMapping.Global.EnumerateAssetsOfType(small
@@ -41,18 +42,18 @@ public class NpcTilesetLoader : Component, IAssetLoader
 
         foreach (var id in assetIds)
         {
-            var sprite = assets.LoadTexture(id); // Get sprite from source mod
-            var spriteInfo = modApplier.GetAssetInfo(id, null); // But get AssetInfo from target mod
-
+            var sprite = sourceAssets.LoadTexture(id); // Get sprite from source mod
+            var sourceNode = sourceAssets.GetAssetInfo(id);
             // Ugh, hacky.
-            int palId = spriteInfo.Get(AssetProperty.PaletteId, 0);
-            if (palId == 0)
-                spriteInfo.Set(AssetProperty.PaletteId,
-                    assets.GetAssetInfo(id).Get(AssetProperty.PaletteId, 0));
+            var npcNode = new AssetNode(id);
+            npcNode.SetProperty(AssetProps.Palette, sourceNode.PaletteId);
 
-            var path = graphicsPattern.Format(new AssetPath(spriteInfo, 9)); // 9 = First frame facing west for both large and small
+            var subContext = new AssetLoadContext(id, npcNode, context.ModContext);
+            var assetPath = subContext.BuildAssetPath(9); // 9 = First frame facing west for both large and small
+
+            var path = graphicsPattern.Format(assetPath);
             path = pathResolver.ResolvePath(path);
-            WriteNpcSprite(path, sprite, spriteInfo, context);
+            WriteNpcSprite(path, sprite, subContext);
 
             var pathRelativeToTsx = ConfigUtil.GetRelativePath(path, tsxDir, true);
 
@@ -71,13 +72,13 @@ public class NpcTilesetLoader : Component, IAssetLoader
         return existing;
     }
 
-    void WriteNpcSprite(string path, ITexture sprite, AssetInfo info, SerdesContext context)
+    void WriteNpcSprite(string path, ITexture sprite, AssetLoadContext context)
     {
         var dir = Path.GetDirectoryName(path);
         if (!context.Disk.DirectoryExists(dir))
             context.Disk.CreateDirectory(dir);
 
-        using var s = FormatUtil.SerializeWithSerdes(s => _png8Loader.Serdes(sprite, info, s, context));
+        using var s = FormatUtil.SerializeWithSerdes(s => _png8Loader.Serdes(sprite, s, context));
         int i = 0;
         foreach (var (chunk, _) in PackedChunks.Unpack(s))
         {

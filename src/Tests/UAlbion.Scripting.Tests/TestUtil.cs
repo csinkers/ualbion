@@ -23,7 +23,7 @@ public static class TestUtil
         {
             var curDir = new DirectoryInfo(start ?? throw new InvalidOperationException());
 
-            while (curDir != null && !File.Exists(Path.Combine(curDir.FullName, "mods", "Base", "base_assets.json")))
+            while (curDir != null && !File.Exists(Path.Combine(curDir.FullName, "mods", "Base", "types.json")))
                 curDir = curDir.Parent;
 
             return curDir?.FullName;

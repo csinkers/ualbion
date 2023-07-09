@@ -5,7 +5,7 @@
   "Author": "Cam Sinclair et al",
   "Version": "0.1.0",
   "Dependencies": [ "Base", "Shaders", "Common" ],
-  "InheritAssetConfigFrom": "Base",
+  "InheritTypeConfigFrom": "Base",
   "AssetConfig": "alb_assets.json",
   "SymLinks": { "Albion": "$(ALBION)" }
 }

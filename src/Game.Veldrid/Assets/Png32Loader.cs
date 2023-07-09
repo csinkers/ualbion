@@ -58,9 +58,8 @@ public class Png32Loader : Component, IAssetLoader<IReadOnlyTexture<uint>>
         return new SimpleTexture<uint>(id, id.ToString(), totalWidth, totalHeight, pixels, frames);
     }
 
-    public IReadOnlyTexture<uint> Serdes(IReadOnlyTexture<uint> existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public IReadOnlyTexture<uint> Serdes(IReadOnlyTexture<uint> existing, ISerializer s, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
@@ -86,11 +85,11 @@ public class Png32Loader : Component, IAssetLoader<IReadOnlyTexture<uint>>
                 images.Add(decoder.Decode<Rgba32>(configuration, stream));
             }
 
-            return Read(info.AssetId, images);
+            return Read(context.AssetId, images);
         }
         finally { foreach (var image in images) image.Dispose(); }
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((IReadOnlyTexture<uint>)existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((IReadOnlyTexture<uint>)existing, s, context);
 }

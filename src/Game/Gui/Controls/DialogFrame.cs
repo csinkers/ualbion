@@ -54,7 +54,8 @@ public class DialogFrame : UiElement
         }
 
         var assets = Resolve<IAssetManager>();
-        var multi = new CompositedTexture(AssetId.None, $"DialogFrame {width}x{height}", assets.LoadPalette(Id(Base.Palette.Inventory)));
+        var palette = assets.LoadPalette(Id(Base.Palette.Inventory));
+        var multi = new CompositedTexture(AssetId.None, $"DialogFrame {width}x{height}", palette);
 
         void DrawLine(int y)
         {

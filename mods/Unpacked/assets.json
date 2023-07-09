@@ -1,219 +1,242 @@
 {
-  "Languages": { // Just used for the options screen
-    "ENGLISH": { "DisplayName": "English",  "ShortName": "EN" },
-    "GERMAN":  { "DisplayName": "Deutsch",  "ShortName": "DE" },
-    "FRENCH":  { "DisplayName": "Français", "ShortName": "FR" }
+ // Pattern Variables: 0=SubId in container 1=frame/sub-asset number 2=Asset name 3=PaletteId. Patterns must begin with {id}_ when writing.
+  "special.SoundBank": { "Files": { "Assets/Soundbank.json": { "Container": "raw", "Loader": "jsonSoundbank" } } },
+
+  "special.TiledNpcsLarge": {
+    "Sequence": 1, // Needs to happen before maps are exported
+    "Loader": "tiledNpcTileset",
+    "Container": "raw",
+    "UseDummyRead": true,
+    "Files": { "Assets/Tilesets/LargeNPCs.tsx": { "IsSmall": false, "GraphicsPattern": "Assets/Tilesets/LargeNPCs/{id}.png" } }
+  },
+  "special.TiledNpcsSmall": {
+    "Sequence": 1, // Needs to happen before maps are exported
+    "Loader": "tiledNpcTileset",
+    "Container": "raw",
+    "UseDummyRead": true,
+    "Files": { "Assets/Tilesets/SmallNPCs.tsx": { "IsSmall": true,  "GraphicsPattern": "Assets/Tilesets/SmallNPCs/{id}.png" } }
   },
 
-  "Files": { // Pattern Variables: 0=SubId in container 1=frame/sub-asset number 2=Asset name 3=PaletteId. Patterns must begin with {id}_ when writing.
-    "Assets/3dBackgrounds":      { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_p{pal}_{name}.png", "Map": { "1": { "Id": "3dbg.1"     } } },
-    "Assets/3dFloors":           { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "floor.1"    } } },
-    "Assets/3dObjects":          { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "3dobj.1"    } } },
-    "Assets/3dOverlays":         { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "overlay.1"  } } },
-    "Assets/3dWalls":            { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "wall.1"     } } },
-    "Assets/CombatBackground":   { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_p{pal}_{name}.png", "Map": { "1": { "Id": "combg.1"    } } },
-    "Assets/CombatGraphics":     { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "comgfx.1"   } } },
-    "Assets/InvBackgrounds":     { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "pinvgfx.1" } } },
-    "Assets/MonsterGraphics":    { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "mongfx.1"   } } },
-    "Assets/NpcGraphicsLarge":   { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "npclarge.1"     } } },
-    "Assets/NpcGraphicsSmall":   { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "npcsmall.1"     } } },
-    "Assets/PartyGraphicsLarge": { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "plarge.1"   } } },
-    "Assets/PartyGraphicsSmall": { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png", "Map": { "1": { "Id": "psmall.1"   } } },
-    "Assets/Pictures":           { "Loader": "png32", "Container": "dir", "Pattern": "{id}_{name}.png", "Map": { "1": { "Id": "pic.1" } } },
-    "Assets/Portraits":          { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{name}.png", "Map": { "1": { "Id": "portrait.1" } } },
-    "Assets/Slab":               { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Map": { "1": { "Id": "uibg.1"     } } },
-    "Assets/TacticalIcons":      { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Map": { "1": { "Id": "tacgfx.1"   } } },
-    "Assets/CoreGraphics":       { "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png",      "Map": { "0": { "Id": "coregfx.0"  } } },
+  "special.ItemNamesMultiLang": { // This is just for repacking back to the binary formats
+    "Loader": "itemnameCollector",
+    "TargetRange": "itemname.1-*",
+    "TargetLanguages": [ "GERMAN", "ENGLISH", "FRENCH" ],
+    "IsReadOnly": true
+  },
 
-    "Assets/Soundbank.json": {
-      "Container": "raw",
-      "Loader": "jsonSoundbank",
-      "Max": 0, 
-      "Map": { "0": { "Id": "special.SoundBank" } }
+  "special.Words1": {
+    "Files": {
+      "!GERMAN": { "Language": "GERMAN" },
+      "!ENGLISH": { "Language": "ENGLISH" },
+      "!FRENCH": { "Language": "FRENCH" }
     },
-
-    "Assets/Tilesets/LargeNPCs.tsx": {
-      "Loader": "tiledNpcTileset",
-      "Container": "raw",
-      "IsSmall": false,
-      "GraphicsPattern": "Assets/Tilesets/LargeNPCs/{id}.png",
-      "Max": 0, 
-      "Map": { "0": { "Id": "special.DummyObject" } }
+    "IsReadOnly": true,
+    "Loader": "stringcollector",
+    "FileRange": "word.0-1499",
+    "TargetRange": "word.0-499"
+  },
+  "special.Words2": {
+    "Files": {
+      "!GERMAN": { "Language": "GERMAN" },
+      "!ENGLISH": { "Language": "ENGLISH" },
+      "!FRENCH": { "Language": "FRENCH" }
     },
-    "Assets/Tilesets/SmallNPCs.tsx": {
-      "Loader": "tiledNpcTileset",
-      "Container": "raw",
-      "IsSmall": true,
-      "GraphicsPattern": "Assets/Tilesets/SmallNPCs/{id}.png",
-      "Max": 0, 
-      "Map": { "0": { "Id": "special.DummyObject" } }
+    "IsReadOnly": true,
+    "Loader": "stringcollector",
+    "FileRange": "word.0-1499",
+    "TargetRange": "word.500-999"
+  },
+  "special.Words3": {
+    "Files": {
+      "!GERMAN": { "Language": "GERMAN" },
+      "!ENGLISH": { "Language": "ENGLISH" },
+      "!FRENCH": { "Language": "FRENCH" }
     },
+    "IsReadOnly": true,
+    "Loader": "stringcollector",
+    "FileRange": "word.0-1499",
+    "TargetRange": "word.1000-1499"
+  },
 
-    "Assets/Chests":        { "Loader": "jsonInv",          "Container": "dir", "Pattern": "{id:000}_{name}.json", "Map": { "1": { "Id": "chest.1"    } } },
-    "Assets/Events":        { "Loader": "eventSetScript",   "Container": "dir", "Pattern": "{id:000}_{name}.ua",   "Map": { "1": { "Id": "eset.1"     } } },
-    "Assets/Merchants":     { "Loader": "jsonInv",          "Container": "dir", "Pattern": "{id:000}_{name}.json", "Map": { "1": { "Id": "merchant.1" } } },
-    "Assets/MonsterGroups": { "Loader": "jsonMonsterGroup", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "2": { "Id": "mongrp.2"   } } },
-    "Assets/Monsters":      { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "monster.1"  } } },
-    "Assets/Npcs":          { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "npc.1"      } } },
-    "Assets/Palettes":      { "Loader": "jsonPal",          "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "0": { "Id": "pal.0"      } } },
-    "Assets/PartyMembers":  { "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "psheet.1"    } } },
-    "Assets/Samples":       { "Loader": "wav",              "Container": "dir", "Pattern": "{id}_{name}.wav",  "Map": { "1": { "Id": "sample.1"   } } },
-    "Assets/Scripts":       { "Loader": "script",           "Container": "dir", "Pattern": "{id}_{name}.ua",   "Map": { "2": { "Id": "script.2"   } } },
-    "Assets/Songs":         { "Loader": "song",             "Container": "dir", "Pattern": "{id}_{name}.xmi",  "Map": { "1": { "Id": "song.1"     } } },
-    "Assets/WaveLib":       { "Loader": "wavlib2",          "Container": "dir", "Pattern": "{id}_{frame}_{name}.wav", "Map": { "5": { "Id": "wavlib.5" } } },
-    "Assets/Items.json":    { "Loader": "jsonItems",        "Container": "jsonObj", "Map": { "1": { "Id": "item.1"  } } },
-    "Assets/Spells.json":   { "Loader": "jsonSpell",        "Container": "jsonObj", "Map": { "1": { "Id": "spell.1" } } },
+  "3dbg.1-*":     { "Files": { "Assets/3dBackgrounds": {} },      "Loader": "png8",  "Container": "dir", "Pattern": "{id}_p{pal}_{name}.png" },
+  "floor.1-*":    { "Files": { "Assets/3dFloors": {} },           "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png" },
+  "3dobj.1-*":    { "Files": { "Assets/3dObjects": {} },          "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png" },
+  "overlay.1-*":  { "Files": { "Assets/3dOverlays": {} },         "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png" },
+  "wall.1-*":     { "Files": { "Assets/3dWalls": {} },            "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png" },
+  "combg.1-*":    { "Files": { "Assets/CombatBackground": {} },   "Loader": "png8",  "Container": "dir", "Pattern": "{id}_p{pal}_{name}.png" },
+  "comgfx.1-*":   { "Files": { "Assets/CombatGraphics": {} },     "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png" },
+  "pinvgfx.1-*":  { "Files": { "Assets/InvBackgrounds": {} },     "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png" },
+  "mongfx.1-*":   { "Files": { "Assets/MonsterGraphics": {} },    "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png" },
+  "npclarge.1-*": { "Files": { "Assets/NpcGraphicsLarge": {} },   "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png" },
+  "npcsmall.1-*": { "Files": { "Assets/NpcGraphicsSmall": {} },   "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png" },
+  "plarge.1-*":   { "Files": { "Assets/PartyGraphicsLarge": {} }, "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png" },
+  "psmall.1-*":   { "Files": { "Assets/PartyGraphicsSmall": {} }, "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png" },
+  "pic.1-*":      { "Files": { "Assets/Pictures": {} },           "Loader": "png32", "Container": "dir", "Pattern": "{id}_{name}.png" },
+  "portrait.1-*": { "Files": { "Assets/Portraits": {} },          "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{name}.png", "Palette": "pal.0" },
+  "uibg.1-*":     { "Files": { "Assets/Slab": {} },               "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Palette": "pal.0" },
+  "tacgfx.1-*":   { "Files": { "Assets/TacticalIcons": {} },      "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Palette": "pal.0" },
+  "coregfx.0-*":  { "Files": { "Assets/CoreGraphics": {} },       "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_{name}.png", "Palette": "pal.0" },
 
-    "dummy_item_names": { "Loader": "itemNameCollector", "Container": "dummy", "Max": 0, "Map": { "0": { "Id": "special.ItemNames" } } },
-    "Assets/ItemNamesDE.json": { "Language": "GERMAN",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "1": { "Id": "itemname.1"  } } },
-    "Assets/ItemNamesEN.json": { "Language": "ENGLISH", "Loader": "utf8", "Container": "jsonStrings", "Map": { "1": { "Id": "itemname.1"  } } },
-    "Assets/ItemNamesFR.json": { "Language": "FRENCH",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "1": { "Id": "itemname.1"  } } },
+  "chest.1-*":    { "Files": { "Assets/Chests": {} },        "Loader": "jsonInv",          "Container": "dir", "Pattern": "{id:000}_{name}.json"    },
+  "eset.1-*":     { "Files": { "Assets/Events": {} },        "Loader": "eventSetScript",   "Container": "dir", "Pattern": "{id:000}_{name}.ua"      },
+  "merchant.1-*": { "Files": { "Assets/Merchants": {} },     "Loader": "jsonInv",          "Container": "dir", "Pattern": "{id:000}_{name}.json"    },
+  "mongrp.2-*":   { "Files": { "Assets/MonsterGroups": {} }, "Loader": "jsonMonsterGroup", "Container": "dir", "Pattern": "{id}_{name}.json"        },
+  "monster.1-*":  { "Files": { "Assets/Monsters": {} },      "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json"        },
+  "npc.1-*":      { "Files": { "Assets/Npcs": {} },          "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json"        },
+  "pal.0-*":      { "Files": { "Assets/Palettes": {} },      "Loader": "jsonPal",          "Container": "dir", "Pattern": "{id}_{name}.json"        },
+  "psheet.1-*":   { "Files": { "Assets/PartyMembers": {} },  "Loader": "jsonSheet",        "Container": "dir", "Pattern": "{id}_{name}.json"        },
+  "sample.1-*":   { "Files": { "Assets/Samples": {} },       "Loader": "wav",              "Container": "dir", "Pattern": "{id}_{name}.wav"         },
+  "script.2-*":   { "Files": { "Assets/Scripts": {} },       "Loader": "script",           "Container": "dir", "Pattern": "{id}_{name}.ua"          },
+  "song.1-*":     { "Files": { "Assets/Songs": {} },         "Loader": "song",             "Container": "dir", "Pattern": "{id}_{name}.xmi"         },
+  "wavlib.5-*":   { "Files": { "Assets/WaveLib": {} },       "Loader": "wavlib2",          "Container": "dir", "Pattern": "{id}_{frame}_{name}.wav" },
+  "item.1-*":     { "Files": { "Assets/Items.json": {} },    "Loader": "jsonItems",        "Container": "jsonObj" },
+  "spell.1-*":    { "Files": { "Assets/Spells.json": {} },   "Loader": "jsonSpell",        "Container": "jsonObj" },
 
-    "Assets/SystemTextDE.json": { "Language": "GERMAN",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "stext.0" } } },
-    "Assets/SystemTextEN.json": { "Language": "ENGLISH", "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "stext.0" } } },
-    "Assets/SystemTextFR.json": { "Language": "FRENCH",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "stext.0" } } },
-
-    "Assets/EventTextDE": { "Language": "GERMAN",  "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "etext.1" } } },
-    "Assets/EventTextEN": { "Language": "ENGLISH", "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "etext.1" } } },
-    "Assets/EventTextFR": { "Language": "FRENCH",  "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "1": { "Id": "etext.1" } } },
-
-    "Assets/MapTextDE": { "Language": "GERMAN",  "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "100": { "Id": "mtext.100" } } },
-    "Assets/MapTextEN": { "Language": "ENGLISH", "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "100": { "Id": "mtext.100" } } },
-    "Assets/MapTextFR": { "Language": "FRENCH",  "Loader": "jsonText", "Container": "dir", "Pattern": "{id}_{name}.json", "Map": { "100": { "Id": "mtext.100" } } },
-
-    "dummy_words_de": {
-      "Language": "GERMAN",
-      "Loader": "wordCollector",
-      "Container": "dummy",
-      "Max": 2,
-      "Map": {
-        "0": { "Id": "special.Words1" },
-        "1": { "Id": "special.Words2" },
-        "2": { "Id": "special.Words3" }
-      }
-    },
-    "dummy_words_en": {
-      "Language": "ENGLISH",
-      "Loader": "wordCollector",
-      "Container": "dummy",
-      "Max": 2,
-      "Map": {
-        "0": { "Id": "special.Words1" },
-        "1": { "Id": "special.Words2" },
-        "2": { "Id": "special.Words3" }
-      }
-    },
-    "dummy_words_fr": {
-      "Language": "FRENCH",
-      "Loader": "wordCollector",
-      "Container": "dummy",
-      "Max": 2,
-      "Map": {
-        "0": { "Id": "special.Words1" },
-        "1": { "Id": "special.Words2" },
-        "2": { "Id": "special.Words3" }
-      }
-    },
-    "Assets/WordsDE.json": { "Language": "GERMAN",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "word.0" } } },
-    "Assets/WordsEN.json": { "Language": "ENGLISH", "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "word.0" } } },
-    "Assets/WordsFR.json": { "Language": "FRENCH",  "Loader": "utf8", "Container": "jsonStrings", "Map": { "0": { "Id": "word.0" } } },
-
-    "Assets/Automap/1": { "Loader": "png8", "Container": "dir", "Pattern": "{id}_{frame:000}_p{pal}_{name}.png", "Max": 1, "Map": { "1": { "Id": "autotile.1" } } },
-    "Assets/Automap/2": { "Loader": "png8", "Container": "dir", "Pattern": "{id}_{frame:000}_p{pal}_{name}.png", "Max": 2, "Map": { "2": { "Id": "autotile.2" } } },
-    "Assets/Automap":   { "Loader": "automap", "Container": "dir", "Pattern": "{id}_{frame}_{name}.dat", "Map": { "100": { "Id": "automap.100" } } },
-    "Assets/FontGfx": {
-      "Container": "dir",
-      "Loader": "pngsheet",
-      "Width": 8, 
-      "Height": 8, 
-      "Pattern": "{id}_{name}.png",
-      "Map": { "1": { "Id": "fontgfx.1" } }
-    },
-    "Assets/Items.png": {
-      "Loader": "pngsheet",
-      "Container": "raw",
-      "Pattern": "{id}_{name}.png",
-      "Width": 16,
-      "Height": 16,
-      "Map": { "0": { "Id": "itemgfx.1"  } }
-    },
-
-    "Assets/Tilesets/1":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  1, "Pattern": "{id}_{frame}.png", "Max":  1, "Map": {  "1": { "Id": "tilegfx.1"  } } },
-    "Assets/Tilesets/2":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  2, "Pattern": "{id}_{frame}.png", "Max":  2, "Map": {  "2": { "Id": "tilegfx.2"  } } },
-    "Assets/Tilesets/3":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  6, "Pattern": "{id}_{frame}.png", "Max":  3, "Map": {  "3": { "Id": "tilegfx.3"  } } },
-    "Assets/Tilesets/4":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  4, "Pattern": "{id}_{frame}.png", "Max":  4, "Map": {  "4": { "Id": "tilegfx.4"  } } },
-    "Assets/Tilesets/5":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  5, "Pattern": "{id}_{frame}.png", "Max":  5, "Map": {  "5": { "Id": "tilegfx.5"  } } },
-    "Assets/Tilesets/6":  { "Loader": "pngtile8", "Container": "dir", "PaletteId": 16, "Pattern": "{id}_{frame}.png", "Max":  6, "Map": {  "6": { "Id": "tilegfx.6"  } } },
-    "Assets/Tilesets/7":  { "Loader": "pngtile8", "Container": "dir", "PaletteId":  9, "Pattern": "{id}_{frame}.png", "Max":  7, "Map": {  "7": { "Id": "tilegfx.7"  } } },
-    "Assets/Tilesets/8":  { "Loader": "pngtile8", "Container": "dir", "PaletteId": 26, "Pattern": "{id}_{frame}.png", "Max":  8, "Map": {  "8": { "Id": "tilegfx.8"  } } },
-    "Assets/Tilesets/9":  { "Loader": "pngtile8", "Container": "dir", "PaletteId": 28, "Pattern": "{id}_{frame}.png", "Max":  9, "Map": {  "9": { "Id": "tilegfx.9"  } } },
-    "Assets/Tilesets/10": { "Loader": "pngtile8", "Container": "dir", "PaletteId": 45, "Pattern": "{id}_{frame}.png", "Max": 10, "Map": { "10": { "Id": "tilegfx.10" } } },
-    "Assets/Tilesets/11": { "Loader": "pngtile8", "Container": "dir", "PaletteId": 56, "Pattern": "{id}_{frame}.png", "Max": 11, "Map": { "11": { "Id": "tilegfx.11" } } },
-
-    "Assets/Tilesets/1/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  1, "Map": {  "1": { "Id": "block.1" } } },
-    "Assets/Tilesets/2/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  2, "Map": {  "2": { "Id": "block.2" } } },
-    "Assets/Tilesets/3/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  3, "Map": {  "3": { "Id": "block.3" } } },
-    "Assets/Tilesets/4/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  4, "Map": {  "4": { "Id": "block.4" } } },
-    "Assets/Tilesets/5/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  5, "Map": {  "5": { "Id": "block.5" } } },
-    "Assets/Tilesets/6/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  6, "Map": {  "6": { "Id": "block.6" } } },
-    "Assets/Tilesets/7/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  7, "Map": {  "7": { "Id": "block.7" } } },
-    "Assets/Tilesets/8/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  8, "Map": {  "8": { "Id": "block.8" } } },
-    "Assets/Tilesets/9/Stamps":  { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max":  9, "Map": {  "9": { "Id": "block.9" } } },
-    "Assets/Tilesets/10/Stamps": { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max": 10, "Map": { "10": { "Id": "block.10" } } },
-    "Assets/Tilesets/11/Stamps": { "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx", "Max": 11, "Map": { "11": { "Id": "block.11" } } },
-
-    "Assets/3dTilesets": {
-      // "Loader": "jsonLab",
-      "Loader": "tiledLabyrinth",
-      "Container": "dir",
-
-      "Pattern": "{id}_{name}.json",
-      "TileWidth": 96,
-      "TileHeight": 128,
-      "BaseHeight": 68,
-      "TilesPerRow": 16, 
-      "TiledFloorPattern": "Tiled/{id}_{name}_Floors.tsx", 
-      "TiledCeilingPattern": "Tiled/{id}_{name}_Ceilings.tsx", 
-      "TiledWallPattern": "Tiled/{id}_{name}_Walls.tsx", 
-      "TiledContentsPattern": "Tiled/{id}_{name}_Contents.tsx", 
-
-      "FloorPngPattern": "Tiled/Gfx/{id}_{name}_Floors.png", 
-      "CeilingPngPattern": "Tiled/Gfx/{id}_{name}_Ceilings.png", 
-      "WallPngPattern": "Tiled/Gfx/{id}_{name}_Walls.png", 
-      "ContentsPngPattern": "Tiled/Gfx/{id}_{name}_Contents.png", 
-
-      "Map": { "1": { "Id": "lab.1" } }
-    },
-
-    "Assets/Tilesets": {
-      "Loader": "tiledTileset", // "jsonTileset"
-      "Container": "dir",
-      "Pattern": "{id}_{name}.tsx", // "{id}_{name}.json",
-      "GraphicsPattern": "{id}/{id}_{frame}.png",
-      "BlankTilePath": "../../Blank.png",
-      "Map": { "1": { "Id": "tiledata.1" } }
-    },
-
-    "Assets/Maps": {
-      "Loader": "tiledMap",
-      "Container": "dir",
-      "Pattern": "{id}_{name}.tmx",
-      "ScriptPattern": "{id}_{name}.ua",
-
-      "TilesetPattern": "../Tilesets/{id}_{name}.tsx",
-      "SmallNpcs": "../Tilesets/SmallNPCs.tsx",
-      "LargeNpcs": "../Tilesets/LargeNPCs.tsx",
-
-      "TileWidth": 96,
-      "TileHeight": 128,
-      "BaseHeight": 68, 
-      "TiledFloorPattern": "../3dTilesets/Tiled/{id}_{name}_Floors.tsx", 
-      "TiledCeilingPattern": "../3dTilesets/Tiled/{id}_{name}_Ceilings.tsx", 
-      "TiledWallPattern": "../3dTilesets/Tiled/{id}_{name}_Walls.tsx", 
-      "TiledContentsPattern": "../3dTilesets/Tiled/{id}_{name}_Contents.tsx", 
-
-      "Map": { "100": { "Id": "map.100" } }
+  "itemname.1-*": {
+    "Loader": "utf8",
+    "Container": "jsonStrings",
+    "Files": {
+      "Assets/ItemNamesDE.json": { "Language": "GERMAN"  },
+      "Assets/ItemNamesEN.json": { "Language": "ENGLISH" },
+      "Assets/ItemNamesFR.json": { "Language": "FRENCH"  }
     }
+  },
+
+  "stext.0-*": {
+    "Loader": "utf8",
+    "Container": "jsonStrings",
+    "Files": {
+      "Assets/SystemTextDE.json": { "Language": "GERMAN"  },
+      "Assets/SystemTextEN.json": { "Language": "ENGLISH" },
+      "Assets/SystemTextFR.json": { "Language": "FRENCH"  }
+    }
+  },
+
+  "etext.1-*": {
+    "Loader": "jsonText",
+    "Container": "dir",
+    "Pattern": "{id}_{name}.json",
+    "Files": {
+      "Assets/EventTextDE": { "Language": "GERMAN"  },
+      "Assets/EventTextEN": { "Language": "ENGLISH" },
+      "Assets/EventTextFR": { "Language": "FRENCH"  }
+    }
+  },
+
+  "mtext.100-*": {
+    "Loader": "jsonText",
+    "Container": "dir",
+    "Optional": true, // Not every map has text
+    "Pattern": "{id}_{name}.json",
+    "Files": {
+      "Assets/MapTextDE": { "Language": "GERMAN"  },
+      "Assets/MapTextEN": { "Language": "ENGLISH" },
+      "Assets/MapTextFR": { "Language": "FRENCH"  }
+    }
+  },
+
+  "word.0-*": {
+    "Loader": "utf8",
+    "Container": "jsonStrings",
+    "Files": {
+      "Assets/WordsDE.json": { "Language": "GERMAN"  },
+      "Assets/WordsEN.json": { "Language": "ENGLISH" },
+      "Assets/WordsFR.json": { "Language": "FRENCH"  }
+    }
+  },
+
+  "autotile.1":    { "Files": { "Assets/Automap/1": {} }, "Loader": "png8",    "Container": "dir", "Pattern": "{id}_{frame:000}_p{pal}_{name}.png" },
+  "autotile.2":    { "Files": { "Assets/Automap/2": {} }, "Loader": "png8",    "Container": "dir", "Pattern": "{id}_{frame:000}_p{pal}_{name}.png" },
+  "automap.100-*": { "Files": { "Assets/Automap": {} },   "Loader": "automap", "Container": "dir", "Pattern": "{id}_{frame}_{name}.dat", "Optional": true  },
+
+  "fontgfx.1-*": {
+    "Files": { "Assets/FontGfx": { } },
+    "Container": "dir",
+    "Loader": "pngsheet",
+    "Width": 8,
+    "Height": 8,
+    "Pattern": "{id}_{name}.png"
+  },
+
+  "itemgfx.1-*": {
+    "Files": { "Assets/Items.png": {} },
+    "Loader": "pngsheet",
+    "Container": "raw",
+    "Pattern": "{id}_{name}.png",
+    "Width": 16, "Height": 16
+  },
+
+  "tilegfx.1":  { "Files": { "Assets/Tilesets/1": {} },  "Loader": "pngtile8", "Container": "dir", "Palette":  "pal.1", "Pattern": "{id}_{frame}.png" },
+  "tilegfx.2":  { "Files": { "Assets/Tilesets/2": {} },  "Loader": "pngtile8", "Container": "dir", "Palette":  "pal.2", "Pattern": "{id}_{frame}.png" },
+  "tilegfx.3":  { "Files": { "Assets/Tilesets/3": {} },  "Loader": "pngtile8", "Container": "dir", "Palette":  "pal.6", "Pattern": "{id}_{frame}.png" },
+  "tilegfx.4":  { "Files": { "Assets/Tilesets/4": {} },  "Loader": "pngtile8", "Container": "dir", "Palette":  "pal.4", "Pattern": "{id}_{frame}.png" },
+  "tilegfx.5":  { "Files": { "Assets/Tilesets/5": {} },  "Loader": "pngtile8", "Container": "dir", "Palette":  "pal.5", "Pattern": "{id}_{frame}.png" },
+  "tilegfx.6":  { "Files": { "Assets/Tilesets/6": {} },  "Loader": "pngtile8", "Container": "dir", "Palette": "pal.16", "Pattern": "{id}_{frame}.png" },
+  "tilegfx.7":  { "Files": { "Assets/Tilesets/7": {} },  "Loader": "pngtile8", "Container": "dir", "Palette":  "pal.9", "Pattern": "{id}_{frame}.png" },
+  "tilegfx.8":  { "Files": { "Assets/Tilesets/8": {} },  "Loader": "pngtile8", "Container": "dir", "Palette": "pal.26", "Pattern": "{id}_{frame}.png" },
+  "tilegfx.9":  { "Files": { "Assets/Tilesets/9": {} },  "Loader": "pngtile8", "Container": "dir", "Palette": "pal.28", "Pattern": "{id}_{frame}.png" },
+  "tilegfx.10": { "Files": { "Assets/Tilesets/10": {} }, "Loader": "pngtile8", "Container": "dir", "Palette": "pal.45", "Pattern": "{id}_{frame}.png" },
+  "tilegfx.11": { "Files": { "Assets/Tilesets/11": {} }, "Loader": "pngtile8", "Container": "dir", "Palette": "pal.56", "Pattern": "{id}_{frame}.png" },
+
+  "block.1":  { "Files": { "Assets/Tilesets/1/Stamps": {} },  "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx" },
+  "block.2":  { "Files": { "Assets/Tilesets/2/Stamps": {} },  "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx" },
+  "block.3":  { "Files": { "Assets/Tilesets/3/Stamps": {} },  "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx" },
+  "block.4":  { "Files": { "Assets/Tilesets/4/Stamps": {} },  "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx" },
+  "block.5":  { "Files": { "Assets/Tilesets/5/Stamps": {} },  "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx" },
+  "block.6":  { "Files": { "Assets/Tilesets/6/Stamps": {} },  "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx" },
+  "block.7":  { "Files": { "Assets/Tilesets/7/Stamps": {} },  "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx" },
+  "block.8":  { "Files": { "Assets/Tilesets/8/Stamps": {} },  "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx" },
+  "block.9":  { "Files": { "Assets/Tilesets/9/Stamps": {} },  "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx" },
+  "block.10": { "Files": { "Assets/Tilesets/10/Stamps": {} }, "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx" },
+  "block.11": { "Files": { "Assets/Tilesets/11/Stamps": {} }, "Loader": "tiledStamp", "Container": "dir", "Pattern": "{id}_{frame:000}.stamp", "TilesetPattern": "../../{id}_{name}.tsx" },
+
+  "lab.1-*": {
+    "Files": { "Assets/3dTilesets": {} },
+    "Loader": "tiledLabyrinth",
+    "Container": "dir",
+
+    "Pattern": "{id}_{name}.json",
+    "TileWidth": 96,
+    "TileHeight": 128,
+    "BaseHeight": 68,
+    "TilesPerRow": 16,
+    "TiledFloorPattern": "Tiled/{id}_{name}_Floors.tsx",
+    "TiledCeilingPattern": "Tiled/{id}_{name}_Ceilings.tsx",
+    "TiledWallPattern": "Tiled/{id}_{name}_Walls.tsx",
+    "TiledContentsPattern": "Tiled/{id}_{name}_Contents.tsx",
+
+    "FloorPngPattern": "Tiled/Gfx/{id}_{name}_Floors.png",
+    "CeilingPngPattern": "Tiled/Gfx/{id}_{name}_Ceilings.png",
+    "WallPngPattern": "Tiled/Gfx/{id}_{name}_Walls.png",
+    "ContentsPngPattern": "Tiled/Gfx/{id}_{name}_Contents.png"
+  },
+
+  "tiledata.1-*": {
+    "Files": { "Assets/Tilesets": {} },
+    "Loader": "tiledTileset", // "jsonTileset"
+    "Container": "dir",
+    "Pattern": "{id}_{name}.tsx", // "{id}_{name}.json",
+    "GraphicsPattern": "{id}/{id}_{frame}.png",
+    "BlankTilePath": "../../Blank.png"
+  },
+
+  "map.100-*": {
+    "Files": { "Assets/Maps": {} },
+    "Loader": "tiledMap",
+    "Container": "dir",
+    "Pattern": "{id}_{name}.tmx",
+    "ScriptPattern": "{id}_{name}.ua",
+
+    "TilesetPattern": "../Tilesets/{id}_{name}.tsx",
+    "SmallNpcs": "../Tilesets/SmallNPCs.tsx",
+    "LargeNpcs": "../Tilesets/LargeNPCs.tsx",
+
+    "TileWidth": 96,
+    "BaseHeight": 68,
+    "TiledFloorPattern": "../3dTilesets/Tiled/{id}_{name}_Floors.tsx",
+    "TiledCeilingPattern": "../3dTilesets/Tiled/{id}_{name}_Ceilings.tsx",
+    "TiledWallPattern": "../3dTilesets/Tiled/{id}_{name}_Walls.tsx",
+    "TiledContentsPattern": "../3dTilesets/Tiled/{id}_{name}_Contents.tsx"
   }
 }
 // vim: tabstop=2 shiftwidth=2 expandtab

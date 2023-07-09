@@ -3,5 +3,6 @@
   "Description": "Local location for repacking modified assets for testing with original game",
   "Version": "0.1.0",
   "Dependencies": [ "Albion" ],
-  "InheritAssetConfigFrom": "Albion"
+  "InheritAssetConfigFrom": "Albion",
+  "InheritTypeConfigFrom": "Albion"
 }

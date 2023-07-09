@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
@@ -8,7 +7,6 @@ using UAlbion.Api.Settings;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Magic;
 
@@ -40,6 +38,7 @@ public sealed class AssetConverter : IDisposable
             .Attach(assetLoaderRegistry)
             .Attach(new ContainerRegistry())
             .Attach(new PostProcessorRegistry())
+            .Attach(new VarRegistry())
             .Attach(new AssetLocator())
             .Attach(new SpellManager())
             .Attach(applier)
@@ -68,40 +67,63 @@ public sealed class AssetConverter : IDisposable
         _fromExchange.Attach(new AssetManager(_from)); // From also needs an asset manager for the inventory post-processor etc
     }
 
-    public void Convert(string[] ids, ISet<AssetType> assetTypes, Regex filePattern, Func<AssetId, object, object> converter = null)
+    public void Convert(
+        ISet<AssetId> ids,
+        ISet<AssetType> assetTypes,
+        Regex filePattern,
+        Func<AssetLoadResult, AssetLoadResult> converter = null,
+        string[] validLanguages = null)
     {
-        var parsedIds = ids?.Select(AssetId.Parse).ToHashSet();
-        var cache = new Dictionary<(AssetId, string), object>();
+        var cache = new Dictionary<(AssetId, string), AssetLoadResult>();
 
-        (object, AssetInfo) LoaderFunc(AssetId id, string language)
+        AssetLoadResult LoaderFunc(AssetId assetId, string language)
         {
-            StringId? stringId = TextId.ValidTypes.Contains(id.Type)
-                ? (TextId)id
-                : null;
+            AssetLoadResult result;
 
-            if (stringId != null)
+            if (cache.TryGetValue((assetId, language), out var cached))
             {
-                if (stringId.Value.Id == id)
-                    stringId = null;
-                else
-                    id = stringId.Value.Id;
+                result = cached;
+            }
+            else
+            {
+                result = _from.LoadAssetAndNode(assetId, language);
+                cache[(assetId, language)] = result;
             }
 
-            var info = _from.GetAssetInfo(id, language);
-            var asset = cache.TryGetValue((id, language), out var cached)
-                ? cached
-                : cache[(id, language)] = _from.LoadAsset(id, language);
-
-            if (stringId.HasValue && asset is IStringSet collection)
-                asset = collection.GetString(stringId.Value, language);
-
             if (converter != null)
-                asset = converter(id, asset);
+                result = converter(result);
 
-            return (asset, info);
+            return result;
         }
 
-        _to.SaveAssets(LoaderFunc, () => cache.Clear(), parsedIds, assetTypes, filePattern);
+        var options = new AssetConversionOptions(
+            LoaderFunc,
+            () => cache.Clear(),
+            ids,
+            assetTypes,
+            validLanguages,
+            filePattern);
+
+        _to.SaveAssets(options);
+    }
+
+    public string[] DiscoverLanguages(TextId? languageSearchId = null)
+    {
+        languageSearchId ??= Base.SystemText.MainMenu_MainMenu;
+        var fromAssets = _fromExchange.Resolve<IAssetManager>();
+
+        // Return null if no languages are found, this will cause all languages defined to be searched for
+        // on language-specific assets. In practice this scenario will happen in minimal round-trip tests
+        // which don't export system text.
+        List<string> validLanguages = null;
+        foreach (var language in _from.Languages.Keys)
+        {
+            if (!fromAssets.IsStringDefined(languageSearchId.Value, language)) continue;
+            validLanguages ??= new List<string>();
+            validLanguages.Add(language);
+        }
+
+        return validLanguages?.ToArray();
     }
 
     public void Dispose()

@@ -1,9 +1,0 @@
-{ 
-    /* 
-    Uses identical asset config to 'Albion', but without the symlink 
-    pointing it to the installed game files. This ensures that when
-    exporting to 'Repacked', the original game won't be affected.
-    Only the files in the mods/Repacked directory will be updated.
-    */ 
-}
-

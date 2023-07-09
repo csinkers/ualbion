@@ -71,7 +71,7 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
             if (context.Source == null)
                 return false;
 
-            return RaiseAsync(new YesNoPromptEvent(new StringId(context.EventSet.TextId, q.Argument)), continuation) > 0;
+            return RaiseAsync(new YesNoPromptEvent(new StringId(context.EventSet.StringSetId, q.Argument)), continuation) > 0;
         });
 
         OnAsync<PromptPlayerNumericEvent, bool>((q, continuation) =>
@@ -81,7 +81,7 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
                 return false;
 
             return RaiseAsync(
-                new NumericPromptEvent((TextId)Base.SystemText.MsgBox_EnterNumber, 0, 9999),
+                new NumericPromptEvent(Base.SystemText.MsgBox_EnterNumber, 0, 9999),
                 x => continuation(x == q.Argument)) > 0;
         });
 

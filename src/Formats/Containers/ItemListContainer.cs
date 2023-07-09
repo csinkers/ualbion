@@ -14,17 +14,16 @@ namespace UAlbion.Formats.Containers;
 /// </summary>
 public class ItemListContainer : IAssetContainer
 {
-    public ISerializer Read(string path, AssetInfo info, SerdesContext context)
+    public ISerializer Read(string path, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
         var stream = context.Disk.OpenRead(path);
         var br = new BinaryReader(stream);
-        stream.Position = info.Index * ItemData.SizeOnDisk;
+        stream.Position = context.Index * ItemData.SizeOnDisk;
         return new AlbionReader(br, ItemData.SizeOnDisk);
     }
 
-    public void Write(string path, IList<(AssetInfo, byte[])> assets, SerdesContext context)
+    public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
@@ -40,15 +39,5 @@ public class ItemListContainer : IAssetContainer
                 $"Expected item data for {info.AssetId} to be {ItemData.SizeOnDisk} bytes, but was {bytes.Length}");
             bw.Write(bytes);
         }
-    }
-
-    public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, SerdesContext context)
-    {
-        if (context == null) throw new ArgumentNullException(nameof(context));
-        if (!context.Disk.FileExists(path))
-            return new List<(int, int)>();
-
-        using var f = context.Disk.OpenRead(path);
-        return new List<(int, int)> { (0, (int)f.Length / ItemData.SizeOnDisk) };
     }
 }

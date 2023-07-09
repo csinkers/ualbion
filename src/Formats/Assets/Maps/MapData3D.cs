@@ -70,12 +70,11 @@ public class MapData3D : BaseMapData
         AutomapGraphics = new byte[AutomapGraphicsSize];
     }
 
-    public static MapData3D Serdes(AssetInfo info, MapData3D existing, AssetMapping mapping, ISerializer s)
+    public static MapData3D Serdes(AssetId id, MapData3D existing, AssetMapping mapping, ISerializer s)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
 
-        var map = existing ?? new MapData3D { Id = info.AssetId };
+        var map = existing ?? new MapData3D { Id = id };
         map.Flags = s.EnumU16(nameof(Flags), map.Flags); // 0
         var _ = s.UInt8("MapType", (byte)map.MapType); // 2
 

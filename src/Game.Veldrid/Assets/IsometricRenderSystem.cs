@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using UAlbion.Api.Eventing;
+using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Etm;
@@ -26,7 +27,7 @@ public sealed class IsometricRenderSystem : Component, IDisposable
     public IsometricBuilder Builder { get; }
     public IFramebufferHolder IsoBuffer { get; }
 
-    public IsometricRenderSystem(int tileWidth, int tileHeight, int baseHeight, int tilesPerRow)
+    public IsometricRenderSystem(ModContext modContext, int tileWidth, int tileHeight, int baseHeight, int tilesPerRow)
     {
         OutputDescription screenFormat = SimpleFramebuffer.Output;
 
@@ -75,7 +76,12 @@ public sealed class IsometricRenderSystem : Component, IDisposable
         IsoBuffer = _manager.GetFramebuffer("fb_iso");
         AttachChild(_manager);
 
-        Builder = new IsometricBuilder(_manager.GetFramebuffer("fb_iso"), sceneManager, tileWidth, tileHeight, baseHeight, tilesPerRow);
+        Builder = new IsometricBuilder(modContext, 
+            _manager.GetFramebuffer("fb_iso"),
+            sceneManager,
+            tileWidth, tileHeight,
+            baseHeight,
+            tilesPerRow);
 
         AddHelpers();
         sceneManager

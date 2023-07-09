@@ -1,19 +1,23 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Config;
+using UAlbion.Config.Properties;
 using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers;
 
 public class PaletteLoader : IAssetLoader<AlbionPalette>
 {
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((AlbionPalette)existing, info, s, context);
+    public static readonly BoolAssetProperty IsCommon = new("IsCommon"); // bool
+    public static readonly StringAssetProperty AnimatedRanges = new("AnimatedRanges"); // string (e.g. "0x1-0xf, 0x12-0x1a")
+    public static AssetIdAssetProperty NightPalette { get; }= new("NightPalette");
 
-    public AlbionPalette Serdes(AlbionPalette existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((AlbionPalette)existing, s, context);
+
+    public AlbionPalette Serdes(AlbionPalette existing, ISerializer s, AssetLoadContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (info == null) throw new ArgumentNullException(nameof(info));
-        return AlbionPalette.Serdes(existing, info,  s);
-    }    
+        return AlbionPalette.Serdes(existing, context, s);
+    }
 }

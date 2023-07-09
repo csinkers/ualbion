@@ -4,6 +4,7 @@ using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
+using UAlbion.Config.Properties;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets.Labyrinth;
@@ -15,11 +16,15 @@ namespace UAlbion.Game.Entities.Map3D;
 public class IsometricLayout : Component
 {
     readonly Dictionary<MapObject, Vector3> _relativeSpritePositions = new();
+    readonly ModContext _modContext;
     IExtrudedTilemap _tilemap;
     byte[] _contents;
     byte[] _floors;
     byte[] _ceilings;
     int _wallCount;
+
+    public IsometricLayout(ModContext modContext) 
+        => _modContext = modContext ?? throw new ArgumentNullException(nameof(modContext));
 
     public int TileCount => _tilemap?.TileCount ?? 0;
     public List<int>[] FloorFrames { get; private set; }
@@ -51,17 +56,18 @@ public class IsometricLayout : Component
     {
         var assets = Resolve<IAssetManager>();
         var labyrinthData = assets.LoadLabyrinthData(labyrinthId);
-        var info = assets.GetAssetInfo(labyrinthId);
-        if (labyrinthData == null || info == null)
+        var node = assets.GetAssetInfo(labyrinthId);
+        if (labyrinthData == null || node == null)
             return;
 
-        Load(labyrinthData, info, mode, request, paletteId, assets);
+        var context = new AssetLoadContext(labyrinthId, node, _modContext);
+        Load(labyrinthData, context, mode, request, paletteId, assets);
     }
 
-    public void Load(LabyrinthData labyrinthData, AssetInfo info, IsometricMode mode, TilemapRequest request, int? paletteNumber, IAssetManager assets)
+    public void Load(LabyrinthData labyrinthData, AssetLoadContext context, IsometricMode mode, TilemapRequest request, int? paletteNumber, IAssetManager assets)
     {
         if (labyrinthData == null) throw new ArgumentNullException(nameof(labyrinthData));
-        if (info == null) throw new ArgumentNullException(nameof(info));
+        if (context == null) throw new ArgumentNullException(nameof(context));
         if (request == null) throw new ArgumentNullException(nameof(request));
         if (assets == null) throw new ArgumentNullException(nameof(assets));
 
@@ -73,7 +79,7 @@ public class IsometricLayout : Component
         bool walls    = mode is IsometricMode.Walls or IsometricMode.All;
         bool contents = mode is IsometricMode.Contents or IsometricMode.All;
 
-        paletteNumber ??= info.Get(AssetProperty.PaletteId, 0);
+        paletteNumber ??= context.GetProperty(AssetProps.Palette).Id;
         var paletteId = new PaletteId(paletteNumber.Value);
         var palette = assets.LoadPalette(paletteId);
         if (palette == null)

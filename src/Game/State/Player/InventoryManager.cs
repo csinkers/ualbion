@@ -277,7 +277,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         };
 
         var (sprite, subId, _) = GetSprite(slot.Item);
-        if (RaiseAsync(new ItemQuantityPromptEvent((TextId)text, sprite, subId, slot.Amount, slotId == ItemSlotId.Gold), continuation) == 0)
+        if (RaiseAsync(new ItemQuantityPromptEvent(new StringId(text), sprite, subId, slot.Amount, slotId == ItemSlotId.Gold), continuation) == 0)
         {
             ApiUtil.Assert("ItemManager.GetQuantity tried to open a quantity dialog, but no-one was listening for the event.");
             continuation(0);
@@ -481,7 +481,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                 _ => Base.SystemText.InvMsg_ReallyThrowTheseItemsAway,
             };
 
-            RaiseAsync(new YesNoPromptEvent((TextId)prompt), response =>
+            RaiseAsync(new YesNoPromptEvent(prompt), response =>
             {
                 if (!response)
                 {
@@ -650,7 +650,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         if (item.TypeId != ItemType.Drink)
             return;
 
-        RaiseAsync(new PartyMemberPromptEvent((TextId)Base.SystemText.InvMsg_WhoShouldDrinkThis), result =>
+        RaiseAsync(new PartyMemberPromptEvent(Base.SystemText.InvMsg_WhoShouldDrinkThis), result =>
         {
             if (result == PartyMemberId.None)
                 return;

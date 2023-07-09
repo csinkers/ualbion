@@ -20,7 +20,7 @@ public class StubAssetManager : IAssetManager
 {
     static readonly AlbionPalette Greyscale = new(0, "Greyscale", Enumerable.Range(0, 256).Select(x => ApiUtil.PackColor((byte)x, (byte)x, (byte)x, 255)).ToArray());
     public AlbionPalette LoadPalette(PaletteId id) => Greyscale;
-    public AssetInfo GetAssetInfo(AssetId id, string language = null) => throw new NotImplementedException();
+    public AssetNode GetAssetInfo(AssetId id, string language = null) => throw new NotImplementedException();
     public Automap LoadAutomap(AutomapId id) => throw new NotImplementedException();
     public PartyMemberInfo LoadPartyMember(PartyMemberId id) => throw new NotImplementedException();
     public CharacterSheet LoadSheet(SheetId id) => throw new NotImplementedException();
@@ -51,9 +51,9 @@ public class StubAssetManager : IAssetManager
     public object LoadSoundBanks() => throw new NotImplementedException();
     public IVarSet LoadConfig() => throw new NotImplementedException();
     public InputConfig LoadInputConfig() => throw new NotImplementedException();
-
-    public string LoadString(StringId id) => throw new NotImplementedException();
-    public string LoadString(StringId id, string language) => throw new NotImplementedException();
-    public string LoadString(TextId id) => throw new NotImplementedException();
-    public string LoadString(TextId id, string language) => throw new NotImplementedException();
+    public string LoadStringRaw(TextId id, string language = null) => throw new NotImplementedException();
+    public string LoadStringRaw(StringId id, string language = null) => throw new NotImplementedException();
+    public string LoadStringSafe(TextId id, string language) => throw new NotImplementedException();
+    public string LoadStringSafe(StringId id, string language) => throw new NotImplementedException();
+    public IStringSet LoadStringSet(StringSetId id, string language) => throw new NotImplementedException();
 }

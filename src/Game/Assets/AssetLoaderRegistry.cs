@@ -2,40 +2,35 @@
 using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Api.Eventing;
-using UAlbion.Formats;
+using UAlbion.Config;
 
 namespace UAlbion.Game.Assets;
 
 public sealed class AssetLoaderRegistry : ServiceComponent<IAssetLoaderRegistry>, IAssetLoaderRegistry, IDisposable
 {
     readonly object _syncRoot = new();
-    readonly IDictionary<string, IAssetLoader> _loaders = new Dictionary<string, IAssetLoader>();
+    readonly IDictionary<Type, IAssetLoader> _loaders = new Dictionary<Type, IAssetLoader>();
 
-    public IAssetLoader GetLoader(string loaderName)
+    public IAssetLoader GetLoader(Type loaderType)
     {
         lock (_syncRoot)
-            return _loaders.TryGetValue(loaderName, out var loader) ? loader : Instantiate(loaderName);
+            return _loaders.TryGetValue(loaderType, out var loader) ? loader : Instantiate(loaderType);
     }
 
-    IAssetLoader Instantiate(string loaderName)
+    IAssetLoader Instantiate(Type loaderType)
     {
-        if(string.IsNullOrEmpty(loaderName))
-            throw new ArgumentNullException(nameof(loaderName));
+        if (loaderType == null) throw new ArgumentNullException(nameof(loaderType));
 
-        var type = Type.GetType(loaderName);
-        if(type == null)
-            throw new InvalidOperationException($"Could not find loader type \"{loaderName}\"");
-
-        var constructor = type.GetConstructor(Array.Empty<Type>());
+        var constructor = loaderType.GetConstructor(Array.Empty<Type>());
         if(constructor == null)
-            throw new InvalidOperationException($"Could not find parameterless constructor for loader type \"{type}\"");
+            throw new InvalidOperationException($"Could not find parameterless constructor for loader type \"{loaderType}\"");
 
         var loader = (IAssetLoader)constructor.Invoke(Array.Empty<object>());
 
         if (loader is IComponent component)
             AttachChild(component);
 
-        _loaders[loaderName] = loader;
+        _loaders[loaderType] = loader;
         return loader;
     }
 

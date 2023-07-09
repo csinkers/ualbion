@@ -13,11 +13,10 @@ namespace UAlbion.Formats.Containers;
 /// </summary>
 public class RawContainer : IAssetContainer
 {
-    public ISerializer Read(string path, AssetInfo info, SerdesContext context)
+    public ISerializer Read(string path, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
-        ApiUtil.Assert(info.Index == 0, "SubItem should always be 0 when accessing a non-container file");
+        ApiUtil.Assert(context.Index == 0, "SubItem should always be 0 when accessing a non-container file");
 
         if (!context.Disk.FileExists(path))
             return null;
@@ -27,7 +26,7 @@ public class RawContainer : IAssetContainer
         return new AlbionReader(br);
     }
 
-    public void Write(string path, IList<(AssetInfo, byte[])> assets, SerdesContext context)
+    public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
     {
         if (assets == null) throw new ArgumentNullException(nameof(assets));
         if (context == null) throw new ArgumentNullException(nameof(context));
@@ -48,7 +47,4 @@ public class RawContainer : IAssetContainer
         var (_, bytes) = assets.Single();
         context.Disk.WriteAllBytes(path, bytes);
     }
-
-    public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, SerdesContext context)
-        => new() { (0, 1) };
 }

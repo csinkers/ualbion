@@ -8,8 +8,9 @@ public class ReadOnlyFileSystem : IFileSystem
 {
     string _currentDirectory;
     public ReadOnlyFileSystem(string currentDirectory) => CurrentDirectory = currentDirectory;
-    public IEnumerable<string> EnumerateDirectory(string path, string filter = null)
+    public IEnumerable<string> EnumerateFiles(string path, string filter = null)
         => filter == null ? Directory.EnumerateFiles(path) : Directory.EnumerateFiles(path, filter);
+    public IEnumerable<string> EnumerateDirectories(string path) => Directory.EnumerateDirectories(path);
 
     public bool IsReadOnly => true;
     public string CurrentDirectory

@@ -94,6 +94,19 @@ public static class TriggerMapping
         return properties;
     }
 
+    static string GetColorForString(string s) => $"#{GetHashForString(s) & 0x00ffffff:x}";
+    static int GetHashForString(string s)
+    {
+        if (string.IsNullOrEmpty(s)) return 0;
+        int result = 0;
+        foreach (var c in s)
+        {
+            result *= 17;
+            result ^= char.ToUpperInvariant(c);
+        }
+        return result;
+    }
+
     static ObjectGroup BuildTriggerObjectGroup(
         int objectGroupId,
         string name,
@@ -121,7 +134,7 @@ public static class TriggerMapping
         {
             Id = objectGroupId,
             Name = name,
-            Color = "#" + (name.GetHashCode(StringComparison.InvariantCulture) & 0x00ffffff).ToString("x"),
+            Color = GetColorForString(name),
             Opacity = 0.5f,
             Objects = zonePolygons.ToList(),
         };

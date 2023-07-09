@@ -3,5 +3,6 @@
   "Description": "Local location for unpacking/modifying and repacking assets",
   "Version": "0.1.0",
   "Dependencies": [ "Base", "Shaders", "Common" ],
-  "InheritAssetConfigFrom": "Base"
+  "InheritTypeConfigFrom": "Base",
+  "AssetConfig": "assets.json"
 }

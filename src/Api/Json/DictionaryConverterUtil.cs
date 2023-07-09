@@ -27,7 +27,8 @@ static class DictionaryConverterUtil<TKey, TValue>
             if (reader.TokenType != JsonTokenType.PropertyName)
                 throw new JsonException($"Expected property name when reading {typeToConvert}, but was {reader.TokenType}");
 
-            var key = parser(reader.GetString());
+            var keyString = reader.GetString();
+            var key = parser(keyString);
 
             TValue v;
             if (valueConverter != null)

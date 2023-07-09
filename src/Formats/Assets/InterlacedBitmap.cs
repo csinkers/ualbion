@@ -33,12 +33,12 @@ public sealed class InterlacedBitmap
         if (s == null) throw new ArgumentNullException(nameof(s));
         img ??= new InterlacedBitmap();
 
-        var formatChunk = IffChunk.Serdes(0, new IffChunk(IFFChunkType.Format, 0), s);
-        if (formatChunk.TypeId != IFFChunkType.Format)
+        var formatChunk = IffChunk.Serdes(0, new IffChunk(IffChunkType.Format, 0), s);
+        if (formatChunk.TypeId != IffChunkType.Format)
             throw new NotSupportedException($"Invalid IFF header, expected \"FORM\", found \"{formatChunk.TypeId}\"");
 
-        var formatId = s.FixedLengthString("FormatId", IFFChunkType.PackedBitmap, 4);
-        if (formatId != IFFChunkType.PackedBitmap)
+        var formatId = s.FixedLengthString("FormatId", IffChunkType.PackedBitmap, 4);
+        if (formatId != IffChunkType.PackedBitmap)
             throw new NotSupportedException($"Invalid IFF header, expected \"PBM \", found \"{formatId}\"");
 
         if (s.IsReading())
@@ -49,17 +49,17 @@ public sealed class InterlacedBitmap
                 var chunk = IffChunk.Serdes(i, null, s);
                 switch (chunk.TypeId)
                 {
-                    case IFFChunkType.BitmapHeader: img.SerdesHeader(s, chunk.Length); break;
-                    case IFFChunkType.ColorMapping: img.SerdesPalette(s, chunk.Length); break;
-                    case IFFChunkType.Hotspot: img.SerdesHotspot(s, chunk.Length); break;
+                    case IffChunkType.BitmapHeader: img.SerdesHeader(s, chunk.Length); break;
+                    case IffChunkType.ColorMapping: img.SerdesPalette(s, chunk.Length); break;
+                    case IffChunkType.Hotspot: img.SerdesHotspot(s, chunk.Length); break;
 
-                    case IFFChunkType.ColorRanges:
+                    case IffChunkType.ColorRanges:
                         img.ColorRanges ??= new List<ColorRange>();
                         img.ColorRanges.Add(ColorRange.Serdes(img.ColorRanges.Count, null, s));
                         break;
 
-                    case IFFChunkType.Thumbnail: img.SerdesThumbnail(s, chunk.Length); break;
-                    case IFFChunkType.Body: img.SerdesPixels(s, chunk.Length); break;
+                    case IffChunkType.Thumbnail: img.SerdesThumbnail(s, chunk.Length); break;
+                    case IffChunkType.Body: img.SerdesPixels(s, chunk.Length); break;
                     default:
                         s.Bytes("Unk", null, chunk.Length);
                         break;
@@ -70,12 +70,12 @@ public sealed class InterlacedBitmap
         }
         else
         {
-            WriteChunk(s, IFFChunkType.BitmapHeader, (x, n) => img.SerdesHeader(x, n));
-            WriteChunk(s, IFFChunkType.ColorMapping, (x, n) => img.SerdesPalette(x, n));
-            WriteChunk(s, IFFChunkType.Hotspot,      (x, n) => img.SerdesHotspot(x, n));
+            WriteChunk(s, IffChunkType.BitmapHeader, (x, n) => img.SerdesHeader(x, n));
+            WriteChunk(s, IffChunkType.ColorMapping, (x, n) => img.SerdesPalette(x, n));
+            WriteChunk(s, IffChunkType.Hotspot,      (x, n) => img.SerdesHotspot(x, n));
             s.List(nameof(img.ColorRanges), img.ColorRanges, img.ColorRanges.Count, ColorRange.Serdes);
-            WriteChunk(s, IFFChunkType.Thumbnail,    (x, n) => img.SerdesThumbnail(x, n));
-            WriteChunk(s, IFFChunkType.Body,         (x, n) => img.SerdesPixels(x, n));
+            WriteChunk(s, IffChunkType.Thumbnail,    (x, n) => img.SerdesThumbnail(x, n));
+            WriteChunk(s, IffChunkType.Body,         (x, n) => img.SerdesPixels(x, n));
         }
 
         formatChunk.WriteLength(s);

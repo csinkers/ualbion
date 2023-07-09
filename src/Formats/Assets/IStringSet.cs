@@ -3,5 +3,6 @@
 public interface IStringSet
 {
     int Count { get; }
-    string GetString(StringId id, string language = null);
+    string GetString(StringId id);
+    void SetString(StringId id, string value);
 }

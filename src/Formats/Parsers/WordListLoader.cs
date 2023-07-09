@@ -11,13 +11,13 @@ public class WordListLoader : IAssetLoader<ListStringSet>
 {
     const int WordLength = 21;
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((ListStringSet)existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((ListStringSet)existing, s, context);
 
-    public ListStringSet Serdes(ListStringSet existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public ListStringSet Serdes(ListStringSet existing, ISerializer s, AssetLoadContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (info == null) throw new ArgumentNullException(nameof(info));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
         if (s.IsReading())
         {
@@ -25,6 +25,7 @@ public class WordListLoader : IAssetLoader<ListStringSet>
             var strings = new List<string>();
             while (s.BytesRemaining > 0)
                 strings.Add(s.FixedLengthString(null, null, WordLength));
+
             return new ListStringSet(strings);
         }
         else

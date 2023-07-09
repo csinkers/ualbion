@@ -12,7 +12,6 @@ using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 
 namespace UAlbion.Game.Veldrid.Assets;
 
@@ -21,9 +20,8 @@ public class MeshLoader : IAssetLoader<Mesh>
     readonly PngDecoder _decoder = new();
     readonly Configuration _configuration = new();
 
-    public Mesh Serdes(Mesh existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public Mesh Serdes(Mesh existing, ISerializer s, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
@@ -41,9 +39,9 @@ public class MeshLoader : IAssetLoader<Mesh>
 
         var mesh = obj.GetFirstMesh();
 
-        var materialPath = Path.Combine(info.File.Filename, obj.MaterialLibName);
+        var materialPath = Path.Combine(context.Filename, obj.MaterialLibName);
         if (!context.Disk.FileExists(materialPath))
-            throw new FileNotFoundException($"Could not find material file \"{materialPath}\" for object {info.AssetId} \"{info.File.Filename}\"");
+            throw new FileNotFoundException($"Could not find material file \"{materialPath}\" for object {context.AssetId} \"{context.Filename}\"");
 
         using var materialStream = context.Disk.OpenRead(materialPath);
         MtlParser mtlParser = new();
@@ -59,7 +57,7 @@ public class MeshLoader : IAssetLoader<Mesh>
             if (string.IsNullOrEmpty(filename) || textures.ContainsKey(filename))
                 return;
 
-            var texture = LoadTexture(info, filename, context.Disk);
+            var texture = LoadTexture(context, filename, context.Disk);
             if (texture != null)
                 textures[filename] = texture;
         }
@@ -73,13 +71,13 @@ public class MeshLoader : IAssetLoader<Mesh>
         AddTexture(material.DisplacementMap);
         AddTexture(material.StencilDecalTexture);
 
-        var key = new MeshId(info.AssetId);
+        var key = new MeshId(context.AssetId);
         return new Mesh(key, mesh, material, textures);
     }
 
-    ITexture LoadTexture(AssetInfo info, string filename, IFileSystem disk)
+    ITexture LoadTexture(AssetLoadContext context, string filename, IFileSystem disk)
     {
-        var path = Path.Combine(info.File.Filename, filename);
+        var path = Path.Combine(context.Filename, filename);
         if (!disk.FileExists(path))
             return null;
 
@@ -89,12 +87,12 @@ public class MeshLoader : IAssetLoader<Mesh>
             throw new InvalidOperationException("Could not retrieve single span from Image");
 
         var span = MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan);
-        var texture = new SimpleTexture<uint>(info.AssetId, info.AssetId.ToString(), image.Width, image.Height, span);
+        var texture = new SimpleTexture<uint>(context.AssetId, context.AssetId.ToString(), image.Width, image.Height, span);
         texture.AddRegion(0, 0, image.Width, image.Height);
         return texture;
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((Mesh)existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((Mesh)existing, s, context);
 }
 

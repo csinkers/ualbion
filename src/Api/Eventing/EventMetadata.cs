@@ -143,7 +143,7 @@ public class EventMetadata
 
     Func<string[], IEvent> BuildParser(ParameterExpression partsParameter)
     {
-        var constructor = Type.GetConstructors().Single();
+        var constructor = GetConstructor();
         var parameters = constructor.GetParameters();
         if (parameters.Length != Parts.Count)
         {
@@ -156,5 +156,30 @@ public class EventMetadata
             Expression.Convert(
                 Expression.New(constructor, Parts.Select(x => x.Parser)), typeof(IEvent)),
             partsParameter).Compile();
+    }
+
+    ConstructorInfo GetConstructor()
+    {
+        var constructors = Type.GetConstructors();
+        ConstructorInfo constructor = null;
+
+        if (constructors.Length == 1)
+            return constructors[0];
+
+        foreach (var x in constructors)
+        {
+            if (x.GetCustomAttribute<EventConstructorAttribute>() == null)
+                continue;
+
+            if (constructor != null)
+                throw new FormatException($"\"{Type}\" has multiple constructors with the {nameof(EventConstructorAttribute)}!");
+
+            constructor = x;
+        }
+
+        if (constructor == null)
+            throw new FormatException($"\"{Type}\" has multiple constructors, but none of them are annotated with an {nameof(EventConstructorAttribute)} to indicate which should be used for constructing parsed events");
+
+        return constructor;
     }
 }

@@ -11,10 +11,10 @@ public class SystemTextLoader : IAssetLoader<IntStringDictionary>
 {
     static readonly Regex Regex = new(@"\[(\d+):(.*)\]");
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((IntStringDictionary) existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((IntStringDictionary) existing, s, context);
 
-    public IntStringDictionary Serdes(IntStringDictionary existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public IntStringDictionary Serdes(IntStringDictionary existing, ISerializer s, AssetLoadContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (s.IsWriting()) throw new NotImplementedException("Saving of system text not currently supported");

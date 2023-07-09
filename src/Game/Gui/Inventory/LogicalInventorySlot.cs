@@ -114,7 +114,7 @@ public class LogicalInventorySlot : UiElement
         if (slotInfo?.Item.Type == AssetType.Item)
         {
             var item = assets.LoadItem(slotInfo.Item);
-            itemName = assets.LoadString(item.Name);
+            itemName = assets.LoadStringSafe(item.Name);
         }
 
         var hand = inventoryManager.ItemInHand;
@@ -122,7 +122,7 @@ public class LogicalInventorySlot : UiElement
         if (hand.Item.Type == AssetType.Item)
         {
             var itemInHand = assets.LoadItem(hand.Item);
-            itemInHandName = assets.LoadString(itemInHand.Name);
+            itemInHandName = assets.LoadStringSafe(itemInHand.Name);
         }
 
         var action = inventoryManager.GetInventoryAction(_id);

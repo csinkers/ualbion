@@ -71,11 +71,10 @@ public class LabyrinthData
                 .Where(x => x is { ObjectInfoNumber: >= 0 } && x.ObjectInfoNumber < Objects.Count)
                 .Select(x => (long)Objects[x.ObjectInfoNumber].FrameCount));
 
-    public static LabyrinthData Serdes(LabyrinthData d, AssetInfo info, AssetMapping mapping, ISerializer s)
+    public static LabyrinthData Serdes(LabyrinthData d, AssetId id, AssetMapping mapping, ISerializer s)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
-        d ??= new LabyrinthData { Id = info.AssetId };
+        d ??= new LabyrinthData { Id = id };
 
         if (d.ObjectGroups.Count > WallOffset) throw new InvalidOperationException($"A labyrinth specification can only contain a maximum of {WallOffset} object groups, but {d.Id} contains {d.ObjectGroups.Count}");
         if (d.Walls.Count > MaxWalls) throw new InvalidOperationException($"A labyrinth specification can only contain a maximum of {WallOffset} walls, but {d.Id} contains {d.Walls.Count}");

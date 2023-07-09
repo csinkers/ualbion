@@ -13,6 +13,7 @@ public enum AssetType : byte
 {
     [Unmapped] None = 0, // Must be 0 so default(AssetId) will equate to AssetId.None
 
+    // Various kinds of SpriteId
     AutomapGfx,
     BackgroundGfx,
     CombatBackground,
@@ -36,31 +37,39 @@ public enum AssetType : byte
     Wall,
     WallOverlay,
 
+    // Text rendering
     Ink,
     FontDefinition,
     [Unmapped] MetaFont,
 
+    // Environmental objects that are setup on new game and have their state tracked in the save files
     Chest,
     Merchant,
     Door,
 
+    // Scripts
     EventSet,
     Script,
 
+    // Inventory items
     [Unmapped] Gold,
     [Unmapped] Rations,
     Item,
 
+    // 3D template
     Labyrinth,
 
+    // Actual map data
     Map,
     [IsomorphicTo(Map)] Automap,
 
+    // Character definitions
     PartyMember,
     [IsomorphicTo(PartyMember)] PartySheet,
     MonsterSheet,
     NpcSheet,
 
+    // Misc
     MonsterGroup,
     [Unmapped] ObjectGroup,
     Palette,
@@ -74,16 +83,21 @@ public enum AssetType : byte
     [IsomorphicTo(Tileset)] BlockList,
     [Localised] Video,
 
-    [Localised] [IsomorphicTo(EventSet)] EventText,
-    [Localised] [IsomorphicTo(Map)] MapText,
+    // Individual strings
     [Localised] [IsomorphicTo(Item)] ItemName,
     [Localised] Text,
     [Localised] Word,
 
-    [Unmapped] MapTextIndex = 250, // Used for NPCs with the SimpleMsg flag
-    [Unmapped] PromptNumber = 251, // Used for DialogueLine actions
-    [Unmapped] LocalNpc = 252, // For identifying NPCs in a map by their slot number
-    Target = 253, // For targeting DataChangeEvents etc
-    Special = 254, // For various types that only have a single value
+    // String sets
+    [Localised] [IsomorphicTo(EventSet)] EventText,
+    [Localised] [IsomorphicTo(Map)] MapText,
+
+    Special, // For various types that only have a single value, can be a string set
+
+    [Unmapped] MapTextIndex, // Used for NPCs with the SimpleMsg flag
+    [Unmapped] PromptNumber, // Used for DialogueLine actions
+    [Unmapped] LocalNpc, // For identifying NPCs in a map by their slot number
+    Target, // For targeting DataChangeEvents etc
+
     [Unmapped] Unknown = 255
 }

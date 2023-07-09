@@ -7,7 +7,7 @@ namespace UAlbion.Formats.Parsers;
 
 public class Utf8Loader : IAssetLoader<string>
 {
-    public string Serdes(string existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public string Serdes(string existing, ISerializer s, AssetLoadContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if(s.IsWriting())
@@ -24,6 +24,6 @@ public class Utf8Loader : IAssetLoader<string>
         }
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((string) existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((string) existing, s, context);
 }

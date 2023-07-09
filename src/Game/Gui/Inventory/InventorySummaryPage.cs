@@ -71,7 +71,7 @@ public class InventorySummaryPage : UiElement // Summary
         // {INVE}{NAME} ({SEXC}), %u years old, {RACE}, {CLAS}, level %d.
         var formatBlocks = tf
             .Format(
-                assets.LoadString(Base.SystemText.Inv1_NYearsOldRaceClassLevelN),
+                assets.LoadStringSafe(Base.SystemText.Inv1_NYearsOldRaceClassLevelN),
                 member.Apparent.Age, member.Apparent.Level).GetBlocks();
 
         foreach (var block in formatBlocks)

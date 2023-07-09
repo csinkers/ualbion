@@ -6,7 +6,8 @@ namespace UAlbion.Formats.Parsers;
 
 public class AutomapLoader : IAssetLoader<Automap>
 {
-    public Automap Serdes(Automap existing, AssetInfo info, ISerializer s, SerdesContext context) => Automap.Serdes(existing, s);
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((Automap)existing, info, s, context);
+    public Automap Serdes(Automap existing, ISerializer s, AssetLoadContext context) 
+        => Automap.Serdes(existing, s);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((Automap)existing, s, context);
 }

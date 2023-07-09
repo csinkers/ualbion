@@ -8,13 +8,12 @@ namespace UAlbion.Formats.Parsers;
 
 public class CharacterSheetLoader : Component, IAssetLoader<CharacterSheet>
 {
-    public CharacterSheet Serdes(CharacterSheet existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public CharacterSheet Serdes(CharacterSheet existing, ISerializer s, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
-        return CharacterSheet.Serdes(info.AssetId, existing, context.Mapping, s, Resolve<ISpellManager>());
+        return CharacterSheet.Serdes(context.AssetId, existing, context.Mapping, s, Resolve<ISpellManager>());
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes(existing as CharacterSheet, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes(existing as CharacterSheet, s, context);
 }

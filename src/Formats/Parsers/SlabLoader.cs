@@ -8,10 +8,10 @@ namespace UAlbion.Formats.Parsers;
 public class SlabLoader : IAssetLoader<IReadOnlyTexture<byte>>
 {
     const int StatusBarHeight = 48;
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((IReadOnlyTexture<byte>)existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((IReadOnlyTexture<byte>)existing, s, context);
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
     {
         IReadOnlyTexture<byte> singleFrame = null;
         if (s.IsWriting())
@@ -28,7 +28,7 @@ public class SlabLoader : IAssetLoader<IReadOnlyTexture<byte>>
             singleFrame = texture;
         }
 
-        var sprite = new FixedSizeSpriteLoader().Serdes(singleFrame, info, s, context);
+        var sprite = new FixedSizeSpriteLoader().Serdes(singleFrame, s, context);
         if (sprite == null)
             return null;
 

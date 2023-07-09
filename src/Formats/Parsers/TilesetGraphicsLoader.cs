@@ -9,17 +9,17 @@ public class TilesetGraphicsLoader : IAssetLoader<ITileGraphics>
 {
     readonly FixedSizeSpriteLoader _spriteLoader = new();
 
-    public ITileGraphics Serdes(ITileGraphics existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public ITileGraphics Serdes(ITileGraphics existing, ISerializer s, AssetLoadContext context)
     {
-        var asset = _spriteLoader.Serdes((IReadOnlyTexture<byte>)existing?.Texture, info, s, context);
+        var asset = _spriteLoader.Serdes((IReadOnlyTexture<byte>)existing?.Texture, s, context);
 
         if (s.IsWriting())
             return existing;
 
-        var texture = AtlasPostProcessor.Process(asset, info);
+        var texture = AtlasPostProcessor.Process(asset, context);
         return new SimpleTileGraphics(texture);
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((ITileGraphics)existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((ITileGraphics)existing, s, context);
 }

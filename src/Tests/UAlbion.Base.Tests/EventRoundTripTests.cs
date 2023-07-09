@@ -25,18 +25,17 @@ public class EventRoundTripTests
         var disk = new MockFileSystem(true);
         var jsonUtil = new FormatJsonUtil();
         var baseDir = ConfigUtil.FindBasePath(disk);
-        var baseAssetConfigPath = Path.Combine(baseDir, "mods", "Base", "base_assets.json");
-        var assetConfigPath = Path.Combine(baseDir, "mods", "Albion", "alb_assets.json");
+        var typeConfigPath = Path.Combine(baseDir, "mods", "Base", "types.json");
 
-        var baseAssetConfig = AssetConfig.Load(baseAssetConfigPath, null, mapping, disk, jsonUtil);
-        var assetConfig = AssetConfig.Load(assetConfigPath, baseAssetConfig, mapping, disk, jsonUtil);
+        var tcl = new TypeConfigLoader(jsonUtil);
+        var typeConfig = tcl.Load(typeConfigPath, "Base", null, mapping, disk);
 
-        foreach (var assetType in assetConfig.IdTypes.Values)
+        foreach (var assetType in typeConfig.IdTypes.Values)
         {
             var enumType = Type.GetType(assetType.EnumType);
             if (enumType == null)
                 throw new InvalidOperationException(
-                    $"Could not load enum type \"{assetType.EnumType}\" defined in \"{assetConfigPath}\"");
+                    $"Could not load enum type \"{assetType.EnumType}\" defined in \"{typeConfigPath}\"");
 
             mapping.RegisterAssetType(assetType.EnumType, assetType.AssetType);
         }

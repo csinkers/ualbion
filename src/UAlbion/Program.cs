@@ -60,10 +60,15 @@ static class Program
                 commandLine.ConvertFrom,
                 commandLine.ConvertTo);
 
+            var languages = commandLine.DumpLanguages ?? converter.DiscoverLanguages();
+
+            var parsedIds = commandLine.DumpIds?.Select(AssetId.Parse).ToHashSet();
             converter.Convert(
-                commandLine.DumpIds,
+                parsedIds,
                 commandLine.DumpAssetTypes,
-                commandLine.ConvertFilePattern);
+                commandLine.ConvertFilePattern,
+                null,
+                languages);
 
             return;
         }

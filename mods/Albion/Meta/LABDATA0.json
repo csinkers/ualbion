@@ -1,11 +1,11 @@
 {
-    "0": { "Id": "lab.1", "PaletteId": 3 }, //  Test1
-    "1": { "PaletteId": 7 }, // Test2
-    "2": { "PaletteId": 8 }, // Test3
-    "3": { "PaletteId": 13 }, // Test4
-    "4": { "PaletteId": 14}, // Test5
-    "5": { "PaletteId": 15 }, // TestArgim
-    "6": { "PaletteId": 15 }, // Unknown7
-    "7": { "PaletteId": 11 }, // Unknown8
-    "8": { "PaletteId": 3 }  // Unknown9
+  "lab.1": { "Palette": "pal.3" }, //  Test1
+  "lab.2": { "Palette": "pal.7" }, // Test2
+  "lab.3": { "Palette": "pal.8" }, // Test3
+  "lab.4": { "Palette": "pal.13" }, // Test4
+  "lab.5": { "Palette": "pal.14"}, // Test5
+  "lab.6": { "Palette": "pal.15" }, // TestArgim
+  "lab.7": { "Palette": "pal.15" }, // Unknown7
+  "lab.8": { "Palette": "pal.11" }, // Unknown8
+  "lab.9": { "Palette": "pal.3" }  // Unknown9
 }        

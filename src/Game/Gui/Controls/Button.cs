@@ -135,7 +135,7 @@ public class Button : UiElement
     }
 
     public Button(IText textSource) : this(new UiText(textSource)) { }
-    public Button(TextId textId) : this((StringId)textId) { }
+    public Button(TextId textId) : this(new StringId(textId)) { }
     public Button(StringId textId) : this((IUiElement)new UiTextBuilder(textId).Center().NoWrap()) { }
     public Button(string literalText) : this((IUiElement)new SimpleText(literalText).Center().NoWrap()) { }
     public Button OnClick(Action callback) { Click += callback; return this; }

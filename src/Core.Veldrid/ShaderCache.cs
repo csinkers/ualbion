@@ -152,7 +152,7 @@ public sealed class ShaderCache : Component, IShaderCache
     }
     void RemoveOldFiles(string name, string goodHash)
     {
-        foreach (var path in _disk.EnumerateDirectory(_shaderCachePath, $"{name}.*"))
+        foreach (var path in _disk.EnumerateFiles(_shaderCachePath, $"{name}.*"))
         {
             var filename = Path.GetFileName(path);
             var parts = filename[(name.Length + 1)..].Split('.');

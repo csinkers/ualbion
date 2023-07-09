@@ -1,39 +1,61 @@
 {
-  "Files": {
-    "config.json": {
-      "Container": "dummy",
-      "Loader": "varset",
-      "Max": 0,
-      "Map": { "0": { "Id": "special.GameConfig" } }
+  "special.GameConfig": {
+    "Files": { "config.json": {} },
+    "Container": "dummy",
+    "Loader": "varset"
+  },
+
+  "special.InputConfig": {
+    "Files": { "input.json": {} },
+    "Container": "dummy",
+    "Loader": "inputconfig"
+  },
+
+  "special.UAlbionStrings": {
+    "Files": {
+      "GERMAN/strings.json":  { "Language": "GERMAN"  },
+      "ENGLISH/strings.json": { "Language": "ENGLISH" },
+      "FRENCH/strings.json":  { "Language": "FRENCH"  }
     },
-    "input.json": {
-      "Container": "dummy",
-      "Loader": "inputconfig",
-      "Max": 0,
-      "Map": { "0": { "Id": "special.InputConfig" } }
+    "Loader": "json",
+    "Container": "raw" 
+  },
+
+  "utext.0-*": {
+    "Files": { // Dummy files used for ensuring the language is available on the AssetLoadContext
+      "!GERMAN":  { "Language": "GERMAN" },
+      "!ENGLISH": { "Language": "ENGLISH" },
+      "!FRENCH":  { "Language": "FRENCH" }
     },
-    "PartyMembers": {
-      "Loader": "jsonParty",
-      "Pattern": "{id:00}_{name}.json",
-      "Map": { "1": { "Id": "party.1" } }
-    },
-    "Fonts": {
-      "Loader": "font",
-      "Pattern": "{id}_{name}.json",
-      "Map": { "0": { "Id": "font.Regular" } }
-    },
-    "Fonts/DebugFonts.png": {
-      "Container": "raw",
-      "Loader": "png8",
-      "Max": 0,
-      "Map": { "0": { "Id": "fontgfx.Debug" } }
-    },
-    "Inks.json": {
-      "Container": "jsonObj",
-      "Loader": "ink",
-      "Max": 99,
-      "Map": { "1": { "Id": "ink.White" } }
-    }
+    "Loader": "stringset",
+    "FirstId": "utext.0",
+    "Target": "special.UAlbionStrings",
+    "IsReadOnly": true 
+  },
+
+  "party.1-*": {
+    "Files": { "PartyMembers": {} },
+    "Loader": "jsonParty",
+    "Pattern": "{id:00}_{name}.json"
+  },
+
+  "font.1-*": {
+    "Files": { "Fonts": {} },
+    "Loader": "font",
+    "Pattern": "{id}_{name}.json"
+  },
+
+  "fontgfx.Debug": {
+    "Files": { "Fonts/DebugFonts.png": {} },
+    "Container": "raw",
+    "Loader": "png8",
+    "Palette": "pal.0" 
+  },
+
+  "ink.1-*": {
+    "Files": { "Inks.json": {} },
+    "Container": "jsonObj",
+    "Loader": "ink"
   }
 }
 // vim: tabstop=2 shiftwidth=2 expandtab

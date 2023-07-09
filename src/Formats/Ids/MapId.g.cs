@@ -131,7 +131,7 @@ public readonly struct MapId : IEquatable<MapId>, IEquatable<AssetId>, IComparab
     public override bool Equals(object obj) => obj is IAssetId other && other.ToUInt32() == _value;
     public int CompareTo(object obj) => (obj is IAssetId other) ? _value.CompareTo(other.ToUInt32()) : -1;
     public override int GetHashCode() => unchecked((int)_value);
-    public readonly TextId ToMapText() => new TextId(AssetType.MapText, Id);
+    public readonly StringSetId ToMapText() => new StringSetId(AssetType.MapText, Id);
 }
 
 public class MapIdConverter : TypeConverter

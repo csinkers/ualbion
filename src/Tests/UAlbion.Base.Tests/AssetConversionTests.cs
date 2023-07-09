@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UAlbion.Api;
@@ -53,8 +54,6 @@ public class AssetConversionTests
         Func<T, T> canonicalize = null) where T : class
     {
         prerequisites ??= Array.Empty<AssetId>();
-        var allIds = prerequisites.Append(id);
-
         var resultsDir = Path.Combine(_baseDir, "re", "ConversionTests");
 
         var baseAsset = (T)_baseApplier.LoadAsset(id);
@@ -63,13 +62,17 @@ public class AssetConversionTests
 
         var mapping = AssetMapping.Global;
         var stubDisk = new StubFileSystem();
-        var context = new SerdesContext("Test", JsonUtil, mapping, stubDisk);
+        var modContext = new ModContext("Test", JsonUtil, stubDisk, mapping);
+        var node = _baseApplier.GetAssetInfo(id, null);
+        var context = new AssetLoadContext(id, node, modContext);
 
         var (baseBytes, baseNotes) = Asset.Save(baseAsset, serdes, context);
         var baseJson = Asset.SaveJson(baseAsset, JsonUtil);
 
-        var idStrings = allIds.Select(x => $"{x.Type}.{x.Id}").ToArray();
-        var assetTypes = allIds.Select(x => x.Type).Distinct().ToHashSet();
+        var idSet = new[] { id }.ToHashSet();
+        var prereqSet = prerequisites.ToHashSet();
+        var assetTypes = prerequisites.Select(x => x.Type).Distinct().ToHashSet();
+        assetTypes.Add(id.Type);
 
         using (var unpacker = new AssetConverter(
                    "ualbion-tests",
@@ -79,7 +82,9 @@ public class AssetConversionTests
                    new[] { BaseAssetMod },
                    UnpackedAssetMod))
         {
-            unpacker.Convert(idStrings, assetTypes, null);
+            if (prerequisites.Length > 0)
+                unpacker.Convert(prereqSet, assetTypes, null);
+            unpacker.Convert(idSet, assetTypes, null);
         }
 
         var unpackedAsset = (T)BuildApplier(UnpackedAssetMod, AssetMapping.Global).LoadAsset(id);
@@ -107,7 +112,10 @@ public class AssetConversionTests
                    new[] { UnpackedAssetMod },
                    RepackedAssetMod))
         {
-            repacker.Convert(idStrings, assetTypes, null);
+            if (prerequisites.Length > 0)
+                repacker.Convert(prereqSet, assetTypes, null);
+
+            repacker.Convert(idSet, assetTypes, null);
         }
 
         var repackedAsset = (T)BuildApplier(RepackedAssetMod, AssetMapping.Global).LoadAsset(id);
@@ -130,7 +138,7 @@ public class AssetConversionTests
     [Fact]
     public void ItemTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Item.Knife) };
+        var id = AssetId.From(Item.Knife);
         var spell = new SpellData(Spell.ThornSnare, SpellClass.DjiKas, 0)
         {
             Cost = 1,
@@ -145,116 +153,99 @@ public class AssetConversionTests
             .Attach(spellManager)
             .Attach(itemDataLoader);
 
-        Test<ItemData>(info.AssetId, null, (x, s, c) => itemDataLoader.Serdes(x, info, s, c));
+        Test<ItemData>(id, null, (x, s, c) => itemDataLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void ItemNameTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Special.ItemNames) };
-        Test<MultiLanguageStringDictionary>(info.AssetId,
-            AssetMapping.Global.EnumerateAssetsOfType(AssetType.ItemName).ToArray(),
-            (x, s, c) => Loaders.ItemNameLoader.Serdes(x, info, s, c));
+        var id = AssetId.From(Special.ItemNamesMultiLang);
+        Test<Dictionary<string, ListStringSet>>(id,
+            AssetId.EnumerateAll(AssetType.ItemName).ToArray(),
+            (x, s, c) => Loaders.ItemNameLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void AutomapTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Automap.Jirinaar) };
-        Test<Formats.Assets.Automap>(info.AssetId, null, (x, s, c) => Loaders.AutomapLoader.Serdes(x, info, s, c));
+        var id = AssetId.From(Automap.Jirinaar);
+        Test<Formats.Assets.Automap>(id, null, (x, s, c) => Loaders.AutomapLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void BlockListTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(BlockList.Toronto) };
-        Test<Formats.Assets.BlockList>(info.AssetId, null, (x, s, c) => Loaders.BlockListLoader.Serdes(x, info, s, c));
+        var id = AssetId.From(BlockList.Toronto);
+        Test<Formats.Assets.BlockList>(id, null, (x, s, c) => Loaders.BlockListLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void ChestTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Chest.HClanCellar_ID_IKn_ILC_StC_LSh_3g) };
+        var id = AssetId.From(Chest.HClanCellar_ID_IKn_ILC_StC_LSh_3g);
         Test<Inventory>(
-            info.AssetId,
+            id,
             AssetId.EnumerateAll(AssetType.Item).ToArray(),
-            (x, s, c) => Loaders.ChestLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.ChestLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void CommonPaletteTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Palette.Common) };
-        info.Set(AssetProperty.IsCommon, true);
-        Test<AlbionPalette>(info.AssetId, null, (x, s, c) => Loaders.PaletteLoader.Serdes(x, info, s, c));
+        var id = AssetId.From(Palette.Common);
+        Test<AlbionPalette>(id, null, (x, s, c) => Loaders.PaletteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void EventSetTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(EventSet.Frill) };
+        var id = AssetId.From(EventSet.Frill);
         Test<Formats.Assets.EventSet>(
-            info.AssetId,
+            id,
             null,
-            (x, s, c) => Loaders.EventSetLoader.Serdes(x, info, s, c),
+            (x, s, c) => Loaders.EventSetLoader.Serdes(x, s, c),
             LayoutTestUtil.CanonicalizeEventSet);
     }
 
     [Fact]
     public void EventTextTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(EventText.Frill) };
-        Test<ListStringSet>(info.AssetId, null, (x, s, c) => Loaders.AlbionStringTableLoader.Serdes(x, info, s, c));
+        var id = AssetId.From(EventText.Frill);
+        Test<ListStringSet>(id, null, (x, s, c) => Loaders.AlbionStringTableLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void LabyrinthTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Labyrinth.Jirinaar) };
-        Test<Formats.Assets.Labyrinth.LabyrinthData>(info.AssetId, null, (x, s, c) => Loaders.LabyrinthDataLoader.Serdes(x, info, s, c));
+        var id = AssetId.From(Labyrinth.Jirinaar);
+        Test<Formats.Assets.Labyrinth.LabyrinthData>(id, null, (x, s, c) => Loaders.LabyrinthDataLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void Map2DTest_200() // An outdoor level
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Map.Nakiridaani) };
-
-        var small = AssetMapping.Global.EnumerateAssetsOfType(AssetType.NpcSmallGfx);
-        var large = AssetMapping.Global.EnumerateAssetsOfType(AssetType.NpcLargeGfx);
+        var id = AssetId.From(Map.Nakiridaani);
         var palettes = AssetMapping.Global.EnumerateAssetsOfType(AssetType.Palette);
-        var prereqs =
-            new[] { AssetId.From(Special.DummyObject) }
-                .Concat(small)
-                .Concat(large)
-                .Concat(palettes)
-                .ToArray();
+        var prereqs = new[] { AssetId.From(Special.TiledNpcsSmall) }.Concat(palettes).ToArray();
 
         Test<MapData2D>(
-            info.AssetId,
+            id,
             prereqs,
-            (x, s, c) => MapData2D.Serdes(info, x, c.Mapping, s),
+            (x, s, c) => MapData2D.Serdes(id, x, c.Mapping, s),
             LayoutTestUtil.CanonicalizeMap);
     }
 
     [Fact]
     public void Map2DTest_300() // Starting level
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Map.TorontoBegin) };
-
-        var small = AssetMapping.Global.EnumerateAssetsOfType(AssetType.NpcSmallGfx);
-        var large = AssetMapping.Global.EnumerateAssetsOfType(AssetType.NpcLargeGfx);
+        var id = AssetId.From(Map.TorontoBegin);
         var palettes = AssetMapping.Global.EnumerateAssetsOfType(AssetType.Palette);
-        var prereqs =
-            new[] { AssetId.From(Special.DummyObject) }
-                .Concat(small)
-                .Concat(large)
-                .Concat(palettes)
-                .ToArray();
+        var prereqs = new[] { AssetId.From(Special.TiledNpcsLarge) }.Concat(palettes).ToArray();
 
         Test<MapData2D>(
-            info.AssetId,
+            id,
             prereqs,
-            (x, s, c) => MapData2D.Serdes(info, x, c.Mapping, s),
+            (x, s, c) => MapData2D.Serdes(id, x, c.Mapping, s),
             LayoutTestUtil.CanonicalizeMap);
     }
 
@@ -262,11 +253,11 @@ public class AssetConversionTests
     public void Map3DTest_110() // A town level with automap markers
     {
         var prereqs = new[] { AssetId.From(Labyrinth.Jirinaar) };
-        var info = new AssetInfo { AssetId = AssetId.From(Map.Jirinaar) };
+        var id = AssetId.From(Map.Jirinaar);
         Test<MapData3D>(
-            info.AssetId,
+            id,
             prereqs,
-            (x, s, c) => MapData3D.Serdes(info, x, c.Mapping, s),
+            (x, s, c) => MapData3D.Serdes(id, x, c.Mapping, s),
             LayoutTestUtil.CanonicalizeMap);
     }
 
@@ -274,46 +265,46 @@ public class AssetConversionTests
     public void Map3DTest_122() // A dungeon level
     {
         var prereqs = new[] { AssetId.From(Labyrinth.Argim) };
-        var info = new AssetInfo { AssetId = AssetId.From(Map.OldFormerBuilding) };
+        var id = AssetId.From(Map.OldFormerBuilding);
         Test<MapData3D>(
-            info.AssetId,
+            id,
             prereqs,
-            (x, s, c) => MapData3D.Serdes(info, x, c.Mapping, s),
+            (x, s, c) => MapData3D.Serdes(id, x, c.Mapping, s),
             LayoutTestUtil.CanonicalizeMap);
     }
 
     [Fact]
     public void MapTextTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(MapText.TorontoBegin) };
-        Test<ListStringSet>(info.AssetId, null, (x, s, c) => Loaders.AlbionStringTableLoader.Serdes(x, info, s, c));
+        var id = AssetId.From(MapText.TorontoBegin);
+        Test<ListStringSet>(id, null, (x, s, c) => Loaders.AlbionStringTableLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void MerchantTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Merchant.AltheaSpells) };
+        var id = AssetId.From(Merchant.AltheaSpells);
         Test<Inventory>(
-            info.AssetId,
+            id,
             AssetId.EnumerateAll(AssetType.Item).ToArray(),
-            (x, s, c) => Loaders.MerchantLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.MerchantLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void BrokenMerchantTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Merchant.Unknown1) };
+        var id = AssetId.From(Merchant.Unknown1);
         Test<Inventory>(
-            info.AssetId,
+            id,
             AssetId.EnumerateAll(AssetType.Item).ToArray(),
-            (x, s, c) => Loaders.MerchantLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.MerchantLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void MonsterGroupTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(MonsterGroup.TwoSkrinn1OneKrondir1) };
-        Test<Formats.Assets.MonsterGroup>(info.AssetId, null, (x, s, c) => Loaders.MonsterGroupLoader.Serdes(x, info, s, c));
+        var id = AssetId.From(MonsterGroup.TwoSkrinn1OneKrondir1);
+        Test<Formats.Assets.MonsterGroup>(id, null, (x, s, c) => Loaders.MonsterGroupLoader.Serdes(x, s, c));
     }
 
     static CharacterSheetLoader BuildCharacterLoader()
@@ -338,45 +329,45 @@ public class AssetConversionTests
     [Fact]
     public void MonsterTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(MonsterSheet.Krondir1) };
+        var id = AssetId.From(MonsterSheet.Krondir1);
         var loader = BuildCharacterLoader();
         Test<CharacterSheet>(
-            info.AssetId,
+            id,
             AssetId.EnumerateAll(AssetType.Item).ToArray(),
-            (x, s, c) => loader.Serdes(x, info, s, c));
+            (x, s, c) => loader.Serdes(x, s, c));
     }
 
     [Fact]
     public void NpcTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(NpcSheet.Christine) };
+        var id = AssetId.From(NpcSheet.Christine);
         var loader = BuildCharacterLoader();
-        Test<CharacterSheet>(info.AssetId, null, (x, s, c) => loader.Serdes(x, info, s, c));
+        Test<CharacterSheet>(id, null, (x, s, c) => loader.Serdes(x, s, c));
     }
 
     [Fact]
     public void PaletteTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Palette.Toronto2D) };
-        Test<AlbionPalette>(info.AssetId, new[] { AssetId.From(Palette.Common) }, (x, s, c) => Loaders.PaletteLoader.Serdes(x, info, s, c));
+        var id = AssetId.From(Palette.Toronto2D);
+        Test<AlbionPalette>(id, new[] { AssetId.From(Palette.Common) }, (x, s, c) => Loaders.PaletteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void PartySheetTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(PartySheet.Tom) };
+        var id = AssetId.From(PartySheet.Tom);
         var loader = BuildCharacterLoader();
         Test<CharacterSheet>(
-            info.AssetId,
+            id,
             AssetId.EnumerateAll(AssetType.Item).ToArray(),
-            (x, s, c) => loader.Serdes(x, info, s, c));
+            (x, s, c) => loader.Serdes(x, s, c));
     }
 
     [Fact]
     public void SampleTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Sample.IllTemperedLlama) };
-        Test<AlbionSample>(info.AssetId, null, (x, s, c) => Loaders.SampleLoader.Serdes(x, info, s, c));
+        var id = AssetId.From(Sample.IllTemperedLlama);
+        Test<AlbionSample>(id, null, (x, s, c) => Loaders.SampleLoader.Serdes(x, s, c));
     }
 
     /* They're text anyway so not too bothered - at the moment they don't round trip due to using friendly asset id names
@@ -384,279 +375,259 @@ public class AssetConversionTests
     [Fact]
     public void ScriptTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Script.TomMeetsChristine) };
-        Test<IList<IEvent>>(info.AssetId, null, (x, s, c) => Loaders.ScriptLoader.Serdes(x, info, s, c));
+        var id = AssetId.From(Script.TomMeetsChristine);
+        Test<IList<IEvent>>(id, null, (x, s, c) => Loaders.ScriptLoader.Serdes(x, s, c));
     } //*/
 
     [Fact]
     public void SongTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Song.Toronto) };
-        Test<byte[]>(info.AssetId, null, (x, s, c) => Loaders.SongLoader.Serdes(x, info, s, c));
+        var id = AssetId.From(Song.Toronto);
+        Test<byte[]>(id, null, (x, s, c) => Loaders.SongLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void SpellTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Spell.FrostAvalanche) };
-        Test<SpellData>(info.AssetId, null, (x, s, c) => Loaders.SpellLoader.Serdes(x, info, s, c));
+        var id = AssetId.From(Spell.FrostAvalanche);
+        Test<SpellData>(id, null, (x, s, c) => Loaders.SpellLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void TilesetTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Tileset.Outdoors) };
-        Test<TilesetData>(info.AssetId, null, (x, s, c) => Loaders.TilesetLoader.Serdes(x, info, s, c));
+        var id = AssetId.From(Tileset.Outdoors);
+        Test<TilesetData>(id, null, (x, s, c) => Loaders.TilesetLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void WaveLibTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(WaveLibrary.Unknown5) };
-        Test<WaveLib>(info.AssetId, null, (x, s, c) => Loaders.WaveLibLoader.Serdes(x, info, s, c));
+        var id = AssetId.From(WaveLibrary.Unknown5);
+        Test<WaveLib>(id, null, (x, s, c) => Loaders.WaveLibLoader.Serdes(x, s, c));
     }
 
     [Fact]
-    public void WordTest()
+    public void Words1Test()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Special.Words1) };
+        var id = AssetId.From(Special.Words1);
         Test<ListStringSet>(
-            info.AssetId,
+            id,
             AssetMapping.Global.EnumerateAssetsOfType(AssetType.Word).ToArray(),
-            (x, s, c) => Loaders.WordListLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.WordListLoader.Serdes(x, s, c));
     }
+
+    [Fact]
+    public void Words2Test()
+    {
+        var id = AssetId.From(Special.Words2);
+        Test<ListStringSet>(
+            id,
+            AssetMapping.Global.EnumerateAssetsOfType(AssetType.Word).ToArray(),
+            (x, s, c) => Loaders.WordListLoader.Serdes(x, s, c));
+    }
+
+    [Fact]
+    public void Words3Test()
+    {
+        var id = AssetId.From(Special.Words3);
+        Test<ListStringSet>(
+            id,
+            AssetMapping.Global.EnumerateAssetsOfType(AssetType.Word).ToArray(),
+            (x, s, c) => Loaders.WordListLoader.Serdes(x, s, c));
+    }
+
     //*
     [Fact]
     public void AutomapGfxTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(AutomapTiles.Set1) };
-        info.Set(AssetProperty.SubSprites, "(8,8,576) (16,16)");
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(AutomapTiles.Set1);
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.Common), AssetId.From(Palette.Unknown11) },
-            (x, s, c) => Loaders.AmorphousSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.AmorphousSpriteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void CombatBgTest()
     {
-        var info = new AssetInfo
-        {
-            AssetId = AssetId.From(CombatBackground.Toronto),
-            Width = 360
-        };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(CombatBackground.Toronto);
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.TorontoCombat), AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void DungeonObjectTest()
     {
-        var info = new AssetInfo
-        {
-            AssetId = AssetId.From(DungeonObject.Krondir),
-            Width = 145,
-            Height = 165
-        };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(DungeonObject.Krondir);
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void FontGfxTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(FontGfx.Regular), Width = 8, Height = 8 };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(FontGfx.Regular);
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.Common), AssetId.From(FontGfx.Bold) },
-            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void ItemSpriteTest()
     {
-        var info = new AssetInfo
-        {
-            AssetId = AssetId.From(ItemGfx.ItemSprites),
-            Width = 16,
-            Height = 16
-        };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(ItemGfx.ItemSprites);
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void SlabTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(UiBackground.Slab), Width = 360 };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(UiBackground.Slab); 
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.SlabLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.SlabLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void TileGfxTest()
     {
-        var info = new AssetInfo
-        {
-            AssetId = AssetId.From(TilesetGfx.Toronto),
-            Width = 16,
-            Height = 16
-        };
+        var id = AssetId.From(TilesetGfx.Toronto);
 
         var palettes = AssetMapping.Global.EnumerateAssetsOfType(AssetType.Palette);
         var prereqs = palettes.Append(AssetId.From(Palette.Toronto2D)).ToArray();
 
-        Test<ITileGraphics>(info.AssetId, prereqs, (x, s, c) => Loaders.TilesetGraphicsLoader.Serdes(x, info, s, c));
+        Test<ITileGraphics>(id, prereqs, (x, s, c) => Loaders.TilesetGraphicsLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void CombatGfxTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(CombatGfx.SplashYellow) };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(CombatGfx.SplashYellow);
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.PlainsCombat), AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.MultiHeaderSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.MultiHeaderSpriteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void DungeonBgTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(DungeonBackground.EarlyGameL) };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(DungeonBackground.EarlyGameL);
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void FloorTest()
     {
-        var info = new AssetInfo
-        {
-            AssetId = AssetId.From(Floor.Water),
-            Width = 64,
-            Height = 64
-        };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(Floor.Water);
+
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void FullBodyPictureTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(PartyInventoryGfx.Tom) };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(PartyInventoryGfx.Tom);
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.Inventory), AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void LargeNpcTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(NpcLargeGfx.Christine) };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(NpcLargeGfx.Christine);
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.Toronto2D), AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void LargePartyMemberTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(PartyLargeGfx.Tom) };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(PartyLargeGfx.Tom);
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.IskaiIndoorDark), AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void MonsterGfxTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(MonsterGfx.Krondir) };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(MonsterGfx.Krondir);
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.DungeonCombat), AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.MultiHeaderSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.MultiHeaderSpriteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void OverlayTest()
     {
-        var info = new AssetInfo
-        {
-            AssetId = AssetId.From(WallOverlay.JiriWindow),
-            Width = 44,
-            File = new AssetFileInfo()
-        };
-        info.File.Set(AssetProperty.Transposed, true);
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(WallOverlay.JiriWindow);
+
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
 
     /* No code to write these atm, if anyone wants to mod them or add new ones they can still use ImageMagick or something to convert to ILBM
     [Fact]
     public void PictureTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(Picture.OpenChestWithGold) };
-        Test<InterlacedBitmap>(info.AssetId, null, (x, s, c) => Loaders.InterlacedBitmapLoader.Serdes(x, info, s, c));
+        var id = AssetId.From(Picture.OpenChestWithGold);
+        Test<InterlacedBitmap>(id, null, (x, s, c) => Loaders.InterlacedBitmapLoader.Serdes(x, s, c));
     } //*/
 
     [Fact]
     public void PortraitTest()
     {
-        var info = new AssetInfo
-        {
-            AssetId = AssetId.From(Portrait.Tom),
-            Width = 34
-        };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(Portrait.Tom);
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void SmallNpcTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(NpcSmallGfx.Krondir) };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(NpcSmallGfx.Krondir);
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.FirstIslandDay), AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void SmallPartyMemberTest()
     {
-        var info = new AssetInfo { AssetId = AssetId.From(PartySmallGfx.Tom) };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(PartySmallGfx.Tom);
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.FirstIslandDay), AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void TacticalGfxTest()
     {
-        var info = new AssetInfo
-        {
-            AssetId = AssetId.From(TacticalGfx.Tom),
-            Width = 32
-        };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(TacticalGfx.Tom);
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
 
     [Fact]
     public void WallTest()
     {
-        var info = new AssetInfo
-        {
-            AssetId = AssetId.From(Wall.TorontoPanelling),
-            Width = 80
-        };
-        Test<IReadOnlyTexture<byte>>(info.AssetId,
+        var id = AssetId.From(Wall.TorontoPanelling);
+        Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.Toronto3D), AssetId.From(Palette.Common) },
-            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, info, s, c));
+            (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
     // */
 }

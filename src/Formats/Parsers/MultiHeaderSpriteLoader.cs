@@ -11,13 +11,13 @@ namespace UAlbion.Formats.Parsers;
 
 public class MultiHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 {
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((IReadOnlyTexture<byte>)existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((IReadOnlyTexture<byte>)existing, s, context);
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (info == null) throw new ArgumentNullException(nameof(info));
+        if (context == null) throw new ArgumentNullException(nameof(context));
         if (s.IsWriting())
         {
             if (existing == null)
@@ -27,10 +27,10 @@ public class MultiHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
             return existing;
         }
 
-        return Read(info, s);
+        return Read(context, s);
     }
 
-    static IReadOnlyTexture<byte> Read(AssetInfo info, ISerializer s)
+    static IReadOnlyTexture<byte> Read(AssetLoadContext context, ISerializer s)
     {
         int width = s.UInt16("Width", 0);
         int height = s.UInt16("Height", 0);
@@ -56,7 +56,7 @@ public class MultiHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
             frames.Add(new SimpleTexture<byte>(null, null, width, height, frameBytes));
         }
 
-        return BlitUtil.CombineFramesVertically<byte>(info.AssetId, frames);
+        return BlitUtil.CombineFramesVertically<byte>(context.AssetId, frames);
     }
 
     static void Write(IReadOnlyTexture<byte> existing, ISerializer s)

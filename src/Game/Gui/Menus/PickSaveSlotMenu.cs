@@ -6,6 +6,7 @@ using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Dialogs;
@@ -20,6 +21,7 @@ public class PickSaveSlotMenu : ModalDialog
     readonly StringId _stringId;
     const ushort MaxSaveNumber = 10; // TODO: Add scroll bar and bump up to 99
 
+    public PickSaveSlotMenu(bool showEmptySlots, TextId textId, int depth) : this(showEmptySlots, new StringId(textId), depth) { }
     public PickSaveSlotMenu(bool showEmptySlots, StringId stringId, int depth) : base(DialogPositioning.Center, depth)
     {
         On<UiRightClickEvent>(e =>

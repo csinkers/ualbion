@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
@@ -6,56 +8,84 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Formats.Parsers;
 
-public class ItemNameLoader : IAssetLoader<MultiLanguageStringDictionary>
+public class ItemNameLoader : IAssetLoader<Dictionary<string, ListStringSet>>
 {
     const int StringSize = 20;
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((MultiLanguageStringDictionary)existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((Dictionary<string, ListStringSet>)existing, s, context);
 
-    public MultiLanguageStringDictionary Serdes(MultiLanguageStringDictionary existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public Dictionary<string, ListStringSet> Serdes(
+        Dictionary<string, ListStringSet> existing,
+        ISerializer s,
+        AssetLoadContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (s.IsWriting() && existing == null) throw new ArgumentNullException(nameof(existing));
-
-        existing ??= new MultiLanguageStringDictionary();
-        if (!existing.ContainsKey(Base.Language.German)) existing[Base.Language.German] = new ListStringSet();
-        if (!existing.ContainsKey(Base.Language.English)) existing[Base.Language.English] = new ListStringSet();
-        if (!existing.ContainsKey(Base.Language.French)) existing[Base.Language.French] = new ListStringSet();
-
-        static void Inner(IStringSet collection, int i, ISerializer s2)
-        {
-            var concrete = (ListStringSet)collection;
-            while (collection.Count <= i)
-                concrete.Add(null);
-            concrete[i] = s2.FixedLengthString(null, concrete[i], StringSize);
-        }
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
         if (s.IsReading())
-        {
-            var streamLength = s.BytesRemaining;
-            ApiUtil.Assert(streamLength % StringSize == 0, "Expected item name file length to be a whole multiple of the string size");
+            return Read(s);
 
-            int i = 1;
-            long end = s.Offset + streamLength;
-            while (s.Offset < end)
-            {
-                Inner(existing[Base.Language.German], i, s);
-                Inner(existing[Base.Language.English], i, s);
-                Inner(existing[Base.Language.French], i, s);
-                i++;
-            }
-        }
-        else
-        {
-            var stringCount = existing[Base.Language.German].Count;
-            for (int i = 1; i < stringCount; i++)
-            {
-                Inner(existing[Base.Language.German], i, s);
-                Inner(existing[Base.Language.English], i, s);
-                Inner(existing[Base.Language.French], i, s);
-            }
-        }
+        if (existing == null)
+            throw new ArgumentNullException(nameof(existing));
 
+        WriteAll(existing, s);
         return existing;
+    }
+
+    static Dictionary<string, ListStringSet> Read(ISerializer s)
+    {
+        var german = new ListStringSet();
+        var english = new ListStringSet();
+        var french = new ListStringSet();
+
+        var results = new Dictionary<string, ListStringSet>
+            {
+                { Base.Language.German, german },
+                { Base.Language.English, english },
+                { Base.Language.French, french }
+            };
+
+        var streamLength = s.BytesRemaining;
+        ApiUtil.Assert(streamLength % StringSize == 0, "Expected item name file length to be a whole multiple of the string size");
+
+        long end = s.Offset + streamLength;
+        while (s.Offset < end)
+        {
+            german.Add(s.FixedLengthString(null, null, StringSize));
+            english.Add(s.FixedLengthString(null, null, StringSize));
+            french.Add(s.FixedLengthString(null, null, StringSize));
+        }
+
+        return results;
+    }
+
+    static void WriteAll(Dictionary<string, ListStringSet> existing, ISerializer s)
+    {
+        existing.TryGetValue(Base.Language.German, out var german);
+        existing.TryGetValue(Base.Language.English, out var english);
+        existing.TryGetValue(Base.Language.French, out var french);
+
+        var maxCount = new[]
+        {
+            german?.Count,
+            english?.Count,
+            french?.Count,
+        }.Max();
+
+        if (maxCount == null)
+            throw new InvalidOperationException($"No strings for base languages in dictionary given to {nameof(ItemNameLoader)}");
+
+        for (int i = 0; i < maxCount.Value; i++)
+        {
+            Write(german, s, i);
+            Write(english, s, i);
+            Write(french, s, i);
+        }
+    }
+
+    static void Write(ListStringSet set, ISerializer s, int i)
+    {
+        var text = set.Count <= i ? "" : set[i];
+        s.FixedLengthString(null, text, StringSize);
     }
 }

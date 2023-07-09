@@ -4,6 +4,7 @@ using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
+using UAlbion.Formats.Ids;
 using UAlbion.Formats.Parsers;
 using UAlbion.TestCommon;
 using Xunit;
@@ -18,33 +19,35 @@ public class SpriteLoaderTests
     static readonly MultiHeaderSpriteLoader MultiHeaderLoader = new();
     static readonly AmorphousSpriteLoader AmorphousLoader = new();
 
-    delegate IReadOnlyTexture<byte> SerdesFunc(IReadOnlyTexture<byte> x, ISerializer s, SerdesContext context);
-    static IReadOnlyTexture<byte> Load(byte[] bytes, SerdesFunc serdes)
+    delegate IReadOnlyTexture<byte> SerdesFunc(IReadOnlyTexture<byte> x, ISerializer s, AssetLoadContext context);
+    static IReadOnlyTexture<byte> Load(byte[] bytes, AssetLoadContext context, SerdesFunc serdes)
     {
         using var ms = new MemoryStream(bytes);
         using var br = new BinaryReader(ms);
         using var s = new AlbionReader(br);
-        var context = new SerdesContext("Test", JsonUtil, AssetMapping.Global, Disk);
         return serdes(null, s, context);
     }
 
-    static byte[] Save(IReadOnlyTexture<byte> sprite, SerdesFunc serdes)
+    static byte[] Save(IReadOnlyTexture<byte> sprite, AssetLoadContext context, SerdesFunc serdes)
     {
         using var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms);
         using var s = new AlbionWriter(bw);
-        var context = new SerdesContext("Test", JsonUtil, AssetMapping.Global, Disk);
         serdes(sprite, s, context);
         ms.Position = 0;
         return ms.ToArray();
     }
 
-
-    static void RoundTrip(byte[] bytes, SerdesFunc serdes, Action<IReadOnlyTexture<byte>> assert)
+    static void RoundTrip(byte[] bytes, SerdesFunc serdes, Action<IReadOnlyTexture<byte>> assert) => RoundTrip(bytes, serdes, assert, AssetId.None);
+    static void RoundTrip(byte[] bytes, SerdesFunc serdes, Action<IReadOnlyTexture<byte>> assert, AssetId assetId, AssetNode node = null)
     {
-        var sprite = Load(bytes, serdes);
+        var mod = new ModContext("Test", JsonUtil, Disk, AssetMapping.Global);
+        var context = new AssetLoadContext(assetId, node ?? new AssetNode(assetId), mod);
+
+        var sprite = Load(bytes, context, serdes);
         assert(sprite);
-        var roundTripped = Save(sprite, serdes);
+
+        var roundTripped = Save(sprite, context, serdes);
         var a = FormatUtil.BytesToHexString(bytes);
         var b = FormatUtil.BytesToHexString(roundTripped);
         Assert.Equal(a, b);
@@ -63,7 +66,7 @@ public class SpriteLoaderTests
         };
 
         RoundTrip(oneFrame,
-            (x, s, c) => HeaderLoader.Serdes(x, new AssetInfo(), s, c),
+            (x, s, c) => HeaderLoader.Serdes(x, s, c),
             sprite =>
             {
                 Assert.Equal(4, sprite.Width);
@@ -93,7 +96,7 @@ public class SpriteLoaderTests
         };
 
         RoundTrip(twoFrames,
-            (x, s, c) => HeaderLoader.Serdes(x, new AssetInfo(), s, c),
+            (x, s, c) => HeaderLoader.Serdes(x, s, c),
             sprite =>
             {
                 Assert.Equal(4, sprite.Width);
@@ -141,9 +144,8 @@ public class SpriteLoaderTests
             01, 02, 03, 04, 05
         };
 
-        var info = new AssetInfo();
         RoundTrip(nonUniform,
-            (x, s, c) => MultiHeaderLoader.Serdes(x, info, s, c),
+            (x, s, c) => MultiHeaderLoader.Serdes(x, s, c),
             sprite =>
             {
                 Assert.Equal(5, sprite.Width);
@@ -177,10 +179,11 @@ public class SpriteLoaderTests
             0x13, 0x14,
         };
 
-        var info = new AssetInfo();
-        info.Set(AssetProperty.SubSprites, "(3,2,2) (2,1)");
+        var id = SpriteId.None;
+        var node = new AssetNode(id);
+        node.SetProperty(AmorphousSpriteLoader.SubSpritesProperty, "(3,2,2) (2,1)");
         RoundTrip(oneFrame,
-            (x, s, c) => AmorphousLoader.Serdes(x, info, s, c),
+            (x, s, c) => AmorphousLoader.Serdes(x, s, c),
             sprite =>
             {
                 Assert.Equal(3, sprite.Width);
@@ -211,6 +214,6 @@ public class SpriteLoaderTests
                 Assert.Equal(1, sprite.Regions[4].Height);
                 Assert.Equal(0, sprite.Regions[4].X);
                 Assert.Equal(6, sprite.Regions[4].Y);
-            });
+            }, id, node);
     }
 }

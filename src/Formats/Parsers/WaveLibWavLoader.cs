@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using SerdesNet;
 using UAlbion.Config;
+using UAlbion.Config.Properties;
 using UAlbion.Formats.Assets;
 using static System.FormattableString;
 
@@ -11,15 +12,16 @@ public class WaveLibWavLoader : IAssetLoader<WaveLib>
 {
     static readonly WavLoader WavLoader = new();
     static readonly Regex NameRegex = new(@"i(\d+)t(\d+)");
-    public WaveLib Serdes(WaveLib existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public WaveLib Serdes(WaveLib existing, ISerializer s, AssetLoadContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
+        if (context == null) throw new ArgumentNullException(nameof(context));
         return s.IsWriting() 
-            ? Write(existing, info, s, context) 
+            ? Write(existing, s, context) 
             : Read(s, context);
     }
 
-    static WaveLib Read(ISerializer s, SerdesContext context)
+    static WaveLib Read(ISerializer s, AssetLoadContext context)
     {
         var lib = new WaveLib();
         int i = 0;
@@ -44,7 +46,7 @@ public class WaveLibWavLoader : IAssetLoader<WaveLib>
 
             var instrument = int.Parse(m.Groups[1].Value);
             var type = int.Parse(m.Groups[2].Value);
-            var sample = FormatUtil.DeserializeFromBytes(bytes, s2 => WavLoader.Serdes(null, null, s2, context));
+            var sample = FormatUtil.DeserializeFromBytes(bytes, s2 => WavLoader.Serdes(null, s2, context));
             lib.Samples[i] = new WaveLibSample
             {
                 Active = true,
@@ -64,9 +66,11 @@ public class WaveLibWavLoader : IAssetLoader<WaveLib>
         return lib;
     }
 
-    static WaveLib Write(WaveLib existing, AssetInfo info, ISerializer s, SerdesContext context)
+    static readonly AssetPathPattern DefaultPattern = AssetPathPattern.Build("{0}_{1}_{2}.dat");
+    static WaveLib Write(WaveLib existing, ISerializer s, AssetLoadContext context)
     {
         if (existing == null) throw new ArgumentNullException(nameof(existing));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
         PackedChunks.PackNamed(s, WaveLib.MaxSamples, i =>
         {
@@ -75,14 +79,14 @@ public class WaveLibWavLoader : IAssetLoader<WaveLib>
                 return (Array.Empty<byte>(), null);
 
             string extension = Invariant($"i{sample.Instrument}t{sample.Type}");
-            var pattern = info.GetPattern(AssetProperty.Pattern, "{0}_{1}_{2}.dat");
-            var name = pattern.Format(new AssetPath(info, i, extension));
-            var bytes = FormatUtil.SerializeToBytes(s2 => WavLoader.Serdes(sample, null, s2, context));
+            var pattern = context.GetProperty(AssetProps.Pattern, DefaultPattern);
+            var name = pattern.Format(context.BuildAssetPath(i, extension));
+            var bytes = FormatUtil.SerializeToBytes(s2 => WavLoader.Serdes(sample, s2, context));
             return (bytes, name);
         });
         return existing;
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((WaveLib)existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((WaveLib)existing, s, context);
 }

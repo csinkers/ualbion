@@ -2,6 +2,7 @@
 using UAlbion.Api;
 using UAlbion.Base;
 using UAlbion.Config;
+using UAlbion.Config.Properties;
 using UAlbion.Formats;
 using static BuildTestingMaps.Constants;
 
@@ -52,10 +53,14 @@ public static class Program
 
         Merge(AutoJumpMap.Build((Map)300, (Map)100, 7, 7, tileset1));
 
-        (object? asset, AssetInfo? info) LoaderFunc(AssetId id, string lang)
-            => assets.TryGetValue(id, out var asset)
-                ? (asset, new AssetInfo(new Dictionary<string, object> { { AssetProperty.PaletteId, Palette1Id.Id } }))
-                : (null, null);
+        AssetLoadResult LoaderFunc(AssetId assetId, string language)
+        {
+            var node = new AssetNode(assetId);
+            node.SetProperty(AssetProps.Palette, Palette1Id);
+            return assets.TryGetValue(assetId, out var asset)
+                ? new AssetLoadResult(assetId, asset, null)
+                : null!;
+        }
 
         // Create 3D lab graphics
         // Create 3D lab data
@@ -84,8 +89,9 @@ public static class Program
         mem monitoring, movement details
          */
 
-        testExchange.Resolve<IModApplier>().SaveAssets(LoaderFunc, () => { }, assets.Keys.ToHashSet(), null, null);
-        repackedExchange.Resolve<IModApplier>().SaveAssets(LoaderFunc, () => { }, assets.Keys.ToHashSet(), null, null);
+        var options = new AssetConversionOptions(LoaderFunc, () => { }, assets.Keys.ToHashSet(), null, null, null);
+        testExchange.Resolve<IModApplier>().SaveAssets(options);
+        repackedExchange.Resolve<IModApplier>().SaveAssets(options);
         Console.WriteLine("Done");
     }
 }

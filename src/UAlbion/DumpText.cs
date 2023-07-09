@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using UAlbion.Api.Eventing;
@@ -250,7 +249,7 @@ class DumpText : Component, IAssetDumper
                 if (npc.Chain != 0xffff)
                 {
                     sw.WriteLine($"        EventChain: {npc.Chain}");
-                    var formatter = new EventFormatter(assets.LoadString, id.ToMapText());
+                    var formatter = new EventFormatter(assets.LoadStringSafe, id.ToMapText());
                     var builder = new UnformattedScriptBuilder(false);
                     formatter.FormatChain(builder, npc.Node, 2);
                     sw.WriteLine(builder.Build());
@@ -333,7 +332,7 @@ class DumpText : Component, IAssetDumper
             {
                 if (e.Event is TextEvent textEvent)
                 {
-                    var textSource = tf.Format(textEvent.ToId(eventSet.TextId));
+                    var textSource = tf.Format(textEvent.ToId(eventSet.StringSetId));
                     var text = string.Join(", ", textSource.GetBlocks().Select(x => x.Text));
                     sw.WriteLine($"        {e} = {text}");
                 }
@@ -457,7 +456,7 @@ class DumpText : Component, IAssetDumper
 
     static void DumpMapEvents(StreamWriter sw, IAssetManager assets, MapId mapId, IMapData map)
     {
-        var formatter = new EventFormatter(assets.LoadString, mapId.ToMapText());
+        var formatter = new EventFormatter(assets.LoadStringSafe, mapId.ToMapText());
         sw.WriteLine();
         sw.WriteLine($"Map {mapId.Id} {mapId}:");
         var builder = new UnformattedScriptBuilder(false);
@@ -511,7 +510,7 @@ class DumpText : Component, IAssetDumper
             if (set == null)
                 continue;
 
-            var formatter = new EventFormatter(assets.LoadString, ((EventSetId)eventSetId).ToEventText());
+            var formatter = new EventFormatter(assets.LoadStringSafe, ((EventSetId)eventSetId).ToEventText());
             var builder = new UnformattedScriptBuilder(false);
             foreach (var e in set.Events)
             {
@@ -528,7 +527,7 @@ class DumpText : Component, IAssetDumper
         foreach (var spellId in Ids<Base.Spell>(dumpIds))
         {
             var spell = assets.LoadSpell(spellId);
-            var name = assets.LoadString(spell.Name);
+            var name = assets.LoadStringSafe(spell.Name);
             //int classNumber = (int)spellId / SpellData.MaxSpellsPerClass;
             //int offsetInClass = (int)spellId % SpellData.MaxSpellsPerClass;
             sw.Write($"Spell{spellId.Id:D3} {spell.Class}_{spell.OffsetInClass} ");

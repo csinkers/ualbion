@@ -6,9 +6,6 @@ using System.Security.Cryptography;
 using System.Text;
 using SerdesNet;
 using UAlbion.Api;
-using UAlbion.Config;
-using UAlbion.Formats.Assets;
-using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats;
@@ -119,14 +116,6 @@ public static class FormatUtil
             ranges.Add((start, last - start + 1));
 
         return ranges;
-    }
-
-    public static StringId ResolveTextId(TextId id)
-    {
-        var result = AssetMapping.Global.TextIdToStringId(id);
-        return result.HasValue
-            ? new StringId(result.Value.Item1, result.Value.Item2)
-            : new StringId(id, 0);
     }
 
     public static bool Compare(QueryOperation operation, int value, int immediate) =>

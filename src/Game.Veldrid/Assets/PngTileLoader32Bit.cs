@@ -11,9 +11,9 @@ using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
+using UAlbion.Config.Properties;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets.Maps;
 using Veldrid;
 
@@ -22,27 +22,28 @@ namespace UAlbion.Game.Veldrid.Assets;
 public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
 {
     const PixelFormat TextureFormat = PixelFormat.R8_G8_B8_A8_UNorm;
+    public static readonly StringAssetProperty DayPath = new("DayPath"); 
+    public static readonly StringAssetProperty NightPath = new("NightPath"); 
     record FrameInfo(string Path, int SubId, int PalFrame);
     readonly PngDecoder _decoder = new();
     readonly Configuration _configuration = new();
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((ITileGraphics)existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((ITileGraphics)existing, s, context);
 
-    public ITileGraphics Serdes(ITileGraphics existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public ITileGraphics Serdes(ITileGraphics existing, ISerializer s, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
         if (s.IsWriting())
             throw new NotSupportedException("Saving png tile graphics is not currently supported");
 
-        return Load(info, context);
+        return Load(context);
     }
 
-    ITileGraphics Load(AssetInfo info, SerdesContext context)
+    ITileGraphics Load(AssetLoadContext context)
     {
         var engine = (Engine)Resolve<IEngine>();
-        var (dayInfo, nightInfo) = FindFiles(info, context.Disk);
+        var (dayInfo, nightInfo) = FindFiles(context);
 
         var totalPngs =
             1 + // Region 0 = Blank instance
@@ -80,7 +81,7 @@ public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
             return new ReadOnlyImageBuffer<uint>(png.Width, png.Height, png.Width, MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan));
         }
 
-        var texture = new LazyTexture<uint>(AccessRegion, info.AssetId, info.ToString(), layout.Width, layout.Height, layout.Layers);
+        var texture = new LazyTexture<uint>(AccessRegion, context.AssetId, context.ToString(), layout.Width, layout.Height, layout.Layers);
         texture.AddRegion(null, 0, 0, tileWidth, tileHeight); // Region 0 is a blank one for unmapped sub-ids
 
         int regionNum = 1;
@@ -108,12 +109,12 @@ public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
         }
     }
 
-    static List<TileFrameSummary> GetInfo(string dir, IFileSystem disk, AssetPathPattern pattern)
+    static List<TileFrameSummary> GetInfo(string dir, AssetType assetType, IFileSystem disk, AssetPathPattern pattern)
     {
         var frames = new List<FrameInfo>();
-        foreach (var path in disk.EnumerateDirectory(dir, "*.png"))
+        foreach (var path in disk.EnumerateFiles(dir, "*.png"))
         {
-            if (!pattern.TryParse(Path.GetFileName(path), out var assetPath))
+            if (!pattern.TryParse(Path.GetFileName(path), assetType, out var assetPath))
                 continue;
 
             frames.Add(new FrameInfo(path, assetPath.SubAsset, assetPath.PaletteFrame ?? 0));
@@ -159,20 +160,21 @@ public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
     }
 
 
-    static (List<TileFrameSummary> dayInfo, List<TileFrameSummary> nightInfo) FindFiles(AssetInfo info, IFileSystem disk)
+    static (List<TileFrameSummary> dayInfo, List<TileFrameSummary> nightInfo) FindFiles(AssetLoadContext context)
     {
-        var pattern = info.GetPattern(AssetProperty.Pattern, "{ignorenum}_{frame:0000}_{palframe:0000}.png");
-        var dayPath = info.Get<string>(AssetProperty.DayPath, null);
-        var nightPath = info.Get<string>(AssetProperty.NightPath, null);
+        var pattern = context.GetProperty(AssetProps.Pattern, AssetPathPattern.Build("{ignorenum}_{frame:0000}_{palframe:0000}.png"));
+        var dayPath = context.GetProperty(DayPath);
+        var nightPath = context.GetProperty(NightPath);
 
         if (!string.IsNullOrEmpty(dayPath))
-            dayPath = Path.Combine(info.File.Filename, dayPath);
+            dayPath = Path.Combine(context.Filename, dayPath);
 
         if (!string.IsNullOrEmpty(nightPath))
-            nightPath = Path.Combine(info.File.Filename, nightPath);
+            nightPath = Path.Combine(context.Filename, nightPath);
 
-        var dayInfo = GetInfo(dayPath, disk, pattern);
-        var nightInfo = nightPath != null ? GetInfo(nightPath, disk, pattern) : null;
+        var assetType = context.AssetId.Type;
+        var dayInfo = GetInfo(dayPath, assetType, context.Disk, pattern);
+        var nightInfo = nightPath != null ? GetInfo(nightPath, assetType, context.Disk, pattern) : null;
         return (dayInfo, nightInfo);
     }
 

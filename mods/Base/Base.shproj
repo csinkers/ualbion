@@ -3,7 +3,8 @@
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\CodeSharing\Microsoft.CodeSharing.CSharp.targets" />
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)\*.json" />
+    <Content Include="C:\Depot\bb\ualbion\mods\Base\modinfo.json" />
+    <Content Include="C:\Depot\bb\ualbion\mods\Base\types.json" />
     <Content Include="$(MSBuildThisFileDirectory)\ENGLISH\**\*.json" />
     <Content Include="$(MSBuildThisFileDirectory)\GERMAN\**\*.json" />
     <Content Include="$(MSBuildThisFileDirectory)\FRENCH\**\*.json" />

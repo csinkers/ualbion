@@ -11,18 +11,18 @@ public class AtlasPostProcessor : IAssetPostProcessor
 {
     const int MarginPixels = 0;
 
-    public object Process(object asset, AssetInfo info) => Process((IReadOnlyTexture<byte>)asset, info);
-    public static SimpleTexture<byte> Process(IReadOnlyTexture<byte> sprite, AssetInfo info)
+    public object Process(object asset, AssetLoadContext context) => Process((IReadOnlyTexture<byte>)asset, context);
+    public static SimpleTexture<byte> Process(IReadOnlyTexture<byte> sprite, AssetLoadContext context)
     {
         if (sprite == null) throw new ArgumentNullException(nameof(sprite));
-        if (info == null) throw new ArgumentNullException(nameof(info));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
         var layout = SpriteSheetUtil.ArrangeSpriteSheet(sprite.Regions.Count, 1, sprite.GetRegionBuffer);
         if (layout.Layers > 1)
             throw new InvalidOperationException("Could not layout atlas onto one layer");
 
         var texture = new SimpleTexture<byte>(
-            info.AssetId, sprite.Id.ToString(),
+            context.AssetId, sprite.Id.ToString(),
             layout.Width, layout.Height);
 
         var pixelData = texture.GetMutableLayerBuffer(0).Buffer;

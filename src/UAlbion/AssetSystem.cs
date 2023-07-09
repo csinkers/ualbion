@@ -60,8 +60,8 @@ public static class AssetSystem
             .Add(new PostProcessorRegistry())
             .Add(new VarRegistry())
             .Add(new AssetLocator());
-        PerfTracker.StartupEvent("Registered asset services");
 
+        PerfTracker.StartupEvent("Registered asset services");
         IModApplier modApplier = new ModApplier();
         exchange.Attach(modApplier);
         modApplier.LoadMods(mapping, pathResolver, mods ?? UserVars.Gameplay.ActiveMods.Read(settings));

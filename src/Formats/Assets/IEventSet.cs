@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Assets;
 public interface IEventSet
 {
     AssetId Id { get; }
-    TextId TextId { get; }
+    StringSetId StringSetId { get; }
     IList<EventNode> Events { get; }
     IList<ushort> Chains { get; }
     IList<ushort> ExtraEntryPoints { get; }

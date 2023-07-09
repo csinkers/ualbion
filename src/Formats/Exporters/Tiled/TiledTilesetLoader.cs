@@ -3,22 +3,25 @@ using System.IO;
 using SerdesNet;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
+using UAlbion.Config.Properties;
 using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Formats.Exporters.Tiled;
 
 public class TiledTilesetLoader : Component, IAssetLoader<TilesetData>
 {
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((TilesetData)existing, info, s, context);
+    public static readonly StringAssetProperty BlankTilePathProperty = new("BlankTilePath"); 
+    public static readonly PathPatternProperty GraphicsPattern = new("GraphicsPattern"); 
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((TilesetData)existing, s, context);
 
-    public TilesetData Serdes(TilesetData existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public TilesetData Serdes(TilesetData existing, ISerializer s, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var graphicsTemplate = info.Get(AssetProperty.GraphicsPattern, "{0}/{0}_{1}.png");
-        var blankTilePath = info.Get(AssetProperty.BlankTilePath, "Blank.png");
+        var graphicsTemplate = context.GetProperty(GraphicsPattern, AssetPathPattern.Build("{0}/{0}_{1}.png"));
+        var blankTilePath = context.GetProperty(BlankTilePathProperty, "Blank.png");
 
         var properties = new Tilemap2DProperties
         {
@@ -28,15 +31,17 @@ public class TiledTilesetLoader : Component, IAssetLoader<TilesetData>
             TileHeight = 16
         };
 
-        return s.IsWriting() ? Save(existing, properties, s) : Load(info, properties, s);
+        return s.IsWriting() 
+            ? Save(existing, properties, s) 
+            : Load(context, properties, s);
     }
 
-    static TilesetData Load(AssetInfo info, Tilemap2DProperties properties, ISerializer serializer)
+    static TilesetData Load(AssetLoadContext context, Tilemap2DProperties properties, ISerializer serializer)
     {
         var xmlBytes = serializer.Bytes(null, null, (int)serializer.BytesRemaining);
         using var ms = new MemoryStream(xmlBytes);
         var tileset = Tileset.Parse(ms);
-        return TilesetMapping.ToAlbion(tileset, info.AssetId, properties);
+        return TilesetMapping.ToAlbion(tileset, context.AssetId, properties);
     }
 
     static TilesetData Save(TilesetData tileset, Tilemap2DProperties properties, ISerializer s)

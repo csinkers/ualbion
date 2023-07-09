@@ -19,7 +19,7 @@ public class InventoryMidPane : UiElement
     protected override void Subscribed()
     {
         var assets = Resolve<IAssetManager>();
-        var positions = assets.LoadPartyMember(_activeCharacter).InventorySlots;
+        var positions = assets.LoadPartyMember(_activeCharacter)?.InventorySlots;
         if (positions == null)
             throw new AssetNotFoundException($"Could not load inventory slot positions for party member {_activeCharacter}");
 

@@ -4,11 +4,13 @@ using System.Text.RegularExpressions;
 using SerdesNet;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
+using UAlbion.Config.Properties;
 
 namespace UAlbion.Formats.Parsers;
 
 public class AmorphousSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 {
+    public static readonly StringAssetProperty SubSpritesProperty = new("SubSprites"); 
     static readonly Regex SizesRegex = new(@"
             \(\s*
                 (?'width'\d+),\s*
@@ -40,16 +42,16 @@ public class AmorphousSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
         }
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((IReadOnlyTexture<byte>)existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((IReadOnlyTexture<byte>)existing, s, context);
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (info == null) throw new ArgumentNullException(nameof(info));
+        if (context == null) throw new ArgumentNullException(nameof(context));
         return s.IsWriting()
             ? Write(existing, s)
-            : Read(info, s);
+            : Read(context, s);
     }
 
     static IReadOnlyTexture<byte> Write(IReadOnlyTexture<byte> existing, ISerializer s)
@@ -78,9 +80,9 @@ public class AmorphousSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
         return existing;
     }
 
-    static IReadOnlyTexture<byte> Read(AssetInfo info, ISerializer s)
+    static IReadOnlyTexture<byte> Read(AssetLoadContext context, ISerializer s)
     {
-        var sizes = ParseSpriteSizes(info.Get<string>(AssetProperty.SubSprites, null));
+        var sizes = ParseSpriteSizes(context.Node.GetProperty(SubSpritesProperty));
 
         int totalWidth = 0;
         int totalHeight = 0;
@@ -101,7 +103,7 @@ public class AmorphousSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
                 totalWidth = width;
         }
 
-        var result = new SimpleTexture<byte>(info.AssetId, totalWidth, totalHeight);
+        var result = new SimpleTexture<byte>(context.AssetId, totalWidth, totalHeight);
 
         for (int n = 0; n < frames.Count; n++)
         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
+using UAlbion.Config;
 using UAlbion.Formats.Containers;
 
 namespace UAlbion.Game.Assets;
@@ -12,10 +13,10 @@ public class ContainerRegistry : ServiceComponent<IContainerRegistry>, IContaine
     readonly object _syncRoot = new();
     readonly IDictionary<Type, IAssetContainer> _containers = new Dictionary<Type, IAssetContainer>();
 
-    public IAssetContainer GetContainer(string path, string container, IFileSystem disk)
+    public IAssetContainer GetContainer(string path, Type container, IFileSystem disk)
     {
         if (disk == null) throw new ArgumentNullException(nameof(disk));
-        if (!string.IsNullOrEmpty(container))
+        if (container != null)
             return GetContainer(container);
 
         switch (Path.GetExtension(path).ToUpperInvariant())
@@ -29,24 +30,13 @@ public class ContainerRegistry : ServiceComponent<IContainerRegistry>, IContaine
         }
     }
 
-    IAssetContainer GetContainer(string containerName)
+    IAssetContainer GetContainer(Type type)
     {
-        if (string.IsNullOrEmpty(containerName))
-            throw new ArgumentNullException(nameof(containerName));
-
-        var type = Type.GetType(containerName);
         if (type == null)
-            throw new InvalidOperationException($"Could not find container type \"{containerName}\"");
+            throw new InvalidOperationException($"Could not find container type \"{type}\"");
 
         lock (_syncRoot)
             return _containers.TryGetValue(type, out var container) ? container : Instantiate(type);
-    }
-
-    IAssetContainer GetContainer(Type containerType)
-    {
-        if (containerType == null) throw new ArgumentNullException(nameof(containerType));
-        lock (_syncRoot)
-            return _containers.TryGetValue(containerType, out var container) ? container : Instantiate(containerType);
     }
 
     IAssetContainer Instantiate(Type type)

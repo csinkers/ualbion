@@ -98,7 +98,7 @@ public class DialogManagerTests
         var metaFont = font.Build(Base.Font.Regular, Base.Ink.White, assetManager);
         mma.Add(metaFont.Id, metaFont);
 
-        var e = new YesNoPromptEvent((TextId)Base.SystemText.MainMenu_DoYouReallyWantToQuit);
+        var e = new YesNoPromptEvent(Base.SystemText.MainMenu_DoYouReallyWantToQuit);
 
         bool? result = null;
         ex.RaiseAsync(e, null, x => result = x);
@@ -117,7 +117,7 @@ public class DialogManagerTests
         Assert.Equal(0, layout.Children.Count); // Dialog should be closed, so no top-level dialogs
 
         // Open another yes/no dialog
-        e = new YesNoPromptEvent((TextId)Base.SystemText.MainMenu_DoYouReallyWantToQuit);
+        e = new YesNoPromptEvent(Base.SystemText.MainMenu_DoYouReallyWantToQuit);
         ex.RaiseAsync(e, this, x => result = x);
         layout = lm.GetLayout();
         Assert.Equal(1, layout.Children.Count); // Should only be one top-level dialog

@@ -1,7 +1,6 @@
 ﻿using System;
 using UAlbion.Api;
 using UAlbion.Config;
-using UAlbion.Formats;
 
 namespace UAlbion.Game.Assets;
 
@@ -9,6 +8,7 @@ public class ModInfo
 {
     public ModInfo(
         string name,
+        TypeConfig typeConfig,
         AssetConfig assetConfig,
         ModConfig modConfig,
         AssetMapping mapping,
@@ -20,6 +20,7 @@ public class ModInfo
 
         Name = name ?? throw new ArgumentNullException(nameof(name));
         AssetConfig = assetConfig ?? throw new ArgumentNullException(nameof(assetConfig));
+        TypeConfig = typeConfig ?? throw new ArgumentNullException(nameof(typeConfig));
         ModConfig = modConfig ?? throw new ArgumentNullException(nameof(modConfig));
 
         if (!string.IsNullOrEmpty(ModConfig.AssetConfig))
@@ -32,13 +33,14 @@ public class ModInfo
             }
         }
 
-        SerdesContext = new SerdesContext(name, json, mapping, disk);
+        ModContext = new ModContext(name, json, disk, mapping);
     }
 
     public string Name { get; }
     public string ShaderPath => ModConfig.ShaderPath;
     public AssetConfig AssetConfig { get; }
+    public TypeConfig TypeConfig { get; }
     public ModConfig ModConfig { get; }
-    public SerdesContext SerdesContext { get; }
+    public ModContext ModContext { get; }
     public override string ToString() => $"Mod:{Name}";
 }

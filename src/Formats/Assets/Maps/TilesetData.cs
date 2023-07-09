@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Formats.Ids;
+using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Formats.Assets.Maps;
 
@@ -16,15 +17,15 @@ public class TilesetData
     public bool UseSmallGraphics { get; set; } // Careful if renaming: needs to match up to asset property in assets.json
     [JsonInclude] public List<TileData> Tiles { get; private set; } = new();
 
-    public static TilesetData Serdes(TilesetData td, ISerializer s, AssetInfo info)
+    public static TilesetData Serdes(TilesetData td, ISerializer s, AssetLoadContext context)
     {
         const int dummyTileCount = 1;
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (info == null) throw new ArgumentNullException(nameof(info));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
         int tileCount = td?.Tiles.Count ?? (int)(s.BytesRemaining / 8) + dummyTileCount;
-        td ??= new TilesetData(info.AssetId);
-        td.UseSmallGraphics = info.Get(AssetProperty.UseSmallGraphics, td.UseSmallGraphics);
+        td ??= new TilesetData(context.AssetId);
+        td.UseSmallGraphics = context.GetProperty(TilesetLoader.UseSmallGraphicsProperty, td.UseSmallGraphics);
 
         if (td.Tiles.Count == 0)
         {

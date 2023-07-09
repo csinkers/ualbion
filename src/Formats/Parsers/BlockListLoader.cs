@@ -6,9 +6,9 @@ namespace UAlbion.Formats.Parsers;
 
 public class BlockListLoader : IAssetLoader<BlockList>
 {
-    public BlockList Serdes(BlockList existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => BlockList.Serdes(info?.AssetId.Id ?? 0, existing, s);
+    public BlockList Serdes(BlockList existing, ISerializer s, AssetLoadContext context)
+        => BlockList.Serdes(context?.AssetId.Id ?? 0, existing, s);
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes(existing as BlockList, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes(existing as BlockList, s, context);
 }

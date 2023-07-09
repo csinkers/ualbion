@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Config.Properties;
 
 namespace UAlbion.Formats.Containers;
 
@@ -13,22 +13,21 @@ namespace UAlbion.Formats.Containers;
 /// </summary>
 public class BinaryOffsetContainer : IAssetContainer
 {
-    public ISerializer Read(string path, AssetInfo info, SerdesContext context)
+    public static readonly IntAssetProperty Offset = new("Offset"); // int, used for BinaryOffsetContainer, e.g. MAIN.EXE
+    public static readonly StringAssetProperty Hotspot = new("Hotspot"); // for cursors, formatted like "5 -2"
+
+    public ISerializer Read(string path, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
         using var stream = context.Disk.OpenRead(path);
         using var br = new BinaryReader(stream);
-        stream.Position = info.Get(AssetProperty.Offset, 0);
-        var bytes = br.ReadBytes(info.Width * info.Height);
+        stream.Position = context.GetProperty(Offset);
+        var bytes = br.ReadBytes(context.Node.Width * context.Node.Height);
         var ms = new MemoryStream(bytes);
         return new AlbionReader(new BinaryReader(ms));
     }
 
-    public void Write(string path, IList<(AssetInfo, byte[])> assets, SerdesContext context)
+    public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
         => ApiUtil.Assert("Binary offset containers do not currently support saving");
-
-    public List<(int, int)> GetSubItemRanges(string path, AssetFileInfo info, SerdesContext context) // All sub-items must be given explicitly for binary offset containers
-        => FormatUtil.SortedIntsToRanges(info?.Map.Keys.OrderBy(x => x));
 }

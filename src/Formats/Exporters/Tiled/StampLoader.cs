@@ -2,6 +2,7 @@
 using System.Text;
 using SerdesNet;
 using UAlbion.Config;
+using UAlbion.Config.Properties;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.Parsers;
@@ -10,9 +11,9 @@ namespace UAlbion.Formats.Exporters.Tiled;
 
 public class StampLoader : IAssetLoader<BlockList>
 {
-    public BlockList Serdes(BlockList existing, AssetInfo info, ISerializer s, SerdesContext context)
+    public static readonly PathPatternProperty TilesetPattern = new("TilesetPattern", "../Tilesets/{0}_{2}.tsx");
+    public BlockList Serdes(BlockList existing, ISerializer s, AssetLoadContext context)
     {
-        if (info == null) throw new ArgumentNullException(nameof(info));
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
@@ -20,11 +21,11 @@ public class StampLoader : IAssetLoader<BlockList>
         {
             if (existing == null) throw new ArgumentNullException(nameof(existing));
 
-            var blockListId = (BlockListId)info.AssetId;
+            var blockListId = (BlockListId)context.AssetId;
             var tilesetId = blockListId.ToTileset();
 
-            var tilesetPattern = info.GetPattern(AssetProperty.TilesetPattern, "../Tilesets/{0}_{2}.tsx");
-            var tilesetPath = tilesetPattern.Format(new AssetPath(tilesetId.Id, 0, null, ConfigUtil.AssetName(tilesetId)));
+            var tilesetPattern = context.GetProperty(TilesetPattern);
+            var tilesetPath = tilesetPattern.Format(new AssetPath(tilesetId, 0, null, ConfigUtil.AssetName(tilesetId)));
 
             var tileset = new Tileset
             {
@@ -58,8 +59,8 @@ public class StampLoader : IAssetLoader<BlockList>
         return list;
     }
 
-    public object Serdes(object existing, AssetInfo info, ISerializer s, SerdesContext context)
-        => Serdes((BlockList) existing, info, s, context);
+    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+        => Serdes((BlockList) existing, s, context);
 
     /* .stamp file
 {

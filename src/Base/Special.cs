@@ -14,5 +14,7 @@ public enum Special : ushort
     GameConfig,
     InputConfig,
     ItemNamesMultiLang,
-    ItemNamesSingleLang
+    ItemNamesSingleLang,
+    TiledNpcsLarge,
+    TiledNpcsSmall
 }

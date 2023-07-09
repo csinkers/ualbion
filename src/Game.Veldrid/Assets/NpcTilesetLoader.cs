@@ -32,7 +32,6 @@ public class NpcTilesetLoader : Component, IAssetLoader
         var tsxDir = Path.GetDirectoryName(context.Filename);
         var tiles = new List<TileProperties>();
         var sourceAssets = Resolve<IAssetManager>();
-        var modApplier = Resolve<IModApplier>();
         var pathResolver = Resolve<IPathResolver>();
         var assetIds =
             AssetMapping.Global.EnumerateAssetsOfType(small

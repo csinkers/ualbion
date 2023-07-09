@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
@@ -68,9 +67,8 @@ public sealed class AssetConverter : IDisposable
         _fromExchange.Attach(new AssetManager(_from)); // From also needs an asset manager for the inventory post-processor etc
     }
 
-    public void Convert(string[] ids, ISet<AssetType> assetTypes, Regex filePattern, Func<AssetLoadResult, AssetLoadResult> converter = null, string[] validLanguages = null)
+    public void Convert(ISet<AssetId> ids, ISet<AssetType> assetTypes, Regex filePattern, Func<AssetLoadResult, AssetLoadResult> converter = null, string[] validLanguages = null)
     {
-        var parsedIds = ids?.Select(AssetId.Parse).ToHashSet();
         var cache = new Dictionary<(AssetId, string), AssetLoadResult>();
 
         AssetLoadResult LoaderFunc(AssetId assetId, string language)
@@ -93,7 +91,7 @@ public sealed class AssetConverter : IDisposable
             return result;
         }
 
-        _to.SaveAssets(LoaderFunc, () => cache.Clear(), parsedIds, assetTypes, validLanguages, filePattern);
+        _to.SaveAssets(LoaderFunc, () => cache.Clear(), ids, assetTypes, validLanguages, filePattern);
     }
 
     public string[] DiscoverLanguages(TextId? languageSearchId = null)

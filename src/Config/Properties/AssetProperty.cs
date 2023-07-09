@@ -12,6 +12,7 @@ public static class AssetProps
     public static readonly StringAssetProperty Language = new("Language");
     public static readonly PathPatternProperty Pattern = new("Pattern"); // Mostly for DirectoryContainer
     public static readonly BoolAssetProperty IsReadOnly = new("IsReadOnly"); // To prevent zeroing out files when repacking formats that don't have writing code yet, e.g. ILBM images
+    public static readonly BoolAssetProperty UseDummyRead = new("UseDummyRead"); // For asset conversion, indicates that no asset should be loaded from the source mod, instead the target mod loader should be called directly with a dummy object
     public static readonly BoolAssetProperty Optional = new("Optional"); // Will suppress missing-asset warnings when true
 
     // Textures

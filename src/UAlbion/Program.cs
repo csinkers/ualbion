@@ -62,8 +62,9 @@ static class Program
 
             var languages = converter.DiscoverLanguages();
 
+            var parsedIds = commandLine.DumpIds?.Select(AssetId.Parse).ToHashSet();
             converter.Convert(
-                commandLine.DumpIds,
+                parsedIds,
                 commandLine.DumpAssetTypes,
                 commandLine.ConvertFilePattern,
                 null,

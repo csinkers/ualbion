@@ -323,18 +323,26 @@ public class ModApplier : Component, IModApplier
                     if (node.GetProperty(AssetProps.IsReadOnly)) continue;
 
                     var language = node.GetProperty(AssetProps.Language);
-                    var result = loaderFunc(assetId, language);
-                    if (result?.Asset == null)
+                    AssetLoadResult result;
+                    if (node.GetProperty(AssetProps.UseDummyRead))
                     {
-                        // if (language == null || languages == null || languages.Contains(language))
+                        result = new AssetLoadResult(assetId, new object(), node);
+                    }
+                    else
+                    {
+                        result = loaderFunc(assetId, language);
+                        if (result?.Asset == null)
                         {
-                            // Automaps should only load for 3D maps, no need for 'not found' errors, also unmapped ids might be getting requested
-                            // due to populating the full range of an XLD, as the ids aren't actually in use it's fine to ignore their absence.
-                            if (assetId.Type != AssetType.Automap && AssetMapping.Global.IsMapped(assetId) && !AssetMapping.Global.IsAssetOptional(assetId))
-                                Error($"Could not load {assetId} {language}");
-                        }
+                            // if (language == null || languages == null || languages.Contains(language))
+                            {
+                                // Automaps should only load for 3D maps, no need for 'not found' errors, also unmapped ids might be getting requested
+                                // due to populating the full range of an XLD, as the ids aren't actually in use it's fine to ignore their absence.
+                                if (assetId.Type != AssetType.Automap && AssetMapping.Global.IsMapped(assetId) && !AssetMapping.Global.IsAssetOptional(assetId))
+                                    Error($"Could not load {assetId} {language}");
+                            }
 
-                        continue;
+                            continue;
+                        }
                     }
 
                     // Hacky copying of palette property to make png export/import work

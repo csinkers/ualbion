@@ -2,13 +2,17 @@
  // Pattern Variables: 0=SubId in container 1=frame/sub-asset number 2=Asset name 3=PaletteId. Patterns must begin with {id}_ when writing.
   "special.SoundBank": { "Files": { "Assets/Soundbank.json": { "Container": "raw", "Loader": "jsonSoundbank" } } },
 
-  "special.DummyObject": {
+  "special.TiledNpcsLarge": {
     "Loader": "tiledNpcTileset",
     "Container": "raw",
-    "Files": {
-      "Assets/Tilesets/LargeNPCs.tsx": { "IsSmall": false, "GraphicsPattern": "Assets/Tilesets/LargeNPCs/{id}.png" },
-      "Assets/Tilesets/SmallNPCs.tsx": { "IsSmall": true,  "GraphicsPattern": "Assets/Tilesets/SmallNPCs/{id}.png" }
-    }
+    "UseDummyRead": true,
+    "Files": { "Assets/Tilesets/LargeNPCs.tsx": { "IsSmall": false, "GraphicsPattern": "Assets/Tilesets/LargeNPCs/{id}.png" } }
+  },
+  "special.TiledNpcsSmall": {
+    "Loader": "tiledNpcTileset",
+    "Container": "raw",
+    "UseDummyRead": true,
+    "Files": { "Assets/Tilesets/SmallNPCs.tsx": { "IsSmall": true,  "GraphicsPattern": "Assets/Tilesets/SmallNPCs/{id}.png" } }
   },
 
   "3dbg.1-*":     { "Files": { "Assets/3dBackgrounds": {} },      "Loader": "png8",  "Container": "dir", "Pattern": "{id}_p{pal}_{name}.png" },

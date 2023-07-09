@@ -54,8 +54,6 @@ public class AssetConversionTests
         Func<T, T> canonicalize = null) where T : class
     {
         prerequisites ??= Array.Empty<AssetId>();
-        var allIds = prerequisites.Append(id);
-
         var resultsDir = Path.Combine(_baseDir, "re", "ConversionTests");
 
         var baseAsset = (T)_baseApplier.LoadAsset(id);
@@ -71,8 +69,10 @@ public class AssetConversionTests
         var (baseBytes, baseNotes) = Asset.Save(baseAsset, serdes, context);
         var baseJson = Asset.SaveJson(baseAsset, JsonUtil);
 
-        var idStrings = allIds.Select(x => $"{x.Type}.{x.Id}").ToArray();
-        var assetTypes = allIds.Select(x => x.Type).Distinct().ToHashSet();
+        var idSet = new[] { id }.ToHashSet();
+        var prereqSet = prerequisites.ToHashSet();
+        var assetTypes = prerequisites.Select(x => x.Type).Distinct().ToHashSet();
+        assetTypes.Add(id.Type);
 
         using (var unpacker = new AssetConverter(
                    "ualbion-tests",
@@ -82,7 +82,9 @@ public class AssetConversionTests
                    new[] { BaseAssetMod },
                    UnpackedAssetMod))
         {
-            unpacker.Convert(idStrings, assetTypes, null);
+            if (prerequisites.Length > 0)
+                unpacker.Convert(prereqSet, assetTypes, null);
+            unpacker.Convert(idSet, assetTypes, null);
         }
 
         var unpackedAsset = (T)BuildApplier(UnpackedAssetMod, AssetMapping.Global).LoadAsset(id);
@@ -110,7 +112,10 @@ public class AssetConversionTests
                    new[] { UnpackedAssetMod },
                    RepackedAssetMod))
         {
-            repacker.Convert(idStrings, assetTypes, null);
+            if (prerequisites.Length > 0)
+                repacker.Convert(prereqSet, assetTypes, null);
+
+            repacker.Convert(idSet, assetTypes, null);
         }
 
         var repackedAsset = (T)BuildApplier(RepackedAssetMod, AssetMapping.Global).LoadAsset(id);
@@ -220,16 +225,8 @@ public class AssetConversionTests
     public void Map2DTest_200() // An outdoor level
     {
         var id = AssetId.From(Map.Nakiridaani);
-
-        var small = AssetMapping.Global.EnumerateAssetsOfType(AssetType.NpcSmallGfx);
-        var large = AssetMapping.Global.EnumerateAssetsOfType(AssetType.NpcLargeGfx);
         var palettes = AssetMapping.Global.EnumerateAssetsOfType(AssetType.Palette);
-        var prereqs =
-            new[] { AssetId.From(Special.DummyObject) }
-                .Concat(small)
-                .Concat(large)
-                .Concat(palettes)
-                .ToArray();
+        var prereqs = new[] { AssetId.From(Special.TiledNpcsSmall) }.Concat(palettes).ToArray();
 
         Test<MapData2D>(
             id,
@@ -242,16 +239,8 @@ public class AssetConversionTests
     public void Map2DTest_300() // Starting level
     {
         var id = AssetId.From(Map.TorontoBegin);
-
-        var small = AssetMapping.Global.EnumerateAssetsOfType(AssetType.NpcSmallGfx);
-        var large = AssetMapping.Global.EnumerateAssetsOfType(AssetType.NpcLargeGfx);
         var palettes = AssetMapping.Global.EnumerateAssetsOfType(AssetType.Palette);
-        var prereqs =
-            new[] { AssetId.From(Special.DummyObject) }
-                .Concat(small)
-                .Concat(large)
-                .Concat(palettes)
-                .ToArray();
+        var prereqs = new[] { AssetId.From(Special.TiledNpcsLarge) }.Concat(palettes).ToArray();
 
         Test<MapData2D>(
             id,

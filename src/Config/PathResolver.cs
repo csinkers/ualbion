@@ -78,14 +78,13 @@ public class PathResolver : IPathResolver
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
             var configHome = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
             if (configHome == null)
             {
-                var home = Environment.GetEnvironmentVariable("HOME");
-                if (home != null)
-                    configHome = Path.Combine(home, ".config");
+                var home = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                configHome = Path.Combine(home, ".config");
             }
 
             if (configHome == null)
@@ -97,6 +96,12 @@ public class PathResolver : IPathResolver
             return configHome;
         }
 
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            var home = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            return Path.Combine(home, "Library", "Application Support");
+        }
+
         throw new NotSupportedException();
     }
 
@@ -105,7 +110,7 @@ public class PathResolver : IPathResolver
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
             var cacheHome = Environment.GetEnvironmentVariable("XDG_CACHE_HOME");
             if (cacheHome == null)

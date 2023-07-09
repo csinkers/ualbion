@@ -27,10 +27,10 @@ public interface IAssetManager : ITextureLoader
     LabyrinthData LoadLabyrinthData(LabyrinthId id);
     bool IsStringDefined(TextId id, string language);
     bool IsStringDefined(StringId id, string language);
-    string LoadString(TextId id);
-    string LoadString(StringId id);
-    string LoadString(TextId id, string language);
-    string LoadString(StringId id, string language);
+    string LoadStringSafe(TextId id, string language = null); // never returns null - will give a "missing string" string instead
+    string LoadStringSafe(StringId id, string language = null); // never returns null - will give a "missing string" string instead
+    string LoadStringRaw(TextId id, string language = null); // can return null
+    string LoadStringRaw(StringId id, string language = null); // can return null
     IStringSet LoadStringSet(StringSetId id, string language);
     ISample LoadSample(SampleId id);
     WaveLib LoadWaveLib(WaveLibraryId waveLibraryId);

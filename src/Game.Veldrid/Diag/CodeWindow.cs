@@ -67,7 +67,7 @@ public class CodeWindow : Component, IImGuiWindow
         if (set.Decompiled == null)
         {
             var assets = Resolve<IAssetManager>();
-            var eventFormatter = new EventFormatter(assets.LoadString, context.EventSet.StringSetId);
+            var eventFormatter = new EventFormatter(assets.LoadStringSafe, context.EventSet.StringSetId);
             set.Decompiled = eventFormatter.Decompile(set.Events, set.Chains, set.ExtraEntryPoints);
             var code = set.Decompiled.Script;
             _editor.AllText = code;

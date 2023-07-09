@@ -44,7 +44,7 @@ public sealed class SelectionHandler2D : Component
     protected override void Subscribed()
     {
         var assets = Resolve<IAssetManager>();
-        var eventFormatter = new EventFormatter(assets.LoadString, _map.Id.ToMapText());
+        var eventFormatter = new EventFormatter(assets.LoadStringSafe, _map.Id.ToMapText());
         _formatChain = x =>
         {
             var builder = new UnformattedScriptBuilder(false);

@@ -408,7 +408,7 @@ public class AssetConversionTests
     }
 
     [Fact]
-    public void WordTest()
+    public void Words1Test()
     {
         var id = AssetId.From(Special.Words1);
         Test<ListStringSet>(
@@ -416,6 +416,27 @@ public class AssetConversionTests
             AssetMapping.Global.EnumerateAssetsOfType(AssetType.Word).ToArray(),
             (x, s, c) => Loaders.WordListLoader.Serdes(x, s, c));
     }
+
+    [Fact]
+    public void Words2Test()
+    {
+        var id = AssetId.From(Special.Words2);
+        Test<ListStringSet>(
+            id,
+            AssetMapping.Global.EnumerateAssetsOfType(AssetType.Word).ToArray(),
+            (x, s, c) => Loaders.WordListLoader.Serdes(x, s, c));
+    }
+
+    [Fact]
+    public void Words3Test()
+    {
+        var id = AssetId.From(Special.Words3);
+        Test<ListStringSet>(
+            id,
+            AssetMapping.Global.EnumerateAssetsOfType(AssetType.Word).ToArray(),
+            (x, s, c) => Loaders.WordListLoader.Serdes(x, s, c));
+    }
+
     //*
     [Fact]
     public void AutomapGfxTest()

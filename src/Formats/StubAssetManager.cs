@@ -51,9 +51,9 @@ public class StubAssetManager : IAssetManager
     public object LoadSoundBanks() => throw new NotImplementedException();
     public IVarSet LoadConfig() => throw new NotImplementedException();
     public InputConfig LoadInputConfig() => throw new NotImplementedException();
-    public string LoadString(StringId id) => throw new NotImplementedException();
-    public string LoadString(StringId id, string language) => throw new NotImplementedException();
-    public string LoadString(TextId id) => throw new NotImplementedException();
-    public string LoadString(TextId id, string language) => throw new NotImplementedException();
+    public string LoadStringRaw(TextId id, string language = null) => throw new NotImplementedException();
+    public string LoadStringRaw(StringId id, string language = null) => throw new NotImplementedException();
+    public string LoadStringSafe(TextId id, string language) => throw new NotImplementedException();
+    public string LoadStringSafe(StringId id, string language) => throw new NotImplementedException();
     public IStringSet LoadStringSet(StringSetId id, string language) => throw new NotImplementedException();
 }

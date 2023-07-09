@@ -43,7 +43,7 @@ public class WordLookup : ServiceComponent<IWordLookup>, IWordLookup
 
         foreach (var id in AssetId.EnumerateAll(AssetType.Word))
         {
-            var text = assets.LoadString(id).Trim().ToUpperInvariant();
+            var text = assets.LoadStringSafe(id).Trim().ToUpperInvariant();
             if (!_lookup.TryGetValue(text, out var ids))
             {
                 ids = new List<WordId>();

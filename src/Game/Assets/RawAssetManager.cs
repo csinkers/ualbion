@@ -83,11 +83,10 @@ public class RawAssetManager : Component, IRawAssetManager
     }
     public bool IsStringDefined(TextId id, string language) => LoadStringCore(new StringId(id), language) != null;
     public bool IsStringDefined(StringId id, string language) => LoadStringCore(id, language) != null;
-    public string LoadString(TextId id) => LoadString(new StringId(id), null);
-    public string LoadString(StringId id) => LoadString(id, null);
-    public string LoadString(TextId id, string language) => LoadString(new StringId(id), language);
-    public string LoadString(StringId id, string language)
-        => LoadStringCore(id, language) ?? $"!MISSING STRING {id.Id}:{id.SubId}!";
+    public string LoadStringRaw(TextId id, string language = null) => LoadStringCore(new StringId(id), language);
+    public string LoadStringRaw(StringId id, string language = null) =>  LoadStringCore(id, language);
+    public string LoadStringSafe(TextId id, string language) => LoadStringCore(new StringId(id), language) ?? $"!MISSING STRING {id.Id}!";
+    public string LoadStringSafe(StringId id, string language) => LoadStringCore(id, language) ?? $"!MISSING STRING {id.Id}:{id.SubId}!";
 
     public ISample LoadSample(SampleId id) => (AlbionSample)_modApplier.LoadAsset(id);
     public WaveLib LoadWaveLib(WaveLibraryId waveLibraryId) => (WaveLib)_modApplier.LoadAsset(waveLibraryId);

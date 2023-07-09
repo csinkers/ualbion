@@ -37,7 +37,7 @@ public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
 
     static string Decompile(EventSetId id, EventSet set, IAssetManager assets)
     {
-        var eventFormatter = new EventFormatter(assets.LoadString, id.ToEventText());
+        var eventFormatter = new EventFormatter(assets.LoadStringSafe, id.ToEventText());
         return eventFormatter.Decompile(set.Events, set.Chains, null).Script;
     }
 

@@ -15,6 +15,47 @@
     "Files": { "Assets/Tilesets/SmallNPCs.tsx": { "IsSmall": true,  "GraphicsPattern": "Assets/Tilesets/SmallNPCs/{id}.png" } }
   },
 
+  "special.ItemNamesMultiLang": { // This is just for repacking back to the binary formats
+    "Loader": "itemnameCollector",
+    "TargetRange": "itemname.1-*",
+    "TargetLanguages": [ "GERMAN", "ENGLISH", "FRENCH" ],
+    "IsReadOnly": true
+  },
+
+  "special.Words1": {
+    "Files": {
+      "!GERMAN": { "Language": "GERMAN" },
+      "!ENGLISH": { "Language": "ENGLISH" },
+      "!FRENCH": { "Language": "FRENCH" }
+    },
+    "IsReadOnly": true,
+    "Loader": "stringcollector",
+    "FileRange": "word.0-1499",
+    "TargetRange": "word.0-499"
+  },
+  "special.Words2": {
+    "Files": {
+      "!GERMAN": { "Language": "GERMAN" },
+      "!ENGLISH": { "Language": "ENGLISH" },
+      "!FRENCH": { "Language": "FRENCH" }
+    },
+    "IsReadOnly": true,
+    "Loader": "stringcollector",
+    "FileRange": "word.0-1499",
+    "TargetRange": "word.500-999"
+  },
+  "special.Words3": {
+    "Files": {
+      "!GERMAN": { "Language": "GERMAN" },
+      "!ENGLISH": { "Language": "ENGLISH" },
+      "!FRENCH": { "Language": "FRENCH" }
+    },
+    "IsReadOnly": true,
+    "Loader": "stringcollector",
+    "FileRange": "word.0-1499",
+    "TargetRange": "word.1000-1499"
+  },
+
   "3dbg.1-*":     { "Files": { "Assets/3dBackgrounds": {} },      "Loader": "png8",  "Container": "dir", "Pattern": "{id}_p{pal}_{name}.png" },
   "floor.1-*":    { "Files": { "Assets/3dFloors": {} },           "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png" },
   "3dobj.1-*":    { "Files": { "Assets/3dObjects": {} },          "Loader": "png8",  "Container": "dir", "Pattern": "{id}_{frame}_p{pal}_{name}.png" },
@@ -57,13 +98,6 @@
       "Assets/ItemNamesEN.json": { "Language": "ENGLISH" },
       "Assets/ItemNamesFR.json": { "Language": "FRENCH"  }
     }
-  },
-
-  "special.ItemNamesMultiLang": { // This is just for repacking back to the binary formats
-    "Loader": "itemnameCollector",
-    "TargetRange": "itemname.1-*",
-    "TargetLanguages": [ "GERMAN", "ENGLISH", "FRENCH" ],
-    "IsReadOnly": true
   },
 
   "stext.0-*": {

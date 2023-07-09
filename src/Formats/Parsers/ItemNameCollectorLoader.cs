@@ -43,7 +43,7 @@ public class ItemNameCollectorLoader : Component, IAssetLoader<Dictionary<string
             foreach (var id in range)
             {
                 var textId = (TextId)id;
-                var value = assets.LoadString(textId, language);
+                var value = assets.LoadStringSafe(textId, language);
                 list.SetString(new StringId(context.AssetId, (ushort)(id.Id - firstId)), value);
             }
         }

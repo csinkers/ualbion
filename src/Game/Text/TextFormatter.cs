@@ -116,31 +116,31 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
         switch (character.Race)
         {
             case PlayerRace.Terran:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Terran));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Race_Terran));
                 break;
             case PlayerRace.Iskai:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Iskai));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Race_Iskai));
                 break;
             case PlayerRace.Celt:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Celt));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Race_Celt));
                 break;
             case PlayerRace.KengetKamulos:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_KengetKamulos));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Race_KengetKamulos));
                 break;
             case PlayerRace.DjiCantos:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_DjiCantos));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Race_DjiCantos));
                 break;
             case PlayerRace.Mahino:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Mahino));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Race_Mahino));
                 break;
             case PlayerRace.Decadent:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Decadent));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Race_Decadent));
                 break;
             case PlayerRace.Umajo:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Umajo));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Race_Umajo));
                 break;
             case PlayerRace.Monster:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Race_Monster));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Race_Monster));
                 break;
             default:
                 throw new InvalidEnumArgumentException(nameof(character.Race), (int)character.Race, typeof(PlayerRace));
@@ -188,7 +188,7 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
             _ => throw new NotImplementedException()
         };
 
-        yield return (Token.Text, assets.LoadString(word));
+        yield return (Token.Text, assets.LoadStringSafe(word));
     }
 
     static IEnumerable<(Token, object)> SubstituteClass(IAssetManager assets, object active)
@@ -202,31 +202,31 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
         switch (character.PlayerClass)
         {
             case PlayerClass.Pilot:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Pilot));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Class_Pilot));
                 break;
             case PlayerClass.Scientist:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Scientist));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Class_Scientist));
                 break;
             case PlayerClass.IskaiWarrior:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Warrior));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Class_Warrior));
                 break;
             case PlayerClass.DjiKasMage:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_DjiKasMage));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Class_DjiKasMage));
                 break;
             case PlayerClass.Druid:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Druid));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Class_Druid));
                 break;
             case PlayerClass.EnlightenedOne:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_EnlightenedOne));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Class_EnlightenedOne));
                 break;
             case PlayerClass.Technician:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Technician));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Class_Technician));
                 break;
             case PlayerClass.OquloKamulos:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_OquloKamulos));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Class_OquloKamulos));
                 break;
             case PlayerClass.Warrior:
-                yield return (Token.Text, assets.LoadString(Base.SystemText.Class_Warrior2));
+                yield return (Token.Text, assets.LoadStringSafe(Base.SystemText.Class_Warrior2));
                 break;
             case PlayerClass.Monster:
                 yield return (Token.Text, "Monster");
@@ -343,7 +343,7 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
         => new DynamicText(() =>
         {
             var assets = Resolve<IAssetManager>();
-            string templateText = assets.LoadString(stringId);
+            string templateText = assets.LoadStringSafe(stringId);
             return InnerFormat(templateText, arguments, implicitTokens, assets);
         });
 

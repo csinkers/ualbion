@@ -12,10 +12,10 @@ namespace UAlbion.Formats;
 
 public class EventFormatter : IEventFormatter
 {
-    readonly Func<StringId, string> _stringLoadFunc;
+    readonly Func<StringId, string, string> _stringLoadFunc;
     readonly AssetId _textSourceId;
 
-    public EventFormatter(Func<StringId, string> stringLoadFunc, AssetId textSourceId)
+    public EventFormatter(Func<StringId, string, string> stringLoadFunc, AssetId textSourceId)
     {
         _stringLoadFunc = stringLoadFunc;
         _textSourceId = textSourceId;
@@ -30,7 +30,7 @@ public class EventFormatter : IEventFormatter
         if (e.Event is TextEvent textEvent && _stringLoadFunc != null)
         {
             var text = 
-                _stringLoadFunc(textEvent.ToId(_textSourceId))
+                _stringLoadFunc(textEvent.ToId(_textSourceId), null)
                 .Replace("\"", "\\\"", StringComparison.Ordinal);
 
             builder.Add(ScriptPartType.Comment, $" ; \"{text}\"");
@@ -46,7 +46,7 @@ public class EventFormatter : IEventFormatter
         if (e is TextEvent textEvent && _stringLoadFunc != null)
         {
             var text = 
-                _stringLoadFunc(textEvent.ToId(_textSourceId))
+                _stringLoadFunc(textEvent.ToId(_textSourceId), null)
                 .Replace("\"", "\\\"", StringComparison.Ordinal);
 
             builder.Add(ScriptPartType.Comment, $" ; \"{text}\"");
@@ -160,7 +160,7 @@ public class EventFormatter : IEventFormatter
         }
     }
 
-    public void FormatEventSet<T>(IScriptBuilder builder, IList<T> events, int indent = 0) where T : IEventNode
+    void FormatEventSet<T>(IScriptBuilder builder, IList<T> events, int indent = 0) where T : IEventNode
     {
         if (builder == null) throw new ArgumentNullException(nameof(builder));
         if (events == null) return;

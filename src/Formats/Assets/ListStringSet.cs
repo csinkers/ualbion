@@ -5,12 +5,16 @@ namespace UAlbion.Formats.Assets;
 public class ListStringSet : List<string>, IStringSet
 {
     public ListStringSet() { }
+    public ListStringSet(int capacity) : base(capacity) { }
     public ListStringSet(IList<string> existing)
     {
         Clear();
         if (existing != null)
+        {
+            Capacity = existing.Count;
             foreach (var s in existing)
                 Add(s);
+        }
     }
 
     public string GetString(StringId id) => Count > id.SubId ? this[id.SubId] : null;

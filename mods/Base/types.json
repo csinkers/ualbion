@@ -104,6 +104,7 @@
     "spell":             "UAlbion.Formats.Parsers.SpellLoader, UAlbion.Formats",
     "stext":             "UAlbion.Formats.Parsers.SystemTextLoader, UAlbion.Formats",
     "stringset":         "UAlbion.Formats.Parsers.StringSetStringLoader, UAlbion.Formats",
+    "stringcollector":   "UAlbion.Formats.Parsers.StringSetCollectorLoader, UAlbion.Formats",
     "stringtable":       "UAlbion.Formats.Parsers.AlbionStringTableLoader, UAlbion.Formats",
     "tiledMap":          "UAlbion.Formats.Exporters.Tiled.TiledMapLoader, UAlbion.Formats",
     "tiledStamp":        "UAlbion.Formats.Exporters.Tiled.StampLoader, UAlbion.Formats",

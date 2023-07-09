@@ -59,7 +59,7 @@ public class AssetLoadTests : IDisposable
     public void ItemTest()
     {
         var item = Test(assets => assets.LoadItem(Item.LughsShield));
-        var name = Test(assets => assets.LoadString(item.Name));
+        var name = Test(assets => assets.LoadStringSafe(item.Name));
         Assert.Equal("Lugh's shield", name);
         Assert.Equal(18, item.Charges);
         Assert.Equal(PlayerClasses.Humans, item.Class);
@@ -201,10 +201,10 @@ public class AssetLoadTests : IDisposable
         Assert.Equal("\"Dsarii-ma, foreign visitors. My name is Frill, and I serve the council as a " +
                      "scholar in history. What horrible events you had to go through! I am sure it is not " +
                      "easy for strangers to be subjected to our laws!\"",
-            Test(assets => assets.LoadString(new StringId(EventText.Frill, 1))));
+            Test(assets => assets.LoadStringSafe(new StringId(EventText.Frill, 1))));
 
         Assert.Equal("\"I am trying to help them in any way I can, Sebai-Giz Frill!\"",
-            Test(assets => assets.LoadString(new StringId(EventText.Frill, 2))));
+            Test(assets => assets.LoadStringSafe(new StringId(EventText.Frill, 2))));
     }
 
     [Fact]
@@ -470,8 +470,8 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void MapTextTest()
     {
-        Assert.Equal("A fuse box.", Test(assets => assets.LoadString(new StringId(MapText.TorontoBegin, 1))));
-        Assert.Equal("An armchair.", Test(assets => assets.LoadString(new StringId(MapText.TorontoBegin, 2))));
+        Assert.Equal("A fuse box.", Test(assets => assets.LoadStringSafe(new StringId(MapText.TorontoBegin, 1))));
+        Assert.Equal("An armchair.", Test(assets => assets.LoadStringSafe(new StringId(MapText.TorontoBegin, 2))));
     }
 
     [Fact]
@@ -551,7 +551,7 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void NewStringTest()
     {
-        Assert.Equal("Take all", Test(assets => assets.LoadString(UAlbionString.TakeAll)));
+        Assert.Equal("Take all", Test(assets => assets.LoadStringSafe(UAlbionString.TakeAll)));
     }
 
     [Fact]
@@ -735,7 +735,7 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void SystemTextTest()
     {
-        Assert.Equal("Main menu", Test(assets => assets.LoadString(SystemText.MainMenu_MainMenu)));
+        Assert.Equal("Main menu", Test(assets => assets.LoadStringSafe(SystemText.MainMenu_MainMenu)));
     }
 
     [Fact]
@@ -798,7 +798,7 @@ public class AssetLoadTests : IDisposable
     [Fact]
     public void WordTest()
     {
-        Assert.Equal("key", Test(assets => assets.LoadString(Word.Key)));
+        Assert.Equal("key", Test(assets => assets.LoadStringSafe(Word.Key)));
     }
 
     [Fact] public void CombatGfxTest() { Test(assets => assets.LoadTexture(CombatGfx.SplashYellow)); }

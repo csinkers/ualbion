@@ -100,7 +100,7 @@ public class Party : ServiceComponent<IParty>, IParty
         // Allocate combat position
         if (_combatPositions[index] == 0)
         {
-            for (int combatSlot = SavedGame.CombatSlotColumns * SavedGame.CombatSlotRows - 1; combatSlot >= 0; combatSlot--)
+            for (int combatSlot = SavedGame.CombatColumns * SavedGame.CombatRowsForParty - 1; combatSlot >= 0; combatSlot--)
             {
                 bool occupied = false;
                 for (int i = 0; i < index && !occupied; i++)

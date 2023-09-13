@@ -69,7 +69,7 @@ right clicking returns held to original loc or undoes last swap
     {
         var stack = new List<IUiElement> { new Spacing(0, 3) };
 
-        for (int row = 0; row < SavedGame.CombatSlotRows; row++)
+        for (int row = 0; row < SavedGame.CombatRowsForParty; row++)
         {
             if (row > 0)
                 stack.Add(new Spacing(0, 2));
@@ -99,8 +99,8 @@ right clicking returns held to original loc or undoes last swap
     HorizontalStacker BuildRow(int row)
     {
         var stack = new List<IUiElement> { new Spacing(15, 0) };
-        for (int col = 0; col < SavedGame.CombatSlotColumns; col++)
-            stack.Add(new LogicalCombatPositionSlot(col + row * SavedGame.CombatSlotColumns, this));
+        for (int col = 0; col < SavedGame.CombatColumns; col++)
+            stack.Add(new LogicalCombatPositionSlot(col + row * SavedGame.CombatColumns, this));
 
         stack.Add(new Spacing(15, 0));
         return new HorizontalStacker(stack);

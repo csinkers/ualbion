@@ -22,16 +22,20 @@ public class MainMenu : Dialog
         var elements = new List<IUiElement>
         {
             new Spacing(0, 2),
-            new HorizontalStacker(new Spacing(5, 0), new BoldHeader(Base.SystemText.MainMenu_MainMenu), new Spacing(5, 0)),
+            new HorizontalStacker(
+                new Spacing(5, 0),
+                new BoldHeader((TextId)Base.SystemText.MainMenu_MainMenu),
+                new Spacing(5, 0)),
             new Divider(CommonColor.Yellow3),
             new Spacing(0, 2),
         };
 
         if (state.Loaded)
         {
+
             elements.AddRange(new IUiElement[]
             {
-                new Button(Base.SystemText.MainMenu_ContinueGame).OnClick(Continue),
+                new Button(Base.SystemText.MainMenu_ContinueGame).OnClick(() => Raise(new PopSceneEvent())),
                 new Spacing(0, 4),
             });
         }
@@ -52,17 +56,12 @@ public class MainMenu : Dialog
             new Button(Base.SystemText.MainMenu_ViewIntro),
             new Button(Base.SystemText.MainMenu_Credits),
             new Spacing(0,3),
-            new Button(Base.SystemText.MainMenu_QuitGame).OnClick(QuitGame),
+            new Button(Base.SystemText.MainMenu_QuitGame).OnClick(() => Raise(new QuitEvent())),
             new Spacing(0,2),
         });
 
         var stack = new VerticalStacker(elements);
         AttachChild(new DialogFrame(stack));
-    }
-
-    void Continue()
-    {
-        Raise(new PopSceneEvent());
     }
 
     void NewGame()
@@ -82,7 +81,7 @@ public class MainMenu : Dialog
     {
         var menu = new PickSaveSlotMenu(false, Base.SystemText.MainMenu_WhichSavedGameDoYouWantToLoad, 1);
         var exchange = Exchange;
-        menu.Closed += (args, id) =>
+        menu.Closed += (_, id) =>
         {
             Attach(exchange);
             if (id.HasValue)
@@ -96,7 +95,7 @@ public class MainMenu : Dialog
     {
         var menu = new PickSaveSlotMenu(true, Base.SystemText.MainMenu_SaveOnWhichPosition, 1);
         var exchange = Exchange;
-        menu.Closed += (args, _) =>
+        menu.Closed += (_, _) =>
         {
             Attach(exchange);
             // TODO: Prompt user for new save name
@@ -110,13 +109,8 @@ public class MainMenu : Dialog
     {
         var optionsMenu = new OptionsMenu();
         var exchange = Exchange;
-        optionsMenu.Closed += (args, _) => Attach(exchange);
+        optionsMenu.Closed += (_, _) => Attach(exchange);
         Exchange.Attach(optionsMenu);
         Detach();
-    }
-
-    void QuitGame()
-    {
-        Raise(new QuitEvent());
     }
 }

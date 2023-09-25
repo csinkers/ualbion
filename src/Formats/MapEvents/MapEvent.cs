@@ -71,7 +71,7 @@ public abstract class MapEvent : Event, IMapEvent
             MapEventType.CreateTransport => CreateTransportEvent.Serdes((CreateTransportEvent)e, mapping, s),
             MapEventType.DataChange => DataChangeEvent.Serdes((IDataChangeEvent)e, mapping, s),
             MapEventType.Door => DoorEvent.Serdes((DoorEvent)e, mapping, s),
-            MapEventType.Encounter => EncounterEvent.Serdes((EncounterEvent)e, s),
+            MapEventType.Encounter => EncounterEvent.Serdes((EncounterEvent)e, mapping, s),
             MapEventType.EndDialogue => EndDialogueEvent.Serdes((EndDialogueEvent)e, s),
             MapEventType.Execute => ExecuteEvent.Serdes((ExecuteEvent)e, s),
             MapEventType.MapExit => TeleportEvent.Serdes((TeleportEvent)e, mapping, s),

@@ -14,6 +14,7 @@ using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Game;
 using UAlbion.Game.Assets;
+using UAlbion.Game.Combat;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
@@ -98,7 +99,7 @@ static class Albion
                 .Add(new PaletteManager())
                 .Add(new MainMenu())
                 .Add(new Sprite(
-                    (SpriteId)Base.Picture.MenuBackground8,
+                    (SpriteId)Base.Picture.MenuBackground8, // TODO: Random background selection like in original
                     DrawLayer.Interface,
                     SpriteKeyFlags.NoTransform,
                     SpriteFlags.LeftAligned)
@@ -112,6 +113,11 @@ static class Albion
                 .Add(new ConversationManager())
                 .Add(new PaletteManager())
                 .Add(new InventoryInspector()))
+
+            .Add(new CombatScene()
+                .Add(new StatusBar())
+                .Add(new PaletteManager())
+            )
 
             .Add(new EditorScene()
                 .Add(new RawAssetManager())

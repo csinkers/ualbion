@@ -6,9 +6,8 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Scenes;
 
-public interface IMenuScene : IScene { }
 [Scene(SceneId.MainMenu)]
-public class MenuScene : Container, IMenuScene
+public class MenuScene : Container, IScene
 {
     bool _clockWasRunning;
     public ICamera Camera { get; }

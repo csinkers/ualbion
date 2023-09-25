@@ -17,7 +17,7 @@ public class SlowClock : Component
     {
         _ticks += updateEvent.Frames;
         var ticksPerSlow = Var(GameVars.Time.FastTicksPerSlowTick);
-        while(_ticks >= ticksPerSlow)
+        while (_ticks >= ticksPerSlow)
         {
             _ticks -= ticksPerSlow;
             GameTrace.Log.SlowTick(_slowTicks++);

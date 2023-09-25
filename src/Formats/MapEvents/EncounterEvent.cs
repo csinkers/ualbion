@@ -1,6 +1,8 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Api.Eventing;
+using UAlbion.Config;
+using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.MapEvents;
 
@@ -8,13 +10,13 @@ namespace UAlbion.Formats.MapEvents;
 public class EncounterEvent : MapEvent
 {
     EncounterEvent() { }
-    public EncounterEvent(ushort unk6, ushort unk8)
+    public EncounterEvent(MonsterGroupId groupId, SpriteId backgroundId)
     {
-        Unk6 = unk6;
-        Unk8 = unk8;
+        GroupId = groupId;
+        BackgroundId = backgroundId;
     }
 
-    public static EncounterEvent Serdes(EncounterEvent e, ISerializer s)
+    public static EncounterEvent Serdes(EncounterEvent e, AssetMapping mapping, ISerializer s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         e ??= new EncounterEvent();
@@ -23,13 +25,13 @@ public class EncounterEvent : MapEvent
         zeroes += s.UInt8(null, 0);
         zeroes += s.UInt8(null, 0);
         zeroes += s.UInt8(null, 0);
-        e.Unk6 = s.UInt16(nameof(Unk6), e.Unk6);
-        e.Unk8 = s.UInt16(nameof(Unk8), e.Unk8);
+        e.GroupId = MonsterGroupId.SerdesU16(nameof(GroupId), e.GroupId, mapping, s);
+        e.BackgroundId = SpriteId.SerdesU16(nameof(BackgroundId), e.BackgroundId, AssetType.CombatBackground, mapping, s);
         s.Assert(zeroes ==0, "EncounterEvent: Expected fields 1-5 to be 0");
         return e;
     }
 
-    [EventPart("unk6")] public ushort Unk6 { get; private set; }
-    [EventPart("unk8")] public ushort Unk8 { get; private set; }
+    [EventPart("group")] public MonsterGroupId GroupId { get; private set; }
+    [EventPart("background")] public SpriteId BackgroundId { get; private set; }
     public override MapEventType EventType => MapEventType.Encounter;
 }

@@ -27,6 +27,7 @@
 
     "InkId": [ "Ink" ],
     "FontId": [ "FontDefinition" ],
+    "CombatBackgroundId": [ "CombatBackground" ],
     "TilesetGfxId": [ "TilesetGfx" ],
     "PictureId": [ "Picture" ],
     "PortraitId": [ "Portrait" ],

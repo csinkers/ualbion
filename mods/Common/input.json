@@ -133,6 +133,9 @@
     "Control+2": "inv:set_page Stats",
     "Control+3": "inv:set_page Misc"
   },
+  "Combat": {
+    "Escape": "inv:close"
+  },
   "Conversation": {
     "Number1": "respond 1",
     "Number2": "respond 2",

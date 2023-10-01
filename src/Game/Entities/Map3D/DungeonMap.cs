@@ -118,28 +118,9 @@ public class DungeonMap : Component, IMap
         // Raise(new LogEvent(LogEvent.Level.Info, $"WallHeight: {_labyrinthData.WallHeight} MaxObj: {maxObjectHeightRaw} EffWallWidth: {_labyrinthData.EffectiveWallWidth}"));
 
         foreach (var npc in _logicalMap.Npcs)
-        {
-            if (npc.SpriteOrGroup.IsNone)
-                continue;
+            BuildNpc(npc, properties);
 
-            if(npc.SpriteOrGroup.Type != AssetType.ObjectGroup)
-            {
-                Warn($"[3DMap] Tried to load npc with object group of incorrect type: {npc.SpriteOrGroup}");
-                continue;
-            }
-
-            if (npc.SpriteOrGroup.Id >= _labyrinthData.ObjectGroups.Count)
-            {
-                Warn($"[3DMap] Tried to load object group {npc.SpriteOrGroup.Id}, but the max group id is {_labyrinthData.ObjectGroups.Count-1}.");
-                continue;
-            }
-
-            var objectData = _labyrinthData.ObjectGroups[npc.SpriteOrGroup.Id]; // TODO: Verify SpriteOrGroup is an ObjectGroup
-            // TODO: Build proper NPC objects with AI, sound effects etc
-            foreach (var subObject in objectData.SubObjects)
-                AttachChild(MapObject.Build(npc.Waypoints[0].X, npc.Waypoints[0].Y, _labyrinthData, subObject, properties));
-        }
-
+        // Build props
         for (int y = 0; y < _logicalMap.Height; y++)
         {
             for (int x = 0; x < _logicalMap.Width; x++)
@@ -152,6 +133,37 @@ public class DungeonMap : Component, IMap
         }
 
         Raise(new SetClearColourEvent(_backgroundRed, _backgroundGreen, _backgroundBlue, 1.0f));
+    }
+
+    void BuildNpc(MapNpc npc, TilemapRequest properties)
+    {
+        if (npc.SpriteOrGroup.IsNone)
+            return;
+
+        if (npc.SpriteOrGroup.Type != AssetType.ObjectGroup)
+        {
+            Warn($"[3DMap] Tried to load npc with object group of incorrect type: {npc.SpriteOrGroup}");
+            return;
+        }
+
+        if (npc.SpriteOrGroup.Id >= _labyrinthData.ObjectGroups.Count)
+        {
+            Warn($"[3DMap] Tried to load object group {npc.SpriteOrGroup.Id}, but the max group id is {_labyrinthData.ObjectGroups.Count - 1}.");
+            return;
+        }
+
+        var objectData = _labyrinthData.ObjectGroups[npc.SpriteOrGroup.Id]; // TODO: Verify SpriteOrGroup is an ObjectGroup
+                                                                            // TODO: Build proper NPC objects with AI, sound effects etc
+        foreach (var subObject in objectData.SubObjects)
+        {
+            AttachChild(MapObject.Build(
+                npc.Waypoints[0].X,
+                npc.Waypoints[0].Y,
+                _labyrinthData,
+                subObject,
+                properties));
+
+        }
     }
 
     protected override void Unsubscribed()

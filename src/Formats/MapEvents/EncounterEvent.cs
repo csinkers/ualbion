@@ -10,7 +10,7 @@ namespace UAlbion.Formats.MapEvents;
 public class EncounterEvent : MapEvent
 {
     EncounterEvent() { }
-    public EncounterEvent(MonsterGroupId groupId, SpriteId backgroundId)
+    public EncounterEvent(MonsterGroupId groupId, CombatBackgroundId backgroundId)
     {
         GroupId = groupId;
         BackgroundId = backgroundId;
@@ -26,12 +26,12 @@ public class EncounterEvent : MapEvent
         zeroes += s.UInt8(null, 0);
         zeroes += s.UInt8(null, 0);
         e.GroupId = MonsterGroupId.SerdesU16(nameof(GroupId), e.GroupId, mapping, s);
-        e.BackgroundId = SpriteId.SerdesU16(nameof(BackgroundId), e.BackgroundId, AssetType.CombatBackground, mapping, s);
+        e.BackgroundId = CombatBackgroundId.SerdesU16(nameof(BackgroundId), e.BackgroundId, mapping, s);
         s.Assert(zeroes ==0, "EncounterEvent: Expected fields 1-5 to be 0");
         return e;
     }
 
     [EventPart("group")] public MonsterGroupId GroupId { get; private set; }
-    [EventPart("background")] public SpriteId BackgroundId { get; private set; }
+    [EventPart("background")] public CombatBackgroundId BackgroundId { get; private set; }
     public override MapEventType EventType => MapEventType.Encounter;
 }

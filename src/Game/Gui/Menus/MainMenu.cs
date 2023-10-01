@@ -24,7 +24,7 @@ public class MainMenu : Dialog
             new Spacing(0, 2),
             new HorizontalStacker(
                 new Spacing(5, 0),
-                new BoldHeader((TextId)Base.SystemText.MainMenu_MainMenu),
+                new BoldHeader(Base.SystemText.MainMenu_MainMenu),
                 new Spacing(5, 0)),
             new Divider(CommonColor.Yellow3),
             new Spacing(0, 2),

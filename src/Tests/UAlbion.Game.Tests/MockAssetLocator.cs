@@ -2,7 +2,6 @@
 using System.IO;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Formats;
 using UAlbion.Game.Assets;
 
 namespace UAlbion.Game.Tests;

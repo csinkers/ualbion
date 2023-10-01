@@ -35,4 +35,8 @@ class GameTrace : EventSource
     public void DayElapsed(int time) => WriteEvent(15, time);
     public void SlowTick(int ticks) => WriteEvent(16, ticks);
     public void IdleTick(int ticks) => WriteEvent(17, ticks);
+    public void CombatClockUpdating(int ticks) => WriteEvent(18, ticks);
+    public void CombatTick(int tick) => WriteEvent(19, tick);
+    public void CombatClockStart(int stoppedFrames, float stoppedMs) => WriteEvent(20, stoppedFrames, stoppedMs);
+    public void CombatClockStop() => WriteEvent(21);
 }

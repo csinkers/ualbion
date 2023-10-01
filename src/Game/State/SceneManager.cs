@@ -50,22 +50,23 @@ public class SceneManager : Container, ISceneManager
 
     void Set(SetSceneEvent e)
     {
-        _scenes[ActiveSceneId].IsActive = false;
-        foreach (var sceneId in _scenes.Keys)
+        if (e.SceneId == ActiveSceneId)
+            return;
+
+        foreach (var kvp in _scenes)
         {
-            var scene = _scenes[sceneId];
-            scene.IsActive = sceneId == e.SceneId;
-
-            if (!scene.IsActive)
-                continue;
-
-            Exchange.Attach(scene);
-
-            var interfaces = scene.GetType().GetInterfaces();
-            var sceneInterface = interfaces.FirstOrDefault(x => typeof(IScene).IsAssignableFrom(x) && x != typeof(IScene));
-            if (sceneInterface != null)
-                Exchange.Register(sceneInterface, scene);
+            if (kvp.Key == e.SceneId) continue; 
+            kvp.Value.IsActive = false;
         }
+
+        var newScene = _scenes[e.SceneId];
+        newScene.IsActive = true;
+        Exchange.Attach(newScene);
+
+        var interfaces = newScene.GetType().GetInterfaces();
+        var sceneInterface = interfaces.FirstOrDefault(x => typeof(IScene).IsAssignableFrom(x) && x != typeof(IScene));
+        if (sceneInterface != null)
+            Exchange.Register(sceneInterface, newScene);
 
         ActiveSceneId = e.SceneId;
     }

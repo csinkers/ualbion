@@ -148,6 +148,7 @@ static class Albion
             new GameClock(),
             new IdleClock(),
             new SlowClock(),
+            new CombatClock(),
             new RandomNumberGenerator(),
             new SpriteSamplerSource(),
             new VideoManager(),
@@ -161,6 +162,7 @@ static class Albion
             new LayoutManager(),
             new DialogManager(),
             new InventoryScreenManager(),
+            new CombatManager(),
             //new DiagWindow()
             //    .Add(new SpriteInstanceDataDebugBehaviour())
             //    .Add(new FormatTextEventBehaviour()),

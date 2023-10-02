@@ -9,6 +9,8 @@ namespace UAlbion.Game.Combat;
 
 public class VisualCombatTile : UiElement
 {
+    readonly int _tileIndex;
+    readonly IReadOnlyBattle _battle;
     const int Width = 32;
 #pragma warning disable CA1823 // Avoid unused private fields
     const int Height = 48;
@@ -27,8 +29,10 @@ public class VisualCombatTile : UiElement
         }
     }
 
-    public VisualCombatTile()
+    public VisualCombatTile(int tileIndex, IReadOnlyBattle battle)
     {
+        _tileIndex = tileIndex;
+        _battle = battle ?? throw new ArgumentNullException(nameof(battle));
         _sprite = new UiSpriteElement(SpriteId.None) { IsActive = false };
 
         _button = AttachChild(new Button(

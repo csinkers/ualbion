@@ -29,7 +29,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
     [JsonInclude] public int Height { get; protected set; }
     [JsonInclude] public SongId SongId { get; set; }
     [JsonInclude] public PaletteId PaletteId { get; set; }
-    [JsonInclude] public SpriteId CombatBackgroundId { get; set; }
+    [JsonInclude] public CombatBackgroundId CombatBackgroundId { get; set; }
     [JsonInclude] public List<MapNpc> Npcs { get; protected set; }
     [JsonIgnore] public IList<EventNode> Events { get; private set; } = new List<EventNode>();
     [JsonInclude] public IList<ushort> Chains { get; private set; } = new List<ushort>();

@@ -2,6 +2,7 @@
 using System.Linq;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats.Ids;
+using UAlbion.Game.Combat;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Dialogs;
@@ -13,6 +14,8 @@ namespace UAlbion.Game.Gui;
 
 public class DialogManager  : ServiceComponent<IDialogManager>, IDialogManager
 {
+    public record ShowCombatDialogEvent(IReadOnlyBattle Battle) : EventRecord, IVerboseEvent;
+
     int MaxLayer => Children.OfType<ModalDialog>().Select(x => (int?)x.Depth).Max() ?? 0;
 
     public T AddDialog<T>(Func<int, T> constructor) where T : ModalDialog
@@ -68,9 +71,7 @@ public class DialogManager  : ServiceComponent<IDialogManager>, IDialogManager
             dialog.Closed += (_, _) => Raise(new LoadMapEvent((Base.Map)dialog.Value)); // TODO: Include mod maps
         });
 
-        On<ShowCombatPositionsDialogEvent>(_ =>
-        {
-            AttachChild(new CombatPositionDialog(MaxLayer + 1));
-        });
+        On<ShowCombatPositionsDialogEvent>(_ => AttachChild(new CombatPositionDialog(MaxLayer + 1)));
+        On<ShowCombatDialogEvent>(e => AttachChild(new CombatDialog(MaxLayer + 1, e.Battle)));
     }
 }

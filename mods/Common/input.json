@@ -134,7 +134,7 @@
     "Control+3": "inv:set_page Misc"
   },
   "Combat": {
-    "Escape": "inv:close"
+    "Escape": "push_scene MainMenu"
   },
   "Conversation": {
     "Number1": "respond 1",

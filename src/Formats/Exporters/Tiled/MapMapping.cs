@@ -51,7 +51,8 @@ public static class MapMapping
         props.Add(new(Prop.Palette, map.PaletteId.ToString()));
 
         if (map.SongId != SongId.None) props.Add(new(Prop.Song, map.SongId.ToString()));
-        if (map.CombatBackgroundId != SpriteId.None) props.Add(new(Prop.CombatBackground, map.CombatBackgroundId.ToString()));
+        if (map.CombatBackgroundId != CombatBackgroundId.None)
+            props.Add(new(Prop.CombatBackground, map.CombatBackgroundId.ToString()));
 
         if (map is MapData2D map2d)
         {

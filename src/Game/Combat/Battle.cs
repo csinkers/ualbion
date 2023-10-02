@@ -6,7 +6,6 @@ using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Ids;
-using UAlbion.Game.Gui;
 
 namespace UAlbion.Game.Combat;
 
@@ -21,8 +20,13 @@ public class Battle : Component, IReadOnlyBattle
 
     public IReadOnlyMob GetTile(int x, int y)
     {
-        int index = x + y * SavedGame.CombatColumns;
-        return index < 0 || index >= _tiles.Length ? null : _tiles[index];
+        int tileIndex = x + y * SavedGame.CombatColumns;
+        return GetTile(tileIndex);
+    }
+
+    public IReadOnlyMob GetTile(int tileIndex)
+    {
+        return tileIndex < 0 || tileIndex >= _tiles.Length ? null : _tiles[tileIndex];
     }
 
     public Battle(MonsterGroupId groupId, SpriteId backgroundId)

@@ -46,7 +46,7 @@ public class HorizontalStacker : UiElement
         int minWidth = 0;
         int nonFixedCount = 0;
 
-        foreach(var child in Children)
+        foreach (var child in Children)
         {
             if (child is not IUiElement { IsActive: true } childElement)
                 continue;

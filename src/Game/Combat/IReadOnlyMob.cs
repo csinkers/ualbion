@@ -6,5 +6,5 @@ public interface IReadOnlyMob
 {
     public int X { get; }
     public int Y { get; }
-    public ICharacterSheet Sheet { get; }
+    public IEffectiveCharacterSheet Sheet { get; }
 }

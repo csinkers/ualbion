@@ -1,17 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UAlbion.Api.Eventing;
+using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Formats;
+using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Ids;
+using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Input;
+using UAlbion.Game.Scenes;
+using UAlbion.Game.Settings;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Combat;
 
 public class LogicalCombatTile : UiElement
 {
+    class NopEvent : Event { }
+
     readonly int _tileIndex;
     readonly IReadOnlyBattle _battle;
     readonly VisualCombatTile _visual;
@@ -43,13 +53,32 @@ public class LogicalCombatTile : UiElement
         // _visual.Hoverable = true;
     }
 
+    bool IsMagicItem(IReadOnlyItemSlot slot)
+    {
+        var assets = Resolve<IAssetManager>();
+        if (slot.Item.IsNone || slot.Item.Type != AssetType.Item)
+            return false;
+
+        var item = assets.LoadItem(slot.Item);
+        if (item == null)
+            return false;
+
+        return !item.Spell.IsNone;
+    }
+
     void OnRightClick()
     {
+        var contents = _battle.GetTile(_tileIndex);
+        var sheet = contents?.Sheet;
+
         var tf = Resolve<ITextFormatter>();
         var window = Resolve<IGameWindow>();
         var cursorManager = Resolve<ICursorManager>();
 
-        var heading = tf.Center().NoWrap().Fat().Format("TODO");
+        var playerName = sheet?.GetName(Var(UserVars.Gameplay.Language));
+        IText heading = playerName == null 
+            ? tf.Center().NoWrap().Fat().Format(Base.SystemText.Combat_Combat) 
+            : tf.Center().NoWrap().Fat().Format(playerName);
 
         IText S(TextId textId, bool disabled = false)
             => tf
@@ -68,35 +97,47 @@ public class LogicalCombatTile : UiElement
 
         var options = new List<ContextMenuOption>();
 
-        options.Add(new ContextMenuOption(
-            S(Base.SystemText.Combat_DoNothing),
-            new NopEvent(),
-            ContextMenuGroup.Actions));
+        if (sheet?.Type == CharacterType.Party)
+        {
+            options.Add(new ContextMenuOption(
+                S(Base.SystemText.Combat_DoNothing),
+                new NopEvent(),
+                ContextMenuGroup.Actions));
 
-        options.Add(new ContextMenuOption(
-            S(Base.SystemText.Combat_Attack),
-            new NopEvent(),
-            ContextMenuGroup.Actions));
+            options.Add(new ContextMenuOption(
+                S(Base.SystemText.Combat_Attack, sheet.DisplayDamage <= 0),
+                new NopEvent(),
+                ContextMenuGroup.Actions));
 
-        options.Add(new ContextMenuOption(
-            S(Base.SystemText.Combat_Move),
-            new NopEvent(),
-            ContextMenuGroup.Actions));
+            options.Add(new ContextMenuOption(
+                S(Base.SystemText.Combat_Move),
+                new NopEvent(),
+                ContextMenuGroup.Actions));
 
-        options.Add(new ContextMenuOption(
-            S(Base.SystemText.Combat_UseMagic),
-            new NopEvent(),
-            ContextMenuGroup.Actions));
+            if (sheet.Magic.KnownSpells.Count > 0)
+            {
+                options.Add(new ContextMenuOption(
+                    S(Base.SystemText.Combat_UseMagic),
+                    new NopEvent(),
+                    ContextMenuGroup.Actions));
+            }
 
-        options.Add(new ContextMenuOption(
-            S(Base.SystemText.Combat_UseMagicItem),
-            new NopEvent(),
-            ContextMenuGroup.Actions));
+            if (sheet.Inventory.EnumerateAll().Any(IsMagicItem))
+            {
+                options.Add(new ContextMenuOption(
+                    S(Base.SystemText.Combat_UseMagicItem),
+                    new NopEvent(),
+                    ContextMenuGroup.Actions));
+            }
 
-        options.Add(new ContextMenuOption(
-            S(Base.SystemText.Combat_Flee),
-            new NopEvent(),
-            ContextMenuGroup.Actions));
+            if (_tileIndex / SavedGame.CombatColumns == 0)
+            {
+                options.Add(new ContextMenuOption(
+                    S(Base.SystemText.Combat_Flee),
+                    new NopEvent(),
+                    ContextMenuGroup.Actions));
+            }
+        }
 
         options.Add(new ContextMenuOption(
             S(Base.SystemText.Combat_AdvanceParty),
@@ -110,12 +151,15 @@ public class LogicalCombatTile : UiElement
 
         options.Add(new ContextMenuOption(
             S(Base.SystemText.MapPopup_MainMenu),
-            new NopEvent(),
+            new PushSceneEvent(SceneId.MainMenu),
+            ContextMenuGroup.System));
+
+        options.Add(new ContextMenuOption(
+            S(Base.SystemText.Combat_EndCombat),
+            new CombatDialog.EndCombatEvent(CombatResult.Victory),
             ContextMenuGroup.System));
 
         var uiPosition = window.PixelToUi(cursorManager.Position);
         Raise(new ContextMenuEvent(uiPosition, heading, options));
     }
 }
-
-class NopEvent : Event { }

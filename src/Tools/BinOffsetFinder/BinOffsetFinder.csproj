@@ -11,17 +11,29 @@
 
   <ItemGroup>
     <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
-
-    <PackageReference Include="Veldrid" Version="4.9.0" />
     <PackageReference Include="Veldrid.ImGui" Version="5.89.2-ga121087cad" />
+  </ItemGroup>
+
+  <ItemGroup Condition="!Exists('..\..\deps\veldrid\src\')">
+    <PackageReference Include="Veldrid" Version="4.9.0" />
     <PackageReference Include="Veldrid.RenderDoc" Version="1.0.1-ga121087cad" />
     <PackageReference Include="Veldrid.SDL2" Version="4.9.0" />
     <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0" />
     <PackageReference Include="Veldrid.Utilities" Version="4.9.0" />
-    <PackageReference Include="Veldrid.SPIRV" Version="1.0.15" />
+  </ItemGroup>
+  <ItemGroup Condition="Exists('..\..\deps\veldrid\src\')">
+    <ProjectReference Include="..\..\deps\veldrid\src\Veldrid\Veldrid.csproj" />
+    <ProjectReference Include="..\..\deps\veldrid\src\Veldrid.OpenGLBindings\Veldrid.OpenGLBindings.csproj" />
+    <ProjectReference Include="..\..\deps\veldrid\src\Veldrid.RenderDoc\Veldrid.RenderDoc.csproj" />
+    <ProjectReference Include="..\..\deps\veldrid\src\Veldrid.SDL2\Veldrid.SDL2.csproj" />
+    <ProjectReference Include="..\..\deps\veldrid\src\Veldrid.StartupUtilities\Veldrid.StartupUtilities.csproj" />
+    <ProjectReference Include="..\..\deps\veldrid\src\Veldrid.Utilities\Veldrid.Utilities.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\deps\veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj" />
+  <ItemGroup Condition="!Exists('..\..\deps\veldrid-spirv\src\')">
+    <PackageReference Include="Veldrid.SPIRV" Version="1.0.15" />
+  </ItemGroup>
+  <ItemGroup Condition="Exists('..\..\deps\veldrid-spirv\src\')">
+    <ProjectReference Include="..\..\deps\veldrid-spirv\src\Veldrid.SPIRV\Veldrid.SPIRV.csproj" />
   </ItemGroup>
 </Project>

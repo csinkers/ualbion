@@ -32,6 +32,6 @@ public class EncounterEvent : MapEvent
     }
 
     [EventPart("group")] public MonsterGroupId GroupId { get; private set; }
-    [EventPart("background")] public CombatBackgroundId BackgroundId { get; private set; }
+    [EventPart("background", true, "None")] public CombatBackgroundId BackgroundId { get; private set; }
     public override MapEventType EventType => MapEventType.Encounter;
 }

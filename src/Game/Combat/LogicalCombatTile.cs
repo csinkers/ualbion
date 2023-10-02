@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Formats.Ids;
@@ -12,13 +13,15 @@ namespace UAlbion.Game.Combat;
 public class LogicalCombatTile : UiElement
 {
     readonly int _tileIndex;
+    readonly IReadOnlyBattle _battle;
     readonly VisualCombatTile _visual;
 
-    public LogicalCombatTile(int tileIndex)
+    public LogicalCombatTile(int tileIndex, IReadOnlyBattle battle)
     {
         _tileIndex = tileIndex;
+        _battle = battle ?? throw new ArgumentNullException(nameof(battle));
 
-        _visual = AttachChild(new VisualCombatTile())
+        _visual = AttachChild(new VisualCombatTile(tileIndex, battle))
             .OnClick(() =>
             {
             })

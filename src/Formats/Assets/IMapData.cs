@@ -11,7 +11,7 @@ public interface IMapData : IEventSet
     SongId SongId { get; }
     int Width { get;  }
     int Height { get;  }
-    SpriteId CombatBackgroundId { get;  }
+    CombatBackgroundId CombatBackgroundId { get;  }
     PaletteId PaletteId { get;  }
 
     List<MapNpc> Npcs { get; }

@@ -86,7 +86,7 @@ public class MapData2D : BaseMapData
         map.Width = s.UInt8(nameof(Width), (byte)(map.Width - OffsetX)) + OffsetX; // 4
         map.Height = s.UInt8(nameof(Height), (byte)(map.Height - OffsetY)) + OffsetY; // 5
         map.TilesetId = TilesetId.SerdesU8(nameof(TilesetId), map.TilesetId, mapping, s); //6
-        map.CombatBackgroundId = SpriteId.SerdesU8(nameof(CombatBackgroundId), map.CombatBackgroundId, AssetType.CombatBackground, mapping, s); // 7
+        map.CombatBackgroundId = CombatBackgroundId.SerdesU8(nameof(CombatBackgroundId), map.CombatBackgroundId, mapping, s); // 7
         map.PaletteId = PaletteId.SerdesU8(nameof(PaletteId), map.PaletteId, mapping, s);
         map.FrameRate = s.UInt8(nameof(FrameRate), map.FrameRate); // 9
         int expectedOffset = 10;

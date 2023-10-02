@@ -85,7 +85,7 @@ public class MapData3D : BaseMapData
         map.Width = s.UInt8(nameof(Width), (byte)(map.Width - OffsetX)) + OffsetX; // 4
         map.Height = s.UInt8(nameof(Height), (byte)(map.Height - OffsetY)) + OffsetY; // 5
         map.LabDataId = LabyrinthId.SerdesU8(nameof(LabDataId), map.LabDataId, mapping, s); // 6
-        map.CombatBackgroundId = SpriteId.SerdesU8(nameof(CombatBackgroundId), map.CombatBackgroundId, AssetType.CombatBackground, mapping, s); // 7 TODO: Verify this is combat background
+        map.CombatBackgroundId = CombatBackgroundId.SerdesU8(nameof(CombatBackgroundId), map.CombatBackgroundId, mapping, s); // 7
         map.PaletteId = PaletteId.SerdesU8(nameof(PaletteId), map.PaletteId, mapping, s);
         map.AmbientSongId = SongId.SerdesU8(nameof(AmbientSongId), map.AmbientSongId, mapping, s);
 

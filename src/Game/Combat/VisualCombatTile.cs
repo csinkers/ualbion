@@ -13,7 +13,8 @@ public class VisualCombatTile : UiElement
     readonly IReadOnlyBattle _battle;
     const int Width = 32;
 #pragma warning disable CA1823 // Avoid unused private fields
-    const int Height = 48;
+    const int Height = 24;
+    const int SpriteHeight = 48;
 #pragma warning restore CA1823 // Avoid unused private fields
     readonly UiSpriteElement _sprite;
     readonly Button _button;
@@ -37,7 +38,7 @@ public class VisualCombatTile : UiElement
 
         _button = AttachChild(new Button(
                 new VerticalStacker(
-                    new Spacing(Width, Width),
+                    new Spacing(Width, Height),
                         _sprite)
                     { Greedy = false })
             .OnHover(() => Hover?.Invoke())
@@ -49,7 +50,7 @@ public class VisualCombatTile : UiElement
     }
 
     // public ButtonState State { get => _frame.State; set => _frame.State = value; }
-    public override Vector2 GetSize() => new(Width);
+    public override Vector2 GetSize() => new(Width, Height);
     public VisualCombatTile OnClick(Action callback) { Click += callback; return this; }
     public VisualCombatTile OnRightClick(Action callback) { RightClick += callback; return this; }
     public VisualCombatTile OnDoubleClick(Action callback) { DoubleClick += callback; return this; }

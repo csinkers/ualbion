@@ -72,7 +72,7 @@ public class AssetNode
     }
 
     /// <summary>
-    /// Set's a property by name
+    /// Sets a property by name
     /// </summary>
     /// <param name="assetProperty">The property</param>
     /// <param name="value">The value to set the property to</param>

@@ -35,7 +35,7 @@ public class PathResolver : IPathResolver
         if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
         Paths[name] = path;
     }
-
+    
     public string ResolvePathAbsolute(string relative)
     {
         var path = ResolvePath(relative);

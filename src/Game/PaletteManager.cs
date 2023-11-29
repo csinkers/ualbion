@@ -26,7 +26,8 @@ public class PaletteManager : ServiceComponent<IPaletteManager>, IPaletteManager
             if (state == null || Night == null)
                 return 0;
 
-            return MathF.Cos((float)state.Time.TimeOfDay.TotalDays * MathF.PI * 2 * 60) * 0.5f + 0.5f;
+            var daysElapsed = (float)state.Time.TimeOfDay.TotalDays; // how far through the day we are (0..1)
+            return MathF.Cos(daysElapsed * MathF.PI * 2) * 0.5f + 0.5f;
         }
     }
 

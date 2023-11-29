@@ -43,7 +43,7 @@ class CommandLineOptions
             if (arg is "--ISO" or "-ISO") Mode = ExecutionMode.BakeIsometric;
             if (arg is "--CONVERT" or "--BUILD" or "-B")
             {
-                if (i +2 >= args.Length)
+                if (i + 2 >= args.Length)
                     throw new FormatException("\"--convert\" requires two parameters: the mod to convert from and the mod to convert to");
                 ConvertFrom = args[++i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 ConvertTo = args[++i];

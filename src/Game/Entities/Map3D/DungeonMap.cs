@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
@@ -178,17 +177,26 @@ public class DungeonMap : Component, IMap
         // TODO
     }
 
-    IEnumerable<MapEventZone> GetZonesOfType(TriggerTypes triggerType) => _mapData.GetZonesOfType(triggerType);
     void FireEventChains(TriggerType type, bool log)
     {
-        var zones = GetZonesOfType(type.ToBitField());
-        if (!log)
-            Raise(new SetLogLevelEvent(LogLevel.Warning));
+        var zones = ZoneListPool.Shared.Borrow();
+        _mapData.GetZonesOfType(zones, type.ToBitField());
 
-        foreach (var zone in zones)
-            Raise(new TriggerChainEvent(_mapData, zone.EventIndex, new EventSource(_mapData.Id, type, zone.X, zone.Y)));
+        try
+        {
+            if (!log)
+                Raise(new SetLogLevelEvent(LogLevel.Warning));
 
-        if (!log)
-            Raise(new SetLogLevelEvent(LogLevel.Info));
+            foreach (var zone in zones)
+                Raise(new TriggerChainEvent(_mapData, zone.EventIndex,
+                    new EventSource(_mapData.Id, type, zone.X, zone.Y)));
+
+            if (!log)
+                Raise(new SetLogLevelEvent(LogLevel.Info));
+        }
+        finally
+        {
+            ZoneListPool.Shared.Return(zones);
+        }
     }
 }

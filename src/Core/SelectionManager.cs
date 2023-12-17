@@ -12,7 +12,16 @@ public class SelectionManager : ServiceComponent<ISelectionManager>, ISelectionM
     readonly BlurEvent _blurEvent = new();
     readonly HoverEvent _hoverEvent = new();
     readonly ScreenCoordinateSelectEvent _selectEvent = new();
-    readonly DoubleBuffered<HashSet<object>> _selection = new(() => new HashSet<object>());
+    readonly DoubleBuffered<List<object>> _selection = new(() => new List<object>());
+
+    readonly Func<Selection, IComponent> _hoverSelectorDelegate;
+    readonly Func<object, IComponent> _blurSelectorDelegate;
+
+    public SelectionManager()
+    {
+        _hoverSelectorDelegate = HoverSelector;
+        _blurSelectorDelegate = BlurSelector;
+    }
 
     IComponent HoverSelector(Selection o)
     {
@@ -57,7 +66,7 @@ public class SelectionManager : ServiceComponent<ISelectionManager>, ISelectionM
             }
         }
 
-        Distribute(_hoverEvent, hits, HoverSelector);
-        Distribute(_blurEvent, _selection.Back, BlurSelector);
+        Distribute(_hoverEvent, hits, _hoverSelectorDelegate);
+        Distribute(_blurEvent, _selection.Back, _blurSelectorDelegate);
     }
 }

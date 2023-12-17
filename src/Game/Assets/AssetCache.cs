@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
+using UAlbion.Formats;
 using UAlbion.Game.Events;
 using static System.FormattableString;
 
@@ -16,8 +17,7 @@ public class AssetCache : Component
     class Entry
     {
         public WeakReference Weak;
-        public object Strong;
-        public AssetNode Node;
+        public AssetLoadResult Strong;
         public DateTime LastAccessed;
     }
 
@@ -148,16 +148,16 @@ public class AssetCache : Component
         return cache;
     }
 
-    public (object, AssetNode) Get(AssetId key, string language)
+    public AssetLoadResult Get(AssetId key, string language)
     {
         lock (_syncRoot)
         {
             var cache = GetCache(language);
             if (cache == null || !_cache.TryGetValue(key, out var entry))
-                return (null, null);
+                return null;
 
             entry.LastAccessed = DateTime.UtcNow;
-            return (entry.Strong ?? entry.Weak.Target, entry.Node);
+            return entry.Strong ?? (AssetLoadResult)entry.Weak.Target;
         }
     }
 
@@ -166,12 +166,12 @@ public class AssetCache : Component
         lock (_syncRoot)
         {
             var cache = GetOrAddCache(language);
+            var loadResult = new AssetLoadResult(id, asset, node);
             cache[id] = new Entry
             {
                 LastAccessed = DateTime.UtcNow,
-                Strong = asset,
-                Weak = new WeakReference(asset),
-                Node = node
+                Strong = loadResult,
+                Weak = new WeakReference(loadResult)
             };
         }
     }

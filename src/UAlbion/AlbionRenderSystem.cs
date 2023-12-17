@@ -70,7 +70,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                             mouseEvent.WheelDelta    = e.Snapshot.WheelDelta;
                             mouseEvent.MousePosition = e.Snapshot.MousePosition;
                             mouseEvent.MouseEvents   = e.Snapshot.MouseEvents;
-                            mouseEvent.IsMouseDown   = e.Snapshot.IsMouseDown;
+                            mouseEvent.Snapshot      = e.Snapshot;
                             x.Raise(mouseEvent);
                         });
                     }))

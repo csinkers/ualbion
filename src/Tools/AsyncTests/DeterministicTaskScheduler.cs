@@ -7,7 +7,7 @@
 /// </summary>
 public class DeterministicTaskScheduler : TaskScheduler
 {
-    readonly List<Task> scheduledTasks = new();
+    readonly List<Task> _scheduledTasks = new();
     public override int MaximumConcurrencyLevel => 1;
 
     /// <summary>
@@ -16,7 +16,7 @@ public class DeterministicTaskScheduler : TaskScheduler
     /// </summary>
     public void RunTasksUntilIdle()
     {
-        while (scheduledTasks.Any())
+        while (_scheduledTasks.Any())
             RunPendingTasks();
     }
 
@@ -26,14 +26,14 @@ public class DeterministicTaskScheduler : TaskScheduler
     /// </summary>
     public void RunPendingTasks()
     {
-        foreach (var task in scheduledTasks.ToArray())
+        foreach (var task in _scheduledTasks.ToArray())
         {
             TryExecuteTask(task);
-            scheduledTasks.Remove(task);
+            _scheduledTasks.Remove(task);
         }
     }
 
-    protected override void QueueTask(Task task) => scheduledTasks.Add(task);
+    protected override void QueueTask(Task task) => _scheduledTasks.Add(task);
     protected override bool TryExecuteTaskInline(Task task, bool taskWasPreviouslyQueued) => TryExecuteTask(task);
-    protected override IEnumerable<Task> GetScheduledTasks() => scheduledTasks;
+    protected override IEnumerable<Task> GetScheduledTasks() => _scheduledTasks;
 }

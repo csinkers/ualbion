@@ -5,6 +5,5 @@ namespace UAlbion.Game.Events;
 
 public class SetTimeEvent : GameEvent, IVerboseEvent
 {
-    public SetTimeEvent(DateTime time) => Time = time;
-    public DateTime Time { get; }
+    public DateTime Time { get; set; }
 }

@@ -52,7 +52,46 @@ public class CoreTrace : EventSource
     public void Critical(string category, string message, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
         => WriteEvent(4, category ?? "", message ?? "", file ?? "", member ?? "", line);
 
-    public void StartFrame(long frameCount, double deltaMicroseconds) => WriteEvent(5, frameCount, deltaMicroseconds);
+    [NonEvent]
+    unsafe void WriteEvent(int eventId, string s1, string s2, string s3, string s4, int n)
+    {
+        if (!IsEnabled())
+            return;
+
+        fixed (char* s1Bytes = s1)
+        fixed (char* s2Bytes = s2)
+        fixed (char* s3Bytes = s3)
+        fixed (char* s4Bytes = s4)
+        {
+            EventData* descrs = stackalloc EventData[5];
+            descrs[0].DataPointer = (IntPtr)s1Bytes; descrs[0].Size = (s1.Length + 1) * 2;
+            descrs[1].DataPointer = (IntPtr)s2Bytes; descrs[1].Size = (s2.Length + 1) * 2;
+            descrs[2].DataPointer = (IntPtr)s3Bytes; descrs[2].Size = (s3.Length + 1) * 2;
+            descrs[3].DataPointer = (IntPtr)s4Bytes; descrs[4].Size = (s4.Length + 1) * 2;
+            descrs[4].DataPointer = (IntPtr)(&n); descrs[4].Size = 4;
+
+            WriteEventCore(eventId, 5, descrs);
+        }
+    }
+
+    public void StartFrame(long frameCount, double deltaMicroseconds) 
+        => WriteEvent(5, frameCount, deltaMicroseconds);
+
+    [NonEvent]
+    unsafe void WriteEvent(int eventId, long arg1, double arg2)
+    {
+        if (!IsEnabled())
+            return;
+
+        EventData* desc = stackalloc EventData[2];
+        desc[0].DataPointer = (IntPtr)(&arg1);
+        desc[0].Size = 8;
+        desc[1].DataPointer = (IntPtr)(&arg2);
+        desc[1].Size = 8;
+
+        WriteEventCore(eventId, 2, desc);
+    }
+
     public void CollectedRenderables(string renderer, int layerCount, int renderableCount) => WriteEvent(6, renderer ?? "", layerCount, renderableCount);
     public void StartDebugGroup(string name) => WriteEvent(7, name ?? "");
     public void StopDebugGroup(string name) => WriteEvent(8, name ?? "");

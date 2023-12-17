@@ -13,6 +13,11 @@ namespace UAlbion.Game;
 public class GameClock : ServiceComponent<IClock>, IClock
 {
     readonly IList<(string, float)> _activeTimers = new List<(string, float)>();
+    readonly SetTimeEvent _setTimeEvent = new();
+    readonly CycleCacheEvent _cycleCacheEvent = new();
+    readonly PostGameUpdateEvent _postGameUpdateEvent = new();
+    readonly FastClockEvent _fastClockEvent = new(1);
+
     float _elapsedTimeThisGameFrame;
     int _ticksRemaining;
     int _stoppedFrames;
@@ -87,7 +92,8 @@ public class GameClock : ServiceComponent<IClock>, IClock
             {
                 var lastGameTime = state.Time;
                 var newGameTime = lastGameTime.AddSeconds(e.DeltaSeconds * Var(GameVars.Time.GameSecondsPerSecond));
-                ((IComponent) state).Receive(new SetTimeEvent(newGameTime), this);
+                _setTimeEvent.Time = newGameTime;
+                ((IComponent) state).Receive(_setTimeEvent, this);
 
                 int time = newGameTime.Day * 10000 + newGameTime.Hour * 100 + newGameTime.Minute;
                 if (newGameTime.Minute != lastGameTime.Minute)
@@ -123,7 +129,7 @@ public class GameClock : ServiceComponent<IClock>, IClock
 
                 var ticksPerCycle = Var(GameVars.Time.FastTicksPerAssetCacheCycle);
                 if ((state?.TickCount ?? 0) % ticksPerCycle == ticksPerCycle - 1)
-                    Raise(new CycleCacheEvent());
+                    Raise(_cycleCacheEvent);
             }
         }
         else
@@ -132,13 +138,13 @@ public class GameClock : ServiceComponent<IClock>, IClock
             _stoppedMs += 1000.0f * e.DeltaSeconds;
         }
 
-        Raise(new PostGameUpdateEvent());
+        Raise(_postGameUpdateEvent);
     }
 
     void RaiseTick()
     {
         GameTrace.Log.FastTick(_totalFastTicks++);
-        Raise(new FastClockEvent(1));
+        Raise(_fastClockEvent);
         if (_ticksRemaining <= 0)
             return;
 

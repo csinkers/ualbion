@@ -177,6 +177,9 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         _contexts.Remove(context);
     }
 
+#pragma warning disable CA1508 // Avoid dead conditional code
+// context.Status can be modified due to the RaiseAsync calls, but the code analysis isn't figuring it out so
+// it was flagging the "context.Status == Waiting" check as always true.
     bool HandleAsyncEvent(EventContext context, IAsyncEvent asyncEvent)
     {
         context.Status = EventContextStatus.Waiting;
@@ -207,7 +210,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         int waiting = RaiseAsync(boolEvent, result =>
         {
 #if DEBUG
-            Info($"if ({context.Node.Event}) => {result}");
+            // Info($"if ({context.Node.Event}) => {result}");
 #endif
             context.Node = result ? branch.Next : branch.NextIfFalse;
 
@@ -223,7 +226,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
 
         if (waiting == 0)
         {
-            ApiUtil.Assert($"Async event {boolEvent} not acknowledged. Continuing immediately.");
+            // ApiUtil.Assert($"Async event {boolEvent} not acknowledged. Continuing immediately.");
             context.Node = context.Node.Next;
             ReadyContext(context);
         }
@@ -236,6 +239,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         // If the continuation was called already then continue iterating.
         return false;
     }
+#pragma warning restore CA1508 // Avoid dead conditional code
 
     public void Dispose() { }
 }

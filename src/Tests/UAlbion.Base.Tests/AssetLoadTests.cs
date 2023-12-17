@@ -392,7 +392,8 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(NpcMovement.Waypoints, n.Movement);
         Assert.Equal(1152, n.Waypoints.Length);
 
-        var initZones = map.GetZonesOfType(TriggerTypes.MapInit);
+        var initZones = new List<MapEventZone>();
+        map.GetZonesOfType(initZones, TriggerTypes.MapInit);
         var z = initZones.First();
         Assert.Equal(24, z.Chain);
         Assert.True(z.Global);

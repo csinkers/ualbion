@@ -75,7 +75,7 @@ public class RightButtonHeldMouseMode : Component
         }
     }
 
-    void ShowContextMenu(IEnumerable<Selection> orderedHits)
+    void ShowContextMenu(List<Selection> orderedHits)
     {
         ShowMapMenuEvent.Propagating = true;
         Raise(PopMouseModeEvent);

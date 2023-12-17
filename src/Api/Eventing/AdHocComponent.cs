@@ -40,7 +40,7 @@ public class AdHocComponent : Component
         public int RaiseAsync(IAsyncEvent @event, Action continuation) => _this.RaiseAsync(@event, continuation);
         public int RaiseAsync<T>(IAsyncEvent<T> @event, Action<T> continuation) => _this.RaiseAsync(@event, continuation);
         public void Enqueue(IEvent @event) => _this.Enqueue(@event);
-        public void Distribute<T>(ICancellableEvent @event, IEnumerable<T> targets, Func<T, IComponent> projection) => _this.Distribute(@event, targets, projection);
+        public void Distribute<T>(ICancellableEvent @event, List<T> targets, Func<T, IComponent> projection) => _this.Distribute(@event, targets, projection);
         public void On<T>(Action<T> callback) where T : IEvent => _this.On(callback);
         public void OnAsync<T>(AsyncMethod<T> callback) where T : IAsyncEvent => _this.OnAsync(callback);
         public void OnAsync<TEvent, TReturn>(AsyncMethod<TEvent, TReturn> callback) where TEvent : IAsyncEvent<TReturn> => _this.OnAsync(callback);

@@ -6,5 +6,5 @@ namespace UAlbion.Core.Events;
 public class EngineUpdateEvent : EngineEvent, IVerboseEvent
 {
     public EngineUpdateEvent(float deltaSeconds) { DeltaSeconds = deltaSeconds; }
-    [EventPart("delta_seconds")] public float DeltaSeconds { get; }
+    [EventPart("delta_seconds")] public float DeltaSeconds { get; set; }
 }

@@ -149,10 +149,10 @@ public class ModApplier : Component, IModApplier
 
     AssetLoadResult GetCached(AssetId assetId, string language)
     {
-        var (asset, node) = _assetCache.Get(assetId, language);
-        return asset is null or Exception 
+        var loadResult = _assetCache.Get(assetId, language);
+        return loadResult?.Asset is null or Exception 
             ? null // If it failed to load once then stop trying (at least until an asset:reload / cycle)
-            : new AssetLoadResult(assetId, asset, node);
+            : loadResult;
     }
 
     AssetLoadResult LoadAssetInternal(AssetId id, string language, TextWriter annotationWriter = null)

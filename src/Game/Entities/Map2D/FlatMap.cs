@@ -128,15 +128,25 @@ public class FlatMap : Component, IMap
 
     void FireEventChains(TriggerType type, bool log)
     {
-        var zones = _logicalMap.GetZonesOfType(type.ToBitField());
-        if (!log)
-            Raise(new SetLogLevelEvent(LogLevel.Warning));
+        var zones = ZoneListPool.Shared.Borrow();
+        _logicalMap.GetZonesOfType(zones, type.ToBitField());
 
-        foreach (var zone in zones)
-            Raise(new TriggerChainEvent(_logicalMap.EventSet, zone.EventIndex, new EventSource(_mapData.Id, type, zone.X, zone.Y)));
+        try
+        {
+            if (!log)
+                Raise(new SetLogLevelEvent(LogLevel.Warning));
 
-        if (!log)
-            Raise(new SetLogLevelEvent(LogLevel.Info));
+            foreach (var zone in zones)
+                Raise(new TriggerChainEvent(_logicalMap.EventSet, zone.EventIndex,
+                    new EventSource(_mapData.Id, type, zone.X, zone.Y)));
+
+            if (!log)
+                Raise(new SetLogLevelEvent(LogLevel.Info));
+        }
+        finally
+        {
+            ZoneListPool.Shared.Return(zones);
+        }
     }
 
     void OnNpcEnteredTile(NpcEnteredTileEvent e)

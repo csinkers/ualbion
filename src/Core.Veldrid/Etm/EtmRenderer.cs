@@ -55,8 +55,7 @@ public sealed class EtmRenderer : Component, IRenderer, IDisposable
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
         var tilemap = window.Tilemap;
-
-        cl.PushDebugGroup($"Tiles3D:{tilemap.Name}");
+        cl.PushDebugGroup(tilemap.Name);
 
         cl.SetPipeline(tilemap.RendererId == DungeonTilemapPipeline.NoCulling 
             ? _nonCullingPipeline.Pipeline 

@@ -83,7 +83,7 @@ public class ImGuiGameWindow : Component, IImGuiWindow
             _mouseEvent.WheelDelta = input.Snapshot.WheelDelta;
             _mouseEvent.MousePosition = input.Snapshot.MousePosition - itemPos;
             _mouseEvent.MouseEvents = input.Snapshot.MouseEvents;
-            _mouseEvent.IsMouseDown = input.Snapshot.IsMouseDown;
+            _mouseEvent.Snapshot = input.Snapshot;
             Raise(_mouseEvent);
             manager.ConsumedMouse = true;
         }

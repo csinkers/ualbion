@@ -25,7 +25,7 @@ public class EtmWindow : Component, IRenderable
         ActiveInstances = new MultiBuffer<ushort>(maxCount, BufferUsage.VertexBuffer, $"B:EtmActive_{name}");
         ActiveCount = maxCount;
         AttachChild(ActiveInstances);
-        On<PrepareFrameEvent>(e =>
+        On<PrepareFrameEvent>(_ =>
         {
             if (_version >= Tilemap.Version)
                 return; // Up to date

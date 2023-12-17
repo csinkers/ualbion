@@ -108,7 +108,7 @@ class InputHandler : Component
 
 public static class Program
 {
-    const string testScript = @"
+    const string TestScript = @"
 {
     Chain0:
     misc
@@ -129,8 +129,8 @@ public static class Program
 }
 ";
 
-    static readonly DeterministicTaskScheduler _scheduler = new();
-    static readonly TaskFactory _factory = new(_scheduler);
+    static readonly DeterministicTaskScheduler Scheduler = new();
+    static readonly TaskFactory Factory = new(Scheduler);
 
     public static void Main()
     {
@@ -139,7 +139,7 @@ public static class Program
         EventExchange exchange = new();
         var input = new InputHandler();
         exchange.Attach(input);
-        var testLayout = AlbionCompiler.Compile(testScript);
+        var testLayout = AlbionCompiler.Compile(TestScript);
         var testSet = new EventSet(EventSetId.None, testLayout.Events, testLayout.Chains);
         Console.WriteLine("Starting");
         bool done = false;
@@ -155,7 +155,7 @@ public static class Program
             Thread.CurrentThread.Name = "Game Loop Thread";
             while (!done)
             {
-                _scheduler.RunPendingTasks();
+                Scheduler.RunPendingTasks();
                 Thread.Sleep(100);
             }
 
@@ -173,7 +173,7 @@ public static class Program
     static Task Run(EventExchange exchange, IEventSet set, int chainId)
     {
         var entryPoint = set.Events[set.Chains[chainId]];
-        return _factory.StartNew(() => RunAsync(exchange, entryPoint)).Unwrap();
+        return Factory.StartNew(() => RunAsync(exchange, entryPoint)).Unwrap();
     }
 
     static async Task RunAsync(EventExchange exchange, IEventNode? node)
@@ -192,6 +192,7 @@ public static class Program
             {
                 await RaiseAsync(exchange, asyncEvent);
                 node = node.Next;
+                Console.WriteLine();
                 Console.WriteLine(" => Done");
             }
             else

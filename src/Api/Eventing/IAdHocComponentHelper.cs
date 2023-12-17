@@ -20,7 +20,7 @@ public interface IAdHocComponentHelper
 #pragma warning restore CA1030
 
     void Enqueue(IEvent @event);
-    void Distribute<T>(ICancellableEvent @event, IEnumerable<T> targets, Func<T, IComponent> projection);
+    void Distribute<T>(ICancellableEvent @event, List<T> targets, Func<T, IComponent> projection);
     void On<T>(Action<T> callback) where T : IEvent;
     void OnAsync<T>(AsyncMethod<T> callback) where T : IAsyncEvent;
     void OnAsync<TEvent, TReturn>(AsyncMethod<TEvent, TReturn> callback) where TEvent : IAsyncEvent<TReturn>;

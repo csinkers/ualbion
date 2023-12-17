@@ -22,7 +22,7 @@ public class EtmManager : ServiceComponent<IEtmManager>, IEtmManager, IRenderabl
         var result = new ExtrudedTilemap(
             this,
             request.Id,
-            request.Id.ToString(),
+            "ETM_" + request.Id,
             request.TileCount,
             properties,
             request.DayPalette,

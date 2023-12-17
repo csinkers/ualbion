@@ -111,7 +111,7 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
         int i = 0;
         foreach (var phase in Passes)
         {
-            using (FrameEventCached(ref i, phase, (x, n) => $"{n} {Name} Render - {x.Name}"))
+            using (FrameEventCached(ref i, (this, phase), static (x, n) => $"{n} {x.Item1.Name} Render - {x.phase.Name}"))
             {
                 _frameCommands.Begin();
                 phase.Render(graphicsDevice, _frameCommands, ResourceProvider?.ResourceSet);
@@ -119,10 +119,10 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
             }
 
             _fence.Reset();
-            using (FrameEventCached(ref i, phase, (x, n) => $"{n} {Name} Submit commands - {x.Name}"))
+            using (FrameEventCached(ref i, (this, phase), static (x, n) => $"{n} {x.Item1.Name} Submit commands - {x.phase.Name}"))
                 graphicsDevice.SubmitCommands(_frameCommands, _fence);
 
-            using (FrameEventCached(ref i, phase, (x, n) => $"{n} {Name} Complete - {x.Name}"))
+            using (FrameEventCached(ref i, (this, phase), static (x, n) => $"{n} {x.Item1.Name} Complete - {x.phase.Name}"))
                 graphicsDevice.WaitForFence(_fence);
         }
     }

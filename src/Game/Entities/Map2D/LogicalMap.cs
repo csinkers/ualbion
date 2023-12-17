@@ -82,7 +82,7 @@ public abstract class LogicalMap : Component
         collection.Update(Id, x, y, changeType, value);
     }
 
-    public IEnumerable<MapEventZone> GetZonesOfType(TriggerTypes triggerType) => _mapData.GetZonesOfType(triggerType);
+    public void GetZonesOfType(List<MapEventZone> result, TriggerTypes triggerType) => _mapData.GetZonesOfType(result, triggerType);
 
     void ApplyChange(byte x, byte y, IconChangeType changeType, ChangeIconLayers layers, ushort value)
     {

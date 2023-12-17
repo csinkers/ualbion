@@ -136,6 +136,9 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
             throw new InvalidOperationException("GraphicsDevice not initialised");
 
         var frameCounter = new FrameCounter();
+        var engineUpdateEvent = new EngineUpdateEvent(0);
+        var layoutEvent = new LayoutEvent();
+
         while (!_done && _newBackend == null)
         {
             var flags = Var(CoreVars.User.EngineFlags);
@@ -154,14 +157,17 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
                 _windowHolder.PumpEvents(deltaSeconds);
 
             using (PerfTracker.FrameEvent("Performing update"))
-                Raise(new EngineUpdateEvent((float)deltaSeconds));
+            {
+                engineUpdateEvent.DeltaSeconds = (float)deltaSeconds;
+                Raise(engineUpdateEvent);
+            }
 
             using (PerfTracker.FrameEvent("Flushing queued events"))
                 Exchange.FlushQueuedEvents();
 
             if ((flags & EngineFlags.SuppressLayout) == 0)
                 using (PerfTracker.FrameEvent("Calculating UI layout"))
-                     Raise(new LayoutEvent());
+                     Raise(layoutEvent);
 
             if (_active)
             {

@@ -24,7 +24,7 @@ public class ContextMenu : Dialog
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
         // Just the default condition without the extents check, as the use of a fixed position stack means the extents passed in are ignored.
-        var maxOrder = DoLayout(extents, order, context, SelectChild);
+        var maxOrder = DoLayout(extents, order, context, SelectChildDelegate);
         context.AddHit(order, this);
         return maxOrder;
     }

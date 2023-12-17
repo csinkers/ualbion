@@ -14,7 +14,8 @@ public class MouseInputEvent : EngineEvent, IVerboseEvent
     public float WheelDelta { get; set; }
     public Vector2 MousePosition { get; set; }
     public IReadOnlyList<MouseEvent> MouseEvents { get; set; }
-    public Func<MouseButton, bool> IsMouseDown { get; set; }
+    public bool IsMouseDown(MouseButton button) => Snapshot.IsMouseDown(button);
+    public InputSnapshot Snapshot { get; set; } // Only used for IsMouseDown
 
     public bool CheckMouse(MouseButton button, bool pressed)
     {

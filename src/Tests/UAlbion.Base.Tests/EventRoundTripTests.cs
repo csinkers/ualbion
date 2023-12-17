@@ -385,7 +385,7 @@ chain_off Set 1 Map.Jirinaar");
     [Fact]
     public void EncounterEvent()
     {
-        Test(@"encounter 1 2");
+        Test(@"encounter MonsterGroup.OneKrondir1 CombatBackground.Dungeon");
     }
 
     [Fact]
@@ -458,7 +458,7 @@ place_action SleepInRoom 1 1 1 1 1 1");
     {
         Test(@"prompt_player 1
 prompt_player 1 NonZero 1
-prompt_player_numeric Equals 0 1
+prompt_player_numeric Equals 1
 is_conscious PartyMember.Tom
 is_conscious PartyMember.Tom NonZero 1
 is_demo_version 1 NonZero 0

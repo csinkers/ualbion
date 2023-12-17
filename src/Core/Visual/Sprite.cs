@@ -13,6 +13,7 @@ public class Sprite : Component, IPositioned
     readonly DrawLayer _layer;
     readonly SpriteKeyFlags _keyFlags;
     readonly Func<IAssetId, ITexture> _textureLoaderFunc;
+    readonly PositionedComponentMovedEvent _moveEvent;
 
     BatchLease<SpriteKey, SpriteInfo> _sprite;
     Vector3 _position;
@@ -31,6 +32,7 @@ public class Sprite : Component, IPositioned
         Func<IAssetId, ITexture> textureLoaderFunc = null,
         IBatchManager<SpriteKey, SpriteInfo> batchManager = null)
     {
+        _moveEvent = new PositionedComponentMovedEvent(this);
         _onRenderDelegate = OnRender;
         On<BackendChangedEvent>(_ => Dirty = true);
         On(_onRenderDelegate);
@@ -79,7 +81,7 @@ public class Sprite : Component, IPositioned
             _position = value;
             Dirty = true;
             if (IsSubscribed)
-                Raise(new PositionedComponentMovedEvent(this));
+                Raise(_moveEvent);
         }
     }
     public Vector3 Dimensions => new(Size.X, Size.Y, Size.X);
@@ -95,7 +97,7 @@ public class Sprite : Component, IPositioned
             _size = value;
             Dirty = true;
             if (IsSubscribed)
-                Raise(new PositionedComponentMovedEvent(this));
+                Raise(_moveEvent);
         }
     }
 

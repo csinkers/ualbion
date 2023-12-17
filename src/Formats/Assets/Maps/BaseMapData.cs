@@ -349,10 +349,13 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
         return Zones[tileIndex];
     }
 
-    public IEnumerable<MapEventZone> GetZonesOfType(TriggerTypes triggerType)
+    public void GetZonesOfType(List<MapEventZone> result, TriggerTypes triggerType)
     {
-        var matchingKeys = _zoneTypeLookup.Keys.Where(x => (x & triggerType) == triggerType);
-        return matchingKeys.SelectMany(x => _zoneTypeLookup[x]);
+        if (result == null) throw new ArgumentNullException(nameof(result));
+        foreach (var kvp in _zoneTypeLookup)
+            if ((kvp.Key & triggerType) == triggerType)
+                foreach(var zone in kvp.Value)
+                    result.Add(zone);
     }
 
     public void AddZone(byte x, byte y, TriggerTypes trigger, ushort chain) => SetZone(BuildZone(false, x, y, trigger, chain));

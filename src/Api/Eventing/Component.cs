@@ -63,7 +63,11 @@ public abstract class Component : IComponent
     /// detached when the parent component is.
     /// This collection should only be modified by the AttachChild, RemoveChild and RemoveAllChildren methods.
     /// </summary>
+#if DEBUG
     protected IReadOnlyList<IComponent> Children => _children ?? EmptyChildren;
+#else // Use List<T> in release mode to avoid allocating enumerators in foreach statements
+    protected List<IComponent> Children => _children ?? EmptyChildren;
+#endif
 
     /// <summary>
     /// Resolve the currently active object that provides the given interface.
@@ -152,7 +156,7 @@ public abstract class Component : IComponent
     /// <param name="targets">The targets to distribute the event to</param>
     /// <param name="projection">A function that maps from the target type to its associated component which will receive the event</param>
     /// <exception cref="ArgumentNullException"></exception>
-    protected void Distribute<T>(ICancellableEvent @event, IEnumerable<T> targets, Func<T, IComponent> projection)
+    protected void Distribute<T>(ICancellableEvent @event, List<T> targets, Func<T, IComponent> projection)
     {
         if (@event == null) throw new ArgumentNullException(nameof(@event));
         if (targets == null) throw new ArgumentNullException(nameof(targets));

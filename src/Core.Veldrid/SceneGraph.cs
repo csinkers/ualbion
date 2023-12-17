@@ -10,6 +10,7 @@ namespace UAlbion.Core.Veldrid;
 public class SceneGraph : ServiceComponent<ISceneGraph>, ISceneGraph
 {
     readonly Octree<IPositioned> _octree = new(new BoundingBox(-Vector3.One, Vector3.One), 2);
+    [ThreadStatic] static List<RayCastHit<IPositioned>> _hitList;
 
     public SceneGraph()
     {
@@ -36,8 +37,10 @@ public class SceneGraph : ServiceComponent<ISceneGraph>, ISceneGraph
     public void RayIntersect(Vector3 origin, Vector3 direction, List<Selection> hits)
     {
         if (hits == null) throw new ArgumentNullException(nameof(hits));
-        var veldridHits = new List<RayCastHit<IPositioned>>();
-        _octree.RayCast(new Ray(origin, direction), veldridHits, (ray, item, list) =>
+
+        _hitList ??= new List<RayCastHit<IPositioned>>();
+        _hitList.Clear();
+        _octree.RayCast(new Ray(origin, direction), _hitList, (ray, item, list) =>
         {
             var hit = item.RayIntersect(ray.Origin, ray.Direction);
             if (!hit.HasValue) 
@@ -47,7 +50,7 @@ public class SceneGraph : ServiceComponent<ISceneGraph>, ISceneGraph
             return 1;
         });
 
-        foreach (var hit in veldridHits)
+        foreach (var hit in _hitList)
             hits.Add(new Selection(hit.Location, hit.Distance, hit.Item));
     }
 

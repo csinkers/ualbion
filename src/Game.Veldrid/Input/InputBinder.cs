@@ -22,8 +22,8 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
     MapId _mapId = Base.Map.TestMapIskai;
 
     public bool IsAltPressed => _pressedKeys.Contains(Key.AltLeft) || _pressedKeys.Contains(Key.AltRight);
-    public bool IsCtrlPressed  => _pressedKeys.Contains(Key.ControlLeft) || _pressedKeys.Contains(Key.ControlRight);
-    public bool IsShiftPressed  => _pressedKeys.Contains(Key.ShiftLeft) || _pressedKeys.Contains(Key.ShiftRight);
+    public bool IsCtrlPressed => _pressedKeys.Contains(Key.ControlLeft) || _pressedKeys.Contains(Key.ControlRight);
+    public bool IsShiftPressed => _pressedKeys.Contains(Key.ShiftLeft) || _pressedKeys.Contains(Key.ShiftRight);
 
     public InputBinder()
     {
@@ -71,7 +71,7 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
                         modifiers |= Enum.Parse<ModifierKeys>(parts[i], true);
                 }
 
-                if(key != Key.LastKey)
+                if (key != Key.LastKey)
                     mode[new KeyBinding(key, modifiers)] = rawBinding.Value;
             }
         }
@@ -82,7 +82,7 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
         get
         {
             foreach (var mode in _bindings)
-                yield return(mode.Key, mode.Value.Select(x => (x.Key.ToString(), x.Value)));
+                yield return (mode.Key, mode.Value.Select(x => (x.Key.ToString(), x.Value)));
         }
     }
 
@@ -92,20 +92,24 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
         {
             ModifierKeys m = ModifierKeys.None;
             if (IsShiftPressed) m |= ModifierKeys.Shift;
-            if (IsCtrlPressed)  m |= ModifierKeys.Control;
-            if (IsAltPressed)   m |= ModifierKeys.Alt;
+            if (IsCtrlPressed) m |= ModifierKeys.Control;
+            if (IsAltPressed) m |= ModifierKeys.Alt;
             return m;
         }
     }
 
     static bool IsModifier(Key key)
     {
-        switch(key)
+        switch (key)
         {
-            case Key.LControl: case Key.RControl:
-            case Key.LShift:   case Key.RShift:
-            case Key.LAlt:     case Key.RAlt:
-            case Key.LWin:     case Key.RWin:
+            case Key.LControl:
+            case Key.RControl:
+            case Key.LShift:
+            case Key.RShift:
+            case Key.LAlt:
+            case Key.RAlt:
+            case Key.LWin:
+            case Key.RWin:
                 return true;
             default:
                 return false;
@@ -115,8 +119,12 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
     void OnKeyboard(KeyboardInputEvent e)
     {
         var inputManager = Resolve<IInputManager>();
-        foreach (var keyEvent in e.KeyEvents)
+
+        // e.KeyEvents is IReadOnlyList, so using foreach will allocate an enumerator
+        // ReSharper disable once ForCanBeConvertedToForeach
+        for (var index = 0; index < e.KeyEvents.Count; index++)
         {
+            var keyEvent = e.KeyEvents[index];
             if (!keyEvent.Down)
             {
                 _pressedKeys.Remove(keyEvent.Key);
@@ -147,6 +155,7 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
                 Raise(new LoadMapEvent(_mapId));
                 continue;
             }
+
             if (action == "!loadnextmap")
             {
                 _mapId = MapId.FromUInt32(_mapId.ToUInt32() + 1);
@@ -159,7 +168,7 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
         }
 
         // Handle continuous bindings
-        foreach(var key in _pressedKeys)
+        foreach (var key in _pressedKeys)
         {
             var binding = new KeyBinding(key, Modifiers);
             var mode = _bindings.ContainsKey(inputManager.InputMode) ? inputManager.InputMode : InputMode.Global;
@@ -171,22 +180,22 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
             if (!action.StartsWith('+'))
                 continue;
 
-            var actionEvent = Event.Parse(action.Substring(1), out _);
-            if(actionEvent != null)
+            var actionEvent = Event.Parse(action[1..], out _);
+            if (actionEvent != null)
                 Raise(actionEvent);
         }
     }
 
-/*
-        void OnUpdate(FastClockEvent fastClockEvent)
-        {
-            // TODO: Re-emit any held events
-        }
+    /*
+            void OnUpdate(FastClockEvent fastClockEvent)
+            {
+                // TODO: Re-emit any held events
+            }
 
 
-        public bool GetKey(Key key) { return CurrentlyPressedKeys.Contains(key); }
-        public bool GetKeyDown(Key key) { return NewKeysThisFrame.Contains(key); }
-        public bool GetMouseButton(MouseButton button) { return CurrentlyPressedMouseButtons.Contains(button); }
-        public bool GetMouseButtonDown(MouseButton button) { return NewMouseButtonsThisFrame.Contains(button); }
-        */
+            public bool GetKey(Key key) { return CurrentlyPressedKeys.Contains(key); }
+            public bool GetKeyDown(Key key) { return NewKeysThisFrame.Contains(key); }
+            public bool GetMouseButton(MouseButton button) { return CurrentlyPressedMouseButtons.Contains(button); }
+            public bool GetMouseButtonDown(MouseButton button) { return NewMouseButtonsThisFrame.Contains(button); }
+            */
 }

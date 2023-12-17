@@ -19,8 +19,9 @@ public abstract class UiElement : Component, IUiElement
             return Vector2.Zero;
 
         Vector2 size = Vector2.Zero;
-        foreach (var child in Children)
+        for (var index = 0; index < Children.Count; index++)
         {
+            var child = Children[index];
             if (child is not IUiElement { IsActive: true } childElement)
                 continue;
 
@@ -30,11 +31,15 @@ public abstract class UiElement : Component, IUiElement
             if (childSize.Y > size.Y)
                 size.Y = childSize.Y;
         }
+
         return size;
     }
 
+    // Cached delegates to avoid per-call allocations on higher order functions
     protected delegate int LayoutFunc<in T>(IUiElement element, Rectangle extents, int order, T context);
-    protected static readonly LayoutFunc<LayoutNode> _renderChildDelegate = RenderChild;
+    protected static readonly LayoutFunc<LayoutNode> RenderChildDelegate = RenderChild;
+    protected static readonly LayoutFunc<SelectionContext> SelectChildDelegate = SelectChild;
+
     protected static int RenderChild(IUiElement child, Rectangle extents, int order, LayoutNode parent)
     {
         if (child == null) throw new ArgumentNullException(nameof(child));
@@ -52,8 +57,9 @@ public abstract class UiElement : Component, IUiElement
         if (func == null) throw new ArgumentNullException(nameof(func));
 
         int maxOrder = order;
-        foreach (var child in Children)
+        for (var index = 0; index < Children.Count; index++)
         {
+            var child = Children[index];
             if (child is not IUiElement { IsActive: true } childElement)
                 continue;
 
@@ -68,7 +74,7 @@ public abstract class UiElement : Component, IUiElement
     public virtual int Render(Rectangle extents, int order, LayoutNode parent)
     {
         var node = parent == null ? null : new LayoutNode(parent, this, extents, order);
-        return DoLayout(extents, order, node, _renderChildDelegate);
+        return DoLayout(extents, order, node, RenderChildDelegate);
     }
 
     public virtual int Selection(Rectangle extents, int order, SelectionContext context)

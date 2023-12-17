@@ -92,5 +92,5 @@ public class StatusBar : Dialog
     }
 
     public override int Render(Rectangle extents, int order, LayoutNode parent) =>
-        DoLayout(extents, order, parent, _renderChildDelegate, false);
+        DoLayout(extents, order, parent, RenderChildDelegate, false);
 }

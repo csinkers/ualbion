@@ -15,14 +15,7 @@ public class Pooled<T> where T : class
         _cleanFunc = cleanFunc;
     }
 
-    public T Borrow()
-    {
-        if (_free.TryPop(out var result))
-            return result;
-
-        return _constructor();
-    }
-
+    public T Borrow() => _free.TryPop(out var result) ? result : _constructor();
     public void Return(T instance)
     {
         _cleanFunc?.Invoke(instance);

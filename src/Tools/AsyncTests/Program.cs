@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
@@ -97,9 +98,9 @@ class InputHandler : Component
         });
     }
 
-    public void HandleInputs(Task task)
+    public void HandleInputs()
     {
-        foreach(var item in _queue.GetConsumingEnumerable())
+        foreach (var item in _queue.GetConsumingEnumerable())
             item();
     }
 
@@ -108,7 +109,7 @@ class InputHandler : Component
 
 public static class Program
 {
-    const string TestScript = @"
+    const string testScript = @"
 {
     Chain0:
     misc
@@ -129,9 +130,6 @@ public static class Program
 }
 ";
 
-    static readonly DeterministicTaskScheduler Scheduler = new();
-    static readonly TaskFactory Factory = new(Scheduler);
-
     public static void Main()
     {
         Event.AddEventsFromAssembly(typeof(MiscEvent).Assembly);
@@ -139,14 +137,15 @@ public static class Program
         EventExchange exchange = new();
         var input = new InputHandler();
         exchange.Attach(input);
-        var testLayout = AlbionCompiler.Compile(TestScript);
+        var testLayout = AlbionCompiler.Compile(testScript);
         var testSet = new EventSet(EventSetId.None, testLayout.Events, testLayout.Chains);
         Console.WriteLine("Starting");
         bool done = false;
-        var task = Run(exchange, testSet, 0).ContinueWith(_ =>
-        {
-            done = true;
-        });
+
+        var entryPoint = testSet.Events[testSet.Chains[0]];
+        var task = RunAsync(exchange, entryPoint);
+        task.OnCompleted(() => { done = true; });
+        task.Start();
 
         Console.WriteLine("Started");
 
@@ -155,7 +154,7 @@ public static class Program
             Thread.CurrentThread.Name = "Game Loop Thread";
             while (!done)
             {
-                Scheduler.RunPendingTasks();
+                AlbionTaskScheduler.Default.RunPendingTasks();
                 Thread.Sleep(100);
             }
 
@@ -163,20 +162,14 @@ public static class Program
         });
         thread.Start();
 
-        input.HandleInputs(task);
+        input.HandleInputs();
         thread.Join();
 
         Console.WriteLine("Done");
         Console.ReadLine();
     }
 
-    static Task Run(EventExchange exchange, IEventSet set, int chainId)
-    {
-        var entryPoint = set.Events[set.Chains[chainId]];
-        return Factory.StartNew(() => RunAsync(exchange, entryPoint)).Unwrap();
-    }
-
-    static async Task RunAsync(EventExchange exchange, IEventNode? node)
+    static async AlbionTask RunAsync(EventExchange exchange, IEventNode? node)
     {
         while (node != null)
         {
@@ -192,7 +185,6 @@ public static class Program
             {
                 await RaiseAsync(exchange, asyncEvent);
                 node = node.Next;
-                Console.WriteLine();
                 Console.WriteLine(" => Done");
             }
             else
@@ -202,19 +194,22 @@ public static class Program
                 Console.WriteLine();
             }
         }
+
+        Console.WriteLine("Finished script");
     }
 
-    static Task RaiseAsync(EventExchange exchange, IAsyncEvent e)
+    static AlbionTask RaiseAsync(EventExchange exchange, IAsyncEvent e)
     {
-        var source = new TaskCompletionSource();
-        int waiters = exchange.RaiseAsync(e, null, source.SetResult);
-        return waiters == 0 ? Task.CompletedTask : source.Task;
+        var task = new AlbionTask();
+        int waiters = exchange.RaiseAsync(e, null, task.SetResult);
+        return waiters == 0 ? AlbionTask.CompletedTask : task;
     }
 
-    static Task<bool> RaiseAsyncBool(EventExchange exchange, IAsyncEvent<bool> e)
+    static AlbionTask<bool> RaiseAsyncBool(EventExchange exchange, IAsyncEvent<bool> e)
     {
-        var source = new TaskCompletionSource<bool>();
-        int waiters = exchange.RaiseAsync(e, null, source.SetResult);
-        return waiters == 0 ? Task.FromResult(false) : source.Task;
+        var task = new AlbionTask<bool>();
+        int waiters = exchange.RaiseAsync(e, null, task.SetResult);
+        return waiters == 0 ? AlbionTask<bool>.FromResult(false) : task;
     }
 }
+

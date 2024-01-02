@@ -1,4 +1,9 @@
-﻿namespace AsyncTests;
+﻿/*
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace UAlbion.Api.Eventing;
 
 public class AlbionTaskScheduler
 {
@@ -32,3 +37,4 @@ public class AlbionTaskScheduler
     public void QueueTask(AlbionTask task) => scheduledTasks.Add(task);
     protected IEnumerable<AlbionTask> GetScheduledTasks() => scheduledTasks;
 }
+*/

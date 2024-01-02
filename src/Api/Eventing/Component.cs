@@ -99,11 +99,9 @@ public abstract class Component : IComponent
     /// they have completed handling the event.
     /// </summary>
     /// <param name="event">The event to raise</param>
-    /// <param name="continuation">The continuation to be called by async handlers upon completion</param>
     /// <returns>The number of async handlers which have either already called the continuation or intend to call it in the future.</returns>
-    protected int RaiseAsync(IAsyncEvent @event, Action continuation)
+    protected AlbionTask RaiseAsync(IAsyncEvent @event)
     {
-        if (continuation == null) throw new ArgumentNullException(nameof(continuation));
         var context = Context;
         int promisedCalls = Exchange?.RaiseAsync(@event, this, 
             () =>
@@ -124,11 +122,9 @@ public abstract class Component : IComponent
     /// </summary>
     /// <typeparam name="T">The return value that async handlers should supply upon completion.</typeparam>
     /// <param name="event">The event to raise</param>
-    /// <param name="continuation">The continuation to be called by async handlers upon completion</param>
     /// <returns>The number of async handlers which have either already called the continuation or intend to call it in the future.</returns>
-    protected int RaiseAsync<T>(IAsyncEvent<T> @event, Action<T> continuation)
+    protected AlbionTask<T> RaiseAsync<T>(IAsyncEvent<T> @event)
     {
-        if (continuation == null) throw new ArgumentNullException(nameof(continuation));
         var context = Context;
         int promisedCalls = Exchange?.RaiseAsync(@event, this,
             x =>
@@ -140,6 +136,8 @@ public abstract class Component : IComponent
         Context = context;
         return promisedCalls;
     }
+
+    protected AlbionTask<T> RaiseAsync2<T>(IAsyncEvent<T> @event) => Exchange?.RaiseAsync(@event, this);
 
     /// <summary>
     /// Enqueue an event with the currently subscribed event exchange to be raised

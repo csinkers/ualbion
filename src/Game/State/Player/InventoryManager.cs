@@ -256,14 +256,11 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         return true;
     }
 
-    void GetQuantity(bool discard, IInventory inventory, ItemSlotId slotId, Action<int> continuation)
+    async AlbionTask<int> GetQuantity(bool discard, IInventory inventory, ItemSlotId slotId)
     {
         var slot = inventory.GetSlot(slotId);
         if (slot.Amount == 1)
-        {
-            continuation(1);
-            return;
-        }
+            return 1;
 
         var text = (slot.Item.Type, discard) switch
         {
@@ -277,11 +274,13 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         };
 
         var (sprite, subId, _) = GetSprite(slot.Item);
-        if (RaiseAsync(new ItemQuantityPromptEvent(new StringId(text), sprite, subId, slot.Amount, slotId == ItemSlotId.Gold), continuation) == 0)
+        var promptEvent = new ItemQuantityPromptEvent(new StringId(text), sprite, subId, slot.Amount, slotId == ItemSlotId.Gold);
+        return RaiseAsync<int>(promptEvent);
+        /* if (RaiseAsync(, continuation) == 0)
         {
             ApiUtil.Assert("ItemManager.GetQuantity tried to open a quantity dialog, but no-one was listening for the event.");
-            continuation(0);
-        }
+            return 0;
+        } */
     }
 
     (SpriteId sprite, int subId, int frameCount) GetSprite(ItemId id)
@@ -304,7 +303,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         }
     }
 
-    bool OnSlotEvent(InventorySlotEvent e, Action continuation)
+    async AlbionTask<bool> OnSlotEvent(InventorySlotEvent e)
     {
         var slotId = new InventorySlotId(e.Id, e.SlotId);
         bool redirected = false;

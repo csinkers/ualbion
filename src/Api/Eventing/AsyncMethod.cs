@@ -22,3 +22,6 @@ public delegate bool AsyncMethod<in TEvent>(TEvent e, Action continuation) where
 /// <returns>True if the continuation has been called synchronously during initial handling, or is going to be called in the future.
 /// False if continuation will not be called.</returns>
 public delegate bool AsyncMethod<in TEvent, out TReturn>(TEvent e, Action<TReturn> continuation) where TEvent : IAsyncEvent<TReturn>;
+
+public delegate AlbionTask AlbionAsyncMethod<in TEvent>(TEvent e) where TEvent : IAsyncEvent;
+public delegate AlbionTask<TResult> AlbionAsyncMethod<in TEvent, TResult>(TEvent e) where TEvent : IAsyncEvent<TResult>;

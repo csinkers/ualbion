@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 #if DEBUG
 #endif
@@ -107,11 +108,61 @@ namespace UAlbion.Api.Eventing
             }
         }
 
-        public void Raise<T>(T e, object sender) where T : IEvent => RaiseInternal(e, sender, null);
-        public int RaiseAsync(IAsyncEvent e, object sender, Action continuation) => RaiseInternal(e, sender, continuation);
-        public int RaiseAsync<T>(IAsyncEvent<T> e, object sender, Action<T> continuation) => RaiseInternal(e, sender, continuation);
+        public void Raise<T>(T e, object sender) where T : IEvent => RaiseInternal(e, sender);
+        public async AlbionTask RaiseAsync<T>(T e, object sender) where T : IAsyncEvent => _ = await RaiseAsyncInner<Unit>(e, sender);
+        public AlbionTask<TResult> RaiseAsync<T, TResult>(T e, object sender) where T : IAsyncEvent<TResult> => RaiseAsyncInner<TResult>(e, sender);
+        AlbionTask<TResult> RaiseAsyncInner<TResult>(IEvent e, object sender)
+        {
+            if (e == null) throw new ArgumentNullException(nameof(e));
+            bool verbose = e is IVerboseEvent;
+            long eventId = Interlocked.Increment(ref _nextEventId);
+            string eventText = LogRaise(e, verbose, eventId, sender);
 
-        int RaiseInternal(IEvent e, object sender, object continuation) // This method is performance critical, memory allocations should be avoided etc.
+            List<Handler> handlers = _dispatchLists.Borrow();
+            lock (_syncRoot)
+            {
+#if DEBUG
+                long time = System.Diagnostics.Stopwatch.GetTimestamp();
+                _frameEvents.Add((e, time));
+#endif
+                Collect(handlers, e.GetType());
+            }
+
+            AlbionTask<TResult> task = default;
+
+            foreach (var handler in handlers)
+            {
+                if (sender == handler.Component) continue;
+
+                if (handler is AsyncHandler2<TResult> asyncHandler)
+                {
+                    if (task.IsValid && typeof(TResult) != typeof(Unit))
+                        throw new InvalidOperationException($"Multiple async handlers found for event {e.GetType()}");
+
+                    task = asyncHandler.InvokeAsync(e);
+                }
+                else if (typeof(TResult) == typeof(Unit))
+                {
+                    handler.Invoke(e);
+                    var done = AlbionTask.CompletedTask.UnitTask;
+                    task = Unsafe.As<AlbionTask<Unit>, AlbionTask<TResult>>(ref done);
+                }
+                else
+                {
+                    handler.Invoke(e);
+                }
+            }
+
+            if (!task.IsValid)
+                throw new InvalidOperationException($"Async event {e.GetType()} was not handled");
+
+            LogRaiseEnd(e, verbose, eventId, eventText, handlers.Count);
+            _dispatchLists.Return(handlers);
+
+            return task;
+        }
+
+        void RaiseInternal<TContext>(IEvent e, TContext context, object sender) // This method is performance critical, memory allocations should be avoided etc.
         {
             if (e == null) throw new ArgumentNullException(nameof(e));
             bool verbose = e is IVerboseEvent;
@@ -132,15 +183,12 @@ namespace UAlbion.Api.Eventing
                 Collect(handlers, e.GetType());
             }
 
-            int inProgressHandlers = 0;
             foreach (var handler in handlers)
                 if (sender != handler.Component)
-                    if (handler.Invoke(e, continuation))
-                        inProgressHandlers++;
+                    handler.Invoke(e);
 
             LogRaiseEnd(e, verbose, eventId, eventText, handlers.Count);
             _dispatchLists.Return(handlers);
-            return inProgressHandlers;
         }
 
         string LogRaise(IEvent e, bool verbose, long eventId, object sender)

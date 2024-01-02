@@ -145,7 +145,6 @@ public static class Program
         var entryPoint = testSet.Events[testSet.Chains[0]];
         var task = RunAsync(exchange, entryPoint);
         task.OnCompleted(() => { done = true; });
-        task.Start();
 
         Console.WriteLine("Started");
 
@@ -177,13 +176,13 @@ public static class Program
 
             if (node is IBranchNode branch && node.Event is IAsyncEvent<bool> boolEvent)
             {
-                var result = await RaiseAsyncBool(exchange, boolEvent);
+                var result = await exchange.RaiseAsyncResult(boolEvent, null);
                 node = result ? branch.Next : branch.NextIfFalse;
                 Console.WriteLine($" => {result}");
             }
             else if (node.Event is IAsyncEvent asyncEvent)
             {
-                await RaiseAsync(exchange, asyncEvent);
+                await exchange.RaiseAsync(asyncEvent, null);
                 node = node.Next;
                 Console.WriteLine(" => Done");
             }
@@ -196,20 +195,6 @@ public static class Program
         }
 
         Console.WriteLine("Finished script");
-    }
-
-    static AlbionTask RaiseAsync(EventExchange exchange, IAsyncEvent e)
-    {
-        var task = new AlbionTask();
-        int waiters = exchange.RaiseAsync(e, null, task.SetResult);
-        return waiters == 0 ? AlbionTask.CompletedTask : task;
-    }
-
-    static AlbionTask<bool> RaiseAsyncBool(EventExchange exchange, IAsyncEvent<bool> e)
-    {
-        var task = new AlbionTask<bool>();
-        int waiters = exchange.RaiseAsync(e, null, task.SetResult);
-        return waiters == 0 ? AlbionTask<bool>.FromResult(false) : task;
     }
 }
 

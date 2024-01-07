@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
@@ -65,9 +64,7 @@ public class ContextMenu : Dialog
         if (!keepOpen)
             Close();
 
-        if (option.Event is IAsyncEvent asyncEvent)
-            RaiseAsync(asyncEvent, () => { });
-        else if (option.Event != null)
+        if (option.Event != null)
             Raise(option.Event);
     }
 

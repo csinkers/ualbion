@@ -5,21 +5,21 @@ using System.Runtime.CompilerServices;
 
 namespace UAlbion.Api.Eventing;
 
-public abstract class AlbionTaskCore : ICriticalNotifyCompletion
+public interface IAlbionTaskCore : ICriticalNotifyCompletion
 {
-    public static AlbionTask<Unit> CompletedTask { get; } = new(Unit.V);
-    public static AlbionTask<T> FromResult<T>(T value) => new(value);
-    public abstract void OnCompleted(Action continuation);
-    public abstract void UnsafeOnCompleted(Action continuation);
+    bool IsCompleted { get; }
 }
 
-internal class AlbionTaskCore<T> : AlbionTaskCore
+internal class AlbionTaskCore<T> : IAlbionTaskCore
 {
     object? _continuation;
     T? _result;
 
     public bool IsCompleted { get; private set; }
-    public override void OnCompleted(Action continuation)
+    public AlbionTask<T> Task => new(this);
+    internal int OutstandingCompletions { get; set; }
+
+    public void OnCompleted(Action continuation)
     {
         if (continuation == null) throw new ArgumentNullException(nameof(continuation));
 
@@ -44,7 +44,7 @@ internal class AlbionTaskCore<T> : AlbionTaskCore
         list.Add(continuation);
     }
 
-    public override void UnsafeOnCompleted(Action continuation) => OnCompleted(continuation);
+    public void UnsafeOnCompleted(Action continuation) => OnCompleted(continuation);
 
     public T GetResult()
     {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -51,12 +50,14 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         context.BreakOnReturn = true;
     }
 
-    bool Trigger(TriggerChainEvent e, Action continuation)
+    async AlbionTask Trigger(TriggerChainEvent e)
     {
         // If the event chain is from a map, check if it's already been disabled in the game state
         var game = Resolve<IGameState>();
         if (e.EventSet.Id.Type == AssetType.Map && game.IsChainDisabled(e.EventSet.Id, e.EventSet.GetChainForEvent(e.EntryPoint)))
-            return true;
+        {
+            return;
+        }
 
         var isClockRunning = Resolve<IClock>().IsRunning;
         var firstNode = e.EventSet.Events[e.EntryPoint];
@@ -66,7 +67,6 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
             EventSet = e.EventSet,
             Node = firstNode,
             ClockWasRunning = isClockRunning,
-            CompletionCallback = continuation,
             LastAction = firstNode.Event as ActionEvent
         };
 
@@ -75,8 +75,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
 
         ReadyContext(context);
         _contexts.Add(context);
-        Resume(context);
-        return true;
+        await Resume(context);
     }
 
     void ReadyContext(EventContext context)
@@ -110,6 +109,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
 
     void ResumeChains(ResumeChainsEvent _)
     {
+        /*
         bool ran;
         do
         {
@@ -124,9 +124,10 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
                 }
             }
         } while (ran);
+        */
     }
 
-    void Resume(EventContext context)
+    async AlbionTask Resume(EventContext context)
     {
         if (context.Status != EventContextStatus.Ready)
             return;
@@ -137,107 +138,55 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         while (context.Node != null)
         {
             context.Status = EventContextStatus.Running;
-            if (context.Node is IBranchNode branch && context.Node.Event is IAsyncEvent<bool> boolEvent)
-            {
-                if (HandleBoolEvent(context, boolEvent, branch))
-                {
-                    Context = oldContext;
-                    return;
-                }
-            }
-            else if (context.Node.Event is IAsyncEvent asyncEvent)
-            {
-                if (HandleAsyncEvent(context, asyncEvent))
-                {
-                    Context = oldContext;
-                    return;
-                }
-            }
+            if (context.Node is IBranchNode branch && context.Node.Event is IQueryEvent<bool> boolEvent)
+                await HandleBoolEvent(context, boolEvent, branch);
             else
-            {
-                Raise(context.Node.Event);
-                context.Node = context.Node.Next;
-            }
+                await HandleAsyncEvent(context, context.Node.Event);
         }
 
-        HandleChainCompletion(context);
+        context.Status = EventContextStatus.Completing;
 
-        if (context.Parent != null)
-            Context = context.Parent;
-    }
-
-    void HandleChainCompletion(EventContext context)
-    {
         if (context.ClockWasRunning)
             Raise(StartClockEvent);
 
-        context.Status = EventContextStatus.Completing;
-        context.CompletionCallback?.Invoke();
-        context.Status = EventContextStatus.Complete;
         _contexts.Remove(context);
+
+        if (context.Parent != null)
+            Context = context.Parent;
+
+        context.Status = EventContextStatus.Complete;
     }
 
 #pragma warning disable CA1508 // Avoid dead conditional code
 // context.Status can be modified due to the RaiseAsync calls, but the code analysis isn't figuring it out so
 // it was flagging the "context.Status == Waiting" check as always true.
-    bool HandleAsyncEvent(EventContext context, IAsyncEvent asyncEvent)
+    async AlbionTask HandleAsyncEvent(EventContext context, IEvent asyncEvent)
     {
         context.Status = EventContextStatus.Waiting;
-        int waiting = RaiseAsync(asyncEvent, () =>
-        {
-            context.Node = context.Node?.Next;
-            ReadyContext(context);
-        });
-
-        if (waiting == 0)
-        {
-            ApiUtil.Assert($"Async event {asyncEvent} not acknowledged. Continuing immediately.");
-            context.Node = context.Node.Next;
-            ReadyContext(context);
-        }
-        else if (context.Status == EventContextStatus.Waiting)
-        {
-            return true;
-        }
-
-        // If the continuation was called already then continue iterating.
-        return false;
+        await RaiseAsync(asyncEvent);
+        context.Node = context.Node?.Next;
+        ReadyContext(context);
     }
 
-    bool HandleBoolEvent(EventContext context, IAsyncEvent<bool> boolEvent, IBranchNode branch) // Return value = whether to return.
+    async AlbionTask<bool> HandleBoolEvent(EventContext context, IQueryEvent<bool> boolEvent, IBranchNode branch) // Return value = whether to return.
     {
         context.Status = EventContextStatus.Waiting;
-        int waiting = RaiseAsync(boolEvent, result =>
-        {
+        var result = await RaiseQueryAsync(boolEvent);
+
 #if DEBUG
-            // Info($"if ({context.Node.Event}) => {result}");
+        // Info($"if ({context.Node.Event}) => {result}");
 #endif
-            context.Node = result ? branch.Next : branch.NextIfFalse;
+        context.Node = result ? branch.Next : branch.NextIfFalse;
 
-            // If a non-query event needs to set this it will have to do it itself. This is to allow
-            // things like chest / door events where different combinations of their IAsyncEvent<bool> result 
-            // and the LastEventResult can mean successful opening, exiting the screen without success or a
-            // trap has been triggered.
-            if (boolEvent is QueryEvent) 
-                context.LastEventResult = result;
+        // If a non-query event needs to set this it will have to do it itself. This is to allow
+        // things like chest / door events where different combinations of their IAsyncEvent<bool> result 
+        // and the LastEventResult can mean successful opening, exiting the screen without success or a
+        // trap has been triggered.
+        if (boolEvent is QueryEvent)
+            context.LastEventResult = result;
 
-            ReadyContext(context);
-        });
-
-        if (waiting == 0)
-        {
-            // ApiUtil.Assert($"Async event {boolEvent} not acknowledged. Continuing immediately.");
-            context.Node = context.Node.Next;
-            ReadyContext(context);
-        }
-        else if (context.Status == EventContextStatus.Waiting)
-        {
-            // If the continuation hasn't been called then stop iterating for now and wait for completion.
-            return true;
-        }
-
-        // If the continuation was called already then continue iterating.
-        return false;
+        ReadyContext(context);
+        return result;
     }
 #pragma warning restore CA1508 // Avoid dead conditional code
 

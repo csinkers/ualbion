@@ -44,13 +44,13 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         });
         OnAsync<InventorySwapEvent>(OnSlotEvent);
         OnAsync<InventoryPickupEvent>(OnSlotEvent);
-        OnAsync<InventoryGiveItemEvent>(OnGiveItem);
+        On<InventoryGiveItemEvent>(OnGiveItem);
         OnAsync<InventoryDiscardEvent>(OnDiscard);
         On<SetInventorySlotUiPositionEvent>(OnSetSlotUiPosition);
         On<ActivateItemEvent>(OnActivateItem);
         On<ActivateItemSpellEvent>(OnActivateItemSpell);
-        On<DrinkItemEvent>(OnDrinkItem);
-        On<ReadItemEvent>(OnReadItem);
+        OnAsync<DrinkItemEvent>(OnDrinkItem);
+        OnAsync<ReadItemEvent>(OnReadItem);
         On<ReadSpellScrollEvent>(OnReadSpellScroll);
 
         ItemInHand = new ReadOnlyItemSlot(_hand);
@@ -228,7 +228,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         }
     }
 
-    bool OnGiveItem(InventoryGiveItemEvent e, Action continuation)
+    void OnGiveItem(InventoryGiveItemEvent e)
     {
         var inventory = _getInventory((InventoryId)e.MemberId);
         switch (_hand.Item.Type)
@@ -244,23 +244,21 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
 
                 slot ??= inventory.BackpackSlots.FirstOrDefault(x => x.Item.IsNone);
                 slot?.TransferFrom(_hand, null, _getItem);
-
                 break;
             }
-            default: return false; // Unknown or null
+
+            default: return; // Unknown or null
         }
 
         Update(inventory.Id);
         SetCursor();
-        continuation();
-        return true;
     }
 
-    async AlbionTask<int> GetQuantity(bool discard, IInventory inventory, ItemSlotId slotId)
+    AlbionTask<int> GetQuantity(bool discard, IInventory inventory, ItemSlotId slotId)
     {
         var slot = inventory.GetSlot(slotId);
         if (slot.Amount == 1)
-            return 1;
+            return AlbionTask.FromResult(1);
 
         var text = (slot.Item.Type, discard) switch
         {
@@ -275,7 +273,8 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
 
         var (sprite, subId, _) = GetSprite(slot.Item);
         var promptEvent = new ItemQuantityPromptEvent(new StringId(text), sprite, subId, slot.Amount, slotId == ItemSlotId.Gold);
-        return RaiseAsync<int>(promptEvent);
+        return RaiseQueryAsync(promptEvent);
+
         /* if (RaiseAsync(, continuation) == 0)
         {
             ApiUtil.Assert("ItemManager.GetQuantity tried to open a quantity dialog, but no-one was listening for the event.");
@@ -303,11 +302,10 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         }
     }
 
-    async AlbionTask<bool> OnSlotEvent(InventorySlotEvent e)
+    async AlbionTask OnSlotEvent(InventorySlotEvent e)
     {
         var slotId = new InventorySlotId(e.Id, e.SlotId);
         bool redirected = false;
-        bool complete = false;
 
         if (!DoesSlotAcceptItemInHand(e.Id, e.SlotId))
         {
@@ -316,12 +314,12 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         }
 
         if (slotId.Slot is ItemSlotId.None or ItemSlotId.CharacterBody)
-            return false;
+            return;
 
         Inventory inventory = _getInventory(slotId.Id);
         ItemSlot slot = inventory?.GetSlot(slotId.Slot);
         if (slot == null)
-            return false;
+            return;
 
         var cursorManager = Resolve<ICursorManager>();
         var window = Resolve<IGameWindow>();
@@ -330,34 +328,31 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         switch (GetInventoryAction(slotId))
         {
             case InventoryAction.Pickup:
-            {
-                if (slot.Amount == 1)
                 {
-                    PickupItem(slot, null);
-                    complete = true;
-                }
-                else if (e is InventoryPickupEvent pickup)
-                {
-                    PickupItem(slot, pickup.Amount);
-                    complete = true;
-                }
-                else
-                {
-                    GetQuantity(false, inventory, e.SlotId, quantity =>
+                    if (slot.Amount == 1)
                     {
+                        PickupItem(slot, null);
+                    }
+                    else if (e is InventoryPickupEvent pickup)
+                    {
+                        PickupItem(slot, pickup.Amount);
+                    }
+                    else
+                    {
+                        var quantity = await GetQuantity(false, inventory, e.SlotId);
                         if (quantity > 0)
                             PickupItem(slot, (ushort)quantity);
-
-                        Update(slotId.Id);
-                        SetCursor();
-                        continuation();
-                    });
+                    }
+                    break;
                 }
-                break;
-            }
+
             case InventoryAction.PutDown:
             {
-                if (redirected)
+                if (!redirected)
+                {
+                    slot.TransferFrom(_hand, null, _getItem);
+                }
+                else
                 {
                     var transitionEvent = new LinearItemTransitionEvent(
                         _hand.Item,
@@ -370,23 +365,21 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                     ItemSlot temp = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
                     temp.TransferFrom(_hand, null, _getItem);
                     SetCursor();
-                    RaiseAsync(transitionEvent, () =>
-                    {
-                        slot.TransferFrom(temp, null, _getItem);
-                        Update(slotId.Id);
-                        continuation();
-                    });
+                    await RaiseAsync(transitionEvent);
+
+                    slot.TransferFrom(temp, null, _getItem);
                 }
-                else
-                {
-                    slot.TransferFrom(_hand, null, _getItem);
-                    complete = true;
-                }
+
                 break;
             }
+
             case InventoryAction.Swap:
             {
-                if (redirected)
+                if (!redirected)
+                {
+                    SwapItems(slot);
+                }
+                else
                 {
                     // Original game didn't handle this, but doesn't hurt.
                     var transitionEvent1 = new LinearItemTransitionEvent(
@@ -410,98 +403,77 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                     temp1.TransferFrom(_hand, null, _getItem);
                     temp2.TransferFrom(slot, null, _getItem);
 
-                    RaiseAsync(transitionEvent1, () =>
-                    {
-                        slot.TransferFrom(temp1, null, _getItem);
-                        Update(slotId.Id);
-                        SetCursor();
-                        continuation();
-                    });
+                    var transition1 = RaiseAsync(transitionEvent1);
+                    var transition2 = RaiseAsync(transitionEvent2);
 
-                    RaiseAsync(transitionEvent2, () =>
-                    {
-                        _hand.TransferFrom(temp2, null, _getItem);
-                        _returnItemInHandEvent = new InventorySwapEvent(slot.Id.Id, slot.Id.Slot);
-                        SetCursor();
-                    });
+                    await transition1;
+                    await transition2;
+                    slot.TransferFrom(temp1, null, _getItem);
+                    _hand.TransferFrom(temp2, null, _getItem);
+                    _returnItemInHandEvent = new InventorySwapEvent(slot.Id.Id, slot.Id.Slot);
+                }
 
-                    SetCursor();
-                }
-                else
-                {
-                    SwapItems(slot);
-                    complete = true;
-                }
                 break;
             }
 
             // Shouldn't be possible for this to be a redirect as redirects only happen between body parts and they don't allow stacks.
             case InventoryAction.Coalesce:
-            {
-                if (e is InventoryPickupEvent pickup)
-                    PickupItem(slot, pickup.Amount);
-                else
-                    CoalesceItems(slot);
-                complete = true;
-                break;
-            }
-            case InventoryAction.NoCoalesceFullStack: complete = true; break; // No-op
+                {
+                    if (e is InventoryPickupEvent pickup)
+                        PickupItem(slot, pickup.Amount);
+                    else
+                        CoalesceItems(slot);
+                    break;
+                }
+            case InventoryAction.NoCoalesceFullStack: break; // No-op
         }
 
-        if (complete)
-        {
-            continuation();
-            Update(slotId.Id);
-            SetCursor();
-        }
-
-        return true;
+        Update(slotId.Id);
+        SetCursor();
     }
 
-    bool OnDiscard(InventoryDiscardEvent e, Action continuation)
+    async AlbionTask OnDiscard(InventoryDiscardEvent e)
     {
         var inventory = _getInventory(e.Id);
-        GetQuantity(true, inventory, e.SlotId, quantity =>
+        var quantity = await GetQuantity(true, inventory, e.SlotId);
+
+        if (quantity <= 0)
         {
-            if (quantity <= 0)
-            {
-                continuation();
-                return;
-            }
+            return;
+        }
 
-            var slot = inventory.GetSlot(e.SlotId);
-            ushort itemsToDrop = Math.Min((ushort)quantity, slot.Amount);
+        var slot = inventory.GetSlot(e.SlotId);
+        ushort itemsToDrop = Math.Min((ushort)quantity, slot.Amount);
 
-            var prompt = slot.Item.Type switch
-            {
-                AssetType.Gold => Base.SystemText.Gold_ReallyThrowTheGoldAway,
-                AssetType.Rations => Base.SystemText.Gold_ReallyThrowTheRationsAway,
-                AssetType.Item when itemsToDrop == 1 => Base.SystemText.InvMsg_ReallyThrowThisItemAway,
-                _ => Base.SystemText.InvMsg_ReallyThrowTheseItemsAway,
-            };
+        var prompt = slot.Item.Type switch
+        {
+            AssetType.Gold => Base.SystemText.Gold_ReallyThrowTheGoldAway,
+            AssetType.Rations => Base.SystemText.Gold_ReallyThrowTheRationsAway,
+            AssetType.Item when itemsToDrop == 1 => Base.SystemText.InvMsg_ReallyThrowThisItemAway,
+            _ => Base.SystemText.InvMsg_ReallyThrowTheseItemsAway,
+        };
 
-            RaiseAsync(new YesNoPromptEvent(prompt), response =>
-            {
-                if (!response)
-                {
-                    continuation();
-                    return;
-                }
+        var response = await RaiseQueryAsync(new YesNoPromptEvent(prompt));
 
-                if (!slot.Item.IsNone)
-                {
-                    var maxTransitions = Var(GameVars.Ui.Transitions.MaxDiscardTransitions);
-                    for (int i = 0; i < itemsToDrop && i < maxTransitions; i++)
-                        Raise(new GravityItemTransitionEvent(slot.Item, e.NormX, e.NormY));
-                }
+        if (!response)
+            return;
 
-                slot.Amount -= itemsToDrop;
-                Update(e.Id);
-                SetCursor();
-                continuation();
-            });
-        });
-        return true;
+        if (!slot.Item.IsNone)
+        {
+            var maxTransitions = Var(GameVars.Ui.Transitions.MaxDiscardTransitions);
+            var transitionsToShow = Math.Min(itemsToDrop, maxTransitions);
+            var transitions = new AlbionTask[transitionsToShow];
+
+            for (int i = 0; i < transitionsToShow; i++)
+                transitions[i] = RaiseAsync(new GravityItemTransitionEvent(slot.Item, e.NormX, e.NormY));
+
+            foreach (var transition in transitions)
+                await transition;
+        }
+
+        slot.Amount -= itemsToDrop;
+        Update(e.Id);
+        SetCursor();
     }
 
     void SetCursor()
@@ -638,7 +610,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         Update(e.SlotId.Id);
     }
 
-    void OnDrinkItem(DrinkItemEvent e)
+    async AlbionTask OnDrinkItem(DrinkItemEvent e)
     {
         var inv = _getInventory(e.SlotId.Id);
         var slot = inv.GetSlot(e.SlotId.Slot);
@@ -649,32 +621,30 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         if (item.TypeId != ItemType.Drink)
             return;
 
-        RaiseAsync(new PartyMemberPromptEvent(Base.SystemText.InvMsg_WhoShouldDrinkThis), result =>
-        {
-            if (result == PartyMemberId.None)
-                return;
+        var result = await RaiseQueryAsync(new PartyMemberPromptEvent(Base.SystemText.InvMsg_WhoShouldDrinkThis));
 
-            Raise(new SetContextEvent(ContextType.Subject, result));
-            TriggerItemChain(slot.Item, () =>
-            {
-                slot.Amount--;
-                Update(e.SlotId.Id);
-            });
-        });
+        if (result == PartyMemberId.None)
+            return;
+
+        await RaiseAsync(new SetContextEvent(ContextType.Subject, result));
+        await TriggerItemChain(slot.Item);
+
+        slot.Amount--;
+        Update(e.SlotId.Id);
     }
 
-    void OnReadItem(ReadItemEvent e)
+    AlbionTask OnReadItem(ReadItemEvent e)
     {
         var inv = _getInventory(e.SlotId.Id);
         var slot = inv.GetSlot(e.SlotId.Slot);
         if (slot.Item.Type != AssetType.Item)
-            return;
+            return AlbionTask.CompletedTask;
 
         var item = _getItem(slot.Item);
         if (item.TypeId != ItemType.Document)
-            return;
+            return AlbionTask.CompletedTask;
 
-        TriggerItemChain(item.Id, () => { });
+        return TriggerItemChain(item.Id);
     }
 
     void OnReadSpellScroll(ReadSpellScrollEvent e)
@@ -716,7 +686,6 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
             return;
         }
 
-
         Raise(new LearnSpellEvent(e.SlotId.Id.ToSheetId(), item.Spell));
         Raise(new HoverTextEvent(tf.Format(Base.SystemText.InvMsg_XLearnedTheSpell)));
         
@@ -724,7 +693,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         Update(e.SlotId.Id);
     }
 
-    void TriggerItemChain(ItemId itemId, Action continuation)
+    async AlbionTask TriggerItemChain(ItemId itemId)
     {
         var eventSet = Resolve<IAssetManager>().LoadEventSet(Base.EventSet.InventoryItems);
         foreach (var eventIndex in eventSet.Chains)
@@ -740,12 +709,9 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                 eventIndex,
                 new EventSource(eventSet.Id, TriggerType.Action));
 
-            RaiseAsync(triggerEvent, continuation);
+            await RaiseAsync(triggerEvent);
             return;
         }
-
-        // If no chain was found just continue immediately
-        continuation.Invoke();
     }
 }
 #pragma warning restore CA1506 // 'InventoryManager' is coupled with '111' different types from '23' different namespaces. Rewrite or refactor the code to decrease its class coupling below '96'.

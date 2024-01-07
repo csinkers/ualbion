@@ -20,7 +20,6 @@ public class EventContext
     public IEventSet EventSet { get; init; }
     public ushort EntryPoint { get; init; }
     public bool ClockWasRunning { get; init; }
-    public Action CompletionCallback { get; init; }
 
     public IEventNode Node { get => _node; set { LastNode = _node; _node = value; } }
     public EventSource Source { get; }

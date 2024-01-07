@@ -4,7 +4,7 @@ using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.Events;
 
-public class PartyMemberPromptEvent : GameEvent, IAsyncEvent<PartyMemberId>
+public class PartyMemberPromptEvent : GameEvent, IQueryEvent<PartyMemberId>
 {
     public StringId Prompt { get; }
     public PartyMemberId[] Members { get; }

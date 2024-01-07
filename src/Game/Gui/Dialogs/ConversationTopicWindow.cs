@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UAlbion.Api.Eventing;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
@@ -13,6 +14,7 @@ namespace UAlbion.Game.Gui.Dialogs;
 public class ConversationTopicWindow : ModalDialog
 {
     readonly List<WordId> _currentWords = new();
+    AlbionTaskSource<WordId> _source;
 
     public ConversationTopicWindow(int depth) : base(DialogPositioning.Center, depth)
     {
@@ -24,7 +26,7 @@ public class ConversationTopicWindow : ModalDialog
         });
 
         On<DismissMessageEvent>(_ => OnWordSelected(WordId.None));
-        On<EnterWordEvent>(_ => ShowWordEntryPrompt());
+        OnQueryAsync<EnterWordEvent, WordId>(_ => PromptForWord());
         On<RespondEvent>(e =>
         {
             int index = e.Option - 1;
@@ -35,18 +37,30 @@ public class ConversationTopicWindow : ModalDialog
         });
     }
 
-    public event EventHandler<WordId> WordSelected;
-    void OnWordSelected(WordId e) => WordSelected?.Invoke(this, e);
-
-    public void SetOptions(IDictionary<WordId, WordStatus> words)
+    void OnWordSelected(WordId e)
     {
+        IsActive = false;
+
+        var source = _source;
+        _source = null;
+        source.Complete(e);
+    }
+
+    public AlbionTask<WordId> GetWord(IDictionary<WordId, WordStatus> words)
+    {
+        if (_source != null)
+            throw new InvalidOperationException("Tried to get a word while another request was in progress");
+
         RemoveAllChildren();
+        IsActive = true;
+        _source = new AlbionTaskSource<WordId>();
 
         var elements = new List<IUiElement>();
         var lookup = Resolve<IWordLookup>();
         var language = Var(UserVars.Gameplay.Language);
 
         _currentWords.Clear();
+
         var wordButtons = 
             words
             .OrderBy(x => x.Value)
@@ -75,19 +89,21 @@ public class ConversationTopicWindow : ModalDialog
             elements.Add(new Spacing(0, 3));
         }
 
-        elements.Add(new Button(Base.SystemText.MsgBox_EnterWord).OnClick(ShowWordEntryPrompt));
-
-        AttachChild(new DialogFrame(new Padding(new VerticalStacker(elements), 3))
+        elements.Add(new Button(Base.SystemText.MsgBox_EnterWord).OnClick(() =>
         {
-            Background = DialogFrameBackgroundStyle.MainMenuPattern
-        });
+            var task = PromptForWord();
+            task.OnCompleted(() => OnWordSelected(task.GetResult()));
+        }));
+
+        AttachChild(new DialogFrame(new Padding(new VerticalStacker(elements), 3)) { Background = DialogFrameBackgroundStyle.MainMenuPattern });
+
+        return _source.Task;
     }
 
-    void ShowWordEntryPrompt() =>
-        RaiseAsync(new TextPromptEvent(), wordString =>
-        {
-            var wordLookup = Resolve<IWordLookup>();
-            var wordId = wordLookup.Parse(wordString);
-            OnWordSelected(wordId);
-        });
+    async AlbionTask<WordId> PromptForWord()
+    {
+        var wordString = await RaiseQueryAsync(new TextPromptEvent());
+        var wordLookup = Resolve<IWordLookup>();
+        return wordLookup.Parse(wordString);
+    }
 }

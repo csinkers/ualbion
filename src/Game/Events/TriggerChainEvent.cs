@@ -5,7 +5,7 @@ using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Game.Events;
 
-public class TriggerChainEvent : IAsyncEvent
+public class TriggerChainEvent : IEvent
 {
     public TriggerChainEvent(IEventSet eventSet, ushort entryPoint, EventSource source)
     {

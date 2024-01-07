@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -18,12 +17,12 @@ public class GameClock : ServiceComponent<IClock>, IClock
     readonly PostGameUpdateEvent _postGameUpdateEvent = new();
     readonly FastClockEvent _fastClockEvent = new(1);
 
+    AlbionTaskSource _currentUpdate;
     float _elapsedTimeThisGameFrame;
     int _ticksRemaining;
     int _stoppedFrames;
     int _totalFastTicks;
     float _stoppedMs;
-    Action _pendingContinuation;
     bool _isRunning;
 
     public GameClock()
@@ -34,16 +33,16 @@ public class GameClock : ServiceComponent<IClock>, IClock
         On<EngineUpdateEvent>(OnEngineUpdate);
         On<StartTimerEvent>(StartTimer);
 
-        OnAsync<GameUpdateEvent>((e, c) =>
+        OnAsync<GameUpdateEvent>(e =>
         {
-            if (IsRunning || _pendingContinuation != null)
-                return false;
+            if (IsRunning) { Warn($"Ignoring {e} - clock paused"); return AlbionTask.CompletedTask; } 
+            if (_currentUpdate != null) { Warn($"Ignoring {e} - already running another update event"); return AlbionTask.CompletedTask; }
 
             GameTrace.Log.ClockUpdating(e.Cycles);
-            _pendingContinuation = c;
+            _currentUpdate = new AlbionTaskSource();
             _ticksRemaining = e.Cycles * Var(GameVars.Time.FastTicksPerSlowTick);
             IsRunning = true;
-            return true;
+            return _currentUpdate.Task;
         });
     }
 
@@ -154,8 +153,9 @@ public class GameClock : ServiceComponent<IClock>, IClock
 
         IsRunning = false;
         GameTrace.Log.ClockUpdateComplete();
-        var continuation = _pendingContinuation;
-        _pendingContinuation = null;
-        continuation?.Invoke();
+
+        var currentUpdate = _currentUpdate;
+        _currentUpdate = null;
+        currentUpdate.Complete();
     }
 }

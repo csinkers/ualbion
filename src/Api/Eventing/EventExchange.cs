@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 #if DEBUG
 #endif
@@ -32,7 +31,7 @@ namespace UAlbion.Api.Eventing
 
 #if DEBUG
         // ReSharper disable once CollectionNeverQueried.Local
-        [DiagIgnore] readonly List<(IEvent, long)> _frameEvents = new();
+        [DiagIgnore] readonly List<(object, long)> _frameEvents = new();
         [DiagIgnore] List<IComponent> _sortedSubscribersCached = new();
         public IReadOnlyList<IComponent> SortedSubscribers // Just for debugging
         {
@@ -81,6 +80,173 @@ namespace UAlbion.Api.Eventing
             _queuedEvents.Back.Clear();
         }
 
+        public void Raise(IEvent e, object sender)
+        {
+            _ = RaiseInner(e, sender, 0, (handlers, _) =>
+            {
+                foreach (var handler in handlers)
+                {
+                    if (sender == handler.Component)
+                        continue;
+
+                    switch (handler)
+                    {
+                        case ISyncHandler syncHandler: syncHandler.Invoke(e); break;
+                        case IAsyncHandler asyncHandler: asyncHandler.InvokeAsAsync(e); break; // Any async handlers are started but never awaited
+                        default: throw new InvalidOperationException($"Could not invoke handler {handler}");
+                    }
+                }
+
+                return new AlbionTask<int>(0);
+            });
+        }
+
+        public async AlbionTask RaiseA(IEvent e, object sender) // Waits for all handlers to complete
+        {
+            _ = await RaiseInner(e, sender, 0, (handlers, _) =>
+            {
+                AlbionTaskCore<Unit> core = null;
+
+                foreach (var handler in handlers)
+                {
+                    if (sender == handler.Component)
+                        continue;
+
+                    switch (handler)
+                    {
+                        case ISyncHandler syncHandler: syncHandler.Invoke(e); break;
+                        case IAsyncHandler asyncHandler:
+                            core ??= new AlbionTaskCore<Unit>();
+
+                            var innerTask = asyncHandler.InvokeAsAsync(e);
+                            if (!innerTask.IsCompleted)
+                            {
+                                core.OutstandingCompletions++;
+                                var core1 = core;
+                                innerTask.OnCompleted(() =>
+                                {
+                                    core1.OutstandingCompletions--;
+                                    if (core1.OutstandingCompletions == 0)
+                                        core1.SetResult(Unit.V);
+                                });
+                            }
+
+                            break;
+
+                        default: throw new InvalidOperationException($"Could not invoke handler {handler}");
+                    }
+                }
+
+                return core?.Task ?? AlbionTask.CompletedUnitTask;
+            });
+        }
+
+        public T RaiseQuery<T>(IQueryEvent<T> e, object sender) =>
+            RaiseInner(e, sender, 0, (handlers, _) =>
+            {
+                bool hasResult = false;
+                T result = default;
+
+                foreach (var handler in handlers)
+                {
+                    if (sender == handler.Component)
+                        continue;
+
+                    switch (handler)
+                    {
+                        case ISyncQueryHandler<T> queryHandler:
+                            if (hasResult)
+                                throw new InvalidOperationException("Multiple results found in RaiseQuery call");
+
+                            result = queryHandler.Invoke(e);
+                            hasResult = true;
+                            break;
+
+                        case ISyncHandler syncHandler: syncHandler.Invoke(e); break;
+                        case IAsyncHandler asyncHandler: asyncHandler.InvokeAsAsync(e); break; // Any async handlers are started but never awaited
+                        default: throw new InvalidOperationException($"Could not invoke handler {handler}");
+                    }
+                }
+
+                if (!hasResult)
+                    throw new InvalidOperationException("No result found for RaiseQuery call");
+
+                return new AlbionTask<T>(result);
+            }).GetResult();
+
+        public AlbionTask<T> RaiseQueryA<T>(IQueryEvent<T> e, object sender) =>
+            RaiseInner(e, sender, 0, async (handlers, _) =>
+            {
+                bool hasResult = false;
+                T result = default;
+
+                foreach (var handler in handlers)
+                {
+                    if (sender == handler.Component)
+                        continue;
+
+                    switch (handler)
+                    {
+                        case ISyncQueryHandler<T> queryHandler:
+                            if (hasResult)
+                                throw new InvalidOperationException("Multiple results found in RaiseQuery call");
+
+                            result = queryHandler.Invoke(e);
+                            hasResult = true;
+                            break;
+
+                        case IAsyncQueryHandler<T> queryHandler:
+                            if (hasResult)
+                                throw new InvalidOperationException("Multiple results found in RaiseQuery call");
+
+                            result = await queryHandler.InvokeAsAsync(e);
+                            hasResult = true;
+                            break;
+
+                        case ISyncHandler syncHandler: syncHandler.Invoke(e); break;
+                        case IAsyncHandler asyncHandler: await asyncHandler.InvokeAsAsync(e); break;
+                        default: throw new InvalidOperationException($"Could not invoke handler {handler}");
+                    }
+                }
+
+                if (!hasResult)
+                    throw new InvalidOperationException("No result found for RaiseQuery call");
+
+                return result;
+            });
+
+        async AlbionTask<TResult> RaiseInner<TResult, TContext>( // This method is performance critical, memory allocations should be avoided etc.
+            IEvent e,
+            object sender,
+            TContext context,
+            Func<List<Handler>, TContext, AlbionTask<TResult>> invoker)
+        {
+            if (e == null) throw new ArgumentNullException(nameof(e));
+            bool verbose = e is IVerboseEvent;
+            long eventId = Interlocked.Increment(ref _nextEventId);
+            string eventText = LogRaise(e, verbose, eventId, sender);
+
+            List<Handler> handlers = _dispatchLists.Borrow();
+            lock (_syncRoot)
+            {
+#if DEBUG
+                if (e is BeginFrameEvent) _frameEvents.Clear();
+                else
+                {
+                    long time = System.Diagnostics.Stopwatch.GetTimestamp();
+                    _frameEvents.Add((e, time));
+                }
+#endif
+                Collect(handlers, e.GetType());
+            }
+
+            var result = await invoker(handlers, context);
+
+            LogRaiseEnd(e, verbose, eventId, eventText, handlers.Count);
+            _dispatchLists.Return(handlers);
+            return result;
+        }
+
         void Collect(List<Handler> subscribers, Type eventType) // Must be called from inside lock(_syncRoot)!
         {
             if (!_subscriptions.TryGetValue(eventType, out var tempSubscribers)) 
@@ -106,89 +272,6 @@ namespace UAlbion.Api.Eventing
                     subscribers.Add(subscriber);
                 _dispatchLists.Return(postHandlers);
             }
-        }
-
-        public void Raise<T>(T e, object sender) where T : IEvent => RaiseInternal(e, sender);
-        public async AlbionTask RaiseAsync<T>(T e, object sender) where T : IAsyncEvent => _ = await RaiseAsyncInner<Unit>(e, sender);
-        public AlbionTask<TResult> RaiseAsync<T, TResult>(T e, object sender) where T : IAsyncEvent<TResult> => RaiseAsyncInner<TResult>(e, sender);
-        AlbionTask<TResult> RaiseAsyncInner<TResult>(IEvent e, object sender)
-        {
-            if (e == null) throw new ArgumentNullException(nameof(e));
-            bool verbose = e is IVerboseEvent;
-            long eventId = Interlocked.Increment(ref _nextEventId);
-            string eventText = LogRaise(e, verbose, eventId, sender);
-
-            List<Handler> handlers = _dispatchLists.Borrow();
-            lock (_syncRoot)
-            {
-#if DEBUG
-                long time = System.Diagnostics.Stopwatch.GetTimestamp();
-                _frameEvents.Add((e, time));
-#endif
-                Collect(handlers, e.GetType());
-            }
-
-            AlbionTask<TResult> task = default;
-
-            foreach (var handler in handlers)
-            {
-                if (sender == handler.Component) continue;
-
-                if (handler is AsyncHandler2<TResult> asyncHandler)
-                {
-                    if (task.IsValid && typeof(TResult) != typeof(Unit))
-                        throw new InvalidOperationException($"Multiple async handlers found for event {e.GetType()}");
-
-                    task = asyncHandler.InvokeAsync(e);
-                }
-                else if (typeof(TResult) == typeof(Unit))
-                {
-                    handler.Invoke(e);
-                    var done = AlbionTask.CompletedTask.UnitTask;
-                    task = Unsafe.As<AlbionTask<Unit>, AlbionTask<TResult>>(ref done);
-                }
-                else
-                {
-                    handler.Invoke(e);
-                }
-            }
-
-            if (!task.IsValid)
-                throw new InvalidOperationException($"Async event {e.GetType()} was not handled");
-
-            LogRaiseEnd(e, verbose, eventId, eventText, handlers.Count);
-            _dispatchLists.Return(handlers);
-
-            return task;
-        }
-
-        void RaiseInternal<TContext>(IEvent e, TContext context, object sender) // This method is performance critical, memory allocations should be avoided etc.
-        {
-            if (e == null) throw new ArgumentNullException(nameof(e));
-            bool verbose = e is IVerboseEvent;
-            long eventId = Interlocked.Increment(ref _nextEventId);
-            string eventText = LogRaise(e, verbose, eventId, sender);
-
-            List<Handler> handlers = _dispatchLists.Borrow();
-            lock (_syncRoot)
-            {
-#if DEBUG
-                if (e is BeginFrameEvent) _frameEvents.Clear();
-                else
-                {
-                    long time = System.Diagnostics.Stopwatch.GetTimestamp();
-                    _frameEvents.Add((e, time));
-                }
-#endif
-                Collect(handlers, e.GetType());
-            }
-
-            foreach (var handler in handlers)
-                if (sender != handler.Component)
-                    handler.Invoke(e);
-
-            LogRaiseEnd(e, verbose, eventId, eventText, handlers.Count);
-            _dispatchLists.Return(handlers);
         }
 
         string LogRaise(IEvent e, bool verbose, long eventId, object sender)
@@ -243,7 +326,7 @@ namespace UAlbion.Api.Eventing
         }
 
         public void Subscribe<T>(IComponent component, bool isPostHandler = false) where T : IEvent 
-            => Subscribe(new Handler<T>(e => component.Receive(e, null), component, isPostHandler));
+            => Subscribe(new SyncHandler<T>(e => component.Receive(e, null), component, isPostHandler));
 
         bool CheckForDoubleRegistration(Handler handler, List<Handler> subscribedTypes)
         {

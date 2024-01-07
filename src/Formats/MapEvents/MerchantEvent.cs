@@ -4,7 +4,7 @@ using UAlbion.Formats.Ids;
 namespace UAlbion.Formats.MapEvents;
 
 [Event("inv:merchant", "Opens the inventory screen for the given merchant")]
-public class MerchantEvent : Event, IAsyncEvent
+public class MerchantEvent : Event
 {
     public MerchantEvent(MerchantId merchantId, PartyMemberId member) // If member is None, then open with the current team leader
     {

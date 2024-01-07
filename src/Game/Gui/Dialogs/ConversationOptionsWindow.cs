@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using UAlbion.Api.Eventing;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Text;
@@ -31,22 +31,38 @@ public class ConversationOptionsWindow : ModalDialog
         });
     }
 
-    public void SetOptions(IEnumerable<(IText, int?, Action)> options, IEnumerable<(IText, int?, Action)> standardOptions)
+    public AlbionTask<T> GetOption<T>((IText, BlockId?, T)[] options, (IText, BlockId?, T)[] standardOptions)
     {
         RemoveAllChildren();
 
         _optionElements.Clear();
+
+        var source = new AlbionTaskSource<T>();
+        void AddOption(IText text, BlockId? blockId, T result)
+        {
+            _optionElements.Add(
+                new ConversationOption(
+                    text,
+                    MaxConversationOptionWidth,
+                    blockId,
+                    () =>
+                    {
+                        IsActive = false;
+                        source.Complete(result);
+                    }));
+        }
+
         if (options != null)
-            foreach (var (text, blockId, action) in options)
-                _optionElements.Add(new ConversationOption(text, MaxConversationOptionWidth, blockId, action));
+            foreach (var (text, blockId, result) in options)
+                AddOption(text, blockId, result);
 
         if (standardOptions != null)
         {
             if (_optionElements.Any() && options?.Any() == true)
                 _optionElements.Add(new Spacing(0, 10));
 
-            foreach (var (text, blockId, action) in standardOptions)
-                _optionElements.Add(new ConversationOption(text, MaxConversationOptionWidth, blockId, action));
+            foreach (var (text, blockId, result) in standardOptions)
+                AddOption(text, blockId, result);
         }
 
         _optionElements.Add(new Spacing(MaxConversationOptionWidth, 0));
@@ -56,5 +72,8 @@ public class ConversationOptionsWindow : ModalDialog
 
         var frame = new DialogFrame(content);
         AttachChild(frame);
+        IsActive = true;
+
+        return source.Task;
     }
 }

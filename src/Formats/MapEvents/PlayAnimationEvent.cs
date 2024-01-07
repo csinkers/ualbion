@@ -7,7 +7,7 @@ using UAlbion.Formats.Ids;
 namespace UAlbion.Formats.MapEvents;
 
 [Event("play_anim")] // USED IN SCRIPT
-public class PlayAnimationEvent : MapEvent, IAsyncEvent
+public class PlayAnimationEvent : MapEvent
 {
     PlayAnimationEvent() { }
     public PlayAnimationEvent(VideoId videoId, byte x, byte y, byte unk4, byte unk5, short offsetX, short offsetY)

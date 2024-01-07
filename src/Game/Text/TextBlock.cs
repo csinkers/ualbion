@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Formats.Ids;
-using UAlbion.Game.Gui.Dialogs;
 
 namespace UAlbion.Game.Text;
 
 public class TextBlock // Logical segment of text where all glyphs share the same formatting.
 {
-    public TextBlock() : this((int)Conversation.SpecialBlockId.MainText, string.Empty) { }
-    public TextBlock(int blockId) : this(blockId, string.Empty) { }
-    public TextBlock(string text) : this((int)Conversation.SpecialBlockId.MainText, text) { }
-    public TextBlock(int blockId, string text)
+    public TextBlock() : this(BlockId.MainText, string.Empty) { }
+    public TextBlock(BlockId blockId) : this(blockId, string.Empty) { }
+    public TextBlock(string text) : this(BlockId.MainText, text) { }
+    public TextBlock(BlockId blockId, string text)
     {
         BlockId = blockId;
         Text = text ?? "";
@@ -21,7 +20,7 @@ public class TextBlock // Logical segment of text where all glyphs share the sam
     string _text;
 
     public string Raw { get; set; }
-    public int BlockId { get; }
+    public BlockId BlockId { get; }
     public string Text { get => _text; set => _text = value ?? ""; }
     public InkId InkId { get; set; }
     public TextStyle Style { get; set; }

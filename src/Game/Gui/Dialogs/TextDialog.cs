@@ -1,4 +1,5 @@
 ﻿using System;
+using UAlbion.Api.Eventing;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
@@ -9,6 +10,9 @@ namespace UAlbion.Game.Gui.Dialogs;
 
 public class TextDialog : ModalDialog
 {
+    readonly AlbionTaskSource _source = new();
+    public AlbionTask Task => _source.Task;
+
     public TextDialog(IText text, SpriteId portraitId = default, int depth = 0) : base(DialogPositioning.Top, depth)
     {
         On<DismissMessageEvent>(_ => Close());
@@ -40,8 +44,6 @@ public class TextDialog : ModalDialog
     void Close()
     {
         Remove();
-        Closed?.Invoke(this, EventArgs.Empty);
+        _source.Complete();
     }
-
-    public event EventHandler<EventArgs> Closed;
 }

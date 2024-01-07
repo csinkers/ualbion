@@ -5,7 +5,7 @@ using UAlbion.Formats.Ids;
 namespace UAlbion.Game.Events.Transitions;
 
 [Event("linear_item_transition")]
-public class LinearItemTransitionEvent : Event, IAsyncEvent
+public class LinearItemTransitionEvent : Event
 {
     public LinearItemTransitionEvent(ItemId itemId, int fromX, int fromY, int toX, int toY, float? transitionTime)
     {

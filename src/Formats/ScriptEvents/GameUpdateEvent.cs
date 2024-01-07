@@ -3,7 +3,7 @@
 namespace UAlbion.Formats.ScriptEvents;
 
 [Event("update", "Run the game clock for the specified number of slow-clock cycles")] // USED IN SCRIPT
-public class GameUpdateEvent : Event, IAsyncEvent
+public class GameUpdateEvent : Event
 {
     public GameUpdateEvent(int cycles) => Cycles = cycles;
 

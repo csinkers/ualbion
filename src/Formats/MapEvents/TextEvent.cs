@@ -8,7 +8,7 @@ using UAlbion.Formats.Ids;
 namespace UAlbion.Formats.MapEvents;
 
 [Event("text")] // USED IN SCRIPT
-public class TextEvent : MapEvent, IAsyncEvent // Relies on event chain context to resolve TextId to an enum type / AssetId
+public class TextEvent : MapEvent // Relies on event chain context to resolve TextId to an enum type / AssetId
 {
     TextEvent() { }
     public TextEvent(ushort subId, TextLocation location, SheetId sheetId)

@@ -4,17 +4,17 @@ using UAlbion.Api.Eventing;
 namespace UAlbion.Core.Tests;
 
 public class BasicEvent : Event { }
-public class BasicAsyncEvent : Event, IAsyncEvent { }
-public class BoolAsyncEvent : Event, IAsyncEvent<bool> { }
+public class BasicAsyncEvent : Event { }
+public class BoolAsyncEvent : Event, IQueryEvent<bool> { }
 
 public class BasicComponent : Component
 {
     public int Seen { get; private set; }
     public int Handled { get; private set; }
     public T CallResolve<T>() => TryResolve<T>();
-    public new void Raise<T>(T e) where T : IEvent => base.Raise(e);
-    public new int RaiseAsync(IAsyncEvent e, Action continuation) => base.RaiseAsync(e, continuation);
-    public new int RaiseAsync<T>(IAsyncEvent<T> e, Action<T> continuation) => base.RaiseAsync(e, continuation);
+    public new void Raise(IEvent e) => base.Raise(e);
+    public new AlbionTask RaiseAsync(IEvent e) => base.RaiseAsync(e);
+    public new AlbionTask<T> RaiseQueryAsync<T>(IQueryEvent<T> e) => base.RaiseQueryAsync(e);
     public new void Enqueue(IEvent e) => base.Enqueue(e);
     public void AddHandler<T>(Action<T> handler) where T : IEvent
     {
@@ -26,21 +26,24 @@ public class BasicComponent : Component
         });
     }
 
-    public void AddAsyncHandler<T>(Func<T, Action, bool> handler) where T : IAsyncEvent
+    public void AddAsyncHandler<T>(Func<T, AlbionTask> handler) where T : IEvent
     {
-        OnAsync<T>((e,c) =>
+        OnAsync<T>(async e =>
         {
             Seen++;
-            return handler(e, () => { Handled++; c(); });
+            await handler(e);
+            Handled++;
         });
     }
 
-    public void AddAsyncHandler<TEvent, TReturn>(Func<TEvent, Action<TReturn>, bool> handler) where TEvent : IAsyncEvent<TReturn>
+    public void AddAsyncHandler<TEvent, TReturn>(Func<TEvent, AlbionTask<TReturn>> handler) where TEvent : IQueryEvent<TReturn>
     {
-        OnAsync<TEvent, TReturn>((e,c) =>
+        OnQueryAsync<TEvent, TReturn>(async e =>
         {
             Seen++;
-            return handler(e, x => { Handled++; c(x); });
+            var result = await handler(e);
+            Handled++;
+            return result;
         });
     }
 

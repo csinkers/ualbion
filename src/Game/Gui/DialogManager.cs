@@ -26,43 +26,49 @@ public class DialogManager  : ServiceComponent<IDialogManager>, IDialogManager
 
     public DialogManager()
     {
-        OnAsync<YesNoPromptEvent, bool>((e, c) =>
+        OnQueryAsync<YesNoPromptEvent, bool>(e =>
         {
             var tf = Resolve<ITextFormatter>();
+            var source = new AlbionTaskSource<bool>();
             var dialog = AttachChild(new YesNoMessageBox(e.StringId, MaxLayer + 1, tf));
-            dialog.Closed += (_, _) => c(dialog.Result);
-            return true;
+            dialog.Closed += (_, _) => source.Complete(dialog.Result);
+            return source.Task;
         });
 
-        OnAsync<ItemQuantityPromptEvent, int>((e, c) =>
+        OnQueryAsync<ItemQuantityPromptEvent, int>(e =>
         {
-            AttachChild(new ItemQuantityDialog(MaxLayer + 1, e.Text, e.Icon, e.IconSubId, e.Max, e.UseTenths, c));
-            return true; 
+            var source = new AlbionTaskSource<int>();
+            var dialog = AttachChild(new ItemQuantityDialog(MaxLayer + 1, e.Text, e.Icon, e.IconSubId, e.Max, e.UseTenths));
+            dialog.Closed += (_, _) => source.Complete(dialog.Value);
+            return source.Task; 
         });
 
-        OnAsync<NumericPromptEvent, int>((e, c) =>
+        OnQueryAsync<NumericPromptEvent, int>(e =>
         {
             var tf = Resolve<ITextFormatter>();
+            var source = new AlbionTaskSource<int>();
             var dialog = AttachChild(new NumericPromptDialog(tf.Format(e.Text), e.Min, e.Max, MaxLayer + 1));
-            dialog.Closed += (_, _) => c(dialog.Value);
-            return true;
+            dialog.Closed += (_, _) => source.Complete(dialog.Value);
+            return source.Task; 
         });
 
-        OnAsync<TextPromptEvent, string>((_, c) =>
+        OnQueryAsync<TextPromptEvent, string>(_ =>
         {
+            var source = new AlbionTaskSource<string>();
             var dialog = AttachChild(new TextPromptDialog(MaxLayer + 1));
-            dialog.Closed += (_, _) => c(dialog.Value);
-            return true;
+            dialog.Closed += (_, _) => source.Complete(dialog.Value);
+            return source.Task; 
         });
 
-        OnAsync<PartyMemberPromptEvent, PartyMemberId>((e, c) =>
+        OnQueryAsync<PartyMemberPromptEvent, PartyMemberId>(e =>
         {
+            var source = new AlbionTaskSource<PartyMemberId>();
             var tf = Resolve<ITextFormatter>();
             var party = Resolve<IParty>();
             var members = party.StatusBarOrder.Where(x => e.Members == null || e.Members.Contains(x.Id)).ToArray();
             var dialog = AttachChild(new PartyMemberPromptDialog(tf, MaxLayer + 1, e.Prompt, members));
-            dialog.Closed += (_, _) => c(dialog.Result);
-            return true;
+            dialog.Closed += (_, _) => source.Complete(dialog.Result);
+            return source.Task; 
         });
 
         On<LoadMapPromptEvent>(_ =>

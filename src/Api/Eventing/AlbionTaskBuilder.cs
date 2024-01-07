@@ -37,7 +37,7 @@ public struct AlbionTaskBuilder<TResult>
     /// <typeparam name="TStateMachine">Specifies the type of the state machine.</typeparam>
     /// <param name="stateMachine">The state machine instance, passed by reference.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
+    public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
     {
         if (stateMachine == null) // TStateMachines are generally non-nullable value types, so this check will be elided
             throw new ArgumentNullException(nameof(stateMachine));
@@ -66,6 +66,7 @@ public struct AlbionTaskBuilder<TResult>
     /// <summary>Rethrows immediately, as AlbionTasks are only intended for single-threaded scenarios.</summary>
     /// <param name="exception">The exception to throw.</param>
     public void SetException(Exception exception) => throw exception;
+    public void SetStateMachine(IAsyncStateMachine stateMachine) { }
 
     /// <summary>
     /// Schedules the specified state machine to be pushed forward when the specified awaiter completes.
@@ -78,6 +79,7 @@ public struct AlbionTaskBuilder<TResult>
         where TAwaiter : INotifyCompletion
         where TStateMachine : IAsyncStateMachine
     {
+        _core ??= new AlbionTaskCore<TResult>();
         awaiter.OnCompleted(GetStateMachineBox(ref stateMachine, ref _core).MoveNextAction);
     }
 
@@ -113,6 +115,7 @@ public struct AlbionTaskBuilder<TResult>
         where TAwaiter : ICriticalNotifyCompletion
         where TStateMachine : IAsyncStateMachine
     {
+        _core ??= new AlbionTaskCore<TResult>();
         var box = GetStateMachineBox(ref stateMachine, ref _core);
         awaiter.UnsafeOnCompleted(box.MoveNextAction);
     }
@@ -158,7 +161,7 @@ public struct AlbionTaskBuilder
     /// <typeparam name="TStateMachine">Specifies the type of the state machine.</typeparam>
     /// <param name="stateMachine">The state machine instance, passed by reference.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
+    public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
     {
         if (stateMachine == null) // TStateMachines are generally non-nullable value types, so this check will be elided
             throw new ArgumentNullException(nameof(stateMachine));
@@ -185,6 +188,7 @@ public struct AlbionTaskBuilder
     /// <summary>Rethrows immediately, as AlbionTasks are only intended for single-threaded scenarios.</summary>
     /// <param name="exception">The exception to throw.</param>
     public void SetException(Exception exception) => throw exception;
+    public void SetStateMachine(IAsyncStateMachine stateMachine) { }
 
     /// <summary>
     /// Schedules the specified state machine to be pushed forward when the specified awaiter completes.
@@ -197,6 +201,7 @@ public struct AlbionTaskBuilder
         where TAwaiter : INotifyCompletion
         where TStateMachine : IAsyncStateMachine
     {
+        _core ??= new AlbionTaskCore<Unit>();
         awaiter.OnCompleted(GetStateMachineBox(ref stateMachine, ref _core).MoveNextAction);
     }
 
@@ -232,6 +237,7 @@ public struct AlbionTaskBuilder
         where TAwaiter : ICriticalNotifyCompletion
         where TStateMachine : IAsyncStateMachine
     {
+        _core ??= new AlbionTaskCore<Unit>();
         var box = GetStateMachineBox(ref stateMachine, ref _core);
         awaiter.UnsafeOnCompleted(box.MoveNextAction);
     }

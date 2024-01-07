@@ -4,7 +4,7 @@ using UAlbion.Formats.Ids;
 namespace UAlbion.Formats.ScriptEvents;
 
 [Event("npc_text")] // USED IN SCRIPT
-public class NpcTextEvent : Event, IAsyncEvent
+public class NpcTextEvent : Event
 {
     public NpcTextEvent(NpcSheetId npcId, byte textId)
     {

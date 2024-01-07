@@ -5,7 +5,7 @@ using UAlbion.Formats.Ids;
 namespace UAlbion.Game.Events;
 
 [Event("prompt:numeric")]
-public class NumericPromptEvent : Event, IAsyncEvent<int>
+public class NumericPromptEvent : Event, IQueryEvent<int>
 {
     public NumericPromptEvent(TextId textId, int min, int max) : this(new StringId(textId), min, max) { }
 

@@ -36,7 +36,7 @@ public class SyncHandler<TEvent> : Handler, ISyncHandler where TEvent : IEvent
     [DebuggerHidden] public AlbionTask InvokeAsAsync(IEvent e)
     {
         Callback((TEvent)e);
-        return AlbionTask.CompletedTask;
+        return AlbionTask.Complete;
     }
 }
 
@@ -50,7 +50,7 @@ public class SyncQueryHandler<TEvent, TResult> : Handler, ISyncQueryHandler<TRes
     [DebuggerHidden] AlbionTask IAsyncHandler.InvokeAsAsync(IEvent e) // Ignores result
     {
         Callback((TEvent)e);
-        return AlbionTask.CompletedTask;
+        return AlbionTask.Complete;
     }
 
     [DebuggerHidden] public TResult Invoke(IQueryEvent<TResult> e) => Callback((TEvent)e);
@@ -71,7 +71,7 @@ public class ReceiveOnlyHandler<TEvent> : Handler, ISyncHandler, IAsyncHandler w
     public AlbionTask InvokeAsAsync(IEvent e)
     {
         Callback((TEvent)e);
-        return AlbionTask.CompletedTask;
+        return AlbionTask.Complete;
     }
 }
 

@@ -137,7 +137,7 @@ namespace UAlbion.Api.Eventing
                     }
                 }
 
-                return core?.Task ?? AlbionTask.CompletedUnitTask;
+                return core?.Task ?? AlbionTask.Unit;
             });
         }
 

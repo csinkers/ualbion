@@ -21,7 +21,7 @@ class YesNoMessageBox : ModalDialog
         Closed?.Invoke(this, EventArgs.Empty);
     }
 
-    static IText BuildButtonText(IText text, int blockNumber, TextId fallback, ITextFormatter textFormatter) =>
+    static IText BuildButtonText(IText text, BlockId blockNumber, TextId fallback, ITextFormatter textFormatter) =>
         new TextFilter(x => { x.Alignment = TextAlignment.Center; return true; })
             {
                 Source = 
@@ -39,9 +39,9 @@ class YesNoMessageBox : ModalDialog
         });
 
         var text = textFormatter.Format(stringId);
-        var body = new TextFilter(x => x.BlockId == -1) { Source = text };
-        var yesText = BuildButtonText(text, 0, Base.SystemText.MsgBox_Yes, textFormatter);
-        var noText = BuildButtonText(text, 1, Base.SystemText.MsgBox_No, textFormatter);
+        var body = new TextFilter(x => x.BlockId == BlockId.MainText) { Source = text };
+        var yesText = BuildButtonText(text, (BlockId)10, Base.SystemText.MsgBox_Yes, textFormatter);
+        var noText = BuildButtonText(text, (BlockId)20, Base.SystemText.MsgBox_No, textFormatter);
 
         // TODO: Block0 = yes text, Block1 = no text.
         var elements = new VerticalStacker(

@@ -157,15 +157,15 @@ public class Conversation : Component
             {
                 var text = _tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId(_npc.EventSetId.ToEventText()));
                 DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
-                await _textWindow.Show(text);
-                return true;
+                await _textWindow.Show(text, null);
+                return;
             }
 
             case TextLocation.ConversationOptions:
             {
                 var text = _tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId(_npc.EventSetId.ToEventText()));
                 DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
-                await _textWindow.Show(text);
+                await _textWindow.Show(text, null);
 
                 var options = new List<(IText, int?, Action)>();
                 var blocks = text.GetBlocks().Select(x => x.BlockId).Distinct();

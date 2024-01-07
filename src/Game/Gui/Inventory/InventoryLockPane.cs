@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -94,19 +93,16 @@ public class InventoryLockPane : UiElement
         }
     }
 
-    void CanPick(IPlayer player, Action<bool> continuation)
+    bool CanPick(IPlayer player)
     {
         var skill = player.Effective.Skills.LockPicking;
         if (skill.Current == 0)
-        {
-            continuation(false);
-            return;
-        }
+            return false;
 
         // TODO: Determine the actual probabilities the game uses.
         var baseChance = (100.0f - _lockEvent.PickDifficulty) / 100.0f;
         var adjusted = baseChance * skill.Current;
-        RaiseAsync(new QueryRandomChanceEvent((ushort)adjusted, QueryOperation.GreaterThan, 0), continuation);
+        return RaiseQuery(new QueryRandomChanceEvent((ushort)adjusted, QueryOperation.GreaterThan, 0));
     }
 
     void PickLock()
@@ -119,18 +115,15 @@ public class InventoryLockPane : UiElement
         }
 
         var leader = Resolve<IParty>().Leader;
-        CanPick(leader, x =>
+        if (CanPick(leader))
         {
-            if (x)
-            {
-                Raise(new DescriptionTextEvent(tf.Format(Base.SystemText.Lock_LeaderPickedTheLock)));
-                Raise(new LockOpenedEvent());
-            }
-            else
-            {
-                Raise(new DescriptionTextEvent(tf.Format(Base.SystemText.Lock_LeaderCannotPickThisLock)));
-            }
-        });
+            Raise(new DescriptionTextEvent(tf.Format(Base.SystemText.Lock_LeaderPickedTheLock)));
+            Raise(new LockOpenedEvent());
+        }
+        else
+        {
+            Raise(new DescriptionTextEvent(tf.Format(Base.SystemText.Lock_LeaderCannotPickThisLock)));
+        }
     }
 
     void LockRightClicked()

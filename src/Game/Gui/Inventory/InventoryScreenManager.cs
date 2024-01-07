@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 using UAlbion.Formats.Ids;
@@ -17,13 +16,12 @@ public class InventoryScreenManager : Component
     IEvent _modeEvent = new InventoryOpenEvent(PartyMemberId.None); // Should never be null.
     InventoryPage _page;
     PartyMemberId _activeCharacter;
-    Action<bool> _continuation;
     InventoryScreen _screen;
 
     public InventoryScreenManager()
     {
-        OnAsync<ChestEvent, bool>(OpenChest);
-        OnAsync<DoorEvent, bool>(OpenDoor);
+        OnQueryAsync<ChestEvent, bool>(OpenChest);
+        OnQueryAsync<DoorEvent, bool>(OpenDoor);
         OnAsync<MerchantEvent>(TalkToMerchant);
         On<InventoryOpenEvent>(e => SetDisplayedPartyMember(e.PartyMemberId));
         On<InventorySetPageEvent>(e => _page = e.Page);
@@ -42,30 +40,27 @@ public class InventoryScreenManager : Component
         });
     }
 
-    bool TalkToMerchant(MerchantEvent e, Action continuation)
+    async AlbionTask TalkToMerchant(MerchantEvent e)
     {
         _continuation?.Invoke(false);
         SetMode(e);
         _continuation = _ => continuation();
-        return true;
     }
 
-    bool OpenDoor(DoorEvent e, Action<bool> continuation)
+    async AlbionTask<bool> OpenDoor(DoorEvent e)
     {
-        Raise(new PushSceneEvent(SceneId.Inventory));
+        await RaiseAsync(new PushSceneEvent(SceneId.Inventory));
         _continuation?.Invoke(false);
         SetMode(e);
         _continuation = continuation;
-        return true;
     }
 
-    bool OpenChest(ChestEvent e, Action<bool> continuation)
+    async AlbionTask<bool> OpenChest(ChestEvent e)
     {
-        Raise(new PushSceneEvent(SceneId.Inventory));
+        await RaiseAsync(new PushSceneEvent(SceneId.Inventory));
         _continuation?.Invoke(false);
         SetMode(e);
         _continuation = continuation;
-        return true;
     }
 
     void SetMode(IEvent e)

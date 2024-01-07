@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UAlbion.Formats.Ids;
-using UAlbion.Game.Gui.Dialogs;
 
 namespace UAlbion.Game.Text;
 
@@ -21,7 +20,7 @@ public class DynamicText : IText
             return _lastText;
 
         var sb = new StringBuilder();
-        int blockId = (int)Conversation.SpecialBlockId.MainText;
+        var blockId = BlockId.MainText;
         var words = new List<WordId>();
 
         void WriteWords()

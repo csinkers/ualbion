@@ -8,7 +8,7 @@ public class CustomisedTextFormatter : ITextFormatter
 {
     readonly TextFormatter _formatter;
     readonly IList<(Token, object)> _implicitTokens = new List<(Token, object)>();
-    int? _blockFilter;
+    BlockId? _blockFilter;
 
     public CustomisedTextFormatter(TextFormatter formatter) => _formatter = formatter;
 
@@ -41,5 +41,5 @@ public class CustomisedTextFormatter : ITextFormatter
     public ITextFormatter Justify(){ _implicitTokens.Add((Token.Justify, null)); return this; }
     public ITextFormatter Fat() { _implicitTokens.Add((Token.Fat, null)); return this; }
     public ITextFormatter Ink(InkId id) { _implicitTokens.Add((Token.Ink, id)); return this; }
-    public ITextFormatter Block(int blockNumber) { _blockFilter = blockNumber; return this; }
+    public ITextFormatter Block(BlockId blockId) { _blockFilter = blockId; return this; }
 }

@@ -638,11 +638,11 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         var inv = _getInventory(e.SlotId.Id);
         var slot = inv.GetSlot(e.SlotId.Slot);
         if (slot.Item.Type != AssetType.Item)
-            return AlbionTask.CompletedTask;
+            return AlbionTask.Complete;
 
         var item = _getItem(slot.Item);
         if (item.TypeId != ItemType.Document)
-            return AlbionTask.CompletedTask;
+            return AlbionTask.Complete;
 
         return TriggerItemChain(item.Id);
     }

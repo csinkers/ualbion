@@ -22,7 +22,7 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
     public ITextFormatter Justify() => new CustomisedTextFormatter(this).Justify();
     public ITextFormatter Fat() => new CustomisedTextFormatter(this).Fat();
     public ITextFormatter Ink(InkId id) => new CustomisedTextFormatter(this).Ink(id);
-    public ITextFormatter Block(int blockNumber) => new CustomisedTextFormatter(this).Block(blockNumber);
+    public ITextFormatter Block(BlockId blockId) => new CustomisedTextFormatter(this).Block(blockId);
 
     IEnumerable<(Token, object)> Substitute(
         IAssetManager assets,
@@ -250,8 +250,8 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
                 yield return block;
 
                 sb.Clear();
-                int blockId = token == Token.Block ? (int)p : block.BlockId;
-                block = new TextBlock(blockId)
+                int blockId = token == Token.Block ? (int)p : (int)block.BlockId;
+                block = new TextBlock((BlockId)blockId)
                 {
                     Alignment = block.Alignment,
                     Style = block.Style,

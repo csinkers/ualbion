@@ -6,21 +6,13 @@ using System.Runtime.CompilerServices;
 
 namespace UAlbion.Api.Eventing;
 
-/*
-
-States:
-  Uninitialised _core null, _result default
-  Complete _core null, _result set
-  Pending _core set, _result default
- */
-
 [AsyncMethodBuilder(typeof(AlbionTaskBuilder))]
 public readonly struct AlbionTask : INotifyCompletion, IEquatable<AlbionTask>
 {
-    public static AlbionTask CompletedTask { get; } = new(null);
-    public static AlbionTask<Unit> CompletedUnitTask { get; } = new(Unit.V);
-    public static AlbionTask<bool> CompletedTrueTask { get; } = new(true);
-    public static AlbionTask<bool> CompletedFalseTask { get; } = new(false);
+    public static AlbionTask Complete { get; } = new(null);
+    public static AlbionTask<Unit> Unit { get; } = new(Api.Unit.V);
+    public static AlbionTask<bool> True { get; } = new(true);
+    public static AlbionTask<bool> False { get; } = new(false);
     public static AlbionTask<T> FromResult<T>(T result) => new(result);
 
     readonly IAlbionTaskCore? _core;
@@ -52,16 +44,13 @@ public readonly struct AlbionTask : INotifyCompletion, IEquatable<AlbionTask>
 }
 
 /// <summary>
-/// A much simpler alternative to Task. Handles all async on the main thread,
-/// each frame any queued unblocked AlbionTasks will be progressed. Tasks that
-/// do not return a value should use the Unit type.
+/// A much simpler alternative to Task. Handles all async on the main thread.
 /// </summary>
 [AsyncMethodBuilder(typeof(AlbionTaskBuilder<>))]
 public readonly struct AlbionTask<T> : INotifyCompletion, IEquatable<AlbionTask<T>>
 {
     readonly AlbionTaskCore<T>? _core;
     readonly T? _result;
-
 
     /// <summary>
     /// Create a completed task

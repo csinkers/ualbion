@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
@@ -42,7 +43,7 @@ public class MainMenu : Dialog
 
         elements.AddRange(new IUiElement[]
         {
-            new Button(Base.SystemText.MainMenu_NewGame).OnClick(NewGame),
+            new Button(Base.SystemText.MainMenu_NewGame).OnClick(() => _ = NewGame()),
             new Button(Base.SystemText.MainMenu_LoadGame).OnClick(LoadGame),
         });
 
@@ -64,17 +65,18 @@ public class MainMenu : Dialog
         AttachChild(new DialogFrame(stack));
     }
 
-    void NewGame()
+    async AlbionTask NewGame()
     {
         var e = new YesNoPromptEvent(Base.SystemText.MainMenu_DoYouReallyWantToStartANewGame);
         var exchange = Exchange;
-        RaiseAsync(e, response =>
-        {
-            Attach(exchange);
-            if (response)
-                Raise(new NewGameEvent(Base.Map.TorontoBegin, 31, 76)); // TODO: Move this to config?
-        });
         Detach();
+
+        var response = await RaiseQueryAsync(e);
+        
+        Attach(exchange);
+
+        if (response)
+            await RaiseAsync(new NewGameEvent(Base.Map.TorontoBegin, 31, 76)); // TODO: Move this to config?
     }
 
     void LoadGame()

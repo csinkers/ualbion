@@ -13,6 +13,7 @@ namespace UAlbion.Game.Gui.Inventory;
 
 public class InventoryScreenManager : Component
 {
+    AlbionTaskSource<bool> _source;
     IEvent _modeEvent = new InventoryOpenEvent(PartyMemberId.None); // Should never be null.
     InventoryPage _page;
     PartyMemberId _activeCharacter;
@@ -40,27 +41,30 @@ public class InventoryScreenManager : Component
         });
     }
 
-    async AlbionTask TalkToMerchant(MerchantEvent e)
+    AlbionTask TalkToMerchant(MerchantEvent e)
     {
-        _continuation?.Invoke(false);
+        _source?.Complete(false);
+        _source = new AlbionTaskSource<bool>();
         SetMode(e);
-        _continuation = _ => continuation();
+        return _source.Task.AsUntyped;
     }
 
-    async AlbionTask<bool> OpenDoor(DoorEvent e)
+    AlbionTask<bool> OpenDoor(DoorEvent e)
     {
-        await RaiseAsync(new PushSceneEvent(SceneId.Inventory));
-        _continuation?.Invoke(false);
+        _source?.Complete(false);
+        _source = new AlbionTaskSource<bool>();
+        Raise(new PushSceneEvent(SceneId.Inventory));
         SetMode(e);
-        _continuation = continuation;
+        return _source.Task;
     }
 
-    async AlbionTask<bool> OpenChest(ChestEvent e)
+    AlbionTask<bool> OpenChest(ChestEvent e)
     {
-        await RaiseAsync(new PushSceneEvent(SceneId.Inventory));
-        _continuation?.Invoke(false);
+        _source?.Complete(false);
+        _source = new AlbionTaskSource<bool>();
+        Raise(new PushSceneEvent(SceneId.Inventory));
         SetMode(e);
-        _continuation = continuation;
+        return _source.Task;
     }
 
     void SetMode(IEvent e)
@@ -99,10 +103,7 @@ public class InventoryScreenManager : Component
         scene.Add(_screen);
     }
 
-    void LockOpened()
-    {
-        InventoryClosed(false, true);
-    }
+    void LockOpened() => InventoryClosed(false, true);
 
     void InventoryClosed(bool triggeredTrap, bool unlocked)
     {
@@ -111,9 +112,9 @@ public class InventoryScreenManager : Component
         _screen = null;
         Raise(new PopSceneEvent());
 
-        var continuation = _continuation;
-        _continuation = null;
-        continuation?.Invoke(!triggeredTrap); // TODO: Test with trapped chests / doors
+        var source = _source;
+        _source = null;
         ((EventContext)Context).LastEventResult = unlocked;
+        source?.Complete(!triggeredTrap); // TODO: Test with trapped chests / doors
     }
 }

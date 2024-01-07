@@ -60,20 +60,19 @@ public class Conversation : Component
         _topicsWindow = dialogs.AddDialog(depth => new ConversationTopicWindow(depth) { IsActive = false });
     }
 
+    (IText, BlockId?, BlockId)[] BuildStandardOptions() =>
+        new[]
+        {
+            (_tf.Format(Base.SystemText.Dialog_WhatsYourProfession), (BlockId?)BlockId.Profession, BlockId.Profession),
+            (_tf.Format(Base.SystemText.Dialog_WhatDoYouKnowAbout), BlockId.QueryWord, BlockId.QueryWord),
+            (_tf.Format(Base.SystemText.Dialog_WhatDoYouKnowAboutThisItem), BlockId.QueryItem, BlockId.QueryItem),
+            (_tf.Format(Base.SystemText.Dialog_ItsBeenNiceTalkingToYou), BlockId.Farewell, BlockId.Farewell)
+        };
+
     public async AlbionTask Run()
     {
         await TriggerAction(ActionType.StartDialogue, 0, AssetId.None);
-
-        var setId = _npc.EventSetId.ToEventText();
-        var strings = (IStringSet)Resolve<IModApplier>().LoadAssetCached(setId);
-
-        var standardOptions = new[]
-            {
-                (_tf.Format(Base.SystemText.Dialog_WhatsYourProfession), (BlockId?)BlockId.Profession, BlockId.Profession),
-                (_tf.Format(Base.SystemText.Dialog_WhatDoYouKnowAbout), BlockId.QueryWord, BlockId.QueryWord),
-                (_tf.Format(Base.SystemText.Dialog_WhatDoYouKnowAboutThisItem), BlockId.QueryItem, BlockId.QueryItem),
-                (_tf.Format(Base.SystemText.Dialog_ItsBeenNiceTalkingToYou), BlockId.Farewell, BlockId.Farewell)
-            };
+        var standardOptions = BuildStandardOptions();
 
         for (;;)
         {
@@ -81,60 +80,77 @@ public class Conversation : Component
                 return;
 
             var blockId = await _optionsWindow.GetOption(null, standardOptions);
-            switch (blockId)
-            {
-                case BlockId.Profession:
-                    {
-                        ushort subId = 0;
-                        for (ushort i = 0; i < strings.Count; i++)
-                        {
-                            var s = strings.GetString(new StringId(setId, i));
-                            if (Tokeniser.Tokenise(s).Any(x => x.Token == Token.Block && x.Argument is 0))
-                            {
-                                subId = i;
-                                break;
-                            }
-                        }
-
-                        var text = _tf.Ink(Base.Ink.Yellow).Format(new StringId(setId, subId));
-                        await _textWindow.Show(text, BlockId.Profession);
-                        break;
-                    }
-
-                case BlockId.QueryWord:
-                    {
-                        _topicsWindow.IsActive = true;
-                        var wordId = await _topicsWindow.GetWord(_topics);
-
-                        if (!wordId.IsNone)
-                        {
-                            var lookup = Resolve<IWordLookup>();
-                            foreach (var homonym in lookup.GetHomonyms(wordId))
-                                if (await TriggerWordAction(homonym))
-                                    break;
-                        }
-                        break;
-                    }
-
-                case BlockId.QueryItem:
-                    await _textWindow.Show(new LiteralText("TODO"), null);
-                    break;
-
-                case BlockId.Farewell:
-                    {
-                        if (await TriggerAction(ActionType.FinishDialogue, 0, AssetId.None))
-                            return; // If there was a custom finish-dialogue script then we don't need to show the default message
-
-                        var text = _tf.Ink(Base.Ink.Yellow).Format(Base.SystemText.Dialog_Farewell);
-                        await _textWindow.Show(text, BlockId.MainText);
-                        return;
-                    }
-
-                default:
-                    TriggerLineAction(blockId, textId);
-                    break;
-            }
+            if (await BlockClicked(blockId))
+                break;
         }
+    }
+
+    async AlbionTask<bool> BlockClicked(BlockId blockId) // return true if conversation is complete
+    {
+        switch (blockId)
+        {
+            case BlockId.Profession:
+                {
+                    var setId = _npc.EventSetId.ToEventText();
+                    var strings = (IStringSet)Resolve<IModApplier>().LoadAssetCached(setId);
+
+                    ushort subId = 0;
+                    for (ushort i = 0; i < strings.Count; i++)
+                    {
+                        var s = strings.GetString(new StringId(setId, i));
+                        if (Tokeniser.Tokenise(s).Any(x => x.Token == Token.Block && x.Argument is 0))
+                        {
+                            subId = i;
+                            break;
+                        }
+                    }
+
+                    var text = _tf.Ink(Base.Ink.Yellow).Format(new StringId(setId, subId));
+                    await _textWindow.Show(text, BlockId.Profession);
+                    break;
+                }
+
+            case BlockId.QueryWord:
+                {
+                    _topicsWindow.IsActive = true;
+                    var wordId = await _topicsWindow.GetWord(_topics);
+
+                    if (!wordId.IsNone)
+                    {
+                        var lookup = Resolve<IWordLookup>();
+                        foreach (var homonym in lookup.GetHomonyms(wordId))
+                            if (await TriggerWordAction(homonym))
+                                break;
+                    }
+                    break;
+                }
+
+            case BlockId.QueryItem:
+                await _textWindow.Show(new LiteralText("TODO"), null);
+                break;
+
+            case BlockId.Farewell:
+                {
+                    if (await TriggerAction(ActionType.FinishDialogue, 0, AssetId.None))
+                        return true; // If there was a custom finish-dialogue script then we don't need to show the default message
+
+                    var text = _tf.Ink(Base.Ink.Yellow).Format(Base.SystemText.Dialog_Farewell);
+                    await _textWindow.Show(text, BlockId.MainText);
+                    return true;
+                }
+
+            default:
+                /* TODO
+                 await TriggerAction(
+                    ActionType.DialogueLine,
+                    (byte)blockId,
+                    new AssetId(AssetType.PromptNumber, textId));
+                */
+
+                break;
+        }
+
+        return false;
     }
 
     protected override void Unsubscribed() => Raise(new PopInputModeEvent());
@@ -167,16 +183,25 @@ public class Conversation : Component
                 DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
                 await _textWindow.Show(text, null);
 
-                var options = new List<(IText, int?, Action)>();
-                var blocks = text.GetBlocks().Select(x => x.BlockId).Distinct();
-                foreach (var blockId in blocks.Where(x => x > 0))
-                    options.Add((text, blockId, () => BlockClicked(blockId, mapTextEvent.SubId)));
+                var options = text.GetBlocks()
+                        .Where(x => x.BlockId > 0)
+                        .Select(x => x.BlockId)
+                        .Distinct()
+                        .Select(x => (text, (BlockId?)x, x))
+                        .ToArray();
 
-                var standardOptions = GetStandardOptions(_tf);
-                _optionsWindow.SetOptions(options, standardOptions);
-                _optionsWindow.IsActive = true;
-                continuation();
-                return true;
+                var standardOptions = BuildStandardOptions();
+
+                // foreach (var blockId in blocks.Where(x => x > 0))
+                //     options.Add((text, blockId, () => BlockClicked(blockId, mapTextEvent.SubId)));
+
+                var blockId = await _optionsWindow.GetOption(options, standardOptions);
+                if (await BlockClicked(blockId))
+                {
+                    // TODO: End conversation
+                }
+
+                return;
             }
 
             case TextLocation.ConversationQuery:
@@ -185,32 +210,32 @@ public class Conversation : Component
 
                 DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
 
-                void OnQueryClicked()
-                {
-                    _textWindow.Clicked -= OnQueryClicked;
+                await _textWindow.Show(text, null);
 
-                    var options = new List<(IText, int?, Action)>();
-                    var blocks = text.GetBlocks().Select(x => x.BlockId).Distinct();
-                    foreach (var blockId in blocks.Where(x => x > 0))
-                        options.Add((text, blockId, () => BlockClicked(blockId, mapTextEvent.SubId)));
-                    _optionsWindow.SetOptions(options, null);
-                    _optionsWindow.IsActive = true;
+                var options = text.GetBlocks()
+                    .Where(x => x.BlockId > 0)
+                    .Select(x => x.BlockId)
+                    .Distinct()
+                    .Select(x => (text, (BlockId?)x, x))
+                    .ToArray();
 
-                    continuation();
+                    // foreach (var blockId in blocks.Where(x => x > 0))
+                    //     options.Add((text, blockId, () => BlockClicked(blockId, mapTextEvent.SubId)));
+
+                    var blockId = await _optionsWindow.GetOption(options, null);
+                    if (await BlockClicked(blockId))
+                    {
+                        // TODO: End conversation
+                    }
+                    return;
                 }
 
-                _textWindow.Text = text;
-                _textWindow.Clicked += OnQueryClicked;
-                return true;
-            }
-
             case TextLocation.StandardOptions:
-            {
-                _optionsWindow.SetOptions(null, GetStandardOptions(_tf));
-                _optionsWindow.IsActive = true;
-                continuation();
-                return true;
-            }
+                {
+                    var standardOptions = BuildStandardOptions();
+                    var blockId = await _optionsWindow.GetOption(null, standardOptions);
+                    return;
+                }
         }
 
         // Actions to check: StartDialogue, DialogueLine #,#, DialogueLine WORD, EndDialogue
@@ -223,7 +248,6 @@ public class Conversation : Component
         {
         }
         */
-        return null;
     }
 
     void OnDataChange(IDataChangeEvent e) // Handle item transitions when the party receives items
@@ -249,12 +273,6 @@ public class Conversation : Component
 
         return result;
     }
-
-    AlbionTask<bool> TriggerLineAction(int blockId, int textId) 
-        => TriggerAction(
-            ActionType.DialogueLine,
-            (byte)blockId,
-            new AssetId(AssetType.PromptNumber, textId));
 
     static ushort? FindActionChain(IEventSet set, ActionType type, byte block, AssetId argument)
     {

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats;
@@ -14,42 +13,35 @@ namespace UAlbion.Game;
 
 public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
 {
-    static AsyncMethod<T, bool> Do<T>(Func<T, bool> func) where T : IAsyncEvent<bool> =>
-        (e, continuation) =>
-        {
-            continuation(func(e));
-            return true;
-        };
-
 #pragma warning disable CA1506 // '.ctor' is coupled with '66' different types from '15' different namespaces. Rewrite or refactor the code to decrease its class coupling below '41'.
     public Querier()
     {
-        OnAsync(          Do<QueryVerbEvent>(q => ((EventContext)Context).Source.Trigger == q.TriggerType));
-        OnAsync(          Do<QueryGoldEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Party.TotalGold, q.Argument)));
-        OnAsync(       Do<QueryHasItemEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Party.GetItemCount(q.ItemId), q.Immediate)));
-        OnAsync(Do<QueryHasPartyMemberEvent>(q => Resolve<IGameState>().Party.StatusBarOrder.Any(x => x.Id == q.PartyMemberId)));
-        OnAsync(          Do<QueryHourEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Time.Hour, q.Argument)));
-        OnAsync(        Do<QueryLeaderEvent>(q => Resolve<IGameState>().Party.Leader.Id == q.PartyMemberId));
-        OnAsync(           Do<QueryMapEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().MapId.Id, q.MapId.Id)));
-        OnAsync(Do<QueryPreviousActionResultEvent> (_ => ((EventContext)Context).LastEventResult));
-        OnAsync(   Do<QueryRandomChanceEvent>(q => Resolve<IRandom>().Generate(100) < q.Argument));
-        OnAsync(         Do<QuerySwitchEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().GetSwitch(q.SwitchId) ? 1 : 0, q.Immediate)));
-        OnAsync(         Do<QueryTickerEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().GetTicker(q.TickerId), q.Immediate)));
-        OnAsync(    Do<QueryTriggerTypeEvent>(q => ((EventContext)Context).Source.Trigger == (TriggerType)q.Argument));
-        OnAsync(       Do<QueryUsedItemEvent>(q => ((EventContext)Context).Source.AssetId == (AssetId)q.ItemId));
-        OnAsync(      Do<QueryNpcActiveEvent>(q => Resolve<IGameState>().IsNpcDisabled(MapId.None, q.Immediate)));
-        OnAsync(Do<QueryScriptDebugModeEvent>(_ => false));
+        OnQuery<          QueryVerbEvent, bool>(q => ((EventContext)Context).Source.Trigger == q.TriggerType);
+        OnQuery<          QueryGoldEvent, bool>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Party.TotalGold, q.Argument));
+        OnQuery<       QueryHasItemEvent, bool>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Party.GetItemCount(q.ItemId), q.Immediate));
+        OnQuery<QueryHasPartyMemberEvent, bool>(q => Resolve<IGameState>().Party.StatusBarOrder.Any(x => x.Id == q.PartyMemberId));
+        OnQuery<          QueryHourEvent, bool>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Time.Hour, q.Argument));
+        OnQuery<        QueryLeaderEvent, bool>(q => Resolve<IGameState>().Party.Leader.Id == q.PartyMemberId);
+        OnQuery<           QueryMapEvent, bool>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().MapId.Id, q.MapId.Id));
+        OnQuery<QueryPreviousActionResultEvent, bool> (_ => ((EventContext)Context).LastEventResult);
+        OnQuery<   QueryRandomChanceEvent, bool>(q => Resolve<IRandom>().Generate(100) < q.Argument);
+        OnQuery<         QuerySwitchEvent, bool>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().GetSwitch(q.SwitchId) ? 1 : 0, q.Immediate));
+        OnQuery<         QueryTickerEvent, bool>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().GetTicker(q.TickerId), q.Immediate));
+        OnQuery<    QueryTriggerTypeEvent, bool>(q => ((EventContext)Context).Source.Trigger == (TriggerType)q.Argument);
+        OnQuery<       QueryUsedItemEvent, bool>(q => ((EventContext)Context).Source.AssetId == (AssetId)q.ItemId);
+        OnQuery<      QueryNpcActiveEvent, bool>(q => Resolve<IGameState>().IsNpcDisabled(MapId.None, q.Immediate));
+        OnQuery<QueryScriptDebugModeEvent, bool>(_ => false);
 
-        OnAsync(Do<QueryConsciousEvent> (q =>
+        OnQuery<QueryConsciousEvent, bool>(q =>
         {
             var state = Resolve<IGameState>();
             var member = state.GetSheet(q.PartyMemberId.ToSheet());
             if (member == null)
                 return false;
             return (member.Combat.Conditions & PlayerConditions.UnconsciousMask) == 0;
-        }));
+        });
 
-        OnAsync(Do<QueryEventUsedEvent> (_ =>
+        OnQuery<QueryEventUsedEvent, bool>(_ =>
         {
             var context = (EventContext)Context;
             if (context.EventSet.Id.Type != AssetType.EventSet)
@@ -57,44 +49,45 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
 
             var game = Resolve<IGameState>();
             return game.IsEventUsed(context.EventSet.Id, context.LastAction);
-        }));
+        });
 
-        OnAsync(Do<QueryDemoVersionEvent> (_ =>
+        OnQuery<QueryDemoVersionEvent, bool>(_ =>
         {
             Error("TODO: Query is demo");
             return false;
-        }));
+        });
 
-        OnAsync<PromptPlayerEvent, bool>((q, continuation) =>
+        OnQueryAsync<PromptPlayerEvent, bool>(async q =>
         {
             var context = (EventContext)Context;
             if (context.Source == null)
                 return false;
 
-            return RaiseAsync(new YesNoPromptEvent(new StringId(context.EventSet.StringSetId, q.Argument)), continuation) > 0;
+            var innerEvent = new YesNoPromptEvent(new StringId(context.EventSet.StringSetId, q.Argument));
+            return await RaiseQueryAsync(innerEvent);
         });
 
-        OnAsync<PromptPlayerNumericEvent, bool>((q, continuation) =>
+        OnQueryAsync<PromptPlayerNumericEvent, bool>(async q =>
         {
             var context = (EventContext)Context;
             if (context?.Source == null)
                 return false;
 
-            return RaiseAsync(
-                new NumericPromptEvent(Base.SystemText.MsgBox_EnterNumber, 0, 9999),
-                x => continuation(x == q.Argument)) > 0;
+            var innerEvent = new NumericPromptEvent(Base.SystemText.MsgBox_EnterNumber, 0, 9999);
+            var result = await RaiseQueryAsync(innerEvent);
+            return result == q.Argument;
         });
 
-        OnAsync(Do<QueryChainActiveEvent>(q => !Resolve<IGameState>().IsChainDisabled(q.MapId, q.ChainNum)));
-        OnAsync(Do<QueryNpcActiveOnMapEvent>(q => !Resolve<IGameState>().IsNpcDisabled(q.MapId, q.NpcNum)));
-        OnAsync(Do<QueryNpcXEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Npcs[q.Immediate].X, q.Argument)));
-        OnAsync(Do<QueryNpcYEvent>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Npcs[q.Immediate].Y, q.Argument)));
+        OnQuery<QueryChainActiveEvent, bool>(q => !Resolve<IGameState>().IsChainDisabled(q.MapId, q.ChainNum));
+        OnQuery<QueryNpcActiveOnMapEvent, bool>(q => !Resolve<IGameState>().IsNpcDisabled(q.MapId, q.NpcNum));
+        OnQuery<QueryNpcXEvent, bool>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Npcs[q.Immediate].X, q.Argument));
+        OnQuery<QueryNpcYEvent, bool>(q => FormatUtil.Compare(q.Operation, Resolve<IGameState>().Npcs[q.Immediate].Y, q.Argument));
 
         // TODO
-        OnAsync(Do<QueryUnkCEvent>(_ => false));
-        OnAsync(Do<QueryUnk19Event>(_ => false));
-        OnAsync(Do<QueryUnk1EEvent>(_ => false));
-        OnAsync(Do<QueryUnk21Event>(_ => false));
+        OnQuery<QueryUnkCEvent, bool>(_ => false);
+        OnQuery<QueryUnk19Event, bool>(_ => false);
+        OnQuery<QueryUnk1EEvent, bool>(_ => false);
+        OnQuery<QueryUnk21Event, bool>(_ => false);
     }
 #pragma warning restore CA1506 // '.ctor' is coupled with '66' different types from '15' different namespaces. Rewrite or refactor the code to decrease its class coupling below '41'.
 

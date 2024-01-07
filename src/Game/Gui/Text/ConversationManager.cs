@@ -1,5 +1,4 @@
-﻿using System;
-using UAlbion.Api;
+﻿using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Formats;
@@ -31,32 +30,36 @@ public class ConversationManager : ServiceComponent<IConversationManager>, IConv
             ? context.EventSet.StringSetId
             : Resolve<IMapManager>().Current.MapId.ToMapText();
 
-    bool OnNpcTextEvent(NpcTextEvent e, Action continuation)
+    AlbionTask OnNpcTextEvent(NpcTextEvent e)
     {
         var textEvent = new TextEvent(e.TextId, TextLocation.PortraitLeft2, e.NpcId);
-        return OnBaseTextEvent(textEvent, continuation);
+        return OnBaseTextEvent(textEvent);
     }
 
-    bool OnPartyMemberTextEvent(PartyMemberTextEvent e, Action continuation)
+    AlbionTask OnPartyMemberTextEvent(PartyMemberTextEvent e)
     {
         var textEvent = new TextEvent(e.TextId, TextLocation.PortraitLeft, e.MemberId.ToSheet());
-        return OnBaseTextEvent(textEvent, continuation);
+        return OnBaseTextEvent(textEvent);
     }
 
-    bool OnBaseTextEvent(TextEvent mapTextEvent, Action continuation)
+    async AlbionTask OnBaseTextEvent(TextEvent mapTextEvent)
     {
-        var conversationResult = Conversation?.OnText(mapTextEvent, continuation);
+        AlbionTask? conversationResult = Conversation?.OnText(mapTextEvent); // Check for custom handling in the current conversation context, if any
         if (conversationResult.HasValue)
-            return conversationResult.Value;
+        {
+            await conversationResult.Value;
+            return;
+        }
+
+        // Default handling
 
         var tf = Resolve<ITextFormatter>();
         switch (mapTextEvent.Location)
         {
             case TextLocation.NoPortrait:
                 {
-                    var dialog = AttachChild(new TextDialog(tf.Format(mapTextEvent.ToId(ContextTextSource))));
-                    dialog.Closed += (_, _) => continuation();
-                    return true;
+                    await AttachChild(new TextDialog(tf.Format(mapTextEvent.ToId(ContextTextSource)))).Task;
+                    return;
                 }
 
             case TextLocation.PortraitLeft:
@@ -65,15 +68,13 @@ public class ConversationManager : ServiceComponent<IConversationManager>, IConv
                 {
                     var portraitId = GetPortrait(mapTextEvent.Speaker);
                     var text = tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId(ContextTextSource));
-                    var dialog = AttachChild(new TextDialog(text, portraitId));
-                    dialog.Closed += (_, _) => continuation();
-                    return true;
+                    await AttachChild(new TextDialog(text, portraitId)).Task;
+                    return;
                 }
 
             case TextLocation.QuickInfo:
-                Raise(new DescriptionTextEvent(tf.Format(mapTextEvent.ToId(ContextTextSource))));
-                continuation();
-                return true;
+                await RaiseAsync(new DescriptionTextEvent(tf.Format(mapTextEvent.ToId(ContextTextSource))));
+                return;
 
             case TextLocation.Conversation:
             case TextLocation.ConversationQuery:
@@ -82,12 +83,9 @@ public class ConversationManager : ServiceComponent<IConversationManager>, IConv
                 break; // Handled by Conversation
 
             default:
-                Raise(new DescriptionTextEvent(tf.Format(mapTextEvent.ToId(ContextTextSource)))); // TODO:
-                continuation();
-                return true;
+                await RaiseAsync(new DescriptionTextEvent(tf.Format(mapTextEvent.ToId(ContextTextSource)))); // TODO:
+                return;
         }
-
-        return false;
     }
 
     SpriteId GetPortrait(SheetId id)
@@ -102,7 +100,7 @@ public class ConversationManager : ServiceComponent<IConversationManager>, IConv
         return leader.PortraitId;
     }
 
-    bool StartDialogue(StartDialogueEvent e, Action continuation)
+    async AlbionTask StartDialogue(StartDialogueEvent e)
     {
         var party = Resolve<IParty>();
         var assets = Resolve<IAssetManager>();
@@ -110,42 +108,34 @@ public class ConversationManager : ServiceComponent<IConversationManager>, IConv
         if (npc == null)
         {
             ApiUtil.Assert($"Could not load NPC {e.NpcId}");
-            return false;
+            return;
         }
 
         var wasRunning = Resolve<IClock>().IsRunning;
         if (wasRunning)
-            Raise(new StopClockEvent());
+            await RaiseAsync(new StopClockEvent());
 
         Conversation = AttachChild(new Conversation(party?.Leader.Id ?? Base.PartyMember.Tom, npc));
-        Conversation.Complete += (_, _) =>
-        {
-            Conversation.Remove();
-            Conversation = null;
+        await Conversation.Run();
+        Conversation.Remove();
+        Conversation = null;
 
-            if (wasRunning)
-                Raise(new StartClockEvent());
-
-            continuation();
-        };
-        Conversation.StartDialogue();
-        return true;
+        if (wasRunning)
+            await RaiseAsync(new StartClockEvent());
     }
 
-    bool StartPartyDialogue(StartPartyDialogueEvent e, Action continuation)
+    async AlbionTask StartPartyDialogue(StartPartyDialogueEvent e)
     {
         var assets = Resolve<IAssetManager>();
         var sheet = assets.LoadSheet(e.MemberId.ToSheet());
         if (sheet == null)
         {
             Error($"Could not load NPC info for \"{e.MemberId}\"");
-            continuation();
-            return true;
+            return;
         }
 
         Conversation = AttachChild(new Conversation(Base.PartyMember.Tom, sheet));
-        Conversation.Complete += (_, _) => { Conversation = null; continuation(); };
-        Conversation.StartDialogue();
-        return true;
+        await Conversation.Run();
+        Conversation = null;
     }
 }

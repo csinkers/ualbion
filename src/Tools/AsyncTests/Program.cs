@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
@@ -10,7 +9,7 @@ namespace AsyncTests;
 [Event("misc")] public record MiscEvent : EventRecord;
 [Event("text")] public record TextEvent(
         [property:EventPart("text")] int Text
-    ) : EventRecord, IAsyncEvent;
+    ) : EventRecord;
 
 [Event("yesno")]
 public record PromptYesNoEvent(
@@ -39,22 +38,24 @@ class InputHandler : Component
 
     public InputHandler()
     {
-        OnAsync<TextEvent>((e, c) =>
+        OnAsync<TextEvent>(e =>
         {
             Console.Write($" \"{Strings[e.Text]}\" ");
+            var source = new AlbionTaskSource();
             _queue.Add(() =>
             {
                 Console.ReadKey();
-                c();
+                source.Complete();
             });
 
-            return true;
+            return source.Task;
         });
 
-        OnAsync<PromptYesNoEvent, bool>((e, c) =>
+        OnQueryAsync<PromptYesNoEvent, bool>(e =>
         {
             Console.Write($" \"{Strings[e.Text]}\" Y/N? ");
 
+            var source = new AlbionTaskSource<bool>();
             _queue.Add(() =>
             {
                 for (;;)
@@ -63,23 +64,24 @@ class InputHandler : Component
                     var keyChar = char.ToLowerInvariant(key.KeyChar);
                     if (keyChar == 'y')
                     {
-                        c(true);
+                        source.Complete(true);
                         break;
                     }
 
                     if (keyChar == 'n')
                     {
-                        c(false);
+                        source.Complete(false);
                         break;
                     }
                 }
             });
 
-            return true;
+            return source.Task;
         });
 
-        OnAsync<PromptNumericEvent, bool>((e, c) =>
+        OnQueryAsync<PromptNumericEvent, bool>(e =>
         {
+            var source = new AlbionTaskSource<bool>();
             _queue.Add(() =>
             {
                 for (;;)
@@ -88,13 +90,13 @@ class InputHandler : Component
                     var line = Console.ReadLine();
                     if (int.TryParse(line, out var num))
                     {
-                        c(num == e.value);
+                        source.Complete(num == e.value);
                         break;
                     }
                 }
             });
 
-            return true;
+            return source.Task;
         });
     }
 
@@ -140,14 +142,14 @@ public static class Program
         var testLayout = AlbionCompiler.Compile(testScript);
         var testSet = new EventSet(EventSetId.None, testLayout.Events, testLayout.Chains);
         Console.WriteLine("Starting");
-        bool done = false;
+        // bool done = false;
 
         var entryPoint = testSet.Events[testSet.Chains[0]];
-        var task = RunAsync(exchange, entryPoint);
-        task.OnCompleted(() => { done = true; });
+        _ = RunAsync(exchange, entryPoint);
+        // task.OnCompleted(() => { done = true; });
 
         Console.WriteLine("Started");
-
+/*
         var thread = new Thread(() =>
         {
             Thread.CurrentThread.Name = "Game Loop Thread";
@@ -160,9 +162,10 @@ public static class Program
             input.Complete();
         });
         thread.Start();
+*/
 
         input.HandleInputs();
-        thread.Join();
+        // thread.Join();
 
         Console.WriteLine("Done");
         Console.ReadLine();
@@ -174,23 +177,17 @@ public static class Program
         {
             Console.Write(node.ToString());
 
-            if (node is IBranchNode branch && node.Event is IAsyncEvent<bool> boolEvent)
+            if (node is IBranchNode branch && node.Event is IQueryEvent<bool> boolEvent)
             {
-                var result = await exchange.RaiseAsyncResult(boolEvent, null);
+                var result = await exchange.RaiseQueryA(boolEvent, null);
                 node = result ? branch.Next : branch.NextIfFalse;
                 Console.WriteLine($" => {result}");
             }
-            else if (node.Event is IAsyncEvent asyncEvent)
-            {
-                await exchange.RaiseAsync(asyncEvent, null);
-                node = node.Next;
-                Console.WriteLine(" => Done");
-            }
             else
             {
-                exchange.Raise(node.Event, null);
+                await exchange.RaiseA(node.Event, null);
                 node = node.Next;
-                Console.WriteLine();
+                Console.WriteLine(" => Done");
             }
         }
 

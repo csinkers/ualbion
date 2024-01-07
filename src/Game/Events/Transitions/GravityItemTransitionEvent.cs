@@ -4,7 +4,7 @@ using UAlbion.Formats.Ids;
 namespace UAlbion.Game.Events.Transitions;
 
 [Event("gravity_item_transition")]
-public class GravityItemTransitionEvent : Event, IAsyncEvent
+public class GravityItemTransitionEvent : Event
 {
     public GravityItemTransitionEvent(ItemId itemId, float fromNormX, float fromNormY)
     {

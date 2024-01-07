@@ -6,20 +6,11 @@ namespace UAlbion.Api.Eventing;
 #pragma warning disable CA1040 // Avoid empty interfaces
 public interface IEvent { void Format(IScriptBuilder builder); }
 // ReSharper disable once UnusedTypeParameter
-
-
-// IEvent - any event
-// ISyncEvent - handlers cannot block
-// IAsyncEvent - handlers can block
-// IFirstResultEvent<TResult>
-// IAllResultsEvent<TResult> - returns List<T>
-
-public interface IAsyncEvent<T> : IEvent { }
-public interface IAsyncEvent : IAsyncEvent<Unit> { }
-public interface IHighlightEvent : IEvent { }
-public interface IVerboseEvent : IEvent { }
-public interface ICancellableEvent : IEvent { bool Propagating { get; set; } }
-public interface IBranchingEvent : IAsyncEvent<bool> { }
+public interface IVerboseEvent : IEvent { } // Events which happen too often to show in the console
+public interface ICancellableEvent : IEvent { bool Propagating { get; set; } } // Events where earlier handlers can stop later handlers from running.
+public interface IQueryEvent : IEvent { } // Events where a single result is returned.
+public interface IQueryEvent<TResult> : IQueryEvent { } // Events where a single result is returned.
+public interface IBranchingEvent : IQueryEvent<bool> { }
 
 public interface IEventNode
 {

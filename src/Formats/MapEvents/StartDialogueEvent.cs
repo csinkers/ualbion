@@ -9,7 +9,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("start_dialogue",
     "Initiates a conversation using the given npc id",
     "talk")]
-public class StartDialogueEvent : MapEvent, IAsyncEvent
+public class StartDialogueEvent : MapEvent
 {
     StartDialogueEvent() { }
     public StartDialogueEvent(NpcSheetId npcId) => NpcId = npcId;

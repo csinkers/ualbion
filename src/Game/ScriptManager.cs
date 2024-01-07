@@ -1,5 +1,4 @@
-﻿using System;
-using UAlbion.Api.Eventing;
+﻿using UAlbion.Api.Eventing;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
@@ -17,7 +16,7 @@ public class ScriptManager : Component
         On<DumpScriptEvent>(Dump);
     }
 
-    bool Run(DoScriptEvent doScriptEvent, Action continuation)
+    AlbionTask Run(DoScriptEvent doScriptEvent)
     {
         var assets = Resolve<IAssetManager>();
         var mapManager = Resolve<IMapManager>();
@@ -26,7 +25,7 @@ public class ScriptManager : Component
         if (events == null)
         {
             Error($"Could not load script {doScriptEvent.ScriptId}");
-            return false;
+            return AlbionTask.CompletedTask;
         }
 
         var nodes = new EventNode[events.Count];
@@ -38,7 +37,7 @@ public class ScriptManager : Component
         var set = new ScriptEventSet(doScriptEvent.ScriptId, mapManager.Current.MapId.ToMapText(), nodes);
         var source = new EventSource(mapManager.Current.MapId, TriggerType.Default); // TODO: Is there a better trigger type for this?
         var trigger = new TriggerChainEvent(set, 0, source);
-        return RaiseAsync(trigger, continuation) > 0;
+        return RaiseAsync(trigger);
     }
 
     void Dump(DumpScriptEvent dumpScriptEvent)

@@ -4,7 +4,7 @@ using UAlbion.Formats.Ids;
 namespace UAlbion.Game.Events.Transitions;
 
 [Event("linear_map_item_transition")]
-public class LinearMapItemTransitionEvent : Event, IAsyncEvent
+public class LinearMapItemTransitionEvent : Event
 {
     public LinearMapItemTransitionEvent(ItemId itemId, int x, int y, float? transitionTime)
     {

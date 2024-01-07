@@ -1,5 +1,4 @@
-﻿using System;
-using UAlbion.Api.Eventing;
+﻿using UAlbion.Api.Eventing;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 
@@ -14,12 +13,13 @@ public class VideoManager : Component
         On<StopAnimEvent>(Stop);
     }
 
-    bool Play(PlayAnimationEvent e, Action continuation)
+    AlbionTask Play(PlayAnimationEvent e)
     {
-        var video = AttachChild(new Video(e.VideoId, false)).OnComplete(continuation);
+        var source = new AlbionTaskSource();
+        AttachChild(new Video(e.VideoId, false)).OnComplete(source.Complete);
         //var map = Resolve<IMapManager>().Current;
         //video.Position = new Vector3(e.X, e.Y, 0) * map.TileSize;
-        return true;
+        return source.Task;
     }
 
     void Start(StartAnimEvent obj)

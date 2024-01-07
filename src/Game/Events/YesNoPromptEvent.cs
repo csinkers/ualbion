@@ -5,7 +5,7 @@ using UAlbion.Formats.Ids;
 namespace UAlbion.Game.Events;
 
 [Event("prompt:yes_no")]
-public class YesNoPromptEvent : Event, IAsyncEvent<bool>, IVerboseEvent
+public class YesNoPromptEvent : Event, IQueryEvent<bool>, IVerboseEvent
 {
     public YesNoPromptEvent(TextId textId) => StringId = new StringId(textId);
 

@@ -102,8 +102,19 @@ public class ComponentTests
 
         c1.AddHandler<BoolAsyncEvent>(_ => { });
         c1.AddHandler<BasicAsyncEvent>(_ => { });
-        c2.AddAsyncHandler<BasicAsyncEvent>((_, c) => { pending2.Enqueue(c); return true; });
-        c3.AddAsyncHandler<BoolAsyncEvent, bool>((_, c) => { pending3.Enqueue(c); return true; });
+        c2.AddAsyncHandler<BasicAsyncEvent>(_ =>
+        {
+            var source = new AlbionTaskSource();
+            pending2.Enqueue(source.Complete);
+            return source.Task;
+        });
+
+        c3.AddAsyncHandler<BoolAsyncEvent, bool>(_ =>
+        {
+            var source = new AlbionTaskSource<bool>();
+            pending3.Enqueue(source.Complete);
+            return source.Task;
+        });
 
         void Check(int seen1, int seen2, int seen3, int handled1, int handled2, int handled3)
         {
@@ -150,7 +161,7 @@ public class ComponentTests
 
         void PlainContinuation() => total++;
 
-        Assert.Equal(1, ee.RaiseAsync(boolEvent, this, BoolContinuation)); // 1 async handler, 1 sync
+        Assert.Equal(1, ee.RaiseA(boolEvent, this, BoolContinuation)); // 1 async handler, 1 sync
         Check(2, 0, 2, 2, 0, 1);
 
         pending3.Dequeue()(true);
@@ -158,7 +169,7 @@ public class ComponentTests
         Assert.Equal(1, total);
         Assert.Equal(1, totalTrue);
 
-        Assert.Equal(1, ee.RaiseAsync(boolEvent, this, BoolContinuation)); // 1 async handler, 1 sync
+        Assert.Equal(1, ee.RaiseA(boolEvent, this, BoolContinuation)); // 1 async handler, 1 sync
         Check(3, 0, 3, 3, 0, 2);
         pending3.Dequeue()(false);
         Assert.Equal(2, total);

@@ -1,5 +1,4 @@
-﻿using System;
-using UAlbion.Api.Eventing;
+﻿using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
@@ -9,15 +8,16 @@ namespace UAlbion.Game.Combat;
 public class CombatClock : Component
 {
     readonly CombatClockEvent _event = new();
+    readonly FastClockEvent _fastClockEvent = new(1);
     int _ticks;
     int _combatTicks;
 
+    AlbionTaskSource _currentUpdate;
     float _elapsedTimeThisGameFrame;
     int _ticksRemaining;
     int _stoppedFrames;
     int _totalFastTicks;
     float _stoppedMs;
-    Action _pendingContinuation;
     bool _isRunning;
 
     public CombatClock()
@@ -26,16 +26,16 @@ public class CombatClock : Component
         On<StopCombatClockEvent>(_ => IsRunning = false);
         On<EngineUpdateEvent>(OnEngineUpdate);
 
-        OnAsync<CombatUpdateEvent>((e, c) =>
+        OnAsync<CombatUpdateEvent>(e =>
         {
-            if (IsRunning || _pendingContinuation != null)
-                return false;
+            if (IsRunning) { Warn($"Ignoring {e} - clock paused"); return AlbionTask.CompletedTask; } 
+            if (_currentUpdate != null) { Warn($"Ignoring {e} - already running another update event"); return AlbionTask.CompletedTask; }
 
             GameTrace.Log.CombatClockUpdating(e.Cycles);
-            _pendingContinuation = c;
+            _currentUpdate = new AlbionTaskSource();
             _ticksRemaining = e.Cycles * Var(GameVars.Time.FastTicksPerSlowTick);
             IsRunning = true;
-            return true;
+            return _currentUpdate.Task;
         });
     }
 
@@ -102,7 +102,7 @@ public class CombatClock : Component
     void RaiseTick()
     {
         GameTrace.Log.FastTick(_totalFastTicks++);
-        Raise(new FastClockEvent(1));
+        Raise(_fastClockEvent);
         if (_ticksRemaining <= 0)
             return;
 
@@ -112,8 +112,9 @@ public class CombatClock : Component
 
         IsRunning = false;
         GameTrace.Log.ClockUpdateComplete();
-        var continuation = _pendingContinuation;
-        _pendingContinuation = null;
-        continuation?.Invoke();
+
+        var currentUpdate = _currentUpdate;
+        _currentUpdate = null;
+        currentUpdate.Complete();
     }
 }

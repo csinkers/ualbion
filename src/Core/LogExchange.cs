@@ -38,10 +38,38 @@ public class LogExchange : ILogExchange
         _exchange = null;
     }
 
+    async AlbionTask FireEvent(IEvent e)
+    {
+        switch (e)
+        {
+            case IQueryEvent<bool> boolEvent:
+                {
+                    var result = await _exchange.RaiseQueryA(boolEvent, this);
+                    Console.WriteLine($"{boolEvent}: {result}");
+                    break;
+                }
+
+            case IQueryEvent<int> intEvent:
+                {
+                    var result = await _exchange.RaiseQueryA(intEvent, this);
+                    Console.WriteLine($"{intEvent}: {result}");
+                    break;
+                }
+
+            default:
+                var task = _exchange.RaiseA(e, this);
+                if (!task.IsCompleted)
+                {
+                    task.OnCompleted(() => Console.WriteLine($"[Completed {e}]"));
+                }
+
+                break;
+        }
+    }
+
     public void Receive(IEvent e, object sender)
     {
         if (e == null) throw new ArgumentNullException(nameof(e));
-        bool highlight = e is IHighlightEvent;
         switch(e)
         {
             case BeginFrameEvent _:
@@ -50,18 +78,7 @@ public class LogExchange : ILogExchange
 #pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
-                        switch (queuedEvent)
-                        {
-                            case IAsyncEvent<bool> boolEvent:
-                                _exchange.RaiseAsync(boolEvent, this, x => { Console.WriteLine($"{boolEvent}: {x}"); });
-                                break;
-                            case IAsyncEvent<int> intEvent:
-                                _exchange.RaiseAsync(intEvent, this, x => { Console.WriteLine($"{intEvent}: {x}"); });
-                                break;
-                            default:
-                                _exchange.Raise(queuedEvent, this);
-                                break;
-                        }
+                        _ = FireEvent(queuedEvent);
                     }
                     catch (Exception exception) { Console.WriteLine("Error: {0}", exception.Message); }
 #pragma warning restore CA1031 // Do not catch general exception types
@@ -135,13 +152,13 @@ public class LogExchange : ILogExchange
 
             default:
             {
-                if (sender == this || (!highlight && _logLevel > LogLevel.Info))
+                if (sender == this || _logLevel > LogLevel.Info)
                     return;
 
                 Log?.Invoke(this, new LogEventArgs
                 {
                     Time = DateTime.Now,
-                    Color = highlight ? ConsoleColor.Cyan : ConsoleColor.Gray,
+                    Color = ConsoleColor.Gray,
                     Nesting = _exchange.Nesting,
                     Message = e.ToString()
                 });

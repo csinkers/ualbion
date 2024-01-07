@@ -8,7 +8,7 @@ using UAlbion.Formats.Ids;
 namespace UAlbion.Formats.MapEvents;
 
 [Event("do_script")]
-public class DoScriptEvent : MapEvent, IAsyncEvent
+public class DoScriptEvent : MapEvent
 {
     DoScriptEvent() { }
     public DoScriptEvent(ScriptId scriptId) => ScriptId = scriptId;

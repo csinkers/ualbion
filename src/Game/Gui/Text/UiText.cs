@@ -17,7 +17,7 @@ public class UiText : UiElement
     readonly IText _source;
     Rectangle _lastExtents = UiConstants.UiExtents; // Initial GetSize should give the constraint-free dimensions.
     int _lastVersion;
-    int? _blockFilter;
+    BlockId? _blockFilter;
     int _totalHeight;
     int _scrollOffset;
     bool _isScrollable;
@@ -42,8 +42,8 @@ public class UiText : UiElement
     public override string ToString() => $"UiText source:\"{_source}\"";
     // public UiText Source(IText source) { _source = source; _lastVersion = 0; return this; }
     public UiText Scrollable() { _isScrollable = true; return this; }
-    public UiText Filter(int? filter) { _blockFilter = filter; return this; }
-    public int? BlockFilter
+    public UiText Filter(BlockId? filter) { _blockFilter = filter; return this; }
+    public BlockId? BlockFilter
     {
         get => _blockFilter;
         set

@@ -3,6 +3,6 @@
 namespace UAlbion.Game.Events;
 
 [Event("prompt:text")]
-public class TextPromptEvent : Event, IAsyncEvent<string>
+public class TextPromptEvent : Event, IQueryEvent<string>
 {
 }

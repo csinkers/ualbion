@@ -9,8 +9,10 @@ namespace UAlbion.Game.Gui.Inventory;
 
 public class ItemQuantityDialog : ModalDialog
 {
-    readonly Action<int> _continuation;
     int _quantity = 1;
+
+    public event EventHandler<EventArgs> Closed;
+    public int Value { get; private set; }
 
     /*---------------------------------------------\
     |/--------\2/---------------------------------\|^5
@@ -23,10 +25,9 @@ public class ItemQuantityDialog : ModalDialog
     |    [<] [=======[  3  ]==============] [>]    |
     |                   [    OK    ]   ^4          |
     \---------------------------------------------*/ //^5
-    public ItemQuantityDialog(int depth, StringId stringId, SpriteId id, int subId, int max, bool useTenths, Action<int> continuation)
+    public ItemQuantityDialog(int depth, StringId stringId, SpriteId id, int subId, int max, bool useTenths)
         : base(DialogPositioning.Center, depth)
     {
-        _continuation = continuation;
         IUiElement itemPic = new UiSpriteElement(id) { SubId = subId }; 
         var topStack = new HorizontalStacker(
             new NonGreedy(new GroupingFrame(itemPic)),
@@ -57,6 +58,7 @@ public class ItemQuantityDialog : ModalDialog
     void Close()
     {
         Remove();
-        _continuation(_quantity);
+        Value = _quantity;
+        Closed?.Invoke(this, EventArgs.Empty);
     }
 }

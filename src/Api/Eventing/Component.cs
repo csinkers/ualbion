@@ -89,8 +89,10 @@ public abstract class Component : IComponent
     /// Raise an event via the currently subscribed event exchange (if subscribed), and
     /// distribute it to all components that have registered a handler.
     /// </summary>
-    /// <param name="event">The event to raise</param>
-    protected void Raise<T>(T @event) where T : IEvent => Exchange?.Raise(@event, this);
+    /// <param name="e">The event to raise</param>
+    protected void Raise(IEvent e) => _ = RaiseAsync(e);
+
+    protected T RaiseQuery<T>(IQueryEvent<T> e) => Exchange.RaiseQuery(e, this);
 
     /// <summary>
     /// Raise an event via the currently subscribed event exchange (if subscribed), and
@@ -98,21 +100,9 @@ public abstract class Component : IComponent
     /// have registered an async handler, they can call the continuation function to indicate
     /// they have completed handling the event.
     /// </summary>
-    /// <param name="event">The event to raise</param>
+    /// <param name="e">The event to raise</param>
     /// <returns>The number of async handlers which have either already called the continuation or intend to call it in the future.</returns>
-    protected AlbionTask RaiseAsync(IAsyncEvent @event)
-    {
-        var context = Context;
-        int promisedCalls = Exchange?.RaiseAsync(@event, this, 
-            () =>
-            {
-                Context = context;
-                continuation();
-            }) ?? 0;
-
-        Context = context;
-        return promisedCalls;
-    }
+    protected AlbionTask RaiseAsync(IEvent e) => Exchange.RaiseA(e, this);
 
     /// <summary>
     /// Raise an event via the currently subscribed event exchange (if subscribed), and
@@ -121,51 +111,37 @@ public abstract class Component : IComponent
     /// they have completed handling the event.
     /// </summary>
     /// <typeparam name="T">The return value that async handlers should supply upon completion.</typeparam>
-    /// <param name="event">The event to raise</param>
+    /// <param name="e">The event to raise</param>
     /// <returns>The number of async handlers which have either already called the continuation or intend to call it in the future.</returns>
-    protected AlbionTask<T> RaiseAsync<T>(IAsyncEvent<T> @event)
-    {
-        var context = Context;
-        int promisedCalls = Exchange?.RaiseAsync(@event, this,
-            x =>
-            {
-                Context = context;
-                continuation(x);
-            }) ?? 0;
-
-        Context = context;
-        return promisedCalls;
-    }
-
-    protected AlbionTask<T> RaiseAsync2<T>(IAsyncEvent<T> @event) => Exchange?.RaiseAsync(@event, this);
+    protected AlbionTask<T> RaiseQueryAsync<T>(IQueryEvent<T> e) => Exchange.RaiseQueryA(e, this);
 
     /// <summary>
     /// Enqueue an event with the currently subscribed event exchange to be raised
     /// after any currently processing synchronous events have completed.
     /// </summary>
-    /// <param name="event"></param>
-    protected void Enqueue(IEvent @event) => Exchange?.Enqueue(@event, this);
+    /// <param name="e"></param>
+    protected void Enqueue(IEvent e) => Exchange?.Enqueue(e, this);
 
     /// <summary>
     /// Distribute a cancellable event to each target in turn until the event is cancelled.
     /// </summary>
     /// <typeparam name="T">The target type</typeparam>
-    /// <param name="event">The event to distribute</param>
+    /// <param name="e">The event to distribute</param>
     /// <param name="targets">The targets to distribute the event to</param>
     /// <param name="projection">A function that maps from the target type to its associated component which will receive the event</param>
     /// <exception cref="ArgumentNullException"></exception>
-    protected void Distribute<T>(ICancellableEvent @event, List<T> targets, Func<T, IComponent> projection)
+    protected void Distribute<T>(ICancellableEvent e, List<T> targets, Func<T, IComponent> projection)
     {
-        if (@event == null) throw new ArgumentNullException(nameof(@event));
+        if (e == null) throw new ArgumentNullException(nameof(e));
         if (targets == null) throw new ArgumentNullException(nameof(targets));
         if (projection == null) throw new ArgumentNullException(nameof(projection));
 
-        @event.Propagating = true;
+        e.Propagating = true;
         foreach (var target in targets)
         {
-            if (!@event.Propagating) break;
+            if (!e.Propagating) break;
             var component = projection(target);
-            component?.Receive(@event, this);
+            component?.Receive(e, this);
         }
     }
 
@@ -209,31 +185,36 @@ public abstract class Component : IComponent
     /// Add an event handler callback to be called when the relevant event
     /// type is raised by other components.
     /// </summary>
-    /// <typeparam name="T">The event type to handle</typeparam>
+    /// <typeparam name="TEvent">The event type to handle</typeparam>
     /// <param name="callback">The function to call when the event is raised</param>
-    protected void On<T>(Action<T> callback) where T : IEvent =>
-        OnCore<T, Action<T>>(callback, (c, x) => new Handler<T>(c, x, false));
-
-    /// <summary>
-    /// Add an event handler callback to be called when the relevant event
-    /// type is raised by other components.
-    /// </summary>
-    /// <typeparam name="T">The event type to handle</typeparam>
-    /// <param name="callback">The function to call when the event is raised</param>
-    protected void OnAsync<T>(AsyncMethod<T> callback) where T : IAsyncEvent =>
-        OnCore<T, AsyncMethod<T>>(callback, (c, x) => new AsyncHandler<T>(c, x, false));
+    protected void On<TEvent>(Action<TEvent> callback) where TEvent : IEvent =>
+        OnCore<TEvent, Action<TEvent>>(callback, (c, x) => new SyncHandler<TEvent>(c, x, false));
 
     /// <summary>
     /// Add an event handler callback to be called when the relevant event
     /// type is raised by other components.
     /// </summary>
     /// <typeparam name="TEvent">The event type to handle</typeparam>
-    /// <typeparam name="TReturn">The type of value returned from async handlers for the event</typeparam>
     /// <param name="callback">The function to call when the event is raised</param>
-    protected void OnAsync<TEvent, TReturn>(AsyncMethod<TEvent, TReturn> callback) where TEvent : IAsyncEvent<TReturn> =>
-        OnCore<TEvent, AsyncMethod<TEvent, TReturn>>(
+    protected void OnAsync<TEvent>(Func<TEvent, AlbionTask> callback) where TEvent : IEvent =>
+        OnCore<TEvent, Func<TEvent, AlbionTask>>(callback, (c, x) => new AsyncHandler<TEvent>(c, x, false));
+
+    protected void OnQuery<TEvent, TResult>(Func<TEvent, TResult> callback) where TEvent : IQueryEvent<TResult> =>
+        OnCore<TEvent, Func<TEvent, TResult>>(
             callback, 
-            (c,x) => new AsyncHandler<TEvent, TReturn>(c, x, false));
+            (c,x) => new SyncQueryHandler<TEvent, TResult>(c, x, false));
+
+    /// <summary>
+    /// Add an event handler callback to be called when the relevant event
+    /// type is raised by other components.
+    /// </summary>
+    /// <typeparam name="TEvent">The type of value returned from async handlers for the event</typeparam>
+    /// <typeparam name="TResult">The query result type</typeparam>
+    /// <param name="callback">The function to call when the event is raised</param>
+    protected void OnQueryAsync<TEvent, TResult>(Func<TEvent, AlbionTask<TResult>> callback) where TEvent : IQueryEvent<TResult> =>
+        OnCore<TEvent, Func<TEvent, AlbionTask<TResult>>>(
+            callback, 
+            (c,x) => new AsyncQueryHandler<TEvent, TResult>(c, x, false));
 
     /// <summary>
     /// Add an event handler callback to be called only when the relevant event
@@ -252,7 +233,7 @@ public abstract class Component : IComponent
     /// <typeparam name="T">The event type to handle</typeparam>
     /// <param name="callback">The function to call after the event is raised</param>
     protected void After<T>(Action<T> callback) where T : IEvent => 
-        OnCore<T, Action<T>>(callback, (c, x) => new Handler<T>(c, x, true));
+        OnCore<T, Action<T>>(callback, (c, x) => new SyncHandler<T>(c, x, true));
 
     /// <summary>
     /// Add an event handler callback to be called after all the On handlers for
@@ -260,20 +241,8 @@ public abstract class Component : IComponent
     /// </summary>
     /// <typeparam name="T">The event type to handle</typeparam>
     /// <param name="callback">The function to call when the event is raised</param>
-    protected void AfterAsync<T>(AsyncMethod<T> callback) where T : IAsyncEvent =>
-        OnCore<T, AsyncMethod<T>>(callback, (c,x)=> new AsyncHandler<T>(c, x, true));
-
-    /// <summary>
-    /// Add an event handler callback to be called after all the On handlers for
-    /// the relevant event type have been called.
-    /// </summary>
-    /// <typeparam name="TEvent">The event type to handle</typeparam>
-    /// <typeparam name="TReturn">The type of value returned from async handlers for the event</typeparam>
-    /// <param name="callback">The function to call when the event is raised</param>
-    protected void AfterAsync<TEvent, TReturn>(AsyncMethod<TEvent, TReturn> callback) where TEvent : IAsyncEvent<TReturn> =>
-        OnCore<TEvent, AsyncMethod<TEvent, TReturn>>(
-            callback, 
-            (c,x) => new AsyncHandler<TEvent, TReturn>(c, x, true));
+    protected void AfterAsync<T>(Func<T, AlbionTask> callback) where T : IEvent =>
+        OnCore<T, Func<T, AlbionTask>>(callback, (c, x) => new AsyncHandler<T>(c, x, true));
 
     /// <summary>
     /// Cease handling the relevant event type.
@@ -458,8 +427,15 @@ public abstract class Component : IComponent
         if (sender == this || !IsSubscribed || Exchange == null)
             return;
 
-        if (_handlers != null && _handlers.TryGetValue(e.GetType(), out var handler) && handler.IsActive)
-            handler.Invoke(e, DummyContinuation.Instance);
+        if (_handlers == null || !_handlers.TryGetValue(e.GetType(), out var handler) || !handler.IsActive) 
+            return;
+
+        switch (handler)
+        {
+            case ISyncHandler syncHandler: syncHandler.Invoke(e); break;
+            case IAsyncHandler asyncHandler: asyncHandler.InvokeAsAsync(e); break;
+            default: throw new InvalidOperationException($"Could not invoke handler {handler} via Receive");
+        }
     }
 
     /// <summary>

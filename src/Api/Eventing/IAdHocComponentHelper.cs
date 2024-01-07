@@ -14,20 +14,18 @@ public interface IAdHocComponentHelper
     T TryResolve<T>();
 
 #pragma warning disable CA1030
-    void Raise<T>(T @event) where T : IEvent;
-    int RaiseAsync(IAsyncEvent @event, Action continuation);
-    int RaiseAsync<T>(IAsyncEvent<T> @event, Action<T> continuation);
+    void Raise(IEvent e);
+    AlbionTask RaiseAsync(IEvent e);
+    AlbionTask<TResult> RaiseQueryAsync<TResult>(IQueryEvent<TResult> e);
+    void Enqueue(IEvent e);
 #pragma warning restore CA1030
 
-    void Enqueue(IEvent @event);
-    void Distribute<T>(ICancellableEvent @event, List<T> targets, Func<T, IComponent> projection);
+    void Distribute<T>(ICancellableEvent e, List<T> targets, Func<T, IComponent> projection);
     void On<T>(Action<T> callback) where T : IEvent;
-    void OnAsync<T>(AsyncMethod<T> callback) where T : IAsyncEvent;
-    void OnAsync<TEvent, TReturn>(AsyncMethod<TEvent, TReturn> callback) where TEvent : IAsyncEvent<TReturn>;
+    void OnAsync<T>(Func<T, AlbionTask> callback) where T : IEvent;
     void OnDirectCall<T>(Action<T> callback) where T : IEvent;
     void After<T>(Action<T> callback) where T : IEvent;
-    void AfterAsync<T>(AsyncMethod<T> callback) where T : IAsyncEvent;
-    void AfterAsync<TEvent, TReturn>(AsyncMethod<TEvent, TReturn> callback) where TEvent : IAsyncEvent<TReturn>;
+    void AfterAsync<T>(Func<T, AlbionTask> callback) where T : IEvent;
     void Off<T>();
     void Detach();
     T AttachChild<T>(T child) where T : IComponent;

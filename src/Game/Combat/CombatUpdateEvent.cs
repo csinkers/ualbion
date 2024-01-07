@@ -3,7 +3,7 @@
 namespace UAlbion.Game.Combat;
 
 [Event("combat_update", "Run the combat clock for the specified number of slow-clock cycles")]
-public class CombatUpdateEvent : Event, IAsyncEvent
+public class CombatUpdateEvent : Event
 {
     public CombatUpdateEvent(int cycles) => Cycles = cycles;
 

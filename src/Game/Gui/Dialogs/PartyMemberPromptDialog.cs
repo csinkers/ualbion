@@ -24,7 +24,7 @@ class PartyMemberPromptDialog : ModalDialog
         On<CloseWindowEvent>(_ => Close());
 
         var text = textFormatter.Format(promptId);
-        var prompt = new TextFilter(x => x.BlockId == -1) { Source = text };
+        var prompt = new TextFilter(x => x.BlockId == BlockId.MainText) { Source = text };
         var portraits = new List<IUiElement> { new VariableSpacing(0, 1) };
         bool first = true;
         foreach (var member in members)

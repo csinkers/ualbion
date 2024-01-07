@@ -25,7 +25,7 @@ public class ScriptManager : Component
         if (events == null)
         {
             Error($"Could not load script {doScriptEvent.ScriptId}");
-            return AlbionTask.CompletedTask;
+            return AlbionTask.Complete;
         }
 
         var nodes = new EventNode[events.Count];

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
-using UAlbion.Config;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Exporters;
 using UAlbion.Formats.Exporters.Tiled;

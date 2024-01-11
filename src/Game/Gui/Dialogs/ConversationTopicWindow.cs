@@ -14,7 +14,7 @@ namespace UAlbion.Game.Gui.Dialogs;
 public class ConversationTopicWindow : ModalDialog
 {
     readonly List<WordId> _currentWords = new();
-    AlbionTaskSource<WordId> _source;
+    AlbionTaskCore<WordId> _source;
 
     public ConversationTopicWindow(int depth) : base(DialogPositioning.Center, depth)
     {
@@ -43,7 +43,7 @@ public class ConversationTopicWindow : ModalDialog
 
         var source = _source;
         _source = null;
-        source.Complete(e);
+        source.SetResult(e);
     }
 
     public AlbionTask<WordId> GetWord(IDictionary<WordId, WordStatus> words)
@@ -53,7 +53,7 @@ public class ConversationTopicWindow : ModalDialog
 
         RemoveAllChildren();
         IsActive = true;
-        _source = new AlbionTaskSource<WordId>();
+        _source = new AlbionTaskCore<WordId>("ConversationTopicWindow.GetWord");
 
         var elements = new List<IUiElement>();
         var lookup = Resolve<IWordLookup>();

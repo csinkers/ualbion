@@ -12,7 +12,7 @@ public class CombatClock : Component
     int _ticks;
     int _combatTicks;
 
-    AlbionTaskSource _currentUpdate;
+    AlbionTaskCore _currentUpdate;
     float _elapsedTimeThisGameFrame;
     int _ticksRemaining;
     int _stoppedFrames;
@@ -32,10 +32,10 @@ public class CombatClock : Component
             if (_currentUpdate != null) { Warn($"Ignoring {e} - already running another update event"); return AlbionTask.Complete; }
 
             GameTrace.Log.CombatClockUpdating(e.Cycles);
-            _currentUpdate = new AlbionTaskSource();
+            _currentUpdate = new AlbionTaskCore("CombatClock.CombatUpdateEvent");
             _ticksRemaining = e.Cycles * Var(GameVars.Time.FastTicksPerSlowTick);
             IsRunning = true;
-            return _currentUpdate.Task;
+            return _currentUpdate.UntypedTask;
         });
     }
 

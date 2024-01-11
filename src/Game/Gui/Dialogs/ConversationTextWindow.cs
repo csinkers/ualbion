@@ -10,7 +10,7 @@ public class ConversationTextWindow : ModalDialog
 {
     readonly TextSourceWrapper _text = new();
     readonly UiText _uiText;
-    AlbionTaskSource _source;
+    AlbionTaskCore _source;
 
     public ConversationTextWindow(int depth) : base(DialogPositioning.Bottom, depth)
     {
@@ -29,10 +29,10 @@ public class ConversationTextWindow : ModalDialog
     {
         // default filter = BlockId.MainText;
 
-        _source = new AlbionTaskSource();
+        _source = new AlbionTaskCore("ConversationTextWindow");
         _uiText.BlockFilter = blockFilter;
         _text.Source = text;
-        return _source.Task;
+        return _source.UntypedTask;
     }
 
     void Complete()

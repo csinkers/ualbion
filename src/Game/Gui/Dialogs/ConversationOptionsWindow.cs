@@ -37,7 +37,7 @@ public class ConversationOptionsWindow : ModalDialog
 
         _optionElements.Clear();
 
-        var source = new AlbionTaskSource<T>();
+        var source = new AlbionTaskCore<T>("ConversationOptionsWindow.GetOption");
         void AddOption(IText text, BlockId? blockId, T result)
         {
             _optionElements.Add(
@@ -48,7 +48,7 @@ public class ConversationOptionsWindow : ModalDialog
                     () =>
                     {
                         IsActive = false;
-                        source.Complete(result);
+                        source.SetResult(result);
                     }));
         }
 

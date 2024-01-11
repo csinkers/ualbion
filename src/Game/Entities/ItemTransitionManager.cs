@@ -58,7 +58,7 @@ public class ItemTransitionManager : Component
         var destPosition = window.UiToNorm(toUiPosition); // Tom's portrait, hardcoded for now.
 
         // Note: no need to attach as child as transitions clean themselves up.
-        var source = new AlbionTaskSource();
+        var source = new AlbionTaskCore("ItemTransitionManager.LinearFromNormPosition");
         switch (itemId.Type)
         {
             case AssetType.Gold:
@@ -107,7 +107,7 @@ public class ItemTransitionManager : Component
             }
         }
 
-        return source.Task;
+        return source.UntypedTask;
     }
 
     AlbionTask GravityFromNormPosition(Vector2 fromNormPosition, ItemId itemId)
@@ -116,7 +116,7 @@ public class ItemTransitionManager : Component
         var window = Resolve<IGameWindow>();
 
         // Note: no need to attach as child as transitions clean themselves up.
-        var source = new AlbionTaskSource();
+        var source = new AlbionTaskCore("ItemTransitionManager.GravityFromNormPosition");
         switch (itemId.Type)
         {
             case AssetType.Gold:
@@ -158,6 +158,6 @@ public class ItemTransitionManager : Component
             }
         }
 
-        return source.Task;
+        return source.UntypedTask;
     }
 }

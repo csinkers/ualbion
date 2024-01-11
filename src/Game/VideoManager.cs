@@ -15,11 +15,11 @@ public class VideoManager : Component
 
     AlbionTask Play(PlayAnimationEvent e)
     {
-        var source = new AlbionTaskSource();
+        var source = new AlbionTaskCore("VideoManager.Play");
         AttachChild(new Video(e.VideoId, false)).OnComplete(source.Complete);
         //var map = Resolve<IMapManager>().Current;
         //video.Position = new Vector3(e.X, e.Y, 0) * map.TileSize;
-        return source.Task;
+        return source.UntypedTask;
     }
 
     void Start(StartAnimEvent obj)

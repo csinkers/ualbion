@@ -4,9 +4,7 @@ using System.Linq;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
-using UAlbion.Config.Properties;
 using UAlbion.Formats;
-using UAlbion.Formats.Ids;
 
 namespace UAlbion;
 

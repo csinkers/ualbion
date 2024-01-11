@@ -13,7 +13,7 @@ namespace UAlbion.Game.Gui.Inventory;
 
 public class InventoryScreenManager : Component
 {
-    AlbionTaskSource<bool> _source;
+    AlbionTaskCore<bool> _source;
     IEvent _modeEvent = new InventoryOpenEvent(PartyMemberId.None); // Should never be null.
     InventoryPage _page;
     PartyMemberId _activeCharacter;
@@ -43,16 +43,16 @@ public class InventoryScreenManager : Component
 
     AlbionTask TalkToMerchant(MerchantEvent e)
     {
-        _source?.Complete(false);
-        _source = new AlbionTaskSource<bool>();
+        _source?.SetResult(false);
+        _source = new AlbionTaskCore<bool>("InventoryScreenManager.TalkToMerchant");
         SetMode(e);
         return _source.Task.AsUntyped;
     }
 
     AlbionTask<bool> OpenDoor(DoorEvent e)
     {
-        _source?.Complete(false);
-        _source = new AlbionTaskSource<bool>();
+        _source?.SetResult(false);
+        _source = new AlbionTaskCore<bool>("InventoryScreenManager.OpenDoor");
         Raise(new PushSceneEvent(SceneId.Inventory));
         SetMode(e);
         return _source.Task;
@@ -60,8 +60,8 @@ public class InventoryScreenManager : Component
 
     AlbionTask<bool> OpenChest(ChestEvent e)
     {
-        _source?.Complete(false);
-        _source = new AlbionTaskSource<bool>();
+        _source?.SetResult(false);
+        _source = new AlbionTaskCore<bool>("InventoryScreenManager.OpenChest");
         Raise(new PushSceneEvent(SceneId.Inventory));
         SetMode(e);
         return _source.Task;
@@ -115,6 +115,6 @@ public class InventoryScreenManager : Component
         var source = _source;
         _source = null;
         ((EventContext)Context).LastEventResult = unlocked;
-        source?.Complete(!triggeredTrap); // TODO: Test with trapped chests / doors
+        source?.SetResult(!triggeredTrap); // TODO: Test with trapped chests / doors
     }
 }

@@ -22,7 +22,7 @@ public struct AlbionTaskBuilder<TResult>
     /// is valid for the mode in which we're operating.  As such, it's cached on the generic builder per TResult
     /// rather than having one sentinel instance for all types.
     /// </remarks>
-    static readonly AlbionTaskCore<TResult> s_syncSuccessSentinel = new();
+    static readonly SentinelTaskCore<TResult> s_syncSuccessSentinel = new();
 
     /// <summary>Gets the value task for this builder.</summary>
     public AlbionTask<TResult> Task => _core == s_syncSuccessSentinel
@@ -79,7 +79,6 @@ public struct AlbionTaskBuilder<TResult>
         where TAwaiter : INotifyCompletion
         where TStateMachine : IAsyncStateMachine
     {
-        _core ??= new AlbionTaskCore<TResult>();
         awaiter.OnCompleted(GetStateMachineBox(ref stateMachine, ref _core).MoveNextAction);
     }
 
@@ -115,7 +114,6 @@ public struct AlbionTaskBuilder<TResult>
         where TAwaiter : ICriticalNotifyCompletion
         where TStateMachine : IAsyncStateMachine
     {
-        _core ??= new AlbionTaskCore<TResult>();
         var box = GetStateMachineBox(ref stateMachine, ref _core);
         awaiter.UnsafeOnCompleted(box.MoveNextAction);
     }
@@ -126,6 +124,9 @@ public struct AlbionTaskBuilder<TResult>
         Action? _moveNextAction;
         public TStateMachine? _stateMachine;
         public Action MoveNextAction => _moveNextAction ??= MoveNext;
+#if DEBUG
+        public AlbionStateMachineBox() : base($"ASMB<{typeof(TResult2)}, {typeof(TStateMachine)}>") { }
+#endif
         void MoveNext()
         {
             Debug.Assert(_stateMachine != null);
@@ -201,7 +202,6 @@ public struct AlbionTaskBuilder
         where TAwaiter : INotifyCompletion
         where TStateMachine : IAsyncStateMachine
     {
-        _core ??= new AlbionTaskCore<Unit>();
         awaiter.OnCompleted(GetStateMachineBox(ref stateMachine, ref _core).MoveNextAction);
     }
 
@@ -237,7 +237,6 @@ public struct AlbionTaskBuilder
         where TAwaiter : ICriticalNotifyCompletion
         where TStateMachine : IAsyncStateMachine
     {
-        _core ??= new AlbionTaskCore<Unit>();
         var box = GetStateMachineBox(ref stateMachine, ref _core);
         awaiter.UnsafeOnCompleted(box.MoveNextAction);
     }
@@ -248,6 +247,9 @@ public struct AlbionTaskBuilder
         Action? _moveNextAction;
         public TStateMachine? _stateMachine;
         public Action MoveNextAction => _moveNextAction ??= MoveNext;
+#if DEBUG
+        public AlbionStateMachineBox() : base($"ASMB<{typeof(TResult2)}, {typeof(TStateMachine)}>") { }
+#endif
         void MoveNext()
         {
             Debug.Assert(_stateMachine != null);

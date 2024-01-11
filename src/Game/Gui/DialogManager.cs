@@ -39,45 +39,45 @@ public class DialogManager  : ServiceComponent<IDialogManager>, IDialogManager
     AlbionTask<bool> OnYesNoPrompt(YesNoPromptEvent e)
     {
         var tf = Resolve<ITextFormatter>();
-        var source = new AlbionTaskSource<bool>();
+        var source = new AlbionTaskCore<bool>("DialogManager.OnYesNoPrompt");
         var dialog = AttachChild(new YesNoMessageBox(e.StringId, MaxLayer + 1, tf));
-        dialog.Closed += (_, _) => source.Complete(dialog.Result);
+        dialog.Closed += (_, _) => source.SetResult(dialog.Result);
         return source.Task;
     }
 
     AlbionTask<int> OnItemQuantityPrompt(ItemQuantityPromptEvent e)
     {
-        var source = new AlbionTaskSource<int>();
+        var source = new AlbionTaskCore<int>("DialogManager.OnItemQuantityPrompt");
         var dialog = AttachChild(new ItemQuantityDialog(MaxLayer + 1, e.Text, e.Icon, e.IconSubId, e.Max, e.UseTenths));
-        dialog.Closed += (_, _) => source.Complete(dialog.Value);
+        dialog.Closed += (_, _) => source.SetResult(dialog.Value);
         return source.Task;
     }
 
     AlbionTask<int> OnNumericPrompt(NumericPromptEvent e)
     {
         var tf = Resolve<ITextFormatter>();
-        var source = new AlbionTaskSource<int>();
+        var source = new AlbionTaskCore<int>("DialogManager.OnNumericPrompt");
         var dialog = AttachChild(new NumericPromptDialog(tf.Format(e.Text), e.Min, e.Max, MaxLayer + 1));
-        dialog.Closed += (_, _) => source.Complete(dialog.Value);
+        dialog.Closed += (_, _) => source.SetResult(dialog.Value);
         return source.Task;
     }
 
     AlbionTask<string> OnTextPrompt(TextPromptEvent _)
     {
-        var source = new AlbionTaskSource<string>();
+        var source = new AlbionTaskCore<string>("DialogManager.OnTextPrompt");
         var dialog = AttachChild(new TextPromptDialog(MaxLayer + 1));
-        dialog.Closed += (_, _) => source.Complete(dialog.Value);
+        dialog.Closed += (_, _) => source.SetResult(dialog.Value);
         return source.Task;
     }
 
     AlbionTask<PartyMemberId> OnPartyMemberPrompt(PartyMemberPromptEvent e)
     {
-        var source = new AlbionTaskSource<PartyMemberId>();
+        var source = new AlbionTaskCore<PartyMemberId>("DialogManager.OnPartyMemberPrompt");
         var tf = Resolve<ITextFormatter>();
         var party = Resolve<IParty>();
         var members = party.StatusBarOrder.Where(x => e.Members == null || e.Members.Contains(x.Id)).ToArray();
         var dialog = AttachChild(new PartyMemberPromptDialog(tf, MaxLayer + 1, e.Prompt, members));
-        dialog.Closed += (_, _) => source.Complete(dialog.Result);
+        dialog.Closed += (_, _) => source.SetResult(dialog.Result);
         return source.Task;
     }
 

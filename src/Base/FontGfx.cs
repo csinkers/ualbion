@@ -1,5 +1,3 @@
-using UAlbion.Config;
-
 namespace UAlbion.Base;
 
 public enum FontGfx : byte

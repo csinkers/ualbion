@@ -1,5 +1,4 @@
-﻿using System;
-using UAlbion.Api.Eventing;
+﻿using UAlbion.Api.Eventing;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
@@ -10,8 +9,8 @@ namespace UAlbion.Game.Gui.Dialogs;
 
 public class TextDialog : ModalDialog
 {
-    readonly AlbionTaskSource _source = new();
-    public AlbionTask Task => _source.Task;
+    readonly AlbionTaskCore _source = new("TextDialog");
+    public AlbionTask Task => _source.UntypedTask;
 
     public TextDialog(IText text, SpriteId portraitId = default, int depth = 0) : base(DialogPositioning.Top, depth)
     {

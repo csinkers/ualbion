@@ -1,11 +1,4 @@
-﻿using UAlbion.Api;
-using UAlbion.Api.Eventing;
-using UAlbion.Config;
-using UAlbion.Formats;
-using UAlbion.Formats.Containers;
-using UAlbion.Game.Assets;
-
-namespace UAlbion.SingleAssetConverter;
+﻿namespace UAlbion.SingleAssetConverter;
 
 static class Program
 {

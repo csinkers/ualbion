@@ -17,7 +17,7 @@ public class GameClock : ServiceComponent<IClock>, IClock
     readonly PostGameUpdateEvent _postGameUpdateEvent = new();
     readonly FastClockEvent _fastClockEvent = new(1);
 
-    AlbionTaskSource _currentUpdate;
+    AlbionTaskCore _currentUpdate;
     float _elapsedTimeThisGameFrame;
     int _ticksRemaining;
     int _stoppedFrames;
@@ -39,10 +39,10 @@ public class GameClock : ServiceComponent<IClock>, IClock
             if (_currentUpdate != null) { Warn($"Ignoring {e} - already running another update event"); return AlbionTask.Complete; }
 
             GameTrace.Log.ClockUpdating(e.Cycles);
-            _currentUpdate = new AlbionTaskSource();
+            _currentUpdate = new AlbionTaskCore("GameClock.GameUpdateEvent");
             _ticksRemaining = e.Cycles * Var(GameVars.Time.FastTicksPerSlowTick);
             IsRunning = true;
-            return _currentUpdate.Task;
+            return _currentUpdate.UntypedTask;
         });
     }
 

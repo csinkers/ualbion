@@ -14,8 +14,8 @@ public interface IAdHocComponentHelper
     T TryResolve<T>();
 
 #pragma warning disable CA1030
-    void Raise(IEvent e);
-    AlbionTask RaiseAsync(IEvent e);
+    void Raise<T>(T e) where T : IEvent;
+    AlbionTask RaiseAsync<T>(T e) where T : IEvent;
     AlbionTask<TResult> RaiseQueryAsync<TResult>(IQueryEvent<TResult> e);
     void Enqueue(IEvent e);
 #pragma warning restore CA1030

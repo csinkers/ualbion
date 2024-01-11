@@ -67,10 +67,10 @@ public class MainMenu : Dialog
 
     async AlbionTask NewGame()
     {
-        var e = new YesNoPromptEvent(Base.SystemText.MainMenu_DoYouReallyWantToStartANewGame);
         var exchange = Exchange;
         Detach();
 
+        var e = new YesNoPromptEvent(Base.SystemText.MainMenu_DoYouReallyWantToStartANewGame);
         var response = await RaiseQueryAsync(e);
         
         Attach(exchange);

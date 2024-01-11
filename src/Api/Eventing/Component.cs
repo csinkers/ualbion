@@ -90,7 +90,7 @@ public abstract class Component : IComponent
     /// distribute it to all components that have registered a handler.
     /// </summary>
     /// <param name="e">The event to raise</param>
-    protected void Raise(IEvent e) => _ = RaiseAsync(e);
+    protected void Raise<T>(T e) where T : IEvent => Exchange.Raise(e, this);
 
     protected T RaiseQuery<T>(IQueryEvent<T> e) => Exchange.RaiseQuery(e, this);
 
@@ -102,7 +102,7 @@ public abstract class Component : IComponent
     /// </summary>
     /// <param name="e">The event to raise</param>
     /// <returns>The number of async handlers which have either already called the continuation or intend to call it in the future.</returns>
-    protected AlbionTask RaiseAsync(IEvent e) => Exchange.RaiseA(e, this);
+    protected AlbionTask RaiseAsync<T>(T e) where T : IEvent => Exchange.RaiseA(e, this);
 
     /// <summary>
     /// Raise an event via the currently subscribed event exchange (if subscribed), and

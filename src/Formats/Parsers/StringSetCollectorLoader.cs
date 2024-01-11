@@ -4,7 +4,6 @@ using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Config.Properties;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Parsers;
 

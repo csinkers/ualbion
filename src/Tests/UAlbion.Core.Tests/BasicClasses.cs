@@ -12,8 +12,8 @@ public class BasicComponent : Component
     public int Seen { get; private set; }
     public int Handled { get; private set; }
     public T CallResolve<T>() => TryResolve<T>();
-    public new void Raise(IEvent e) => base.Raise(e);
-    public new AlbionTask RaiseAsync(IEvent e) => base.RaiseAsync(e);
+    public new void Raise<T>(T e) where T : IEvent => base.Raise(e);
+    public new AlbionTask RaiseAsync<T>(T e) where T : IEvent => base.RaiseAsync(e);
     public new AlbionTask<T> RaiseQueryAsync<T>(IQueryEvent<T> e) => base.RaiseQueryAsync(e);
     public new void Enqueue(IEvent e) => base.Enqueue(e);
     public void AddHandler<T>(Action<T> handler) where T : IEvent

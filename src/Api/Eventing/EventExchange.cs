@@ -78,10 +78,12 @@ namespace UAlbion.Api.Eventing
             _queuedEvents.Swap();
             foreach (var (e, sender) in _queuedEvents.Back)
                 Raise(e, sender);
+
             _queuedEvents.Back.Clear();
         }
 
-        [DebuggerHidden, StackTraceHidden] public void Raise(IEvent e, object sender) => _ = RaiseInner(e, sender, 0, RaiseInvoker);
+        // [DebuggerHidden, StackTraceHidden]
+        public void Raise(IEvent e, object sender) => _ = RaiseInner(e, sender, 0, RaiseInvoker);
         static AlbionTask<int> RaiseInvoker(List<Handler> handlers, IEvent e, object sender, int _)
         {
             foreach (var handler in handlers)
@@ -94,8 +96,8 @@ namespace UAlbion.Api.Eventing
                         syncHandler.Invoke(e);
                         break;
                     case IAsyncHandler asyncHandler:
-                        asyncHandler.InvokeAsAsync(e);
-                        break; // Any async handlers are started but never awaited
+                        asyncHandler.InvokeAsAsync(e); // Any async handlers are started but never awaited
+                        break;
                     default:
                         throw new InvalidOperationException($"Could not invoke handler {handler}");
                 }
@@ -104,7 +106,8 @@ namespace UAlbion.Api.Eventing
             return new AlbionTask<int>(0);
         }
 
-        [DebuggerHidden, StackTraceHidden] public async AlbionTask RaiseA(IEvent e, object sender) => _ = await RaiseInner(e, sender, 0, RaiseAInvoker);
+        // [DebuggerHidden, StackTraceHidden]
+        public async AlbionTask RaiseA(IEvent e, object sender) => _ = await RaiseInner(e, sender, 0, RaiseAInvoker);
         static AlbionTask<Unit> RaiseAInvoker(List<Handler> handlers, IEvent e, object sender, int _) // Waits for all handlers to complete
         {
             AlbionTaskCore<Unit> core = null;
@@ -143,7 +146,8 @@ namespace UAlbion.Api.Eventing
             return core?.Task ?? AlbionTask.Unit;
         }
 
-        [DebuggerHidden, StackTraceHidden] public T RaiseQuery<T>(IQueryEvent<T> e, object sender) => RaiseInner(e, sender, 0, RaiseQueryInvoker).GetResult();
+        // [DebuggerHidden, StackTraceHidden]
+        public T RaiseQuery<T>(IQueryEvent<T> e, object sender) => RaiseInner(e, sender, 0, RaiseQueryInvoker).GetResult();
         static AlbionTask<T> RaiseQueryInvoker<T>(List<Handler> handlers, IQueryEvent<T> e, object sender, int _)
         {
             bool hasResult = false;
@@ -178,7 +182,8 @@ namespace UAlbion.Api.Eventing
             return new AlbionTask<T>(result);
         }
 
-        [DebuggerHidden, StackTraceHidden] public AlbionTask<T> RaiseQueryA<T>(IQueryEvent<T> e, object sender) => RaiseInner(e, sender, 0, RaiseQueryAInvoker);
+        // [DebuggerHidden, StackTraceHidden]
+        public AlbionTask<T> RaiseQueryA<T>(IQueryEvent<T> e, object sender) => RaiseInner(e, sender, 0, RaiseQueryAInvoker);
         static async AlbionTask<T> RaiseQueryAInvoker<T>(List<Handler> handlers, IQueryEvent<T> e, object sender, int _)
         {
             bool hasResult = false;
@@ -224,7 +229,7 @@ namespace UAlbion.Api.Eventing
 
         delegate AlbionTask<TResult> InvokerFunc<in TEvent, TResult, in TContext>(List<Handler> handlers, TEvent e, object sender, TContext context);
 
-        [DebuggerHidden, StackTraceHidden]
+        // [DebuggerHidden, StackTraceHidden]
         AlbionTask<TResult> RaiseInner<TEvent, TResult, TContext>( // This method is performance critical, memory allocations should be avoided etc.
             TEvent e,
             object sender,

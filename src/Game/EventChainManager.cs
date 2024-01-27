@@ -50,13 +50,13 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         context.BreakOnReturn = true;
     }
 
-    async AlbionTask Trigger(TriggerChainEvent e)
+    AlbionTask Trigger(TriggerChainEvent e)
     {
         // If the event chain is from a map, check if it's already been disabled in the game state
         var game = Resolve<IGameState>();
         if (e.EventSet.Id.Type == AssetType.Map && game.IsChainDisabled(e.EventSet.Id, e.EventSet.GetChainForEvent(e.EntryPoint)))
         {
-            return;
+            return AlbionTask.Complete;
         }
 
         var isClockRunning = Resolve<IClock>().IsRunning;
@@ -75,7 +75,12 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
 
         ReadyContext(context);
         _contexts.Add(context);
-        await Resume(context);
+        var task = Resume(context);
+#if DEBUG
+        if (!task.IsCompleted)
+            task.Named($"ECM.Trigger C{context.Id}: {e}");
+#endif
+        return task;
     }
 
     void ReadyContext(EventContext context)
@@ -137,11 +142,18 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
 
         while (context.Node != null)
         {
+            var node = context.Node;
             context.Status = EventContextStatus.Running;
-            if (context.Node is IBranchNode branch && context.Node.Event is IQueryEvent<bool> boolEvent)
-                await HandleBoolEvent(context, boolEvent, branch);
+            AlbionTask task;
+            if (node is IBranchNode branch && node.Event is IQueryEvent<bool> boolEvent)
+                task = HandleBoolEvent(context, boolEvent, branch).AsUntyped;
             else
-                await HandleAsyncEvent(context, context.Node.Event);
+                task = HandleAsyncEvent(context, node.Event);
+
+#if DEBUG
+            _ = task.Named($"ECM.Resume for C{context.Id} {context.EventSet.Id}:{node.Id}: {node.Event}");
+#endif
+            await task;
         }
 
         context.Status = EventContextStatus.Completing;
@@ -163,7 +175,13 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
     async AlbionTask HandleAsyncEvent(EventContext context, IEvent asyncEvent)
     {
         context.Status = EventContextStatus.Waiting;
-        await RaiseAsync(asyncEvent);
+
+        var task = RaiseAsync(asyncEvent);
+#if DEBUG
+            _ = task.Named($"ECM.HandleAsyncEvent for C{context.Id} {context.EventSet.Id}:{context.Node.Id}: {context.Node.Event}");
+#endif
+        await task;
+
         context.Node = context.Node?.Next;
         ReadyContext(context);
     }
@@ -171,7 +189,12 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
     async AlbionTask<bool> HandleBoolEvent(EventContext context, IQueryEvent<bool> boolEvent, IBranchNode branch) // Return value = whether to return.
     {
         context.Status = EventContextStatus.Waiting;
-        var result = await RaiseQueryAsync(boolEvent);
+        var task = RaiseQueryAsync(boolEvent);
+#if DEBUG
+            _ = task.Named($"ECM.HandleBoolEvent for C{context.Id} {context.EventSet.Id}:{context.Node.Id}: {context.Node.Event}");
+#endif
+
+        var result = await task;
 
 #if DEBUG
         // Info($"if ({context.Node.Event}) => {result}");

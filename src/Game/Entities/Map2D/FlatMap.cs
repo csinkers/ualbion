@@ -36,10 +36,10 @@ public class FlatMap : Component, IMap
         On<PlayerEnteredTileEvent>(OnPlayerEnteredTile);
         On<NpcEnteredTileEvent>(OnNpcEnteredTile);
         On<ChangeIconEvent>(ChangeIcon);
-        On<MapInitEvent>(_ => FireEventChains(TriggerType.MapInit, true));
-        On<SlowClockEvent>(_ => FireEventChains(TriggerType.EveryStep, false));
-        On<HourElapsedEvent>(_ => FireEventChains(TriggerType.EveryHour, true));
-        On<DayElapsedEvent>(_ => FireEventChains(TriggerType.EveryDay, true));
+        OnAsync<MapInitEvent>(_ => FireEventChains(TriggerType.MapInit, true));
+        OnAsync<SlowClockEvent>(_ => FireEventChains(TriggerType.EveryStep, false));
+        OnAsync<HourElapsedEvent>(_ => FireEventChains(TriggerType.EveryHour, true));
+        OnAsync<DayElapsedEvent>(_ => FireEventChains(TriggerType.EveryDay, true));
         On<PartyChangedEvent>(_ => RebuildPartyMembers());
         On<TriggerMapTileEvent>(TileTriggered);
         // On<UnloadMapEvent>(_ => Unload());
@@ -126,22 +126,22 @@ public class FlatMap : Component, IMap
         }
     }
 
-    void FireEventChains(TriggerType type, bool log)
+    async AlbionTask FireEventChains(TriggerType type, bool log)
     {
         var zones = ZoneListPool.Shared.Borrow();
         _logicalMap.GetZonesOfType(zones, type.ToBitField());
 
         try
         {
-            if (!log)
-                Raise(new SetLogLevelEvent(LogLevel.Warning));
+            // if (!log)
+            //     Raise(new SetLogLevelEvent(LogLevel.Warning));
 
             foreach (var zone in zones)
-                Raise(new TriggerChainEvent(_logicalMap.EventSet, zone.EventIndex,
+                await RaiseAsync(new TriggerChainEvent(_logicalMap.EventSet, zone.EventIndex,
                     new EventSource(_mapData.Id, type, zone.X, zone.Y)));
 
-            if (!log)
-                Raise(new SetLogLevelEvent(LogLevel.Info));
+            // if (!log)
+            //     Raise(new SetLogLevelEvent(LogLevel.Info));
         }
         finally
         {

@@ -8,6 +8,9 @@ namespace UAlbion.Api.Eventing;
 
 public interface IAlbionTaskCore : ICriticalNotifyCompletion
 {
+#if DEBUG
+    string? Description { get; set; }
+#endif
     bool IsCompleted { get; }
 }
 
@@ -23,9 +26,9 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
     }
 
     readonly int _id;
-    readonly string? _description;
     TaskStatus _status = TaskStatus.Unused;
     public bool BreakOnCompletion { get; set; }
+    public string? Description { get; set; }
 #endif
 
 #if RECORD_TASK_STACKS
@@ -44,8 +47,8 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
     public AlbionTaskCore(string? description)
     {
 #if DEBUG
-        _description = description;
         _id = Tasks.GetNextId();
+        Description = description;
         Tasks.AddTask(this);
 #endif
 #if RECORD_TASK_STACKS
@@ -63,8 +66,8 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
             };
 
 #if DEBUG
-        return _description != null 
-            ? $"T{_id}<{typeof(T)}>: [{_status}] ({waiters} waiting): {_description}" 
+        return Description != null 
+            ? $"T{_id}<{typeof(T)}>: [{_status}] ({waiters} waiting): {Description}" 
             : $"T{_id}<{typeof(T)}>: [{_status}] ({waiters} waiting)";
 #else
         return $"T<{nameof(T)}>: ({waiters} waiting)";
@@ -140,11 +143,6 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
         Tasks.RemoveTask(this);
 #endif
     }
-}
-
-internal class SentinelTaskCore<T> : AlbionTaskCore<T>
-{
-    public override string ToString() => $"Sentinel<{typeof(T)}>";
 }
 
 public class AlbionTaskCore : AlbionTaskCore<Unit>

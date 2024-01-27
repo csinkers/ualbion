@@ -19,20 +19,20 @@ public class MapManager : ServiceComponent<IMapManager>, IMapManager
     {
         On<ShowMapEvent>(e => { foreach (var child in Children) child.IsActive = e.Show ?? true; });
         On<TeleportEvent>(Teleport);
-        On<LoadMapEvent>(e =>
+        OnAsync<LoadMapEvent>(async e =>
         {
             if (!Resolve<IGameState>().Loaded)
             {
-                Raise(new NewGameEvent(e.MapId, 32, 32));
+                await RaiseAsync(new NewGameEvent(e.MapId, 32, 32));
                 return;
             }
 
-            LoadMap(e.MapId);
+            await LoadMap(e.MapId);
             Raise(new CameraJumpEvent(0, 0));
         });
     }
 
-    void LoadMap(MapId mapId)
+    async AlbionTask LoadMap(MapId mapId)
     {
         Raise(new UnloadMapEvent());
         if (mapId == MapId.None) // 0 = Build a blank scene for testing / debugging
@@ -56,7 +56,7 @@ public class MapManager : ServiceComponent<IMapManager>, IMapManager
         AttachChild(map);
 
         Info($"Loaded map {mapId.Id}: {mapId}");
-        Enqueue(new MapInitEvent());
+        await RaiseAsync(new MapInitEvent());
 
         if (!map.MapData.SongId.IsNone)
             Enqueue(new SongEvent(map.MapData.SongId));

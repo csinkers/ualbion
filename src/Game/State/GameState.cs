@@ -75,8 +75,8 @@ public class GameState : ServiceComponent<IGameState>, IGameState
 #pragma warning disable CA1506 // '.ctor' is coupled with '42' different types from '11' different namespaces. Rewrite or refactor the code to decrease its class coupling below '41'.
     public GameState()
     {
-        On<NewGameEvent>(e => NewGame(e.MapId, e.X, e.Y));
-        On<LoadGameEvent>(e => LoadGame(e.Id));
+        OnAsync<NewGameEvent>(e => NewGame(e.MapId, e.X, e.Y));
+        OnAsync<LoadGameEvent>(e => LoadGame(e.Id));
         On<SaveGameEvent>(e => SaveGame(e.Id, e.Name));
         On<FastClockEvent>(e => TickCount += e.Frames);
         On<GetTimeEvent>(_ => Info(Time.ToString("O")));
@@ -311,7 +311,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
     public int TickCount { get; private set; }
     public bool Loaded => _game != null;
 
-    void NewGame(MapId mapId, ushort x, ushort y)
+    AlbionTask NewGame(MapId mapId, ushort x, ushort y)
     {
         Raise(new ReloadAssetsEvent()); // Make sure we don't end up with cached assets from the last game.
         var assets = Resolve<IAssetManager>();
@@ -338,7 +338,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         foreach (var id in AssetMapping.Global.EnumerateAssetsOfType(AssetType.Merchant))
             _game.Inventories.Add(id, assets.LoadInventory(id));
 
-        InitialiseGame();
+        return InitialiseGame();
     }
 
     string IdToPath(ushort id)
@@ -348,13 +348,13 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         return pathResolver.ResolvePath($"$(SAVES)/SAVE.{id:D3}");
     }
 
-    void LoadGame(ushort id)
+    AlbionTask LoadGame(ushort id)
     {
         _game = Resolve<IAssetManager>().LoadSavedGame(IdToPath(id));
         if (_game == null)
-            return;
+            return AlbionTask.Complete;
 
-        InitialiseGame();
+        return InitialiseGame();
     }
 
     void SaveGame(ushort id, string name)
@@ -379,7 +379,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         SavedGame.Serdes(_game, mapping, aw, spellManager);
     }
 
-    void InitialiseGame()
+    async AlbionTask InitialiseGame()
     {
         _party?.Remove();
         _party = AttachChild(new Party(_game.Sheets, GetWriteableInventory, _game.CombatPositions));
@@ -388,7 +388,8 @@ public class GameState : ServiceComponent<IGameState>, IGameState
             if (!member.IsNone)
                 _party.AddMember(member);
 
-        Raise(new LoadMapEvent(_game.MapId));
+        await RaiseAsync(new LoadMapEvent(_game.MapId));
+
         Raise(new StartClockEvent());
         Raise(new SetPartyLeaderEvent(_party.Leader.Id, 0, 0));
         Raise(new PartyChangedEvent());

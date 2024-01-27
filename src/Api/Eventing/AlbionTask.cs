@@ -21,6 +21,16 @@ public readonly struct AlbionTask : INotifyCompletion, IEquatable<AlbionTask>
     public AlbionTask GetAwaiter() => this;
     public bool IsCompleted => _core == null || _core.IsCompleted;
 
+    public AlbionTask Named(string description)
+    {
+#if DEBUG
+        if (_core != null)
+            _core.Description = description;
+#endif
+
+        return this;
+    }
+
     public void OnCompleted(Action continuation)
     {
         if (_core == null)
@@ -72,6 +82,17 @@ public readonly struct AlbionTask<T> : INotifyCompletion, IEquatable<AlbionTask<
 
     public AlbionTask AsUntyped => new(_core);
     public AlbionTask<T> GetAwaiter() => this;
+
+    public AlbionTask<T> Named(string description)
+    {
+#if DEBUG
+        if (_core != null)
+            _core.Description = description;
+#endif
+
+        return this;
+    }
+
     public bool IsCompleted => _core == null || _core.IsCompleted;
 
     public void OnCompleted(Action continuation)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
 using SerdesNet;
@@ -13,6 +14,10 @@ public class CharacterSheet : ICharacterSheet
     public const int SpellSchoolCount = 7;
     public const int MaxSpellsPerSchool = 30;
     public const int MaxNameLength = 16;
+
+    const int NpcSheetSize = 742;
+    const int PlayerSheetSize = 940;
+    const int MonsterSheetSize = 1214;
 
     public CharacterSheet(SheetId id)
     {
@@ -156,7 +161,6 @@ public class CharacterSheet : ICharacterSheet
         }
     }
 
-
     public static CharacterSheet Serdes(SheetId id, CharacterSheet sheet, AssetMapping mapping, ISerializer s, ISpellManager spellManager)
     {
         if (mapping == null) throw new ArgumentNullException(nameof(mapping));
@@ -293,7 +297,7 @@ public class CharacterSheet : ICharacterSheet
                 }
             }
         }
-        ApiUtil.Assert(s.Offset - initialOffset == 742, "Expected common sheet data to be 742 bytes"); // 742=2E6
+        ApiUtil.Assert(s.Offset - initialOffset == NpcSheetSize, $"Expected common sheet data to be {NpcSheetSize} bytes"); // 742=2E6
 
         if (sheet.Type == CharacterType.Npc)
         {
@@ -304,7 +308,7 @@ public class CharacterSheet : ICharacterSheet
         if (sheet.Type == CharacterType.Party)
         {
             Inventory.SerdesCharacter(id.Id, sheet.Inventory, mapping, s);
-            ApiUtil.Assert(s.Offset - initialOffset == 940, "Expected player character sheet to be 940 bytes"); // 940=3AC
+            ApiUtil.Assert(s.Offset - initialOffset == PlayerSheetSize, $"Expected player character sheet to be {PlayerSheetSize} bytes"); // 940=3AC
             s.End();
             return sheet;
         }
@@ -313,8 +317,27 @@ public class CharacterSheet : ICharacterSheet
         Inventory.SerdesMonster(id.Id, sheet.Inventory, mapping, s);
         sheet.Monster = MonsterData.Serdes(sheet.Monster, mapping, s);
         // sheet.UnkMonster = s.Bytes(nameof(UnkMonster), sheet.UnkMonster, 328);
-        ApiUtil.Assert(s.Offset - initialOffset == 1214, "Expected monster character sheet to be 1214 bytes"); // 1214=4BE
+        ApiUtil.Assert(s.Offset - initialOffset == MonsterSheetSize, $"Expected monster character sheet to be {MonsterSheetSize} bytes"); // 1214=4BE
         s.End();
         return sheet;
+    }
+
+    public CharacterSheet DeepClone(ISpellManager spellManager)
+    {
+        using var ms = new MemoryStream(MonsterSheetSize);
+
+        using (var bw = new BinaryWriter(ms, FormatUtil.AlbionEncoding, true))
+        using (var writer = new AlbionWriter(bw))
+        {
+            Serdes(Id, this, AssetMapping.Global, writer, spellManager);
+        }
+
+        ms.Position = 0;
+
+        using (var br = new BinaryReader(ms, FormatUtil.AlbionEncoding, true))
+        using (var reader = new AlbionReader(br))
+        {
+            return Serdes(Id, this, AssetMapping.Global, reader, spellManager);
+        }
     }
 }

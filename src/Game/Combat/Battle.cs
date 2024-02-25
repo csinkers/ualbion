@@ -5,6 +5,7 @@ using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Ids;
+using UAlbion.Game.State;
 
 namespace UAlbion.Game.Combat;
 
@@ -41,6 +42,29 @@ public class Battle : GameComponent, IReadOnlyBattle
     protected override void Subscribed()
     {
         var group = Assets.LoadMonsterGroup(_groupId);
+        foreach (var partyMember in Resolve<IParty>().StatusBarOrder)
+        {
+            var mob = new Mob(partyMember);
+            _mobs.Add(mob);
+            _tiles[mob.CombatPosition] = mob;
+        }
+
+        for (int row = 0; row < SavedGame.CombatRows; row++)
+        {
+            for (int column = 0; column < SavedGame.CombatColumns; column++)
+            {
+                var index = row * SavedGame.CombatColumns + column;
+                var mobId = group.Grid[index];
+                if (mobId.IsNone)
+                    continue;
+
+                var sheet = Assets.LoadSheet(mobId);
+                var monster = new Monster(sheet);
+                var mob = new Mob(monster);
+                _mobs.Add(mob);
+                _tiles[mob.CombatPosition] = mob;
+            }
+        }
     }
 
     public IReadOnlyMob GetTile(int x, int y)

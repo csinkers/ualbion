@@ -1,14 +1,21 @@
 ﻿using System;
-using UAlbion.Api.Eventing;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Save;
+using UAlbion.Game.State;
 
 namespace UAlbion.Game.Combat;
 
-public class Mob : Component, IReadOnlyMob // Logical mob / character in a battle
+public class Mob : GameComponent, IReadOnlyMob // Logical mob / character in a battle
 {
-    public Mob(IEffectiveCharacterSheet sheet) => Sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
+    readonly ICombatParticipant _participant;
 
-    public int X { get; private set; }
-    public int Y { get; private set; }
-    public IEffectiveCharacterSheet Sheet { get; }
+    public Mob(ICombatParticipant participant)
+    {
+        _participant = participant ?? throw new ArgumentNullException(nameof(participant));
+    }
+
+    public int X => _participant.CombatPosition % SavedGame.CombatColumns;
+    public int Y => _participant.CombatPosition / SavedGame.CombatColumns;
+    public IEffectiveCharacterSheet Sheet => _participant.Effective;
+    public int CombatPosition => _participant.CombatPosition;
 }

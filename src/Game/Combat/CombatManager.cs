@@ -1,6 +1,4 @@
-﻿using UAlbion.Api.Eventing;
-using UAlbion.Formats;
-using UAlbion.Formats.Ids;
+﻿using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
@@ -9,7 +7,7 @@ using UAlbion.Game.Scenes;
 
 namespace UAlbion.Game.Combat;
 
-public class CombatManager : Component
+public class CombatManager : GameComponent
 {
     public CombatManager()
     {
@@ -23,8 +21,7 @@ public class CombatManager : Component
 
         Raise(new PushSceneEvent(SceneId.Combat));
 
-        var assets = Resolve<IAssetManager>();
-        var info = assets.GetAssetInfo(backgroundId);
+        var info = Assets.GetAssetInfo(backgroundId);
         if (info != null)
             Raise(new LoadPaletteEvent(info.PaletteId));
 

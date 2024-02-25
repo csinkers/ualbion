@@ -4,7 +4,6 @@ using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.Gui.Controls;
@@ -30,9 +29,8 @@ public class UiFixedPositionElement : UiElement
     {
         if (_sprite == null)
         {
-            var assets = Resolve<IAssetManager>();
             var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
-            var texture = assets.LoadTexture(_id);
+            var texture = Assets.LoadTexture(_id);
             var key = new SpriteKey(texture, SpriteSampler.Point, DrawLayer.Interface, SpriteKeyFlags.NoTransform | SpriteKeyFlags.NoDepthTest);
             _sprite = sm.Borrow(key, 1, this);
         }

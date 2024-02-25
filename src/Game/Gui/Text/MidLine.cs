@@ -4,7 +4,6 @@ using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.Gui.Text;
@@ -52,7 +51,6 @@ public class MidLine : UiElement
 
         UpdateSprite((DrawLayer)order);
 
-        var assets = Resolve<IAssetManager>();
         var window = Resolve<IGameWindow>();
         var yPosition = extents.Y + extents.Height / 2;
         var position = new Vector3(window.UiToNorm(extents.X + MarginX, yPosition), 0);
@@ -70,7 +68,7 @@ public class MidLine : UiElement
         try
         {
             // Shrink by 1 pix from either end
-            var ink = assets.LoadInk(_ink);
+            var ink = Assets.LoadInk(_ink);
             var region = Resolve<ICommonColors>().GetRegion(ink.PaletteLineColor);
             var shadowOffset = window.UiToNormRelative(1, 1);
             instances[0] = new SpriteInfo(SpriteFlags.TopLeft, position, size, region);

@@ -1,7 +1,6 @@
 ﻿using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
-using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
@@ -12,7 +11,7 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Text;
 
-public class ConversationManager : ServiceComponent<IConversationManager>, IConversationManager
+public class ConversationManager : GameServiceComponent<IConversationManager>, IConversationManager
 {
     public Conversation Conversation { get; private set; }
 
@@ -103,8 +102,7 @@ public class ConversationManager : ServiceComponent<IConversationManager>, IConv
     async AlbionTask StartDialogue(StartDialogueEvent e)
     {
         var party = Resolve<IParty>();
-        var assets = Resolve<IAssetManager>();
-        var npc = assets.LoadSheet(e.NpcId);
+        var npc = Assets.LoadSheet(e.NpcId);
         if (npc == null)
         {
             ApiUtil.Assert($"Could not load NPC {e.NpcId}");
@@ -126,8 +124,7 @@ public class ConversationManager : ServiceComponent<IConversationManager>, IConv
 
     async AlbionTask StartPartyDialogue(StartPartyDialogueEvent e)
     {
-        var assets = Resolve<IAssetManager>();
-        var sheet = assets.LoadSheet(e.MemberId.ToSheet());
+        var sheet = Assets.LoadSheet(e.MemberId.ToSheet());
         if (sheet == null)
         {
             Error($"Could not load NPC info for \"{e.MemberId}\"");

@@ -10,7 +10,6 @@ using UAlbion.Config.Properties;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Audio;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
@@ -18,7 +17,7 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Veldrid.Audio;
 
-public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManager, IDisposable
+public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioManager, IDisposable
 {
     const int DefaultSampleRate = 11025;
     public static readonly AssetIdAssetProperty<WaveLibraryId> WaveLibProperty = new("WaveLib", WaveLibraryId.None, x => x);
@@ -81,8 +80,7 @@ public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManage
             if (_sampleCache.TryGetValue(id, out var buffer))
                 return buffer;
 
-            var assets = Resolve<IAssetManager>();
-            var sample = assets.LoadSample(id);
+            var sample = Assets.LoadSample(id);
             if (sample == null)
             {
                 Error($"Could not load audio sample {id.Id}: {id}");
@@ -104,8 +102,7 @@ public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManage
         {
             if (_waveLibCache.TryGetValue(key, out var buffer))
                 return buffer;
-            var assets = Resolve<IAssetManager>();
-            var songInfo = assets.GetAssetInfo(songId);
+            var songInfo = Assets.GetAssetInfo(songId);
             var waveLibId = songInfo.GetProperty(WaveLibProperty);
             if (waveLibId.IsNone)
             {
@@ -113,7 +110,7 @@ public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManage
                 return null;
             }
 
-            var waveLibrary = assets.LoadWaveLib(waveLibId)?[instrument];
+            var waveLibrary = Assets.LoadWaveLib(waveLibId)?[instrument];
             if (waveLibrary == null)
             {
                 Error($"Could not load audio sample {key}");

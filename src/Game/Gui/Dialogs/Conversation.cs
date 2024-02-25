@@ -17,7 +17,7 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Dialogs;
 
-public class Conversation : Component
+public class Conversation : GameComponent
 {
     static readonly Vector2 ConversationPositionLeft = new(20, 20); // For 'give item' transitions
     static readonly Vector2 ConversationPositionRight = new(335, 20);
@@ -48,9 +48,8 @@ public class Conversation : Component
 
         _tf = Resolve<ITextFormatter>();
         var game = TryResolve<IGameState>();
-        var assets = Resolve<IAssetManager>();
         var dialogs = Resolve<IDialogManager>();
-        var sheet = game?.GetSheet(_partyMemberId.ToSheet()) ?? assets.LoadSheet(_partyMemberId.ToSheet());
+        var sheet = game?.GetSheet(_partyMemberId.ToSheet()) ?? Assets.LoadSheet(_partyMemberId.ToSheet());
 
         AttachChild(new ConversationParticipantLabel(sheet, false));
         AttachChild(new ConversationParticipantLabel(_npc, true));
@@ -294,9 +293,7 @@ public class Conversation : Component
 
     async AlbionTask<bool> TriggerAction(ActionType type, byte small, AssetId argument) // Return true if a script was run for the action
     {
-        var assets = Resolve<IAssetManager>();
-
-        var chainSource = _npc.EventSetId.IsNone ? null : assets.LoadEventSet(_npc.EventSetId);
+        var chainSource = _npc.EventSetId.IsNone ? null : Assets.LoadEventSet(_npc.EventSetId);
         ushort? eventIndex = null;
 
         if (chainSource != null)
@@ -304,7 +301,7 @@ public class Conversation : Component
 
         if (eventIndex == null) // Fall back to the word set
         {
-            chainSource = _npc.WordSetId.IsNone ? null : assets.LoadEventSet(_npc.WordSetId);
+            chainSource = _npc.WordSetId.IsNone ? null : Assets.LoadEventSet(_npc.WordSetId);
             if (chainSource != null)
                 eventIndex = FindActionChain(chainSource, type, small, argument);
         }

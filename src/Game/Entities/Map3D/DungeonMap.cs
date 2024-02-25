@@ -4,7 +4,6 @@ using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
@@ -16,7 +15,7 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities.Map3D;
 
-public class DungeonMap : Component, IMap
+public class DungeonMap : GameComponent, IMap
 {
     readonly MapData3D _mapData;
     readonly ICamera _camera;
@@ -65,9 +64,8 @@ public class DungeonMap : Component, IMap
             return;
         }
 
-        var assets = Resolve<IAssetManager>();
         var factory = Resolve<ICoreFactory>();
-        _labyrinthData = assets.LoadLabyrinthData(_mapData.LabDataId);
+        _labyrinthData = Assets.LoadLabyrinthData(_mapData.LabDataId);
 
         if (_labyrinthData == null)
             return;
@@ -95,14 +93,14 @@ public class DungeonMap : Component, IMap
 
         if (!_labyrinthData.BackgroundId.IsNone)
         {
-            var background = assets.LoadTexture(_labyrinthData.BackgroundId);
+            var background = Assets.LoadTexture(_labyrinthData.BackgroundId);
             if (background == null)
                 Error($"Could not load background image {_labyrinthData.BackgroundId}");
 
             _skybox = factory.CreateSkybox(background, _camera);
         }
 
-        var palette = assets.LoadPalette(_logicalMap.PaletteId);
+        var palette = Assets.LoadPalette(_logicalMap.PaletteId);
         uint backgroundColour = palette.GetPaletteAtTime(0)[_labyrinthData.BackgroundColour];
         _backgroundRed = (backgroundColour & 0xff) / 255.0f;
         _backgroundGreen = (backgroundColour & 0xff00 >> 8) / 255.0f;

@@ -6,7 +6,6 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Game.Entities;
 
 namespace UAlbion.Game.Gui.Controls;
@@ -53,7 +52,7 @@ public class DialogFrame : UiElement
             _lastPixelSize = pixelSize;
         }
 
-        var assets = Resolve<IAssetManager>();
+        var assets = Assets;
         var palette = assets.LoadPalette(Id(Base.Palette.Inventory));
         var multi = new CompositedTexture(AssetId.None, $"DialogFrame {width}x{height}", palette);
 

@@ -1,10 +1,8 @@
-﻿using UAlbion.Api.Eventing;
-using UAlbion.Formats;
-using UAlbion.Game.Events.Inventory;
+﻿using UAlbion.Game.Events.Inventory;
 
 namespace UAlbion.Game.Gui.Inventory;
 
-public class InventoryInspector : Component
+public class InventoryInspector : GameComponent
 {
     public InventoryInspector()
     {
@@ -13,8 +11,7 @@ public class InventoryInspector : Component
 
     void Examine(InventoryExamineEvent e)
     {
-        var assets = Resolve<IAssetManager>();
-        var item = assets.LoadItem(e.ItemId);
+        var item = Assets.LoadItem(e.ItemId);
         if (item == null)
             return;
         var details = AttachChild(new InventoryDetailsDialog(item));

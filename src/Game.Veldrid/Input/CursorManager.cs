@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config.Properties;
 using UAlbion.Core;
@@ -18,7 +17,7 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Veldrid.Input;
 
-public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
+public class CursorManager : GameServiceComponent<ICursorManager>, ICursorManager
 {
     static readonly Vector2 ItemSpriteOffset = new(3, 3);
     static readonly StringAssetProperty Hotspot = new("Hotspot");
@@ -87,9 +86,8 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
 
     void SetCursor(SpriteId cursorId)
     {
-        var assets = Resolve<IAssetManager>();
         var window = Resolve<IGameWindow>();
-        var config = assets.GetAssetInfo(cursorId);
+        var config = Assets.GetAssetInfo(cursorId);
 
         _cursorId = cursorId;
         var hotspot = CursorHotspot.Parse(config?.GetProperty(Hotspot, null));
@@ -110,7 +108,6 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
             return;
         _dirty = false;
 
-        var assets = Resolve<IAssetManager>();
         var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
         var window = Resolve<IGameWindow>();
 
@@ -118,8 +115,8 @@ public class CursorManager : ServiceComponent<ICursorManager>, ICursorManager
             return;
 
         var position = new Vector3(window.PixelToNorm(Position - _hotspot), 1.0f);
-        RenderCursor(assets, sm, window, position);
-        RenderItemInHandCursor(assets, sm, window, position);
+        RenderCursor(Assets, sm, window, position);
+        RenderItemInHandCursor(Assets, sm, window, position);
         RenderHotspot(sm, window, showHotspot);
     }
 

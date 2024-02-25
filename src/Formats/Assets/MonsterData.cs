@@ -20,6 +20,10 @@ public class MonsterData
     // public ushort DisplayHeight { get; set; }
 
     public SpriteId MonsterGraphics { get; set; }
+
+    // Hardcoded offset of 12. This is pretty nasty, but it's how it was done in the original.
+    // TODO: Make this data driven if modding ever requires it.
+    public SpriteId TacticalGraphics => new(AssetType.TacticalGfx, MonsterGraphics.Id + 12);
     public byte Unk1 { get; set; }
     public byte[] Unk2 { get; set; }
 

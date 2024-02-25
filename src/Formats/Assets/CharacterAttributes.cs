@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using SerdesNet;
 using UAlbion.Formats.MapEvents;
 
@@ -61,9 +63,25 @@ public class CharacterAttribute : ICharacterAttribute
     }
 }
 
-public class CharacterAttributes : ICharacterAttributes
+public class CharacterAttributes : ICharacterAttributes, IEnumerable<CharacterAttribute>
 {
+    IEnumerable<CharacterAttribute> Enumerate()
+    {
+        yield return Strength;
+        yield return Intelligence;
+        yield return Dexterity;
+        yield return Speed;
+        yield return Stamina;
+        yield return Luck;
+        yield return MagicResistance;
+        yield return MagicTalent;
+    }
+
+    public IEnumerator<CharacterAttribute> GetEnumerator() => Enumerate().GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Enumerate()).GetEnumerator();
+
     public override string ToString() => $"S{Strength} I{Intelligence} D{Dexterity} Sp{Speed} St{Stamina} L{Luck} MR{MagicResistance} MT{MagicTalent}";
+
     ICharacterAttribute ICharacterAttributes.Strength => Strength;
     ICharacterAttribute ICharacterAttributes.Intelligence => Intelligence;
     ICharacterAttribute ICharacterAttributes.Dexterity => Dexterity;

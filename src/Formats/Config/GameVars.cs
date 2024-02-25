@@ -15,6 +15,12 @@ public class GameVars
         public FloatVar PollIntervalSeconds { get; } = new(Library, "Game.Audio.PollIntervalSeconds", 0.1f);
     }
 
+    public CombatVars Combat { get; } = new();
+    public class CombatVars
+    {
+        public IntVar StatRandomisationPercentage { get; }= new(Library, "Game.Combat.StatRandomizationPercentage", 10);
+    }
+
     public InventoryVars Inventory { get; } = new();
     public class InventoryVars
     {

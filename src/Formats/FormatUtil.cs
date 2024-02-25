@@ -12,7 +12,7 @@ namespace UAlbion.Formats;
 
 public static class FormatUtil
 {
-    static readonly Encoding AlbionEncoding = GetEncoding850();
+    public static readonly Encoding AlbionEncoding = GetEncoding850();
     static Encoding GetEncoding850()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Required for code page 850 support in .NET Core

@@ -11,7 +11,6 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Audio;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
@@ -256,7 +255,7 @@ public sealed class AudioManager : ServiceComponent<IAudioManager>, IAudioManage
     {
         using var device = new AudioDevice { DistanceModel = DistanceModel.InverseDistance };
 
-        while (!_doneEvent.WaitOne((int)(Var(GameVars.Audio.PollIntervalSeconds) * 1000)))
+        while (!_doneEvent.WaitOne((int)(ReadVar(V.Game.Audio.PollIntervalSeconds) * 1000)))
         {
             if (_standalone)
                 Raise(BeginFrameEvent.Instance);

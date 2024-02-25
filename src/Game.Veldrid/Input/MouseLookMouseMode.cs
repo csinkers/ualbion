@@ -4,7 +4,6 @@ using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
-using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Veldrid.Input;
@@ -100,7 +99,7 @@ public class MouseLookMouseMode : Component
 
         if (e.MouseDelta.LengthSquared() > float.Epsilon)
         {
-            var sensitivity = Var(GameVars.Ui.MouseLookSensitivity) / -1000;
+            var sensitivity = ReadVar(V.Game.Ui.MouseLookSensitivity) / -1000;
             _cameraRotateEvent.Yaw = e.MouseDelta.X * sensitivity;
             _cameraRotateEvent.Pitch = e.MouseDelta.Y * sensitivity;
             Raise(_cameraRotateEvent);

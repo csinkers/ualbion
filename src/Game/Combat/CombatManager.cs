@@ -1,5 +1,4 @@
 ﻿using UAlbion.Api.Eventing;
-using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
@@ -21,7 +20,6 @@ public class CombatManager : Component
     {
         if (backgroundId.IsNone)
             backgroundId = Resolve<IMapManager>().Current.MapData.CombatBackgroundId;
-
 
         Raise(new PushSceneEvent(SceneId.Combat));
 

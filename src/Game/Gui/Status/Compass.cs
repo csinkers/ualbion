@@ -5,7 +5,6 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
-using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 
 namespace UAlbion.Game.Gui.Status;
@@ -53,7 +52,7 @@ public class Compass : Dialog
                     _frame = 0;
             }
 
-            var language = Var(UserVars.Gameplay.Language);
+            var language = ReadVar(V.User.Gameplay.Language);
             _face.Id = language switch
             {
                 Base.Language.German => Base.CoreGfx.CompassDe,

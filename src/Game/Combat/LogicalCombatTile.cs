@@ -13,7 +13,6 @@ using UAlbion.Game.Gui;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Input;
 using UAlbion.Game.Scenes;
-using UAlbion.Game.Settings;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Combat;
@@ -75,7 +74,7 @@ public class LogicalCombatTile : UiElement
         var window = Resolve<IGameWindow>();
         var cursorManager = Resolve<ICursorManager>();
 
-        var playerName = sheet?.GetName(Var(UserVars.Gameplay.Language));
+        var playerName = sheet?.GetName(ReadVar(V.User.Gameplay.Language));
         IText heading = playerName == null 
             ? tf.Center().NoWrap().Fat().Format(Base.SystemText.Combat_Combat) 
             : tf.Center().NoWrap().Fat().Format(playerName);

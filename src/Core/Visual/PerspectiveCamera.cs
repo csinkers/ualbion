@@ -142,7 +142,7 @@ public class PerspectiveCamera : Component, ICamera
 
     void UpdateBackend()
     {
-        var engineFlags = Var(CoreVars.User.EngineFlags);
+        var engineFlags = ReadVar(V.Core.User.EngineFlags);
         var e = TryResolve<IEngine>();
         if (e != null)
         {

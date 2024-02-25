@@ -28,7 +28,7 @@ public class SettingsWindow : Component, IImGuiWindow
                     x => me.Raise(new DebugFlagEvent(x ? FlagOperation.Set : FlagOperation.Clear, flag)));
             }
 
-            var curFlags = Var(UserVars.Debug.DebugFlags);
+            var curFlags = ReadVar(V.User.Debug.DebugFlags);
             DebugFlagOption(this, curFlags, DebugFlags.DrawPositions);
             DebugFlagOption(this, curFlags, DebugFlags.HighlightTile);
             // DebugFlagOption(this, curFlags, DebugFlags.HighlightChain);
@@ -52,7 +52,7 @@ public class SettingsWindow : Component, IImGuiWindow
                     x => me.Raise(new EngineFlagEvent(x ? FlagOperation.Set : FlagOperation.Clear, flag)));
             }
 
-            var curFlags = Var(CoreVars.User.EngineFlags);
+            var curFlags = ReadVar(V.Core.User.EngineFlags);
             EngineFlagOption(this, curFlags, EngineFlags.ShowBoundingBoxes);
             EngineFlagOption(this, curFlags, EngineFlags.ShowCameraPosition);
             EngineFlagOption(this, curFlags, EngineFlags.FlipDepthRange);

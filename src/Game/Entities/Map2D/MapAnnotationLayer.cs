@@ -67,7 +67,7 @@ public class MapAnnotationLayer : Component
     void Render()
     {
 #if DEBUG
-        var debug = Var(UserVars.Debug.DebugFlags);
+        var debug = ReadVar(V.User.Debug.DebugFlags);
         //if (_lastDebugFlags != debug)
         //    _allDirty = true;
         _lastDebugFlags = debug;

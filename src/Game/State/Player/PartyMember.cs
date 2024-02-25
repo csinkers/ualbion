@@ -5,7 +5,6 @@ using UAlbion.Api.Settings;
 using UAlbion.Core.Events;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
@@ -50,7 +49,7 @@ public class PartyMember : Component, IPlayer
         var elapsed = (DateTime.Now - _lastChangeTime).TotalSeconds;
         var oldLerp = _lerp;
 
-        var lerpDuration = Var(GameVars.Ui.Transitions.InventoryChangLerpSeconds);
+        var lerpDuration = ReadVar(V.Game.Ui.Transitions.InventoryChangLerpSeconds);
         _lerp = elapsed >  lerpDuration
             ? 1.0f 
             : (float)(elapsed / lerpDuration);

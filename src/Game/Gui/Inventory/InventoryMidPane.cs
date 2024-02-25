@@ -4,7 +4,6 @@ using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
-using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
 
@@ -61,7 +60,7 @@ public class InventoryMidPane : UiElement
                 if (member == null)
                     return Array.Empty<TextBlock>();
 
-                var name = member.Apparent.GetName(Var(UserVars.Gameplay.Language));
+                var name = member.Apparent.GetName(ReadVar(V.User.Gameplay.Language));
                 return new[] { new TextBlock(name) { Alignment = TextAlignment.Center } };
             }), 18),
             new HorizontalStacker(

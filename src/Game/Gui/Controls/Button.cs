@@ -4,7 +4,6 @@ using System.Threading;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Text;
@@ -91,7 +90,7 @@ public class Button : UiElement
         }
         else // For the first click, just start the double-click timer.
         {
-            Raise(new StartTimerEvent(TimerName, Var(GameVars.Ui.ButtonDoubleClickIntervalSeconds), this));
+            Raise(new StartTimerEvent(TimerName, ReadVar(V.Game.Ui.ButtonDoubleClickIntervalSeconds), this));
             ClickTimerPending = true;
         }
     }

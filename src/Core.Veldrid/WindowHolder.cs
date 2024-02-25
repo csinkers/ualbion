@@ -44,10 +44,10 @@ class WindowHolder : Component, IDisposable
         if (_window != null)
             return;
 
-        var x = Var(CoreVars.Ui.WindowPosX);
-        var y = Var(CoreVars.Ui.WindowPosY);
-        var w = Var(CoreVars.Ui.WindowWidth);
-        var h = Var(CoreVars.Ui.WindowHeight);
+        var x = ReadVar(V.Core.Ui.WindowPosX);
+        var y = ReadVar(V.Core.Ui.WindowPosY);
+        var w = ReadVar(V.Core.Ui.WindowWidth);
+        var h = ReadVar(V.Core.Ui.WindowHeight);
 
         var windowInfo = new WindowCreateInfo
         {
@@ -63,8 +63,8 @@ class WindowHolder : Component, IDisposable
         _window.Moved += pos =>
         {
             var settings = Resolve<ISettings>();
-            CoreVars.Ui.WindowPosX.Write(settings, pos.X);
-            CoreVars.Ui.WindowPosY.Write(settings, pos.Y);
+            V.Core.Ui.WindowPosX.Write(settings, pos.X);
+            V.Core.Ui.WindowPosY.Write(settings, pos.Y);
         };
 
         _window.Resized += () =>
@@ -80,8 +80,8 @@ class WindowHolder : Component, IDisposable
             }
 
             var settings = Resolve<ISettings>();
-            CoreVars.Ui.WindowWidth.Write(settings, _window.Width);
-            CoreVars.Ui.WindowHeight.Write(settings, _window.Height);
+            V.Core.Ui.WindowWidth.Write(settings, _window.Width);
+            V.Core.Ui.WindowHeight.Write(settings, _window.Height);
             Raise(new WindowResizedEvent(_window.Width, _window.Height));
         };
 

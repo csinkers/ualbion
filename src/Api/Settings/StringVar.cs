@@ -5,14 +5,18 @@ namespace UAlbion.Api.Settings;
 
 public class StringVar : IVar<string>
 {
-    public StringVar(string key, string defaultValue)
+    public StringVar(VarLibrary library, string key, string defaultValue)
     {
+        if (library == null) throw new ArgumentNullException(nameof(library));
         Key = key;
         DefaultValue = defaultValue;
+        library.Add(this);
     }
 
     public string Key { get; }
     public string DefaultValue { get; }
+    public object DefaultValueUntyped => DefaultValue;
+    public Type ValueType => typeof(string);
 
     public string Read(IVarSet varSet)
     {
@@ -32,4 +36,9 @@ public class StringVar : IVar<string>
         if (varSet == null) throw new ArgumentNullException(nameof(varSet));
         varSet.SetValue(Key, value);
     }
+
+    public void WriteFromString(ISettings varSet, string value) => Write(varSet, value);
+
+    public override string ToString()
+        => $"StringVar({Key}) (default={DefaultValue})";
 }

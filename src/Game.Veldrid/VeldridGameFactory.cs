@@ -1,14 +1,24 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Api.Visual;
+using UAlbion.Core;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Formats.Config;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Entities.Map2D;
+using UAlbion.Game.Settings;
 using UAlbion.Game.Veldrid.Visual;
 
 namespace UAlbion.Game.Veldrid;
+
+internal static class V
+{
+    public static GameVars Game => GameVars.Instance;
+    public static CoreVars Core => CoreVars.Instance;
+    public static UserVars User => UserVars.Instance;
+}
 
 public class VeldridGameFactory : VeldridCoreFactory, IGameFactory
 {

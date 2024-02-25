@@ -5,7 +5,6 @@ using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.State;
 
@@ -73,8 +72,8 @@ public class CameraMotion2D : Component
                 return;
 
             var tileOffset = new Vector3(
-                Var(GameVars.VisualVars.Camera2D.TileOffsetX),
-                Var(GameVars.VisualVars.Camera2D.TileOffsetY),
+                ReadVar(V.Game.Visual.Camera2D.TileOffsetX),
+                ReadVar(V.Game.Visual.Camera2D.TileOffsetY),
                 0);
 
             var tilePosition = leader.GetPosition() + tileOffset;
@@ -92,7 +91,7 @@ public class CameraMotion2D : Component
             }
             else
             {
-                var lerpRate = Var(GameVars.VisualVars.Camera2D.LerpRate);
+                var lerpRate = ReadVar(V.Game.Visual.Camera2D.LerpRate);
                 _position = new Vector3(
                     ApiUtil.Lerp(_position.X, posXY.X, lerpRate * e.DeltaSeconds),
                     ApiUtil.Lerp(_position.Y, posXY.Y, lerpRate * e.DeltaSeconds),

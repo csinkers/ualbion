@@ -64,7 +64,7 @@ public static class AssetSystem
         PerfTracker.StartupEvent("Registered asset services");
         IModApplier modApplier = new ModApplier();
         exchange.Attach(modApplier);
-        modApplier.LoadMods(mapping, pathResolver, mods ?? UserVars.Gameplay.ActiveMods.Read(settings));
+        modApplier.LoadMods(mapping, pathResolver, mods ?? V.User.Gameplay.ActiveMods.Read(settings));
         mapping.ConsistencyCheck();
 
         exchange.Attach(new Container("Logging",

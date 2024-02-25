@@ -8,7 +8,6 @@ using UAlbion.Api.Eventing;
 using UAlbion.Api.Settings;
 using UAlbion.Config;
 using UAlbion.Game.Events;
-using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Assets;
 
@@ -32,8 +31,8 @@ class ModLoader : Component // Shouldn't be referenced outside ModApplier
         if (pathResolver == null) throw new ArgumentNullException(nameof(pathResolver));
         if (mods == null) throw new ArgumentNullException(nameof(mods));
 
-        pathResolver.RegisterPath("ALBION", pathResolver.ResolvePathAbsolute(Var(UserVars.Path.Albion)));
-        pathResolver.RegisterPath("SAVES", pathResolver.ResolvePathAbsolute(Var(UserVars.Path.Saves)));
+        pathResolver.RegisterPath("ALBION", pathResolver.ResolvePathAbsolute(ReadVar(V.User.Path.Albion)));
+        pathResolver.RegisterPath("SAVES", pathResolver.ResolvePathAbsolute(ReadVar(V.User.Path.Saves)));
 
         _mods.Clear();
         _modsInReverseDependencyOrder.Clear();

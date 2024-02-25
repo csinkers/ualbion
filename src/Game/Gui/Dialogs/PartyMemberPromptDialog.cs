@@ -5,7 +5,6 @@ using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
-using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
 
@@ -44,7 +43,7 @@ class PartyMemberPromptDialog : ModalDialog
                     .OnClick(() => OnButton(member.Id))
                     .OnHover(() =>
                     {
-                        var name = member.Effective.GetName(Var(UserVars.Gameplay.Language));
+                        var name = member.Effective.GetName(ReadVar(V.User.Gameplay.Language));
                         Raise(new HoverTextEvent(new LiteralText(name)));
                     })
                     .OnBlur(() => Raise(new HoverTextEvent(null))

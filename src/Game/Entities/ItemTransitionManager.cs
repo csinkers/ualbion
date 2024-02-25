@@ -6,7 +6,6 @@ using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events.Transitions;
 using UAlbion.Game.State;
-using TransitionVars = UAlbion.Formats.Config.GameVars.Ui.Transitions;
 
 namespace UAlbion.Game.Entities;
 
@@ -70,7 +69,7 @@ public class ItemTransitionManager : Component
                     Base.CoreGfx.UiGold, 0,
                     fromNormPosition,
                     destPosition,
-                    transitionTimeSeconds ?? Var(TransitionVars.DefaultTransitionTimeSeconds),
+                    transitionTimeSeconds ?? ReadVar(V.Game.Ui.Transitions.DefaultTransitionTimeSeconds),
                     window.UiToNormRelative(subImageDetails.Size),
                     source.Complete));
                 break;
@@ -85,7 +84,7 @@ public class ItemTransitionManager : Component
                     Base.CoreGfx.UiFood, 0,
                     fromNormPosition,
                     destPosition,
-                    transitionTimeSeconds ?? Var(TransitionVars.DefaultTransitionTimeSeconds),
+                    transitionTimeSeconds ?? ReadVar(V.Game.Ui.Transitions.DefaultTransitionTimeSeconds),
                     window.UiToNormRelative(subImageDetails.Size),
                     source.Complete));
                 break;
@@ -100,7 +99,7 @@ public class ItemTransitionManager : Component
                     item.Icon, item.IconSubId,
                     fromNormPosition,
                     destPosition,
-                    transitionTimeSeconds ?? Var(TransitionVars.DefaultTransitionTimeSeconds),
+                    transitionTimeSeconds ?? ReadVar(V.Game.Ui.Transitions.DefaultTransitionTimeSeconds),
                     window.UiToNormRelative(subImageDetails.Size),
                     source.Complete));
                 break;

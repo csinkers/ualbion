@@ -18,7 +18,6 @@ using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
-using NpcMoveVars = UAlbion.Formats.Config.GameVars.NpcMovement;
 
 namespace UAlbion.Game.Entities;
 
@@ -156,8 +155,8 @@ public class Npc2D : Component
     {
         _moveSettings ??= new MovementSettings(_isLarge ? LargeSpriteAnimations.Frames : SmallSpriteAnimations.Frames)
         {
-            TicksPerFrame = Var(NpcMoveVars.TicksPerFrame),
-            TicksPerTile = Var(NpcMoveVars.TicksPerTile)
+            TicksPerFrame = ReadVar(V.Game.NpcMovement.TicksPerFrame),
+            TicksPerTile = ReadVar(V.Game.NpcMovement.TicksPerTile)
         };
 
         SyncSprite();

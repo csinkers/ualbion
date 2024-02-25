@@ -2,12 +2,10 @@
 using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats.Assets.Maps;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
-using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Entities.Map2D;
 
@@ -29,12 +27,12 @@ public class MapRenderable2D : Component
 
         On<ToggleUnderlayEvent>(_ => _mapLayer.IsUnderlayActive = !_mapLayer.IsUnderlayActive);
         On<ToggleOverlayEvent>(_ => _mapLayer.IsOverlayActive = !_mapLayer.IsOverlayActive);
-        After<DebugFlagEvent>(_ => _mapLayer.DebugFlags = Var(UserVars.Debug.DebugFlags));
+        After<DebugFlagEvent>(_ => _mapLayer.DebugFlags = ReadVar(V.User.Debug.DebugFlags));
 
         On<FastClockEvent>(e =>
         {
             _fastFrames += e.Frames;
-            var newMapFrame = _fastFrames / Var(GameVars.Time.FastTicksPerMapTileFrame);
+            var newMapFrame = _fastFrames / ReadVar(V.Game.Time.FastTicksPerMapTileFrame);
             if (newMapFrame != _mapFrame)
             {
                 _mapFrame = newMapFrame;
@@ -54,7 +52,7 @@ public class MapRenderable2D : Component
 
     protected override void Subscribed()
     {
-        _mapLayer.DebugFlags = Var(UserVars.Debug.DebugFlags);
+        _mapLayer.DebugFlags = ReadVar(V.User.Debug.DebugFlags);
         Raise(new LoadPaletteEvent(Palette));
         _logicalMap.Dirty += OnLogicalMapDirty;
     }

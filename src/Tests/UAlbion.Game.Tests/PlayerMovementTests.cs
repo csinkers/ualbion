@@ -4,7 +4,6 @@ using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
-using UAlbion.Formats.Config;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Entities.Map2D;
 using Xunit;
@@ -95,10 +94,10 @@ public class PlayerMovementTests
         var moveSettings = new MovementSettings(LargeSpriteAnimations.Frames)
         {
             CanSit = true,
-            MinTrailDistance = GameVars.PartyMovement.MinTrailDistanceLarge.DefaultValue,
-            MaxTrailDistance = GameVars.PartyMovement.MaxTrailDistanceLarge.DefaultValue,
-            TicksPerTile = GameVars.PartyMovement.TicksPerTile.DefaultValue,
-            TicksPerFrame = GameVars.PartyMovement.TicksPerFrame.DefaultValue,
+            MinTrailDistance = V.Game.PartyMovement.MinTrailDistanceLarge.DefaultValue,
+            MaxTrailDistance = V.Game.PartyMovement.MaxTrailDistanceLarge.DefaultValue,
+            TicksPerTile = V.Game.PartyMovement.TicksPerTile.DefaultValue,
+            TicksPerFrame = V.Game.PartyMovement.TicksPerFrame.DefaultValue,
         };
 
         var m = new PlayerMovementState(moveSettings)
@@ -195,10 +194,10 @@ public class PlayerMovementTests
 
         var moveSettings = new MovementSettings(LargeSpriteAnimations.Frames)
         {
-            MinTrailDistance = GameVars.PartyMovement.MinTrailDistanceLarge.DefaultValue,
-            MaxTrailDistance = GameVars.PartyMovement.MaxTrailDistanceLarge.DefaultValue,
-            TicksPerTile = GameVars.PartyMovement.TicksPerTile.DefaultValue,
-            TicksPerFrame = GameVars.PartyMovement.TicksPerFrame.DefaultValue,
+            MinTrailDistance = V.Game.PartyMovement.MinTrailDistanceLarge.DefaultValue,
+            MaxTrailDistance = V.Game.PartyMovement.MaxTrailDistanceLarge.DefaultValue,
+            TicksPerTile = V.Game.PartyMovement.TicksPerTile.DefaultValue,
+            TicksPerFrame = V.Game.PartyMovement.TicksPerFrame.DefaultValue,
         };
 
         var m = new PlayerMovementState(moveSettings)

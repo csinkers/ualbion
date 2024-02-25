@@ -59,7 +59,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
         var oldTicksPerFrame = _settings.TicksPerFrame;
         After<DebugFlagEvent>(_ =>
         {
-            var debugFlags = Var(UserVars.Debug.DebugFlags);
+            var debugFlags = ReadVar(V.User.Debug.DebugFlags);
             if ((debugFlags & DebugFlags.FastMovement) != 0)
             {
                 _settings.TicksPerTile = (oldTicksPerTile + 3) / 4;

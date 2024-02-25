@@ -3,7 +3,6 @@ using UAlbion.Api.Settings;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
-using InvVars = UAlbion.Formats.Config.GameVars.Inventory;
 
 namespace UAlbion.Game.State.Player;
 
@@ -64,9 +63,9 @@ public static class EffectiveSheetCalculator
             sheet.TotalWeight += itemSlot.Amount * item.Weight;
         }
 
-        sheet.TotalWeight += (sheet.Inventory.Gold.Amount * InvVars.GramsPerGold.Read(config)) / 10;
-        sheet.TotalWeight += sheet.Inventory.Rations.Amount * InvVars.GramsPerRation.Read(config);
-        sheet.MaxWeight = sheet.Attributes.Strength.Current * InvVars.CarryWeightPerStrength.Read(config);
+        sheet.TotalWeight += (sheet.Inventory.Gold.Amount * V.Game.Inventory.GramsPerGold.Read(config)) / 10;
+        sheet.TotalWeight += sheet.Inventory.Rations.Amount * V.Game.Inventory.GramsPerRation.Read(config);
+        sheet.MaxWeight = sheet.Attributes.Strength.Current * V.Game.Inventory.CarryWeightPerStrength.Read(config);
     }
 
     static void ApplyWieldedItems(EffectiveCharacterSheet sheet, Func<ItemId, ItemData> getItem)

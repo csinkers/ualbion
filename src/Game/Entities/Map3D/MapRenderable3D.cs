@@ -8,7 +8,6 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets.Labyrinth;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Entities.Map2D;
@@ -143,7 +142,7 @@ public class MapRenderable3D : Component
 
     void Update()
     {
-        var frameCount =  (Resolve<IGameState>()?.TickCount ?? 0) / Var(GameVars.Time.FastTicksPerMapTileFrame);
+        var frameCount =  (Resolve<IGameState>()?.TickCount ?? 0) / ReadVar(V.Game.Time.FastTicksPerMapTileFrame);
 
         if (_frameCount != frameCount)
         {

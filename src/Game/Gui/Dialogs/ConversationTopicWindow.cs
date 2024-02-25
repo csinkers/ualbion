@@ -6,7 +6,6 @@ using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
-using UAlbion.Game.Settings;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Dialogs;
@@ -57,7 +56,7 @@ public class ConversationTopicWindow : ModalDialog
 
         var elements = new List<IUiElement>();
         var lookup = Resolve<IWordLookup>();
-        var language = Var(UserVars.Gameplay.Language);
+        var language = ReadVar(V.User.Gameplay.Language);
 
         _currentWords.Clear();
 

@@ -1,5 +1,6 @@
 ﻿using UAlbion.Api.Eventing;
 using UAlbion.Core.Visual;
+using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
@@ -21,9 +22,13 @@ public class CombatManager : Component
         if (backgroundId.IsNone)
             backgroundId = Resolve<IMapManager>().Current.MapData.CombatBackgroundId;
 
-        var paletteId = PaletteId.FromUInt32(Resolve<IPaletteManager>().Day.Id);
+
         Raise(new PushSceneEvent(SceneId.Combat));
-        Raise(new LoadPaletteEvent(paletteId));
+
+        var assets = Resolve<IAssetManager>();
+        var info = assets.GetAssetInfo(backgroundId);
+        if (info != null)
+            Raise(new LoadPaletteEvent(info.PaletteId));
 
         var battle = AttachChild(new Battle(groupId, backgroundId));
         Raise(new DialogManager.ShowCombatDialogEvent(battle));

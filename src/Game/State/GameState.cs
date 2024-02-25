@@ -17,7 +17,7 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.State;
 
-public class GameState : ServiceComponent<IGameState>, IGameState
+public class GameState : GameServiceComponent<IGameState>, IGameState
 {
     const int DaysPerMonth = 30;
     const int HoursPerDay = 24;
@@ -185,7 +185,6 @@ public class GameState : ServiceComponent<IGameState>, IGameState
 
     void OnSetContext(SetContextEvent e)
     {
-        var assets = Resolve<IAssetManager>();
         var state = Resolve<IGameState>();
 
         var asset = e.AssetId.Type switch
@@ -193,8 +192,8 @@ public class GameState : ServiceComponent<IGameState>, IGameState
             AssetType.PartyMember => (object)state.GetSheet(((PartyMemberId)e.AssetId).ToSheet()),
             AssetType.PartySheet => state.GetSheet(e.AssetId),
             AssetType.NpcSheet => state.GetSheet(e.AssetId),
-            AssetType.MonsterSheet => assets.LoadSheet(e.AssetId),
-            AssetType.Item => assets.LoadItem(e.AssetId),
+            AssetType.MonsterSheet => Assets.LoadSheet(e.AssetId),
+            AssetType.Item => Assets.LoadItem(e.AssetId),
             _ => null
         };
 
@@ -306,7 +305,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
         return inventory;
     }
 
-    ItemData GetItem(ItemId id) => Resolve<IAssetManager>().LoadItemStrict(id);
+    ItemData GetItem(ItemId id) => Assets.LoadItemStrict(id);
 
     public int TickCount { get; private set; }
     public bool Loaded => _game != null;
@@ -314,7 +313,6 @@ public class GameState : ServiceComponent<IGameState>, IGameState
     AlbionTask NewGame(MapId mapId, ushort x, ushort y)
     {
         Raise(new ReloadAssetsEvent()); // Make sure we don't end up with cached assets from the last game.
-        var assets = Resolve<IAssetManager>();
         _game = new SavedGame
         {
             MapId = mapId,
@@ -326,6 +324,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
             CombatPositions = { [0] = 1 } // Tom starts off in the second position
         };
 
+        var assets = Assets;
         foreach (var id in AssetMapping.Global.EnumerateAssetsOfType(AssetType.PartySheet))
             _game.Sheets.Add(id, assets.LoadSheet(id));
 
@@ -350,7 +349,7 @@ public class GameState : ServiceComponent<IGameState>, IGameState
 
     AlbionTask LoadGame(ushort id)
     {
-        _game = Resolve<IAssetManager>().LoadSavedGame(IdToPath(id));
+        _game = Assets.LoadSavedGame(IdToPath(id));
         if (_game == null)
             return AlbionTask.Complete;
 

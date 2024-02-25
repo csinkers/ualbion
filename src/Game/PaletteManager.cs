@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Linq;
 using UAlbion.Api;
-using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.ScriptEvents;
@@ -13,7 +11,7 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game;
 
-public class PaletteManager : ServiceComponent<IPaletteManager>, IPaletteManager
+public class PaletteManager : GameServiceComponent<IPaletteManager>, IPaletteManager
 {
     public IPalette Day { get; private set; }
     public IPalette Night { get; private set; }
@@ -51,8 +49,7 @@ public class PaletteManager : ServiceComponent<IPaletteManager>, IPaletteManager
 
     void SetPalette(PaletteId paletteId)
     {
-        var assets = Resolve<IAssetManager>();
-        var day = assets.LoadPalette(paletteId);
+        var day = Assets.LoadPalette(paletteId);
         if (day == null)
         {
             Error($"Palette ID {paletteId} could not be loaded!");
@@ -61,7 +58,7 @@ public class PaletteManager : ServiceComponent<IPaletteManager>, IPaletteManager
 
         Day = day;
         Night = NightPalettes.TryGetValue(paletteId, out var nightPaletteId)
-            ? assets.LoadPalette(nightPaletteId)
+            ? Assets.LoadPalette(nightPaletteId)
             : null;
 
         if (Night != null)

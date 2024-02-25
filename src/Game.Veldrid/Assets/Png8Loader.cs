@@ -8,7 +8,6 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.PixelFormats;
-using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core.Veldrid.Textures;
@@ -18,20 +17,19 @@ using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Game.Veldrid.Assets;
 
-public class Png8Loader : Component, IAssetLoader<IReadOnlyTexture<byte>>
+public class Png8Loader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>>
 {
     public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var assets = Resolve<IAssetManager>();
         var paletteId = context.PaletteId;
 
         if (paletteId.IsNone)
             throw new InvalidOperationException($"No palette id specified for {context.AssetId} ({context.AssetId.Id})");
 
-        var palette = assets.LoadPalette(paletteId);
+        var palette = Assets.LoadPalette(paletteId);
         if (palette == null)
             throw new InvalidOperationException($"Could not load palette {paletteId} for asset {context.AssetId} in file {context.Filename}");
 

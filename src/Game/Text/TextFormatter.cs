@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using UAlbion.Api;
-using UAlbion.Api.Eventing;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
@@ -12,7 +11,7 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game.Text;
 
-public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
+public class TextFormatter : GameServiceComponent<ITextFormatter>, ITextFormatter
 {
     public ITextFormatter NoWrap() => new CustomisedTextFormatter(this).NoWrap();
     public ITextFormatter Left() => new CustomisedTextFormatter(this).Left();
@@ -341,15 +340,13 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
     public IText Format(StringId stringId, IList<(Token, object)> implicitTokens, params object[] arguments)
         => new DynamicText(() =>
         {
-            var assets = Resolve<IAssetManager>();
-            string templateText = assets.LoadStringSafe(stringId);
-            return InnerFormat(templateText, arguments, implicitTokens, assets);
+            string templateText = Assets.LoadStringSafe(stringId);
+            return InnerFormat(templateText, arguments, implicitTokens, Assets);
         });
 
     public IText Format(string templateText, IList<(Token, object)> implicitTokens, params object[] arguments)
         => new DynamicText(() =>
         {
-            var assets = Resolve<IAssetManager>();
-            return InnerFormat(templateText, arguments, implicitTokens, assets);
+            return InnerFormat(templateText, arguments, implicitTokens, Assets);
         });
 }

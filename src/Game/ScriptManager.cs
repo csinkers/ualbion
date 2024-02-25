@@ -1,5 +1,4 @@
 ﻿using UAlbion.Api.Eventing;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Ids;
@@ -8,7 +7,7 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game;
 
-public class ScriptManager : Component
+public class ScriptManager : GameComponent
 {
     public ScriptManager()
     {
@@ -18,10 +17,9 @@ public class ScriptManager : Component
 
     AlbionTask Run(DoScriptEvent doScriptEvent)
     {
-        var assets = Resolve<IAssetManager>();
         var mapManager = Resolve<IMapManager>();
 
-        var events = assets.LoadScript(doScriptEvent.ScriptId);
+        var events = Assets.LoadScript(doScriptEvent.ScriptId);
         if (events == null)
         {
             Error($"Could not load script {doScriptEvent.ScriptId}");
@@ -42,8 +40,7 @@ public class ScriptManager : Component
 
     void Dump(DumpScriptEvent dumpScriptEvent)
     {
-        var assets = Resolve<IAssetManager>();
-        var events = assets.LoadScript(dumpScriptEvent.ScriptId);
+        var events = Assets.LoadScript(dumpScriptEvent.ScriptId);
         foreach (var e in events)
             Info(e.ToString());
     }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using UAlbion.Api.Eventing;
 using UAlbion.Api.Settings;
 using UAlbion.Core.Events;
 using UAlbion.Formats;
@@ -11,7 +10,7 @@ using UAlbion.Game.Events.Inventory;
 
 namespace UAlbion.Game.State.Player;
 
-public class PartyMember : Component, IPlayer
+public class PartyMember : GameComponent, IPlayer
 {
     readonly CharacterSheet _base;
     IEffectiveCharacterSheet _lastEffective;
@@ -73,7 +72,7 @@ public class PartyMember : Component, IPlayer
             UpdateSheet();
     }
 
-    ItemData LoadItem(ItemId x) => Resolve<IAssetManager>().LoadItemStrict(x);
+    ItemData LoadItem(ItemId x) => Assets.LoadItemStrict(x);
     void UpdateSheet()
     {
         _lastEffective = Effective;

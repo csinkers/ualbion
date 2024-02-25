@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UAlbion.Api;
-using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Config.Properties;
 using UAlbion.Core;
@@ -19,7 +18,7 @@ using static System.FormattableString;
 
 namespace UAlbion.Game.Assets;
 
-public class ModApplier : Component, IModApplier
+public class ModApplier : GameComponent, IModApplier
 {
     readonly AssetCache _assetCache = new();
     readonly ModLoader _mods = new();
@@ -265,10 +264,9 @@ public class ModApplier : Component, IModApplier
 
     AssetLoadResult LoadMetaFont(AssetId id)
     {
-        var assets = Resolve<IAssetManager>();
         var metaId = (MetaFontId)id;
-        var font = assets.LoadFontDefinition(metaId.FontId);
-        var metaFont = font.Build(metaId.FontId, metaId.InkId, assets);
+        var font = Assets.LoadFontDefinition(metaId.FontId);
+        var metaFont = font.Build(metaId.FontId, metaId.InkId, Assets);
         return new AssetLoadResult(id, metaFont, null);
     }
 

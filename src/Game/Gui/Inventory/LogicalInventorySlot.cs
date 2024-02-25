@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
@@ -104,7 +103,6 @@ public class LogicalInventorySlot : UiElement
 
     void Hover()
     {
-        var assets = Resolve<IAssetManager>();
         var inventoryManager = Resolve<IInventoryManager>();
         var inventory = Resolve<IGameState>().GetInventory(_id.Id);
         var tf = Resolve<ITextFormatter>();
@@ -113,16 +111,16 @@ public class LogicalInventorySlot : UiElement
         string itemName = null;
         if (slotInfo?.Item.Type == AssetType.Item)
         {
-            var item = assets.LoadItem(slotInfo.Item);
-            itemName = assets.LoadStringSafe(item.Name);
+            var item = Assets.LoadItem(slotInfo.Item);
+            itemName = Assets.LoadStringSafe(item.Name);
         }
 
         var hand = inventoryManager.ItemInHand;
         string itemInHandName = null;
         if (hand.Item.Type == AssetType.Item)
         {
-            var itemInHand = assets.LoadItem(hand.Item);
-            itemInHandName = assets.LoadStringSafe(itemInHand.Name);
+            var itemInHand = Assets.LoadItem(hand.Item);
+            itemInHandName = Assets.LoadStringSafe(itemInHand.Name);
         }
 
         var action = inventoryManager.GetInventoryAction(_id);
@@ -196,7 +194,7 @@ public class LogicalInventorySlot : UiElement
         var window = Resolve<IGameWindow>();
         var cursorManager = Resolve<ICursorManager>();
 
-        var item = Resolve<IAssetManager>().LoadItem(slotInfo.Item);
+        var item = Assets.LoadItem(slotInfo.Item);
         var itemPosition = window.UiToNorm(slotInfo.LastUiPosition);
         var heading = tf.Center().NoWrap().Fat().Format(item.Name);
 

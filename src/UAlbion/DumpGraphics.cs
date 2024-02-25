@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Config.Properties;
@@ -12,10 +11,11 @@ using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
+using UAlbion.Game;
 
 namespace UAlbion;
 
-class DumpGraphics : Component, IAssetDumper
+class DumpGraphics : GameComponent, IAssetDumper
 {
     readonly DumpFormats _formats;
 
@@ -31,14 +31,13 @@ class DumpGraphics : Component, IAssetDumper
 
             var ids = Enum.GetValues(typeof(TEnum)).OfType<TEnum>().ToArray();
             Console.WriteLine($"Dumping {ids.Length} assets to {directory}...");
-            var assets = Resolve<IAssetManager>();
             foreach (var id in ids)
             {
                 var assetId = AssetId.From(id);
                 if (dumpIds != null && !dumpIds.Contains(assetId))
                     continue;
 
-                ExportImage(assetId, assets, directory, _formats, (frame, palFrame) => palFrame < 10); // Limit to 10, some of the tile sets can get a bit silly.
+                ExportImage(assetId, Assets, directory, _formats, (frame, palFrame) => palFrame < 10); // Limit to 10, some of the tile sets can get a bit silly.
             }
         }
 

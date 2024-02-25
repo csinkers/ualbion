@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
@@ -8,7 +7,6 @@ using UAlbion.Core.Veldrid.Etm;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.State;
@@ -19,7 +17,7 @@ namespace UAlbion.Game.Veldrid.Assets;
 
 [SuppressMessage("", "CA2000")] // Analysis thinks disposable resources won't get cleaned up, but the manager, systems & passes will.
 [SuppressMessage("", "CA2213")] // Analysis thinks disposable resources won't get cleaned up, but the manager, systems & passes will.
-public sealed class IsometricRenderSystem : Component, IDisposable
+public sealed class IsometricRenderSystem : GameComponent, IDisposable
 {
     readonly RenderManager _manager;
     public RenderSystem OnScreen { get; }
@@ -95,8 +93,7 @@ public sealed class IsometricRenderSystem : Component, IDisposable
     {
         Mesh LoadMesh(MeshId id)
         {
-            var assets = Resolve<IAssetManager>();
-            if (assets.LoadMapObject((MapObjectId)id.Id) is not Mesh mesh)
+            if (Assets.LoadMapObject((MapObjectId)id.Id) is not Mesh mesh)
                 throw new InvalidOperationException($"Could not load mesh for {id}");
 
             return mesh;

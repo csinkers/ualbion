@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Config.Properties;
@@ -13,7 +12,7 @@ using UAlbion.Formats.ScriptEvents;
 
 namespace UAlbion.Game.Entities.Map3D;
 
-public class IsometricLayout : Component
+public class IsometricLayout : GameComponent
 {
     readonly Dictionary<MapObject, Vector3> _relativeSpritePositions = new();
     readonly ModContext _modContext;
@@ -54,14 +53,13 @@ public class IsometricLayout : Component
 
     public void Load(LabyrinthId labyrinthId, IsometricMode mode, TilemapRequest request, int? paletteId)
     {
-        var assets = Resolve<IAssetManager>();
-        var labyrinthData = assets.LoadLabyrinthData(labyrinthId);
-        var node = assets.GetAssetInfo(labyrinthId);
+        var labyrinthData = Assets.LoadLabyrinthData(labyrinthId);
+        var node = Assets.GetAssetInfo(labyrinthId);
         if (labyrinthData == null || node == null)
             return;
 
         var context = new AssetLoadContext(labyrinthId, node, _modContext);
-        Load(labyrinthData, context, mode, request, paletteId, assets);
+        Load(labyrinthData, context, mode, request, paletteId, Assets);
     }
 
     public void Load(LabyrinthData labyrinthData, AssetLoadContext context, IsometricMode mode, TilemapRequest request, int? paletteNumber, IAssetManager assets)

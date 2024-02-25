@@ -3,7 +3,6 @@ using SerdesNet;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
-using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core.Veldrid.Textures;
@@ -12,7 +11,7 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Veldrid.Assets;
 
-public class PalettePng32Loader : Component, IAssetLoader<AlbionPalette>
+public class PalettePng32Loader : GameComponent, IAssetLoader<AlbionPalette>
 {
     public AlbionPalette Serdes(AlbionPalette existing, ISerializer s, AssetLoadContext context)
     {
@@ -22,7 +21,7 @@ public class PalettePng32Loader : Component, IAssetLoader<AlbionPalette>
         if (!s.IsWriting())
             throw new NotSupportedException();
 
-        var common = Resolve<IAssetManager>().LoadPalette(Base.Palette.Common);
+        var common = Assets.LoadPalette(Base.Palette.Common);
 
         var pixels = new uint[256];
         BlitUtil.BlitDirect(

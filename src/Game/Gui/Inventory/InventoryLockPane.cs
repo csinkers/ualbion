@@ -83,7 +83,7 @@ public class InventoryLockPane : UiElement
         }
         else if (hand.Item.Type == AssetType.Item)
         {
-            var item = Resolve<IAssetManager>().LoadItem(hand.Item) 
+            var item = Assets.LoadItem(hand.Item) 
                        ?? throw new AssetNotFoundException($"Could not load item {hand.Item}", hand.Item);
 
             Raise(new DescriptionTextEvent(tf.Format(

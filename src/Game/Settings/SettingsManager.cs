@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using UAlbion.Api;
-using UAlbion.Api.Eventing;
 using UAlbion.Api.Settings;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -15,8 +14,7 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Settings;
 
-#pragma warning disable CA2227 // Collection properties should be read only
-public class SettingsManager : Component, ISettings
+public class SettingsManager : GameComponent, ISettings
 {
     const int ConfigVersion = 1;
     const string VarSetName = "Settings";
@@ -228,4 +226,3 @@ public class SettingsManager : Component, ISettings
         _dirty = true;
     }
 }
-#pragma warning restore CA2227 // Collection properties should be read only

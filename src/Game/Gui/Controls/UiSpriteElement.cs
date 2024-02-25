@@ -4,7 +4,6 @@ using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.Gui.Controls;
@@ -108,14 +107,13 @@ public class UiSpriteElement : UiElement
         if (Exchange == null || !_dirty)
             return;
 
-        var assets = Resolve<IAssetManager>();
         if (_id.IsNone)
         {
             _size = Vector2.One;
         }
         else
         {
-            var texture = assets.LoadTexture(_id);
+            var texture = Assets.LoadTexture(_id);
             _size = texture?.Regions[0].Size ?? Vector2.One;
         }
     }
@@ -125,7 +123,6 @@ public class UiSpriteElement : UiElement
         if (Exchange == null || !_dirty)
             return;
 
-        var assets = Resolve<IAssetManager>();
         var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
 
         _sprite?.Dispose();
@@ -137,7 +134,7 @@ public class UiSpriteElement : UiElement
         }
         else
         {
-            var texture = assets.LoadTexture(_id);
+            var texture = Assets.LoadTexture(_id);
             if (texture == null)
                 return;
             var key = new SpriteKey(texture, SpriteSampler.Point, order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);

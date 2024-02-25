@@ -4,7 +4,6 @@ using System.Linq;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Ids;
@@ -54,11 +53,10 @@ public class LogicalCombatTile : UiElement
 
     bool IsMagicItem(IReadOnlyItemSlot slot)
     {
-        var assets = Resolve<IAssetManager>();
         if (slot.Item.IsNone || slot.Item.Type != AssetType.Item)
             return false;
 
-        var item = assets.LoadItem(slot.Item);
+        var item = Assets.LoadItem(slot.Item);
         if (item == null)
             return false;
 

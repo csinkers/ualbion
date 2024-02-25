@@ -2,14 +2,13 @@
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events.Transitions;
 using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities;
 
-public class ItemTransitionManager : Component
+public class ItemTransitionManager : GameComponent
 {
     static readonly Vector2 FirstPortraitPosition = new(23, 204);
 
@@ -52,7 +51,6 @@ public class ItemTransitionManager : Component
         ItemId itemId,
         float? transitionTimeSeconds)
     {
-        var assets = Resolve<IAssetManager>();
         var window = Resolve<IGameWindow>();
         var destPosition = window.UiToNorm(toUiPosition); // Tom's portrait, hardcoded for now.
 
@@ -62,7 +60,7 @@ public class ItemTransitionManager : Component
         {
             case AssetType.Gold:
             {
-                var texture = assets.LoadTexture(Base.CoreGfx.UiGold);
+                var texture = Assets.LoadTexture(Base.CoreGfx.UiGold);
                 var subImageDetails = texture.Regions[0];
 
                 AttachChild(new LinearItemTransition(
@@ -77,7 +75,7 @@ public class ItemTransitionManager : Component
 
             case AssetType.Rations:
             {
-                var texture = assets.LoadTexture(Base.CoreGfx.UiFood);
+                var texture = Assets.LoadTexture(Base.CoreGfx.UiFood);
                 var subImageDetails = texture.Regions[0];
 
                 AttachChild(new LinearItemTransition(
@@ -91,8 +89,8 @@ public class ItemTransitionManager : Component
             }
             default:
             {
-                var item = assets.LoadItem(itemId);
-                var texture = assets.LoadTexture(item.Icon);
+                var item = Assets.LoadItem(itemId);
+                var texture = Assets.LoadTexture(item.Icon);
                 var subImageDetails = texture.Regions[item.IconSubId];
 
                 AttachChild(new LinearItemTransition(
@@ -111,7 +109,6 @@ public class ItemTransitionManager : Component
 
     AlbionTask GravityFromNormPosition(Vector2 fromNormPosition, ItemId itemId)
     {
-        var assets = Resolve<IAssetManager>();
         var window = Resolve<IGameWindow>();
 
         // Note: no need to attach as child as transitions clean themselves up.
@@ -120,7 +117,7 @@ public class ItemTransitionManager : Component
         {
             case AssetType.Gold:
             {
-                var texture = assets.LoadTexture(Base.CoreGfx.UiGold);
+                var texture = Assets.LoadTexture(Base.CoreGfx.UiGold);
                 var subImageDetails = texture.Regions[0];
 
                 AttachChild(new GravityItemTransition(
@@ -132,7 +129,7 @@ public class ItemTransitionManager : Component
             }
             case AssetType.Rations:
             {
-                var texture = assets.LoadTexture(Base.CoreGfx.UiFood);
+                var texture = Assets.LoadTexture(Base.CoreGfx.UiFood);
                 var subImageDetails = texture.Regions[0];
 
                 AttachChild(new GravityItemTransition(
@@ -144,8 +141,8 @@ public class ItemTransitionManager : Component
             }
             default:
             {
-                var item = assets.LoadItem(itemId);
-                var texture = assets.LoadTexture(item.Icon);
+                var item = Assets.LoadItem(itemId);
+                var texture = Assets.LoadTexture(item.Icon);
                 var subImageDetails = texture.Regions[item.IconSubId];
 
                 AttachChild(new GravityItemTransition(

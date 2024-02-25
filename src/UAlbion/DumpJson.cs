@@ -5,14 +5,14 @@ using System.Linq;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
+using UAlbion.Game;
 
 namespace UAlbion;
 
-class DumpJson : Component, IAssetDumper
+class DumpJson : GameComponent, IAssetDumper
 {
     public void Dump(string baseDir, ISet<AssetType> types, AssetId[] dumpIds)
     {
@@ -40,7 +40,7 @@ class DumpJson : Component, IAssetDumper
             disposeList.Clear();
         }
 
-        var assets = Resolve<IAssetManager>();
+        var assets = Assets;
         var jsonUtil = Resolve<IJsonUtil>();
         TextWriter tw;
         if (types.Contains(AssetType.Tileset))

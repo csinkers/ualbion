@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Api;
-using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
@@ -10,7 +9,7 @@ using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.Entities;
 
-public class MapObject : Component
+public class MapObject : GameComponent
 {
     readonly Vector3 _initialPosition;
     readonly Vector2 _size;
@@ -34,7 +33,7 @@ public class MapObject : Component
 
     protected override void Subscribed()
     {
-        var asset = Resolve<IAssetManager>().LoadMapObject(Id);
+        var asset = Assets.LoadMapObject(Id);
         switch (asset)
         {
             case null:

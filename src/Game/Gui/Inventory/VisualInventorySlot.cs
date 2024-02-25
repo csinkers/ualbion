@@ -2,7 +2,6 @@
 using System.Numerics;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events.Inventory;
@@ -120,7 +119,7 @@ public sealed class VisualInventorySlot : UiElement
         }
         else if (slot.Item.Type == AssetType.Item)
         {
-            var item = Resolve<IAssetManager>().LoadItem(slot.Item);
+            var item = Assets.LoadItem(slot.Item);
             int frames = item.IconAnim == 0 ? 1 : item.IconAnim;
             while (_frameNumber >= frames)
                 _frameNumber -= frames;

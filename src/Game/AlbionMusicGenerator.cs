@@ -1,14 +1,12 @@
 ﻿using System;
 using ADLMidi.NET;
 using UAlbion.Api;
-using UAlbion.Api.Eventing;
 using UAlbion.Core;
-using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game;
 
-public class AlbionMusicGenerator : Component, IAudioGenerator
+public class AlbionMusicGenerator : GameComponent, IAudioGenerator
 {
     MidiPlayer _player;
 
@@ -26,12 +24,11 @@ public class AlbionMusicGenerator : Component, IAudioGenerator
         if (_player == null)
             return;
 
-        var assets = Resolve<IAssetManager>();
-        var xmiBytes = assets.LoadSong(SongId);
+        var xmiBytes = Assets.LoadSong(SongId);
         if ((xmiBytes?.Length ?? 0) == 0)
             return;
 
-        var soundBanks = assets.LoadSoundBanks();
+        var soundBanks = Assets.LoadSoundBanks();
         if (soundBanks is not GlobalTimbreLibrary timbreLibrary)
         {
             Error("AlbionMusicGenerator: Could not load sound banks");

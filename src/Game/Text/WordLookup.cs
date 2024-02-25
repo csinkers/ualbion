@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Text;
 
-public class WordLookup : ServiceComponent<IWordLookup>, IWordLookup
+public class WordLookup : GameServiceComponent<IWordLookup>, IWordLookup
 {
     readonly Dictionary<string, List<WordId>> _lookup = new();
     readonly Dictionary<WordId, string> _reverse = new();
@@ -38,9 +36,9 @@ public class WordLookup : ServiceComponent<IWordLookup>, IWordLookup
 
     void Rebuild()
     {
-        var assets = Resolve<IAssetManager>();
         _reverse.Clear();
 
+        var assets = Assets;
         foreach (var id in AssetId.EnumerateAll(AssetType.Word))
         {
             var text = assets.LoadStringSafe(id).Trim().ToUpperInvariant();

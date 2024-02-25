@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
@@ -54,15 +53,13 @@ public class InventorySummaryPage : UiElement // Summary
 
     protected override void Subscribed()
     {
-        var assets = Resolve<IAssetManager>();
-        var sheet = assets.LoadSheet(_activeMember.ToSheet());
+        var sheet = Assets.LoadSheet(_activeMember.ToSheet());
         _portrait.Id = sheet.PortraitId;
         base.Subscribed();
     }
 
     IEnumerable<TextBlock> BuildSummary()
     {
-        var assets = Resolve<IAssetManager>();
         var tf = Resolve<ITextFormatter>();
         var member = Resolve<IParty>()?[_activeMember];
         if (member == null)
@@ -71,7 +68,7 @@ public class InventorySummaryPage : UiElement // Summary
         // {INVE}{NAME} ({SEXC}), %u years old, {RACE}, {CLAS}, level %d.
         var formatBlocks = tf
             .Format(
-                assets.LoadStringSafe(Base.SystemText.Inv1_NYearsOldRaceClassLevelN),
+                Assets.LoadStringSafe(Base.SystemText.Inv1_NYearsOldRaceClassLevelN),
                 member.Apparent.Age, member.Apparent.Level).GetBlocks();
 
         foreach (var block in formatBlocks)

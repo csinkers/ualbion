@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
@@ -11,14 +10,13 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Text;
 
-public class TextManager : ServiceComponent<ITextManager>, ITextManager
+public class TextManager : GameServiceComponent<ITextManager>, ITextManager
 {
     public Vector2 Measure(TextBlock block)
     {
         if (block == null) throw new ArgumentNullException(nameof(block));
         int offset = 0;
-        var assets = Resolve<IAssetManager>();
-        var font = assets.LoadFont(block.Style == TextStyle.Big ? Base.Font.Bold : Base.Font.Regular, block.InkId);
+        var font = Assets.LoadFont(block.Style == TextStyle.Big ? Base.Font.Bold : Base.Font.Regular, block.InkId);
         if (font == null)
             throw new AssetNotFoundException($"Could not load font {block.Style}.{block.InkId}");
 
@@ -42,10 +40,9 @@ public class TextManager : ServiceComponent<ITextManager>, ITextManager
     {
         if (block == null) throw new ArgumentNullException(nameof(block));
         var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
-        var assets = Resolve<IAssetManager>();
         var window = Resolve<IGameWindow>();
 
-        var font = assets.LoadFont(block.Style == TextStyle.Big ? Base.Font.Bold : Base.Font.Regular, block.InkId);
+        var font = Assets.LoadFont(block.Style == TextStyle.Big ? Base.Font.Bold : Base.Font.Regular, block.InkId);
         var text = block.Text ?? "";
         var isFat = block.Style is TextStyle.Fat or TextStyle.FatAndHigh;
 

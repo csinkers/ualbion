@@ -5,7 +5,6 @@ using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Ids;
@@ -20,7 +19,7 @@ namespace UAlbion.Game.State.Player;
 
 // TODO: Refactor / break this class up if possible
 #pragma warning disable CA1506 // 'InventoryManager' is coupled with '111' different types from '23' different namespaces. Rewrite or refactor the code to decrease its class coupling below '96'.
-public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryManager
+public class InventoryManager : GameServiceComponent<IInventoryManager>, IInventoryManager
 {
     readonly Func<InventoryId, Inventory> _getInventory;
     readonly Func<ItemId, ItemData> _getItem;
@@ -657,7 +656,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
         if (item.TypeId != ItemType.SpellScroll)
             return;
 
-        var spell = Resolve<IAssetManager>().LoadSpell(item.Spell);
+        var spell = Assets.LoadSpell(item.Spell);
         if (spell == null)
             return;
 
@@ -694,7 +693,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
 
     async AlbionTask TriggerItemChain(ItemId itemId)
     {
-        var eventSet = Resolve<IAssetManager>().LoadEventSet(Base.EventSet.InventoryItems);
+        var eventSet = Assets.LoadEventSet(Base.EventSet.InventoryItems);
         foreach (var eventIndex in eventSet.Chains)
         {
             if (eventSet.Events[eventIndex].Event is not ActionEvent action)

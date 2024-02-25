@@ -8,7 +8,6 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
-using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Config.Properties;
@@ -19,7 +18,7 @@ using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.Veldrid.Assets;
 
-public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>> // For fonts etc
+public class PngSheetLoader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>> // For fonts etc
 {
     static byte[] Write(IImageEncoder encoder, uint[] palette, IReadOnlyTexture<byte> existing)
     {
@@ -62,14 +61,13 @@ public class PngSheetLoader : Component, IAssetLoader<IReadOnlyTexture<byte>> //
         if (s == null) throw new ArgumentNullException(nameof(s));
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var assets = Resolve<IAssetManager>();
         var paletteId = context.GetProperty(AssetProps.Palette);
         if (paletteId.IsNone)
             paletteId = (PaletteId)Base.Palette.Common;
 
         var palette = context.AssetId.Type == AssetType.FontGfx 
             ? FontDefinition.ExportPalette 
-            : assets.LoadPalette(paletteId).GetUnambiguousPalette();
+            : Assets.LoadPalette(paletteId).GetUnambiguousPalette();
 
         if (s.IsWriting())
         {

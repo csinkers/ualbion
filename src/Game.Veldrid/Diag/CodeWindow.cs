@@ -1,6 +1,5 @@
 ﻿using ImGuiColorTextEditNet;
 using ImGuiNET;
-using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid;
 using UAlbion.Formats;
 using UAlbion.Formats.MapEvents;
@@ -28,7 +27,7 @@ namespace UAlbion.Game.Veldrid.Diag;
 
 */
 
-public class CodeWindow : Component, IImGuiWindow
+public class CodeWindow : GameComponent, IImGuiWindow
 {
     readonly TextEditor _editor;
     public string Name { get; }
@@ -66,8 +65,7 @@ public class CodeWindow : Component, IImGuiWindow
         var set = context.EventSet;
         if (set.Decompiled == null)
         {
-            var assets = Resolve<IAssetManager>();
-            var eventFormatter = new EventFormatter(assets.LoadStringSafe, context.EventSet.StringSetId);
+            var eventFormatter = new EventFormatter(Assets.LoadStringSafe, context.EventSet.StringSetId);
             set.Decompiled = eventFormatter.Decompile(set.Events, set.Chains, set.ExtraEntryPoints);
             var code = set.Decompiled.Script;
             _editor.AllText = code;

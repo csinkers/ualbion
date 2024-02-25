@@ -5,7 +5,6 @@ using System.Linq;
 using SerdesNet;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Config.Properties;
 using UAlbion.Core.Events;
@@ -20,7 +19,7 @@ using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Assets;
 
-public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<LabyrinthData>, IDisposable
+public sealed class IsometricLabyrinthLoader : GameComponent, IAssetLoader<LabyrinthData>, IDisposable
 {
     public const int DefaultWidth = 48;
     public const int DefaultHeight = 64;
@@ -76,7 +75,6 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
 
     IEnumerable<(string, byte[])> Save(LabyrinthData labyrinth, AssetLoadContext context, IsometricMode mode, string pngPath, string tsxPath)
     {
-        var assets = Resolve<IAssetManager>();
         var tileWidth = context.GetProperty(TileWidth, DefaultWidth);
         var tileHeight = context.GetProperty(TileHeight, DefaultHeight);
         var baseHeight = context.GetProperty(BaseHeight, DefaultBaseHeight);
@@ -85,7 +83,7 @@ public sealed class IsometricLabyrinthLoader : Component, IAssetLoader<Labyrinth
         if (_engine == null)
             SetupEngine(context.ModContext, tileWidth, tileHeight, baseHeight, tilesPerRow);
 
-        var frames = _isoRsm.Builder.Build(labyrinth, context, mode, assets);
+        var frames = _isoRsm.Builder.Build(labyrinth, context, mode, Assets);
 
         _engine.RenderFrame(false);
         Image<Bgra32> image = _engine.ReadTexture2D(_isoRsm.IsoBuffer.GetColorTexture(0));

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using UAlbion.Api;
-using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
@@ -15,7 +13,7 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities.Map3D;
 
-public class MapRenderable3D : Component
+public class MapRenderable3D : GameComponent
 {
     readonly LogicalMap3D _logicalMap;
     readonly LabyrinthData _labyrinthData;
@@ -52,12 +50,11 @@ public class MapRenderable3D : Component
         if (_tilemap != null)
             return;
 
-        var assets = Resolve<IAssetManager>();
         _properties.TileCount = _logicalMap.Width * _logicalMap.Height;
-        _properties.DayPalette = assets.LoadPalette(_logicalMap.PaletteId);
+        _properties.DayPalette = Assets.LoadPalette(_logicalMap.PaletteId);
 
         if (NightPalettes.TryGetValue(_logicalMap.PaletteId, out var nightPaletteId))
-            _properties.NightPalette = assets.LoadPalette(nightPaletteId);
+            _properties.NightPalette = Assets.LoadPalette(nightPaletteId);
 
         var etmManager = Resolve<IEtmManager>();
         _tilemap = etmManager.CreateTilemap(_properties);
@@ -65,7 +62,7 @@ public class MapRenderable3D : Component
         for (int i = 0; i < _labyrinthData.FloorAndCeilings.Count; i++)
         {
             var floorInfo = _labyrinthData.FloorAndCeilings[i];
-            _tilemap.DefineFloor(i + 1, assets.LoadTexture(floorInfo?.SpriteId ?? AssetId.None));
+            _tilemap.DefineFloor(i + 1, Assets.LoadTexture(floorInfo?.SpriteId ?? AssetId.None));
         }
 
         for (int i = 0; i < _labyrinthData.Walls.Count; i++)
@@ -74,7 +71,7 @@ public class MapRenderable3D : Component
             if (wallInfo == null)
                 continue;
 
-            ITexture wall = assets.LoadTexture(wallInfo.SpriteId);
+            ITexture wall = Assets.LoadTexture(wallInfo.SpriteId);
             if (wall == null)
                 continue;
 
@@ -86,7 +83,7 @@ public class MapRenderable3D : Component
                 if (overlayInfo.SpriteId.IsNone)
                     continue;
 
-                var overlay = assets.LoadTexture(overlayInfo.SpriteId);
+                var overlay = Assets.LoadTexture(overlayInfo.SpriteId);
                 _tilemap.DefineWall(i + 1, overlay, overlayInfo.XOffset, overlayInfo.YOffset, wallInfo.TransparentColour, isAlphaTested);
             }
         }

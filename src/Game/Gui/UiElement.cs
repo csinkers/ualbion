@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using UAlbion.Api.Eventing;
 using UAlbion.Core;
 
 namespace UAlbion.Game.Gui;
@@ -11,7 +10,7 @@ namespace UAlbion.Game.Gui;
 /// child element, and when calculating layout the full extents
 /// will be passed through to each child.
 /// </summary>
-public abstract class UiElement : Component, IUiElement
+public abstract class UiElement : GameComponent, IUiElement
 {
     protected Vector2 GetMaxChildSize()
     {

@@ -16,7 +16,7 @@ using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Entities.Map2D;
 
-public sealed class SelectionHandler2D : Component
+public sealed class SelectionHandler2D : GameComponent
 {
     static readonly Vector3 Normal = Vector3.UnitZ;
     readonly LogicalMap2D _map;
@@ -43,8 +43,7 @@ public sealed class SelectionHandler2D : Component
     public event EventHandler<int> HighlightIndexChanged;
     protected override void Subscribed()
     {
-        var assets = Resolve<IAssetManager>();
-        var eventFormatter = new EventFormatter(assets.LoadStringSafe, _map.Id.ToMapText());
+        var eventFormatter = new EventFormatter(Assets.LoadStringSafe, _map.Id.ToMapText());
         _formatChain = x =>
         {
             var builder = new UnformattedScriptBuilder(false);

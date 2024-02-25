@@ -1,15 +1,13 @@
 ﻿using System;
 using ADLMidi.NET;
 using UAlbion.Api;
-using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
-using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game;
 
-public class AmbientSoundPlayer : Component
+public class AmbientSoundPlayer : GameComponent
 {
     readonly NoteHook _hook;
     MidiPlayer _player;
@@ -29,12 +27,11 @@ public class AmbientSoundPlayer : Component
         if (_player != null)
             return;
 
-        var assets = Resolve<IAssetManager>();
-        var xmiBytes = assets.LoadSong(SongId);
+        var xmiBytes = Assets.LoadSong(SongId);
         if ((xmiBytes?.Length ?? 0) == 0)
             return;
 
-        var soundBanks = assets.LoadSoundBanks();
+        var soundBanks = Assets.LoadSoundBanks();
         if (soundBanks is not GlobalTimbreLibrary timbreLibrary)
         {
             Error("AlbionMusicGenerator: Could not load sound banks");

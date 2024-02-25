@@ -64,7 +64,7 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
 
     void RenderLayout(LayoutEvent e)
     {
-        var flags = Var(CoreVars.User.EngineFlags);
+        var flags = ReadVar(V.Core.User.EngineFlags);
         if ((flags & EngineFlags.SuppressLayout) != 0)
         {
             // If the user specifically requested this layout run then record the layout tree

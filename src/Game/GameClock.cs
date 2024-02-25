@@ -2,7 +2,6 @@
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
@@ -40,7 +39,7 @@ public class GameClock : ServiceComponent<IClock>, IClock
 
             GameTrace.Log.ClockUpdating(e.Cycles);
             _currentUpdate = new AlbionTaskCore("GameClock.GameUpdateEvent");
-            _ticksRemaining = e.Cycles * Var(GameVars.Time.FastTicksPerSlowTick);
+            _ticksRemaining = e.Cycles * ReadVar(V.Game.Time.FastTicksPerSlowTick);
             IsRunning = true;
             return _currentUpdate.UntypedTask;
         });
@@ -90,7 +89,7 @@ public class GameClock : ServiceComponent<IClock>, IClock
             if (state != null)
             {
                 var lastGameTime = state.Time;
-                var newGameTime = lastGameTime.AddSeconds(e.DeltaSeconds * Var(GameVars.Time.GameSecondsPerSecond));
+                var newGameTime = lastGameTime.AddSeconds(e.DeltaSeconds * ReadVar(V.Game.Time.GameSecondsPerSecond));
                 _setTimeEvent.Time = newGameTime;
                 ((IComponent) state).Receive(_setTimeEvent, this);
 
@@ -115,7 +114,7 @@ public class GameClock : ServiceComponent<IClock>, IClock
             }
 
             _elapsedTimeThisGameFrame += e.DeltaSeconds;
-            var tickDurationSeconds = 1.0f / Var(GameVars.Time.FastTicksPerSecond);
+            var tickDurationSeconds = 1.0f / ReadVar(V.Game.Time.FastTicksPerSecond);
 
             // If the game was paused for a while don't try and catch up
             if (_elapsedTimeThisGameFrame > 4 * tickDurationSeconds)
@@ -126,7 +125,7 @@ public class GameClock : ServiceComponent<IClock>, IClock
                 _elapsedTimeThisGameFrame -= tickDurationSeconds;
                 RaiseTick();
 
-                var ticksPerCycle = Var(GameVars.Time.FastTicksPerAssetCacheCycle);
+                var ticksPerCycle = ReadVar(V.Game.Time.FastTicksPerAssetCacheCycle);
                 if ((state?.TickCount ?? 0) % ticksPerCycle == ticksPerCycle - 1)
                     Raise(_cycleCacheEvent);
             }

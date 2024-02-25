@@ -1,6 +1,5 @@
 ﻿using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
-using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Combat;
@@ -33,7 +32,7 @@ public class CombatClock : Component
 
             GameTrace.Log.CombatClockUpdating(e.Cycles);
             _currentUpdate = new AlbionTaskCore("CombatClock.CombatUpdateEvent");
-            _ticksRemaining = e.Cycles * Var(GameVars.Time.FastTicksPerSlowTick);
+            _ticksRemaining = e.Cycles * ReadVar(V.Game.Time.FastTicksPerSlowTick);
             IsRunning = true;
             return _currentUpdate.UntypedTask;
         });
@@ -42,7 +41,7 @@ public class CombatClock : Component
     void OnUpdate(FastClockEvent updateEvent)
     {
         _ticks += updateEvent.Frames;
-        var ticksPerCombat = Var(GameVars.Time.FastTicksPerSlowTick);
+        var ticksPerCombat = ReadVar(V.Game.Time.FastTicksPerSlowTick);
         while (_ticks >= ticksPerCombat)
         {
             _ticks -= ticksPerCombat;
@@ -80,7 +79,7 @@ public class CombatClock : Component
         if (IsRunning)
         {
             _elapsedTimeThisGameFrame += e.DeltaSeconds;
-            var tickDurationSeconds = 1.0f / Var(GameVars.Time.FastTicksPerSecond);
+            var tickDurationSeconds = 1.0f / ReadVar(V.Game.Time.FastTicksPerSecond);
 
             // If the game was paused for a while don't try and catch up
             if (_elapsedTimeThisGameFrame > 4 * tickDurationSeconds)

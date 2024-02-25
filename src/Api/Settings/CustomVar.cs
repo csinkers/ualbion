@@ -9,17 +9,21 @@ public class CustomVar<TLogical, TPersistent> : IVar<TLogical>
     readonly Func<TPersistent, TLogical> _castFrom;
     readonly Func<JsonElement, TPersistent> _castJson;
 
-    public CustomVar(string key, TLogical defaultValue, Func<TLogical, TPersistent> castTo, Func<TPersistent, TLogical> castFrom, Func<JsonElement, TPersistent> castJson)
+    public CustomVar(VarLibrary library, string key, TLogical defaultValue, Func<TLogical, TPersistent> castTo, Func<TPersistent, TLogical> castFrom, Func<JsonElement, TPersistent> castJson)
     {
+        if (library == null) throw new ArgumentNullException(nameof(library));
         Key = key;
         DefaultValue = defaultValue;
         _castTo = castTo ?? throw new ArgumentNullException(nameof(castTo));
         _castFrom = castFrom ?? throw new ArgumentNullException(nameof(castFrom));
         _castJson = castJson;
+        library.Add(this);
     }
 
     public string Key { get; }
     public TLogical DefaultValue { get; }
+    public object DefaultValueUntyped => DefaultValue;
+    public Type ValueType => typeof(TLogical);
 
     public TLogical Read(IVarSet varSet)
     {
@@ -39,4 +43,15 @@ public class CustomVar<TLogical, TPersistent> : IVar<TLogical>
         if (varSet == null) throw new ArgumentNullException(nameof(varSet));
         varSet.SetValue(Key, _castTo(value));
     }
+
+    public void WriteFromString(ISettings varSet, string value)
+    {
+        if (varSet == null) throw new ArgumentNullException(nameof(varSet));
+        var doc = JsonDocument.Parse(value);
+        var typedValue = _castJson(doc.RootElement);
+        varSet.SetValue(Key, typedValue);
+    }
+
+    public override string ToString()
+        => $"CustomVar<{typeof(TLogical)}, {typeof(TPersistent)}>({Key}) (default={DefaultValue})";
 }

@@ -70,20 +70,20 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
         if (DateTime.UtcNow - _lastLayoutUpdate > LayoutUpdateInterval)
         {
             _lastLayoutUpdate = DateTime.UtcNow;
-            var lastLayout = Var(CoreVars.Ui.ImGuiLayout);
+            var lastLayout = ReadVar(V.Core.Ui.ImGuiLayout);
             var ini = ImGui.SaveIniSettingsToMemory();
 
             if (!string.Equals(lastLayout, ini, StringComparison.Ordinal))
             {
                 var settings = Resolve<ISettings>();
-                CoreVars.Ui.ImGuiLayout.Write(settings, ini);
+                V.Core.Ui.ImGuiLayout.Write(settings, ini);
             }
         }
     }
 
     void InitialiseLayout()
     {
-        var layout = Var(CoreVars.Ui.ImGuiLayout);
+        var layout = ReadVar(V.Core.Ui.ImGuiLayout);
         var config = ImGuiConfig.Load(layout);
         var newConfig = new ImGuiConfig();
 

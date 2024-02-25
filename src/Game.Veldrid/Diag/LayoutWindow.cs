@@ -19,7 +19,7 @@ public class LayoutWindow : Component, IImGuiWindow
         ImGui.Begin(Name, ref open);
 
         var manager = Resolve<ILayoutManager>();
-        var engineFlags = Var(CoreVars.User.EngineFlags);
+        var engineFlags = ReadVar(V.Core.User.EngineFlags);
         bool suppressLayout = (engineFlags & EngineFlags.SuppressLayout) != 0;
         if (ImGui.Checkbox("Suppress Layout", ref suppressLayout))
         {

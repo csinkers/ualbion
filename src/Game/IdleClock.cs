@@ -1,6 +1,5 @@
 ﻿using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
-using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game;
@@ -20,7 +19,7 @@ public class IdleClock : Component
     void OnEngineUpdate(EngineUpdateEvent e)
     {
         _elapsedTimeThisGameFrame += e.DeltaSeconds;
-        var tickDurationSeconds = 1.0f / Var(GameVars.Time.IdleTicksPerSecond);
+        var tickDurationSeconds = 1.0f / ReadVar(V.Game.Time.IdleTicksPerSecond);
 
         // If the game was paused for a while don't try and catch up
         if (_elapsedTimeThisGameFrame > 4 * tickDurationSeconds)

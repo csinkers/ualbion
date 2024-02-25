@@ -6,7 +6,6 @@ using UAlbion.Core.Events;
 using Veldrid;
 using VeldridGen.Interfaces;
 using static System.FormattableString;
-using Vars = UAlbion.Core.CoreVars.Gfx.TextureSource;
 
 namespace UAlbion.Core.Veldrid.Textures;
 
@@ -73,7 +72,7 @@ public sealed class TextureSource : ServiceComponent<ITextureSource>, ITextureSo
     void OnUpdate(EngineUpdateEvent e)
     {
         _totalTime += e.DeltaSeconds;
-        if (_totalTime - _lastCleanup <= Var(Vars.CacheCheckIntervalSeconds))
+        if (_totalTime - _lastCleanup <= ReadVar(V.Core.Gfx.TextureSource.CacheCheckIntervalSeconds))
             return;
 
         _simple.Cleanup();

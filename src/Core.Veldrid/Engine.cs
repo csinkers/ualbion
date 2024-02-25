@@ -141,7 +141,7 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
 
         while (!_done && _newBackend == null)
         {
-            var flags = Var(CoreVars.User.EngineFlags);
+            var flags = ReadVar(V.Core.User.EngineFlags);
             var deltaSeconds =
                 (flags & EngineFlags.FixedTimeStep) != 0
                 ? 1 / 60.0f
@@ -207,7 +207,7 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
             _renderDoc.APIValidation = true;
         }
 
-        var flags = Var(CoreVars.User.EngineFlags);
+        var flags = ReadVar(V.Core.User.EngineFlags);
         var gdOptions = new GraphicsDeviceOptions(
             _renderDoc != null,
             PixelFormat.D24_UNorm_S8_UInt,

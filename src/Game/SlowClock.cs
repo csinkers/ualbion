@@ -1,5 +1,4 @@
 ﻿using UAlbion.Api.Eventing;
-using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game;
@@ -16,7 +15,7 @@ public class SlowClock : Component
     void OnUpdate(FastClockEvent updateEvent)
     {
         _ticks += updateEvent.Frames;
-        var ticksPerSlow = Var(GameVars.Time.FastTicksPerSlowTick);
+        var ticksPerSlow = ReadVar(V.Game.Time.FastTicksPerSlowTick);
         while (_ticks >= ticksPerSlow)
         {
             _ticks -= ticksPerSlow;

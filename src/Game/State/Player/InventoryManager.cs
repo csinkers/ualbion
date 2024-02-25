@@ -8,7 +8,6 @@ using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -360,7 +359,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                         (int)cursorUiPosition.Y,
                         (int)slot.LastUiPosition.X,
                         (int)slot.LastUiPosition.Y,
-                        Var(GameVars.Ui.Transitions.ItemMovementTransitionTimeSeconds));
+                        ReadVar(V.Game.Ui.Transitions.ItemMovementTransitionTimeSeconds));
 
                     ItemSlot temp = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
                     temp.TransferFrom(_hand, null, _getItem);
@@ -388,7 +387,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                         (int)cursorUiPosition.Y,
                         (int)slot.LastUiPosition.X,
                         (int)slot.LastUiPosition.Y,
-                        Var(GameVars.Ui.Transitions.ItemMovementTransitionTimeSeconds));
+                        ReadVar(V.Game.Ui.Transitions.ItemMovementTransitionTimeSeconds));
 
                     var transitionEvent2 = new LinearItemTransitionEvent(
                         slot.Item,
@@ -396,7 +395,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
                         (int)slot.LastUiPosition.Y,
                         (int)cursorUiPosition.X,
                         (int)cursorUiPosition.Y,
-                        Var(GameVars.Ui.Transitions.ItemMovementTransitionTimeSeconds));
+                        ReadVar(V.Game.Ui.Transitions.ItemMovementTransitionTimeSeconds));
 
                     ItemSlot temp1 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
                     ItemSlot temp2 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
@@ -460,7 +459,7 @@ public class InventoryManager : ServiceComponent<IInventoryManager>, IInventoryM
 
         if (!slot.Item.IsNone)
         {
-            var maxTransitions = Var(GameVars.Ui.Transitions.MaxDiscardTransitions);
+            var maxTransitions = ReadVar(V.Game.Ui.Transitions.MaxDiscardTransitions);
             var transitionsToShow = Math.Min(itemsToDrop, maxTransitions);
             var transitions = new AlbionTask[transitionsToShow];
 

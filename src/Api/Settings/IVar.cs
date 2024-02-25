@@ -1,8 +1,13 @@
-﻿namespace UAlbion.Api.Settings;
+﻿using System;
+
+namespace UAlbion.Api.Settings;
 
 public interface IVar
 {
     string Key { get; }
+    object DefaultValueUntyped { get; }
+    Type ValueType { get; }
+    void WriteFromString(ISettings varSet, string value);
 }
 
 public interface IVar<T> : IVar

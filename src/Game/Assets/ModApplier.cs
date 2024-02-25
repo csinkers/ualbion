@@ -11,7 +11,6 @@ using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Events;
-using UAlbion.Game.Settings;
 
 #if DEBUG
 using System.Text;
@@ -166,7 +165,7 @@ public class ModApplier : Component, IModApplier
         object asset = null;
         AssetNode loadedNode = null;
         Stack<IPatch> patches = null; // Create the stack lazily, as most assets won't have any patches.
-        language ??= Var(UserVars.Gameplay.Language);
+        language ??= ReadVar(V.User.Gameplay.Language);
 
 #if DEBUG
         var filesSearched = new List<string>();

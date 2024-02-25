@@ -8,7 +8,6 @@ using UAlbion.Api.Eventing;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
-using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 
 namespace UAlbion.Game.Text;
@@ -158,7 +157,7 @@ public class TextFormatter : ServiceComponent<ITextFormatter>, ITextFormatter
         {
             case ICharacterSheet character:
             {
-                var language = Var(UserVars.Gameplay.Language);
+                var language = ReadVar(V.User.Gameplay.Language);
                 return (Token.Text, character.GetName(language));
             }
             case ItemData item: return (Token.Text, item.Name);

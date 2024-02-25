@@ -7,14 +7,12 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
-using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Input;
-using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 using UAlbion.Game.State.Player;
 using UAlbion.Game.Text;
@@ -68,7 +66,7 @@ public class StatusBarPortrait : UiElement
         var tf = Resolve<ITextFormatter>();
 
         var heading = new LiteralText(
-            new TextBlock(member.Apparent.GetName(Var(UserVars.Gameplay.Language)))
+            new TextBlock(member.Apparent.GetName(ReadVar(V.User.Gameplay.Language)))
             {
                 Style = TextStyle.Fat,
                 Alignment = TextAlignment.Center
@@ -185,7 +183,7 @@ public class StatusBarPortrait : UiElement
         }
         else // For the first click, just start the double-click timer.
         {
-            Raise(new StartTimerEvent(TimerName, Var(GameVars.Ui.ButtonDoubleClickIntervalSeconds), this));
+            Raise(new StartTimerEvent(TimerName, ReadVar(V.Game.Ui.ButtonDoubleClickIntervalSeconds), this));
             _isClickTimerPending = true;
         }
     }
@@ -230,26 +228,26 @@ public class StatusBarPortrait : UiElement
                 text = tf.Format(
                     Base.SystemText.PartyPortrait_GiveXToX,
                     item.Name,
-                    member.Apparent.GetName(Var(UserVars.Gameplay.Language)));
+                    member.Apparent.GetName(ReadVar(V.User.Gameplay.Language)));
                 break;
             }
             case AssetType.Gold:
                 // Give gold to %s
                 text = tf.Format(
                     Base.SystemText.PartyPortrait_GiveGoldToX,
-                    member.Apparent.GetName(Var(UserVars.Gameplay.Language)));
+                    member.Apparent.GetName(ReadVar(V.User.Gameplay.Language)));
                 break;
             case AssetType.Rations:
                 // Give food to %s
                 text = tf.Format(
                     Base.SystemText.PartyPortrait_GiveFoodToX,
-                    member.Apparent.GetName(Var(UserVars.Gameplay.Language)));
+                    member.Apparent.GetName(ReadVar(V.User.Gameplay.Language)));
                 break;
             default:
                 // %s (LP:%d, SP:%d)
                 text = tf.Format(
                     Base.SystemText.PartyPortrait_XLifeMana,
-                    member.Apparent.GetName(Var(UserVars.Gameplay.Language)),
+                    member.Apparent.GetName(ReadVar(V.User.Gameplay.Language)),
                     member.Apparent.Combat.LifePoints.Current,
                     member.Apparent.Magic.SpellPoints.Current);
                 break;

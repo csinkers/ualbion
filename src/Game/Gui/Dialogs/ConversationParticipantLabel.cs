@@ -2,7 +2,6 @@
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
-using UAlbion.Game.Settings;
 using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Gui.Dialogs;
@@ -59,7 +58,7 @@ public class ConversationParticipantLabel : Dialog
 
     IText GetName(ICharacterSheet sheet, bool isRight) => new DynamicText(() =>
     {
-        var name = sheet.GetName(Var(UserVars.Gameplay.Language));
+        var name = sheet.GetName(ReadVar(V.User.Gameplay.Language));
         return new[] 
         {
             new TextBlock(name)

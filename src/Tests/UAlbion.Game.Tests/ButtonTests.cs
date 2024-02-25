@@ -49,7 +49,7 @@ public class ButtonTests : Component
             ;
 
         var settings = new MockSettings();
-        GameVars.Ui.ButtonDoubleClickIntervalSeconds.Write(settings, 0.35f);
+        GameVars.Instance.Ui.ButtonDoubleClickIntervalSeconds.Write(settings, 0.35f);
 
         var assetManager = new AssetManager();
         _exchange

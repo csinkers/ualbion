@@ -445,7 +445,7 @@ public abstract class Component : IComponent
     /// <param name="varInfo">The IVar</param>
     /// <returns>The current value</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    protected T Var<T>(IVar<T> varInfo)
+    protected T ReadVar<T>(IVar<T> varInfo)
     {
         if (varInfo == null) throw new ArgumentNullException(nameof(varInfo));
         var varSet = Resolve<IVarSet>();

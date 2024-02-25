@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Settings;
@@ -11,42 +12,32 @@ public class VarRegistry : ServiceComponent<IVarRegistry>, IVarRegistry
     record VarInfo(IVar Var, Type ValueType, Type OwningType);
     readonly Dictionary<string, VarInfo> _vars = new();
 
+    public IEnumerable<IVar> Vars => _vars.Select(x => x.Value.Var).OrderBy(x => x.Key);
     public bool IsVarRegistered(string key) => _vars.ContainsKey(key);
     public void Clear() => _vars.Clear();
 
     public void Register(Type type)
     {
-        if (type is null) throw new ArgumentNullException(nameof(type));
+        if (type is null)
+            throw new ArgumentNullException(nameof(type));
 
-        var subClasess = type.GetNestedTypes(BindingFlags.Public);
-        foreach(var  sub in subClasess)
-            Register(sub);
+        var libraryProperty = type.GetProperty("Library", BindingFlags.Public | BindingFlags.Static);
+        if (libraryProperty == null)
+            throw new InvalidOperationException($"Expected var holder type \"{type}\" to contain a public static Library property of type VarLibrary");
 
-        var properties = type.GetProperties(BindingFlags.Static | BindingFlags.Public);
-        foreach (var property in properties)
-        {
-            if (property.PropertyType.IsAssignableTo(typeof(IVar)))
-            {
-                var instance = (IVar)property.GetValue(null);
-                RegisterVar(instance, property.PropertyType, type);
-            }
-        }
+        var library = (VarLibrary)libraryProperty.GetValue(null);
+        if (library == null)
+            throw new InvalidOperationException($"Expected non-null value from Library property on var holder type \"{type}\"");
 
-        var fields = type.GetFields(BindingFlags.Static | BindingFlags.Public);
-        foreach (var field in fields)
-        {
-            if (field.FieldType.IsAssignableTo(typeof(IVar)))
-            {
-                var instance = (IVar)field.GetValue(null);
-                RegisterVar(instance, field.FieldType, type);
-            }
-        }
+        foreach(var v in library.Vars)
+            RegisterVar(v, type);
     }
 
-    void RegisterVar(IVar instance, Type varType, Type owningType)
+    void RegisterVar(IVar instance, Type owningType)
     {
         Type valueType = null;
 
+        var varType = instance.GetType();
         foreach (var iface in varType.GetInterfaces())
             if (iface.IsGenericType && iface.GetGenericTypeDefinition() == typeof(IVar<>))
                 valueType = iface.GetGenericArguments()[0];

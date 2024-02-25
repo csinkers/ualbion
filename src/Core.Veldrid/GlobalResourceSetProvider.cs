@@ -49,7 +49,7 @@ public sealed class GlobalResourceSetProvider : Component, IResourceProvider, ID
         var clock = TryResolve<IClock>();
         var textureSource = Resolve<ITextureSource>();
         var paletteManager = Resolve<IPaletteManager>();
-        var engineFlags = Var(CoreVars.User.EngineFlags);
+        var engineFlags = ReadVar(V.Core.User.EngineFlags);
 
         var dayPalette = textureSource.GetSimpleTexture(paletteManager.Day.Texture);
         var nightTexture = paletteManager.Night?.Texture ?? paletteManager.Day.Texture;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UAlbion.Api;
 using UAlbion.Api.Settings;
 
@@ -22,6 +23,9 @@ public class VarSet : IVarSet, IPatch
         _name = name;
         _values = values ?? throw new ArgumentNullException(nameof(values));
     }
+
+    internal IEnumerable<(string, object)> Ordered // Just for debugging
+        => _values.OrderBy(x => x.Key).Select(x => (x.Key, x.Value));
 
     public bool TryGetValue(string key, out object value)
     {

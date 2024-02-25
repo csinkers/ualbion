@@ -12,7 +12,6 @@ using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
-using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Assets;
 
@@ -64,7 +63,7 @@ public class RawAssetManager : Component, IRawAssetManager
     public IStringSet LoadStringSet(StringSetId id) => LoadStringSet(id, null);
     public IStringSet LoadStringSet(StringSetId id, string language)
     {
-        var currentLanguage = Var(UserVars.Gameplay.Language);
+        var currentLanguage = ReadVar(V.User.Gameplay.Language);
         language ??= currentLanguage;
 
         var asset = _modApplier.LoadAsset(id, language);
@@ -72,7 +71,7 @@ public class RawAssetManager : Component, IRawAssetManager
     }
     string LoadStringCore(StringId id, string language)
     {
-        language ??= Var(UserVars.Gameplay.Language);
+        language ??= ReadVar(V.User.Gameplay.Language);
         var asset = _modApplier.LoadAsset(id.Id, language);
         return asset switch
         {

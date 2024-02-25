@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Text.Json;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Settings;
@@ -17,7 +19,6 @@ namespace UAlbion.Game.Settings;
 public class SettingsManager : Component, ISettings
 {
     const int ConfigVersion = 1;
-    static readonly IntVar Version = new("ConfigVersion", 0);
     const string VarSetName = "Settings";
     const string UserPath = "$(CONFIG)/settings.json";
     VarSet _set = new(VarSetName);
@@ -32,40 +33,98 @@ public class SettingsManager : Component, ISettings
         });
         On<SetLanguageEvent>(e =>
         {
-            if (Var(UserVars.Gameplay.Language) == e.Language)
+            if (ReadVar(V.User.Gameplay.Language) == e.Language)
                 return;
 
-            SetVar(UserVars.Gameplay.Language, e.Language);
+            SetVar(V.User.Gameplay.Language, e.Language);
         });
 
-        On<SetMusicVolumeEvent>(e => SetVar(UserVars.Audio.MusicVolume, e.Value));
-        On<SetFxVolumeEvent>(e => SetVar(UserVars.Audio.FxVolume, e.Value));
-        On<SetCombatDelayEvent>(e => SetVar(UserVars.Gameplay.CombatDelay, e.Value));
+        On<SetMusicVolumeEvent>(e => SetVar(V.User.Audio.MusicVolume, e.Value));
+        On<SetFxVolumeEvent>(e => SetVar(V.User.Audio.FxVolume, e.Value));
+        On<SetCombatDelayEvent>(e => SetVar(V.User.Gameplay.CombatDelay, e.Value));
         On<DebugFlagEvent>(e =>
         {
-            var debugFlags = Var(UserVars.Debug.DebugFlags);
+            var debugFlags = ReadVar(V.User.Debug.DebugFlags);
             debugFlags = (DebugFlags)CoreUtil.UpdateFlag((uint)debugFlags, e.Operation, (uint)e.Flag);
             TraceAttachment = (debugFlags & DebugFlags.TraceAttachment) != 0;
-            SetVar(UserVars.Debug.DebugFlags, debugFlags);
+            SetVar(V.User.Debug.DebugFlags, debugFlags);
         });
         On<SpecialEvent>(e =>
         {
-            var value = Var(CoreVars.User.Special1);
+            var value = ReadVar(V.Core.User.Special1);
             value = CoreUtil.UpdateValue(value, e.Operation, e.Argument);
-            SetVar(CoreVars.User.Special1, value);
+            SetVar(V.Core.User.Special1, value);
         });
         On<Special2Event>(e =>
         {
-            var value = Var(CoreVars.User.Special2);
+            var value = ReadVar(V.Core.User.Special2);
             value = CoreUtil.UpdateValue(value, e.Operation, e.Argument);
-            SetVar(CoreVars.User.Special2, value);
+            SetVar(V.Core.User.Special2, value);
         });
         On<EngineFlagEvent>(e =>
         {
-            var value = Var(CoreVars.User.EngineFlags);
+            var value = ReadVar(V.Core.User.EngineFlags);
             value = (EngineFlags)CoreUtil.UpdateFlag((uint)value, e.Operation, (uint)e.Flag);
-            SetVar(CoreVars.User.EngineFlags, value);
+            SetVar(V.Core.User.EngineFlags, value);
         });
+
+        On<GetVarEvent>(e =>
+        {
+            var name = e.Name ?? "";
+            var registry = TryResolve<IVarRegistry>();
+            foreach (var v in registry.Vars)
+            {
+                if (!v.Key.Contains(name, StringComparison.InvariantCultureIgnoreCase))
+                    continue;
+
+                if (!_set.TryGetValue(v.Key, out var value))
+                    value = v.DefaultValueUntyped;
+
+                Info($"{v.Key} {value} [default: {v.DefaultValueUntyped}]");
+            }
+        });
+
+        On<SetVarEvent>(e =>
+        {
+            var target = GetSingleVar(e.Name ?? "");
+            if (target == null)
+                return;
+
+            try
+            {
+                target.WriteFromString(this, e.Value);
+            }
+            catch (JsonException ex) { Error($"\"{e.Value}\" could not be converted to a valid {target.ValueType}: {ex.Message}"); }
+            catch (FormatException ex) { Error($"\"{e.Value}\" could not be converted to a valid {target.ValueType}: {ex.Message}"); }
+        });
+
+        On<ResetVarEvent>(e =>
+        {
+            var target = GetSingleVar(e.Name ?? "");
+            if (target == null)
+                return;
+
+            ClearValue(target.Key);
+        });
+    }
+
+    IVar GetSingleVar(string name)
+    {
+        var registry = TryResolve<IVarRegistry>();
+        var candidates = registry.Vars.Where(v => v.Key.Contains(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        if (candidates.Count == 0)
+        {
+            Error($"No var found matching \"{name}\"");
+            return null;
+        }
+
+        if (candidates.Count > 1)
+        {
+            Error($"Multiple vars found matching \"{name}\": {string.Join(", ", candidates.Select(x => x.Key))}");
+            return null;
+        }
+
+        return candidates[0];
     }
 
     void SetVar<T>(IVar<T> varInfo, T value)
@@ -103,14 +162,14 @@ public class SettingsManager : Component, ISettings
             // Note: If version doesn't match discard old config and go back to defaults.
             // This is just to clear out any bad entries from before the format was stabilised,
             // if future changes are made to the format we can implement an actual upgrade process.
-            int version = Version.Read(_set);
+            int version = V.Game.Version.Read(_set);
             if (version != ConfigVersion)
             {
                 Warn($"Settings file was not version {ConfigVersion} - discarding settings");
                 _set = new VarSet(VarSetName);
             }
             else
-                _set.ClearValue(Version.Key);
+                _set.ClearValue(V.Game.Version.Key);
         }
 
         // The global mapping may be empty for unit tests that construct the asset system statically 
@@ -150,9 +209,9 @@ public class SettingsManager : Component, ISettings
         if (!disk.DirectoryExists(dir))
             disk.CreateDirectory(dir);
 
-        Version.Write(this, ConfigVersion);
+        V.Game.Version.Write(this, ConfigVersion);
         VarSetLoader.Save(_set, path, disk, jsonUtil);
-        _set.ClearValue(Version.Key);
+        _set.ClearValue(V.Game.Version.Key);
         _dirty = false;
     }
 

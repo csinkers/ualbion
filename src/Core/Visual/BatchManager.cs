@@ -44,7 +44,7 @@ public class BatchManager<TKey, TInstance> : ServiceComponent<IBatchManager<TKey
     {
         _totalTime += e.DeltaSeconds;
 
-        if (_totalTime - _lastCleanup <= Var(CoreVars.Gfx.SpriteManager.CacheCheckIntervalSeconds))
+        if (_totalTime - _lastCleanup <= ReadVar(V.Core.Gfx.SpriteManager.CacheCheckIntervalSeconds))
             return;
 
         lock (_syncRoot)

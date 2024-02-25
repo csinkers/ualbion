@@ -13,7 +13,6 @@ using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
-using MoveVars = UAlbion.Formats.Config.GameVars.PartyMovement;
 
 namespace UAlbion.Game.Entities.Map2D;
 
@@ -78,17 +77,17 @@ public class FlatMap : Component, IMap
         var movementSettings = _logicalMap.UseSmallSprites
             ? new MovementSettings(SmallSpriteAnimations.Frames)
             {
-                MaxTrailDistance = Var(MoveVars.MaxTrailDistanceSmall),
-                MinTrailDistance = Var(MoveVars.MinTrailDistanceSmall),
-                TicksPerFrame = Var(MoveVars.TicksPerFrame),
-                TicksPerTile = Var(MoveVars.TicksPerTile)
+                MaxTrailDistance = ReadVar(V.Game.PartyMovement.MaxTrailDistanceSmall),
+                MinTrailDistance = ReadVar(V.Game.PartyMovement.MinTrailDistanceSmall),
+                TicksPerFrame = ReadVar(V.Game.PartyMovement.TicksPerFrame),
+                TicksPerTile = ReadVar(V.Game.PartyMovement.TicksPerTile)
             }
             : new MovementSettings(LargeSpriteAnimations.Frames)
             {
-                MaxTrailDistance = Var(MoveVars.MaxTrailDistanceLarge),
-                MinTrailDistance = Var(MoveVars.MinTrailDistanceLarge),
-                TicksPerFrame = Var(MoveVars.TicksPerFrame),
-                TicksPerTile = Var(MoveVars.TicksPerTile)
+                MaxTrailDistance = ReadVar(V.Game.PartyMovement.MaxTrailDistanceLarge),
+                MinTrailDistance = ReadVar(V.Game.PartyMovement.MinTrailDistanceLarge),
+                TicksPerFrame = ReadVar(V.Game.PartyMovement.TicksPerFrame),
+                TicksPerTile = ReadVar(V.Game.PartyMovement.TicksPerTile)
             };
 
         var initialPos = new Vector2(_logicalMap.Width / 2.0f, _logicalMap.Height / 2.0f);

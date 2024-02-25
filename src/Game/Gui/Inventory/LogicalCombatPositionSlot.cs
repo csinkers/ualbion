@@ -2,7 +2,6 @@
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
-using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 using UAlbion.Game.State.Player;
 using UAlbion.Game.Text;
@@ -69,7 +68,7 @@ public class LogicalCombatPositionSlot : UiElement
         var party = Resolve<IParty>();
 
         var sheet = GetSheet(_slotNumber);
-        var lang = Var(UserVars.Gameplay.Language);
+        var lang = ReadVar(V.User.Gameplay.Language);
 
         string inHandName = null;
         if (!_owner.InHand.IsNone)

@@ -7,6 +7,9 @@ using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Combat;
 
+/// <summary>
+/// The top-level UI for a battle
+/// </summary>
 public class CombatDialog : Dialog
 {
     public record EndCombatEvent(CombatResult Result) : EventRecord;

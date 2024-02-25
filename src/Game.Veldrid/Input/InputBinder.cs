@@ -4,7 +4,6 @@ using System.Linq;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core.Veldrid.Events;
-using UAlbion.Formats;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
@@ -13,7 +12,7 @@ using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Input;
 
-public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
+public class InputBinder : GameServiceComponent<IInputBinder>, IInputBinder
 {
     class BindingSet : Dictionary<InputMode, IDictionary<KeyBinding, string>> { }
 
@@ -41,7 +40,7 @@ public class InputBinder : ServiceComponent<IInputBinder>, IInputBinder
 
     void Rebind()
     {
-        var config = Resolve<IAssetManager>().LoadInputConfig();
+        var config = Assets.LoadInputConfig();
         if (config == null)
             throw new InvalidOperationException("Input config could not be loaded");
 

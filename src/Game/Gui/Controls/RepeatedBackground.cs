@@ -4,7 +4,6 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Textures;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Game.Entities;
 
 namespace UAlbion.Game.Gui.Controls;
@@ -36,11 +35,10 @@ public class RepeatedBackground : UiElement
             _lastPixelSize = pixelSize;
         }
 
-        var assets = Resolve<IAssetManager>();
-        var multi = new CompositedTexture(AssetId.None, $"Background {width}x{height}", assets.LoadPalette(Base.Palette.Inventory));
+        var multi = new CompositedTexture(AssetId.None, $"Background {width}x{height}", Assets.LoadPalette(Base.Palette.Inventory));
 
         // Background
-        var background = assets.LoadTexture(Base.CoreGfx.UiBackground);
+        var background = Assets.LoadTexture(Base.CoreGfx.UiBackground);
         multi.AddTexture(1, background, 0, 0, 0, true, width, height);
 
         var subImage = multi.Regions[multi.GetSubImageAtTime(1, 0, false)];

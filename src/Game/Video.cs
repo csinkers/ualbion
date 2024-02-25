@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Numerics;
-using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets.Flic;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.ScriptEvents;
 
 namespace UAlbion.Game;
 
-public class Video : Component
+public class Video : GameComponent
 {
     readonly VideoId _id;
     readonly bool _looping;
@@ -60,7 +58,7 @@ public class Video : Component
         if (_player != null)
             return;
 
-        var flic = Resolve<IAssetManager>().LoadVideo(_id);
+        var flic = Assets.LoadVideo(_id);
         if (flic == null)
         {
             Complete?.Invoke();

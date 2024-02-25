@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Ids;
 
@@ -14,7 +12,7 @@ namespace UAlbion.Game.Combat;
 /// Contains the logical state of a battle
 /// The top-level combat UI is handled by <see cref="CombatDialog"/>
 /// </summary>
-public class Battle : Component, IReadOnlyBattle
+public class Battle : GameComponent, IReadOnlyBattle
 {
     readonly MonsterGroupId _groupId;
     readonly List<Mob> _mobs = new();
@@ -42,7 +40,7 @@ public class Battle : Component, IReadOnlyBattle
 
     protected override void Subscribed()
     {
-        var assets = Resolve<IAssetManager>();
+        var group = Assets.LoadMonsterGroup(_groupId);
     }
 
     public IReadOnlyMob GetTile(int x, int y)

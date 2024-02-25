@@ -6,7 +6,6 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -224,7 +223,7 @@ public class StatusBarPortrait : UiElement
             case AssetType.Item:
             {
                 // Give %s to %s
-                var item = Resolve<IAssetManager>().LoadItem(inventoryManager.ItemInHand.Item);
+                var item = Assets.LoadItem(inventoryManager.ItemInHand.Item);
                 text = tf.Format(
                     Base.SystemText.PartyPortrait_GiveXToX,
                     item.Name,

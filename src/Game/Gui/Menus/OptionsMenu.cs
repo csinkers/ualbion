@@ -17,7 +17,7 @@ public class OptionsMenu : ModalDialog
     int _combatDelay;
 
     bool HasLanguageFiles(string language)
-        => Resolve<IAssetManager>().IsStringDefined(Base.SystemText.MainMenu_MainMenu, language);
+        => Assets.IsStringDefined(Base.SystemText.MainMenu_MainMenu, language);
 
     public OptionsMenu() : base(DialogPositioning.Center) { }
 

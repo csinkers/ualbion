@@ -16,7 +16,7 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities.Map2D;
 
-public class FlatMap : Component, IMap
+public class FlatMap : GameComponent, IMap
 {
     readonly MapData2D _mapData;
     LogicalMap2D _logicalMap;
@@ -53,11 +53,10 @@ public class FlatMap : Component, IMap
         if (_logicalMap != null)
             return;
 
-        var assetManager = Resolve<IAssetManager>();
         var state = Resolve<IGameState>();
         var gameFactory = Resolve<IGameFactory>();
-        _logicalMap = AttachChild(new LogicalMap2D(assetManager, _mapData, state.TemporaryMapChanges, state.PermanentMapChanges));
-        var tileset = assetManager.LoadTileGraphics(_logicalMap.TileData.Id.ToTilesetGfx());
+        _logicalMap = AttachChild(new LogicalMap2D(Assets, _mapData, state.TemporaryMapChanges, state.PermanentMapChanges));
+        var tileset = Assets.LoadTileGraphics(_logicalMap.TileData.Id.ToTilesetGfx());
 
         AttachChild(new ScriptManager());
         AttachChild(new Collider2D(

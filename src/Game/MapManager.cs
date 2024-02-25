@@ -11,7 +11,7 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game;
 
-public class MapManager : ServiceComponent<IMapManager>, IMapManager
+public class MapManager : GameServiceComponent<IMapManager>, IMapManager
 {
     public IMap Current { get; private set; }
 
@@ -64,8 +64,7 @@ public class MapManager : ServiceComponent<IMapManager>, IMapManager
 
     IMap BuildMap(MapId mapId)
     {
-        var assets = Resolve<IAssetManager>();
-        var mapData = assets.LoadMap(mapId);
+        var mapData = Assets.LoadMap(mapId);
         if (mapData == null)
             return null;
 

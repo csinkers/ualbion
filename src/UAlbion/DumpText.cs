@@ -10,11 +10,12 @@ using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
+using UAlbion.Game;
 using UAlbion.Game.Text;
 
 namespace UAlbion;
 
-class DumpText : Component, IAssetDumper
+class DumpText : GameComponent, IAssetDumper
 {
     const string ChestPath            = "ChestInfo.txt";
     const string EventSetPath         = "EventSets.txt";
@@ -38,24 +39,23 @@ class DumpText : Component, IAssetDumper
 
     public void Dump(string baseDir, ISet<AssetType> types, AssetId[] dumpIds)
     {
-        var assets = Resolve<IAssetManager>();
         var tf = Resolve<ITextFormatter>();
         foreach (var type in types)
         {
             switch (type)
             {
-                case AssetType.Chest: Chests(assets, baseDir, dumpIds); break;
-                case AssetType.EventSet: EventSets(assets, baseDir, dumpIds); break;
-                case AssetType.Item: ItemData(assets, baseDir, dumpIds); break;
-                case AssetType.Labyrinth: Labyrinths(assets, baseDir); break;
-                case AssetType.Map: MapData(assets, baseDir, dumpIds); MapEvents(assets, baseDir, dumpIds); break;
-                case AssetType.Merchant: Merchants(assets, baseDir, dumpIds); break;
-                case AssetType.MonsterSheet: MonsterCharacterSheets(assets, tf, baseDir, dumpIds); break;
-                case AssetType.MonsterGroup: MonsterGroups(assets, baseDir, dumpIds); break;
-                case AssetType.NpcSheet: NpcCharacterSheets(assets, tf, baseDir, dumpIds); break;
-                case AssetType.PartySheet: PartyCharacterSheets(assets, tf, baseDir, dumpIds); break;
-                case AssetType.Script: Scripts(assets, baseDir, dumpIds); break;
-                case AssetType.Spell: Spells(assets, baseDir, dumpIds); break;
+                case AssetType.Chest: Chests(Assets, baseDir, dumpIds); break;
+                case AssetType.EventSet: EventSets(Assets, baseDir, dumpIds); break;
+                case AssetType.Item: ItemData(Assets, baseDir, dumpIds); break;
+                case AssetType.Labyrinth: Labyrinths(Assets, baseDir); break;
+                case AssetType.Map: MapData(Assets, baseDir, dumpIds); MapEvents(Assets, baseDir, dumpIds); break;
+                case AssetType.Merchant: Merchants(Assets, baseDir, dumpIds); break;
+                case AssetType.MonsterSheet: MonsterCharacterSheets(Assets, tf, baseDir, dumpIds); break;
+                case AssetType.MonsterGroup: MonsterGroups(Assets, baseDir, dumpIds); break;
+                case AssetType.NpcSheet: NpcCharacterSheets(Assets, tf, baseDir, dumpIds); break;
+                case AssetType.PartySheet: PartyCharacterSheets(Assets, tf, baseDir, dumpIds); break;
+                case AssetType.Script: Scripts(Assets, baseDir, dumpIds); break;
+                case AssetType.Spell: Spells(Assets, baseDir, dumpIds); break;
             }
         }
     }

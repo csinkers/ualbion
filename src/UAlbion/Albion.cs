@@ -163,6 +163,7 @@ static class Albion
             new DialogManager(),
             new InventoryScreenManager(),
             new CombatManager(),
+            new MonsterFactory(),
             //new DiagWindow()
             //    .Add(new SpriteInstanceDataDebugBehaviour())
             //    .Add(new FormatTextEventBehaviour()),

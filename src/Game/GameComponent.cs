@@ -5,7 +5,6 @@ namespace UAlbion.Game;
 
 public abstract class GameComponent : Component
 {
-    protected static ushort Random() => AlbionRandom.Next();
     protected IAssetManager Assets => Resolve<IAssetManager>();
 }
 

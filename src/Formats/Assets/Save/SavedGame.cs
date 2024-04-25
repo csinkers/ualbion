@@ -17,6 +17,7 @@ public class SavedGame
     public const int MaxPartySize = 6;
     public const int CombatRows = 5;
     public const int CombatRowsForParty = 2;
+    public const int CombatRowsForMobs = CombatRows - CombatRowsForParty;
     public const int CombatColumns = 6;
     const int MapCount = 512; // TODO
     const int SwitchCount = 1024; // 0x80 bytes

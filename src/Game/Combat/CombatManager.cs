@@ -4,6 +4,7 @@ using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
 using UAlbion.Game.Scenes;
+using UAlbion.Game.State;
 
 namespace UAlbion.Game.Combat;
 
@@ -25,12 +26,15 @@ public class CombatManager : GameComponent
         if (info != null)
             Raise(new LoadPaletteEvent(info.PaletteId));
 
-        var battle = AttachChild(new Battle(groupId, backgroundId));
+        var scene = Resolve<ISceneManager>().ActiveScene;
+        var battle = new Battle(groupId, backgroundId);
+        scene.Add(battle);
+
         Raise(new DialogManager.ShowCombatDialogEvent(battle));
 
         battle.Complete += () =>
         {
-            RemoveChild(battle);
+            scene.Remove(battle);
             Raise(new PopSceneEvent());
         };
     }

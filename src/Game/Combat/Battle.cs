@@ -49,17 +49,16 @@ public class Battle : GameComponent, IReadOnlyBattle
             _tiles[mob.CombatPosition] = mob;
         }
 
-        for (int row = 0; row < SavedGame.CombatRows; row++)
+        for (int row = 0; row < SavedGame.CombatRowsForMobs; row++)
         {
             for (int column = 0; column < SavedGame.CombatColumns; column++)
             {
                 var index = row * SavedGame.CombatColumns + column;
-                var mobId = group.Grid[index];
+                MonsterId mobId = group.Grid[index];
                 if (mobId.IsNone)
                     continue;
 
-                var sheet = Assets.LoadSheet(mobId);
-                var monster = new Monster(sheet);
+                var monster = Resolve<IMonsterFactory>().BuildMonster(mobId);
                 var mob = new Mob(monster);
                 _mobs.Add(mob);
                 _tiles[mob.CombatPosition] = mob;

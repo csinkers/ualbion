@@ -34,17 +34,17 @@ public class MapManager : GameServiceComponent<IMapManager>, IMapManager
 
     async AlbionTask LoadMap(MapId mapId)
     {
-        Raise(new UnloadMapEvent());
+        await RaiseAsync(new UnloadMapEvent());
         if (mapId == MapId.None) // 0 = Build a blank scene for testing / debugging
         {
-            Raise(new SetSceneEvent(SceneId.World2D));
+            await RaiseAsync(new SetSceneEvent(SceneId.World2D));
             return;
         }
 
         // Remove old map
         RemoveAllChildren();
 
-        Raise(new MuteEvent());
+        await RaiseAsync(new MuteEvent());
         var map = BuildMap(mapId);
         Current = map;
 
@@ -52,7 +52,7 @@ public class MapManager : GameServiceComponent<IMapManager>, IMapManager
             return;
 
         // Set the scene first to ensure scene-local components from other scenes are disabled.
-        Raise(new SetSceneEvent(map is Entities.Map3D.DungeonMap ? SceneId.World3D : SceneId.World2D));
+        await RaiseAsync(new SetSceneEvent(map is Entities.Map3D.DungeonMap ? SceneId.World3D : SceneId.World2D));
         AttachChild(map);
 
         Info($"Loaded map {mapId.Id}: {mapId}");

@@ -121,7 +121,7 @@ public class AssetLoadTests : IDisposable
     public void CombatBgTest()
     {
         var bg = Test(assets => assets.LoadTexture(CombatBackground.Toronto));
-        Assert.Equal(1, bg.Regions.Count);
+        Assert.Single(bg.Regions);
         Assert.Equal(360, bg.Width);
         Assert.Equal(192, bg.Height);
     }
@@ -144,7 +144,7 @@ public class AssetLoadTests : IDisposable
     public void CoreSpriteTest()
     {
         var cursor = Test(assets => assets.LoadTexture(CoreGfx.Cursor));
-        Assert.Equal(1, cursor.Regions.Count);
+        Assert.Single(cursor.Regions);
         Assert.Equal(14, cursor.Width);
         Assert.Equal(14, cursor.Height);
     }

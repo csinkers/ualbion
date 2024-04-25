@@ -37,7 +37,7 @@ public class ImGuiConsoleLogger : Component, IImGuiWindow
         ImGui.BeginChild(
             "ScrollingRegion",
             new Vector2(0, -footerHeightToReserve),
-            false,
+            ImGuiChildFlags.None,
             ImGuiWindowFlags.HorizontalScrollbar);
 
         // Display every line as a separate entry so we can change their color or add custom widgets.

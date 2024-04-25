@@ -103,7 +103,7 @@ public class DialogManagerTests
         var task = ex.RaiseQueryA(e, null);
 
         var layout = lm.GetLayout();
-        Assert.Equal(1, layout.Children.Count); // Should only be one top-level dialog
+        Assert.Single(layout.Children); // Should only be one top-level dialog
         var yesText = layout.DepthFirstSearch(x => x.Element is UiTextLine txt && txt.ToString().Contains("\"Yes\"")).First();
         var yesButton = (Button)yesText.Ancestors.First(x => x.Element is Button).Element;
         yesButton.Receive(new HoverEvent(), null);
@@ -113,13 +113,13 @@ public class DialogManagerTests
         Assert.True(task.IsCompleted);
         Assert.True(task.GetResult());
         layout = lm.GetLayout();
-        Assert.Equal(0, layout.Children.Count); // Dialog should be closed, so no top-level dialogs
+        Assert.Empty(layout.Children); // Dialog should be closed, so no top-level dialogs
 
         // Open another yes/no dialog
         e = new YesNoPromptEvent(Base.SystemText.MainMenu_DoYouReallyWantToQuit);
         task = ex.RaiseQueryA(e, this);
         layout = lm.GetLayout();
-        Assert.Equal(1, layout.Children.Count); // Should only be one top-level dialog
+        Assert.Single(layout.Children); // Should only be one top-level dialog
         var noText = layout.DepthFirstSearch(x => x.Element is UiTextLine txt && txt.ToString().Contains("\"No\"")).First();
         var noButton = (Button)noText.Ancestors.First(x => x.Element is Button).Element;
         noButton.Receive(new HoverEvent(), null);

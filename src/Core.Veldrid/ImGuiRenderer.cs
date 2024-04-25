@@ -553,7 +553,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
 
         for (int i = 0; i < drawData.CmdListsCount; i++)
         {
-            ImDrawListPtr cmdList = drawData.CmdListsRange[i];
+            ImDrawListPtr cmdList = drawData.CmdLists[i];
 
             cl.UpdateBuffer(
                 _vertexBuffer,
@@ -598,7 +598,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
         int idxOffset = 0;
         for (int n = 0; n < drawData.CmdListsCount; n++)
         {
-            ImDrawListPtr cmdList = drawData.CmdListsRange[n];
+            ImDrawListPtr cmdList = drawData.CmdLists[n];
             for (int cmdIndex = 0; cmdIndex < cmdList.CmdBuffer.Size; cmdIndex++)
             {
                 ImDrawCmdPtr pcmd = cmdList.CmdBuffer[cmdIndex];

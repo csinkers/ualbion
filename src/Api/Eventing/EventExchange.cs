@@ -19,7 +19,7 @@ namespace UAlbion.Api.Eventing
         readonly object _syncRoot = new();
         [DiagIgnore] readonly ILogExchange _logExchange;
         [DiagIgnore] readonly PooledThreadSafe<List<Handler>> _dispatchLists = new(() => new List<Handler>(), x => x.Clear());
-        [DiagIgnore] readonly DoubleBuffered<List<(IEvent, object)>> _queuedEvents = new(() => new List<(IEvent, object)>());
+        [DiagIgnore] readonly DoubleBuffered<List<(IEvent Event, object Sender)>> _queuedEvents = new(() => new List<(IEvent Event, object Sender)>());
         readonly IDictionary<Type, object> _registrations = new Dictionary<Type, object>();
         readonly IDictionary<Type, List<Handler>> _subscriptions = new Dictionary<Type, List<Handler>>();
         readonly IDictionary<IComponent, List<Handler>> _subscribers = new Dictionary<IComponent, List<Handler>>();
@@ -32,7 +32,7 @@ namespace UAlbion.Api.Eventing
 
 #if DEBUG
         // ReSharper disable once CollectionNeverQueried.Local
-        [DiagIgnore] readonly List<(object, long)> _frameEvents = new();
+        [DiagIgnore] readonly List<(int Depth, object Event, long TimestampTicks)> _frameEvents = new();
         [DiagIgnore] List<IComponent> _sortedSubscribersCached = new();
         public IReadOnlyList<IComponent> SortedSubscribers // Just for debugging
         {
@@ -249,7 +249,7 @@ namespace UAlbion.Api.Eventing
                 else
                 {
                     long time = Stopwatch.GetTimestamp();
-                    _frameEvents.Add((e, time));
+                    _frameEvents.Add((_nesting, e, time));
                 }
 #endif
                 Collect(handlers, e.GetType());

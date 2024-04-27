@@ -13,7 +13,6 @@ public class GameClock : ServiceComponent<IClock>, IClock
     readonly IList<(string, float)> _activeTimers = new List<(string, float)>();
     readonly SetTimeEvent _setTimeEvent = new();
     readonly CycleCacheEvent _cycleCacheEvent = new();
-    readonly PostGameUpdateEvent _postGameUpdateEvent = new();
     readonly FastClockEvent _fastClockEvent = new(1);
 
     AlbionTaskCore _currentUpdate;
@@ -135,8 +134,6 @@ public class GameClock : ServiceComponent<IClock>, IClock
             _stoppedFrames++;
             _stoppedMs += 1000.0f * e.DeltaSeconds;
         }
-
-        Raise(_postGameUpdateEvent);
     }
 
     void RaiseTick()

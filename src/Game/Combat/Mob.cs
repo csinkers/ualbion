@@ -18,4 +18,6 @@ public class Mob : GameComponent, IReadOnlyMob // Logical mob / character in a b
     public int Y => _participant.CombatPosition / SavedGame.CombatColumns;
     public IEffectiveCharacterSheet Sheet => _participant.Effective;
     public int CombatPosition => _participant.CombatPosition;
+    public override string ToString() => $"Mob({_participant})";
+
 }

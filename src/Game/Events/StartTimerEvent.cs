@@ -2,7 +2,7 @@
 
 namespace UAlbion.Game.Events;
 
-public class StartTimerEvent : GameEvent
+public class StartTimerEvent : GameEvent, IVerboseEvent
 {
     public StartTimerEvent(string id, float intervalSeconds, IComponent target)
     {

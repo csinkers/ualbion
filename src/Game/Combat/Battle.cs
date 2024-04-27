@@ -41,7 +41,9 @@ public class Battle : GameComponent, IReadOnlyBattle
 
     protected override void Subscribed()
     {
-        var group = Assets.LoadMonsterGroup(_groupId);
+        if (_mobs.Count > 0)
+            return;
+
         foreach (var partyMember in Resolve<IParty>().StatusBarOrder)
         {
             var mob = new Mob(partyMember);
@@ -49,6 +51,7 @@ public class Battle : GameComponent, IReadOnlyBattle
             _tiles[mob.CombatPosition] = mob;
         }
 
+        var group = Assets.LoadMonsterGroup(_groupId);
         for (int row = 0; row < SavedGame.CombatRowsForMobs; row++)
         {
             for (int column = 0; column < SavedGame.CombatColumns; column++)
@@ -58,8 +61,9 @@ public class Battle : GameComponent, IReadOnlyBattle
                 if (mobId.IsNone)
                     continue;
 
-                var monster = Resolve<IMonsterFactory>().BuildMonster(mobId);
-                var mob = new Mob(monster);
+                var monster = AttachChild(Resolve<IMonsterFactory>().BuildMonster(mobId, index));
+                var mob = AttachChild(new Mob(monster));
+
                 _mobs.Add(mob);
                 _tiles[mob.CombatPosition] = mob;
             }

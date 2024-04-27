@@ -51,9 +51,11 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
 
     public int? GetCombatPositionForPlayer(PartyMemberId id)
     {
+        var offset = (SavedGame.CombatRows - SavedGame.CombatRowsForParty) * SavedGame.CombatColumns;
         for (int i = 0; i < _party.StatusBarOrder.Count; i++)
             if (_party.StatusBarOrder[i].Id == id)
-                return _game.CombatPositions[i];
+                return _game.CombatPositions[i] + offset;
+
         return null;
     }
 

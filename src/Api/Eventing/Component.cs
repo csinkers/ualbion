@@ -28,6 +28,7 @@ public abstract class Component : IComponent
     protected static object Context { get => ThreadContext.Value; set => ThreadContext.Value = value; }
     static int _nesting;
     static int _nextId;
+
     [DiagIgnore] List<IComponent> _children;
     [DiagIgnore] Dictionary<Type, Handler> _handlers;
     [DiagIgnore] bool _isActive = true; // If false, then this component will not be attached to the exchange even if its parent is.

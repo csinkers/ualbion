@@ -8,7 +8,7 @@ namespace UAlbion.Game.Combat;
 
 public class MonsterFactory : ServiceComponent<IMonsterFactory>, IMonsterFactory
 {
-    public Monster BuildMonster(MonsterId mobId)
+    public Monster BuildMonster(MonsterId mobId, int position)
     {
         var assets = Resolve<IAssetManager>();
         var sheet = assets.LoadSheet(mobId).DeepClone(Resolve<ISpellManager>());
@@ -26,7 +26,7 @@ public class MonsterFactory : ServiceComponent<IMonsterFactory>, IMonsterFactory
 
         RandomiseStat(sheet.Combat.LifePoints, statOffset, statModulus);
         sheet.Magic.SpellPoints.Max = sheet.Magic.SpellPoints.Current; // Not randomised in original.
-        return new Monster(sheet);
+        return new Monster(sheet, position);
     }
 
     static void RandomiseStat(CharacterAttribute attribute, int offset, int modulus)

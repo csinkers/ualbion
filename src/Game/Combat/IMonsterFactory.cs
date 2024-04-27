@@ -4,5 +4,5 @@ namespace UAlbion.Game.Combat;
 
 public interface IMonsterFactory
 {
-    Monster BuildMonster(MonsterId mobId);
+    Monster BuildMonster(MonsterId mobId, int position);
 }

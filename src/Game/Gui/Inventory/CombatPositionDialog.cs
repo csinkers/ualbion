@@ -73,6 +73,7 @@ right clicking returns held to original loc or undoes last swap
         {
             if (row > 0)
                 stack.Add(new Spacing(0, 2));
+
             stack.Add(BuildRow(row));
         }
 

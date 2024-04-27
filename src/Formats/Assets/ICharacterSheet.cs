@@ -14,10 +14,14 @@ public interface ICharacterSheet
     ICharacterAttribute Age { get; }
     byte Level { get; }
 
-    SpriteId SpriteId { get; }
-    SpriteId PortraitId { get; }
+    // Visual
+    SpriteId SpriteId { get; } // Overworld / 3D graphics
+    SpriteId PortraitId { get; } // Conversation portrait
+    SpriteId MonsterGfxId { get; } // Combat 3D graphics
+    SpriteId TacticalGfxId { get; } // Combat 2D graphics
+
     EventSetId EventSetId { get; }
-    EventSetId WordSetId { get; }
+    EventSetId WordSetId { get; } // Base set of conversation topics
     PlayerLanguages Languages { get; }
 
     // Grouped
@@ -26,12 +30,4 @@ public interface ICharacterSheet
     ICharacterAttributes Attributes { get; }
     ICharacterSkills Skills { get; }
     ICombatAttributes Combat { get; }
-}
-
-public interface IEffectiveCharacterSheet : ICharacterSheet
-{
-    int TotalWeight { get; }
-    int MaxWeight { get; }
-    int DisplayDamage { get; }
-    int DisplayProtection { get; }
 }

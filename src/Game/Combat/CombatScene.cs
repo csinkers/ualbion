@@ -24,7 +24,7 @@ public class CombatScene : Container, IScene
         if (_clockWasRunning)
             Raise(new StopClockEvent());
 
-        Raise(new ShowMapEvent(false));
+        // Raise(new ShowMapEvent(false));
         Raise(new PushMouseModeEvent(MouseMode.Normal));
         Raise(new PushInputModeEvent(InputMode.Combat));
     }
@@ -33,7 +33,7 @@ public class CombatScene : Container, IScene
     {
         Raise(new PopMouseModeEvent());
         Raise(new PopInputModeEvent());
-        Raise(new ShowMapEvent());
+        // Raise(new ShowMapEvent());
 
         if (_clockWasRunning)
             Raise(new StartClockEvent());

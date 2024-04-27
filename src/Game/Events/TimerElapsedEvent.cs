@@ -1,6 +1,8 @@
-﻿namespace UAlbion.Game.Events;
+﻿using UAlbion.Api.Eventing;
 
-public class TimerElapsedEvent : GameEvent
+namespace UAlbion.Game.Events;
+
+public class TimerElapsedEvent : GameEvent, IVerboseEvent
 {
     public TimerElapsedEvent(string id) { Id = id; }
     public string Id { get; }

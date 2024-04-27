@@ -1,20 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace UAlbion.Formats.Assets;
 
-public interface ICharacterSkills
+public class CharacterSkills : ICharacterSkills
 {
-    ICharacterAttribute CloseCombat { get; }
-    ICharacterAttribute RangedCombat { get; }
-    ICharacterAttribute CriticalChance { get; }
-    ICharacterAttribute LockPicking { get; }
-}
-
-public class CharacterSkills : ICharacterSkills, IEnumerable<CharacterAttribute>
-{
-    IEnumerable<CharacterAttribute> Enumerate()
+    public IEnumerable<CharacterAttribute> Enumerate()
     {
         yield return CloseCombat;
         yield return RangedCombat;
@@ -22,8 +13,6 @@ public class CharacterSkills : ICharacterSkills, IEnumerable<CharacterAttribute>
         yield return LockPicking;
     }
 
-    public IEnumerator<CharacterAttribute> GetEnumerator() => Enumerate().GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Enumerate()).GetEnumerator();
     public override string ToString() => $"M{CloseCombat} R{RangedCombat} C{CriticalChance} L{LockPicking}";
     ICharacterAttribute ICharacterSkills.CloseCombat => CloseCombat;
     ICharacterAttribute ICharacterSkills.RangedCombat => RangedCombat;

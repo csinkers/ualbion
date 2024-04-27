@@ -3,14 +3,14 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-// ReSharper disable UnusedMember.Global
+#pragma warning disable CA1000 // Do not declare static members on generic types
 #pragma warning disable CA1815 // Override equals and operator equals on value types
 #pragma warning disable CA1822 // Mark members as static
 
 namespace UAlbion.Api.Eventing;
 
 [StructLayout(LayoutKind.Auto)]
-public struct AlbionTaskBuilder
+public struct AlbionTaskBuilder<TResult>
 {
     enum BuilderState
     {
@@ -20,19 +20,20 @@ public struct AlbionTaskBuilder
     }
 
     BuilderState _state;
-    AlbionTaskCore<Unit>? _core;
+    AlbionTaskCore<TResult>? _core;
+    TResult _result;
 
     /// <summary>Gets the value task for this builder.</summary>
-    public AlbionTask Task => _state switch
+    public AlbionTask<TResult> Task => _state switch
     {
-        BuilderState.Complete => AlbionTask.Complete,
-        BuilderState.Pending => new AlbionTask(_core),
+        BuilderState.Complete => new AlbionTask<TResult>(_result),
+        BuilderState.Pending => new AlbionTask<TResult>(_core!),
         _ => throw new InvalidOperationException("Tried to get Task, but it hasn't been created")
     };
 
     /// <summary>Creates an instance of the <see cref="AlbionTaskBuilder{TResult}"/> struct.</summary>
     /// <returns>The initialized instance.</returns>
-    public static AlbionTaskBuilder Create() => default;
+    public static AlbionTaskBuilder<TResult> Create() => default;
 
     /// <summary>Initiates the builder's execution with the associated state machine.</summary>
     /// <typeparam name="TStateMachine">Specifies the type of the state machine.</typeparam>
@@ -47,11 +48,13 @@ public struct AlbionTaskBuilder
     }
 
     /// <summary>Marks the value task as successfully completed.</summary>
-    public void SetResult()
+    /// <param name="result">The result to use to complete the value task.</param>
+    public void SetResult(TResult result)
     {
         switch (_state)
         {
             case BuilderState.Indeterminate:
+                _result = result;
                 _state = BuilderState.Complete;
                 break;
 
@@ -59,7 +62,7 @@ public struct AlbionTaskBuilder
                 if (_core!.IsCompleted)
                     throw new InvalidOperationException("Tried to set value on a completed task");
 
-                _core.SetResult(Unit.V);
+                _core.SetResult(result);
                 break;
 
             case BuilderState.Complete:
@@ -93,20 +96,24 @@ public struct AlbionTaskBuilder
         {
             case BuilderState.Indeterminate:
             {
-                var box = new AlbionStateMachineBox<TStateMachine>();
+                var box = new AlbionStateMachineBox<TResult, TStateMachine>();
                 _core = box;
                 _state = BuilderState.Pending;
+
+                // In release mode, the state machine is a struct which actually includes this task builder.
+                // By setting the state machine on the box, we're making a copy of the state of this task builder for when the continuation is called.
+                // As a result, we need to make sure that we only perform the copy after any required changes to variables, e.g. setting _core and _state.
                 box._stateMachine = stateMachine;
                 awaiter.OnCompleted(box.MoveNextAction);
                 break;
             }
 
             case BuilderState.Pending:
-                {
-                    var box = (AlbionStateMachineBox<TStateMachine>)_core!;
-                    awaiter.OnCompleted(box.MoveNextAction);
-                    break;
-                }
+            {
+                var box = (AlbionStateMachineBox<TResult, TStateMachine>)_core!;
+                awaiter.OnCompleted(box.MoveNextAction);
+                break;
+            }
 
             default:
                 throw new InvalidOperationException("Called AwaitOnCompleted on a completed AlbionTaskBuilder");
@@ -129,34 +136,34 @@ public struct AlbionTaskBuilder
         switch (_state)
         {
             case BuilderState.Indeterminate:
-                {
-                    var box = new AlbionStateMachineBox<TStateMachine> { _stateMachine = stateMachine };
-                    _core = box;
-                    _state = BuilderState.Pending;
-                    awaiter.UnsafeOnCompleted(box.MoveNextAction);
-                    break;
-                }
+            {
+                var box = new AlbionStateMachineBox<TResult, TStateMachine> { _stateMachine = stateMachine };
+                _core = box;
+                _state = BuilderState.Pending;
+                awaiter.UnsafeOnCompleted(box.MoveNextAction);
+                break;
+            }
 
             case BuilderState.Pending:
-                {
-                    var box = (AlbionStateMachineBox<TStateMachine>)_core!;
-                    awaiter.UnsafeOnCompleted(box.MoveNextAction);
-                    break;
-                }
+            {
+                var box = (AlbionStateMachineBox<TResult, TStateMachine>)_core!;
+                awaiter.UnsafeOnCompleted(box.MoveNextAction);
+                break;
+            }
 
             default:
                 throw new InvalidOperationException("Called AwaitUnsafeOnCompleted on a completed AlbionTaskBuilder");
         }
     }
 
-    class AlbionStateMachineBox<TStateMachine> : AlbionTaskCore<Unit>
+    class AlbionStateMachineBox<TResult2, TStateMachine> : AlbionTaskCore<TResult2>
         where TStateMachine : IAsyncStateMachine
     {
         Action? _moveNextAction;
         public TStateMachine? _stateMachine;
         public Action MoveNextAction => _moveNextAction ??= MoveNext;
 #if DEBUG
-        public AlbionStateMachineBox() : base($"ASMB<{typeof(TStateMachine)}>") { }
+        public AlbionStateMachineBox() : base($"ASMB<{typeof(TResult2)}, {typeof(TStateMachine)}>") { }
 #endif
         void MoveNext()
         {

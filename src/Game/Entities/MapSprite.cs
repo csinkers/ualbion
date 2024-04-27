@@ -9,17 +9,17 @@ namespace UAlbion.Game.Entities;
 
 public class MapSprite : Sprite
 {
+    readonly Vector3 _tileSize;
     public Vector3 TilePosition
     {
-        get => Position / Resolve<IMapManager>().Current.TileSize;
+        get => Position / _tileSize;
         set
         {
-            var map = Resolve<IMapManager>().Current;
-            var tilePosition = Position / map.TileSize;
+            var tilePosition = Position / _tileSize;
             if (tilePosition == value)
                 return;
 
-            Position = value * map.TileSize;
+            Position = value * _tileSize;
         }
     }
 
@@ -27,6 +27,7 @@ public class MapSprite : Sprite
 
     public MapSprite(
         SpriteId id,
+        Vector3 tileSize,
         DrawLayer layer,
         SpriteKeyFlags keyFlags,
         SpriteFlags flags,
@@ -34,5 +35,6 @@ public class MapSprite : Sprite
         IBatchManager<SpriteKey, SpriteInfo> batchManager = null)
         : base(id, layer, keyFlags, flags, textureLoaderFunc, batchManager)
     {
+        _tileSize = tileSize;
     }
 }

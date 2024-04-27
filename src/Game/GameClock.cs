@@ -10,7 +10,7 @@ namespace UAlbion.Game;
 
 public class GameClock : ServiceComponent<IClock>, IClock
 {
-    readonly IList<(string, float)> _activeTimers = new List<(string, float)>();
+    readonly List<(AlbionTaskCore Task, float ExpiryTimeSeconds)> _activeTimers = new();
     readonly SetTimeEvent _setTimeEvent = new();
     readonly CycleCacheEvent _cycleCacheEvent = new();
     readonly FastClockEvent _fastClockEvent = new(1);
@@ -29,7 +29,7 @@ public class GameClock : ServiceComponent<IClock>, IClock
         On<StopClockEvent>(_ => IsRunning = false);
         On<ToggleClockEvent>(_ => IsRunning = !IsRunning);
         On<EngineUpdateEvent>(OnEngineUpdate);
-        On<StartTimerEvent>(StartTimer);
+        OnAsync<WallClockTimerEvent>(StartTimer);
 
         OnAsync<GameUpdateEvent>(e =>
         {
@@ -66,7 +66,12 @@ public class GameClock : ServiceComponent<IClock>, IClock
         }
     }
 
-    void StartTimer(StartTimerEvent e) => _activeTimers.Add((e.Id, ElapsedTime + e.IntervalSeconds));
+    AlbionTask StartTimer(WallClockTimerEvent e)
+    {
+        var atc = new AlbionTaskCore();
+        _activeTimers.Add((atc, ElapsedTime + e.IntervalSeconds));
+        return atc.UntypedTask;
+    }
 
     void OnEngineUpdate(EngineUpdateEvent e)
     {
@@ -74,12 +79,14 @@ public class GameClock : ServiceComponent<IClock>, IClock
 
         for (int i = 0; i < _activeTimers.Count; i++)
         {
-            if (!(_activeTimers[i].Item2 <= ElapsedTime))
+            if (ElapsedTime < _activeTimers[i].ExpiryTimeSeconds)
                 continue;
 
-            Raise(new TimerElapsedEvent(_activeTimers[i].Item1));
+            var task = _activeTimers[i].Task;
             _activeTimers.RemoveAt(i);
             i--;
+
+            task.Complete();
         }
 
         if (IsRunning)

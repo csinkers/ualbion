@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Api.Eventing;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Gui;
 using UAlbion.Game.Gui.Controls;
@@ -12,11 +11,12 @@ namespace UAlbion.Game.Combat;
 /// </summary>
 public class CombatDialog : Dialog
 {
-    public record EndCombatEvent(CombatResult Result) : EventRecord;
     readonly IReadOnlyBattle _battle;
 
     public CombatDialog(int depth, IReadOnlyBattle battle) : base(DialogPositioning.Center, depth)
     {
+        On<EndCombatEvent>(_ => Remove());
+
         _battle = battle ?? throw new ArgumentNullException(nameof(battle));
         var stack = new List<IUiElement>();
 
@@ -28,9 +28,7 @@ public class CombatDialog : Dialog
             new Button(Base.SystemText.Combat_StartRound)
             {
                 DoubleFrame = true
-            }.OnClick(() =>
-            {
-            });
+            }.OnClick(StartRound);
 
         stack.Add(new NonGreedy(startRoundButton));
         stack.Add(new Spacing(0, 2));
@@ -39,6 +37,12 @@ public class CombatDialog : Dialog
         {
             Background = DialogFrameBackgroundStyle.MainMenuPattern
         });
+    }
+
+    void StartRound()
+    {
+        IsActive = false;
+        RaiseAsync(new BeginCombatRoundEvent()).OnCompleted(() => IsActive = true);
     }
 
     HorizontalStacker BuildRow(int row)

@@ -41,4 +41,20 @@ public class NpcMoveState
         s.End();
         return ms;
     }
+
+    public void Reset()
+    {
+        Flags = 0;
+        X1 = 0;
+        Y1 = 0;
+        Angle1 = 0;
+        X2 = 0;
+        Y2 = 0;
+        Direction = Direction.East;
+        UnkE = 0;
+        Unk10 = 0;
+        Unk12 = 0;
+        Unk14 = 0;
+        Unk16 = 0;
+    }
 }

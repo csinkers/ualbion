@@ -2,7 +2,6 @@
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
-using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
@@ -16,11 +15,13 @@ namespace UAlbion.Game.Entities.Map2D;
 class NpcManager2D : Component
 {
     readonly LogicalMap2D _logicalMap;
+    readonly Container _sceneObjects;
     readonly Npc2D[] _npcs;
 
-    public NpcManager2D(LogicalMap2D logicalMap2D)
+    public NpcManager2D(LogicalMap2D logicalMap2D, Container sceneObjects)
     {
         _logicalMap = logicalMap2D ?? throw new ArgumentNullException(nameof(logicalMap2D));
+        _sceneObjects = sceneObjects;
         _npcs = new Npc2D[_logicalMap.Npcs.Count];
 
         After<ModifyNpcOffEvent>(e => UpdateNpcStatus(e.NpcNum));
@@ -70,7 +71,17 @@ class NpcManager2D : Component
             if (npc.IsUnused)
                 continue;
 
-            _npcs[index] = new Npc2D(state, npc, (byte)index, !_logicalMap.UseSmallSprites) { IsActive = !isDisabled };
+            _npcs[index] = new Npc2D(
+                _sceneObjects,
+                state,
+                npc,
+                (byte)index,
+                !_logicalMap.UseSmallSprites,
+                new Vector3(_logicalMap.TileSize, 1))
+            {
+                IsActive = !isDisabled
+            };
+
             AttachChild(_npcs[index]);
         }
 
@@ -136,18 +147,7 @@ class NpcManager2D : Component
         state.Unk64 = 0;
         state.Unk65 = 0;
         state.Unk66 = 0;
-        state.NpcMoveState.Flags = 0;
-        state.NpcMoveState.X1 = 0;
-        state.NpcMoveState.Y1 = 0;
-        state.NpcMoveState.Angle1 = 0;
-        state.NpcMoveState.X2 = 0;
-        state.NpcMoveState.Y2 = 0;
-        state.NpcMoveState.Direction = Direction.East;
-        state.NpcMoveState.UnkE = 0;
-        state.NpcMoveState.Unk10 = 0;
-        state.NpcMoveState.Unk12 = 0;
-        state.NpcMoveState.Unk14 = 0;
-        state.NpcMoveState.Unk16 = 0;
+        state.NpcMoveState.Reset();
     }
 
     protected override void Unsubscribed() => RemoveAllChildren();

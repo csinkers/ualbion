@@ -6,6 +6,7 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Visual;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 using Veldrid;
@@ -17,14 +18,21 @@ public class RightButtonHeldMouseMode : Component
     static readonly PopMouseModeEvent PopMouseModeEvent = new();
     static readonly ShowMapMenuEvent ShowMapMenuEvent = new();
     readonly List<Selection> _hits = new();
-    readonly MapSprite _cursor;
+    readonly Sprite _cursor;
     Vector2 _lastTilePosition;
     bool _wasClockRunning;
 
     public RightButtonHeldMouseMode()
     {
         On<MouseInputEvent>(OnInput);
-        _cursor = AttachChild(new MapSprite(Base.CoreGfx.Select, DrawLayer.MaxLayer, 0, SpriteFlags.LeftAligned));
+        _cursor = AttachChild(
+            new Sprite(
+                (SpriteId)Base.CoreGfx.Select,
+                DrawLayer.MaxLayer,
+                0,
+                SpriteFlags.LeftAligned
+            )
+        );
     }
 
     protected override void Subscribed()
@@ -68,10 +76,14 @@ public class RightButtonHeldMouseMode : Component
                 return;
 
             var map = Resolve<IMapManager>()?.Current;
-            var offset = map == null ? Vector3.Zero : new Vector3(-1.0f, -1.0f, 0.0f) / map.TileSize;
+            if (map == null)
+                return;
+
             _lastTilePosition = tile.Tile;
-            _cursor.TilePosition = new Vector3(tile.Tile, 0) + offset;
-            return;
+
+            var offset = new Vector3(-1.0f, -1.0f, 0.0f) / map.TileSize;
+            var tilePosition = new Vector3(tile.Tile, 0) + offset;
+            _cursor.Position = tilePosition * map.TileSize;
         }
     }
 

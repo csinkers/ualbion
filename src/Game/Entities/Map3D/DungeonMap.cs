@@ -2,6 +2,7 @@
 using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
+using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
@@ -19,9 +20,9 @@ public class DungeonMap : GameComponent, IMap
 {
     readonly MapData3D _mapData;
     readonly ICamera _camera;
+    readonly Container _sceneObjects;
     LabyrinthData _labyrinthData;
     LogicalMap3D _logicalMap;
-    Selection3D _selection;
     float _backgroundRed;
     float _backgroundGreen;
     float _backgroundBlue;
@@ -32,6 +33,7 @@ public class DungeonMap : GameComponent, IMap
         MapId = mapId;
         _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
         _camera = camera ?? throw new ArgumentNullException(nameof(camera));
+        _sceneObjects = new($"MapObjects_{mapId}");
 
         On<WorldCoordinateSelectEvent>(Select);
         On<MapInitEvent>(_ => FireEventChains(TriggerType.MapInit, true));
@@ -49,21 +51,8 @@ public class DungeonMap : GameComponent, IMap
     public Vector3 TileSize => _labyrinthData?.TileSize ?? Vector3.One * 512;
     public float BaseCameraHeight => (_labyrinthData?.CameraHeight ?? 0) != 0 ? _labyrinthData.CameraHeight * 8 : TileSize.Y / 2;
 
-    protected override void Subscribed()
+    void Setup(IGameState state)
     {
-        var state = Resolve<IGameState>();
-        if (state.Party == null)
-            return;
-
-        foreach (var player in state.Party.StatusBarOrder)
-            player.SetPositionFunc(() => _camera.Position / TileSize);
-
-        if (_labyrinthData != null)
-        {
-            Raise(new SetClearColourEvent(_backgroundRed, _backgroundGreen, _backgroundBlue, 1.0f));
-            return;
-        }
-
         var factory = Resolve<ICoreFactory>();
         _labyrinthData = Assets.LoadLabyrinthData(_mapData.LabDataId);
 
@@ -86,8 +75,12 @@ public class DungeonMap : GameComponent, IMap
             Pipeline = DungeonTilemapPipeline.Normal
         };
 
-        _selection = AttachChild(new Selection3D());
-        AttachChild(new MapRenderable3D(_logicalMap, _labyrinthData, properties));
+        // These belong to the scene so we don't render when in menus etc
+        var renderable = new MapRenderable3D(_logicalMap, _labyrinthData, properties);
+        var selection = new Selection3D();
+        _sceneObjects.Add(renderable);
+        _sceneObjects.Add(selection);
+
         AttachChild(new ScriptManager());
         AttachChild(new Collider3D(_logicalMap));
 
@@ -125,11 +118,37 @@ public class DungeonMap : GameComponent, IMap
                 var group = _logicalMap.GetObject(x, y);
                 if (group == null) continue;
                 foreach (var subObject in group.SubObjects)
-                    AttachChild(MapObject.Build(x, y, _labyrinthData, subObject, properties));
+                    _sceneObjects.Add(MapObject.Build(x, y, _labyrinthData, subObject, properties));
             }
         }
+    }
+
+    protected override void Subscribed()
+    {
+        var state = Resolve<IGameState>();
+        if (state.Party == null)
+            return;
+
+        foreach (var player in state.Party.StatusBarOrder)
+            player.SetPositionFunc(() => _camera.Position / TileSize);
+
+        if (_labyrinthData == null)
+            Setup(state);
+
+        var scene = Resolve<ISceneManager>().ActiveScene;
+        scene.Add(_sceneObjects);
 
         Raise(new SetClearColourEvent(_backgroundRed, _backgroundGreen, _backgroundBlue, 1.0f));
+    }
+
+    protected override void Unsubscribed()
+    {
+        if (_sceneObjects.Parent is IScene scene)
+            scene.Remove(_sceneObjects);
+
+        _skybox?.Dispose();
+        _skybox = null;
+        base.Unsubscribed();
     }
 
     void BuildNpc(MapNpc npc, TilemapRequest properties)
@@ -153,21 +172,13 @@ public class DungeonMap : GameComponent, IMap
                                                                             // TODO: Build proper NPC objects with AI, sound effects etc
         foreach (var subObject in objectData.SubObjects)
         {
-            AttachChild(MapObject.Build(
+            _sceneObjects.Add(MapObject.Build(
                 npc.Waypoints[0].X,
                 npc.Waypoints[0].Y,
                 _labyrinthData,
                 subObject,
                 properties));
-
         }
-    }
-
-    protected override void Unsubscribed()
-    {
-        _skybox?.Dispose();
-        _skybox = null;
-        base.Unsubscribed();
     }
 
     void Select(WorldCoordinateSelectEvent worldCoordinateSelectEvent)

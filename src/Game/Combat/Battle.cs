@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets.Save;
@@ -15,29 +16,33 @@ namespace UAlbion.Game.Combat;
 /// </summary>
 public class Battle : GameComponent, IReadOnlyBattle
 {
+
     readonly MonsterGroupId _groupId;
     readonly List<Mob> _mobs = new();
     readonly Mob[] _tiles = new Mob[SavedGame.CombatRows * SavedGame.CombatColumns];
-    readonly Sprite _background;
 
     public IReadOnlyList<IReadOnlyMob> Mobs { get; }
     public event Action Complete;
 
     public Battle(MonsterGroupId groupId, SpriteId backgroundId)
     {
+        On<EndCombatEvent>(_ => Complete?.Invoke());
+        OnAsync<BeginCombatRoundEvent>(BeginRoundAsync);
+
         _groupId = groupId;
         Mobs = _mobs;
-        _background = 
-            AttachChild(new Sprite(
-                backgroundId,
-                DrawLayer.Interface,
-                SpriteKeyFlags.NoTransform,
-                SpriteFlags.LeftAligned)
-            {
-                Position = new Vector3(-1.0f, 1.0f, 0),
-                Size = new Vector2(2.0f, -2.0f)
-            });
+        AttachChild(new Sprite(
+            backgroundId,
+            DrawLayer.Background,
+            SpriteKeyFlags.NoTransform,
+            SpriteFlags.LeftAligned)
+        {
+            Position = new Vector3(-1.0f, 1.0f, 0),
+            Size = new Vector2(2.0f, -2.0f)
+        });
     }
+
+    AlbionTask BeginRoundAsync(BeginCombatRoundEvent _) => RaiseAsync(new CombatUpdateEvent(25)); // TODO
 
     protected override void Subscribed()
     {

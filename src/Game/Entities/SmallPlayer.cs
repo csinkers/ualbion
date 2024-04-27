@@ -14,7 +14,7 @@ public class SmallPlayer : Component
     readonly Func<(Vector3, int)> _positionFunc;
     readonly MapSprite _sprite;
 
-    public SmallPlayer(PartyMemberId charId, Func<(Vector3, int)> positionFunc)
+    public SmallPlayer(PartyMemberId charId, Func<(Vector3, int)> positionFunc, Vector3 tileSize, IContainer sceneObjects)
     {
         On<FastClockEvent>(e =>
         {
@@ -26,11 +26,14 @@ public class SmallPlayer : Component
 
         _id = charId;
         _positionFunc = positionFunc;
-        _sprite = AttachChild(new MapSprite(
+        _sprite = new MapSprite(
             charId.ToSmallGfx(),
+            tileSize,
             DrawLayer.Character,
             0,
-            SpriteFlags.LeftAligned));
+            SpriteFlags.LeftAligned);
+
+        sceneObjects.Add(_sprite);
     }
 
     public override string ToString() => $"SPlayer {_id}";

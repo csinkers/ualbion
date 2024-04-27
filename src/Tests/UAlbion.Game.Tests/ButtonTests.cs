@@ -131,8 +131,12 @@ public class ButtonTests : Component
                 .OnDoubleClick(() => doubleClickCount++)
             ;
 
-        string timerId = null;
-        On<StartTimerEvent>(e => timerId = e.Id);
+        AlbionTaskCore timerTask = null;
+        OnAsync<WallClockTimerEvent>(_ =>
+        {
+            timerTask = new AlbionTaskCore();
+            return timerTask.UntypedTask;
+        });
 
         _exchange.Attach(button);
         Assert.Equal(ButtonState.Normal, button.Frame.State);
@@ -146,14 +150,14 @@ public class ButtonTests : Component
         Assert.Equal(ButtonState.Clicked, button.Frame.State);
 
         button.Receive(new UiLeftReleaseEvent(), null);
-        Assert.NotNull(timerId);
+        Assert.NotNull(timerTask);
         Assert.Equal(1, downCount);
         Assert.Equal(0, clickCount);
         Assert.Equal(ButtonState.Hover, button.Frame.State);
 
-        Raise(new TimerElapsedEvent(timerId));
+        timerTask.Complete();
         Assert.Equal(1, clickCount);
-        timerId = null;
+        timerTask = null;
 
         button.Receive(new UiLeftClickEvent(), null);
         Assert.Equal(2, downCount);
@@ -167,7 +171,7 @@ public class ButtonTests : Component
         Assert.Equal(2, downCount);
         Assert.Equal(1, clickCount);
         Assert.Equal(ButtonState.Normal, button.Frame.State);
-        Assert.Null(timerId);
+        Assert.Null(timerTask);
     }
 
     [Fact]
@@ -215,8 +219,12 @@ public class ButtonTests : Component
                 .OnDoubleClick(() => doubleClickCount++)
             ;
 
-        string timerId = null;
-        On<StartTimerEvent>(e => timerId = e.Id);
+        AlbionTaskCore timerTask = null;
+        OnAsync<WallClockTimerEvent>(_ =>
+        {
+            timerTask = new AlbionTaskCore();
+            return timerTask.UntypedTask;
+        });
 
         _exchange.Attach(button);
         Assert.Equal(ButtonState.Normal, button.Frame.State);
@@ -231,7 +239,7 @@ public class ButtonTests : Component
         Assert.Equal(ButtonState.Clicked, button.Frame.State);
 
         button.Receive(new UiLeftReleaseEvent(), null);
-        Assert.NotNull(timerId);
+        Assert.NotNull(timerTask);
         Assert.Equal(1, downCount);
         Assert.Equal(0, clickCount);
         Assert.Equal(0, doubleClickCount);
@@ -249,11 +257,10 @@ public class ButtonTests : Component
         Assert.Equal(1, doubleClickCount);
         Assert.Equal(ButtonState.Hover, button.Frame.State);
 
-        Raise(new TimerElapsedEvent(timerId));
+        timerTask.Complete();
         Assert.Equal(2, downCount);
         Assert.Equal(0, clickCount);
         Assert.Equal(1, doubleClickCount);
-        timerId = null;
     }
 
     [Fact]

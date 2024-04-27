@@ -70,7 +70,8 @@ public class BatchManager<TKey, TInstance> : ServiceComponent<IBatchManager<TKey
         lock (_syncRoot)
         {
             foreach (var kvp in _batchList)
-                renderables.Add(kvp);
+                if (kvp.ActiveInstances > 0)
+                    renderables.Add(kvp);
         }
     }
 }

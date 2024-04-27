@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-#if DEBUG
-#endif
 
 #pragma warning disable CA1030 // Use events where appropriate
 namespace UAlbion.Api.Eventing
@@ -107,7 +105,7 @@ namespace UAlbion.Api.Eventing
         }
 
         // [DebuggerHidden, StackTraceHidden]
-        public async AlbionTask RaiseA(IEvent e, object sender) => _ = await RaiseInner(e, sender, 0, RaiseAInvoker);
+        public async AlbionTask RaiseA(IEvent e, object sender) => _ = await RaiseInner(e, sender, 0, RaiseAInvoker); // TODO: Avoid delegate allocations
         static AlbionTask<Unit> RaiseAInvoker(List<Handler> handlers, IEvent e, object sender, int _) // Waits for all handlers to complete
         {
             AlbionTaskCore<Unit> core = null;
@@ -132,7 +130,8 @@ namespace UAlbion.Api.Eventing
                             innerTask.OnCompleted(() =>
                             {
                                 core1.OutstandingCompletions--;
-                                if (core1.OutstandingCompletions == 0) core1.SetResult(Unit.V);
+                                if (core1.OutstandingCompletions == 0)
+                                    core1.SetResult(Unit.V);
                             });
                         }
 

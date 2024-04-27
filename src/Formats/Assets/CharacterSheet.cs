@@ -78,6 +78,14 @@ public class CharacterSheet : ICharacterSheet
     }
 
     public SpriteId MonsterGfxId { get; set; }
+    public SpriteId TacticalGfxId => // In original game hardcoded to be MonsterGfxId + 12 for monsters and PartyMemberId for party members.
+        Type switch
+        {
+            CharacterType.Party => new SpriteId(AssetType.TacticalGfx, Id.Id),
+            CharacterType.Monster => new SpriteId(AssetType.TacticalGfx, MonsterGfxId.Id + 12),
+            _ => SpriteId.None
+        };
+
     public byte Morale { get; set; }
     public byte SpellTypeImmunities { get; set; }
     public ushort ExperienceReward { get; set; }

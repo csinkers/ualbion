@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Core;
+using UAlbion.Core.Events;
+using UAlbion.Core.Visual;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Gui;
 using UAlbion.Game.Gui.Controls;
@@ -32,9 +34,10 @@ public class VisualCombatTile : UiElement
 
     public VisualCombatTile(int tileIndex, IReadOnlyBattle battle)
     {
+        On<PostEngineUpdateEvent>(_ => OnPostUpdate());
         _tileIndex = tileIndex;
         _battle = battle ?? throw new ArgumentNullException(nameof(battle));
-        _sprite = new UiSpriteElement(SpriteId.None) { IsActive = false };
+        _sprite = new UiSpriteElement(SpriteId.None) { IsActive = false, Flags = SpriteFlags.BottomAligned };
 
         _button = AttachChild(new Button(
                 new VerticalStacker(
@@ -47,6 +50,12 @@ public class VisualCombatTile : UiElement
             .OnRightClick(() => RightClick?.Invoke())
             .OnDoubleClick(() => DoubleClick?.Invoke())
             .OnButtonDown(() => ButtonDown?.Invoke()));
+    }
+
+    void OnPostUpdate()
+    {
+        IReadOnlyMob mob = _battle.GetTile(_tileIndex);
+        Icon = mob == null ? SpriteId.None : mob.Sheet.TacticalGfxId;
     }
 
     // public ButtonState State { get => _frame.State; set => _frame.State = value; }

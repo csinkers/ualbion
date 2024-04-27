@@ -52,7 +52,7 @@ public class MouseLookMouseMode : Component
         On<MouseInputEvent>(OnInput);
         On<FocusGainedEvent>(_ => AcquireMouse());
         On<FocusLostEvent>(_ => ReleaseMouse());
-        On<PostGameUpdateEvent>(_ =>
+        On<PostEngineUpdateEvent>(_ =>
         {
             //var windowState = Resolve<IWindowManager>();
             //Raise(new SetCursorPositionEvent(windowState.PixelWidth / 2, windowState.PixelHeight / 2));

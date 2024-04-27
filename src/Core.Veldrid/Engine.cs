@@ -137,6 +137,7 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
 
         var frameCounter = new FrameCounter();
         var engineUpdateEvent = new EngineUpdateEvent(0);
+        var postEngineUpdateEvent = new PostEngineUpdateEvent();
         var layoutEvent = new LayoutEvent();
 
         while (!_done && _newBackend == null)
@@ -160,6 +161,7 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
             {
                 engineUpdateEvent.DeltaSeconds = (float)deltaSeconds;
                 Raise(engineUpdateEvent);
+                Raise(postEngineUpdateEvent);
             }
 
             using (PerfTracker.FrameEvent("Flushing queued events"))

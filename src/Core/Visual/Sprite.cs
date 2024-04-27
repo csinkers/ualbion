@@ -131,6 +131,8 @@ public class Sprite : Component, IPositioned
 
     void OnRender(PrepareFrameEvent _) => UpdateSprite();
 
+    public override string ToString() => $"Sprite {Id}";
+
     protected override void Subscribed()
     {
         Dirty = true;

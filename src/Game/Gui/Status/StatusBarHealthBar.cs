@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
+using UAlbion.Core.Events;
 using UAlbion.Formats.Assets;
-using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.State;
 
@@ -15,7 +15,7 @@ public class StatusBarHealthBar : UiElement
 
     public StatusBarHealthBar(int order, bool isHealth)
     {
-        On<PostGameUpdateEvent>(_ => Update());
+        On<PostEngineUpdateEvent>(_ => Update());
 
         _order = order;
         _isHealth = isHealth;

@@ -72,14 +72,17 @@ static class Albion
         sceneManager
             .Add(new EmptyScene()
                 .Add(new StatusBar())
+                .Add(new DialogManager())
                 .Add(new PaletteManager()))
 
             .Add(new AutomapScene()
                 .Add(new StatusBar())
+                .Add(new DialogManager())
                 .Add(new PaletteManager()))
 
             .Add(new FlatScene()
                 .Add(new StatusBar())
+                .Add(new DialogManager())
                 .Add(new ConversationManager())
                 .Add(new PaletteManager())
                 .Add(new ClockWidget())
@@ -88,6 +91,7 @@ static class Albion
             .Add(new DungeonScene()
                 .Add(new SceneGraph())
                 .Add(new StatusBar())
+                .Add(new DialogManager())
                 .Add(new ConversationManager())
                 .Add(new PaletteManager())
                 .Add(new ClockWidget())
@@ -96,6 +100,7 @@ static class Albion
 
             .Add(new MenuScene()
                 .Add(new StatusBar())
+                .Add(new DialogManager())
                 .Add(new PaletteManager())
                 .Add(new MainMenu())
                 .Add(new Sprite(
@@ -110,17 +115,20 @@ static class Albion
 
             .Add(new InventoryScene()
                 .Add(new StatusBar())
+                .Add(new DialogManager())
                 .Add(new ConversationManager())
                 .Add(new PaletteManager())
                 .Add(new InventoryInspector()))
 
             .Add(new CombatScene()
                 .Add(new StatusBar())
+                .Add(new DialogManager())
                 .Add(new PaletteManager())
             )
 
             .Add(new EditorScene()
                 .Add(new RawAssetManager())
+                .Add(new DialogManager())
                 .Add(new PaletteManager())
                 .Add(new EditorAssetManager())
                 .Add(new EditorUi()));
@@ -160,7 +168,6 @@ static class Albion
             new TextFormatter(),
             new TextManager(),
             new LayoutManager(),
-            new DialogManager(),
             new InventoryScreenManager(),
             new CombatManager(),
             new MonsterFactory(),

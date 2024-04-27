@@ -57,13 +57,13 @@ static class Program
             {
                 using var stream = File.OpenRead(file);
                 var image = Image.Load<Rgba32>(stream);
-                if (!image.TryGetSinglePixelSpan(out var pixelSpan))
+                if (!image.DangerousTryGetSinglePixelMemory(out var pixelMemory))
                 {
                     Console.WriteLine($"Could not read pixels from {file}");
                     continue;
                 }
 
-                builder.Add(pixelSpan);
+                builder.Add(pixelMemory.Span);
                 Console.Write('.');
             }
         }
@@ -93,10 +93,10 @@ static class Program
             {
                 using var stream = File.OpenRead(file);
                 var image = Image.Load<Rgba32>(stream);
-                if (!image.TryGetSinglePixelSpan(out var pixelSpan))
+                if (!image.DangerousTryGetSinglePixelMemory(out var pixelMemory))
                     continue;
 
-                var pixels = palette.Convert(pixelSpan);
+                var pixels = palette.Convert(pixelMemory.Span);
                 WriteBitmap(Path.ChangeExtension(file, "bmp"), palette.Colours, pixels, image.Width);
                 Console.Write('.');
             }

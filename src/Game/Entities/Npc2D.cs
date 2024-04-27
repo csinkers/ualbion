@@ -40,20 +40,24 @@ public class Npc2D : Component
 
     public override string ToString() => $"Npc {_npcNumber} @ ({_state.X},{_state.Y}) {_state.Id} {_sprite.Id}";
 
-    public Npc2D(NpcState state, MapNpc mapData, byte npcNumber, bool isLarge)
+    public Npc2D(Container sceneObjects, NpcState state, MapNpc definition, byte npcNumber, bool isLarge, Vector3 tileSize)
     {
         _state = state ?? throw new ArgumentNullException(nameof(state));
-        _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
+        _mapData = definition ?? throw new ArgumentNullException(nameof(definition));
         _npcNumber = npcNumber;
         _isLarge = isLarge;
-        _sprite = AttachChild(new MapSprite(
+
+        _sprite = new MapSprite(
             _state.SpriteOrGroup,
+            tileSize,
             DrawLayer.Character,
             0,
             SpriteFlags.BottomAligned)
         {
             SelectionCallback = () => this
-        });
+        };
+
+        sceneObjects.Add(_sprite);
 
         _onTileEnteredDelegate = (x, y) => Raise(new NpcEnteredTileEvent(_npcNumber, x, y));
 
@@ -128,10 +132,10 @@ public class Npc2D : Component
             pos += LargeTileOffset;
 
         _sprite.TilePosition = new Vector3(pos.X, pos.Y, _moveSettings.GetDepth(pos.Y));
-        _sprite.Frame = _moveSettings.GetSpriteFrame(_state, _getSitModeDelegate);
+        _sprite.Frame = _moveSettings.GetSpriteFrame(_state, GetSitModeDelegate);
     }
 
-    static readonly Func<int, int, SitMode> _getSitModeDelegate = GetSitMode;
+    static readonly Func<int, int, SitMode> GetSitModeDelegate = GetSitMode;
     static SitMode GetSitMode(int x, int y) => SitMode.None; // TODO
     void OnTurn(NpcTurnEvent e)
     {

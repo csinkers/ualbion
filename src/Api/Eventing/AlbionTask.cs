@@ -33,8 +33,12 @@ public readonly struct AlbionTask : INotifyCompletion, IEquatable<AlbionTask>
 
     public void OnCompleted(Action continuation)
     {
-        if (_core == null)
-            throw new InvalidOperationException("Tried to add a continuation to a completed task");
+        if (_core == null) // If it's already completed then call the continuation immediately.
+        {
+            continuation();
+            return;
+        }
+
 
         _core.OnCompleted(continuation);
     }

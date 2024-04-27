@@ -13,6 +13,7 @@ public class MapObject : GameComponent
 {
     readonly Vector3 _initialPosition;
     readonly Vector2 _size;
+    readonly Vector3 _tileSize;
     readonly bool _onFloor;
     readonly bool _isBouncy;
     readonly bool _depthTest;
@@ -20,11 +21,12 @@ public class MapObject : GameComponent
     IMeshInstance _mesh;
     int _frame;
 
-    public MapObject(MapObjectId id, Vector3 initialPosition, Vector2 size, bool onFloor, bool bouncy, bool depthTest)
+    public MapObject(MapObjectId id, Vector3 initialPosition, Vector2 size, Vector3 tileSize, bool onFloor, bool bouncy, bool depthTest)
     {
         Id = id;
         _initialPosition = initialPosition;
         _size = size;
+        _tileSize = tileSize;
         _onFloor = onFloor;
         _isBouncy = bouncy;
         _depthTest = depthTest;
@@ -40,20 +42,22 @@ public class MapObject : GameComponent
                 throw new AssetNotFoundException($"Could not find asset for id  {Id}");
 
             case ITexture:
-                _sprite = AttachChild(new MapSprite(
-                    Id,
-                    DrawLayer.Billboards,
-                    _depthTest ? 0 : SpriteKeyFlags.NoDepthTest,
+            {
+                var keyFlags = _depthTest ? 0 : SpriteKeyFlags.NoDepthTest;
+                var flags = 
                     SpriteFlags.FlipVertical |
                     (_onFloor
                         ? SpriteFlags.Floor | SpriteFlags.MidAligned
-                        : SpriteFlags.Billboard))
+                        : SpriteFlags.Billboard);
+
+                _sprite = AttachChild(new MapSprite(Id, _tileSize, DrawLayer.Billboards, keyFlags, flags)
                 {
                     Size = _size,
                     Position = _initialPosition,
                     SelectionCallback = () => this
                 });
                 break;
+            }
 
             case IMesh:
                 // TODO: Load these from JSON or something
@@ -173,6 +177,13 @@ public class MapObject : GameComponent
 
         size *= new Vector2(properties.Scale.X, properties.Scale.Y);
 
-        return new MapObject(definition.Id, pos3, size, onFloor, backAndForth, depthTest);
+        return new MapObject(
+            definition.Id,
+            pos3,
+            size,
+            labyrinth.TileSize,
+            onFloor,
+            backAndForth,
+            depthTest);
     }
 }

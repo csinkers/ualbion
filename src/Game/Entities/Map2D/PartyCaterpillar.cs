@@ -57,6 +57,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
 
         var oldTicksPerTile = _settings.TicksPerTile;
         var oldTicksPerFrame = _settings.TicksPerFrame;
+
         After<DebugFlagEvent>(_ =>
         {
             var debugFlags = ReadVar(V.User.Debug.DebugFlags);
@@ -84,6 +85,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
             _state.X = (ushort)e.X;
             _state.Y = (ushort)e.Y;
         });
+
         On<PartyTurnEvent>(e =>
         {
             var (position3d, _) = _trail[_trailOffset];
@@ -91,6 +93,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
             _state.FacingDirection = e.Direction;
             MoveLeader(position);
         });
+
         On<NoClipEvent>(_ =>
         {
             _state.NoClip = !_state.NoClip;

@@ -20,8 +20,6 @@ namespace UAlbion.Game.Gui.Status;
 
 public class StatusBarPortrait : UiElement
 {
-    const string TimerName = "StatusBarPortrait.ClickTimer";
-
     readonly UiSpriteElement _portrait;
     readonly StatusBarHealthBar _health;
     readonly StatusBarHealthBar _mana;
@@ -44,12 +42,6 @@ public class StatusBarPortrait : UiElement
             _portrait.Flags = 0;
             Raise(new HoverTextEvent(null));
         });
-        On<TimerElapsedEvent>(e =>
-        {
-            if (e.Id == TimerName)
-                OnTimer();
-        });
-
     }
 
     void OnRightClick(UiRightClickEvent e)
@@ -182,7 +174,7 @@ public class StatusBarPortrait : UiElement
         }
         else // For the first click, just start the double-click timer.
         {
-            Raise(new StartTimerEvent(TimerName, ReadVar(V.Game.Ui.ButtonDoubleClickIntervalSeconds), this));
+            RaiseAsync(new WallClockTimerEvent(ReadVar(V.Game.Ui.ButtonDoubleClickIntervalSeconds))).OnCompleted(OnTimer);
             _isClickTimerPending = true;
         }
     }

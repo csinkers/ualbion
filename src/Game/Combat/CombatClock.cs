@@ -38,9 +38,9 @@ public class CombatClock : Component
         });
     }
 
-    void OnUpdate(FastClockEvent updateEvent)
+    void OnUpdate()
     {
-        _ticks += updateEvent.Frames;
+        _ticks++;
         var ticksPerCombat = ReadVar(V.Game.Time.FastTicksPerSlowTick);
         while (_ticks >= ticksPerCombat)
         {
@@ -102,18 +102,21 @@ public class CombatClock : Component
     {
         GameTrace.Log.FastTick(_totalFastTicks++);
         Raise(_fastClockEvent);
+        OnUpdate();
+
         if (_ticksRemaining <= 0)
             return;
 
-        _ticksRemaining --;
-        if (_ticksRemaining > 0)
-            return;
+        _ticksRemaining--;
 
-        IsRunning = false;
-        GameTrace.Log.ClockUpdateComplete();
+        if (_ticksRemaining == 0)
+        {
+            IsRunning = false;
+            GameTrace.Log.ClockUpdateComplete();
 
-        var currentUpdate = _currentUpdate;
-        _currentUpdate = null;
-        currentUpdate.Complete();
+            var currentUpdate = _currentUpdate;
+            _currentUpdate = null;
+            currentUpdate.Complete();
+        }
     }
 }

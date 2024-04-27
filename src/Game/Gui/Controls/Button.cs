@@ -44,7 +44,6 @@ public class Button : UiElement
         On<UiLeftReleaseEvent>(OnLeftRelease);
         On<UiRightClickEvent>(OnRightClick);
         On<UiRightReleaseEvent>(OnRightRelease);
-        On<TimerElapsedEvent>(OnTimerElapsed);
         On<EngineUpdateEvent>(OnEngineUpdate);
 
         _id = Interlocked.Increment(ref _nextId);
@@ -90,7 +89,16 @@ public class Button : UiElement
         }
         else // For the first click, just start the double-click timer.
         {
-            Raise(new StartTimerEvent(TimerName, ReadVar(V.Game.Ui.ButtonDoubleClickIntervalSeconds), this));
+            RaiseAsync(new WallClockTimerEvent(ReadVar(V.Game.Ui.ButtonDoubleClickIntervalSeconds)))
+                .OnCompleted(() =>
+                {
+                    if (!ClickTimerPending) // They've already double-clicked
+                        return;
+
+                    Click?.Invoke();
+                    ClickTimerPending = false;
+                });
+
             ClickTimerPending = true;
         }
     }
@@ -107,17 +115,6 @@ public class Button : UiElement
         if (RightClick == null) return;
         if (IsRightClicked && IsHovered) RightClick.Invoke();
         IsRightClicked = false;
-    }
-
-    void OnTimerElapsed(TimerElapsedEvent e)
-    {
-        if (e.Id != TimerName) return;
-
-        if (!ClickTimerPending) // They've already double-clicked
-            return;
-
-        Click?.Invoke();
-        ClickTimerPending = false;
     }
 
     void OnEngineUpdate(EngineUpdateEvent e)

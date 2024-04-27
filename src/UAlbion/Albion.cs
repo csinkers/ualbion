@@ -124,6 +124,7 @@ static class Albion
                 .Add(new StatusBar())
                 .Add(new DialogManager())
                 .Add(new PaletteManager())
+                .Add(new MonsterFactory())
             )
 
             .Add(new EditorScene()
@@ -170,7 +171,6 @@ static class Albion
             new LayoutManager(),
             new InventoryScreenManager(),
             new CombatManager(),
-            new MonsterFactory(),
             //new DiagWindow()
             //    .Add(new SpriteInstanceDataDebugBehaviour())
             //    .Add(new FormatTextEventBehaviour()),

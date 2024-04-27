@@ -16,14 +16,15 @@ public class LargePlayer : Component
     readonly MapSprite _sprite;
     public override string ToString() => $"LPlayer {_id}";
 
-    public LargePlayer(PartyMemberId charId, Func<(Vector3, int)> positionFunc)
+    public LargePlayer(PartyMemberId charId, Func<(Vector3, int)> positionFunc, Vector3 tileSize, IContainer sceneObjects)
     {
         On<FastClockEvent>(_ => Update());
         On<MapInitEvent>(_ => Update());
 
         _id = charId;
         _positionFunc = positionFunc;
-        _sprite = AttachChild(new MapSprite(charId.ToLargeGfx(), DrawLayer.Character, 0, SpriteFlags.BottomAligned));
+        _sprite = new MapSprite(charId.ToLargeGfx(), tileSize, DrawLayer.Character, 0, SpriteFlags.BottomAligned);
+        sceneObjects.Add(_sprite);
     }
 
     protected override void Subscribed()

@@ -153,7 +153,7 @@ public class LogicalCombatTile : UiElement
 
         options.Add(new ContextMenuOption(
             S(Base.SystemText.Combat_EndCombat),
-            new CombatDialog.EndCombatEvent(CombatResult.Victory),
+            new EndCombatEvent(CombatResult.Victory),
             ContextMenuGroup.System));
 
         var uiPosition = window.PixelToUi(cursorManager.Position);

@@ -4,6 +4,7 @@ using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
+using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
@@ -19,6 +20,7 @@ namespace UAlbion.Game.Entities.Map2D;
 public class FlatMap : GameComponent, IMap
 {
     readonly MapData2D _mapData;
+    readonly Container _sceneObjects;
     LogicalMap2D _logicalMap;
     IMovement _partyMovement;
 
@@ -28,10 +30,14 @@ public class FlatMap : GameComponent, IMap
     public Vector3 TileSize => new(16, 16, 1);
     public IMapData MapData => _mapData;
     public float BaseCameraHeight => 0.0f;
-    public override string ToString() { return $"FlatMap: {MapId} ({MapId.Id})"; }
+    public override string ToString() => $"FlatMap: {MapId} ({MapId.Id})";
 
     public FlatMap(MapId mapId, MapData2D mapData)
     {
+        MapId = mapId;
+        _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
+        _sceneObjects = new($"MapObjects_{mapId}");
+
         On<PlayerEnteredTileEvent>(OnPlayerEnteredTile);
         On<NpcEnteredTileEvent>(OnNpcEnteredTile);
         On<ChangeIconEvent>(ChangeIcon);
@@ -42,36 +48,34 @@ public class FlatMap : GameComponent, IMap
         On<PartyChangedEvent>(_ => RebuildPartyMembers());
         On<TriggerMapTileEvent>(TileTriggered);
         // On<UnloadMapEvent>(_ => Unload());
-
-        MapId = mapId;
-        _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
     }
 
-    protected override void Subscribed()
+    void Setup()
     {
-        Raise(new SetClearColourEvent(0,0,0, 1.0f));
-        if (_logicalMap != null)
-            return;
-
+        var tileSize = new Vector2(TileSize.X, TileSize.Y);
         var state = Resolve<IGameState>();
         var gameFactory = Resolve<IGameFactory>();
-        _logicalMap = AttachChild(new LogicalMap2D(Assets, _mapData, state.TemporaryMapChanges, state.PermanentMapChanges));
-        var tileset = Assets.LoadTileGraphics(_logicalMap.TileData.Id.ToTilesetGfx());
+
+        _logicalMap = AttachChild(new LogicalMap2D(Assets, _mapData, state.TemporaryMapChanges, state.PermanentMapChanges) { TileSize = tileSize });
 
         AttachChild(new ScriptManager());
         AttachChild(new Collider2D(
             (x, y) => _logicalMap.GetPassability(_logicalMap.Index(x, y)),
             !_logicalMap.UseSmallSprites));
 
-        var renderable = AttachChild(new MapRenderable2D(
+        // The renderable and selector are children of the Scene, so we don't render the map when the player is in the main menu / inventory screen / combat
+        var tileset = Assets.LoadTileGraphics(_logicalMap.TileData.Id.ToTilesetGfx());
+        var renderable = new MapRenderable2D(
             _logicalMap,
             tileset,
             gameFactory,
-            new Vector2(TileSize.X, TileSize.Y)));
+            tileSize);
 
-        var selector = AttachChild(new SelectionHandler2D(_logicalMap, renderable));
+        var selector = new SelectionHandler2D(_logicalMap, renderable);
         selector.HighlightIndexChanged += (_, x) => renderable.SetHighlightIndex(x);
-        _logicalMap.TileSize = renderable.TileSize;
+
+        _sceneObjects.Add(renderable);
+        _sceneObjects.Add(selector);
 
         var movementSettings = _logicalMap.UseSmallSprites
             ? new MovementSettings(SmallSpriteAnimations.Frames)
@@ -93,8 +97,26 @@ public class FlatMap : GameComponent, IMap
         _partyMovement = AttachChild(new PartyCaterpillar(initialPos, Direction.East, movementSettings, _logicalMap));
         Raise(new CameraJumpEvent((int)initialPos.X, (int)initialPos.Y));
 
-        AttachChild(new NpcManager2D(_logicalMap));
+        AttachChild(new NpcManager2D(_logicalMap, _sceneObjects));
         RebuildPartyMembers();
+    }
+
+    protected override void Subscribed()
+    {
+        Raise(new SetClearColourEvent(0,0,0, 1.0f));
+        if (_logicalMap == null)
+            Setup();
+
+        var scene = Resolve<ISceneManager>().ActiveScene;
+        scene.Add(_sceneObjects);
+    }
+
+    protected override void Unsubscribed()
+    {
+        if (_sceneObjects.Parent is IScene scene)
+            scene.Remove(_sceneObjects);
+
+        base.Unsubscribed();
     }
 
     void RebuildPartyMembers()
@@ -116,9 +138,9 @@ public class FlatMap : GameComponent, IMap
             (Vector3, int) PositionFunc() => _partyMovement.GetPositionHistory(iCopy);
 
             if (_logicalMap.UseSmallSprites)
-                AttachChild(new SmallPlayer(player.Id, PositionFunc));
+                _sceneObjects.Add(new SmallPlayer(player.Id, PositionFunc, TileSize, _sceneObjects));
             else
-                AttachChild(new LargePlayer(player.Id, PositionFunc));
+                _sceneObjects.Add(new LargePlayer(player.Id, PositionFunc, TileSize, _sceneObjects));
 
             i++;
         }

@@ -26,7 +26,6 @@ public class InventoryScene : Container, IInventoryScene
         if (_clockWasRunning)
             Raise(new StopClockEvent());
 
-        Raise(new ShowMapEvent(false));
         Raise(new PushInputModeEvent(InputMode.Inventory));
         Raise(new PushMouseModeEvent(MouseMode.Normal));
         Raise(new LoadPaletteEvent(Base.Palette.Inventory));
@@ -36,7 +35,6 @@ public class InventoryScene : Container, IInventoryScene
     {
         Raise(new PopMouseModeEvent());
         Raise(new PopInputModeEvent());
-        Raise(new ShowMapEvent());
 
         if (_clockWasRunning)
             Raise(new StartClockEvent());

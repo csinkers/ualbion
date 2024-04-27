@@ -71,7 +71,7 @@ public class SpriteLoaderTests
             {
                 Assert.Equal(4, sprite.Width);
                 Assert.Equal(3, sprite.Height);
-                Assert.Equal(1, sprite.Regions.Count);
+                Assert.Single(sprite.Regions);
                 Assert.Equal(4, sprite.Regions[0].Width);
                 Assert.Equal(3, sprite.Regions[0].Height);
                 Assert.Equal(0, sprite.Regions[0].X);

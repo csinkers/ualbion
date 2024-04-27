@@ -18,10 +18,10 @@ public class MonsterFactory : ServiceComponent<IMonsterFactory>, IMonsterFactory
         int statOffset = 100 - (percentage / 2);
         int statModulus = percentage + 1;
 
-        foreach (var attrib in sheet.Attributes)
+        foreach (var attrib in sheet.Attributes.Enumerate())
             RandomiseStat(attrib, statOffset, statModulus);
 
-        foreach (var skill in sheet.Skills)
+        foreach (var skill in sheet.Skills.Enumerate())
             RandomiseStat(skill, statOffset, statModulus);
 
         RandomiseStat(sheet.Combat.LifePoints, statOffset, statModulus);

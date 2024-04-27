@@ -1,71 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using SerdesNet;
-using UAlbion.Formats.MapEvents;
 
 namespace UAlbion.Formats.Assets;
 
-#pragma warning disable CA1711
-public interface ICharacterAttribute
+public class CharacterAttributes : ICharacterAttributes
 {
-    ushort Current { get; }
-    ushort Max { get; }
-    ushort Boost { get; }
-    ushort Backup { get; }
-}
-
-public interface ICharacterAttributes
-{
-    ICharacterAttribute Strength { get; }
-    ICharacterAttribute Intelligence { get; }
-    ICharacterAttribute Dexterity { get; }
-    ICharacterAttribute Speed { get; }
-    ICharacterAttribute Stamina { get; }
-    ICharacterAttribute Luck { get; }
-    ICharacterAttribute MagicResistance { get; }
-    ICharacterAttribute MagicTalent { get; }
-}
-
-public class CharacterAttribute : ICharacterAttribute
-{
-    public ushort Current { get; set; }
-    public ushort Max { get; set; }
-    public ushort Boost { get; set; }
-    public ushort Backup { get; set; }
-    public CharacterAttribute DeepClone() => (CharacterAttribute)MemberwiseClone();
-    public override string ToString() => $"[{Current}/{Max}]{(Boost > 0 ? $"+{Boost}" : "")}{(Backup > 0 ? $" (was {Backup})" : "")}";
-
-    public static CharacterAttribute Serdes(string name, CharacterAttribute attr, ISerializer s, bool hasBackup = true)
-    {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        s.Begin(name);
-        attr ??= new CharacterAttribute();
-        attr.Current = s.UInt16(nameof(Current), attr.Current);
-        attr.Max = s.UInt16(nameof(Max), attr.Max);
-        attr.Boost = s.UInt16(nameof(Boost), attr.Boost);
-        if (hasBackup)
-            attr.Backup = s.UInt16(nameof(Backup), attr.Backup);
-        s.End();
-        return attr;
-    }
-
-    public void Apply(NumericOperation operation, ushort amount)
-    {
-        Current = operation.Apply16(Current, amount, 0, Max);
-    }
-
-    public void ApplyToMax(NumericOperation operation, ushort amount)
-    {
-        Max = operation.Apply16(Max, amount);
-        if (Current > Max)
-            Current = Max;
-    }
-}
-
-public class CharacterAttributes : ICharacterAttributes, IEnumerable<CharacterAttribute>
-{
-    IEnumerable<CharacterAttribute> Enumerate()
+    public IEnumerable<CharacterAttribute> Enumerate()
     {
         yield return Strength;
         yield return Intelligence;
@@ -76,9 +16,6 @@ public class CharacterAttributes : ICharacterAttributes, IEnumerable<CharacterAt
         yield return MagicResistance;
         yield return MagicTalent;
     }
-
-    public IEnumerator<CharacterAttribute> GetEnumerator() => Enumerate().GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Enumerate()).GetEnumerator();
 
     public override string ToString() => $"S{Strength} I{Intelligence} D{Dexterity} Sp{Speed} St{Stamina} L{Luck} MR{MagicResistance} MT{MagicTalent}";
 

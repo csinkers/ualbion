@@ -28,7 +28,7 @@ public class Png32Loader : Component, IAssetLoader<IReadOnlyTexture<uint>>
             existing.Width,
             existing.PixelData.Slice(frame.PixelOffset, frame.PixelLength));
 
-        Image<Rgba32> image = ImageSharpUtil.ToImageSharp(buffer);
+        using Image<Rgba32> image = ImageSharpUtil.ToImageSharp(buffer);
         return FormatUtil.BytesFromStream(stream => encoder.Encode(image, stream));
     }
 
@@ -42,15 +42,20 @@ public class Png32Loader : Component, IAssetLoader<IReadOnlyTexture<uint>>
         for (int i = 0; i < images.Count; i++)
         {
             Image<Rgba32> image = images[i];
-            if (!image.TryGetSinglePixelSpan(out Span<Rgba32> rgbaSpan))
-                throw new InvalidOperationException("Could not retrieve single span from Image");
-
-            frames.Add(new Region(0, currentY, image.Width, image.Height, totalWidth, totalHeight, 0));
-            var fromSpan = MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan);
-            var from = new ReadOnlyImageBuffer<uint>(image.Width, image.Height, image.Width, fromSpan);
-            var toSpan = pixels.AsSpan(currentY * totalWidth, totalWidth * (image.Height - 1) + image.Width);
-            var to = new ImageBuffer<uint>(image.Width, image.Height, totalWidth, toSpan);
-            BlitUtil.BlitDirect(from, to);
+            image.ProcessPixelRows(p =>
+            {
+                frames.Add(new Region(0, currentY, image.Width, image.Height, totalWidth, totalHeight, 0));
+                for (int row = 0; row < image.Height; row++)
+                {
+                    var rgbaSpan = p.GetRowSpan(row);
+                    var fromSpan = MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan);
+                    var toSpan = pixels.AsSpan((currentY + row) * totalWidth, totalWidth * (image.Height - 1) + image.Width);
+                    fromSpan.CopyTo(toSpan);
+                    // var from = new ReadOnlyImageBuffer<uint>(image.Width, image.Height, image.Width, fromSpan);
+                    // var to = new ImageBuffer<uint>(image.Width, image.Height, totalWidth, toSpan);
+                    // BlitUtil.BlitDirect(from, to);
+                }
+            });
 
             currentY += image.Height;
         }
@@ -74,15 +79,16 @@ public class Png32Loader : Component, IAssetLoader<IReadOnlyTexture<uint>>
         }
 
         // Read
-        var decoder = new PngDecoder();
-        var configuration = new Configuration();
+        var decoder = PngDecoder.Instance;
+        var options = new PngDecoderOptions();
         var images = new List<Image<Rgba32>>();
+
         try
         {
             foreach (var (bytes, _) in PackedChunks.Unpack(s))
             {
                 using var stream = new MemoryStream(bytes);
-                images.Add(decoder.Decode<Rgba32>(configuration, stream));
+                images.Add(decoder.Decode<Rgba32>(options, stream));
             }
 
             return Read(context.AssetId, images);

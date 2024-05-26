@@ -28,9 +28,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="ImGui.NET" Version="1.90.1.1" />
+    <PackageReference Include="ImGui.NET" Version="1.90.5.1" />
     <PackageReference Include="OpenAL-Soft" Version="1.16.0" />
     <PackageReference Include="OpenRA-OpenAL-CS" Version="1.0.22" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,7 +42,6 @@
 
   <ItemGroup Condition="!Exists('..\..\deps\veldrid\src\')">
     <PackageReference Include="Veldrid" Version="4.9.0" />
-    <PackageReference Include="Veldrid.ImageSharp" Version="4.9.0" />
     <PackageReference Include="Veldrid.RenderDoc" Version="1.0.1-ga121087cad" />
     <PackageReference Include="Veldrid.SDL2" Version="4.9.0" />
     <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0" />
@@ -49,7 +49,6 @@
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\deps\veldrid\src\')">
     <ProjectReference Include="..\..\deps\veldrid\src\Veldrid\Veldrid.csproj" />
-    <ProjectReference Include="..\..\deps\veldrid\src\Veldrid.ImageSharp\Veldrid.ImageSharp.csproj" />
     <ProjectReference Include="..\..\deps\veldrid\src\Veldrid.OpenGLBindings\Veldrid.OpenGLBindings.csproj" />
     <ProjectReference Include="..\..\deps\veldrid\src\Veldrid.RenderDoc\Veldrid.RenderDoc.csproj" />
     <ProjectReference Include="..\..\deps\veldrid\src\Veldrid.SDL2\Veldrid.SDL2.csproj" />
@@ -65,7 +64,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\deps\VeldridGen\')">
-    <PackageReference Include="VeldridGen.Interfaces" Version="0.2.1" />
+    <PackageReference Include="VeldridGen.Interfaces" Version="0.2.3" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\deps\VeldridGen\')">
     <ProjectReference Include="..\..\deps\VeldridGen\VeldridGen.Interfaces\VeldridGen.Interfaces.csproj" />

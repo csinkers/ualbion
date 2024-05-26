@@ -33,7 +33,7 @@ public class PalettePng32Loader : GameComponent, IAssetLoader<AlbionPalette>
             new ImageBuffer<uint>(192, 1, 192, pixels));
 
         var buffer = new ReadOnlyImageBuffer<uint>(256, 1, 256, pixels);
-        Image<Rgba32> image = ImageSharpUtil.ToImageSharp(buffer);
+        using Image<Rgba32> image = ImageSharpUtil.ToImageSharp(buffer);
 
         var encoder = new PngEncoder();
         var bytes = FormatUtil.BytesFromStream(stream => encoder.Encode(image, stream));

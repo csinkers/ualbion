@@ -25,8 +25,7 @@ public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
     public static readonly StringAssetProperty DayPath = new("DayPath"); 
     public static readonly StringAssetProperty NightPath = new("NightPath"); 
     record FrameInfo(string Path, int SubId, int PalFrame);
-    readonly PngDecoder _decoder = new();
-    readonly Configuration _configuration = new();
+    readonly PngDecoderOptions _pngOptions = new();
 
     public object Serdes(object existing, ISerializer s, AssetLoadContext context)
         => Serdes((ITileGraphics)existing, s, context);
@@ -75,10 +74,10 @@ public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
             if (tileWidth != png.Width || tileHeight != png.Height)
                 throw new InvalidOperationException($"Expected tiles to be {tileWidth} x {tileHeight}, but {path} is {png.Width} x {png.Height}");
 
-            if (!png.TryGetSinglePixelSpan(out Span<Rgba32> rgbaSpan))
+            if (!png.DangerousTryGetSinglePixelMemory(out var rgbaMemory))
                 throw new InvalidOperationException("Could not retrieve single span from Image");
 
-            return new ReadOnlyImageBuffer<uint>(png.Width, png.Height, png.Width, MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan));
+            return new ReadOnlyImageBuffer<uint>(png.Width, png.Height, png.Width, MemoryMarshal.Cast<Rgba32, uint>(rgbaMemory.Span));
         }
 
         var texture = new LazyTexture<uint>(AccessRegion, context.AssetId, context.ToString(), layout.Width, layout.Height, layout.Layers);
@@ -202,7 +201,7 @@ public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
     Image<Rgba32> LoadPng(string path, IFileSystem disk)
     {
         using var stream = disk.OpenRead(path);
-        return _decoder.Decode<Rgba32>(_configuration, stream);
+        return PngDecoder.Instance.Decode<Rgba32>(_pngOptions, stream);
     }
 
 

@@ -46,15 +46,14 @@ public class Png8Loader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>>
         }
 
         // Read
-        var decoder = new PngDecoder();
-        var configuration = new Configuration();
+        var pngOptions = new PngDecoderOptions();
         var images = new List<Image<Rgba32>>();
         try
         {
             foreach (var (bytes, _) in PackedChunks.Unpack(s))
             {
                 using var stream = new MemoryStream(bytes);
-                images.Add(decoder.Decode<Rgba32>(configuration, stream));
+                images.Add(PngDecoder.Instance.Decode<Rgba32>(pngOptions, stream));
             }
 
             return Read(context.AssetId, unambiguousPalette, images, paletteId);
@@ -74,7 +73,7 @@ public class Png8Loader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>>
             existing.Width,
             existing.PixelData.Slice(frame.PixelOffset, frame.PixelLength));
 
-        Image<Rgba32> image = ImageSharpUtil.ToImageSharp(buffer, palette);
+        using Image<Rgba32> image = ImageSharpUtil.ToImageSharp(buffer, palette);
         var bytes = FormatUtil.BytesFromStream(stream => encoder.Encode(image, stream));
         return bytes;
     }
@@ -91,11 +90,11 @@ public class Png8Loader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>>
         for (int i = 0; i < images.Count; i++)
         {
             Image<Rgba32> image = images[i];
-            if (!image.TryGetSinglePixelSpan(out Span<Rgba32> rgbaSpan))
+            if (!image.DangerousTryGetSinglePixelMemory(out var rgbaMemory))
                 throw new InvalidOperationException("Could not retrieve single span from Image");
 
             frames.Add(new Region(0, currentY, image.Width, image.Height, totalWidth, totalHeight, 0));
-            var uintSpan = MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan);
+            var uintSpan = MemoryMarshal.Cast<Rgba32, uint>(rgbaMemory.Span);
             var from = new ReadOnlyImageBuffer<uint>(image.Width, image.Height, image.Width, uintSpan);
             var byteSpan = pixels.AsSpan(currentY * totalWidth, totalWidth * (image.Height - 1) + image.Width);
             var to = new ImageBuffer<byte>(image.Width, image.Height, totalWidth, byteSpan);

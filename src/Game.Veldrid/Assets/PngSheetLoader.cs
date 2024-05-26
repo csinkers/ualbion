@@ -22,7 +22,7 @@ public class PngSheetLoader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>
 {
     static byte[] Write(IImageEncoder encoder, uint[] palette, IReadOnlyTexture<byte> existing)
     {
-        var image = ImageSharpUtil.PackSpriteSheet(palette, existing.Regions.Count, existing.GetRegionBuffer);
+        using var image = ImageSharpUtil.PackSpriteSheet(palette, existing.Regions.Count, existing.GetRegionBuffer);
         return FormatUtil.BytesFromStream(stream => encoder.Encode(image, stream));
     }
 
@@ -31,10 +31,10 @@ public class PngSheetLoader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>
     {
         var pixels = new byte[image.Width * image.Height];
         var frames = new List<Region>();
-        if (!image.TryGetSinglePixelSpan(out Span<Rgba32> rgbaSpan))
+        if (!image.DangerousTryGetSinglePixelMemory(out var rgbaMemory))
             throw new InvalidOperationException("Could not retrieve single span from Image");
 
-        var uintSpan = MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan);
+        var uintSpan = MemoryMarshal.Cast<Rgba32, uint>(rgbaMemory.Span);
         var source = new ReadOnlyImageBuffer<uint>(image.Width, image.Height, image.Width, uintSpan);
         var dest = new ImageBuffer<byte>(image.Width, image.Height, image.Width, pixels);
         BlitUtil.UnpackSpriteSheet(palette, subItemWidth, subItemHeight, source, dest,
@@ -92,11 +92,10 @@ public class PngSheetLoader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>
                                                     "PngSheetLoader, but does not have its Height property set");
             }
 
-            var decoder = new PngDecoder();
-            var configuration = new Configuration();
+            var pngOptions = new PngDecoderOptions();
             var bytes = s.Bytes(null, null, (int) s.BytesRemaining);
             using var stream = new MemoryStream(bytes);
-            using var image = decoder.Decode<Rgba32>(configuration, stream);
+            using var image = PngDecoder.Instance.Decode<Rgba32>(pngOptions, stream);
             return Read(context.AssetId, palette, paletteId, image, context.Width, context.Height);
         }
     }

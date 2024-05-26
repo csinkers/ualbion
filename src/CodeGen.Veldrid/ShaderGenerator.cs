@@ -75,7 +75,7 @@ static class ShaderGenerator
                 {
                     if (!context.Types.TryGetValue(resource.BufferType, out var bufferType))
                     {
-                        context.Report(
+                        context.Error(
                             $"Resource {resource.Name} in set {setInfo.Symbol.ToDisplayString()} was " +
                             $"of unknown type {resource.BufferType.ToDisplayString()}. " +
                             $"The buffer type must inherit from the {context.Symbols.Interfaces.UniformFormat.ToDisplayString()} interface");
@@ -94,7 +94,7 @@ static class ShaderGenerator
                 {
                     if (!context.Types.TryGetValue(resource.BufferType, out var bufferType))
                     {
-                        context.Report(
+                        context.Error(
                             $"Resource {resource.Name} in set {setInfo.Symbol.ToDisplayString()} was " +
                             $"of unknown type {resource.BufferType.ToDisplayString()}. " +
                             $"The buffer type must inherit from the {context.Symbols.Interfaces.UniformFormat.ToDisplayString()} interface");
@@ -135,7 +135,7 @@ static class ShaderGenerator
                 break;
 
             default:
-                context.Report($"Resource {resource.Name} in {setInfo.Symbol.ToDisplayString()} was of unhandled type {resource.ResourceType}");
+                context.Error($"Resource {resource.Name} in {setInfo.Symbol.ToDisplayString()} was of unhandled type {resource.ResourceType}");
                 break;
         }
     }
@@ -178,7 +178,7 @@ static class ShaderGenerator
             {
                 return VeldridGenUtil.GetGlslTypeForColorAttachment(component.ColorAttachment.Format);
             }
-            catch (FormatException e) { context.Report(e.Message); }
+            catch (FormatException e) { context.Error(e.Message); }
         }
 
         return null;
@@ -195,7 +195,7 @@ static class ShaderGenerator
         foreach (var component in layoutInfo.Members)
         {
             var glslType = TypeForMember(component, context, isInput);
-            if(glslType == null)
+            if (glslType == null)
                 continue;
 
             sb.Append("layout(location = ");

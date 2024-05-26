@@ -315,15 +315,18 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
         try
         {
             var result = new Image<Bgra32>((int)texture.Width, (int)texture.Height);
-            var sourceSpan = new Span<uint>(mapped.Data.ToPointer(), (int)mapped.SizeInBytes);
-            var stride = (int)mapped.RowPitch / sizeof(uint);
 
-            for (int j = 0; j < texture.Height; j++)
+            result.ProcessPixelRows(p =>
             {
-                var sourceRow = sourceSpan.Slice(stride * j, (int)texture.Width);
-                var destRow = MemoryMarshal.Cast<Bgra32, uint>(result.GetPixelRowSpan(j));
-                sourceRow.CopyTo(destRow);
-            }
+                var sourceSpan = new Span<uint>(mapped.Data.ToPointer(), (int)mapped.SizeInBytes);
+                var stride = (int)mapped.RowPitch / sizeof(uint);
+                for (int j = 0; j < texture.Height; j++)
+                {
+                    var sourceRow = sourceSpan.Slice(stride * j, (int)texture.Width);
+                    var destRow = MemoryMarshal.Cast<Bgra32, uint>(p.GetRowSpan(j));
+                    sourceRow.CopyTo(destRow);
+                }
+            });
 
             return result;
         }

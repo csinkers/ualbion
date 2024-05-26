@@ -71,7 +71,7 @@ static class ShaderEnumGenerator
 
             foreach (var member in typeInfo.Members)
             {
-                var prefix = member.Vertex?.EnumPrefix 
+                var prefix = member.Vertex?.EnumPrefix
                              ?? member.UniformMember?.EnumPrefix
                              ?? member.StructuredMember?.EnumPrefix;
 
@@ -86,15 +86,15 @@ static class ShaderEnumGenerator
                     default: continue;
                 }
 
-                if (memberType.TypeKind != TypeKind.Enum) 
+                if (memberType.TypeKind != TypeKind.Enum)
                     continue;
 
                 if (enumTypes.TryGetValue(memberType, out var existingPrefix))
                 {
                     if (existingPrefix != prefix)
                     {
-                        context.Report($"Member {member.Symbol.Name} of {typeSymbol.Name} was declared with enum " +
-                                       $"prefix \"{prefix}\", but another attribute has already declared it with the attribute \"{existingPrefix}\"");
+                        context.Error($"Member {member.Symbol.Name} of {typeSymbol.Name} was declared with enum " +
+                                      $"prefix \"{prefix}\", but another attribute has already declared it with the attribute \"{existingPrefix}\"");
                     }
                 }
                 else enumTypes[memberType] = prefix;

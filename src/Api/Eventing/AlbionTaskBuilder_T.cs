@@ -76,9 +76,7 @@ public struct AlbionTaskBuilder<TResult>
 
     public void SetStateMachine(IAsyncStateMachine stateMachine)
     {
-        if (stateMachine == null)
-            throw new ArgumentNullException(nameof(stateMachine));
-
+        /* Not used in .NET Core and later */
     }
 
     /// <summary>

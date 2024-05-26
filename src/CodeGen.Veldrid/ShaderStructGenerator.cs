@@ -21,7 +21,7 @@ static class ShaderStructGenerator
 
             var missing = actualMembers.Where(x => x.Kind == SymbolKind.Field && typeInfo.Members.All(m => !m.Symbol.Equals(x, SymbolEqualityComparer.Default)));
             foreach (var member in missing)
-                context.Report($"Found member in IStructuredFormat struct without a StructureAttribute: {member}");
+                context.Error($"Found member in IStructuredFormat struct without a StructureAttribute: {member}");
 
             foreach (var member in typeInfo.Members)
             {

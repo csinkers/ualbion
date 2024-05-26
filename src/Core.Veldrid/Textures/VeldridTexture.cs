@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api.Visual;
 using Veldrid;
-using Veldrid.ImageSharp;
 
 namespace UAlbion.Core.Veldrid.Textures;
 
@@ -138,17 +136,5 @@ public static class VeldridTexture
         gd.SubmitCommands(cl);
 
         return veldridTexture;
-    }
-
-    public static Texture CreateImageSharp(GraphicsDevice gd, TextureUsage usage, SixLabors.ImageSharp.Image<Rgba32> image, string name)
-    {
-        if (gd == null) throw new ArgumentNullException(nameof(gd));
-        if (usage != TextureUsage.Sampled && usage != (TextureUsage.Sampled | TextureUsage.GenerateMipmaps))
-            throw new ArgumentOutOfRangeException(nameof(usage), "Only sampled texture usage is currently supported (with optional mipmapping)");
-
-        ImageSharpTexture imageSharpTexture = new ImageSharpTexture(image, (usage & TextureUsage.GenerateMipmaps) != 0);
-        var texture = imageSharpTexture.CreateDeviceTexture(gd, gd.ResourceFactory);
-        texture.Name = "T_" + name;
-        return texture;
     }
 }

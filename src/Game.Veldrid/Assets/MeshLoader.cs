@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using SerdesNet;
-using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using Veldrid.Utilities;
@@ -17,8 +16,7 @@ namespace UAlbion.Game.Veldrid.Assets;
 
 public class MeshLoader : IAssetLoader<Mesh>
 {
-    readonly PngDecoder _decoder = new();
-    readonly Configuration _configuration = new();
+    readonly PngDecoderOptions _pngOptions = new();
 
     public Mesh Serdes(Mesh existing, ISerializer s, AssetLoadContext context)
     {
@@ -82,11 +80,11 @@ public class MeshLoader : IAssetLoader<Mesh>
             return null;
 
         using var stream = disk.OpenRead(path);
-        var image = _decoder.Decode<Rgba32>(_configuration, stream);
-        if (!image.TryGetSinglePixelSpan(out Span<Rgba32> rgbaSpan))
+        var image = PngDecoder.Instance.Decode<Rgba32>(_pngOptions, stream);
+        if (!image.DangerousTryGetSinglePixelMemory(out var rgbaMemory))
             throw new InvalidOperationException("Could not retrieve single span from Image");
 
-        var span = MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan);
+        var span = MemoryMarshal.Cast<Rgba32, uint>(rgbaMemory.Span);
         var texture = new SimpleTexture<uint>(context.AssetId, context.AssetId.ToString(), image.Width, image.Height, span);
         texture.AddRegion(0, 0, image.Width, image.Height);
         return texture;

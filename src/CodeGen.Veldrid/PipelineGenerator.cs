@@ -65,16 +65,12 @@ static class PipelineGenerator
             if (sets[set.slot] == null)
                 sets[set.slot] = set.type;
             else
-            {
-                context.Report(DiagnosticSeverity.Error,
-                    $"Tried to define ResourceSlot {set.slot} as {set.type}, " +
-                    $"but it is already defined as {sets[set.slot]}!");
-            }
+                context.Error($"Tried to define ResourceSlot {set.slot} as {set.type}, but it is already defined as {sets[set.slot]}!");
         }
 
         for(int i = 0; i < sets.Count; i++)
             if (sets[i] == null)
-                context.Report(DiagnosticSeverity.Error, $"No resource layout is defined for slot {i}!");
+                context.Error($"No resource layout is defined for slot {i}!");
 
         first = true;
         foreach (var set in sets)
@@ -90,7 +86,7 @@ static class PipelineGenerator
         }
         sb.AppendLine();
         sb.AppendLine("            })");
-        sb.AppendLine(@"        { }");
+        sb.AppendLine("        { }");
 
         /* e.g.
         static VertexLayoutDescription SpriteInstanceDataLayout

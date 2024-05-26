@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -9,6 +8,9 @@ namespace UAlbion.CodeGen.Veldrid;
 
 static class ResourceSetGenerator
 {
+    const string NewLine = @"
+";
+
     public static void Generate(StringBuilder sb, VeldridTypeInfo type, GenerationContext context)
     {
         /* e.g.
@@ -56,7 +58,7 @@ static class ResourceSetGenerator
                     break;
 
                 default:
-                    context.Report($"Resource {member.Symbol.ToDisplayString()} was of unexpected kind {member.Resource.Kind}");
+                    context.Error($"Resource {member.Symbol.ToDisplayString()} was of unexpected kind {member.Resource.Kind}");
                     break;
             }
         }
@@ -77,7 +79,7 @@ static class ResourceSetGenerator
         {
             if (member.Symbol is not IFieldSymbol field)
             {
-                context.Report($"Resource set backing members must be fields (member {member.Symbol.ToDisplayString()} in {type.Symbol.ToDisplayString()} was a {member.Symbol.GetType().Name})");
+                context.Error($"Resource set backing members must be fields (member {member.Symbol.ToDisplayString()} in {type.Symbol.ToDisplayString()} was a {member.Symbol.GetType().Name})");
                 continue;
             }
 
@@ -90,7 +92,7 @@ static class ResourceSetGenerator
                 " == null) throw new System.InvalidOperationException(\"Tried to construct {0}, but {1} has not been initialised. It may not have been attached to the exchange.\");{2}",
                 type.Symbol.Name,
                 VeldridGenUtil.UnderscoreToTitleCase(field.Name),
-                Environment.NewLine);
+                NewLine);
         }
 
         sb.AppendLine(@"#endif
@@ -108,7 +110,7 @@ static class ResourceSetGenerator
             sb.Append('.');
             AppendDeviceMemberForKind(sb, member, context);
         }
- 
+
         sb.AppendLine("));");
         sb.AppendLine("        }");
 
@@ -167,7 +169,7 @@ static class ResourceSetGenerator
 
             case KnownResourceKind.Unknown:
             default:
-                context.Report($"Resource {member.Symbol.ToDisplayString()} was of unexpected kind \"{member.Resource.Kind}\"");
+                context.Error($"Resource {member.Symbol.ToDisplayString()} was of unexpected kind \"{member.Resource.Kind}\"");
                 break;
         }
     }
@@ -176,7 +178,7 @@ static class ResourceSetGenerator
     {
         if (member.Symbol is not IFieldSymbol field)
         {
-            context.Report($"Resource set backing members must be fields (member {member.Symbol.ToDisplayString()} in " +
+            context.Error($"Resource set backing members must be fields (member {member.Symbol.ToDisplayString()} in " +
                            $"{member.Symbol.ContainingType.ToDisplayString()} was a {member.Symbol.GetType().Name})");
             return;
         }
@@ -220,7 +222,7 @@ static class ResourceSetGenerator
     {
         if (member.Symbol is not IFieldSymbol field)
         {
-            context.Report($"Resource set backing members must be fields (member {member.Symbol.ToDisplayString()} in " +
+            context.Error($"Resource set backing members must be fields (member {member.Symbol.ToDisplayString()} in " +
                            $"{member.Symbol.ContainingType.ToDisplayString()} was a {member.Symbol.GetType().Name})");
             return;
         }
@@ -263,7 +265,7 @@ static class ResourceSetGenerator
     {
         if (member.Symbol is not IFieldSymbol field)
         {
-            context.Report($"Resource set backing members must be fields (member {member.Symbol.ToDisplayString()} in " +
+            context.Error($"Resource set backing members must be fields (member {member.Symbol.ToDisplayString()} in " +
                            $"{member.Symbol.ContainingType.ToDisplayString()} was a {member.Symbol.GetType().Name})");
             return;
         }

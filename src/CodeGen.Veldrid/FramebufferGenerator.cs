@@ -7,6 +7,7 @@ namespace UAlbion.CodeGen.Veldrid;
 
 static class FramebufferGenerator
 {
+    const string TexturesNamespace = "global::UAlbion.Core.Veldrid.Textures";
     public static void Generate(StringBuilder sb, VeldridTypeInfo type)
     {
         var depth = type.Members.SingleOrDefault(x => x.DepthAttachment != null);
@@ -23,10 +24,10 @@ static class FramebufferGenerator
             $@"        public {typeName}(string name, uint width, uint height) : base(name, width, height)
         {{");
         if (depth != null)
-            sb.AppendLine($@"            {depth.Symbol.Name} = new global::UAlbion.Core.Veldrid.Textures.Texture2DHolder(name + "".{depth.Symbol.Name}"");");
+            sb.AppendLine($@"            {depth.Symbol.Name} = new {TexturesNamespace}.Texture2DHolder(name + "".{depth.Symbol.Name}"");");
 
         foreach (var color in type.Members.Where(member => member.ColorAttachment != null))
-            sb.AppendLine($@"            {color.Symbol.Name} = new global::UAlbion.Core.Veldrid.Textures.Texture2DHolder(name + "".{color.Symbol.Name}"");");
+            sb.AppendLine($@"            {color.Symbol.Name} = new {TexturesNamespace}.Texture2DHolder(name + "".{color.Symbol.Name}"");");
 
         sb.AppendLine(@"        }
 ");

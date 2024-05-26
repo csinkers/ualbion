@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using JetBrains.Annotations;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Formats.MapEvents;
@@ -130,7 +131,7 @@ public static class FormatUtil
             _ => true
         };
 
-    public static byte[] BytesFromTextWriter(Action<TextWriter> func)
+    public static byte[] BytesFromTextWriter([InstantHandle] Action<TextWriter> func)
     {
         if (func == null) throw new ArgumentNullException(nameof(func));
         using var ms = new MemoryStream();
@@ -141,7 +142,7 @@ public static class FormatUtil
         return ms.ToArray();
     }
 
-    public static byte[] BytesFromStream(Action<Stream> func)
+    public static byte[] BytesFromStream([InstantHandle] Action<Stream> func)
     {
         if (func == null) throw new ArgumentNullException(nameof(func));
         using var stream = new MemoryStream();
@@ -150,7 +151,7 @@ public static class FormatUtil
         return stream.ToArray();
     }
 
-    public static ISerializer SerializeWithSerdes(Action<ISerializer> serdes)
+    public static ISerializer SerializeWithSerdes([InstantHandle] Action<ISerializer> serdes)
     {
         if (serdes == null) throw new ArgumentNullException(nameof(serdes));
         var ms = new MemoryStream();
@@ -168,7 +169,7 @@ public static class FormatUtil
         });
     }
 
-    public static byte[] SerializeToBytes(Action<ISerializer> serdes)
+    public static byte[] SerializeToBytes([InstantHandle] Action<ISerializer> serdes)
     {
         if (serdes == null) throw new ArgumentNullException(nameof(serdes));
         var ms = new MemoryStream();
@@ -180,7 +181,7 @@ public static class FormatUtil
         return ms.ToArray();
     }
 
-    public static T DeserializeFromBytes<T>(byte[] bytes, Func<ISerializer, T> serdes)
+    public static T DeserializeFromBytes<T>(byte[] bytes, [InstantHandle] Func<ISerializer, T> serdes)
     {
         if (serdes == null) throw new ArgumentNullException(nameof(serdes));
         using var ms = new MemoryStream(bytes);

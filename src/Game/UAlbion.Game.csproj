@@ -20,7 +20,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Vortice.Direct3D11" Version="1.8.10" />
+    <!--
+    <PackageReference Include="Vortice.Direct3D11" Version="2.3.0" />
+	-->
   </ItemGroup>
 
   <ItemGroup>

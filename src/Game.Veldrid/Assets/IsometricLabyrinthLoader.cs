@@ -86,7 +86,7 @@ public sealed class IsometricLabyrinthLoader : GameComponent, IAssetLoader<Labyr
         var frames = _isoRsm.Builder.Build(labyrinth, context, mode, Assets);
 
         _engine.RenderFrame(false);
-        Image<Bgra32> image = _engine.ReadTexture2D(_isoRsm.IsoBuffer.GetColorTexture(0));
+        using Image<Bgra32> image = _engine.ReadTexture2D(_isoRsm.IsoBuffer.GetColorTexture(0));
 
         using var stream = new MemoryStream();
         image.SaveAsPng(stream);

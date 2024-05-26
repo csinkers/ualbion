@@ -12,10 +12,10 @@ public static class ImageSharpUtil
     public static Image<Rgba32> ToImageSharp(ReadOnlyImageBuffer<byte> from, ReadOnlySpan<uint> palette)
     {
         Image<Rgba32> image = new Image<Rgba32>(from.Width, from.Height);
-        if (!image.TryGetSinglePixelSpan(out var rgbaSpan))
+        if (!image.DangerousTryGetSinglePixelMemory(out var rgbaMemory))
             throw new InvalidOperationException("Could not retrieve single span from Image");
 
-        Span<uint> toBuffer = MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan);
+        Span<uint> toBuffer = MemoryMarshal.Cast<Rgba32, uint>(rgbaMemory.Span);
         var to = new ImageBuffer<uint>(from.Width, from.Height, from.Width, toBuffer);
         BlitUtil.BlitTiled8To32(from, to, palette, 255, 0);
 
@@ -25,10 +25,10 @@ public static class ImageSharpUtil
     public static Image<Rgba32> ToImageSharp(ReadOnlyImageBuffer<uint> from)
     {
         Image<Rgba32> image = new Image<Rgba32>(from.Width, from.Height);
-        if (!image.TryGetSinglePixelSpan(out var rgbaSpan))
+        if (!image.DangerousTryGetSinglePixelMemory(out var rgbaMemory))
             throw new InvalidOperationException("Could not retrieve single span from Image");
 
-        Span<uint> toBuffer = MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan);
+        Span<uint> toBuffer = MemoryMarshal.Cast<Rgba32, uint>(rgbaMemory.Span);
         var to = new ImageBuffer<uint>(from.Width, from.Height, from.Width, toBuffer);
         BlitUtil.BlitDirect(from, to);
         return image;
@@ -43,10 +43,10 @@ public static class ImageSharpUtil
             throw new InvalidOperationException("Could not pack sprite sheet into a single layer");
 
         Image<Rgba32> image = new Image<Rgba32>(layout.Width, layout.Height);
-        if (!image.TryGetSinglePixelSpan(out var rgbaSpan))
+        if (!image.DangerousTryGetSinglePixelMemory(out var rgbaMemory))
             throw new InvalidOperationException("Could not retrieve single span from Image");
 
-        Span<uint> pixels = MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan);
+        Span<uint> pixels = MemoryMarshal.Cast<Rgba32, uint>(rgbaMemory.Span);
         for (var i = 0; i < frameCount; i++)
         {
             var frame = getFrame(i);
@@ -59,11 +59,13 @@ public static class ImageSharpUtil
         return image;
     }
 
-    public static object FromImageSharp(IAssetId id, string name, Image<Rgba32> image)
+    public static SimpleTexture<uint> FromImageSharp(IAssetId id, string name, Image<Rgba32> image)
     {
         if (image == null) throw new ArgumentNullException(nameof(image));
-        image.TryGetSinglePixelSpan(out var pixels);
-        var asUint = MemoryMarshal.Cast<Rgba32, uint>(pixels);
+        if (!image.DangerousTryGetSinglePixelMemory(out var rgbaMemory))
+            throw new InvalidOperationException("Could not retrieve single span from Image");
+
+        var asUint = MemoryMarshal.Cast<Rgba32, uint>(rgbaMemory.Span);
         var result = new SimpleTexture<uint>(id, name, image.Width, image.Height, asUint);
         result.AddRegion(0, 0, image.Width, image.Height);
         return result;

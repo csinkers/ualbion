@@ -31,8 +31,8 @@ public class SpellData
     public byte Unused { get; set; } // Always 0 except for unused spells in school 6
     public static SpellData Serdes(SpellData d, AssetLoadContext context, ISerializer s)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(s);
 
         d ??= new SpellData(context.AssetId);
         d.Environments = s.EnumU8(nameof(Environments), d.Environments);

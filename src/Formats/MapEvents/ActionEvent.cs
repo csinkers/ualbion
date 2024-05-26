@@ -25,7 +25,7 @@ public class ActionEvent : MapEvent
 
     public static ActionEvent Serdes(ActionEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         var actionType = s.EnumU8(nameof(ActionType), e?.ActionType ?? 0);
         e ??= new ActionEvent();
         e.ActionType = actionType;

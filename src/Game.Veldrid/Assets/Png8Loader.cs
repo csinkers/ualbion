@@ -21,8 +21,8 @@ public class Png8Loader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>>
 {
     public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
 
         var paletteId = context.PaletteId;
 
@@ -37,8 +37,7 @@ public class Png8Loader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>>
 
         if (s.IsWriting())
         {
-            if (existing == null)
-                throw new ArgumentNullException(nameof(existing));
+            ArgumentNullException.ThrowIfNull(existing);
 
             var encoder = new PngEncoder();
             PackedChunks.Pack(s, existing.Regions.Count, frameNum => Write(encoder, unambiguousPalette, existing, frameNum));
@@ -64,7 +63,7 @@ public class Png8Loader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>>
     public object Serdes(object existing, ISerializer s, AssetLoadContext context)
         => Serdes((IReadOnlyTexture<byte>)existing, s, context);
 
-    static byte[] Write(IImageEncoder encoder, uint[] palette, IReadOnlyTexture<byte> existing, int frameNum)
+    static byte[] Write(PngEncoder encoder, uint[] palette, IReadOnlyTexture<byte> existing, int frameNum)
     {
         var frame = existing.Regions[frameNum];
         var buffer = new ReadOnlyImageBuffer<byte>(
@@ -78,7 +77,7 @@ public class Png8Loader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>>
         return bytes;
     }
 
-    static IReadOnlyTexture<byte> Read(AssetId id, uint[] palette, IList<Image<Rgba32>> images, PaletteId paletteId)
+    static SimpleTexture<byte> Read(AssetId id, uint[] palette, IList<Image<Rgba32>> images, PaletteId paletteId)
     {
         int totalWidth = images.Max(x => x.Width);
         int totalHeight = images.Sum(x => x.Height);

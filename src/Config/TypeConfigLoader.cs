@@ -13,7 +13,7 @@ public class TypeConfigLoader
         => _jsonUtil = jsonUtil ?? throw new ArgumentNullException(nameof(jsonUtil));
 
 #pragma warning disable CA1812 // 'AssetConfigLoader.RawTypeConfig' is an internal class that is apparently never instantiated. If so, remove the code from the assembly. If this class is intended to contain only static members, make it 'static' (Module in Visual Basic).
-    class RawTypeConfig
+    sealed class RawTypeConfig
     {
         [JsonInclude, JsonPropertyName("Languages")] public Dictionary<string, LanguageConfig> Languages { get; private set; } = new();
         [JsonInclude, JsonPropertyName("IdTypes")] public Dictionary<string, AssetTypeInfo> IdTypes { get; private set; } = new();
@@ -27,7 +27,7 @@ public class TypeConfigLoader
 
     public TypeConfig Load(string configPath, string modName, TypeConfig parent, AssetMapping mapping, IFileSystem disk)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(disk);
         if (!disk.FileExists(configPath))
             throw new FileNotFoundException($"Could not open asset config from {configPath}");
 
@@ -41,7 +41,7 @@ public class TypeConfigLoader
 
     public IReadOnlyDictionary<string, AssetTypeInfo> LoadIdTypesOnly(string configPath, IFileSystem disk)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(disk);
         if (!disk.FileExists(configPath))
             throw new FileNotFoundException($"Could not open asset config from {configPath}");
 

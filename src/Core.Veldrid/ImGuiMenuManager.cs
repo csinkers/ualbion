@@ -20,7 +20,7 @@ public class ImGuiMenuManager : ServiceComponent<IImGuiMenuManager>, IImGuiMenuM
 
     public IImGuiWindow CreateWindow(string name, IImGuiManager manager)
     {
-        if (manager == null) throw new ArgumentNullException(nameof(manager));
+        ArgumentNullException.ThrowIfNull(manager);
 
         if (!_windowTypes.TryGetValue(name, out var showWindow))
         {

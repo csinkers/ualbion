@@ -10,7 +10,7 @@ public class DeltaFlcChunk : FlicChunk
 
     protected override uint LoadChunk(uint length, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         var start = s.Offset;
         ushort lineCount = s.UInt16(null, 0);
         _lines ??= new DeltaFlcLine[lineCount];

@@ -19,14 +19,14 @@ public class FixedSizeSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 
     public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
         return s.IsWriting()
             ? Write(existing, context, s)
             : Read(context, s);
     }
 
-    static IReadOnlyTexture<byte> Read(AssetLoadContext context, ISerializer s)
+    static SimpleTexture<byte> Read(AssetLoadContext context, ISerializer s)
     {
         var streamLength = s.BytesRemaining;
         if (streamLength == 0)
@@ -69,7 +69,7 @@ public class FixedSizeSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 
     static IReadOnlyTexture<byte> Write(IReadOnlyTexture<byte> existing, AssetLoadContext context, ISerializer s)
     {
-        if (existing == null) throw new ArgumentNullException(nameof(existing));
+        ArgumentNullException.ThrowIfNull(existing);
 
         var f = existing.Regions[0];
         foreach (var frame in existing.Regions)
@@ -105,7 +105,7 @@ public class FixedSizeSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
         finally { ArrayPool<byte>.Shared.Return(pixelData); }
     }
 
-    static IReadOnlyTexture<byte> Transpose(IReadOnlyTexture<byte> sprite)
+    static SimpleTexture<byte> Transpose(IReadOnlyTexture<byte> sprite)
     {
         var firstFrame = sprite.Regions[0];
         int width = firstFrame.Width;

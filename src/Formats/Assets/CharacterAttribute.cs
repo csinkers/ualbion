@@ -16,7 +16,7 @@ public class CharacterAttribute : ICharacterAttribute
 
     public static CharacterAttribute Serdes(string name, CharacterAttribute attr, ISerializer s, bool hasBackup = true)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         s.Begin(name);
         attr ??= new CharacterAttribute();
         attr.Current = s.UInt16(nameof(Current), attr.Current);

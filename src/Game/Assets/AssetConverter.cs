@@ -55,8 +55,8 @@ public sealed class AssetConverter : IDisposable
 
     public AssetConverter(string appName, AssetMapping mapping, IFileSystem disk, IJsonUtil jsonUtil, string[] fromMods, string toMod)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
-        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        ArgumentNullException.ThrowIfNull(disk);
+        ArgumentNullException.ThrowIfNull(jsonUtil);
 
         var baseDir = ConfigUtil.FindBasePath(disk);
         (_from, _fromExchange, _fromLoaderRegistry) = BuildModApplier(baseDir, appName, fromMods, disk, jsonUtil, mapping);

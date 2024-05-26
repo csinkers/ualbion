@@ -13,7 +13,7 @@ public abstract class MapEvent : Event, IMapEvent
 
     public static EventNode SerdesNode(ushort id, EventNode node, ISerializer s, AssetMapping mapping, MapType mapType)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         var initialPosition = s.Offset;
         var mapEvent = node?.Event as MapEvent;
         if (node?.Event != null && mapEvent == null)
@@ -56,7 +56,7 @@ public abstract class MapEvent : Event, IMapEvent
 
     public static IMapEvent SerdesEvent(IMapEvent e, ISerializer s, AssetMapping mapping, MapType mapType)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         var initialPosition = s.Offset;
         s.Begin();
         var type = s.EnumU8("Type", e?.EventType ?? MapEventType.UnkFf);

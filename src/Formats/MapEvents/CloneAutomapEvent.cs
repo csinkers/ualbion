@@ -11,7 +11,7 @@ public class CloneAutomapEvent : MapEvent
 {
     public static CloneAutomapEvent Serdes(CloneAutomapEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new CloneAutomapEvent();
         int zeroes = s.UInt8(null, 0);
         zeroes += s.UInt8(null, 0);

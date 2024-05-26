@@ -11,8 +11,8 @@ public class CompositedTexture : IReadOnlyTexture<uint>
 {
     const int LayerLimit = 512;
 
-    readonly IList<LogicalSubImage> _logicalSubImages = new List<LogicalSubImage>();
-    readonly IDictionary<LayerKey, int> _layerLookup = new Dictionary<LayerKey, int>();
+    readonly List<LogicalSubImage> _logicalSubImages = new();
+    readonly Dictionary<LayerKey, int> _layerLookup = new();
     readonly List<Vector2> _layerSizes = new();
     IPalette _palette;
     bool _isMetadataDirty = true;
@@ -224,8 +224,8 @@ public class CompositedTexture : IReadOnlyTexture<uint>
 
     void RebuildLayer(LogicalSubImage lsi, int frameNumber, Span<uint> toBuffer, IReadOnlyTexture<uint> palette)
     {
-        if (lsi == null) throw new ArgumentNullException(nameof(lsi));
-        if (palette == null) throw new ArgumentNullException(nameof(palette));
+        ArgumentNullException.ThrowIfNull(lsi);
+        ArgumentNullException.ThrowIfNull(palette);
 
         foreach (var component in lsi.Components)
         {

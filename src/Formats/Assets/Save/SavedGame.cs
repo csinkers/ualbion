@@ -141,7 +141,7 @@ public class SavedGame
 
     public static string GetName(BinaryReader br)
     {
-        if (br == null) throw new ArgumentNullException(nameof(br));
+        ArgumentNullException.ThrowIfNull(br);
         using var s = new AlbionReader(br, br.BaseStream.Length);
         ushort nameLength = s.UInt16("NameLength", 0);
         if (nameLength > 1024)
@@ -153,7 +153,7 @@ public class SavedGame
 
     public static SavedGame Serdes(SavedGame save, AssetMapping mapping, ISerializer s, ISpellManager spellManager)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         save ??= new SavedGame();
 
         ushort nameLength = s.UInt16("NameLength", (ushort)(save.Name?.Length ?? 0));
@@ -436,7 +436,7 @@ public class SavedGame
 
     public bool IsEventUsed(AssetId eventSetId, ActionEvent action)
     {
-        if (action == null) throw new ArgumentNullException(nameof(action));
+        ArgumentNullException.ThrowIfNull(action);
 
         var visited = new VisitedEvent(eventSetId, action.ActionType, action.Argument);
         return _visitedSet.Contains(visited);
@@ -444,7 +444,7 @@ public class SavedGame
 
     public void UseEvent(AssetId eventSetId, ActionEvent action)
     {
-        if (action == null) throw new ArgumentNullException(nameof(action));
+        ArgumentNullException.ThrowIfNull(action);
 
         var visited = new VisitedEvent(eventSetId, action.ActionType, action.Argument);
         if (_visitedSet.Add(visited))

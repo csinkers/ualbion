@@ -24,7 +24,7 @@ public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
     const PixelFormat TextureFormat = PixelFormat.R8_G8_B8_A8_UNorm;
     public static readonly StringAssetProperty DayPath = new("DayPath"); 
     public static readonly StringAssetProperty NightPath = new("NightPath"); 
-    record FrameInfo(string Path, int SubId, int PalFrame);
+    sealed record FrameInfo(string Path, int SubId, int PalFrame);
     readonly PngDecoderOptions _pngOptions = new();
 
     public object Serdes(object existing, ISerializer s, AssetLoadContext context)
@@ -32,14 +32,14 @@ public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
 
     public ITileGraphics Serdes(ITileGraphics existing, ISerializer s, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         if (s.IsWriting())
             throw new NotSupportedException("Saving png tile graphics is not currently supported");
 
         return Load(context);
     }
 
-    ITileGraphics Load(AssetLoadContext context)
+    TrueColorTileGraphics Load(AssetLoadContext context)
     {
         var engine = (Engine)Resolve<IEngine>();
         var (dayInfo, nightInfo) = FindFiles(context);
@@ -92,7 +92,7 @@ public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
         return new TrueColorTileGraphics(texture, dayInfo, nightInfo);
     }
 
-    class FrameComparer : IComparer<FrameInfo>
+    sealed class FrameComparer : IComparer<FrameInfo>
     {
         public static FrameComparer Instance { get; } = new();
         FrameComparer() { }

@@ -10,7 +10,7 @@ public class VarSetLoader : IAssetLoader<VarSet>
 {
     public VarSet Serdes(VarSet existing, ISerializer s, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         if (!context.Disk.FileExists(context.Filename))
             throw new FileNotFoundException($"Could not find game config file at expected path {context.Filename}");
@@ -28,8 +28,8 @@ public class VarSetLoader : IAssetLoader<VarSet>
 
     public static VarSet Load(string name, string path, IFileSystem disk, IJsonUtil json)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
-        if (json == null) throw new ArgumentNullException(nameof(json));
+        ArgumentNullException.ThrowIfNull(disk);
+        ArgumentNullException.ThrowIfNull(json);
 
         var bytes = disk.ReadAllBytes(path);
         return VarSet.FromJsonBytes(name, bytes, json);
@@ -37,9 +37,9 @@ public class VarSetLoader : IAssetLoader<VarSet>
 
     public static void Save(VarSet set, string path, IFileSystem disk, IJsonUtil jsonUtil)
     {
-        if (set == null) throw new ArgumentNullException(nameof(set));
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
-        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        ArgumentNullException.ThrowIfNull(set);
+        ArgumentNullException.ThrowIfNull(disk);
+        ArgumentNullException.ThrowIfNull(jsonUtil);
 
         var json = set.ToJson(jsonUtil);
         disk.WriteAllText(path, json);

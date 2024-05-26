@@ -126,8 +126,8 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
     public ControlFlowGraph(IEnumerable<ICfgNode> nodes, IEnumerable<(int start, int end, CfgEdge label)> edges) : this(-1, -1, nodes, edges) { }
     public ControlFlowGraph(int entryIndex, int exitIndex, IEnumerable<ICfgNode> nodes, IEnumerable<(int start, int end, CfgEdge label)> edges)
     {
-        if (nodes == null) throw new ArgumentNullException(nameof(nodes));
-        if (edges == null) throw new ArgumentNullException(nameof(edges));
+        ArgumentNullException.ThrowIfNull(nodes);
+        ArgumentNullException.ThrowIfNull(edges);
 
         Nodes = ImmutableList<ICfgNode>.Empty.AddRange(nodes);
         var starts = EmptyEdges.ToBuilder();
@@ -534,7 +534,7 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
 
     public CfgCutResult Cut(HashSet<int> selectedNodes, int entry, int exit)
     {
-        if (selectedNodes == null) throw new ArgumentNullException(nameof(selectedNodes));
+        ArgumentNullException.ThrowIfNull(selectedNodes);
         List<ICfgNode> remainderNodes = new();
         List<(int, int, CfgEdge)> remainderEdges = new();
         var remainderMapping = new int[Nodes.Count];
@@ -591,7 +591,7 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
 
     public (ControlFlowGraph result, int[] mapping) Merge(ControlFlowGraph other)
     {
-        if (other == null) throw new ArgumentNullException(nameof(other));
+        ArgumentNullException.ThrowIfNull(other);
 
         var result = this;
         var mapping = new int[other.Nodes.Count];
@@ -648,7 +648,7 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
 
     public ControlFlowGraph AcceptBuilder(IAstBuilderVisitor visitor)
     {
-        if (visitor == null) throw new ArgumentNullException(nameof(visitor));
+        ArgumentNullException.ThrowIfNull(visitor);
 
         var result = this;
         foreach (var index in GetDfsOrder())

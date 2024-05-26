@@ -37,7 +37,7 @@ public class ObjectReflector : IReflector
     public ObjectReflector(ReflectorManager manager, Type type)
     {
         _manager = manager ?? throw new ArgumentNullException(nameof(manager));
-        if (type == null) throw new ArgumentNullException(nameof(type));
+        ArgumentNullException.ThrowIfNull(type);
 
         _typeName = ReflectorUtil.BuildTypeName(type);
         var subObjects = new Dictionary<string, ReflectorMetadata>();

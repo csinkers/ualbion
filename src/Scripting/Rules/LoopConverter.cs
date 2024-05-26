@@ -8,12 +8,12 @@ public static class LoopConverter
 {
     public static (ControlFlowGraph result, string description) Apply(ControlFlowGraph graph)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
         var visitor = new LoopConversionVisitor();
         return (graph.AcceptBuilder(visitor), "Convert loops");
     }
 
-    class LoopConversionVisitor : BaseAstBuilderVisitor
+    sealed class LoopConversionVisitor : BaseAstBuilderVisitor
     {
         protected override ICfgNode Build(EndlessLoop loop)
         {

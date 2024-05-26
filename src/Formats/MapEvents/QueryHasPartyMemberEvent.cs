@@ -22,7 +22,7 @@ public class QueryHasPartyMemberEvent : QueryEvent
     }
     public static QueryHasPartyMemberEvent Serdes(QueryHasPartyMemberEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryHasPartyMemberEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         e.Immediate = s.UInt8(nameof(Immediate), e.Immediate);

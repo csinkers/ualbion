@@ -23,13 +23,12 @@ public static class LayerMapping3D
 
     public static List<TiledMapLayer> BuildLayers(MapData3D map, ref int nextLayerId)
     {
-        if (map == null) throw new ArgumentNullException(nameof(map));
+        ArgumentNullException.ThrowIfNull(map);
 
         int floorId = nextLayerId++;
         int wallId = nextLayerId++;
         int contentId = nextLayerId++;
         int ceilingid = nextLayerId++;
-        var encoding = UncompressedCsvTileEncoding.Instance;
 
         return new List<TiledMapLayer>
         {
@@ -39,7 +38,7 @@ public static class LayerMapping3D
                 Name = LayerName.Floors,
                 Width = map.Width,
                 Height = map.Height,
-                Data = new LayerData { Encoding = "csv", Content = EncodeLayer(map, IsometricMode.Floors, encoding) }
+                Data = new LayerData { Encoding = "csv", Content = EncodeLayer(map, IsometricMode.Floors) }
             },
             new()
             {
@@ -47,7 +46,7 @@ public static class LayerMapping3D
                 Name = LayerName.Walls,
                 Width = map.Width,
                 Height = map.Height,
-                Data = new LayerData { Encoding = "csv", Content = EncodeLayer(map, IsometricMode.Walls, encoding) }
+                Data = new LayerData { Encoding = "csv", Content = EncodeLayer(map, IsometricMode.Walls) }
             },
             new()
             {
@@ -55,7 +54,7 @@ public static class LayerMapping3D
                 Name = LayerName.Contents,
                 Width = map.Width,
                 Height = map.Height,
-                Data = new LayerData { Encoding = "csv", Content = EncodeLayer(map, IsometricMode.Contents, encoding) }
+                Data = new LayerData { Encoding = "csv", Content = EncodeLayer(map, IsometricMode.Contents) }
             },
             new()
             {
@@ -64,15 +63,15 @@ public static class LayerMapping3D
                 Width = map.Width,
                 Height = map.Height,
                 Opacity = 0.5,
-                Data = new LayerData { Encoding = "csv", Content = EncodeLayer(map, IsometricMode.Ceilings, encoding) }
+                Data = new LayerData { Encoding = "csv", Content = EncodeLayer(map, IsometricMode.Ceilings) }
             }
         };
     }
 
     public static void ReadLayers(MapData3D albionMap, List<TiledMapLayer> layers)
     {
-        if (albionMap == null) throw new ArgumentNullException(nameof(albionMap));
-        if (layers == null) throw new ArgumentNullException(nameof(layers));
+        ArgumentNullException.ThrowIfNull(albionMap);
+        ArgumentNullException.ThrowIfNull(layers);
 
         foreach (var layer in layers)
         {
@@ -114,7 +113,7 @@ public static class LayerMapping3D
             _ => throw new ArgumentOutOfRangeException($"Tile {tile} did not fall into any of the expected ranges")
         };
 
-    static string EncodeLayer(MapData3D map, IsometricMode mode, ITileEncoding encoding)
+    static string EncodeLayer(MapData3D map, IsometricMode mode)
     {
         var (gidOffset, tiles) = mode switch
         {
@@ -136,6 +135,6 @@ public static class LayerMapping3D
                 indices[i] = gidOffset + tiles[i];
         }
 
-        return encoding.Encode(indices, map.Width);
+        return UncompressedCsvTileEncoding.Instance.Encode(indices, map.Width);
     }
 }

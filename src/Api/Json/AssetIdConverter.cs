@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace UAlbion.Api.Json;
 #pragma warning disable CA1812 // Internal class that is apparently never instantiated; this class is instantiated generically
-class AssetIdConverter<T> : JsonConverter<T> where T : struct, IAssetId
+sealed class AssetIdConverter<T> : JsonConverter<T> where T : struct, IAssetId
 {
     static readonly IAssetId.ParserMethod<T> Parser = IAssetId.GetParser<T>();
     public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

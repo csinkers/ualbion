@@ -15,7 +15,7 @@ using UAlbion.Game;
 
 namespace UAlbion;
 
-class DumpGraphics : GameComponent, IAssetDumper
+sealed class DumpGraphics : GameComponent, IAssetDumper
 {
     readonly DumpFormats _formats;
 
@@ -71,7 +71,7 @@ class DumpGraphics : GameComponent, IAssetDumper
         }
     }
 
-    public class ExportedImageInfo
+    public sealed class ExportedImageInfo
     {
         public string Path { get; set; }
         public int Width { get; set; }
@@ -160,14 +160,14 @@ class DumpGraphics : GameComponent, IAssetDumper
         return filenames;
     }
 
-    static void Save(Image<Rgba32> image, string pathWithoutExtension, DumpFormats formats, IList<ExportedImageInfo> filenames)
+    static void Save(Image<Rgba32> image, string pathWithoutExtension, DumpFormats formats, List<ExportedImageInfo> filenames)
     {
-        if ((formats & DumpFormats.Png) != 0)
-        {
-            var path = Path.ChangeExtension(pathWithoutExtension, "png");
-            using var stream = File.OpenWrite(path);
-            image.SaveAsPng(stream);
-            filenames.Add(new ExportedImageInfo { Path = path, Format = DumpFormats.Png, Width = image.Width, Height = image.Height });
-        }
+        if ((formats & DumpFormats.Png) == 0)
+            return;
+
+        var path = Path.ChangeExtension(pathWithoutExtension, "png");
+        using var stream = File.OpenWrite(path);
+        image.SaveAsPng(stream);
+        filenames.Add(new ExportedImageInfo { Path = path, Format = DumpFormats.Png, Width = image.Width, Height = image.Height });
     }
 }

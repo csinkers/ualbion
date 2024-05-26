@@ -4,7 +4,7 @@ using UAlbion.Api.Eventing;
 
 namespace UAlbion.Core.Veldrid.Reflection;
 
-class Vec4Reflector : IReflector
+sealed class Vec4Reflector : IReflector
 {
     public static Vec4Reflector Instance { get; } = new();
     Vec4Reflector() { }

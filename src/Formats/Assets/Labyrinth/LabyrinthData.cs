@@ -73,7 +73,7 @@ public class LabyrinthData
 
     public static LabyrinthData Serdes(LabyrinthData d, AssetId id, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         d ??= new LabyrinthData { Id = id };
 
         if (d.ObjectGroups.Count > WallOffset) throw new InvalidOperationException($"A labyrinth specification can only contain a maximum of {WallOffset} object groups, but {d.Id} contains {d.ObjectGroups.Count}");

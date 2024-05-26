@@ -2,7 +2,7 @@
 A remake of the 1995 RPG Albion 
 
 Prerequisites: 
-* [.NET 6](https://docs.microsoft.com/en-us/dotnet/core/install/)
+* [.NET 8](https://docs.microsoft.com/en-us/dotnet/core/install/)
 * Game data from an install of the original game ([full version](https://www.gog.com/game/albion) or [demo](https://archive.org/details/Albidemo))
 
 ## Screenshots

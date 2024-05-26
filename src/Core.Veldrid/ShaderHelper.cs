@@ -18,9 +18,9 @@ public static class ShaderHelper
         string setName,
         IFileSystem disk)
     {
-        if (gd == null) throw new ArgumentNullException(nameof(gd));
-        if (factory == null) throw new ArgumentNullException(nameof(factory));
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(gd);
+        ArgumentNullException.ThrowIfNull(factory);
+        ArgumentNullException.ThrowIfNull(disk);
 
         byte[] vsBytes = LoadBytecode(GraphicsBackend.Vulkan, setName, ShaderStages.Vertex, disk);
         byte[] fsBytes = LoadBytecode(GraphicsBackend.Vulkan, setName, ShaderStages.Fragment, disk);
@@ -49,7 +49,7 @@ public static class ShaderHelper
 
     public static SpecializationConstant[] GetSpecializations(GraphicsDevice gd)
     {
-        if (gd == null) throw new ArgumentNullException(nameof(gd));
+        ArgumentNullException.ThrowIfNull(gd);
         bool glOrGles = gd.BackendType == GraphicsBackend.OpenGL || gd.BackendType == GraphicsBackend.OpenGLES;
 
         List<SpecializationConstant> specializations = new List<SpecializationConstant>();
@@ -70,7 +70,7 @@ public static class ShaderHelper
 
     public static byte[] LoadBytecode(GraphicsBackend backend, string setName, ShaderStages stage, IFileSystem disk)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(disk);
         string stageExt = stage == ShaderStages.Vertex ? "vert" : "frag";
         string name = setName + "." + stageExt;
 

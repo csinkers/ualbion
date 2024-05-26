@@ -29,7 +29,7 @@ public class ChangeAttributeEvent : MapEvent, IDataChangeEvent
 
     public static ChangeAttributeEvent Serdes(ChangeAttributeEvent e, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new ChangeAttributeEvent();
         var (targetType, targetId) = DataChangeEvent.UnpackTargetId(e.Target);
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);                   // 2

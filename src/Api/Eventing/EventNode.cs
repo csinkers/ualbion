@@ -19,7 +19,7 @@ public class EventNode : IEventNode, IEquatable<EventNode>
 
     public virtual void Format(IScriptBuilder builder, int idOffset)
     {
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
         int id = Id - idOffset;
         int? next = Next?.Id - idOffset;
 
@@ -42,7 +42,7 @@ public class EventNode : IEventNode, IEquatable<EventNode>
 
     public virtual void Unswizzle(IList<EventNode> nodes)
     {
-        if (nodes == null) throw new ArgumentNullException(nameof(nodes));
+        ArgumentNullException.ThrowIfNull(nodes);
         if (Next is not DummyEventNode dummy) 
             return;
 

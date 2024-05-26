@@ -11,7 +11,7 @@ public class RemovePartyMemberEvent : MapEvent
 {
     public static RemovePartyMemberEvent Serdes(RemovePartyMemberEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new RemovePartyMemberEvent();
         e.PartyMemberId = PartyMemberId.SerdesU8(nameof(PartyMemberId), e.PartyMemberId, mapping, s);
         e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);

@@ -6,7 +6,6 @@ using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Ids;
@@ -33,7 +32,7 @@ public class Npc2D : Component
     readonly bool _isLarge;
     bool _isLocked;
 
-    IMovementSettings _moveSettings;
+    MovementSettings _moveSettings;
     // int _frameCount;
     int _targetX;
     int _targetY;

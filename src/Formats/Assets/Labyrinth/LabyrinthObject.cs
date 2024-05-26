@@ -22,7 +22,7 @@ public class LabyrinthObject // Length 0x10 (16) bytes
 
     public static LabyrinthObject Serdes(int _, LabyrinthObject o, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         o ??= new LabyrinthObject();
         o.Properties = s.EnumU8(nameof(o.Properties), o.Properties);
 

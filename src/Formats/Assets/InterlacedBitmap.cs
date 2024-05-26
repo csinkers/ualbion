@@ -30,7 +30,7 @@ public sealed class InterlacedBitmap
 
     public static InterlacedBitmap Serdes(InterlacedBitmap img, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         img ??= new InterlacedBitmap();
 
         var formatChunk = IffChunk.Serdes(0, new IffChunk(IffChunkType.Format, 0), s);

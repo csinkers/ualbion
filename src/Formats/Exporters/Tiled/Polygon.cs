@@ -11,7 +11,7 @@ public class Polygon
 
     public Polygon(IList<(int, int)> points, int multX = 1, int multY = 1)
     {
-        if (points == null) throw new ArgumentNullException(nameof(points));
+        ArgumentNullException.ThrowIfNull(points);
         var sb = new StringBuilder();
         foreach (var (x, y) in points)
             sb.Append($"{x * multX},{y * multY} ");

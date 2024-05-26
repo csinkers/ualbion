@@ -15,8 +15,8 @@ public class ModInfo
         IJsonUtil json,
         IFileSystem disk) // Current directory of disk should be the mod's root dir
     {
-        if (json == null) throw new ArgumentNullException(nameof(json));
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(json);
+        ArgumentNullException.ThrowIfNull(disk);
 
         Name = name ?? throw new ArgumentNullException(nameof(name));
         AssetConfig = assetConfig ?? throw new ArgumentNullException(nameof(assetConfig));

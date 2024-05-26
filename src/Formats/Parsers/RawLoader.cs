@@ -8,7 +8,7 @@ public class RawLoader : IAssetLoader<byte[]>
 {
     public byte[] Serdes(byte[] existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         return s.Bytes(null, existing, (int) (existing?.Length ?? s.BytesRemaining));
     }
 

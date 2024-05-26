@@ -2,7 +2,7 @@
 
 namespace UAlbion.Core.Textures;
 
-class SubImageComponent
+sealed class SubImageComponent
 {
     public ITexture Texture { get; set; }
     public int X { get; set; }

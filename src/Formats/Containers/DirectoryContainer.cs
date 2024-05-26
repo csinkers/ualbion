@@ -19,7 +19,7 @@ public class DirectoryContainer : IAssetContainer
     static readonly AssetPathPattern DefaultPattern = AssetPathPattern.Build("{0}_{1}_{2}.dat");
     public ISerializer Read(string path, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         var subAssets = new Dictionary<int, (string, string)>(); // path and name
         // Pattern vars: 0=Index 1=SubItem 2=Name 3=Palette
@@ -69,8 +69,8 @@ public class DirectoryContainer : IAssetContainer
 
     public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
     {
-        if (assets == null) throw new ArgumentNullException(nameof(assets));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(assets);
+        ArgumentNullException.ThrowIfNull(context);
 
         if (context.Disk.FileExists(path))
             throw new InvalidOperationException($"Cannot save directory container at \"{path}\", as there is already a file with that name.");

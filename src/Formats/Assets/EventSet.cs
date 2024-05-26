@@ -28,8 +28,8 @@ public class EventSet : IEventSet
 
     public EventSet(EventSetId id, IEnumerable<EventNode> nodes, IEnumerable<ushort> chains)
     {
-        if (nodes == null) throw new ArgumentNullException(nameof(nodes));
-        if (chains == null) throw new ArgumentNullException(nameof(chains));
+        ArgumentNullException.ThrowIfNull(nodes);
+        ArgumentNullException.ThrowIfNull(chains);
         Id = id;
         Events = nodes.ToList();
         Chains = chains.ToList();
@@ -50,7 +50,7 @@ public class EventSet : IEventSet
 
     public static EventSet Serdes(EventSetId id, EventSet set, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         set ??= new EventSet { Id = id };
         ushort chainCount = s.UInt16("ChainCount", (ushort)(set.Chains?.Count ?? 0));
         ushort eventCount = s.UInt16("TotalEventCount", (ushort)(set.Events?.Count ?? 0));

@@ -90,7 +90,7 @@ public class Tileset
 
     public static Tileset Parse(Stream stream)
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream);
         using var xr = new XmlTextReader(stream);
         var serializer = new XmlSerializer(typeof(Tileset));
         return (Tileset)serializer.Deserialize(xr);
@@ -98,7 +98,7 @@ public class Tileset
 
     public static Tileset Load(string path, IFileSystem disk)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(disk);
         using var stream = disk.OpenRead(path);
         var tilemap = Parse(stream);
         tilemap.Filename = path;
@@ -107,7 +107,7 @@ public class Tileset
 
     public void Save(string path, IFileSystem disk)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(disk);
         var dir = Path.GetDirectoryName(path);
         foreach (var tile in Tiles)
             if (!string.IsNullOrEmpty(tile.Image?.Source))

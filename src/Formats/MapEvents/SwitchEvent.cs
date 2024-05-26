@@ -19,7 +19,7 @@ public class SwitchEvent : ModifyEvent
 
     public static SwitchEvent Serdes(SwitchEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new SwitchEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);

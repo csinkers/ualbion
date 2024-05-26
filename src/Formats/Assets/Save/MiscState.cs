@@ -33,7 +33,7 @@ public class MiscState
 
     public static MiscState Serdes(string _, MiscState m, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         m ??= new MiscState();
         m.Unk0 = s.Int64(nameof(Unk0), m.Unk0);
         m.Unk8 = s.Int64(nameof(Unk8), m.Unk8);

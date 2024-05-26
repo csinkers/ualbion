@@ -18,7 +18,7 @@ public class IffChunk
 
     public void WriteLength(ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         var offset = s.Offset;
         s.Seek(_lengthOffset);
         Length = s.Int32BE(nameof(Length), (int)(offset - _lengthOffset));
@@ -27,7 +27,7 @@ public class IffChunk
 
     public static IffChunk Serdes(int _, IffChunk c, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         c ??= new IffChunk();
         c.TypeId = s.FixedLengthString(nameof(TypeId), c.TypeId, 4);
         c._lengthOffset = s.Offset;

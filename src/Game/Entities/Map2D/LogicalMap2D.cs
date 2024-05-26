@@ -20,7 +20,7 @@ public class LogicalMap2D : LogicalMap
         MapChangeCollection tempChanges,
         MapChangeCollection permChanges) : base(mapData, tempChanges, permChanges)
     {
-        if (assetManager == null) throw new ArgumentNullException(nameof(assetManager));
+        ArgumentNullException.ThrowIfNull(assetManager);
         _mapData = mapData ?? throw new ArgumentNullException(nameof(mapData));
         TileData = assetManager.LoadTileData(_mapData.TilesetId);
         _blockList = assetManager.LoadBlockList(_mapData.TilesetId.ToBlockList());

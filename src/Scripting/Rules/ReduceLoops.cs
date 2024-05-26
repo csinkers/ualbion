@@ -10,7 +10,7 @@ public static class ReduceLoops
 {
     public static (ControlFlowGraph, string) Decompile(ControlFlowGraph graph)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
         var loops = GetLoops(graph);
 
         // Add an empty node for the header so the header will never be a continue / break. Then we can structure 
@@ -187,8 +187,8 @@ public static class ReduceLoops
 
     public static CfgLoop GetLoopInformation(ControlFlowGraph graph, List<int> nodes)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
-        if (nodes == null) throw new ArgumentNullException(nameof(nodes));
+        ArgumentNullException.ThrowIfNull(graph);
+        ArgumentNullException.ThrowIfNull(nodes);
         if (nodes.Count == 0) throw new ArgumentException("Empty loop provided to GetLoopInformation", nameof(nodes));
 
         var body = new List<LoopPart>();

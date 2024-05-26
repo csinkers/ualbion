@@ -10,7 +10,7 @@ using static System.FormattableString;
 
 namespace UAlbion.Core.Veldrid.Textures;
 
-class TextureCache<T> : Component, IDisposable where T : TextureHolder
+sealed class TextureCache<T> : Component, IDisposable where T : TextureHolder
 {
     record struct CacheEntry(WeakReference<T> Holder, Texture Texture, int Version);
     readonly object _syncRoot = new();
@@ -25,7 +25,7 @@ class TextureCache<T> : Component, IDisposable where T : TextureHolder
 
     public TextureCache(Func<ITexture, T> factory, Func<GraphicsDevice, ITexture, Texture> textureFactory, ITexture defaultTexture)
     {
-        if (defaultTexture == null) throw new ArgumentNullException(nameof(defaultTexture));
+        ArgumentNullException.ThrowIfNull(defaultTexture);
         _holderFactory = factory ?? throw new ArgumentNullException(nameof(factory));
         _textureFactory = textureFactory ?? throw new ArgumentNullException(nameof(textureFactory));
 

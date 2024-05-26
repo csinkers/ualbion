@@ -35,7 +35,7 @@ public class ModalDialog : Dialog
 
     public override int Selection(Rectangle extents, int order, SelectionContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         int maxOrder = order;
         if (extents.Contains((int)context.UiPosition.X, (int)context.UiPosition.Y))
         {

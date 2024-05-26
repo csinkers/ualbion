@@ -11,7 +11,7 @@ namespace UAlbion.Game.Assets;
 
 public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocator
 {
-    readonly IDictionary<string, string> _hashCache = new Dictionary<string, string>();
+    readonly Dictionary<string, string> _hashCache = new();
     IAssetLoaderRegistry _assetLoaderRegistry;
     IContainerRegistry _containerRegistry;
 
@@ -24,7 +24,7 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
 
     public object LoadAsset(AssetLoadContext context, TextWriter annotationWriter, List<string> filesSearched)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         var pathResolver = Resolve<IPathResolver>();
 
         if (context.Node.Filename == null || context.Node.Filename.StartsWith('!')) // If this is a meta-asset (e.g. is loaded from another asset)

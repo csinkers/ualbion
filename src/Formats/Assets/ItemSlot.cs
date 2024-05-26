@@ -173,7 +173,7 @@ public class ItemSlot : IReadOnlyItemSlot
 
     public static ItemSlot Serdes(InventorySlotId id, ItemSlot slot, AssetMapping mapping, ISerializer s)  // 6 per slot
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         slot ??= new ItemSlot(id);
         slot.Amount = s.UInt8(nameof(slot.Amount), (byte)(slot.Amount == Unlimited ? 0xff : slot.Amount));
         if (slot.Amount == 0xff)
@@ -250,8 +250,8 @@ public class ItemSlot : IReadOnlyItemSlot
 
     public ushort TransferFrom(ItemSlot other, ushort? quantity, Func<ItemId, ItemData> getItem) // Return the number of items transferred
     {
-        if (other == null) throw new ArgumentNullException(nameof(other));
-        if (getItem == null) throw new ArgumentNullException(nameof(getItem));
+        ArgumentNullException.ThrowIfNull(other);
+        ArgumentNullException.ThrowIfNull(getItem);
         if (quantity == 0) throw new ArgumentOutOfRangeException(nameof(quantity));
         CheckAssumptions();
         other.CheckAssumptions();
@@ -275,8 +275,8 @@ public class ItemSlot : IReadOnlyItemSlot
 
     public bool CanCoalesce(ItemSlot y, Func<ItemId, ItemData> getItem)
     {
-        if (y == null) throw new ArgumentNullException(nameof(y));
-        if (getItem == null) throw new ArgumentNullException(nameof(getItem));
+        ArgumentNullException.ThrowIfNull(y);
+        ArgumentNullException.ThrowIfNull(getItem);
 
         if (Item.IsNone || y.Item.IsNone) return true; // Anything can coalesce with nothing
         if (Item != y.Item) return false; // Can't stack dissimilar items
@@ -289,7 +289,7 @@ public class ItemSlot : IReadOnlyItemSlot
 
     public void Swap(ItemSlot other)
     {
-        if (other == null) throw new ArgumentNullException(nameof(other));
+        ArgumentNullException.ThrowIfNull(other);
         (Item, other.Item)               = (other.Item, Item);
         (Amount, other.Amount)           = (other.Amount, Amount);
         (Charges, other.Charges)         = (other.Charges, Charges);

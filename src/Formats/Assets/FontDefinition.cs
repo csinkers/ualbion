@@ -80,7 +80,7 @@ public class FontDefinition
 
     public MetaFont Build(FontId fontId, InkId inkId, IAssetManager assets)
     {
-        if (assets == null) throw new ArgumentNullException(nameof(assets));
+        ArgumentNullException.ThrowIfNull(assets);
         if (_layout == null)
         {
             foreach (var component in Components)

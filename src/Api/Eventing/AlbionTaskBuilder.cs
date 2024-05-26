@@ -147,7 +147,7 @@ public struct AlbionTaskBuilder
         }
     }
 
-    class AlbionStateMachineBox<TStateMachine> : AlbionTaskCore<Unit>
+    sealed class AlbionStateMachineBox<TStateMachine> : AlbionTaskCore<Unit>
         where TStateMachine : IAsyncStateMachine
     {
         Action? _moveNextAction;

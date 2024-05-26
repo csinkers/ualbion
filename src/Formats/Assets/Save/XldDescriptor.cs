@@ -12,7 +12,7 @@ public class XldDescriptor
 
     public static XldDescriptor Serdes(string _, XldDescriptor d, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         d ??= new XldDescriptor();
         d.Size = s.UInt32(nameof(Size), d.Size);
         d.Category = s.EnumU16(nameof(Category), d.Category);

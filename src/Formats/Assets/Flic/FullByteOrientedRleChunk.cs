@@ -5,7 +5,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats.Assets.Flic;
 
-class FullByteOrientedRleChunk : FlicChunk
+sealed class FullByteOrientedRleChunk : FlicChunk
 {
     readonly int _width;
     readonly int _height;
@@ -22,7 +22,7 @@ class FullByteOrientedRleChunk : FlicChunk
 
     public IEnumerable<byte> ReadLinePixels(ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
 
         var startOfLine = s.Offset;
         int x = 0;
@@ -56,7 +56,7 @@ class FullByteOrientedRleChunk : FlicChunk
 
     protected override uint LoadChunk(uint length, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         var start = s.Offset;
         int i = 0;
         for (int y = 0; y < _height; y++)

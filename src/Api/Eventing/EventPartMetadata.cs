@@ -20,7 +20,7 @@ public class EventPartMetadata
 
     public EventPartMetadata(PropertyInfo property, ParameterExpression partsParameter, int index)
     {
-        if (property == null) throw new ArgumentNullException(nameof(property));
+        ArgumentNullException.ThrowIfNull(property);
         var declaringType = property.DeclaringType;
         if (declaringType == null)
             throw new InvalidOperationException("Property must have a declaring type");

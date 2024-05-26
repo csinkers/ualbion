@@ -68,7 +68,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     /// </summary>
     public void Update(float deltaSeconds, InputSnapshot snapshot)
     {
-        if (snapshot == null) throw new ArgumentNullException(nameof(snapshot));
+        ArgumentNullException.ThrowIfNull(snapshot);
 
         if (_frameBegun)
             return;
@@ -92,8 +92,8 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     /// <exception cref="ArgumentException"></exception>
     public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, IResourceSetHolder set1, IResourceSetHolder set2)
     {
-        if (cl == null) throw new ArgumentNullException(nameof(cl));
-        if (device == null) throw new ArgumentNullException(nameof(device));
+        ArgumentNullException.ThrowIfNull(cl);
+        ArgumentNullException.ThrowIfNull(device);
         if (renderable is not DebugGuiRenderable)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
@@ -111,8 +111,8 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     /// </summary>
     public IntPtr GetOrCreateImGuiBinding(ResourceFactory factory, TextureView textureView)
     {
-        if (factory == null) throw new ArgumentNullException(nameof(factory));
-        if (textureView == null) throw new ArgumentNullException(nameof(textureView));
+        ArgumentNullException.ThrowIfNull(factory);
+        ArgumentNullException.ThrowIfNull(textureView);
 
         if (!_setsByView.TryGetValue(textureView, out ResourceSetInfo rsi))
         {
@@ -145,8 +145,8 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     /// </summary>
     public IntPtr GetOrCreateImGuiBinding(ResourceFactory factory, Texture texture)
     {
-        if (factory == null) throw new ArgumentNullException(nameof(factory));
-        if (texture == null) throw new ArgumentNullException(nameof(texture));
+        ArgumentNullException.ThrowIfNull(factory);
+        ArgumentNullException.ThrowIfNull(texture);
 
         if (!_autoViewsByTexture.TryGetValue(texture, out TextureView textureView))
         {
@@ -231,8 +231,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
 
     void CreateDeviceObjects(GraphicsDevice graphicsDevice)
     {
-        if (graphicsDevice == null)
-            throw new ArgumentNullException(nameof(graphicsDevice));
+        ArgumentNullException.ThrowIfNull(graphicsDevice);
 
         if (_vertexBuffer != null)
             Dispose();

@@ -15,7 +15,7 @@ public class DebugGuiRenderable : Component, IRenderable, IRenderableSource
     public DrawLayer RenderOrder => DrawLayer.Debug;
     public void Collect(List<IRenderable> renderables)
     {
-        if (renderables == null) throw new ArgumentNullException(nameof(renderables));
+        ArgumentNullException.ThrowIfNull(renderables);
         renderables.Add(this);
     }
 }

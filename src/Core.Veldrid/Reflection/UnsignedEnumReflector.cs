@@ -5,14 +5,14 @@ using UAlbion.Api.Eventing;
 namespace UAlbion.Core.Veldrid.Reflection;
 
 #pragma warning disable CA1812 // Class is instantiated via reflection
-class UnsignedEnumReflector<T> : EnumReflector, IReflector where T : struct, Enum
+sealed class UnsignedEnumReflector<T> : EnumReflector, IReflector where T : struct, Enum
 {
     readonly Func<T, ulong> _toNum;
     readonly Func<ulong, T> _fromNum;
     readonly EnumValue[] _values;
     readonly string[] _names;
 
-    record EnumValue(ulong Numeric, string Name, bool IsPowerOfTwo);
+    sealed record EnumValue(ulong Numeric, string Name, bool IsPowerOfTwo);
 
     public UnsignedEnumReflector(Func<T, ulong> toNum, Func<ulong, T> fromNum) : base(typeof(T))
     {

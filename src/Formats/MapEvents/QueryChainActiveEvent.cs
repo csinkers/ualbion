@@ -23,7 +23,7 @@ public class QueryChainActiveEvent : QueryEvent
 
     public static QueryChainActiveEvent Serdes(QueryChainActiveEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryChainActiveEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         e.ChainNum = s.UInt8(nameof(ChainNum), e.ChainNum);

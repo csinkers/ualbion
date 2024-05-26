@@ -29,7 +29,7 @@ public sealed class ShaderLoader : ServiceComponent<IShaderLoader>, IShaderLoade
     public ShaderInfo Load(string path, IFileSystem disk)
     {
         if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(disk);
 
         foreach (var dir in _directories)
         {
@@ -44,7 +44,7 @@ public sealed class ShaderLoader : ServiceComponent<IShaderLoader>, IShaderLoade
     public byte[] LoadRaw(string path, IFileSystem disk)
     {
         if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(disk);
 
         foreach (var dir in _directories)
         {

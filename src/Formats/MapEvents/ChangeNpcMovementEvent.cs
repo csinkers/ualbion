@@ -15,7 +15,7 @@ public class ChangeNpcMovementEvent : MapEvent, INpcEvent // Specialised variant
         if (s.IsReading()) // Should never be used
             return (ChangeNpcMovementEvent)ChangeIconEvent.Serdes(null, mapping, mapType, s);
 
-        if (e == null) throw new ArgumentNullException(nameof(e));
+        ArgumentNullException.ThrowIfNull(e);
         var cie = new ChangeIconEvent(e.NpcNum, 0, e.Scope, IconChangeType.NpcMovement, (ushort)e.Mode, e.Layers, e.MapId);
         ChangeIconEvent.Serdes(cie, mapping, mapType, s);
         return e;
@@ -23,7 +23,7 @@ public class ChangeNpcMovementEvent : MapEvent, INpcEvent // Specialised variant
 
     public static ChangeNpcMovementEvent FromChangeIconEvent(ChangeIconEvent cie)
     {
-        if (cie == null) throw new ArgumentNullException(nameof(cie));
+        ArgumentNullException.ThrowIfNull(cie);
 
         if (cie.X is < 0 or > byte.MaxValue) throw new FormatException($"Expected X to be in range [0..{byte.MaxValue}] for ChangeNpcMovementEvent but was {cie.X}");
         if (cie.ChangeType != IconChangeType.NpcMovement) throw new FormatException($"Expected ChangeType to be NpcMovement for ChangeNpcMovementEvent, but was {cie.ChangeType}");

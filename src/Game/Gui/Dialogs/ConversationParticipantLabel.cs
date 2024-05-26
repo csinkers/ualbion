@@ -11,7 +11,7 @@ public class ConversationParticipantLabel : Dialog
     public ConversationParticipantLabel(ICharacterSheet sheet, bool isRight)
         : base(isRight ? DialogPositioning.TopRight : DialogPositioning.TopLeft)
     {
-        if (sheet == null) throw new ArgumentNullException(nameof(sheet));
+        ArgumentNullException.ThrowIfNull(sheet);
         var name = GetName(sheet, false);
 
         var fixedPos = new FixedPositionStacker();
@@ -56,7 +56,7 @@ public class ConversationParticipantLabel : Dialog
          */
     }
 
-    IText GetName(ICharacterSheet sheet, bool isRight) => new DynamicText(() =>
+    DynamicText GetName(ICharacterSheet sheet, bool isRight) => new(() =>
     {
         var name = sheet.GetName(ReadVar(V.User.Gameplay.Language));
         return new[] 

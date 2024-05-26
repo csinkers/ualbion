@@ -21,8 +21,8 @@ public class MovementSettings : IMovementSettings
     public float GetDepth(float y) => DepthUtil.GetAbsDepth(y);
     public int GetSpriteFrame(IMovementState state, Func<int, int, SitMode> getSitMode)
     {
-        if (state == null) throw new ArgumentNullException(nameof(state));
-        if (getSitMode == null) throw new ArgumentNullException(nameof(getSitMode));
+        ArgumentNullException.ThrowIfNull(state);
+        ArgumentNullException.ThrowIfNull(getSitMode);
         var sitMode = getSitMode(state.X, state.Y);
 
         var anim = state.FacingDirection switch

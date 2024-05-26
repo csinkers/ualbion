@@ -18,12 +18,12 @@ public class AlbionPalette : IPalette
     const int VariableEntries = EntryCount - CommonEntries;
 
     readonly int[] _periods = new int[EntryCount];
-    readonly IList<(byte, byte)> _ranges = new List<(byte, byte)>();
+    readonly List<(byte, byte)> _ranges = new();
     SimpleTexture<uint> _texture;
     uint[] _unambiguous;
 
-    public uint Id { get; private set; }
-    public string Name { get; private set; }
+    public uint Id { get; private init; }
+    public string Name { get; private init; }
     [JsonInclude] public uint[] Entries { get; private set; } = new uint[EntryCount];
     [JsonIgnore] public bool IsAnimated => Period > 1;
     [JsonIgnore] public int Period { get; private set; }
@@ -36,7 +36,7 @@ public class AlbionPalette : IPalette
         uint[] entries,
         IList<(byte, byte)> ranges = null)
     {
-        if (entries == null) throw new ArgumentNullException(nameof(entries));
+        ArgumentNullException.ThrowIfNull(entries);
         if (entries.Length != EntryCount)
             throw new ArgumentOutOfRangeException(nameof(entries), $"Expected entries to be an array of {EntryCount} elements");
 
@@ -111,8 +111,7 @@ public class AlbionPalette : IPalette
 
     public void SetCommonPalette(AlbionPalette commonPalette)
     {
-        if (commonPalette == null)
-            throw new ArgumentNullException(nameof(commonPalette));
+        ArgumentNullException.ThrowIfNull(commonPalette);
 
         var span = _texture.GetMutableLayerBuffer(0).Buffer;
         for (int offset = 0; offset < span.Length; offset += 256)
@@ -127,7 +126,7 @@ public class AlbionPalette : IPalette
 
     [JsonIgnore] public IReadOnlyTexture<uint> Texture => _texture;
 
-    static uint Search(uint root, ISet<uint> visited)
+    static uint Search(uint root, HashSet<uint> visited)
     {
         var queue = new Queue<uint>();
         queue.Enqueue(root);
@@ -181,8 +180,8 @@ public class AlbionPalette : IPalette
 
     public static AlbionPalette Serdes(AlbionPalette p, AssetLoadContext context, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
 
         bool isCommon = context.GetProperty(PaletteLoader.IsCommon);
         long entryCount = isCommon ? CommonEntries : VariableEntries;

@@ -33,7 +33,7 @@ public class MapAnnotationLayer : Component
     readonly LogicalMap2D _logicalMap;
     readonly Vector2 _tileSize;
     // readonly DrawLayer _drawLayer;
-    readonly ISet<(int, int)> _dirty = new HashSet<(int, int)>();
+    readonly HashSet<(int, int)> _dirty = new();
 
 #if DEBUG
     DebugFlags _lastDebugFlags;

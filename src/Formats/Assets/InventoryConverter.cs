@@ -153,8 +153,8 @@ public class InventoryConverter : JsonConverter<Inventory>
 
     public override void Write(Utf8JsonWriter writer, Inventory value, JsonSerializerOptions options)
     {
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
-        if (value == null) throw new ArgumentNullException(nameof(value));
+        ArgumentNullException.ThrowIfNull(writer);
+        ArgumentNullException.ThrowIfNull(value);
 
         writer.WriteStartObject();
         writer.WritePropertyName("Id");

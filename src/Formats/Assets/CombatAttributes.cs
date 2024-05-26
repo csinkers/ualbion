@@ -14,7 +14,7 @@ public class CombatAttributes : ICombatAttributes
     public CombatAttributes DeepClone() => new CombatAttributes().CopyFrom(this);
     public CombatAttributes CopyFrom(CombatAttributes other)
     {
-        if (other == null) throw new ArgumentNullException(nameof(other));
+        ArgumentNullException.ThrowIfNull(other);
 
         ExperiencePoints = other.ExperiencePoints;
         TrainingPoints = other.TrainingPoints;

@@ -15,7 +15,7 @@ public class DoScriptEvent : MapEvent
 
     public static DoScriptEvent Serdes(DoScriptEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new DoScriptEvent();
         e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);
         e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);

@@ -27,9 +27,9 @@ class ModLoader : Component // Shouldn't be referenced outside ModApplier
 
     public void LoadMods(AssetMapping mapping, IPathResolver pathResolver, IReadOnlyList<string> mods)
     {
-        if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        if (pathResolver == null) throw new ArgumentNullException(nameof(pathResolver));
-        if (mods == null) throw new ArgumentNullException(nameof(mods));
+        ArgumentNullException.ThrowIfNull(mapping);
+        ArgumentNullException.ThrowIfNull(pathResolver);
+        ArgumentNullException.ThrowIfNull(mods);
 
         pathResolver.RegisterPath("ALBION", pathResolver.ResolvePathAbsolute(ReadVar(V.User.Path.Albion)));
         pathResolver.RegisterPath("SAVES", pathResolver.ResolvePathAbsolute(ReadVar(V.User.Path.Saves)));

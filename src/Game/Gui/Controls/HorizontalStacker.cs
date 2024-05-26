@@ -15,7 +15,7 @@ public class HorizontalStacker : UiElement
     public HorizontalStacker(params IUiElement[] args) : this((IList<IUiElement>)args) { }
     public HorizontalStacker(IList<IUiElement> children)
     {
-        if (children == null) throw new ArgumentNullException(nameof(children));
+        ArgumentNullException.ThrowIfNull(children);
         foreach(var child in children)
             AttachChild(child);
     }
@@ -40,7 +40,7 @@ public class HorizontalStacker : UiElement
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
-        if (func == null) throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
 
         int maxOrder = order;
         int minWidth = 0;

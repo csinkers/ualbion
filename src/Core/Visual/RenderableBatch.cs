@@ -61,7 +61,7 @@ public abstract class RenderableBatch<TKey, TInstance> : Component, IRenderable,
 
     public void Shrink(BatchLease<TKey, TInstance> leaseToRemove)
     {
-        if (leaseToRemove == null) throw new ArgumentNullException(nameof(leaseToRemove));
+        ArgumentNullException.ThrowIfNull(leaseToRemove);
         // TODO: Use a more efficient algorithm, e.g. look for equal sized lease at end of list and swap, use linked list for lease list etc
         lock (_syncRoot)
         {
@@ -119,7 +119,7 @@ public abstract class RenderableBatch<TKey, TInstance> : Component, IRenderable,
 
     public Span<TInstance> Lock(BatchLease<TKey, TInstance> lease, ref bool lockWasTaken)
     {
-        if (lease == null) throw new ArgumentNullException(nameof(lease));
+        ArgumentNullException.ThrowIfNull(lease);
         PerfTracker.IncrementFrameCounter("Lease Accesses");
         Monitor.Enter(_syncRoot, ref lockWasTaken);
         return MutableInstances.Slice(lease.From, lease.Length);

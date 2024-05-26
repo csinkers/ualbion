@@ -14,11 +14,11 @@ namespace UAlbion.Core.Veldrid;
 public sealed class ShaderCache : Component, IShaderCache
 {
     readonly object _syncRoot = new();
-    readonly IDictionary<string, CacheEntry> _cache = new Dictionary<string, CacheEntry>();
+    readonly Dictionary<string, CacheEntry> _cache = new();
     readonly string _shaderCachePath;
     IFileSystem _disk;
 
-    class CacheEntry
+    sealed class CacheEntry
     {
         public CacheEntry(ShaderDescription vertexShader, ShaderDescription fragmentShader, GraphicsBackend backend, string vertexHash, string fragmentHash)
         {
@@ -166,9 +166,9 @@ public sealed class ShaderCache : Component, IShaderCache
 
     public Shader[] GetShaderPair(ResourceFactory factory, ShaderInfo vertex, ShaderInfo fragment)
     {
-        if (factory == null) throw new ArgumentNullException(nameof(factory));
-        if (vertex == null) throw new ArgumentNullException(nameof(vertex));
-        if (fragment == null) throw new ArgumentNullException(nameof(fragment));
+        ArgumentNullException.ThrowIfNull(factory);
+        ArgumentNullException.ThrowIfNull(vertex);
+        ArgumentNullException.ThrowIfNull(fragment);
 
         lock (_syncRoot)
         {

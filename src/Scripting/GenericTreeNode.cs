@@ -30,7 +30,7 @@ public class GenericTreeNode<T>
 
     public GenericTreeNode<T> AddPath(IList<T> path, int pathOffset, Func<T, T, bool> equalityFunc)
     {
-        if (path == null) throw new ArgumentNullException(nameof(path));
+        ArgumentNullException.ThrowIfNull(path);
         if (path.Count <= pathOffset)
             return this;
 
@@ -60,7 +60,7 @@ public class GenericTreeNode<T>
 
     public GenericTreeNode<T> FindChild(T value, Func<T, T, bool> equalityFunc, bool recursive = false)
     {
-        if (equalityFunc == null) throw new ArgumentNullException(nameof(equalityFunc));
+        ArgumentNullException.ThrowIfNull(equalityFunc);
 
         foreach (GenericTreeNode<T> child in Children)
         {
@@ -80,7 +80,7 @@ public class GenericTreeNode<T>
 
     public List<T> FindPath(T value, Func<T, T, bool> equalityFunc)
     {
-        if (equalityFunc == null) throw new ArgumentNullException(nameof(equalityFunc));
+        ArgumentNullException.ThrowIfNull(equalityFunc);
 
         foreach (GenericTreeNode<T> child in Children)
         {

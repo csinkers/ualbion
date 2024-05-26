@@ -29,9 +29,8 @@ public static class ReflectionHelper
             }
 
             foreach (var type in assemblyTypes.Where(x =>
-                         x != null &&
-                         !x.IsAbstract &&
-                         x.GetCustomAttributes(false).Any()))
+                         x is { IsAbstract: false } &&
+                         x.GetCustomAttributes(false).Length > 0))
             {
                 types.Add(type);
             }

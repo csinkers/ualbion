@@ -10,7 +10,7 @@ public class AssetRangeAssetProperty : IAssetProperty<AssetRange>
     public AssetRange DefaultValue => new(AssetId.None, AssetId.None);
     public object FromJson(JsonElement elem, TypeConfig config)
     {
-        if (config == null) throw new ArgumentNullException(nameof(config));
+        ArgumentNullException.ThrowIfNull(config);
         var asString = elem.GetString();
         return config.ParseIdRange(asString);
     }

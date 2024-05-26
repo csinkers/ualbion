@@ -8,7 +8,7 @@ public static class ReduceSeseRegions
     const string Description = "Reduce SESE region";
     public static (ControlFlowGraph, string) Decompile(ControlFlowGraph graph/*, RecordFunc recordFunc = null*/)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
         var regions = graph.GetAllSeseRegions();
 
         // Do smallest regions first, as they may be nested in a larger one
@@ -89,7 +89,7 @@ public static class ReduceSeseRegions
 
     static ControlFlowGraph SeverEdge(ControlFlowGraph graph, int start, int end)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
 
         var labelName = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
         var gotoNode = UAEmit.Goto(labelName);

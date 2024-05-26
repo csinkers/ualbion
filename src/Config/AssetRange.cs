@@ -9,7 +9,7 @@ public readonly record struct AssetRange(AssetId From, AssetId To) : IEnumerable
     public IEnumerator<AssetId> GetEnumerator() => new RangeEnumerator(this);
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    class RangeEnumerator : IEnumerator<AssetId>
+    sealed class RangeEnumerator : IEnumerator<AssetId>
     {
         readonly AssetRange _range;
         public RangeEnumerator(AssetRange range) => _range = range;

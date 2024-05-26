@@ -26,7 +26,7 @@ public class MapEventZone
 
     public static MapEventZone Serdes(MapEventZone existing, ISerializer s, byte y)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
 
         s.Begin("Zone");
         bool global = y == 0xff;
@@ -54,9 +54,9 @@ public class MapEventZone
 
     public void Unswizzle(MapId mapId, Func<ushort, IEventNode> getEvent, Func<ushort, ushort> getChain, Func<ushort, IEventNode> getEventForChain)
     {
-        if (getEvent == null) throw new ArgumentNullException(nameof(getEvent));
-        if (getChain == null) throw new ArgumentNullException(nameof(getChain));
-        if (getEventForChain == null) throw new ArgumentNullException(nameof(getEventForChain));
+        ArgumentNullException.ThrowIfNull(getEvent);
+        ArgumentNullException.ThrowIfNull(getChain);
+        ArgumentNullException.ThrowIfNull(getEventForChain);
 
         ChainSource = mapId;
         if (Node is DummyEventNode dummy)

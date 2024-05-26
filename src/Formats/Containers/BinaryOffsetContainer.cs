@@ -18,7 +18,7 @@ public class BinaryOffsetContainer : IAssetContainer
 
     public ISerializer Read(string path, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         using var stream = context.Disk.OpenRead(path);
         using var br = new BinaryReader(stream);

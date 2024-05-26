@@ -13,7 +13,7 @@ public class FlicPlayer
 
     public FlicPlayer(FlicFile flic, FlicFile.GetPixelDataFunc getPixelData)
     {
-        if (flic == null) throw new ArgumentNullException(nameof(flic));
+        ArgumentNullException.ThrowIfNull(flic);
         _getPixelData = getPixelData ?? throw new ArgumentNullException(nameof(getPixelData));
 
         var pixelData = _getPixelData();

@@ -6,14 +6,14 @@ namespace UAlbion.Formats.Assets.Flic;
 public class Palette8Chunk : FlicChunk
 {
     PalettePacket[] _packets;
-    class PalettePacket
+    sealed class PalettePacket
     {
         public byte Skip { get; }
         public byte[] Triplets { get; }
 
         public PalettePacket(ISerializer s)
         {
-            if (s == null) throw new ArgumentNullException(nameof(s));
+            ArgumentNullException.ThrowIfNull(s);
             Skip = s.UInt8(null, 0);
             var copy = s.UInt8(null, 0);
 
@@ -32,7 +32,7 @@ public class Palette8Chunk : FlicChunk
     public override FlicChunkType Type => FlicChunkType.Palette8Bit;
     protected override uint LoadChunk(uint length, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         ushort packetCount = s.UInt16(null, 0);
         _packets = new PalettePacket[packetCount];
         for(int i = 0; i < packetCount; i++)

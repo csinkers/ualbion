@@ -102,7 +102,7 @@ namespace UAlbion.Core.Visual
 
         public TextureBuilder<T> Text(string text, T color, int x, int y, IFont font)
         {
-            if (font == null) throw new ArgumentNullException(nameof(font));
+            ArgumentNullException.ThrowIfNull(font);
             if (text == null)
                 return this;
 

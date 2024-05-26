@@ -13,7 +13,7 @@ public class ChangeIconEvent : MapEvent
     // MapEvent as this method handles ChangeIconEvent, ChangeNpcSpriteEvent and ChangeNpcMovementEvent
     public static MapEvent Serdes(MapEvent me, AssetMapping mapping, MapType mapType, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         if (me is ChangeNpcSpriteEvent cnse)
             return ChangeNpcSpriteEvent.Serdes(cnse, mapping, mapType, s);
 

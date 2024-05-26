@@ -51,12 +51,12 @@ public static class ObjectGroupMapping
         List<AutomapInfo> markers,
         List<byte> markerTiles)
     {
-        if (map == null) throw new ArgumentNullException(nameof(map));
-        if (triggers == null) throw new ArgumentNullException(nameof(triggers));
-        if (npcs == null) throw new ArgumentNullException(nameof(npcs));
-        if (zones == null) throw new ArgumentNullException(nameof(zones));
-        if (markers == null) throw new ArgumentNullException(nameof(markers));
-        if (markerTiles == null) throw new ArgumentNullException(nameof(markerTiles));
+        ArgumentNullException.ThrowIfNull(map);
+        ArgumentNullException.ThrowIfNull(triggers);
+        ArgumentNullException.ThrowIfNull(npcs);
+        ArgumentNullException.ThrowIfNull(zones);
+        ArgumentNullException.ThrowIfNull(markers);
+        ArgumentNullException.ThrowIfNull(markerTiles);
 
         ushort ResolveEntryPoint(string name)
         {

@@ -112,7 +112,7 @@ public class TileData // 8 bytes per tile
     public TileData() { }
     public TileData(TileData other) // Make a copy
     {
-        if (other == null) throw new ArgumentNullException(nameof(other));
+        ArgumentNullException.ThrowIfNull(other);
         _raw       = other._raw;
         Index       = other.Index;
         Layer       = other.Layer;
@@ -142,7 +142,7 @@ public class TileData // 8 bytes per tile
 
     public static TileData Serdes(int _, TileData t, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         t ??= new TileData();
         t._raw = s.EnumU32(nameof(_raw), t._raw); // 0
         t.ImageNumber = s.UInt16(nameof(ImageNumber), t.ImageNumber); // 4

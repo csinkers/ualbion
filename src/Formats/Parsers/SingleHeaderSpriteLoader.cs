@@ -14,12 +14,12 @@ public class SingleHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 
     public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
 
         if (s.IsWriting())
         {
-            if (existing == null) throw new ArgumentNullException(nameof(existing));
+            ArgumentNullException.ThrowIfNull(existing);
             Write(existing, s);
             return existing;
         }
@@ -27,7 +27,7 @@ public class SingleHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
         return Read(context, s);
     }
 
-    static IReadOnlyTexture<byte> Read(AssetLoadContext context, ISerializer s)
+    static SimpleTexture<byte> Read(AssetLoadContext context, ISerializer s)
     {
         ushort width = s.UInt16("Width", 0);
         ushort height = s.UInt16("Height", 0);

@@ -19,7 +19,7 @@ public class SetPartyLeaderEvent : ModifyEvent
 
     public static SetPartyLeaderEvent Serdes(SetPartyLeaderEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new SetPartyLeaderEvent();
         e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);
         e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);

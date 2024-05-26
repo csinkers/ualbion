@@ -29,7 +29,7 @@ public class RenderSystemBuilder
     /// </summary>
     public RenderSystemBuilder Action(Action action)
     {
-        if (action == null) throw new ArgumentNullException(nameof(action));
+        ArgumentNullException.ThrowIfNull(action);
         Check();
         action();
         return this;
@@ -51,7 +51,7 @@ public class RenderSystemBuilder
 
     public RenderSystemBuilder Pass(string name, Func<RenderPassBuilder, RenderPass> builderFunc)
     {
-        if (builderFunc == null) throw new ArgumentNullException(nameof(builderFunc));
+        ArgumentNullException.ThrowIfNull(builderFunc);
 
         Check();
         _passes.Add(name, builderFunc(RenderPassBuilder.Create(name, this, _manager)));

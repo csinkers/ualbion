@@ -14,7 +14,7 @@ public class StringSetStringLoader : Component, IAssetLoader<string>
     public static readonly AssetIdAssetProperty<TextId> FirstIdProperty = new("FirstId", TextId.None, x => x);
     public string Serdes(string existing, ISerializer s, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         if (existing != null)
             throw new NotSupportedException($"{nameof(StringSetStringLoader)} is read-only");

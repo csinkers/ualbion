@@ -56,7 +56,7 @@ public class UiSpriteElement : UiElement
 
     public override int Selection(Rectangle extents, int order, SelectionContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         if (extents.Contains((int)context.UiPosition.X, (int)context.UiPosition.Y))
             context.AddHit(order, this);
         return order;

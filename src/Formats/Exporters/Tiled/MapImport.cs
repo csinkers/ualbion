@@ -10,7 +10,7 @@ public static class MapImport
 {
     public static BaseMapData ToAlbion(this Map map, AssetId assetId, string script)
     {
-        if (map == null) throw new ArgumentNullException(nameof(map));
+        ArgumentNullException.ThrowIfNull(map);
 
         // Check width/height <= 255
         if (map.Width > 256) throw new FormatException($"Map widths above 256 are not currently supported (was {map.Width})");

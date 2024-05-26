@@ -34,7 +34,7 @@ public class AssetProperties
 
     public void LoadAssetPropertiesFromType(bool loadGlobal, Type type)
     {
-        if (type == null) throw new ArgumentNullException(nameof(type));
+        ArgumentNullException.ThrowIfNull(type);
         var properties = type.GetProperties(BindingFlags.Static | BindingFlags.Public);
         foreach (var property in properties)
         {

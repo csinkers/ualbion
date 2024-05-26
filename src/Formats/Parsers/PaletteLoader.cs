@@ -17,7 +17,7 @@ public class PaletteLoader : IAssetLoader<AlbionPalette>
 
     public AlbionPalette Serdes(AlbionPalette existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         return AlbionPalette.Serdes(existing, context, s);
     }
 }

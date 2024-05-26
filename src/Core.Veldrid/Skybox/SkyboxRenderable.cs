@@ -15,8 +15,8 @@ public sealed class SkyboxRenderable : Component, ISkybox
 
     internal SkyboxRenderable(ITextureHolder texture, ISamplerHolder sampler, SkyboxManager manager, ICamera camera)
     {
-        if (texture == null) throw new ArgumentNullException(nameof(texture));
-        if (sampler == null) throw new ArgumentNullException(nameof(sampler));
+        ArgumentNullException.ThrowIfNull(texture);
+        ArgumentNullException.ThrowIfNull(sampler);
         _manager = manager;
 
         _uniformBuffer = new SingleBuffer<SkyboxUniformInfo>(new SkyboxUniformInfo(), BufferUsage.UniformBuffer, "SpriteUniformBuffer");

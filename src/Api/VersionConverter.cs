@@ -16,7 +16,7 @@ public class VersionConverter : JsonConverter<Version>
 
     public override void Write(Utf8JsonWriter writer, Version value, JsonSerializerOptions options)
     {
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        ArgumentNullException.ThrowIfNull(writer);
         if (value == null)
             writer.WriteNullValue();
         else

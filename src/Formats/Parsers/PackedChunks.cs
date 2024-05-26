@@ -11,7 +11,7 @@ public static class PackedChunks
     // Format: u32 count; [ u32 size; byte[size] chunk ]
     public static IEnumerable<(byte[], string)> Unpack(ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         var initial = s.Offset;
         if (s.BytesRemaining < Magic.Length)
         {
@@ -42,8 +42,8 @@ public static class PackedChunks
 
     public static void PackNamed(ISerializer s, int count, Func<int, (byte[], string)> buildChunk)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (buildChunk == null) throw new ArgumentNullException(nameof(buildChunk));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(buildChunk);
 
         if (count == 1)
         {

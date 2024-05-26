@@ -12,7 +12,7 @@ public class WaveLib
     Dictionary<int, WaveLibSample> _instrumentIndex;
     public static WaveLib Serdes(WaveLib w, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         w ??= new WaveLib();
         w.Samples ??= new WaveLibSample[512];
         uint offset = WaveLibSample.SizeInBytes * MaxSamples;

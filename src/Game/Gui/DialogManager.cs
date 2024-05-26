@@ -20,7 +20,7 @@ public class DialogManager  : ServiceComponent<IDialogManager>, IDialogManager
 
     public T AddDialog<T>(Func<int, T> constructor) where T : ModalDialog
     {
-        if (constructor == null) throw new ArgumentNullException(nameof(constructor));
+        ArgumentNullException.ThrowIfNull(constructor);
         return AttachChild(constructor(MaxLayer + 1));
     }
 

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using SerdesNet;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api.Visual;
@@ -20,13 +19,13 @@ namespace UAlbion.Game.Veldrid.Assets;
 
 public class PngSheetLoader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>> // For fonts etc
 {
-    static byte[] Write(IImageEncoder encoder, uint[] palette, IReadOnlyTexture<byte> existing)
+    static byte[] Write(PngEncoder encoder, uint[] palette, IReadOnlyTexture<byte> existing)
     {
         using var image = ImageSharpUtil.PackSpriteSheet(palette, existing.Regions.Count, existing.GetRegionBuffer);
         return FormatUtil.BytesFromStream(stream => encoder.Encode(image, stream));
     }
 
-    static IReadOnlyTexture<byte> Read(AssetId id, uint[] palette, AssetId paletteId, Image<Rgba32> image,
+    static SimpleTexture<byte> Read(AssetId id, uint[] palette, AssetId paletteId, Image<Rgba32> image,
         int subItemWidth, int subItemHeight)
     {
         var pixels = new byte[image.Width * image.Height];
@@ -58,8 +57,8 @@ public class PngSheetLoader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>
 
     public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
 
         var paletteId = context.GetProperty(AssetProps.Palette);
         if (paletteId.IsNone)
@@ -71,8 +70,7 @@ public class PngSheetLoader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>
 
         if (s.IsWriting())
         {
-            if (existing == null)
-                throw new ArgumentNullException(nameof(existing));
+            ArgumentNullException.ThrowIfNull(existing);
             var encoder = new PngEncoder();
             var bytes = Write(encoder, palette, existing);
             s.Bytes(null, bytes, bytes.Length);

@@ -27,49 +27,49 @@ public static class WindowManagerExtensions
 {
     public static Vector2 UiToNorm(this IGameWindow wm, float x, float y)
     {
-        if (wm == null) throw new ArgumentNullException(nameof(wm));
+        ArgumentNullException.ThrowIfNull(wm);
         return wm.UiToNorm(new Vector2(x, y));
     }
 
     public static Vector2 NormToUi(this IGameWindow wm, float x, float y)
     {
-        if (wm == null) throw new ArgumentNullException(nameof(wm));
+        ArgumentNullException.ThrowIfNull(wm);
         return wm.NormToUi(new Vector2(x, y));
     }
 
     public static Vector2 NormToPixel(this IGameWindow wm, float x, float y)
     {
-        if (wm == null) throw new ArgumentNullException(nameof(wm));
+        ArgumentNullException.ThrowIfNull(wm);
         return wm.NormToPixel(new Vector2(x, y));
     }
 
     public static Vector2 PixelToNorm(this IGameWindow wm, float x, float y)
     {
-        if (wm == null) throw new ArgumentNullException(nameof(wm));
+        ArgumentNullException.ThrowIfNull(wm);
         return wm.PixelToNorm(new Vector2(x, y));
     }
 
     public static Vector2 UiToNormRelative(this IGameWindow wm, float x, float y)
     {
-        if (wm == null) throw new ArgumentNullException(nameof(wm));
+        ArgumentNullException.ThrowIfNull(wm);
         return wm.UiToNormRelative(new Vector2(x, y));
     }
 
     public static Vector2 NormToUiRelative(this IGameWindow wm, float x, float y)
     {
-        if (wm == null) throw new ArgumentNullException(nameof(wm));
+        ArgumentNullException.ThrowIfNull(wm);
         return wm.NormToUiRelative(new Vector2(x, y));
     }
 
     public static Vector2 NormToPixelRelative(this IGameWindow wm, float x, float y)
     {
-        if (wm == null) throw new ArgumentNullException(nameof(wm));
+        ArgumentNullException.ThrowIfNull(wm);
         return wm.NormToPixelRelative(new Vector2(x, y));
     }
 
     public static Vector2 PixelToNormRelative(this IGameWindow wm, float x, float y)
     {
-        if (wm == null) throw new ArgumentNullException(nameof(wm));
+        ArgumentNullException.ThrowIfNull(wm);
         return wm.PixelToNormRelative(new Vector2(x, y));
     }
 }

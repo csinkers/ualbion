@@ -16,11 +16,11 @@ namespace UAlbion.Api.Eventing
     {
         readonly object _syncRoot = new();
         [DiagIgnore] readonly ILogExchange _logExchange;
-        [DiagIgnore] readonly PooledThreadSafe<List<Handler>> _dispatchLists = new(() => new List<Handler>(), x => x.Clear());
-        [DiagIgnore] readonly DoubleBuffered<List<(IEvent Event, object Sender)>> _queuedEvents = new(() => new List<(IEvent Event, object Sender)>());
-        readonly IDictionary<Type, object> _registrations = new Dictionary<Type, object>();
-        readonly IDictionary<Type, List<Handler>> _subscriptions = new Dictionary<Type, List<Handler>>();
-        readonly IDictionary<IComponent, List<Handler>> _subscribers = new Dictionary<IComponent, List<Handler>>();
+        [DiagIgnore] readonly PooledThreadSafe<List<Handler>> _dispatchLists = new(() => new(), x => x.Clear());
+        [DiagIgnore] readonly DoubleBuffered<List<(IEvent Event, object Sender)>> _queuedEvents = new(() => new());
+        readonly Dictionary<Type, object> _registrations = new();
+        readonly Dictionary<Type, List<Handler>> _subscriptions = new();
+        readonly Dictionary<IComponent, List<Handler>> _subscribers = new();
 
         [DiagIgnore] int _nesting = -1;
         [DiagIgnore] long _nextEventId;
@@ -62,7 +62,7 @@ namespace UAlbion.Api.Eventing
 
         public EventExchange Attach(IComponent component)
         {
-            if (component == null) throw new ArgumentNullException(nameof(component));
+            ArgumentNullException.ThrowIfNull(component);
             // Stopwatch sw = Stopwatch.StartNew();
             component.Attach(this);
             // PerfTracker.StartupEvent($"Attached {component.GetType().Name} in {sw.ElapsedMilliseconds}ms");
@@ -101,7 +101,7 @@ namespace UAlbion.Api.Eventing
                 }
             }
 
-            return new AlbionTask<int>(0);
+            return new(0);
         }
 
         // [DebuggerHidden, StackTraceHidden]
@@ -120,7 +120,7 @@ namespace UAlbion.Api.Eventing
                         syncHandler.Invoke(e);
                         break;
                     case IAsyncHandler asyncHandler:
-                        core ??= new AlbionTaskCore<Unit>($"RaiseAInvoker helper for {e.GetType()} from {sender}");
+                        core ??= new($"RaiseAInvoker helper for {e.GetType()} from {sender}");
 
                         var innerTask = asyncHandler.InvokeAsAsync(e);
                         if (!innerTask.IsCompleted)
@@ -178,7 +178,7 @@ namespace UAlbion.Api.Eventing
 
             if (!hasResult) throw new InvalidOperationException("No result found for RaiseQuery call");
 
-            return new AlbionTask<T>(result);
+            return new(result);
         }
 
         // [DebuggerHidden, StackTraceHidden]
@@ -235,7 +235,7 @@ namespace UAlbion.Api.Eventing
             TContext context,
             InvokerFunc<TEvent, TResult, TContext> invoker) where TEvent : IEvent
         {
-            if (e == null) throw new ArgumentNullException(nameof(e));
+            ArgumentNullException.ThrowIfNull(e);
             bool verbose = e is IVerboseEvent;
             long eventId = Interlocked.Increment(ref _nextEventId);
             string eventText = LogRaise(e, verbose, eventId, sender);
@@ -365,7 +365,7 @@ namespace UAlbion.Api.Eventing
 
         public void Subscribe(Handler handler)
         {
-            if (handler == null) throw new ArgumentNullException(nameof(handler));
+            ArgumentNullException.ThrowIfNull(handler);
             lock (_syncRoot)
             {
                 if (!handler.ShouldSubscribe)
@@ -378,13 +378,13 @@ namespace UAlbion.Api.Eventing
                 }
                 else
                 {
-                    _subscribers[handler.Component] = new List<Handler>();
+                    _subscribers[handler.Component] = new();
                 }
 
                 if (handler.Type != null)
                 {
                     if (!_subscriptions.ContainsKey(handler.Type))
-                        _subscriptions.Add(handler.Type, new List<Handler>());
+                        _subscriptions.Add(handler.Type, new());
 
                     _subscriptions[handler.Type].Add(handler);
                     _subscribers[handler.Component].Add(handler);
@@ -436,16 +436,15 @@ namespace UAlbion.Api.Eventing
         {
             lock (_syncRoot)
             {
-                if (_registrations.ContainsKey(type))
+                if (!_registrations.TryAdd(type, system))
                 {
                     if (_registrations[type] != system)
-                        throw new InvalidOperationException(
-                            "Only one instance can be registered per type / interface in a given exchange.");
+                        throw new InvalidOperationException("Only one instance can be registered per type / interface in a given exchange.");
+
                     attach = false;
                 }
                 else
                 {
-                    _registrations.Add(type, system);
                     attach &= system is IComponent component && !_subscribers.ContainsKey(component);
                 }
             }
@@ -458,7 +457,7 @@ namespace UAlbion.Api.Eventing
 
         public void Unregister(object system)
         {
-            if (system == null) throw new ArgumentNullException(nameof(system));
+            ArgumentNullException.ThrowIfNull(system);
             Unregister(system.GetType(), system);
             foreach (var i in system.GetType().GetInterfaces())
                 Unregister(i, system);
@@ -481,7 +480,7 @@ namespace UAlbion.Api.Eventing
 
         public IEnumerable<IComponent> EnumerateRecipients(Type eventType)
         {
-            if (eventType == null) throw new ArgumentNullException(nameof(eventType));
+            ArgumentNullException.ThrowIfNull(eventType);
             lock (_syncRoot)
             {
                 var subscribers = new List<Handler>();

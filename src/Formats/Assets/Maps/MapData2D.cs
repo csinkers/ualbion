@@ -71,8 +71,8 @@ public class MapData2D : BaseMapData
 
     public static MapData2D Serdes(AssetId id, MapData2D existing, AssetMapping mapping, ISerializer s)
     {
-        if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(mapping);
+        ArgumentNullException.ThrowIfNull(s);
 
         var startOffset = s.Offset;
         var map = existing ?? new MapData2D { Id = id };

@@ -40,7 +40,7 @@ public sealed class MeshRenderer : Component, IRenderer, IDisposable
         var globalSet = (GlobalSet)set1 ?? throw new ArgumentNullException(nameof(set1));
         var renderPassSet = (MainPassSet)set2 ?? throw new ArgumentNullException(nameof(set2));
 
-        if (cl == null) throw new ArgumentNullException(nameof(cl));
+        ArgumentNullException.ThrowIfNull(cl);
         if (renderable is not MeshBatch batch)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
@@ -71,9 +71,9 @@ public sealed class MeshRenderer : Component, IRenderer, IDisposable
 
 [VertexShader(typeof(MeshVertexShader))]
 [FragmentShader(typeof(MeshFragmentShader))]
-partial class MeshPipeline : PipelineHolder { }
+sealed partial class MeshPipeline : PipelineHolder { }
 
-partial class MeshResourceSet : ResourceSetHolder
+sealed partial class MeshResourceSet : ResourceSetHolder
 {
     [Texture("Diffuse", ShaderStages.Fragment)] ITextureHolder _diffuse;
     [Sampler("Sampler", ShaderStages.Fragment)] ISamplerHolder _sampler;
@@ -88,7 +88,7 @@ partial class MeshResourceSet : ResourceSetHolder
 [ResourceSet(2, typeof(MeshResourceSet))]
 [Output(0, typeof(MeshIntermediate))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-partial class MeshVertexShader : IVertexShader { }
+sealed partial class MeshVertexShader : IVertexShader { }
 
 [Name("MeshSF.frag")]
 [Input(0, typeof(MeshIntermediate))]
@@ -97,7 +97,7 @@ partial class MeshVertexShader : IVertexShader { }
 [ResourceSet(2, typeof(MeshResourceSet))]
 [Output(0, typeof(SimpleFramebuffer))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-partial class MeshFragmentShader : IFragmentShader { }
+sealed partial class MeshFragmentShader : IFragmentShader { }
 
 public partial struct MeshVertex : IVertexFormat
 { // Should match Veldrid.Utilities.VertexPositionNormalTexture exactly as Unsafe.As is used for casting

@@ -65,7 +65,7 @@ public static class ReflectorUtil
 
     public static T GetAuxiliaryState<T>(in ReflectorState state, string type, Func<ReflectorState, T> auxStateBuilder)
     {
-        if (auxStateBuilder == null) throw new ArgumentNullException(nameof(auxStateBuilder));
+        ArgumentNullException.ThrowIfNull(auxStateBuilder);
 
         lock (AuxState)
         {

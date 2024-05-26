@@ -25,21 +25,21 @@ public readonly struct AssetId : IEquatable<AssetId>, IComparable, IAssetId
 
     public int ToDisk(AssetMapping mapping)
     {
-        if (mapping == null) throw new ArgumentNullException(nameof(mapping));
+        ArgumentNullException.ThrowIfNull(mapping);
         var (enumType, enumValue) = AssetMapping.Global.IdToEnum(this);
         return mapping.EnumToId(enumType, enumValue).Id;
     }
 
     public static AssetId FromDisk(AssetType type, int disk, AssetMapping mapping)
     {
-        if (mapping == null) throw new ArgumentNullException(nameof(mapping));
+        ArgumentNullException.ThrowIfNull(mapping);
         var (enumType, enumValue) = mapping.IdToEnum(new AssetId(type, disk));
         return AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
     public static AssetId SerdesU8(string name, AssetId id, AssetType type, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
 
         byte diskValue = (byte)id.ToDisk(mapping);
         diskValue = s.UInt8(name, diskValue);
@@ -48,8 +48,8 @@ public readonly struct AssetId : IEquatable<AssetId>, IComparable, IAssetId
 
     public static AssetId SerdesU16(string name, AssetId id, AssetType type, AssetMapping mapping, ISerializer s)
     {
-        if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(mapping);
+        ArgumentNullException.ThrowIfNull(s);
         var (enumType, enumValue) = AssetMapping.Global.IdToEnum(id);
         ushort diskValue = (ushort)mapping.EnumToId(enumType, enumValue).Id;
 

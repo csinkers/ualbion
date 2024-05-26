@@ -39,7 +39,7 @@ public class MonsterData
     public MonsterData DeepCopy() => new MonsterData().CopyFrom(this);
     public MonsterData CopyFrom(MonsterData other)
     {
-        if (other == null) throw new ArgumentNullException(nameof(other));
+        ArgumentNullException.ThrowIfNull(other);
 
         MonsterGraphics = other.MonsterGraphics;
         Unk1 = other.Unk1;

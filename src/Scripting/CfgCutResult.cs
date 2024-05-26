@@ -23,7 +23,7 @@ public class CfgCutResult
 
     public ControlFlowGraph Merge(ControlFlowGraph restructured)
     {
-        if (restructured == null) throw new ArgumentNullException(nameof(restructured));
+        ArgumentNullException.ThrowIfNull(restructured);
 
         var (updated, mapping) = Remainder.Merge(restructured);
 

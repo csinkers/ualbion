@@ -137,7 +137,7 @@ public class UiText : UiElement
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
-        if (func == null) throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
 
         Rebuild(extents);
 

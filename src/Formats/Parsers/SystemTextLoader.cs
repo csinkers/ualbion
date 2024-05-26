@@ -16,7 +16,7 @@ public class SystemTextLoader : IAssetLoader<IntStringDictionary>
 
     public IntStringDictionary Serdes(IntStringDictionary existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         if (s.IsWriting()) throw new NotImplementedException("Saving of system text not currently supported");
         var results = new IntStringDictionary();
         var bytes = s.Bytes(null, null, (int)s.BytesRemaining);

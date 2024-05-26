@@ -38,14 +38,14 @@ public class Map : ITiledPropertySource
 
     public static Map Load(string path, IFileSystem disk)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(disk);
         using var stream = disk.OpenRead(path);
         return Parse(stream);
     }
 
     public void Save(string path, IFileSystem disk)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(disk);
         var dir = Path.GetDirectoryName(path);
         foreach (var tileset in Tilesets)
             tileset.Source = ConfigUtil.GetRelativePath(tileset.Source, dir, false);

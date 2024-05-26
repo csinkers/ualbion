@@ -8,7 +8,7 @@ using UAlbion.Formats;
 
 namespace UAlbion;
 
-class FrameStats
+sealed class FrameStats
 {
     static void StatsForEnum<T>(IAssetManager assets, Dictionary<AssetId, int> dict) where T : unmanaged, Enum
     {

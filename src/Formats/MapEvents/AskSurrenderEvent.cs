@@ -9,7 +9,7 @@ public class AskSurrenderEvent : MapEvent
 {
     public static AskSurrenderEvent Serdes(AskSurrenderEvent e, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new AskSurrenderEvent();
         e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);
         e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);

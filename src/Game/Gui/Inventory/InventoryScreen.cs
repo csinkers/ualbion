@@ -15,8 +15,8 @@ public class InventoryScreen : Dialog
         PartyMemberId activeCharacter,
         Func<InventoryPage> getPage) : base(DialogPositioning.TopLeft)
     {
-        if (modeEvent == null) throw new ArgumentNullException(nameof(modeEvent));
-        if (getPage == null) throw new ArgumentNullException(nameof(getPage));
+        ArgumentNullException.ThrowIfNull(modeEvent);
+        ArgumentNullException.ThrowIfNull(getPage);
 
         var leftPane =
             modeEvent switch

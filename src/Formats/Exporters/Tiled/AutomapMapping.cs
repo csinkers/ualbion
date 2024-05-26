@@ -18,7 +18,7 @@ public static class AutomapMapping
 
     public static IEnumerable<ObjectGroup> BuildMarkers(MapData3D map, int tileWidth, int tileHeight, ref int nextObjectGroupId, ref int nextObjectId)
     {
-        if (map == null) throw new ArgumentNullException(nameof(map));
+        ArgumentNullException.ThrowIfNull(map);
 
         if (map.Automap == null || map.Automap.Count == 0 || map.AutomapGraphics == null)
             return Enumerable.Empty<ObjectGroup>();
@@ -59,7 +59,7 @@ public static class AutomapMapping
 
     public static (AutomapInfo, byte) ParseMarker(MapObject obj, int tileWidth, int tileHeight)
     {
-        if (obj == null) throw new ArgumentNullException(nameof(obj));
+        ArgumentNullException.ThrowIfNull(obj);
 
         var unk2 = obj.PropInt(Prop.Unk2) ?? 0;
         var unk3 = obj.PropInt(Prop.Unk3) ?? 0;

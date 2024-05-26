@@ -26,7 +26,7 @@ public class SimpleChestEvent : MapEvent
 
     public static SimpleChestEvent Serdes(SimpleChestEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new SimpleChestEvent();
         e.ChestType = s.EnumU8(nameof(ChestType), e.ChestType);
         uint padding = s.UInt32(nameof(padding), 0);

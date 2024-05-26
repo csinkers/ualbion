@@ -17,7 +17,7 @@ public class SpellListContainer : IAssetContainer
     static readonly byte[] Blank = { 0, 0, 0, 0, 0 };
     public ISerializer Read(string path, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         var stream = context.Disk.OpenRead(path);
         var br = new BinaryReader(stream);
@@ -27,7 +27,7 @@ public class SpellListContainer : IAssetContainer
 
     public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         var dir = Path.GetDirectoryName(path);
         if (!context.Disk.DirectoryExists(dir))

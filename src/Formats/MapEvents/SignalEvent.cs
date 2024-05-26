@@ -12,7 +12,7 @@ public class SignalEvent : MapEvent
 
     public static SignalEvent Serdes(SignalEvent e, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new SignalEvent();
         e.SignalId = s.UInt8(nameof(SignalId), e.SignalId);
         int zeroed = s.UInt8(null, 0);

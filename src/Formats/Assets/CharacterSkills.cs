@@ -25,7 +25,7 @@ public class CharacterSkills : ICharacterSkills
     public CharacterSkills DeepClone() => new CharacterSkills().CopyFrom(this);
     public CharacterSkills CopyFrom(CharacterSkills other)
     {
-        if (other == null) throw new ArgumentNullException(nameof(other));
+        ArgumentNullException.ThrowIfNull(other);
 
         CloseCombat = other.CloseCombat.DeepClone();
         RangedCombat = other.RangedCombat.DeepClone();

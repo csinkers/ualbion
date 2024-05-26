@@ -19,7 +19,7 @@ namespace UAlbion.Game.Veldrid.Assets;
 
 public class Png32Loader : Component, IAssetLoader<IReadOnlyTexture<uint>>
 {
-    static byte[] Write(IImageEncoder encoder, IReadOnlyTexture<uint> existing, int frameNum)
+    static byte[] Write(PngEncoder encoder, IReadOnlyTexture<uint> existing, int frameNum)
     {
         var frame = existing.Regions[frameNum];
         var buffer = new ReadOnlyImageBuffer<uint>(
@@ -32,7 +32,7 @@ public class Png32Loader : Component, IAssetLoader<IReadOnlyTexture<uint>>
         return FormatUtil.BytesFromStream(stream => encoder.Encode(image, stream));
     }
 
-    static IReadOnlyTexture<uint> Read(AssetId id, IList<Image<Rgba32>> images)
+    static SimpleTexture<uint> Read(AssetId id, IList<Image<Rgba32>> images)
     {
         int totalWidth = images.Max(x => x.Width);
         int totalHeight = images.Sum(x => x.Height);
@@ -65,13 +65,12 @@ public class Png32Loader : Component, IAssetLoader<IReadOnlyTexture<uint>>
 
     public IReadOnlyTexture<uint> Serdes(IReadOnlyTexture<uint> existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
 
         if (s.IsWriting())
         {
-            if (existing == null)
-                throw new ArgumentNullException(nameof(existing));
+            ArgumentNullException.ThrowIfNull(existing);
 
             var encoder = new PngEncoder();
             PackedChunks.Pack(s, existing.Regions.Count, frameNum => Write(encoder, existing, frameNum));

@@ -9,10 +9,10 @@ public class Utf8Loader : IAssetLoader<string>
 {
     public string Serdes(string existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         if(s.IsWriting())
         {
-            if (existing == null) throw new ArgumentNullException(nameof(existing));
+            ArgumentNullException.ThrowIfNull(existing);
             var bytes = Encoding.UTF8.GetBytes(existing);
             s.Bytes(null, bytes, bytes.Length);
             return existing;

@@ -21,7 +21,7 @@ public class NpcMoveState
 
     public static NpcMoveState Serdes(NpcMoveState ms, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
 
         ms ??= new NpcMoveState();
         s.Begin("NpcMoveState");

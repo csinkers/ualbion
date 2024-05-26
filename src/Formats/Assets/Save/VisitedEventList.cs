@@ -13,7 +13,7 @@ public class VisitedEventList
 
     public static VisitedEventList Serdes(int _, VisitedEventList c, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         c ??= new VisitedEventList();
         c.Size = s.UInt32(nameof(Size), c.Size);
         c.NumChunks = s.UInt16(nameof(NumChunks), c.NumChunks);

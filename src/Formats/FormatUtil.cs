@@ -29,7 +29,7 @@ public static class FormatUtil
 
     public static byte[] BytesFrom850String(string str)
     {
-        if (str == null) throw new ArgumentNullException(nameof(str));
+        ArgumentNullException.ThrowIfNull(str);
         return AlbionEncoding.GetBytes(str.Replace('ß', '×'));
     }
 
@@ -133,7 +133,7 @@ public static class FormatUtil
 
     public static byte[] BytesFromTextWriter([InstantHandle] Action<TextWriter> func)
     {
-        if (func == null) throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
         using var ms = new MemoryStream();
         using var tw = new StreamWriter(ms);
         func(tw);
@@ -144,7 +144,7 @@ public static class FormatUtil
 
     public static byte[] BytesFromStream([InstantHandle] Action<Stream> func)
     {
-        if (func == null) throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
         using var stream = new MemoryStream();
         func(stream);
         stream.Position = 0;
@@ -153,7 +153,7 @@ public static class FormatUtil
 
     public static ISerializer SerializeWithSerdes([InstantHandle] Action<ISerializer> serdes)
     {
-        if (serdes == null) throw new ArgumentNullException(nameof(serdes));
+        ArgumentNullException.ThrowIfNull(serdes);
         var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms, AlbionEncoding, true);
         using var s = new AlbionWriter(bw);
@@ -171,7 +171,7 @@ public static class FormatUtil
 
     public static byte[] SerializeToBytes([InstantHandle] Action<ISerializer> serdes)
     {
-        if (serdes == null) throw new ArgumentNullException(nameof(serdes));
+        ArgumentNullException.ThrowIfNull(serdes);
         var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms, AlbionEncoding, true);
         using var s = new AlbionWriter(bw);
@@ -183,7 +183,7 @@ public static class FormatUtil
 
     public static T DeserializeFromBytes<T>(byte[] bytes, [InstantHandle] Func<ISerializer, T> serdes)
     {
-        if (serdes == null) throw new ArgumentNullException(nameof(serdes));
+        ArgumentNullException.ThrowIfNull(serdes);
         using var ms = new MemoryStream(bytes);
         var br = new BinaryReader(ms);
         using var s = new AlbionReader(br);
@@ -192,7 +192,7 @@ public static class FormatUtil
 
     public static string GetReducedSha256HexString(string filename, IFileSystem disk)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(disk);
 
         using var sha256 = SHA256.Create();
         using var stream = disk.OpenRead(filename);

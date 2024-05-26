@@ -19,7 +19,7 @@ public class EventMetadata
 
     public EventMetadata(Type type)
     {
-        if (type == null) throw new ArgumentNullException(nameof(type));
+        ArgumentNullException.ThrowIfNull(type);
         var eventAttribute = (EventAttribute)type.GetCustomAttribute(typeof(EventAttribute), false);
         if (eventAttribute == null)
             throw new InvalidOperationException($"Event type {type} is missing an Event attribute");
@@ -66,7 +66,7 @@ public class EventMetadata
 
     public void Serialize(IScriptBuilder builder, object instance)
     {
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
         builder.Add(ScriptPartType.EventName, Name);
 
         int skipCount = 0;
@@ -93,8 +93,8 @@ public class EventMetadata
 
     public static void SerializePart(IScriptBuilder builder, EventPartMetadata part, object value)
     {
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
-        if (part == null) throw new ArgumentNullException(nameof(part));
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(part);
 
         switch (value)
         {

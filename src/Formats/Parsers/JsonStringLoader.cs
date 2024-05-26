@@ -9,8 +9,8 @@ public class JsonStringLoader : IAssetLoader
 {
     public object Serdes(object existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
         var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
         return context.Json.Deserialize<IntStringDictionary>(bytes);
     }

@@ -10,7 +10,7 @@ public class CharacterSheetLoader : Component, IAssetLoader<CharacterSheet>
 {
     public CharacterSheet Serdes(CharacterSheet existing, ISerializer s, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         return CharacterSheet.Serdes(context.AssetId, existing, context.Mapping, s, Resolve<ISpellManager>());
     }
 

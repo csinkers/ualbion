@@ -11,7 +11,7 @@ public class CustomVar<TLogical, TPersistent> : IVar<TLogical>
 
     public CustomVar(VarLibrary library, string key, TLogical defaultValue, Func<TLogical, TPersistent> castTo, Func<TPersistent, TLogical> castFrom, Func<JsonElement, TPersistent> castJson)
     {
-        if (library == null) throw new ArgumentNullException(nameof(library));
+        ArgumentNullException.ThrowIfNull(library);
         Key = key;
         DefaultValue = defaultValue;
         _castTo = castTo ?? throw new ArgumentNullException(nameof(castTo));
@@ -27,7 +27,7 @@ public class CustomVar<TLogical, TPersistent> : IVar<TLogical>
 
     public TLogical Read(IVarSet varSet)
     {
-        if (varSet == null) throw new ArgumentNullException(nameof(varSet));
+        ArgumentNullException.ThrowIfNull(varSet);
         if (varSet.TryGetValue(Key, out var objValue))
         {
             if (objValue is TPersistent value) return _castFrom(value);
@@ -40,13 +40,13 @@ public class CustomVar<TLogical, TPersistent> : IVar<TLogical>
 
     public void Write(ISettings varSet, TLogical value)
     {
-        if (varSet == null) throw new ArgumentNullException(nameof(varSet));
+        ArgumentNullException.ThrowIfNull(varSet);
         varSet.SetValue(Key, _castTo(value));
     }
 
     public void WriteFromString(ISettings varSet, string value)
     {
-        if (varSet == null) throw new ArgumentNullException(nameof(varSet));
+        ArgumentNullException.ThrowIfNull(varSet);
         var doc = JsonDocument.Parse(value);
         var typedValue = _castJson(doc.RootElement);
         varSet.SetValue(Key, typedValue);

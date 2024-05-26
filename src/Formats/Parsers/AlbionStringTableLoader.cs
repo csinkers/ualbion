@@ -10,7 +10,7 @@ public class AlbionStringTableLoader : IAssetLoader<ListStringSet>
 {
     public ListStringSet Serdes(ListStringSet existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         if (s.IsReading())
         {
             var stringCount = s.UInt16("StringCount", 0);
@@ -25,7 +25,7 @@ public class AlbionStringTableLoader : IAssetLoader<ListStringSet>
         }
         else
         {
-            if (existing == null) throw new ArgumentNullException(nameof(existing));
+            ArgumentNullException.ThrowIfNull(existing);
             var stringCount = s.UInt16("StringCount", (ushort)existing.Count);
             var byteArrays = existing.Select(FormatUtil.BytesFrom850String).ToArray();
             for (int i = 0; i < stringCount; i++)

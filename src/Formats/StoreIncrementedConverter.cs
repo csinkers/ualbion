@@ -15,31 +15,31 @@ public sealed class StoreIncrementedConverter :
     StoreIncrementedConverter() { }
     public static byte Serdes(string name, byte existing, Func<string, byte, byte, byte> serializer)
     {
-        if (serializer == null) throw new ArgumentNullException(nameof(serializer));
+        ArgumentNullException.ThrowIfNull(serializer);
         return Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing), 0));
     }
 
     public static ushort Serdes(string name, ushort existing, Func<string, ushort, ushort, ushort> serializer)
     {
-        if (serializer == null) throw new ArgumentNullException(nameof(serializer));
+        ArgumentNullException.ThrowIfNull(serializer);
         return Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing), 0));
     }
 
     public static uint Serdes(string name, uint existing, Func<string, uint, uint, uint> serializer)
     {
-        if (serializer == null) throw new ArgumentNullException(nameof(serializer));
+        ArgumentNullException.ThrowIfNull(serializer);
         return Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing), 0));
     }
 
     public static short Serdes(string name, short existing, Func<string, short, short, short> serializer)
     {
-        if (serializer == null) throw new ArgumentNullException(nameof(serializer));
+        ArgumentNullException.ThrowIfNull(serializer);
         return Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing), 0));
     }
 
     public static int Serdes(string name, int existing, Func<string, int, int, int> serializer)
     {
-        if (serializer == null) throw new ArgumentNullException(nameof(serializer));
+        ArgumentNullException.ThrowIfNull(serializer);
         return Instance.FromNumeric(serializer(name, Instance.ToNumeric(existing), 0));
     }
 

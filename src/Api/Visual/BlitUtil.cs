@@ -6,7 +6,7 @@ namespace UAlbion.Api.Visual;
 
 public static class BlitUtil
 {
-    static void Blit8To32Transparent(ReadOnlyImageBuffer<byte> fromBuffer, ImageBuffer<uint> toBuffer, ReadOnlySpan<uint> palette, byte componentAlpha, byte transparentColor)
+    static void Blit8To32Transparent(in ReadOnlyImageBuffer<byte> fromBuffer, in ImageBuffer<uint> toBuffer, ReadOnlySpan<uint> palette, byte componentAlpha, byte transparentColor)
     {
         var from = fromBuffer.Buffer;
         var to = toBuffer.Buffer;
@@ -30,7 +30,7 @@ public static class BlitUtil
         }
     }
 
-    static void Blit8To32Opaque(ReadOnlyImageBuffer<byte> fromBuffer, ImageBuffer<uint> toBuffer, ReadOnlySpan<uint> palette, byte componentAlpha)
+    static void Blit8To32Opaque(in ReadOnlyImageBuffer<byte> fromBuffer, in ImageBuffer<uint> toBuffer, ReadOnlySpan<uint> palette, byte componentAlpha)
     {
         var from = fromBuffer.Buffer;
         var to = toBuffer.Buffer;
@@ -53,7 +53,7 @@ public static class BlitUtil
         }
     }
 
-    public static void Blit8Translated(ReadOnlyImageBuffer<byte> fromBuffer, ImageBuffer<byte> toBuffer, ReadOnlySpan<byte> mapping)
+    public static void Blit8Translated(in ReadOnlyImageBuffer<byte> fromBuffer, in ImageBuffer<byte> toBuffer, ReadOnlySpan<byte> mapping)
     {
         var from = fromBuffer.Buffer;
         var to = toBuffer.Buffer;
@@ -77,9 +77,8 @@ public static class BlitUtil
         }
     }
 
-    public static void BlitTiled8To32(ReadOnlyImageBuffer<byte> from, ImageBuffer<uint> to, ReadOnlySpan<uint> palette, byte componentAlpha, byte? transparentColor)
+    public static void BlitTiled8To32(in ReadOnlyImageBuffer<byte> from, in ImageBuffer<uint> to, ReadOnlySpan<uint> palette, byte componentAlpha, byte? transparentColor)
     {
-        if (palette == null) throw new ArgumentNullException(nameof(palette));
         int remainingWidth = to.Width;
         int remainingHeight = to.Height;
         Span<uint> dest = to.Buffer;
@@ -114,7 +113,7 @@ public static class BlitUtil
 
     static byte Quantize(uint value, uint[] palette)
     {
-        if (palette == null) throw new ArgumentNullException(nameof(palette));
+        ArgumentNullException.ThrowIfNull(palette);
         if (palette.Length > 256) throw new ArgumentOutOfRangeException(nameof(palette), "Only 8-bit palettes are supported");
 
         var (r, g, b, a) = ApiUtil.UnpackColor(value);
@@ -138,7 +137,7 @@ public static class BlitUtil
         return result;
     }
 
-    public static void Blit32To8(ReadOnlyImageBuffer<uint> fromBuffer, ImageBuffer<byte> toBuffer, uint[] palette, Dictionary<uint, byte> quantizeCache = null)
+    public static void Blit32To8(in ReadOnlyImageBuffer<uint> fromBuffer, in ImageBuffer<byte> toBuffer, uint[] palette, Dictionary<uint, byte> quantizeCache = null)
     {
         quantizeCache ??= new Dictionary<uint, byte>();
         var from = fromBuffer.Buffer;
@@ -171,7 +170,7 @@ public static class BlitUtil
     public static bool OpacityFunc8(byte pixel) => pixel != 0;
     public static bool OpacityFunc32(uint pixel) => (byte)((pixel >> 24) & 0xff) > 0;
 
-    public static void BlitDirect<T>(ReadOnlyImageBuffer<T> fromBuffer, ImageBuffer<T> toBuffer) where T : unmanaged
+    public static void BlitDirect<T>(in ReadOnlyImageBuffer<T> fromBuffer, in ImageBuffer<T> toBuffer) where T : unmanaged
     {
         for (int j = 0; j < fromBuffer.Height; j++)
         {
@@ -181,9 +180,9 @@ public static class BlitUtil
         }
     }
 
-    public static void BlitMasked<T>(ReadOnlyImageBuffer<T> fromBuffer, ImageBuffer<T> toBuffer, Func<T, bool> opacityFunc) where T : unmanaged
+    public static void BlitMasked<T>(in ReadOnlyImageBuffer<T> fromBuffer, in ImageBuffer<T> toBuffer, Func<T, bool> opacityFunc) where T : unmanaged
     {
-        if (opacityFunc == null) throw new ArgumentNullException(nameof(opacityFunc));
+        ArgumentNullException.ThrowIfNull(opacityFunc);
         var from = fromBuffer.Buffer;
         var to = toBuffer.Buffer;
         int fromOffset = 0;
@@ -206,7 +205,7 @@ public static class BlitUtil
         }
     }
 
-    public static void BlitTiled<T>(ReadOnlyImageBuffer<T> from, ImageBuffer<T> to, Func<T, bool> opacityFunc = null) where T : unmanaged
+    public static void BlitTiled<T>(in ReadOnlyImageBuffer<T> from, in ImageBuffer<T> to, Func<T, bool> opacityFunc = null) where T : unmanaged
     {
         int remainingWidth = to.Width;
         int remainingHeight = to.Height;
@@ -240,8 +239,8 @@ public static class BlitUtil
         } while (remainingHeight > 0);
     }
 
-    public static void BlitTiled8(ReadOnlyImageBuffer<byte> from, ImageBuffer<byte> to) => BlitTiled(from, to, OpacityFunc8);
-    public static void BlitTiled32(ReadOnlyImageBuffer<uint> from, ImageBuffer<uint> to) => BlitTiled(from, to, OpacityFunc32);
+    public static void BlitTiled8(in ReadOnlyImageBuffer<byte> from, in ImageBuffer<byte> to) => BlitTiled(from, to, OpacityFunc8);
+    public static void BlitTiled32(in ReadOnlyImageBuffer<uint> from, in ImageBuffer<uint> to) => BlitTiled(from, to, OpacityFunc32);
 
     /*
     public static void Blit8(ReadOnlySpan<byte> from, Span<byte> to, int width, int height, int fromStride, int toStride)
@@ -258,7 +257,7 @@ public static class BlitUtil
     } */
 
 
-    public static ISet<T> DistinctColors<T>(ReadOnlyImageBuffer<T> buffer) where T : unmanaged
+    public static ISet<T> DistinctColors<T>(in ReadOnlyImageBuffer<T> buffer) where T : unmanaged
     {
         int c = 0;
         var active = new HashSet<T>();
@@ -277,7 +276,7 @@ public static class BlitUtil
         return active;
     }
 
-    public static ISet<T> DistinctColors<T>(ReadOnlySpan<T> buffer) where T : unmanaged
+    public static ISet<T> DistinctColors<T>(in ReadOnlySpan<T> buffer) where T : unmanaged
     {
         var active = new HashSet<T>();
         foreach (var pixel in buffer)
@@ -289,11 +288,11 @@ public static class BlitUtil
         uint[] palette,
         int frameWidth,
         int frameHeight,
-        ReadOnlyImageBuffer<uint> source,
-        ImageBuffer<byte> dest,
+        in ReadOnlyImageBuffer<uint> source,
+        in ImageBuffer<byte> dest,
         Action<int, int, int, int> frameFunc)
     {
-        if (frameFunc == null) throw new ArgumentNullException(nameof(frameFunc));
+        ArgumentNullException.ThrowIfNull(frameFunc);
         if (frameWidth <= 0) throw new ArgumentOutOfRangeException(nameof(frameWidth), "Tried to unpack with a frame width of 0");
         if (frameHeight <= 0) throw new ArgumentOutOfRangeException(nameof(frameHeight), "Tried to unpack with a frame height of 0");
         if (dest.Width < source.Width) throw new ArgumentOutOfRangeException(nameof(dest), "Tried to unpack to a smaller destination");
@@ -316,8 +315,8 @@ public static class BlitUtil
 
     public static long CalculatePalettePeriod(ISet<byte> colors, IPalette palette)
     {
-        if (colors == null) throw new ArgumentNullException(nameof(colors));
-        if (palette == null) throw new ArgumentNullException(nameof(palette));
+        ArgumentNullException.ThrowIfNull(colors);
+        ArgumentNullException.ThrowIfNull(palette);
 
         var periods =
             palette.AnimatedEntries
@@ -330,7 +329,7 @@ public static class BlitUtil
 
     public static IReadOnlyTexture<T> CombineFramesVertically<T>(IAssetId id, IList<IReadOnlyTexture<T>> frames) where T : unmanaged
     {
-        if (frames == null) throw new ArgumentNullException(nameof(frames));
+        ArgumentNullException.ThrowIfNull(frames);
         int[] yOffsets = new int[frames.Count];
         int currentY = 0;
         int totalWidth = 0;

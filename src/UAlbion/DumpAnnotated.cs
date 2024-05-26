@@ -7,7 +7,7 @@ using UAlbion.Formats;
 
 namespace UAlbion;
 
-class DumpAnnotated : Component, IAssetDumper
+sealed class DumpAnnotated : Component, IAssetDumper
 {
     public void Dump(string baseDir, ISet<AssetType> types, AssetId[] dumpIds)
     {

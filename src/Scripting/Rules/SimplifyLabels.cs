@@ -9,7 +9,7 @@ public static class SimplifyLabels
     public static (ControlFlowGraph result, string description) Apply(ControlFlowGraph graph) 
         => (Relabel(graph, ScriptConstants.DummyLabelPrefix), "Relabel");
 
-    class LabelCollectionAstVisitor : BaseAstVisitor
+    sealed class LabelCollectionAstVisitor : BaseAstVisitor
     {
         public Dictionary<string, ICfgNode> Labels { get; } = new();
         public override void Visit(Sequence seq)
@@ -35,14 +35,14 @@ public static class SimplifyLabels
         }
     }
 
-    class RelabellingAstVisitor : BaseAstBuilderVisitor
+    sealed class RelabellingAstVisitor : BaseAstBuilderVisitor
     {
         readonly IDictionary<string, (string target, bool removed)> _mapping;
         public RelabellingAstVisitor(IDictionary<string, (string target, bool removed)> mapping)
             => _mapping = mapping ?? throw new ArgumentNullException(nameof(mapping));
         protected override ICfgNode Build(GotoStatement jump) => 
-            _mapping.ContainsKey(jump.Label) 
-                ? UAEmit.Goto(_mapping[jump.Label].target) 
+            _mapping.TryGetValue(jump.Label, out var tuple) 
+                ? UAEmit.Goto(tuple.target) 
                 : null;
 
         protected override ICfgNode Build(Label label)
@@ -58,7 +58,7 @@ public static class SimplifyLabels
 
     public static ControlFlowGraph Relabel(ControlFlowGraph graph, string dummyLabelPrefix)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
         var collector = new LabelCollectionAstVisitor();
         graph.Accept(collector);
 

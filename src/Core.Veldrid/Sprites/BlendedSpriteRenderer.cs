@@ -71,7 +71,7 @@ public sealed class BlendedSpriteRenderer : Component, IRenderer, IDisposable
         var globalSet = (GlobalSet)set1 ?? throw new ArgumentNullException(nameof(set1));
         var renderPassSet = (MainPassSet)set2 ?? throw new ArgumentNullException(nameof(set2));
 
-        if (cl == null) throw new ArgumentNullException(nameof(cl));
+        ArgumentNullException.ThrowIfNull(cl);
         if (renderable is not VeldridSpriteBatch<BlendedSpriteInfo, GpuBlendedSpriteInstanceData> batch)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
@@ -112,7 +112,7 @@ public sealed class BlendedSpriteRenderer : Component, IRenderer, IDisposable
 
 [VertexShader(typeof(BlendedSpriteVertexShader))]
 [FragmentShader(typeof(BlendedSpriteFragmentShader))]
-internal partial class BlendedSpritePipeline : PipelineHolder { }
+internal sealed partial class BlendedSpritePipeline : PipelineHolder { }
 
 [Name("BlendedSpriteSF.frag")]
 [Input(0, typeof(BlendedSpriteIntermediateData))]
@@ -121,7 +121,7 @@ internal partial class BlendedSpritePipeline : PipelineHolder { }
 [ResourceSet(2, typeof(SpriteSet))]
 [Output(0, typeof(SimpleFramebuffer))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-internal partial class BlendedSpriteFragmentShader : IFragmentShader { }
+internal sealed partial class BlendedSpriteFragmentShader : IFragmentShader { }
 
 [Name("BlendedSpriteSV.vert")]
 [Input(0, typeof(Vertex2DTextured))]
@@ -131,7 +131,7 @@ internal partial class BlendedSpriteFragmentShader : IFragmentShader { }
 [ResourceSet(2, typeof(SpriteSet))]
 [Output(0, typeof(BlendedSpriteIntermediateData))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-internal partial class BlendedSpriteVertexShader : IVertexShader { }
+internal sealed partial class BlendedSpriteVertexShader : IVertexShader { }
 
 #pragma warning disable 649 // CS0649 Field is never assigned to, and will always have its default value
 internal partial struct BlendedSpriteIntermediateData : IVertexFormat

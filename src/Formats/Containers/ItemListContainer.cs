@@ -16,7 +16,7 @@ public class ItemListContainer : IAssetContainer
 {
     public ISerializer Read(string path, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         var stream = context.Disk.OpenRead(path);
         var br = new BinaryReader(stream);
         stream.Position = context.Index * ItemData.SizeOnDisk;
@@ -25,7 +25,7 @@ public class ItemListContainer : IAssetContainer
 
     public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         var dir = Path.GetDirectoryName(path);
         if (!context.Disk.DirectoryExists(dir))

@@ -14,14 +14,14 @@ public class LayerStacker : UiElement
     public LayerStacker(params IUiElement[] children) : this((IList<IUiElement>)children) { }
     public LayerStacker(IList<IUiElement> children)
     {
-        if (children == null) throw new ArgumentNullException(nameof(children));
+        ArgumentNullException.ThrowIfNull(children);
         foreach(var child in children)
             AttachChild(child);
     }
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
-        if (func == null) throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
 
         foreach(var child in Children)
         {

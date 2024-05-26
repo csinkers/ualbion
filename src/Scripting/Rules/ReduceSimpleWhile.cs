@@ -7,7 +7,7 @@ public static class ReduceSimpleWhile
 {
     public static (ControlFlowGraph, string) Decompile(ControlFlowGraph graph)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
         var simpleLoopIndices =
             from index in graph.GetDfsPostOrder()
             let children = graph.Children(index)

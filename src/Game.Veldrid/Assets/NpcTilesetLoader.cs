@@ -21,13 +21,13 @@ public class NpcTilesetLoader : Component, IAssetLoader
     public NpcTilesetLoader() => AttachChild(_png8Loader);
     public object Serdes(object existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
 
         if (!s.IsWriting())
             return new object();
 
-        if (existing == null) throw new ArgumentNullException(nameof(existing));
+        ArgumentNullException.ThrowIfNull(existing);
         var graphicsPattern = context.GetProperty(GraphicsPattern);
         bool small = context.GetProperty(IsSmallProperty);
 

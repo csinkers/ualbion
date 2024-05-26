@@ -19,8 +19,8 @@ public static class TilesetMapping
 
     public static Tileset FromAlbion(TilesetData tileset, Tilemap2DProperties properties)
     {
-        if (tileset == null) throw new ArgumentNullException(nameof(tileset));
-        if (properties == null) throw new ArgumentNullException(nameof(properties));
+        ArgumentNullException.ThrowIfNull(tileset);
+        ArgumentNullException.ThrowIfNull(properties);
 
         var graphicsPattern = properties.GraphicsTemplate;
         List<Tile> tiles =
@@ -82,8 +82,8 @@ public static class TilesetMapping
 
     public static TilesetData ToAlbion(Tileset tileset, TilesetId id, Tilemap2DProperties properties)
     {
-        if (tileset == null) throw new ArgumentNullException(nameof(tileset));
-        if (properties == null) throw new ArgumentNullException(nameof(properties));
+        ArgumentNullException.ThrowIfNull(tileset);
+        ArgumentNullException.ThrowIfNull(properties);
 
         var t = new TilesetData(id);
         var graphicsPattern = properties.GraphicsTemplate;
@@ -104,9 +104,9 @@ public static class TilesetMapping
 
     public static Tileset FromLabyrinth(LabyrinthData labyrinth, Tilemap3DProperties properties, List<int>[] allFrames)
     {
-        if (labyrinth == null) throw new ArgumentNullException(nameof(labyrinth));
-        if (properties == null) throw new ArgumentNullException(nameof(properties));
-        if (allFrames == null) throw new ArgumentNullException(nameof(allFrames));
+        ArgumentNullException.ThrowIfNull(labyrinth);
+        ArgumentNullException.ThrowIfNull(properties);
+        ArgumentNullException.ThrowIfNull(allFrames);
 
         List<Tile> tiles =
             allFrames
@@ -169,7 +169,7 @@ public static class TilesetMapping
 
     public static Tileset FromSprites(string name, string type, IList<TileProperties> tiles) // (name, source, w, h)
     {
-        if (tiles == null) throw new ArgumentNullException(nameof(tiles));
+        ArgumentNullException.ThrowIfNull(tiles);
         return new Tileset
         {
             Name = name,

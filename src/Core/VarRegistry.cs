@@ -9,7 +9,7 @@ namespace UAlbion.Core;
 
 public class VarRegistry : ServiceComponent<IVarRegistry>, IVarRegistry
 {
-    record VarInfo(IVar Var, Type ValueType, Type OwningType);
+    sealed record VarInfo(IVar Var, Type ValueType, Type OwningType);
     readonly Dictionary<string, VarInfo> _vars = new();
 
     public IEnumerable<IVar> Vars => _vars.Select(x => x.Value.Var).OrderBy(x => x.Key);
@@ -18,8 +18,7 @@ public class VarRegistry : ServiceComponent<IVarRegistry>, IVarRegistry
 
     public void Register(Type type)
     {
-        if (type is null)
-            throw new ArgumentNullException(nameof(type));
+        ArgumentNullException.ThrowIfNull(type);
 
         var libraryProperty = type.GetProperty("Library", BindingFlags.Public | BindingFlags.Static);
         if (libraryProperty == null)

@@ -98,7 +98,7 @@ public class FlagSet
 
     public void SetPacked(byte[] packed)
     {
-        if (packed == null) throw new ArgumentNullException(nameof(packed));
+        ArgumentNullException.ThrowIfNull(packed);
         if (packed.Length != PackedSize)
             throw new ArgumentException($"Expected {PackedSize} bytes, but given {packed.Length}");
 
@@ -111,7 +111,7 @@ public class FlagSet
 
     public void Serdes(string name, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
 
         if (s.IsReading())
             SetPacked(s.Bytes(name, null, PackedSize));

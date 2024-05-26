@@ -11,7 +11,7 @@ using Veldrid.StartupUtilities;
 
 namespace UAlbion.Core.Veldrid;
 
-class WindowHolder : Component, IDisposable
+sealed class WindowHolder : Component, IDisposable
 {
     readonly InputEvent _inputEvent = new();
     Sdl2Window _window;

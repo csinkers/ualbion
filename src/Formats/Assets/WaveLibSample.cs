@@ -7,6 +7,9 @@ namespace UAlbion.Formats.Assets;
 
 public class WaveLibSample : ISample
 {
+    static readonly int[] ExpectedTypes = { 56, 58, 60, 62, 63, 64, 66, 69, 76, 80 };
+    static readonly int[] ExpectedInstruments = { 119, 120, 121, 122, 123, 124, 125, 126, 127, -1 };
+
     public const uint SizeInBytes = 32;
     public bool Active { get; set; }
     public int Instrument { get; set; } = -1;
@@ -21,7 +24,7 @@ public class WaveLibSample : ISample
 
     public static WaveLibSample Serdes(WaveLibSample w, ISerializer s, ref uint nextBufferOffset)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         w ??= new WaveLibSample();
         w.Active = s.Int32(nameof(Active), w.Active ? 0 : -1) == 0; // 0
         w.Instrument = s.Int32(nameof(Instrument), w.Instrument); // 4
@@ -43,8 +46,8 @@ public class WaveLibSample : ISample
         w.SampleRate = s.Int32(nameof(SampleRate), w.SampleRate); // 1c
 
         // Check for new patterns
-        ApiUtil.Assert(new[] { 119, 120, 121, 122, 123, 124, 125, 126, 127, -1 }.Contains(w.Instrument));
-        ApiUtil.Assert(new[] { 56, 58, 60, 62, 63, 64, 66, 69, 76, 80 }.Contains(w.Type));
+        ApiUtil.Assert(ExpectedInstruments.Contains(w.Instrument));
+        ApiUtil.Assert(ExpectedTypes.Contains(w.Type));
         ApiUtil.Assert(w.SampleRate is 11025 or -1);
 
         return w;

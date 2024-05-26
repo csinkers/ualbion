@@ -6,6 +6,7 @@ namespace UAlbion.Core.Veldrid;
 
 public class ImGuiConfig
 {
+    static readonly char[] NewLineChars = { '\n', '\r' };
     public List<ImGuiConfigSection> Sections { get; } = new();
     public static ImGuiConfig Load(string raw) => new(raw ?? "");
 
@@ -32,7 +33,7 @@ public class ImGuiConfig
 
     ImGuiConfig(string raw)
     {
-        var lines = raw.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        var lines = raw.Split(NewLineChars, StringSplitOptions.RemoveEmptyEntries);
         ImGuiConfigSection section = null;
 
         foreach (var line in lines)

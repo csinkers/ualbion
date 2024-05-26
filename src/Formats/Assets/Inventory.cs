@@ -55,7 +55,7 @@ public class Inventory : IInventory
 
     static Inventory Serdes(int n, Inventory inv, AssetMapping mapping, ISerializer s, InventoryType type)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         var invId = new InventoryId(type, (ushort)n);
         void S(string name, ItemSlot existing, ItemSlotId slotId)
             => s.Object(name, existing,

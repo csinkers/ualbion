@@ -7,7 +7,7 @@ public class StringVar : IVar<string>
 {
     public StringVar(VarLibrary library, string key, string defaultValue)
     {
-        if (library == null) throw new ArgumentNullException(nameof(library));
+        ArgumentNullException.ThrowIfNull(library);
         Key = key;
         DefaultValue = defaultValue;
         library.Add(this);
@@ -20,7 +20,7 @@ public class StringVar : IVar<string>
 
     public string Read(IVarSet varSet)
     {
-        if (varSet == null) throw new ArgumentNullException(nameof(varSet));
+        ArgumentNullException.ThrowIfNull(varSet);
         if (varSet.TryGetValue(Key, out var objValue))
         {
             if (objValue is string value) return value;
@@ -33,7 +33,7 @@ public class StringVar : IVar<string>
 
     public void Write(ISettings varSet, string value)
     {
-        if (varSet == null) throw new ArgumentNullException(nameof(varSet));
+        ArgumentNullException.ThrowIfNull(varSet);
         varSet.SetValue(Key, value);
     }
 

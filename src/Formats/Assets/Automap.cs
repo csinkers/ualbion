@@ -46,7 +46,7 @@ public class Automap
 
     public static Automap Serdes(Automap map, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         int length;
         byte[] bytes = null;
         if (s.IsReading())
@@ -56,7 +56,7 @@ public class Automap
         }
         else
         {
-            if (map == null) throw new ArgumentNullException(nameof(map));
+            ArgumentNullException.ThrowIfNull(map);
             bytes = map.AsBytes;
             length = bytes.Length;
         }

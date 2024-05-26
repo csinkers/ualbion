@@ -16,10 +16,8 @@ public class Stamp
     public Stamp() { }
     public Stamp(int blockId, Block block, Tileset tileset)
     {
-        if (block == null) throw new ArgumentNullException(nameof(block));
-        if (tileset == null) throw new ArgumentNullException(nameof(tileset));
-
-        var encoding = ZlibBase64TileEncoding.Instance;
+        ArgumentNullException.ThrowIfNull(block);
+        ArgumentNullException.ThrowIfNull(tileset);
 
         Name = $"{blockId:000}_{block.Width}x{block.Height}";
         Variations.Add(new Variation
@@ -39,17 +37,17 @@ public class Stamp
                 },
                 Layers = new List<VariationLayer> 
                 {
-                    BuildStampLayer(encoding, 1, "Underlay", block.Width, block.Height, MapTile.ToInts(block.Tiles, false)),
-                    BuildStampLayer(encoding, 2, "Overlay", block.Width, block.Height, MapTile.ToInts(block.Tiles, true))
+                    BuildStampLayer(1, "Underlay", block.Width, block.Height, MapTile.ToInts(block.Tiles, false)),
+                    BuildStampLayer(2, "Overlay", block.Width, block.Height, MapTile.ToInts(block.Tiles, true))
                 }
             }
         });
     }
 
-    static VariationLayer BuildStampLayer(ITileEncoding encoding, int id, string name, int width, int height, int[] data)
+    static VariationLayer BuildStampLayer(int id, string name, int width, int height, int[] data)
     {
-        if (encoding == null) throw new ArgumentNullException(nameof(encoding));
-        if (data == null) throw new ArgumentNullException(nameof(data));
+        var encoding = ZlibBase64TileEncoding.Instance;
+        ArgumentNullException.ThrowIfNull(data);
         return new()
         {
             Id = id,
@@ -146,25 +144,25 @@ public class Stamp
      */
     public static Stamp Load(string path, IFileSystem disk, IJsonUtil jsonUtil)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(disk);
         return Parse(disk.ReadAllBytes(path), jsonUtil);
     }
 
     public static Stamp Parse(byte[] json, IJsonUtil jsonUtil)
     {
-        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        ArgumentNullException.ThrowIfNull(jsonUtil);
         return jsonUtil.Deserialize<Stamp>(json);
     }
 
     public void Save(string path, IFileSystem disk, IJsonUtil jsonUtil)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(disk);
         disk.WriteAllText(path, Serialize(jsonUtil));
     }
 
     public string Serialize(IJsonUtil jsonUtil)
     {
-        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        ArgumentNullException.ThrowIfNull(jsonUtil);
         return jsonUtil.Serialize(this);
     }
 }

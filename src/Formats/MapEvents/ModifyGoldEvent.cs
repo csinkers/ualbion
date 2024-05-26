@@ -9,7 +9,7 @@ public class ModifyGoldEvent : ModifyEvent
 {
     public static ModifyGoldEvent Serdes(ModifyGoldEvent e, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new ModifyGoldEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         e.Unk3 = s.UInt8(nameof(Unk3), e.Unk3);

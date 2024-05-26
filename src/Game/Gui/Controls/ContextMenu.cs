@@ -21,7 +21,7 @@ public class ContextMenu : Dialog
 
     public override int Selection(Rectangle extents, int order, SelectionContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         // Just the default condition without the extents check, as the use of a fixed position stack means the extents passed in are ignored.
         var maxOrder = DoLayout(extents, order, context, SelectChildDelegate);
         context.AddHit(order, this);
@@ -30,7 +30,7 @@ public class ContextMenu : Dialog
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
-        if (func == null) throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
 
         int maxOrder = order;
         foreach (var child in Children)

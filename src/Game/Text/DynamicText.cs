@@ -25,7 +25,7 @@ public class DynamicText : IText
 
         void WriteWords()
         {
-            if (words.Any())
+            if (words.Count > 0)
             {
                 sb.Append(" (");
                 sb.Append(string.Join(", ", words.Select(x => x.ToString())));

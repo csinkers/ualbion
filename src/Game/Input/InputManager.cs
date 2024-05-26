@@ -8,8 +8,8 @@ namespace UAlbion.Game.Input;
 
 public class InputManager : ServiceComponent<IInputManager>, IInputManager
 {
-    readonly IDictionary<InputMode, IComponent> _inputModes = new Dictionary<InputMode, IComponent>();
-    readonly IDictionary<MouseMode, IComponent> _mouseModes = new Dictionary<MouseMode, IComponent>();
+    readonly Dictionary<InputMode, IComponent> _inputModes = new();
+    readonly Dictionary<MouseMode, IComponent> _mouseModes = new();
     readonly Stack<MouseMode> _mouseModeStack = new();
     readonly Stack<InputMode> _inputModeStack = new();
 
@@ -66,7 +66,7 @@ public class InputManager : ServiceComponent<IInputManager>, IInputManager
 
     public InputManager RegisterMouseMode(MouseMode mouseMode, IComponent implementation)
     {
-        if (implementation == null) throw new ArgumentNullException(nameof(implementation));
+        ArgumentNullException.ThrowIfNull(implementation);
         _mouseModes.Add(mouseMode, implementation);
         implementation.IsActive = false;
         AttachChild(implementation);
@@ -75,7 +75,7 @@ public class InputManager : ServiceComponent<IInputManager>, IInputManager
 
     public InputManager RegisterInputMode(InputMode inputMode, IComponent implementation)
     {
-        if (implementation == null) throw new ArgumentNullException(nameof(implementation));
+        ArgumentNullException.ThrowIfNull(implementation);
         _inputModes.Add(inputMode, implementation);
         implementation.IsActive = false;
         AttachChild(implementation);

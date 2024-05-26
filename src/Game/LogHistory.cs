@@ -43,7 +43,7 @@ public class LogHistory : ServiceComponent<ILogHistory>, ILogHistory
 
     public void Access<T>(T context, Action<T, IReadOnlyCollection<LogEventArgs>> operation)
     {
-        if (operation == null) throw new ArgumentNullException(nameof(operation));
+        ArgumentNullException.ThrowIfNull(operation);
         lock (_syncRoot)
             operation(context, _history);
     }

@@ -47,8 +47,8 @@ public class AmorphousSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 
     public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
         return s.IsWriting()
             ? Write(existing, s)
             : Read(context, s);
@@ -56,7 +56,7 @@ public class AmorphousSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 
     static IReadOnlyTexture<byte> Write(IReadOnlyTexture<byte> existing, ISerializer s)
     {
-        if (existing == null) throw new ArgumentNullException(nameof(existing));
+        ArgumentNullException.ThrowIfNull(existing);
 
         int bufferW = 0, bufferH = 0;
         for (int i = 0; i < existing.Regions.Count; i++)
@@ -80,7 +80,7 @@ public class AmorphousSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
         return existing;
     }
 
-    static IReadOnlyTexture<byte> Read(AssetLoadContext context, ISerializer s)
+    static SimpleTexture<byte> Read(AssetLoadContext context, ISerializer s)
     {
         var sizes = ParseSpriteSizes(context.Node.GetProperty(SubSpritesProperty));
 

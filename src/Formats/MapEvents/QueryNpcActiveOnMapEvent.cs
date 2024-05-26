@@ -22,7 +22,7 @@ public class QueryNpcActiveOnMapEvent : QueryEvent
     }
     public static QueryNpcActiveOnMapEvent Serdes(QueryNpcActiveOnMapEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryNpcActiveOnMapEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         e.NpcNum = s.UInt8(nameof(NpcNum), e.NpcNum);

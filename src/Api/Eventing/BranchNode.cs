@@ -17,7 +17,7 @@ public class BranchNode : EventNode, IBranchNode
 
     public override void Format(IScriptBuilder builder, int idOffset)
     {
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
         var id = Id - idOffset;
         var ifTrue = (Next?.Id - idOffset)?.ToString() ?? "!";
         var ifFalse = (NextIfFalse?.Id - idOffset)?.ToString() ?? "!";
@@ -35,7 +35,7 @@ public class BranchNode : EventNode, IBranchNode
     public IEventNode NextIfFalse { get; set; }
     public override void Unswizzle(IList<EventNode> nodes)
     {
-        if (nodes == null) throw new ArgumentNullException(nameof(nodes));
+        ArgumentNullException.ThrowIfNull(nodes);
         if (NextIfFalse is DummyEventNode dummy)
         {
             if (dummy.Id >= nodes.Count)

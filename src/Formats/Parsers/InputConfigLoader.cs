@@ -12,12 +12,12 @@ public class InputConfigLoader : IAssetLoader<InputConfig>
 
     public InputConfig Serdes(InputConfig existing, ISerializer s, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         if (!s.IsWriting())
             return InputConfig.Load(context.Filename, context.Disk, context.Json);
 
-        if (existing == null) throw new ArgumentNullException(nameof(existing));
+        ArgumentNullException.ThrowIfNull(existing);
         existing.Save(context.Filename, context.Disk, context.Json);
         return existing;
     }

@@ -34,7 +34,7 @@ public static class Decompiler
         IList<ControlFlowRuleMethod> rules = null) where T : IEventNode
     {
         rules ??= DefaultRules;
-        if (nodes == null) throw new ArgumentNullException(nameof(nodes));
+        ArgumentNullException.ThrowIfNull(nodes);
         if (nodes.Count == 0)
             throw new ArgumentException("Must supply at least one event node", nameof(nodes));
 
@@ -72,8 +72,8 @@ public static class Decompiler
 
     public static ICfgNode SimplifyGraph(ControlFlowGraph graph, RecordFunc record, IList<ControlFlowRuleMethod> rules = null)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
-        if (record == null) throw new ArgumentNullException(nameof(record));
+        ArgumentNullException.ThrowIfNull(graph);
+        ArgumentNullException.ThrowIfNull(record);
 
         record("Begin decompilation", graph);
         // Func<string> vis = () => graph.Visualize(); // For VS Code debug visualisation
@@ -97,7 +97,7 @@ public static class Decompiler
 
     public static ControlFlowGraph SimplifyOnce(ControlFlowGraph previous, RecordFunc record, IList<ControlFlowRuleMethod> rules = null)
     {
-        if (record == null) throw new ArgumentNullException(nameof(record));
+        ArgumentNullException.ThrowIfNull(record);
         rules ??= DefaultRules;
 
         var graph = previous;

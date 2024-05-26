@@ -17,8 +17,8 @@ public class TiledTilesetLoader : Component, IAssetLoader<TilesetData>
 
     public TilesetData Serdes(TilesetData existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
 
         var graphicsTemplate = context.GetProperty(GraphicsPattern, AssetPathPattern.Build("{0}/{0}_{1}.png"));
         var blankTilePath = context.GetProperty(BlankTilePathProperty, "Blank.png");
@@ -46,7 +46,7 @@ public class TiledTilesetLoader : Component, IAssetLoader<TilesetData>
 
     static TilesetData Save(TilesetData tileset, Tilemap2DProperties properties, ISerializer s)
     {
-        if (tileset == null) throw new ArgumentNullException(nameof(tileset));
+        ArgumentNullException.ThrowIfNull(tileset);
         var tiledTileset = TilesetMapping.FromAlbion(tileset, properties);
         var bytes = FormatUtil.BytesFromTextWriter(tiledTileset.Serialize);
         s.Bytes(null, bytes, bytes.Length);

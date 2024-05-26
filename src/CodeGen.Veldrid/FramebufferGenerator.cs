@@ -37,7 +37,7 @@ static class FramebufferGenerator
     {
         sb.AppendLine(@"        protected override Framebuffer CreateFramebuffer(global::Veldrid.GraphicsDevice device)
         {
-            if (device == null) throw new System.ArgumentNullException(nameof(device));");
+            System.ArgumentNullException.ThrowIfNull(device);");
 
         if (depth != null)
         {

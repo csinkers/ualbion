@@ -14,8 +14,8 @@ public class WaveLibWavLoader : IAssetLoader<WaveLib>
     static readonly Regex NameRegex = new(@"i(\d+)t(\d+)");
     public WaveLib Serdes(WaveLib existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
         return s.IsWriting() 
             ? Write(existing, s, context) 
             : Read(s, context);
@@ -69,8 +69,8 @@ public class WaveLibWavLoader : IAssetLoader<WaveLib>
     static readonly AssetPathPattern DefaultPattern = AssetPathPattern.Build("{0}_{1}_{2}.dat");
     static WaveLib Write(WaveLib existing, ISerializer s, AssetLoadContext context)
     {
-        if (existing == null) throw new ArgumentNullException(nameof(existing));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(existing);
+        ArgumentNullException.ThrowIfNull(context);
 
         PackedChunks.PackNamed(s, WaveLib.MaxSamples, i =>
         {

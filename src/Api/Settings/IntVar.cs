@@ -8,7 +8,7 @@ public class IntVar : IVar<int>
 {
     public IntVar(VarLibrary library, string key, int defaultValue)
     {
-        if (library == null) throw new ArgumentNullException(nameof(library));
+        ArgumentNullException.ThrowIfNull(library);
         Key = key;
         DefaultValue = defaultValue;
         library.Add(this);
@@ -21,7 +21,7 @@ public class IntVar : IVar<int>
 
     public int Read(IVarSet varSet)
     {
-        if (varSet == null) throw new ArgumentNullException(nameof(varSet));
+        ArgumentNullException.ThrowIfNull(varSet);
         if (varSet.TryGetValue(Key, out var objValue))
         {
             if (objValue is int value) return value;
@@ -34,7 +34,7 @@ public class IntVar : IVar<int>
 
     public void Write(ISettings varSet, int value)
     {
-        if (varSet == null) throw new ArgumentNullException(nameof(varSet));
+        ArgumentNullException.ThrowIfNull(varSet);
         varSet.SetValue(Key, value);
     }
 

@@ -16,12 +16,11 @@ public class MultiHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 
     public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
         if (s.IsWriting())
         {
-            if (existing == null)
-                throw new ArgumentNullException(nameof(existing));
+            ArgumentNullException.ThrowIfNull(existing);
 
             Write(existing, s);
             return existing;

@@ -18,11 +18,11 @@ public static class MapExport
         Tileset npcTileset,
         EventFormatter eventFormatter)
     {
-        if (map == null) throw new ArgumentNullException(nameof(map));
-        if (tileset == null) throw new ArgumentNullException(nameof(tileset));
-        if (properties == null) throw new ArgumentNullException(nameof(properties));
-        if (npcTileset == null) throw new ArgumentNullException(nameof(npcTileset));
-        if (eventFormatter == null) throw new ArgumentNullException(nameof(eventFormatter));
+        ArgumentNullException.ThrowIfNull(map);
+        ArgumentNullException.ThrowIfNull(tileset);
+        ArgumentNullException.ThrowIfNull(properties);
+        ArgumentNullException.ThrowIfNull(npcTileset);
+        ArgumentNullException.ThrowIfNull(eventFormatter);
 
         int npcGidOffset = tileset.Tiles.Count;
         var (script, functionsByEventId) = BuildScript(map, eventFormatter);
@@ -69,9 +69,9 @@ public static class MapExport
 
     public static (Map, string) FromAlbionMap3D(MapData3D map, Tilemap3DProperties properties, EventFormatter eventFormatter)
     {
-        if (map == null) throw new ArgumentNullException(nameof(map));
-        if (properties == null) throw new ArgumentNullException(nameof(properties));
-        if (eventFormatter == null) throw new ArgumentNullException(nameof(eventFormatter));
+        ArgumentNullException.ThrowIfNull(map);
+        ArgumentNullException.ThrowIfNull(properties);
+        ArgumentNullException.ThrowIfNull(eventFormatter);
 
         if (string.IsNullOrEmpty(properties.FloorPath)) throw new ArgumentException("No floor path given", nameof(properties));
         if (string.IsNullOrEmpty(properties.CeilingPath)) throw new ArgumentException("No ceiling path given", nameof(properties));
@@ -120,7 +120,7 @@ public static class MapExport
         return (result, script);
     }
 
-    static (string script, Dictionary<ushort, string> functionsByEventId) BuildScript(IEventSet eventSet, IEventFormatter eventFormatter)
+    static (string script, Dictionary<ushort, string> functionsByEventId) BuildScript(IEventSet eventSet, EventFormatter eventFormatter)
     {
         var functionMapping = new Dictionary<ushort, string>();
 

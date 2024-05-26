@@ -19,8 +19,8 @@ public class EventNodeConverter : JsonConverter<IEventNode>
 
     public override void Write(Utf8JsonWriter writer, IEventNode value, JsonSerializerOptions options)
     {
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
-        if (value == null) throw new ArgumentNullException(nameof(value));
+        ArgumentNullException.ThrowIfNull(writer);
+        ArgumentNullException.ThrowIfNull(value);
         writer.WriteStringValue(value.ToString());
     }
 }

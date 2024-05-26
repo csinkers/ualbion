@@ -12,13 +12,13 @@ public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
 {
     public EventSet Serdes(EventSet existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
 
         var id = (EventSetId)context.AssetId;
         if (s.IsWriting())
         {
-            if (existing == null) throw new ArgumentNullException(nameof(existing));
+            ArgumentNullException.ThrowIfNull(existing);
             var assets = Resolve<IAssetManager>();
             var script = Decompile(id, existing, assets);
             var bytes = Encoding.UTF8.GetBytes(script);

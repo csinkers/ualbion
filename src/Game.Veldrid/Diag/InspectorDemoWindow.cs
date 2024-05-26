@@ -28,7 +28,7 @@ public class InspectorDemoWindow : Component, IImGuiWindow
     }
 #pragma warning restore CA1711 // Identifiers should not have incorrect suffix
 
-    class TestObject
+    sealed class TestObject
     {
         [DiagEdit(Style = DiagEditStyle.Checkboxes)] public bool BoolProp { get; set; }
         [DiagEdit(Style = DiagEditStyle.NumericSlider, Min = 0, Max = 100)] public int[] IntArray = new int[16];

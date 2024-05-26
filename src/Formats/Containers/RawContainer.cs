@@ -15,7 +15,7 @@ public class RawContainer : IAssetContainer
 {
     public ISerializer Read(string path, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         ApiUtil.Assert(context.Index == 0, "SubItem should always be 0 when accessing a non-container file");
 
         if (!context.Disk.FileExists(path))
@@ -28,8 +28,8 @@ public class RawContainer : IAssetContainer
 
     public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
     {
-        if (assets == null) throw new ArgumentNullException(nameof(assets));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(assets);
+        ArgumentNullException.ThrowIfNull(context);
 
         var dir = Path.GetDirectoryName(path);
         if (!context.Disk.DirectoryExists(dir))

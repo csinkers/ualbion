@@ -82,7 +82,7 @@ public sealed class FullscreenQuad : Component, IRenderable, IDisposable
 #pragma warning disable 649
 [VertexShader(typeof(FullscreenQuadVertexShader))]
 [FragmentShader(typeof(FullscreenQuadFragmentShader))]
-partial class FullscreenQuadPipeline : PipelineHolder { }
+sealed partial class FullscreenQuadPipeline : PipelineHolder { }
 
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
 partial struct FullscreenQuadIntermediate : IVertexFormat
@@ -95,16 +95,16 @@ partial struct FullscreenQuadIntermediate : IVertexFormat
 [ResourceSet(0, typeof(FullscreenQuadResourceSet))]
 [Output(0, typeof(FullscreenQuadIntermediate))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-internal partial class FullscreenQuadVertexShader : IVertexShader { }
+internal sealed partial class FullscreenQuadVertexShader : IVertexShader { }
 
 [Name("FullscreenQuadSF.frag")]
 [Input(0, typeof(FullscreenQuadIntermediate))]
 [ResourceSet(0, typeof(FullscreenQuadResourceSet))]
 [Output(0, typeof(SimpleFramebuffer))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-internal partial class FullscreenQuadFragmentShader : IFragmentShader { }
+internal sealed partial class FullscreenQuadFragmentShader : IFragmentShader { }
 
-partial class FullscreenQuadResourceSet : ResourceSetHolder
+sealed partial class FullscreenQuadResourceSet : ResourceSetHolder
 {
     [Sampler("uSampler", ShaderStages.Fragment)] ISamplerHolder _sampler;
     [Texture("uTexture", ShaderStages.Fragment)] ITextureHolder _texture;
@@ -157,7 +157,7 @@ public sealed class FullscreenQuadRenderer : Component, IRenderer, IDisposable
 
     public void Render(IRenderable renderable, CommandList cl, GraphicsDevice device, IResourceSetHolder set1, IResourceSetHolder set2)
     {
-        if (cl == null) throw new ArgumentNullException(nameof(cl));
+        ArgumentNullException.ThrowIfNull(cl);
         if (renderable is not FullscreenQuad fullscreenQuad)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 

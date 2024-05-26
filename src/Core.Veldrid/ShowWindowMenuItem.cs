@@ -19,7 +19,7 @@ public class ShowWindowMenuItem : IMenuItem
     public string BuildName(int id) => $"{Name}##{id}";
     public void Draw(IImGuiManager manager)
     {
-        if (manager == null) throw new ArgumentNullException(nameof(manager));
+        ArgumentNullException.ThrowIfNull(manager);
 
         if (!ImGui.MenuItem(Name))
             return;

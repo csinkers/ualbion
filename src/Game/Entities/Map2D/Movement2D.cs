@@ -18,9 +18,9 @@ public class Movement2D : IMovementController
         Func<TContext, (int X, int Y)> getDesiredDirection,
         Action<int, int> onTileEntered)
     {
-        if (state == null) throw new ArgumentNullException(nameof(state));
-        if (settings == null) throw new ArgumentNullException(nameof(settings));
-        if (getDesiredDirection == null) throw new ArgumentNullException(nameof(getDesiredDirection));
+        ArgumentNullException.ThrowIfNull(state);
+        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(getDesiredDirection);
 
         GameTrace.Log.MoveStart(state.Id.ToString(), state.X, state.Y, state.PixelX, state.PixelY);
 

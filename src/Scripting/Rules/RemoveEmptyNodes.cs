@@ -8,11 +8,11 @@ public static class RemoveEmptyNodes
 {
     public static (ControlFlowGraph result, string description) Apply(ControlFlowGraph graph)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
         return (graph.AcceptBuilder(new EmptyNodeRemovalVisitor()), "Remove empty nodes");
     }
 
-    class EmptyNodeRemovalVisitor : BaseAstBuilderVisitor
+    sealed class EmptyNodeRemovalVisitor : BaseAstBuilderVisitor
     {
         protected override ICfgNode Build(Sequence sequence)
         {

@@ -35,7 +35,7 @@ public static class CoreUtil
 
     public static ArrayTexture<T> BuildTransposedTexture<T>(IReadOnlyTexture<T> texture) where T : unmanaged
     {
-        if (texture == null) throw new ArgumentNullException(nameof(texture));
+        ArgumentNullException.ThrowIfNull(texture);
 
         var rotatedPixels = new T[texture.Width * texture.Height];
         ApiUtil.TransposeImage(texture.Width, texture.Height,

@@ -64,10 +64,10 @@ public class IsometricLayout : GameComponent
 
     public void Load(LabyrinthData labyrinthData, AssetLoadContext context, IsometricMode mode, TilemapRequest request, int? paletteNumber, IAssetManager assets)
     {
-        if (labyrinthData == null) throw new ArgumentNullException(nameof(labyrinthData));
-        if (context == null) throw new ArgumentNullException(nameof(context));
-        if (request == null) throw new ArgumentNullException(nameof(request));
-        if (assets == null) throw new ArgumentNullException(nameof(assets));
+        ArgumentNullException.ThrowIfNull(labyrinthData);
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(assets);
 
         RemoveAllChildren();
         _relativeSpritePositions.Clear();

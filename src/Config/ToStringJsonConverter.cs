@@ -12,7 +12,7 @@ public class ToStringJsonConverter<T> : JsonConverter<T>
 
     public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (typeToConvert == null) throw new ArgumentNullException(nameof(typeToConvert));
+        ArgumentNullException.ThrowIfNull(typeToConvert);
         if (typeToConvert != typeof(T)) throw new InvalidOperationException($"Invoked ToStringJsonConverter<{typeof(T).Name}>.Read with typeToConvert = {typeToConvert.Name}");
 
         if (reader.TokenType == JsonTokenType.String)
@@ -39,7 +39,7 @@ public class ToStringJsonConverter<T> : JsonConverter<T>
 
     public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
     {
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        ArgumentNullException.ThrowIfNull(writer);
         if (value == null) throw new ArgumentNullException(nameof(value));
         var serialise = Serialise.Value;
         if (serialise != null && !serialise.IsStatic && serialise.ReturnType == typeof(string))

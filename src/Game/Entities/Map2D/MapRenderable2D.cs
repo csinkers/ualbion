@@ -18,8 +18,8 @@ public class MapRenderable2D : Component
 
     public MapRenderable2D(LogicalMap2D logicalMap, ITileGraphics tileset, IGameFactory factory, Vector2 tileSize)
     {
-        if (tileset == null) throw new ArgumentNullException(nameof(tileset));
-        if (factory == null) throw new ArgumentNullException(nameof(factory));
+        ArgumentNullException.ThrowIfNull(tileset);
+        ArgumentNullException.ThrowIfNull(factory);
         _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
         TileSize = tileSize;
 

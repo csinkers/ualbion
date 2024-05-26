@@ -15,8 +15,8 @@ public class PalettePng32Loader : GameComponent, IAssetLoader<AlbionPalette>
 {
     public AlbionPalette Serdes(AlbionPalette existing, ISerializer s, AssetLoadContext context)
     {
-        if (existing == null) throw new ArgumentNullException(nameof(existing));
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(existing);
+        ArgumentNullException.ThrowIfNull(s);
 
         if (!s.IsWriting())
             throw new NotSupportedException();

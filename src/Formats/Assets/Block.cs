@@ -37,7 +37,7 @@ public class Block
 
     public static Block Serdes(int _, Block b, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         b ??= new Block();
         b.Width = s.UInt8(nameof(Width), b.Width);
         b.Height = s.UInt8(nameof(Height), b.Height);

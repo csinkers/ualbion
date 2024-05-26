@@ -69,7 +69,7 @@ public class LogExchange : ILogExchange
 
     public void Receive(IEvent e, object sender)
     {
-        if (e == null) throw new ArgumentNullException(nameof(e));
+        ArgumentNullException.ThrowIfNull(e);
         switch(e)
         {
             case BeginFrameEvent _:
@@ -197,7 +197,7 @@ public class LogExchange : ILogExchange
                     .Distinct()
                     .ToList();
 
-            if (matchingEvents.Any())
+            if (matchingEvents.Count == 0)
                 PrintHelpSummary(sb, matchingEvents);
             else
                 sb.AppendFormat("The command \"{0}\" is not recognised." + Environment.NewLine, pattern);
@@ -221,8 +221,8 @@ public class LogExchange : ILogExchange
 
     static void PrintDetailedHelp(StringBuilder sb, EventMetadata metadata)
     {
-        if (sb == null) throw new ArgumentNullException(nameof(sb));
-        if (metadata == null) throw new ArgumentNullException(nameof(metadata));
+        ArgumentNullException.ThrowIfNull(sb);
+        ArgumentNullException.ThrowIfNull(metadata);
         var paramList = metadata.Parts.Count == 0
             ? ""
             : " " + string.Join(" ",

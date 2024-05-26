@@ -20,7 +20,7 @@ public class QueryUnkCEvent : QueryEvent
     }
     public static QueryUnkCEvent Serdes(QueryUnkCEvent e, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryUnkCEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         e.Immediate = s.UInt8(nameof(Immediate), e.Immediate);

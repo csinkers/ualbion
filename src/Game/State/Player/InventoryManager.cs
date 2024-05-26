@@ -504,7 +504,7 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
     public int GetItemCount(InventoryId id, ItemId item) => _getInventory(id).EnumerateAll().Where(x => x.Item == item).Sum(x => (int?)x.Amount) ?? 0;
     public ushort TryGiveItems(InventoryId id, ItemSlot donor, ushort? amount)
     {
-        if (donor == null) throw new ArgumentNullException(nameof(donor));
+        ArgumentNullException.ThrowIfNull(donor);
 
         // TODO: Ensure weight limit is not exceeded?
         ushort totalTransferred = 0;
@@ -534,7 +534,7 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
 
     public ushort TryTakeItems(InventoryId id, ItemSlot acceptor, ItemId item, ushort? amount)
     {
-        if (acceptor == null) throw new ArgumentNullException(nameof(acceptor));
+        ArgumentNullException.ThrowIfNull(acceptor);
 
         ushort totalTransferred = 0;
         ushort remaining = amount ?? ushort.MaxValue;

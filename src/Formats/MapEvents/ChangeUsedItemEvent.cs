@@ -11,7 +11,7 @@ public class ChangeUsedItemEvent : MapEvent
 {
     public static ChangeUsedItemEvent Serdes(ChangeUsedItemEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new ChangeUsedItemEvent();
         int zeroes = s.UInt8(null, 0);
         zeroes += s.UInt8(null, 0);

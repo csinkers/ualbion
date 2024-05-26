@@ -133,9 +133,9 @@ public abstract class Component : IComponent
     /// <exception cref="ArgumentNullException"></exception>
     protected void Distribute<T>(ICancellableEvent e, List<T> targets, Func<T, IComponent> projection)
     {
-        if (e == null) throw new ArgumentNullException(nameof(e));
-        if (targets == null) throw new ArgumentNullException(nameof(targets));
-        if (projection == null) throw new ArgumentNullException(nameof(projection));
+        ArgumentNullException.ThrowIfNull(e);
+        ArgumentNullException.ThrowIfNull(targets);
+        ArgumentNullException.ThrowIfNull(projection);
 
         e.Propagating = true;
         foreach (var target in targets)
@@ -287,7 +287,7 @@ public abstract class Component : IComponent
     /// <param name="exchange">The event exchange that this component should be attached to</param>
     public void Attach(EventExchange exchange)
     {
-        if (exchange == null) throw new ArgumentNullException(nameof(exchange));
+        ArgumentNullException.ThrowIfNull(exchange);
         if (IsSubscribed)
             return;
 
@@ -402,7 +402,7 @@ public abstract class Component : IComponent
     /// <param name="child">The child component to remove</param>
     protected void RemoveChild(IComponent child)
     {
-        if (child == null) throw new ArgumentNullException(nameof(child));
+        ArgumentNullException.ThrowIfNull(child);
         if (_children == null) return;
         int index = _children.IndexOf(child);
         if (index == -1) return;
@@ -424,7 +424,7 @@ public abstract class Component : IComponent
     /// <param name="sender">The component which generated the event</param>
     public void Receive(IEvent e, object sender)
     {
-        if (e == null) throw new ArgumentNullException(nameof(e));
+        ArgumentNullException.ThrowIfNull(e);
         if (sender == this || !IsSubscribed || Exchange == null)
             return;
 
@@ -448,7 +448,7 @@ public abstract class Component : IComponent
     /// <exception cref="ArgumentNullException"></exception>
     protected T ReadVar<T>(IVar<T> varInfo)
     {
-        if (varInfo == null) throw new ArgumentNullException(nameof(varInfo));
+        ArgumentNullException.ThrowIfNull(varInfo);
         var varSet = Resolve<IVarSet>();
         return varInfo.Read(varSet);
     }

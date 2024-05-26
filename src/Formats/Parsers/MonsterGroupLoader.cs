@@ -9,7 +9,7 @@ public class MonsterGroupLoader : IAssetLoader<MonsterGroup>
 {
     public MonsterGroup Serdes(MonsterGroup existing, ISerializer s, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         return MonsterGroup.Serdes(context.AssetId.Id, existing, context.Mapping, s);
     }
 

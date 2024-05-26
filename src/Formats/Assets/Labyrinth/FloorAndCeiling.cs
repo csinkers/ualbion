@@ -32,7 +32,7 @@ public class FloorAndCeiling // Length = 0xA (10) bytes
 
     public static FloorAndCeiling Serdes(int _, FloorAndCeiling existing, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         var fc = existing ?? new FloorAndCeiling();
         fc.Properties = s.EnumU8(nameof(fc.Properties), fc.Properties);
         fc.Unk1 = s.UInt8(nameof(fc.Unk1), fc.Unk1);

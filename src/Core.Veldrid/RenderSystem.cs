@@ -25,7 +25,7 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
 
     public RenderSystem(IEnumerable<IComponent> extraComponents)
     {
-        if (extraComponents == null) throw new ArgumentNullException(nameof(extraComponents));
+        ArgumentNullException.ThrowIfNull(extraComponents);
 
         foreach (var component in extraComponents)
             AttachChild(component);
@@ -72,8 +72,7 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
 
     public void Render(GraphicsDevice graphicsDevice)
     {
-        if (graphicsDevice == null)
-            throw new ArgumentNullException(nameof(graphicsDevice));
+        ArgumentNullException.ThrowIfNull(graphicsDevice);
 
         if (!IsActive)
             throw new InvalidOperationException($"Tried to render using an inactive RenderSystem ({Name})");

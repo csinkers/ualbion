@@ -27,8 +27,8 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
 
     public BaseMapData Serdes(BaseMapData existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
 
         if (!s.IsWriting())
             return Read(s, context);

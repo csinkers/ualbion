@@ -8,7 +8,7 @@ namespace UAlbion.Game.Gui.Controls;
 
 public class FixedPositionStacker : UiElement, IFixedSizeUiElement
 {
-    readonly IList<Child> _positions = new List<Child>();
+    readonly List<Child> _positions = new();
 
     class Child
     {
@@ -60,7 +60,7 @@ public class FixedPositionStacker : UiElement, IFixedSizeUiElement
 
     public override Vector2 GetSize()
     {
-        if(!_positions.Any())
+        if(_positions.Count == 0)
             return Vector2.Zero;
 
         var size = Vector2.Zero;
@@ -81,7 +81,7 @@ public class FixedPositionStacker : UiElement, IFixedSizeUiElement
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
-        if (func == null) throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
 
         int maxOrder = order;
         foreach (var child in _positions)
@@ -100,7 +100,7 @@ public class FixedPositionStacker : UiElement, IFixedSizeUiElement
 
     public override int Selection(Rectangle extents, int order, SelectionContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         // The fixed positions may be outside the regular UI area, so don't clip to the extents that are passed in.
         var maxOrder = DoLayout(extents, order, context, SelectChild);
         context.AddHit(order, this);

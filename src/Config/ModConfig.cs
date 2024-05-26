@@ -24,8 +24,8 @@ public class ModConfig
 
     public static ModConfig Load(string configPath, IFileSystem disk, IJsonUtil jsonUtil)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
-        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        ArgumentNullException.ThrowIfNull(disk);
+        ArgumentNullException.ThrowIfNull(jsonUtil);
         if (!disk.FileExists(configPath))
             throw new FileNotFoundException($"mod.config not found for mod {configPath}");
 

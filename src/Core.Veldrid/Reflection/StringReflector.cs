@@ -4,7 +4,7 @@ using ImGuiNET;
 
 namespace UAlbion.Core.Veldrid.Reflection;
 
-class StringReflector : IReflector
+sealed class StringReflector : IReflector
 {
     StringReflector() { }
     public static StringReflector Instance { get; } = new();
@@ -52,7 +52,7 @@ class StringReflector : IReflector
 
     }
 }
-class BoolReflector : IReflector
+sealed class BoolReflector : IReflector
 {
     BoolReflector() { }
     public static BoolReflector Instance { get; } = new();
@@ -76,7 +76,7 @@ class BoolReflector : IReflector
         ImGui.Unindent();
     }
 }
-class NullReflector : IReflector
+sealed class NullReflector : IReflector
 {
     NullReflector() { }
     public static NullReflector Instance { get; } = new();

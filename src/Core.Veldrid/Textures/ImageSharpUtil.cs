@@ -36,7 +36,7 @@ public static class ImageSharpUtil
 
     public static Image<Rgba32> PackSpriteSheet(uint[] palette, int frameCount, GetFrameMethod<byte> getFrame)
     {
-        if (getFrame == null) throw new ArgumentNullException(nameof(getFrame));
+        ArgumentNullException.ThrowIfNull(getFrame);
 
         var layout = SpriteSheetUtil.ArrangeSpriteSheet(frameCount, 0, getFrame);
         if (layout.Layers > 1)
@@ -61,7 +61,7 @@ public static class ImageSharpUtil
 
     public static SimpleTexture<uint> FromImageSharp(IAssetId id, string name, Image<Rgba32> image)
     {
-        if (image == null) throw new ArgumentNullException(nameof(image));
+        ArgumentNullException.ThrowIfNull(image);
         if (!image.DangerousTryGetSinglePixelMemory(out var rgbaMemory))
             throw new InvalidOperationException("Could not retrieve single span from Image");
 

@@ -15,11 +15,11 @@ public class PngTileLoader8Bit : Component, IAssetLoader<ITileGraphics>
 
     public ITileGraphics Serdes(ITileGraphics existing, ISerializer s, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         if (s.IsWriting())
         {
-            if (existing == null) throw new ArgumentNullException(nameof(existing));
+            ArgumentNullException.ThrowIfNull(existing);
 
             if (existing.Texture is not IReadOnlyTexture<byte> texture)
                 throw new FormatException(

@@ -53,8 +53,7 @@ public class ReflectorManager
 
     Reflector BuildReflector(Type type)
     {
-        if (type == null)
-            throw new ArgumentNullException(nameof(type));
+        ArgumentNullException.ThrowIfNull(type);
 
         if (typeof(Enum).IsAssignableFrom(type))
             return EnumReflector.Build(type);

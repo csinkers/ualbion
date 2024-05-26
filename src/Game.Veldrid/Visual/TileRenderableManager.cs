@@ -15,7 +15,7 @@ public sealed class TileRenderableManager : ServiceComponent<ITileRenderableMana
 {
     public void Collect(List<IRenderable> renderables)
     {
-        if (renderables == null) throw new ArgumentNullException(nameof(renderables));
+        ArgumentNullException.ThrowIfNull(renderables);
         foreach (var child in Children)
             if (child is TileLayerRenderable renderable)
                 renderables.Add(renderable);
@@ -23,8 +23,8 @@ public sealed class TileRenderableManager : ServiceComponent<ITileRenderableMana
 
     public TilesetResourceHolder AcquireTilesetResources(ITileGraphics tileset, LogicalMap2D logicalMap, Vector2 tileSize)
     {
-        if (tileset == null) throw new ArgumentNullException(nameof(tileset));
-        if (logicalMap == null) throw new ArgumentNullException(nameof(logicalMap));
+        ArgumentNullException.ThrowIfNull(tileset);
+        ArgumentNullException.ThrowIfNull(logicalMap);
 
         foreach(var child in Children)
         {
@@ -64,7 +64,7 @@ public sealed class TileRenderableManager : ServiceComponent<ITileRenderableMana
 
     public TileLayerRenderable CreateTileRenderable(string name, byte width, ReadOnlySpan<uint> map, DrawLayer renderOrder, TilesetResourceHolder tileset)
     {
-        if (tileset == null) throw new ArgumentNullException(nameof(tileset));
+        ArgumentNullException.ThrowIfNull(tileset);
         var renderable = new TileLayerRenderable(name, width, map, renderOrder, tileset);
         AttachChild(renderable);
         return renderable;
@@ -72,7 +72,7 @@ public sealed class TileRenderableManager : ServiceComponent<ITileRenderableMana
 
     public void ReleaseTilesetResources(TilesetResourceHolder resourceHolder)
     {
-        if (resourceHolder == null) throw new ArgumentNullException(nameof(resourceHolder));
+        ArgumentNullException.ThrowIfNull(resourceHolder);
         resourceHolder.RefCount--;
         if (resourceHolder.RefCount == 0)
         {
@@ -83,7 +83,7 @@ public sealed class TileRenderableManager : ServiceComponent<ITileRenderableMana
 
     public void DisposeTileRenderable(TileLayerRenderable layerRenderable)
     {
-        if (layerRenderable == null) throw new ArgumentNullException(nameof(layerRenderable));
+        ArgumentNullException.ThrowIfNull(layerRenderable);
         RemoveChild(layerRenderable);
         layerRenderable.Dispose();
     }

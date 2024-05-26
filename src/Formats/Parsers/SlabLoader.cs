@@ -16,7 +16,7 @@ public class SlabLoader : IAssetLoader<IReadOnlyTexture<byte>>
         IReadOnlyTexture<byte> singleFrame = null;
         if (s.IsWriting())
         {
-            if (existing == null) throw new ArgumentNullException(nameof(existing));
+            ArgumentNullException.ThrowIfNull(existing);
             var texture = new SimpleTexture<byte>(
                         existing.Id,
                         existing.Name,

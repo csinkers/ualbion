@@ -30,7 +30,7 @@ public class ChangeSkillEvent : MapEvent, IDataChangeEvent
 
     public static ChangeSkillEvent Serdes(ChangeSkillEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new ChangeSkillEvent();
         var (targetType, targetId) = DataChangeEvent.UnpackTargetId(e.Target);
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);                   // 2

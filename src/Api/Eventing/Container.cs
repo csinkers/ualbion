@@ -9,7 +9,7 @@ public class Container : Component, IContainer
     public Container(string name) { Name = name; }
     public Container(string name, params IComponent[] components)
     {
-        if (components == null) throw new ArgumentNullException(nameof(components));
+        ArgumentNullException.ThrowIfNull(components);
         Name = name;
         foreach (var component in components)
             Add(component);
@@ -30,7 +30,7 @@ public class Container : Component, IContainer
 
     public void Remove(IComponent child)
     {
-        if (child == null) throw new ArgumentNullException(nameof(child));
+        ArgumentNullException.ThrowIfNull(child);
         if (!RemovingChild(child))
             return;
 

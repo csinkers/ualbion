@@ -25,7 +25,7 @@ public class LayoutNode
 
     public IEnumerable<LayoutNode> DepthFirstSearch(Func<LayoutNode, bool> predicate)
     {
-        if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+        ArgumentNullException.ThrowIfNull(predicate);
 
         foreach(var child in Children)
         {

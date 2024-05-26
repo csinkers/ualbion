@@ -55,7 +55,7 @@ public sealed class TileRenderer : Component, IRenderer, IDisposable
         var globalSet = (GlobalSet)set1 ?? throw new ArgumentNullException(nameof(set1));
         var renderPassSet = (MainPassSet)set2 ?? throw new ArgumentNullException(nameof(set2));
 
-        if (cl == null) throw new ArgumentNullException(nameof(cl));
+        ArgumentNullException.ThrowIfNull(cl);
         if (renderable is not TileLayerRenderable tileLayer)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
@@ -91,7 +91,7 @@ public sealed class TileRenderer : Component, IRenderer, IDisposable
 
 [VertexShader(typeof(TileVertexShader))]
 [FragmentShader(typeof(TileFragmentShader))]
-internal partial class TilePipeline : PipelineHolder { }
+internal sealed partial class TilePipeline : PipelineHolder { }
 
 [Name("TilesSF.frag")]
 [Input(0, typeof(TileIntermediateData))]
@@ -101,7 +101,7 @@ internal partial class TilePipeline : PipelineHolder { }
 [ResourceSet(3, typeof(TileLayerResourceSet))]
 [Output(0, typeof(SimpleFramebuffer))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-internal partial class TileFragmentShader : IFragmentShader { }
+internal sealed partial class TileFragmentShader : IFragmentShader { }
 
 [Name("TilesSV.vert")]
 [Input(0, typeof(Vertex2D))]
@@ -111,7 +111,7 @@ internal partial class TileFragmentShader : IFragmentShader { }
 [ResourceSet(3, typeof(TileLayerResourceSet))]
 [Output(0, typeof(TileIntermediateData))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-internal partial class TileVertexShader : IVertexShader { }
+internal sealed partial class TileVertexShader : IVertexShader { }
 
 internal sealed partial class TilesetResourceSet : ResourceSetHolder
 {

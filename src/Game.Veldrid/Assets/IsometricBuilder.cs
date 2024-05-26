@@ -113,7 +113,7 @@ public class IsometricBuilder : Component
 
     public List<int>[] Build(LabyrinthData labyrinth, AssetLoadContext context, IsometricMode mode, IAssetManager assets)
     {
-        if (labyrinth == null) throw new ArgumentNullException(nameof(labyrinth));
+        ArgumentNullException.ThrowIfNull(labyrinth);
         _labId = labyrinth.Id;
         _mode = mode;
 

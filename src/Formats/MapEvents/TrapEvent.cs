@@ -20,7 +20,7 @@ public class TrapEvent : MapEvent
 
     public static TrapEvent Serdes(TrapEvent e, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new TrapEvent();
         e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);
         e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);

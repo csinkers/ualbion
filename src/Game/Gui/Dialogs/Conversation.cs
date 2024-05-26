@@ -24,7 +24,7 @@ public class Conversation : GameComponent
 
     readonly PartyMemberId _partyMemberId;
     readonly ICharacterSheet _npc;
-    readonly IDictionary<WordId, WordStatus> _topics = new Dictionary<WordId, WordStatus>();
+    readonly Dictionary<WordId, WordStatus> _topics = new();
     ITextFormatter _tf;
     ConversationTextWindow _textWindow;
     ConversationTopicWindow _topicsWindow;
@@ -163,7 +163,7 @@ public class Conversation : GameComponent
 
     public async AlbionTask OnText(TextEvent mapTextEvent)
     {
-        if (mapTextEvent == null) throw new ArgumentNullException(nameof(mapTextEvent));
+        ArgumentNullException.ThrowIfNull(mapTextEvent);
 
         switch (mapTextEvent.Location)
         {

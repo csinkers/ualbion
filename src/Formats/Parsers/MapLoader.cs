@@ -10,7 +10,7 @@ public class MapLoader : IAssetLoader<IMapData>
 {
     public IMapData Serdes(IMapData existing, ISerializer s, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         return BaseMapData.Serdes(context.AssetId, existing, context.Mapping, s);
     }
 

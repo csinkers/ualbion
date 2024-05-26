@@ -10,7 +10,7 @@ public class InterlacedBitmapLoader : IAssetLoader<IReadOnlyTexture<uint>>
 {
     public IReadOnlyTexture<uint> Serdes(IReadOnlyTexture<uint> existing, ISerializer s, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         if (s.IsWriting()) // TODO: Implement writing if required. May require palette generation, which can get complicated.
             return existing;
@@ -22,7 +22,7 @@ public class InterlacedBitmapLoader : IAssetLoader<IReadOnlyTexture<uint>>
     public object Serdes(object existing, ISerializer s, AssetLoadContext context)
         => Serdes((IReadOnlyTexture<uint>)existing, s, context);
 
-    static IReadOnlyTexture<uint> ConvertIlbmToTexture(InterlacedBitmap bitmap, AssetLoadContext info)
+    static SimpleTexture<uint> ConvertIlbmToTexture(InterlacedBitmap bitmap, AssetLoadContext info)
     {
         var texture = new SimpleTexture<uint>(info.AssetId, bitmap.Width, bitmap.Height);
         texture.AddRegion(0, 0, bitmap.Width, bitmap.Height);

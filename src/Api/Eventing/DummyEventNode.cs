@@ -17,7 +17,7 @@ public class DummyEventNode : IEventNode // These should only exist temporarily 
 
     public void Format(IScriptBuilder builder, int idOffset)
     {
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
         builder.Append("DummyNode ");
         builder.Append(Id - idOffset);
     }

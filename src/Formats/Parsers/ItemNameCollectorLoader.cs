@@ -21,7 +21,7 @@ public class ItemNameCollectorLoader : Component, IAssetLoader<Dictionary<string
         ISerializer s,
         AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         if (existing != null)
             throw new NotSupportedException($"{nameof(StringSetStringLoader)} is read-only");

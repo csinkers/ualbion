@@ -16,7 +16,7 @@ public class ExecuteEvent : MapEvent
 
     public static ExecuteEvent Serdes(ExecuteEvent e, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new ExecuteEvent();
         e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);
         int zeroes = s.UInt8(null, 0);

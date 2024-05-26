@@ -10,7 +10,7 @@ public class NpcPathParser // Functionality needs to line up with NpcPathBuilder
     readonly Dictionary<int, Waypoint> _waypoints = new();
     public NpcPathParser(IEnumerable<MapObject> objects, int tileWidth, int tileHeight)
     {
-        if (objects == null) throw new ArgumentNullException(nameof(objects));
+        ArgumentNullException.ThrowIfNull(objects);
         foreach (var obj in objects)
             if ("Path".Equals(obj.Type, StringComparison.OrdinalIgnoreCase))
                 _waypoints[obj.Id] = ParseWaypoint(obj, tileWidth, tileHeight);

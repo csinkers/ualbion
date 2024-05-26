@@ -21,7 +21,7 @@ public class ChestEvent : MapEvent, ILockedInventoryEvent
 
     public static ChestEvent Serdes(ChestEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new ChestEvent();
         e.PickDifficulty = s.UInt8(nameof(PickDifficulty), e.PickDifficulty);
         e.Key = ItemId.SerdesU16(nameof(Key), e.Key, AssetType.Item, mapping, s);

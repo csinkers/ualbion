@@ -9,7 +9,7 @@ namespace UAlbion.Game.Assets;
 public sealed class AssetLoaderRegistry : ServiceComponent<IAssetLoaderRegistry>, IAssetLoaderRegistry, IDisposable
 {
     readonly object _syncRoot = new();
-    readonly IDictionary<Type, IAssetLoader> _loaders = new Dictionary<Type, IAssetLoader>();
+    readonly Dictionary<Type, IAssetLoader> _loaders = new();
 
     public IAssetLoader GetLoader(Type loaderType)
     {
@@ -19,7 +19,7 @@ public sealed class AssetLoaderRegistry : ServiceComponent<IAssetLoaderRegistry>
 
     IAssetLoader Instantiate(Type loaderType)
     {
-        if (loaderType == null) throw new ArgumentNullException(nameof(loaderType));
+        ArgumentNullException.ThrowIfNull(loaderType);
 
         var constructor = loaderType.GetConstructor(Array.Empty<Type>());
         if(constructor == null)

@@ -20,7 +20,7 @@ public class ModifyNpcOffEvent : ModifyEvent, INpcEvent
 
     public static ModifyNpcOffEvent Serdes(ModifyNpcOffEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new ModifyNpcOffEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         e.NpcNum = s.UInt8(nameof(NpcNum), e.NpcNum);

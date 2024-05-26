@@ -292,7 +292,7 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
 
     public unsafe Image<Bgra32> ReadTexture2D(ITextureHolder textureHolder)
     {
-        if (textureHolder == null) throw new ArgumentNullException(nameof(textureHolder));
+        ArgumentNullException.ThrowIfNull(textureHolder);
         var texture = textureHolder.DeviceTexture;
         var stagingDesc = new TextureDescription(
             texture.Width, texture.Height,

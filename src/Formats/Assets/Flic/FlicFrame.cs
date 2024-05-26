@@ -24,7 +24,7 @@ public class FlicFrame : FlicChunk
 
     protected override uint LoadChunk(uint length, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         var initialOffset = s.Offset;
         ushort subChunkCount = s.UInt16(null, 0);
         Delay = s.UInt16(null, 0);

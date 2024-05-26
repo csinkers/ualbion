@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace UAlbion.Api.Json;
 #pragma warning disable CA1812 // Internal class that is apparently never instantiated; this class is instantiated generically
-class DictionaryAssetIdConverter<TKey, TValue> : JsonConverter<Dictionary<TKey, TValue>> where TKey : struct, IAssetId
+sealed class DictionaryAssetIdConverter<TKey, TValue> : JsonConverter<Dictionary<TKey, TValue>> where TKey : struct, IAssetId
 {
     static readonly Type ValueType = typeof(TValue);
     static readonly IAssetId.ParserMethod<TKey> Parser = IAssetId.GetParser<TKey>();
@@ -13,7 +13,7 @@ class DictionaryAssetIdConverter<TKey, TValue> : JsonConverter<Dictionary<TKey, 
 
     public DictionaryAssetIdConverter(JsonSerializerOptions options)
     {
-        if (options == null) throw new ArgumentNullException(nameof(options));
+        ArgumentNullException.ThrowIfNull(options);
         _valueConverter = (JsonConverter<TValue>)options.GetConverter(typeof(TValue));
     }
 

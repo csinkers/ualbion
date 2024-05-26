@@ -83,7 +83,7 @@ public class BatchLease<TKey, TInstance> : IComparable<BatchLease<TKey, TInstanc
     /// <param name="context">The context for the mutator function</param>
     public void Access<T>(LeaseAccessor<T> mutatorFunc, T context)
     {
-        if (mutatorFunc == null) throw new ArgumentNullException(nameof(mutatorFunc));
+        ArgumentNullException.ThrowIfNull(mutatorFunc);
         bool lockWasTaken = false;
         var instances = Lock(ref lockWasTaken);
         try { mutatorFunc(instances, context); }

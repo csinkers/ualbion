@@ -32,7 +32,7 @@ public sealed class DataChangeEvent : MapEvent, IDataChangeEvent
 
     public static IDataChangeEvent Serdes(IDataChangeEvent existing, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         if (s.IsWriting() && existing == null) throw new ArgumentNullException(nameof(existing));
 
         var property = s.EnumU8(nameof(MapEvents.ChangeProperty), existing?.ChangeProperty ?? ChangeProperty.Attribute); // 1

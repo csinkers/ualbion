@@ -8,7 +8,7 @@ public readonly struct ZoneKey : IEquatable<ZoneKey>
 {
     public ZoneKey(MapEventZone zone)
     {
-        if (zone == null) throw new ArgumentNullException(nameof(zone));
+        ArgumentNullException.ThrowIfNull(zone);
         Global = zone.Global;
         Unk1 = zone.Unk1;
         Trigger = zone.Trigger;

@@ -23,7 +23,7 @@ public class UiTextLine : UiElement // Multiple TextChunks arranged on a line
     /// <param name="size"></param>
     public void Add(TextBlock block, Vector2 size)
     {
-        if (block == null) throw new ArgumentNullException(nameof(block));
+        ArgumentNullException.ThrowIfNull(block);
         if (string.IsNullOrEmpty(block.Text))
             return;
 
@@ -56,7 +56,7 @@ public class UiTextLine : UiElement // Multiple TextChunks arranged on a line
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
-        if (func == null) throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
 
         var lineExtents = _alignment switch
         {

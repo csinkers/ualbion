@@ -10,7 +10,7 @@ public class ItemDataLoader : Component, IAssetLoader<ItemData>
 {
     public ItemData Serdes(ItemData existing, ISerializer s, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         return ItemData.Serdes(context.AssetId, existing, s, Resolve<ISpellManager>());
     }
 

@@ -10,7 +10,7 @@ public class QueryEventUsedEvent : QueryEvent
     public override QueryType QueryType => QueryType.EventUsed;
     public static QueryEventUsedEvent Serdes(QueryEventUsedEvent e, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryEventUsedEvent();
         int zeroes = s.UInt8("zero2", 0);
         zeroes += s.UInt8("zero3", 0);

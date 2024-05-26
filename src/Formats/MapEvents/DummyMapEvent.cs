@@ -30,7 +30,7 @@ public class DummyMapEvent : MapEvent
 
     public static DummyMapEvent Serdes(DummyMapEvent e, ISerializer s, MapEventType type)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new DummyMapEvent();
         e.Type = type;
         e.Unk1 = s.UInt8(nameof(Unk1), e.Unk1);

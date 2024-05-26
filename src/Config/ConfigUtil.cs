@@ -11,7 +11,7 @@ public static class ConfigUtil
     static readonly string ProbePath = Path.Combine("mods", "Base", "types.json");
     public static string FindBasePath(IFileSystem disk) // Should roughly match UAlbion.Scripting.Tests.TestUtil
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(disk);
 
         static string Probe(string start, IFileSystem disk)
         {
@@ -31,8 +31,8 @@ public static class ConfigUtil
     static readonly char[] OneSlash = { '/' };
     public static string GetRelativePath(string path, string curDir, bool useForwardSlash)
     {
-        if (path == null) throw new ArgumentNullException(nameof(path));
-        if (curDir == null) throw new ArgumentNullException(nameof(curDir));
+        ArgumentNullException.ThrowIfNull(path);
+        ArgumentNullException.ThrowIfNull(curDir);
 
         path = path.Replace('\\', '/');
         curDir = curDir.Replace('\\', '/');

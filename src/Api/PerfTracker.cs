@@ -14,7 +14,7 @@ public static class PerfTracker
     // task / thread, to ensure that writing to the console doesn't affect
     // the perf stats
 
-    class Stats
+    sealed class Stats
     {
         public long Count { get; private set; }
         public long Total { get; private set; }
@@ -35,8 +35,8 @@ public static class PerfTracker
     }
 
     static readonly Stopwatch StartupStopwatch = Stopwatch.StartNew();
-    static readonly IDictionary<string, Stats> FrameTimes = new Dictionary<string, Stats>();
-    static readonly IDictionary<string, int> FrameCounters = new Dictionary<string, int>();
+    static readonly Dictionary<string, Stats> FrameTimes = new();
+    static readonly Dictionary<string, int> FrameCounters = new();
     static readonly List<KeyValuePair<string, int>> CountersTemp = new();
     static readonly object SyncRoot = new();
     static int _frameCount;

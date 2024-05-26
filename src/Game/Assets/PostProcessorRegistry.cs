@@ -9,12 +9,11 @@ namespace UAlbion.Game.Assets;
 public class PostProcessorRegistry : ServiceComponent<IAssetPostProcessorRegistry>, IAssetPostProcessorRegistry
 {
     readonly object _syncRoot = new();
-    readonly IDictionary<Type, IAssetPostProcessor> _loaders = new Dictionary<Type, IAssetPostProcessor>();
+    readonly Dictionary<Type, IAssetPostProcessor> _loaders = new();
 
     public IAssetPostProcessor GetPostProcessor(Type postProcessorType)
     {
-        if (postProcessorType == null)
-            throw new ArgumentNullException(nameof(postProcessorType));
+        ArgumentNullException.ThrowIfNull(postProcessorType);
 
         lock (_syncRoot)
             return _loaders.TryGetValue(postProcessorType, out var postProcessor) ? postProcessor : Instantiate(postProcessorType);

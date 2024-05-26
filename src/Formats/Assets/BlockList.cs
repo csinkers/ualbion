@@ -10,7 +10,7 @@ public class BlockList : List<Block>
     public const int MaxCount = 4095;
     public static BlockList Serdes(int blockNumber, BlockList blockList, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         blockList ??= new BlockList();
         if (s.IsCommenting())
             s.Begin(blockNumber.ToString());

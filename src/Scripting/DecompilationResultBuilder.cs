@@ -29,8 +29,7 @@ public class DecompilationResultBuilder : IScriptBuilder
 
     public void EventScope<T>(int eventId, T context, Action<T> func)
     {
-        if (func == null)
-            throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
 
         int start = _sb.Length;
         func(context);
@@ -42,8 +41,7 @@ public class DecompilationResultBuilder : IScriptBuilder
 
     public void Add<T>(ScriptPartType type, T context, Action<T, StringBuilder> func)
     {
-        if (func == null)
-            throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
 
         int start = _sb.Length;
         func(context, _sb);
@@ -58,7 +56,7 @@ public class DecompilationResultBuilder : IScriptBuilder
 
     public DecompilationResult Build(IEnumerable<ICfgNode> nodes)
     {
-        if (nodes == null) throw new ArgumentNullException(nameof(nodes));
+        ArgumentNullException.ThrowIfNull(nodes);
         return new(_sb.ToString(), _parts.ToArray(), _eventRegions.ToArray(), _eventRegionLookup, nodes.ToArray());
     }
 }

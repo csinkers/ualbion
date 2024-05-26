@@ -10,13 +10,13 @@ public class EnumReflector
 
     protected EnumReflector(Type type)
     {
-        if (type == null) throw new ArgumentNullException(nameof(type));
+        ArgumentNullException.ThrowIfNull(type);
         TypeName = ReflectorUtil.BuildTypeName(type);
     }
 
     public static Reflector Build(Type type)
     {
-        if (type == null) throw new ArgumentNullException(nameof(type));
+        ArgumentNullException.ThrowIfNull(type);
         if (!type.IsEnum) throw new ArgumentException($"EnumReflector was given a non-enum type \"{type}\"", nameof(type));
 
         Type reflectorType;

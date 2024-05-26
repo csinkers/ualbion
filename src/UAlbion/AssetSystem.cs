@@ -39,9 +39,9 @@ public static class AssetSystem
         IJsonUtil jsonUtil,
         IReadOnlyList<string> mods)
     {
-        if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
-        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        ArgumentNullException.ThrowIfNull(mapping);
+        ArgumentNullException.ThrowIfNull(disk);
+        ArgumentNullException.ThrowIfNull(jsonUtil);
 
         var pathResolver = new PathResolver(baseDir, appName);
         var settings = new SettingsManager();
@@ -62,7 +62,7 @@ public static class AssetSystem
             .Add(new AssetLocator());
 
         PerfTracker.StartupEvent("Registered asset services");
-        IModApplier modApplier = new ModApplier();
+        ModApplier modApplier = new ModApplier();
         exchange.Attach(modApplier);
         modApplier.LoadMods(mapping, pathResolver, mods ?? V.User.Gameplay.ActiveMods.Read(settings));
         mapping.ConsistencyCheck();

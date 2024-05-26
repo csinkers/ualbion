@@ -171,9 +171,9 @@ public class CharacterSheet : ICharacterSheet
 
     public static CharacterSheet Serdes(SheetId id, CharacterSheet sheet, AssetMapping mapping, ISerializer s, ISpellManager spellManager)
     {
-        if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (spellManager == null) throw new ArgumentNullException(nameof(spellManager));
+        ArgumentNullException.ThrowIfNull(mapping);
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(spellManager);
         var initialOffset = s.Offset;
 
         sheet ??= new CharacterSheet(id);

@@ -21,7 +21,7 @@ public class XldContainer : IAssetContainer
 
     public ISerializer Read(string path, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         if (!context.Disk.FileExists(path))
             return null;
 
@@ -36,8 +36,8 @@ public class XldContainer : IAssetContainer
 
     public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
     {
-        if (assets == null) throw new ArgumentNullException(nameof(assets));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(assets);
+        ArgumentNullException.ThrowIfNull(context);
 
         var dir = Path.GetDirectoryName(path);
         if (!context.Disk.DirectoryExists(dir))
@@ -73,7 +73,7 @@ public class XldContainer : IAssetContainer
                 s.Bytes(null, buffer, buffer.Length);
     }
 
-    static byte[] LoadAsset(int subItem, ISerializer s)
+    static byte[] LoadAsset(int subItem, AlbionReader s)
     {
         var lengths = HeaderSerdes(null, s);
         if (subItem >= lengths.Length)
@@ -97,7 +97,7 @@ public class XldContainer : IAssetContainer
 
     static int[] HeaderSerdes(int[] lengths, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         s.Begin("XldHeader");
         string magic = s.NullTerminatedString("MagicString", MagicString);
         if(magic != MagicString)
@@ -187,8 +187,8 @@ public class XldContainer : IAssetContainer
         Action<int, int, TContext, ISerializer> func,
         IList<int> populatedIds)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (lastId < firstId) throw new ArgumentOutOfRangeException(nameof(lastId));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentOutOfRangeException.ThrowIfLessThan(lastId, firstId);
 
         s.Object(
             $"{category}.{firstId}-{lastId}",

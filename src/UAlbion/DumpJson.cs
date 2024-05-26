@@ -12,7 +12,7 @@ using UAlbion.Game;
 
 namespace UAlbion;
 
-class DumpJson : GameComponent, IAssetDumper
+sealed class DumpJson : GameComponent, IAssetDumper
 {
     public void Dump(string baseDir, ISet<AssetType> types, AssetId[] dumpIds)
     {

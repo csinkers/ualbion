@@ -9,7 +9,7 @@ public static class ZipUtil
 {
     public static int[] Inflate(byte[] compressed)
     {
-        if (compressed == null) throw new ArgumentNullException(nameof(compressed));
+        ArgumentNullException.ThrowIfNull(compressed);
         var inflater = new Inflater();
         inflater.SetInput(compressed);
 
@@ -40,7 +40,7 @@ public static class ZipUtil
 
     public static byte[] Deflate(byte[] bytes)
     {
-        if (bytes == null) throw new ArgumentNullException(nameof(bytes));
+        ArgumentNullException.ThrowIfNull(bytes);
 
         var deflater = new Deflater();
         deflater.SetLevel(Deflater.DEFAULT_COMPRESSION);

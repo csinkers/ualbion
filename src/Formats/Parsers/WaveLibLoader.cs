@@ -11,7 +11,7 @@ public class WaveLibLoader : IAssetLoader<WaveLib>
         => Serdes((WaveLib)existing, s, context);
     public WaveLib Serdes(WaveLib existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         return WaveLib.Serdes(existing, s);
     }
 }

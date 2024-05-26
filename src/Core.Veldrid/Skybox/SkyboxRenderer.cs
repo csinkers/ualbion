@@ -53,7 +53,7 @@ public sealed class SkyboxRenderer : Component, IRenderer, IDisposable
         var globalSet = (GlobalSet)set1 ?? throw new ArgumentNullException(nameof(set1));
         var renderPassSet = (MainPassSet)set2 ?? throw new ArgumentNullException(nameof(set2));
 
-        if (cl == null) throw new ArgumentNullException(nameof(cl));
+        ArgumentNullException.ThrowIfNull(cl);
         if (renderable is not SkyboxRenderable skybox)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
@@ -81,9 +81,9 @@ public sealed class SkyboxRenderer : Component, IRenderer, IDisposable
 
 [VertexShader(typeof(SkyboxVertexShader))]
 [FragmentShader(typeof(SkyboxFragmentShader))]
-partial class SkyboxPipeline : PipelineHolder { }
+sealed partial class SkyboxPipeline : PipelineHolder { }
 
-partial class SkyboxResourceSet : ResourceSetHolder
+sealed partial class SkyboxResourceSet : ResourceSetHolder
 {
     [Sampler("uSampler", ShaderStages.Fragment)] ISamplerHolder _sampler;
     [Texture("uTexture", ShaderStages.Fragment)] ITextureHolder _texture;
@@ -95,7 +95,7 @@ partial class SkyboxResourceSet : ResourceSetHolder
 [ResourceSet(2, typeof(SkyboxResourceSet))]
 [Output(0, typeof(SkyboxIntermediate))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-internal partial class SkyboxVertexShader : IVertexShader { }
+internal sealed partial class SkyboxVertexShader : IVertexShader { }
 
 [Name("SkyBoxSF.frag")]
 [Input(0, typeof(SkyboxIntermediate))]
@@ -104,7 +104,7 @@ internal partial class SkyboxVertexShader : IVertexShader { }
 [ResourceSet(2, typeof(SkyboxResourceSet))]
 [Output(0, typeof(SimpleFramebuffer))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-internal partial class SkyboxFragmentShader : IFragmentShader { }
+internal sealed partial class SkyboxFragmentShader : IFragmentShader { }
 
 #pragma warning disable 649
 [StructLayout(LayoutKind.Sequential)]

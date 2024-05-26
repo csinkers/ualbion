@@ -27,7 +27,7 @@ public class AssetMapping
 
     static T GetAttribute<T>(object x) where T : Attribute
     {
-        if (x == null) throw new ArgumentNullException(nameof(x));
+        ArgumentNullException.ThrowIfNull(x);
         var str = x.ToString();
         if (str == null)
             return null;
@@ -56,7 +56,7 @@ public class AssetMapping
         public override string ToString() => $"{From}:{To}";
     }
 
-    class EnumInfo
+    sealed class EnumInfo
     {
         [JsonIgnore] readonly string _enumTypeString;
         [JsonIgnore] public Type EnumType { get; set; }
@@ -286,8 +286,7 @@ public class AssetMapping
 
     public AssetId EnumToId(Type enumType, string value)
     {
-        if (value == null)
-            throw new ArgumentNullException(nameof(value));
+        ArgumentNullException.ThrowIfNull(value);
 
         if (!_byEnumType.TryGetValue(enumType, out var enumInfo))
             throw new FormatException($"Could not parse a value of type \"{enumType}\", as it has not been registered in the asset mapping");
@@ -330,7 +329,7 @@ public class AssetMapping
     /// <param name="assetType">The type of asset that the enum identifies</param>
     public AssetMapping RegisterAssetType(string enumName, AssetType assetType)
     {
-        if (enumName == null) throw new ArgumentNullException(nameof(enumName));
+        ArgumentNullException.ThrowIfNull(enumName);
 
         var mapping = _byAssetType[(byte)assetType];
         var info = new EnumInfo(enumName, assetType, mapping.LastOrDefault()?.MappedMax);
@@ -424,7 +423,7 @@ public class AssetMapping
 
     public string Serialize(IJsonUtil jsonUtil)
     {
-        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        ArgumentNullException.ThrowIfNull(jsonUtil);
         return jsonUtil.Serialize(
             _byEnumType.ToDictionary(
                 x => x.Key.AssemblyQualifiedName,
@@ -433,7 +432,7 @@ public class AssetMapping
 
     public static AssetMapping Deserialize(byte[] json, IJsonUtil jsonUtil)
     {
-        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        ArgumentNullException.ThrowIfNull(jsonUtil);
         var stringKeyed = jsonUtil.Deserialize<Dictionary<string, EnumInfo>>(json);
         var typeKeyed = stringKeyed.ToDictionary(
             x => Type.GetType(x.Key),
@@ -447,7 +446,7 @@ public class AssetMapping
 
     public void MergeFrom(AssetMapping other)
     {
-        if (other == null) throw new ArgumentNullException(nameof(other));
+        ArgumentNullException.ThrowIfNull(other);
         foreach (var info in other._byAssetType.SelectMany(x => x))
         {
             if (!_byEnumType.ContainsKey(info.EnumType))
@@ -540,7 +539,7 @@ public class AssetMapping
 
     public AssetId MaxIdForType(Type type)
     {
-        if (type == null) throw new ArgumentNullException(nameof(type));
+        ArgumentNullException.ThrowIfNull(type);
         if (!_byEnumType.TryGetValue(type, out var result))
             throw new FormatException($"Could not get max id for unmapped type \"{type.FullName}\"");
 

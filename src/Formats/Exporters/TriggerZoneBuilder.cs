@@ -12,7 +12,7 @@ public static class TriggerZoneBuilder
 {
     public static IList<(ZoneKey, Geometry.Polygon)> BuildZones(BaseMapData map)
     {
-        if (map == null) throw new ArgumentNullException(nameof(map));
+        ArgumentNullException.ThrowIfNull(map);
 
         // Render zones to a grid
         var zoneMap = new MapEventZone[map.Width * map.Height];
@@ -80,7 +80,7 @@ public static class TriggerZoneBuilder
 
     public static string PrintRegion(IList<(int x, int y)> region)
     {
-        if (region == null) throw new ArgumentNullException(nameof(region));
+        ArgumentNullException.ThrowIfNull(region);
 
         var extents = GetExtents(region);
         var width = 1 + extents.x1 - extents.x0;
@@ -116,7 +116,7 @@ public static class TriggerZoneBuilder
 
     public static void RemoveVoids(List<(ZoneKey key, IList<(int x, int y)> points)> regions)
     {
-        if (regions == null) throw new ArgumentNullException(nameof(regions));
+        ArgumentNullException.ThrowIfNull(regions);
 
         for (int regionIndex = 0; regionIndex < regions.Count; regionIndex++)
         {
@@ -166,7 +166,7 @@ public static class TriggerZoneBuilder
 
     public static IList<Edge> FindRegionEdges(IList<(int, int)> region)
     {
-        if (region == null) throw new ArgumentNullException(nameof(region));
+        ArgumentNullException.ThrowIfNull(region);
         var w = region.Max(x => x.Item1) + 1;
         var h = region.Max(x => x.Item2) + 1;
         var grid = new bool[w * h];
@@ -262,10 +262,10 @@ public static class TriggerZoneBuilder
         indices.Add(index);
     }
 
-    class EdgeLookup : Dictionary<(ushort, ushort), List<int>> { }
+    sealed class EdgeLookup : Dictionary<(ushort, ushort), List<int>> { }
     public static IList<Geometry.Polygon> BuildPolygonsFromSortedEdges(IList<Edge> edges)
     {
-        if (edges == null) throw new ArgumentNullException(nameof(edges));
+        ArgumentNullException.ThrowIfNull(edges);
 
         var adjacency = new EdgeLookup(); // Build lookups
         for (int i = 0; i < edges.Count; i++)
@@ -438,7 +438,7 @@ public static class TriggerZoneBuilder
 
     public static IList<(int x, int y)> GetPointsInsidePolygon(IEnumerable<(int, int)> polygon)
     {
-        if (polygon == null) throw new ArgumentNullException(nameof(polygon));
+        ArgumentNullException.ThrowIfNull(polygon);
         var shape = PolygonToShape(polygon);
         return GetPointsInsideShape(shape);
     }
@@ -463,7 +463,7 @@ public static class TriggerZoneBuilder
         yield return (lastPoint, firstPoint);
     }
 
-    static IList<(int x, int y)> GetPointsInsideShape(IEnumerable<((int x, int y) from, (int x, int y) to)> shape)
+    static List<(int x, int y)> GetPointsInsideShape(IEnumerable<((int x, int y) from, (int x, int y) to)> shape)
     {
         var results = new List<(int x, int y)>();
         shape = SortEdges(shape);

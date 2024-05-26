@@ -24,7 +24,7 @@ public partial struct SpriteInfo
 
     public SpriteInfo(SpriteFlags flags, Vector3 position, Vector2 size, Region region)
     {
-        if (region == null) throw new ArgumentNullException(nameof(region));
+        ArgumentNullException.ThrowIfNull(region);
         Flags = flags;
         Position = new Vector4(position, 1);
         Size = size;

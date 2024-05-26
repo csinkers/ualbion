@@ -30,7 +30,7 @@ public partial struct BlendedSpriteInfo
 
     public BlendedSpriteInfo(SpriteFlags flags, Vector3 position, Vector2 size, Region region1, Region region2)
     {
-        if (region1 == null) throw new ArgumentNullException(nameof(region1));
+        ArgumentNullException.ThrowIfNull(region1);
         Flags = flags;
         Position = new Vector4(position, 1);
         Size = size;

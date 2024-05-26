@@ -12,7 +12,7 @@ namespace UAlbion.Core.Veldrid;
 public record RefreshFramebuffersEvent : EventRecord;
 public abstract class FramebufferHolder : Component, IFramebufferHolder
 {
-    class TextureHolder : ITextureHolder
+    sealed class TextureHolder : ITextureHolder
     {
         readonly Func<Texture> _getter;
         public TextureHolder(Func<Texture> getter) => _getter = getter ?? throw new ArgumentNullException(nameof(getter));

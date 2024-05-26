@@ -11,11 +11,11 @@ namespace UAlbion.Game.Assets;
 public class ContainerRegistry : ServiceComponent<IContainerRegistry>, IContainerRegistry
 {
     readonly object _syncRoot = new();
-    readonly IDictionary<Type, IAssetContainer> _containers = new Dictionary<Type, IAssetContainer>();
+    readonly Dictionary<Type, IAssetContainer> _containers = new();
 
     public IAssetContainer GetContainer(string path, Type container, IFileSystem disk)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(disk);
         if (container != null)
             return GetContainer(container);
 

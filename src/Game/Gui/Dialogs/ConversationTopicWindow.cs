@@ -82,7 +82,7 @@ public class ConversationTopicWindow : ModalDialog
             }
         ).ToArray();
 
-        if (wordButtons.Any())
+        if (wordButtons.Length > 0)
         {
             elements.Add(new GroupingFrame(new VerticalStacker(wordButtons)));
             elements.Add(new Spacing(0, 3));

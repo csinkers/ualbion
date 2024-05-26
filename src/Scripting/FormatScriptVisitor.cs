@@ -44,7 +44,7 @@ public class FormatScriptVisitor : IAstVisitor
 
     public void Visit(SingleEvent e)
     {
-        if (e == null) throw new ArgumentNullException(nameof(e));
+        ArgumentNullException.ThrowIfNull(e);
 
         Indent();
         _builder.EventScope(e.OriginalIndex, (e, this), static x =>
@@ -67,13 +67,13 @@ public class FormatScriptVisitor : IAstVisitor
     public void Visit(EmptyNode empty) { _builder.Add(ScriptPartType.Comment, "ø"); }
     public void Visit(Name name)
     {
-        if (name == null) throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(name);
         _builder.Add(ScriptPartType.Identifier, name.Value);
     }
 
     public void Visit(Negation negation)
     {
-        if (negation == null) throw new ArgumentNullException(nameof(negation));
+        ArgumentNullException.ThrowIfNull(negation);
         _builder.Add(ScriptPartType.Operator, "!");
         bool parens = negation.Expression.Priority > negation.Priority;
         if (parens) _builder.Append('(');
@@ -82,13 +82,13 @@ public class FormatScriptVisitor : IAstVisitor
     }
     public void Visit(Numeric numeric)
     {
-        if (numeric == null) throw new ArgumentNullException(nameof(numeric));
+        ArgumentNullException.ThrowIfNull(numeric);
         _builder.Add(ScriptPartType.Number, numeric.Value.ToString());
     }
 
     public void Visit(IfThen ifThen)
     {
-        if (ifThen == null) throw new ArgumentNullException(nameof(ifThen));
+        ArgumentNullException.ThrowIfNull(ifThen);
         Indent();
         _builder.Add(ScriptPartType.Keyword, "if");
         _builder.Append(" (");
@@ -109,7 +109,7 @@ public class FormatScriptVisitor : IAstVisitor
 
     public void Visit(IfThenElse ifElse)
     {
-        if (ifElse == null) throw new ArgumentNullException(nameof(ifElse));
+        ArgumentNullException.ThrowIfNull(ifElse);
         Indent();
         _builder.Add(ScriptPartType.Keyword, "if");
         _builder.Append(" (");
@@ -139,7 +139,7 @@ public class FormatScriptVisitor : IAstVisitor
 
     public void Visit(GotoStatement jump)
     {
-        if (jump == null) throw new ArgumentNullException(nameof(jump));
+        ArgumentNullException.ThrowIfNull(jump);
         Indent();
         _builder.Add(ScriptPartType.Keyword, "goto ");
         _builder.Add(ScriptPartType.Label, jump.Label);
@@ -147,7 +147,7 @@ public class FormatScriptVisitor : IAstVisitor
 
     public void Visit(Statement statement)
     {
-        if (statement == null) throw new ArgumentNullException(nameof(statement));
+        ArgumentNullException.ThrowIfNull(statement);
         Indent();
         if (WrapStatements)
             _builder.Append("S(");
@@ -165,7 +165,7 @@ public class FormatScriptVisitor : IAstVisitor
 
     public void Visit(Sequence sequence)
     {
-        if (sequence == null) throw new ArgumentNullException(nameof(sequence));
+        ArgumentNullException.ThrowIfNull(sequence);
         bool first = true;
         foreach (var node in sequence.Statements)
         {
@@ -178,7 +178,7 @@ public class FormatScriptVisitor : IAstVisitor
 
     public void Visit(DoLoop doLoop)
     {
-        if (doLoop == null) throw new ArgumentNullException(nameof(doLoop));
+        ArgumentNullException.ThrowIfNull(doLoop);
         Indent();
         _builder.Add(ScriptPartType.Keyword, "do");
         _builder.Append(" {");
@@ -201,7 +201,7 @@ public class FormatScriptVisitor : IAstVisitor
 
     public void Visit(EndlessLoop endlessLoop)
     {
-        if (endlessLoop == null) throw new ArgumentNullException(nameof(endlessLoop));
+        ArgumentNullException.ThrowIfNull(endlessLoop);
         Indent();
         _builder.Add(ScriptPartType.Keyword, "loop");
         _builder.Append(" {");
@@ -216,7 +216,7 @@ public class FormatScriptVisitor : IAstVisitor
 
     public void Visit(WhileLoop whileLoop)
     {
-        if (whileLoop == null) throw new ArgumentNullException(nameof(whileLoop));
+        ArgumentNullException.ThrowIfNull(whileLoop);
         Indent();
         _builder.Add(ScriptPartType.Keyword, "while");
         _builder.Append(" (");
@@ -237,7 +237,7 @@ public class FormatScriptVisitor : IAstVisitor
 
     public void Visit(Label label)
     {
-        if (label == null) throw new ArgumentNullException(nameof(label));
+        ArgumentNullException.ThrowIfNull(label);
         Indent();
         _builder.Add(ScriptPartType.Label, label, (l, sb) =>
         {
@@ -248,7 +248,7 @@ public class FormatScriptVisitor : IAstVisitor
 
     public void Visit(BinaryOp binaryOp)
     {
-        if (binaryOp == null) throw new ArgumentNullException(nameof(binaryOp));
+        ArgumentNullException.ThrowIfNull(binaryOp);
         bool parens = binaryOp.Left.Priority > binaryOp.Priority;
         if (parens) _builder.Append('(');
         binaryOp.Left.Accept(this);

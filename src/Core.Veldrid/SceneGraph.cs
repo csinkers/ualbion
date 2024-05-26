@@ -25,7 +25,7 @@ public class SceneGraph : ServiceComponent<ISceneGraph>, ISceneGraph
 
     public void Add(IPositioned entity)
     {
-        if (entity == null) throw new ArgumentNullException(nameof(entity));
+        ArgumentNullException.ThrowIfNull(entity);
         _octree.AddItem(new BoundingBox(
                 entity.Position - entity.Dimensions,
                 entity.Position + entity.Dimensions),
@@ -36,7 +36,7 @@ public class SceneGraph : ServiceComponent<ISceneGraph>, ISceneGraph
 
     public void RayIntersect(Vector3 origin, Vector3 direction, List<Selection> hits)
     {
-        if (hits == null) throw new ArgumentNullException(nameof(hits));
+        ArgumentNullException.ThrowIfNull(hits);
 
         _hitList ??= new List<RayCastHit<IPositioned>>();
         _hitList.Clear();

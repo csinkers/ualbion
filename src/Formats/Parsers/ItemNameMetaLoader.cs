@@ -13,7 +13,7 @@ public class ItemNameMetaLoader : Component, IAssetLoader<ListStringSet>
     public static readonly AssetIdAssetProperty TargetProperty = new("Target");
     public ListStringSet Serdes(ListStringSet existing, ISerializer s, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         var targetId = context.GetProperty(TargetProperty);
         if (targetId == AssetId.None)
             return null;

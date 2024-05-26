@@ -16,7 +16,7 @@ public class FontComponent
 
     public Region TryGetRegion(char c, ITexture texture)
     {
-        if (texture == null) throw new ArgumentNullException(nameof(texture));
+        ArgumentNullException.ThrowIfNull(texture);
 
         int index = Mapping.IndexOf(c, StringComparison.Ordinal);
         if (index == -1)

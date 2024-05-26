@@ -97,7 +97,7 @@ public static class ApiUtil
 
     public static uint SizeInBytes<T>(this T[] array) where T : struct
     {
-        if (array == null) throw new ArgumentNullException(nameof(array));
+        ArgumentNullException.ThrowIfNull(array);
         return (uint)(array.Length * Unsafe.SizeOf<T>());
     }
 
@@ -177,7 +177,7 @@ public static class ApiUtil
 
     public static int IndexOfIgnoreCase(IList<string> list, string str)
     {
-        if (list == null) throw new ArgumentNullException(nameof(list));
+        ArgumentNullException.ThrowIfNull(list);
         if (string.IsNullOrEmpty(str)) throw new ArgumentNullException(nameof(str));
 
         for (int i = 0; i < list.Count; i++)

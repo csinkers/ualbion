@@ -134,8 +134,8 @@ public sealed class ItemData
 
     public static ItemData Serdes(AssetId id, ItemData item, ISerializer s, ISpellManager spellManager)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (spellManager == null) throw new ArgumentNullException(nameof(spellManager));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(spellManager);
 
         item ??= new ItemData(id);
         item.Unknown  = s.UInt8(nameof(item.Unknown), item.Unknown); // 0

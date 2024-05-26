@@ -36,8 +36,8 @@ public static class TileMapping
 
     public static Tile BuildTile(TilesetId id, int index, ushort? imageNumber, List<TiledProperty> tileProperties, Tilemap2DProperties properties, AssetPathPattern graphicsPattern)
     {
-        if (properties == null) throw new ArgumentNullException(nameof(properties));
-        if (graphicsPattern == null) throw new ArgumentNullException(nameof(graphicsPattern));
+        ArgumentNullException.ThrowIfNull(properties);
+        ArgumentNullException.ThrowIfNull(graphicsPattern);
 
         var source = imageNumber switch
         {
@@ -61,9 +61,9 @@ public static class TileMapping
 
     public static TileData InterpretTile(Tile tile, Tilemap2DProperties properties, AssetPathPattern graphicsPattern)
     {
-        if (tile == null) throw new ArgumentNullException(nameof(tile));
-        if (properties == null) throw new ArgumentNullException(nameof(properties));
-        if (graphicsPattern == null) throw new ArgumentNullException(nameof(graphicsPattern));
+        ArgumentNullException.ThrowIfNull(tile);
+        ArgumentNullException.ThrowIfNull(properties);
+        ArgumentNullException.ThrowIfNull(graphicsPattern);
 
         var result = new TileData
         {
@@ -92,7 +92,7 @@ public static class TileMapping
 
     public static List<TiledProperty> BuildTileProperties(TileData x)
     {
-        if (x == null) throw new ArgumentNullException(nameof(x));
+        ArgumentNullException.ThrowIfNull(x);
 
         var properties = new List<TiledProperty>
         {
@@ -123,7 +123,7 @@ public static class TileMapping
 
     public static List<TiledProperty> BuildIsoTileProperties(LabyrinthData labyrinth, int index, IsometricMode isoMode)
     {
-        if (labyrinth == null) throw new ArgumentNullException(nameof(labyrinth));
+        ArgumentNullException.ThrowIfNull(labyrinth);
 
         var properties = new List<TiledProperty>();
         if (index == 0) // First tile always blank

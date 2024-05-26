@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UAlbion.Api.Eventing;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
@@ -58,7 +57,7 @@ public class ConversationOptionsWindow : ModalDialog
 
         if (standardOptions != null)
         {
-            if (_optionElements.Any() && options?.Any() == true)
+            if (_optionElements.Count > 0 && options is { Length: > 0 })
                 _optionElements.Add(new Spacing(0, 10));
 
             foreach (var (text, blockId, result) in standardOptions)

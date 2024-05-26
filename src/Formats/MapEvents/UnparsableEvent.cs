@@ -10,7 +10,7 @@ public class UnparsableEvent : IVerboseEvent // No-op event for parsing failures
     public override string ToString() => RawEventText;
     public void Format(IScriptBuilder builder)
     {
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
         builder.Add(ScriptPartType.Error, RawEventText);
     }
 }

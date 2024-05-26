@@ -12,8 +12,8 @@ public class SheetApplier : Component
 {
     public void Apply(IDataChangeEvent e, CharacterSheet sheet)
     {
-        if (e == null) throw new ArgumentNullException(nameof(e));
-        if (sheet == null) throw new ArgumentNullException(nameof(sheet));
+        ArgumentNullException.ThrowIfNull(e);
+        ArgumentNullException.ThrowIfNull(sheet);
 
         switch (e)
         {

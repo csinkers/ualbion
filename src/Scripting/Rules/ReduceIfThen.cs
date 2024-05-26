@@ -7,7 +7,7 @@ public static class ReduceIfThen
     const string Description = "Reduce if-then";
     public static (ControlFlowGraph, string) Decompile(ControlFlowGraph graph)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
         foreach (var head in graph.GetDfsPostOrder())
         {
             var (trueChild, falseChild) = graph.GetBinaryChildren(head);

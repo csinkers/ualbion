@@ -17,7 +17,7 @@ public class OffsetEvent : MapEvent
 
     public static OffsetEvent Serdes(OffsetEvent e, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new OffsetEvent();
         e.X = s.Int8(nameof(X), e.X);
         e.Y = s.Int8(nameof(Y), e.Y);

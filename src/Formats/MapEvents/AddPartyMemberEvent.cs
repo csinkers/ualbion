@@ -11,7 +11,7 @@ public class AddPartyMemberEvent : ModifyEvent
 {
     public static AddPartyMemberEvent Serdes(AddPartyMemberEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new AddPartyMemberEvent();
         e.Operation = s.EnumU8(nameof(e.Operation), e.Operation);
         if (e.Operation != NumericOperation.SetAmount)

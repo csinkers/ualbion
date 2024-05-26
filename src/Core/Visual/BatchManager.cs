@@ -25,7 +25,7 @@ public class BatchManager<TKey, TInstance> : ServiceComponent<IBatchManager<TKey
 
     public BatchLease<TKey, TInstance> Borrow(TKey key, int count, object owner)
     {
-        if (count <= 0) throw new ArgumentOutOfRangeException(nameof(count));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(count);
         lock (_syncRoot)
         {
             if (!_batchLookup.TryGetValue(key, out var entry))
@@ -66,7 +66,7 @@ public class BatchManager<TKey, TInstance> : ServiceComponent<IBatchManager<TKey
 
     public void Collect(List<IRenderable> renderables)
     {
-        if (renderables == null) throw new ArgumentNullException(nameof(renderables));
+        ArgumentNullException.ThrowIfNull(renderables);
         lock (_syncRoot)
         {
             foreach (var kvp in _batchList)

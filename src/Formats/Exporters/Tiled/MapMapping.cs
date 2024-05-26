@@ -24,7 +24,7 @@ public static class MapMapping
 
     public static void ReadMapProperties(BaseMapData albionMap, Map tiledMap)
     {
-        if (albionMap == null) throw new ArgumentNullException(nameof(albionMap));
+        ArgumentNullException.ThrowIfNull(albionMap);
 
         albionMap.CombatBackgroundId = PropId(tiledMap, Prop.CombatBackground);
         albionMap.SongId = PropId(tiledMap, Prop.Song);
@@ -45,7 +45,7 @@ public static class MapMapping
 
     public static List<TiledProperty> BuildMapProperties(BaseMapData map)
     {
-        if (map == null) throw new ArgumentNullException(nameof(map));
+        ArgumentNullException.ThrowIfNull(map);
 
         var props = new List<TiledProperty>();
         props.Add(new(Prop.Palette, map.PaletteId.ToString()));

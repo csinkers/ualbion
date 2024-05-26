@@ -28,7 +28,7 @@ public class SoundEvent : MapEvent, ISoundEvent
 
     public static SoundEvent Serdes(SoundEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new SoundEvent();
         e.Mode = s.EnumU8(nameof(Mode), e.Mode);
         e.SoundId = SampleId.SerdesU8(nameof(SoundId), e.SoundId, mapping, s);

@@ -6,7 +6,7 @@ using static System.FormattableString;
 
 namespace UAlbion.Formats.Assets.Maps;
 
-class NpcWaypointConverter : JsonConverter<NpcWaypoint[]>
+sealed class NpcWaypointConverter : JsonConverter<NpcWaypoint[]>
 {
     NpcWaypointConverter() {}
     public static readonly NpcWaypointConverter Instance = new();

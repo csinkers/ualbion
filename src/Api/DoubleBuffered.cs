@@ -8,7 +8,7 @@ public class DoubleBuffered<T>
 
     public DoubleBuffered(Func<T> constructor)
     {
-        if (constructor == null) throw new ArgumentNullException(nameof(constructor));
+        ArgumentNullException.ThrowIfNull(constructor);
         Front = constructor();
         Back = constructor();
     }

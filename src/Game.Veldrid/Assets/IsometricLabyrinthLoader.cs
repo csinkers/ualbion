@@ -120,7 +120,7 @@ public sealed class IsometricLabyrinthLoader : GameComponent, IAssetLoader<Labyr
 
     public LabyrinthData Serdes(LabyrinthData existing, ISerializer s, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         var json = context.GetProperty(AssetProps.Pattern, AssetPathPattern.Build("{0}_{2}.json"));
         var path = context.BuildAssetPath();
@@ -135,7 +135,7 @@ public sealed class IsometricLabyrinthLoader : GameComponent, IAssetLoader<Labyr
                 _jsonLoader.Serdes(null, s2, context));
         }
 
-        if (existing == null) throw new ArgumentNullException(nameof(existing));
+        ArgumentNullException.ThrowIfNull(existing);
         var floorTsx    = context.GetProperty(TiledFloorPattern);
         var ceilingTsx  = context.GetProperty(TiledCeilingPattern);
         var wallTsx     = context.GetProperty(TiledWallPattern);

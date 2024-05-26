@@ -9,7 +9,7 @@ public class PauseEvent : MapEvent
 {
     public static PauseEvent Serdes(PauseEvent e, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new PauseEvent();
         e.Length = s.UInt8(nameof(Length), e.Length);
         int zeroes = s.UInt8(null, 0);

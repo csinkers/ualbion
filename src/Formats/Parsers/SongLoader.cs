@@ -11,11 +11,11 @@ public class SongLoader : IAssetLoader<byte[]>
 
     public byte[] Serdes(byte[] existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         if (s.IsReading())
             return s.Bytes(null, null, (int) s.BytesRemaining);
 
-        if (existing == null) throw new ArgumentNullException(nameof(existing));
+        ArgumentNullException.ThrowIfNull(existing);
         s.Bytes(null, existing, existing.Length);
         return existing;
     }

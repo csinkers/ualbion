@@ -101,7 +101,7 @@ public readonly struct AlbionTask<T> : INotifyCompletion, IEquatable<AlbionTask<
 
     public void OnCompleted(Action continuation)
     {
-        if (continuation == null) throw new ArgumentNullException(nameof(continuation));
+        ArgumentNullException.ThrowIfNull(continuation);
 
         if (_core == null)
         {

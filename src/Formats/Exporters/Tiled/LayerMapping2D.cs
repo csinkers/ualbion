@@ -16,7 +16,7 @@ public static class LayerMapping2D
 
     public static MapTile[] ReadMapLayers(Map map)
     {
-        if (map == null) throw new ArgumentNullException(nameof(map));
+        ArgumentNullException.ThrowIfNull(map);
         var firstGid = map.Tilesets[0].FirstGid; // Assume the main tileset always comes first
         var underlay = LoadLayer(map, LayerName.Underlay, firstGid);
         var overlay = LoadLayer(map, LayerName.Overlay, firstGid);
@@ -25,8 +25,8 @@ public static class LayerMapping2D
 
     public static List<TiledMapLayer> BuildMapLayers(MapData2D map, TilesetData tileset, ref int nextLayerId)
     {
-        if (map == null) throw new ArgumentNullException(nameof(map));
-        if (tileset == null) throw new ArgumentNullException(nameof(tileset));
+        ArgumentNullException.ThrowIfNull(map);
+        ArgumentNullException.ThrowIfNull(tileset);
         var encoding = UncompressedCsvTileEncoding.Instance;
 
         var underlayId = nextLayerId++;
@@ -38,9 +38,9 @@ public static class LayerMapping2D
         };
     }
 
-    static TiledMapLayer BuildLayer(ITileEncoding encoding, int id, string name, int width, int height, int[] data)
+    static TiledMapLayer BuildLayer(UncompressedCsvTileEncoding encoding, int id, string name, int width, int height, int[] data)
     {
-        if (encoding == null) throw new ArgumentNullException(nameof(encoding));
+        ArgumentNullException.ThrowIfNull(encoding);
         return new()
         {
             Id = id,

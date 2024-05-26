@@ -30,8 +30,8 @@ public class VeldridGameFactory : VeldridCoreFactory, IGameFactory
     //*
     public IMapLayer CreateMapLayer(LogicalMap2D logicalMap, ITileGraphics tileset, Vector2 tileSize)
     {
-        if (logicalMap == null) throw new ArgumentNullException(nameof(logicalMap));
-        if (tileset == null) throw new ArgumentNullException(nameof(tileset));
+        ArgumentNullException.ThrowIfNull(logicalMap);
+        ArgumentNullException.ThrowIfNull(tileset);
         return new TileRendererMapLayer(logicalMap, tileset, tileSize, DrawLayer.Underlay);
     }
 

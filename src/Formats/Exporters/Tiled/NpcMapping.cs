@@ -32,7 +32,7 @@ public static class NpcMapping
         ref int nextObjectGroupId,
         ref int nextObjectId)
     {
-        if (map == null) throw new ArgumentNullException(nameof(map));
+        ArgumentNullException.ThrowIfNull(map);
 
         int nextId = nextObjectId;
         int npcGroupId = nextObjectGroupId++;
@@ -126,9 +126,9 @@ public static class NpcMapping
 
     public static MapNpc ParseNpc(MapObject obj, int tileWidth, int tileHeight, Func<string, ushort> resolveEntryPoint, NpcPathParser pathParser)
     {
-        if (obj == null) throw new ArgumentNullException(nameof(obj));
-        if (resolveEntryPoint == null) throw new ArgumentNullException(nameof(resolveEntryPoint));
-        if (pathParser == null) throw new ArgumentNullException(nameof(pathParser));
+        ArgumentNullException.ThrowIfNull(obj);
+        ArgumentNullException.ThrowIfNull(resolveEntryPoint);
+        ArgumentNullException.ThrowIfNull(pathParser);
 
         var position = ((int)obj.X / tileWidth, (int)obj.Y / tileHeight);
         NpcWaypoint[] waypoints = { new((byte)position.Item1, (byte)position.Item2) };

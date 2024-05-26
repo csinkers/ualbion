@@ -20,8 +20,8 @@ public class TilesetData
     public static TilesetData Serdes(TilesetData td, ISerializer s, AssetLoadContext context)
     {
         const int dummyTileCount = 1;
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
 
         int tileCount = td?.Tiles.Count ?? (int)(s.BytesRemaining / 8) + dummyTileCount;
         td ??= new TilesetData(context.AssetId);

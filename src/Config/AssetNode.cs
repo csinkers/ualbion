@@ -42,7 +42,7 @@ public class AssetNode
     /// <returns>The parsed value, or defaultValue if no value existed or could be parsed.</returns>
     public T GetProperty<T>(IAssetProperty<T> assetProperty)
     {
-        if (assetProperty == null) throw new ArgumentNullException(nameof(assetProperty));
+        ArgumentNullException.ThrowIfNull(assetProperty);
         return GetProperty(assetProperty, assetProperty.DefaultValue);
     }
 
@@ -55,7 +55,7 @@ public class AssetNode
     /// <returns>The parsed value, or defaultValue if no value existed or could be parsed.</returns>
     public T GetProperty<T>(IAssetProperty<T> assetProperty, T defaultValue)
     {
-        if (assetProperty == null) throw new ArgumentNullException(nameof(assetProperty));
+        ArgumentNullException.ThrowIfNull(assetProperty);
         var name = assetProperty.Name;
 
         object token = null;
@@ -79,7 +79,7 @@ public class AssetNode
     /// <param name="typeConfig">The type config</param>
     public void SetProperty(IAssetProperty assetProperty, JsonElement value, TypeConfig typeConfig)
     {
-        if (assetProperty == null) throw new ArgumentNullException(nameof(assetProperty));
+        ArgumentNullException.ThrowIfNull(assetProperty);
         if (_frozen) throw new InvalidOperationException("Tried to modify asset node after it was frozen. Asset nodes are immutable after mods have been loaded.");
 
         try
@@ -97,7 +97,7 @@ public class AssetNode
 
     public void SetProperty<T>(IAssetProperty<T> assetProperty, T value)
     {
-        if (assetProperty == null) throw new ArgumentNullException(nameof(assetProperty));
+        ArgumentNullException.ThrowIfNull(assetProperty);
         if (_frozen) throw new InvalidOperationException("Tried to modify asset node after it was frozen. Asset nodes are immutable after mods have been loaded.");
         Properties ??= new Dictionary<string, object>();
         Properties[assetProperty.Name] = value;
@@ -105,8 +105,8 @@ public class AssetNode
 
     public void SetProperties(IReadOnlyDictionary<string, JsonElement> dict, TypeConfig typeConfig, string contextName, object context)
     {
-        if (dict == null) throw new ArgumentNullException(nameof(dict));
-        if (typeConfig == null) throw new ArgumentNullException(nameof(typeConfig));
+        ArgumentNullException.ThrowIfNull(dict);
+        ArgumentNullException.ThrowIfNull(typeConfig);
 
         // The loader and container can change the set of valid properties, so we have to make sure those are set first.
         foreach (var kvp in dict)

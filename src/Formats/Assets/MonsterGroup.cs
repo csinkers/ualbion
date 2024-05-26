@@ -15,7 +15,7 @@ public class MonsterGroup
 
     public static MonsterGroup Serdes(int _, MonsterGroup m, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         m ??= new MonsterGroup();
         for (int i = 0; i < m.Grid.Length; i++)
         {

@@ -18,7 +18,7 @@ public class JsonObjectContainer : IAssetContainer
     [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The serializer will handle it")]
     public ISerializer Read(string path, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         if (!context.Disk.FileExists(path))
             return null;
 
@@ -38,8 +38,8 @@ public class JsonObjectContainer : IAssetContainer
 
     public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
     {
-        if (assets == null) throw new ArgumentNullException(nameof(assets));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(assets);
+        ArgumentNullException.ThrowIfNull(context);
 
         var dir = Path.GetDirectoryName(path);
         if (!context.Disk.DirectoryExists(dir))
@@ -56,9 +56,9 @@ public class JsonObjectContainer : IAssetContainer
         context.Disk.WriteAllText(path, fullText);
     }
 
-    static IDictionary<AssetId, object> Load(string path, AssetLoadContext context)
+    static Dictionary<AssetId, object> Load(string path, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         var text = context.Disk.ReadAllBytes(path);
         var dict = context.Json.Deserialize<IDictionary<string, object>>(text);

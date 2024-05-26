@@ -20,7 +20,7 @@ public class QueryPreviousActionResultEvent : QueryEvent
     }
     public static QueryPreviousActionResultEvent Serdes(QueryPreviousActionResultEvent e, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryPreviousActionResultEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         e.Immediate = s.UInt8(nameof(Immediate), e.Immediate);

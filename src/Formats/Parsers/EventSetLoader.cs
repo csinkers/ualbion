@@ -9,7 +9,7 @@ public class EventSetLoader : IAssetLoader<EventSet>
 {
     public EventSet Serdes(EventSet existing, ISerializer s, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         return EventSet.Serdes(context.AssetId, existing, context.Mapping, s);
     }
 

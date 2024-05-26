@@ -23,8 +23,8 @@ public class EventFormatter : IEventFormatter
 
     public void Format(IScriptBuilder builder, IEventNode e, int idOffset = 0)
     {
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
-        if (e == null) throw new ArgumentNullException(nameof(e));
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(e);
         e.Format(builder, idOffset);
 
         if (e.Event is TextEvent textEvent && _stringLoadFunc != null)
@@ -39,8 +39,8 @@ public class EventFormatter : IEventFormatter
 
     public void Format(IScriptBuilder builder, IEvent e)
     {
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
-        if (e == null) throw new ArgumentNullException(nameof(e));
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(e);
         e.Format(builder);
 
         if (e is TextEvent textEvent && _stringLoadFunc != null)
@@ -59,7 +59,7 @@ public class EventFormatter : IEventFormatter
         IEnumerable<ushort> additionalEntryPoints,
         int indent = 0) where T : IEventNode
     {
-        if (events == null) throw new ArgumentNullException(nameof(events));
+        ArgumentNullException.ThrowIfNull(events);
         if (events.Count == 0)
             return new DecompilationResult();
 
@@ -79,7 +79,7 @@ public class EventFormatter : IEventFormatter
 
     public DecompilationResult FormatGraphsAsBlocks(IEnumerable<ICfgNode> trees, int indent)
     {
-        if (trees == null) throw new ArgumentNullException(nameof(trees));
+        ArgumentNullException.ThrowIfNull(trees);
         var builder = new DecompilationResultBuilder(false);
         var counter = new CountEventsVisitor();
 
@@ -148,7 +148,7 @@ public class EventFormatter : IEventFormatter
 
     public void FormatChain(IScriptBuilder builder, IEventNode firstEvent, int indent = 0)
     {
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
         if (firstEvent == null) return;
 
         var uniqueEvents = ExploreGraph(firstEvent);
@@ -160,9 +160,9 @@ public class EventFormatter : IEventFormatter
         }
     }
 
-    void FormatEventSet<T>(IScriptBuilder builder, IList<T> events, int indent = 0) where T : IEventNode
+    void FormatEventSet<T>(DecompilationResultBuilder builder, IList<T> events, int indent = 0) where T : IEventNode
     {
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
         if (events == null) return;
 
         foreach (var e in events)

@@ -11,7 +11,7 @@ public abstract class QueryEvent : MapEvent, IBranchingEvent
     public abstract QueryType QueryType { get; }
     public static QueryEvent Serdes(QueryEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         if (s.IsWriting() && e == null) throw new ArgumentNullException(nameof(e));
 
         var queryType = s.EnumU8(nameof(QueryType), e?.QueryType ?? 0);

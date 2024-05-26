@@ -9,7 +9,7 @@ namespace UAlbion.Api.Eventing;
 
 public class EventPartParsers
 {
-    readonly IDictionary<Type, MethodInfo> _parsers = new Dictionary<Type, MethodInfo>();
+    readonly Dictionary<Type, MethodInfo> _parsers = new();
     readonly MethodInfo _isNullOrEmpty = typeof(string).GetMethod("IsNullOrEmpty", BindingFlags.Static | BindingFlags.Public);
 
     public EventPartParsers()
@@ -25,13 +25,13 @@ public class EventPartParsers
 
     public void AddParser(Type type, MethodInfo method)
     {
-        if (type == null) throw new ArgumentNullException(nameof(type));
+        ArgumentNullException.ThrowIfNull(type);
         _parsers[type] = method ?? throw new ArgumentNullException(nameof(method));
     }
 
     public Expression GetParser(Type type, Expression argument)
     {
-        if (type == null) throw new ArgumentNullException(nameof(type));
+        ArgumentNullException.ThrowIfNull(type);
         if (type == typeof(string))
             return argument;
 

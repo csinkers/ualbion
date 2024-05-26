@@ -7,7 +7,7 @@ namespace UAlbion.Game.Gui.Text;
 
 public class UiTextBuilder : UiElement, IText, ITextBuilder<UiTextBuilder>
 {
-    readonly IList<(Token, object)> _implicitTokens = new List<(Token, object)>();
+    readonly List<(Token, object)> _implicitTokens = new();
     readonly StringId _stringId;
     string _language;
 

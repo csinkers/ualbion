@@ -43,6 +43,6 @@ public class SpellManager : ServiceComponent<ISpellManager>, ISpellManager
     public SpellData GetSpellOrDefault(SpellId id)
     {
         if (!_loaded) Reload();
-        return _spells.TryGetValue(id, out var spell) ? spell : null;
+        return _spells.GetValueOrDefault(id);
     }
 }

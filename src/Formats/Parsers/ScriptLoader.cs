@@ -24,14 +24,12 @@ public class ScriptLoader : IAssetLoader<Script>
 
     public Script Serdes(Script existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null)
-            throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
 
         if (s.IsReading())
             return Parse(ReadLines(s));
 
-        if (existing == null)
-            throw new ArgumentNullException(nameof(existing));
+        ArgumentNullException.ThrowIfNull(existing);
 
         var builder = new UnformattedScriptBuilder(true);
         foreach (var e in existing)
@@ -49,8 +47,7 @@ public class ScriptLoader : IAssetLoader<Script>
     public static Script Parse(string text) => Parse(ApiUtil.SplitLines(text));
     public static Script Parse(IEnumerable<string> lines)
     {
-        if (lines == null)
-            throw new ArgumentNullException(nameof(lines));
+        ArgumentNullException.ThrowIfNull(lines);
 
         var script = new Script();
         foreach (var line in lines)
@@ -58,7 +55,7 @@ public class ScriptLoader : IAssetLoader<Script>
             IEvent e;
             if (string.IsNullOrEmpty(line))
                 e = new CommentEvent(null);
-            else if (line.StartsWith(";", StringComparison.Ordinal))
+            else if (line.StartsWith(';'))
                 e = new CommentEvent(line[1..]);
             else
             {

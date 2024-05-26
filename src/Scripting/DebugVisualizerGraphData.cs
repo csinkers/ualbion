@@ -11,13 +11,20 @@ public class DebugVisualizerGraphData
 #pragma warning disable CA1822 // Mark members as static
     [JsonPropertyName("kind")] public Dictionary<string, bool> Kind => Tags.ToDictionary(tag => tag, _ => true);
     [JsonIgnore] public string[] Tags => new[] { "graph" };
-    [JsonPropertyName("nodes")] public List<DebugVisualizerNodeData> Nodes { get; } = new(); 
-    [JsonPropertyName("edges")] public List<DebugVisualizerEdgeData> Edges { get; } = new(); 
+    [JsonPropertyName("nodes")] public List<DebugVisualizerNodeData> Nodes { get; } = new();
+    [JsonPropertyName("edges")] public List<DebugVisualizerEdgeData> Edges { get; } = new();
 #pragma warning restore CA1822 // Mark members as static
+
+    static readonly JsonSerializerOptions Options = new()
+    {
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+        WriteIndented = true,
+    };
 
     public static DebugVisualizerGraphData FromCfg(ControlFlowGraph graph)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
         var data = new DebugVisualizerGraphData();
         for (int i = 0; i < graph.Nodes.Count; i++)
         {
@@ -59,11 +66,5 @@ public class DebugVisualizerGraphData
         return this;
     }
 
-    public override string ToString() => JsonSerializer.Serialize(this,
-        new JsonSerializerOptions
-        {
-            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
-            WriteIndented = true,
-        });
+    public override string ToString() => JsonSerializer.Serialize(this, Options);
 }

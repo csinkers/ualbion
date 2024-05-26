@@ -12,7 +12,7 @@ public class WipeEvent : MapEvent
 
     public static WipeEvent Serdes(WipeEvent e, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new WipeEvent();
         e.Value = s.UInt8(nameof(Value), e.Value);
         int zeroed = s.UInt8(null, 0);

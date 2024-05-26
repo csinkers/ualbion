@@ -20,8 +20,8 @@ public class MeshLoader : IAssetLoader<Mesh>
 
     public Mesh Serdes(Mesh existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
 
         if (!s.IsReading())
             throw new NotSupportedException();
@@ -73,7 +73,7 @@ public class MeshLoader : IAssetLoader<Mesh>
         return new Mesh(key, mesh, material, textures);
     }
 
-    ITexture LoadTexture(AssetLoadContext context, string filename, IFileSystem disk)
+    SimpleTexture<uint> LoadTexture(AssetLoadContext context, string filename, IFileSystem disk)
     {
         var path = Path.Combine(context.Filename, filename);
         if (!disk.FileExists(path))

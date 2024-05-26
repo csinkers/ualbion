@@ -98,10 +98,10 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
         IEnumerable<MapNpc> npcs,
         IList<MapEventZone> zones)
     {
-        if (events == null) throw new ArgumentNullException(nameof(events));
-        if (chains == null) throw new ArgumentNullException(nameof(chains));
-        if (npcs == null) throw new ArgumentNullException(nameof(npcs));
-        if (zones == null) throw new ArgumentNullException(nameof(zones));
+        ArgumentNullException.ThrowIfNull(events);
+        ArgumentNullException.ThrowIfNull(chains);
+        ArgumentNullException.ThrowIfNull(npcs);
+        ArgumentNullException.ThrowIfNull(zones);
 
         Id = id;
         PaletteId = paletteId;
@@ -129,7 +129,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 
     protected int SerdesZones(ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         Zones ??= new MapEventZone[Width * Height];
         int zoneCount = s.UInt16("GlobalZoneCount", (ushort)GlobalZones.Count);
         int totalCount = zoneCount;
@@ -166,7 +166,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 
     protected void SerdesEvents(AssetMapping mapping, MapType mapType, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         ushort eventCount = s.UInt16("EventCount", (ushort)Events.Count);
 
         if (Events != null) // Ensure ids match up
@@ -188,7 +188,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 
     protected void SerdesChains(ISerializer s, int chainCount)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         while (Chains.Count < chainCount)
             Chains.Add(EventNode.UnusedEventId);
 
@@ -253,7 +253,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 
     protected void SerdesNpcWaypoints(ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         for (var index = 0; index < Npcs.Count; index++)
         {
             var npc = Npcs[index];
@@ -271,7 +271,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 
     public static IMapData Serdes(AssetId id, IMapData existing, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         if (s.BytesRemaining == 0)
             return null;
 
@@ -319,7 +319,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 
     public void RemapChains(IList<EventNode> events, IList<ushort> chains)
     {
-        if (chains == null) throw new ArgumentNullException(nameof(chains));
+        ArgumentNullException.ThrowIfNull(chains);
 
         foreach (var npc in Npcs)
             if (npc.Chain != EventNode.UnusedEventId)
@@ -351,7 +351,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 
     public void GetZonesOfType(List<MapEventZone> result, TriggerTypes triggerType)
     {
-        if (result == null) throw new ArgumentNullException(nameof(result));
+        ArgumentNullException.ThrowIfNull(result);
         foreach (var kvp in _zoneTypeLookup)
             if ((kvp.Key & triggerType) == triggerType)
                 foreach(var zone in kvp.Value)

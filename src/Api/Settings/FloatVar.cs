@@ -8,7 +8,7 @@ public class FloatVar : IVar<float>
 {
     public FloatVar(VarLibrary library, string key, float defaultValue)
     {
-        if (library == null) throw new ArgumentNullException(nameof(library));
+        ArgumentNullException.ThrowIfNull(library);
         Key = key;
         DefaultValue = defaultValue;
         library.Add(this);
@@ -21,7 +21,7 @@ public class FloatVar : IVar<float>
 
     public float Read(IVarSet varSet)
     {
-        if (varSet == null) throw new ArgumentNullException(nameof(varSet));
+        ArgumentNullException.ThrowIfNull(varSet);
         if (varSet.TryGetValue(Key, out var objValue))
         {
             if (objValue is float value) return value;
@@ -35,7 +35,7 @@ public class FloatVar : IVar<float>
 
     public void Write(ISettings varSet, float value)
     {
-        if (varSet == null) throw new ArgumentNullException(nameof(varSet));
+        ArgumentNullException.ThrowIfNull(varSet);
         varSet.SetValue(Key, value);
     }
 

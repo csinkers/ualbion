@@ -16,7 +16,7 @@ public class MapLightingEvent : ModifyEvent
 
     public static MapLightingEvent Serdes(MapLightingEvent e, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new MapLightingEvent();
         int temp = s.UInt8("Operation", 3);
         if (temp != 3)

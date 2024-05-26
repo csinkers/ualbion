@@ -21,8 +21,8 @@ class YesNoMessageBox : ModalDialog
         Closed?.Invoke(this, EventArgs.Empty);
     }
 
-    static IText BuildButtonText(IText text, BlockId blockNumber, TextId fallback, ITextFormatter textFormatter) =>
-        new TextFilter(x => { x.Alignment = TextAlignment.Center; return true; })
+    static TextFilter BuildButtonText(IText text, BlockId blockNumber, TextId fallback, ITextFormatter textFormatter) =>
+        new(x => { x.Alignment = TextAlignment.Center; return true; })
             {
                 Source = 
                     new TextFallback(

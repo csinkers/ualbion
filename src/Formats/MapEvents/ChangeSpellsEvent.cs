@@ -28,7 +28,7 @@ public class ChangeSpellsEvent : MapEvent, IDataChangeEvent
 
     public static ChangeSpellsEvent Serdes(ChangeSpellsEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new ChangeSpellsEvent();
         var (targetType, targetId) = DataChangeEvent.UnpackTargetId(e.Target);
 

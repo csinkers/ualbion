@@ -11,8 +11,8 @@ public class AssetIdConfig
     [JsonInclude] public Dictionary<string, List<string>> Extras { get; private set; } = new();
     public static AssetIdConfig Load(string filename, IFileSystem disk, IJsonUtil jsonUtil)
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
-        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        ArgumentNullException.ThrowIfNull(disk);
+        ArgumentNullException.ThrowIfNull(jsonUtil);
         return jsonUtil.Deserialize<AssetIdConfig>(disk.ReadAllBytes(filename));
     }
 }

@@ -16,7 +16,7 @@ public class SampleLoader : IAssetLoader<AlbionSample>
 
     public AlbionSample Serdes(AlbionSample existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         return s.IsWriting() ? Write(existing, s) : Read(s);
     }
 
@@ -33,7 +33,7 @@ public class SampleLoader : IAssetLoader<AlbionSample>
 
     static AlbionSample Write(AlbionSample sample, ISerializer s)
     {
-        if (sample == null) throw new ArgumentNullException(nameof(sample));
+        ArgumentNullException.ThrowIfNull(sample);
         if(sample.SampleRate != SampleRate)
             throw new ArgumentOutOfRangeException(nameof(sample), $"Only sounds with a sample rate of {SampleRate} are currently supported");
         if(sample.Channels!= Channels)

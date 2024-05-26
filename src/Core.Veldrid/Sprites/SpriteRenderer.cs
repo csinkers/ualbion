@@ -72,7 +72,7 @@ public sealed class SpriteRenderer : Component, IRenderer, IDisposable
         var globalSet = (GlobalSet)set1 ?? throw new ArgumentNullException(nameof(set1));
         var renderPassSet = (MainPassSet)set2 ?? throw new ArgumentNullException(nameof(set2));
 
-        if (cl == null) throw new ArgumentNullException(nameof(cl));
+        ArgumentNullException.ThrowIfNull(cl);
         if (renderable is not VeldridSpriteBatch<SpriteInfo, GpuSpriteInstanceData> batch)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
@@ -113,7 +113,7 @@ public sealed class SpriteRenderer : Component, IRenderer, IDisposable
 
 [VertexShader(typeof(SpriteVertexShader))]
 [FragmentShader(typeof(SpriteFragmentShader))]
-internal partial class SpritePipeline : PipelineHolder { }
+internal sealed partial class SpritePipeline : PipelineHolder { }
 
 [Name("SpriteSF.frag")]
 [Input(0, typeof(SpriteIntermediateData))]
@@ -122,7 +122,7 @@ internal partial class SpritePipeline : PipelineHolder { }
 [ResourceSet(2, typeof(SpriteSet))]
 [Output(0, typeof(SimpleFramebuffer))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-internal partial class SpriteFragmentShader : IFragmentShader { }
+internal sealed partial class SpriteFragmentShader : IFragmentShader { }
 
 [Name("SpriteSV.vert")]
 [Input(0, typeof(Vertex2DTextured))]
@@ -132,7 +132,7 @@ internal partial class SpriteFragmentShader : IFragmentShader { }
 [ResourceSet(2, typeof(SpriteSet))]
 [Output(0, typeof(SpriteIntermediateData))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-internal partial class SpriteVertexShader : IVertexShader { }
+internal sealed partial class SpriteVertexShader : IVertexShader { }
 
 internal sealed partial class SpriteSet : ResourceSetHolder
 {

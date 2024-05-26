@@ -8,7 +8,7 @@ public class ImGuiConfigSection
     public ImGuiConfigSection(string name) => Name = name;
     public ImGuiConfigSection(string name, List<string> lines)
     {
-        if (lines == null) throw new ArgumentNullException(nameof(lines));
+        ArgumentNullException.ThrowIfNull(lines);
 
         Name = name;
         foreach (var line in lines)

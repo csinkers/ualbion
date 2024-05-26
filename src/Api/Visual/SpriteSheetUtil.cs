@@ -21,7 +21,7 @@ public static class SpriteSheetUtil
         int margin,
         GetFrameSizeMethod getFrameSize)
     {
-        if (getFrameSize == null) throw new ArgumentNullException(nameof(getFrameSize));
+        ArgumentNullException.ThrowIfNull(getFrameSize);
         long totalPixels = 0;
         int width = 0;
         int layers = 1;

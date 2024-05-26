@@ -11,7 +11,7 @@ public class AssetIdAssetProperty : IAssetProperty<AssetId>
     public AssetId DefaultValue => AssetId.None;
     public object FromJson(JsonElement elem, TypeConfig config)
     {
-        if (config == null) throw new ArgumentNullException(nameof(config));
+        ArgumentNullException.ThrowIfNull(config);
         var asString = elem.GetString();
         return config.ResolveId(asString);
     }
@@ -32,7 +32,7 @@ public class AssetIdAssetProperty<T> : IAssetProperty<T> where T : IAssetId
     public T DefaultValue { get; }
     public object FromJson(JsonElement elem, TypeConfig config)
     {
-        if (config == null) throw new ArgumentNullException(nameof(config));
+        ArgumentNullException.ThrowIfNull(config);
         var asString = elem.GetString();
         AssetId id = config.ResolveId(asString);
         return _converter(id);

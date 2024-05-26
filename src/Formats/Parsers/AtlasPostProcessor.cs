@@ -14,8 +14,8 @@ public class AtlasPostProcessor : IAssetPostProcessor
     public object Process(object asset, AssetLoadContext context) => Process((IReadOnlyTexture<byte>)asset, context);
     public static SimpleTexture<byte> Process(IReadOnlyTexture<byte> sprite, AssetLoadContext context)
     {
-        if (sprite == null) throw new ArgumentNullException(nameof(sprite));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(sprite);
+        ArgumentNullException.ThrowIfNull(context);
 
         var layout = SpriteSheetUtil.ArrangeSpriteSheet(sprite.Regions.Count, 1, sprite.GetRegionBuffer);
         if (layout.Layers > 1)

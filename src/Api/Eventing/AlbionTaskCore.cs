@@ -76,8 +76,7 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
 
     public void OnCompleted(Action continuation)
     {
-        if (continuation == null)
-            throw new ArgumentNullException(nameof(continuation));
+        ArgumentNullException.ThrowIfNull(continuation);
 
         if (IsCompleted)
         {

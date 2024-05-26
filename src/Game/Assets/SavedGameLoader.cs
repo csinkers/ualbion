@@ -11,7 +11,7 @@ public class SavedGameLoader : Component, IAssetLoader<SavedGame>
 {
     public SavedGame Serdes(SavedGame existing, ISerializer s, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         return SavedGame.Serdes(existing, context.Mapping, s, Resolve<ISpellManager>());
     }
 

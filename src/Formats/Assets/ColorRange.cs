@@ -35,7 +35,7 @@ public class ColorRange
     /// </summary>
     public static ColorRange Serdes(int _, ColorRange c, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         c ??= new ColorRange();
         c._pad1 = s.UInt16BE(nameof(_pad1), c._pad1);
         c.Rate = s.UInt16BE(nameof(Rate), c.Rate);

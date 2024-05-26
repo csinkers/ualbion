@@ -29,7 +29,7 @@ public class TriggerChainEvent : IEvent
 
     public void Format(IScriptBuilder builder)
     {
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
         builder.Append("Triggering chain ");
         builder.Append(EventSet.Id);
         builder.Append(":");

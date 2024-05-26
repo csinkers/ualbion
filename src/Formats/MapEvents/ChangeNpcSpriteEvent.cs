@@ -15,7 +15,7 @@ public class ChangeNpcSpriteEvent : MapEvent, INpcEvent // Specialised variant o
         if (s.IsReading()) // Should never be used
             return (ChangeNpcSpriteEvent)ChangeIconEvent.Serdes(null, mapping, mapType, s);
 
-        if (e == null) throw new ArgumentNullException(nameof(e));
+        ArgumentNullException.ThrowIfNull(e);
         var value = e.SpriteOrGroup.ToDisk(mapping);
         if (value is < 0 or > ushort.MaxValue)
             throw new FormatException($"Sprite/group id {e.SpriteOrGroup} mapped to disk id {value}, which is outside the allowed range of 0-{ushort.MaxValue}");
@@ -27,7 +27,7 @@ public class ChangeNpcSpriteEvent : MapEvent, INpcEvent // Specialised variant o
 
     public static ChangeNpcSpriteEvent FromChangeIconEvent(ChangeIconEvent cie, AssetMapping mapping, MapType mapType)
     {
-        if (cie == null) throw new ArgumentNullException(nameof(cie));
+        ArgumentNullException.ThrowIfNull(cie);
         if (cie.X is < 0 or > byte.MaxValue) throw new FormatException($"Expected X to be in range [0..{byte.MaxValue}] for ChangeNpcSpriteEvent but was {cie.X}");
         if (cie.Y != 0) throw new FormatException($"Expected Y to be 0 for ChangeNpcSpriteEvent but was {cie.Y}");
         if (cie.ChangeType != IconChangeType.NpcSprite) throw new FormatException($"Expected ChangeType to be NpcSprite for ChangeNpcSpriteEvent, but was {cie.ChangeType}");

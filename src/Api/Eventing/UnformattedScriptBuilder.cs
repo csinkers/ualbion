@@ -22,13 +22,13 @@ public class UnformattedScriptBuilder : IScriptBuilder
     public void Add(ScriptPartType type, string text) => _sb.Append(text);
     public void Add<T>(ScriptPartType type, T context, Action<T, StringBuilder> func)
     {
-        if (func == null) throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
         func(context, _sb);
     }
 
     public void EventScope<T>(int eventId, T context, Action<T> func)
     {
-        if (func == null) throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
         func(context);
     }
 }

@@ -127,7 +127,7 @@ public class SettingsManager : GameComponent, ISettings
 
     void SetVar<T>(IVar<T> varInfo, T value)
     {
-        if (varInfo == null) throw new ArgumentNullException(nameof(varInfo));
+        ArgumentNullException.ThrowIfNull(varInfo);
         varInfo.Write(this, value);
     }
 

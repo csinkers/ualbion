@@ -13,8 +13,8 @@ public class Mesh : IMesh
 {
     public Mesh(MeshId id, ConstructedMeshInfo mesh, MaterialDefinition material, Dictionary<string, ITexture> textures)
     {
-        if (mesh == null) throw new ArgumentNullException(nameof(mesh));
-        if (material == null) throw new ArgumentNullException(nameof(material));
+        ArgumentNullException.ThrowIfNull(mesh);
+        ArgumentNullException.ThrowIfNull(material);
         Id = id;
         Textures = textures ?? throw new ArgumentNullException(nameof(textures));
 

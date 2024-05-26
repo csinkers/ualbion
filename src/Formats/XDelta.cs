@@ -57,8 +57,8 @@ public static class XDelta
 
     public static IEnumerable<DiffOperation> Compare(byte[] source, byte[] target)
     {
-        if (source == null) throw new ArgumentNullException(nameof(source));
-        if (target == null) throw new ArgumentNullException(nameof(target));
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(target);
 
         if (ShortArrayEqualityCheck(source, target))
         {

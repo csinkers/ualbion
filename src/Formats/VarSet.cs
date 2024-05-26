@@ -64,14 +64,14 @@ public class VarSet : IVarSet, IPatch
 
     public string ToJson(IJsonUtil jsonUtil)
     {
-        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        ArgumentNullException.ThrowIfNull(jsonUtil);
         return jsonUtil.Serialize(_values);
     }
 
     public static VarSet FromJsonBytes(string name, byte[] bytes, IJsonUtil json)
     {
-        if (bytes == null) throw new ArgumentNullException(nameof(bytes));
-        if (json == null) throw new ArgumentNullException(nameof(json));
+        ArgumentNullException.ThrowIfNull(bytes);
+        ArgumentNullException.ThrowIfNull(json);
 
         var dictionary = json.Deserialize<Dictionary<string, object>>(bytes);
         return new VarSet(name, dictionary);

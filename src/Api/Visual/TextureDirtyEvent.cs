@@ -7,7 +7,7 @@ public record TextureDirtyEvent(ITexture Texture) : IVerboseEvent
 {
     public void Format(IScriptBuilder builder)
     {
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
         builder.Add(ScriptPartType.EventName, ToString());
     }
 }

@@ -9,7 +9,7 @@ public class EventParsingVisitor : BaseAstBuilderVisitor
     int _nextEventId;
     protected override ICfgNode Build(Statement statement)
     {
-        if (statement == null) throw new ArgumentNullException(nameof(statement));
+        ArgumentNullException.ThrowIfNull(statement);
 
         var builder = new UnformattedScriptBuilder(false);
         var formatter = new FormatScriptVisitor(builder);
@@ -30,7 +30,7 @@ public class EventParsingVisitor : BaseAstBuilderVisitor
 
     protected override ICfgNode Build(Name name)
     {
-        if (name == null) throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNull(name);
 
         var e = Event.Parse(name.Value, out var error);
         if (e == null)

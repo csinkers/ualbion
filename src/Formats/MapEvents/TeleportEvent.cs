@@ -22,7 +22,7 @@ public class TeleportEvent : MapEvent
 
     public static TeleportEvent Serdes(TeleportEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new TeleportEvent();
         e.X = s.UInt8(nameof(X), e.X);
         e.Y = s.UInt8(nameof(Y), e.Y);

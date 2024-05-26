@@ -18,7 +18,7 @@ public sealed class TextureSource : ServiceComponent<ITextureSource>, ITextureSo
                 span[j * 64 + i] = (byte)(j >= 32 ^ i >= 32 ? 255 : 1);
     }
 
-    static ITexture BuildDefaultArray()
+    static ArrayTexture<byte> BuildDefaultArray()
     {
         var result = new ArrayTexture<byte>(null, 64, 64, 2);
         Checkerboard(result.GetMutableLayerBuffer(0).Buffer);
@@ -26,7 +26,7 @@ public sealed class TextureSource : ServiceComponent<ITextureSource>, ITextureSo
         return result;
     }
 
-    static ITexture BuildDefault()
+    static SimpleTexture<byte> BuildDefault()
     {
         var result = new SimpleTexture<byte>(null, 64, 64);
         Checkerboard(result.GetMutableLayerBuffer(0).Buffer);

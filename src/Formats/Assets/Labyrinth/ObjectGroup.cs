@@ -16,7 +16,7 @@ public class ObjectGroup
 
     public static ObjectGroup Serdes(int _, ObjectGroup og, ISerializer s) // total size 0x42 = 66
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         og ??= new ObjectGroup();
         og.AutoGraphicsId = s.UInt16(nameof(og.AutoGraphicsId), og.AutoGraphicsId);
 

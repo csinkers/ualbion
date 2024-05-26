@@ -29,7 +29,7 @@ public sealed class SkyboxManager : ServiceComponent<ISkyboxManager>, ISkyboxMan
 
     public void Collect(List<IRenderable> renderables)
     {
-        if (renderables == null) throw new ArgumentNullException(nameof(renderables));
+        ArgumentNullException.ThrowIfNull(renderables);
         foreach (var child in Children)
             if (child is SkyboxRenderable skybox)
                 renderables.Add(skybox);
@@ -46,7 +46,7 @@ public sealed class SkyboxManager : ServiceComponent<ISkyboxManager>, ISkyboxMan
 
     internal void DisposeSkybox(SkyboxRenderable skybox)
     {
-        if (skybox == null) throw new ArgumentNullException(nameof(skybox));
+        ArgumentNullException.ThrowIfNull(skybox);
         RemoveChild(skybox);
     }
 

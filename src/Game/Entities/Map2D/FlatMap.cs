@@ -22,7 +22,7 @@ public class FlatMap : GameComponent, IMap
     readonly MapData2D _mapData;
     readonly Container _sceneObjects;
     LogicalMap2D _logicalMap;
-    IMovement _partyMovement;
+    PartyCaterpillar _partyMovement;
 
     public MapId MapId { get; }
     public MapType MapType => _logicalMap.UseSmallSprites ? MapType.TwoDOutdoors : MapType.TwoD;

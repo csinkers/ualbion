@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace UAlbion.Core.Textures;
 
-class LogicalSubImage
+sealed class LogicalSubImage
 {
     public LogicalSubImage(int id) { Id = id; }
 

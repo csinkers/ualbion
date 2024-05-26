@@ -23,9 +23,9 @@ public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioMa
     public static readonly AssetIdAssetProperty<WaveLibraryId> WaveLibProperty = new("WaveLib", WaveLibraryId.None, x => x);
 
     readonly bool _standalone;
-    readonly IDictionary<SampleId, AudioBuffer> _sampleCache = new Dictionary<SampleId, AudioBuffer>();
-    readonly IDictionary<(SongId, int), AudioBuffer> _waveLibCache = new Dictionary<(SongId, int), AudioBuffer>();
-    readonly IList<ActiveSound> _activeSounds = new List<ActiveSound>();
+    readonly Dictionary<SampleId, AudioBuffer> _sampleCache = new();
+    readonly Dictionary<(SongId, int), AudioBuffer> _waveLibCache = new();
+    readonly List<ActiveSound> _activeSounds = new();
     readonly ManualResetEvent _doneEvent = new(false);
     readonly object _syncRoot = new();
 
@@ -59,7 +59,7 @@ public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioMa
         base.Subscribed();
     }
 
-    class ActiveSound
+    sealed class ActiveSound
     {
         public ActiveSound(AudioSource source, object id, int restartProbability)
         {

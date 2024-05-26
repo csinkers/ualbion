@@ -18,7 +18,7 @@ public class AutomapInfo // Total size 0x13 = 19 bytes
 
     public static AutomapInfo Serdes(int _, AutomapInfo existing, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         var info = existing ?? new AutomapInfo();
         info.X = s.UInt8(nameof(X), info.X); // 0
         info.Y = s.UInt8(nameof(Y), info.Y); // 1

@@ -28,7 +28,7 @@ public class MagicSkills : IMagicSkills
     public MagicSkills DeepClone() => new MagicSkills().CopyFrom(this);
     public MagicSkills CopyFrom(MagicSkills other)
     {
-        if (other == null) throw new ArgumentNullException(nameof(other));
+        ArgumentNullException.ThrowIfNull(other);
 
         SpellPoints = other.SpellPoints.DeepClone();
         SpellClasses = other.SpellClasses;

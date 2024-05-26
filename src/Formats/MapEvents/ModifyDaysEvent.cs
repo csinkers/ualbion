@@ -9,7 +9,7 @@ public class ModifyDaysEvent : ModifyEvent
 {
     public static ModifyDaysEvent Serdes(ModifyDaysEvent e, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new ModifyDaysEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         int zeroes = s.UInt8(null, 0);

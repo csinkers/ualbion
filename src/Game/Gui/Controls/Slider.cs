@@ -68,7 +68,7 @@ public class Slider : UiElement
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
-        if (func == null) throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
         int maxOrder = order;
         var decWidth = (int)_decrement.GetSize().X;
         var incWidth = (int)_increment.GetSize().X;

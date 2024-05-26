@@ -66,7 +66,7 @@ public class MapNpc // 0xA = 10 bytes
 
     public static MapNpc Serdes(int _, MapNpc existing, MapType mapType, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         s.Begin("Npc");
         var offset = s.Offset;
         var npc = existing ?? new MapNpc();
@@ -117,7 +117,7 @@ public class MapNpc // 0xA = 10 bytes
     }
     public void LoadWaypoints(ISerializer s, bool useWaypoints)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         if (useWaypoints)
         {
             Waypoints ??= new NpcWaypoint[WaypointCount];
@@ -141,8 +141,8 @@ public class MapNpc // 0xA = 10 bytes
 
     public void Unswizzle(MapId mapId, Func<ushort, IEventNode> getEvent, Func<ushort, ushort> getChain)
     {
-        if (getEvent == null) throw new ArgumentNullException(nameof(getEvent));
-        if (getChain == null) throw new ArgumentNullException(nameof(getChain));
+        ArgumentNullException.ThrowIfNull(getEvent);
+        ArgumentNullException.ThrowIfNull(getChain);
 
         if (Node is DummyEventNode dummy)
         {

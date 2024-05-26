@@ -72,7 +72,7 @@ public class MapData3D : BaseMapData
 
     public static MapData3D Serdes(AssetId id, MapData3D existing, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
 
         var map = existing ?? new MapData3D { Id = id };
         map.Flags = s.EnumU16(nameof(Flags), map.Flags); // 0

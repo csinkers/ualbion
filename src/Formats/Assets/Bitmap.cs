@@ -27,7 +27,7 @@ public class Bitmap8Bit
 
     public static Bitmap8Bit Serdes(Bitmap8Bit b, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
 
         var initialOffset = s.Offset;
         b ??= new Bitmap8Bit();

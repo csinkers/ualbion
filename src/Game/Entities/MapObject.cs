@@ -142,8 +142,8 @@ public class MapObject : GameComponent
 
     public static MapObject Build(int tileX, int tileY, LabyrinthData labyrinth, SubObject subObject, TilemapRequest properties, bool depthTest = true)
     {
-        if (labyrinth == null) throw new ArgumentNullException(nameof(labyrinth));
-        if (properties == null) throw new ArgumentNullException(nameof(properties));
+        ArgumentNullException.ThrowIfNull(labyrinth);
+        ArgumentNullException.ThrowIfNull(properties);
         if (subObject == null) return null;
         if (subObject.ObjectInfoNumber >= labyrinth.Objects.Count)
         {

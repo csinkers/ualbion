@@ -14,7 +14,7 @@ namespace UAlbion.Game.Veldrid.Input;
 
 public class InputBinder : GameServiceComponent<IInputBinder>, IInputBinder
 {
-    class BindingSet : Dictionary<InputMode, IDictionary<KeyBinding, string>> { }
+    sealed class BindingSet : Dictionary<InputMode, IDictionary<KeyBinding, string>> { }
 
     readonly BindingSet _bindings = new();
     readonly HashSet<Key> _pressedKeys = new();

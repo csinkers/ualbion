@@ -25,8 +25,7 @@ public class InventoryDetailsDialog : ModalDialog
 #pragma warning disable CA1506 // '.ctor' is coupled with '41' different types from '12' different namespaces. Rewrite or refactor the code to decrease its class coupling below '41'.
     public InventoryDetailsDialog(ItemData item) : base(DialogPositioning.Center, 1)
     {
-        if (item == null)
-            throw new ArgumentNullException(nameof(item));
+        ArgumentNullException.ThrowIfNull(item);
 
         var heading = new Header(item.Name, 0, Base.Ink.Yellow);
         var itemPic = new UiSpriteElement(item.Icon)

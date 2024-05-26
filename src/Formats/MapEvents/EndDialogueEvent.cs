@@ -9,7 +9,7 @@ public class EndDialogueEvent : MapEvent
 {
     public static EndDialogueEvent Serdes(EndDialogueEvent e, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new EndDialogueEvent();
         s.UInt8("Pad1", 0);
         s.UInt8("Pad2", 0);

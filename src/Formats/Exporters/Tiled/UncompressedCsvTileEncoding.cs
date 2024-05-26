@@ -14,7 +14,7 @@ public class UncompressedCsvTileEncoding : ITileEncoding
     public string Encoding => "csv";
     public string Encode(int[] data, int width)
     {
-        if (data == null) throw new ArgumentNullException(nameof(data));
+        ArgumentNullException.ThrowIfNull(data);
 
         var sb = new StringBuilder();
         int lineLength = 0;

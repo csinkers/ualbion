@@ -23,7 +23,7 @@ public class PlayAnimationEvent : MapEvent
 
     public static PlayAnimationEvent Serdes(PlayAnimationEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new PlayAnimationEvent();
         e.VideoId = VideoId.SerdesU8(nameof(VideoId), e.VideoId, mapping, s);
         e.X = s.UInt8(nameof(X), e.X);

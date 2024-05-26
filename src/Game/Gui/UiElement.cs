@@ -41,19 +41,19 @@ public abstract class UiElement : GameComponent, IUiElement
 
     protected static int RenderChild(IUiElement child, Rectangle extents, int order, LayoutNode parent)
     {
-        if (child == null) throw new ArgumentNullException(nameof(child));
+        ArgumentNullException.ThrowIfNull(child);
         return child.Render(extents, order, parent);
     }
 
     protected static int SelectChild(IUiElement child, Rectangle extents, int order, SelectionContext context)
     {
-        if (child == null) throw new ArgumentNullException(nameof(child));
+        ArgumentNullException.ThrowIfNull(child);
         return child.Selection(extents, order, context);
     }
 
     protected virtual int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
-        if (func == null) throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
 
         int maxOrder = order;
         for (var index = 0; index < Children.Count; index++)
@@ -78,8 +78,7 @@ public abstract class UiElement : GameComponent, IUiElement
 
     public virtual int Selection(Rectangle extents, int order, SelectionContext context)
     {
-        if (context == null)
-            throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         if (!extents.Contains((int)context.UiPosition.X, (int)context.UiPosition.Y))
             return order;

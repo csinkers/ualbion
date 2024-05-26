@@ -12,7 +12,7 @@ public abstract class FlicChunk
 
     public static FlicChunk Load(ISerializer s, int width, int height) 
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
 
         var chunkSizeOffset = s.Offset;
         uint chunkSize = s.UInt32(null, 0);

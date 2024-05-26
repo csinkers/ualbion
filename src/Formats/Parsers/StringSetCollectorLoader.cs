@@ -13,7 +13,7 @@ public class StringSetCollectorLoader : Component, IAssetLoader<ListStringSet>
     public static readonly AssetRangeAssetProperty TargetRange = new("TargetRange");
     public ListStringSet Serdes(ListStringSet existing, ISerializer s, AssetLoadContext context)
     {
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
         var targetRange = context.GetProperty(TargetRange);
         var fileRange = context.GetProperty(FileRange);
 

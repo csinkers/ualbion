@@ -11,7 +11,7 @@ public class ModifyItemCountEvent : ModifyEvent
 {
     public static ModifyItemCountEvent Serdes(ModifyItemCountEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new ModifyItemCountEvent();
         e.Operation = s.EnumU8(nameof(Operation), e.Operation);
         e.Amount = s.UInt8(nameof(Amount), e.Amount);

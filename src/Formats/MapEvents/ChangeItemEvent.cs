@@ -30,7 +30,7 @@ public class ChangeItemEvent : MapEvent, IDataChangeEvent
 
     public static ChangeItemEvent Serdes(ChangeItemEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new ChangeItemEvent();
 
         var (targetType, targetId) = DataChangeEvent.UnpackTargetId(e.Target);

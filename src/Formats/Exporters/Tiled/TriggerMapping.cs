@@ -145,9 +145,9 @@ public static class TriggerMapping
 
     public static void LoadZones(List<MapEventZone> zones, AssetId assetId, List<TriggerInfo> triggers, Map map)
     {
-        if (zones == null) throw new ArgumentNullException(nameof(zones));
-        if (map == null) throw new ArgumentNullException(nameof(map));
-        if (triggers == null) throw new ArgumentNullException(nameof(triggers));
+        ArgumentNullException.ThrowIfNull(zones);
+        ArgumentNullException.ThrowIfNull(map);
+        ArgumentNullException.ThrowIfNull(triggers);
 
         zones.AddRange(BuildGlobalZones(assetId, triggers));
         zones.AddRange(BuildZones(assetId, map, triggers));
@@ -207,8 +207,8 @@ public static class TriggerMapping
 
     public static TriggerInfo ParseTrigger(MapObject obj, int tileWidth, int tileHeight, Func<string, ushort> resolveEntryPoint)
     {
-        if (obj == null) throw new ArgumentNullException(nameof(obj));
-        if (resolveEntryPoint == null) throw new ArgumentNullException(nameof(resolveEntryPoint));
+        ArgumentNullException.ThrowIfNull(obj);
+        ArgumentNullException.ThrowIfNull(resolveEntryPoint);
 
         var polygon = obj.Polygon.Points.Select(p => (((int)obj.X + p.x) / tileWidth, ((int)obj.Y + p.y) / tileHeight));
         var entryPointName = obj.PropString(Prop.Script);

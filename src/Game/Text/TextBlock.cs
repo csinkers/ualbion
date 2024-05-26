@@ -28,13 +28,13 @@ public class TextBlock // Logical segment of text where all glyphs share the sam
     public TextArrangementFlags ArrangementFlags { get; set; }
     public IEnumerable<WordId> Words => _words ?? Enumerable.Empty<WordId>();
     public void AddWord(WordId word) { _words ??= new HashSet<WordId>(); _words.Add(word); }
-    ISet<WordId> _words;
+    HashSet<WordId> _words;
 
     public override string ToString() => $"[\"{Text}\" {InkId} {Style} {Alignment} {ArrangementFlags}]";
 
     public bool IsMergeableWith(TextBlock other)
     {
-        if (other == null) throw new ArgumentNullException(nameof(other));
+        ArgumentNullException.ThrowIfNull(other);
         return
             other.BlockId == BlockId &&
             (string.IsNullOrWhiteSpace(other.Text) ||
@@ -46,7 +46,7 @@ public class TextBlock // Logical segment of text where all glyphs share the sam
 
     public void Merge(TextBlock other)
     {
-        if (other == null) throw new ArgumentNullException(nameof(other));
+        ArgumentNullException.ThrowIfNull(other);
         if (string.IsNullOrEmpty(other.Text))
             Text += " ";
         else

@@ -32,7 +32,7 @@ public static class ScriptCompiler
 
     public static ControlFlowGraph ExpandAstToGraph(ICfgNode ast, Func<IEvent, IEvent> eventTransformer, RecordFunc record)
     {
-        if (ast == null) throw new ArgumentNullException(nameof(ast));
+        ArgumentNullException.ThrowIfNull(ast);
         var start = UAEmit.Empty();
         var end = UAEmit.Empty();
         var graph = new ControlFlowGraph(new[] { start, ast, end }, new[] { (0, 1, CfgEdge.True), (1, 2, CfgEdge.True) });
@@ -41,8 +41,8 @@ public static class ScriptCompiler
 
     public static ControlFlowGraph ExpandGraph(ControlFlowGraph graph, Func<IEvent, IEvent> eventTransformer, RecordFunc record)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
-        if (record == null) throw new ArgumentNullException(nameof(record));
+        ArgumentNullException.ThrowIfNull(graph);
+        ArgumentNullException.ThrowIfNull(record);
         ControlFlowGraph previous = null;
         graph = record("Begin compilation", graph);
         graph = record("Lower loops", LowerLoops(graph));
@@ -148,7 +148,7 @@ public static class ScriptCompiler
 
     public static ControlFlowGraph ExpandSequence(ControlFlowGraph graph)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
         foreach (var index in graph.GetDfsOrder())
         {
             var node = graph.Nodes[index];
@@ -170,7 +170,7 @@ public static class ScriptCompiler
 
     public static ControlFlowGraph ExpandIfThenElse(ControlFlowGraph graph)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
         foreach (var index in graph.GetDfsOrder())
         {
             var node = graph.Nodes[index];
@@ -200,7 +200,7 @@ public static class ScriptCompiler
 
     public static ControlFlowGraph ExpandIfThen(ControlFlowGraph graph)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
         foreach (var index in graph.GetDfsOrder())
         {
             var node = graph.Nodes[index];
@@ -236,7 +236,7 @@ public static class ScriptCompiler
 
     public static ControlFlowGraph RemoveLoopSuccessors(ControlFlowGraph graph)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
 
         var edgesToRemove = graph.LabelledEdges.Where(x => x.label == CfgEdge.LoopSuccessor);
         foreach (var (start, end, _) in edgesToRemove)
@@ -246,7 +246,7 @@ public static class ScriptCompiler
 
     public static ControlFlowGraph ResolveGotos(ControlFlowGraph graph)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
 
         // Build label name -> target dict
         var mapping = new Dictionary<string, int>();

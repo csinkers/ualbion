@@ -29,7 +29,7 @@ public sealed class SingleBuffer<T> : Component, IBufferHolder<T> where T : unma
     public delegate void ModifierFunc<in TContext>(TContext context, ref T data);
     public void Modify<TContext>(ModifierFunc<TContext> func, TContext context)
     {
-        if (func == null) throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
         func(context, ref _instance);
         Dirty();
     }

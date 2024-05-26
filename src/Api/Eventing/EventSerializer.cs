@@ -11,9 +11,9 @@ public class EventSerializer
     public static EventSerializer Instance { get; } = new();
     EventSerializer() {}
 
-    readonly object SyncRoot = new();
-    readonly IDictionary<Type, EventMetadata> Serializers = new Dictionary<Type, EventMetadata>();
-    readonly IDictionary<string, EventMetadata> Events = new Dictionary<string, EventMetadata>();
+    readonly object _syncRoot = new();
+    readonly Dictionary<Type, EventMetadata> _serializers = new();
+    readonly Dictionary<string, EventMetadata> _events = new();
 
     static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly)
     {
@@ -23,19 +23,18 @@ public class EventSerializer
         return types.Where(x => x != null);
     }
 
-    public IEnumerable<Type> AllEventTypes => Serializers.Keys;
+    public IEnumerable<Type> AllEventTypes => _serializers.Keys;
 
     public void AddEventsFromAssembly(Assembly assembly)
     {
-        if (assembly == null)
-            throw new ArgumentNullException(nameof(assembly));
+        ArgumentNullException.ThrowIfNull(assembly);
 
         var types =
             from type in GetTypesFromAssembly(assembly) 
             where (typeof(Event).IsAssignableFrom(type) || typeof(EventRecord).IsAssignableFrom(type)) && !type.IsAbstract 
             select type;
 
-        lock (SyncRoot)
+        lock (_syncRoot)
         {
             foreach (var type in types)
             {
@@ -44,38 +43,38 @@ public class EventSerializer
                     continue;
 
                 var metadata = new EventMetadata(type);
-                Serializers[type] = metadata;
-                Events[metadata.Name.ToUpperInvariant()] = metadata;
+                _serializers[type] = metadata;
+                _events[metadata.Name.ToUpperInvariant()] = metadata;
 
                 if (metadata.Aliases == null) 
                     continue;
 
                 foreach (var alias in metadata.Aliases)
-                    Events[alias.ToUpperInvariant()] = metadata;
+                    _events[alias.ToUpperInvariant()] = metadata;
             }
         }
     }
 
     public string ToString(IEvent e)
     {
-        if (e == null) throw new ArgumentNullException(nameof(e));
-        return Serializers.TryGetValue(e.GetType(), out var metadata)
+        ArgumentNullException.ThrowIfNull(e);
+        return _serializers.TryGetValue(e.GetType(), out var metadata)
             ? metadata.Serialize(e, false)
             : e.GetType().Name;
     }
 
     public void Format(IScriptBuilder builder, IEvent e)
     {
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
-        if (e == null) throw new ArgumentNullException(nameof(e));
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(e);
 
-        if (Serializers.TryGetValue(e.GetType(), out var metadata))
+        if (_serializers.TryGetValue(e.GetType(), out var metadata))
             metadata.Serialize(builder, e);
         else
             builder.Add(ScriptPartType.EventName, e.GetType().Name);
     }
 
-    public IEnumerable<EventMetadata> GetEventMetadata() => Events.Values.OrderBy(x => x.Name);
+    public IEnumerable<EventMetadata> GetEventMetadata() => _events.Values.OrderBy(x => x.Name);
 
     public IEvent Parse(string s, out string error)
     {
@@ -155,7 +154,7 @@ public class EventSerializer
             return null;
         }
 
-        if (!Events.TryGetValue(parts[0].ToUpperInvariant(), out var metadata))
+        if (!_events.TryGetValue(parts[0].ToUpperInvariant(), out var metadata))
         {
             error = $"Could not find event \"{parts[0]}\"";
             return null;

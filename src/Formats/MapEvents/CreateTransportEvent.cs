@@ -21,7 +21,7 @@ public class CreateTransportEvent : MapEvent
 
     public static CreateTransportEvent Serdes(CreateTransportEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new CreateTransportEvent();
         e.X = s.UInt8(nameof(X), e.X);
         e.Y = s.UInt8(nameof(Y), e.Y);

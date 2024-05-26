@@ -7,7 +7,7 @@ using Veldrid;
 
 namespace UAlbion;
 
-class CommandLineOptions
+sealed class CommandLineOptions
 {
     public ExecutionMode Mode { get; }
     public GraphicsBackend Backend { get; }

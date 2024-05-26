@@ -11,7 +11,7 @@ public class AdHocComponent : Component
 
     public AdHocComponent(string name, Action<IAdHocComponentHelper> constructor)
     {
-        if (constructor == null) throw new ArgumentNullException(nameof(constructor));
+        ArgumentNullException.ThrowIfNull(constructor);
         Name = name;
         constructor(new Helper(this));
     }
@@ -27,7 +27,7 @@ public class AdHocComponent : Component
     protected override void Subscribing() => OnSubscribing?.Invoke();
     protected override void Unsubscribed() => OnUnsubscribed?.Invoke();
 
-    class Helper : IAdHocComponentHelper
+    sealed class Helper : IAdHocComponentHelper
     {
         readonly AdHocComponent _this;
         public Helper(AdHocComponent adhoc) => _this = adhoc;

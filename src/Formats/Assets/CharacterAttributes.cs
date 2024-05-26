@@ -39,7 +39,7 @@ public class CharacterAttributes : ICharacterAttributes
     public CharacterAttributes DeepClone() => new CharacterAttributes().CopyFrom(this);
     public CharacterAttributes CopyFrom(CharacterAttributes other)
     {
-        if (other == null) throw new ArgumentNullException(nameof(other));
+        ArgumentNullException.ThrowIfNull(other);
         Strength = other.Strength.DeepClone();
         Intelligence = other.Intelligence.DeepClone();
         Dexterity = other.Dexterity.DeepClone();

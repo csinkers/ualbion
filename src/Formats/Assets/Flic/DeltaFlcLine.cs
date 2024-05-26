@@ -17,7 +17,7 @@ public class DeltaFlcLine
 
     public DeltaFlcLine(ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         int remaining = 1;
         while (remaining > 0)
         {

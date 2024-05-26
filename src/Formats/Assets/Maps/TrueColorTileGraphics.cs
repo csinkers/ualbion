@@ -22,7 +22,7 @@ public class TrueColorTileGraphics : ITileGraphics
 
     public Region GetRegionInner(List<TileFrameSummary> frames, int imageNumber, int paletteFrame)
     {
-        if (frames == null) throw new ArgumentNullException(nameof(frames));
+        ArgumentNullException.ThrowIfNull(frames);
 
         var info = frames[imageNumber];
         paletteFrame %= info.Paths.Length;

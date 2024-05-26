@@ -41,7 +41,7 @@ public class SelectionManager : ServiceComponent<ISelectionManager>, ISelectionM
 
     public void CastRayFromScreenSpace(List<Selection> hits, Vector2 pixelPosition, bool debug, bool performFocusAlerts)
     {
-        if (hits == null) throw new ArgumentNullException(nameof(hits));
+        ArgumentNullException.ThrowIfNull(hits);
         _selectEvent.Position = pixelPosition;
         _selectEvent.Debug = debug;
         _selectEvent.Selections = hits;

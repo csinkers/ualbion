@@ -35,7 +35,7 @@ public class TextEvent : MapEvent // Relies on event chain context to resolve Te
 
     public static TextEvent Parse(string[] parts)
     {
-        if (parts == null) throw new ArgumentNullException(nameof(parts));
+        ArgumentNullException.ThrowIfNull(parts);
 
         var subId = ushort.Parse(parts[1]);
         var location = parts.Length > 2 ? (TextLocation)Enum.Parse(typeof(TextLocation), parts[2]) : TextLocation.NoPortrait;
@@ -60,7 +60,7 @@ public class TextEvent : MapEvent // Relies on event chain context to resolve Te
     {
         e ??= new TextEvent();
 
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e.Location = s.EnumU8(nameof(Location), e.Location); // 1
         int zeroed = s.UInt16(null, 0); // 2, 3
 

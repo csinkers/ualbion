@@ -9,7 +9,7 @@ public class CopyChunk : FlicChunk
     public override FlicChunkType Type => FlicChunkType.FullUncompressed;
     protected override uint LoadChunk(uint length, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         PixelData = s.Bytes(null, null, (int)length);
         return length;
     }

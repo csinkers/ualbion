@@ -14,7 +14,7 @@ public class TextManager : GameServiceComponent<ITextManager>, ITextManager
 {
     public Vector2 Measure(TextBlock block)
     {
-        if (block == null) throw new ArgumentNullException(nameof(block));
+        ArgumentNullException.ThrowIfNull(block);
         int offset = 0;
         var font = Assets.LoadFont(block.Style == TextStyle.Big ? Base.Font.Bold : Base.Font.Regular, block.InkId);
         if (font == null)
@@ -38,7 +38,7 @@ public class TextManager : GameServiceComponent<ITextManager>, ITextManager
 
     public PositionedSpriteBatch BuildRenderable(TextBlock block, DrawLayer layer, Rectangle? scissorRegion, object caller)
     {
-        if (block == null) throw new ArgumentNullException(nameof(block));
+        ArgumentNullException.ThrowIfNull(block);
         var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
         var window = Resolve<IGameWindow>();
 
@@ -119,7 +119,7 @@ public class TextManager : GameServiceComponent<ITextManager>, ITextManager
 
     public IEnumerable<TextBlock> SplitBlocksToSingleWords(IEnumerable<TextBlock> blocks)
     {
-        if (blocks == null) throw new ArgumentNullException(nameof(blocks));
+        ArgumentNullException.ThrowIfNull(blocks);
         foreach (var block in blocks)
         {
             if ((block.ArrangementFlags & TextArrangementFlags.NoWrap) != 0)

@@ -15,7 +15,7 @@ public class CentreContent : UiElement, IFixedSizeUiElement
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
-        if (func == null) throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
         var childSize = _content.GetSize();
         var childExtents = new Rectangle(
             extents.X + (int)(extents.Width - childSize.X) / 2,

@@ -13,7 +13,7 @@ public class NpcState : IMovementState
     // Total size = 128 bytes
     public static NpcState Serdes(int i, NpcState npc, (MapType mapType, AssetMapping mapping) c, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         npc ??= new NpcState();
         var startOffset = s.Offset;
 

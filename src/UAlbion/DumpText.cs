@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats;
@@ -15,7 +17,7 @@ using UAlbion.Game.Text;
 
 namespace UAlbion;
 
-class DumpText : GameComponent, IAssetDumper
+sealed class DumpText : GameComponent, IAssetDumper
 {
     const string ChestPath            = "ChestInfo.txt";
     const string EventSetPath         = "EventSets.txt";
@@ -29,7 +31,7 @@ class DumpText : GameComponent, IAssetDumper
     const string NpcCharacterPath     = "NpcCharacters.txt";
     const string PartyCharacterPath   = "PartyCharacters.txt";
     const string SpellInfoPath        = "Spells.txt";
-    const string ScriptPath           = "Scripts/{0}.txt";
+    static readonly CompositeFormat ScriptPath = CompositeFormat.Parse("Scripts/{0}.txt");
 
     static IEnumerable<AssetId> Ids<T>(AssetId[] dumpIds) where T : unmanaged, Enum 
         => Enum.GetValues(typeof(T))
@@ -76,8 +78,11 @@ class DumpText : GameComponent, IAssetDumper
         foreach (var id in Ids<Base.Script>(dumpIds))
         {
             var events = assets.LoadScript(id);
-            if (events == null) continue;
-            using var sw = Open(baseDir, string.Format(ScriptPath, id));
+            if (events == null)
+                continue;
+
+            var name = string.Format(CultureInfo.InvariantCulture, ScriptPath, id);
+            using var sw = Open(baseDir, name);
             foreach (var e in events)
                 sw.WriteLine(e.ToString());
         }
@@ -440,7 +445,7 @@ class DumpText : GameComponent, IAssetDumper
         }
     }
 
-    static void PrintEvent(IScriptBuilder builder, EventFormatter formatter, IEventNode e, int? chainId)
+    static void PrintEvent(UnformattedScriptBuilder builder, EventFormatter formatter, IEventNode e, int? chainId)
     {
         if(chainId.HasValue)
         {

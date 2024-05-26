@@ -17,7 +17,7 @@ public class DeltaFlcLineToken
 
     public DeltaFlcLineToken(ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         ColumnSkipCount = s.UInt8(null, 0);
         SignedCount = s.Int8(null, 0); // +ve = verbatim, -ve = RLE
 

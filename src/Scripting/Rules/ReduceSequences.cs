@@ -7,7 +7,7 @@ public static class ReduceSequences
 {
     public static (ControlFlowGraph, string) Decompile(ControlFlowGraph graph)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
         foreach (var index in graph.GetDfsPostOrder())
         {
             var children = graph.Children(index);

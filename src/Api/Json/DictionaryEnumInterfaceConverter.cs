@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace UAlbion.Api.Json;
 #pragma warning disable CA1812 // Internal class that is apparently never instantiated; this class is instantiated generically
-class DictionaryEnumInterfaceConverter<TKey, TValue> : JsonConverter<IDictionary<TKey, TValue>> where TKey : struct, Enum
+sealed class DictionaryEnumInterfaceConverter<TKey, TValue> : JsonConverter<IDictionary<TKey, TValue>> where TKey : struct, Enum
 {
     static readonly Type KeyType = typeof(TKey);
     static readonly Type ValueType = typeof(TValue);

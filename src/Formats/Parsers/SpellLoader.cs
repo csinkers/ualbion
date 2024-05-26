@@ -14,8 +14,8 @@ public class SpellLoader : IAssetLoader<SpellData>
 
     public SpellData Serdes(SpellData existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
         return SpellData.Serdes(existing, context, s);
     }
 

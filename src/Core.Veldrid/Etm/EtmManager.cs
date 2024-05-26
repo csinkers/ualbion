@@ -9,7 +9,7 @@ public class EtmManager : ServiceComponent<IEtmManager>, IEtmManager, IRenderabl
 {
     public IExtrudedTilemap CreateTilemap(TilemapRequest request)
     {
-        if (request == null) throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
         if (request.Id == null) throw new ArgumentException("The tilemap request did not have an id set", nameof(request));
 
         var properties = new DungeonTileMapProperties(
@@ -37,13 +37,13 @@ public class EtmManager : ServiceComponent<IEtmManager>, IEtmManager, IRenderabl
 
     public void DisposeTilemap(ExtrudedTilemap tilemap)
     {
-        if (tilemap == null) throw new ArgumentNullException(nameof(tilemap));
+        ArgumentNullException.ThrowIfNull(tilemap);
         RemoveChild(tilemap);
     }
 
     public void Collect(List<IRenderable> renderables)
     {
-        if (renderables == null) throw new ArgumentNullException(nameof(renderables));
+        ArgumentNullException.ThrowIfNull(renderables);
         foreach (var child in Children)
         {
             if (child is not ExtrudedTilemap tilemap)

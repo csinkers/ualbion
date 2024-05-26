@@ -10,7 +10,7 @@ public class WavLoader : IAssetLoader<ISample>
 {
     public ISample Serdes(ISample existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         if (s.IsWriting() && existing == null)
             throw new ArgumentNullException(nameof(existing));
 

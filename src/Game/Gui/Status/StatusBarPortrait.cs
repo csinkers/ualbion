@@ -114,7 +114,7 @@ public class StatusBarPortrait : UiElement
 
     protected override int DoLayout<T>(Rectangle extents, int order, T context, LayoutFunc<T> func)
     {
-        if (func == null) throw new ArgumentNullException(nameof(func));
+        ArgumentNullException.ThrowIfNull(func);
         var party = Resolve<IParty>();
         var member = PartyMember;
         if (member == null)

@@ -10,7 +10,7 @@ public class EventTransformVisitor : BaseAstBuilderVisitor
     public EventTransformVisitor(Func<IEvent, IEvent> transform) => _transform = transform ?? throw new ArgumentNullException(nameof(transform));
     protected override ICfgNode Build(SingleEvent e)
     {
-        if (e == null) throw new ArgumentNullException(nameof(e));
+        ArgumentNullException.ThrowIfNull(e);
 
         var transformed = _transform(e.Event);
         return transformed == null || transformed == e.Event ? null : UAEmit.Event(transformed, e.OriginalIndex);

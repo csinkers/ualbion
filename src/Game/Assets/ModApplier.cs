@@ -288,7 +288,7 @@ public class ModApplier : GameComponent, IModApplier
 
     public void SaveAssets(AssetConversionOptions options)
     {
-        if (options == null) throw new ArgumentNullException(nameof(options));
+        ArgumentNullException.ThrowIfNull(options);
         if (options.LoaderFunc == null) throw new ArgumentException(nameof(options.LoaderFunc));
         if (options.FlushCacheFunc == null) throw new ArgumentException(nameof(options.FlushCacheFunc));
 

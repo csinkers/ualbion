@@ -10,7 +10,7 @@ public class CommentEvent : IVerboseEvent // No-op event for preserving comments
     public override string ToString() => Comment == null ? "" : $";{Comment}";
     public void Format(IScriptBuilder builder)
     {
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
         builder.Add(ScriptPartType.Comment, ToString());
     }
 }

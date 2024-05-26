@@ -12,7 +12,7 @@ public class PathResolver : IPathResolver
     const string ModsDirectory = "mods";
     static readonly Regex Pattern = new(@"(\$\([A-Z]+\))");
     public string BasePath { get; }
-    IDictionary<string, string> Paths { get; } = new Dictionary<string, string>();
+    Dictionary<string, string> Paths { get; } = new();
 
     public PathResolver(string baseDir, string appName)
     {

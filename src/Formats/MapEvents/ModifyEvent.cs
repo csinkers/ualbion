@@ -9,7 +9,7 @@ public abstract class ModifyEvent : MapEvent
 {
     public static ModifyEvent BaseSerdes(ModifyEvent genericEvent, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         var subType = s.EnumU8("SubType", genericEvent?.SubType ?? ModifyType.DoorOpen);
         return subType switch
         {

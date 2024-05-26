@@ -8,7 +8,7 @@ public static class VeldridUtil
 {
     public static void UpdateBufferSpan<T>(CommandList cl, DeviceBuffer buffer, ReadOnlySpan<T> instances) where T : unmanaged
     {
-        if (cl == null) throw new ArgumentNullException(nameof(cl));
+        ArgumentNullException.ThrowIfNull(cl);
         unsafe
         {
             fixed (T* instancePtr = &instances[0])

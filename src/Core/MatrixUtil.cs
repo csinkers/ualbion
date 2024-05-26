@@ -61,8 +61,8 @@ public static class MatrixUtil
     static Matrix4x4 CreatePerspective(bool depthZeroToOne, float fov, float aspectRatio, float near, float far)
     {
         if (fov <= 0.0f || fov >= MathF.PI) throw new ArgumentOutOfRangeException(nameof(fov));
-        if (near <= 0.0f) throw new ArgumentOutOfRangeException(nameof(near));
-        if (far <= 0.0f) throw new ArgumentOutOfRangeException(nameof(far));
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(near, 0.0f);
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(far, 0.0f);
 
         float yScale = 1.0f / MathF.Tan(fov * 0.5f);
         float xScale = yScale / aspectRatio;

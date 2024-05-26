@@ -39,7 +39,7 @@ public class Wall // Length = 0x12 + overlayCount * 0xC
 
     public static Wall Serdes(int _, Wall w, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         w ??= new Wall();
         w.Properties = s.EnumU8(nameof(w.Properties), w.Properties); // 0
 

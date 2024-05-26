@@ -26,7 +26,7 @@ public sealed class ExtrudedTilemap : Component, IExtrudedTilemap
 
     public ExtrudedTilemap(EtmManager manager, IAssetId id, string name, int tileCount, DungeonTileMapProperties properties, IPalette dayPalette, IPalette nightPalette)
     {
-        if (dayPalette == null) throw new ArgumentNullException(nameof(dayPalette));
+        ArgumentNullException.ThrowIfNull(dayPalette);
         _manager = manager ?? throw new ArgumentNullException(nameof(manager));
 
         _tiles = new MultiBuffer<DungeonTile>(tileCount, BufferUsage.VertexBuffer) { Name = $"B_Inst{name}"};

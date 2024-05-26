@@ -22,7 +22,7 @@ public class Overlay // 0xC bytes = 12
 
     public static Overlay Serdes(int _, Overlay o, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         o ??= new Overlay();
         o.SpriteId = SpriteId.SerdesU16(nameof(o.SpriteId), o.SpriteId, AssetType.WallOverlay, mapping, s);
         o.AnimationFrames = s.UInt8(nameof(o.AnimationFrames), o.AnimationFrames);

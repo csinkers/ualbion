@@ -9,7 +9,7 @@ public class PlaceActionEvent : MapEvent
 {
     public static PlaceActionEvent Serdes(PlaceActionEvent e, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new PlaceActionEvent();
         e.Type = s.EnumU8(nameof(Type), e.Type);
         e.Unk2 = s.UInt8(nameof(Unk2), e.Unk2);

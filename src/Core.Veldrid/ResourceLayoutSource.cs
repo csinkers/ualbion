@@ -21,8 +21,8 @@ public class ResourceLayoutSource : ServiceComponent<IResourceLayoutSource>, IRe
 
     public ResourceLayout GetLayout(Type type, GraphicsDevice device)
     {
-        if (type == null) throw new ArgumentNullException(nameof(type));
-        if (device == null) throw new ArgumentNullException(nameof(device));
+        ArgumentNullException.ThrowIfNull(type);
+        ArgumentNullException.ThrowIfNull(device);
 
         lock (_syncRoot)
         {

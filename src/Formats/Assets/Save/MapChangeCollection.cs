@@ -12,7 +12,7 @@ public class MapChangeCollection : List<MapChange>
 {
     public static MapChangeCollection Serdes(int _, MapChangeCollection c, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         c ??= new MapChangeCollection();
         uint size = s.UInt32("Size", (uint)(c.Count * MapChange.SizeOnDisk + 2));
         ushort count = s.UInt16(nameof(Count), (ushort)c.Count);

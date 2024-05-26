@@ -11,7 +11,7 @@ public class UnknownChunk : FlicChunk
     public override string ToString() => $"Unknown:{Type} ({Bytes.Length} bytes)";
     protected override uint LoadChunk(uint length, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         Bytes = s.Bytes(null, null, (int)length);
         return (uint)Bytes.Length;
     }

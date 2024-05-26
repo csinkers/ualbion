@@ -28,7 +28,7 @@ public class VisitedEvent
 
     public static VisitedEvent Serdes(int n, VisitedEvent u, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
 
         u ??= new VisitedEvent();
         s.Begin();

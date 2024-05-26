@@ -29,7 +29,7 @@ public class DominatorTree
     public DominatorTree AddPath(params int[] path) => AddPathList(path);
     public DominatorTree AddPathList(IList<int> path)
     {
-        if (path == null) throw new ArgumentNullException(nameof(path));
+        ArgumentNullException.ThrowIfNull(path);
         if (path.Count == 0)
             return this;
 
@@ -63,7 +63,7 @@ public class DominatorTree
 
     public void ExportToDot(StringBuilder sb, int dpi = 150)
     {
-        if (sb == null) throw new ArgumentNullException(nameof(sb));
+        ArgumentNullException.ThrowIfNull(sb);
         sb.AppendLine("digraph G {");
         sb.AppendLine($"    graph [ dpi = {dpi} ];");
         var stack = new Stack<GenericTreeNode<int>>();

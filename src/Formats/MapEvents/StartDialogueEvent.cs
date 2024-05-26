@@ -19,7 +19,7 @@ public class StartDialogueEvent : MapEvent
 
     public static StartDialogueEvent Serdes(StartDialogueEvent e, AssetMapping mapping, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         e ??= new StartDialogueEvent();
         s.UInt8("Pad1", 1);
         s.UInt8("Pad2", 0);

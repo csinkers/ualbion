@@ -50,7 +50,7 @@ public sealed class EtmRenderer : Component, IRenderer, IDisposable
         var globalSet = (GlobalSet)set1 ?? throw new ArgumentNullException(nameof(set1));
         var renderPassSet = (MainPassSet)set2 ?? throw new ArgumentNullException(nameof(set2));
 
-        if (cl == null) throw new ArgumentNullException(nameof(cl));
+        ArgumentNullException.ThrowIfNull(cl);
         if (renderable is not EtmWindow window)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
@@ -83,9 +83,9 @@ public sealed class EtmRenderer : Component, IRenderer, IDisposable
 
 [VertexShader(typeof(EtmVertexShader))]
 [FragmentShader(typeof(EtmFragmentShader))]
-partial class EtmPipeline : PipelineHolder { }
+sealed partial class EtmPipeline : PipelineHolder { }
 
-partial class EtmSet : ResourceSetHolder
+sealed partial class EtmSet : ResourceSetHolder
 {
     [UniformBuffer("Properties", ShaderStages.Vertex)] IBufferHolder<DungeonTileMapProperties> _properties;
     [TextureArray("DayFloors", ShaderStages.Fragment)] ITextureArrayHolder _dayFloors;
@@ -103,7 +103,7 @@ partial class EtmSet : ResourceSetHolder
 [ResourceSet(2, typeof(EtmSet))]
 [Output(0, typeof(EtmIntermediate))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-partial class EtmVertexShader : IVertexShader { }
+sealed partial class EtmVertexShader : IVertexShader { }
 
 [Name( "ExtrudedTileMapSF.frag")]
 [Input(0, typeof(EtmIntermediate))]
@@ -112,7 +112,7 @@ partial class EtmVertexShader : IVertexShader { }
 [ResourceSet(2, typeof(EtmSet))]
 [Output(0, typeof(SimpleFramebuffer))]
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-partial class EtmFragmentShader : IFragmentShader { }
+sealed partial class EtmFragmentShader : IFragmentShader { }
 
 #pragma warning disable CA1815 // Override equals and operator equals on value types
 [StructLayout(LayoutKind.Sequential)]
@@ -198,7 +198,7 @@ public partial struct DungeonTile : IVertexFormat, IEquatable<DungeonTile>
 
 #pragma warning restore CA1815 // Override equals and operator equals on value types
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-partial class EtmIntermediate : IVertexFormat
+sealed partial class EtmIntermediate : IVertexFormat
 {
 #pragma warning disable 649
     [Vertex("TexCoords")] public Vector2 TextureCordinates;

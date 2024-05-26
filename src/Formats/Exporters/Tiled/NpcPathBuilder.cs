@@ -11,7 +11,7 @@ public static class NpcPathBuilder
     public const string TimePropertyName = "Time";
     public static IEnumerable<(int index, int x, int y)> CombineRuns(NpcWaypoint[] points)
     {
-        if (points == null) throw new ArgumentNullException(nameof(points));
+        ArgumentNullException.ThrowIfNull(points);
 
         var waypoints = IdentifyWaypoints(points).ToList();
         int last = -1;
@@ -65,7 +65,7 @@ public static class NpcPathBuilder
         int tileHeight,
         ref int nextId)
     {
-        if (waypoints == null) throw new ArgumentNullException(nameof(waypoints));
+        ArgumentNullException.ThrowIfNull(waypoints);
         var results = new List<MapObject>();
         var combined = CombineRuns(waypoints);
 

@@ -11,7 +11,7 @@ public class TickerSet : Dictionary<TickerId, byte>
 
     public static TickerSet Serdes(string _, TickerSet d, ISerializer s)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        ArgumentNullException.ThrowIfNull(s);
         d ??= new TickerSet();
         if (s.IsReading())
             d.Clear();

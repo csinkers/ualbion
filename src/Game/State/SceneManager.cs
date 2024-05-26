@@ -12,7 +12,7 @@ namespace UAlbion.Game.State;
 
 public class SceneManager : Container, ISceneManager
 {
-    readonly IDictionary<SceneId, IScene> _scenes = new Dictionary<SceneId, IScene>();
+    readonly Dictionary<SceneId, IScene> _scenes = new();
 
     public SceneManager() : base("SceneManager")
     {
@@ -20,7 +20,7 @@ public class SceneManager : Container, ISceneManager
     }
 
     public SceneId ActiveSceneId { get; private set; }
-    public IScene GetScene(SceneId sceneId) => _scenes.TryGetValue(sceneId, out var scene) ? scene : null;
+    public IScene GetScene(SceneId sceneId) => _scenes.GetValueOrDefault(sceneId);
     public IScene ActiveScene => _scenes[ActiveSceneId];
     protected override void Subscribing()
     {

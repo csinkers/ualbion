@@ -17,6 +17,7 @@ public class DialogFrame : UiElement
     const int FrameOffsetY = 7;
     const int ShadowX = 10;
     const int ShadowY = 10;
+    static readonly int[] Region1Only = { 1 }; // Just the black region
 
     PositionedSpriteBatch _sprite;
     Vector2 _lastPixelSize; // For dirty state detection
@@ -105,7 +106,7 @@ public class DialogFrame : UiElement
                 multi.AddTexture(1, colors.BorderTexture,
                     FrameOffsetX, FrameOffsetY, 0, false,
                     width - FrameOffsetX * 2, height - FrameOffsetY * 2, 128,
-                    new[] { 1 }); // Just the black region
+                    Region1Only); // Just the black region
                 break;
             }
         }

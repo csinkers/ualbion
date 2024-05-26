@@ -8,7 +8,7 @@ public static class ConnectDisjointNodeToExit
     const string Description = "Connect disjoint node to exit";
     public static (ControlFlowGraph, string) Decompile(ControlFlowGraph graph)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
         var (reachability, reachableCount) = graph.Reverse().GetReachability(graph.ExitIndex);
         if (reachableCount == graph.ActiveNodeCount)
             return (graph, null);

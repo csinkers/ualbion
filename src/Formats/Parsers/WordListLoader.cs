@@ -16,8 +16,8 @@ public class WordListLoader : IAssetLoader<ListStringSet>
 
     public ListStringSet Serdes(ListStringSet existing, ISerializer s, AssetLoadContext context)
     {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (context == null) throw new ArgumentNullException(nameof(context));
+        ArgumentNullException.ThrowIfNull(s);
+        ArgumentNullException.ThrowIfNull(context);
 
         if (s.IsReading())
         {
@@ -30,8 +30,7 @@ public class WordListLoader : IAssetLoader<ListStringSet>
         }
         else
         {
-            if (existing == null)
-                throw new ArgumentNullException(nameof(existing));
+            ArgumentNullException.ThrowIfNull(existing);
 
             foreach (var x in existing)
             {

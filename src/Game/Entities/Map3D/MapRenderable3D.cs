@@ -19,7 +19,7 @@ public class MapRenderable3D : GameComponent
     readonly LabyrinthData _labyrinthData;
     readonly TilemapRequest _properties;
     // readonly IDictionary<int, IList<int>> _tilesByDistance = new Dictionary<int, IList<int>>();
-    readonly ISet<int> _dirty = new HashSet<int>();
+    readonly HashSet<int> _dirty = new();
     IExtrudedTilemap _tilemap;
     // bool _isSorting;
     bool _fullUpdate = true;
@@ -27,8 +27,8 @@ public class MapRenderable3D : GameComponent
 
     public MapRenderable3D(LogicalMap3D logicalMap, LabyrinthData labyrinthData, TilemapRequest properties)
     {
-        if (logicalMap == null) throw new ArgumentNullException(nameof(logicalMap));
-        if (labyrinthData == null) throw new ArgumentNullException(nameof(labyrinthData));
+        ArgumentNullException.ThrowIfNull(logicalMap);
+        ArgumentNullException.ThrowIfNull(labyrinthData);
 
         On<PrepareFrameEvent>(_ => Update());
         // On<SortMapTilesEvent>(e => _isSorting = e.IsSorting);

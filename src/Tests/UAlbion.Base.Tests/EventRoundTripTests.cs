@@ -158,7 +158,7 @@ public class EventRoundTripTests
     [Fact]
     public void DoorOpen()
     {
-        Test(("set_door_open Set Door.Beastmaster", new SetDoorOpenEvent(SwitchOperation.Set, Base.Door.Beastmaster)));
+        Test(("set_door_open Set Door.Beastmaster", new SetDoorOpenEvent(SwitchOperation.Set, Door.Beastmaster)));
     }
 
     [Fact]

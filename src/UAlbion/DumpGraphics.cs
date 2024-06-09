@@ -37,7 +37,7 @@ sealed class DumpGraphics : GameComponent, IAssetDumper
                 if (dumpIds != null && !dumpIds.Contains(assetId))
                     continue;
 
-                ExportImage(assetId, Assets, directory, _formats, (frame, palFrame) => palFrame < 10); // Limit to 10, some of the tile sets can get a bit silly.
+                ExportImage(assetId, Assets, directory, _formats, (_, palFrame) => palFrame < 10); // Limit to 10, some of the tile sets can get a bit silly.
             }
         }
 

@@ -24,7 +24,7 @@ public static class JumpMap
         {
             if (i == columns) { i = 0; j++; }
             var portal = portals[index];
-            builder.Marker(index, 3 + i * 2, 3 + j * 2, portal.name, s => @$"
+            builder.Marker(index, 3 + i * 2, 3 + j * 2, portal.name, _ => @$"
 teleport {portal.id} 8 8
 ");
         }

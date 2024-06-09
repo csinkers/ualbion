@@ -22,7 +22,7 @@ public class ItemNameMetaLoader : Component, IAssetLoader<ListStringSet>
             throw new NotSupportedException($"{nameof(ItemNameMetaLoader)} is read-only");
 
         var applier = Resolve<IModApplier>();
-        var target = applier.LoadAssetCached(targetId, null);
+        var target = applier.LoadAssetCached(targetId);
 
         if (target is not Dictionary<string, ListStringSet> dict)
             throw new FormatException($"Expected target \"{targetId}\" to be a {nameof(Dictionary<string, ListStringSet>)} but it was {target?.GetType()}");

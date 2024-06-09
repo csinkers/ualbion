@@ -10,7 +10,7 @@ public class NumericPromptDialog : ModalDialog
 {
     public NumericPromptDialog(IText text, int min, int max, int depth) : base(DialogPositioning.Center, depth)
     {
-        On<CloseWindowEvent>(e => Close());
+        On<CloseWindowEvent>(_ => Close());
 
         var textSection = new UiText(text);
         var slider = new Slider(() => Value, x => Value = x, min, max);

@@ -15,6 +15,6 @@ public class InventoryInspector : GameComponent
         if (item == null)
             return;
         var details = AttachChild(new InventoryDetailsDialog(item));
-        details.Closed += (sender, args) => RemoveChild(details);
+        details.Closed += (_, _) => RemoveChild(details);
     }
 }

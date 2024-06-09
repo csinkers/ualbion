@@ -152,7 +152,7 @@ public class EdgeMergingTests
         var r = new Random();
         edges = edges.Distinct().ToList();
         Assert.Equal(10, edges.Count);
-        edges = edges.OrderBy(x => r.Next()).ToList(); // Shuffle
+        edges = edges.OrderBy(_ => r.Next()).ToList(); // Shuffle
         edges = edges.OrderBy(x => x).ToList();
         Assert.Collection(edges,
             e => Assert.Equal(E(0, 0, 0, 0), e),

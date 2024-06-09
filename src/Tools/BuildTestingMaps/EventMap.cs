@@ -14,7 +14,7 @@ public static class EventMap
 
         var builder = new MapBuilder2D(mapId, Constants.Palette1Id, tileset1, MapWidth, MapHeight);
         builder.DrawBorder();
-        builder.Marker(1, 3, 3, "Give 10 gold to everyone", s => "change everyone gold AddAmount 100");
+        builder.Marker(1, 3, 3, "Give 10 gold to everyone", _ => "change everyone gold AddAmount 100");
 
         var (map, mapText) = builder.Build();
         return new Dictionary<AssetId, object>

@@ -471,7 +471,7 @@ public class FullDecompilationTests : IDisposable
         var zoneRefs = map.UniqueZoneNodeIds;
         var refs = npcRefs.Union(zoneRefs).Except(map.Chains);
 
-        TestInner(map.Events, id.ToMapText(), map.Chains, refs, testName);
+        TestInner(map.Events, map.Chains, refs, testName);
     }
 
     static void TestEventSet(EventSetId id, [CallerMemberName] string testName = null)
@@ -486,12 +486,11 @@ public class FullDecompilationTests : IDisposable
         if (set.Events.Count == 0)
             return;
 
-        TestInner(set.Events, id.ToEventText(), set.Chains, Array.Empty<ushort>(), testName);
+        TestInner(set.Events, set.Chains, Array.Empty<ushort>(), testName);
     }
 
     static void TestInner<T>(
         IList<T> events,
-        AssetId contextId,
         IEnumerable<ushort> chains,
         IEnumerable<ushort> entryPoints,
         [CallerMemberName] string testName = null) where T : IEventNode

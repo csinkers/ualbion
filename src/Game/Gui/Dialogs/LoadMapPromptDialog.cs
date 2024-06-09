@@ -10,7 +10,7 @@ public class LoadMapPromptDialog : ModalDialog // TODO: Use textbox
 {
     public LoadMapPromptDialog(IText text, int min, int max, int depth = 0) : base(DialogPositioning.Center, depth)
     {
-        On<CloseWindowEvent>(e => Close());
+        On<CloseWindowEvent>(_ => Close());
 
         var textSection = new UiText(text);
         var slider = new Slider(() => Value, x => Value = x, min, max);

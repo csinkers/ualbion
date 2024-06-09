@@ -16,7 +16,7 @@ public class SmallPlayer : Component
 
     public SmallPlayer(PartyMemberId charId, Func<(Vector3, int)> positionFunc, Vector3 tileSize, IContainer sceneObjects)
     {
-        On<FastClockEvent>(e =>
+        On<FastClockEvent>(_ =>
         {
             //(_sprite.TilePosition, _sprite.Frame) = _positionFunc();
             var (pos, frame) = _positionFunc();

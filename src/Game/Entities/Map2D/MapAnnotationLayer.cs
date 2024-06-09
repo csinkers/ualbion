@@ -25,9 +25,9 @@ public class MapAnnotationLayer : Component
     {
         _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
         _tileSize = tileSize;
-        _logicalMap.Dirty += (sender, args) => _dirty.Add((args.X, args.Y));
+        _logicalMap.Dirty += (_, args) => _dirty.Add((args.X, args.Y));
         // _drawLayer = DrawLayer.Diagnostic;
-        On<PrepareFrameEvent>(e => Render());
+        On<PrepareFrameEvent>(_ => Render());
     }
 
     readonly LogicalMap2D _logicalMap;

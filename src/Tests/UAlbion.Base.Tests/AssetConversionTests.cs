@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
@@ -14,10 +15,11 @@ using UAlbion.Formats.Parsers;
 using UAlbion.Game.Assets;
 using UAlbion.TestCommon;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace UAlbion.Base.Tests;
 
-public class AssetConversionTests
+public class AssetConversionTests : TestWithLogging
 {
     const string BaseAssetMod = "Albion";
     const string UnpackedAssetMod = "Unpacked";
@@ -28,7 +30,7 @@ public class AssetConversionTests
     readonly IFileSystem _disk;
     readonly IModApplier _baseApplier;
 
-    public AssetConversionTests()
+    public AssetConversionTests(ITestOutputHelper testOutput) : base(testOutput)
     {
         Event.AddEventsFromAssembly(typeof(ActionEvent).Assembly);
         AssetMapping.GlobalIsThreadLocal = true;
@@ -63,7 +65,7 @@ public class AssetConversionTests
         var mapping = AssetMapping.Global;
         var stubDisk = new StubFileSystem();
         var modContext = new ModContext("Test", JsonUtil, stubDisk, mapping);
-        var node = _baseApplier.GetAssetInfo(id, null);
+        var node = _baseApplier.GetAssetInfo(id);
         var context = new AssetLoadContext(id, node, modContext);
 
         var (baseBytes, baseNotes) = Asset.Save(baseAsset, serdes, context);
@@ -630,4 +632,23 @@ public class AssetConversionTests
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
     // */
+}
+
+public abstract class TestWithLogging : IDisposable
+{
+    protected ITestOutputHelper TestOutput { get; }
+
+    protected TestWithLogging([NotNull] ITestOutputHelper testOutput) => TestOutput = testOutput ?? throw new ArgumentNullException(nameof(testOutput));
+
+    protected virtual void Dispose(bool disposing)
+    {
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~TestWithLogging() => Dispose(false);
 }

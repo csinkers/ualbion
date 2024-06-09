@@ -20,7 +20,7 @@ public class EditorUi : Component
 
     public EditorUi()
     {
-        On<EngineUpdateEvent>(e =>
+        On<EngineUpdateEvent>(_ =>
         {
             RenderMenus();
             RenderAssetPicker();

@@ -21,7 +21,7 @@ public class InfoOverlay : Component, IRenderable
         _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
         // 1 tile padding all around so we don't have to worry about edge conditions in the shader
         _tiles = new byte[Width * Height]; 
-        _logicalMap.Dirty += (sender, args) =>
+        _logicalMap.Dirty += (_, args) =>
         {
             if (args.Type != IconChangeType.Trigger) 
                 return;

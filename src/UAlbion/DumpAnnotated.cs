@@ -19,7 +19,7 @@ sealed class DumpAnnotated : Component, IAssetDumper
             var directory = Path.GetDirectoryName(filename);
 
             if (!Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
+                Directory.CreateDirectory(directory!);
 
             File.WriteAllText(filename, content);
         }

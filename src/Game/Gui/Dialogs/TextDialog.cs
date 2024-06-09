@@ -17,7 +17,7 @@ public class TextDialog : ModalDialog
         On<DismissMessageEvent>(_ => Close());
         On<UiLeftClickEvent>(e => { Close(); e.Propagating = false; });
         On<UiRightClickEvent>(e => { Close(); e.Propagating = false; });
-        On<CloseWindowEvent>(e => Close());
+        On<CloseWindowEvent>(_ => Close());
 
         var textSection = new UiText(text);
         var padding = new Padding(textSection, 3, 7);

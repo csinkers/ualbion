@@ -7,7 +7,6 @@ using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
-using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Scripting;
 
@@ -15,7 +14,6 @@ namespace UAlbion.Base.Tests;
 
 public static class LayoutTestUtil
 {
-    public delegate (List<EventNode> events, List<ushort> chains, List<ushort> extra) LayoutExtractor<in T>(T value);
     public delegate T LayoutConstructor<T>(T value, EventLayout layout) where T : IEventSet;
 
     public static Formats.Assets.EventSet CanonicalizeEventSet(Formats.Assets.EventSet set) => Canonicalize(set, ConstructSet);
@@ -52,13 +50,6 @@ public static class LayoutTestUtil
     {
         TrimTrailingEmptyChains(actual.Chains);
         TrimTrailingEmptyChains(expected.Chains);
-
-        AssetId textSource = assetId.Type switch
-        {
-            AssetType.EventSet => ((EventSetId)assetId).ToEventText(),
-            AssetType.Map => ((MapId)assetId).ToMapText(),
-            _ => throw new ArgumentOutOfRangeException(nameof(assetId), $"Unexpected asset {assetId}, expected event set or map")
-        };
 
         if (actual.Chains.Count != expected.Chains.Count)
         {

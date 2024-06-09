@@ -17,7 +17,7 @@ public class SceneStack : Component
             _stack.Push(sceneManager.ActiveSceneId);
             Raise(new SetSceneEvent(e.SceneId));
         });
-        On<PopSceneEvent>(e =>
+        On<PopSceneEvent>(_ =>
         {
             if (_stack.Count > 0)
             {

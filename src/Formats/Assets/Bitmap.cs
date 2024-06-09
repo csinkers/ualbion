@@ -85,7 +85,7 @@ public class Bitmap8Bit
         //---------\\
         // Palette \\ // 36
         //---------\\
-        b.Palette = s.List("Palette", b.Palette, (int)paletteSize, (n, x, s2) =>
+        b.Palette = s.List("Palette", b.Palette, (int)paletteSize, (_, x, s2) =>
         {
             uint b1 = s2.UInt8(null, (byte)((x & 0x00ff0000) >> 16)); // B
             uint b2 = s2.UInt8(null, (byte)((x & 0x0000ff00) >> 8));  // G

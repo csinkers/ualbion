@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace UAlbion.Game.Text;
 
@@ -23,6 +22,6 @@ public class TextSourceWrapper : IText
     public int Version => _version + (_source?.Version ?? 0 - _baseSourceVersion);
     public IEnumerable<TextBlock> GetBlocks() =>
         _source == null
-            ? Enumerable.Empty<TextBlock>()
+            ? []
             : _source.GetBlocks();
 }

@@ -36,7 +36,7 @@ sealed class DictionaryAssetIdConverterFactory : JsonConverterFactory
             baseType.MakeGenericType(keyType, valueType),
             BindingFlags.Instance | BindingFlags.Public,
             null,
-            new object[] { options },
+            [options],
             null);
     }
 }

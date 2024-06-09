@@ -301,6 +301,7 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
             deletedCount);
     }
 
+    /*
     static void BuilderAddEdge(int start, int end, CfgEdge label,
         ImmutableDictionary<int, ImmutableArray<int>>.Builder byStart,
         ImmutableDictionary<int, ImmutableArray<int>>.Builder byEnd,
@@ -317,6 +318,7 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
         if (label != CfgEdge.True)
             labels.Add((start, end), label);
     }
+    */
 
     static void BuilderRemoveEdges(int i,
         ImmutableDictionary<int, ImmutableArray<int>>.Builder byStart,
@@ -447,7 +449,7 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
     }
 
     static (ImmutableArray<int>, ImmutableArray<(int start, int end)>) ToImmutable((List<int> order, List<(int, int)> backEdges) result) 
-        => (result.order.ToImmutableArray(), result.backEdges.ToImmutableArray());
+        => ([..result.order], [..result.backEdges]);
 
     IEnumerable<(int, int)> IGraph.GetBackEdges() => GetBackEdges();
     public ImmutableArray<(int start, int end)> GetBackEdges()
@@ -455,7 +457,7 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
         if (!_cachedBackEdges.HasValue)
             (_cachedPostOrder, _cachedBackEdges) = ToImmutable(GetDfsOrderAndBackEdges(true, false)); // Use post-order, more likely we'll need the cached order later
 
-        return _cachedBackEdges.Value;
+        return _cachedBackEdges!.Value;
     }
 
     IList<int> IGraph.GetDfsOrder() => GetDfsOrder();
@@ -464,7 +466,7 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
         if (!_cachedOrder.HasValue)
             (_cachedOrder, _cachedBackEdges) = ToImmutable(GetDfsOrderAndBackEdges(false, false));
 
-        return _cachedOrder.Value;
+        return _cachedOrder!.Value;
     }
 
     public List<int> GetDfsOrderComplete() => GetDfsOrderAndBackEdges(false, true).Item1;
@@ -475,7 +477,7 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
         if (!_cachedPostOrder.HasValue)
             (_cachedPostOrder, _cachedBackEdges) = ToImmutable(GetDfsOrderAndBackEdges(true, false));
 
-        return _cachedPostOrder.Value;
+        return _cachedPostOrder!.Value;
     }
 
     (List<int>, List<(int, int)>) GetDfsOrderAndBackEdges(bool postOrder, bool allNodes)
@@ -535,16 +537,16 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
     public CfgCutResult Cut(HashSet<int> selectedNodes, int entry, int exit)
     {
         ArgumentNullException.ThrowIfNull(selectedNodes);
-        List<ICfgNode> remainderNodes = new();
-        List<(int, int, CfgEdge)> remainderEdges = new();
+        List<ICfgNode> remainderNodes = [];
+        List<(int, int, CfgEdge)> remainderEdges = [];
         var remainderMapping = new int[Nodes.Count];
 
-        List<ICfgNode> cutNodes = new();
-        List<(int, int, CfgEdge)> cutEdges = new();
+        List<ICfgNode> cutNodes = [];
+        List<(int, int, CfgEdge)> cutEdges = [];
         var cutMapping = new int[Nodes.Count];
 
-        List<(int, CfgEdge)> cutToRemainderEdges = new();
-        List<(int, CfgEdge)> remainderToCutEdges = new();
+        List<(int, CfgEdge)> cutToRemainderEdges = [];
+        List<(int, CfgEdge)> remainderToCutEdges = [];
 
         for (int i = 0; i < Nodes.Count; i++)
         {
@@ -783,10 +785,10 @@ public class ControlFlowGraph : IGraph<ICfgNode, CfgEdge>
         if (count < 2)
             throw new InvalidOperationException("All control flow graphs require an entry and exit node");
 
-        yield return UAEmit.Empty();
+        yield return Emit.Empty();
         for (int i = 1; i < count - 1; i++)
-            yield return UAEmit.Statement(UAEmit.Const(i));
-        yield return UAEmit.Empty();
+            yield return Emit.Statement(Emit.Const(i));
+        yield return Emit.Empty();
     }
 
     public override string ToString() // Emit structural representation without details of node contents

@@ -94,7 +94,7 @@ public class PipelineHolder : Component, IPipelineHolder
             var shaderSetDescription = new ShaderSetDescription(
                 _vertexLayouts,
                 _shaders,
-                Array.Empty<SpecializationConstant>()); // TODO: Add specialisation constant support
+                []); // TODO: Add specialisation constant support
 
             var pipelineDescription = new GraphicsPipelineDescription(
                 AlphaBlend,

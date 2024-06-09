@@ -7,7 +7,7 @@ namespace UAlbion.Config;
 
 public class ToStringJsonConverter<T> : JsonConverter<T>
 {
-    static readonly Lazy<MethodInfo> Parser = new(() => typeof(T).GetMethod("Parse", new[] { typeof(string) }));
+    static readonly Lazy<MethodInfo> Parser = new(() => typeof(T).GetMethod("Parse", [typeof(string)]));
     static readonly Lazy<MethodInfo> Serialise = new(() => typeof(T).GetMethod("Serialise"));
 
     public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -20,7 +20,7 @@ public class ToStringJsonConverter<T> : JsonConverter<T>
             var asString = reader.GetString();
             var parser = Parser.Value;
             if (parser != null && parser.IsStatic && parser.ReturnType == typeToConvert)
-                return (T)parser.Invoke(null, new object[] { asString });
+                return (T)parser.Invoke(null, [asString]);
 
             if (typeToConvert.IsEnum && asString != null)
                 return (T)Enum.Parse(typeToConvert, asString);
@@ -43,7 +43,7 @@ public class ToStringJsonConverter<T> : JsonConverter<T>
         if (value == null) throw new ArgumentNullException(nameof(value));
         var serialise = Serialise.Value;
         if (serialise != null && !serialise.IsStatic && serialise.ReturnType == typeof(string))
-            writer.WriteStringValue((string)serialise.Invoke(value, Array.Empty<object>()));
+            writer.WriteStringValue((string)serialise.Invoke(value, []));
         else
             writer.WriteStringValue(value.ToString());
     }

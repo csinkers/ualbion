@@ -101,7 +101,7 @@ public struct AlbionTaskBuilder<TResult>
                 // In release mode, the state machine is a struct which actually includes this task builder.
                 // By setting the state machine on the box, we're making a copy of the state of this task builder for when the continuation is called.
                 // As a result, we need to make sure that we only perform the copy after any required changes to variables, e.g. setting _core and _state.
-                box._stateMachine = stateMachine;
+                box.StateMachine = stateMachine;
                 awaiter.OnCompleted(box.MoveNextAction);
                 break;
             }
@@ -135,7 +135,7 @@ public struct AlbionTaskBuilder<TResult>
         {
             case BuilderState.Indeterminate:
             {
-                var box = new AlbionStateMachineBox<TResult, TStateMachine> { _stateMachine = stateMachine };
+                var box = new AlbionStateMachineBox<TResult, TStateMachine> { StateMachine = stateMachine };
                 _core = box;
                 _state = BuilderState.Pending;
                 awaiter.UnsafeOnCompleted(box.MoveNextAction);
@@ -158,18 +158,18 @@ public struct AlbionTaskBuilder<TResult>
         where TStateMachine : IAsyncStateMachine
     {
         Action? _moveNextAction;
-        public TStateMachine? _stateMachine;
+        public TStateMachine? StateMachine;
         public Action MoveNextAction => _moveNextAction ??= MoveNext;
 #if DEBUG
         public AlbionStateMachineBox() : base($"ASMB<{typeof(TResult2)}, {typeof(TStateMachine)}>") { }
 #endif
         void MoveNext()
         {
-            Debug.Assert(_stateMachine != null);
-            _stateMachine.MoveNext();
+            Debug.Assert(StateMachine != null);
+            StateMachine.MoveNext();
 
             if (IsCompleted)
-                _stateMachine = default;
+                StateMachine = default;
         }
     }
 }

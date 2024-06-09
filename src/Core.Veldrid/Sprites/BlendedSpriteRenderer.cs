@@ -15,14 +15,14 @@ public sealed class BlendedSpriteRenderer : Component, IRenderer, IDisposable
     readonly BlendedSpritePipeline _pipeline;
     readonly BlendedSpritePipeline _noCullPipeline;
 
-    static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
+    static readonly ushort[] Indices = [0, 1, 2, 2, 1, 3];
     static readonly Vertex2DTextured[] Vertices =
-    {
+    [
         new(-0.5f, 0.0f, 0.0f, 0.0f), new(0.5f, 0.0f, 1.0f, 0.0f),
-        new(-0.5f, 1.0f, 0.0f, 1.0f), new(0.5f, 1.0f, 1.0f, 1.0f),
-    };
+        new(-0.5f, 1.0f, 0.0f, 1.0f), new(0.5f, 1.0f, 1.0f, 1.0f)
+    ];
 
-    public Type[] HandledTypes { get; } = { typeof(VeldridSpriteBatch<BlendedSpriteInfo, GpuBlendedSpriteInstanceData>) };
+    public Type[] HandledTypes { get; } = [typeof(VeldridSpriteBatch<BlendedSpriteInfo, GpuBlendedSpriteInstanceData>)];
 
     public BlendedSpriteRenderer(in OutputDescription outputFormat)
     {

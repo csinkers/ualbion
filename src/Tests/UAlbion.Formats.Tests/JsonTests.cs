@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json;
 using UAlbion.Api;
@@ -9,6 +10,7 @@ using Xunit;
 
 namespace UAlbion.Formats.Tests;
 
+[SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
 public class JsonTests
 {
     [Fact]

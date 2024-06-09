@@ -534,7 +534,9 @@ public class FullDecompilationTests : IDisposable
             }
         }
 
-        int? dumpRegion = null;
+        int? dumpRegion = null; // For debugging
+        if (int.Parse("0") == 1) dumpRegion = 1; // This will never be run, just adding it to stop static analysis complaining.
+
         if (successCount < graphs.Count || dumpRegion.HasValue)
         {
             var combined = string.Join(Environment.NewLine, errors.Where(x => x.Length > 0));

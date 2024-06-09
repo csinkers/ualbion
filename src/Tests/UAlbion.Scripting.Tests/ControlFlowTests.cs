@@ -26,13 +26,13 @@ public class ControlFlowTests
         for (int i = 0; i < expected.Nodes.Count; i++)
             Assert.Equal(expected.Nodes[i].ToString(), result.Nodes[i].ToString());
 
-        var i1 = expected.Edges.GetEnumerator();
-        var i2 = result.Edges.GetEnumerator();
+        using var i1 = expected.Edges.GetEnumerator();
+        using var i2 = result.Edges.GetEnumerator();
         while (i1.MoveNext())
         {
             i2.MoveNext();
-            Assert.Equal(i1.Current.Item1, i2.Current.Item1);
-            Assert.Equal(i1.Current.Item2, i2.Current.Item2);
+            Assert.Equal(i1.Current.start, i2.Current.start);
+            Assert.Equal(i1.Current.end, i2.Current.end);
         }
     }
 

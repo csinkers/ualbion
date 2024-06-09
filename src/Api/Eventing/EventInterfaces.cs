@@ -9,6 +9,8 @@ public interface IEvent { void Format(IScriptBuilder builder); }
 public interface IVerboseEvent : IEvent { } // Events which happen too often to show in the console
 public interface ICancellableEvent : IEvent { bool Propagating { get; set; } } // Events where earlier handlers can stop later handlers from running.
 public interface IQueryEvent : IEvent { } // Events where a single result is returned.
+
+// ReSharper disable once UnusedTypeParameter
 public interface IQueryEvent<TResult> : IQueryEvent { } // Events where a single result is returned.
 public interface IBranchingEvent : IQueryEvent<bool> { }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using SerdesNet;
 using UAlbion.Api;
@@ -11,6 +12,7 @@ using Xunit;
 
 namespace UAlbion.Formats.Tests;
 
+[SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
 public class SpriteLoaderTests
 {
     static readonly IJsonUtil JsonUtil = new FormatJsonUtil();

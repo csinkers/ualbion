@@ -26,7 +26,6 @@ public class FlatMap : GameComponent, IMap
 
     public MapId MapId { get; }
     public MapType MapType => _logicalMap.UseSmallSprites ? MapType.TwoDOutdoors : MapType.TwoD;
-    public Vector2 LogicalSize => new(_logicalMap.Width, _logicalMap.Height);
     public Vector3 TileSize => new(16, 16, 1);
     public IMapData MapData => _mapData;
     public float BaseCameraHeight => 0.0f;

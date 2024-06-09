@@ -6,8 +6,8 @@ namespace UAlbion.Core.Veldrid;
 
 public class ImGuiConfig
 {
-    static readonly char[] NewLineChars = { '\n', '\r' };
-    public List<ImGuiConfigSection> Sections { get; } = new();
+    static readonly char[] NewLineChars = ['\n', '\r'];
+    public List<ImGuiConfigSection> Sections { get; } = [];
     public static ImGuiConfig Load(string raw) => new(raw ?? "");
 
     public ImGuiConfig() { }

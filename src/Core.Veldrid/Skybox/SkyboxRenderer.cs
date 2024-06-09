@@ -11,18 +11,18 @@ namespace UAlbion.Core.Veldrid.Skybox;
 
 public sealed class SkyboxRenderer : Component, IRenderer, IDisposable
 {
-    static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
+    static readonly ushort[] Indices = [0, 1, 2, 2, 1, 3];
     static readonly Vertex2DTextured[] Vertices =
-    {
+    [
         new (-1.0f, -1.0f, 0.0f, 0.0f), new (1.0f, -1.0f, 1.0f, 0.0f),
-        new (-1.0f, 1.0f, 0.0f, 1.0f), new (1.0f, 1.0f, 1.0f, 1.0f),
-    };
+        new (-1.0f, 1.0f, 0.0f, 1.0f), new (1.0f, 1.0f, 1.0f, 1.0f)
+    ];
 
     readonly SkyboxPipeline _pipeline;
     readonly MultiBuffer<Vertex2DTextured> _vertexBuffer;
     readonly MultiBuffer<ushort> _indexBuffer;
 
-    public Type[] HandledTypes { get; } = { typeof(SkyboxRenderable) };
+    public Type[] HandledTypes { get; } = [typeof(SkyboxRenderable)];
 
     static SkyboxPipeline BuildPipeline(in OutputDescription outputFormat) => new()
     {

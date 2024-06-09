@@ -46,14 +46,14 @@ public static class TilesetMapping
             if (sourceTile.FrameCount <= 1)
                 continue;
 
-            tile.Frames = new List<TileFrame> { new(tile.Id, properties.FrameDurationMs) };
+            tile.Frames = [new(tile.Id, properties.FrameDurationMs)];
             for (int f = 1; f < sourceTile.FrameCount; f++)
             {
                 tiles.Add(TileMapping.BuildTile(
                     tileset.Id,
                     nextId,
                     (ushort)(sourceTile.ImageNumber + f),
-                    new List<TiledProperty> { new(Prop.Frame, true) },
+                    [new(Prop.Frame, true)],
                     properties,
                     graphicsPattern));
 
@@ -127,7 +127,7 @@ public static class TilesetMapping
                 tiles.Add(new Tile
                 {
                     Id = (ushort)frames[f],
-                    Properties = new List<TiledProperty> { new(Prop.Frame, true) }
+                    Properties = [new(Prop.Frame, true)]
                 });
             }
         }
@@ -190,10 +190,7 @@ public static class TilesetMapping
                     Width = x.Width,
                     Height = x.Height
                 },
-                Properties = new List<TiledProperty>
-                {
-                    new(Prop.Visual, x.Name)
-                }
+                Properties = [new(Prop.Visual, x.Name)]
             }).ToList(),
         };
     }

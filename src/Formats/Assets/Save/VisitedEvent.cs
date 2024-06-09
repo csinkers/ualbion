@@ -39,13 +39,14 @@ public class VisitedEvent
 
         if (s.IsCommenting())
             s.Comment(u.ToString());
+
         s.End();
         return u;
     }
 
     public override string ToString() => $"{Unk0} {EventSetId} {Type} {Argument}";
     public override int GetHashCode() =>
-        (int)HashUtil.FNV1a()
+        (int)HashUtil.Fnv1A()
             .Combine(Unk0)
             .Combine(EventSetId.ToUInt32())
             .Combine((int)Type)

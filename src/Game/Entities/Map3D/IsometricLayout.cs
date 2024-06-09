@@ -214,11 +214,11 @@ public class IsometricLayout : GameComponent
         if (contents)
         {
             ContentsFrames = new List<int>[labyrinthData.ObjectGroups.Count + 1];
-            ContentsFrames[0] = new List<int> { 0 };
+            ContentsFrames[0] = [0];
             for (byte i = 1; i <= labyrinthData.ObjectGroups.Count; i++)
             {
                 _contents[index] = i;
-                ContentsFrames[i] = new List<int> { index };
+                ContentsFrames[i] = [index];
                 index++;
             }
         }
@@ -231,11 +231,11 @@ public class IsometricLayout : GameComponent
         if (walls)
         {
             WallFrames = new List<int>[labyrinthData.Walls.Count + 1];
-            WallFrames[0] = new List<int> { 0 };
+            WallFrames[0] = [0];
             for (byte i = 1; i <= labyrinthData.Walls.Count; i++)
             {
                 _contents[index] = (byte)(i + 100);
-                WallFrames[i] = new List<int> { index };
+                WallFrames[i] = [index];
                 index++;
             }
         }
@@ -248,11 +248,11 @@ public class IsometricLayout : GameComponent
         if (ceilings)
         {
             CeilingFrames = new List<int>[labyrinthData.FloorAndCeilings.Count + 1];
-            CeilingFrames[0] = new List<int> { 0 };
+            CeilingFrames[0] = [0];
             for (byte i = 1; i <= labyrinthData.FloorAndCeilings.Count; i++)
             {
                 _ceilings[index] = i;
-                CeilingFrames[i] = new List<int> { index };
+                CeilingFrames[i] = [index];
                 index++;
             }
         }
@@ -265,11 +265,11 @@ public class IsometricLayout : GameComponent
         if (floors)
         {
             FloorFrames = new List<int>[labyrinthData.FloorAndCeilings.Count + 1];
-            FloorFrames[0] = new List<int> { 0 };
+            FloorFrames[0] = [0];
             for (byte i = 1; i <= labyrinthData.FloorAndCeilings.Count; i++)
             {
                 _floors[index] = i;
-                FloorFrames[i] = new List<int> { index };
+                FloorFrames[i] = [index];
                 index++;
             }
         }

@@ -34,7 +34,7 @@ public class UserVars
         public CustomVar<List<string>, string> ActiveMods { get; } = new(
             Library,
             "User.Gameplay.ActiveMods",
-            new List<string> { "Albion" },
+            ["Albion"],
             x => string.Join(",", x),
             x => (x ?? "").Split(',').ToList(),
             j => j.GetString());

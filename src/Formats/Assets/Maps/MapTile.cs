@@ -82,7 +82,7 @@ public struct MapTile : IEquatable<MapTile>
     public static byte[] ToPacked(ReadOnlySpan<MapTile> tiles, int sourceWidth, int offsetX, int offsetY)
     {
         if (tiles == null || tiles.Length == 0)
-            return Array.Empty<byte>();
+            return [];
 
         int sourceHeight = tiles.Length / sourceWidth;
         int destWidth = sourceWidth - offsetX;
@@ -113,7 +113,7 @@ public struct MapTile : IEquatable<MapTile>
     public static MapTile[] FromPacked(ReadOnlySpan<byte> buf, int destWidth, int offsetX, int offsetY)
     {
         if (buf == null || buf.Length == 0)
-            return Array.Empty<MapTile>();
+            return [];
 
         if (buf.Length % 3 != 0)
         {

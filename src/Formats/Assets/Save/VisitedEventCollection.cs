@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace UAlbion.Formats.Assets.Save;
 
@@ -9,6 +10,8 @@ public class VisitedEventCollection : IList<VisitedEvent>
     readonly List<VisitedEvent> _list = new();
     readonly HashSet<VisitedEvent> _set = new();
     public IEnumerator<VisitedEvent> GetEnumerator() => _list.GetEnumerator();
+
+    [MustDisposeResource]
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_list).GetEnumerator();
     public void Add(VisitedEvent item)
     {

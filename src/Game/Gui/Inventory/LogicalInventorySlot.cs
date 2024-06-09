@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats.Assets;
@@ -53,7 +52,7 @@ public class LogicalInventorySlot : UiElement
             {
                 var slotInfo = Slot;
                 return slotInfo == null || slotInfo.Amount < 2
-                    ? Array.Empty<TextBlock>()
+                    ? []
                     : new[] { new TextBlock(slotInfo.Amount.ToString()) { Alignment = TextAlignment.Right } }; // todo: i18n: Will need to be changed if we support a language that doesn't use Hindu-Arabic numerals.
             }, _ => _version);
         }
@@ -68,7 +67,7 @@ public class LogicalInventorySlot : UiElement
                     || inputBinder.IsShiftPressed
                     || inputBinder.IsAltPressed)
                 {
-                    _visual.SuppressNextDoubleClick = true;
+                    _visual!.SuppressNextDoubleClick = true;
                 }
             })
             .OnClick(() =>

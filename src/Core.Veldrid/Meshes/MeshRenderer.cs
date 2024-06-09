@@ -12,7 +12,7 @@ public sealed class MeshRenderer : Component, IRenderer, IDisposable
 {
     readonly MeshPipeline _pipeline;
 
-    public Type[] HandledTypes { get; } = { typeof(MeshBatch) };
+    public Type[] HandledTypes { get; } = [typeof(MeshBatch)];
 
     public MeshRenderer(in OutputDescription outputFormat)
     {
@@ -99,12 +99,14 @@ sealed partial class MeshVertexShader : IVertexShader { }
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
 sealed partial class MeshFragmentShader : IFragmentShader { }
 
+// ReSharper disable UnassignedReadonlyField
 public partial struct MeshVertex : IVertexFormat
 { // Should match Veldrid.Utilities.VertexPositionNormalTexture exactly as Unsafe.As is used for casting
     [Vertex("Position")]  public readonly Vector3 Position;
     [Vertex("Normal")]    public readonly Vector3 Normal;
     [Vertex("TexCoords")] public readonly Vector2 TextureCoordinates;
 }
+// ReSharper restore UnassignedReadonlyField
 
 public partial struct GpuMeshInstanceData : IVertexFormat
 {
@@ -119,7 +121,7 @@ partial struct MeshIntermediate : IVertexFormat
     [Vertex("TexCoords")] public Vector2 TextureCordinates;
 }
 
-partial struct MeshUniform : IUniformFormat
+struct MeshUniform : IUniformFormat
 {
     [Uniform("uAmbRef")]    public Vector3 AmbientReflectivity;
     [Uniform("uOpacity")]   public float Opacity;

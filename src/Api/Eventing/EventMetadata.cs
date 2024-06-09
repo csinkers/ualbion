@@ -28,7 +28,7 @@ public class EventMetadata
         Type = type;
         Name = eventAttribute.Name;
         HelpText = eventAttribute.HelpText;
-        Aliases = new ReadOnlyCollection<string>(eventAttribute.Aliases ?? Array.Empty<string>());
+        Aliases = new ReadOnlyCollection<string>(eventAttribute.Aliases ?? []);
 
         var partsParameter = Expression.Parameter(typeof(string[]), "parts");
         // TODO: Order passed in to EventPartMetadata needs to be based on constructor parameters.

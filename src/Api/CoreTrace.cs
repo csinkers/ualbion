@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.Tracing;
 using System.Runtime.CompilerServices;
-using T = System.Diagnostics.Tracing;
 
 namespace UAlbion.Api;
 
@@ -36,19 +35,19 @@ public class CoreTrace : EventSource
     [NonEvent]
     public static void SetCorrelationId(Guid correlationId) => SetCurrentThreadActivityId(correlationId, out _);
 
-    [T.Event(1, Level = EventLevel.Informational)]
+    [Event(1, Level = EventLevel.Informational)]
     public void Info(string category, string message, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
         => WriteEvent(1, category ?? "", message ?? "", file ?? "", member ?? "", line);
 
-    [T.Event(2, Level = EventLevel.Warning)]
+    [Event(2, Level = EventLevel.Warning)]
     public void Warning(string category, string message, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
         => WriteEvent(2, category ?? "", message ?? "", file ?? "", member ?? "", line);
 
-    [T.Event(3, Level = EventLevel.Error)]
+    [Event(3, Level = EventLevel.Error)]
     public void Error(string category, string message, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
         => WriteEvent(3, category ?? "", message ?? "", file ?? "", member ?? "", line);
 
-    [T.Event(4, Level = EventLevel.Critical)]
+    [Event(4, Level = EventLevel.Critical)]
     public void Critical(string category, string message, [CallerFilePath] string file = null, [CallerMemberName] string member = null, [CallerLineNumber] int line = 0)
         => WriteEvent(4, category ?? "", message ?? "", file ?? "", member ?? "", line);
 
@@ -96,13 +95,13 @@ public class CoreTrace : EventSource
     public void StartDebugGroup(string name) => WriteEvent(7, name ?? "");
     public void StopDebugGroup(string name) => WriteEvent(8, name ?? "");
 
-    [T.Event(9, Level = EventLevel.Informational, Task = Tasks.Raise, Opcode = EventOpcode.Start)]
+    [Event(9, Level = EventLevel.Informational, Task = Tasks.Raise, Opcode = EventOpcode.Start)]
     public void StartRaise(long eventId, int nesting, string type, string details) => WriteEvent(9, eventId, nesting, type ?? "", details ?? "");
 
-    [T.Event(10, Level = EventLevel.Informational, Task = Tasks.Raise, Opcode = EventOpcode.Stop)]
+    [Event(10, Level = EventLevel.Informational, Task = Tasks.Raise, Opcode = EventOpcode.Stop)]
     public void StopRaise(long eventId, int nesting, string type, string details, int subscriberCount) => WriteEvent(10, eventId, nesting, type, details, subscriberCount);
 
-    [T.Event(11, Level = EventLevel.Verbose, Task = Tasks.Raise, Opcode = Opcodes.StartVerbose)]
+    [Event(11, Level = EventLevel.Verbose, Task = Tasks.Raise, Opcode = Opcodes.StartVerbose)]
     public unsafe void StartRaiseVerbose(long eventId, int nesting, string type, string details)
     {
         type ??= "";
@@ -124,7 +123,7 @@ public class CoreTrace : EventSource
         }
     } //=> WriteEvent(10, eventId, nesting, type ?? "", details ?? "", exchangeName ?? "");
 
-    [T.Event(12, Level = EventLevel.Verbose, Task = Tasks.Raise, Opcode = Opcodes.StopVerbose)]
+    [Event(12, Level = EventLevel.Verbose, Task = Tasks.Raise, Opcode = Opcodes.StopVerbose)]
     public unsafe void StopRaiseVerbose(long eventId, int nesting, string type, string details, int subscriberCount)
     {
         type ??= "";
@@ -142,7 +141,7 @@ public class CoreTrace : EventSource
             data[2].Size = (type.Length + 1) * 2;
             data[3].DataPointer = (IntPtr)detailsPtr;
             data[3].Size = (details.Length + 1) * 2;
-            data[4].DataPointer = (IntPtr)subscriberCount;
+            data[4].DataPointer = subscriberCount;
             data[4].Size = sizeof(int);
             WriteEventCore(12, 5, data);
         }

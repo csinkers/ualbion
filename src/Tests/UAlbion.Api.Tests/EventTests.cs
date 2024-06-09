@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UAlbion.Api.Eventing;
 using Xunit;
 
 namespace UAlbion.Api.Tests;
 
+[SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
 public class EventTests
 {
     public EventTests()

@@ -83,7 +83,7 @@ public static class NpcPathBuilder
                 Name = $"N{npcNumber} T{time}",
                 X = posX * tileWidth,
                 Y = posY * tileHeight,
-                Properties = new List<TiledProperty> { new(TimePropertyName, time) },
+                Properties = [new(TimePropertyName, time)],
                 Point = TiledPoint.Instance
             });
         }

@@ -74,7 +74,7 @@ public sealed class ShaderCache : Component, IShaderCache
             }
             catch (DllNotFoundException ex)
             {
-                throw new DllNotFoundException( $"Could not find dll, search path was {Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)}. {ex.Message}", ex);
+                throw new DllNotFoundException( $"Could not find dll, search path was {Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location)}. {ex.Message}", ex);
             }
         }
     }
@@ -112,7 +112,7 @@ public sealed class ShaderCache : Component, IShaderCache
             GraphicsBackend.Metal      => "msl",
             GraphicsBackend.OpenGL     => "glsl",
             GraphicsBackend.OpenGLES   => "essl",
-            GraphicsBackend.Vulkan     => "spirv",
+            // GraphicsBackend.Vulkan     => "spirv", // handled explicitly above
             _ => throw new ArgumentOutOfRangeException(nameof(backend), backend, null)
         };
 
@@ -195,7 +195,7 @@ public sealed class ShaderCache : Component, IShaderCache
             var fragmentShader = factory.CreateShader(entry.FragmentShader);
             vertexShader.Name = "S_" + vertex.Name;
             fragmentShader.Name = "S_" + fragment.Name;
-            return new[] { vertexShader, fragmentShader };
+            return [vertexShader, fragmentShader];
         }
     }
 }

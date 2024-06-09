@@ -15,7 +15,7 @@ public class RangeLookup // Note: it is assumed that id ranges in a given config
 
         var groups = ranges
             .GroupBy(x => x.Range.From.Type)
-            .Select(x => (x.Key, x.OrderBy(x => x.Range.From).ToArray()));
+            .Select(x => (x.Key, x.OrderBy(y => y.Range.From).ToArray()));
 
         foreach (var (type, group) in groups)
             _byType[(int)type] = group;

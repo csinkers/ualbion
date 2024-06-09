@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace UAlbion.Scripting;
@@ -41,7 +40,7 @@ public class DominatorTree
         return new DominatorTree(root.AddPath(path, 1, NodeEquality));
     }
 
-    public IEnumerable<int> Values => Root?.Values ?? Enumerable.Empty<int>();
+    public IEnumerable<int> Values => Root?.Values ?? [];
 
     public int? ImmediateDominator(int index)
     {

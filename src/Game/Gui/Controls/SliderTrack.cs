@@ -27,6 +27,13 @@ public class SliderTrack : UiElement
 
     public SliderTrack(Func<int> getter, Action<int> setter, int min, int max, Func<int, string> format = null)
     {
+        _getter = getter;
+        _setter = setter;
+        _min = min;
+        _max = max;
+        _thumb = new SliderThumb(getter, format);
+        AttachChild(_thumb);
+
         On<UiLeftClickEvent>(e =>
         {
             _thumb.State = ButtonState.Clicked;
@@ -51,13 +58,6 @@ public class SliderTrack : UiElement
             if (newValue != _getter())
                 _setter(newValue);
         });
-
-        _getter = getter;
-        _setter = setter;
-        _min = min;
-        _max = max;
-        _thumb = new SliderThumb(getter, format);
-        AttachChild(_thumb);
     }
 
     public override Vector2 GetSize() => _thumb.GetSize();

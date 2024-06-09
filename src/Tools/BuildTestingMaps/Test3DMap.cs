@@ -13,7 +13,7 @@ class Test3DMap
     //  static int Pos(int x, int y) => y * MapWidth + x;
     public static Dictionary<AssetId, object> Build(MapId mapId, TestLab lab1)
     {
-        if (lab1 == null) throw new ArgumentNullException(nameof(lab1));
+        ArgumentNullException.ThrowIfNull(lab1);
 
         var assets = new Dictionary<AssetId, object>();
         var builder = new MapBuilder3D(mapId, Palette1Id, lab1, MapWidth, MapHeight);

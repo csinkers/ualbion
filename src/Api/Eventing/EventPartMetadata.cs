@@ -56,7 +56,7 @@ public class EventPartMetadata
 
     static Func<object, object> BuildGetter(PropertyInfo property, Type declaringType)
     {
-        var getMethod = property.GetMethod;
+        var getMethod = property.GetMethod ?? throw new InvalidOperationException($"Property \"{property.Name}\" on {declaringType.FullName} did not have a getter");
 
         var instance = Expression.Parameter(typeof(object), "x");
         var getter = (Func<object, object>)

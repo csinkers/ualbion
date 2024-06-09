@@ -43,11 +43,10 @@ public class DungeonMap : GameComponent, IMap
         // On<UnloadMapEvent>(_ => Unload());
     }
 
-    public override string ToString() => $"DungeonMap:{MapId} {LogicalSize.X}x{LogicalSize.Y} TileSize: {TileSize}";
+    public override string ToString() => $"DungeonMap:{MapId} TileSize: {TileSize}";
     public MapId MapId { get; }
     public MapType MapType => MapType.ThreeD;
     public IMapData MapData => _mapData;
-    public Vector2 LogicalSize { get; private set; }
     public Vector3 TileSize => _labyrinthData?.TileSize ?? Vector3.One * 512;
     public float BaseCameraHeight => (_labyrinthData?.CameraHeight ?? 0) != 0 ? _labyrinthData.CameraHeight * 8 : TileSize.Y / 2;
 

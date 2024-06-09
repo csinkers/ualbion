@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using SerdesNet;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api.Eventing;
@@ -44,20 +43,19 @@ public class Png32Loader : Component, IAssetLoader<IReadOnlyTexture<uint>>
             Image<Rgba32> image = images[i];
             image.ProcessPixelRows(p =>
             {
-                frames.Add(new Region(0, currentY, image.Width, image.Height, totalWidth, totalHeight, 0));
-                for (int row = 0; row < image.Height; row++)
+                frames.Add(new Region(0, currentY, p.Width, p.Height, totalWidth, totalHeight, 0));
+                for (int row = 0; row < p.Height; row++)
                 {
                     var rgbaSpan = p.GetRowSpan(row);
                     var fromSpan = MemoryMarshal.Cast<Rgba32, uint>(rgbaSpan);
-                    var toSpan = pixels.AsSpan((currentY + row) * totalWidth, totalWidth * (image.Height - 1) + image.Width);
+                    var toSpan = pixels.AsSpan((currentY + row) * totalWidth, totalWidth * (p.Height - 1) + p.Width);
                     fromSpan.CopyTo(toSpan);
-                    // var from = new ReadOnlyImageBuffer<uint>(image.Width, image.Height, image.Width, fromSpan);
-                    // var to = new ImageBuffer<uint>(image.Width, image.Height, totalWidth, toSpan);
+                    // var from = new ReadOnlyImageBuffer<uint>(p.Width, p.Height, p.Width, fromSpan);
+                    // var to = new ImageBuffer<uint>(p.Width, p.Height, totalWidth, toSpan);
                     // BlitUtil.BlitDirect(from, to);
                 }
+                currentY += image.Height;
             });
-
-            currentY += image.Height;
         }
 
         return new SimpleTexture<uint>(id, id.ToString(), totalWidth, totalHeight, pixels, frames);

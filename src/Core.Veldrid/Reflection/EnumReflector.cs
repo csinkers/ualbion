@@ -45,7 +45,7 @@ public class EnumReflector
             throw new ArgumentException($"Tried to build EnumReflector for \"{type}\" with unsupported underlying type \"{underlying}\"");
 
         var constructor = reflectorType.GetConstructors()[0];
-		var instance = (IReflector)constructor.Invoke(new[] { toNum, fromNum });
+		var instance = (IReflector)constructor.Invoke([toNum, fromNum]);
         if (instance == null)
             throw new InvalidOperationException($"Could not instantiate EnumReflector for \"{type}\"");
 

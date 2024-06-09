@@ -1,1 +1,0 @@
-﻿namespace UAlbion.Formats.Config;

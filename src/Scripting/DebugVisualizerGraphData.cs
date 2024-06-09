@@ -10,9 +10,9 @@ public class DebugVisualizerGraphData
 {
 #pragma warning disable CA1822 // Mark members as static
     [JsonPropertyName("kind")] public Dictionary<string, bool> Kind => Tags.ToDictionary(tag => tag, _ => true);
-    [JsonIgnore] public string[] Tags => new[] { "graph" };
-    [JsonPropertyName("nodes")] public List<DebugVisualizerNodeData> Nodes { get; } = new();
-    [JsonPropertyName("edges")] public List<DebugVisualizerEdgeData> Edges { get; } = new();
+    [JsonIgnore] public string[] Tags => ["graph"];
+    [JsonPropertyName("nodes")] public List<DebugVisualizerNodeData> Nodes { get; } = [];
+    [JsonPropertyName("edges")] public List<DebugVisualizerEdgeData> Edges { get; } = [];
 #pragma warning restore CA1822 // Mark members as static
 
     static readonly JsonSerializerOptions Options = new()

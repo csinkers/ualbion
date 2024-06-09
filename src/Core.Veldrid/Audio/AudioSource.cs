@@ -59,7 +59,7 @@ public abstract class AudioSource : AudioObject, IDisposable
     {
         if (_disposed)
             throw new InvalidOperationException("AudioSource already disposed");
-        AL10.alDeleteSources(1, new[] {Source});
+        AL10.alDeleteSources(1, [Source]);
         Check();
         _disposed = true;
     }

@@ -8,9 +8,10 @@ public static class ReduceSimpleWhile
     public static (ControlFlowGraph, string) Decompile(ControlFlowGraph graph)
     {
         ArgumentNullException.ThrowIfNull(graph);
+        var originalGraph = graph;
         var simpleLoopIndices =
-            from index in graph.GetDfsPostOrder()
-            let children = graph.Children(index)
+            from index in originalGraph.GetDfsPostOrder()
+            let children = originalGraph.Children(index)
             where children.Length == 2 && children.Contains(index)
             select index;
 
@@ -20,10 +21,11 @@ public static class ReduceSimpleWhile
 
             // Add an empty header node, which will put it into the form expected by the general-case loop reducer
             int? successor = null;
-            foreach (var child in graph.Children(index).Where(x => graph.GetEdgeLabel(index, x) == CfgEdge.LoopSuccessor))
-                successor = child;
+            foreach (var child in graph.Children(index))
+                if (graph.GetEdgeLabel(index, child) == CfgEdge.LoopSuccessor)
+                    successor = child;
 
-            graph = graph.InsertBefore(index, UAEmit.Empty(), out var newHeaderIndex);
+            graph = graph.InsertBefore(index, Emit.Empty(), out var newHeaderIndex);
 
             if (successor.HasValue)
             {

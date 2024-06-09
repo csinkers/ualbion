@@ -42,7 +42,7 @@ public static class SimplifyLabels
             => _mapping = mapping ?? throw new ArgumentNullException(nameof(mapping));
         protected override ICfgNode Build(GotoStatement jump) => 
             _mapping.TryGetValue(jump.Label, out var tuple) 
-                ? UAEmit.Goto(tuple.target) 
+                ? Emit.Goto(tuple.target) 
                 : null;
 
         protected override ICfgNode Build(Label label)
@@ -51,8 +51,8 @@ public static class SimplifyLabels
                 return null;
 
             return value.removed 
-                ? UAEmit.Empty() 
-                : UAEmit.Label(value.target);
+                ? Emit.Empty() 
+                : Emit.Label(value.target);
         }
     }
 

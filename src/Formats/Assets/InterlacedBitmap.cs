@@ -167,7 +167,7 @@ public sealed class InterlacedBitmap
                 var rawBytes = s.Bytes("Raw", null, n + 1);
                 ms.Write(rawBytes, 0, rawBytes.Length);
             }
-            else if (n is >= 129 and <= 255)
+            else if (n >= 129)
             {
                 byte value = s.UInt8("Value", 0);
                 for (int i = 0; i < 257 - n; i++)

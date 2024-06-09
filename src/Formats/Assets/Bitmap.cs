@@ -74,8 +74,8 @@ public class Bitmap8Bit
             throw new FormatException($"Unsupported compression method {compression}, expected RGB (0)");
 
         s.UInt32("ImageSize", 0); // 22 Dummy value for RGB bitmaps
-        int widthPixelsPerMetre = s.Int32("HorizontalResolution", 3779); // 26
-        int heightPixelsPerMetre = s.Int32("VerticalResolution", 3779); // 2A
+        s.Int32("HorizontalResolution", 3779); // 26
+        s.Int32("VerticalResolution", 3779); // 2A
         uint paletteSize = s.UInt32("PaletteSize", (uint)b.Palette.Count); // 2E
         if (paletteSize != 256)
             throw new FormatException($"Unsupported palette size {paletteSize}, expected 256");
@@ -90,7 +90,7 @@ public class Bitmap8Bit
             uint b1 = s2.UInt8(null, (byte)((x & 0x00ff0000) >> 16)); // B
             uint b2 = s2.UInt8(null, (byte)((x & 0x0000ff00) >> 8));  // G
             uint b3 = s2.UInt8(null, (byte)(x & 0x000000ff));         // R
-            uint b4 = s2.UInt8(null, 0);                              // A
+            s2.UInt8(null, 0);                                        // A
             return 0xff000000U | (b1 << 16) | (b2 << 8) | b3;
         });
 
@@ -134,6 +134,7 @@ public class Bitmap8Bit
     enum Compression : uint
     {
         Rgb = 0,
+        /*
         Rle8 = 1,
         Rle4 = 2,
         BitFields = 3,
@@ -143,5 +144,6 @@ public class Bitmap8Bit
         Cmyk = 11,
         CmykRle8 = 12,
         CmykRle4 = 13
+        */
     }
 }

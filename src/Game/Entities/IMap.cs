@@ -10,7 +10,6 @@ public interface IMap : IComponent
 {
     MapId MapId { get; }
     MapType MapType { get; }
-    Vector2 LogicalSize { get; }
     Vector3 TileSize { get; }
     float BaseCameraHeight { get; }
     IMapData MapData { get; }

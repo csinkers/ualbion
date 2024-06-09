@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.Json.Serialization;
 using UAlbion.Api;
 using UAlbion.Formats.Assets;
@@ -15,7 +14,7 @@ public class FormatJsonUtil : JsonUtil
             (JsonConverter)EventNodeConverter.Instance,
             InventoryConverter.Instance,
             NpcWaypointConverter.Instance, 
-        }.Concat(extraConverters ?? Array.Empty<JsonConverter>()).ToArray())
+        }.Concat(extraConverters ?? []).ToArray())
     {
     }
 }

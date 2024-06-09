@@ -52,10 +52,12 @@ public static class ShaderHelper
         ArgumentNullException.ThrowIfNull(gd);
         bool glOrGles = gd.BackendType == GraphicsBackend.OpenGL || gd.BackendType == GraphicsBackend.OpenGLES;
 
-        List<SpecializationConstant> specializations = new List<SpecializationConstant>();
-        specializations.Add(new SpecializationConstant(100, gd.IsClipSpaceYInverted));
-        specializations.Add(new SpecializationConstant(101, glOrGles)); // TextureCoordinatesInvertedY
-        specializations.Add(new SpecializationConstant(102, gd.IsDepthRangeZeroToOne));
+        List<SpecializationConstant> specializations =
+        [
+            new SpecializationConstant(100, gd.IsClipSpaceYInverted),
+            new SpecializationConstant(101, glOrGles), // TextureCoordinatesInvertedY
+            new SpecializationConstant(102, gd.IsDepthRangeZeroToOne)
+        ];
 
         if (gd.MainSwapchain != null)
         {

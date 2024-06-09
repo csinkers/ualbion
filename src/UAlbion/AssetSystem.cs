@@ -20,6 +20,7 @@ public static class AssetSystem
 {
     public static void LoadEvents()
     {
+        // ReSharper disable RedundantNameQualifier
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Api.Eventing.Event)));
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Core.Events.HelpEvent)));
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Core.Veldrid.Events.InputEvent)));
@@ -28,6 +29,7 @@ public static class AssetSystem
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Game.Events.StartEvent)));
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(UAlbion.Game.Veldrid.Assets.IsoModeEvent)));
         Event.AddEventsFromAssembly(Assembly.GetAssembly(typeof(IsoYawEvent)));
+        // ReSharper restore RedundantNameQualifier
     }
 
 #pragma warning disable CA2000 // Dispose objects before losing scope

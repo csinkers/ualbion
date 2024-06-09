@@ -23,13 +23,13 @@ public class DeltaFlcLineToken
 
         if (SignedCount > 0)
         {
-            PixelData ??= new ushort[SignedCount];
+            PixelData = new ushort[SignedCount];
             for (int j = 0; j < SignedCount; j++)
                 PixelData[j] = s.UInt16(null, 0);
         }
         else
         {
-            PixelData ??= new ushort[1];
+            PixelData = new ushort[1];
             PixelData[0] = s.UInt16(null, 0);
         }
     }

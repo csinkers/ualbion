@@ -8,11 +8,11 @@ namespace UAlbion.Core.Veldrid.Sprites;
 
 public sealed class SpriteSamplerSource : ServiceComponent<ISpriteSamplerSource>, ISpriteSamplerSource, IDisposable
 {
-    readonly SamplerHolder LinearSampler;
-    readonly SamplerHolder PointSampler;
+    readonly SamplerHolder _linearSampler;
+    readonly SamplerHolder _pointSampler;
     public SpriteSamplerSource()
     {
-        LinearSampler = new SamplerHolder
+        _linearSampler = new SamplerHolder
         {
             AddressModeU = SamplerAddressMode.Clamp,
             AddressModeV = SamplerAddressMode.Clamp,
@@ -21,7 +21,7 @@ public sealed class SpriteSamplerSource : ServiceComponent<ISpriteSamplerSource>
             Filter = SamplerFilter.MinLinear_MagLinear_MipLinear,
         };
 
-        PointSampler = new SamplerHolder
+        _pointSampler = new SamplerHolder
         {
             AddressModeU = SamplerAddressMode.Clamp,
             AddressModeV = SamplerAddressMode.Clamp,
@@ -29,21 +29,21 @@ public sealed class SpriteSamplerSource : ServiceComponent<ISpriteSamplerSource>
             BorderColor = SamplerBorderColor.TransparentBlack,
             Filter = SamplerFilter.MinPoint_MagPoint_MipPoint,
         };
-        AttachChild(LinearSampler);
-        AttachChild(PointSampler);
+        AttachChild(_linearSampler);
+        AttachChild(_pointSampler);
     }
 
     public ISamplerHolder GetSampler(SpriteSampler sampler) =>
         sampler switch
         {
-            SpriteSampler.TriLinear => LinearSampler,
-            SpriteSampler.Point => PointSampler,
+            SpriteSampler.TriLinear => _linearSampler,
+            SpriteSampler.Point => _pointSampler,
             _ => throw new ArgumentOutOfRangeException(nameof(sampler), "Unexpected sprite sampler \"{sampler}\"")
         };
 
     public void Dispose()
     {
-        LinearSampler?.Dispose();
-        PointSampler?.Dispose();
+        _linearSampler?.Dispose();
+        _pointSampler?.Dispose();
     }
 }

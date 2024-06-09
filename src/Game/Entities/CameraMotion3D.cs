@@ -35,13 +35,15 @@ public class CameraMotion3D : Component
             _camera.Yaw += e.Yaw;
             _camera.Pitch += e.Pitch;
         });
-        On<EngineUpdateEvent>(e =>
-        {
-            if (_velocity == Vector3.Zero)
-                return;
+        On<EngineUpdateEvent>(OnEngineUpdate);
+    }
 
-            var lookRotation = Quaternion.CreateFromYawPitchRoll(_camera.Yaw, 0f, 0f);
-            _camera.Position += Vector3.Transform(_velocity, lookRotation) * e.DeltaSeconds;
-        });
+    void OnEngineUpdate(EngineUpdateEvent e)
+    {
+        if (_velocity == Vector3.Zero)
+            return;
+
+        var lookRotation = Quaternion.CreateFromYawPitchRoll(_camera.Yaw, 0f, 0f);
+        _camera.Position += Vector3.Transform(_velocity, lookRotation) * e.DeltaSeconds;
     }
 }

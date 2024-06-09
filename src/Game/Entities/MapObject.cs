@@ -132,9 +132,9 @@ public class MapObject : GameComponent
     static Vector4 GetRelativeObjectPosition(LabyrinthData labyrinth, SubObject subObject, float objectYScaling)
     {
         var offset = new Vector4(
-            (float)subObject.X / 512 /*labyrinth.EffectiveWallWidth */,
-            (float)subObject.Y * objectYScaling / labyrinth.WallHeight,
-            (float)subObject.Z / 512 /*labyrinth.EffectiveWallWidth*/,
+            subObject.X / 512.0f /*labyrinth.EffectiveWallWidth */,
+            subObject.Y * objectYScaling / labyrinth.WallHeight,
+            subObject.Z / 512.0f /*labyrinth.EffectiveWallWidth*/,
             0);
 
         return offset - new Vector4(0.5f, 0, 0.5f, 0);

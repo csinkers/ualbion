@@ -1,5 +1,4 @@
-﻿using System;
-using ImGuiNET;
+﻿using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid;
 
@@ -9,7 +8,7 @@ public class BreakpointsWindow : Component, IImGuiWindow
 {
     readonly DiagNewBreakpoint _newBreakpoint;
     int _currentBreakpointIndex;
-    string[] _breakpointNames = Array.Empty<string>();
+    string[] _breakpointNames = [];
 
     public string Name { get; }
 

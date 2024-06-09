@@ -4,7 +4,7 @@ using UAlbion.Scripting.Ast;
 
 namespace UAlbion.Scripting;
 
-public static class UAEmit
+public static class Emit
 {
     public static SingleEvent Event(IEvent e, int originalIndex) => new(e ?? throw new ArgumentNullException(nameof(e)), originalIndex);
     public static BreakStatement Break() => new();
@@ -50,7 +50,7 @@ public static class UAEmit
             return new Sequence(args);
         }
 
-        return new Sequence(new[] { head, tail });
+        return new Sequence([head, tail]);
     }
 
     public static Statement Statement(ICfgNode head, params ICfgNode[] parameters) => new(head, parameters);

@@ -72,6 +72,7 @@ public class AssetMapping
         [JsonIgnore] public int MappedMax => EnumMax + Offset;
         public Range[] Ranges { get; set; }
 
+        // ReSharper disable once UnusedMember.Local
         public EnumInfo() { } // For deserialisation
         public override string ToString() => $"{EnumType.Name}@{Offset} = {AssetType}";
 

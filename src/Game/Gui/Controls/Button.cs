@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using System.Threading;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Formats.Assets;
@@ -16,23 +15,19 @@ public class Button : UiElement
     [Flags]
     enum ButtonFlags
     {
-        Pressed           = 1,
-        Hoverable         = 1 << 1,
-        Typematic         = 1 << 2,
-        DoubleFrame       = 1 << 3,
-        AllowDoubleClick  = 1 << 4,
-        Hovered           = 1 << 5,
-        Clicked           = 1 << 6,
-        RightClicked      = 1 << 7,
+        Pressed = 1,
+        Hoverable = 1 << 1,
+        Typematic = 1 << 2,
+        DoubleFrame = 1 << 3,
+        AllowDoubleClick = 1 << 4,
+        Hovered = 1 << 5,
+        Clicked = 1 << 6,
+        RightClicked = 1 << 7,
         ClickTimerPending = 1 << 8,
         SuppressNextDoubleClick = 1 << 9,
     }
 
-    string TimerName => "DoubleClickButton." + _id;
-
-    static int _nextId;
     readonly ButtonFrame _frame;
-    readonly int _id;
     float _typematicAccrual;
     ButtonFlags _flags = ButtonFlags.Hoverable;
 
@@ -46,18 +41,20 @@ public class Button : UiElement
         On<UiRightReleaseEvent>(OnRightRelease);
         On<EngineUpdateEvent>(OnEngineUpdate);
 
-        _id = Interlocked.Increment(ref _nextId);
         _frame = AttachChild(new ButtonFrame(content));
     }
 
     void OnLeftClick(UiLeftClickEvent e)
     {
-        if (!IsHovered) return;
+        if (!IsHovered)
+            return;
 
-        if (!IsClicked) ButtonDown?.Invoke();
+        if (!IsClicked)
+            ButtonDown?.Invoke();
 
         IsClicked = true;
-        if (Typematic) Click?.Invoke();
+        if (Typematic)
+            Click?.Invoke();
 
         e.Propagating = false;
     }

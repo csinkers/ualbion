@@ -13,6 +13,6 @@ public class EventTransformVisitor : BaseAstBuilderVisitor
         ArgumentNullException.ThrowIfNull(e);
 
         var transformed = _transform(e.Event);
-        return transformed == null || transformed == e.Event ? null : UAEmit.Event(transformed, e.OriginalIndex);
+        return transformed == null || transformed == e.Event ? null : Emit.Event(transformed, e.OriginalIndex);
     }
 }

@@ -4,7 +4,7 @@ namespace UAlbion.Scripting;
 
 public static class TestGraphs
 {
-    static Statement D(string name) => UAEmit.Statement(UAEmit.Name(name));
+    static Statement D(string name) => Emit.Statement(Emit.Name(name));
     /* Sequence: 1 -> 2 -> 3  = 1,2,3 */
     public static ControlFlowGraph Sequence => ControlFlowGraph.FromString("[0, 4, 5, 0+1 1+2 2+3 3+4]");
 

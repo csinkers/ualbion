@@ -55,7 +55,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
     {
         ArgumentNullException.ThrowIfNull(negation);
         negation.Expression.Accept(this);
-        return Result == null ? null : UAEmit.Negation(Result);
+        return Result == null ? null : Emit.Negation(Result);
     }
 
     protected virtual ICfgNode Build(IfThen ifThen)
@@ -70,7 +70,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
         if (condition == null && body == null)
             return null;
 
-        return UAEmit.If(condition ?? ifThen.Condition, body ?? ifThen.Body);
+        return Emit.If(condition ?? ifThen.Condition, body ?? ifThen.Body);
     }
 
     protected virtual ICfgNode Build(IfThenElse ifElse)
@@ -87,7 +87,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
         if (condition == null && trueBody == null && falseBody == null)
             return null;
 
-        return UAEmit.IfElse(
+        return Emit.IfElse(
             condition ?? ifElse.Condition,
             trueBody ?? ifElse.TrueBody,
             falseBody ?? ifElse.FalseBody);
@@ -122,7 +122,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
         head ??= statement.Head;
         parts ??= statement.Parameters;
 
-        return UAEmit.Statement(head, parts);
+        return Emit.Statement(head, parts);
     }
 
     protected virtual ICfgNode Build(Sequence sequence)
@@ -152,7 +152,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
             else result.Add(Result ?? node);
         }
 
-        return result == null ? null : UAEmit.Seq(result.ToArray());
+        return result == null ? null : Emit.Seq(result.ToArray());
     }
 
     protected virtual ICfgNode Build(DoLoop doLoop)
@@ -167,7 +167,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
         if (condition == null && body == null)
             return null;
 
-        return UAEmit.Do(
+        return Emit.Do(
             condition ?? doLoop.Condition,
             body ?? doLoop.Body);
     }
@@ -182,7 +182,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
         if (body == null)
             return null;
 
-        return UAEmit.Loop(body);
+        return Emit.Loop(body);
     }
 
     protected virtual ICfgNode Build(WhileLoop whileLoop)
@@ -197,7 +197,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
         if (condition == null && body == null)
             return null;
 
-        return UAEmit.While(
+        return Emit.While(
             condition ?? whileLoop.Condition,
             body ?? whileLoop.Body);
     }
@@ -214,7 +214,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
         if (left == null && right == null)
             return null;
 
-        return UAEmit.Op(
+        return Emit.Op(
             binaryOp.Operation,
             left ?? binaryOp.Left,
             right ?? binaryOp.Right);

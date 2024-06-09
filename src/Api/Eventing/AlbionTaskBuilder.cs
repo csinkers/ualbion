@@ -94,7 +94,7 @@ public struct AlbionTaskBuilder
                 var box = new AlbionStateMachineBox<TStateMachine>();
                 _core = box;
                 _state = BuilderState.Pending;
-                box._stateMachine = stateMachine;
+                box.StateMachine = stateMachine;
                 awaiter.OnCompleted(box.MoveNextAction);
                 break;
             }
@@ -128,7 +128,7 @@ public struct AlbionTaskBuilder
         {
             case BuilderState.Indeterminate:
                 {
-                    var box = new AlbionStateMachineBox<TStateMachine> { _stateMachine = stateMachine };
+                    var box = new AlbionStateMachineBox<TStateMachine> { StateMachine = stateMachine };
                     _core = box;
                     _state = BuilderState.Pending;
                     awaiter.UnsafeOnCompleted(box.MoveNextAction);
@@ -151,18 +151,18 @@ public struct AlbionTaskBuilder
         where TStateMachine : IAsyncStateMachine
     {
         Action? _moveNextAction;
-        public TStateMachine? _stateMachine;
+        public TStateMachine? StateMachine;
         public Action MoveNextAction => _moveNextAction ??= MoveNext;
 #if DEBUG
         public AlbionStateMachineBox() : base($"ASMB<{typeof(TStateMachine)}>") { }
 #endif
         void MoveNext()
         {
-            Debug.Assert(_stateMachine != null);
-            _stateMachine.MoveNext();
+            Debug.Assert(StateMachine != null);
+            StateMachine.MoveNext();
 
             if (IsCompleted)
-                _stateMachine = default;
+                StateMachine = default;
         }
     }
 }

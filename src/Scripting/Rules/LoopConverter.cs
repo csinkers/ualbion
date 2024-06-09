@@ -25,31 +25,31 @@ public static class LoopConverter
             static ICfgNode SeqRemoveHead(Sequence seq) =>
                 seq.Statements.Length == 2
                     ? seq.Statements[1]
-                    : UAEmit.Seq(seq.Statements.Skip(1).ToArray());
+                    : Emit.Seq(seq.Statements.Skip(1).ToArray());
 
             static ICfgNode SeqRemoveTail(Sequence seq) =>
                 seq.Statements.Length == 2
                     ? seq.Statements[0]
-                    : UAEmit.Seq(seq.Statements.Take(seq.Statements.Length - 1).ToArray());
+                    : Emit.Seq(seq.Statements.Take(seq.Statements.Length - 1).ToArray());
 
             if (loop.Body is IfThen(Negation n1, BreakStatement))
             {
                 n1.Expression.Accept(this);
                 var condition = Result ?? n1.Expression;
-                return UAEmit.While(condition, null);
+                return Emit.While(condition, null);
             }
 
             if (loop.Body is IfThen(var condition1, BreakStatement))
             {
                 condition1.Accept(this);
                 var condition = Result ?? condition1;
-                return UAEmit.While(UAEmit.Negation(condition), null);
+                return Emit.While(Emit.Negation(condition), null);
             }
 
             if (loop.Body is not Sequence seq)
             {
                 loop.Body.Accept(this);
-                return Result != null ? UAEmit.Loop(Result) : null;
+                return Result != null ? Emit.Loop(Result) : null;
             }
 
             if (seq.Statements[0] is IfThen(Negation n2, BreakStatement))
@@ -60,7 +60,7 @@ public static class LoopConverter
                 var newSeq = SeqRemoveHead(seq);
                 newSeq.Accept(this);
                 newSeq = Result ?? newSeq;
-                return UAEmit.While(condition, newSeq);
+                return Emit.While(condition, newSeq);
             }
 
             if (seq.Statements[0] is IfThen(var condition2, BreakStatement))
@@ -71,7 +71,7 @@ public static class LoopConverter
                 var newSeq = SeqRemoveHead(seq);
                 newSeq.Accept(this);
                 newSeq = Result ?? newSeq;
-                return UAEmit.While(UAEmit.Negation(condition), newSeq);
+                return Emit.While(Emit.Negation(condition), newSeq);
             }
 
             if (seq.Statements[^1] is IfThen(Negation n3, BreakStatement))
@@ -82,7 +82,7 @@ public static class LoopConverter
                 var newSeq = SeqRemoveTail(seq);
                 newSeq.Accept(this);
                 newSeq = Result ?? newSeq;
-                return UAEmit.Do(condition, newSeq);
+                return Emit.Do(condition, newSeq);
             }
 
             if (seq.Statements[^1] is IfThen(var condition3, BreakStatement))
@@ -93,11 +93,11 @@ public static class LoopConverter
                 var newSeq = SeqRemoveTail(seq);
                 newSeq.Accept(this);
                 newSeq = Result ?? newSeq;
-                return UAEmit.Do(UAEmit.Negation(condition), newSeq);
+                return Emit.Do(Emit.Negation(condition), newSeq);
             }
 
             loop.Body.Accept(this);
-            return Result != null ? UAEmit.Loop(Result) : null;
+            return Result != null ? Emit.Loop(Result) : null;
         }
     }
 }

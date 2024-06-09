@@ -1,8 +1,10 @@
-﻿using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Xunit;
 
 namespace UAlbion.Formats.Tests;
 
+[SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
 public class XDeltaTests
 {
     [Fact]

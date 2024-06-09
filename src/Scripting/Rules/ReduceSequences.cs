@@ -35,7 +35,7 @@ public static class ReduceSequences
 
             var updated = graph
                 .RemoveNode(child)
-                .ReplaceNode(index, UAEmit.Seq(node, childNode));
+                .ReplaceNode(index, Emit.Seq(node, childNode));
 
             foreach (var grandChild in grandChildren)
                 updated = updated.AddEdge(index, grandChild, graph.GetEdgeLabel(child, grandChild));

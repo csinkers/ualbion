@@ -37,7 +37,7 @@ public class StampLoader : IAssetLoader<BlockList>
             PackedChunks.Pack(s, existing.Count, stampNumber =>
             {
                 if (existing[stampNumber].Width == 0 || existing[stampNumber].Height == 0)
-                    return Array.Empty<byte>();
+                    return [];
                 var stamp = new Stamp(stampNumber, existing[stampNumber], tileset);
                 return Encoding.UTF8.GetBytes(stamp.Serialize(context.Json));
             });

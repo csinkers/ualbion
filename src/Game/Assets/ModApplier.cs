@@ -81,7 +81,7 @@ public class ModApplier : GameComponent, IModApplier
         try
         {
             var result = LoadAssetInternal(id, language);
-            return result?.Asset is Exception ? null : result.Asset;
+            return result?.Asset is Exception ? null : result?.Asset;
         }
         catch (Exception e)
         {

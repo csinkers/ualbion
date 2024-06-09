@@ -80,8 +80,9 @@ public static class AviFile
 
         // 80044068
         AVIStreamSetFormat(compressedStream, 0, ref bi, 40);
+
         int count = 0;
-        foreach (var (frame, delay) in frames)
+        foreach (var (frame, _) in frames) // delay not used at the moment
         {
             fixed (uint* framePtr = frame)
             {

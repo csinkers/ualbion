@@ -67,7 +67,7 @@ sealed class DumpText : GameComponent, IAssetDumper
         var filename = Path.Combine(baseDir, "data", "exported", "text", name);
         var directory = Path.GetDirectoryName(filename);
 
-        if (!Directory.Exists(directory))
+        if (!Directory.Exists(directory) && !string.IsNullOrEmpty(directory))
             Directory.CreateDirectory(directory);
 
         return File.CreateText(filename);
@@ -102,7 +102,7 @@ sealed class DumpText : GameComponent, IAssetDumper
             sw.WriteLine("    Floors: " + string.Join(" ", floors.Select(x => $"{x.Key}:{x.Item2}")));
             var ceilings = map.Ceilings.GroupBy(x => x).Select(x => (x.Key, x.Count())).OrderBy(x => x.Key);
             sw.WriteLine("    Ceilings: " + string.Join(" ", ceilings.Select(x => $"{x.Key}:{x.Item2}")));
-            var contents = map.Contents.GroupBy(x => x).Select(x => (x.Key, x.Count())).OrderBy(x => x.Key);
+            var contents = map.Contents.GroupBy(x => x).Select(x => (x.Key, x.Count())).OrderBy(x => x.Key).ToArray();
             sw.WriteLine("    Contents: " + string.Join(" ", contents.Select(x => $"{x.Key}:{x.Item2}")));
 
             var l = assets.LoadLabyrinthData(map.LabDataId);

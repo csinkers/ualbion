@@ -131,7 +131,7 @@ public static class NpcMapping
         ArgumentNullException.ThrowIfNull(pathParser);
 
         var position = ((int)obj.X / tileWidth, (int)obj.Y / tileHeight);
-        NpcWaypoint[] waypoints = { new((byte)position.Item1, (byte)position.Item2) };
+        NpcWaypoint[] waypoints = [new((byte)position.Item1, (byte)position.Item2)];
 
         var id = obj.PropString(Prop.Id);
         var visual = obj.PropString(Prop.Visual);

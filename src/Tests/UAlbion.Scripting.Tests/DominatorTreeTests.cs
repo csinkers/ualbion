@@ -156,7 +156,7 @@ public class DominatorTreeTests
         Assert.Equal(13, tree.ImmediateDominator(1));
         Assert.Equal(1, tree.ImmediateDominator(0));
         Assert.Equal(13, tree.ImmediateDominator(2));
-        Assert.Equal((int?)null, tree.ImmediateDominator(13));
+        Assert.Null(tree.ImmediateDominator(13));
     }
 
     [Fact]
@@ -181,6 +181,6 @@ public class DominatorTreeTests
         Assert.Equal(12, tree.ImmediateDominator(10));
         Assert.Equal(8, tree.ImmediateDominator(12));
         Assert.Equal(2, tree.ImmediateDominator(13));
-        Assert.Equal((int?)null, tree.ImmediateDominator(11));
+        Assert.Null(tree.ImmediateDominator(11));
     }
 }

@@ -6,7 +6,7 @@ using UAlbion.Api.Visual;
 namespace UAlbion.Core.Visual;
 #pragma warning disable CA1051 // Do not declare visible instance fields
 [SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Not comparable")]
-public partial struct SpriteInfo
+public struct SpriteInfo
 {
     public override string ToString() => $"SID {Position}:{TexLayer} ({Flags & ~SpriteFlags.DebugMask}) Z:{DebugZ}";
 

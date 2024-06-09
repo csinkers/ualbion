@@ -92,7 +92,7 @@ public static class ReduceSeseRegions
         ArgumentNullException.ThrowIfNull(graph);
 
         var labelName = ScriptConstants.BuildDummyLabel(Guid.NewGuid());
-        var gotoNode = UAEmit.Goto(labelName);
+        var gotoNode = Emit.Goto(labelName);
         var label = graph.GetEdgeLabel(start, end);
 
         graph = graph
@@ -105,7 +105,7 @@ public static class ReduceSeseRegions
         {
             graph = graph.ReplaceNode(end,
                 new ControlFlowGraph(0, 1,
-                    new[] { UAEmit.Label(labelName), graph.Nodes[end] },
+                    new[] { Emit.Label(labelName), graph.Nodes[end] },
                     new[] { (0, 1, CfgEdge.True) }));
         }
 

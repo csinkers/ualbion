@@ -22,13 +22,13 @@ public class ObjectReflector : IReflector
         // > = starts with
         // anything else = exact short name match
 
-        { "*", new [] { "~__BackingField", "_syncRoot" } }, // ignore backing fields, lock objects etc
+        { "*", ["~__BackingField", "_syncRoot"] }, // ignore backing fields, lock objects etc
 
         // These often throw exceptions and cripple performance
-        { "MemberInfo",  new[] { "DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition" } },
-        { "Type",        new[] { "DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition" } },
-        { "TypeInfo",    new[] { "DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition" } },
-        { "RuntimeType", new[] { "DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition" } },
+        { "MemberInfo", ["DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition"] },
+        { "Type", ["DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition"] },
+        { "TypeInfo", ["DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition"] },
+        { "RuntimeType", ["DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition"] },
     };
 
     readonly string _typeName;
@@ -116,7 +116,7 @@ public class ObjectReflector : IReflector
         if (type.BaseType != null)
             PopulateMembers(type.BaseType, subObjects);
 
-        List<string> ignoreList = new();
+        List<string> ignoreList = [];
         foreach (var kvp in MembersToIgnore)
         {
             bool isMatch = kvp.Key[0] switch

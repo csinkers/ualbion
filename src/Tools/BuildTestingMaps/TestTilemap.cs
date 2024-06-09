@@ -45,8 +45,8 @@ public class TestTilemap
 
     public TestTilemap(Dictionary<AssetId, object> assets, IAssetManager assetManager)
     {
-        if (assets == null) throw new ArgumentNullException(nameof(assets));
-        if (assetManager == null) throw new ArgumentNullException(nameof(assetManager));
+        ArgumentNullException.ThrowIfNull(assets);
+        ArgumentNullException.ThrowIfNull(assetManager);
 
         var font = assetManager.LoadFont(UAlbion.Base.Font.DebugFont6, UAlbion.Base.Ink.White);
         var bigFont = assetManager.LoadFont(UAlbion.Base.Font.DebugFont10, UAlbion.Base.Ink.White);
@@ -121,7 +121,7 @@ public class TestTilemap
                 int gfxIndex = tiles.Count;
                 for (int j = 0; j < frameCount; j++)
                 {
-                    float t = (float)j / (frameCount - 1);
+                    // 0float t = (float)j / (frameCount - 1);
                     tiles.Add(T16(null).FillAll(CRainbowLoop[j % 8])
                         //.FillRect(CGrey8, 0, 0, 15, (int)(15 * t))
                         .Border(CWhite)

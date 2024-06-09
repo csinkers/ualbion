@@ -30,8 +30,8 @@ public static class LayerMapping3D
         int contentId = nextLayerId++;
         int ceilingid = nextLayerId++;
 
-        return new List<TiledMapLayer>
-        {
+        return
+        [
             new()
             {
                 Id = floorId,
@@ -40,6 +40,7 @@ public static class LayerMapping3D
                 Height = map.Height,
                 Data = new LayerData { Encoding = "csv", Content = EncodeLayer(map, IsometricMode.Floors) }
             },
+
             new()
             {
                 Id = wallId,
@@ -48,6 +49,7 @@ public static class LayerMapping3D
                 Height = map.Height,
                 Data = new LayerData { Encoding = "csv", Content = EncodeLayer(map, IsometricMode.Walls) }
             },
+
             new()
             {
                 Id = contentId,
@@ -56,6 +58,7 @@ public static class LayerMapping3D
                 Height = map.Height,
                 Data = new LayerData { Encoding = "csv", Content = EncodeLayer(map, IsometricMode.Contents) }
             },
+
             new()
             {
                 Id = ceilingid,
@@ -65,7 +68,7 @@ public static class LayerMapping3D
                 Opacity = 0.5,
                 Data = new LayerData { Encoding = "csv", Content = EncodeLayer(map, IsometricMode.Ceilings) }
             }
-        };
+        ];
     }
 
     public static void ReadLayers(MapData3D albionMap, List<TiledMapLayer> layers)

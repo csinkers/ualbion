@@ -18,7 +18,7 @@ public sealed partial class GlobalSet : ResourceSetHolder
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public partial struct GlobalInfo : IUniformFormat
+public struct GlobalInfo : IUniformFormat
 {
     [Uniform("uTime")] public float Time;
     [Uniform("uEngineFlags", EnumPrefix = "EF")] public EngineFlags EngineFlags;
@@ -32,7 +32,7 @@ public sealed partial class MainPassSet : ResourceSetHolder
 }
 
 #pragma warning disable CA1823 // Avoid unused private fields
-public partial struct CameraUniform : IUniformFormat
+public struct CameraUniform : IUniformFormat
 {
     [Uniform("uProjection")] public Matrix4x4 Projection;
     [Uniform("uView")] public Matrix4x4 View;

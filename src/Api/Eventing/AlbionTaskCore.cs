@@ -32,6 +32,7 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
 #endif
 
 #if RECORD_TASK_STACKS
+    // ReSharper disable once NotAccessedField.Local (used for debugging)
     string _stack;
 #endif
 
@@ -96,7 +97,7 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
 
         if (_continuation is not List<Action> list)
         {
-            list = new List<Action> { (Action)_continuation };
+            list = [(Action)_continuation];
             _continuation = list;
         }
 
@@ -147,7 +148,7 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
 
 public class AlbionTaskCore : AlbionTaskCore<Unit>
 {
-    public AlbionTaskCore() : base() { }
+    public AlbionTaskCore() { }
     public AlbionTaskCore(string description) : base(description) { }
     public void Complete() => SetResult(Unit.V);
 }

@@ -17,14 +17,14 @@ namespace UAlbion.Core.Veldrid;
 public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is largely based on Veldrid.ImGuiRenderer from Veldrid.ImGui
 {
     readonly OutputDescription _outputFormat;
-    readonly IntPtr _fontAtlasId = (IntPtr)1;
+    readonly IntPtr _fontAtlasId = 1;
     readonly Vector2 _scaleFactor = Vector2.One;
 
     // Image trackers
     readonly Dictionary<TextureView, ResourceSetInfo> _setsByView = new();
     readonly Dictionary<Texture, TextureView> _autoViewsByTexture = new();
     readonly Dictionary<IntPtr, ResourceSetInfo> _viewsById = new();
-    readonly List<IDisposable> _ownedResources = new();
+    readonly List<IDisposable> _ownedResources = [];
     int _lastAssignedId = 100;
     bool _frameBegun;
 
@@ -44,7 +44,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     int _windowWidth;
     int _windowHeight;
 
-    public Type[] HandledTypes { get; } = { typeof(DebugGuiRenderable) };
+    public Type[] HandledTypes { get; } = [typeof(DebugGuiRenderable)];
     public bool IsReady => _pipeline != null;
 
     public ImGuiRenderer(in OutputDescription outputFormat)
@@ -130,9 +130,8 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
 
     public void RemoveImGuiBinding(TextureView textureView)
     {
-        if (_setsByView.TryGetValue(textureView, out ResourceSetInfo rsi))
+        if (_setsByView.Remove(textureView, out ResourceSetInfo rsi))
         {
-            _setsByView.Remove(textureView);
             _viewsById.Remove(rsi.ImGuiBinding);
             _ownedResources.Remove(rsi.ResourceSet);
             rsi.ResourceSet.Dispose();
@@ -161,9 +160,8 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
 
     public void RemoveImGuiBinding(Texture texture)
     {
-        if (_autoViewsByTexture.TryGetValue(texture, out TextureView textureView))
+        if (_autoViewsByTexture.Remove(texture, out TextureView textureView))
         {
-            _autoViewsByTexture.Remove(texture);
             _ownedResources.Remove(textureView);
             textureView.Dispose();
             RemoveImGuiBinding(textureView);
@@ -277,12 +275,13 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
         _fragmentShader = factory.CreateShader(new ShaderDescription(ShaderStages.Fragment, fragmentShaderBytes, gd.BackendType == GraphicsBackend.Vulkan ? "main" : "FS"));
         _fragmentShader.Name = "ImGui.NET Fragment Shader";
 
-        VertexLayoutDescription[] vertexLayouts = {
+        VertexLayoutDescription[] vertexLayouts =
+        [
             new(
                 new VertexElementDescription("in_position", VertexElementSemantic.Position, VertexElementFormat.Float2),
                 new VertexElementDescription("in_texCoord", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
                 new VertexElementDescription("in_color", VertexElementSemantic.Color, VertexElementFormat.Byte4_Norm))
-        };
+        ];
 
         _layout = factory.CreateResourceLayout(new ResourceLayoutDescription(
             new ResourceLayoutElementDescription("ProjectionMatrixBuffer", ResourceKind.UniformBuffer, ShaderStages.Vertex),
@@ -300,13 +299,12 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
             PrimitiveTopology.TriangleList,
             new ShaderSetDescription(
                 vertexLayouts,
-                new[] { _vertexShader, _fragmentShader },
-                new[]
-                {
+                [_vertexShader, _fragmentShader],
+                [
                     new SpecializationConstant(0, gd.IsClipSpaceYInverted),
-                    new SpecializationConstant(1, false), // is color space legacy?
-                }),
-            new[] { _layout, _textureLayout },
+                    new SpecializationConstant(1, false) // is color space legacy?
+                ]),
+            [_layout, _textureLayout],
             outputDescription,
             ResourceBindingModel.Default);
 
@@ -319,7 +317,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
         RecreateFontDeviceTexture(gd);
     }
 
-    IntPtr GetNextImGuiBindingId() => (IntPtr)Interlocked.Increment(ref _lastAssignedId);
+    IntPtr GetNextImGuiBindingId() => Interlocked.Increment(ref _lastAssignedId);
 
     byte[] LoadShader(ResourceFactory factory, string name)
     {

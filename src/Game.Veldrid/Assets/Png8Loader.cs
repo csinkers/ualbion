@@ -6,13 +6,11 @@ using System.Runtime.InteropServices;
 using SerdesNet;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Formats;
-using UAlbion.Formats.Ids;
 using UAlbion.Formats.Parsers;
 
 namespace UAlbion.Game.Veldrid.Assets;
@@ -55,7 +53,7 @@ public class Png8Loader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>>
                 images.Add(PngDecoder.Instance.Decode<Rgba32>(pngOptions, stream));
             }
 
-            return Read(context.AssetId, unambiguousPalette, images, paletteId);
+            return Read(context.AssetId, unambiguousPalette, images);
         }
         finally { foreach (var image in images) image.Dispose(); }
     }
@@ -77,7 +75,7 @@ public class Png8Loader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>>
         return bytes;
     }
 
-    static SimpleTexture<byte> Read(AssetId id, uint[] palette, IList<Image<Rgba32>> images, PaletteId paletteId)
+    static SimpleTexture<byte> Read(AssetId id, uint[] palette, IList<Image<Rgba32>> images)
     {
         int totalWidth = images.Max(x => x.Width);
         int totalHeight = images.Sum(x => x.Height);

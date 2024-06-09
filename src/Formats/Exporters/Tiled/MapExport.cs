@@ -53,11 +53,11 @@ public static class MapExport
             Orientation = "orthogonal",
             RenderOrder = "right-down",
             Properties = MapMapping.BuildMapProperties(map),
-            Tilesets = new List<MapTileset>
-            {
+            Tilesets =
+            [
                 new() { FirstGid = 0, Source = tilesetPath, },
                 new() { FirstGid = npcGidOffset, Source = npcTileset.Filename }
-            },
+            ],
             Layers = LayerMapping2D.BuildMapLayers(map, tileset, ref nextLayerId),
             ObjectGroups = ObjectGroupMapping.BuildObjectGroups(map, properties.TileWidth, properties.TileHeight, GetNpcTileInfo, functionsByEventId, ref nextLayerId, ref nextObjectId)
         };
@@ -104,13 +104,13 @@ public static class MapExport
             RenderOrder = "right-down",
             BackgroundColor = "#000000",
             Properties = MapMapping.BuildMapProperties(map),
-            Tilesets = new List<MapTileset>
-            {
+            Tilesets =
+            [
                 new() { FirstGid = LayerMapping3D.FloorGid, Source = properties.FloorPath, },
                 new() { FirstGid = LayerMapping3D.WallGid, Source = properties.WallPath, },
                 new() { FirstGid = LayerMapping3D.ContentsGid, Source = properties.ContentsPath },
-                new() { FirstGid = LayerMapping3D.CeilingGid, Source = properties.CeilingPath, },
-            },
+                new() { FirstGid = LayerMapping3D.CeilingGid, Source = properties.CeilingPath, }
+            ],
             Layers = LayerMapping3D.BuildLayers(map, ref nextLayerId),
             ObjectGroups = ObjectGroupMapping.BuildObjectGroups(map, properties.TileHeight, properties.TileHeight, GetNpcTileInfo, functionsByEventId, ref nextLayerId, ref nextObjectId)
         };

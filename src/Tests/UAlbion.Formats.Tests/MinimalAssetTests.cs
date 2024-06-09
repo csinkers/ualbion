@@ -6,6 +6,7 @@ public class MinimalAssetTests
 {
     void Setup()
     {
+        // TODO
     }
 
     [Fact] public void AutomapGfxTest() {}

@@ -7,7 +7,7 @@ namespace UAlbion.Api.Eventing;
 #pragma warning disable CA1716 // Identifiers should not match keywords
 public interface IAdHocComponentHelper
 {
-    object Context { get; }
+    object ThreadContext { get; }
     EventExchange Exchange { get; }
     IReadOnlyList<IComponent> Children { get; }
     T Resolve<T>();

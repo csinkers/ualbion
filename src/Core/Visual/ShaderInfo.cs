@@ -12,7 +12,7 @@ public class ShaderInfo
         if (string.IsNullOrEmpty(content)) throw new ArgumentNullException(content);
         Name = name;
         Content = content;
-        Hash = HashUtil.FNV1a(Encoding.UTF8.GetBytes(Content)).ToString("X8");
+        Hash = HashUtil.Fnv1A(Encoding.UTF8.GetBytes(Content)).ToString("X8");
     }
 
     public string Name { get; }

@@ -8,6 +8,6 @@ public class MockPaletteManager : ServiceComponent<IPaletteManager>, IPaletteMan
 {
     public IPalette Day { get; set; }
     public IPalette Night { get; set; }
-    public float Blend { get; }
+    public float Blend => 0.0f;
     public int Frame { get; set; }
 }

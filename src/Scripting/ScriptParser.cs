@@ -10,12 +10,12 @@ public static class ScriptParser
 {
     public static readonly TokenListParser<ScriptToken, ICfgNode> Name =
         Token.EqualTo(ScriptToken.Identifier)
-            .Select(x => (ICfgNode)UAEmit.Name(x.ToStringValue())).Named("Name");
+            .Select(x => (ICfgNode)Emit.Name(x.ToStringValue())).Named("Name");
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> Number =
         Token.EqualTo(ScriptToken.Number)
             .Apply(Numerics.IntegerInt32)
-            .Select(x => (ICfgNode)UAEmit.Const(x)).Named("Number");
+            .Select(x => (ICfgNode)Emit.Const(x)).Named("Number");
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> Identifier = Name.Or(Number).Named("Identifier");
 
@@ -28,7 +28,7 @@ public static class ScriptParser
     public static readonly TokenListParser<ScriptToken, ICfgNode> Negation =
         (from op in Token.EqualTo(ScriptToken.Not)
             from val in Factor
-            select (ICfgNode)UAEmit.Negation(val)).Named("Negation");
+            select (ICfgNode)Emit.Negation(val)).Named("Negation");
 
     public static readonly TokenListParser<ScriptToken, ScriptOp> Member = Token.EqualTo(ScriptToken.Dot).Value(ScriptOp.Member);
     public static readonly TokenListParser<ScriptToken, ScriptOp> Eq  = Token.EqualTo(ScriptToken.Equal).Value(ScriptOp.Equal);
@@ -59,30 +59,30 @@ public static class ScriptParser
     10 LtR , 
     */
 
-    public static readonly TokenListParser<ScriptToken, ICfgNode> Op1 = Parse.Chain(Member, Factor, UAEmit.Op);
+    public static readonly TokenListParser<ScriptToken, ICfgNode> Op1 = Parse.Chain(Member, Factor, Emit.Op);
     public static readonly TokenListParser<ScriptToken, ICfgNode> Op2 = Negation.Or(Op1);
-    public static readonly TokenListParser<ScriptToken, ICfgNode> Op3 = Parse.Chain(Lte.Or(Lt).Or(Gte).Or(Gt), Op2, UAEmit.Op);
-    public static readonly TokenListParser<ScriptToken, ICfgNode> Op4 = Parse.Chain(Eq.Or(Neq), Op3, UAEmit.Op);
-    public static readonly TokenListParser<ScriptToken, ICfgNode> Op5 = Parse.Chain(BitwiseAnd, Op4, UAEmit.Op);
-    public static readonly TokenListParser<ScriptToken, ICfgNode> Op6 = Parse.Chain(BitwiseOr, Op5, UAEmit.Op);
-    public static readonly TokenListParser<ScriptToken, ICfgNode> Op7 = Parse.Chain(And, Op6, UAEmit.Op);
-    public static readonly TokenListParser<ScriptToken, ICfgNode> Op8 = Parse.Chain(Or, Op7, UAEmit.Op);
-    public static readonly TokenListParser<ScriptToken, ICfgNode> Op9 = Parse.ChainRight(Assign.Or(Add).Or(Sub), Op8, UAEmit.Op);
+    public static readonly TokenListParser<ScriptToken, ICfgNode> Op3 = Parse.Chain(Lte.Or(Lt).Or(Gte).Or(Gt), Op2, Emit.Op);
+    public static readonly TokenListParser<ScriptToken, ICfgNode> Op4 = Parse.Chain(Eq.Or(Neq), Op3, Emit.Op);
+    public static readonly TokenListParser<ScriptToken, ICfgNode> Op5 = Parse.Chain(BitwiseAnd, Op4, Emit.Op);
+    public static readonly TokenListParser<ScriptToken, ICfgNode> Op6 = Parse.Chain(BitwiseOr, Op5, Emit.Op);
+    public static readonly TokenListParser<ScriptToken, ICfgNode> Op7 = Parse.Chain(And, Op6, Emit.Op);
+    public static readonly TokenListParser<ScriptToken, ICfgNode> Op8 = Parse.Chain(Or, Op7, Emit.Op);
+    public static readonly TokenListParser<ScriptToken, ICfgNode> Op9 = Parse.ChainRight(Assign.Or(Add).Or(Sub), Op8, Emit.Op);
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> Expression =
         (from first in Op9
             from rest in Op9.Many()
-            select rest.Length == 0 ? first : UAEmit.Statement(first, rest)).Named("Expression");
+            select rest.Length == 0 ? first : Emit.Statement(first, rest)).Named("Expression");
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> EventStatement =
         (from first in Op9
             from rest in Op9.Many()
-            select (ICfgNode)UAEmit.Statement(first, rest)).Named("EventStatement");
+            select (ICfgNode)Emit.Statement(first, rest)).Named("EventStatement");
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> Label =
         (from name in Token.EqualTo(ScriptToken.Identifier)
             from colon in Token.EqualTo(ScriptToken.Colon)
-            select (ICfgNode)UAEmit.Label(name.ToStringValue())).Named("Label");
+            select (ICfgNode)Emit.Label(name.ToStringValue())).Named("Label");
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> If =
         (from keyword in Token.EqualToValue(ScriptToken.Identifier, "if")
@@ -91,7 +91,7 @@ public static class ScriptParser
             from condition in Expression
             from rp in Token.EqualTo(ScriptToken.RParen)
             from body in Parse.Ref(() => Statement)
-            select (ICfgNode)UAEmit.If(condition, body)).Named("If");
+            select (ICfgNode)Emit.If(condition, body)).Named("If");
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> IfElse =
         (from keyword in Token.EqualToValue(ScriptToken.Identifier, "if")
@@ -102,7 +102,7 @@ public static class ScriptParser
             from body in Parse.Ref(() => Statement)
             from keyword2 in Token.EqualToValue(ScriptToken.Identifier, "else")
             from elseBody in Parse.Ref(() => Statement)
-            select (ICfgNode)UAEmit.IfElse(condition, body, elseBody)).Named("IfElse");
+            select (ICfgNode)Emit.IfElse(condition, body, elseBody)).Named("IfElse");
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> While =
         (from keyword in Token.EqualToValue(ScriptToken.Identifier, "while")
@@ -111,7 +111,7 @@ public static class ScriptParser
             from condition in Expression
             from rp in Token.EqualTo(ScriptToken.RParen)
             from body in Parse.Ref(() => Statement)
-            select (ICfgNode)UAEmit.While(condition, body)).Named("While");
+            select (ICfgNode)Emit.While(condition, body)).Named("While");
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> Do =
         (from keyword in Token.EqualToValue(ScriptToken.Identifier, "do")
@@ -121,22 +121,22 @@ public static class ScriptParser
             from _ in Token.EqualTo(ScriptToken.NewLine).Many()
             from condition in Expression
             from rp in Token.EqualTo(ScriptToken.RParen)
-            select (ICfgNode)UAEmit.Do(condition, body)).Named("Do");
+            select (ICfgNode)Emit.Do(condition, body)).Named("Do");
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> Loop =
         (from keyword in Token.EqualToValue(ScriptToken.Identifier, "loop")
             from body in Parse.Ref(() => Statement)
-            select (ICfgNode)UAEmit.Loop(body)).Named("EndlessLoop");
+            select (ICfgNode)Emit.Loop(body)).Named("EndlessLoop");
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> Break =
-        Token.EqualToValue(ScriptToken.Identifier, "break").Value((ICfgNode)UAEmit.Break());
+        Token.EqualToValue(ScriptToken.Identifier, "break").Value((ICfgNode)Emit.Break());
     public static readonly TokenListParser<ScriptToken, ICfgNode> Continue =
-        Token.EqualToValue(ScriptToken.Identifier, "continue").Value((ICfgNode)UAEmit.Continue());
+        Token.EqualToValue(ScriptToken.Identifier, "continue").Value((ICfgNode)Emit.Continue());
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> Goto =
         from keyword in Token.EqualToValue(ScriptToken.Identifier, "goto")
         from label in Token.EqualTo(ScriptToken.Identifier)
-        select (ICfgNode)UAEmit.Goto(label.ToStringValue());
+        select (ICfgNode)Emit.Goto(label.ToStringValue());
 
     public static readonly TokenListParser<ScriptToken, ICfgNode> SingleStatement =
         Label.Try()
@@ -153,9 +153,9 @@ public static class ScriptParser
     static ICfgNode MakeSeq(ICfgNode[] statements) =>
         statements.Length switch
         {
-            0 => UAEmit.Empty(),
+            0 => Emit.Empty(),
             1 => statements[0],
-            _ => UAEmit.Seq(statements)
+            _ => Emit.Seq(statements)
         };
 
     public static readonly TokenListParser<ScriptToken, Token<ScriptToken>> Comma = Token.EqualTo(ScriptToken.Comma);

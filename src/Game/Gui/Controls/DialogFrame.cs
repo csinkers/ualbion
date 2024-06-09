@@ -17,7 +17,7 @@ public class DialogFrame : UiElement
     const int FrameOffsetY = 7;
     const int ShadowX = 10;
     const int ShadowY = 10;
-    static readonly int[] Region1Only = { 1 }; // Just the black region
+    static readonly int[] Region1Only = [1]; // Just the black region
 
     PositionedSpriteBatch _sprite;
     Vector2 _lastPixelSize; // For dirty state detection
@@ -65,7 +65,7 @@ public class DialogFrame : UiElement
             {
                 var sprite = (Base.CoreGfx)((int)Base.CoreGfx.UiBackgroundLines1 + n % 4); // TODO: Better solution
                 var texture = assets.LoadTexture(Id(sprite));
-                int? w = x + 2*TileSize > width ? width - TileSize - x : (int?)null;
+                int? w = x + 2*TileSize > width ? width - TileSize - x : null;
                 multi.AddTexture(1, texture, x, y, 0, true, w);
                 n++;
                 x += TileSize;
@@ -75,15 +75,13 @@ public class DialogFrame : UiElement
         void DrawVerticalLine(int x)
         {
             int y = TileSize;
-            int n = 0;
             var sprite = (Base.CoreGfx)(int)Base.CoreGfx.UiBackgroundLines1; // TODO: Better solution
             ITexture texture = assets.LoadTexture(Id(sprite));
             texture = CoreUtil.BuildTransposedTexture((IReadOnlyTexture<byte>)texture);
             while (y < height - TileSize)
             {
-                int? h = y + 2*TileSize > height ? height - TileSize - y : (int?)null;
+                int? h = y + 2*TileSize > height ? height - TileSize - y : null;
                 multi.AddTexture(1, texture, x, y, 0, true, null, h);
-                n++;
                 y += TileSize;
             }
         }

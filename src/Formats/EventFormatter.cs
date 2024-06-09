@@ -63,7 +63,7 @@ public class EventFormatter : IEventFormatter
         if (events.Count == 0)
             return new DecompilationResult();
 
-        List<(string, IGraph)> steps = new();
+        List<(string, IGraph)> steps = [];
         try
         {
             var trees = Decompiler.Decompile(events, chains, additionalEntryPoints, steps);
@@ -73,11 +73,11 @@ public class EventFormatter : IEventFormatter
         {
             var builder = new DecompilationResultBuilder(false);
             FormatEventSet(builder, events, indent); // Fallback to raw view
-            return builder.Build(Enumerable.Empty<ICfgNode>());
+            return builder.Build([]);
         }
     }
 
-    public DecompilationResult FormatGraphsAsBlocks(IEnumerable<ICfgNode> trees, int indent)
+    public DecompilationResult FormatGraphsAsBlocks(IList<ICfgNode> trees, int indent)
     {
         ArgumentNullException.ThrowIfNull(trees);
         var builder = new DecompilationResultBuilder(false);

@@ -11,7 +11,7 @@ namespace UAlbion.Formats.Exporters.Tiled;
 public class Stamp
 {
     [JsonPropertyName("name")] public string Name { get; set; }
-    [JsonInclude, JsonPropertyName("variations")] public List<Variation> Variations { get; private set; } = new();
+    [JsonInclude, JsonPropertyName("variations")] public List<Variation> Variations { get; private set; } = [];
 
     public Stamp() { }
     public Stamp(int blockId, Block block, Tileset tileset)
@@ -31,15 +31,12 @@ public class Stamp
                 TileHeight = tileset.TileHeight,
                 NextLayerId = 3,
                 NextObjectId = 1,
-                Tilesets = new List<VariationTileset> 
-                {
-                    new() { FirstGid = 0, Source = tileset.Filename }
-                },
-                Layers = new List<VariationLayer> 
-                {
+                Tilesets = [new() { FirstGid = 0, Source = tileset.Filename }],
+                Layers =
+                [
                     BuildStampLayer(1, "Underlay", block.Width, block.Height, MapTile.ToInts(block.Tiles, false)),
                     BuildStampLayer(2, "Overlay", block.Width, block.Height, MapTile.ToInts(block.Tiles, true))
-                }
+                ]
             }
         });
     }
@@ -181,8 +178,8 @@ public class VariationMap
     [JsonPropertyName("tileheight")] public int TileHeight { get; set; }
     [JsonPropertyName("nextlayerid")] public int NextLayerId { get; set; }
     [JsonPropertyName("nextobjectid")] public int NextObjectId { get; set; }
-    [JsonPropertyName("layers")] public List<VariationLayer> Layers { get; set; } = new();
-    [JsonPropertyName("tilesets")] public List<VariationTileset> Tilesets { get; set; } = new();
+    [JsonPropertyName("layers")] public List<VariationLayer> Layers { get; set; } = [];
+    [JsonPropertyName("tilesets")] public List<VariationTileset> Tilesets { get; set; } = [];
 
     [JsonPropertyName("type")] public string Type { get; set; } = "map";
     [JsonPropertyName("compressionlevel")] public int Compressionlevel { get; set; } = -1;

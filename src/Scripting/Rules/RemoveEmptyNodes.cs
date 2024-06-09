@@ -55,9 +55,9 @@ public static class RemoveEmptyNodes
             {
                 // If it was a sequence of all empty nodes, emit a single empty node
                 // so the next iteration will take care of it
-                0 => UAEmit.Empty(),
+                0 => Emit.Empty(),
                 1 => result[0],
-                _ => UAEmit.Seq(result.ToArray())
+                _ => Emit.Seq(result.ToArray())
             };
         }
     }

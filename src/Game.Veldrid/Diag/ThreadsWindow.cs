@@ -1,5 +1,4 @@
-﻿using System;
-using ImGuiNET;
+﻿using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid;
 
@@ -9,7 +8,7 @@ public class ThreadsWindow : Component, IImGuiWindow
 {
 
     int _currentContextIndex;
-    string[] _contextNames = Array.Empty<string>();
+    string[] _contextNames = [];
 
     public string Name { get; }
     public ThreadsWindow(string name) => Name = name;

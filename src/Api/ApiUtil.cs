@@ -169,11 +169,11 @@ public static class ApiUtil
         };
     }
 
-    static readonly string[] NewLineChars = { "\r\n", "\r", "\n" };
+    static readonly string[] NewLineChars = ["\r\n", "\r", "\n"];
 
     public static string[] SplitLines(string s, StringSplitOptions options = StringSplitOptions.RemoveEmptyEntries)
         => s?.Split(NewLineChars, options)
-           ?? Array.Empty<string>();
+           ?? [];
 
     public static int IndexOfIgnoreCase(IList<string> list, string str)
     {

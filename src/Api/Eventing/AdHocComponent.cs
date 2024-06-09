@@ -31,7 +31,7 @@ public class AdHocComponent : Component
     {
         readonly AdHocComponent _this;
         public Helper(AdHocComponent adhoc) => _this = adhoc;
-        public object Context => Component.Context;
+        public object ThreadContext => Context;
         public EventExchange Exchange => _this.Exchange;
         public IReadOnlyList<IComponent> Children => _this.Children;
         public T Resolve<T>() => _this.Resolve<T>();
@@ -51,7 +51,7 @@ public class AdHocComponent : Component
         public T AttachChild<T>(T child) where T : IComponent => _this.AttachChild(child);
         public void RemoveAllChildren() => _this.RemoveAllChildren();
         public void RemoveChild(IComponent child) => _this.RemoveChild(child);
-        public T Var<T>(IVar<T> varInfo) => _this.ReadVar<T>(varInfo);
+        public T Var<T>(IVar<T> varInfo) => _this.ReadVar(varInfo);
         public void Verbose(string msg) => _this.Verbose(msg);
         public void Info(string msg) => _this.Info(msg);
         public void Warn(string msg) => _this.Warn(msg);

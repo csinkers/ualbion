@@ -10,7 +10,7 @@ static class AutoJumpMap
     const byte MapHeight = 80;
     public static Dictionary<AssetId, object> Build(Map mapId, Map targetId, int x, int y, TestTilemap tileset1)
     {
-        if (tileset1 == null) throw new ArgumentNullException(nameof(tileset1));
+        ArgumentNullException.ThrowIfNull(tileset1);
 
         var builder = new MapBuilder2D(mapId, Constants.Palette1Id, tileset1, MapWidth, MapHeight);
         builder.DrawBorder();

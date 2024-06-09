@@ -16,14 +16,14 @@ public class SliderThumb : UiElement
 
     public SliderThumb(Func<int> getter, Func<int, string> format = null)
     {
-        On<HoverEvent>(_ => _frame.State = ButtonState.Hover);
-        On<BlurEvent>(_ => _frame.State = ButtonState.Normal);
-
         _getter = getter;
         _format = format;
         _text = new SimpleText("").Center();
         _frame = new ButtonFrame(_text) { Theme = ButtonTheme.SliderThumb };
         AttachChild(_frame);
+
+        On<HoverEvent>(_ => _frame.State = ButtonState.Hover);
+        On<BlurEvent>(_ => _frame.State = ButtonState.Normal);
     }
 
     public ButtonState State { get => _frame.State; set => _frame.State = value; }

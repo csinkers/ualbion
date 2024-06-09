@@ -21,7 +21,7 @@ public static class AutomapMapping
         ArgumentNullException.ThrowIfNull(map);
 
         if (map.Automap == null || map.Automap.Count == 0 || map.AutomapGraphics == null)
-            return Enumerable.Empty<ObjectGroup>();
+            return [];
 
         int nextId = nextObjectId;
         int npcGroupId = nextObjectGroupId++;
@@ -49,12 +49,12 @@ public static class AutomapMapping
             Type = ObjectGroupMapping.TypeName.Marker,
             X = marker.X * tileWidth,
             Y = marker.Y * tileHeight,
-            Properties = new List<TiledProperty>
-            {
+            Properties =
+            [
                 new(Prop.Visual, tile.ToString()),
                 new(Prop.Unk2, marker.Unk2.ToString()),
                 new(Prop.Unk3, marker.MarkerId.ToString())
-            }
+            ]
         };
 
     public static (AutomapInfo, byte) ParseMarker(MapObject obj, int tileWidth, int tileHeight)

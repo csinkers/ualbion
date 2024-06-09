@@ -2,8 +2,8 @@
 
 public static class Cube
 {
-    public static readonly Vertex3DTextured[] Vertices = 
-    { // Unit cube centred on the middle of the bottom face. Up axis = Y.
+    public static readonly Vertex3DTextured[] Vertices =
+    [ // Unit cube centred on the middle of the bottom face. Up axis = Y.
         // Floor (facing inward)
         new (-0.5f, -0.5f,  0.5f, 0.0f, 1.0f), //  0 Bottom Front Left
         new ( 0.5f, -0.5f,  0.5f, 1.0f, 1.0f), //  1 Bottom Front Right
@@ -38,16 +38,16 @@ public static class Cube
         new ( 0.5f,  0.5f, -0.5f, 0.0f, 0.0f), // 20 Front Top Right
         new ( 0.5f,  0.5f,  0.5f, 1.0f, 0.0f), // 21 Back Top Right
         new ( 0.5f, -0.5f, -0.5f, 0.0f, 1.0f), // 22 Front Bottom Right
-        new ( 0.5f, -0.5f,  0.5f, 1.0f, 1.0f), // 23 Back Bottom Right
-    };
+        new ( 0.5f, -0.5f,  0.5f, 1.0f, 1.0f) // 23 Back Bottom Right
+    ];
 
     public static readonly ushort[] Indices =
-    {
+    [
         0,  1,  2,  2,  1,  3, // Floor
         6,  5,  4,  7,  5,  6, // Ceiling
         8,  9, 10, 10,  9, 11, // Back
         12, 13, 14, 14, 13, 15, // Front
         16, 17, 18, 18, 17, 19, // Left
-        20, 21, 22, 22, 21, 23, // Right
-    };
+        20, 21, 22, 22, 21, 23 // Right
+    ];
 }

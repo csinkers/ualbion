@@ -32,14 +32,14 @@ public class LoopLoweringVisitor : BaseAstBuilderVisitor
             negated = true;
         }
 
-        return UAEmit.Cfg(new ControlFlowGraph(new[]
+        return Emit.Cfg(new ControlFlowGraph(new[]
             {
-                UAEmit.Empty(), // 0
-                UAEmit.Label(headLabel), // 1
+                Emit.Empty(), // 0
+                Emit.Label(headLabel), // 1
                 body, // 2
                 condition, // 3
-                UAEmit.Label(tailLabel), // 4
-                UAEmit.Empty() // 5
+                Emit.Label(tailLabel), // 4
+                Emit.Empty() // 5
             },
             new[]
             {
@@ -73,14 +73,14 @@ public class LoopLoweringVisitor : BaseAstBuilderVisitor
             negated = true;
         }
 
-        return UAEmit.Cfg(new ControlFlowGraph(new[]
+        return Emit.Cfg(new ControlFlowGraph(new[]
             {
-                UAEmit.Empty(), // 0
-                UAEmit.Label(headLabel), // 1
+                Emit.Empty(), // 0
+                Emit.Label(headLabel), // 1
                 condition, // 2
                 body, // 3
-                UAEmit.Label(tailLabel), // 4
-                UAEmit.Empty() // 5
+                Emit.Label(tailLabel), // 4
+                Emit.Empty() // 5
             },
             new[]
             {
@@ -106,13 +106,13 @@ public class LoopLoweringVisitor : BaseAstBuilderVisitor
         _tailStack.Pop();
         _headStack.Pop();
 
-        return UAEmit.Cfg(new ControlFlowGraph(new[]
+        return Emit.Cfg(new ControlFlowGraph(new[]
             {
-                UAEmit.Empty(), // 0
-                UAEmit.Label(headLabel), // 1
+                Emit.Empty(), // 0
+                Emit.Label(headLabel), // 1
                 body, // 2
-                UAEmit.Label(tailLabel), // 3
-                UAEmit.Empty() // 4
+                Emit.Label(tailLabel), // 3
+                Emit.Empty() // 4
             },
             new[]
             {
@@ -127,13 +127,13 @@ public class LoopLoweringVisitor : BaseAstBuilderVisitor
     {
         if (_headStack.Count == 0)
             throw new InvalidOperationException("Break statement detected outside of a loop");
-        return UAEmit.Goto(_tailStack.Peek());
+        return Emit.Goto(_tailStack.Peek());
     }
 
     protected override ICfgNode Build(ContinueStatement continueStatement)
     {
         if (_headStack.Count == 0)
             throw new InvalidOperationException("Continue statement detected outside of a loop");
-        return UAEmit.Goto(_headStack.Peek());
+        return Emit.Goto(_headStack.Peek());
     }
 }

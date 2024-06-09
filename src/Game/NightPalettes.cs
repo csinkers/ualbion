@@ -6,18 +6,18 @@ namespace UAlbion.Game;
 public static class NightPalettes // TODO: Load from config / asset instead
 {
     static readonly object SyncRoot = new();
-    static readonly Dictionary<PaletteId, PaletteId> _mapping = new();
+    static readonly Dictionary<PaletteId, PaletteId> Mapping = new();
 
     public static bool TryGetValue(PaletteId dayPaletteId, out PaletteId nightPaletteId)
     {
         lock (SyncRoot)
-            return _mapping.TryGetValue(dayPaletteId, out nightPaletteId);
+            return Mapping.TryGetValue(dayPaletteId, out nightPaletteId);
     }
 
     public static void Map(PaletteId dayPaletteId, PaletteId nightPaletteId)
     {
         lock (SyncRoot)
-            _mapping[dayPaletteId] = nightPaletteId;
+            Mapping[dayPaletteId] = nightPaletteId;
     }
 
     static NightPalettes()

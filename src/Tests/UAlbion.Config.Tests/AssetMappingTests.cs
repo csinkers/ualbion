@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using UAlbion.Api;
@@ -8,8 +9,10 @@ using Xunit.Abstractions;
 
 namespace UAlbion.Config.Tests;
 
+[SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
 public class AssetMappingTests : Component
 {
+    // ReSharper disable UnusedMember.Local
     static readonly IJsonUtil JsonUtil = new JsonUtil();
     readonly ITestOutputHelper _output;
     enum ZeroBasedByte : byte { Zero = 0, One, Two }
@@ -17,6 +20,7 @@ public class AssetMappingTests : Component
     enum ZeroBasedShort : ushort { Zero = 0, One, Two }
     enum GapByteZero : byte { Zero = 0, One, Foo255 = 255 }
     enum GapByteOne : byte { One = 1, Two, Foo255 = 255 }
+    // ReSharper restore UnusedMember.Local
 
     public AssetMappingTests(ITestOutputHelper output)
     {

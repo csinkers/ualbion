@@ -34,7 +34,7 @@ public abstract class AudioBuffer : AudioObject, IDisposable
         if (_disposed)
             return;
 
-        AL10.alDeleteBuffers(1, new[] { Buffer });
+        AL10.alDeleteBuffers(1, [Buffer]);
         Check();
         _disposed = true;
     }

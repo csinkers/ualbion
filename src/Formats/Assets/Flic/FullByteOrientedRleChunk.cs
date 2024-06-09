@@ -24,7 +24,6 @@ sealed class FullByteOrientedRleChunk : FlicChunk
     {
         ArgumentNullException.ThrowIfNull(s);
 
-        var startOfLine = s.Offset;
         int x = 0;
         while (x < _width)
         {
@@ -57,7 +56,6 @@ sealed class FullByteOrientedRleChunk : FlicChunk
     protected override uint LoadChunk(uint length, ISerializer s)
     {
         ArgumentNullException.ThrowIfNull(s);
-        var start = s.Offset;
         int i = 0;
         for (int y = 0; y < _height; y++)
         {

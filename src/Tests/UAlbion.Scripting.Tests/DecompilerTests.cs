@@ -14,7 +14,7 @@ public class DecompilerTests
     static readonly string ResultsDir = Path.Combine(TestUtil.FindBasePath(), "re", "DecompilerTests");
     static void TestSimplify(ControlFlowGraph graph, string expected, [CallerMemberName] string method = null)
     {
-        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        ArgumentNullException.ThrowIfNull(graph);
         var steps = new List<(string, IGraph)> { ("Initial", graph) };
         var resultsDir = !string.IsNullOrEmpty(method) ? Path.Combine(ResultsDir, method) : ResultsDir;
 
@@ -120,39 +120,39 @@ public class DecompilerTests
     [Fact]
     public void ConvertWhileTest() =>
         LoopConversionTest("while (!(1)) { }, 2",
-            UAEmit.Seq(
-                UAEmit.Loop(
-                    UAEmit.If(
-                        UAEmit.Statement(UAEmit.Const(1)),
-                        UAEmit.Break())),
-                UAEmit.Statement(UAEmit.Const(2))));
+            Emit.Seq(
+                Emit.Loop(
+                    Emit.If(
+                        Emit.Statement(Emit.Const(1)),
+                        Emit.Break())),
+                Emit.Statement(Emit.Const(2))));
 
     [Fact]
     public void ConvertDoTest() =>
         LoopConversionTest("do { 1 } while (!(2)), 3",
-            UAEmit.Seq(
-                UAEmit.Loop(
-                    UAEmit.Seq(
-                        UAEmit.Statement(UAEmit.Const(1)),
-                        UAEmit.If(
-                            UAEmit.Statement(UAEmit.Const(2)),
-                            UAEmit.Break()))
+            Emit.Seq(
+                Emit.Loop(
+                    Emit.Seq(
+                        Emit.Statement(Emit.Const(1)),
+                        Emit.If(
+                            Emit.Statement(Emit.Const(2)),
+                            Emit.Break()))
                 ),
-                UAEmit.Statement(UAEmit.Const(3))));
+                Emit.Statement(Emit.Const(3))));
 
     [Fact]
     public void ConvertWhileWithTerminalBreakTest() =>
         LoopConversionTest("while (!(1)) { if (2) { break } }, 3",
-            UAEmit.Seq(
-                UAEmit.Loop(
-                    UAEmit.Seq(
-                        UAEmit.If(
-                            UAEmit.Statement(UAEmit.Const(1)),
-                            UAEmit.Break()),
-                        UAEmit.If(
-                            UAEmit.Statement(UAEmit.Const(2)),
-                            UAEmit.Break()))),
-                UAEmit.Statement(UAEmit.Const(3))));
+            Emit.Seq(
+                Emit.Loop(
+                    Emit.Seq(
+                        Emit.If(
+                            Emit.Statement(Emit.Const(1)),
+                            Emit.Break()),
+                        Emit.If(
+                            Emit.Statement(Emit.Const(2)),
+                            Emit.Break()))),
+                Emit.Statement(Emit.Const(3))));
 
     [Fact] public void SimpleWhileTest() => TestSimplify(TestGraphs.SimpleWhileLoop, "while (1) { }"); 
     [Fact] public void WhileTest() => TestSimplify(TestGraphs.WhileLoop, "while (1) { 2 }"); 

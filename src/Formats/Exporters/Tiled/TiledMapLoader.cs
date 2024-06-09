@@ -130,13 +130,13 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
         var contentsPattern = context.GetProperty(TiledContentsPattern);
 
         if (floorPattern.IsEmpty || ceilingPattern.IsEmpty || wallPattern.IsEmpty || contentsPattern.IsEmpty)
-            return (Array.Empty<byte>(), null);
+            return ([], null);
 
         var labInfo = destModApplier.GetAssetInfo(map.LabDataId);
         if (labInfo == null)
         {
             Error($"Could not load asset info for lab {map.LabDataId} in map {map.Id}");
-            return (Array.Empty<byte>(), null);
+            return ([], null);
         }
 
         var assetPath = new AssetPath(map.LabDataId, 0, labInfo.PaletteId.Id);

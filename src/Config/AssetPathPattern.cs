@@ -202,8 +202,8 @@ public class AssetPathPattern
         var pframeGroup = m.Groups["PFrame"];
         int id = idGroup.Success ? int.Parse(idGroup.Value) : -1;
         int subAsset = subAssetGroup.Success ? int.Parse(subAssetGroup.Value) : 0;
-        int? paletteId = paletteGroup.Success ? (int?)int.Parse(paletteGroup.Value) : null;
-        int? paletteFrame = pframeGroup.Success ? (int?)int.Parse(pframeGroup.Value) : null;
+        int? paletteId = paletteGroup.Success ? int.Parse(paletteGroup.Value) : null;
+        int? paletteFrame = pframeGroup.Success ? int.Parse(pframeGroup.Value) : null;
 
         path = new AssetPath(new AssetId(type, id), subAsset, paletteId, m.Groups["Name"].Value, paletteFrame);
         return true;

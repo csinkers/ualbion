@@ -44,8 +44,8 @@ public class InventoryConverter : JsonConverter<Inventory>
             var slotKey = reader.GetString();
             if (int.TryParse(slotKey, out var numId))
                 slotId = (ItemSlotId)numId;
-            else if (Enum.TryParse(typeof(ItemSlotId), slotKey, true, out var enumId) && enumId != null)
-                slotId = (ItemSlotId)enumId;
+            else if (Enum.TryParse<ItemSlotId>(slotKey, true, out var enumId))
+                slotId = enumId;
             else
                 throw new JsonException($"Could not parse inventory slot name \"{slotKey}\" as a numerical or named slot id");
 

@@ -68,7 +68,7 @@ public static class FormatUtil
 
     public static byte[] HexStringToBytes(string s)
     {
-        if (string.IsNullOrEmpty(s)) return Array.Empty<byte>();
+        if (string.IsNullOrEmpty(s)) return [];
         if ((s.Length & 1) == 1)
             throw new FormatException("Hex string did not consist of an even number of characters");
 

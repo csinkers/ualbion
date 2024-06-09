@@ -11,7 +11,7 @@ public class MapNpc // 0xA = 10 bytes
 {
     public const int SizeOnDisk = 10;
     public const int WaypointCount = 0x480;
-    public static MapNpc Unused => new() { Waypoints = new[] { new NpcWaypoint(0, 0) } };
+    public static MapNpc Unused => new() { Waypoints = [new NpcWaypoint(0, 0)] };
 
     MapNpcFlags _raw;
     public AssetId Id { get; set; } // MonsterGroup, Npc etc
@@ -135,7 +135,7 @@ public class MapNpc // 0xA = 10 bytes
             byte y = wp?.Y ?? 0;
             x = s.UInt8("X", x);
             y = s.UInt8("Y", y);
-            Waypoints = new[] { new NpcWaypoint(x, y) };
+            Waypoints = [new NpcWaypoint(x, y)];
         }
     }
 

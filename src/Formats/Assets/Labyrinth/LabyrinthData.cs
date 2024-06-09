@@ -68,7 +68,7 @@ public class LabyrinthData
     public int FrameCountForObjectGroup(int i) =>
         (int)ApiUtil.Lcm(
             ObjectGroups[i].SubObjects
-                .Where(x => x is { ObjectInfoNumber: >= 0 } && x.ObjectInfoNumber < Objects.Count)
+                .Where(x => x != null && x.ObjectInfoNumber < Objects.Count)
                 .Select(x => (long)Objects[x.ObjectInfoNumber].FrameCount));
 
     public static LabyrinthData Serdes(LabyrinthData d, AssetId id, AssetMapping mapping, ISerializer s)

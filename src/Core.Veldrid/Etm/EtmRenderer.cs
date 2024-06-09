@@ -16,7 +16,7 @@ public sealed class EtmRenderer : Component, IRenderer, IDisposable
     readonly EtmPipeline _normalPipeline;
     readonly EtmPipeline _nonCullingPipeline;
 
-    public Type[] HandledTypes { get; } = { typeof(EtmWindow) };
+    public Type[] HandledTypes { get; } = [typeof(EtmWindow)];
 
     public EtmRenderer(in OutputDescription outputFormat)
     {
@@ -116,7 +116,7 @@ sealed partial class EtmFragmentShader : IFragmentShader { }
 
 #pragma warning disable CA1815 // Override equals and operator equals on value types
 [StructLayout(LayoutKind.Sequential)]
-public partial struct DungeonTileMapProperties : IUniformFormat
+public struct DungeonTileMapProperties : IUniformFormat
 {
     [Uniform("uScale")]            	public Vector4 Scale { get; set; }
     [Uniform("uRotation")]         	public Vector4 Rotation { get; set; }

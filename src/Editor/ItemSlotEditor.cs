@@ -11,8 +11,8 @@ namespace UAlbion.Editor;
 
 public class ItemSlotEditor : AssetEditor
 {
-    static readonly string[] _itemNames;
-    static readonly IDictionary<ItemId, int> _itemNameIndexLookup;
+    static readonly string[] ItemNames;
+    static readonly IDictionary<ItemId, int> ItemNameIndexLookup;
     readonly ItemSlot _slot;
 
     // TODO: Nice visual editor with icons etc
@@ -26,12 +26,12 @@ public class ItemSlotEditor : AssetEditor
                 .Select((x,i) => (x.Item1, i, x.Item2))
                 .ToArray();
 
-        _itemNames = new[] { "Empty" }.Concat(itemIdInfo.Select(x => x.Item3)).ToArray();
-        _itemNameIndexLookup = itemIdInfo.ToDictionary(x => x.Item1, x => x.i + 1);
+        ItemNames = new[] { "Empty" }.Concat(itemIdInfo.Select(x => x.Item3)).ToArray();
+        ItemNameIndexLookup = itemIdInfo.ToDictionary(x => x.Item1, x => x.i + 1);
     }
 
-    static int IndexForItemId(ItemId? x) => x == null ? 0 : _itemNameIndexLookup[x.Value];
-    static ItemId ItemIdForIndex(int x) => x == 0 ? ItemId.None : Enum.Parse<Base.Item>(_itemNames[x]); // TODO: Proper item id support
+    static int IndexForItemId(ItemId? x) => x == null ? 0 : ItemNameIndexLookup[x.Value];
+    static ItemId ItemIdForIndex(int x) => x == 0 ? ItemId.None : Enum.Parse<Base.Item>(ItemNames[x]); // TODO: Proper item id support
 
     public ItemSlotEditor(ItemSlot slot) : base(slot)
     {
@@ -42,7 +42,7 @@ public class ItemSlotEditor : AssetEditor
     {
         int index = IndexForItemId(_slot.Item);
         int oldIndex = index;
-        ImGui.Combo(_slot.Id.Slot.ToString(), ref index, _itemNames, _itemNames.Length);
+        ImGui.Combo(_slot.Id.Slot.ToString(), ref index, ItemNames, ItemNames.Length);
         if (index != oldIndex)
         {
             var assetId = Resolve<IEditorAssetManager>().GetIdForAsset(Asset);

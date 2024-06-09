@@ -77,7 +77,8 @@ public static class Constants
     public const byte CGrey15 = (byte)CommonColor.Grey15;
     public const byte CMidGrey = (byte)CommonColor.MidGrey;
 
-    public static readonly byte[] CRainbowLoop = {
+    public static readonly byte[] CRainbowLoop =
+    [
         (byte)CommonColor.Flesh1,
         (byte)CommonColor.Flesh2,
         (byte)CommonColor.Flesh3,
@@ -85,10 +86,11 @@ public static class Constants
         (byte)CommonColor.Flesh5,
         (byte)CommonColor.Flesh6,
         (byte)CommonColor.Flesh7,
-        (byte)CommonColor.Flesh8,
-    };
+        (byte)CommonColor.Flesh8
+    ];
 
-    static readonly uint[] RawPalette = {
+    static readonly uint[] RawPalette =
+    [
         0000000000, 4279176967, 4279966479, 4280755987, 4281807647, 4282597159, 4283648819, 4284438331,
         4285489991, 4286279507, 4287067999, 4288119659, 4288647035, 4289436555, 4290226075, 4290754479,
         4279176975, 4279966491, 4280756007, 4281545523, 4282335039, 4283124555, 4283914071, 4284703587,
@@ -122,7 +124,7 @@ public static class Constants
         4287609827, 4284979139, 4283135915, 4281555855, 4280238967, 4279185243, 4278655807, 4278194987,
         4278192919, 4278915871, 4279442207, 4280230695, 4280757035, 4281545523, 4282071867, 4282598211,
         4282862411, 4283126615, 4283915103, 4284441447, 4285230963, 4286020475, 4287335303, 4284699483
-    };
+    ];
 
     public static TextureBuilder<byte> T16(IAssetId? id) => TextureBuilder.Create<byte>(id, TileWidth, TileHeight);
     public static TextureBuilder<byte> T64(IAssetId? id) => TextureBuilder.Create<byte>(id, 64, 64);
@@ -148,7 +150,7 @@ public static class Constants
             func(i, j);
     }
 
-    public static NpcWaypoint[] NpcPos(byte x, byte y) => new NpcWaypoint[] { new(x, y) };
+    public static NpcWaypoint[] NpcPos(byte x, byte y) => [new(x, y)];
     public static NpcWaypoint[] BuildPatrolPath(int x0, int y0)
     {
         var waypoints = new NpcWaypoint[MapNpc.WaypointCount];

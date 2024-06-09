@@ -11,27 +11,27 @@ namespace UAlbion.Benchmarks
 {
     public class Blitting
     {
-        const int N = 1000;
         const int Dimensions = 256;
-        static readonly IPalette _palette = new MockPalette();
-        static readonly ITexture _black = new SimpleTexture<byte>(AssetId.None, 
+        static readonly IPalette Palette = new MockPalette();
+        static readonly ITexture Black = new SimpleTexture<byte>(AssetId.None, 
                 "Black",
                 Dimensions,
                 Dimensions,
                 Enumerable.Repeat((byte)0, Dimensions * Dimensions).ToArray(),
                 new[] { new Region(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
 
-        static readonly ITexture _white = new SimpleTexture<byte>(AssetId.None, 
+        static readonly ITexture White = new SimpleTexture<byte>(AssetId.None, 
                 "Black",
                 Dimensions,
                 Dimensions,
                 Enumerable.Repeat((byte)255, Dimensions * Dimensions).ToArray(),
                 new[] { new Region(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
 
-        readonly CompositedTexture _opaqueUniform = new(AssetId.None, "OpaqueUniform", _palette);
-        readonly CompositedTexture _opaqueRandom = new(AssetId.None, "OpaqueRandom", _palette);
-        readonly CompositedTexture _transparentUniform = new(AssetId.None, "TransparentUniform", _palette);
-        readonly CompositedTexture _transparentRandom = new(AssetId.None, "TransparentRandom", _palette);
+        readonly CompositedTexture _opaqueUniform = new(AssetId.None, "OpaqueUniform", Palette);
+        readonly CompositedTexture _opaqueRandom = new(AssetId.None, "OpaqueRandom", Palette);
+        readonly CompositedTexture _transparentUniform = new(AssetId.None, "TransparentUniform", Palette);
+        readonly CompositedTexture _transparentRandom = new(AssetId.None, "TransparentRandom", Palette);
+
         public Blitting()
         {
             var r = new Random();
@@ -44,15 +44,15 @@ namespace UAlbion.Benchmarks
                 randomBuffer,
                 new[] { new Region(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
 
-            _opaqueRandom.AddTexture(1, _black, 0, 0, null, false);
+            _opaqueRandom.AddTexture(1, Black, 0, 0, null, false);
             _opaqueRandom.AddTexture(1, random, Dimensions / 4, Dimensions / 4, null, false, Dimensions / 2, Dimensions / 2);
-            _opaqueUniform.AddTexture(1, _black, 0, 0, null, false);
-            _opaqueUniform.AddTexture(1, _white, Dimensions / 4, Dimensions / 4, null, false, Dimensions / 2, Dimensions / 2);
+            _opaqueUniform.AddTexture(1, Black, 0, 0, null, false);
+            _opaqueUniform.AddTexture(1, White, Dimensions / 4, Dimensions / 4, null, false, Dimensions / 2, Dimensions / 2);
 
-            _transparentRandom.AddTexture(1, _black, 0, 0, null, false);
+            _transparentRandom.AddTexture(1, Black, 0, 0, null, false);
             _transparentRandom.AddTexture(1, random, Dimensions / 4, Dimensions / 4, 0, true, Dimensions / 2, Dimensions / 2, 128);
-            _transparentUniform.AddTexture(1, _black, 0, 0, null, false);
-            _transparentUniform.AddTexture(1, _white, Dimensions / 4, Dimensions / 4, 0, true, Dimensions / 2, Dimensions / 2, 128);
+            _transparentUniform.AddTexture(1, Black, 0, 0, null, false);
+            _transparentUniform.AddTexture(1, White, Dimensions / 4, Dimensions / 4, 0, true, Dimensions / 2, Dimensions / 2, 128);
         }
 
         [Benchmark]

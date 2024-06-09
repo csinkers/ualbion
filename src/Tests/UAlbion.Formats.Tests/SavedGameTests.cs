@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using SerdesNet;
@@ -12,6 +13,7 @@ using Xunit;
 
 namespace UAlbion.Formats.Tests;
 
+[SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
 public class SavedGameTests
 {
     static void RoundTrip(string file)

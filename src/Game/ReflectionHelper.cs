@@ -16,8 +16,9 @@ public static class ReflectionHelper
         var types = new List<Type>();
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
-            if (!assembly.FullName.Contains("Albion", StringComparison.OrdinalIgnoreCase))
+            if (!(assembly.FullName ?? "").Contains("Albion", StringComparison.OrdinalIgnoreCase))
                 continue;
+
             Type[] assemblyTypes;
             try
             {

@@ -21,11 +21,11 @@ public class Tileset
     [XmlElement("tileoffset", Order = 1)] public TileOffset Offset { get; set; }
     [XmlElement("grid", Order = 2)] public TiledGrid Grid { get; set; }
     [XmlElement("image", Order = 3)] public TilesetImage Image { get; set; }
-    [XmlArray("terraintypes", Order = 4)] [XmlArrayItem("terrain")] public List<TerrainType> TerrainTypes { get; } = new();
+    [XmlArray("terraintypes", Order = 4)] [XmlArrayItem("terrain")] public List<TerrainType> TerrainTypes { get; } = [];
     [XmlIgnore] public bool TerrainTypesSpecified => TerrainTypes is { Count: > 0 };
     [XmlElement("tile", Order = 5)] public List<Tile> Tiles { get; set; }
     [XmlIgnore] public bool TilesSpecified => Tiles is { Count: > 0 };
-    [XmlArray("wangsets", Order = 6)] [XmlArrayItem("wangset")] public List<WangSet> WangSets { get; } = new();
+    [XmlArray("wangsets", Order = 6)] [XmlArrayItem("wangset")] public List<WangSet> WangSets { get; } = [];
     [XmlIgnore] public bool WangSetsSpecified => WangSets is { Count: > 0 };
 
     [XmlAttribute("margin")] public int Margin { get; set; }
@@ -66,23 +66,23 @@ public class Tileset
         test.TerrainTypes.Add(new TerrainType { Name = "Road", IndexTile = 301 });
 
         test.Tiles.Add(new Tile { Id = 8, Terrain = "0,0,0,0" });
-        test.Tiles.Add(new Tile { Id = 216, Frames = new List<TileFrame> { F(216, 180), F(217, 180), F(218, 180) } });
+        test.Tiles.Add(new Tile { Id = 216, Frames = [F(216, 180), F(217, 180), F(218, 180)] });
 
         test.WangSets.Add(new WangSet
         {
-            Corners = new List<WangCorner>
-            {
+            Corners =
+            [
                 new() { Name = "", Color = "#ff0000", Tile = -1, Probability = 1 },
                 new() { Name = "", Color = "#00ff00", Tile = -1, Probability = 1 },
-                new() { Name = "", Color = "#0000ff", Tile = -1, Probability = 1 },
-            },
-            Tiles = new List<WangTile>
-            {
+                new() { Name = "", Color = "#0000ff", Tile = -1, Probability = 1 }
+            ],
+            Tiles =
+            [
                 W(8, "0x20202020"),
                 W(9, "0x20202020"),
                 W(10, "0x20202020"),
-                W(11, "0x20202020"),
-            }
+                W(11, "0x20202020")
+            ]
         });
 
         return test;

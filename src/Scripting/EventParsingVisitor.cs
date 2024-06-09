@@ -25,7 +25,7 @@ public class EventParsingVisitor : BaseAstBuilderVisitor
         if (e == null)
             throw new InvalidOperationException($"Could not parse \"{formatted}\" as an event: {error}");
 
-        return UAEmit.Event(e, _nextEventId++);
+        return Emit.Event(e, _nextEventId++);
     }
 
     protected override ICfgNode Build(Name name)
@@ -36,6 +36,6 @@ public class EventParsingVisitor : BaseAstBuilderVisitor
         if (e == null)
             throw new InvalidOperationException($"Could not parse \"{name.Value}\" as an event: {error}");
 
-        return UAEmit.Event(e, _nextEventId++);
+        return Emit.Event(e, _nextEventId++);
     }
 }

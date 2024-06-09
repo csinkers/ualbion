@@ -21,11 +21,11 @@ public sealed class AssetLoaderRegistry : ServiceComponent<IAssetLoaderRegistry>
     {
         ArgumentNullException.ThrowIfNull(loaderType);
 
-        var constructor = loaderType.GetConstructor(Array.Empty<Type>());
+        var constructor = loaderType.GetConstructor([]);
         if(constructor == null)
             throw new InvalidOperationException($"Could not find parameterless constructor for loader type \"{loaderType}\"");
 
-        var loader = (IAssetLoader)constructor.Invoke(Array.Empty<object>());
+        var loader = (IAssetLoader)constructor.Invoke([]);
 
         if (loader is IComponent component)
             AttachChild(component);

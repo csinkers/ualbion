@@ -85,7 +85,7 @@ public class GenericTreeNode<T>
         foreach (GenericTreeNode<T> child in Children)
         {
             if (equalityFunc(child.Value, value))
-                return new List<T> { child.Value };
+                return [child.Value];
 
             var result = child.FindPath(value, equalityFunc);
             if (result != null)

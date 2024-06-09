@@ -65,7 +65,7 @@ public class SyncQueryHandler<TEvent, TResult> : Handler, ISyncQueryHandler<TRes
     public override string ToString() => $"HQ<{Component.GetType().Name}, {Type.Name}>";
 }
 
-public class ReceiveOnlyHandler<TEvent> : Handler, ISyncHandler, IAsyncHandler where TEvent : IEvent
+public class ReceiveOnlyHandler<TEvent> : Handler, ISyncHandler where TEvent : IEvent
 {
     public override bool ShouldSubscribe => false;
     Action<TEvent> Callback { get; }

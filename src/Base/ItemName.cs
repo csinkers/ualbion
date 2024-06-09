@@ -323,7 +323,7 @@ public enum ItemName : ushort
     Wrench5 = 319,
     Screwdriver3 = 320,
     HandConsole = 321,
-    PDA = 322,
+    Pda = 322,
     Screwdriver4 = 323,
     Pliers4 = 324,
     SilverTorque = 325,

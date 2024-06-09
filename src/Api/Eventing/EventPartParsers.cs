@@ -14,13 +14,13 @@ public class EventPartParsers
 
     public EventPartParsers()
     {
-        _parsers[typeof(bool)]    =   typeof(bool).GetMethod("Parse", new[] { typeof(string) });
-        _parsers[typeof(byte)]    =   typeof(byte).GetMethod("Parse", new[] { typeof(string) });
-        _parsers[typeof(ushort)]  = typeof(ushort).GetMethod("Parse", new[] { typeof(string) });
-        _parsers[typeof(short)]   =  typeof(short).GetMethod("Parse", new[] { typeof(string) });
-        _parsers[typeof(int)]     =    typeof(int).GetMethod("Parse", new[] { typeof(string) });
-        _parsers[typeof(uint)]    =   typeof(uint).GetMethod("Parse", new[] { typeof(string) });
-        _parsers[typeof(float)]   =  typeof(float).GetMethod("Parse", new[] { typeof(string) });
+        _parsers[typeof(bool)]    =   typeof(bool).GetMethod("Parse", [typeof(string)]);
+        _parsers[typeof(byte)]    =   typeof(byte).GetMethod("Parse", [typeof(string)]);
+        _parsers[typeof(ushort)]  = typeof(ushort).GetMethod("Parse", [typeof(string)]);
+        _parsers[typeof(short)]   =  typeof(short).GetMethod("Parse", [typeof(string)]);
+        _parsers[typeof(int)]     =    typeof(int).GetMethod("Parse", [typeof(string)]);
+        _parsers[typeof(uint)]    =   typeof(uint).GetMethod("Parse", [typeof(string)]);
+        _parsers[typeof(float)]   =  typeof(float).GetMethod("Parse", [typeof(string)]);
     }
 
     public void AddParser(Type type, MethodInfo method)
@@ -77,6 +77,7 @@ public class EventPartParsers
     }
 
     // Methods called via reflection
+    // ReSharper disable UnusedMember.Local
 #pragma warning disable IDE0051 // Remove unused private members
     static T ParseEnum<T>(string s) => (T)Enum.Parse(typeof(T), s, true);
     static T? ParseNullableEnum<T>(string s) where T : struct, Enum => string.IsNullOrEmpty(s) ? null : (T?)Enum.Parse(typeof(T), s, true);
@@ -112,4 +113,5 @@ public class EventPartParsers
         }
     }
 #pragma warning restore IDE0051 // Remove unused private members
+    // ReSharper restore UnusedMember.Local
 }

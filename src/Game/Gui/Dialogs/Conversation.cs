@@ -60,13 +60,12 @@ public class Conversation : GameComponent
     }
 
     (IText, BlockId?, BlockId)[] BuildStandardOptions() =>
-        new[]
-        {
-            (_tf.Format(Base.SystemText.Dialog_WhatsYourProfession), (BlockId?)BlockId.Profession, BlockId.Profession),
+    [
+        (_tf.Format(Base.SystemText.Dialog_WhatsYourProfession), (BlockId?)BlockId.Profession, BlockId.Profession),
             (_tf.Format(Base.SystemText.Dialog_WhatDoYouKnowAbout), BlockId.QueryWord, BlockId.QueryWord),
             (_tf.Format(Base.SystemText.Dialog_WhatDoYouKnowAboutThisItem), BlockId.QueryItem, BlockId.QueryItem),
             (_tf.Format(Base.SystemText.Dialog_ItsBeenNiceTalkingToYou), BlockId.Farewell, BlockId.Farewell)
-        };
+    ];
 
     public async AlbionTask Run()
     {
@@ -138,15 +137,15 @@ public class Conversation : GameComponent
                     return true;
                 }
 
+            /* TODO
             default:
-                /* TODO
                  await TriggerAction(
                     ActionType.DialogueLine,
                     (byte)blockId,
                     new AssetId(AssetType.PromptNumber, textId));
-                */
 
                 break;
+            */
         }
 
         return false;

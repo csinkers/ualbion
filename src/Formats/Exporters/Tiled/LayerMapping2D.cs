@@ -31,11 +31,13 @@ public static class LayerMapping2D
 
         var underlayId = nextLayerId++;
         var overlayId = nextLayerId++;
-        return new()
-        {
-            BuildLayer(encoding, underlayId, LayerName.Underlay, map.Width, map.Height, TilesToInts(map.Tiles, tileset, false)),
-            BuildLayer(encoding, overlayId, LayerName.Overlay, map.Width, map.Height, TilesToInts(map.Tiles, tileset, true))
-        };
+        return
+        [
+            BuildLayer(encoding, underlayId, LayerName.Underlay, map.Width, map.Height,
+                TilesToInts(map.Tiles, tileset, false)),
+            BuildLayer(encoding, overlayId, LayerName.Overlay, map.Width, map.Height,
+                TilesToInts(map.Tiles, tileset, true))
+        ];
     }
 
     static TiledMapLayer BuildLayer(UncompressedCsvTileEncoding encoding, int id, string name, int width, int height, int[] data)

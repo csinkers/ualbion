@@ -8,10 +8,10 @@ public class DecompilationResult
 {
     public DecompilationResult()
         : this(string.Empty,
-            Array.Empty<ScriptPart>(),
-            Array.Empty<EventRegion>(),
+            [],
+            [],
             new Dictionary<int, int>(),
-            Array.Empty<ICfgNode>())
+            [])
     {
     }
 

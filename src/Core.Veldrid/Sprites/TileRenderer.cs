@@ -11,13 +11,13 @@ namespace UAlbion.Core.Veldrid.Sprites;
 
 public sealed class TileRenderer : Component, IRenderer, IDisposable
 {
-    public Type[] HandledTypes { get; } = { typeof(TileLayerRenderable) };
-    static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
+    public Type[] HandledTypes { get; } = [typeof(TileLayerRenderable)];
+    static readonly ushort[] Indices = [0, 1, 2, 2, 1, 3];
     static readonly Vertex2D[] Vertices =
-    {
+    [
         new(0.0f, 0.0f), new(1.0f, 0.0f),
-        new(0.0f, 1.0f), new(1.0f, 1.0f),
-    };
+        new(0.0f, 1.0f), new(1.0f, 1.0f)
+    ];
 
     readonly TilePipeline _pipeline;
     readonly MultiBuffer<Vertex2D> _vertexBuffer;
@@ -226,8 +226,13 @@ internal struct TilesetUniform : IUniformFormat // Length must be multiple of 16
     [Uniform("uTileWorldSize")] public Vector2 TileWorldSize { get; set; } // 8 bytes
     [Uniform("uTileUvSize")] public Vector2 TileUvSize { get; set; } // 8 bytes
     [Uniform("uTilesetFlags", EnumPrefix = "TSF")] public GpuTilesetFlags Flags { get; set; } // 4 byte
+
+    // ReSharper disable InconsistentNaming
+    // ReSharper disable UnusedMember.Local
     [Uniform("uPad1")] uint _Pad1 { get; set; } // 4 bytes
     [Uniform("uPad2")] Vector2 _Pad2 { get; set; } // 8 bytes
+    // ReSharper restore UnusedMember.Local
+    // ReSharper restore InconsistentNaming
 }
 
 [StructLayout(LayoutKind.Sequential)]

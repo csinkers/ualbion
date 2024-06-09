@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Flic;
@@ -38,7 +37,7 @@ class Program
             // break;
         }
     }
-
+/*
     static IEnumerable<byte[]> FrameGenerator(int width, int height)
     {
         byte[] frame = new byte[width * height * 3];
@@ -48,4 +47,5 @@ class Program
             yield return frame;
         }
     }
+*/
 }

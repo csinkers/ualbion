@@ -64,7 +64,7 @@ public static class TestUtil
             return false;
         }
 
-        var nodes = graph.GetDfsOrder().Select(x => graph.Nodes[x]);
+        var nodes = graph.GetDfsOrder().Select(x => graph.Nodes[x]).ToArray();
         return CompareNodesVsScript(nodes, expected, out message);
     }
 
@@ -78,9 +78,9 @@ public static class TestUtil
         return builder.Build();
     }
 
-    public static bool CompareNodesVsScript(IEnumerable<ICfgNode> nodes, string expected, out string message)
+    public static bool CompareNodesVsScript(IList<ICfgNode> nodes, string expected, out string message)
     {
-        if (nodes == null) throw new ArgumentNullException(nameof(nodes));
+        ArgumentNullException.ThrowIfNull(nodes);
         var compact = FormatScript(nodes, false);
         var pretty = FormatScript(nodes, true);
 
@@ -192,6 +192,7 @@ public static class TestUtil
         if (steps == null)
             return;
 
+        resultsDir ??= ".";
         if (!Directory.Exists(resultsDir))
             Directory.CreateDirectory(resultsDir);
 

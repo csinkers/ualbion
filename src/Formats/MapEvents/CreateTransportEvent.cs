@@ -27,12 +27,12 @@ public class CreateTransportEvent : MapEvent
         e.Y = s.UInt8(nameof(Y), e.Y);
         e.Id = s.UInt8(nameof(Id), e.Id);
 
-        int zeroed = s.UInt8(null, 0);
-        zeroed += s.UInt8(null, 0);
+        s.UInt8(null, 0);
+        s.UInt8(null, 0);
 
         e.MapId = MapId.SerdesU16(nameof(MapId), e.MapId, mapping, s);
 
-        zeroed += s.UInt16(null, 0);
+        s.UInt16(null, 0);
         return e;
     }
 

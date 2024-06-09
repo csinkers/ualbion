@@ -18,20 +18,20 @@ public static class CoreUtil
 
     public static float[] GetFullScreenQuadVerts(bool isClipSpaceYInverted) =>
         isClipSpaceYInverted
-            ? new float[]
-            {
+            ?
+            [
                 -1, -1, 0, 0,
                 1, -1, 1, 0,
                 1,  1, 1, 1,
                 -1,  1, 0, 1
-            }
-            : new float[]
-            {
+            ]
+            :
+            [
                 -1,  1, 0, 0,
                 1,  1, 1, 0,
                 1, -1, 1, 1,
                 -1, -1, 0, 1
-            };
+            ];
 
     public static ArrayTexture<T> BuildTransposedTexture<T>(IReadOnlyTexture<T> texture) where T : unmanaged
     {

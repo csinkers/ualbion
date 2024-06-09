@@ -21,11 +21,11 @@ public class PostProcessorRegistry : ServiceComponent<IAssetPostProcessorRegistr
 
     IAssetPostProcessor Instantiate(Type type)
     {
-        var constructor = type.GetConstructor(Array.Empty<Type>());
+        var constructor = type.GetConstructor([]);
         if(constructor == null)
             throw new InvalidOperationException($"Could not find parameterless constructor for post-processor type \"{type}\"");
 
-        var postProcessor = (IAssetPostProcessor)constructor.Invoke(Array.Empty<object>());
+        var postProcessor = (IAssetPostProcessor)constructor.Invoke([]);
 
         if (postProcessor is IComponent component)
             AttachChild(component);

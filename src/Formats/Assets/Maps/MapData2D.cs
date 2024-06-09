@@ -14,11 +14,11 @@ namespace UAlbion.Formats.Assets.Maps;
 public class MapData2D : BaseMapData
 {
     static readonly Base.Tileset[] OutdoorTilesets =
-    { // TODO: Pull from config or infer from other data
+    [ // TODO: Pull from config or infer from other data
         Base.Tileset.Outdoors,
         Base.Tileset.Outdoors2,
         Base.Tileset.Desert
-    };
+    ];
     public override MapType MapType => OutdoorTilesets.Any(x => x == TilesetId) ? MapType.TwoDOutdoors : MapType.TwoD;
     [JsonInclude] public byte Sound { get; set; }
     [JsonInclude] public TilesetId TilesetId { get; set; }
@@ -92,7 +92,7 @@ public class MapData2D : BaseMapData
         int expectedOffset = 10;
         ApiUtil.Assert(s.Offset - startOffset == expectedOffset, $"Map2D: Expected offset after header to be {expectedOffset:x}, but it was {s.Offset - startOffset:x}");
 
-        map.Npcs ??= new List<MapNpc>();
+        map.Npcs ??= [];
 
         int npcCount = (map.Flags & MapFlags.ExtraNpcs) != 0 ? 96 : 32;
         while (map.Npcs.Count < npcCount)

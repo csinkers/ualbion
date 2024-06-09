@@ -15,7 +15,7 @@ public static class FlagTestMap
     static int Pos(int x, int y) => y * MapWidth + x;
     public static Dictionary<AssetId, object> Build(MapId mapId, TestTilemap tileset1)
     {
-        if (tileset1 == null) throw new ArgumentNullException(nameof(tileset1));
+        ArgumentNullException.ThrowIfNull(tileset1);
 
         var assets = new Dictionary<AssetId, object>();
         var builder = new MapBuilder2D(mapId, Palette1Id, tileset1, MapWidth, MapHeight);
@@ -35,6 +35,7 @@ public static class FlagTestMap
 }} else {{
     {scriptBuilder(s)}
 }}";
+
                 for (var index = 0; index < name.Length; index++)
                 {
                     var c = name[index];

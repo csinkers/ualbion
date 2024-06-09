@@ -7,7 +7,7 @@ namespace UAlbion.Core.Visual;
 
 #pragma warning disable CA1051 // Do not declare visible instance fields
 [SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Not comparable")]
-public partial struct BlendedSpriteInfo
+public struct BlendedSpriteInfo
 {
     public override string ToString() => $"SID {Position}:{Size} ({Flags & ~SpriteFlags.DebugMask}) Z:{DebugZ}";
 

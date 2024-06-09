@@ -53,7 +53,7 @@ public class EditorAsset : Component
                 var constructor = itemType.GetConstructors().FirstOrDefault(x => x.GetParameters().Length == 0);
                 if (constructor == null)
                     throw new InvalidOperationException($"Tried to add a new instance of type {itemType} to the collection {collectionName} on {_asset} of type {assetType} which does not have a parameterless public constructor");
-                var newInstance = constructor.Invoke(Array.Empty<object>());
+                var newInstance = constructor.Invoke([]);
 
                 if(collection == null)
                     throw new InvalidOperationException($"Tried to add a new instance of type {itemType} to the collection {collectionName} on {_asset} of type {assetType}, but the collection is null or of non-IList type");

@@ -16,14 +16,14 @@ public sealed class SpriteRenderer : Component, IRenderer, IDisposable
     readonly SpritePipeline _pipeline;
     readonly SpritePipeline _noCullPipeline;
 
-    static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
+    static readonly ushort[] Indices = [0, 1, 2, 2, 1, 3];
     static readonly Vertex2DTextured[] Vertices =
-    {
+    [
         new(-0.5f, 0.0f, 0.0f, 0.0f), new(0.5f, 0.0f, 1.0f, 0.0f),
-        new(-0.5f, 1.0f, 0.0f, 1.0f), new(0.5f, 1.0f, 1.0f, 1.0f),
-    };
+        new(-0.5f, 1.0f, 0.0f, 1.0f), new(0.5f, 1.0f, 1.0f, 1.0f)
+    ];
 
-    public Type[] HandledTypes { get; } = { typeof(VeldridSpriteBatch<SpriteInfo, GpuSpriteInstanceData>) };
+    public Type[] HandledTypes { get; } = [typeof(VeldridSpriteBatch<SpriteInfo, GpuSpriteInstanceData>)];
 
     public SpriteRenderer(in OutputDescription outputFormat)
     {
@@ -147,6 +147,7 @@ internal struct SpriteUniform  : IUniformFormat // Length must be multiple of 16
 {
     [Uniform("uTexSize")] public Vector2 TextureSize { get; set; } // 8 bytes
     [Uniform("uFlags", EnumPrefix = "SKF")] public SpriteKeyFlags Flags { get; set; } // 4 bytes
+    // ReSharper disable once UnusedMember.Local
     [Uniform("_pad1")] uint Padding { get; set; } // 4 bytes
 }
 

@@ -28,7 +28,7 @@ public static class ConfigUtil
         return result;
     }
 
-    static readonly char[] OneSlash = { '/' };
+    static readonly char[] OneSlash = ['/'];
     public static string GetRelativePath(string path, string curDir, bool useForwardSlash)
     {
         ArgumentNullException.ThrowIfNull(path);

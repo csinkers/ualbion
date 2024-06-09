@@ -50,6 +50,5 @@ public sealed class MainPassResourceProvider : Component, IResourceProvider, IDi
     {
         _passSet?.Dispose();
         _cameraUniform?.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

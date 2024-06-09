@@ -50,17 +50,23 @@ public class SingleHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 
     static void Write(IReadOnlyTexture<byte> existing, ISerializer s)
     {
-        var distinctSizes = existing.Regions.Select(x => (x.Width, x.Height)).Distinct();
-        if (distinctSizes.Count() > 1)
+        if (existing.Regions.Count == 0)
+            throw new InvalidOperationException("Tried to write SingleHeader sprite without any regions");
+
+        ushort width = (ushort)existing.Regions[0].Width;
+        ushort height = (ushort)existing.Regions[0].Height;
+        var frameCount = (byte)existing.Regions.Count;
+
+        foreach (var region in existing.Regions)
         {
+            if (region.Width == width && region.Height == height)
+                continue;
+
+            var distinctSizes = existing.Regions.Select(x => (x.Width, x.Height)).Distinct();
             var parts = distinctSizes.Select(x => $"({x.Width}, {x.Height})");
             var joined = string.Join(", ", parts);
             throw new InvalidOperationException($"Tried to a write an image with non-uniform frames to a single-header sprite (sizes: {joined})");
         }
-
-        var width = (ushort)existing.Regions[0].Width;
-        var height = (ushort)existing.Regions[0].Height;
-        var frameCount = (byte)existing.Regions.Count;
 
         s.UInt16("Width", width);
         s.UInt16("Height", height);

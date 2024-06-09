@@ -23,7 +23,7 @@ sealed class DumpJson : GameComponent, IAssetDumper
             var filename = Path.Combine(baseDir, "data", "exported", "json", name);
             var directory = Path.GetDirectoryName(filename);
 
-            if (!Directory.Exists(directory))
+            if (!Directory.Exists(directory) && !string.IsNullOrEmpty(directory))
                 Directory.CreateDirectory(directory);
 
             var stream = File.Open(filename, FileMode.Create);

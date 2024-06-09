@@ -5,8 +5,11 @@ namespace UAlbion.Tools.ExportFlic;
 
 static class AviImports
 {
+    // ReSharper disable InconsistentNaming
     public const int OF_WRITE = 0x1;
     public const int OF_CREATE = 0x1000;
+    // ReSharper restore InconsistentNaming
+
     public const uint StreamTypeVideo = 0x73646976; // "vids"
     public const uint StreamCompressor = 0x30357669; // "iv50"
 

@@ -30,7 +30,7 @@ public sealed class FullscreenQuad : Component, IRenderable, IDisposable
     public FullscreenQuad(string name,
         DrawLayer renderOrder,
         ITextureHolder source,
-        Vector4 normalisedDestWindowXYWH,
+        Vector4 normalisedDestWindowXywh,
         OutputDescription outputFormat)
     {
         Name = name;
@@ -39,7 +39,7 @@ public sealed class FullscreenQuad : Component, IRenderable, IDisposable
         OutputFormat = outputFormat;
         _uniform = new SingleBuffer<FullscreenQuadUniformInfo>(new FullscreenQuadUniformInfo
         {
-            uRect = normalisedDestWindowXYWH
+            uRect = normalisedDestWindowXywh
         }, BufferUsage.UniformBuffer);
 
         AttachChild(_uniform);
@@ -119,18 +119,18 @@ struct FullscreenQuadUniformInfo // Length must be multiple of 16
 #pragma warning restore 649
 public sealed class FullscreenQuadRenderer : Component, IRenderer, IDisposable
 {
-    static readonly ushort[] Indices = { 0, 1, 2, 2, 1, 3 };
+    static readonly ushort[] Indices = [0, 1, 2, 2, 1, 3];
     static readonly Vertex2DTextured[] Vertices =
-    {
+    [
         new (-1.0f, -1.0f, 0.0f, 0.0f), new (1.0f, -1.0f, 1.0f, 0.0f),
-        new (-1.0f, 1.0f, 0.0f, 1.0f), new (1.0f, 1.0f, 1.0f, 1.0f),
-    };
+        new (-1.0f, 1.0f, 0.0f, 1.0f), new (1.0f, 1.0f, 1.0f, 1.0f)
+    ];
 
     readonly Dictionary<OutputDescription, FullscreenQuadPipeline> _pipelines = new();
     readonly MultiBuffer<Vertex2DTextured> _vertexBuffer;
     readonly MultiBuffer<ushort> _indexBuffer;
 
-    public Type[] HandledTypes { get; } = { typeof(FullscreenQuad) };
+    public Type[] HandledTypes { get; } = [typeof(FullscreenQuad)];
 
     static FullscreenQuadPipeline BuildPipeline(OutputDescription outputDescription) 
         => new()

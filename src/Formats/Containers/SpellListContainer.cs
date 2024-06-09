@@ -14,7 +14,7 @@ namespace UAlbion.Formats.Containers;
 /// </summary>
 public class SpellListContainer : IAssetContainer
 {
-    static readonly byte[] Blank = { 0, 0, 0, 0, 0 };
+    static readonly byte[] Blank = [0, 0, 0, 0, 0];
     public ISerializer Read(string path, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);

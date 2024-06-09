@@ -63,22 +63,28 @@ public class MidLine : UiElement
         _lastSize = size;
         _dirty = false;
 
-        bool lockWasTaken = false;
-        var instances = _sprite.Lock(ref lockWasTaken);
-        try
+        if (_sprite != null)
         {
-            // Shrink by 1 pix from either end
-            var ink = Assets.LoadInk(_ink);
-            var region = Resolve<ICommonColors>().GetRegion(ink.PaletteLineColor);
-            var shadowOffset = window.UiToNormRelative(1, 1);
-            instances[0] = new SpriteInfo(SpriteFlags.TopLeft, position, size, region);
-            instances[1] = new SpriteInfo(
-                SpriteFlags.TopLeft | SpriteFlags.DropShadow,
-                position + new Vector3(shadowOffset, 0),
-                size,
-                region);
+            bool lockWasTaken = false;
+            var instances = _sprite.Lock(ref lockWasTaken);
+            try
+            {
+                // Shrink by 1 pix from either end
+                var ink = Assets.LoadInk(_ink);
+                var region = Resolve<ICommonColors>().GetRegion(ink.PaletteLineColor);
+                var shadowOffset = window.UiToNormRelative(1, 1);
+                instances[0] = new SpriteInfo(SpriteFlags.TopLeft, position, size, region);
+                instances[1] = new SpriteInfo(
+                    SpriteFlags.TopLeft | SpriteFlags.DropShadow,
+                    position + new Vector3(shadowOffset, 0),
+                    size,
+                    region);
+            }
+            finally
+            {
+                _sprite.Unlock(lockWasTaken);
+            }
         }
-        finally { _sprite.Unlock(lockWasTaken); }
 
         return order;
     }

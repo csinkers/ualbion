@@ -104,6 +104,5 @@ public sealed class TextureSource : ServiceComponent<ITextureSource>, ITextureSo
     {
         _simple?.Dispose();
         _array?.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

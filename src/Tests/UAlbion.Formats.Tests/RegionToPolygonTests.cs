@@ -221,9 +221,10 @@ public class RegionToPolygonTests
             (innerKey, ToInts(CrashSite2))
         };
 
-        var preRegions = regions.Select(x => TriggerZoneBuilder.PrintRegion(x.points)).ToList();
+        // For debugging
+        // var preRegions = regions.Select(x => TriggerZoneBuilder.PrintRegion(x.points)).ToList();
         TriggerZoneBuilder.RemoveVoids(regions);
-        var postRegions = regions.Select(x => TriggerZoneBuilder.PrintRegion(x.points)).ToList();
+        // var postRegions = regions.Select(x => TriggerZoneBuilder.PrintRegion(x.points)).ToList();
 
         Assert.Equal(4, regions.Count);
         var outerRegions = regions.Where(x => x.key == outerKey);

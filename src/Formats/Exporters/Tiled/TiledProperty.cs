@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Xml.Serialization;
 
 namespace UAlbion.Formats.Exporters.Tiled;
@@ -25,7 +26,7 @@ public class TiledProperty
     public TiledProperty(string key, float value)
     {
         Name = key;
-        Value = value.ToString();
+        Value = value.ToString(CultureInfo.InvariantCulture);
         Type = TiledPropertyType.Float;
     }
 

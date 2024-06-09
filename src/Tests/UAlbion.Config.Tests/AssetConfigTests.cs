@@ -233,8 +233,9 @@ public class AssetConfigTests : Component
 }
 ";
 
-    TypeConfig TypeConfig { get; }
+    // ReSharper disable once UnusedAutoPropertyAccessor.Local
     AssetConfig AssetConfig { get; }
+    TypeConfig TypeConfig { get; }
 
     public AssetConfigTests()
     {

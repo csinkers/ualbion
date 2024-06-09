@@ -32,20 +32,17 @@ public class ContainerRegistry : ServiceComponent<IContainerRegistry>, IContaine
 
     IAssetContainer GetContainer(Type type)
     {
-        if (type == null)
-            throw new InvalidOperationException($"Could not find container type \"{type}\"");
-
         lock (_syncRoot)
             return _containers.TryGetValue(type, out var container) ? container : Instantiate(type);
     }
 
     IAssetContainer Instantiate(Type type)
     {
-        var constructor = type.GetConstructor(Array.Empty<Type>());
+        var constructor = type.GetConstructor([]);
         if (constructor == null)
             throw new InvalidOperationException($"Could not find parameterless constructor for container type \"{type}\"");
 
-        var container = (IAssetContainer)constructor.Invoke(Array.Empty<object>());
+        var container = (IAssetContainer)constructor.Invoke([]);
 
         // Can uncomment if we ever end up needing this
         // if (container is IComponent component)

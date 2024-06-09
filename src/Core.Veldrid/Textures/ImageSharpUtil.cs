@@ -50,7 +50,7 @@ public static class ImageSharpUtil
         for (var i = 0; i < frameCount; i++)
         {
             var frame = getFrame(i);
-            var (toX, toY, toLayer) = layout.Positions[i];
+            var (toX, toY, _) = layout.Positions[i];
             var target = pixels[(toX + toY * layout.Width)..];
             var to = new ImageBuffer<uint>(frame.Width, frame.Height, layout.Width, target);
             BlitUtil.BlitTiled8To32(frame, to, palette, 255, 0);

@@ -6,7 +6,7 @@ namespace UAlbion.Game.Gui;
 
 /// <summary>
 /// Abstract base class providing reasonable defaults for the methods
-/// on IUiElement. By default the size will be that of the largest
+/// on IUiElement. By default, the size will be that of the largest
 /// child element, and when calculating layout the full extents
 /// will be passed through to each child.
 /// </summary>
@@ -83,7 +83,7 @@ public abstract class UiElement : GameComponent, IUiElement
         if (!extents.Contains((int)context.UiPosition.X, (int)context.UiPosition.Y))
             return order;
 
-        var maxOrder = DoLayout(extents, order, context, (x,y,z, context) => x.Selection(y, z, context));
+        var maxOrder = DoLayout(extents, order, context, static (x, y, z, context2) => x.Selection(y, z, context2));
         context.AddHit(order, this);
         return maxOrder;
     }

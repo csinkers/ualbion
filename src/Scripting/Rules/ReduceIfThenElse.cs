@@ -41,7 +41,7 @@ public static class ReduceIfThenElse
             if (after == head)
                 continue;
 
-            var newNode = UAEmit.IfElse(
+            var newNode = Emit.IfElse(
                 graph.Nodes[head],
                 graph.Nodes[left],
                 graph.Nodes[right]);

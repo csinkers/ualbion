@@ -60,7 +60,7 @@ public sealed class AssetConverter : IDisposable
 
         var baseDir = ConfigUtil.FindBasePath(disk);
         (_from, _fromExchange, _fromLoaderRegistry) = BuildModApplier(baseDir, appName, fromMods, disk, jsonUtil, mapping);
-        (_to, _toExchange, _toLoaderRegistry) = BuildModApplier(baseDir, appName, new[] { toMod }, disk, jsonUtil, mapping);
+        (_to, _toExchange, _toLoaderRegistry) = BuildModApplier(baseDir, appName, [toMod], disk, jsonUtil, mapping);
 
         // Give the "from" universe's asset manager "to" the to exchange so we can import the assets.
         _toExchange.Attach(new AssetManager(_from));
@@ -119,7 +119,7 @@ public sealed class AssetConverter : IDisposable
         foreach (var language in _from.Languages.Keys)
         {
             if (!fromAssets.IsStringDefined(languageSearchId.Value, language)) continue;
-            validLanguages ??= new List<string>();
+            validLanguages ??= [];
             validLanguages.Add(language);
         }
 

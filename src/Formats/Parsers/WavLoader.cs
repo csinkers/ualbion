@@ -20,7 +20,7 @@ public class WavLoader : IAssetLoader<ISample>
         ApiUtil.Assert(tag == "RIFF", "tag == 'RIFF'");
 
         var riffSizeOffset = s.Offset;
-        int fullSize = s.Int32("TotalSize", 0); // Dummy write to start with, will be overwritten at the end.
+        int _ = s.Int32("TotalSize", 0); // Dummy write to start with, will be overwritten at the end.
 
         tag = s.FixedLengthString(null, "WAVE",4);
         ApiUtil.Assert(tag == "WAVE", "tag == 'WAVE'");

@@ -85,7 +85,7 @@ public class EventRoundTripTests
         ms.Position = 0;
         return ms.ToArray();
     }
-
+/*
     static IMapEvent BytesToEvent(byte[] bytes)
     {
         using var ms = new MemoryStream(bytes);
@@ -93,6 +93,7 @@ public class EventRoundTripTests
         using var s = new AlbionReader(br);
         return MapEvent.SerdesEvent(null, s, AssetMapping.Global, MapType.Unknown);
     }
+*/
 
     static string Test(string scriptFormat, string expectedToStringResult, IMapEvent e)
     {

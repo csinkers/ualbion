@@ -76,7 +76,7 @@ public class WaveLibWavLoader : IAssetLoader<WaveLib>
         {
             var sample = existing.Samples[i];
             if (!sample.Active)
-                return (Array.Empty<byte>(), null);
+                return ([], null);
 
             string extension = Invariant($"i{sample.Instrument}t{sample.Type}");
             var pattern = context.GetProperty(AssetProps.Pattern, DefaultPattern);

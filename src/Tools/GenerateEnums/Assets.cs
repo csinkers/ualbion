@@ -19,7 +19,7 @@ public class Assets
 
     public Assets(string appName, IFileSystem disk, IJsonUtil jsonUtil, string assetIdJsonPath, string modName) // Everything in this class should be treated as read-only once the constructor finishes.
     {
-        if (disk == null) throw new ArgumentNullException(nameof(disk));
+        ArgumentNullException.ThrowIfNull(disk);
         BaseDir = ConfigUtil.FindBasePath(disk);
         var assetIdConfigPath = Path.Combine(BaseDir, assetIdJsonPath);
         var config = new PathResolver(BaseDir, appName);
@@ -184,7 +184,6 @@ public class Assets
                 e.Entries.Add(entry);
         }
     }
-    */
 
     static readonly char[] ForbiddenCharacters = { ' ', '\t', '-', '(', ')', ',', '?', '.', '"' };
     static string Sanitise(string x)
@@ -206,4 +205,5 @@ public class Assets
 
         return new string(chars.ToArray());
     }
+    */
 }

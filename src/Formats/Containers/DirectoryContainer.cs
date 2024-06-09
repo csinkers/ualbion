@@ -54,7 +54,7 @@ public class DirectoryContainer : IAssetContainer
             using var s = new AlbionWriter(bw);
             PackedChunks.PackNamed(s, subAssets.Keys.Max() + 1, i => 
                 !subAssets.TryGetValue(i, out var pathAndName)
-                    ? (Array.Empty<byte>(), null)
+                    ? ([], null)
                     : (context.Disk.ReadAllBytes(pathAndName.Item1), pathAndName.Item2));
         }
 

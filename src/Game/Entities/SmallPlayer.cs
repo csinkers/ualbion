@@ -16,14 +16,6 @@ public class SmallPlayer : Component
 
     public SmallPlayer(PartyMemberId charId, Func<(Vector3, int)> positionFunc, Vector3 tileSize, IContainer sceneObjects)
     {
-        On<FastClockEvent>(_ =>
-        {
-            //(_sprite.TilePosition, _sprite.Frame) = _positionFunc();
-            var (pos, frame) = _positionFunc();
-            _sprite.TilePosition = pos + new Vector3(0.0f, -1.0f, 0.0f); // TODO: Hacky, find a better way of fixing.
-            _sprite.Frame = frame;
-        });
-
         _id = charId;
         _positionFunc = positionFunc;
         _sprite = new MapSprite(
@@ -34,6 +26,14 @@ public class SmallPlayer : Component
             SpriteFlags.LeftAligned);
 
         sceneObjects.Add(_sprite);
+
+        On<FastClockEvent>(_ =>
+        {
+            //(_sprite.TilePosition, _sprite.Frame) = _positionFunc();
+            var (pos, frame) = _positionFunc();
+            _sprite.TilePosition = pos + new Vector3(0.0f, -1.0f, 0.0f); // TODO: Hacky, find a better way of fixing.
+            _sprite.Frame = frame;
+        });
     }
 
     public override string ToString() => $"SPlayer {_id}";

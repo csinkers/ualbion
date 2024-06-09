@@ -19,7 +19,9 @@ namespace UAlbion.Game.Veldrid.Assets;
 [SuppressMessage("", "CA2213")] // Analysis thinks disposable resources won't get cleaned up, but the manager, systems & passes will.
 public sealed class IsometricRenderSystem : GameComponent, IDisposable
 {
+    // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
     readonly RenderManager _manager;
+
     public RenderSystem OnScreen { get; }
     public RenderSystem OffScreen { get; }
     public IsometricBuilder Builder { get; }
@@ -91,6 +93,13 @@ public sealed class IsometricRenderSystem : GameComponent, IDisposable
 
     void AddHelpers()
     {
+        AttachChild(new SpriteSamplerSource());
+        AttachChild(new TextureSource());
+        AttachChild(new ResourceLayoutSource());
+        AttachChild(new VeldridCoreFactory(LoadMesh));
+        AttachChild(new SceneStack());
+        return;
+
         Mesh LoadMesh(MeshId id)
         {
             if (Assets.LoadMapObject((MapObjectId)id.Id) is not Mesh mesh)
@@ -98,12 +107,6 @@ public sealed class IsometricRenderSystem : GameComponent, IDisposable
 
             return mesh;
         }
-
-        AttachChild(new SpriteSamplerSource());
-        AttachChild(new TextureSource());
-        AttachChild(new ResourceLayoutSource());
-        AttachChild(new VeldridCoreFactory(LoadMesh));
-        AttachChild(new SceneStack());
     }
 
     public void Dispose()
@@ -111,8 +114,8 @@ public sealed class IsometricRenderSystem : GameComponent, IDisposable
         foreach(var child in Children)
             if (child is IDisposable disposable)
                 disposable.Dispose();
+
         RemoveAllChildren();
-        GC.SuppressFinalize(this);
     }
 }
 

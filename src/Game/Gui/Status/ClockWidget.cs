@@ -15,12 +15,12 @@ public class ClockWidget : Dialog
     static readonly (int, int) Size  = (31, 25);
     static readonly (int, int) DigitSize  = (5, 7);
     static readonly (int, int)[] Digits =
-    {
+    [
         ( 3, 10),
         ( 9, 10),
         (17, 10),
         (23, 10)
-    };
+    ];
 
     readonly UiSpriteElement[] _digits;
     DateTime _lastTime;
@@ -35,13 +35,13 @@ public class ClockWidget : Dialog
         });
 
         var face = new UiSpriteElement(Base.CoreGfx.Clock);
-        _digits = new[]
-        {
+        _digits =
+        [
             new UiSpriteElement(AssetId.None),
             new UiSpriteElement(AssetId.None),
             new UiSpriteElement(AssetId.None),
             new UiSpriteElement(AssetId.None)
-        };
+        ];
 
         var digitStack = new FixedPositionStacker()
             .Add(_digits[0], Digits[0].Item1, Digits[0].Item2, DigitSize.Item1, DigitSize.Item2)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ using Xunit;
 
 namespace UAlbion.TestCommon;
 
+[SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
 public static class Asset
 {
     static readonly XldContainer XldLoader = new();
@@ -172,7 +174,7 @@ public static class Asset
 
     public static string SaveJson(object asset, IJsonUtil jsonUtil)
     {
-        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        ArgumentNullException.ThrowIfNull(jsonUtil);
         using var stream = new MemoryStream();
         stream.Write(Encoding.UTF8.GetBytes(jsonUtil.Serialize(asset)));
         return ReadToEnd(stream);
@@ -180,7 +182,7 @@ public static class Asset
 
     public static T LoadJson<T>(string json, IJsonUtil jsonUtil)
     {
-        if (jsonUtil == null) throw new ArgumentNullException(nameof(jsonUtil));
+        ArgumentNullException.ThrowIfNull(jsonUtil);
         return jsonUtil.Deserialize<T>(Encoding.UTF8.GetBytes(json));
     }
 

@@ -77,24 +77,24 @@ public class CameraMotion2D : Component
                 0);
 
             var tilePosition = leader.GetPosition() + tileOffset;
-            var posXYZ = tilePosition * map.TileSize;
-            var curPosXY = new Vector2(_position.X, _position.Y);
-            var posXY = new Vector2(posXYZ.X, posXYZ.Y);
-            var len2 = (curPosXY - posXY).LengthSquared();
+            var posXyz = tilePosition * map.TileSize;
+            var curPosXy = new Vector2(_position.X, _position.Y);
+            var posXy = new Vector2(posXyz.X, posXyz.Y);
+            var len2 = (curPosXy - posXy).LengthSquared();
 
             if (len2 < 0.25f)
             {
                 if (len2 < 0.001f) // Stop updating the position if we're close enough
                     return;
 
-                _position = new Vector3(posXY, _position.Z);
+                _position = new Vector3(posXy, _position.Z);
             }
             else
             {
                 var lerpRate = ReadVar(V.Game.Visual.Camera2D.LerpRate);
                 _position = new Vector3(
-                    ApiUtil.Lerp(_position.X, posXY.X, lerpRate * e.DeltaSeconds),
-                    ApiUtil.Lerp(_position.Y, posXY.Y, lerpRate * e.DeltaSeconds),
+                    ApiUtil.Lerp(_position.X, posXy.X, lerpRate * e.DeltaSeconds),
+                    ApiUtil.Lerp(_position.Y, posXy.Y, lerpRate * e.DeltaSeconds),
                     map.BaseCameraHeight);
             }
         }

@@ -148,9 +148,9 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
         const string script = 
             @"!0?1:2: verb Examine
  1=>!: text 37 NoPortrait None ; ""The door to the house of the Hunter Clan. It is secured with a lock.""
-!2?3:!: door Door.HClan_HCK Item.HunterClanKey 100 32 33
+!2?3:!: door Door.HClan_HunterClanKey Item.HunterClanKey 100 32 33
 !3?4:!: result
- 4=>5: set_door_open Set Door.HClan_HCK
+ 4=>5: set_door_open Set Door.HClan_HunterClanKey
  5=>!: teleport Map.HunterClan 69 67 Unchanged 255 0";
 
         string expected = 
@@ -158,9 +158,9 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
 if (verb Examine) {
     text 37
 } else {
-    if (door Door.HClan_HCK Item.HunterClanKey 100 32 33) {
+    if (door Door.HClan_HunterClanKey Item.HunterClanKey 100 32 33) {
         if (result) {
-            set_door_open Set Door.HClan_HCK
+            set_door_open Set Door.HClan_HunterClanKey
             teleport Map.HunterClan 69 67 Unchanged 255 0
         }
     }

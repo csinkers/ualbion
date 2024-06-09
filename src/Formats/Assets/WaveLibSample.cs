@@ -7,8 +7,8 @@ namespace UAlbion.Formats.Assets;
 
 public class WaveLibSample : ISample
 {
-    static readonly int[] ExpectedTypes = { 56, 58, 60, 62, 63, 64, 66, 69, 76, 80 };
-    static readonly int[] ExpectedInstruments = { 119, 120, 121, 122, 123, 124, 125, 126, 127, -1 };
+    static readonly int[] ExpectedTypes = [56, 58, 60, 62, 63, 64, 66, 69, 76, 80];
+    static readonly int[] ExpectedInstruments = [119, 120, 121, 122, 123, 124, 125, 126, 127, -1];
 
     public const uint SizeInBytes = 32;
     public bool Active { get; set; }
@@ -18,7 +18,7 @@ public class WaveLibSample : ISample
     public int SampleRate { get; set; } = -1; // -1 = Use default sample rate (11025)
     public int Channels { get; set; } = 1;
     public int BytesPerSample { get; set; } = 1;
-    public byte[] Samples { get; set; } = Array.Empty<byte>();
+    public byte[] Samples { get; set; } = [];
 
     public override string ToString() => Active ? $"I:{Instrument} T:{Type} {Samples.Length} = {(MidiInstrument)Instrument}" : "None";
 

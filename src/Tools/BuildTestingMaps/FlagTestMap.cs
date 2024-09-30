@@ -56,6 +56,7 @@ public static class FlagTestMap
                 return "do_script " + scriptId.Id;
             }
 
+            // ReSharper disable once UselessBinaryOperation
             Add(1, n+1, "S0", "Set switch 0", s => @$"
     text {s("Setting switch 0")}
     switch 1 0

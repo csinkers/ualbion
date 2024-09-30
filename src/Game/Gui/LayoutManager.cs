@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Numerics;
-using System.Text;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
@@ -10,7 +9,6 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
-using static System.FormattableString;
 
 namespace UAlbion.Game.Gui;
 
@@ -150,6 +148,7 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
         return (x, y);
     }
 
+    /*
     void DumpLayout()
     {
         var root = GetLayout();
@@ -168,6 +167,7 @@ public class LayoutManager : ServiceComponent<ILayoutManager>, ILayoutManager
         Aux(root, 0);
         Info(sb.ToString());
     }
+    */
 
     void CaptureSnapshot()
     {

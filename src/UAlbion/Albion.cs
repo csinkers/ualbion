@@ -4,6 +4,7 @@ using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
+using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
@@ -200,6 +201,9 @@ static class Albion
         G.Instance.Attach(global); // Add convenience class that holds globals for debugging
 #endif
 #pragma warning restore CA2000 // Dispose objects before losing scope
+
+        if (commandLine.DebugMenus)
+            global.Enqueue(new ToggleDiagnosticsEvent(), null);
     }
 
     static void ConfigureMenus(EventExchange eventExchange)

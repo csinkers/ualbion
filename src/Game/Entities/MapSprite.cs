@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Ids;
@@ -10,6 +11,8 @@ namespace UAlbion.Game.Entities;
 public class MapSprite : Sprite
 {
     readonly Vector3 _tileSize;
+
+    [DiagEdit(Style = DiagEditStyle.TilePosition3D)]
     public Vector3 TilePosition
     {
         get => Position / _tileSize;

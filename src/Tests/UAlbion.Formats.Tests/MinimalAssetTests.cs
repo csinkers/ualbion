@@ -1,14 +1,8 @@
-﻿using Xunit;
-
-namespace UAlbion.Formats.Tests;
+﻿namespace UAlbion.Formats.Tests;
 
 public class MinimalAssetTests
 {
-    void Setup()
-    {
-        // TODO
-    }
-
+    /*
     [Fact] public void AutomapGfxTest() {}
     [Fact] public void BackgroundGfxTest() {}
     [Fact] public void BigNpcTest() {}
@@ -55,4 +49,5 @@ public class MinimalAssetTests
     [Fact] public void MapTextTest() {}
     [Fact] public void TextTest() {}
     [Fact] public void WordsTest() {}
+    */
 }

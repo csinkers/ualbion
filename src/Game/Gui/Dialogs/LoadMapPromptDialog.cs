@@ -34,11 +34,13 @@ public class LoadMapPromptDialog : ModalDialog // TODO: Use textbox
         AttachChild(new DialogFrame(stack) { Background = DialogFrameBackgroundStyle.MainMenuPattern });
     }
 
+    /*
     void Respond(int response)
     {
         Value = response;
         Close();
     }
+    */
 
     void Close()
     {

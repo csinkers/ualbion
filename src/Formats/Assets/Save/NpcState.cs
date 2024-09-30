@@ -74,7 +74,7 @@ public class NpcState : IMovementState
         npc.Unk58 = s.UInt16(nameof(Unk58), npc.Unk58);
         npc.GfxWidth = s.UInt16(nameof(GfxWidth), npc.GfxWidth);
         npc.GfxHeight = s.UInt16(nameof(GfxHeight), npc.GfxHeight);
-        npc.Unk5E_GfxRelated = s.UInt16(nameof(Unk5E_GfxRelated), npc.Unk5E_GfxRelated);
+        npc.Unk5EGfxRelated = s.UInt16(nameof(Unk5EGfxRelated), npc.Unk5EGfxRelated);
         npc.GfxAlloc = s.UInt32(nameof(GfxAlloc), npc.GfxAlloc);
         npc.Unk64 = s.UInt8(nameof(Unk64), npc.Unk64);
         npc.Unk65 = s.UInt8(nameof(Unk65), npc.Unk65);
@@ -138,7 +138,7 @@ public class NpcState : IMovementState
     public ushort Unk58 { get; set; }
     public ushort GfxWidth { get; set; }
     public ushort GfxHeight { get; set; }
-    public ushort Unk5E_GfxRelated { get; set; }
+    public ushort Unk5EGfxRelated { get; set; }
     public uint GfxAlloc { get; set; }
     public byte Unk64 { get; set; }
     public byte Unk65 { get; set; }

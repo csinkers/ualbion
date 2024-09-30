@@ -45,6 +45,8 @@ public class VisitedEvent
     }
 
     public override string ToString() => $"{Unk0} {EventSetId} {Type} {Argument}";
+
+    // ReSharper disable NonReadonlyMemberInGetHashCode
     public override int GetHashCode() =>
         (int)HashUtil.Fnv1A()
             .Combine(Unk0)
@@ -52,6 +54,7 @@ public class VisitedEvent
             .Combine((int)Type)
             .Combine(Argument.ToUInt32())
             .Hash;
+    // ReSharper restore NonReadonlyMemberInGetHashCode
 
     /*
      Logical to textual word id mapping clues:

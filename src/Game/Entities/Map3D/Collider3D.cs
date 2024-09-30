@@ -3,12 +3,8 @@ using UAlbion.Game.Entities.Map2D;
 
 namespace UAlbion.Game.Entities.Map3D;
 
-public class Collider3D : Component
+public class Collider3D(LogicalMap3D logicalMap) : Component
 {
-    readonly LogicalMap3D _logicalMap;
-
-    public Collider3D(LogicalMap3D logicalMap)
-    {
-        _logicalMap = logicalMap;
-    }
+    // ReSharper disable once UnusedMember.Local
+    readonly LogicalMap3D _logicalMap = logicalMap;
 }

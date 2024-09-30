@@ -56,6 +56,7 @@ public class Sprite : Component, IPositioned
         _textureLoaderFunc = textureLoaderFunc ?? DefaultLoader;
     }
 
+    [DiagEdit]
     public IAssetId Id
     {
         get => _id;
@@ -71,6 +72,7 @@ public class Sprite : Component, IPositioned
     public Func<object> SelectionCallback { get; init; }
     static Vector3 Normal => Vector3.UnitZ; // TODO
 
+    [DiagEdit(Style = DiagEditStyle.Position3D)]
     public Vector3 Position
     {
         get => _position;
@@ -84,9 +86,11 @@ public class Sprite : Component, IPositioned
                 Raise(_moveEvent);
         }
     }
+
     public Vector3 Dimensions => new(Size.X, Size.Y, Size.X);
     public int DebugZ => DepthUtil.DepthToLayer(Position.Z);
 
+    [DiagEdit(Style = DiagEditStyle.Size2D)]
     public Vector2 Size
     {
         get => _size ?? Vector2.One;
@@ -101,6 +105,7 @@ public class Sprite : Component, IPositioned
         }
     }
 
+    [DiagEdit(Style = DiagEditStyle.NumericSlider, Min = 0, MaxProperty = nameof(FrameCount))]
     public int Frame
     {
         get => _frame % FrameCount;

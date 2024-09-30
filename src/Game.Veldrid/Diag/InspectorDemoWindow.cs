@@ -28,6 +28,8 @@ public class InspectorDemoWindow : Component, IImGuiWindow
     }
 #pragma warning restore CA1711 // Identifiers should not have incorrect suffix
 
+#pragma warning disable CS0414 // Field is assigned but its value is never used
+    // ReSharper disable UnusedMember.Local
     sealed class TestObject
     {
         [DiagEdit(Style = DiagEditStyle.Checkboxes)] public bool BoolProp { get; set; }
@@ -38,10 +40,12 @@ public class InspectorDemoWindow : Component, IImGuiWindow
         [DiagEdit(Style = DiagEditStyle.NumericSlider, Min = -1, Max = 1)] public float FloatProp { get; set; }
         [DiagEdit(Style = DiagEditStyle.ColorPicker)] public Vector3 Vec3 { get; set; } = new(0.3f, 0.5f, 0.8f);
         [DiagEdit(Style = DiagEditStyle.ColorPicker)] public Vector4 Color { get; set; } = new(0, 0.5f, 1.0f, 1.0f);
-        [DiagEdit(Style=DiagEditStyle.Dropdown)] public SomeEnum SimpleEnum { get; set; } = SomeEnum.Second;
+        [DiagEdit(Style = DiagEditStyle.Dropdown)] public SomeEnum SimpleEnum { get; set; } = SomeEnum.Second;
         [DiagEdit(Style = DiagEditStyle.Checkboxes)] public SomeFlags FlagsEnum { get; set; } = SomeFlags.Two | SomeFlags.Four;
         [DiagEdit(Style = DiagEditStyle.Text, MaxLength = 32)] public string Text { get; set; } = "Foo";
     }
+    // ReSharper restore UnusedMember.Local
+#pragma warning restore CS0414 // Field is assigned but its value is never used
 
     readonly TestObject _testObject = new();
     public string Name { get; }

@@ -37,7 +37,7 @@ public class Battle : GameComponent, IReadOnlyBattle
             SpriteKeyFlags.NoTransform,
             SpriteFlags.LeftAligned)
         {
-            Position = new Vector3(-1.0f, 1.0f, 0),
+            Position = new Vector3(-1.0f, 1.0f, 1.0f),
             Size = new Vector2(2.0f, -2.0f)
         });
     }
@@ -57,6 +57,13 @@ public class Battle : GameComponent, IReadOnlyBattle
         }
 
         var group = Assets.LoadMonsterGroup(_groupId);
+        if (group == null)
+        {
+            Error($"Tried to start battle with group {_groupId}, but no such group was found.");
+            Enqueue(new EndCombatEvent(CombatResult.Victory));
+            return;
+        }
+
         for (int row = 0; row < SavedGame.CombatRowsForMobs; row++)
         {
             for (int column = 0; column < SavedGame.CombatColumns; column++)

@@ -163,5 +163,7 @@ public class EventNode : IEventNode, IEquatable<EventNode>
         return Equals((EventNode)obj);
     }
 
+    // ReSharper disable NonReadonlyMemberInGetHashCode
     public override int GetHashCode() => HashCode.Combine(Id, Event.GetHashCode(), Next?.Id);
+    // ReSharper restore NonReadonlyMemberInGetHashCode
 }

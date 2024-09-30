@@ -1,15 +1,27 @@
 ﻿using System;
+using UAlbion.Api.Eventing;
+
 namespace UAlbion.Formats.Assets;
 
 public class CombatAttributes : ICombatAttributes
 {
+    [DiagEdit(Style = DiagEditStyle.NumericInput, Min = 0)]
     public int ExperiencePoints { get; set; }
+
+    [DiagEdit(Style = DiagEditStyle.NumericInput, Min = 0)]
     public ushort TrainingPoints { get; set; }
+
     ICharacterAttribute ICombatAttributes.LifePoints => LifePoints;
+
+    [DiagEdit(Style = DiagEditStyle.CharacterAttribute)]
     public CharacterAttribute LifePoints { get; set; }
+
+    [DiagEdit(Style = DiagEditStyle.NumericInput, Min = 0)]
     public byte ActionPoints { get; set; }
     public ushort UnknownD6 { get; set; }
     public ushort UnknownD8 { get; set; }
+
+    [DiagEdit(Style = DiagEditStyle.Checkboxes)]
     public PlayerConditions Conditions { get; set; }
     public CombatAttributes DeepClone() => new CombatAttributes().CopyFrom(this);
     public CombatAttributes CopyFrom(CombatAttributes other)

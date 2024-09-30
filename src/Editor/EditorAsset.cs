@@ -75,7 +75,7 @@ public class EditorAsset : Component
 
     public bool Apply(IEditorEvent editorEvent)
     {
-        if (editorEvent == null) throw new ArgumentNullException(nameof(editorEvent));
+        ArgumentNullException.ThrowIfNull(editorEvent);
         switch (editorEvent)
         {
             case EditorSetPropertyEvent setProperty:

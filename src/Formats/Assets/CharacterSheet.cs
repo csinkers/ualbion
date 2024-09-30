@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using SerdesNet;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats.Ids;
 
@@ -59,11 +60,11 @@ public class CharacterSheet : ICharacterSheet
     public Gender Gender { get; set; }
     public PlayerRace Race { get; set; }
     public PlayerClass PlayerClass { get; set; }
-    public CharacterAttribute Age { get; set; }
-    public byte Level { get; set; }
+    [DiagEdit(Style = DiagEditStyle.CharacterAttribute)] public CharacterAttribute Age { get; set; }
+    [DiagEdit(Style = DiagEditStyle.NumericInput, Min = 0)] public byte Level { get; set; }
 
     // Display and behaviour
-    public PlayerLanguages Languages { get; set; }
+    [DiagEdit(Style = DiagEditStyle.Checkboxes)] public PlayerLanguages Languages { get; set; }
     public SpriteId SpriteId { get; set; }
     public SpriteId PortraitId { get; set; }
     public EventSetId EventSetId { get; set; }
@@ -86,16 +87,17 @@ public class CharacterSheet : ICharacterSheet
             _ => SpriteId.None
         };
 
-    public byte Morale { get; set; }
-    public byte SpellTypeImmunities { get; set; }
-    public ushort ExperienceReward { get; set; }
-    public ushort PartyDepartX { get; set; }
-    public ushort PartyDepartY { get; set; }
-    public MapId PartyDepartMapId { get; set; }
-    public ushort LevelsPerActionPoint { get; set; }
-    public ushort LifePointsPerLevel { get; set; }
-    public ushort SpellPointsPerLevel { get; set; }
-    public ushort TrainingPointsPerLevel { get; set; }
+    [DiagEdit(Style = DiagEditStyle.NumericInput)] public byte Morale { get; set; }
+    [DiagEdit(Style = DiagEditStyle.Checkboxes)] public SpellClasses SpellTypeImmunities { get; set; }
+    [DiagEdit(Style = DiagEditStyle.NumericInput)] public ushort ExperienceReward { get; set; }
+    [DiagEdit(Style = DiagEditStyle.NumericInput)] public ushort PartyDepartX { get; set; }
+    [DiagEdit(Style = DiagEditStyle.NumericInput)] public ushort PartyDepartY { get; set; }
+
+    [DiagEdit(Style = DiagEditStyle.IdPicker)] public MapId PartyDepartMapId { get; set; }
+    [DiagEdit(Style = DiagEditStyle.NumericInput)] public ushort LevelsPerActionPoint { get; set; }
+    [DiagEdit(Style = DiagEditStyle.NumericInput)] public ushort LifePointsPerLevel { get; set; }
+    [DiagEdit(Style = DiagEditStyle.NumericInput)] public ushort SpellPointsPerLevel { get; set; }
+    [DiagEdit(Style = DiagEditStyle.NumericInput)] public ushort TrainingPointsPerLevel { get; set; }
     public int Weight { get; set; }
 
     // Pending further reversing
@@ -212,7 +214,7 @@ public class CharacterSheet : ICharacterSheet
         sheet.UnknownE = s.UInt8(nameof(sheet.UnknownE), sheet.UnknownE);
 
         sheet.Morale = s.UInt8(nameof(sheet.Morale), sheet.Morale); // F [0..100]
-        sheet.SpellTypeImmunities = s.UInt8(nameof(sheet.SpellTypeImmunities), sheet.SpellTypeImmunities); // 10 spell type immunities? Always 0
+        sheet.SpellTypeImmunities = s.EnumU8(nameof(sheet.SpellTypeImmunities), sheet.SpellTypeImmunities); // 10 spell type immunities? Always 0
         sheet.Combat.ActionPoints = s.UInt8(nameof(sheet.Combat.ActionPoints), sheet.Combat.ActionPoints); // 11
         sheet.EventSetId = EventSetId.SerdesU16(nameof(sheet.EventSetId), sheet.EventSetId, mapping, s); // 12
         sheet.WordSetId = EventSetId.SerdesU16(nameof(sheet.WordSetId), sheet.WordSetId, mapping, s); // 14

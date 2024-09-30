@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
 
@@ -20,6 +21,7 @@ public sealed class PositionedSpriteBatch : IDisposable
     /// <summary>
     /// Position of the sprite batch in normalised device coordinates.
     /// </summary>
+    [DiagEdit(Style = DiagEditStyle.Position3D)]
     public Vector3 Position
     {
         get => _position;

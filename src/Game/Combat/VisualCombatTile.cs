@@ -11,13 +11,12 @@ namespace UAlbion.Game.Combat;
 
 public class VisualCombatTile : UiElement
 {
+    const int Width = 32;
+    const int Height = 24;
+    // const int SpriteHeight = 48;
+
     readonly int _tileIndex;
     readonly IReadOnlyBattle _battle;
-    const int Width = 32;
-#pragma warning disable CA1823 // Avoid unused private fields
-    const int Height = 24;
-    const int SpriteHeight = 48;
-#pragma warning restore CA1823 // Avoid unused private fields
     readonly UiSpriteElement _sprite;
     readonly Button _button;
 
@@ -77,6 +76,7 @@ public class VisualCombatTile : UiElement
     public bool Hoverable { get => _button.Hoverable; set => _button.Hoverable = value; }
     public bool SuppressNextDoubleClick { get => _button.SuppressNextDoubleClick; set => _button.SuppressNextDoubleClick = value; }
 
+    // ReSharper disable once UnusedParameter.Local
     static void Rebuild(in Rectangle extents)
     {
     }

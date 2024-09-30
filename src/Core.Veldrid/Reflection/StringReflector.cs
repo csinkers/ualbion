@@ -35,7 +35,7 @@ sealed class StringReflector : IReflector
                 }
             );
 
-            if (ImGui.InputText(name, buf, (uint)buf.Length))
+            if (ImGui.InputText("##" + name, buf, (uint)buf.Length))
             {
                 var str = ImGuiUtil.GetString(buf);
                 state.Meta.Setter(state, str);
@@ -50,42 +50,5 @@ sealed class StringReflector : IReflector
 
         ImGui.Unindent();
 
-    }
-}
-sealed class BoolReflector : IReflector
-{
-    BoolReflector() { }
-    public static BoolReflector Instance { get; } = new();
-
-    public void Reflect(in ReflectorState state)
-    {
-        var value = (bool)state.Target;
-        var description = ReflectorUtil.NameText(state);
-        ImGui.Indent();
-        ImGui.TextWrapped(description);
-        ImGui.SameLine();
-
-        if (state.Meta?.Options != null)
-        {
-            if (ImGui.Checkbox("##" + description, ref value))
-                state.Meta.Setter(state, value);
-        }
-        else
-            ImGui.TextWrapped(value.ToString());
-
-        ImGui.Unindent();
-    }
-}
-sealed class NullReflector : IReflector
-{
-    NullReflector() { }
-    public static NullReflector Instance { get; } = new();
-
-    public void Reflect(in ReflectorState state)
-    {
-        var description = ReflectorUtil.Describe(state, "null", "null");
-        ImGui.Indent();
-        ImGui.TextUnformatted(description);
-        ImGui.Unindent();
     }
 }

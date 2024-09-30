@@ -171,10 +171,11 @@ public class LogExchange : ILogExchange
     static void PrintHelp(StringBuilder sb, string pattern)
     {
         sb.AppendLine();
-        var metadata = EventSerializer.Instance.GetEventMetadata()
-            .FirstOrDefault(x => x.Name.Equals(pattern, StringComparison.OrdinalIgnoreCase)
-                                 || x.Aliases != null &&
-                                 x.Aliases.Any(y => y.Equals(pattern, StringComparison.OrdinalIgnoreCase)));
+        var metadata =
+            EventSerializer.Instance.GetEventMetadata()
+                .FirstOrDefault(x =>
+                    x.Name.Equals(pattern, StringComparison.OrdinalIgnoreCase)
+                    || x.Aliases != null && x.Aliases.Any(y => y.Equals(pattern, StringComparison.OrdinalIgnoreCase)));
 
         if (metadata != null)
         {
@@ -197,7 +198,7 @@ public class LogExchange : ILogExchange
                     .Distinct()
                     .ToList();
 
-            if (matchingEvents.Count == 0)
+            if (matchingEvents.Count != 0)
                 PrintHelpSummary(sb, matchingEvents);
             else
                 sb.AppendFormat("The command \"{0}\" is not recognised." + Environment.NewLine, pattern);

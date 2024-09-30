@@ -1,5 +1,6 @@
 ﻿namespace UAlbion.Formats.Assets;
 
+// ReSharper disable InconsistentNaming
 public enum MidiInstrument : byte
 {
     AcousticGrandPiano = 1,
@@ -131,3 +132,4 @@ public enum MidiInstrument : byte
     Applause = 127,
     Gunshot = 128,
 }
+// ReSharper restore InconsistentNaming

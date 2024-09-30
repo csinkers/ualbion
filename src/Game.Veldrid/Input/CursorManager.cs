@@ -38,7 +38,7 @@ public class CursorManager : GameServiceComponent<ICursorManager>, ICursorManage
     int _lastAmount;
     bool _dirty = true;
     bool _showCursor = true;
-    bool _relative;
+    // bool _relative;
     int _frame;
 
     public CursorManager()
@@ -48,7 +48,7 @@ public class CursorManager : GameServiceComponent<ICursorManager>, ICursorManage
         On<GameWindowResizedEvent>(_ => SetCursor(_cursorId));
         On<SetCursorEvent>(e => SetCursor(e.CursorId));
         On<ShowCursorEvent>(e => { _showCursor = e.Show; _dirty = true; });
-        On<SetRelativeMouseModeEvent>(e => _relative = e.Enabled);
+        // On<SetRelativeMouseModeEvent>(e => _relative = e.Enabled);
         On<SetHeldItemCursorEvent>(e =>
         {
             _heldItemId = e.Sprite;

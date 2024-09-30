@@ -65,7 +65,7 @@ public class EditorAssetManager : ServiceComponent<IEditorAssetManager>, IEditor
         return false;
     }
 
-    void Undo(IEditorEvent e)
+    void Undo(IEditorEvent _)
     {
         // Verify id is valid
         // Perform inverse of change

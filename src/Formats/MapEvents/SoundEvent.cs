@@ -62,29 +62,19 @@ public class SoundEvent : MapEvent, ISoundEvent
 }
 
 [Event("sound_effect", "Play a sound sample")] // USED IN SCRIPT
-public class SoundEffectEvent : Event, ISoundEvent
+public class SoundEffectEvent(
+    SampleId soundId,
+    byte volume,
+    byte restartProbability,
+    byte unk3,
+    ushort frequencyOverride,
+    SoundMode mode)
+    : Event, ISoundEvent
 {
-    SoundEffectEvent() { }
-    public SoundEffectEvent(
-        SampleId soundId,
-        byte volume,
-        byte restartProbability,
-        byte unk3,
-        ushort frequencyOverride,
-        SoundMode mode)
-    {
-        SoundId = soundId;
-        Volume = volume;
-        RestartProbability = restartProbability;
-        Unk3 = unk3;
-        FrequencyOverride = frequencyOverride;
-        Mode = mode;
-    }
-
-    [EventPart("sound")] public SampleId SoundId { get; } // [0..78], 153
-    [EventPart("vol")] public byte Volume { get; } // [0..150]
-    [EventPart("restart_prob")] public byte RestartProbability { get; } // [0..100]
-    [EventPart("unk3")] public byte Unk3 { get; } // [0..100] (multiples of 5)
-    [EventPart("freq")] public ushort FrequencyOverride { get; } // 0,8, [5..22]*1000
-    [EventPart("mode", true, SoundMode.GlobalOneShot)] public SoundMode Mode { get; }
+    [EventPart("sound")] public SampleId SoundId { get; } = soundId; // [0..78], 153
+    [EventPart("vol")] public byte Volume { get; } = volume; // [0..150]
+    [EventPart("restart_prob")] public byte RestartProbability { get; } = restartProbability; // [0..100]
+    [EventPart("unk3")] public byte Unk3 { get; } = unk3; // [0..100] (multiples of 5)
+    [EventPart("freq")] public ushort FrequencyOverride { get; } = frequencyOverride; // 0,8, [5..22]*1000
+    [EventPart("mode", true, SoundMode.GlobalOneShot)] public SoundMode Mode { get; } = mode;
 }

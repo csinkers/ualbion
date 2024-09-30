@@ -67,7 +67,7 @@ public static class ReflectorUtil
     {
         ArgumentNullException.ThrowIfNull(auxStateBuilder);
 
-        lock (AuxState)
+        lock (SyncRoot)
         {
             var result = AuxState.Get(state, type);
             if (result == null)

@@ -49,9 +49,11 @@ public static class Program
             (int)gd.MainSwapchain.Framebuffer.Height);
 
         var cl = gd.ResourceFactory.CreateCommandList();
+
+        var gd1 = gd;
         window.Resized += () =>
         {
-            gd.ResizeMainWindow((uint)window.Width, (uint)window.Height);
+            gd1.ResizeMainWindow((uint)window.Width, (uint)window.Height);
             imguiRenderer.WindowResized(window.Width, window.Height);
         };
 

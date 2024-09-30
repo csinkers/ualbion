@@ -27,6 +27,7 @@ public class PostProcessorRegistry : ServiceComponent<IAssetPostProcessorRegistr
 
         var postProcessor = (IAssetPostProcessor)constructor.Invoke([]);
 
+        // ReSharper disable once SuspiciousTypeConversion.Global
         if (postProcessor is IComponent component)
             AttachChild(component);
 

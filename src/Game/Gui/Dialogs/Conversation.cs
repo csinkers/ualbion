@@ -61,10 +61,10 @@ public class Conversation : GameComponent
 
     (IText, BlockId?, BlockId)[] BuildStandardOptions() =>
     [
-        (_tf.Format(Base.SystemText.Dialog_WhatsYourProfession), (BlockId?)BlockId.Profession, BlockId.Profession),
-            (_tf.Format(Base.SystemText.Dialog_WhatDoYouKnowAbout), BlockId.QueryWord, BlockId.QueryWord),
-            (_tf.Format(Base.SystemText.Dialog_WhatDoYouKnowAboutThisItem), BlockId.QueryItem, BlockId.QueryItem),
-            (_tf.Format(Base.SystemText.Dialog_ItsBeenNiceTalkingToYou), BlockId.Farewell, BlockId.Farewell)
+        (_tf.Format(Base.SystemText.Dialog_WhatsYourProfession), BlockId.Profession, BlockId.Profession),
+        (_tf.Format(Base.SystemText.Dialog_WhatDoYouKnowAbout), BlockId.QueryWord, BlockId.QueryWord),
+        (_tf.Format(Base.SystemText.Dialog_WhatDoYouKnowAboutThisItem), BlockId.QueryItem, BlockId.QueryItem),
+        (_tf.Format(Base.SystemText.Dialog_ItsBeenNiceTalkingToYou), BlockId.Farewell, BlockId.Farewell)
     ];
 
     public async AlbionTask Run()

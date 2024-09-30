@@ -2,10 +2,7 @@
 
 namespace UAlbion.Editor;
 
-public class EditorMoveInstanceEvent : Event, IEditorEvent
-{
-    public int Id { get; }
-    public string CollectionName { get; }
-    public int FromIndex { get; }
-    public int ToIndex { get; }
-}
+// ReSharper disable NotAccessedPositionalProperty.Global
+// ReSharper disable once ClassNeverInstantiated.Global
+public record EditorMoveInstanceEvent(int Id, string CollectionName, int FromIndex, int ToIndex) : EventRecord, IEditorEvent;
+// ReSharper restore NotAccessedPositionalProperty.Global

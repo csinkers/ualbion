@@ -145,6 +145,7 @@ public class FlatMap : GameComponent, IMap
         }
     }
 
+    // ReSharper disable once UnusedParameter.Local
     async AlbionTask FireEventChains(TriggerType type, bool log)
     {
         var zones = ZoneListPool.Shared.Borrow();

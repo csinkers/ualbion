@@ -31,7 +31,7 @@ public static class Program
         var assetManager = baseExchange.Resolve<IAssetManager>();
 
         var tileset1 = new TestTilemap(assets, assetManager);
-        var lab1 = new TestLab(assets, assetManager);
+        // var lab1 = new TestLab(assets, assetManager);
 
         void Merge(Dictionary<AssetId, object> newAssets)
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using UAlbion.Api;
+using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
 using UAlbion.Formats;
@@ -44,7 +45,7 @@ public class MapObject : GameComponent
             case ITexture:
             {
                 var keyFlags = _depthTest ? 0 : SpriteKeyFlags.NoDepthTest;
-                var flags = 
+                    var flags = 
                     SpriteFlags.FlipVertical |
                     (_onFloor
                         ? SpriteFlags.Floor | SpriteFlags.MidAligned
@@ -96,6 +97,8 @@ public class MapObject : GameComponent
     }
 
     public MapObjectId Id { get; }
+
+    [DiagEdit(Style = DiagEditStyle.Position3D)]
     public Vector3 Position
     {
         get

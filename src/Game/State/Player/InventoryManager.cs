@@ -498,8 +498,7 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
         _returnItemInHandEvent = new InventorySwapEvent(slot.Id.Id, slot.Id.Slot);
     }
 
-    void RaiseStatusMessage(TextId textId)
-        => Raise(new DescriptionTextEvent(Resolve<ITextFormatter>().Format(textId)));
+    // void RaiseStatusMessage(TextId textId) => Raise(new DescriptionTextEvent(Resolve<ITextFormatter>().Format(textId)));
 
     public int GetItemCount(InventoryId id, ItemId item) => _getInventory(id).EnumerateAll().Where(x => x.Item == item).Sum(x => (int?)x.Amount) ?? 0;
     public ushort TryGiveItems(InventoryId id, ItemSlot donor, ushort? amount)

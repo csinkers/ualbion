@@ -2,9 +2,5 @@
 
 namespace UAlbion.Editor;
 
-public class EditorAddInstanceEvent : Event, IEditorEvent
-{
-    public int Id { get; }
-    public string CollectionName { get; }
-    public int Index { get; }
-}
+// ReSharper disable once ClassNeverInstantiated.Global
+public record EditorAddInstanceEvent(int Id, string CollectionName, int Index) : EventRecord, IEditorEvent;

@@ -175,6 +175,7 @@ static class Program
         }
     }
 
+    /*
     static void ColorPrint(int offset, long value)
     {
         Console.Write("\t{0:X2}:", offset);
@@ -200,4 +201,5 @@ static class Program
         Console.Write("{0:X2}", value);
         Console.ForegroundColor = ConsoleColor.White;
     }
+    */
 }

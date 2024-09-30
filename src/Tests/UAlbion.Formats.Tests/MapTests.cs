@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Linq;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Exporters.Tiled;
 using UAlbion.Formats.Ids;
@@ -18,6 +17,7 @@ public enum TestTiles
 
 public class MapTests
 {
+    /*
     static readonly AlbionPalette TestPalette = new(
         1, "TestPal", new[]
             {
@@ -79,6 +79,7 @@ public class MapTests
             3,4,
             4,4 },
     };
+    */
 
     static TileData T(string s)
     {

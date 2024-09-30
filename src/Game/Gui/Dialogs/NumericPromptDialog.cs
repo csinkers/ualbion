@@ -34,11 +34,13 @@ public class NumericPromptDialog : ModalDialog
         AttachChild(new DialogFrame(stack) { Background = DialogFrameBackgroundStyle.MainMenuPattern });
     }
 
+    /*
     void Respond(int response)
     {
         Value = response;
         Close();
     }
+    */
 
     void Close()
     {

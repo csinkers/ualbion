@@ -87,7 +87,7 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
         var config = ImGuiConfig.Load(layout);
         var newConfig = new ImGuiConfig();
 
-        var oldIni = ImGui.SaveIniSettingsToMemory();
+        // var oldIni = ImGui.SaveIniSettingsToMemory();
 
         // Create windows
         var menus = Resolve<IImGuiMenuManager>();
@@ -122,8 +122,9 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
 
         var newConfigText = newConfig.ToString();
         ImGui.LoadIniSettingsFromMemory(newConfigText);
-        var roundTrip = ImGui.SaveIniSettingsToMemory();
-        int diff = roundTrip.Length - newConfigText.Length;
+
+        // var roundTrip = ImGui.SaveIniSettingsToMemory();
+        // int diff = roundTrip.Length - newConfigText.Length;
     }
 
     public int GetNextWindowId() => Interlocked.Increment(ref _nextWindowId);

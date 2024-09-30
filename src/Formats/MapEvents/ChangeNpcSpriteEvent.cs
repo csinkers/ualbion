@@ -8,7 +8,8 @@ using UAlbion.Formats.Ids;
 namespace UAlbion.Formats.MapEvents;
 
 [Event("change_npc_sprite", "Modify an NPC's sprite or 3D sprite group")]
-public class ChangeNpcSpriteEvent : MapEvent, INpcEvent // Specialised variant of ChangeIconEvent
+public class ChangeNpcSpriteEvent(byte npcNum, AssetId id, EventScope scope, ChangeIconLayers layers, MapId mapId)
+    : MapEvent, INpcEvent // Specialised variant of ChangeIconEvent
 {
     public static ChangeNpcSpriteEvent Serdes(ChangeNpcSpriteEvent e, AssetMapping mapping, MapType mapType, ISerializer s)
     {
@@ -45,20 +46,10 @@ public class ChangeNpcSpriteEvent : MapEvent, INpcEvent // Specialised variant o
         return new ChangeNpcSpriteEvent((byte)cie.X, spriteOrGroup, cie.Scope, cie.Layers, cie.MapId);
     }
 
-    ChangeNpcSpriteEvent() { }
-    public ChangeNpcSpriteEvent(byte npcNum, AssetId id, EventScope scope, ChangeIconLayers layers, MapId mapId)
-    {
-        NpcNum = npcNum;
-        SpriteOrGroup = id;
-        Scope = scope;
-        Layers = layers;
-        MapId = mapId;
-    }
-
-    [EventPart("npc")] public byte NpcNum { get; }
-    [EventPart("id")] public AssetId SpriteOrGroup { get; }
-    [EventPart("scope")] public EventScope Scope { get; }
-    [EventPart("layers", true, (ChangeIconLayers)3)] public ChangeIconLayers Layers { get; } // Only applies to the block change types
-    [EventPart("mapId", true, "None")] public MapId MapId { get; } // None = current map
+    [EventPart("npc")] public byte NpcNum { get; } = npcNum;
+    [EventPart("id")] public AssetId SpriteOrGroup { get; } = id;
+    [EventPart("scope")] public EventScope Scope { get; } = scope;
+    [EventPart("layers", true, (ChangeIconLayers)3)] public ChangeIconLayers Layers { get; } = layers; // Only applies to the block change types
+    [EventPart("mapId", true, "None")] public MapId MapId { get; } = mapId; // None = current map
     public override MapEventType EventType => MapEventType.ChangeIcon;
 }

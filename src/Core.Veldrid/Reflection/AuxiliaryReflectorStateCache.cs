@@ -4,7 +4,10 @@ namespace UAlbion.Core.Veldrid.Reflection;
 
 public class AuxiliaryReflectorStateCache
 {
+    // ReSharper disable NotAccessedPositionalProperty.Local
     record struct Key(object Parent, ReflectorMetadata Meta, int Index, string Type);
+    // ReSharper restore NotAccessedPositionalProperty.Local
+
     readonly Dictionary<Key, object> _cache1 = new();
     readonly Dictionary<Key, object> _cache2 = new();
     bool _cache1Active = true;

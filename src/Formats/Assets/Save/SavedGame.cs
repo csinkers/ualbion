@@ -27,11 +27,11 @@ public class SavedGame
     const int ChainCountPerMap = 250; // total 128000 = 0x3e80 bytes
     const int AutomapMarkerCount = 256; // = 0x20 bytes
 
-#pragma warning disable CA1823 // Avoid unused private fields
-    const int Unk5Count = 1500; // Words? = 0xBC bytes
-    const int Unk6Count = 1500; // Words? = 0xBC bytes
-    const int Unk8Count = 1500; // ? = 0xBC bytes
-#pragma warning restore CA1823 // Avoid unused private fields
+    // #pragma warning disable CA1823 // Avoid unused private fields
+    // const int Unk5Count = 1500; // Words? = 0xBC bytes
+    // const int Unk6Count = 1500; // Words? = 0xBC bytes
+    // const int Unk8Count = 1500; // ? = 0xBC bytes
+    // #pragma warning restore CA1823 // Avoid unused private fields
 
     public static readonly DateTime Epoch = new(2200, 1, 1, 0, 0, 0);
 
@@ -129,9 +129,9 @@ public class SavedGame
     public ushort HoursSinceResting { get; set; }
     public byte[] CombatPositions { get; private set; } = new byte[MaxPartySize];
     public MiscState Misc { get; private set; } = new();
-    public byte[] Unknown5B8c { get; set; }
+    public byte[] Unknown5B8C { get; set; }
     public NpcState[] Npcs { get; } = new NpcState[NpcCountPerMap];
-    public byte[] Unknown8bb8 { get; set; } 
+    public byte[] Unknown8Bb8 { get; set; } 
     public MapChangeCollection PermanentMapChanges { get; private set; } = new();
     public MapChangeCollection TemporaryMapChanges { get; private set; } = new();
     HashSet<VisitedEvent> _visitedSet = new();
@@ -228,11 +228,11 @@ public class SavedGame
         // ----------------------------
 
         ApiUtil.Assert(s.Offset - headerOffset == 0x5b8c, $"Expected header to be 0x5b8c bytes, but it was {s.Offset - headerOffset:x}");
-        save.Unknown5B8c = s.Bytes(nameof(Unknown5B8c), save.Unknown5B8c, 0x2C);
+        save.Unknown5B8C = s.Bytes(nameof(Unknown5B8C), save.Unknown5B8C, 0x2C);
         var mapType = MapType.TwoD;
         s.List(nameof(save.Npcs), save.Npcs, (mapType, mapping), NpcCountPerMap, NpcState.Serdes); // 5bb8
 
-        save.Unknown8bb8 = s.Bytes( nameof(Unknown8bb8), save.Unknown8bb8, 0x8c0); // 8bb8
+        save.Unknown8Bb8 = s.Bytes( nameof(Unknown8Bb8), save.Unknown8Bb8, 0x8c0); // 8bb8
 
         // Temp + permanent map changes plus visited event details
         SerdesPermanentMapChanges(save, mapping, s);

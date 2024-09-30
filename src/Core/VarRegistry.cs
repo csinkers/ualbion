@@ -9,6 +9,7 @@ namespace UAlbion.Core;
 
 public class VarRegistry : ServiceComponent<IVarRegistry>, IVarRegistry
 {
+    // ReSharper disable once NotAccessedPositionalProperty.Local
     sealed record VarInfo(IVar Var, Type ValueType, Type OwningType);
     readonly Dictionary<string, VarInfo> _vars = new();
 

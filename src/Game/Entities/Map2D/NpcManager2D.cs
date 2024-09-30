@@ -142,7 +142,7 @@ class NpcManager2D : Component
         state.Unk58 = 0;
         state.GfxWidth = 0;
         state.GfxHeight = 0;
-        state.Unk5E_GfxRelated = 0;
+        state.Unk5EGfxRelated = 0;
         state.GfxAlloc = 0;
         state.Unk64 = 0;
         state.Unk65 = 0;

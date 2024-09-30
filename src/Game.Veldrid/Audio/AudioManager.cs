@@ -19,6 +19,8 @@ namespace UAlbion.Game.Veldrid.Audio;
 
 public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioManager, IDisposable
 {
+    sealed record ActiveSound(AudioSource Source, object Id, int RestartProbability);
+
     const int DefaultSampleRate = 11025;
     public static readonly AssetIdAssetProperty<WaveLibraryId> WaveLibProperty = new("WaveLib", WaveLibraryId.None, x => x);
 
@@ -57,20 +59,6 @@ public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioMa
     {
         _doneEvent.Set();
         base.Subscribed();
-    }
-
-    sealed class ActiveSound
-    {
-        public ActiveSound(AudioSource source, object id, int restartProbability)
-        {
-            Source = source;
-            Id = id;
-            RestartProbability = restartProbability;
-        }
-
-        public AudioSource Source { get; }
-        public object Id { get; }
-        public int RestartProbability { get; }
     }
 
     AudioBuffer GetBuffer(SampleId id)

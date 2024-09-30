@@ -1,5 +1,4 @@
-﻿using System;
-using ImGuiNET;
+﻿using ImGuiNET;
 using UAlbion.Formats.Assets.Maps;
 
 namespace UAlbion.Editor;
@@ -7,12 +6,12 @@ namespace UAlbion.Editor;
 public class FlatMapEditor : AssetEditor
 {
     readonly string _name;
-    readonly MapData2D _map;
+    //  readonly MapData2D _map;
 
     public FlatMapEditor(string name, MapData2D map): base(map)
     {
         _name = name;
-        _map = map ?? throw new ArgumentNullException(nameof(map));
+        // _map = map ?? throw new ArgumentNullException(nameof(map));
     }
 
     public override void Render()

@@ -8,7 +8,14 @@ using UAlbion.Formats.Ids;
 namespace UAlbion.Formats.MapEvents;
 
 [Event("change_npc_movement", "Modify an NPC's movement mode")]
-public class ChangeNpcMovementEvent : MapEvent, INpcEvent // Specialised variant of ChangeIconEvent
+public class ChangeNpcMovementEvent(
+    byte npcNum,
+    NpcMovement mode,
+    EventScope scope,
+    ChangeIconLayers layers,
+    MapId mapId,
+    short y)
+    : MapEvent, INpcEvent // Specialised variant of ChangeIconEvent
 {
     public static ChangeNpcMovementEvent Serdes(ChangeNpcMovementEvent e, AssetMapping mapping, MapType mapType, ISerializer s)
     {
@@ -32,22 +39,11 @@ public class ChangeNpcMovementEvent : MapEvent, INpcEvent // Specialised variant
         return new ChangeNpcMovementEvent((byte)cie.X, (NpcMovement)cie.Value, cie.Scope, cie.Layers, cie.MapId, cie.Y);
     }
 
-    ChangeNpcMovementEvent() { }
-    public ChangeNpcMovementEvent(byte npcNum, NpcMovement mode, EventScope scope, ChangeIconLayers layers, MapId mapId, short y)
-    {
-        NpcNum = npcNum;
-        Mode = mode;
-        Scope = scope;
-        Layers = layers;
-        MapId = mapId;
-        Y = y;
-    }
-
-    [EventPart("npc")] public byte NpcNum { get; }
-    [EventPart("mode")] public NpcMovement Mode { get; }
-    [EventPart("scope")] public EventScope Scope { get; }
-    [EventPart("layers", true, (ChangeIconLayers)3)] public ChangeIconLayers Layers { get; } // Only applies to the block change types
-    [EventPart("mapId", true, "None")] public MapId MapId { get; } // None = current map
-    [EventPart("y", true, (short)0)] public short Y { get; }
+    [EventPart("npc")] public byte NpcNum { get; } = npcNum;
+    [EventPart("mode")] public NpcMovement Mode { get; } = mode;
+    [EventPart("scope")] public EventScope Scope { get; } = scope;
+    [EventPart("layers", true, (ChangeIconLayers)3)] public ChangeIconLayers Layers { get; } = layers; // Only applies to the block change types
+    [EventPart("mapId", true, "None")] public MapId MapId { get; } = mapId; // None = current map
+    [EventPart("y", true, (short)0)] public short Y { get; } = y;
     public override MapEventType EventType => MapEventType.ChangeIcon;
 }

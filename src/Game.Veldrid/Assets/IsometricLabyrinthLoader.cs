@@ -49,7 +49,7 @@ public sealed class IsometricLabyrinthLoader : GameComponent, IAssetLoader<Labyr
     Engine _engine;
     ShaderLoader _shaderLoader;
 
-    void SetupEngine(ModContext modContext, int tileWidth, int tileHeight, int baseHeight, int tilesPerRow)
+    Engine SetupEngine(ModContext modContext, int tileWidth, int tileHeight, int baseHeight, int tilesPerRow)
     {
         var pathResolver = Resolve<IPathResolver>();
         AttachChild(new ShaderCache(pathResolver.ResolvePath("$(CACHE)/ShaderCache")));
@@ -58,19 +58,20 @@ public sealed class IsometricLabyrinthLoader : GameComponent, IAssetLoader<Labyr
         foreach (var shaderPath in Resolve<IModApplier>().ShaderPaths)
             _shaderLoader.AddShaderDirectory(shaderPath);
 
-        _engine = new Engine(GraphicsBackend.Vulkan, false, false);
+        var engine = new Engine(GraphicsBackend.Vulkan, false, false);
         _isoRsm = new IsometricRenderSystem(modContext, tileWidth, tileHeight, baseHeight, tilesPerRow);
 
         AttachChild(_shaderLoader);
-        AttachChild(_engine);
+        AttachChild(engine);
         AttachChild(_isoRsm);
 
         _isoRsm.OffScreen.IsActive = true;
-        _engine.RenderSystem = _isoRsm.OffScreen;
+        engine.RenderSystem = _isoRsm.OffScreen;
 
         Raise(new SetSceneEvent(SceneId.IsometricBake));
         Raise(new SetClearColourEvent(0, 0, 0, 0));
         // Raise(new EngineFlagEvent(FlagOperation.Set, EngineFlags.ShowBoundingBoxes));
+        return engine;
     }
 
     IEnumerable<(string, byte[])> Save(LabyrinthData labyrinth, AssetLoadContext context, IsometricMode mode, string pngPath, string tsxPath)
@@ -80,8 +81,7 @@ public sealed class IsometricLabyrinthLoader : GameComponent, IAssetLoader<Labyr
         var baseHeight = context.GetProperty(BaseHeight, DefaultBaseHeight);
         var tilesPerRow = context.GetProperty(TilesPerRow, DefaultTilesPerRow);
 
-        if (_engine == null)
-            SetupEngine(context.ModContext, tileWidth, tileHeight, baseHeight, tilesPerRow);
+        _engine ??= SetupEngine(context.ModContext, tileWidth, tileHeight, baseHeight, tilesPerRow);
 
         var frames = _isoRsm.Builder.Build(labyrinth, context, mode, Assets);
 

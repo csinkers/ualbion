@@ -57,7 +57,7 @@ public class Palette8Chunk : FlicChunk
             {
                 palette[i] =
                     (uint) 0xff << 24 // Alpha
-                    | (uint) packet.Triplets[j++] // Red
+                    |        packet.Triplets[j++] // Red
                     | (uint) packet.Triplets[j++] << 8 // Green
                     | (uint) packet.Triplets[j++] << 16 // Blue
                     ;

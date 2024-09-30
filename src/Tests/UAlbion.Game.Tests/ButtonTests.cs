@@ -5,7 +5,6 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
-using UAlbion.Formats.Assets;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Assets;
@@ -13,7 +12,6 @@ using UAlbion.Game.Events;
 using UAlbion.Game.Gui;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
-using UAlbion.Game.Text;
 using UAlbion.TestCommon;
 
 namespace UAlbion.Game.Tests;
@@ -24,9 +22,9 @@ public class ButtonTests : Component
 
     class PublicFrameButton : Button
     {
-        public PublicFrameButton(IUiElement content) : base(content) { } 
-        public PublicFrameButton(IText textSource) : base(textSource) { } 
-        public PublicFrameButton(StringId textId) : base(textId) { } 
+        // public PublicFrameButton(IUiElement content) : base(content) { } 
+        // public PublicFrameButton(IText textSource) : base(textSource) { } 
+        // public PublicFrameButton(StringId textId) : base(textId) { } 
         public PublicFrameButton(string literalText) : base(literalText) { }
         public ButtonFrame Frame => Children.OfType<ButtonFrame>().First();
     }
@@ -172,6 +170,7 @@ public class ButtonTests : Component
         Assert.Equal(1, clickCount);
         Assert.Equal(ButtonState.Normal, button.Frame.State);
         Assert.Null(timerTask);
+        Assert.Equal(0, doubleClickCount);
     }
 
     [Fact]

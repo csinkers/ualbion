@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UAlbion.Api.Eventing;
 
 namespace UAlbion.Formats.Assets;
 
@@ -27,14 +28,15 @@ public class CharacterAttributes : ICharacterAttributes
     ICharacterAttribute ICharacterAttributes.Luck => Luck;
     ICharacterAttribute ICharacterAttributes.MagicResistance => MagicResistance;
     ICharacterAttribute ICharacterAttributes.MagicTalent => MagicTalent;
-    public CharacterAttribute Strength { get; set; }
-    public CharacterAttribute Intelligence { get; set; }
-    public CharacterAttribute Dexterity { get; set; }
-    public CharacterAttribute Speed { get; set; }
-    public CharacterAttribute Stamina { get; set; }
-    public CharacterAttribute Luck { get; set; }
-    public CharacterAttribute MagicResistance { get; set; }
-    public CharacterAttribute MagicTalent { get; set; }
+
+    [DiagEdit(Style = DiagEditStyle.CharacterAttribute)] public CharacterAttribute Strength { get; set; }
+    [DiagEdit(Style = DiagEditStyle.CharacterAttribute)] public CharacterAttribute Intelligence { get; set; }
+    [DiagEdit(Style = DiagEditStyle.CharacterAttribute)] public CharacterAttribute Dexterity { get; set; }
+    [DiagEdit(Style = DiagEditStyle.CharacterAttribute)] public CharacterAttribute Speed { get; set; }
+    [DiagEdit(Style = DiagEditStyle.CharacterAttribute)] public CharacterAttribute Stamina { get; set; }
+    [DiagEdit(Style = DiagEditStyle.CharacterAttribute)] public CharacterAttribute Luck { get; set; }
+    [DiagEdit(Style = DiagEditStyle.CharacterAttribute)] public CharacterAttribute MagicResistance { get; set; }
+    [DiagEdit(Style = DiagEditStyle.CharacterAttribute)] public CharacterAttribute MagicTalent { get; set; }
 
     public CharacterAttributes DeepClone() => new CharacterAttributes().CopyFrom(this);
     public CharacterAttributes CopyFrom(CharacterAttributes other)

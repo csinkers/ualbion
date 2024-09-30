@@ -9,4 +9,13 @@ public enum DiagEditStyle
     Dropdown, // For enum
     Checkboxes, // For flags enum
     Text, // For strings
+
+    Size2D,
+
+    Size3D,
+    Position3D,
+    TilePosition3D,
+    CharacterAttribute,
+    IdPicker,
+    InvSlot
 }

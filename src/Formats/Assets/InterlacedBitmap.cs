@@ -149,10 +149,9 @@ public sealed class InterlacedBitmap
             : s.Bytes("Pixels", ImageData, length);
     }
 
-    static byte[] Pack(byte[] data, ISerializer s)
-    {
-        throw new NotImplementedException();
-    }
+    // ReSharper disable UnusedParameter.Local
+    static byte[] Pack(byte[] data, ISerializer s) => throw new NotImplementedException();
+    // ReSharper restore UnusedParameter.Local
 
     static byte[] Unpack(ISerializer s, int size)
     {

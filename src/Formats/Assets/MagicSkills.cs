@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
+using UAlbion.Api.Eventing;
 using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets;
@@ -9,10 +10,20 @@ namespace UAlbion.Formats.Assets;
 public class MagicSkills : IMagicSkills
 {
     ICharacterAttribute IMagicSkills.SpellPoints => SpellPoints;
+
+    [DiagEdit(Style = DiagEditStyle.CharacterAttribute)]
     public CharacterAttribute SpellPoints { get; set; }
+
+    [DiagEdit(Style = DiagEditStyle.Checkboxes)]
     public SpellClasses SpellClasses { get; set; }
-    [JsonInclude] public IList<SpellId> KnownSpells { get; private set; } = new List<SpellId>();
-    [JsonInclude] public IDictionary<SpellId, ushort> SpellStrengths { get; private set; } = new Dictionary<SpellId, ushort>();
+
+    [JsonInclude]
+    [DiagEdit(Style = DiagEditStyle.IdPicker)]
+    public IList<SpellId> KnownSpells { get; private set; } = new List<SpellId>();
+
+    [JsonInclude]
+    [DiagEdit(Style = DiagEditStyle.IdPicker)]
+    public IDictionary<SpellId, ushort> SpellStrengths { get; private set; } = new Dictionary<SpellId, ushort>();
 
     /*
     #pragma warning disable CA2227 // Collection properties should be read only

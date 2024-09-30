@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
-using UAlbion.Game.Settings;
 
 namespace UAlbion.Game.Entities.Map2D;
 
@@ -21,22 +19,23 @@ public class ShowPassabilityAnnotation : Component
 
 public class MapAnnotationLayer : Component
 {
+    // ReSharper disable once UnusedParameter.Local
     public MapAnnotationLayer(LogicalMap2D logicalMap, Vector2 tileSize)
     {
         _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
-        _tileSize = tileSize;
-        _logicalMap.Dirty += (_, args) => _dirty.Add((args.X, args.Y));
+        // _tileSize = tileSize;
+        // _logicalMap.Dirty += (_, args) => _dirty.Add((args.X, args.Y));
         // _drawLayer = DrawLayer.Diagnostic;
         On<PrepareFrameEvent>(_ => Render());
     }
 
     readonly LogicalMap2D _logicalMap;
-    readonly Vector2 _tileSize;
+    // readonly Vector2 _tileSize;
     // readonly DrawLayer _drawLayer;
-    readonly HashSet<(int, int)> _dirty = new();
+    // readonly HashSet<(int, int)> _dirty = new();
 
 #if DEBUG
-    DebugFlags _lastDebugFlags;
+    // DebugFlags _lastDebugFlags;
 #endif
     // bool _allDirty = true;
     public int? HighlightIndex { get; set; }
@@ -46,6 +45,7 @@ public class MapAnnotationLayer : Component
     {
     }
 
+    /*
     void BuildInstanceData(int i, int j)
     {
         var index = _logicalMap.Index(i, j);
@@ -63,14 +63,15 @@ public class MapAnnotationLayer : Component
 //        }
 //#endif
     }
+    */
 
     void Render()
     {
 #if DEBUG
-        var debug = ReadVar(V.User.Debug.DebugFlags);
-        //if (_lastDebugFlags != debug)
-        //    _allDirty = true;
-        _lastDebugFlags = debug;
+        // var debug = ReadVar(V.User.Debug.DebugFlags);
+        // if (_lastDebugFlags != debug)
+        //     _allDirty = true;
+        // _lastDebugFlags = debug;
 #endif
 
         if (HighlightIndex.HasValue)

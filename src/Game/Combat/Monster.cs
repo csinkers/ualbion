@@ -19,7 +19,12 @@ public class Monster : GameComponent, ICombatParticipant
     public Monster(CharacterSheet clonedSheet, int position)
     {
         _sheet = clonedSheet ?? throw new ArgumentNullException(nameof(clonedSheet));
-        _sprite = AttachChild(new Sprite(clonedSheet.MonsterGfxId, DrawLayer.Billboards, 0, SpriteFlags.BottomMid));
+        _sprite = AttachChild(new Sprite(
+            clonedSheet.MonsterGfxId,
+            DrawLayer.Billboards,
+            0,
+            SpriteFlags.FlipVertical));
+
         CombatPosition = position;
         UpdatePosition();
     }
@@ -38,6 +43,8 @@ public class Monster : GameComponent, ICombatParticipant
 
     void UpdatePosition()
     {
-        _sprite.Position = new Vector3(0, 0, -50);
+        var x = CombatPosition % SavedGame.CombatColumns;
+        var y = CombatPosition / SavedGame.CombatColumns;
+        _sprite.Position = new Vector3(20 * (x - SavedGame.CombatColumns / 0.5f), 20, -20 * (SavedGame.CombatRows - y));
     }
 }

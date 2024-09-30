@@ -53,14 +53,14 @@ public sealed class AssetViewerWindow : Component, IImGuiWindow
 
     void DrawTexture(ITexture texture)
     {
-        if (_texture != null)
+        if (_texture is { DeviceTexture: not null })
         {
             var imgui = Resolve<IImGuiManager>();
             var ptr = imgui.GetOrCreateImGuiBinding(_texture.DeviceTexture);
             ImGui.Image(ptr, new Vector2(_texture.DeviceTexture.Width, _texture.DeviceTexture.Height));
         }
 
-        if (_textureArray != null)
+        if (_textureArray is { DeviceTexture: not null })
         {
         }
     }
@@ -89,9 +89,7 @@ public sealed class AssetViewerWindow : Component, IImGuiWindow
         {
             var source = Resolve<ITextureSource>();
             if (texture.ArrayLayers > 1)
-            {
                 _textureArray = source.GetArrayTexture(texture);
-            }
             else
                 _texture = source.GetSimpleTexture(texture);
         }

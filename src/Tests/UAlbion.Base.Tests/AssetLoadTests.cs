@@ -542,7 +542,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(1, m.UnknownE);
         Assert.Equal(75, m.Morale);
         Assert.Equal(180, m.ExperienceReward);
-        Assert.Equal(21, m.UnknownDA);
+        Assert.Equal(21, m.Combat.BaseAttack);
         Assert.Equal(8, m.LevelsPerActionPoint);
         Assert.Equal(99, m.LifePointsPerLevel);
         Assert.Equal(99u, m.SpellPointsPerLevel);
@@ -597,7 +597,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(0, n.UnknownE);
         Assert.Equal(0, n.Morale);
         Assert.Equal(0, n.ExperienceReward);
-        Assert.Equal(0, n.UnknownDA);
+        Assert.Equal(0, n.Combat.BaseAttack);
         Assert.Equal(0, n.LevelsPerActionPoint);
         Assert.Equal(0, n.LifePointsPerLevel);
         Assert.Equal(0u, n.SpellPointsPerLevel);
@@ -653,7 +653,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(12, t.Combat.LifePoints.Current);
         Assert.Equal(12, t.Combat.LifePoints.Max);
         Assert.Equal(1, t.Combat.ActionPoints);
-        Assert.Equal(25, t.Combat.UnknownD8);
+        Assert.Equal(25, t.Combat.BonusDefense);
         Assert.Equal(PartySheet.Tom, t.Id);
         Assert.Equal("", t.EnglishName);
         Assert.Equal("Tom", t.GermanName);
@@ -664,7 +664,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(PartyLargeGfx.Tom, t.SpriteId);
         Assert.Equal(Portrait.Tom, t.PortraitId);
         Assert.Equal(EventSet.Tom, t.EventSetId);
-        Assert.Equal(1, t.Unknown6);
+        Assert.Equal(1, t.NumberOfOccupiedHands);
         Assert.Equal(1, t.MonsterGfxId.Id);
         Assert.Equal(0, t.UnkownC);
         Assert.Equal(2, t.UnknownE);

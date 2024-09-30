@@ -6,7 +6,7 @@ public interface ICombatAttributes
     ushort TrainingPoints { get; }
     ICharacterAttribute LifePoints { get; }
     byte ActionPoints { get; }
-    ushort UnknownD6 { get; }
-    ushort UnknownD8 { get; }
+    ushort BaseDefense { get; }
+    ushort BonusDefense { get; }
     PlayerConditions Conditions { get; }
 }

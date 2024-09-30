@@ -18,8 +18,8 @@ public class CombatAttributeEditor : AssetEditor
         UInt16Slider(nameof(_combat.LifePoints     ), _combat.LifePoints.Current, 0, _combat.LifePoints.Max); 
         UInt16Slider(nameof(_combat.LifePoints.Max  ), _combat.LifePoints.Max , 0, ushort.MaxValue); 
         UInt8Slider(nameof(_combat.ActionPoints    ), _combat.ActionPoints  , 0, byte.MaxValue); 
-        UInt16Slider(nameof(_combat.UnknownD6     ), _combat.UnknownD6    , 0, 100); 
-        UInt16Slider(nameof(_combat.UnknownD8         ), _combat.UnknownD8        , 0, 100);
+        UInt16Slider(nameof(_combat.BaseDefense     ), _combat.BaseDefense    , 0, 100); 
+        UInt16Slider(nameof(_combat.BonusDefense         ), _combat.BonusDefense        , 0, 100);
         EnumCheckboxes(nameof(_combat.Conditions), _combat.Conditions);
     }
 }

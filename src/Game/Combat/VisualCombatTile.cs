@@ -38,17 +38,23 @@ public class VisualCombatTile : UiElement
         _battle = battle ?? throw new ArgumentNullException(nameof(battle));
         _sprite = new UiSpriteElement(SpriteId.None) { IsActive = false, Flags = SpriteFlags.BottomAligned };
 
-        _button = AttachChild(new Button(
-                new VerticalStacker(
+        var stack =
+            new VerticalStacker(
                     new Spacing(Width, Height),
-                        _sprite)
-                    { Greedy = false })
+                    _sprite
+            )
+            {
+                Greedy = false
+            };
+
+        _button = new Button(stack) { Margin = 0 }
             .OnHover(() => Hover?.Invoke())
             .OnBlur(() => Blur?.Invoke())
             .OnClick(() => Click?.Invoke())
             .OnRightClick(() => RightClick?.Invoke())
             .OnDoubleClick(() => DoubleClick?.Invoke())
-            .OnButtonDown(() => ButtonDown?.Invoke()));
+            .OnButtonDown(() => ButtonDown?.Invoke());
+        AttachChild(_button);
     }
 
     void OnPostUpdate()

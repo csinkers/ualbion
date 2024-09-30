@@ -18,8 +18,10 @@ public class CombatAttributes : ICombatAttributes
 
     [DiagEdit(Style = DiagEditStyle.NumericInput, Min = 0)]
     public byte ActionPoints { get; set; }
-    public ushort UnknownD6 { get; set; }
-    public ushort UnknownD8 { get; set; }
+    public ushort BaseDefense { get; set; } // Intrinsic defense (monsters only?)
+    public ushort BonusDefense { get; set; } // Due to equipment
+    public ushort BaseAttack { get; set; } // Intrinsic damage (monsters only?)
+    public ushort BonusAttack { get; set; } // Due to equipment
 
     [DiagEdit(Style = DiagEditStyle.Checkboxes)]
     public PlayerConditions Conditions { get; set; }
@@ -32,11 +34,11 @@ public class CombatAttributes : ICombatAttributes
         TrainingPoints = other.TrainingPoints;
         LifePoints = other.LifePoints.DeepClone();
         ActionPoints = other.ActionPoints;
-        UnknownD6 = other.UnknownD6;
-        UnknownD8 = other.UnknownD8;
+        BaseDefense = other.BaseDefense;
+        BonusDefense = other.BonusDefense;
         Conditions = other.Conditions;
         return this;
     }
 
-    public override string ToString() => $"XP:{ExperiencePoints} TP:{TrainingPoints} LP:{LifePoints} AP:{ActionPoints} D:{UnknownD8} P:{UnknownD6} Cond:{Conditions}";
+    public override string ToString() => $"XP:{ExperiencePoints} TP:{TrainingPoints} LP:{LifePoints} AP:{ActionPoints} D:{BonusDefense} P:{BaseDefense} Cond:{Conditions}";
 }

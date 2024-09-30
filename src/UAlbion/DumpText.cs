@@ -346,8 +346,8 @@ sealed class DumpText : GameComponent, IAssetDumper
             }
         }
 
-        if (c.Unknown6 != 0) sw.WriteLine($"    Unknown06:{c.Unknown6}");
-        if (c.Unknown7 != 0) sw.WriteLine($"    Unknown07:{c.Unknown7}");
+        if (c.NumberOfOccupiedHands != 0) sw.WriteLine($"    Unknown06:{c.NumberOfOccupiedHands}");
+        if (c.NumberOfOccupiedFingers != 0) sw.WriteLine($"    Unknown07:{c.NumberOfOccupiedFingers}");
         if (!c.MonsterGfxId.IsNone) sw.WriteLine($"    CombatGfx:{c.MonsterGfxId}");
         if (c.UnkownC != 0) sw.WriteLine($"    Unknown12:{c.UnkownC}");
         if (c.UnkownD != 0) sw.WriteLine($"    Unknown13:{c.UnkownD}");
@@ -366,9 +366,9 @@ sealed class DumpText : GameComponent, IAssetDumper
                 sw.WriteLine($" UnusedBlock.{i}:{c.UnusedBlock[i]}");
         }
 
-        if (c.UnknownDA != 0) sw.WriteLine($"    UnknownDA:{c.UnknownDA}");
-        if (c.UnknownDE != 0) sw.WriteLine($"    UnknownDC:{c.UnknownDE}");
-        if (c.UnknownE0 != 0) sw.WriteLine($"    UnknownDE:{c.UnknownE0}");
+        if (c.Combat.BonusAttack != 0) sw.WriteLine($"    BonusAttack?:{c.Combat.BonusAttack}");
+        if (c.UnknownDE != 0) sw.WriteLine($"    UnknownDE:{c.UnknownDE}");
+        if (c.UnknownE0 != 0) sw.WriteLine($"    UnknownE0:{c.UnknownE0}");
         if (c.LevelsPerActionPoint != 0) sw.WriteLine($"    UnknownE2:{c.LevelsPerActionPoint}");
         if (c.LifePointsPerLevel != 0) sw.WriteLine($"    UnknownE4:{c.LifePointsPerLevel}");
         if (c.SpellPointsPerLevel != 0) sw.WriteLine($"    UnknownE6:{c.SpellPointsPerLevel}");

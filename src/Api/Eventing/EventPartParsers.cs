@@ -57,10 +57,10 @@ public class EventPartParsers
 
         if (type.IsEnum)
         {
-            var methodName = ApiUtil.IsFlagsEnum(type) ? "ParseFlags" : "ParseEnum";
+            var methodName = ApiUtil.IsFlagsEnum(type) ? nameof(ParseFlags) : nameof(ParseEnum);
             var method = GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static);
             if (method == null)
-                throw new InvalidOperationException("Method ParseEnum could not be found");
+                throw new InvalidOperationException($"Method {nameof(ParseEnum)} could not be found");
 
             parser = method.MakeGenericMethod(type);
         }
@@ -79,7 +79,14 @@ public class EventPartParsers
     // Methods called via reflection
     // ReSharper disable UnusedMember.Local
 #pragma warning disable IDE0051 // Remove unused private members
-    static T ParseEnum<T>(string s) => (T)Enum.Parse(typeof(T), s, true);
+    static T ParseEnum<T>(string s)
+    {
+        if (!Enum.TryParse(typeof(T), s, true, out var result))
+            throw new FormatException("No value supplied for required parameter");
+
+        return (T)result;
+    }
+
     static T? ParseNullableEnum<T>(string s) where T : struct, Enum => string.IsNullOrEmpty(s) ? null : (T?)Enum.Parse(typeof(T), s, true);
     static T ParseFlags<T>(string s) where T : unmanaged, Enum
     {

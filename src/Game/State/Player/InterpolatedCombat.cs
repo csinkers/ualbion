@@ -22,7 +22,7 @@ public class InterpolatedCombat : ICombatAttributes
     public ushort TrainingPoints => (ushort)ApiUtil.Lerp(_a().TrainingPoints, _b().TrainingPoints, _getLerp());
     public ICharacterAttribute LifePoints { get; }
     public byte ActionPoints => (byte)ApiUtil.Lerp(_a().ActionPoints, _b().ActionPoints, _getLerp());
-    public ushort UnknownD6 => (ushort)ApiUtil.Lerp(_a().UnknownD6, _b().UnknownD6, _getLerp());
-    public ushort UnknownD8 => (ushort)ApiUtil.Lerp(_a().UnknownD8, _b().UnknownD8, _getLerp());
+    public ushort BaseDefense => (ushort)ApiUtil.Lerp(_a().BaseDefense, _b().BaseDefense, _getLerp());
+    public ushort BonusDefense => (ushort)ApiUtil.Lerp(_a().BonusDefense, _b().BonusDefense, _getLerp());
     public PlayerConditions Conditions => _b().Conditions;
 }

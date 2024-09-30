@@ -71,8 +71,8 @@ public static class EffectiveSheetCalculator
 
     static void ApplyWieldedItems(EffectiveCharacterSheet sheet, Func<ItemId, ItemData> getItem)
     {
-        int initialDamage = sheet.Combat.UnknownD8;
-        int initialProtection = sheet.Combat.UnknownD6;
+        int initialDamage = sheet.Combat.BonusDefense;
+        int initialProtection = sheet.Combat.BaseDefense;
 
         foreach (var itemSlot in sheet.Inventory.EnumerateBodyParts())
         {
@@ -80,8 +80,8 @@ public static class EffectiveSheetCalculator
                 continue;
 
             var item = getItem(itemSlot.Item);
-            sheet.Combat.UnknownD8      += item.Damage;
-            sheet.Combat.UnknownD6      += item.Protection;
+            sheet.Combat.BonusDefense      += item.Damage;
+            sheet.Combat.BaseDefense      += item.Protection;
             sheet.Combat.LifePoints.Max += item.LpMaxBonus;
             sheet.Magic.SpellPoints.Max += item.SpMaxBonus;
 
@@ -91,8 +91,8 @@ public static class EffectiveSheetCalculator
             ApplySkillTax2(sheet, item);
         }
 
-        sheet.DisplayDamage = sheet.Combat.UnknownD8 - initialDamage;
-        sheet.DisplayProtection = sheet.Combat.UnknownD6 - initialProtection;
+        sheet.DisplayDamage = sheet.Combat.BonusDefense - initialDamage;
+        sheet.DisplayProtection = sheet.Combat.BaseDefense - initialProtection;
     }
 
     static void ApplySkillTax1(CharacterSheet sheet, ItemData item)

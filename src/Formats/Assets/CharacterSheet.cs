@@ -102,16 +102,14 @@ public class CharacterSheet : ICharacterSheet
 
     // Pending further reversing
     // ReSharper disable InconsistentNaming
-    public byte Unknown6 { get; set; }
-    public byte Unknown7 { get; set; }
+    public byte NumberOfOccupiedHands { get; set; }
+    public byte NumberOfOccupiedFingers { get; set; }
     public byte UnkownC { get; set; }
     public byte UnkownD { get; set; }
     public byte UnknownE { get; set; }
     public ushort Unknown1C { get; set; }
     public ushort Unknown22 { get; set; }
     public byte[] UnusedBlock { get; set; } // Only non-zero for the NPC "Konny"
-    public ushort UnknownDA { get; set; }
-    public ushort UnknownDC { get; set; }
     public ushort UnknownDE { get; set; }
     public ushort UnknownE0 { get; set; }
     public ushort UnknownE8 { get; set; }
@@ -189,9 +187,12 @@ public class CharacterSheet : ICharacterSheet
         sheet.PlayerClass = s.EnumU8(nameof(sheet.PlayerClass), sheet.PlayerClass); // 3
         sheet.Magic.SpellClasses = s.EnumU8(nameof(sheet.Magic.SpellClasses), sheet.Magic.SpellClasses); // 4
         sheet.Level = s.UInt8(nameof(sheet.Level), sheet.Level); // 5
-        sheet.Unknown6 = s.UInt8(nameof(sheet.Unknown6), sheet.Unknown6); //  6 takes values [0..2] except Rainer, with 255. All other party members except Siobhan are 1. Monsters are mix of 1 and 2.
-        sheet.Unknown7 = s.UInt8(nameof(sheet.Unknown7), sheet.Unknown7); //  7 (always 0)
-        sheet.Languages = s.EnumU8(nameof(sheet.Languages), sheet.Languages); //8
+
+        // Takes values [0..2] except Rainer, with 255. All other party members except Siobhan are 1. Monsters are mix of 1 and 2.
+        // Based on Ambermoon, this is probably 'Number of occupied hands'
+        sheet.NumberOfOccupiedHands = s.UInt8(nameof(sheet.NumberOfOccupiedHands), sheet.NumberOfOccupiedHands);
+        sheet.NumberOfOccupiedFingers = s.UInt8(nameof(sheet.NumberOfOccupiedFingers), sheet.NumberOfOccupiedFingers); //  7 (always 0) Number of occupied fingers? (ref Ambermoon)
+        sheet.Languages = s.EnumU8(nameof(sheet.Languages), sheet.Languages); // 8
 
         sheet.SpriteId = sheet.Type switch // 9
         {
@@ -206,16 +207,18 @@ public class CharacterSheet : ICharacterSheet
         // Only monster graphics if monster, means something else for party members (matches PartyMemberId). Never set for NPCs.
         sheet.MonsterGfxId = SpriteId.SerdesU8(nameof(sheet.MonsterGfxId), sheet.MonsterGfxId, AssetType.MonsterGfx, mapping, s); // B
 
-        sheet.UnkownC = s.UInt8(nameof(sheet.UnkownC), sheet.UnkownC); // C takes values [0..9], only non-zero for monsters & Drirr. Distribution of non-zero values: 42, 3, 4, 1, 1, 1, 4, 3,  1
+        sheet.UnkownC = s.UInt8(nameof(sheet.UnkownC), sheet.UnkownC); // C takes values [0..9], only non-zero for monsters & Drirr. Distribution of non-zero values: 42, 3, 4, 1, 1, 1, 4, 3, 1
         sheet.UnkownD = s.UInt8(nameof(sheet.UnkownD), sheet.UnkownD); // D takes values [0..4], only non-zero for monsters & Drirr. Distribution of non-zero values: 46, 3, 4, 3
 
         // E takes values 1,2,10,20,130,138,186. Only non-zero for monsters & party members. All party members use 2. Distr: 23, 15, 3, 3, 1, 2, 12. Flags?
         // Basic mobs=1. AiBody1,Argim=2. all demons=20. human/iskai mobs=10. Ai,Ai2,AiBody22=130. Beastmaster,Nodd,Kontos=138. Kamulos=186.
+        // Maybe 'magic bonus to hit'? (ref Ambermoon)
         sheet.UnknownE = s.UInt8(nameof(sheet.UnknownE), sheet.UnknownE);
 
         sheet.Morale = s.UInt8(nameof(sheet.Morale), sheet.Morale); // F [0..100]
         sheet.SpellTypeImmunities = s.EnumU8(nameof(sheet.SpellTypeImmunities), sheet.SpellTypeImmunities); // 10 spell type immunities? Always 0
         sheet.Combat.ActionPoints = s.UInt8(nameof(sheet.Combat.ActionPoints), sheet.Combat.ActionPoints); // 11
+
         sheet.EventSetId = EventSetId.SerdesU16(nameof(sheet.EventSetId), sheet.EventSetId, mapping, s); // 12
         sheet.WordSetId = EventSetId.SerdesU16(nameof(sheet.WordSetId), sheet.WordSetId, mapping, s); // 14
         sheet.Combat.TrainingPoints = s.UInt16(nameof(sheet.Combat.TrainingPoints), sheet.Combat.TrainingPoints); // 16
@@ -260,18 +263,18 @@ public class CharacterSheet : ICharacterSheet
         sheet.Magic.SpellPoints = CharacterAttribute.Serdes(nameof(sheet.Magic.SpellPoints), sheet.Magic.SpellPoints, s, false); // D0
 
         // Expect variable protection, base protection, variable attack, base attack
-        sheet.Combat.UnknownD6 = s.UInt16(nameof(sheet.Combat.UnknownD6), sheet.Combat.UnknownD6); // D6
-        sheet.Combat.UnknownD8 = s.UInt16(nameof(sheet.Combat.UnknownD8), sheet.Combat.UnknownD8); // D8
-        sheet.UnknownDA = s.UInt16(nameof(sheet.UnknownDA), sheet.UnknownDA); // DA
-        sheet.UnknownDC = s.UInt16(nameof(sheet.UnknownDC), sheet.UnknownDC); // DC
-        sheet.UnknownDE = s.UInt16(nameof(sheet.UnknownDE), sheet.UnknownDE); // DE always 0 in initial data
-        sheet.UnknownE0 = s.UInt16(nameof(sheet.UnknownE0), sheet.UnknownE0); // E0 always 0 in initial data
+        sheet.Combat.BaseDefense = s.UInt16(nameof(sheet.Combat.BaseDefense), sheet.Combat.BaseDefense); // D6
+        sheet.Combat.BonusDefense = s.UInt16(nameof(sheet.Combat.BonusDefense), sheet.Combat.BonusDefense); // D8
+        sheet.Combat.BaseAttack = s.UInt16(nameof(sheet.Combat.BaseAttack), sheet.Combat.BaseAttack); // DA
+        sheet.Combat.BonusAttack = s.UInt16(nameof(sheet.Combat.BonusAttack), sheet.Combat.BonusAttack); // DC
+        sheet.UnknownDE = s.UInt16(nameof(sheet.UnknownDE), sheet.UnknownDE); // DE always 0 in initial data. Magic attack level? (ref Ambermoon)
+        sheet.UnknownE0 = s.UInt16(nameof(sheet.UnknownE0), sheet.UnknownE0); // E0 always 0 in initial data. Magic defense level? (ref Ambermoon)
         sheet.LevelsPerActionPoint = s.UInt16(nameof(sheet.LevelsPerActionPoint), sheet.LevelsPerActionPoint); // E2
         sheet.LifePointsPerLevel = s.UInt16(nameof(sheet.LifePointsPerLevel), sheet.LifePointsPerLevel); // E4
         sheet.SpellPointsPerLevel = s.UInt16(nameof(sheet.SpellPointsPerLevel), sheet.SpellPointsPerLevel); // E6
         sheet.UnknownE8 = s.UInt16(nameof(sheet.UnknownE8), sheet.UnknownE8); // E8 Spell learning points? Only set for some Iskai monsters
         sheet.TrainingPointsPerLevel = s.UInt16(nameof(sheet.TrainingPointsPerLevel), sheet.TrainingPointsPerLevel); // EA
-        sheet.UnknownEC = s.UInt16(nameof(sheet.UnknownEC), sheet.UnknownEC); // EC
+        sheet.UnknownEC = s.UInt16(nameof(sheet.UnknownEC), sheet.UnknownEC); // EC, ref Ambermoon: Text index for looking at character
 
         sheet.Combat.ExperiencePoints = s.Int32(nameof(sheet.Combat.ExperiencePoints), sheet.Combat.ExperiencePoints); // EE
         // e.g. 98406 = 0x18066 => 6680 0100 in file

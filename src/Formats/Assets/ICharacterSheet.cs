@@ -17,7 +17,7 @@ public interface ICharacterSheet
     // Visual
     SpriteId SpriteId { get; } // Overworld / 3D graphics
     SpriteId PortraitId { get; } // Conversation portrait
-    SpriteId MonsterGfxId { get; } // Combat 3D graphics
+    SpriteId TwoDGfxId { get; } // Combat 3D graphics
     SpriteId TacticalGfxId { get; } // Combat 2D graphics
 
     EventSetId EventSetId { get; }

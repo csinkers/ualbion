@@ -138,7 +138,7 @@ public sealed class ItemData
         ArgumentNullException.ThrowIfNull(spellManager);
 
         item ??= new ItemData(id);
-        item.Unknown  = s.UInt8(nameof(item.Unknown), item.Unknown); // 0
+        item.Unknown  = s.UInt8(nameof(item.Unknown), item.Unknown); // 0 Was item pic at some point but deprecated?
         item.TypeId   = s.EnumU8(nameof(item.TypeId), item.TypeId);   // 1
         item.SlotType = ((PersistedItemSlotId)s.UInt8(nameof(item.SlotType), (byte)item.SlotType.ToPersisted())).ToMemory(); // 2
         item.BreakRate      = s.UInt8(nameof(item.BreakRate), item.BreakRate);           // 3

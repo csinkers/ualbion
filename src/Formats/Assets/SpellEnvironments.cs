@@ -7,7 +7,7 @@ public enum SpellEnvironments : byte
 {
     // The first 4 always appear together: reversing of
     // the exe will be required to see which is actually which
-    Indoors   = 1 << 0, 
+    Indoors   = 1 << 0,
     Outdoors  = 1 << 1,
     Dungeon   = 1 << 2,
     Inventory = 1 << 3,
@@ -16,4 +16,14 @@ public enum SpellEnvironments : byte
     Combat = 1 << 5,
     Unk6   = 1 << 6,
     Unk7   = 1 << 7,
+
+    /* From early asm code:
+    0 City
+    1 Dungeon
+    2 Wilderness
+    3 Interior
+    4 Camp
+    5 Combat
+    6 Spaceship
+    */
 }

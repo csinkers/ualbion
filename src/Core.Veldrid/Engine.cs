@@ -20,14 +20,12 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
     static RenderDoc _renderDoc;
 
     readonly FrameTimeAverager _frameTimeAverager = new(0.5);
-    readonly FenceHolder _fence;
     readonly WindowHolder _windowHolder;
     readonly bool _useRenderDoc;
 
     public GraphicsDevice Device { get; private set; }
-    CommandList _frameCommands;
     GraphicsBackend? _newBackend;
-    IRenderPipeline _renderSystem;
+    IRenderSystem _renderSystem;
     bool _done;
     bool _active = true;
 
@@ -36,7 +34,7 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
     public bool IsClipSpaceYInverted => Device?.IsClipSpaceYInverted ?? false;
     public string FrameTimeText => $"{Device.BackendType} {_frameTimeAverager.CurrentAverageFramesPerSecond:N2} fps ({_frameTimeAverager.CurrentAverageFrameTimeMilliseconds:N3} ms)";
 
-    public IRenderPipeline RenderSystem
+    public IRenderSystem RenderSystem
     {
         get => _renderSystem;
         set
@@ -51,8 +49,6 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
         _newBackend = backend;
         _useRenderDoc = useRenderDoc;
         _windowHolder = showWindow ? new WindowHolder() : null;
-        _fence = new FenceHolder("RenderStage fence");
-        AttachChild(_fence);
 
         if (_windowHolder != null)
             AttachChild(_windowHolder);
@@ -248,8 +244,6 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
             }
 
             Device.WaitForIdle();
-            _frameCommands = Device.ResourceFactory.CreateCommandList();
-            _frameCommands.Name = "Frame Commands List";
 
             Raise(new DeviceCreatedEvent(Device));
             Raise(new BackendChangedEvent());
@@ -271,9 +265,7 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
         {
             Device?.WaitForIdle();
             Raise(new DestroyDeviceObjectsEvent());
-            _frameCommands?.Dispose();
             Device?.Dispose();
-            _frameCommands = null;
             Device = null;
         }
     }
@@ -340,7 +332,6 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
     {
         DestroyAllObjects();
         _windowHolder?.Dispose();
-        _fence.Dispose();
     }
 
     public GraphicsDeviceFeatures GraphicsFeatures => Device.Features;

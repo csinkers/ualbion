@@ -62,9 +62,9 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
     [JsonIgnore] internal List<MapEventZone> GlobalZones { get; private set; } = new();
     [JsonIgnore] internal MapEventZone[] Zones { get; private set; } // This should only ever be modified using the Add/RemoveZone methods
 
-    [JsonIgnore] public MapSubMode SubMode
+    [JsonIgnore] public MapLightingMode LightingMode
     {
-        get => (MapSubMode)(
+        get => (MapLightingMode)(
             ((Flags & MapFlags.SubMode1) != 0 ? 1 : 0) |
             ((Flags & MapFlags.SubMode2) != 0 ? 2 : 0));
         set => Flags =

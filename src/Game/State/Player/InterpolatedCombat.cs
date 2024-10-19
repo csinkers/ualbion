@@ -23,6 +23,8 @@ public class InterpolatedCombat : ICombatAttributes
     public ICharacterAttribute LifePoints { get; }
     public byte ActionPoints => (byte)ApiUtil.Lerp(_a().ActionPoints, _b().ActionPoints, _getLerp());
     public ushort BaseDefense => (ushort)ApiUtil.Lerp(_a().BaseDefense, _b().BaseDefense, _getLerp());
-    public ushort BonusDefense => (ushort)ApiUtil.Lerp(_a().BonusDefense, _b().BonusDefense, _getLerp());
+    public short BonusDefense => (short)ApiUtil.Lerp(_a().BonusDefense, _b().BonusDefense, _getLerp());
+    public ushort BaseAttack => (ushort)ApiUtil.Lerp(_a().BaseAttack, _b().BaseAttack, _getLerp());
+    public short BonusAttack => (short)ApiUtil.Lerp(_a().BonusAttack, _b().BonusAttack, _getLerp());
     public PlayerConditions Conditions => _b().Conditions;
 }

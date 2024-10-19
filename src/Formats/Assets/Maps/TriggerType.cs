@@ -6,8 +6,8 @@ public enum TriggerType : ushort
 {
     Normal = 0,
     Examine = 1,
-    Manipulate = 2,
-    TalkTo = 3,
+    Manipulate = 2, // aka 'Touch'
+    TalkTo = 3,     // aka 'Speak'
     UseItem = 4,
     MapInit = 5,
     EveryStep = 6,

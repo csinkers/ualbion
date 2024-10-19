@@ -21,17 +21,16 @@ public enum MapNpcFlags : ushort
     MoveA1 = 0x4, // 2 bit movement type, used if MapFlags.NpcMovementMode is not set
     MoveA2 = 0x8, // part of movement type in V1, an unknown flag in V2
 
-    Unk3      = 0x8,
     SimpleMsg = 0x10, // When talked to, shows a simple msg (i.e. interprets Id as a MapText sub-id). When not set, Id = EventSetId.
     Unk5      = 0x20, // 277 times - IconPriority?
-    NoClip    = 0x40,
-    Unused7   = 0x80, // ??
+    NoClip    = 0x40, // WaveAnim?
+    Unused7   = 0x80, // ?? - 2 bit 'icon height'?
 
     // Movement (used if MapFlags.NpcMovementMode is set)
-    MoveB1 = 0x100,
-    MoveB2 = 0x200,
-    MoveB4 = 0x400,
-    MoveB8 = 0x800,
+    MoveB1 = 0x100, // part of icon height?
+    MoveB2 = 0x200, // async anim?
+    MoveB4 = 0x400, // random anim?
+    MoveB8 = 0x800, // map graphics?
 
     Unused12 = 0x1000,
     Unused13 = 0x2000,

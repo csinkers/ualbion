@@ -22,8 +22,8 @@ public sealed class IsometricRenderSystem : GameComponent, IDisposable
     // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
     readonly RenderManager _manager;
 
-    public RenderSystem OnScreen { get; }
-    public RenderSystem OffScreen { get; }
+    public IRenderSystem OnScreen { get; }
+    public IRenderSystem OffScreen { get; }
     public IsometricBuilder Builder { get; }
     public IFramebufferHolder IsoBuffer { get; }
 
@@ -32,6 +32,8 @@ public sealed class IsometricRenderSystem : GameComponent, IDisposable
         OutputDescription screenFormat = SimpleFramebuffer.Output;
 
         var sceneManager = AttachChild(new SceneManager());
+        var globalProvider1 = new GlobalResourceSetProvider();
+        var globalProvider2 = new GlobalResourceSetProvider();
         _manager = RenderManagerBuilder.Create()
             .Framebuffer("fb_iso", new SimpleFramebuffer("fb_iso", (uint)(tileWidth * tilesPerRow), (uint)tileHeight))
             .Renderer("r_sprite", new SpriteRenderer(screenFormat))
@@ -42,7 +44,8 @@ public sealed class IsometricRenderSystem : GameComponent, IDisposable
             .System("sys_onscreen", pipe => 
                 pipe
                 .Framebuffer("fb_screen", new MainFramebuffer("fb_screen"))
-                .Resources(new GlobalResourceSetProvider())
+                .Resources(globalProvider1)
+                .Component("c_globalUpdater", new GlobalResourceSetUpdater(globalProvider1))
                 .Pass("p_iso", pb => 
                     pb
                     .Resources(new MainPassResourceProvider(pipe.GetFramebuffer("fb_iso"), sceneManager))
@@ -59,7 +62,8 @@ public sealed class IsometricRenderSystem : GameComponent, IDisposable
             )
             .System("sys_offscreen", pipe => 
                 pipe
-                .Resources(new GlobalResourceSetProvider())
+                .Resources(globalProvider2)
+                .Component("c_globalUpdater", new GlobalResourceSetUpdater(globalProvider2))
                 .Pass("p_iso", pb => 
                     pb
                     .Resources(new MainPassResourceProvider(pipe.GetFramebuffer("fb_iso"), sceneManager))

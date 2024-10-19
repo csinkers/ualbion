@@ -1,8 +1,5 @@
 ﻿using System;
 using UAlbion.Api.Eventing;
-using UAlbion.Core.Events;
-using UAlbion.Core.Veldrid.Textures;
-using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 
@@ -13,12 +10,10 @@ public sealed class GlobalResourceSetProvider : Component, IResourceProvider, ID
     readonly SingleBuffer<GlobalInfo> _globalInfo;
     readonly SamplerHolder _paletteSampler;
     readonly GlobalSet _globalSet;
-    ITextureHolder _dayPalette;
-    ITextureHolder _nightPalette;
 
     public IResourceSetHolder ResourceSet => _globalSet;
 
-    public GlobalResourceSetProvider()
+    public GlobalResourceSetProvider(string name = "Global")
     {
         _paletteSampler = new SamplerHolder
         {
@@ -29,10 +24,10 @@ public sealed class GlobalResourceSetProvider : Component, IResourceProvider, ID
             Filter = SamplerFilter.MinPoint_MagPoint_MipPoint,
         };
 
-        _globalInfo = new SingleBuffer<GlobalInfo>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "B_Global");
+        _globalInfo = new SingleBuffer<GlobalInfo>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, $"B_{name}");
         _globalSet = new GlobalSet
         {
-            Name = "RS_Global",
+            Name = $"RS_{name}",
             Global = _globalInfo,
             Sampler = _paletteSampler,
         };
@@ -40,42 +35,24 @@ public sealed class GlobalResourceSetProvider : Component, IResourceProvider, ID
         AttachChild(_paletteSampler);
         AttachChild(_globalInfo);
         AttachChild(_globalSet);
-
-        On<PrepareFrameEvent>(_ => UpdatePerFrameResources());
     }
 
-    void UpdatePerFrameResources()
+    public ITextureHolder DayPalette
     {
-        var clock = TryResolve<IClock>();
-        var textureSource = Resolve<ITextureSource>();
-        var paletteManager = Resolve<IPaletteManager>();
-        var engineFlags = ReadVar(V.Core.User.EngineFlags);
+        get => _globalSet.DayPalette;
+        set => _globalSet.DayPalette = value;
+    }
 
-        var dayPalette = textureSource.GetSimpleTexture(paletteManager.Day.Texture);
-        var nightTexture = paletteManager.Night?.Texture ?? paletteManager.Day.Texture;
-        var nightPalette = textureSource.GetSimpleTexture(nightTexture);
+    public ITextureHolder NightPalette
+    {
+        get => _globalSet.NightPalette;
+        set => _globalSet.NightPalette = value;
+    }
 
-        if (_dayPalette != dayPalette)
-        {
-            _dayPalette = dayPalette;
-            _globalSet.DayPalette = dayPalette;
-        }
-
-        if (_nightPalette != nightPalette)
-        {
-            _nightPalette = nightPalette;
-            _globalSet.NightPalette = nightPalette;
-        }
-
-        var info = new GlobalInfo
-        {
-            Time = clock?.ElapsedTime ?? 0,
-            EngineFlags = engineFlags,
-            PaletteBlend = paletteManager.Blend,
-            PaletteFrame = paletteManager.Frame,
-        };
-
-        _globalInfo.Data = info;
+    public GlobalInfo GlobalInfo
+    {
+        get => _globalInfo.Data;
+        set => _globalInfo.Data = value;
     }
 
     public void Dispose()
@@ -84,5 +61,4 @@ public sealed class GlobalResourceSetProvider : Component, IResourceProvider, ID
         _paletteSampler?.Dispose();
         _globalSet?.Dispose();
     }
-
 }

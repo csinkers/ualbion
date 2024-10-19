@@ -85,11 +85,27 @@ public class MonsterData
     {
         m ??= new MonsterData();
         var initial = s.Offset;
-        m.MonsterGraphics = SpriteId.SerdesU8(nameof(MonsterGraphics), m.MonsterGraphics, AssetType.MonsterGfx, mapping, s);
+        m.MonsterGraphics = SpriteId.SerdesU8(nameof(MonsterGraphics), m.MonsterGraphics, AssetType.MonsterGfx, mapping, s); // 0
 
         // 0x148 total length
-        m.Unk1   = s.UInt8(nameof(Unk1), m.Unk1);
-        m.Unk2   = s.Bytes(nameof(Unk2), m.Unk2, 0x32);
+
+        /*
+        Based on Ambermoon:
+        0x100 bytes for animation data
+          0x8 for active frame bitfields
+         0x30 Atari & Amiga palette info (probably not used?)
+          0x1 bitfield for animation bounciness
+          0x1 'even' ??
+          0x2 Monster Width
+          0x2 Monster Height
+          0x2 Monster ZoomX
+          0x2 Monster ZoomY
+
+        Total: 142
+        */
+
+        m.Unk1   = s.UInt8(nameof(Unk1), m.Unk1); // Anim motion?
+        m.Unk2   = s.Bytes(nameof(Unk2), m.Unk2, 0x32); // Recolour pal # (1byte), 1 unused, then animation data (256 bytes)
         m.Unk34  = s.UInt16(nameof(Unk34), m.Unk34);
         m.Unk36  = s.UInt16(nameof(Unk36), m.Unk36);
         m.Unk38  = s.UInt32(nameof(Unk38), m.Unk38);
@@ -130,9 +146,9 @@ public class MonsterData
         m.Unkf8  = s.UInt32(nameof(Unkf8), m.Unkf8);
         m.Unkfc  = s.UInt32(nameof(Unkfc), m.Unkfc);
         m.Unk100 = s.UInt32(nameof(Unk100), m.Unk100);
-        m.Unk104 = s.UInt32(nameof(Unk104), m.Unk104);
+        m.Unk104 = s.UInt32(nameof(Unk104), m.Unk104); // anim lengths? (8 bytes)
         m.Unk108 = s.UInt32(nameof(Unk108), m.Unk108);
-        m.Unk10c = s.Bytes(nameof(Unk10c), m.Unk10c, 0xc);
+        m.Unk10c = s.Bytes(nameof(Unk10c), m.Unk10c, 0xc); // Baseline short, X factor short, Y factor short ????
         m.Unk118 = s.UInt32(nameof(Unk118), m.Unk118);
         m.Unk11c = s.UInt32(nameof(Unk11c), m.Unk11c);
         m.Unk120 = s.UInt32(nameof(Unk120), m.Unk120);

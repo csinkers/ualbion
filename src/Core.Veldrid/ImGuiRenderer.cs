@@ -14,6 +14,11 @@ using UAlbion.Core.Visual;
 
 namespace UAlbion.Core.Veldrid;
 
+public class ImGuiPreRenderEvent : Event, IVerboseEvent
+{
+    public GraphicsDevice Device { get; internal set; }
+}
+
 public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is largely based on Veldrid.ImGuiRenderer from Veldrid.ImGui
 {
     readonly OutputDescription _outputFormat;
@@ -25,6 +30,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     readonly Dictionary<Texture, TextureView> _autoViewsByTexture = new();
     readonly Dictionary<IntPtr, ResourceSetInfo> _viewsById = new();
     readonly List<IDisposable> _ownedResources = [];
+    readonly ImGuiPreRenderEvent _preRenderEvent = new();
     int _lastAssignedId = 100;
     bool _frameBegun;
 
@@ -99,6 +105,9 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
 
         if (!_frameBegun)
             return;
+
+        _preRenderEvent.Device = device;
+        Raise(_preRenderEvent);
 
         _frameBegun = false;
         ImGui.Render();

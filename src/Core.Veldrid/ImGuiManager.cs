@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.Threading;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
@@ -129,6 +130,13 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
 
     public int GetNextWindowId() => Interlocked.Increment(ref _nextWindowId);
     public void AddWindow(IImGuiWindow window) => AttachChild(window);
+
+    public IEnumerable<IImGuiWindow> FindWindows(string prefix)
+    {
+        foreach (var child in Children)
+            if (child is IImGuiWindow window && window.Name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                yield return window;
+    }
 
     public IntPtr GetOrCreateImGuiBinding(Texture texture)
     {

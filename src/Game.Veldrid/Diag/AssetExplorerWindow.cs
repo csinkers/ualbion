@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Numerics;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
@@ -14,8 +15,10 @@ public class AssetExplorerWindow : Component, IImGuiWindow
     AssetId _selected = AssetId.None;
     AssetId _hovered = AssetId.None;
     AssetViewerWindow _lastViewer;
+    bool _init = true;
     public string Name { get; }
     public AssetExplorerWindow(string name) => Name = name;
+
     public void Draw()
     {
         bool open = true;
@@ -24,18 +27,28 @@ public class AssetExplorerWindow : Component, IImGuiWindow
         if (ImGui.InputText("Filter", _filterBuf, (uint)_filterBuf.Length))
             _filter = ImGuiUtil.GetString(_filterBuf);
 
+        if (_init)
+        {
+            var manager = Resolve<IImGuiManager>();
+            _lastViewer = manager.FindWindows("Asset Viewer").OfType<AssetViewerWindow>().FirstOrDefault();
+            _init = false;
+        }
+
         if (ImGui.Button("Open Viewer"))
         {
             var manager = Resolve<IImGuiManager>();
-            var id = manager.GetNextWindowId();
-            var name = $"AssetViewer##{id}";
-            _lastViewer = new AssetViewerWindow(name);
-            manager.AddWindow(_lastViewer);
+            _lastViewer = manager.FindWindows("Asset Viewer").OfType<AssetViewerWindow>().FirstOrDefault();
+            if (_lastViewer == null)
+            {
+                var id = manager.GetNextWindowId();
+                var name = $"Asset Viewer##{id}";
+                _lastViewer = new AssetViewerWindow(name);
+
+                manager.AddWindow(_lastViewer);
+            }
         }
 
-        if (_lastViewer != null)
-            _lastViewer.Id = _selected;
-
+        bool selectionChanged = false;
         foreach (var type in Enum.GetValues<AssetType>())
         {
             bool shown = false;
@@ -62,7 +75,11 @@ public class AssetExplorerWindow : Component, IImGuiWindow
                         ImGui.Text(name);
 
                     if (ImGui.IsItemClicked())
+                    {
                         _selected = id;
+                        selectionChanged = true;
+                    }
+
                     if (ImGui.IsItemHovered())
                         _hovered = id;
                 }
@@ -72,6 +89,9 @@ public class AssetExplorerWindow : Component, IImGuiWindow
                 ImGui.TreePop();
         }
         ImGui.End();
+
+        if (selectionChanged && _lastViewer != null)
+            _lastViewer.Id = _selected;
 
         if (!open)
             Remove();

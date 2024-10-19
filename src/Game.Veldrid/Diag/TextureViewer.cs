@@ -1,108 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Text;
 using ImGuiNET;
 using JetBrains.Annotations;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Textures;
-using UAlbion.Core.Visual;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
-using Veldrid;
 using VeldridGen.Interfaces;
 using Component = UAlbion.Api.Eventing.Component;
 
 namespace UAlbion.Game.Veldrid.Diag;
-
-public class TextureViewerRenderer : Component, ICameraProvider
-{
-    public uint Width
-    {
-        get => _fb.Width;
-        set => _fb.Width = value;
-    }
-
-    public uint Height
-    {
-        get => _fb.Height;
-        set => _fb.Height = value;
-    }
-
-    public int Frame
-    {
-        get => _sprite.Frame;
-        set => _sprite.Frame = value;
-    }
-
-    public int FrameCount => _sprite.FrameCount;
-
-    public ITextureHolder Palette
-    {
-        get => _globalSet.DayPalette;
-        set
-        {
-            _globalSet.DayPalette = value;
-            _globalSet.NightPalette = value;
-        }
-    }
-
-    readonly List<IRenderable> _renderables = new();
-    readonly SimpleFramebuffer _fb;
-    readonly CommandListHolder _cl;
-    readonly FenceHolder _fence;
-    readonly BatchManager<SpriteKey, SpriteInfo> _batchManager;
-    readonly GlobalResourceSetProvider _globalSet;
-    readonly MainPassResourceProvider _passSet;
-    readonly OrthographicCamera _camera;
-    readonly Sprite _sprite;
-
-    public TextureViewerRenderer(ITexture texture)
-    {
-        _fb = AttachChild(new SimpleFramebuffer("fb_texViewer", (uint)texture.Width, (uint)texture.Height));
-        _cl = AttachChild(new CommandListHolder("cl_texViewer"));
-        _fence = AttachChild(new FenceHolder("f_texViewer"));
-        _batchManager = AttachChild(new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key), false));
-        _globalSet = AttachChild(new GlobalResourceSetProvider("TexViewerGlobal"));
-        _camera = AttachChild(new OrthographicCamera());
-        _passSet = AttachChild(new MainPassResourceProvider(_fb, this));
-        _sprite = AttachChild(new Sprite(AssetId.None, DrawLayer.Interface, SpriteKeyFlags.NoTransform, 0, _ => texture, _batchManager));
-
-        On<ImGuiPreRenderEvent>(e => Render(e.Device));
-    }
-
-    void Render(GraphicsDevice gd)
-    {
-        var cl = _cl.CommandList;
-        if (cl == null)
-            return;
-
-        _renderables.Clear();
-        cl.Begin();
-
-        cl.SetFramebuffer(_fb.Framebuffer);
-        cl.SetFullViewports();
-        cl.SetFullScissorRects();
-        cl.ClearColorTarget(0, RgbaFloat.Black);
-        cl.ClearDepthStencil(gd.IsDepthRangeZeroToOne ? 1f : 0f);
-
-        var renderer = Resolve<IRenderManager>().GetRenderer(AlbionRenderSystemConstants.R_Sprite);
-        _batchManager.Collect(_renderables);
-
-        foreach (var renderable in _renderables)
-            renderer.Render(renderable, _cl.CommandList, gd, _globalSet.ResourceSet, _passSet.ResourceSet);
-
-        _cl.CommandList.End();
-
-        gd.SubmitCommands(_cl.CommandList, _fence.Fence);
-        gd.WaitForFence(_fence.Fence); // Slow but simple
-    }
-
-    public ICamera Camera => _camera;
-    public Texture Framebuffer => _fb.Color.DeviceTexture;
-}
 
 public sealed class TextureViewer : Component, IAssetViewer
 {
@@ -110,11 +21,18 @@ public sealed class TextureViewer : Component, IAssetViewer
     readonly ITexture _asset;
     readonly TextureViewerRenderer _renderer;
 
+    int[] _frames = [];
+    int _frameIndex;
+    DateTime _lastTransition = DateTime.UtcNow;
+    float _animSpeed = 1.0f;
+    bool _isAnimating;
+
     string[] _paletteNames = [];
+    AssetId[] _paletteIds = [];
     ITextureArrayHolder _textureArray;
     ITextureHolder _texture;
     int _curPal;
-    float _animSpeed;
+    bool _skipShadows;
 
     public TextureViewer([NotNull] ITexture asset)
     {
@@ -130,24 +48,72 @@ public sealed class TextureViewer : Component, IAssetViewer
         else
             _texture = source.GetSimpleTexture(_asset);
 
-        var paletteIds = AssetMapping.Global.EnumerateAssetsOfType(AssetType.Palette);
-        _paletteNames = paletteIds.Select(x => x.ToString()).OrderBy(x => x).ToArray();
+        _paletteIds = AssetMapping.Global.EnumerateAssetsOfType(AssetType.Palette).OrderBy(x => x.ToString()).ToArray();
+        _paletteNames = _paletteIds.Select(x => x.ToString()).ToArray();
 
-        AlbionPalette pal = Resolve<IAssetManager>().LoadPalette(paletteIds.First());
+        var meta = Resolve<IAssetManager>().GetAssetInfo((AssetId)_asset.Id);
+        var palId = meta.PaletteId;
+        if (palId.IsNone)
+            palId = _paletteIds[0];
+
+        _skipShadows = ((AssetId)_asset.Id).Type == AssetType.MonsterGfx;
+
+        for (int i = 0; i < _paletteIds.Length; i++)
+            if (palId == _paletteIds[i])
+                _curPal = i;
+
+        AlbionPalette pal = Resolve<IAssetManager>().LoadPalette(palId);
         var textureSource = Resolve<ITextureSource>();
         _renderer.Palette = textureSource.GetSimpleTexture(pal.Texture);
     }
 
     public void Draw()
     {
-        ImGui.Combo("Palette", ref _curPal, _paletteNames, _paletteNames.Length);
-        ImGui.Text($"Max Frame: {_renderer.FrameCount}");
+        int zoom = _renderer.Zoom;
+        if (ImGui.SliderInt("Zoom", ref zoom, 1, 4))
+            _renderer.Zoom = zoom;
 
-        if (ImGui.InputText("Frames", _framesBuf, (uint)_framesBuf.Length))
+        if (ImGui.Combo("Palette", ref _curPal, _paletteNames, _paletteNames.Length))
         {
+            AlbionPalette pal = Resolve<IAssetManager>().LoadPalette(_paletteIds[_curPal]);
+            var textureSource = Resolve<ITextureSource>();
+            _renderer.Palette = textureSource.GetSimpleTexture(pal.Texture);
         }
 
-        ImGui.SliderFloat("Animation Speed", ref _animSpeed, 0.0f, 1.0f);
+        int factor = _skipShadows ? 2 : 1; 
+        ImGui.Text($"Max Frame: {_renderer.FrameCount / factor}");
+
+        bool temp = ImGui.Checkbox("Skip shadows", ref _skipShadows);
+        if (ImGui.InputText("Frames", _framesBuf, (uint)_framesBuf.Length) || temp)
+        {
+            var framesString = Encoding.UTF8.GetString(_framesBuf);
+            _frames = framesString[..framesString.IndexOf('\0')]
+                .Split([' ', ',', ';'], StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => int.TryParse(x, out var n) ? n : -1)
+                .Where(x => x >= 0)
+                .ToArray();
+        }
+
+        int curFrame = _renderer.Frame / factor;
+        if (ImGui.SliderInt("Frame", ref curFrame, 0, (_renderer.FrameCount / factor) - 1))
+            _renderer.Frame = (curFrame * factor);
+
+        ImGui.Checkbox("Animate", ref _isAnimating);
+        ImGui.SameLine();
+        ImGui.SliderFloat("Animation Speed", ref _animSpeed, 1.0f, 10.0f);
+
+        TimeSpan period = TimeSpan.FromSeconds(1.0f / _animSpeed);
+        if (_isAnimating && _lastTransition + period < DateTime.UtcNow && _frames.Length > 0)
+        {
+            _lastTransition = DateTime.UtcNow;
+            _frameIndex++;
+
+            if (_frameIndex >= _frames.Length)
+                _frameIndex = 0;
+
+            int frame = _frames[_frameIndex] * factor;
+            _renderer.Frame = frame < _renderer.FrameCount ? frame : 0;
+        }
 
         if (_texture is { DeviceTexture: not null })
         {

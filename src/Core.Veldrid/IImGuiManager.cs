@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UAlbion.Core.Veldrid.Events;
 using Veldrid;
 
@@ -8,6 +9,7 @@ public interface IImGuiManager
 {
     int GetNextWindowId();
     void AddWindow(IImGuiWindow window);
+    IEnumerable<IImGuiWindow> FindWindows(string prefix);
     IntPtr GetOrCreateImGuiBinding(TextureView textureView);
     IntPtr GetOrCreateImGuiBinding(Texture texture);
     void RemoveImGuiBinding(TextureView textureView);

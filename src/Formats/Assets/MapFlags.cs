@@ -5,7 +5,7 @@ namespace UAlbion.Formats.Assets;
 [Flags]
 public enum MapFlags : ushort
 {
-    SubModeMask = SubMode1 | SubMode2,
+    SubModeMask  = SubMode1  | SubMode2,
     RestModeMask = RestMode1 | RestMode2,
 
     SubMode1        =    0x1,

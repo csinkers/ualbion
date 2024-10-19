@@ -22,7 +22,7 @@ class Test3DMap
         {
             map.Flags |= MapFlags.Unk8000;
             map.RestMode = RestMode.NoResting;
-            map.SubMode = MapSubMode.Unk1;
+            map.LightingMode = MapLightingMode.AlwaysDark;
 
             Array.Fill(map.Floors, (byte)lab1.BlankFloorOffset);
             /*for (int i = 0; i < map.Contents.Length; i++)

@@ -6,8 +6,19 @@ using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.MapEvents;
 
+public enum MapExitType
+{
+    Normal = 0,
+    Teleporter = 1,
+    TrapdoorUp = 2,
+    Jump = 3,
+    EndSequence = 4,
+    TrapdoorDown = 5,
+    Shuttle = 6,
+}
+
 [Event("teleport", "teleports the party to a specific location")]
-public class TeleportEvent : MapEvent
+public class TeleportEvent : MapEvent // aka MapExit event
 {
     TeleportEvent() { }
     public TeleportEvent(MapId mapId, byte x, byte y, Direction direction, byte unk4, byte unk5)
@@ -40,7 +51,7 @@ public class TeleportEvent : MapEvent
     [EventPart("x")] public byte X { get; private set; }
     [EventPart("y")] public byte Y { get; private set; }
     [EventPart("dir", true, Direction.Unchanged)] public Direction Direction { get; private set; }
-    [EventPart("unk4", true, (byte)255)] public byte Unk4 { get; private set; } // 255 on 2D maps, (1,6) on 3D maps
+    [EventPart("unk4", true, (byte)255)] public byte Unk4 { get; private set; } // 255 on 2D maps, (1,6) on 3D maps - probably "MapExitType"
     [EventPart("unk5", true, (byte)2)] public byte Unk5 { get; private set; } // 2,3,4,5,6,8,9
     public override MapEventType EventType => MapEventType.MapExit;
 }

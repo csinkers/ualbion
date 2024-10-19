@@ -30,4 +30,19 @@ public class EventContext
     public ActionEvent LastAction { get; set; }
 
     public override string ToString() => $"{Id} Status:{Status} Src:{Source} Node:{Node}";
+    /*
+    byte   EventContextType
+    byte   EventContextFlags
+    byte   EventHandle     ; Memory block containing event data
+    byte   EventTextHandle ; Memory block containing texts
+    byte   EventChainNr    ; Current chain number
+    ???    rseven
+    ushort EventBlockNr ; Current block number
+    int    EventBase    ; Offset to event blocks
+    byte   EventData    ; Current event block
+    int    ContextValidator
+    byte   NormalEventData
+    int[2] ExtraData
+    byte   EventContextSize
+     */
 }

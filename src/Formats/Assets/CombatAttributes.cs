@@ -19,9 +19,11 @@ public class CombatAttributes : ICombatAttributes
     [DiagEdit(Style = DiagEditStyle.NumericInput, Min = 0)]
     public byte ActionPoints { get; set; }
     public ushort BaseDefense { get; set; } // Intrinsic defense (monsters only?)
-    public ushort BonusDefense { get; set; } // Due to equipment
+    public short BonusDefense { get; set; } // Due to equipment
     public ushort BaseAttack { get; set; } // Intrinsic damage (monsters only?)
-    public ushort BonusAttack { get; set; } // Due to equipment
+    public short BonusAttack { get; set; } // Due to equipment
+    public ushort MagicAttack { get; set; }
+    public ushort MagicDefense { get; set; }
 
     [DiagEdit(Style = DiagEditStyle.Checkboxes)]
     public PlayerConditions Conditions { get; set; }

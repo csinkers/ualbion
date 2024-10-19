@@ -1,28 +1,20 @@
-﻿using System.Numerics;
-using ImGuiNET;
+﻿using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Reflection;
-using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Formats;
-using VeldridGen.Interfaces;
+using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
-public sealed class AssetViewerWindow : Component, IImGuiWindow
+public sealed class AssetViewerWindow(string name) : Component, IImGuiWindow
 {
     AssetId _id;
     bool _dirty = true;
     object _asset;
-    ITextureArrayHolder _textureArray;
-    ITextureHolder _texture;
-
-    public AssetViewerWindow(string name)
-    {
-        Name = name;
-    }
+    IAssetViewer _viewer;
 
     public AssetId Id
     {
@@ -35,7 +27,8 @@ public sealed class AssetViewerWindow : Component, IImGuiWindow
         }
     }
 
-    public string Name { get; }
+    public string Name { get; } = name;
+
     public void Draw()
     {
         Refresh();
@@ -43,26 +36,12 @@ public sealed class AssetViewerWindow : Component, IImGuiWindow
         bool open = true;
         ImGui.Begin(Name, ref open);
 
-        DrawTexture(_asset as ITexture);
         DrawInspector(Id.ToString(), _asset);
+        _viewer?.Draw();
 
         ImGui.End();
         if (!open)
             Remove();
-    }
-
-    void DrawTexture(ITexture texture)
-    {
-        if (_texture is { DeviceTexture: not null })
-        {
-            var imgui = Resolve<IImGuiManager>();
-            var ptr = imgui.GetOrCreateImGuiBinding(_texture.DeviceTexture);
-            ImGui.Image(ptr, new Vector2(_texture.DeviceTexture.Width, _texture.DeviceTexture.Height));
-        }
-
-        if (_textureArray is { DeviceTexture: not null })
-        {
-        }
     }
 
     static void DrawInspector(string name, object target)
@@ -79,19 +58,16 @@ public sealed class AssetViewerWindow : Component, IImGuiWindow
             return;
 
         _dirty = false;
-        _textureArray = null;
-        _texture = null;
 
         var mods = Resolve<IModApplier>();
         _asset = mods.LoadAsset(_id);
+        _viewer?.Remove();
 
-        if (_asset is ITexture texture)
+        _viewer = AttachChild(_asset switch
         {
-            var source = Resolve<ITextureSource>();
-            if (texture.ArrayLayers > 1)
-                _textureArray = source.GetArrayTexture(texture);
-            else
-                _texture = source.GetSimpleTexture(texture);
-        }
+            ITexture texture => new TextureViewer(texture),
+            CharacterSheet sheet => new CharacterViewer(sheet),
+            _ => _viewer
+        });
     }
 }

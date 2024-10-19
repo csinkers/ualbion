@@ -17,7 +17,7 @@ public class BatchManager<TKey, TInstance> : ServiceComponent<IBatchManager<TKey
     float _lastCleanup;
     float _totalTime;
 
-    public BatchManager(BatchFactoryFunc factory)
+    public BatchManager(BatchFactoryFunc factory, bool registerAsService = true) : base(registerAsService)
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         On<EngineUpdateEvent>(OnUpdate);

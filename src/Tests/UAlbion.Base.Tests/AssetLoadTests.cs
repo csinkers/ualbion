@@ -359,7 +359,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(Tileset.Toronto, map.TilesetId);
         Assert.Equal(Palette.Toronto2D, map.PaletteId);
         Assert.Equal(MapFlags.RestMode1 | MapFlags.RestMode2 | MapFlags.TorontoAutomap | MapFlags.V2NpcData | MapFlags.ExtraNpcs, map.Flags);
-        Assert.Equal(MapSubMode.Unk0, map.SubMode);
+        Assert.Equal(MapLightingMode.AlwaysLight, map.LightingMode);
         Assert.Equal(RestMode.NoResting, map.RestMode);
         Assert.Equal(map.Width * map.Height, map.Tiles.Length);
         Assert.Equal(871, map.Tiles[map.Width + 1].Underlay);
@@ -417,7 +417,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(64, map.AutomapGraphics.Length);
         Assert.Equal(Song.DungeonAmbient, map.AmbientSongId);
         Assert.Equal(MapFlags.SubMode1 | MapFlags.RestMode1 | MapFlags.V2NpcData | MapFlags.ExtraNpcs, map.Flags);
-        Assert.Equal(MapSubMode.Unk1, map.SubMode);
+        Assert.Equal(MapLightingMode.AlwaysDark, map.LightingMode);
         Assert.Equal(RestMode.RestEightHours, map.RestMode);
         Assert.Equal(map.Width * map.Height, map.Ceilings.Length);
         Assert.Equal(2, map.Ceilings[2 * map.Width + 2]);
@@ -536,7 +536,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(PlayerClass.Monster, m.PlayerClass);
         Assert.Equal(PlayerLanguages.None, m.Languages);
         Assert.Equal(10, m.Level);
-        Assert.Equal(MonsterGfx.Krondir, m.MonsterGfxId);
+        Assert.Equal(MonsterGfx.Krondir, m.TwoDGfxId);
         Assert.Equal(1, m.UnkownC);
         Assert.Equal(1, m.UnkownD);
         Assert.Equal(1, m.UnknownE);
@@ -591,7 +591,7 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(0, n.Combat.LifePoints.Max);
         Assert.Equal(0, n.Combat.ActionPoints);
         Assert.Equal(0, n.Level);
-        Assert.Equal(SpriteId.None, n.MonsterGfxId);
+        Assert.Equal(SpriteId.None, n.TwoDGfxId);
         Assert.Equal(0, n.UnkownC);
         Assert.Equal(0, n.UnkownD);
         Assert.Equal(0, n.UnknownE);
@@ -665,10 +665,10 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(Portrait.Tom, t.PortraitId);
         Assert.Equal(EventSet.Tom, t.EventSetId);
         Assert.Equal(1, t.NumberOfOccupiedHands);
-        Assert.Equal(1, t.MonsterGfxId.Id);
+        Assert.Equal(1, t.TwoDGfxId.Id);
         Assert.Equal(0, t.UnkownC);
         Assert.Equal(2, t.UnknownE);
-        Assert.Equal(0, t.UnknownDE);
+        Assert.Equal(0, t.Combat.MagicAttack);
         Assert.Equal(10, t.LevelsPerActionPoint);
         Assert.Equal(4, t.LifePointsPerLevel);
         Assert.Equal(3, t.TrainingPointsPerLevel);

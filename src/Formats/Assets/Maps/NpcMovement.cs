@@ -6,6 +6,8 @@ public enum NpcMovement : byte
     RandomWander = 0x1,
     Stationary = 0x2,
     ChaseParty = 0x3,
+
+    // -- Values past this point are probably nonsense, the movement type is most likely only a 2 bit value. --
     Waypoints2 = 0x4,
     Stationary2 = 0x5, // Stationary
     Stationary3 = 0x6, // Stationary

@@ -9,48 +9,35 @@ using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
-public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
+public sealed class RenderSystem : Component, IRenderSystem, IDisposable
 {
     public string Name { get; init; }
     internal List<RenderPass> Passes { get; init; }
     internal List<IFramebufferHolder> Framebuffers { get; init; }
     internal IResourceProvider ResourceProvider { get; init; }
 
+    readonly PrepareDeviceObjectsEvent _prepareDeviceObjectsEvent = new();
     readonly PrepareFrameEvent _prepareFrameEvent = new();
     readonly PrepareFrameResourcesEvent _prepareFrameResourcesEvent = new();
     readonly PrepareFrameResourceSetsEvent _prepareFrameResourceSetsEvent = new();
-    CommandList _frameCommands;
-    Fence _fence;
+    readonly CommandListHolder _frameCommands;
+    readonly FenceHolder _fence;
     bool _addedChildren;
+
+    CommandList FrameCommands => _frameCommands.CommandList;
+    Fence Fence => _fence.Fence;
 
     public RenderSystem(IEnumerable<IComponent> extraComponents)
     {
         ArgumentNullException.ThrowIfNull(extraComponents);
+        _frameCommands = AttachChild(new CommandListHolder("cl_main"));
+        _fence = AttachChild(new FenceHolder("f_main"));
 
         foreach (var component in extraComponents)
             AttachChild(component);
-
-        On<DeviceCreatedEvent>(e => RebuildDeviceObjects(e.Device));
-        On<DestroyDeviceObjectsEvent>(_ => DestroyDeviceObjects());
     }
 
     public override string ToString() => $"RenderSystem:{Name}";
-    void RebuildDeviceObjects(GraphicsDevice device)
-    {
-        if (_frameCommands != null)
-            return;
-
-        _frameCommands = device.ResourceFactory.CreateCommandList();
-        _fence = device.ResourceFactory.CreateFence(false);
-    }
-
-    void DestroyDeviceObjects()
-    {
-        _frameCommands?.Dispose();
-        _fence?.Dispose();
-        _frameCommands = null;
-        _fence = null;
-    }
 
     protected override void Subscribing()
     {
@@ -77,34 +64,30 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
         if (!IsActive)
             throw new InvalidOperationException($"Tried to render using an inactive RenderSystem ({Name})");
 
-        if (_frameCommands == null)
-        {
-            RebuildDeviceObjects(graphicsDevice);
-            if (_frameCommands == null)
-                return;
-        }
+        _prepareDeviceObjectsEvent.Device = graphicsDevice;
+        Raise(_prepareDeviceObjectsEvent);
 
         using (PerfTracker.FrameEvent("Prepare resources"))
         {
-            _frameCommands.Begin();
+            FrameCommands.Begin();
 
             _prepareFrameResourcesEvent.Device = graphicsDevice;
-            _prepareFrameResourcesEvent.CommandList = _frameCommands;
+            _prepareFrameResourcesEvent.CommandList = FrameCommands;
             _prepareFrameResourceSetsEvent.Device = graphicsDevice;
-            _prepareFrameResourceSetsEvent.CommandList = _frameCommands;
+            _prepareFrameResourceSetsEvent.CommandList = FrameCommands;
 
             Raise(_prepareFrameEvent);
             Raise(_prepareFrameResourcesEvent);
             Raise(_prepareFrameResourceSetsEvent);
 
-            _frameCommands.End();
+            FrameCommands.End();
         }
 
         using (PerfTracker.FrameEvent("Submit prepare commands"))
         {
-            _fence.Reset();
-            graphicsDevice.SubmitCommands(_frameCommands, _fence);
-            graphicsDevice.WaitForFence(_fence);
+            Fence.Reset();
+            graphicsDevice.SubmitCommands(FrameCommands, Fence);
+            graphicsDevice.WaitForFence(Fence);
         }
 
         int i = 0;
@@ -112,17 +95,17 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
         {
             using (FrameEventCached(ref i, (this, phase), static (x, n) => $"{n} {x.Item1.Name} Render - {x.phase.Name}"))
             {
-                _frameCommands.Begin();
-                phase.Render(graphicsDevice, _frameCommands, ResourceProvider?.ResourceSet);
-                _frameCommands.End();
+                FrameCommands.Begin();
+                phase.Render(graphicsDevice, FrameCommands, ResourceProvider?.ResourceSet);
+                FrameCommands.End();
             }
 
-            _fence.Reset();
+            Fence.Reset();
             using (FrameEventCached(ref i, (this, phase), static (x, n) => $"{n} {x.Item1.Name} Submit commands - {x.phase.Name}"))
-                graphicsDevice.SubmitCommands(_frameCommands, _fence);
+                graphicsDevice.SubmitCommands(FrameCommands, Fence);
 
             using (FrameEventCached(ref i, (this, phase), static (x, n) => $"{n} {x.Item1.Name} Complete - {x.phase.Name}"))
-                graphicsDevice.WaitForFence(_fence);
+                graphicsDevice.WaitForFence(Fence);
         }
     }
 
@@ -133,7 +116,6 @@ public sealed class RenderSystem : Component, IRenderPipeline, IDisposable
                 disposable.Dispose();
 
         RemoveAllChildren();
-        DestroyDeviceObjects();
     }
 
     readonly List<string> _cachedStrings = new();

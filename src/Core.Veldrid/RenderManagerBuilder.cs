@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UAlbion.Core.Visual;
 using VeldridGen.Interfaces;
 
@@ -39,9 +38,9 @@ public class RenderManagerBuilder
         _built = true;
         return new()
         {
-            Renderers = _renderers.Values.ToList(),
-            Sources = _sources.Values.ToList(),
-            Framebuffers = _framebuffers.Values.ToList(),
+            Renderers = _renderers,
+            Sources = _sources,
+            Framebuffers = _framebuffers,
             Systems = _pipelines,
         };
     }

@@ -7,6 +7,8 @@ public interface ICombatAttributes
     ICharacterAttribute LifePoints { get; }
     byte ActionPoints { get; }
     ushort BaseDefense { get; }
-    ushort BonusDefense { get; }
+    short BonusDefense { get; }
+    ushort BaseAttack { get; }
+    short BonusAttack { get; }
     PlayerConditions Conditions { get; }
 }

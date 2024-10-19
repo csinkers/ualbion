@@ -213,6 +213,7 @@ static class Albion
         // Note: ImGuiGameWindow and PositionsWindow are added in AlbionRenderSystem so they can have access to internal render system components.
         var items = new[] { 
             new ShowWindowMenuItem("Asset Explorer", "Windows", name => new AssetExplorerWindow(name)),
+            new ShowWindowMenuItem("Asset Viewer",   "Windows", name => new AssetViewerWindow(name)),
             new ShowWindowMenuItem("Breakpoints",    "Windows", name => new BreakpointsWindow(name)),
             new ShowWindowMenuItem("Script",         "Windows", name => new CodeWindow(name)),
             new ShowWindowMenuItem("Console",        "Windows", name => new ImGuiConsoleLogger(name)),

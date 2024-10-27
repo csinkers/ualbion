@@ -115,4 +115,11 @@ public class SimpleTexture<T> : IMutableTexture<T> where T : unmanaged
         ArgumentOutOfRangeException.ThrowIfNotEqual(i, 0);
         return new ImageBuffer<T>(Width, Height, Width, MutablePixelData);
     }
+
+    public SimpleTexture<T> Clone()
+    {
+        var result = new SimpleTexture<T>(Id, Width, Height, Regions);
+        PixelData.CopyTo(result.MutablePixelData);
+        return result;
+    }
 }

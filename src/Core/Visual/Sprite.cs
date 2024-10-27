@@ -9,13 +9,13 @@ namespace UAlbion.Core.Visual;
 
 public class Sprite : Component, IPositioned
 {
-    readonly Action<PrepareFrameEvent> _onRenderDelegate;
+    readonly Action<PrepareFrameEvent> _onPrepareFrameDelegate;
     readonly DrawLayer _layer;
     readonly SpriteKeyFlags _keyFlags;
     readonly Func<IAssetId, ITexture> _textureLoaderFunc;
     readonly PositionedComponentMovedEvent _moveEvent;
 
-    BatchLease<SpriteKey, SpriteInfo> _sprite;
+    BatchLease<SpriteKey, SpriteInfo> _spriteLease;
     Vector3 _position;
     Vector2? _size;
     IAssetId _id;
@@ -33,9 +33,9 @@ public class Sprite : Component, IPositioned
         IBatchManager<SpriteKey, SpriteInfo> batchManager = null)
     {
         _moveEvent = new PositionedComponentMovedEvent(this);
-        _onRenderDelegate = OnRender;
+        _onPrepareFrameDelegate = OnPrepareFrame;
         On<BackendChangedEvent>(_ => Dirty = true);
-        On(_onRenderDelegate);
+        On(_onPrepareFrameDelegate);
         On<WorldCoordinateSelectEvent>(Select);
         On<HoverEvent>(_ =>
         {
@@ -63,8 +63,8 @@ public class Sprite : Component, IPositioned
         set
         {
             _id = value;
-            _sprite?.Dispose();
-            _sprite = null;
+            _spriteLease?.Dispose();
+            _spriteLease = null;
             Dirty = true;
         }
     }
@@ -98,12 +98,16 @@ public class Sprite : Component, IPositioned
         {
             if (_size == value)
                 return;
+
             _size = value;
             Dirty = true;
+
             if (IsSubscribed)
                 Raise(_moveEvent);
         }
     }
+
+    public Vector2 FrameSize => _spriteLease?.Key.Texture.Regions[Frame].Size ?? Vector2.One;
 
     [DiagEdit(Style = DiagEditStyle.NumericSlider, Min = 0, MaxProperty = nameof(FrameCount))]
     public int Frame
@@ -127,14 +131,14 @@ public class Sprite : Component, IPositioned
             if (value == _dirty)
                 return;
 
-            if (value) On(_onRenderDelegate);
+            if (value) On(_onPrepareFrameDelegate);
             else Off<PrepareFrameEvent>();
 
             _dirty = value;
         }
     }
 
-    void OnRender(PrepareFrameEvent _) => UpdateSprite();
+    void OnPrepareFrame(PrepareFrameEvent _) => UpdateSprite();
 
     public override string ToString() => $"Sprite {Id}";
 
@@ -147,8 +151,8 @@ public class Sprite : Component, IPositioned
     protected override void Unsubscribed()
     {
         Raise(new RemovePositionedComponentEvent(this));
-        _sprite?.Dispose();
-        _sprite = null;
+        _spriteLease?.Dispose();
+        _spriteLease = null;
     }
 
     ITexture DefaultLoader(IAssetId id) => Resolve<ITextureLoader>().LoadTexture(id);
@@ -157,37 +161,34 @@ public class Sprite : Component, IPositioned
     {
         if (!_dirty)
             return;
+
         Dirty = false;
 
-        if (_sprite == null)
+        if (_spriteLease == null)
         {
             var texture = _textureLoaderFunc(Id);
             if (texture == null)
             {
-                _sprite?.Dispose();
-                _sprite = null;
+                _spriteLease?.Dispose();
+                _spriteLease = null;
                 return;
             }
 
             FrameCount = texture.Regions.Count;
 
-            var frame = _frame; // Ensure frame is in bounds.
-            Frame = 0;
-            Frame = frame;
-
             var key = new SpriteKey(texture, SpriteSampler.Point, _layer, _keyFlags);
             var batchManager = _batchManager ?? Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
-            _sprite = batchManager.Borrow(key, 1, this);
+            _spriteLease = batchManager.Borrow(key, 1, this);
         }
 
-        var subImage = _sprite.Key.Texture.Regions[Frame];
+        var subImage = _spriteLease.Key.Texture.Regions[Frame];
         _size ??= subImage.Size;
-        _sprite.Update(0, new SpriteInfo(_flags, _position, Size, subImage));
+        _spriteLease.Update(0, new SpriteInfo(_flags, _position, Size, subImage));
     }
 
     void Select(WorldCoordinateSelectEvent e)
     {
-        if (_sprite == null)
+        if (_spriteLease == null)
             return;
 
         var hit = RayIntersect(e.Origin, e.Direction);

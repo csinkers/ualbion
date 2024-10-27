@@ -13,30 +13,7 @@ static class ResourceSetGenerator
 
     public static void Generate(StringBuilder sb, VeldridTypeInfo type, GenerationContext context)
     {
-        /* e.g.
-        new ResourceLayoutElementDescription("uSprite", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
-        new ResourceLayoutElementDescription("uSpriteSampler", ResourceKind.Sampler, ShaderStages.Fragment),
-        new ResourceLayoutElementDescription("_Uniform", ResourceKind.UniformBuffer, ShaderStages.Vertex | ShaderStages.Fragment));
-        */
-        sb.AppendLine("        public static readonly ResourceLayoutDescription Layout = new(");
-        bool first = true;
-        foreach (var member in type.Members.Where(x => x.Resource != null))
-        {
-            if (!first)
-                sb.AppendLine(",");
-
-            var shaderStages = member.Resource.Stages.ToString(CultureInfo.InvariantCulture); // Util.FormatFlagsEnum(member.Resource.Stages);
-            var kindString = context.Symbols.Veldrid.ResourceKind.KnownKindString(member.Resource.Kind);
-            var resourceName =
-                member.Resource.Kind is KnownResourceKind.StructuredBufferReadOnly or KnownResourceKind.StructuredBufferReadWrite
-                    ? member.Resource.Name + "Buffer"
-                    : member.Resource.Name;
-
-            sb.Append($"            new ResourceLayoutElementDescription(\"{resourceName}\", global::{kindString}, (ShaderStages){shaderStages})");
-            first = false;
-        }
-        sb.AppendLine(");");
-        sb.AppendLine();
+        BuildLayout(sb, type, context);
 
         foreach (var member in type.Members.Where(x => x.Resource != null))
         {
@@ -71,6 +48,41 @@ static class ResourceSetGenerator
                 _view.DeviceBuffer,
                 _palette.DeviceTexture)); */
 
+        BuildBuild(sb, type, context);
+        BuildResubscribe(sb, type, context);
+        BuildDispose(sb, type, context);
+    }
+
+    static void BuildLayout(StringBuilder sb, VeldridTypeInfo type, GenerationContext context)
+    {
+        /* e.g.
+        new ResourceLayoutElementDescription("uSprite", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
+        new ResourceLayoutElementDescription("uSpriteSampler", ResourceKind.Sampler, ShaderStages.Fragment),
+        new ResourceLayoutElementDescription("_Uniform", ResourceKind.UniformBuffer, ShaderStages.Vertex | ShaderStages.Fragment));
+        */
+        sb.AppendLine("        public static readonly ResourceLayoutDescription Layout = new(");
+        bool first = true;
+        foreach (var member in type.Members.Where(x => x.Resource != null))
+        {
+            if (!first)
+                sb.AppendLine(",");
+
+            var shaderStages = member.Resource.Stages.ToString(CultureInfo.InvariantCulture); // Util.FormatFlagsEnum(member.Resource.Stages);
+            var kindString = context.Symbols.Veldrid.ResourceKind.KnownKindString(member.Resource.Kind);
+            var resourceName =
+                member.Resource.Kind is KnownResourceKind.StructuredBufferReadOnly or KnownResourceKind.StructuredBufferReadWrite
+                    ? member.Resource.Name + "Buffer"
+                    : member.Resource.Name;
+
+            sb.Append($"            new ResourceLayoutElementDescription(\"{resourceName}\", global::{kindString}, (ShaderStages){shaderStages})");
+            first = false;
+        }
+        sb.AppendLine(");");
+        sb.AppendLine();
+    }
+
+    static void BuildBuild(StringBuilder sb, VeldridTypeInfo type, GenerationContext context)
+    {
         sb.AppendLine(@"        protected override ResourceSet Build(GraphicsDevice device, ResourceLayout layout)
         {
 #if DEBUG");
@@ -113,7 +125,10 @@ static class ResourceSetGenerator
 
         sb.AppendLine("));");
         sb.AppendLine("        }");
+    }
 
+    static void BuildResubscribe(StringBuilder sb, VeldridTypeInfo type, GenerationContext context)
+    {
         sb.AppendLine(@"
         protected override void Resubscribe()
         {");
@@ -129,7 +144,10 @@ static class ResourceSetGenerator
         }
 
         sb.AppendLine("        }");
+    }
 
+    static void BuildDispose(StringBuilder sb, VeldridTypeInfo type, GenerationContext context)
+    {
         sb.AppendLine(@"
         protected override void Dispose(bool disposing)
         {

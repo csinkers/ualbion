@@ -126,7 +126,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumpEnums", "Tools\DumpEnums\DumpEnums.csproj", "{2B781DA8-EF10-4D89-A447-CA608CD19D3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DumpEnums", "Tools\DumpEnums\DumpEnums.csproj", "{2B781DA8-EF10-4D89-A447-CA608CD19D3D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAlbion.Tests", "Tests\UAlbion.Tests\UAlbion.Tests.csproj", "{F60CCDEB-8BA1-4052-BCF9-68B7980D5764}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -326,6 +328,10 @@ Global
 		{2B781DA8-EF10-4D89-A447-CA608CD19D3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B781DA8-EF10-4D89-A447-CA608CD19D3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B781DA8-EF10-4D89-A447-CA608CD19D3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F60CCDEB-8BA1-4052-BCF9-68B7980D5764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F60CCDEB-8BA1-4052-BCF9-68B7980D5764}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F60CCDEB-8BA1-4052-BCF9-68B7980D5764}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F60CCDEB-8BA1-4052-BCF9-68B7980D5764}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -375,6 +381,7 @@ Global
 		{75E1C38E-ED34-4CB2-9EF9-0DC57E1FDF6C} = {149A8BC2-91D1-4249-9E1D-7B0054347832}
 		{D88C3948-818A-4E31-9356-8129FF1FAC89} = {B2D034E4-684C-48C8-85C4-A74AFEDF9BEA}
 		{2B781DA8-EF10-4D89-A447-CA608CD19D3D} = {149A8BC2-91D1-4249-9E1D-7B0054347832}
+		{F60CCDEB-8BA1-4052-BCF9-68B7980D5764} = {EC61DB68-353D-4825-B221-FADABA7ADFF3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2759A62D-227A-4D68-B6B5-966B9141AA74}

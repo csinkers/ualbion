@@ -7,7 +7,7 @@ using Veldrid;
 
 namespace UAlbion;
 
-sealed class CommandLineOptions
+public sealed class CommandLineOptions
 {
     public ExecutionMode Mode { get; }
     public GraphicsBackend Backend { get; }
@@ -66,7 +66,7 @@ sealed class CommandLineOptions
 
             if (arg == "--MENUS") DebugMenus = true;
             if (arg is "--NO-AUDIO" or "-MUTE" or "--MUTE") Mute = true;
-            if (arg is "--STARTUPONlY" or "-S") StartupOnly = true;
+            if (arg is "--STARTUPONLY" or "-S") StartupOnly = true;
             if (arg is "--RENDERDOC" or "-RD") UseRenderDoc = true;
 
             if (arg is "--COMMANDS" or "-C")

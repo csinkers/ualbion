@@ -1,4 +1,4 @@
-﻿using UAlbion.Formats.Assets;
+﻿using UAlbion.Formats.Assets.Inv;
 using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.State.Player;

@@ -2,7 +2,7 @@
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Inv;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;

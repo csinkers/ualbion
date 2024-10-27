@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Inv;
 
 namespace UAlbion.Editor;
 

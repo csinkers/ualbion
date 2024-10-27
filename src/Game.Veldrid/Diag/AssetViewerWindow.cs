@@ -5,16 +5,23 @@ using UAlbion.Config;
 using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Reflection;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Sheets;
+using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
-public sealed class AssetViewerWindow(string name) : Component, IImGuiWindow
+public sealed class AssetViewerWindow : Component, IImGuiWindow
 {
     AssetId _id;
     bool _dirty = true;
     object _asset;
     IAssetViewer _viewer;
+
+    public AssetViewerWindow(string name)
+    {
+        Name = name;
+        On<LanguageChangedEvent>(_ => _dirty = true);
+    }
 
     public AssetId Id
     {
@@ -27,7 +34,7 @@ public sealed class AssetViewerWindow(string name) : Component, IImGuiWindow
         }
     }
 
-    public string Name { get; } = name;
+    public string Name { get; }
 
     public void Draw()
     {
@@ -63,11 +70,11 @@ public sealed class AssetViewerWindow(string name) : Component, IImGuiWindow
         _asset = mods.LoadAsset(_id);
         _viewer?.Remove();
 
-        _viewer = AttachChild(_asset switch
+        _viewer = AttachChild((IAssetViewer)(_asset switch
         {
             ITexture texture => new TextureViewer(texture),
             CharacterSheet _ => new CharacterViewer(),
-            _ => _viewer
-        });
+            _ => null
+        }));
     }
 }

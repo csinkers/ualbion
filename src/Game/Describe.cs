@@ -1,5 +1,6 @@
 ﻿using System;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Inv;
+using UAlbion.Formats.Assets.Sheets;
 using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game;

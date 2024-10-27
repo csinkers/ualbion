@@ -5,7 +5,7 @@ using System.Linq;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Config;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Inv;
 
 namespace UAlbion.Formats.Containers;
 

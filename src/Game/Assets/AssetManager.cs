@@ -8,9 +8,11 @@ using UAlbion.Config;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Flic;
+using UAlbion.Formats.Assets.Inv;
 using UAlbion.Formats.Assets.Labyrinth;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Assets.Sheets;
 using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
 

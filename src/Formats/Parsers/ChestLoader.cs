@@ -1,7 +1,7 @@
 ﻿using System;
 using SerdesNet;
 using UAlbion.Config;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Inv;
 
 namespace UAlbion.Formats.Parsers;
 

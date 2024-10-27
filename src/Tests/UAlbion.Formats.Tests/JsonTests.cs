@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text.Json;
 using UAlbion.Api;
 using UAlbion.Config;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Inv;
+using UAlbion.Formats.Assets.Sheets;
 using UAlbion.Formats.Ids;
 using Xunit;
 

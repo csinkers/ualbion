@@ -1,4 +1,4 @@
-﻿using UAlbion.Formats.Assets;
+﻿using UAlbion.Formats.Assets.Inv;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.Gui.Controls;

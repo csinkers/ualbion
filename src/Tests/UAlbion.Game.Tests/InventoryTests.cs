@@ -5,7 +5,7 @@ using UAlbion.Api.Eventing;
 using Xunit;
 using UAlbion.Config;
 using UAlbion.Core;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Inv;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events.Inventory;
 using UAlbion.Game.State.Player;

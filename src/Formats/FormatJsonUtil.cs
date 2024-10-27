@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Text.Json.Serialization;
 using UAlbion.Api;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Inv;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.MapEvents;
 

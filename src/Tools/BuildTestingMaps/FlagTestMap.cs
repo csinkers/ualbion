@@ -1,6 +1,7 @@
 ﻿using UAlbion.Base;
 using UAlbion.Config;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Inv;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.Parsers;

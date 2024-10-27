@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using UAlbion.Config;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Inv;
 using UAlbion.Formats.Assets.Save;
+using UAlbion.Formats.Assets.Sheets;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 

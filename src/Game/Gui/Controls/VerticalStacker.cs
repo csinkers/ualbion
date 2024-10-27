@@ -21,6 +21,7 @@ public class VerticalStacker : UiElement
     }
 
     public bool Greedy { get; set; } = true;
+    public bool ProgressiveOverlap { get; set; } // When true lower rows will be drawn on a higher layer than upper rows, e.g. for the combat grid.
 
     public override Vector2 GetSize()
     {
@@ -59,7 +60,9 @@ public class VerticalStacker : UiElement
                 ? new Rectangle(extents.X, offset, extents.Width, height)
                 : new Rectangle(extents.X + (int)(extents.Width - childSize.X) / 2, offset, (int)childSize.X, height);
 
-            maxOrder = Math.Max(maxOrder, func(childElement, childExtents, order + 1, context));
+            int childOrder = ProgressiveOverlap ? maxOrder + 1 : order + 1;
+            maxOrder = Math.Max(maxOrder, func(childElement, childExtents, childOrder, context));
+
             // Rendering may have altered the size of any text elements, so retrieve it
             // again to ensure correct rendering on the first frame.
             height = (int)childElement.GetSize().Y;

@@ -2,6 +2,8 @@
 using System.Linq;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Inv;
+using UAlbion.Formats.Assets.Sheets;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
 

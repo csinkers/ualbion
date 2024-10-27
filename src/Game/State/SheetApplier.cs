@@ -1,7 +1,8 @@
 ﻿using System;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Inv;
+using UAlbion.Formats.Assets.Sheets;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;

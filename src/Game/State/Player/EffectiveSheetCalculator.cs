@@ -1,7 +1,8 @@
 ﻿using System;
 using UAlbion.Api.Settings;
 using UAlbion.Config;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Inv;
+using UAlbion.Formats.Assets.Sheets;
 using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game.State.Player;
@@ -43,7 +44,8 @@ public static class EffectiveSheetCalculator
             Inventory = sheet.Inventory?.DeepClone(),
             Attributes = sheet.Attributes.DeepClone(),
             Skills = sheet.Skills.DeepClone(),
-            Combat = sheet.Combat.DeepClone()
+            Combat = sheet.Combat.DeepClone(),
+            Monster = sheet.Monster?.DeepClone()
         };
 
         ApplyWieldedItems(effective, getItem);

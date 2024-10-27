@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Inv;
 
 namespace UAlbion.Game.State.Player;
 

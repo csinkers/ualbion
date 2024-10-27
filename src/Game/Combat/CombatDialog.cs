@@ -33,7 +33,7 @@ public class CombatDialog : Dialog
         stack.Add(new NonGreedy(startRoundButton));
         stack.Add(new Spacing(0, 2));
 
-        AttachChild(new DialogFrame(new VerticalStacker(stack))
+        AttachChild(new DialogFrame(new VerticalStacker(stack) { ProgressiveOverlap = true })
         {
             Background = DialogFrameBackgroundStyle.MainMenuPattern
         });

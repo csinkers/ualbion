@@ -1,6 +1,6 @@
 ﻿using System;
 using ImGuiNET;
-using UAlbion.Formats.Assets;
+using UAlbion.Formats.Assets.Sheets;
 
 namespace UAlbion.Editor;
 

@@ -1,4 +1,4 @@
-﻿using UAlbion.Formats.Assets;
+﻿using UAlbion.Formats.Assets.Inv;
 
 namespace UAlbion.Game.Events.Inventory;
 

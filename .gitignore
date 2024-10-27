@@ -8,7 +8,7 @@
 /deps/
 /_deps/
 /ualbion.wiki/
-/src/Core.Veldrid/Generated/
+/src/Generated/
 
 .vs/
 .vscode/

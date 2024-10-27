@@ -11,6 +11,8 @@
     <AnalysisMode>Recommended</AnalysisMode>
     <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
     <_SkipUpgradeNetAnalyzersNuGetWarning>true</_SkipUpgradeNetAnalyzersNuGetWarning>
+    <EmitCompilerGeneratedFiles>True</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>../Generated</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsWindows)'=='true'">
@@ -69,16 +71,4 @@
   <ItemGroup Condition="Exists('..\..\deps\VeldridGen\')">
     <ProjectReference Include="..\..\deps\VeldridGen\VeldridGen.Interfaces\VeldridGen.Interfaces.csproj" />
   </ItemGroup>
-
-  <!-- -->
-  <PropertyGroup>
-    <EmitCompilerGeneratedFiles>True</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
-  </PropertyGroup>
-  <Target Name="RemoveGenerated" BeforeTargets="CoreCompile">
-    <ItemGroup>
-      <Compile Remove="$(CompilerGeneratedFilesOutputPath)/*/**/*.cs" />
-    </ItemGroup>
-  </Target>
-  <!-- -->
 </Project>

@@ -563,7 +563,7 @@ public class AssetConversionTests : TestWithLogging
     [Fact]
     public void MonsterGfxTest()
     {
-        var id = AssetId.From(MonsterGfx.Krondir);
+        var id = AssetId.From(MonsterGfx.Krondir1);
         Test<IReadOnlyTexture<byte>>(id,
             new[] { AssetId.From(Palette.DungeonCombat), AssetId.From(Palette.Common) },
             (x, s, c) => Loaders.MultiHeaderSpriteLoader.Serdes(x, s, c));

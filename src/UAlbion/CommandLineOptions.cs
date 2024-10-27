@@ -93,8 +93,18 @@ public sealed class CommandLineOptions
                 }
 
                 DumpAssetTypes = new HashSet<AssetType>();
-                foreach (var type in args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries))
-                    DumpAssetTypes.Add(Enum.Parse<AssetType>(type, true));
+                foreach (var typeString in args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                {
+                    if (!Enum.TryParse<AssetType>(typeString, true, out var type))
+                    {
+                        var message = @$"Unknown type ""{typeString}"" encountered.
+Valid Types: {string.Join(" ", Enum.GetNames<AssetType>().OrderBy(x => x))}";
+
+                        throw new FormatException(message);
+                    }
+
+                    DumpAssetTypes.Add(type);
+                }
             }
 
             if (arg is "--ID" or "-ID" or "-IDS" or "--IDS")

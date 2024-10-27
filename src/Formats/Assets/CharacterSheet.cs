@@ -78,12 +78,19 @@ public class CharacterSheet : ICharacterSheet
         throw new InvalidOperationException($"Unexpected language {language}");
     }
 
-    public SpriteId TwoDGfxId { get; set; }
-    public SpriteId TacticalGfxId => // In original game hardcoded to be MonsterGfxId + 12 for monsters and PartyMemberId for party members.
+    public SpriteId CombatGfx => 
+        Type switch
+        {
+            CharacterType.Monster => Monster.CombatGfx,
+            _ => SpriteId.None
+        };
+
+    public byte UnusedGfxNum { get; set; }
+    public SpriteId TacticalGfx =>
         Type switch
         {
             CharacterType.Party => new SpriteId(AssetType.TacticalGfx, Id.Id),
-            CharacterType.Monster => new SpriteId(AssetType.TacticalGfx, TwoDGfxId.Id + 12),
+            CharacterType.Monster => Monster.TacticalGfx,
             _ => SpriteId.None
         };
 
@@ -203,7 +210,7 @@ public class CharacterSheet : ICharacterSheet
         sheet.PortraitId = SpriteId.SerdesU8(nameof(sheet.PortraitId), sheet.PortraitId, AssetType.Portrait, mapping, s); // A
 
         // Only monster graphics if monster, means something else for party members (matches PartyMemberId). Never set for NPCs.
-        sheet.TwoDGfxId = SpriteId.SerdesU8(nameof(sheet.TwoDGfxId), sheet.TwoDGfxId, AssetType.MonsterGfx, mapping, s); // B
+        sheet.UnusedGfxNum = s.UInt8(nameof(sheet.UnusedGfxNum), sheet.UnusedGfxNum); // B
 
         sheet.UnkownC = s.UInt8(nameof(sheet.UnkownC), sheet.UnkownC); // C Full body pic number? Takes values [0..9], only non-zero for monsters & Drirr. Distribution of non-zero values: 42, 3, 4, 1, 1, 1, 4, 3, 1
         sheet.UnkownD = s.UInt8(nameof(sheet.UnkownD), sheet.UnkownD); // D Tactical icon type? Takes values [0..4], only non-zero for monsters & Drirr. Distribution of non-zero values: 46, 3, 4, 3

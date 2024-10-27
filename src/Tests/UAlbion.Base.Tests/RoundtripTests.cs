@@ -747,7 +747,7 @@ public class RoundtripTests
         RoundTripXld<IReadOnlyTexture<byte>>(nameof(MonsterGfxTest),
             "$(ALBION)/CD/XLDLIBS/MONGFX0.XLD",
             (SpriteId)(MonsterGfx)1,
-            (SpriteId)MonsterGfx.Krondir,
+            (SpriteId)MonsterGfx.Krondir1,
             (x, s, c) => Loaders.MultiHeaderSpriteLoader.Serdes(x, s, c));
     }
 

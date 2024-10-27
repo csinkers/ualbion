@@ -348,7 +348,6 @@ sealed class DumpText : GameComponent, IAssetDumper
 
         if (c.NumberOfOccupiedHands != 0) sw.WriteLine($"    Unknown06:{c.NumberOfOccupiedHands}");
         if (c.NumberOfOccupiedFingers != 0) sw.WriteLine($"    Unknown07:{c.NumberOfOccupiedFingers}");
-        if (!c.TwoDGfxId.IsNone) sw.WriteLine($"    CombatGfx:{c.TwoDGfxId}");
         if (c.UnkownC != 0) sw.WriteLine($"    Unknown12:{c.UnkownC}");
         if (c.UnkownD != 0) sw.WriteLine($"    Unknown13:{c.UnkownD}");
         if (c.UnknownE != 0) sw.WriteLine($"    Unknown14:{c.UnknownE}");

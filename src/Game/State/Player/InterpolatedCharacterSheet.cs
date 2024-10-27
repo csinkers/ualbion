@@ -34,8 +34,8 @@ public class InterpolatedCharacterSheet : IEffectiveCharacterSheet
     public byte Level => _b().Level;
     public SpriteId SpriteId => _b().SpriteId;
     public SpriteId PortraitId => _b().PortraitId;
-    public SpriteId TwoDGfxId => _b().TwoDGfxId;
-    public SpriteId TacticalGfxId => _b().TacticalGfxId;
+    public SpriteId CombatGfx => _b().CombatGfx;
+    public SpriteId TacticalGfx => _b().TacticalGfx;
     public EventSetId EventSetId => _b().EventSetId;
     public EventSetId WordSetId => _b().WordSetId;
     public PlayerLanguages Languages => _b().Languages;

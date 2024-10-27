@@ -22,12 +22,12 @@ public class TextureViewerRenderer : Component, ICameraProvider
     readonly MainPassResourceProvider _passSet;
     readonly OrthographicCamera _camera;
     readonly Sprite _sprite;
-    readonly int _defaultWidth;
-    readonly int _defaultHeight;
     int _zoom;
 
-    public uint Width => _fb?.Width ?? 1;
-    public uint Height => _fb?.Height ?? 1;
+    public int MaxFrameWidth { get; }
+    public int MaxFrameHeight { get; }
+    public uint FramebufferWidth => _fb?.Width ?? 1;
+    public uint FramebufferHeight => _fb?.Height ?? 1;
 
     public int Zoom
     {
@@ -39,11 +39,11 @@ public class TextureViewerRenderer : Component, ICameraProvider
 
             _zoom = value;
             int factor = ZoomFactor;
-            _fb.Width = (uint)(_defaultWidth * factor);
-            _fb.Height = (uint)(_defaultHeight * factor);
+            _fb.Width = (uint)(MaxFrameWidth * factor);
+            _fb.Height = (uint)(MaxFrameHeight * factor);
             Frame = _sprite.Frame; // Recalculate size
-            _camera.Position = new Vector3(0, Height / 4.0f, 0.0f);
-            _sprite.Position = new Vector3(0, Height / 2.0f, 1.0f);
+            _camera.Position = new Vector3(0, FramebufferHeight / 4.0f, 0.0f);
+            _sprite.Position = new Vector3(0, FramebufferHeight / 2.0f, 1.0f);
         }
     }
 
@@ -75,8 +75,8 @@ public class TextureViewerRenderer : Component, ICameraProvider
     {
         foreach (var region in texture.Regions)
         {
-            if (region.Width > _defaultWidth) _defaultWidth = region.Width;
-            if (region.Height > _defaultHeight) _defaultHeight = region.Height;
+            if (region.Width > MaxFrameWidth) MaxFrameWidth = region.Width;
+            if (region.Height > MaxFrameHeight) MaxFrameHeight = region.Height;
         }
 
         _cl = AttachChild(new CommandListHolder("cl_texViewer"));
@@ -84,7 +84,7 @@ public class TextureViewerRenderer : Component, ICameraProvider
         _batchManager = AttachChild(new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key), false));
         _globalSet = AttachChild(new GlobalResourceSetProvider("TexViewerGlobal"));
         _camera = AttachChild(new OrthographicCamera());
-        _camera.Position = new Vector3(0, _defaultHeight / 4.0f, 0.0f);
+        _camera.Position = new Vector3(0, MaxFrameHeight / 4.0f, 0.0f);
 
         _sprite = AttachChild(new Sprite(
             AssetId.None,
@@ -93,10 +93,10 @@ public class TextureViewerRenderer : Component, ICameraProvider
             SpriteFlags.BottomMid,
             _ => texture, _batchManager));
 
-        _sprite.Position = new Vector3(0, _defaultHeight / 2.0f, 1.0f);
+        _sprite.Position = new Vector3(0, MaxFrameHeight / 2.0f, 1.0f);
         _sprite.Size = ZoomFactor * texture.Regions[0].Size / 2;
 
-        _fb = AttachChild(new SimpleFramebuffer("fb_texViewer", (uint)_defaultWidth, (uint)_defaultHeight));
+        _fb = AttachChild(new SimpleFramebuffer("fb_texViewer", (uint)MaxFrameWidth, (uint)MaxFrameHeight));
         _passSet = AttachChild(new MainPassResourceProvider(_fb, this));
 
         On<ImGuiPreRenderEvent>(e => Render(e.Device));

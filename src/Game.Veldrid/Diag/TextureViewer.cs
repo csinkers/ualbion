@@ -24,7 +24,7 @@ public sealed class TextureViewer : Component, IAssetViewer
     int[] _frames = [];
     int _frameIndex;
     DateTime _lastTransition = DateTime.UtcNow;
-    float _animSpeed = 1.0f;
+    float _animSpeed = 7.0f;
     bool _isAnimating;
 
     string[] _paletteNames = [];
@@ -150,6 +150,8 @@ public sealed class TextureViewer : Component, IAssetViewer
         ImGui.Checkbox("Bouncy", ref _isBouncy);
         ImGui.SliderFloat("Animation Speed", ref _animSpeed, 1.0f, 10.0f);
 
+        ImGui.Text($"Max Dims: {_renderer.MaxFrameWidth} x {_renderer.MaxFrameHeight} ({_renderer.MaxFrameWidth:X} x {_renderer.MaxFrameHeight:X})");
+
         TimeSpan period = TimeSpan.FromSeconds(1.0f / _animSpeed);
         if (_isAnimating && _lastTransition + period < DateTime.UtcNow && _frames.Length > 0)
         {
@@ -166,11 +168,7 @@ public sealed class TextureViewer : Component, IAssetViewer
             var imgui = Resolve<IImGuiManager>();
 
             var ptr1 = imgui.GetOrCreateImGuiBinding(_renderer.Framebuffer);
-            ImGui.Image(ptr1, new Vector2(_renderer.Width, _renderer.Height));
-
-            ImGui.Text("Raw:");
-            var ptr2 = imgui.GetOrCreateImGuiBinding(_texture.DeviceTexture);
-            ImGui.Image(ptr2, new Vector2(_texture.DeviceTexture.Width, _texture.DeviceTexture.Height));
+            ImGui.Image(ptr1, new Vector2(_renderer.FramebufferWidth, _renderer.FramebufferHeight));
         }
 
         if (_textureArray is { DeviceTexture: not null })

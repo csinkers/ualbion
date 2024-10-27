@@ -9,5 +9,5 @@ public enum CombatAnimationId // From Ambermoon, still need to check/confirm aga
     Hit = 4,
     Die = 5, // Death?
     Initial = 6, // Played at start of combat
-    Special = 7
+    Retreat = 7
 }

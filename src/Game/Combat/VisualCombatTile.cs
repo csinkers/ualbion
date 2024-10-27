@@ -60,7 +60,7 @@ public class VisualCombatTile : UiElement
     void OnPostUpdate()
     {
         IReadOnlyMob mob = _battle.GetTile(_tileIndex);
-        Icon = mob == null ? SpriteId.None : mob.Sheet.TacticalGfxId;
+        Icon = mob == null ? SpriteId.None : mob.Sheet.TacticalGfx;
     }
 
     // public ButtonState State { get => _frame.State; set => _frame.State = value; }

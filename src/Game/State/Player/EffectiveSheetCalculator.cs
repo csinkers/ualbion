@@ -35,7 +35,7 @@ public static class EffectiveSheetCalculator
             // Display and behaviour
             Languages = sheet.Languages,
             SpriteId = sheet.SpriteId,
-            TwoDGfxId = sheet.TwoDGfxId,
+            UnusedGfxNum = sheet.UnusedGfxNum,
             PortraitId = sheet.PortraitId,
             EventSetId = sheet.EventSetId,
             WordSetId = sheet.WordSetId,

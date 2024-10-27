@@ -20,7 +20,7 @@ public class Monster : GameComponent, ICombatParticipant
     {
         _sheet = clonedSheet ?? throw new ArgumentNullException(nameof(clonedSheet));
         _sprite = AttachChild(new Sprite(
-            clonedSheet.TwoDGfxId,
+            clonedSheet.CombatGfx,
             DrawLayer.Billboards,
             0,
             SpriteFlags.FlipVertical));
@@ -33,8 +33,8 @@ public class Monster : GameComponent, ICombatParticipant
 
     public int CombatPosition { get; private set; }
     public SheetId SheetId => _sheet.Id;
-    public SpriteId TacticalSpriteId => _sheet.Monster.TacticalGraphics;
-    public SpriteId CombatSpriteId => _sheet.TwoDGfxId;
+    public SpriteId TacticalSpriteId => _sheet.TacticalGfx;
+    public SpriteId CombatSpriteId => _sheet.CombatGfx;
     public IEffectiveCharacterSheet Effective { get; private set; }
     public override string ToString() 
         => $"{_sheet.Id} at {CombatPosition} ({CombatPosition % SavedGame.CombatColumns}, {CombatPosition / SavedGame.CombatColumns})";

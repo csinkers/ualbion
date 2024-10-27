@@ -66,7 +66,7 @@ public sealed class AssetViewerWindow(string name) : Component, IImGuiWindow
         _viewer = AttachChild(_asset switch
         {
             ITexture texture => new TextureViewer(texture),
-            CharacterSheet sheet => new CharacterViewer(sheet),
+            CharacterSheet _ => new CharacterViewer(),
             _ => _viewer
         });
     }

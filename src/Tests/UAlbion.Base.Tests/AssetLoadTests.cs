@@ -536,7 +536,6 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(PlayerClass.Monster, m.PlayerClass);
         Assert.Equal(PlayerLanguages.None, m.Languages);
         Assert.Equal(10, m.Level);
-        Assert.Equal(MonsterGfx.Krondir, m.TwoDGfxId);
         Assert.Equal(1, m.UnkownC);
         Assert.Equal(1, m.UnkownD);
         Assert.Equal(1, m.UnknownE);
@@ -547,6 +546,8 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(99, m.LifePointsPerLevel);
         Assert.Equal(99u, m.SpellPointsPerLevel);
         Assert.Equal(480, m.Weight);
+        Assert.Equal(MonsterGfx.Krondir1, m.CombatGfx);
+        Assert.Equal(TacticalGfx.Krondir1, m.TacticalGfx);
     }
 
     [Fact]
@@ -591,7 +592,6 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(0, n.Combat.LifePoints.Max);
         Assert.Equal(0, n.Combat.ActionPoints);
         Assert.Equal(0, n.Level);
-        Assert.Equal(SpriteId.None, n.TwoDGfxId);
         Assert.Equal(0, n.UnkownC);
         Assert.Equal(0, n.UnkownD);
         Assert.Equal(0, n.UnknownE);
@@ -665,7 +665,6 @@ public class AssetLoadTests : IDisposable
         Assert.Equal(Portrait.Tom, t.PortraitId);
         Assert.Equal(EventSet.Tom, t.EventSetId);
         Assert.Equal(1, t.NumberOfOccupiedHands);
-        Assert.Equal(1, t.TwoDGfxId.Id);
         Assert.Equal(0, t.UnkownC);
         Assert.Equal(2, t.UnknownE);
         Assert.Equal(0, t.Combat.MagicAttack);
@@ -808,7 +807,7 @@ public class AssetLoadTests : IDisposable
     [Fact] public void FullBodyPictureTest() { Test(assets => assets.LoadTexture(PartyInventoryGfx.Tom)); }
     [Fact] public void LargeNpcTest() { Test(assets => assets.LoadTexture(NpcLargeGfx.Christine)); }
     [Fact] public void LargePartyMemberTest() { Test(assets => assets.LoadTexture(PartyLargeGfx.Tom)); }
-    [Fact] public void MonsterGfxTest() { Test(assets => assets.LoadTexture(MonsterGfx.Krondir)); }
+    [Fact] public void MonsterGfxTest() { Test(assets => assets.LoadTexture(MonsterGfx.Krondir1)); }
     [Fact] public void OverlayTest() { Test(assets => assets.LoadTexture(WallOverlay.JiriWindow)); }
     [Fact] public void PictureTest() { Test(assets => assets.LoadTexture(Picture.OpenChestWithGold)); }
     [Fact] public void PortraitTest() { Test(assets => assets.LoadTexture(Portrait.Tom)); }

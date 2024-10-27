@@ -13,6 +13,19 @@ namespace UAlbion.Game.Veldrid.Diag;
 
 public class TextureViewerRenderer : Component, ICameraProvider
 {
+    readonly List<IRenderable> _renderables = new();
+    readonly SimpleFramebuffer _fb;
+    readonly CommandListHolder _cl;
+    readonly FenceHolder _fence;
+    readonly BatchManager<SpriteKey, SpriteInfo> _batchManager;
+    readonly GlobalResourceSetProvider _globalSet;
+    readonly MainPassResourceProvider _passSet;
+    readonly OrthographicCamera _camera;
+    readonly Sprite _sprite;
+    readonly int _defaultWidth;
+    readonly int _defaultHeight;
+    int _zoom;
+
     public uint Width => _fb?.Width ?? 1;
     public uint Height => _fb?.Height ?? 1;
 
@@ -57,19 +70,6 @@ public class TextureViewerRenderer : Component, ICameraProvider
             _globalSet.NightPalette = value;
         }
     }
-
-    readonly List<IRenderable> _renderables = new();
-    readonly SimpleFramebuffer _fb;
-    readonly CommandListHolder _cl;
-    readonly FenceHolder _fence;
-    readonly BatchManager<SpriteKey, SpriteInfo> _batchManager;
-    readonly GlobalResourceSetProvider _globalSet;
-    readonly MainPassResourceProvider _passSet;
-    readonly OrthographicCamera _camera;
-    readonly Sprite _sprite;
-    readonly int _defaultWidth;
-    readonly int _defaultHeight;
-    int _zoom;
 
     public TextureViewerRenderer(ITexture texture)
     {

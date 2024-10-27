@@ -43,36 +43,38 @@ public class MapObject : GameComponent
                 throw new AssetNotFoundException($"Could not find asset for id  {Id}");
 
             case ITexture:
-            {
-                var keyFlags = _depthTest ? 0 : SpriteKeyFlags.NoDepthTest;
-                    var flags = 
-                    SpriteFlags.FlipVertical |
-                    (_onFloor
-                        ? SpriteFlags.Floor | SpriteFlags.MidAligned
-                        : SpriteFlags.Billboard);
-
-                _sprite = AttachChild(new MapSprite(Id, _tileSize, DrawLayer.Billboards, keyFlags, flags)
                 {
-                    Size = _size,
-                    Position = _initialPosition,
-                    SelectionCallback = () => this
-                });
-                break;
-            }
+                    var keyFlags = _depthTest ? 0 : SpriteKeyFlags.NoDepthTest;
+                    var flags =
+                        SpriteFlags.FlipVertical |
+                        (_onFloor
+                            ? SpriteFlags.Floor | SpriteFlags.MidAligned
+                            : SpriteFlags.Billboard);
+
+                    _sprite = AttachChild(new MapSprite(Id, _tileSize, DrawLayer.Billboards, keyFlags, flags)
+                    {
+                        Size = _size,
+                        Position = _initialPosition,
+                        SelectionCallback = () => this
+                    });
+                    break;
+                }
 
             case IMesh:
-                // TODO: Load these from JSON or something
-                float widthCoefficient = 1 / 4.0f;
-                float heightCoefficient = 1 / 10.0f;
+                {
+                    // TODO: Load these from JSON or something
+                    float widthCoefficient = 1 / 4.0f;
+                    float heightCoefficient = 1 / 10.0f;
 
-                if (Id == Base.DungeonObject.Pylon)
-                    widthCoefficient = 1 / 2.0f;
+                    if (Id == Base.DungeonObject.Pylon)
+                        widthCoefficient = 1 / 2.0f;
 
-                var manager = Resolve<IMeshManager>();
-                var adjustedSize = new Vector3(_size.X * widthCoefficient, _size.Y * heightCoefficient, _size.X * widthCoefficient);
+                    var manager = Resolve<IMeshManager>();
+                    var adjustedSize = new Vector3(_size.X * widthCoefficient, _size.Y * heightCoefficient, _size.X * widthCoefficient);
 
-                _mesh = AttachChild(manager.BuildInstance(new MeshId(Id), _initialPosition, adjustedSize));
-                break;
+                    _mesh = AttachChild(manager.BuildInstance(new MeshId(Id), _initialPosition, adjustedSize));
+                    break;
+                }
 
             default:
                 throw new NotSupportedException($"Unsupported map object type {asset.GetType()} found for id {Id}");
@@ -173,7 +175,7 @@ public class MapObject : GameComponent
             + tileY * properties.VerticalSpacing
             + new Vector3(offset.X, offset.Y, offset.Z) * properties.Scale;
 
-        var size = 
+        var size =
                 new Vector2(definition.MapWidth, definition.MapHeight)
                 / new Vector2(labyrinth.EffectiveWallWidth, labyrinth.WallHeight)
             ;

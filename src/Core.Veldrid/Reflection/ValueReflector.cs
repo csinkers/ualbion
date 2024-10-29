@@ -17,7 +17,7 @@ public class ValueReflector : IReflector
     public void Reflect(in ReflectorState state)
     {
         var value = _toValue(state.Target);
-        var description = ReflectorUtil.Describe(state, _typeName, value);
+        var description = ReflectorUtil.DescribePlain(state, _typeName, value);
         ImGui.Indent();
         ImGui.TextWrapped(description);
         ImGui.Unindent();

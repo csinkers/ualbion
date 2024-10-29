@@ -10,6 +10,18 @@ namespace UAlbion.Game.Combat;
 
 public class CombatManager : GameComponent
 {
+    /*
+    CombatManager
+    |--Battle
+      |--List<Mob> _mobs
+      |--Mob[] _tiles
+      |--Sprite (background)
+      |-- Mobs contain a Monster, created by the Battle
+
+    |--CombatDialog (owned by DialogManager, but CombatManager asks for it to be created)
+
+
+     */
     public CombatManager()
     {
         On<EncounterEvent>(e => BeginCombat(e.GroupId, e.BackgroundId));

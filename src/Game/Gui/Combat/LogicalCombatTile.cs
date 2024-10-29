@@ -8,14 +8,14 @@ using UAlbion.Formats.Assets.Inv;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Assets.Sheets;
 using UAlbion.Formats.Ids;
+using UAlbion.Game.Combat;
 using UAlbion.Game.Events;
-using UAlbion.Game.Gui;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Input;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.Text;
 
-namespace UAlbion.Game.Combat;
+namespace UAlbion.Game.Gui.Combat;
 
 public class LogicalCombatTile : UiElement
 {
@@ -66,15 +66,15 @@ public class LogicalCombatTile : UiElement
     void OnRightClick()
     {
         var contents = _battle.GetTile(_tileIndex);
-        var sheet = contents?.Sheet;
+        var sheet = contents?.Effective;
 
         var tf = Resolve<ITextFormatter>();
         var window = Resolve<IGameWindow>();
         var cursorManager = Resolve<ICursorManager>();
 
         var playerName = sheet?.GetName(ReadVar(V.User.Gameplay.Language));
-        IText heading = playerName == null 
-            ? tf.Center().NoWrap().Fat().Format(Base.SystemText.Combat_Combat) 
+        IText heading = playerName == null
+            ? tf.Center().NoWrap().Fat().Format(Base.SystemText.Combat_Combat)
             : tf.Center().NoWrap().Fat().Format(playerName);
 
         IText S(TextId textId, bool disabled = false)

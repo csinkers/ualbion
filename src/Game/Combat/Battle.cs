@@ -6,6 +6,7 @@ using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Ids;
+using UAlbion.Game.Gui.Combat;
 using UAlbion.Game.State;
 
 namespace UAlbion.Game.Combat;
@@ -18,10 +19,10 @@ public class Battle : GameComponent, IReadOnlyBattle
 {
 
     readonly MonsterGroupId _groupId;
-    readonly List<Mob> _mobs = new();
-    readonly Mob[] _tiles = new Mob[SavedGame.CombatRows * SavedGame.CombatColumns];
+    readonly List<ICombatParticipant> _mobs = new();
+    readonly ICombatParticipant[] _tiles = new ICombatParticipant[SavedGame.CombatRows * SavedGame.CombatColumns];
 
-    public IReadOnlyList<IReadOnlyMob> Mobs { get; }
+    public IReadOnlyList<ICombatParticipant> Mobs { get; }
     public event Action Complete;
 
     public Battle(MonsterGroupId groupId, SpriteId backgroundId)
@@ -31,6 +32,7 @@ public class Battle : GameComponent, IReadOnlyBattle
 
         _groupId = groupId;
         Mobs = _mobs;
+
         AttachChild(new Sprite(
             backgroundId,
             DrawLayer.Background,
@@ -51,9 +53,8 @@ public class Battle : GameComponent, IReadOnlyBattle
 
         foreach (var partyMember in Resolve<IParty>().StatusBarOrder)
         {
-            var mob = new Mob(partyMember);
-            _mobs.Add(mob);
-            _tiles[mob.CombatPosition] = mob;
+            _mobs.Add(partyMember);
+            _tiles[partyMember.CombatPosition] = partyMember;
         }
 
         var group = Assets.LoadMonsterGroup(_groupId);
@@ -74,21 +75,20 @@ public class Battle : GameComponent, IReadOnlyBattle
                     continue;
 
                 var monster = AttachChild(Resolve<IMonsterFactory>().BuildMonster(mobId, index));
-                var mob = AttachChild(new Mob(monster));
 
-                _mobs.Add(mob);
-                _tiles[mob.CombatPosition] = mob;
+                _mobs.Add(monster);
+                _tiles[monster.CombatPosition] = monster;
             }
         }
     }
 
-    public IReadOnlyMob GetTile(int x, int y)
+    public ICombatParticipant GetTile(int x, int y)
     {
         int tileIndex = x + y * SavedGame.CombatColumns;
         return GetTile(tileIndex);
     }
 
-    public IReadOnlyMob GetTile(int tileIndex)
+    public ICombatParticipant GetTile(int tileIndex)
     {
         return tileIndex < 0 || tileIndex >= _tiles.Length ? null : _tiles[tileIndex];
     }

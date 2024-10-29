@@ -46,7 +46,7 @@ public class EnumerableReflector : IReflector
     public void Reflect(in ReflectorState state)
     {
         var value = state.Target is ICollection coll ? $"{coll.Count}" : "<...>";
-        var description = ReflectorUtil.Describe(state, _typeName, value);
+        var description = ReflectorUtil.DescribeAsNodeId(state, _typeName, value);
         bool treeOpen = ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowOverlap);
         if (!treeOpen) return;
 

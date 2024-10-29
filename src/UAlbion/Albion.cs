@@ -224,7 +224,7 @@ static class Albion
             new ShowWindowMenuItem("Stats",          "Windows", name => new StatsWindow(name)),
             new ShowWindowMenuItem("Threads",        "Windows", name => new ThreadsWindow(name)),
             new ShowWindowMenuItem("UI Layout",      "Windows", name => new LayoutWindow(name)),
-            new ShowWindowMenuItem("Watch",          "Windows", name => new WatchWindow(name)),
+            new ShowWindowMenuItem("Watch",          "Windows", name => new WatchWindow(name, (object)G.Instance)),
             // new ShowWindowMenuItem("Profiler", "Windows", name => new ProfilerWindow(name)),
         };
         foreach(var item in items)

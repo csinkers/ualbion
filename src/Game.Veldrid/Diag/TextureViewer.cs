@@ -17,7 +17,7 @@ namespace UAlbion.Game.Veldrid.Diag;
 
 public sealed class TextureViewer : Component, IAssetViewer
 {
-    readonly byte[] _framesBuf = new byte[256];
+    readonly byte[] _framesBuf = new byte[1024];
     readonly ITexture _asset;
     readonly TextureViewerRenderer _renderer;
 
@@ -163,10 +163,9 @@ public sealed class TextureViewer : Component, IAssetViewer
             _renderer.Frame = frame < _renderer.FrameCount ? frame : 0;
         }
 
-        if (_texture is { DeviceTexture: not null })
+        if (_renderer.Framebuffer != null)
         {
             var imgui = Resolve<IImGuiManager>();
-
             var ptr1 = imgui.GetOrCreateImGuiBinding(_renderer.Framebuffer);
             ImGui.Image(ptr1, new Vector2(_renderer.FramebufferWidth, _renderer.FramebufferHeight));
         }

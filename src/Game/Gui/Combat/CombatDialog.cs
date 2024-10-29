@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using UAlbion.Formats.Assets.Save;
-using UAlbion.Game.Gui;
+using UAlbion.Game.Combat;
 using UAlbion.Game.Gui.Controls;
 
-namespace UAlbion.Game.Combat;
+namespace UAlbion.Game.Gui.Combat;
 
 /// <summary>
 /// The top-level UI for a battle
@@ -24,7 +24,7 @@ public class CombatDialog : Dialog
             stack.Add(BuildRow(row));
 
         stack.Add(new Spacing(0, 2));
-        var startRoundButton = 
+        var startRoundButton =
             new Button(Base.SystemText.Combat_StartRound)
             {
                 DoubleFrame = true

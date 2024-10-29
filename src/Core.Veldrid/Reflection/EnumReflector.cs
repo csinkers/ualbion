@@ -54,7 +54,7 @@ public class EnumReflector
 
     protected void RenderLabel(in ReflectorState state)
     {
-        var description = ReflectorUtil.Describe(state, TypeName, state.Target);
+        var description = ReflectorUtil.DescribePlain(state, TypeName, state.Target);
         ImGui.Indent();
         ImGui.TextWrapped(description);
         ImGui.Unindent();

@@ -9,7 +9,7 @@ sealed class NullReflector : IReflector
 
     public void Reflect(in ReflectorState state)
     {
-        var description = ReflectorUtil.Describe(state, "null", "null");
+        var description = ReflectorUtil.DescribePlain(state, "null", "null");
         ImGui.Indent();
         ImGui.TextUnformatted(description);
         ImGui.Unindent();

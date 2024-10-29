@@ -6,15 +6,16 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
-public class WatchWindow : Component, IImGuiWindow
+public class WatchWindow(string name, object globals) : Component, IImGuiWindow
 {
-    public string Name { get; }
-    public WatchWindow(string name) => Name = name;
+    public string Name { get; } = name;
 
     public void Draw()
     {
         bool open = true;
         ImGui.Begin(Name, ref open);
+
+        RenderNode("Globals", globals);
 
         var state = TryResolve<IGameState>();
         if (state != null)

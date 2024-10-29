@@ -32,7 +32,7 @@ sealed class Vec3Reflector : IReflector
     {
         var v = (Vector3)state.Target;
         var value = $"({v.X}, {v.Y}, {v.Z})";
-        var description = ReflectorUtil.Describe(state, "Vector3", value);
+        var description = ReflectorUtil.DescribePlain(state, "Vector3", value);
         ImGui.Indent();
         ImGui.TextWrapped(description);
         ImGui.Unindent();

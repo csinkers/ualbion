@@ -14,7 +14,7 @@ public class ReflectorManager
 
     ReflectorManager()
     {
-        void Add<T>(string name) => _reflectors[typeof(T)] = new ValueReflector(name).Reflect;
+        // void Add<T>(string name) => _reflectors[typeof(T)] = new ValueReflector(name).Reflect;
         void Add2<T>(string name, Func<object, string> toString) => _reflectors[typeof(T)] = new ValueReflector(name, toString).Reflect;
 
         _nullReflector              = NullReflector.Instance.Reflect;
@@ -22,17 +22,17 @@ public class ReflectorManager
         _reflectors[typeof(string)] = StringReflector.Instance.Reflect;
         _reflectors[typeof(Vector3)] = Vec3Reflector.Instance.Reflect;
         _reflectors[typeof(Vector4)] = Vec4Reflector.Instance.Reflect;
-        _reflectors[typeof(byte)]   = new IntegralValueReflector("byte",   x => (byte)x).Reflect;
-        _reflectors[typeof(sbyte)]  = new IntegralValueReflector("sbyte",  x => (sbyte)x).Reflect;
-        _reflectors[typeof(ushort)] = new IntegralValueReflector("ushort", x => (ushort)x).Reflect;
-        _reflectors[typeof(short)]  = new IntegralValueReflector("short",  x => (short)x).Reflect;
-        _reflectors[typeof(uint)]   = new IntegralValueReflector("uint",   x => (int)(uint)x).Reflect;
-        _reflectors[typeof(int)]    = new IntegralValueReflector("int",    x => (int)x).Reflect;
-        _reflectors[typeof(ulong)]  = new IntegralValueReflector("ulong",  x => (int)(ulong)x).Reflect;
-        _reflectors[typeof(long)]   = new IntegralValueReflector("long",   x => (int)(long)x).Reflect;
+        _reflectors[typeof(byte)]   = new IntReflector("byte",   x => (byte)x).Reflect;
+        _reflectors[typeof(sbyte)]  = new IntReflector("sbyte",  x => (sbyte)x).Reflect;
+        _reflectors[typeof(ushort)] = new IntReflector("ushort", x => (ushort)x).Reflect;
+        _reflectors[typeof(short)]  = new IntReflector("short",  x => (short)x).Reflect;
+        _reflectors[typeof(uint)]   = new IntReflector("uint",   x => (int)(uint)x).Reflect;
+        _reflectors[typeof(int)]    = new IntReflector("int",    x => (int)x).Reflect;
+        _reflectors[typeof(ulong)]  = new IntReflector("ulong",  x => (int)(ulong)x).Reflect;
+        _reflectors[typeof(long)]   = new IntReflector("long",   x => (int)(long)x).Reflect;
+        _reflectors[typeof(float)]  = new FloatReflector("float", x => (float)x).Reflect;
+        _reflectors[typeof(double)] = new FloatReflector("double", x => (float)(double)x).Reflect;
 
-        Add<float>("float");
-        Add<double>("double");
         Add2<Vector2>("Vector2", x => { var v = (Vector2)x; return $"({v.X}, {v.Y})"; });
     }
 

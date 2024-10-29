@@ -4,17 +4,8 @@ using UAlbion.Api.Eventing;
 
 namespace UAlbion.Core.Veldrid.Reflection;
 
-public class IntegralValueReflector : IReflector
+public class IntReflector(string typeName, Func<object, int> toInt) : IReflector
 {
-    readonly string _typeName;
-    readonly Func<object, int> _toInt;
-
-    public IntegralValueReflector(string typeName, Func<object, int> toInt)
-    {
-        _typeName = typeName;
-        _toInt = toInt;
-    }
-
     public void Reflect(in ReflectorState state)
     {
         ImGui.Indent();
@@ -36,18 +27,36 @@ public class IntegralValueReflector : IReflector
             return;
         }
 
-        int value = _toInt(state.Target);
+        int value = toInt(state.Target);
         var label = state.Meta.Name ?? state.Index.ToString();
         var options = state.Meta.Options;
+
+        int min = -1024;
+        int max = 1024;
+
+        if (options.Min is int minInt) min = minInt;
+        else if (options.MinProperty != null)
+        {
+            options.GetMinProperty ??= ReflectorUtil.BuildPropertyGetter(options.MinProperty, state.Parent.GetType());
+            min = options.GetMinProperty(state.Parent) as int? ?? 0;
+        } 
+
+        if (options.Max is int maxInt) max = maxInt;
+        else if (options.MaxProperty != null)
+        {
+            options.GetMaxProperty ??= ReflectorUtil.BuildPropertyGetter(options.MaxProperty, state.Parent.GetType());
+            max = options.GetMaxProperty(state.Parent) as int? ?? 0;
+        } 
+
         ImGui.TextUnformatted(label);
         ImGui.SameLine();
-        if (ImGui.SliderInt("##" + label, ref value, options.Min, options.Max))
+        if (ImGui.SliderInt("##" + label, ref value, min, max))
             state.Meta.Setter(state, value);
     }
 
     void RenderInput(in ReflectorState state)
     {
-        int value = _toInt(state.Target);
+        int value = toInt(state.Target);
         var label = state.Meta.Name ?? state.Index.ToString();
         ImGui.TextUnformatted(label);
         ImGui.SameLine();
@@ -57,7 +66,7 @@ public class IntegralValueReflector : IReflector
 
     void RenderLabel(in ReflectorState state)
     {
-        var description = ReflectorUtil.Describe(state, _typeName, state.Target);
+        var description = ReflectorUtil.DescribePlain(state, typeName, state.Target);
         ImGui.TextUnformatted(description);
     }
 }

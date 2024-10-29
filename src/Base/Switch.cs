@@ -1,4 +1,5 @@
-﻿namespace UAlbion.Base;
+﻿// ReSharper disable InconsistentNaming
+namespace UAlbion.Base;
 
 #pragma warning disable CA1712 // Do not prefix enum values with type name
 public enum Switch : ushort
@@ -511,7 +512,7 @@ public enum Switch : ushort
     Switch505 = 505,
     Switch506 = 506,
     Switch507 = 507,
-    Switch508 = 508,
+    M122_MentionedGlowingFloor = 508,
     Switch509 = 509,
     Switch510 = 510,
     Switch511 = 511,
@@ -558,15 +559,15 @@ public enum Switch : ushort
     Switch552 = 552,
     Switch553 = 553,
     Switch554 = 554,
-    ShownDogFlyMsg = 555,
+    M122_ShownDogFlyMsg = 555,
     Switch556 = 556,
     Switch557 = 557,
     Switch558 = 558,
-    ArgimRewardedParty = 559,
-    GaveMusicToArgim = 560,
-    AskedArgimToMove = 561,
+    M122_ArgimRewardedParty = 559,
+    M122_GaveMusicToArgim = 560,
+    M122_AskedArgimToMove = 561,
     Switch562 = 562,
-    ShownPlantTouchMsg = 563,
+    M122_ShownPlantTouchMsg = 563,
     ArgimDead = 564,
     Switch565 = 565,
     Switch566 = 566,

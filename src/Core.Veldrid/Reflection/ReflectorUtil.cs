@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Linq.Expressions;
 
 namespace UAlbion.Core.Veldrid.Reflection;
 
@@ -12,7 +13,20 @@ public static class ReflectorUtil
                 ? ""
                 : $"{state.Index}: ";
 
-    public static string Describe(in ReflectorState state, string typeName, object target)
+    public static string DescribeAsNodeId(in ReflectorState state, string typeName, object target)
+    {
+        target ??= state.Target;
+        var description =
+            state.Meta?.Name != null
+                ? $"{state.Meta.Name}: {target} ({typeName})###{state.Meta.Name}"
+                : state.Index == -1
+                    ? $"{target} ({typeName})"
+                    : $"{state.Index}: {target} ({typeName})###{state.Index}";
+
+        return CoreUtil.WordWrap(description, 120);
+    }
+
+    public static string DescribePlain(in ReflectorState state, string typeName, object target)
     {
         target ??= state.Target;
         var description =
@@ -78,5 +92,19 @@ public static class ReflectorUtil
 
             return (T)result;
         }
+    }
+
+    public static Func<object, object> BuildPropertyGetter(string propertyName, Type type)
+    {
+        if (string.IsNullOrEmpty(propertyName))
+            throw new ArgumentNullException(nameof(propertyName));
+
+        var parameter = Expression.Parameter(typeof(object), "target");
+        var stronglyTypedParameter = Expression.Convert(parameter, type);
+        var property = Expression.Property(stronglyTypedParameter, propertyName);
+        var castResult = Expression.Convert(property, typeof(object));
+
+        var lambda = Expression.Lambda<Func<object, object>>(castResult, parameter);
+        return lambda.Compile();
     }
 }

@@ -4,6 +4,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Combat;
 using UAlbion.Game.Events;
+using UAlbion.Game.Gui.Combat;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Dialogs;
 using UAlbion.Game.Gui.Inventory;

@@ -51,7 +51,7 @@ public class ObjectReflector : IReflector
 
     public void Reflect(in ReflectorState state)
     {
-        var description = ReflectorUtil.Describe(state, _typeName, state.Target);
+        var description = ReflectorUtil.DescribeAsNodeId(state, _typeName, state.Target);
         bool treeOpen = ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowOverlap);
         if (!treeOpen)
             return;
@@ -70,7 +70,7 @@ public class ObjectReflector : IReflector
     public void ReflectComponent(in ReflectorState state)
     {
         var component = (Component)state.Target;
-        var description = ReflectorUtil.Describe(state, _typeName, component);
+        var description = ReflectorUtil.DescribeAsNodeId(state, _typeName, component);
         Vector4 color = GetComponentColor(component);
         ImGui.PushStyleColor(0, color);
         bool treeOpen = ImGui.TreeNodeEx(description, ImGuiTreeNodeFlags.AllowOverlap);

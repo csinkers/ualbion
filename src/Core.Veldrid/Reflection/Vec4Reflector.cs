@@ -32,7 +32,7 @@ sealed class Vec4Reflector : IReflector
     {
         var v = (Vector4)state.Target;
         var value = $"({v.X}, {v.Y}, {v.Z}, {v.W})";
-        var description = ReflectorUtil.Describe(state, "Vector4", value);
+        var description = ReflectorUtil.DescribePlain(state, "Vector4", value);
         ImGui.Indent();
         ImGui.TextWrapped(description);
         ImGui.Unindent();

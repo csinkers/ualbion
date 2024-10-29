@@ -1,4 +1,5 @@
-﻿namespace UAlbion.Base;
+﻿// ReSharper disable InconsistentNaming
+namespace UAlbion.Base;
 
 #pragma warning disable CA1712
 public enum Ticker : ushort
@@ -20,9 +21,9 @@ public enum Ticker : ushort
     Ticker113 = 113,
     Ticker114 = 114,
     Ticker115 = 115,
-    Ticker116 = 116,
-    Ticker117 = 117,
-    Ticker118 = 118,
+    M122_GlowingFloor_Count = 116,
+    M122_GlowingFloor_CorrectPathCount = 117,
+    M122_GlowingFloor_ResetCountdown = 118,
     Ticker119 = 119,
     Ticker120 = 120,
     Ticker121 = 121,

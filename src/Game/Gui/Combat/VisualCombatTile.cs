@@ -4,10 +4,11 @@ using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Ids;
-using UAlbion.Game.Gui;
+using UAlbion.Game.Combat;
 using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.State;
 
-namespace UAlbion.Game.Combat;
+namespace UAlbion.Game.Gui.Combat;
 
 public class VisualCombatTile : UiElement
 {
@@ -59,8 +60,8 @@ public class VisualCombatTile : UiElement
 
     void OnPostUpdate()
     {
-        IReadOnlyMob mob = _battle.GetTile(_tileIndex);
-        Icon = mob == null ? SpriteId.None : mob.Sheet.TacticalGfx;
+        ICombatParticipant mob = _battle.GetTile(_tileIndex);
+        Icon = mob == null ? SpriteId.None : mob.Effective.TacticalGfx;
     }
 
     // public ButtonState State { get => _frame.State; set => _frame.State = value; }

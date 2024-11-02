@@ -1,14 +1,15 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
 namespace UAlbion.Api.Eventing;
 
-internal static class Tasks
+public static class Tasks
 {
     static int _nextId;
     static readonly object SyncRoot = new();
-    public static List<IAlbionTaskCore> Pending { get; } = new(); // Just for debugging
+    static readonly List<IAlbionTaskCore> Pending = new(); // Just for debugging
 
     public static int GetNextId() => Interlocked.Increment(ref _nextId);
     public static void AddTask(IAlbionTaskCore task)
@@ -21,5 +22,14 @@ internal static class Tasks
     {
         lock (SyncRoot)
             Pending.Remove(task);
+    }
+
+    public static void EnumeratePendingTasks<TContext>(TContext context, Action<TContext, IAlbionTaskCore> func)
+    {
+        lock (SyncRoot)
+        {
+            foreach (var task in Pending)
+                func(context, task);
+        }
     }
 }

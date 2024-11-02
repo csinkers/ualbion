@@ -24,6 +24,8 @@ public interface IAdHocComponentHelper
     void On<T>(Action<T> callback) where T : IEvent;
     void OnAsync<T>(Func<T, AlbionTask> callback) where T : IEvent;
     void OnDirectCall<T>(Action<T> callback) where T : IEvent;
+    void OnQuery<TEvent, TResult>(Func<TEvent, TResult> callback) where TEvent : IQueryEvent<TResult>;
+    void OnQueryAsync<TEvent, TResult>(Func<TEvent, AlbionTask<TResult>> callback) where TEvent : IQueryEvent<TResult>;
     void After<T>(Action<T> callback) where T : IEvent;
     void AfterAsync<T>(Func<T, AlbionTask> callback) where T : IEvent;
     void Off<T>();

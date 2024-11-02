@@ -1,11 +1,14 @@
 ﻿using ImGuiNET;
 using UAlbion.Api.Eventing;
+using UAlbion.Core;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Reflection;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
 public class ThreadsWindow : Component, IImGuiWindow
 {
+    readonly StringCache<int> _stringCache = new();
 
     int _currentContextIndex;
     string[] _contextNames = [];
@@ -28,6 +31,17 @@ public class ThreadsWindow : Component, IImGuiWindow
             _contextNames[i] = chainManager.Contexts[i].ToString();
 
         ImGui.ListBox("Active Contexts", ref _currentContextIndex, _contextNames, _contextNames.Length);
+
+        #if DEBUG
+        ImGui.Text("Pending Async Tasks:");
+        Tasks.EnumeratePendingTasks(_stringCache, static (stringCache, core) =>
+        {
+            var name = stringCache.Get(core.Id, 0, static (x, _) => $"Task{x}");
+            var reflector = ReflectorManager.Instance;
+            reflector.RenderNode(name, core);
+        });
+        #endif
+
         ImGui.End();
 
         if (!open)

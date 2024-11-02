@@ -15,26 +15,19 @@ public class WatchWindow(string name, object globals) : Component, IImGuiWindow
         bool open = true;
         ImGui.Begin(Name, ref open);
 
-        RenderNode("Globals", globals);
+        var reflector = ReflectorManager.Instance;
+        reflector.RenderNode("Globals", globals);
 
         var state = TryResolve<IGameState>();
         if (state != null)
-            RenderNode("State", state);
+            reflector.RenderNode("State", state);
 
-        RenderNode("Exchange", Exchange);
-        RenderNode("ImGui", Resolve<IImGuiManager>());
+        reflector.RenderNode("Exchange", Exchange);
+        reflector.RenderNode("ImGui", Resolve<IImGuiManager>());
 
         ImGui.End();
 
         if (!open)
             Remove();
-    }
-
-    static void RenderNode(string name, object target)
-    {
-        var meta = new ReflectorMetadata(name, null, null, null);
-        var state = new ReflectorState(target, null, -1, meta);
-        var reflector = ReflectorManager.Instance.GetReflectorForInstance(state.Target);
-        reflector(state);
     }
 }

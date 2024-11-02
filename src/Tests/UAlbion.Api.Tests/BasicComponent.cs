@@ -1,11 +1,7 @@
-using System;
+﻿using System;
 using UAlbion.Api.Eventing;
 
-namespace UAlbion.Core.Tests;
-
-public class BasicEvent : Event { }
-public class BasicAsyncEvent : Event { }
-public class BoolAsyncEvent : Event, IQueryEvent<bool> { }
+namespace UAlbion.Api.Tests;
 
 public class BasicComponent : Component
 {
@@ -51,25 +47,4 @@ public class BasicComponent : Component
     public void AddChild(IComponent child) => AttachChild(child);
     public new void RemoveChild(IComponent child) => base.RemoveChild(child);
     public void RemoveAll() => RemoveAllChildren();
-}
-
-public class BasicLogExchange : ILogExchange
-{
-    public void Attach(EventExchange exchange) { }
-    public void Remove() { }
-
-    public void Receive(IEvent e, object sender)
-    {
-        Log?.Invoke(this, new LogEventArgs
-        {
-            Time = DateTime.Now,
-            Nesting = 0,
-            Message = e.ToString(),
-            Color = Console.ForegroundColor = ConsoleColor.Gray,
-        });
-    }
-    public bool IsActive { get; set; }
-    public int ComponentId => -1;
-    public void EnqueueEvent(IEvent e) { }
-    public event EventHandler<LogEventArgs> Log;
 }

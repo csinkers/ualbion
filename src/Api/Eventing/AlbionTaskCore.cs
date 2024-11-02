@@ -9,6 +9,7 @@ namespace UAlbion.Api.Eventing;
 public interface IAlbionTaskCore : ICriticalNotifyCompletion
 {
 #if DEBUG
+    int Id { get; }
     string? Description { get; set; }
 #endif
     bool IsCompleted { get; }
@@ -25,7 +26,7 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
         Completed
     }
 
-    readonly int _id;
+    public int Id { get; }
     TaskStatus _status = TaskStatus.Unused;
     public bool BreakOnCompletion { get; set; }
     public string? Description { get; set; }
@@ -48,7 +49,7 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
     public AlbionTaskCore(string? description)
     {
 #if DEBUG
-        _id = Tasks.GetNextId();
+        Id = Tasks.GetNextId();
         Description = description;
         Tasks.AddTask(this);
 #endif
@@ -67,9 +68,9 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
             };
 
 #if DEBUG
-        return Description != null 
-            ? $"T{_id}<{typeof(T)}>: [{_status}] ({waiters} waiting): {Description}" 
-            : $"T{_id}<{typeof(T)}>: [{_status}] ({waiters} waiting)";
+        return Description != null
+            ? $"T{Id}<{typeof(T)}>: [{_status}] ({waiters} waiting): {Description}"
+            : $"T{Id}<{typeof(T)}>: [{_status}] ({waiters} waiting)";
 #else
         return $"T<{nameof(T)}>: ({waiters} waiting)";
 #endif

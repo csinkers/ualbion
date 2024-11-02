@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Linq;
 using UAlbion.Api.Eventing;
 using Xunit;
 
-namespace UAlbion.Core.Tests;
+namespace UAlbion.Api.Tests;
 
 public class ComponentTests
 {

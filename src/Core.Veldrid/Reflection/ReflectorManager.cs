@@ -36,6 +36,14 @@ public class ReflectorManager
         Add2<Vector2>("Vector2", x => { var v = (Vector2)x; return $"({v.X}, {v.Y})"; });
     }
 
+    public void RenderNode(string name, object target)
+    {
+        var meta = new ReflectorMetadata(name, null, null, null);
+        var state = new ReflectorState(target, null, -1, meta);
+        var reflector = GetReflectorForInstance(state.Target);
+        reflector(state);
+    }
+
     public Reflector GetReflectorForInstance(object target)
         => target == null
             ? _nullReflector

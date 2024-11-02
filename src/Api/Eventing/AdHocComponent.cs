@@ -44,6 +44,8 @@ public class AdHocComponent : Component
         public void On<T>(Action<T> callback) where T : IEvent => _this.On(callback);
         public void OnAsync<T>(Func<T, AlbionTask> callback) where T : IEvent => _this.OnAsync(callback);
         public void OnDirectCall<T>(Action<T> callback) where T : IEvent => _this.OnDirectCall(callback);
+        public void OnQuery<TEvent, TResult>(Func<TEvent, TResult> callback) where TEvent : IQueryEvent<TResult> => _this.OnQuery(callback);
+        public void OnQueryAsync<TEvent, TResult>(Func<TEvent, AlbionTask<TResult>> callback) where TEvent : IQueryEvent<TResult> => _this.OnQueryAsync(callback);
         public void After<T>(Action<T> callback) where T : IEvent => _this.After(callback);
         public void AfterAsync<T>(Func<T, AlbionTask> callback) where T : IEvent => _this.AfterAsync(callback);
         public void Off<T>() => _this.Off<T>();

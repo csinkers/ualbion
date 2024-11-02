@@ -157,8 +157,15 @@ public class FlatMap : GameComponent, IMap
             //     Raise(new SetLogLevelEvent(LogLevel.Warning));
 
             foreach (var zone in zones)
-                await RaiseAsync(new TriggerChainEvent(_logicalMap.EventSet, zone.EventIndex,
-                    new EventSource(_mapData.Id, type, zone.X, zone.Y)));
+            {
+                await RaiseAsync(
+                    new TriggerChainEvent(
+                        _logicalMap.EventSet,
+                        zone.EventIndex,
+                        new EventSource(_mapData.Id, type, zone.X, zone.Y)
+                    )
+                );
+            }
 
             // if (!log)
             //     Raise(new SetLogLevelEvent(LogLevel.Info));

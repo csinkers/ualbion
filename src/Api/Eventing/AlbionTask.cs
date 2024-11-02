@@ -119,5 +119,5 @@ public readonly struct AlbionTask<T> : INotifyCompletion, IEquatable<AlbionTask<
     public static bool operator ==(AlbionTask<T> x, AlbionTask<T> y) => x.Equals(y);
     public static bool operator !=(AlbionTask<T> x, AlbionTask<T> y) => !(x == y);
     public override int GetHashCode() => HashCode.Combine(_core, _result);
-    public override string ToString() => _core == null ? $"AT[{_result}]" : "AT(Pending)";
+    public override string ToString() => _core == null ? $"AT[{_result}]" : _core.IsCompleted ? $"AT({_core.GetResult()})" : "AT(Pending)";
 }

@@ -16,6 +16,7 @@ public sealed class RenderSystem : Component, IRenderSystem, IDisposable
     internal List<IFramebufferHolder> Framebuffers { get; init; }
     internal IResourceProvider ResourceProvider { get; init; }
 
+    readonly StringCache<int> _stringCache = new();
     readonly PrepareDeviceObjectsEvent _prepareDeviceObjectsEvent = new();
     readonly PrepareFrameEvent _prepareFrameEvent = new();
     readonly PrepareFrameResourcesEvent _prepareFrameResourcesEvent = new();
@@ -93,7 +94,7 @@ public sealed class RenderSystem : Component, IRenderSystem, IDisposable
         int i = 0;
         foreach (var phase in Passes)
         {
-            using (FrameEventCached(ref i, (this, phase), static (x, n) => $"{n} {x.Item1.Name} Render - {x.phase.Name}"))
+            using (FrameEventCached(ref i, (this, phase), static (n, x) => $"{n} {x.Item1.Name} Render - {x.phase.Name}"))
             {
                 FrameCommands.Begin();
                 phase.Render(graphicsDevice, FrameCommands, ResourceProvider?.ResourceSet);
@@ -101,10 +102,10 @@ public sealed class RenderSystem : Component, IRenderSystem, IDisposable
             }
 
             Fence.Reset();
-            using (FrameEventCached(ref i, (this, phase), static (x, n) => $"{n} {x.Item1.Name} Submit commands - {x.phase.Name}"))
+            using (FrameEventCached(ref i, (this, phase), static (n, x) => $"{n} {x.Item1.Name} Submit commands - {x.phase.Name}"))
                 graphicsDevice.SubmitCommands(FrameCommands, Fence);
 
-            using (FrameEventCached(ref i, (this, phase), static (x, n) => $"{n} {x.Item1.Name} Complete - {x.phase.Name}"))
+            using (FrameEventCached(ref i, (this, phase), static (n, x) => $"{n} {x.Item1.Name} Complete - {x.phase.Name}"))
                 graphicsDevice.WaitForFence(Fence);
         }
     }
@@ -118,14 +119,6 @@ public sealed class RenderSystem : Component, IRenderSystem, IDisposable
         RemoveAllChildren();
     }
 
-    readonly List<string> _cachedStrings = new();
-
-    FrameTimeTracker FrameEventCached<T>(ref int num, T context, Func<T, int, string> builder)
-    {
-        if (_cachedStrings.Count <= num)
-            _cachedStrings.Add(builder(context, num));
-
-        var message = _cachedStrings[num++];
-        return PerfTracker.FrameEvent(message);
-    }
+    FrameTimeTracker FrameEventCached<T>(ref int num, T context, Func<int, T, string> builder)
+        => PerfTracker.FrameEvent(_stringCache.Get(num++, context, builder));
 }

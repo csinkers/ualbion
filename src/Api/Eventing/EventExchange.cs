@@ -119,12 +119,18 @@ namespace UAlbion.Api.Eventing
                     case ISyncHandler syncHandler:
                         syncHandler.Invoke(e);
                         break;
-                    case IAsyncHandler asyncHandler:
-                        core ??= new($"RaiseAInvoker helper for {e.GetType()} from {sender}");
 
-                        var innerTask = asyncHandler.InvokeAsAsync(e);
-                        if (!innerTask.IsCompleted)
+                    case IAsyncHandler asyncHandler:
                         {
+                            core ??= new($"RaiseAInvoker helper for {e.GetType()} from {sender}");
+
+                            var innerTask = asyncHandler.InvokeAsAsync(e);
+                            if (innerTask.IsCompleted)
+                            {
+                                core.SetResult(Unit.V);
+                                break;
+                            }
+
                             core.OutstandingCompletions++;
                             var core1 = core;
                             innerTask.OnCompleted(() =>
@@ -133,9 +139,9 @@ namespace UAlbion.Api.Eventing
                                 if (core1.OutstandingCompletions == 0)
                                     core1.SetResult(Unit.V);
                             });
-                        }
 
-                        break;
+                            break;
+                        }
 
                     default:
                         throw new InvalidOperationException($"Could not invoke handler {handler}");

@@ -65,7 +65,7 @@ public class ContextMenu : Dialog
             Close();
 
         if (option.Event != null)
-            Raise(option.Event);
+            _ = WithFrozenClock((this, option), static x => x.Item1.RaiseA(x.option.Event));
     }
 
     void Close()

@@ -273,7 +273,7 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
 
         var (sprite, subId, _) = GetSprite(slot.Item);
         var promptEvent = new ItemQuantityPromptEvent(new StringId(text), sprite, subId, slot.Amount, slotId == ItemSlotId.Gold);
-        return RaiseQueryAsync(promptEvent);
+        return RaiseQueryA(promptEvent);
 
         /* if (RaiseAsync(, continuation) == 0)
         {
@@ -365,7 +365,7 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
                     ItemSlot temp = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
                     temp.TransferFrom(_hand, null, _getItem);
                     SetCursor();
-                    await RaiseAsync(transitionEvent);
+                    await RaiseA(transitionEvent);
 
                     slot.TransferFrom(temp, null, _getItem);
                 }
@@ -403,8 +403,8 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
                     temp1.TransferFrom(_hand, null, _getItem);
                     temp2.TransferFrom(slot, null, _getItem);
 
-                    var transition1 = RaiseAsync(transitionEvent1);
-                    var transition2 = RaiseAsync(transitionEvent2);
+                    var transition1 = RaiseA(transitionEvent1);
+                    var transition2 = RaiseA(transitionEvent2);
 
                     await transition1;
                     await transition2;
@@ -453,7 +453,7 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
             _ => Base.SystemText.InvMsg_ReallyThrowTheseItemsAway,
         };
 
-        var response = await RaiseQueryAsync(new YesNoPromptEvent(prompt));
+        var response = await RaiseQueryA(new YesNoPromptEvent(prompt));
 
         if (!response)
             return;
@@ -465,7 +465,7 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
             var transitions = new AlbionTask[transitionsToShow];
 
             for (int i = 0; i < transitionsToShow; i++)
-                transitions[i] = RaiseAsync(new GravityItemTransitionEvent(slot.Item, e.NormX, e.NormY));
+                transitions[i] = RaiseA(new GravityItemTransitionEvent(slot.Item, e.NormX, e.NormY));
 
             foreach (var transition in transitions)
                 await transition;
@@ -620,12 +620,12 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
         if (item.TypeId != ItemType.Drink)
             return;
 
-        var result = await RaiseQueryAsync(new PartyMemberPromptEvent(Base.SystemText.InvMsg_WhoShouldDrinkThis));
+        var result = await RaiseQueryA(new PartyMemberPromptEvent(Base.SystemText.InvMsg_WhoShouldDrinkThis));
 
         if (result == PartyMemberId.None)
             return;
 
-        await RaiseAsync(new SetContextEvent(ContextType.Subject, result));
+        await RaiseA(new SetContextEvent(ContextType.Subject, result));
         await TriggerItemChain(slot.Item);
 
         slot.Amount--;
@@ -637,11 +637,11 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
         var inv = _getInventory(e.SlotId.Id);
         var slot = inv.GetSlot(e.SlotId.Slot);
         if (slot.Item.Type != AssetType.Item)
-            return AlbionTask.Complete;
+            return AlbionTask.CompletedTask;
 
         var item = _getItem(slot.Item);
         if (item.TypeId != ItemType.Document)
-            return AlbionTask.Complete;
+            return AlbionTask.CompletedTask;
 
         return TriggerItemChain(item.Id);
     }
@@ -708,7 +708,7 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
                 eventIndex,
                 new EventSource(eventSet.Id, TriggerType.Action));
 
-            await RaiseAsync(triggerEvent);
+            await RaiseA(triggerEvent);
             return;
         }
     }

@@ -226,7 +226,7 @@ public class EventExchangeTests
         var component = new AdHocComponent("C1", x => x.OnAsync<BasicEvent>(_ =>
         {
             received = true;
-            return AlbionTask.Complete;
+            return AlbionTask.CompletedTask;
         }));
 
         exchange.Attach(component);
@@ -245,7 +245,7 @@ public class EventExchangeTests
         bool received1 = false;
         bool received2 = false;
 
-        var component1 = new AdHocComponent("C1", x => x.OnAsync<BasicEvent>(_ => { received1 = true; return AlbionTask.Complete; }));
+        var component1 = new AdHocComponent("C1", x => x.OnAsync<BasicEvent>(_ => { received1 = true; return AlbionTask.CompletedTask; }));
         var component2 = new AdHocComponent("C2", x => x.On<BasicEvent>(_ => received2 = true));
 
         exchange.Attach(component1);

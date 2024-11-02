@@ -37,8 +37,8 @@ public class AdHocComponent : Component
         public T Resolve<T>() => _this.Resolve<T>();
         public T TryResolve<T>() => _this.TryResolve<T>();
         public void Raise<T>(T e) where T : IEvent => _this.Raise(e);
-        public AlbionTask RaiseAsync<T>(T e) where T : IEvent => _this.RaiseAsync(e);
-        public AlbionTask<TResult> RaiseQueryAsync<TResult>(IQueryEvent<TResult> e) => _this.RaiseQueryAsync(e);
+        public AlbionTask RaiseAsync<T>(T e) where T : IEvent => _this.RaiseA(e);
+        public AlbionTask<TResult> RaiseQueryAsync<TResult>(IQueryEvent<TResult> e) => _this.RaiseQueryA(e);
         public void Enqueue(IEvent e) => _this.Enqueue(e);
         public void Distribute<T>(ICancellableEvent e, List<T> targets, Func<T, IComponent> projection) => _this.Distribute(e, targets, projection);
         public void On<T>(Action<T> callback) where T : IEvent => _this.On(callback);

@@ -24,7 +24,11 @@ public class ConversationOptionsWindow : ModalDialog
                     continue;
 
                 if (e.Option == i)
+                {
                     conversationOption.Trigger();
+                    break;
+                }
+
                 i++;
             }
         });

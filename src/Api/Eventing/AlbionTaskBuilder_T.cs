@@ -26,7 +26,7 @@ public struct AlbionTaskBuilder<TResult>
     /// <summary>Gets the value task for this builder.</summary>
     public AlbionTask<TResult> Task => _state switch
     {
-        BuilderState.Complete => new AlbionTask<TResult>(_result),
+        BuilderState.Complete => AlbionTask.FromResult(_result),
         BuilderState.Pending => new AlbionTask<TResult>(_core!),
         _ => throw new InvalidOperationException("Tried to get Task, but it hasn't been created")
     };

@@ -86,7 +86,7 @@ public class Button : UiElement
         }
         else // For the first click, just start the double-click timer.
         {
-            RaiseAsync(new WallClockTimerEvent(ReadVar(V.Game.Ui.ButtonDoubleClickIntervalSeconds)))
+            RaiseA(new WallClockTimerEvent(ReadVar(V.Game.Ui.ButtonDoubleClickIntervalSeconds)))
                 .OnCompleted(() =>
                 {
                     if (!ClickTimerPending) // They've already double-clicked

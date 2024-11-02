@@ -10,7 +10,6 @@ public class ThreadsWindow : Component, IImGuiWindow
 {
     readonly StringCache<int> _stringCache = new();
 
-    int _currentContextIndex;
     string[] _contextNames = [];
 
     public string Name { get; }
@@ -30,9 +29,11 @@ public class ThreadsWindow : Component, IImGuiWindow
         for (int i = 0; i < _contextNames.Length; i++)
             _contextNames[i] = chainManager.Contexts[i].ToString();
 
-        ImGui.ListBox("Active Contexts", ref _currentContextIndex, _contextNames, _contextNames.Length);
+        int currentContextIndex = chainManager.CurrentDebugContextIndex;
+        if (ImGui.ListBox("Active Contexts", ref currentContextIndex, _contextNames, _contextNames.Length))
+            chainManager.CurrentDebugContextIndex = currentContextIndex;
 
-        #if DEBUG
+#if DEBUG
         ImGui.Text("Pending Async Tasks:");
         Tasks.EnumeratePendingTasks(_stringCache, static (stringCache, core) =>
         {

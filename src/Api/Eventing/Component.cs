@@ -103,7 +103,7 @@ public abstract class Component : IComponent
     /// </summary>
     /// <param name="e">The event to raise</param>
     /// <returns>The number of async handlers which have either already called the continuation or intend to call it in the future.</returns>
-    protected AlbionTask RaiseAsync<T>(T e) where T : IEvent => Exchange.RaiseA(e, this);
+    protected AlbionTask RaiseA<T>(T e) where T : IEvent => Exchange.RaiseA(e, this);
 
     /// <summary>
     /// Raise an event via the currently subscribed event exchange (if subscribed), and
@@ -114,7 +114,7 @@ public abstract class Component : IComponent
     /// <typeparam name="T">The return value that async handlers should supply upon completion.</typeparam>
     /// <param name="e">The event to raise</param>
     /// <returns>The number of async handlers which have either already called the continuation or intend to call it in the future.</returns>
-    protected AlbionTask<T> RaiseQueryAsync<T>(IQueryEvent<T> e) => Exchange.RaiseQueryA(e, this);
+    protected AlbionTask<T> RaiseQueryA<T>(IQueryEvent<T> e) => Exchange.RaiseQueryA(e, this);
 
     /// <summary>
     /// Enqueue an event with the currently subscribed event exchange to be raised

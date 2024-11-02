@@ -71,12 +71,12 @@ public class MainMenu : Dialog
         Detach();
 
         var e = new YesNoPromptEvent(Base.SystemText.MainMenu_DoYouReallyWantToStartANewGame);
-        var response = await RaiseQueryAsync(e);
+        var response = await RaiseQueryA(e);
         
         Attach(exchange);
 
         if (response)
-            await RaiseAsync(new NewGameEvent(Base.Map.TorontoBegin, 31, 76)); // TODO: Move this to config?
+            await RaiseA(new NewGameEvent(Base.Map.TorontoBegin, 31, 76)); // TODO: Move this to config?
     }
 
     void LoadGame()

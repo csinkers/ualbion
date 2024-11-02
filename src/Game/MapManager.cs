@@ -23,7 +23,7 @@ public class MapManager : GameServiceComponent<IMapManager>, IMapManager
         {
             if (!Resolve<IGameState>().Loaded)
             {
-                await RaiseAsync(new NewGameEvent(e.MapId, 32, 32));
+                await RaiseA(new NewGameEvent(e.MapId, 32, 32));
                 return;
             }
 
@@ -34,17 +34,17 @@ public class MapManager : GameServiceComponent<IMapManager>, IMapManager
 
     async AlbionTask LoadMap(MapId mapId)
     {
-        await RaiseAsync(new UnloadMapEvent());
+        await RaiseA(new UnloadMapEvent());
         if (mapId == MapId.None) // 0 = Build a blank scene for testing / debugging
         {
-            await RaiseAsync(new SetSceneEvent(SceneId.World2D));
+            await RaiseA(new SetSceneEvent(SceneId.World2D));
             return;
         }
 
         // Remove old map
         RemoveAllChildren();
 
-        await RaiseAsync(new MuteEvent());
+        await RaiseA(new MuteEvent());
         var map = BuildMap(mapId);
         Current = map;
 
@@ -52,11 +52,11 @@ public class MapManager : GameServiceComponent<IMapManager>, IMapManager
             return;
 
         // Set the scene first to ensure scene-local components from other scenes are disabled.
-        await RaiseAsync(new SetSceneEvent(map is Entities.Map3D.DungeonMap ? SceneId.World3D : SceneId.World2D));
+        await RaiseA(new SetSceneEvent(map is Entities.Map3D.DungeonMap ? SceneId.World3D : SceneId.World2D));
         AttachChild(map);
 
         Info($"Loaded map {mapId.Id}: {mapId}");
-        await RaiseAsync(new MapInitEvent());
+        await RaiseA(new MapInitEvent());
 
         if (!map.MapData.SongId.IsNone)
             Enqueue(new SongEvent(map.MapData.SongId));

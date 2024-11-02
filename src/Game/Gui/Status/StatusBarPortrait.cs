@@ -174,7 +174,7 @@ public class StatusBarPortrait : UiElement
         }
         else // For the first click, just start the double-click timer.
         {
-            RaiseAsync(new WallClockTimerEvent(ReadVar(V.Game.Ui.ButtonDoubleClickIntervalSeconds))).OnCompleted(OnTimer);
+            RaiseA(new WallClockTimerEvent(ReadVar(V.Game.Ui.ButtonDoubleClickIntervalSeconds))).OnCompleted(OnTimer);
             _isClickTimerPending = true;
         }
     }

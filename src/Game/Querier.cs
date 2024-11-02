@@ -65,7 +65,7 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
                 return false;
 
             var innerEvent = new YesNoPromptEvent(new StringId(context.EventSet.StringSetId, q.Argument));
-            return await RaiseQueryAsync(innerEvent);
+            return await RaiseQueryA(innerEvent);
         });
 
         OnQueryAsync<PromptPlayerNumericEvent, bool>(async q =>
@@ -75,7 +75,7 @@ public class Querier : Component // : ServiceComponent<IQuerier>, IQuerier
                 return false;
 
             var innerEvent = new NumericPromptEvent(Base.SystemText.MsgBox_EnterNumber, 0, 9999);
-            var result = await RaiseQueryAsync(innerEvent);
+            var result = await RaiseQueryA(innerEvent);
             return result == q.Argument;
         });
 

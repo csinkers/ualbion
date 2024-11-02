@@ -74,7 +74,7 @@ public class ConversationManager : GameServiceComponent<IConversationManager>, I
                 }
 
             case TextLocation.QuickInfo:
-                await RaiseAsync(new DescriptionTextEvent(tf.Format(mapTextEvent.ToId(ContextTextSource))));
+                await RaiseA(new DescriptionTextEvent(tf.Format(mapTextEvent.ToId(ContextTextSource))));
                 return;
 
             case TextLocation.Conversation:
@@ -84,7 +84,7 @@ public class ConversationManager : GameServiceComponent<IConversationManager>, I
                 break; // Handled by Conversation
 
             default:
-                await RaiseAsync(new DescriptionTextEvent(tf.Format(mapTextEvent.ToId(ContextTextSource)))); // TODO:
+                await RaiseA(new DescriptionTextEvent(tf.Format(mapTextEvent.ToId(ContextTextSource)))); // TODO:
                 return;
         }
     }
@@ -105,7 +105,7 @@ public class ConversationManager : GameServiceComponent<IConversationManager>, I
     {
         var wasRunning = Resolve<IClock>().IsRunning;
         if (wasRunning)
-            await RaiseAsync(new StopClockEvent());
+            await RaiseA(new StopClockEvent());
 
         Conversation = AttachChild(new Conversation(left, right));
         await Conversation.Run();
@@ -113,7 +113,7 @@ public class ConversationManager : GameServiceComponent<IConversationManager>, I
         Conversation = null;
 
         if (wasRunning)
-            await RaiseAsync(new StartClockEvent());
+            await RaiseA(new StartClockEvent());
     }
 
     async AlbionTask StartDialogue(StartDialogueEvent e)

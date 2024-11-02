@@ -101,7 +101,7 @@ namespace UAlbion.Api.Eventing
                 }
             }
 
-            return new(0);
+            return AlbionTask.FromResult(0);
         }
 
         // [DebuggerHidden, StackTraceHidden]
@@ -178,9 +178,10 @@ namespace UAlbion.Api.Eventing
                 }
             }
 
-            if (!hasResult) throw new InvalidOperationException("No result found for RaiseQuery call");
+            if (!hasResult)
+                throw new InvalidOperationException("No result found for RaiseQuery call");
 
-            return new(result);
+            return AlbionTask.FromResult(result);
         }
 
         // [DebuggerHidden, StackTraceHidden]

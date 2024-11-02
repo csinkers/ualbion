@@ -11,6 +11,7 @@ public interface IAlbionTaskCore : ICriticalNotifyCompletion
 #if DEBUG
     int Id { get; }
     string? Description { get; set; }
+    IAlbionTaskCore? Parent { get; }
 #endif
     bool IsCompleted { get; }
 }
@@ -32,6 +33,7 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
     [DiagEdit]
     public bool BreakOnCompletion { get; set; }
     public string? Description { get; set; }
+    public IAlbionTaskCore? Parent { get; }
 #endif
 
 #if RECORD_TASK_STACKS
@@ -56,6 +58,7 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
 #if DEBUG
         Id = Tasks.GetNextId();
         Description = description;
+        Parent = Tasks.Current;
         Tasks.AddTask(this);
 #endif
 
@@ -125,11 +128,14 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
     {
         _result = value;
         IsCompleted = true;
+
 #if DEBUG
         if (BreakOnCompletion)
             Debugger.Break();
 
         _status = TaskStatus.Completing;
+        var previous = Tasks.Current;
+        Tasks.Current = this;
 #endif
 
         switch (_continuation)
@@ -149,6 +155,7 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
 #if DEBUG
         _status = TaskStatus.Completed;
         Tasks.RemoveTask(this);
+        Tasks.Current = previous;
 #endif
     }
 }

@@ -101,7 +101,7 @@ public class ConversationTopicWindow : ModalDialog
 
     async AlbionTask<WordId> PromptForWord()
     {
-        var wordString = await RaiseQueryAsync(new TextPromptEvent());
+        var wordString = await RaiseQueryA(new TextPromptEvent());
         var wordLookup = Resolve<IWordLookup>();
         return wordLookup.Parse(wordString);
     }

@@ -354,7 +354,7 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
     {
         _game = Assets.LoadSavedGame(IdToPath(id));
         if (_game == null)
-            return AlbionTask.Complete;
+            return AlbionTask.CompletedTask;
 
         return InitialiseGame();
     }
@@ -390,7 +390,7 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
             if (!member.IsNone)
                 _party.AddMember(member);
 
-        await RaiseAsync(new LoadMapEvent(_game.MapId));
+        await RaiseA(new LoadMapEvent(_game.MapId));
 
         Raise(new StartClockEvent());
         Raise(new SetPartyLeaderEvent(_party.Leader.Id, 0, 0));

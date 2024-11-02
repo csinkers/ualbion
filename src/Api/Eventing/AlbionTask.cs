@@ -9,7 +9,7 @@ namespace UAlbion.Api.Eventing;
 [AsyncMethodBuilder(typeof(AlbionTaskBuilder))]
 public readonly struct AlbionTask : INotifyCompletion, IEquatable<AlbionTask>
 {
-    public static AlbionTask Complete { get; } = new(null);
+    public static AlbionTask CompletedTask { get; } = new(null);
     public static AlbionTask<Unit> Unit { get; } = new(Api.Unit.V);
     public static AlbionTask<bool> True { get; } = new(true);
     public static AlbionTask<bool> False { get; } = new(false);
@@ -69,7 +69,7 @@ public readonly struct AlbionTask<T> : INotifyCompletion, IEquatable<AlbionTask<
     /// <summary>
     /// Create a completed task
     /// </summary>
-    public AlbionTask(T value)
+    internal AlbionTask(T value)
     {
         _core = null;
         _result = value;

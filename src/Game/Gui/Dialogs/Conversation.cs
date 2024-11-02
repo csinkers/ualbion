@@ -331,10 +331,10 @@ public class Conversation : GameComponent
             eventIndex.Value,
             new EventSource(chainSource.Id, TriggerType.Action));
 
-        await RaiseAsync(triggerEvent);
+        await RaiseA(triggerEvent);
 
         var action = (ActionEvent)chainSource.Events[eventIndex.Value].Event;
-        await RaiseAsync(new EventVisitedEvent(chainSource.Id, action));
+        await RaiseA(new EventVisitedEvent(chainSource.Id, action));
         return true;
     }
 }

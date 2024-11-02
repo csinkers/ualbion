@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\deps\ImGuiColorTextEditNet\')">
-    <PackageReference Include="ImGuiColorTextEditNet" Version="0.1.3" />
+    <PackageReference Include="ImGuiColorTextEditNet" Version="0.1.7" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\..\deps\ImGuiColorTextEditNet\')">
     <ProjectReference Include="..\..\deps\ImGuiColorTextEditNet\src\TextEdit\ImGuiColorTextEditNet.csproj" />

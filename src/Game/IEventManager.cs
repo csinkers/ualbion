@@ -7,6 +7,7 @@ namespace UAlbion.Game;
 public interface IEventManager
 {
     EventContext CurrentDebugContext { get; }
+    int CurrentDebugContextIndex { get; set; }
     IReadOnlyList<EventContext> Contexts { get; }
     IReadOnlyList<Breakpoint> Breakpoints { get; }
     void AddBreakpoint(Breakpoint bp);

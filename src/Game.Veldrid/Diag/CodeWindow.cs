@@ -1,5 +1,7 @@
-﻿using ImGuiColorTextEditNet;
+﻿using System;
+using ImGuiColorTextEditNet;
 using ImGuiNET;
+using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid;
 using UAlbion.Formats;
 using UAlbion.Formats.MapEvents;
@@ -27,12 +29,12 @@ namespace UAlbion.Game.Veldrid.Diag;
 
 */
 
-public class CodeWindow : GameComponent, IImGuiWindow
+public class ScriptWindow : GameComponent, IImGuiWindow
 {
     readonly TextEditor _editor;
     public string Name { get; }
 
-    public CodeWindow(string name)
+    public ScriptWindow(string name)
     {
         Name = name;
         _editor = new TextEditor
@@ -67,10 +69,31 @@ public class CodeWindow : GameComponent, IImGuiWindow
         {
             var eventFormatter = new EventFormatter(Assets.LoadStringSafe, context.EventSet.StringSetId);
             set.Decompiled = eventFormatter.Decompile(set.Events, set.Chains, set.ExtraEntryPoints);
-            var code = set.Decompiled.Script;
-            _editor.AllText = code;
+            var code = set.Decompiled.Script.AsSpan();
+            _editor.AllText = "";
+
+            foreach (var part in set.Decompiled.Parts)
+            {
+                PaletteIndex color = part.Type switch
+                {
+                    ScriptPartType.Text           => PaletteIndex.Default,
+                    ScriptPartType.Keyword        => PaletteIndex.Keyword,
+                    ScriptPartType.EventName      => PaletteIndex.KnownIdentifier,
+                    ScriptPartType.Identifier     => PaletteIndex.Identifier,
+                    ScriptPartType.Number         => PaletteIndex.Number,
+                    ScriptPartType.Operator       => PaletteIndex.Punctuation,
+                    ScriptPartType.Label          => PaletteIndex.Identifier,
+                    ScriptPartType.StringConstant => PaletteIndex.String,
+                    ScriptPartType.Comment        => PaletteIndex.Comment,
+                    ScriptPartType.Error          => PaletteIndex.ErrorMarker,
+                    _ => PaletteIndex.Default
+                };
+
+                _editor.Append(code[part.Range.Start..part.Range.End], color);
+            }
             // TODO: Add breakpoints
         }
+        // _editor.Selection.HighlightedLine =
 
         _editor.Render("Script");
     }

@@ -10,6 +10,13 @@ public static class Tasks
     static int _nextId;
     static readonly object SyncRoot = new();
     static readonly List<IAlbionTaskCore> Pending = new(); // Just for debugging
+    static readonly ThreadLocal<IAlbionTaskCore?> CurrentTask = new();
+
+    public static IAlbionTaskCore? Current
+    {
+        get => CurrentTask.Value;
+        set => CurrentTask.Value = value;
+    }
 
     public static int GetNextId() => Interlocked.Increment(ref _nextId);
     public static void AddTask(IAlbionTaskCore task)

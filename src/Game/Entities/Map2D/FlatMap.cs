@@ -158,7 +158,7 @@ public class FlatMap : GameComponent, IMap
 
             foreach (var zone in zones)
             {
-                await RaiseAsync(
+                await RaiseA(
                     new TriggerChainEvent(
                         _logicalMap.EventSet,
                         zone.EventIndex,

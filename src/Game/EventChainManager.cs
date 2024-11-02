@@ -17,7 +17,12 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
 
     readonly List<EventContext> _contexts = new();
     readonly List<Breakpoint> _breakpoints = new();
-    public EventContext CurrentDebugContext { get; }
+    public int CurrentDebugContextIndex { get; set; } = -1;
+    public EventContext CurrentDebugContext =>
+        CurrentDebugContextIndex >= 0 && CurrentDebugContextIndex < _contexts.Count
+            ? _contexts[CurrentDebugContextIndex]
+            : null;
+
     public IReadOnlyList<EventContext> Contexts => _contexts;
     public IReadOnlyList<Breakpoint> Breakpoints => _breakpoints;
 
@@ -51,7 +56,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         var game = Resolve<IGameState>();
         if (e.EventSet.Id.Type == AssetType.Map && game.IsChainDisabled(e.EventSet.Id, e.EventSet.GetChainForEvent(e.EntryPoint)))
         {
-            return AlbionTask.Complete;
+            return AlbionTask.CompletedTask;
         }
 
         var isClockRunning = Resolve<IClock>().IsRunning;
@@ -151,7 +156,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
     {
         context.Status = EventContextStatus.Waiting;
 
-        var task = RaiseAsync(asyncEvent);
+        var task = RaiseA(asyncEvent);
 #if DEBUG
             _ = task.Named($"ECM.HandleAsyncEvent for C{context.Id} {context.EventSet.Id}:{context.Node.Id}: {context.Node.Event}");
 #endif
@@ -164,7 +169,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
     async AlbionTask<bool> HandleBoolEvent(EventContext context, IQueryEvent<bool> boolEvent, IBranchNode branch) // Return value = whether to return.
     {
         context.Status = EventContextStatus.Waiting;
-        var task = RaiseQueryAsync(boolEvent);
+        var task = RaiseQueryA(boolEvent);
 #if DEBUG
             _ = task.Named($"ECM.HandleBoolEvent for C{context.Id} {context.EventSet.Id}:{context.Node.Id}: {context.Node.Event}");
 #endif

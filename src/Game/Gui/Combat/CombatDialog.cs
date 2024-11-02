@@ -42,7 +42,7 @@ public class CombatDialog : Dialog
     void StartRound()
     {
         IsActive = false;
-        RaiseAsync(new BeginCombatRoundEvent()).OnCompleted(() => IsActive = true);
+        RaiseA(new BeginCombatRoundEvent()).OnCompleted(() => IsActive = true);
     }
 
     HorizontalStacker BuildRow(int row)

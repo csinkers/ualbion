@@ -27,8 +27,8 @@ public class CombatClock : Component
 
         OnAsync<CombatUpdateEvent>(e =>
         {
-            if (IsRunning) { Warn($"Ignoring {e} - clock paused"); return AlbionTask.Complete; } 
-            if (_currentUpdate != null) { Warn($"Ignoring {e} - already running another update event"); return AlbionTask.Complete; }
+            if (IsRunning) { Warn($"Ignoring {e} - clock paused"); return AlbionTask.CompletedTask; }
+            if (_currentUpdate != null) { Warn($"Ignoring {e} - already running another update event"); return AlbionTask.CompletedTask; }
 
             GameTrace.Log.CombatClockUpdating(e.Cycles);
             _currentUpdate = new AlbionTaskCore("CombatClock.CombatUpdateEvent");

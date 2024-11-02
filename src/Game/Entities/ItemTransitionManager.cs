@@ -26,7 +26,7 @@ public class ItemTransitionManager : GameComponent
         var map = TryResolve<IMapManager>()?.Current;
 
         if (scene == null || map == null)
-            return AlbionTask.Complete;
+            return AlbionTask.CompletedTask;
 
         var worldPosition = new Vector3(x, y, 0) * map.TileSize;
         var normPosition = sceneManager.Camera.ProjectWorldToNorm(worldPosition);

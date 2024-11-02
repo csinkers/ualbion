@@ -10,7 +10,7 @@ public class AsyncTests
     {
         async AlbionTask Foo()
         {
-            await AlbionTask.Complete;
+            await AlbionTask.CompletedTask;
         }
 
         Foo().GetResult();

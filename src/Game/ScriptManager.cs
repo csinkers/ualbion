@@ -23,7 +23,7 @@ public class ScriptManager : GameComponent
         if (events == null)
         {
             Error($"Could not load script {doScriptEvent.ScriptId}");
-            return AlbionTask.Complete;
+            return AlbionTask.CompletedTask;
         }
 
         var nodes = new EventNode[events.Count];
@@ -35,7 +35,7 @@ public class ScriptManager : GameComponent
         var set = new ScriptEventSet(doScriptEvent.ScriptId, mapManager.Current.MapId.ToMapText(), nodes);
         var source = new EventSource(mapManager.Current.MapId, TriggerType.Default); // TODO: Is there a better trigger type for this?
         var trigger = new TriggerChainEvent(set, 0, source);
-        return RaiseAsync(trigger);
+        return RaiseA(trigger);
     }
 
     void Dump(DumpScriptEvent dumpScriptEvent)

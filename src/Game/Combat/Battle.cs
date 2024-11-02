@@ -44,7 +44,7 @@ public class Battle : GameComponent, IReadOnlyBattle
         });
     }
 
-    AlbionTask BeginRoundAsync(BeginCombatRoundEvent _) => RaiseAsync(new CombatUpdateEvent(25)); // TODO
+    AlbionTask BeginRoundAsync(BeginCombatRoundEvent _) => RaiseA(new CombatUpdateEvent(25)); // TODO
 
     protected override void Subscribed()
     {

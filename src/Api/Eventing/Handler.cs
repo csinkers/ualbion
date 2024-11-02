@@ -36,7 +36,7 @@ public class SyncHandler<TEvent> : Handler, ISyncHandler where TEvent : IEvent
     [DebuggerHidden, StackTraceHidden] public AlbionTask InvokeAsAsync(IEvent e)
     {
         Callback((TEvent)e);
-        return AlbionTask.Complete;
+        return AlbionTask.CompletedTask;
     }
 
     public override string ToString() => $"H<{Component.GetType().Name}, {Type.Name}>";
@@ -52,14 +52,14 @@ public class SyncQueryHandler<TEvent, TResult> : Handler, ISyncQueryHandler<TRes
     [DebuggerHidden, StackTraceHidden] AlbionTask IAsyncHandler.InvokeAsAsync(IEvent e) // Ignores result
     {
         Callback((TEvent)e);
-        return AlbionTask.Complete;
+        return AlbionTask.CompletedTask;
     }
 
     [DebuggerHidden, StackTraceHidden] public TResult Invoke(IQueryEvent<TResult> e) => Callback((TEvent)e);
     [DebuggerHidden, StackTraceHidden] public AlbionTask<TResult> InvokeAsAsync(IQueryEvent<TResult> e)
     {
         var result = Callback((TEvent)e);
-        return new AlbionTask<TResult>(result);
+        return AlbionTask.FromResult(result);
     }
 
     public override string ToString() => $"HQ<{Component.GetType().Name}, {Type.Name}>";
@@ -75,7 +75,7 @@ public class ReceiveOnlyHandler<TEvent> : Handler, ISyncHandler where TEvent : I
     [DebuggerHidden, StackTraceHidden] public AlbionTask InvokeAsAsync(IEvent e)
     {
         Callback((TEvent)e);
-        return AlbionTask.Complete;
+        return AlbionTask.CompletedTask;
     }
 
     public override string ToString() => $"HR<{Component.GetType().Name}, {Type.Name}>";

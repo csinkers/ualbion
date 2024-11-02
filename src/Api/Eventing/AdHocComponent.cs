@@ -51,6 +51,7 @@ public class AdHocComponent : Component
         public void Off<T>() => _this.Off<T>();
         public void Detach() => _this.Detach();
         public T AttachChild<T>(T child) where T : IComponent => _this.AttachChild(child);
+        public void Remove() => _this.Remove();
         public void RemoveAllChildren() => _this.RemoveAllChildren();
         public void RemoveChild(IComponent child) => _this.RemoveChild(child);
         public T Var<T>(IVar<T> varInfo) => _this.ReadVar(varInfo);

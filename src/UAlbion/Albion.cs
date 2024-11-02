@@ -69,6 +69,10 @@ static class Albion
         PerfTracker.StartupEvent("Creating main components");
         global.Register<ICommonColors>(new CommonColors());
 
+#if DEBUG
+        G.Instance.Attach(global); // Add convenience class that holds globals for debugging
+#endif
+
         var sceneManager = new SceneManager();
         sceneManager
             .Add(new EmptyScene()
@@ -196,10 +200,6 @@ static class Albion
             gameServices.Add(new AudioManager(false));
 
         global.Attach(gameServices);
-
-#if DEBUG
-        G.Instance.Attach(global); // Add convenience class that holds globals for debugging
-#endif
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
         if (commandLine.DebugMenus)

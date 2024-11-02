@@ -6,6 +6,8 @@ namespace UAlbion.Core.Veldrid.Reflection;
 
 public class IntReflector(string typeName, Func<object, int> toInt) : IReflector
 {
+    const int DefaultMin = -1024;
+    const int DefaultMax = 1024;
     public void Reflect(in ReflectorState state)
     {
         ImGui.Indent();
@@ -31,8 +33,8 @@ public class IntReflector(string typeName, Func<object, int> toInt) : IReflector
         var label = state.Meta.Name ?? state.Index.ToString();
         var options = state.Meta.Options;
 
-        int min = -1024;
-        int max = 1024;
+        int min = DefaultMin;
+        int max = DefaultMax;
 
         if (options.Min is int minInt) min = minInt;
         else if (options.MinProperty != null)

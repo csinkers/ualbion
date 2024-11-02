@@ -6,8 +6,8 @@ namespace UAlbion.Core.Veldrid.Reflection;
 
 public class FloatReflector(string typeName, Func<object, float> toFloat) : IReflector
 {
-    const float _defaultMin = -10.0f;
-    const float _defaultMax = 10.0f;
+    const float DefaultMin = -10.0f;
+    const float DefaultMax = 10.0f;
     public void Reflect(in ReflectorState state)
     {
         ImGui.Indent();
@@ -33,21 +33,21 @@ public class FloatReflector(string typeName, Func<object, float> toFloat) : IRef
         var label = state.Meta.Name ?? state.Index.ToString();
         var options = state.Meta.Options;
 
-        float min = _defaultMin;
-        float max = _defaultMax;
+        float min = DefaultMin;
+        float max = DefaultMax;
 
         if (options.Min is float minFloat) min = minFloat;
         else if (options.MinProperty != null)
         {
             options.GetMinProperty ??= ReflectorUtil.BuildPropertyGetter(options.MinProperty, state.Parent.GetType());
-            min = options.GetMinProperty(state.Parent) as float? ?? _defaultMin;
+            min = options.GetMinProperty(state.Parent) as float? ?? DefaultMin;
         }
 
         if (options.Max is float maxFloat) max = maxFloat;
         else if (options.MaxProperty != null)
         {
             options.GetMaxProperty ??= ReflectorUtil.BuildPropertyGetter(options.MaxProperty, state.Parent.GetType());
-            max = options.GetMaxProperty(state.Parent) as float? ?? _defaultMax;
+            max = options.GetMaxProperty(state.Parent) as float? ?? DefaultMax;
         }
 
         ImGui.TextUnformatted(label);

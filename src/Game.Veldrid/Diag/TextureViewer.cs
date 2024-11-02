@@ -10,7 +10,6 @@ using UAlbion.Core.Veldrid;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
-using VeldridGen.Interfaces;
 using Component = UAlbion.Api.Eventing.Component;
 
 namespace UAlbion.Game.Veldrid.Diag;
@@ -20,6 +19,7 @@ public sealed class TextureViewer : Component, IAssetViewer
     readonly byte[] _framesBuf = new byte[1024];
     readonly ITexture _asset;
     readonly TextureViewerRenderer _renderer;
+    readonly TextureViewerRenderer2 _renderer2;
 
     int[] _frames = [];
     int _frameIndex;
@@ -29,8 +29,6 @@ public sealed class TextureViewer : Component, IAssetViewer
 
     string[] _paletteNames = [];
     AssetId[] _paletteIds = [];
-    ITextureArrayHolder _textureArray;
-    ITextureHolder _texture;
     int _curPal;
     int _defaultPalette;
     bool _skipShadows;
@@ -59,16 +57,11 @@ public sealed class TextureViewer : Component, IAssetViewer
 
         _asset = asset ?? throw new ArgumentNullException(nameof(asset));
         _renderer = AttachChild(new TextureViewerRenderer(asset));
+        _renderer2 = AttachChild(new TextureViewerRenderer2(asset));
     }
 
     protected override void Subscribed()
     {
-        var source = Resolve<ITextureSource>();
-        if (_asset.ArrayLayers > 1)
-            _textureArray = source.GetArrayTexture(_asset);
-        else
-            _texture = source.GetSimpleTexture(_asset);
-
         _paletteIds = AssetMapping.Global.EnumerateAssetsOfType(AssetType.Palette).OrderBy(x => x.ToString()).ToArray();
         _paletteNames = _paletteIds.Select(x => x.ToString()).ToArray();
 
@@ -84,9 +77,11 @@ public sealed class TextureViewer : Component, IAssetViewer
                 _curPal = i;
 
         _defaultPalette = _curPal;
+
         AlbionPalette pal = Resolve<IAssetManager>().LoadPalette(palId);
         var textureSource = Resolve<ITextureSource>();
         _renderer.Palette = textureSource.GetSimpleTexture(pal.Texture);
+        _renderer2.Palette = textureSource.GetSimpleTexture(pal.Texture);
     }
 
     public void Draw()
@@ -170,9 +165,8 @@ public sealed class TextureViewer : Component, IAssetViewer
             ImGui.Image(ptr1, new Vector2(_renderer.FramebufferWidth, _renderer.FramebufferHeight));
         }
 
-        if (_textureArray is { DeviceTexture: not null })
-        {
-            ImGui.Text("TextureArray: TODO");
-        }
+        ImGui.PushID("2");
+        _renderer2?.Draw();
+        ImGui.PopID();
     }
 }

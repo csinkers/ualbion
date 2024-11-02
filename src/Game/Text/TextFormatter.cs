@@ -347,8 +347,5 @@ public class TextFormatter : GameServiceComponent<ITextFormatter>, ITextFormatte
         });
 
     public IText Format(string templateText, IList<(Token, object)> implicitTokens, params object[] arguments)
-        => new DynamicText(() =>
-        {
-            return InnerFormat(templateText, arguments, implicitTokens, Assets);
-        });
+        => new DynamicText(() => InnerFormat(templateText, arguments, implicitTokens, Assets));
 }

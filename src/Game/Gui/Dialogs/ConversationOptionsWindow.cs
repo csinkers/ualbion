@@ -30,7 +30,9 @@ public class ConversationOptionsWindow : ModalDialog
         });
     }
 
-    public AlbionTask<T> GetOption<T>((IText, BlockId?, T)[] options, (IText, BlockId?, T)[] standardOptions)
+    public AlbionTask<T> GetOption<T>(
+        (IText text, BlockId? block, T result)[] options,
+        (IText text, BlockId? block, T result)[] standardOptions)
     {
         RemoveAllChildren();
 

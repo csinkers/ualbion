@@ -15,16 +15,15 @@ namespace UAlbion.Game.Combat;
 public class Monster : GameComponent, ICombatParticipant
 {
     readonly CharacterSheet _sheet;
-    readonly Sprite _sprite;
+    readonly MonsterSprite _sprite;
 
     public Monster(CharacterSheet clonedSheet, int position)
     {
         _sheet = clonedSheet ?? throw new ArgumentNullException(nameof(clonedSheet));
-        _sprite = AttachChild(new Sprite(
+        _sprite = AttachChild(new MonsterSprite(
             clonedSheet.CombatGfx,
             DrawLayer.Billboards,
-            0,
-            SpriteFlags.FlipVertical));
+            SpriteKeyFlags.UsePalette));
 
         CombatPosition = position;
         UpdatePosition();
@@ -75,8 +74,15 @@ public class Monster : GameComponent, ICombatParticipant
 
     void UpdatePosition()
     {
-        var x = CombatPosition % SavedGame.CombatColumns;
-        var y = CombatPosition / SavedGame.CombatColumns;
-        _sprite.Position = new Vector3(20 * (x - SavedGame.CombatColumns / 0.5f), 20, -20 * (SavedGame.CombatRows - y));
+        var tileX = CombatPosition % SavedGame.CombatColumns;
+        var tileY = CombatPosition / SavedGame.CombatColumns;
+
+        const float fieldWidth = 500.0f;
+        const float fieldDepth = 500.0f;
+
+        _sprite.Position = new Vector3(
+            fieldWidth * (tileX / (float)SavedGame.CombatColumns - 0.5f),
+            0,
+            -fieldDepth * (1.0f - tileY / (float)SavedGame.CombatRows));
     }
 }

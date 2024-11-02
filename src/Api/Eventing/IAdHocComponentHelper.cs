@@ -31,6 +31,7 @@ public interface IAdHocComponentHelper
     void Off<T>();
     void Detach();
     T AttachChild<T>(T child) where T : IComponent;
+    void Remove();
     void RemoveAllChildren();
     void RemoveChild(IComponent child);
     T Var<T>(IVar<T> varInfo);

@@ -8,10 +8,10 @@ namespace UAlbion.Game.Gui.Text;
 
 public class ScrollBar : UiElement
 {
-    readonly Func<(int, int, int)> _getPosition; // (position, totalHeight, pageHeight)
+    readonly Func<(int position, int totalHeight, int pageHeight)> _getPosition;
     readonly UiRectangle _rectangle;
 
-    public ScrollBar(CommonColor color, int width, Func<(int, int, int)> getPosition)
+    public ScrollBar(CommonColor color, int width, Func<(int position, int totalHeight, int pageHeight)> getPosition)
     {
         _getPosition = getPosition;
         Width = width;
@@ -27,11 +27,13 @@ public class ScrollBar : UiElement
         var (position, totalHeight, pageHeight) = _getPosition();
         _rectangle.MeasureSize = extents.Size;
         _rectangle.DrawSize = new Vector2(Width, extents.Height * (float)pageHeight / totalHeight);
+
         var rect = new Rectangle(
             extents.X,
             extents.Y + (int)(extents.Height * ((float)position / totalHeight)),
             extents.Width,
             extents.Height);
+
         return func(_rectangle, rect, order + 1, context);
     }
 }

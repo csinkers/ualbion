@@ -11,6 +11,25 @@ namespace UAlbion.Formats.MapEvents;
     "talk")]
 public class StartDialogueEvent : MapEvent
 {
+    /*
+    Good test conversations:
+    111 Frill - Ask about item (FineIskaiDagger)
+    123 Fasiir - Learn spells
+    127 Rejira - Merchant, Heal, Cure, RemoveCurse
+    144 Zirr - SleepInRoom, OrderFood
+    146 Snird - Merchant, RepairItem
+    156 Garris - Unk2 ???, AskAbout(TharnossPermit)
+    159 Ferina - LearnCloseCombat
+    173 Torko - AskOpinion (2x)
+    176 Roves - ScrollMerchant
+    224 Unk - Unk9 ?? (also 241_Riko)
+    285 Konny - AskToJoin
+    314 Drannagh - RestoreItemEnergy, LearnSpells
+    981 Tom - UnkE
+    984 Sira2 - AskToLeave, PartySleeps, Unk2D, Unk17
+    986 Harriet - DropItem(GodesssAmulet)
+    */
+
     StartDialogueEvent() { }
     public StartDialogueEvent(NpcSheetId npcId) => NpcId = npcId;
 

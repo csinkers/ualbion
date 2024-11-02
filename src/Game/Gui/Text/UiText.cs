@@ -14,6 +14,8 @@ namespace UAlbion.Game.Gui.Text;
 public class UiText : UiElement
 {
     const int ScrollBarWidth = 4;
+    const int ScrollWheelSpeed = 5; // UI pixels per scroll-wheel delta
+
     readonly IText _source;
     Rectangle _lastExtents = UiConstants.UiExtents; // Initial GetSize should give the constraint-free dimensions.
     int _lastVersion;
@@ -39,6 +41,16 @@ public class UiText : UiElement
         On<UiScrollEvent>(OnScroll);
     }
 
+    public int ScrollOffset // In pages
+    {
+        get => _scrollOffset;
+        set => _scrollOffset = Math.Clamp(value, 0, MaxScrollOffset);
+    }
+
+    public int PageSize => _lastExtents.Height;
+    public int MaxScrollOffset => Math.Max(0, _totalHeight - _lastExtents.Height);
+
+
     public override string ToString() => $"UiText source:\"{_source}\"";
     // public UiText Source(IText source) { _source = source; _lastVersion = 0; return this; }
     public UiText Scrollable() { _isScrollable = true; return this; }
@@ -61,8 +73,7 @@ public class UiText : UiElement
         if (!_isScrollable)
             return;
 
-        int maxScrollOffset = Math.Max(0, _totalHeight - _lastExtents.Height);
-        _scrollOffset = Math.Clamp(_scrollOffset - e.Delta * 5, 0, maxScrollOffset);
+        ScrollOffset -= e.Delta * ScrollWheelSpeed;
     }
 
     IEnumerable<UiTextLine> BuildLines(Rectangle extents, IEnumerable<TextBlock> blocks)

@@ -26,26 +26,28 @@ public class Conversation : GameComponent
     readonly PartyMemberId _partyMemberId;
     readonly ICharacterSheet _npc;
     readonly Dictionary<WordId, WordStatus> _topics = new();
+
     ITextFormatter _tf;
     ConversationTextWindow _textWindow;
     ConversationTopicWindow _topicsWindow;
     ConversationOptionsWindow _optionsWindow;
+    bool _done;
 
     public Conversation(PartyMemberId partyMemberId, ICharacterSheet npc)
     {
-        // On<EndDialogueEvent>(_ => Close());
-        // On<UnloadMapEvent>(_ => Close());
+        On<EndDialogueEvent>(_ => Close());
+        On<UnloadMapEvent>(_ => Close());
         On<DataChangeEvent>(OnDataChange);
 
         _partyMemberId = partyMemberId;
         _npc = npc ?? throw new ArgumentNullException(nameof(npc));
     }
 
+    void Close() => _done = true;
+
     protected override void Subscribed()
     {
         Raise(new PushInputModeEvent(InputMode.Conversation));
-        if (_textWindow != null)
-            return;
 
         _tf = Resolve<ITextFormatter>();
         var game = TryResolve<IGameState>();
@@ -62,10 +64,10 @@ public class Conversation : GameComponent
 
     (IText, BlockId?, BlockId)[] BuildStandardOptions() =>
     [
-        (_tf.Format(Base.SystemText.Dialog_WhatsYourProfession), BlockId.Profession, BlockId.Profession),
-        (_tf.Format(Base.SystemText.Dialog_WhatDoYouKnowAbout), BlockId.QueryWord, BlockId.QueryWord),
-        (_tf.Format(Base.SystemText.Dialog_WhatDoYouKnowAboutThisItem), BlockId.QueryItem, BlockId.QueryItem),
-        (_tf.Format(Base.SystemText.Dialog_ItsBeenNiceTalkingToYou), BlockId.Farewell, BlockId.Farewell)
+        (_tf.Format(Base.SystemText.Dialog_WhatsYourProfession), null, BlockId.Profession),
+        (_tf.Format(Base.SystemText.Dialog_WhatDoYouKnowAbout), null, BlockId.QueryWord),
+        (_tf.Format(Base.SystemText.Dialog_WhatDoYouKnowAboutThisItem), null, BlockId.QueryItem),
+        (_tf.Format(Base.SystemText.Dialog_ItsBeenNiceTalkingToYou), null, BlockId.Farewell)
     ];
 
     public async AlbionTask Run()
@@ -73,7 +75,7 @@ public class Conversation : GameComponent
         await TriggerAction(ActionType.StartDialogue, 0, AssetId.None);
         var standardOptions = BuildStandardOptions();
 
-        for (;;)
+        while(!_done)
         {
             if (_optionsWindow.IsActive || !IsSubscribed)
                 return;
@@ -105,7 +107,8 @@ public class Conversation : GameComponent
                     }
 
                     var text = _tf.Ink(Base.Ink.Yellow).Format(new StringId(setId, subId));
-                    await _textWindow.Show(text, BlockId.Profession);
+                    _textWindow.Show(text, BlockId.Profession);
+                    await _textWindow.Closed();
                     break;
                 }
 
@@ -125,7 +128,8 @@ public class Conversation : GameComponent
                 }
 
             case BlockId.QueryItem:
-                await _textWindow.Show(new LiteralText("TODO"), null);
+                _textWindow.Show(new LiteralText("TODO"), null);
+                await _textWindow.Closed();
                 break;
 
             case BlockId.Farewell:
@@ -134,7 +138,8 @@ public class Conversation : GameComponent
                         return true; // If there was a custom finish-dialogue script then we don't need to show the default message
 
                     var text = _tf.Ink(Base.Ink.Yellow).Format(Base.SystemText.Dialog_Farewell);
-                    await _textWindow.Show(text, BlockId.MainText);
+                    _textWindow.Show(text, BlockId.MainText);
+                    await _textWindow.Closed();
                     return true;
                 }
 
@@ -152,7 +157,18 @@ public class Conversation : GameComponent
         return false;
     }
 
-    protected override void Unsubscribed() => Raise(new PopInputModeEvent());
+    protected override void Unsubscribed()
+    {
+        _textWindow.Remove();
+        _topicsWindow.Remove();
+        _optionsWindow.Remove();
+
+        _textWindow = null;
+        _topicsWindow = null;
+        _optionsWindow = null;
+
+        Raise(new PopInputModeEvent());
+    }
 
     void DiscoverTopics(IEnumerable<WordId> topics)
     {
@@ -169,64 +185,65 @@ public class Conversation : GameComponent
         {
             case TextLocation.Conversation:
             case TextLocation.NoPortrait:
-            {
-                var text = _tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId(_npc.EventSetId.ToEventText()));
-                DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
-                await _textWindow.Show(text, null);
-                return;
-            }
+                {
+                    var text = _tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId(_npc.EventSetId.ToEventText()));
+                    var topics = text.GetBlocks().SelectMany(x => x.Words);
+                    DiscoverTopics(topics);
+                    _textWindow.Show(text, null);
+                    await _textWindow.Closed();
+                    return;
+                }
 
             case TextLocation.ConversationOptions:
-            {
-                var text = _tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId(_npc.EventSetId.ToEventText()));
-                DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
-                await _textWindow.Show(text, null);
+                {
+                    var text = _tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId(_npc.EventSetId.ToEventText()));
+                    DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
+                    _textWindow.Show(text, null);
+                    // Note: Not waiting for the user to click, as this should be the same text as the last event, but with options
 
-                var options = text.GetBlocks()
+                    var options = text.GetBlocks()
                         .Where(x => x.BlockId > 0)
                         .Select(x => x.BlockId)
                         .Distinct()
                         .Select(x => (text, (BlockId?)x, x))
                         .ToArray();
 
-                var standardOptions = BuildStandardOptions();
+                    var standardOptions = BuildStandardOptions();
 
-                // foreach (var blockId in blocks.Where(x => x > 0))
-                //     options.Add((text, blockId, () => BlockClicked(blockId, mapTextEvent.SubId)));
+                    // foreach (var blockId in blocks.Where(x => x > 0))
+                    //     options.Add((text, blockId, () => BlockClicked(blockId, mapTextEvent.SubId)));
 
-                var blockId = await _optionsWindow.GetOption(options, standardOptions);
-                if (await BlockClicked(blockId))
-                {
-                    // TODO: End conversation
+                    var blockId = await _optionsWindow.GetOption(options, standardOptions);
+                    if (await BlockClicked(blockId))
+                        Close();
+
+                    return;
                 }
 
-                return;
-            }
-
             case TextLocation.ConversationQuery:
-            {
-                var text = _tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId(_npc.EventSetId.ToEventText()));
+                {
+                    var text = _tf.Ink(Base.Ink.Yellow).Format(mapTextEvent.ToId(_npc.EventSetId.ToEventText()));
 
-                DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
+                    DiscoverTopics(text.GetBlocks().SelectMany(x => x.Words));
 
-                await _textWindow.Show(text, null);
+                    _textWindow.Show(text, null);
+                    await _textWindow.Closed();
 
-                var options = text.GetBlocks()
-                    .Where(x => x.BlockId > 0)
-                    .Select(x => x.BlockId)
-                    .Distinct()
-                    .Select(x => (text, (BlockId?)x, x))
-                    .ToArray();
+                    var options = text.GetBlocks()
+                        .Where(x => x.BlockId > 0)
+                        .Select(x => x.BlockId)
+                        .Distinct()
+                        .Select(x => (text, (BlockId?)x, x))
+                        .ToArray();
 
                     // foreach (var blockId in blocks.Where(x => x > 0))
                     //     options.Add((text, blockId, () => BlockClicked(blockId, mapTextEvent.SubId)));
 
                     var blockId = await _optionsWindow.GetOption(options, null);
                     if (await BlockClicked(blockId))
-                    {
-                        // TODO: End conversation
-                    }
-                    return;
+                        Close();
+
+                    break;;
                 }
 
             case TextLocation.StandardOptions:

@@ -42,8 +42,8 @@ public class TextureViewerRenderer : Component, ICameraProvider
             _fb.Width = (uint)(MaxFrameWidth * factor);
             _fb.Height = (uint)(MaxFrameHeight * factor);
             Frame = _sprite.Frame; // Recalculate size
-            _camera.Position = new Vector3(0, FramebufferHeight / 4.0f, 0.0f);
-            _sprite.Position = new Vector3(0, FramebufferHeight / 2.0f, 1.0f);
+            _camera.Position = new Vector3(0, 0, 0.0f);
+            _sprite.Position = new Vector3(0, FramebufferHeight / 4.0f, 1.0f);
         }
     }
 
@@ -84,7 +84,7 @@ public class TextureViewerRenderer : Component, ICameraProvider
         _batchManager = AttachChild(new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key), false));
         _globalSet = AttachChild(new GlobalResourceSetProvider("TexViewerGlobal"));
         _camera = AttachChild(new OrthographicCamera());
-        _camera.Position = new Vector3(0, MaxFrameHeight / 4.0f, 0.0f);
+        _camera.Position = Vector3.Zero;
 
         _sprite = AttachChild(new Sprite(
             AssetId.None,

@@ -10,10 +10,11 @@ namespace UAlbion.Core.Visual;
 public class Sprite : Component, IPositioned
 {
     readonly Action<PrepareFrameEvent> _onPrepareFrameDelegate;
+    readonly PositionedComponentMovedEvent _moveEvent;
     readonly DrawLayer _layer;
     readonly SpriteKeyFlags _keyFlags;
     readonly Func<IAssetId, ITexture> _textureLoaderFunc;
-    readonly PositionedComponentMovedEvent _moveEvent;
+    readonly IBatchManager<SpriteKey, SpriteInfo> _batchManager;
 
     BatchLease<SpriteKey, SpriteInfo> _spriteLease;
     Vector3 _position;
@@ -21,7 +22,6 @@ public class Sprite : Component, IPositioned
     IAssetId _id;
     int _frame;
     SpriteFlags _flags;
-    readonly IBatchManager<SpriteKey, SpriteInfo> _batchManager;
     bool _dirty = true;
 
     public Sprite(
@@ -34,6 +34,13 @@ public class Sprite : Component, IPositioned
     {
         _moveEvent = new PositionedComponentMovedEvent(this);
         _onPrepareFrameDelegate = OnPrepareFrame;
+        _layer = layer;
+        _keyFlags = keyFlags;
+        _flags = flags;
+        _batchManager = batchManager;
+        _id = id;
+        _textureLoaderFunc = textureLoaderFunc ?? DefaultLoader;
+
         On<BackendChangedEvent>(_ => Dirty = true);
         On(_onPrepareFrameDelegate);
         On<WorldCoordinateSelectEvent>(Select);
@@ -47,13 +54,6 @@ public class Sprite : Component, IPositioned
             if ((ReadVar(V.Core.User.EngineFlags) & EngineFlags.HighlightSelection) == EngineFlags.HighlightSelection)
                 Flags &= ~SpriteFlags.Highlight;
         });
-
-        _layer = layer;
-        _keyFlags = keyFlags;
-        _flags = flags;
-        _batchManager = batchManager;
-        _id = id;
-        _textureLoaderFunc = textureLoaderFunc ?? DefaultLoader;
     }
 
     [DiagEdit]
@@ -80,6 +80,7 @@ public class Sprite : Component, IPositioned
         {
             if (_position == value)
                 return;
+
             _position = value;
             Dirty = true;
             if (IsSubscribed)
@@ -91,7 +92,7 @@ public class Sprite : Component, IPositioned
     public int DebugZ => DepthUtil.DepthToLayer(Position.Z);
 
     [DiagEdit(Style = DiagEditStyle.Size2D)]
-    public Vector2 Size
+    public Vector2 Size // Logical size, may differ from actual size (RenderSize).
     {
         get => _size ?? Vector2.One;
         set
@@ -107,6 +108,7 @@ public class Sprite : Component, IPositioned
         }
     }
 
+    public ITexture Texture => _spriteLease?.Key.Texture;
     public Vector2 FrameSize => _spriteLease?.Key.Texture.Regions[Frame].Size ?? Vector2.One;
 
     [DiagEdit(Style = DiagEditStyle.NumericSlider, Min = 0, MaxProperty = nameof(FrameCount))]
@@ -144,7 +146,7 @@ public class Sprite : Component, IPositioned
 
     protected override void Subscribed()
     {
-        Dirty = true;
+        UpdateSprite();
         Raise(new AddPositionedComponentEvent(this));
     }
 

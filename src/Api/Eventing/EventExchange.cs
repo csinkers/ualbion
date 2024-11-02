@@ -122,15 +122,11 @@ namespace UAlbion.Api.Eventing
 
                     case IAsyncHandler asyncHandler:
                         {
-                            core ??= new($"RaiseAInvoker helper for {e.GetType()} from {sender}");
-
                             var innerTask = asyncHandler.InvokeAsAsync(e);
                             if (innerTask.IsCompleted)
-                            {
-                                core.SetResult(Unit.V);
                                 break;
-                            }
 
+                            core ??= new($"RaiseAInvoker helper for {e.GetType().Name} from {sender}");
                             core.OutstandingCompletions++;
                             var core1 = core;
                             innerTask.OnCompleted(() =>

@@ -28,6 +28,8 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
 
     public int Id { get; }
     TaskStatus _status = TaskStatus.Unused;
+
+    [DiagEdit]
     public bool BreakOnCompletion { get; set; }
     public string? Description { get; set; }
 #endif
@@ -38,21 +40,25 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
 #endif
 
     object? _continuation;
-    T? _result;
+    T _result; // Only meaningful when IsCompleted == true
 
     public bool IsCompleted { get; private set; }
+    internal int OutstandingCompletions { get; set; }
+
     public AlbionTask<T> Task => new(this);
     public AlbionTask UntypedTask => new(this);
-    internal int OutstandingCompletions { get; set; }
 
     public AlbionTaskCore() : this(null) { }
     public AlbionTaskCore(string? description)
     {
+        _result = default!;
+
 #if DEBUG
         Id = Tasks.GetNextId();
         Description = description;
         Tasks.AddTask(this);
 #endif
+
 #if RECORD_TASK_STACKS
         _stack = Environment.StackTrace;
 #endif
@@ -112,7 +118,7 @@ public class AlbionTaskCore<T> : IAlbionTaskCore
         if (!IsCompleted)
             throw new InvalidOperationException("Tried to get result of an incomplete task");
 
-        return _result!;
+        return _result;
     }
 
     public void SetResult(T value)

@@ -1,4 +1,9 @@
-﻿using UAlbion.Api.Eventing;
+﻿using System;
+using System.Diagnostics;
+using System.Numerics;
+using UAlbion.Api;
+using UAlbion.Api.Eventing;
+using UAlbion.Core.Events;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
 using UAlbion.Game.Gui.Text;
@@ -25,19 +30,53 @@ public class ConversationTextWindow : ModalDialog
         AttachChild(frame);
     }
 
-    public AlbionTask Show(IText text, BlockId? blockFilter)
+    public void Show(IText text, BlockId? blockFilter)
     {
-        // default filter = BlockId.MainText;
-
-        _source = new AlbionTaskCore("ConversationTextWindow");
         _uiText.BlockFilter = blockFilter;
         _text.Source = text;
+    }
+
+    public AlbionTask Closed()
+    {
+        Debug.Assert(_source == null, "Tried to start a new text window wait before the last one was completed");
+        _source = new AlbionTaskCore("ConversationTextWindow");
         return _source.UntypedTask;
     }
 
     void Complete()
     {
-        _source?.Complete();
+        if (_uiText.ScrollOffset < _uiText.MaxScrollOffset)
+        {
+            ScrollDown();
+            return;
+        }
+
+        var source = _source;
         _source = null;
+        source?.Complete();
+    }
+
+    void ScrollDown()
+    {
+        var fromOffset = _uiText.ScrollOffset;
+        var target = Math.Min(_uiText.MaxScrollOffset, _uiText.ScrollOffset + _uiText.PageSize);
+
+        AttachChild(new AdHocComponent("ScrollTransition", x =>
+        {
+            var transitionTimeSeconds = 0.25f;
+            var elapsedTime = 0.0f;
+
+            x.On<EngineUpdateEvent>(e =>
+            {
+                elapsedTime += e.DeltaSeconds;
+                float t = elapsedTime / transitionTimeSeconds;
+                bool done = t > 1.0f;
+                t = Math.Min(t, 1.0f);
+                _uiText.ScrollOffset = (int)ApiUtil.Lerp(fromOffset, target, t);
+
+                if (done)
+                    x.Remove();
+            });
+        }));
     }
 }

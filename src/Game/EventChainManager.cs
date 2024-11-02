@@ -12,8 +12,6 @@ namespace UAlbion.Game;
 
 public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventManager, IDisposable
 {
-    class ResumeChainsEvent : Event, IVerboseEvent { }
-    static readonly ResumeChainsEvent ResumeChainsInstance = new();
     static readonly StartClockEvent StartClockEvent = new();
     static readonly StopClockEvent StopClockEvent = new();
 
@@ -25,9 +23,6 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
 
     public EventChainManager()
     {
-        // Need to enqueue without a sender if we want to handle it ourselves.
-        On<BeginFrameEvent>(_ => Exchange?.Enqueue(ResumeChainsInstance, null)); 
-        On<ResumeChainsEvent>(ResumeChains);
         OnAsync<TriggerChainEvent>(Trigger);
         Context = new EventContext(new EventSource(AssetId.None, 0), null);
     }
@@ -110,26 +105,6 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         }
 
         context.Status = breakpointHit ? EventContextStatus.Breakpoint : EventContextStatus.Ready;
-    }
-
-    void ResumeChains(ResumeChainsEvent _)
-    {
-        /*
-        bool ran;
-        do
-        {
-            ran = false;
-            foreach (var context in _contexts)
-            {
-                if (context.Status == EventContextStatus.Ready)
-                {
-                    Resume(context);
-                    ran = true;
-                    break;
-                }
-            }
-        } while (ran);
-        */
     }
 
     async AlbionTask Resume(EventContext context)

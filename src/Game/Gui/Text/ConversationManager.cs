@@ -1,6 +1,8 @@
 ﻿using UAlbion.Api;
 using UAlbion.Api.Eventing;
+using UAlbion.Config;
 using UAlbion.Core;
+using UAlbion.Formats.Assets.Sheets;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
@@ -99,6 +101,21 @@ public class ConversationManager : GameServiceComponent<IConversationManager>, I
         return leader.PortraitId;
     }
 
+    async AlbionTask StartDialogueCommon(PartyMemberId left, ICharacterSheet right)
+    {
+        var wasRunning = Resolve<IClock>().IsRunning;
+        if (wasRunning)
+            await RaiseAsync(new StopClockEvent());
+
+        Conversation = AttachChild(new Conversation(left, right));
+        await Conversation.Run();
+        Conversation.Remove();
+        Conversation = null;
+
+        if (wasRunning)
+            await RaiseAsync(new StartClockEvent());
+    }
+
     async AlbionTask StartDialogue(StartDialogueEvent e)
     {
         var party = Resolve<IParty>();
@@ -109,17 +126,7 @@ public class ConversationManager : GameServiceComponent<IConversationManager>, I
             return;
         }
 
-        var wasRunning = Resolve<IClock>().IsRunning;
-        if (wasRunning)
-            await RaiseAsync(new StopClockEvent());
-
-        Conversation = AttachChild(new Conversation(party?.Leader.Id ?? Base.PartyMember.Tom, npc));
-        await Conversation.Run();
-        Conversation.Remove();
-        Conversation = null;
-
-        if (wasRunning)
-            await RaiseAsync(new StartClockEvent());
+        await StartDialogueCommon(party?.Leader.Id ?? Base.PartyMember.Tom, npc);
     }
 
     async AlbionTask StartPartyDialogue(StartPartyDialogueEvent e)
@@ -127,12 +134,10 @@ public class ConversationManager : GameServiceComponent<IConversationManager>, I
         var sheet = Assets.LoadSheet(e.MemberId.ToSheet());
         if (sheet == null)
         {
-            Error($"Could not load NPC info for \"{e.MemberId}\"");
+            Error($"Could not load party member info for \"{e.MemberId}\"");
             return;
         }
 
-        Conversation = AttachChild(new Conversation(Base.PartyMember.Tom, sheet));
-        await Conversation.Run();
-        Conversation = null;
+        await StartDialogueCommon(Base.PartyMember.Tom, sheet);
     }
 }

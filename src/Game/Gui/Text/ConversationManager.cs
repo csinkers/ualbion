@@ -1,7 +1,5 @@
 ﻿using UAlbion.Api;
 using UAlbion.Api.Eventing;
-using UAlbion.Config;
-using UAlbion.Core;
 using UAlbion.Formats.Assets.Sheets;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
@@ -101,20 +99,15 @@ public class ConversationManager : GameServiceComponent<IConversationManager>, I
         return leader.PortraitId;
     }
 
-    async AlbionTask StartDialogueCommon(PartyMemberId left, ICharacterSheet right)
-    {
-        var wasRunning = Resolve<IClock>().IsRunning;
-        if (wasRunning)
-            await RaiseA(new StopClockEvent());
-
-        Conversation = AttachChild(new Conversation(left, right));
-        await Conversation.Run();
-        Conversation.Remove();
-        Conversation = null;
-
-        if (wasRunning)
-            await RaiseA(new StartClockEvent());
-    }
+    AlbionTask StartDialogueCommon(PartyMemberId left, ICharacterSheet right) =>
+        WithFrozenClock((this, left, right), async static tuple =>
+        {
+            var (x, left, right) = tuple;
+            x.Conversation = x.AttachChild(new Conversation(left, right));
+            await x.Conversation.Run();
+            x.Conversation.Remove();
+            x.Conversation = null;
+        });
 
     async AlbionTask StartDialogue(StartDialogueEvent e)
     {

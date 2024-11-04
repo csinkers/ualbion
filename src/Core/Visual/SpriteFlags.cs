@@ -34,7 +34,7 @@ public enum SpriteFlags : uint
     Floor          =     0x10, // On the floor rather than standing upright
     Billboard      =     0x20, // Autorotate to face the camera
     OnlyEvenFrames =     0x40, // Used for monsters etc where the odd frames are shadows
-    Transparent    =     0x80,
+    // 0x80 Unused
     Highlight      =    0x100,
     RedTint        =    0x200, // Debug Flag
     GreenTint      =    0x400, // Debug Flag

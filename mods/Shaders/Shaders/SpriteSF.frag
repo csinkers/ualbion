@@ -15,9 +15,7 @@ vec4 Pal(float color)
 
 void main()
 {
-    vec2 uv = ((iFlags & SF_FLIP_VERTICAL) != 0)
-        ? vec2(iTexPosition.x, 1 - iTexPosition.y)
-        : iTexPosition;
+    vec2 uv = iTexPosition;
 
     if ((uFlags & SKF_CLAMP_EDGES) != 0)
 		uv = vec2(clamp(uv.x, iUvClamp.x, iUvClamp.z), clamp(uv.y, iUvClamp.y, iUvClamp.w));

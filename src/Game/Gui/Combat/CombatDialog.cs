@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UAlbion.Api.Eventing;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Combat;
 using UAlbion.Game.Gui.Controls;
@@ -11,11 +12,17 @@ namespace UAlbion.Game.Gui.Combat;
 /// </summary>
 public class CombatDialog : Dialog
 {
+    public record ShowCombatDialogEvent(bool Show) : EventRecord, IVerboseEvent;
     readonly IReadOnlyBattle _battle;
 
     public CombatDialog(int depth, IReadOnlyBattle battle) : base(DialogPositioning.Center, depth)
     {
         On<EndCombatEvent>(_ => Remove());
+        On<ShowCombatDialogEvent>(e =>
+        {
+            foreach(var child in Children)
+                child.IsActive = e.Show;
+        });
 
         _battle = battle ?? throw new ArgumentNullException(nameof(battle));
         var stack = new List<IUiElement>();

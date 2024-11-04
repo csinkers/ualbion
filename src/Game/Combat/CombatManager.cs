@@ -42,7 +42,7 @@ public class CombatManager : GameComponent
         var battle = new Battle(groupId, backgroundId);
         scene.Add(battle);
 
-        Raise(new DialogManager.ShowCombatDialogEvent(battle));
+        Raise(new DialogManager.CombatDialogEvent(battle));
 
         battle.Complete += () =>
         {

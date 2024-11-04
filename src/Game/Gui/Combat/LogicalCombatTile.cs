@@ -143,7 +143,7 @@ public class LogicalCombatTile : UiElement
 
         options.Add(new ContextMenuOption(
             S(Base.SystemText.Combat_Observe),
-            new NopEvent(),
+            new ObserveCombatEvent(),
             ContextMenuGroup.System));
 
         options.Add(new ContextMenuOption(

@@ -146,6 +146,7 @@ public class Sprite : Component, IPositioned
 
     protected override void Subscribed()
     {
+        Dirty = true;
         UpdateSprite();
         Raise(new AddPositionedComponentEvent(this));
     }

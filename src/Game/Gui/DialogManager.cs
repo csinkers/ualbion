@@ -15,7 +15,7 @@ namespace UAlbion.Game.Gui;
 
 public class DialogManager  : ServiceComponent<IDialogManager>, IDialogManager
 {
-    public record ShowCombatDialogEvent(IReadOnlyBattle Battle) : EventRecord, IVerboseEvent;
+    public record CombatDialogEvent(IReadOnlyBattle Battle) : EventRecord, IVerboseEvent;
 
     int MaxLayer => Children.OfType<ModalDialog>().Select(x => (int?)x.Depth).Max() ?? 0;
 
@@ -34,7 +34,7 @@ public class DialogManager  : ServiceComponent<IDialogManager>, IDialogManager
         OnQueryAsync<PartyMemberPromptEvent, PartyMemberId>(OnPartyMemberPrompt);
         On<LoadMapPromptEvent>(OnMapNumberPrompt);
         On<ShowCombatPositionsDialogEvent>(_ => AttachChild(new CombatPositionDialog(MaxLayer + 1)));
-        On<ShowCombatDialogEvent>(e => AttachChild(new CombatDialog(MaxLayer + 1, e.Battle)));
+        On<CombatDialogEvent>(e => AttachChild(new CombatDialog(MaxLayer + 1, e.Battle)));
     }
 
     AlbionTask<bool> OnYesNoPrompt(YesNoPromptEvent e)

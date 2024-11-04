@@ -14,16 +14,28 @@ public abstract class GameComponent : Component
     {
         var wasClockRunning = Resolve<IClock>()?.IsRunning ?? false;
         if (wasClockRunning)
-            Raise(new StopClockEvent());
+            Raise(StopClockEvent.Instance);
 
         await func(context);
 
         if (wasClockRunning)
-            Raise(new StartClockEvent());
+            Raise(StartClockEvent.Instance);
     }
 }
 
 public abstract class GameServiceComponent<T> : ServiceComponent<T>
 {
     protected IAssetManager Assets => Resolve<IAssetManager>();
+
+    protected async AlbionTask WithFrozenClock<T>(T context, Func<T, AlbionTask> func)
+    {
+        var wasClockRunning = Resolve<IClock>()?.IsRunning ?? false;
+        if (wasClockRunning)
+            Raise(StopClockEvent.Instance);
+
+        await func(context);
+
+        if (wasClockRunning)
+            Raise(StartClockEvent.Instance);
+    }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
@@ -19,7 +18,7 @@ public class ConversationTextWindow : ModalDialog
 
     public ConversationTextWindow(int depth) : base(DialogPositioning.Bottom, depth)
     {
-        On<UiLeftClickEvent>(_ => Complete());
+        On<UiLeftClickEvent>(e => { Complete(); e.Propagating = false; });
         On<DismissMessageEvent>(_ => Complete());
 
         _uiText = new UiText(_text).Scrollable();

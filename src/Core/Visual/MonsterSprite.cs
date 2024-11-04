@@ -9,7 +9,7 @@ namespace UAlbion.Core.Visual;
 public class MonsterSprite : Component
 {
     readonly Sprite _sprite;
-    readonly Sprite _shadow;
+    // readonly Sprite _shadow;
 
     Vector2 _scale = Vector2.One;
     Vector2 _maxSize = Vector2.One;
@@ -22,9 +22,9 @@ public class MonsterSprite : Component
         Func<IAssetId, ITexture> textureLoaderFunc = null,
         IBatchManager<SpriteKey, SpriteInfo> batchManager = null)
     {
-        var flags = SpriteFlags.BottomMid | SpriteFlags.Transparent;
+        var flags = SpriteFlags.TopMid | SpriteFlags.FlipVertical;
         _sprite = AttachChild(new Sprite(id, layer, keyFlags, flags, textureLoaderFunc, batchManager));
-        _shadow = AttachChild(new Sprite(id, layer, keyFlags, flags, textureLoaderFunc, batchManager));
+        // _shadow = AttachChild(new Sprite(id, layer, keyFlags, flags, textureLoaderFunc, batchManager));
     }
 
     protected override void Subscribed()
@@ -32,10 +32,13 @@ public class MonsterSprite : Component
         base.Subscribed();
 
         _maxSize = Vector2.Zero;
-        foreach (var region in _sprite.Texture.Regions)
+        if (_sprite.Texture != null)
         {
-            if (region.Width > _maxSize.X) _maxSize.X = region.Width;
-            if (region.Height > _maxSize.Y) _maxSize.Y = region.Height;
+            foreach (var region in _sprite.Texture.Regions)
+            {
+                if (region.Width > _maxSize.X) _maxSize.X = region.Width;
+                if (region.Height > _maxSize.Y) _maxSize.Y = region.Height;
+            }
         }
 
         Update();
@@ -63,7 +66,7 @@ public class MonsterSprite : Component
                 return;
 
             _sprite.Frame = 2 * value;
-            _shadow.Frame = 2 * value + 1;
+            // _shadow.Frame = 2 * value + 1;
 
             Update();
         }
@@ -89,8 +92,8 @@ public class MonsterSprite : Component
     void Update()
     {
         _sprite.Position = _position;
-        _shadow.Position = _position + new Vector3(0, 0, 0.1f);
+        // _shadow.Position = _position + new Vector3(0, 0, 0.1f);
         _sprite.Size = _scale * _sprite.FrameSize;
-        _shadow.Size = _scale * _shadow.FrameSize;
+        // _shadow.Size = _scale * _shadow.FrameSize;
     }
 }

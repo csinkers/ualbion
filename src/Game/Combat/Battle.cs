@@ -7,6 +7,7 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Gui.Combat;
+using UAlbion.Game.Gui.Dialogs;
 using UAlbion.Game.State;
 
 namespace UAlbion.Game.Combat;
@@ -17,7 +18,6 @@ namespace UAlbion.Game.Combat;
 /// </summary>
 public class Battle : GameComponent, IReadOnlyBattle
 {
-
     readonly MonsterGroupId _groupId;
     readonly List<ICombatParticipant> _mobs = new();
     readonly ICombatParticipant[] _tiles = new ICombatParticipant[SavedGame.CombatRows * SavedGame.CombatColumns];
@@ -29,6 +29,7 @@ public class Battle : GameComponent, IReadOnlyBattle
     {
         On<EndCombatEvent>(_ => Complete?.Invoke());
         OnAsync<BeginCombatRoundEvent>(BeginRoundAsync);
+        OnAsync<ObserveCombatEvent>(Observe);
 
         _groupId = groupId;
         Mobs = _mobs;
@@ -44,7 +45,20 @@ public class Battle : GameComponent, IReadOnlyBattle
         });
     }
 
-    AlbionTask BeginRoundAsync(BeginCombatRoundEvent _) => RaiseA(new CombatUpdateEvent(25)); // TODO
+    AlbionTask Observe(ObserveCombatEvent _) =>
+        WithFrozenClock(this, async x =>
+        {
+            Raise(new CombatDialog.ShowCombatDialogEvent(false));
+            var dlg = x.AttachChild(new InvisibleWaitForClickDialog());
+            await dlg.Task;
+            Raise(new CombatDialog.ShowCombatDialogEvent(true));
+        });
+
+    AlbionTask BeginRoundAsync(BeginCombatRoundEvent _)
+    {
+        return RaiseA(new CombatUpdateEvent(100));
+        // TODO
+    }
 
     protected override void Subscribed()
     {

@@ -12,9 +12,6 @@ namespace UAlbion.Game;
 
 public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventManager, IDisposable
 {
-    static readonly StartClockEvent StartClockEvent = new();
-    static readonly StopClockEvent StopClockEvent = new();
-
     readonly List<EventContext> _contexts = new();
     readonly List<Breakpoint> _breakpoints = new();
     public int CurrentDebugContextIndex { get; set; } = -1;
@@ -59,19 +56,19 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
             return AlbionTask.CompletedTask;
         }
 
-        var isClockRunning = Resolve<IClock>().IsRunning;
+        var wasClockRunning = Resolve<IClock>().IsRunning;
         var firstNode = e.EventSet.Events[e.EntryPoint];
         var context = new EventContext(e.Source, (EventContext)Context)
         {
             EntryPoint = e.EntryPoint,
             EventSet = e.EventSet,
             Node = firstNode,
-            ClockWasRunning = isClockRunning,
+            ClockWasRunning = wasClockRunning,
             LastAction = firstNode.Event as ActionEvent
         };
 
-        if (isClockRunning)
-            Raise(StopClockEvent);
+        if (wasClockRunning)
+            Raise(StopClockEvent.Instance);
 
         ReadyContext(context);
         _contexts.Add(context);
@@ -139,7 +136,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         context.Status = EventContextStatus.Completing;
 
         if (context.ClockWasRunning)
-            Raise(StartClockEvent);
+            Raise(StartClockEvent.Instance);
 
         _contexts.Remove(context);
 

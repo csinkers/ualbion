@@ -10,7 +10,8 @@ public class FixedPosition : UiElement, IFixedSizeUiElement
     public FixedPosition(Rectangle extents, IUiElement child)
     {
         _extents = extents;
-        AttachChild(child);
+        if (child != null)
+            AttachChild(child);
     }
 
     public override Vector2 GetSize() => new(_extents.Width, _extents.Height);

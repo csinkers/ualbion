@@ -47,7 +47,11 @@ void main()
     }
 	else oUvClamp = vec4(0,0,1,1);
 
-    oTexPosition = iTexCoords * iTexSize + iTexOffset;
+    vec2 uv = ((iFlags & SF_FLIP_VERTICAL) != 0)
+        ? vec2(iTexCoords.x, 1 - iTexCoords.y)
+        : iTexCoords;
+
+    oTexPosition = uv * iTexSize + iTexOffset;
     oLayer = float(iTexLayer);
     oFlags = iFlags;
     oNormCoords = iTexCoords;

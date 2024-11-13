@@ -11,40 +11,74 @@ using Veldrid.SPIRV;
 
 namespace UAlbion.Core.Veldrid;
 
-public sealed class ShaderCache : Component, IShaderCache
+public sealed class ShaderCache(string shaderCachePath) : Component, IShaderCache
 {
     readonly object _syncRoot = new();
     readonly Dictionary<string, CacheEntry> _cache = new();
-    readonly string _shaderCachePath;
     IFileSystem _disk;
 
-    sealed class CacheEntry
+    sealed class CacheEntry(
+        ShaderDescription vertexShader,
+        ShaderDescription fragmentShader,
+        GraphicsBackend backend,
+        string vertexHash,
+        string fragmentHash)
     {
-        public CacheEntry(ShaderDescription vertexShader, ShaderDescription fragmentShader, GraphicsBackend backend, string vertexHash, string fragmentHash)
-        {
-            VertexShader = vertexShader;
-            FragmentShader = fragmentShader;
-            Backend = backend;
-            VertexHash = vertexHash;
-            FragmentHash = fragmentHash;
-        }
-
-        public GraphicsBackend Backend { get; }
-        public string VertexHash { get; }
-        public string FragmentHash { get; }
-        public ShaderDescription VertexShader { get; }
-        public ShaderDescription FragmentShader { get; }
+        public GraphicsBackend Backend { get; } = backend;
+        public string VertexHash { get; } = vertexHash;
+        public string FragmentHash { get; } = fragmentHash;
+        public ShaderDescription VertexShader { get; } = vertexShader;
+        public ShaderDescription FragmentShader { get; } = fragmentShader;
     }
 
-    public ShaderCache(string shaderCachePath) => _shaderCachePath = shaderCachePath ?? throw new ArgumentNullException(nameof(shaderCachePath));
+    /// <summary>
+    /// Builds or retrieves a pair of shaders for the given vertex and fragment shader info.
+    /// </summary>
+    public Shader[] GetShaderPair(ResourceFactory factory, ShaderInfo vertex, ShaderInfo fragment)
+    {
+        ArgumentNullException.ThrowIfNull(factory);
+        ArgumentNullException.ThrowIfNull(vertex);
+        ArgumentNullException.ThrowIfNull(fragment);
+
+        lock (_syncRoot)
+        {
+            var cacheKey = vertex.Name + "|" + fragment.Name;
+            Exception compileException = null;
+            if (!_cache.TryGetValue(cacheKey, out var entry) || entry.VertexHash != vertex.Hash || entry.FragmentHash != fragment.Hash || entry.Backend != factory.BackendType)
+            {
+                try
+                {
+                    entry = BuildShaderPair(factory.BackendType, vertex, fragment);
+                    _cache[cacheKey] = entry;
+                }
+                catch (SpirvCompilationException e)
+                {
+                    Error($"Error compiling shaders ({vertex.Name}, {fragment.Name}): {e}");
+                    compileException = e;
+                }
+            }
+
+            if (entry == null)
+                throw new InvalidOperationException($"No shader could be built for ({vertex.Name}, {fragment.Name}): {compileException}");
+
+            var vertexShader = factory.CreateShader(entry.VertexShader);
+            var fragmentShader = factory.CreateShader(entry.FragmentShader);
+            vertexShader.Name = "S_" + vertex.Name;
+            fragmentShader.Name = "S_" + fragment.Name;
+            return [vertexShader, fragmentShader];
+        }
+    }
 
     protected override void Subscribed()
     {
+        if (string.IsNullOrEmpty(shaderCachePath))
+            throw new InvalidOperationException("No shader cache path was supplied");
+
         Exchange.Register(typeof(IShaderCache), this, false);
 
         _disk = Resolve<IFileSystem>();
-        if (!_disk.DirectoryExists(_shaderCachePath))
-            _disk.CreateDirectory(_shaderCachePath);
+        if (!_disk.DirectoryExists(shaderCachePath))
+            _disk.CreateDirectory(shaderCachePath);
     }
 
     protected override void Unsubscribed()
@@ -52,7 +86,7 @@ public sealed class ShaderCache : Component, IShaderCache
         Exchange.Unregister(typeof(IShaderCache), this);
     }
 
-    string GetShaderPath(ShaderInfo info, string extension) => Path.Combine(_shaderCachePath, $"{info.Name}.{info.Hash}.{extension}");
+    string GetShaderPath(ShaderInfo info, string extension) => Path.Combine(shaderCachePath, $"{info.Name}.{info.Hash}.{extension}");
 
     (string, byte[]) LoadSpirvByteCode(ShaderInfo info, ShaderStages stage)
     {
@@ -95,7 +129,7 @@ public sealed class ShaderCache : Component, IShaderCache
 
     CacheEntry BuildShaderPair(GraphicsBackend backend, ShaderInfo vertex, ShaderInfo fragment)
     {
-        string entryPoint = (backend == GraphicsBackend.Metal) ? "main0" : "main";
+        string entryPoint = backend == GraphicsBackend.Metal ? "main0" : "main";
 
         var (vertexSpirvPath, vertexSpirv) = LoadSpirvByteCode(vertex, ShaderStages.Vertex);
         var (fragmentSpirvPath, fragmentSpirv) = LoadSpirvByteCode(fragment, ShaderStages.Fragment);
@@ -137,6 +171,7 @@ public sealed class ShaderCache : Component, IShaderCache
 
                 // Once it succeeds, remove any old results
                 RemoveOldFiles(vertex.Name, vertex.Hash);
+                RemoveOldFiles(fragment.Name, fragment.Hash);
             }
         }
         else
@@ -150,9 +185,10 @@ public sealed class ShaderCache : Component, IShaderCache
 
         return new CacheEntry(vertexShaderDescription, fragmentShaderDescription, backend, vertex.Hash, fragment.Hash);
     }
+
     void RemoveOldFiles(string name, string goodHash)
     {
-        foreach (var path in _disk.EnumerateFiles(_shaderCachePath, $"{name}.*"))
+        foreach (var path in _disk.EnumerateFiles(shaderCachePath, $"{name}.*"))
         {
             var filename = Path.GetFileName(path);
             var parts = filename[(name.Length + 1)..].Split('.');
@@ -161,41 +197,6 @@ public sealed class ShaderCache : Component, IShaderCache
 
             Info($"Removing old cached shader {filename}");
             _disk.DeleteFile(path);
-        }
-    }
-
-    public Shader[] GetShaderPair(ResourceFactory factory, ShaderInfo vertex, ShaderInfo fragment)
-    {
-        ArgumentNullException.ThrowIfNull(factory);
-        ArgumentNullException.ThrowIfNull(vertex);
-        ArgumentNullException.ThrowIfNull(fragment);
-
-        lock (_syncRoot)
-        {
-            var cacheKey = vertex.Name + "|" + fragment.Name;
-            Exception compileException = null;
-            if (!_cache.TryGetValue(cacheKey, out var entry) || entry.VertexHash != vertex.Hash || entry.FragmentHash != fragment.Hash || entry.Backend != factory.BackendType)
-            {
-                try
-                {
-                    entry = BuildShaderPair(factory.BackendType, vertex, fragment);
-                    _cache[cacheKey] = entry;
-                }
-                catch (SpirvCompilationException e)
-                {
-                    Error($"Error compiling shaders ({vertex.Name}, {fragment.Name}): {e}");
-                    compileException = e;
-                }
-            }
-
-            if (entry == null)
-                throw new InvalidOperationException($"No shader could be built for ({vertex.Name}, {fragment.Name}): {compileException}");
-
-            var vertexShader = factory.CreateShader(entry.VertexShader);
-            var fragmentShader = factory.CreateShader(entry.FragmentShader);
-            vertexShader.Name = "S_" + vertex.Name;
-            fragmentShader.Name = "S_" + fragment.Name;
-            return [vertexShader, fragmentShader];
         }
     }
 }

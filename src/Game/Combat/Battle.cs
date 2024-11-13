@@ -20,6 +20,7 @@ public class Battle : GameComponent, IReadOnlyBattle
 {
     readonly MonsterGroupId _groupId;
     readonly List<ICombatParticipant> _mobs = new();
+    readonly List<ICombatParticipant> _corpses = new();
     readonly ICombatParticipant[] _tiles = new ICombatParticipant[SavedGame.CombatRows * SavedGame.CombatColumns];
 
     public IReadOnlyList<ICombatParticipant> Mobs { get; }
@@ -34,6 +35,7 @@ public class Battle : GameComponent, IReadOnlyBattle
         _groupId = groupId;
         Mobs = _mobs;
 
+        // AttachChild(new UiFixedPositionElement(backgroundId, UiConstants.UiExtents));
         AttachChild(new Sprite(
             backgroundId,
             DrawLayer.Background,

@@ -14,7 +14,7 @@ public class EnumerableReflector : IReflector
     {
         _manager = manager ?? throw new ArgumentNullException(nameof(manager));
         _typeName = ReflectorUtil.BuildTypeName(type);
-        _meta = new ReflectorMetadata(null, Getter, Setter, null);
+        _meta = new ReflectorMetadata(null, null, type, Getter, Setter, null);
     }
 
     static object Getter(in ReflectorState state)
@@ -56,7 +56,7 @@ public class EnumerableReflector : IReflector
             meta = ReflectorUtil.GetAuxiliaryState(
                 state,
                 "EnumMeta",
-                s => new ReflectorMetadata(null, Getter, Setter, s.Meta.Options));
+                s => new ReflectorMetadata(null, null, null, Getter, Setter, s.Meta.Options));
         }
 
         int index = 0;

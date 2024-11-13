@@ -264,7 +264,7 @@ public abstract class Component : IComponent
     /// inactive all event handlers are removed from the exchange, all child
     /// components are also recursively removed from the exchange.
     /// </summary>
-    [DiagIgnore, JsonIgnore]
+    [JsonIgnore]
     public bool IsActive
     {
         get => _isActive;

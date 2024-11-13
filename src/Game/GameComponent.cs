@@ -27,7 +27,7 @@ public abstract class GameServiceComponent<T> : ServiceComponent<T>
 {
     protected IAssetManager Assets => Resolve<IAssetManager>();
 
-    protected async AlbionTask WithFrozenClock<T>(T context, Func<T, AlbionTask> func)
+    protected async AlbionTask WithFrozenClock<TContext>(TContext context, Func<TContext, AlbionTask> func)
     {
         var wasClockRunning = Resolve<IClock>()?.IsRunning ?? false;
         if (wasClockRunning)

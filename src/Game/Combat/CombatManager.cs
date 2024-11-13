@@ -17,7 +17,6 @@ public class CombatManager : GameComponent
       |--Mob[] _tiles
       |--Sprite (background)
       |-- Mobs contain a Monster, created by the Battle
-
     |--CombatDialog (owned by DialogManager, but CombatManager asks for it to be created)
 
 

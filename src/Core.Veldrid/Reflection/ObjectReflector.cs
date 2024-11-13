@@ -10,8 +10,6 @@ namespace UAlbion.Core.Veldrid.Reflection;
 
 public class ObjectReflector : IReflector
 {
-    readonly ReflectorManager _manager;
-
     // For ignoring fields on built-in types where we can't just add a [DiagIgnore] attribute.
     static readonly Dictionary<string, string[]> MembersToIgnore = new()
     {
@@ -25,14 +23,15 @@ public class ObjectReflector : IReflector
         { "*", ["~__BackingField", "_syncRoot"] }, // ignore backing fields, lock objects etc
 
         // These often throw exceptions and cripple performance
-        { "MemberInfo", ["DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition"] },
-        { "Type", ["DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition"] },
-        { "TypeInfo", ["DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition"] },
+        { "MemberInfo",  ["DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition"] },
+        { "Type",        ["DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition"] },
+        { "TypeInfo",    ["DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition"] },
         { "RuntimeType", ["DeclaringMethod", "GenericParameterAttributes", "GenericParameterPosition"] },
     };
 
-    readonly string _typeName;
+    readonly ReflectorManager _manager;
     readonly ReflectorMetadata[] _subObjects;
+    readonly string _typeName;
 
     public ObjectReflector(ReflectorManager manager, Type type)
     {
@@ -49,6 +48,7 @@ public class ObjectReflector : IReflector
             .ToArray();
     }
 
+    static readonly List<string> EditButtonLabels = new();
     public void Reflect(in ReflectorState state)
     {
         var description = ReflectorUtil.DescribeAsNodeId(state, _typeName, state.Target);
@@ -56,11 +56,33 @@ public class ObjectReflector : IReflector
         if (!treeOpen)
             return;
 
-        foreach (var subObject in _subObjects)
+        for (var index = 0; index < _subObjects.Length; index++)
         {
+            var subObject = _subObjects[index];
             var child = subObject.Getter(state);
             var childState = new ReflectorState(child, state.Target, -1, subObject);
             var childReflector = _manager.GetReflectorForInstance(child);
+
+            if (_manager.IsEditMode)
+            {
+                while (EditButtonLabels.Count <= index)
+                    EditButtonLabels.Add($"##{EditButtonLabels.Count}");
+
+                var label = EditButtonLabels[index];
+                bool selected = _manager.EditTarget == subObject;
+
+                if (selected)
+                    ImGui.PushStyleColor(ImGuiCol.Button, Vector4.One);
+
+                if (ImGui.Button( label, new Vector2(12, 12)))
+                    _manager.EditTarget = subObject;
+
+                if (selected)
+                    ImGui.PopStyleColor();
+
+                ImGui.SameLine();
+            }
+
             childReflector(childState);
         }
 
@@ -144,34 +166,34 @@ public class ObjectReflector : IReflector
 
         foreach (var prop in publicProperties)
         {
-            var meta = BuildPropertyMetadata(prop, ignoreList);
+            var meta = BuildPropertyMetadata(type, prop, ignoreList);
             if (meta != null)
                 subObjects["A|" + prop.Name] = meta;
         }
 
         foreach (var field in publicFields)
         {
-            var meta = BuildFieldMetadata(field, ignoreList);
+            var meta = BuildFieldMetadata(type, field, ignoreList);
             if (meta != null)
                 subObjects["A|" + field.Name] = meta;
         }
 
         foreach (var prop in privateProperties)
         {
-            var meta = BuildPropertyMetadata(prop, ignoreList);
+            var meta = BuildPropertyMetadata(type, prop, ignoreList);
             if (meta != null)
                 subObjects["B|" + prop.Name] = meta;
         }
 
         foreach (var field in privateFields)
         {
-            var meta = BuildFieldMetadata(field, ignoreList);
+            var meta = BuildFieldMetadata(type, field, ignoreList);
             if (meta != null)
                 subObjects["B|" + field.Name] = meta;
         }
     }
 
-    static ReflectorMetadata BuildPropertyMetadata(PropertyInfo prop, List<string> ignoreList)
+    static ReflectorMetadata BuildPropertyMetadata(Type type, PropertyInfo prop, List<string> ignoreList)
     {
         if (prop.GetIndexParameters().Length > 0)
             return null; 
@@ -181,18 +203,22 @@ public class ObjectReflector : IReflector
 
         return new ReflectorMetadata(
             prop.Name,
+            type,
+            prop.PropertyType,
             BuildPropertyGetter(prop),
             BuildPropertySetter(prop),
             options);
     }
 
-    static ReflectorMetadata BuildFieldMetadata(FieldInfo field, List<string> ignoreList)
+    static ReflectorMetadata BuildFieldMetadata(Type type, FieldInfo field, List<string> ignoreList)
     {
         if (IsMemberIgnored(ignoreList, field.Name, field.GetCustomAttributes(), out var options))
             return null;
 
         return new ReflectorMetadata(
             field.Name,
+            type,
+            field.FieldType,
             BuildFieldGetter(field),
             BuildFieldSetter(field),
             options);

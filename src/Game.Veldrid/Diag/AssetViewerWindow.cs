@@ -53,7 +53,7 @@ public sealed class AssetViewerWindow : Component, IImGuiWindow
 
     static void DrawInspector(string name, object target)
     {
-        var meta = new ReflectorMetadata(name, null, null, null);
+        var meta = new ReflectorMetadata(name, null, null, null, null, null);
         var state = new ReflectorState(target, null, -1, meta);
         var reflector = ReflectorManager.Instance.GetReflectorForInstance(state.Target);
         reflector(state);

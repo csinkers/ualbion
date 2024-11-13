@@ -22,6 +22,9 @@ public class PerspectiveCamera : Component, ICamera
     bool _isClipSpaceYInverted;
     bool _depthZeroToOne;
     bool _dirty = true;
+    float _fieldOfView;
+    float _nearDistance = 10f;
+    float _farDistance = 512.0f * 256.0f * 2.0f;
 #pragma warning restore 649
 
     public int Version { get; private set; }
@@ -50,9 +53,10 @@ public class PerspectiveCamera : Component, ICamera
         }
     }
 
-    public float FieldOfView { get; private set; }
-    public float NearDistance { get; private set; } = 10f;
-    public float FarDistance { get; private set; } = 512.0f * 256.0f * 2.0f;
+    public float FieldOfView { get => _fieldOfView; private set { _fieldOfView = value; _dirty = true; } }
+    public float NearDistance { get => _nearDistance; private set { _nearDistance = value; _dirty = true; } }
+    public float FarDistance { get => _farDistance; private set { _farDistance = value; _dirty = true; } }
+
     public bool LegacyPitch { get; }
     public float AspectRatio => _viewport.X / _viewport.Y;
     public float Magnification { get; set; } // Ignored.
@@ -101,21 +105,16 @@ public class PerspectiveCamera : Component, ICamera
         });
         On<CameraPlanesEvent>(e =>
         {
-            NearDistance = e.Near; FarDistance = e.Far; 
+            NearDistance = e.Near; FarDistance = e.Far;
             _dirty = true;
         });
 
         On<SetFieldOfViewEvent>(e =>
         {
             if (e.Degrees == null)
-            {
                 Info($"FOV {ApiUtil.RadToDeg(FieldOfView)}");
-            }
             else
-            {
                 FieldOfView = ApiUtil.DegToRad(e.Degrees.Value);
-                _dirty = true;
-            }
         });
 
         LegacyPitch = legacyPitch;

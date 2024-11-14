@@ -14,7 +14,7 @@ public class MockSpellManager : ServiceComponent<ISpellManager>, ISpellManager
         => _lookup.TryGetValue((school, number), out var id) ? id : SpellId.None;
 
     public SpellData GetSpellOrDefault(SpellId id)
-        => _spells.TryGetValue(id, out var spell) ? spell : null;
+        => _spells.GetValueOrDefault(id);
 
     public MockSpellManager Add(SpellData spell)
     {

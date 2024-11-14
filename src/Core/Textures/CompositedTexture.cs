@@ -80,7 +80,7 @@ public class CompositedTexture : IReadOnlyTexture<uint>
         }
         else frame = tick % logicalImage.Frames;
 
-        return _layerLookup.TryGetValue(new LayerKey(logicalId, frame), out var result) ? result : 0;
+        return _layerLookup.GetValueOrDefault(new LayerKey(logicalId, frame), 0);
     }
 
     public void AddTexture(

@@ -27,9 +27,7 @@ public class ItemNameMetaLoader : Component, IAssetLoader<ListStringSet>
         if (target is not Dictionary<string, ListStringSet> dict)
             throw new FormatException($"Expected target \"{targetId}\" to be a {nameof(Dictionary<string, ListStringSet>)} but it was {target?.GetType()}");
 
-        return dict.TryGetValue(context.Language, out var list)
-            ? list
-            : null;
+        return dict.GetValueOrDefault(context.Language);
     }
 
     public object Serdes(object existing, ISerializer s, AssetLoadContext context)

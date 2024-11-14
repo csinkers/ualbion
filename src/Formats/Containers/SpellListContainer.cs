@@ -41,8 +41,7 @@ public class SpellListContainer : IAssetContainer
 
         for(int i = 0; i <= maxId; i++)
         {
-            if (!dict.TryGetValue(i, out var bytes))
-                bytes = Blank;
+            var bytes = dict.GetValueOrDefault(i, Blank);
 
             ApiUtil.Assert(bytes.Length == SpellData.SizeOnDisk,
                 $"Expected spell data for entry {i} to be {SpellData.SizeOnDisk} bytes, but was {bytes.Length}");

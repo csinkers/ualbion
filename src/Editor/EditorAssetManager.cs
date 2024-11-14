@@ -83,5 +83,5 @@ public class EditorAssetManager : ServiceComponent<IEditorAssetManager>, IEditor
         return id;
     }
 
-    public EditorAsset GetAssetForId(int id) => _assetsById.TryGetValue(id, out var asset) ? asset : null;
+    public EditorAsset GetAssetForId(int id) => _assetsById.GetValueOrDefault(id);
 }

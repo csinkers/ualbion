@@ -47,7 +47,7 @@ public class PathResolver : IPathResolver
             : path;
     }
 
-    public string GetPath(string pathName) => Paths.TryGetValue(pathName, out var result) ? result : null;
+    public string GetPath(string pathName) => Paths.GetValueOrDefault(pathName);
 
     public string ResolvePath(string relative)
     {

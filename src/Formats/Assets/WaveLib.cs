@@ -35,7 +35,7 @@ public class WaveLib
                 .ToLookup(x => x.Instrument)
                 .ToDictionary(x => x.Key, x => x.First());
 
-            return _instrumentIndex.TryGetValue(instrument, out var sample) ? sample : null;
+            return _instrumentIndex.GetValueOrDefault(instrument);
         }
     }
 

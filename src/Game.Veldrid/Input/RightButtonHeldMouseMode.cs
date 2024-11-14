@@ -17,7 +17,7 @@ public class RightButtonHeldMouseMode : Component
 {
     static readonly PopMouseModeEvent PopMouseModeEvent = new();
     static readonly ShowMapMenuEvent ShowMapMenuEvent = new();
-    readonly List<Selection> _hits = new();
+    readonly List<Selection> _hits = [];
     readonly Sprite _cursor;
     Vector2 _lastTilePosition;
     bool _wasClockRunning;

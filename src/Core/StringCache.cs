@@ -5,7 +5,7 @@ namespace UAlbion.Core;
 
 public class StringCache<TKey>
 {
-    readonly Dictionary<TKey, string> _cachedStrings = new();
+    readonly Dictionary<TKey, string> _cachedStrings = [];
     public string Get<T>(TKey key, T context, Func<TKey, T, string> builder)
     {
         if (_cachedStrings.TryGetValue(key, out var result))

@@ -14,7 +14,7 @@ namespace UAlbion.Game.Entities.Map3D;
 
 public class IsometricLayout : GameComponent
 {
-    readonly Dictionary<MapObject, Vector3> _relativeSpritePositions = new();
+    readonly Dictionary<MapObject, Vector3> _relativeSpritePositions = [];
     readonly ModContext _modContext;
     IExtrudedTilemap _tilemap;
     byte[] _contents;
@@ -279,7 +279,7 @@ public class IsometricLayout : GameComponent
 
     int DefineContents(LabyrinthData labyrinthData, int totalTiles)
     {
-        var transparent = new SimpleTexture<byte>(AssetId.None, "Transparent", 1, 1, new byte[] { 0 });
+        var transparent = new SimpleTexture<byte>(AssetId.None, "Transparent", 1, 1, [0]);
         transparent.AddRegion(Vector2.Zero, Vector2.One, 0);
 
         for (byte i = 1; i <= labyrinthData.ObjectGroups.Count; i++)

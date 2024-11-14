@@ -17,7 +17,7 @@ namespace UAlbion.Game.Veldrid.Diag;
 public class TextureViewerRenderer2 : Component, ICameraProvider
 {
     readonly byte[] _framesBuf = new byte[1024];
-    readonly List<IRenderable> _renderables = new();
+    readonly List<IRenderable> _renderables = [];
     readonly SimpleFramebuffer _fb;
     readonly CommandListHolder _cl;
     readonly FenceHolder _fence;

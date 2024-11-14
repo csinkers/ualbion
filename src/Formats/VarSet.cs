@@ -15,7 +15,7 @@ public class VarSet : IVarSet, IPatch
     public VarSet(string name)
     {
         _name = name;
-        _values = new Dictionary<string, object>();
+        _values = [];
     }
 
     public VarSet(string name, Dictionary<string, object> values)

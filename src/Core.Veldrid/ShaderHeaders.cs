@@ -6,8 +6,8 @@ namespace UAlbion.Core.Veldrid;
 
 public static class ShaderHeaders
 {
-    public static IEnumerable<(string, string)> All => new[]
-    {
+    public static IEnumerable<(string, string)> All =>
+    [
         BlendedSpriteVertexShader.ShaderSource(),
         BlendedSpriteFragmentShader.ShaderSource(),
         Etm.EtmVertexShader.ShaderSource(),
@@ -21,6 +21,6 @@ public static class ShaderHeaders
         SpriteVertexShader.ShaderSource(),
         SpriteFragmentShader.ShaderSource(),
         TileVertexShader.ShaderSource(),
-        TileFragmentShader.ShaderSource(),
-    };
+        TileFragmentShader.ShaderSource()
+    ];
 }

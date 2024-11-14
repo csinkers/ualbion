@@ -2,6 +2,7 @@
 using System.Text;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 
 namespace UAlbion.Core.Veldrid.Reflection;
 
@@ -70,7 +71,7 @@ public static class ReflectorUtil
         return sb.ToString();
     }
 
-    static readonly object SyncRoot = new();
+    static readonly Lock SyncRoot = new();
     static readonly AuxiliaryReflectorStateCache AuxState = new();
     public static void SwapAuxiliaryState()
     {

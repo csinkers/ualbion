@@ -35,7 +35,7 @@ public class ItemNameCollectorLoader : Component, IAssetLoader<Dictionary<string
         {
             if (!results.TryGetValue(language, out var list))
             {
-                list = new ListStringSet();
+                list = [];
                 results[language] = list;
             }
 

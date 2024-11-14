@@ -256,7 +256,7 @@ public static class TriggerZoneBuilder
     {
         if (!adjacency.TryGetValue((x, y), out var indices))
         {
-            indices = new List<int>();
+            indices = [];
             adjacency[(x, y)] = indices;
         }
         indices.Add(index);
@@ -293,7 +293,7 @@ public static class TriggerZoneBuilder
         int edgeIndex = initialEdge;
         var endpoint = (edges[initialEdge].X1, edges[initialEdge].Y1);
         var p2 = endpoint;
-        var cur = new Geometry.Polygon { Points = new List<(int, int)>() };
+        var cur = new Geometry.Polygon { Points = [] };
         for (;;)
         {
             var (x1, y1, x2, y2) = edges[edgeIndex].Tuple;

@@ -12,7 +12,7 @@ namespace UAlbion.Game.Gui.Dialogs;
 
 public class ConversationTopicWindow : ModalDialog
 {
-    readonly List<WordId> _currentWords = new();
+    readonly List<WordId> _currentWords = [];
     AlbionTaskCore<WordId> _source;
 
     public ConversationTopicWindow(int depth) : base(DialogPositioning.Center, depth)

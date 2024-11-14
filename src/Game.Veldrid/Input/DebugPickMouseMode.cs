@@ -11,7 +11,7 @@ namespace UAlbion.Game.Veldrid.Input;
 
 public class DebugPickMouseMode : Component
 {
-    readonly List<Selection> _hits = new();
+    readonly List<Selection> _hits = [];
     readonly PopMouseModeEvent _popMouseModeEvent = new();
     readonly InspectorPickEvent _pickEvent;
 

@@ -17,8 +17,8 @@ namespace UAlbion.Game.State;
 public class Party : ServiceComponent<IParty>, IParty
 {
     readonly IDictionary<SheetId, CharacterSheet> _characterSheets;
-    readonly List<Player.PartyMember> _statusBarOrder = new();
-    readonly List<Player.PartyMember> _walkOrder = new();
+    readonly List<Player.PartyMember> _statusBarOrder = [];
+    readonly List<Player.PartyMember> _walkOrder = [];
     readonly IReadOnlyList<Player.PartyMember> _readOnlyStatusBarOrder;
     readonly IReadOnlyList<Player.PartyMember> _readOnlyWalkOrder;
     readonly byte[] _combatPositions;

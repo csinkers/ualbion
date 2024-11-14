@@ -9,7 +9,7 @@ namespace UAlbion.Api.Eventing;
 
 public class EventPartParsers
 {
-    readonly Dictionary<Type, MethodInfo> _parsers = new();
+    readonly Dictionary<Type, MethodInfo> _parsers = [];
     readonly MethodInfo _isNullOrEmpty = typeof(string).GetMethod("IsNullOrEmpty", BindingFlags.Static | BindingFlags.Public);
 
     public EventPartParsers()

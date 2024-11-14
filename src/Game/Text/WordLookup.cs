@@ -8,8 +8,8 @@ namespace UAlbion.Game.Text;
 
 public class WordLookup : GameServiceComponent<IWordLookup>, IWordLookup
 {
-    readonly Dictionary<string, List<WordId>> _lookup = new();
-    readonly Dictionary<WordId, string> _reverse = new();
+    readonly Dictionary<string, List<WordId>> _lookup = [];
+    readonly Dictionary<WordId, string> _reverse = [];
 
     public WordLookup() => On<LanguageChangedEvent>(_ => _lookup.Clear());
     public WordId Parse(string s)
@@ -44,7 +44,7 @@ public class WordLookup : GameServiceComponent<IWordLookup>, IWordLookup
             var text = assets.LoadStringSafe(id).Trim().ToUpperInvariant();
             if (!_lookup.TryGetValue(text, out var ids))
             {
-                ids = new List<WordId>();
+                ids = [];
                 _lookup[text] = ids;
             }
 

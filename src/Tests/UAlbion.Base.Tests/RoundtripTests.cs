@@ -106,7 +106,7 @@ public class RoundtripTests
             testName,
             bytes,
             postBytes,
-            new[] { (".pre.txt", preTxt), (".post.txt", postTxt), (".reload.txt", reloadTxt) });
+            [(".pre.txt", preTxt), (".post.txt", postTxt), (".reload.txt", reloadTxt)]);
 
         if (asset is IReadOnlyTexture<byte>) // TODO: Png round-trip?
             return asset;
@@ -118,7 +118,7 @@ public class RoundtripTests
             testName + ".json",
             bytes,
             fromJsonBytes,
-            new[] { (".pre.txt", preTxt), (".post.txt", json), (".reload.txt", fromJsonTxt) });
+            [(".pre.txt", preTxt), (".post.txt", json), (".reload.txt", fromJsonTxt)]);
 
         return asset;
     }
@@ -492,7 +492,7 @@ public class RoundtripTests
             nameof(TiledTilesetTest),
             bytes,
             roundTripped,
-            new[] { (".pre.txt", preTxt), (".post.txt", tiledTxt), (".reload.txt", roundTripTxt)});
+            [(".pre.txt", preTxt), (".post.txt", tiledTxt), (".reload.txt", roundTripTxt)]);
     }
 
     [Fact]
@@ -518,7 +518,7 @@ public class RoundtripTests
             nameof(TiledStampTest),
             bytes,
             roundTripped,
-            new[] { (".pre.txt", preTxt), (".post.txt", tiledTxt), (".reload.txt", roundTripTxt)});
+            [(".pre.txt", preTxt), (".post.txt", tiledTxt), (".reload.txt", roundTripTxt)]);
     }
 
     [Fact]

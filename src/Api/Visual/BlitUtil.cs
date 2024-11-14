@@ -139,7 +139,7 @@ public static class BlitUtil
 
     public static void Blit32To8(in ReadOnlyImageBuffer<uint> fromBuffer, in ImageBuffer<byte> toBuffer, uint[] palette, Dictionary<uint, byte> quantizeCache = null)
     {
-        quantizeCache ??= new Dictionary<uint, byte>();
+        quantizeCache ??= [];
         var from = fromBuffer.Buffer;
         var to = toBuffer.Buffer;
         int fromOffset = 0;

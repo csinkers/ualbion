@@ -126,7 +126,7 @@ public sealed class FullscreenQuadRenderer : Component, IRenderer, IDisposable
         new (-1.0f, 1.0f, 0.0f, 1.0f), new (1.0f, 1.0f, 1.0f, 1.0f)
     ];
 
-    readonly Dictionary<OutputDescription, FullscreenQuadPipeline> _pipelines = new();
+    readonly Dictionary<OutputDescription, FullscreenQuadPipeline> _pipelines = [];
     readonly MultiBuffer<Vertex2DTextured> _vertexBuffer;
     readonly MultiBuffer<ushort> _indexBuffer;
 

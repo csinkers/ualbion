@@ -11,7 +11,7 @@ namespace UAlbion.Game.Assets;
 
 public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocator
 {
-    readonly Dictionary<string, string> _hashCache = new();
+    readonly Dictionary<string, string> _hashCache = [];
     IAssetLoaderRegistry _assetLoaderRegistry;
     IContainerRegistry _containerRegistry;
 

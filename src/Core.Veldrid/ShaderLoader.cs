@@ -12,8 +12,8 @@ namespace UAlbion.Core.Veldrid;
 public sealed class ShaderLoader : ServiceComponent<IShaderLoader>, IShaderLoader, IDisposable
 {
     static readonly Regex IncludeRegex = new("^#include\\s+\"([^\"]+)\"");
-    readonly List<FileSystemWatcher> _watchers = new();
-    readonly List<string> _directories = new();
+    readonly List<FileSystemWatcher> _watchers = [];
+    readonly List<string> _directories = [];
 
     public event EventHandler<EventArgs> ShadersUpdated;
     public void AddShaderDirectory(string directory)

@@ -37,8 +37,8 @@ public sealed class TextureSource : ServiceComponent<ITextureSource>, ITextureSo
     static readonly ITexture DefaultArrayTexture = BuildDefaultArray();
     readonly TextureCache<Texture2DHolder> _simple = new(x => new Texture2DHolder(x.Name), CreateTexture, DefaultTexture);
     readonly TextureCache<Texture2DArrayHolder> _array = new(x => new Texture2DArrayHolder(x.Name), CreateTexture, DefaultArrayTexture);
-    readonly ITexture _dummySimple = new SimpleTexture<byte>(null, "Dummy Texture", 1, 1, new byte[] { 0 });
-    readonly ITexture _dummyArray = new ArrayTexture<byte>(null, "Dummy ArrayTexture", 1, 1, 2, new byte[] { 0, 0 });
+    readonly ITexture _dummySimple = new SimpleTexture<byte>(null, "Dummy Texture", 1, 1, [0]);
+    readonly ITexture _dummyArray = new ArrayTexture<byte>(null, "Dummy ArrayTexture", 1, 1, 2, [0, 0]);
     float _lastCleanup;
     float _totalTime;
 

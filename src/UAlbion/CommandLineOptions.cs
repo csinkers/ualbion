@@ -168,9 +168,7 @@ Valid Types: {string.Join(" ", Enum.GetNames<AssetType>().OrderBy(x => x))}";
                     return;
                 }
 
-                Mods = new List<string>();
-                foreach (var mod in args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries))
-                    Mods.Add(mod);
+                Mods = [.. args[i].Split(' ', StringSplitOptions.RemoveEmptyEntries)];
             }
         }
     }

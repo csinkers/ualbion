@@ -6,7 +6,7 @@ namespace UAlbion.Game;
 
 public class SlowClock : Component
 {
-    readonly List<(AlbionTaskCore Task, int ExpiryTickCount)> _activeTimers = new();
+    readonly List<(AlbionTaskCore Task, int ExpiryTickCount)> _activeTimers = [];
     readonly SlowClockEvent _event = new();
     int _ticks;
     int _slowTicks;

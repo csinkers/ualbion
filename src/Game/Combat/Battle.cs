@@ -19,8 +19,8 @@ namespace UAlbion.Game.Combat;
 public class Battle : GameComponent, IReadOnlyBattle
 {
     readonly MonsterGroupId _groupId;
-    readonly List<ICombatParticipant> _mobs = new();
-    readonly List<ICombatParticipant> _corpses = new();
+    readonly List<ICombatParticipant> _mobs = [];
+    readonly List<ICombatParticipant> _corpses = [];
     readonly ICombatParticipant[] _tiles = new ICombatParticipant[SavedGame.CombatRows * SavedGame.CombatColumns];
 
     public IReadOnlyList<ICombatParticipant> Mobs { get; }
@@ -56,11 +56,7 @@ public class Battle : GameComponent, IReadOnlyBattle
             Raise(new CombatDialog.ShowCombatDialogEvent(true));
         });
 
-    AlbionTask BeginRoundAsync(BeginCombatRoundEvent _)
-    {
-        return RaiseA(new CombatUpdateEvent(100));
-        // TODO
-    }
+    AlbionTask BeginRoundAsync(BeginCombatRoundEvent _) => RaiseA(new CombatUpdateEvent(100)); // TODO
 
     protected override void Subscribed()
     {
@@ -105,7 +101,5 @@ public class Battle : GameComponent, IReadOnlyBattle
     }
 
     public ICombatParticipant GetTile(int tileIndex)
-    {
-        return tileIndex < 0 || tileIndex >= _tiles.Length ? null : _tiles[tileIndex];
-    }
+        => tileIndex < 0 || tileIndex >= _tiles.Length ? null : _tiles[tileIndex];
 }

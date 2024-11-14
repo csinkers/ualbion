@@ -10,7 +10,7 @@ namespace UAlbion.Core.Veldrid;
 
 public sealed class RenderPass : Component
 {
-    readonly List<IRenderable> _renderList = new();
+    readonly List<IRenderable> _renderList = [];
     Dictionary<Type, IRenderer> _rendererLookup;
 
     public delegate void RenderMethod(RenderPass pass, GraphicsDevice device, CommandList cl, IResourceSetHolder set1);

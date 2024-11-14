@@ -13,7 +13,7 @@ public class DeltaFlcLine
 
     public ushort Skip { get; }
     public byte? LastPixel { get; }
-    public IList<DeltaFlcLineToken> Tokens { get; } = new List<DeltaFlcLineToken>();
+    public IList<DeltaFlcLineToken> Tokens { get; } = [];
 
     public DeltaFlcLine(ISerializer s)
     {

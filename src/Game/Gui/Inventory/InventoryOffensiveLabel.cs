@@ -25,7 +25,7 @@ public class InventoryOffensiveLabel : UiElement
         {
             var player = Resolve<IParty>()[_activeCharacter];
             var damage = player?.Apparent.DisplayDamage ?? 0;
-            return new[] { new TextBlock($"{damage}") };
+            return [new TextBlock($"{damage}")];
         }, _ => _version);
 
         AttachChild(

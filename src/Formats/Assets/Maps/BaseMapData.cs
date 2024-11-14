@@ -17,7 +17,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
     protected const int OffsetX = 1; // Compensation for all absolute map coordinates being relative to (1,1).
     protected const int OffsetY = 1;
 
-    readonly Dictionary<TriggerTypes, HashSet<MapEventZone>> _zoneTypeLookup = new();
+    readonly Dictionary<TriggerTypes, HashSet<MapEventZone>> _zoneTypeLookup = [];
     ushort[] _chainMapping;
 
     AssetId IEventSet.Id => Id;
@@ -31,8 +31,8 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
     [JsonInclude] public PaletteId PaletteId { get; set; }
     [JsonInclude] public CombatBackgroundId CombatBackgroundId { get; set; }
     [JsonInclude] public List<MapNpc> Npcs { get; protected set; }
-    [JsonIgnore] public IList<EventNode> Events { get; private set; } = new List<EventNode>();
-    [JsonInclude] public IList<ushort> Chains { get; private set; } = new List<ushort>();
+    [JsonIgnore] public IList<EventNode> Events { get; private set; } = [];
+    [JsonInclude] public IList<ushort> Chains { get; private set; } = [];
     [JsonIgnore] public DecompilationResult Decompiled { get; set; }
 
     [JsonIgnore]
@@ -55,11 +55,11 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
     [JsonInclude] public string[] EventStrings // Used for JSON
     {
         get => Events?.Select(x => x.ToString()).ToArray();
-        set => Events = value?.Select(EventNode.Parse).ToList() ?? new List<EventNode>();
+        set => Events = value?.Select(EventNode.Parse).ToList() ?? [];
     }
 
     [JsonIgnore] public HashSet<ushort> UniqueZoneNodeIds => GlobalZones.Concat(Zones).Where(x => x?.Node != null).Select(x => x.Node.Id).ToHashSet();
-    [JsonIgnore] internal List<MapEventZone> GlobalZones { get; private set; } = new();
+    [JsonIgnore] internal List<MapEventZone> GlobalZones { get; private set; } = [];
     [JsonIgnore] internal MapEventZone[] Zones { get; private set; } // This should only ever be modified using the Add/RemoveZone methods
 
     [JsonIgnore] public MapLightingMode LightingMode
@@ -123,7 +123,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
         PaletteId = paletteId;
         Width = width;
         Height = height;
-        Npcs = new List<MapNpc>();
+        Npcs = [];
         Zones = new MapEventZone[width * height];
     }
 
@@ -246,7 +246,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
 #if DEBUG
     void AddEventReference(int id, object referrer)
     {
-        EventReferences[id] ??= new List<object>();
+        EventReferences[id] ??= [];
         EventReferences[id].Add(referrer);
     }
 #endif
@@ -299,7 +299,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
     public void OnDeserialized()
     {
         var allZones = GlobalZones; // Split up the data from the JSON into global and regular zones
-        GlobalZones = new List<MapEventZone>();
+        GlobalZones = [];
         Zones = new MapEventZone[Width * Height];
         foreach (var zone in allZones)
         {
@@ -402,7 +402,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
     {
         if (!_zoneTypeLookup.TryGetValue(zone.Trigger, out var ofType))
         {
-            ofType = new HashSet<MapEventZone>();
+            ofType = [];
             _zoneTypeLookup[zone.Trigger] = ofType;
         }
         ofType.Add(zone);

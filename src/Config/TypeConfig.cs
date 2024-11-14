@@ -51,7 +51,7 @@ public class TypeConfig // Defines the vocabulary to be used in assets.json file
     /// <summary>
     /// The collection of types containing vars
     /// </summary>
-    public List<string> VarTypes { get; init; } = new();
+    public List<string> VarTypes { get; init; } = [];
 
     public IAssetProperty GetAssetProperty(string name, AssetNode node)
     {

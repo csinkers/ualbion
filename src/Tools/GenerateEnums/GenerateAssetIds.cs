@@ -23,7 +23,7 @@ static class GenerateAssetIds
     {
         var runs = 
             types
-                .Union(new[] { AssetType.None })
+                .Union([AssetType.None])
                 .Select(x => (int)x)
                 .OrderBy(x => x)
                 .Aggregate(new List<(int, int)>(), (acc, x) =>

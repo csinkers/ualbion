@@ -6,5 +6,5 @@ namespace UAlbion.Game.Events;
 
 public class CollectDialogsEvent : GameEvent, IVerboseEvent
 {
-    public List<IDialog> Dialogs { get; } = new();
+    public List<IDialog> Dialogs { get; } = [];
 }

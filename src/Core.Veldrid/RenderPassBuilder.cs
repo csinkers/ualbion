@@ -11,9 +11,9 @@ public class RenderPassBuilder
     readonly string _name;
     readonly RenderManagerBuilder _manager;
     readonly RenderSystemBuilder _system;
-    readonly List<string> _dependencies = new();
-    readonly List<IRenderer> _renderers = new();
-    readonly List<IRenderableSource> _sources = new();
+    readonly List<string> _dependencies = [];
+    readonly List<IRenderer> _renderers = [];
+    readonly List<IRenderableSource> _sources = [];
     IResourceProvider _resourceProvider;
     IFramebufferHolder _target;
     RenderPass.RenderMethod _renderFunc;

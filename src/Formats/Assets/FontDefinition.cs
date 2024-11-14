@@ -8,9 +8,9 @@ namespace UAlbion.Formats.Assets;
 
 public class FontDefinition
 {
-    readonly Dictionary<char, (int regionNumber, int advance)> _charInfo = new();
-    readonly List<(IReadOnlyTexture<byte>, Region)> _sourceRegions = new();
-    readonly List<Region> _destRegions = new();
+    readonly Dictionary<char, (int regionNumber, int advance)> _charInfo = [];
+    readonly List<(IReadOnlyTexture<byte>, Region)> _sourceRegions = [];
+    readonly List<Region> _destRegions = [];
     SpriteSheetLayout _layout;
 
     public static uint[] ExportPalette { get; } = BuildExportPalette();
@@ -28,8 +28,8 @@ public class FontDefinition
     public int LineHeight { get; set; } // Size in UI pixels
     public int SpaceSize { get; set; } = 3; // Advance for a whitespace character
     public int Margin { get; set; } = 1; // Default whitespace pixels to include in advance when not overriden by kerning
-    public List<FontComponent> Components { get; set; } = new();
-    public Dictionary<char, Dictionary<char, int>> Kerning { get; set; } = new();
+    public List<FontComponent> Components { get; set; } = [];
+    public Dictionary<char, Dictionary<char, int>> Kerning { get; set; } = [];
 
     public bool SupportsCharacter(char c) => _charInfo.ContainsKey(c);
     public int GetAdvance(char c, char nextChar)

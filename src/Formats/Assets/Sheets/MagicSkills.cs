@@ -19,7 +19,7 @@ public class MagicSkills : IMagicSkills
 
     [JsonInclude]
     [DiagEdit(Style = DiagEditStyle.IdPicker)]
-    public IList<SpellId> KnownSpells { get; private set; } = new List<SpellId>();
+    public IList<SpellId> KnownSpells { get; private set; } = [];
 
     [JsonInclude]
     [DiagEdit(Style = DiagEditStyle.IdPicker)]

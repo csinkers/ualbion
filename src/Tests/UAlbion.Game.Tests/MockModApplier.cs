@@ -10,8 +10,8 @@ namespace UAlbion.Game.Tests;
 
 public class MockModApplier : ServiceComponent<IModApplier>, IModApplier
 {
-    readonly Dictionary<AssetId, object> _assets = new();
-    readonly Dictionary<AssetId, AssetNode> _infos = new();
+    readonly Dictionary<AssetId, object> _assets = [];
+    readonly Dictionary<AssetId, AssetNode> _infos = [];
 
     public void LoadMods(AssetMapping mapping, IPathResolver pathResolver, IReadOnlyList<string> mods) { }
     public AssetNode GetAssetInfo(AssetId id, string language) => _infos[id];

@@ -13,27 +13,27 @@ public class EdgeMergingTests
     [Fact]
     public void TwoHorizontalTest()
     {
-        IList<Edge> edges = new[]
-        {
+        IList<Edge> edges =
+        [
             E(0, 0, 1, 0),
-            E(1, 0, 2, 0),
-        };
+            E(1, 0, 2, 0)
+        ];
         edges = TriggerZoneBuilder.MergeEdges(edges);
         Assert.Collection(edges, e => Assert.Equal(E(0, 0, 2, 0), e));
 
-        edges = new[]
-        {
+        edges =
+        [
             E(1, 0, 2, 0),
-            E(1, 0, 0, 0),
-        };
+            E(1, 0, 0, 0)
+        ];
         edges = TriggerZoneBuilder.MergeEdges(edges);
         Assert.Collection(edges, e => Assert.Equal(E(0, 0, 2, 0), e));
 
-        edges = new[]
-        {
+        edges =
+        [
             E(0, 0, 1, 0),
-            E(2, 0, 3, 0),
-        };
+            E(2, 0, 3, 0)
+        ];
         edges = TriggerZoneBuilder.MergeEdges(edges);
         Assert.Collection(edges,
             e => Assert.Equal(E(0, 0, 1, 0), e),
@@ -44,11 +44,11 @@ public class EdgeMergingTests
     [Fact]
     public void TwoVerticalTest()
     {
-        IList<Edge> edges = new[]
-        {
+        IList<Edge> edges =
+        [
             E(0, 0, 0, 1),
-            E(0, 1, 0, 2),
-        };
+            E(0, 1, 0, 2)
+        ];
         edges = TriggerZoneBuilder.MergeEdges(edges);
         Assert.Collection(edges,
             e => Assert.Equal(E(0, 0, 0, 2), e)
@@ -58,44 +58,44 @@ public class EdgeMergingTests
     [Fact]
     public void CornerTest()
     {
-        IList<Edge> edges = new[]
-        {
+        IList<Edge> edges =
+        [
             E(0, 0, 1, 0),
-            E(1, 0, 1, 1),
-        };
+            E(1, 0, 1, 1)
+        ];
         edges = TriggerZoneBuilder.MergeEdges(edges);
         Assert.Collection(edges,
             e => Assert.Equal(E(0, 0, 1, 0), e),
             e => Assert.Equal(E(1, 0, 1, 1), e)
         );
 
-        edges = new[]
-        {
+        edges =
+        [
             E(1, 0, 1, 1),
-            E(1, 1, 0, 1),
-        };
+            E(1, 1, 0, 1)
+        ];
         edges = TriggerZoneBuilder.MergeEdges(edges);
         Assert.Collection(edges,
             e => Assert.Equal(E(1, 0, 1, 1), e),
             e => Assert.Equal(E(1, 1, 0, 1), e)
         );
 
-        edges = new[]
-        {
+        edges =
+        [
             E(1, 1, 0, 1),
-            E(0, 1, 0, 0),
-        };
+            E(0, 1, 0, 0)
+        ];
         edges = TriggerZoneBuilder.MergeEdges(edges);
         Assert.Collection(edges,
             e => Assert.Equal(E(0, 1, 0, 0), e),
             e => Assert.Equal(E(1, 1, 0, 1), e)
         );
 
-        edges = new[]
-        {
+        edges =
+        [
             E(0, 1, 0, 0),
-            E(0, 0, 1, 0),
-        };
+            E(0, 0, 1, 0)
+        ];
         edges = TriggerZoneBuilder.MergeEdges(edges);
         Assert.Collection(edges,
             e => Assert.Equal(E(0, 0, 1, 0), e),
@@ -106,8 +106,8 @@ public class EdgeMergingTests
     [Fact]
     public void BoxTest()
     {
-        IList<Edge> edges = new[]
-        {
+        IList<Edge> edges =
+        [
             E(0, 0, 1, 0),
             E(1, 0, 2, 0),
             E(2, 0, 2, 1),
@@ -115,8 +115,8 @@ public class EdgeMergingTests
             E(2, 2, 1, 2),
             E(1, 2, 0, 2),
             E(0, 2, 0, 1),
-            E(0, 1, 0, 0),
-        };
+            E(0, 1, 0, 0)
+        ];
         edges = TriggerZoneBuilder.MergeEdges(edges);
         // edges = edges.OrderBy(x => x).ToList();
         Assert.Collection(edges,
@@ -130,8 +130,8 @@ public class EdgeMergingTests
     [Fact]
     public void EdgeSortTest()
     {
-        IList<Edge> edges = new[]
-        {
+        IList<Edge> edges =
+        [
             E(0, 0, 0, 0),
             E(0, 0, 0, 1),
             E(0, 0, 1, 0),
@@ -147,8 +147,8 @@ public class EdgeMergingTests
             E(1, 1, 0, 0),
             E(1, 1, 0, 1),
             E(1, 1, 1, 0),
-            E(1, 1, 1, 1),
-        };
+            E(1, 1, 1, 1)
+        ];
         var r = new Random();
         edges = edges.Distinct().ToList();
         Assert.Equal(10, edges.Count);
@@ -171,15 +171,15 @@ public class EdgeMergingTests
     [Fact]
     public void EdgePackingTest()
     {
-        IList<Edge> edges = new[]
-        {
+        IList<Edge> edges =
+        [
             E(0, 0, 0, 0),
             E(0, 1, 2, 3),
             E(3, 2, 1, 0),
             E(255, 255, 255, 255),
             E(256, 256, 256, 256),
-            E(0xffff,0xffff,0xffff,0xffff),
-        };
+            E(0xffff,0xffff,0xffff,0xffff)
+        ];
 
         Assert.Equal((0,0,0,0), edges[0].Tuple);
         Assert.Equal((0,1,2,3), edges[1].Tuple);

@@ -105,8 +105,8 @@ public static class ReduceSeseRegions
         {
             graph = graph.ReplaceNode(end,
                 new ControlFlowGraph(0, 1,
-                    new[] { Emit.Label(labelName), graph.Nodes[end] },
-                    new[] { (0, 1, CfgEdge.True) }));
+                    [Emit.Label(labelName), graph.Nodes[end]],
+                    [(0, 1, CfgEdge.True)]));
         }
 
         return graph;

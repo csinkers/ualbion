@@ -116,7 +116,7 @@ else:");
                 if (current != null)
                     yield return current;
 
-                current = new EnumDef(header.Name, header.BackingType, new List<EnumEntry>());
+                current = new EnumDef(header.Name, header.BackingType, []);
             }
 
             if (line is EnumEntry entry && current != null)

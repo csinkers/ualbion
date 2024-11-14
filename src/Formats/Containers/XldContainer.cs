@@ -45,7 +45,7 @@ public class XldContainer : IAssetContainer
 
         var byIndex = context.Disk.FileExists(path) 
             ? LoadAll(context.Disk, path) 
-            : new Dictionary<int, byte[]>();
+            : [];
 
         foreach (var (info, bytes) in assets)
             byIndex[info.Index] = bytes;

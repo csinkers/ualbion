@@ -27,7 +27,7 @@ public class TextBlock // Logical segment of text where all glyphs share the sam
     public TextAlignment Alignment { get; set; }
     public TextArrangementFlags ArrangementFlags { get; set; }
     public IEnumerable<WordId> Words => _words ?? Enumerable.Empty<WordId>();
-    public void AddWord(WordId word) { _words ??= new HashSet<WordId>(); _words.Add(word); }
+    public void AddWord(WordId word) { _words ??= []; _words.Add(word); }
     HashSet<WordId> _words;
 
     public override string ToString() => $"[\"{Text}\" {InkId} {Style} {Alignment} {ArrangementFlags}]";
@@ -54,7 +54,7 @@ public class TextBlock // Logical segment of text where all glyphs share the sam
 
         if (other._words != null)
         {
-            _words ??= new HashSet<WordId>();
+            _words ??= [];
             _words.UnionWith(other._words);
         }
     }

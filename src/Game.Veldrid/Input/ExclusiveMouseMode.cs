@@ -11,7 +11,7 @@ namespace UAlbion.Game.Veldrid.Input;
 
 public class ExclusiveMouseMode : Component
 {
-    readonly List<Selection> _hits = new();
+    readonly List<Selection> _hits = [];
     public ExclusiveMouseMode() => On<MouseInputEvent>(OnInput);
 
     void OnInput(MouseInputEvent e)

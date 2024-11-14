@@ -4,6 +4,6 @@ namespace UAlbion.Api.Settings;
 
 public class VarLibrary
 {
-    public List<IVar> Vars { get; } = new();
+    public List<IVar> Vars { get; } = [];
     public void Add(IVar v) => Vars.Add(v);
 }

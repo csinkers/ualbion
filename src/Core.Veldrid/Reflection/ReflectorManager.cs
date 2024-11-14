@@ -12,7 +12,7 @@ public class ReflectorManager : Component
 {
     readonly ReflectorMetadataStore _store;
     readonly Reflector _nullReflector;
-    readonly Dictionary<Type, Reflector> _reflectors = new();
+    readonly Dictionary<Type, Reflector> _reflectors = [];
     bool _editMode;
 
     public bool IsEditMode => _editMode;

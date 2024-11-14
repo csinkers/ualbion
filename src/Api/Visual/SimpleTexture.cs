@@ -19,7 +19,7 @@ public class SimpleTexture<T> : IMutableTexture<T> where T : unmanaged
         Width = width;
         Height = height;
         _pixelData = new T[Width * Height];
-        _regions = regions?.ToList() ?? new List<Region>();
+        _regions = regions?.ToList() ?? [];
     }
 
     public SimpleTexture(IAssetId id, string name, int width, int height, IEnumerable<Region> regions = null)
@@ -29,7 +29,7 @@ public class SimpleTexture<T> : IMutableTexture<T> where T : unmanaged
         Width = width;
         Height = height;
         _pixelData = new T[Width * Height];
-        _regions = regions?.ToList() ?? new List<Region>();
+        _regions = regions?.ToList() ?? [];
     }
 
     public SimpleTexture(IAssetId id, string name, int width, int height, ReadOnlySpan<T> pixelData, IEnumerable<Region> regions = null)
@@ -43,7 +43,7 @@ public class SimpleTexture<T> : IMutableTexture<T> where T : unmanaged
         if (pixelData.Length != pixelCount)
             throw new ArgumentException($"A span of {pixelData.Length} pixels was given to create an image of dimensions {Width}x{Height} ({pixelCount} expected)");
         _pixelData = pixelData.ToArray();
-        _regions = regions?.ToList() ?? new List<Region>();
+        _regions = regions?.ToList() ?? [];
     }
 
     public void AddRegion(int x, int y, int w, int h, int layer = 0) => _regions.Add(new Region(x, y, w, h, Width, Height, layer));

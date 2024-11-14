@@ -12,8 +12,8 @@ namespace UAlbion.Game;
 
 public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventManager, IDisposable
 {
-    readonly List<EventContext> _contexts = new();
-    readonly List<Breakpoint> _breakpoints = new();
+    readonly List<EventContext> _contexts = [];
+    readonly List<Breakpoint> _breakpoints = [];
     public int CurrentDebugContextIndex { get; set; } = -1;
     public EventContext CurrentDebugContext =>
         CurrentDebugContextIndex >= 0 && CurrentDebugContextIndex < _contexts.Count
@@ -121,11 +121,9 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         {
             var node = context.Node;
             context.Status = EventContextStatus.Running;
-            AlbionTask task;
-            if (node is IBranchNode branch && node.Event is IQueryEvent<bool> boolEvent)
-                task = HandleBoolEvent(context, boolEvent, branch).AsUntyped;
-            else
-                task = HandleAsyncEvent(context, node.Event);
+            AlbionTask task = node is IBranchNode branch && node.Event is IQueryEvent<bool> boolEvent
+                ? HandleBoolEvent(context, boolEvent, branch).AsUntyped
+                : HandleAsyncEvent(context, node.Event);
 
 #if DEBUG
             _ = task.Named($"ECM.Resume for C{context.Id} {context.EventSet.Id}:{node.Id}: {node.Event}");
@@ -147,15 +145,15 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
     }
 
 #pragma warning disable CA1508 // Avoid dead conditional code
-// context.Status can be modified due to the RaiseAsync calls, but the code analysis isn't figuring it out so
-// it was flagging the "context.Status == Waiting" check as always true.
+    // context.Status can be modified due to the RaiseAsync calls, but the code analysis isn't figuring it out so
+    // it was flagging the "context.Status == Waiting" check as always true.
     async AlbionTask HandleAsyncEvent(EventContext context, IEvent asyncEvent)
     {
         context.Status = EventContextStatus.Waiting;
 
         var task = RaiseA(asyncEvent);
 #if DEBUG
-            _ = task.Named($"ECM.HandleAsyncEvent for C{context.Id} {context.EventSet.Id}:{context.Node.Id}: {context.Node.Event}");
+        _ = task.Named($"ECM.HandleAsyncEvent for C{context.Id} {context.EventSet.Id}:{context.Node.Id}: {context.Node.Event}");
 #endif
         await task;
 
@@ -168,7 +166,7 @@ public sealed class EventChainManager : ServiceComponent<IEventManager>, IEventM
         context.Status = EventContextStatus.Waiting;
         var task = RaiseQueryA(boolEvent);
 #if DEBUG
-            _ = task.Named($"ECM.HandleBoolEvent for C{context.Id} {context.EventSet.Id}:{context.Node.Id}: {context.Node.Event}");
+        _ = task.Named($"ECM.HandleBoolEvent for C{context.Id} {context.EventSet.Id}:{context.Node.Id}: {context.Node.Event}");
 #endif
 
         var result = await task;

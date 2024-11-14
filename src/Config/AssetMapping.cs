@@ -46,7 +46,7 @@ public class AssetMapping
     // Always built dynamically based on the current set of active mods
     public static AssetMapping Global => GlobalIsThreadLocal ? ThreadLocalGlobal.Value : TrueGlobal;
     public static bool GlobalIsThreadLocal { get; set; } // Set to true for unit tests.
-    readonly Dictionary<AssetId, string> _idToNameCache = new();
+    readonly Dictionary<AssetId, string> _idToNameCache = [];
 
     readonly struct Range
     {
@@ -119,8 +119,8 @@ public class AssetMapping
             .Select(_ => new List<EnumInfo>())
             .ToArray(); // Keyed by AssetType, a byte enum
 
-    readonly Dictionary<Type, EnumInfo> _byEnumType = new();
-    readonly Dictionary<string, List<(EnumInfo Info, int Value)>> _byName = new();
+    readonly Dictionary<Type, EnumInfo> _byEnumType = [];
+    readonly Dictionary<string, List<(EnumInfo Info, int Value)>> _byName = [];
 
     public AssetMapping() { }
     AssetMapping(Dictionary<Type, EnumInfo> byEnumType)
@@ -354,7 +354,7 @@ public class AssetMapping
             var key = value.Item1.ToUpperInvariant();
             if (!_byName.TryGetValue(key, out var entries))
             {
-                entries = new List<(EnumInfo Info, int Value)>();
+                entries = [];
                 _byName[key] = entries;
             }
             entries.Add((info, value.Item2 + info.Offset));

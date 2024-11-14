@@ -11,9 +11,9 @@ public class CompositedTexture : IReadOnlyTexture<uint>
 {
     const int LayerLimit = 512;
 
-    readonly List<LogicalSubImage> _logicalSubImages = new();
-    readonly Dictionary<LayerKey, int> _layerLookup = new();
-    readonly List<Vector2> _layerSizes = new();
+    readonly List<LogicalSubImage> _logicalSubImages = [];
+    readonly Dictionary<LayerKey, int> _layerLookup = [];
+    readonly List<Vector2> _layerSizes = [];
     IPalette _palette;
     bool _isMetadataDirty = true;
     ArrayTexture<uint> _texture;

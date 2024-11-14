@@ -390,10 +390,10 @@ public class ModApplier : GameComponent, IModApplier
 
             ms.Position = 0;
 
-            assets ??= new Dictionary<string, List<(AssetLoadContext, byte[])>>();
+            assets ??= [];
             if (!assets.TryGetValue(targetInfo.Filename, out var list))
             {
-                list = new List<(AssetLoadContext, byte[])>();
+                list = [];
                 assets[targetInfo.Filename] = list;
             }
 

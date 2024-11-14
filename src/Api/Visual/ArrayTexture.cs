@@ -20,7 +20,7 @@ public class ArrayTexture<T> : IMutableTexture<T> where T : unmanaged
         Height = height;
         ArrayLayers = layers;
         _pixelData = new T[Width * Height * ArrayLayers];
-        _regions = regions?.ToList() ?? new List<Region>();
+        _regions = regions?.ToList() ?? [];
     }
 
     public ArrayTexture(IAssetId id, string name, int width, int height, int layers = 1, IEnumerable<Region> regions = null)
@@ -31,7 +31,7 @@ public class ArrayTexture<T> : IMutableTexture<T> where T : unmanaged
         Height = height;
         ArrayLayers = layers;
         _pixelData = new T[Width * Height * ArrayLayers];
-        _regions = regions?.ToList() ?? new List<Region>();
+        _regions = regions?.ToList() ?? [];
     }
 
     public ArrayTexture(IAssetId id, string name, int width, int height, int layers, ReadOnlySpan<T> pixelData, IEnumerable<Region> regions = null)
@@ -46,7 +46,7 @@ public class ArrayTexture<T> : IMutableTexture<T> where T : unmanaged
         if (pixelData.Length != pixelCount)
             throw new ArgumentException($"A span of {pixelData.Length} pixels was given to create an image of dimensions {Width}x{Height}x{ArrayLayers} ({pixelCount} expected)");
         _pixelData = pixelData.ToArray();
-        _regions = regions?.ToList() ?? new List<Region>();
+        _regions = regions?.ToList() ?? [];
     }
 
     public void AddRegion(int x, int y, int w, int h, int layer = 0) => _regions.Add(new Region(x, y, w, h, Width, Height, layer));

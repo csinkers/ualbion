@@ -10,7 +10,7 @@ namespace UAlbion.Game.Veldrid.Input;
 
 public class ContextMenuMouseMode : Component
 {
-    readonly List<Selection> _hits = new();
+    readonly List<Selection> _hits = [];
     readonly UiLeftClickEvent _leftClickEvent = new();
     readonly UiLeftReleaseEvent _leftReleaseEvent = new();
     bool _wasClockRunning;

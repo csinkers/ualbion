@@ -23,7 +23,7 @@ public class RegionToPolygonTests
         var map = new MapData2D(MapId.None, PaletteId.None, TilesetId.None,
             w, h,
             events,
-            new ushort[] { 0 },
+            [0],
             Array.Empty<MapNpc>(),
             region.Select(p => new MapEventZone
             {
@@ -200,7 +200,7 @@ public class RegionToPolygonTests
 # #   ##
 ###
 ").ToList();
-    static List<(byte x, byte y)> CrashSite2 => new() { (1, 16) };
+    static List<(byte x, byte y)> CrashSite2 => [(1, 16)];
 
     [Fact]
     public void CrashSiteTest1()
@@ -215,11 +215,11 @@ public class RegionToPolygonTests
         var outerKey = new ZoneKey(false, TriggerTypes.Examine | TriggerTypes.Normal, 4);
         var innerKey = new ZoneKey(false, TriggerTypes.Examine, 6);
 
-        List<(ZoneKey key, IList<(int x, int y)> points)> regions = new()
-        {
+        List<(ZoneKey key, IList<(int x, int y)> points)> regions =
+        [
             (outerKey, ToInts(CrashSite1)),
             (innerKey, ToInts(CrashSite2))
-        };
+        ];
 
         // For debugging
         // var preRegions = regions.Select(x => TriggerZoneBuilder.PrintRegion(x.points)).ToList();

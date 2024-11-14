@@ -35,7 +35,7 @@ public class LogicalInventorySlot : UiElement
             amountSource = new DynamicText(() =>
             {
                 var gold = Inventory?.Gold.Amount ?? 0;
-                return new[] { new TextBlock($"{gold / 10}.{gold % 10}") }; // todo: i18n: May need to vary based on the current game language
+                return [new TextBlock($"{gold / 10}.{gold % 10}")]; // todo: i18n: May need to vary based on the current game language
             }, _ => _version);
         }
         else if (id.Slot == ItemSlotId.Rations)
@@ -43,7 +43,7 @@ public class LogicalInventorySlot : UiElement
             amountSource = new DynamicText(() =>
             {
                 var food = Inventory?.Rations.Amount ?? 0;
-                return new[] { new TextBlock(food.ToString()) }; // todo: i18n: Will need to be changed if we support a language that doesn't use Hindu-Arabic numerals.
+                return [new TextBlock(food.ToString())]; // todo: i18n: Will need to be changed if we support a language that doesn't use Hindu-Arabic numerals.
             }, _ => _version);
         }
         else

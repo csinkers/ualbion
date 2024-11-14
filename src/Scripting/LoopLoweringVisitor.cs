@@ -32,21 +32,19 @@ public class LoopLoweringVisitor : BaseAstBuilderVisitor
             negated = true;
         }
 
-        return Emit.Cfg(new ControlFlowGraph(new[]
-            {
+        return Emit.Cfg(new ControlFlowGraph([
                 Emit.Empty(), // 0
                 Emit.Label(headLabel), // 1
                 body, // 2
                 condition, // 3
                 Emit.Label(tailLabel), // 4
                 Emit.Empty() // 5
-            },
-            new[]
-            {
+            ],
+            [
                 (0,1,CfgEdge.True), (1,2,CfgEdge.True), (2,3,CfgEdge.True),
                 (3,1,negated ? CfgEdge.False : CfgEdge.True), (3,4,negated ? CfgEdge.True : CfgEdge.False),
-                (4,5,CfgEdge.True),
-            }));
+                (4,5,CfgEdge.True)
+            ]));
     }
 
     protected override ICfgNode Build(WhileLoop whileLoop)
@@ -73,22 +71,20 @@ public class LoopLoweringVisitor : BaseAstBuilderVisitor
             negated = true;
         }
 
-        return Emit.Cfg(new ControlFlowGraph(new[]
-            {
+        return Emit.Cfg(new ControlFlowGraph([
                 Emit.Empty(), // 0
                 Emit.Label(headLabel), // 1
                 condition, // 2
                 body, // 3
                 Emit.Label(tailLabel), // 4
                 Emit.Empty() // 5
-            },
-            new[]
-            {
+            ],
+            [
                 (0,1,CfgEdge.True), (1,2,CfgEdge.True),
                 (2,3,negated ? CfgEdge.False : CfgEdge.True), (2,4,negated ? CfgEdge.True : CfgEdge.False),
                 (3,1,CfgEdge.True),
                 (4,5,CfgEdge.True)
-            }));
+            ]));
     }
 
     protected override ICfgNode Build(EndlessLoop endlessLoop)
@@ -106,21 +102,19 @@ public class LoopLoweringVisitor : BaseAstBuilderVisitor
         _tailStack.Pop();
         _headStack.Pop();
 
-        return Emit.Cfg(new ControlFlowGraph(new[]
-            {
+        return Emit.Cfg(new ControlFlowGraph([
                 Emit.Empty(), // 0
                 Emit.Label(headLabel), // 1
                 body, // 2
                 Emit.Label(tailLabel), // 3
                 Emit.Empty() // 4
-            },
-            new[]
-            {
+            ],
+            [
                 (0,1,CfgEdge.True),
                 (1,2,CfgEdge.True), (1,3,CfgEdge.LoopSuccessor),
                 (2,1,CfgEdge.True),
                 (3,4,CfgEdge.True)
-            }));
+            ]));
     }
 
     protected override ICfgNode Build(BreakStatement breakStatement)

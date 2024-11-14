@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Formats;
@@ -12,7 +13,7 @@ namespace UAlbion.Game.Assets;
 
 public class AssetCache : Component
 {
-    readonly object _syncRoot = new();
+    readonly Lock _syncRoot = new();
 
     class Entry
     {
@@ -21,8 +22,8 @@ public class AssetCache : Component
         public DateTime LastAccessed;
     }
 
-    readonly Dictionary<string, Dictionary<AssetId, Entry>> _langCache = new();
-    readonly Dictionary<AssetId, Entry> _cache = new();
+    readonly Dictionary<string, Dictionary<AssetId, Entry>> _langCache = [];
+    readonly Dictionary<AssetId, Entry> _cache = [];
 
     public AssetCache()
     {
@@ -60,7 +61,7 @@ public class AssetCache : Component
                     Cycle(kvp.Value, threshold);
                     if (kvp.Value.Count == 0)
                     {
-                        emptyLanguages ??= new List<string>();
+                        emptyLanguages ??= [];
                         emptyLanguages.Add(kvp.Key);
                     }
                 }
@@ -140,7 +141,7 @@ public class AssetCache : Component
         {
             if (!_langCache.TryGetValue(language, out cache))
             {
-                cache = new Dictionary<AssetId, Entry>();
+                cache = [];
                 _langCache[language] = cache;
             }
         }

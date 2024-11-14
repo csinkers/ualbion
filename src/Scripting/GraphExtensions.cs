@@ -190,7 +190,7 @@ public static class GraphExtensions
         ArgumentNullException.ThrowIfNull(graph);
 
         var result = new List<List<int>>();
-        GetReachingPath(graph, from, to, new List<int>(), result);
+        GetReachingPath(graph, from, to, [], result);
         return result;
     }
 
@@ -261,7 +261,7 @@ public static class GraphExtensions
                     for (var i = 1; i < parents.Count; i++)
                         currentDominators = currentDominators.Intersect(dominators[parents[i]]).ToList();
                 }
-                else currentDominators = new List<int>();
+                else currentDominators = [];
 
                 if (!currentDominators.Contains(index))
                     currentDominators.Add(index);
@@ -351,8 +351,8 @@ public static class GraphExtensions
     {
         ArgumentNullException.ThrowIfNull(graph);
 
-        List<List<int>> result = new();
-        List<int> finished = new();
+        List<List<int>> result = [];
+        List<int> finished = [];
         var visited = new bool[graph.NodeCount];
 
         void Inner(int node)
@@ -394,10 +394,10 @@ public static class GraphExtensions
     {
         ArgumentNullException.ThrowIfNull(graph);
         ArgumentNullException.ThrowIfNull(component);
-        List<int> stack = new();
-        List<int> blocked = new();
-        List<List<int>> result = new();
-        List<(int, int)> blockMap = new();
+        List<int> stack = [];
+        List<int> blocked = [];
+        List<List<int>> result = [];
+        List<(int, int)> blockMap = [];
         var visited = new bool[graph.NodeCount];
 
         static void Unblock(int index, List<int> blocked, List<(int, int)> blockMap)
@@ -528,7 +528,7 @@ public static class GraphExtensions
 
         var domTree = graph.GetDominatorTree();
         var postDomTree = graph.GetPostDominatorTree();
-        List<(HashSet<int>, int, int)> regions = new();
+        List<(HashSet<int>, int, int)> regions = [];
 
         foreach (var i in graph.GetDfsPostOrder())
         {

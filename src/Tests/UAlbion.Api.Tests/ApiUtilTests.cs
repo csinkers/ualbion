@@ -53,34 +53,38 @@ public class ApiUtilTests
     [Fact]
     public void TransposeImageTest()
     {
-        byte[] image = {
+        byte[] image =
+        [
             1,2,3,
             4,5,6,
             7,8,9
-        };
+        ];
 
-        byte[] rotated = {
+        byte[] rotated =
+        [
             1,4,7,
             2,5,8,
             3,6,9
-        };
+        ];
 
         var result = new byte[9];
         ApiUtil.TransposeImage<byte>(3, 3, image, result);
         Assert.Equal(rotated, result);
 
-        image = new byte[] {
+        image =
+        [
             1, 2, 3, 4,
             5, 6, 7, 8,
             9,10,11,12
-        };
+        ];
 
-        rotated = new byte[] {
+        rotated =
+        [
             1, 5,  9,
             2, 6, 10,
             3, 7, 11,
             4, 8, 12
-        };
+        ];
 
         result = new byte[12];
         ApiUtil.TransposeImage<byte>(4, 3, image, result);

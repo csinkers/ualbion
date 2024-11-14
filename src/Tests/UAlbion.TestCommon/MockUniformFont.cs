@@ -11,22 +11,23 @@ public static class MockUniformFont
 {
     public static FontDefinition BuildFontDefinition() => new()
     {
-        Components = new List<FontComponent>
+        Components =
+        [
+            new()
             {
-                new()
-                {
-                    GraphicsId = Base.FontGfx.Regular,
-                    Width = 6,
-                    Height = 8,
-                    Mapping = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\""?!/()#%*&+-=><☺♀♂éâàçêëèïîìôòûùáíóú"
-                }
+                GraphicsId = Base.FontGfx.Regular,
+                Width = 6,
+                Height = 8,
+                Mapping =
+                    @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890äÄöÖüÜß.:,;'$\""?!/()#%*&+-=><☺♀♂éâàçêëèïîìôòûùáíóú"
             }
+        ]
     };
 
     public static Ink BuildInk() =>
         new()
         {
-            PaletteMapping = new[] { 0, 194, 194, 195, 196, 197 },
+            PaletteMapping = [0, 194, 194, 195, 196, 197],
             PaletteLineColor = CommonColor.White,
         };
 

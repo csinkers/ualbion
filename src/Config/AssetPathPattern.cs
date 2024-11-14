@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace UAlbion.Config;
 
 public class AssetPathPattern
 {
-    static readonly object SyncRoot = new();
-    static readonly Dictionary<string, AssetPathPattern> Cache = new();
+    static readonly Lock SyncRoot = new();
+    static readonly Dictionary<string, AssetPathPattern> Cache = [];
     readonly string _pattern;
     readonly Regex _regex;
-    readonly List<Part> _parts = new();
+    readonly List<Part> _parts = [];
 
     enum PartType
     {

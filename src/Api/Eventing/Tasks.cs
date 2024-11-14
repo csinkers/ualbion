@@ -8,8 +8,8 @@ namespace UAlbion.Api.Eventing;
 public static class Tasks
 {
     static int _nextId;
-    static readonly object SyncRoot = new();
-    static readonly List<IAlbionTaskCore> Pending = new(); // Just for debugging
+    static readonly Lock SyncRoot = new();
+    static readonly List<IAlbionTaskCore> Pending = []; // Just for debugging
     static readonly ThreadLocal<IAlbionTaskCore?> CurrentTask = new();
 
     public static IAlbionTaskCore? Current

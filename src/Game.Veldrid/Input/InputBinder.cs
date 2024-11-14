@@ -17,7 +17,7 @@ public class InputBinder : GameServiceComponent<IInputBinder>, IInputBinder
     sealed class BindingSet : Dictionary<InputMode, IDictionary<KeyBinding, string>> { }
 
     readonly BindingSet _bindings = new();
-    readonly HashSet<Key> _pressedKeys = new();
+    readonly HashSet<Key> _pressedKeys = [];
     MapId _mapId = Base.Map.TestMapIskai;
 
     public bool IsAltPressed => _pressedKeys.Contains(Key.AltLeft) || _pressedKeys.Contains(Key.AltRight);

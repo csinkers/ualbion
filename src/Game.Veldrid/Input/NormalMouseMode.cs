@@ -11,7 +11,7 @@ namespace UAlbion.Game.Veldrid.Input;
 
 public class NormalMouseMode : Component
 {
-    readonly List<Selection> _hits = new();
+    readonly List<Selection> _hits = [];
     readonly UiMouseMoveEvent _moveEvent = new(0, 0);
     readonly UiScrollEvent _scrollEvent = new(0);
     readonly UiLeftClickEvent _leftClickEvent = new();

@@ -59,14 +59,14 @@ public class ConversationParticipantLabel : Dialog
     DynamicText GetName(ICharacterSheet sheet, bool isRight) => new(() =>
     {
         var name = sheet.GetName(ReadVar(V.User.Gameplay.Language));
-        return new[] 
-        {
+        return
+        [
             new TextBlock(name)
             {
                 Alignment = isRight ? TextAlignment.Right : TextAlignment.Left,
                 ArrangementFlags = TextArrangementFlags.NoWrap,
                 InkId = Base.Ink.White,
             }
-        };
+        ];
     });
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 
@@ -8,8 +9,8 @@ namespace UAlbion.Game.Assets;
 
 public sealed class AssetLoaderRegistry : ServiceComponent<IAssetLoaderRegistry>, IAssetLoaderRegistry, IDisposable
 {
-    readonly object _syncRoot = new();
-    readonly Dictionary<Type, IAssetLoader> _loaders = new();
+    readonly Lock _syncRoot = new();
+    readonly Dictionary<Type, IAssetLoader> _loaders = [];
 
     public IAssetLoader GetLoader(Type loaderType)
     {

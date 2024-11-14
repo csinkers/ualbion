@@ -43,7 +43,7 @@ public class MouseLookMouseMode : Component
     readonly UiLeftReleaseEvent _uiLeftReleaseEvent = new();
     readonly UiRightClickEvent _uiRightClickEvent = new();
     readonly UiScrollEvent _uiScrollEvent = new(0);
-    readonly List<Selection> _hits = new();
+    readonly List<Selection> _hits = [];
 
     bool _firstEvent;
 

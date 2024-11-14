@@ -7,8 +7,8 @@ namespace UAlbion.Config;
 
 public class AssetIdConfig
 {
-    [JsonInclude] public Dictionary<string, List<AssetType>> Mappings { get; private set; } = new();
-    [JsonInclude] public Dictionary<string, List<string>> Extras { get; private set; } = new();
+    [JsonInclude] public Dictionary<string, List<AssetType>> Mappings { get; private set; } = [];
+    [JsonInclude] public Dictionary<string, List<string>> Extras { get; private set; } = [];
     public static AssetIdConfig Load(string filename, IFileSystem disk, IJsonUtil jsonUtil)
     {
         ArgumentNullException.ThrowIfNull(disk);

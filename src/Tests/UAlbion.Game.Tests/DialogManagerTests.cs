@@ -62,8 +62,8 @@ public class DialogManagerTests
                 id,
                 id.ToString(),
                 2, 2,
-                new byte[] { 0, 1, 2, 3 },
-                new[] { new Region(0, 0, 2, 2, 2, 2, 0) }));
+                [0, 1, 2, 3],
+                [new Region(0, 0, 2, 2, 2, 2, 0)]));
         }
 
         AddDummySprite(Base.CoreGfx.UiBackground);

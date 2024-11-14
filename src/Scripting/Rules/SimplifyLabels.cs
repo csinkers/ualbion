@@ -11,7 +11,7 @@ public static class SimplifyLabels
 
     sealed class LabelCollectionAstVisitor : BaseAstVisitor
     {
-        public Dictionary<string, ICfgNode> Labels { get; } = new();
+        public Dictionary<string, ICfgNode> Labels { get; } = [];
         public override void Visit(Sequence seq)
         {
             List<string> labels = null;
@@ -19,7 +19,7 @@ public static class SimplifyLabels
             {
                 if (statement is Label label)
                 {
-                    labels ??= new List<string>();
+                    labels ??= [];
                     labels.Add(label.Name);
                 }
                 else if (labels != null)

@@ -19,7 +19,7 @@ public class MapRenderable3D : GameComponent
     readonly LabyrinthData _labyrinthData;
     readonly TilemapRequest _properties;
     // readonly IDictionary<int, IList<int>> _tilesByDistance = new Dictionary<int, IList<int>>();
-    readonly HashSet<int> _dirty = new();
+    readonly HashSet<int> _dirty = [];
     IExtrudedTilemap _tilemap;
     // bool _isSorting;
     bool _fullUpdate = true;

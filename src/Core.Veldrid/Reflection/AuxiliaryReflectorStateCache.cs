@@ -8,8 +8,8 @@ public class AuxiliaryReflectorStateCache
     record struct Key(object Parent, ReflectorMetadata Meta, int Index, string Type);
     // ReSharper restore NotAccessedPositionalProperty.Local
 
-    readonly Dictionary<Key, object> _cache1 = new();
-    readonly Dictionary<Key, object> _cache2 = new();
+    readonly Dictionary<Key, object> _cache1 = [];
+    readonly Dictionary<Key, object> _cache2 = [];
     bool _cache1Active = true;
 
     Dictionary<Key, object> Primary => _cache1Active ? _cache1 : _cache2;

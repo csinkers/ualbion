@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading;
 
 namespace UAlbion.Api.Eventing;
 
 public class Container : Component, IContainer
 {
-    readonly object _syncRoot = new();
+    readonly Lock _syncRoot = new();
     public virtual string Name { get; }
     public Container(string name) { Name = name; }
     public Container(string name, params IComponent[] components)

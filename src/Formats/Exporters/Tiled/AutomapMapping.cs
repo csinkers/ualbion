@@ -38,7 +38,7 @@ public static class AutomapMapping
         };
 
         nextObjectId = nextId;
-        return new[] { group };
+        return [group];
     }
 
     static MapObject BuildMarker(int tileWidth, int tileHeight, AutomapInfo marker, byte tile, ref int nextId) =>

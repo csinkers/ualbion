@@ -40,7 +40,7 @@ public static class TriggerMapping
                 {
                     OffsetX = -x - 1,
                     OffsetY = -y - 1,
-                    Points = new List<(int, int)> { (0, 0), (1, 0), (1, 1), (0, 1) }
+                    Points = [(0, 0), (1, 0), (1, 1), (0, 1)]
                 };
                 globalRegions.Add((new ZoneKey(global), polygon));
             }

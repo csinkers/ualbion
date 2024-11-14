@@ -14,7 +14,7 @@ public class AssetFileInfo
         Node = new AssetNode(range.Node);
     }
 
-    public Dictionary<AssetId, AssetInfo> Map { get; } = new();
+    public Dictionary<AssetId, AssetInfo> Map { get; } = [];
 
     public override string ToString() => $"AssetFile: {Node.Filename}{(string.IsNullOrEmpty(Node.Sha256Hash) ? "" : $"#{Node.Sha256Hash}")}";
 }

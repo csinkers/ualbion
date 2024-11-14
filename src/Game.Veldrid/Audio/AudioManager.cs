@@ -25,11 +25,11 @@ public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioMa
     public static readonly AssetIdAssetProperty<WaveLibraryId> WaveLibProperty = new("WaveLib", WaveLibraryId.None, x => x);
 
     readonly bool _standalone;
-    readonly Dictionary<SampleId, AudioBuffer> _sampleCache = new();
-    readonly Dictionary<(SongId, int), AudioBuffer> _waveLibCache = new();
-    readonly List<ActiveSound> _activeSounds = new();
+    readonly Dictionary<SampleId, AudioBuffer> _sampleCache = [];
+    readonly Dictionary<(SongId, int), AudioBuffer> _waveLibCache = [];
+    readonly List<ActiveSound> _activeSounds = [];
     readonly ManualResetEvent _doneEvent = new(false);
-    readonly object _syncRoot = new();
+    readonly Lock _syncRoot = new();
 
     StreamingAudioSource _music;
     AlbionMusicGenerator _musicGenerator;

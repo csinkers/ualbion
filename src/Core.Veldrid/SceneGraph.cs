@@ -38,7 +38,7 @@ public class SceneGraph : ServiceComponent<ISceneGraph>, ISceneGraph
     {
         ArgumentNullException.ThrowIfNull(hits);
 
-        _hitList ??= new List<RayCastHit<IPositioned>>();
+        _hitList ??= [];
         _hitList.Clear();
         _octree.RayCast(new Ray(origin, direction), _hitList, (ray, item, list) =>
         {

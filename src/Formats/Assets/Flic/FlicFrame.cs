@@ -17,7 +17,7 @@ public class FlicFrame : FlicChunk
     }
 
     public override FlicChunkType Type => FlicChunkType.Frame;
-    public IList<FlicChunk> SubChunks { get; } = new List<FlicChunk>();
+    public IList<FlicChunk> SubChunks { get; } = [];
     public ushort Delay { get; private set; }
     public ushort Width { get; private set; } // Overrides, usually 0.
     public ushort Height { get; private set; }

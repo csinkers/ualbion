@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Visual;
@@ -13,8 +14,8 @@ namespace UAlbion.Core.Veldrid;
 
 public sealed class ShaderCache(string shaderCachePath) : Component, IShaderCache
 {
-    readonly object _syncRoot = new();
-    readonly Dictionary<string, CacheEntry> _cache = new();
+    readonly Lock _syncRoot = new();
+    readonly Dictionary<string, CacheEntry> _cache = [];
     IFileSystem _disk;
 
     sealed class CacheEntry(

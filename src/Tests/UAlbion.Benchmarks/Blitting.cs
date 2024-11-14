@@ -18,14 +18,14 @@ namespace UAlbion.Benchmarks
                 Dimensions,
                 Dimensions,
                 Enumerable.Repeat((byte)0, Dimensions * Dimensions).ToArray(),
-                new[] { new Region(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
+                [new Region(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0)]);
 
         static readonly ITexture White = new SimpleTexture<byte>(AssetId.None, 
                 "Black",
                 Dimensions,
                 Dimensions,
                 Enumerable.Repeat((byte)255, Dimensions * Dimensions).ToArray(),
-                new[] { new Region(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
+                [new Region(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0)]);
 
         readonly CompositedTexture _opaqueUniform = new(AssetId.None, "OpaqueUniform", Palette);
         readonly CompositedTexture _opaqueRandom = new(AssetId.None, "OpaqueRandom", Palette);
@@ -42,7 +42,7 @@ namespace UAlbion.Benchmarks
                 Dimensions,
                 Dimensions,
                 randomBuffer,
-                new[] { new Region(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0) });
+                [new Region(Vector2.Zero, Vector2.One * Dimensions, Vector2.One * Dimensions, 0)]);
 
             _opaqueRandom.AddTexture(1, Black, 0, 0, null, false);
             _opaqueRandom.AddTexture(1, random, Dimensions / 4, Dimensions / 4, null, false, Dimensions / 2, Dimensions / 2);

@@ -11,8 +11,8 @@ public delegate string ScriptBuilderFunc(StringCreationFunc createString);
 public abstract class MapBuilder
 {
     protected BaseMapData Map { get; }
-    readonly ListStringSet _mapStrings = new();
-    readonly Dictionary<int, string> _scripts = new();
+    readonly ListStringSet _mapStrings = [];
+    readonly Dictionary<int, string> _scripts = [];
 
     public int AddMapText(string text) => _mapStrings.FindOrAdd(text);
 

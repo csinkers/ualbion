@@ -12,7 +12,7 @@ public class TickerSet : Dictionary<TickerId, byte>
     public static TickerSet Serdes(string _, TickerSet d, ISerializer s)
     {
         ArgumentNullException.ThrowIfNull(s);
-        d ??= new TickerSet();
+        d ??= [];
         if (s.IsReading())
             d.Clear();
 

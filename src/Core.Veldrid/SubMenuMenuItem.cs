@@ -7,7 +7,7 @@ namespace UAlbion.Core.Veldrid;
 
 public class SubMenuMenuItem : IMenuItem
 {
-    readonly List<IMenuItem> _items = new();
+    readonly List<IMenuItem> _items = [];
     public SubMenuMenuItem(string name, string path)
     {
         Name = name;

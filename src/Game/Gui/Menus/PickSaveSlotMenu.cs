@@ -70,7 +70,7 @@ public class PickSaveSlotMenu : ModalDialog
                     .Format(Base.SystemText.MainMenu_EmptyPosition)
                     .GetBlocks().Single();
                 block.Text = $"{x,2}    {block.Text}";
-                return new[] { block };
+                return [block];
             });
 
         var buttons = new List<IUiElement>();

@@ -57,7 +57,7 @@ public class AssetConversionTests : TestWithLogging
         Asset.SerdesFunc<T> serdes,
         Func<T, T> canonicalize = null) where T : class
     {
-        prerequisites ??= Array.Empty<AssetId>();
+        prerequisites ??= [];
         var resultsDir = Path.Combine(_baseDir, "re", "ConversionTests");
 
         var baseAsset = (T)_baseApplier.LoadAsset(id);
@@ -83,7 +83,7 @@ public class AssetConversionTests : TestWithLogging
                    mapping,
                    _disk,
                    JsonUtil,
-                   new[] { BaseAssetMod },
+                   [BaseAssetMod],
                    UnpackedAssetMod))
         {
             if (prerequisites.Length > 0)
@@ -100,20 +100,19 @@ public class AssetConversionTests : TestWithLogging
             id.ToString(),
             baseBytes,
             unpackedBytes,
-            new[]
-            {
+            [
                 (".saveBase.txt", baseNotes),
                 (".saveUnpacked.txt", unpackedNotes),
                 (".Base.json", baseJson),
                 (".Unpacked.json", unpackedJson)
-            });
+            ]);
 
         using (var repacker = new AssetConverter(
                    "ualbion-tests", 
                    mapping,
                    _disk,
                    JsonUtil,
-                   new[] { UnpackedAssetMod },
+                   [UnpackedAssetMod],
                    RepackedAssetMod))
         {
             if (prerequisites.Length > 0)
@@ -130,13 +129,12 @@ public class AssetConversionTests : TestWithLogging
             id.Type.ToString(),
             baseBytes,
             repackedBytes,
-            new[]
-            {
+            [
                 (".saveBase.txt", baseNotes),
                 (".saveRepacked.txt", repackedNotes),
                 (".Base.json", baseJson),
                 (".Repacked.json", repackedJson)
-            });
+            ]);
     }
 
     [Fact]
@@ -353,7 +351,7 @@ public class AssetConversionTests : TestWithLogging
     public void PaletteTest()
     {
         var id = AssetId.From(Palette.Toronto2D);
-        Test<AlbionPalette>(id, new[] { AssetId.From(Palette.Common) }, (x, s, c) => Loaders.PaletteLoader.Serdes(x, s, c));
+        Test<AlbionPalette>(id, [AssetId.From(Palette.Common)], (x, s, c) => Loaders.PaletteLoader.Serdes(x, s, c));
     }
 
     [Fact]
@@ -447,7 +445,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(AutomapTiles.Set1);
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.Common), AssetId.From(Palette.Unknown11) },
+            [AssetId.From(Palette.Common), AssetId.From(Palette.Unknown11)],
             (x, s, c) => Loaders.AmorphousSpriteLoader.Serdes(x, s, c));
     }
 
@@ -456,7 +454,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(CombatBackground.Toronto);
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.TorontoCombat), AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.TorontoCombat), AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
 
@@ -465,7 +463,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(DungeonObject.Krondir);
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
 
@@ -474,7 +472,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(FontGfx.Regular);
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.Common), AssetId.From(FontGfx.Bold) },
+            [AssetId.From(Palette.Common), AssetId.From(FontGfx.Bold)],
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
 
@@ -483,7 +481,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(ItemGfx.ItemSprites);
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
 
@@ -492,7 +490,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(UiBackground.Slab); 
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.SlabLoader.Serdes(x, s, c));
     }
 
@@ -512,7 +510,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(CombatGfx.SplashYellow);
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.PlainsCombat), AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.PlainsCombat), AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.MultiHeaderSpriteLoader.Serdes(x, s, c));
     }
 
@@ -521,7 +519,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(DungeonBackground.EarlyGameL);
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, s, c));
     }
 
@@ -531,7 +529,7 @@ public class AssetConversionTests : TestWithLogging
         var id = AssetId.From(Floor.Water);
 
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
 
@@ -540,7 +538,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(PartyInventoryGfx.Tom);
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.Inventory), AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.Inventory), AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, s, c));
     }
 
@@ -549,7 +547,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(NpcLargeGfx.Christine);
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.Toronto2D), AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.Toronto2D), AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, s, c));
     }
 
@@ -558,7 +556,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(PartyLargeGfx.Tom);
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.IskaiIndoorDark), AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.IskaiIndoorDark), AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, s, c));
     }
 
@@ -567,7 +565,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(MonsterGfx.Krondir1);
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.DungeonCombat), AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.DungeonCombat), AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.MultiHeaderSpriteLoader.Serdes(x, s, c));
     }
 
@@ -577,7 +575,7 @@ public class AssetConversionTests : TestWithLogging
         var id = AssetId.From(WallOverlay.JiriWindow);
 
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.JirinaarDay), AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
 
@@ -594,7 +592,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(Portrait.Tom);
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
 
@@ -603,7 +601,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(NpcSmallGfx.Krondir);
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.FirstIslandDay), AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.FirstIslandDay), AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, s, c));
     }
 
@@ -612,7 +610,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(PartySmallGfx.Tom);
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.FirstIslandDay), AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.FirstIslandDay), AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.SingleHeaderSpriteLoader.Serdes(x, s, c));
     }
 
@@ -621,7 +619,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(TacticalGfx.Tom);
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
 
@@ -630,7 +628,7 @@ public class AssetConversionTests : TestWithLogging
     {
         var id = AssetId.From(Wall.TorontoPanelling);
         Test<IReadOnlyTexture<byte>>(id,
-            new[] { AssetId.From(Palette.Toronto3D), AssetId.From(Palette.Common) },
+            [AssetId.From(Palette.Toronto3D), AssetId.From(Palette.Common)],
             (x, s, c) => Loaders.FixedSizeSpriteLoader.Serdes(x, s, c));
     }
     // */

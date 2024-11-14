@@ -1,8 +1,10 @@
-﻿namespace UAlbion.Game;
+﻿using System.Threading;
+
+namespace UAlbion.Game;
 
 public static class AlbionRandom
 {
-    static readonly object SyncRoot = new();
+    static readonly Lock SyncRoot = new();
     static uint _seed = 1;
 
     public static ushort Next()

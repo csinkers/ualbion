@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 
@@ -8,7 +9,7 @@ namespace UAlbion.Game;
 public class LogHistory : ServiceComponent<ILogHistory>, ILogHistory
 {
     const int MaxHistory = 1000;
-    readonly object _syncRoot = new();
+    readonly Lock _syncRoot = new();
     readonly Queue<LogEventArgs> _history = new();
 
     public LogHistory()

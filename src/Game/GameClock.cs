@@ -10,7 +10,7 @@ namespace UAlbion.Game;
 
 public class GameClock : ServiceComponent<IClock>, IClock
 {
-    readonly List<(AlbionTaskCore Task, float ExpiryTimeSeconds)> _activeTimers = new();
+    readonly List<(AlbionTaskCore Task, float ExpiryTimeSeconds)> _activeTimers = [];
     readonly SetTimeEvent _setTimeEvent = new();
     readonly CycleCacheEvent _cycleCacheEvent = new();
     readonly FastClockEvent _fastClockEvent = new(1);

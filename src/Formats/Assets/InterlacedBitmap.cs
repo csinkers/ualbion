@@ -54,7 +54,7 @@ public sealed class InterlacedBitmap
                     case IffChunkType.Hotspot: img.SerdesHotspot(s, chunk.Length); break;
 
                     case IffChunkType.ColorRanges:
-                        img.ColorRanges ??= new List<ColorRange>();
+                        img.ColorRanges ??= [];
                         img.ColorRanges.Add(ColorRange.Serdes(img.ColorRanges.Count, null, s));
                         break;
 

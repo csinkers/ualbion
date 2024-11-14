@@ -33,7 +33,7 @@ public class TextPromptDialog : ModalDialog
         // Cursor: 5x8, white, period ~280ms
 
         _block = new TextBlock("");
-        _textSource = new DynamicText( () => new[] { new TextBlock(Value) });
+        _textSource = new DynamicText( () => [new TextBlock(Value)]);
         _cursor = new UiRectangle(CommonColor.Transparent)
         {
             DrawSize = new Vector2(5, 8),

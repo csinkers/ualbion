@@ -72,7 +72,7 @@ public class Video : GameComponent
             _id,
             $"V:{_id}",
             flic.Width, flic.Height,
-            new[] { new Region(Vector2.Zero, size, size, 0) });
+            [new Region(Vector2.Zero, size, size, 0)]);
 
         _texture = texture;
         _dirtyEvent = new TextureDirtyEvent(_texture);

@@ -19,11 +19,11 @@ public static class MapImport
         bool is3d = map.Orientation == "isometric";
         var eventLayout = AlbionCompiler.Compile(script);
 
-        List<TriggerInfo> triggers = new();
-        List<MapNpc> npcs = new();
-        List<MapEventZone> zones = new();
-        List<AutomapInfo> markers = new();
-        List<byte> markerTiles = new();
+        List<TriggerInfo> triggers = [];
+        List<MapNpc> npcs = [];
+        List<MapEventZone> zones = [];
+        List<AutomapInfo> markers = [];
+        List<byte> markerTiles = [];
         ObjectGroupMapping.LoadObjectGroups(
             assetId,
             map,

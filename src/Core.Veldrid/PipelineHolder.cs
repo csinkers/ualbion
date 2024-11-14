@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid.Events;
@@ -11,7 +12,7 @@ namespace UAlbion.Core.Veldrid;
 
 public class PipelineHolder : Component, IPipelineHolder
 {
-    readonly object _syncRoot = new();
+    readonly Lock _syncRoot = new();
     readonly string _vertexShaderName;
     readonly string _fragmentShaderName;
     readonly VertexLayoutDescription[] _vertexLayouts;

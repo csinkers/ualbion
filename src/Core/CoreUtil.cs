@@ -48,12 +48,13 @@ public static class CoreUtil
             texture.Height, texture.Width,
             texture.ArrayLayers,
             rotatedPixels,
-            new[] { new Region(
+            [
+                new Region(
                 Vector2.Zero,
                 new Vector2(texture.Height, texture.Width),
                 new Vector2(texture.Height, texture.Width),
                 0)
-            });
+            ]);
     }
 
     public static uint UpdateFlag(uint flags, FlagOperation operation, uint flag)

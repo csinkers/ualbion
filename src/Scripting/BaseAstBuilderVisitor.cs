@@ -139,7 +139,7 @@ public abstract class BaseAstBuilderVisitor : IAstBuilderVisitor
                 if (Result == null)
                     continue;
 
-                result = new List<ICfgNode>();
+                result = [];
                 for (int i = 0; i < index; i++)
                     result.Add(sequence.Statements[i]);
             }

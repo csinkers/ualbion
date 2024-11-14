@@ -16,7 +16,7 @@ public class EditorUi : Component
     bool _showInspector;
     bool _showAssets;
 
-    readonly Dictionary<AssetType, AssetId[]> _allKeys = new();
+    readonly Dictionary<AssetType, AssetId[]> _allKeys = [];
 
     public EditorUi()
     {

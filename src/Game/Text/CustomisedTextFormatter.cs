@@ -7,7 +7,7 @@ namespace UAlbion.Game.Text;
 public class CustomisedTextFormatter : ITextFormatter
 {
     readonly TextFormatter _formatter;
-    readonly List<(Token, object)> _implicitTokens = new();
+    readonly List<(Token, object)> _implicitTokens = [];
     BlockId? _blockFilter;
 
     public CustomisedTextFormatter(TextFormatter formatter) => _formatter = formatter;

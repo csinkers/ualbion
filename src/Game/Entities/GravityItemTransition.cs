@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using System.Threading;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
@@ -12,7 +13,7 @@ namespace UAlbion.Game.Entities;
 public class GravityItemTransition : Component
 {
     static readonly Random Random = new();
-    static readonly object SyncRoot = new();
+    static readonly Lock SyncRoot = new();
 
     readonly Action _continuation;
     readonly Sprite _sprite;

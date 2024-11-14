@@ -17,7 +17,7 @@ public abstract class RenderableBatch<TKey, TInstance> : Component, IRenderable,
     protected const double ShrinkFactor = 0.3;
 
     readonly object _syncRoot = new();
-    readonly List<BatchLease<TKey, TInstance>> _leases = new();
+    readonly List<BatchLease<TKey, TInstance>> _leases = [];
 
     protected RenderableBatch(TKey key)
     {

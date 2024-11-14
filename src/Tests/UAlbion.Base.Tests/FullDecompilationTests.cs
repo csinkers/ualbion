@@ -512,11 +512,11 @@ public class FullDecompilationTests : IDisposable
             try
             {
                 var decompiledGraph = Decompile(graph, steps);
-                var result = formatter.FormatGraphsAsBlocks(new[] { decompiledGraph }, 0);
+                var result = formatter.FormatGraphsAsBlocks([decompiledGraph], 0);
                 scripts[index] = result.Script;
 
                 var roundTripLayout = AlbionCompiler.Compile(scripts[index], steps);
-                var expectedLayout = EventLayout.Build(new[] { graph });
+                var expectedLayout = EventLayout.Build([graph]);
 
                 if (!TestUtil.CompareLayout(roundTripLayout, expectedLayout, out var error))
                     errors[index] += $"[{index}: {error}] ";

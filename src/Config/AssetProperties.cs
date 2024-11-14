@@ -6,8 +6,8 @@ namespace UAlbion.Config;
 
 public class AssetProperties
 {
-    readonly Dictionary<Type, Dictionary<string, IAssetProperty>> _properties = new(); // loader/container specific properties
-    readonly Dictionary<string, IAssetProperty> _globalProperties = new();
+    readonly Dictionary<Type, Dictionary<string, IAssetProperty>> _properties = []; // loader/container specific properties
+    readonly Dictionary<string, IAssetProperty> _globalProperties = [];
     readonly AssetProperties _parent;
 
     public AssetProperties(AssetProperties parent) 
@@ -67,7 +67,7 @@ public class AssetProperties
         _properties.TryGetValue(type, out var dict);
         if (dict == null)
         {
-            dict = new Dictionary<string, IAssetProperty>();
+            dict = [];
             _properties[type] = dict;
         }
 

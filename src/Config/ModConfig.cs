@@ -19,8 +19,8 @@ public class ModConfig
     public string TypeConfig { get; set; }
     public string InheritAssetConfigFrom { get; set; }
     public string InheritTypeConfigFrom { get; set; }
-    [JsonInclude] public List<string> Dependencies { get; private set; } = new();
-    [JsonInclude] public Dictionary<string, string> SymLinks { get; private set; } = new();
+    [JsonInclude] public List<string> Dependencies { get; private set; } = [];
+    [JsonInclude] public Dictionary<string, string> SymLinks { get; private set; } = [];
 
     public static ModConfig Load(string configPath, IFileSystem disk, IJsonUtil jsonUtil)
     {

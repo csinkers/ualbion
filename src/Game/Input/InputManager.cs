@@ -8,8 +8,8 @@ namespace UAlbion.Game.Input;
 
 public class InputManager : ServiceComponent<IInputManager>, IInputManager
 {
-    readonly Dictionary<InputMode, IComponent> _inputModes = new();
-    readonly Dictionary<MouseMode, IComponent> _mouseModes = new();
+    readonly Dictionary<InputMode, IComponent> _inputModes = [];
+    readonly Dictionary<MouseMode, IComponent> _mouseModes = [];
     readonly Stack<MouseMode> _mouseModeStack = new();
     readonly Stack<InputMode> _inputModeStack = new();
 

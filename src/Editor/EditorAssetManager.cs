@@ -8,8 +8,8 @@ public class EditorAssetManager : ServiceComponent<IEditorAssetManager>, IEditor
 {
     const int MaxUndo = 100;
     int _nextId;
-    readonly Dictionary<int, EditorAsset> _assetsById = new();
-    readonly Dictionary<object, int> _idsByAsset = new();
+    readonly Dictionary<int, EditorAsset> _assetsById = [];
+    readonly Dictionary<object, int> _idsByAsset = [];
     readonly LinkedList<IEditorEvent> _undoStack = new();
     // Cross references: IDictionary<AssetId, IList<(object, string)>> - requires loading total state.
 

@@ -9,8 +9,8 @@ namespace UAlbion.Api.Visual;
 public class LazyTexture<T> : IReadOnlyTexture<T> where T : unmanaged
 {
     public delegate ReadOnlyImageBuffer<T> RegionAccessor(LazyTexture<T> texture, Region region, object context);
-    readonly List<Region> _regions = new();
-    readonly List<object> _regionContexts = new();
+    readonly List<Region> _regions = [];
+    readonly List<object> _regionContexts = [];
     readonly RegionAccessor _regionAccessor;
 
     public LazyTexture(RegionAccessor regionAccessor, IAssetId id, int width, int height, int layers = 1)

@@ -15,14 +15,14 @@ public class PlayerMovementTests
     const int MapWidth = 5;
 
     static readonly int[] Map1 =
-    {
+    [
         // 0  1  2  3  4
         0, 0, 8, 8, 0, // 0
         0, 0, 0, 0, 0, // 1
         8, 0, 0, 8, 0, // 2
         8, 0, 0, 0, 0, // 3
-        0, 0, 0, 0, 0, // 4
-    };
+        0, 0, 0, 0, 0 // 4
+    ];
 
     /// <summary>
     /// Map: . = empty tile, 0-f = collision state for tile, @ = starting position

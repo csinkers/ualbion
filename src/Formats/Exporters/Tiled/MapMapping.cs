@@ -47,8 +47,10 @@ public static class MapMapping
     {
         ArgumentNullException.ThrowIfNull(map);
 
-        var props = new List<TiledProperty>();
-        props.Add(new(Prop.Palette, map.PaletteId.ToString()));
+        var props = new List<TiledProperty>
+        {
+            new(Prop.Palette, map.PaletteId.ToString())
+        };
 
         if (map.SongId != SongId.None) props.Add(new(Prop.Song, map.SongId.ToString()));
         if (map.CombatBackgroundId != CombatBackgroundId.None)

@@ -16,7 +16,7 @@ public class MonsterData
     public short Unk152 { get; set; } // Some sort of offset? Sometimes negative.
     public short WidthPercentage { get; set; }
     public short HeightPercentage { get; set; }
-    public Dictionary<CombatAnimationId, int[]> Animations { get; set; } = new(); // Needs a setter for JSON initialisation
+    public Dictionary<CombatAnimationId, int[]> Animations { get; set; } = []; // Needs a setter for JSON initialisation
 
     // Hardcoded offset of 12. This is pretty nasty, but it's how it was done in the original.
     // TODO: Make this data driven if modding ever requires it.

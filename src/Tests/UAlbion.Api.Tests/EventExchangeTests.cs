@@ -9,7 +9,7 @@ public class EventExchangeTests
 {
     class TestComponent : IComponent
     {
-        public List<IEvent> ReceivedEvents { get; } = new();
+        public List<IEvent> ReceivedEvents { get; } = [];
 
         public void Attach(EventExchange exchange) { }
         public void Remove() { }

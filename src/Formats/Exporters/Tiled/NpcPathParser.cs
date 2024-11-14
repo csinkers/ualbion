@@ -7,7 +7,7 @@ namespace UAlbion.Formats.Exporters.Tiled;
 public class NpcPathParser // Functionality needs to line up with NpcPathBuilder.
 {
     record struct Waypoint(int Id, int X, int Y, int Time, int? Next);
-    readonly Dictionary<int, Waypoint> _waypoints = new();
+    readonly Dictionary<int, Waypoint> _waypoints = [];
     public NpcPathParser(IEnumerable<MapObject> objects, int tileWidth, int tileHeight)
     {
         ArgumentNullException.ThrowIfNull(objects);

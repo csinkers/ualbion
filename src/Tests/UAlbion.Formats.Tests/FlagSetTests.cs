@@ -42,16 +42,16 @@ public class SimpleFlagSetTests
                 Assert.Equal(values.Contains(i), set[i]);
         }
 
-        Test(new[] { 0 });
-        Test(new[] { 1 });
-        Test(new[] { 2 });
-        Test(new[] { 3 });
-        Test(new[] { 4 });
-        Test(new[] { 5 });
-        Test(new[] { 6 });
-        Test(new[] { 7 });
-        Test(new[] { 0, 8, 16, 24, 32, 40, 48, 56 });
-        Test(new[] { 63 });
+        Test([0]);
+        Test([1]);
+        Test([2]);
+        Test([3]);
+        Test([4]);
+        Test([5]);
+        Test([6]);
+        Test([7]);
+        Test([0, 8, 16, 24, 32, 40, 48, 56]);
+        Test([63]);
     }
 
     [Fact]

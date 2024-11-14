@@ -7,7 +7,7 @@ namespace UAlbion.Formats.Tests;
 
 public class NpcPathBuilderTests
 {
-    static readonly NpcWaypoint[] TestWaypoints1 = ToWaypoints(new[] {
+    static readonly NpcWaypoint[] TestWaypoints1 = ToWaypoints([
         (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),
         (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),
         (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),
@@ -32,7 +32,7 @@ public class NpcPathBuilderTests
         (63, 41),  (62, 41),  (62, 40),  (62, 39),  (62, 38),  (62, 37),  (62, 36),  (62, 35),  (62, 34),  (62, 33),  (62, 32),  (63, 32),  (64, 32),  (65, 32),  (66, 32),  (67, 32),  (67, 31),  (67, 30),  (67, 29),  (67, 28),  (67, 27),  (68, 27),  (68, 27),  (68, 27),  (68, 27),  (67, 27),  (67, 26),  (67, 25),  (67, 25),  (67, 25),  (67, 25),  (67, 25),  (67, 25),  (67, 25),  (67, 25),  (67, 25),  (67, 25),  (67, 25),  (67, 26),  (66, 26),  (65, 26),  (64, 26),  (64, 26),  (64, 26),  (64, 26),  (65, 26),  (66, 26),  (67, 26),
         (68, 26),  (68, 27),  (69, 27),  (70, 27),  (71, 27),  (71, 27),  (71, 27),  (71, 27),  (71, 27),  (71, 27),  (70, 27),  (71, 27),  (71, 27),  (70, 27),  (69, 27),  (68, 27),  (67, 27),  (67, 28),  (67, 29),  (67, 30),  (67, 31),  (67, 32),  (66, 32),  (65, 32),  (64, 32),  (63, 32),  (62, 32),  (61, 32),  (60, 32),  (60, 31),  (60, 30),  (60, 29),  (59, 29),  (59, 30),  (58, 30),  (57, 30),  (56, 30),  (55, 30),  (55, 30),  (55, 30),  (55, 30),  (56, 30),  (57, 30),  (57, 29),  (57, 28),  (58, 28),  (59, 28),  (60, 28),
         (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28),  (60, 28)
-    });
+    ]);
 
     const string JsonWaypoints = @"[
     ""(60, 55, 191)"", ""(60, 56)"", ""(60, 57)"", ""(60, 58)"", ""(60, 59)"", ""(61, 59)"", ""(62, 59)"", ""(63, 59)"", ""(64, 59)"", ""(65, 59)"",
@@ -194,7 +194,7 @@ public class NpcPathBuilderTests
     [Fact]
     public void SinglePoint()
     {
-        var path = ToWaypoints(new[] { (0, 0) });
+        var path = ToWaypoints([(0, 0)]);
         var waypoints = NpcPathBuilder.IdentifyWaypoints(path).ToList();
         Assert.NotNull(waypoints);
         Assert.Collection(waypoints, i => Assert.Equal((0, true), i));
@@ -209,12 +209,11 @@ public class NpcPathBuilderTests
     [Fact]
     public void Waiting()
     {
-        var path = ToWaypoints(new[]
-        {
+        var path = ToWaypoints([
             (0, 0), (0, 0), (0, 0), (0, 0), (0, 0),
             (0, 0), (0, 0), (0, 0), (0, 0), (0, 0),
             (0, 0)
-        });
+        ]);
 
         var waypoints = NpcPathBuilder.IdentifyWaypoints(path).ToList();
         Assert.NotNull(waypoints);
@@ -235,10 +234,9 @@ public class NpcPathBuilderTests
     [Fact]
     public void Horizontal()
     {
-        var path = ToWaypoints(new[]
-        {
+        var path = ToWaypoints([
             (0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0)
-        });
+        ]);
 
         var waypoints = NpcPathBuilder.IdentifyWaypoints(path).ToList();
         Assert.NotNull(waypoints);
@@ -259,10 +257,9 @@ public class NpcPathBuilderTests
     [Fact]
     public void Corner()
     {
-        var path = ToWaypoints(new[]
-        {
+        var path = ToWaypoints([
             (0, 0), (1, 0), (2, 0), (3, 0), (3, 1), (3, 2), (3, 3)
-        });
+        ]);
 
         var waypoints = NpcPathBuilder.IdentifyWaypoints(path).ToList();
         Assert.NotNull(waypoints);
@@ -285,8 +282,7 @@ public class NpcPathBuilderTests
     [Fact]
     public void CornerWithWait()
     {
-        var path = ToWaypoints(new[]
-        {
+        var path = ToWaypoints([
             (0, 0), // 0*
             (1, 0), // 1
             (2, 0), // 2
@@ -297,7 +293,7 @@ public class NpcPathBuilderTests
             (3, 1), // 7
             (3, 2), // 8
             (3, 3)  // 9*
-        });
+        ]);
 
         var waypoints = NpcPathBuilder.IdentifyWaypoints(path).ToList();
         Assert.NotNull(waypoints);
@@ -321,10 +317,9 @@ public class NpcPathBuilderTests
     [Fact]
     public void Zigzag()
     {
-        var path = ToWaypoints(new[]
-        {
+        var path = ToWaypoints([
             (0, 0), (1, 0), (1, 1), (2, 1), (2, 2), (3, 2), (3, 3)
-        });
+        ]);
 
         var waypoints = NpcPathBuilder.IdentifyWaypoints(path).ToList();
         Assert.NotNull(waypoints);
@@ -355,12 +350,11 @@ public class NpcPathBuilderTests
     [Fact]
     public void DiscontinuityTest()
     {
-        var path = ToWaypoints(new[]
-        {
+        var path = ToWaypoints([
             (70, 54), (69, 54), (68, 54), (67, 54), (66, 54),
             // (66,55) missing
-            (66, 56), (66, 57), (66, 58),
-        });
+            (66, 56), (66, 57), (66, 58)
+        ]);
 
         RoundTrip(path);
     }
@@ -368,23 +362,21 @@ public class NpcPathBuilderTests
     [Fact]
     public void DiscontinuityTest2()
     {
-        var path = ToWaypoints(new[]
-        {
+        var path = ToWaypoints([
             (117, 56),
             (117, 56),
             (119, 56),
             (119, 57),
             (119, 57),
             (119, 57)
-        });
+        ]);
         RoundTrip(path);
     }
 
     [Fact]
     public void DiscontinuityTest3()
     {
-        var path = ToWaypoints(new[]
-        {
+        var path = ToWaypoints([
             (165, 29), // 0 X
             (164, 29),
             (163, 29),
@@ -402,8 +394,8 @@ public class NpcPathBuilderTests
             (150, 30),
             (149, 30),
             (148, 30),
-            (147, 30), // 17 X
-        });
+            (147, 30) // 17 X
+        ]);
 
         var waypoints = NpcPathBuilder.IdentifyWaypoints(path).ToList();
         Assert.NotNull(waypoints);

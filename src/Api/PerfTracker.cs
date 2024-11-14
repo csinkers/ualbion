@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using static System.FormattableString;
 
 namespace UAlbion.Api;
@@ -35,10 +36,10 @@ public static class PerfTracker
     }
 
     static readonly Stopwatch StartupStopwatch = Stopwatch.StartNew();
-    static readonly Dictionary<string, Stats> FrameTimes = new();
-    static readonly Dictionary<string, int> FrameCounters = new();
-    static readonly List<KeyValuePair<string, int>> CountersTemp = new();
-    static readonly object SyncRoot = new();
+    static readonly Dictionary<string, Stats> FrameTimes = [];
+    static readonly Dictionary<string, int> FrameCounters = [];
+    static readonly List<KeyValuePair<string, int>> CountersTemp = [];
+    static readonly Lock SyncRoot = new();
     static int _frameCount;
 
     public static bool IsTracing { get; set; }

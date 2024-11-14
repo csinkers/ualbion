@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game;
 
 public static class NightPalettes // TODO: Load from config / asset instead
 {
-    static readonly object SyncRoot = new();
-    static readonly Dictionary<PaletteId, PaletteId> Mapping = new();
+    static readonly Lock SyncRoot = new();
+    static readonly Dictionary<PaletteId, PaletteId> Mapping = [];
 
     public static bool TryGetValue(PaletteId dayPaletteId, out PaletteId nightPaletteId)
     {

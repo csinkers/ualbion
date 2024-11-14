@@ -15,13 +15,13 @@ public class TypeConfigLoader
 #pragma warning disable CA1812 // 'AssetConfigLoader.RawTypeConfig' is an internal class that is apparently never instantiated. If so, remove the code from the assembly. If this class is intended to contain only static members, make it 'static' (Module in Visual Basic).
     sealed class RawTypeConfig
     {
-        [JsonInclude, JsonPropertyName("Languages")] public Dictionary<string, LanguageConfig> Languages { get; private set; } = new();
-        [JsonInclude, JsonPropertyName("IdTypes")] public Dictionary<string, AssetTypeInfo> IdTypes { get; private set; } = new();
-        [JsonInclude, JsonPropertyName("Containers")] public Dictionary<string, string> Containers { get; private set; } = new();
-        [JsonInclude, JsonPropertyName("Loaders")] public Dictionary<string, string> Loaders { get; private set; } = new();
-        [JsonInclude, JsonPropertyName("PostProcessors")] public Dictionary<string, string> PostProcessors { get; private set; } = new();
-        [JsonInclude, JsonPropertyName("GlobalPropertyTypes")] public List<string> GlobalPropertyTypes { get; private set; } = new();
-        [JsonInclude, JsonPropertyName("VarTypes")] public List<string> VarTypes { get; private set; } = new();
+        [JsonInclude, JsonPropertyName("Languages")] public Dictionary<string, LanguageConfig> Languages { get; private set; } = [];
+        [JsonInclude, JsonPropertyName("IdTypes")] public Dictionary<string, AssetTypeInfo> IdTypes { get; private set; } = [];
+        [JsonInclude, JsonPropertyName("Containers")] public Dictionary<string, string> Containers { get; private set; } = [];
+        [JsonInclude, JsonPropertyName("Loaders")] public Dictionary<string, string> Loaders { get; private set; } = [];
+        [JsonInclude, JsonPropertyName("PostProcessors")] public Dictionary<string, string> PostProcessors { get; private set; } = [];
+        [JsonInclude, JsonPropertyName("GlobalPropertyTypes")] public List<string> GlobalPropertyTypes { get; private set; } = [];
+        [JsonInclude, JsonPropertyName("VarTypes")] public List<string> VarTypes { get; private set; } = [];
     }
 #pragma warning restore CA1812 // 'AssetConfigLoader.RawTypeConfig' is an internal class that is apparently never instantiated. If so, remove the code from the assembly. If this class is intended to contain only static members, make it 'static' (Module in Visual Basic).
 

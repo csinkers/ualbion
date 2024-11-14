@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 
@@ -11,9 +12,9 @@ public class BatchManager<TKey, TInstance> : ServiceComponent<IBatchManager<TKey
 {
     public delegate RenderableBatch<TKey, TInstance> BatchFactoryFunc(TKey key, ICoreFactory factory);
     readonly BatchFactoryFunc _factory;
-    readonly object _syncRoot = new();
-    readonly Dictionary<TKey, RenderableBatch<TKey, TInstance>> _batchLookup = new();
-    readonly List<RenderableBatch<TKey, TInstance>> _batchList = new();
+    readonly Lock _syncRoot = new();
+    readonly Dictionary<TKey, RenderableBatch<TKey, TInstance>> _batchLookup = [];
+    readonly List<RenderableBatch<TKey, TInstance>> _batchList = [];
     float _lastCleanup;
     float _totalTime;
 

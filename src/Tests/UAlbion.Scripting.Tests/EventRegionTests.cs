@@ -64,7 +64,7 @@ public class EventRegionTests
     {
         Test(@"0=>1: s 0
 1=>2: s 1
-2=>!: s 2", new[] { "Chain0:, s 0, s 1, s 2" }, "0");
+2=>!: s 2", ["Chain0:, s 0, s 1, s 2"], "0");
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class EventRegionTests
     {
         Test(@"!0?1:2: b 0
 1=>2: s 1
-2=>!: s 2", new[] { "Chain0:, if (b 0) { s 1 }, s 2" }, "0");
+2=>!: s 2", ["Chain0:, if (b 0) { s 1 }, s 2"], "0");
     }
 
     [Fact]
@@ -83,11 +83,10 @@ public class EventRegionTests
 2=>!: s 2
 3=>4: s 3
 4=>5: s 4
-5=>!: s 5", new[]
-        {
+5=>!: s 5", [
             "Chain0:, s 0, s 1, s 2",
-            "Chain1:, s 3, s 4, s 5",
-        }, "0 3");
+            "Chain1:, s 3, s 4, s 5"
+        ], "0 3");
     }
 
     [Fact]
@@ -98,11 +97,10 @@ public class EventRegionTests
 2=>!: s 2
 3=>4: s 3
 4=>5: s 4
-5=>!: s 5", new[]
-        {
+5=>!: s 5", [
             "Chain0:, s 0, s 1, s 2",
-            "Event3:, s 3, s 4, s 5",
-        }, "0", "3");
+            "Event3:, s 3, s 4, s 5"
+        ], "0", "3");
     }
 
     [Fact]
@@ -113,8 +111,7 @@ public class EventRegionTests
 2=>3: s 2
 3=>4: s 3
 4=>5: s 4
-5=>!: s 5", new[]
-        {
+5=>!: s 5", [
             @"Chain0:
 s 0
 s 1
@@ -126,7 +123,8 @@ s 5",
             @"Chain1:
 s 3
 s 4
-s 5" }, "0 3");
+s 5"
+        ], "0 3");
     }
 
     [Fact]
@@ -137,8 +135,7 @@ s 5" }, "0 3");
 2=>4: s 2
 3=>4: s 3
 4=>5: s 4
-5=>!: s 5", new[]
-        {
+5=>!: s 5", [
             @"Chain0:
 s 0
 s 1
@@ -149,6 +146,7 @@ s 5",
             @"Chain1:
 s 3
 s 4
-s 5", }, "0 3");
+s 5"
+        ], "0 3");
     }
 }

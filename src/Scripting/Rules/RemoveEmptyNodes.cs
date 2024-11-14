@@ -24,7 +24,7 @@ public static class RemoveEmptyNodes
                 {
                     if (result == null)
                     {
-                        result = new List<ICfgNode>();
+                        result = [];
                         for (int i = 0; i < index; i++)
                             result.Add(sequence.Statements[i]);
                     }
@@ -38,7 +38,7 @@ public static class RemoveEmptyNodes
                     if (Result == null)
                         continue;
 
-                    result = new List<ICfgNode>();
+                    result = [];
                     for (int i = 0; i < index; i++)
                         result.Add(sequence.Statements[i]);
                 }

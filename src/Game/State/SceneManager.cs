@@ -12,7 +12,7 @@ namespace UAlbion.Game.State;
 
 public class SceneManager : Container, ISceneManager
 {
-    readonly Dictionary<SceneId, IScene> _scenes = new();
+    readonly Dictionary<SceneId, IScene> _scenes = [];
 
     public SceneManager() : base("SceneManager")
     {

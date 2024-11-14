@@ -125,7 +125,7 @@ public class MapTests
     public void RoundTrip3DLayers()
     {
         int nextLayerId = 0;
-        var map = new MapData3D(MapId.None, PaletteId.None, LabyrinthId.None, 16, 16, new List<EventNode>(), new List<ushort>(), new List<MapNpc>(), new List<MapEventZone>());
+        var map = new MapData3D(MapId.None, PaletteId.None, LabyrinthId.None, 16, 16, [], [], new List<MapNpc>(), []);
         for (int i = 0; i < 256; i++)
         {
             map.Floors[i] = (byte)i;
@@ -134,7 +134,7 @@ public class MapTests
         }
 
         var layers = LayerMapping3D.BuildLayers(map, ref nextLayerId);
-        var reloaded = new MapData3D(MapId.None, PaletteId.None, LabyrinthId.None, 16, 16, new List<EventNode>(), new List<ushort>(), new List<MapNpc>(), new List<MapEventZone>());
+        var reloaded = new MapData3D(MapId.None, PaletteId.None, LabyrinthId.None, 16, 16, [], [], new List<MapNpc>(), []);
         LayerMapping3D.ReadLayers(reloaded, layers);
 
         Assert.True(map.Floors.SequenceEqual(reloaded.Floors));

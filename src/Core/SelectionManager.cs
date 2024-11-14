@@ -12,7 +12,7 @@ public class SelectionManager : ServiceComponent<ISelectionManager>, ISelectionM
     readonly BlurEvent _blurEvent = new();
     readonly HoverEvent _hoverEvent = new();
     readonly ScreenCoordinateSelectEvent _selectEvent = new();
-    readonly DoubleBuffered<List<object>> _selection = new(() => new List<object>());
+    readonly DoubleBuffered<List<object>> _selection = new(() => []);
 
     readonly Func<Selection, IComponent> _hoverSelectorDelegate;
     readonly Func<object, IComponent> _blurSelectorDelegate;

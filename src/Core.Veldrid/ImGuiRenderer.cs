@@ -26,9 +26,9 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     readonly Vector2 _scaleFactor = Vector2.One;
 
     // Image trackers
-    readonly Dictionary<TextureView, ResourceSetInfo> _setsByView = new();
-    readonly Dictionary<Texture, TextureView> _autoViewsByTexture = new();
-    readonly Dictionary<IntPtr, ResourceSetInfo> _viewsById = new();
+    readonly Dictionary<TextureView, ResourceSetInfo> _setsByView = [];
+    readonly Dictionary<Texture, TextureView> _autoViewsByTexture = [];
+    readonly Dictionary<IntPtr, ResourceSetInfo> _viewsById = [];
     readonly List<IDisposable> _ownedResources = [];
     readonly ImGuiPreRenderEvent _preRenderEvent = new();
     int _lastAssignedId = 100;

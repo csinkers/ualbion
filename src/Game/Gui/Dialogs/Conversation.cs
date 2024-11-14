@@ -25,7 +25,7 @@ public class Conversation : GameComponent
 
     readonly PartyMemberId _partyMemberId;
     readonly ICharacterSheet _npc;
-    readonly Dictionary<WordId, WordStatus> _topics = new();
+    readonly Dictionary<WordId, WordStatus> _topics = [];
 
     ITextFormatter _tf;
     ConversationTextWindow _textWindow;
@@ -58,7 +58,7 @@ public class Conversation : GameComponent
         AttachChild(new ConversationParticipantLabel(_npc, true));
 
         _textWindow = dialogs.AddDialog(depth => new ConversationTextWindow(depth));
-        _optionsWindow = dialogs.AddDialog(depth => new ConversationOptionsWindow(depth) { IsActive = false});
+        _optionsWindow = dialogs.AddDialog(depth => new ConversationOptionsWindow(depth) { IsActive = false });
         _topicsWindow = dialogs.AddDialog(depth => new ConversationTopicWindow(depth) { IsActive = false });
     }
 
@@ -75,7 +75,7 @@ public class Conversation : GameComponent
         await TriggerAction(ActionType.StartDialogue, 0, AssetId.None);
         var standardOptions = BuildStandardOptions();
 
-        while(!_done)
+        while (!_done)
         {
             if (_optionsWindow.IsActive || !IsSubscribed)
                 return;
@@ -121,8 +121,10 @@ public class Conversation : GameComponent
                     {
                         var lookup = Resolve<IWordLookup>();
                         foreach (var homonym in lookup.GetHomonyms(wordId))
+                        {
                             if (await TriggerWordAction(homonym))
                                 break;
+                        }
                     }
                     break;
                 }
@@ -143,15 +145,14 @@ public class Conversation : GameComponent
                     return true;
                 }
 
-            /* TODO
-            default:
-                 await TriggerAction(
-                    ActionType.DialogueLine,
-                    (byte)blockId,
-                    new AssetId(AssetType.PromptNumber, textId));
-
-                break;
-            */
+            default: // TODO
+                {
+                    //await TriggerAction(
+                    //    ActionType.DialogueLine,
+                    //    (byte)blockId,
+                    //    new AssetId(AssetType.PromptNumber, textId));
+                    break;
+                }
         }
 
         return false;
@@ -173,8 +174,10 @@ public class Conversation : GameComponent
     void DiscoverTopics(IEnumerable<WordId> topics)
     {
         foreach (var topic in topics)
+        {
             if (!_topics.TryGetValue(topic, out var currentStatus) || currentStatus == WordStatus.Unknown)
                 _topics[topic] = WordStatus.Mentioned;
+        }
     }
 
     public async AlbionTask OnText(TextEvent mapTextEvent)
@@ -243,7 +246,7 @@ public class Conversation : GameComponent
                     if (await BlockClicked(blockId))
                         Close();
 
-                    break;;
+                    break;
                 }
 
             case TextLocation.StandardOptions:
@@ -275,7 +278,7 @@ public class Conversation : GameComponent
             (int)ConversationPositionRight.X,
             (int)ConversationPositionRight.Y,
             (int)ConversationPositionLeft.X,
-            (int)ConversationPositionLeft.Y, 
+            (int)ConversationPositionLeft.Y,
             null);
         Raise(transitionEvent);
     }

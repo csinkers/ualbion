@@ -8,7 +8,7 @@ namespace UAlbion.Core.Veldrid;
 public class ImGuiMenuManager : ServiceComponent<IImGuiMenuManager>, IImGuiMenuManager
 {
     readonly SubMenuMenuItem _root = new("", "");
-    readonly Dictionary<string, ShowWindowMenuItem> _windowTypes = new();
+    readonly Dictionary<string, ShowWindowMenuItem> _windowTypes = [];
 
     public void AddMenuItem(IMenuItem item)
     {

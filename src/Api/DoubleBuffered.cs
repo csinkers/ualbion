@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading;
 
 namespace UAlbion.Api;
 
 public class DoubleBuffered<T>
 {
-    readonly object _syncRoot = new();
+    readonly Lock _syncRoot = new();
 
     public DoubleBuffered(Func<T> constructor)
     {

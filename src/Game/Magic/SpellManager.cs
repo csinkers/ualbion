@@ -10,8 +10,8 @@ namespace UAlbion.Game.Magic;
 
 public class SpellManager : ServiceComponent<ISpellManager>, ISpellManager
 {
-    readonly Dictionary<(SpellClass, byte), SpellId> _lookup = new();
-    readonly Dictionary<SpellId, SpellData> _spells = new();
+    readonly Dictionary<(SpellClass, byte), SpellId> _lookup = [];
+    readonly Dictionary<SpellId, SpellData> _spells = [];
     bool _loaded;
 
     public SpellManager() => On<ModsLoadedEvent>(_ => _loaded = false);

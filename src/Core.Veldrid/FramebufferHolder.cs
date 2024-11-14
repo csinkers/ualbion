@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid.Events;
 using Veldrid;
@@ -21,8 +22,8 @@ public abstract class FramebufferHolder : Component, IFramebufferHolder
         public string Name => _getter()?.Name;
     }
 
-    readonly object _syncRoot = new();
-    readonly List<TextureHolder> _colorHolders = new();
+    readonly Lock _syncRoot = new();
+    readonly List<TextureHolder> _colorHolders = [];
     Framebuffer _framebuffer;
     TextureHolder _depthHolder;
     uint _width;

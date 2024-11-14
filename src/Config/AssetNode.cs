@@ -84,7 +84,7 @@ public class AssetNode
 
         try
         {
-            Properties ??= new Dictionary<string, object>();
+            Properties ??= [];
             Properties[assetProperty.Name] = assetProperty.FromJson(value, typeConfig);
         }
         catch (Exception ex)
@@ -99,7 +99,7 @@ public class AssetNode
     {
         ArgumentNullException.ThrowIfNull(assetProperty);
         if (_frozen) throw new InvalidOperationException("Tried to modify asset node after it was frozen. Asset nodes are immutable after mods have been loaded.");
-        Properties ??= new Dictionary<string, object>();
+        Properties ??= [];
         Properties[assetProperty.Name] = value;
     }
 

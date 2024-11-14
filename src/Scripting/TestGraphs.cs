@@ -240,7 +240,7 @@ public static class TestGraphs
     #           ---n9----      #           ---17----      #
     \#########################/#\########################*/
     public static ControlFlowGraph NoMoreGotos3 =>
-        new(0, 17, new[] {
+        new(0, 17, [
             D("A"),  // 0
             D("b1"), // 1
             D("b2"), // 2
@@ -258,8 +258,8 @@ public static class TestGraphs
             D("n6"), // 14
             D("n7"), // 15
             D("n8"), // 16
-            D("n9"), // 17
-        }, new[] {
+            D("n9") // 17
+        ], [
             ( 0, 1, CfgEdge.False), // ( A,!b1),
             ( 0, 3, CfgEdge.True),  // ( A,c1),
             ( 1, 2, CfgEdge.True),  // (b1,b2),
@@ -285,8 +285,8 @@ public static class TestGraphs
             (10,17, CfgEdge.True),  // (n2,n9),
             (11, 5, CfgEdge.True),  // (n3,c3),
             ( 5, 3, CfgEdge.True),  // (c3,c1),
-            ( 5,17, CfgEdge.False), // (c3,!n9),
-        });
+            ( 5,17, CfgEdge.False) // (c3,!n9),
+        ]);
     public const string NoMoreGotos3Code = @"if (A) {
     do {
         if (c1) {
@@ -329,7 +329,7 @@ public static class TestGraphs
 n9";
 
     public static ControlFlowGraph NoMoreGotos3Reversed =>
-        new(17, 0, new[] {
+        new(17, 0, [
             D("A"),  // 0
             D("b1"), // 1
             D("b2"), // 2
@@ -347,8 +347,8 @@ n9";
             D("n6"), // 14
             D("n7"), // 15
             D("n8"), // 16
-            D("n9"), // 17
-        }, new[] {
+            D("n9") // 17
+        ], [
             ( 1,  0, CfgEdge.False), // (b1, !A),
             ( 3,  0, CfgEdge.True),  // (c1,  A),
             ( 2,  1, CfgEdge.True),  // (b2, b1),
@@ -374,11 +374,11 @@ n9";
             (17, 10, CfgEdge.True),  // (n9, n2),
             ( 5, 11, CfgEdge.True),  // (c3, n3),
             ( 3,  5, CfgEdge.True),  // (c1, c3),
-            (17,  5, CfgEdge.False), // (n9,!c3),
-        });
+            (17,  5, CfgEdge.False) // (n9,!c3),
+        ]);
 
     public static ControlFlowGraph NoMoreGotos3Region1 =>
-        new(0, 7, new[] {
+        new(0, 7, [
             D("A"),  // 0
             D("c1"), // 1
             D("c2"), // 2
@@ -386,8 +386,8 @@ n9";
             D("n1"), // 4
             D("n2"), // 5
             D("n3"), // 6
-            D("n9"), // 7
-        }, new[] {
+            D("n9") // 7
+        ], [
             (0, 1, CfgEdge.True),
             (1, 2, CfgEdge.False),
             (1, 4, CfgEdge.True),
@@ -398,7 +398,7 @@ n9";
             (3, 7, CfgEdge.False),
             (5, 7, CfgEdge.True),
             (6, 3, CfgEdge.True)
-        });
+        ]);
 
     public static string NoMoreGotos3Region1Code =>
         @"A
@@ -419,16 +419,15 @@ loop {
 n9";
 
     public static ControlFlowGraph NoMoreGotos3Region2 =>
-        new(0, 6, new[]
-        {
+        new(0, 6, [
             D("A"),  // 0
             D("b1"), // 1
             D("b2"), // 2
             D("n4"), // 3
             D("n5"), // 4
             D("n6"), // 5
-            D("n7"), // 6
-        }, new[] {
+            D("n7") // 6
+        ], [
             (0, 1, CfgEdge.True),
             (1, 2, CfgEdge.True),
             (1, 3, CfgEdge.False),
@@ -437,20 +436,19 @@ n9";
             (3, 4, CfgEdge.True),
             (4, 6, CfgEdge.True),
             (5, 6, CfgEdge.True)
-        });
+        ]);
 
     public const string NoMoreGotos3Region2Code = @"A, if (b1) { if (b2) { n6 } else { goto L1 } } else { n4, L1:, n5 }, n7";
 
     public static ControlFlowGraph NoMoreGotos3Region3 =>
-        new(0, 5, new[]
-        {
+        new(0, 5, [
             D("start"), // 0
             D("d1"), // 1
             D("d2"), // 2
             D("d3"), // 3
             D("n8"), // 4
-            D("n9"), // 5
-        }, new[] {
+            D("n9") // 5
+        ], [
             (0, 1, CfgEdge.True),
             (1, 2, CfgEdge.False),
             (1, 3, CfgEdge.True),
@@ -458,8 +456,8 @@ n9";
             (2, 5, CfgEdge.False),
             (3, 4, CfgEdge.True),
             (3, 5, CfgEdge.False),
-            (4, 1, CfgEdge.True),
-        });
+            (4, 1, CfgEdge.True)
+        ]);
     public static string NoMoreGotos3Region3Code => @"start, loop { if (d1) { if (!(d3)) { break } } else { if (!(d2)) { break } }, n8 }, n9";
 
     /* ZeroK if example

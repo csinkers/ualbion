@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace UAlbion.Api;
 
 public class PooledThreadSafe<T> where T : class
 {
-    readonly object _syncRoot = new();
+    readonly Lock _syncRoot = new();
     readonly Func<T> _constructor;
     readonly Action<T> _cleanFunc;
     readonly Stack<T> _free = new();

@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>12</LangVersion>
+    <LangVersion>13</LangVersion>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IsRoslynComponent/>
     <AnalysisMode>Recommended</AnalysisMode>

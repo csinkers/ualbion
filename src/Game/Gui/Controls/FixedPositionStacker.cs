@@ -7,7 +7,7 @@ namespace UAlbion.Game.Gui.Controls;
 
 public class FixedPositionStacker : UiElement, IFixedSizeUiElement
 {
-    readonly List<Child> _positions = new();
+    readonly List<Child> _positions = [];
 
     class Child
     {

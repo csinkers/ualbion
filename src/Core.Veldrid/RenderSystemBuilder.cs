@@ -10,9 +10,9 @@ public class RenderSystemBuilder
 {
     readonly string _name;
     readonly RenderManagerBuilder _manager;
-    readonly Dictionary<string, RenderPass> _passes = new();
-    readonly Dictionary<string, IComponent> _components = new();
-    readonly Dictionary<string, IFramebufferHolder> _framebuffers = new();
+    readonly Dictionary<string, RenderPass> _passes = [];
+    readonly Dictionary<string, IComponent> _components = [];
+    readonly Dictionary<string, IFramebufferHolder> _framebuffers = [];
     IResourceProvider _resourceProvider;
     bool _built;
 

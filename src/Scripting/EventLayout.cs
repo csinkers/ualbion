@@ -9,8 +9,8 @@ namespace UAlbion.Scripting;
 public class EventLayout
 {
     readonly IList<ControlFlowGraph> _graphs;
-    readonly Dictionary<ushort, (int, int)> _indexToNode = new();
-    readonly Dictionary<(int, int), ushort> _nodeToIndex = new();
+    readonly Dictionary<ushort, (int, int)> _indexToNode = [];
+    readonly Dictionary<(int, int), ushort> _nodeToIndex = [];
 
     EventLayout(IList<ControlFlowGraph> graphs) => _graphs = graphs ?? throw new ArgumentNullException(nameof(graphs));
 
@@ -18,12 +18,12 @@ public class EventLayout
     {
         Events = events ?? throw new ArgumentNullException(nameof(events));
         Chains = chains ?? throw new ArgumentNullException(nameof(chains));
-        ExtraEntryPoints = extraEntryPoints ?? new List<ushort>();
+        ExtraEntryPoints = extraEntryPoints ?? [];
     }
 
-    public IList<EventNode> Events { get; } = new List<EventNode>();
-    public IList<ushort> Chains { get; } = new List<ushort>();
-    public IList<ushort> ExtraEntryPoints { get; private set; } = new List<ushort>();
+    public IList<EventNode> Events { get; } = [];
+    public IList<ushort> Chains { get; } = [];
+    public IList<ushort> ExtraEntryPoints { get; private set; } = [];
 
     public static EventLayout Build(IList<ControlFlowGraph> graphs)
     {

@@ -7,8 +7,8 @@ namespace UAlbion.Formats.Assets.Save;
 
 public class VisitedEventCollection : IList<VisitedEvent>
 {
-    readonly List<VisitedEvent> _list = new();
-    readonly HashSet<VisitedEvent> _set = new();
+    readonly List<VisitedEvent> _list = [];
+    readonly HashSet<VisitedEvent> _set = [];
     public IEnumerator<VisitedEvent> GetEnumerator() => _list.GetEnumerator();
 
     [MustDisposeResource]

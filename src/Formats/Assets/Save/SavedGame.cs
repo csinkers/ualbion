@@ -56,7 +56,7 @@ public class SavedGame
     readonly FlagSet _removedNpcs  = new(MapCount, NpcCountPerMap);
     readonly FlagSet _disabledChains  = new(MapCount, ChainCountPerMap);
     readonly FlagSet _automapMarkersFound = new(AutomapMarkerCount);
-    readonly TickerSet _tickers = new();
+    readonly TickerSet _tickers = [];
 
     public IDictionary<TickerId, byte> Tickers => _tickers;
     public bool GetSwitch(SwitchId flag) => _switches.GetFlag(flag.Id);
@@ -134,10 +134,10 @@ public class SavedGame
     public byte[] Unknown5B8C { get; set; }
     public NpcState[] Npcs { get; } = new NpcState[NpcCountPerMap];
     public byte[] Unknown8Bb8 { get; set; } 
-    public MapChangeCollection PermanentMapChanges { get; private set; } = new();
-    public MapChangeCollection TemporaryMapChanges { get; private set; } = new();
-    HashSet<VisitedEvent> _visitedSet = new();
-    List<VisitedEvent> _visitedEvents = new();
+    public MapChangeCollection PermanentMapChanges { get; private set; } = [];
+    public MapChangeCollection TemporaryMapChanges { get; private set; } = [];
+    HashSet<VisitedEvent> _visitedSet = [];
+    List<VisitedEvent> _visitedEvents = [];
     public IReadOnlyList<VisitedEvent> VisitedEvents => _visitedEvents;
     public IList<PartyMemberId> ActiveMembers { get; private set; } = new PartyMemberId[MaxPartySize];
 

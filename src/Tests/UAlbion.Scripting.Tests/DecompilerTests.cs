@@ -35,7 +35,7 @@ public class DecompilerTests
                     return x;
                 });
 
-            if (!TestUtil.CompareNodesVsScript(new[] { result }, expected, out var error))
+            if (!TestUtil.CompareNodesVsScript([result], expected, out var error))
             {
                 TestUtil.DumpSteps(steps, resultsDir, method);
                 throw new InvalidOperationException(error);

@@ -11,7 +11,7 @@ public class VarRegistry : ServiceComponent<IVarRegistry>, IVarRegistry
 {
     // ReSharper disable once NotAccessedPositionalProperty.Local
     sealed record VarInfo(IVar Var, Type ValueType, Type OwningType);
-    readonly Dictionary<string, VarInfo> _vars = new();
+    readonly Dictionary<string, VarInfo> _vars = [];
 
     public IEnumerable<IVar> Vars => _vars.Select(x => x.Value.Var).OrderBy(x => x.Key);
     public bool IsVarRegistered(string key) => _vars.ContainsKey(key);

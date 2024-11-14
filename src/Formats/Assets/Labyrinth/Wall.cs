@@ -32,7 +32,7 @@ public class Wall // Length = 0x12 + overlayCount * 0xC
     public byte Unk9 { get; set; } // 9
     public ushort Width { get; set; } // A
     public ushort Height { get; set; } // C
-    [JsonInclude] public IList<Overlay> Overlays { get; private set; } = new List<Overlay>();
+    [JsonInclude] public IList<Overlay> Overlays { get; private set; } = [];
 
     public override string ToString() =>
         $"Wall.{SpriteId}:{FrameCount} {Width}x{Height} ({Properties}) [ {string.Join(", ", Overlays.Select(x => x.ToString()))} ]";

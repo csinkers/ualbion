@@ -8,7 +8,7 @@ public class StringListAssetProperty : IAssetProperty<List<string>>
 {
     public StringListAssetProperty(string name) => Name = name;
     public string Name { get; }
-    public List<string> DefaultValue => new();
+    public List<string> DefaultValue => [];
     public object FromJson(JsonElement elem, TypeConfig config)
     {
         if (elem.ValueKind != JsonValueKind.Array)

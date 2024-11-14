@@ -30,12 +30,12 @@ static class Program
     }
 
     static readonly Command[] Commands =
-    {
+    [
         new("dve", DumpVisitedEvents, "Dump Visited Events: Dump details of events and conversation paths that have been triggered."),
         new("dtc", DumpTempMapChanges, "Dump Temp Changes: Dump details of temporary changes to the current map."),
         new("dpc", DumpPermMapChanges, "Dump Perm Changes: Dump details of permanent changes to all maps."),
         new("a", DumpAnnotated, "Dump annotated")
-    };
+    ];
 
     static void DumpVisitedEvents(EventExchange exchange, string filename, TextWriter writer)
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid.Events;
 using Veldrid;
@@ -9,7 +10,7 @@ namespace UAlbion.Core.Veldrid;
 
 public sealed class MultiBuffer<T> : Component, IBufferHolder<T> where T : unmanaged // GPU buffer containing an array of Ts
 {
-    readonly object _syncRoot = new();
+    readonly Lock _syncRoot = new();
     readonly Action<IVeldridInitEvent> _updateAction; // Cached action to avoid allocating new closures every time a buffer is dirtied
     readonly BufferUsage _usage;
     string _name;

@@ -56,7 +56,10 @@ static class Albion
                     global.Raise(e, null);
             }
         }
-        else global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
+        else
+        {
+            global.Raise(new SetSceneEvent(SceneId.MainMenu), null);
+        }
 
         var engine = (Engine)global.Resolve<IEngine>();
         engine.Run();
@@ -211,7 +214,8 @@ static class Albion
         var menus = eventExchange.Resolve<IImGuiMenuManager>();
 
         // Note: ImGuiGameWindow and PositionsWindow are added in AlbionRenderSystem so they can have access to internal render system components.
-        var items = new[] { 
+        var items = new[]
+        {
             new ShowWindowMenuItem("Asset Explorer", "Windows", name => new AssetExplorerWindow(name)),
             new ShowWindowMenuItem("Asset Viewer",   "Windows", name => new AssetViewerWindow(name)),
             new ShowWindowMenuItem("Breakpoints",    "Windows", name => new BreakpointsWindow(name)),
@@ -224,10 +228,11 @@ static class Albion
             new ShowWindowMenuItem("Stats",          "Windows", name => new StatsWindow(name)),
             new ShowWindowMenuItem("Threads",        "Windows", name => new ThreadsWindow(name)),
             new ShowWindowMenuItem("UI Layout",      "Windows", name => new LayoutWindow(name)),
-            new ShowWindowMenuItem("Watch",          "Windows", name => new WatchWindow(name, (object)G.Instance)),
+            new ShowWindowMenuItem("Watch",          "Windows", name => new WatchWindow(name, G.Instance)),
             // new ShowWindowMenuItem("Profiler", "Windows", name => new ProfilerWindow(name)),
         };
-        foreach(var item in items)
+
+        foreach (var item in items)
             menus.AddMenuItem(item);
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 
 namespace UAlbion.Api.Eventing;
 
@@ -11,9 +12,9 @@ public class EventSerializer
     public static EventSerializer Instance { get; } = new();
     EventSerializer() {}
 
-    readonly object _syncRoot = new();
-    readonly Dictionary<Type, EventMetadata> _serializers = new();
-    readonly Dictionary<string, EventMetadata> _events = new();
+    readonly Lock _syncRoot = new();
+    readonly Dictionary<Type, EventMetadata> _serializers = [];
+    readonly Dictionary<string, EventMetadata> _events = [];
 
     static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly)
     {

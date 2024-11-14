@@ -11,7 +11,7 @@ public class BlockList : List<Block>
     public static BlockList Serdes(int blockNumber, BlockList blockList, ISerializer s)
     {
         ArgumentNullException.ThrowIfNull(s);
-        blockList ??= new BlockList();
+        blockList ??= [];
         if (s.IsCommenting())
             s.Begin(blockNumber.ToString());
 

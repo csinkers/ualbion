@@ -7,10 +7,10 @@ namespace UAlbion.Core.Veldrid;
 
 public class RenderManagerBuilder
 {
-    readonly Dictionary<string, IRenderer> _renderers = new();
-    readonly Dictionary<string, IRenderableSource> _sources = new();
-    readonly Dictionary<string, RenderSystem> _pipelines = new();
-    readonly Dictionary<string, IFramebufferHolder> _framebuffers = new();
+    readonly Dictionary<string, IRenderer> _renderers = [];
+    readonly Dictionary<string, IRenderableSource> _sources = [];
+    readonly Dictionary<string, RenderSystem> _pipelines = [];
+    readonly Dictionary<string, IFramebufferHolder> _framebuffers = [];
     bool _built;
 
     public RenderManagerBuilder Framebuffer(string name, IFramebufferHolder framebuffer) { Check(); _framebuffers.Add(name, framebuffer); return this; }

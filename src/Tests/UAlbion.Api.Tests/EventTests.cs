@@ -54,7 +54,7 @@ public class EventTests
     {
         var meta = EventSerializer.Instance.GetEventMetadata().First(x => x.Type == typeof(Event1));
         Assert.Equal("event1", meta.Name);
-        Assert.Equal(new[] { "event_1" }, meta.Aliases);
+        Assert.Equal(["event_1"], meta.Aliases);
         Assert.Equal("A simple event", meta.HelpText);
         Assert.Collection(meta.Parts,
             partMeta =>

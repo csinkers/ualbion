@@ -26,7 +26,7 @@ public class InventoryDefensiveLabel : UiElement
         {
             var player = Resolve<IParty>()[_activeCharacter];
             var protection = player?.Apparent.DisplayProtection ?? 0;
-            return new[] { new TextBlock($"{protection}") };
+            return [new TextBlock($"{protection}")];
         }, _ => _version);
 
         AttachChild(

@@ -42,7 +42,7 @@ public class EventSet : IEventSet
         get => Events?.Select(x => x.ToString()).ToArray();
         set
         {
-            Events = value?.Select(EventNode.Parse).ToList() ?? new List<EventNode>();
+            Events = value?.Select(EventNode.Parse).ToList() ?? [];
             foreach (var e in Events)
                 e.Unswizzle(Events);
         }

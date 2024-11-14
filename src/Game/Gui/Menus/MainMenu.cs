@@ -34,32 +34,29 @@ public class MainMenu : Dialog
         if (state.Loaded)
         {
 
-            elements.AddRange(new IUiElement[]
-            {
+            elements.AddRange([
                 new Button(Base.SystemText.MainMenu_ContinueGame).OnClick(() => Raise(new PopSceneEvent())),
-                new Spacing(0, 4),
-            });
+                new Spacing(0, 4)
+            ]);
         }
 
-        elements.AddRange(new IUiElement[]
-        {
+        elements.AddRange([
             new Button(Base.SystemText.MainMenu_NewGame).OnClick(() => _ = NewGame()),
-            new Button(Base.SystemText.MainMenu_LoadGame).OnClick(LoadGame),
-        });
+            new Button(Base.SystemText.MainMenu_LoadGame).OnClick(LoadGame)
+        ]);
 
         if (state.Loaded)
             elements.Add(new Button(Base.SystemText.MainMenu_SaveGame).OnClick(SaveGame));
 
-        elements.AddRange(new IUiElement[]
-        {
+        elements.AddRange([
             new Spacing(0,4),
             new Button(Base.SystemText.MainMenu_Options).OnClick(Options),
             new Button(Base.SystemText.MainMenu_ViewIntro),
             new Button(Base.SystemText.MainMenu_Credits),
             new Spacing(0,3),
             new Button(Base.SystemText.MainMenu_QuitGame).OnClick(() => Raise(new QuitEvent())),
-            new Spacing(0,2),
-        });
+            new Spacing(0,2)
+        ]);
 
         var stack = new VerticalStacker(elements);
         AttachChild(new DialogFrame(stack));

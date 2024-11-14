@@ -50,7 +50,7 @@ public class ObjectReflector : IReflector
             .ToArray();
     }
 
-    static readonly List<string> EditButtonLabels = new();
+    static readonly List<string> EditButtonLabels = [];
     public void Reflect(in ReflectorState state)
     {
         var description = ReflectorUtil.DescribeAsNodeId(state, _typeName, state.Target);

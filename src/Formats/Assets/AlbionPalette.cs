@@ -18,7 +18,7 @@ public class AlbionPalette : IPalette
     const int VariableEntries = EntryCount - CommonEntries;
 
     readonly int[] _periods = new int[EntryCount];
-    readonly List<(byte, byte)> _ranges = new();
+    readonly List<(byte, byte)> _ranges = [];
     SimpleTexture<uint> _texture;
     uint[] _unambiguous;
 

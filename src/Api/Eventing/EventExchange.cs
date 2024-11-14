@@ -14,13 +14,13 @@ namespace UAlbion.Api.Eventing
     /// </summary>
     public sealed class EventExchange : IDisposable
     {
-        readonly object _syncRoot = new();
+        readonly Lock _syncRoot = new();
         [DiagIgnore] readonly ILogExchange _logExchange;
-        [DiagIgnore] readonly PooledThreadSafe<List<Handler>> _dispatchLists = new(() => new(), x => x.Clear());
-        [DiagIgnore] readonly DoubleBuffered<List<(IEvent Event, object Sender)>> _queuedEvents = new(() => new());
-        readonly Dictionary<Type, object> _registrations = new();
-        readonly Dictionary<Type, List<Handler>> _subscriptions = new();
-        readonly Dictionary<IComponent, List<Handler>> _subscribers = new();
+        [DiagIgnore] readonly PooledThreadSafe<List<Handler>> _dispatchLists = new(() => [], x => x.Clear());
+        [DiagIgnore] readonly DoubleBuffered<List<(IEvent Event, object Sender)>> _queuedEvents = new(() => []);
+        readonly Dictionary<Type, object> _registrations = [];
+        readonly Dictionary<Type, List<Handler>> _subscriptions = [];
+        readonly Dictionary<IComponent, List<Handler>> _subscribers = [];
 
         [DiagIgnore] int _nesting = -1;
         [DiagIgnore] long _nextEventId;
@@ -30,8 +30,8 @@ namespace UAlbion.Api.Eventing
 
 #if DEBUG
         // ReSharper disable once CollectionNeverQueried.Local
-        [DiagIgnore] readonly List<(int Depth, object Event, long TimestampTicks)> _frameEvents = new();
-        [DiagIgnore] List<IComponent> _sortedSubscribersCached = new();
+        [DiagIgnore] readonly List<(int Depth, object Event, long TimestampTicks)> _frameEvents = [];
+        [DiagIgnore] List<IComponent> _sortedSubscribersCached = [];
         public IReadOnlyList<IComponent> SortedSubscribers // Just for debugging
         {
             get
@@ -381,13 +381,13 @@ namespace UAlbion.Api.Eventing
                 }
                 else
                 {
-                    _subscribers[handler.Component] = new();
+                    _subscribers[handler.Component] = [];
                 }
 
                 if (handler.Type != null)
                 {
                     if (!_subscriptions.ContainsKey(handler.Type))
-                        _subscriptions.Add(handler.Type, new());
+                        _subscriptions.Add(handler.Type, []);
 
                     _subscriptions[handler.Type].Add(handler);
                     _subscribers[handler.Component].Add(handler);

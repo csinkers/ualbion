@@ -8,9 +8,9 @@ namespace UAlbion.Core.Veldrid.Reflection;
 
 public class ReflectorMetadataStore(IFileSystem disk, IJsonUtil jsonUtil, string settingsPath)
 {
-    readonly Dictionary<string, DiagEditAttribute> _defaults = new(); // Keep track of which options were set via attributes in the code so we don't save redundant info.
-    readonly Dictionary<string, DiagEditAttribute> _overrides = new(); // This only contains overrides that were loaded from the settings file
-    readonly Dictionary<(Type, string), ReflectorMetadata> _metadata = new(); // Keep track of all the metadata used by ObjectReflector, because their Options could go from null to an override
+    readonly Dictionary<string, DiagEditAttribute> _defaults = []; // Keep track of which options were set via attributes in the code so we don't save redundant info.
+    readonly Dictionary<string, DiagEditAttribute> _overrides = []; // This only contains overrides that were loaded from the settings file
+    readonly Dictionary<(Type, string), ReflectorMetadata> _metadata = []; // Keep track of all the metadata used by ObjectReflector, because their Options could go from null to an override
 
     static string ToStringKey(Type type, string memberName) => $"{type.FullName}:{memberName}";
     static (Type, string)? FromStringKey(string key)

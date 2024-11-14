@@ -58,14 +58,14 @@ public class SpriteLoaderTests
     [Fact]
     public void SingleHeader()
     {
-        byte[] oneFrame = 
-        {
+        byte[] oneFrame =
+        [
             04, 00, 03, 00, //4x3
             00, 01, // 1 frame
             01, 02, 03, 04,
             05, 06, 07, 10,
-            11, 12, 13, 14,
-        };
+            11, 12, 13, 14
+        ];
 
         RoundTrip(oneFrame,
             (x, s, c) => HeaderLoader.Serdes(x, s, c),
@@ -85,7 +85,7 @@ public class SpriteLoaderTests
     public void TwoUniformHeaders()
     {
         byte[] twoFrames =
-        {
+        [
             04, 00, 03, 00, //4x3
             00, 02, // 2 frames
             01, 02, 03, 04,
@@ -94,8 +94,8 @@ public class SpriteLoaderTests
 
             31, 32, 33, 34,
             35, 36, 37, 40,
-            41, 42, 43, 44,
-        };
+            41, 42, 43, 44
+        ];
 
         RoundTrip(twoFrames,
             (x, s, c) => HeaderLoader.Serdes(x, s, c),
@@ -119,7 +119,7 @@ public class SpriteLoaderTests
     public void NonUniformHeaders()
     {
         byte[] nonUniform =
-        {
+        [
             04, 00, 02, 00, //4x2
             00, 03, // 3 frames
             01, 02, 03, 04, // +6
@@ -134,17 +134,17 @@ public class SpriteLoaderTests
             05, 00, 01, 00, // 5x1 (+1A)
             00, 03, // 3 frames
             01, 02, 03, 04, 05 // +20
-        }; // Total width = max(4,2,5) = 5, total height = 2+3+1=6
+        ]; // Total width = max(4,2,5) = 5, total height = 2+3+1=6
 
         byte[] expectedFinalPixels =
-        {
+        [
             01, 02, 03, 04, 00,
             05, 06, 07, 10, 00,
             31, 32, 00, 00, 00,
             35, 36, 00, 00, 00,
             41, 42, 00, 00, 00,
             01, 02, 03, 04, 05
-        };
+        ];
 
         RoundTrip(nonUniform,
             (x, s, c) => MultiHeaderLoader.Serdes(x, s, c),
@@ -168,8 +168,8 @@ public class SpriteLoaderTests
     [Fact]
     public void AmorphousSimple()
     {
-        byte[] oneFrame = 
-        {
+        byte[] oneFrame =
+        [
             0x01, 0x02, 0x03, 
             0x04, 0x05, 0x06, 
 
@@ -178,8 +178,8 @@ public class SpriteLoaderTests
 
             0x0F, 0x10,
             0x11, 0x12,
-            0x13, 0x14,
-        };
+            0x13, 0x14
+        ];
 
         var id = SpriteId.None;
         var node = new AssetNode(id);

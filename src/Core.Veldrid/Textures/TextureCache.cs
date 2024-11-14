@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Veldrid.Events;
@@ -13,11 +14,11 @@ namespace UAlbion.Core.Veldrid.Textures;
 sealed class TextureCache<T> : Component, IDisposable where T : TextureHolder
 {
     record struct CacheEntry(WeakReference<T> Holder, Texture Texture, int Version);
-    readonly object _syncRoot = new();
-    readonly Dictionary<ITexture, CacheEntry> _cache = new();
+    readonly Lock _syncRoot = new();
+    readonly Dictionary<ITexture, CacheEntry> _cache = [];
     readonly Func<ITexture, T> _holderFactory;
     readonly Func<GraphicsDevice, ITexture, Texture> _textureFactory;
-    readonly HashSet<ITexture> _dirtySet = new();
+    readonly HashSet<ITexture> _dirtySet = [];
     readonly T _defaultHolder;
     bool _allDirty = true;
 

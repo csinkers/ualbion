@@ -245,9 +245,9 @@ public class AssetMappingTests : Component
         Assert.Equal(new AssetId(AssetType.Unknown), m.Parse("somethinginvalid", null));
         Assert.Equal(new AssetId(AssetType.Unknown), m.Parse("Portrait.nonsense", null));
         Assert.Throws<FormatException>(() => m.Parse("0", null));
-        Assert.Equal(AssetId.From(ZeroBasedByte.Zero), m.Parse("0", new[] { AssetType.Portrait }));
-        Assert.Equal(AssetId.From(ZeroBasedByte.One), m.Parse("1", new[] { AssetType.Portrait }));
-        Assert.Equal(AssetId.From(OneBasedByte.One), m.Parse("1", new[] { AssetType.NpcSheet }));
+        Assert.Equal(AssetId.From(ZeroBasedByte.Zero), m.Parse("0", [AssetType.Portrait]));
+        Assert.Equal(AssetId.From(ZeroBasedByte.One), m.Parse("1", [AssetType.Portrait]));
+        Assert.Equal(AssetId.From(OneBasedByte.One), m.Parse("1", [AssetType.NpcSheet]));
         // Assert.Equal(AssetId.None, m.Parse("0", new[] { AssetType.Npc })); // TODO: Decide if this should be parse to None, an unmapped Npc.0 id, or throw.
 
         Assert.Equal(AssetId.From(ZeroBasedByte.Zero), m.Parse("Portrait.0", null));
@@ -256,12 +256,12 @@ public class AssetMappingTests : Component
         Assert.Equal(AssetId.From(OneBasedByte.Two), m.Parse("NpcSheet.2", null));
 
         m.RegisterAssetType(typeof(ZeroBasedShort), AssetType.Portrait);
-        Assert.Equal(AssetId.From(ZeroBasedByte.Zero), m.Parse("0", new[] { AssetType.Portrait }));
-        Assert.Equal(AssetId.From(ZeroBasedByte.One), m.Parse("1", new[] { AssetType.Portrait }));
-        Assert.Equal(AssetId.From(ZeroBasedByte.Two), m.Parse("2", new[] { AssetType.Portrait }));
-        Assert.Equal(AssetId.From(ZeroBasedShort.Zero), m.Parse("3", new[] { AssetType.Portrait }));
-        Assert.Equal(AssetId.From(ZeroBasedShort.One), m.Parse("4", new[] { AssetType.Portrait }));
-        Assert.Equal(AssetId.From(ZeroBasedShort.Two), m.Parse("5", new[] { AssetType.Portrait }));
+        Assert.Equal(AssetId.From(ZeroBasedByte.Zero), m.Parse("0", [AssetType.Portrait]));
+        Assert.Equal(AssetId.From(ZeroBasedByte.One), m.Parse("1", [AssetType.Portrait]));
+        Assert.Equal(AssetId.From(ZeroBasedByte.Two), m.Parse("2", [AssetType.Portrait]));
+        Assert.Equal(AssetId.From(ZeroBasedShort.Zero), m.Parse("3", [AssetType.Portrait]));
+        Assert.Equal(AssetId.From(ZeroBasedShort.One), m.Parse("4", [AssetType.Portrait]));
+        Assert.Equal(AssetId.From(ZeroBasedShort.Two), m.Parse("5", [AssetType.Portrait]));
     }
 
     [Fact]
@@ -273,10 +273,10 @@ public class AssetMappingTests : Component
         _output.WriteLine(m.Serialize(JsonUtil));
         Assert.Equal(AssetId.From(ZeroBasedByte.Zero), m.Parse("Zero", null));
         Assert.Throws<FormatException>(() => m.Parse("One", null)); // Ambiguous
-        Assert.Equal(AssetId.From(ZeroBasedByte.One), m.Parse("One", new[] {AssetType.Portrait}));
-        Assert.Equal(AssetId.From(OneBasedByte.One), m.Parse("One", new[] {AssetType.NpcSheet}));
+        Assert.Equal(AssetId.From(ZeroBasedByte.One), m.Parse("One", [AssetType.Portrait]));
+        Assert.Equal(AssetId.From(OneBasedByte.One), m.Parse("One", [AssetType.NpcSheet]));
         Assert.Throws<FormatException>(() =>
-            m.Parse("One", new[] {AssetType.Portrait, AssetType.NpcSheet})); // Ambiguous
+            m.Parse("One", [AssetType.Portrait, AssetType.NpcSheet])); // Ambiguous
     }
 
     [Fact]

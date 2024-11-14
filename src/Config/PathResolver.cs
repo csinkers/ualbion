@@ -12,7 +12,7 @@ public class PathResolver : IPathResolver
     const string ModsDirectory = "mods";
     static readonly Regex Pattern = new(@"(\$\([A-Z]+\))");
     public string BasePath { get; }
-    Dictionary<string, string> Paths { get; } = new();
+    Dictionary<string, string> Paths { get; } = [];
 
     public PathResolver(string baseDir, string appName)
     {
@@ -24,9 +24,11 @@ public class PathResolver : IPathResolver
         Paths["CACHE"] = Path.Combine(GetCacheBaseDir(), appName);
         Paths["MODS"] = Path.Combine(baseDir, ModsDirectory);
 
-        foreach (var kvp in Paths.ToList())
-            if (!Path.IsPathRooted(kvp.Value))
-                Paths[kvp.Key] = Path.Combine(baseDir, kvp.Value);
+        foreach (var (key, value) in Paths.ToList())
+        {
+            if (!Path.IsPathRooted(value))
+                Paths[key] = Path.Combine(baseDir, value!);
+        }
     }
 
     public void RegisterPath(string name, string path)
@@ -35,16 +37,16 @@ public class PathResolver : IPathResolver
         if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
         Paths[name] = path;
     }
-    
+
     public string ResolvePathAbsolute(string relative)
     {
         var path = ResolvePath(relative);
         if (string.IsNullOrEmpty(path))
             return null;
 
-        return !Path.IsPathRooted(path) 
-            ? Path.Combine(BasePath, path) 
-            : path;
+        return Path.IsPathRooted(path)
+            ? path
+            : Path.Combine(BasePath, path);
     }
 
     public string GetPath(string pathName) => Paths.GetValueOrDefault(pathName);

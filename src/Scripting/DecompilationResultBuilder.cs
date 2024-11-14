@@ -10,9 +10,9 @@ namespace UAlbion.Scripting;
 public class DecompilationResultBuilder : IScriptBuilder
 {
     readonly StringBuilder _sb = new();
-    readonly List<ScriptPart> _parts = new();
-    readonly List<EventRegion> _eventRegions = new();
-    readonly Dictionary<int, int> _eventRegionLookup = new();
+    readonly List<ScriptPart> _parts = [];
+    readonly List<EventRegion> _eventRegions = [];
+    readonly Dictionary<int, int> _eventRegionLookup = [];
 
     public DecompilationResultBuilder(bool useNumericIds) => UseNumericIds = useNumericIds;
 

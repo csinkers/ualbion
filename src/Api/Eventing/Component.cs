@@ -23,7 +23,7 @@ namespace UAlbion.Api.Eventing;
 public abstract class Component : IComponent
 {
     public static bool TraceAttachment { get; set; }
-    static readonly List<IComponent> EmptyChildren = new();
+    static readonly List<IComponent> EmptyChildren = [];
     static readonly ThreadLocal<object> ThreadContext = new();
     protected static object Context { get => ThreadContext.Value; set => ThreadContext.Value = value; }
     static int _nesting;
@@ -164,7 +164,7 @@ public abstract class Component : IComponent
 
     void OnCore<T, TCallback>(TCallback callback, Func<TCallback, Component, Handler> handlerConstructor)
     {
-        _handlers ??= new Dictionary<Type, Handler>();
+        _handlers ??= [];
         _handlers.TryGetValue(typeof(T), out var handler);
 
         if (handler == null)
@@ -371,7 +371,7 @@ public abstract class Component : IComponent
         if (_isActive) // Children will be attached when this component is made active.
             Exchange?.Attach(child);
 
-        _children ??= new List<IComponent>();
+        _children ??= [];
         _children.Add(child);
         if (child is Component component)
         {

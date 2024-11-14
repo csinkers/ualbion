@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid.Events;
 using Veldrid;
@@ -9,8 +10,8 @@ namespace UAlbion.Core.Veldrid;
 
 public class ResourceLayoutSource : ServiceComponent<IResourceLayoutSource>, IResourceLayoutSource
 {
-    readonly object _syncRoot = new();
-    readonly Dictionary<Type, ResourceLayout> _layouts = new();
+    readonly Lock _syncRoot = new();
+    readonly Dictionary<Type, ResourceLayout> _layouts = [];
 
     public ResourceLayoutSource()
     {

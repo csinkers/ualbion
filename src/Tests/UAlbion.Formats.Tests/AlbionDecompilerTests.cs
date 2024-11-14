@@ -104,7 +104,7 @@ ffff 5c00 0402 0000 0415 0000 0000 5d00 0c00 0000 0000 4a00 5e00 ffff 0c15 0000 
         {
             var result = Decompiler.Decompile(
                 events,
-                new ushort[] { 0 },
+                [0],
                 null,
                 steps).Single();
 

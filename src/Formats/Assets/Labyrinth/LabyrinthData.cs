@@ -41,10 +41,10 @@ public class LabyrinthData
     public ushort Unk20 { get; set; }
     public ushort Lighting { get; set; }
     public ushort Unk24 { get; set; }
-    [JsonInclude] public IList<ObjectGroup> ObjectGroups { get; private set; } = new List<ObjectGroup>();
-    [JsonInclude] public IList<LabyrinthObject> Objects { get; private set; } = new List<LabyrinthObject>();
-    [JsonInclude] public IList<FloorAndCeiling> FloorAndCeilings { get; private set; } = new List<FloorAndCeiling>();
-    [JsonInclude] public IList<Wall> Walls { get; private set; } = new List<Wall>();
+    [JsonInclude] public IList<ObjectGroup> ObjectGroups { get; private set; } = [];
+    [JsonInclude] public IList<LabyrinthObject> Objects { get; private set; } = [];
+    [JsonInclude] public IList<FloorAndCeiling> FloorAndCeilings { get; private set; } = [];
+    [JsonInclude] public IList<Wall> Walls { get; private set; } = [];
     [JsonIgnore] public Vector3 TileSize => new(EffectiveWallWidth, WallHeight, EffectiveWallWidth);
     public uint FogColor => ApiUtil.PackColor(
         (byte)(FogRed >> 8),

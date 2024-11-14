@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
@@ -10,8 +11,8 @@ namespace UAlbion.Game.Assets;
 
 public class ContainerRegistry : ServiceComponent<IContainerRegistry>, IContainerRegistry
 {
-    readonly object _syncRoot = new();
-    readonly Dictionary<Type, IAssetContainer> _containers = new();
+    readonly Lock _syncRoot = new();
+    readonly Dictionary<Type, IAssetContainer> _containers = [];
 
     public IAssetContainer GetContainer(string path, Type container, IFileSystem disk)
     {

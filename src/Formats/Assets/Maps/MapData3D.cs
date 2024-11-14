@@ -26,7 +26,7 @@ public class MapData3D : BaseMapData
     [JsonInclude] public byte[] Floors { get; set; }
     [JsonInclude] public byte[] Ceilings { get; set; }
     [JsonInclude] public byte[] AutomapGraphics { get; set; }
-    [JsonInclude] public List<AutomapInfo> Automap { get; set; } = new();
+    [JsonInclude] public List<AutomapInfo> Automap { get; set; } = [];
 
     public byte[] BuildWallArray() => Contents.Select(x => (byte)(x >= LabyrinthData.WallOffset ? x - LabyrinthData.WallOffset + 1 : 0)).ToArray();
     public byte[] BuildObjectArray() => Contents.Select(x => x < LabyrinthData.WallOffset ? x : (byte)0).ToArray();
@@ -89,7 +89,7 @@ public class MapData3D : BaseMapData
         map.PaletteId = PaletteId.SerdesU8(nameof(PaletteId), map.PaletteId, mapping, s);
         map.AmbientSongId = SongId.SerdesU8(nameof(AmbientSongId), map.AmbientSongId, mapping, s);
 
-        map.Npcs ??= new List<MapNpc>();
+        map.Npcs ??= [];
         int npcCount = (map.Flags & MapFlags.ExtraNpcs) != 0 ? 96 : 32;
         while (map.Npcs.Count < npcCount)
             map.Npcs.Add(new MapNpc());

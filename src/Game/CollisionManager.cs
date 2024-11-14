@@ -5,7 +5,7 @@ namespace UAlbion.Game;
 
 public class CollisionManager : ServiceComponent<ICollisionManager>, ICollisionManager
 {
-    readonly List<IMovementCollider> _colliders = new();
+    readonly List<IMovementCollider> _colliders = [];
 
     public bool IsOccupied(int fromX, int fromY, int toX, int toY)
     {

@@ -13,9 +13,9 @@ namespace UAlbion.Game.Assets;
 
 class ModLoader : Component // Shouldn't be referenced outside ModApplier
 {
-    readonly List<ModInfo> _modsInReverseDependencyOrder = new();
-    readonly Dictionary<string, ModInfo> _mods = new();
-    readonly Dictionary<string, LanguageConfig> _languages = new();
+    readonly List<ModInfo> _modsInReverseDependencyOrder = [];
+    readonly Dictionary<string, ModInfo> _mods = [];
+    readonly Dictionary<string, LanguageConfig> _languages = [];
 
     public IReadOnlyList<ModInfo> ModsInReverseDependencyOrder => _modsInReverseDependencyOrder;
     public IReadOnlyDictionary<string, LanguageConfig> Languages { get; }

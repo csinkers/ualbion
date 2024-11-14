@@ -9,7 +9,7 @@ namespace UAlbion.Game.Gui.Dialogs;
 public class ConversationOptionsWindow : ModalDialog
 {
     const int MaxConversationOptionWidth = 283;
-    readonly List<IUiElement> _optionElements = new();
+    readonly List<IUiElement> _optionElements = [];
     // Opaque background
     // Yellow options, gap, then white options.
 

@@ -100,7 +100,7 @@ public class MapObject : GameComponent
 
     public MapObjectId Id { get; }
 
-    [DiagEdit(Style = DiagEditStyle.Position3D)]
+    [DiagEdit(Style = DiagEditStyle.Position)]
     public Vector3 Position
     {
         get

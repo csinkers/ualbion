@@ -33,27 +33,6 @@ public class Monster : GameComponent, ICombatParticipant
 
     public int CombatPosition { get; private set; }
 
-    [DiagEdit(Min = -300.0f, Max = 300.0f, Style = DiagEditStyle.NumericSlider)]
-    public float PositionX
-    {
-        get => _sprite.Position.X;
-        set => _sprite.Position = _sprite.Position with { X = value };
-    }
-
-    [DiagEdit(Min = -300.0f, Max = 300.0f, Style = DiagEditStyle.NumericSlider)]
-    public float PositionY
-    {
-        get => _sprite.Position.Y;
-        set => _sprite.Position = _sprite.Position with { Y = value };
-    }
-
-    [DiagEdit(Min = -2000.0f, Max = 0.0f, Style = DiagEditStyle.NumericSlider)]
-    public float PositionZ
-    {
-        get => _sprite.Position.Z;
-        set => _sprite.Position = _sprite.Position with { Z = value };
-    }
-
     [DiagEdit(Min = 0, MaxProperty = nameof(FrameCount), Style = DiagEditStyle.NumericSlider)]
     public int Frame
     {

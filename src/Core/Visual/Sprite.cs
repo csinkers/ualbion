@@ -72,7 +72,7 @@ public class Sprite : Component, IPositioned
     public Func<object> SelectionCallback { get; init; }
     static Vector3 Normal => Vector3.UnitZ; // TODO
 
-    [DiagEdit(Style = DiagEditStyle.Position3D)]
+    [DiagEdit(Style = DiagEditStyle.Position)]
     public Vector3 Position
     {
         get => _position;
@@ -91,7 +91,7 @@ public class Sprite : Component, IPositioned
     public Vector3 Dimensions => new(Size.X, Size.Y, Size.X);
     public int DebugZ => DepthUtil.DepthToLayer(Position.Z);
 
-    [DiagEdit(Style = DiagEditStyle.Size2D)]
+    [DiagEdit(Style = DiagEditStyle.Size)]
     public Vector2 Size // Logical size, may differ from actual size (RenderSize).
     {
         get => _size ?? Vector2.One;

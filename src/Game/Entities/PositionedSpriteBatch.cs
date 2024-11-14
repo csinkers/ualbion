@@ -21,7 +21,7 @@ public sealed class PositionedSpriteBatch : IDisposable
     /// <summary>
     /// Position of the sprite batch in normalised device coordinates.
     /// </summary>
-    [DiagEdit(Style = DiagEditStyle.Position3D)]
+    [DiagEdit(Style = DiagEditStyle.Position)]
     public Vector3 Position
     {
         get => _position;

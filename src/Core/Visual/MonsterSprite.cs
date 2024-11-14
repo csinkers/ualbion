@@ -57,6 +57,7 @@ public class MonsterSprite : Component
         }
     }
 
+    [DiagEdit(Style = DiagEditStyle.NumericSlider, Min = 0, MaxProperty = nameof(FrameCount))]
     public int Frame
     {
         get => _sprite.Frame / 2;

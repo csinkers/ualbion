@@ -8,16 +8,8 @@ using UAlbion.Api.Eventing;
 
 namespace UAlbion.Core.Veldrid.Reflection;
 
-public class ReflectorManager
+public class ReflectorManager : Component
 {
-    static readonly DiagEditStyle[] Styles =
-        typeof(DiagEditStyle)
-            .GetEnumValues()
-            .OfType<DiagEditStyle>()
-            .ToArray();
-
-    static readonly string[] StyleNames = Styles.Select(x => x.ToString()).ToArray();
-
     readonly ReflectorMetadataStore _store;
     readonly Reflector _nullReflector;
     readonly Dictionary<Type, Reflector> _reflectors = new();
@@ -36,21 +28,24 @@ public class ReflectorManager
         _nullReflector               = NullReflector.Instance.Reflect;
         _reflectors[typeof(bool)]    = BoolReflector.Instance.Reflect;
         _reflectors[typeof(string)]  = StringReflector.Instance.Reflect;
+        _reflectors[typeof(Vector2)] = Vec2Reflector.Instance.Reflect;
         _reflectors[typeof(Vector3)] = Vec3Reflector.Instance.Reflect;
         _reflectors[typeof(Vector4)] = Vec4Reflector.Instance.Reflect;
-        _reflectors[typeof(byte)]    = new IntReflector("byte",   x => (byte)x).Reflect;
-        _reflectors[typeof(sbyte)]   = new IntReflector("sbyte",  x => (sbyte)x).Reflect;
-        _reflectors[typeof(ushort)]  = new IntReflector("ushort", x => (ushort)x).Reflect;
-        _reflectors[typeof(short)]   = new IntReflector("short",  x => (short)x).Reflect;
-        _reflectors[typeof(uint)]    = new IntReflector("uint",   x => (int)(uint)x).Reflect;
-        _reflectors[typeof(int)]     = new IntReflector("int",    x => (int)x).Reflect;
-        _reflectors[typeof(ulong)]   = new IntReflector("ulong",  x => (int)(ulong)x).Reflect;
-        _reflectors[typeof(long)]    = new IntReflector("long",   x => (int)(long)x).Reflect;
+        _reflectors[typeof(byte)]    = new IntReflector("byte",   x => (byte)x, byte.MinValue, byte.MaxValue).Reflect;
+        _reflectors[typeof(sbyte)]   = new IntReflector("sbyte",  x => (sbyte)x, sbyte.MinValue, sbyte.MaxValue).Reflect;
+        _reflectors[typeof(ushort)]  = new IntReflector("ushort", x => (ushort)x, ushort.MinValue, ushort.MaxValue).Reflect;
+        _reflectors[typeof(short)]   = new IntReflector("short",  x => (short)x, short.MinValue, short.MaxValue).Reflect;
+        _reflectors[typeof(uint)]    = new IntReflector("uint",   x => (int)(uint)x, 0, int.MaxValue).Reflect; // Note: Restricted to int.MaxValue
+        _reflectors[typeof(int)]     = new IntReflector("int",    x => (int)x, int.MinValue, int.MaxValue).Reflect;
+        _reflectors[typeof(ulong)]   = new IntReflector("ulong",  x => (int)(ulong)x, 0, int.MaxValue).Reflect; // Note: restricted to int.MaxValue
+        _reflectors[typeof(long)]    = new IntReflector("long",   x => (int)(long)x, int.MinValue, int.MaxValue).Reflect; // Note: restricted to int range
         _reflectors[typeof(float)]   = new FloatReflector("float", x => (float)x).Reflect;
         _reflectors[typeof(double)]  = new FloatReflector("double", x => (float)(double)x).Reflect;
 
         Add2<Vector2>("Vector2", x => { var v = (Vector2)x; return $"({v.X}, {v.Y})"; });
     }
+
+    public void SaveOverrides() => _store.SaveOverrides();
 
     public void RenderNode(string name, object target)
     {
@@ -67,15 +62,12 @@ public class ReflectorManager
 
     public void RenderOptions()
     {
-        ImGui.Checkbox("Edit Mode", ref _editMode);
-        ImGui.SameLine();
-
-        if (ImGui.Button("Save"))
+        if (ImGui.Checkbox("Edit Mode", ref _editMode) && _editMode)
         {
+            var imguiManager = Resolve<IImGuiManager>();
+            if (!imguiManager.FindWindows(ReflectorSettingsWindow.NamePrefix).Any())
+                imguiManager.AddWindow(new ReflectorSettingsWindow());
         }
-
-        if (EditTarget != null)
-            RenderEditPopup();
     }
 
     Reflector GetReflectorForType(Type type)
@@ -100,73 +92,5 @@ public class ReflectorManager
             return new ObjectReflector(this, _store, type).ReflectComponent;
 
         return new ObjectReflector(this, _store, type).Reflect;
-    }
-
-    void RenderEditPopup()
-    {
-        bool open = true;
-        if (ImGui.Begin("Edit Member", ref open))
-        {
-            ImGui.Text($"Editing {EditTarget.ParentType}.{EditTarget.Name}");
-
-            if (EditTarget.Options != null && ImGui.Button("Reset to Defaults"))
-                EditTarget.Options = null;
-
-            if (EditTarget.Options == null && ImGui.Button("Override Defaults"))
-                EditTarget.Options = new DiagEditAttribute { Style = DiagEditStyle.Label };
-
-            if (ImGui.Button("Save Overrides"))
-                _store.SaveOverrides();
-
-            var options = EditTarget.Options;
-            if (options != null)
-            {
-                int style = (int)options.Style;
-                if (ImGui.Combo("Style", ref style, StyleNames, StyleNames.Length))
-                    options.Style = Styles[style];
-
-                EditValue("Min", static x => x.Options.Min, static (x, v) => x.Options.Min = v);
-                EditValue("Max", static x => x.Options.Max, static (x, v) => x.Options.Max = v);
-
-                // EditTarget.Options.Min MinProperty
-                // EditTarget.Options.Max MaxProperty
-                // EditTarget.Options.MaxLength
-            }
-
-            ImGui.End();
-        }
-
-        if (!open)
-            EditTarget = null;
-    }
-
-    void EditValue(string label, Func<ReflectorMetadata, object> getter, Action<ReflectorMetadata, object> setter)
-    {
-        if (EditTarget.ValueType == typeof(int))
-        {
-            int currentVal = getter(EditTarget) is int intValue ? intValue : int.MinValue;
-            if (ImGui.InputInt(label, ref currentVal))
-                setter(EditTarget, currentVal == int.MinValue ? null : currentVal);
-
-            if (currentVal != int.MinValue)
-            {
-                ImGui.SameLine();
-                if (ImGui.Button("Clear##Clear" + label))
-                    setter(EditTarget, null);
-            }
-        }
-        else if (EditTarget.ValueType == typeof(float))
-        {
-            float currentVal = getter(EditTarget) is float intValue ? intValue : float.NaN;
-            if (ImGui.InputFloat(label, ref currentVal))
-                setter(EditTarget, float.IsNaN(currentVal) ? null : currentVal);
-
-            if (!float.IsNaN(currentVal))
-            {
-                ImGui.SameLine();
-                if (ImGui.Button("Clear##Clear" + label))
-                    setter(EditTarget, null);
-            }
-        }
     }
 }

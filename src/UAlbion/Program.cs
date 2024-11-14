@@ -148,8 +148,8 @@ static class Program
 
         Console.WriteLine("Exiting");
 
-        var reflectorMetadataStore = exchange.Resolve<ReflectorMetadataStore>();
-        reflectorMetadataStore.SaveOverrides();
+        var reflectorManager = exchange.Resolve<ReflectorManager>();
+        reflectorManager.SaveOverrides();
 
         exchange.Dispose();
     }

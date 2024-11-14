@@ -4,10 +4,11 @@ using UAlbion.Api.Eventing;
 
 namespace UAlbion.Core.Veldrid.Reflection;
 
-public class IntReflector(string typeName, Func<object, int> toInt) : IReflector
+public class IntReflector(string typeName, Func<object, int> toInt, int typeMin, int typeMax) : IReflector
 {
     const int DefaultMin = -1024;
     const int DefaultMax = 1024;
+
     public void Reflect(in ReflectorState state)
     {
         ImGui.Indent();
@@ -41,7 +42,7 @@ public class IntReflector(string typeName, Func<object, int> toInt) : IReflector
         {
             options.GetMinProperty ??= ReflectorUtil.BuildPropertyGetter(options.MinProperty, state.Parent.GetType());
             min = options.GetMinProperty(state.Parent) as int? ?? 0;
-        } 
+        }
 
         if (options.Max is int maxInt) max = maxInt;
         else if (options.MaxProperty != null)
@@ -49,6 +50,10 @@ public class IntReflector(string typeName, Func<object, int> toInt) : IReflector
             options.GetMaxProperty ??= ReflectorUtil.BuildPropertyGetter(options.MaxProperty, state.Parent.GetType());
             max = options.GetMaxProperty(state.Parent) as int? ?? 0;
         } 
+
+        // Make sure it can always fit in the underlying type
+        min = Math.Max(typeMin, min);
+        max = Math.Min(typeMax, max);
 
         ImGui.TextUnformatted(label);
         ImGui.SameLine();

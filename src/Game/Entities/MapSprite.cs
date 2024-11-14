@@ -12,7 +12,7 @@ public class MapSprite : Sprite
 {
     readonly Vector3 _tileSize;
 
-    [DiagEdit(Style = DiagEditStyle.TilePosition3D)]
+    [DiagEdit(Style = DiagEditStyle.Position)]
     public Vector3 TilePosition
     {
         get => Position / _tileSize;

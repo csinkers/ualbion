@@ -20,7 +20,7 @@ public class ScriptEventSet : IEventSet
     public AssetId Id { get; }
     public StringSetId StringSetId { get; }
     public IList<EventNode> Events { get; }
-    public IList<ushort> Chains { get; } = Array.Empty<ushort>();
+    public IList<ushort> Chains { get; } = [0];
     public IList<ushort> ExtraEntryPoints { get; } = Array.Empty<ushort>();
     public DecompilationResult Decompiled { get; set; }
     public ushort GetChainForEvent(ushort index) => 0;

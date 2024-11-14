@@ -28,7 +28,7 @@ public sealed class AudioDevice : IDisposable
         _device = ALC10.alcOpenDevice(null); Check();
         _context = ALC10.alcCreateContext(_device, []); Check();
         ALC10.alcMakeContextCurrent(_context); Check();
-        var _ = AL10.alGetError(); // Clear error code for subsequent callers
+        _ = AL10.alGetError(); // Clear error code for subsequent callers
     }
 
     public AudioListener Listener { get; } = new();

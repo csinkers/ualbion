@@ -62,7 +62,7 @@ public class ScriptWindow : GameComponent, IImGuiWindow
 
     void DrawContext(EventContext context)
     {
-        ImGui.TextUnformatted(Context.ToString());
+        ImGui.TextUnformatted(context.ToString());
 
         var set = context.EventSet;
         if (set.Decompiled == null)

@@ -76,7 +76,7 @@ public class MapData3D : BaseMapData
 
         var map = existing ?? new MapData3D { Id = id };
         map.Flags = s.EnumU16(nameof(Flags), map.Flags); // 0
-        var _ = s.UInt8("MapType", (byte)map.MapType); // 2
+        _ = s.UInt8("MapType", (byte)map.MapType); // 2
 
         if (map.Width > byte.MaxValue + OffsetX) throw new InvalidOperationException($"Cannot save a map with a width above {byte.MaxValue + OffsetX} using original game formats");
         if (map.Height > byte.MaxValue + OffsetY) throw new InvalidOperationException($"Cannot save a map with a height above {byte.MaxValue + OffsetY} using original game formats");

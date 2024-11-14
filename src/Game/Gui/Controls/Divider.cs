@@ -6,14 +6,11 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Gui.Controls;
 
-public class Divider : UiElement
+public class Divider(CommonColor color) : UiElement
 {
-    readonly CommonColor _color;
     BatchLease<SpriteKey, SpriteInfo> _sprite;
     Vector3 _lastPosition;
     Vector2 _lastSize;
-
-    public Divider(CommonColor color) => _color = color;
 
     protected override void Unsubscribed()
     {
@@ -41,7 +38,7 @@ public class Divider : UiElement
         var instances = _sprite.Lock(ref lockWasTaken);
         try
         {
-            instances[0] = new SpriteInfo(SpriteFlags.TopLeft, position, size, commonColors.GetRegion(_color));
+            instances[0] = new SpriteInfo(SpriteFlags.TopLeft, position, size, commonColors.GetRegion(color));
         }
         finally { _sprite.Unlock(lockWasTaken); }
 
@@ -51,7 +48,7 @@ public class Divider : UiElement
 
     public override int Render(Rectangle extents, int order, LayoutNode parent)
     {
-        var _ = parent == null ? null : new LayoutNode(parent, this, extents, order);
+        _ = parent == null ? null : new LayoutNode(parent, this, extents, order);
         var window = Resolve<IGameWindow>();
         var size = window.UiToNormRelative(extents.Width, extents.Height);
         var position = new Vector3(window.UiToNorm(extents.X, extents.Y), 0);

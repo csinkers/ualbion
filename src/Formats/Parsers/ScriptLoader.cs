@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
@@ -12,13 +13,6 @@ namespace UAlbion.Formats.Parsers;
 
 public class ScriptLoader : IAssetLoader<Script>
 {
-    static IEnumerable<string> ReadLines(ISerializer s)
-    {
-        var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
-        var text = FormatUtil.BytesTo850String(bytes);
-        return ApiUtil.SplitLines(text, StringSplitOptions.None).Select(x => x.Trim());
-    }
-
     public object Serdes(object existing, ISerializer s, AssetLoadContext context)
         => Serdes((Script)existing, s, context);
 
@@ -27,7 +21,7 @@ public class ScriptLoader : IAssetLoader<Script>
         ArgumentNullException.ThrowIfNull(s);
 
         if (s.IsReading())
-            return Parse(ReadLines(s));
+            return ParseLines(ReadLines(s));
 
         ArgumentNullException.ThrowIfNull(existing);
 
@@ -44,8 +38,16 @@ public class ScriptLoader : IAssetLoader<Script>
         return existing;
     }
 
-    public static Script Parse(string text) => Parse(ApiUtil.SplitLines(text));
-    public static Script Parse(IEnumerable<string> lines)
+    public static Script Parse(string text) => ParseLines(ApiUtil.SplitLines(text));
+
+    static IEnumerable<string> ReadLines(ISerializer s)
+    {
+        var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
+        var text = Encoding.Latin1.GetString(bytes); // FormatUtil.BytesTo850String(bytes);
+        return ApiUtil.SplitLines(text, StringSplitOptions.None).Select(x => x.Trim());
+    }
+
+    static Script ParseLines(IEnumerable<string> lines)
     {
         ArgumentNullException.ThrowIfNull(lines);
 

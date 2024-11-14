@@ -5,8 +5,6 @@ using System.Linq;
 using System.Numerics;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
-using Vulkan.Xcb;
-using Component = System.ComponentModel.Component;
 
 namespace UAlbion.Core.Veldrid.Reflection;
 
@@ -20,34 +18,36 @@ public class ReflectorManager
 
     static readonly string[] StyleNames = Styles.Select(x => x.ToString()).ToArray();
 
+    readonly ReflectorMetadataStore _store;
     readonly Reflector _nullReflector;
     readonly Dictionary<Type, Reflector> _reflectors = new();
     bool _editMode;
 
-    public static ReflectorManager Instance { get; } = new();
     public bool IsEditMode => _editMode;
     public ReflectorMetadata EditTarget { get; set; }
 
-    ReflectorManager()
+    public ReflectorManager(ReflectorMetadataStore store)
     {
+        _store = store ?? throw new ArgumentNullException(nameof(store));
+
         // void Add<T>(string name) => _reflectors[typeof(T)] = new ValueReflector(name).Reflect;
         void Add2<T>(string name, Func<object, string> toString) => _reflectors[typeof(T)] = new ValueReflector(name, toString).Reflect;
 
-        _nullReflector              = NullReflector.Instance.Reflect;
-        _reflectors[typeof(bool)]   = BoolReflector.Instance.Reflect;
-        _reflectors[typeof(string)] = StringReflector.Instance.Reflect;
+        _nullReflector               = NullReflector.Instance.Reflect;
+        _reflectors[typeof(bool)]    = BoolReflector.Instance.Reflect;
+        _reflectors[typeof(string)]  = StringReflector.Instance.Reflect;
         _reflectors[typeof(Vector3)] = Vec3Reflector.Instance.Reflect;
         _reflectors[typeof(Vector4)] = Vec4Reflector.Instance.Reflect;
-        _reflectors[typeof(byte)]   = new IntReflector("byte",   x => (byte)x).Reflect;
-        _reflectors[typeof(sbyte)]  = new IntReflector("sbyte",  x => (sbyte)x).Reflect;
-        _reflectors[typeof(ushort)] = new IntReflector("ushort", x => (ushort)x).Reflect;
-        _reflectors[typeof(short)]  = new IntReflector("short",  x => (short)x).Reflect;
-        _reflectors[typeof(uint)]   = new IntReflector("uint",   x => (int)(uint)x).Reflect;
-        _reflectors[typeof(int)]    = new IntReflector("int",    x => (int)x).Reflect;
-        _reflectors[typeof(ulong)]  = new IntReflector("ulong",  x => (int)(ulong)x).Reflect;
-        _reflectors[typeof(long)]   = new IntReflector("long",   x => (int)(long)x).Reflect;
-        _reflectors[typeof(float)]  = new FloatReflector("float", x => (float)x).Reflect;
-        _reflectors[typeof(double)] = new FloatReflector("double", x => (float)(double)x).Reflect;
+        _reflectors[typeof(byte)]    = new IntReflector("byte",   x => (byte)x).Reflect;
+        _reflectors[typeof(sbyte)]   = new IntReflector("sbyte",  x => (sbyte)x).Reflect;
+        _reflectors[typeof(ushort)]  = new IntReflector("ushort", x => (ushort)x).Reflect;
+        _reflectors[typeof(short)]   = new IntReflector("short",  x => (short)x).Reflect;
+        _reflectors[typeof(uint)]    = new IntReflector("uint",   x => (int)(uint)x).Reflect;
+        _reflectors[typeof(int)]     = new IntReflector("int",    x => (int)x).Reflect;
+        _reflectors[typeof(ulong)]   = new IntReflector("ulong",  x => (int)(ulong)x).Reflect;
+        _reflectors[typeof(long)]    = new IntReflector("long",   x => (int)(long)x).Reflect;
+        _reflectors[typeof(float)]   = new FloatReflector("float", x => (float)x).Reflect;
+        _reflectors[typeof(double)]  = new FloatReflector("double", x => (float)(double)x).Reflect;
 
         Add2<Vector2>("Vector2", x => { var v = (Vector2)x; return $"({v.X}, {v.Y})"; });
     }
@@ -65,6 +65,19 @@ public class ReflectorManager
             ? _nullReflector
             : GetReflectorForType(target.GetType());
 
+    public void RenderOptions()
+    {
+        ImGui.Checkbox("Edit Mode", ref _editMode);
+        ImGui.SameLine();
+
+        if (ImGui.Button("Save"))
+        {
+        }
+
+        if (EditTarget != null)
+            RenderEditPopup();
+    }
+
     Reflector GetReflectorForType(Type type)
     {
         if (_reflectors.TryGetValue(type, out var reflector))
@@ -77,8 +90,6 @@ public class ReflectorManager
 
     Reflector BuildReflector(Type type)
     {
-        ArgumentNullException.ThrowIfNull(type);
-
         if (typeof(Enum).IsAssignableFrom(type))
             return EnumReflector.Build(type);
 
@@ -86,22 +97,9 @@ public class ReflectorManager
             return new EnumerableReflector(this, type).Reflect;
 
         if (typeof(Component).IsAssignableFrom(type))
-            return new ObjectReflector(this, type).ReflectComponent;
+            return new ObjectReflector(this, _store, type).ReflectComponent;
 
-        return new ObjectReflector(this, type).Reflect;
-    }
-
-    public void RenderOptions()
-    {
-        ImGui.Checkbox("Edit Mode", ref _editMode);
-        ImGui.SameLine();
-
-        if (ImGui.Button("Save"))
-        {
-        }
-
-        if (EditTarget != null)
-            RenderEditPopup();
+        return new ObjectReflector(this, _store, type).Reflect;
     }
 
     void RenderEditPopup()
@@ -116,6 +114,9 @@ public class ReflectorManager
 
             if (EditTarget.Options == null && ImGui.Button("Override Defaults"))
                 EditTarget.Options = new DiagEditAttribute { Style = DiagEditStyle.Label };
+
+            if (ImGui.Button("Save Overrides"))
+                _store.SaveOverrides();
 
             var options = EditTarget.Options;
             if (options != null)

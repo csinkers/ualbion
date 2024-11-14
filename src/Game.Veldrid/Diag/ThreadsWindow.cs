@@ -35,13 +35,13 @@ public class ThreadsWindow : Component, IImGuiWindow
 
 #if DEBUG
         ImGui.Text("Pending Async Tasks:");
-        Tasks.EnumeratePendingTasks(_stringCache, static (stringCache, core) =>
+        var reflectorManager = Resolve<ReflectorManager>();
+        Tasks.EnumeratePendingTasks((_stringCache, reflectorManager), static (context, core) =>
         {
-            var name = stringCache.Get(core.Id, 0, static (x, _) => $"Task{x}");
-            var reflector = ReflectorManager.Instance;
-            reflector.RenderNode(name, core);
+            var name = context._stringCache.Get(core.Id, 0, static (x, _) => $"Task{x}");
+            context.reflectorManager.RenderNode(name, core);
         });
-        #endif
+#endif
 
         ImGui.End();
 

@@ -8,7 +8,7 @@ using UAlbion.Game.State;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
-public class InspectorDemoWindow : Component, IImGuiWindow
+public class InspectorDemoWindow(string name) : Component, IImGuiWindow
 {
 #pragma warning disable CA1711 // Identifiers should not have incorrect suffix
     public enum SomeEnum
@@ -48,8 +48,7 @@ public class InspectorDemoWindow : Component, IImGuiWindow
 #pragma warning restore CS0414 // Field is assigned but its value is never used
 
     readonly TestObject _testObject = new();
-    public string Name { get; }
-    public InspectorDemoWindow(string name) => Name = name;
+    public string Name { get; } = name;
 
     public void Draw()
     {
@@ -60,18 +59,13 @@ public class InspectorDemoWindow : Component, IImGuiWindow
 
         bool open = true;
         ImGui.Begin(Name, ref open);
-        RenderNode("Test", _testObject);
+
+        var reflectorManager = Resolve<ReflectorManager>();
+        reflectorManager.RenderNode("Test", _testObject);
+
         ImGui.End();
 
         if (!open)
             Remove();
-    }
-
-    static void RenderNode(string name, object target)
-    {
-        var meta = new ReflectorMetadata(name, null, null, null, null, null);
-        var state = new ReflectorState(target, null, -1, meta);
-        var reflector = ReflectorManager.Instance.GetReflectorForInstance(state.Target);
-        reflector(state);
     }
 }

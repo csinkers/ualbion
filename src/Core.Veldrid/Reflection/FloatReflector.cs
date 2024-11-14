@@ -8,6 +8,7 @@ public class FloatReflector(string typeName, Func<object, float> toFloat) : IRef
 {
     const float DefaultMin = -10.0f;
     const float DefaultMax = 10.0f;
+
     public void Reflect(in ReflectorState state)
     {
         ImGui.Indent();

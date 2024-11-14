@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace UAlbion.Core.Veldrid.Reflection;
 
@@ -106,5 +107,80 @@ public static class ReflectorUtil
 
         var lambda = Expression.Lambda<Func<object, object>>(castResult, parameter);
         return lambda.Compile();
+    }
+
+    static void NullSetter(in ReflectorState _, object value) { }
+    static ReflectorGetter NameGetter(PropertyInfo prop) => (in ReflectorState _) => prop.PropertyType.Name;
+    static ReflectorGetter NameGetter(FieldInfo field) => (in ReflectorState _) => field.FieldType.Name;
+
+    public static ReflectorGetter BuildSafeFieldGetter(FieldInfo field)
+    {
+        if (field.FieldType.Name.StartsWith("Span", StringComparison.Ordinal))
+            return NameGetter(field);
+        if (field.FieldType.Name.StartsWith("ReadOnlySpan", StringComparison.Ordinal))
+            return NameGetter(field);
+
+        return (in ReflectorState state) => GetFieldSafe(field, state.Target);
+    }
+
+    public static ReflectorGetter BuildSafePropertyGetter(PropertyInfo prop)
+    {
+        if (prop.PropertyType.Name.StartsWith("Span", StringComparison.Ordinal)) return NameGetter(prop);
+        if (prop.PropertyType.Name.StartsWith("ReadOnlySpan", StringComparison.Ordinal)) return NameGetter(prop);
+        if (!prop.CanRead) return (in ReflectorState _) => prop.PropertyType.Name;
+        return (in ReflectorState state) => GetPropertySafe(prop, state.Target);
+    }
+
+    public static ReflectorSetter BuildSafeFieldSetter(FieldInfo field)
+    {
+        if (field.FieldType.Name.StartsWith("Span", StringComparison.Ordinal)) return NullSetter;
+        if (field.FieldType.Name.StartsWith("ReadOnlySpan", StringComparison.Ordinal)) return NullSetter;
+        return (in ReflectorState state, object value) => SetFieldSafe(field, state.Parent, value);
+    }
+
+    public static ReflectorSetter BuildSafePropertySetter(PropertyInfo prop)
+    {
+        if (prop.PropertyType.Name.StartsWith("Span", StringComparison.Ordinal)) return NullSetter;
+        if (prop.PropertyType.Name.StartsWith("ReadOnlySpan", StringComparison.Ordinal)) return NullSetter;
+        if (!prop.CanWrite) return NullSetter;
+        return (in ReflectorState state, object value) => SetPropertySafe(prop, state.Parent, value);
+    }
+
+    static object GetPropertySafe(PropertyInfo x, object o)
+    {
+        try { return x.GetValue(o); }
+        catch (TargetException e) { return e; }
+        catch (TargetParameterCountException e) { return e; }
+        catch (NotSupportedException e) { return e; }
+        catch (MethodAccessException e) { return e; }
+        catch (TargetInvocationException e) { return e; }
+    }
+
+    static object GetFieldSafe(FieldInfo x, object o)
+    {
+        try { return x.GetValue(o); }
+        catch (TargetException e) { return e; }
+        catch (NotSupportedException e) { return e; }
+        catch (FieldAccessException e) { return e; }
+        catch (ArgumentException e) { return e; }
+    }
+
+    static void SetPropertySafe(PropertyInfo x, object o, object value)
+    {
+        try { x.SetValue(o, value); }
+        catch (TargetException) { }
+        catch (TargetParameterCountException) { }
+        catch (NotSupportedException) { }
+        catch (MethodAccessException) { }
+        catch (TargetInvocationException) { }
+    }
+
+    static void SetFieldSafe(FieldInfo x, object o, object value)
+    {
+        try { x.SetValue(o, value); }
+        catch (TargetException) { }
+        catch (NotSupportedException) { }
+        catch (FieldAccessException) { }
+        catch (ArgumentException) { }
     }
 }

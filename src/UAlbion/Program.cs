@@ -7,6 +7,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Reflection;
 using UAlbion.Formats;
 using UAlbion.Game.Assets;
 using UAlbion.Game.Events;
@@ -146,6 +147,10 @@ static class Program
         }
 
         Console.WriteLine("Exiting");
+
+        var reflectorMetadataStore = exchange.Resolve<ReflectorMetadataStore>();
+        reflectorMetadataStore.SaveOverrides();
+
         exchange.Dispose();
     }
 
@@ -179,6 +184,8 @@ static class Program
         };
 
 #pragma warning disable CA2000 // Dispose objects before losing scopes
+        var disk = exchange.Resolve<IFileSystem>();
+        var jsonUtil = exchange.Resolve<IJsonUtil>();
         var pathResolver = exchange.Resolve<IPathResolver>();
         var shaderCache = new ShaderCache(pathResolver.ResolvePath("$(CACHE)/ShaderCache"));
         var shaderLoader = new ShaderLoader();
@@ -194,6 +201,13 @@ static class Program
             new ResourceLayoutSource());
 
         exchange.Attach(engineServices);
+
+        var reflectorOverridePath = pathResolver.ResolvePath("$(CONFIG)/reflectorOverrides.json");
+        var reflectorMetadataStore = new ReflectorMetadataStore(disk, jsonUtil, reflectorOverridePath);
+        reflectorMetadataStore.LoadOverrides();
+
+        var reflectorManager = new ReflectorManager(reflectorMetadataStore);
+        exchange.Register(reflectorManager);
     }
 }
 #pragma warning restore CA2000 // Dispose objects before losing scopes

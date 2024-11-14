@@ -30,12 +30,14 @@ public class ObjectReflector : IReflector
     };
 
     readonly ReflectorManager _manager;
+    readonly ReflectorMetadataStore _store;
     readonly ReflectorMetadata[] _subObjects;
     readonly string _typeName;
 
-    public ObjectReflector(ReflectorManager manager, Type type)
+    public ObjectReflector(ReflectorManager manager, ReflectorMetadataStore store, Type type)
     {
         _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+        _store = store ?? throw new ArgumentNullException(nameof(store));
         ArgumentNullException.ThrowIfNull(type);
 
         _typeName = ReflectorUtil.BuildTypeName(type);
@@ -63,26 +65,7 @@ public class ObjectReflector : IReflector
             var childState = new ReflectorState(child, state.Target, -1, subObject);
             var childReflector = _manager.GetReflectorForInstance(child);
 
-            if (_manager.IsEditMode)
-            {
-                while (EditButtonLabels.Count <= index)
-                    EditButtonLabels.Add($"##{EditButtonLabels.Count}");
-
-                var label = EditButtonLabels[index];
-                bool selected = _manager.EditTarget == subObject;
-
-                if (selected)
-                    ImGui.PushStyleColor(ImGuiCol.Button, Vector4.One);
-
-                if (ImGui.Button( label, new Vector2(12, 12)))
-                    _manager.EditTarget = subObject;
-
-                if (selected)
-                    ImGui.PopStyleColor();
-
-                ImGui.SameLine();
-            }
-
+            DrawEditButton(index, subObject);
             childReflector(childState);
         }
 
@@ -112,15 +95,41 @@ public class ObjectReflector : IReflector
         }
         */
 
-        foreach (var subObject in _subObjects)
+        for (var index = 0; index < _subObjects.Length; index++)
         {
+            var subObject = _subObjects[index];
             var child = subObject.Getter(state);
             var childState = new ReflectorState(child, state.Target, -1, subObject);
             var childReflector = _manager.GetReflectorForInstance(child);
+
+            DrawEditButton(index, subObject);
             childReflector(childState);
         }
 
         ImGui.TreePop();
+    }
+
+    void DrawEditButton(int index, ReflectorMetadata subObject)
+    {
+        if (!_manager.IsEditMode)
+            return;
+
+        while (EditButtonLabels.Count <= index)
+            EditButtonLabels.Add($"##{EditButtonLabels.Count}");
+
+        var label = EditButtonLabels[index];
+        bool selected = _manager.EditTarget == subObject;
+
+        if (selected)
+            ImGui.PushStyleColor(ImGuiCol.Button, Vector4.One);
+
+        if (ImGui.Button(label, new Vector2(12, 12)))
+            _manager.EditTarget = subObject;
+
+        if (selected)
+            ImGui.PopStyleColor();
+
+        ImGui.SameLine();
     }
 
     static Vector4 GetComponentColor(Component component) =>
@@ -130,7 +139,7 @@ public class ObjectReflector : IReflector
                 : new Vector4(0.6f, 0.6f, 0.6f, 1)
             : new Vector4(1.0f, 0.6f, 0.6f, 1);
 
-    static void PopulateMembers(Type type, Dictionary<string, ReflectorMetadata> subObjects)
+    void PopulateMembers(Type type, Dictionary<string, ReflectorMetadata> subObjects)
     {
         const BindingFlags publicFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
         const BindingFlags privateFlags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
@@ -166,169 +175,30 @@ public class ObjectReflector : IReflector
 
         foreach (var prop in publicProperties)
         {
-            var meta = BuildPropertyMetadata(type, prop, ignoreList);
+            var meta = _store.GetPropertyMetadata(type, prop, ignoreList);
             if (meta != null)
                 subObjects["A|" + prop.Name] = meta;
         }
 
         foreach (var field in publicFields)
         {
-            var meta = BuildFieldMetadata(type, field, ignoreList);
+            var meta = _store.GetFieldMetadata(type, field, ignoreList);
             if (meta != null)
                 subObjects["A|" + field.Name] = meta;
         }
 
         foreach (var prop in privateProperties)
         {
-            var meta = BuildPropertyMetadata(type, prop, ignoreList);
+            var meta = _store.GetPropertyMetadata(type, prop, ignoreList);
             if (meta != null)
                 subObjects["B|" + prop.Name] = meta;
         }
 
         foreach (var field in privateFields)
         {
-            var meta = BuildFieldMetadata(type, field, ignoreList);
+            var meta = _store.GetFieldMetadata(type, field, ignoreList);
             if (meta != null)
                 subObjects["B|" + field.Name] = meta;
         }
-    }
-
-    static ReflectorMetadata BuildPropertyMetadata(Type type, PropertyInfo prop, List<string> ignoreList)
-    {
-        if (prop.GetIndexParameters().Length > 0)
-            return null; 
-
-        if (IsMemberIgnored(ignoreList, prop.Name, prop.GetCustomAttributes(), out var options))
-            return null;
-
-        return new ReflectorMetadata(
-            prop.Name,
-            type,
-            prop.PropertyType,
-            BuildPropertyGetter(prop),
-            BuildPropertySetter(prop),
-            options);
-    }
-
-    static ReflectorMetadata BuildFieldMetadata(Type type, FieldInfo field, List<string> ignoreList)
-    {
-        if (IsMemberIgnored(ignoreList, field.Name, field.GetCustomAttributes(), out var options))
-            return null;
-
-        return new ReflectorMetadata(
-            field.Name,
-            type,
-            field.FieldType,
-            BuildFieldGetter(field),
-            BuildFieldSetter(field),
-            options);
-    }
-
-    static bool IsMemberIgnored(
-        List<string> ignoreList,
-        string name,
-        IEnumerable<Attribute> customAttributes,
-        out DiagEditAttribute options)
-    {
-        options = null;
-        bool isIgnored = false;
-        foreach (var attrib in customAttributes)
-        {
-            if (attrib is DiagEditAttribute editAttribute)
-                options = editAttribute;
-
-            if (attrib is DiagIgnoreAttribute)
-                isIgnored = true;
-        }
-
-        if (isIgnored)
-            return true;
-
-        foreach (var entry in ignoreList)
-        {
-            switch (entry[0])
-            {
-                case '*': return true;
-                case '~': if (name.Contains(entry[1..], StringComparison.Ordinal)) return true; break;
-                case '>': if (name.StartsWith(entry[1..], StringComparison.Ordinal)) return true; break;
-                default: if (name.Equals(entry, StringComparison.Ordinal)) return true; break;
-            }
-        }
-
-        return false;
-    }
-
-    static void NullSetter(in ReflectorState _, object value) { }
-    static ReflectorGetter NameGetter(PropertyInfo prop) => (in ReflectorState _) => prop.PropertyType.Name;
-    static ReflectorGetter NameGetter(FieldInfo field) => (in ReflectorState _) => field.FieldType.Name;
-
-    static ReflectorGetter BuildFieldGetter(FieldInfo field)
-    {
-        if (field.FieldType.Name.StartsWith("Span", StringComparison.Ordinal))
-            return NameGetter(field);
-        if (field.FieldType.Name.StartsWith("ReadOnlySpan", StringComparison.Ordinal))
-            return NameGetter(field);
-        return (in ReflectorState state) => GetFieldSafe(field, state.Target);
-    }
-
-    static ReflectorGetter BuildPropertyGetter(PropertyInfo prop)
-    {
-        if (prop.PropertyType.Name.StartsWith("Span", StringComparison.Ordinal)) return NameGetter(prop);
-        if (prop.PropertyType.Name.StartsWith("ReadOnlySpan", StringComparison.Ordinal)) return NameGetter(prop);
-        if (!prop.CanRead) return (in ReflectorState _) => prop.PropertyType.Name;
-        return (in ReflectorState state) => GetPropertySafe(prop, state.Target);
-    }
-
-    static ReflectorSetter BuildFieldSetter(FieldInfo field)
-    {
-        if (field.FieldType.Name.StartsWith("Span", StringComparison.Ordinal)) return NullSetter;
-        if (field.FieldType.Name.StartsWith("ReadOnlySpan", StringComparison.Ordinal)) return NullSetter;
-        return (in ReflectorState state, object value) => SetFieldSafe(field, state.Parent, value);
-    }
-
-    static ReflectorSetter BuildPropertySetter(PropertyInfo prop)
-    {
-        if (prop.PropertyType.Name.StartsWith("Span", StringComparison.Ordinal)) return NullSetter;
-        if (prop.PropertyType.Name.StartsWith("ReadOnlySpan", StringComparison.Ordinal)) return NullSetter;
-        if (!prop.CanWrite) return NullSetter;
-        return (in ReflectorState state, object value) => SetPropertySafe(prop, state.Parent, value);
-    }
-
-    static object GetPropertySafe(PropertyInfo x, object o)
-    {
-        try { return x.GetValue(o); }
-        catch (TargetException e) { return e; }
-        catch (TargetParameterCountException e) { return e; }
-        catch (NotSupportedException e) { return e; }
-        catch (MethodAccessException e) { return e; }
-        catch (TargetInvocationException e) { return e; }
-    }
-
-    static object GetFieldSafe(FieldInfo x, object o)
-    {
-        try { return x.GetValue(o); }
-        catch (TargetException e) { return e; }
-        catch (NotSupportedException e) { return e; }
-        catch (FieldAccessException e) { return e; }
-        catch (ArgumentException e) { return e; }
-    }
-
-    static void SetPropertySafe(PropertyInfo x, object o, object value)
-    {
-        try { x.SetValue(o, value); }
-        catch (TargetException) { }
-        catch (TargetParameterCountException) { }
-        catch (NotSupportedException) { }
-        catch (MethodAccessException) { }
-        catch (TargetInvocationException) { }
-    }
-
-    static void SetFieldSafe(FieldInfo x, object o, object value)
-    {
-        try { x.SetValue(o, value); }
-        catch (TargetException) { }
-        catch (NotSupportedException) { }
-        catch (FieldAccessException) { }
-        catch (ArgumentException) { }
     }
 }

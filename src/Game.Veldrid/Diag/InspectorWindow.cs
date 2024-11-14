@@ -25,10 +25,11 @@ public class InspectorWindow : Component, IImGuiWindow
         int hitId = 0;
         if (_hits != null)
         {
+            var reflectorManager = Resolve<ReflectorManager>();
             foreach (var hit in _hits)
             {
                 var target = hit.Formatter == null ? hit.Target : hit.Formatter(hit.Target);
-                RenderNode($"{hitId}", target);
+                reflectorManager.RenderNode($"{hitId}", target);
                 hitId++;
             }
         }
@@ -36,13 +37,5 @@ public class InspectorWindow : Component, IImGuiWindow
 
         if (!open)
             Remove();
-    }
-
-    static void RenderNode(string name, object target)
-    {
-        var meta = new ReflectorMetadata(name, null, null, null, null, null);
-        var state = new ReflectorState(target, null, -1, meta);
-        var reflector = ReflectorManager.Instance.GetReflectorForInstance(state.Target);
-        reflector(state);
     }
 }

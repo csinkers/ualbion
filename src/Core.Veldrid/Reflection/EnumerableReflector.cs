@@ -4,18 +4,10 @@ using ImGuiNET;
 
 namespace UAlbion.Core.Veldrid.Reflection;
 
-public class EnumerableReflector : IReflector
+public class EnumerableReflector(ReflectorManager manager, Type type) : IReflector
 {
-    readonly ReflectorMetadata _meta;
-    readonly ReflectorManager _manager;
-    readonly string _typeName;
-
-    public EnumerableReflector(ReflectorManager manager, Type type)
-    {
-        _manager = manager ?? throw new ArgumentNullException(nameof(manager));
-        _typeName = ReflectorUtil.BuildTypeName(type);
-        _meta = new ReflectorMetadata(null, null, type, Getter, Setter, null);
-    }
+    readonly ReflectorMetadata _meta = new(null, null, type, Getter, Setter, null);
+    readonly string _typeName = ReflectorUtil.BuildTypeName(type);
 
     static object Getter(in ReflectorState state)
     {
@@ -63,7 +55,7 @@ public class EnumerableReflector : IReflector
         foreach (var child in (IEnumerable)state.Target)
         {
             var childState = new ReflectorState(child, state.Target, index, meta);
-            var childReflector = _manager.GetReflectorForInstance(child);
+            var childReflector = manager.GetReflectorForInstance(child);
             childReflector(childState);
             index++;
         }

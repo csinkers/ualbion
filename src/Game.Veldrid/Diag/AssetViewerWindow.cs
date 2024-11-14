@@ -43,20 +43,13 @@ public sealed class AssetViewerWindow : Component, IImGuiWindow
         bool open = true;
         ImGui.Begin(Name, ref open);
 
-        DrawInspector(Id.ToString(), _asset);
+        var reflectorManager = Resolve<ReflectorManager>();
+        reflectorManager.RenderNode(Id.ToString(), _asset);
         _viewer?.Draw();
 
         ImGui.End();
         if (!open)
             Remove();
-    }
-
-    static void DrawInspector(string name, object target)
-    {
-        var meta = new ReflectorMetadata(name, null, null, null, null, null);
-        var state = new ReflectorState(target, null, -1, meta);
-        var reflector = ReflectorManager.Instance.GetReflectorForInstance(state.Target);
-        reflector(state);
     }
 
     void Refresh()

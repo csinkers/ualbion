@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using ImGuiNET;
+using UAlbion.Api.Eventing;
 
 namespace UAlbion.Core.Veldrid.Reflection;
 
@@ -23,9 +24,12 @@ sealed class StringReflector : IReflector
                 "StringState",
                 s =>
                 {
-                    int len = 1024;
+                    int len = DiagEditAttribute.DefaultMaxStringLength;
                     if (s.Meta?.Options?.MaxLength != null)
                         len = s.Meta.Options.MaxLength;
+
+                    if (len == 0)
+                        len = DiagEditAttribute.DefaultMaxStringLength;
 
                     var buf = new byte[len];
                     var str = (string)s.Target;

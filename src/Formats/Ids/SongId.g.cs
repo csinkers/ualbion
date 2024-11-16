@@ -67,7 +67,7 @@ public readonly struct SongId : IEquatable<SongId>, IEquatable<AssetId>, ICompar
         return (SongId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static SongId SerdesU8(string name, SongId id, AssetMapping mapping, ISerializer s)
+    public static SongId SerdesU8(string name, SongId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct SongId : IEquatable<SongId>, IEquatable<AssetId>, ICompar
         return id;
     }
 
-    public static SongId SerdesU16(string name, SongId id, AssetMapping mapping, ISerializer s)
+    public static SongId SerdesU16(string name, SongId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct SongId : IEquatable<SongId>, IEquatable<AssetId>, ICompar
         return id;
     }
 
-    public static SongId SerdesU16BE(string name, SongId id, AssetMapping mapping, ISerializer s)
+    public static SongId SerdesU16BE(string name, SongId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

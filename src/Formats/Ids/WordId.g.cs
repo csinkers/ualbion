@@ -67,7 +67,7 @@ public readonly struct WordId : IEquatable<WordId>, IEquatable<AssetId>, ICompar
         return (WordId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static WordId SerdesU8(string name, WordId id, AssetMapping mapping, ISerializer s)
+    public static WordId SerdesU8(string name, WordId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct WordId : IEquatable<WordId>, IEquatable<AssetId>, ICompar
         return id;
     }
 
-    public static WordId SerdesU16(string name, WordId id, AssetMapping mapping, ISerializer s)
+    public static WordId SerdesU16(string name, WordId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct WordId : IEquatable<WordId>, IEquatable<AssetId>, ICompar
         return id;
     }
 
-    public static WordId SerdesU16BE(string name, WordId id, AssetMapping mapping, ISerializer s)
+    public static WordId SerdesU16BE(string name, WordId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

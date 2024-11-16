@@ -19,7 +19,7 @@ public class CreateTransportEvent : MapEvent
 
     CreateTransportEvent() { }
 
-    public static CreateTransportEvent Serdes(CreateTransportEvent e, AssetMapping mapping, ISerializer s)
+    public static CreateTransportEvent Serdes(CreateTransportEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new CreateTransportEvent();

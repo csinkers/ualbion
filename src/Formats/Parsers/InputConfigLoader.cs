@@ -7,10 +7,10 @@ namespace UAlbion.Formats.Parsers;
 
 public class InputConfigLoader : IAssetLoader<InputConfig>
 {
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context) 
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((InputConfig)existing, s, context);
 
-    public InputConfig Serdes(InputConfig existing, ISerializer s, AssetLoadContext context)
+    public InputConfig Serdes(InputConfig existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 

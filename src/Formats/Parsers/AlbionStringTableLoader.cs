@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Parsers;
 
 public class AlbionStringTableLoader : IAssetLoader<ListStringSet>
 {
-    public ListStringSet Serdes(ListStringSet existing, ISerializer s, AssetLoadContext context)
+    public ListStringSet Serdes(ListStringSet existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
         if (s.IsReading())
@@ -41,6 +41,6 @@ public class AlbionStringTableLoader : IAssetLoader<ListStringSet>
         }
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes(existing as ListStringSet, s, context);
 }

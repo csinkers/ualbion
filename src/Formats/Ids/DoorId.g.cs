@@ -67,7 +67,7 @@ public readonly struct DoorId : IEquatable<DoorId>, IEquatable<AssetId>, ICompar
         return (DoorId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static DoorId SerdesU8(string name, DoorId id, AssetMapping mapping, ISerializer s)
+    public static DoorId SerdesU8(string name, DoorId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct DoorId : IEquatable<DoorId>, IEquatable<AssetId>, ICompar
         return id;
     }
 
-    public static DoorId SerdesU16(string name, DoorId id, AssetMapping mapping, ISerializer s)
+    public static DoorId SerdesU16(string name, DoorId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct DoorId : IEquatable<DoorId>, IEquatable<AssetId>, ICompar
         return id;
     }
 
-    public static DoorId SerdesU16BE(string name, DoorId id, AssetMapping mapping, ISerializer s)
+    public static DoorId SerdesU16BE(string name, DoorId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

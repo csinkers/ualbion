@@ -11,7 +11,7 @@ public class StringSetCollectorLoader : Component, IAssetLoader<ListStringSet>
 {
     public static readonly AssetRangeAssetProperty FileRange = new("FileRange");
     public static readonly AssetRangeAssetProperty TargetRange = new("TargetRange");
-    public ListStringSet Serdes(ListStringSet existing, ISerializer s, AssetLoadContext context)
+    public ListStringSet Serdes(ListStringSet existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         var targetRange = context.GetProperty(TargetRange);
@@ -47,6 +47,6 @@ public class StringSetCollectorLoader : Component, IAssetLoader<ListStringSet>
         return result;
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((ListStringSet)existing, s, context);
 }

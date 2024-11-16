@@ -20,7 +20,7 @@ public class QueryTickerEvent : QueryEvent
         Operation = operation;
         Immediate = immediate;
     }
-    public static QueryTickerEvent Serdes(QueryTickerEvent e, AssetMapping mapping, ISerializer s)
+    public static QueryTickerEvent Serdes(QueryTickerEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryTickerEvent();

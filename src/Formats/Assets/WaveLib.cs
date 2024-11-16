@@ -10,7 +10,7 @@ public class WaveLib
 {
     public const int MaxSamples = 512;
     Dictionary<int, WaveLibSample> _instrumentIndex;
-    public static WaveLib Serdes(WaveLib w, ISerializer s)
+    public static WaveLib Serdes(WaveLib w, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         w ??= new WaveLib();

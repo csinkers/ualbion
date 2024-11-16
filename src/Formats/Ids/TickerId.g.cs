@@ -67,7 +67,7 @@ public readonly struct TickerId : IEquatable<TickerId>, IEquatable<AssetId>, ICo
         return (TickerId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static TickerId SerdesU8(string name, TickerId id, AssetMapping mapping, ISerializer s)
+    public static TickerId SerdesU8(string name, TickerId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct TickerId : IEquatable<TickerId>, IEquatable<AssetId>, ICo
         return id;
     }
 
-    public static TickerId SerdesU16(string name, TickerId id, AssetMapping mapping, ISerializer s)
+    public static TickerId SerdesU16(string name, TickerId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct TickerId : IEquatable<TickerId>, IEquatable<AssetId>, ICo
         return id;
     }
 
-    public static TickerId SerdesU16BE(string name, TickerId id, AssetMapping mapping, ISerializer s)
+    public static TickerId SerdesU16BE(string name, TickerId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

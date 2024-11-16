@@ -7,7 +7,7 @@ namespace UAlbion.Formats.Parsers;
 
 public class JsonStringLoader : IAssetLoader
 {
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
         ArgumentNullException.ThrowIfNull(context);

@@ -20,7 +20,7 @@ public class QueryNpcActiveEvent : QueryEvent
         Operation = operation;
     }
 
-    public static QueryNpcActiveEvent Serdes(QueryNpcActiveEvent e, AssetMapping mapping, ISerializer s)
+    public static QueryNpcActiveEvent Serdes(QueryNpcActiveEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryNpcActiveEvent();

@@ -67,7 +67,7 @@ public readonly struct PortraitId : IEquatable<PortraitId>, IEquatable<AssetId>,
         return (PortraitId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static PortraitId SerdesU8(string name, PortraitId id, AssetMapping mapping, ISerializer s)
+    public static PortraitId SerdesU8(string name, PortraitId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct PortraitId : IEquatable<PortraitId>, IEquatable<AssetId>,
         return id;
     }
 
-    public static PortraitId SerdesU16(string name, PortraitId id, AssetMapping mapping, ISerializer s)
+    public static PortraitId SerdesU16(string name, PortraitId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct PortraitId : IEquatable<PortraitId>, IEquatable<AssetId>,
         return id;
     }
 
-    public static PortraitId SerdesU16BE(string name, PortraitId id, AssetMapping mapping, ISerializer s)
+    public static PortraitId SerdesU16BE(string name, PortraitId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

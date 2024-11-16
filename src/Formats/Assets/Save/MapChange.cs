@@ -18,7 +18,7 @@ public class MapChange // Basically an IconChangeEvent without the MapEventType 
     public MapId MapId { get; set; }
 
     public override string ToString() => $"MapΔ {X:X2} {Y:X2} {ChangeType} {Layers} {Value:X4} {MapId}";
-    public static MapChange Serdes(int i, MapChange u, AssetMapping mapping, ISerializer s)
+    public static MapChange Serdes(int i, MapChange u, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         u ??= new MapChange();

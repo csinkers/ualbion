@@ -8,7 +8,7 @@ public class DeltaFlcChunk : FlicChunk
     DeltaFlcLine[] _lines;
     public override FlicChunkType Type => FlicChunkType.DeltaWordOrientedRle;
 
-    protected override uint LoadChunk(uint length, ISerializer s)
+    protected override uint LoadChunk(uint length, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         var start = s.Offset;

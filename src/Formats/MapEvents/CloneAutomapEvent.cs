@@ -9,7 +9,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("clone_automap", "Copy the automap discovery data from one map to another")]
 public class CloneAutomapEvent : MapEvent
 {
-    public static CloneAutomapEvent Serdes(CloneAutomapEvent e, AssetMapping mapping, ISerializer s)
+    public static CloneAutomapEvent Serdes(CloneAutomapEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new CloneAutomapEvent();

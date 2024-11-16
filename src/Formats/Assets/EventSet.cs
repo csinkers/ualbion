@@ -48,7 +48,7 @@ public class EventSet : IEventSet
         }
     }
 
-    public static EventSet Serdes(EventSetId id, EventSet set, AssetMapping mapping, ISerializer s)
+    public static EventSet Serdes(EventSetId id, EventSet set, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         set ??= new EventSet { Id = id };

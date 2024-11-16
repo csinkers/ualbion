@@ -20,7 +20,7 @@ public class LabyrinthObject // Length 0x10 (16) bytes
     public override string ToString() =>
         $"EO.{Id}:{FrameCount} {Width}x{Height} [{MapWidth}x{MapHeight}] {Properties}";
 
-    public static LabyrinthObject Serdes(int _, LabyrinthObject o, AssetMapping mapping, ISerializer s)
+    public static LabyrinthObject Serdes(int _, LabyrinthObject o, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         o ??= new LabyrinthObject();

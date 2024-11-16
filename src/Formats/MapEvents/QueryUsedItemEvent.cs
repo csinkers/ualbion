@@ -20,7 +20,7 @@ public class QueryUsedItemEvent : QueryEvent
         Operation = operation;
         Immediate = immediate;
     }
-    public static QueryUsedItemEvent Serdes(QueryUsedItemEvent e, AssetMapping mapping, ISerializer s)
+    public static QueryUsedItemEvent Serdes(QueryUsedItemEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryUsedItemEvent();

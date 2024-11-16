@@ -8,12 +8,12 @@ namespace UAlbion.Formats.Parsers;
 
 public class MapLoader : IAssetLoader<IMapData>
 {
-    public IMapData Serdes(IMapData existing, ISerializer s, AssetLoadContext context)
+    public IMapData Serdes(IMapData existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         return BaseMapData.Serdes(context.AssetId, existing, context.Mapping, s);
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes(existing as IMapData, s, context);
 }

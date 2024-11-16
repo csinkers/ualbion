@@ -11,10 +11,10 @@ public class WordListLoader : IAssetLoader<ListStringSet>
 {
     const int WordLength = 21;
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((ListStringSet)existing, s, context);
 
-    public ListStringSet Serdes(ListStringSet existing, ISerializer s, AssetLoadContext context)
+    public ListStringSet Serdes(ListStringSet existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
         ArgumentNullException.ThrowIfNull(context);

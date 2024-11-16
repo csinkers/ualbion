@@ -67,7 +67,7 @@ public readonly struct EventSetId : IEquatable<EventSetId>, IEquatable<AssetId>,
         return (EventSetId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static EventSetId SerdesU8(string name, EventSetId id, AssetMapping mapping, ISerializer s)
+    public static EventSetId SerdesU8(string name, EventSetId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct EventSetId : IEquatable<EventSetId>, IEquatable<AssetId>,
         return id;
     }
 
-    public static EventSetId SerdesU16(string name, EventSetId id, AssetMapping mapping, ISerializer s)
+    public static EventSetId SerdesU16(string name, EventSetId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct EventSetId : IEquatable<EventSetId>, IEquatable<AssetId>,
         return id;
     }
 
-    public static EventSetId SerdesU16BE(string name, EventSetId id, AssetMapping mapping, ISerializer s)
+    public static EventSetId SerdesU16BE(string name, EventSetId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

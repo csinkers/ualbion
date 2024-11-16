@@ -14,7 +14,7 @@ public class ObjectGroup
     public override string ToString() =>
         $"Obj: AG{AutoGraphicsId} [ {string.Join("; ", SubObjects.Select(x => x.ToString()))} ]";
 
-    public static ObjectGroup Serdes(int _, ObjectGroup og, ISerializer s) // total size 0x42 = 66
+    public static ObjectGroup Serdes(int _, ObjectGroup og, ISerdes s) // total size 0x42 = 66
     {
         ArgumentNullException.ThrowIfNull(s);
         og ??= new ObjectGroup();
@@ -29,11 +29,11 @@ public class ObjectGroup
             so.Z = s.Int16(nameof(so.Z), so.Z);
             so.Y = s.Int16(nameof(so.Y), so.Y);
 
-            so.ObjectInfoNumber = s.Transform<ushort, ushort>(
-                nameof(so.ObjectInfoNumber),
-                so.ObjectInfoNumber,
-                S.UInt16,
-                StoreIncrementedConverter.Instance);
+            var incremented = (ushort)(so.ObjectInfoNumber + 1);
+
+            incremented = s.UInt16(nameof(so.ObjectInfoNumber), incremented);
+
+            so.ObjectInfoNumber = (ushort)(incremented - 1);
 
             if (so.ObjectInfoNumber == 0xffff)
                 og.SubObjects[n] = null;

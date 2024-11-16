@@ -27,10 +27,10 @@ public class PngTileLoader32Bit : Component, IAssetLoader<ITileGraphics>
     sealed record FrameInfo(string Path, int SubId, int PalFrame);
     readonly PngDecoderOptions _pngOptions = new();
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((ITileGraphics)existing, s, context);
 
-    public ITileGraphics Serdes(ITileGraphics existing, ISerializer s, AssetLoadContext context)
+    public ITileGraphics Serdes(ITileGraphics existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         if (s.IsWriting())

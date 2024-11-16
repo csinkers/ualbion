@@ -22,7 +22,7 @@ public class FlicFrame : FlicChunk
     public ushort Width { get; private set; } // Overrides, usually 0.
     public ushort Height { get; private set; }
 
-    protected override uint LoadChunk(uint length, ISerializer s)
+    protected override uint LoadChunk(uint length, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         var initialOffset = s.Offset;

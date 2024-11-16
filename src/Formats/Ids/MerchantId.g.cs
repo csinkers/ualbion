@@ -67,7 +67,7 @@ public readonly struct MerchantId : IEquatable<MerchantId>, IEquatable<AssetId>,
         return (MerchantId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static MerchantId SerdesU8(string name, MerchantId id, AssetMapping mapping, ISerializer s)
+    public static MerchantId SerdesU8(string name, MerchantId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct MerchantId : IEquatable<MerchantId>, IEquatable<AssetId>,
         return id;
     }
 
-    public static MerchantId SerdesU16(string name, MerchantId id, AssetMapping mapping, ISerializer s)
+    public static MerchantId SerdesU16(string name, MerchantId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct MerchantId : IEquatable<MerchantId>, IEquatable<AssetId>,
         return id;
     }
 
-    public static MerchantId SerdesU16BE(string name, MerchantId id, AssetMapping mapping, ISerializer s)
+    public static MerchantId SerdesU16BE(string name, MerchantId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

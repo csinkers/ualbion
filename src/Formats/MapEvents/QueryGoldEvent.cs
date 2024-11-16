@@ -18,7 +18,7 @@ public class QueryGoldEvent : QueryEvent
         Immediate = immediate;
         Argument = argument;
     }
-    public static QueryGoldEvent Serdes(QueryGoldEvent e, ISerializer s)
+    public static QueryGoldEvent Serdes(QueryGoldEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryGoldEvent();

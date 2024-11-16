@@ -19,7 +19,7 @@ public class XldContainer : IAssetContainer
     static readonly IntAssetProperty MinimumCount = new("MinimumCount");
     static int HeaderSize(int itemCount) => MagicString.Length + 3 + 4 * itemCount;
 
-    public ISerializer Read(string path, AssetLoadContext context)
+    public ISerdes Read(string path, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         if (!context.Disk.FileExists(path))
@@ -95,7 +95,7 @@ public class XldContainer : IAssetContainer
         return results;
     }
 
-    static int[] HeaderSerdes(int[] lengths, ISerializer s)
+    static int[] HeaderSerdes(int[] lengths, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         s.Begin("XldHeader");
@@ -117,8 +117,8 @@ public class XldContainer : IAssetContainer
         XldCategory category,
         int firstId,
         TContext context,
-        ISerializer s,
-        Action<int, int, TContext, ISerializer> func)
+        ISerdes s,
+        Action<int, int, TContext, ISerdes> func)
     {
         var descriptor = s.Object("XldDescriptor", (XldDescriptor)null, XldDescriptor.Serdes);
         ApiUtil.Assert(descriptor.Category == category);
@@ -135,7 +135,7 @@ public class XldContainer : IAssetContainer
             if (lengths[i] == 0)
                 continue;
 
-            using var window = new WindowingProxySerializer(s, null);
+            using var window = new WindowingProxySerdes(s, null);
             func(i + firstId, lengths[i], context, window);
             offset += lengths[i];
             ApiUtil.Assert(offset == s.Offset);
@@ -147,8 +147,8 @@ public class XldContainer : IAssetContainer
         int firstId,
         int lastId,
         TContext context,
-        ISerializer s,
-        Action<int, int, TContext, ISerializer> func,
+        ISerdes s,
+        Action<int, int, TContext, ISerdes> func,
         IList<int> populatedIds)
     {
         int count = populatedIds.Where(x => x >= firstId && x <= lastId).Max() - firstId + 1;
@@ -158,7 +158,7 @@ public class XldContainer : IAssetContainer
 
         for (int i = 0; i < count; i++)
         {
-            using var window = new WindowingProxySerializer(s, null);
+            using var window = new WindowingProxySerdes(s, null);
             func(i + firstId, 0, context, window);
             lengths[i] = (int)window.Offset;
         }
@@ -183,8 +183,8 @@ public class XldContainer : IAssetContainer
         int firstId,
         int lastId,
         TContext context,
-        ISerializer s,
-        Action<int, int, TContext, ISerializer> func,
+        ISerdes s,
+        Action<int, int, TContext, ISerdes> func,
         IList<int> populatedIds)
     {
         ArgumentNullException.ThrowIfNull(s);

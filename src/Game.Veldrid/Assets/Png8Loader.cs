@@ -17,7 +17,7 @@ namespace UAlbion.Game.Veldrid.Assets;
 
 public class Png8Loader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>>
 {
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
         ArgumentNullException.ThrowIfNull(context);
@@ -58,7 +58,7 @@ public class Png8Loader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>>
         finally { foreach (var image in images) image.Dispose(); }
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((IReadOnlyTexture<byte>)existing, s, context);
 
     static byte[] Write(PngEncoder encoder, uint[] palette, IReadOnlyTexture<byte> existing, int frameNum)

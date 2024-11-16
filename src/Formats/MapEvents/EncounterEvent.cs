@@ -16,7 +16,7 @@ public class EncounterEvent : MapEvent
         BackgroundId = backgroundId;
     }
 
-    public static EncounterEvent Serdes(EncounterEvent e, AssetMapping mapping, ISerializer s)
+    public static EncounterEvent Serdes(EncounterEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new EncounterEvent();

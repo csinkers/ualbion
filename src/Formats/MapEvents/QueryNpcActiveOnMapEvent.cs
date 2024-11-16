@@ -20,7 +20,7 @@ public class QueryNpcActiveOnMapEvent : QueryEvent
         NpcNum = npcNum;
         MapId = mapId;
     }
-    public static QueryNpcActiveOnMapEvent Serdes(QueryNpcActiveOnMapEvent e, AssetMapping mapping, ISerializer s)
+    public static QueryNpcActiveOnMapEvent Serdes(QueryNpcActiveOnMapEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryNpcActiveOnMapEvent();

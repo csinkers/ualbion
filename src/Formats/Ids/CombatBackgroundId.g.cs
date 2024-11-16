@@ -67,7 +67,7 @@ public readonly struct CombatBackgroundId : IEquatable<CombatBackgroundId>, IEqu
         return (CombatBackgroundId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static CombatBackgroundId SerdesU8(string name, CombatBackgroundId id, AssetMapping mapping, ISerializer s)
+    public static CombatBackgroundId SerdesU8(string name, CombatBackgroundId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct CombatBackgroundId : IEquatable<CombatBackgroundId>, IEqu
         return id;
     }
 
-    public static CombatBackgroundId SerdesU16(string name, CombatBackgroundId id, AssetMapping mapping, ISerializer s)
+    public static CombatBackgroundId SerdesU16(string name, CombatBackgroundId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct CombatBackgroundId : IEquatable<CombatBackgroundId>, IEqu
         return id;
     }
 
-    public static CombatBackgroundId SerdesU16BE(string name, CombatBackgroundId id, AssetMapping mapping, ISerializer s)
+    public static CombatBackgroundId SerdesU16BE(string name, CombatBackgroundId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

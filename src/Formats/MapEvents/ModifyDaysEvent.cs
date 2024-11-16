@@ -7,7 +7,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("modify_days")]
 public class ModifyDaysEvent : ModifyEvent
 {
-    public static ModifyDaysEvent Serdes(ModifyDaysEvent e, ISerializer s)
+    public static ModifyDaysEvent Serdes(ModifyDaysEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new ModifyDaysEvent();

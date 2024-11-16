@@ -67,7 +67,7 @@ public readonly struct NpcSheetId : IEquatable<NpcSheetId>, IEquatable<AssetId>,
         return (NpcSheetId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static NpcSheetId SerdesU8(string name, NpcSheetId id, AssetMapping mapping, ISerializer s)
+    public static NpcSheetId SerdesU8(string name, NpcSheetId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct NpcSheetId : IEquatable<NpcSheetId>, IEquatable<AssetId>,
         return id;
     }
 
-    public static NpcSheetId SerdesU16(string name, NpcSheetId id, AssetMapping mapping, ISerializer s)
+    public static NpcSheetId SerdesU16(string name, NpcSheetId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct NpcSheetId : IEquatable<NpcSheetId>, IEquatable<AssetId>,
         return id;
     }
 
-    public static NpcSheetId SerdesU16BE(string name, NpcSheetId id, AssetMapping mapping, ISerializer s)
+    public static NpcSheetId SerdesU16BE(string name, NpcSheetId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

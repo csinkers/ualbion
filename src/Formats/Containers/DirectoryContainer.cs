@@ -17,7 +17,7 @@ namespace UAlbion.Formats.Containers;
 public class DirectoryContainer : IAssetContainer
 {
     static readonly AssetPathPattern DefaultPattern = AssetPathPattern.Build("{0}_{1}_{2}.dat");
-    public ISerializer Read(string path, AssetLoadContext context)
+    public ISerdes Read(string path, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 

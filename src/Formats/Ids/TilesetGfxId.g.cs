@@ -67,7 +67,7 @@ public readonly struct TilesetGfxId : IEquatable<TilesetGfxId>, IEquatable<Asset
         return (TilesetGfxId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static TilesetGfxId SerdesU8(string name, TilesetGfxId id, AssetMapping mapping, ISerializer s)
+    public static TilesetGfxId SerdesU8(string name, TilesetGfxId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct TilesetGfxId : IEquatable<TilesetGfxId>, IEquatable<Asset
         return id;
     }
 
-    public static TilesetGfxId SerdesU16(string name, TilesetGfxId id, AssetMapping mapping, ISerializer s)
+    public static TilesetGfxId SerdesU16(string name, TilesetGfxId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct TilesetGfxId : IEquatable<TilesetGfxId>, IEquatable<Asset
         return id;
     }
 
-    public static TilesetGfxId SerdesU16BE(string name, TilesetGfxId id, AssetMapping mapping, ISerializer s)
+    public static TilesetGfxId SerdesU16BE(string name, TilesetGfxId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

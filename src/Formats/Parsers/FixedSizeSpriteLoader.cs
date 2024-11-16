@@ -14,10 +14,10 @@ public class FixedSizeSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
     public static readonly BoolAssetProperty TransposedProperty = new("Transposed"); // For various textures in the 3D world that are stored with rows/columns flipped
     public static readonly IntAssetProperty ExtraBytesProperty = new("ExtraBytes"); // Used to suppress assertions when loading original assets that have incorrect sizes
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((IReadOnlyTexture<byte>) existing, s, context);
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
         ArgumentNullException.ThrowIfNull(context);
@@ -26,7 +26,7 @@ public class FixedSizeSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
             : Read(context, s);
     }
 
-    static SimpleTexture<byte> Read(AssetLoadContext context, ISerializer s)
+    static SimpleTexture<byte> Read(AssetLoadContext context, ISerdes s)
     {
         var streamLength = s.BytesRemaining;
         if (streamLength == 0)
@@ -67,7 +67,7 @@ public class FixedSizeSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
         return info.GetProperty(TransposedProperty) ? Transpose(sprite) : sprite;
     }
 
-    static IReadOnlyTexture<byte> Write(IReadOnlyTexture<byte> existing, AssetLoadContext context, ISerializer s)
+    static IReadOnlyTexture<byte> Write(IReadOnlyTexture<byte> existing, AssetLoadContext context, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(existing);
 
@@ -86,7 +86,7 @@ public class FixedSizeSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
         return existing;
     }
 
-    static void InnerWrite(IReadOnlyTexture<byte> sprite, ISerializer s)
+    static void InnerWrite(IReadOnlyTexture<byte> sprite, ISerdes s)
     {
         var f = sprite.Regions[0];
         int frameSize = f.Width * f.Height;

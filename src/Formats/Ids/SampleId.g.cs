@@ -67,7 +67,7 @@ public readonly struct SampleId : IEquatable<SampleId>, IEquatable<AssetId>, ICo
         return (SampleId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static SampleId SerdesU8(string name, SampleId id, AssetMapping mapping, ISerializer s)
+    public static SampleId SerdesU8(string name, SampleId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct SampleId : IEquatable<SampleId>, IEquatable<AssetId>, ICo
         return id;
     }
 
-    public static SampleId SerdesU16(string name, SampleId id, AssetMapping mapping, ISerializer s)
+    public static SampleId SerdesU16(string name, SampleId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct SampleId : IEquatable<SampleId>, IEquatable<AssetId>, ICo
         return id;
     }
 
-    public static SampleId SerdesU16BE(string name, SampleId id, AssetMapping mapping, ISerializer s)
+    public static SampleId SerdesU16BE(string name, SampleId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

@@ -30,7 +30,7 @@ public class FloorAndCeiling // Length = 0xA (10) bytes
     public ushort Unk8 { get; set; }
     public override string ToString() => $"FC.{SpriteId}:{FrameCount} {Properties}";
 
-    public static FloorAndCeiling Serdes(int _, FloorAndCeiling existing, AssetMapping mapping, ISerializer s)
+    public static FloorAndCeiling Serdes(int _, FloorAndCeiling existing, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         var fc = existing ?? new FloorAndCeiling();

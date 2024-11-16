@@ -8,9 +8,9 @@ namespace UAlbion.Formats.Parsers;
 public class TilesetLoader : IAssetLoader<TilesetData>
 {
     public static readonly BoolAssetProperty UseSmallGraphicsProperty = new("UseSmallGraphics"); 
-    public TilesetData Serdes(TilesetData existing, ISerializer s, AssetLoadContext context)
+    public TilesetData Serdes(TilesetData existing, ISerdes s, AssetLoadContext context)
         => TilesetData.Serdes(existing, s, context);
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes(existing as TilesetData, s, context);
 }

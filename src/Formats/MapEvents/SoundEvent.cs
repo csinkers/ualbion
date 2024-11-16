@@ -26,7 +26,7 @@ public class SoundEvent : MapEvent, ISoundEvent
         Mode = mode;
     }
 
-    public static SoundEvent Serdes(SoundEvent e, AssetMapping mapping, ISerializer s)
+    public static SoundEvent Serdes(SoundEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new SoundEvent();

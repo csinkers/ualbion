@@ -19,7 +19,7 @@ public class QueryRandomChanceEvent : QueryEvent
         Immediate = immediate;
         Argument = argument;
     }
-    public static QueryRandomChanceEvent Serdes(QueryRandomChanceEvent e, ISerializer s)
+    public static QueryRandomChanceEvent Serdes(QueryRandomChanceEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryRandomChanceEvent();

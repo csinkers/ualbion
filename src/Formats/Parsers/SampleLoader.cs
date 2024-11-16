@@ -11,16 +11,16 @@ public class SampleLoader : IAssetLoader<AlbionSample>
     const int Channels = 1;
     const int BytesPerSample = 1;
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((AlbionSample) existing, s, context);
 
-    public AlbionSample Serdes(AlbionSample existing, ISerializer s, AssetLoadContext context)
+    public AlbionSample Serdes(AlbionSample existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
         return s.IsWriting() ? Write(existing, s) : Read(s);
     }
 
-    static AlbionSample Read(ISerializer s)
+    static AlbionSample Read(ISerdes s)
     {
         return new()
         {
@@ -31,7 +31,7 @@ public class SampleLoader : IAssetLoader<AlbionSample>
         };
     }
 
-    static AlbionSample Write(AlbionSample sample, ISerializer s)
+    static AlbionSample Write(AlbionSample sample, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(sample);
         if(sample.SampleRate != SampleRate)

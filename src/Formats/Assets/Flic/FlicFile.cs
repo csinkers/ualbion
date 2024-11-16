@@ -6,7 +6,7 @@ namespace UAlbion.Formats.Assets.Flic;
 
 public class FlicFile
 {
-    public FlicFile(ISerializer s)
+    public FlicFile(ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         if (s.IsWriting())

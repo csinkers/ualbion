@@ -216,7 +216,7 @@ public readonly struct {name} : IEquatable<{name}>, IEquatable<AssetId>, ICompar
         return ({name})AssetMapping.Global.EnumToId(enumType, enumValue);
     }}
 
-    public static {name} SerdesU8(string name, {name} id, {(single ? "" : "AssetType type, ")}AssetMapping mapping, ISerializer s)
+    public static {name} SerdesU8(string name, {name} id, {(single ? "" : "AssetType type, ")}AssetMapping mapping, ISerdes s)
     {{
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -227,7 +227,7 @@ public readonly struct {name} : IEquatable<{name}>, IEquatable<AssetId>, ICompar
         return id;
     }}
 
-    public static {name} SerdesU16(string name, {name} id, {(single ? "" : "AssetType type, ")}AssetMapping mapping, ISerializer s)
+    public static {name} SerdesU16(string name, {name} id, {(single ? "" : "AssetType type, ")}AssetMapping mapping, ISerdes s)
     {{
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -238,7 +238,7 @@ public readonly struct {name} : IEquatable<{name}>, IEquatable<AssetId>, ICompar
         return id;
     }}
 
-    public static {name} SerdesU16BE(string name, {name} id, {(single ? "" : "AssetType type, ")}AssetMapping mapping, ISerializer s)
+    public static {name} SerdesU16BE(string name, {name} id, {(single ? "" : "AssetType type, ")}AssetMapping mapping, ISerdes s)
     {{
         if (s == null) throw new ArgumentNullException(nameof(s));
 

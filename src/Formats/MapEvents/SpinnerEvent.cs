@@ -10,7 +10,7 @@ public class SpinnerEvent : MapEvent
     SpinnerEvent() { }
     public SpinnerEvent(byte unk1) => Unk1 = unk1;
 
-    public static SpinnerEvent Serdes(SpinnerEvent e, ISerializer s)
+    public static SpinnerEvent Serdes(SpinnerEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new SpinnerEvent();

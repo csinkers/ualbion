@@ -109,7 +109,7 @@ public class FlagSet
         }
     }
 
-    public void Serdes(string name, ISerializer s)
+    public void Serdes(string name, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
 
@@ -122,7 +122,7 @@ public class FlagSet
             Describe(s);
     }
 
-    void Describe(ISerializer s)
+    void Describe(ISerdes s)
     {
         var sb = new StringBuilder();
         int lastMap = -1;

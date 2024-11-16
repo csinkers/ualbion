@@ -67,7 +67,7 @@ public readonly struct LabyrinthId : IEquatable<LabyrinthId>, IEquatable<AssetId
         return (LabyrinthId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static LabyrinthId SerdesU8(string name, LabyrinthId id, AssetMapping mapping, ISerializer s)
+    public static LabyrinthId SerdesU8(string name, LabyrinthId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct LabyrinthId : IEquatable<LabyrinthId>, IEquatable<AssetId
         return id;
     }
 
-    public static LabyrinthId SerdesU16(string name, LabyrinthId id, AssetMapping mapping, ISerializer s)
+    public static LabyrinthId SerdesU16(string name, LabyrinthId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct LabyrinthId : IEquatable<LabyrinthId>, IEquatable<AssetId
         return id;
     }
 
-    public static LabyrinthId SerdesU16BE(string name, LabyrinthId id, AssetMapping mapping, ISerializer s)
+    public static LabyrinthId SerdesU16BE(string name, LabyrinthId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

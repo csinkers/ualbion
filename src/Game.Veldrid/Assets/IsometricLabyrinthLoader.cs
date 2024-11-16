@@ -39,7 +39,6 @@ public sealed class IsometricLabyrinthLoader : GameComponent, IAssetLoader<Labyr
     public static readonly PathPatternProperty WallPngPattern       = new("WallPngPattern",       "Tiled/Gfx/{0}_{2}_Walls.png");
     public static readonly PathPatternProperty ContentsPngPattern   = new("ContentsPngPattern",   "Tiled/Gfx/{0}_{2}_Contents.png");
 
-
     // TODO: Calculate these properly
     const int HackyContentsOffsetX = -143;
     const int HackyContentsOffsetY = 235;
@@ -118,7 +117,7 @@ public sealed class IsometricLabyrinthLoader : GameComponent, IAssetLoader<Labyr
         FormatUtil.SerializeToBytes(s =>
             _jsonLoader.Serdes(labyrinth, s, context));
 
-    public LabyrinthData Serdes(LabyrinthData existing, ISerializer s, AssetLoadContext context)
+    public LabyrinthData Serdes(LabyrinthData existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -155,7 +154,7 @@ public sealed class IsometricLabyrinthLoader : GameComponent, IAssetLoader<Labyr
         return existing;
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((LabyrinthData)existing, s, context);
 
     public void Dispose()

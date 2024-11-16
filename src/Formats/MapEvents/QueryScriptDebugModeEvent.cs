@@ -18,7 +18,7 @@ public class QueryScriptDebugModeEvent : QueryEvent
         Operation = operation;
         Immediate = immediate;
     }
-    public static QueryScriptDebugModeEvent Serdes(QueryScriptDebugModeEvent e, ISerializer s)
+    public static QueryScriptDebugModeEvent Serdes(QueryScriptDebugModeEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryScriptDebugModeEvent();

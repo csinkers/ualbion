@@ -22,7 +22,7 @@ public class WaveLibSample : ISample
 
     public override string ToString() => Active ? $"I:{Instrument} T:{Type} {Samples.Length} = {(MidiInstrument)Instrument}" : "None";
 
-    public static WaveLibSample Serdes(WaveLibSample w, ISerializer s, ref uint nextBufferOffset)
+    public static WaveLibSample Serdes(WaveLibSample w, ISerdes s, ref uint nextBufferOffset)
     {
         ArgumentNullException.ThrowIfNull(s);
         w ??= new WaveLibSample();

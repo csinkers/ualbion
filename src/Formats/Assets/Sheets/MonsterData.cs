@@ -23,7 +23,7 @@ public class MonsterData
     [JsonIgnore] // Exclude from JSON as it has a computed value.
     public SpriteId TacticalGfx => new(AssetType.TacticalGfx, CombatGfx.Id + 12);
 
-    public static MonsterData Serdes(MonsterData m, AssetMapping mapping, ISerializer s)
+    public static MonsterData Serdes(MonsterData m, AssetMapping mapping, ISerdes s)
     {
         m ??= new MonsterData();
         var initial = s.Offset;
@@ -78,7 +78,7 @@ public class MonsterData
         return m;
     }
 
-    static void SerdesAnimation(string name, CombatAnimationId id, Dictionary<CombatAnimationId, int[]> animations, ISerializer s)
+    static void SerdesAnimation(string name, CombatAnimationId id, Dictionary<CombatAnimationId, int[]> animations, ISerdes s)
     {
         if (s.IsReading())
         {

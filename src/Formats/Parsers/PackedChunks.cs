@@ -9,7 +9,7 @@ public static class PackedChunks
     const string Magic = "CHUNKED_MAGIC";
 
     // Format: u32 count; [ u32 size; byte[size] chunk ]
-    public static IEnumerable<(byte[], string)> Unpack(ISerializer s)
+    public static IEnumerable<(byte[], string)> Unpack(ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         var initial = s.Offset;
@@ -37,10 +37,10 @@ public static class PackedChunks
         }
     }
 
-    public static void Pack(ISerializer s, int count, Func<int, byte[]> buildChunk) 
+    public static void Pack(ISerdes s, int count, Func<int, byte[]> buildChunk)
         => PackNamed(s, count, i => (buildChunk(i), null));
 
-    public static void PackNamed(ISerializer s, int count, Func<int, (byte[], string)> buildChunk)
+    public static void PackNamed(ISerdes s, int count, Func<int, (byte[], string)> buildChunk)
     {
         ArgumentNullException.ThrowIfNull(s);
         ArgumentNullException.ThrowIfNull(buildChunk);

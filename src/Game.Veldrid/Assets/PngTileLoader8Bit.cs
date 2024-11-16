@@ -13,7 +13,7 @@ public class PngTileLoader8Bit : Component, IAssetLoader<ITileGraphics>
     readonly Png8Loader _png8Loader = new();
     public PngTileLoader8Bit() => AttachChild(_png8Loader);
 
-    public ITileGraphics Serdes(ITileGraphics existing, ISerializer s, AssetLoadContext context)
+    public ITileGraphics Serdes(ITileGraphics existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -36,6 +36,6 @@ public class PngTileLoader8Bit : Component, IAssetLoader<ITileGraphics>
         }
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((ITileGraphics)existing, s, context);
 }

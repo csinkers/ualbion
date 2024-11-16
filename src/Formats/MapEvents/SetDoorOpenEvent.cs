@@ -10,7 +10,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("set_door_open")]
 public class SetDoorOpenEvent : ModifyEvent
 {
-    public static SetDoorOpenEvent Serdes(SetDoorOpenEvent e, AssetMapping mapping, ISerializer s)
+    public static SetDoorOpenEvent Serdes(SetDoorOpenEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new SetDoorOpenEvent();

@@ -16,7 +16,7 @@ namespace UAlbion.TestCommon;
 public static class Asset
 {
     static readonly XldContainer XldLoader = new();
-    public delegate T SerdesFunc<T>(T x, ISerializer s, AssetLoadContext context) where T : class;
+    public delegate T SerdesFunc<T>(T x, ISerdes s, AssetLoadContext context) where T : class;
     public static void Compare(
         string resultDir,
         string testName,
@@ -67,7 +67,7 @@ public static class Asset
 
         using var annotationStream = new MemoryStream();
         using var annotationWriter = new StreamWriter(annotationStream);
-        using var afs = new AnnotationProxySerializer(ar, annotationWriter, FormatUtil.BytesFrom850String);
+        using var afs = new AnnotationProxySerdes(ar, annotationWriter, FormatUtil.BytesFrom850String);
 
         T result;
         Exception exception = null;
@@ -99,7 +99,7 @@ public static class Asset
         using var bw = new BinaryWriter(ms);
         using var annotationStream = new MemoryStream();
         using var annotationWriter = new StreamWriter(annotationStream);
-        using var aw = new AnnotationProxySerializer(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
+        using var aw = new AnnotationProxySerdes(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
 
         Exception exception = null;
         try { serdes(asset, aw, context); }
@@ -116,7 +116,7 @@ public static class Asset
         return (bytes, annotation);
     }
 
-    public static string Load(byte[] bytes, Action<ISerializer> serdes)
+    public static string Load(byte[] bytes, Action<ISerdes> serdes)
     {
         using var stream = new MemoryStream(bytes);
         using var br = new BinaryReader(stream);
@@ -124,7 +124,7 @@ public static class Asset
 
         using var annotationStream = new MemoryStream();
         using var annotationWriter = new StreamWriter(annotationStream);
-        using var afs = new AnnotationProxySerializer(ar, annotationWriter, FormatUtil.BytesFrom850String);
+        using var afs = new AnnotationProxySerdes(ar, annotationWriter, FormatUtil.BytesFrom850String);
 
         Exception exception = null;
         try
@@ -148,13 +148,13 @@ public static class Asset
         return annotation;
     }
 
-    public static (byte[], string) Save(Action<ISerializer> serdes)
+    public static (byte[], string) Save(Action<ISerdes> serdes)
     {
         using var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms);
         using var annotationStream = new MemoryStream();
         using var annotationWriter = new StreamWriter(annotationStream);
-        using var aw = new AnnotationProxySerializer(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
+        using var aw = new AnnotationProxySerdes(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
 
         Exception exception = null;
         try { serdes(aw); }

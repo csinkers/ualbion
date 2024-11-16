@@ -14,7 +14,7 @@ namespace UAlbion.Formats.Containers;
 /// </summary>
 public class ItemListContainer : IAssetContainer
 {
-    public ISerializer Read(string path, AssetLoadContext context)
+    public ISerdes Read(string path, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         var stream = context.Disk.OpenRead(path);

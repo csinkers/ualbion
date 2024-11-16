@@ -13,10 +13,10 @@ namespace UAlbion.Formats.Parsers;
 
 public class ScriptLoader : IAssetLoader<Script>
 {
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((Script)existing, s, context);
 
-    public Script Serdes(Script existing, ISerializer s, AssetLoadContext context)
+    public Script Serdes(Script existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
 
@@ -40,7 +40,7 @@ public class ScriptLoader : IAssetLoader<Script>
 
     public static Script Parse(string text) => ParseLines(ApiUtil.SplitLines(text));
 
-    static IEnumerable<string> ReadLines(ISerializer s)
+    static IEnumerable<string> ReadLines(ISerdes s)
     {
         var bytes = s.Bytes(null, null, (int)s.BytesRemaining);
         var text = Encoding.Latin1.GetString(bytes); // FormatUtil.BytesTo850String(bytes);

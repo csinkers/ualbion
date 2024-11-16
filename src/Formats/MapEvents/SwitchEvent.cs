@@ -17,7 +17,7 @@ public class SwitchEvent : ModifyEvent
         Unk3 = unk3;
     }
 
-    public static SwitchEvent Serdes(SwitchEvent e, AssetMapping mapping, ISerializer s)
+    public static SwitchEvent Serdes(SwitchEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new SwitchEvent();

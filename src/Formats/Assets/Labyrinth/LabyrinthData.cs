@@ -71,7 +71,7 @@ public class LabyrinthData
                 .Where(x => x != null && x.ObjectInfoNumber < Objects.Count)
                 .Select(x => (long)Objects[x.ObjectInfoNumber].FrameCount));
 
-    public static LabyrinthData Serdes(LabyrinthData d, AssetId id, AssetMapping mapping, ISerializer s)
+    public static LabyrinthData Serdes(LabyrinthData d, AssetId id, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         d ??= new LabyrinthData { Id = id };
@@ -110,12 +110,12 @@ public class LabyrinthData
         // MaxFloors = 50
         var floorAndCeilingCount = s.UInt16("FloorAndCeilingCount", (ushort)d.FloorAndCeilings.Count); // 28 + objectGroupCount * 42
         ApiUtil.Assert(floorAndCeilingCount <= 50, "A labyrinth cannot have more than 50 floors/ceilings");
-        s.List(nameof(d.FloorAndCeilings), d.FloorAndCeilings, mapping, floorAndCeilingCount, FloorAndCeiling.Serdes);
+        s.ListWithContext(nameof(d.FloorAndCeilings), d.FloorAndCeilings, mapping, floorAndCeilingCount, FloorAndCeiling.Serdes);
 
         // MaxObjects = 100
         ushort objectCount = s.UInt16("ObjectCount", (ushort)d.Objects.Count); // 2A + objectGroupCount * 42 + floorAndCeilingCount * A
         ApiUtil.Assert(objectCount <= 100, "A labyrinth cannot have more than 100 object types");
-        s.List(nameof(d.Objects), d.Objects, mapping, objectCount, LabyrinthObject.Serdes);
+        s.ListWithContext(nameof(d.Objects), d.Objects, mapping, objectCount, LabyrinthObject.Serdes);
 
         // Populate objectIds on subobjects to improve debugging experience
         foreach (var so in d.ObjectGroups.SelectMany(x => x.SubObjects))
@@ -126,7 +126,7 @@ public class LabyrinthData
 
         ushort wallCount = s.UInt16("WallCount", (ushort)d.Walls.Count);
         ApiUtil.Assert(objectCount <= MaxWalls, "A labyrinth cannot have more than 150 wall types");
-        s.List(nameof(d.Walls), d.Walls, mapping, wallCount, Wall.Serdes);
+        s.ListWithContext(nameof(d.Walls), d.Walls, mapping, wallCount, Wall.Serdes);
         // PerfTracker.StartupEvent("Finish loading labyrinth data");
         return d;
     }

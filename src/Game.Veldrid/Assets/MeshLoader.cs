@@ -18,7 +18,7 @@ public class MeshLoader : IAssetLoader<Mesh>
 {
     readonly PngDecoderOptions _pngOptions = new();
 
-    public Mesh Serdes(Mesh existing, ISerializer s, AssetLoadContext context)
+    public Mesh Serdes(Mesh existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
         ArgumentNullException.ThrowIfNull(context);
@@ -90,7 +90,7 @@ public class MeshLoader : IAssetLoader<Mesh>
         return texture;
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((Mesh)existing, s, context);
 }
 

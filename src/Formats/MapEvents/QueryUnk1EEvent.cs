@@ -18,7 +18,7 @@ public class QueryUnk1EEvent : QueryEvent
         Immediate = immediate;
         Argument = argument;
     }
-    public static QueryUnk1EEvent Serdes(QueryUnk1EEvent e, ISerializer s)
+    public static QueryUnk1EEvent Serdes(QueryUnk1EEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryUnk1EEvent();

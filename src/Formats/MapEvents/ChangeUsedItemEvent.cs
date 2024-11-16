@@ -9,7 +9,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("change_used_item")]
 public class ChangeUsedItemEvent : MapEvent
 {
-    public static ChangeUsedItemEvent Serdes(ChangeUsedItemEvent e, AssetMapping mapping, ISerializer s)
+    public static ChangeUsedItemEvent Serdes(ChangeUsedItemEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new ChangeUsedItemEvent();

@@ -8,7 +8,7 @@ namespace UAlbion.Formats.MapEvents;
 public class QueryEventUsedEvent : QueryEvent
 {
     public override QueryType QueryType => QueryType.EventUsed;
-    public static QueryEventUsedEvent Serdes(QueryEventUsedEvent e, ISerializer s)
+    public static QueryEventUsedEvent Serdes(QueryEventUsedEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryEventUsedEvent();

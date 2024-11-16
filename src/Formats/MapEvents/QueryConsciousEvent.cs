@@ -20,7 +20,7 @@ public class QueryConsciousEvent : QueryEvent
         Operation = operation;
         Immediate = immediate;
     }
-    public static QueryConsciousEvent Serdes(QueryConsciousEvent e, AssetMapping mapping, ISerializer s)
+    public static QueryConsciousEvent Serdes(QueryConsciousEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryConsciousEvent();

@@ -31,7 +31,7 @@ public class TeleportEvent : MapEvent // aka MapExit event
         Unk5 = unk5;
     }
 
-    public static TeleportEvent Serdes(TeleportEvent e, AssetMapping mapping, ISerializer s)
+    public static TeleportEvent Serdes(TeleportEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new TeleportEvent();

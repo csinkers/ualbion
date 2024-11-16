@@ -178,7 +178,7 @@ public class AlbionPalette : IPalette
     public ReadOnlySpan<uint> GetPaletteAtTime(int i) => _texture.GetLayerBuffer(0).GetRow(i % _texture.Height);
     public override string ToString() { return string.IsNullOrEmpty(Name) ? $"Palette {Id}" : $"{Name} ({Id})"; }
 
-    public static AlbionPalette Serdes(AlbionPalette p, AssetLoadContext context, ISerializer s)
+    public static AlbionPalette Serdes(AlbionPalette p, AssetLoadContext context, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         ArgumentNullException.ThrowIfNull(context);

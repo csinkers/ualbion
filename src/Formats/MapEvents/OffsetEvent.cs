@@ -15,7 +15,7 @@ public class OffsetEvent : MapEvent
         Unk3 = unk3;
     }
 
-    public static OffsetEvent Serdes(OffsetEvent e, ISerializer s)
+    public static OffsetEvent Serdes(OffsetEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new OffsetEvent();

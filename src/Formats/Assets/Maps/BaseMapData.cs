@@ -127,13 +127,13 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
         Zones = new MapEventZone[width * height];
     }
 
-    protected int SerdesZones(ISerializer s)
+    protected int SerdesZones(ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         Zones ??= new MapEventZone[Width * Height];
         int zoneCount = s.UInt16("GlobalZoneCount", (ushort)GlobalZones.Count);
         int totalCount = zoneCount;
-        GlobalZones = (List<MapEventZone>)s.List(
+        GlobalZones = (List<MapEventZone>)s.ListWithContext(
             nameof(GlobalZones),
             GlobalZones,
             (byte)255,
@@ -150,7 +150,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
             zoneCount = s.UInt16("RowZones", (ushort)(row?.Count ?? 0));
             totalCount += zoneCount;
 
-            row = (List<MapEventZone>)s.List(
+            row = (List<MapEventZone>)s.ListWithContext(
                 nameof(Zones),
                 row, y, zoneCount,
                 (_, zone, y2, s2) => MapEventZone.Serdes(zone, s2, (byte)y2),
@@ -164,7 +164,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
         return totalCount;
     }
 
-    protected void SerdesEvents(AssetMapping mapping, MapType mapType, ISerializer s)
+    protected void SerdesEvents(AssetMapping mapping, MapType mapType, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         ushort eventCount = s.UInt16("EventCount", (ushort)Events.Count);
@@ -186,7 +186,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
             node.Unswizzle(Events);
     }
 
-    protected void SerdesChains(ISerializer s, int chainCount)
+    protected void SerdesChains(ISerdes s, int chainCount)
     {
         ArgumentNullException.ThrowIfNull(s);
         while (Chains.Count < chainCount)
@@ -251,7 +251,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
     }
 #endif
 
-    protected void SerdesNpcWaypoints(ISerializer s)
+    protected void SerdesNpcWaypoints(ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         for (var index = 0; index < Npcs.Count; index++)
@@ -269,7 +269,7 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
         }
     }
 
-    public static IMapData Serdes(AssetId id, IMapData existing, AssetMapping mapping, ISerializer s)
+    public static IMapData Serdes(AssetId id, IMapData existing, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         if (s.BytesRemaining == 0)

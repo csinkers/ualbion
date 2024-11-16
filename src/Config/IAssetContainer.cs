@@ -16,7 +16,7 @@ public interface IAssetContainer
     /// <param name="path">The path to the container file/directory</param>
     /// <param name="context">The loader context, containing the JSON serialiser, file system access object etc</param>
     /// <returns></returns>
-    ISerializer Read(string path, AssetLoadContext context);
+    ISerdes Read(string path, AssetLoadContext context);
 
     /// <summary>
     /// Write all assets inside a container

@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Parsers;
 
 public class VarSetLoader : IAssetLoader<VarSet>
 {
-    public VarSet Serdes(VarSet existing, ISerializer s, AssetLoadContext context)
+    public VarSet Serdes(VarSet existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -23,7 +23,7 @@ public class VarSetLoader : IAssetLoader<VarSet>
         return existing;
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((VarSet)existing, s, context);
 
     public static VarSet Load(string name, string path, IFileSystem disk, IJsonUtil json)

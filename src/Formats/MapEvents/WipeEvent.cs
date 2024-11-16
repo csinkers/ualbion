@@ -10,7 +10,7 @@ public class WipeEvent : MapEvent
     WipeEvent() { }
     public WipeEvent(byte value) => Value = value;
 
-    public static WipeEvent Serdes(WipeEvent e, ISerializer s)
+    public static WipeEvent Serdes(WipeEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new WipeEvent();

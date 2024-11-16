@@ -14,7 +14,7 @@ public class ExecuteEvent : MapEvent
         Unk8 = unk8;
     }
 
-    public static ExecuteEvent Serdes(ExecuteEvent e, ISerializer s)
+    public static ExecuteEvent Serdes(ExecuteEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new ExecuteEvent();

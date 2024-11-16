@@ -151,7 +151,7 @@ public static class FormatUtil
         return stream.ToArray();
     }
 
-    public static ISerializer SerializeWithSerdes([InstantHandle] Action<ISerializer> serdes)
+    public static ISerdes SerializeWithSerdes([InstantHandle] Action<ISerdes> serdes)
     {
         ArgumentNullException.ThrowIfNull(serdes);
         var ms = new MemoryStream();
@@ -169,7 +169,7 @@ public static class FormatUtil
         });
     }
 
-    public static byte[] SerializeToBytes([InstantHandle] Action<ISerializer> serdes)
+    public static byte[] SerializeToBytes([InstantHandle] Action<ISerdes> serdes)
     {
         ArgumentNullException.ThrowIfNull(serdes);
         var ms = new MemoryStream();
@@ -181,7 +181,7 @@ public static class FormatUtil
         return ms.ToArray();
     }
 
-    public static T DeserializeFromBytes<T>(byte[] bytes, [InstantHandle] Func<ISerializer, T> serdes)
+    public static T DeserializeFromBytes<T>(byte[] bytes, [InstantHandle] Func<ISerdes, T> serdes)
     {
         ArgumentNullException.ThrowIfNull(serdes);
         using var ms = new MemoryStream(bytes);

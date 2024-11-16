@@ -20,7 +20,7 @@ public class QueryLeaderEvent : QueryEvent
         Operation = operation;
         Immediate = immediate;
     }
-    public static QueryLeaderEvent Serdes(QueryLeaderEvent e, AssetMapping mapping, ISerializer s)
+    public static QueryLeaderEvent Serdes(QueryLeaderEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryLeaderEvent();

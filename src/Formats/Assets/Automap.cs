@@ -44,7 +44,7 @@ public class Automap
         _discovered = new BitArray(width * height);
     }
 
-    public static Automap Serdes(Automap map, ISerializer s)
+    public static Automap Serdes(Automap map, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         int length;

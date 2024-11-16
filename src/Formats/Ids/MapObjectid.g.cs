@@ -67,7 +67,7 @@ public readonly struct MapObjectId : IEquatable<MapObjectId>, IEquatable<AssetId
         return (MapObjectId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static MapObjectId SerdesU8(string name, MapObjectId id, AssetMapping mapping, ISerializer s)
+    public static MapObjectId SerdesU8(string name, MapObjectId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct MapObjectId : IEquatable<MapObjectId>, IEquatable<AssetId
         return id;
     }
 
-    public static MapObjectId SerdesU16(string name, MapObjectId id, AssetMapping mapping, ISerializer s)
+    public static MapObjectId SerdesU16(string name, MapObjectId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct MapObjectId : IEquatable<MapObjectId>, IEquatable<AssetId
         return id;
     }
 
-    public static MapObjectId SerdesU16BE(string name, MapObjectId id, AssetMapping mapping, ISerializer s)
+    public static MapObjectId SerdesU16BE(string name, MapObjectId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

@@ -67,7 +67,7 @@ public readonly struct AutomapId : IEquatable<AutomapId>, IEquatable<AssetId>, I
         return (AutomapId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static AutomapId SerdesU8(string name, AutomapId id, AssetMapping mapping, ISerializer s)
+    public static AutomapId SerdesU8(string name, AutomapId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct AutomapId : IEquatable<AutomapId>, IEquatable<AssetId>, I
         return id;
     }
 
-    public static AutomapId SerdesU16(string name, AutomapId id, AssetMapping mapping, ISerializer s)
+    public static AutomapId SerdesU16(string name, AutomapId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct AutomapId : IEquatable<AutomapId>, IEquatable<AssetId>, I
         return id;
     }
 
-    public static AutomapId SerdesU16BE(string name, AutomapId id, AssetMapping mapping, ISerializer s)
+    public static AutomapId SerdesU16BE(string name, AutomapId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

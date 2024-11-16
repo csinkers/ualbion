@@ -70,7 +70,7 @@ public class MapData3D : BaseMapData
         AutomapGraphics = new byte[AutomapGraphicsSize];
     }
 
-    public static MapData3D Serdes(AssetId id, MapData3D existing, AssetMapping mapping, ISerializer s)
+    public static MapData3D Serdes(AssetId id, MapData3D existing, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
 
@@ -141,7 +141,7 @@ public class MapData3D : BaseMapData
         return map;
     }
 
-    void SerdesAutomap(ISerializer s)
+    void SerdesAutomap(ISerdes s)
     {
         ushort automapInfoCount = s.UInt16("AutomapInfoCount", (ushort)Automap.Count);
         if (automapInfoCount != 0xffff)

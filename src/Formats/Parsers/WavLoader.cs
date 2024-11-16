@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Parsers;
 
 public class WavLoader : IAssetLoader<ISample>
 {
-    public ISample Serdes(ISample existing, ISerializer s, AssetLoadContext context)
+    public ISample Serdes(ISample existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
         if (s.IsWriting() && existing == null)
@@ -40,7 +40,7 @@ public class WavLoader : IAssetLoader<ISample>
         return existing;
     }
 
-    static void SerdesFormatTag(ISample w, ISerializer s)
+    static void SerdesFormatTag(ISample w, ISerdes s)
     {
         var tag = s.FixedLengthString(null, "fmt ",4); // Subchunk1 (format metadata)
         ApiUtil.Assert(tag == "fmt ", "tag == 'fmt '");
@@ -57,7 +57,7 @@ public class WavLoader : IAssetLoader<ISample>
         w.BytesPerSample = s.UInt16("BitsPerSample", (ushort)(w.BytesPerSample * 8)) / 8; // BitsPerSample
     }
 
-    static void SerdesDataTag(ISample w, ISerializer s)
+    static void SerdesDataTag(ISample w, ISerdes s)
     {
         var tag = s.FixedLengthString("Tag", "data", 4); // Subchunk2 (raw sample data)
         ApiUtil.Assert(tag == "data");
@@ -65,6 +65,6 @@ public class WavLoader : IAssetLoader<ISample>
         w.Samples = s.Bytes(nameof(w.Samples), w.Samples, sampleCount);
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((ISample) existing, s, context);
 }

@@ -10,7 +10,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("set_chest_open")]
 public class SetChestOpenEvent : ModifyEvent
 {
-    public static SetChestOpenEvent Serdes(SetChestOpenEvent e, AssetMapping mapping, ISerializer s)
+    public static SetChestOpenEvent Serdes(SetChestOpenEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new SetChestOpenEvent();

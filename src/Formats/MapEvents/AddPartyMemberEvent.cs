@@ -9,7 +9,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("add_party_member", "Add someone to the party", "apm")]
 public class AddPartyMemberEvent : ModifyEvent
 {
-    public static AddPartyMemberEvent Serdes(AddPartyMemberEvent e, AssetMapping mapping, ISerializer s)
+    public static AddPartyMemberEvent Serdes(AddPartyMemberEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new AddPartyMemberEvent();

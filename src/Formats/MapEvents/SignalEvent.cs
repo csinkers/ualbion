@@ -10,7 +10,7 @@ public class SignalEvent : MapEvent
     SignalEvent() { }
     public SignalEvent(byte signalId) => SignalId = signalId;
 
-    public static SignalEvent Serdes(SignalEvent e, ISerializer s)
+    public static SignalEvent Serdes(SignalEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new SignalEvent();

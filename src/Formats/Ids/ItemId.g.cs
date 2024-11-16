@@ -61,7 +61,7 @@ public readonly struct ItemId : IEquatable<ItemId>, IEquatable<AssetId>, ICompar
         return (ItemId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static ItemId SerdesU8(string name, ItemId id, AssetType type, AssetMapping mapping, ISerializer s)
+    public static ItemId SerdesU8(string name, ItemId id, AssetType type, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -72,7 +72,7 @@ public readonly struct ItemId : IEquatable<ItemId>, IEquatable<AssetId>, ICompar
         return id;
     }
 
-    public static ItemId SerdesU16(string name, ItemId id, AssetType type, AssetMapping mapping, ISerializer s)
+    public static ItemId SerdesU16(string name, ItemId id, AssetType type, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -83,7 +83,7 @@ public readonly struct ItemId : IEquatable<ItemId>, IEquatable<AssetId>, ICompar
         return id;
     }
 
-    public static ItemId SerdesU16BE(string name, ItemId id, AssetType type, AssetMapping mapping, ISerializer s)
+    public static ItemId SerdesU16BE(string name, ItemId id, AssetType type, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

@@ -171,7 +171,7 @@ public class ItemSlot : IReadOnlyItemSlot
         return slot;
     }
 
-    public static ItemSlot Serdes(InventorySlotId id, ItemSlot slot, AssetMapping mapping, ISerializer s)  // 6 per slot
+    public static ItemSlot Serdes(InventorySlotId id, ItemSlot slot, AssetMapping mapping, ISerdes s)  // 6 per slot
     {
         ArgumentNullException.ThrowIfNull(s);
         slot ??= new ItemSlot(id);

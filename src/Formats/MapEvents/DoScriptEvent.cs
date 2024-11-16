@@ -13,7 +13,7 @@ public class DoScriptEvent : MapEvent
     DoScriptEvent() { }
     public DoScriptEvent(ScriptId scriptId) => ScriptId = scriptId;
 
-    public static DoScriptEvent Serdes(DoScriptEvent e, AssetMapping mapping, ISerializer s)
+    public static DoScriptEvent Serdes(DoScriptEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new DoScriptEvent();

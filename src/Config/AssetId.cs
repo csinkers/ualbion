@@ -37,7 +37,7 @@ public readonly struct AssetId : IEquatable<AssetId>, IComparable, IAssetId
         return AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static AssetId SerdesU8(string name, AssetId id, AssetType type, AssetMapping mapping, ISerializer s)
+    public static AssetId SerdesU8(string name, AssetId id, AssetType type, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
 
@@ -46,7 +46,7 @@ public readonly struct AssetId : IEquatable<AssetId>, IComparable, IAssetId
         return FromDisk(type, diskValue, mapping);
     }
 
-    public static AssetId SerdesU16(string name, AssetId id, AssetType type, AssetMapping mapping, ISerializer s)
+    public static AssetId SerdesU16(string name, AssetId id, AssetType type, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(mapping);
         ArgumentNullException.ThrowIfNull(s);

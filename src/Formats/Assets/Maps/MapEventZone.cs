@@ -8,7 +8,7 @@ using UAlbion.Formats.Ids;
 
 namespace UAlbion.Formats.Assets.Maps;
 
-public class MapEventZone 
+public class MapEventZone
 {
     public bool Global { get; set; }
     public byte Unk1 { get; set; }
@@ -18,13 +18,15 @@ public class MapEventZone
     [JsonIgnore] public AssetId ChainSource { get; set; }
     [JsonIgnore] public ushort Chain { get; set; }
     [JsonIgnore] public IEventNode Node { get; set; }
-    [JsonIgnore(Condition = JsonIgnoreCondition.Never)] public ushort EventIndex
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+    public ushort EventIndex
     {
         get => Node?.Id ?? 0xffff;
         set => Node = value == 0xffff ? null : new DummyEventNode(value);
     }
 
-    public static MapEventZone Serdes(MapEventZone existing, ISerializer s, byte y)
+    public static MapEventZone Serdes(MapEventZone existing, ISerdes s, byte y)
     {
         ArgumentNullException.ThrowIfNull(s);
 
@@ -41,7 +43,11 @@ public class MapEventZone
         // ApiUtil.Assert(global && zone.X == 0xff || !global && zone.X != 0xff);
         zone.Unk1 = s.UInt8(nameof(Unk1), zone.Unk1);
         zone.Trigger = s.EnumU16(nameof(Trigger), zone.Trigger);
-        ushort? nodeId = s.Transform<ushort, ushort?>(nameof(Node), zone.Node?.Id, S.UInt16, MaxToNullConverter.Instance);
+
+        ushort rawNodeId = zone.Node?.Id ?? 0xffff;
+        rawNodeId = s.UInt16(nameof(Node), rawNodeId);
+        ushort? nodeId = rawNodeId == 0xffff ? null : rawNodeId;
+
         if (nodeId != null && zone.Node == null)
             zone.Node = new DummyEventNode(nodeId.Value);
 

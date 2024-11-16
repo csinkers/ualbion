@@ -67,7 +67,7 @@ public readonly struct MonsterGroupId : IEquatable<MonsterGroupId>, IEquatable<A
         return (MonsterGroupId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static MonsterGroupId SerdesU8(string name, MonsterGroupId id, AssetMapping mapping, ISerializer s)
+    public static MonsterGroupId SerdesU8(string name, MonsterGroupId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct MonsterGroupId : IEquatable<MonsterGroupId>, IEquatable<A
         return id;
     }
 
-    public static MonsterGroupId SerdesU16(string name, MonsterGroupId id, AssetMapping mapping, ISerializer s)
+    public static MonsterGroupId SerdesU16(string name, MonsterGroupId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct MonsterGroupId : IEquatable<MonsterGroupId>, IEquatable<A
         return id;
     }
 
-    public static MonsterGroupId SerdesU16BE(string name, MonsterGroupId id, AssetMapping mapping, ISerializer s)
+    public static MonsterGroupId SerdesU16BE(string name, MonsterGroupId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

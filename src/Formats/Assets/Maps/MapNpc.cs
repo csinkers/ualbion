@@ -26,9 +26,9 @@ public class MapNpc // 0xA = 10 bytes
             ((_raw & MapNpcFlags.Type2) != 0 ? 2 : 0));
         set => _raw =
             _raw & ~MapNpcFlags.TypeMaskV2
-            | (((int)value &  1) != 0 ? MapNpcFlags.Type1 : 0)
-            | (((int)value &  2) != 0 ? MapNpcFlags.Type2 : 0)
-            | (((int)value &  4) != 0 ? MapNpcFlags.Type4 : 0);
+            | (((int)value & 1) != 0 ? MapNpcFlags.Type1 : 0)
+            | (((int)value & 2) != 0 ? MapNpcFlags.Type2 : 0)
+            | (((int)value & 4) != 0 ? MapNpcFlags.Type4 : 0);
     }
 
     public MapNpcFlags Flags
@@ -56,7 +56,9 @@ public class MapNpc // 0xA = 10 bytes
     public NpcWaypoint[] Waypoints { get; set; }
     public ushort Chain { get; set; }
     [JsonIgnore] public IEventNode Node { get; set; }
-    [JsonIgnore(Condition = JsonIgnoreCondition.Never)] public ushort EventIndex
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+    public ushort EventIndex
     {
         get => Node?.Id ?? 0xffff;
         set => Node = value == 0xffff ? null : new DummyEventNode(value);
@@ -64,7 +66,7 @@ public class MapNpc // 0xA = 10 bytes
 
     public bool HasWaypoints(MapFlags mapFlags) => Movement is NpcMovement.Waypoints or NpcMovement.Waypoints2;
 
-    public static MapNpc Serdes(int _, MapNpc existing, MapType mapType, AssetMapping mapping, ISerializer s)
+    public static MapNpc Serdes(int _, MapNpc existing, MapType mapType, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         s.Begin("Npc");
@@ -75,7 +77,10 @@ public class MapNpc // 0xA = 10 bytes
         id = s.UInt8(nameof(Id), id);
         npc.Sound = s.UInt8(nameof(Sound), npc.Sound);
 
-        ushort? eventNumber = MaxToNullConverter.Serdes(nameof(npc.Node), npc.Node?.Id, s.UInt16);
+        ushort rawEventNumber = npc.Node?.Id ?? 0xffff;
+        rawEventNumber = s.UInt16(nameof(npc.Node), rawEventNumber);
+        ushort? eventNumber = rawEventNumber == 0xffff ? null : rawEventNumber;
+
         if (eventNumber != null && npc.Node == null)
             npc.Node = new DummyEventNode(eventNumber.Value);
 
@@ -115,7 +120,7 @@ public class MapNpc // 0xA = 10 bytes
         };
 
     }
-    public void LoadWaypoints(ISerializer s, bool useWaypoints)
+    public void LoadWaypoints(ISerdes s, bool useWaypoints)
     {
         ArgumentNullException.ThrowIfNull(s);
         if (useWaypoints)
@@ -149,7 +154,10 @@ public class MapNpc // 0xA = 10 bytes
             Node = getEvent(dummy.Id);
             Chain = getChain(dummy.Id);
         }
-        else Chain = 0xffff;
+        else
+        {
+            Chain = 0xffff;
+        }
     }
 
     public static int WaypointIndexToTime(int index)

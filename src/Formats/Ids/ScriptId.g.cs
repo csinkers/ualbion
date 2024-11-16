@@ -67,7 +67,7 @@ public readonly struct ScriptId : IEquatable<ScriptId>, IEquatable<AssetId>, ICo
         return (ScriptId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static ScriptId SerdesU8(string name, ScriptId id, AssetMapping mapping, ISerializer s)
+    public static ScriptId SerdesU8(string name, ScriptId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct ScriptId : IEquatable<ScriptId>, IEquatable<AssetId>, ICo
         return id;
     }
 
-    public static ScriptId SerdesU16(string name, ScriptId id, AssetMapping mapping, ISerializer s)
+    public static ScriptId SerdesU16(string name, ScriptId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct ScriptId : IEquatable<ScriptId>, IEquatable<AssetId>, ICo
         return id;
     }
 
-    public static ScriptId SerdesU16BE(string name, ScriptId id, AssetMapping mapping, ISerializer s)
+    public static ScriptId SerdesU16BE(string name, ScriptId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

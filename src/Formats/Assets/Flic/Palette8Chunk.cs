@@ -11,7 +11,7 @@ public class Palette8Chunk : FlicChunk
         public byte Skip { get; }
         public byte[] Triplets { get; }
 
-        public PalettePacket(ISerializer s)
+        public PalettePacket(ISerdes s)
         {
             ArgumentNullException.ThrowIfNull(s);
             Skip = s.UInt8(null, 0);
@@ -30,7 +30,7 @@ public class Palette8Chunk : FlicChunk
     }
 
     public override FlicChunkType Type => FlicChunkType.Palette8Bit;
-    protected override uint LoadChunk(uint length, ISerializer s)
+    protected override uint LoadChunk(uint length, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         ushort packetCount = s.UInt16(null, 0);

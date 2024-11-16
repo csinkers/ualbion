@@ -67,7 +67,7 @@ public readonly struct FontId : IEquatable<FontId>, IEquatable<AssetId>, ICompar
         return (FontId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static FontId SerdesU8(string name, FontId id, AssetMapping mapping, ISerializer s)
+    public static FontId SerdesU8(string name, FontId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct FontId : IEquatable<FontId>, IEquatable<AssetId>, ICompar
         return id;
     }
 
-    public static FontId SerdesU16(string name, FontId id, AssetMapping mapping, ISerializer s)
+    public static FontId SerdesU16(string name, FontId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct FontId : IEquatable<FontId>, IEquatable<AssetId>, ICompar
         return id;
     }
 
-    public static FontId SerdesU16BE(string name, FontId id, AssetMapping mapping, ISerializer s)
+    public static FontId SerdesU16BE(string name, FontId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

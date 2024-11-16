@@ -18,7 +18,7 @@ public class QueryNpcXEvent : QueryEvent
         Immediate = immediate;
         Argument = argument;
     }
-    public static QueryNpcXEvent Serdes(QueryNpcXEvent e, ISerializer s)
+    public static QueryNpcXEvent Serdes(QueryNpcXEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryNpcXEvent();

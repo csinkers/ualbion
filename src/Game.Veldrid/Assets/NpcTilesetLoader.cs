@@ -19,7 +19,7 @@ public class NpcTilesetLoader : Component, IAssetLoader
     readonly Png8Loader _png8Loader = new();
 
     public NpcTilesetLoader() => AttachChild(_png8Loader);
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
         ArgumentNullException.ThrowIfNull(context);

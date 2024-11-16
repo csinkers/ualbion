@@ -133,7 +133,7 @@ public sealed class ItemData
         return sb.ToString();
     }
 
-    public static ItemData Serdes(AssetId id, ItemData item, ISerializer s, ISpellManager spellManager)
+    public static ItemData Serdes(AssetId id, ItemData item, ISerdes s, ISpellManager spellManager)
     {
         ArgumentNullException.ThrowIfNull(s);
         ArgumentNullException.ThrowIfNull(spellManager);

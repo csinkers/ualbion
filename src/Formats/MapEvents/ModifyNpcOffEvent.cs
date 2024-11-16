@@ -18,7 +18,7 @@ public class ModifyNpcOffEvent : ModifyEvent, INpcEvent
         Map = map;
     }
 
-    public static ModifyNpcOffEvent Serdes(ModifyNpcOffEvent e, AssetMapping mapping, ISerializer s)
+    public static ModifyNpcOffEvent Serdes(ModifyNpcOffEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new ModifyNpcOffEvent();

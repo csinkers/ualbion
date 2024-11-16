@@ -5,7 +5,7 @@ using UAlbion.Api;
 
 namespace UAlbion.Formats;
 
-public class AlbionReader : GenericBinaryReader
+public class AlbionReader : ReaderSerdes
 {
     readonly BinaryReader _br;
 

@@ -67,7 +67,7 @@ public readonly struct PartyMemberId : IEquatable<PartyMemberId>, IEquatable<Ass
         return (PartyMemberId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static PartyMemberId SerdesU8(string name, PartyMemberId id, AssetMapping mapping, ISerializer s)
+    public static PartyMemberId SerdesU8(string name, PartyMemberId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct PartyMemberId : IEquatable<PartyMemberId>, IEquatable<Ass
         return id;
     }
 
-    public static PartyMemberId SerdesU16(string name, PartyMemberId id, AssetMapping mapping, ISerializer s)
+    public static PartyMemberId SerdesU16(string name, PartyMemberId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct PartyMemberId : IEquatable<PartyMemberId>, IEquatable<Ass
         return id;
     }
 
-    public static PartyMemberId SerdesU16BE(string name, PartyMemberId id, AssetMapping mapping, ISerializer s)
+    public static PartyMemberId SerdesU16BE(string name, PartyMemberId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

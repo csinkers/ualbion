@@ -175,7 +175,7 @@ public class CharacterSheet : ICharacterSheet
         }
     }
 
-    public static CharacterSheet Serdes(SheetId id, CharacterSheet sheet, AssetMapping mapping, ISerializer s, ISpellManager spellManager)
+    public static CharacterSheet Serdes(SheetId id, CharacterSheet sheet, AssetMapping mapping, ISerdes s, ISpellManager spellManager)
     {
         ArgumentNullException.ThrowIfNull(mapping);
         ArgumentNullException.ThrowIfNull(s);

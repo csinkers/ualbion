@@ -67,7 +67,7 @@ public readonly struct BlockListId : IEquatable<BlockListId>, IEquatable<AssetId
         return (BlockListId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static BlockListId SerdesU8(string name, BlockListId id, AssetMapping mapping, ISerializer s)
+    public static BlockListId SerdesU8(string name, BlockListId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct BlockListId : IEquatable<BlockListId>, IEquatable<AssetId
         return id;
     }
 
-    public static BlockListId SerdesU16(string name, BlockListId id, AssetMapping mapping, ISerializer s)
+    public static BlockListId SerdesU16(string name, BlockListId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct BlockListId : IEquatable<BlockListId>, IEquatable<AssetId
         return id;
     }
 
-    public static BlockListId SerdesU16BE(string name, BlockListId id, AssetMapping mapping, ISerializer s)
+    public static BlockListId SerdesU16BE(string name, BlockListId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

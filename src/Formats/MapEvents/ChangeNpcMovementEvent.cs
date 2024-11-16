@@ -17,7 +17,7 @@ public class ChangeNpcMovementEvent(
     short y)
     : MapEvent, INpcEvent // Specialised variant of ChangeIconEvent
 {
-    public static ChangeNpcMovementEvent Serdes(ChangeNpcMovementEvent e, AssetMapping mapping, MapType mapType, ISerializer s)
+    public static ChangeNpcMovementEvent Serdes(ChangeNpcMovementEvent e, AssetMapping mapping, MapType mapType, ISerdes s)
     {
         if (s.IsReading()) // Should never be used
             return (ChangeNpcMovementEvent)ChangeIconEvent.Serdes(null, mapping, mapType, s);

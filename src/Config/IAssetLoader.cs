@@ -4,10 +4,10 @@ namespace UAlbion.Config;
 
 public interface IAssetLoader
 {
-    object Serdes(object existing, ISerializer s, AssetLoadContext context);
+    object Serdes(object existing, ISerdes s, AssetLoadContext context);
 }
 
 public interface IAssetLoader<T> : IAssetLoader where T : class
 {
-    T Serdes(T existing, ISerializer s, AssetLoadContext context); // SerDes = Serialise / Deserialise.
+    T Serdes(T existing, ISerdes s, AssetLoadContext context); // SerDes = Serialise / Deserialise.
 }

@@ -17,7 +17,7 @@ public class SetPartyLeaderEvent : ModifyEvent
         Unk3 = unk3;
     }
 
-    public static SetPartyLeaderEvent Serdes(SetPartyLeaderEvent e, AssetMapping mapping, ISerializer s)
+    public static SetPartyLeaderEvent Serdes(SetPartyLeaderEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new SetPartyLeaderEvent();

@@ -67,7 +67,7 @@ public readonly struct SpecialId : IEquatable<SpecialId>, IEquatable<AssetId>, I
         return (SpecialId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static SpecialId SerdesU8(string name, SpecialId id, AssetMapping mapping, ISerializer s)
+    public static SpecialId SerdesU8(string name, SpecialId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct SpecialId : IEquatable<SpecialId>, IEquatable<AssetId>, I
         return id;
     }
 
-    public static SpecialId SerdesU16(string name, SpecialId id, AssetMapping mapping, ISerializer s)
+    public static SpecialId SerdesU16(string name, SpecialId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct SpecialId : IEquatable<SpecialId>, IEquatable<AssetId>, I
         return id;
     }
 
-    public static SpecialId SerdesU16BE(string name, SpecialId id, AssetMapping mapping, ISerializer s)
+    public static SpecialId SerdesU16BE(string name, SpecialId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

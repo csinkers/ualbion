@@ -36,11 +36,11 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
             return metaLoader.Serdes(null, null, context);
         }
 
-        using ISerializer s = Search(pathResolver, context, annotationWriter, filesSearched);
+        using ISerdes s = Search(pathResolver, context, annotationWriter, filesSearched);
         if (s == null)
             return null;
 
-        if (s.BytesRemaining == 0 && s is not EmptySerializer) // Happens all the time when dumping, just return rather than throw to preserve perf.
+        if (s.BytesRemaining == 0 && s is not EmptySerdes) // Happens all the time when dumping, just return rather than throw to preserve perf.
             return new AssetNotFoundException($"Asset for {context.AssetId} found but size was 0 bytes.", context.AssetId);
 
         var loader = _assetLoaderRegistry.GetLoader(context.Node.Loader);
@@ -50,7 +50,7 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
         return loader.Serdes(null, s, context);
     }
 
-    ISerializer Search(IPathResolver pathResolver, AssetLoadContext context, TextWriter annotationWriter, List<string> filesSearched)
+    ISerdes Search(IPathResolver pathResolver, AssetLoadContext context, TextWriter annotationWriter, List<string> filesSearched)
     {
         var node = context.Node;
         var disk = context.ModContext.Disk;
@@ -65,13 +65,16 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
                 if (!node.Sha256Hash.Equals(hash, StringComparison.OrdinalIgnoreCase))
                     return null;
             }
-            else filesSearched?.Add(disk.ToAbsolutePath(path));
+            else
+            {
+                filesSearched?.Add(disk.ToAbsolutePath(path));
+            }
         }
 
         var container = _containerRegistry.GetContainer(path, node.Container, disk);
         var s = container?.Read(path, context);
         if (annotationWriter != null)
-            s = new AnnotationProxySerializer(s, annotationWriter, FormatUtil.BytesFrom850String);
+            s = new AnnotationProxySerdes(s, annotationWriter, FormatUtil.BytesFrom850String);
         return s;
     }
 

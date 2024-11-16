@@ -36,7 +36,7 @@ public class StartDialogueEvent : MapEvent
     [EventPart("npc_id")]
     public NpcSheetId NpcId { get; private set; }
 
-    public static StartDialogueEvent Serdes(StartDialogueEvent e, AssetMapping mapping, ISerializer s)
+    public static StartDialogueEvent Serdes(StartDialogueEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new StartDialogueEvent();

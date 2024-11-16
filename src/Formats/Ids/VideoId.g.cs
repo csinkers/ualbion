@@ -67,7 +67,7 @@ public readonly struct VideoId : IEquatable<VideoId>, IEquatable<AssetId>, IComp
         return (VideoId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static VideoId SerdesU8(string name, VideoId id, AssetMapping mapping, ISerializer s)
+    public static VideoId SerdesU8(string name, VideoId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct VideoId : IEquatable<VideoId>, IEquatable<AssetId>, IComp
         return id;
     }
 
-    public static VideoId SerdesU16(string name, VideoId id, AssetMapping mapping, ISerializer s)
+    public static VideoId SerdesU16(string name, VideoId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct VideoId : IEquatable<VideoId>, IEquatable<AssetId>, IComp
         return id;
     }
 
-    public static VideoId SerdesU16BE(string name, VideoId id, AssetMapping mapping, ISerializer s)
+    public static VideoId SerdesU16BE(string name, VideoId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

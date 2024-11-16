@@ -67,7 +67,7 @@ public readonly struct InkId : IEquatable<InkId>, IEquatable<AssetId>, IComparab
         return (InkId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static InkId SerdesU8(string name, InkId id, AssetMapping mapping, ISerializer s)
+    public static InkId SerdesU8(string name, InkId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct InkId : IEquatable<InkId>, IEquatable<AssetId>, IComparab
         return id;
     }
 
-    public static InkId SerdesU16(string name, InkId id, AssetMapping mapping, ISerializer s)
+    public static InkId SerdesU16(string name, InkId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct InkId : IEquatable<InkId>, IEquatable<AssetId>, IComparab
         return id;
     }
 
-    public static InkId SerdesU16BE(string name, InkId id, AssetMapping mapping, ISerializer s)
+    public static InkId SerdesU16BE(string name, InkId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

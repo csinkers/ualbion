@@ -18,7 +18,7 @@ public class TrapEvent : MapEvent
         Unk6 = unk6;
     }
 
-    public static TrapEvent Serdes(TrapEvent e, ISerializer s)
+    public static TrapEvent Serdes(TrapEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new TrapEvent();

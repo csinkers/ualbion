@@ -14,7 +14,7 @@ public class MapLightingEvent : ModifyEvent
         Unk3 = unk3;
     }
 
-    public static MapLightingEvent Serdes(MapLightingEvent e, ISerializer s)
+    public static MapLightingEvent Serdes(MapLightingEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new MapLightingEvent();

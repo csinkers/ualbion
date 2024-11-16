@@ -9,7 +9,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("door", "Opens the inventory screen for the given door")]
 public class DoorEvent : MapEvent, ILockedInventoryEvent
 {
-    public static DoorEvent Serdes(DoorEvent e, AssetMapping mapping, ISerializer s)
+    public static DoorEvent Serdes(DoorEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new DoorEvent();

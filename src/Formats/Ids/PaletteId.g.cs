@@ -67,7 +67,7 @@ public readonly struct PaletteId : IEquatable<PaletteId>, IEquatable<AssetId>, I
         return (PaletteId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static PaletteId SerdesU8(string name, PaletteId id, AssetMapping mapping, ISerializer s)
+    public static PaletteId SerdesU8(string name, PaletteId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct PaletteId : IEquatable<PaletteId>, IEquatable<AssetId>, I
         return id;
     }
 
-    public static PaletteId SerdesU16(string name, PaletteId id, AssetMapping mapping, ISerializer s)
+    public static PaletteId SerdesU16(string name, PaletteId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct PaletteId : IEquatable<PaletteId>, IEquatable<AssetId>, I
         return id;
     }
 
-    public static PaletteId SerdesU16BE(string name, PaletteId id, AssetMapping mapping, ISerializer s)
+    public static PaletteId SerdesU16BE(string name, PaletteId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

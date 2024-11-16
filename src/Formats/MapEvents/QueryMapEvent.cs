@@ -20,7 +20,7 @@ public class QueryMapEvent : QueryEvent
         Immediate = immediate;
         MapId = mapId;
     }
-    public static QueryMapEvent Serdes(QueryMapEvent e, AssetMapping mapping, ISerializer s)
+    public static QueryMapEvent Serdes(QueryMapEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryMapEvent();

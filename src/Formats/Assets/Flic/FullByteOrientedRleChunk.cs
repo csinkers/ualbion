@@ -20,7 +20,7 @@ sealed class FullByteOrientedRleChunk : FlicChunk
 
     public override FlicChunkType Type => FlicChunkType.FullByteOrientedRle;
 
-    public IEnumerable<byte> ReadLinePixels(ISerializer s)
+    public IEnumerable<byte> ReadLinePixels(ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
 
@@ -53,7 +53,7 @@ sealed class FullByteOrientedRleChunk : FlicChunk
         }
     }
 
-    protected override uint LoadChunk(uint length, ISerializer s)
+    protected override uint LoadChunk(uint length, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         int i = 0;

@@ -7,7 +7,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("place_action")]
 public class PlaceActionEvent : MapEvent
 {
-    public static PlaceActionEvent Serdes(PlaceActionEvent e, ISerializer s)
+    public static PlaceActionEvent Serdes(PlaceActionEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new PlaceActionEvent();

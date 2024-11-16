@@ -22,10 +22,10 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
     public static readonly PathPatternProperty TilesetPattern = new("TilesetPattern", "../Tilesets/{0}_{2}.tsx"); // string
     public static readonly PathPatternProperty ScriptPattern  = new("ScriptPattern"); // string
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((BaseMapData) existing, s, context);
 
-    public BaseMapData Serdes(BaseMapData existing, ISerializer s, AssetLoadContext context)
+    public BaseMapData Serdes(BaseMapData existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
         ArgumentNullException.ThrowIfNull(context);
@@ -43,7 +43,7 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
         return scriptPattern.Format(context.BuildAssetPath());
     }
 
-    void Write(BaseMapData existing, ISerializer s, AssetLoadContext context)
+    void Write(BaseMapData existing, ISerdes s, AssetLoadContext context)
     {
         (byte[] bytes, string script) = existing switch
         {
@@ -77,7 +77,7 @@ public class TiledMapLoader : Component, IAssetLoader<BaseMapData>
         context.Disk.WriteAllText(Path.Combine(assetDir, scriptPath), script);
     }
 
-    BaseMapData Read(ISerializer s, AssetLoadContext context)
+    BaseMapData Read(ISerdes s, AssetLoadContext context)
     {
         var assetDir = GetAssetDir(context);
         var scriptPath = Path.Combine(assetDir, GetScriptFilename(context));

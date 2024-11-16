@@ -12,7 +12,7 @@ namespace UAlbion.Formats.Exporters.Tiled;
 public class StampLoader : IAssetLoader<BlockList>
 {
     public static readonly PathPatternProperty TilesetPattern = new("TilesetPattern", "../Tilesets/{0}_{2}.tsx");
-    public BlockList Serdes(BlockList existing, ISerializer s, AssetLoadContext context)
+    public BlockList Serdes(BlockList existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
         ArgumentNullException.ThrowIfNull(context);
@@ -59,7 +59,7 @@ public class StampLoader : IAssetLoader<BlockList>
         return list;
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((BlockList) existing, s, context);
 
     /* .stamp file

@@ -13,7 +13,7 @@ namespace UAlbion.Formats.Containers;
 /// </summary>
 public class RawContainer : IAssetContainer
 {
-    public ISerializer Read(string path, AssetLoadContext context)
+    public ISerdes Read(string path, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         ApiUtil.Assert(context.Index == 0, "SubItem should always be 0 when accessing a non-container file");

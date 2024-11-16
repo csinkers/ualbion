@@ -61,7 +61,7 @@ public readonly struct SheetId : IEquatable<SheetId>, IEquatable<AssetId>, IComp
         return (SheetId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static SheetId SerdesU8(string name, SheetId id, AssetType type, AssetMapping mapping, ISerializer s)
+    public static SheetId SerdesU8(string name, SheetId id, AssetType type, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -72,7 +72,7 @@ public readonly struct SheetId : IEquatable<SheetId>, IEquatable<AssetId>, IComp
         return id;
     }
 
-    public static SheetId SerdesU16(string name, SheetId id, AssetType type, AssetMapping mapping, ISerializer s)
+    public static SheetId SerdesU16(string name, SheetId id, AssetType type, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -83,7 +83,7 @@ public readonly struct SheetId : IEquatable<SheetId>, IEquatable<AssetId>, IComp
         return id;
     }
 
-    public static SheetId SerdesU16BE(string name, SheetId id, AssetType type, AssetMapping mapping, ISerializer s)
+    public static SheetId SerdesU16BE(string name, SheetId id, AssetType type, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

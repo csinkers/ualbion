@@ -20,7 +20,7 @@ public class QueryHasItemEvent : QueryEvent
         Immediate = immediate;
         ItemId = itemId;
     }
-    public static QueryHasItemEvent Serdes(QueryHasItemEvent e, AssetMapping mapping, ISerializer s)
+    public static QueryHasItemEvent Serdes(QueryHasItemEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryHasItemEvent();

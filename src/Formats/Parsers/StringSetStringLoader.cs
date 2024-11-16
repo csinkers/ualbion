@@ -12,7 +12,7 @@ public class StringSetStringLoader : Component, IAssetLoader<string>
 {
     public static readonly AssetIdAssetProperty<StringSetId> TargetProperty = new("Target", StringSetId.None, x => x);
     public static readonly AssetIdAssetProperty<TextId> FirstIdProperty = new("FirstId", TextId.None, x => x);
-    public string Serdes(string existing, ISerializer s, AssetLoadContext context)
+    public string Serdes(string existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -39,6 +39,6 @@ public class StringSetStringLoader : Component, IAssetLoader<string>
         return set.GetString(stringId);
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((string)existing, s, context);
 }

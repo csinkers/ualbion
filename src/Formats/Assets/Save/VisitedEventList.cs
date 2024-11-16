@@ -11,7 +11,7 @@ public class VisitedEventList
     public ushort NumChunks { get; set; }
     public VisitedEvent[] Contents { get; set; }
 
-    public static VisitedEventList Serdes(int _, VisitedEventList c, AssetMapping mapping, ISerializer s)
+    public static VisitedEventList Serdes(int _, VisitedEventList c, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         c ??= new VisitedEventList();
@@ -19,7 +19,7 @@ public class VisitedEventList
         c.NumChunks = s.UInt16(nameof(NumChunks), c.NumChunks);
         ApiUtil.Assert(c.NumChunks == c.Size / VisitedEvent.SizeOnDisk);
         c.Contents ??= new VisitedEvent[(c.Size - 2) / VisitedEvent.SizeOnDisk];
-        s.List(nameof(c.Contents), c.Contents, mapping, c.Contents.Length, VisitedEvent.Serdes);
+        s.ListWithContext(nameof(c.Contents), c.Contents, mapping, c.Contents.Length, VisitedEvent.Serdes);
         return c;
     }
 }

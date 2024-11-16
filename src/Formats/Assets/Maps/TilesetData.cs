@@ -17,7 +17,7 @@ public class TilesetData
     public bool UseSmallGraphics { get; set; } // Careful if renaming: needs to match up to asset property in assets.json
     [JsonInclude] public List<TileData> Tiles { get; private set; } = [];
 
-    public static TilesetData Serdes(TilesetData td, ISerializer s, AssetLoadContext context)
+    public static TilesetData Serdes(TilesetData td, ISerdes s, AssetLoadContext context)
     {
         const int dummyTileCount = 1;
         ArgumentNullException.ThrowIfNull(s);
@@ -40,7 +40,12 @@ public class TilesetData
             });
         }
 
-        s.List(nameof(Tiles), td.Tiles, tileCount - dummyTileCount, dummyTileCount, S.Object<TileData>(TileData.Serdes));
+        s.List(
+            nameof(Tiles),
+            td.Tiles,
+            tileCount - dummyTileCount,
+            dummyTileCount,
+            static (i, x, s2) => s2.Object(i, x, TileData.Serdes));
 
         if (s.IsReading())
             for (ushort i = 0; i < td.Tiles.Count; i++)

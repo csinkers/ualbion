@@ -18,7 +18,7 @@ public class EventChainOffEvent : ModifyEvent
         Map = map;
     }
 
-    public static EventChainOffEvent Serdes(EventChainOffEvent e, AssetMapping mapping, ISerializer s)
+    public static EventChainOffEvent Serdes(EventChainOffEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new EventChainOffEvent();

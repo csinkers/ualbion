@@ -108,7 +108,7 @@ static class Program
     {
         using var stream = File.Open(path, FileMode.Create, FileAccess.Write);
         using var bw = new BinaryWriter(stream);
-        using var s = new GenericBinaryWriter(bw, Encoding.ASCII.GetBytes);
+        using var s = new WriterSerdes(bw, Encoding.ASCII.GetBytes);
         Bitmap8Bit.Serdes(new Bitmap8Bit((ushort)width, palette, pixels), s);
     }
 

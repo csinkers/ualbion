@@ -9,7 +9,7 @@ namespace UAlbion.Formats.Containers;
 /// </summary>
 public class ZipContainer : IAssetContainer
 {
-    public ISerializer Read(string path, AssetLoadContext context) => throw new System.NotImplementedException();
+    public ISerdes Read(string path, AssetLoadContext context) => throw new System.NotImplementedException();
     public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
         => throw new System.NotImplementedException();
 }

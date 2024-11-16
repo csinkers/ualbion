@@ -11,7 +11,7 @@ namespace UAlbion.Formats.Assets.Save;
 public class NpcState : IMovementState
 {
     // Total size = 128 bytes
-    public static NpcState Serdes(int i, NpcState npc, (MapType mapType, AssetMapping mapping) c, ISerializer s)
+    public static NpcState Serdes(int i, NpcState npc, (MapType mapType, AssetMapping mapping) c, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         npc ??= new NpcState();

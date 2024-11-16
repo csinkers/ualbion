@@ -18,7 +18,7 @@ public class QueryDemoVersionEvent : QueryEvent
         Operation = operation;
         Immediate = immediate;
     }
-    public static QueryDemoVersionEvent Serdes(QueryDemoVersionEvent e, ISerializer s)
+    public static QueryDemoVersionEvent Serdes(QueryDemoVersionEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryDemoVersionEvent();

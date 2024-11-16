@@ -19,7 +19,7 @@ public class TickerEvent : ModifyEvent
         Unk4 = unk4;
     }
 
-    public static TickerEvent Serdes(TickerEvent e, AssetMapping mapping, ISerializer s)
+    public static TickerEvent Serdes(TickerEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
 

@@ -61,7 +61,7 @@ public readonly struct SpriteId : IEquatable<SpriteId>, IEquatable<AssetId>, ICo
         return (SpriteId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static SpriteId SerdesU8(string name, SpriteId id, AssetType type, AssetMapping mapping, ISerializer s)
+    public static SpriteId SerdesU8(string name, SpriteId id, AssetType type, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -72,7 +72,7 @@ public readonly struct SpriteId : IEquatable<SpriteId>, IEquatable<AssetId>, ICo
         return id;
     }
 
-    public static SpriteId SerdesU16(string name, SpriteId id, AssetType type, AssetMapping mapping, ISerializer s)
+    public static SpriteId SerdesU16(string name, SpriteId id, AssetType type, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -83,7 +83,7 @@ public readonly struct SpriteId : IEquatable<SpriteId>, IEquatable<AssetId>, ICo
         return id;
     }
 
-    public static SpriteId SerdesU16BE(string name, SpriteId id, AssetType type, AssetMapping mapping, ISerializer s)
+    public static SpriteId SerdesU16BE(string name, SpriteId id, AssetType type, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

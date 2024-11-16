@@ -16,7 +16,7 @@ public class PromptPlayerNumericEvent : QueryEvent
         Operation = operation;
         Argument = argument;
     }
-    public static PromptPlayerNumericEvent Serdes(PromptPlayerNumericEvent e, ISerializer s)
+    public static PromptPlayerNumericEvent Serdes(PromptPlayerNumericEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new PromptPlayerNumericEvent();

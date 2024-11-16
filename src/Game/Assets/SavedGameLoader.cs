@@ -9,12 +9,12 @@ namespace UAlbion.Game.Assets;
 
 public class SavedGameLoader : Component, IAssetLoader<SavedGame>
 {
-    public SavedGame Serdes(SavedGame existing, ISerializer s, AssetLoadContext context)
+    public SavedGame Serdes(SavedGame existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         return SavedGame.Serdes(existing, context.Mapping, s, Resolve<ISpellManager>());
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes(existing as SavedGame, s, context);
 }

@@ -27,7 +27,7 @@ public class ChangeAttributeEvent : MapEvent, IDataChangeEvent
         IsRandom = isRandom;
     }
 
-    public static ChangeAttributeEvent Serdes(ChangeAttributeEvent e, ISerializer s)
+    public static ChangeAttributeEvent Serdes(ChangeAttributeEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new ChangeAttributeEvent();

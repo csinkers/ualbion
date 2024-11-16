@@ -7,7 +7,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("end_dialogue", null, "ed")]
 public class EndDialogueEvent : MapEvent
 {
-    public static EndDialogueEvent Serdes(EndDialogueEvent e, ISerializer s)
+    public static EndDialogueEvent Serdes(EndDialogueEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new EndDialogueEvent();

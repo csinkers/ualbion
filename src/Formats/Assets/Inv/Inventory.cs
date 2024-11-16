@@ -57,13 +57,13 @@ public class Inventory : IInventory
     [JsonIgnore, DiagEdit(Style = DiagEditStyle.InvSlot)] public ItemSlot Feet        => TrySlot(ItemSlotId.Feet); 
     [JsonIgnore, DiagEdit(Style = DiagEditStyle.InvSlot)] public ItemSlot RightFinger => TrySlot(ItemSlotId.RightFinger);
 
-    public static Inventory SerdesChest(int n, Inventory inv, AssetMapping mapping, ISerializer s) => Serdes(n, inv, mapping, s, InventoryType.Chest);
-    public static Inventory SerdesMerchant(int n, Inventory inv, AssetMapping mapping, ISerializer s) => Serdes(n, inv, mapping, s, InventoryType.Merchant);
-    public static Inventory SerdesCharacter(int n, Inventory inv, AssetMapping mapping, ISerializer s) => Serdes(n, inv, mapping, s, InventoryType.Player);
-    public static Inventory SerdesMonster(int n, Inventory inv, AssetMapping mapping, ISerializer s) => Serdes(n, inv, mapping, s, InventoryType.Monster);
+    public static Inventory SerdesChest(int n, Inventory inv, AssetMapping mapping, ISerdes s) => Serdes(n, inv, mapping, s, InventoryType.Chest);
+    public static Inventory SerdesMerchant(int n, Inventory inv, AssetMapping mapping, ISerdes s) => Serdes(n, inv, mapping, s, InventoryType.Merchant);
+    public static Inventory SerdesCharacter(int n, Inventory inv, AssetMapping mapping, ISerdes s) => Serdes(n, inv, mapping, s, InventoryType.Player);
+    public static Inventory SerdesMonster(int n, Inventory inv, AssetMapping mapping, ISerdes s) => Serdes(n, inv, mapping, s, InventoryType.Monster);
     public IEnumerable<ItemSlot> EnumerateAll() => Slots.Where(x => x != null);
 
-    static Inventory Serdes(int n, Inventory inv, AssetMapping mapping, ISerializer s, InventoryType type)
+    static Inventory Serdes(int n, Inventory inv, AssetMapping mapping, ISerdes s, InventoryType type)
     {
         ArgumentNullException.ThrowIfNull(s);
         var invId = new InventoryId(type, (ushort)n);

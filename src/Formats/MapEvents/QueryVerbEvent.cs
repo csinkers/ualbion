@@ -19,7 +19,7 @@ public class QueryVerbEvent : QueryEvent
         Operation = operation;
         Immediate = immediate;
     }
-    public static QueryVerbEvent Serdes(QueryVerbEvent e, ISerializer s)
+    public static QueryVerbEvent Serdes(QueryVerbEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryVerbEvent();

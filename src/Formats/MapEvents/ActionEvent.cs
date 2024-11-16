@@ -23,7 +23,7 @@ public class ActionEvent : MapEvent
         Argument = arg;
     }
 
-    public static ActionEvent Serdes(ActionEvent e, AssetMapping mapping, ISerializer s)
+    public static ActionEvent Serdes(ActionEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         var actionType = s.EnumU8(nameof(ActionType), e?.ActionType ?? 0);

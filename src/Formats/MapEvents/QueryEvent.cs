@@ -9,7 +9,7 @@ public abstract class QueryEvent : MapEvent, IBranchingEvent
 {
     public override MapEventType EventType => MapEventType.Query;
     public abstract QueryType QueryType { get; }
-    public static QueryEvent Serdes(QueryEvent e, AssetMapping mapping, ISerializer s)
+    public static QueryEvent Serdes(QueryEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         if (s.IsWriting() && e == null) throw new ArgumentNullException(nameof(e));

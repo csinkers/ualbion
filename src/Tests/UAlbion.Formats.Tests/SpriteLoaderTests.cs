@@ -16,12 +16,12 @@ namespace UAlbion.Formats.Tests;
 public class SpriteLoaderTests
 {
     static readonly IJsonUtil JsonUtil = new FormatJsonUtil();
-    static readonly IFileSystem Disk = new StubFileSystem(); // These tests shouldn't access the disk at all - just use a stream via ISerializer directly
+    static readonly IFileSystem Disk = new StubFileSystem(); // These tests shouldn't access the disk at all - just use a stream via ISerdes directly
     static readonly SingleHeaderSpriteLoader HeaderLoader = new();
     static readonly MultiHeaderSpriteLoader MultiHeaderLoader = new();
     static readonly AmorphousSpriteLoader AmorphousLoader = new();
 
-    delegate IReadOnlyTexture<byte> SerdesFunc(IReadOnlyTexture<byte> x, ISerializer s, AssetLoadContext context);
+    delegate IReadOnlyTexture<byte> SerdesFunc(IReadOnlyTexture<byte> x, ISerdes s, AssetLoadContext context);
     static IReadOnlyTexture<byte> Load(byte[] bytes, AssetLoadContext context, SerdesFunc serdes)
     {
         using var ms = new MemoryStream(bytes);

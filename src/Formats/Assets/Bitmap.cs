@@ -25,7 +25,7 @@ public class Bitmap8Bit
     public IList<uint> Palette { get; private set; }
     public byte[] Pixels { get; private set; }
 
-    public static Bitmap8Bit Serdes(Bitmap8Bit b, ISerializer s)
+    public static Bitmap8Bit Serdes(Bitmap8Bit b, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
 

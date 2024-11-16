@@ -9,7 +9,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("remove_party_member", "Remove someone from the party", "rpm")]
 public class RemovePartyMemberEvent : MapEvent
 {
-    public static RemovePartyMemberEvent Serdes(RemovePartyMemberEvent e, AssetMapping mapping, ISerializer s)
+    public static RemovePartyMemberEvent Serdes(RemovePartyMemberEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new RemovePartyMemberEvent();

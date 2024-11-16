@@ -69,7 +69,7 @@ public class MapData2D : BaseMapData
         Tiles = new MapTile[width * height];
     }
 
-    public static MapData2D Serdes(AssetId id, MapData2D existing, AssetMapping mapping, ISerializer s)
+    public static MapData2D Serdes(AssetId id, MapData2D existing, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(mapping);
         ArgumentNullException.ThrowIfNull(s);

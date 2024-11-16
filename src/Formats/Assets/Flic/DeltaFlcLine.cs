@@ -15,7 +15,7 @@ public class DeltaFlcLine
     public byte? LastPixel { get; }
     public IList<DeltaFlcLineToken> Tokens { get; } = [];
 
-    public DeltaFlcLine(ISerializer s)
+    public DeltaFlcLine(ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         int remaining = 1;

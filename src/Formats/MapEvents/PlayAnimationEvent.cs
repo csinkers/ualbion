@@ -21,7 +21,7 @@ public class PlayAnimationEvent : MapEvent
         OffsetY = offsetY;
     }
 
-    public static PlayAnimationEvent Serdes(PlayAnimationEvent e, AssetMapping mapping, ISerializer s)
+    public static PlayAnimationEvent Serdes(PlayAnimationEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new PlayAnimationEvent();

@@ -28,7 +28,7 @@ public class ChangeWordSetEvent : MapEvent, IDataChangeEvent
         IsRandom = isRandom;
     }
 
-    public static ChangeWordSetEvent Serdes(ChangeWordSetEvent e, AssetMapping mapping, ISerializer s)
+    public static ChangeWordSetEvent Serdes(ChangeWordSetEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new ChangeWordSetEvent();

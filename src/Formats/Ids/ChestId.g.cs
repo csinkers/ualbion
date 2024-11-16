@@ -67,7 +67,7 @@ public readonly struct ChestId : IEquatable<ChestId>, IEquatable<AssetId>, IComp
         return (ChestId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static ChestId SerdesU8(string name, ChestId id, AssetMapping mapping, ISerializer s)
+    public static ChestId SerdesU8(string name, ChestId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct ChestId : IEquatable<ChestId>, IEquatable<AssetId>, IComp
         return id;
     }
 
-    public static ChestId SerdesU16(string name, ChestId id, AssetMapping mapping, ISerializer s)
+    public static ChestId SerdesU16(string name, ChestId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct ChestId : IEquatable<ChestId>, IEquatable<AssetId>, IComp
         return id;
     }
 
-    public static ChestId SerdesU16BE(string name, ChestId id, AssetMapping mapping, ISerializer s)
+    public static ChestId SerdesU16BE(string name, ChestId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

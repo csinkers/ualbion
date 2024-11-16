@@ -10,7 +10,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("word_known")]
 public class WordKnownEvent : ModifyEvent
 {
-    public static WordKnownEvent Serdes(WordKnownEvent e, AssetMapping mapping, ISerializer s)
+    public static WordKnownEvent Serdes(WordKnownEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new WordKnownEvent();

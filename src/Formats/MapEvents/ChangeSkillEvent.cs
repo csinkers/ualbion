@@ -28,7 +28,7 @@ public class ChangeSkillEvent : MapEvent, IDataChangeEvent
         IsRandom = isRandom;
     }
 
-    public static ChangeSkillEvent Serdes(ChangeSkillEvent e, AssetMapping mapping, ISerializer s)
+    public static ChangeSkillEvent Serdes(ChangeSkillEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new ChangeSkillEvent();

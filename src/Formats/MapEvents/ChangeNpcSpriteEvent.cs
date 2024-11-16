@@ -11,7 +11,7 @@ namespace UAlbion.Formats.MapEvents;
 public class ChangeNpcSpriteEvent(byte npcNum, AssetId id, EventScope scope, ChangeIconLayers layers, MapId mapId)
     : MapEvent, INpcEvent // Specialised variant of ChangeIconEvent
 {
-    public static ChangeNpcSpriteEvent Serdes(ChangeNpcSpriteEvent e, AssetMapping mapping, MapType mapType, ISerializer s)
+    public static ChangeNpcSpriteEvent Serdes(ChangeNpcSpriteEvent e, AssetMapping mapping, MapType mapType, ISerdes s)
     {
         if (s.IsReading()) // Should never be used
             return (ChangeNpcSpriteEvent)ChangeIconEvent.Serdes(null, mapping, mapType, s);

@@ -20,7 +20,7 @@ public class QuerySwitchEvent : QueryEvent
         Immediate = immediate;
         SwitchId = switchId;
     }
-    public static QuerySwitchEvent Serdes(QuerySwitchEvent e, AssetMapping mapping, ISerializer s)
+    public static QuerySwitchEvent Serdes(QuerySwitchEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QuerySwitchEvent();

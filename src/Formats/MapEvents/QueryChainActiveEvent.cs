@@ -21,7 +21,7 @@ public class QueryChainActiveEvent : QueryEvent
         MapId = mapId;
     }
 
-    public static QueryChainActiveEvent Serdes(QueryChainActiveEvent e, AssetMapping mapping, ISerializer s)
+    public static QueryChainActiveEvent Serdes(QueryChainActiveEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryChainActiveEvent();

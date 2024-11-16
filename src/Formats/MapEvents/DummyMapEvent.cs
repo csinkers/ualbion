@@ -28,7 +28,7 @@ public class DummyMapEvent : MapEvent
         Unk8 = unk8;
     }
 
-    public static DummyMapEvent Serdes(DummyMapEvent e, ISerializer s, MapEventType type)
+    public static DummyMapEvent Serdes(DummyMapEvent e, ISerdes s, MapEventType type)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new DummyMapEvent();

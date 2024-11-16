@@ -30,7 +30,7 @@ public sealed class DataChangeEvent : MapEvent, IDataChangeEvent
         IsRandom = isRandom;
     }
 
-    public static IDataChangeEvent Serdes(IDataChangeEvent existing, AssetMapping mapping, ISerializer s)
+    public static IDataChangeEvent Serdes(IDataChangeEvent existing, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         if (s.IsWriting() && existing == null) throw new ArgumentNullException(nameof(existing));

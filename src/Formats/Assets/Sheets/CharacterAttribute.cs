@@ -14,7 +14,7 @@ public class CharacterAttribute : ICharacterAttribute
     public CharacterAttribute DeepClone() => (CharacterAttribute)MemberwiseClone();
     public override string ToString() => $"[{Current}/{Max}]{(Boost > 0 ? $"+{Boost}" : "")}{(Backup > 0 ? $" (was {Backup})" : "")}";
 
-    public static CharacterAttribute Serdes(string name, CharacterAttribute attr, ISerializer s, bool hasBackup = true)
+    public static CharacterAttribute Serdes(string name, CharacterAttribute attr, ISerdes s, bool hasBackup = true)
     {
         ArgumentNullException.ThrowIfNull(s);
         s.Begin(name);

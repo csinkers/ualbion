@@ -20,7 +20,7 @@ public class QueryHasPartyMemberEvent : QueryEvent
         Operation = operation;
         Immediate = immediate;
     }
-    public static QueryHasPartyMemberEvent Serdes(QueryHasPartyMemberEvent e, AssetMapping mapping, ISerializer s)
+    public static QueryHasPartyMemberEvent Serdes(QueryHasPartyMemberEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryHasPartyMemberEvent();

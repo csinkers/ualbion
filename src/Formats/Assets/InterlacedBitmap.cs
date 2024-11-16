@@ -28,7 +28,7 @@ public sealed class InterlacedBitmap
     public byte[] Thumbnail { get; set; }
     public byte[] ImageData { get; set; }
 
-    public static InterlacedBitmap Serdes(InterlacedBitmap img, ISerializer s)
+    public static InterlacedBitmap Serdes(InterlacedBitmap img, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         img ??= new InterlacedBitmap();
@@ -82,14 +82,14 @@ public sealed class InterlacedBitmap
         return img;
     }
 
-    static void WriteChunk(ISerializer s, string chunkType, Action<ISerializer, int> serdes)
+    static void WriteChunk(ISerdes s, string chunkType, Action<ISerdes, int> serdes)
     {
         var chunk = IffChunk.Serdes(0, new IffChunk(chunkType, 0), s);
         serdes(s, chunk.Length);
         chunk.WriteLength(s);
     }
 
-    void SerdesHeader(ISerializer s, int length)
+    void SerdesHeader(ISerdes s, int length)
     {
         if (length < 20)
             throw new FormatException($"ILBM header chunk was {length} bytes, expected at least 20");
@@ -111,7 +111,7 @@ public sealed class InterlacedBitmap
             s.Bytes("UnexpectedHeaderData", null, length - 20);
     }
 
-    void SerdesPalette(ISerializer s, int length)
+    void SerdesPalette(ISerdes s, int length)
     {
         uint[] pal = Palette ?? new uint[length / 3];
         for (int i = 0; i < pal.Length; i++)
@@ -126,13 +126,13 @@ public sealed class InterlacedBitmap
         Palette = pal;
     }
 
-    void SerdesHotspot(ISerializer s, int _)
+    void SerdesHotspot(ISerdes s, int _)
     {
         HotspotX = s.Int16(nameof(HotspotX), HotspotX);
         HotspotY = s.Int16(nameof(HotspotY), HotspotY);
     }
 
-    void SerdesThumbnail(ISerializer s, int length)
+    void SerdesThumbnail(ISerdes s, int length)
     {
         ThumbnailWidth = s.UInt16BE(nameof(ThumbnailWidth), ThumbnailWidth);
         ThumbnailHeight = s.UInt16BE(nameof(ThumbnailHeight), ThumbnailHeight);
@@ -142,7 +142,7 @@ public sealed class InterlacedBitmap
             : s.Bytes("Pixels", null, length - 4);
     }
 
-    void SerdesPixels(ISerializer s, int length)
+    void SerdesPixels(ISerdes s, int length)
     {
         ImageData = Compression == 1
             ? s.IsReading() ? Unpack(s, length) : Pack(ImageData, s)
@@ -150,10 +150,10 @@ public sealed class InterlacedBitmap
     }
 
     // ReSharper disable UnusedParameter.Local
-    static byte[] Pack(byte[] data, ISerializer s) => throw new NotImplementedException();
+    static byte[] Pack(byte[] data, ISerdes s) => throw new NotImplementedException();
     // ReSharper restore UnusedParameter.Local
 
-    static byte[] Unpack(ISerializer s, int size)
+    static byte[] Unpack(ISerdes s, int size)
     {
         using MemoryStream ms = new MemoryStream();
         var finalOffset = s.Offset + size;

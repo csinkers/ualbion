@@ -16,7 +16,7 @@ public class BinaryOffsetContainer : IAssetContainer
     public static readonly IntAssetProperty Offset = new("Offset"); // int, used for BinaryOffsetContainer, e.g. MAIN.EXE
     public static readonly StringAssetProperty Hotspot = new("Hotspot"); // for cursors, formatted like "5 -2"
 
-    public ISerializer Read(string path, AssetLoadContext context)
+    public ISerdes Read(string path, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 

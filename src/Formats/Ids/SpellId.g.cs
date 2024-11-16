@@ -67,7 +67,7 @@ public readonly struct SpellId : IEquatable<SpellId>, IEquatable<AssetId>, IComp
         return (SpellId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static SpellId SerdesU8(string name, SpellId id, AssetMapping mapping, ISerializer s)
+    public static SpellId SerdesU8(string name, SpellId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct SpellId : IEquatable<SpellId>, IEquatable<AssetId>, IComp
         return id;
     }
 
-    public static SpellId SerdesU16(string name, SpellId id, AssetMapping mapping, ISerializer s)
+    public static SpellId SerdesU16(string name, SpellId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct SpellId : IEquatable<SpellId>, IEquatable<AssetId>, IComp
         return id;
     }
 
-    public static SpellId SerdesU16BE(string name, SpellId id, AssetMapping mapping, ISerializer s)
+    public static SpellId SerdesU16BE(string name, SpellId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

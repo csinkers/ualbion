@@ -24,7 +24,7 @@ public class SimpleChestEvent : MapEvent
 
     SimpleChestEvent() { }
 
-    public static SimpleChestEvent Serdes(SimpleChestEvent e, AssetMapping mapping, ISerializer s)
+    public static SimpleChestEvent Serdes(SimpleChestEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new SimpleChestEvent();

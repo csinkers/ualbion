@@ -13,12 +13,12 @@ public class ItemNameCollectorLoader : Component, IAssetLoader<Dictionary<string
 {
     public static readonly AssetRangeAssetProperty TargetRange = new("TargetRange");
     public static readonly StringListAssetProperty TargetLanguages = new("TargetLanguages");
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((Dictionary<string, ListStringSet>)existing, s, context);
 
     public Dictionary<string, ListStringSet> Serdes(
         Dictionary<string, ListStringSet> existing,
-        ISerializer s,
+        ISerdes s,
         AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);

@@ -28,7 +28,7 @@ public class ChangeItemEvent : MapEvent, IDataChangeEvent
         IsRandom = isRandom;
     }
 
-    public static ChangeItemEvent Serdes(ChangeItemEvent e, AssetMapping mapping, ISerializer s)
+    public static ChangeItemEvent Serdes(ChangeItemEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new ChangeItemEvent();

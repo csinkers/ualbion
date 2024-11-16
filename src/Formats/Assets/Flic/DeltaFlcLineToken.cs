@@ -15,7 +15,7 @@ public class DeltaFlcLineToken
     public sbyte SignedCount { get; }
     public ushort[] PixelData { get; }
 
-    public DeltaFlcLineToken(ISerializer s)
+    public DeltaFlcLineToken(ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         ColumnSkipCount = s.UInt8(null, 0);

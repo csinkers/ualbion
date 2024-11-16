@@ -61,7 +61,7 @@ public readonly struct StringSetId : IEquatable<StringSetId>, IEquatable<AssetId
         return (StringSetId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static StringSetId SerdesU8(string name, StringSetId id, AssetType type, AssetMapping mapping, ISerializer s)
+    public static StringSetId SerdesU8(string name, StringSetId id, AssetType type, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -72,7 +72,7 @@ public readonly struct StringSetId : IEquatable<StringSetId>, IEquatable<AssetId
         return id;
     }
 
-    public static StringSetId SerdesU16(string name, StringSetId id, AssetType type, AssetMapping mapping, ISerializer s)
+    public static StringSetId SerdesU16(string name, StringSetId id, AssetType type, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -83,7 +83,7 @@ public readonly struct StringSetId : IEquatable<StringSetId>, IEquatable<AssetId
         return id;
     }
 
-    public static StringSetId SerdesU16BE(string name, StringSetId id, AssetType type, AssetMapping mapping, ISerializer s)
+    public static StringSetId SerdesU16BE(string name, StringSetId id, AssetType type, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

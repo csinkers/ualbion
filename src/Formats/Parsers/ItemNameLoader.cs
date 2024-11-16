@@ -11,12 +11,12 @@ namespace UAlbion.Formats.Parsers;
 public class ItemNameLoader : IAssetLoader<Dictionary<string, ListStringSet>>
 {
     const int StringSize = 20;
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((Dictionary<string, ListStringSet>)existing, s, context);
 
     public Dictionary<string, ListStringSet> Serdes(
         Dictionary<string, ListStringSet> existing,
-        ISerializer s,
+        ISerdes s,
         AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
@@ -31,7 +31,7 @@ public class ItemNameLoader : IAssetLoader<Dictionary<string, ListStringSet>>
         return existing;
     }
 
-    static Dictionary<string, ListStringSet> Read(ISerializer s)
+    static Dictionary<string, ListStringSet> Read(ISerdes s)
     {
         var german = new ListStringSet();
         var english = new ListStringSet();
@@ -58,7 +58,7 @@ public class ItemNameLoader : IAssetLoader<Dictionary<string, ListStringSet>>
         return results;
     }
 
-    static void WriteAll(Dictionary<string, ListStringSet> existing, ISerializer s)
+    static void WriteAll(Dictionary<string, ListStringSet> existing, ISerdes s)
     {
         existing.TryGetValue(Base.Language.German, out var german);
         existing.TryGetValue(Base.Language.English, out var english);
@@ -82,7 +82,7 @@ public class ItemNameLoader : IAssetLoader<Dictionary<string, ListStringSet>>
         }
     }
 
-    static void Write(ListStringSet set, ISerializer s, int i)
+    static void Write(ListStringSet set, ISerdes s, int i)
     {
         var text = set.Count <= i ? "" : set[i];
         s.FixedLengthString(null, text, StringSize);

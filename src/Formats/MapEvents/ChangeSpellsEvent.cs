@@ -26,7 +26,7 @@ public class ChangeSpellsEvent : MapEvent, IDataChangeEvent
         Operation = operation;
     }
 
-    public static ChangeSpellsEvent Serdes(ChangeSpellsEvent e, AssetMapping mapping, ISerializer s)
+    public static ChangeSpellsEvent Serdes(ChangeSpellsEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new ChangeSpellsEvent();

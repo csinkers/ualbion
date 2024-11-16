@@ -9,7 +9,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("modify_item_count")]
 public class ModifyItemCountEvent : ModifyEvent
 {
-    public static ModifyItemCountEvent Serdes(ModifyItemCountEvent e, AssetMapping mapping, ISerializer s)
+    public static ModifyItemCountEvent Serdes(ModifyItemCountEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new ModifyItemCountEvent();

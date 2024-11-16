@@ -7,7 +7,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("modify_mticks")]
 public class ModifyMTicksEvent : ModifyEvent
 {
-    public static ModifyMTicksEvent Serdes(ModifyMTicksEvent e, ISerializer s)
+    public static ModifyMTicksEvent Serdes(ModifyMTicksEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new ModifyMTicksEvent();

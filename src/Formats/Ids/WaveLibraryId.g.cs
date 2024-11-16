@@ -67,7 +67,7 @@ public readonly struct WaveLibraryId : IEquatable<WaveLibraryId>, IEquatable<Ass
         return (WaveLibraryId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static WaveLibraryId SerdesU8(string name, WaveLibraryId id, AssetMapping mapping, ISerializer s)
+    public static WaveLibraryId SerdesU8(string name, WaveLibraryId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct WaveLibraryId : IEquatable<WaveLibraryId>, IEquatable<Ass
         return id;
     }
 
-    public static WaveLibraryId SerdesU16(string name, WaveLibraryId id, AssetMapping mapping, ISerializer s)
+    public static WaveLibraryId SerdesU16(string name, WaveLibraryId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct WaveLibraryId : IEquatable<WaveLibraryId>, IEquatable<Ass
         return id;
     }
 
-    public static WaveLibraryId SerdesU16BE(string name, WaveLibraryId id, AssetMapping mapping, ISerializer s)
+    public static WaveLibraryId SerdesU16BE(string name, WaveLibraryId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

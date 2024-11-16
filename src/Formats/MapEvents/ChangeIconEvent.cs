@@ -11,7 +11,7 @@ namespace UAlbion.Formats.MapEvents;
 public class ChangeIconEvent : MapEvent
 {
     // MapEvent as this method handles ChangeIconEvent, ChangeNpcSpriteEvent and ChangeNpcMovementEvent
-    public static MapEvent Serdes(MapEvent me, AssetMapping mapping, MapType mapType, ISerializer s)
+    public static MapEvent Serdes(MapEvent me, AssetMapping mapping, MapType mapType, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         if (me is ChangeNpcSpriteEvent cnse)

@@ -9,10 +9,10 @@ namespace UAlbion.Formats.Parsers;
 
 public class SingleHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 {
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((IReadOnlyTexture<byte>)existing, s, context);
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
         ArgumentNullException.ThrowIfNull(context);
@@ -27,7 +27,7 @@ public class SingleHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
         return Read(context, s);
     }
 
-    static SimpleTexture<byte> Read(AssetLoadContext context, ISerializer s)
+    static SimpleTexture<byte> Read(AssetLoadContext context, ISerdes s)
     {
         ushort width = s.UInt16("Width", 0);
         ushort height = s.UInt16("Height", 0);
@@ -48,7 +48,7 @@ public class SingleHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
         return result;
     }
 
-    static void Write(IReadOnlyTexture<byte> existing, ISerializer s)
+    static void Write(IReadOnlyTexture<byte> existing, ISerdes s)
     {
         if (existing.Regions.Count == 0)
             throw new InvalidOperationException("Tried to write SingleHeader sprite without any regions");

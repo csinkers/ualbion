@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Parsers;
 
 public class InterlacedBitmapLoader : IAssetLoader<IReadOnlyTexture<uint>>
 {
-    public IReadOnlyTexture<uint> Serdes(IReadOnlyTexture<uint> existing, ISerializer s, AssetLoadContext context)
+    public IReadOnlyTexture<uint> Serdes(IReadOnlyTexture<uint> existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -19,7 +19,7 @@ public class InterlacedBitmapLoader : IAssetLoader<IReadOnlyTexture<uint>>
         return s.IsWriting() ? existing : ConvertIlbmToTexture(ilbm, context);
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((IReadOnlyTexture<uint>)existing, s, context);
 
     static SimpleTexture<uint> ConvertIlbmToTexture(InterlacedBitmap bitmap, AssetLoadContext info)

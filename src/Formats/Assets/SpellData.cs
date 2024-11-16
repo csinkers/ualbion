@@ -29,7 +29,7 @@ public class SpellData
     public byte LevelRequirement { get; set; }
     public SpellTargets Targets { get; set; }
     public byte Unused { get; set; } // Always 0 except for unused spells in school 6
-    public static SpellData Serdes(SpellData d, AssetLoadContext context, ISerializer s)
+    public static SpellData Serdes(SpellData d, AssetLoadContext context, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(s);

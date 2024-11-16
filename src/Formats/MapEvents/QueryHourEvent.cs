@@ -18,7 +18,7 @@ public class QueryHourEvent : QueryEvent
         Immediate = immediate;
         Argument = argument;
     }
-    public static QueryHourEvent Serdes(QueryHourEvent e, ISerializer s)
+    public static QueryHourEvent Serdes(QueryHourEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryHourEvent();

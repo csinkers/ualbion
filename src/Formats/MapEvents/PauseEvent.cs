@@ -7,7 +7,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("pause")] // USED IN SCRIPT
 public class PauseEvent : MapEvent
 {
-    public static PauseEvent Serdes(PauseEvent e, ISerializer s)
+    public static PauseEvent Serdes(PauseEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new PauseEvent();

@@ -67,7 +67,7 @@ public readonly struct PictureId : IEquatable<PictureId>, IEquatable<AssetId>, I
         return (PictureId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static PictureId SerdesU8(string name, PictureId id, AssetMapping mapping, ISerializer s)
+    public static PictureId SerdesU8(string name, PictureId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct PictureId : IEquatable<PictureId>, IEquatable<AssetId>, I
         return id;
     }
 
-    public static PictureId SerdesU16(string name, PictureId id, AssetMapping mapping, ISerializer s)
+    public static PictureId SerdesU16(string name, PictureId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct PictureId : IEquatable<PictureId>, IEquatable<AssetId>, I
         return id;
     }
 
-    public static PictureId SerdesU16BE(string name, PictureId id, AssetMapping mapping, ISerializer s)
+    public static PictureId SerdesU16BE(string name, PictureId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

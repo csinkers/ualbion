@@ -8,9 +8,9 @@ public abstract class FlicChunk
 {
     const uint ChunkHeaderSize = 6;
     public abstract FlicChunkType Type { get; }
-    protected abstract uint LoadChunk(uint length, ISerializer s);
+    protected abstract uint LoadChunk(uint length, ISerdes s);
 
-    public static FlicChunk Load(ISerializer s, int width, int height) 
+    public static FlicChunk Load(ISerdes s, int width, int height)
     {
         ArgumentNullException.ThrowIfNull(s);
 

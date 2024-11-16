@@ -18,7 +18,7 @@ public class QueryTriggerTypeEvent : QueryEvent
         Immediate = immediate;
         Argument = argument;
     }
-    public static QueryTriggerTypeEvent Serdes(QueryTriggerTypeEvent e, ISerializer s)
+    public static QueryTriggerTypeEvent Serdes(QueryTriggerTypeEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryTriggerTypeEvent();

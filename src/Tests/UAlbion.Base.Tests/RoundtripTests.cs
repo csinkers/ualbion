@@ -477,7 +477,7 @@ public class RoundtripTests
 
         var bytes = Asset.BytesFromXld(PathResolver, "$(ALBION)/CD/XLDLIBS/ICONDAT0.XLD", context);
 
-        TilesetData Serdes(TilesetData x, ISerializer s, AssetLoadContext c) => Loaders.TilesetLoader.Serdes(x, s, c);
+        TilesetData Serdes(TilesetData x, ISerdes s, AssetLoadContext c) => Loaders.TilesetLoader.Serdes(x, s, c);
         var (asset, preTxt) = Asset.Load<TilesetData>(bytes, Serdes, context);
 
         var loader = new TiledTilesetLoader();
@@ -503,7 +503,7 @@ public class RoundtripTests
         var context = new AssetLoadContext(id, new AssetNode((BlockListId)(BlockList)1), modContext);
         var bytes = Asset.BytesFromXld(PathResolver, "$(ALBION)/CD/XLDLIBS/BLKLIST0.XLD", context);
 
-        Formats.Assets.BlockList Serdes(Formats.Assets.BlockList x, ISerializer s, AssetLoadContext c2) => Loaders.BlockListLoader.Serdes(x, s, c2);
+        Formats.Assets.BlockList Serdes(Formats.Assets.BlockList x, ISerdes s, AssetLoadContext c2) => Loaders.BlockListLoader.Serdes(x, s, c2);
         var (asset, preTxt) = Asset.Load<Formats.Assets.BlockList>(bytes, Serdes, context);
 
         var loader = new StampLoader();

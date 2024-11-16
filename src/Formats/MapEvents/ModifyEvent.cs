@@ -7,7 +7,7 @@ namespace UAlbion.Formats.MapEvents;
 
 public abstract class ModifyEvent : MapEvent
 {
-    public static ModifyEvent BaseSerdes(ModifyEvent genericEvent, AssetMapping mapping, ISerializer s)
+    public static ModifyEvent BaseSerdes(ModifyEvent genericEvent, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         var subType = s.EnumU8("SubType", genericEvent?.SubType ?? ModifyType.DoorOpen);

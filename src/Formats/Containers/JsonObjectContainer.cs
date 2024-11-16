@@ -16,7 +16,7 @@ namespace UAlbion.Formats.Containers;
 public class JsonObjectContainer : IAssetContainer
 {
     [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The serializer will handle it")]
-    public ISerializer Read(string path, AssetLoadContext context)
+    public ISerdes Read(string path, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         if (!context.Disk.FileExists(path))
@@ -28,7 +28,7 @@ public class JsonObjectContainer : IAssetContainer
 
         var ms = new MemoryStream(Encoding.UTF8.GetBytes(context.Json.Serialize(token)));
         var br = new BinaryReader(ms);
-        return new GenericBinaryReader(
+        return new ReaderSerdes(
             br,
             ms.Length,
             Encoding.UTF8.GetString,

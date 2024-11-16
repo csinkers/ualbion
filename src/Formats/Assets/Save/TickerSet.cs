@@ -9,7 +9,7 @@ public class TickerSet : Dictionary<TickerId, byte>
 {
     const int Max = 255;
 
-    public static TickerSet Serdes(string _, TickerSet d, ISerializer s)
+    public static TickerSet Serdes(string _, TickerSet d, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         d ??= [];

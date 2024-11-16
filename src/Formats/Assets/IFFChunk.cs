@@ -16,7 +16,7 @@ public class IffChunk
         Length = length;
     }
 
-    public void WriteLength(ISerializer s)
+    public void WriteLength(ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         var offset = s.Offset;
@@ -25,7 +25,7 @@ public class IffChunk
         s.Seek(offset);
     }
 
-    public static IffChunk Serdes(int _, IffChunk c, ISerializer s)
+    public static IffChunk Serdes(int _, IffChunk c, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         c ??= new IffChunk();

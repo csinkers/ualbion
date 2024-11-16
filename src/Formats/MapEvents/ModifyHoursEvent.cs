@@ -7,7 +7,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("modify_hours")]
 public class ModifyHoursEvent : ModifyEvent
 {
-    public static ModifyHoursEvent Serdes(ModifyHoursEvent e, ISerializer s)
+    public static ModifyHoursEvent Serdes(ModifyHoursEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new ModifyHoursEvent();

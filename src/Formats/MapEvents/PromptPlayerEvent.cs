@@ -19,7 +19,7 @@ public class PromptPlayerEvent : QueryEvent
         Immediate = immediate;
     }
 
-    public static PromptPlayerEvent Serdes(PromptPlayerEvent e, ISerializer s)
+    public static PromptPlayerEvent Serdes(PromptPlayerEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new PromptPlayerEvent();

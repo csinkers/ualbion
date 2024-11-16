@@ -7,7 +7,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("modify_gold")]
 public class ModifyGoldEvent : ModifyEvent
 {
-    public static ModifyGoldEvent Serdes(ModifyGoldEvent e, ISerializer s)
+    public static ModifyGoldEvent Serdes(ModifyGoldEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new ModifyGoldEvent();

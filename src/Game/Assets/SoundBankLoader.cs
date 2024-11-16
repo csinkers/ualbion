@@ -7,6 +7,6 @@ namespace UAlbion.Game.Assets;
 
 public class SoundBankLoader : Component, IAssetLoader
 {
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => GlobalTimbreLibrary.Serdes((GlobalTimbreLibrary)existing, s);
 }

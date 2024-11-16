@@ -7,7 +7,7 @@ namespace UAlbion.Formats.MapEvents;
 [Event("modify_rations")]
 public class ModifyRationsEvent : ModifyEvent
 {
-    public static ModifyRationsEvent Serdes(ModifyRationsEvent e, ISerializer s)
+    public static ModifyRationsEvent Serdes(ModifyRationsEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new ModifyRationsEvent();

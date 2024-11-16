@@ -19,7 +19,7 @@ public class NpcMoveState
     public ushort Unk14 { get; set; } // Sometimes has NPC index?
     public ushort Unk16 { get; set; } // Frame number? [0..11]
 
-    public static NpcMoveState Serdes(NpcMoveState ms, ISerializer s)
+    public static NpcMoveState Serdes(NpcMoveState ms, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
 

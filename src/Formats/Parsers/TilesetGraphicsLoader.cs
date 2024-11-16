@@ -9,7 +9,7 @@ public class TilesetGraphicsLoader : IAssetLoader<ITileGraphics>
 {
     readonly FixedSizeSpriteLoader _spriteLoader = new();
 
-    public ITileGraphics Serdes(ITileGraphics existing, ISerializer s, AssetLoadContext context)
+    public ITileGraphics Serdes(ITileGraphics existing, ISerdes s, AssetLoadContext context)
     {
         var asset = _spriteLoader.Serdes((IReadOnlyTexture<byte>)existing?.Texture, s, context);
 
@@ -20,6 +20,6 @@ public class TilesetGraphicsLoader : IAssetLoader<ITileGraphics>
         return new SimpleTileGraphics(texture);
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((ITileGraphics)existing, s, context);
 }

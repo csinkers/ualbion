@@ -8,7 +8,7 @@ namespace UAlbion.Formats.Assets;
 public class BlockList : List<Block>
 {
     public const int MaxCount = 4095;
-    public static BlockList Serdes(int blockNumber, BlockList blockList, ISerializer s)
+    public static BlockList Serdes(int blockNumber, BlockList blockList, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         blockList ??= [];

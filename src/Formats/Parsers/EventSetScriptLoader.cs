@@ -10,7 +10,7 @@ namespace UAlbion.Formats.Parsers;
 
 public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
 {
-    public EventSet Serdes(EventSet existing, ISerializer s, AssetLoadContext context)
+    public EventSet Serdes(EventSet existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
         ArgumentNullException.ThrowIfNull(context);
@@ -41,6 +41,6 @@ public class EventSetScriptLoader : Component, IAssetLoader<EventSet>
         return eventFormatter.Decompile(set.Events, set.Chains, null).Script;
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((EventSet)existing, s, context);
 }

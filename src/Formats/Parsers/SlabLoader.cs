@@ -8,10 +8,10 @@ namespace UAlbion.Formats.Parsers;
 public class SlabLoader : IAssetLoader<IReadOnlyTexture<byte>>
 {
     const int StatusBarHeight = 48;
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((IReadOnlyTexture<byte>)existing, s, context);
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerdes s, AssetLoadContext context)
     {
         IReadOnlyTexture<byte> singleFrame = null;
         if (s.IsWriting())

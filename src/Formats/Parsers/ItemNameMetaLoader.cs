@@ -11,7 +11,7 @@ namespace UAlbion.Formats.Parsers;
 public class ItemNameMetaLoader : Component, IAssetLoader<ListStringSet>
 {
     public static readonly AssetIdAssetProperty TargetProperty = new("Target");
-    public ListStringSet Serdes(ListStringSet existing, ISerializer s, AssetLoadContext context)
+    public ListStringSet Serdes(ListStringSet existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         var targetId = context.GetProperty(TargetProperty);
@@ -30,6 +30,6 @@ public class ItemNameMetaLoader : Component, IAssetLoader<ListStringSet>
         return dict.GetValueOrDefault(context.Language);
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((ListStringSet)existing, s, context);
 }

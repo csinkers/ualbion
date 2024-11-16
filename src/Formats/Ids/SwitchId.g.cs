@@ -67,7 +67,7 @@ public readonly struct SwitchId : IEquatable<SwitchId>, IEquatable<AssetId>, ICo
         return (SwitchId)AssetMapping.Global.EnumToId(enumType, enumValue);
     }
 
-    public static SwitchId SerdesU8(string name, SwitchId id, AssetMapping mapping, ISerializer s)
+    public static SwitchId SerdesU8(string name, SwitchId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -78,7 +78,7 @@ public readonly struct SwitchId : IEquatable<SwitchId>, IEquatable<AssetId>, ICo
         return id;
     }
 
-    public static SwitchId SerdesU16(string name, SwitchId id, AssetMapping mapping, ISerializer s)
+    public static SwitchId SerdesU16(string name, SwitchId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -89,7 +89,7 @@ public readonly struct SwitchId : IEquatable<SwitchId>, IEquatable<AssetId>, ICo
         return id;
     }
 
-    public static SwitchId SerdesU16BE(string name, SwitchId id, AssetMapping mapping, ISerializer s)
+    public static SwitchId SerdesU16BE(string name, SwitchId id, AssetMapping mapping, ISerdes s)
     {
         if (s == null) throw new ArgumentNullException(nameof(s));
 

@@ -12,10 +12,10 @@ public class TiledTilesetLoader : Component, IAssetLoader<TilesetData>
 {
     public static readonly StringAssetProperty BlankTilePathProperty = new("BlankTilePath"); 
     public static readonly PathPatternProperty GraphicsPattern = new("GraphicsPattern"); 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((TilesetData)existing, s, context);
 
-    public TilesetData Serdes(TilesetData existing, ISerializer s, AssetLoadContext context)
+    public TilesetData Serdes(TilesetData existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
         ArgumentNullException.ThrowIfNull(context);
@@ -36,15 +36,15 @@ public class TiledTilesetLoader : Component, IAssetLoader<TilesetData>
             : Load(context, properties, s);
     }
 
-    static TilesetData Load(AssetLoadContext context, Tilemap2DProperties properties, ISerializer serializer)
+    static TilesetData Load(AssetLoadContext context, Tilemap2DProperties properties, ISerdes serdes)
     {
-        var xmlBytes = serializer.Bytes(null, null, (int)serializer.BytesRemaining);
+        var xmlBytes = serdes.Bytes(null, null, (int)serdes.BytesRemaining);
         using var ms = new MemoryStream(xmlBytes);
         var tileset = Tileset.Parse(ms);
         return TilesetMapping.ToAlbion(tileset, context.AssetId, properties);
     }
 
-    static TilesetData Save(TilesetData tileset, Tilemap2DProperties properties, ISerializer s)
+    static TilesetData Save(TilesetData tileset, Tilemap2DProperties properties, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(tileset);
         var tiledTileset = TilesetMapping.FromAlbion(tileset, properties);

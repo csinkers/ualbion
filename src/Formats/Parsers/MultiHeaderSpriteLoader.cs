@@ -11,10 +11,10 @@ namespace UAlbion.Formats.Parsers;
 
 public class MultiHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
 {
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((IReadOnlyTexture<byte>)existing, s, context);
 
-    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerializer s, AssetLoadContext context)
+    public IReadOnlyTexture<byte> Serdes(IReadOnlyTexture<byte> existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(s);
         ArgumentNullException.ThrowIfNull(context);
@@ -29,7 +29,7 @@ public class MultiHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
         return Read(context, s);
     }
 
-    static IReadOnlyTexture<byte> Read(AssetLoadContext context, ISerializer s)
+    static IReadOnlyTexture<byte> Read(AssetLoadContext context, ISerdes s)
     {
         int width = s.UInt16("Width", 0);
         int height = s.UInt16("Height", 0);
@@ -58,7 +58,7 @@ public class MultiHeaderSpriteLoader : IAssetLoader<IReadOnlyTexture<byte>>
         return BlitUtil.CombineFramesVertically(context.AssetId, frames);
     }
 
-    static void Write(IReadOnlyTexture<byte> existing, ISerializer s)
+    static void Write(IReadOnlyTexture<byte> existing, ISerdes s)
     {
         if (existing.Regions.Count > 255)
             throw new ArgumentOutOfRangeException($"Tried to save an image with more than 255 frames as a multi-header sprite ({existing.Name} with {existing.Regions.Count} regions)");

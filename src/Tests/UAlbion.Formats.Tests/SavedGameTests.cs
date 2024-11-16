@@ -54,7 +54,7 @@ public class SavedGameTests
         using var br = new BinaryReader(stream);
         using var annotationReadStream = new MemoryStream();
         using var annotationReader = new StreamWriter(annotationReadStream);
-        using var ar = new AnnotationProxySerializer(new AlbionReader(br, stream.Length), annotationReader, FormatUtil.BytesFrom850String);
+        using var ar = new AnnotationProxySerdes(new AlbionReader(br, stream.Length), annotationReader, FormatUtil.BytesFrom850String);
         var save = SavedGame.Serdes(null, mapping, ar, spellManager);
 
         // === Save ===
@@ -62,7 +62,7 @@ public class SavedGameTests
         using var bw = new BinaryWriter(ms);
         using var annotationWriteStream = new MemoryStream();
         using var annotationWriter = new StreamWriter(annotationWriteStream);
-        using var aw = new AnnotationProxySerializer(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
+        using var aw = new AnnotationProxySerdes(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
         SavedGame.Serdes(save, mapping, aw, spellManager);
 
         File.WriteAllText(file + ".json", jsonUtil.Serialize(save));
@@ -91,7 +91,7 @@ public class SavedGameTests
             using var reloadBr = new BinaryReader(ms);
             using var reloadAnnotationStream = new MemoryStream();
             using var reloadAnnotationReader = new StreamWriter(reloadAnnotationStream);
-            using var reloadFacade = new AnnotationProxySerializer(new AlbionReader(reloadBr, stream.Length), reloadAnnotationReader, FormatUtil.BytesFrom850String);
+            using var reloadFacade = new AnnotationProxySerdes(new AlbionReader(reloadBr, stream.Length), reloadAnnotationReader, FormatUtil.BytesFrom850String);
             SavedGame.Serdes(null, mapping, reloadFacade, spellManager);
 
             File.WriteAllBytes(file + ".bin", roundTripBytes);

@@ -13,7 +13,7 @@ namespace UAlbion.Game.Veldrid.Assets;
 
 public class PalettePng32Loader : GameComponent, IAssetLoader<AlbionPalette>
 {
-    public AlbionPalette Serdes(AlbionPalette existing, ISerializer s, AssetLoadContext context)
+    public AlbionPalette Serdes(AlbionPalette existing, ISerdes s, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(existing);
         ArgumentNullException.ThrowIfNull(s);
@@ -42,6 +42,6 @@ public class PalettePng32Loader : GameComponent, IAssetLoader<AlbionPalette>
         return existing;
     }
 
-    public object Serdes(object existing, ISerializer s, AssetLoadContext context)
+    public object Serdes(object existing, ISerdes s, AssetLoadContext context)
         => Serdes((AlbionPalette)existing, s, context);
 }

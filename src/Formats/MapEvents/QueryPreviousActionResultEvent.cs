@@ -18,7 +18,7 @@ public class QueryPreviousActionResultEvent : QueryEvent
         Immediate = immediate;
         Argument = argument;
     }
-    public static QueryPreviousActionResultEvent Serdes(QueryPreviousActionResultEvent e, ISerializer s)
+    public static QueryPreviousActionResultEvent Serdes(QueryPreviousActionResultEvent e, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new QueryPreviousActionResultEvent();

@@ -19,7 +19,7 @@ public class ChestEvent : MapEvent, ILockedInventoryEvent
         UnlockedText = unlockedText;
     }
 
-    public static ChestEvent Serdes(ChestEvent e, AssetMapping mapping, ISerializer s)
+    public static ChestEvent Serdes(ChestEvent e, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         e ??= new ChestEvent();

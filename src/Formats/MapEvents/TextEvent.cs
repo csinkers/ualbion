@@ -56,7 +56,7 @@ public class TextEvent : MapEvent // Relies on event chain context to resolve Te
         return new TextEvent(subId, location, charId);
     }
 
-    public static TextEvent Serdes(TextEvent e, AssetMapping mapping, ISerializer s)
+    public static TextEvent Serdes(TextEvent e, AssetMapping mapping, ISerdes s)
     {
         e ??= new TextEvent();
 

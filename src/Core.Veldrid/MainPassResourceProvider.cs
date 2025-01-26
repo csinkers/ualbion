@@ -19,7 +19,7 @@ public sealed class MainPassResourceProvider : Component, IResourceProvider, IDi
     public MainPassResourceProvider(IFramebufferHolder target, ICameraProvider cameraProvider)
     {
         _cameraProvider = cameraProvider ?? throw new ArgumentNullException(nameof(cameraProvider));
-        _cameraUniform = new SingleBuffer<CameraUniform>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, "B_Camera");
+        _cameraUniform = new SingleBuffer<CameraUniform>(BufferUsage.UniformBuffer | BufferUsage.DynamicWrite, "B_Camera");
         _passSet = new MainPassSet
         {
             Name = "RS_MainPass",

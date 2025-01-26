@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
+using Veldrid.Sdl2;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
@@ -9,7 +10,6 @@ using UAlbion.Core.Visual;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Input;
 

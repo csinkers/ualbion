@@ -1,10 +1,13 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
+using System.Text;
 using System.Threading;
 using ImGuiNET;
 using Veldrid;
+using Veldrid.Sdl2;
 using VeldridGen.Interfaces;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
@@ -16,7 +19,7 @@ namespace UAlbion.Core.Veldrid;
 
 public class ImGuiPreRenderEvent : Event, IVerboseEvent
 {
-    public GraphicsDevice Device { get; internal set; }
+    public GraphicsDevice? Device { get; internal set; }
 }
 
 public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is largely based on Veldrid.ImGuiRenderer from Veldrid.ImGui
@@ -35,17 +38,17 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     bool _frameBegun;
 
     // Device objects
-    DeviceBuffer _vertexBuffer;
-    DeviceBuffer _indexBuffer;
-    DeviceBuffer _projMatrixBuffer;
-    Texture _fontTexture;
-    Shader _vertexShader;
-    Shader _fragmentShader;
-    ResourceLayout _layout;
-    ResourceLayout _textureLayout;
-    Pipeline _pipeline;
-    ResourceSet _mainResourceSet;
-    ResourceSet _fontTextureResourceSet;
+    DeviceBuffer? _vertexBuffer;
+    DeviceBuffer? _indexBuffer;
+    DeviceBuffer? _projMatrixBuffer;
+    Texture? _fontTexture;
+    Shader? _vertexShader;
+    Shader? _fragmentShader;
+    ResourceLayout? _layout;
+    ResourceLayout? _textureLayout;
+    Pipeline? _pipeline;
+    ResourceSet? _mainResourceSet;
+    ResourceSet? _fontTextureResourceSet;
 
     int _windowWidth;
     int _windowHeight;
@@ -101,7 +104,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
         ArgumentNullException.ThrowIfNull(cl);
         ArgumentNullException.ThrowIfNull(device);
         if (renderable is not DebugGuiRenderable)
-            throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
+            throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable.GetType().Name}", nameof(renderable));
 
         if (!_frameBegun)
             return;
@@ -123,16 +126,16 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
         ArgumentNullException.ThrowIfNull(factory);
         ArgumentNullException.ThrowIfNull(textureView);
 
-        if (!_setsByView.TryGetValue(textureView, out ResourceSetInfo rsi))
-        {
-            ResourceSet resourceSet = factory.CreateResourceSet(new ResourceSetDescription(_textureLayout, textureView));
-            resourceSet.Name = $"ImGui.NET {textureView.Name} Resource Set";
-            rsi = new ResourceSetInfo(GetNextImGuiBindingId(), resourceSet);
+        if (_setsByView.TryGetValue(textureView, out ResourceSetInfo rsi))
+            return rsi.ImGuiBinding;
 
-            _setsByView.Add(textureView, rsi);
-            _viewsById.Add(rsi.ImGuiBinding, rsi);
-            _ownedResources.Add(resourceSet);
-        }
+        ResourceSet resourceSet = factory.CreateResourceSet(new ResourceSetDescription(_textureLayout!, textureView));
+        resourceSet.Name = $"ImGui.NET {textureView.Name} Resource Set";
+        rsi = new ResourceSetInfo(GetNextImGuiBindingId(), resourceSet);
+
+        _setsByView.Add(textureView, rsi);
+        _viewsById.Add(rsi.ImGuiBinding, rsi);
+        _ownedResources.Add(resourceSet);
 
         return rsi.ImGuiBinding;
     }
@@ -156,25 +159,25 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
         ArgumentNullException.ThrowIfNull(factory);
         ArgumentNullException.ThrowIfNull(texture);
 
-        if (!_autoViewsByTexture.TryGetValue(texture, out TextureView textureView))
-        {
-            textureView = factory.CreateTextureView(texture);
-            textureView.Name = $"ImGui.NET {texture.Name} View";
-            _autoViewsByTexture.Add(texture, textureView);
-            _ownedResources.Add(textureView);
-        }
+        if (_autoViewsByTexture.TryGetValue(texture, out TextureView? textureView))
+            return GetOrCreateImGuiBinding(factory, textureView);
+
+        textureView = factory.CreateTextureView(texture);
+        textureView.Name = $"ImGui.NET {texture.Name} View";
+        _autoViewsByTexture.Add(texture, textureView);
+        _ownedResources.Add(textureView);
 
         return GetOrCreateImGuiBinding(factory, textureView);
     }
 
     public void RemoveImGuiBinding(Texture texture)
     {
-        if (_autoViewsByTexture.Remove(texture, out TextureView textureView))
-        {
-            _ownedResources.Remove(textureView);
-            textureView.Dispose();
-            RemoveImGuiBinding(textureView);
-        }
+        if (!_autoViewsByTexture.Remove(texture, out TextureView? textureView))
+            return;
+
+        _ownedResources.Remove(textureView);
+        textureView.Dispose();
+        RemoveImGuiBinding(textureView);
     }
 
     /// <summary>
@@ -208,17 +211,17 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
         if (_vertexBuffer == null)
             return;
 
-        _vertexBuffer.Dispose();
-        _indexBuffer.Dispose();
-        _projMatrixBuffer.Dispose();
-        _fontTexture.Dispose();
-        _vertexShader.Dispose();
-        _fragmentShader.Dispose();
-        _layout.Dispose();
-        _textureLayout.Dispose();
-        _pipeline.Dispose();
-        _mainResourceSet.Dispose();
-        _fontTextureResourceSet.Dispose();
+        _vertexBuffer?.Dispose();
+        _indexBuffer?.Dispose();
+        _projMatrixBuffer?.Dispose();
+        _fontTexture?.Dispose();
+        _vertexShader?.Dispose();
+        _fragmentShader?.Dispose();
+        _layout?.Dispose();
+        _textureLayout?.Dispose();
+        _pipeline?.Dispose();
+        _mainResourceSet?.Dispose();
+        _fontTextureResourceSet?.Dispose();
 
         foreach (IDisposable resource in _ownedResources)
             resource.Dispose();
@@ -266,13 +269,13 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     void CreateDeviceResources(GraphicsDevice gd, OutputDescription outputDescription)
     {
         ResourceFactory factory = gd.ResourceFactory;
-        _vertexBuffer = factory.CreateBuffer(new BufferDescription(10000, BufferUsage.VertexBuffer | BufferUsage.Dynamic));
+        _vertexBuffer = factory.CreateBuffer(new BufferDescription(10000, BufferUsage.VertexBuffer | BufferUsage.DynamicWrite));
         _vertexBuffer.Name = "ImGui.NET Vertex Buffer";
 
-        _indexBuffer = factory.CreateBuffer(new BufferDescription(2000, BufferUsage.IndexBuffer | BufferUsage.Dynamic));
+        _indexBuffer = factory.CreateBuffer(new BufferDescription(2000, BufferUsage.IndexBuffer | BufferUsage.DynamicWrite));
         _indexBuffer.Name = "ImGui.NET Index Buffer";
 
-        _projMatrixBuffer = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
+        _projMatrixBuffer = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.DynamicWrite));
         _projMatrixBuffer.Name = "ImGui.NET Projection Buffer";
 
         byte[] vertexShaderBytes   = LoadShader(gd.ResourceFactory, "imgui-vertex");
@@ -294,14 +297,14 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
 
         _layout = factory.CreateResourceLayout(new ResourceLayoutDescription(
             new ResourceLayoutElementDescription("ProjectionMatrixBuffer", ResourceKind.UniformBuffer, ShaderStages.Vertex),
-            new ResourceLayoutElementDescription("MainSampler", ResourceKind.Sampler, ShaderStages.Fragment)));
+            new ResourceLayoutElementDescription("FontSampler", ResourceKind.Sampler, ShaderStages.Fragment)));
         _layout.Name = "ImGui.NET Resource Layout";
 
         _textureLayout = factory.CreateResourceLayout(new ResourceLayoutDescription(
-            new ResourceLayoutElementDescription("MainTexture", ResourceKind.TextureReadOnly, ShaderStages.Fragment)));
+            new ResourceLayoutElementDescription("FontTexture", ResourceKind.TextureReadOnly, ShaderStages.Fragment)));
         _textureLayout.Name = "ImGui.NET Texture Layout";
 
-        var pd = new GraphicsPipelineDescription(
+        GraphicsPipelineDescription pd = new(
             BlendStateDescription.SingleAlphaBlend,
             new DepthStencilStateDescription(false, false, ComparisonKind.Always),
             new RasterizerStateDescription(FaceCullMode.None, PolygonFillMode.Solid, FrontFace.Clockwise, true, true),
@@ -311,13 +314,13 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
                 [_vertexShader, _fragmentShader],
                 [
                     new SpecializationConstant(0, gd.IsClipSpaceYInverted),
-                    new SpecializationConstant(1, false) // is color space legacy?
+                    new SpecializationConstant(1, true) // is color space legacy?
                 ]),
             [_layout, _textureLayout],
             outputDescription,
             ResourceBindingModel.Default);
 
-        _pipeline = factory.CreateGraphicsPipeline(ref pd);
+        _pipeline = factory.CreateGraphicsPipeline(pd);
         _pipeline.Name = "ImGui.NET Pipeline";
 
         _mainResourceSet = factory.CreateResourceSet(new ResourceSetDescription(_layout, _projMatrixBuffer, gd.PointSampler));
@@ -382,7 +385,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
             0);
 
         _fontTextureResourceSet?.Dispose();
-        _fontTextureResourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_textureLayout, _fontTexture));
+        _fontTextureResourceSet = gd.ResourceFactory.CreateResourceSet(new ResourceSetDescription(_textureLayout!, _fontTexture));
         _fontTextureResourceSet.Name = "ImGui.NET Font Texture Resource Set";
 
         io.Fonts.ClearTexData();
@@ -418,9 +421,15 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
             return true;
         }
 
-        if (key is >= Key.Keypad0 and <= Key.Keypad9)
+        if (key == Key.Keypad0)
         {
             result = KeyToImGuiKeyShortcut(key, Key.Keypad0, ImGuiKey.Keypad0);
+            return true;
+        }
+
+        if (key is >= Key.Keypad1 and <= Key.Keypad9)
+        {
+            result = KeyToImGuiKeyShortcut(key, Key.Keypad1, ImGuiKey.Keypad1);
             return true;
         }
 
@@ -430,31 +439,37 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
             return true;
         }
 
-        if (key is >= Key.Number0 and <= Key.Number9)
+        if (key == Key.Num0)
         {
-            result = KeyToImGuiKeyShortcut(key, Key.Number0, ImGuiKey._0);
+            result = KeyToImGuiKeyShortcut(key, Key.Num0, ImGuiKey._0);
+            return true;
+        }
+
+        if (key is >= Key.Num1 and <= Key.Num9)
+        {
+            result = KeyToImGuiKeyShortcut(key, Key.Num1, ImGuiKey._1);
             return true;
         }
 
         switch (key)
         {
-            case Key.ShiftLeft:
-            case Key.ShiftRight:
+            case Key.LeftShift:
+            case Key.RightShift:
                 result = ImGuiKey.ModShift;
                 return true;
 
-            case Key.ControlLeft:
-            case Key.ControlRight:
+            case Key.LeftControl:
+            case Key.RightControl:
                 result = ImGuiKey.ModCtrl;
                 return true;
 
-            case Key.AltLeft:
-            case Key.AltRight:
+            case Key.LeftAlt:
+            case Key.RightAlt:
                 result = ImGuiKey.ModAlt;
                 return true;
 
-            case Key.WinLeft:
-            case Key.WinRight:
+            case Key.LeftGui:
+            case Key.RightGui:
                 result = ImGuiKey.ModSuper;
                 return true;
 
@@ -463,11 +478,11 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
             case Key.Down:           result = ImGuiKey.DownArrow;      return true;
             case Key.Left:           result = ImGuiKey.LeftArrow;      return true;
             case Key.Right:          result = ImGuiKey.RightArrow;     return true;
-            case Key.Enter:          result = ImGuiKey.Enter;          return true;
+            case Key.Return:         result = ImGuiKey.Enter;          return true;
             case Key.Escape:         result = ImGuiKey.Escape;         return true;
             case Key.Space:          result = ImGuiKey.Space;          return true;
             case Key.Tab:            result = ImGuiKey.Tab;            return true;
-            case Key.BackSpace:      result = ImGuiKey.Backspace;      return true;
+            case Key.Backspace:      result = ImGuiKey.Backspace;      return true;
             case Key.Insert:         result = ImGuiKey.Insert;         return true;
             case Key.Delete:         result = ImGuiKey.Delete;         return true;
             case Key.PageUp:         result = ImGuiKey.PageUp;         return true;
@@ -478,28 +493,29 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
             case Key.ScrollLock:     result = ImGuiKey.ScrollLock;     return true;
             case Key.PrintScreen:    result = ImGuiKey.PrintScreen;    return true;
             case Key.Pause:          result = ImGuiKey.Pause;          return true;
-            case Key.NumLock:        result = ImGuiKey.NumLock;        return true;
+            case Key.NumLockClear:   result = ImGuiKey.NumLock;        return true;
             case Key.KeypadDivide:   result = ImGuiKey.KeypadDivide;   return true;
             case Key.KeypadMultiply: result = ImGuiKey.KeypadMultiply; return true;
-            case Key.KeypadSubtract: result = ImGuiKey.KeypadSubtract; return true;
-            case Key.KeypadAdd:      result = ImGuiKey.KeypadAdd;      return true;
+            case Key.KeypadMinus:    result = ImGuiKey.KeypadSubtract; return true;
+            case Key.KeypadPlus:     result = ImGuiKey.KeypadAdd;      return true;
             case Key.KeypadDecimal:  result = ImGuiKey.KeypadDecimal;  return true;
             case Key.KeypadEnter:    result = ImGuiKey.KeypadEnter;    return true;
-            case Key.Tilde:          result = ImGuiKey.GraveAccent;    return true;
+            case Key.Grave:          result = ImGuiKey.GraveAccent;    return true;
             case Key.Minus:          result = ImGuiKey.Minus;          return true;
-            case Key.Plus:           result = ImGuiKey.Equal;          return true;
-            case Key.BracketLeft:    result = ImGuiKey.LeftBracket;    return true;
-            case Key.BracketRight:   result = ImGuiKey.RightBracket;   return true;
+            case Key.Equals:         result = ImGuiKey.Equal;          return true;
+            case Key.LeftBracket:    result = ImGuiKey.LeftBracket;    return true;
+            case Key.RightBracket:   result = ImGuiKey.RightBracket;   return true;
             case Key.Semicolon:      result = ImGuiKey.Semicolon;      return true;
-            case Key.Quote:          result = ImGuiKey.Apostrophe;     return true;
+            case Key.Apostrophe:     result = ImGuiKey.Apostrophe;     return true;
             case Key.Comma:          result = ImGuiKey.Comma;          return true;
             case Key.Period:         result = ImGuiKey.Period;         return true;
             case Key.Slash:          result = ImGuiKey.Slash;          return true;
 
-            case Key.BackSlash:
-            case Key.NonUSBackSlash:
+            case Key.Backslash:
+            case Key.NonUsBackslash:
                 result = ImGuiKey.Backslash;
                 return true;
+
             default:
                 result = ImGuiKey.GamepadBack;
                 return false;
@@ -511,22 +527,24 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     {
         ImGuiIOPtr io = ImGui.GetIO();
         io.AddMousePosEvent(snapshot.MousePosition.X, snapshot.MousePosition.Y);
-        io.AddMouseButtonEvent(0, snapshot.IsMouseDown(MouseButton.Left));
-        io.AddMouseButtonEvent(1, snapshot.IsMouseDown(MouseButton.Right));
-        io.AddMouseButtonEvent(2, snapshot.IsMouseDown(MouseButton.Middle));
-        io.AddMouseButtonEvent(3, snapshot.IsMouseDown(MouseButton.Button1));
-        io.AddMouseButtonEvent(4, snapshot.IsMouseDown(MouseButton.Button2));
-        io.AddMouseWheelEvent(0f, snapshot.WheelDelta);
+        MouseButton snapMouseDown = snapshot.MouseDown;
+        io.AddMouseButtonEvent(0, (snapMouseDown & MouseButton.Left) != 0);
+        io.AddMouseButtonEvent(1, (snapMouseDown & MouseButton.Right) != 0);
+        io.AddMouseButtonEvent(2, (snapMouseDown & MouseButton.Middle) != 0);
+        io.AddMouseButtonEvent(3, (snapMouseDown & MouseButton.Button1) != 0);
+        io.AddMouseButtonEvent(4, (snapMouseDown & MouseButton.Button2) != 0);
 
-        for (int i = 0; i < snapshot.KeyCharPresses.Count; i++)
+        Vector2 wheelDelta = snapshot.WheelDelta;
+        io.AddMouseWheelEvent(wheelDelta.X, wheelDelta.Y);
+
+        foreach (Rune rune in snapshot.InputEvents)
         {
-            io.AddInputCharacter(snapshot.KeyCharPresses[i]);
+            io.AddInputCharacter((uint)rune.Value);
         }
 
-        for (int i = 0; i < snapshot.KeyEvents.Count; i++)
+        foreach(KeyEvent keyEvent in snapshot.KeyEvents)
         {
-            KeyEvent keyEvent = snapshot.KeyEvents[i];
-            if (TryMapKey(keyEvent.Key, out ImGuiKey imguikey))
+            if (TryMapKey(keyEvent.Physical, out ImGuiKey imguikey))
             {
                 io.AddKeyEvent(imguikey, keyEvent.Down);
             }
@@ -542,19 +560,21 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
             return;
 
         uint totalVbSize = (uint)(drawData.TotalVtxCount * sizeof(ImDrawVert));
-        if (totalVbSize > _vertexBuffer.SizeInBytes)
+        if (totalVbSize > _vertexBuffer!.SizeInBytes)
         {
+            var name = _vertexBuffer.Name;
             _vertexBuffer.Dispose();
-            _vertexBuffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)(totalVbSize * 1.5f), BufferUsage.VertexBuffer | BufferUsage.Dynamic));
-            _vertexBuffer.Name = "ImGui.NET Vertex Buffer";
+            _vertexBuffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)(totalVbSize * 1.5f), BufferUsage.VertexBuffer | BufferUsage.DynamicWrite));
+            _vertexBuffer.Name = name;
         }
 
         uint totalIbSize = (uint)(drawData.TotalIdxCount * sizeof(ushort));
-        if (totalIbSize > _indexBuffer.SizeInBytes)
+        if (totalIbSize > _indexBuffer!.SizeInBytes)
         {
+            var name = _indexBuffer.Name;
             _indexBuffer.Dispose();
-            _indexBuffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)(totalIbSize * 1.5f), BufferUsage.IndexBuffer | BufferUsage.Dynamic));
-            _indexBuffer.Name = "ImGui.NET Index Buffer";
+            _indexBuffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)(totalIbSize * 1.5f), BufferUsage.IndexBuffer | BufferUsage.DynamicWrite));
+            _indexBuffer.Name = name;
         }
 
         for (int i = 0; i < drawData.CmdListsCount; i++)
@@ -589,13 +609,13 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
                 -1.0f,
                 1.0f);
 
-            gd.UpdateBuffer(_projMatrixBuffer, 0, ref mvp);
+            gd.UpdateBuffer(_projMatrixBuffer!, 0, ref mvp);
         }
 
         cl.SetVertexBuffer(0, _vertexBuffer);
         cl.SetIndexBuffer(_indexBuffer, IndexFormat.UInt16);
-        cl.SetPipeline(_pipeline);
-        cl.SetGraphicsResourceSet(0, _mainResourceSet);
+        cl.SetPipeline(_pipeline!);
+        cl.SetGraphicsResourceSet(0, _mainResourceSet!);
 
         drawData.ScaleClipRects(ImGui.GetIO().DisplayFramebufferScale);
 
@@ -613,8 +633,8 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
 
                 if (pcmd.TextureId != IntPtr.Zero)
                 {
-                    cl.SetGraphicsResourceSet(1, pcmd.TextureId == _fontAtlasId 
-                        ? _fontTextureResourceSet 
+                    cl.SetGraphicsResourceSet(1, pcmd.TextureId == _fontAtlasId
+                        ? _fontTextureResourceSet!
                         : GetImageResourceSet(pcmd.TextureId));
                 }
 

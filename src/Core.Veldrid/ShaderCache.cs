@@ -97,10 +97,12 @@ public sealed class ShaderCache(string shaderCachePath) : Component, IShaderCach
 
         using (PerfTracker.InfrequentEvent($"Compiling {info.Name} to SPIR-V"))
         {
-            var options = GlslCompileOptions.Default;
 #if DEBUG
-            options.Debug = true;
+            var options = new GlslCompileOptions(true, []);
+#else
+            var options = new GlslCompileOptions(false, []);
 #endif
+
             try
             {
                 var glslCompileResult = SpirvCompilation.CompileGlslToSpirv(info.Content, info.Name, stage, options);

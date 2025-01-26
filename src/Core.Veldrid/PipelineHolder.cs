@@ -109,7 +109,7 @@ public class PipelineHolder : Component, IPipelineHolder
                 ?? Framebuffer?.Framebuffer?.OutputDescription
                 ?? device.SwapchainFramebuffer.OutputDescription);
 
-            _pipeline = device.ResourceFactory.CreateGraphicsPipeline(ref pipelineDescription);
+            _pipeline = device.ResourceFactory.CreateGraphicsPipeline(in pipelineDescription);
             _pipeline.Name = Name;
             GC.ReRegisterForFinalize(this);
             Off<PrepareFrameResourcesEvent>();

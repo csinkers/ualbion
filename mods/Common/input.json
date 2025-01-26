@@ -3,7 +3,7 @@
   "Global": {
     "Alt+F4": "quit",
     "Alt+Enter": "e:toggle_fullscreen",
-    "Control+M": "mute",
+    "Ctrl+M": "mute",
 
     "Alt+1": "set_language English",
     "Alt+2": "set_language German",
@@ -15,15 +15,15 @@
 
     // Debugging
     "Tilde": "focus_console",
-    "Control+Shift+V": "push_mouse_mode DebugPick",
+    "Ctrl+Shift+V": "push_mouse_mode DebugPick",
     "Shift+V": "hide_debug_window",
-    "Control+D": "engine_flag toggle RenderDepth",
-    "Control+E": "push_scene Editor",
-    "Control+B": "engine_flag toggle ShowBoundingBoxes",
-    "Control+Shift+L": "engine_flag toggle SuppressLayout",
-    "Control+L": "eng:layout",
-    "Control+R": "e:run_renderdoc",
-    "Control+V": "engine_flag toggle VSync",
+    "Ctrl+D": "engine_flag toggle RenderDepth",
+    "Ctrl+E": "push_scene Editor",
+    "Ctrl+B": "engine_flag toggle ShowBoundingBoxes",
+    "Ctrl+Shift+L": "engine_flag toggle SuppressLayout",
+    "Ctrl+L": "eng:layout",
+    "Ctrl+R": "e:run_renderdoc",
+    "Ctrl+V": "engine_flag toggle VSync",
     "Pause": "e:run_renderdoc",
     "F1": "toggle_diagnostics",
     "F2": "toggle_clock",
@@ -34,13 +34,13 @@
   },
   "World2D": {
     "Escape": "push_scene MainMenu",
-    "Control+A": "!loadnextmap",
-    "Control+X": "!loadprevmap",
-    "Control+Q": "debug_flag toggle FastMovement",
-    "BracketLeft": "e:mag -1",
-    "BracketRight": "e:mag 1",
-    "Shift+BracketLeft": "toggle_underlay",
-    "Shift+BracketRight": "toggle_overlay",
+    "Ctrl+A": "!loadnextmap",
+    "Ctrl+X": "!loadprevmap",
+    "Ctrl+Q": "debug_flag toggle FastMovement",
+    "LeftBracket": "e:mag -1",
+    "RightBracket": "e:mag 1",
+    "Shift+LeftBracket": "toggle_underlay",
+    "Shift+RightBracket": "toggle_overlay",
     "C": "noclip",
 
     "W": "+party_move  0 -1",
@@ -66,13 +66,13 @@
     "F5": "inv:open_pos 4",
     "F6": "inv:open_pos 5",*/
 
-    "Control+Number1": "debug_flag toggle CollisionLayer",
-    "Control+Number2": "debug_flag toggle SitLayer",
-    "Control+Number3": "debug_flag toggle MiscLayer",
-    "Control+Number4": "debug_flag toggle ShowDebugTiles",
-    "Control+Number5": "debug_flag toggle ZoneLayer",
-    "Control+Number6": "debug_flag toggle NpcColliderLayer",
-    "Control+Number7": "debug_flag toggle NpcPathLayer",
+    "Ctrl+1": "debug_flag toggle CollisionLayer",
+    "Ctrl+2": "debug_flag toggle SitLayer",
+    "Ctrl+3": "debug_flag toggle MiscLayer",
+    "Ctrl+4": "debug_flag toggle ShowDebugTiles",
+    "Ctrl+5": "debug_flag toggle ZoneLayer",
+    "Ctrl+6": "debug_flag toggle NpcColliderLayer",
+    "Ctrl+7": "debug_flag toggle NpcPathLayer",
 
     "Q": "+cursor_mode examine",
     "E": "+cursor_mode manipulate",
@@ -89,13 +89,13 @@
     "F5": "inv:open_pos 4",
     "F6": "inv:open_pos 5",*/
 
-    "Control+A": "!loadnextmap",
-    "Control+X": "!loadprevmap",
+    "Ctrl+A": "!loadnextmap",
+    "Ctrl+X": "!loadprevmap",
 
     "M": "open_map",
     "T": "wait",
-    "Control+Shift+M": "set_mouse_mode MouseLook",
-    "Control+Shift+N": "set_mouse_mode Normal",
+    "Ctrl+Shift+M": "set_mouse_mode MouseLook",
+    "Ctrl+Shift+N": "set_mouse_mode Normal",
 
     "W": "+camera_move  0 -4",
     "A": "+camera_move -4  0",
@@ -119,7 +119,7 @@
     "Z": "+cursor_mode take"
   },
   "Inventory": {
-    "Control+A": "take_all",
+    "Ctrl+A": "take_all",
     "E": "inv:equip",
     "Escape": "inv:close",
     "Tab": "inv:close",
@@ -129,33 +129,33 @@
     "F4": "inv:open_pos 3",
     "F5": "inv:open_pos 4",
     "F6": "inv:open_pos 5",*/
-    "Control+1": "inv:set_page Summary",
-    "Control+2": "inv:set_page Stats",
-    "Control+3": "inv:set_page Misc"
+    "Ctrl+1": "inv:set_page Summary",
+    "Ctrl+2": "inv:set_page Stats",
+    "Ctrl+3": "inv:set_page Misc"
   },
   "Combat": {
     "Escape": "push_scene MainMenu"
   },
   "Conversation": {
-    "Number1": "respond 1",
-    "Number2": "respond 2",
-    "Number3": "respond 3",
-    "Number4": "respond 4",
-    "Number5": "respond 5",
-    "Number6": "respond 6",
-    "Number7": "respond 7",
-    "Number8": "respond 8",
-    "Number9": "respond 9",
-    "Number0": "enter_word" // Used to trigger 'Enter word' in conversation
+    "1": "respond 1",
+    "2": "respond 2",
+    "3": "respond 3",
+    "4": "respond 4",
+    "5": "respond 5",
+    "6": "respond 6",
+    "7": "respond 7",
+    "8": "respond 8",
+    "9": "respond 9",
+    "0": "enter_word" // Used to trigger 'Enter word' in conversation
   },
   "MainMenu": {
-    "Control+N": "new_game TorontoBegin 32 76",
-    "Control+3": "new_game Jirinaar 20 20",
-    "Control+Shift+N": "new_game TorontoBegin 32 76",
+    "Ctrl+N": "new_game TorontoBegin 32 76",
+    "Ctrl+3": "new_game Jirinaar 20 20",
+    "Ctrl+Shift+N": "new_game TorontoBegin 32 76",
     "Escape": "close_window"
   },
   "Editor": {
-    "Control+E": "pop_scene Editor"
+    "Ctrl+E": "pop_scene Editor"
   },
   "IsoBake": {
     "W": "+cam_move 0 50",
@@ -165,14 +165,14 @@
     "Q": "+cam_move 0 0 -10",
     "F": "+cam_move 0 0 10",
 
-    "Control+A": "iso_lab 1",
-    "Control+X": "iso_lab -1",
-    "Control+Z": "iso_pal -1",
-    "Control+C": "iso_pal 1",
-    "Number1": "iso_mode Floors",
-    "Number2": "iso_mode Ceilings",
-    "Number3": "iso_mode Walls",
-    "Number4": "iso_mode Contents",
+    "Ctrl+A": "iso_lab 1",
+    "Ctrl+X": "iso_lab -1",
+    "Ctrl+Z": "iso_pal -1",
+    "Ctrl+C": "iso_pal 1",
+    "1": "iso_mode Floors",
+    "2": "iso_mode Ceilings",
+    "3": "iso_mode Walls",
+    "4": "iso_mode Contents",
 
     "Shift+W": "+cam_move 0 150",
     "Shift+A": "+cam_move -150 0",
@@ -195,7 +195,7 @@
     "Left": "+iso_yaw -1",
     "Right": "+iso_yaw 1",
 
-    "BracketLeft": "e:mag -1",
-    "BracketRight": "e:mag 1"
+    "LeftBracket": "e:mag -1",
+    "RightBracket": "e:mag 1"
   }
 }

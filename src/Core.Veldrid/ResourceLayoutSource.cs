@@ -38,7 +38,7 @@ public class ResourceLayoutSource : ServiceComponent<IResourceLayoutSource>, IRe
                 throw new InvalidOperationException($"Tried to retrieve resource layout from type {type.Name}, but its \"Layout\" field is not of type ResourceLayoutDescription");
 
             var description = (ResourceLayoutDescription)field.GetValue(null)!;
-            layout = device.ResourceFactory.CreateResourceLayout(ref description);
+            layout = device.ResourceFactory.CreateResourceLayout(in description);
             _layouts[type] = layout;
             return layout;
         }

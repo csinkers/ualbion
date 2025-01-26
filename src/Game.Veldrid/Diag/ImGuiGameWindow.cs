@@ -38,7 +38,7 @@ public class ImGuiGameWindow : Component, IImGuiWindow
         if (!manager.ConsumedKeyboard)
         {
             _keyboardEvent.DeltaSeconds = input.DeltaSeconds;
-            _keyboardEvent.KeyCharPresses = input.Snapshot.KeyCharPresses;
+            _keyboardEvent.InputEvents = input.Snapshot.InputEvents;
             _keyboardEvent.KeyEvents = input.Snapshot.KeyEvents;
             Raise(_keyboardEvent);
             manager.ConsumedKeyboard = true;
@@ -49,6 +49,10 @@ public class ImGuiGameWindow : Component, IImGuiWindow
 
         bool open = true;
         ImGui.Begin(Name, ref open);
+
+        Vector2 contentRegion = ImGui.GetContentRegionAvail();
+        var width = (int)contentRegion.X;
+        var height = (int)contentRegion.Y;
 
         var texture = _framebuffer.Framebuffer?.ColorTargets[0].Target;
         if (texture != null)
@@ -62,11 +66,6 @@ public class ImGuiGameWindow : Component, IImGuiWindow
             else
                 ImGui.Image(handle, new Vector2(_framebuffer.Width, _framebuffer.Height));
         }
-
-        var vMin = ImGui.GetWindowContentRegionMin();
-        var vMax = ImGui.GetWindowContentRegionMax();
-        var width = (int)(vMax.X - vMin.X);
-        var height = (int)(vMax.Y - vMin.Y);
 
         var isHovered = ImGui.IsItemHovered();
         if (isHovered != _wasHovered)
@@ -93,12 +92,15 @@ public class ImGuiGameWindow : Component, IImGuiWindow
 
         if (_dirty || width != _framebuffer.Width || height != _framebuffer.Height)
         {
-            // Framebuffer requires resizing
-            _framebuffer.Width = (uint)width;
-            _framebuffer.Height = (uint)height;
-            _gameWindow.Resize(width, height);
+            if (width >= 1 && height >= 1) // Don't update if the content region gave a weird value
+            {
+                // Framebuffer requires resizing
+                _framebuffer.Width = (uint)width;
+                _framebuffer.Height = (uint)height;
+                _gameWindow.Resize(width, height);
 
-            _dirty = false;
+                _dirty = false;
+            }
         }
 
         if (!open)

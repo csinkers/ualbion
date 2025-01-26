@@ -11,7 +11,7 @@ namespace UAlbion.Core.Veldrid;
 
 public class Mesh : IMesh
 {
-    public Mesh(MeshId id, ConstructedMeshInfo mesh, MaterialDefinition material, Dictionary<string, ITexture> textures)
+    public Mesh(MeshId id, ConstructedMesh16 mesh, MaterialDefinition material, Dictionary<string, ITexture> textures)
     {
         ArgumentNullException.ThrowIfNull(mesh);
         ArgumentNullException.ThrowIfNull(material);

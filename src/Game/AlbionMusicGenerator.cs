@@ -6,12 +6,11 @@ using UAlbion.Formats.Ids;
 
 namespace UAlbion.Game;
 
-public class AlbionMusicGenerator : GameComponent, IAudioGenerator
+public class AlbionMusicGenerator(SongId songId) : GameComponent, IAudioGenerator
 {
     MidiPlayer _player;
 
-    public SongId SongId { get; }
-    public AlbionMusicGenerator(SongId songId) => SongId = songId;
+    public SongId SongId => songId;
 
     protected override void Subscribed()
     {
@@ -24,7 +23,7 @@ public class AlbionMusicGenerator : GameComponent, IAudioGenerator
         if (_player == null)
             return;
 
-        var xmiBytes = Assets.LoadSong(SongId);
+        var xmiBytes = Assets.LoadSong(songId);
         if ((xmiBytes?.Length ?? 0) == 0)
             return;
 

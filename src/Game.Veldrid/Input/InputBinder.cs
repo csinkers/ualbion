@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Veldrid.Sdl2;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Core.Veldrid.Events;
@@ -8,7 +9,6 @@ using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Input;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Input;
 
@@ -20,9 +20,9 @@ public class InputBinder : GameServiceComponent<IInputBinder>, IInputBinder
     readonly HashSet<Key> _pressedKeys = [];
     MapId _mapId = Base.Map.TestMapIskai;
 
-    public bool IsAltPressed => _pressedKeys.Contains(Key.AltLeft) || _pressedKeys.Contains(Key.AltRight);
-    public bool IsCtrlPressed => _pressedKeys.Contains(Key.ControlLeft) || _pressedKeys.Contains(Key.ControlRight);
-    public bool IsShiftPressed => _pressedKeys.Contains(Key.ShiftLeft) || _pressedKeys.Contains(Key.ShiftRight);
+    public bool IsAltPressed => _pressedKeys.Contains(Key.LeftAlt) || _pressedKeys.Contains(Key.RightAlt);
+    public bool IsCtrlPressed => _pressedKeys.Contains(Key.LeftControl) || _pressedKeys.Contains(Key.RightControl);
+    public bool IsShiftPressed => _pressedKeys.Contains(Key.LeftShift) || _pressedKeys.Contains(Key.RightShift);
 
     public InputBinder()
     {
@@ -55,22 +55,35 @@ public class InputBinder : GameServiceComponent<IInputBinder>, IInputBinder
             foreach (var rawBinding in rawMode.Value)
             {
                 var parts = rawBinding.Key.Split('+').Select(x => x.Trim().ToUpperInvariant()).ToArray();
-                Key key = Key.LastKey;
+                Key key = Key.Unknown;
                 var modifiers = ModifierKeys.None;
                 for (int i = 0; i < parts.Length; i++)
                 {
                     if (i == parts.Length - 1)
                     {
-                        if (int.TryParse(parts[i], out var numeric))
-                            key = Key.Number0 + numeric;
-                        else
-                            key = Enum.Parse<Key>(parts[i], true);
+                        key = int.TryParse(parts[i], out var numeric)
+                            ? KeyHelper.KeyForDigit(numeric)
+                            : Enum.Parse<Key>(parts[i], true);
                     }
                     else
-                        modifiers |= Enum.Parse<ModifierKeys>(parts[i], true);
+                    {
+                        if (!Enum.TryParse(parts[i], true, out ModifierKeys modifier))
+                        {
+                            modifier = parts[i].ToUpperInvariant() switch
+                            {
+                                "SHIFT" => ModifierKeys.LeftShift,
+                                "ALT" => ModifierKeys.LeftAlt,
+                                "CTRL" or "CONTROL" => ModifierKeys.LeftControl,
+                                "WIN" or "GUI" => ModifierKeys.LeftGui,
+                                _ => modifier
+                            };
+                        }
+
+                        modifiers |= modifier;
+                    }
                 }
 
-                if (key != Key.LastKey)
+                if (key != Key.Unknown)
                     mode[new KeyBinding(key, modifiers)] = rawBinding.Value;
             }
         }
@@ -90,30 +103,22 @@ public class InputBinder : GameServiceComponent<IInputBinder>, IInputBinder
         get
         {
             ModifierKeys m = ModifierKeys.None;
-            if (IsShiftPressed) m |= ModifierKeys.Shift;
-            if (IsCtrlPressed) m |= ModifierKeys.Control;
-            if (IsAltPressed) m |= ModifierKeys.Alt;
+            if (IsShiftPressed) m |= ModifierKeys.LeftShift;
+            if (IsCtrlPressed) m |= ModifierKeys.LeftControl;
+            if (IsAltPressed) m |= ModifierKeys.LeftAlt;
             return m;
         }
     }
 
-    static bool IsModifier(Key key)
-    {
-        switch (key)
+    static bool IsModifier(Key key) =>
+        key switch
         {
-            case Key.LControl:
-            case Key.RControl:
-            case Key.LShift:
-            case Key.RShift:
-            case Key.LAlt:
-            case Key.RAlt:
-            case Key.LWin:
-            case Key.RWin:
-                return true;
-            default:
-                return false;
-        }
-    }
+            Key.LeftControl or Key.RightControl
+            or Key.LeftShift or Key.RightShift
+            or Key.LeftAlt or Key.RightAlt
+            or Key.LeftGui or Key.RightGui => true,
+            _ => false
+        };
 
     void OnKeyboard(KeyboardInputEvent e)
     {
@@ -126,16 +131,16 @@ public class InputBinder : GameServiceComponent<IInputBinder>, IInputBinder
             var keyEvent = e.KeyEvents[index];
             if (!keyEvent.Down)
             {
-                _pressedKeys.Remove(keyEvent.Key);
+                _pressedKeys.Remove(keyEvent.Physical);
                 continue;
             }
 
-            _pressedKeys.Add(keyEvent.Key);
+            _pressedKeys.Add(keyEvent.Physical);
 
-            if (IsModifier(keyEvent.Key))
+            if (IsModifier(keyEvent.Physical))
                 continue;
 
-            var binding = new KeyBinding(keyEvent.Key, keyEvent.Modifiers);
+            var binding = new KeyBinding(keyEvent.Physical, keyEvent.Modifiers);
             var mode = _bindings.ContainsKey(inputManager.InputMode) ? inputManager.InputMode : InputMode.Global;
             if (mode == InputMode.TextEntry)
                 continue;
@@ -186,15 +191,14 @@ public class InputBinder : GameServiceComponent<IInputBinder>, IInputBinder
     }
 
     /*
-            void OnUpdate(FastClockEvent fastClockEvent)
-            {
-                // TODO: Re-emit any held events
-            }
+    void OnUpdate(FastClockEvent fastClockEvent)
+    {
+        // TODO: Re-emit any held events
+    }
 
-
-            public bool GetKey(Key key) { return CurrentlyPressedKeys.Contains(key); }
-            public bool GetKeyDown(Key key) { return NewKeysThisFrame.Contains(key); }
-            public bool GetMouseButton(MouseButton button) { return CurrentlyPressedMouseButtons.Contains(button); }
-            public bool GetMouseButtonDown(MouseButton button) { return NewMouseButtonsThisFrame.Contains(button); }
-            */
+    public bool GetKey(Key key) { return CurrentlyPressedKeys.Contains(key); }
+    public bool GetKeyDown(Key key) { return NewKeysThisFrame.Contains(key); }
+    public bool GetMouseButton(MouseButton button) { return CurrentlyPressedMouseButtons.Contains(button); }
+    public bool GetMouseButtonDown(MouseButton button) { return NewMouseButtonsThisFrame.Contains(button); }
+    */
 }

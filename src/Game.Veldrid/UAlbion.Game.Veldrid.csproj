@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <LangVersion>13</LangVersion>
@@ -8,23 +7,15 @@
     <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
     <_SkipUpgradeNetAnalyzersNuGetWarning>true</_SkipUpgradeNetAnalyzersNuGetWarning>
   </PropertyGroup>
-
   <ItemGroup>
+    <PackageReference Include="ImGuiColorTextEditNet" Version="0.1.7" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Core.Veldrid\UAlbion.Core.Veldrid.csproj" />
     <ProjectReference Include="..\Game\UAlbion.Game.csproj" />
-  </ItemGroup>
-
-  <ItemGroup Condition="!Exists('..\..\deps\ImGuiColorTextEditNet\')">
-    <PackageReference Include="ImGuiColorTextEditNet" Version="0.1.7" />
-  </ItemGroup>
-  <ItemGroup Condition="Exists('..\..\deps\ImGuiColorTextEditNet\')">
-    <ProjectReference Include="..\..\deps\ImGuiColorTextEditNet\src\TextEdit\ImGuiColorTextEditNet.csproj" />
   </ItemGroup>
 </Project>

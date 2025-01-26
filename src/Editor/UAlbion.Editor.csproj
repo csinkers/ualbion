@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Api\UAlbion.Api.csproj" />
-    <ProjectReference Include="..\Core\UAlbion.Core.csproj" />
     <ProjectReference Include="..\Game\UAlbion.Game.csproj" />
   </ItemGroup>
 

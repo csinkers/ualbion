@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <LangVersion>13</LangVersion>
@@ -9,17 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Superpower" Version="3.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup Condition="!Exists('..\..\deps\superpower')">
-    <PackageReference Include="Superpower" Version="3.0.0" />
-  </ItemGroup>
-  <ItemGroup Condition="Exists('..\..\deps\superpower')">
-    <ProjectReference Include="..\..\deps\superpower\src\Superpower\Superpower.csproj" />
   </ItemGroup>
 
   <ItemGroup>

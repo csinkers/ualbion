@@ -24,7 +24,7 @@ public sealed class GlobalResourceSetProvider : Component, IResourceProvider, ID
             Filter = SamplerFilter.MinPoint_MagPoint_MipPoint,
         };
 
-        _globalInfo = new SingleBuffer<GlobalInfo>(BufferUsage.UniformBuffer | BufferUsage.Dynamic, $"B_{name}");
+        _globalInfo = new SingleBuffer<GlobalInfo>(BufferUsage.UniformBuffer | BufferUsage.DynamicWrite, $"B_{name}");
         _globalSet = new GlobalSet
         {
             Name = $"RS_{name}",

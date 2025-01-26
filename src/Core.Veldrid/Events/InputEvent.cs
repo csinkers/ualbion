@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
-using Veldrid;
+using Veldrid.Sdl2;
 
 namespace UAlbion.Core.Veldrid.Events;
 

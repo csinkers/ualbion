@@ -105,7 +105,7 @@ public class ImGuiConsoleLogger : Component, IImGuiWindow
             _focus = false;
         }
 
-        if (ImGui.InputText("", _inputBuffer, (uint)_inputBuffer.Length, inputTextFlags))
+        if (ImGui.InputText("##input", _inputBuffer, (uint)_inputBuffer.Length, inputTextFlags))
         {
             var logExchange = Resolve<ILogExchange>();
             var command = Encoding.ASCII.GetString(_inputBuffer);

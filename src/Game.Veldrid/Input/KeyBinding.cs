@@ -1,5 +1,5 @@
 ﻿using System;
-using Veldrid;
+using Veldrid.Sdl2;
 
 namespace UAlbion.Game.Veldrid.Input;
 

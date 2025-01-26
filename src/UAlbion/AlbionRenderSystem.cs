@@ -14,6 +14,7 @@ using UAlbion.Game.Veldrid.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 using static UAlbion.Game.Veldrid.AlbionRenderSystemConstants;
+using ImGuiRenderer = UAlbion.Core.Veldrid.ImGuiRenderer;
 
 namespace UAlbion;
 
@@ -65,7 +66,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                         x.On<InputEvent>(e =>
                         {
                             keyboardEvent.DeltaSeconds   = e.DeltaSeconds;
-                            keyboardEvent.KeyCharPresses = e.Snapshot.KeyCharPresses;
+                            keyboardEvent.InputEvents    = e.Snapshot.InputEvents;
                             keyboardEvent.KeyEvents      = e.Snapshot.KeyEvents;
                             x.Raise(keyboardEvent);
 

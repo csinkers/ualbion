@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using UAlbion.Api;
 
-namespace UAlbion.TestCommon;
+namespace UAlbion.Api;
 
 public class MockFileSystemChild : IFileSystem
 {

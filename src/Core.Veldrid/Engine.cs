@@ -6,12 +6,12 @@ using SixLabors.ImageSharp.PixelFormats;
 using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
+using VeldridGen.Interfaces;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Visual;
-using VeldridGen.Interfaces;
 
 namespace UAlbion.Core.Veldrid;
 
@@ -293,7 +293,7 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
             TextureUsage.Staging,
             TextureType.Texture2D);
 
-        using var staging = Device.ResourceFactory.CreateTexture(ref stagingDesc);
+        using var staging = Device.ResourceFactory.CreateTexture(in stagingDesc);
         using var cl = Device.ResourceFactory.CreateCommandList();
 
         cl.Name = "CL:ReadTexture2D";

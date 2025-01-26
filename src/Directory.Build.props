@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Project>
+  <Import
+	  Condition="Exists($([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../')))"
+	  Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
   <PropertyGroup>
-    <BaseOutputPath>$(MSBuildThisFileDirectory)\..\build\$(MSBuildProjectName)\bin</BaseOutputPath>
-    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)\..\build\$(MSBuildProjectName)\obj</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)..\build\$(MSBuildProjectName)\bin</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)..\build\$(MSBuildProjectName)\obj</BaseIntermediateOutputPath>
   </PropertyGroup>
 </Project>

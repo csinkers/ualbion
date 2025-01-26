@@ -1,5 +1,6 @@
-﻿using UAlbion.Api.Eventing;
+﻿using System.Text;
+using UAlbion.Api.Eventing;
 
 namespace UAlbion.Game.Events;
 
-public record TextEntryCharEvent(char Character) : EventRecord;
+public record TextEntryCharEvent(Rune Character) : EventRecord;

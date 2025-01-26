@@ -19,9 +19,9 @@
     <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
-      <TrimmerRootAssembly Include="UAlbion.Api" />
-      <TrimmerRootAssembly Include="UAlbion.Core" />
-      <TrimmerRootAssembly Include="UAlbion.Game" />
+    <TrimmerRootAssembly Include="UAlbion.Api" />
+    <TrimmerRootAssembly Include="UAlbion.Core" />
+    <TrimmerRootAssembly Include="UAlbion.Game" />
   </ItemGroup>
 
   <ItemGroup>

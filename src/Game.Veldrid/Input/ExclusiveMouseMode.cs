@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
+using Veldrid.Sdl2;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Formats.Config;
 using UAlbion.Game.Events;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Input;
 

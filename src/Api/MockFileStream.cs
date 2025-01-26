@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace UAlbion.TestCommon;
+namespace UAlbion.Api;
 
 public class MockFileStream : Stream
 {
@@ -17,7 +17,7 @@ public class MockFileStream : Stream
 
     public override int Read(byte[] buffer, int offset, int count)
     {
-        if (_stream.Position != _offset) _stream.Position = _offset; 
+        if (_stream.Position != _offset) _stream.Position = _offset;
         var result = _stream.Read(buffer, offset, count);
         _offset = _stream.Position;
         return result;

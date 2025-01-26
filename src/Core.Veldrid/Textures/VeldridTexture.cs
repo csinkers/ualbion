@@ -45,7 +45,7 @@ public static class VeldridTexture
 
         for (int layer = 0; layer < texture.ArrayLayers; layer++)
         {
-            var mapped = gd.Map(staging, MapMode.Write, (uint)layer * mipLevels);
+            MappedResource mapped = gd.Map(staging, MapMode.Write, (uint)layer * mipLevels);
             try
             {
                 var span = new Span<T>(mapped.Data.ToPointer(), (int)mapped.SizeInBytes / sizeof(T));

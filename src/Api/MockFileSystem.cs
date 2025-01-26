@@ -6,9 +6,8 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using UAlbion.Api;
 
-namespace UAlbion.TestCommon;
+namespace UAlbion.Api;
 
 public class MockFileSystem : IFileSystem
 {
@@ -19,7 +18,7 @@ public class MockFileSystem : IFileSystem
     string _currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="maskingFunc">A function that takes a path, and returns true if
     /// the on-disk version should be used as a fallback for reading, and false if
@@ -42,19 +41,17 @@ public class MockFileSystem : IFileSystem
         }
     }
 
-    class DirNode : Dictionary<string, INode>, INode
+    sealed class DirNode(string path) : Dictionary<string, INode>, INode
     {
-        public DirNode(string path) => Path = path;
-        public string Path { get; }
-        public override string ToString() => Path;
+        public string Path => path;
+        public override string ToString() => path;
     }
 
-    class FileNode : INode
+    sealed class FileNode(string path) : INode
     {
-        public FileNode(string path) { Path = path; Stream = new MemoryStream(); }
-        public string Path { get; }
-        public MemoryStream Stream { get; }
-        public override string ToString() => $"{Path} ({Stream.Length} bytes)";
+        public string Path => path;
+        public MemoryStream Stream { get; } = new();
+        public override string ToString() => $"{path} ({Stream.Length} bytes)";
     }
 
     public IFileSystem Duplicate(string currentDirectory) => new MockFileSystemChild(this, currentDirectory);

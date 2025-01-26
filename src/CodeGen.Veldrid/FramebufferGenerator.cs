@@ -68,7 +68,7 @@ static class FramebufferGenerator
         }
 
         sb.AppendLine(@");
-            var framebuffer = device.ResourceFactory.CreateFramebuffer(ref description);
+            var framebuffer = device.ResourceFactory.CreateFramebuffer(in description);
             framebuffer.Name = Name;
             return framebuffer;
         }
@@ -147,7 +147,7 @@ public partial class SimpleFramebuffer
         Color.DeviceTexture.Name = Color.Name;
 
         var description = new FramebufferDescription(_depth, _color);
-        var framebuffer = device.ResourceFactory.CreateFramebuffer(ref description);
+        var framebuffer = device.ResourceFactory.CreateFramebuffer(in description);
         framebuffer.Name = Name;
         return framebuffer;
     }

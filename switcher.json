@@ -1,0 +1,14 @@
+{
+  "solution": "src/ualbion.sln",
+  "solutionFolder": null,
+  "mappings": {
+    "AdlMidi.NET": "../AdlMidi.NET/src/ADLMidi.NET.csproj",
+    "ImGuiColorTextEditNet": "../ImGuiColorTextEditNet/src/TextEdit/ImGuiColorTextEditNet.csproj",
+    "SerdesNet": "../SerdesNet/src/SerdesNet/SerdesNet.csproj",
+    "Sinkers.Veldrid": "../veldrid/src/Veldrid/Veldrid.csproj",
+    "Sinkers.Veldrid.SPIRV": "../veldrid-spirv/src/Veldrid.SPIRV/Veldrid.SPIRV.csproj",
+    "Sinkers.VeldridGen.Interfaces": "../VeldridGen/VeldridGen.Interfaces/VeldridGen.Interfaces.csproj",
+    "VeldridGen": "../VeldridGen/VeldridGen/VeldridGen.csproj"
+  },
+  "removeProjects": true
+}

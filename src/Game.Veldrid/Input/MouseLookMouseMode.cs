@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Veldrid;
+using Veldrid.Sdl2;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
@@ -117,9 +117,9 @@ public class MouseLookMouseMode : Component
             if (e.CheckMouse(MouseButton.Left, true))
                 Distribute(_uiLeftClickEvent, _hits, x => x.Target as IComponent);
 
-            if ((int)e.WheelDelta != 0)
+            if ((int)e.WheelDelta.Y != 0)
             {
-                _uiScrollEvent.Delta = (int)e.WheelDelta;
+                _uiScrollEvent.Delta = (int)e.WheelDelta.Y;
                 Distribute(_uiScrollEvent, _hits, x => x.Target as IComponent);
             }
         }

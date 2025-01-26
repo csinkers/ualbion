@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Numerics;
+using Veldrid.Sdl2;
+using Veldrid.StartupUtilities;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Settings;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
-using Veldrid;
-using Veldrid.Sdl2;
-using Veldrid.StartupUtilities;
 
 namespace UAlbion.Core.Veldrid;
 

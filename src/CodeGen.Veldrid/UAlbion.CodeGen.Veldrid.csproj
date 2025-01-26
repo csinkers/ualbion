@@ -1,46 +1,35 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>13</LangVersion>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <IsRoslynComponent/>
+    <IsRoslynComponent />
     <AnalysisMode>Recommended</AnalysisMode>
     <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <_SkipUpgradeNetAnalyzersNuGetWarning>true</_SkipUpgradeNetAnalyzersNuGetWarning>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="VeldridGen" Version="0.1.12" GeneratePathProperty="true" PrivateAssets="all"/>
   </ItemGroup>
-
-  <ItemGroup Condition="!Exists('..\..\deps\VeldridGen\')">
-    <PackageReference Include="VeldridGen" Version="0.1.11" GeneratePathProperty="true" PrivateAssets="all"/>
-  </ItemGroup>
-
-  <ItemGroup Condition="Exists('..\..\deps\VeldridGen\')">
-    <ProjectReference Include="..\..\deps\VeldridGen\VeldridGen\VeldridGen.csproj" PrivateAssets="all"/>
-  </ItemGroup>
-
   <ItemGroup>
-    <None Remove="bin\Debug\netstandard2.0\$(AssemblyName).dll"/>
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+    <None Remove="bin\Debug\netstandard2.0\$(AssemblyName).dll" />
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
-
   <PropertyGroup>
     <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
   </PropertyGroup>
-
   <Target Name="GetDependencyTargetPaths">
-    <ItemGroup Condition="!Exists('..\..\deps\VeldridGen\')">
-      <TargetPathWithTargetPlatformMoniker Include="$(PKGVeldridGen)\lib\netstandard2.0\VeldridGen.dll" IncludeRuntimeDependency="false"/>
+    <ItemGroup Condition="'$(PKGVeldridGen)' != ''">
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGVeldridGen)\lib\netstandard2.0\VeldridGen.dll" IncludeRuntimeDependency="false" />
     </ItemGroup>
-    <ItemGroup Condition="Exists('..\..\deps\VeldridGen\')">
-      <TargetPathWithTargetPlatformMoniker Include="..\..\deps\VeldridGen\VeldridGen\bin\Debug\netstandard2.0\VeldridGen.dll" IncludeRuntimeDependency="false"/>
+    <ItemGroup Condition="'$(PKGVeldridGen)' == ''">
+      <TargetPathWithTargetPlatformMoniker Include="..\..\..\VeldridGen\VeldridGen\bin\Debug\netstandard2.0\VeldridGen.dll" IncludeRuntimeDependency="false" />
     </ItemGroup>
   </Target>
 </Project>

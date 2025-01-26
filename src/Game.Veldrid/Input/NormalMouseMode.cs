@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
+using Veldrid.Sdl2;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Game.Events;
-using Veldrid;
 
 namespace UAlbion.Game.Veldrid.Input;
 
@@ -41,9 +41,9 @@ public class NormalMouseMode : Component
             if (e.CheckMouse(MouseButton.Left, true))
                 Distribute(_leftClickEvent, _hits, x => x.Target as IComponent);
 
-            if ((int)e.WheelDelta != 0)
+            if ((int)e.WheelDelta.Y != 0)
             {
-                _scrollEvent.Delta = (int)e.WheelDelta;
+                _scrollEvent.Delta = (int)e.WheelDelta.Y;
                 Distribute(_scrollEvent, _hits, x => x.Target as IComponent);
             }
         }

@@ -35,7 +35,7 @@ public class MeshLoader : IAssetLoader<Mesh>
         if (obj.MeshGroups.Length > 1)
             throw new NotSupportedException("Meshes with multiple mesh groups are not currently supported");
 
-        var mesh = obj.GetFirstMesh();
+        var mesh = obj.GetMesh16(obj.MeshGroups[0]);
 
         var materialPath = Path.Combine(context.Filename, obj.MaterialLibName);
         if (!context.Disk.FileExists(materialPath))

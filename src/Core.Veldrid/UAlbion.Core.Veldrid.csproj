@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net9.0</TargetFramework>
@@ -33,7 +33,7 @@
     <PackageReference Include="ImGui.NET" Version="1.90.5.1" />
     <PackageReference Include="OpenAL-Soft" Version="1.16.0" />
     <PackageReference Include="OpenRA-OpenAL-CS" Version="1.0.22" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.5" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
   </ItemGroup>
 
   <ItemGroup>

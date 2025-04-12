@@ -18,7 +18,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="AdlMidi.NET" Version="1.0.19" />
+    <PackageReference Include="AdlMidi.NET" Version="1.0.20" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\UAlbion.Core.csproj" />

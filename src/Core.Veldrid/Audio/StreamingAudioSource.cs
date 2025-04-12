@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using OpenAL;
+using Silk.NET.OpenAL;
 
 namespace UAlbion.Core.Veldrid.Audio;
 
@@ -16,7 +16,7 @@ public class StreamingAudioSource : AudioSource
     readonly AudioBufferInt16Stereo[] _buffers;
     bool _playing;
 
-    public StreamingAudioSource(IAudioGenerator generator)
+    public StreamingAudioSource(AL al, IAudioGenerator generator) : base(al)
     {
         _generator = generator ?? throw new ArgumentNullException(nameof(generator));
         _buffers = new AudioBufferInt16Stereo[BufferCount];
@@ -25,11 +25,11 @@ public class StreamingAudioSource : AudioSource
         for (int i = 0; i < _buffers.Length; i++)
         {
             _generator.FillBuffer(buffer);
-            _buffers[i] = new AudioBufferInt16Stereo(buffer, SamplingRate);
+            _buffers[i] = new AudioBufferInt16Stereo(AL, buffer, SamplingRate);
         }
 
-        AL10.alSourceQueueBuffers(Source, BufferCount, _buffers.Select(x => x.Buffer).ToArray());
-        Check();
+        AL.SourceQueueBuffers(Source, _buffers.Select(x => x.Buffer).ToArray());
+        AL.Check();
     }
 
     public override void Play() { _playing = true; base.Play(); }
@@ -46,25 +46,28 @@ public class StreamingAudioSource : AudioSource
 
         while (BuffersProcessed > BufferCount / 2)
         {
-            AL10.alSourceUnqueueBuffers(Source, 1, _tempBufferIds);
+            AL.SourceUnqueueBuffers(Source, _tempBufferIds);
 
             _generator.FillBuffer(_tempBuffer);
             _buffers.First(x => x.Buffer == _tempBufferIds[0]).Update(_tempBuffer);
 
-            AL10.alSourceQueueBuffers(Source, 1, _tempBufferIds);
+            AL.SourceQueueBuffers(Source, _tempBufferIds);
         }
     }
 
     protected override void Dispose(bool disposing)
     {
         Stop();
+
         if (disposing)
         {
             uint[] buffers = new uint[BuffersQueued];
-            AL10.alSourceUnqueueBuffers(Source, buffers.Length, buffers);
+            AL.SourceUnqueueBuffers(Source, buffers);
+
             foreach (var buffer in _buffers)
                 buffer.Dispose();
         }
+
         base.Dispose(disposing);
     }
 }

@@ -1,31 +1,31 @@
 ﻿using System;
-using OpenAL;
+using Silk.NET.OpenAL;
 
 namespace UAlbion.Core.Veldrid.Audio;
 
 public class AudioBufferUInt8 : AudioBuffer
 {
-    public AudioBufferUInt8(ReadOnlySpan<byte> samples, int samplingRate) : base(samplingRate)
+    public AudioBufferUInt8(AL al, ReadOnlySpan<byte> samples, int samplingRate) : base(al, samplingRate)
     {
-        if (samples == null) throw new ArgumentNullException(nameof(samples));
         unsafe
         {
             fixed (byte* samplePtr = &samples[0])
-                AL10.alBufferData(Buffer, AL10.AL_FORMAT_MONO8, (IntPtr) samplePtr, samples.Length, SamplingRate);
+                AL.BufferData(Buffer, BufferFormat.Mono8, samplePtr, samples.Length, SamplingRate);
         }
 
-        Check();
+        AL.Check();
+        LastUpdatedDateTime = DateTime.Now;
+        LastSize = samples.Length;
     }
 
     public void Update(ReadOnlySpan<byte> samples)
     {
-        if (samples == null) throw new ArgumentNullException(nameof(samples));
         unsafe
         {
             fixed (byte* samplePtr = &samples[0])
-                AL10.alBufferData(Buffer, AL10.AL_FORMAT_MONO8, (IntPtr)samplePtr, samples.Length, SamplingRate);
+                AL.BufferData(Buffer, BufferFormat.Mono8, samplePtr, samples.Length, SamplingRate);
         }
-        Check();
+        AL.Check();
         LastUpdatedDateTime = DateTime.Now;
         LastSize = samples.Length;
     }

@@ -1,9 +1,9 @@
 ﻿using System;
-using OpenAL;
+using Silk.NET.OpenAL;
 
 namespace UAlbion.Core.Veldrid.Audio;
 
-public abstract class AudioBuffer : AudioObject, IDisposable
+public abstract class AudioBuffer : IDisposable
 {
     public int SamplingRate { get; }
     public DateTime LastUpdatedDateTime { get; protected set; }
@@ -12,12 +12,14 @@ public abstract class AudioBuffer : AudioObject, IDisposable
 
     internal readonly uint Buffer;
     bool _disposed;
+    protected AL AL { get; private set; }
 
-    protected AudioBuffer(int samplingRate)
+    protected AudioBuffer(AL al, int samplingRate)
     {
+        AL = al;
         SamplingRate = samplingRate;
-        AL10.alGenBuffers(1, out Buffer);
-        Check();
+        Buffer = AL.GenBuffer();
+        AL.Check();
         LastUpdatedDateTime = DateTime.Now;
     }
 
@@ -34,8 +36,8 @@ public abstract class AudioBuffer : AudioObject, IDisposable
         if (_disposed)
             return;
 
-        AL10.alDeleteBuffers(1, [Buffer]);
-        Check();
+        AL.DeleteBuffer(Buffer);
+        AL.Check();
         _disposed = true;
     }
 }

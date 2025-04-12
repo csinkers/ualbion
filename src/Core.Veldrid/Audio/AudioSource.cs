@@ -1,52 +1,53 @@
 ﻿using System;
 using System.Numerics;
-using OpenAL;
+using Silk.NET.OpenAL;
 
 // "Stop" is a keyword in Visual Basic, but VB compatibility is not a concern.
 #pragma warning disable CA1716 // Identifiers should not match keywords
 namespace UAlbion.Core.Veldrid.Audio;
 
-public abstract class AudioSource : AudioObject, IDisposable
+public abstract class AudioSource : IDisposable
 {
+    protected AL AL { get; private set; }
     protected uint Source { get; }
     bool _disposed;
 
-    protected AudioSource()
+    protected AudioSource(AL al)
     {
-        AL10.alGenSources(1, out var source);
-        Source = source;
-        Check();
+        AL = al;
+        Source = AL.GenSource();
+        AL.Check();
     }
 
-    public virtual void Play() { AL10.alSourcePlay(Source); Check(); }
-    public virtual void Pause() { AL10.alSourcePause(Source); Check(); }
-    public virtual void Stop() { AL10.alSourceStop(Source); Check(); }
+    public virtual void Play() { AL.SourcePlay(Source); AL.Check(); }
+    public virtual void Pause() { AL.SourcePause(Source); AL.Check(); }
+    public virtual void Stop() { AL.SourceStop(Source); AL.Check(); }
     // public void Rewind() {}
 
-    public bool Looping { get => GetInt(AL10.AL_LOOPING) != AL10.AL_FALSE; set => SetInt(AL10.AL_LOOPING, value ? AL10.AL_TRUE : AL10.AL_FALSE); } 
-    public Vector3 Position { get => GetVector(AL10.AL_POSITION); set => SetVector(AL10.AL_POSITION, value); } 
-    public float Volume { get => GetFloat(AL10.AL_GAIN); set => SetFloat(AL10.AL_GAIN, value); } 
-    public float Pitch { get => GetFloat(AL10.AL_PITCH); set => SetFloat(AL10.AL_PITCH, value); } 
-    public float MaxDistance { get => GetFloat(AL10.AL_MAX_DISTANCE); set => SetFloat(AL10.AL_MAX_DISTANCE, value); } 
-    public float RolloffFactor { get => GetFloat(AL10.AL_ROLLOFF_FACTOR); set => SetFloat(AL10.AL_ROLLOFF_FACTOR, value); } 
-    public float ReferenceDistance { get => GetFloat(AL10.AL_REFERENCE_DISTANCE); set => SetFloat(AL10.AL_REFERENCE_DISTANCE, value); } 
-    public float MinGain { get => GetFloat(AL10.AL_MIN_GAIN); set => SetFloat(AL10.AL_MIN_GAIN, value); } 
-    public float MaxGain { get => GetFloat(AL10.AL_MAX_GAIN); set => SetFloat(AL10.AL_MAX_GAIN, value); } 
-    public float ConeOuterGain { get => GetFloat(AL10.AL_CONE_OUTER_GAIN); set => SetFloat(AL10.AL_CONE_OUTER_GAIN, value); } 
-    public float ConeInnerAngle { get => GetFloat(AL10.AL_CONE_INNER_ANGLE); set => SetFloat(AL10.AL_CONE_INNER_ANGLE, value); } 
-    public float ConeOuterAngle { get => GetFloat(AL10.AL_CONE_OUTER_ANGLE); set => SetFloat(AL10.AL_CONE_OUTER_ANGLE, value); } 
-    public Vector3 Direction { get => GetVector(AL10.AL_DIRECTION); set => SetVector(AL10.AL_DIRECTION, value); }
-    public bool SourceRelative { get => GetInt(AL10.AL_SOURCE_RELATIVE) != AL10.AL_FALSE; set => SetInt(AL10.AL_SOURCE_RELATIVE, value ? AL10.AL_TRUE : AL10.AL_FALSE); }
-    public SourceState State { get => (SourceState) GetInt(AL10.AL_SOURCE_STATE); set => SetInt(AL10.AL_SOURCE_STATE, (int) value); }
-    public int BuffersQueued => GetInt(AL10.AL_BUFFERS_QUEUED);
-    public int BuffersProcessed => GetInt(AL10.AL_BUFFERS_PROCESSED);
-    // public float OffsetSeconds => GetFloat(AL11.AL_SEC_OFFSET);
-    // public int OffsetSamples => GetFloat(AL11.AL_SAMPLE_OFFSET);
+    public bool Looping { get => GetBool(SourceBoolean.Looping); set => SetBool(SourceBoolean.Looping, value); }
+    public Vector3 Position { get => GetVector(SourceVector3.Position); set => SetVector(SourceVector3.Position, value); }
+    public float Volume { get => GetFloat(SourceFloat.Gain); set => SetFloat(SourceFloat.Gain, value); }
+    public float Pitch { get => GetFloat(SourceFloat.Pitch); set => SetFloat(SourceFloat.Pitch, value); }
+    public float MaxDistance { get => GetFloat(SourceFloat.MaxDistance); set => SetFloat(SourceFloat.MaxDistance, value); }
+    public float RolloffFactor { get => GetFloat(SourceFloat.RolloffFactor); set => SetFloat(SourceFloat.RolloffFactor, value); }
+    public float ReferenceDistance { get => GetFloat(SourceFloat.ReferenceDistance); set => SetFloat(SourceFloat.ReferenceDistance, value); }
+    public float MinGain { get => GetFloat(SourceFloat.MinGain); set => SetFloat(SourceFloat.MinGain, value); }
+    public float MaxGain { get => GetFloat(SourceFloat.MaxGain); set => SetFloat(SourceFloat.MaxGain, value); }
+    public float ConeOuterGain { get => GetFloat(SourceFloat.ConeOuterGain); set => SetFloat(SourceFloat.ConeOuterGain, value); }
+    public float ConeInnerAngle { get => GetFloat(SourceFloat.ConeInnerAngle); set => SetFloat(SourceFloat.ConeInnerAngle, value); }
+    public float ConeOuterAngle { get => GetFloat(SourceFloat.ConeOuterAngle); set => SetFloat(SourceFloat.ConeOuterAngle, value); }
+    public Vector3 Direction { get => GetVector(SourceVector3.Direction); set => SetVector(SourceVector3.Direction, value); }
+    public bool SourceRelative { get => GetBool(SourceBoolean.SourceRelative); set => SetBool(SourceBoolean.SourceRelative, value); }
+    public SourceState State => (SourceState)GetInt(GetSourceInteger.SourceState);
+    public int BuffersQueued => GetInt(GetSourceInteger.BuffersQueued);
+    public int BuffersProcessed => GetInt(GetSourceInteger.BuffersProcessed);
+    public float OffsetSeconds => GetFloat(SourceFloat.SecOffset);
+    public int OffsetSamples => GetInt(GetSourceInteger.SampleOffset);
 
     public SourceType SourceType
     {
-        get => (SourceType)GetInt(AL10.AL_SOURCE_TYPE);
-        set => SetInt(AL10.AL_SOURCE_TYPE, (int)value);
+        get => (SourceType)GetInt(GetSourceInteger.SourceType);
+        set => SetInt(SourceInteger.SourceType, (int)value);
     }
 
     public void Dispose()
@@ -59,28 +60,31 @@ public abstract class AudioSource : AudioObject, IDisposable
     {
         if (_disposed)
             throw new InvalidOperationException("AudioSource already disposed");
-        AL10.alDeleteSources(1, [Source]);
-        Check();
+        AL.DeleteSource(Source);
+        AL.Check();
         _disposed = true;
     }
 
     #region Get / set helpers
 
-    float GetFloat(int param) { AL10.alGetSourcef(Source, param, out var value); Check(); return value; }
-    void SetFloat(int param, float value) { AL10.alSourcef(Source, param, value); Check(); }
-    int GetInt(int param) { AL10.alGetSourcei(Source, param, out var value); Check(); return value; }
-    void SetInt(int param, int value) { AL10.alSourcei(Source, param, value); Check(); }
-    Vector3 GetVector(int param)
+    float GetFloat(SourceFloat param) { AL.GetSourceProperty(Source, param, out var value); AL.Check(); return value; }
+    void SetFloat(SourceFloat param, float value) { AL.SetSourceProperty(Source, param, value); AL.Check(); }
+    int GetInt(GetSourceInteger param) { AL.GetSourceProperty(Source, param, out int value); AL.Check(); return value; }
+    void SetInt(SourceInteger param, int value) { AL.SetSourceProperty(Source, param, value); AL.Check(); }
+    bool GetBool(SourceBoolean param) { AL.GetSourceProperty(Source, param, out bool value); AL.Check(); return value; }
+    void SetBool(SourceBoolean param, bool value) { AL.SetSourceProperty(Source, param, value); AL.Check(); }
+
+    Vector3 GetVector(SourceVector3 param)
     {
-        AL10.alGetSource3f(Source, param, out var x, out var y, out var z);
-        Check();
+        AL.GetSourceProperty(Source, param, out var x, out var y, out var z);
+        AL.Check();
         return new Vector3(x, y, z);
     }
 
-    void SetVector(int param, Vector3 value)
+    void SetVector(SourceVector3 param, Vector3 value)
     {
-        AL10.alSource3f(Source, param, value.X, value.Y, value.Z);
-        Check();
+        AL.SetSourceProperty(Source, param, value.X, value.Y, value.Z);
+        AL.Check();
     }
 
     #endregion

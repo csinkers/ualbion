@@ -4,12 +4,14 @@ using System.Linq;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+using Silk.NET.OpenAL;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
 using UAlbion.Config.Properties;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Audio;
 using UAlbion.Core.Visual;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
@@ -29,6 +31,7 @@ public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioMa
     readonly Dictionary<(SongId, int), AudioBuffer> _waveLibCache = [];
     readonly List<ActiveSound> _activeSounds = [];
     readonly ManualResetEvent _doneEvent = new(false);
+    readonly AudioDevice _device;
     readonly Lock _syncRoot = new();
 
     StreamingAudioSource _music;
@@ -46,6 +49,8 @@ public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioMa
         On<QuitEvent>(_ => _doneEvent.Set());
 
         _standalone = standalone;
+        _device = new AudioDevice();
+        _device.DistanceModel = DistanceModel.InverseDistance;
     }
 
     protected override void Subscribed()
@@ -68,7 +73,7 @@ public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioMa
             if (_sampleCache.TryGetValue(id, out var buffer))
                 return buffer;
 
-            var sample = Assets.LoadSample(id);
+            ISample sample = Assets.LoadSample(id);
             if (sample == null)
             {
                 Error($"Could not load audio sample {id.Id}: {id}");
@@ -77,7 +82,7 @@ public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioMa
             }
 
             var sampleRate = sample.SampleRate == -1 ? DefaultSampleRate : sample.SampleRate;
-            buffer = new AudioBufferUInt8(sample.Samples, sampleRate);
+            buffer = _device.CreateBuffer(sample.Samples, sampleRate);
             _sampleCache[id] = buffer;
             return buffer;
         }
@@ -88,7 +93,7 @@ public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioMa
         var key = (songId, instrument);
         lock (_syncRoot)
         {
-            if (_waveLibCache.TryGetValue(key, out var buffer))
+            if (_waveLibCache.TryGetValue(key, out AudioBuffer buffer))
                 return buffer;
             var songInfo = Assets.GetAssetInfo(songId);
             var waveLibId = songInfo.GetProperty(WaveLibProperty);
@@ -107,7 +112,7 @@ public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioMa
             }
 
             var sampleRate = waveLibrary.SampleRate == -1 ? DefaultSampleRate : waveLibrary.SampleRate;
-            buffer = new AudioBufferUInt8(waveLibrary.Samples, sampleRate);
+            buffer = _device.CreateBuffer(waveLibrary.Samples, sampleRate);
             _waveLibCache[key] = buffer;
             return buffer;
         }
@@ -119,11 +124,9 @@ public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioMa
         if (buffer == null)
             return;
 
-        var source = new SimpleAudioSource(buffer)
-        {
-            Volume = e.Velocity == 0 ? 0.4f : 0.4f * (e.Velocity / 255.0f),
-            SourceRelative = true
-        };
+        var source = _device.CreateSource(buffer);
+        source.Volume = e.Velocity == 0 ? 0.4f : 0.4f * (e.Velocity / 255.0f);
+        source.SourceRelative = true;
 
         var active = new ActiveSound(source, (e.SongId, e.Instrument), 0);
         active.Source.Play();
@@ -143,15 +146,14 @@ public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioMa
         var context = (EventContext)Context;
         var map = Resolve<IMapManager>()?.Current;
         var tileSize = map?.TileSize ?? Vector3.One;
-        var source = new SimpleAudioSource(buffer)
-        {
-            Volume = e.Volume == 0 ? 1.0f : e.Volume / 255.0f,
-            Looping = e.Mode == SoundMode.LocalLoop,
-            Position = tileSize * new Vector3(context.Source.X, context.Source.Y, 0.0f),
-            SourceRelative = context.Source.AssetId.Type != AssetType.Map, // If we couldn't localise the sound then play it at (0,0) relative to the player.
-            ReferenceDistance = 1.0f * tileSize.X,
-            RolloffFactor = 4.0f
-        };
+
+        var source = _device.CreateSource(buffer);
+        source.Volume = e.Volume == 0 ? 1.0f : e.Volume / 255.0f;
+        source.Looping = e.Mode == SoundMode.LocalLoop;
+        source.Position = tileSize * new Vector3(context.Source.X, context.Source.Y, 0.0f);
+        source.SourceRelative = context.Source.AssetId.Type != AssetType.Map; // If we couldn't localise the sound then play it at (0,0) relative to the player.
+        source.ReferenceDistance = 1.0f * tileSize.X;
+        source.RolloffFactor = 4.0f;
 
         if (e.FrequencyOverride != 0)
             source.Pitch = (float)e.FrequencyOverride / buffer.SamplingRate;
@@ -177,13 +179,11 @@ public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioMa
 
             _musicGenerator = AttachChild(new AlbionMusicGenerator(songId));
 
-            _music = new StreamingAudioSource(_musicGenerator)
-            {
-                Volume = 1.0f,
-                Looping = false, // Looping is the responsibility of the generator
-                SourceRelative = true,
-                Position = Vector3.Zero
-            };
+            _music = _device.CreateStreamingSource(_musicGenerator);
+            _music.Volume = 1.0f;
+            _music.Looping = false; // Looping is the responsibility of the generator
+            _music.SourceRelative = true;
+            _music.Position = Vector3.Zero;
 
             _music.Play();
         }
@@ -238,9 +238,6 @@ public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioMa
 
     void AudioThread()
     {
-        using var device = new AudioDevice();
-        device.DistanceModel = DistanceModel.InverseDistance;
-
         while (!_doneEvent.WaitOne((int)(ReadVar(V.Game.Audio.PollIntervalSeconds) * 1000)))
         {
             if (_standalone)
@@ -270,7 +267,7 @@ public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioMa
 
             var camera = TryResolve<ICameraProvider>()?.Camera;
             if (camera != null)
-                device.Listener.Position = camera.Position;
+                _device.Listener.Position = camera.Position;
         }
 
         StopAll();
@@ -301,5 +298,6 @@ public sealed class AudioManager : GameServiceComponent<IAudioManager>, IAudioMa
     {
         _doneEvent?.Dispose();
         _music?.Dispose();
+        _device.Dispose();
     }
 }

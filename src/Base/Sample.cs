@@ -5,7 +5,7 @@ namespace UAlbion.Base;
 public enum Sample : ushort
 {
     CreakyWoodenDoor = 1,
-    SqueekyMetalDoor = 2,
+    SqueakyMetalDoor = 2,
     HiTechDoor = 3,
     HeavyWoodenDoor = 4,
     // Unknown5 = 5,

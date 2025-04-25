@@ -100,7 +100,7 @@ public class PlayerMovementTests
             TicksPerFrame = V.Game.PartyMovement.TicksPerFrame.DefaultValue,
         };
 
-        var m = new PlayerMovementState(moveSettings)
+        var m = new PlayerMovementState
         {
             X = (ushort)map.StartPos.X,
             Y = (ushort)map.StartPos.Y,
@@ -117,7 +117,7 @@ public class PlayerMovementTests
             var lastDir = m.FacingDirection;
             var lastPos = (m.X, m.Y);
             while (lastOrder == orderIndex) // Fire ticks until the next order is retrieved
-                Movement2D.Instance.Update(m, m.Settings, collManager, this, GetOrder, null);
+                Movement2D.Instance.Update(m, moveSettings, collManager, this, GetOrder, null);
 
             // State after handling the order should match
             var (type, param) = expectedResponses[resultIndex++];
@@ -200,7 +200,7 @@ public class PlayerMovementTests
             TicksPerFrame = V.Game.PartyMovement.TicksPerFrame.DefaultValue,
         };
 
-        var m = new PlayerMovementState(moveSettings)
+        var m = new PlayerMovementState
         {
             X = 2,
             Y = 3,
@@ -209,9 +209,9 @@ public class PlayerMovementTests
 
         void Move(int dx, int dy, Direction dir, float expectedX, float expectedY, SpriteAnimation anim, int frame)
         {
-            Movement2D.Instance.Update(m, m.Settings, collManager, dx, dy, null); // Turn east
-            float actualX = m.PixelX / m.Settings.TileWidth;
-            float actualY = m.PixelY / m.Settings.TileHeight;
+            Movement2D.Instance.Update(m, moveSettings, collManager, dx, dy, null); // Turn east
+            float actualX = m.PixelX / moveSettings.TileWidth;
+            float actualY = m.PixelY / moveSettings.TileHeight;
             Assert.True(expectedX - actualX < 0.0001, $"{expectedX} != {actualX}");
             Assert.True(expectedY - actualY < 0.0001, $"{expectedY} != {actualY}");
             Assert.Equal(dir, m.FacingDirection);

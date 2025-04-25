@@ -21,6 +21,7 @@ public abstract class ResourceSetHolder : Component, IResourceSetHolder
 
     public ResourceSet ResourceSet => _resourceSet;
 
+    public override string ToString() => $"RS[{Name}]";
     public string Name
     {
         get => _name;

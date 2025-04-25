@@ -325,7 +325,7 @@ public enum DungeonObject : ushort
     Security = 319,
     Security2 = 320,
     Celt12 = 321,
-    MutedPuppyDog = 322,
+    MuntedPuppyDog = 322,
     IllTemperedMoleRat2 = 323,
     Raptor2 = 324,
     Spidermajigger2 = 325,

@@ -1,4 +1,5 @@
-﻿using UAlbion.Api;
+﻿#if DEBUG
+using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Veldrid;
@@ -44,3 +45,4 @@ public class G : Component
     public ConversationManager Convos => (ConversationManager)TryResolve<IConversationManager>();
     public Conversation Convo => Convos?.Conversation;
 }
+#endif

@@ -28,7 +28,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _logicalMap = logicalMap ?? throw new ArgumentNullException(nameof(logicalMap));
 
-        _state = new PlayerMovementState(settings)
+        _state = new PlayerMovementState
         {
             X = (ushort)initialPosition.X,
             Y = (ushort)initialPosition.Y,
@@ -64,12 +64,12 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
             if ((debugFlags & DebugFlags.FastMovement) != 0)
             {
                 _settings.TicksPerTile = (oldTicksPerTile + 3) / 4;
-                _settings.TicksPerTile = (oldTicksPerFrame + 3) / 4;
+                _settings.TicksPerFrame = (oldTicksPerFrame + 3) / 4;
             }
             else
             {
                 _settings.TicksPerTile = oldTicksPerTile;
-                _settings.TicksPerTile = oldTicksPerFrame;
+                _settings.TicksPerFrame = oldTicksPerFrame;
             }
 
         });
@@ -114,8 +114,8 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
                 OnEnteredTile))
         {
             MoveLeader(new Vector2(
-                _state.PixelX / _state.Settings.TileWidth,
-                _state.PixelY / _state.Settings.TileHeight));
+                _state.PixelX / _settings.TileWidth,
+                _state.PixelY / _settings.TileHeight));
         }
 
         _direction = Vector2.Zero;

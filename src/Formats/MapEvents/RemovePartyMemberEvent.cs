@@ -33,7 +33,13 @@ public class RemovePartyMemberEvent : MapEvent
     }
 
     [EventPart("member_id")] public PartyMemberId PartyMemberId { get; private set; }
+
+    // 0 = offer equipment before leaving?
+    // 1 = simple depart
+    // 2 = leave forever?
     [EventPart("unk2", true, (byte)0)] public byte Unk2 { get; private set; }
+
+    // NPC active flag: map_num*num_npcs + offset
     [EventPart("unk6", true, (ushort)0)] public ushort Unk6 { get; private set; }
     public override MapEventType EventType => MapEventType.RemovePartyMember;
 }

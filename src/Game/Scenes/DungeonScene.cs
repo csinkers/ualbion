@@ -2,7 +2,6 @@ using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Config;
-using UAlbion.Game.Entities;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Scenes;
@@ -15,7 +14,6 @@ public class DungeonScene : Container, IDungeonScene
     public DungeonScene() : base(nameof(SceneId.World3D))
     {
         Camera = AttachChild(new PerspectiveCamera(true));
-        AttachChild(new CameraMotion3D(Camera));
     }
 
     protected override void Subscribed()

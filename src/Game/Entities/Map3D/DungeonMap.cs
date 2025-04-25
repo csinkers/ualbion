@@ -74,6 +74,9 @@ public class DungeonMap : GameComponent, IMap
             Pipeline = DungeonTilemapPipeline.Normal
         };
 
+        var initialPos = new Vector2(_logicalMap.Width / 2.0f, _logicalMap.Height / 2.0f);
+        AttachChild(new Movement3D(initialPos));
+
         // These belong to the scene so we don't render when in menus etc
         var renderable = new MapRenderable3D(_logicalMap, _labyrinthData, properties);
         var selection = new Selection3D();

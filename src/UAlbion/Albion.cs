@@ -212,6 +212,12 @@ static class Albion
     static void ConfigureMenus(EventExchange eventExchange)
     {
         var menus = eventExchange.Resolve<IImGuiMenuManager>();
+        object globals =
+#if DEBUG
+            G.Instance;
+#else
+            null;
+#endif
 
         // Note: ImGuiGameWindow and PositionsWindow are added in AlbionRenderSystem so they can have access to internal render system components.
         var items = new[]
@@ -228,7 +234,7 @@ static class Albion
             new ShowWindowMenuItem("Stats",          "Windows", name => new StatsWindow(name)),
             new ShowWindowMenuItem("Threads",        "Windows", name => new ThreadsWindow(name)),
             new ShowWindowMenuItem("UI Layout",      "Windows", name => new LayoutWindow(name)),
-            new ShowWindowMenuItem("Watch",          "Windows", name => new WatchWindow(name, G.Instance)),
+            new ShowWindowMenuItem("Watch",          "Windows", name => new WatchWindow(name, globals)),
             // new ShowWindowMenuItem("Profiler", "Windows", name => new ProfilerWindow(name)),
         };
 

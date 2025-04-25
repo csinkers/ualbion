@@ -17,7 +17,8 @@ public class WatchWindow(string name, object globals) : Component, IImGuiWindow
 
         var reflectorManager = Resolve<ReflectorManager>();
         reflectorManager.RenderOptions();
-        reflectorManager.RenderNode("Globals", globals);
+        if (globals != null)
+            reflectorManager.RenderNode("Globals", globals);
 
         var state = TryResolve<IGameState>();
         if (state != null)

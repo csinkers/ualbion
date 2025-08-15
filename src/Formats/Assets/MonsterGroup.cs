@@ -13,7 +13,7 @@ public class MonsterGroup
     [JsonInclude]
     public MonsterId[] Grid { get; private set; } = new MonsterId[SavedGame.CombatColumns * SavedGame.CombatRowsForMobs];
 
-    public static MonsterGroup Serdes(int _, MonsterGroup m, AssetMapping mapping, ISerdes s)
+    public static MonsterGroup Serdes(SerdesName _, MonsterGroup m, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         m ??= new MonsterGroup();

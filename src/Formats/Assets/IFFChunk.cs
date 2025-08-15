@@ -25,7 +25,7 @@ public class IffChunk
         s.Seek(offset);
     }
 
-    public static IffChunk Serdes(int _, IffChunk c, ISerdes s)
+    public static IffChunk Serdes(SerdesName _, IffChunk c, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         c ??= new IffChunk();

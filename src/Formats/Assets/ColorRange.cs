@@ -33,7 +33,7 @@ public class ColorRange
     /// <summary>
     /// Reads range from IFF stream.
     /// </summary>
-    public static ColorRange Serdes(int _, ColorRange c, ISerdes s)
+    public static ColorRange Serdes(SerdesName _, ColorRange c, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         c ??= new ColorRange();

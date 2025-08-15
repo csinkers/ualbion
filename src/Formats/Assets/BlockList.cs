@@ -8,12 +8,11 @@ namespace UAlbion.Formats.Assets;
 public class BlockList : List<Block>
 {
     public const int MaxCount = 4095;
-    public static BlockList Serdes(int blockNumber, BlockList blockList, ISerdes s)
+    public static BlockList Serdes(SerdesName name, BlockList blockList, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         blockList ??= [];
-        if (s.IsCommenting())
-            s.Begin(blockNumber.ToString());
+        s.Begin(name);
 
         if (s.IsReading())
         {
@@ -29,8 +28,7 @@ public class BlockList : List<Block>
             s.List(null, blockList, blockList.Count, Block.Serdes);
         }
 
-        if (s.IsCommenting())
-            s.End();
+        s.End();
         return blockList;
     }
 }

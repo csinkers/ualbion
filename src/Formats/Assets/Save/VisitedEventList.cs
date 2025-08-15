@@ -11,7 +11,7 @@ public class VisitedEventList
     public ushort NumChunks { get; set; }
     public VisitedEvent[] Contents { get; set; }
 
-    public static VisitedEventList Serdes(int _, VisitedEventList c, AssetMapping mapping, ISerdes s)
+    public static VisitedEventList Serdes(SerdesName _, VisitedEventList c, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         c ??= new VisitedEventList();

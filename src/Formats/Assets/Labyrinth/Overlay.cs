@@ -20,7 +20,7 @@ public class Overlay // 0xC bytes = 12
     public override string ToString() =>
         $"O.{SpriteId}:{AnimationFrames} ({XOffset}, {YOffset}) {Width}x{Height}";
 
-    public static Overlay Serdes(int _, Overlay o, AssetMapping mapping, ISerdes s)
+    public static Overlay Serdes(SerdesName _, Overlay o, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         o ??= new Overlay();

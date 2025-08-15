@@ -14,7 +14,7 @@ public class ObjectGroup
     public override string ToString() =>
         $"Obj: AG{AutoGraphicsId} [ {string.Join("; ", SubObjects.Select(x => x.ToString()))} ]";
 
-    public static ObjectGroup Serdes(int _, ObjectGroup og, ISerdes s) // total size 0x42 = 66
+    public static ObjectGroup Serdes(SerdesName _, ObjectGroup og, ISerdes s) // total size 0x42 = 66
     {
         ArgumentNullException.ThrowIfNull(s);
         og ??= new ObjectGroup();

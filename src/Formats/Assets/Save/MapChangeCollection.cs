@@ -10,7 +10,7 @@ namespace UAlbion.Formats.Assets.Save;
 
 public class MapChangeCollection : List<MapChange>
 {
-    public static MapChangeCollection Serdes(int _, MapChangeCollection c, AssetMapping mapping, ISerdes s)
+    public static MapChangeCollection Serdes(SerdesName _, MapChangeCollection c, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         c ??= [];

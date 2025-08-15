@@ -198,9 +198,9 @@ public class SavedGame
             nameof(ActiveMembers),
             save.ActiveMembers,
             MaxPartySize,
-            (i, _, s2) =>
+            (name, _, s2) =>
             {
-                var value = PartyMemberId.SerdesU8(null, save.ActiveMembers[i], mapping, s);
+                var value = PartyMemberId.SerdesU8(null, save.ActiveMembers[name.N], mapping, s);
                 s2.Pad(1);
                 return value;
             });

@@ -66,7 +66,7 @@ public class MapNpc // 0xA = 10 bytes
 
     public bool HasWaypoints(MapFlags mapFlags) => Movement is NpcMovement.Waypoints or NpcMovement.Waypoints2;
 
-    public static MapNpc Serdes(int _, MapNpc existing, MapType mapType, AssetMapping mapping, ISerdes s)
+    public static MapNpc Serdes(SerdesName _, MapNpc existing, MapType mapType, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         s.Begin("Npc");

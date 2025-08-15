@@ -10,7 +10,7 @@ public class XldDescriptor
     public XldCategory Category { get; set; }
     public ushort Number { get; set; }
 
-    public static XldDescriptor Serdes(string _, XldDescriptor d, ISerdes s)
+    public static XldDescriptor Serdes(SerdesName _, XldDescriptor d, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         d ??= new XldDescriptor();

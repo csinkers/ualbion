@@ -140,7 +140,7 @@ public class TileData // 8 bytes per tile
         $"U7:{Unk7} {(Bouncy ? "Bounce " : "")}{(UseUnderlayFlags ? "Fallback " : "")}{(DebugDot ? "Debug " : "")}" +
         $"{(NoDraw ? "NoDraw ":"")}{(Unk12 ? "Unk12 ":"")}{(Unk18 ? "Unk18 ":"")}";
 
-    public static TileData Serdes(int _, TileData t, ISerdes s)
+    public static TileData Serdes(SerdesName _, TileData t, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         t ??= new TileData();

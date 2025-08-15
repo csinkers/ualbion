@@ -57,16 +57,19 @@ public class Inventory : IInventory
     [JsonIgnore, DiagEdit(Style = DiagEditStyle.InvSlot)] public ItemSlot Feet        => TrySlot(ItemSlotId.Feet); 
     [JsonIgnore, DiagEdit(Style = DiagEditStyle.InvSlot)] public ItemSlot RightFinger => TrySlot(ItemSlotId.RightFinger);
 
-    public static Inventory SerdesChest(int n, Inventory inv, AssetMapping mapping, ISerdes s) => Serdes(n, inv, mapping, s, InventoryType.Chest);
-    public static Inventory SerdesMerchant(int n, Inventory inv, AssetMapping mapping, ISerdes s) => Serdes(n, inv, mapping, s, InventoryType.Merchant);
-    public static Inventory SerdesCharacter(int n, Inventory inv, AssetMapping mapping, ISerdes s) => Serdes(n, inv, mapping, s, InventoryType.Player);
-    public static Inventory SerdesMonster(int n, Inventory inv, AssetMapping mapping, ISerdes s) => Serdes(n, inv, mapping, s, InventoryType.Monster);
+    public static Inventory SerdesChest(SerdesName n, Inventory inv, AssetMapping mapping, ISerdes s) => Serdes(n, inv, mapping, s, InventoryType.Chest);
+    public static Inventory SerdesMerchant(SerdesName n, Inventory inv, AssetMapping mapping, ISerdes s) => Serdes(n, inv, mapping, s, InventoryType.Merchant);
+    public static Inventory SerdesCharacter(SerdesName n, Inventory inv, AssetMapping mapping, ISerdes s) => Serdes(n, inv, mapping, s, InventoryType.Player);
+    public static Inventory SerdesMonster(SerdesName n, Inventory inv, AssetMapping mapping, ISerdes s) => Serdes(n, inv, mapping, s, InventoryType.Monster);
     public IEnumerable<ItemSlot> EnumerateAll() => Slots.Where(x => x != null);
 
-    static Inventory Serdes(int n, Inventory inv, AssetMapping mapping, ISerdes s, InventoryType type)
+    static Inventory Serdes(SerdesName name, Inventory inv, AssetMapping mapping, ISerdes s, InventoryType type)
     {
         ArgumentNullException.ThrowIfNull(s);
-        var invId = new InventoryId(type, (ushort)n);
+        if (name.N == -1)
+            throw new ArgumentException("Unexpected SerdesName " + name + ", expected numeric name");
+
+        var invId = new InventoryId(type, (ushort)name.N);
         void S(string name, ItemSlot existing, ItemSlotId slotId)
             => s.Object(name, existing,
                 (_, x, s2) => ItemSlot.Serdes(new InventorySlotId(invId, slotId), x, mapping, s2));

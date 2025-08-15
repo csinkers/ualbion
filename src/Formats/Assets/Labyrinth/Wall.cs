@@ -37,7 +37,7 @@ public class Wall // Length = 0x12 + overlayCount * 0xC
     public override string ToString() =>
         $"Wall.{SpriteId}:{FrameCount} {Width}x{Height} ({Properties}) [ {string.Join(", ", Overlays.Select(x => x.ToString()))} ]";
 
-    public static Wall Serdes(int _, Wall w, AssetMapping mapping, ISerdes s)
+    public static Wall Serdes(SerdesName _, Wall w, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         w ??= new Wall();

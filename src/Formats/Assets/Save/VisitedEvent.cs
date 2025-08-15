@@ -26,7 +26,7 @@ public class VisitedEvent
         Argument = argument;
     }
 
-    public static VisitedEvent Serdes(int n, VisitedEvent u, AssetMapping mapping, ISerdes s)
+    public static VisitedEvent Serdes(SerdesName n, VisitedEvent u, AssetMapping mapping, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
 

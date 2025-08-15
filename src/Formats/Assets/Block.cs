@@ -35,7 +35,7 @@ public class Block
         set => _tiles = MapTile.FromPacked(value, Width, 0, 0);
     }
 
-    public static Block Serdes(int _, Block b, ISerdes s)
+    public static Block Serdes(SerdesName _, Block b, ISerdes s)
     {
         ArgumentNullException.ThrowIfNull(s);
         b ??= new Block();

@@ -174,9 +174,9 @@ public abstract class BaseMapData : IMapData, IJsonPostDeserialise
                 Events[i].Id = i;
 
         s.List(nameof(Events), Events, eventCount,
-            (i, x, serializer) =>
+            (n, x, serializer) =>
         {
-            var node = MapEvent.SerdesNode((ushort)i, x, serializer, mapping, mapType);
+            var node = MapEvent.SerdesNode((ushort)n.N, x, serializer, mapping, mapType);
             if (serializer.IsCommenting())
                 serializer.Comment(node.ToString());
             return node;

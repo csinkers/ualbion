@@ -50,7 +50,9 @@ public class GravityItemTransition : Component
 
     void Update(float deltaSeconds)
     {
-        if (_sprite.Position.Y > UiConstants.StatusBarExtents.Bottom)
+        var window = Resolve<IGameWindow>();
+        var uiPosition = window.NormToUi(new Vector2(_sprite.Position.X, _sprite.Position.Y));
+        if (uiPosition.Y > UiConstants.StatusBarExtents.Bottom)
         {
             Remove();
             _continuation?.Invoke();

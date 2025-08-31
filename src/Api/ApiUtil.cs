@@ -131,7 +131,7 @@ public static class ApiUtil
             Assert($"Assertion failed! {message}");
     }
 
-    public static bool IsFlagsEnum(Type type) => type is {IsEnum: true} && type.GetCustomAttribute(typeof(FlagsAttribute)) != null;
+    public static bool IsFlagsEnum(Type type) => type is {IsEnum: true} && type.GetCustomAttribute<FlagsAttribute>() != null;
 
     public static (byte r, byte g, byte b, byte a) UnpackColor(uint c)
     {

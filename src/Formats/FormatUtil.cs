@@ -48,7 +48,9 @@ public static class FormatUtil
 
     public static string BytesToHexString(ReadOnlySpan<byte> bytes)
     {
-        if (bytes == null) return "";
+        if (bytes.Length == 0)
+            return "";
+
         var result = new StringBuilder(bytes.Length * 2);
         foreach (var b in bytes)
         {

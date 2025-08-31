@@ -288,7 +288,7 @@ public static class TriggerZoneBuilder
         return polygons;
     }
 
-    static Geometry.Polygon BuildPolygon(IList<Edge> edges, IList<bool> visited, EdgeLookup adjacency, int initialEdge)
+    static Geometry.Polygon BuildPolygon(IList<Edge> edges, bool[] visited, EdgeLookup adjacency, int initialEdge)
     {
         int edgeIndex = initialEdge;
         var endpoint = (edges[initialEdge].X1, edges[initialEdge].Y1);

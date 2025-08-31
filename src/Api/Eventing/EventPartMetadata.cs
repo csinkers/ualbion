@@ -25,9 +25,10 @@ public class EventPartMetadata
         if (declaringType == null)
             throw new InvalidOperationException("Property must have a declaring type");
 
-        var attribute = (EventPartAttribute)property.GetCustomAttribute(typeof(EventPartAttribute), false);
+        var attribute = property.GetCustomAttribute<EventPartAttribute>(false);
         if (attribute == null)
             throw new InvalidOperationException("Property must have an event part attribute");
+
         Name = attribute.Name;
         HelpText = attribute.HelpText;
         IsOptional = attribute.IsOptional;

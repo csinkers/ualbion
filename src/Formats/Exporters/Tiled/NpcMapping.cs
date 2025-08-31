@@ -151,10 +151,10 @@ public static class NpcMapping
             Id = string.IsNullOrEmpty(id) ? AssetId.None : AssetId.Parse(id),
             Node = entryPoint == EventNode.UnusedEventId ? null : new DummyEventNode(entryPoint),
             Waypoints = waypoints,
-            Type = (NpcType)Enum.Parse(typeof(NpcType), obj.PropString(Prop.Type)),
-            Flags = (MapNpcFlags)Enum.Parse(typeof(MapNpcFlags), obj.PropString(Prop.Flags)),
-            Triggers = (TriggerTypes)Enum.Parse(typeof(TriggerTypes), obj.PropString(Prop.Triggers)),
-            Movement = (NpcMovement)Enum.Parse(typeof(NpcMovement), obj.PropString(Prop.Movement)),
+            Type = Enum.Parse<NpcType>(obj.PropString(Prop.Type)),
+            Flags = Enum.Parse<MapNpcFlags>(obj.PropString(Prop.Flags)),
+            Triggers = Enum.Parse<TriggerTypes>(obj.PropString(Prop.Triggers)),
+            Movement = Enum.Parse<NpcMovement>(obj.PropString(Prop.Movement)),
             Sound = (byte)(obj.PropInt(Prop.Sound) ?? 0),
             SpriteOrGroup = AssetId.Parse(visual) // TODO: Handle groups for 3D maps
         };

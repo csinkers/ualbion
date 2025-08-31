@@ -1,5 +1,6 @@
 ﻿using System;
 using ImGuiColorTextEditNet;
+using ImGuiColorTextEditNet.Syntax;
 
 namespace UAlbion.Game.Veldrid.Diag;
 

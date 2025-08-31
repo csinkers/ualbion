@@ -64,7 +64,6 @@ public sealed class TileLayerRenderable : Component, IRenderable, IDisposable
 
     public TileLayerRenderable(string name, byte width, ReadOnlySpan<uint> map, DrawLayer renderOrder, TilesetResourceHolder tileset)
     {
-        if (map == null) throw new ArgumentNullException(nameof(map));
         Name = name;
         RenderOrder = renderOrder;
         Tileset = tileset ?? throw new ArgumentNullException(nameof(tileset));

@@ -12,7 +12,7 @@ sealed class FrameStats
 {
     static void StatsForEnum<T>(IAssetManager assets, Dictionary<AssetId, int> dict) where T : unmanaged, Enum
     {
-        foreach (var enumValue in Enum.GetValues(typeof(T)).OfType<T>())
+        foreach (var enumValue in Enum.GetValues<T>())
         {
             var id = AssetId.From(enumValue);
             var info = assets.GetAssetInfo(id);

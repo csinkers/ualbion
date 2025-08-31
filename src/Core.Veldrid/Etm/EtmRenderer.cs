@@ -198,7 +198,7 @@ public partial struct DungeonTile : IVertexFormat, IEquatable<DungeonTile>
 
 #pragma warning restore CA1815 // Override equals and operator equals on value types
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
-sealed partial class EtmIntermediate : IVertexFormat
+partial struct EtmIntermediate : IVertexFormat
 {
 #pragma warning disable 649
     [Vertex("TexCoords")] public Vector2 TextureCordinates;

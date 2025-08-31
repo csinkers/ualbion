@@ -38,7 +38,7 @@ public class TextEvent : MapEvent // Relies on event chain context to resolve Te
         ArgumentNullException.ThrowIfNull(parts);
 
         var subId = ushort.Parse(parts[1]);
-        var location = parts.Length > 2 ? (TextLocation)Enum.Parse(typeof(TextLocation), parts[2]) : TextLocation.NoPortrait;
+        var location = parts.Length > 2 ? Enum.Parse<TextLocation>(parts[2]) : TextLocation.NoPortrait;
 
         if (parts.Length <= 3)
             return new TextEvent(subId, location, SheetId.None);

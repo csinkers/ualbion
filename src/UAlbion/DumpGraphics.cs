@@ -29,7 +29,7 @@ sealed class DumpGraphics : GameComponent, IAssetDumper
             if (!Directory.Exists(directory))
                 Directory.CreateDirectory(directory);
 
-            var ids = Enum.GetValues(typeof(TEnum)).OfType<TEnum>().ToArray();
+            var ids = Enum.GetValues<TEnum>();
             Console.WriteLine($"Dumping {ids.Length} assets to {directory}...");
             foreach (var id in ids)
             {

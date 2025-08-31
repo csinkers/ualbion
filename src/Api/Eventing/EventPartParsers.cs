@@ -87,7 +87,7 @@ public class EventPartParsers
         return (T)result;
     }
 
-    static T? ParseNullableEnum<T>(string s) where T : struct, Enum => string.IsNullOrEmpty(s) ? null : (T?)Enum.Parse(typeof(T), s, true);
+    static T? ParseNullableEnum<T>(string s) where T : struct, Enum => string.IsNullOrEmpty(s) ? null : Enum.Parse<T>(s, true);
     static T ParseFlags<T>(string s) where T : unmanaged, Enum
     {
         if (string.IsNullOrEmpty(s))

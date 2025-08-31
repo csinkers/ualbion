@@ -176,14 +176,12 @@ Valid Types: {string.Join(" ", Enum.GetNames<AssetType>().OrderBy(x => x))}";
     static void DisplayUsage()
     {
         var formats = string.Join(" ", 
-            Enum.GetValues(typeof(DumpFormats))
-                .Cast<DumpFormats>()
+            Enum.GetValues<DumpFormats>()
                 .Select(x => x.ToString())
                 .OrderBy(x => x));
 
         var dumpTypes = string.Join(" ",
-            Enum.GetValues(typeof(AssetType))
-                .Cast<AssetType>()
+            Enum.GetValues<AssetType>()
                 .Select(x => x.ToString())
                 .OrderBy(x => x));
 

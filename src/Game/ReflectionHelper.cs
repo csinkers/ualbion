@@ -48,14 +48,14 @@ public static class ReflectionHelper
             if (!typeof(T).IsAssignableFrom(type))
                 continue;
 
-            var attribute = (TAttribute)type.GetCustomAttribute(typeof(TAttribute), false);
-            if (attribute != null)
-            {
-                var constructor = type.GetConstructors().Single();
-                var lambda = (Func<object>)Expression.Lambda(Expression.New(constructor)).Compile();
-                var loader = (T)lambda();
-                yield return (loader, attribute);
-            }
+            var attribute = type.GetCustomAttribute<TAttribute>(false);
+            if (attribute == null)
+                continue;
+
+            var constructor = type.GetConstructors().Single();
+            var lambda = (Func<object>)Expression.Lambda(Expression.New(constructor)).Compile();
+            var loader = (T)lambda();
+            yield return (loader, attribute);
         }
     }
 }

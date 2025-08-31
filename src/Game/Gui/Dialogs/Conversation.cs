@@ -293,7 +293,7 @@ public class Conversation : GameComponent
         return result;
     }
 
-    static ushort? FindActionChain(IEventSet set, ActionType type, byte block, AssetId argument)
+    static ushort? FindActionChain(EventSet set, ActionType type, byte block, AssetId argument)
     {
         foreach (var x in set.Chains)
         {

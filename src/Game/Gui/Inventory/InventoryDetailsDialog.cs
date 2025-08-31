@@ -58,8 +58,7 @@ public class InventoryDetailsDialog : ModalDialog
         );
 
         var classElements =
-            Enum.GetValues(typeof(PlayerClass))
-                .Cast<PlayerClass>()
+            Enum.GetValues<PlayerClass>()
                 .Where(x => item.Class.IsAllowed(x))
                 .Select(x => (IUiElement)new UiTextBuilder(Describe.DescribePlayerClass(x)).NoWrap())
                 .ToArray();

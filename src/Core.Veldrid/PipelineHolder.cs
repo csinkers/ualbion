@@ -45,14 +45,14 @@ public class PipelineHolder : Component, IPipelineHolder
     }
 
     public Pipeline Pipeline => _pipeline;
-    public bool UseDepthTest { get => _useDepthTest; set { _useDepthTest = value; Dirty(); } } 
-    public bool UseScissorTest { get => _useScissorTest; set { _useScissorTest = value; Dirty(); } } 
-    public DepthStencilStateDescription DepthStencilMode { get => _depthStencilMode; set { _depthStencilMode = value; Dirty(); } } 
-    public FaceCullMode CullMode { get => _cullMode; set { _cullMode = value; Dirty(); } } 
-    public PrimitiveTopology Topology { get => _topology; set { _topology = value; Dirty(); } } 
-    public PolygonFillMode FillMode { get => _fillMode; set { _fillMode = value; Dirty(); } } 
-    public FrontFace Winding { get => _winding; set { _winding = value; Dirty(); } } 
-    public BlendStateDescription AlphaBlend { get => _alphaBlend; set { _alphaBlend = value; Dirty(); } } 
+    public bool UseDepthTest { get => _useDepthTest; set { _useDepthTest = value; Dirty(); } }
+    public bool UseScissorTest { get => _useScissorTest; set { _useScissorTest = value; Dirty(); } }
+    public DepthStencilStateDescription DepthStencilMode { get => _depthStencilMode; set { _depthStencilMode = value; Dirty(); } }
+    public FaceCullMode CullMode { get => _cullMode; set { _cullMode = value; Dirty(); } }
+    public PrimitiveTopology Topology { get => _topology; set { _topology = value; Dirty(); } }
+    public PolygonFillMode FillMode { get => _fillMode; set { _fillMode = value; Dirty(); } }
+    public FrontFace Winding { get => _winding; set { _winding = value; Dirty(); } }
+    public BlendStateDescription AlphaBlend { get => _alphaBlend; set { _alphaBlend = value; Dirty(); } }
     public OutputDescription? OutputDescription { get => _outputDescription; set { _outputDescription = value; Dirty(); } }
     public IFramebufferHolder Framebuffer { get => _framebuffer; set { _framebuffer = value; Dirty(); } }
 
@@ -97,6 +97,13 @@ public class PipelineHolder : Component, IPipelineHolder
                 _shaders,
                 []); // TODO: Add specialisation constant support
 
+            var outputDescription =
+                OutputDescription
+                ?? Framebuffer?.OutputDescription
+                ?? Framebuffer?.Framebuffer?.OutputDescription
+                ?? device.SwapchainFramebuffer?.OutputDescription
+                ?? throw new InvalidOperationException("No suitable output description could be determined for pipeline "+ Name);
+
             var pipelineDescription = new GraphicsPipelineDescription(
                 AlphaBlend,
                 DepthStencilMode,
@@ -104,10 +111,7 @@ public class PipelineHolder : Component, IPipelineHolder
                 Topology,
                 shaderSetDescription,
                 _resourceLayouts.Select(x => layoutSource.GetLayout(x, device)).ToArray(),
-                OutputDescription 
-                ?? Framebuffer?.OutputDescription
-                ?? Framebuffer?.Framebuffer?.OutputDescription
-                ?? device.SwapchainFramebuffer.OutputDescription);
+                outputDescription);
 
             _pipeline = device.ResourceFactory.CreateGraphicsPipeline(in pipelineDescription);
             _pipeline.Name = Name;

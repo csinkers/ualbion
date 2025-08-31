@@ -36,8 +36,7 @@ sealed class DumpText : GameComponent, IAssetDumper
     static readonly CompositeFormat ScriptPath = CompositeFormat.Parse("Scripts/{0}.txt");
 
     static IEnumerable<AssetId> Ids<T>(AssetId[] dumpIds) where T : unmanaged, Enum 
-        => Enum.GetValues(typeof(T))
-            .Cast<T>()
+        => Enum.GetValues<T>()
             .Select(AssetId.From)
             .Where(x => dumpIds == null || dumpIds.Contains(x));
 

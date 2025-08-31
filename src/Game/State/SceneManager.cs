@@ -39,7 +39,7 @@ public class SceneManager : Container, ISceneManager
         if (child is not IScene scene)
             return true;
 
-        var attrib = (SceneAttribute)scene.GetType().GetCustomAttribute(typeof(SceneAttribute));
+        var attrib = scene.GetType().GetCustomAttribute<SceneAttribute>();
         if (attrib == null)
             throw new InvalidOperationException($"Expected a Scene attribute on type {scene.GetType().Name}");
 

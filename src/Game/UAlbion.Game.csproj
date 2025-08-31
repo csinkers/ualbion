@@ -14,11 +14,11 @@
     </AssemblyAttribute>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0">
+    <PackageReference Include="AdlMidi.NET" Version="1.0.21" />
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="AdlMidi.NET" Version="1.0.20" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\UAlbion.Core.csproj" />

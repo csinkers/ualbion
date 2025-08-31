@@ -10,8 +10,7 @@ namespace UAlbion.Game.Gui;
 public class CommonColors : ICommonColors
 {
     public IDictionary<CommonColor, uint> Palette { get; } =
-        Enum.GetValues(typeof(CommonColor))
-            .Cast<CommonColor>()
+        Enum.GetValues<CommonColor>()
             .Select((x, i) => (x, i))
             .ToDictionary(x => x.x, x => (uint)x.i);
 

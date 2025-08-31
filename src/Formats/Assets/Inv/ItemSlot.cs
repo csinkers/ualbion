@@ -149,7 +149,7 @@ public class ItemSlot : IReadOnlyItemSlot
                 case '(':
                     index = s.IndexOf(')', i);
                     if (i == -1) throw new FormatException($"Expected ')' after the flag list when parsing ItemSlot \"{s}\"");
-                    slot.Flags = (ItemSlotFlags)Enum.Parse(typeof(ItemSlotFlags), s[i..index]);
+                    slot.Flags = Enum.Parse<ItemSlotFlags>(s[i..index]);
                     i = index;
                     mode = ' ';
                     break;

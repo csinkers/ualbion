@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
-    <PackageReference Include="Sinkers.Veldrid" Version="0.4.15" />
+    <PackageReference Include="Sinkers.Veldrid" Version="0.4.16" />
   </ItemGroup>
 
 </Project>

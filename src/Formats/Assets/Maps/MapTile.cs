@@ -62,9 +62,6 @@ public struct MapTile : IEquatable<MapTile>
 
     public static MapTile[] FromInts(ReadOnlySpan<int> underlay, ReadOnlySpan<int> overlay)
     {
-        if (underlay == null) throw new ArgumentNullException(nameof(underlay));
-        if (overlay == null) throw new ArgumentNullException(nameof(overlay));
-
         if (underlay.Length != overlay.Length)
         {
             throw new ArgumentOutOfRangeException(
@@ -81,7 +78,7 @@ public struct MapTile : IEquatable<MapTile>
 
     public static byte[] ToPacked(ReadOnlySpan<MapTile> tiles, int sourceWidth, int offsetX, int offsetY)
     {
-        if (tiles == null || tiles.Length == 0)
+        if (tiles.Length == 0)
             return [];
 
         int sourceHeight = tiles.Length / sourceWidth;
@@ -112,7 +109,7 @@ public struct MapTile : IEquatable<MapTile>
 
     public static MapTile[] FromPacked(ReadOnlySpan<byte> buf, int destWidth, int offsetX, int offsetY)
     {
-        if (buf == null || buf.Length == 0)
+        if (buf.Length == 0)
             return [];
 
         if (buf.Length % 3 != 0)

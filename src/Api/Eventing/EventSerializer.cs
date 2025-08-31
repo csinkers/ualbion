@@ -39,7 +39,7 @@ public class EventSerializer
         {
             foreach (var type in types)
             {
-                var eventAttribute = (EventAttribute) type.GetCustomAttribute(typeof(EventAttribute), false);
+                var eventAttribute = type.GetCustomAttribute<EventAttribute>(false);
                 if (eventAttribute == null) 
                     continue;
 

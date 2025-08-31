@@ -93,7 +93,7 @@ E\((?<Event>[^)]+)\)\s*", RegexOptions.IgnorePatternWhitespace);
             Global = m.Groups["Type"].Value == "GZ",
             X = byte.Parse(m.Groups["X"].Value),
             Y = byte.Parse(m.Groups["Y"].Value),
-            Trigger = (TriggerTypes)Enum.Parse(typeof(TriggerTypes), m.Groups["Trigger"].Value),
+            Trigger = Enum.Parse<TriggerTypes>(m.Groups["Trigger"].Value),
             Unk1 = byte.Parse(m.Groups["Mode"].Value),
             Chain = ushort.Parse(m.Groups["Chain"].Value),
             Node = new DummyEventNode(ushort.Parse(m.Groups["Event"].Value))

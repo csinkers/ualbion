@@ -21,7 +21,6 @@ public class DeltaFlcChunk : FlicChunk
 
     public void Apply(Span<byte> buffer8, int width)
     {
-        if (buffer8 == null) throw new ArgumentNullException(nameof(buffer8));
         int y = 0;
         int x = 0;
 

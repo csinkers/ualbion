@@ -75,10 +75,10 @@ public static class TileMapping
         if (result.FrameCount == 0 && tile.Image != null)
             result.FrameCount = 1;
 
-        result.Layer     =   (TileLayer)Enum.Parse(typeof(TileLayer),   PropString(tile, Prop.Layer)     ?? "0");
-        result.Type      =    (TileType)Enum.Parse(typeof(TileType),    PropString(tile, Prop.Type)      ?? "0");
-        result.Collision = (Passability)Enum.Parse(typeof(Passability), PropString(tile, Prop.Collision) ?? "0");
-        result.SitMode   =     (SitMode)Enum.Parse(typeof(SitMode),     PropString(tile, Prop.SitMode)   ?? "0");
+        result.Layer     = Enum.Parse<TileLayer>(PropString(tile, Prop.Layer) ?? "0");
+        result.Type      = Enum.Parse<TileType>(PropString(tile, Prop.Type) ?? "0");
+        result.Collision = Enum.Parse<Passability>(PropString(tile, Prop.Collision) ?? "0");
+        result.SitMode   = Enum.Parse<SitMode>(PropString(tile, Prop.SitMode) ?? "0");
         result.Unk7      = (byte)(PropInt(tile, Prop.Unk7) ?? 0);
 
         result.Bouncy   = PropBool(tile, Prop.Bouncy) ?? false;

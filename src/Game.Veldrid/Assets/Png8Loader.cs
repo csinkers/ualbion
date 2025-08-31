@@ -75,7 +75,7 @@ public class Png8Loader : GameComponent, IAssetLoader<IReadOnlyTexture<byte>>
         return bytes;
     }
 
-    static SimpleTexture<byte> Read(AssetId id, uint[] palette, IList<Image<Rgba32>> images)
+    static SimpleTexture<byte> Read(AssetId id, uint[] palette, List<Image<Rgba32>> images)
     {
         int totalWidth = images.Max(x => x.Width);
         int totalHeight = images.Sum(x => x.Height);

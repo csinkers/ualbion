@@ -20,7 +20,7 @@ public class EventMetadata
     public EventMetadata(Type type)
     {
         ArgumentNullException.ThrowIfNull(type);
-        var eventAttribute = (EventAttribute)type.GetCustomAttribute(typeof(EventAttribute), false);
+        var eventAttribute = type.GetCustomAttribute<EventAttribute>(false);
         if (eventAttribute == null)
             throw new InvalidOperationException($"Event type {type} is missing an Event attribute");
 
@@ -33,7 +33,7 @@ public class EventMetadata
         var partsParameter = Expression.Parameter(typeof(string[]), "parts");
         // TODO: Order passed in to EventPartMetadata needs to be based on constructor parameters.
         Parts = new ReadOnlyCollection<EventPartMetadata>(properties
-            .Where(x => x.GetCustomAttribute(typeof(EventPartAttribute)) != null)
+            .Where(x => x.GetCustomAttribute<EventPartAttribute>() != null)
             .Select((x, i) => new EventPartMetadata(x, partsParameter, i))
             .ToArray());
 

@@ -225,7 +225,7 @@ public static class TriggerMapping
         {
             Global = global,
             ObjectId = obj.Id,
-            TriggerType = (TriggerTypes)Enum.Parse(typeof(TriggerTypes), trigger),
+            TriggerType = Enum.Parse<TriggerTypes>(trigger),
             Unk1 = string.IsNullOrEmpty(unk1) ? (byte)0 : byte.Parse(unk1),
             EventIndex = entryPoint,
             Points = points

@@ -462,13 +462,9 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
         {
             var maxTransitions = ReadVar(V.Game.Ui.Transitions.MaxDiscardTransitions);
             var transitionsToShow = Math.Min(itemsToDrop, maxTransitions);
-            var transitions = new AlbionTask[transitionsToShow];
 
             for (int i = 0; i < transitionsToShow; i++)
-                transitions[i] = RaiseA(new GravityItemTransitionEvent(slot.Item, e.NormX, e.NormY));
-
-            foreach (var transition in transitions)
-                await transition;
+                _ = RaiseA(new GravityItemTransitionEvent(slot.Item, e.NormX, e.NormY));
         }
 
         slot.Amount -= itemsToDrop;

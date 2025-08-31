@@ -31,7 +31,7 @@ public class Png32Loader : Component, IAssetLoader<IReadOnlyTexture<uint>>
         return FormatUtil.BytesFromStream(stream => encoder.Encode(image, stream));
     }
 
-    static SimpleTexture<uint> Read(AssetId id, IList<Image<Rgba32>> images)
+    static SimpleTexture<uint> Read(AssetId id, List<Image<Rgba32>> images)
     {
         int totalWidth = images.Max(x => x.Width);
         int totalHeight = images.Sum(x => x.Height);

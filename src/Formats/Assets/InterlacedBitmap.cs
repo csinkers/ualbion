@@ -37,7 +37,7 @@ public sealed class InterlacedBitmap
         if (formatChunk.TypeId != IffChunkType.Format)
             throw new NotSupportedException($"Invalid IFF header, expected \"FORM\", found \"{formatChunk.TypeId}\"");
 
-        var formatId = s.FixedLengthString("FormatId", IffChunkType.PackedBitmap, 4);
+        var formatId = s.AlbionString("FormatId", IffChunkType.PackedBitmap, 4);
         if (formatId != IffChunkType.PackedBitmap)
             throw new NotSupportedException($"Invalid IFF header, expected \"PBM \", found \"{formatId}\"");
 

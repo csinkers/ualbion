@@ -19,7 +19,7 @@ public static class PackedChunks
             yield break;
         }
 
-        var magic = s.FixedLengthString(null, null, Magic.Length);
+        var magic = s.AlbionString(null, null, Magic.Length);
         if (!string.Equals(magic, Magic, StringComparison.Ordinal))
         {
             s.Seek(initial);
@@ -28,9 +28,10 @@ public static class PackedChunks
         }
 
         var count = s.Int32(null, 0);
-        for(int i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
-            var name = s.NullTerminatedString(null, string.Empty);
+            int nameLength = s.Int32(i, 0);
+            var name = s.AlbionString(i, string.Empty, nameLength);
             int length = s.Int32(null, 0);
             var chunk = s.Bytes(null, null, length);
             yield return (chunk, name);
@@ -52,12 +53,14 @@ public static class PackedChunks
             return;
         }
 
-        s.FixedLengthString(null, Magic, Magic.Length);
+        s.AlbionString(null, Magic, Magic.Length);
         s.Int32(null, count);
+
         for(int i = 0; i < count; i++)
         {
             var (chunk, name) = buildChunk(i);
-            s.NullTerminatedString(null, name ?? string.Empty);
+            int nameLength = s.Int32(i, name?.Length ?? 0);
+            s.AlbionString(i, name ?? string.Empty, nameLength);
             s.Int32(null, chunk.Length);
             s.Bytes(null, chunk, chunk.Length);
         }

@@ -16,13 +16,13 @@ public class WavLoader : IAssetLoader<ISample>
 
         existing ??= new AlbionSample();
 
-        var tag = s.FixedLengthString("Tag", "RIFF", 4); // Container format chunk
+        var tag = s.AlbionString("Tag", "RIFF", 4); // Container format chunk
         ApiUtil.Assert(tag == "RIFF", "tag == 'RIFF'");
 
         var riffSizeOffset = s.Offset;
         int _ = s.Int32("TotalSize", 0); // Dummy write to start with, will be overwritten at the end.
 
-        tag = s.FixedLengthString(null, "WAVE",4);
+        tag = s.AlbionString(null, "WAVE",4);
         ApiUtil.Assert(tag == "WAVE", "tag == 'WAVE'");
 
         SerdesFormatTag(existing, s);
@@ -42,7 +42,7 @@ public class WavLoader : IAssetLoader<ISample>
 
     static void SerdesFormatTag(ISample w, ISerdes s)
     {
-        var tag = s.FixedLengthString(null, "fmt ",4); // Subchunk1 (format metadata)
+        var tag = s.AlbionString(null, "fmt ",4); // Subchunk1 (format metadata)
         ApiUtil.Assert(tag == "fmt ", "tag == 'fmt '");
 
         s.Int32(null, 16);
@@ -59,7 +59,7 @@ public class WavLoader : IAssetLoader<ISample>
 
     static void SerdesDataTag(ISample w, ISerdes s)
     {
-        var tag = s.FixedLengthString("Tag", "data", 4); // Subchunk2 (raw sample data)
+        var tag = s.AlbionString("Tag", "data", 4); // Subchunk2 (raw sample data)
         ApiUtil.Assert(tag == "data");
         int sampleCount = s.Int32("SampleCount", w.Samples?.Length ?? 0);
         w.Samples = s.Bytes(nameof(w.Samples), w.Samples, sampleCount);

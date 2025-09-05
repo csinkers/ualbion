@@ -67,7 +67,7 @@ public static class Asset
 
         using var annotationStream = new MemoryStream();
         using var annotationWriter = new StreamWriter(annotationStream);
-        using var afs = new AnnotationProxySerdes(ar, annotationWriter, FormatUtil.BytesFrom850String);
+        using var afs = new AnnotationProxySerdes(ar, annotationWriter);
 
         T result;
         Exception exception = null;
@@ -99,7 +99,7 @@ public static class Asset
         using var bw = new BinaryWriter(ms);
         using var annotationStream = new MemoryStream();
         using var annotationWriter = new StreamWriter(annotationStream);
-        using var aw = new AnnotationProxySerdes(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
+        using var aw = new AnnotationProxySerdes(new AlbionWriter(bw), annotationWriter);
 
         Exception exception = null;
         try { serdes(asset, aw, context); }
@@ -124,7 +124,7 @@ public static class Asset
 
         using var annotationStream = new MemoryStream();
         using var annotationWriter = new StreamWriter(annotationStream);
-        using var afs = new AnnotationProxySerdes(ar, annotationWriter, FormatUtil.BytesFrom850String);
+        using var afs = new AnnotationProxySerdes(ar, annotationWriter);
 
         Exception exception = null;
         try
@@ -154,7 +154,7 @@ public static class Asset
         using var bw = new BinaryWriter(ms);
         using var annotationStream = new MemoryStream();
         using var annotationWriter = new StreamWriter(annotationStream);
-        using var aw = new AnnotationProxySerdes(new AlbionWriter(bw), annotationWriter, FormatUtil.BytesFrom850String);
+        using var aw = new AnnotationProxySerdes(new AlbionWriter(bw), annotationWriter);
 
         Exception exception = null;
         try { serdes(aw); }

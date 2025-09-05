@@ -33,7 +33,7 @@ public class ScriptLoader : IAssetLoader<Script>
         }
 
         var text = builder.Build().TrimEnd() + Environment.NewLine;
-        s.FixedLengthString(null, text, text.Length);
+        s.AlbionString(null, text, text.Length);
 
         return existing;
     }

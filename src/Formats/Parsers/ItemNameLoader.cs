@@ -50,9 +50,9 @@ public class ItemNameLoader : IAssetLoader<Dictionary<string, ListStringSet>>
         long end = s.Offset + streamLength;
         while (s.Offset < end)
         {
-            german.Add(s.FixedLengthString(null, null, StringSize));
-            english.Add(s.FixedLengthString(null, null, StringSize));
-            french.Add(s.FixedLengthString(null, null, StringSize));
+            german.Add(s.AlbionString(null, null, StringSize));
+            english.Add(s.AlbionString(null, null, StringSize));
+            french.Add(s.AlbionString(null, null, StringSize));
         }
 
         return results;
@@ -85,6 +85,6 @@ public class ItemNameLoader : IAssetLoader<Dictionary<string, ListStringSet>>
     static void Write(ListStringSet set, ISerdes s, int i)
     {
         var text = set.Count <= i ? "" : set[i];
-        s.FixedLengthString(null, text, StringSize);
+        s.AlbionString(null, text, StringSize);
     }
 }

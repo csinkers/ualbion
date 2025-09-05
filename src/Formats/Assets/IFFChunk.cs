@@ -29,7 +29,7 @@ public class IffChunk
     {
         ArgumentNullException.ThrowIfNull(s);
         c ??= new IffChunk();
-        c.TypeId = s.FixedLengthString(nameof(TypeId), c.TypeId, 4);
+        c.TypeId = s.AlbionString(nameof(TypeId), c.TypeId, 4);
         c._lengthOffset = s.Offset;
         c.Length = s.Int32BE(nameof(Length), c.Length);
         return c;

@@ -24,7 +24,7 @@ public class AutomapInfo // Total size 0x13 = 19 bytes
         info.Y = s.UInt8(nameof(Y), info.Y); // 1
         info.Unk2 = s.UInt8(nameof(Unk2), info.Unk2); // 2
         info.MarkerId = s.UInt8(nameof(MarkerId), info.MarkerId); // 3
-        info.Name = s.FixedLengthString(nameof(Name), info.Name, 15); // 4
+        info.Name = s.AlbionString(nameof(Name), info.Name, 15); // 4
         return info;
     }
 }

@@ -70,7 +70,7 @@ static class Program
         var s1 = new AlbionReader(br, stream.Length);
 
         using var ms = new MemoryStream();
-        var s2 = new AnnotationProxySerdes(s1, writer, FormatUtil.BytesFrom850String);
+        var s2 = new AnnotationProxySerdes(s1, writer);
         try
         {
             SavedGame.Serdes(null, AssetMapping.Global, s2, spellManager);

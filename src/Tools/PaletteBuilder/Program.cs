@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Microsoft.ML;
 using SerdesNet;
 using SixLabors.ImageSharp;
@@ -108,7 +107,7 @@ static class Program
     {
         using var stream = File.Open(path, FileMode.Create, FileAccess.Write);
         using var bw = new BinaryWriter(stream);
-        using var s = new WriterSerdes(bw, Encoding.ASCII.GetBytes);
+        using var s = new WriterSerdes(bw);
         Bitmap8Bit.Serdes(new Bitmap8Bit((ushort)width, palette, pixels), s);
     }
 

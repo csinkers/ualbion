@@ -31,7 +31,6 @@ public class JsonStringContainer : IAssetContainer
         return new ReaderSerdes(
             br,
             ms.Length,
-            Encoding.UTF8.GetString,
             ApiUtil.Assert,
             () => { br.Dispose(); ms.Dispose(); });
     }

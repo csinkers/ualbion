@@ -12,7 +12,6 @@ public class AlbionReader : ReaderSerdes
     public AlbionReader(BinaryReader br, long maxLength = 0, Action disposeAction = null)
         : base(br,
             maxLength == 0 ? br?.BaseStream.Length ?? 0 : maxLength,
-            FormatUtil.BytesTo850String,
             ApiUtil.Assert,
             disposeAction)
     {

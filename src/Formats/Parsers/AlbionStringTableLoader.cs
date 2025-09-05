@@ -20,7 +20,7 @@ public class AlbionStringTableLoader : IAssetLoader<ListStringSet>
 
             var strings = new string[stringCount];
             for (int i = 0; i < stringCount; i++)
-                strings[i] = s.FixedLengthString(null, null, stringLengths[i]);
+                strings[i] = s.AlbionString(null, null, stringLengths[i]);
             return new ListStringSet(strings);
         }
         else

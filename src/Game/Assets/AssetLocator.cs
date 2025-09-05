@@ -74,7 +74,7 @@ public sealed class AssetLocator : ServiceComponent<IAssetLocator>, IAssetLocato
         var container = _containerRegistry.GetContainer(path, node.Container, disk);
         var s = container?.Read(path, context);
         if (annotationWriter != null)
-            s = new AnnotationProxySerdes(s, annotationWriter, FormatUtil.BytesFrom850String);
+            s = new AnnotationProxySerdes(s, annotationWriter);
         return s;
     }
 

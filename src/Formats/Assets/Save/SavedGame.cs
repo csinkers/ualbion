@@ -150,7 +150,7 @@ public class SavedGame
             return "Invalid";
 
         s.UInt16(nameof(Unk0), 0);
-        return s.FixedLengthString(nameof(Name), null, nameLength);
+        return s.AlbionString(nameof(Name), null, nameLength);
     }
 
     public static SavedGame Serdes(SavedGame save, AssetMapping mapping, ISerdes s, ISpellManager spellManager)
@@ -160,7 +160,7 @@ public class SavedGame
 
         ushort nameLength = s.UInt16("NameLength", (ushort)(save.Name?.Length ?? 0));
         save.Unk0 = s.UInt16(nameof(Unk0), save.Unk0);
-        save.Name = s.FixedLengthString(nameof(Name), save.Name, nameLength);
+        save.Name = s.AlbionString(nameof(Name), save.Name, nameLength);
 
         save.MagicNumber = s.UInt32(nameof(MagicNumber), save.MagicNumber);
         ApiUtil.Assert(save.MagicNumber == 0x25051971, $"Magic number was expected to be 0x25051971 but it was 0x{save.MagicNumber:x}"); // Must be someone's birthday

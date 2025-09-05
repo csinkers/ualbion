@@ -24,7 +24,7 @@ public class WordListLoader : IAssetLoader<ListStringSet>
             ApiUtil.Assert(s.BytesRemaining % WordLength == 0, "Expected word list file length to be a whole multiple of the string size");
             var strings = new List<string>();
             while (s.BytesRemaining > 0)
-                strings.Add(s.FixedLengthString(null, null, WordLength));
+                strings.Add(s.AlbionString(null, null, WordLength));
 
             return new ListStringSet(strings);
         }
@@ -37,7 +37,7 @@ public class WordListLoader : IAssetLoader<ListStringSet>
                 if (x is { Length: > WordLength })
                     throw new ArgumentOutOfRangeException(nameof(existing), $"Tried to write a word ({x}) of length {x.Length} to a word list, but the maximum length is {WordLength}");
 
-                s.FixedLengthString(null, x, WordLength);
+                s.AlbionString(null, x, WordLength);
             }
 
             return existing;

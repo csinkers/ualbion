@@ -291,9 +291,9 @@ public class CharacterSheet : ICharacterSheet
         knownSpellBytes = s.Bytes("KnownSpells", knownSpellBytes, SpellSchoolCount * sizeof(uint)); // F2
 
         sheet.Weight = s.Int32(nameof(sheet.Weight), sheet.Weight); // FA
-        sheet.GermanName = s.FixedLengthString(nameof(sheet.GermanName), sheet.GermanName, MaxNameLength); // 112
-        sheet.EnglishName = s.FixedLengthString(nameof(sheet.EnglishName), sheet.EnglishName, MaxNameLength);
-        sheet.FrenchName = s.FixedLengthString(nameof(sheet.FrenchName), sheet.FrenchName, MaxNameLength);
+        sheet.GermanName = s.AlbionString(nameof(sheet.GermanName), sheet.GermanName, MaxNameLength); // 112
+        sheet.EnglishName = s.AlbionString(nameof(sheet.EnglishName), sheet.EnglishName, MaxNameLength);
+        sheet.FrenchName = s.AlbionString(nameof(sheet.FrenchName), sheet.FrenchName, MaxNameLength);
 
         spellStrengthBytes = s.Bytes("SpellStrength", spellStrengthBytes, MaxSpellsPerSchool * SpellSchoolCount * sizeof(ushort));
 

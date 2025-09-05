@@ -33,6 +33,14 @@ public static class FormatUtil
         return AlbionEncoding.GetBytes(str.Replace('ß', '×'));
     }
 
+    public static byte[] BytesFrom850StringN(string str, int length)
+    {
+        ArgumentNullException.ThrowIfNull(str);
+        byte[] bytes = new byte[length];
+        AlbionEncoding.GetBytes(str.Replace('ß', '×').AsSpan(), bytes.AsSpan());
+        return bytes;
+    }
+
     public static bool TryParseFloat(string s, out float result)
         => float.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out result);
 

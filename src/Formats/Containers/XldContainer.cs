@@ -99,9 +99,11 @@ public class XldContainer : IAssetContainer
     {
         ArgumentNullException.ThrowIfNull(s);
         s.Begin("XldHeader");
-        string magic = s.NullTerminatedString("MagicString", MagicString);
-        if(magic != MagicString)
+        string magic = s.AlbionString("MagicString", MagicString, MagicString.Length);
+        if (magic != MagicString)
             throw new FormatException("XLD file magic string not found");
+
+        s.Pad(1); // null terminator for the string
 
         ushort objectCount = s.UInt16("ObjectCount", (ushort)(lengths?.Length ?? 0));
         lengths ??= new int[objectCount];

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Text.Json.Serialization;
 
 namespace UAlbion.Api.Visual;
 
 public interface ITexture
 {
+    [JsonIgnore]
     IAssetId Id { get; }
     string Name { get; }
     int Width { get; }
@@ -23,6 +25,7 @@ public interface IDepthTexture : ITexture
 
 public interface IReadOnlyTexture<T> : ITexture where T : unmanaged
 {
+    [JsonIgnore]
     ReadOnlySpan<T> PixelData { get; }
     ReadOnlyImageBuffer<T> GetRegionBuffer(Region region);
     ReadOnlyImageBuffer<T> GetRegionBuffer(int i);
@@ -31,6 +34,7 @@ public interface IReadOnlyTexture<T> : ITexture where T : unmanaged
 
 public interface IMutableTexture<T> : IReadOnlyTexture<T> where T : unmanaged
 {
+    [JsonIgnore]
     Span<T> MutablePixelData { get; }
     ImageBuffer<T> GetMutableRegionBuffer(Region region);
     ImageBuffer<T> GetMutableRegionBuffer(int i);

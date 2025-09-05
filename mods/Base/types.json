@@ -118,7 +118,7 @@
     "wavlib2":           "UAlbion.Formats.Parsers.WaveLibWavLoader, UAlbion.Formats",
     "wordlist":          "UAlbion.Formats.Parsers.WordListLoader, UAlbion.Formats",
 
-    // These are in Game.Veldrid due to a dependency on ImageSharp
+    // These are in Game.Veldrid (rather than Formats) due to a dependency on ImageSharp
     "mesh":              "UAlbion.Game.Veldrid.Assets.MeshLoader, UAlbion.Game.Veldrid",
     "png8":              "UAlbion.Game.Veldrid.Assets.Png8Loader, UAlbion.Game.Veldrid",
     "png32":             "UAlbion.Game.Veldrid.Assets.Png32Loader, UAlbion.Game.Veldrid",
@@ -127,11 +127,11 @@
     "pngsheet":          "UAlbion.Game.Veldrid.Assets.PngSheetLoader, UAlbion.Game.Veldrid",
     "palpng":            "UAlbion.Game.Veldrid.Assets.PalettePng32Loader, UAlbion.Game.Veldrid",
 
-    // This is in Game due to a dependency on AdlMidi.NET
+    // This is in Game (rather than Formats) due to a dependency on AdlMidi.NET
     "soundbank":         "UAlbion.Game.Assets.SoundBankLoader, UAlbion.Game",
     "jsonSoundbank":     "UAlbion.Formats.Parsers.JsonLoader`1[[ADLMidi.NET.GlobalTimbreLibrary, ADLMidi.NET]], UAlbion.Formats",
 
-    // These are in Game.Veldrid as they require the 3D engine to render isometric tiles to offscreen buffers
+    // These are in Game.Veldrid (rather than Formats) as they require the 3D engine to render isometric tiles to offscreen buffers
     "tiledLabyrinth":    "UAlbion.Game.Veldrid.Assets.IsometricLabyrinthLoader, UAlbion.Game.Veldrid",
     "tiledNpcTileset":   "UAlbion.Game.Veldrid.Assets.NpcTilesetLoader, UAlbion.Game.Veldrid"
   },

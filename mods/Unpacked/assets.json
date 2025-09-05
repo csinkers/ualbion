@@ -1,5 +1,5 @@
 {
- // Pattern Variables: 0=SubId in container 1=frame/sub-asset number 2=Asset name 3=PaletteId. Patterns must begin with {id}_ when writing.
+ // Pattern variables must begin with {id}_ when writing.
   "special.SoundBank": { "Files": { "Assets/Soundbank.json": { "Container": "raw", "Loader": "jsonSoundbank" } } },
 
   "special.TiledNpcsLarge": {

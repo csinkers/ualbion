@@ -114,7 +114,6 @@ sealed partial class EtmVertexShader : IVertexShader { }
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
 sealed partial class EtmFragmentShader : IFragmentShader { }
 
-#pragma warning disable CA1815 // Override equals and operator equals on value types
 [StructLayout(LayoutKind.Sequential)]
 public struct DungeonTileMapProperties : IUniformFormat
 {
@@ -196,7 +195,6 @@ public partial struct DungeonTile : IVertexFormat, IEquatable<DungeonTile>
     public static bool operator !=(DungeonTile left, DungeonTile right) => !(left == right);
 }
 
-#pragma warning restore CA1815 // Override equals and operator equals on value types
 [SuppressMessage("Microsoft.Naming", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for code generation")]
 partial struct EtmIntermediate : IVertexFormat
 {

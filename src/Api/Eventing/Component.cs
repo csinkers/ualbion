@@ -5,7 +5,6 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using UAlbion.Api.Settings;
 
-#pragma warning disable CA1030 // Use events where appropriate
 namespace UAlbion.Api.Eventing;
 
 /// <summary>
@@ -466,4 +465,3 @@ public abstract class Component : IComponent
         => Raise(new LogEvent(LogLevel.Critical, msg, file, member, line));
 }
 
-#pragma warning restore CA1030 // Use events where appropriate

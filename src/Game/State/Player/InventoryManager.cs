@@ -20,7 +20,6 @@ using UAlbion.Game.Text;
 namespace UAlbion.Game.State.Player;
 
 // TODO: Refactor / break this class up if possible
-#pragma warning disable CA1506 // 'InventoryManager' is coupled with '111' different types from '23' different namespaces. Rewrite or refactor the code to decrease its class coupling below '96'.
 public class InventoryManager : GameServiceComponent<IInventoryManager>, IInventoryManager
 {
     readonly Func<InventoryId, Inventory> _getInventory;
@@ -76,42 +75,28 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
         if (slot == null || slot.Id.Slot == ItemSlotId.None)
             return InventoryAction.Nothing;
 
-        switch (_hand.Item.Type, slot.Item.Type)
+        return (_hand.Item.Type, slot.Item.Type) switch
         {
-            case (AssetType.None, AssetType.None):
-                return InventoryAction.Nothing;
-
-            case (AssetType.None, _):
-                return InventoryAction.Pickup;
-
-            case (AssetType.Gold, AssetType.Gold):
-            case (AssetType.Rations, AssetType.Rations):
-                return InventoryAction.Coalesce;
-
-            case (AssetType.Gold, AssetType.None):
-                return id.Slot == ItemSlotId.Gold 
-                    ? InventoryAction.PutDown 
-                    : InventoryAction.Nothing;
-
-            case (AssetType.Rations, AssetType.None):
-                return id.Slot == ItemSlotId.Rations 
-                    ? InventoryAction.PutDown 
-                    : InventoryAction.Nothing;
-
-            case (AssetType.Item, AssetType.None):
-                return InventoryAction.PutDown;
-
-            case (AssetType.Item, AssetType.Item) when slot.CanCoalesce(_hand, _getItem):
-                return slot.Amount >= ItemSlot.MaxItemCount
+            (AssetType.None, AssetType.None) => InventoryAction.Nothing,
+            (AssetType.None, _) => InventoryAction.Pickup,
+            (AssetType.Gold, AssetType.Gold) => InventoryAction.Coalesce,
+            (AssetType.Rations, AssetType.Rations) => InventoryAction.Coalesce,
+            (AssetType.Gold, AssetType.None) =>
+                id.Slot == ItemSlotId.Gold
+                    ? InventoryAction.PutDown
+                    : InventoryAction.Nothing,
+            (AssetType.Rations, AssetType.None) => 
+                id.Slot == ItemSlotId.Rations
+                    ? InventoryAction.PutDown
+                    : InventoryAction.Nothing,
+            (AssetType.Item, AssetType.None) => InventoryAction.PutDown,
+            (AssetType.Item, AssetType.Item) when slot.CanCoalesce(_hand, _getItem) =>
+                slot.Amount >= ItemSlot.MaxItemCount
                     ? InventoryAction.NoCoalesceFullStack
-                    : InventoryAction.Coalesce;
-
-            case (AssetType.Item, AssetType.Item):
-                return InventoryAction.Swap;
-
-            default:
-                return InventoryAction.Nothing;
-        }
+                    : InventoryAction.Coalesce,
+            (AssetType.Item, AssetType.Item) => InventoryAction.Swap,
+            _ => InventoryAction.Nothing
+        };
     }
 
     void Update(InventoryId id) => Raise(new InventoryChangedEvent(id));
@@ -362,7 +347,7 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
                         (int)slot.LastUiPosition.Y,
                         ReadVar(V.Game.Ui.Transitions.ItemMovementTransitionTimeSeconds));
 
-                    ItemSlot temp = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
+                    ItemSlot temp = new(new InventorySlotId(InventoryType.Temporary, 0, 0));
                     temp.TransferFrom(_hand, null, _getItem);
                     SetCursor();
                     await RaiseA(transitionEvent);
@@ -398,8 +383,8 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
                         (int)cursorUiPosition.Y,
                         ReadVar(V.Game.Ui.Transitions.ItemMovementTransitionTimeSeconds));
 
-                    ItemSlot temp1 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
-                    ItemSlot temp2 = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, 0));
+                    ItemSlot temp1 = new(new InventorySlotId(InventoryType.Temporary, 0, 0));
+                    ItemSlot temp2 = new(new InventorySlotId(InventoryType.Temporary, 0, 0));
                     temp1.TransferFrom(_hand, null, _getItem);
                     temp2.TransferFrom(slot, null, _getItem);
 
@@ -709,4 +694,3 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
         }
     }
 }
-#pragma warning restore CA1506 // 'InventoryManager' is coupled with '111' different types from '23' different namespaces. Rewrite or refactor the code to decrease its class coupling below '96'.

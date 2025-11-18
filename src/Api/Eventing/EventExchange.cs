@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
-#pragma warning disable CA1030 // Use events where appropriate
 namespace UAlbion.Api.Eventing
 {
     /// <summary>
@@ -39,7 +38,7 @@ namespace UAlbion.Api.Eventing
                 lock (_syncRoot)
                 {
                     if (_sortedSubscribersCached?.Count != _subscribers.Count)
-                        _sortedSubscribersCached = _subscribers.Keys.OrderBy(x => x.ToString()).ToList();
+                        _sortedSubscribersCached = [.._subscribers.Keys.OrderBy(x => x.ToString())];
                     return _sortedSubscribersCached;
                 }
             }
@@ -488,9 +487,8 @@ namespace UAlbion.Api.Eventing
             {
                 var subscribers = new List<Handler>();
                 Collect(subscribers, eventType);
-                return subscribers.Select(x => x.Component).ToList(); // Fine to allocate here - not called every frame.
+                return [..subscribers.Select(x => x.Component)]; // Fine to allocate here - not called every frame.
             }
         }
     }
 }
-#pragma warning restore CA1030 // Use events where appropriate

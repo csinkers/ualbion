@@ -5,5 +5,8 @@
   <PropertyGroup>
     <BaseOutputPath>$(MSBuildThisFileDirectory)..\build\$(MSBuildProjectName)\bin</BaseOutputPath>
     <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)..\build\$(MSBuildProjectName)\obj</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)</IntermediateOutputPath>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>13</LangVersion>
   </PropertyGroup>
 </Project>

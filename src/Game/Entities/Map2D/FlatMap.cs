@@ -153,8 +153,8 @@ public class FlatMap : GameComponent, IMap
 
         try
         {
-            // if (!log)
-            //     Raise(new SetLogLevelEvent(LogLevel.Warning));
+            if (!log)
+                Raise(new SetLogLevelEvent(LogLevel.Warning));
 
             foreach (var zone in zones)
             {
@@ -167,8 +167,8 @@ public class FlatMap : GameComponent, IMap
                 );
             }
 
-            // if (!log)
-            //     Raise(new SetLogLevelEvent(LogLevel.Info));
+            if (!log)
+                Raise(new SetLogLevelEvent(LogLevel.Info));
         }
         finally
         {

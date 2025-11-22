@@ -272,7 +272,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
         _vertexBuffer = factory.CreateBuffer(new BufferDescription(10000, BufferUsage.VertexBuffer | BufferUsage.DynamicWrite));
         _vertexBuffer.Name = "ImGui.NET Vertex Buffer";
 
-        _indexBuffer = factory.CreateBuffer(new BufferDescription(2000, BufferUsage.IndexBuffer | BufferUsage.DynamicWrite));
+        _indexBuffer = factory.CreateBuffer(new BufferDescription(4000, BufferUsage.IndexBuffer | BufferUsage.DynamicWrite));
         _indexBuffer.Name = "ImGui.NET Index Buffer";
 
         _projMatrixBuffer = factory.CreateBuffer(new BufferDescription(64, BufferUsage.UniformBuffer | BufferUsage.DynamicWrite));

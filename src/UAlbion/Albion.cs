@@ -26,12 +26,14 @@ using UAlbion.Game.Gui.Status;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Input;
 using UAlbion.Game.Scenes;
+using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid;
 using UAlbion.Game.Veldrid.Audio;
 using UAlbion.Game.Veldrid.Diag;
 using UAlbion.Game.Veldrid.Input;
+using Vortice.Direct3D11;
 
 namespace UAlbion;
 
@@ -63,6 +65,7 @@ static class Albion
 
         var engine = (Engine)global.Resolve<IEngine>();
         engine.Run();
+        global.Raise(new SaveSettingsEvent(), engine);
         // TODO: Ensure all sprite leases returned etc to weed out memory leaks
     }
 

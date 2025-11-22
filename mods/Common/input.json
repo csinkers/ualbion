@@ -149,9 +149,9 @@
     "0": "enter_word" // Used to trigger 'Enter word' in conversation
   },
   "MainMenu": {
-    "Ctrl+N": "new_game TorontoBegin 32 76",
+    "Ctrl+N": "new_game TorontoBegin 31 76",
     "Ctrl+3": "new_game Jirinaar 20 20",
-    "Ctrl+Shift+N": "new_game TorontoBegin 32 76",
+    "Ctrl+Shift+N": "new_game TorontoBegin 31 76",
     "Escape": "close_window"
   },
   "Editor": {

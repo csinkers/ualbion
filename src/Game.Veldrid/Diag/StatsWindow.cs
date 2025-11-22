@@ -89,7 +89,6 @@ public class StatsWindow : Component, IImGuiWindow
         //     ImGui.TreePop();
         // }
 
-        ImGui.TreePop();
         ImGui.End();
 
         if (!open)

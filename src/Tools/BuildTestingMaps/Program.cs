@@ -14,7 +14,10 @@ public static class Program
     {
         AssetSystem.LoadEvents();
 
-        var disk = new FileSystem(@"C:\Depot\bb\ualbion");
+        var disk = new FileSystem(Environment.CurrentDirectory);
+        var baseDir = ConfigUtil.FindBasePath(disk);
+        disk.CurrentDirectory = baseDir;
+
         var baseExchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "Albion");
         var testExchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "UATestDev");
         var repackedExchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "Repacked");

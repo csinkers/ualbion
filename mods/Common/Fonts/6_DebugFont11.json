@@ -8,7 +8,8 @@
       "X": 25,
       "Width": 11,
       "Height": 11,
-      "PadY": 1,
+      "XAdvance": 0,
+      "YAdvance": 12,
       "Mapping": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890-=~!@#$%^&*()_+;[]\\',./:{}|\"<>? "
     }
   ]

@@ -65,7 +65,7 @@ public class MainMenu : Dialog
     async AlbionTask NewGame()
     {
         var exchange = Exchange;
-        Detach();
+        Detach(); // Hide the main menu while the prompt is active
 
         var e = new YesNoPromptEvent(Base.SystemText.MainMenu_DoYouReallyWantToStartANewGame);
         var response = await RaiseQueryA(e);

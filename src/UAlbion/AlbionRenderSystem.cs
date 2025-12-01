@@ -111,7 +111,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                     menus.AddMenuItem(new ShowWindowMenuItem(
                         "Game",
                         "Windows",
-                        x => new ImGuiGameWindow(x, framebuffer, window)));
+                        name => new ImGuiGameWindow(name, framebuffer, window)));
 
                     menus.AddMenuItem(new ShowWindowMenuItem(
                         "Positions",

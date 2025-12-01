@@ -11,7 +11,8 @@ public class FontComponent
     public int Height { get; set; }
     public int X { get; set; }
     public int Y { get; set; }
-    public int PadY { get; set; }
+    public int XAdvance { get; set; } // 0 = use Height and YAdvance instead
+    public int YAdvance { get; set; }
     public string Mapping { get; set; }
 
     public Region TryGetRegion(char c, ITexture texture)
@@ -37,13 +38,15 @@ public class FontComponent
             ...
         */
 
-        int x = X + Width * index;
-        int y = Y; // + (Height + PadY) * index;
+        int x = X + XAdvance * index;
+        int y = Y;
+        if (XAdvance == 0)
+            y += YAdvance * index;
 
         while (x >= texture.Width)
         {
             x -= texture.Width;
-            y += Height + PadY;
+            y += YAdvance;
         }
 
         if (x + Width > texture.Width || y + Height > texture.Height)

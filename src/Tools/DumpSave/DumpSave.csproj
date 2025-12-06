@@ -6,6 +6,6 @@
     <ProjectReference Include="..\..\UAlbion\UAlbion.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="SerdesNet" Version="4.1.0" />
+    <PackageReference Include="SerdesNet" Version="4.2.0" />
   </ItemGroup>
 </Project>

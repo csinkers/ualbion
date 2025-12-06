@@ -34,7 +34,7 @@ public class FileSystem : IFileSystem
     public void WriteAllText(string path, string fullText) => File.WriteAllText(ToAbsolutePath(path), fullText);
     public IEnumerable<string> ReadAllLines(string path)  => File.ReadAllLines(ToAbsolutePath(path));
     public byte[] ReadAllBytes(string path)               => File.ReadAllBytes(ToAbsolutePath(path));
-    public void WriteAllBytes(string path, byte[] bytes)  => File.WriteAllBytes(ToAbsolutePath(path), bytes);
+    public void WriteAllBytes(string path, ReadOnlySpan<byte> bytes) => File.WriteAllBytes(ToAbsolutePath(path), bytes);
     public IEnumerable<string> EnumerateFiles(string path, string filter = null)
         => filter == null ? Directory.EnumerateFiles(ToAbsolutePath(path)) : Directory.EnumerateFiles(ToAbsolutePath(path), filter);
     public IEnumerable<string> EnumerateDirectories(string path) => Directory.EnumerateDirectories(ToAbsolutePath(path));

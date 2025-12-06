@@ -279,9 +279,7 @@ public class ModApplier : GameComponent, IModApplier
             return null;
         }
 
-        using var stream = disk.OpenRead(path);
-        using var br = new BinaryReader(stream);
-        using var s = new AlbionReader(br, stream.Length);
+        using var s = AlbionSerdes.CreateReader(disk.OpenRead(path));
         var spellManager = Resolve<ISpellManager>();
         return SavedGame.Serdes(null, AssetMapping.Global, s, spellManager);
     }
@@ -303,7 +301,7 @@ public class ModApplier : GameComponent, IModApplier
             if (options.AssetTypes != null && !options.AssetTypes.Contains(rangeInfo.Range.From.Type))
                 continue;
 
-            var assets = new Dictionary<string, List<(AssetLoadContext Context, byte[] Bytes)>>();
+            var assets = new Dictionary<string, List<(AssetLoadContext Context, ReadOnlyMemory<byte> Bytes)>>();
             foreach (var assetId in rangeInfo.Range)
             {
                 if (!AssetMapping.Global.IsMapped(assetId)) continue;
@@ -334,7 +332,7 @@ public class ModApplier : GameComponent, IModApplier
         AssetConversionOptions options,
         AssetLoadContext saveContext,
         HashSet<string> filesWritten,
-        Dictionary<string, List<(AssetLoadContext Context, byte[] Bytes)>> assets)
+        Dictionary<string, List<(AssetLoadContext Context, ReadOnlyMemory<byte> Bytes)>> assets)
     {
         var filename = saveContext.Filename;
         if (options.FilePattern != null && !options.FilePattern.IsMatch(filename)) return;
@@ -375,20 +373,16 @@ public class ModApplier : GameComponent, IModApplier
         SaveAsset(saveContext, result.Asset, assets);
     }
 
-    void SaveAsset(AssetLoadContext targetInfo, object asset, Dictionary<string, List<(AssetLoadContext, byte[])>> assets)
+    void SaveAsset(AssetLoadContext targetInfo, object asset, Dictionary<string, List<(AssetLoadContext, ReadOnlyMemory<byte>)>> assets)
     {
         var loaderRegistry = Resolve<IAssetLoaderRegistry>();
         var loader = loaderRegistry.GetLoader(targetInfo.Node.Loader);
 
-        using var ms = new MemoryStream();
-        using var bw = new BinaryWriter(ms);
-        using var s = new AlbionWriter(bw);
+        using var s = AlbionSerdes.CreateWriter();
 
         try
         {
             loader.Serdes(asset, s, targetInfo);
-
-            ms.Position = 0;
 
             assets ??= [];
             if (!assets.TryGetValue(targetInfo.Filename, out var list))
@@ -397,7 +391,7 @@ public class ModApplier : GameComponent, IModApplier
                 assets[targetInfo.Filename] = list;
             }
 
-            list.Add((targetInfo, ms.ToArray()));
+            list.Add((targetInfo, s.GetMemory()));
         }
         catch (Exception e)
         {

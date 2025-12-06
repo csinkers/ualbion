@@ -23,8 +23,7 @@ class Program
         foreach (var file in files)
         {
             using var stream = File.OpenRead(file);
-            using var br = new BinaryReader(stream);
-            using var s = new AlbionReader(br);
+            using var s = AlbionSerdes.CreateReader(stream);
             var flic = new FlicFile(s);
             var buffer = new byte[flic.Width * flic.Height];
 

@@ -55,24 +55,21 @@ public static class XDelta
 
     const int FingerprintWidth = 16;
 
-    public static IEnumerable<DiffOperation> Compare(byte[] source, byte[] target)
+    public static IEnumerable<DiffOperation> Compare(ReadOnlyMemory<byte> source, ReadOnlyMemory<byte> target)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(target);
-
-        if (ShortArrayEqualityCheck(source, target))
+        if (ShortArrayEqualityCheck(source.Span, target.Span))
         {
             yield return DiffOperation.Copy(0, source.Length);
             yield break;
         }
 
-        var sindex = InitMatch(source); // Initialise string matching
+        var sindex = InitMatch(source.Span); // Initialise string matching
         for (int i = 0; i < target.Length;) // Loop over target offsets
         {
-            var (offset, length) = FindMatch(source, sindex, target, i); // Find longest match
+            var (offset, length) = FindMatch(source.Span, sindex, target.Span, i); // Find longest match
             if (length < FingerprintWidth)
             {
-                yield return DiffOperation.Insert(target[i]);
+                yield return DiffOperation.Insert(target.Span[i]);
                 i++;
             }
             else
@@ -83,21 +80,20 @@ public static class XDelta
         }
     }
 
-    static Dictionary<uint, int> InitMatch(byte[] source)
+    static Dictionary<uint, int> InitMatch(ReadOnlySpan<byte> source)
     {
         var hashes = new Dictionary<uint, int>(); // Init output array (hash table)
         for (int i = 0; i + FingerprintWidth <= source.Length; i += FingerprintWidth) // Loop over source blocks
         {
             var hash = Adler32(source, i, i + FingerprintWidth); // Compute fingerprint
-            if (!hashes.ContainsKey(hash)) // Keep first match rather than last
-                hashes[hash] = i; // Enter in table
+            hashes.TryAdd(hash, i); // Keep first match rather than last
         }
         return hashes;
     }
 
-    static (int, int) FindMatch(byte[] source, Dictionary<uint, int> sindex, byte[] target, int targetOffset)
+    static (int, int) FindMatch(ReadOnlySpan<byte> source, Dictionary<uint, int> sindex, ReadOnlySpan<byte> target, int targetOffset)
     {
-        if(targetOffset + FingerprintWidth >= target.Length)
+        if (targetOffset + FingerprintWidth >= target.Length)
             return (-1, -1);
 
         var f = Adler32(target, targetOffset, targetOffset + FingerprintWidth); // Compute fingerprint
@@ -108,7 +104,7 @@ public static class XDelta
         return (sourceOffset, l);
     }
 
-    static int MatchLength(byte[] target, int targetOffset, byte[] source, int sourceOffset)
+    static int MatchLength(ReadOnlySpan<byte> target, int targetOffset, ReadOnlySpan<byte> source, int sourceOffset)
     {
         int delta = targetOffset - sourceOffset;
         int i = targetOffset;
@@ -117,7 +113,7 @@ public static class XDelta
         return i - targetOffset;
     }
 
-    static uint Adler32(byte[] target, int from, int to) // https://www.ietf.org/rfc/rfc1950.txt
+    static uint Adler32(ReadOnlySpan<byte> target, int from, int to) // https://www.ietf.org/rfc/rfc1950.txt
     {
         int s1 = 1;
         int s2 = 0;
@@ -135,7 +131,7 @@ public static class XDelta
         return (uint)(s2 * 65536 + (long)s1);
     }
 
-    static bool ShortArrayEqualityCheck(byte[] a, byte[] b)
+    static bool ShortArrayEqualityCheck(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
     {
         if (a.Length > 16 || (a.Length != b.Length))
             return false;
@@ -145,6 +141,7 @@ public static class XDelta
             if (a[i] == b[i]) continue;
             return false;
         }
+
         return true;
     }
 }

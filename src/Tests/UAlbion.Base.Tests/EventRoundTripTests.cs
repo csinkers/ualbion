@@ -75,15 +75,11 @@ public class EventRoundTripTests
         }
     }
 
-    static byte[] EventToBytes(IMapEvent e)
+    static ReadOnlyMemory<byte> EventToBytes(IMapEvent e)
     {
-        using var ms = new MemoryStream();
-        using var bw = new BinaryWriter(ms);
-        using var s = new AlbionWriter(bw);
+        using var s = AlbionSerdes.CreateWriter();
         MapEvent.SerdesEvent(e, s, AssetMapping.Global, MapType.Unknown);
-        bw.Flush();
-        ms.Position = 0;
-        return ms.ToArray();
+        return s.GetMemory();
     }
 /*
     static IMapEvent BytesToEvent(byte[] bytes)
@@ -111,8 +107,8 @@ public class EventRoundTripTests
 
         var bytes1 = EventToBytes(e);
         var bytes2 = EventToBytes(parsed);
-        var hex1 = FormatUtil.BytesToHexString(bytes1);
-        var hex2 = FormatUtil.BytesToHexString(bytes2);
+        var hex1 = FormatUtil.BytesToHexString(bytes1.Span);
+        var hex2 = FormatUtil.BytesToHexString(bytes2.Span);
         if (!string.Equals(hex1, hex2, StringComparison.Ordinal))
             return $"The literal event ({e}) serialised to {hex1}, but the parsed event ({scriptFormat}) serialised to {hex2}";
 
@@ -128,7 +124,7 @@ public class EventRoundTripTests
             catch (Exception ex) { return $"Could not parse \"{expectedToStringResult}\": {ex}"; }
 
             var bytes3 = EventToBytes(roundTripped);
-            var hex3 = FormatUtil.BytesToHexString(bytes3);
+            var hex3 = FormatUtil.BytesToHexString(bytes3.Span);
             if (!string.Equals(hex1, hex2, StringComparison.Ordinal))
                 return $"The literal event ({e}) serialised to {hex1}, but after round-tripping through text ({expectedToStringResult}) it serialised to {hex3}";
         }

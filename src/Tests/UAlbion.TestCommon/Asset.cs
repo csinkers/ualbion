@@ -20,15 +20,15 @@ public static class Asset
     public static void Compare(
         string resultDir,
         string testName,
-        byte[] originalBytes,
-        byte[] roundTripBytes,
+        ReadOnlyMemory<byte> originalBytes,
+        ReadOnlyMemory<byte> roundTripBytes,
         (string, string)[] notes) // (extension, text)
     {
         if (string.IsNullOrEmpty(resultDir))
             throw new ArgumentNullException(nameof(resultDir));
 
         ApiUtil.Assert(originalBytes.Length == roundTripBytes.Length, $"Asset size changed after round trip (delta {roundTripBytes.Length - originalBytes.Length})");
-        ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
+        ApiUtil.Assert(originalBytes.Span.SequenceEqual(roundTripBytes.Span));
 
         var diffs = XDelta.Compare(originalBytes, roundTripBytes).ToArray();
 
@@ -59,11 +59,9 @@ public static class Asset
         return reader.ReadToEnd();
     }
 
-    public static (T, string) Load<T>(byte[] bytes, SerdesFunc<T> serdes, AssetLoadContext context) where T : class
+    public static (T, string) Load<T>(ReadOnlyMemory<byte> bytes, SerdesFunc<T> serdes, AssetLoadContext context) where T : class
     {
-        using var stream = new MemoryStream(bytes);
-        using var br = new BinaryReader(stream);
-        using var ar = new AlbionReader(br, stream.Length);
+        using var ar = AlbionSerdes.CreateReader(bytes);
 
         using var annotationStream = new MemoryStream();
         using var annotationWriter = new StreamWriter(annotationStream);
@@ -93,34 +91,30 @@ public static class Asset
         return (result, annotation);
     }
 
-    public static (byte[], string) Save<T>(T asset, SerdesFunc<T> serdes, AssetLoadContext context) where T : class
+    public static (ReadOnlyMemory<byte>, string) Save<T>(T asset, SerdesFunc<T> serdes, AssetLoadContext context) where T : class
     {
-        using var ms = new MemoryStream();
-        using var bw = new BinaryWriter(ms);
         using var annotationStream = new MemoryStream();
         using var annotationWriter = new StreamWriter(annotationStream);
-        using var aw = new AnnotationProxySerdes(new AlbionWriter(bw), annotationWriter);
+        using var writer = AlbionSerdes.CreateWriter();
+        using var aw = new AnnotationProxySerdes(writer, annotationWriter);
 
         Exception exception = null;
         try { serdes(asset, aw, context); }
         catch (Exception ex) { exception = ex; }
 
-        ms.Position = 0;
-        var bytes = ms.ToArray();
+        ;
         annotationWriter.Flush();
         var annotation = ReadToEnd(annotationStream);
 
         if (exception != null)
             throw new AssetSerializationException(exception, annotation);
 
-        return (bytes, annotation);
+        return (writer.GetMemory(), annotation);
     }
 
     public static string Load(byte[] bytes, Action<ISerdes> serdes)
     {
-        using var stream = new MemoryStream(bytes);
-        using var br = new BinaryReader(stream);
-        using var ar = new AlbionReader(br, stream.Length);
+        using var ar = AlbionSerdes.CreateReader(bytes);
 
         using var annotationStream = new MemoryStream();
         using var annotationWriter = new StreamWriter(annotationStream);
@@ -148,29 +142,25 @@ public static class Asset
         return annotation;
     }
 
-    public static (byte[], string) Save(Action<ISerdes> serdes)
+    public static (ReadOnlyMemory<byte>, string) Save(Action<ISerdes> serdes)
     {
-        using var ms = new MemoryStream();
-        using var bw = new BinaryWriter(ms);
         using var annotationStream = new MemoryStream();
         using var annotationWriter = new StreamWriter(annotationStream);
-        using var aw = new AnnotationProxySerdes(new AlbionWriter(bw), annotationWriter);
+        using var writer = AlbionSerdes.CreateWriter();
+        using var aw = new AnnotationProxySerdes(writer, annotationWriter);
 
         Exception exception = null;
         try { serdes(aw); }
         catch (Exception ex) { exception = ex; }
 
-        ms.Position = 0;
-        var bytes = ms.ToArray();
         annotationWriter.Flush();
         var annotation = ReadToEnd(annotationStream);
 
         if (exception != null)
             throw new AssetSerializationException(exception, annotation);
 
-        return (bytes, annotation);
+        return (writer.GetMemory(), annotation);
     }
-
 
     public static string SaveJson(object asset, IJsonUtil jsonUtil)
     {

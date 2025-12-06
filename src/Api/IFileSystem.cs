@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace UAlbion.Api;
@@ -20,6 +21,6 @@ public interface IFileSystem
     void WriteAllText(string path, string fullText);
     IEnumerable<string> ReadAllLines(string path);
     byte[] ReadAllBytes(string path);
-    void WriteAllBytes(string path, byte[] bytes);
+    void WriteAllBytes(string path, ReadOnlySpan<byte> bytes);
     string ToAbsolutePath(string path);
 }

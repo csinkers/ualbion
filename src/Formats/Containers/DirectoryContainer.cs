@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using SerdesNet;
 using UAlbion.Config;
 using UAlbion.Config.Properties;
@@ -47,27 +46,19 @@ public class DirectoryContainer : IAssetContainer
             }
         }
 
-        var ms = new MemoryStream();
+        using var s = AlbionSerdes.CreateWriter();
         if (subAssets.Count > 0)
         {
-            using var bw = new BinaryWriter(ms, Encoding.UTF8, true);
-            using var s = new AlbionWriter(bw);
             PackedChunks.PackNamed(s, subAssets.Keys.Max() + 1, i => 
                 !subAssets.TryGetValue(i, out var pathAndName)
                     ? ([], null)
                     : (context.Disk.ReadAllBytes(pathAndName.Item1), pathAndName.Item2));
         }
 
-        ms.Position = 0;
-        var br = new BinaryReader(ms);
-        return new AlbionReader(br, ms.Length, () =>
-        {
-            br.Dispose();
-            ms.Dispose();
-        });
+        return AlbionSerdes.CreateReader(s.GetMemory());
     }
 
-    public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
+    public void Write(string path, IList<(AssetLoadContext, ReadOnlyMemory<byte>)> assets, ModContext context)
     {
         ArgumentNullException.ThrowIfNull(assets);
         ArgumentNullException.ThrowIfNull(context);
@@ -85,9 +76,7 @@ public class DirectoryContainer : IAssetContainer
             if (assetBytes.Length == 0)
                 continue;
 
-            using var ms = new MemoryStream(assetBytes);
-            using var br = new BinaryReader(ms);
-            using var s = new AlbionReader(br);
+            using var s = AlbionSerdes.CreateReader(assetBytes);
             var subAssets = PackedChunks.Unpack(s).ToList();
 
             var pattern = info.GetProperty(AssetProps.Pattern, AssetPathPattern.Build("{0}_{1}_{2}.dat"));

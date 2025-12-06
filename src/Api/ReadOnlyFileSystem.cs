@@ -38,6 +38,6 @@ public class ReadOnlyFileSystem : IFileSystem
     public void DeleteFile(string path)                  => throw new NotSupportedException();
     public Stream OpenWriteTruncate(string path)         => throw new NotSupportedException();
     public void WriteAllText(string path, string fullText) => throw new NotSupportedException();
-    public void WriteAllBytes(string path, byte[] bytes) => throw new NotSupportedException();
+    public void WriteAllBytes(string path, ReadOnlySpan<byte> bytes) => throw new NotSupportedException();
     public string ToAbsolutePath(string path) => ApiUtil.CombinePaths(_currentDirectory, path);
 }

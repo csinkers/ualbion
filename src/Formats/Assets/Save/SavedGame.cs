@@ -141,10 +141,9 @@ public class SavedGame
     public IReadOnlyList<VisitedEvent> VisitedEvents => _visitedEvents;
     public IList<PartyMemberId> ActiveMembers { get; private set; } = new PartyMemberId[MaxPartySize];
 
-    public static string GetName(BinaryReader br)
+    public static string GetName(ISerdes s)
     {
-        ArgumentNullException.ThrowIfNull(br);
-        using var s = new AlbionReader(br, br.BaseStream.Length);
+        ArgumentNullException.ThrowIfNull(s);
         ushort nameLength = s.UInt16("NameLength", 0);
         if (nameLength > 1024)
             return "Invalid";

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,7 +14,6 @@ namespace UAlbion.Formats.Containers;
 /// </summary>
 public class JsonObjectContainer : IAssetContainer
 {
-    [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The serializer will handle it")]
     public ISerdes Read(string path, AssetLoadContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
@@ -35,7 +33,7 @@ public class JsonObjectContainer : IAssetContainer
             () => { br.Dispose(); ms.Dispose(); });
     }
 
-    public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
+    public void Write(string path, IList<(AssetLoadContext, ReadOnlyMemory<byte>)> assets, ModContext context)
     {
         ArgumentNullException.ThrowIfNull(assets);
         ArgumentNullException.ThrowIfNull(context);
@@ -47,7 +45,7 @@ public class JsonObjectContainer : IAssetContainer
         var dict = new Dictionary<string, object>();
         foreach (var (info, bytes) in assets)
         {
-            var jObject = context.Json.Deserialize<object>(bytes);
+            var jObject = context.Json.Deserialize<object>(bytes.Span);
             dict[info.AssetId.ToString()] = jObject;
         }
 

@@ -164,39 +164,23 @@ public static class FormatUtil
     public static ISerdes SerializeWithSerdes([InstantHandle] Action<ISerdes> serdes)
     {
         ArgumentNullException.ThrowIfNull(serdes);
-        var ms = new MemoryStream();
-        using var bw = new BinaryWriter(ms, AlbionEncoding, true);
-        using var s = new AlbionWriter(bw);
+        using var s = AlbionSerdes.CreateWriter();
         serdes(s);
-        bw.Flush();
-        ms.Position = 0;
-
-        var br = new BinaryReader(ms);
-        return new AlbionReader(br, ms.Length, () =>
-        {
-            br.Dispose();
-            ms.Dispose();
-        });
+        return AlbionSerdes.CreateReader(s.GetMemory());
     }
 
-    public static byte[] SerializeToBytes([InstantHandle] Action<ISerdes> serdes)
+    public static ReadOnlyMemory<byte> SerializeToBytes([InstantHandle] Action<ISerdes> serdes)
     {
         ArgumentNullException.ThrowIfNull(serdes);
-        var ms = new MemoryStream();
-        using var bw = new BinaryWriter(ms, AlbionEncoding, true);
-        using var s = new AlbionWriter(bw);
+        using var s = AlbionSerdes.CreateWriter();
         serdes(s);
-        bw.Flush();
-        ms.Position = 0;
-        return ms.ToArray();
+        return s.GetMemory();
     }
 
     public static T DeserializeFromBytes<T>(byte[] bytes, [InstantHandle] Func<ISerdes, T> serdes)
     {
         ArgumentNullException.ThrowIfNull(serdes);
-        using var ms = new MemoryStream(bytes);
-        var br = new BinaryReader(ms);
-        using var s = new AlbionReader(br);
+        using var s = AlbionSerdes.CreateReader(bytes);
         return serdes(s);
     }
 

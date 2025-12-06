@@ -25,16 +25,14 @@ public class XldContainer : IAssetContainer
         if (!context.Disk.FileExists(path))
             return null;
 
-        using var s = new AlbionReader(new BinaryReader(context.Disk.OpenRead(path)));
+        using var s = AlbionSerdes.CreateReader(context.Disk.OpenRead(path));
         var bytes = LoadAsset(context.Index, s);
-        if (bytes == null)
-            return null;
-
-        var ms = new MemoryStream(bytes);
-        return new AlbionReader(new BinaryReader(ms));
+        return bytes != null
+            ? AlbionSerdes.CreateReader(bytes)
+            : null;
     }
 
-    public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
+    public void Write(string path, IList<(AssetLoadContext, ReadOnlyMemory<byte>)> assets, ModContext context)
     {
         ArgumentNullException.ThrowIfNull(assets);
         ArgumentNullException.ThrowIfNull(context);
@@ -64,16 +62,15 @@ public class XldContainer : IAssetContainer
             lengths[i] = byIndex.TryGetValue(i, out var buffer) ? buffer.Length : 0;
 
         using var fs = context.Disk.OpenWriteTruncate(path);
-        using var bw = new BinaryWriter(fs);
-        using var s = new AlbionWriter(bw);
+        using var s = AlbionSerdes.CreateWriter(fs);
         HeaderSerdes(lengths, s);
 
         for (int i = 0; i < count; i++)
             if (byIndex.TryGetValue(i, out var buffer))
-                s.Bytes(null, buffer, buffer.Length);
+                s.Bytes(null, buffer.Span);
     }
 
-    static byte[] LoadAsset(int subItem, AlbionReader s)
+    static byte[] LoadAsset(int subItem, ReaderSerdes s)
     {
         var lengths = HeaderSerdes(null, s);
         if (subItem >= lengths.Length)
@@ -85,13 +82,15 @@ public class XldContainer : IAssetContainer
         return s.Bytes(null, null, lengths[subItem]);
     }
 
-    static Dictionary<int, byte[]> LoadAll(IFileSystem disk, string path)
+    static Dictionary<int, ReadOnlyMemory<byte>> LoadAll(IFileSystem disk, string path)
     {
-        using var s = new AlbionReader(new BinaryReader(disk.OpenRead(path)));
+        using var s = AlbionSerdes.CreateReader(disk.OpenRead(path));
         var lengths = HeaderSerdes(null, s);
-        var results = new Dictionary<int, byte[]>();
+        var results = new Dictionary<int, ReadOnlyMemory<byte>>();
+
         for (var index = 0; index < lengths.Length; index++)
             results[index] = s.Bytes(null, null, lengths[index]);
+
         return results;
     }
 

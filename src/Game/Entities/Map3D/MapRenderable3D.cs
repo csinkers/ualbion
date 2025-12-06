@@ -93,7 +93,7 @@ public class MapRenderable3D : GameComponent
 
     protected override void Unsubscribed()
     {
-        _tilemap.Dispose();
+        _tilemap?.Dispose();
         _tilemap = null;
     }
 

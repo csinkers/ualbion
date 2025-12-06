@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using SerdesNet;
 using UAlbion.Api;
 using UAlbion.Api.Visual;
@@ -12,7 +10,6 @@ using Xunit;
 
 namespace UAlbion.Formats.Tests;
 
-[SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
 public class SpriteLoaderTests
 {
     static readonly IJsonUtil JsonUtil = new FormatJsonUtil();
@@ -24,20 +21,15 @@ public class SpriteLoaderTests
     delegate IReadOnlyTexture<byte> SerdesFunc(IReadOnlyTexture<byte> x, ISerdes s, AssetLoadContext context);
     static IReadOnlyTexture<byte> Load(byte[] bytes, AssetLoadContext context, SerdesFunc serdes)
     {
-        using var ms = new MemoryStream(bytes);
-        using var br = new BinaryReader(ms);
-        using var s = new AlbionReader(br);
+        using var s = AlbionSerdes.CreateReader(bytes);
         return serdes(null, s, context);
     }
 
-    static byte[] Save(IReadOnlyTexture<byte> sprite, AssetLoadContext context, SerdesFunc serdes)
+    static ReadOnlyMemory<byte> Save(IReadOnlyTexture<byte> sprite, AssetLoadContext context, SerdesFunc serdes)
     {
-        using var ms = new MemoryStream();
-        using var bw = new BinaryWriter(ms);
-        using var s = new AlbionWriter(bw);
+        using var s = AlbionSerdes.CreateWriter();
         serdes(sprite, s, context);
-        ms.Position = 0;
-        return ms.ToArray();
+        return s.GetMemory();
     }
 
     static void RoundTrip(byte[] bytes, SerdesFunc serdes, Action<IReadOnlyTexture<byte>> assert) => RoundTrip(bytes, serdes, assert, AssetId.None);
@@ -51,7 +43,7 @@ public class SpriteLoaderTests
 
         var roundTripped = Save(sprite, context, serdes);
         var a = FormatUtil.BytesToHexString(bytes);
-        var b = FormatUtil.BytesToHexString(roundTripped);
+        var b = FormatUtil.BytesToHexString(roundTripped.Span);
         Assert.Equal(a, b);
     }
 

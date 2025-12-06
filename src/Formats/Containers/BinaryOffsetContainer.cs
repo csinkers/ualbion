@@ -24,10 +24,9 @@ public class BinaryOffsetContainer : IAssetContainer
         using var br = new BinaryReader(stream);
         stream.Position = context.GetProperty(Offset);
         var bytes = br.ReadBytes(context.Node.Width * context.Node.Height);
-        var ms = new MemoryStream(bytes);
-        return new AlbionReader(new BinaryReader(ms));
+        return AlbionSerdes.CreateReader(bytes);
     }
 
-    public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
+    public void Write(string path, IList<(AssetLoadContext, ReadOnlyMemory<byte>)> assets, ModContext context)
         => ApiUtil.Assert("Binary offset containers do not currently support saving");
 }

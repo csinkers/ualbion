@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
 using SerdesNet;
@@ -132,7 +131,7 @@ public class CharacterSheet : ICharacterSheet
             knownSpells[(int)spell.Class] |= 1U << spell.OffsetInClass;
         }
 
-        return knownSpells.Select(BitConverter.GetBytes).SelectMany(x => x).ToArray();
+        return [..knownSpells.Select(BitConverter.GetBytes).SelectMany(x => x)];
     }
 
     static byte[] GetSpellStrengthBytes(CharacterSheet sheet, ISpellManager spellManager)
@@ -145,7 +144,7 @@ public class CharacterSheet : ICharacterSheet
             spellStrengths[(int)spell.Class * MaxSpellsPerSchool + spell.OffsetInClass] = kvp.Value;
         }
 
-        return spellStrengths.Select(BitConverter.GetBytes).SelectMany(x => x).ToArray();
+        return [..spellStrengths.Select(BitConverter.GetBytes).SelectMany(x => x)];
     }
 
     static void SetSpellData(
@@ -343,20 +342,10 @@ public class CharacterSheet : ICharacterSheet
 
     public CharacterSheet DeepClone(ISpellManager spellManager)
     {
-        using var ms = new MemoryStream(MonsterSheetSize);
+        using var writer = AlbionSerdes.CreateWriter(MonsterSheetSize);
+        Serdes(Id, this, AssetMapping.Global, writer, spellManager);
 
-        using (var bw = new BinaryWriter(ms, FormatUtil.AlbionEncoding, true))
-        using (var writer = new AlbionWriter(bw))
-        {
-            Serdes(Id, this, AssetMapping.Global, writer, spellManager);
-        }
-
-        ms.Position = 0;
-
-        using (var br = new BinaryReader(ms, FormatUtil.AlbionEncoding, true))
-        using (var reader = new AlbionReader(br))
-        {
-            return Serdes(Id, this, AssetMapping.Global, reader, spellManager);
-        }
+        using var reader = AlbionSerdes.CreateReader(writer.GetMemory());
+        return Serdes(Id, this, AssetMapping.Global, reader, spellManager);
     }
 }

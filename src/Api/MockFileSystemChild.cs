@@ -30,6 +30,6 @@ public class MockFileSystemChild : IFileSystem
     public void WriteAllText(string path, string fullText) => _parent.WriteAllText(ToAbsolutePath(path), fullText);
     public IEnumerable<string> ReadAllLines(string path) => _parent.ReadAllLines(ToAbsolutePath(path));
     public byte[] ReadAllBytes(string path) => _parent.ReadAllBytes(ToAbsolutePath(path));
-    public void WriteAllBytes(string path, byte[] bytes) => _parent.WriteAllBytes(ToAbsolutePath(path), bytes);
+    public void WriteAllBytes(string path, ReadOnlySpan<byte> bytes) => _parent.WriteAllBytes(ToAbsolutePath(path), bytes);
     public string ToAbsolutePath(string path) => ApiUtil.CombinePaths(_currentDirectory, path);
 }

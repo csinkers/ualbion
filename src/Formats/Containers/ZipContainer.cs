@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SerdesNet;
 using UAlbion.Config;
 
@@ -10,6 +11,6 @@ namespace UAlbion.Formats.Containers;
 public class ZipContainer : IAssetContainer
 {
     public ISerdes Read(string path, AssetLoadContext context) => throw new System.NotImplementedException();
-    public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
+    public void Write(string path, IList<(AssetLoadContext, ReadOnlyMemory<byte>)> assets, ModContext context)
         => throw new System.NotImplementedException();
 }

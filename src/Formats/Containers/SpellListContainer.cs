@@ -20,12 +20,11 @@ public class SpellListContainer : IAssetContainer
         ArgumentNullException.ThrowIfNull(context);
 
         var stream = context.Disk.OpenRead(path);
-        var br = new BinaryReader(stream);
         stream.Position = context.Index * SpellData.SizeOnDisk;
-        return new AlbionReader(br, SpellData.SizeOnDisk);
+        return AlbionSerdes.CreateReader(stream, SpellData.SizeOnDisk);
     }
 
-    public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
+    public void Write(string path, IList<(AssetLoadContext, ReadOnlyMemory<byte>)> assets, ModContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -41,12 +40,12 @@ public class SpellListContainer : IAssetContainer
 
         for(int i = 0; i <= maxId; i++)
         {
-            var bytes = dict.GetValueOrDefault(i, Blank);
+            ReadOnlyMemory<byte> bytes = dict.GetValueOrDefault(i, Blank);
 
             ApiUtil.Assert(bytes.Length == SpellData.SizeOnDisk,
                 $"Expected spell data for entry {i} to be {SpellData.SizeOnDisk} bytes, but was {bytes.Length}");
 
-            bw.Write(bytes);
+            bw.Write(bytes.Span);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UAlbion.Formats.Assets.Save;
 using Xunit;
 
@@ -29,7 +30,7 @@ public class SimpleFlagSetTests
     [Fact]
     public void RoundTrip()
     {
-        void Test(int[] values)
+        static void Test(int[] values)
         {
             var set = new FlagSet(64);
             foreach (var value in values)
@@ -96,7 +97,7 @@ public class SimpleFlagSetTests
 // 0 9 23 ", loadNotes);
 
         var (repacked, saveNotes) = TestCommon.Asset.Save(s => set.Serdes("TestSet", s));
-        Assert.True(packed.SequenceEqual(repacked));
+        Assert.True(packed.AsSpan().SequenceEqual(repacked.Span));
         Assert.Equal(@"
 0 TestSet = 0102800000000000
 // 0 9 23 ", saveNotes);

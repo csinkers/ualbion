@@ -18,15 +18,12 @@ public class RawContainer : IAssetContainer
         ArgumentNullException.ThrowIfNull(context);
         ApiUtil.Assert(context.Index == 0, "SubItem should always be 0 when accessing a non-container file");
 
-        if (!context.Disk.FileExists(path))
-            return null;
-
-        var stream = context.Disk.OpenRead(path);
-        var br = new BinaryReader(stream);
-        return new AlbionReader(br);
+        return context.Disk.FileExists(path)
+            ? AlbionSerdes.CreateReader(context.Disk.OpenRead(path))
+            : null;
     }
 
-    public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
+    public void Write(string path, IList<(AssetLoadContext, ReadOnlyMemory<byte>)> assets, ModContext context)
     {
         ArgumentNullException.ThrowIfNull(assets);
         ArgumentNullException.ThrowIfNull(context);
@@ -45,6 +42,6 @@ public class RawContainer : IAssetContainer
         if (assets.Count > 1) throw new ArgumentOutOfRangeException(nameof(assets), "A RawContainer can only hold a single asset");
 
         var (_, bytes) = assets.Single();
-        context.Disk.WriteAllBytes(path, bytes);
+        context.Disk.WriteAllBytes(path, bytes.Span);
     }
 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using UAlbion.Api;
 using UAlbion.Config;
+using UAlbion.Formats;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Ids;
@@ -79,9 +80,8 @@ public class PickSaveSlotMenu : ModalDialog
             var filename = BuildSaveFilename(i);
             if (disk.FileExists(filename))
             {
-                using var stream = disk.OpenRead(filename);
-                using var br = new BinaryReader(stream);
-                var name = SavedGame.GetName(br) ?? "Invalid";
+                using var s = AlbionSerdes.CreateReader(disk.OpenRead(filename));
+                var name = SavedGame.GetName(s) ?? "Invalid";
                 var text = $"{i,2}    {name}";
                 ushort slotNumber = i;
                 buttons.Add(new ConversationOption(new LiteralText(text), MaxSaveSlotWidth, null, () => PickSlot(slotNumber)));

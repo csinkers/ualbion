@@ -348,7 +348,7 @@ public class MockFileSystem : IFileSystem
         }
     }
 
-    public void WriteAllBytes(string path, byte[] bytes)
+    public void WriteAllBytes(string path, ReadOnlySpan<byte> bytes)
     {
         if (IsReadOnly)
             throw new NotSupportedException();

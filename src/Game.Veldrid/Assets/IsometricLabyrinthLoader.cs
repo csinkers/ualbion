@@ -73,7 +73,7 @@ public sealed class IsometricLabyrinthLoader : GameComponent, IAssetLoader<Labyr
         return engine;
     }
 
-    IEnumerable<(string, byte[])> Save(LabyrinthData labyrinth, AssetLoadContext context, IsometricMode mode, string pngPath, string tsxPath)
+    IEnumerable<(string, ReadOnlyMemory<byte>)> Save(LabyrinthData labyrinth, AssetLoadContext context, IsometricMode mode, string pngPath, string tsxPath)
     {
         var tileWidth = context.GetProperty(TileWidth, DefaultWidth);
         var tileHeight = context.GetProperty(TileHeight, DefaultHeight);
@@ -113,7 +113,7 @@ public sealed class IsometricLabyrinthLoader : GameComponent, IAssetLoader<Labyr
         yield return (tsxPath, tsxBytes);
     }
 
-    byte[] SaveJson(LabyrinthData labyrinth, AssetLoadContext context) =>
+    ReadOnlyMemory<byte> SaveJson(LabyrinthData labyrinth, AssetLoadContext context) =>
         FormatUtil.SerializeToBytes(s =>
             _jsonLoader.Serdes(labyrinth, s, context));
 
@@ -144,7 +144,7 @@ public sealed class IsometricLabyrinthLoader : GameComponent, IAssetLoader<Labyr
         var wallPng     = context.GetProperty(WallPngPattern);
         var contentsPng = context.GetProperty(ContentsPngPattern);
 
-        var files = new List<(string, byte[])> {(json.Format(path), SaveJson(existing, context))};
+        var files = new List<(string, ReadOnlyMemory<byte>)> {(json.Format(path), SaveJson(existing, context))};
         files.AddRange(Save(existing, context, IsometricMode.Floors,   BuildPath(floorPng),    BuildPath(floorTsx)));
         files.AddRange(Save(existing, context, IsometricMode.Ceilings, BuildPath(ceilingPng),  BuildPath(ceilingTsx)));
         files.AddRange(Save(existing, context, IsometricMode.Walls,    BuildPath(wallPng),     BuildPath(wallTsx)));

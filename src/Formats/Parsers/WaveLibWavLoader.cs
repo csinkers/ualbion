@@ -76,13 +76,13 @@ public class WaveLibWavLoader : IAssetLoader<WaveLib>
         {
             var sample = existing.Samples[i];
             if (!sample.Active)
-                return ([], null);
+                return (Array.Empty<byte>(), null);
 
             string extension = Invariant($"i{sample.Instrument}t{sample.Type}");
             var pattern = context.GetProperty(AssetProps.Pattern, DefaultPattern);
             var name = pattern.Format(context.BuildAssetPath(i, extension));
             var bytes = FormatUtil.SerializeToBytes(s2 => WavLoader.Serdes(sample, s2, context));
-            return (bytes, name);
+            return (bytes.ToArray(), name);
         });
         return existing;
     }

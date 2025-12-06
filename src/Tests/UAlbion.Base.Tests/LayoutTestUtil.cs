@@ -66,9 +66,10 @@ public static class LayoutTestUtil
         var sb = new StringBuilder();
         for (int i = 0; i < actual.Chains.Count; i++)
         {
-            var expectedBytes = BytesForEventChain(expected.Events, expected.Chains[i]);
-            var actualBytes = BytesForEventChain(actual.Events, actual.Chains[i]);
-            if (!expectedBytes.SequenceEqual(actualBytes))
+            ReadOnlyMemory<byte> expectedBytes = BytesForEventChain(expected.Events, expected.Chains[i]);
+            ReadOnlyMemory<byte> actualBytes = BytesForEventChain(actual.Events, actual.Chains[i]);
+
+            if (!expectedBytes.Span.SequenceEqual(actualBytes.Span))
                 sb.AppendLine($"Chain{i} mismatch on {assetId}");
         }
 
@@ -76,7 +77,7 @@ public static class LayoutTestUtil
         {
             var expectedBytes = BytesForEventChain(expected.Events, expected.ExtraEntryPoints[i]);
             var actualBytes = BytesForEventChain(actual.Events, actual.ExtraEntryPoints[i]);
-            if (!expectedBytes.SequenceEqual(actualBytes))
+            if (!expectedBytes.Span.SequenceEqual(actualBytes.Span))
                 sb.AppendLine($"Extra entry {i} ({actual.ExtraEntryPoints[i]}) mismatch on {assetId}");
         }
 
@@ -84,7 +85,7 @@ public static class LayoutTestUtil
         return sb.Length == 0;
     }
 
-    static byte[] BytesForEventChain(IList<EventNode> events, int entryPoint) =>
+    static ReadOnlyMemory<byte> BytesForEventChain(IList<EventNode> events, int entryPoint) =>
         FormatUtil.SerializeToBytes(s =>
         {
             var visited = new bool[events.Count];

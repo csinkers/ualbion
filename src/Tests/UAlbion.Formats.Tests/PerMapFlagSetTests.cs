@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UAlbion.Config;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Ids;
@@ -123,7 +124,7 @@ public class PerMapFlagSetTests
 // Map.KounosCave5 (256): 0 ", loadNotes);
 
         var (repacked, saveNotes) = TestCommon.Asset.Save(s => set.Serdes("TestSet", s));
-        Assert.True(packed.SequenceEqual(repacked));
+        Assert.True(packed.AsSpan().SequenceEqual(repacked.Span));
         Assert.Equal(@"
 0 TestSet =  
     0000: 0102 8000 0000 0000-0000 0000 0000 0000 ................

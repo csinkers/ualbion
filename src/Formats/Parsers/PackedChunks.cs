@@ -41,7 +41,7 @@ public static class PackedChunks
     public static void Pack(ISerdes s, int count, Func<int, byte[]> buildChunk)
         => PackNamed(s, count, i => (buildChunk(i), null));
 
-    public static void PackNamed(ISerdes s, int count, Func<int, (byte[], string)> buildChunk)
+    public static void PackNamed(ISerdes s, int count, Func<int, (ReadOnlyMemory<byte>, string)> buildChunk)
     {
         ArgumentNullException.ThrowIfNull(s);
         ArgumentNullException.ThrowIfNull(buildChunk);
@@ -49,7 +49,7 @@ public static class PackedChunks
         if (count == 1)
         {
             var (chunk, _) = buildChunk(0);
-            s.Bytes(null, chunk, chunk.Length);
+            s.Bytes(null, chunk.ToArray());
             return;
         }
 
@@ -62,7 +62,7 @@ public static class PackedChunks
             int nameLength = s.Int32(i, name?.Length ?? 0);
             s.AlbionString(i, name ?? string.Empty, nameLength);
             s.Int32(null, chunk.Length);
-            s.Bytes(null, chunk, chunk.Length);
+            s.Bytes(null, chunk.ToArray());
         }
     }
 }

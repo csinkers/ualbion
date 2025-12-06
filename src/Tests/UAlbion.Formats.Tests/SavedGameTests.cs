@@ -13,7 +13,6 @@ using Xunit;
 
 namespace UAlbion.Formats.Tests;
 
-[SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
 public class SavedGameTests
 {
     static void RoundTrip(string file)
@@ -54,15 +53,14 @@ public class SavedGameTests
         using var br = new BinaryReader(stream);
         using var annotationReadStream = new MemoryStream();
         using var annotationReader = new StreamWriter(annotationReadStream);
-        using var ar = new AnnotationProxySerdes(new AlbionReader(br, stream.Length), annotationReader);
+        using var ar = new AnnotationProxySerdes(AlbionSerdes.CreateReader(br), annotationReader);
         var save = SavedGame.Serdes(null, mapping, ar, spellManager);
 
         // === Save ===
-        using var ms = new MemoryStream();
-        using var bw = new BinaryWriter(ms);
         using var annotationWriteStream = new MemoryStream();
         using var annotationWriter = new StreamWriter(annotationWriteStream);
-        using var aw = new AnnotationProxySerdes(new AlbionWriter(bw), annotationWriter);
+        using var writer = AlbionSerdes.CreateWriter();
+        using var aw = new AnnotationProxySerdes(writer, annotationWriter);
         SavedGame.Serdes(save, mapping, aw, spellManager);
 
         File.WriteAllText(file + ".json", jsonUtil.Serialize(save));
@@ -70,10 +68,10 @@ public class SavedGameTests
         // write out debugging files and compare round-tripped data
         br.BaseStream.Position = 0;
         var originalBytes = br.ReadBytes((int)stream.Length);
-        var roundTripBytes = ms.ToArray();
+        var roundTripBytes = writer.GetMemory();
 
         ApiUtil.Assert(originalBytes.Length == roundTripBytes.Length, $"Save game size changed after round trip (delta {roundTripBytes.Length - originalBytes.Length})");
-        ApiUtil.Assert(originalBytes.SequenceEqual(roundTripBytes));
+        ApiUtil.Assert(originalBytes.AsSpan().SequenceEqual(roundTripBytes.Span));
 
         var diffs = XDelta.Compare(originalBytes, roundTripBytes).ToArray();
         if (diffs.Length != 1)
@@ -87,14 +85,12 @@ public class SavedGameTests
                 return reader.ReadToEnd();
             }
 
-            ms.Position = 0;
-            using var reloadBr = new BinaryReader(ms);
             using var reloadAnnotationStream = new MemoryStream();
             using var reloadAnnotationReader = new StreamWriter(reloadAnnotationStream);
-            using var reloadFacade = new AnnotationProxySerdes(new AlbionReader(reloadBr, stream.Length), reloadAnnotationReader);
+            using var reloadFacade = new AnnotationProxySerdes(AlbionSerdes.CreateReader(writer.GetMemory()), reloadAnnotationReader);
             SavedGame.Serdes(null, mapping, reloadFacade, spellManager);
 
-            File.WriteAllBytes(file + ".bin", roundTripBytes);
+            File.WriteAllBytes(file + ".bin", roundTripBytes.Span);
             File.WriteAllText(file + ".pre.txt", ReadToEnd(annotationReadStream));
             File.WriteAllText(file + ".post.txt", ReadToEnd(annotationWriteStream));
             File.WriteAllText(file + ".reload.txt", ReadToEnd(reloadAnnotationStream));

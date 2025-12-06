@@ -75,7 +75,6 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
         set => _game.MapIdForNpcs = value;
     }
 
-#pragma warning disable CA1506 // '.ctor' is coupled with '42' different types from '11' different namespaces. Rewrite or refactor the code to decrease its class coupling below '41'.
     public GameState()
     {
         OnAsync<NewGameEvent>(e => NewGame(e.MapId, e.X, e.Y));
@@ -104,7 +103,6 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
         AttachChild(new InventoryManager(GetWriteableInventory, GetItem));
         _sheetApplier = AttachChild(new SheetApplier());
     }
-#pragma warning restore CA1506 // '.ctor' is coupled with '42' different types from '11' different namespaces. Rewrite or refactor the code to decrease its class coupling below '41'.
 
     void OnLoadMap(LoadMapEvent e)
     {
@@ -375,9 +373,8 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
 
         // var key = new AssetId(AssetType.SavedGame, id);
         using var stream = disk.OpenWriteTruncate(IdToPath(id));
-        using var bw = new BinaryWriter(stream);
+        using var aw = AlbionSerdes.CreateWriter(stream);
         var mapping = new AssetMapping(); // TODO
-        using var aw = new AlbionWriter(bw);
         SavedGame.Serdes(_game, mapping, aw, spellManager);
     }
 

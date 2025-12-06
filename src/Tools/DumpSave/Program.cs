@@ -65,9 +65,8 @@ static class Program
     {
         var disk = exchange.Resolve<IFileSystem>();
         var stream = disk.OpenRead(filename);
-        using var br = new BinaryReader(stream, Encoding.GetEncoding(850));
         var spellManager = exchange.Resolve<ISpellManager>();
-        var s1 = new AlbionReader(br, stream.Length);
+        var s1 = AlbionSerdes.CreateReader(stream);
 
         using var ms = new MemoryStream();
         var s2 = new AnnotationProxySerdes(s1, writer);
@@ -84,28 +83,27 @@ static class Program
 
     static bool VerifyRoundTrip(Stream fileStream, TextWriter writer, SavedGame save, AssetMapping mapping, ISpellManager spellManager)
     {
-        using var ms = new MemoryStream((int)fileStream.Length);
-        using var bw = new BinaryWriter(ms, Encoding.GetEncoding(850));
-        SavedGame.Serdes(save, mapping, new AlbionWriter(bw), spellManager);
+        using var s = AlbionSerdes.CreateWriter((int)fileStream.Length);
+        SavedGame.Serdes(save, mapping, s, spellManager);
 
-        if (ms.Position != fileStream.Length)
+        if (s.Offset != fileStream.Length)
         {
-            writer.WriteLine($"Assertion failed: Round-trip length mismatch (read {fileStream.Length}, wrote {ms.Position}");
+            writer.WriteLine($"Assertion failed: Round-trip length mismatch (read {fileStream.Length}, wrote {s.Offset}");
             return false;
         }
 
-        ms.Position = 0;
         fileStream.Position = 0;
         int errors = 0;
         const int maxErrors = 20;
-        for (int i = 0; i < ms.Length && i < fileStream.Length && errors < maxErrors; i++)
+        var bytes = s.GetMemory();
+        for (int i = 0; i < bytes.Length && i < fileStream.Length && errors < maxErrors; i++)
         {
-            var a = ms.ReadByte();
+            var a = bytes.Span[i];
             var b = fileStream.ReadByte();
             if (a == b) 
                 continue;
 
-            writer.WriteLine($"Assertion failed: Round-trip mismatch at {ms.Position:X}: read {a}, wrote {b}");
+            writer.WriteLine($"Assertion failed: Round-trip mismatch at {i:X}: read {a}, wrote {b}");
             errors++;
         }
 
@@ -115,11 +113,10 @@ static class Program
     static SavedGame VerifiedLoad(EventExchange exchange, string filename, TextWriter writer)
     {
         var disk = exchange.Resolve<IFileSystem>();
-        var stream = disk.OpenRead(filename);
-        using var br = new BinaryReader(stream);
-
+        using var stream = disk.OpenRead(filename);
+        using var s = AlbionSerdes.CreateReaderKeepOpen(stream);
         var spellManager = exchange.Resolve<ISpellManager>();
-        var save = SavedGame.Serdes(null, AssetMapping.Global, new AlbionReader(br, stream.Length), spellManager);
+        var save = SavedGame.Serdes(null, AssetMapping.Global, s, spellManager);
 
         if (!VerifyRoundTrip(stream, writer, save, AssetMapping.Global, spellManager))
             throw new InvalidOperationException("Saved-game round-tripping failed");
@@ -134,7 +131,7 @@ static class Program
         var exchange = AssetSystem.SetupSimple(disk, AssetMapping.Global, "Base");
 
         var commands = ParseCommands(args.Skip(1)).ToList();
-        if (!commands.Any())
+        if (commands.Count == 0)
         {
             PrintUsage();
             return;

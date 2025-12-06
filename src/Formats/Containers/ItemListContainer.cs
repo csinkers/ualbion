@@ -18,12 +18,11 @@ public class ItemListContainer : IAssetContainer
     {
         ArgumentNullException.ThrowIfNull(context);
         var stream = context.Disk.OpenRead(path);
-        var br = new BinaryReader(stream);
         stream.Position = context.Index * ItemData.SizeOnDisk;
-        return new AlbionReader(br, ItemData.SizeOnDisk);
+        return AlbionSerdes.CreateReader(stream, ItemData.SizeOnDisk);
     }
 
-    public void Write(string path, IList<(AssetLoadContext, byte[])> assets, ModContext context)
+    public void Write(string path, IList<(AssetLoadContext, ReadOnlyMemory<byte>)> assets, ModContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -37,7 +36,7 @@ public class ItemListContainer : IAssetContainer
         {
             ApiUtil.Assert(bytes.Length == ItemData.SizeOnDisk,
                 $"Expected item data for {info.AssetId} to be {ItemData.SizeOnDisk} bytes, but was {bytes.Length}");
-            bw.Write(bytes);
+            bw.Write(bytes.Span);
         }
     }
 }

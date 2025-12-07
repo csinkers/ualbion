@@ -3,6 +3,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 using UAlbion.Core.Veldrid.Etm;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Veldrid.Meshes;
@@ -14,7 +15,7 @@ using UAlbion.Game.Veldrid.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
 using static UAlbion.Game.Veldrid.AlbionRenderSystemConstants;
-using ImGuiRenderer = UAlbion.Core.Veldrid.ImGuiRenderer;
+using ImGuiRenderer = UAlbion.Core.Veldrid.Diag.ImGuiRenderer;
 
 namespace UAlbion;
 
@@ -115,7 +116,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
 
                     menus.AddMenuItem(new ShowWindowMenuItem(
                         "Positions",
-                        "Windows",
+                        "Windows/Debug",
                         name => new PositionsWindow(name, mainCamera)));
                 })
                 .Resources(globalProvider2)

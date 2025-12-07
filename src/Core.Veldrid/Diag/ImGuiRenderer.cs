@@ -15,7 +15,7 @@ using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Visual;
 
-namespace UAlbion.Core.Veldrid;
+namespace UAlbion.Core.Veldrid.Diag;
 
 public class ImGuiPreRenderEvent : Event, IVerboseEvent
 {
@@ -25,13 +25,13 @@ public class ImGuiPreRenderEvent : Event, IVerboseEvent
 public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is largely based on Veldrid.ImGuiRenderer from Veldrid.ImGui
 {
     readonly OutputDescription _outputFormat;
-    readonly IntPtr _fontAtlasId = 1;
+    readonly nint _fontAtlasId = 1;
     readonly Vector2 _scaleFactor = Vector2.One;
 
     // Image trackers
     readonly Dictionary<TextureView, ResourceSetInfo> _setsByView = [];
     readonly Dictionary<Texture, TextureView> _autoViewsByTexture = [];
-    readonly Dictionary<IntPtr, ResourceSetInfo> _viewsById = [];
+    readonly Dictionary<nint, ResourceSetInfo> _viewsById = [];
     readonly List<IDisposable> _ownedResources = [];
     readonly ImGuiPreRenderEvent _preRenderEvent = new();
     int _lastAssignedId = 100;
@@ -121,7 +121,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     /// Gets or creates a handle for a texture to be drawn with ImGui.
     /// Pass the returned handle to Image() or ImageButton().
     /// </summary>
-    public IntPtr GetOrCreateImGuiBinding(ResourceFactory factory, TextureView textureView)
+    public nint GetOrCreateImGuiBinding(ResourceFactory factory, TextureView textureView)
     {
         ArgumentNullException.ThrowIfNull(factory);
         ArgumentNullException.ThrowIfNull(textureView);
@@ -154,7 +154,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     /// Gets or creates a handle for a texture to be drawn with ImGui.
     /// Pass the returned handle to Image() or ImageButton().
     /// </summary>
-    public IntPtr GetOrCreateImGuiBinding(ResourceFactory factory, Texture texture)
+    public nint GetOrCreateImGuiBinding(ResourceFactory factory, Texture texture)
     {
         ArgumentNullException.ThrowIfNull(factory);
         ArgumentNullException.ThrowIfNull(texture);
@@ -183,7 +183,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     /// <summary>
     /// Retrieves the shader texture binding for the given helper handle.
     /// </summary>
-    public ResourceSet GetImageResourceSet(IntPtr imGuiBinding)
+    public ResourceSet GetImageResourceSet(nint imGuiBinding)
     {
         if (!_viewsById.TryGetValue(imGuiBinding, out ResourceSetInfo rsi))
             throw new InvalidOperationException("No registered ImGui binding with id " + imGuiBinding);
@@ -250,7 +250,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
         _windowWidth = window.PixelWidth;
         _windowHeight = window.PixelHeight;
 
-        IntPtr context = ImGui.CreateContext();
+        nint context = ImGui.CreateContext();
         ImGui.SetCurrentContext(context);
 
         var io = ImGui.GetIO();
@@ -329,7 +329,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
         RecreateFontDeviceTexture(gd);
     }
 
-    IntPtr GetNextImGuiBindingId() => Interlocked.Increment(ref _lastAssignedId);
+    nint GetNextImGuiBindingId() => Interlocked.Increment(ref _lastAssignedId);
 
     byte[] LoadShader(ResourceFactory factory, string name)
     {
@@ -373,7 +373,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
         _fontTexture.Name = "ImGui.NET Font Texture";
         gd.UpdateTexture(
             _fontTexture,
-            (IntPtr)pixels,
+            (nint)pixels,
             (uint)(bytesPerPixel * width * height),
             0,
             0,
@@ -628,10 +628,10 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
             for (int cmdIndex = 0; cmdIndex < cmdList.CmdBuffer.Size; cmdIndex++)
             {
                 ImDrawCmdPtr pcmd = cmdList.CmdBuffer[cmdIndex];
-                if (pcmd.UserCallback != IntPtr.Zero)
+                if (pcmd.UserCallback != nint.Zero)
                     throw new NotImplementedException();
 
-                if (pcmd.TextureId != IntPtr.Zero)
+                if (pcmd.TextureId != nint.Zero)
                 {
                     cl.SetGraphicsResourceSet(1, pcmd.TextureId == _fontAtlasId
                         ? _fontTextureResourceSet!
@@ -657,10 +657,10 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
 
     struct ResourceSetInfo
     {
-        public readonly IntPtr ImGuiBinding;
+        public readonly nint ImGuiBinding;
         public readonly ResourceSet ResourceSet;
 
-        public ResourceSetInfo(IntPtr imGuiBinding, ResourceSet resourceSet)
+        public ResourceSetInfo(nint imGuiBinding, ResourceSet resourceSet)
         {
             ImGuiBinding = imGuiBinding;
             ResourceSet = resourceSet;

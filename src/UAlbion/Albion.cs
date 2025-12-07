@@ -2,10 +2,12 @@
 using System.Numerics;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
+using UAlbion.Api.Settings;
 using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
@@ -26,14 +28,12 @@ using UAlbion.Game.Gui.Status;
 using UAlbion.Game.Gui.Text;
 using UAlbion.Game.Input;
 using UAlbion.Game.Scenes;
-using UAlbion.Game.Settings;
 using UAlbion.Game.State;
 using UAlbion.Game.Text;
 using UAlbion.Game.Veldrid;
 using UAlbion.Game.Veldrid.Audio;
 using UAlbion.Game.Veldrid.Diag;
 using UAlbion.Game.Veldrid.Input;
-using Vortice.Direct3D11;
 
 namespace UAlbion;
 
@@ -71,7 +71,6 @@ static class Albion
 
     static void RegisterComponents(EventExchange global, CommandLineOptions commandLine)
     {
-#pragma warning disable CA2000 // Dispose objects before losing scope
         PerfTracker.StartupEvent("Creating main components");
         global.Register<ICommonColors>(new CommonColors());
 
@@ -206,7 +205,6 @@ static class Albion
             gameServices.Add(new AudioManager(false));
 
         global.Attach(gameServices);
-#pragma warning restore CA2000 // Dispose objects before losing scope
 
         if (commandLine.DebugMenus)
             global.Enqueue(new ToggleDiagnosticsEvent(), null);
@@ -223,21 +221,23 @@ static class Albion
 #endif
 
         // Note: ImGuiGameWindow and PositionsWindow are added in AlbionRenderSystem so they can have access to internal render system components.
-        var items = new[]
+        var items = new IMenuItem[]
         {
-            new ShowWindowMenuItem("Asset Explorer", "Windows", name => new AssetExplorerWindow(name)),
-            new ShowWindowMenuItem("Asset Viewer",   "Windows", name => new AssetViewerWindow(name)),
-            new ShowWindowMenuItem("Breakpoints",    "Windows", name => new BreakpointsWindow(name)),
-            new ShowWindowMenuItem("Script",         "Windows", name => new ScriptWindow(name)),
+            new ShowWindowMenuItem("Asset Explorer", "Windows/Assets", name => new AssetExplorerWindow(name)),
+            new ShowWindowMenuItem("Asset Viewer",   "Windows/Assets", name => new AssetViewerWindow(name)),
+            new ShowWindowMenuItem("Breakpoints",    "Windows/Debug", name => new BreakpointsWindow(name)),
+            new ShowWindowMenuItem("Inspector Demo", "Windows/Debug", name => new InspectorDemoWindow(name)),
+            new ShowWindowMenuItem("Inspector",      "Windows/Debug", name => new InspectorWindow(name)),
+            new ShowWindowMenuItem("Script",         "Windows/Debug", name => new ScriptWindow(name)),
+            new ShowWindowMenuItem("Settings",       "Windows/Debug", name => new SettingsWindow(name)),
+            new ShowWindowMenuItem("Stats",          "Windows/Debug", name => new StatsWindow(name)),
+            new ShowWindowMenuItem("Threads",        "Windows/Debug", name => new ThreadsWindow(name)),
+            new ShowWindowMenuItem("UI Layout",      "Windows/Debug", name => new LayoutWindow(name)),
+            new ShowWindowMenuItem("Watch",          "Windows/Debug", name => new WatchWindow(name, globals)),
+            new ShowWindowMenuItem("ImGuiDemo",      "Windows/Misc", name => new DemoWindow(name)),
             new ShowWindowMenuItem("Console",        "Windows", name => new ImGuiConsoleLogger(name)),
-            new ShowWindowMenuItem("ImGuiDemo",      "Windows", name => new DemoWindow(name)),
-            new ShowWindowMenuItem("Inspector Demo", "Windows", name => new InspectorDemoWindow(name)),
-            new ShowWindowMenuItem("Inspector",      "Windows", name => new InspectorWindow(name)),
-            new ShowWindowMenuItem("Settings",       "Windows", name => new SettingsWindow(name)),
-            new ShowWindowMenuItem("Stats",          "Windows", name => new StatsWindow(name)),
-            new ShowWindowMenuItem("Threads",        "Windows", name => new ThreadsWindow(name)),
-            new ShowWindowMenuItem("UI Layout",      "Windows", name => new LayoutWindow(name)),
-            new ShowWindowMenuItem("Watch",          "Windows", name => new WatchWindow(name, globals)),
+            new AdhocMenuItem("Save Settings", "File", manager => manager.SaveSettings()),
+            new AdhocMenuItem("Close all", "Windows", manager => manager.CloseAllWindows()),
             // new ShowWindowMenuItem("Profiler", "Windows", name => new ProfilerWindow(name)),
         };
 

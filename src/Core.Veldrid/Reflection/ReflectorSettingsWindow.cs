@@ -2,31 +2,26 @@
 using System.Linq;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
+using UAlbion.Core.Veldrid.Diag;
 
 namespace UAlbion.Core.Veldrid.Reflection;
 
 public class ReflectorSettingsWindow : Component, IImGuiWindow
 {
     public const string NamePrefix = "Reflector Settings";
-    static readonly DiagEditStyle[] Styles =
-        typeof(DiagEditStyle)
-            .GetEnumValues()
-            .OfType<DiagEditStyle>()
-            .ToArray();
 
-    static readonly string[] StyleNames = Styles.Select(x => x.ToString()).ToArray();
+    static readonly DiagEditStyle[] Styles = [.. typeof(DiagEditStyle).GetEnumValues().OfType<DiagEditStyle>()];
+    static readonly string[] StyleNames = [.. Styles.Select(x => x.ToString())];
 
     public string Name => NamePrefix;
 
-    public void Draw()
+    public ImGuiWindowDrawResult Draw()
     {
         bool open = true;
         ImGui.Begin(Name, ref open);
         DrawInner();
         ImGui.End();
-
-        if (!open)
-            Remove();
+        return open ? ImGuiWindowDrawResult.None : ImGuiWindowDrawResult.Closed;
     }
 
     void DrawInner()

@@ -3,7 +3,7 @@ using System.Numerics;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
-using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 using UAlbion.Core.Visual;
 using UAlbion.Game.Input;
 using UAlbion.Game.State;
@@ -21,7 +21,7 @@ public class PositionsWindow : Component, IImGuiWindow
         _cameraProvider = cameraProvider ?? throw new ArgumentNullException(nameof(cameraProvider));
     }
 
-    public void Draw()
+    public ImGuiWindowDrawResult Draw()
     {
         bool open = true;
         ImGui.Begin(Name, ref open);
@@ -33,7 +33,7 @@ public class PositionsWindow : Component, IImGuiWindow
         {
             ImGui.Text("No camera found");
             ImGui.End();
-            return;
+            return open ? ImGuiWindowDrawResult.None : ImGuiWindowDrawResult.Closed;
         }
 
         Vector3 cameraPosition = camera.Position;
@@ -66,8 +66,6 @@ public class PositionsWindow : Component, IImGuiWindow
         ImGui.TextUnformatted($"TileSize: {map?.TileSize}");
 
         ImGui.End();
-
-        if (!open)
-            Remove();
+        return open ? ImGuiWindowDrawResult.None : ImGuiWindowDrawResult.Closed;
     }
 }

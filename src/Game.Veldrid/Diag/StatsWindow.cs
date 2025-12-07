@@ -2,7 +2,7 @@
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
-using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 using UAlbion.Game.Input;
 using UAlbion.Game.Veldrid.Audio;
 
@@ -13,7 +13,7 @@ public class StatsWindow : Component, IImGuiWindow
     public string Name { get; }
     public StatsWindow(string name) => Name = name;
 
-    public void Draw()
+    public ImGuiWindowDrawResult Draw()
     {
         bool open = true;
         ImGui.Begin(Name, ref open);
@@ -91,7 +91,6 @@ public class StatsWindow : Component, IImGuiWindow
 
         ImGui.End();
 
-        if (!open)
-            Remove();
+        return open ? ImGuiWindowDrawResult.None : ImGuiWindowDrawResult.Closed;
     }
 }

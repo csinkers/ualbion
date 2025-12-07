@@ -1,6 +1,6 @@
 ﻿using ImGuiNET;
 using UAlbion.Api.Eventing;
-using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 using UAlbion.Core.Veldrid.Reflection;
 using UAlbion.Game.State;
 
@@ -10,7 +10,7 @@ public class WatchWindow(string name, object globals) : Component, IImGuiWindow
 {
     public string Name { get; } = name;
 
-    public void Draw()
+    public ImGuiWindowDrawResult Draw()
     {
         bool open = true;
         ImGui.Begin(Name, ref open);
@@ -28,8 +28,6 @@ public class WatchWindow(string name, object globals) : Component, IImGuiWindow
         reflectorManager.RenderNode("ImGui", Resolve<IImGuiManager>());
 
         ImGui.End();
-
-        if (!open)
-            Remove();
+        return open ? ImGuiWindowDrawResult.None : ImGuiWindowDrawResult.Closed;
     }
 }

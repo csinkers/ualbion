@@ -1,6 +1,6 @@
 ﻿using ImGuiNET;
 using UAlbion.Api.Eventing;
-using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -18,7 +18,7 @@ public class BreakpointsWindow : Component, IImGuiWindow
         _newBreakpoint = AttachChild(new DiagNewBreakpoint());
     }
 
-    public void Draw()
+    public ImGuiWindowDrawResult Draw()
     {
         bool open = true;
         ImGui.Begin(Name, ref open);
@@ -45,8 +45,6 @@ public class BreakpointsWindow : Component, IImGuiWindow
         }
 
         ImGui.End();
-
-        if (!open)
-            Remove();
+        return open ? ImGuiWindowDrawResult.None : ImGuiWindowDrawResult.Closed;
     }
 }

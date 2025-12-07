@@ -1,6 +1,5 @@
 ﻿using UAlbion.Api.Settings;
 
-#pragma warning disable CA1034 // Nested types should not be visible
 namespace UAlbion.Core;
 
 public class CoreVars
@@ -49,4 +48,3 @@ public class CoreVars
         public StringVar ImGuiLayout { get; } = new(Library, "Core.UI.ImGuiLayout", "");
     }
 }
-#pragma warning restore CA1034 // Nested types should not be visible

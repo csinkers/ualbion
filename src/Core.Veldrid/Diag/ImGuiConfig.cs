@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace UAlbion.Core.Veldrid;
+namespace UAlbion.Core.Veldrid.Diag;
 
 public class ImGuiConfig
 {

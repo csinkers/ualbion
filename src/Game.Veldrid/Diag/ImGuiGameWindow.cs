@@ -5,6 +5,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 using UAlbion.Core.Veldrid.Events;
 using Veldrid;
 using VeldridGen.Interfaces;
@@ -30,7 +31,7 @@ public class ImGuiGameWindow : Component, IImGuiWindow
 
     protected override void Subscribed() => _dirty = true; // Make sure GameWindow gets resized when first displayed
 
-    public void Draw()
+    public ImGuiWindowDrawResult Draw()
     {
         var manager = Resolve<IImGuiManager>();
         var input = manager.LastInput;
@@ -103,7 +104,6 @@ public class ImGuiGameWindow : Component, IImGuiWindow
             }
         }
 
-        if (!open)
-            Remove();
+        return open ? ImGuiWindowDrawResult.None : ImGuiWindowDrawResult.Closed;
     }
 }

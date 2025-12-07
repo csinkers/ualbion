@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UAlbion.Core.Veldrid;
+namespace UAlbion.Core.Veldrid.Diag;
 
 public class ImGuiConfigSection
 {

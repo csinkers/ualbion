@@ -8,6 +8,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 using UAlbion.Core.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;

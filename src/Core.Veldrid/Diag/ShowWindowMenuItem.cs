@@ -1,7 +1,7 @@
 ﻿using System;
 using ImGuiNET;
 
-namespace UAlbion.Core.Veldrid;
+namespace UAlbion.Core.Veldrid.Diag;
 
 public class ShowWindowMenuItem : IMenuItem
 {

@@ -1,4 +1,4 @@
-﻿namespace UAlbion.Core.Veldrid;
+﻿namespace UAlbion.Core.Veldrid.Diag;
 
 public interface IImGuiMenuManager
 {

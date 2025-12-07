@@ -2,7 +2,7 @@
 using System.Numerics;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
-using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 using UAlbion.Core.Veldrid.Reflection;
 using UAlbion.Game.State;
 
@@ -50,12 +50,12 @@ public class InspectorDemoWindow(string name) : Component, IImGuiWindow
     readonly TestObject _testObject = new();
     public string Name { get; } = name;
 
-    public void Draw()
+    public ImGuiWindowDrawResult Draw()
     {
         ReflectorUtil.SwapAuxiliaryState();
         var state = TryResolve<IGameState>();
         if (state == null)
-            return;
+            return ImGuiWindowDrawResult.Closed;
 
         bool open = true;
         ImGui.Begin(Name, ref open);
@@ -64,8 +64,6 @@ public class InspectorDemoWindow(string name) : Component, IImGuiWindow
         reflectorManager.RenderNode("Test", _testObject);
 
         ImGui.End();
-
-        if (!open)
-            Remove();
+        return open ? ImGuiWindowDrawResult.None : ImGuiWindowDrawResult.Closed;
     }
 }

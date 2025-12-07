@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
+using UAlbion.Core.Veldrid.Diag;
 
 namespace UAlbion.Core.Veldrid.Reflection;
 

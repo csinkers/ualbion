@@ -4,7 +4,7 @@ using System.Numerics;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -19,7 +19,7 @@ public class AssetExplorerWindow : Component, IImGuiWindow
     public string Name { get; }
     public AssetExplorerWindow(string name) => Name = name;
 
-    public void Draw()
+    public ImGuiWindowDrawResult Draw()
     {
         bool open = true;
         ImGui.Begin(Name, ref open);
@@ -93,7 +93,6 @@ public class AssetExplorerWindow : Component, IImGuiWindow
         if (selectionChanged && _lastViewer != null)
             _lastViewer.Id = _selected;
 
-        if (!open)
-            Remove();
+        return open ? ImGuiWindowDrawResult.None : ImGuiWindowDrawResult.Closed;
     }
 }

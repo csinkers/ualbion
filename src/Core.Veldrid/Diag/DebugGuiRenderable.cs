@@ -4,7 +4,7 @@ using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Core.Visual;
 
-namespace UAlbion.Core.Veldrid;
+namespace UAlbion.Core.Veldrid.Diag;
 
 /// <summary>
 /// A dummy renderable object to trigger drawing of the ImGui UI

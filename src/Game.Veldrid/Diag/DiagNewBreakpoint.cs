@@ -2,7 +2,7 @@
 using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 using UAlbion.Formats.Assets.Maps;
 using UAlbion.Game.Diag;
 

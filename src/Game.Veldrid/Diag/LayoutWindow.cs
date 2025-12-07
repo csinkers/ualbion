@@ -3,7 +3,7 @@ using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 using UAlbion.Game.Gui;
 
 namespace UAlbion.Game.Veldrid.Diag;
@@ -13,7 +13,7 @@ public class LayoutWindow : Component, IImGuiWindow
     public string Name { get; }
     public LayoutWindow(string name) => Name = name;
 
-    public void Draw()
+    public ImGuiWindowDrawResult Draw()
     {
         bool open = true;
         ImGui.Begin(Name, ref open);
@@ -68,8 +68,6 @@ public class LayoutWindow : Component, IImGuiWindow
         }
 
         ImGui.End();
-
-        if (!open)
-            Remove();
+        return open ? ImGuiWindowDrawResult.None : ImGuiWindowDrawResult.Closed;
     }
 }

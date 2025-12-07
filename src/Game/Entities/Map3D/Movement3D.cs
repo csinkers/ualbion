@@ -5,8 +5,15 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Entities.Map3D;
 
-public class Movement3D(Vector2 initialPos) : Component
+public class Movement3D : Component
 {
+    readonly Vector2 _initialPos;
+
+    public Movement3D(Vector2 initialPos)
+    {
+        _initialPos = initialPos;
+    }
+
     // TODO: Implement collision detection etc for 3D maps
     public static void Update<TContext>(
         IMovementState state,

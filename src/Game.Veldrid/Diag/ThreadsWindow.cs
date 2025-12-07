@@ -1,7 +1,7 @@
 ﻿using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
-using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 using UAlbion.Core.Veldrid.Reflection;
 
 namespace UAlbion.Game.Veldrid.Diag;
@@ -15,7 +15,7 @@ public class ThreadsWindow : Component, IImGuiWindow
     public string Name { get; }
     public ThreadsWindow(string name) => Name = name;
 
-    public void Draw()
+    public ImGuiWindowDrawResult Draw()
     {
         bool open = true;
         ImGui.Begin(Name, ref open);
@@ -44,8 +44,6 @@ public class ThreadsWindow : Component, IImGuiWindow
 #endif
 
         ImGui.End();
-
-        if (!open)
-            Remove();
+        return open ? ImGuiWindowDrawResult.None : ImGuiWindowDrawResult.Closed;
     }
 }

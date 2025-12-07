@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace UAlbion.Core.Veldrid;
+namespace UAlbion.Core.Veldrid.Diag;
 
 public static class ImGuiUtil
 {

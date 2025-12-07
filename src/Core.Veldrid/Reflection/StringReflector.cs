@@ -2,6 +2,7 @@
 using System.Text;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
+using UAlbion.Core.Veldrid.Diag;
 
 namespace UAlbion.Core.Veldrid.Reflection;
 

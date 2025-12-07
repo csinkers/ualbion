@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
@@ -9,15 +10,14 @@ using UAlbion.Core.Veldrid.Events;
 using UAlbion.Core.Veldrid.Reflection;
 using Veldrid;
 
-namespace UAlbion.Core.Veldrid;
+namespace UAlbion.Core.Veldrid.Diag;
 
 public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
 {
-    static readonly TimeSpan LayoutUpdateInterval = TimeSpan.FromSeconds(10);
+    const string WindowPrefix = "[Window]";
     readonly ImGuiRenderer _renderer;
     int _nextWindowId;
     bool _initialised;
-    DateTime _lastLayoutUpdate;
 
     public InputEvent LastInput { get; private set; }
     public bool ConsumedKeyboard { get; set; }
@@ -36,7 +36,7 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
 
         if (!_initialised)
         {
-            if (ImGui.GetCurrentContext() == IntPtr.Zero)
+            if (ImGui.GetCurrentContext() == nint.Zero)
                 return;
 
             InitialiseLayout();
@@ -64,22 +64,14 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
                 array[windowCount++] = window;
 
         for (int i = 0; i < windowCount; i++)
-            array[i].Draw();
+        {
+            var result = array[i].Draw();
+            if (result == ImGuiWindowDrawResult.Closed)
+                RemoveChild(array[i]);
+        }
 
         ArrayPool<IImGuiWindow>.Shared.Return(array);
 
-        if (DateTime.UtcNow - _lastLayoutUpdate > LayoutUpdateInterval)
-        {
-            _lastLayoutUpdate = DateTime.UtcNow;
-            var lastLayout = ReadVar(V.Core.Ui.ImGuiLayout);
-            var ini = ImGui.SaveIniSettingsToMemory();
-
-            if (!string.Equals(lastLayout, ini, StringComparison.Ordinal))
-            {
-                var settings = Resolve<ISettings>();
-                V.Core.Ui.ImGuiLayout.Write(settings, ini);
-            }
-        }
     }
 
     void InitialiseLayout()
@@ -88,21 +80,18 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
         var config = ImGuiConfig.Load(layout);
         var newConfig = new ImGuiConfig();
 
-        // var oldIni = ImGui.SaveIniSettingsToMemory();
-
         // Create windows
         var menus = Resolve<IImGuiMenuManager>();
 
-        const string prefix = "[Window]";
         foreach (var section in config.Sections)
         {
-            if (!section.Name.StartsWith(prefix, StringComparison.Ordinal))
+            if (!section.Name.StartsWith(WindowPrefix, StringComparison.Ordinal))
             {
                 newConfig.Sections.Add(section);
                 continue;
             }
 
-            var windowName = section.Name[(prefix.Length + 1)..].TrimEnd(']');
+            var windowName = section.Name[(WindowPrefix.Length + 1)..].TrimEnd(']');
             var index = windowName.IndexOf("##", StringComparison.Ordinal);
             if (index == -1)
             {
@@ -134,6 +123,43 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
 
     public int GetNextWindowId() => Interlocked.Increment(ref _nextWindowId);
     public void AddWindow(IImGuiWindow window) => AttachChild(window);
+    public void CloseAllWindows()
+    {
+        IComponent[] children = [..Children];
+        foreach (var child in children)
+            if (child is IImGuiWindow)
+                RemoveChild(child);
+    }
+
+    public void SaveSettings()
+    {
+        var ini = ImGui.SaveIniSettingsToMemory();
+        var config = ImGuiConfig.Load(ini);
+
+        var newConfig = new ImGuiConfig();
+        var childNames = Children.OfType<IImGuiWindow>().Select(x => x.Name).ToHashSet();
+        foreach (var section in config.Sections)
+        {
+            if (!section.Name.StartsWith(WindowPrefix, StringComparison.Ordinal))
+            {
+                newConfig.Sections.Add(section);
+                continue;
+            }
+
+            var windowName = section.Name[(WindowPrefix.Length + 1)..].TrimEnd(']');
+            if (childNames.Contains(windowName))
+                newConfig.Sections.Add(section);
+            else
+                Info($"Dropping window \"{windowName}\"");
+        }
+
+        var newConfigText = newConfig.ToString();
+
+        var settings = Resolve<ISettings>();
+        V.Core.Ui.ImGuiLayout.Write(settings, newConfigText);
+
+        Raise(new SaveSettingsEvent());
+    }
 
     public IEnumerable<IImGuiWindow> FindWindows(string prefix)
     {
@@ -142,13 +168,13 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
                 yield return window;
     }
 
-    public IntPtr GetOrCreateImGuiBinding(Texture texture)
+    public nint GetOrCreateImGuiBinding(Texture texture)
     {
         var engine = Resolve<IVeldridEngine>();
         return _renderer.GetOrCreateImGuiBinding(engine.Device.ResourceFactory, texture);
     }
 
-    public IntPtr GetOrCreateImGuiBinding(TextureView textureView)
+    public nint GetOrCreateImGuiBinding(TextureView textureView)
     {
         var engine = Resolve<IVeldridEngine>();
         return _renderer.GetOrCreateImGuiBinding(engine.Device.ResourceFactory, textureView);

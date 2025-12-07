@@ -2,7 +2,7 @@
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
-using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 using UAlbion.Core.Veldrid.Reflection;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets.Sheets;
@@ -36,7 +36,7 @@ public sealed class AssetViewerWindow : Component, IImGuiWindow
 
     public string Name { get; }
 
-    public void Draw()
+    public ImGuiWindowDrawResult Draw()
     {
         Refresh();
 
@@ -48,8 +48,7 @@ public sealed class AssetViewerWindow : Component, IImGuiWindow
         _viewer?.Draw();
 
         ImGui.End();
-        if (!open)
-            Remove();
+        return open ? ImGuiWindowDrawResult.None : ImGuiWindowDrawResult.Closed;
     }
 
     void Refresh()

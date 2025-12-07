@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using UAlbion.Api;
-using UAlbion.Api.Eventing;
 using UAlbion.Api.Settings;
 using UAlbion.Config;
 using UAlbion.Core;
@@ -14,9 +13,6 @@ using UAlbion.Formats.Parsers;
 using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Settings;
-
-[Event("save", "Save the current settings to disk")]
-public record SaveSettingsEvent : EventRecord;
 
 public class SettingsManager : GameComponent, ISettings
 {
@@ -41,7 +37,7 @@ public class SettingsManager : GameComponent, ISettings
             SetVar(V.User.Gameplay.Language, e.Language);
         });
 
-        On<SaveSettingsEvent>(_ => Save());
+        After<SaveSettingsEvent>(_ => Save()); // Any components that need to update their settings variables should do so in the 'On' handlers
         On<SetMusicVolumeEvent>(e => SetVar(V.User.Audio.MusicVolume, e.Value));
         On<SetFxVolumeEvent>(e => SetVar(V.User.Audio.FxVolume, e.Value));
         On<SetCombatDelayEvent>(e => SetVar(V.User.Gameplay.CombatDelay, e.Value));

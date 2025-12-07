@@ -2,7 +2,7 @@
 using ImGuiColorTextEditNet;
 using ImGuiNET;
 using UAlbion.Api.Eventing;
-using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 using UAlbion.Formats;
 using UAlbion.Formats.MapEvents;
 
@@ -44,7 +44,7 @@ public class ScriptWindow : GameComponent, IImGuiWindow
         };
     }
 
-    public void Draw()
+    public ImGuiWindowDrawResult Draw()
     {
         var chainManager = Resolve<IEventManager>();
         var context = chainManager.CurrentDebugContext;
@@ -55,9 +55,7 @@ public class ScriptWindow : GameComponent, IImGuiWindow
             DrawContext(context);
 
         ImGui.End();
-
-        if (!open)
-            Remove();
+        return open ? ImGuiWindowDrawResult.None : ImGuiWindowDrawResult.Closed;
     }
 
     void DrawContext(EventContext context)

@@ -3,7 +3,7 @@ using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 using UAlbion.Game.Events;
 using UAlbion.Game.Settings;
 
@@ -14,7 +14,7 @@ public class SettingsWindow : Component, IImGuiWindow
     public string Name { get; }
     public SettingsWindow(string name) => Name = name;
 
-    public void Draw()
+    public ImGuiWindowDrawResult Draw()
     {
         bool open = true;
         ImGui.Begin(Name, ref open);
@@ -66,9 +66,7 @@ public class SettingsWindow : Component, IImGuiWindow
         }
 
         ImGui.End();
-
-        if (!open)
-            Remove();
+        return open ? ImGuiWindowDrawResult.None : ImGuiWindowDrawResult.Closed;
     }
 
     static void BoolOption(string name, Func<bool> getter, Action<bool> setter)

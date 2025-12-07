@@ -5,7 +5,7 @@ using ImGuiNET;
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
-using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 
 namespace UAlbion.Game.Veldrid.Diag;
 
@@ -24,7 +24,7 @@ public class ImGuiConsoleLogger : Component, IImGuiWindow
         On<FocusConsoleEvent>(_ => _focus = true);
     }
 
-    public void Draw()
+    public ImGuiWindowDrawResult Draw()
     {
         var window = Resolve<IGameWindow>();
         bool open = true;
@@ -109,7 +109,7 @@ public class ImGuiConsoleLogger : Component, IImGuiWindow
         {
             var logExchange = Resolve<ILogExchange>();
             var command = Encoding.ASCII.GetString(_inputBuffer);
-            command = command.Substring(0, command.IndexOf((char)0, StringComparison.Ordinal));
+            command = command[..command.IndexOf((char)0, StringComparison.Ordinal)];
             for (int i = 0; i < command.Length; i++)
                 _inputBuffer[i] = 0;
 
@@ -131,8 +131,7 @@ public class ImGuiConsoleLogger : Component, IImGuiWindow
 
         ImGui.End();
 
-        if (!open)
-            Remove();
+        return open ? ImGuiWindowDrawResult.None : ImGuiWindowDrawResult.Closed;
     }
 
     void PrintMessage(ILogExchange logExchange, string message, LogLevel level) 

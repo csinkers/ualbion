@@ -6,7 +6,7 @@ using ImGuiNET;
 using JetBrains.Annotations;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
-using UAlbion.Core.Veldrid;
+using UAlbion.Core.Veldrid.Diag;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;

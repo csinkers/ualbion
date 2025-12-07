@@ -46,7 +46,6 @@ public class UserVars
     {
         public StringVar Albion { get; } = new(Library, "User.Path.ALBION", "ALBION");
         public StringVar Saves { get; } = new(Library, "User.Path.SAVE", "$(ALBION)/SAVES");
-
     }
 }
 #pragma warning restore CA1724 // Type names should not match namespaces

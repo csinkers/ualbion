@@ -79,10 +79,9 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
         var layout = ReadVar(V.Core.Ui.ImGuiLayout);
         var config = ImGuiConfig.Load(layout);
         var newConfig = new ImGuiConfig();
-
-        // Create windows
         var menus = Resolve<IImGuiMenuManager>();
 
+        // Create windows
         foreach (var section in config.Sections)
         {
             if (!section.Name.StartsWith(WindowPrefix, StringComparison.Ordinal))
@@ -106,6 +105,8 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
             var window = menus.CreateWindow(windowType, this);
             if (window == null)
                 continue;
+
+            // TODO: Rewrite docking ids
 
             newConfig.Sections.Add(new ImGuiConfigSection($"[Window][{window.Name}]", section.Lines));
         }
@@ -148,9 +149,14 @@ public class ImGuiManager : ServiceComponent<IImGuiManager>, IImGuiManager
 
             var windowName = section.Name[(WindowPrefix.Length + 1)..].TrimEnd(']');
             if (childNames.Contains(windowName))
+            {
+                // TODO: Remove old docking ids
                 newConfig.Sections.Add(section);
+            }
             else
+            {
                 Info($"Dropping window \"{windowName}\"");
+            }
         }
 
         var newConfigText = newConfig.ToString();

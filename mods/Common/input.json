@@ -97,6 +97,17 @@
     "Ctrl+Shift+M": "set_mouse_mode MouseLook",
     "Ctrl+Shift+N": "set_mouse_mode Normal",
 
+    "W": "+camera_move  0 -4",
+    "A": "+camera_move -4  0",
+    "S": "+camera_move  0  4",
+    "D": "+camera_move  4  0",
+
+    "Shift+W": "+camera_move  0 -8",
+    "Shift+A": "+camera_move -8  0",
+    "Shift+S": "+camera_move  0  8",
+    "Shift+D": "+camera_move  8  0",
+
+    /*
     "W": "+party_move  0 -1",
     "A": "+party_move -1  0",
     "S": "+party_move  0  1",
@@ -106,6 +117,7 @@
     "Shift+S": "+party_move  0  2",
     "Shift+A": "+party_move -2  0",
     "Shift+D": "+party_move  2  0",
+    */
 
     "Up": "+cam_rotate 0 0.03",
     "Down": "+cam_rotate 0 -0.03",

@@ -25,14 +25,19 @@ public class SceneGraph : ServiceComponent<ISceneGraph>, ISceneGraph
 
     public void Add(IPositioned entity)
     {
+        /*
         ArgumentNullException.ThrowIfNull(entity);
         _octree.AddItem(new BoundingBox(
                 entity.Position - entity.Dimensions,
                 entity.Position + entity.Dimensions),
             entity);
+        */
     }
 
-    public void Remove(IPositioned entity) => _octree.RemoveItem(entity);
+    public void Remove(IPositioned entity)
+    {
+        // _octree.RemoveItem(entity); // TODO: Resolve perf issues
+    }
 
     public void RayIntersect(Vector3 origin, Vector3 direction, List<Selection> hits)
     {

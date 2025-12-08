@@ -7,7 +7,7 @@ public class MockSpriteBatch<TInstance> : RenderableBatch<SpriteKey, TInstance>
     where TInstance : unmanaged
 {
     TInstance[] _instances = new TInstance[MinSize];
-    public MockSpriteBatch(SpriteKey key) : base(key) { } 
+    public MockSpriteBatch(SpriteKey key, Action<Span<TInstance>> disableInstancesFunc) : base(key, disableInstancesFunc) { }
     protected override ReadOnlySpan<TInstance> ReadOnlyInstances => _instances;
     protected override Span<TInstance> MutableInstances => _instances;
     protected override void Resize(int instanceCount)

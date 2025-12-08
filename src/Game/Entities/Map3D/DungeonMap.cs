@@ -52,9 +52,7 @@ public class DungeonMap : GameComponent, IMap
 
     void Setup(IGameState state)
     {
-        var factory = Resolve<ICoreFactory>();
         _labyrinthData = Assets.LoadLabyrinthData(_mapData.LabDataId);
-
         if (_labyrinthData == null)
             return;
 
@@ -74,9 +72,6 @@ public class DungeonMap : GameComponent, IMap
             Pipeline = DungeonTilemapPipeline.Normal
         };
 
-        var initialPos = new Vector2(_logicalMap.Width / 2.0f, _logicalMap.Height / 2.0f);
-        AttachChild(new Movement3D(initialPos));
-
         // These belong to the scene so we don't render when in menus etc
         var renderable = new MapRenderable3D(_logicalMap, _labyrinthData, properties);
         var selection = new Selection3D();
@@ -85,6 +80,7 @@ public class DungeonMap : GameComponent, IMap
 
         AttachChild(new ScriptManager());
         AttachChild(new Collider3D(_logicalMap));
+        AttachChild(new Movement3D());
 
         if (!_labyrinthData.BackgroundId.IsNone)
         {
@@ -92,6 +88,7 @@ public class DungeonMap : GameComponent, IMap
             if (background == null)
                 Error($"Could not load background image {_labyrinthData.BackgroundId}");
 
+            var factory = Resolve<ICoreFactory>();
             _skybox = factory.CreateSkybox(background, _camera);
         }
 
@@ -101,10 +98,10 @@ public class DungeonMap : GameComponent, IMap
         _backgroundGreen = (backgroundColour & 0xff00 >> 8) / 255.0f;
         _backgroundBlue = (backgroundColour & 0xff0000 >> 16) / 255.0f;
 
-        //if(_labyrinthData.CameraHeight != 0)
+        //if (_labyrinthData.CameraHeight != 0)
         //    Debugger.Break();
 
-        //if(_labyrinthData.Unk12 != 0) // 7=1|2|4 (Jirinaar), 54=32|16|4|2, 156=128|16|8|2 (Tall town)
+        //if (_labyrinthData.Unk12 != 0) // 7=1|2|4 (Jirinaar), 54=32|16|4|2, 156=128|16|8|2 (Tall town)
         //    Debugger.Break();
 
         // Raise(new LogEvent(LogEvent.Level.Info, $"WallHeight: {_labyrinthData.WallHeight} MaxObj: {maxObjectHeightRaw} EffWallWidth: {_labyrinthData.EffectiveWallWidth}"));

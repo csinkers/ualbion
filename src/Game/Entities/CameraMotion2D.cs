@@ -25,26 +25,24 @@ public class CameraMotion2D : Component
         On<BeginFrameEvent>(_ => _velocity = Vector3.Zero);
         On<CameraLockEvent>(_ => _locked = true);
         On<CameraUnlockEvent>(_ => _locked = false);
+
         On<CameraJumpEvent>(e =>
         {
             var map = TryResolve<IMapManager>()?.Current;
-            if (map == null)
-            {
-                _position = new Vector3(e.X, e.Y, e.Z ?? _camera.Position.Z);
-                _camera.Position = _position;
-            }
-            else
-            {
-                _position = new Vector3(e.X * map.TileSize.X + 0.1f, e.Y * map.TileSize.Y + 0.1f, e.Z ?? map.BaseCameraHeight);
-                _camera.Position = _position;
-            }
+            _position = map == null
+                ? new Vector3(e.X, e.Y, e.Z ?? _camera.Position.Z)
+                : new Vector3(e.X * map.TileSize.X + 0.1f, e.Y * map.TileSize.Y + 0.1f, e.Z ?? map.BaseCameraHeight);
+
+            _camera.Position = _position;
         });
 
         On<CameraMoveEvent>(e =>
         {
             var map = TryResolve<IMapManager>()?.Current;
-            if (map == null) _velocity += new Vector3(e.X, e.Y, e.Z ?? 0);
-            else _velocity += new Vector3(e.X * map.TileSize.X, e.Y * map.TileSize.Y, e.Z ?? 0);
+            if (map == null)
+                _velocity += new Vector3(e.X, e.Y, e.Z ?? 0);
+            else
+                _velocity += new Vector3(e.X * map.TileSize.X, e.Y * map.TileSize.Y, e.Z ?? 0);
         });
     }
 

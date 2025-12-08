@@ -11,6 +11,9 @@ namespace UAlbion.Game.Tests;
 
 public class MockGameFactory : Component, IGameFactory
 {
+    readonly Action<Span<SpriteInfo>> _disableSprites = DisableSprites;
+    readonly Action<Span<BlendedSpriteInfo>> _disableBlendedSprites = DisableBlendedSprites;
+
     protected override void Subscribed()
     {
         Exchange.Register<IGameFactory>(this);
@@ -29,9 +32,31 @@ public class MockGameFactory : Component, IGameFactory
         throw new NotImplementedException();
     }
 
-    public RenderableBatch<SpriteKey, SpriteInfo> CreateSpriteBatch(SpriteKey key) => new MockSpriteBatch<SpriteInfo>(key);
-    public RenderableBatch<SpriteKey, BlendedSpriteInfo> CreateBlendedSpriteBatch(SpriteKey key) => new MockSpriteBatch<BlendedSpriteInfo>(key);
+    public RenderableBatch<SpriteKey, SpriteInfo> CreateSpriteBatch(SpriteKey key) => new MockSpriteBatch<SpriteInfo>(key, _disableSprites);
+    public RenderableBatch<SpriteKey, BlendedSpriteInfo> CreateBlendedSpriteBatch(SpriteKey key) => new MockSpriteBatch<BlendedSpriteInfo>(key, _disableBlendedSprites);
 
     public IMapLayer CreateMapLayer(LogicalMap2D logicalMap, ITileGraphics tileset, Vector2 tileSize)
         => throw new NotImplementedException();
+
+    static void DisableSprites(Span<SpriteInfo> instances)
+    {
+        for (int i = 0; i < instances.Length; i++)
+        {
+            ref var instance = ref instances[i];
+            instance.Flags = 0;
+            instance.Position = new Vector4(1e12f, 1e12f, 1e12f, 0);
+            instance.Size = Vector2.Zero;
+        }
+    }
+
+    static void DisableBlendedSprites(Span<BlendedSpriteInfo> instances)
+    {
+        for (int i = 0; i < instances.Length; i++)
+        {
+            ref var instance = ref instances[i];
+            instance.Flags = 0;
+            instance.Position = new Vector4(1e12f, 1e12f, 1e12f, 0);
+            instance.Size = Vector2.Zero;
+        }
+    }
 }

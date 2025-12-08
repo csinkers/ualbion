@@ -18,8 +18,8 @@ namespace UAlbion.Api.Eventing
         [DiagIgnore] readonly PooledThreadSafe<List<Handler>> _dispatchLists = new(() => [], x => x.Clear());
         [DiagIgnore] readonly DoubleBuffered<List<(IEvent Event, object Sender)>> _queuedEvents = new(() => []);
         readonly Dictionary<Type, object> _registrations = [];
-        readonly Dictionary<Type, List<Handler>> _subscriptions = [];
-        readonly Dictionary<IComponent, List<Handler>> _subscribers = [];
+        readonly Dictionary<Type, HashSet<Handler>> _subscriptions = [];
+        readonly Dictionary<IComponent, HashSet<Handler>> _subscribers = [];
 
         [DiagIgnore] int _nesting = -1;
         [DiagIgnore] long _nextEventId;
@@ -349,7 +349,7 @@ namespace UAlbion.Api.Eventing
         public void Subscribe<T>(IComponent component, bool isPostHandler = false) where T : IEvent 
             => Subscribe(new SyncHandler<T>(e => component.Receive(e, null), component, isPostHandler));
 
-        bool CheckForDoubleRegistration(Handler handler, List<Handler> subscribedTypes)
+        bool CheckForDoubleRegistration(Handler handler, HashSet<Handler> subscribedTypes)
         {
             foreach (var x in subscribedTypes)
             {

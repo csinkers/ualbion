@@ -19,22 +19,28 @@ public class CameraMotion3D : Component
         On<BeginFrameEvent>(_ => _velocity = Vector3.Zero);
         On<CameraJumpEvent>(e =>
         {
-            var map = Resolve<IMapManager>().Current;
+            var map = TryResolve<IMapManager>()?.Current;
             if (map == null)
                 return;
 
             _camera.Position = new Vector3(e.X * map.TileSize.X, map.BaseCameraHeight, e.Y * map.TileSize.Y);
         });
+
         On<CameraMoveEvent>(e =>
         {
             var map = Resolve<IMapManager>().Current;
-            if (map == null) return;
+            if (map == null)
+                return;
+
             _velocity += new Vector3(e.X, 0, e.Y) * map.TileSize;
         });
-        On<CameraRotateEvent>(e => {
+
+        On<CameraRotateEvent>(e =>
+        {
             _camera.Yaw += e.Yaw;
             _camera.Pitch += e.Pitch;
         });
+
         On<EngineUpdateEvent>(OnEngineUpdate);
     }
 

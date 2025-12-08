@@ -1,17 +1,29 @@
 ﻿using System;
-using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Formats.Assets;
+using UAlbion.Formats.ScriptEvents;
 
 namespace UAlbion.Game.Entities.Map3D;
 
 public class Movement3D : Component
 {
-    readonly Vector2 _initialPos;
-
-    public Movement3D(Vector2 initialPos)
+    public Movement3D()
     {
-        _initialPos = initialPos;
+        On<PartyMoveEvent>(OnMove);
+        On<PartyJumpEvent>(OnJump);
+        On<PartyTurnEvent>(OnTurn);
+    }
+
+    void OnMove(PartyMoveEvent e)
+    {
+    }
+
+    void OnTurn(PartyTurnEvent e)
+    {
+    }
+
+    void OnJump(PartyJumpEvent e)
+    {
     }
 
     // TODO: Implement collision detection etc for 3D maps

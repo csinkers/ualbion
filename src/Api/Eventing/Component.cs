@@ -402,14 +402,19 @@ public abstract class Component : IComponent
     protected void RemoveChild(IComponent child)
     {
         ArgumentNullException.ThrowIfNull(child);
-        if (_children == null) return;
+        if (_children == null)
+            return;
+
         int index = _children.IndexOf(child);
-        if (index == -1) return;
+        if (index == -1)
+            return;
+
         if (child is Component c)
             c.Parent = null;
 
         child.Remove();
         _children.RemoveAt(index);
+
         if (_children.Count == 0)
             _children = null;
     }

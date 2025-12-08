@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Veldrid.Textures;
 using UAlbion.Core.Visual;
@@ -17,8 +18,18 @@ public class MeshBatch : RenderableBatch<MeshId, GpuMeshInstanceData>
     public ITextureHolder Diffuse { get; private set; }
     internal MeshResourceSet ResourceSet { get; private set; }
 
-    public MeshBatch(MeshId id, Func<MeshId, Mesh> loadFunc) : base(id)
+    public MeshBatch(MeshId id, Func<MeshId, Mesh> loadFunc) : base(id, DisableInstancesFunc)
         => _loadFunc = loadFunc ?? throw new ArgumentNullException(nameof(loadFunc));
+
+    static void DisableInstancesFunc(Span<GpuMeshInstanceData> instances)
+    {
+        for (int i = 0; i < instances.Length; i++)
+        {
+            ref var instance = ref instances[i];
+            instance.Position = new Vector3(1e12f, 1e12f, 1e12f);
+            instance.Scale = Vector3.Zero;
+        }
+    }
 
     protected override void Subscribed()
     {

@@ -44,6 +44,8 @@ public sealed class MeshRenderer : Component, IRenderer, IDisposable
         if (renderable is not MeshBatch batch)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
+        batch.ShrinkIfNeeded();
+
         cl.PushDebugGroup($"Mesh:{batch.Key}");
 
         cl.SetPipeline(_pipeline.Pipeline);
@@ -55,7 +57,7 @@ public sealed class MeshRenderer : Component, IRenderer, IDisposable
         cl.SetVertexBuffer(1, batch.Instances.DeviceBuffer);
         cl.SetIndexBuffer(batch.IndexBuffer.DeviceBuffer, IndexFormat.UInt16);
 
-        cl.DrawIndexed((uint)batch.IndexBuffer.Count, (uint)batch.Instances.Count, 0, 0, 0);
+        cl.DrawIndexed((uint)batch.IndexBuffer.Count, (uint)batch.AssignedCount, 0, 0, 0);
         cl.PopDebugGroup();
     }
 

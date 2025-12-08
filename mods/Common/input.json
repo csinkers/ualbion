@@ -89,8 +89,8 @@
     "F5": "inv:open_pos 4",
     "F6": "inv:open_pos 5",*/
 
-    "Ctrl+A": "!loadnextmap",
-    "Ctrl+X": "!loadprevmap",
+    // "Ctrl+A": "!loadnextmap",
+    // "Ctrl+X": "!loadprevmap",
 
     "M": "open_map",
     "T": "wait",
@@ -107,17 +107,15 @@
     "Shift+S": "+camera_move  0  8",
     "Shift+D": "+camera_move  8  0",
 
-    /*
-    "W": "+party_move  0 -1",
-    "A": "+party_move -1  0",
-    "S": "+party_move  0  1",
-    "D": "+party_move  1  0",
+    "Ctrl+W": "+party_move  0 -1",
+    "Ctrl+A": "+party_move -1  0",
+    "Ctrl+S": "+party_move  0  1",
+    "Ctrl+D": "+party_move  1  0",
 
-    "Shift+W": "+party_move  0 -2",
-    "Shift+S": "+party_move  0  2",
-    "Shift+A": "+party_move -2  0",
-    "Shift+D": "+party_move  2  0",
-    */
+    "Ctrl+Shift+W": "+party_move  0 -2",
+    "Ctrl+Shift+S": "+party_move  0  2",
+    "Ctrl+Shift+A": "+party_move -2  0",
+    "Ctrl+Shift+D": "+party_move  2  0",
 
     "Up": "+cam_rotate 0 0.03",
     "Down": "+cam_rotate 0 -0.03",

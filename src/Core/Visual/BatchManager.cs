@@ -37,7 +37,7 @@ public class BatchManager<TKey, TInstance> : ServiceComponent<IBatchManager<TKey
                 _batchList.Add(entry);
             }
 
-            return entry.Grow(count, owner);
+            return entry.BorrowLease(count, owner);
         }
     }
 
@@ -52,7 +52,7 @@ public class BatchManager<TKey, TInstance> : ServiceComponent<IBatchManager<TKey
         {
             var spritesToRemove = new List<KeyValuePair<TKey, RenderableBatch<TKey, TInstance>>>();
             foreach (var kvp in _batchLookup)
-                if (kvp.Value.ActiveInstances == 0)
+                if (kvp.Value.AssignedCount == 0)
                     spritesToRemove.Add(kvp);
 
             foreach (var kvp in spritesToRemove)
@@ -62,6 +62,7 @@ public class BatchManager<TKey, TInstance> : ServiceComponent<IBatchManager<TKey
                 RemoveChild(kvp.Value);
             }
         }
+
         _lastCleanup = _totalTime;
     }
 
@@ -71,7 +72,7 @@ public class BatchManager<TKey, TInstance> : ServiceComponent<IBatchManager<TKey
         lock (_syncRoot)
         {
             foreach (var kvp in _batchList)
-                if (kvp.ActiveInstances > 0)
+                if (kvp.AssignedCount > 0)
                     renderables.Add(kvp);
         }
     }

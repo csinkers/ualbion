@@ -12,9 +12,18 @@ public class BatchLease<TKey, TInstance> : IComparable<BatchLease<TKey, TInstanc
     public int Length => To - From;
     internal int From { get; set; } // [from..to)
     internal int To { get; set; }
-    public bool Disposed { get; private set; }
+    public bool Disposed { get; internal set; }
     internal object Owner { get; set; } // For debugging
-    public override string ToString() => $"LEASE [{From}-{To}) {_batch} for {Owner}";
+    public override string ToString() =>
+        Disposed
+        ? $"DEAD  [{From}-{To}) {_batch}"
+        : $"LEASE [{From}-{To}) {_batch} for {Owner}";
+
+    // Linked List
+    internal BatchLease<TKey, TInstance> Next { get; set; }
+    internal BatchLease<TKey, TInstance> Prev { get; set; }
+    internal BatchLease<TKey, TInstance> NextDead { get; set; }
+    internal BatchLease<TKey, TInstance> PrevDead { get; set; }
 
     public TInstance? GetInstance(int index)
     {
@@ -30,9 +39,10 @@ public class BatchLease<TKey, TInstance> : IComparable<BatchLease<TKey, TInstanc
 
     public void Dispose()
     {
-        if (Disposed) return;
-        _batch.Shrink(this);
-        Disposed = true;
+        if (Disposed)
+            return;
+
+        _batch.ReturnLease(this); // Will set Disposed and clear Owner
     }
 
     public void Update(int index, in TInstance instance)

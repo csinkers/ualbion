@@ -75,6 +75,8 @@ public sealed class BlendedSpriteRenderer : Component, IRenderer, IDisposable
         if (renderable is not VeldridSpriteBatch<BlendedSpriteInfo, GpuBlendedSpriteInstanceData> batch)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable?.GetType().Name ?? "null"}", nameof(renderable));
 
+        batch.ShrinkIfNeeded();
+
         cl.PushDebugGroup(batch.Name);
         if (batch.Key.ScissorRegion.HasValue)
         {
@@ -94,7 +96,7 @@ public sealed class BlendedSpriteRenderer : Component, IRenderer, IDisposable
         cl.SetVertexBuffer(1, batch.Instances.DeviceBuffer);
         cl.SetIndexBuffer(_indexBuffer.DeviceBuffer, IndexFormat.UInt16);
 
-        cl.DrawIndexed((uint)Indices.Length, (uint)batch.ActiveInstances, 0, 0, 0);
+        cl.DrawIndexed((uint)Indices.Length, (uint)batch.AssignedCount, 0, 0, 0);
 
         if (batch.Key.ScissorRegion.HasValue)
             cl.SetFullScissorRect(0);

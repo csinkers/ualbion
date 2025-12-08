@@ -11,7 +11,7 @@ public class VeldridSpriteBatch<TInstance, TGpuInstance> : RenderableBatch<Sprit
     where TGpuInstance : unmanaged 
     where TInstance : unmanaged
 {
-    public VeldridSpriteBatch(SpriteKey key) : base(key)
+    public VeldridSpriteBatch(SpriteKey key, Action<Span<TInstance>> disableInstancesFunc) : base(key, disableInstancesFunc)
     {
         unsafe
         {
@@ -29,6 +29,7 @@ public class VeldridSpriteBatch<TInstance, TGpuInstance> : RenderableBatch<Sprit
             Flags = Key.Flags,
             TextureSize = new Vector2(key.Texture.Width, key.Texture.Height)
         }, BufferUsage.UniformBuffer, $"B_SpriteUniform:{Name}");
+
         AttachChild(Instances);
         AttachChild(Uniform);
     }

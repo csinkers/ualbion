@@ -17,8 +17,13 @@ public class MapManager : GameServiceComponent<IMapManager>, IMapManager
 
     public MapManager()
     {
-        On<ShowMapEvent>(e => { foreach (var child in Children) child.IsActive = e.Show ?? true; });
-        On<TeleportEvent>(Teleport);
+        On<ShowMapEvent>(e =>
+        {
+            foreach (var child in Children)
+                child.IsActive = e.Show ?? true;
+        });
+
+        OnAsync<TeleportEvent>(Teleport);
         OnAsync<LoadMapEvent>(async e =>
         {
             if (!Resolve<IGameState>().Loaded)
@@ -78,16 +83,18 @@ public class MapManager : GameServiceComponent<IMapManager>, IMapManager
         };
     }
 
-    void Teleport(TeleportEvent e)
+    async AlbionTask Teleport(TeleportEvent e)
     {
         // Raise event rather than calling directly so that GameState.Map will get updated.
         // Need to explicitly pass null sender as this class handles the event.
         if (e.MapId != Current?.MapId)
-            Exchange.Raise(new LoadMapEvent(e.MapId), null); 
+            await Exchange.RaiseA(new LoadMapEvent(e.MapId), null); 
 
         Raise(new PartyJumpEvent(e.X, e.Y));
+
         if (e.Direction != Direction.Unchanged)
             Raise(new PartyTurnEvent(e.Direction));
+
         Raise(new CameraJumpEvent(e.X, e.Y));
     }
 }

@@ -15,6 +15,7 @@ public enum MapExitType
     EndSequence = 4,
     TrapdoorDown = 5,
     Shuttle = 6,
+    None = 255
 }
 
 [Event("teleport", "teleports the party to a specific location")]

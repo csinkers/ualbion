@@ -21,6 +21,7 @@ public class MapObject : GameComponent
     MapSprite _sprite;
     IMeshInstance _mesh;
     int _frame;
+    bool _initialised;
 
     public MapObject(MapObjectId id, Vector3 initialPosition, Vector2 size, Vector3 tileSize, bool onFloor, bool bouncy, bool depthTest)
     {
@@ -36,6 +37,10 @@ public class MapObject : GameComponent
 
     protected override void Subscribed()
     {
+        if (_initialised)
+            return;
+
+        _initialised = true;
         var asset = Assets.LoadMapObject(Id);
         switch (asset)
         {

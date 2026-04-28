@@ -229,20 +229,55 @@ AlbionTask Observe(ObserveCombatEvent _) =>
         }
     }
 
-    // Monsters auto-attack the nearest living party member.
+    // Monsters move toward party and attack if in melee range.
     void ExecuteMonsterAction(ICombatParticipant actor, IRandom rng)
     {
         var target = _mobs
             .Where(p => !p.IsDead && p.Effective.Type == CharacterType.Party)
-            .OrderBy(p => p.CombatPosition)
+            .OrderBy(p => Math.Abs(p.CombatPosition % SavedGame.CombatColumns - actor.CombatPosition % SavedGame.CombatColumns))
+            .ThenBy(p => p.CombatPosition)
             .FirstOrDefault();
 
         if (target == null) return;
 
-        var dmg = DamageCalculator.CalculateAfflictedDamage(rng, actor.Effective, target.Effective);
-        ApplyDamageAndCleanup(target, dmg.Afflicted);
-        Raise(new LogEvent(LogLevel.Info,
-            $"[DAMAGE] {actor.SheetId}→{target.SheetId}: raw={dmg.RawDamage} prot={dmg.RawProtection} rolled={dmg.RolledDamage} vs {dmg.RolledProtection} = {dmg.Afflicted}{(dmg.IsCritical ? " CRITICAL" : "")}"));
+        if (IsInMeleeRange(actor.CombatPosition, target.CombatPosition))
+        {
+            var dmg = DamageCalculator.CalculateAfflictedDamage(rng, actor.Effective, target.Effective);
+            ApplyDamageAndCleanup(target, dmg.Afflicted);
+            Raise(new LogEvent(LogLevel.Info,
+                $"[DAMAGE] {actor.SheetId}→{target.SheetId}: raw={dmg.RawDamage} prot={dmg.RawProtection} rolled={dmg.RolledDamage} vs {dmg.RolledProtection} = {dmg.Afflicted}{(dmg.IsCritical ? " CRITICAL" : "")}"));
+        }
+        else
+        {
+            MoveMonsterToward(actor, target.CombatPosition);
+        }
+    }
+
+    // DEVIATION: range check approximated from Horneman MONLOGIC.C
+    static bool IsInMeleeRange(int actorTile, int targetTile)
+    {
+        int cols = SavedGame.CombatColumns;
+        int dx = Math.Abs(actorTile % cols - targetTile % cols);
+        int dy = Math.Abs(actorTile / cols - targetTile / cols);
+        return dx <= 1 && dy <= 1;
+    }
+
+    void MoveMonsterToward(ICombatParticipant actor, int targetTile)
+    {
+        int cols = SavedGame.CombatColumns;
+        int actorRow = actor.CombatPosition / cols;
+        int actorCol = actor.CombatPosition % cols;
+        int targetRow = targetTile / cols;
+        int targetCol = targetTile % cols;
+
+        int newRow = actorRow + Math.Sign(targetRow - actorRow);
+        int newCol = actorCol;
+        if (newRow == actorRow)
+            newCol = actorCol + Math.Sign(targetCol - actorCol);
+
+        int newPos = newRow * cols + newCol;
+        if (newPos >= 0 && newPos < _tiles.Length && _tiles[newPos] == null)
+            MoveParticipant(actor, newPos);
     }
 
     void ApplyDamageAndCleanup(ICombatParticipant target, int damage)

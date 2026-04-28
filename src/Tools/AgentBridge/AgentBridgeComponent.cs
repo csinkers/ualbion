@@ -302,7 +302,7 @@ public class AgentBridgeComponent : Component, IDisposable
         var tileMap = battle?.Mobs.Select((mob, idx) => mob == null ? null : new {
             tile = idx,
             id = mob.SheetId.ToString(),
-            name = mob.Effective.GetName("en"),
+            name = mob.Effective.GetName(Base.Language.English),
             type = mob.Effective.Type.ToString(),
             hp = mob.Effective.Combat.LifePoints.Current,
             max_hp = mob.Effective.Combat.LifePoints.Max

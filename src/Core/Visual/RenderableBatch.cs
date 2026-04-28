@@ -244,6 +244,8 @@ public abstract class RenderableBatch<TKey, TInstance> : Component, IRenderable,
         ApiUtil.Assert((_deadHead == null) == (_deadTail == null), "Dead list head and tail had differing nullity");
         if (lease.PrevDead != null) lease.PrevDead.NextDead = lease.NextDead;
         if (lease.NextDead != null) lease.NextDead.PrevDead = lease.PrevDead;
+        lease.PrevDead = null;
+        lease.NextDead = null;
     }
 
     public void ShrinkIfNeeded()

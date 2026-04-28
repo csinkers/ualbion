@@ -200,8 +200,10 @@ AlbionTask Observe(ObserveCombatEvent _) =>
             {
                 var target = plan.TargetTileIndex >= 0 ? GetTile(plan.TargetTileIndex) : null;
                 if (target == null || target.IsDead) break;
-                int damage = DamageCalculator.CalculateAfflictedDamage(rng, actor.Effective, target.Effective);
-                ApplyDamageAndCleanup(target, damage);
+                var dmg = DamageCalculator.CalculateAfflictedDamage(rng, actor.Effective, target.Effective);
+                ApplyDamageAndCleanup(target, dmg.Afflicted);
+                Raise(new LogEvent(LogLevel.Info,
+                    $"[DAMAGE] {actor.SheetId}→{target.SheetId}: raw={dmg.RawDamage} prot={dmg.RawProtection} rolled={dmg.RolledDamage} vs {dmg.RolledProtection} = {dmg.Afflicted}{(dmg.IsCritical ? " CRITICAL" : "")}"));
                 break;
             }
 
@@ -237,8 +239,10 @@ AlbionTask Observe(ObserveCombatEvent _) =>
 
         if (target == null) return;
 
-        int damage = DamageCalculator.CalculateAfflictedDamage(rng, actor.Effective, target.Effective);
-        ApplyDamageAndCleanup(target, damage);
+        var dmg = DamageCalculator.CalculateAfflictedDamage(rng, actor.Effective, target.Effective);
+        ApplyDamageAndCleanup(target, dmg.Afflicted);
+        Raise(new LogEvent(LogLevel.Info,
+            $"[DAMAGE] {actor.SheetId}→{target.SheetId}: raw={dmg.RawDamage} prot={dmg.RawProtection} rolled={dmg.RolledDamage} vs {dmg.RolledProtection} = {dmg.Afflicted}{(dmg.IsCritical ? " CRITICAL" : "")}"));
     }
 
     void ApplyDamageAndCleanup(ICombatParticipant target, int damage)

@@ -48,6 +48,13 @@ public class AgentBridgeComponent : Component, IDisposable
     public AgentBridgeComponent()
     {
         On<BeginFrameEvent>(_ => DrainCommandQueue());
+        On<LogEvent>(BroadcastLog);
+    }
+
+    void BroadcastLog(LogEvent e)
+    {
+        var payload = JsonSerializer.Serialize(new { type = "log", severity = e.Severity.ToString(), message = e.Message });
+        BroadcastEvent(payload);
     }
 
     protected override void Subscribed()

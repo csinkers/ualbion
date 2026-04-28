@@ -60,6 +60,19 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
         return null;
     }
 
+    public void SetCombatPositionForPlayer(PartyMemberId id, int newTileIndex)
+    {
+        var offset = (SavedGame.CombatRows - SavedGame.CombatRowsForParty) * SavedGame.CombatColumns;
+        for (int i = 0; i < _party.StatusBarOrder.Count; i++)
+        {
+            if (_party.StatusBarOrder[i].Id == id)
+            {
+                _game.CombatPositions[i] = (byte)(newTileIndex - offset);
+                return;
+            }
+        }
+    }
+
     public MapChangeCollection TemporaryMapChanges => _game.TemporaryMapChanges;
     public MapChangeCollection PermanentMapChanges => _game.PermanentMapChanges;
     public ActiveItems ActiveItems => _game.ActiveItems;
@@ -289,7 +302,7 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
         return GetWriteableInventory(id);
     }
 
-    Inventory GetWriteableInventory(InventoryId id)
+    public Inventory GetWriteableInventory(InventoryId id)
     {
         Inventory inventory;
         switch(id.Type)

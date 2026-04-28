@@ -415,10 +415,7 @@ public class AgentBridgeComponent : Component, IDisposable
             catch { partyMemberId = new PartyMemberId(1); } // Fallback: ID 1 for Tom
             
             var invId = new InventoryId(partyMemberId);
-            
-// Use GetWriteableInventory from GameState (it's not in IGameState interface)
-        var invId = new InventoryId(partyMemberId);
-        var inv = ((GameState)state).GetWriteableInventory(invId);
+            var inv = ((GameState)state).GetWriteableInventory(invId);
             if (inv == null)
                 return Error("not_found", $"Inventory not found for member");
 

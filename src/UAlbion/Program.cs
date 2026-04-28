@@ -86,10 +86,11 @@ static class Program
         if (commandLine.NeedsEngine)
             BuildEngine(commandLine, exchange);
 
-        if (commandLine.AgentMode)
+if (commandLine.AgentMode)
         {
             exchange.Attach(new AgentBridgeComponent());
-            exchange.OnQuery<IsAgentModeEvent, bool>(_ => true);
+            var agentModeComponent = new AdHocComponent("AgentMode", x => x.OnQuery<IsAgentModeEvent, bool>(_ => true));
+            exchange.Attach(agentModeComponent);
         }
 
         exchange.Attach(new StdioConsoleReader()); // TODO: Only add this if running with a console window

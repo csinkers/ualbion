@@ -1,19 +1,24 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
+using UAlbion.Config;
 using UAlbion.Core.Visual;
+using UAlbion.Formats.Assets.Inv;
+using UAlbion.Formats.Assets.Sheets;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Gui.Combat;
 using UAlbion.Game.Gui.Dialogs;
 using UAlbion.Game.State;
+using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Combat;
 
 /// <summary>
-/// Contains the logical state of a battle
+/// Contains the logical state of a battle.
 /// The top-level combat UI is handled by <see cref="CombatDialog"/>
 /// </summary>
 public class Battle : GameComponent, IReadOnlyBattle
@@ -22,15 +27,34 @@ public class Battle : GameComponent, IReadOnlyBattle
     readonly List<ICombatParticipant> _mobs = [];
     readonly List<ICombatParticipant> _corpses = [];
     readonly ICombatParticipant[] _tiles = new ICombatParticipant[SavedGame.CombatRows * SavedGame.CombatColumns];
+    readonly Dictionary<int, PlannedCombatAction> _plannedActions = new();
+    readonly List<(ItemId Item, int Amount)> _apresItems = [];
+    int _addedExperiencePoints;
+    int _apresGold;
+    int _apresFood;
+    CombatActionType _pendingActionType;
 
     public IReadOnlyList<ICombatParticipant> Mobs { get; }
-    public event Action Complete;
+    public CombatPlanningState PlanningState { get; private set; } = CombatPlanningState.Planning;
+    public int PendingActorPosition { get; private set; } = -1;
+    public PlannedCombatAction GetPlannedAction(int tileIndex)
+        => _plannedActions.TryGetValue(tileIndex, out var a) ? a : null;
+
+    // Apres combat data (set after battle ends)
+    public int XpShare { get; private set; }
+    public int ApresGold => _apresGold;
+    public int ApresFood => _apresFood;
+    public IReadOnlyList<(ItemId Item, int Amount)> ApresItems => _apresItems;
+
+    public event Action<CombatResult> Complete;
 
     public Battle(MonsterGroupId groupId, SpriteId backgroundId)
     {
-        On<EndCombatEvent>(_ => Complete?.Invoke());
+        On<EndCombatEvent>(e => Complete?.Invoke(e.Result));
         OnAsync<BeginCombatRoundEvent>(BeginRoundAsync);
         OnAsync<ObserveCombatEvent>(Observe);
+        On<SelectCombatActionEvent>(OnSelectAction);
+        On<SelectCombatTargetEvent>(OnSelectTarget);
 
         _groupId = groupId;
         Mobs = _mobs;
@@ -47,16 +71,230 @@ public class Battle : GameComponent, IReadOnlyBattle
         });
     }
 
-    AlbionTask Observe(ObserveCombatEvent _) =>
+    // Player selected an action from the context menu for a party member.
+    void OnSelectAction(SelectCombatActionEvent e)
+    {
+        if (e.Action is CombatActionType.Attack or CombatActionType.Move)
+        {
+            PlanningState = CombatPlanningState.SelectingTarget;
+            PendingActorPosition = e.ActorPosition;
+            _pendingActionType = e.Action;
+        }
+        else
+        {
+            _plannedActions[e.ActorPosition] = new PlannedCombatAction(e.Action);
+            PlanningState = CombatPlanningState.Planning;
+            PendingActorPosition = -1;
+        }
+    }
+
+    // Player clicked a tile while in SelectingTarget mode.
+    void OnSelectTarget(SelectCombatTargetEvent e)
+    {
+        if (PlanningState != CombatPlanningState.SelectingTarget) return;
+        if (!IsValidTarget(PendingActorPosition, e.TargetTileIndex)) return;
+        _plannedActions[PendingActorPosition] = new PlannedCombatAction(_pendingActionType, e.TargetTileIndex);
+        PlanningState = CombatPlanningState.Planning;
+        PendingActorPosition = -1;
+    }
+
+    // Close range = Chebyshev distance 1. Long range = any tile.
+    // DEVIATION: exact Get_close_range_targets adjacency mask (COMACTS.C) not available in Horneman source snapshot.
+    bool IsValidTarget(int actorPos, int targetPos)
+    {
+        if (_pendingActionType != CombatActionType.Attack) return true;
+        if (actorPos < 0 || actorPos >= _tiles.Length) return false;
+
+        var actor = _tiles[actorPos];
+        if (actor == null) return false;
+
+        var rightHand = actor.Effective.Inventory.RightHand;
+        if (!rightHand.Item.IsNone && rightHand.Item.Type == AssetType.Item)
+        {
+            var item = Assets.LoadItem(rightHand.Item);
+            if (item?.TypeId == ItemType.LongRangeWeapon)
+                return true; // ranged: any tile is valid
+        }
+
+        // Close range (melee or unarmed): Chebyshev distance <= 1
+        return IsAdjacent(actorPos, targetPos);
+    }
+
+    static bool IsAdjacent(int pos1, int pos2)
+    {
+        int x1 = pos1 % SavedGame.CombatColumns, y1 = pos1 / SavedGame.CombatColumns;
+        int x2 = pos2 % SavedGame.CombatColumns, y2 = pos2 / SavedGame.CombatColumns;
+        return Math.Abs(x1 - x2) <= 1 && Math.Abs(y1 - y2) <= 1;
+    }
+
+AlbionTask Observe(ObserveCombatEvent _) =>
         WithFrozenClock(this, async x =>
         {
+            if (RaiseQuery(new IsAgentModeEvent()))
+                return;
+
             Raise(new CombatDialog.ShowCombatDialogEvent(false));
             var dlg = x.AttachChild(new InvisibleWaitForClickDialog());
             await dlg.Task;
             Raise(new CombatDialog.ShowCombatDialogEvent(true));
         });
 
-    AlbionTask BeginRoundAsync(BeginCombatRoundEvent _) => RaiseA(new CombatUpdateEvent(100)); // TODO
+    // Round execution — source: Horneman COMBAT.C Create_sorted_combat_event_list + COMACTS.C actions
+    AlbionTask BeginRoundAsync(BeginCombatRoundEvent _) =>
+        WithFrozenClock(this, async x =>
+        {
+            var rng = Resolve<IRandom>();
+
+            // Speed-sorted order descending (Shellsort by Speed in Horneman)
+            var roundOrder = _mobs
+                .Where(p => !p.IsDead)
+                .OrderByDescending(p => p.Effective.Attributes.Speed.Current)
+                .ToList();
+
+            foreach (var actor in roundOrder)
+            {
+                if (actor.IsDead) continue;
+
+                if (actor.Effective.Type == CharacterType.Party)
+                    ExecutePartyAction(actor, rng);
+                else
+                    ExecuteMonsterAction(actor, rng);
+            }
+
+            _plannedActions.Clear();
+            PlanningState = CombatPlanningState.Planning;
+            PendingActorPosition = -1;
+
+            await RaiseA(new CombatUpdateEvent(10));
+
+            bool anyMonsters = _mobs.Any(p => p.Effective.Type == CharacterType.Monster);
+            bool anyParty    = _mobs.Any(p => p.Effective.Type == CharacterType.Party);
+
+            if (!anyMonsters)
+            {
+                DistributeXp();
+                Raise(new CombatDialog.ShowCombatDialogEvent(false));
+                var dlg = x.AttachChild(new ApresCombatDialog(XpShare, _apresGold, _apresFood, _apresItems));
+                await dlg.Task;
+                dlg.Remove();
+                Raise(new CombatDialog.ShowCombatDialogEvent(true));
+                Enqueue(new EndCombatEvent(CombatResult.Victory));
+            }
+            else if (!anyParty)
+            {
+                Enqueue(new EndCombatEvent(CombatResult.PartyKilled));
+            }
+        });
+
+    void ExecutePartyAction(ICombatParticipant actor, IRandom rng)
+    {
+        if (!_plannedActions.TryGetValue(actor.CombatPosition, out var plan))
+            return; // no action planned — skip turn
+
+        switch (plan.ActionType)
+        {
+            case CombatActionType.None:
+                break;
+
+            case CombatActionType.Attack:
+            {
+                var target = plan.TargetTileIndex >= 0 ? GetTile(plan.TargetTileIndex) : null;
+                if (target == null || target.IsDead) break;
+                int damage = DamageCalculator.CalculateAfflictedDamage(rng, actor.Effective, target.Effective);
+                ApplyDamageAndCleanup(target, damage);
+                break;
+            }
+
+            case CombatActionType.Move:
+            {
+                int newPos = plan.TargetTileIndex;
+                if (newPos < 0 || newPos >= _tiles.Length || _tiles[newPos] != null) break;
+                MoveParticipant(actor, newPos);
+                break;
+            }
+
+            case CombatActionType.Flee:
+                // Participant escapes — remove from battle without dying
+                _mobs.Remove(actor);
+                if (actor.CombatPosition >= 0)
+                    _tiles[actor.CombatPosition] = null;
+                break;
+
+            case CombatActionType.CastSpell:
+            case CombatActionType.UseMagicItem:
+                // TODO: spell execution — stub for now
+                break;
+        }
+    }
+
+    // Monsters auto-attack the nearest living party member.
+    void ExecuteMonsterAction(ICombatParticipant actor, IRandom rng)
+    {
+        var target = _mobs
+            .Where(p => !p.IsDead && p.Effective.Type == CharacterType.Party)
+            .OrderBy(p => p.CombatPosition)
+            .FirstOrDefault();
+
+        if (target == null) return;
+
+        int damage = DamageCalculator.CalculateAfflictedDamage(rng, actor.Effective, target.Effective);
+        ApplyDamageAndCleanup(target, damage);
+    }
+
+    void ApplyDamageAndCleanup(ICombatParticipant target, int damage)
+    {
+        var oldHp = target.Effective.Combat.LifePoints.Current;
+        target.TakeDamage(damage);
+        var newHp = target.Effective.Combat.LifePoints.Current;
+        Raise(new LogEvent(LogLevel.Info, $"Damage: {damage} | {target.SheetId}: {oldHp} → {newHp}/{target.Effective.Combat.LifePoints.Max}"));
+        if (!target.IsDead) return;
+
+        _addedExperiencePoints += target.ExperienceReward;
+        CollectLoot(target);
+        _mobs.Remove(target);
+        _corpses.Add(target);
+        if (target.CombatPosition >= 0)
+            _tiles[target.CombatPosition] = null;
+        Raise(new LogEvent(LogLevel.Info, $"Monster killed! XP reward: {_addedExperiencePoints}"));
+    }
+
+    // Source: Horneman COMBAT.C Kill_participant — collect items/gold/food from dead monsters.
+    void CollectLoot(ICombatParticipant target)
+    {
+        var loot = target.GetLoot();
+        if (loot == null) return;
+
+        _apresGold += loot.Gold?.Amount ?? 0;
+        _apresFood += loot.Rations?.Amount ?? 0;
+
+        foreach (var slot in loot.EnumerateAll())
+        {
+            if (slot.Item.IsNone || slot.Item.Type != AssetType.Item) continue;
+            _apresItems.Add((slot.Item, slot.Amount));
+        }
+    }
+
+    void MoveParticipant(ICombatParticipant participant, int newPos)
+    {
+        int oldPos = participant.CombatPosition;
+        if (oldPos >= 0 && oldPos < _tiles.Length)
+            _tiles[oldPos] = null;
+        _tiles[newPos] = participant;
+        participant.SetCombatPosition(newPos);
+    }
+
+    // Source: Horneman COMBAT.C Added_experience_points distributed in Enter_Apres_combat
+    void DistributeXp()
+    {
+        var party = Resolve<IParty>();
+        var living = party.StatusBarOrder.Where(m => !m.IsDead).ToList();
+        if (living.Count > 0 && _addedExperiencePoints > 0)
+        {
+            XpShare = _addedExperiencePoints / living.Count;
+            foreach (var member in living)
+                member.AddExperience(XpShare);
+        }
+    }
 
     protected override void Subscribed()
     {
@@ -65,8 +303,10 @@ public class Battle : GameComponent, IReadOnlyBattle
 
         foreach (var partyMember in Resolve<IParty>().StatusBarOrder)
         {
+            var pos = partyMember.CombatPosition;
             _mobs.Add(partyMember);
-            _tiles[partyMember.CombatPosition] = partyMember;
+            if (pos >= 0 && pos < _tiles.Length)
+                _tiles[pos] = partyMember;
         }
 
         var group = Assets.LoadMonsterGroup(_groupId);

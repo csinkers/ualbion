@@ -302,6 +302,8 @@ AlbionTask Observe(ObserveCombatEvent _) =>
 
     protected override void Subscribed()
     {
+        Exchange.Register(this);
+
         if (_mobs.Count > 0)
             return;
 

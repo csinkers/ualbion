@@ -14,12 +14,15 @@ public class VisualCombatTile : UiElement
 {
     const int Width = 32;
     const int Height = 24;
-    // const int SpriteHeight = 48;
 
     readonly int _tileIndex;
     readonly IReadOnlyBattle _battle;
     readonly UiSpriteElement _sprite;
+    readonly UiSpriteElement _actionIcon;
     readonly Button _button;
+    bool _isDying;
+    float _deathTimer;
+    float _deathStartElapsed;
 
     public SpriteId Icon
     {
@@ -35,13 +38,21 @@ public class VisualCombatTile : UiElement
     public VisualCombatTile(int tileIndex, IReadOnlyBattle battle)
     {
         On<PostEngineUpdateEvent>(_ => OnPostUpdate());
+        On<CombatAnimationEvent>(e =>
+        {
+            if (e.Tile == _tileIndex && e.AnimationType == CombatAnimationType.Death)
+                ShowDeathState();
+        });
         _tileIndex = tileIndex;
         _battle = battle ?? throw new ArgumentNullException(nameof(battle));
         _sprite = new UiSpriteElement(SpriteId.None) { IsActive = false, Flags = SpriteFlags.BottomAligned };
+        _actionIcon = new UiSpriteElement(SpriteId.None);
 
         var stack =
             new VerticalStacker(
-                    new Spacing(Width, Height),
+                    new LayerStacker(
+                        new Spacing(Width, Height),
+                        new CentreContent(_actionIcon)),
                     _sprite
             )
             {
@@ -60,8 +71,41 @@ public class VisualCombatTile : UiElement
 
     void OnPostUpdate()
     {
+        if (_isDying)
+        {
+            var clock = Resolve<IClock>();
+            if (clock != null)
+                _deathTimer = clock.ElapsedTime - _deathStartElapsed;
+            if (_deathTimer >= 1.0f)
+            {
+                _isDying = false;
+                _sprite.IsActive = false;
+            }
+            return;
+        }
+
         ICombatParticipant mob = _battle.GetTile(_tileIndex);
         Icon = mob == null ? SpriteId.None : mob.Effective.TacticalGfx;
+
+        var planned = _battle.GetPlannedAction(_tileIndex);
+        _actionIcon.Id = planned?.ActionType switch
+        {
+            CombatActionType.Attack       => (SpriteId)Base.CoreGfx.CombatAttackMelee,
+            CombatActionType.Move         => (SpriteId)Base.CoreGfx.CombatMove,
+            CombatActionType.CastSpell    => (SpriteId)Base.CoreGfx.CombatMagic,
+            CombatActionType.UseMagicItem => (SpriteId)Base.CoreGfx.CombatMagicItem,
+            CombatActionType.Flee         => (SpriteId)Base.CoreGfx.CombatRetreat,
+            _                             => SpriteId.None
+        };
+    }
+
+    void ShowDeathState()
+    {
+        _isDying = true;
+        var clock = Resolve<IClock>();
+        _deathStartElapsed = clock?.ElapsedTime ?? 0f;
+        _deathTimer = 0f;
+        // DEVIATION: Full fade/alpha not exposed on UiSpriteElement — icon stays visible until timer expires
     }
 
     // public ButtonState State { get => _frame.State; set => _frame.State = value; }

@@ -71,7 +71,8 @@ public static class AssetSystem
 
         exchange.Attach(new Container("Logging",
             new LogHistory(),
-            new StdioConsoleLogger()));
+            new StdioConsoleLogger(),
+            new JsonStderrLogger()));
 
         assetServices
             .Add(new WordLookup())

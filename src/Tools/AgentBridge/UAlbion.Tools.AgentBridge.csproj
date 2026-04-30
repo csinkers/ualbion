@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AnalysisMode>Recommended</AnalysisMode>
+    <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Api\UAlbion.Api.csproj" />
+    <ProjectReference Include="..\..\Game\UAlbion.Game.csproj" />
+    <ProjectReference Include="..\..\Formats\UAlbion.Formats.csproj" />
+  </ItemGroup>
+
+</Project>

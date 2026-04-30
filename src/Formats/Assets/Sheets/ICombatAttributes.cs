@@ -11,4 +11,5 @@ public interface ICombatAttributes
     ushort BaseAttack { get; }
     short BonusAttack { get; }
     PlayerConditions Conditions { get; }
+    byte Morale { get; } // Horneman: Courage — für Flucht-Entscheidung (Default_decider)
 }

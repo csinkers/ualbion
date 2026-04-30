@@ -48,8 +48,17 @@ public class CombatDialog : Dialog
 
     void StartRound()
     {
-        IsActive = false;
-        RaiseA(new BeginCombatRoundEvent()).OnCompleted(() => IsActive = true);
+        // Hide children but keep the dialog subscribed so EndCombatEvent can still Remove() it.
+        // Setting IsActive=false would Detach the dialog, causing it to miss EndCombatEvent and
+        // re-appear on the map when the OnCompleted continuation fires.
+        foreach (var child in Children)
+            child.IsActive = false;
+        RaiseA(new BeginCombatRoundEvent()).OnCompleted(() =>
+        {
+            if (Exchange != null) // null after Remove() — don't re-show if combat ended
+                foreach (var child in Children)
+                    child.IsActive = true;
+        });
     }
 
     HorizontalStacker BuildRow(int row)

@@ -27,4 +27,5 @@ public class InterpolatedCombat : ICombatAttributes
     public ushort BaseAttack => (ushort)ApiUtil.Lerp(_a().BaseAttack, _b().BaseAttack, _getLerp());
     public short BonusAttack => (short)ApiUtil.Lerp(_a().BonusAttack, _b().BonusAttack, _getLerp());
     public PlayerConditions Conditions => _b().Conditions;
+    public byte Morale => _b().Morale;
 }

@@ -27,6 +27,10 @@ public class CombatAttributes : ICombatAttributes
 
     [DiagEdit(Style = DiagEditStyle.Checkboxes)]
     public PlayerConditions Conditions { get; set; }
+
+    [DiagEdit(Style = DiagEditStyle.NumericInput, Min = 0, Max = 100)]
+    public byte Morale { get; set; } // Horneman: Courage — für Flucht-Entscheidung
+
     public CombatAttributes DeepClone() => new CombatAttributes().CopyFrom(this);
     public CombatAttributes CopyFrom(CombatAttributes other)
     {

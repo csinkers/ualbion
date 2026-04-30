@@ -346,6 +346,6 @@ public class CharacterSheet : ICharacterSheet
         Serdes(Id, this, AssetMapping.Global, writer, spellManager);
 
         using var reader = AlbionSerdes.CreateReader(writer.GetMemory());
-        return Serdes(Id, this, AssetMapping.Global, reader, spellManager);
+        return Serdes(Id, null, AssetMapping.Global, reader, spellManager);
     }
 }

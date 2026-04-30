@@ -14,6 +14,7 @@ public sealed class CommandLineOptions
     public bool DebugMenus { get; }
     public bool Mute { get; }
     public bool NeedsEngine => Mode == ExecutionMode.Game;
+    public bool AgentMode { get; private set; }
     public bool StartupOnly { get; }
     public bool UseRenderDoc { get; }
     public string[] ConvertFrom { get; }
@@ -66,6 +67,7 @@ public sealed class CommandLineOptions
 
             if (arg == "--MENUS") DebugMenus = true;
             if (arg is "--NO-AUDIO" or "-MUTE" or "--MUTE") Mute = true;
+            if (arg is "--AGENT-MODE" or "--AGENT") AgentMode = true;
             if (arg is "--STARTUPONLY" or "-S") StartupOnly = true;
             if (arg is "--RENDERDOC" or "-RD") UseRenderDoc = true;
 

@@ -8,4 +8,7 @@ public interface IReadOnlyBattle
     IReadOnlyList<ICombatParticipant> Mobs { get; }
     ICombatParticipant GetTile(int x, int y);
     ICombatParticipant GetTile(int tileIndex);
+    CombatPlanningState PlanningState { get; }
+    int PendingActorPosition { get; }
+    PlannedCombatAction GetPlannedAction(int tileIndex);
 }

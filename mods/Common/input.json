@@ -34,6 +34,7 @@
   },
   "World2D": {
     "Escape": "push_scene MainMenu",
+    "F6": "encounter MonsterGroup.FourWarniak1OneWarniak3",
     "Ctrl+A": "!loadnextmap",
     "Ctrl+X": "!loadprevmap",
     "Ctrl+Q": "debug_flag toggle FastMovement",

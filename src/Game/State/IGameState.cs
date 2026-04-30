@@ -21,6 +21,7 @@ public interface IGameState
     ICharacterSheet GetSheet(SheetId id);
     IPlayer GetPlayerForCombatPosition(int position);
     int? GetCombatPositionForPlayer(PartyMemberId id);
+    void SetCombatPositionForPlayer(PartyMemberId id, int newTileIndex);
     IInventory GetInventory(InventoryId id);
     short GetTicker(TickerId id);
     bool GetSwitch(SwitchId id);

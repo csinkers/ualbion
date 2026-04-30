@@ -36,7 +36,7 @@ public static class DamageCalculator
     //   Both are randomised to 50–100% via Get_rnd_50_100.
     //   afflicted  = max(damage - protection, 0)
     //   Critical hit: Probe_skill(CriticalChance) && defender is not a boss-type monster
-    //                 → afflicted = defender.MaxHP  (instant kill)
+    //                 → afflicted = defender.CurrentHP  (instant kill of remaining HP)
     //
     // Get_damage(char) maps to BaseAttack + BonusAttack (intrinsic, monsters) + DisplayDamage (weapons, party).
     // Get_protection(char) maps to Combat.BaseDefense (after EffectiveSheetCalculator, includes armor).
@@ -66,7 +66,7 @@ public static class DamageCalculator
             && ProbeSkill(rng, attacker.Skills.CriticalChance);
         if (isCritical)
         {
-            afflicted = defender.Combat.LifePoints.Max;
+            afflicted = defender.Combat.LifePoints.Current;
         }
 
         return new DamageResult(afflicted, rawDamage, rawProtection, damage, protection, isCritical);

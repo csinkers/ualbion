@@ -334,8 +334,8 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
             PartyX = x,
             PartyY = y,
             PartyDirection = Direction.East,
-            ActiveMembers = { [0] = Base.PartyMember.Tom },
-            CombatPositions = { [0] = 1 } // Tom starts off in the second position
+            ActiveMembers = { [0] = Base.PartyMember.Tom, [1] = Base.PartyMember.Sira },
+            CombatPositions = { [0] = 1, [1] = 2 }
         };
 
         var assets = Assets;

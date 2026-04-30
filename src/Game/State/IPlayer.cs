@@ -13,4 +13,5 @@ public interface IPlayer : ICombatParticipant
     Vector3 GetPosition();
     void SetPositionFunc(Func<Vector3> func); // TODO: Refactor
     Vector2 StatusBarUiPosition { get; }
+    void AddExperience(int amount);
 }

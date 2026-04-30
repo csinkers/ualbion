@@ -50,6 +50,8 @@ public class Battle : GameComponent, IReadOnlyBattle
 
     public Battle(MonsterGroupId groupId, SpriteId backgroundId)
     {
+        // Fires when an external event source (e.g. a map script) ends combat early.
+        // When Battle ends combat internally, it calls Complete directly (see BeginRoundAsync).
         On<EndCombatEvent>(e => Complete?.Invoke(e.Result));
         OnAsync<BeginCombatRoundEvent>(BeginRoundAsync);
         OnAsync<ObserveCombatEvent>(Observe);
@@ -92,18 +94,30 @@ public class Battle : GameComponent, IReadOnlyBattle
     void OnSelectTarget(SelectCombatTargetEvent e)
     {
         if (PlanningState != CombatPlanningState.SelectingTarget) return;
-        if (!IsValidTarget(PendingActorPosition, e.TargetTileIndex)) return;
+        
+        // DEVIATION: In agent mode, bypass adjacency check so agent can plan attacks on any tile
+        // (original game UI enforces range via context menu visibility, but agent should be able to plan freely)
+        bool isValid = RaiseQuery(new IsAgentModeEvent()) || IsValidTarget(PendingActorPosition, e.TargetTileIndex);
+        if (!isValid) return;
+        
         _plannedActions[PendingActorPosition] = new PlannedCombatAction(_pendingActionType, e.TargetTileIndex);
         PlanningState = CombatPlanningState.Planning;
         PendingActorPosition = -1;
     }
 
     // Close range = Chebyshev distance 1. Long range = any tile.
+    // Move = exactly 1 tile (Chebyshev distance 1, source: Horneman COMACTS.C MOVE_COMACT).
     // DEVIATION: exact Get_close_range_targets adjacency mask (COMACTS.C) not available in Horneman source snapshot.
     bool IsValidTarget(int actorPos, int targetPos)
     {
-        if (_pendingActionType != CombatActionType.Attack) return true;
         if (actorPos < 0 || actorPos >= _tiles.Length) return false;
+
+        if (_pendingActionType == CombatActionType.Move)
+            return IsAdjacent(actorPos, targetPos)
+                && targetPos >= 0 && targetPos < _tiles.Length
+                && _tiles[targetPos] == null;
+
+        if (_pendingActionType != CombatActionType.Attack) return true;
 
         var actor = _tiles[actorPos];
         if (actor == null) return false;
@@ -155,10 +169,20 @@ AlbionTask Observe(ObserveCombatEvent _) =>
             {
                 if (actor.IsDead) continue;
 
-                if (actor.Effective.Type == CharacterType.Party)
-                    ExecutePartyAction(actor, rng);
-                else
-                    ExecuteMonsterAction(actor, rng);
+                Raise(new LogEvent(LogLevel.Info, $"[ROUND] actor={actor.SheetId} type={actor.Effective.Type} pos={actor.CombatPosition} hp={actor.Effective.Combat.LifePoints.Current}"));
+
+                // Horneman COMBAT.C Attacks_per_round = Character_data.ActionPoints
+                int actions = actor.Effective.Combat.ActionPoints;
+                for (int i = 0; i < actions; i++)
+                {
+                    if (actor.IsDead) break;
+
+                    Raise(new LogEvent(LogLevel.Info, $"  [ACTION] {i+1}/{actions} for {actor.SheetId}"));
+                    if (actor.Effective.Type == CharacterType.Party)
+                        ExecutePartyAction(actor, rng);
+                    else
+                        ExecuteMonsterAction(actor, rng);
+                }
             }
 
             _plannedActions.Clear();
@@ -170,19 +194,29 @@ AlbionTask Observe(ObserveCombatEvent _) =>
             bool anyMonsters = _mobs.Any(p => p.Effective.Type == CharacterType.Monster);
             bool anyParty    = _mobs.Any(p => p.Effective.Type == CharacterType.Party);
 
+            Raise(new LogEvent(LogLevel.Info,
+                $"[ROUND END] mobs={_mobs.Count} anyMonsters={anyMonsters} anyParty={anyParty} " +
+                string.Join(", ", _mobs.Select(m => $"{m.SheetId}({m.Effective.Type},dead={m.IsDead})"))));
+
             if (!anyMonsters)
             {
                 DistributeXp();
+                Raise(new LogEvent(LogLevel.Info, $"[COMBAT END] Victory — XP={XpShare} gold={_apresGold}"));
                 Raise(new CombatDialog.ShowCombatDialogEvent(false));
                 var dlg = x.AttachChild(new ApresCombatDialog(XpShare, _apresGold, _apresFood, _apresItems));
                 await dlg.Task;
                 dlg.Remove();
-                Raise(new CombatDialog.ShowCombatDialogEvent(true));
-                Enqueue(new EndCombatEvent(CombatResult.Victory));
+                Raise(new LogEvent(LogLevel.Info, "[COMBAT END] Raising EndCombatEvent Victory"));
+                // Use Raise (not Enqueue) so CombatDialog receives it immediately.
+                // Invoke Complete directly because Exchange skips Battle's own On<EndCombatEvent> (sender == Battle).
+                Raise(new EndCombatEvent(CombatResult.Victory));
+                Complete?.Invoke(CombatResult.Victory);
             }
             else if (!anyParty)
             {
-                Enqueue(new EndCombatEvent(CombatResult.PartyKilled));
+                Raise(new LogEvent(LogLevel.Info, "[COMBAT END] Raising EndCombatEvent PartyKilled"));
+                Raise(new EndCombatEvent(CombatResult.PartyKilled));
+                Complete?.Invoke(CombatResult.PartyKilled);
             }
         });
 
@@ -200,8 +234,10 @@ AlbionTask Observe(ObserveCombatEvent _) =>
             {
                 var target = plan.TargetTileIndex >= 0 ? GetTile(plan.TargetTileIndex) : null;
                 if (target == null || target.IsDead) break;
+Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Attack, target.CombatPosition));
                 var dmg = DamageCalculator.CalculateAfflictedDamage(rng, actor.Effective, target.Effective);
                 ApplyDamageAndCleanup(target, dmg.Afflicted);
+                Raise(new CombatDamageFloaterEvent(target.CombatPosition, dmg.Afflicted));
                 Raise(new LogEvent(LogLevel.Info,
                     $"[DAMAGE] {actor.SheetId}→{target.SheetId}: raw={dmg.RawDamage} prot={dmg.RawProtection} rolled={dmg.RolledDamage} vs {dmg.RolledProtection} = {dmg.Afflicted}{(dmg.IsCritical ? " CRITICAL" : "")}"));
                 break;
@@ -211,16 +247,25 @@ AlbionTask Observe(ObserveCombatEvent _) =>
             {
                 int newPos = plan.TargetTileIndex;
                 if (newPos < 0 || newPos >= _tiles.Length || _tiles[newPos] != null) break;
+                Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Move));
                 MoveParticipant(actor, newPos);
                 break;
             }
 
             case CombatActionType.Flee:
-                // Participant escapes — remove from battle without dying
+            {
+                // Horneman COMACTS.C Flee_combat_action — Flucht nur aus hinterster Reihe
+                int row = actor.CombatPosition / SavedGame.CombatColumns;
+                int lastRow = SavedGame.CombatRows - 1; // = 4
+                if (row != lastRow)
+                    break;
+
+Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Flee));
                 _mobs.Remove(actor);
                 if (actor.CombatPosition >= 0)
                     _tiles[actor.CombatPosition] = null;
                 break;
+            }
 
             case CombatActionType.CastSpell:
             case CombatActionType.UseMagicItem:
@@ -232,18 +277,43 @@ AlbionTask Observe(ObserveCombatEvent _) =>
     // Monsters move toward party and attack if in melee range.
     void ExecuteMonsterAction(ICombatParticipant actor, IRandom rng)
     {
+        Raise(new LogEvent(LogLevel.Info, $"  [MONSTER] {actor.SheetId} at tile {actor.CombatPosition} AP={actor.Effective.Combat.ActionPoints}"));
+        // Horneman MONLOGIC.C Default_decider — Flucht-Entscheidung vor Aktion
+        if (ShouldMonsterFlee(actor))
+        {
+            Raise(new LogEvent(LogLevel.Info, $"  [MONSTER] {actor.SheetId} FLEEING (danger>morale)"));
+            Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Flee));
+            int row = actor.CombatPosition / SavedGame.CombatColumns;
+            if (row == 0)
+            {
+                _mobs.Remove(actor);
+                _tiles[actor.CombatPosition] = null;
+            }
+            else
+            {
+                MoveMonsterToward(actor, actor.CombatPosition % SavedGame.CombatColumns); // retreat toward row 0
+            }
+            Raise(new LogEvent(LogLevel.Info, $"{actor.SheetId} versucht zu fliehen!"));
+            return;
+        }
+
         var target = _mobs
             .Where(p => !p.IsDead && p.Effective.Type == CharacterType.Party)
             .OrderBy(p => Math.Abs(p.CombatPosition % SavedGame.CombatColumns - actor.CombatPosition % SavedGame.CombatColumns))
             .ThenBy(p => p.CombatPosition)
             .FirstOrDefault();
 
+        Raise(new LogEvent(LogLevel.Info, $"  [MONSTER TARGET] {actor.SheetId} found target: {(target == null ? "none" : target.SheetId.ToString())} at tile {(target == null ? -1 : target.CombatPosition)}"));
+
         if (target == null) return;
 
         if (IsInMeleeRange(actor.CombatPosition, target.CombatPosition))
         {
+            Raise(new LogEvent(LogLevel.Info, $"  [MONSTER ATTACK] {actor.SheetId} → {target.SheetId}"));
+            Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Attack, target.CombatPosition));
             var dmg = DamageCalculator.CalculateAfflictedDamage(rng, actor.Effective, target.Effective);
             ApplyDamageAndCleanup(target, dmg.Afflicted);
+            Raise(new CombatDamageFloaterEvent(target.CombatPosition, dmg.Afflicted));
             Raise(new LogEvent(LogLevel.Info,
                 $"[DAMAGE] {actor.SheetId}→{target.SheetId}: raw={dmg.RawDamage} prot={dmg.RawProtection} rolled={dmg.RolledDamage} vs {dmg.RolledProtection} = {dmg.Afflicted}{(dmg.IsCritical ? " CRITICAL" : "")}"));
         }
@@ -260,6 +330,23 @@ AlbionTask Observe(ObserveCombatEvent _) =>
         int dx = Math.Abs(actorTile % cols - targetTile % cols);
         int dy = Math.Abs(actorTile / cols - targetTile / cols);
         return dx <= 1 && dy <= 1;
+    }
+
+    // Horneman MONLOGIC.C Default_decider — Monster-Flucht basierend auf Morale
+    bool ShouldMonsterFlee(ICombatParticipant actor)
+    {
+        int courage = actor.Effective.Combat.Morale;
+        if (courage == 0) return false; // 0 = fights to the death
+
+        int total = _mobs.Count(p => p.Effective.Type == CharacterType.Monster);
+        int surviving = _mobs.Count(p => p.Effective.Type == CharacterType.Monster && !p.IsDead);
+        int globalDanger = total > 0 ? 100 - (surviving * 100 / total) : 100;
+        int maxHp = actor.Effective.Combat.LifePoints.Max;
+        int curHp = actor.Effective.Combat.LifePoints.Current;
+        int localDanger = maxHp > 0 ? 100 - (curHp * 100 / maxHp) : 100;
+        int danger = (globalDanger + localDanger) / 2;
+        Raise(new LogEvent(LogLevel.Info, $"  [FLEE] {actor.SheetId}: total={total} surviving={surviving} globalDanger={globalDanger} maxHp={maxHp} curHp={curHp} localDanger={localDanger} danger={danger} courage={courage} flee={danger >= courage}"));
+        return danger >= courage;
     }
 
     void MoveMonsterToward(ICombatParticipant actor, int targetTile)
@@ -282,12 +369,14 @@ AlbionTask Observe(ObserveCombatEvent _) =>
 
     void ApplyDamageAndCleanup(ICombatParticipant target, int damage)
     {
+        Raise(new CombatAnimationEvent(target.CombatPosition, CombatAnimationType.Hit));
         var oldHp = target.Effective.Combat.LifePoints.Current;
         target.TakeDamage(damage);
         var newHp = target.Effective.Combat.LifePoints.Current;
         Raise(new LogEvent(LogLevel.Info, $"Damage: {damage} | {target.SheetId}: {oldHp} → {newHp}/{target.Effective.Combat.LifePoints.Max}"));
         if (!target.IsDead) return;
 
+        Raise(new CombatAnimationEvent(target.CombatPosition, CombatAnimationType.Death));
         _addedExperiencePoints += target.ExperienceReward;
         CollectLoot(target);
         _mobs.Remove(target);
@@ -335,6 +424,11 @@ AlbionTask Observe(ObserveCombatEvent _) =>
         }
     }
 
+    protected override void Unsubscribed()
+    {
+        Exchange.Unregister(typeof(IReadOnlyBattle), this);
+    }
+
     protected override void Subscribed()
     {
         Exchange.Register<IReadOnlyBattle>(this);
@@ -373,6 +467,10 @@ AlbionTask Observe(ObserveCombatEvent _) =>
                 _tiles[monster.CombatPosition] = monster;
             }
         }
+
+        // DEVIATION: Monster stat randomisation (±5%) not implemented —
+        // IEffectiveCharacterSheet is read-only and exposes no setters for attributes/HP.
+        // Horneman COMBAT.C Clone_monster_data randomises all attributes at combat start.
     }
 
     public ICombatParticipant GetTile(int x, int y)

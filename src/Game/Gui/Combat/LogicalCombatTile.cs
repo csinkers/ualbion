@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UAlbion.Api.Eventing;
@@ -30,15 +30,26 @@ public class LogicalCombatTile : UiElement
         _battle = battle ?? throw new ArgumentNullException(nameof(battle));
 
         AttachChild(new VisualCombatTile(tileIndex, battle))
-            .OnClick(() =>
-            {
-            })
+            .OnClick(OnClick)
             .OnRightClick(OnRightClick)
             .OnHover(Hover)
             .OnBlur(Blur);
+
+        On<CombatDamageFloaterEvent>(e =>
+        {
+            if (e.Tile == _tileIndex)
+                AttachChild(new DamageFloater(e.Damage));
+        });
     }
 
     public override string ToString() => $"CombatTile:{_tileIndex}";
+
+    void OnClick()
+    {
+        // During target selection, any tile click completes the pending action.
+        if (_battle.PlanningState == CombatPlanningState.SelectingTarget)
+            Raise(new SelectCombatTargetEvent(_tileIndex));
+    }
 
     void Blur()
     {
@@ -84,38 +95,31 @@ public class LogicalCombatTile : UiElement
                 .Ink(disabled ? Base.Ink.Yellow : Base.Ink.White)
                 .Format(textId);
 
-        // Drop (Yellow inactive when critical)
-        // Examine
-        // Use (e.g. torch)
-        // Drink
-        // Activate (compass, clock, monster eye)
-        // Activate spell (if has spell, yellow if combat spell & not in combat etc)
-        // Read (e.g. metal-magic knowledge, maps)
-
         var options = new List<ContextMenuOption>();
 
         if (sheet?.Type == CharacterType.Party)
         {
             options.Add(new ContextMenuOption(
                 S(Base.SystemText.Combat_DoNothing),
-                new NopEvent(),
+                new SelectCombatActionEvent(_tileIndex, CombatActionType.None),
                 ContextMenuGroup.Actions));
 
             options.Add(new ContextMenuOption(
-                S(Base.SystemText.Combat_Attack, sheet.DisplayDamage <= 0),
-                new NopEvent(),
+                S(Base.SystemText.Combat_Attack, sheet.DisplayDamage <= 0
+                    && sheet.Combat.BaseAttack == 0 && sheet.Combat.BonusAttack <= 0),
+                new SelectCombatActionEvent(_tileIndex, CombatActionType.Attack),
                 ContextMenuGroup.Actions));
 
             options.Add(new ContextMenuOption(
                 S(Base.SystemText.Combat_Move),
-                new NopEvent(),
+                new SelectCombatActionEvent(_tileIndex, CombatActionType.Move),
                 ContextMenuGroup.Actions));
 
             if (sheet.Magic.KnownSpells.Count > 0)
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.Combat_UseMagic),
-                    new NopEvent(),
+                    new SelectCombatActionEvent(_tileIndex, CombatActionType.CastSpell),
                     ContextMenuGroup.Actions));
             }
 
@@ -123,7 +127,7 @@ public class LogicalCombatTile : UiElement
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.Combat_UseMagicItem),
-                    new NopEvent(),
+                    new SelectCombatActionEvent(_tileIndex, CombatActionType.UseMagicItem),
                     ContextMenuGroup.Actions));
             }
 
@@ -131,7 +135,7 @@ public class LogicalCombatTile : UiElement
             {
                 options.Add(new ContextMenuOption(
                     S(Base.SystemText.Combat_Flee),
-                    new NopEvent(),
+                    new SelectCombatActionEvent(_tileIndex, CombatActionType.Flee),
                     ContextMenuGroup.Actions));
             }
         }

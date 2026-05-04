@@ -10,6 +10,8 @@ public static class ShaderHeaders
     [
         BlendedSpriteVertexShader.ShaderSource(),
         BlendedSpriteFragmentShader.ShaderSource(),
+        DebugVertexShader.ShaderSource(),
+        DebugFragmentShader.ShaderSource(),
         Etm.EtmVertexShader.ShaderSource(),
         Etm.EtmFragmentShader.ShaderSource(),
         FullscreenQuadVertexShader.ShaderSource(),

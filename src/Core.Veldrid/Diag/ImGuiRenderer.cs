@@ -53,7 +53,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     int _windowWidth;
     int _windowHeight;
 
-    public Type[] HandledTypes { get; } = [typeof(DebugGuiRenderable)];
+    public Type[] HandledTypes { get; } = [typeof(ImGuiRenderable)];
     public bool IsReady => _pipeline != null;
 
     public ImGuiRenderer(in OutputDescription outputFormat)
@@ -103,7 +103,7 @@ public sealed class ImGuiRenderer : Component, IRenderer, IDisposable // This is
     {
         ArgumentNullException.ThrowIfNull(cl);
         ArgumentNullException.ThrowIfNull(device);
-        if (renderable is not DebugGuiRenderable)
+        if (renderable is not ImGuiRenderable)
             throw new ArgumentException($"{GetType().Name} was passed renderable of unexpected type {renderable.GetType().Name}", nameof(renderable));
 
         if (!_frameBegun)

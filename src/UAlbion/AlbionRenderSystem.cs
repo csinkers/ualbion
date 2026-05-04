@@ -53,7 +53,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
             .Source(S_Tile, new TileRenderableManager())
             .Source(S_Etm, new EtmManager())
             .Source(S_Sky, new SkyboxManager())
-            .Source(S_Debug, new DebugGuiRenderable())
+            .Source(S_Debug, new ImGuiRenderable())
 
             .System(Sys_Default, sys => 
                 sys

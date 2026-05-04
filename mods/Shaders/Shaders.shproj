@@ -12,4 +12,12 @@
     <Content Include="$(MSBuildThisFileDirectory)\**\*.vert" />
     <Content Include="$(MSBuildThisFileDirectory)\**\*.glsl" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Shaders\DebugSF.h.frag" />
+    <Content Remove="Shaders\DebugSV.h.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\DebugSF.h.frag" />
+    <None Include="Shaders\DebugSV.h.vert" />
+  </ItemGroup>
 </Project>

@@ -9,9 +9,9 @@ namespace UAlbion.Core.Veldrid.Diag;
 /// <summary>
 /// A dummy renderable object to trigger drawing of the ImGui UI
 /// </summary>
-public class DebugGuiRenderable : Component, IRenderable, IRenderableSource
+public class ImGuiRenderable : Component, IRenderable, IRenderableSource
 {
-    public string Name => "DebugGui";
+    public string Name => "ImGui";
     public DrawLayer RenderOrder => DrawLayer.Debug;
     public void Collect(List<IRenderable> renderables)
     {

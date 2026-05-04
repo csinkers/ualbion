@@ -31,6 +31,8 @@ public class UserVars
     {
         public StringVar Language { get; } = new(Library, "User.Gameplay.Language", Base.Language.English);
         public IntVar CombatDelay { get; } = new(Library, "User.Gameplay.Combat.MessageDelay", 3);
+        public BoolVar UseMouseLook { get; } = new(Library, "User.Gameplay.UseMouseLook", false);
+
         public CustomVar<List<string>, string> ActiveMods { get; } = new(
             Library,
             "User.Gameplay.ActiveMods",

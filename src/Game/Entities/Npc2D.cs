@@ -110,7 +110,7 @@ public class Npc2D : Component
             }
         }
 
-        if (Movement2D.Instance.Update(_state,
+        if (Movement2D.Update(_state,
                 _moveSettings,
                 Resolve<ICollisionManager>(),
                 (_targetX - _state.X, _targetY - _state.Y),

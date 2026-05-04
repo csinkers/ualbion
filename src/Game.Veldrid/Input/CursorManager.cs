@@ -28,7 +28,6 @@ public class CursorManager : GameServiceComponent<ICursorManager>, ICursorManage
     BatchLease<SpriteKey, SpriteInfo> _hotspotSprite;
     PositionedSpriteBatch _itemAmountSprite;
 
-    SpriteId _cursorId = Base.CoreGfx.Cursor;
     SpriteId _heldItemId = SpriteId.None;
     int _heldSubItem;
     int _heldItemFrames;
@@ -41,11 +40,12 @@ public class CursorManager : GameServiceComponent<ICursorManager>, ICursorManage
     // bool _relative;
     int _frame;
 
+    public SpriteId CursorId { get; private set; } = Base.CoreGfx.Cursor;
     public CursorManager()
     {
         On<PrepareFrameEvent>(_ => Render());
         On<IdleClockEvent>(_ => _frame++);
-        On<GameWindowResizedEvent>(_ => SetCursor(_cursorId));
+        On<GameWindowResizedEvent>(_ => SetCursor(CursorId));
         On<SetCursorEvent>(e => SetCursor(e.CursorId));
         On<ShowCursorEvent>(e => { _showCursor = e.Show; _dirty = true; });
         // On<SetRelativeMouseModeEvent>(e => _relative = e.Enabled);
@@ -89,7 +89,7 @@ public class CursorManager : GameServiceComponent<ICursorManager>, ICursorManage
         var window = Resolve<IGameWindow>();
         var config = Assets.GetAssetInfo(cursorId);
 
-        _cursorId = cursorId;
+        CursorId = cursorId;
         var hotspot = CursorHotspot.Parse(config?.GetProperty(Hotspot, null));
         _hotspot = hotspot == null
             ? Vector2.Zero
@@ -159,7 +159,7 @@ public class CursorManager : GameServiceComponent<ICursorManager>, ICursorManage
             return;
         }
 
-        var cursorTexture = assets.LoadTexture(_cursorId);
+        var cursorTexture = assets.LoadTexture(CursorId);
         if (cursorTexture == null)
             return;
 

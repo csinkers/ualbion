@@ -106,7 +106,7 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
     void Update()
     {
         var detector = Resolve<ICollisionManager>();
-        if (Movement2D.Instance.Update(_state,
+        if (Movement2D.Update(_state,
                 _settings,
                 detector,
                 (int)_direction.X,

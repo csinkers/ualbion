@@ -23,7 +23,7 @@ public class MenuScene : Container, IScene
         if (_clockWasRunning)
             Raise(new StopClockEvent());
 
-        Raise(new PushMouseModeEvent(MouseMode.Normal));
+        Raise(new PushMouseModeEvent(MouseMode.Normal2D));
         Raise(new PushInputModeEvent(InputMode.MainMenu));
     }
 

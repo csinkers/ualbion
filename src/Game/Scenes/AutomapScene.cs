@@ -20,7 +20,7 @@ public class AutomapScene : Container, IAutoMapScene
 
     protected override void Subscribed()
     {
-        Raise(new PushMouseModeEvent(MouseMode.Normal));
+        Raise(new PushMouseModeEvent(MouseMode.Normal2D));
         Raise(new PushInputModeEvent(InputMode.Automap));
     }
 

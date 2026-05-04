@@ -6,6 +6,6 @@ namespace UAlbion.Game.Veldrid.Input;
 
 public class World2DInputMode : Component
 {
-    protected override void Subscribed() => Raise(new PushMouseModeEvent(MouseMode.Normal));
+    protected override void Subscribed() => Raise(new PushMouseModeEvent(MouseMode.Normal2D));
     protected override void Unsubscribed() => Raise(new PopMouseModeEvent());
 }

@@ -27,7 +27,7 @@ public class InventoryScene : Container, IInventoryScene
             Raise(new StopClockEvent());
 
         Raise(new PushInputModeEvent(InputMode.Inventory));
-        Raise(new PushMouseModeEvent(MouseMode.Normal));
+        Raise(new PushMouseModeEvent(MouseMode.Normal2D));
         Raise(new LoadPaletteEvent(Base.Palette.Inventory));
     }
 

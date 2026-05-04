@@ -1,4 +1,5 @@
 using UAlbion.Api.Eventing;
+using UAlbion.Api.Settings;
 using UAlbion.Core;
 using UAlbion.Core.Visual;
 using UAlbion.Formats.Config;
@@ -20,7 +21,9 @@ public class DungeonScene : Container, IDungeonScene
 
     protected override void Subscribed()
     {
-        Raise(new PushMouseModeEvent(MouseMode.MouseLook));
+        var settings = Resolve<ISettings>();
+        var mode = V.User.Gameplay.UseMouseLook.Read(settings) ? MouseMode.MouseLook : MouseMode.Normal3D;
+        Raise(new PushMouseModeEvent(mode));
         Raise(new PushInputModeEvent(InputMode.World3D));
     }
 

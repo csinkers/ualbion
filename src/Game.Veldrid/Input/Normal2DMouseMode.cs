@@ -9,7 +9,7 @@ using UAlbion.Game.Events;
 
 namespace UAlbion.Game.Veldrid.Input;
 
-public class NormalMouseMode : Component
+public class Normal2DMouseMode : Component
 {
     readonly List<Selection> _hits = [];
     readonly UiMouseMoveEvent _moveEvent = new(0, 0);
@@ -21,7 +21,7 @@ public class NormalMouseMode : Component
 
     Vector2 _lastPosition;
 
-    public NormalMouseMode() => On<MouseInputEvent>(OnInput);
+    public Normal2DMouseMode() => On<MouseInputEvent>(OnInput);
     protected override void Subscribed() => Raise(new SetCursorEvent(Base.CoreGfx.Cursor));
 
     void OnInput(MouseInputEvent e)

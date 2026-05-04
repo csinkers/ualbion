@@ -14,7 +14,7 @@ public class InputManager : ServiceComponent<IInputManager>, IInputManager
     readonly Stack<InputMode> _inputModeStack = new();
 
     public InputMode InputMode { get; private set; } = InputMode.Global;
-    public MouseMode MouseMode { get; private set; } = MouseMode.Normal;
+    public MouseMode MouseMode { get; private set; } = MouseMode.Normal2D;
     public IEnumerable<InputMode> InputModeStack => _inputModeStack;
     public IEnumerable<MouseMode> MouseModeStack => _mouseModeStack;
 
@@ -26,8 +26,8 @@ public class InputManager : ServiceComponent<IInputManager>, IInputManager
         {
             switch (MouseMode)
             {
-                case MouseMode.Normal: SetMouseMode(MouseMode.MouseLook); break;
-                case MouseMode.MouseLook: SetMouseMode(MouseMode.Normal); break;
+                case MouseMode.Normal3D: SetMouseMode(MouseMode.MouseLook); break;
+                case MouseMode.MouseLook: SetMouseMode(MouseMode.Normal3D); break;
             }
         });
         On<PushMouseModeEvent>(e =>

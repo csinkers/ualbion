@@ -117,7 +117,7 @@ public class PlayerMovementTests
             var lastDir = m.FacingDirection;
             var lastPos = (m.X, m.Y);
             while (lastOrder == orderIndex) // Fire ticks until the next order is retrieved
-                Movement2D.Instance.Update(m, moveSettings, collManager, this, GetOrder, null);
+                Movement2D.Update(m, moveSettings, collManager, this, GetOrder, null);
 
             // State after handling the order should match
             var (type, param) = expectedResponses[resultIndex++];
@@ -209,7 +209,7 @@ public class PlayerMovementTests
 
         void Move(int dx, int dy, Direction dir, float expectedX, float expectedY, SpriteAnimation anim, int frame)
         {
-            Movement2D.Instance.Update(m, moveSettings, collManager, dx, dy, null); // Turn east
+            Movement2D.Update(m, moveSettings, collManager, dx, dy, null); // Turn east
             float actualX = m.PixelX / moveSettings.TileWidth;
             float actualY = m.PixelY / moveSettings.TileHeight;
             Assert.True(expectedX - actualX < 0.0001, $"{expectedX} != {actualX}");

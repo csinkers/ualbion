@@ -95,7 +95,7 @@
     "M": "open_map",
     "T": "wait",
     "Ctrl+Shift+M": "set_mouse_mode MouseLook",
-    "Ctrl+Shift+N": "set_mouse_mode Normal",
+    "Ctrl+Shift+N": "set_mouse_mode Normal3D",
 
     "W": "+camera_move  0 -4",
     "A": "+camera_move -4  0",

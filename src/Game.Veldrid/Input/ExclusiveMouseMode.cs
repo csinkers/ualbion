@@ -22,13 +22,13 @@ public class ExclusiveMouseMode : Component
         if (e.CheckMouse(MouseButton.Left, false))
         {
             Raise(new UiLeftReleaseEvent());
-            Raise(new MouseModeEvent(MouseMode.Normal));
+            Raise(new MouseModeEvent(MouseMode.Normal2D));
         }
 
         if (e.CheckMouse(MouseButton.Right, false))
         {
             Raise(new UiRightReleaseEvent());
-            Raise(new MouseModeEvent(MouseMode.Normal));
+            Raise(new MouseModeEvent(MouseMode.Normal2D));
         }
     }
 }

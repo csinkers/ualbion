@@ -5,12 +5,9 @@ using UAlbion.Formats.Assets;
 
 namespace UAlbion.Game.Entities.Map2D;
 
-public class Movement2D : IMovementController
+public static class Movement2D
 {
-    Movement2D() {}
-    public static Movement2D Instance { get; } = new();
-
-    public bool Update<TContext>(
+    public static bool Update<TContext>(
         IMovementState state,
         IMovementSettings settings,
         ICollisionManager detector,
@@ -97,7 +94,7 @@ public class Movement2D : IMovementController
         return moved;
     }
 
-    public bool Update(
+    public static bool Update(
         IMovementState state,
         IMovementSettings settings,
         ICollisionManager detector,

@@ -24,7 +24,7 @@ public class CombatScene : Container, IScene
             Raise(new StopClockEvent());
 
         // Raise(new ShowMapEvent(false));
-        Raise(new PushMouseModeEvent(MouseMode.Normal));
+        Raise(new PushMouseModeEvent(MouseMode.Normal2D));
         Raise(new PushInputModeEvent(InputMode.Combat));
     }
 

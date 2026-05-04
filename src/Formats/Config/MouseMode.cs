@@ -2,7 +2,8 @@
 
 public enum MouseMode
 {
-    Normal,
+    Normal2D,
+    Normal3D,
     MouseLook,
     DebugPick,
     RightButtonHeld,

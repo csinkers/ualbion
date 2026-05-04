@@ -52,11 +52,6 @@ public class MouseLookMouseMode : Component
         On<MouseInputEvent>(OnInput);
         On<FocusGainedEvent>(_ => AcquireMouse());
         On<FocusLostEvent>(_ => ReleaseMouse());
-        On<PostEngineUpdateEvent>(_ =>
-        {
-            //var windowState = Resolve<IWindowManager>();
-            //Raise(new SetCursorPositionEvent(windowState.PixelWidth / 2, windowState.PixelHeight / 2));
-        });
     }
 
     protected override void Subscribed()

@@ -1,5 +1,7 @@
 ﻿using System.Numerics;
 using UAlbion.Api.Eventing;
+using UAlbion.Base;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Input;
 
 namespace UAlbion.Game.Tests;
@@ -7,4 +9,5 @@ namespace UAlbion.Game.Tests;
 public class MockCursorManager : ServiceComponent<ICursorManager>, ICursorManager
 {
     public Vector2 Position { get; set; }
+    public SpriteId CursorId => CoreGfx.Cursor;
 }

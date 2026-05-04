@@ -17,10 +17,12 @@ public class GameWindow : ServiceComponent<IGameWindow>, IGameWindow
     Vector2 _normToPixel;
     Vector2 _pixelToNorm;
 
-    public GameWindow(int width, int height)
+    public GameWindow(int width, int height, int uiWidth, int uiHeight)
     {
         _width = width;
         _height = height;
+        UiWidth = uiWidth;
+        UiHeight = uiHeight;
     }
 
     public void Resize(int width, int height)
@@ -32,12 +34,11 @@ public class GameWindow : ServiceComponent<IGameWindow>, IGameWindow
     }
 
     public int GuiScale { get; private set; }
-    public int UiWidth => UiConstants.UiExtents.Width;
-    public int UiHeight => UiConstants.UiExtents.Height;
+    public int UiWidth { get; }
+    public int UiHeight { get; }
     public int PixelWidth => _width;
     public int PixelHeight => _height;
     public Vector2 Size => new(_width, _height);
-    static Vector2 UiSize => new(UiConstants.UiExtents.Width, UiConstants.UiExtents.Height);
 
     // UI Coordinates:
     // Top left corner in original game = (0,0)
@@ -90,8 +91,8 @@ public class GameWindow : ServiceComponent<IGameWindow>, IGameWindow
             -2.0f / _height);
 
         _uiOffset = new Vector2(
-            UiSize.X * GuiScale / _width,
-            1.0f - 2 * GuiScale * UiSize.Y / _height);
+            (float)UiWidth * GuiScale / _width,
+            1.0f - 2 * GuiScale * (float)UiHeight / _height);
 
         // Snap to the nearest pixel
         var uiPos = NormToUiRelative(_uiOffset);

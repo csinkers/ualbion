@@ -10,6 +10,7 @@ using UAlbion.Core.Veldrid.Meshes;
 using UAlbion.Core.Veldrid.Skybox;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Visual;
+using UAlbion.Game;
 using UAlbion.Game.Veldrid.Diag;
 using UAlbion.Game.Veldrid.Visual;
 using Veldrid;
@@ -80,7 +81,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                             x.Raise(mouseEvent);
                         });
                     }))
-                .Component(C_GameWindow, new GameWindow(1,1))
+                .Component(C_GameWindow, new GameWindow(1,1, UiConstants.UiExtents.Width, UiConstants.UiExtents.Height))
                 .Component(C_WindowUpdater, // Minimal component to ensure the game resizes with the window
                     AdHocComponent.Build(C_WindowUpdater,
                         (GameWindow)sys.GetComponent(C_GameWindow),
@@ -103,7 +104,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                 sys
                 .Framebuffer(FB_Screen, new MainFramebuffer(FB_Screen))
                 .Framebuffer(FB_Game, new SimpleFramebuffer(FB_Game, 360, 240))
-                .Component(C_GameWindow, new GameWindow(360, 240))
+                .Component(C_GameWindow, new GameWindow(360, 240, UiConstants.UiExtents.Width, UiConstants.UiExtents.Height))
                 .Component(C_ImGui, new ImGuiManager((ImGuiRenderer)sys.GetRenderer(R_Debug)))
                 .Action(() =>
                 {

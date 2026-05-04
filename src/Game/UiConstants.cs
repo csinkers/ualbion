@@ -1,4 +1,6 @@
-﻿namespace UAlbion.Core;
+﻿using UAlbion.Core;
+
+namespace UAlbion.Game;
 
 public static class UiConstants
 {

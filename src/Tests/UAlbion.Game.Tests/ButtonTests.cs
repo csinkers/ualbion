@@ -55,7 +55,7 @@ public class ButtonTests : Component
             .Attach(modApplier)
             .Attach(assetManager)
             .Register<IBatchManager<SpriteKey, SpriteInfo>>(new BatchManager<SpriteKey, SpriteInfo>(static (key, f) => f.CreateSpriteBatch(key)))
-            .Attach(new GameWindow(1920, 1080))
+            .Attach(new GameWindow(1920, 1080, UiConstants.UiExtents.Width, UiConstants.UiExtents.Height))
             .Attach(new MockGameFactory())
             .Attach(new TextManager())
             .Register<ICommonColors>(new CommonColors())

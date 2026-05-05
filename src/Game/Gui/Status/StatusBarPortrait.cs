@@ -6,6 +6,7 @@ using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
+using UAlbion.Formats.Assets.Sheets;
 using UAlbion.Formats.Ids;
 using UAlbion.Formats.MapEvents;
 using UAlbion.Game.Events;
@@ -23,6 +24,7 @@ public class StatusBarPortrait : UiElement
     readonly UiSpriteElement _portrait;
     readonly StatusBarHealthBar _health;
     readonly StatusBarHealthBar _mana;
+    readonly UiSpriteElement _conditionIcon;
     readonly int _order;
     bool _isClickTimerPending;
 
@@ -32,8 +34,12 @@ public class StatusBarPortrait : UiElement
         _portrait = AttachChild(new UiSpriteElement(Base.Portrait.Tom));
         _health = AttachChild(new StatusBarHealthBar(order, true));
         _mana = AttachChild(new StatusBarHealthBar(order, false));
+        // DEVIATION: Only Poisoned mapped to CharEffect3. Other conditions need per-sprite research.
+        _conditionIcon = AttachChild(new UiSpriteElement(SpriteId.None));
 
         On<PartyChangedEvent>(_ => LoadSprite());
+        On<SheetChangedEvent>(_ => LoadSprite());
+        On<InventoryChangedEvent>(_ => LoadSprite());
         On<UiLeftClickEvent>(OnClick);
         On<UiRightClickEvent>(OnRightClick);
         On<HoverEvent>(Hover);
@@ -78,7 +84,7 @@ public class StatusBarPortrait : UiElement
         {
             options.Add(new ContextMenuOption(
                 S(Base.SystemText.PartyPopup_UseMagic),
-                null,
+                new UseOutOfCombatSpellEvent(member.Id),
                 ContextMenuGroup.Actions));
         }
 
@@ -133,6 +139,13 @@ public class StatusBarPortrait : UiElement
         }
 
         maxOrder = Math.Max(maxOrder, func(_portrait, portraitExtents, order, context));
+        {
+            int iconX = portraitExtents.X + (portraitExtents.Width  - 14) / 2;
+            int iconY = portraitExtents.Y + (portraitExtents.Height - 13) / 2;
+            maxOrder = Math.Max(maxOrder, func(_conditionIcon,
+                new Rectangle(iconX, iconY, 14, 13),
+                order + 1, context));
+        }
         maxOrder = Math.Max(maxOrder, func(_health, new Rectangle(
                 extents.X + 5,
                 extents.Y + extents.Height - 7,
@@ -159,6 +172,11 @@ public class StatusBarPortrait : UiElement
         _portrait.IsActive = portraitId.HasValue;
         if (portraitId.HasValue)
             _portrait.Id = portraitId.Value;
+
+        var conditions = PartyMember?.Effective.Combat.Conditions ?? PlayerConditions.None;
+        _conditionIcon.Id = conditions != PlayerConditions.None
+            ? (SpriteId)Base.CoreGfx.CharEffect3
+            : SpriteId.None;
     }
 
     void OnClick(UiLeftClickEvent e)

@@ -51,9 +51,14 @@ public class LogicalInventorySlot : UiElement
             amountSource = new DynamicText(() =>
             {
                 var slotInfo = Slot;
-                return slotInfo == null || slotInfo.Amount < 2
-                    ? []
-                    : new[] { new TextBlock(slotInfo.Amount.ToString()) { Alignment = TextAlignment.Right } }; // todo: i18n: Will need to be changed if we support a language that doesn't use Hindu-Arabic numerals.
+                if (slotInfo == null || slotInfo.Amount < 2)
+                    return [];
+                // Horneman ITEMLIST.C: Quantity==255 means infinite merchant stock → display "**".
+                // CLARIFY: Buy price = ItemData.Value / 10 Obols? Sell price = Value / 2?
+                // Needs verification against SR-output before implementing M2 (price display).
+                if (slotInfo.Amount == 255)
+                    return [new TextBlock("**") { Alignment = TextAlignment.Right }];
+                return [new TextBlock(slotInfo.Amount.ToString()) { Alignment = TextAlignment.Right }]; // todo: i18n: Will need to be changed if we support a language that doesn't use Hindu-Arabic numerals.
             }, _ => _version);
         }
 
@@ -72,6 +77,12 @@ public class LogicalInventorySlot : UiElement
             })
             .OnClick(() =>
             {
+                // M3: Left-click on merchant slot buys the item.
+                if (_id.Id.Type == InventoryType.Merchant)
+                {
+                    Raise(new InventorySellEvent(_id.Id, _id.Slot));
+                    return;
+                }
                 var inputBinder = Resolve<IInputBinder>();
                 if (inputBinder.IsCtrlPressed)
                     Raise(new InventoryPickupEvent(null, _id.Id, _id.Slot));
@@ -133,7 +144,22 @@ public class LogicalInventorySlot : UiElement
             {
                 if (itemName != null)
                 {
-                    Raise(new HoverTextEvent(new LiteralText(itemName)));
+                    // M2: Show buy price when hovering over merchant stock.
+                    // CLARIFY: price formula (Value = resell*10; buy=full, sell=half?) needs SR verification.
+                    if (_id.Id.Type == InventoryType.Merchant)
+                    {
+                        var slotInfo2 = Slot;
+                        if (slotInfo2?.Item.Type == AssetType.Item)
+                        {
+                            var itemForPrice = Assets.LoadItem(slotInfo2.Item);
+                            string priceStr = $"{itemForPrice.Value / 10}.{itemForPrice.Value % 10}";
+                            Raise(new HoverTextEvent(new LiteralText($"{itemName} ({priceStr})")));
+                        }
+                        else
+                            Raise(new HoverTextEvent(new LiteralText(itemName)));
+                    }
+                    else
+                        Raise(new HoverTextEvent(new LiteralText(itemName)));
                     Raise(new SetCursorEvent(Base.CoreGfx.CursorSelected));
                 }
                 else if(_id.Slot is ItemSlotId.Gold or ItemSlotId.Rations)
@@ -217,28 +243,40 @@ public class LogicalInventorySlot : UiElement
 
         if (_id.Id.Type == InventoryType.Merchant)
         {
+            // Right-click on merchant slot also triggers buy (same as left-click).
             options.Add(new ContextMenuOption(
-                S(Base.SystemText.InvPopup_Sell, isPlotItem),
-                isPlotItem 
-                    ? new HoverTextEvent(
-                        tf.Format(
-                            Base.SystemText.InvMsg_ThisIsAVitalItem))
+                S(Base.SystemText.Shop_Buy, isPlotItem),
+                isPlotItem
+                    ? new HoverTextEvent(tf.Format(Base.SystemText.InvMsg_ThisIsAVitalItem))
                     : new InventorySellEvent(_id.Id, _id.Slot),
                 ContextMenuGroup.Actions,
                 isPlotItem));
         }
         else
         {
-            options.Add(
-                new ContextMenuOption(
-                    S(Base.SystemText.InvPopup_Drop, isPlotItem),
+            // M5: If a merchant screen is open, offer "Sell to Merchant" option on player items.
+            var im = Resolve<IInventoryManager>();
+            if (_id.Id.Type == InventoryType.Player && im.ActiveMerchantId != null)
+            {
+                options.Add(new ContextMenuOption(
+                    S(Base.SystemText.InvPopup_Sell, isPlotItem),
                     isPlotItem
-                        ? new HoverTextEvent(
-                            tf.Format(
-                                Base.SystemText.InvMsg_ThisIsAVitalItem))
-                        : new InventoryDiscardEvent(itemPosition.X, itemPosition.Y, _id.Id, _id.Slot),
+                        ? new HoverTextEvent(tf.Format(Base.SystemText.InvMsg_ThisIsAVitalItem))
+                        : new InventorySellToMerchantEvent(_id.Id, _id.Slot),
                     ContextMenuGroup.Actions,
                     isPlotItem));
+            }
+            else
+            {
+                options.Add(
+                    new ContextMenuOption(
+                        S(Base.SystemText.InvPopup_Drop, isPlotItem),
+                        isPlotItem
+                            ? new HoverTextEvent(tf.Format(Base.SystemText.InvMsg_ThisIsAVitalItem))
+                            : new InventoryDiscardEvent(itemPosition.X, itemPosition.Y, _id.Id, _id.Slot),
+                        ContextMenuGroup.Actions,
+                        isPlotItem));
+            }
         }
 
         options.Add(new ContextMenuOption(

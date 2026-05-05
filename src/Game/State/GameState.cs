@@ -111,6 +111,7 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
         On<SetChestOpenEvent>(e => _game.SetChestOpen(e.Chest, SetFlag(e.Operation, _game.IsChestOpen(e.Chest))));
         On<SetDoorOpenEvent>(e => _game.SetDoorOpen(e.Door, SetFlag(e.Operation, _game.IsDoorOpen(e.Door))));
         On<DataChangeEvent>(OnDataChange);
+        On<ChangeStatusEvent>(OnDataChange);
         On<SetContextEvent>(OnSetContext);
 
         AttachChild(new InventoryManager(GetWriteableInventory, GetItem));
@@ -317,6 +318,11 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
         }
 
         return inventory;
+    }
+
+    public CharacterSheet GetWriteableSheet(PartyMemberId id)
+    {
+        return _game.Sheets.TryGetValue(id.ToSheet(), out var sheet) ? sheet : null;
     }
 
     ItemData GetItem(ItemId id) => Assets.LoadItemStrict(id);

@@ -6,14 +6,17 @@ using UAlbion.Api.Eventing;
 using UAlbion.Api.Visual;
 using UAlbion.Config;
 using UAlbion.Core.Visual;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Assets.Inv;
 using UAlbion.Formats.Assets.Sheets;
 using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Ids;
+using UAlbion.Game.Gui;
 using UAlbion.Game.Gui.Combat;
 using UAlbion.Game.Gui.Dialogs;
 using UAlbion.Game.State;
 using UAlbion.Game.Events;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Combat;
 
@@ -33,6 +36,7 @@ public class Battle : GameComponent, IReadOnlyBattle
     int _apresGold;
     int _apresFood;
     CombatActionType _pendingActionType;
+    SpellId _pendingSpellId;
 
     public IReadOnlyList<ICombatParticipant> Mobs { get; }
     public CombatPlanningState PlanningState { get; private set; } = CombatPlanningState.Planning;
@@ -57,6 +61,7 @@ public class Battle : GameComponent, IReadOnlyBattle
         OnAsync<ObserveCombatEvent>(Observe);
         On<SelectCombatActionEvent>(OnSelectAction);
         On<SelectCombatTargetEvent>(OnSelectTarget);
+        On<SpellSelectedEvent>(OnSpellSelected);
 
         _groupId = groupId;
         Mobs = _mobs;
@@ -82,9 +87,49 @@ public class Battle : GameComponent, IReadOnlyBattle
             PendingActorPosition = e.ActorPosition;
             _pendingActionType = e.Action;
         }
+        else if (e.Action == CombatActionType.CastSpell)
+        {
+            var actor = GetTile(e.ActorPosition);
+            var spells = actor?.Effective?.Magic?.SpellStrengths;
+            if (spells != null && spells.Count > 0)
+            {
+                PlanningState = CombatPlanningState.SelectingSpell;
+                PendingActorPosition = e.ActorPosition;
+                int actorPos = e.ActorPosition;
+                var spellEntries = spells.ToList();
+                Resolve<IDialogManager>().AddDialog(depth => new SelectSpellDialog(
+                    spellEntries,
+                    s => Raise(new SpellSelectedEvent(actorPos, s)),
+                    depth));
+            }
+            else
+            {
+                _plannedActions[e.ActorPosition] = new PlannedCombatAction(CombatActionType.None);
+                PlanningState = CombatPlanningState.Planning;
+                PendingActorPosition = -1;
+            }
+        }
         else
         {
             _plannedActions[e.ActorPosition] = new PlannedCombatAction(e.Action);
+            PlanningState = CombatPlanningState.Planning;
+            PendingActorPosition = -1;
+        }
+    }
+
+    // Player selected a spell from the spell dialog.
+    void OnSpellSelected(SpellSelectedEvent e)
+    {
+        _pendingSpellId = e.SpellId;
+        var spell = Assets.LoadSpell(e.SpellId);
+        if (spell != null && (spell.Targets & (SpellTargets.OneMonster | SpellTargets.RowOfMonsters | SpellTargets.AllMonsters)) != 0)
+        {
+            PlanningState = CombatPlanningState.SelectingTarget;
+            _pendingActionType = CombatActionType.CastSpell;
+        }
+        else
+        {
+            _plannedActions[e.ActorPosition] = new PlannedCombatAction(CombatActionType.CastSpell, -1, e.SpellId);
             PlanningState = CombatPlanningState.Planning;
             PendingActorPosition = -1;
         }
@@ -100,7 +145,9 @@ public class Battle : GameComponent, IReadOnlyBattle
         bool isValid = RaiseQuery(new IsAgentModeEvent()) || IsValidTarget(PendingActorPosition, e.TargetTileIndex);
         if (!isValid) return;
         
-        _plannedActions[PendingActorPosition] = new PlannedCombatAction(_pendingActionType, e.TargetTileIndex);
+        _plannedActions[PendingActorPosition] = _pendingActionType == CombatActionType.CastSpell
+            ? new PlannedCombatAction(_pendingActionType, e.TargetTileIndex, _pendingSpellId)
+            : new PlannedCombatAction(_pendingActionType, e.TargetTileIndex);
         PlanningState = CombatPlanningState.Planning;
         PendingActorPosition = -1;
     }
@@ -223,7 +270,10 @@ AlbionTask Observe(ObserveCombatEvent _) =>
     void ExecutePartyAction(ICombatParticipant actor, IRandom rng)
     {
         if (!_plannedActions.TryGetValue(actor.CombatPosition, out var plan))
-            return; // no action planned — skip turn
+            return;
+
+        var tf = Resolve<ITextFormatter>();
+        var actorName = actor.Effective.GetName(ReadVar(V.User.Gameplay.Language));
 
         switch (plan.ActionType)
         {
@@ -234,8 +284,28 @@ AlbionTask Observe(ObserveCombatEvent _) =>
             {
                 var target = plan.TargetTileIndex >= 0 ? GetTile(plan.TargetTileIndex) : null;
                 if (target == null || target.IsDead) break;
-Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Attack, target.CombatPosition));
+                var targetName = target.Effective.GetName(ReadVar(V.User.Gameplay.Language));
+
+                var rightHand = actor.Effective.Inventory.RightHand;
+                bool hasWeapon = !rightHand.Item.IsNone && rightHand.Item.Type == AssetType.Item;
+                string attackText = hasWeapon
+                    ? $"{actorName} greift {targetName} an."
+                    : $"{actorName} greift {targetName} unbewaffnet an.";
+                Raise(new DescriptionTextEvent(tf.Format(attackText)));
+
+                Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Attack, target.CombatPosition));
                 var dmg = DamageCalculator.CalculateAfflictedDamage(rng, actor.Effective, target.Effective);
+
+                if (dmg.Afflicted <= 0)
+                {
+                    string missText = dmg.RolledDamage <= 0 ? $"{actorName} verfehlt {targetName}!" : $"{actorName} kann {targetName} nicht verletzen!";
+                    Raise(new DescriptionTextEvent(tf.Format(missText)));
+                }
+                else if (dmg.IsCritical)
+                {
+                    Raise(new DescriptionTextEvent(tf.Format($"{actorName} macht einen Volltreffer!")));
+                }
+
                 ApplyDamageAndCleanup(target, dmg.Afflicted);
                 Raise(new CombatDamageFloaterEvent(target.CombatPosition, dmg.Afflicted));
                 Raise(new LogEvent(LogLevel.Info,
@@ -247,6 +317,7 @@ Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Attack,
             {
                 int newPos = plan.TargetTileIndex;
                 if (newPos < 0 || newPos >= _tiles.Length || _tiles[newPos] != null) break;
+                Raise(new DescriptionTextEvent(tf.Format($"{actorName} bewegt sich.")));
                 Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Move));
                 MoveParticipant(actor, newPos);
                 break;
@@ -254,13 +325,11 @@ Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Attack,
 
             case CombatActionType.Flee:
             {
-                // Horneman COMACTS.C Flee_combat_action — Flucht nur aus hinterster Reihe
                 int row = actor.CombatPosition / SavedGame.CombatColumns;
-                int lastRow = SavedGame.CombatRows - 1; // = 4
-                if (row != lastRow)
-                    break;
-
-Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Flee));
+                int lastRow = SavedGame.CombatRows - 1;
+                if (row != lastRow) break;
+                Raise(new DescriptionTextEvent(tf.Format($"{actorName} flieht aus dem Kampf!")));
+                Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Flee));
                 _mobs.Remove(actor);
                 if (actor.CombatPosition >= 0)
                     _tiles[actor.CombatPosition] = null;
@@ -268,20 +337,56 @@ Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Flee));
             }
 
             case CombatActionType.CastSpell:
+            {
+                var magic = actor.Effective.Magic;
+                if (magic.SpellStrengths.Count == 0) break;
+
+                SpellId spellId = !plan.SpellId.IsNone ? plan.SpellId : magic.SpellStrengths.FirstOrDefault().Key;
+                var spellData = Assets.LoadSpell(spellId);
+                int strength = magic.SpellStrengths.TryGetValue(spellId, out ushort s) ? s : 5;
+                var spellName = spellData != null ? Assets.LoadStringSafe(spellData.Name) : "Zauber";
+
+                if (spellData != null && (spellData.Targets & (SpellTargets.Party | SpellTargets.DeadParty)) != 0)
+                {
+                    int amount = strength * 5;
+                    Raise(new DescriptionTextEvent(tf.Format($"{actorName} wirkt {spellName}.")));
+                    Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Cast));
+                    ApplyHealing(actor, amount);
+                    Raise(new LogEvent(LogLevel.Info,
+                        $"[SPELL] {actor.SheetId} cast heal self: {spellId} heal={amount}"));
+                }
+                else
+                {
+                    var target = plan.TargetTileIndex >= 0 ? GetTile(plan.TargetTileIndex) : null;
+                    if (target == null || target.IsDead) break;
+                    var targetName = target.Effective.GetName(ReadVar(V.User.Gameplay.Language));
+
+                    int damage = strength * 5;
+                    Raise(new DescriptionTextEvent(tf.Format($"{actorName} wirkt {spellName} auf {targetName}.")));
+                    Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Cast, target.CombatPosition));
+                    ApplyDamageAndCleanup(target, damage);
+                    Raise(new CombatDamageFloaterEvent(target.CombatPosition, damage));
+                    Raise(new LogEvent(LogLevel.Info,
+                        $"[SPELL] {actor.SheetId} cast on {target.SheetId}: dmg={damage}"));
+                }
+                break;
+            }
+
             case CombatActionType.UseMagicItem:
-                // TODO: spell execution — stub for now
                 break;
         }
     }
 
-    // Monsters move toward party and attack if in melee range.
     void ExecuteMonsterAction(ICombatParticipant actor, IRandom rng)
     {
+        var tf = Resolve<ITextFormatter>();
+        var actorName = actor.Effective.GetName(ReadVar(V.User.Gameplay.Language));
+
         Raise(new LogEvent(LogLevel.Info, $"  [MONSTER] {actor.SheetId} at tile {actor.CombatPosition} AP={actor.Effective.Combat.ActionPoints}"));
-        // Horneman MONLOGIC.C Default_decider — Flucht-Entscheidung vor Aktion
         if (ShouldMonsterFlee(actor))
         {
             Raise(new LogEvent(LogLevel.Info, $"  [MONSTER] {actor.SheetId} FLEEING (danger>morale)"));
+            Raise(new DescriptionTextEvent(tf.Format($"{actorName} versucht zu fliehen!")));
             Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Flee));
             int row = actor.CombatPosition / SavedGame.CombatColumns;
             if (row == 0)
@@ -291,9 +396,8 @@ Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Flee));
             }
             else
             {
-                MoveMonsterToward(actor, actor.CombatPosition % SavedGame.CombatColumns); // retreat toward row 0
+                MoveMonsterToward(actor, actor.CombatPosition % SavedGame.CombatColumns);
             }
-            Raise(new LogEvent(LogLevel.Info, $"{actor.SheetId} versucht zu fliehen!"));
             return;
         }
 
@@ -310,6 +414,8 @@ Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Flee));
         if (IsInMeleeRange(actor.CombatPosition, target.CombatPosition))
         {
             Raise(new LogEvent(LogLevel.Info, $"  [MONSTER ATTACK] {actor.SheetId} → {target.SheetId}"));
+            var targetName = target.Effective.GetName(ReadVar(V.User.Gameplay.Language));
+            Raise(new DescriptionTextEvent(tf.Format($"{actorName} greift {targetName} an.")));
             Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Attack, target.CombatPosition));
             var dmg = DamageCalculator.CalculateAfflictedDamage(rng, actor.Effective, target.Effective);
             ApplyDamageAndCleanup(target, dmg.Afflicted);
@@ -384,6 +490,17 @@ Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Flee));
         if (target.CombatPosition >= 0)
             _tiles[target.CombatPosition] = null;
         Raise(new LogEvent(LogLevel.Info, $"Monster killed! XP reward: {_addedExperiencePoints}"));
+    }
+
+    void ApplyHealing(ICombatParticipant target, int amount)
+    {
+        var lp = target.Effective.Combat.LifePoints;
+        int oldHp = lp.Current;
+        target.Heal(amount);
+        int newHp = target.Effective.Combat.LifePoints.Current;
+        Raise(new CombatDamageFloaterEvent(target.CombatPosition, -amount));
+        Raise(new LogEvent(LogLevel.Info,
+            $"[HEAL] {target.SheetId}: {oldHp} → {newHp}/{lp.Max} (+{amount})"));
     }
 
     // Source: Horneman COMBAT.C Kill_participant — collect items/gold/food from dead monsters.

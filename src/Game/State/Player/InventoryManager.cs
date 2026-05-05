@@ -26,9 +26,12 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
     readonly Func<ItemId, ItemData> _getItem;
     readonly ItemSlot _hand = new(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.None));
     IEvent _returnItemInHandEvent;
+    MerchantId? _activeMerchantId;
+    PartyMemberId _activeMerchantMemberId;
 
     ItemSlot GetSlot(InventorySlotId id) => _getInventory(id.Id)?.GetSlot(id.Slot);
     public ReadOnlyItemSlot ItemInHand { get; }
+    public MerchantId? ActiveMerchantId => _activeMerchantId;
     public InventoryManager(Func<InventoryId, Inventory> getInventory, Func<ItemId, ItemData> getItem)
     {
         _getInventory = getInventory ?? throw new ArgumentNullException(nameof(getInventory));
@@ -51,6 +54,11 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
         OnAsync<DrinkItemEvent>(OnDrinkItem);
         OnAsync<ReadItemEvent>(OnReadItem);
         On<ReadSpellScrollEvent>(OnReadSpellScroll);
+        On<MerchantEvent>(e => { _activeMerchantId = e.MerchantId; _activeMerchantMemberId = e.PartyMemberId; });
+        On<InventoryCloseEvent>(_ => { _activeMerchantId = null; _activeMerchantMemberId = PartyMemberId.None; });
+        On<SetContextEvent>(e => { if (e.Type == ContextType.Inventory) _activeMerchantMemberId = (PartyMemberId)e.AssetId; });
+        OnAsync<InventorySellEvent>(OnBuyFromMerchant);
+        OnAsync<InventorySellToMerchantEvent>(OnSellToMerchant);
 
         ItemInHand = new ReadOnlyItemSlot(_hand);
     }
@@ -692,5 +700,136 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
             await RaiseA(triggerEvent);
             return;
         }
+    }
+
+    // Player buys item from merchant (InventorySellEvent raised from right-click on merchant slot).
+    async AlbionTask OnBuyFromMerchant(InventorySellEvent e)
+    {
+        var merchantInv = _getInventory(e.Id);
+        var merchantSlot = merchantInv?.GetSlot(e.SlotId);
+        if (merchantSlot == null || merchantSlot.Item.IsNone)
+            return;
+
+        var itemData = _getItem(merchantSlot.Item);
+        var tf = Resolve<ITextFormatter>();
+
+        bool infinite = merchantSlot.Amount == ItemSlot.Unlimited;
+        int maxQty = infinite ? ItemSlot.MaxItemCount : merchantSlot.Amount;
+
+        int quantity = 1;
+        if (maxQty > 1 && itemData.IsStackable)
+        {
+            var prompt = new ItemQuantityPromptEvent(
+                new StringId(Base.SystemText.Shop_BuyHowManyItems),
+                itemData.Icon, itemData.IconSubId, maxQty, false);
+            quantity = await RaiseQueryA(prompt);
+            if (quantity <= 0)
+                return;
+        }
+
+        // DEVIATION: Buy price = ItemData.Value * quantity (Value is base resell value * 10).
+        // SR-output formula unverified. See CLARIFY comment in LogicalInventorySlot.cs.
+        int totalCost = itemData.Value * quantity;
+
+        var party = Resolve<IParty>();
+        var activeId = (!_activeMerchantMemberId.IsNone ? _activeMerchantMemberId : party.Leader.Id);
+        var playerInv = _getInventory((InventoryId)activeId);
+
+        if (playerInv.Gold.Amount < totalCost)
+        {
+            Raise(new HoverTextEvent(tf.Format(Base.SystemText.Shop_ThePartyDoesNotHaveEnoughGold)));
+            return;
+        }
+
+        // Check space in player backpack
+        bool hasSpace = playerInv.BackpackSlots.Any(s =>
+            s.Item.IsNone ||
+            (s.Item == merchantSlot.Item && s.Amount < ItemSlot.MaxItemCount && itemData.IsStackable));
+        if (!hasSpace)
+        {
+            Raise(new HoverTextEvent(tf.Format(Base.SystemText.Shop_XHasNoSpaceLeft)));
+            return;
+        }
+
+        playerInv.Gold.Amount -= (ushort)Math.Min(totalCost, playerInv.Gold.Amount);
+
+        var donor = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.Slot0));
+        donor.Item = merchantSlot.Item;
+        donor.Charges = merchantSlot.Charges;
+        donor.Enchantment = merchantSlot.Enchantment;
+        donor.Amount = infinite ? ItemSlot.Unlimited : (ushort)quantity;
+
+        TryGiveItems((InventoryId)activeId, donor, (ushort)quantity);
+
+        if (!infinite)
+            merchantSlot.Amount -= (ushort)quantity;
+
+        Raise(new HoverTextEvent(tf.Format(Base.SystemText.Shop_TheItemsHaveBeenBought)));
+        Update(e.Id);
+        Update((InventoryId)activeId);
+    }
+
+    // Player sells item to merchant (InventorySellToMerchantEvent raised from right-click on player slot).
+    async AlbionTask OnSellToMerchant(InventorySellToMerchantEvent e)
+    {
+        if (_activeMerchantId == null)
+            return;
+
+        var playerInv = _getInventory(e.Id);
+        var playerSlot = playerInv?.GetSlot(e.SlotId);
+        if (playerSlot == null || playerSlot.Item.IsNone)
+            return;
+
+        var itemData = _getItem(playerSlot.Item);
+        var tf = Resolve<ITextFormatter>();
+
+        int maxQty = playerSlot.Amount;
+        int quantity = 1;
+        if (maxQty > 1 && itemData.IsStackable)
+        {
+            var prompt = new ItemQuantityPromptEvent(
+                new StringId(Base.SystemText.Shop_SellHowManyItems),
+                itemData.Icon, itemData.IconSubId, maxQty, false);
+            quantity = await RaiseQueryA(prompt);
+            if (quantity <= 0)
+                return;
+        }
+
+        // DEVIATION: Sell price = ItemData.Value / 2 * quantity.
+        // SR-output formula unverified. See CLARIFY comment in LogicalInventorySlot.cs.
+        int proceeds = (itemData.Value / 2) * quantity;
+
+        var party = Resolve<IParty>();
+        var activeId = (!_activeMerchantMemberId.IsNone ? _activeMerchantMemberId : party.Leader.Id);
+        var playerInvForGold = _getInventory((InventoryId)activeId);
+
+        // Check merchant has storage room (skip adding to merchant for now if full).
+        // DEVIATION: sold items are not added to merchant inventory; only gold is transferred.
+        // Original game tracked merchant purchases. Requires save-system support to persist.
+        var merchantInv = _getInventory((InventoryId)_activeMerchantId.Value);
+        bool merchantHasRoom = merchantInv != null &&
+            merchantInv.BackpackSlots.Any(s => s.Item.IsNone || (s.Item == playerSlot.Item && itemData.IsStackable));
+        if (!merchantHasRoom)
+        {
+            Raise(new HoverTextEvent(tf.Format(Base.SystemText.Shop_TheMerchantHasNoStorageRoomLeft)));
+            return;
+        }
+
+        var soldItem = playerSlot.Item; // capture before decrementing (Amount=0 makes Item return None)
+        playerSlot.Amount -= (ushort)quantity;
+
+        // Add sold item to merchant inventory
+        var donor = new ItemSlot(new InventorySlotId(InventoryType.Temporary, 0, ItemSlotId.Slot0));
+        donor.Item = soldItem;
+        donor.Amount = (ushort)quantity;
+        TryGiveItems((InventoryId)_activeMerchantId.Value, donor, (ushort)quantity);
+
+        // Pay player
+        int newGold = playerInvForGold.Gold.Amount + proceeds;
+        playerInvForGold.Gold.Amount = (ushort)Math.Min(newGold, short.MaxValue);
+
+        Update(e.Id);
+        Update((InventoryId)activeId);
+        Update((InventoryId)_activeMerchantId.Value);
     }
 }

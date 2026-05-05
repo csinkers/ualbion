@@ -29,7 +29,7 @@ public class InventoryActivePageSelector : UiElement
         {
             InventoryPage.Summary => new InventorySummaryPage(_activeCharacter),
             InventoryPage.Stats => new InventoryStatsPage(_activeCharacter),
-            InventoryPage.Misc => new InventoryMiscPage(),
+            InventoryPage.Misc => new InventoryMiscPage(_activeCharacter),
             { } x => throw new NotImplementedException($"Unhandled inventory page \"{x}\"")
         };
 

@@ -53,13 +53,22 @@ public class LogicalCombatTile : UiElement
 
     void Blur()
     {
-        // Raise(new SetCursorEvent(hand.Item.IsNone ? Base.CoreGfx.Cursor : Base.CoreGfx.CursorSmall));
-        // Raise(new HoverTextEvent(null));
+        Raise(new HoverTextEvent(null));
     }
 
     void Hover()
     {
-        // _visual.Hoverable = true;
+        var contents = _battle.GetTile(_tileIndex);
+        var sheet = contents?.Effective;
+        if (sheet != null)
+        {
+            var name = sheet.GetName(ReadVar(V.User.Gameplay.Language));
+            var lp = sheet.Combat.LifePoints.Current;
+            var maxLp = sheet.Combat.LifePoints.Max;
+            var sp = sheet.Magic.SpellPoints.Current;
+            var maxSp = sheet.Magic.SpellPoints.Max;
+            Raise(new HoverTextEvent(new LiteralText($"{name} (LP:{lp}/{maxLp}, SP:{sp}/{maxSp})")));
+        }
     }
 
     bool IsMagicItem(IReadOnlyItemSlot slot)

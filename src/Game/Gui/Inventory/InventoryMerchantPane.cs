@@ -9,7 +9,7 @@ public class InventoryMerchantPane : UiElement
     const int InventoryWidth = 6;
     const int InventoryHeight = 4;
 
-    public InventoryMerchantPane(MerchantId id)
+    public InventoryMerchantPane(MerchantId id, PartyMemberId activeCharacter)
     {
         var slotSpans = new IUiElement[InventoryHeight];
         for (int j = 0; j < InventoryHeight; j++)
@@ -24,9 +24,13 @@ public class InventoryMerchantPane : UiElement
         }
 
         var slotStack = new VerticalStacker(slotSpans);
-        var slotHalfFrame = new ButtonFrame(slotStack) {Theme = ButtonTheme.InventoryOuterFrame, Padding = -1 };
+        var slotHalfFrame = new ButtonFrame(slotStack) { Theme = ButtonTheme.InventoryOuterFrame, Padding = -1 };
         var header = new Header(Base.SystemText.Shop_Merchant);
-        var stack = new VerticalStacker(header, slotHalfFrame) { Greedy = false };
+
+        // M6: Show active character's gold so the player knows their budget.
+        var goldSlot = new LogicalInventorySlot(new InventorySlotId((InventoryId)activeCharacter, ItemSlotId.Gold));
+
+        var stack = new VerticalStacker(header, slotHalfFrame, new Spacing(0, 4), goldSlot) { Greedy = false };
         AttachChild(stack);
     }
 }

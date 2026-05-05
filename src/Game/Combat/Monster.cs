@@ -65,6 +65,12 @@ public class Monster : GameComponent, ICombatParticipant
         lp.Current = (ushort)Math.Max(0, lp.Current - amount);
     }
 
+    public void Heal(int amount)
+    {
+        var lp = _sheet.Combat.LifePoints;
+        lp.Current = (ushort)Math.Min(lp.Max, lp.Current + amount);
+    }
+
     public void SetCombatPosition(int newTileIndex)
     {
         CombatPosition = newTileIndex;

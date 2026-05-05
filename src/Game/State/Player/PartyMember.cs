@@ -23,6 +23,7 @@ public class PartyMember : GameComponent, IPlayer
     {
         On<InventoryChangedEvent>(InventoryChanged);
         On<LearnSpellEvent>(LearnSpell);
+        On<SheetChangedEvent>(e => { if (e.Id == SheetId) UpdateSheet(); });
         On<SetPlayerStatusUiPositionEvent>(e => { if (id == e.Id) StatusBarUiPosition = new Vector2(e.CentreX, e.CentreY); });
 
         Id = id;
@@ -75,6 +76,13 @@ public class PartyMember : GameComponent, IPlayer
     {
         var lp = _base.Combat.LifePoints;
         lp.Current = (ushort)Math.Max(0, lp.Current - amount);
+        UpdateSheet();
+    }
+
+    public void Heal(int amount)
+    {
+        var lp = _base.Combat.LifePoints;
+        lp.Current = (ushort)Math.Min(lp.Max, lp.Current + amount);
         UpdateSheet();
     }
 

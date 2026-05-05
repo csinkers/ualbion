@@ -1,7 +1,9 @@
 using UAlbion.Api.Eventing;
 using UAlbion.Core;
 using UAlbion.Core.Events;
+using UAlbion.Formats.Ids;
 using UAlbion.Game.Combat;
+using UAlbion.Game.Gui.Controls;
 
 namespace UAlbion.Game.Gui.Combat;
 
@@ -20,6 +22,7 @@ public class DamageFloater : UiElement
         var clock = Resolve<IClock>();
         _startElapsed = clock?.ElapsedTime ?? 0f;
         IsActive = true;
+        AttachChild(new UiSpriteElement((SpriteId)Base.CombatGfx.DamageSplat));
         On<PostEngineUpdateEvent>(_ => Update(clock));
     }
 

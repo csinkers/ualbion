@@ -42,7 +42,12 @@ public class CombatAttributes : ICombatAttributes
         ActionPoints = other.ActionPoints;
         BaseDefense = other.BaseDefense;
         BonusDefense = other.BonusDefense;
+        BaseAttack = other.BaseAttack;
+        BonusAttack = other.BonusAttack;
+        MagicAttack = other.MagicAttack;
+        MagicDefense = other.MagicDefense;
         Conditions = other.Conditions;
+        Morale = other.Morale;
         return this;
     }
 

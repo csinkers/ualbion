@@ -39,14 +39,16 @@ public class InventoryRightPane : UiElement
         HorizontalStacker moneyAndFoodStacker;
         if (showTotalPartyGold)
         {
-            var tf = Resolve<ITextFormatter>();
-            int total = Resolve<IParty>().StatusBarOrder.Sum(x => x.Apparent.Inventory.Gold.Amount);
             var money = new Button(
                     new VerticalStacker(
                         new Spacing(64, 0),
                         new UiSpriteElement(Base.CoreGfx.UiGold) { Flags = SpriteFlags.Highlight },
-                        new UiText(tf.Format(Base.SystemText.Shop_GoldAll)),
-                        new SimpleText($"{total / 10}.{total % 10}")
+                        new UiText(new DynamicText(() => Resolve<ITextFormatter>().Format(Base.SystemText.Shop_GoldAll).GetBlocks())),
+                        new UiText(new DynamicText(() =>
+                        {
+                            int t = Resolve<IParty>().StatusBarOrder.Sum(x => x.Apparent.Inventory.Gold.Amount);
+                            return [new TextBlock($"{t / 10}.{t % 10}")];
+                        }))
                     ) { Greedy = false})
                 { IsPressed = true };
             moneyAndFoodStacker = new HorizontalStacker(money);

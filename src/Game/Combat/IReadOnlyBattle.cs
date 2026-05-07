@@ -11,4 +11,5 @@ public interface IReadOnlyBattle
     CombatPlanningState PlanningState { get; }
     int PendingActorPosition { get; }
     PlannedCombatAction GetPlannedAction(int tileIndex);
+    bool IsValidTarget(int targetTileIndex);
 }

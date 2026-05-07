@@ -140,10 +140,7 @@ public class Battle : GameComponent, IReadOnlyBattle
     {
         if (PlanningState != CombatPlanningState.SelectingTarget) return;
         
-        // DEVIATION: In agent mode, bypass adjacency check so agent can plan attacks on any tile
-        // (original game UI enforces range via context menu visibility, but agent should be able to plan freely)
-        bool isValid = RaiseQuery(new IsAgentModeEvent()) || IsValidTarget(PendingActorPosition, e.TargetTileIndex);
-        if (!isValid) return;
+        if (!IsValidTarget(PendingActorPosition, e.TargetTileIndex)) return;
         
         _plannedActions[PendingActorPosition] = _pendingActionType == CombatActionType.CastSpell
             ? new PlannedCombatAction(_pendingActionType, e.TargetTileIndex, _pendingSpellId)
@@ -152,33 +149,97 @@ public class Battle : GameComponent, IReadOnlyBattle
         PendingActorPosition = -1;
     }
 
-    // Close range = Chebyshev distance 1. Long range = any tile.
-    // Move = exactly 1 tile (Chebyshev distance 1, source: Horneman COMACTS.C MOVE_COMACT).
-    // DEVIATION: exact Get_close_range_targets adjacency mask (COMACTS.C) not available in Horneman source snapshot.
+    // IReadOnlyBattle implementation — uses the current pending actor and action type.
+    public bool IsValidTarget(int targetTileIndex) => IsValidTarget(PendingActorPosition, targetTileIndex);
+
+    // Source: Horneman COMBVAR.H MOVE_SPEED_FACTOR and COMBAT.H MAX_COMBAT_MOVES
+    const int MoveSpeedFactor = 30;
+    const int MaxCombatMoves = 3;
+
+    static int GetNrMoves(ICombatParticipant actor) =>
+        Math.Clamp(actor.Effective.Attributes.Speed.Current / MoveSpeedFactor, 1, MaxCombatMoves);
+
+    bool IsAgentMode => RaiseQuery(new IsAgentModeEvent());
+
+    // Move = up to GetNrMoves(actor) tiles via flood-fill through empty cells
+    // (source: Horneman COMBAT.C Get_movement_range + cellular automaton).
+    // Attack = any occupied enemy tile; range enforcement happens at execution time, not selection time.
+    // DEVIATION: original UI restricts melee selection to close-range tiles, but this is unimplemented —
+    // allowing any enemy tile keeps the fight playable until range-restricted selection is reconstructed.
     bool IsValidTarget(int actorPos, int targetPos)
     {
         if (actorPos < 0 || actorPos >= _tiles.Length) return false;
 
         if (_pendingActionType == CombatActionType.Move)
-            return IsAdjacent(actorPos, targetPos)
-                && targetPos >= 0 && targetPos < _tiles.Length
-                && _tiles[targetPos] == null;
+        {
+            if (targetPos < 0 || targetPos >= _tiles.Length) return false;
+            if (_tiles[targetPos] != null) return false;
+            var reachable = GetReachableTiles(actorPos);
+            return reachable.Contains(targetPos);
+        }
 
         if (_pendingActionType != CombatActionType.Attack) return true;
 
-        var actor = _tiles[actorPos];
-        if (actor == null) return false;
+        if (targetPos < 0 || targetPos >= _tiles.Length) return false;
+        var target = _tiles[targetPos];
+        // Only allow targeting enemy mobs (not friendly party members, not empty tiles)
+        return target != null && target.Effective.Type != CharacterType.Party;
+    }
 
-        var rightHand = actor.Effective.Inventory.RightHand;
-        if (!rightHand.Item.IsNone && rightHand.Item.Type == AssetType.Item)
+    // BFS flood-fill to compute all tiles reachable within GetNrMoves steps.
+    // Source: Horneman COMBAT.C Get_movement_range() cellular automaton approximation.
+    HashSet<int> GetReachableTiles(int startPos)
+    {
+        int actorIndex = _mobs.FindIndex(m => m.CombatPosition == startPos);
+        int maxSteps = actorIndex >= 0 ? GetNrMoves(_mobs[actorIndex]) : 1;
+
+        if (actorIndex >= 0)
+            Raise(new LogEvent(LogLevel.Info,
+                $"[MOVE] actor={_mobs[actorIndex].SheetId} pos={startPos} speed={_mobs[actorIndex].Effective.Attributes.Speed.Current} maxSteps={maxSteps}"));
+
+        var reachable = new HashSet<int>();
+        var frontier = new Queue<(int pos, int steps)>();
+        frontier.Enqueue((startPos, 0));
+        reachable.Add(startPos);
+
+        while (frontier.Count > 0)
         {
-            var item = Assets.LoadItem(rightHand.Item);
-            if (item?.TypeId == ItemType.LongRangeWeapon)
-                return true; // ranged: any tile is valid
+            var (pos, steps) = frontier.Dequeue();
+            if (steps >= maxSteps) continue;
+
+            foreach (var neighbor in GetAdjacentTiles(pos))
+            {
+                if (_tiles[neighbor] == null && !reachable.Contains(neighbor))
+                {
+                    reachable.Add(neighbor);
+                    frontier.Enqueue((neighbor, steps + 1));
+                }
+            }
         }
 
-        // Close range (melee or unarmed): Chebyshev distance <= 1
-        return IsAdjacent(actorPos, targetPos);
+        Raise(new LogEvent(LogLevel.Info,
+            $"[MOVE] reachable tiles: {string.Join(", ", reachable)}"));
+
+        // Remove starting position — we want reachable destination tiles, not the origin.
+        reachable.Remove(startPos);
+        return reachable;
+    }
+
+    static IEnumerable<int> GetAdjacentTiles(int pos)
+    {
+        int col = pos % SavedGame.CombatColumns;
+        int row = pos / SavedGame.CombatColumns;
+        for (int dy = -1; dy <= 1; dy++)
+        {
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                if (dx == 0 && dy == 0) continue;
+                int nx = col + dx;
+                int ny = row + dy;
+                if (nx >= 0 && nx < SavedGame.CombatColumns && ny >= 0 && ny < SavedGame.CombatRows)
+                    yield return ny * SavedGame.CombatColumns + nx;
+            }
+        }
     }
 
     static bool IsAdjacent(int pos1, int pos2)
@@ -345,15 +406,106 @@ AlbionTask Observe(ObserveCombatEvent _) =>
                 var spellData = Assets.LoadSpell(spellId);
                 int strength = magic.SpellStrengths.TryGetValue(spellId, out ushort s) ? s : 5;
                 var spellName = spellData != null ? Assets.LoadStringSafe(spellData.Name) : "Zauber";
+                var effectType = SpellEffectMapping.GetEffectType(spellId);
 
                 if (spellData != null && (spellData.Targets & (SpellTargets.Party | SpellTargets.DeadParty)) != 0)
                 {
-                    int amount = strength * 5;
                     Raise(new DescriptionTextEvent(tf.Format($"{actorName} wirkt {spellName}.")));
                     Raise(new CombatAnimationEvent(actor.CombatPosition, CombatAnimationType.Cast));
-                    ApplyHealing(actor, amount);
-                    Raise(new LogEvent(LogLevel.Info,
-                        $"[SPELL] {actor.SheetId} cast heal self: {spellId} heal={amount}"));
+
+                    switch (effectType)
+                    {
+                        case SpellEffectType.HealHP:
+                        {
+                            int amount = strength * 5;
+                            ApplyHealing(actor, amount);
+                            Raise(new LogEvent(LogLevel.Info,
+                                $"[SPELL] {actor.SheetId} cast {spellId}: heal={amount}"));
+                            break;
+                        }
+                        case SpellEffectType.HealAllHP:
+                        {
+                            int amount = strength * 5;
+                            foreach (var p in _mobs.Where(x => !x.IsDead && x.Effective.Type == CharacterType.Party))
+                                ApplyHealing(p, amount);
+                            Raise(new LogEvent(LogLevel.Info,
+                                $"[SPELL] {actor.SheetId} cast {spellId}: heal all={amount}"));
+                            break;
+                        }
+                        case SpellEffectType.Recuperation:
+                        {
+                            int amount = strength * 5;
+                            foreach (var p in _mobs.Where(x => !x.IsDead && x.Effective.Type == CharacterType.Party))
+                            {
+                                ApplyHealing(p, amount);
+                                ApplyConditionCure(p, PlayerConditions.Poisoned);
+                                ApplyConditionCure(p, PlayerConditions.Intoxicated);
+                                ApplyConditionCure(p, PlayerConditions.Ill);
+                            }
+                            Raise(new LogEvent(LogLevel.Info,
+                                $"[SPELL] {actor.SheetId} cast recuperation {spellId}: heal all+condition cure"));
+                            break;
+                        }
+                        case SpellEffectType.Regeneration:
+                        {
+                            int amount = strength * 5;
+                            foreach (var p in _mobs.Where(x => !x.IsDead && x.Effective.Type == CharacterType.Party))
+                            {
+                                ApplyHealing(p, amount);
+                                ApplyConditionCure(p, PlayerConditions.Poisoned);
+                                ApplyConditionCure(p, PlayerConditions.Intoxicated);
+                                ApplyConditionCure(p, PlayerConditions.Ill);
+                                ApplyConditionCure(p, PlayerConditions.Asleep);
+                                ApplyConditionCure(p, PlayerConditions.Paralysed);
+                                ApplyConditionCure(p, PlayerConditions.Blind);
+                                ApplyConditionCure(p, PlayerConditions.Insane);
+                                ApplyConditionCure(p, PlayerConditions.Panicking);
+                                ApplyConditionCure(p, PlayerConditions.Irritated);
+                                ApplyConditionCure(p, PlayerConditions.Exhausted);
+                            }
+                            Raise(new LogEvent(LogLevel.Info,
+                                $"[SPELL] {actor.SheetId} cast regeneration {spellId}: heal all+condition cure"));
+                            break;
+                        }
+                        case SpellEffectType.CureAllConditions:
+                        {
+                            foreach (var p in _mobs.Where(x => x.Effective.Type == CharacterType.Party))
+                            {
+                                ApplyConditionCure(p, PlayerConditions.Poisoned);
+                                ApplyConditionCure(p, PlayerConditions.Intoxicated);
+                                ApplyConditionCure(p, PlayerConditions.Ill);
+                                ApplyConditionCure(p, PlayerConditions.Asleep);
+                                ApplyConditionCure(p, PlayerConditions.Paralysed);
+                                ApplyConditionCure(p, PlayerConditions.Blind);
+                                ApplyConditionCure(p, PlayerConditions.Insane);
+                                ApplyConditionCure(p, PlayerConditions.Panicking);
+                                ApplyConditionCure(p, PlayerConditions.Irritated);
+                                ApplyConditionCure(p, PlayerConditions.Exhausted);
+                            }
+                            Raise(new LogEvent(LogLevel.Info,
+                                $"[SPELL] {actor.SheetId} cast cure all {spellId}"));
+                            break;
+                        }
+                        default:
+                        {
+                            var cured = SpellEffectMapping.GetConditionCured(effectType);
+                            if (cured.HasValue)
+                            {
+                                foreach (var p in _mobs.Where(x => x.Effective.Type == CharacterType.Party))
+                                    ApplyConditionCure(p, cured.Value);
+                                Raise(new LogEvent(LogLevel.Info,
+                                    $"[SPELL] {actor.SheetId} cast cure {cured} {spellId}"));
+                            }
+                            else
+                            {
+                                int amount = strength * 5;
+                                ApplyHealing(actor, amount);
+                                Raise(new LogEvent(LogLevel.Info,
+                                    $"[SPELL] {actor.SheetId} cast fallback heal {spellId}: heal={amount}"));
+                            }
+                            break;
+                        }
+                    }
                 }
                 else
                 {
@@ -501,6 +653,15 @@ AlbionTask Observe(ObserveCombatEvent _) =>
         Raise(new CombatDamageFloaterEvent(target.CombatPosition, -amount));
         Raise(new LogEvent(LogLevel.Info,
             $"[HEAL] {target.SheetId}: {oldHp} → {newHp}/{lp.Max} (+{amount})"));
+    }
+
+    void ApplyConditionCure(ICombatParticipant target, PlayerConditions condition)
+    {
+        var existing = target.Effective.Combat.Conditions;
+        if ((existing & condition) == 0) return;
+        target.ClearCondition(condition);
+        Raise(new LogEvent(LogLevel.Info,
+            $"[CURE] {target.SheetId}: cleared {condition}"));
     }
 
     // Source: Horneman COMBAT.C Kill_participant — collect items/gold/food from dead monsters.

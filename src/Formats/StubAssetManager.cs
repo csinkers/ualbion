@@ -43,7 +43,6 @@ public class StubAssetManager : IAssetManager
     public ItemData LoadItem(ItemId id) => throw new NotImplementedException();
     public LabyrinthData LoadLabyrinthData(LabyrinthId id) => throw new NotImplementedException();
     public MonsterGroup LoadMonsterGroup(MonsterGroupId id) => throw new NotImplementedException();
-    public SavedGame LoadSavedGame(string path) => throw new NotImplementedException();
     public SpellData LoadSpell(SpellId id) => throw new NotImplementedException();
     public TilesetData LoadTileData(TilesetId id) => throw new NotImplementedException();
     public WaveLib LoadWaveLib(WaveLibraryId waveLibraryId) => throw new NotImplementedException();

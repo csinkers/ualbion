@@ -1,0 +1,13 @@
+{
+  "name": "New Game → 2× Skrinn",
+  "description": "Starts a new game, dismisses the intro popup, enables autocombat, then fights 2 Skrinn1",
+  "steps": [
+    { "type": "cmd", "cmd": "start_new_game" },
+    { "type": "wait", "condition": "delay", "ms": 2000 },
+    { "type": "cmd", "cmd": "dismiss_message" },
+    { "type": "wait", "condition": "delay", "ms": 500 },
+    { "type": "cmd", "cmd": "auto_combat_start", "params": { "attack_priority": "weakest" } },
+    { "type": "fight", "encounter": "MonsterGroup.TwoSkrinn1", "background": "CombatBackground.Dungeon", "name": "2× Skrinn" },
+    { "type": "cmd", "cmd": "auto_combat_stop" }
+  ]
+}

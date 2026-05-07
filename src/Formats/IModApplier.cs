@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
-using UAlbion.Formats.Assets.Save;
 
 namespace UAlbion.Formats;
 
@@ -11,7 +10,6 @@ public interface IModApplier : IComponent
     IEnumerable<string> ShaderPaths { get; }
 
     void LoadMods(AssetMapping mapping, IPathResolver pathResolver, IReadOnlyList<string> mods);
-    SavedGame LoadSavedGame(string path);
     AssetNode GetAssetInfo(AssetId key, string language = null);
 
     object LoadAsset(AssetId id, string language = null);

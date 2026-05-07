@@ -210,7 +210,7 @@ public class Npc2D : Component
 
     IEvent BuildInteractionEvent()
     {
-        if (_state.EventIndex != EventNode.UnusedEventId)
+        if (_state.EventIndex != EventNode.UnusedEventId && _state.EventSet != null)
             return new TriggerChainEvent(
                 _state.EventSet,
                 _state.EventIndex,

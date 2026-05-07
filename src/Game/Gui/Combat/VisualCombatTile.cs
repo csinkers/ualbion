@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Numerics;
+using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Visual;
+using UAlbion.Formats.Assets;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Combat;
 using UAlbion.Game.Gui.Controls;
@@ -23,6 +25,11 @@ public class VisualCombatTile : UiElement
     bool _isDying;
     float _deathTimer;
     float _deathStartElapsed;
+    float _blinkTimer;
+    bool _showBorder;
+    BatchLease<SpriteKey, SpriteInfo> _borderBatch;
+    bool _borderDirty = true;
+    bool _hasBorderBatch;
 
     public SpriteId Icon
     {
@@ -97,6 +104,18 @@ public class VisualCombatTile : UiElement
             CombatActionType.Flee         => (SpriteId)Base.CoreGfx.CombatRetreat,
             _                             => SpriteId.None
         };
+
+        var clock2 = Resolve<IClock>();
+        if (clock2 != null)
+            _blinkTimer = clock2.ElapsedTime;
+        bool shouldShow = _battle.PlanningState == CombatPlanningState.SelectingTarget
+                          && _battle.IsValidTarget(_tileIndex)
+                          && (Math.Sin(_blinkTimer * 8) > 0);
+        if (shouldShow != _showBorder)
+        {
+            _showBorder = shouldShow;
+            _borderDirty = true;
+        }
     }
 
     void ShowDeathState()
@@ -105,10 +124,8 @@ public class VisualCombatTile : UiElement
         var clock = Resolve<IClock>();
         _deathStartElapsed = clock?.ElapsedTime ?? 0f;
         _deathTimer = 0f;
-        // DEVIATION: Full fade/alpha not exposed on UiSpriteElement — icon stays visible until timer expires
     }
 
-    // public ButtonState State { get => _frame.State; set => _frame.State = value; }
     public override Vector2 GetSize() => new(Width, Height);
     public VisualCombatTile OnClick(Action callback) { Click += callback; return this; }
     public VisualCombatTile OnRightClick(Action callback) { RightClick += callback; return this; }
@@ -127,14 +144,72 @@ public class VisualCombatTile : UiElement
     public bool Hoverable { get => _button.Hoverable; set => _button.Hoverable = value; }
     public bool SuppressNextDoubleClick { get => _button.SuppressNextDoubleClick; set => _button.SuppressNextDoubleClick = value; }
 
-    // ReSharper disable once UnusedParameter.Local
-    static void Rebuild(in Rectangle extents)
+    protected override void Unsubscribed()
     {
+        _borderBatch?.Dispose();
+        _borderBatch = null;
+        _hasBorderBatch = false;
+        base.Unsubscribed();
     }
 
     public override int Render(Rectangle extents, int order, LayoutNode parent)
     {
-        Rebuild(extents);
+        // Draw border directly via batch manager to avoid layout clipping issues
+        if (_showBorder && IsSubscribed)
+        {
+            var window = Resolve<IGameWindow>();
+            var sm = Resolve<IBatchManager<SpriteKey, SpriteInfo>>();
+            var commonColors = Resolve<ICommonColors>();
+
+            if (window != null && sm != null && commonColors != null)
+            {
+                var key = new SpriteKey(commonColors.BorderTexture, SpriteSampler.Point, (DrawLayer)order, SpriteKeyFlags.NoDepthTest | SpriteKeyFlags.NoTransform);
+                if (!_hasBorderBatch || _borderBatch?.Key != key)
+                {
+                    _borderBatch?.Dispose();
+                    _borderBatch = sm.Borrow(key, 4, this);
+                    _hasBorderBatch = true;
+                    _borderDirty = true;
+                }
+
+                if (_borderDirty)
+                {
+                    _borderDirty = false;
+                    bool lockWasTaken = false;
+                    var instances = _borderBatch.Lock(ref lockWasTaken);
+                    try
+                    {
+                        var region = commonColors.GetRegion(CommonColor.LightBurgundy);
+                        // Top strip
+                        instances[0] = new SpriteInfo(SpriteFlags.TopLeft,
+                            new Vector3(window.UiToNorm(extents.X, extents.Y), 0),
+                            window.UiToNormRelative(new Vector2(Width, 1)), region);
+                        // Bottom strip
+                        instances[1] = new SpriteInfo(SpriteFlags.TopLeft,
+                            new Vector3(window.UiToNorm(extents.X, extents.Y + Height - 1), 0),
+                            window.UiToNormRelative(new Vector2(Width, 1)), region);
+                        // Left strip
+                        instances[2] = new SpriteInfo(SpriteFlags.TopLeft,
+                            new Vector3(window.UiToNorm(extents.X, extents.Y + 1), 0),
+                            window.UiToNormRelative(new Vector2(1, Height - 2)), region);
+                        // Right strip
+                        instances[3] = new SpriteInfo(SpriteFlags.TopLeft,
+                            new Vector3(window.UiToNorm(extents.X + Width - 1, extents.Y + 1), 0),
+                            window.UiToNormRelative(new Vector2(1, Height - 2)), region);
+                    }
+                    finally { _borderBatch.Unlock(lockWasTaken); }
+                }
+
+                return order + 1;
+            }
+        }
+        else if (_hasBorderBatch)
+        {
+            _borderBatch?.Dispose();
+            _borderBatch = null;
+            _hasBorderBatch = false;
+        }
+
         return base.Render(extents, order, parent);
     }
 }

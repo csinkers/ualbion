@@ -69,7 +69,7 @@ public class InventorySummaryPage : UiElement // Summary
         var formatBlocks = tf
             .Format(
                 Assets.LoadStringSafe(Base.SystemText.Inv1_NYearsOldRaceClassLevelN),
-                member.Apparent.Age, member.Apparent.Level).GetBlocks();
+                member.Apparent.Age.Current, member.Apparent.Level).GetBlocks();
 
         foreach (var block in formatBlocks)
             yield return block;

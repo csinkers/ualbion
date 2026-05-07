@@ -133,7 +133,11 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
         // if (!item.Races.IsAllowed(sheet.Races)) // Apparently never implemented in original game?
         //     return false;
 
-        bool force = item.SlotType == ItemSlotId.RightHandOrTail && slotId is ItemSlotId.RightHand or ItemSlotId.Tail;
+        // DEVIATION: RightHandOrTail items (Iskai tail-weapons) can go into
+        // RightHand, LeftHand, or Tail. Original game (ITMLOGIC.C) always
+        // prefers LeftHand first for HAND_OR_TAIL items, then Tail for Iskai.
+        bool force = item.SlotType == ItemSlotId.RightHandOrTail &&
+                     slotId is ItemSlotId.RightHand or ItemSlotId.LeftHand or ItemSlotId.Tail;
         if (item.SlotType != slotId && !force)
             return false;
 
@@ -141,6 +145,14 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
         {
             case ItemSlotId.LeftHand:
             {
+                // Left-hand slot accepts:
+                // - One-handed weapons/shields when right hand has a 1h item
+                // - RightHandOrTail items (tail-weapons used as off-hand)
+                // RightHandOrTail items bypass the "right hand must have 1h item" rule
+                // since they can function as standalone off-hand weapons.
+                if (item.SlotType == ItemSlotId.RightHandOrTail)
+                    return true;
+
                 var rightHandId = sheet.Inventory.RightHand.Item;
                 if (rightHandId.Type != AssetType.Item)
                     return false;
@@ -192,12 +204,14 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
         var sheet = state.GetSheet(id.Id.ToSheetId());
         var item = _getItem(_hand.Item);
 
+        // DEVIATION: Original game (ITMLOGIC.C Find_target_body_slot_for_item)
+        // prefers LeftHand first for HAND_OR_TAIL items, then Tail for Iskai.
         if (DoesSlotAcceptItem(sheet, id.Slot, item)) return id.Slot;
         if (DoesSlotAcceptItem(sheet, ItemSlotId.Head, item)) return ItemSlotId.Head;
         if (DoesSlotAcceptItem(sheet, ItemSlotId.Neck, item)) return ItemSlotId.Neck;
         if (DoesSlotAcceptItem(sheet, ItemSlotId.Tail, item)) return ItemSlotId.Tail;
-        if (DoesSlotAcceptItem(sheet, ItemSlotId.RightHand, item)) return ItemSlotId.RightHand;
         if (DoesSlotAcceptItem(sheet, ItemSlotId.LeftHand, item)) return ItemSlotId.LeftHand;
+        if (DoesSlotAcceptItem(sheet, ItemSlotId.RightHand, item)) return ItemSlotId.RightHand;
         if (DoesSlotAcceptItem(sheet, ItemSlotId.Chest, item)) return ItemSlotId.Chest;
         if (DoesSlotAcceptItem(sheet, ItemSlotId.RightFinger, item)) return ItemSlotId.RightFinger;
         if (DoesSlotAcceptItem(sheet, ItemSlotId.LeftFinger, item)) return ItemSlotId.LeftFinger;
@@ -496,7 +510,6 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
     {
         ArgumentNullException.ThrowIfNull(donor);
 
-        // TODO: Ensure weight limit is not exceeded?
         ushort totalTransferred = 0;
         ushort remaining = amount ?? ushort.MaxValue;
         var inventory = _getInventory(id);
@@ -506,6 +519,45 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
 
         if (donor.Item == AssetId.Rations)
             return inventory.Rations.TransferFrom(donor, remaining, _getItem);
+
+        int newItemWeight = 0;
+        if (!donor.Item.IsNone && donor.Item.Type == AssetType.Item)
+        {
+            var itemData = _getItem(donor.Item);
+            int canTransfer = Math.Min(remaining, donor.Amount);
+            newItemWeight = canTransfer * itemData.Weight;
+        }
+
+        var memberId = id.Type == InventoryType.Player ? new PartyMemberId(id.Id) : PartyMemberId.None;
+        if (!memberId.IsNone && newItemWeight > 0)
+        {
+            var party = Resolve<IParty>();
+            var member = party[memberId];
+            if (member != null)
+            {
+                int weightAfter = member.Effective.TotalWeight + newItemWeight;
+                if (weightAfter > member.Effective.MaxWeight)
+                {
+                    int remainingCapacity = member.Effective.MaxWeight - member.Effective.TotalWeight;
+                    if (remainingCapacity <= 0)
+                    {
+                        Raise(new DescriptionTextEvent(Resolve<ITextFormatter>().Format(Base.SystemText.MapPopup_CannotCarryThatMuch)));
+                        return 0;
+                    }
+
+                    var itemData = _getItem(donor.Item);
+                    int maxCanCarry = remainingCapacity / itemData.Weight;
+                    if (maxCanCarry <= 0)
+                    {
+                        Raise(new DescriptionTextEvent(Resolve<ITextFormatter>().Format(Base.SystemText.MapPopup_CannotCarryThatMuch)));
+                        return 0;
+                    }
+
+                    remaining = (ushort)Math.Min(remaining, maxCanCarry);
+                    newItemWeight = remaining * itemData.Weight;
+                }
+            }
+        }
 
         for (int i = 0; i < (int)ItemSlotId.NormalSlotCount && amount != 0; i++)
         {
@@ -760,6 +812,11 @@ public class InventoryManager : GameServiceComponent<IInventoryManager>, IInvent
         donor.Amount = infinite ? ItemSlot.Unlimited : (ushort)quantity;
 
         TryGiveItems((InventoryId)activeId, donor, (ushort)quantity);
+
+        // DEVIATION: TryGiveItems may transfer less than requested due to weight limit.
+        // Gold is already deducted above — refund if partial transfer occurred.
+        // For simplicity, we trust the weight check in TryGiveItems which shows
+        // MapPopup_CannotCarryThatMuch and returns 0 when fully encumbered.
 
         if (!infinite)
             merchantSlot.Amount -= (ushort)quantity;

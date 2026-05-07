@@ -328,6 +328,51 @@ public sealed class Engine : ServiceComponent<IVeldridEngine, IEngine>, IVeldrid
         }
     }
 
+    public unsafe SixLabors.ImageSharp.Image<Bgra32> ReadTexture2D(Texture texture)
+    {
+        ArgumentNullException.ThrowIfNull(texture);
+        var stagingDesc = new TextureDescription(
+            texture.Width, texture.Height,
+            1, 1, 1,
+            texture.Format,
+            TextureUsage.Staging,
+            TextureType.Texture2D);
+
+        using var staging = Device.ResourceFactory.CreateTexture(in stagingDesc);
+        using var cl = Device.ResourceFactory.CreateCommandList();
+
+        cl.Name = "CL:ReadTexture2D";
+        cl.Begin();
+        cl.CopyTexture(texture, staging);
+        cl.End();
+        Device.SubmitCommands(cl);
+        Device.WaitForIdle();
+
+        var mapped = Device.Map(staging, MapMode.Read);
+        try
+        {
+            var result = new Image<Bgra32>((int)texture.Width, (int)texture.Height);
+
+            result.ProcessPixelRows(p =>
+            {
+                var sourceSpan = new Span<uint>(mapped.Data.ToPointer(), (int)mapped.SizeInBytes);
+                var stride = (int)mapped.RowPitch / sizeof(uint);
+                for (int j = 0; j < texture.Height; j++)
+                {
+                    var sourceRow = sourceSpan.Slice(stride * j, (int)texture.Width);
+                    var destRow = MemoryMarshal.Cast<Bgra32, uint>(p.GetRowSpan(j));
+                    sourceRow.CopyTo(destRow);
+                }
+            });
+
+            return result;
+        }
+        finally
+        {
+            Device.Unmap(staging);
+        }
+    }
+
     public void Dispose()
     {
         DestroyAllObjects();

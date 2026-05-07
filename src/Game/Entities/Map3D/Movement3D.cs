@@ -2,6 +2,7 @@
 using UAlbion.Api.Eventing;
 using UAlbion.Formats.Assets;
 using UAlbion.Formats.ScriptEvents;
+using UAlbion.Game.State;
 
 namespace UAlbion.Game.Entities.Map3D;
 
@@ -14,8 +15,22 @@ public class Movement3D : Component
         On<PartyTurnEvent>(OnTurn);
     }
 
+    bool IsEncumbered()
+    {
+        var party = TryResolve<IParty>();
+        if (party == null) return false;
+        foreach (var member in party.WalkOrder)
+        {
+            if (member.Effective.TotalWeight > member.Effective.MaxWeight)
+                return true;
+        }
+        return false;
+    }
+
     void OnMove(PartyMoveEvent e)
     {
+        if (IsEncumbered())
+            return;
     }
 
     void OnTurn(PartyTurnEvent e)

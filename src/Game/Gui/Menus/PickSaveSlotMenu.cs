@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using UAlbion.Api;
 using UAlbion.Config;
 using UAlbion.Formats;
@@ -20,7 +21,10 @@ public class PickSaveSlotMenu : ModalDialog
 {
     readonly bool _showEmptySlots;
     readonly StringId _stringId;
-    const ushort MaxSaveNumber = 10; // TODO: Add scroll bar and bump up to 99
+    const ushort MaxSaveNumber = 10;
+    const int ThumbnailWidth = 72;
+    const int ThumbnailHeight = 48;
+    const int ThumbnailSpacing = 8;
 
     public PickSaveSlotMenu(bool showEmptySlots, TextId textId, int depth) : this(showEmptySlots, new StringId(textId), depth) { }
     public PickSaveSlotMenu(bool showEmptySlots, StringId stringId, int depth) : base(DialogPositioning.Center, depth)
@@ -53,11 +57,12 @@ public class PickSaveSlotMenu : ModalDialog
     string BuildSaveFilename(ushort i)
     {
         var pathResolver = Resolve<IPathResolver>();
-        // TODO: This path currently exists in two places: here and Game\State\GameState.cs
         return pathResolver.ResolvePath($"$(SAVES)/SAVE.{i:D3}");
     }
 
-    const int MaxSaveSlotWidth = 280;
+    string BuildScreenshotFilename(ushort i) => BuildSaveFilename(i) + ".png";
+
+    const int MaxSaveSlotWidth = 360;
     protected override void Subscribed()
     {
         var disk = Resolve<IFileSystem>();
@@ -80,17 +85,37 @@ public class PickSaveSlotMenu : ModalDialog
             var filename = BuildSaveFilename(i);
             if (disk.FileExists(filename))
             {
-                using var s = AlbionSerdes.CreateReader(disk.OpenRead(filename));
-                var name = SavedGame.GetName(s) ?? "Invalid";
+                var jsonText = disk.ReadAllText(filename);
+                string name;
+                try
+                {
+                    var dto = JsonSerializer.Deserialize<JsonSavedGame>(jsonText, JsonSavedGame.JsonOptions);
+                    name = dto?.Name ?? "Invalid";
+                }
+                catch { name = "[Corrupt Save]"; }
                 var text = $"{i,2}    {name}";
                 ushort slotNumber = i;
-                buttons.Add(new ConversationOption(new LiteralText(text), MaxSaveSlotWidth, null, () => PickSlot(slotNumber)));
+
+                var row = new List<IUiElement>();
+                var screenshotPath = BuildScreenshotFilename(i);
+                var thumbnailFactory = TryResolve<IScreenshotThumbnailFactory>();
+                if (disk.FileExists(screenshotPath) && thumbnailFactory != null)
+                {
+                    row.Add(thumbnailFactory.CreateThumbnail(screenshotPath, ThumbnailWidth, ThumbnailHeight));
+                    row.Add(new Spacing(ThumbnailSpacing, 0));
+                }
+                row.Add(new ConversationOption(new LiteralText(text), MaxSaveSlotWidth - ThumbnailWidth - ThumbnailSpacing, null, () => PickSlot(slotNumber)));
+                buttons.Add(new HorizontalStacker(row));
             }
             else if (_showEmptySlots)
             {
                 var text = BuildEmptySlotText(i);
                 ushort slotNumber = i;
-                buttons.Add(new ConversationOption(text, MaxSaveSlotWidth, null, () => PickSlot(slotNumber)));
+
+                var row = new List<IUiElement>();
+                row.Add(new Spacing(ThumbnailWidth + ThumbnailSpacing, 0));
+                row.Add(new ConversationOption(text, MaxSaveSlotWidth - ThumbnailWidth - ThumbnailSpacing, null, () => PickSlot(slotNumber)));
+                buttons.Add(new HorizontalStacker(row));
             }
         }
 

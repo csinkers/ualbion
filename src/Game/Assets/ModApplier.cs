@@ -8,7 +8,6 @@ using UAlbion.Config.Properties;
 using UAlbion.Core;
 using UAlbion.Formats;
 using UAlbion.Formats.Assets;
-using UAlbion.Formats.Assets.Save;
 using UAlbion.Game.Events;
 
 #if DEBUG
@@ -268,20 +267,6 @@ public class ModApplier : GameComponent, IModApplier
         var font = Assets.LoadFontDefinition(metaId.FontId);
         var metaFont = font.Build(metaId.FontId, metaId.InkId, Assets);
         return new AssetLoadResult(id, metaFont, null);
-    }
-
-    public SavedGame LoadSavedGame(string path)
-    {
-        var disk = Resolve<IFileSystem>();
-        if (!disk.FileExists(path))
-        {
-            Error($"Could not find save game file \"{path}\"");
-            return null;
-        }
-
-        using var s = AlbionSerdes.CreateReader(disk.OpenRead(path));
-        var spellManager = Resolve<ISpellManager>();
-        return SavedGame.Serdes(null, AssetMapping.Global, s, spellManager);
     }
 
     public void SaveAssets(AssetConversionOptions options)

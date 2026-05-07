@@ -56,7 +56,7 @@ public class PartyMember : GameComponent, IPlayer
             : (float)(elapsed / lerpDuration);
 
         if (Math.Abs(_lerp - oldLerp) > float.Epsilon)
-            Raise(new InventoryChangedEvent(new InventoryId(Id)));
+            Raise(new InventoryChangedEvent(new InventoryId(Id)) { IsRealChange = false });
     }
 
     public PartyMemberId Id { get; }
@@ -83,6 +83,12 @@ public class PartyMember : GameComponent, IPlayer
     {
         var lp = _base.Combat.LifePoints;
         lp.Current = (ushort)Math.Min(lp.Max, lp.Current + amount);
+        UpdateSheet();
+    }
+
+    public void ClearCondition(PlayerConditions condition)
+    {
+        _base.Combat.Conditions &= ~condition;
         UpdateSheet();
     }
 

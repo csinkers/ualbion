@@ -100,7 +100,6 @@ public class RawAssetManager : Component, IRawAssetManager
     public byte[] LoadSong(SongId id) => (byte[]) _modApplier.LoadAsset(id);
     public IList<IEvent> LoadScript(ScriptId id) => (IList<IEvent>) _modApplier.LoadAsset(id);
     public SpellData LoadSpell(SpellId id) => (SpellData)_modApplier.LoadAsset(id);
-    public SavedGame LoadSavedGame(string path) => _modApplier.LoadSavedGame(path);
     public MonsterGroup LoadMonsterGroup(MonsterGroupId id) => (MonsterGroup)_modApplier.LoadAsset(id);
     public Automap LoadAutomap(AutomapId id) => (Automap) _modApplier.LoadAsset(id);
     public object LoadSoundBanks() => _modApplier.LoadAsset(AssetId.From(Base.Special.SoundBank));

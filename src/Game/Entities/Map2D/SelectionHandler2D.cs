@@ -11,6 +11,7 @@ using UAlbion.Formats.Config;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.Input;
 using UAlbion.Game.Scenes;
 using UAlbion.Game.Text;
 
@@ -25,6 +26,7 @@ public sealed class SelectionHandler2D : GameComponent
     readonly DebugMapTileHit _debugMapTileHit = new();
     Func<object, string> _formatChain;
     int _lastHighlightIndex;
+    CursorMode _currentCursorMode;
 
     public SelectionHandler2D(LogicalMap2D map, MapRenderable2D renderable)
     {
@@ -35,6 +37,7 @@ public sealed class SelectionHandler2D : GameComponent
             e.Propagating = false;
             Raise(new PushMouseModeEvent(MouseMode.RightButtonHeld));
         });
+        On<CursorModeEvent>(e => _currentCursorMode = e.Mode);
 
         _map = map ?? throw new ArgumentNullException(nameof(map));
         _renderable = renderable;
@@ -88,6 +91,16 @@ public sealed class SelectionHandler2D : GameComponent
             var chain = zone?.Chain;
             if (chain != null)
                 e.Selections.Add(new Selection(e.Origin, e.Direction, t, zone.Node, _formatChain));
+        }
+
+        if (_currentCursorMode == CursorMode.Take)
+        {
+            var zone = _map.GetOffsetZone(x, y);
+            if (zone?.Chain != null && zone.Node != null && (zone.Trigger & TriggerTypes.Take) != 0)
+            {
+                Raise(new TriggerMapTileEvent(TriggerType.Take, zone.X, zone.Y));
+                return;
+            }
         }
 
         int highlightIndex = y * _map.Width + x;

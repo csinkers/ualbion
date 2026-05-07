@@ -34,6 +34,8 @@
   },
   "World2D": {
     "Escape": "push_scene MainMenu",
+    "F5": "quicksave",
+    "F9": "quickload",
     "F6": "encounter MonsterGroup.FourWarniak1OneWarniak3",
     "Ctrl+A": "!loadnextmap",
     "Ctrl+X": "!loadprevmap",
@@ -82,6 +84,8 @@
   },
   "World3D": {
     "Escape": "push_scene MainMenu",
+    "F5": "quicksave",
+    "F9": "quickload",
     "Tab": "inv:open Tom",
     /*"F1": "inv:open_pos 0",
     "F2": "inv:open_pos 1",

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
@@ -43,9 +45,12 @@ public class AgentBridgeComponent : Component, IDisposable
     readonly List<WebSocket> _eventClients = [];
     readonly Lock _eventLock = new();
     CancellationTokenSource _cts = new();
+    readonly CombatAgent _combatAgent = new();
 
     static readonly string ScriptDir = Path.Combine(
         AppContext.BaseDirectory, "..", "..", "..", "..", "Tools", "AgentBridge", "test");
+
+    static string SequenceDir => ScriptDir;
 
     public void Dispose()
     {
@@ -56,8 +61,12 @@ public class AgentBridgeComponent : Component, IDisposable
 
     public AgentBridgeComponent()
     {
+        AttachChild(_combatAgent);
         On<BeginFrameEvent>(_ => DrainCommandQueue());
         On<LogEvent>(BroadcastLog);
+        On<EndCombatEvent>(e => BroadcastEvent(JsonSerializer.Serialize(
+            new { type = "combat_ended", result = e.Result.ToString() })));
+        On<InventoryChangedEvent>(OnInventoryChanged);
     }
 
     void BroadcastLog(LogEvent e)
@@ -119,6 +128,16 @@ public class AgentBridgeComponent : Component, IDisposable
                     _ = Task.Run(() => ServeScriptListAsync(ctx), ct);
                 else if (ctx.Request.HttpMethod == "POST" && ctx.Request.Url?.AbsolutePath == "/run-script")
                     _ = Task.Run(() => RunScriptAsync(ctx), ct);
+                else if (ctx.Request.Url?.AbsolutePath == "/sequences")
+                {
+                    switch (ctx.Request.HttpMethod)
+                    {
+                        case "GET":    _ = Task.Run(() => ServeSequenceListAsync(ctx), ct); break;
+                        case "POST":   _ = Task.Run(() => SaveSequenceAsync(ctx), ct); break;
+                        case "DELETE": _ = Task.Run(() => DeleteSequenceAsync(ctx), ct); break;
+                        default: ctx.Response.StatusCode = 405; ctx.Response.Close(); break;
+                    }
+                }
                 else
                 {
                     ctx.Response.StatusCode = 400;
@@ -173,7 +192,7 @@ public class AgentBridgeComponent : Component, IDisposable
             catch (Exception ex) { BroadcastEvent(JsonSerializer.Serialize(new { type = "script_error", file, message = ex.Message })); return; }
             async Task Relay(StreamReader reader)
             {
-                string line;
+                string? line;
                 while ((line = await reader.ReadLineAsync()) != null)
                     BroadcastEvent(JsonSerializer.Serialize(new { type = "script_output", file, line }));
             }
@@ -182,6 +201,97 @@ public class AgentBridgeComponent : Component, IDisposable
             BroadcastEvent(JsonSerializer.Serialize(new { type = "script_done", file, exit = proc.ExitCode }));
         });
     }
+
+    // ── Sequence REST handlers ─────────────────────────────────────────────────
+
+    static async Task ServeSequenceListAsync(HttpListenerContext ctx)
+    {
+        // If ?file=name.seq.json → return full content of that sequence
+        var fileParam = ctx.Request.QueryString["file"];
+        if (!string.IsNullOrEmpty(fileParam))
+        {
+            var path = Path.Combine(SequenceDir, Path.GetFileName(fileParam));
+            if (!File.Exists(path)) { ctx.Response.StatusCode = 404; ctx.Response.Close(); return; }
+            var content = await File.ReadAllTextAsync(path);
+            ctx.Response.ContentType = "application/json";
+            ctx.Response.Headers["Access-Control-Allow-Origin"] = "*";
+            var bytes = Encoding.UTF8.GetBytes(content);
+            ctx.Response.ContentLength64 = bytes.Length;
+            try { await ctx.Response.OutputStream.WriteAsync(bytes); ctx.Response.OutputStream.Close(); }
+            catch { }
+            return;
+        }
+
+        // Otherwise return metadata list
+        var files = Directory.Exists(SequenceDir)
+            ? Directory.GetFiles(SequenceDir, "*.seq.json")
+                .Select(p =>
+                {
+                    try
+                    {
+                        var json = File.ReadAllText(p);
+                        var node = JsonNode.Parse(json);
+                        return (object)new
+                        {
+                            file = Path.GetFileName(p),
+                            name = node?["name"]?.GetValue<string>() ?? Path.GetFileNameWithoutExtension(p),
+                            description = node?["description"]?.GetValue<string>() ?? "",
+                            steps = node?["steps"]?.AsArray().Count ?? 0
+                        };
+                    }
+                    catch { return null; }
+                })
+                .Where(x => x != null)
+                .ToArray()
+            : Array.Empty<object>();
+
+        await WriteJsonResponseAsync(ctx, files);
+    }
+
+    static async Task SaveSequenceAsync(HttpListenerContext ctx)
+    {
+        using var reader = new StreamReader(ctx.Request.InputStream);
+        var body = await reader.ReadToEndAsync();
+
+        JsonNode? node;
+        try { node = JsonNode.Parse(body); }
+        catch { ctx.Response.StatusCode = 400; ctx.Response.Close(); return; }
+
+        var name = node?["name"]?.GetValue<string>();
+        if (string.IsNullOrWhiteSpace(name)) { ctx.Response.StatusCode = 400; ctx.Response.Close(); return; }
+
+        Directory.CreateDirectory(SequenceDir);
+        var safeName = string.Concat(name.Select(c => Path.GetInvalidFileNameChars().Contains(c) ? '_' : c));
+        var path = Path.Combine(SequenceDir, safeName + ".seq.json");
+        await File.WriteAllTextAsync(path, body);
+
+        await WriteJsonResponseAsync(ctx, new { saved = Path.GetFileName(path) });
+    }
+
+    static async Task DeleteSequenceAsync(HttpListenerContext ctx)
+    {
+        var file = ctx.Request.QueryString["file"];
+        if (string.IsNullOrEmpty(file)) { ctx.Response.StatusCode = 400; ctx.Response.Close(); return; }
+
+        var path = Path.Combine(SequenceDir, Path.GetFileName(file));
+        if (File.Exists(path))
+            File.Delete(path);
+
+        await WriteJsonResponseAsync(ctx, new { deleted = file });
+    }
+
+    static async Task WriteJsonResponseAsync(HttpListenerContext ctx, object payload)
+    {
+        var json = JsonSerializer.Serialize(payload);
+        ctx.Response.ContentType = "application/json";
+        ctx.Response.Headers["Access-Control-Allow-Origin"] = "*";
+        var bytes = Encoding.UTF8.GetBytes(json);
+        ctx.Response.ContentLength64 = bytes.Length;
+        try { await ctx.Response.OutputStream.WriteAsync(bytes); ctx.Response.OutputStream.Close(); }
+        catch { }
+    }
+
+    // ── WebSocket ─────────────────────────────────────────────────────────────
 
     async Task HandleWebSocketAsync(HttpListenerContext ctx, CancellationToken ct)
     {
@@ -296,13 +406,23 @@ public class AgentBridgeComponent : Component, IDisposable
             "modify_status"    => ModifyStatus(node),
             "raise_event"        => RaiseGameEvent(node?["event"]?.GetValue<string>()),
             "send_input_action"  => SendInputAction(node),
-            "start_new_game"     => RaiseGameEvent("new_game Map.TorontoBegin 31 76"),
+            "start_new_game"     => StartNewGame(node),
             "dismiss_message"    => RaiseGameEvent("dismiss_message"),
             "enter_merchant"     => EnterMerchant(node),
+            "toggle_clock"       => ToggleSpecialItem(Base.Item.Clock, ActiveItems.Clock),
+            "toggle_compass"     => ToggleSpecialItem(Base.Item.Compass, ActiveItems.Compass),
+            "toggle_monster_eye" => ToggleSpecialItem(Base.Item.MonsterEye, ActiveItems.MonsterEye),
+            "get_active_items"   => GetActiveItems(),
+            "quicksave"          => RaiseGameEvent("quicksave"),
+            "quickload"          => RaiseGameEvent("quickload"),
+            "auto_combat_start"  => AutoCombatStart(node),
+            "auto_combat_stop"   => AutoCombatStop(),
+            "auto_combat_status" => AutoCombatStatus(),
             _ => Error("unknown_command",
                 $"Unknown command '{cmd}'. Available: ping, quit, get_scene, get_party, get_inventory, get_map, get_time, get_npcs, " +
                 "get_combat, select_combat_action, select_combat_target, equip_item, save_game, load_game, teleport, load_map, " +
-                "talk_npc, respond, modify_gold, modify_hp, modify_status, raise_event, send_input_action, start_new_game, dismiss_message, enter_merchant")
+                "talk_npc, respond, modify_gold, modify_hp, modify_status, raise_event, send_input_action, start_new_game, dismiss_message, enter_merchant, " +
+                "toggle_clock, toggle_compass, toggle_monster_eye, get_active_items")
         };
     }
 
@@ -396,10 +516,13 @@ public class AgentBridgeComponent : Component, IDisposable
             }
         }
 
-        return Ok(new { scene = sceneId, party = partyInCombat, tile_map = tileMap });
+        var planningState = battle == null ? "NotInCombat" : battle.PlanningState.ToString();
+        var pendingActor  = battle?.PendingActorPosition;
+
+        return Ok(new { scene = sceneId, planning_state = planningState, pending_actor = pendingActor, party = partyInCombat, tile_map = tileMap });
     }
 
-    string SelectCombatAction(JsonNode node)
+    string SelectCombatAction(JsonNode? node)
     {
         var battle = TryResolve<IReadOnlyBattle>();
         if (battle == null)
@@ -430,7 +553,7 @@ public class AgentBridgeComponent : Component, IDisposable
         return RaiseGameEvent($"select_combat_action {combatPos.Value} {action}");
     }
 
-    string SelectCombatTarget(JsonNode node)
+    string SelectCombatTarget(JsonNode? node)
     {
         var battle = TryResolve<IReadOnlyBattle>();
         if (battle == null)
@@ -536,7 +659,7 @@ public class AgentBridgeComponent : Component, IDisposable
 
 // ── Action commands ───────────────────────────────────────────────────────
 
-    string GetEncounters()
+    static string GetEncounters()
     {
         var groups = new List<object>();
         foreach (Base.MonsterGroup mg in Enum.GetValues<Base.MonsterGroup>())
@@ -596,7 +719,7 @@ public class AgentBridgeComponent : Component, IDisposable
             var items = typeIdGroup.OrderBy(d => d.Id).Select(d =>
             {
                 string name;
-                try { name = assets.LoadStringSafe(d.Name, "English"); }
+                try { name = assets.LoadStringSafe(d.Name); }
                 catch { name = d.Id.ToString(); }
                 return new
                 {
@@ -640,7 +763,7 @@ public class AgentBridgeComponent : Component, IDisposable
 
         var slotId = ParseItemSlotId(slot);
 
-        IPlayer player = null;
+        IPlayer? player = null;
         foreach (var p in state.Party.WalkOrder)
         {
             if (p.Id == partyMemberId)
@@ -665,6 +788,8 @@ public class AgentBridgeComponent : Component, IDisposable
         itemSlot.Item = itemId;
         itemSlot.Amount = 1;
 
+        Raise(new InventoryChangedEvent(invId));
+
         return Ok(new { equipped = item, member = member, slot = slot });
     }
 
@@ -682,7 +807,7 @@ public class AgentBridgeComponent : Component, IDisposable
     {
         if (string.IsNullOrEmpty(s)) return null;
 
-        var name = s.StartsWith("PartyMember.", StringComparison.Ordinal) ? s.Substring(14) : s;
+        var name = s.StartsWith("PartyMember.", StringComparison.Ordinal) ? s.Substring(12) : s;
 
         try { return PartyMemberId.Parse("PartyMember." + name); }
         catch { return null; }
@@ -768,7 +893,11 @@ public class AgentBridgeComponent : Component, IDisposable
     {
         var amount = node?["amount"]?.GetValue<int>();
         if (amount == null) return Error("missing_param", "Field 'amount' is required");
-        return RaiseGameEvent($"modify_gold {amount}");
+        // Gold is stored at 10× scale (display = stored / 10), so multiply input by 10.
+        int raw = amount.Value * 10;
+        if (raw >= 0)
+            return RaiseGameEvent($"modify_gold AddAmount {raw}");
+        return RaiseGameEvent($"modify_gold SubtractAmount {-raw}");
     }
 
     string ModifyHp(JsonNode? node)
@@ -942,7 +1071,129 @@ public class AgentBridgeComponent : Component, IDisposable
         return Ok(new { raised = eventString });
     }
 
+    string StartNewGame(JsonNode? node)
+    {
+        var mapName = node?["map"]?.GetValue<string>() ?? "TorontoBegin";
+        var x = (ushort)(node?["x"]?.GetValue<ushort>() ?? 31);
+        var y = (ushort)(node?["y"]?.GetValue<ushort>() ?? 76);
+
+        var mapId = mapName.Contains('.') ? MapId.Parse(mapName) : (MapId)AssetMapping.Global.Parse(mapName, MapId.ValidTypes);
+
+        var logExchange = TryResolve<ILogExchange>();
+        if (logExchange == null)
+            return Error("not_ready", "Log exchange not available");
+
+        // Bypass MainMenu Yes/No prompt — directly enqueue NewGameEvent
+        logExchange.EnqueueEvent(new NewGameEvent(mapId, x, y));
+        return Ok(new { raised = $"new_game {mapName} {x} {y}" });
+    }
+
+    // ── Special item (HDOB overlay) toggles ───────────────────────────────────
+
+    string ToggleSpecialItem(ItemId itemId, ActiveItems flag)
+    {
+        var state = TryResolve<IGameState>();
+        if (state == null || !state.Loaded)
+            return Error("not_ready", "No game loaded.");
+
+        var currentlyActive = (state.ActiveItems & flag) != 0;
+        var newState = !currentlyActive;
+        Raise(new SetSpecialItemActiveEvent(itemId, newState));
+        return Ok(new { item = itemId.ToString(), active = newState });
+    }
+
+    string GetActiveItems()
+    {
+        var state = TryResolve<IGameState>();
+        if (state == null || !state.Loaded)
+            return Error("not_ready", "No game loaded.");
+
+        var items = state.ActiveItems;
+        return Ok(new
+        {
+            compass = (items & ActiveItems.Compass) != 0,
+            monster_eye = (items & ActiveItems.MonsterEye) != 0,
+            clock = (items & ActiveItems.Clock) != 0,
+            raw = (uint)items
+        });
+    }
+
+    // ── Auto-combat commands ──────────────────────────────────────────────────
+
+    string AutoCombatStart(JsonNode? node)
+    {
+        _combatAgent.Strategy.Enabled         = true;
+        _combatAgent.Strategy.AttackPriority  = node?["attack_priority"]?.GetValue<string>() ?? _combatAgent.Strategy.AttackPriority;
+        _combatAgent.Strategy.HealThreshold   = node?["heal_threshold"]?.GetValue<float>()   ?? _combatAgent.Strategy.HealThreshold;
+        BroadcastEvent(JsonSerializer.Serialize(new { type = "auto_combat", enabled = true, strategy = new
+        {
+            attack_priority = _combatAgent.Strategy.AttackPriority,
+            heal_threshold  = _combatAgent.Strategy.HealThreshold
+        }}));
+        return Ok(new { auto_combat = true, attack_priority = _combatAgent.Strategy.AttackPriority, heal_threshold = _combatAgent.Strategy.HealThreshold });
+    }
+
+    string AutoCombatStop()
+    {
+        _combatAgent.Strategy.Enabled = false;
+        BroadcastEvent(JsonSerializer.Serialize(new { type = "auto_combat", enabled = false }));
+        return Ok(new { auto_combat = false });
+    }
+
+    string AutoCombatStatus() =>
+        Ok(new
+        {
+            enabled         = _combatAgent.Strategy.Enabled,
+            attack_priority = _combatAgent.Strategy.AttackPriority,
+            heal_threshold  = _combatAgent.Strategy.HealThreshold
+        });
+
     // ── Broadcast ─────────────────────────────────────────────────────────────
+
+    void OnInventoryChanged(InventoryChangedEvent e)
+    {
+        if (!e.IsRealChange) return;
+        if (e.Id.Type != InventoryType.Player) return;
+
+        var state = TryResolve<IGameState>();
+        if (state == null) return;
+
+        var assets = TryResolve<IAssetManager>();
+        if (assets == null) return;
+
+        var partyMemberId = new PartyMemberId(e.Id.Id);
+        var member = state.Party[partyMemberId];
+        if (member == null) return;
+
+        // Read from writable inventory (ground truth), not the interpolated apparent copy
+        var inv = ((GameState)state).GetWriteableInventory(e.Id);
+        if (inv == null) return;
+
+        var bodyParts = new Dictionary<string, object>();
+        foreach (var slotId in new[] { ItemSlotId.Head, ItemSlotId.Neck, ItemSlotId.Chest, ItemSlotId.Feet,
+                                       ItemSlotId.RightHand, ItemSlotId.LeftHand, ItemSlotId.RightFinger, ItemSlotId.LeftFinger,
+                                       ItemSlotId.Tail })
+        {
+            var slot = inv.GetSlot(slotId);
+            if (slot != null && slot.Item.Type == AssetType.Item)
+            {
+                var itemData = assets.LoadItem(slot.Item);
+                var itemName = itemData != null ? assets.LoadStringSafe(itemData.Name) : slot.Item.ToString();
+                bodyParts[slotId.ToString()] = new { item = itemName, charges = slot.Charges, broken = (slot.Flags & ItemSlotFlags.Broken) != 0, cursed = (slot.Flags & ItemSlotFlags.Cursed) != 0 };
+            }
+            else
+            {
+                bodyParts[slotId.ToString()] = null;
+            }
+        }
+
+        BroadcastEvent(JsonSerializer.Serialize(new
+        {
+            type = "inventory_changed",
+            member = member.Id.ToString(),
+            equip = bodyParts
+        }));
+    }
 
     public void BroadcastEvent(string eventJson)
     {
@@ -1082,6 +1333,13 @@ public class AgentBridgeComponent : Component, IDisposable
               return `get_combat: ${mobs} mob(s) on field, scene=${m.scene}`;
             }
             if (m.cmd === 'get_scene') return `get_scene: ${m.scene ?? '?'}`;
+            if (m.cmd === 'get_active_items' && m.clock !== undefined) {
+              const items = [];
+              if (m.compass) items.push('Compass');
+              if (m.monster_eye) items.push('MonsterEye');
+              if (m.clock) items.push('Clock');
+              return `active items: ${items.length ? items.join(', ') : '(none)'}`;
+            }
             if (m.type === 'command') return `→ ${m.cmd ?? raw.slice(0, 60)}`;
             if (m.type === 'response' && m.ok != null) return `← ok=${m.ok}${m.error ? ' err='+m.error : ''}`;
             if (m.sev) return `[${m.sev}] ${m.msg}`;
@@ -1131,6 +1389,8 @@ public class AgentBridgeComponent : Component, IDisposable
         const QUICK_CMDS = [
           ['Ping',        '{"cmd":"ping"}'],
           ['New Game',    '{"cmd":"start_new_game"}'],
+          ['Quicksave',   '{"cmd":"quicksave"}'],
+          ['Quickload',   '{"cmd":"quickload"}'],
           ['Scene',       '{"cmd":"get_scene"}'],
           ['Party',       '{"cmd":"get_party"}'],
           ['Combat',      '{"cmd":"get_combat"}'],
@@ -1141,16 +1401,33 @@ public class AgentBridgeComponent : Component, IDisposable
         function connectEvents() {
           const ws = new WebSocket('ws://' + location.host + '/events');
           ws.onopen  = () => { dot.className = 'on'; addRow('info','●','Connected to /events'); };
-          ws.onclose = () => { dot.className = ''; addRow('info','●','Disconnected — reconnecting…'); setTimeout(connectEvents, 2000); };
+          ws.onclose = () => {
+            dot.className = '';
+            addRow('info','●','Disconnected — reconnecting…');
+            for (const w of pendingEventWaiters) { clearTimeout(w.timer); w.reject(new Error('disconnected')); }
+            pendingEventWaiters = [];
+            setTimeout(connectEvents, 2000);
+          };
           ws.onerror = () => {};
           ws.onmessage = e => {
             try {
               const outer = JSON.parse(e.data);
+              // Notify any promise-based event waiters
+              pendingEventWaiters = pendingEventWaiters.filter(w => {
+                if (outer.type === w.type) { clearTimeout(w.timer); w.resolve(outer); return false; }
+                return true;
+              });
               if (outer.type === 'response' && outer.payload) {
                 const inner = JSON.parse(outer.payload);
+                // Auto-fetch party after start_new_game so tabs populate automatically
+                if (inner.cmd === 'start_new_game' && inner.ok !== false) {
+                  setTimeout(() => fetchPartyWithRetry(), 600);
+                }
                 if (inner.result && inner.result.members) {
-                  buildCharactersPane(inner.result.members);
+                  buildCharactersPane(inner.result.members, inner.result.gold);
                   if (merchantTabBuilt) buildMerchantList();
+                  if (equipTabBuilt && itemCategories.length) buildItemPicker(itemCategories);
+                  if (partyPollTimer) { clearTimeout(partyPollTimer); partyPollTimer = null; }
                 }
                 if (inner.result && inner.result.categories) {
                   buildItemPicker(inner.result.categories);
@@ -1275,10 +1552,15 @@ public class AgentBridgeComponent : Component, IDisposable
             ['engine_flag toggle SuppressLayout','SuppressLayout'],
             ['debug_flag toggle NpcColliderLayer','NpcCollider'],['debug_flag toggle NpcPathLayer','NpcPath'],
           ],
+          Overlays: [
+            ['get_active_items','⟳ Refresh'],['toggle_clock','Clock'],['toggle_compass','Compass'],['toggle_monster_eye','MonsterEye'],
+          ],
           Characters: [],
           Equip: [],
           Combat: [],
           Merchant: [],
+          Sequences: [],
+          AutoCombat: [],
         };
 
         const STATUS_CONDITIONS = [
@@ -1294,12 +1576,36 @@ public class AgentBridgeComponent : Component, IDisposable
         let combatTabBuilt = false;
         let merchantTabBuilt = false;
         let selectedMerchantChar = null;
+        let sequencesTabBuilt = false;
+        let autoCombatTabBuilt = false;
+        let seqRunning = false;
+        let seqAbort = false;
+        let editingSequence = null;
+        let seqResults = [];
+        let allEncounters = [];
+        let csFights = [];
+        let csEquipItems = [];
+        let pendingEventWaiters = [];
 
         function fetchPartyAndBuild() { sendRaw(JSON.stringify({cmd:'get_party'})); }
+        let partyPollTimer = null;
+        function fetchPartyWithRetry(maxAttempts) {
+          if (partyPollTimer) { clearTimeout(partyPollTimer); partyPollTimer = null; }
+          let attempts = 0;
+          const max = maxAttempts || 8;
+          function attempt() {
+            sendRaw(JSON.stringify({cmd:'get_party'}));
+            attempts++;
+            if (attempts < max && !partyMembers.length) {
+              partyPollTimer = setTimeout(attempt, 500);
+            }
+          }
+          attempt();
+        }
         function fetchItems() { sendRaw(JSON.stringify({cmd:'get_items'})); }
         function fetchEncounters() { sendRaw(JSON.stringify({cmd:'get_encounters'})); }
 
-        function buildCharactersPane(members) {
+        function buildCharactersPane(members, partyGold) {
           partyMembers = members || [];
           const panesEl = document.getElementById('hpanes');
           let pane = panesEl.querySelector('[data-pane="Characters"]');
@@ -1322,6 +1628,19 @@ public class AgentBridgeComponent : Component, IDisposable
           refreshBtn.style.cssText = 'border-color:#ff9800;color:#e8c890;width:100%;margin-bottom:4px;';
           refreshBtn.onclick = fetchPartyAndBuild;
           pane.appendChild(refreshBtn);
+
+          // Gold section
+          const goldRow = document.createElement('div');
+          goldRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px;background:#0a1220;border:1px solid #997700;border-radius:4px;padding:4px 10px;';
+          goldRow.innerHTML = `
+            <span style="color:#ffd080;font-size:13px;">💰</span>
+            <span style="color:#aaa;font-size:11px;">Party Gold:</span>
+            <span style="color:#ffd080;font-size:13px;font-weight:bold;flex:1;">${partyGold !== undefined ? partyGold : '—'}</span>
+            <input id="gold-amount" type="number" value="100" min="1" style="width:70px;background:#0a0a1a;border:1px solid #334;color:#e0e0e0;padding:2px 5px;border-radius:3px;font-size:11px;font-family:inherit;">
+            <button class="hbtn" style="border-color:#ffd080;color:#ffd080;font-size:10px;" onclick="addGold(1)">+ Give</button>
+            <button class="hbtn" style="border-color:#888;color:#888;font-size:10px;" onclick="addGold(-1)">− Take</button>
+          `;
+          pane.appendChild(goldRow);
 
           for (const member of partyMembers) {
             const card = document.createElement('div');
@@ -1361,6 +1680,12 @@ public class AgentBridgeComponent : Component, IDisposable
         function toggleStatus(memberId, condition) {
           sendRaw(JSON.stringify({cmd:'modify_status',member:memberId,condition,operation:'toggle'}));
           setTimeout(fetchPartyAndBuild, 300);
+        }
+
+        function addGold(sign) {
+          const amt = parseInt(document.getElementById('gold-amount')?.value || '100') * sign;
+          sendRaw(JSON.stringify({cmd:'modify_gold', amount: amt}));
+          setTimeout(() => sendRaw(JSON.stringify({cmd:'get_party'})), 350);
         }
 
         function buildItemPicker(categories) {
@@ -1450,6 +1775,8 @@ public class AgentBridgeComponent : Component, IDisposable
         }
 
         function buildEncounterList(encounters) {
+          allEncounters = encounters || [];
+          csBuildEncounterPicker(); // update Combat Suite picker if open
           const panesEl = document.getElementById('hpanes');
           let pane = panesEl.querySelector('[data-pane="Combat"]');
           if (!pane) {
@@ -1557,7 +1884,7 @@ public class AgentBridgeComponent : Component, IDisposable
             const pane = document.createElement('div');
             pane.className = 'hpane' + (first ? ' active' : '');
             pane.dataset.pane = mode;
-            if (mode === 'Characters' || mode === 'Equip' || mode === 'Combat' || mode === 'Merchant') {
+            if (mode === 'Characters' || mode === 'Equip' || mode === 'Combat' || mode === 'Merchant' || mode === 'Sequences' || mode === 'AutoCombat') {
               pane.innerHTML = `<span style="color:#888;padding:4px;">Loading…</span>`;
             } else {
               for (const [action, label, cont] of actions) {
@@ -1566,7 +1893,11 @@ public class AgentBridgeComponent : Component, IDisposable
                 if (cont) b.dataset.cont = '1';
                 b.title = action;
                 b.textContent = label;
-                b.onclick = () => sendRaw(JSON.stringify({cmd:'send_input_action', action}));
+                if (mode === 'Overlays') {
+                  b.onclick = () => sendRaw(JSON.stringify({cmd: action}));
+                } else {
+                  b.onclick = () => sendRaw(JSON.stringify({cmd:'send_input_action', action}));
+                }
                 pane.appendChild(b);
               }
             }
@@ -1577,14 +1908,669 @@ public class AgentBridgeComponent : Component, IDisposable
               panesEl.querySelectorAll('.hpane').forEach(p => p.classList.remove('active'));
               tab.classList.add('active');
               pane.classList.add('active');
-              if (mode === 'Characters' && !charsTabBuilt) { charsTabBuilt = true; fetchPartyAndBuild(); }
-              if (mode === 'Equip' && !equipTabBuilt) { equipTabBuilt = true; fetchItems(); }
+              if (mode === 'Characters' && !charsTabBuilt) { charsTabBuilt = true; fetchPartyWithRetry(); }
+              if (mode === 'Equip' && !equipTabBuilt) { equipTabBuilt = true; if (!charsTabBuilt) { charsTabBuilt = true; fetchPartyWithRetry(); } fetchItems(); }
               if (mode === 'Combat' && !combatTabBuilt) { combatTabBuilt = true; fetchEncounters(); }
               if (mode === 'Merchant' && !merchantTabBuilt) { merchantTabBuilt = true; if (!charsTabBuilt) { charsTabBuilt = true; fetchPartyAndBuild(); } buildMerchantList(); }
+              if (mode === 'Sequences' && !sequencesTabBuilt) { sequencesTabBuilt = true; buildSequencesPane(); }
+              if (mode === 'AutoCombat' && !autoCombatTabBuilt) { autoCombatTabBuilt = true; buildAutoCombatPane(); }
             };
             first = false;
           }
         })();
+
+        // ── Sequence execution engine ─────────────────────────────────────────
+        function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        function waitForGameEvent(type, timeout_ms = 60000) {
+          return new Promise((resolve, reject) => {
+            const timer = setTimeout(() => {
+              pendingEventWaiters = pendingEventWaiters.filter(w => w.resolve !== resolve);
+              reject(new Error('timeout:' + type));
+            }, timeout_ms);
+            pendingEventWaiters.push({ type, resolve, reject, timer });
+          });
+        }
+
+        async function sendCmdAsync(payload) {
+          return new Promise(resolve => {
+            const ws = new WebSocket('ws://' + location.host + '/agent');
+            ws.onopen  = () => ws.send(typeof payload === 'string' ? payload : JSON.stringify(payload));
+            ws.onmessage = e => { ws.close(); try { resolve(JSON.parse(e.data)); } catch { resolve({}); } };
+            ws.onerror  = () => resolve({ ok: false, error: 'ws_error' });
+          });
+        }
+
+        async function waitForCondition(step) {
+          const timeout = step.timeout_ms || 30000;
+          const start = Date.now();
+          while (Date.now() - start < timeout) {
+            if (seqAbort) return false;
+            if (step.condition === 'delay') { await sleep(step.ms || 1000); return true; }
+            if (step.condition === 'combat_ended') {
+              try { await waitForGameEvent('combat_ended', timeout - (Date.now() - start)); return true; }
+              catch { return false; }
+            }
+            let r;
+            if (step.condition === 'scene')           r = await sendCmdAsync({cmd:'get_scene'});
+            else if (step.condition === 'combat_planning' || step.condition === 'no_combat')
+              r = await sendCmdAsync({cmd:'get_combat'});
+            else { await sleep(200); continue; }
+            if (step.condition === 'scene' && r.ok && r.result?.scene_id === step.value) return true;
+            if (step.condition === 'combat_planning' && r.ok && r.result?.planning_state === 'Planning') return true;
+            if (step.condition === 'no_combat' && r.ok && r.result?.planning_state === 'NotInCombat') return true;
+            await sleep(250);
+          }
+          return false; // timed out
+        }
+
+        async function executeFightStep(step) {
+          const enc  = step.encounter  || 'MonsterGroup.DebugMix';
+          const bg   = step.background || 'CombatBackground.Dungeon';
+          const name = step.name || enc.replace('MonsterGroup.','');
+
+          const r = await sendCmdAsync({ cmd: 'raise_event', event: `encounter ${enc} ${bg}` });
+          if (!r.ok) { seqResults.push({ name, result: 'FailedToStart', ok: false }); renderSuiteResults(); return false; }
+
+          const started = await waitForCondition({ condition: 'combat_planning', timeout_ms: 15000 });
+          if (!started) { seqResults.push({ name, result: 'DidNotStart', ok: false }); renderSuiteResults(); return false; }
+
+          let combatResult = 'Timeout';
+          try {
+            const evt = await waitForGameEvent('combat_ended', step.timeout_ms || 180000);
+            combatResult = evt.result || 'Unknown';
+          } catch { /* timeout */ }
+
+          const ok = combatResult === 'Victory';
+          seqResults.push({ name, result: combatResult, ok });
+          renderSuiteResults();
+
+          if (!ok) return false; // party killed or timed out → stop
+
+          await sleep(800); // brief pause between fights
+          return true;
+        }
+
+        function renderSuiteResults() {
+          const el = document.getElementById('cs-results');
+          if (!el) return;
+          const rows = seqResults.map(r => {
+            const color = r.ok ? '#4caf50' : r.result === 'Retreat' ? '#ff9800' : '#e94560';
+            return `<div style="display:flex;gap:6px;align-items:center;font-size:11px;padding:1px 0;">
+              <span style="color:${color};font-weight:bold;min-width:12px;">${r.ok ? '✓' : '✗'}</span>
+              <span style="flex:1;color:#e0e0e0;">${esc(r.name)}</span>
+              <span style="color:${color};">${esc(r.result)}</span>
+            </div>`;
+          }).join('');
+          const wins = seqResults.filter(r => r.ok).length;
+          const defeat = seqResults.find(r => !r.ok);
+          const summaryColor = defeat ? '#e94560' : wins > 0 ? '#4caf50' : '#888';
+          const summary = seqResults.length > 0
+            ? `<div style="margin-top:4px;padding-top:4px;border-top:1px solid #334;color:${summaryColor};font-size:11px;font-weight:bold;">
+                ${wins}/${seqResults.length} won${defeat ? ` — stopped: ${esc(defeat.result)} at "${esc(defeat.name)}"` : ' — all clear! ✓'}
+              </div>` : '';
+          el.innerHTML = `<div style="margin-top:6px;">${rows}${summary}</div>`;
+          // Also add summary to log when complete
+          if (defeat || wins === seqResults.length)
+            addRow(defeat ? 'err' : 'resp', '🏟', `Suite: ${wins}/${seqResults.length} victories${defeat ? ' — Party defeated at "'+defeat.name+'"' : ''}`);
+        }
+
+        async function executeSequence(seq) {
+          if (seqRunning) { addRow('info','⚡','Sequence already running'); return; }
+          seqRunning = true; seqAbort = false;
+          seqResults = [];
+          const statusEl = document.getElementById('seq-run-status');
+          const steps = seq.steps || [];
+          for (let i = 0; i < steps.length; i++) {
+            if (seqAbort) break;
+            const step = steps[i];
+            if (statusEl) statusEl.textContent = `Step ${i+1}/${steps.length}: ${step.type} ${step.cmd || step.condition || step.encounter || ''}`;
+            if (step.type === 'cmd') {
+              const payload = { ...(step.params || {}), cmd: step.cmd };
+              const r = await sendCmdAsync(payload);
+              if (!r.ok) { addRow('err','⚡',`Seq step ${i+1} failed: ${r.error}`); }
+            } else if (step.type === 'wait') {
+              const ok = await waitForCondition(step);
+              if (!ok) addRow('info','⚡',`Seq step ${i+1} wait timed out`);
+            } else if (step.type === 'fight') {
+              const ok = await executeFightStep(step);
+              if (!ok) { seqAbort = true; break; }
+            }
+          }
+          const wasAborted = seqAbort;
+          seqRunning = false; seqAbort = false;
+          if (statusEl) statusEl.textContent = wasAborted ? '⛔ Stopped' : '✓ Done';
+          if (seqResults.length === 0)
+            addRow(wasAborted ? 'err' : 'resp', '⚡', `Sequence "${seq.name}" ${wasAborted ? 'aborted' : 'completed'}`);
+        }
+
+        // ── Sequence step metadata ────────────────────────────────────────────
+        const SEQ_COMMANDS = [
+          { cmd: 'start_new_game',    label: 'Start New Game',      params: [] },
+          { cmd: 'quicksave',         label: 'Quicksave',           params: [] },
+          { cmd: 'quickload',         label: 'Quickload',           params: [] },
+          { cmd: 'dismiss_message',   label: 'Dismiss Message',     params: [] },
+          { cmd: 'auto_combat_start', label: 'Auto-Combat Start',   params: [{ key: 'attack_priority', ph: 'weakest / nearest / strongest' }] },
+          { cmd: 'auto_combat_stop',  label: 'Auto-Combat Stop',    params: [] },
+          { cmd: 'equip_item',        label: 'Equip Item',          params: [{ key: 'member', ph: 'Tom' }, { key: 'item', ph: 'Sword' }, { key: 'slot', ph: 'RightHand' }] },
+          { cmd: 'modify_gold',       label: 'Modify Gold',         params: [{ key: 'amount', ph: '100 (negative to take)' }] },
+          { cmd: 'modify_hp',         label: 'Modify HP',           params: [{ key: 'member', ph: 'Tom' }, { key: 'amount', ph: '10 or full' }] },
+          { cmd: 'raise_event',       label: 'Raise Event',         params: [{ key: 'event', ph: 'encounter MonsterGroup.TwoSkrinn1 CombatBackground.Dungeon' }] },
+          { cmd: 'teleport',          label: 'Teleport',            params: [{ key: 'map', ph: 'Map.TorontoBegin' }, { key: 'x', ph: '31' }, { key: 'y', ph: '76' }] },
+          { cmd: 'respond',           label: 'Dialog: Respond',     params: [{ key: 'option', ph: '1' }] },
+          { cmd: 'save_game',         label: 'Save Game',           params: [{ key: 'id', ph: '1' }, { key: 'name', ph: 'AgentSave' }] },
+          { cmd: 'load_game',         label: 'Load Game',           params: [{ key: 'id', ph: '1' }] },
+          { cmd: 'load_map',          label: 'Load Map',            params: [{ key: 'map', ph: 'Map.TorontoBegin' }] },
+        ];
+        const SEQ_CONDITIONS = [
+          { value: 'delay',            label: 'Delay (ms)',               extra: 'ms' },
+          { value: 'scene',            label: 'Wait for Scene',           extra: 'value' },
+          { value: 'combat_planning',  label: 'Wait: Combat Planning',    extra: null },
+          { value: 'no_combat',        label: 'Wait: Combat Ends',        extra: null },
+          { value: 'combat_ended',     label: 'Wait: Combat Result Event',extra: null },
+        ];
+
+        function addSeqStep(type) {
+          if (!editingSequence) return;
+          const adder = document.getElementById('seq-step-adder');
+          if (!adder) return;
+          adder.innerHTML = '';
+          adder.style.display = 'block';
+
+          if (type === 'cmd') {
+            const sel = document.createElement('select');
+            sel.style.cssText = 'background:#0a1a2a;color:#e0e0e0;border:1px solid #1565c0;padding:2px;font-size:11px;margin-bottom:4px;width:100%;';
+            for (const c of SEQ_COMMANDS) {
+              const opt = document.createElement('option');
+              opt.value = c.cmd; opt.textContent = c.label;
+              sel.appendChild(opt);
+            }
+            const paramsDiv = document.createElement('div');
+            paramsDiv.id = 'seq-adder-params';
+            paramsDiv.style.cssText = 'display:flex;flex-direction:column;gap:2px;margin-bottom:4px;';
+            function renderCmdParams() {
+              paramsDiv.innerHTML = '';
+              const cmd = SEQ_COMMANDS.find(c => c.cmd === sel.value);
+              if (!cmd || !cmd.params.length) return;
+              for (const p of cmd.params) {
+                const row = document.createElement('div');
+                row.style.cssText = 'display:flex;gap:4px;align-items:center;';
+                row.innerHTML = `<label style="color:#aaa;font-size:10px;min-width:60px;">${esc(p.key)}</label><input id="seq-param-${esc(p.key)}" placeholder="${esc(p.ph)}" style="flex:1;background:#0a0a1a;border:1px solid #334;color:#e0e0e0;padding:2px 5px;border-radius:3px;font-size:11px;font-family:inherit;">`;
+                paramsDiv.appendChild(row);
+              }
+            }
+            sel.onchange = renderCmdParams;
+            adder.appendChild(sel);
+            adder.appendChild(paramsDiv);
+            renderCmdParams();
+            const btnRow = document.createElement('div');
+            btnRow.style.cssText = 'display:flex;gap:3px;';
+            btnRow.innerHTML = `<button class="hbtn" style="border-color:#4caf50;color:#90e898;" onclick="confirmAddCmdStep()">+ Add</button><button class="hbtn" onclick="document.getElementById('seq-step-adder').style.display='none'">Cancel</button>`;
+            adder.appendChild(btnRow);
+
+          } else {
+            const sel = document.createElement('select');
+            sel.style.cssText = 'background:#0a1a2a;color:#e0e0e0;border:1px solid #1565c0;padding:2px;font-size:11px;margin-bottom:4px;width:100%;';
+            for (const c of SEQ_CONDITIONS) {
+              const opt = document.createElement('option'); opt.value = c.value; opt.textContent = c.label;
+              sel.appendChild(opt);
+            }
+            const extraDiv = document.createElement('div');
+            extraDiv.id = 'seq-adder-extra';
+            extraDiv.style.cssText = 'margin-bottom:4px;';
+            function renderWaitExtra() {
+              extraDiv.innerHTML = '';
+              const cond = SEQ_CONDITIONS.find(c => c.value === sel.value);
+              if (!cond?.extra) return;
+              extraDiv.innerHTML = `<input id="seq-adder-extra-val" placeholder="${cond.extra === 'ms' ? '1000' : 'expected value'}" style="background:#0a0a1a;border:1px solid #334;color:#e0e0e0;padding:2px 5px;border-radius:3px;font-size:11px;font-family:inherit;width:100%;">`;
+            }
+            sel.onchange = renderWaitExtra;
+            adder.appendChild(sel);
+            adder.appendChild(extraDiv);
+            renderWaitExtra();
+            const btnRow = document.createElement('div');
+            btnRow.style.cssText = 'display:flex;gap:3px;';
+            btnRow.innerHTML = `<button class="hbtn" style="border-color:#ff9800;color:#ffd080;" onclick="confirmAddWaitStep()">+ Add</button><button class="hbtn" onclick="document.getElementById('seq-step-adder').style.display='none'">Cancel</button>`;
+            adder.appendChild(btnRow);
+          }
+        }
+
+        function confirmAddCmdStep() {
+          if (!editingSequence) return;
+          const sel = document.querySelector('#seq-step-adder select');
+          if (!sel) return;
+          const cmd = sel.value;
+          const cmdMeta = SEQ_COMMANDS.find(c => c.cmd === cmd);
+          const params = {};
+          if (cmdMeta) {
+            for (const p of cmdMeta.params) {
+              const inp = document.getElementById('seq-param-' + p.key);
+              const v = inp?.value?.trim();
+              if (v) params[p.key] = isNaN(v) || v === '' ? v : Number(v);
+            }
+          }
+          editingSequence.steps.push({ type: 'cmd', cmd, ...(Object.keys(params).length ? { params } : {}) });
+          document.getElementById('seq-step-adder').style.display = 'none';
+          renderSeqEditorSteps();
+        }
+
+        function confirmAddWaitStep() {
+          if (!editingSequence) return;
+          const sel = document.querySelector('#seq-step-adder select');
+          if (!sel) return;
+          const condition = sel.value;
+          const step = { type: 'wait', condition };
+          const extraInp = document.getElementById('seq-adder-extra-val');
+          if (extraInp?.value?.trim()) {
+            const cond = SEQ_CONDITIONS.find(c => c.value === condition);
+            if (cond?.extra === 'ms') step.ms = parseInt(extraInp.value) || 1000;
+            else if (cond?.extra === 'value') step.value = extraInp.value.trim();
+          }
+          editingSequence.steps.push(step);
+          document.getElementById('seq-step-adder').style.display = 'none';
+          renderSeqEditorSteps();
+        }
+
+        // ── Sequences pane ────────────────────────────────────────────────────
+        function buildSequencesPane() {
+          const panesEl = document.getElementById('hpanes');
+          let pane = panesEl.querySelector('[data-pane="Sequences"]');
+          if (!pane) {
+            pane = document.createElement('div');
+            pane.className = 'hpane';
+            pane.dataset.pane = 'Sequences';
+            panesEl.appendChild(pane);
+          }
+          pane.innerHTML = '';
+
+          // Toolbar
+          const toolbar = document.createElement('div');
+          toolbar.style.cssText = 'display:flex;gap:4px;margin-bottom:6px;align-items:center;flex-wrap:wrap;';
+          toolbar.innerHTML = `
+            <button class="hbtn" style="border-color:#4caf50;color:#90e898;" onclick="fetchAndRenderSequences()">⟳ Refresh</button>
+            <button class="hbtn" style="border-color:#2196f3;color:#90c4e8;" onclick="openSeqEditor(null)">+ New</button>
+            <button class="hbtn" style="border-color:#e94560;color:#e89090;" onclick="seqAbort=true" id="seq-abort-btn">⛔ Abort</button>
+            <span id="seq-run-status" style="color:#888;font-size:11px;padding:2px 6px;"></span>`;
+          pane.appendChild(toolbar);
+
+          const listEl = document.createElement('div');
+          listEl.id = 'seq-list';
+          listEl.style.cssText = 'display:flex;flex-direction:column;gap:3px;max-height:240px;overflow-y:auto;';
+          pane.appendChild(listEl);
+
+          // Editor (hidden by default)
+          const editor = document.createElement('div');
+          editor.id = 'seq-editor';
+          editor.style.cssText = 'display:none;margin-top:6px;border:1px solid #1565c0;border-radius:4px;padding:8px;background:#0a1220;';
+          editor.innerHTML = `
+            <div style="margin-bottom:4px;display:flex;gap:4px;align-items:center;">
+              <input id="seq-edit-name" placeholder="Sequence name" style="flex:1;background:#0a0a1a;border:1px solid #334;color:#e0e0e0;padding:3px 6px;border-radius:3px;font-family:inherit;font-size:12px;">
+              <input id="seq-edit-desc" placeholder="Description" style="flex:2;background:#0a0a1a;border:1px solid #334;color:#e0e0e0;padding:3px 6px;border-radius:3px;font-family:inherit;font-size:12px;">
+            </div>
+            <div id="seq-edit-steps" style="display:flex;flex-direction:column;gap:2px;max-height:160px;overflow-y:auto;margin-bottom:4px;"></div>
+            <div id="seq-step-adder" style="display:none;background:#0a0a2a;border:1px solid #1565c0;border-radius:3px;padding:6px;margin-bottom:4px;"></div>
+            <div style="display:flex;gap:3px;flex-wrap:wrap;">
+              <button class="hbtn" style="border-color:#4caf50;" onclick="addSeqStep('cmd')">+ Command</button>
+              <button class="hbtn" style="border-color:#ff9800;" onclick="addSeqStep('wait')">+ Wait</button>
+              <button class="hbtn" style="border-color:#4caf50;color:#90e898;" onclick="saveEditingSequence()">💾 Save</button>
+              <button class="hbtn" onclick="closeSeqEditor()">Cancel</button>
+            </div>`;
+          pane.appendChild(editor);
+
+          fetchAndRenderSequences();
+        }
+
+        function fetchAndRenderSequences() {
+          fetch('/sequences').then(r => r.json()).then(seqs => {
+            const listEl = document.getElementById('seq-list');
+            if (!listEl) return;
+            listEl.innerHTML = '';
+            if (!seqs.length) { listEl.innerHTML = '<span style="color:#888;font-size:11px;padding:4px;">No sequences saved.</span>'; return; }
+            for (const s of seqs) {
+              const row = document.createElement('div');
+              row.style.cssText = 'display:flex;gap:3px;align-items:center;background:#0a1220;border:1px solid #1a2a3a;border-radius:3px;padding:3px 6px;';
+              row.innerHTML = `
+                <span style="flex:1;font-size:11px;color:#e0e0e0;" title="${esc(s.description)}">${esc(s.name)}</span>
+                <span style="color:#888;font-size:10px;">${s.steps} steps</span>
+                <button class="hbtn" style="border-color:#4caf50;color:#90e898;font-size:10px;" onclick="runSequenceFile('${esc(s.file)}')">▶ Run</button>
+                <button class="hbtn" style="font-size:10px;" onclick="editSequenceFile('${esc(s.file)}')">✏️</button>
+                <button class="hbtn" style="border-color:#e94560;color:#e89090;font-size:10px;" onclick="deleteSequence('${esc(s.file)}')">🗑</button>`;
+              listEl.appendChild(row);
+            }
+          }).catch(() => {});
+        }
+
+        function runSequenceFile(file) {
+          fetch('/sequences?file=' + encodeURIComponent(file))
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null)
+            .then(seq => { if (seq) executeSequence(seq); else addRow('err','⚡','Could not load sequence: ' + file); });
+        }
+
+        function editSequenceFile(file) {
+          fetch('/sequences?file=' + encodeURIComponent(file))
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null)
+            .then(seq => { if (seq) openSeqEditor(seq); });
+        }
+
+        function deleteSequence(file) {
+          if (!confirm('Delete sequence "' + file + '"?')) return;
+          fetch('/sequences?file=' + encodeURIComponent(file), { method: 'DELETE' })
+            .then(() => fetchAndRenderSequences());
+        }
+
+        function openSeqEditor(seq) {
+          editingSequence = seq ? JSON.parse(JSON.stringify(seq)) : { name: '', description: '', steps: [] };
+          document.getElementById('seq-editor').style.display = 'block';
+          document.getElementById('seq-edit-name').value = editingSequence.name || '';
+          document.getElementById('seq-edit-desc').value = editingSequence.description || '';
+          renderSeqEditorSteps();
+        }
+
+        function closeSeqEditor() {
+          editingSequence = null;
+          document.getElementById('seq-editor').style.display = 'none';
+        }
+
+        function renderSeqEditorSteps() {
+          const el = document.getElementById('seq-edit-steps');
+          if (!el || !editingSequence) return;
+          el.innerHTML = '';
+          (editingSequence.steps || []).forEach((step, i) => {
+            const row = document.createElement('div');
+            row.style.cssText = 'display:flex;gap:2px;align-items:center;background:#0a0a1a;border:1px solid #223;border-radius:2px;padding:2px 4px;';
+            const label = step.type === 'cmd'
+              ? `<b style="color:#2196f3">cmd</b> ${esc(step.cmd || '')} ${step.params ? '<span style="color:#888">'+esc(JSON.stringify(step.params))+'</span>' : ''}`
+              : `<b style="color:#ff9800">wait</b> ${esc(step.condition || '')}${step.value ? ' = '+esc(step.value) : ''}${step.ms ? ' '+step.ms+'ms' : ''}`;
+            row.innerHTML = `
+              <span style="flex:1;font-size:11px;">${label}</span>
+              <button class="hbtn" style="font-size:10px;padding:1px 5px;" onclick="moveStep(${i},-1)">↑</button>
+              <button class="hbtn" style="font-size:10px;padding:1px 5px;" onclick="moveStep(${i},1)">↓</button>
+              <button class="hbtn" style="border-color:#e94560;color:#e89090;font-size:10px;padding:1px 5px;" onclick="removeStep(${i})">✕</button>`;
+            el.appendChild(row);
+          });
+        }
+
+        function moveStep(i, dir) {
+          const steps = editingSequence.steps;
+          const j = i + dir;
+          if (j < 0 || j >= steps.length) return;
+          [steps[i], steps[j]] = [steps[j], steps[i]];
+          renderSeqEditorSteps();
+        }
+
+        function removeStep(i) { editingSequence.steps.splice(i, 1); renderSeqEditorSteps(); }
+
+
+        function saveEditingSequence() {
+          if (!editingSequence) return;
+          editingSequence.name = document.getElementById('seq-edit-name').value.trim();
+          editingSequence.description = document.getElementById('seq-edit-desc').value.trim();
+          if (!editingSequence.name) { alert('Name required'); return; }
+          fetch('/sequences', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(editingSequence) })
+            .then(r => r.json())
+            .then(() => { closeSeqEditor(); fetchAndRenderSequences(); })
+            .catch(err => alert('Save failed: ' + err));
+        }
+
+        // ── Auto-Combat pane ──────────────────────────────────────────────────
+        const CS_BACKGROUNDS = [
+          'CombatBackground.Dungeon','CombatBackground.Forest','CombatBackground.Desert',
+          'CombatBackground.Plains','CombatBackground.Beach','CombatBackground.Wasteland'
+        ];
+
+        function buildAutoCombatPane() {
+          const panesEl = document.getElementById('hpanes');
+          let pane = panesEl.querySelector('[data-pane="AutoCombat"]');
+          if (!pane) {
+            pane = document.createElement('div');
+            pane.className = 'hpane';
+            pane.dataset.pane = 'AutoCombat';
+            panesEl.appendChild(pane);
+          }
+          pane.innerHTML = '';
+
+          // ── Strategy section ──
+          const stratDiv = document.createElement('div');
+          stratDiv.style.cssText = 'padding:6px;max-width:420px;width:100%;';
+          stratDiv.innerHTML = `
+            <div style="color:#ff9800;font-size:11px;margin-bottom:6px;font-weight:bold;">Auto-Combat Strategy (C# engine)</div>
+            <div style="display:flex;gap:4px;align-items:center;margin-bottom:8px;">
+              <button class="hbtn" style="border-color:#4caf50;color:#90e898;" onclick="startAutoCombat()">▶ Enable</button>
+              <button class="hbtn" style="border-color:#e94560;color:#e89090;" onclick="stopAutoCombat()">⏹ Disable</button>
+              <button class="hbtn" onclick="refreshAutoCombatStatus()">⟳</button>
+              <span id="ac-status" style="color:#888;font-size:11px;padding:2px 6px;"></span>
+            </div>
+            <div style="display:grid;grid-template-columns:130px 1fr;gap:4px 8px;align-items:center;font-size:12px;">
+              <label style="color:#aaa;">Attack Priority</label>
+              <select id="ac-priority" style="background:#0a1a2a;color:#e0e0e0;border:1px solid #1565c0;padding:2px;font-size:11px;">
+                <option value="weakest">Weakest first</option>
+                <option value="nearest">Nearest first</option>
+                <option value="strongest">Strongest first</option>
+              </select>
+              <label style="color:#aaa;">Heal Threshold</label>
+              <div style="display:flex;align-items:center;gap:4px;">
+                <input id="ac-heal" type="range" min="0" max="1" step="0.05" value="0"
+                  style="flex:1;" oninput="document.getElementById('ac-heal-val').textContent=Math.round(this.value*100)+'%'">
+                <span id="ac-heal-val" style="color:#888;font-size:11px;min-width:32px;">0%</span>
+              </div>
+            </div>`;
+          pane.appendChild(stratDiv);
+
+          // ── Combat Suite section ──
+          const suiteDiv = document.createElement('div');
+          suiteDiv.style.cssText = 'padding:6px;max-width:420px;width:100%;border-top:1px solid #1565c0;margin-top:4px;';
+          suiteDiv.innerHTML = `
+            <div style="color:#ff9800;font-size:11px;margin-bottom:6px;font-weight:bold;">Combat Suite Runner</div>
+
+            <div style="display:grid;grid-template-columns:130px 1fr;gap:4px 6px;align-items:center;font-size:11px;margin-bottom:6px;">
+              <label style="color:#aaa;">Setup</label>
+              <select id="cs-start" style="background:#0a1a2a;color:#e0e0e0;border:1px solid #1565c0;padding:2px;font-size:11px;">
+                <option value="new_game">New Game (TorontoBegin)</option>
+                <option value="quickload">Quickload</option>
+              </select>
+              <label style="color:#aaa;">Auto-Combat</label>
+              <label style="font-size:10px;display:flex;align-items:center;gap:4px;color:#aaa;">
+                <input type="checkbox" id="cs-autocombat" checked style="accent-color:#4caf50;"> Enable during suite
+              </label>
+            </div>
+
+            <div style="color:#aaa;font-size:10px;margin-bottom:3px;">Items to equip before fights:</div>
+            <div id="cs-equip-list" style="display:flex;flex-direction:column;gap:2px;margin-bottom:4px;max-height:80px;overflow-y:auto;"></div>
+            <div style="display:flex;gap:3px;margin-bottom:6px;flex-wrap:wrap;">
+              <input id="cs-equip-member" placeholder="Member (e.g. Tom)" style="width:90px;background:#0a0a1a;border:1px solid #334;color:#e0e0e0;padding:2px 5px;border-radius:3px;font-size:10px;font-family:inherit;">
+              <input id="cs-equip-item" placeholder="Item (e.g. Sword)" style="width:110px;background:#0a0a1a;border:1px solid #334;color:#e0e0e0;padding:2px 5px;border-radius:3px;font-size:10px;font-family:inherit;">
+              <select id="cs-equip-slot" style="background:#0a1a2a;color:#e0e0e0;border:1px solid #334;padding:2px;font-size:10px;">
+                <option>RightHand</option><option>LeftHand</option><option>Chest</option>
+                <option>Head</option><option>Feet</option><option>Neck</option>
+              </select>
+              <button class="hbtn" style="font-size:10px;border-color:#4caf50;" onclick="csAddEquip()">+ Add</button>
+            </div>
+
+            <div style="color:#aaa;font-size:10px;margin-bottom:3px;">Fight list (in order):</div>
+            <div id="cs-fights-list" style="display:flex;flex-direction:column;gap:2px;max-height:160px;overflow-y:auto;margin-bottom:4px;"></div>
+            <div style="display:flex;gap:3px;margin-bottom:6px;flex-wrap:wrap;align-items:center;">
+              <select id="cs-enc-pick" style="flex:1;background:#0a1a2a;color:#e0e0e0;border:1px solid #1565c0;padding:2px;font-size:10px;min-width:140px;">
+                <option value="">— pick encounter —</option>
+              </select>
+              <select id="cs-bg-pick" style="background:#0a1a2a;color:#e0e0e0;border:1px solid #1565c0;padding:2px;font-size:10px;">
+                ${CS_BACKGROUNDS.map(b => `<option value="${b}">${b.replace('CombatBackground.','')}</option>`).join('')}
+              </select>
+              <button class="hbtn" style="font-size:10px;border-color:#4caf50;" onclick="csAddFight()">+ Add</button>
+            </div>
+
+            <div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;">
+              <button class="hbtn" style="border-color:#4caf50;color:#90e898;" onclick="runCombatSuite()">▶ Run Suite</button>
+              <button class="hbtn" style="border-color:#e94560;color:#e89090;" onclick="seqAbort=true">⛔ Stop</button>
+              <button class="hbtn" style="font-size:10px;" onclick="csSaveAsSequence()">💾 Save as Sequence</button>
+              <span id="cs-run-status" style="color:#888;font-size:11px;padding:2px 4px;"></span>
+            </div>
+            <div id="cs-results" style="font-size:11px;"></div>`;
+          pane.appendChild(suiteDiv);
+
+          refreshAutoCombatStatus();
+          // Populate encounter picker (may already be loaded)
+          csBuildEncounterPicker();
+          renderCsEquipList();
+          renderCsFightList();
+        }
+
+        function csBuildEncounterPicker() {
+          const sel = document.getElementById('cs-enc-pick');
+          if (!sel) return;
+          // Remove all except placeholder
+          while (sel.options.length > 1) sel.remove(1);
+          if (!allEncounters.length) { fetchEncounters(); return; } // will re-trigger buildEncounterList
+          for (const e of allEncounters) {
+            const opt = document.createElement('option');
+            opt.value = e.id;
+            opt.textContent = e.name;
+            sel.appendChild(opt);
+          }
+        }
+
+        function renderCsEquipList() {
+          const el = document.getElementById('cs-equip-list');
+          if (!el) return;
+          if (!csEquipItems.length) { el.innerHTML = '<span style="color:#666;font-size:10px;">No items.</span>'; return; }
+          el.innerHTML = csEquipItems.map((it, i) =>
+            `<div style="display:flex;gap:3px;align-items:center;font-size:10px;background:#0a0a1a;border:1px solid #223;border-radius:2px;padding:1px 4px;">
+              <span style="flex:1;color:#aaa;">${esc(it.member)} ← ${esc(it.item)} [${esc(it.slot)}]</span>
+              <button class="hbtn" style="font-size:9px;padding:0 4px;border-color:#e94560;color:#e89090;" onclick="csRemoveEquip(${i})">✕</button>
+            </div>`
+          ).join('');
+        }
+
+        function csAddEquip() {
+          const member = (document.getElementById('cs-equip-member')?.value || '').trim();
+          const item   = (document.getElementById('cs-equip-item')?.value || '').trim();
+          const slot   = document.getElementById('cs-equip-slot')?.value || 'RightHand';
+          if (!member || !item) { alert('Member and item are required'); return; }
+          const fullMember = member.startsWith('PartyMember.') ? member : 'PartyMember.' + member;
+          const fullItem   = item.startsWith('Item.') ? item : 'Item.' + item;
+          csEquipItems.push({ member: fullMember, item: fullItem, slot });
+          renderCsEquipList();
+        }
+
+        function csRemoveEquip(i) { csEquipItems.splice(i, 1); renderCsEquipList(); }
+
+        function renderCsFightList() {
+          const el = document.getElementById('cs-fights-list');
+          if (!el) return;
+          if (!csFights.length) { el.innerHTML = '<span style="color:#666;font-size:10px;">No fights added.</span>'; return; }
+          el.innerHTML = csFights.map((f, i) =>
+            `<div style="display:flex;gap:3px;align-items:center;font-size:10px;background:#0a0a1a;border:1px solid #223;border-radius:2px;padding:1px 4px;">
+              <span style="color:#888;min-width:16px;">${i+1}.</span>
+              <span style="flex:1;color:#aaa;">${esc(f.name || f.encounter.replace('MonsterGroup.',''))}</span>
+              <span style="color:#666;">${esc(f.background.replace('CombatBackground.',''))}</span>
+              <button class="hbtn" style="font-size:9px;padding:0 4px;" onclick="csMoveFight(${i},-1)">↑</button>
+              <button class="hbtn" style="font-size:9px;padding:0 4px;" onclick="csMoveFight(${i},1)">↓</button>
+              <button class="hbtn" style="font-size:9px;padding:0 4px;border-color:#e94560;color:#e89090;" onclick="csRemoveFight(${i})">✕</button>
+            </div>`
+          ).join('');
+        }
+
+        function csAddFight() {
+          const enc = document.getElementById('cs-enc-pick')?.value;
+          const bg  = document.getElementById('cs-bg-pick')?.value || 'CombatBackground.Dungeon';
+          if (!enc) { alert('Select an encounter first'); return; }
+          const name = allEncounters.find(e => e.id === enc)?.name || enc.replace('MonsterGroup.','');
+          csFights.push({ encounter: enc, background: bg, name });
+          renderCsFightList();
+        }
+
+        function csMoveFight(i, dir) {
+          const j = i + dir;
+          if (j < 0 || j >= csFights.length) return;
+          [csFights[i], csFights[j]] = [csFights[j], csFights[i]];
+          renderCsFightList();
+        }
+
+        function csRemoveFight(i) { csFights.splice(i, 1); renderCsFightList(); }
+
+        function csBuildSequence() {
+          const startType = document.getElementById('cs-start')?.value || 'new_game';
+          const steps = [];
+
+          // Setup step
+          if (startType === 'new_game')   steps.push({ type: 'cmd', cmd: 'start_new_game' });
+          else if (startType === 'quickload') steps.push({ type: 'cmd', cmd: 'quickload' });
+          steps.push({ type: 'wait', condition: 'delay', ms: 2000 });
+
+          // Equip items
+          for (const it of csEquipItems)
+            steps.push({ type: 'cmd', cmd: 'equip_item', params: { member: it.member, item: it.item, slot: it.slot } });
+
+          // Enable auto-combat if checked
+          if (document.getElementById('cs-autocombat')?.checked)
+            steps.push({ type: 'cmd', cmd: 'auto_combat_start', params: { attack_priority: document.getElementById('ac-priority')?.value || 'weakest' } });
+
+          // Fights
+          for (const f of csFights) steps.push({ type: 'fight', ...f });
+
+          // Disable auto-combat after suite
+          if (document.getElementById('cs-autocombat')?.checked)
+            steps.push({ type: 'cmd', cmd: 'auto_combat_stop' });
+
+          return { name: 'Combat Suite ' + new Date().toLocaleTimeString(), steps };
+        }
+
+        async function runCombatSuite() {
+          if (!csFights.length) { alert('Add at least one fight'); return; }
+          document.getElementById('cs-results').innerHTML = '';
+          const seq = csBuildSequence();
+          const statusEl = document.getElementById('cs-run-status');
+          // Mirror seq-run-status to cs-run-status
+          const origStatus = document.getElementById('seq-run-status');
+          await executeSequence(seq);
+          if (statusEl && origStatus) statusEl.textContent = origStatus.textContent;
+        }
+
+        function csSaveAsSequence() {
+          if (!csFights.length) { alert('Add at least one fight'); return; }
+          const seq = csBuildSequence();
+          seq.name = prompt('Sequence name:', seq.name) || seq.name;
+          fetch('/sequences', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(seq) })
+            .then(r => r.json())
+            .then(r => { addRow('resp','💾',`Saved as: ${r.saved}`); })
+            .catch(err => alert('Save failed: ' + err));
+        }
+
+        async function startAutoCombat() {
+          const priority  = document.getElementById('ac-priority')?.value || 'weakest';
+          const threshold = parseFloat(document.getElementById('ac-heal')?.value || '0');
+          const r = await sendCmdAsync({ cmd: 'auto_combat_start', attack_priority: priority, heal_threshold: threshold });
+          updateAutoCombatStatus(r.ok ? { enabled: true, attack_priority: priority, heal_threshold: threshold } : null);
+        }
+
+        async function stopAutoCombat() {
+          const r = await sendCmdAsync({ cmd: 'auto_combat_stop' });
+          updateAutoCombatStatus(r.ok ? { enabled: false } : null);
+        }
+
+        async function refreshAutoCombatStatus() {
+          const r = await sendCmdAsync({ cmd: 'auto_combat_status' });
+          if (r.ok) updateAutoCombatStatus(r.result);
+        }
+
+        function updateAutoCombatStatus(s) {
+          const el = document.getElementById('ac-status');
+          if (!el || !s) return;
+          el.textContent = s.enabled ? '● Active' : '○ Inactive';
+          el.style.color = s.enabled ? '#4caf50' : '#888';
+          if (s.attack_priority) {
+            const sel = document.getElementById('ac-priority');
+            if (sel) sel.value = s.attack_priority;
+          }
+          if (s.heal_threshold !== undefined) {
+            const inp = document.getElementById('ac-heal');
+            if (inp) { inp.value = s.heal_threshold; document.getElementById('ac-heal-val').textContent = Math.round(s.heal_threshold * 100) + '%'; }
+          }
+        }
+
+        // Listen for auto_combat events from the server
+        // (handled in the existing ws.onmessage by checking outer.type)
 
         connectEvents();
         </script>

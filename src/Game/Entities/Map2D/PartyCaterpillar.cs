@@ -105,6 +105,19 @@ public class PartyCaterpillar : ServiceComponent<IMovement>, IMovement
 
     void Update()
     {
+        var party = TryResolve<IParty>();
+        if (party != null)
+        {
+            foreach (var member in party.WalkOrder)
+            {
+                if (member.Effective.TotalWeight > member.Effective.MaxWeight)
+                {
+                    _direction = Vector2.Zero;
+                    return;
+                }
+            }
+        }
+
         var detector = Resolve<ICollisionManager>();
         if (Movement2D.Instance.Update(_state,
                 _settings,

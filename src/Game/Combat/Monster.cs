@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Numerics;
 using UAlbion.Api.Eventing;
 using UAlbion.Api.Settings;
@@ -55,7 +56,7 @@ public class Monster : GameComponent, ICombatParticipant
     public SheetId SheetId => _sheet.Id;
     public SpriteId TacticalSpriteId => _sheet.TacticalGfx;
     public SpriteId CombatSpriteId => _sheet.CombatGfx;
-    public IEffectiveCharacterSheet Effective { get; private set; }
+    public IEffectiveCharacterSheet? Effective { get; private set; }
     public bool IsDead => _sheet.Combat.LifePoints.Current == 0;
     public int ExperienceReward => _sheet.ExperienceReward;
 
@@ -69,6 +70,11 @@ public class Monster : GameComponent, ICombatParticipant
     {
         var lp = _sheet.Combat.LifePoints;
         lp.Current = (ushort)Math.Min(lp.Max, lp.Current + amount);
+    }
+
+    public void ClearCondition(PlayerConditions condition)
+    {
+        _sheet.Combat.Conditions &= ~condition;
     }
 
     public void SetCombatPosition(int newTileIndex)

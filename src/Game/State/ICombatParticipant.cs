@@ -18,6 +18,7 @@ public interface ICombatParticipant
     int ExperienceReward { get; }
     void TakeDamage(int amount);
     void Heal(int amount);
+    void ClearCondition(PlayerConditions condition);
     void SetCombatPosition(int newTileIndex);
     // Returns monster inventory for Apres loot collection; null for party members.
     IInventory GetLoot();

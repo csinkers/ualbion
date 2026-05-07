@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using UAlbion.Api;
 using UAlbion.Api.Eventing;
 using UAlbion.Config;
@@ -22,7 +23,6 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
 {
     const int DaysPerMonth = 30;
     const int HoursPerDay = 24;
-
     readonly SheetApplier _sheetApplier;
     SavedGame _game;
     Party _party;
@@ -88,11 +88,15 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
         set => _game.MapIdForNpcs = value;
     }
 
+    const ushort QuicksaveSlot = 0;
+
     public GameState()
     {
         OnAsync<NewGameEvent>(e => NewGame(e.MapId, e.X, e.Y));
         OnAsync<LoadGameEvent>(e => LoadGame(e.Id));
         On<SaveGameEvent>(e => SaveGame(e.Id, e.Name));
+        On<QuicksaveEvent>(_ => SaveGame(QuicksaveSlot, "Quicksave"));
+        OnAsync<QuickloadEvent>(e => Quickload());
         On<FastClockEvent>(e => TickCount += e.Frames);
         On<GetTimeEvent>(_ => Info(Time.ToString("O")));
         On<SetTimeEvent>(e => _game.ElapsedTime = e.Time - SavedGame.Epoch);
@@ -113,6 +117,7 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
         On<DataChangeEvent>(OnDataChange);
         On<ChangeStatusEvent>(OnDataChange);
         On<SetContextEvent>(OnSetContext);
+        On<PlayerEnteredTileEvent>(e => { if (_game != null) { _game.PartyX = (ushort)e.X; _game.PartyY = (ushort)e.Y; } });
 
         AttachChild(new InventoryManager(GetWriteableInventory, GetItem));
         _sheetApplier = AttachChild(new SheetApplier());
@@ -341,7 +346,9 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
             PartyY = y,
             PartyDirection = Direction.East,
             ActiveMembers = { [0] = Base.PartyMember.Tom, [1] = Base.PartyMember.Sira },
-            CombatPositions = { [0] = 1, [1] = 2 }
+            CombatPositions = { [0] = 1, [1] = 2 },
+            MagicNumber = 0x25051971,
+            Version = 138,
         };
 
         var assets = Assets;
@@ -369,7 +376,15 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
 
     AlbionTask LoadGame(ushort id)
     {
-        _game = Assets.LoadSavedGame(IdToPath(id));
+        var disk = Resolve<IFileSystem>();
+        var spellManager = Resolve<ISpellManager>();
+        var path = IdToPath(id);
+        
+        if (!disk.FileExists(path))
+            return AlbionTask.CompletedTask;
+        
+        var json = disk.ReadAllText(path);
+        _game = SavedGame.FromJson(json, AssetMapping.Global, spellManager);
         if (_game == null)
             return AlbionTask.CompletedTask;
 
@@ -378,7 +393,7 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
 
     void SaveGame(ushort id, string name)
     {
-        if (_game == null)
+        if (_game == null || _party == null)
             return;
 
         var disk = Resolve<IFileSystem>();
@@ -390,11 +405,24 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
                 ? _party.StatusBarOrder[i].Id
                 : PartyMemberId.None;
 
-        // var key = new AssetId(AssetType.SavedGame, id);
-        using var stream = disk.OpenWriteTruncate(IdToPath(id));
-        using var aw = AlbionSerdes.CreateWriter(stream);
-        var mapping = new AssetMapping(); // TODO
-        SavedGame.Serdes(_game, mapping, aw, spellManager);
+        var json = _game.ToJson(AssetMapping.Global, spellManager);
+        var jsonText = JsonSerializer.Serialize(json, JsonSavedGame.JsonOptions);
+        disk.WriteAllText(IdToPath(id), jsonText);
+
+        // Capture screenshot for save slot
+        var screenshotPath = IdToPath(id) + ".png";
+        Raise(new CaptureScreenshotEvent(screenshotPath));
+    }
+
+    async AlbionTask Quickload()
+    {
+        if (!Resolve<IFileSystem>().FileExists(IdToPath(QuicksaveSlot)))
+        {
+            // No localized StringId for this message yet; using literal.
+            Raise(new DescriptionTextEvent(Resolve<ITextFormatter>().Format("No quicksave found.")));
+            return;
+        }
+        await LoadGame(QuicksaveSlot);
     }
 
     async AlbionTask InitialiseGame()

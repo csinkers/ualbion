@@ -48,7 +48,6 @@ public interface IAssetManager : ITextureLoader
     byte[] LoadSong(SongId id);
     IList<IEvent> LoadScript(ScriptId id);
     SpellData LoadSpell(SpellId id);
-    SavedGame LoadSavedGame(string path);
     MonsterGroup LoadMonsterGroup(MonsterGroupId id);
     Automap LoadAutomap(AutomapId id);
     object LoadSoundBanks(); // Should always return a GlobalTimbreLibrary, but we don't want to force a dependency on ADLMidi.NET in UAlbion.Formats, so use object

@@ -10,7 +10,10 @@ using UAlbion.Core.Veldrid.Meshes;
 using UAlbion.Core.Veldrid.Skybox;
 using UAlbion.Core.Veldrid.Sprites;
 using UAlbion.Core.Visual;
+using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.Veldrid.Gui;
 using UAlbion.Game.Veldrid.Diag;
+using UAlbion.Game.Veldrid.Screenshot;
 using UAlbion.Game.Veldrid.Visual;
 using Veldrid;
 using VeldridGen.Interfaces;
@@ -105,6 +108,7 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                 .Framebuffer(FB_Game, new SimpleFramebuffer(FB_Game, 360, 240))
                 .Component(C_GameWindow, new GameWindow(360, 240))
                 .Component(C_ImGui, new ImGuiManager((ImGuiRenderer)sys.GetRenderer(R_Debug)))
+                .Component("c_screenshot", new ScreenshotCaptureService())
                 .Action(() =>
                 {
                     var framebuffer = sys.GetFramebuffer(FB_Game);
@@ -162,7 +166,11 @@ public sealed class AlbionRenderSystem : Component, IDisposable
         On<SetClearColourEvent>(e => _clearColour = (e.Red, e.Green, e.Blue, e.Alpha));
     }
 
-    protected override void Subscribed() => SetRenderSystem();
+    protected override void Subscribed()
+    {
+        SetRenderSystem();
+        Exchange.Register<IScreenshotThumbnailFactory>(new ScreenshotThumbnailFactory());
+    }
 
     void SetRenderSystem()
     {

@@ -118,7 +118,6 @@ public class AssetManager : Component, IAssetManager
     public IList<IEvent> LoadScript(ScriptId id) => (IList<IEvent>)_modApplier.LoadAsset(id);
 
     public SpellData LoadSpell(SpellId id) => (SpellData)_modApplier.LoadAssetCached(id);
-    public SavedGame LoadSavedGame(string path) => _modApplier.LoadSavedGame(path);
     public MonsterGroup LoadMonsterGroup(MonsterGroupId id) => (MonsterGroup)_modApplier.LoadAssetCached(id);
     public Automap LoadAutomap(AutomapId id) => (Automap)_modApplier.LoadAssetCached(id);
     public object LoadSoundBanks() => _modApplier.LoadAssetCached(AssetId.From(Base.Special.SoundBank));

@@ -21,6 +21,7 @@ public sealed class VisualInventorySlot : UiElement
     readonly Vector2 _size;
 
     int _frameNumber;
+    int _rebuildCount; // Debug: track Rebuild calls for sword-visibility investigation
 
     public VisualInventorySlot(InventorySlotId slotId, IText amountSource, Func<IReadOnlyItemSlot> getSlot)
     {
@@ -104,6 +105,16 @@ public sealed class VisualInventorySlot : UiElement
         var slot = _getSlot();
         if (slot == null)
             return;
+
+        // Debug: log first 3 Rebuild calls for body-part slots to diagnose
+        // "sword only visible after clicking empty slot" issue.
+        _rebuildCount++;
+        if (_rebuildCount <= 3 && _slotId.Slot.IsBodyPart())
+        {
+            var itemType = slot.Item.Type;
+            var itemId = slot.Item;
+            Info($"[VisualSlot] Rebuild #{_rebuildCount} slot={_slotId.Slot} item.Type={itemType} item={itemId} amount={slot.Amount}");
+        }
 
         _button.AllowDoubleClick = slot.Amount > 1;
 

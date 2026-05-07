@@ -25,7 +25,6 @@ public class MockModApplier : ServiceComponent<IModApplier>, IModApplier
         return new AssetLoadResult(assetId, asset, node);
     }
 
-    public SavedGame LoadSavedGame(string path) => throw new NotImplementedException();
     public IReadOnlyDictionary<string, LanguageConfig> Languages { get; } 
         = new ReadOnlyDictionary<string, LanguageConfig>(
             new Dictionary<string, LanguageConfig>());

@@ -14,6 +14,7 @@ using UAlbion.Formats.MapEvents;
 using UAlbion.Formats.ScriptEvents;
 using UAlbion.Game.Events;
 using UAlbion.Game.State;
+using UAlbion.Game.Text;
 
 namespace UAlbion.Game.Entities.Map2D;
 
@@ -72,6 +73,21 @@ public class FlatMap : GameComponent, IMap
 
         var selector = new SelectionHandler2D(_logicalMap, renderable);
         selector.HighlightIndexChanged += (_, x) => renderable.SetHighlightIndex(x);
+        selector.HighlightIndexChanged += (_, highlightIndex) =>
+        {
+            int x = highlightIndex % _logicalMap.Width;
+            int y = highlightIndex / _logicalMap.Width;
+
+            var zone = _logicalMap.GetOffsetZone(x, y);
+            if (zone?.Node == null)
+                return;
+
+            if ((zone.Trigger & TriggerTypes.Examine) == 0)
+                return;
+
+            var source = new EventSource(_mapData.Id, TriggerType.Examine, zone.X, zone.Y);
+            Raise(new TriggerChainEvent(_logicalMap.EventSet, zone.EventIndex, source));
+        };
 
         _sceneObjects.Add(renderable);
         _sceneObjects.Add(selector);

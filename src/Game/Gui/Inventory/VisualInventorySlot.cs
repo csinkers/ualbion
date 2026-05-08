@@ -22,6 +22,7 @@ public sealed class VisualInventorySlot : UiElement
 
     int _frameNumber;
     int _rebuildCount; // Debug: track Rebuild calls for sword-visibility investigation
+    bool _isQueuedForSale;
 
     public VisualInventorySlot(InventorySlotId slotId, IText amountSource, Func<IReadOnlyItemSlot> getSlot)
     {
@@ -99,6 +100,17 @@ public sealed class VisualInventorySlot : UiElement
 
     public bool Hoverable { get => _button.Hoverable; set => _button.Hoverable = value; }
     public bool SuppressNextDoubleClick { get => _button.SuppressNextDoubleClick; set => _button.SuppressNextDoubleClick = value; }
+    public bool IsQueuedForSale
+    {
+        get => _isQueuedForSale;
+        set
+        {
+            _isQueuedForSale = value;
+            // Invert IsPressed to give a raised/highlighted look when queued for sale.
+            if (!_slotId.Slot.IsBodyPart() && !_slotId.Slot.IsSpecial())
+                _button.IsPressed = !value;
+        }
+    }
 
     void Rebuild(in Rectangle extents)
     {

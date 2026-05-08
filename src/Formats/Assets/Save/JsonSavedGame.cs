@@ -177,4 +177,5 @@ public class JsonPartyMemberInfo
     public string Name { get; set; }
     public byte Level { get; set; }
     public int ExperiencePoints { get; set; }
+    public ushort PortraitId { get; set; }
 }

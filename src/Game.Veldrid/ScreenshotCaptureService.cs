@@ -5,6 +5,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using UAlbion.Api.Eventing;
 using UAlbion.Core.Veldrid;
 using UAlbion.Game.Events;
+using VeldridGen.Interfaces;
 
 namespace UAlbion.Game.Veldrid.Screenshot;
 
@@ -14,8 +15,11 @@ namespace UAlbion.Game.Veldrid.Screenshot;
 /// </summary>
 public class ScreenshotCaptureService : Component
 {
-    public ScreenshotCaptureService()
+    readonly IFramebufferHolder _framebuffer;
+
+    public ScreenshotCaptureService(IFramebufferHolder framebuffer)
     {
+        _framebuffer = framebuffer ?? throw new ArgumentNullException(nameof(framebuffer));
         On<CaptureScreenshotEvent>(OnCaptureScreenshot);
     }
 
@@ -25,15 +29,10 @@ public class ScreenshotCaptureService : Component
         if (engine == null)
             return;
 
-        var renderManager = TryResolve<IRenderManager>();
-        if (renderManager == null)
+        if (_framebuffer?.Framebuffer == null)
             return;
 
-        var framebuffer = renderManager.GetFramebuffer("fb_game");
-        if (framebuffer?.Framebuffer == null)
-            return;
-
-        var colorTexture = framebuffer.Framebuffer.ColorTargets[0].Target;
+        var colorTexture = _framebuffer.Framebuffer.ColorTargets[0].Target;
         if (colorTexture == null)
             return;
 

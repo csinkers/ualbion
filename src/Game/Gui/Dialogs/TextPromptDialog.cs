@@ -15,7 +15,7 @@ public class TextPromptDialog : ModalDialog
     readonly TextBlock _block;
     readonly UiRectangle _cursor;
 
-    public TextPromptDialog(int depth) : base(DialogPositioning.Center, depth)
+    public TextPromptDialog(int depth, string initialValue = "") : base(DialogPositioning.Center, depth)
     {
         On<TextEntryCompleteEvent>(_ => Close());
         On<CloseWindowEvent>(_ => { Value = null; Close(); });
@@ -32,7 +32,7 @@ public class TextPromptDialog : ModalDialog
         // TextBox: 162x13 (incl. border)
         // Cursor: 5x8, white, period ~280ms
 
-        _block = new TextBlock("");
+        _block = new TextBlock(initialValue ?? "");
         _textSource = new DynamicText( () => [new TextBlock(Value)]);
         _cursor = new UiRectangle(CommonColor.Transparent)
         {

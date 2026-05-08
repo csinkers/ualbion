@@ -408,10 +408,6 @@ public class GameState : GameServiceComponent<IGameState>, IGameState
         var json = _game.ToJson(AssetMapping.Global, spellManager);
         var jsonText = JsonSerializer.Serialize(json, JsonSavedGame.JsonOptions);
         disk.WriteAllText(IdToPath(id), jsonText);
-
-        // Capture screenshot for save slot
-        var screenshotPath = IdToPath(id) + ".png";
-        Raise(new CaptureScreenshotEvent(screenshotPath));
     }
 
     async AlbionTask Quickload()

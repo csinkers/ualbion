@@ -510,7 +510,7 @@ public class SavedGame
             if (memberId.IsNone) continue;
             var sheetId = memberId.ToSheet();
             if (Sheets.TryGetValue(sheetId, out var sheet))
-                json.PartyMembers.Add(new JsonPartyMemberInfo { SheetId = mapping.IdToName(sheetId), Name = sheet.EnglishName ?? sheet.PlayerClass.ToString(), Level = sheet.Level, ExperiencePoints = sheet.Combat?.ExperiencePoints ?? 0 });
+                json.PartyMembers.Add(new JsonPartyMemberInfo { SheetId = mapping.IdToName(sheetId), Name = sheet.EnglishName ?? sheet.PlayerClass.ToString(), Level = sheet.Level, ExperiencePoints = sheet.Combat?.ExperiencePoints ?? 0, PortraitId = (ushort)sheet.PortraitId.Id });
         }
 
         return json;

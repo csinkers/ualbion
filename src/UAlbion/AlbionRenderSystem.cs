@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Numerics;
 using UAlbion.Api.Eventing;
+using UAlbion.Api.Visual;
 using UAlbion.Core;
 using UAlbion.Core.Events;
 using UAlbion.Core.Veldrid;
@@ -40,6 +42,11 @@ public sealed class AlbionRenderSystem : Component, IDisposable
         var globalProvider1 = new GlobalResourceSetProvider();
         var globalProvider2 = new GlobalResourceSetProvider();
 
+        var fbGame = new SimpleFramebuffer(FB_Game, 1, 1);
+        var quadRenderer = new FullscreenQuadRenderer();
+        var copyQuad = new FullscreenQuad("ScreenCopy", DrawLayer.Compositing,
+            fbGame.GetColorTexture(0), new Vector4(0, 0, 1, 1), SimpleFramebuffer.Output);
+
         _manager = RenderManagerBuilder.Create()
             .Renderer(R_Sprite, new SpriteRenderer(screenFormat))
             .Renderer(R_Blended, new BlendedSpriteRenderer(screenFormat))
@@ -57,12 +64,13 @@ public sealed class AlbionRenderSystem : Component, IDisposable
             .Source(S_Sky, new SkyboxManager())
             .Source(S_Debug, new DebugGuiRenderable())
 
-            .System(Sys_Default, sys => 
+            .System(Sys_Default, sys =>
                 sys
                 .Framebuffer(FB_Screen, new MainFramebuffer(FB_Screen))
+                .Framebuffer(FB_Game, fbGame)
                 .Component(C_InputRouter, new AdHocComponent(C_InputRouter,
                     static x =>
-                    { 
+                    {
                         // When running fullscreen, just echo the mouse input through to the game's mouse modes,
                         // when showing the debug UI the pass-through of input is done in ImGuiGameWindow.
                         var mouseEvent = new MouseInputEvent();
@@ -84,20 +92,42 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                         });
                     }))
                 .Component(C_GameWindow, new GameWindow(1,1))
-                .Component(C_WindowUpdater, // Minimal component to ensure the game resizes with the window
-                    AdHocComponent.Build(C_WindowUpdater,
-                        (GameWindow)sys.GetComponent(C_GameWindow),
-                        static (gameWindow, x) 
-                            => x.On<WindowResizedEvent>(e => gameWindow.Resize(e.Width, e.Height))))
+                .Component(C_WindowUpdater,
+                    new AdHocComponent(C_WindowUpdater, helper =>
+                    {
+                        var gameWindow = (GameWindow)sys.GetComponent(C_GameWindow);
+                        helper.On<WindowResizedEvent>(e =>
+                        {
+                            gameWindow.Resize(e.Width, e.Height);
+                            fbGame.Width = (uint)e.Width;
+                            fbGame.Height = (uint)e.Height;
+                        });
+                    }))
+                .Component("c_quadRenderer", quadRenderer)
+                .Component("c_copyQuad", copyQuad)
                 .Resources(globalProvider1)
                 .Component("c_globalUpdater", new GlobalResourceSetUpdater(globalProvider1))
                 .Pass(P_Game, pass => 
                     pass
                     .Renderers(R_Sprite, R_Blended, R_Tile, R_Etm, R_Mesh, R_Sky)
                     .Sources(S_Sprite, S_Blended, S_Tile, S_Etm, S_Mesh, S_Sky)
-                    .Target(FB_Screen)
-                    .Resources(new MainPassResourceProvider(sys.GetFramebuffer(FB_Screen), mainCamera))
+                    .Target(FB_Game)
+                    .Resources(new MainPassResourceProvider(sys.GetFramebuffer(FB_Game), mainCamera))
                     .Render(MainRenderFunc)
+                    .Build()
+                )
+                .Pass(P_Copy, pass =>
+                    pass
+                    .Target(FB_Screen)
+                    .Dependency(P_Game)
+                    .Render((p, device, cl, set1) =>
+                    {
+                        cl.SetFramebuffer(p.Target.Framebuffer);
+                        cl.SetFullViewports();
+                        cl.SetFullScissorRects();
+                        cl.ClearColorTarget(0, RgbaFloat.Clear);
+                        quadRenderer.Render(copyQuad, cl, device, set1, null);
+                    })
                     .Build()
                 )
                 .Build()
@@ -108,7 +138,6 @@ public sealed class AlbionRenderSystem : Component, IDisposable
                 .Framebuffer(FB_Game, new SimpleFramebuffer(FB_Game, 360, 240))
                 .Component(C_GameWindow, new GameWindow(360, 240))
                 .Component(C_ImGui, new ImGuiManager((ImGuiRenderer)sys.GetRenderer(R_Debug)))
-                .Component("c_screenshot", new ScreenshotCaptureService())
                 .Action(() =>
                 {
                     var framebuffer = sys.GetFramebuffer(FB_Game);

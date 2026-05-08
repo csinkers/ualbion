@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UAlbion.Config;
 using UAlbion.Core;
 using UAlbion.Formats.Assets.Inv;
@@ -25,6 +26,13 @@ public class LogicalInventorySlot : UiElement
         {
             if (e.Id == _id.Id)
                 _version++;
+        });
+        On<SellQueueChangedEvent>(_ =>
+        {
+            if (_id.Id.Type != InventoryType.Player) return;
+            var im = TryResolve<IInventoryManager>();
+            if (im != null)
+                _visual.IsQueuedForSale = im.SellQueue.Contains(_id);
         });
 
         _id = id;
@@ -56,7 +64,7 @@ public class LogicalInventorySlot : UiElement
                 // Horneman ITEMLIST.C: Quantity==255 means infinite merchant stock → display "**".
                 // CLARIFY: Buy price = ItemData.Value / 10 Obols? Sell price = Value / 2?
                 // Needs verification against SR-output before implementing M2 (price display).
-                if (slotInfo.Amount == 255)
+                if (slotInfo.Amount == ItemSlot.Unlimited)
                     return [new TextBlock("**") { Alignment = TextAlignment.Right }];
                 return [new TextBlock(slotInfo.Amount.ToString()) { Alignment = TextAlignment.Right }]; // todo: i18n: Will need to be changed if we support a language that doesn't use Hindu-Arabic numerals.
             }, _ => _version);
@@ -77,13 +85,24 @@ public class LogicalInventorySlot : UiElement
             })
             .OnClick(() =>
             {
-                // M3: Left-click on merchant slot buys the item.
-                if (_id.Id.Type == InventoryType.Merchant)
-                {
-                    Raise(new InventorySellEvent(_id.Id, _id.Slot));
-                    return;
-                }
+                var im = Resolve<IInventoryManager>();
                 var inputBinder = Resolve<IInputBinder>();
+
+                // QoL: Ctrl+Click = direct sell; Alt+Click = queue for batch sell (merchant open).
+                if (_id.Id.Type == InventoryType.Player && im.ActiveMerchantId != null)
+                {
+                    if (inputBinder.IsCtrlPressed)
+                    {
+                        Raise(new InventorySellToMerchantEvent(_id.Id, _id.Slot));
+                        return;
+                    }
+                    if (inputBinder.IsAltPressed)
+                    {
+                        im.ToggleSellQueue(_id);
+                        return;
+                    }
+                }
+
                 if (inputBinder.IsCtrlPressed)
                     Raise(new InventoryPickupEvent(null, _id.Id, _id.Slot));
                 else if (inputBinder.IsShiftPressed)

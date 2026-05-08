@@ -60,9 +60,28 @@ public class PickSaveSlotMenu : ModalDialog
         return pathResolver.ResolvePath($"$(SAVES)/SAVE.{i:D3}");
     }
 
-    string BuildScreenshotFilename(ushort i) => BuildSaveFilename(i) + ".png";
-
     const int MaxSaveSlotWidth = 360;
+
+    static void AddPortraitThumbnail(List<IUiElement> row, IReadOnlyList<JsonPartyMemberInfo> partyMembers)
+    {
+        var portraits = new List<IUiElement>();
+        foreach (var pm in partyMembers)
+        {
+            if (pm.PortraitId == 0)
+                continue;
+
+            var sprite = new UiSpriteElement(new PortraitId(pm.PortraitId));
+            portraits.Add(new FixedSize(36, 38, sprite));
+        }
+
+        if (portraits.Count == 0)
+            return;
+
+        var stacker = new HorizontalStacker(portraits);
+        row.Add(new FixedSize(ThumbnailWidth, ThumbnailHeight, stacker));
+        row.Add(new Spacing(ThumbnailSpacing, 0));
+    }
+
     protected override void Subscribed()
     {
         var disk = Resolve<IFileSystem>();
@@ -80,6 +99,32 @@ public class PickSaveSlotMenu : ModalDialog
             });
 
         var buttons = new List<IUiElement>();
+
+        // In load mode, show quicksave (slot 0) at the top if it exists
+        if (!_showEmptySlots)
+        {
+            var qs_filename = BuildSaveFilename(0);
+            if (disk.FileExists(qs_filename))
+            {
+                string qsName;
+                List<JsonPartyMemberInfo> partyMembers = null;
+                try
+                {
+                    var dto = JsonSerializer.Deserialize<JsonSavedGame>(disk.ReadAllText(qs_filename), JsonSavedGame.JsonOptions);
+                    qsName = dto?.Name ?? "Quicksave";
+                    partyMembers = dto?.PartyMembers;
+                }
+                catch { qsName = "Quicksave"; }
+
+                var text = $" 0    {qsName}";
+                var row = new List<IUiElement>();
+                if (partyMembers is { Count: > 0 })
+                    AddPortraitThumbnail(row, partyMembers);
+                row.Add(new ConversationOption(new LiteralText(text), MaxSaveSlotWidth - ThumbnailWidth - ThumbnailSpacing, null, () => PickSlot(0)));
+                buttons.Add(new HorizontalStacker(row));
+            }
+        }
+
         for (ushort i = 1; i <= MaxSaveNumber; i++)
         {
             var filename = BuildSaveFilename(i);
@@ -87,23 +132,20 @@ public class PickSaveSlotMenu : ModalDialog
             {
                 var jsonText = disk.ReadAllText(filename);
                 string name;
+                List<JsonPartyMemberInfo> partyMembers = null;
                 try
                 {
                     var dto = JsonSerializer.Deserialize<JsonSavedGame>(jsonText, JsonSavedGame.JsonOptions);
                     name = dto?.Name ?? "Invalid";
+                    partyMembers = dto?.PartyMembers;
                 }
                 catch { name = "[Corrupt Save]"; }
                 var text = $"{i,2}    {name}";
                 ushort slotNumber = i;
 
                 var row = new List<IUiElement>();
-                var screenshotPath = BuildScreenshotFilename(i);
-                var thumbnailFactory = TryResolve<IScreenshotThumbnailFactory>();
-                if (disk.FileExists(screenshotPath) && thumbnailFactory != null)
-                {
-                    row.Add(thumbnailFactory.CreateThumbnail(screenshotPath, ThumbnailWidth, ThumbnailHeight));
-                    row.Add(new Spacing(ThumbnailSpacing, 0));
-                }
+                if (partyMembers is { Count: > 0 })
+                    AddPortraitThumbnail(row, partyMembers);
                 row.Add(new ConversationOption(new LiteralText(text), MaxSaveSlotWidth - ThumbnailWidth - ThumbnailSpacing, null, () => PickSlot(slotNumber)));
                 buttons.Add(new HorizontalStacker(row));
             }

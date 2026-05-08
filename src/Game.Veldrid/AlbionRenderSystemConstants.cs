@@ -14,6 +14,7 @@ public static class AlbionRenderSystemConstants
     public const string FB_Screen      = "fb_screen";
 
     // Render passes
+    public const string P_Copy         = "p_copy";
     public const string P_Debug        = "p_debug";
     public const string P_Game         = "p_game";
 

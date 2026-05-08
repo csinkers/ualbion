@@ -16,17 +16,21 @@ public class SelectSpellDialog : ModalDialog
     const int MaxVisibleSpells = 10;
     const int StrengthBarSegments = 10;
 
+    readonly List<KeyValuePair<SpellId, ushort>> _spellList;
+    readonly Action<SpellId> _onSelected;
+
     public SelectSpellDialog(IEnumerable<KeyValuePair<SpellId, ushort>> spells, Action<SpellId> onSelected, int depth = 0)
         : base(DialogPositioning.Center, depth)
     {
-        var spellList = spells.ToList();
+        _spellList = spells.ToList();
+        _onSelected = onSelected;
+    }
 
+    protected override void Subscribed()
+    {
         var rows = new List<Button>();
-        for (int i = 0; i < Math.Min(spellList.Count, MaxVisibleSpells); i++)
-        {
-            rows.Add(BuildSpellRow(spellList[i].Key, spellList[i].Value, onSelected));
-        }
-
+        for (int i = 0; i < Math.Min(_spellList.Count, MaxVisibleSpells); i++)
+            rows.Add(BuildSpellRow(_spellList[i].Key, _spellList[i].Value, _onSelected));
         AttachChild(new DialogFrame(new VerticalStacker(rows.ToArray()) { Greedy = false }));
     }
 

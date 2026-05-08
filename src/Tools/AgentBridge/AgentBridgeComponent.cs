@@ -22,6 +22,7 @@ using UAlbion.Formats.Assets.Save;
 using UAlbion.Formats.Assets.Sheets;
 using UAlbion.Formats.Ids;
 using UAlbion.Game.State;
+using UAlbion.Game.State.Player;
 using UAlbion.Game.Combat;
 using UAlbion.Game.Events;
 using UAlbion.Game.Events.Inventory;
@@ -783,6 +784,10 @@ public class AgentBridgeComponent : Component, IDisposable
 
         if (inv is not Inventory writableInv)
             return Error("not_supported", $"Inventory type {inv.GetType()} is not writable");
+
+        var inventoryManager = TryResolve<IInventoryManager>();
+        if (inventoryManager != null && !inventoryManager.CanEquipItem(invId, slotId, itemId))
+            return Error("invalid_slot", $"Item '{item}' cannot be equipped in slot '{slot}' by '{member}'");
 
         var itemSlot = writableInv.Slots[(int)slotId];
         itemSlot.Item = itemId;

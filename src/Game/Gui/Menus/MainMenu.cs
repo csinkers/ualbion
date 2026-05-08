@@ -4,6 +4,7 @@ using UAlbion.Core.Events;
 using UAlbion.Formats.Assets;
 using UAlbion.Game.Events;
 using UAlbion.Game.Gui.Controls;
+using UAlbion.Game.Gui.Dialogs;
 using UAlbion.Game.State;
 
 namespace UAlbion.Game.Gui.Menus;
@@ -94,11 +95,20 @@ public class MainMenu : Dialog
     {
         var menu = new PickSaveSlotMenu(true, Base.SystemText.MainMenu_SaveOnWhichPosition, 1);
         var exchange = Exchange;
-        menu.Closed += (_, _) =>
+        menu.Closed += (_, id) =>
         {
-            Attach(exchange);
-            // TODO: Prompt user for new save name
-            // Raise(new SaveGameEvent(filename, name));
+            if (!id.HasValue) { Attach(exchange); return; }
+            var slotId = id.Value;
+
+            var prompt = new TextPromptDialog(1, $"Save {slotId}");
+            prompt.Closed += (_, _) =>
+            {
+                Attach(exchange);
+                var name = prompt.Value;
+                if (name != null)
+                    Raise(new SaveGameEvent(slotId, name.Length > 0 ? name : $"Save {slotId}"));
+            };
+            Exchange.Attach(prompt);
         };
         Exchange.Attach(menu);
         Detach();

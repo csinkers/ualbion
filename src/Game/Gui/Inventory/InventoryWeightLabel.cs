@@ -39,11 +39,15 @@ public class InventoryWeightLabel : UiElement
             if (player == null)
                 return Array.Empty<TextBlock>();
 
+            bool overweight = player.Apparent.TotalWeight > player.Apparent.MaxWeight;
+
             // Carried Weight : %ld of %ld g
-            return Resolve<ITextFormatter>().Format(
-                Base.SystemText.Inv_CarriedWeightNdOfNdG,
-                player.Apparent.TotalWeight,
-                player.Apparent.MaxWeight).GetBlocks();
+            return Resolve<ITextFormatter>()
+                .Ink(overweight ? Base.Ink.Yellow : Base.Ink.White)
+                .Format(
+                    Base.SystemText.Inv_CarriedWeightNdOfNdG,
+                    player.Apparent.TotalWeight,
+                    player.Apparent.MaxWeight).GetBlocks();
         }, _ => _version);
 
         var source = new DynamicText(() =>
@@ -52,11 +56,14 @@ public class InventoryWeightLabel : UiElement
             if (player == null)
                 return Array.Empty<TextBlock>();
 
+            bool overweight = player.Apparent.TotalWeight > player.Apparent.MaxWeight;
+
             // Weight : %d Kg
             int weight = player.Apparent.TotalWeight / 1000;
             return Resolve<ITextFormatter>()
                 .NoWrap()
                 .Center()
+                .Ink(overweight ? Base.Ink.Yellow : Base.Ink.White)
                 .Format(Base.SystemText.Inv_WeightNKg, weight)
                 .GetBlocks();
         }, _ => _version);
